@@ -1,0 +1,97 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : VTKViewer
+# $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= VTKViewer_Actor.h \
+	 	VTKViewer_CellRectPicker.h \
+		VTKViewer_ExtractUnstructuredGrid.h \
+		VTKViewer_ConvexTool.h \
+	        VTKViewer_Filter.h \
+		VTKViewer_GeometryFilter.h \
+		VTKViewer_Algorithm.h \
+		VTKViewer.h \
+		VTKViewer_InteractorStyle.h \
+		VTKViewer_PassThroughFilter.h \
+		VTKViewer_RectPicker.h \
+		VTKViewer_RenderWindow.h \
+		VTKViewer_RenderWindowInteractor.h \
+		VTKViewer_ShrinkFilter.h \
+		VTKViewer_TransformFilter.h \
+		VTKViewer_Transform.h \
+		VTKViewer_Trihedron.h \
+		VTKViewer_Utilities.h \
+		VTKViewer_VectorText.h \
+		VTKViewer_ViewManager.h \
+		VTKViewer_ViewModel.h \
+		VTKViewer_ViewWindow.h \
+		VTKViewer_Functor.h
+
+PO_FILES = VTKViewer_images.po \
+	   VTKViewer_msg_en.po 
+		     
+# Libraries targets
+LIB = libVTKViewer.la
+
+LIB_SRC= VTKViewer_Actor.cxx \
+	 VTKViewer_CellRectPicker.cxx \
+	 VTKViewer_ExtractUnstructuredGrid.cxx \
+	 VTKViewer_Filter.cxx \
+	 VTKViewer_GeometryFilter.cxx \
+	 VTKViewer_InteractorStyle.cxx \
+	 VTKViewer_PassThroughFilter.cxx \
+	 VTKViewer_RectPicker.cxx \
+	 VTKViewer_RenderWindow.cxx \
+	 VTKViewer_RenderWindowInteractor.cxx \
+	 VTKViewer_ShrinkFilter.cxx \
+	 VTKViewer_Transform.cxx \
+	 VTKViewer_TransformFilter.cxx \
+	 VTKViewer_Trihedron.cxx \
+	 VTKViewer_Utilities.cxx \
+	 VTKViewer_VectorText.cxx \
+	 VTKViewer_ViewManager.cxx \
+	 VTKViewer_ViewModel.cxx \
+	 VTKViewer_ConvexTool.cxx \
+	 VTKViewer_ViewWindow.cxx 		
+  
+
+LIB_MOC = \
+	  VTKViewer_RenderWindow.h \
+	  VTKViewer_RenderWindowInteractor.h \
+	  VTKViewer_ViewManager.h \
+	  VTKViewer_ViewModel.h \
+	  VTKViewer_ViewWindow.h 
+ 
+RESOURCES_FILES = \
+	view_back.png \
+	view_bottom.png \
+	view_camera_dump.png \
+	view_fitall.png \
+	view_fitarea.png \
+	view_front.png \
+	view_glpan.png \
+	view_left.png \
+	view_pan.png \
+	view_reset.png \
+	view_right.png \
+	view_rotate.png \
+	view_top.png \
+	view_triedre.png \
+	view_zoom.png
+
+CPPFLAGS+=$(QT_INCLUDES) $(VTK_INCLUDES) $(OCC_INCLUDES)
+
+LDFLAGS+=$(VTK_LIBS) $(QT_MT_LIBS) $(CAS_KERNEL) -lsuit
+
+@CONCLUDE@
+
+

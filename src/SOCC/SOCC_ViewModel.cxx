@@ -1,0 +1,590 @@
+#include "SOCC_ViewModel.h"
+
+#include "SOCC_Prs.h"
+
+#include "SUIT_Session.h"
+#include "SUIT_Application.h"
+
+#include "ToolsGUI.h"
+
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOMEDS)
+
+#include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <Visual3d_View.hxx>
+
+#include <SALOME_AISShape.hxx>
+#include <SALOME_AISObject.hxx>
+
+#include <Utils_ORB_INIT.hxx>
+#include <Utils_SINGLETON.hxx>
+#include <SALOME_ModuleCatalog_impl.hxx>
+#include <SALOME_NamingService.hxx>
+
+#include "SALOMEDSClient.hxx"
+#include "SALOMEDS_StudyManager.hxx"
+
+// in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
+// SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
+// SALOMEDS::StudyManager - no linkage with SalomeApp. 
+
+static _PTR(Study) getStudyDS() 
+{
+  SALOMEDSClient_Study* aStudy = NULL;
+  _PTR(StudyManager) aMgr( new SALOMEDS_StudyManager() );
+
+  // get id of SUIT_Study, if it's a SalomeApp_Study, it will return
+  //    id of its underlying SALOMEDS::Study
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( !app )  return _PTR(Study)(aStudy); 
+  SUIT_Study* stud = app->activeStudy();
+  if ( !stud ) return _PTR(Study)(aStudy);  
+  const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
+  // get SALOMEDS_Study with this id from StudyMgr
+  return aMgr->GetStudyByID( id );
+}
+
+SOCC_Viewer::SOCC_Viewer( bool DisplayTrihedron )
+: OCCViewer_Viewer( DisplayTrihedron )
+{
+}
+
+SOCC_Viewer::~SOCC_Viewer()
+{
+}
+
+bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
+                             bool hilight, bool upd )
+{
+  bool isInLocal = getAISContext()->HasOpenedContext();
+  //SUIT_Study* ActiveStudy = SUIT_Application::getDesktop()->getActiveStudy();
+  //SALOME_Selection* Sel = SALOME_Selection::Selection( ActiveStudy->getSelection() );
+
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+  
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+      Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+    {
+      if ( !isInLocal )
+          OCCViewer_Viewer::highlight( ite.Value(), hilight, false );
+      // highlight subshapes only when local selection is active
+      else
+      {
+        /*if ( ite.Value()->IsKind( STANDARD_TYPE( SALOME_AISShape ) ) )
+        {
+          Handle(SALOME_AISShape) aSh = Handle(SALOME_AISShape)::DownCast( ite.Value() );
+          TColStd_IndexedMapOfInteger MapIndex;
+          Sel->GetIndex( IObject, MapIndex );
+          aSh->highlightSubShapes( MapIndex, highlight );
+        }*/
+      }
+      break;
+    }
+  }
+    
+  if( upd )
+    update();
+    
+  return false;
+}
+
+bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
+                              bool onlyInViewer )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+
+  if( !onlyInViewer ) {
+    AIS_ListOfInteractive List1;
+    getAISContext()->ObjectsInCollector(List1);
+    List.Append(List1);
+  }
+
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+      return true;
+  }
+  return false;
+}
+
+bool SOCC_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& obj )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects( List );
+
+  AIS_ListIteratorOfListOfInteractive ite( List );
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+      Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+      return getAISContext()->IsDisplayed( ite.Value() );
+  }
+  
+  return false;
+}
+
+void SOCC_Viewer::setColor( const Handle(SALOME_InteractiveObject)& obj,
+                            const QColor& color, bool update )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+  
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+    {
+      OCCViewer_Viewer::setColor( ite.Value(), color, update );
+      return;
+    }
+  }
+}
+
+void SOCC_Viewer::switchRepresentation( const Handle(SALOME_InteractiveObject)& obj,
+                                        int mode, bool update )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+  
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+    {
+      OCCViewer_Viewer::switchRepresentation( ite.Value(), mode, update );
+      return;
+    }
+  }
+}
+
+void SOCC_Viewer::setTransparency( const Handle(SALOME_InteractiveObject)& obj,
+                                   float trans, bool update )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects( List );
+  
+  AIS_ListIteratorOfListOfInteractive ite( List );
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+    {
+      OCCViewer_Viewer::setTransparency( ite.Value(), trans, update );
+      return;
+    }
+  }
+}
+
+void SOCC_Viewer::rename( const Handle(SALOME_InteractiveObject)& obj,
+                          const QString& name )
+{
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+  
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  while (ite.More())
+  {
+    if (ite.Value()->IsKind(STANDARD_TYPE(SALOME_AISShape)))
+    {
+      Handle(SALOME_AISShape) aSh = Handle(SALOME_AISShape)::DownCast(ite.Value());
+      
+      if ( aSh->hasIO() )
+      {
+        Handle(SALOME_InteractiveObject) IO = aSh->getIO();
+        if ( IO->isSame( obj ) )
+        {
+          aSh->setName( (char*)name.latin1() );
+          break;
+        }
+      }
+    }
+    else if ( ite.Value()->IsKind( STANDARD_TYPE( SALOME_AISObject ) ) )
+    {
+      Handle(SALOME_AISObject) aSh = Handle(SALOME_AISObject)::DownCast( ite.Value() );
+
+      // Add code here, if someone create a MODULE_AISObject.
+    }
+    ite.Next();
+  }
+}
+
+//=======================================================================
+// name    : Display
+// Purpose : Display presentation
+//=======================================================================
+void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
+{
+  // try do downcast object
+  const SOCC_Prs* anOCCPrs = dynamic_cast<const SOCC_Prs*>( prs );
+  if ( !anOCCPrs || anOCCPrs->IsNull() )
+    return;
+
+  // get SALOMEDS Study
+  _PTR(Study) study(getStudyDS());
+
+  // get context
+  Handle (AIS_InteractiveContext) ic = getAISContext();
+
+  // get all displayed objects
+  AIS_ListOfInteractive List;
+  ic->DisplayedObjects( List );
+  // get objects in the collector
+  AIS_ListOfInteractive ListCollector;
+  ic->ObjectsInCollector( ListCollector );
+
+  // get objects to be displayed
+  AIS_ListOfInteractive anAISObjects;
+  anOCCPrs->GetObjects( anAISObjects );
+
+  AIS_ListIteratorOfListOfInteractive aIter( anAISObjects );
+  for ( ; aIter.More(); aIter.Next() )
+  {
+    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
+    if ( !anAIS.IsNull() )
+    {
+      // try to find presentation in the viewer
+      bool bDisplayed = false;
+      AIS_ListIteratorOfListOfInteractive ite( List );
+      for ( ; ite.More(); ite.Next() )
+      {
+        // compare presentations by handles
+        // if the object is already displayed - nothing to do more
+        if ( ite.Value() == anAIS )
+        {
+          // Deactivate object if necessary
+          if ( !anOCCPrs->ToActivate() )
+            ic->Deactivate( anAIS );
+          bDisplayed = true;
+          break;
+        }
+      }
+
+      if ( bDisplayed )
+        continue;
+
+      // then try to find presentation in the collector
+      bDisplayed = false;
+      ite.Initialize( ListCollector );
+      for ( ; ite.More(); ite.Next() )
+      {
+        // compare presentations by handles
+        // if the object is in collector - display it
+        if ( ite.Value() == anAIS )
+        {
+          ic->DisplayFromCollector( anAIS, false );
+
+          // Deactivate object if necessary
+          if ( !anOCCPrs->ToActivate() )
+            ic->Deactivate( anAIS );
+          bDisplayed = true;
+
+          // Set visibility flag
+          Handle(SALOME_InteractiveObject) anObj =
+            Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
+          if ( !anObj.IsNull() && anObj->hasEntry() )
+          {
+	    if ( study )
+	      ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+          }
+
+          break;
+        }
+      }
+      if ( bDisplayed )
+        continue;
+
+      // if object is not displayed and not found in the collector - display it
+      if ( anAIS->IsKind( STANDARD_TYPE(AIS_Trihedron) ) )
+      {
+        Handle(AIS_Trihedron) aTrh = Handle(AIS_Trihedron)::DownCast( anAIS );
+        double aNewSize = 100, aSize = 100;
+        getTrihedronSize( aNewSize, aSize );
+        aTrh->SetSize( aTrh == getTrihedron() ? aNewSize : 0.5 * aNewSize );
+      }
+
+      ic->Display( anAIS, false );
+
+      // Set visibility flag
+      Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
+      if ( !anObj.IsNull() && anObj->hasEntry() )
+      {
+	if ( study  )
+	  ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+      }
+
+      // Deactivate object if necessary
+      if ( !anOCCPrs->ToActivate() )
+        ic->Deactivate( anAIS );
+    }
+  }
+}
+
+//=======================================================================
+// name    : Erase
+// Purpose : Erase presentation
+//=======================================================================
+void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
+{
+  // try do downcast object
+  const SOCC_Prs* anOCCPrs = dynamic_cast<const SOCC_Prs*>( prs );
+  if ( !anOCCPrs || anOCCPrs->IsNull() )
+    return;
+
+  // get SALOMEDS Study
+  _PTR(Study) study(getStudyDS());
+
+  // get context
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+
+  // get objects to be erased
+  AIS_ListOfInteractive anAISObjects;
+  anOCCPrs->GetObjects( anAISObjects );
+
+  AIS_ListIteratorOfListOfInteractive aIter( anAISObjects );
+  for ( ; aIter.More(); aIter.Next() ) {
+    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
+    if ( !anAIS.IsNull() ) {
+      // erase the object from context : move it to collector
+      ic->Erase( anAIS, false, forced ? false : true );
+
+      // Set visibility flag if necessary
+      if ( !forced )
+      {
+        Handle(SALOME_InteractiveObject) anObj =
+          Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
+        if ( !anObj.IsNull() && anObj->hasEntry() )
+        {
+	  if ( study )
+	    ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+        }
+      }
+    }
+  }
+}
+
+//=======================================================================
+// name    : EraseAll
+// Purpose : Erase all presentations
+//=======================================================================
+void SOCC_Viewer::EraseAll( const bool forced )
+{
+  // get SALOMEDS Study
+  _PTR(Study) study(getStudyDS());
+
+  // get context
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+
+  // check if trihedron is displayed
+  Standard_Boolean isTrihedronDisplayed = ic->IsDisplayed( getTrihedron() );
+
+  // get objects to be erased (all currently displayed objects)
+  AIS_ListOfInteractive aList;
+  ic->DisplayedObjects( aList );
+  AIS_ListIteratorOfListOfInteractive anIter( aList );
+  for ( ; anIter.More(); anIter.Next() ) {
+    if ( isTrihedronDisplayed && anIter.Value()->DynamicType() == STANDARD_TYPE( AIS_Trihedron ) )
+      continue;
+
+    // erase an object
+    Handle(AIS_InteractiveObject) anIO = anIter.Value();
+    ic->Erase( anIO, false, forced ? false : true );
+    
+    // Set visibility flag if necessary
+    if ( !forced ) {
+      Handle(SALOME_InteractiveObject) anObj =
+	Handle(SALOME_InteractiveObject)::DownCast( anIO->GetOwner() );
+
+      if ( !anObj.IsNull() && anObj->hasEntry() ) {
+	if ( study )
+	  ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+      }
+    }
+  }
+
+  // display trihedron if necessary
+  if ( isTrihedronDisplayed )
+    getAISContext()->Display( getTrihedron() );
+  else
+    Repaint();
+}
+
+//=======================================================================
+// name    : CreatePrs
+// Purpose : Create presentation corresponding to the entry
+//=======================================================================
+SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
+{
+  SOCC_Prs* prs = new SOCC_Prs();
+  if ( entry )
+  {
+    // get context
+    Handle(AIS_InteractiveContext) ic = getAISContext();
+
+    // get displayed objects
+    AIS_ListOfInteractive List;
+    ic->DisplayedObjects( List );
+    // get objects in the collector
+    AIS_ListOfInteractive ListCollector;
+    ic->ObjectsInCollector( ListCollector );
+    List.Append( ListCollector );
+
+    AIS_ListIteratorOfListOfInteractive ite( List );
+    for ( ; ite.More(); ite.Next() )
+    {
+      Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+      if ( !anObj.IsNull() && anObj->hasEntry() && strcmp( anObj->getEntry(), entry ) == 0 )
+        prs->AddObject( ite.Value() );
+    }
+  }
+  return prs;
+}
+
+//=======================================================================
+// name    : LocalSelection
+// Purpose : Activates selection of sub shapes
+//=======================================================================
+void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
+{
+  Handle(AIS_InteractiveContext) anIC = getAISContext();
+  
+  const SOCC_Prs* anOCCPrs = dynamic_cast<const SOCC_Prs*>( thePrs );
+  if ( anIC.IsNull() )
+    return;
+  
+  // Open local context if there is no one
+  bool allObjects = thePrs == 0 || thePrs->IsNull();
+  if ( !anIC->HasOpenedContext() ) {
+    anIC->ClearCurrents( false );
+    anIC->OpenLocalContext( allObjects, true, true );
+  }
+
+  AIS_ListOfInteractive anObjs;
+  // Get objects to be activated
+  if ( allObjects ) 
+    anIC->DisplayedObjects( anObjs );
+  else
+    anOCCPrs->GetObjects( anObjs );
+
+  // Activate selection of objects from prs
+  AIS_ListIteratorOfListOfInteractive aIter( anObjs );
+  for ( ; aIter.More(); aIter.Next() ) {
+    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
+    if ( !anAIS.IsNull() )
+    {
+      if ( anAIS->IsKind( STANDARD_TYPE( AIS_Shape ) ) )
+      {
+        anIC->Load( anAIS, -1, false );
+        anIC->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)theMode ) );
+      }
+      else if ( anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron) )
+      {
+        anIC->Load( anAIS, -1, false );
+        anIC->Activate( anAIS, theMode );
+      }
+    }
+  }
+}
+
+//=======================================================================
+// name    : GlobalSelection
+// Purpose : Deactivates selection of sub shapes
+//=======================================================================
+void SOCC_Viewer::GlobalSelection( const bool update ) const
+{
+  Handle(AIS_InteractiveContext) anIC = getAISContext();
+  if ( !anIC.IsNull() )
+    anIC->CloseAllContexts( false );
+  if ( update )
+    anIC->CurrentViewer()->Redraw();
+}
+
+//=======================================================================
+// name    : BeforeDisplay
+// Purpose : Axiluary method called before displaying of objects
+//=======================================================================
+void  SOCC_Viewer::BeforeDisplay( SALOME_Displayer* d )
+{
+  d->BeforeDisplay( this, SALOME_OCCViewType() );
+}
+
+//=======================================================================
+// name    : AfterDisplay
+// Purpose : Axiluary method called after displaying of objects
+//=======================================================================
+void SOCC_Viewer::AfterDisplay( SALOME_Displayer* d )
+{
+  d->AfterDisplay( this, SALOME_OCCViewType() );
+}
+
+//=======================================================================
+// name    : getTrihedronSize
+// Purpose : Get new and current trihedron size corresponding to the
+//           current model size
+//=======================================================================
+bool SOCC_Viewer::getTrihedronSize( double& theNewSize, double& theSize )
+{
+  theNewSize = 100;
+  theSize = 100;
+
+  Handle(V3d_View) view3d = getViewer3d()->ActiveView();
+
+  if ( view3d.IsNull() )
+    return false;
+
+  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
+  double aMaxSide;
+
+  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
+
+  if ( Xmin == RealFirst() || Ymin == RealFirst() || Zmin == RealFirst() ||
+       Xmax == RealLast()  || Ymax == RealLast()  || Zmax == RealLast() )
+    return false;
+
+  aMaxSide = Xmax - Xmin;
+  if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
+  if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+
+  float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("Viewer:TrihedronSize", 105.);
+
+  static float EPS = 5.0E-3;
+  theSize = getTrihedron()->Size();
+  theNewSize = aMaxSide*aSizeInPercents / 100.0;
+
+  return fabs( theNewSize - theSize ) > theSize * EPS ||
+         fabs( theNewSize - theSize) > theNewSize * EPS;
+}
+
+//=======================================================================
+// name    : Repaint
+// Purpose : 
+//=======================================================================
+void SOCC_Viewer::Repaint()
+{
+//  onAdjustTrihedron();
+  getViewer3d()->Update();
+}
+

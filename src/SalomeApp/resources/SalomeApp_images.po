@@ -1,0 +1,25 @@
+// File:      SalomeApp_images.po
+// Created:   November, 2004
+// Author:    OCC team
+// Copyright (C) CEA 2004
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2002-05-28 10:57:43 AM CEST\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+
+msgid "APP_LOGO_ICO"
+msgstr "icon_applogo.png"
+
+msgid "ABOUT_ICO"
+msgstr "icon_about.png"
+
+msgid "APP_DEFAULT_ICO"
+msgstr "icon_default.png"
+
+msgid "APP_MODULE_ICO"
+msgstr "icon_module.png"
+

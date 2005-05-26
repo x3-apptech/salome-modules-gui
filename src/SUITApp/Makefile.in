@@ -1,0 +1,41 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : suitApp
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= SUITApp_Application.h
+
+# .po files to transform in .qm
+PO_FILES = SUITApp_msg_en.po
+
+LIB_SRC= SUITApp.cxx \
+	 SUITApp_Application.cxx 
+
+LIB_MOC = SUITApp_Application.h
+
+# Libraries targets
+LIB = libSUITApp.la
+
+# Executables targets
+BIN = SUITApp
+BIN_SRC = 
+
+CPPFLAGS+=$(QT_INCLUDES) $(PYTHON_INCLUDES)
+
+LDFLAGS+=$(QT_MT_LIBS) 
+
+LIBS+= -Xlinker -export-dynamic $(PYTHON_LIBS)
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lqtx
+
+@CONCLUDE@
+
+

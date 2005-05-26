@@ -1,0 +1,58 @@
+#  File   : Makefile.in
+#  Author : Alexander Solovyov(OCN)
+#  Module : SVTK
+# $Header: /dn06/SALOME_CVS/GUI_SRC/src/SVTK/Makefile.in,v 1.1
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@
+
+
+@COMMENCE@
+
+# header files
+EXPORT_HEADERS= SVTK.h \
+		SVTK_Prs.h \
+		SVTK_Actor.h \
+		SVTK_Functor.h \
+		SVTK_ViewManager.h \
+		SVTK_ViewModel.h \
+		SVTK_ViewWindow.h \
+		SVTK_RenderWindow.h \
+		SVTK_InteractorStyle.h \
+		SVTK_RenderWindowInteractor.h \
+		SVTK_Selector.h SVTK_Selection.h
+
+# Libraries targets
+LIB = libSVTK.la
+
+LIB_SRC= 	SVTK_Prs.cxx \
+		SVTK_Actor.cxx \
+		SVTK_Trihedron.cxx \
+		SVTK_ViewManager.cxx \
+		SVTK_ViewModel.cxx \
+		SVTK_ViewWindow.cxx \
+		SVTK_RenderWindow.cxx \
+		SVTK_InteractorStyle.cxx \
+		SVTK_RenderWindowInteractor.cxx \
+		SVTK_Selector.cxx
+
+LIB_MOC = 	SVTK_RenderWindowInteractor.h \
+		SVTK_InteractorStyle.h \
+		SVTK_RenderWindow.h \
+		SVTK_ViewWindow.h \
+		SVTK_ViewModel.h \
+		SVTK_ViewManager.h
+
+LIB_CLIENT_IDL = SALOMEDS.idl \
+		 SALOME_Exception.idl \
+		 SALOME_ModuleCatalog.idl \
+		 SALOME_GenericObj.idl
+
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
+
+LDFLAGS+=$(QT_MT_LIBS) $(OCC_LIBS) $(VTK_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer -lOpUtil
+
+@CONCLUDE@

@@ -1,0 +1,125 @@
+#  File   : Makefile.in#  Author : Vladimir Klyachin (OCN)
+#  Module : suit
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+
+VPATH=.:@srcdir@:@srcdir@/resources
+
+@COMMENCE@
+
+# header files 
+
+EXPORT_HEADERS= Qtx.h \
+	 	QtxAction.h \
+		QtxColorScale.h \
+		QtxComboBox.h \
+		QtxDblSpinBox.h \
+		QtxDialog.h \
+		QtxDockAction.h \
+                QtxDockWindow.h \
+                QtxGroupBox.h \
+		QtxIntSpinBox.h \
+		QtxListAction.h \
+		QtxListBox.h \
+                QtxListOfOperations.h \
+		QtxMenuButton.h \
+		QtxMRUAction.h \
+		QtxOperations.h \
+		QtxPathDialog.h \
+                QtxPopupMgr.h \
+		QtxResourceMgr.h \
+                QtxStdOperations.h \
+		QtxToolBar.h \
+		QtxToolTip.h \
+		QtxParser.h \
+		QtxActionMgr.h \
+		QtxActionMenuMgr.h \
+		QtxActionToolMgr.h \
+                QtxMainWindow.h \
+		QtxWorkspaceAction.h \
+		QtxWorkstackAction.h \
+		QtxResourceEditor.h \
+		QtxWorkstack.h \
+		QtxListView.h
+
+# .po files to transform in .qm
+
+PO_FILES = \
+
+# Libraries targets
+
+LIB = libqtx.la
+
+LIB_SRC= \
+        Qtx.cxx \
+	QtxAction.cxx \
+	QtxColorScale.cxx \
+	QtxComboBox.cxx \
+	QtxDblSpinBox.cxx \
+	QtxDialog.cxx \
+	QtxDockAction.cxx \
+        QtxDockWindow.cxx \
+        QtxGroupBox.cxx \
+	QtxIntSpinBox.cxx \
+	QtxListAction.cxx \
+	QtxListBox.cxx \
+        QtxListOfOperations.cxx \
+	QtxMenuButton.cxx \
+	QtxMRUAction.cxx \
+	QtxPathDialog.cxx \
+        QtxPopupMgr.cxx \
+	QtxResourceMgr.cxx \
+        QtxStdOperations.cxx \
+	QtxToolBar.cxx \
+	QtxToolTip.cxx \
+	QtxOperations.cxx \
+	QtxParser.cxx \
+	QtxActionMgr.cxx \
+	QtxActionMenuMgr.cxx \
+	QtxActionToolMgr.cxx \
+        QtxMainWindow.cxx \
+	QtxWorkspaceAction.cxx \
+	QtxWorkstackAction.cxx \
+	QtxResourceEditor.cxx \
+	QtxWorkstack.cxx \
+	QtxListView.cxx
+
+LIB_MOC = \
+	QtxAction.h \
+        QtxColorScale.h \
+        QtxComboBox.h \
+        QtxDblSpinBox.h \
+        QtxDialog.h \
+        QtxDockAction.h \
+        QtxDockWindow.h \
+        QtxGroupBox.h \
+        QtxIntSpinBox.h \
+        QtxListAction.h \
+        QtxListBox.h \
+        QtxMenuButton.h \
+        QtxMRUAction.h \
+        QtxPathDialog.h \
+        QtxPopupMgr.h \
+	QtxToolBar.h \
+        QtxToolTip.h \
+	QtxActionMgr.h \
+	QtxActionMenuMgr.h \
+	QtxActionToolMgr.h \
+        QtxMainWindow.h \
+	QtxWorkspaceAction.h \
+	QtxWorkstackAction.h \
+	QtxWorkstack.h \
+	QtxListView.h
+
+RESOURCES_FILES = \
+
+CPPFLAGS+=$(QT_INCLUDES)
+
+LDFLAGS+=$(QT_MT_LIBS)
+
+@CONCLUDE@
+
+

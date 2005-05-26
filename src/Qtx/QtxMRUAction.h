@@ -1,0 +1,95 @@
+// File:      QtxMRUAction.h
+// Author:    Sergey TELKOV
+
+#ifndef QTXMRUACTION_H
+#define QTXMRUACTION_H
+
+#include "QtxAction.h"
+
+#include <qmap.h>
+#include <qstringlist.h>
+
+class QPopupMenu;
+class QtxResourceMgr;
+
+#ifdef WIN32
+#pragma warning( disable:4251 )
+#endif
+
+class QTX_EXPORT QtxMRUAction : public QtxAction
+{
+  Q_OBJECT
+
+public:
+  typedef enum { Items, SubMenu }                         PopupMode;
+  typedef enum { MoveFirst, MoveLast, AddFirst, AddLast } InsertMode;
+
+public:
+  QtxMRUAction( QObject* = 0, const char* = 0 );
+  QtxMRUAction( const QString&, const QString&, QObject*, const char* = 0 );
+  QtxMRUAction( const QString&, const QIconSet&, const QString&, QObject*, const char* = 0 );
+  virtual ~QtxMRUAction();
+
+  int          insertMode() const;
+  void         setInsertMode( const int );
+
+  int          popupMode() const;
+  void         setPopupMode( const int );
+
+  int          count() const;
+  bool         isEmpty() const;
+
+  int          visibleCount() const;
+  void         setVisibleCount( const int );
+
+  void         remove( const int );
+  void         remove( const QString& );
+  void         insert( const QString& );
+
+  QString      item( const int ) const;
+  int          find( const QString& ) const;
+  bool         contains( const QString& ) const;
+
+  virtual bool addTo( QWidget* );
+  virtual bool addTo( QWidget*, const int );
+
+  virtual bool removeFrom( QWidget* );
+
+  virtual void loadLinks( QtxResourceMgr*, const QString&, const bool = true );
+  virtual void saveLinks( QtxResourceMgr*, const QString&, const bool = true ) const;
+
+signals:
+  void         activated( QString );
+
+public slots:
+  virtual void setEnabled( bool );
+
+private slots:
+  void         onAboutToShow();
+  void         onActivated( int );
+  void         onDestroyed( QObject* );
+
+private:
+  void         updateState();
+  void         checkPopup( QPopupMenu* );
+  void         updatePopup( QPopupMenu*, const int );
+  bool         removeLinks( QPopupMenu*, const int );
+  bool         insertLinks( QPopupMenu*, const int, const int = -1 );
+
+  int          findId( QPopupMenu*, QPopupMenu* ) const;
+
+private:
+  typedef struct { int pId, nId; QIntList idList; } Item;
+  typedef QMap<QPopupMenu*, Item>                   ItemsMap;
+  typedef QMap<QPopupMenu*, QPopupMenu*>            MenusMap;
+
+private:
+  QStringList  myLinks;
+  ItemsMap     myItems;
+  MenusMap     myMenus;
+  int          myVisCount;
+  int          myPopupMode;
+  int          myInsertMode;
+};
+
+#endif

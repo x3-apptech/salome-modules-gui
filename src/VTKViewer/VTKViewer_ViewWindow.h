@@ -1,0 +1,109 @@
+#ifndef VTKVIEWER_VIEWWINDOW_H
+#define VTKVIEWER_VIEWWINDOW_H
+
+#include "VTKViewer.h"
+
+#include "SUIT_ViewWindow.h"
+
+#include "QtxAction.h"
+
+class vtkRenderer;
+class SUIT_Desktop;
+class VTKViewer_Viewer;
+class VTKViewer_Trihedron;
+class VTKViewer_Transform;
+class VTKViewer_RenderWindow;
+class VTKViewer_InteractorStyle;
+class VTKViewer_RenderWindowInteractor;
+class VTKViewer_Actor;
+
+#ifdef WIN32
+#pragma warning( disable:4251 )
+#endif
+
+class VTKVIEWER_EXPORT VTKViewer_ViewWindow : public SUIT_ViewWindow
+{
+  Q_OBJECT
+
+public:
+  VTKViewer_ViewWindow( SUIT_Desktop*, VTKViewer_Viewer*,
+                        VTKViewer_InteractorStyle* = 0,
+			VTKViewer_RenderWindowInteractor* = 0 );
+  virtual ~VTKViewer_ViewWindow();
+  
+  QToolBar*    getToolBar() { return myToolBar; }
+  
+  void         setBackgroundColor( const QColor& );
+  QColor       backgroundColor() const;
+
+  vtkRenderer*                      getRenderer()     { return myRenderer;     }
+  VTKViewer_RenderWindow*	    getRenderWindow() { return myRenderWindow; }
+  VTKViewer_RenderWindowInteractor* getRWInteractor() { return myRWInteractor; }
+  bool                              isTrihedronDisplayed();
+
+  void Repaint( bool theUpdateTrihedron = true );
+  void onAdjustTrihedron();
+  void GetScale( double theScale[3] );
+  void SetScale( double theScale[3] );
+  void AddActor( VTKViewer_Actor*, bool update = false );
+  void RemoveActor( VTKViewer_Actor*, bool update = false);
+
+public slots:
+  void onFrontView();
+  void onBackView();
+  void onTopView();
+  void onBottomView();
+  void onLeftView();
+  void onRightView();
+  void onResetView();
+  void onFitAll();
+  void onDumpView();
+  void activateZoom();
+  void activateWindowFit();
+  void activateRotation();
+  void activatePanning();
+  void activateGlobalPanning();
+
+protected slots:
+  void onKeyPressed(QKeyEvent* event);
+  void onKeyReleased(QKeyEvent* event);
+  void onMousePressed(QMouseEvent* event);
+  void onMouseDoubleClicked(QMouseEvent* event);
+  void onMouseReleased(QMouseEvent* event);
+  void onMouseMoving(QMouseEvent* event);
+
+private:
+  void                              InsertActor( VTKViewer_Actor* theActor,
+                                                 bool theMoveInternalActors = false );
+  void                              MoveActor( VTKViewer_Actor* theActor );
+
+private:
+  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId };
+  typedef QMap<int, QtxAction*> ActionsMap;
+  
+  void    createActions();
+  void    createToolBar();
+  
+  VTKViewer_Viewer*                 myModel;
+ 
+  vtkRenderer*                      myRenderer;
+  VTKViewer_RenderWindow*           myRenderWindow;
+  VTKViewer_RenderWindowInteractor* myRWInteractor;
+  
+  VTKViewer_Trihedron*              myTrihedron;  
+  VTKViewer_Transform*              myTransform;
+  
+  QToolBar*                         myToolBar;
+  ActionsMap                        myActionsMap;  
+  
+  double                            myCurScale;
+
+  friend class VTKViewer_RenderWindowInteractor;
+};
+
+#ifdef WIN32
+#pragma warning( default:4251 )
+#endif
+
+#endif

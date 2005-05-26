@@ -1,0 +1,23 @@
+//  File   : SalomeApp_Engine.idl
+//  Author : Alexander SLADKOV
+
+#ifndef __SalomeApp_Engine__
+#define __SalomeApp_Engine__
+
+#include "SALOME_Component.idl"
+#include "SALOMEDS.idl"
+
+module SalomeApp
+{
+
+  /*!
+   *  SalomeApp::Engine: special CORBA pseudo-engine for persistance needs of components
+   *  with no CORBA-based Engine.
+   */
+  interface Engine : Engines::Component, 
+                     SALOMEDS::Driver
+  {
+  };
+};
+
+#endif

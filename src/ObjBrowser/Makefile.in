@@ -1,0 +1,42 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : ObjectBrowser
+# $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= OB.h \
+		OB_Browser.h \
+		OB_ListItem.h \
+		OB_ListView.h \
+		OB_Filter.h
+		     
+# Libraries targets
+LIB = libObjBrowser.la
+
+LIB_SRC= OB_Browser.cxx \
+	 OB_ListItem.cxx \
+	 OB_ListView.cxx \
+	 OB_Filter.cxx
+
+LIB_MOC = OB_Browser.h \
+	  OB_ListView.h
+
+# .po files to transform in .qm
+PO_FILES = OB_msg_en.po
+
+CPPFLAGS+=$(QT_INCLUDES)
+
+LDFLAGS+=$(QT_MT_LIBS)
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit
+
+@CONCLUDE@
+
+

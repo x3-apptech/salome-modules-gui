@@ -1,0 +1,85 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : caf
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= GLViewer.h \
+		GLViewer_Context.h \
+		GLViewer_Defs.h \
+		GLViewer_Detector.h \
+		GLViewer_Drawer.h \
+		GLViewer_Group.h \
+		GLViewer_Object.h \
+		GLViewer_Selector.h \
+		GLViewer_Selector2d.h \
+		GLViewer_ViewFrame.h \
+		GLViewer_ViewManager.h \
+		GLViewer_ViewPort.h \
+		GLViewer_ViewPort2d.h \
+		GLViewer_Viewer.h \
+		GLViewer_Viewer2d.h \
+		GLViewer_Widget.h
+		     
+# .po files to transform in .qm
+PO_FILES = GLViewer_images.po \
+	   GLViewer_msg_en.po
+
+# Libraries targets
+LIB = libGLViewer.la
+
+LIB_SRC= GLViewer_Context.cxx \
+	 GLViewer_Detector.cxx \
+	 GLViewer_Drawer.cxx \
+	 GLViewer_Group.cxx \
+	 GLViewer_Object.cxx \
+	 GLViewer_Selector.cxx \
+	 GLViewer_Selector2d.cxx \
+	 GLViewer_ViewFrame.cxx \
+	 GLViewer_ViewManager.cxx \
+	 GLViewer_ViewPort.cxx \
+	 GLViewer_ViewPort2d.cxx \
+	 GLViewer_Viewer.cxx \
+	 GLViewer_Viewer2d.cxx \
+	 GLViewer_Widget.cxx
+
+LIB_MOC = GLViewer_Context.h \
+	GLViewer_Drawer.h \
+	GLViewer_Object.h \
+	GLViewer_Selector.h \
+	GLViewer_Selector2d.h \
+	GLViewer_ViewFrame.h \
+	GLViewer_ViewManager.h \
+	GLViewer_ViewPort.h \
+	GLViewer_ViewPort2d.h \
+	GLViewer_Viewer.h \
+	GLViewer_Viewer2d.h \
+	GLViewer_Widget.h
+
+RESOURCES_FILES = cursor_rotate.png \
+		  cursor_sketch.png \
+		  cursor_zoom.png \
+		  view_dump.png \
+		  view_fitall.png \
+		  view_fitarea.png \
+		  view_fitselect.png \
+		  view_glpan.png \
+		  view_pan.png \
+		  view_reset.png \
+		  view_zoom.png
+
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES)
+
+LDFLAGS+=$(QT_MT_LIBS) $(CAS_KERNEL)
+
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -L/usr/X11R6/lib -lGLU
+
+@CONCLUDE@

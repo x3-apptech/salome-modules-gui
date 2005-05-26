@@ -1,0 +1,9 @@
+
+msgid "APP_ERROR"
+msgstr "Error"
+
+msgid "APP_OK"
+msgstr "Ok"
+
+msgid "APP_UNK_EXCEPTION"
+msgstr "Unknown exception"

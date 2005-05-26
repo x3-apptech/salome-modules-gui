@@ -1,0 +1,44 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : CAM
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@
+
+
+@COMMENCE@
+
+EXPORT_HEADERS= CAM_Application.h \
+	 	CAM_DataModel.h \
+		CAM_DataObject.h \
+	        CAM.h \
+		CAM_Module.h \
+		CAM_Study.h \
+		CAM_RootObject.h
+		     
+LIB = libCAM.la
+
+LIB_SRC= CAM_Application.cxx \
+	 CAM_DataModel.cxx \
+	 CAM_DataObject.cxx \
+	 CAM_Module.cxx \
+	 CAM_Study.cxx \
+	 CAM_RootObject.cxx
+
+LIB_MOC = CAM_Application.h \
+	  CAM_Module.h \
+	  CAM_Study.h \
+	  CAM_DataModel.h
+
+CPPFLAGS+=$(QT_INCLUDES) 
+
+LDFLAGS+=$(QT_MT_LIBS)
+
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lstd
+
+@CONCLUDE@
+
+

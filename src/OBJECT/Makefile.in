@@ -1,0 +1,59 @@
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@top_srcdir@/idl
+
+
+@COMMENCE@
+
+EXPORT_HEADERS = SALOME_InteractiveObject.hxx \
+		 Handle_SALOME_InteractiveObject.hxx \
+		 SALOME_Actor.h \
+		 SALOME_GLOwner.h \
+		 SALOME_AISShape.hxx \
+		 Handle_SALOME_AISShape.hxx \
+		 SALOME_AISObject.hxx \
+		 Handle_SALOME_AISObject.hxx \
+		 SALOME_ListIO.hxx \
+		 SALOME_ListIteratorOfListIO.hxx \
+		 Handle_SALOME_ListNodeOfListIO.hxx \
+		 SALOME_ListNodeOfListIO.hxx \
+		 Handle_SALOME_Filter.hxx \
+		 SALOME_Filter.hxx \
+		 Handle_SALOME_TypeFilter.hxx \
+		 SALOME_TypeFilter.hxx \
+		 SALOME_DataMapOfIOMapOfInteger.hxx \
+		 SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger.hxx \
+		 Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx \
+		 SALOME_Selection.h
+
+
+# Libraries targets
+
+LIB = libSalomeObject.la
+LIB_SRC =	 SALOME_InteractiveObject.cxx \
+		 SALOME_Actor.cxx \
+		 SALOME_GLOwner.cxx \
+		 SALOME_AISShape.cxx\
+		 SALOME_AISObject.cxx\
+		 SALOME_ListIO_0.cxx \
+		 SALOME_ListIteratorOfListIO_0.cxx \
+		 SALOME_ListNodeOfListIO_0.cxx \
+		 SALOME_Filter.cxx \
+		 SALOME_TypeFilter.cxx \
+		 SALOME_DataMapOfIOMapOfInteger_0.cxx \
+		 SALOME_DataMapNodeOfDataMapOfIOMapOfInteger_0.cxx \
+		 SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger_0.cxx
+
+LIB_CLIENT_IDL =
+
+# Executables targets
+BIN = 
+BIN_SRC	=
+
+CPPFLAGS+=$(PYTHON_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(QT_INCLUDES) $(OGL_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
+LDFLAGS+= $(PYTHON_LIBS) $(VTK_LIBS) $(QT_LIBS) $(OGL_LIBS) $(CAS_LDPATH) -lTKV3d -lVTKViewer -lsuit
+
+
+@CONCLUDE@

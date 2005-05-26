@@ -1,0 +1,54 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : caf
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= CAF.h \
+		CAF_Application.h \
+		CAF_Operation.h \
+		CAF_Study.h \
+		CAF_Tools.h
+		     
+# .po files to transform in .qm
+PO_FILES = CAF_images.po \
+	   CAF_msg_en.po 
+
+# Libraries targets
+LIB = libcaf.la
+
+LIB_SRC= CAF_Application.cxx \
+	 CAF_Operation.cxx \
+	 CAF_Study.cxx \
+	 CAF_Tools.cxx 		
+
+LIB_MOC = \
+	CAF_Application.h \
+	CAF_Operation.h \
+	CAF_Study.h
+
+RESOURCES_FILES = \
+redo.png \
+undo.png
+
+
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) -I${QTDIR}/src/kernel -I$(QTDIR)/mkspecs/linux-g++
+
+LDFLAGS+=$(QT_MT_LIBS) $(CAS_KERNEL) $(CAS_OCAF)
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lstd
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit
+
+@CONCLUDE@
+
+
+
+
+

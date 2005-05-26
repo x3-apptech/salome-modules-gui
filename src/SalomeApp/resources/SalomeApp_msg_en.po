@@ -1,0 +1,103 @@
+// File:      CATHAREGUI_msg_en.po
+// Created:   10/25/2004 12:46:36 PM
+// Author:    Sergey LITONIN
+// Copyright (C) CEA 2004
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2002-02-22 16:56:46 CET\n"
+"PO-Revision-Date: 2004-02-17 11:17+0300\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+
+//=======================================================================================
+
+msgid "BUT_OK"
+msgstr "&OK"
+
+msgid "BUT_NEW"
+msgstr "&New"
+
+msgid "BUT_OPEN"
+msgstr "&Open"
+
+msgid "BUT_LOAD"
+msgstr "&Load"
+
+msgid "BUT_CANCEL"
+msgstr "&Cancel"
+
+//=======================================================================================
+
+msgid "SalomeApp_Application::OBJECT_BROWSER"
+msgstr "Object Browser"
+
+msgid "SalomeApp_Application::PYTHON_CONSOLE"
+msgstr "Python Console"
+
+msgid "SalomeApp_Application::DATA_MODELS"
+msgstr "Data models"
+
+msgid "SalomeApp_Application::NEW_WINDOW_0"
+msgstr "GL view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_1"
+msgstr "Plot2d view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_2"
+msgstr "OCC view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_3"
+msgstr "VTK view"
+
+msgid "SalomeApp_Application::APP_NAME"
+msgstr "SALOME"
+
+msgid "SalomeApp_Application::ABOUT"
+msgstr "About"
+
+msgid "SalomeApp_Application::APP_NAME_LONG"
+msgstr "GUI for SALOME platform v %1\nCopyright (c) CEA 2004"
+
+//=======================================================================================
+
+msgid "SalomeApp_Application::MEN_WINDOWS_NEW"
+msgstr "New window"
+
+msgid "SalomeApp_Application::MEN_VIEW_WNDS"
+msgstr "Windows"
+
+msgid "SalomeApp_Application::PRP_MODULE"
+msgstr "Switch to the module \"%1\""
+
+msgid "SalomeApp_Application::PRP_APP_MODULE"
+msgstr "Switch to SALOME platform neutral point"
+
+msgid "SalomeApp_Application::INF_TOOLBAR_MODULES"
+msgstr "Modules"
+
+msgid "SalomeApp_Application::INF_CANCELLED"
+msgstr "Module activation cancelled"
+
+//=======================================================================================
+
+msgid "SalomeApp_ModuleDlg::CAPTION"
+msgstr "Activate module"
+
+msgid "SalomeApp_ModuleDlg::NEW"
+msgstr "&New"
+
+msgid "SalomeApp_ModuleDlg::OPEN"
+msgstr "&Open"
+
+msgid "SalomeApp_ModuleDlg::LOAD"
+msgstr "&Load"
+
+msgid "SalomeApp_ModuleDlg::CANCEL"
+msgstr "&Cancel"
+
+msgid "SalomeApp_ModuleDlg::ActivateComponent_DESCRIPTION"
+msgstr "Create, open or load study."
+
+//=======================================================================================

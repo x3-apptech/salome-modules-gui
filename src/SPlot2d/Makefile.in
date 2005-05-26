@@ -1,0 +1,52 @@
+# source path
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@top_srcdir@/idl
+
+
+@COMMENCE@
+
+EXPORT_HEADERS = \
+           SPlot2d.h \
+           SPlot2d_Curve.h \
+           SPlot2d_CurveContainer.h \
+	   SPlot2d_Prs.h \
+	   SPlot2d_ViewModel.h
+
+# .po files to transform in .qm
+#PO_FILES = \
+
+# Libraries targets
+
+LIB = libSPlot2d.la
+LIB_SRC = 	  \
+           SPlot2d_Curve.cxx \
+           SPlot2d_CurveContainer.cxx \
+	   SPlot2d_Prs.cxx \
+	   SPlot2d_ViewModel.cxx
+
+#LIB_MOC = \
+#           Plot2d.h \
+#           Plot2d_ViewFrame.h \
+#           Plot2d_SetupViewDlg.h \
+#           Plot2d_SetupPlot2dDlg.h \
+#           Plot2d_FitDataDlg.h
+
+LIB_CLIENT_IDL = SALOMEDS.idl \
+		 SALOME_ModuleCatalog.idl \
+		 SALOME_Component.idl \
+		 SALOME_ContainerManager.idl \
+		 SALOME_Exception.idl \
+		 SALOME_GenericObj.idl
+
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(OGL_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
+LDFLAGS+=$(QT_MT_LIBS) $(OGL_LIBS) $(QWT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit  
+
+
+@CONCLUDE@
+
+
+
+
+

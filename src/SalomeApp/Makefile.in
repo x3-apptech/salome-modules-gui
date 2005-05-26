@@ -1,0 +1,103 @@
+#  File   : Makefile.in
+#  Author : Vladimir Klyachin (OCN)
+#  Module : SalomeApp
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= SalomeApp.h \
+		SalomeApp_Application.h \
+		SalomeApp_DataModel.h \
+		SalomeApp_DataObject.h \
+		SalomeApp_DataOwner.h \
+		SalomeApp_OCCSelector.h \
+		SalomeApp_VTKSelector.h \
+		SalomeApp_OBSelector.h \
+		SalomeApp_GLSelector.h \
+		SalomeApp_Module.h \
+		SalomeApp_Study.h \
+		SalomeApp_WidgetContainer.h \
+		SalomeApp_ExceptionHandler.h \
+		SalomeApp_RootObject.h \
+		SalomeApp_SelectionMgr.h \
+                SalomeApp_EventFilter.h \
+		SalomeApp_ResourceEditor.h \
+		SalomeApp_Tools.h \
+		SalomeApp_NameDlg.h \
+		SalomeApp_ImportOperation.h \
+		SalomeApp_DataSubOwner.h \
+                SalomeApp_Selection.h
+
+# .po files to transform in .qm
+PO_FILES = SalomeApp_images.po \
+	   SalomeApp_msg_en.po
+
+# Libraries targets
+LIB = libSalomeApp.la
+
+LIB_SRC= SalomeApp_Application.cxx \
+	 SalomeApp_DataModel.cxx \
+	 SalomeApp_DataObject.cxx \
+	 SalomeApp_DataOwner.cxx \
+	 SalomeApp_OCCSelector.cxx \
+	 SalomeApp_VTKSelector.cxx \
+	 SalomeApp_OBSelector.cxx \
+	 SalomeApp_GLSelector.cxx \
+	 SalomeApp_Module.cxx \
+	 SalomeApp_Study.cxx \
+	 SalomeApp_WidgetContainer.cxx \
+	 SalomeApp_ExceptionHandler.cxx \
+	 SalomeApp_SelectionMgr.cxx \
+         SalomeApp_EventFilter.cxx \
+	 SalomeApp_ResourceEditor.cxx \
+	 SalomeApp_PyInterp.cxx \
+	 SalomeApp_Tools.cxx \
+	 SalomeApp_NameDlg.cxx \
+	 SalomeApp_ImportOperation.cxx \
+	 SalomeApp_DataSubOwner.cxx \
+	 SalomeApp_ModuleDlg.cxx \
+         SalomeApp_Selection.cxx
+
+LIB_MOC = SalomeApp_Application.h \
+	  SalomeApp_DataModel.h \
+	  SalomeApp_OBSelector.h \
+	  SalomeApp_OCCSelector.h \
+	  SalomeApp_VTKSelector.h \
+	  SalomeApp_GLSelector.h \
+	  SalomeApp_Module.h \
+	  SalomeApp_Study.h \
+          SalomeApp_SelectionMgr.h \
+	  SalomeApp_WidgetContainer.h \
+	  SalomeApp_ResourceEditor.h \
+	  SalomeApp_NameDlg.h \
+	  SalomeApp_ModuleDlg.h
+
+LIB_CLIENT_IDL = SALOMEDS.idl \
+		 SALOME_Exception.idl \
+		 SALOME_GenericObj.idl
+
+RESOURCES_FILES = icon_about.png \
+		  icon_applogo.png \
+                  icon_default.png \
+                  icon_module.png \
+		  SalomeApp.ini \
+		  SalomeApp.xml
+
+CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
+
+LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS) 
+LIBS+= -L$(GUI_ROOT_DIR)/lib/salome -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole
+
+@CONCLUDE@
+
+
+
+
+

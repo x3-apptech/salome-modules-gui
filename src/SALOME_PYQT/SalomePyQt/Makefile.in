@@ -1,0 +1,93 @@
+#  Copyright (C) 2003  CEA/DEN, EDF R&D
+#
+#
+#
+#  File   : Makefile.in
+#  Author : Nicolas REJNERI
+#  Module : SALOME
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@top_srcdir@/idl
+
+
+@COMMENCE@
+
+# small trick for Mandrake-10.1: PyQt 3.13 does not support Qt 3.3.3
+ifeq ($(QT_VERS),Qt_3_3_3)
+QT_VERS = Qt_3_3_0
+endif
+
+# Sip flags
+SIP_FLAGS = -t WS_X11 -t $(QT_VERS) -s ".cc" -c . -I $(PYQT_SIPS)
+# Sip common sources
+SIP_SRC = sipSalomePyQtSalomePyQt.cc \
+	  sipSalomePyQtSALOME_Selection.cc
+
+# Sip version-specific sources
+ifeq ($(SIP_VERS),v4)
+SIP_SRC  += sipSalomePyQtcmodule.cc
+else
+SIP_SRC  += SalomePyQtcmodule.cc
+endif
+
+# Sip/moc sources
+ifeq ($(SIP_VERS),v4)
+MOC_SRC   = sipSalomePyQtcmodule_moc.cxx
+MOC_H     = sipSalomePyQtcmodule.h
+else 
+ifeq ($(SIP_VERS),v3_new)
+MOC_SRC   = SalomePyQtcmodule_moc.cxx
+MOC_H     = SalomePyQtcmodule.h
+else
+MOC_SRC   = sipSalomePyQtProxySalomePyQt_moc.cxx
+MOC_H     = sipSalomePyQtProxySalomePyQt.h
+endif
+endif
+
+# Sip definition files
+ifeq ($(SIP_VERS),v4)
+SIP_FILES = SalomePyQt_v4.sip
+else
+SIP_FILES = SalomePyQt.sip
+endif 
+
+# Libraries targets
+ifeq ($(SIP_VERS),v4)
+LIB = SalomePyQt.so
+else
+LIB = libSalomePyQtcmodule.la
+endif 
+
+# Exported python scripts
+ifneq ($(SIP_VERS),v4)
+EXPORT_SHAREDPYSCRIPTS = SalomePyQt.py
+endif
+
+# Library sources
+LIB_SRC = SalomePyQt.cxx \
+          $(SIP_SRC)     \
+          $(MOC_SRC) 
+
+# Library moc sources
+LIB_MOC = SalomePyQt.h
+
+# Client IDL
+LIB_CLIENT_IDL = SALOME_Exception.idl SALOME_GenericObj.idl
+
+# Compilation/linkage flags
+CPPFLAGS += $(QT_INCLUDES) $(PYTHON_INCLUDES) $(SIP_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(OGL_INCLUDES) $(BOOST_CPPFLAGS) -DHAVE_CONFIG_H -I${KERNEL_ROOT_DIR}/include/salome
+LIBS     += $(PYTHON_LIBS) $(SIP_LIBS) $(PYQT_LIBS) $(VTK_LIBS) $(OGL_LIBS)
+LDFLAGS  += -lsuit -lCAM -lstd -lqtx -lSalomeApp -lEvent -lLogWindow -lVTKViewer -lToolsGUI -L${KERNEL_ROOT_DIR}/lib/salome -lSalomeDS
+
+
+# Custom build step: generate C++ wrapping according to $(SIP_FILES)
+$(SIP_SRC): $(SIP_FILES)
+	$(SIP) $(SIP_FLAGS) $<
+
+$(MOC_SRC): $(MOC_H)
+	$(MOC) $< -o $@
+
+@CONCLUDE@

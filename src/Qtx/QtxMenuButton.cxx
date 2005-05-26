@@ -1,0 +1,310 @@
+// File:      QtxMenuButton.cxx
+// Author:    Sergey TELKOV
+
+#include "QtxMenuButton.h"
+
+#include <qstyle.h>
+#include <qpainter.h>
+#include <qpopupmenu.h>
+#include <qpointarray.h>
+#include <qapplication.h>
+
+class QtxMenuButton::PopupMenu : public QPopupMenu
+{
+public:
+    PopupMenu( QtxMenuButton* mb ) : QPopupMenu( mb ), myMenuButton( mb ) {};
+    virtual ~PopupMenu() {};
+
+    virtual void setMinimumSize( int, int );
+
+private:
+    QtxMenuButton* myMenuButton;
+};
+
+void QtxMenuButton::PopupMenu::setMinimumSize( int w, int h )
+{
+    if ( myMenuButton->isAlignWidth() &&
+         ( myMenuButton->position() == Top || myMenuButton->position() == Bottom ) )
+        w = QMAX( w, myMenuButton->width() );
+
+    QPopupMenu::setMinimumSize( w, h );
+}
+
+
+QtxMenuButton::QtxMenuButton( int pos, QWidget* parent, const char* name )
+: QPushButton( parent, name ),
+myPos( pos )
+{
+	initialize();
+}
+
+QtxMenuButton::QtxMenuButton( const QString& text, QWidget* parent, const char* name )
+: QPushButton( parent, name ),
+myPos( Bottom )
+{
+	setText( text );
+	initialize();
+}
+
+QtxMenuButton::QtxMenuButton( int pos, const QString& text, QWidget* parent, const char* name )
+: QPushButton( parent, name ),
+myPos( pos )
+{
+	setText( text );
+	initialize();
+}
+
+QtxMenuButton::QtxMenuButton( QWidget* parent, const char* name )
+: QPushButton( parent, name ),
+myPos( Bottom )
+{
+	initialize();
+}
+
+QtxMenuButton::~QtxMenuButton()
+{
+}
+
+void QtxMenuButton::initialize()
+{
+	myArrow = true;
+    myAlign = true;
+
+	setAutoDefault( false );
+	myPopup = new PopupMenu( this );
+    myPopup->hide();
+
+	connect( myPopup, SIGNAL( activated( int ) ), this, SIGNAL( activated( int ) ) );
+	connect( this, SIGNAL( clicked() ), this, SLOT( onShowPopup() ) );
+}
+
+int QtxMenuButton::position() const
+{
+	return myPos;
+}
+
+bool QtxMenuButton::isAlignWidth() const
+{
+    return myAlign;
+}
+
+bool QtxMenuButton::isArrowEnabled() const
+{
+	return myArrow;
+}
+
+void QtxMenuButton::setPosition( const int pos )
+{
+	if ( myPos == pos )
+		return;
+
+    myPos = pos;
+    if ( myPopup->isVisible() )
+        onShowPopup();
+}
+
+void QtxMenuButton::setAlignWidth( const bool on )
+{
+    if ( myAlign == on )
+        return;
+
+    myAlign = on;
+    updateGeometry();
+}
+
+void QtxMenuButton::setArrowEnabled( const bool on )
+{
+	if ( myArrow == on )
+		return;
+
+    myArrow = on;
+    repaint();
+}
+
+void QtxMenuButton::clear()
+{
+	if ( myPopup )
+		myPopup->clear();
+	onShowPopup();
+	updateGeometry();
+}
+
+void QtxMenuButton::removeItem( int id )
+{
+	if ( myPopup )
+		removeItem( id );
+	updateGeometry();
+}
+
+int QtxMenuButton::insertSeparator( int id )
+{
+	int res = -1;
+	if ( myPopup )
+		res = myPopup->insertSeparator( id );
+    return res;
+}
+
+int QtxMenuButton::insertItem( const QString& t, int id, int index )
+{
+	int resId = -1;
+	if ( myPopup )
+		resId = myPopup->insertItem( t, id, index );
+
+	if ( resId != -1 )
+		updateGeometry();
+
+	return resId;
+}
+
+int QtxMenuButton::insertItem( const QIconSet& is, const QString& t, int id, int index )
+{
+	int resId = -1;
+	if ( myPopup )
+		resId = myPopup->insertItem( is, t, id, index );
+
+	if ( resId != -1 )
+		updateGeometry();
+
+	return resId;
+}
+
+void QtxMenuButton::onShowPopup()
+{
+	if ( !myPopup || !myPopup->count() )
+	{
+		myPopup->hide();
+		return;
+	}
+
+	QPoint p = mapToGlobal( QPoint( 0, 0 ) );
+	int x = p.x();
+	int y = p.y() + 1;
+	int margin = 0;
+	int xoffset = 0;
+	int yoffset = 0;
+	switch ( position() )
+	{
+	case Left:
+		xoffset = -1 * ( myPopup->sizeHint().width() + margin );
+		break;
+	case Right:
+		xoffset = width() + margin;
+		break;
+	case Top:
+		yoffset = -1 * ( myPopup->sizeHint().height() + margin );
+		break;
+	case Bottom:
+	default:
+		yoffset = height() + margin;
+		break;
+	}
+	int dw = QApplication::desktop()->width();
+	int dh = QApplication::desktop()->height();
+	x = QMIN( QMAX( x + xoffset, 0 ), dw );
+	y = QMIN( QMAX( y + yoffset, 0 ), dh );
+
+	myPopup->exec( QPoint( x, y ) );
+}
+
+bool QtxMenuButton::event( QEvent* e )
+{
+	if ( e->type() == QEvent::MouseButtonPress ||
+		 e->type() == QEvent::MouseButtonDblClick ||
+		 e->type() == QEvent::MouseButtonRelease )
+	{
+		onShowPopup();
+		return false;
+	}
+
+	return QPushButton::event( e );
+}
+
+QSize QtxMenuButton::sizeHint() const
+{
+	QSize sz = QPushButton::sizeHint();
+	if ( ( position() == Top || position() == Bottom ) && myPopup && myAlign )
+		sz = QSize( QMAX( sz.width(), myPopup->sizeHint().width() ), sz.height() );
+
+	return sz;
+}
+
+QSize QtxMenuButton::minimumSizeHint() const
+{
+	QSize sz = QPushButton::minimumSizeHint();
+	if ( ( position() == Top || position() == Bottom ) && myPopup && myAlign )
+		sz = QSize( QMAX( sz.width(), myPopup->sizeHint().width() ), sz.height() );
+
+	return sz;
+}
+
+void QtxMenuButton::resizeEvent( QResizeEvent* re )
+{
+	if ( re )
+		QPushButton::resizeEvent( re );
+
+	if ( ( position() == Top || position() == Bottom ) && myPopup && myAlign )
+        myPopup->setMinimumWidth( re ? re->size().width() : width() );
+}
+
+QPopupMenu* QtxMenuButton::popup() const
+{
+    return myPopup;
+}
+
+void QtxMenuButton::drawButtonLabel( QPainter* p )
+{
+    QPushButton::drawButtonLabel( p );
+/*
+	QStyle::SFlags flags = QStyle::Style_Default;
+	if ( isEnabled() )
+		flags |= QStyle::Style_Enabled;
+	if ( hasFocus() )
+		flags |= QStyle::Style_HasFocus;
+*/
+#if QT_VER < 3
+    QRect r = rect();
+#else
+	QRect r = style().subRect( QStyle::SR_PushButtonContents, this );
+#endif
+
+	if ( myArrow && myPopup && myPopup->count() )
+	{
+		int w = 7;
+		int h = 7;
+		int margin = 5;
+
+		QRect ar( 0, 0, w, h );
+		if ( position() == Left || position() == Top )
+			r.moveBy( ar.width() + 2 * margin, 0 );
+		else
+			ar.moveBy( r.width() - ar.width() - 2 * margin, 0 );
+
+		r.setWidth( r.width() - ar.width() - 2 * margin );
+    
+		ar.moveBy( margin, ( height() - h ) / 2 );
+
+		QPointArray arrow( 3 );
+		switch ( position() )
+		{
+		case Left:
+			arrow.putPoints( 0, 3, ar.left(), ar.top() + ar.height() / 2, ar.right(), ar.top(), ar.right(), ar.bottom() );
+			break;
+		case Right:
+			arrow.putPoints( 0, 3, ar.left(), ar.top(), ar.left(), ar.bottom(), ar.right(), ar.top() + ar.height() / 2 );
+			break;
+		case Top:
+			arrow.putPoints( 0, 3, ar.left(), ar.bottom(), ar.right(), ar.bottom(), ar.left() + ar.width() / 2, ar.top() );
+			break;
+		case Bottom:
+		default:
+			arrow.putPoints( 0, 3, ar.left(), ar.top(), ar.right(), ar.top(), ar.left() + ar.width() / 2, ar.bottom() );
+			break;
+		}
+
+		p->setPen( colorGroup().text() );
+		p->setBrush( colorGroup().text() );
+		p->drawPolygon( arrow, true );
+	}
+
+//	style().drawControl( QStyle::CE_PushButtonLabel, p, this, r, colorGroup(), flags );
+}

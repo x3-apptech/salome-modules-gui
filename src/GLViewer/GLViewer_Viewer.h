@@ -1,0 +1,214 @@
+// File:      GLViewer_Viewer.h
+// Created:   November, 2004
+// Author:    OCC team
+// Copyright (C) CEA 2004
+
+/***************************************************************************
+**  Class:   GLViewer_Viewer
+**  Descr:   Viewer for QAD-based application
+**  Module:  QAD
+**  Created: UI team, 05.09.00
+****************************************************************************/
+#ifndef GLVIEWER_VIEWER_H
+#define GLVIEWER_VIEWER_H
+
+#include "GLViewer_Defs.h"
+#include "GLViewer_ViewFrame.h"
+#include <SUIT_ViewModel.h>
+
+#include <qlist.h>
+#include <qcursor.h>
+#include <qobject.h>
+#include <qpixmap.h>
+
+class GLViewer_Selector;
+class GLViewer_ViewSketcher;
+class GLViewer_ViewTransformer;
+
+class SUIT_Desktop;
+class SUIT_ViewWindow;
+
+#ifdef WNT
+#pragma warning( disable:4251 )
+#endif
+
+class GLVIEWER_EXPORT GLViewer_Viewer: public SUIT_ViewModel
+{
+    Q_OBJECT
+
+public:
+    enum SelectionMode { NoSelection, Single, Multiple };
+    enum TransformType { NoTransform, Reset, FitAll, FitRect, FitSelect,
+                         Zoom, PanGlobal, Pan, Rotate, UserTransform = 100 };
+    enum SketchingType { NoSketching, Rect, UserSketching = 100 };
+
+public:
+    GLViewer_Viewer( const QString& title );
+    ~GLViewer_Viewer();
+
+public:
+    virtual void                 setViewManager( SUIT_ViewManager* theViewManager );
+    virtual QString              getType() const { return Type(); }
+    static QString               Type() { return "GLViewer_ViewModel";  }
+
+public:
+    void                         setSelectionMode( SelectionMode );
+    SelectionMode                getSelectionMode() const;
+    GLViewer_Selector*           getSelector() const;
+
+    virtual void                 update( int = 0 );
+
+    void                         activateTransform( int );
+    void                         activateSketching( int );
+
+    GLViewer_ViewFrame*          getActiveView() const;
+
+signals:
+    void                         selectionChanged( SelectionChangeStatus );
+
+protected:
+    virtual void                 onSketchingStarted();
+    virtual void                 onSketchingFinished();
+    virtual void                 onTransformationStarted();
+    virtual void                 onTransformationFinished();
+    virtual void                 onSelectionModeChanged();
+
+    virtual void                 unhilightDetected();
+    virtual bool                 eventFilter( QObject*, QEvent* );
+
+    /* virtual constructors */
+    virtual GLViewer_ViewTransformer* createTransformer( int );
+    virtual GLViewer_ViewSketcher*    createSketcher( int );
+    virtual GLViewer_Selector*        createSelector();
+
+    virtual void                 startOperations( QMouseEvent* ) {}
+    virtual bool                 updateOperations( QMouseEvent* ) { return false; }
+    virtual void                 finishOperations( QMouseEvent* ) {}
+    virtual void                 startOperations( QWheelEvent* ) {}
+
+protected slots:
+    virtual void                 onKeyEvent( SUIT_ViewWindow*, QKeyEvent* );
+    virtual void                 onMouseEvent( SUIT_ViewWindow*, QMouseEvent* );
+    virtual void                 onWheelEvent( SUIT_ViewWindow*, QWheelEvent* );
+
+    virtual void                 onSelectionCancel();
+    virtual void                 onSelectionDone( bool add, SelectionChangeStatus status );
+
+private:
+    void                         handleMouseMove( QMouseEvent* );
+    void                         handleMousePress( QMouseEvent* );
+    void                         handleMouseRelease( QMouseEvent* );
+    void                         handleWheel( QWheelEvent* );
+
+protected:
+    GLViewer_Selector*           mySelector;        /* selector */
+    SelectionMode                mySelMode;         /* current selection mode */
+    GLViewer_ViewSketcher*       mySketcher;        /* sketch manipulator */
+    GLViewer_ViewTransformer*    myTransformer;     /* transform manipulator */
+};
+
+/****************************************************************
+**  Class: GLViewer_ViewTransformer
+**
+*****************************************************************/
+class GLVIEWER_EXPORT GLViewer_ViewTransformer : public QObject
+{
+public:
+    GLViewer_ViewTransformer( GLViewer_Viewer*, int type );
+    ~GLViewer_ViewTransformer();
+
+public:
+    /*! Returns transformer type */
+    int                          type() const;
+
+    /*! Sets/returns acceleration key ( CTRL by default ) */
+    static int                   accelKey() { return acccelKey; }
+    static void                  setAccelKey( int k ) { acccelKey = k; }
+
+    /*! Sets/returns mouse button used for zooming ( MB1 by default ) */
+    static int                   zoomButton() { return zoomBtn; }
+    static void                  setZoomButton( int b ) { zoomBtn = b; }
+
+    /*! Sets/returns mouse button used for panning ( MB2 by default ) */
+    static int                   panButton() { return panBtn; }
+    static void                  setPanButton( int b ) { panBtn = b; }
+
+    /*! Sets/returns mouse button used for global pan ( MB1 by default ) */
+    static int                   panGlobalButton() { return panGlobalBtn; }
+    static void                  setPanGlobalButton( int b ) { panGlobalBtn = b; }
+
+    /*! Sets/returns mouse button used for fit area ( MB1 by default ) */
+    static int                   fitRectButton() { return fitRectBtn; }
+    static void                  setFitRectButton( int b ) { fitRectBtn = b; }
+
+    virtual void                 exec();
+    virtual bool                 eventFilter( QObject*, QEvent* );
+
+protected:
+    enum TransformState { Debut, EnTrain, Fin };
+    virtual void                 onTransform( TransformState );
+    void                         initTransform( bool );
+
+protected:
+    static int                   panBtn;
+    static int                   zoomBtn;
+    static int                   fitRectBtn;
+    static int                   panGlobalBtn;
+
+    static int                   acccelKey;
+
+    GLViewer_Viewer*             myViewer;
+    int                          myType;
+    QCursor                      mySavedCursor;
+    bool                         mySavedMouseTrack;
+    QPoint                       myStart, myCurr;
+    int                          myButtonState;
+    QRect                        myDrawRect;
+    int                          myMajorBtn;
+};
+
+/****************************************************************
+**  Class: GLViewer_ViewSketcher
+**
+*****************************************************************/
+class GLVIEWER_EXPORT GLViewer_ViewSketcher : public QObject
+{
+public:
+    GLViewer_ViewSketcher( GLViewer_Viewer*, int type );
+    ~GLViewer_ViewSketcher();
+
+public:
+    /*! Returns sketcher type */
+    int                          type() const { return myType; }
+
+    /*! Returns result of sketching */
+    void*                        data() const { return myData; }
+
+    /*! Returns current state of mouse/sys kbd buttons */
+    int                          buttonState() const { return myButtonState; }
+
+    /*! Sets/returns mouse button used for sketching ( MB1 by default ) */
+    static int                   sketchButton() { return sketchBtn; }
+    static void                  setSketchButton( int b ) { sketchBtn = b; }
+
+    virtual bool                 eventFilter( QObject*, QEvent* );
+
+protected:
+    enum SketchState { Debut, EnTrain, Fin };
+    virtual void                 onSketch( SketchState );
+
+protected:
+    static int                   sketchBtn;
+    GLViewer_Viewer*             myViewer;
+    int                          myType;
+    void*                        myData;
+    QCursor                      mySavedCursor;
+    QPoint                       myStart, myCurr;
+    int                          myButtonState;
+};
+
+#ifdef WNT
+#pragma warning ( default:4251 )
+#endif
+
+#endif

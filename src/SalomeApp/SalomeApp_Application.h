@@ -1,0 +1,154 @@
+// File:      SalomeApp_Application.h
+// Created:   10/22/2004 3:37:25 PM
+// Author:    Sergey LITONIN
+// Copyright (C) CEA 2004
+
+#ifndef SALOMEAPP_APPLICATION_H
+#define SALOMEAPP_APPLICATION_H
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+#include "SalomeApp.h"
+#include <CAM_Application.h>
+
+#include <CORBA.h>
+
+#include <SALOMEconfig.h>
+//#include CORBA_CLIENT_HEADER(SALOMEDS)
+#include <SALOME_NamingService.hxx>
+
+#include "SALOMEDSClient.hxx"
+
+class QAction;
+class QComboBox;
+class QDockWindow;
+
+class LogWindow;
+class OB_Browser;
+class SalomeApp_Module;
+class SalomeApp_SelectionMgr;
+class SalomeApp_WidgetContainer;
+
+#ifdef WIN32
+#pragma warning( disable:4251 )
+#endif
+
+/*
+  Class       : SalomeApp_Application
+  Description : Application containing SalomeApp module
+*/
+
+class SALOMEAPP_EXPORT SalomeApp_Application : public CAM_Application
+{
+  Q_OBJECT
+
+public:
+  typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
+
+  enum { ModulesListId = STD_Application::UserID, NewGLViewId,
+         NewPlot2dId, NewOCCViewId, NewVTKViewId, UserID };
+
+public:
+  SalomeApp_Application();
+  virtual ~SalomeApp_Application();
+  
+  virtual QString                     applicationName() const;
+
+  virtual CAM_Module*                 loadModule( const QString& );
+  virtual bool                        activateModule( const QString& );
+  
+  SalomeApp_SelectionMgr*             selectionMgr() const;
+
+  OB_Browser*                         objectBrowser();
+  LogWindow*                          logWindow();
+
+  virtual QString                     getFileFilter() const;
+  SUIT_ViewManager*                   getViewManager( const QString&, const bool );
+
+  void                                updateActions();
+
+  QWidget*                            getWindow( const int, const int = -1 );
+
+  QWidget*                            window( const int, const int = -1 ) const;
+  void                                addWindow( QWidget*, const int, const int = -1 );
+  void                                removeWindow( const int, const int = -1 );
+
+  bool                                isWindowVisible( const int ) const;
+  void                                setWindowShown( const int, const bool );
+
+  virtual void                        start();
+
+  static CORBA::ORB_var               orb();
+  static SALOMEDSClient_StudyManager* studyMgr();
+  static SALOME_NamingService*        namingService();
+  static QString                      defaultEngineIOR();
+
+signals:
+  void                                studyOpened();
+  void                                studySaved();
+  void                                studyClosed();
+
+public slots:
+  virtual void                        onNewDoc();
+  virtual void                        onOpenDoc();
+  virtual void                        onHelpAbout();
+
+private slots:
+  void                                onSelection();
+
+protected:
+  virtual void                        createActions();
+  virtual SUIT_Study*                 createNewStudy();
+  virtual QWidget*                    createWindow( const int );
+  virtual void                        defaultWindows( QMap<int, int>& ) const;
+  virtual void                        defaultViewManagers( QStringList& ) const;
+
+  virtual void                        setActiveStudy( SUIT_Study* );
+
+  virtual void                        updateCommandsStatus();
+
+  virtual void                        onSelectionChanged();
+
+private slots:
+  void                                onNewWindow();
+  void                                onModuleActivation( QAction* );
+  void                                onCloseView( SUIT_ViewManager* );
+
+  void                                onStudyCreated( SUIT_Study* );
+  void                                onStudyOpened( SUIT_Study* );
+  void                                onStudySaved( SUIT_Study* );
+  void                                onStudyClosed( SUIT_Study* );
+
+private:
+  void                                updateWindows();
+  void                                updateViewManagers();
+  void                                updateModuleActions();
+
+  void                                loadWindowsGeometry();
+  void                                saveWindowsGeometry();
+
+  QString                             defaultModule() const;
+  void                                currentWindows( QMap<int, int>& ) const;
+  void                                currentViewManagers( QStringList& ) const;
+  SUIT_ViewManager*                   createViewManager( const QString& vmType );
+  void                                moduleIconNames( QMap<QString, QString>& ) const;
+
+  void                                activateWindows();
+
+private:
+  typedef QMap<QString, QAction*>               ActionMap;
+  typedef QMap<int, SalomeApp_WidgetContainer*> WindowMap;
+
+private:
+  SalomeApp_SelectionMgr*             mySelMgr;
+  ActionMap                           myActions;
+  WindowMap                           myWindows;
+};
+
+#ifdef WIN32
+#pragma warning( default:4251 )
+#endif
+
+#endif
