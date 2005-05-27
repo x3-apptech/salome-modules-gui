@@ -29,7 +29,7 @@ bool SalomeApp_TypeFilter::isOk( const SUIT_DataOwner* sOwner ) const
       if (aSObj)
 	{
 	  _PTR(SComponent) aComponent(aSObj->GetFatherComponent());
-	  if ( aComponent && (aComponent->ComponentDataType() == myKind) )
+	  if ( aComponent && (aComponent->ComponentDataType() == myKind.latin1()) )
 	    return true;
 	}
     }
