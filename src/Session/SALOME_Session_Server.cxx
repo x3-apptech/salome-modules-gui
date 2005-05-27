@@ -57,7 +57,7 @@
 #include "SUIT_MessageBox.h"
 
 
-#include "SalomeApp_ExceptionHandler.h"
+#include "SUIT_ExceptionHandler.h"
 using namespace std;
 
 extern "C" int HandleSignals(QApplication *theQApplication);
