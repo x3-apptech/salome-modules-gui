@@ -39,6 +39,8 @@ class vtkRenderWindowInteractor;
 #include <qobject.h>
 #include <qcursor.h>
 
+#include <map>
+
 #include "VTKViewer_Filter.h"
 
 class VTKViewer_Trihedron;
