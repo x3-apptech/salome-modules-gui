@@ -52,7 +52,8 @@ LIB_SRC=Session_Session_i.cxx \
 # Executables targets
 BIN = SALOME_Session_Server
 BIN_SRC = 
-BIN_SERVER_IDL = SALOME_Session.idl SalomeApp_Engine.idl
+LIB_SERVER_IDL = SALOME_Session.idl SalomeApp_Engine.idl
+BIN_SERVER_IDL = 
 BIN_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Component.idl SALOME_Registry.idl SALOME_ModuleCatalog.idl SALOME_Exception.idl SALOME_GenericObj.idl
 
 CPPFLAGS += $(QT_MT_INCLUDES) $(PYTHON_INCLUDES) $(HDF5_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome -I$(OCC_INCLUDES)
