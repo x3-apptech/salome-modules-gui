@@ -33,7 +33,9 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_NameDlg.h \
 		SalomeApp_ImportOperation.h \
 		SalomeApp_DataSubOwner.h \
-                SalomeApp_Selection.h
+		SalomeApp_Selection.h \
+		SalomeApp_Filter.h \
+		SalomeApp_TypeFilter.h		
 
 # .po files to transform in .qm
 PO_FILES = SalomeApp_images.po \
@@ -63,7 +65,9 @@ LIB_SRC= SalomeApp_Application.cxx \
 	 SalomeApp_ImportOperation.cxx \
 	 SalomeApp_DataSubOwner.cxx \
 	 SalomeApp_ModuleDlg.cxx \
-         SalomeApp_Selection.cxx
+	 SalomeApp_Selection.cxx \
+	 SalomeApp_Filter.cxx \
+	 SalomeApp_TypeFilter.cxx
 
 LIB_MOC = SalomeApp_Application.h \
 	  SalomeApp_DataModel.h \
@@ -93,7 +97,7 @@ RESOURCES_FILES = icon_about.png \
 CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
 LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS) 
-LIBS+= -L$(GUI_ROOT_DIR)/lib/salome -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole -lLogWindow
+LIBS+= -L$(GUI_ROOT_DIR)/lib/salome -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole
 
 @CONCLUDE@
 
