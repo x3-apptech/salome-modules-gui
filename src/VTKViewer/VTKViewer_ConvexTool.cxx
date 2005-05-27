@@ -8,36 +8,29 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
 // 
 //  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
-//
-//
-//
-//  File   : VTKViewer_ConvexTool.cxx
-//  Author : Eugeny Nikolaev
-//  Module : SALOME
-//  $Header$
 
 #include "VTKViewer_ConvexTool.h"
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkTriangle.h>
 #include <vtkConvexPointSet.h>
-
 #include <vtkMath.h>
+
 #include <set>
 #include <algorithm>
-#include <algo.h>
+#include <iterator>
 
-static float FACE_TOLERANCE=0;
+static float FACE_TOLERANCE = 0;
 
 typedef std::set<vtkIdType> TUIDS; // unique ids 
 typedef std::map<vtkIdType,TUIDS> TPTOIDS; // id points -> unique ids
 
-
-namespace CONVEX_TOOL{
+namespace CONVEX_TOOL
+{
 #ifdef _DEBUG_
-static int MYDEBUG = 0;
+  static int MYDEBUG = 0;
 #else
-static int MYDEBUG = 0;
+  static int MYDEBUG = 0;
 #endif
 
 static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
@@ -62,7 +55,8 @@ static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
     }
 }
 
-static void ReverseIds(TCell &theIds){
+static void ReverseIds(TCell &theIds)
+{
   int i;
   vtkIdType tmp;
   vtkIdType npts=theIds.size();
@@ -101,7 +95,7 @@ void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2fa
       faces2 = p2faces.find(id2);
       
       std::set_intersection(faces1->second.begin(), faces1->second.end(), faces2->second.begin(), faces2->second.end(),
-			    inserter(output_faces,output_faces.begin()));
+        std::inserter(output_faces,output_faces.begin()));
       
       id1 = id2;
       faces1 = faces2;
@@ -109,13 +103,13 @@ void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2fa
     id1 = face_points[0];
     faces1 = p2faces.find(id1);
     std::set_intersection(faces1->second.begin(), faces1->second.end(), faces2->second.begin(), faces2->second.end(),
-			  inserter(output_faces,output_faces.begin()));
+      std::inserter(output_faces,output_faces.begin()));
     
     output_faces.erase(faceId); // erase the face id for which we found friends
 
     if(MYDEBUG){
       cout << "fId[" << faceId <<"]: ";
-      copy(output_faces.begin(), output_faces.end(), ostream_iterator<vtkIdType>(cout, " "));
+      std::copy(output_faces.begin(), output_faces.end(), std::ostream_iterator<vtkIdType>(cout, " "));
       cout << endl;
     }
     
@@ -123,14 +117,14 @@ void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2fa
   }
 }
 
-bool IsConnectedFacesOnOnePlane(vtkUnstructuredGrid* theGrid,
-				vtkIdType theFId1,vtkIdType theFId2,
-				TUIDS FpIds1,TUIDS FpIds2)
+bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
+                                 vtkIdType theFId1, vtkIdType theFId2,
+				                         TUIDS FpIds1, TUIDS FpIds2 )
 {
   bool status = false;
   TUIDS common_ids;
   std::set_intersection(FpIds1.begin(), FpIds1.end(), FpIds2.begin(), FpIds2.end(),
-			inserter(common_ids,common_ids.begin()));
+			std::inserter(common_ids,common_ids.begin()));
   
   /*           Number of common ids = 2 (A1,A2)
 	       
@@ -159,8 +153,8 @@ bool IsConnectedFacesOnOnePlane(vtkUnstructuredGrid* theGrid,
 
     vtkIdType A1 = *loc_id1_0;
     vtkIdType A2 = *loc_id1_1;
-    vtkIdType B1,B2;
-    vtkIdType C1,C2;
+    vtkIdType B1;
+    vtkIdType C1;
 
     for(;loc_id2_0!=FpIds1.end();loc_id2_0++)
       if(*loc_id2_0 != A1 && *loc_id2_0!= A2){
@@ -219,9 +213,9 @@ bool IsConnectedFacesOnOnePlane(vtkUnstructuredGrid* theGrid,
   return status;
 }
 
-void GetAllFacesOnOnePlane(TPTOIDS theFaces, vtkIdType faceId,
-			   TUIDS &new_faces,TCell &new_faces_v2){
-
+void GetAllFacesOnOnePlane( TPTOIDS theFaces, vtkIdType faceId, 
+                            TUIDS &new_faces, TCell &new_faces_v2 )
+{
   if (new_faces.find(faceId) != new_faces.end()) return;
   
   new_faces.insert(new_faces.begin(),faceId);
@@ -239,24 +233,24 @@ void GetAllFacesOnOnePlane(TPTOIDS theFaces, vtkIdType faceId,
   return;
 }
 
-void GetSumm(TCell v1,TCell v2,TCell &output){
-  
+void GetSumm(TCell v1,TCell v2,TCell &output)
+{
   output.clear();
 
   if(MYDEBUG) cout << "========================================="<<endl;
   if(MYDEBUG) cout << "v1:";
-  if(MYDEBUG) copy(v1.begin(), v1.end(), ostream_iterator<vtkIdType>(cout, " "));
+  if(MYDEBUG) std::copy(v1.begin(), v1.end(), std::ostream_iterator<vtkIdType>(cout, " "));
   if(MYDEBUG) cout << "\tv2:";
-  if(MYDEBUG) copy(v2.begin(), v2.end(), ostream_iterator<vtkIdType>(cout, " "));
+  if(MYDEBUG) std::copy(v2.begin(), v2.end(), std::ostream_iterator<vtkIdType>(cout, " "));
   if(MYDEBUG) cout << endl;
   
   TUIDS v1_set;
-  copy(v1.begin(), v1.end(), inserter(v1_set,v1_set.begin()));
+  std::copy(v1.begin(), v1.end(), std::inserter(v1_set,v1_set.begin()));
   TUIDS v2_set;
-  copy(v2.begin(), v2.end(), inserter(v2_set,v2_set.begin()));
+  std::copy(v2.begin(), v2.end(), std::inserter(v2_set,v2_set.begin()));
   TUIDS tmpIntersection;
-  set_intersection(v1_set.begin(),v1_set.end(),v2_set.begin(),v2_set.end(),inserter(tmpIntersection,tmpIntersection.begin()));
-  if(MYDEBUG) copy(tmpIntersection.begin(),tmpIntersection.end(),ostream_iterator<vtkIdType>(cout, " "));
+  std::set_intersection(v1_set.begin(),v1_set.end(),v2_set.begin(),v2_set.end(), std::inserter(tmpIntersection,tmpIntersection.begin()));
+  if(MYDEBUG) std::copy(tmpIntersection.begin(),tmpIntersection.end(), std::ostream_iterator<vtkIdType>(cout, " "));
   if(MYDEBUG) cout << endl;
 
   if(tmpIntersection.size() < 2)
@@ -295,7 +289,7 @@ void GetSumm(TCell v1,TCell v2,TCell &output){
   }
 
   if(MYDEBUG) cout << "Result: " ;
-  if(MYDEBUG) copy(output.begin(),output.end(),ostream_iterator<vtkIdType>(cout, " "));
+  if(MYDEBUG) std::copy(output.begin(),output.end(),std::ostream_iterator<vtkIdType>(cout, " "));
   if(MYDEBUG) cout << endl;
 }
 
@@ -321,7 +315,8 @@ void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outpu
 	int numFacePts = aFace->GetNumberOfPoints();
 	TCell aIds;
 	
- 	for(int i=0;i<numFacePts;i++)
+  int i = 0;
+ 	for(i=0;i<numFacePts;i++)
 	  aIds.push_back(aFace->GetPointId(i));
 
  	float v_a[3],v_b[3],v_convex2face[3]; // vectors
@@ -345,7 +340,7 @@ void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outpu
 	id_1 = theGrid->GetPoint(aIds[1]);
 	id_n = theGrid->GetPoint(aIds[numFacePts-1]);
 
-	for(int i=0;i<3;i++){
+	for(i=0;i<3;i++){
 	  v_a[i] = id_1[i] - id_0[i];
 	  v_b[i] = id_n[i] - id_0[i];
 	  v_convex2face[i] = id_0[i] - convex_center[i];
@@ -355,7 +350,7 @@ void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outpu
 	  ReverseIds(aIds);
  	}
 
-	for(int i=0;i<aIds.size();i++){
+	for(i=0;i<(int)aIds.size();i++){
 	  TUIDS &acell = p2faces[aIds[i]];
 	  acell.insert(faceId);
 	}
