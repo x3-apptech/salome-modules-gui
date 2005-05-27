@@ -28,9 +28,8 @@
 
 #ifndef SVTK_SELECTOR_H
 #define SVTK_SELECTOR_H
-
-#include <vtkSmartPointer.h>
 #include <NCollection_DataMap.hxx>
+#include <vtkSmartPointer.h>
 #include <TColStd_MapOfInteger.hxx>
 
 #include "SVTK_Selection.h"

@@ -1,3 +1,4 @@
+#include "SVTK_Selector.h"
 #include "SALOME_Actor.h"
 
 #include <qapplication.h>
@@ -21,7 +22,6 @@
 #include "VTKViewer_Utilities.h"
 
 #include "SVTK_Trihedron.h"
-#include "SVTK_Selector.h"
 #include "SVTK_ViewWindow.h"
 #include "SVTK_ViewModel.h"
 #include "SVTK_RenderWindow.h"
