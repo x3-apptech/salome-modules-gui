@@ -29,12 +29,6 @@
 using namespace std;
 #include "SUPERVGraph_ViewFrame.h"
 
-#include "QAD_Settings.h"
-#include "QAD_Config.h"
-#include "QAD_Application.h"
-#include "QAD_Desktop.h"
-#include "SALOME_Selection.h"
-
 #include "utilities.h"
 
 //QT Include
@@ -42,14 +36,23 @@ using namespace std;
 #include <qcolordialog.h>
 
 
-SUPERVGraph_View::SUPERVGraph_View(QWidget* theParent): QWidget(theParent){
+SUPERVGraph_View::SUPERVGraph_View( QWidget* theParent ): QWidget( theParent )
+{
   init(theParent);
 }
-SUPERVGraph_View::SUPERVGraph_View(SUPERVGraph_View* theParent): QWidget(theParent){
-  setPopupServer(theParent->getPopupServer());
+
+SUPERVGraph_View::SUPERVGraph_View( SUPERVGraph_View* theParent ): QWidget( theParent )
+{
   init(theParent);
 }
-void SUPERVGraph_View::init(QWidget* theParent){
+
+void SUPERVGraph_View::contextMenuPopup( QPopupMenu* )
+{
+  // to be implemented
+}
+
+void SUPERVGraph_View::init( QWidget* theParent )
+{
   if ( theParent->inherits( "QMainWindow" ) ) {
     ( ( QMainWindow* )theParent )->setCentralWidget( this );
   }
@@ -59,35 +62,15 @@ void SUPERVGraph_View::init(QWidget* theParent){
   }
 
 }
-void SUPERVGraph_View::onCreatePopup(){
-  /*
-  if ( myPopup ) {	
-    QAD_Desktop*     Desktop = (QAD_Desktop*) QAD_Application::getDesktop();
-    QAD_Study*   ActiveStudy = Desktop->getActiveStudy();
-    SALOME_Selection*      Sel = SALOME_Selection::Selection( ActiveStudy->getSelection() );
-    
-    QString theContext;
-    QString theParent("Viewer");
-    QString theObject;
-    
-    Desktop->definePopup( theContext, theParent, theObject );
-    Desktop->createPopup( myPopup, theContext, theParent, theObject);
-    Desktop->customPopup( myPopup, theContext, theParent, theObject );
-    if (Sel->IObjectCount() == 0 && myPopup->count()<1) {
-      int id;
-      myIDs.append ( id = myPopup->insertItem (tr ("MEN_VP3D_CHANGEBGR")) );	
-      QAD_ASSERT ( myPopup->connectItem ( id, this, SLOT(onChangeBackgroundColor())) );
-    }
-  }
-  */
- }
+
 /*!
     Constructor
 */
-SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame(QWidget* parent, const char* name) 
-  : QAD_ViewFrame(parent, name)
+SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame( SUIT_Desktop* theDesktop ) 
+  : SUIT_ViewWindow( theDesktop )
 {
   myView = 0;
+
   //myView = new SUPERVGraph_View(this); 
   // Set BackgroundColor
   /*
@@ -96,21 +79,21 @@ SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame(QWidget* parent, const char* name)
   int B = QAD_CONFIG->getSetting("SUPERVGraph:BackgroundColorBlue").toInt();
   setBackgroundColor(QColor(R,G,B));*/
 }
-SUPERVGraph_ViewFrame::~SUPERVGraph_ViewFrame(){}
+
+SUPERVGraph_ViewFrame::~SUPERVGraph_ViewFrame() {}
 
 /*!
   Returns widget containing 3D-Viewer
 */
-SUPERVGraph_View* SUPERVGraph_ViewFrame::getViewWidget(){
+SUPERVGraph_View* SUPERVGraph_ViewFrame::getViewWidget()
+{
   return myView;
 }
 
 
-void SUPERVGraph_ViewFrame::setViewWidget(SUPERVGraph_View* theView) {
+void SUPERVGraph_ViewFrame::setViewWidget( SUPERVGraph_View* theView )
+{
   myView = theView;
-  if (myApp) {
-    myView->setPopupServer(myApp);
-  }
 }
 
 
@@ -233,7 +216,7 @@ void SUPERVGraph_ViewFrame::onViewFitAll()
 /*!
     Set background of the viewport
 */
-void SUPERVGraph_ViewFrame::setBackgroundColor( const QColor& color)
+void SUPERVGraph_ViewFrame::setBackgroundColor( const QColor& color )
 {
     if (myView)
       myView->setPaletteBackgroundColor(color);
@@ -249,13 +232,7 @@ QColor SUPERVGraph_ViewFrame::backgroundColor() const
   return QMainWindow::backgroundColor();
 }
 
-
-void SUPERVGraph_ViewFrame::SetSelectionMode( Selection_Mode mode )
-{
-  MESSAGE ( "SUPERVGraph_ViewFrame::SetSelectionMode" )
-}
-
-void SUPERVGraph_ViewFrame::onAdjustTrihedron(  )
+void SUPERVGraph_ViewFrame::onAdjustTrihedron()
 {
   MESSAGE ( "SUPERVGraph_ViewFrame::onAdjustTrihedron" )  
 }
@@ -289,22 +266,14 @@ bool SUPERVGraph_ViewFrame::isVisible( const Handle(SALOME_InteractiveObject)& I
   return false;
 }
 
-void SUPERVGraph_ViewFrame::setPopupServer( QAD_Application* App )
-{
-  myApp = App;
-  if (myView) {
-    myView->setPopupServer(myApp);
-  }
-}
-
-void SUPERVGraph_ViewFrame::undo(const _PTR(Study)& aStudy,
-				 const char* StudyFrameEntry)
+void SUPERVGraph_ViewFrame::undo( const _PTR(Study)& aStudy,
+				  const char* StudyFrameEntry )
 {
   MESSAGE ( "SUPERVGraph_ViewFrame::undo" )
 }
 
-void SUPERVGraph_ViewFrame::redo(const _PTR(Study)& aStudy,
-				 const char* StudyFrameEntry)
+void SUPERVGraph_ViewFrame::redo( const _PTR(Study)& aStudy,
+				  const char* StudyFrameEntry )
 {
   MESSAGE ( "SUPERVGraph_ViewFrame::redo" )
 }

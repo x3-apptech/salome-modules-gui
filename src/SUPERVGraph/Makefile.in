@@ -7,17 +7,22 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 @COMMENCE@
 
-EXPORT_HEADERS = \
-		  SUPERVGraph_ViewFrame.h 
+EXPORT_HEADERS = SUPERVGraph_ViewFrame.h \
+		 SUPERVGraph_ViewManager.h \
+		 SUPERVGraph_ViewModel.h
 
 # Libraries targets
 
 LIB = libSUPERVGraph.la
 LIB_SRC = 	  SUPERVGraph.cxx \
-		  SUPERVGraph_ViewFrame.cxx 
+		  SUPERVGraph_ViewFrame.cxx \
+		  SUPERVGraph_ViewManager.cxx \
+		  SUPERVGraph_ViewModel.cxx 
 
 LIB_MOC = 	  SUPERVGraph_moc.cxx \
-		  SUPERVGraph_ViewFrame_moc.cxx 
+		  SUPERVGraph_ViewFrame_moc.cxx \
+		  SUPERVGraph_ViewManager_moc.cxx \
+		  SUPERVGraph_ViewModel_moc.cxx 
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_ModuleCatalog.idl \
@@ -26,8 +31,8 @@ LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_GenericObj.idl
 
 
-CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome 
-LDFLAGS+=$(QT_MT_LIBS) -L$(top_builddir)/lib -lSalomeGUI
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome -I${GUI_ROOT_DIR}/include/salome
+LDFLAGS+=$(QT_MT_LIBS) -L$(top_builddir)/lib
 
 
 @CONCLUDE@

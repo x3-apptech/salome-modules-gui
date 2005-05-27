@@ -29,49 +29,48 @@
 #ifndef SUPERVGraph_ViewFrame_H
 #define SUPERVGraph_ViewFrame_H
 
-#include "QAD.h"
-#include "QAD_ViewFrame.h"
-#include "QAD_Application.h"
-
 #include "SALOME_InteractiveObject.hxx"
-#include "SALOME_Selection.h" 
 
 #include "SALOMEDSClient.hxx"
 
-class QAD_EXPORT SUPERVGraph_View: public QWidget, public QAD_PopupClientServer{
+#include "SalomeApp_Application.h"
+#include "SUIT_PopupClient.h"
+#include "SUIT_ViewWindow.h"
+
+class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_View: public QWidget, public SUIT_PopupClient {
   Q_OBJECT;
  public:
+  static QString Type() { return "SUPERVGraphViewer"; }
+
   SUPERVGraph_View(QWidget* theParent);
   SUPERVGraph_View(SUPERVGraph_View* theParent);
 
   virtual void ActivatePanning() = 0;
   virtual void ResetView() = 0;
+
+  /* redefine functions from SUIT_PopupClient */
+  virtual QString popupClientType() const { return Type(); }
+  virtual void    contextMenuPopup( QPopupMenu* );
+  
  protected:
   void init(QWidget* theParent);
-  void onCreatePopup();
 };
 
-class QAD_EXPORT SUPERVGraph_ViewFrame : public QAD_ViewFrame {
+class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   Q_OBJECT
 
     public:
-  SUPERVGraph_ViewFrame(QWidget* parent, const char* name=0 );
+  SUPERVGraph_ViewFrame(SUIT_Desktop* theDesktop );
   ~SUPERVGraph_ViewFrame();
 
-  ViewType                       getTypeView() const{ return VIEW_GRAPHSUPERV;};
   SUPERVGraph_View*              getViewWidget();
   void                           setViewWidget(SUPERVGraph_View* theView);
 
   void                           setBackgroundColor( const QColor& );
   QColor                         backgroundColor() const;
   
-  void                           SetSelectionMode( Selection_Mode mode );
-
   void                           onAdjustTrihedron( );
   
-  /*  popup management */
-  void                           setPopupServer( QAD_Application* );
-
   /*  interactive object management */
   void                           highlight( const Handle(SALOME_InteractiveObject)& IObject, 
 					    bool highlight, bool immediatly = true );
@@ -85,7 +84,7 @@ class QAD_EXPORT SUPERVGraph_ViewFrame : public QAD_ViewFrame {
   void              undo(const _PTR(Study)& aStudy, const char* StudyFrameEntry);
   void              redo(const _PTR(Study)& aStudy, const char* StudyFrameEntry);
 
-
+  
   /* selection */
   Handle(SALOME_InteractiveObject) FindIObject(const char* Entry) { Handle(SALOME_InteractiveObject) o; return o; };
 
@@ -112,9 +111,9 @@ class QAD_EXPORT SUPERVGraph_ViewFrame : public QAD_ViewFrame {
   void           onViewBottom();
   void           onViewTop();
   void           onViewTrihedron(); 
- 
+  
  private:
   SUPERVGraph_View* myView;
-  QAD_Application* myApp;
+  SalomeApp_Application* myApp;
 }; 
 #endif

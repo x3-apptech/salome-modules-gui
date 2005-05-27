@@ -30,14 +30,14 @@ using namespace std;
 #include "SUPERVGraph.h"
 #include "SUPERVGraph_ViewFrame.h"
 
-QAD_ViewFrame* SUPERVGraph::createView(QAD_RightFrame* parent)
+SUIT_ViewWindow* SUPERVGraph::createView(SUIT_Desktop* parent)
 {
-  return new SUPERVGraph_ViewFrame( parent, "vtkView" ); 
+  return new SUPERVGraph_ViewFrame( parent/*, "vtkView"*/ ); 
 }
 
 extern "C"
 {
-  QAD_ViewFrame* createView(QAD_RightFrame* parent)
+  SUIT_ViewWindow* createView(SUIT_Desktop* parent)
   {
     return SUPERVGraph::createView(parent);
   }

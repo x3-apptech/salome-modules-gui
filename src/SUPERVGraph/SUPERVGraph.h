@@ -29,8 +29,8 @@
 #ifndef SUPERVGraph_HeaderFile
 #define SUPERVGraph_HeaderFile
 
-#include "QAD_RightFrame.h"
-#include "QAD_ViewFrame.h"
+#include "SUIT_Desktop.h"
+#include "SUIT_ViewWindow.h"
 
 class SUPERVGraph : public QObject
 {
@@ -38,7 +38,7 @@ class SUPERVGraph : public QObject
 
 public :
 
-    Standard_EXPORT static QAD_ViewFrame* createView ( QAD_RightFrame* parent);
+    /*Standard_EXPORT*/ static SUIT_ViewWindow* createView ( SUIT_Desktop* parent);
   
 };
 
