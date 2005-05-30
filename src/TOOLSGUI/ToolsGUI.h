@@ -29,6 +29,8 @@
 #ifndef ToolsGUI_HeaderFile
 #define ToolsGUI_HeaderFile
 
+#include "utilities.h"
+
 #ifndef _Standard_HeaderFile
 #include <Standard.hxx>
 #endif

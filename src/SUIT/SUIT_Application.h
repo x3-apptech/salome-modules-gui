@@ -37,6 +37,8 @@ public:
       This method called by SUIT_Session whin closing of application was requested. */
   virtual bool          isPossibleToClose();
 
+  virtual void          closeApplication();
+
   //! Returns active Study. If Application supports wirking with several studies this method should be redefined
   virtual SUIT_Study*   activeStudy() const;
 

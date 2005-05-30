@@ -33,6 +33,11 @@ bool SUIT_Application::isPossibleToClose()
   return true;
 }
 
+void SUIT_Application::closeApplication()
+{
+  emit applicationClosed( this );
+}
+
 SUIT_Study* SUIT_Application::activeStudy() const
 {
   return myStudy;

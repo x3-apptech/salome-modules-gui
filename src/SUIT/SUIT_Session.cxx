@@ -191,12 +191,14 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
 */
 void SUIT_Session::closeSession()
 {
-  for ( AppListIterator it( myAppList ); it.current(); ++it )
+  while ( !myAppList.isEmpty() )
   {
-    if ( !it.current()->isPossibleToClose() )
+    SUIT_Application* app = myAppList.getFirst();
+    if ( !app->isPossibleToClose() )
       return;
+
+    app->closeApplication();
   }
-  qApp->quit();
 }
 
 SUIT_ExceptionHandler* SUIT_Session::handler() const

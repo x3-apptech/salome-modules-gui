@@ -18,7 +18,6 @@
 
 #include <set>
 #include <algorithm>
-#include <iterator>
 
 static float FACE_TOLERANCE = 0;
 

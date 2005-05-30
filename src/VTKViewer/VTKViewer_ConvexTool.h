@@ -17,13 +17,6 @@
 // 
 //  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
 //
-//
-//
-//  File   : VTKViewer_ConvexTool.h
-//  Author : Eugeny Nikolaev
-//  Module : SALOME
-//  $Header$
-
 
 #ifndef _VTKViewer_ConvexTool_H
 #define _VTKViewer_ConvexTool_H
@@ -36,10 +29,9 @@
 typedef std::vector<vtkIdType> TCell; // ptsIds
 typedef std::map<vtkIdType,TCell> TCellArray; // CellId, TCell
 
-namespace CONVEX_TOOL{
-
+namespace CONVEX_TOOL
+{
   void GetPolygonalFaces(vtkUnstructuredGrid* theCell,int cellId,TCellArray &outputCellArray);
 }
 
 #endif // _VTKViewer_ConvexTool_H
-

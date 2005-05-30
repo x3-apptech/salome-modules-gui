@@ -121,10 +121,8 @@ void QtxDockWindow::Watcher::updateVisibility()
     }
   }
 
-  if ( vis )
-    myCont->show();
-  else
-    myCont->hide();
+  if ( vis != myCont->isVisibleTo( myCont->parentWidget() ) )
+    vis ? myCont->show() : myCont->hide();
 }
 
 void QtxDockWindow::Watcher::updateIcon()

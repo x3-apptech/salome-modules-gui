@@ -68,10 +68,15 @@ void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
   }
 
   SUIT_Study* study = activeStudy();
+
+  if ( study )
+    study->closeDocument();
+
   setActiveStudy( 0 );
   delete study;
 
   setDesktop( 0 );
+
   closeApplication();
 }
 
@@ -303,13 +308,9 @@ void STD_Application::onCloseDoc()
   }
 
   afterCloseDoc();
-  closeApplication();
-}
 
-void STD_Application::closeApplication()
-{
   if ( !desktop() )
-    emit applicationClosed( this );
+    closeApplication();
 }
 
 bool STD_Application::isPossibleToClose()
