@@ -14,12 +14,11 @@
 
 SalomeApp_Study::SalomeApp_Study( SUIT_Application* app )
 : CAM_Study( app )
-{}  
-
+{
+}  
 
 SalomeApp_Study::~SalomeApp_Study()
 {
-  closeDocument();
 }
 
 int SalomeApp_Study::id() const
@@ -188,9 +187,13 @@ void SalomeApp_Study::closeDocument()
   emit closed( this );
 
   // close SALOMEDS document
-  SalomeApp_Application::studyMgr()->Close( studyDS() );
-  SALOMEDSClient_Study* aStudy = NULL;
-  setStudyDS( _PTR(Study)(aStudy) );
+  _PTR(Study) st = studyDS();
+  if ( st.get() )
+  {
+    SalomeApp_Application::studyMgr()->Close( st );
+    SALOMEDSClient_Study* aStudy = 0;
+    setStudyDS( _PTR(Study)(aStudy) );
+  }
 
   CAM_Study::closeDocument();
 }
