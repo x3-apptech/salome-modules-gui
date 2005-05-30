@@ -696,9 +696,7 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
 
   activateModule( "" );
   if ( objectBrowser() != 0 )
-  {
     objectBrowser()->setRootObject( 0 );
-  }
 
   saveWindowsGeometry();
 }
@@ -706,6 +704,13 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
 QString SalomeApp_Application::getFileFilter() const
 {
   return "(*.hdf)";
+}
+
+void SalomeApp_Application::afterCloseDoc()
+{
+  updateWindows();
+
+  CAM_Application::afterCloseDoc();
 }
 
 void SalomeApp_Application::updateActions()

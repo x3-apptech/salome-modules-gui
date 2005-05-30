@@ -111,6 +111,8 @@ protected:
 
   virtual void                        onSelectionChanged();
 
+  virtual void                        afterCloseDoc();
+
 private slots:
   void                                onNewWindow();
   void                                onModuleActivation( QAction* );
