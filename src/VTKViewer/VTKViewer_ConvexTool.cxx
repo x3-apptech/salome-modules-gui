@@ -17,6 +17,7 @@
 #include <vtkMath.h>
 
 #include <set>
+#include <iterator>
 #include <algorithm>
 
 static float FACE_TOLERANCE = 0;
@@ -379,7 +380,6 @@ void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outpu
 	
       
       TPTOIDS new_face2faces; // which connected and in one plane
-      int count=0;
       
       TPTOIDS::const_iterator aF2FIter = face2face.begin();
       for(;aF2FIter!=face2face.end();aF2FIter++){

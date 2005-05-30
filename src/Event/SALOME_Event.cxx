@@ -34,12 +34,6 @@
 #include <qapplication.h>
 #include <qthread.h>
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
-
 // asv 21.02.05 : introducing multi-platform approach of thread comparison
 // on Unix using pthread_t type for storing ThreadId
 // on Win32 using integer type for storing ThreadId
@@ -47,11 +41,14 @@ static int MYDEBUG = 0;
 // "...Do not allow your program to rely on the internal structure or size of the pthread_t..."
 
 #ifdef WIN32
-  #include <windows.h>
-  static DWORD myThread;
+#include <windows.h>
+
+static DWORD myThread;
 #else
-  #include <qthread.h>
-  static pthread_t myThread;
+#include <qthread.h>
+#include <pthread.h>
+
+static pthread_t myThread;
 #endif
 
 void SALOME_Event::GetSessionThread(){

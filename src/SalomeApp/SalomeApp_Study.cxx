@@ -258,7 +258,7 @@ void SalomeApp_Study::dataModelInserted (const CAM_DataModel* dm)
         aComp = aBuilder->NewComponent(dm->module()->name());
 
         // Set default engine IOR
-        aBuilder->DefineComponentInstance(aComp, SalomeApp_Application::defaultEngineIOR());
+        aBuilder->DefineComponentInstance(aComp, SalomeApp_Application::defaultEngineIOR().latin1());
       }
     }
   }
