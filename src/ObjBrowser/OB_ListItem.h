@@ -11,7 +11,8 @@ class SUIT_DataObject;
   base template class for ListViewItems and CheckListItems
 */
 
-template<class T> class ListItem : public T {
+template<class T> class ListItem : public T
+{
 public:
   ListItem( SUIT_DataObject*, QListView* );
   ListItem( SUIT_DataObject*, QListViewItem* );
@@ -23,15 +24,13 @@ public:
   ListItem( SUIT_DataObject*, QListView*, QListViewItem*, int );
   ListItem( SUIT_DataObject*, QListViewItem*, QListViewItem*, int );
 
-  virtual void paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
-
-  virtual void paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
-
-  inline SUIT_DataObject* dataObject() const
-  { return myObject; }
+  virtual void            setSelected( bool s );
+  inline SUIT_DataObject* dataObject() const { return myObject; }
+  virtual void            paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
+  virtual void            paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
 
 private:
-  void             update();
+  void                     update();
 
 private:
   SUIT_DataObject* myObject;

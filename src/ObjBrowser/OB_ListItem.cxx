@@ -1,5 +1,7 @@
 #include "OB_ListItem.h"
 
+#include "OB_ListView.h"
+
 #include <SUIT_DataObject.h>
 
 #include <qpainter.h>
@@ -112,6 +114,18 @@ void ListItem<T>::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r
   QRect rect = r;
   rect.setWidth( width( p->fontMetrics(), this->listView(), 0 ) );
   T::paintFocus( p, cg, rect );
+}
+
+template<class T>
+void ListItem<T>::setSelected( bool s )
+{
+  if ( s && listView() && listView()->inherits( "OB_ListView" ) )
+  {
+    OB_ListView* oblv = (OB_ListView*)listView();
+    s = s && oblv->isOk( this );
+  }
+
+  QListViewItem::setSelected( s );
 }
 
 template<class T>

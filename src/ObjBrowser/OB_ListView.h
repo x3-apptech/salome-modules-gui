@@ -28,10 +28,10 @@ public:
   OB_Filter*              filter() const;
   void                    setFilter( OB_Filter* );
 
-  virtual void            setSelected( QListViewItem*, bool );
-
   virtual int             addColumn( const QString& label, int width = -1 );
   virtual int             addColumn( const QIconSet& iconset, const QString& label, int width = -1 );
+
+  bool                    isOk( QListViewItem* ) const;
 
 signals:
   void                    dropped( QPtrList<QListViewItem>, QListViewItem*, int );

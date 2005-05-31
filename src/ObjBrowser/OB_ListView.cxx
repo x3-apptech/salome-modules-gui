@@ -38,17 +38,13 @@ void OB_ListView::setFilter( OB_Filter* f )
   myFilter = f;
 }
 
-void OB_ListView::setSelected( QListViewItem* item, bool sel )
+bool OB_ListView::isOk( QListViewItem* item ) const
 {
-  bool on = sel;
-  if ( filter() )
-  {
-    SUIT_DataObject* obj = dataObject( item );
-    if ( obj )
-      on = on && filter()->isOk( obj );
-  }
-
-  QListView::setSelected( item, on );
+  bool ok = true;
+  SUIT_DataObject* obj = dataObject( item );
+  if ( obj && filter() )
+    ok = filter()->isOk( obj );
+  return ok;
 }
 
 int OB_ListView::addColumn( const QString& label, int width )
