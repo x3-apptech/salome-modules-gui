@@ -78,9 +78,10 @@ SVTK_ViewWindow
   SVTK_InteractorStyle* RWS = SVTK_InteractorStyle::New();
   RWS->setGUIWindow( myRenderWindow );
   RWS->setViewWindow( this );
-  myRWInteractor->SetInteractorStyle( RWS ); 
 
+  myRWInteractor->SetInteractorStyle( RWS ); 
   myRWInteractor->Initialize();
+
   RWS->setTriedron( myTrihedron );
   RWS->FindPokedRenderer( 0, 0 );
 
