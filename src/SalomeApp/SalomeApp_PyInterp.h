@@ -34,8 +34,6 @@
 class SalomeApp_PyInterp : public PythonConsole_PyInterp
 {
 public:
-  static PyObject *salome_shared_modules_module;
-
   SalomeApp_PyInterp();
   virtual ~SalomeApp_PyInterp();
 

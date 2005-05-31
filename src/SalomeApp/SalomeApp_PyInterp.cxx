@@ -36,8 +36,6 @@ static int MYDEBUG = 0;
 static int MYDEBUG = 0;
 #endif
 
-PyObject *SalomeApp_PyInterp::salome_shared_modules_module = NULL;
-
 /*!
  * constructor : multi Python interpreter, one per SALOME study.
  * calls initialize method defined in base class, which calls virtual methods
@@ -79,21 +77,6 @@ bool SalomeApp_PyInterp::initContext()
    */
   if ( !PythonConsole_PyInterp::initContext() )
     return false;
-
-  /*
-    salome_shared_modules should be imported only once
-  */
-  if ( !salome_shared_modules_module )
-  {
-    salome_shared_modules_module = PyImport_ImportModule( "salome_shared_modules" );
-    if ( !salome_shared_modules_module )
-    {
-	    INFOS( "SalomeApp_PyInterp::initContext() - salome_shared_modules_module == NULL" );
-	    PyErr_Print();
-	    PyErr_Clear();
-	    return false;
-    }
-  }
 
   // Debut modif CCAR
   // Import special module to change the import mechanism
