@@ -26,6 +26,10 @@ public:
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
+public slots:
+  virtual void  show();
+  virtual void  hide();
+
 private:
   Watcher*      myWatcher;
   bool          myStretch;

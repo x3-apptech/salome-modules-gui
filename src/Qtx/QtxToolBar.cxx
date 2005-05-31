@@ -20,6 +20,9 @@ class QtxToolBar::Watcher : public QObject
 public:
   Watcher( QtxToolBar* );
 
+  void         shown( QtxToolBar* );
+  void         hided( QtxToolBar* );
+
   virtual bool eventFilter( QObject*, QEvent* );
 
 protected:
@@ -31,24 +34,31 @@ private:
 private:
   void         installFilters();
 
+  void         showContainer();
+  void         hideContainer();
+
   void         updateIcon();
   void         updateCaption();
   void         updateVisibility();
 
 private:
-  bool         myVis;
   QtxToolBar*  myCont;
+  bool         myState;
+  bool         myEmpty;
+  bool         myVisible;
 };
 
 QtxToolBar::Watcher::Watcher( QtxToolBar* cont )
 : QObject( cont ),
 myCont( cont ),
-myVis( true )
+myState( true ),
+myEmpty( true )
 {
   if ( myCont->mainWindow() )
-    myVis = myCont->mainWindow()->appropriate( myCont );
+    myState = myCont->mainWindow()->appropriate( myCont );
 
   myCont->installEventFilter( this );
+  myVisible = myCont->isVisibleTo( myCont->parentWidget() );
 
   installFilters();
 }
@@ -78,6 +88,44 @@ bool QtxToolBar::Watcher::eventFilter( QObject* o, QEvent* e )
   }
 
   return false;
+}
+
+void QtxToolBar::Watcher::shown( QtxToolBar* tb )
+{
+  if ( tb != myCont )
+    return;
+
+  myVisible = true;
+}
+
+void QtxToolBar::Watcher::hided( QtxToolBar* tb )
+{
+  if ( tb != myCont )
+    return;
+
+  myVisible = false;
+}
+
+void QtxToolBar::Watcher::showContainer()
+{
+  if ( !myCont )
+    return;
+
+  QtxToolBar* cont = myCont;
+  myCont = 0;
+  cont->show();
+  myCont = cont;
+}
+
+void QtxToolBar::Watcher::hideContainer()
+{
+  if ( !myCont )
+    return;
+
+  QtxToolBar* cont = myCont;
+  myCont = 0;
+  cont->hide();
+  myCont = cont;
 }
 
 void QtxToolBar::Watcher::customEvent( QCustomEvent* e )
@@ -132,19 +180,21 @@ void QtxToolBar::Watcher::updateVisibility()
   }
 
   QMainWindow* mw = myCont->mainWindow();
-  if ( mw )
+  if ( mw && myEmpty != vis )
   {
-    if ( vis )
-      mw->setAppropriate( myCont, myVis );
+    myEmpty = vis;
+    if ( myEmpty )
+      mw->setAppropriate( myCont, myState );
     else
     {
-      myVis = mw->appropriate( myCont );
+      myState = mw->appropriate( myCont );
       mw->setAppropriate( myCont, false );
     }
   }
 
+  vis = myEmpty && myVisible;
   if ( vis != myCont->isVisibleTo( myCont->parentWidget() ) )
-    vis ? myCont->show() : myCont->hide();
+    vis ? showContainer() : hideContainer();
 }
 
 void QtxToolBar::Watcher::updateIcon()
@@ -277,4 +327,20 @@ QSize QtxToolBar::minimumSizeHint() const
   }
 
   return sz;
+}
+
+void QtxToolBar::show()
+{
+  if ( myWatcher )
+    myWatcher->shown( this );
+
+  QToolBar::show();
+}
+
+void QtxToolBar::hide()
+{
+  if ( myWatcher )
+    myWatcher->hided( this );
+
+  QToolBar::hide();
 }

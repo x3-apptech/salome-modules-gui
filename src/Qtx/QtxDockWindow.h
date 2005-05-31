@@ -27,6 +27,10 @@ public:
 
   QMainWindow*  mainWindow() const;
 
+public slots:
+  virtual void  show();
+  virtual void  hide();
+
 private:
   Watcher*      myWatcher;
   bool          myStretch;

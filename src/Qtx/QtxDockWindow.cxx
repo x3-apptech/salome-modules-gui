@@ -19,6 +19,9 @@ class QtxDockWindow::Watcher : public QObject
 public:
   Watcher( QtxDockWindow* );
 
+  void           shown( QtxDockWindow* );
+  void           hided( QtxDockWindow* );
+
   virtual bool   eventFilter( QObject*, QEvent* );
 
 protected:
@@ -27,23 +30,30 @@ protected:
 private:
   void           installFilters();
 
+  void           showContainer();
+  void           hideContainer();
+
   void           updateIcon();
   void           updateCaption();
   void           updateVisibility();
 
 private:
-  bool           myVis;
   QtxDockWindow* myCont;
+  bool           myState;
+  bool           myEmpty;
+  bool           myVisible;
 };
 
 QtxDockWindow::Watcher::Watcher( QtxDockWindow* cont )
 : QObject( cont ), myCont( cont ),
-myVis( true )
+myState( true ),
+myEmpty( true )
 {
   if ( myCont->mainWindow() )
-    myVis = myCont->mainWindow()->appropriate( myCont );
+    myState = myCont->mainWindow()->appropriate( myCont );
 
   myCont->installEventFilter( this );
+  myVisible = myCont->isVisibleTo( myCont->parentWidget() );
 
   installFilters();
 }
@@ -69,6 +79,44 @@ bool QtxDockWindow::Watcher::eventFilter( QObject* o, QEvent* e )
     updateVisibility();
 
   return false;
+}
+
+void QtxDockWindow::Watcher::shown( QtxDockWindow* dw )
+{
+  if ( dw != myCont )
+    return;
+
+  myVisible = true;
+}
+
+void QtxDockWindow::Watcher::hided( QtxDockWindow* dw )
+{
+  if ( dw != myCont )
+    return;
+
+  myVisible = false;
+}
+
+void QtxDockWindow::Watcher::showContainer()
+{
+  if ( !myCont )
+    return;
+
+  QtxDockWindow* cont = myCont;
+  myCont = 0;
+  cont->show();
+  myCont = cont;
+}
+
+void QtxDockWindow::Watcher::hideContainer()
+{
+  if ( !myCont )
+    return;
+
+  QtxDockWindow* cont = myCont;
+  myCont = 0;
+  cont->hide();
+  myCont = cont;
 }
 
 void QtxDockWindow::Watcher::customEvent( QCustomEvent* e )
@@ -110,19 +158,21 @@ void QtxDockWindow::Watcher::updateVisibility()
     vis = it.current()->widget() && it.current()->widget()->isVisibleTo( myCont );
 
   QMainWindow* mw = myCont->mainWindow();
-  if ( mw )
+  if ( mw && myEmpty != vis )
   {
-    if ( vis )
-      mw->setAppropriate( myCont, myVis );
+    myEmpty = vis;
+    if ( myEmpty )
+      mw->setAppropriate( myCont, myState );
     else
     {
-      myVis = mw->appropriate( myCont );
+      myState = mw->appropriate( myCont );
       mw->setAppropriate( myCont, false );
     }
   }
 
+  vis = myEmpty && myVisible;
   if ( vis != myCont->isVisibleTo( myCont->parentWidget() ) )
-    vis ? myCont->show() : myCont->hide();
+    vis ? showContainer() : hideContainer();
 }
 
 void QtxDockWindow::Watcher::updateIcon()
@@ -252,4 +302,20 @@ QMainWindow* QtxDockWindow::mainWindow() const
   }
 
   return mw;
+}
+
+void QtxDockWindow::show()
+{
+  if ( myWatcher )
+    myWatcher->shown( this );
+
+  QDockWindow::show();
+}
+
+void QtxDockWindow::hide()
+{
+  if ( myWatcher )
+    myWatcher->hided( this );
+
+  QDockWindow::hide();
 }
