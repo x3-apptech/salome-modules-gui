@@ -52,13 +52,10 @@ public:
 
   // getting access 
   //operator RefCount*()      { return (RefCount*)p; }
-  operator T*()               { return  p;           }
-  T& operator*()              { return *p;           }
-  const T& operator*() const  { return *p;           }
-  T* operator->()             { return  p;           }
-  const T* operator->() const { return  p;           }
-  const T* get() const        { return  p;           }
-  T* get()                    { return  p;           }
+  T& operator*() const        { return *p;           }
+  T* operator->() const       { return  p;           }
+  operator T*() const         { return  p;           }
+  T* get() const              { return  p;           }
 
   // assignment
   template<class Y> SmartPtr& operator=( const SmartPtr<Y>& y_ ) 
