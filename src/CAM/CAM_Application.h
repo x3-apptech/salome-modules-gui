@@ -41,7 +41,7 @@ public:
 
   virtual bool        activateModule( const QString& );
 
-  virtual void        contextMenuPopup( const QString&, QPopupMenu* );
+  virtual void        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
   QString             moduleName( const QString& ) const;
   QString             moduleTitle( const QString& ) const;

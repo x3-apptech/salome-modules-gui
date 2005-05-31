@@ -463,8 +463,6 @@ void SalomeApp_Application::updateCommandsStatus()
 //=======================================================================
 void SalomeApp_Application::onHelpAbout()
 {
-  //QAD_MessageBox::info1( myDesktop, tr( "ABOUT" ), tr( "APP_NAME_LONG" ).arg( APP_VERSION ), tr( "BUT_OK" ) );
-
   QMessageBox aDlg( desktop(), "AboutDlg" );
 
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
@@ -472,7 +470,7 @@ void SalomeApp_Application::onHelpAbout()
 
   QFontMetrics m( aDlg.font() );
   QImage anImage = aPixmap.convertToImage();
-  int w = m.height() * 3;
+  int w = m.height() * 5;
   anImage = anImage.scale( w, w );
   aPixmap.convertFromImage( anImage );
 
@@ -780,6 +778,13 @@ void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 
 void SalomeApp_Application::defaultViewManagers( QStringList& ) const
 {
+}
+
+void SalomeApp_Application::afterCloseDoc()
+{
+  updateWindows();
+
+  CAM_Application::afterCloseDoc();
 }
 
 CORBA::ORB_var SalomeApp_Application::orb()

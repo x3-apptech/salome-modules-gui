@@ -369,7 +369,7 @@ void SALOME_PYQT_Module::onDesktopActivated()
   Context popup menu request.
   Called when user activates popup menu in some window (view, object browser, etc).
   */
-void SALOME_PYQT_Module::contextMenuPopup( const QString& theContext, QPopupMenu* thePopupMenu )
+void SALOME_PYQT_Module::contextMenuPopup( const QString& theContext, QPopupMenu* thePopupMenu, QString& /*title*/ )
 {
   MESSAGE( "SALOME_PYQT_Module::contextMenuPopup : " << theContext.latin1() );
   // perform synchronous request to Python event dispatcher

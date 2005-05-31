@@ -35,7 +35,7 @@ public:
   CAM_DataModel*         dataModel() const;
   CAM_Application*       application() const;
 
-  virtual void           contextMenuPopup( const QString&, QPopupMenu* ) {};
+  virtual void           contextMenuPopup( const QString&, QPopupMenu*, QString& title ) {};
   virtual void           updateCommandsStatus() {};
 
 public slots:

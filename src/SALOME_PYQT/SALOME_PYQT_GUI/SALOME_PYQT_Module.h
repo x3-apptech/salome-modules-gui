@@ -82,7 +82,7 @@ public:
   void           viewManagers( QStringList& ) const;
 
   /* context popup menu request */
-  void           contextMenuPopup( const QString&, QPopupMenu* );
+  void           contextMenuPopup( const QString&, QPopupMenu*, QString& );
   
 protected:
   /* data model creation */

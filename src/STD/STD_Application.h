@@ -59,7 +59,7 @@ public:
 
   virtual void          start();
 
-  virtual void          contextMenuPopup( const QString&, QPopupMenu* ) {}
+  virtual void          contextMenuPopup( const QString&, QPopupMenu*, QString& ) {}
 
 signals:
   void                  viewManagerAdded( SUIT_ViewManager* );

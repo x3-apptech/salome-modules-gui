@@ -46,7 +46,7 @@ public:
   virtual void                        viewManagers( QStringList& ) const;
   virtual QString                     engineIOR() const;
 
-  virtual void                        contextMenuPopup( const QString&, QPopupMenu* );
+  virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
   // Convenient shortcuts
   SalomeApp_Application*              getApp() const;

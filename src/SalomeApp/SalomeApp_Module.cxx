@@ -112,7 +112,7 @@ void SalomeApp_Module::updateObjBrowser( bool updateDataModel, SUIT_DataObject* 
   getApp()->objectBrowser()->updateTree( root );
 }
 
-void SalomeApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu )
+void SalomeApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
 {
   SalomeApp_Selection* sel = createSelection();
   sel->init( client, getApp()->selectionMgr() );

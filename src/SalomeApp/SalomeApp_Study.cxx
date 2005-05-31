@@ -187,10 +187,10 @@ void SalomeApp_Study::closeDocument()
   emit closed( this );
 
   // close SALOMEDS document
-  _PTR(Study) st = studyDS();
-  if ( st.get() )
+  _PTR(Study) studyPtr = studyDS();
+  if ( studyPtr.get() )
   {
-    SalomeApp_Application::studyMgr()->Close( st );
+    SalomeApp_Application::studyMgr()->Close( studyPtr );
     SALOMEDSClient_Study* aStudy = 0;
     setStudyDS( _PTR(Study)(aStudy) );
   }

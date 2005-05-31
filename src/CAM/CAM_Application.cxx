@@ -10,6 +10,8 @@
 #include <qfile.h> 
 #include <qfileinfo.h>
 #include <qtextstream.h>
+#include <qlabel.h>
+#include <qfont.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -377,9 +379,9 @@ void CAM_Application::readModuleList()
     SUIT_MessageBox::error1( 0, tr( "Error" ), tr( "Can not load modules configuration file " ), tr( "Ok" ) );
 }
 
-void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup )
+void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   // to do : add common items for popup menu ( if they are exist )
   if ( activeModule() ) 
-    activeModule()->contextMenuPopup( type, thePopup );
+    activeModule()->contextMenuPopup( type, thePopup, title );
 }
