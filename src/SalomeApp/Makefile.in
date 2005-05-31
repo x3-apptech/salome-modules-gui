@@ -35,7 +35,8 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_DataSubOwner.h \
 		SalomeApp_Selection.h \
 		SalomeApp_Filter.h \
-		SalomeApp_TypeFilter.h		
+		SalomeApp_TypeFilter.h \
+		SalomeApp_OBFilter.h		
 
 # .po files to transform in .qm
 PO_FILES = SalomeApp_images.po \
@@ -67,7 +68,8 @@ LIB_SRC= SalomeApp_Application.cxx \
 	 SalomeApp_ModuleDlg.cxx \
 	 SalomeApp_Selection.cxx \
 	 SalomeApp_Filter.cxx \
-	 SalomeApp_TypeFilter.cxx
+	 SalomeApp_TypeFilter.cxx \
+	 SalomeApp_OBFilter.cxx
 
 LIB_MOC = SalomeApp_Application.h \
 	  SalomeApp_DataModel.h \

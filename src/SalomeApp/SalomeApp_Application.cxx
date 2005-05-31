@@ -18,6 +18,7 @@
 #include "SalomeApp_EventFilter.h"
 #include "SalomeApp_WidgetContainer.h"
 #include "SalomeApp_ModuleDlg.h"
+#include "SalomeApp_OBFilter.h"
 
 #include <LogWindow.h>
 
@@ -731,6 +732,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   if ( flag == WT_ObjectBrowser )
   {
     OB_Browser* ob = new OB_Browser( desktop() );
+    ob->setFilter( new SalomeApp_OBFilter(selectionMgr()) );
 
     ob->setCaption( tr( "OBJECT_BROWSER" ) );
     ob->resize( OBJECT_BROWSER_WIDTH, ob->height() );
