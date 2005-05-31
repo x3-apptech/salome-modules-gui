@@ -119,10 +119,11 @@ void ListItem<T>::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r
 template<class T>
 void ListItem<T>::setSelected( bool s )
 {
-  if ( s && listView() && listView()->inherits( "OB_ListView" ) )
+  QListView* lv = T::listView();
+  if ( s && lv && lv->inherits( "OB_ListView" ) )
   {
-    OB_ListView* oblv = (OB_ListView*)listView();
-    s = s && oblv->isOk( this );
+    OB_ListView* objlv = (OB_ListView*)lv;
+    s = s && objlv->isOk( this );
   }
 
   QListViewItem::setSelected( s );
