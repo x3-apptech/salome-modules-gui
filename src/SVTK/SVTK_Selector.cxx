@@ -137,6 +137,7 @@ SVTK_Selector
 	myMapIOSubIndex.UnBind(theIO);
       myIObjects.Remove(anIter);
       anIsIOBound = true; 
+      break;
     }
   }
 
@@ -164,6 +165,7 @@ SVTK_Selector
 	myMapIOSubIndex.UnBind(anIO);
       myIObjects.Remove(anIter);
       anIsIOBound = true; 
+      break;
     }
   }
 
