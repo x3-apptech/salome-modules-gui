@@ -26,6 +26,7 @@
 //  Module : SALOME
 //  $Header$
 
+
 #include <TColStd_MapIteratorOfMapOfInteger.hxx>
 #include <TColStd_IndexedMapOfInteger.hxx>
 
@@ -36,7 +37,6 @@
 #include "SALOME_ListIteratorOfListIO.hxx"
 
 #include "SVTK_Selector.h"
-
 #include "utilities.h"
 
 SVTK_Selector
@@ -247,8 +247,9 @@ SVTK_Selector
 		    const TColStd_IndexedMapOfInteger& theIndices, 
 		    bool theIsModeShift)
 {
+  TColStd_IndexedMapOfInteger empty;
   if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO,TColStd_IndexedMapOfInteger());
+    myMapIOSubIndex.Bind(theIO, empty);
 
   TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
   aMapIndex = theIndices;
@@ -271,8 +272,9 @@ SVTK_Selector
 		    const TColStd_MapOfInteger& theIndices, 
 		    bool theIsModeShift)
 {
+  TColStd_IndexedMapOfInteger empty;	
   if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO,TColStd_IndexedMapOfInteger());
+    myMapIOSubIndex.Bind(theIO, empty);
 
   TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
 
@@ -297,8 +299,9 @@ SVTK_Selector
 		    int theIndex, 
 		    bool theIsModeShift)
 {
+  TColStd_IndexedMapOfInteger empty;		
   if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO,TColStd_IndexedMapOfInteger());
+    myMapIOSubIndex.Bind(theIO, empty);
   
   TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
 
