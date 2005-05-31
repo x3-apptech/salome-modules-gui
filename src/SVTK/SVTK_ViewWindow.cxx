@@ -73,6 +73,7 @@ SVTK_ViewWindow
   // Create an interactor.
   myRWInteractor = SVTK_RenderWindowInteractor::New();
   myRWInteractor->SetRenderWindow( myRenderWindow->getRenderWindow() );
+  myRWInteractor->setViewWindow( this );
 
   SVTK_InteractorStyle* RWS = SVTK_InteractorStyle::New();
   RWS->setGUIWindow( myRenderWindow );
