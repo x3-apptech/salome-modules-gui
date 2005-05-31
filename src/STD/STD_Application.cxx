@@ -153,7 +153,7 @@ void STD_Application::createActions()
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1, -1, 0 );
   int editMenu = createMenu( tr( "MEN_DESK_EDIT" ), -1, -1, 10 );
-  int viewMenu = createMenu( tr( "MEN_DESK_VIEW" ), -1, -1, 20 );
+  int viewMenu = createMenu( tr( "MEN_DESK_VIEW" ), -1, -1, 10 );
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
 
   // Create menu items
