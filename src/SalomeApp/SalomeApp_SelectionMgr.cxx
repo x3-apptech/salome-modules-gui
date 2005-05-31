@@ -54,12 +54,12 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
   SUIT_DataOwnerPtrList aList;
   selected( aList );
 
-  QValueList< QString > anEntryList;
-  Handle(SALOME_InteractiveObject) anIO;
-
   for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
   {
     const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*>( (*itr).operator->() );
+    if( owner )
+      lst.Append( owner->IO() );
+/*
 
     if ( owner && dynamic_cast<const SalomeApp_DataSubOwner*>( owner ) ) 
     { //get only subowners, insert into lst unique subowners (subowners with different entries)
@@ -93,6 +93,7 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
         }
       }
     }
+*/
   }
 }
 

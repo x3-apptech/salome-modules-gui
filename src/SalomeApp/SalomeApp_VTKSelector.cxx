@@ -21,8 +21,7 @@ SalomeApp_SVTKDataOwner
 			   const TColStd_IndexedMapOfInteger& theIds,
 			   Selection_Mode theMode,
 			   SALOME_Actor* theActor):
-  SalomeApp_DataOwner(theIO->getEntry()),
-  myIO(theIO),
+  SalomeApp_DataOwner( theIO ),
   mySelectionMode(theMode),
   myActor(theActor)
 {
@@ -120,7 +119,7 @@ SalomeApp_VTKSelector
 	    const SUIT_DataOwner* aDataOwner = (*anIter).get();
 	    if(const SalomeApp_SVTKDataOwner* anOwner = dynamic_cast<const SalomeApp_SVTKDataOwner*>(aDataOwner)){
 	      aSelector->SetSelectionMode(anOwner->GetMode());
-	      Handle(SALOME_InteractiveObject) anIO = anOwner->GetIO();
+	      Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
 	      aSelector->AddIObject(anIO);
 	      aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);
 	      if(MYDEBUG) MESSAGE("VTKSelector::setSelection - SVTKDataOwner - "<<anIO->getEntry());

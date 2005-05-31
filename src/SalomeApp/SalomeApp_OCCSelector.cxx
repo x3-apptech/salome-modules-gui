@@ -39,11 +39,12 @@ void SalomeApp_OCCSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
   AIS_ListOfInteractive aSelList;
   myViewer->getSelectedObjects( aSelList );
   for ( AIS_ListIteratorOfListOfInteractive anIt( aSelList ); anIt.More(); anIt.Next() )
-  {
-    QString entryStr = entry( anIt.Value() );
-    if ( !entryStr.isEmpty() )
-      aList.append( SUIT_DataOwnerPtr( new SalomeApp_DataOwner( entryStr ) ) );
-  }
+    if ( !anIt.Value().IsNull() )
+    {
+      Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast(anIt.Value()->GetOwner());
+      if( !anObj.IsNull() )
+        aList.append( SUIT_DataOwnerPtr( new SalomeApp_DataOwner( anObj ) ) );
+    }
 }
 
 void SalomeApp_OCCSelector::setSelection( const SUIT_DataOwnerPtrList& aList )

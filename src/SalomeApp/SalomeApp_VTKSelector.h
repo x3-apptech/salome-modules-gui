@@ -27,11 +27,6 @@ class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
 			     SALOME_Actor* theActor = NULL);
     virtual ~SalomeApp_SVTKDataOwner();
 
-    const Handle(SALOME_InteractiveObject)& GetIO() const
-    {
-      return myIO;
-    }
-
     const TColStd_IndexedMapOfInteger& GetIds() const
     {
       return myIds;
@@ -45,7 +40,6 @@ class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
     SALOME_Actor* GetActor() const;
 
  protected:
-    Handle(SALOME_InteractiveObject) myIO;
     TColStd_IndexedMapOfInteger myIds;
     Selection_Mode mySelectionMode;
     vtkSmartPointer<SALOME_Actor> myActor;

@@ -36,7 +36,11 @@ void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& list ) const
   {
     SalomeApp_DataObject* obj = dynamic_cast<SalomeApp_DataObject*>( it.current() );
     if ( obj )
-      list.append( SUIT_DataOwnerPtr( new SalomeApp_DataOwner( obj->entry() ) ) );
+    {
+      Handle( SALOME_InteractiveObject ) aSObj = new SALOME_InteractiveObject
+	( obj->entry(), obj->componentDataType(), obj->name() );
+      list.append( SUIT_DataOwnerPtr( new SalomeApp_DataOwner( aSObj  ) ) );
+    }
   }
 }
 
