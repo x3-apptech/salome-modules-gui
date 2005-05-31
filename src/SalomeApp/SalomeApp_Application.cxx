@@ -29,14 +29,15 @@
 #include <OCCViewer_ViewManager.h>
 #include <SOCC_ViewModel.h>
 
-#include "SVTK_ViewManager.h"
-#include "SVTK_ViewModel.h"
+#include <SVTK_ViewModel.h>
+#include <SVTK_ViewManager.h>
 
 #include <STD_TabDesktop.h>
 
 #include <SUIT_Tools.h>
 #include <SUIT_Session.h>
 
+#include <QtxToolBar.h>
 #include <QtxDockAction.h>
 
 #include <OB_Browser.h>
@@ -216,12 +217,14 @@ void SalomeApp_Application::createActions()
   QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
   if ( defIcon.isNull() )
     defIcon = QPixmap( imageEmptyIcon );
+
   // default icon for any module
   QPixmap modIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_MODULE_ICO" ) );
   if ( modIcon.isNull() )
     modIcon = QPixmap( imageEmptyIcon );
 
-  int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ) );
+  QToolBar* modTBar = new QtxToolBar( true, desk );
+  modTBar->setLabel( tr( "INF_TOOLBAR_MODULES" ) );
 
   QActionGroup* modGroup = new QActionGroup( this );
   modGroup->setExclusive( true );
@@ -237,8 +240,8 @@ void SalomeApp_Application::createActions()
 
   const int iconSize = 20;
 
-  createTool( modGroup, modTBar );
-  createTool( separator(), modTBar );
+  modGroup->addTo( modTBar );
+  modTBar->addSeparator();
 
   QStringList modList;
   modules( modList, false );
@@ -261,11 +264,15 @@ void SalomeApp_Application::createActions()
     icon.convertFromImage( icon.convertToImage().smoothScale( iconSize, iconSize, QImage::ScaleMin ) );
 
     QAction* a = createAction( -1, *it, icon, *it, tr( "PRP_MODULE" ).arg( *it ), 0, desk, true );
-    createTool( a, modTBar );
+    a->addTo( modTBar );
     modGroup->add( a );
 
     myActions.insert( *it, a );
   }
+
+  SUIT_Tools::simplifySeparators( modTBar );
+
+  // New window
 
   int windowMenu = createMenu( tr( "MEN_DESK_WINDOW" ), -1, 100 );
   int newWinMenu = createMenu( tr( "MEN_DESK_NEWWINDOW" ), windowMenu, -1, 0 );
@@ -704,6 +711,14 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
 QString SalomeApp_Application::getFileFilter() const
 {
   return "(*.hdf)";
+}
+
+void SalomeApp_Application::beforeCloseDoc( SUIT_Study* s )
+{
+  CAM_Application::beforeCloseDoc( s );
+
+  for ( WindowMap::ConstIterator itr = myWindows.begin(); s && itr != myWindows.end(); ++itr )
+    removeWindow( itr.key(), s->id() );
 }
 
 void SalomeApp_Application::afterCloseDoc()

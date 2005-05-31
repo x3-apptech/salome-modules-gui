@@ -111,6 +111,7 @@ protected:
 
   virtual void                        onSelectionChanged();
 
+  virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
 
 private slots:
