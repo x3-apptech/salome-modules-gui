@@ -74,7 +74,7 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
 	  _PTR(SComponent) aFC (anObj->GetFatherComponent());
 	  if ( aFC )
 	  {
-	    anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->Name().c_str() );
+	    anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->GetName().c_str() );
 	    if ( anIO ) lst.Append( anIO );
 	  }
 	}
@@ -88,7 +88,7 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
         _PTR(SComponent) aFC (anObj->GetFatherComponent());
         if ( aFC )
         {
-          anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->Name().c_str() );
+          anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->GetName().c_str() );
 	  if ( anIO ) lst.Append( anIO );
         }
       }
