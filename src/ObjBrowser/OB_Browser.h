@@ -84,6 +84,7 @@ signals:
 
 private slots:
   void              onExpand();
+  void              onRefresh();
   void              onDestroyed( SUIT_DataObject* );
   void              onDropped( QPtrList<QListViewItem>, QListViewItem*, int );
 

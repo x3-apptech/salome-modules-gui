@@ -759,6 +759,11 @@ void OB_Browser::onExpand()
     expand( listViewItem( itr.current() ) );
 }
 
+void OB_Browser::onRefresh()
+{
+  updateTree();
+}
+
 void OB_Browser::onDestroyed( SUIT_DataObject* obj )
 {
   if ( !obj )
@@ -848,7 +853,11 @@ void OB_Browser::contextMenuPopup( QPopupMenu* menu )
     closed = hasClosed( listViewItem( itr.current() ) );
 
   if ( closed )
+  {
     menu->insertItem( tr( "MEN_EXPAND_ALL" ), this, SLOT( onExpand() ) );
+    menu->insertSeparator();
+  }
+  menu->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
 }
 
 void OB_Browser::expand( QListViewItem* item )
