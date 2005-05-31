@@ -719,13 +719,6 @@ void SalomeApp_Application::beforeCloseDoc( SUIT_Study* s )
     removeWindow( itr.key(), s->id() );
 }
 
-void SalomeApp_Application::afterCloseDoc()
-{
-  updateWindows();
-
-  CAM_Application::afterCloseDoc();
-}
-
 void SalomeApp_Application::updateActions()
 {
   updateCommandsStatus();
