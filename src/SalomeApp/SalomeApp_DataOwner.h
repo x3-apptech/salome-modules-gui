@@ -17,4 +17,6 @@ private:
     QString  myEntry;
 };
 
+typedef SMART(SalomeApp_DataOwner) SalomeApp_DataOwnerPtr;
+
 #endif
