@@ -24,23 +24,10 @@
 
 #include <Python.h>   // must be before qt includes ...
 
-class QSemaphore;
-class QMutex;
-
 extern "C" PyObject * PyEval_EvalCode(PyObject *co, PyObject *g, PyObject *l);
 
 #define TOP_HISTORY_PY "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"
-
-
-class SemaphoreLock{
-  QSemaphore* mySemaphore;
-  std::string myComment;
- public:
-  SemaphoreLock(QSemaphore* theSemaphore, const char* theComment = "");
-  ~SemaphoreLock();
-};
-
 
 class PYINTERP_EXPORT PyLockWrapper
 {
@@ -52,23 +39,8 @@ class PYINTERP_EXPORT PyLockWrapper
 };
 
 
-class ThreadLock
-{
-  QMutex* myMutex;
-  std::string myComment;
-public:
-  ThreadLock(QMutex* theMutex, const char* theComment = "");
-  ~ThreadLock();
-};
-
-
-bool IsPyLocked();
-
-ThreadLock GetPyThreadLock(const char* theComment = "");
-
 class PYINTERP_EXPORT PyInterp_base{
  public:
-//  static PyThreadState *_gtstate;
   static int _argc;
   static char* _argv[];
   static PyObject *builtinmodule;

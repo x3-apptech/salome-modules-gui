@@ -17,8 +17,6 @@
 #include <Container_init_python.hxx>
 #include <cStringIO.h>
 
-#include <qmutex.h>
-
 #include <utilities.h>
 
 
@@ -32,9 +30,6 @@ using namespace std;
 //static int MYDEBUG = 0;
 //static int MYPYDEBUG = 0;
 //#endif
-
-
-static QMutex myMutex(true);
 
 
 PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState): 
@@ -52,31 +47,6 @@ PyLockWrapper::~PyLockWrapper(){
   PyThreadState_Swap(mySaveThreadState); // restore previous current (no need to get local,
   PyEval_ReleaseLock();                  // local thread state* already in _tstate
 //  if(MYDEBUG) MESSAGE(" PyLockWrapper "<<this<<" released: new thread state "<<mySaveThreadState);
-}
-
-
-ThreadLock::ThreadLock(QMutex* theMutex, const char* theComment):
-  myMutex(theMutex),
-  myComment(theComment)
-{
-//  if(MYDEBUG && myComment != "") MESSAGE(" ThreadLock "<<this<<"::"<<myMutex<<" - "<<myComment<<" - "<<myMutex->locked());
-  myMutex->lock();
-}
-
-
-ThreadLock::~ThreadLock(){
-//  if(MYDEBUG && myComment != "") MESSAGE("~ThreadLock "<<this<<"::"<<myMutex<<" - "<<myComment);
-  myMutex->unlock();
-}
-
-
-bool IsPyLocked(){
-  return myMutex.locked();
-}
-
-
-ThreadLock GetPyThreadLock(const char* theComment){
-  return ThreadLock(&myMutex,theComment);
 }
 
 
