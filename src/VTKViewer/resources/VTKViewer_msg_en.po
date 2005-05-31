@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: example-Qt-message-extraction\n"
 "POT-Creation-Date: 1999-02-23 15:38+0200\n"
-"PO-Revision-Date: 1999-02-23 15:38+0200\n"
+"PO-Revision-Date: 2005-05-31 13:25+0400\n"
 "Last-Translator: \n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 
@@ -134,3 +134,11 @@ msgstr "Error"
 msgid "BUT_OK"
 msgstr "Ok"
 
+msgid "VTKViewer_Viewer::MEN_DUMP_VIEW"
+msgstr "Dump view..."
+
+msgid "VTKViewer_Viewer::MEN_SHOW_TOOLBAR"
+msgstr "Show toolbar"
+
+msgid "VTKViewer_Viewer::MEN_CHANGE_BACKGROUD"
+msgstr "Change background..."

@@ -89,26 +89,20 @@ SVTK_Viewer
 }
 
 //==========================================================
-void
-SVTK_Viewer
-::contextMenuPopup(QPopupMenu* thePopup)
+void SVTK_Viewer::contextMenuPopup( QPopupMenu* thePopup )
 {
-  if (thePopup->count() > 0) thePopup->insertSeparator();
-  thePopup->insertItem("Change background...", this, SLOT(onChangeBgColor()));
-  if(SUIT_ViewWindow* aViewWindow = myViewManager->getActiveView()){
-    if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewWindow)){
-      if(!aView->getToolBar()->isVisible()){
-	thePopup->insertSeparator();
-	thePopup->insertItem("Show toolbar", this, SLOT(onShowToolbar()));
-      }
-    }
-  }
+  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+
+  thePopup->insertSeparator();
+
+  SVTK_ViewWindow* aView = (SVTK_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView && !aView->getToolBar()->isVisible() )
+    thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
 //==========================================================
-void
-SVTK_Viewer
-::onMousePress(SUIT_ViewWindow* vw, QMouseEvent* event)
+void SVTK_Viewer::onMousePress(SUIT_ViewWindow* vw, QMouseEvent* event)
 {
   if(SVTK_ViewWindow* aVW = dynamic_cast<SVTK_ViewWindow*>(vw)){
     if(SVTK_RenderWindowInteractor* aRWI = aVW->getRWInteractor()){
@@ -183,10 +177,15 @@ SVTK_Viewer
   //!! To be done for view windows
 }
 
+void SVTK_Viewer::onDumpView()
+{
+  SVTK_ViewWindow* aView = (SVTK_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView )
+    aView->onDumpView();
+}
+
 //==========================================================
-void
-SVTK_Viewer
-::onChangeBgColor()
+void SVTK_Viewer::onChangeBgColor()
 {
   QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)

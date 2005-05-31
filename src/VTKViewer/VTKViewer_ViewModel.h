@@ -40,8 +40,9 @@ protected slots:
   void onMouseMove(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
 
-  void onChangeBgColor();
+  void onDumpView();
   void onShowToolbar();
+  void onChangeBgColor();
 
 private:
   bool mySelectionEnabled;

@@ -181,16 +181,21 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
 //*********************************************************************
 void OCCViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
 {
-  if (thePopup->count() > 0) thePopup->insertSeparator();
-  thePopup->insertItem("Change background...", this, SLOT(onChangeBgColor()));
+  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+
+  thePopup->insertSeparator();
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
-  if ( aView ) {
-    if ( !aView->getToolBar()->isVisible() ) {
-      if (thePopup->count() > 0) thePopup->insertSeparator();
-      thePopup->insertItem("Show toolbar", this, SLOT(onShowToolbar()));
-    }
-  }
+  if ( aView && !aView->getToolBar()->isVisible() )
+    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
+}
+
+void OCCViewer_Viewer::onDumpView()
+{
+  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView )
+    aView->onDumpView();
 }
 
 //*********************************************************************

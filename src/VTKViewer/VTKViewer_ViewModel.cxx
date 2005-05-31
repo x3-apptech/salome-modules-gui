@@ -47,16 +47,14 @@ void VTKViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 //*********************************************************************
 void VTKViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
 {
-  if (thePopup->count() > 0) thePopup->insertSeparator();
-  thePopup->insertItem("Change background...", this, SLOT(onChangeBgColor()));
+  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+
+  thePopup->insertSeparator();
 
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
-  if ( aView ) {
-    if ( !aView->getToolBar()->isVisible() ) {
-      thePopup->insertSeparator();
-      thePopup->insertItem("Show toolbar", this, SLOT(onShowToolbar()));
-    }
-  }
+  if ( aView && !aView->getToolBar()->isVisible() )
+    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
 //*********************************************************************
@@ -129,6 +127,13 @@ void VTKViewer_Viewer::enableMultiselection(bool isEnable)
 {
   myMultiSelectionEnabled = isEnable;
   //!! To be done for view windows
+}
+
+void VTKViewer_Viewer::onDumpView()
+{
+  VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView )
+    aView->onDumpView();
 }
 
 //*********************************************************************

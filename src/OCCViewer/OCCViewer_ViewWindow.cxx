@@ -391,7 +391,7 @@ void OCCViewer_ViewWindow::setTransformRequested ( OperationType op )
 }
 
 
-//****************************************************************
+//****************************************************************/
 void OCCViewer_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
 {
   myCurrX = theEvent->x();
@@ -442,7 +442,7 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
   }
 }
 
-//****************************************************************
+//****************************************************************/
 void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 {
   switch ( myOperation ) {
@@ -523,7 +523,7 @@ void OCCViewer_ViewWindow::resetState()
 }
 
 
-//****************************************************************
+//****************************************************************/
 void OCCViewer_ViewWindow::drawRect()
 {
   QPainter aPainter(myViewPort);
@@ -536,7 +536,7 @@ void OCCViewer_ViewWindow::drawRect()
   myRect = aRect;
 }
 
-//****************************************************************
+//****************************************************************/
 void OCCViewer_ViewWindow::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
