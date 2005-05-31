@@ -546,7 +546,9 @@ void SalomeApp_Application::removeWindow( const int flag, const int studyId )
       sId = activeStudy()->id();
   }
 
+  QWidget* wid = myWindows[flag]->widget( sId );
   myWindows[flag]->remove( sId );
+  delete wid;
 
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
@@ -700,8 +702,6 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
   emit studyClosed();
 
   activateModule( "" );
-  if ( objectBrowser() != 0 )
-    objectBrowser()->setRootObject( 0 );
 
   saveWindowsGeometry();
 }
