@@ -36,6 +36,9 @@ msgstr "Object Browser"
 msgid "SalomeApp_Application::PYTHON_CONSOLE"
 msgstr "Python Console"
 
+msgid "SalomeApp_Application::LOG_WINDOW"
+msgstr "Message Window"
+
 msgid "SalomeApp_Application::DATA_MODELS"
 msgstr "Data models"
 
