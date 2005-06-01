@@ -677,11 +677,15 @@ QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
 {
   QPopupMenu* popup = QTextEdit::createPopupMenu( pos );
 
+  QValueList<int> ids;
   for ( int i = 0; popup && i < popup->count(); i++ )
   {
     if ( !popup->isItemEnabled( popup->idAt( i ) ) )
-      popup->removeItemAt( i );
+      ids.append( popup->idAt( i ) );
   }
+
+  for ( QValueList<int>::const_iterator it = ids.begin(); it != ids.end(); ++it )
+    popup->removeItem( *it );
 
   SUIT_Tools::simplifySeparators( popup );
 
