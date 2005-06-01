@@ -26,12 +26,9 @@ LIB_SRC = 	  \
 	   SPlot2d_Prs.cxx \
 	   SPlot2d_ViewModel.cxx
 
-#LIB_MOC = \
-#           Plot2d.h \
-#           Plot2d_ViewFrame.h \
-#           Plot2d_SetupViewDlg.h \
-#           Plot2d_SetupPlot2dDlg.h \
-#           Plot2d_FitDataDlg.h
+LIB_MOC = \
+	   SPlot2d_ViewModel.h
+
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_ModuleCatalog.idl \
@@ -41,7 +38,7 @@ LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_GenericObj.idl
 
 CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(OGL_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
-LDFLAGS+=$(QT_MT_LIBS) $(OGL_LIBS) $(QWT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit  
+LDFLAGS+=$(QT_MT_LIBS) $(OGL_LIBS) $(QWT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit -lPlot2d -lSalomePrs
 
 
 @CONCLUDE@
