@@ -128,7 +128,9 @@ QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )
   QIntList szList = pSplit->sizes();
 
   QSplitter* wrap = new QSplitter( 0 );
+#if defined QT_VERSION && QT_VERSION >= 0x30200
   wrap->setChildrenCollapsible( false );
+#endif
   insertWidget( wrap, pSplit, area );
   area->reparent( wrap, QPoint( 0, 0 ), true );
 
