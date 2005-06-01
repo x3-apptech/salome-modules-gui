@@ -279,12 +279,18 @@ void SalomeApp_Application::createActions()
   int newWinMenu = createMenu( tr( "MEN_DESK_NEWWINDOW" ), windowMenu, -1, 0 );
   createMenu( separator(), windowMenu, -1, 1 );
 
+  QMap<int, int> accelMap;
+  accelMap[NewGLViewId]  = ALT+Key_G;
+  accelMap[NewPlot2dId]  = ALT+Key_P;
+  accelMap[NewOCCViewId] = ALT+Key_O;
+  accelMap[NewVTKViewId] = ALT+Key_K;
+
   for ( int id = NewGLViewId; id <= NewVTKViewId; id++ )
   {
     QAction* a = createAction( id, tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ), QIconSet(), 
-				                       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
-				                       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
-				                       0, desk, false, this, SLOT( onNewWindow() ) );
+			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
+			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
+			       accelMap.contains( id ) ? accelMap[id] : 0, desk, false, this, SLOT( onNewWindow() ) );
     createMenu( a, newWinMenu, -1 );
   }
 
