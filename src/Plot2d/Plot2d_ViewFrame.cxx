@@ -1120,6 +1120,7 @@ void Plot2d_ViewFrame::setBackgroundColor( const QColor& color )
     aPal.setColor( cg, QColorGroup::Background, myBackground );
   }
   myPlot->getLegend()->setPalette( aPal );
+  Repaint();
 }
 /*!
   Gets background color
