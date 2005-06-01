@@ -346,6 +346,7 @@ QtxParser::Error QtxLogic::calculate( const QString& op,
 {
     QtxParser::Error err = QtxParser::OK;
     if( v1.isValid() && v2.isValid() )
+    {
         if( op=="and" || op=="&&" )
             set( v1, v1.toBool() && v2.toBool() );
         else if( op=="or" || op=="||" )
@@ -356,7 +357,7 @@ QtxParser::Error QtxLogic::calculate( const QString& op,
             set( v1, !v1.toBool() || v2.toBool() );
         else if( op=="=" )
             set( v1, v1.toBool()==v2.toBool() );
-
+    }
     else
         if( op=="not" || op=="!" )
             v2 = !v2.toBool();
