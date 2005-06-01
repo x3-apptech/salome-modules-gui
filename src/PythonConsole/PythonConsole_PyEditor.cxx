@@ -280,8 +280,6 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
   bool ctrlPressed = e->state() & ControlButton;
   // check if <Shift> is pressed
   bool shftPressed = e->state() & ShiftButton;
-  // check if <Alt> is pressed
-  bool altPressed = e->state() & AltButton;
 
   // process <Ctrl>+<C> key-bindings
   if ( aKey == Key_C && ctrlPressed ) {
