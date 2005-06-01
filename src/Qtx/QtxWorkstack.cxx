@@ -1124,7 +1124,11 @@ QRect QtxWorkstackTabBar::tabRect( const int idx ) const
 
     int bw = 0;
     if ( QABS( x2 - x1 ) > width() )
+#if defined QT_VERSION && QT_VERSION >= 0x30300
       bw = 2 * style().pixelMetric( QStyle::PM_TabBarScrollButtonWidth, this );
+#else
+      bw = 2 * 16;
+#endif
 
     int limit = width() - bw;
     r.setRight( QMIN( r.right(), limit ) );
