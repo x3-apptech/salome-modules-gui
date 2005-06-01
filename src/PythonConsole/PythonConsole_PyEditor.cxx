@@ -24,30 +24,21 @@
 //  File   : PythonConsole_PyEditor.cxx
 //  Author : Nicolas REJNERI
 //  Module : SALOME
-//  $Header$
 
 #include <PythonConsole_PyEditor.h> // this include must be first (see PyInterp_base.h)!
+
 #include <PyInterp_Dispatcher.h>
+
 #include <SUIT_Tools.h>
 
-#include <qapplication.h>
 #include <qmap.h>
 #include <qclipboard.h>
 #include <qdragobject.h>
+#include <qapplication.h>
 
-//#include "utilities.h"
 using namespace std;
 
-
-//#ifdef _DEBUG_
-//static int MYDEBUG = 1;
-//#else
-//static int MYDEBUG = 0;
-//#endif
-
-
 enum { IdCopy, IdPaste, IdClear, IdSelectAll };
-
 
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
@@ -105,6 +96,7 @@ PythonConsole_PyEditor::PythonConsole_PyEditor(PyInterp_base* theInterp, QWidget
   QFont aFont = SUIT_Tools::stringToFont( fntSet );
   setFont(aFont);
   setTextFormat(QTextEdit::PlainText);
+  setUndoRedoEnabled( false );
 
   _currentPrompt = READY_PROMPT;
   setWordWrap(NoWrap);
@@ -681,4 +673,19 @@ void PythonConsole_PyEditor::onPyInterpChanged( PyInterp_base* interp )
       viewport()->setCursor( waitCursor );
     }
   }
+}
+
+QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
+{
+  QPopupMenu* popup = QTextEdit::createPopupMenu( pos );
+
+  for ( int i = 0; popup && i < popup->count(); i++ )
+  {
+    if ( !popup->isItemEnabled( popup->idAt( i ) ) )
+      popup->removeItemAt( i );
+  }
+
+  SUIT_Tools::simplifySeparators( popup );
+
+  return popup;
 }

@@ -57,6 +57,8 @@ protected:
 public slots:
   void handleReturn();
   void onPyInterpChanged( PyInterp_base* );
+
+  virtual QPopupMenu* createPopupMenu( const QPoint& );
   
 private:
   QString        _buf;
