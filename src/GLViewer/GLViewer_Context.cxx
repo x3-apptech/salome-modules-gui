@@ -77,15 +77,11 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
   region.setTop( (int)(y - myTolerance) );
   region.setBottom( (int)(y + myTolerance) );
 
-  QRegion circle( (int)(x - myTolerance), (int)(y - myTolerance),
-                      (int)(2 * myTolerance), (int)(2 * myTolerance), QRegion::Ellipse );
-
   for( it = myObjects.begin(); it != myObjects.end(); ++it )
   {
     it.key()->setScale( aXScale, aYScale );
     rect = it.key()->getUpdateRect()->toQRect();
     obj = QRegion( *rect );
-    intersection = obj.intersect( circle );
 
     if( !byCircle && rect->intersects( region ) )
     {
@@ -99,13 +95,19 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
       //    cout << "highlight" << endl;
     }
 
-    if( byCircle && !intersection.isEmpty() )
+    if( byCircle )
     {
-      update = it.key()->highlight( x, y, myTolerance, GL_TRUE );
-      isHigh = it.key()->isHighlighted();
-      onObject = GL_TRUE;
+      QRegion circle( (int)(x - myTolerance), (int)(y - myTolerance),
+		      (int)(2 * myTolerance), (int)(2 * myTolerance), QRegion::Ellipse );
+      intersection = obj.intersect( circle );
+      if( !intersection.isEmpty() )
+      {
+	update = it.key()->highlight( x, y, myTolerance, GL_TRUE );
+	isHigh = it.key()->isHighlighted();
+	onObject = GL_TRUE;
+      }
     }
-    
+
     if( isHigh )
     {
       lastPicked = it.key();
