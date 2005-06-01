@@ -28,9 +28,6 @@ public:
   OB_Filter*              filter() const;
   void                    setFilter( OB_Filter* );
 
-  virtual int             addColumn( const QString& label, int width = -1 );
-  virtual int             addColumn( const QIconSet& iconset, const QString& label, int width = -1 );
-
   bool                    isOk( QListViewItem* ) const;
 
 signals:
@@ -41,6 +38,8 @@ protected:
   virtual void            dropEvent( QDropEvent* );
   virtual void            dragMoveEvent( QDragMoveEvent* );
   virtual void            dragEnterEvent( QDragEnterEvent* );
+
+  virtual void            keyPressEvent( QKeyEvent* );
 
 private:
   void                    updateHeader();

@@ -26,6 +26,14 @@ SUIT_DataObject::SUIT_DataObject( SUIT_DataObject* p )
 
 SUIT_DataObject::~SUIT_DataObject()
 {
+  if ( mySignal )
+  {
+    mySignal->emitSignal();
+    mySignal->setOwner( 0 );
+  }
+
+  delete mySignal;
+
   SUIT_DataObject* p = myParent;
 
   myParent = 0;
@@ -35,8 +43,6 @@ SUIT_DataObject::~SUIT_DataObject()
 
   for ( QPtrListIterator<SUIT_DataObject> it( myChildren ); it.current(); ++it )
     it.current()->myParent = 0;
-
-  delete mySignal;
 }
 
 /*!
@@ -242,9 +248,21 @@ bool SUIT_DataObject::replaceChild( SUIT_DataObject* src, SUIT_DataObject* trg, 
   removeChild( src );
 
   if ( del )
-    delete src;
+    src->deleteLater();
 
   return true;
+}
+
+/*!
+    Transfer the all children from specified object 'obj' to self.
+*/
+
+void SUIT_DataObject::reparentChildren( const SUIT_DataObject* obj )
+{
+  DataObjectList lst;
+  obj->children( lst );
+  for ( DataObjectListIterator it( lst ); it.current(); ++it )
+    it.current()->setParent( this );
 }
 
 /*!
@@ -305,6 +323,19 @@ bool SUIT_DataObject::disconnect( QObject* reciever, const char* slot )
     return true;
 
   return QObject::disconnect( mySignal, SIGNAL( destroyed( SUIT_DataObject* ) ), reciever, slot );
+}
+
+/*!
+    Returns object name
+*/
+
+void SUIT_DataObject::deleteLater()
+{
+  if ( !mySignal )
+    mySignal = new Signal( this );
+  
+  mySignal->emitSignal();
+  mySignal->deleteLater();
 }
 
 /*!
@@ -415,4 +446,36 @@ void SUIT_DataObject::dump( const int indent ) const
   std::cout << strIndent << name() << std::endl;     // dump to cout
   for ( DataObjectListIterator it( myChildren ); it.current(); ++it ) // iterate all children
     it.current()->dump( indent + 2 );  // dump every child with indent + 2 spaces
+}
+
+/*!
+  Class: SUIT_DataObject::Signal [Internal]
+*/
+
+SUIT_DataObject::Signal::Signal( SUIT_DataObject* o )
+: QObject(),
+myOwner( o )
+{
+}
+
+SUIT_DataObject::Signal::~Signal()
+{
+  SUIT_DataObject* o = myOwner;
+  myOwner = 0;
+  if ( o )
+  {
+    o->mySignal = 0;
+    delete o;
+  }
+}
+
+void SUIT_DataObject::Signal::setOwner( SUIT_DataObject* o )
+{
+  myOwner = o;
+}
+
+void SUIT_DataObject::Signal::emitSignal()
+{
+  if ( myOwner )
+    emit destroyed( myOwner );
 }

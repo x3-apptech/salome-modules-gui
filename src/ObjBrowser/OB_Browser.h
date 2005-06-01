@@ -68,6 +68,9 @@ public:
   bool              rootIsDecorated() const;
   void              setRootIsDecorated( const bool );
 
+  int               autoOpenLevel() const;
+  void              setAutoOpenLevel( const int );
+
   virtual int       addColumn( const QString & label, int width = -1, int index = -1 );
   virtual int       addColumn( const QIconSet & iconset, const QString & label, int width = -1, int index = -1 );
   virtual void      removeColumn( int index );
@@ -108,8 +111,12 @@ private:
   void              expand( QListViewItem* );
   bool              hasClosed( QListViewItem* ) const;
 
+  void              autoOpenBranches();
+  void              openBranch( QListViewItem*, const int );
+
   void              removeReferences( QListViewItem* );
   void              createConnections( SUIT_DataObject* );
+  void              removeObject( SUIT_DataObject*, const bool = true );
 
   DataObjectKey     objectKey( QListViewItem* ) const;
   DataObjectKey     objectKey( SUIT_DataObject* ) const;
@@ -132,6 +139,7 @@ private:
   bool              myAutoDelObjs;
   bool              myShowToolTips;
   bool              myRootDecorated;
+  int               myAutoOpenLevel;
 
   friend class OB_Browser::ToolTip;
 };

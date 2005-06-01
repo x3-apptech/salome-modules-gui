@@ -51,6 +51,8 @@ public:
   virtual void                insertChild( SUIT_DataObject*, int thePosition );
   bool                        replaceChild( SUIT_DataObject*, SUIT_DataObject*, const bool = false );
 
+  void                        reparentChildren( const SUIT_DataObject* );
+
   QString                     text() const { return text( 0 ); }
   QColor                      color() const { return color( Foreground ); }
   virtual QString             name() const;
@@ -74,6 +76,8 @@ public:
 
   bool                        connect( QObject*, const char* );
   bool                        disconnect( QObject*, const char* );
+
+  void                        deleteLater();
   
   void                        dump( const int indent = 2 ) const; // dump to cout
 
@@ -83,6 +87,7 @@ private:
   SUIT_DataObject*            myParent;
   DataObjectList              myChildren;
 
+  friend class SUIT_DataObject::Signal;
   friend class SUIT_DataObjectIterator;
 };
 
@@ -91,8 +96,11 @@ class SUIT_DataObject::Signal : public QObject
   Q_OBJECT
 
 public:
-  Signal( SUIT_DataObject* o ) : QObject(), myOwner( o ) {};
-  virtual ~Signal() { emit destroyed( myOwner ); };
+  Signal( SUIT_DataObject* );
+  virtual ~Signal();
+
+  void                        emitSignal();
+  void                        setOwner( SUIT_DataObject* o );
 
 signals:
   void                        destroyed( SUIT_DataObject* );

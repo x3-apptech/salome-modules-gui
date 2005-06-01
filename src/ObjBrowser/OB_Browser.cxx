@@ -71,6 +71,7 @@ OB_Browser::OB_Browser( QWidget* parent, SUIT_DataObject* root )
 
 myRoot( 0 ),
 myTooltip( 0 ),
+myAutoOpenLevel( 0 ),
 myAutoUpdate( false ),
 myAutoDelObjs( false ),
 myRootDecorated( true )
@@ -84,7 +85,7 @@ myRootDecorated( true )
 
   QVBoxLayout* main = new QVBoxLayout( this );
   main->addWidget( myView );
-  
+
   myShowToolTips = true;
   myTooltip = new ToolTip( this, myView->viewport() );
 
@@ -113,6 +114,21 @@ void OB_Browser::setRootIsDecorated( const bool decor )
 
   myRootDecorated = decor;
   updateTree();
+}
+
+int OB_Browser::autoOpenLevel() const
+{
+  return myAutoOpenLevel;
+}
+
+void OB_Browser::setAutoOpenLevel( const int level )
+{
+  if ( myAutoOpenLevel == level )
+    return;
+
+  myAutoOpenLevel = level;
+
+  autoOpenBranches();
 }
 
 bool OB_Browser::isShowToolTips()
@@ -178,6 +194,8 @@ void OB_Browser::setRootObject( SUIT_DataObject* theRoot )
   }
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
+
+  autoOpenBranches();
 
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
@@ -394,6 +412,8 @@ void OB_Browser::updateTree( SUIT_DataObject* o )
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
 
+  autoOpenBranches();
+
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
 }
@@ -428,6 +448,8 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
   updateView( trg );
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
+
+  autoOpenBranches();
 
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
@@ -739,15 +761,6 @@ void OB_Browser::keyPressEvent( QKeyEvent* e )
   if ( e->key() == Qt::Key_F5 )
     updateTree();
 
-  if ( ( e->key() == Qt::Key_Plus || e->key() == Qt::Key_Minus ) &&
-       e->state() & ControlButton && getListView() )
-  {
-    bool isOpen = e->key() == Qt::Key_Plus;
-    for ( QListViewItemIterator it( getListView() ); it.current(); ++it )
-      if ( it.current()->childCount() )
-        it.current()->setOpen( isOpen );
-  }
-
   QFrame::keyPressEvent( e );
 }
 
@@ -766,31 +779,7 @@ void OB_Browser::onRefresh()
 
 void OB_Browser::onDestroyed( SUIT_DataObject* obj )
 {
-  if ( !obj )
-    return;
-
-  // Removing list view items from <myItems> recursively for all children.
-  // Otherwise, "delete item" line will destroy all item's children,
-  // and <myItems> will contain invalid pointers (see ~QListViewItem() description in Qt docs)
-  DataObjectList childList;
-  obj->children( childList );
-  for ( DataObjectListIterator it( childList ); it.current(); ++it )
-    onDestroyed( it.current() );
-
-  QListViewItem* item = listViewItem( obj );
-
-  myItems.remove( obj );
-
-  if ( obj == myRoot )
-    myRoot = 0;
-
-  if ( isAutoUpdate() )
-  {
-    SUIT_DataObject* pObj = item && item->parent() ? dataObject( item->parent() ) : 0;
-    updateTree( pObj );
-  }
-  else
-    delete item;
+  removeObject( obj );
 }
 
 void OB_Browser::onDropped( QPtrList<QListViewItem> items, QListViewItem* item, int action )
@@ -883,4 +872,64 @@ bool OB_Browser::hasClosed( QListViewItem* item ) const
     has = hasClosed( child );
 
   return has;
+}
+
+void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
+{
+  if ( !obj )
+    return;
+
+  // Removing list view items from <myItems> recursively for all children.
+  // Otherwise, "delete item" line will destroy all item's children,
+  // and <myItems> will contain invalid pointers (see ~QListViewItem() description in Qt docs)
+  DataObjectList childList;
+  obj->children( childList );
+  for ( DataObjectListIterator it( childList ); it.current(); ++it )
+    removeObject( it.current(), false );
+
+  QListViewItem* item = listViewItem( obj );
+
+  myItems.remove( obj );
+
+  if ( obj == myRoot )
+    myRoot = 0;
+
+  if ( !autoUpd )
+    return;
+
+  if ( isAutoUpdate() )
+  {
+    SUIT_DataObject* pObj = item && item->parent() ? dataObject( item->parent() ) : 0;
+    updateTree( pObj );
+  }
+  else
+    delete item;
+}
+
+void OB_Browser::autoOpenBranches()
+{
+  int level = autoOpenLevel();
+  QListView* lv = getListView();
+  if ( !lv || level < 1 )
+    return;
+
+  QListViewItem* item = lv->firstChild();
+  while ( item )
+  {
+    openBranch( item, level );
+    item = item->nextSibling();
+  }
+}
+
+void OB_Browser::openBranch( QListViewItem* item, const int level )
+{
+  if ( !item || level < 1 || !item->childCount() )
+    return;
+
+  item->setOpen( true );
+  while ( item )
+  {
+    openBranch( item, level - 1 );
+    item = item->nextSibling();
+  }
 }

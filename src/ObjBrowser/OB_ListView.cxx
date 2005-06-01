@@ -47,24 +47,6 @@ bool OB_ListView::isOk( QListViewItem* item ) const
   return ok;
 }
 
-int OB_ListView::addColumn( const QString& label, int width )
-{
-  int res = QListView::addColumn( label, width );
-
-  updateHeader();
-
-  return res;
-}
-
-int OB_ListView::addColumn( const QIconSet& iconset, const QString& label, int width )
-{
-  int res = QListView::addColumn( iconset, label, width );
-
-  updateHeader();
-
-  return res;
-}
-
 QDragObject* OB_ListView::dragObject()
 {
   myItems.clear();
@@ -103,6 +85,19 @@ void OB_ListView::dropEvent( QDropEvent* e )
     emit dropped( myItems, item, e->action() );
   }
   myItems.clear();
+}
+
+void OB_ListView::keyPressEvent( QKeyEvent* ke )
+{
+  if ( ( ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Minus ) && ke->state() & ControlButton )
+  {
+    bool isOpen = ke->key() == Qt::Key_Plus;
+    for ( QListViewItemIterator it( this ); it.current(); ++it )
+      if ( it.current()->childCount() )
+        it.current()->setOpen( isOpen );
+  }
+  else
+    QtxListView::keyPressEvent( ke );
 }
 
 QListViewItem* OB_ListView::dropItem( QDropEvent* e ) const
@@ -148,9 +143,4 @@ bool OB_ListView::isDropAccepted( QListViewItem* drag, QListViewItem* drop ) con
     return false;
 
   return dropObj->isDropAccepted( dragObj );
-}
-
-void OB_ListView::updateHeader()
-{
-
 }
