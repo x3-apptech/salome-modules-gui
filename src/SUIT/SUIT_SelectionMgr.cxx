@@ -203,10 +203,19 @@ bool SUIT_SelectionMgr::hasFilter( SUIT_SelectionFilter* f ) const
   return myFilters.contains( f );
 }
 
-void SUIT_SelectionMgr::installFilter( SUIT_SelectionFilter* f )
+void SUIT_SelectionMgr::installFilter( SUIT_SelectionFilter* f, const bool updateSelection )
 {
   if ( !hasFilter( f ) )
+  {
+    SUIT_DataOwnerPtrList selOwners;
+    if( updateSelection )
+      selected( selOwners );
+      
     myFilters.append( f );
+    
+    if( updateSelection )
+      setSelected( selOwners );
+  }
 }
 
 void SUIT_SelectionMgr::removeFilter( SUIT_SelectionFilter* f )

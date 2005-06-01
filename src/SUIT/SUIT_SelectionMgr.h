@@ -49,7 +49,7 @@ public:
 
   bool            hasFilter( SUIT_SelectionFilter* ) const;
 
-  virtual void    installFilter( SUIT_SelectionFilter* );
+  virtual void    installFilter( SUIT_SelectionFilter*, const bool = true );
   virtual void    removeFilter( SUIT_SelectionFilter* );
   virtual void    clearFilters();
 
