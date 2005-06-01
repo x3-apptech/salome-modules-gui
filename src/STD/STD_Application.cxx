@@ -321,8 +321,9 @@ bool STD_Application::isPossibleToClose()
     activeStudy()->abortAllOperations();
     if ( activeStudy()->isModified() )
     {
-      int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TOT_DESK_FILE_CLOSE" ),
-                                            tr( "Document \"%1\" has been modified.\nDo you want to save changes?").arg( activeStudy()->studyName() ),
+      QString sName = activeStudy()->studyName().stripWhiteSpace();
+      QString msg = sName.isEmpty() ? tr( "INF_DOC_MODIFIED" ) : tr ( "INF_DOCUMENT_MODIFIED" ).arg( sName );
+      int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TOT_DESK_FILE_CLOSE" ), msg,
                                             tr( "BUT_YES" ), tr( "BUT_NO" ), tr( "BUT_CANCEL" ), 1, 2, 3, 1 );
       switch ( aAnswer )
       {
