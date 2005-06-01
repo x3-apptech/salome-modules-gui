@@ -22,10 +22,10 @@ class QTX_EXPORT QtxPathDialog : public QtxDialog
   Q_OBJECT
 
 protected:
-  QtxPathDialog( QWidget* = 0, const bool = true, const bool = false );
+  QtxPathDialog( QWidget* = 0, const bool = true, const bool = false, const int = Standard, WFlags = 0 );
 
 public:
-  QtxPathDialog( const bool, QWidget* = 0, const bool = true, const bool = false );
+  QtxPathDialog( const bool, QWidget* = 0, const bool = true, const bool = false, const int = Standard, WFlags = 0 );
   virtual ~QtxPathDialog();
 
   QString            fileName() const;

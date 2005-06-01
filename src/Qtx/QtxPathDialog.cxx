@@ -47,8 +47,8 @@ static const char* open_icon[] = {
 // Purpose  : Constructor.
 //================================================================
 
-QtxPathDialog::QtxPathDialog( const bool import, QWidget* parent, const bool modal, const bool resize )
-: QtxDialog( parent, 0, modal, resize ),
+QtxPathDialog::QtxPathDialog( const bool import, QWidget* parent, const bool modal, const bool resize, const int buttons, WFlags f )
+: QtxDialog( parent, 0, modal, resize, buttons, f ),
 myDefault( -1 ),
 myEntriesFrame( 0 ),
 myOptionsFrame( 0 )
@@ -72,8 +72,8 @@ myOptionsFrame( 0 )
 // Purpose  : Constructor.
 //================================================================
 
-QtxPathDialog::QtxPathDialog( QWidget* parent, const bool modal, const bool resize )
-: QtxDialog( parent, 0, modal, resize ),
+QtxPathDialog::QtxPathDialog( QWidget* parent, const bool modal, const bool resize, const int buttons, WFlags f )
+: QtxDialog( parent, 0, modal, resize, buttons, f ),
 myDefault( -1 ),
 myEntriesFrame( 0 ),
 myOptionsFrame( 0 )
