@@ -738,11 +738,11 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   if ( flag == WT_ObjectBrowser )
   {
     OB_Browser* ob = new OB_Browser( desktop() );
-    ob->setFilter( new SalomeApp_OBFilter(selectionMgr()) );
-
+    ob->setAutoUpdate( true );
+    ob->setAutoOpenLevel( 1 );
     ob->setCaption( tr( "OBJECT_BROWSER" ) );
     ob->resize( OBJECT_BROWSER_WIDTH, ob->height() );
-    ob->setAutoUpdate( true );
+    ob->setFilter( new SalomeApp_OBFilter( selectionMgr() ) );
 
     // Create OBSelector
     new SalomeApp_OBSelector( ob, mySelMgr );
