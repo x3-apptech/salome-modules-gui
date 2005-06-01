@@ -40,17 +40,6 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
 {
   lst.Clear();
 
-  if ( !application() )
-    return;
-
-  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( application()->activeStudy() );
-  if ( !appStudy )
-    return;
-
-  _PTR(Study) aStudy ( appStudy->studyDS() );
-  if ( !aStudy )
-    return;
-
   SUIT_DataOwnerPtrList aList;
   selected( aList );
 
@@ -59,63 +48,18 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& lst ) const
     const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*>( (*itr).operator->() );
     if( owner )
       lst.Append( owner->IO() );
-/*
-
-    if ( owner && dynamic_cast<const SalomeApp_DataSubOwner*>( owner ) ) 
-    { //get only subowners, insert into lst unique subowners (subowners with different entries)
-      if ( !anEntryList.contains( owner->entry() ) )
-      {	
-	anEntryList.append( owner->entry() );
-
-	//construct SALOME_InteractiveObject with predefined entry
-	_PTR(SObject) anObj ( aStudy->FindObjectID( owner->entry().latin1() ) );
-	if ( anObj )
-	{
-	  _PTR(SComponent) aFC (anObj->GetFatherComponent());
-	  if ( aFC )
-	  {
-	    anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->GetName().c_str() );
-	    if ( anIO ) lst.Append( anIO );
-	  }
-	}
-      }
-    }
-    else if ( owner )
-    { //get not subowners data owners
-      _PTR(SObject) anObj ( aStudy->FindObjectID( owner->entry().latin1() ) );
-      if ( anObj )
-      {
-        _PTR(SComponent) aFC (anObj->GetFatherComponent());
-        if ( aFC )
-        {
-          anIO = new SALOME_InteractiveObject( anObj->GetID().c_str(), aFC->ComponentDataType().c_str(), anObj->GetName().c_str() );
-	  if ( anIO ) lst.Append( anIO );
-        }
-      }
-    }
-*/
   }
 }
 
 void SalomeApp_SelectionMgr::setSelectedObjects( const SALOME_ListIO& lst, const bool append )
 {
-  if ( !application() )
-    return;
-
-  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( application()->activeStudy() );
-  if ( !appStudy )
-    return;
-
-  _PTR(Study) aStudy ( appStudy->studyDS() );
-  if ( !aStudy )
-    return;
-
   SUIT_DataOwnerPtrList owners;
   for ( SALOME_ListIteratorOfListIO it( lst ); it.More(); it.Next() )
   {
     if ( it.Value()->hasEntry() )
-      owners.append( new SalomeApp_DataOwner( it.Value()->getEntry() ) );
+      owners.append( new SalomeApp_DataOwner( it.Value() ) );
   }
+
   setSelected( owners, append );
 }
 
