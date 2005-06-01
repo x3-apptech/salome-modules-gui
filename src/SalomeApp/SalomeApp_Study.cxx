@@ -39,11 +39,13 @@ void SalomeApp_Study::createDocument()
   MESSAGE( "openDocument" );
 
   // initialize myStudyDS, read HDF file
-  _PTR(Study) study ( SalomeApp_Application::studyMgr()->NewStudy( newStudyName().latin1() ) );
+  QString aName = newStudyName();
+  _PTR(Study) study ( SalomeApp_Application::studyMgr()->NewStudy( aName.latin1() ) );
   if ( !study )
     return;
 
   setStudyDS( study );
+  setStudyName( aName );
 
   // create myRoot
   setRoot( new SalomeApp_RootObject( this ) );
@@ -188,7 +190,7 @@ void SalomeApp_Study::closeDocument()
 
   // close SALOMEDS document
   _PTR(Study) studyPtr = studyDS();
-  if ( studyPtr.get() )
+  if ( studyPtr )
   {
     SalomeApp_Application::studyMgr()->Close( studyPtr );
     SALOMEDSClient_Study* aStudy = 0;
