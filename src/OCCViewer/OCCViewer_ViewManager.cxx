@@ -21,7 +21,7 @@ OCCViewer_ViewManager::~OCCViewer_ViewManager()
 void OCCViewer_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
   int aPos = myViews.find(theView);
-  theView->setCaption( QString( "OCC scene:%1 - viewer:%2" ).arg(myId).arg(aPos+1));
+  theView->setCaption( tr( "OCC_VIEW_TITLE" ).arg( myId ).arg( aPos + 1 ) );
 }
 
 //***************************************************************/

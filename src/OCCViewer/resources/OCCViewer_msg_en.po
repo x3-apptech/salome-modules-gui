@@ -163,3 +163,6 @@ msgstr "Error"
 
 msgid "BUT_OK"
 msgstr "Ok"
+
+msgid "OCCViewer_ViewManager::OCC_VIEW_TITLE"
+msgstr "OCC scene:%1 - viewer:%2"

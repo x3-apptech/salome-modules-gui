@@ -142,3 +142,6 @@ msgstr "Show toolbar"
 
 msgid "VTKViewer_Viewer::MEN_CHANGE_BACKGROUD"
 msgstr "Change background..."
+
+msgid "VTKViewer_ViewManager::VTK_VIEW_TITLE"
+msgstr "VTK scene:%1 - viewer:%2"
