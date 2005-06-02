@@ -45,6 +45,8 @@ public:
   //! Returns Name of application. Using is not defined.
   virtual QString       applicationName() const = 0;
 
+  virtual QString       applicationVersion() const;
+
   //! Shows the application's main widget. For non GUI application must be redefined.
   virtual void          start();
 

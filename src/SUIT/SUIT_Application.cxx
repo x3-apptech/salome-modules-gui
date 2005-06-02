@@ -43,6 +43,11 @@ SUIT_Study* SUIT_Application::activeStudy() const
   return myStudy;
 }
 
+QString SUIT_Application::applicationVersion() const
+{
+  return QString::null;
+}
+
 void SUIT_Application::start()
 {
   if ( desktop() )
