@@ -453,6 +453,10 @@ void STD_Application::useFile(const QString& theFileName)
 void STD_Application::updateDesktopTitle()
 {
   QString aTitle = applicationName();
+  QString aVer = applicationVersion();
+  if ( !aVer.isEmpty() )
+    aTitle += QString( " " ) + aVer;
+
   if ( activeStudy() )
   {
     QString sName = SUIT_Tools::file( activeStudy()->studyName().stripWhiteSpace(), false );

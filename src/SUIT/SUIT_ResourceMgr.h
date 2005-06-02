@@ -11,7 +11,16 @@ public:
   SUIT_ResourceMgr( const QString&, const QString& = QString::null );
   virtual ~SUIT_ResourceMgr();
 
-  QString loadDoc( const QString&, const QString& ) const;
+  QString         version() const;
+  void            setVersion( const QString& );
+
+  QString         loadDoc( const QString&, const QString& ) const;
+
+protected:
+  virtual QString userFileName( const QString& ) const;
+
+private:
+  QString         myVersion;
 };
 
 #endif
