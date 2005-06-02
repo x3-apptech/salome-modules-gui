@@ -20,6 +20,10 @@ public:
 protected:
   void              setViewName(SUIT_ViewWindow* theView);
 
+private:
+  static int        myMaxId;
+  int               myId;
+
 };
 
 #endif
