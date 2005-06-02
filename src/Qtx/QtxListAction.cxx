@@ -972,16 +972,16 @@ bool QtxListFrame::handleMouseEvent( QObject* o, QMouseEvent* e )
 
 bool QtxListFrame::event( QEvent* e )
 {
-	if ( e->type() != ScrollEvent::Scroll )
-		return QFrame::event( e );
+  if ( e->type() != (int)ScrollEvent::Scroll )
+    return QFrame::event( e );
 
-	ScrollEvent* se = (ScrollEvent*)e;
-	if ( se->isDown() )
-		setSelected( myList->topItem() + myList->numItemsVisible() );
-	else
-		setSelected( myList->topItem() + 1 );
-
-	return true;
+  ScrollEvent* se = (ScrollEvent*)e;
+  if ( se->isDown() )
+    setSelected( myList->topItem() + myList->numItemsVisible() );
+  else
+    setSelected( myList->topItem() + 1 );
+  
+  return true;
 }
 
 /*!

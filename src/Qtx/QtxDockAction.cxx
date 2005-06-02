@@ -520,7 +520,7 @@ void QtxDockAction::onDockWindowPositionChanged( QDockWindow* dw )
 
 bool QtxDockAction::event( QEvent* e )
 {
-  if ( e->type() == AutoAdd )
+  if ( e->type() == (int)AutoAdd )
   {
     QCustomEvent* ce = (QCustomEvent*)e;
     QDockWindow* dw = (QDockWindow*)ce->data();
@@ -844,6 +844,8 @@ void QtxDockAction::loadPlaceArea( const int place, QMainWindow* mw, QDockArea* 
 
   if ( !area )
     return;
+
+  qApp->processEvents();
 
   for ( QPtrListIterator<QDockWindow> itr( dockList ); itr.current(); ++itr )
   {
