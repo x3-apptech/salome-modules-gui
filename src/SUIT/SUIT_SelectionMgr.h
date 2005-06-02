@@ -18,7 +18,7 @@ public:
   virtual ~SUIT_SelectionMgr();
 
   void            clearSelected();
-  virtual void    selected( SUIT_DataOwnerPtrList& ) const;
+  virtual void    selected( SUIT_DataOwnerPtrList&, const QString& = QString::null ) const;
   virtual void    setSelected( const SUIT_DataOwnerPtrList&, const bool = false );
 
   virtual void    installSelector( SUIT_Selector* );
