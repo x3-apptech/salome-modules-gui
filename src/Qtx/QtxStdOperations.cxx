@@ -360,7 +360,7 @@ QtxParser::Error QtxLogic::calculate( const QString& op,
     }
     else
         if( op=="not" || op=="!" )
-            v2 = !v2.toBool();
+            set( v2, !v2.toBool() );
 
     return err;
 }
