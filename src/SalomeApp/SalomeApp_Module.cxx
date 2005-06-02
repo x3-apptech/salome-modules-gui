@@ -65,15 +65,6 @@ void SalomeApp_Module::viewManagers( QStringList& ) const
 {
 }
 
-QString SalomeApp_Module::engineIOR() const
-{
-  // Return an empty string by default, to avoid any "default behavior".
-  // It means that SALOMEDS persistence is not used by a module by default.
-  // Each module can override this method to return either its actual engine's IOR,
-  // or simple the result returned by SalomeApp_Application::defaultEngineIOR()
-  return QString( "" );
-}
-
 SalomeApp_Application* SalomeApp_Module::getApp() const
 {
   return (SalomeApp_Application*)application();

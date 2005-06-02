@@ -44,7 +44,15 @@ public:
   virtual void                        initialize( CAM_Application* );
   virtual void                        windows( QMap<int, int>& ) const;
   virtual void                        viewManagers( QStringList& ) const;
-  virtual QString                     engineIOR() const;
+
+  // engineIOR() should be a pure virtual method, to avoid logical errors!
+  //
+  // Implementation in derived classes can return the following values:
+  // "" (empty string)   - means that this is a light module, default engine should be used for interaction with SALOMEDS persistence
+  // "-1"                - means that this is a light module, SALOMEDS persistence is not used at all
+  // module`s engine IOR - means that this is a standard SALOME module with a CORBA engine
+  //
+  virtual QString                     engineIOR() const = 0;
 
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
