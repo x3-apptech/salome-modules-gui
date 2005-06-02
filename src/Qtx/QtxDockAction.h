@@ -11,8 +11,9 @@
 #include <qpopupmenu.h>
 
 class QAction;
-class QMainWindow;
+class QDockArea;
 class QDockWindow;
+class QMainWindow;
 class QtxResourceMgr;
 
 #ifdef WIN32
@@ -86,6 +87,7 @@ private:
   QString      windowName( QDockWindow* ) const;
   void         savePlaceInfo( QDockWindow* );
   void         loadPlaceInfo( QDockWindow* ) const;
+  void         loadPlaceInfo() const;
 
   bool         autoAddDockWindow( QDockWindow* );
   void         autoLoadPlaceInfo( QDockWindow* );
@@ -93,10 +95,13 @@ private:
   void         splitMenuText( QString&, QString& ) const;
   QStringList  splitText( const QString&, const QString& ) const;
 
+  QDockArea*   dockArea( const int ) const;
   int          dockPlace( const QString& ) const;
 
+  void         collectNames( const int, QStringList& ) const;
+
 private:
-  enum { AutoAdd = QEvent::User };
+  enum { AutoAdd = QEvent::User, LoadArea };
 
   typedef struct { bool vis, newLine;
                    int place, index, offset;
@@ -113,12 +118,16 @@ private:
                              const QString&, GeomInfo& ) const;
   bool         saveGeometry( QtxResourceMgr*, const QString&,
                              const QString&, const GeomInfo& ) const;
+  void         loadPlaceArea( const int, QMainWindow*, QDockArea*,
+                              const QPtrList<QDockWindow>&,
+                              const QMap<QDockWindow*, GeomInfo>& ) const;
 
 private:
   InfoMap      myInfo;
   MenuMap      myMenu;
   GeomMap      myGeom;
   QMainWindow* myMain;
+  QStringList  myNames;
 
   bool         myAutoAdd;
   bool         mySeparate;

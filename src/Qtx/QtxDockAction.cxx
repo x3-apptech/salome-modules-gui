@@ -22,7 +22,7 @@ QtxDockAction::QtxDockAction( QMainWindow* mw, const char* name )
 myMain( mw ),
 myAutoAdd( true ),
 mySeparate( true ),
-myAutoPlace( true )
+myAutoPlace( false )
 {
   initialize( mw );
 }
@@ -39,7 +39,7 @@ QtxDockAction::QtxDockAction( const QString& text, const QString& menuText, QMai
 myMain( mw ),
 myAutoAdd( true ),
 mySeparate( true ),
-myAutoPlace( true )
+myAutoPlace( false )
 {
   initialize( mw );
 }
@@ -56,7 +56,7 @@ QtxDockAction::QtxDockAction( const QString& text, const QIconSet& icon, const Q
 myMain( mw ),
 myAutoAdd( true ),
 mySeparate( true ),
-myAutoPlace( true )
+myAutoPlace( false )
 {
   initialize( mw );
 }
@@ -331,15 +331,10 @@ bool QtxDockAction::eventFilter( QObject* o, QEvent* e )
 
 void QtxDockAction::restoreGeometry( QDockWindow* dw ) const
 {
-  QPtrList<QDockWindow> dwList;
-
-  if ( dw )
-    dwList.append( dw );
+  if ( !dw )
+    loadPlaceInfo();
   else
-    dockWindows( dwList );
-
-  for ( QPtrListIterator<QDockWindow> it( dwList ); it.current(); ++it )
-    loadPlaceInfo( it.current() );
+    loadPlaceInfo( dw );
 }
 
 /*!
@@ -371,6 +366,8 @@ void QtxDockAction::loadGeometry( QtxResourceMgr* resMgr, const QString& section
   QString sec = section.stripWhiteSpace();
   if ( !resMgr || sec.isEmpty() )
     return;
+
+  myNames = QStringList::split( "|", resMgr->stringValue( sec, "windows_list", QString::null ) );
 
   QMap<QString, int> map;
   QStringList params = resMgr->parameters( sec );
@@ -409,8 +406,18 @@ void QtxDockAction::saveGeometry( QtxResourceMgr* resMgr, const QString& section
   if ( !resMgr || sec.isEmpty() )
     return;
 
+  QtxDockAction* that = (QtxDockAction*)this;
+  that->storeGeometry();
+
+  that->myNames.clear();
+  collectNames( Minimized, that->myNames );
+  for ( int i = DockTornOff; i < Minimized; i++ )
+    collectNames( i, that->myNames );
+
   if ( clear )
     resMgr->removeSection( sec );
+
+  resMgr->setValue( sec, "windows_list", myNames.join( "|" ) );
 
   for ( GeomMap::ConstIterator it = myGeom.begin(); it != myGeom.end(); ++it )
     saveGeometry( resMgr, sec, it.key(), it.data() );
@@ -751,6 +758,121 @@ void QtxDockAction::loadPlaceInfo( QDockWindow* dw ) const
 }
 
 /*!
+	Name: loadPlaceInfo [private]
+	Desc: Retrieve the stored place and geometry information to all dock windows.
+*/
+
+void QtxDockAction::loadPlaceInfo() const
+{
+  QMainWindow* mw = mainWindow();
+  if ( !mw )
+    return;
+
+  typedef QPtrList<QDockWindow> DockWinList;
+
+  DockWinList lst;
+  dockWindows( lst, mw );
+
+  QMap<QString, QDockWindow*> nameMap;
+  for ( QPtrListIterator<QDockWindow> itr( lst ); itr.current(); ++itr )
+  {
+    QString name;
+    if ( myInfo.contains( itr.current() ) )
+      name = myInfo[itr.current()].name;
+
+    if ( !myGeom.contains( name ) )
+      continue;
+
+    nameMap.insert( name, itr.current() );
+  }
+
+  DockWinList winList;
+  for ( QStringList::const_iterator iter = myNames.begin(); iter != myNames.end(); ++iter )
+  {
+    if ( nameMap.contains( *iter ) )
+      winList.append( nameMap[*iter] );
+    nameMap.remove( *iter );
+  }
+
+  for ( QMap<QString, QDockWindow*>::ConstIterator mIt = nameMap.begin(); mIt != nameMap.end(); ++mIt )
+    winList.append( mIt.data() );
+
+  QMap<int, DockWinList> winMap;
+  QMap<QDockWindow*, GeomInfo> geomMap;
+
+  for ( QPtrListIterator<QDockWindow> it( winList ); it.current(); ++it )
+  {
+    QString name;
+    if ( myInfo.contains( it.current() ) )
+      name = myInfo[it.current()].name;
+
+    if ( !myGeom.contains( name ) )
+      continue;
+
+    GeomInfo inf( myGeom[name] );
+    geomMap.insert( it.current(), inf );
+    if ( !winMap.contains( inf.place ) )
+      winMap.insert( inf.place, DockWinList() );
+    winMap[inf.place].append( it.current() );
+  }
+
+  loadPlaceArea( DockMinimized, mw, 0,
+                 winMap.contains( DockMinimized ) ? winMap[DockMinimized] : DockWinList(), geomMap );
+  for ( int i = DockTornOff; i < DockMinimized; i++ )
+  {
+    loadPlaceArea( i, mw, dockArea( i ), winMap.contains( i ) ? winMap[i] : DockWinList(), geomMap );
+  }
+}
+
+/*!
+	Name: loadPlaceArea [private]
+	Desc: Set the place and geometry information to all dock windows in the area.
+*/
+
+void QtxDockAction::loadPlaceArea( const int place, QMainWindow* mw, QDockArea* area,
+                                   const QPtrList<QDockWindow>& dockList,
+                                   const QMap<QDockWindow*, GeomInfo>& geomMap ) const
+{
+  for ( QPtrListIterator<QDockWindow> it( dockList ); it.current(); ++it )
+  {
+    if ( !geomMap.contains( it.current() ) )
+      continue;
+
+    const GeomInfo& inf = geomMap[it.current()];
+    mw->moveDockWindow( it.current(), (Qt::Dock)place, inf.newLine, inf.index, inf.offset );
+  }
+
+  if ( !area )
+    return;
+
+  for ( QPtrListIterator<QDockWindow> itr( dockList ); itr.current(); ++itr )
+  {
+    QDockWindow* dw = itr.current();
+    if ( !geomMap.contains( dw ) )
+      continue;
+
+    const GeomInfo& inf = geomMap[dw];
+    if ( place != DockTornOff )
+    {
+      dw->setNewLine( inf.newLine );
+		  dw->setOffset( inf.offset );
+		  dw->setFixedExtentWidth( inf.fixW );
+		  dw->setFixedExtentHeight( inf.fixH );
+    }
+    dw->setGeometry( inf.x, inf.y, inf.w, inf.h );
+
+    inf.vis ? dw->show() : dw->hide();
+  }
+
+  QWidget* wid = area;
+  if ( wid->layout() )
+  {
+    wid->layout()->invalidate();
+    wid->layout()->activate();
+  }
+}
+
+/*!
 	Name: action [private]
 	Desc: Returns action for the given dock window.
 */
@@ -917,6 +1039,40 @@ int QtxDockAction::dockPlace( const QString& dockName ) const
   return res;
 }
 
+/*!
+	Name: dockArea [private]
+	Desc: 
+*/
+
+QDockArea* QtxDockAction::dockArea( const int place ) const
+{
+  if ( !mainWindow() )
+    return 0;
+
+  QDockArea* area = 0;
+  switch ( place )
+  {
+  case DockTop:
+    area = mainWindow()->topDock();
+    break;
+  case DockBottom:
+    area = mainWindow()->bottomDock();
+    break;
+  case DockLeft:
+    area = mainWindow()->leftDock();
+    break;
+  case DockRight:
+    area = mainWindow()->rightDock();
+    break;
+  }
+  return area;
+}
+
+/*!
+	Name: loadGeometry [private]
+	Desc: 
+*/
+
 bool QtxDockAction::loadGeometry( QtxResourceMgr* resMgr, const QString& sec,
                                   const QString& name, GeomInfo& inf ) const
 {
@@ -953,6 +1109,11 @@ bool QtxDockAction::loadGeometry( QtxResourceMgr* resMgr, const QString& sec,
   return true;
 }
 
+/*!
+	Name: saveGeometry [private]
+	Desc: 
+*/
+
 bool QtxDockAction::saveGeometry( QtxResourceMgr* resMgr, const QString& sec,
                                   const QString& name, const GeomInfo& inf ) const
 {
@@ -974,4 +1135,32 @@ bool QtxDockAction::saveGeometry( QtxResourceMgr* resMgr, const QString& sec,
   resMgr->setValue( sec, tmpl.arg( "place" ), inf.place );
 
   return true;
+}
+
+/*!
+	Name: collectNames [private]
+	Desc: 
+*/
+
+void QtxDockAction::collectNames( const int place, QStringList& lst ) const
+{
+  QPtrList<QDockWindow> winList;
+  QDockArea* area = dockArea( place );
+  if ( area )
+    winList = area->dockWindowList();
+  else
+    winList = mainWindow()->dockWindows( (Qt::Dock)place );
+
+  for ( QPtrListIterator<QDockWindow> it( winList ); it.current(); ++it )
+  {
+    QString name;
+    if ( myInfo.contains( it.current() ) )
+      name = myInfo[it.current()].name;
+    if ( name.isEmpty() )
+      name = windowName( it.current() );
+    if ( name.isEmpty() )
+      continue;
+
+    lst.append( name );
+  }
 }
