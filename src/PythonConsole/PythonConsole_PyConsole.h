@@ -16,6 +16,8 @@ public:
 
   PyInterp_base* getInterp() { return myInterp; } 
 
+  void           exec( const QString& command );
+
 protected:
   PyInterp_base*          myInterp;
   PythonConsole_PyEditor* myEditor;

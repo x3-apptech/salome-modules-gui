@@ -46,6 +46,8 @@ public:
   
   virtual void setText(QString s); 
   bool isCommand(const QString& str) const;
+
+  virtual void exec( const QString& command );
   
 protected:
   virtual void contentsDropEvent( QDropEvent* event );
@@ -57,8 +59,6 @@ protected:
 public slots:
   void handleReturn();
   void onPyInterpChanged( PyInterp_base* );
-
-  virtual QPopupMenu* createPopupMenu( const QPoint& );
   
 private:
   QString        _buf;

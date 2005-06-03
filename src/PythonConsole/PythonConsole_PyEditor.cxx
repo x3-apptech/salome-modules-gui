@@ -24,21 +24,30 @@
 //  File   : PythonConsole_PyEditor.cxx
 //  Author : Nicolas REJNERI
 //  Module : SALOME
+//  $Header$
 
 #include <PythonConsole_PyEditor.h> // this include must be first (see PyInterp_base.h)!
-
 #include <PyInterp_Dispatcher.h>
-
 #include <SUIT_Tools.h>
 
+#include <qapplication.h>
 #include <qmap.h>
 #include <qclipboard.h>
 #include <qdragobject.h>
-#include <qapplication.h>
 
+//#include "utilities.h"
 using namespace std;
 
+
+//#ifdef _DEBUG_
+//static int MYDEBUG = 1;
+//#else
+//static int MYDEBUG = 0;
+//#endif
+
+
 enum { IdCopy, IdPaste, IdClear, IdSelectAll };
+
 
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
@@ -96,7 +105,6 @@ PythonConsole_PyEditor::PythonConsole_PyEditor(PyInterp_base* theInterp, QWidget
   QFont aFont = SUIT_Tools::stringToFont( fntSet );
   setFont(aFont);
   setTextFormat(QTextEdit::PlainText);
-  setUndoRedoEnabled( false );
 
   _currentPrompt = READY_PROMPT;
   setWordWrap(NoWrap);
@@ -125,6 +133,25 @@ void PythonConsole_PyEditor::setText(QString s)
   insertAt(s,para,col);
   int n = paragraphs()-1;  
   setCursorPosition( n, paragraphLength(n)); 
+}
+
+/*!
+    Convenient method for executing a Python command,
+    as if the user typed it manually
+*/
+void PythonConsole_PyEditor::exec( const QString& command )
+{
+  // Some interactive command is being executed in this editor -> do nothing
+  if ( isReadOnly() )
+    return;
+  int para=paragraphs()-1;
+  removeParagraph( para );
+  _currentPrompt = READY_PROMPT;
+  _buf.truncate(0);
+  _isInHistory = false;
+  setText(_currentPrompt); 
+  setText( command + "\n" ); 
+  handleReturn();
 }
 
 /*!
@@ -280,6 +307,8 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
   bool ctrlPressed = e->state() & ControlButton;
   // check if <Shift> is pressed
   bool shftPressed = e->state() & ShiftButton;
+  // check if <Alt> is pressed
+  bool altPressed = e->state() & AltButton;
 
   // process <Ctrl>+<C> key-bindings
   if ( aKey == Key_C && ctrlPressed ) {
@@ -671,23 +700,4 @@ void PythonConsole_PyEditor::onPyInterpChanged( PyInterp_base* interp )
       viewport()->setCursor( waitCursor );
     }
   }
-}
-
-QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
-{
-  QPopupMenu* popup = QTextEdit::createPopupMenu( pos );
-
-  QValueList<int> ids;
-  for ( int i = 0; popup && i < popup->count(); i++ )
-  {
-    if ( !popup->isItemEnabled( popup->idAt( i ) ) )
-      ids.append( popup->idAt( i ) );
-  }
-
-  for ( QValueList<int>::const_iterator it = ids.begin(); it != ids.end(); ++it )
-    popup->removeItem( *it );
-
-  SUIT_Tools::simplifySeparators( popup );
-
-  return popup;
 }

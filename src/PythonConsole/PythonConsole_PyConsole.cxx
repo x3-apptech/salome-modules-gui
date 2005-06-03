@@ -10,7 +10,7 @@ using namespace std;
 
 //****************************************************************
 PythonConsole::PythonConsole(QWidget* parent, PyInterp_base* interp)
-: QWidget(parent)
+: QWidget(parent), myEditor( 0 )
 {
   // create python interpreter
   myInterp = interp;
@@ -31,3 +31,9 @@ PythonConsole::~PythonConsole()
 {
 }
 
+//****************************************************************
+void PythonConsole::exec( const QString& command )
+{
+  if ( myEditor )
+    myEditor->exec( command );
+}
