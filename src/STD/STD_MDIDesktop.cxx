@@ -5,7 +5,6 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <QtxAction.h>
-#include <QtxWorkstack.h>
 #include <QtxActionMenuMgr.h>
 #include <QtxWorkspaceAction.h>
 
@@ -18,17 +17,17 @@
 
 STD_MDIDesktop::STD_MDIDesktop()
 : SUIT_Desktop(),
-myWorkstack( 0 )
-//myWorkspaceAction( 0 )
+myWorkspace( 0 ),
+myWorkspaceAction( 0 )
 {
   QVBox* base = new QVBox( this );
   base->setFrameStyle( QFrame::Panel | QFrame::Sunken );
 
   setCentralWidget( base );
 
-  myWorkstack = new QtxWorkstack( base );
+  myWorkspace = new QWorkspace( base );
 
-  connect( myWorkstack, SIGNAL( windowActivated( QWidget* ) ),
+  connect( myWorkspace, SIGNAL( windowActivated( QWidget* ) ),
            this, SLOT( onWindowActivated( QWidget* ) ) );
 
   createActions();
@@ -42,7 +41,7 @@ SUIT_ViewWindow* STD_MDIDesktop::activeWindow() const
 {
   SUIT_ViewWindow* wnd = 0;
 
-  QWidget* wid = myWorkstack->activeWindow();
+  QWidget* wid = myWorkspace->activeWindow();
   if ( wid && wid->inherits( "SUIT_ViewWindow" ) )
     wnd = (SUIT_ViewWindow*)wid;
 
@@ -53,7 +52,7 @@ QPtrList<SUIT_ViewWindow> STD_MDIDesktop::windows() const
 {
   QPtrList<SUIT_ViewWindow> winList;
 
-  QWidgetList children = myWorkstack->windowList();
+  QWidgetList children = myWorkspace->windowList();
   for ( QWidgetListIt it( children ); it.current(); ++it )
   {
     if ( it.current()->inherits( "SUIT_ViewWindow" ) )
@@ -65,12 +64,12 @@ QPtrList<SUIT_ViewWindow> STD_MDIDesktop::windows() const
 
 QWidget* STD_MDIDesktop::parentArea() const
 {
-  return myWorkstack;
+  return workspace();
 }
 
 void STD_MDIDesktop::windowOperation( const int type )
 {
-//  myWorkspaceAction->perform( operationFlag( type ) );
+  myWorkspaceAction->perform( operationFlag( type ) );
 }
 
 void STD_MDIDesktop::setWindowOperations( const int first, ... )
@@ -97,12 +96,12 @@ void STD_MDIDesktop::setWindowOperations( const QValueList<int>& opList )
   for ( QValueList<int>::const_iterator it = opList.begin(); it != opList.end(); ++it )
     flags = flags | operationFlag( *it );
 
-//  myWorkspaceAction->setItems( flags );
+  myWorkspaceAction->setItems( flags );
 }
 
 QWorkspace* STD_MDIDesktop::workspace() const
 {
-  return 0;//myWorkspace;
+  return myWorkspace;
 }
 
 void STD_MDIDesktop::onWindowActivated( QWidget* w )
@@ -113,7 +112,6 @@ void STD_MDIDesktop::onWindowActivated( QWidget* w )
 
 void STD_MDIDesktop::createActions()
 {
-/*
   if ( myWorkspaceAction )
     return;
 
@@ -159,7 +157,6 @@ void STD_MDIDesktop::createActions()
   int winMenuId = mMgr->insert( tr( "MEN_DESK_WINDOW" ), -1, 100 );
   mMgr->insert( myWorkspaceAction, winMenuId, -1 );
   mMgr->insert( QtxActionMenuMgr::separator(), winMenuId, -1 );
-*/
 }
 
 int STD_MDIDesktop::operationFlag( const int type ) const

@@ -8,8 +8,7 @@
 class QtxAction;
 class QPopupMenu;
 class QWorkspace;
-class QtxWorkstack;
-//class QtxWorkspaceAction;
+class QtxWorkspaceAction;
 
 #if defined WNT
 #pragma warning( disable: 4251 )
@@ -47,8 +46,8 @@ private:
   int                      operationFlag( const int ) const;
 
 private:
-  QtxWorkstack*            myWorkstack;
-//  QtxWorkspaceAction*      myWorkspaceAction;
+  QWorkspace*              myWorkspace;
+  QtxWorkspaceAction*      myWorkspaceAction;
 };
 
 #if defined WNT
