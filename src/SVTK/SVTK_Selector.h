@@ -30,11 +30,10 @@
 #define SVTK_SELECTOR_H
 
 #include <TColStd_MapOfInteger.hxx>
+#include <TColStd_IndexedMapOfInteger.hxx>
 
 #include "SVTK_Selection.h"
 #include "SALOME_ListIO.hxx"
-#include "SALOME_InteractiveObject.hxx"
-#include "SALOME_DataMapOfIOMapOfInteger.hxx"
 
 class SALOME_Actor;
 

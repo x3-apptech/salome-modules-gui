@@ -29,9 +29,12 @@
 #ifndef SVTK_SELECTORDEF_H
 #define SVTK_SELECTORDEF_H
 
-#include <NCollection_DataMap.hxx>
-#include <vtkSmartPointer.h>
+#include <set>
+#include <map>
+
+#include <TColStd_IndexedMapOfInteger.hxx>
 #include <TColStd_MapOfInteger.hxx>
+#include <vtkSmartPointer.h>
 
 #include "SVTK_Selector.h"
 
@@ -131,12 +134,42 @@ public:
   ClearIndex();
 
 private:
-  typedef NCollection_DataMap<Handle(SALOME_InteractiveObject),
-                              vtkSmartPointer<SALOME_Actor> > TIO2Actors;
-  TIO2Actors myIO2Actors;
   Selection_Mode mySelectionMode;
-  SALOME_ListIO myIObjects;
-  SALOME_DataMapOfIOMapOfInteger myMapIOSubIndex;
+
+  struct TIOLessThan
+  {
+    bool 
+    operator()(const Handle(SALOME_InteractiveObject)& theRightIO,
+	       const Handle(SALOME_InteractiveObject)& theLeftIO) const
+    {
+      return strcmp(theRightIO->getEntry(),theLeftIO->getEntry()) < 0;
+    }
+  };
+
+  struct TIndexedMapOfInteger{
+    TColStd_IndexedMapOfInteger myMap;
+    TIndexedMapOfInteger()
+    {}
+    TIndexedMapOfInteger(const TIndexedMapOfInteger& theIndexedMapOfInteger)
+    {
+      myMap = theIndexedMapOfInteger.myMap;
+    }
+  };
+
+  mutable SALOME_ListIO myIObjectList;
+  typedef std::set<Handle(SALOME_InteractiveObject),
+                   TIOLessThan> TIObjects;
+  TIObjects myIObjects;
+
+  typedef std::map<Handle(SALOME_InteractiveObject),
+                   vtkSmartPointer<SALOME_Actor>,
+                   TIOLessThan> TIO2Actors;
+  TIO2Actors myIO2Actors;
+
+  typedef std::map<Handle(SALOME_InteractiveObject),
+                   TIndexedMapOfInteger,
+                   TIOLessThan> TMapIOSubIndex;
+  TMapIOSubIndex myMapIOSubIndex;
 };
 
 

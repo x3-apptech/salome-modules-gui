@@ -34,7 +34,6 @@
 #include "SALOME_Actor.h"
 #include "SVTK_ViewModel.h"
 #include "SVTK_ViewWindow.h"
-#include "SALOME_ListIteratorOfListIO.hxx"
 
 #include "SVTK_SelectorDef.h"
 #include "utilities.h"
@@ -60,23 +59,17 @@ void
 SVTK_SelectorDef
 ::ClearIObjects() 
 {
-  myIO2Actors.Clear();
-  myIObjects.Clear();
-  //myMapIOSubIndex.Clear();
+  myIO2Actors.clear();
+  myIObjects.clear();
+  myMapIOSubIndex.clear();
 }
 
 //----------------------------------------------------------------------------
 bool
 SVTK_SelectorDef
-::IsSelected(const Handle(SALOME_InteractiveObject)& theObject) const
+::IsSelected(const Handle(SALOME_InteractiveObject)& theIO) const
 {
-  SALOME_ListIteratorOfListIO anIter(myIObjects);
-  for(; anIter.More(); anIter.Next()){
-    if(theObject->isSame(anIter.Value())){
-      return true;
-    }
-  }
-  return false;
+  return myIObjects.find(theIO) != myIObjects.end();
 }
 
 bool
@@ -84,15 +77,16 @@ SVTK_SelectorDef
 ::IsSelected(SALOME_Actor* theActor) const
 {
   const Handle(SALOME_InteractiveObject) anIO = theActor->getIO();
-  return IsSelected(anIO) && myIO2Actors.IsBound(anIO);
+  return IsSelected(anIO) && myIO2Actors.find(anIO) != myIO2Actors.end();
 }
 
 SALOME_Actor*
 SVTK_SelectorDef
 ::GetActor(const Handle(SALOME_InteractiveObject)& theIO) const
 {
-  if(myIO2Actors.IsBound(theIO))
-    return myIO2Actors.Find(theIO).GetPointer();
+  TIO2Actors::const_iterator anIter = myIO2Actors.find(theIO);
+  if(anIter != myIO2Actors.end())
+    return anIter->second.GetPointer();
   return NULL;
 }
 
@@ -102,7 +96,7 @@ SVTK_SelectorDef
 ::AddIObject(const Handle(SALOME_InteractiveObject)& theIO) 
 {
   if(!IsSelected(theIO)){
-    myIObjects.Append(theIO);
+    myIObjects.insert(theIO);
     return true;
   }
   return false;
@@ -116,11 +110,11 @@ SVTK_SelectorDef
 
   bool anIsIOBound = IsSelected(anIO);
   if(!anIsIOBound)
-    myIObjects.Append(anIO);
+    myIObjects.insert(anIO);
 
-  bool anIsActorBound = myIO2Actors.IsBound(anIO);
+  bool anIsActorBound = myIO2Actors.find(anIO) != myIO2Actors.end();
   if(!anIsActorBound)
-    myIO2Actors.Bind(anIO,theActor);
+    myIO2Actors[anIO] = theActor;
   
   return !anIsIOBound || !anIsActorBound;
 }
@@ -130,22 +124,13 @@ bool
 SVTK_SelectorDef
 ::RemoveIObject(const Handle(SALOME_InteractiveObject)& theIO) 
 {
-  bool anIsIOBound = false;
-  for(SALOME_ListIteratorOfListIO anIter(myIObjects); anIter.More(); anIter.Next()){
-    if(theIO->isSame(anIter.Value())){
-      if(myMapIOSubIndex.IsBound(theIO))
-	myMapIOSubIndex.UnBind(theIO);
-      myIObjects.Remove(anIter);
-      anIsIOBound = true; 
-      break;
-    }
-  }
+  bool anIsIOBound = myIObjects.find(theIO) != myIObjects.end();
 
-  bool anIsActorBound = myIO2Actors.IsBound(theIO);
-  if(anIsActorBound)
-    myIO2Actors.UnBind(theIO);
+  myIObjects.erase(theIO);
+  myIO2Actors.erase(theIO);
+  myMapIOSubIndex.erase(theIO);
 
-  return anIsIOBound || anIsActorBound;
+  return anIsIOBound;
 }
 
 bool 
@@ -154,22 +139,11 @@ SVTK_SelectorDef
 {
   const Handle(SALOME_InteractiveObject) anIO = theActor->getIO();
 
-  bool anIsActorBound = myIO2Actors.IsBound(anIO);
+  bool anIsActorBound = myIO2Actors.find(anIO) != myIO2Actors.end();
   if(anIsActorBound)
-    myIO2Actors.UnBind(anIO);
+    myIO2Actors.erase(anIO);
 
-  bool anIsIOBound = false;
-  for(SALOME_ListIteratorOfListIO anIter(myIObjects); anIter.More(); anIter.Next()){
-    if(anIO->isSame(anIter.Value())){
-      if(myMapIOSubIndex.IsBound(anIO))
-	myMapIOSubIndex.UnBind(anIO);
-      myIObjects.Remove(anIter);
-      anIsIOBound = true; 
-      break;
-    }
-  }
-
-  return anIsIOBound || anIsActorBound;
+  return RemoveIObject(anIO) || anIsActorBound;
 }
 
 //----------------------------------------------------------------------------
@@ -177,21 +151,27 @@ const SALOME_ListIO&
 SVTK_SelectorDef
 ::StoredIObjects() const
 {
-  return myIObjects;
+  myIObjectList.Clear();
+  TIObjects::const_iterator anIter = myIObjects.begin();
+  TIObjects::const_iterator anIterEnd = myIObjects.end();
+  for(; anIter != anIterEnd; anIter++)
+    myIObjectList.Append(*anIter);
+
+  return myIObjectList;
 }
 
 int
 SVTK_SelectorDef
 ::IObjectCount() const
 {
-  return myIObjects.Extent();
+  return myIObjects.size();
 }
 
 bool 
 SVTK_SelectorDef
 ::HasIndex( const Handle(SALOME_InteractiveObject)& theIO) const
 {
-  return myMapIOSubIndex.IsBound(theIO);
+  return myMapIOSubIndex.find(theIO) != myMapIOSubIndex.end();
 }
 
 void 
@@ -199,8 +179,9 @@ SVTK_SelectorDef
 ::GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	    TColStd_IndexedMapOfInteger& theIndex)
 {
-  if(myMapIOSubIndex.IsBound(theIO))
-    theIndex = myMapIOSubIndex.Find(theIO);
+  TMapIOSubIndex::const_iterator anIter = myMapIOSubIndex.find(theIO);
+  if(anIter != myMapIOSubIndex.end())
+    theIndex = anIter->second.myMap;
   else
     theIndex.Clear();
 }
@@ -210,11 +191,13 @@ SVTK_SelectorDef
 ::IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
 		  int theIndex) const
 {
-  if( !myMapIOSubIndex.IsBound(theIO))
-    return false;
+  TMapIOSubIndex::const_iterator anIter = myMapIOSubIndex.find(theIO);
+  if(anIter != myMapIOSubIndex.end()){
+    const TColStd_IndexedMapOfInteger& aMapIndex = anIter->second.myMap;
+    return aMapIndex.Contains(theIndex);
+  }
 
-  const TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.Find(theIO);
-  return aMapIndex.Contains(theIndex);
+  return false;
 }
 
 static 
@@ -249,20 +232,22 @@ SVTK_SelectorDef
 		    const TColStd_IndexedMapOfInteger& theIndices, 
 		    bool theIsModeShift)
 {
-  TColStd_IndexedMapOfInteger empty;
-  if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO, empty);
-
-  TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
-  aMapIndex = theIndices;
+  TMapIOSubIndex::iterator aMapIter = myMapIOSubIndex.find(theIO);
+  if(aMapIter == myMapIOSubIndex.end()){
+    TIndexedMapOfInteger anEmpty;
+    aMapIter = myMapIOSubIndex.
+      insert(TMapIOSubIndex::value_type(theIO,anEmpty)).first;
+  }
+  TColStd_IndexedMapOfInteger& aMapIndex = aMapIter->second.myMap;
 
   if(!theIsModeShift)
     aMapIndex.Clear();
   
-  if(aMapIndex.IsEmpty()){
-    myMapIOSubIndex.UnBind(theIO);
+  for(int i = 0, iEnd = theIndices.Extent(); i < iEnd; i++)
+    aMapIndex.Add(theIndices(i));
+  
+  if(aMapIndex.IsEmpty())
     RemoveIObject(theIO);
-  }
 
   return !aMapIndex.IsEmpty();
 }
@@ -274,22 +259,23 @@ SVTK_SelectorDef
 		    const TColStd_MapOfInteger& theIndices, 
 		    bool theIsModeShift)
 {
-  TColStd_IndexedMapOfInteger empty;	
-  if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO, empty);
-
-  TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
+  TMapIOSubIndex::iterator aMapIter = myMapIOSubIndex.find(theIO);
+  if(aMapIter == myMapIOSubIndex.end()){
+    TIndexedMapOfInteger anEmpty;
+    aMapIter = myMapIOSubIndex.
+      insert(TMapIOSubIndex::value_type(theIO,anEmpty)).first;
+  }
+  TColStd_IndexedMapOfInteger& aMapIndex = aMapIter->second.myMap;
 
   if(!theIsModeShift)
     aMapIndex.Clear();
   
-  for(TColStd_MapIteratorOfMapOfInteger anIter(theIndices); anIter.More(); anIter.Next())
+  TColStd_MapIteratorOfMapOfInteger anIter(theIndices);
+  for(; anIter.More(); anIter.Next())
     aMapIndex.Add(anIter.Key());
   
-  if(aMapIndex.IsEmpty()){
-    myMapIOSubIndex.UnBind(theIO);
+  if(aMapIndex.IsEmpty())
     RemoveIObject(theIO);
-  }
 
   return !aMapIndex.IsEmpty();
 }
@@ -301,27 +287,26 @@ SVTK_SelectorDef
 		    int theIndex, 
 		    bool theIsModeShift)
 {
-  TColStd_IndexedMapOfInteger empty;		
-  if(!myMapIOSubIndex.IsBound(theIO))
-    myMapIOSubIndex.Bind(theIO, empty);
-  
-  TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind(theIO);
+  TMapIOSubIndex::iterator anIter = myMapIOSubIndex.find(theIO);
+  if(anIter == myMapIOSubIndex.end()){
+    TIndexedMapOfInteger anEmpty;
+    anIter = myMapIOSubIndex.
+      insert(TMapIOSubIndex::value_type(theIO,anEmpty)).first;
+  }
+  TColStd_IndexedMapOfInteger& aMapIndex = anIter->second.myMap;
 
-  bool anIsConatains = aMapIndex.Contains( theIndex );
-
-  if (anIsConatains)
-    removeIndex( aMapIndex, theIndex );
+  bool anIsConatains = aMapIndex.Contains(theIndex);
+  if(anIsConatains)
+    removeIndex(aMapIndex,theIndex);
   
-  if (!theIsModeShift)
+  if(!theIsModeShift)
     aMapIndex.Clear();
   
   if(!anIsConatains)
     aMapIndex.Add( theIndex );
 
-  if ( aMapIndex.IsEmpty() ) {
-    myMapIOSubIndex.UnBind(theIO);
+  if( aMapIndex.IsEmpty())
     RemoveIObject(theIO);
-  }
 
   return false;
 }
@@ -332,9 +317,10 @@ SVTK_SelectorDef
 ::RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	       int theIndex)
 {
-  if ( myMapIOSubIndex.IsBound( theIO ) ) {
-    TColStd_IndexedMapOfInteger& aMapIndex = myMapIOSubIndex.ChangeFind( theIO );
-    removeIndex( aMapIndex, theIndex );
+  if(IsIndexSelected(theIO,theIndex)){
+    TMapIOSubIndex::iterator anIter = myMapIOSubIndex.find(theIO);
+    TColStd_IndexedMapOfInteger& aMapIndex = anIter->second.myMap;
+    removeIndex(aMapIndex,theIndex);
   }
 }
 
@@ -342,5 +328,5 @@ void
 SVTK_SelectorDef
 ::ClearIndex()
 {
-  myMapIOSubIndex.Clear();  
+  myMapIOSubIndex.clear();  
 }

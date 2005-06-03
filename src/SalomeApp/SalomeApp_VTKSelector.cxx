@@ -113,7 +113,8 @@ SalomeApp_VTKSelector
     if(SUIT_ViewManager* aViewMgr = myViewer->getViewManager()){
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
 	if(SVTK_Selector* aSelector = aView->GetSelector()){
-	  aSelector->ClearIObjects();
+	  SALOME_ListIO anAppendList;
+	  const SALOME_ListIO& aStoredList = aSelector->StoredIObjects();
 	  SUIT_DataOwnerPtrList::const_iterator anIter = theList.begin();
 	  for(; anIter != theList.end(); ++anIter){
 	    const SUIT_DataOwner* aDataOwner = (*anIter).get();
@@ -121,14 +122,32 @@ SalomeApp_VTKSelector
 	      aSelector->SetSelectionMode(anOwner->GetMode());
 	      Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
 	      aSelector->AddIObject(anIO);
+	      anAppendList.Append(anIO);
 	      aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);
 	      if(MYDEBUG) MESSAGE("VTKSelector::setSelection - SVTKDataOwner - "<<anIO->getEntry());
 	    }else if(const SalomeApp_DataOwner* anOwner = dynamic_cast<const SalomeApp_DataOwner*>(aDataOwner)){
 	      Handle(SALOME_InteractiveObject) anIO = 
 		new SALOME_InteractiveObject(anOwner->entry().latin1(),"");
 	      aSelector->AddIObject(anIO);
+	      anAppendList.Append(anIO);
 	      if(MYDEBUG) MESSAGE("VTKSelector::setSelection - DataOwner - "<<anIO->getEntry());
 	    }
+	  }
+	  // To remove IOs, which is not selected.
+	  SALOME_ListIO aRemoveList;
+	  SALOME_ListIteratorOfListIO anAppendListIter(anAppendList);
+	  for(; anAppendListIter.More(); anAppendListIter.Next()){
+	    Handle(SALOME_InteractiveObject) anIO = anAppendListIter.Value();
+	    SALOME_ListIteratorOfListIO aStoredListIter(aStoredList);
+	    for(; aStoredListIter.More(); aStoredListIter.Next()){
+	      if(anIO->isSame(aStoredListIter.Value())){
+		aRemoveList.Append(anIO);
+	      }
+	    }
+	  }
+	  SALOME_ListIteratorOfListIO aRemoveListIter(aRemoveList);
+	  for(; aRemoveListIter.More(); aRemoveListIter.Next()){
+	    aSelector->RemoveIObject(aRemoveListIter.Value());
 	  }
 	  aView->onSelectionChanged();
 	}
