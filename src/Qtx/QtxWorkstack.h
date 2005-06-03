@@ -79,6 +79,8 @@ private:
   void                updateState();
   void                updateState( QSplitter* );
 
+  void                distributeSpace( QSplitter* ) const;
+
 private:
   QWidget*            myWin;
   QtxWorkstackArea*   myArea;

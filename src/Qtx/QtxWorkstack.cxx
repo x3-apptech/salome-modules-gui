@@ -99,8 +99,23 @@ void QtxWorkstack::split( const int o )
   area->removeWidget( curWid );
   newArea->insertWidget( curWid );
 
+  distributeSpace( trg );
+
   curWid->show();
   curWid->setFocus();
+}
+
+void QtxWorkstack::distributeSpace( QSplitter* split ) const
+{
+  if ( !split )
+    return;
+
+  QIntList szList = split->sizes();
+  int size = ( split->orientation() == Horizontal ?
+               split->width() : split->height() ) / szList.count();
+  for ( QIntList::iterator it = szList.begin(); it != szList.end(); ++it )
+    *it = size;
+  split->setSizes( szList );
 }
 
 void QtxWorkstack::splitVertical()
