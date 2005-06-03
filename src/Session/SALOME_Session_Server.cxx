@@ -35,9 +35,9 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <qthread.h> 
+#include <qdir.h>
+#include <qfile.h>
 #include <qapplication.h>
-#include <qlabel.h>
 #include <qwaitcondition.h>
 
 #include "Utils_SALOME_Exception.hxx"
@@ -80,13 +80,37 @@ extern "C" int HandleSignals(QApplication *theQApplication);
  *   - get session state
  */
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
+QString salomeVersion()
+{
+  QString path( ::getenv( "GUI_ROOT_DIR" ) );
+  if ( !path.isEmpty() )
+    path += QDir::separator();
+  path += QString( "bin/salome/VERSION" );
+
+  QFile vf( path );
+  if ( !vf.open( IO_ReadOnly ) )
+    return QString::null;
+
+  QString line;
+  vf.readLine( line, 1024 );
+  vf.close();
+
+  if ( line.isEmpty() )
+    return QString::null;
+
+  while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
+    line.remove( line.length() - 1, 1 );
+
+  QString ver;
+  int idx = line.findRev( ":" );
+  if ( idx != -1 )
+    ver = line.mid( idx + 1 ).stripWhiteSpace();
+
+  return ver;
+}
 
 PyObject *salome_shared_modules_module = NULL;
+
 void MessageOutput( QtMsgType type, const char *msg )
 {
   switch ( type ) {
@@ -112,6 +136,7 @@ protected:
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
   {
     SUIT_ResourceMgr* resMgr = new SUIT_ResourceMgr( appName, QString( "%1Config" ) );
+    resMgr->setVersion( salomeVersion() );
     resMgr->setCurrentFormat( "xml" );
     return resMgr;
   }
@@ -138,8 +163,6 @@ private:
 };
 
 
-
-
 int main(int argc, char **argv)
 {
   qInstallMsgHandler( MessageOutput );
@@ -147,6 +170,10 @@ int main(int argc, char **argv)
   /*
    * Python initialisation : only once
    */
+
+  char* _argv_0[512];
+  strcpy( (char*)_argv_0, (char*)argv[0] );
+
   int _argc = 1;
   char* _argv[] = {""};
   KERNEL_PYTHON::init_python(_argc,_argv);
@@ -208,7 +235,9 @@ int main(int argc, char **argv)
 	INFOS("Session activated, Launch IAPP...");
 
 	int qArgc = 1;
+	argv[0] = (char*)_argv_0;
 	SALOME_QApplication* _qappl = new SALOME_QApplication( qArgc, argv );
+	_qappl->setStyle( "salome" );
 	
 	INFOS("creation QApplication");
 	_GUIMutex.unlock();

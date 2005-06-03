@@ -51,11 +51,7 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName ) const
   QString pathName = QtxResourceMgr::userFileName( appName );
 
   if ( !version().isEmpty() )
-  {
-    int idx = pathName.findRev( appName );
-    if ( idx != -1 )
-      pathName.replace( idx, appName.length(), appName + version() );
-  }
+    pathName += QString( "." ) + version();
 
   return pathName;
 }
