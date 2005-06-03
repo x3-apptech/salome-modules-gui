@@ -959,7 +959,7 @@ SVTK_InteractorStyle
 		  if (anEdgeId >= 0) {
 		    if(MYDEBUG) INFOS(" CellId : "<<anObjId<<"; EdgeId : "<<anEdgeId);
 		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,false);
-		    GetSelector()->AddOrRemoveIndex(anIO,-anEdgeId-1,false);
+		    GetSelector()->AddOrRemoveIndex(anIO,-anEdgeId-1,true);
 		    GetSelector()->AddIObject(aSActor);
 		  } 
 		}
@@ -1361,7 +1361,6 @@ SVTK_InteractorStyle
 		}
 	      }
 	    }
-	    //if(MYDEBUG) INFOS ( " NAME PREVIEW " << aSActor->getName() );
 	  }
 	}
       }

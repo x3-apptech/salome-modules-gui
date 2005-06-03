@@ -26,106 +26,117 @@
 //  Module : SALOME
 //  $Header$
 
-#ifndef SVTK_SELECTOR_H
-#define SVTK_SELECTOR_H
+#ifndef SVTK_SELECTORDEF_H
+#define SVTK_SELECTORDEF_H
 
+#include <NCollection_DataMap.hxx>
+#include <vtkSmartPointer.h>
 #include <TColStd_MapOfInteger.hxx>
 
-#include "SVTK_Selection.h"
-#include "SALOME_ListIO.hxx"
-#include "SALOME_InteractiveObject.hxx"
-#include "SALOME_DataMapOfIOMapOfInteger.hxx"
+#include "SVTK_Selector.h"
 
 class SALOME_Actor;
 
-class SVTK_Selector
+class SVTK_Viewer;
+class SVTK_ViewWindow;
+
+class SVTK_SelectorDef: public SVTK_Selector
 {
 public:
-  virtual ~SVTK_Selector() = 0;
+  SVTK_SelectorDef();
+  virtual ~SVTK_SelectorDef();
 
   virtual
   void 
-  SetSelectionMode( Selection_Mode theMode ) = 0;
+  SetSelectionMode( Selection_Mode theMode );
 
   virtual
   Selection_Mode
-  SelectionMode() const = 0;
+  SelectionMode() const { return mySelectionMode; }
 
   virtual
   void
-  ClearIObjects() = 0;
+  ClearIObjects();
 
   virtual
   SALOME_Actor* 
-  GetActor(const Handle(SALOME_InteractiveObject)& theIO) const = 0;
+  GetActor(const Handle(SALOME_InteractiveObject)& theIO) const;
 
   virtual
   bool
-  IsSelected(const Handle(SALOME_InteractiveObject)& theIO) const = 0;
+  IsSelected(const Handle(SALOME_InteractiveObject)& theIO) const;
 
   virtual
   bool
-  IsSelected(SALOME_Actor* theActor) const = 0;
+  IsSelected(SALOME_Actor* theActor) const;
 
   virtual
   bool
-  AddIObject(const Handle(SALOME_InteractiveObject)& theIO) = 0;
+  AddIObject(const Handle(SALOME_InteractiveObject)& theIO);
 
   virtual
   bool
-  AddIObject(SALOME_Actor* theActor) = 0;
+  AddIObject(SALOME_Actor* theActor);
 
   virtual
   bool 
-  RemoveIObject(const Handle(SALOME_InteractiveObject)& theIO) = 0;
+  RemoveIObject(const Handle(SALOME_InteractiveObject)& theIO);
 
   virtual
   bool 
-  RemoveIObject(SALOME_Actor* theActor) = 0;
+  RemoveIObject(SALOME_Actor* theActor);
 
   virtual
   const SALOME_ListIO& 
-  StoredIObjects() const = 0;
+  StoredIObjects() const;
 
   virtual
   int 
-  IObjectCount() const = 0;
+  IObjectCount() const;
 
   virtual
   bool 
-  HasIndex(const Handle(SALOME_InteractiveObject)& theIO ) const = 0;
+  HasIndex(const Handle(SALOME_InteractiveObject)& theIO ) const;
 
   virtual
   void 
   GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	    TColStd_IndexedMapOfInteger& theIndex ) = 0;
+	    TColStd_IndexedMapOfInteger& theIndex );
 	
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    const TColStd_IndexedMapOfInteger& theIndices, 
-		    bool theIsModeShift) = 0;
+		    bool theIsModeShift);
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    const TColStd_MapOfInteger& theIndices, 
-		    bool theIsModeShift) = 0;
+		    bool theIsModeShift);
   virtual
   bool
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    int theIndex, 
-		    bool theIsModeShift) = 0;
+		    bool theIsModeShift);
   virtual
   void 
   RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	       int theIndex) = 0;
+	       int theIndex);
   virtual
   bool 
   IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
-		  int theIndex) const = 0;
+		  int theIndex) const;
   virtual
   void 
-  ClearIndex() = 0;
+  ClearIndex();
+
+private:
+  typedef NCollection_DataMap<Handle(SALOME_InteractiveObject),
+                              vtkSmartPointer<SALOME_Actor> > TIO2Actors;
+  TIO2Actors myIO2Actors;
+  Selection_Mode mySelectionMode;
+  SALOME_ListIO myIObjects;
+  SALOME_DataMapOfIOMapOfInteger myMapIOSubIndex;
 };
 
 

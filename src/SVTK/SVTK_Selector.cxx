@@ -36,38 +36,38 @@
 #include "SVTK_ViewWindow.h"
 #include "SALOME_ListIteratorOfListIO.hxx"
 
-#include "SVTK_Selector.h"
+#include "SVTK_SelectorDef.h"
 #include "utilities.h"
 
-SVTK_Selector
-::SVTK_Selector()
+SVTK_SelectorDef
+::SVTK_SelectorDef()
 {
 }
 
-SVTK_Selector
-::~SVTK_Selector()
+SVTK_SelectorDef
+::~SVTK_SelectorDef()
 {
 }
 
 void 
-SVTK_Selector
+SVTK_SelectorDef
 ::SetSelectionMode(Selection_Mode theMode)
 {
   mySelectionMode = theMode;
 }
 
 void 
-SVTK_Selector
+SVTK_SelectorDef
 ::ClearIObjects() 
 {
   myIO2Actors.Clear();
   myIObjects.Clear();
-  myMapIOSubIndex.Clear();
+  //myMapIOSubIndex.Clear();
 }
 
 //----------------------------------------------------------------------------
 bool
-SVTK_Selector
+SVTK_SelectorDef
 ::IsSelected(const Handle(SALOME_InteractiveObject)& theObject) const
 {
   SALOME_ListIteratorOfListIO anIter(myIObjects);
@@ -80,7 +80,7 @@ SVTK_Selector
 }
 
 bool
-SVTK_Selector
+SVTK_SelectorDef
 ::IsSelected(SALOME_Actor* theActor) const
 {
   const Handle(SALOME_InteractiveObject) anIO = theActor->getIO();
@@ -88,7 +88,7 @@ SVTK_Selector
 }
 
 SALOME_Actor*
-SVTK_Selector
+SVTK_SelectorDef
 ::GetActor(const Handle(SALOME_InteractiveObject)& theIO) const
 {
   if(myIO2Actors.IsBound(theIO))
@@ -98,7 +98,7 @@ SVTK_Selector
 
 //----------------------------------------------------------------------------
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::AddIObject(const Handle(SALOME_InteractiveObject)& theIO) 
 {
   if(!IsSelected(theIO)){
@@ -109,7 +109,7 @@ SVTK_Selector
 }
 
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::AddIObject(SALOME_Actor* theActor) 
 {
   const Handle(SALOME_InteractiveObject) anIO = theActor->getIO();
@@ -127,7 +127,7 @@ SVTK_Selector
 
 //----------------------------------------------------------------------------
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::RemoveIObject(const Handle(SALOME_InteractiveObject)& theIO) 
 {
   bool anIsIOBound = false;
@@ -149,7 +149,7 @@ SVTK_Selector
 }
 
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::RemoveIObject(SALOME_Actor* theActor) 
 {
   const Handle(SALOME_InteractiveObject) anIO = theActor->getIO();
@@ -174,28 +174,28 @@ SVTK_Selector
 
 //----------------------------------------------------------------------------
 const SALOME_ListIO& 
-SVTK_Selector
+SVTK_SelectorDef
 ::StoredIObjects() const
 {
   return myIObjects;
 }
 
 int
-SVTK_Selector
+SVTK_SelectorDef
 ::IObjectCount() const
 {
   return myIObjects.Extent();
 }
 
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::HasIndex( const Handle(SALOME_InteractiveObject)& theIO) const
 {
   return myMapIOSubIndex.IsBound(theIO);
 }
 
 void 
-SVTK_Selector
+SVTK_SelectorDef
 ::GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	    TColStd_IndexedMapOfInteger& theIndex)
 {
@@ -206,7 +206,7 @@ SVTK_Selector
 }
 
 bool
-SVTK_Selector
+SVTK_SelectorDef
 ::IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
 		  int theIndex) const
 {
@@ -244,7 +244,7 @@ removeIndex(TColStd_IndexedMapOfInteger& theMapIndex,
 
 
 bool
-SVTK_Selector
+SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    const TColStd_IndexedMapOfInteger& theIndices, 
 		    bool theIsModeShift)
@@ -269,7 +269,7 @@ SVTK_Selector
 
 
 bool
-SVTK_Selector
+SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    const TColStd_MapOfInteger& theIndices, 
 		    bool theIsModeShift)
@@ -296,7 +296,7 @@ SVTK_Selector
 
 
 bool 
-SVTK_Selector
+SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 		    int theIndex, 
 		    bool theIsModeShift)
@@ -328,7 +328,7 @@ SVTK_Selector
 
 
 void
-SVTK_Selector
+SVTK_SelectorDef
 ::RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	       int theIndex)
 {
@@ -339,7 +339,7 @@ SVTK_Selector
 }
 
 void 
-SVTK_Selector
+SVTK_SelectorDef
 ::ClearIndex()
 {
   myMapIOSubIndex.Clear();  

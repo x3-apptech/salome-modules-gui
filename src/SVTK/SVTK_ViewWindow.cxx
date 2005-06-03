@@ -1,6 +1,3 @@
-#include "SVTK_Selector.h"
-#include "SALOME_Actor.h"
-
 #include <qapplication.h>
 
 #include <vtkActorCollection.h>
@@ -30,6 +27,9 @@
 
 #include "SALOME_ListIteratorOfListIO.hxx"
 
+#include "SVTK_SelectorDef.h"
+#include "SALOME_Actor.h"
+
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"
 
@@ -40,7 +40,7 @@ SVTK_ViewWindow
   : SUIT_ViewWindow(theDesktop)
 {
   myModel = theModel;
-  mySelector = new SVTK_Selector();
+  mySelector = new SVTK_SelectorDef();
   connect(this,SIGNAL(selectionChanged()),theModel,SLOT(onSelectionChanged()));
 
   myTransform = VTKViewer_Transform::New();
