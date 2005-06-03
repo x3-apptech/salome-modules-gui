@@ -74,25 +74,27 @@ public:
 
 public:
   /* initialization */
-  void           initialize  ( CAM_Application* );
+  void            initialize  ( CAM_Application* );
 
   /* getting windows list */
-  void           windows     ( QMap<int, int>& ) const;
+  void            windows     ( QMap<int, int>& ) const;
   /* getting compatible viewer managers list */
-  void           viewManagers( QStringList& ) const;
+  void            viewManagers( QStringList& ) const;
 
   /* context popup menu request */
-  void           contextMenuPopup( const QString&, QPopupMenu*, QString& );
-  
+  void            contextMenuPopup( const QString&, QPopupMenu*, QString& );
+
+  virtual QString engineIOR() const;
+
 protected:
   /* data model creation */
-  CAM_DataModel* createDataModel();
+  CAM_DataModel*  createDataModel();
 
 public slots:
   /* activation */
-  void           activateModule  ( SUIT_Study* );
+  void            activateModule( SUIT_Study* );
   /* deactivation */
-  void           deactivateModule( SUIT_Study* );
+  void            deactivateModule( SUIT_Study* );
 
   /******************************
    * Internal methods
@@ -100,35 +102,35 @@ public slots:
 
 public slots:
   /* GUI action processing slot */
-  void           onGUIEvent();
+  void            onGUIEvent();
   /* desktop activation slot */ 
-  void           onDesktopActivated();
- 
+  void            onDesktopActivated();
+
 private:
   /* internal initizalition */ 
-  void           init        ( CAM_Application* );
+  void            init        ( CAM_Application* );
   /* internal activation */ 
-  void           activate    ( SUIT_Study* );
+  void            activate    ( SUIT_Study* );
   /* internal deactivation */ 
-  void           deactivate  ( SUIT_Study* );
+  void            deactivate  ( SUIT_Study* );
   /* study activation */ 
-  void           studyChanged( SUIT_Study* );
+  void            studyChanged( SUIT_Study* );
   /* context popup menu processing */
-  void           contextMenu( const QString&, QPopupMenu* );
+  void            contextMenu( const QString&, QPopupMenu* );
   /* GUI event processing */
-  void           guiEvent( const int );
+  void            guiEvent( const int );
 
   /* add action to the private action map */ 
-  void           addAction   ( const PyQtGUIAction, QAction* );
+  void            addAction   ( const PyQtGUIAction, QAction* );
 
   /* initialize a Python subinterpreter */
-  void           initInterp  ( int );
+  void            initInterp  ( int );
   /* import a Python GUI module */
-  void           importModule();
+  void            importModule();
   /* set workspace to Python GUI module */
-  void           setWorkSpace();
+  void            setWorkSpace();
 
-friend class SALOME_PYQT_XmlHandler;
+  friend class SALOME_PYQT_XmlHandler;
 };
 
 #endif // SALOME_PYQT_MODULE_H

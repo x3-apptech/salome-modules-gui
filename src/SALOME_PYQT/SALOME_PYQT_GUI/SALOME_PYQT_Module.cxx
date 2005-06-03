@@ -32,12 +32,6 @@
 
 using namespace std;
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
-
 // Default name of the module, should be replaced at the moment 
 // of module creation
 #define __DEFAULT_NAME__ "SALOME_PYQT_Module"
@@ -629,6 +623,11 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
   }
+}
+
+QString SALOME_PYQT_Module::engineIOR() const
+{
+  return QString::null;
 }
 
 /*!
