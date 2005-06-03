@@ -491,6 +491,9 @@ void QtxWorkstack::updateState( QSplitter* split )
   if ( split == mySplit )
     return;
 
+  for ( QPtrListIterator<QSplitter> iter( splitList ); iter.current() && !vis; ++iter )
+    vis = iter.current()->isVisibleTo( iter.current()->parentWidget() );
+
   if ( areaList.isEmpty() && splitList.isEmpty() )
     delete split;
   else if ( vis )
