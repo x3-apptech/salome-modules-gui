@@ -55,6 +55,7 @@ public:
   virtual ~SalomeApp_Application();
   
   virtual QString                     applicationName() const;
+  virtual QString                     applicationVersion() const;
 
   virtual CAM_Module*                 loadModule( const QString& );
   virtual bool                        activateModule( const QString& );

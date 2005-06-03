@@ -14,7 +14,7 @@ msgstr ""
 msgid "APP_LOGO_ICO"
 msgstr "icon_applogo.png"
 
-msgid "ABOUT_ICO"
+msgid "ABOUT"
 msgstr "icon_about.png"
 
 msgid "APP_DEFAULT_ICO"
@@ -22,4 +22,3 @@ msgstr "icon_default.png"
 
 msgid "APP_MODULE_ICO"
 msgstr "icon_module.png"
-

@@ -9,16 +9,18 @@
 
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Module.h"
+#include "SalomeApp_OBFilter.h"
+#include "SalomeApp_EventFilter.h"
+#include "SalomeApp_WidgetContainer.h"
+
+#include "SalomeApp_AboutDlg.h"
+#include "SalomeApp_ModuleDlg.h"
+
 #include "SalomeApp_GLSelector.h"
 #include "SalomeApp_OBSelector.h"
 #include "SalomeApp_OCCSelector.h"
 #include "SalomeApp_VTKSelector.h"
-#include "SalomeApp_EventFilter.h"
 #include "SalomeApp_SelectionMgr.h"
-#include "SalomeApp_EventFilter.h"
-#include "SalomeApp_WidgetContainer.h"
-#include "SalomeApp_ModuleDlg.h"
-#include "SalomeApp_OBFilter.h"
 
 #include <LogWindow.h>
 
@@ -54,6 +56,7 @@
 #include <SALOME_ModuleCatalog_impl.hxx>
 
 #include <qmap.h>
+#include <qdir.h>
 #include <qlabel.h>
 #include <qimage.h>
 #include <qaction.h>
@@ -161,7 +164,40 @@ void SalomeApp_Application::start()
 
 QString SalomeApp_Application::applicationName() const 
 { 
-  return "SalomeApp";
+  return tr( "APP_NAME" );
+}
+
+QString SalomeApp_Application::applicationVersion() const
+{
+  static QString _app_version;
+
+  if ( _app_version.isEmpty() )
+  {
+    QString path( ::getenv( "GUI_ROOT_DIR" ) );
+    if ( !path.isEmpty() )
+      path += QDir::separator();
+    path += QString( "bin/salome/VERSION" );
+  
+    QFile vf( path );
+    if ( vf.open( IO_ReadOnly ) )
+    {
+      QString line;
+      vf.readLine( line, 1024 );
+      vf.close();
+
+      if ( !line.isEmpty() )
+      {
+	while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
+	  line.remove( line.length() - 1, 1 );
+
+	int idx = line.findRev( ":" );
+	if ( idx != -1 )
+	  _app_version = line.mid( idx + 1 ).stripWhiteSpace();
+      }
+    }
+  }
+
+  return _app_version;
 }
 
 CAM_Module* SalomeApp_Application::loadModule( const QString& name )
@@ -470,21 +506,9 @@ void SalomeApp_Application::updateCommandsStatus()
 //=======================================================================
 void SalomeApp_Application::onHelpAbout()
 {
-  QMessageBox aDlg( desktop(), "AboutDlg" );
-
-  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-  QPixmap aPixmap = aResMgr->loadPixmap( "SalomeApp", tr( "ABOUT_ICO" ) );
-
-  QFontMetrics m( aDlg.font() );
-  QImage anImage = aPixmap.convertToImage();
-  int w = m.height() * 5;
-  anImage = anImage.scale( w, w );
-  aPixmap.convertFromImage( anImage );
-
-  aDlg.setCaption( tr( "ABOUT" ) );
-  aDlg.setText( tr( "APP_NAME_LONG" ).arg( APP_VERSION ) );
-  aDlg.setIconPixmap( aPixmap );
-  aDlg.exec();
+  SalomeApp_AboutDlg* dlg = new SalomeApp_AboutDlg( applicationName(), applicationVersion(), desktop() );
+  dlg->exec();
+  delete dlg;
 }
 
 QWidget* SalomeApp_Application::window( const int flag, const int studyId ) const
@@ -775,6 +799,7 @@ void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
   aMap.insert( WT_ObjectBrowser, Qt::DockLeft );
   aMap.insert( WT_PyConsole, Qt::DockBottom );
+  aMap.insert( WT_LogWindow, Qt::DockBottom );
 }
 
 void SalomeApp_Application::defaultViewManagers( QStringList& ) const
@@ -923,7 +948,6 @@ void SalomeApp_Application::loadWindowsGeometry()
   QString section = QString( "windows_geometry" );
   if ( !modName.isEmpty() )
     section += QString( "." ) + modName;
-
 
   dockMgr->loadGeometry( resourceMgr(), section, false );
   dockMgr->restoreGeometry();

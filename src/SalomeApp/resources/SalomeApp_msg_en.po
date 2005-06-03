@@ -30,6 +30,23 @@ msgstr "&Cancel"
 
 //=======================================================================================
 
+msgid "APP_NAME"
+msgstr "SALOME"
+
+msgid "ABOUT_CAPTION"
+msgstr "About %1"
+
+msgid "ABOUT_VERSION"
+msgstr "Version %1"
+
+msgid "ABOUT_COPYRIGHT"
+msgstr "Copyright (C) 2003-2005 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
+
+msgid "ABOUT_LICENSE"
+msgstr "GNU LGPL"
+
+//=======================================================================================
+
 msgid "SalomeApp_Application::OBJECT_BROWSER"
 msgstr "Object Browser"
 
@@ -53,9 +70,6 @@ msgstr "OCC view"
 
 msgid "SalomeApp_Application::NEW_WINDOW_3"
 msgstr "VTK view"
-
-msgid "SalomeApp_Application::APP_NAME"
-msgstr "SALOME"
 
 msgid "SalomeApp_Application::ABOUT"
 msgstr "About"

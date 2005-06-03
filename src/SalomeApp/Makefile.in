@@ -13,6 +13,7 @@ VPATH=.:@srcdir@:@srcdir@/resources
 
 # header files 
 EXPORT_HEADERS= SalomeApp.h \
+		SalomeApp_AboutDlg.h \
 		SalomeApp_Application.h \
 		SalomeApp_DataModel.h \
 		SalomeApp_DataObject.h \
@@ -45,7 +46,8 @@ PO_FILES = SalomeApp_images.po \
 # Libraries targets
 LIB = libSalomeApp.la
 
-LIB_SRC= SalomeApp_Application.cxx \
+LIB_SRC= SalomeApp_AboutDlg.cxx \
+         SalomeApp_Application.cxx \
 	 SalomeApp_DataModel.cxx \
 	 SalomeApp_DataObject.cxx \
 	 SalomeApp_DataOwner.cxx \
@@ -71,7 +73,8 @@ LIB_SRC= SalomeApp_Application.cxx \
 	 SalomeApp_TypeFilter.cxx \
 	 SalomeApp_OBFilter.cxx
 
-LIB_MOC = SalomeApp_Application.h \
+LIB_MOC = SalomeApp_AboutDlg.h \
+          SalomeApp_Application.h \
 	  SalomeApp_DataModel.h \
 	  SalomeApp_OBSelector.h \
 	  SalomeApp_OCCSelector.h \
