@@ -151,7 +151,9 @@ public:
      return legend(); /* mpv: porting to the Qwt 4.2.0 */
 #endif
   }
-  virtual QSize minimumSizeHint() const;
+  virtual QSize       sizeHint() const;
+  virtual QSizePolicy sizePolicy() const;
+  virtual QSize       minimumSizeHint() const;
 
 protected:
   bool       existMarker( const QwtSymbol::Style typeMarker, const QColor& color, const Qt::PenStyle typeLine );

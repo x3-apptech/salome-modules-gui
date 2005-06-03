@@ -142,9 +142,9 @@ Plot2d_ViewFrame::Plot2d_ViewFrame( QWidget* parent, const QString& title )
        myXMode( 0 ), myYMode( 0 ), mySecondY( false )
 {
   /* Plot 2d View */
-  QGridLayout* aLayout = new QGridLayout( this ); 
+  QVBoxLayout* aLayout = new QVBoxLayout( this ); 
   myPlot = new Plot2d_Plot2d( this );
-  aLayout->addWidget( myPlot, 0, 0);
+  aLayout->addWidget( myPlot );
 
 //  createActions();
 
@@ -1687,13 +1687,24 @@ void Plot2d_Plot2d::getNextMarker( QwtSymbol::Style& typeMarker, QColor& color, 
 */
 }
 
+QSizePolicy Plot2d_Plot2d::sizePolicy() const
+{
+  return QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+}
+
+QSize Plot2d_Plot2d::sizeHint() const
+{
+  return QwtPlot::minimumSizeHint();
+}
+
 /*!
   return minimum size for qwt plot
 */
 QSize Plot2d_Plot2d::minimumSizeHint() const
 {
-  QSize aSize = QwtPlot::minimumSizeHint();
-  return QSize(aSize.width()*3/4, aSize.height());
+  return QSize( 0, 0 );
+//  QSize aSize = QwtPlot::minimumSizeHint();
+//  return QSize(aSize.width()*3/4, aSize.height());
 }
 /*!
   Checks if marker belongs to any enitity
