@@ -78,6 +78,8 @@ class SVTK_EXPORT SVTK_InteractorStyle : public QObject,
   void setViewWindow(SVTK_ViewWindow* theViewWindow);
   void setGUIWindow(QWidget* theWindow);
 
+  virtual int GetState();
+
   void setTriedron(VTKViewer_Trihedron* theTrihedron);
   void setPreselectionProp(const double& theRed = 0, 
 			   const double& theGreen = 1,
@@ -134,7 +136,6 @@ class SVTK_EXPORT SVTK_InteractorStyle : public QObject,
 		const int left, const int top, 
 		const int right, const int bottom);
 
-  int State;
   float MotionFactor;
   float RadianToDegree;                 // constant: for conv from deg to rad
   double myScale;
