@@ -99,6 +99,8 @@ void ListItem<T>::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, i
       colorGrp.setColor( QColorGroup::Background, myObject->color( SUIT_DataObject::Background ) );
     if ( myObject->color( SUIT_DataObject::Highlight ).isValid() )
       colorGrp.setColor( QColorGroup::Highlight, myObject->color( SUIT_DataObject::Highlight ) );
+    if ( myObject->color( SUIT_DataObject::HighlightedText ).isValid() )
+      colorGrp.setColor( QColorGroup::HighlightedText, myObject->color( SUIT_DataObject::HighlightedText ) );
   }
 
   

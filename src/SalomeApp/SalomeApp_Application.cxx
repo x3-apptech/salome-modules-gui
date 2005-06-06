@@ -10,6 +10,7 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_OBFilter.h"
+#include "SalomeApp_DataObject.h"
 #include "SalomeApp_EventFilter.h"
 #include "SalomeApp_WidgetContainer.h"
 
@@ -769,6 +770,10 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     ob->resize( OBJECT_BROWSER_WIDTH, ob->height() );
     ob->setFilter( new SalomeApp_OBFilter( selectionMgr() ) );
 
+    ob->setNameTitle( tr( "OBJ_BROWSER_NAME" ) );
+    for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
+      ob->addColumn( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), i );
+
     // Create OBSelector
     new SalomeApp_OBSelector( ob, mySelMgr );
 
@@ -792,7 +797,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 
     logWin->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
   }
-  
+
   return wid;
 }
 

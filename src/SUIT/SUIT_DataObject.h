@@ -24,7 +24,7 @@ public:
   class Signal;
 
   typedef enum { None, RadioButton, CheckBox } CheckType;
-  typedef enum { Text, Base, Foreground, Background, Highlight } ColorRole;
+  typedef enum { Text, Base, Foreground, Background, Highlight, HighlightedText } ColorRole;
 
   SUIT_DataObject( SUIT_DataObject* = 0 );
   virtual ~SUIT_DataObject();
@@ -53,12 +53,11 @@ public:
 
   void                        reparentChildren( const SUIT_DataObject* );
 
-  QString                     text() const { return text( 0 ); }
-  QColor                      color() const { return color( Foreground ); }
-  virtual QString             name() const;
-  virtual QPixmap             icon() const;
   virtual QString             text( const int ) const;
   virtual QColor              color( const ColorRole ) const;
+
+  virtual QString             name() const;
+  virtual QPixmap             icon() const;
   virtual QString             toolTip() const;
 
   virtual SUIT_DataObject*    parent() const;

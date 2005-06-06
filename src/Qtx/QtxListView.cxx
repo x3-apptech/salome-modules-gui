@@ -186,6 +186,9 @@ void QtxListView::setShown( int ind, bool sh )
 
 void QtxListView::setColumnWidth( int c, int w )
 {
+  if ( myColumns.contains( c ) )
+    myColumns[c].width = w;
+
   QListView::setColumnWidth( c, !myColumns.contains( c ) ? w : 0 );
 }
 

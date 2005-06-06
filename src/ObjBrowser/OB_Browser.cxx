@@ -44,7 +44,7 @@ void OB_Browser::ToolTip::maybeTip( const QPoint& pos )
   if ( !parentWidget() || !myBrowser || !myBrowser->isShowToolTips() )
 	  return;
 
-  QListView* lv = myBrowser->getListView();
+  QListView* lv = myBrowser->listView();
 
   QListViewItem* item = lv->itemAt( pos );
   SUIT_DataObject* obj = myBrowser->dataObject( item );
@@ -76,8 +76,8 @@ myAutoUpdate( false ),
 myAutoDelObjs( false ),
 myRootDecorated( true )
 {
-  myView = new OB_ListView( this );
-  myView->addColumn( "Data" );
+  myView = new OB_ListView( QtxListView::HeaderAuto, this );
+  myView->setAppropriate( myView->addColumn( "Data" ), false );
   myView->setSorting( -1 );
   myView->setRootIsDecorated( true );
   myView->setSelectionMode( QListView::Extended );
@@ -187,10 +187,10 @@ void OB_Browser::setRootObject( SUIT_DataObject* theRoot )
 
   if ( myRoot )
     updateView( myRoot );
-  else if ( getListView() )
+  else if ( listView() )
   {
     myItems.clear();
-    getListView()->clear();
+    listView()->clear();
   }
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
@@ -204,9 +204,9 @@ void OB_Browser::setRootObject( SUIT_DataObject* theRoot )
 int OB_Browser::numberOfSelected() const
 {
   int count = 0;
-  if ( getListView() )
+  if ( listView() )
   {
-    for ( QListViewItemIterator it( getListView() ); it.current(); ++it )
+    for ( QListViewItemIterator it( listView() ); it.current(); ++it )
       if ( it.current()->isSelected() ) 
         count++;
   }
@@ -224,16 +224,16 @@ void OB_Browser::getSelected( DataObjectList& theObjList ) const
 {
   theObjList.clear();
 
-  if ( !getListView() )
+  if ( !listView() )
     return;
 
-  for ( QListViewItemIterator it( getListView() ); it.current(); ++it )
+  for ( QListViewItemIterator it( listView() ); it.current(); ++it )
   {
     if ( it.current()->isSelected() ) 
     {
       SUIT_DataObject* obj = dataObject( it.current() );
       if ( obj )
-	      theObjList.append( obj );
+	theObjList.append( obj );
     }
   }
 }
@@ -247,7 +247,7 @@ void OB_Browser::setSelected( const SUIT_DataObject* theObject, const bool appen
 
 void OB_Browser::setSelected( const DataObjectList& theObjLst, const bool append )
 {
-  QListView* lv = getListView();
+  QListView* lv = listView();
 
   if ( !lv )
     return;
@@ -307,22 +307,22 @@ void OB_Browser::setSelected( const DataObjectList& theObjLst, const bool append
 bool OB_Browser::isOpen( SUIT_DataObject* theObject ) const
 {
   bool res = false;
-  if ( getListView() )
-    res = getListView()->isOpen( listViewItem( theObject ) );
+  if ( listView() )
+    res = listView()->isOpen( listViewItem( theObject ) );
   return res;
 }
 
 void OB_Browser::setOpen( SUIT_DataObject* theObject, const bool theOpen )
 {
-  if ( getListView() )
-    getListView()->setOpen( listViewItem( theObject ), theOpen );
+  if ( listView() )
+    listView()->setOpen( listViewItem( theObject ), theOpen );
 }
 
 SUIT_DataObject* OB_Browser::dataObjectAt( const QPoint& pos ) const
 {
   SUIT_DataObject* obj = 0;
 
-  QListView* lv = getListView();
+  QListView* lv = listView();
   if ( lv )
     obj = dataObject( lv->itemAt( pos ) );
 
@@ -339,63 +339,115 @@ void OB_Browser::setFilter( OB_Filter* f )
   myView->setFilter( f );
 }
 
-int OB_Browser::addColumn( const QString & label, int width, int index )
+int OB_Browser::addColumn( const QString& label, const int id, const int width )
 {
-  int id = -1;
-  if ( !myView )
-    return id;
-  if ( index != -1 && myColumnIds.contains( index ) )
-    return id; // can not reuse index
-
-  int trueId = index;
-  id = myView->addColumn( label, width );
-  if ( trueId == -1 )
-    trueId = id;
-  myColumnIds.insert( trueId, id );
-  updateText();
-
-  return trueId;
+  return addColumn( QIconSet(), label, id, width );
 }
 
-int OB_Browser::addColumn( const QIconSet & iconset, const QString & label, int width, int index )
+int OB_Browser::addColumn( const QIconSet& icon, const QString& label, const int id, const int width )
 {
-  int id = -1;
-  if ( !myView )
-    return id;
-  if ( index != -1 && myColumnIds.contains( index ) )
-    return id; // can not reuse index
+  QListView* lv = listView();
+  if ( !lv )
+    return -1;
 
-  int trueId = index;
-  id = myView->addColumn( iconset, label, width );
-  if ( trueId == -1 )
-    trueId = id;
-  myColumnIds.insert( trueId, id );
+  int theId = id;
+  if ( theId < 0 )
+  {
+    while ( myColumnIds.contains( theId ) )
+      theId++;
+  }
+
+  if ( myColumnIds.contains( theId ) )
+    return -1; // can not reuse id
+
+  int sec = -1;
+  if ( icon.isNull() )
+    sec = lv->addColumn( label, width );
+  else
+    sec = lv->addColumn( icon, label, width );
+
+  if ( sec == -1 )
+    return -1;
+
+  myColumnIds.insert( theId, sec );
   updateText();
 
-  return trueId;
+  return theId;
 }
 
-void OB_Browser::removeColumn( int index )
+void OB_Browser::removeColumn( const int id )
 {
-  if ( !myView || !myColumnIds.contains( index ) )
+  QListView* lv = listView();
+  if ( !lv || !myColumnIds.contains( id ) )
     return;
 
-  int id = myColumnIds[ index ];
-  myView->removeColumn( id );
+  int sec = myColumnIds[id];
+  lv->removeColumn( sec );
 
   // update map of column indeces
-  myColumnIds.remove( index );
+  myColumnIds.remove( id );
   for ( QMap<int, int>::iterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
   {
-    if ( it.key() > index )
+    if ( it.key() > id )
       it.data()--;
   }
   updateText();
 }
 
+void OB_Browser::setNameTitle( const QString& label )
+{
+  setNameTitle( QIconSet(), label );
+}
+
+void OB_Browser::setNameTitle( const QIconSet& icon, const QString& label )
+{
+  QListView* lv = listView();
+  if ( !lv )
+    return;
+
+  if ( icon.isNull() )
+    lv->setColumnText( 0, label );
+  else
+    lv->setColumnText( 0, icon, label );
+}
+
+void OB_Browser::setColumnTitle( const int id, const QString& label )
+{
+  setColumnTitle( id, QIconSet(), label );
+}
+
+void OB_Browser::setColumnTitle( const int id, const QIconSet& icon, const QString& label )
+{
+  QListView* lv = listView();
+  if ( !lv || !myColumnIds.contains( id ) )
+    return;
+
+  if ( icon.isNull() )
+    lv->setColumnText( myColumnIds[id], label );
+  else
+    lv->setColumnText( myColumnIds[id], icon, label );
+}
+
+bool OB_Browser::isColumnVisible( const int id ) const
+{
+  myColumnIds.contains( id ) && myView->isShown( myColumnIds[id] );
+}
+
+void OB_Browser::setColumnShown( const int id, const bool on )
+{
+  if ( !myColumnIds.contains( id ) )
+    return;
+
+  myView->setShown( myColumnIds[id], on );
+}
+
 void OB_Browser::updateTree( SUIT_DataObject* o )
 {
-  SUIT_DataObject* obj = o ? o : getRootObject();
+  updateTree( o ? o : getRootObject(), false );
+}
+
+void OB_Browser::updateTree( SUIT_DataObject* obj, const bool notify )
+{
   if ( !obj )
     return;
 
@@ -406,6 +458,9 @@ void OB_Browser::updateTree( SUIT_DataObject* o )
   int selNum = numberOfSelected();
 
   SUIT_DataObject* curObj = storeState( selObjs, openObjs, selKeys, openKeys, curKey );
+
+  if ( notify )
+    emit aboutRefresh();
 
   createConnections( obj );
   updateView( obj );
@@ -457,7 +512,7 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
 
 void OB_Browser::updateView( const SUIT_DataObject* theStartObj )
 {
-  QListView* lv = getListView();
+  QListView* lv = listView();
   if ( !lv )
     return;
 
@@ -513,7 +568,7 @@ void OB_Browser::updateView( const SUIT_DataObject* theStartObj )
 }
 
 QListViewItem* OB_Browser::createTree( const SUIT_DataObject* obj,
-                                          QListViewItem* parent, QListViewItem* after )
+                                       QListViewItem* parent, QListViewItem* after )
 {
   if ( !obj )
     return 0;
@@ -531,7 +586,7 @@ QListViewItem* OB_Browser::createTree( const SUIT_DataObject* obj,
 QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
                                        QListViewItem* parent, QListViewItem* after )
 {
-  QListView* lv = getListView();
+  QListView* lv = listView();
 
   if ( !lv || !o )
     return 0;
@@ -585,17 +640,19 @@ QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
 
   myItems.insert( obj, item );
 
+  updateText( item );
+
   return item;
 }
 
 void OB_Browser::adjustWidth()
 {
-  if ( !getListView() )
+  if ( !listView() )
     return;
 
-  getListView()->setColumnWidth( 0, 0 );
-  if ( getListView()->firstChild() )
-    adjustWidth( getListView()->firstChild() );
+  listView()->setColumnWidth( 0, 0 );
+  if ( listView()->firstChild() )
+    adjustWidth( listView()->firstChild() );
 }
 
 void OB_Browser::adjustWidth( QListViewItem* item )
@@ -631,7 +688,7 @@ QListViewItem* OB_Browser::listViewItem( const SUIT_DataObject* obj ) const
   return item;
 }
 
-QListView* OB_Browser::getListView() const
+QListView* OB_Browser::listView() const
 {
   return myView;
 }
@@ -670,7 +727,7 @@ SUIT_DataObject* OB_Browser::storeState( DataObjectMap& selObjs, DataObjectMap& 
                                          DataObjectKeyMap& selKeys, DataObjectKeyMap& openKeys,
                                          DataObjectKey& curKey ) const
 {
-  QListView* lv = getListView();
+  QListView* lv = listView();
   if ( !lv )
     return 0;
 
@@ -699,7 +756,7 @@ void OB_Browser::restoreState( const DataObjectMap& selObjs, const DataObjectMap
                                const SUIT_DataObject* curObj, const DataObjectKeyMap& selKeys,
                                const DataObjectKeyMap& openKeys, const DataObjectKey& curKey )
 {
-  QListView* lv = getListView();
+  QListView* lv = listView();
   if ( !lv )
     return;
 
@@ -774,7 +831,7 @@ void OB_Browser::onExpand()
 
 void OB_Browser::onRefresh()
 {
-  updateTree();
+  updateTree( 0, true );
 }
 
 void OB_Browser::onDestroyed( SUIT_DataObject* obj )
@@ -802,24 +859,32 @@ void OB_Browser::onDropped( QPtrList<QListViewItem> items, QListViewItem* item, 
 
 void OB_Browser::updateText()
 {
-  if ( !myView )
+  if ( myColumnIds.isEmpty() )
     return;
-  
-  if ( myColumnIds.size() )
+
+  QListView* lv = listView();
+  if ( !lv )
+    return;
+
+  for ( QListViewItemIterator it( lv ); it.current(); ++it )
   {
-    QListViewItemIterator it( myView );
-    for ( ; it.current() != 0; ++it )
-    {
-      QListViewItem* item = it.current();
-      SUIT_DataObject* obj = dataObject( item );
-      if ( !item || !obj )
-        continue;
-      QMap<int, int>::iterator it = myColumnIds.begin();
-      for( ; it != myColumnIds.end(); ++it )
-        item->setText( it.data(), obj->text( it.key() ) );
-    }
+    SUIT_DataObject* obj = dataObject( it.current() );
+    if ( !obj )
+      continue;
+
+    for( QMap<int, int>::iterator itr = myColumnIds.begin(); itr != myColumnIds.end(); ++itr )
+      it.current()->setText( itr.data(), obj->text( itr.key() ) );
   }
-  updateView();
+}
+
+void OB_Browser::updateText( QListViewItem* item )
+{
+  SUIT_DataObject* obj = dataObject( item );
+  if ( !obj )
+    return;
+
+  for( QMap<int, int>::iterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
+    item->setText( it.data(), obj->text( it.key() ) );
 }
 
 bool OB_Browser::eventFilter(QObject* watched, QEvent* e)
@@ -909,7 +974,7 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
 void OB_Browser::autoOpenBranches()
 {
   int level = autoOpenLevel();
-  QListView* lv = getListView();
+  QListView* lv = listView();
   if ( !lv || level < 1 )
     return;
 

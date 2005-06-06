@@ -27,8 +27,8 @@ class OB_EXPORT OB_Browser : public QFrame, public SUIT_PopupClient
   class ToolTip;
 
 public:
-	OB_Browser( QWidget* = 0, SUIT_DataObject* theRoot = 0 );
-	virtual ~OB_Browser();
+  OB_Browser( QWidget* = 0, SUIT_DataObject* theRoot = 0 );
+  virtual ~OB_Browser();
 
   virtual QString   popupClientType() const { return QString( "ObjectBrowser" ); }
 
@@ -71,17 +71,26 @@ public:
   int               autoOpenLevel() const;
   void              setAutoOpenLevel( const int );
 
-  virtual int       addColumn( const QString & label, int width = -1, int index = -1 );
-  virtual int       addColumn( const QIconSet & iconset, const QString & label, int width = -1, int index = -1 );
-  virtual void      removeColumn( int index );
+  virtual int       addColumn( const QString&, const int id = -1, const int width = -1 );
+  virtual int       addColumn( const QIconSet&, const QString&, const int id = -1, const int width = -1 );
+  virtual void      removeColumn( const int id );
+
+  void              setNameTitle( const QString& );
+  virtual void      setNameTitle( const QIconSet&, const QString& );
+  void              setColumnTitle( const int id, const QString& );
+  virtual void      setColumnTitle( const int id, const QIconSet&, const QString& );
+
+  bool              isColumnVisible( const int ) const;
+  virtual void      setColumnShown( const int, const bool );
 
   virtual bool      eventFilter(QObject* watched, QEvent* e);
 
-  QListView*        getListView() const;
-  
+  QListView*        listView() const;
+
   virtual void      contextMenuPopup( QPopupMenu* );
 
 signals:
+  void              aboutRefresh();
   void              selectionChanged();
   void              dropped( DataObjectList, SUIT_DataObject*, int );
 
@@ -117,6 +126,9 @@ private:
   void              removeReferences( QListViewItem* );
   void              createConnections( SUIT_DataObject* );
   void              removeObject( SUIT_DataObject*, const bool = true );
+
+  void              updateText( QListViewItem* );
+  void              updateTree( SUIT_DataObject*, const bool );
 
   DataObjectKey     objectKey( QListViewItem* ) const;
   DataObjectKey     objectKey( SUIT_DataObject* ) const;
