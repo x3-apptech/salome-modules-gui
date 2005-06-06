@@ -73,39 +73,39 @@ class QTX_EXPORT Qtx : public Qt
 {
 public:
   enum AlignmentFlags
-	{
-	  AlignOutLeft   = AlignVCenter  << 2,
-		AlignOutRight  = AlignOutLeft  << 2,
+  {
+    AlignOutLeft   = AlignVCenter  << 2,
+    AlignOutRight  = AlignOutLeft  << 2,
     AlignOutTop    = AlignOutRight << 2,
     AlignOutBottom = AlignOutTop   << 2
   };
 
   static void    setTabOrder( QWidget*, ... );
-	static void    setTabOrder( const QWidgetList& );
-	static void    alignWidget( QWidget*, const QWidget*, const int );
+  static void    setTabOrder( const QWidgetList& );
+  static void    alignWidget( QWidget*, const QWidget*, const int );
 
   static void    simplifySeparators( QToolBar* );
   static void    simplifySeparators( QPopupMenu*, const bool = true );
 
   static bool    isParent( QObject*, QObject* );
 
-	static QString extension( const QString& );
-	static QString dir( const QString&, const bool = true );
-	static QString file( const QString&, const bool = true );
+  static QString extension( const QString& );
+  static QString dir( const QString&, const bool = true );
+  static QString file( const QString&, const bool = true );
 
   static QString library( const QString& );
 
-	static QString tmpDir();
-	static bool    mkDir( const QString& );
-	static bool    rmDir( const QString& );
-	static bool    dos2unix( const QString& );
-	static QString addSlash( const QString& );
+  static QString tmpDir();
+  static bool    mkDir( const QString& );
+  static bool    rmDir( const QString& );
+  static bool    dos2unix( const QString& );
+  static QString addSlash( const QString& );
 
-	static int     rgbSet( const QColor& );
-	static int     rgbSet( const int, const int, const int );
+  static int     rgbSet( const QColor& );
+  static int     rgbSet( const int, const int, const int );
 
-	static void    rgbSet( const int, QColor& );
-	static void    rgbSet( const int, int&, int&, int& );
+  static void    rgbSet( const int, QColor& );
+  static void    rgbSet( const int, int&, int&, int& );
 };
 
 #endif
