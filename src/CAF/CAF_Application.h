@@ -25,10 +25,13 @@ public:
 
   virtual QString applicationName() const;
 
+public slots:  
+  virtual void    onHelpAbout();
+
 protected slots:
   virtual bool    onUndo( int );
   virtual bool    onRedo( int );
-
+  
 protected:
   enum {  EditUndoId = STD_Application::UserID, EditRedoId, UserID };
 

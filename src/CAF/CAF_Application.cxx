@@ -55,7 +55,7 @@ void CAF_Application::createActions()
   registerAction( EditRedoId, editRedo );
 
   editUndo->setComment( tr( "INF_APP_UNDOACTIONS" ) );
-	editRedo->setComment( tr( "INF_APP_REDOACTIONS" ) );
+  editRedo->setComment( tr( "INF_APP_REDOACTIONS" ) );
 
   connect( editUndo, SIGNAL( activated( int ) ), this, SLOT( onUndo( int ) ) );
   connect( editRedo, SIGNAL( activated( int ) ), this, SLOT( onRedo( int ) ) );
@@ -170,4 +170,9 @@ void CAF_Application::updateCommandsStatus()
 
   undo->setEnabled( cafStudy && cafStudy->canUndo() );
   redo->setEnabled( cafStudy && cafStudy->canRedo() );
+}
+
+void CAF_Application::onHelpAbout()
+{
+  SUIT_MessageBox::info1( desktop(), tr( "About" ), tr( "ABOUT_INFO" ), "&OK" );
 }
