@@ -299,7 +299,7 @@ msgstr "Recent &Files"
 msgid "PRP_DESK_FILE_MRU"
 msgstr "Opens a document"
 
-msgid "ABOUT_INFO"
+msgid "STD_Application::ABOUT_INFO"
 msgstr "SUIT Std application"
 
 msgid "MSG_FILE_EXISTS"
