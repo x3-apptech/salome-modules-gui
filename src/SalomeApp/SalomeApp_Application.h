@@ -30,6 +30,7 @@ class OB_Browser;
 class SalomeApp_Module;
 class SalomeApp_SelectionMgr;
 class SalomeApp_WidgetContainer;
+class SALOME_LifeCycleCORBA;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -84,6 +85,7 @@ public:
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
   static SALOME_NamingService*        namingService();
+  static SALOME_LifeCycleCORBA*       lcc();
   static QString                      defaultEngineIOR();
 
 signals:

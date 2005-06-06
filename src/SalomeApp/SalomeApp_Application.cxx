@@ -54,6 +54,7 @@
 #include <Utils_ORB_INIT.hxx>
 #include <Utils_SINGLETON.hxx>
 #include <SALOME_ModuleCatalog_impl.hxx>
+#include <SALOME_LifeCycleCORBA.hxx>
 
 #include <qmap.h>
 #include <qdir.h>
@@ -816,24 +817,26 @@ void SalomeApp_Application::afterCloseDoc()
 CORBA::ORB_var SalomeApp_Application::orb()
 {
   ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-  CORBA::ORB_var& orb = init( qApp->argc(), qApp->argv() );
-
-  return orb;
+  static CORBA::ORB_var _orb = init( qApp->argc(), qApp->argv() );
+  return _orb;
 }
 
 SALOMEDSClient_StudyManager* SalomeApp_Application::studyMgr()
 {
-  static SALOMEDSClient_StudyManager* aStudyManager = NULL;
-  
-  if(!aStudyManager) {
-    aStudyManager = new SALOMEDS_StudyManager();
-  }
-  return aStudyManager;
+  static SALOMEDSClient_StudyManager* _sm = new SALOMEDS_StudyManager();
+  return _sm;
 }
 
 SALOME_NamingService* SalomeApp_Application::namingService()
 {
-  return new SALOME_NamingService( orb() );
+  static SALOME_NamingService* _ns = new SALOME_NamingService( orb() );
+  return _ns;
+}
+
+SALOME_LifeCycleCORBA* SalomeApp_Application::lcc()
+{
+  static SALOME_LifeCycleCORBA* _lcc = new SALOME_LifeCycleCORBA( namingService() );
+  return _lcc;
 }
 
 QString SalomeApp_Application::defaultEngineIOR()
