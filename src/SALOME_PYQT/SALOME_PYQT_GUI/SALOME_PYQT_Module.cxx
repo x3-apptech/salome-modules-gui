@@ -16,6 +16,8 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_DataModel.h"
 
+#include <SALOME_LifeCycleCORBA.hxx>
+
 #include <qfile.h>
 #include <qdom.h>
 #include <qworkspace.h>
@@ -625,9 +627,23 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
   }
 }
 
+/*!
+ * Get module engine, returns nil var if engine is not found in LifeCycleCORBA
+ */
+Engines::Component_var SALOME_PYQT_Module::getEngine() const
+{
+  Engines::Component_var comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name( "" ) );
+  return comp;
+}
+
+/*!
+ * Get module engine IOR, returns empty string if engine is not found in LifeCycleCORBA
+ */
 QString SALOME_PYQT_Module::engineIOR() const
 {
-  return QString::null;
+  if ( !CORBA::is_nil( getEngine() ) )
+    return QString( getApp()->orb()->object_to_string( getEngine() ) );
+  return QString( "" );
 }
 
 /*!

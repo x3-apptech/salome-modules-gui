@@ -49,7 +49,10 @@ LIB_SRC = SALOME_PYQT_PyInterp.cxx \
 # moc pre-processing
 LIB_MOC = SALOME_PYQT_Module.h
 
-LIB_CLIENT_IDL = SALOME_Exception.idl SALOME_GenericObj.idl
+LIB_CLIENT_IDL = SALOME_Exception.idl \
+                 SALOME_GenericObj.idl \
+                 SALOME_ContainerManager.idl \
+                 SALOME_Component.idl 
 
 CPPFLAGS += $(QT_INCLUDES) $(PYTHON_INCLUDES) $(SIP_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(OGL_INCLUDES) $(BOOST_CPPFLAGS) -DHAVE_CONFIG_H -I${KERNEL_ROOT_DIR}/include/salome
 

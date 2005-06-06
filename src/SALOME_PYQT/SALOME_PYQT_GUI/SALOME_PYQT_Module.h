@@ -20,6 +20,9 @@
 #include <qstringlist.h>
 #include <qmap.h>
 
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOME_Component)
+
 class SALOME_PYQT_XmlHandler;
 
 class SALOME_PYQT_EXPORT SALOME_PYQT_Module: public SalomeApp_Module
@@ -68,6 +71,9 @@ public:
   /* destructor */
   ~SALOME_PYQT_Module();
 
+  /* get module engine */
+  Engines::Component_var getEngine() const;
+
   /******************************
    * Inherited from CAM_Module 
    ******************************/
@@ -84,6 +90,7 @@ public:
   /* context popup menu request */
   void            contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
+  /* get module engine IOR */
   virtual QString engineIOR() const;
 
 protected:
