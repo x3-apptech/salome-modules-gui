@@ -39,6 +39,9 @@ public:
   bool          isShown( int ) const;
   void          setShown( int, bool );
 
+  bool          appropriate( const int ) const;
+  virtual void  setAppropriate( const int, const bool );
+
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
@@ -65,6 +68,7 @@ private:
   QPopupMenu*   myPopup;
   QButton*      myButton;
   ColumnsMap    myColumns;
+  QIntList      myAppropriate;
   int           myHeaderState;
 };
 

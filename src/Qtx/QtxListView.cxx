@@ -77,6 +77,8 @@ QtxListView::~QtxListView()
 int QtxListView::addColumn( const QString& label, int width )
 {
   int res = QListView::addColumn( label, width );
+  for ( int i = myAppropriate.count(); i <= res; i++ )
+    myAppropriate.append( 1 );
   onHeaderResized();
   return res;
 }
@@ -84,6 +86,8 @@ int QtxListView::addColumn( const QString& label, int width )
 int QtxListView::addColumn( const QIconSet& iconset, const QString& label, int width ) 
 {
   int res = QListView::addColumn( iconset, label, width );
+  for ( int i = myAppropriate.count(); i <= res; i++ )
+    myAppropriate.append( 1 );
   onHeaderResized();
   return res;
 }
@@ -91,7 +95,22 @@ int QtxListView::addColumn( const QIconSet& iconset, const QString& label, int w
 void QtxListView::removeColumn( int index ) 
 {
   QListView::removeColumn( index );
+  if ( index >= 0 && index < (int)myAppropriate.count() )
+    myAppropriate.remove( myAppropriate.at( index ) );
   onHeaderResized();
+}
+
+bool QtxListView::appropriate( const int index ) const
+{
+  return index >= 0 && index < (int)myAppropriate.count() && myAppropriate[index];
+}
+
+void QtxListView::setAppropriate( const int index, const bool on )
+{
+  if ( index < 0 || index >= (int)myAppropriate.count() )
+    return;
+
+  myAppropriate[index] = on ? 1 : 0;
 }
 
 void QtxListView::resize( int w, int h )
@@ -216,14 +235,18 @@ void QtxListView::onButtonClicked()
     return;
 
   myPopup->clear();
-  for( int i=0, n=header()->count(); i<n; i++ )
+  for ( int i = 0; i < columns(); i++ )
   {
-    int id = myPopup->insertItem( header()->label( i ) );
-    myPopup->setItemChecked( id, isShown( i ) );
+    if ( appropriate( i ) )
+    {
+      int id = myPopup->insertItem( header()->label( i ), i );
+      myPopup->setItemChecked( id, isShown( i ) );
+    }
   }
   int x = myButton->x(),
       y = myButton->y() + myButton->height();
-  myPopup->exec( mapToGlobal( QPoint( x, y ) ) );
+  if ( myPopup->count() )
+    myPopup->exec( mapToGlobal( QPoint( x, y ) ) );
 }
 
 void QtxListView::onShowHide( int id )
@@ -231,8 +254,7 @@ void QtxListView::onShowHide( int id )
   if ( myHeaderState != HeaderButton )
     return;
 
-  int ind = myPopup->indexOf( id );
-  setShown( ind, !isShown( ind ) );
+  setShown( id, !isShown( id ) );
 }
 
 void QtxListView::viewportResizeEvent( QResizeEvent* e )
