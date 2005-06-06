@@ -42,6 +42,8 @@ public:
   bool          appropriate( const int ) const;
   virtual void  setAppropriate( const int, const bool );
 
+  virtual void  setColumnWidth( int, int );
+
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
