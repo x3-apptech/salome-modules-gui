@@ -71,7 +71,7 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
   license->setText( tr( "ABOUT_LICENSE" ) );
   checkLabel( license );
 
-  QString capText = tr( "ABOUT_VERSION" );
+  QString capText = tr( "ABOUT_CAPTION" );
   if ( capText.contains( "%1" ) )
     capText = capText.arg( defName );
   setCaption( capText );
