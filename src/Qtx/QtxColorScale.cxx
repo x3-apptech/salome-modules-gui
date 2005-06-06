@@ -1055,7 +1055,7 @@ QColor QtxColorScale::getColor( const int idx ) const
 	if ( colorMode() == User )
 		res = color( idx );
 	else
-		res = QColor( hueFromValue( idx, 0, intervalsNumber() - 1 ), 255, 255, QColor::Hsv );
+    res = Qtx::scaleColor( idx, 0, intervalsNumber() - 1 );
 	return res;
 }
 
@@ -1119,31 +1119,6 @@ QSimpleRichText* QtxColorScale::simpleRichText( const int flags ) const
 	}
 
 	return srt;
-}
-
-//================================================================
-// Function : hueFromValue
-// Purpose  : 
-//================================================================
-
-int QtxColorScale::hueFromValue( const int value, const int min, const int max ) const
-{
-  static const int HUE[10] = {230, 210, 195, 180, 160, 80, 60, 50, 30, 0};
-
-	if ( min == max )
-    return HUE[0];
-
-  double aPosition = 9.0 * ( value - min ) / ( max - min );
-
-  if ( aPosition <= 0. )
-    return HUE[0];
-
-  if ( aPosition >= 9. )
-    return HUE[9];
-
-  int idx = (int)aPosition;
-
-  return HUE[idx] + int( ( aPosition - idx ) * ( HUE[idx + 1] - HUE[idx] ) );
 }
 
 #if QT_VER == 3

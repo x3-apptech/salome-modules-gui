@@ -133,7 +133,6 @@ private:
 									                   const bool, const bool, const bool ) const;
 	  QSize                 calculateSize( const bool, const int,
 										                     const bool, const bool, const bool ) const;
-	  int                   hueFromValue( const int, const int, const int ) const;
 
 	  friend class Dock;
 

@@ -106,6 +106,9 @@ public:
 
   static void    rgbSet( const int, QColor& );
   static void    rgbSet( const int, int&, int&, int& );
+
+  static QColor  scaleColor( const int, const int, const int );
+  static void    scaleColors( const int, QValueList<QColor>& );
 };
 
 #endif

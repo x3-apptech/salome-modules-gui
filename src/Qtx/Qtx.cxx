@@ -499,3 +499,42 @@ void Qtx::rgbSet( const int rgb, int& r, int& g, int& b )
   g = ( rgb >> 8 ) & 0xff;
   b = rgb & 0xff;
 }
+
+/*!
+	Name: scaleColor [static public]
+	Desc: Returns the color specified by the index between min (blue) and max (red).
+*/
+QColor Qtx::scaleColor( const int index, const int min, const int max )
+{
+  static const int HUE[10] = {230, 210, 195, 180, 160, 80, 60, 50, 30, 0};
+
+  int hue = HUE[0];
+
+	if ( min != max )
+  {
+    double aPosition = 9.0 * ( index - min ) / ( max - min );
+    if ( aPosition > 0.0 )
+    {
+      if ( aPosition >= 9.0 )
+        hue = HUE[9];
+      else
+      {
+        int idx = (int)aPosition;
+        hue = HUE[idx] + int( ( aPosition - idx ) * ( HUE[idx + 1] - HUE[idx] ) );
+      }
+    }
+  }
+
+  return QColor( hue, 255, 255, QColor::Hsv );
+}
+
+/*!
+	Name: scaleColors [static public]
+	Desc: Returns the 'num' number of colors from blue to red.
+*/
+void Qtx::scaleColors( const int num, QValueList<QColor>& lst )
+{
+  lst.clear();
+  for ( int i = 0; i < num; i++ )
+    lst.append( scaleColor( i, 0, num - 1 ) );
+}
