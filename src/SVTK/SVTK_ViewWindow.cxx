@@ -1,3 +1,5 @@
+#include "SALOME_Actor.h"
+
 #include <qapplication.h>
 
 #include <vtkActorCollection.h>
@@ -28,7 +30,6 @@
 #include "SALOME_ListIteratorOfListIO.hxx"
 
 #include "SVTK_SelectorDef.h"
-#include "SALOME_Actor.h"
 
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"
