@@ -127,7 +127,17 @@ void QtxListView::show()
 
 void QtxListView::resizeContents( int w, int h )
 {
+/*
+  if ( myButton && myButton->isVisibleTo( myButton->parentWidget() ) )
+  {
+    if ( header()->orientation() == Qt::Horizontal )
+      w += myButton->width();
+    else
+      h += myButton->width();
+  }
+*/
   QListView::resizeContents( w, h );
+
   onHeaderResized();
 }
 
@@ -143,7 +153,7 @@ void QtxListView::hide( int ind )
 
 bool QtxListView::isShown( int ind ) const
 {
-  if( ind>=0 && ind<header()->count() )
+  if ( ind>=0 && ind<header()->count() )
     return columnWidth( ind ) > 0 || header()->isResizeEnabled( ind );
   else
     return false;
@@ -154,12 +164,15 @@ void QtxListView::setShown( int ind, bool sh )
   if( ind<0 || ind>=header()->count() || isShown( ind )==sh )
     return;
 
-  ColumnData& data = myColumns[ ind ];
-  if( sh )
+  ColumnData& data = myColumns[ind];
+  if ( sh )
   {
-    setColumnWidth( ind, data.width );
-    header()->setResizeEnabled( data.resizeable, ind );
+    int w = data.width;
+    bool resizeable = data.resizeable;
     myColumns.remove( ind );
+
+    setColumnWidth( ind, w );
+    header()->setResizeEnabled( resizeable, ind );
   }
   else
   {
@@ -169,6 +182,11 @@ void QtxListView::setShown( int ind, bool sh )
     header()->setResizeEnabled( false, ind );
   }
   updateContents();
+}
+
+void QtxListView::setColumnWidth( int c, int w )
+{
+  QListView::setColumnWidth( c, !myColumns.contains( c ) ? w : 0 );
 }
 
 QSize QtxListView::sizeHint() const
@@ -222,7 +240,7 @@ void QtxListView::onHeaderResized()
 
   if ( myHeaderState == HeaderButton )
   {
-    if( header()->orientation() == Qt::Horizontal )
+    if ( header()->orientation() == Qt::Horizontal )
       myButton->move( lw+x, lw );
     else
       myButton->move( lw, lw+x );
