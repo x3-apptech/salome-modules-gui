@@ -158,10 +158,10 @@ void QtxDockWindow::Watcher::updateVisibility()
     vis = it.current()->widget() && it.current()->widget()->isVisibleTo( myCont );
 
   QMainWindow* mw = myCont->mainWindow();
-  if ( mw && myEmpty != vis )
+  if ( mw && myEmpty == vis )
   {
-    myEmpty = vis;
-    if ( myEmpty )
+    myEmpty = !vis;
+    if ( !myEmpty )
       mw->setAppropriate( myCont, myState );
     else
     {
@@ -170,7 +170,7 @@ void QtxDockWindow::Watcher::updateVisibility()
     }
   }
 
-  vis = myEmpty && myVisible;
+  vis = !myEmpty && myVisible;
   if ( vis != myCont->isVisibleTo( myCont->parentWidget() ) )
     vis ? showContainer() : hideContainer();
 }
