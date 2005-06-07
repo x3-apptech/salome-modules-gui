@@ -80,10 +80,16 @@ public:
   void              setColumnTitle( const int id, const QString& );
   virtual void      setColumnTitle( const int id, const QIconSet&, const QString& );
 
+  QString           nameTitle() const;
+  QString           columnTitle( const int ) const;
+
   bool              isColumnVisible( const int ) const;
   virtual void      setColumnShown( const int, const bool );
 
   QValueList<int>   columns() const;
+
+  bool              appropriateColumn( const int ) const;
+  virtual void      setAppropriateColumn( const int, const bool );
 
   virtual bool      eventFilter(QObject* watched, QEvent* e);
 
@@ -99,6 +105,7 @@ signals:
 private slots:
   void              onExpand();
   void              onRefresh();
+  void              onColumnVisible( int );
   void              onDestroyed( SUIT_DataObject* );
   void              onDropped( QPtrList<QListViewItem>, QListViewItem*, int );
 

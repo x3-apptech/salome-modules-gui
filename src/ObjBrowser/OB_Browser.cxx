@@ -429,6 +429,19 @@ void OB_Browser::setColumnTitle( const int id, const QIconSet& icon, const QStri
     lv->setColumnText( myColumnIds[id], icon, label );
 }
 
+QString OB_Browser::nameTitle() const
+{
+  return myView->columnText( 0 );
+}
+
+QString OB_Browser::columnTitle( const int id ) const
+{
+  QString txt;
+  if ( myColumnIds.contains( id ) )
+    txt = myView->columnText( myColumnIds[id] );
+  return txt;
+}
+
 bool OB_Browser::isColumnVisible( const int id ) const
 {
   return myColumnIds.contains( id ) && myView->isShown( myColumnIds[id] );
@@ -448,6 +461,22 @@ QValueList<int> OB_Browser::columns() const
   for ( QMap<int, int>::ConstIterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
     lst.append( it.key() );
   return lst;
+}
+
+bool OB_Browser::appropriateColumn( const int id ) const
+{
+  bool res = false;
+  if ( myColumnIds.contains( id ) )
+    res = myView->appropriate( myColumnIds[id] );
+  return res;
+}
+
+void OB_Browser::setAppropriateColumn( const int id, const bool on )
+{
+  if ( !myColumnIds.contains( id ) )
+    return;
+
+  myView->setAppropriate( myColumnIds[id], on );
 }
 
 void OB_Browser::updateTree( SUIT_DataObject* o )
@@ -848,6 +877,11 @@ void OB_Browser::onRefresh()
   updateTree( 0, true );
 }
 
+void OB_Browser::onColumnVisible( int id )
+{
+  setColumnShown( id, !isColumnVisible( id ) );
+}
+
 void OB_Browser::onDestroyed( SUIT_DataObject* obj )
 {
   removeObject( obj );
@@ -926,6 +960,28 @@ bool OB_Browser::eventFilter( QObject* o, QEvent* e )
 
 void OB_Browser::contextMenuPopup( QPopupMenu* menu )
 {
+  QValueList<int> cols;
+  for ( QMap<int, int>::ConstIterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
+  {
+    if ( appropriateColumn( it.key() ) )
+      cols.append( it.key() );
+  }
+
+  uint num = menu->count();
+  menu->setCheckable( true );
+  for ( QValueList<int>::const_iterator iter = cols.begin(); iter != cols.end(); ++iter )
+  {
+    QString name = columnTitle( *iter );
+    if ( name.isEmpty() )
+      continue;
+
+    int id = menu->insertItem( name, this, SLOT( onColumnVisible( int ) ) );
+    menu->setItemChecked( id, isColumnVisible( *iter ) );
+    menu->setItemParameter( id, *iter );
+  }
+  if ( menu->count() != num )
+    menu->insertSeparator();
+
   DataObjectList selected;
   getSelected( selected );
 
