@@ -10,11 +10,11 @@
 
 #include "utilities.h"
 
-#ifdef _DEBUG_
+//#ifdef _DEBUG_
+static int MYDEBUG = 1;
+/*#else
 static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
+#endif*/
 
 SalomeApp_SVTKDataOwner
 ::SalomeApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
@@ -134,7 +134,18 @@ SalomeApp_VTKSelector
 	    }
 	  }
 	  // To remove IOs, which is not selected.
-	  SALOME_ListIO aRemoveList;
+	  QMap< QString, Handle( SALOME_InteractiveObject )> toRemove;
+	  SALOME_ListIteratorOfListIO anIt( aStoredList );
+	  for( ; anIt.More(); anIt.Next() )
+	    if( !anIt.Value().IsNull() )
+	      toRemove[ anIt.Value()->getEntry() ] = anIt.Value();
+
+	  anIt = SALOME_ListIteratorOfListIO(anAppendList);
+	  for( ; anIt.More(); anIt.Next() )
+	    toRemove.remove( anIt.Value()->getEntry() );
+
+
+/*	  SALOME_ListIO aRemoveList;
 	  SALOME_ListIteratorOfListIO anAppendListIter(anAppendList);
 	  for(; anAppendListIter.More(); anAppendListIter.Next()){
 	    Handle(SALOME_InteractiveObject) anIO = anAppendListIter.Value();
@@ -145,10 +156,13 @@ SalomeApp_VTKSelector
 	      }
 	    }
 	  }
-	  SALOME_ListIteratorOfListIO aRemoveListIter(aRemoveList);
-	  for(; aRemoveListIter.More(); aRemoveListIter.Next()){
-	    aSelector->RemoveIObject(aRemoveListIter.Value());
-	  }
+	  SALOME_ListIteratorOfListIO aRemoveListIter(aRemoveList);*/
+
+	  QMap< QString, Handle( SALOME_InteractiveObject )>::const_iterator RIt = toRemove.begin(),
+	                                                                     REnd = toRemove.end();
+	  for( ; RIt!=REnd; RIt++ )
+	    aSelector->RemoveIObject( RIt.data() );
+	  
 	  aView->onSelectionChanged();
 	}
       }
