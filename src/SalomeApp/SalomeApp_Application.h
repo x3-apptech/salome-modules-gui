@@ -100,6 +100,7 @@ public slots:
 
 private slots:
   void                                onSelection();
+  void                                onAboutRefresh();
 
 protected:
   virtual void                        createActions();

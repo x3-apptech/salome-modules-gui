@@ -159,11 +159,12 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   switch ( cr )
   {
   case Foreground:
+    if ( myObject )
     {
       _PTR(GenericAttribute) anAttr;
-      if ( myObject && myObject->FindAttribute( anAttr, "AttributeTextColor" ) )
+      if ( myObject->FindAttribute( anAttr, "AttributeTextColor" ) )
       {
-	_PTR(AttributeTextColor) aColAttr( anAttr );
+	_PTR(AttributeTextColor) aColAttr = anAttr;
 	clr = QColor( (int)aColAttr->TextColor().R, (int)aColAttr->TextColor().G, (int)aColAttr->TextColor().B );
       }
     }

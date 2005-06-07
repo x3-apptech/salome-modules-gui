@@ -10,6 +10,7 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_OBFilter.h"
+#include "SalomeApp_DataModel.h"
 #include "SalomeApp_DataObject.h"
 #include "SalomeApp_EventFilter.h"
 #include "SalomeApp_WidgetContainer.h"
@@ -462,6 +463,20 @@ void SalomeApp_Application::onSelectionChanged()
 {
 }
 
+void SalomeApp_Application::onAboutRefresh()
+{
+  SalomeApp_DataModel* dm = 0;
+  if ( activeModule() )
+  {
+    CAM_DataModel* camDM = activeModule()->dataModel();
+    if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
+      dm = (SalomeApp_DataModel*)camDM;
+  }
+
+  if ( dm )
+    dm->update();
+}
+
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 {
   CAM_Application::setActiveStudy( study );
@@ -779,6 +794,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 
     wid = ob;
 
+    connect( ob, SIGNAL( aboutRefresh() ), this, SLOT( onAboutRefresh() ) );
     ob->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
   }
   else if ( flag == WT_PyConsole )
