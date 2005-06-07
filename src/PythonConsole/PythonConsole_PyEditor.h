@@ -24,7 +24,6 @@
 //  File   : PythonConsole_PyEditor.h
 //  Author : Nicolas REJNERI
 //  Module : SALOME
-//  $Header$
 
 #ifndef PythonConsole_PyEditor_H
 #define PythonConsole_PyEditor_H
@@ -59,6 +58,8 @@ protected:
 public slots:
   void handleReturn();
   void onPyInterpChanged( PyInterp_base* );
+
+  virtual QPopupMenu* createPopupMenu( const QPoint& );
   
 private:
   QString        _buf;
