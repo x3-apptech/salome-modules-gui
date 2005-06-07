@@ -10,69 +10,71 @@
 OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, OCCViewer_Viewer* curModel )
 : QDialog( aWin )
 {
-	myParametersMap = curModel->getViewAspects();
+  setCaption( tr( "CAPTION" ) );
 
-	myKeyFlag = 0;
+  myParametersMap = curModel->getViewAspects();
 
-	int aQuantityOfItems = myParametersMap.count();
+  myKeyFlag = 0;
+
+  int aQuantityOfItems = myParametersMap.count();
 	
-	setFixedSize( 400, 300 );
+  setFixedSize( 400, 300 );
 
-	QGridLayout* aGrid = new QGridLayout( this, 2, 1, 5, 10 ); 
+  QGridLayout* aGrid = new QGridLayout( this, 2, 1, 5, 10 ); 
 
-	QWidget* aWidget1 = new QWidget( this );
-	QWidget* aWidget2 = new QWidget( this );
+  QWidget* aWidget1 = new QWidget( this );
+  QWidget* aWidget2 = new QWidget( this );
 	
-	QHBoxLayout* aLayout = new QHBoxLayout( aWidget1 );
+  QHBoxLayout* aLayout = new QHBoxLayout( aWidget1 );
 	
-	myListBox = new QtxListBox( aWidget1 );
-	myListBox->installEventFilter( this );
+  myListBox = new QtxListBox( aWidget1 );
+  myListBox->installEventFilter( this );
 
-	myCurViewPort = new OCCViewer_ViewPort3d( aWidget1, curModel->getViewer3d(), V3d_ORTHOGRAPHIC );
-	myCurViewPort->getView()->SetBackgroundColor( Quantity_NOC_BLACK );
+  myCurViewPort = new OCCViewer_ViewPort3d( aWidget1, curModel->getViewer3d(), V3d_ORTHOGRAPHIC );
+  myCurViewPort->getView()->SetBackgroundColor( Quantity_NOC_BLACK );
 
-	myListBox->setEditEnabled( 1 );
+  myListBox->setEditEnabled( 1 );
 	
-	if( aQuantityOfItems )
-	{
-		myListBox->clear();
-		for( int i = 0; i < aQuantityOfItems; i++ )
-			myListBox->insertItem( myParametersMap[ i ].name );
+  if ( aQuantityOfItems )
+  {
+    myListBox->clear();
+    for( int i = 0; i < aQuantityOfItems; i++ )
+      myListBox->insertItem( myParametersMap[ i ].name );
+    
+    changeImage( myListBox->item( 0 ) );
+  }
+  else
+  {
+    myListBox->clear();
+    myListBox->insertItem( "No Items", 0 );
+    myListBox->setEditEnabled( 0 );
+  }
 
-		changeImage( myListBox->item( 0 ) );
-	}
-	else
-	{
-		myListBox->clear();
-		myListBox->insertItem( "No Items", 0 );
-		myListBox->setEditEnabled( 0 );
-	}
-
-	connect( myListBox, SIGNAL( clicked( QListBoxItem* ) ), this, SLOT( changeImage( QListBoxItem* ) ) );
-	connect( myListBox, SIGNAL( itemEdited( QListBoxItem* ) ), this, SLOT( editItemText( QListBoxItem* ) ) );
+  connect( myListBox, SIGNAL( clicked( QListBoxItem* ) ), this, SLOT( changeImage( QListBoxItem* ) ) );
+  connect( myListBox, SIGNAL( itemEdited( QListBoxItem* ) ), this, SLOT( editItemText( QListBoxItem* ) ) );
 	
-	aLayout->addWidget( myListBox );
-	aLayout->addWidget( myCurViewPort, 30 );
+  aLayout->addWidget( myListBox );
+  aLayout->addWidget( myCurViewPort, 30 );
 
-	QHBoxLayout* aButtonLayout = new QHBoxLayout( aWidget2, 0, 5 );
+  QHBoxLayout* aButtonLayout = new QHBoxLayout( aWidget2, 0, 5 );
 
-	QPushButton* theOk     = new QPushButton( tr( "Ok" ), aWidget2 );            theOk->setAutoDefault( false );
-	QPushButton* theCancel = new QPushButton( tr( "Cancel" ), aWidget2 );		 theCancel->setAutoDefault( false );
-	QPushButton* theDelete = new QPushButton( tr( "Delete" ), aWidget2 );		 theDelete->setAutoDefault( false );
-	QPushButton* theClearAll = new QPushButton( tr( "Clear List" ), aWidget2 );  theClearAll->setAutoDefault( false );
+  QPushButton* theOk     = new QPushButton( tr( "Ok" ), aWidget2 );            theOk->setAutoDefault( false );
+  QPushButton* theCancel = new QPushButton( tr( "Cancel" ), aWidget2 );		 theCancel->setAutoDefault( false );
+  QPushButton* theDelete = new QPushButton( tr( "Delete" ), aWidget2 );		 theDelete->setAutoDefault( false );
+  QPushButton* theClearAll = new QPushButton( tr( "Clear List" ), aWidget2 );  theClearAll->setAutoDefault( false );
 
-	aButtonLayout->addWidget( theOk );
-	aButtonLayout->addWidget( theCancel );
-	aButtonLayout->addWidget( theDelete );
-	aButtonLayout->addWidget( theClearAll );
+  aButtonLayout->addWidget( theOk );
+  aButtonLayout->addWidget( theCancel );
+  aButtonLayout->addWidget( theDelete );
+  aButtonLayout->addWidget( theClearAll );
 
-	aGrid->addWidget( aWidget1, 0, 0 );
-	aGrid->addWidget( aWidget2, 1, 0 );
+  aGrid->addWidget( aWidget1, 0, 0 );
+  aGrid->addWidget( aWidget2, 1, 0 );
 	
-	connect( theOk, SIGNAL( clicked() ), this, SLOT( OKpressed() ) );
-	connect( theCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
-	connect( theDelete, SIGNAL( clicked() ), this, SLOT( deleteSelectedItems() ) );
-	connect( theClearAll, SIGNAL( clicked() ), this, SLOT( clearList() ) );
+  connect( theOk, SIGNAL( clicked() ), this, SLOT( OKpressed() ) );
+  connect( theCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+  connect( theDelete, SIGNAL( clicked() ), this, SLOT( deleteSelectedItems() ) );
+  connect( theClearAll, SIGNAL( clicked() ), this, SLOT( clearList() ) );
 }
 
 OCCViewer_CreateRestoreViewDlg::~OCCViewer_CreateRestoreViewDlg()

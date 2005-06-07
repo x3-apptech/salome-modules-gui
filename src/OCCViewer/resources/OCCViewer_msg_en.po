@@ -134,15 +134,6 @@ msgstr "Restore View"
 msgid "DSC_PRESETS_VIEW"
 msgstr "Selection of the memorized state of the active view"
 
-msgid "OCCViewer_Viewer::MEN_DUMP_VIEW"
-msgstr "Dump view..."
-
-msgid "OCCViewer_Viewer::MEN_SHOW_TOOLBAR"
-msgstr "Show toolbar"
-
-msgid "OCCViewer_Viewer::MEN_CHANGE_BACKGROUD"
-msgstr "Change background..."
-
 msgid "OCC_IMAGE_FILES"
 msgstr "Images Files (*.bmp *.png *.jpg *.jpeg)"
 
@@ -164,5 +155,19 @@ msgstr "Error"
 msgid "BUT_OK"
 msgstr "Ok"
 
+
+msgid "OCCViewer_Viewer::MEN_DUMP_VIEW"
+msgstr "Dump view..."
+
+msgid "OCCViewer_Viewer::MEN_SHOW_TOOLBAR"
+msgstr "Show toolbar"
+
+msgid "OCCViewer_Viewer::MEN_CHANGE_BACKGROUD"
+msgstr "Change background..."
+
 msgid "OCCViewer_ViewManager::OCC_VIEW_TITLE"
 msgstr "OCC scene:%1 - viewer:%2"
+
+
+msgid "OCCViewer_CreateRestoreViewDlg::CAPTION"
+msgstr "Restore view"
