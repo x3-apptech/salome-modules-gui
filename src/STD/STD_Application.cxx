@@ -278,17 +278,10 @@ void STD_Application::onCloseDoc()
 
   beforeCloseDoc( study );
 
-  QPtrListIterator<SUIT_ViewManager> it( myViewMgrs );
-  it.toLast();
-  SUIT_ViewManager* vm = 0;
-  while( ( vm = it.current()) != 0 )
-  {
-    vm->closeAllViews();
-    --it;
-  }
-
   if ( study )
     study->closeDocument();
+
+  clearViewManagers();
 
   setActiveStudy( 0 );
   delete study;
