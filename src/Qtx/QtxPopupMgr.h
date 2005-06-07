@@ -25,6 +25,13 @@ public:
     public:
         virtual int      count() const = 0;
         virtual QtxValue param( const int, const QString& ) const = 0;
+	virtual QtxValue globalParam( const QString& ) const;
+
+	virtual QChar   equality() const;
+	virtual QString selCountParam() const;
+
+	static QChar    defEquality();
+	static QString  defSelCountParam();
     };
     
 protected:
@@ -68,8 +75,6 @@ public:
     void    setRule( const int, const QString&, bool visibility );
     void    updatePopup( QPopupMenu*, Selection* );
 
-    virtual QChar   equality() const;
-    virtual QString selCountParam() const;
     //return name of parameter corresponding to selected objects count
     //it will be set automatically
 

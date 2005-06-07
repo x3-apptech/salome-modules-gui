@@ -10,6 +10,74 @@
 // Function : 
 // Purpose  : 
 //================================================================
+QtxValue QtxPopupMgr::Selection::globalParam( const QString& str ) const
+{
+  if( str==selCountParam() )
+    return count();
+
+  else if( str[0]==equality() )
+  {
+    QtxSets::ValueSet set;
+    QString par = str.mid( 1 );
+
+    for( int i=0, n=count(); i<n; i++ )
+    {
+      QtxValue v = param( i, par );
+      if( v.isValid() )
+	QtxSets::add( set, v );
+      else
+	return QtxValue();	
+    }
+    return set;
+  }
+
+  else
+    return QtxValue();
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QChar QtxPopupMgr::Selection::equality() const
+{
+  return defEquality();
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QString QtxPopupMgr::Selection::selCountParam() const
+{
+  return defSelCountParam();
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QChar QtxPopupMgr::Selection::defEquality()
+{
+    return '$';
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QString QtxPopupMgr::Selection::defSelCountParam()
+{
+    return "selcount";
+}
+
+
+
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
 QtxPopupMgr::Operations::Operations( QtxPopupMgr* mgr )
 : QtxStrings(),
   myPopupMgr( mgr )
@@ -276,7 +344,7 @@ bool result( QtxParser* p )
 //================================================================
 void QtxPopupMgr::setParams( QtxParser* p, QStringList& specific ) const
 {
-    if( !p )
+    if( !p || !myCurrentSelection )
         return;
 
     QStringList params;
@@ -285,28 +353,13 @@ void QtxPopupMgr::setParams( QtxParser* p, QStringList& specific ) const
     QStringList::const_iterator anIt = params.begin(),
                                 aLast = params.end();
     for( ; anIt!=aLast; anIt++ )
-
-        if( *anIt==selCountParam() )
-        {
-            if( myCurrentSelection )
-                p->set( *anIt, myCurrentSelection->count() );
-            else
-                p->set( *anIt, 0 );
-        }
-
-        else if( (*anIt)[0]==equality() )
-        {
-            QtxSets::ValueSet set;
-            QString par = ( *anIt ).mid( 1 );
-
-            if( myCurrentSelection && myCurrentSelection->count() > 0 )
-                for( int i=0, n=myCurrentSelection->count(); i<n; i++ )
-                    QtxSets::add( set, myCurrentSelection->param( i, par ) );
-
-            p->set( *anIt, set );
-        }
-        else
-            specific.append( *anIt );
+    {
+      QtxValue v = myCurrentSelection->globalParam( *anIt );
+      if( v.isValid() )
+	p->set( *anIt, v );
+      else
+        specific.append( *anIt );
+    }
 }
 
 //================================================================
@@ -374,7 +427,7 @@ bool QtxPopupMgr::isVisible( const int actId, const int place ) const
 //================================================================
 void QtxPopupMgr::updatePopup( QPopupMenu* p, Selection* sel )
 {
-    if( !p )
+    if( !p || !sel )
         return;
 
     myCurrentSelection = sel;
@@ -396,24 +449,6 @@ void QtxPopupMgr::updatePopup( QPopupMenu* p, Selection* sel )
 QtxPopupMgr::RulesMap& QtxPopupMgr::map( bool visibility ) const
 {
     return ( RulesMap& )( visibility ? myVisibility : myToggle );
-}
-
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
-QString QtxPopupMgr::selCountParam() const
-{
-    return "selcount";
-}
-
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
-QChar QtxPopupMgr::equality() const
-{
-    return '$';
 }
 
 //================================================================
