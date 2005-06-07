@@ -430,7 +430,7 @@ void OB_Browser::setColumnTitle( const int id, const QIconSet& icon, const QStri
 
 bool OB_Browser::isColumnVisible( const int id ) const
 {
-  myColumnIds.contains( id ) && myView->isShown( myColumnIds[id] );
+  return myColumnIds.contains( id ) && myView->isShown( myColumnIds[id] );
 }
 
 void OB_Browser::setColumnShown( const int id, const bool on )
@@ -439,6 +439,14 @@ void OB_Browser::setColumnShown( const int id, const bool on )
     return;
 
   myView->setShown( myColumnIds[id], on );
+}
+
+QValueList<int> OB_Browser::columns() const
+{
+  QValueList<int> lst;
+  for ( QMap<int, int>::ConstIterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
+    lst.append( it.key() );
+  return lst;
 }
 
 void OB_Browser::updateTree( SUIT_DataObject* o )
@@ -460,7 +468,12 @@ void OB_Browser::updateTree( SUIT_DataObject* obj, const bool notify )
   SUIT_DataObject* curObj = storeState( selObjs, openObjs, selKeys, openKeys, curKey );
 
   if ( notify )
+  {
+    bool upd = isAutoUpdate();
+    setAutoUpdate( false );
     emit aboutRefresh();
+    setAutoUpdate( upd );
+  }
 
   createConnections( obj );
   updateView( obj );
@@ -887,14 +900,27 @@ void OB_Browser::updateText( QListViewItem* item )
     item->setText( it.data(), obj->text( it.key() ) );
 }
 
-bool OB_Browser::eventFilter(QObject* watched, QEvent* e)
+bool OB_Browser::eventFilter( QObject* o, QEvent* e )
 {
-  if ( watched == myView && e->type() == QEvent::ContextMenu )
+  if ( o == myView && e->type() == QEvent::ContextMenu )
   {
-    contextMenuRequest( (QContextMenuEvent*)e );
+    QContextMenuEvent* ce = (QContextMenuEvent*)e;
+    if ( ce->reason() != QContextMenuEvent::Mouse )
+      contextMenuRequest( ce );
     return true;
   }
-  return QFrame::eventFilter(watched, e);
+  if ( o == myView && e->type() == QEvent::MouseButtonRelease )
+  {
+    QMouseEvent* me = (QMouseEvent*)e;
+    if ( me->button() == RightButton )
+    {
+      QContextMenuEvent ce( QContextMenuEvent::Mouse, me->pos(), me->globalPos(), me->state() );
+      contextMenuRequest( &ce );
+      return true;
+    }
+  }
+
+  return QFrame::eventFilter( o, e );
 }
 
 void OB_Browser::contextMenuPopup( QPopupMenu* menu )

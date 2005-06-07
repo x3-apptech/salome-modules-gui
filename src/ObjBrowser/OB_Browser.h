@@ -83,6 +83,8 @@ public:
   bool              isColumnVisible( const int ) const;
   virtual void      setColumnShown( const int, const bool );
 
+  QValueList<int>   columns() const;
+
   virtual bool      eventFilter(QObject* watched, QEvent* e);
 
   QListView*        listView() const;
