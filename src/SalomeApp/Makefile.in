@@ -102,7 +102,7 @@ RESOURCES_FILES = icon_about.png \
 CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
 LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS) 
-LIBS+= -L$(GUI_ROOT_DIR)/lib/salome -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole -lLogWindow
+LIBS+= -L$(GUI_ROOT_DIR)/lib/salome -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole -lLogWindow -lSalomeContainer
 
 @CONCLUDE@
 
