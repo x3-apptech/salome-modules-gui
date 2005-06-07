@@ -176,10 +176,12 @@ void QtxListView::setShown( int ind, bool sh )
   }
   else
   {
-    data.width = columnWidth( ind );
-    data.resizeable = header()->isResizeEnabled( ind );
+    int w = columnWidth( ind );
+    bool r = header()->isResizeEnabled( ind );
     setColumnWidth( ind, 0 );
     header()->setResizeEnabled( false, ind );
+    data.width = w;
+    data.resizeable = r;
   }
   updateContents();
 }

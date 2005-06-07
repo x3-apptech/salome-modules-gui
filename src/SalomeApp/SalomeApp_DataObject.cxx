@@ -95,6 +95,13 @@ QString SalomeApp_DataObject::name() const
   if ( myObject )
     str = myObject->GetName().c_str();
 
+  if ( str.isEmpty() )
+  {
+    _PTR(SObject) refObj = referencedObject();
+    if ( refObj )
+      str = refObj->GetName().c_str();
+  }
+
   if ( isReference() )
     str = QString( "* " ) + str;
 

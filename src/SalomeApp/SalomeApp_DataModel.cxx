@@ -35,9 +35,10 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
   if ( !obj || !study )
     return aDataObj;
 
-  if ( obj->GetName().size() ) { // skip nameless SObjects
-    _PTR(SComponent) aSComp ( obj );
-
+  _PTR(SObject) refObj;
+  if ( obj->GetName().size() || obj->ReferencedObject( refObj ) )  // skip nameless non references SObjects
+  {
+    _PTR(SComponent) aSComp( obj );
     aDataObj = aSComp ? new SalomeApp_ModuleObject( aSComp, parent ) :
                         new SalomeApp_DataObject  ( obj, parent );
 
@@ -45,7 +46,7 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
     for ( ; it->More();it->Next() ) {
       // don't use shared_ptr here, for Data Object will take
       // ownership of this pointer
-      _PTR(SObject) aSO ( it->Value() );
+      _PTR(SObject) aSO( it->Value() );
       BuildTree( aSO, aDataObj, study );
     }
   }
