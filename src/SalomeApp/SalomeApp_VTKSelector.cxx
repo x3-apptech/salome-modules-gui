@@ -10,11 +10,11 @@
 
 #include "utilities.h"
 
-//#ifdef _DEBUG_
+#ifdef _DEBUG_
 static int MYDEBUG = 1;
-/*#else
+#else
 static int MYDEBUG = 0;
-#endif*/
+#endif
 
 SalomeApp_SVTKDataOwner
 ::SalomeApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
