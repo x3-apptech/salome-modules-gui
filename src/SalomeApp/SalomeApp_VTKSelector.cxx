@@ -144,20 +144,6 @@ SalomeApp_VTKSelector
 	  for( ; anIt.More(); anIt.Next() )
 	    toRemove.remove( anIt.Value()->getEntry() );
 
-
-/*	  SALOME_ListIO aRemoveList;
-	  SALOME_ListIteratorOfListIO anAppendListIter(anAppendList);
-	  for(; anAppendListIter.More(); anAppendListIter.Next()){
-	    Handle(SALOME_InteractiveObject) anIO = anAppendListIter.Value();
-	    SALOME_ListIteratorOfListIO aStoredListIter(aStoredList);
-	    for(; aStoredListIter.More(); aStoredListIter.Next()){
-	      if(anIO->isSame(aStoredListIter.Value())){
-		aRemoveList.Append(anIO);
-	      }
-	    }
-	  }
-	  SALOME_ListIteratorOfListIO aRemoveListIter(aRemoveList);*/
-
 	  QMap< QString, Handle( SALOME_InteractiveObject )>::const_iterator RIt = toRemove.begin(),
 	                                                                     REnd = toRemove.end();
 	  for( ; RIt!=REnd; RIt++ )
