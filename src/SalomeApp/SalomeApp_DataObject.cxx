@@ -125,18 +125,6 @@ QPixmap SalomeApp_DataObject::icon() const
   return QPixmap();
 }
 
-QColor SalomeApp_DataObject::color() const
-{
-  _PTR(GenericAttribute) anAttr;
-  if ( myObject && myObject->FindAttribute( anAttr, "AttributeTextColor" ) )
-  {
-    _PTR(AttributeTextColor) aColAttr( anAttr );
-    QColor color( (int)aColAttr->TextColor().R, (int)aColAttr->TextColor().G, (int)aColAttr->TextColor().B );
-    return color;
-  }
-  return QColor();
-}
-
 QString SalomeApp_DataObject::text( const int id ) const
 {
   QString txt;
@@ -165,8 +153,10 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   QColor clr;
   switch ( cr )
   {
-  case Foreground:
-    if ( myObject )
+  case Text:
+    if ( isReference() )
+      clr = QColor( 255, 0, 0 );
+    else if ( myObject )
     {
       _PTR(GenericAttribute) anAttr;
       if ( myObject->FindAttribute( anAttr, "AttributeTextColor" ) )

@@ -24,7 +24,6 @@ public:
     
   virtual QString                 name() const;
   virtual QPixmap                 icon() const;
-  virtual QColor                  color() const;
   virtual QString                 toolTip() const;
 
   virtual QString                 text( const int ) const;
