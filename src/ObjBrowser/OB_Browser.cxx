@@ -82,6 +82,7 @@ myRootDecorated( true )
   myView->setRootIsDecorated( true );
   myView->setSelectionMode( QListView::Extended );
   myView->installEventFilter( this );
+  myView->viewport()->installEventFilter( this );
 
   QVBoxLayout* main = new QVBoxLayout( this );
   main->addWidget( myView );
@@ -909,7 +910,7 @@ bool OB_Browser::eventFilter( QObject* o, QEvent* e )
       contextMenuRequest( ce );
     return true;
   }
-  if ( o == myView && e->type() == QEvent::MouseButtonRelease )
+  if ( o == myView->viewport() && e->type() == QEvent::MouseButtonRelease )
   {
     QMouseEvent* me = (QMouseEvent*)e;
     if ( me->button() == RightButton )
