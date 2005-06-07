@@ -61,7 +61,7 @@ void QtxPopupMenu::TitleMenuItem::paint( QPainter* p, const QColorGroup& cg,
   QFont f = p->font();
   p->setFont( myFont );
 
-  p->fillRect( x, y, w, h, cg.brush( QColorGroup::Mid ) );
+  p->fillRect( x, y, w, h, cg.brush( QColorGroup::Dark ) );
 
   p->setPen( cg.shadow() );
   p->drawRect( x, y, w, h );
@@ -216,6 +216,7 @@ void QtxPopupMenu::insertTitle()
   TitleMenuItem* item = createTitleItem( titleText(), titleIcon(), titleAlignment() );
 
   myId = insertItem( item, -1, 0 );
+  setItemEnabled( myId, false );
 }
 
 void QtxPopupMenu::removeTitle()
