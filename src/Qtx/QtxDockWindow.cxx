@@ -72,10 +72,9 @@ bool QtxDockWindow::Watcher::eventFilter( QObject* o, QEvent* e )
   if ( o != myCont && e->type() == QEvent::CaptionChange )
     updateCaption();
 
-  if ( o != myCont &&
-       ( e->type() == QEvent::Show || e->type() == QEvent::ShowToParent ||
-         e->type() == QEvent::Hide || e->type() == QEvent::HideToParent ||
-         e->type() == QEvent::ChildRemoved ) )
+  if ( ( o != myCont && ( e->type() == QEvent::Hide || e->type() == QEvent::HideToParent ) ) ||
+       ( o == myCont && ( e->type() == QEvent::ChildRemoved ) ) ||
+       ( e->type() == QEvent::Show || e->type() == QEvent::ShowToParent ) )
     updateVisibility();
 
   return false;
