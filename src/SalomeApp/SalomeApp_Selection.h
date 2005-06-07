@@ -48,6 +48,7 @@ public:
 
   virtual int                    count() const;
   virtual QtxValue               param( const int, const QString& ) const;
+  virtual QtxValue               globalParam( const QString& ) const;
 
 protected:
   QString                        entry( const int ) const;
