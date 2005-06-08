@@ -6,7 +6,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
 
 
 @COMMENCE@
@@ -19,6 +19,8 @@ EXPORT_HEADERS= CAM_Application.h \
 		CAM_Study.h \
 		CAM_RootObject.h
 		     
+PO_FILES = CAM_msg_en.po
+
 LIB = libCAM.la
 
 LIB_SRC= CAM_Application.cxx \
