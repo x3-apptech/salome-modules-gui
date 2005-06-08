@@ -110,6 +110,7 @@ QtxArithmetics::QtxArithmetics()
     aList.append( "<=" );
     aList.append( ">=" );
     aList.append( "<>" );
+    aList.append( "!=" ); // same as "<>" - for C++ addicts
     addOperations( aList );
 
     ListOfTypes aTypes;
@@ -153,7 +154,7 @@ int QtxArithmetics::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
         if( op=="<" || op==">" || op=="=" || 
-            op=="<=" || op==">=" || op=="<>" )
+            op=="<=" || op==">=" || op=="<>" || op=="!=" )
             return 1;
         else if( op=="+" || op=="-" )
             return 2;
@@ -213,7 +214,7 @@ QtxParser::Error QtxArithmetics::calculate( const QString& op,
                 set( v1, _v1<=_v2 );
             else if( op==">=" )
                 set( v1, _v1>=_v2 );
-            else if( op=="<>" )
+            else if( op=="<>" || op=="!=" )
                 set( v1, _v1!=_v2 );
         }
         else if( ( v1.type()==QVariant::Int || v1.type()==QVariant::Double ) &&
@@ -243,7 +244,7 @@ QtxParser::Error QtxArithmetics::calculate( const QString& op,
                 set( v1, _v1<=_v2 );
             else if( op==">=" )
                 set( v1, _v1>=_v2 );
-            else if( op=="<>" )
+            else if( op=="<>" || op=="!=" )
                 set( v1, _v1!=_v2 );
         }
     else
@@ -486,6 +487,7 @@ QtxStrings::QtxStrings()
     aList.append( "<=" );
     aList.append( ">=" );
     aList.append( "<>" );
+    aList.append( "!=" ); // same as "<>" - for C++ addicts
     aList.append( "length" );
     aList.append( "lower" );
     aList.append( "upper" );
@@ -535,7 +537,7 @@ int QtxStrings::prior( const QString& op, bool isBin ) const
         if( op=="+" ) 
             return 2;
         else if( op=="="  || op=="<"  || op==">"  ||
-                 op=="<=" || op==">=" || op=="<>" )
+                 op=="<=" || op==">=" || op=="<>" || op=="!=" )
             return 1;
         else
             return 0;
@@ -566,7 +568,7 @@ QtxParser::Error QtxStrings::calculate( const QString& op,
             set( v1, _v1<_v2 );
         else if( op==">" )
             set( v1, _v1>_v2 );
-        else if( op=="<>" )
+        else if( op=="<>" || op=="!=" )
             set( v1, _v1!=_v2 );
         else if( op=="<=" )
             set( v1, _v1<_v2 || _v1==_v2 );
@@ -603,6 +605,7 @@ QtxSets::QtxSets()
     aList.append( "}" );
     aList.append( "=" );
     aList.append( "<>" );
+    aList.append( "!=" ); // same as "<>" - for C++ addicts
     aList.append( "+" );
     aList.append( "-" );
     aList.append( "*" );
@@ -652,7 +655,7 @@ bool QtxSets::createValue( const QString& str, QtxValue& val ) const
 int QtxSets::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
-        if( op=="=" || op=="<>" )
+        if( op=="=" || op=="<>" || op=="!=" )
             return 1;
         else if( op=="+" || op=="-" || op=="*" )
             return 2;
@@ -748,18 +751,18 @@ QtxParser::Error QtxSets::calculate( const QString& op, QtxValue& v1, QtxValue& 
             v1 = aNewList;
         }
 
-        else if( op=="=" || op=="<>" || op=="+" || op=="-" || op=="*" )
+        else if( op=="=" || op=="<>" || op=="!=" || op=="+" || op=="-" || op=="*" )
         {
             ValueSet aNewList;
             add( aNewList, v1.toList() );
 
-            if( op=="=" || op=="<>" || op=="-" )
+            if( op=="=" || op=="<>" || op=="!=" || op=="-" )
             {
                 remove( aNewList, v2.toList() );
 
                 if( op=="=" )
                     set( v1, aNewList.isEmpty() );
-                else if( op=="<>" )
+                else if( op=="<>" || op=="!=" )
                     set( v1, !aNewList.isEmpty() );
                 else
                     v1 = aNewList;
