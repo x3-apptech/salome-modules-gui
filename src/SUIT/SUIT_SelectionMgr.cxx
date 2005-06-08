@@ -108,8 +108,9 @@ void SUIT_SelectionMgr::selectionChanged( SUIT_Selector* sel )
   {
     for ( SUIT_Selector* aSel = mySelectors.first(); aSel; aSel = mySelectors.next() )
     {
-      if ( aSel != sel )
-  	    aSel->setSelected( newOwners );
+      // Temporary action(to avoid selection of the objects which don't pass the filters):
+      //if ( aSel != sel )
+	aSel->setSelected( newOwners );
     }
   }
   myIsSelChangeEnabled = true;
