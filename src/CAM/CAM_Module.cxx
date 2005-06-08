@@ -89,12 +89,14 @@ CAM_Application* CAM_Module::application() const
   return myApp;
 }
 
-void CAM_Module::activateModule( SUIT_Study* study )
+bool CAM_Module::activateModule( SUIT_Study* study )
 {
+  return true;
 }
 
-void CAM_Module::deactivateModule( SUIT_Study* )
+bool CAM_Module::deactivateModule( SUIT_Study* )
 {
+  return true;
 }
 
 void CAM_Module::studyClosed( SUIT_Study* study )

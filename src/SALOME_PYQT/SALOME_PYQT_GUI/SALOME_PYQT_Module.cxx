@@ -203,11 +203,14 @@ void SALOME_PYQT_Module::initialize( CAM_Application* app )
  * Activation of the module.
  * Inherited from CAM_Module.
  */
-void SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
+bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
 {
   MESSAGE( "SALOME_PYQT_Module::activateModule" );
 
-  SalomeApp_Module::activateModule( theStudy );
+  bool res = SalomeApp_Module::activateModule( theStudy );
+  
+  if ( !res )
+    return res;
 
   // activate menus, toolbars, etc
   setMenuShown( true );
@@ -239,17 +242,19 @@ void SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
 
   // connect desktop activation signal
   connect( application()->desktop(), SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
+  
+  return true;
 }
 
 /*!
  * Deactivation of the module.
  * Inherited from CAM_Module.
  */
-void SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
+bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
 {
   MESSAGE( "SALOME_PYQT_Module::deactivateModule" );
 
-  SalomeApp_Module::deactivateModule( theStudy );
+  bool res = SalomeApp_Module::deactivateModule( theStudy );
 
   // deactivate menus, toolbars, etc
   setMenuShown( false );
@@ -282,6 +287,8 @@ void SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
 
   // disconnect desktop activation signal
   disconnect( application()->desktop(), SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
+  
+  return res;
 }
 
 /*!

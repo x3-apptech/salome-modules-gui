@@ -39,8 +39,8 @@ public:
   virtual void           updateCommandsStatus() {};
 
 public slots:
-  virtual void           activateModule( SUIT_Study* );
-  virtual void           deactivateModule( SUIT_Study* );
+  virtual bool           activateModule( SUIT_Study* );
+  virtual bool           deactivateModule( SUIT_Study* );
 
   virtual void           studyClosed( SUIT_Study* );
   virtual void           studyChanged( SUIT_Study*, SUIT_Study* );

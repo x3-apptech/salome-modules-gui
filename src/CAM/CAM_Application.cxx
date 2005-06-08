@@ -233,8 +233,12 @@ bool CAM_Application::activateModule( CAM_Module* mod )
     return true;
 
   if ( myModule )
-    myModule->deactivateModule( activeStudy() );
-
+  {
+    if ( !myModule->deactivateModule( activeStudy() ) )
+    {
+      // ....      
+    }    
+  }	
   myModule = mod;
 
   if ( myModule ){
@@ -253,7 +257,14 @@ bool CAM_Application::activateModule( CAM_Module* mod )
 	prev = dm;
       }
     }
-    myModule->activateModule( activeStudy() );
+    if ( !myModule->activateModule( activeStudy() ) )
+    {
+      myModule->setMenuShown( false );
+      myModule->setToolShown( false );
+      SUIT_MessageBox::error1( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ), tr( "BUT_OK" ) );
+      myModule = 0;
+      return false;
+    }
   }
 
   updateCommandsStatus();

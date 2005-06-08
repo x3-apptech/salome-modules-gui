@@ -37,16 +37,19 @@ void SalomeApp_Module::initialize( CAM_Application* app )
     resMgr->raiseTranslators( name() );
 }
 
-void SalomeApp_Module::activateModule( SUIT_Study* study )
+bool SalomeApp_Module::activateModule( SUIT_Study* study )
 {
-  CAM_Module::activateModule( study );
+  bool res = CAM_Module::activateModule( study );
 
-  if ( application() && application()->resourceMgr() )
+  if ( res && application() && application()->resourceMgr() )
     application()->resourceMgr()->raiseTranslators( name() );
+    
+  return res;
 }
 
-void SalomeApp_Module::deactivateModule( SUIT_Study* )
+bool SalomeApp_Module::deactivateModule( SUIT_Study* )
 {
+  return true;
 }
 
 void SalomeApp_Module::selectionChanged()

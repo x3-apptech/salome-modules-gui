@@ -99,9 +99,9 @@ protected:
 
 public slots:
   /* activation */
-  void            activateModule( SUIT_Study* );
+  virtual bool    activateModule( SUIT_Study* );
   /* deactivation */
-  void            deactivateModule( SUIT_Study* );
+  virtual bool    deactivateModule( SUIT_Study* );
 
   /******************************
    * Internal methods

@@ -64,8 +64,8 @@ public:
   virtual void                        selectionChanged();
 
 public slots:
-  virtual void                        activateModule( SUIT_Study* );
-  virtual void                        deactivateModule( SUIT_Study* );
+  virtual bool                        activateModule( SUIT_Study* );
+  virtual bool                        deactivateModule( SUIT_Study* );
   void                                MenuItem();
 
 protected slots:
