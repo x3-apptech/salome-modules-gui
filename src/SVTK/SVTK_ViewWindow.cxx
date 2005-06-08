@@ -279,6 +279,13 @@ SVTK_ViewWindow
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onResetView()));
   myActionsMap[ ResetId ] = aAction;
+
+  // onViewTrihedron: Shows - Hides Trihedron
+  aAction = new QtxAction(tr("MNU_VIEW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
+                           tr( "MNU_VIEW_TRIHEDRON" ), 0, this);
+  aAction->setStatusTip(tr("DSC_VIEW_TRIHEDRON"));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onViewTrihedron()));
+  myActionsMap[ ViewTrihedronId ] = aAction;
 }
 
 //----------------------------------------------------------------------------
@@ -287,6 +294,7 @@ SVTK_ViewWindow
 ::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
+  myActionsMap[ViewTrihedronId]->addTo(myToolBar);
 
   SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar);
   aScaleBtn->AddAction(myActionsMap[FitAllId]);
