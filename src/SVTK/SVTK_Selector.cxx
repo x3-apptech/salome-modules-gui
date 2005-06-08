@@ -128,7 +128,6 @@ SVTK_SelectorDef
 
   myIObjects.erase(theIO);
   myIO2Actors.erase(theIO);
-  myMapIOSubIndex.erase(theIO);
 
   return anIsIOBound;
 }
@@ -247,7 +246,7 @@ SVTK_SelectorDef
     aMapIndex.Add(theIndices(i));
   
   if(aMapIndex.IsEmpty())
-    RemoveIObject(theIO);
+    myMapIOSubIndex.erase(theIO);
 
   return !aMapIndex.IsEmpty();
 }
@@ -275,7 +274,7 @@ SVTK_SelectorDef
     aMapIndex.Add(anIter.Key());
   
   if(aMapIndex.IsEmpty())
-    RemoveIObject(theIO);
+    myMapIOSubIndex.erase(theIO);
 
   return !aMapIndex.IsEmpty();
 }
@@ -306,7 +305,7 @@ SVTK_SelectorDef
     aMapIndex.Add( theIndex );
 
   if( aMapIndex.IsEmpty())
-    RemoveIObject(theIO);
+    myMapIOSubIndex.erase(theIO);
 
   return false;
 }
