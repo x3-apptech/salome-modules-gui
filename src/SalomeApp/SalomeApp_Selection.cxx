@@ -46,9 +46,12 @@ int SalomeApp_Selection::count() const
   return myEntries.count();
 }
 
-QtxValue SalomeApp_Selection::param( const int, const QString& ) const
+QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
 {
-  return QtxValue();
+  if( p=="client" )
+    return myPopupClient;
+  else    
+    return QtxValue();
 }
 
 QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
