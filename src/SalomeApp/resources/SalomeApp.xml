@@ -32,6 +32,7 @@
     <parameter name="VTKViewer"  value="${SUITRoot}/resources"/>
     <parameter name="SalomeApp"  value="${SUITRoot}/resources"/>
     <parameter name="OB"         value="${SUITRoot}/resources"/>
+    <parameter name="CAM"        value="${SUITRoot}/resources"/>
     <parameter name="GEOM"       value="${GEOM_ROOT_DIR}/share/salome/resources"/>
     <parameter name="SMESH"      value="${SMESH_ROOT_DIR}/share/salome/resources"/>
     <parameter name="VISU"       value="${VISU_ROOT_DIR}/share/salome/resources"/>
