@@ -26,8 +26,6 @@ public:
   SPlot2d_Curve( const SPlot2d_Curve& curve );
   SPlot2d_Curve& operator= ( const SPlot2d_Curve& curve );
 
-  void setData( const double* hData, const double* vData, long size );
-
   virtual bool                             hasIO() { return !myIO.IsNull(); }
   virtual Handle(SALOME_InteractiveObject) getIO() const { return myIO; }
   virtual void                             setIO( const Handle(SALOME_InteractiveObject)& io ) { myIO = io; }

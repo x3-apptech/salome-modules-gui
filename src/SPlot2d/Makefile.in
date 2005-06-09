@@ -10,9 +10,9 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 EXPORT_HEADERS = \
            SPlot2d.h \
            SPlot2d_Curve.h \
-           SPlot2d_CurveContainer.h \
 	   SPlot2d_Prs.h \
-	   SPlot2d_ViewModel.h
+	   SPlot2d_ViewModel.h \
+	   SPlot2d_SetupPlot2dDlg.h
 
 # .po files to transform in .qm
 #PO_FILES = \
@@ -22,23 +22,25 @@ EXPORT_HEADERS = \
 LIB = libSPlot2d.la
 LIB_SRC = 	  \
            SPlot2d_Curve.cxx \
-           SPlot2d_CurveContainer.cxx \
 	   SPlot2d_Prs.cxx \
-	   SPlot2d_ViewModel.cxx
+	   SPlot2d_ViewModel.cxx \
+	   SPlot2d_SetupPlot2dDlg.cxx
 
 LIB_MOC = \
-	   SPlot2d_ViewModel.h
+	   SPlot2d_ViewModel.h \
+	   SPlot2d_SetupPlot2dDlg.h
 
 
-LIB_CLIENT_IDL = SALOMEDS.idl \
-		 SALOME_ModuleCatalog.idl \
-		 SALOME_Component.idl \
-		 SALOME_ContainerManager.idl \
-		 SALOME_Exception.idl \
-		 SALOME_GenericObj.idl
+#LIB_CLIENT_IDL = SALOMEDS.idl \
+#		 SALOME_ModuleCatalog.idl \
+#		 SALOME_Component.idl \
+#		 SALOME_ContainerManager.idl \
+#		 SALOME_Exception.idl \
+#		 SALOME_GenericObj.idl
 
-CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(OGL_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
-LDFLAGS+=$(QT_MT_LIBS) $(OGL_LIBS) $(QWT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit -lPlot2d -lSalomePrs
+#CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(OGL_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(QWT_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
+LDFLAGS+=$(QT_MT_LIBS) $(QWT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit -lPlot2d -lSalomePrs
 
 
 @CONCLUDE@

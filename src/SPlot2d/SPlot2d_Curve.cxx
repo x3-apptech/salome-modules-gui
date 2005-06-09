@@ -59,11 +59,3 @@ SPlot2d_Curve& SPlot2d_Curve::operator=( const SPlot2d_Curve& curve )
   return *this;
 }
 
-/*!
-  Sets curve's data. 
-*/
-void SPlot2d_Curve::setData( const double* hData, const double* vData, long size )
-{
-  clearAllPoints();
-  for(long i = 0; i < size; i++) addPoint(hData[i], vData[i]);
-}
