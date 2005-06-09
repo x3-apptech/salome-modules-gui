@@ -43,8 +43,11 @@ public:
   void        deletePoint(int thePos);
   void        clearAllPoints();
   pointList   getPointList() const;
+
+  void        setData( const double* hData, const double* vData, long size );
   double*     horData() const;
   double*     verData() const;
+
   int         nbPoints() const;
   bool        isEmpty() const;
 

@@ -182,6 +182,15 @@ pointList Plot2d_Curve::getPointList() const
 }
 
 /*!
+  Sets curve's data. 
+*/
+void Plot2d_Curve::setData( const double* hData, const double* vData, long size )
+{
+  clearAllPoints();
+  for(long i = 0; i < size; i++) addPoint(hData[i], vData[i]);
+}
+
+/*!
   Gets curve's data : abscissas of points
 */
 double* Plot2d_Curve::horData() const
