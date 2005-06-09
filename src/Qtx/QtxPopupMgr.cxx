@@ -211,7 +211,8 @@ void QtxPopupMgr::Operations::clear()
 // Purpose  : 
 //================================================================
 QtxPopupMgr::QtxPopupMgr( QPopupMenu* popup, QObject* parent )
-: QtxActionMenuMgr( popup, parent )
+: QtxActionMenuMgr( popup, parent ),
+  myCurrentSelection( 0 )
 {
     createOperations();
 }
