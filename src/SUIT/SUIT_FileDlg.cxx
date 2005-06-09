@@ -117,14 +117,18 @@ myOpen( open )
   }
   setMode( myOpen ? ExistingFile : AnyFile );     
   setCaption( myOpen ? tr( "INF_DESK_DOC_OPEN" ) : tr( "INF_DESK_DOC_SAVE" ) );
-  if (myLastVisitedPath.isNull() || myLastVisitedPath.isEmpty()) {
-    // If no last visited path exists -> switch to the first preferred path
-    processPath(myQuickCombo->text(0));
-  } 
-  else if ( !processPath(myLastVisitedPath) ) {
-    // If last visited path doesn't exist -> switch to the first preferred path
-    processPath(myQuickCombo->text(0));
+
+  if (showQuickDir) {
+    if (myLastVisitedPath.isNull() || myLastVisitedPath.isEmpty()) {
+      // If no last visited path exists -> switch to the first preferred path
+      processPath(myQuickCombo->text(0));
+    } 
+    else if ( !processPath(myLastVisitedPath) ) {
+      // If last visited path doesn't exist -> switch to the first preferred path
+      processPath(myQuickCombo->text(0));
+    }
   }
+
   myValidator = new SUIT_FileValidator(this);
   
 }
