@@ -149,7 +149,7 @@ void PythonConsole_PyEditor::exec( const QString& command )
   _currentPrompt = READY_PROMPT;
   _buf.truncate(0);
   _isInHistory = false;
-  setText(_currentPrompt); 
+  setText( "\n" + _currentPrompt); 
   setText( command + "\n" ); 
   handleReturn();
 }

@@ -25,7 +25,8 @@ LIB_SRC= PythonConsole_PyConsole.cxx \
 	 PythonConsole_PyInterp.cxx		
 
 LIB_MOC = \
-	PythonConsole_PyEditor.h 
+	PythonConsole_PyEditor.h \
+	PythonConsole_PyConsole.h
 
 CPPFLAGS+= $(PYTHON_INCLUDES) $(QT_INCLUDES)
 

@@ -10,6 +10,8 @@ class PyInterp_base;
 
 class PYCONSOLE_EXPORT PythonConsole: public QWidget
 {
+  Q_OBJECT;
+
 public:
   PythonConsole(QWidget* parent, PyInterp_base* interp = 0 );
   virtual ~PythonConsole();
