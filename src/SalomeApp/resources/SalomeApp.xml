@@ -15,7 +15,7 @@
     <parameter name="xterm"      value="no"/>
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,SUPERV"/>
+    <parameter name="modules"    value="GEOM,SMESH,SUPERV,MED,VISU"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine"/>
     <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
@@ -37,6 +37,7 @@
     <parameter name="SMESH"      value="${SMESH_ROOT_DIR}/share/salome/resources"/>
     <parameter name="VISU"       value="${VISU_ROOT_DIR}/share/salome/resources"/>
     <parameter name="SUPERV"     value="${SUPERV_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="MED"        value="${MED_ROOT_DIR}/share/salome/resources"/>
   </section>
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>
@@ -54,6 +55,11 @@
     <parameter name="name"       value="Supervision"/>
     <parameter name="icon"       value="ModuleSupervision.png"/>
   </section>
+  <section name="MED">
+    <parameter name="name"       value="Med"/>
+    <parameter name="icon"       value="ModuleMed.png"/>
+  </section>
+
 <!-- values below this line are just an example, they are not used  -->
   <section name="application">
     <parameter name="QuickDirList" value=""/>
