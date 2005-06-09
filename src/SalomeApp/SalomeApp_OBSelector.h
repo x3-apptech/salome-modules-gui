@@ -19,11 +19,14 @@ public:
   virtual ~SalomeApp_OBSelector();
 
   OB_Browser*  browser() const;
+
+  void setBrowser(OB_Browser* theBrowser);
   
   virtual QString type() const { return "ObjectBrowser"; }
 
 private slots:
   void         onSelectionChanged();
+  void         onBrowserDestroyed();
 
 protected:
   virtual void getSelection( SUIT_DataOwnerPtrList& ) const;
