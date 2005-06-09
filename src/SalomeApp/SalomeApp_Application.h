@@ -27,6 +27,7 @@ class QDockWindow;
 
 class LogWindow;
 class OB_Browser;
+class PythonConsole;
 class SalomeApp_Module;
 class SalomeApp_SelectionMgr;
 class SalomeApp_WidgetContainer;
@@ -49,7 +50,7 @@ public:
   typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
 
   enum { ModulesListId = STD_Application::UserID, NewGLViewId,
-         NewPlot2dId, NewOCCViewId, NewVTKViewId, UserID };
+         NewPlot2dId, NewOCCViewId, NewVTKViewId, LoadScriptId, UserID };
 
 public:
   SalomeApp_Application();
@@ -65,6 +66,7 @@ public:
 
   OB_Browser*                         objectBrowser();
   LogWindow*                          logWindow();
+  PythonConsole*                      pythonConsole();   
 
   virtual QString                     getFileFilter() const;
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
@@ -127,6 +129,8 @@ private slots:
   void                                onStudyOpened( SUIT_Study* );
   void                                onStudySaved( SUIT_Study* );
   void                                onStudyClosed( SUIT_Study* );
+  
+  void                                onLoadScript(); 
 
 private:
   void                                updateWindows();

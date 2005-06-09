@@ -135,3 +135,20 @@ msgid "SalomeApp_ModuleDlg::ActivateComponent_DESCRIPTION"
 msgstr "Create, open or load study."
 
 //=======================================================================================
+
+msgid "SalomeApp_Application::ALL_FILES_FILTER"
+msgstr "All files ( * )"
+
+msgid "SalomeApp_Application::PYTHON_FILES_FILTER"
+msgstr "PYTHON Files ( *.py )"
+
+//=======================================================================================
+
+msgid "TOT_DESK_FILE_LOAD_SCRIPT"
+msgstr "Load python script"
+
+msgid "MEN_DESK_FILE_LOAD_SCRIPT"
+msgstr "Load script..."
+
+msgid "PRP_DESK_FILE_LOAD_SCRIPT"
+msgstr "Loads python script from file"

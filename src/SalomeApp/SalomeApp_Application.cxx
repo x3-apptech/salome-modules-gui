@@ -49,6 +49,7 @@
 
 #include <PythonConsole_PyConsole.h>
 
+#include <SUIT_FileDlg.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_ActionOperation.h>
@@ -252,7 +253,14 @@ void SalomeApp_Application::createActions()
 
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-
+  
+  // Load script
+  createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
+		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
+		0, desk, false, this, SLOT( onLoadScript() ) );
+  int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
+  createMenu( LoadScriptId, fileMenu, 10, -1 );
+  
   // default icon for neutral point ('SALOME' module)
   QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
   if ( defIcon.isNull() )
@@ -311,7 +319,7 @@ void SalomeApp_Application::createActions()
   }
 
   SUIT_Tools::simplifySeparators( modTBar );
-
+  
   // New window
 
   int windowMenu = createMenu( tr( "MEN_DESK_WINDOW" ), -1, 100 );
@@ -515,6 +523,11 @@ void SalomeApp_Application::updateCommandsStatus()
     if ( a )
       a->setEnabled( activeStudy() );
   }
+
+  // Load script menu
+  QAction* a = action( LoadScriptId );
+  if ( a )
+    a->setEnabled( activeStudy() );
 }
 
 //=======================================================================
@@ -649,6 +662,15 @@ LogWindow* SalomeApp_Application::logWindow()
   return lw;
 }
 
+PythonConsole* SalomeApp_Application::pythonConsole()
+{
+  PythonConsole* console = 0;
+  QWidget* wid = getWindow( WT_PyConsole );
+  if ( wid->inherits( "PythonConsole" ) )
+    console = (PythonConsole*)wid;
+  return console;
+}
+
 SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, const bool create )
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
@@ -752,6 +774,35 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
   activateModule( "" );
 
   saveWindowsGeometry();
+}
+
+void SalomeApp_Application::onLoadScript( )
+{
+  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+  if ( !appStudy ) return;
+  _PTR(Study) aStudy = appStudy->studyDS();
+  
+  if ( aStudy->GetProperties()->IsLocked() ) {
+    SUIT_MessageBox::warn1 ( desktop(),
+			     QObject::tr("WRN_WARNING"), 
+			     QObject::tr("WRN_STUDY_LOCKED"),
+			     QObject::tr("BUT_OK") );
+    return;
+  }
+  
+  QStringList filtersList;
+  filtersList.append(tr("PYTHON_FILES_FILTER"));
+  filtersList.append(tr("ALL_FILES_FILTER"));
+  
+  QString aFile = SUIT_FileDlg::getFileName(desktop(), "", filtersList, tr("TOT_DESK_FILE_LOAD_SCRIPT"), true, false);
+  if(!aFile.isEmpty()) {
+    QString command = QString("execfile(\"%1\")").arg(aFile);
+    
+    PythonConsole* pyConsole = pythonConsole();
+    
+    if(pyConsole)
+      pyConsole->exec(command);
+  }
 }
 
 QString SalomeApp_Application::getFileFilter() const
