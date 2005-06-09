@@ -796,7 +796,10 @@ QtxParser::Error QtxSets::calculate( const QString& op, QtxValue& v1, QtxValue& 
                 set( v1, res );
             }
             else
-                v1 = v2.toList().contains( v1 );
+	    {
+	      const QValueList< QVariant >& list = v2.toList();
+	      v1 = ( bool )( list.find( v1 )!=list.end() );
+	    }
         }
 
     return err;
