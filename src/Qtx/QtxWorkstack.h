@@ -148,7 +148,7 @@ protected:
   virtual void        mousePressEvent( QMouseEvent* );
 
 private:
-  enum { ActivateEvent = QEvent::User, FocusEvent, RemoveEvent };
+  enum { ActivateWidget = QEvent::User, FocusWidget, RemoveWidget };
 
 private:
   void                updateState();

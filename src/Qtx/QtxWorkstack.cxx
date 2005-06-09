@@ -704,7 +704,7 @@ bool QtxWorkstackArea::eventFilter( QObject* o, QEvent* e )
         wid = wid->parentWidget();
       }
       if ( ok )
-        QApplication::postEvent( this, new QCustomEvent( (QEvent::Type)( e->type() == QEvent::FocusIn ? ActivateEvent : FocusEvent ) ) );
+        QApplication::postEvent( this, new QCustomEvent( (QEvent::Type)( e->type() == QEvent::FocusIn ? ActivateWidget : FocusWidget ) ) );
     }
   }
   return false;
@@ -737,14 +737,14 @@ void QtxWorkstackArea::customEvent( QCustomEvent* e )
 {
   switch ( e->type() )
   {
-  case ActivateEvent:
+  case ActivateWidget:
     emit activated( activeWidget() );
     break;
-  case FocusEvent:
-    if ( activeWidget() )
+  case FocusWidget:
+    if ( activeWidget() && !activeWidget()->focusWidget() )
       activeWidget()->setFocus();
     break;
-  case RemoveEvent:
+  case RemoveWidget:
     removeWidget( (QWidget*)e->data() );
     break;
   }
@@ -801,7 +801,7 @@ void QtxWorkstackArea::onChildDestroyed( QObject* obj )
 
   myChild.remove( wid );
 
-  QApplication::postEvent( this, new QCustomEvent( (QEvent::Type)RemoveEvent, wid ) );
+  QApplication::postEvent( this, new QCustomEvent( (QEvent::Type)RemoveWidget, wid ) );
 }
 
 void QtxWorkstackArea::onChildShown( QtxWorkstackChild* c )
