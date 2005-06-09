@@ -30,6 +30,7 @@
 #include <GLViewer_ViewManager.h>
 
 #include <Plot2d_ViewManager.h>
+#include <SPlot2d_ViewModel.h>
 
 #include <OCCViewer_ViewManager.h>
 #include <SOCC_ViewModel.h>
@@ -696,7 +697,10 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
     new SalomeApp_GLSelector( (GLViewer_Viewer2d*)viewMgr->getViewModel(), mySelMgr );
   }
   else if ( vmType == Plot2d_Viewer::Type() )
+  {
     viewMgr = new Plot2d_ViewManager( activeStudy(), desktop() );
+    viewMgr->setViewModel( new SPlot2d_Viewer() );// custom view model, which extends SALOME_View interface
+  }
   else if ( vmType == OCCViewer_Viewer::Type() )
   {
     viewMgr = new OCCViewer_ViewManager( activeStudy(), desktop() );
