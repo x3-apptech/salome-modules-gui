@@ -17,6 +17,7 @@
 
 #include "SalomeApp_AboutDlg.h"
 #include "SalomeApp_ModuleDlg.h"
+#include "SalomeApp_PreferencesDlg.h"
 
 #include "SalomeApp_GLSelector.h"
 #include "SalomeApp_OBSelector.h"
@@ -109,7 +110,8 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 */
 
 SalomeApp_Application::SalomeApp_Application()
-: CAM_Application( false )
+: CAM_Application( false ),
+myPrefDlg( 0 )
 {
   STD_TabDesktop* desk = new STD_TabDesktop();
 
@@ -672,6 +674,31 @@ PythonConsole* SalomeApp_Application::pythonConsole()
   return console;
 }
 
+QtxResourceEdit* SalomeApp_Application::resourceEdit() const
+{
+  return 0;
+  /*
+  QtxResourceEdit* edit = 0;
+  if ( !myPrefDlg )
+  {
+    SalomeApp_Application* that = (SalomeApp_Application*)this;
+    that->myPrefDlg = new SalomeApp_PreferencesDlg( that->desktop() );
+
+    edit = myPrefDlg->resourceEdit();
+
+    QStringList modList;
+    modules( modList, false );
+    for ( QStringList::const_iterator it = modList.begin(); it != modList.end(); ++it )
+    {
+      int id = edit->addItem( *it );
+      edit->setProperty( id, "info", tr( "PREFERENCES_NOT_LOADED" ).arg( *it ) );
+    }
+  }
+  else
+    edit = myPrefDlg->resourceEdit();
+  */
+}
+
 SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, const bool create )
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
@@ -745,6 +772,8 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* theStudy )
     objectBrowser()->setRootObject( aRoot );
 
   activateModule( defaultModule() );
+
+  activateWindows();
 }
 
 void SalomeApp_Application::onStudyOpened( SUIT_Study* theStudy )
@@ -759,9 +788,9 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* theStudy )
     objectBrowser()->setRootObject( aRoot );
   }
 
-  activateWindows();
-
   activateModule( defaultModule() );
+
+  activateWindows();
 
   emit studyOpened();
 }

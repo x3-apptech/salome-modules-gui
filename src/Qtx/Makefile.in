@@ -42,7 +42,8 @@ EXPORT_HEADERS= Qtx.h \
                 QtxMainWindow.h \
 		QtxWorkspaceAction.h \
 		QtxWorkstackAction.h \
-		QtxResourceEditor.h \
+		QtxResourceEdit.h \
+		QtxListResourceEdit.h \
 		QtxWorkstack.h \
 		QtxListView.h
 
@@ -85,7 +86,8 @@ LIB_SRC= \
         QtxMainWindow.cxx \
 	QtxWorkspaceAction.cxx \
 	QtxWorkstackAction.cxx \
-	QtxResourceEditor.cxx \
+	QtxResourceEdit.cxx \
+        QtxListResourceEdit.cxx \
 	QtxWorkstack.cxx \
 	QtxListView.cxx
 
@@ -115,7 +117,8 @@ LIB_MOC = \
 	QtxWorkspaceAction.h \
 	QtxWorkstackAction.h \
 	QtxWorkstack.h \
-	QtxListView.h
+	QtxListView.h \
+	QtxListResourceEdit.h
 
 RESOURCES_FILES = \
 

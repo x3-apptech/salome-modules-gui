@@ -29,7 +29,7 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_RootObject.h \
 		SalomeApp_SelectionMgr.h \
                 SalomeApp_EventFilter.h \
-		SalomeApp_ResourceEditor.h \
+		SalomeApp_PreferencesDlg.h \
 		SalomeApp_Tools.h \
 		SalomeApp_NameDlg.h \
 		SalomeApp_ImportOperation.h \
@@ -61,7 +61,7 @@ LIB_SRC= SalomeApp_AboutDlg.cxx \
 	 SalomeApp_ExceptionHandler.cxx \
 	 SalomeApp_SelectionMgr.cxx \
          SalomeApp_EventFilter.cxx \
-	 SalomeApp_ResourceEditor.cxx \
+	 SalomeApp_PreferencesDlg.cxx \
 	 SalomeApp_PyInterp.cxx \
 	 SalomeApp_Tools.cxx \
 	 SalomeApp_NameDlg.cxx \
@@ -84,7 +84,7 @@ LIB_MOC = SalomeApp_AboutDlg.h \
 	  SalomeApp_Study.h \
           SalomeApp_SelectionMgr.h \
 	  SalomeApp_WidgetContainer.h \
-	  SalomeApp_ResourceEditor.h \
+	  SalomeApp_PreferencesDlg.h \
 	  SalomeApp_NameDlg.h \
 	  SalomeApp_ModuleDlg.h
 

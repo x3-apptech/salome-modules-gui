@@ -51,11 +51,17 @@ public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
   virtual ~QtxListResourceEdit();
 
+signals:
+  void          resourceChanged( int );
+  void          resourceChanged( QString&, QString& );
+  void          resourcesChanged( const QMap<int, QString>& );
+
 private slots:
   void          onSelectionChanged();
 
 protected:
   virtual Item* createItem( const QString&, const int );
+  virtual void  changedResources( const QMap<Item*, QString>& );
 
 private:
   void          updateState();

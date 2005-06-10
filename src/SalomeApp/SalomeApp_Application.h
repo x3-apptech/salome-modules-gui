@@ -28,9 +28,12 @@ class QDockWindow;
 class LogWindow;
 class OB_Browser;
 class PythonConsole;
+class QtxResourceEdit;
 class SalomeApp_Module;
 class SalomeApp_SelectionMgr;
+class SalomeApp_PreferencesDlg;
 class SalomeApp_WidgetContainer;
+
 class SALOME_LifeCycleCORBA;
 
 #ifdef WIN32
@@ -64,9 +67,11 @@ public:
   
   SalomeApp_SelectionMgr*             selectionMgr() const;
 
-  OB_Browser*                         objectBrowser();
   LogWindow*                          logWindow();
+  OB_Browser*                         objectBrowser();
   PythonConsole*                      pythonConsole();   
+
+  QtxResourceEdit*                    resourceEdit() const;
 
   virtual QString                     getFileFilter() const;
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
@@ -154,6 +159,7 @@ private:
 
 private:
   SalomeApp_SelectionMgr*             mySelMgr;
+  SalomeApp_PreferencesDlg*           myPrefDlg;
   ActionMap                           myActions;
   WindowMap                           myWindows;
 };

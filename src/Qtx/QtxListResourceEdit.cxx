@@ -80,6 +80,23 @@ QtxResourceEdit::Item* QtxListResourceEdit::createItem( const QString& title, co
   return category;
 }
 
+void QtxListResourceEdit::changedResources( const QMap<Item*, QString>& map )
+{
+  QMap<int, QString> idMap;
+  for ( QMap<Item*, QString>::ConstIterator it = map.begin(); it != map.end(); ++it )
+  {
+    idMap.insert( it.key()->id(), it.data() );
+
+    emit resourceChanged( it.key()->id() );
+
+    QString sec, param;
+    it.key()->resource( sec, param );
+    emit resourceChanged( sec, param );
+  }
+
+  emit resourcesChanged( idMap );
+}
+
 void QtxListResourceEdit::updateState()
 {
   if ( myStack->visibleWidget() )

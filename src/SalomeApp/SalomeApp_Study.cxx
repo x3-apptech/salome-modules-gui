@@ -144,14 +144,15 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
   for ( ; aModel; aModel = (SalomeApp_DataModel*)list.next() )
     aModel->saveAs( theFileName, this );
 
-  bool res = CAM_Study::saveDocumentAs( theFileName );
-
   // save SALOMEDS document
   bool isMultiFile = false, isAscii = false;// TODO: This information should be taken from preferences afterwards!
-  isAscii ? SalomeApp_Application::studyMgr()->SaveAsASCII( theFileName.latin1(), studyDS(), isMultiFile ) :
-            SalomeApp_Application::studyMgr()->SaveAs     ( theFileName.latin1(), studyDS(), isMultiFile );
+   /* bool res = */isAscii ? SalomeApp_Application::studyMgr()->SaveAsASCII( theFileName.latin1(), studyDS(), isMultiFile ) :
+                  SalomeApp_Application::studyMgr()->SaveAs     ( theFileName.latin1(), studyDS(), isMultiFile );
 
-  emit saved( this );
+  bool res = res && CAM_Study::saveDocumentAs( theFileName );
+
+  if ( res )
+    emit saved( this );
 
   return res;
 }
