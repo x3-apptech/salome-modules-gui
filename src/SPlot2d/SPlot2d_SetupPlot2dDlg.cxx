@@ -115,10 +115,10 @@ SPlot2d_SetupPlot2dDlg::SPlot2d_SetupPlot2dDlg( _PTR(SObject) object, QWidget* p
 	  frameLayout->addWidget( item->myVBtn,        row, 1 );
 	  frameLayout->addWidget( item->myTitleLab,    row, 3 );
 	  if ( rowTitles.size() > 0 )
-	    item->myTitleLab->setText( QString( rowTitles[ i ] ) );
+	    item->myTitleLab->setText( QString( rowTitles[ i ].c_str() ) );
 	  frameLayout->addWidget( item->myUnitLab,     row, 5 );
 	  if ( rowUnits.size() > 0 )
-	    item->myUnitLab->setText( QString( rowUnits[ i ] ) );
+	    item->myUnitLab->setText( QString( rowUnits[ i ].c_str() ) );
 	  frameLayout->addWidget( item->myAutoCheck,   row, 7 );
 	  frameLayout->addWidget( item->myLineCombo,   row, 8 );
 	  frameLayout->addWidget( item->myLineSpin,    row, 9 );
@@ -150,10 +150,10 @@ SPlot2d_SetupPlot2dDlg::SPlot2d_SetupPlot2dDlg( _PTR(SObject) object, QWidget* p
 	  frameLayout->addWidget( item->myVBtn,        row, 1 );
 	  frameLayout->addWidget( item->myTitleLab,    row, 3 );
 	  if ( rowTitles.size() > 0 )
-	    item->myTitleLab->setText( QString( rowTitles[ i ] ) );
+	    item->myTitleLab->setText( QString( rowTitles[ i ].c_str() ) );
 	  frameLayout->addWidget( item->myUnitLab,     row, 5 );
 	  if ( rowUnits.size() > 0 )
-	    item->myUnitLab->setText( QString( rowUnits[ i ] ) );
+	    item->myUnitLab->setText( QString( rowUnits[ i ].c_str() ) );
 	  frameLayout->addWidget( item->myAutoCheck,   row, 7 );
 	  frameLayout->addWidget( item->myLineCombo,   row, 8 );
 	  frameLayout->addWidget( item->myLineSpin,    row, 9 );
@@ -217,7 +217,7 @@ void SPlot2d_SetupPlot2dDlg::getCurvesSource( int& horIndex, QValueList<int>& ve
 {
   /* collecting horizontal and vertical axis items */
   horIndex = -1;
-  int i, j;
+  int i;
   for ( i = 0; i < myItems.count(); i++ ) {
     if ( myItems.at( i )->isHorizontalOn() ) {
       horIndex = i;
@@ -280,13 +280,13 @@ void SPlot2d_SetupPlot2dDlg::getCurves( QPtrList<Plot2d_Curve>& container )
 	  SPlot2d_Curve* curve = new SPlot2d_Curve();
 	  // curve titles
 	  if ( rowTitles.size() > 0 ) {
-	    curve->setHorTitle( QString( rowTitles[ horIndex ] ) );
-	    curve->setVerTitle( QString( rowTitles[ verIndex[i] ] ) );
+	    curve->setHorTitle( QString( rowTitles[ horIndex ].c_str() ) );
+	    curve->setVerTitle( QString( rowTitles[ verIndex[i] ].c_str() ) );
 	  }
 	  // curve units
 	  if ( rowUnits.size() > 0 ) {
-	    curve->setHorUnits( QString( rowUnits[ horIndex ] ) );
-	    curve->setVerUnits( QString( rowUnits[ verIndex[i] ] ) );
+	    curve->setHorUnits( QString( rowUnits[ horIndex ].c_str() ) );
+	    curve->setVerUnits( QString( rowUnits[ verIndex[i] ].c_str() ) );
 	  }
 	  // curve data
 	  int nbPoints = 0;
@@ -332,13 +332,13 @@ void SPlot2d_SetupPlot2dDlg::getCurves( QPtrList<Plot2d_Curve>& container )
 	  SPlot2d_Curve* curve = new SPlot2d_Curve();
 	  // curve titles
 	  if ( rowTitles.size() > 0 ) {
-	    curve->setHorTitle( QString( rowTitles[ horIndex ] ) );
-	    curve->setVerTitle( QString( rowTitles[ verIndex[i] ] ) );
+	    curve->setHorTitle( QString( rowTitles[ horIndex ].c_str() ) );
+	    curve->setVerTitle( QString( rowTitles[ verIndex[i] ].c_str() ) );
 	  }
 	  // curve units
 	  if ( rowUnits.size() > 0 ) {
-	    curve->setHorUnits( QString( rowUnits[ horIndex ] ) );
-	    curve->setVerUnits( QString( rowUnits[ verIndex[i] ] ) );
+	    curve->setHorUnits( QString( rowUnits[ horIndex ].c_str() ) );
+	    curve->setVerUnits( QString( rowUnits[ verIndex[i] ].c_str() ) );
 	  }
 	  // curve data
 	  int nbPoints = 0;
