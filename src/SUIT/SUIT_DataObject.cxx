@@ -13,6 +13,7 @@
 SUIT_DataObject::SUIT_DataObject( SUIT_DataObject* p )
 : myParent( 0 ),
   mySignal( 0 ),
+  myOpen( false ),
   myCheck( false )
 {
   myChildren.setAutoDelete( true );
@@ -426,6 +427,16 @@ bool SUIT_DataObject::isOn() const
 void SUIT_DataObject::setOn( const bool on )
 {
   myCheck = on;
+}
+
+bool SUIT_DataObject::isOpen() const
+{
+  return myOpen;
+}
+
+void SUIT_DataObject::setOpen( const bool on )
+{
+  myOpen = on;
 }
 
 /*!

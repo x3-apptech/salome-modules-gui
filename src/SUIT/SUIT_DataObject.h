@@ -71,6 +71,9 @@ public:
   virtual bool                isOn() const;
   virtual void                setOn( const bool );
 
+  virtual bool                isOpen() const;
+  virtual void                setOpen( const bool );
+
   virtual SUIT_DataObjectKey* key() const;
 
   bool                        connect( QObject*, const char* );
@@ -81,6 +84,7 @@ public:
   void                        dump( const int indent = 2 ) const; // dump to cout
 
 private:
+  bool                        myOpen;
   bool                        myCheck;
   Signal*                     mySignal;
   SUIT_DataObject*            myParent;

@@ -623,6 +623,9 @@ QListViewItem* OB_Browser::createTree( const SUIT_DataObject* obj,
   for ( DataObjectListIterator it ( lst ); it.current(); ++it )
     createTree( it.current(), item );
 
+  if ( item )
+    item->setOpen( obj->isOpen() );
+
   return item;
 }
 
@@ -1077,7 +1080,7 @@ void OB_Browser::openBranch( QListViewItem* item, const int level )
   item->setOpen( true );
   while ( item )
   {
-    openBranch( item, level - 1 );
+    openBranch( item->firstChild(), level - 1 );
     item = item->nextSibling();
   }
 }
