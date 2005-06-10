@@ -244,9 +244,12 @@ void QtxWorkstack::onDeactivated( QtxWorkstackArea* area )
   if ( idx == -1 )
     return;
 
+  myWin = 0;
+  myArea = 0;
+
   QtxWorkstackArea* newArea = neighbourArea( area );
-  if ( newArea )
-    newArea->setFocus();
+  if ( newArea && newArea->activeWidget() )
+    newArea->activeWidget()->setFocus();
 
   QApplication::postEvent( this, new QCustomEvent( QEvent::User ) );
 }
