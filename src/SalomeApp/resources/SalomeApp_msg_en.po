@@ -97,6 +97,9 @@ msgstr "Modules"
 msgid "SalomeApp_Application::INF_CANCELLED"
 msgstr "Module activation cancelled"
 
+msgid "SalomeApp_Application::PREFERENCES_NOT_LOADED"
+msgstr "Preferences for module \"<b>%1</b>\" will be available when the module will be loaded"
+
 //=======================================================================================
 
 msgid "SalomeApp_Application::OBJ_BROWSER_NAME"
