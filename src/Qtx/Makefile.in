@@ -87,6 +87,7 @@ LIB_SRC= \
 	QtxWorkspaceAction.cxx \
 	QtxWorkstackAction.cxx \
         QtxListResourceEdit.cxx \
+	QtxResourceEdit.cxx \
 	QtxWorkstack.cxx \
 	QtxListView.cxx
 
