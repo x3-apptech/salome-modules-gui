@@ -64,15 +64,25 @@ SUIT_ViewWindow* SUIT_ViewManager::createViewWindow()
 {
   SUIT_ViewWindow* aView = myViewModel->createView(myDesktop);
 
-  if ( !insertView( aView ) )
+  if ( !insertView( aView ) ){
     delete aView;
+    return 0;
+  }
   
   setViewName( aView );
   //myDesktop->addViewWindow( aView );
   //it is done automatically during creation of view
 
   aView->setViewManager(this);
+
   emit viewCreated(aView);
+
+  // Special treatment for the case when <aView> is the first one in this view manager
+  // -> call onWindowActivated() directly, because somebody may always want
+  // to use getActiveView()
+  if ( !myActiveView )
+    onWindowActivated( aView );
+
   return aView;
 }
 
@@ -160,7 +170,7 @@ void SUIT_ViewManager::onMousePressed(SUIT_ViewWindow* theView, QMouseEvent* the
 //***************************************************************
 void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 {
-  if (view) {
+  if (view && myActiveView != view) {
     unsigned int aSize = myViews.size();
     for (uint i = 0; i < aSize; i++) {
       if (myViews[i] && myViews[i] == view) {
