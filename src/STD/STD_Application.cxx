@@ -343,11 +343,17 @@ void STD_Application::onSaveDoc()
   if ( !activeStudy() )
     return;
 
+  bool isOk = false;
   if ( activeStudy()->isSaved() )
   {
-    activeStudy()->saveDocument();
-    updateCommandsStatus();
+    isOk = activeStudy()->saveDocument();
+    if ( !isOk )
+      SUIT_MessageBox::error1( desktop(), tr( "TIT_FILE_SAVEAS" ),
+			       tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ), tr( "BUT_OK" ) );
   }
+
+  if ( isOk )
+    updateCommandsStatus();
   else
     onSaveAsDoc();
 }
@@ -358,50 +364,58 @@ bool STD_Application::onSaveAsDoc()
   if ( !study )
     return false;
 
-  QString aName, aUsedFilter, anOldPath = study->studyName();
-  bool isSelected = false;
-  while( !isSelected )
+  QString aName;
+  QString aUsedFilter;
+  QString anOldPath = study->studyName();
+
+  bool isOk = false;
+  while ( !isOk )
   {
     // It is preferrable to use OS-specific file dialog box here !!!
     aName = QFileDialog::getSaveFileName( anOldPath, getFileFilter(), desktop(),
                                           0, QString::null, &aUsedFilter);
 
     if ( aName.isNull() )
-      break;
-
-    if ( !getFileFilter().isNull() )
-    { // check exstension and add if it is necessary
-      int aStart = aUsedFilter.find('*');
-      int aEnd = aUsedFilter.find(')', aStart + 1);
-      QString aExt = aUsedFilter.mid(aStart + 1, aEnd - aStart - 1);
-      if (aExt.contains('*') == 0 ) {  // if it is not *.*
-        // Check that there is an extension at the end of the name
-        QString aNameTail = aName.right(aExt.length());
+      isOk = true;
+    else
+    {
+      if ( !getFileFilter().isNull() ) // check exstension and add if it is necessary
+      {
+	int aStart = aUsedFilter.find( '*' );
+	int aEnd = aUsedFilter.find( ')', aStart + 1 );
+	QString aExt = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
+	if ( aExt.contains( '*' ) == 0 ) // if it is not *.*
+	{
+	  // Check that there is an extension at the end of the name
+	  QString aNameTail = aName.right( aExt.length() );
           if ( aNameTail != aExt )
             aName += aExt;
+	}
       }
-    }
-    QFile aFile( aName );
-    if ( aFile.exists() )
-    {
-      int aAnswer = SUIT_MessageBox::warn2( desktop(), tr("TIT_FILE_SAVEAS"),
-                                                     tr("MSG_FILE_EXISTS").arg(aName),
-                                                     tr("BUT_YES"), tr("BUT_NO"), 1, 2, 2);
-      if ( aAnswer != 2 )
-        isSelected = true;
+      if ( QFileInfo( aName ).exists() )
+      {
+	int aAnswer = SUIT_MessageBox::warn2( desktop(), tr( "TIT_FILE_SAVEAS" ),
+					      tr( "MSG_FILE_EXISTS" ).arg( aName ),
+					      tr( "BUT_YES" ), tr( "BUT_NO" ), 1, 2, 2 );
+	if ( aAnswer != 2 )
+	  isOk = true;
+	else
+	  anOldPath = aName; // Not to return to the same initial dir at each "while" step
+      }
       else
-        anOldPath = aName; // Not to return to the same initial dir at each "while" step
+	isOk = true;
+
+      if ( isOk )
+	isOk = study->saveDocumentAs( aName );
     }
-    else
-      isSelected = true;
   }
 
   if ( aName.isNull() ) 
     return false;
 
-  study->saveDocumentAs( aName );
   updateDesktopTitle();
   updateCommandsStatus();
+
   return true;
 }
 
