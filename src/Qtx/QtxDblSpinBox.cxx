@@ -82,6 +82,8 @@ myPrecision( 0 )
   setValidator( new Validator( this, "double_spinbox_validator" ) );
   rangeChange();
   updateDisplay();
+
+  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::QtxDblSpinBox( double min, double max, double step, QWidget* parent, const char* name )
@@ -97,6 +99,8 @@ myPrecision( 0 )
   setValidator( new Validator( this, "double_spinbox_validator" ) );
   rangeChange();
   updateDisplay();
+
+  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::~QtxDblSpinBox()
@@ -399,4 +403,12 @@ void QtxDblSpinBox::wheelEvent( QWheelEvent* e )
 
   QSpinBox::wheelEvent( e );
   updateDisplay();
+}
+
+void QtxDblSpinBox::onTextChanged( const QString& str )
+{
+  bool isBlock = myBlocked;
+  myBlocked = true;
+  interpretText();
+  myBlocked = isBlock;
 }

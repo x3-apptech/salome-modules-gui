@@ -47,7 +47,7 @@ public:
     
 signals:
   void               valueChanged( double );
-  void		           valueChanged( const QString& );
+  void		     valueChanged( const QString& );
     
 public slots:
   virtual void	     stepUp();
@@ -56,6 +56,9 @@ public slots:
   virtual void	     setValue( int );
   virtual void	     setValue( double );
   
+protected slots:
+  virtual void       onTextChanged( const QString& );
+
 protected:
   virtual void	     updateDisplay();
   virtual void	     interpretText();
