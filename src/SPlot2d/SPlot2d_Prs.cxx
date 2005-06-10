@@ -43,20 +43,4 @@ SPlot2d_Prs::~SPlot2d_Prs()
 { 
 }
 
-//==========================================================
-/*!
- *  SPlot2d_Prs::GetObjects
- *  Get curves list
- */
-//==========================================================
-SPlot2d_CurveContainer SPlot2d_Prs::GetObjects() const 
-{ 
-  SPlot2d_CurveContainer anObjects;
-  int aLen = getCurves().count(); 
-  for ( int i = 0; i < aLen; i++ ) {
-    anObjects.addCurve(getCurves().at( i ));
-  }
-  return anObjects;  
-}
-
 

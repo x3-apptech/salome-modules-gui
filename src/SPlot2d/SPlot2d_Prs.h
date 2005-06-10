@@ -7,8 +7,9 @@
 
 #include "SPlot2d.h"
 #include "SALOME_Prs.h"
-#include "SPlot2d_CurveContainer.h"
 #include "Plot2d_Prs.h"
+
+#include <qptrlist.h>
 
 class Plot2d_Curve;
 
@@ -31,7 +32,7 @@ public:
 
   // Get curves list
   // Note: Depricated method, use method getCurves     
-  SPlot2d_CurveContainer GetObjects() const;
+  curveList GetObjects() const { return getCurves(); }
 
 };
 
