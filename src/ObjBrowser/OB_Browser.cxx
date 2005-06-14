@@ -607,7 +607,7 @@ void OB_Browser::updateView( const SUIT_DataObject* theStartObj )
       createTree( it.current(), 0, 0 );
   }
   else
-    createTree( theStartObj, parent, after );
+    createTree( theStartObj, parent, after ? after : parent );
 }
 
 QListViewItem* OB_Browser::createTree( const SUIT_DataObject* obj,
