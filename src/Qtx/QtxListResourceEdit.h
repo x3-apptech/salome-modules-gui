@@ -47,6 +47,8 @@ public:
   class IntegerSpinItem;
   class IntegerEditItem;
 
+  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer };
+
 public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
   virtual ~QtxListResourceEdit();
@@ -125,7 +127,7 @@ private:
   void          adjustLabels();
 
 private:
-  QGroupBox*    myMainFrame;
+  QWidget*      myMainFrame;
 };
 
 /*

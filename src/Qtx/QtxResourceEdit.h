@@ -21,8 +21,6 @@ class QTX_EXPORT QtxResourceEdit
 public:
   class Item;
 
-  enum { Space, Bool, Color, String, List, RealSpin, IntegerSpin, RealEdit, IntegerEdit };
-
 public:
   QtxResourceEdit( QtxResourceMgr* );
   virtual ~QtxResourceEdit();

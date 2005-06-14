@@ -4,6 +4,7 @@
 #include "QtxListResourceEdit.h"
 
 #include <qhbox.h>
+#include <qvbox.h>
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qlistbox.h>
@@ -28,16 +29,17 @@ QtxListResourceEdit::QtxListResourceEdit( QtxResourceMgr* mgr, QWidget* parent )
 : QFrame( parent ),
 QtxResourceEdit( mgr )
 {
-  QHBoxLayout* main = new QHBoxLayout( this, 0, 5 );
+  QVBoxLayout* main = new QVBoxLayout( this, 0, 5 );
+  QGroupBox* base = new QGroupBox( 1, Qt::Vertical, "", this );
+  base->setFrameStyle( QFrame::NoFrame );
+  base->setInsideMargin( 0 );
+  main->addWidget( base );
 
-  myList  = new QListBox( this );
-  myStack = new QWidgetStack( this );
+  myList  = new QListBox( base );
+  myStack = new QWidgetStack( base );
 
-  myList->setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred ) );
+  myList->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred ) );
   myStack->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
-
-  main->addWidget( myList );
-  main->addWidget( myStack );
 
   myList->setSelectionMode( QListBox::Single );
 
@@ -204,10 +206,11 @@ QtxListResourceEdit::Tab::Tab( QtxResourceEdit* edit, Item* pItem, QWidget* pare
 Item( edit, pItem )
 {
   QVBoxLayout* main = new QVBoxLayout( this );
-  myMainFrame = new QGroupBox( 1, Qt::Horizontal, "", this );
-  myMainFrame->setFrameStyle( QFrame::NoFrame );
-  myMainFrame->setInsideMargin( 5 );
+  QVBox* vbox = new QVBox( this );
+  vbox->setMargin( 5 );
+  myMainFrame = vbox;
   main->addWidget( myMainFrame );
+  main->addStretch( 1 );
 }
 
 QtxListResourceEdit::Tab::~Tab()
@@ -338,19 +341,19 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
   case String:
     item = new StringItem( title, resourceEdit(), this, this );
     break;
-  case List:
+  case Selector:
     item = new ListItem( title, resourceEdit(), this, this );
     break;
-  case RealSpin:
+  case DblSpin:
     item = new DoubleSpinItem( title, resourceEdit(), this, this );
     break;
-  case IntegerSpin:
+  case IntSpin:
     item = new IntegerSpinItem( title, resourceEdit(), this, this );
     break;
-  case RealEdit:
+  case Double:
     item = new DoubleEditItem( title, resourceEdit(), this, this );
     break;
-  case IntegerEdit:
+  case Integer:
     item = new IntegerEditItem( title, resourceEdit(), this, this );
     break;
   case Space:
@@ -418,11 +421,11 @@ void QtxListResourceEdit::Spacer::retrieve()
 
 QtxListResourceEdit::ListItem::ListItem( const QString& title, QtxResourceEdit* edit,
                                          Item* pItem, QWidget* parent )
-: PrefItem( List, edit, pItem, parent )
+: PrefItem( Selector, edit, pItem, parent )
 {
   new QLabel( title, this );
   myList = new QComboBox( false, this );
-  myList->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myList->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::ListItem::~ListItem()
@@ -526,7 +529,7 @@ QtxListResourceEdit::StateItem::StateItem( const QString& title, QtxResourceEdit
 : PrefItem( Bool, edit, pItem, parent )
 {
   myState = new QCheckBox( title, this );
-  myState->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myState->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::StateItem::~StateItem()
@@ -554,7 +557,7 @@ QtxListResourceEdit::StringItem::StringItem( const QString& title, QtxResourceEd
 {
   new QLabel( title, this );
   myString = new QLineEdit( this );
-  myString->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myString->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::StringItem::~StringItem()
@@ -577,12 +580,12 @@ void QtxListResourceEdit::StringItem::retrieve()
 */
 
 QtxListResourceEdit::IntegerEditItem::IntegerEditItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
-: PrefItem( IntegerEdit, edit, pItem, parent )
+: PrefItem( Integer, edit, pItem, parent )
 {
   new QLabel( title, this );
   myInteger = new QLineEdit( this );
   myInteger->setValidator( new QIntValidator( myInteger ) );
-  myInteger->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myInteger->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::IntegerEditItem::~IntegerEditItem()
@@ -605,11 +608,11 @@ void QtxListResourceEdit::IntegerEditItem::retrieve()
 */
 
 QtxListResourceEdit::IntegerSpinItem::IntegerSpinItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
-: PrefItem( IntegerSpin, edit, pItem, parent )
+: PrefItem( IntSpin, edit, pItem, parent )
 {
   new QLabel( title, this );
   myInteger = new QtxIntSpinBox( this );
-  myInteger->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myInteger->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::IntegerSpinItem::~IntegerSpinItem()
@@ -660,12 +663,12 @@ void QtxListResourceEdit::IntegerSpinItem::setProperty( const QString& name, con
 
 QtxListResourceEdit::DoubleEditItem::DoubleEditItem( const QString& title, QtxResourceEdit* edit,
                                                      Item* pItem, QWidget* parent )
-: PrefItem( RealEdit, edit, pItem, parent )
+: PrefItem( Double, edit, pItem, parent )
 {
   new QLabel( title, this );
   myDouble = new QLineEdit( this );
   myDouble->setValidator( new QDoubleValidator( myDouble ) );
-  myDouble->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myDouble->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::DoubleEditItem::~DoubleEditItem()
@@ -689,11 +692,11 @@ void QtxListResourceEdit::DoubleEditItem::retrieve()
 
 QtxListResourceEdit::DoubleSpinItem::DoubleSpinItem( const QString& title, QtxResourceEdit* edit,
                                                      Item* pItem, QWidget* parent )
-: PrefItem( RealSpin, edit, pItem, parent )
+: PrefItem( DblSpin, edit, pItem, parent )
 {
   new QLabel( title, this );
   myDouble = new QtxDblSpinBox( this );
-  myDouble->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myDouble->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::DoubleSpinItem::~DoubleSpinItem()
@@ -784,7 +787,7 @@ QtxListResourceEdit::ColorItem::ColorItem( const QString& title, QtxResourceEdit
 
   new QLabel( title, this );
   myColor = new ColorSelector( this );
-  myColor->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myColor->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::ColorItem::~ColorItem()
