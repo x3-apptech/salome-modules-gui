@@ -31,7 +31,6 @@ home.xpm \
 new.png \
 open.png \
 print.png \
-redo.png \
 reset.png \
 Application-Logo.png \
 Application-Splash.png \
@@ -40,7 +39,6 @@ save.png \
 select1.png \
 tile.png \
 Tools_en.xml \
-undo.png \
 view_back.png \
 view_bottom.png \
 view_camera_dump.png \
