@@ -108,6 +108,8 @@ void SUIT_Application::setDesktop( SUIT_Desktop* desk )
 
   delete myDesktop;
   myDesktop = desk;
+  connect( myDesktop, SIGNAL( activated() ), 
+	   this, SLOT( onDesktopActivated() ) );
 }
 
 SUIT_Study* SUIT_Application::createNewStudy()
@@ -295,4 +297,9 @@ void SUIT_Application::registerAction( const int id, QAction* a )
 QAction* SUIT_Application::separator()
 {
   return QtxActionMgr::separator();
+}
+
+void SUIT_Application::onDesktopActivated()
+{
+  emit activated( this );
 }

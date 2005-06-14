@@ -62,6 +62,7 @@ protected:
 
 private slots:
   void                         onApplicationClosed( SUIT_Application* );
+  void                         onApplicationActivated( SUIT_Application* ); 
 
 private:
   typedef QPtrList<SUIT_Application>         AppList;
@@ -77,6 +78,7 @@ private:
   SUIT_ResourceMgr*            myResMgr;
   AppList                      myAppList;
   AppLibMap                    myAppLibs;
+  SUIT_Application*            myActiveApp;
 
   SUIT_ExceptionHandler*       myHandler;
   static SUIT_Session*         mySession;

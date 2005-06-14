@@ -22,7 +22,8 @@ SUIT_Session* SUIT_Session::mySession = 0;
 SUIT_Session::SUIT_Session()
 : QObject(),
 myResMgr( 0 ),
-myHandler( 0 )
+myHandler( 0 ),
+myActiveApp( 0 )
 {
   SUIT_ASSERT( !mySession )
 
@@ -100,6 +101,8 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
 
   connect( anApp, SIGNAL( applicationClosed( SUIT_Application* ) ),
            this, SLOT( onApplicationClosed( SUIT_Application* ) ) );
+  connect( anApp, SIGNAL( activated( SUIT_Application* ) ), 
+	   this, SLOT( onApplicationActivated( SUIT_Application* ) ) );
 
   myAppList.append( anApp );
 
@@ -139,6 +142,7 @@ QPtrList<SUIT_Application> SUIT_Session::applications() const
 */
 SUIT_Application* SUIT_Session::activeApplication() const
 {
+  /*
   if ( myAppList.count() == 1 )
     return myAppList.getFirst();
 
@@ -162,6 +166,8 @@ SUIT_Application* SUIT_Session::activeApplication() const
     return 0;
 
   return study->application();
+  */
+  return myActiveApp;
 }
 
 /*!
@@ -181,6 +187,8 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
   emit applicationClosed( theApp );
 
   myAppList.remove( theApp );
+  if ( theApp == myActiveApp )
+    myActiveApp = 0;
 
   if ( myAppList.isEmpty() )
     qApp->quit();
@@ -255,4 +263,12 @@ QString SUIT_Session::applicationName( const QString& str ) const
 SUIT_ResourceMgr* SUIT_Session::createResourceMgr( const QString& appName ) const
 {
   return new SUIT_ResourceMgr( appName );
+}
+
+/*!
+  Slot, called on activation of some application's desktop
+*/
+void SUIT_Session::onApplicationActivated( SUIT_Application* app ) 
+{
+  myActiveApp = app;
 }

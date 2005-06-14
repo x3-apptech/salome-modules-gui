@@ -71,6 +71,7 @@ public:
 
 signals:
   void                  applicationClosed( SUIT_Application* );
+  void                  activated( SUIT_Application* );
 
 protected:
   SUIT_Application*     startApplication( int, char** ) const;
@@ -107,6 +108,9 @@ protected:
   QAction*              createAction( const int, const QString&, const QIconSet&, const QString&,
                                       const QString&, const int, QObject* = 0,
                                       const bool = false, QObject* = 0, const char* = 0 );
+
+private slots:
+  void                  onDesktopActivated();
 
 private:
   SUIT_Study*           myStudy;
