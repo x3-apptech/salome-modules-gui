@@ -80,6 +80,6 @@ CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES)
 
 LDFLAGS+=$(QT_MT_LIBS) $(CAS_KERNEL)
 
-LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -L/usr/X11R6/lib -lGLU
+LIBS+= -lsuit -L/usr/X11R6/lib -lGLU
 
 @CONCLUDE@

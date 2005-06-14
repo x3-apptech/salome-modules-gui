@@ -35,7 +35,7 @@ PO_FILES = OB_msg_en.po
 CPPFLAGS+=$(QT_INCLUDES)
 
 LDFLAGS+=$(QT_MT_LIBS)
-LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit
+LIBS+= -lsuit
 
 @CONCLUDE@
 

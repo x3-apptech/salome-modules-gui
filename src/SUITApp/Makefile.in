@@ -34,7 +34,8 @@ CPPFLAGS+=$(QT_INCLUDES) $(PYTHON_INCLUDES)
 LDFLAGS+=$(QT_MT_LIBS) 
 
 LIBS+= -Xlinker -export-dynamic $(PYTHON_LIBS)
-LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lqtx
+LIBS+= -lsuit -lqtx
+LIBSFORBIN+= -lsuit -lqtx
 
 @CONCLUDE@
 

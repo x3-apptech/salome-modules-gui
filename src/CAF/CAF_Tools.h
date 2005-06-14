@@ -6,7 +6,7 @@
 
 #include <CAF.h>
 
-#include <qt.h>
+#include <qnamespace.h>
 #include <qstring.h>
 #include <TCollection_ExtendedString.hxx>
 

@@ -32,6 +32,6 @@ LIB_CLIENT_IDL = SALOMEDS.idl \
 CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
 
 LDFLAGS+=$(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome
-LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lSalomeObject -lSalomePrs -lOCCViewer -lOpUtil
+LIBS+= -lsuit -lSalomeObject -lSalomePrs -lOCCViewer -lOpUtil
 
 @CONCLUDE@

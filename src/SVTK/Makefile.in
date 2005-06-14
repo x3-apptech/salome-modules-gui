@@ -53,6 +53,6 @@ LIB_CLIENT_IDL = SALOMEDS.idl \
 CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
 
 LDFLAGS+=$(QT_MT_LIBS) $(OCC_LIBS) $(VTK_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome
-LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer -lOpUtil
+LIBS+= -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer -lOpUtil
 
 @CONCLUDE@
