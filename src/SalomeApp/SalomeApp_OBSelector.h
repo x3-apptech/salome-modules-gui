@@ -5,12 +5,10 @@
 
 #include <SUIT_Selector.h>
 
-#include <qobject.h>
-
 class OB_Browser;
 class SalomeApp_DataObject;
 
-class SALOMEAPP_EXPORT SalomeApp_OBSelector : public QObject, public SUIT_Selector
+class SALOMEAPP_EXPORT SalomeApp_OBSelector : public SUIT_Selector
 {
   Q_OBJECT
 

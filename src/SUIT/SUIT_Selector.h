@@ -4,14 +4,16 @@
 #include "SUIT.h"
 
 #include <qvaluelist.h>
+#include <qobject.h>
 
 class SUIT_SelectionMgr;
 class SUIT_DataOwnerPtrList;
 
-class SUIT_EXPORT SUIT_Selector
+class SUIT_EXPORT SUIT_Selector : public QObject
 {
+  Q_OBJECT
 public:
-  SUIT_Selector( SUIT_SelectionMgr* );
+  SUIT_Selector( SUIT_SelectionMgr*, QObject* = 0 );
   virtual ~SUIT_Selector();
 
   virtual QString    type() const = 0;

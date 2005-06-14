@@ -7,11 +7,9 @@
 
 #include <OCCViewer_ViewModel.h>
 
-#include <qobject.h>
-
 class Handle_AIS_InteractiveObject;
 
-class SALOMEAPP_EXPORT SalomeApp_OCCSelector : public QObject, public SUIT_Selector
+class SALOMEAPP_EXPORT SalomeApp_OCCSelector : public SUIT_Selector
 {
   Q_OBJECT
 

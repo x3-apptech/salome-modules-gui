@@ -21,9 +21,6 @@ public:
   virtual void    selected( SUIT_DataOwnerPtrList&, const QString& = QString::null ) const;
   virtual void    setSelected( const SUIT_DataOwnerPtrList&, const bool = false );
 
-  virtual void    installSelector( SUIT_Selector* );
-  virtual void    removeSelector( SUIT_Selector* );
-
   void            selectors( QPtrList<SUIT_Selector>& ) const;
   void            selectors( const QString&, QPtrList<SUIT_Selector>& ) const;
 
@@ -63,6 +60,9 @@ protected:
   virtual void    selectionChanged( SUIT_Selector* );
 
   typedef QPtrListIterator<SUIT_Selector>        SelectorListIterator;
+
+  virtual void    installSelector( SUIT_Selector* );
+  virtual void    removeSelector( SUIT_Selector* );
 
 private:
   void            filterOwners( const SUIT_DataOwnerPtrList&, SUIT_DataOwnerPtrList& ) const;

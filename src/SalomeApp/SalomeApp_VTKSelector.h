@@ -1,8 +1,6 @@
 #ifndef SALOMEAPP_VTKSELECTOR_H
 #define SALOMEAPP_VTKSELECTOR_H
 
-#include <qobject.h>
-
 #include <vtkSmartPointer.h>
 
 #include <TColStd_IndexedMapOfInteger.hxx>
@@ -46,7 +44,7 @@ class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
 };
 
 
-class SALOMEAPP_EXPORT SalomeApp_VTKSelector : public QObject, public SUIT_Selector
+class SALOMEAPP_EXPORT SalomeApp_VTKSelector : public SUIT_Selector
 {
   Q_OBJECT;
 

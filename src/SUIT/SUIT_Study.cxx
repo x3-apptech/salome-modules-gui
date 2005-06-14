@@ -15,7 +15,7 @@ myName( "" )
 {
   static int _id = 0;
 
-  myId = _id++;
+  myId = ++_id;
 
   myRoot = new SUIT_DataObject();
   myOperations.setAutoDelete( false );

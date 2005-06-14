@@ -89,7 +89,8 @@ LIB_MOC = SUIT_ActionOperation.h \
 	  SUIT_ViewModel.h \
 	  SUIT_ViewWindow.h \
 	  SUIT_ViewManager.h \
-	  SUIT_SelectionMgr.h
+	  SUIT_SelectionMgr.h \
+          SUIT_Selector.h
 
 RESOURCES_FILES = \
 	cascade.png \

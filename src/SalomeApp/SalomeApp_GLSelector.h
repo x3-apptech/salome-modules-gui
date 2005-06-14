@@ -3,13 +3,11 @@
 
 #include "SalomeApp.h"
 
-#include <qobject.h>
-
 #include <SUIT_Selector.h>
 
 #include <GLViewer_Viewer2d.h>
 
-class SALOMEAPP_EXPORT SalomeApp_GLSelector : public QObject, public SUIT_Selector
+class SALOMEAPP_EXPORT SalomeApp_GLSelector : public SUIT_Selector
 {
   Q_OBJECT
 

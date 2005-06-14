@@ -7,9 +7,8 @@
 #include <GLViewer_Context.h>
 
 SalomeApp_GLSelector::SalomeApp_GLSelector( GLViewer_Viewer2d* viewer, SUIT_SelectionMgr* mgr )
-: QObject( 0 ),
-SUIT_Selector( mgr ),
-myViewer( viewer )
+: SUIT_Selector( mgr, viewer ),
+  myViewer( viewer )
 {
   if ( myViewer )
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );

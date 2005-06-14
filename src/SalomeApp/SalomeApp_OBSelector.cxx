@@ -8,9 +8,8 @@
 #include <SUIT_DataObjectIterator.h>
 
 SalomeApp_OBSelector::SalomeApp_OBSelector( OB_Browser* ob, SUIT_SelectionMgr* mgr )
-: QObject( 0 ),
-SUIT_Selector( mgr ),
-myBrowser( ob )
+: SUIT_Selector( mgr, ob ),
+  myBrowser( ob )
 {
   if ( myBrowser ) {
     connect( myBrowser, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );

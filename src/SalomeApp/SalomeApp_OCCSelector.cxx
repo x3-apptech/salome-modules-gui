@@ -9,9 +9,8 @@
 
 
 SalomeApp_OCCSelector::SalomeApp_OCCSelector( OCCViewer_Viewer* viewer, SUIT_SelectionMgr* mgr )
-: QObject( 0 ),
-SUIT_Selector( mgr ),
-myViewer( viewer )
+: SUIT_Selector( mgr, viewer ),
+  myViewer( viewer )
 {
   if ( myViewer )
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );

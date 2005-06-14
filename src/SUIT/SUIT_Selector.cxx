@@ -2,8 +2,9 @@
 
 #include "SUIT_SelectionMgr.h"
 
-SUIT_Selector::SUIT_Selector( SUIT_SelectionMgr* selMgr )
-: mySelMgr( selMgr ),
+SUIT_Selector::SUIT_Selector( SUIT_SelectionMgr* selMgr, QObject* parent ) :
+QObject( parent ), 
+mySelMgr( selMgr ),
 myBlock( false ),
 myEnabled( true ),
 myAutoBlock( true )

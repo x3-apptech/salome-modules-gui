@@ -8,6 +8,7 @@ myIsSelChangeEnabled( true )
 
 SUIT_SelectionMgr::~SUIT_SelectionMgr()
 {
+  mySelectors.setAutoDelete( true );
 }
 
 void SUIT_SelectionMgr::installSelector( SUIT_Selector* sel )

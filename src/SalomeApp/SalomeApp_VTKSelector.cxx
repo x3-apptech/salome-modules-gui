@@ -44,8 +44,7 @@ SalomeApp_SVTKDataOwner
 SalomeApp_VTKSelector
 ::SalomeApp_VTKSelector( SVTK_Viewer* viewer, 
 			 SUIT_SelectionMgr* mgr ): 
-  QObject( 0 ),
-  SUIT_Selector( mgr ),
+  SUIT_Selector( mgr, viewer ),
   myViewer( viewer )
 {
   if ( myViewer )
