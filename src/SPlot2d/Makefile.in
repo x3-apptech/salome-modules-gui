@@ -30,6 +30,9 @@ LIB_MOC = \
 	   SPlot2d_ViewModel.h \
 	   SPlot2d_SetupPlot2dDlg.h
 
+LIB_CLIENT_IDL = SALOMEDS.idl \
+		 SALOME_Exception.idl \
+		 SALOME_GenericObj.idl
 
 #LIB_CLIENT_IDL = SALOMEDS.idl \
 #		 SALOME_ModuleCatalog.idl \
