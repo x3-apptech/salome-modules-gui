@@ -53,7 +53,7 @@ public:
   typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
 
   enum { ModulesListId = STD_Application::UserID, NewGLViewId,
-         NewPlot2dId, NewOCCViewId, NewVTKViewId, LoadScriptId, UserID };
+         NewPlot2dId, NewOCCViewId, NewVTKViewId, LoadScriptId, PropertiesId, UserID };
 
 public:
   SalomeApp_Application();
@@ -136,6 +136,7 @@ private slots:
   void                                onStudyClosed( SUIT_Study* );
   
   void                                onLoadScript(); 
+  void                                onProperties();
 
 private:
   void                                updateWindows();

@@ -155,3 +155,49 @@ msgstr "Load script..."
 
 msgid "PRP_DESK_FILE_LOAD_SCRIPT"
 msgstr "Loads python script from file"
+
+msgid "TOT_DESK_FILE_PROPERTIES"
+msgstr "Study properties"
+
+msgid "MEN_DESK_FILE_PROPERTIES"
+msgstr "Properties..."
+
+msgid "PRP_DESK_FILE_PROPERTIES"
+msgstr "Edits study properties"
+
+
+
+## SalomeApp_StudyPropertiesDlg
+msgid "PRP_MODE_FROM_SCRATCH"
+msgstr "from scratch"
+
+msgid "PRP_MODE_FROM_COPYFROM"
+msgstr "copy from"
+
+msgid "PRP_NO"
+msgstr "No"
+
+msgid "PRP_YES"
+msgstr "Yes"
+
+msgid "TLT_STUDY_PROPERTIES"
+msgstr "Study Properties"
+
+msgid "PRP_AUTHOR"
+msgstr "Author"
+
+msgid "PRP_DATE"
+msgstr "Date"
+
+msgid "PRP_MODE"
+msgstr "Mode"
+
+msgid "PRP_LOCKED"
+msgstr "LOCKED"
+
+msgid "PRP_MODIFIED"
+msgstr "MODIFIED"
+
+msgid "PRP_MODIFICATIONS"
+msgstr "Modifications"
+

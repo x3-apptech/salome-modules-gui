@@ -18,6 +18,7 @@
 #include "SalomeApp_AboutDlg.h"
 #include "SalomeApp_ModuleDlg.h"
 #include "SalomeApp_PreferencesDlg.h"
+#include "SalomeApp_StudyPropertiesDlg.h"
 
 #include "SalomeApp_GLSelector.h"
 #include "SalomeApp_OBSelector.h"
@@ -263,6 +264,12 @@ void SalomeApp_Application::createActions()
 		0, desk, false, this, SLOT( onLoadScript() ) );
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
+
+  createAction( PropertiesId, tr( "TOT_DESK_FILE_PROPERTIES" ), QIconSet(),
+	        tr( "MEN_DESK_FILE_PROPERTIES" ), tr( "PRP_DESK_FILE_PROPERTIES" ),
+	        0, desk, false, this, SLOT( onProperties() ) );
+  createMenu( PropertiesId, fileMenu, 10, -1 );
+
   
   // default icon for neutral point ('SALOME' module)
   QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
@@ -530,6 +537,10 @@ void SalomeApp_Application::updateCommandsStatus()
   // Load script menu
   QAction* a = action( LoadScriptId );
   if ( a )
+    a->setEnabled( activeStudy() );
+  
+  a = action( PropertiesId );
+  if( a )
     a->setEnabled( activeStudy() );
 }
 
@@ -1091,4 +1102,23 @@ void SalomeApp_Application::activateWindows()
     for ( WindowMap::Iterator itr = myWindows.begin(); itr != myWindows.end(); ++itr )
       itr.data()->activate( activeStudy()->id() );
   }
+}
+
+void SalomeApp_Application::onProperties()
+{
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+  if( !study )
+    return;
+
+  _PTR(StudyBuilder) SB = study->studyDS()->NewBuilder();
+  SB->NewCommand();
+
+  SalomeApp_StudyPropertiesDlg aDlg( desktop() );
+  int res = aDlg.exec();
+  if( res==QDialog::Accepted && aDlg.isChanged() )
+    SB->CommitCommand();
+  else
+    SB->AbortCommand();
+
+  //study->updateCaptions();
 }
