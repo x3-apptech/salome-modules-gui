@@ -53,7 +53,7 @@
     <parameter name="icon"       value="ModuleVisu.png"/>
   </section>
   <section name="SUPERV">
-    <parameter name="name"       value="Supervision"/>
+    <parameter name="name"       value="Supervisor"/>
     <parameter name="icon"       value="ModuleSupervision.png"/>
   </section>
   <section name="MED">
