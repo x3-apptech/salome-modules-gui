@@ -83,7 +83,7 @@ myPrecision( 0 )
   rangeChange();
   updateDisplay();
 
-  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
+  //connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::QtxDblSpinBox( double min, double max, double step, QWidget* parent, const char* name )
@@ -100,7 +100,7 @@ myPrecision( 0 )
   rangeChange();
   updateDisplay();
 
-  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
+  //connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::~QtxDblSpinBox()
@@ -177,6 +177,8 @@ void QtxDblSpinBox::setLineStep( double step )
 
 double QtxDblSpinBox::value() const
 {
+  QtxDblSpinBox* _this = ( QtxDblSpinBox* )this;
+  _this->clearFocus();
   return myValue;
 }
 
