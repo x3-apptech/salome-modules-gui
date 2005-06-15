@@ -714,15 +714,20 @@ SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, 
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
   SUIT_ViewManager* anActiveVM = CAM_Application::activeViewManager();
+
   if ( anActiveVM && anActiveVM->getType() == vmType )
     aVM = anActiveVM;
-  else if ( aVM )
+
+  if ( aVM && create )
   {
     if ( !aVM->getActiveView() )
       aVM->createView();
+    else
+      aVM->getActiveView()->setFocus();
   }
   else if ( create )
     aVM = createViewManager( vmType );
+
   return aVM;
 }
 
