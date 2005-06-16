@@ -877,7 +877,7 @@ void OB_Browser::onExpand()
 
 void OB_Browser::onRefresh()
 {
-  updateTree( 0, true );
+  updateTree( getRootObject(), true );
 }
 
 void OB_Browser::onColumnVisible( int id )
