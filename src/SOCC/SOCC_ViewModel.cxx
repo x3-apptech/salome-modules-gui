@@ -550,7 +550,13 @@ bool SOCC_Viewer::getTrihedronSize( double& theNewSize, double& theSize )
   theNewSize = 100;
   theSize = 100;
 
-  Handle(V3d_View) view3d = getViewer3d()->ActiveView();
+  //SRN: BUG IPAL8996, a usage of method ActiveView without an initialization
+  Handle(V3d_Viewer) viewer = getViewer3d();
+  viewer->InitActiveViews();
+  if(!viewer->MoreActiveViews()) return false;
+
+  Handle(V3d_View) view3d = viewer->ActiveView();
+  //SRN: END of fix
 
   if ( view3d.IsNull() )
     return false;
