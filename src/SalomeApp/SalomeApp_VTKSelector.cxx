@@ -120,7 +120,10 @@ SalomeApp_VTKSelector
 	    if(const SalomeApp_SVTKDataOwner* anOwner = dynamic_cast<const SalomeApp_SVTKDataOwner*>(aDataOwner)){
 	      aSelector->SetSelectionMode(anOwner->GetMode());
 	      Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
-	      aSelector->AddIObject(anIO);
+	      if( anOwner->GetActor() )
+		aSelector->AddIObject( anOwner->GetActor() );
+	      else
+		aSelector->AddIObject(anIO);
 	      anAppendList.Append(anIO);
 	      aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);
 	      if(MYDEBUG) MESSAGE("VTKSelector::setSelection - SVTKDataOwner - "<<anIO->getEntry());
