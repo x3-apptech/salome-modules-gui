@@ -462,12 +462,12 @@ SPlot2d_ItemContainer::SPlot2d_ItemContainer( QObject* parent, const char* name 
 void SPlot2d_ItemContainer::createWidgets( QWidget* parentWidget )
 {
   myHBtn = new QToolButton( parentWidget );
-  myHBtn->setText( tr( " H " ) );
+  myHBtn->setText( tr( "H" ) );
   myHBtn->setToggleButton( true );
   myHBtn->setOn( false );
 
   myVBtn = new QToolButton( parentWidget );
-  myVBtn->setText( tr( " V " ) );
+  myVBtn->setText( tr( "V" ) );
   myVBtn->setToggleButton( true );
   myVBtn->setOn( false );
   

@@ -1,0 +1,128 @@
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2005-06-16 12:01:13 PM MSD\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:71
+msgid "ATTRIBUTES_LBL"
+msgstr "Attributes"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:68
+msgid "AXIS_LBL"
+msgstr "Axis"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:188
+msgid "BUT_CANCEL"
+msgstr "Cancel"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:185
+msgid "BUT_OK"
+msgstr "Ok"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:69
+msgid "DATA_LBL"
+msgstr "Data"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:49
+msgid "TLT_SETUP_PLOT2D"
+msgstr "Setup Plot 2d"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:70
+msgid "UNITS_LBL"
+msgstr "Units"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:445
+msgid "SPlot2d_ItemContainer::H"
+msgstr " H "
+
+#: SPlot2d_SetupPlot2dDlg.cxx:450
+msgid "SPlot2d_ItemContainer::V"
+msgstr " V "
+
+#: SPlot2d_SetupPlot2dDlg.cxx:458
+msgid "SPlot2d_ItemContainer::AUTO_CHECK_LBL"
+msgstr "Auto assign"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:475
+msgid "SPlot2d_ItemContainer::CIRCLE_MARKER_LBL"
+msgstr "Circle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:482
+msgid "SPlot2d_ItemContainer::CROSS_MARKER_LBL"
+msgstr "Cross"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:467
+msgid "SPlot2d_ItemContainer::DAHSDOTDOT_LINE_LBL"
+msgstr "DashDotDot"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:466
+msgid "SPlot2d_ItemContainer::DASHDOT_LINE_LBL"
+msgstr "DashDot"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:464
+msgid "SPlot2d_ItemContainer::DASH_LINE_LBL"
+msgstr "Dash"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:477
+msgid "SPlot2d_ItemContainer::DIAMOND_MARKER_LBL"
+msgstr "Diamond"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:465
+msgid "SPlot2d_ItemContainer::DOT_LINE_LBL"
+msgstr "Dot"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:478
+msgid "SPlot2d_ItemContainer::DTRIANGLE_MARKER_LBL"
+msgstr "Downward triangle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:480
+msgid "SPlot2d_ItemContainer::LTRIANGLE_MARKER_LBL"
+msgstr "Leftward triangle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:462
+msgid "SPlot2d_ItemContainer::NONE_LINE_LBL"
+msgstr "None"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:474
+msgid "SPlot2d_ItemContainer::NONE_MARKER_LBL"
+msgstr "None"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:476
+msgid "SPlot2d_ItemContainer::RECTANGLE_MARKER_LBL"
+msgstr "Rectangle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:481
+msgid "SPlot2d_ItemContainer::RTRIANGLE_MARKER_LBL"
+msgstr "Rightward triangle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:463
+msgid "SPlot2d_ItemContainer::SOLID_LINE_LBL"
+msgstr "Solid"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:479
+msgid "SPlot2d_ItemContainer::UTRIANGLE_MARKER_LBL"
+msgstr "Upward triangle"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:483
+msgid "SPlot2d_ItemContainer::XCROSS_MARKER_LBL"
+msgstr "Diagonal cross"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:404
+msgid "SPlot2d_SetupPlot2dDlg::BUT_NO"
+msgstr "No"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:403
+msgid "SPlot2d_SetupPlot2dDlg::BUT_YES"
+msgstr "Yes"
+
+#: SPlot2d_SetupPlot2dDlg.cxx:402
+msgid "SPlot2d_SetupPlot2dDlg::QUE_WANT_SAME_UNITS"
+msgstr "Do you want to choose all items with the same units for vertical axis?"
+

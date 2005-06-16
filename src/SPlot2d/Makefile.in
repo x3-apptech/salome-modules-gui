@@ -15,7 +15,7 @@ EXPORT_HEADERS = \
 	   SPlot2d_SetupPlot2dDlg.h
 
 # .po files to transform in .qm
-#PO_FILES = \
+PO_FILES = SPlot2d_msg_en.po
 
 # Libraries targets
 
