@@ -88,7 +88,7 @@ public:
 			    aYears [i], 
 			    aHours [i], 
 			    aMins  [i]);
-		val = val + " : " + QString(aUsers[i]);
+		val = val + " : " + QString(aUsers[i].c_str());
 		list.prepend(val);
 	      }
 	      theWidget->setDuplicatesEnabled(true);
@@ -169,7 +169,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
   // Study author's name
   SalomeApp_PropItem* item = new SalomeApp_PropItem(myPropList, tr("PRP_AUTHOR")+":", true, prpAuthorId);
   if (hasData)
-    item->setValue(propAttr->GetUserName());
+    item->setValue(propAttr->GetUserName().c_str());
 
   // Date of creation
   item = new SalomeApp_PropItem(myPropList, item, tr("PRP_DATE")+":", false, prpDateId);
@@ -217,7 +217,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
 		  aYears [aLast], 
 		  aHours [aLast], 
 		  aMins  [aLast]);
-      val = val + " : " + QString(aUsers[aUsers.size()-1]);
+      val = val + " : " + QString(aUsers[aUsers.size()-1].c_str());
       item->setValue(val);
     }
   }
@@ -270,12 +270,12 @@ bool SalomeApp_StudyPropertiesDlg::propChanged() {
       SalomeApp_PropItem* item = (SalomeApp_PropItem*)(it.current());
       switch (item->getUserType()) {
       case prpAuthorId:
-	if ( QString( propAttr->GetUserName() ) != item->getValue().stripWhiteSpace() ) {
+	if ( QString( propAttr->GetUserName().c_str() ) != item->getValue().stripWhiteSpace() ) {
 	  return true;
 	}
 	break;
       case prpModeId:
-	if ( QString( propAttr->GetCreationMode() ) != item->getValue().stripWhiteSpace() ) {
+	if ( QString( propAttr->GetCreationMode().c_str() ) != item->getValue().stripWhiteSpace() ) {
 	  return true;
         }
 	break;
