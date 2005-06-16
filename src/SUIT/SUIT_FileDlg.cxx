@@ -12,6 +12,7 @@
 #include <qregexp.h>
 #include <qpalette.h>
 #include <qobjectlist.h>
+#include <qcombobox.h>
 #include <qpushbutton.h>
 #include <qapplication.h>
 
@@ -25,71 +26,80 @@ Constructor
 SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool modal ) :
 QFileDialog( parent, 0, modal ),
 myValidator( 0 ),
-myQuickCombo( 0 ),
+myQuickCombo( 0 ), myQuickButton( 0 ), myQuickLab( 0 ),
 myOpen( open )
 {    
   if ( parent->icon() )
     setIcon( *parent->icon() );       
   setSizeGripEnabled( true );
   
-  if (showQuickDir) {
+  if ( showQuickDir ) {
     // inserting quick dir combo box
-    QLabel* lab  = new QLabel(tr("Quick path:"), this);
+    myQuickLab  = new QLabel(tr("LAB_QUICK_PATH"), this);
     myQuickCombo = new QComboBox(false, this);
     myQuickCombo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     myQuickCombo->setMinimumSize(MIN_COMBO_SIZE, 0);
     
-    // the following is a workaround for proper layouting of custom widgets ===========
-    QPushButton* btn = new QPushButton(this);
-    btn->setEnabled(false);
-    QPalette pal = btn->palette();
-    QColorGroup ca = pal.active();
-    ca.setColor(QColorGroup::Light,    palette().active().background());
-    ca.setColor(QColorGroup::Midlight, palette().active().background());
-    ca.setColor(QColorGroup::Dark,     palette().active().background());
-    ca.setColor(QColorGroup::Mid,      palette().active().background());
-    ca.setColor(QColorGroup::Shadow,   palette().active().background());
-    QColorGroup ci = pal.inactive();
-    ci.setColor(QColorGroup::Light,    palette().inactive().background());
-    ci.setColor(QColorGroup::Midlight, palette().inactive().background());
-    ci.setColor(QColorGroup::Dark,     palette().inactive().background());
-    ci.setColor(QColorGroup::Mid,      palette().inactive().background());
-    ci.setColor(QColorGroup::Shadow,   palette().inactive().background());
-    QColorGroup cd = pal.disabled();
-    cd.setColor(QColorGroup::Light,    palette().disabled().background());
-    cd.setColor(QColorGroup::Midlight, palette().disabled().background());
-    cd.setColor(QColorGroup::Dark,     palette().disabled().background());
-    cd.setColor(QColorGroup::Mid,      palette().disabled().background());
-    cd.setColor(QColorGroup::Shadow,   palette().disabled().background());
-    pal.setActive(ca); pal.setInactive(ci); pal.setDisabled(cd);
-    btn->setPalette(pal);
-    // ================================================================================
+    myQuickButton = new QPushButton(tr("BUT_ADD_PATH"), this);
 
-    connect(myQuickCombo, SIGNAL(activated(const QString&)), this, SLOT(quickDir(const QString&)));
-    addWidgets(lab, myQuickCombo, btn);
+    connect(myQuickCombo,  SIGNAL(activated(const QString&)), this, SLOT(quickDir(const QString&)));
+    connect(myQuickButton, SIGNAL(clicked()),                 this, SLOT(addQuickDir()));
+    addWidgets(myQuickLab, myQuickCombo, myQuickButton);
 
     // getting dir list from settings
     QString dirs;
     SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
     if ( resMgr )
-      dirs = resMgr->stringValue( "FileDlg", "QuickDirList" );
+      dirs = resMgr->stringValue( "FileDlg", QString( "QuickDirList" ) );
 
     QStringList dirList = QStringList::split(';', dirs, false);
     if (dirList.count() > 0) {
       for (unsigned i = 0; i < dirList.count(); i++)
-	      myQuickCombo->insertItem(dirList[i]);
+        myQuickCombo->insertItem(dirList[i]);
     }
     else {
       myQuickCombo->insertItem(QDir::homeDirPath());
     }
+  }
+  setMode( myOpen ? ExistingFile : AnyFile );     
+  setCaption( myOpen ? tr( "INF_DESK_DOC_OPEN" ) : tr( "INF_DESK_DOC_SAVE" ) );
 
-    // the following is a workaround for proper layouting of custom widgets ===========
+  // If last visited path doesn't exist -> switch to the first preferred path
+  if ( !myLastVisitedPath.isEmpty() ) {
+    if ( !processPath( myLastVisitedPath ) && showQuickDir )
+      processPath( myQuickCombo->text( 0 ) );
+  }
+  else {
+    if ( showQuickDir )
+      processPath(myQuickCombo->text( 0 ) );
+  } 
+
+  // set default file validator
+  myValidator = new SUIT_FileValidator(this);
+}
+
+/*!
+Destructor
+*/
+SUIT_FileDlg::~SUIT_FileDlg() 
+{
+  setValidator( 0 );
+}
+
+/*!
+  Redefined from QFileDialog.
+*/
+void SUIT_FileDlg::polish()
+{
+  QFileDialog::polish();
+  if ( myQuickButton && myQuickLab ) {
+    // the following is a workaround for proper layouting of custom widgets
     QValueList<QPushButton*> buttonList;
     QValueList<QLabel*> labelList;
     const QObjectList *list = children();
     QObjectListIt it(*list);
-    int maxButWidth = lab->sizeHint().width();
-    int maxLabWidth = btn->sizeHint().width();
+    int maxButWidth = myQuickLab->sizeHint().width();
+    int maxLabWidth = myQuickButton->sizeHint().width();
     
     for (; it.current() ; ++it) {
       if ( it.current()->isA( "QLabel" ) ) {
@@ -113,40 +123,16 @@ myOpen( open )
       for ( lListIt = labelList.begin(); lListIt != labelList.end(); ++lListIt )
 	(*lListIt)->setFixedWidth( maxLabWidth );
     }
-    // ================================================================================
   }
-  setMode( myOpen ? ExistingFile : AnyFile );     
-  setCaption( myOpen ? tr( "INF_DESK_DOC_OPEN" ) : tr( "INF_DESK_DOC_SAVE" ) );
-
-  if (showQuickDir) {
-    if (myLastVisitedPath.isNull() || myLastVisitedPath.isEmpty()) {
-      // If no last visited path exists -> switch to the first preferred path
-      processPath(myQuickCombo->text(0));
-    } 
-    else if ( !processPath(myLastVisitedPath) ) {
-      // If last visited path doesn't exist -> switch to the first preferred path
-      processPath(myQuickCombo->text(0));
-    }
-  }
-
-  myValidator = new SUIT_FileValidator(this);
-  
-}
-
-/*!
-Destructor
-*/
-SUIT_FileDlg::~SUIT_FileDlg() 
-{
 }
 
 /*!
 Sets validator for file names to open/save
-Deletes previous validator
+Deletes previous validator if the dialog owns it.
 */
 void SUIT_FileDlg::setValidator( SUIT_FileValidator* v )
 {
-  if (myValidator)
+  if ( myValidator && myValidator->parent() == this )
     delete myValidator;
   myValidator = v;
 }
@@ -175,8 +161,10 @@ if the selected name is valid ( see 'acceptData()' )
 void SUIT_FileDlg::accept()
 {
 //  mySelectedFile = QFileDialog::selectedFile().simplifyWhiteSpace(); //VSR- 06/12/02
-  mySelectedFile = QFileDialog::selectedFile(); //VSR+ 06/12/02
-  addExtension();
+  if ( mode() != ExistingFiles ) {
+    mySelectedFile = QFileDialog::selectedFile(); //VSR+ 06/12/02
+    addExtension();
+  }
 //  mySelectedFile = mySelectedFile.simplifyWhiteSpace(); //VSR- 06/12/02
 
   /* Qt 2.2.2 BUG: accept() is called twice if you validate 
@@ -209,7 +197,17 @@ bool SUIT_FileDlg::acceptData()
   if ( myValidator )
   {
     if ( isOpenDlg() )
-      return myValidator->canOpen( selectedFile() );
+      if ( mode() == ExistingFiles ) {
+	QStringList fileNames = selectedFiles();
+	for ( int i = 0; i < fileNames.count(); i++ ) {
+	  if ( !myValidator->canOpen( fileNames[i] ) )
+	    return false;
+	}
+	return true;
+      }
+      else {
+	return myValidator->canOpen( selectedFile() );
+      }
     else 
       return myValidator->canSave( selectedFile() );
   }
@@ -264,7 +262,7 @@ void SUIT_FileDlg::addExtension()
       
       if ( anExtRExp.match(anExt) == -1 ) //if a selected file extension does not match to filter's list
 	{ //remove a point if it is at the word end
-    int aExtLen = anExt.length();
+          int aExtLen = anExt.length();
 	  if (anExt[ aExtLen - 1 ] == '.')  anExt.truncate( aExtLen - 1 );
 	  index = wildcard.findRev( '.' );    
 	  if ( index >= 0 ) 
@@ -291,6 +289,7 @@ bool SUIT_FileDlg::processPath( const QString& path )
     else {
       if ( QFileInfo( fi.dirPath() ).exists() ) {
 	setDir( fi.dirPath() );
+	setSelection( path );
 	return true;
       }
     }
@@ -313,17 +312,54 @@ void SUIT_FileDlg::quickDir(const QString& dirPath)
     processPath(dirPath);
   }
 }
-
+/*!
+  Called when user presses "Add" button - adds current directory to quick directory
+  list and to the preferences
+*/
+void SUIT_FileDlg::addQuickDir()
+{
+  QString dp = dirPath();
+  if ( !dp.isEmpty() ) {
+    QDir dir( dp );
+    // getting dir list from settings
+    QString dirs;
+    SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+    if ( resMgr )
+      dirs = resMgr->stringValue( "FileDlg", QString( "QuickDirList" ) );
+    QStringList dirList = QStringList::split(';', dirs, false);
+    bool found = false;
+    bool emptyAndHome = false;
+    if ( dirList.count() > 0 ) {
+      for ( unsigned i = 0; i < dirList.count(); i++ ) {
+	QDir aDir( dirList[i] );
+	if ( aDir.canonicalPath().isNull() && dirList[i] == dir.absPath() ||
+	    !aDir.canonicalPath().isNull() && aDir.exists() && aDir.canonicalPath() == dir.canonicalPath() ) {
+	  found = true;
+	  break;
+	}
+      }
+    }
+    else {
+      emptyAndHome = dir.canonicalPath() == QDir(QDir::homeDirPath()).canonicalPath();
+    }
+    if ( !found ) {
+      dirList.append( dp );
+      resMgr->setValue( "FileDlg", QString( "QuickDirList" ), dirList.join(";") );
+      if ( !emptyAndHome )
+	myQuickCombo->insertItem( dp );
+    }
+  }
+}
 /*!
   Returns the file name for Open/Save [ static ]
 */
-QString SUIT_FileDlg::getFileName( QWidget*           parent, 
-				  const QString&     initial, 
-                                  const QStringList& filters, 
-                                  const QString&     caption,
-                                  bool               open,
-				  bool               showQuickDir, 
-				  SUIT_FileValidator* validator )
+QString SUIT_FileDlg::getFileName( QWidget*            parent, 
+				   const QString&      initial, 
+                                   const QStringList&  filters, 
+                                   const QString&      caption,
+                                   bool                open,
+				   bool                showQuickDir, 
+				   SUIT_FileValidator* validator )
 {            
   SUIT_FileDlg* fd = new SUIT_FileDlg( parent, open, showQuickDir, true );    
   if ( !caption.isEmpty() )
@@ -341,10 +377,38 @@ QString SUIT_FileDlg::getFileName( QWidget*           parent,
   return filename;
 }
 
+
+/*!
+  Returns the list of files to be opened [ static ]
+*/
+QStringList SUIT_FileDlg::getOpenFileNames( QWidget*            parent, 
+					    const QString&      initial, 
+					    const QStringList&  filters, 
+					    const QString&      caption,
+					    bool                showQuickDir, 
+					    SUIT_FileValidator* validator )
+{            
+  SUIT_FileDlg* fd = new SUIT_FileDlg( parent, true, showQuickDir, true );    
+  fd->setMode( ExistingFiles );     
+  if ( !caption.isEmpty() )
+    fd->setCaption( caption );
+  if ( !initial.isEmpty() ) { 
+    fd->processPath( initial ); // VSR 24/03/03 check for existing of directory has been added to avoid QFileDialog's bug
+  }
+  fd->setFilters( filters );        
+  if ( validator )
+    fd->setValidator( validator );
+  fd->exec();
+  QStringList filenames = fd->selectedFiles();
+  delete fd;
+  qApp->processEvents();
+  return filenames;
+}
+
 /*!
   Existing directory selection dialog [ static ]
 */
-QString SUIT_FileDlg::getExistingDirectory ( QWidget*       parent,
+QString SUIT_FileDlg::getExistingDirectory( QWidget*       parent,
 					    const QString& initial,
 					    const QString& caption, 
 					    bool           showQuickDir )
@@ -356,7 +420,7 @@ QString SUIT_FileDlg::getExistingDirectory ( QWidget*       parent,
     fd->processPath( initial ); // VSR 24/03/03 check for existing of directory has been added to avoid QFileDialog's bug
   }
   fd->setMode( DirectoryOnly );
-  fd->setFilters(tr("DIRECTORIES_FILTER"));
+  fd->setFilters(tr("INF_DIRECTORIES_FILTER"));
   fd->exec();
   QString dirname = fd->selectedFile();
   delete fd;

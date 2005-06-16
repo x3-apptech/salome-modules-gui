@@ -99,6 +99,8 @@ protected:
 
   virtual void          setActiveViewManager( SUIT_ViewManager* );
 
+  virtual QString       getFileName( bool );
+
 private:
   ViewManagerList       myViewMgrs;
   SUIT_ViewManager*     myActiveViewMgr;

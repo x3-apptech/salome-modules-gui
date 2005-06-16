@@ -225,7 +225,7 @@ void STD_Application::onNewDoc()
 void STD_Application::onOpenDoc()
 {
   // It is preferrable to use OS-specific file dialog box here !!!
-  QString aName = QFileDialog::getOpenFileName( QString::null, getFileFilter(), desktop() );
+  QString aName = getFileName( true );
   if ( aName.isNull() )
     return;
 
@@ -364,59 +364,16 @@ bool STD_Application::onSaveAsDoc()
   if ( !study )
     return false;
 
-  QString aName;
-  QString aUsedFilter;
-  QString anOldPath = study->studyName();
-
-  bool isOk = false;
-  while ( !isOk )
-  {
-    // It is preferrable to use OS-specific file dialog box here !!!
-    aName = QFileDialog::getSaveFileName( anOldPath, getFileFilter(), desktop(),
-                                          0, QString::null, &aUsedFilter);
-
-    if ( aName.isNull() )
-      isOk = true;
-    else
-    {
-      if ( !getFileFilter().isNull() ) // check exstension and add if it is necessary
-      {
-	int aStart = aUsedFilter.find( '*' );
-	int aEnd = aUsedFilter.find( ')', aStart + 1 );
-	QString aExt = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
-	if ( aExt.contains( '*' ) == 0 ) // if it is not *.*
-	{
-	  // Check that there is an extension at the end of the name
-	  QString aNameTail = aName.right( aExt.length() );
-          if ( aNameTail != aExt )
-            aName += aExt;
-	}
-      }
-      if ( QFileInfo( aName ).exists() )
-      {
-	int aAnswer = SUIT_MessageBox::warn2( desktop(), tr( "TIT_FILE_SAVEAS" ),
-					      tr( "MSG_FILE_EXISTS" ).arg( aName ),
-					      tr( "BUT_YES" ), tr( "BUT_NO" ), 1, 2, 2 );
-	if ( aAnswer != 2 )
-	  isOk = true;
-	else
-	  anOldPath = aName; // Not to return to the same initial dir at each "while" step
-      }
-      else
-	isOk = true;
-
-      if ( isOk )
-	isOk = study->saveDocumentAs( aName );
-    }
-  }
+  QString aName = getFileName( false );
 
   if ( aName.isNull() ) 
     return false;
+  bool isOk = study->saveDocumentAs( aName );
 
   updateDesktopTitle();
   updateCommandsStatus();
 
-  return true;
+  return isOk;
 }
 
 void STD_Application::onExit()
@@ -631,4 +588,63 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   if ( popup->count() )
     popup->exec( e->globalPos() );
   delete popup;
+}
+
+QString STD_Application::getFileName( bool open )
+{
+  if ( open ) 
+  {
+    return QFileDialog::getOpenFileName( QString::null, getFileFilter(), desktop() );
+  }
+  else
+  {
+    SUIT_Study* study = activeStudy();
+    QString aName;
+    QString aUsedFilter;
+    QString anOldPath = study->studyName();
+
+    bool isOk = false;
+    while ( !isOk )
+    {
+      // It is preferrable to use OS-specific file dialog box here !!!
+      aName = QFileDialog::getSaveFileName( anOldPath, getFileFilter(), desktop(),
+					    0, QString::null, &aUsedFilter);
+
+      if ( aName.isNull() )
+        isOk = true;
+      else
+      {
+        if ( !getFileFilter().isNull() ) // check extension and add if it is necessary
+        {
+	  int aStart = aUsedFilter.find( '*' );
+	  int aEnd = aUsedFilter.find( ')', aStart + 1 );
+	  QString aExt = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
+	  if ( aExt.contains( '*' ) == 0 ) // if it is not *.*
+	  {
+	    // Check that there is an extension at the end of the name
+  	    QString aNameTail = aName.right( aExt.length() );
+	    if ( aNameTail != aExt )
+              aName += aExt;
+	  }
+        }
+	if ( QFileInfo( aName ).exists() )
+        {
+	  int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TIT_FILE_SAVEAS" ),
+					        tr( "MSG_FILE_EXISTS" ).arg( aName ),
+					        tr( "BUT_YES" ), tr( "BUT_NO" ), tr( "BUT_CANCEL" ), 1, 2, 3, 1 );
+	  if ( aAnswer == 3 ) {     // cancelled
+            aName = QString::null;
+	    isOk = true;
+          }
+	  else if ( aAnswer == 2 ) // not save to this file
+	    anOldPath = aName;             // not to return to the same initial dir at each "while" step
+	  else                     // overwrite the existing file
+	    isOk = true;
+        }
+	else
+	  isOk = true;
+      }
+    }
+    return aName;
+  }
 }

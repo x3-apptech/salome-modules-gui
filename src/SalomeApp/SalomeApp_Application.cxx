@@ -843,7 +843,7 @@ void SalomeApp_Application::onLoadScript( )
   filtersList.append(tr("PYTHON_FILES_FILTER"));
   filtersList.append(tr("ALL_FILES_FILTER"));
   
-  QString aFile = SUIT_FileDlg::getFileName(desktop(), "", filtersList, tr("TOT_DESK_FILE_LOAD_SCRIPT"), true, false);
+  QString aFile = SUIT_FileDlg::getFileName(desktop(), "", filtersList, tr("TOT_DESK_FILE_LOAD_SCRIPT"), true, true );
   if(!aFile.isEmpty()) {
     QString command = QString("execfile(\"%1\")").arg(aFile);
     
@@ -1126,4 +1126,12 @@ void SalomeApp_Application::onProperties()
     SB->AbortCommand();
 
   //study->updateCaptions();
+}
+
+QString SalomeApp_Application::getFileName( bool open )
+{
+  QStringList filtersList;
+  filtersList.append( getFileFilter() );
+  QString initial = open ? QString( "" ) : ( activeStudy() ? activeStudy()->studyName() : QString( "" ) );
+  return SUIT_FileDlg::getFileName( desktop(), initial, filtersList, QString::null, open, true );
 }

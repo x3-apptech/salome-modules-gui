@@ -23,6 +23,8 @@ public:
   virtual bool    canOpen( const QString& file );
   virtual bool    canSave( const QString& file );
 
+  QWidget*        parent() const { return myParent; }
+  
  private:
   QWidget*        myParent;
 };

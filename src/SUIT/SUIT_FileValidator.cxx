@@ -28,7 +28,7 @@ bool SUIT_FileValidator::canOpen( const QString& file )
   if ( !QFile::exists( file ) ) {
     SUIT_MessageBox::error1( myParent,
           QObject::tr( "ERR_ERROR" ),
-          QObject::tr( "ERR_DOC_FILENOTEXIST" ).arg( file ),
+          QObject::tr( "ERR_FILE_NOT_EXIST" ).arg( file ),
           QObject::tr( "BUT_OK" ) );
       return false;
     }

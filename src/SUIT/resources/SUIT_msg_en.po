@@ -32,3 +32,46 @@ msgstr "Arranges the windows as nonoverlapping vertical tiles"
 
 msgid "PRP_DESK_WINDOW_ACTIVATE"
 msgstr "Activates this window"
+
+msgid "LAB_QUICK_PATH"
+msgstr "Quick path:"
+
+msgid "BUT_ADD_PATH"
+msgstr "Add path"
+
+msgid "INF_DESK_DOC_OPEN"
+msgstr "Open File"
+
+msgid "INF_DESK_DOC_SAVE"
+msgstr "Save File"
+
+msgid "ERR_ERROR"
+msgstr "Error"
+
+msgid "WRN_WARNING"
+msgstr "Warning"
+
+msgid "ERR_DIR_NOT_EXIST"
+msgstr "The directory \"%1\" does not exist!"
+
+msgid "ERR_FILE_NOT_EXIST"
+msgstr "The file \"%1\" does not exist!"
+
+msgid "ERR_PERMISSION_DENIED"
+msgstr "Can't save file \"%1\".\nPermission denied."
+
+msgid "BUT_OK"
+msgstr "&OK"
+
+msgid "BUT_YES"
+msgstr "&Yes"
+
+msgid "BUT_NO"
+msgstr "&No"
+
+msgid "INF_DIRECTORIES_FILTER"
+msgstr "Directories"
+
+msgid "QUE_FILE_EXISTS"
+msgstr "The file \"%1\" already exists.\nDo you want to overwrite it?"
+

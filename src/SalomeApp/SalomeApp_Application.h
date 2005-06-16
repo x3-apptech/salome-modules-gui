@@ -125,6 +125,8 @@ protected:
   virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
 
+  virtual QString                     getFileName( bool );
+
 private slots:
   void                                onNewWindow();
   void                                onModuleActivation( QAction* );
