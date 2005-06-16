@@ -36,25 +36,26 @@ LIBS+=
 LIB_PLUGINDIR = $(top_builddir)/bin/salome/styles
 LIB_PLUGINLIB = $(patsubst %.la, $(LIB_PLUGINDIR)/%.so, $(filter %.la, $(LIB)))
 
-lib: $(LIB_PLUGINDIR) $(LIB_PLUGINLIB)
+lib: $(LIB) $(LIB_PLUGINDIR) $(LIB_PLUGINLIB)
 
 $(LIB_PLUGINDIR):
 	mkdir -p $@
 
-$(LIB_PLUGINLIB):
-	cp $(patsubst %.la, $(top_builddir)/lib/salome/%.so, $(filter %.la, $(LIB))) $@
+$(LIB_PLUGINLIB): $(top_builddir)/bin/salome/styles/%.so: .libs/%.so
+	-$(RM) $@
+	ln -sf $(CURDIR)/$< $@ || true
 
 # do the same in install step
 INSTALL_PLUGINDIR = $(bindir)/styles
-INSTALL_PLUGINLIB = $(patsubst %.la, $(INSTALL_PLUGINDIR)/%.so, $(filter %.la, $(LIB)))
+INSTALL_COPYLIB = $(patsubst %.la, $(INSTALL_PLUGINDIR)/%.so, $(filter %.la, $(LIB)))
 
-install: $(INSTALL_PLUGINDIR) $(INSTALL_PLUGINLIB)
+install: $(INSTALL_PLUGINDIR) $(INSTALL_COPYLIB)
 
 $(INSTALL_PLUGINDIR):
 	mkdir -p $@
 
-$(INSTALL_PLUGINLIB):
-	cp $(patsubst %.la, $(libdir)/%.so, $(filter %.la, $(LIB))) $@
+$(INSTALL_COPYLIB):
+	ln -sf $(patsubst %.la, $(libdir)/%.so, $(filter %.la, $(LIB))) $@ || true
 
 @CONCLUDE@
 
