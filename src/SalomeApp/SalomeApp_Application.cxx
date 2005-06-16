@@ -483,16 +483,12 @@ void SalomeApp_Application::onSelectionChanged()
 
 void SalomeApp_Application::onAboutRefresh()
 {
-  SalomeApp_DataModel* dm = 0;
-  if ( activeModule() )
-  {
-    CAM_DataModel* camDM = activeModule()->dataModel();
+  for ( ModuleListIterator it = modules(); it.current(); ++it )
+  {    
+    CAM_DataModel* camDM = it.current()->dataModel();
     if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
-      dm = (SalomeApp_DataModel*)camDM;
+      ((SalomeApp_DataModel*)camDM)->update();
   }
-
-  if ( dm )
-    dm->update();
 }
 
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
