@@ -11,22 +11,18 @@
 
 #include <qapplication.h>
 #include <qmenubar.h>
+#include <qstringlist.h>
 
 #include "SALOME_Event.hxx"
 
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
+#include "SUIT_ResourceMgr.h"
 #include "STD_MDIDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
+#include "SalomeApp_SelectionMgr.h"
 #include "OB_Browser.h"
-// #include "QAD_FileDlg.h"
-// #include "QAD_ViewFrame.h"
-// #include "QAD_RightFrame.h"
-// #include "QAD_Tools.h"
-
-// #include "QAD_Config.h"
-// #include "QAD_Settings.h"
 
 using namespace std;
 
@@ -55,20 +51,74 @@ static SalomeApp_Study* getActiveStudy()
 }
 
 //====================================================================================
-// SALOME_Selection class (implemented to keep compatibility with previous SALOME GUI
+// SALOME_Selection class.
 //====================================================================================
-SALOME_Selection::SALOME_Selection()
+/*!
+  SALOME_Selection::SALOME_Selection
+  Selection constructor. Gets an instance of selection manager.
+*/
+SALOME_Selection::SALOME_Selection() : mySelMgr( 0 )
 {
-  // VSR: TODO...
+  if ( SalomeApp_Application* anApp = getApplication() ) {
+    mySelMgr = anApp->selectionMgr();
+    connect( mySelMgr, SIGNAL( selectionChanged() ), this, SIGNAL( currentSelectionChanged() ) );
+    connect( mySelMgr, SIGNAL( destroyed() ),        this, SLOT  ( onSelMgrDestroyed() ) );
+  }
 }
 
+/*!
+  SALOME_Selection::onSelMgrDestroyed
+  Watches for the selection manager destroying when study is closed.
+*/
+void SALOME_Selection::onSelMgrDestroyed()
+{
+  mySelMgr = 0;
+}
+
+/*!
+  SALOME_Selection::Clear
+  Clears the selection.
+*/
 void SALOME_Selection::Clear()
 {
-  // VSR: TODO...
+  class TEvent: public SALOME_Event {
+    SalomeApp_SelectionMgr* mySelMgr;
+  public:
+    TEvent( SalomeApp_SelectionMgr* selMgr ) 
+      : mySelMgr( selMgr ) {}
+    virtual void Execute() {
+      if ( mySelMgr )
+        mySelMgr->clearSelected();
+    }
+  };
+  ProcessVoidEvent( new TEvent( mySelMgr ) );
 }
+
+/*!
+  SALOME_Selection::ClearIObjects
+  Clears the selection.
+*/
 void SALOME_Selection::ClearIObjects()
 {
-  // VSR: TODO...
+  Clear();
+}
+
+/*!
+  SALOME_Selection::ClearFilters
+  Removes all selection filters.
+*/
+void SALOME_Selection::ClearFilters()
+{
+  class TEvent: public SALOME_Event {
+    SalomeApp_SelectionMgr* mySelMgr;
+  public:
+    TEvent( SalomeApp_SelectionMgr* selMgr ) 
+      : mySelMgr( selMgr ) {}
+    virtual void Execute() {
+      if ( mySelMgr )
+        mySelMgr->clearFilters();
+    }
+  };
 }
 
 //====================================================================================
@@ -105,8 +155,8 @@ public:
   TGetMainFrameEvent() : myResult( 0 ) {}
   virtual void Execute() {
     if ( getApplication() ) {
-      STD_MDIDesktop* aDesktop = dynamic_cast<STD_MDIDesktop*>( getApplication()->desktop() );
-      myResult = (QWidget*)( aDesktop->workspace() );
+      SUIT_Desktop* aDesktop = getApplication()->desktop();
+      myResult = (QWidget*)( aDesktop->centralWidget() );
     }
   }
 };
@@ -125,9 +175,8 @@ public:
   TResult myResult;
   TGetMainMenuBarEvent() : myResult( 0 ) {}
   virtual void Execute() {
-    if ( getApplication() ) {
-      // VSR: TODO
-      // myResult = (QMenuBar*)(QAD_Application::getDesktop()->getMainMenuBar());
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      myResult = anApp->desktop()->menuBar();
     }
   }
 };
@@ -147,13 +196,32 @@ public:
   MenuName myMenuName;
   TGetPopupMenuEvent( const MenuName menu ) : myResult( 0 ), myMenuName( menu ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy =*/ getActiveStudy() ) {
-      // VSR: TODO
-      //QMenuBar* mainMenu = QAD_Application::getDesktop()->getMainMenuBar();
-      //if ( mainMenu->findItem( menu ) ) {
-      //  return mainMenu->findItem( menu )->popup();
-      //}
-      //return 0;
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      QMenuBar* menuBar = anApp->desktop()->menuBar();
+      if ( menuBar ) {
+        QString menu;
+        switch( myMenuName) {
+        case File:
+          menu = QObject::tr( "MEN_DESK_FILE" );        break;
+        case View:
+          menu = QObject::tr( "MEN_DESK_VIEW" );        break;
+        case Edit:
+          menu = QObject::tr( "MEN_DESK_EDIT" );        break;
+        case Preferences:
+          menu = QObject::tr( "MEN_DESK_PREFERENCES" ); break;
+        case Tools:
+          menu = QObject::tr( "MEN_DESK_TOOLS" );       break;
+        case Window:
+          menu = QObject::tr( "MEN_DESK_WINDOW" );      break;
+        case Help:
+          menu = QObject::tr( "MEN_DESK_HELP" );        break;
+        }
+        for ( int i = 0; i < menuBar->count() && !myResult; i++ ) {
+          QMenuItem* item = menuBar->findItem( menuBar->idAt( i ) );
+	  if ( item && item->text() == menu && item->popup() )
+            myResult = item->popup();
+        }
+      }
     }
   }
 };
@@ -192,11 +260,7 @@ public:
   TResult myResult;
   TGetSelectionEvent() : myResult( 0 ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // return SALOME_Selection::Selection(QAD_Application::getDesktop()->getActiveApp()->getActiveStudy()->getSelection());
-      myResult = new SALOME_Selection();
-    }
+    myResult = new SALOME_Selection();
   }
 };
 SALOME_Selection* SalomePyQt::getSelection()
@@ -207,29 +271,22 @@ SALOME_Selection* SalomePyQt::getSelection()
 /*!
   SalomePyQt::putInfo
   Puts an information message to the desktop's status bar
-  (with optional delay parameter given in msec)
+  (with optional delay parameter given in seconds)
 */
 class TPutInfoEvent: public SALOME_Event {
   QString myMsg;
-  int     myMsecs;
+  int     mySecs;
 public:
-  TPutInfoEvent( const QString& msg, const int ms = 0 ) : myMsg( msg ), myMsecs( ms ) {}
+  TPutInfoEvent( const QString& msg, const int sec = 0 ) : myMsg( msg ), mySecs( sec ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // QAD_Application::getDesktop()->putInfo(msg);
-      // ... or ...
-      // QAD_Application::getDesktop()->putInfo(msg, ms);
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      anApp->putInfo( myMsg, mySecs * 1000 );
     }
   }
 };
-void SalomePyQt::putInfo( const QString& msg )
+void SalomePyQt::putInfo( const QString& msg, const int sec )
 {
-  ProcessVoidEvent( new TPutInfoEvent( msg ) );
-}
-void SalomePyQt::putInfo( const QString& msg, const int ms )
-{
-  ProcessVoidEvent( new TPutInfoEvent( msg, ms ) );
+  ProcessVoidEvent( new TPutInfoEvent( msg, sec ) );
 }
 
 /*!
@@ -242,9 +299,10 @@ public:
   TResult myResult;
   TGetActiveComponentEvent() {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      //   return QAD_Application::getDesktop()->getActiveComponent();
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      if ( CAM_Module* mod = anApp->activeModule() ) {
+        myResult = mod->name("");
+      }
     }
   }
 };
@@ -255,8 +313,9 @@ const QString SalomePyQt::getActiveComponent()
 
 /*!
   SalomePyQt::updateObjBrowser
-  Updates an Object Browser of a given study
-  VSR: updateSelection parameter is currently not used. Will be implemented or removed lately.
+  Updates an Object Browser of a given study.
+  If <studyId> <= 0 the active study's object browser is updated.
+  <updateSelection> parameter is obsolete parameter and currently not used. To be removed lately.
 */
 void SalomePyQt::updateObjBrowser( const int studyId, bool updateSelection )
 {  
@@ -267,30 +326,31 @@ void SalomePyQt::updateObjBrowser( const int studyId, bool updateSelection )
     TEvent( const int studyId, bool updateSelection ) 
       : myStudyId( studyId ), myUpdateSelection( updateSelection ) {}
     virtual void Execute() {
-      if ( SalomeApp_Application* anApp = getApplication() ) {
-	// VSR: TODO
-	// this implementation is temporary and works only for the active study
-	OB_Browser* browser = anApp->objectBrowser();
-	if ( browser )
-	  browser->updateTree();
-	///
-// 	QList<QAD_Study>& studies = QAD_Application::getDesktop()->getActiveApp()->getStudies();
-// 	for ( QAD_Study* study = studies.first(); study; study = studies.next() )  {
-// 	  if ( study->getStudyId() == studyId ) {
-// 	    study->updateObjBrowser( updateSelection );
-// 	    break;
-// 	  }
-// 	}
-	///
+      if ( SUIT_Session::session() ) {
+        if ( getActiveStudy() && myStudyId <= 0 )
+          myStudyId = getActiveStudy()->id();
+	if ( myStudyId > 0 ) {
+          QPtrList<SUIT_Application> apps = SUIT_Session::session()->applications();
+          QPtrListIterator<SUIT_Application> it( apps );
+	  for( ; it.current(); ++it ) {
+            SalomeApp_Application* anApp = dynamic_cast<SalomeApp_Application*>( it.current() );
+            if ( anApp && anApp->activeStudy() && anApp->activeStudy()->id() == myStudyId && anApp->objectBrowser() )
+	      anApp->objectBrowser()->updateTree();
+          }
+        }
       }
     }
   };
   ProcessVoidEvent( new TEvent( studyId, updateSelection ) );
 }
 
+const char* DEFAULT_SECTION = "SalomePyQt";
+
 /*!
   SalomePyQt::addStringSetting
   Adds a string setting to the application preferences
+  <autoValue> parameter is obsolete parameter and currently not used. To be removed lately.
+  This function is obsolete. Use addSetting() instead.
 */
 void SalomePyQt::addStringSetting( const QString& name, const QString& value, bool autoValue )
 {
@@ -302,9 +362,13 @@ void SalomePyQt::addStringSetting( const QString& name, const QString& value, bo
     TEvent( const QString& name, const QString& value, bool autoValue ) 
       : myName( name ), myValue( value ), myAutoValue( autoValue ) {}
     virtual void Execute() {
-      if ( /*SalomeApp_Application* anApp =*/ getApplication() ) {
-	// VSR: TODO
-	// QAD_CONFIG->addSetting(_name, _value, _autoValue);
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	QStringList sl = QStringList::split( ":", myName );
+	QString _sec = sl.count() > 1 ? sl[ 0 ].stripWhiteSpace() : QString( DEFAULT_SECTION );
+	QString _nam = sl.count() > 1 ? sl[ 1 ].stripWhiteSpace() : sl.count() > 0 ? sl[ 0 ].stripWhiteSpace() : QString( "" );
+	if ( !_sec.isEmpty() && !_nam.isEmpty() )
+          resMgr->setValue( _sec, _nam, myValue );
       }
     }
   };
@@ -314,6 +378,8 @@ void SalomePyQt::addStringSetting( const QString& name, const QString& value, bo
 /*!
   SalomePyQt::addIntSetting
   Adds an integer setting to the application preferences
+  <autoValue> parameter is obsolete parameter and currently not used. To be removed lately.
+  This function is obsolete. Use addSetting() instead.
 */
 void SalomePyQt::addIntSetting( const QString& name, const int value, bool autoValue)
 {
@@ -325,9 +391,13 @@ void SalomePyQt::addIntSetting( const QString& name, const int value, bool autoV
     TEvent( const QString& name, const int value, bool autoValue ) 
       : myName( name ), myValue( value ), myAutoValue( autoValue ) {}
     virtual void Execute() {
-      if ( /*SalomeApp_Application* anApp =*/ getApplication() ) {
-	// VSR: TODO
-	// QAD_CONFIG->addSetting(_name, _value, _autoValue);
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	QStringList sl = QStringList::split( ":", myName );
+	QString _sec = sl.count() > 1 ? sl[ 0 ].stripWhiteSpace() : QString( DEFAULT_SECTION );
+	QString _nam = sl.count() > 1 ? sl[ 1 ].stripWhiteSpace() : sl.count() > 0 ? sl[ 0 ].stripWhiteSpace() : QString( "" );
+	if ( !_sec.isEmpty() && !_nam.isEmpty() )
+          resMgr->setValue( _sec, _nam, myValue );
       }
     }
   };
@@ -337,6 +407,8 @@ void SalomePyQt::addIntSetting( const QString& name, const int value, bool autoV
 /*!
   SalomePyQt::addDoubleSetting
   Adds an double setting to the application preferences
+  <autoValue> parameter is obsolete parameter and currently not used. To be removed lately.
+  This function is obsolete. Use addSetting() instead.
 */
 void SalomePyQt::addDoubleSetting( const QString& name, const double value, bool autoValue )
 {
@@ -348,9 +420,13 @@ void SalomePyQt::addDoubleSetting( const QString& name, const double value, bool
     TEvent( const QString& name, const double value, bool autoValue ) 
       : myName( name ), myValue( value ), myAutoValue( autoValue ) {}
     virtual void Execute() {
-      if ( /*SalomeApp_Application* anApp =*/ getApplication() ) {
-	// VSR: TODO
-	// QAD_CONFIG->addSetting(_name, _value, _autoValue);
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	QStringList sl = QStringList::split( ":", myName );
+	QString _sec = sl.count() > 1 ? sl[ 0 ].stripWhiteSpace() : QString( DEFAULT_SECTION );
+	QString _nam = sl.count() > 1 ? sl[ 1 ].stripWhiteSpace() : sl.count() > 0 ? sl[ 0 ].stripWhiteSpace() : QString( "" );
+	if ( !_sec.isEmpty() && !_nam.isEmpty() )
+          resMgr->setValue( _sec, _nam, myValue );
       }
     }
   };
@@ -360,6 +436,7 @@ void SalomePyQt::addDoubleSetting( const QString& name, const double value, bool
 /*!
   SalomePyQt::removeSettings
   Removes a setting from the application preferences
+  This function is obsolete. Use removeSetting() instead.
 */
 void SalomePyQt::removeSettings( const QString& name )
 {
@@ -368,9 +445,13 @@ void SalomePyQt::removeSettings( const QString& name )
   public:
     TEvent( const QString& name ) : myName( name ) {}
     virtual void Execute() {
-      if ( /*SalomeApp_Application* anApp =*/ getApplication() ) {
-	// VSR: TODO
-	// QAD_CONFIG->removeSettings( name );
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	QStringList sl = QStringList::split( ":", myName );
+	QString _sec = sl.count() > 1 ? sl[ 0 ].stripWhiteSpace() : QString( DEFAULT_SECTION );
+	QString _nam = sl.count() > 1 ? sl[ 1 ].stripWhiteSpace() : sl.count() > 0 ? sl[ 0 ].stripWhiteSpace() : QString( "" );
+	if ( !_sec.isEmpty() && !_nam.isEmpty() )
+          resMgr->remove( _sec, _nam );
       }
     }
   };
@@ -380,6 +461,8 @@ void SalomePyQt::removeSettings( const QString& name )
 /*!
   SalomePyQt::getSetting
   Gets a setting value (as string)
+  This function is obsolete. Use stringSetting(), integerSetting(), 
+  boolSetting(), stringSetting() or colorSetting() instead.
 */
 class TGetSettingEvent: public SALOME_Event {
 public:
@@ -388,15 +471,261 @@ public:
   QString myName;
   TGetSettingEvent( const QString& name ) : myName( name ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // myResult = QAD_CONFIG->getSetting(name);
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      QStringList sl = QStringList::split( ":", myName );
+      QString _sec = sl.count() > 1 ? sl[ 0 ].stripWhiteSpace() : QString( DEFAULT_SECTION );
+      QString _nam = sl.count() > 1 ? sl[ 1 ].stripWhiteSpace() : sl.count() > 0 ? sl[ 0 ].stripWhiteSpace() : QString( "" );
+      myResult = ( !_sec.isEmpty() && !_nam.isEmpty() ) ? resMgr->stringValue( _sec, _nam, "" ) : QString( "" );
     }
   }
 };
 QString SalomePyQt::getSetting( const QString& name )
 {
   return ProcessEvent( new TGetSettingEvent( name ) );
+}
+
+/*!
+  SalomePyQt::addSetting
+  Adds a double setting to the application preferences
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const double value )
+{
+  class TEvent: public SALOME_Event {
+    QString mySection;
+    QString myName;
+    double  myValue;
+  public:
+    TEvent( const QString& section, const QString& name, double value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
+  SalomePyQt::addSetting
+  Adds an integer setting to the application preferences
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const int value )
+{
+  class TEvent: public SALOME_Event {
+    QString mySection;
+    QString myName;
+    int     myValue;
+  public:
+    TEvent( const QString& section, const QString& name, int value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
+  SalomePyQt::addSetting
+  Adds a string setting to the application preferences
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const QString& value )
+{
+  class TEvent: public SALOME_Event {
+    QString mySection;
+    QString myName;
+    QString myValue;
+  public:
+    TEvent( const QString& section, const QString& name, const QString& value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
+  SalomePyQt::addSetting
+  Adds a color setting to the application preferences
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const QColor& value )
+{
+  class TEvent: public SALOME_Event {
+    QString mySection;
+    QString myName;
+    QColor  myValue;
+  public:
+    TEvent( const QString& section, const QString& name, const QColor& value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
+  SalomePyQt::integerSetting
+  Gets an integer setting from the application preferences
+*/
+class TGetIntSettingEvent: public SALOME_Event {
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetIntSettingEvent( const QString& section, const QString& name, const int def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->integerValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+int SalomePyQt::integerSetting( const QString& section, const QString& name, const int def )
+{
+  return ProcessEvent( new TGetIntSettingEvent( section, name, def ) );
+}
+
+/*!
+  SalomePyQt::doubleSetting
+  Gets a double setting from the application preferences
+*/
+class TGetDblSettingEvent: public SALOME_Event {
+public:
+  typedef double TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetDblSettingEvent( const QString& section, const QString& name, const double def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->doubleValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+double SalomePyQt::doubleSetting( const QString& section, const QString& name, const int def )
+{
+  return ProcessEvent( new TGetDblSettingEvent( section, name, def ) );
+}
+
+/*!
+  SalomePyQt::boolSetting
+  Gets a boolean setting from the application preferences
+*/
+class TGetBoolSettingEvent: public SALOME_Event {
+public:
+  typedef bool TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetBoolSettingEvent( const QString& section, const QString& name, const bool def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->booleanValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+bool SalomePyQt::boolSetting( const QString& section, const QString& name, const bool def )
+{
+  return ProcessEvent( new TGetBoolSettingEvent( section, name, def ) );
+}
+
+/*!
+  SalomePyQt::stringSetting
+  Gets a string setting from the application preferences
+*/
+class TGetStrSettingEvent: public SALOME_Event {
+public:
+  typedef QString TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetStrSettingEvent( const QString& section, const QString& name, const QString& def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->stringValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+QString SalomePyQt::stringSetting( const QString& section, const QString& name, const QString& def )
+{
+  return ProcessEvent( new TGetStrSettingEvent( section, name, def ) );
+}
+
+/*!
+  SalomePyQt::colorSetting
+  Gets a color setting from the application preferences
+*/
+class TGetColorSettingEvent: public SALOME_Event {
+public:
+  typedef QColor TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetColorSettingEvent( const QString& section, const QString& name, const QColor& def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->colorValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+QColor SalomePyQt::colorSetting ( const QString& section, const QString& name, const QColor& def )
+{
+  return ProcessEvent( new TGetColorSettingEvent( section, name, def ) );
+}
+
+/*!
+  SalomePyQt::removeSetting
+  Removes a setting from the application preferences
+*/
+void SalomePyQt::removeSetting( const QString& section, const QString& name )
+{
+  class TEvent: public SALOME_Event {
+    QString mySection;
+    QString myName;
+  public:
+    TEvent( const QString& section, const QString& name ) : mySection( section ), myName( name ) {}
+    virtual void Execute() {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+	if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->remove( mySection, myName );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name ) );
 }
 
 /*!
@@ -507,7 +836,7 @@ QString SalomePyQt::getExistingDirectory( QWidget*       parent,
 /*!
   SalomePyQt::helpContext
   Opens external browser to display 'context help' information
-  VSR: current implementation does nothing.
+  current implementation does nothing.
 */
 void SalomePyQt::helpContext( const QString& source, const QString& context ) {
   class TEvent: public SALOME_Event {
@@ -569,3 +898,4 @@ bool SalomePyQt::dumpView( const QString& filename )
 {
   return ProcessEvent( new TDumpViewEvent( filename ) );
 }
+

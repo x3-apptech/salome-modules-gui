@@ -11,7 +11,6 @@
 
 %Import qtmod.sip
 
-
 class SALOME_Selection : QObject
 {
 
@@ -24,6 +23,7 @@ public:
 
   void Clear();
   void ClearIObjects();
+  void ClearFilters();
 
 signals:
   void currentSelectionChanged();
@@ -51,18 +51,11 @@ public:
   static QWidget*          getMainFrame();
   static QMenuBar*         getMainMenuBar();
   static QPopupMenu*       getPopupMenu( const MenuName );
-  static SALOME_Selection* getSelection();
+  static SALOME_Selection* getSelection() /Factory/;
   static int               getStudyId();
-  static void              putInfo( const QString& );
-  static void              putInfo( const QString&, const int );
+  static void              putInfo( const QString&, int = 0 );
   static const QString     getActiveComponent();
-  static void              updateObjBrowser( const int, bool );
-
-  static void              addStringSetting( const QString&, const QString&, bool );
-  static void              addIntSetting   ( const QString&, const int,      bool );
-  static void              addDoubleSetting( const QString&, const double,   bool );
-  static void              removeSettings  ( const QString& );
-  static QString           getSetting      ( const QString& );
+  static void              updateObjBrowser( int = 0, bool = true );
 
   static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool );
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
@@ -71,4 +64,22 @@ public:
   static void              helpContext( const QString&, const QString& );
 
   static bool              dumpView( const QString& );
+
+  static void              addSetting    ( const QString&, const QString&, const double );
+  static void              addSetting    ( const QString&, const QString&, const int /Constrained/ );
+  static void              addSetting    ( const QString&, const QString&, const QString& );
+  static void              addSetting    ( const QString&, const QString&, const QColor& );
+  static int               integerSetting( const QString&, const QString&, int = 0 );
+  static double            doubleSetting ( const QString&, const QString&, int = 0 );
+  static bool              boolSetting   ( const QString&, const QString&, bool = 0 );
+  static QString           stringSetting ( const QString&, const QString&, const QString& = QString("") );
+  static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
+  static void              removeSetting ( const QString&, const QString& );
+
+// obsolete
+  static void              addStringSetting( const QString&, const QString&, bool = true );
+  static void              addIntSetting   ( const QString&, const int,      bool = true );
+  static void              addDoubleSetting( const QString&, const double,   bool = true );
+  static void              removeSettings  ( const QString& );
+  static QString           getSetting      ( const QString& );
 };

@@ -14,17 +14,27 @@
 #include <qstring.h>
 #include <qmenubar.h>
 
+class SalomeApp_SelectionMgr;
+
 class SALOME_Selection : public QObject
 {
   Q_OBJECT
+
 public:
   SALOME_Selection();
 
   void Clear();
   void ClearIObjects();
+  void ClearFilters();
 
 signals:
   void currentSelectionChanged();
+
+private slots:
+  void onSelMgrDestroyed();
+
+private:
+  SalomeApp_SelectionMgr* mySelMgr;
 };
 
 enum MenuName {
@@ -43,36 +53,37 @@ public:
   static QWidget*          getDesktop();
   static QWidget*          getMainFrame();
   static QMenuBar*         getMainMenuBar();
-  static QPopupMenu*       getPopupMenu( const MenuName menu );
+  static QPopupMenu*       getPopupMenu( const MenuName );
   static SALOME_Selection* getSelection();
   static int               getStudyId();
-  static void              putInfo( const QString& );
-  static void              putInfo( const QString&, const int );
+  static void              putInfo( const QString&, const int = 0 );
   static const QString     getActiveComponent();
-  static void              updateObjBrowser( const int studyId, bool updateSelection );
+  static void              updateObjBrowser( const int = 0, bool = true );
 
-  static void              addStringSetting( const QString& name, const QString& value, bool autoValue );
-  static void              addIntSetting   ( const QString& name, const int      value, bool autoValue );
-  static void              addDoubleSetting( const QString& name, const double   value, bool autoValue );
-  static void              removeSettings  ( const QString& name );
-  static QString           getSetting      ( const QString& name );
+  static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool );
+  static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
+  static QString           getExistingDirectory( QWidget*, const QString&, const QString& );
 
-  static QString           getFileName( QWidget*           parent, 
-                                        const QString&     initial, 
-                                        const QStringList& filters, 
-                                        const QString&     caption,
-                                        bool               open );
-  static QStringList       getOpenFileNames( QWidget*           parent, 
-                                             const QString&     initial, 
-                                             const QStringList& filters, 
-                                             const QString&     caption );
-  static QString           getExistingDirectory( QWidget*       parent,
-                                                 const QString& initial,
-                                                 const QString& caption );
+  static void              helpContext( const QString&, const QString& );
 
-  static void              helpContext( const QString& source, const QString& context );
+  static bool              dumpView( const QString& );
 
-  static bool              dumpView( const QString& filename );
+  static void              addSetting    ( const QString&, const QString&, const double );
+  static void              addSetting    ( const QString&, const QString&, const int );
+  static void              addSetting    ( const QString&, const QString&, const QString& );
+  static void              addSetting    ( const QString&, const QString&, const QColor& );
+  static int               integerSetting( const QString&, const QString&, const int = 0 );
+  static double            doubleSetting ( const QString&, const QString&, const int = 0 );
+  static bool              boolSetting   ( const QString&, const QString&, const bool = 0 );
+  static QString           stringSetting ( const QString&, const QString&, const QString& = QString("") );
+  static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
+  static void              removeSetting ( const QString&, const QString& );
+  // obsolete
+  static void              addStringSetting( const QString&, const QString&, bool = true );
+  static void              addIntSetting   ( const QString&, const int,      bool = true );
+  static void              addDoubleSetting( const QString&, const double,   bool = true );
+  static void              removeSettings  ( const QString& );
+  static QString           getSetting      ( const QString& );
 };
 
 #endif // SALOME_PYQT_H
