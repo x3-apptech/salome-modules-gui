@@ -81,10 +81,13 @@ msgid "GLViewer_Viewer2d::CHANGE_BGCOLOR"
 msgstr "Change background..."
 
 msgid "GLViewer_ViewFrame::DUMP_VIEW_SAVE_FILE_DLG_CAPTION"
-msgstr "Save Dump View in file"
+msgstr "Dump View"
 
 msgid "GLViewer_ViewFrame::DUMP_VIEW_ERROR_DLG_CAPTION"
 msgstr "Error"
 
 msgid "GLViewer_ViewFrame::DUMP_VIEW_ERROR_DLG_TEXT"
-msgstr "Can't save Dump View in file"
+msgstr "Dump view operation failed."
+
+msgid "GLViewer_ViewFrame::DUMP_VIEW_ERROR_UNSUPPORTED_FORMAT"
+msgstr "Can't dump view. Unsupported image format: %1."

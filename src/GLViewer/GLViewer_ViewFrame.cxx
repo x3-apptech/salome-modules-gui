@@ -17,14 +17,15 @@
 #include "GLViewer_ViewPort2d.h"
 
 #include <SUIT_Desktop.h>
+#include <SUIT_Application.h>
 #include <SUIT_Session.h>
 #include <SUIT_ToolButton.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_Tools.h>
 #include <QtxAction.h>
 #include <SUIT_MessageBox.h>
 
 #include <qcolor.h>
-#include <qfiledialog.h>
 #include <qimage.h>
 #include <qlayout.h>
 #include <qstring.h>
@@ -383,39 +384,22 @@ void GLViewer_ViewFrame::onViewDump()
 
     delete [] imageBits;
 
-    QString aFilter( "*.bmp\n*.png" );
+    SUIT_Application* app = getViewManager()->study()->application();
 
-    QFileDialog aFileDlg( QDir::current().absPath(), aFilter, this );
-    aFileDlg.setCaption( tr( "DUMP_VIEW_SAVE_FILE_DLG_CAPTION" ) );
-    aFileDlg.setMode( QFileDialog::AnyFile );
+    QString aFileName = app->getFileName( false, QString::null, QString( "*.bmp;*.png" ), tr( "DUMP_VIEW_SAVE_FILE_DLG_CAPTION" ), 0 );
 
-    if( !aFileDlg.exec() )
-        return;
+    if( aFileName.isEmpty() ) // cancelled
+      return;
 
-    QString aFileName = aFileDlg.selectedFile();
-    QString aFileExt = aFileDlg.selectedFilter();
+    QString aSaveOp = SUIT_Tools::extension( aFileName ).upper();
 
-    if( aFileName.isEmpty() )
-    {
-        SUIT_MessageBox::error1( this,
-				 tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
-				 tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
-				 tr( "BUT_OK" ) );
+    if ( aSaveOp != "BMP" && aSaveOp != "PNG" ) {
+      SUIT_MessageBox::error1( this,
+			       tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
+			       tr( "DUMP_VIEW_ERROR_UNSUPPORTED_FORMAT" ).arg( aSaveOp ),
+			       tr( "BUT_OK" ) );
+      return;
     }
-
-    QString aSaveOp = "BMP";
-    QString aTypedFileExt = QFileInfo( aFileName ).extension( false ).lower();
-
-    if( aFileExt == "*.bmp" )
-    {
-        if( aTypedFileExt.isEmpty() )
-            aFileName += ".bmp";
-        aSaveOp = "BMP";
-    }
-    else if( aFileExt == "*.png" )
-        if( aTypedFileExt.isEmpty() )
-            aFileName += ".png";
-        aSaveOp = "PNG";
 
     if( !anImage.save( aFileName, aSaveOp ) )
     {

@@ -7,10 +7,10 @@
 #include "Plot2d_SetupViewDlg.h"
 
 #include "SUIT_Tools.h"
-#include "SUIT_FileDlg.h"
 #include "SUIT_Session.h"
 #include "SUIT_MessageBox.h"
 #include "SUIT_ResourceMgr.h"
+#include "SUIT_Application.h"
 
 //#include "utilities.h"
 
@@ -1470,21 +1470,20 @@ void Plot2d_ViewFrame::onDump()
   QApplication::setOverrideCursor( Qt::waitCursor );
   QPixmap px = QPixmap::grabWindow(winId());
   QApplication::restoreOverrideCursor();
-  
-  QString fileName = SUIT_FileDlg::getFileName(this,
-                QString::null,
-                tr("OCC_IMAGE_FILES"),
-                tr("INF_APP_DUMP_VIEW"),
-                false);
-  if ( !fileName.isNull() )
+
+  SUIT_Application* app = ((Plot2d_ViewWindow*)parent())->getViewManager()->study()->application();
+
+  QString aFileName = app->getFileName( false, QString::null, tr("PLOT2D_IMAGE_FILES"), tr("INF_APP_DUMP_VIEW"), 0 );
+
+  if ( !aFileName.isNull() )
   {
     QApplication::setOverrideCursor( Qt::waitCursor );
-    QString fmt = SUIT_Tools::extension( fileName ).upper();
+    QString fmt = SUIT_Tools::extension( aFileName ).upper();
     if (fmt.isEmpty())
       fmt = QString("BMP"); // default format
     if (fmt == "JPG")
       fmt = "JPEG";
-    bool bOk = px.save(fileName, fmt.latin1());
+    bool bOk = px.save(aFileName, fmt.latin1());
     QApplication::restoreOverrideCursor();
     if (!bOk) {
       SUIT_MessageBox::error1(this, tr("ERROR"), tr("ERR_DOC_CANT_SAVE_FILE"), tr("BUT_OK"));

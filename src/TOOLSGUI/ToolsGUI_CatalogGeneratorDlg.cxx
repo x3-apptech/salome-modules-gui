@@ -31,7 +31,6 @@
 
 #include "SUIT_Application.h"
 #include "SUIT_Desktop.h"
-#include "SUIT_FileDlg.h"
 #include "SUIT_MessageBox.h"
 #include "SUIT_Tools.h"
 #include "SUIT_Session.h"
@@ -45,6 +44,7 @@
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qvalidator.h>
+#include <qfile.h>
 
 #include <OSD_Process.hxx>
 #include <OSD_Path.hxx>
@@ -333,34 +333,21 @@ void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
 {
   QPushButton* send = (QPushButton*)sender();
   
-  QWidget* aParent = SUIT_Session::session()->activeApplication()->desktop();
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
 
   if ( send == myBrowseIdlBtn ) {
-    QString file = myIdlEdit->text().stripWhiteSpace();
-    file = SUIT_FileDlg::getFileName(aParent, 
-				    file,
-				    tr("TOOLS_MEN_IMPORT_IDL"),
-				    tr("TOOLS_MEN_IMPORT"),
-				    true);
+    QString file = app->getFileName( true, myIdlEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_IMPORT_IDL"), tr("TOOLS_MEN_IMPORT"), 0 );
     if ( !file.isEmpty() ) {
       myIdlEdit->setText(file);
     }
   } 
   else if ( send == myBrowseXmlBtn ) {
-    QString file = SUIT_FileDlg::getFileName(aParent,
-					    myXmlEdit->text().stripWhiteSpace(),
-					    tr("TOOLS_MEN_EXPORT_XML"),
-					    tr("TOOLS_MEN_EXPORT"),
-					    false);
+    QString file = app->getFileName( false, myXmlEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_EXPORT_XML"), tr("TOOLS_MEN_EXPORT"), 0 );
     if ( !file.isEmpty() ) {
       myXmlEdit->setText(file);
     }
   } else if ( send == myBrowsePngBtn ) {
-    QString file = SUIT_FileDlg::getFileName(aParent,
-					    myXmlEdit->text().stripWhiteSpace(),
-					    tr("TOOLS_MEN_IMPORT_PNG"),
-					    tr("TOOLS_MEN_IMPORT"),
-					    true);
+    QString file = app->getFileName( true, myPngEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_IMPORT_PNG"), tr("TOOLS_MEN_IMPORT"), 0 );
     if ( !file.isEmpty() ) {
       myPngEdit->setText(file);
     

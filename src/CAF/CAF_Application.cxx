@@ -15,7 +15,6 @@
 #include <qmenubar.h>
 #include <qpopupmenu.h>
 #include <qstatusbar.h>
-#include <qfiledialog.h>
 #include <qapplication.h>
 
 extern "C" CAF_EXPORT SUIT_Application* createApplication()

@@ -13,7 +13,6 @@
 
 #include "SUIT_Tools.h"
 #include "SUIT_ResourceMgr.h"
-#include "SUIT_FileDlg.h"
 
 #include <qapplication.h>
 
@@ -393,20 +392,19 @@ void VTKViewer_ViewWindow::onDumpView()
   QApplication::setOverrideCursor( Qt::waitCursor );
   QPixmap px = QPixmap::grabWindow(myRenderWindow->winId());
   QApplication::restoreOverrideCursor();
-  
-  QString fileName = SUIT_FileDlg::getFileName(this,
-                                              QString::null,
-                                              tr("VTK_IMAGE_FILES"),
-                                              tr("INF_APP_DUMP_VIEW"),
-                                              false);
-  if (!fileName.isNull()) {
+ 
+  SUIT_Application* app = getViewManager()->study()->application();
+
+  QString aFileName = app->getFileName( false, QString::null, tr("VTK_IMAGE_FILES"), tr("INF_APP_DUMP_VIEW"), 0 );
+ 
+  if ( !aFileName.isNull() ) {
     QApplication::setOverrideCursor( Qt::waitCursor );
-    QString fmt = SUIT_Tools::extension( fileName ).upper();
+    QString fmt = SUIT_Tools::extension( aFileName ).upper();
     if (fmt.isEmpty())
       fmt = QString("BMP"); // default format
     if (fmt == "JPG")
       fmt = "JPEG";
-    bool bOk = px.save(fileName, fmt.latin1());
+    bool bOk = px.save(aFileName, fmt.latin1());
     QApplication::restoreOverrideCursor();
     if (!bOk) {
       SUIT_MessageBox::error1(this, tr("ERROR"), tr("ERR_DOC_CANT_SAVE_FILE"), tr("BUT_OK"));

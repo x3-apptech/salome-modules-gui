@@ -126,7 +126,7 @@ msgstr "Coordinates: X : %1, Y : %2 ( %3 )"
 #msgid "INF_READY"
 #msgstr "Ready"
 
-msgid "OCC_IMAGE_FILES"
+msgid "PLOT2D_IMAGE_FILES"
 msgstr "Images Files (*.bmp *.png *.jpg *.jpeg)"
 
 msgid "INF_APP_DUMP_VIEW"
