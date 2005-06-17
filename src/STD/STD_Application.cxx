@@ -617,7 +617,7 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
     while ( !isOk )
     {
       // It is preferrable to use OS-specific file dialog box here !!!
-      aName = QFileDialog::getSaveFileName( anOldPath, fls.join( ";;" ), parent,
+      aName = QFileDialog::getSaveFileName( anOldPath, filters, parent,
 					    0, caption, &aUsedFilter);
 
       if ( aName.isNull() )
