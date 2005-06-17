@@ -1,3 +1,49 @@
+//*********************************************************************************
+// SUIT_FileDlg class is the extension of the Qt's Open/Save file dialog box.
+// To get the file/directory name(s) call static methods:
+//
+// to invoke "Open file" or "Save file" dialog box
+//    static QString getFileName(QWidget* parent, const QString& initial, const QStringList& filters, 
+//                               const QString& caption, const bool open, const bool showQuickDir = true,
+//                               SUIT_FileValidator* validator = 0);
+//
+// to invoke "Open files" dialog box (to get the multiple file selection)
+//    static QStringList getOpenFileNames(QWidget* parent, const QString& initial, const QStringList& filters, 
+//                                        const QString& caption, bool showQuickDir = true, 
+//                                        SUIT_FileValidator* validator = 0);
+//
+// to invoke "Select directory" dialog box
+//    static QString getExistingDirectory(QWidget* parent, const QString& initial,
+//                                        const QString& caption, const bool showQuickDir = true);
+//
+// The parameters:
+// - parent        parent widget (if 0, the current desktop is used)
+// - initial       starting directory or file name (if null, last visited directory is used)
+// - filters       file filters list; patterns inside the filter can be separated by ';','|' or ' ' 
+//                 symbols
+// - caption       dialog box's caption: if null, the default one is used
+// - open          open flag - true for "Open File" and false for "Save File" dialog box
+// - showQuickDir  this flag enables/disables "Quick directory list" controls
+// - validator     you can provide custom file validator with this parameter
+//
+// Examples:
+//   ...
+//   QStringList flist;
+//   flist.append( "Image files (*.bmp *.gif *.jpg )" );
+//   flist.append( "All files (*.*)" );
+//   QMyFileValidator* v = new QMyFileValidator( 0 );
+//   QString fileName =  SUIT_FileDlg::getFileName( 0, QString::null, flist, "Dump view", false, true, v );
+//   if ( !fileName.isEmpty() ) {
+//      ... writing image to the file 
+//   }
+//   ...
+//   QStringList flist;
+//   flist.append( "*.cpp | *.cxx | *.c++" );
+//   flist.append( "*.h | *.hpp | *.hxx" );
+//   QString fileName =  SUIT_FileDlg::getFileName( desktop(), QString::null, flist, QString::null, true, true );
+//
+//*********************************************************************************
+
 #include "SUIT_FileDlg.h"
 
 #include "SUIT_Tools.h"   
@@ -18,6 +64,10 @@
 
 #define MIN_COMBO_SIZE 100
 
+// If the selected file name has extension which does not match the selected filter
+// this extension is ignored (and new one will be added). See below for details.
+const bool IGNORE_NON_MATCHING_EXTENSION = true;
+
 QString SUIT_FileDlg::myLastVisitedPath;
 
 /*!
@@ -27,7 +77,8 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
 QFileDialog( parent, 0, modal ),
 myValidator( 0 ),
 myQuickCombo( 0 ), myQuickButton( 0 ), myQuickLab( 0 ),
-myOpen( open )
+myOpen( open ),
+myAccepted( false )
 {    
   if ( parent->icon() )
     setIcon( *parent->icon() );       
@@ -160,21 +211,24 @@ if the selected name is valid ( see 'acceptData()' )
 */
 void SUIT_FileDlg::accept()
 {
-//  mySelectedFile = QFileDialog::selectedFile().simplifyWhiteSpace(); //VSR- 06/12/02
-  if ( mode() != ExistingFiles ) {
-    mySelectedFile = QFileDialog::selectedFile(); //VSR+ 06/12/02
-    addExtension();
-  }
-//  mySelectedFile = mySelectedFile.simplifyWhiteSpace(); //VSR- 06/12/02
-
-  /* Qt 2.2.2 BUG: accept() is called twice if you validate 
-  the selected file name by pressing 'Return' key in file 
-  name editor but this name is not acceptable for acceptData()
+  /* myAccepted flag is used to warkaround the Qt 2.2.2 BUG: 
+     accept() method is called twice if user presses 'Enter' key 
+     in file name editor while file name is not acceptable by acceptData()
+     (e.g. permission denied)
   */
-  if ( acceptData() ) {
-    myLastVisitedPath = dirPath();
-    QFileDialog::accept();        
+  if ( !myAccepted ) {
+    if ( mode() != ExistingFiles ) {
+      mySelectedFile = QFileDialog::selectedFile();
+      addExtension();
+    }
+
+    if ( acceptData() ) {
+      myLastVisitedPath = dirPath();
+      QFileDialog::accept();        
+      myAccepted = true;
+    }
   }
+  myAccepted = !myAccepted;
 }
 
 /*!
@@ -221,55 +275,75 @@ The extension is extracted from the active filter.
 */
 void SUIT_FileDlg::addExtension()
 {
-//  mySelectedFile.stripWhiteSpace();//VSR- 06/12/02
-//  if ( mySelectedFile.isEmpty() )//VSR- 06/12/02
-  if ( mySelectedFile.stripWhiteSpace().isEmpty() )//VSR+ 06/12/02
+  // check if file name entered is empty
+  if ( mySelectedFile.stripWhiteSpace().isEmpty() )
     return;
 
-//  if ( SUIT_Tools::getFileExtensionFromPath( mySelectedFile ).isEmpty() ) //VSR- 06/12/02
-//ota :   16/12/03  if ( SUIT_Tools::getFileExtensionFromPath( mySelectedFile ).isEmpty() ) //VSR+ 06/12/02
-//  {
+  // current file extension
+  QString anExt = "." + SUIT_Tools::extension( mySelectedFile.stripWhiteSpace() ).stripWhiteSpace();
 
+  // If the file already has extension and it does not match the filter there are two choices:
+  // - to leave it 'as is'
+  // - to ignore it
+  // The behavior is defined by IGNORE_NON_MATCHING_EXTENSION constant
+  if ( anExt != "." && !IGNORE_NON_MATCHING_EXTENSION )
+    return;
+
+  // get selected file filter
 #if QT_VERSION < 0x030000
-    QRegExp r( QString::fromLatin1("([a-zA-Z0-9.*? +;#]*)$") );
-    int len, index = r.match( selectedFilter(), 0, &len );
+  QRegExp r( QString::fromLatin1("(?[a-zA-Z0-9.*? +;#|]*)?$") );
+  int len, index = r.match( selectedFilter().stripWhiteSpace(), 0, &len );
 #else
-    QRegExp r( QString::fromLatin1("\\([a-zA-Z0-9.*? +;#]*\\)$") );
-    int index = r.search(selectedFilter());
+  QRegExp r( QString::fromLatin1("\\(?[a-zA-Z0-9.*? +;#|]*\\)?$") );
+  int index = r.search( selectedFilter().stripWhiteSpace() );
 #endif
-    if ( index >= 0 ) 
-    {            
+
+  if ( index >= 0 ) {            
+    // Create wildcard regular expression basing on selected filter 
+    // in order to validate a file extension.
+    // Due to transformations from the filter list (*.txt *.*xx *.c++ SUIT*.* ) we 
+    // will have the pattern (\.txt|\..*xx|\.c\+\+|\..*) (as we validate extension only, 
+    // we remove everything except extension mask from the pattern
 #if QT_VERSION < 0x030000
-//      QString wildcard = selectedFilter().mid( index + 1, len-2 ); //VSR- 06/12/02
-      QString wildcard = selectedFilter().mid( index + 1, len-2 ).stripWhiteSpace(); //VSR+ 06/12/02
+    QString wildcard = selectedFilter().mid( index, len ).stripWhiteSpace();
 #else
-//      QString wildcard = selectedFilter().mid( index + 1, r.matchedLength()-2 ); //VSR- 06/12/02
-      QString wildcard = selectedFilter().mid( index + 1, r.matchedLength()-2 ).stripWhiteSpace(); //VSR+ 06/12/02
+    QString wildcard = selectedFilter().mid( index, r.matchedLength() ).stripWhiteSpace();
 #endif
-    int aLen = mySelectedFile.length();
-    if ( mySelectedFile[aLen - 1] == '.')
-	  //if the file name ends with the point remove it
-	    mySelectedFile.truncate(aLen - 1);
-    QString anExt = "." + SUIT_Tools::extension( mySelectedFile ).stripWhiteSpace();
-      // From the filters list make a pattern to validate a file extension
-      // Due to transformations from the filter list (*.txt *.*xx *.c++ SUIT*.* ) we 
-      // will have the pattern (\.txt|\..*xx|\.c\+\+|\..*) (as we validate extension only we remove
-      // stay extension mask only in the pattern
-      QString aPattern(wildcard);
-      QRegExp anExtRExp("("+aPattern.replace(QRegExp("(^| )[0-9a-zA-Z*_?]*\\."), " \\.").
-			stripWhiteSpace().replace(QRegExp("\\s+"), "|").
-			replace(QRegExp("[*]"),".*").replace(QRegExp("[+]"),"\\+") + ")");
-      
-      if ( anExtRExp.match(anExt) == -1 ) //if a selected file extension does not match to filter's list
-	{ //remove a point if it is at the word end
-          int aExtLen = anExt.length();
-	  if (anExt[ aExtLen - 1 ] == '.')  anExt.truncate( aExtLen - 1 );
-	  index = wildcard.findRev( '.' );    
-	  if ( index >= 0 ) 
-	    mySelectedFile += wildcard.mid( index ); //add the extension
-	}
+    // replace '|' and ';' separators by space symbol and also brackets if there are some
+    wildcard.replace( QRegExp( "[\\|;|(|)]" )," " ); 
+
+    QString aPattern = wildcard.replace( QRegExp( "(^| )(\\s*)[0-9a-zA-Z*_?]*\\."), " \\." ).stripWhiteSpace().
+                                         replace( QRegExp( "\\s+" ), "|" ).replace( QRegExp( "[?]" ),".?" ).
+                                         replace( QRegExp( "[*]" ),".*" ).replace( QRegExp( "[+]" ),"\\+" );
+
+    // now we get the list of all extension masks and remove all which does not contain wildcard symbols
+    QStringList extList = QStringList::split( "|",aPattern );
+    for( int i = extList.count() - 1; i >= 0; i-- ) {
+      if ( !extList[i].contains( "." ) )
+        extList.remove( extList.at( i ) );
     }
-  //  }
+    aPattern = extList.join( "|" );
+
+    // finalize pattern
+    QRegExp anExtRExp( "^("+ aPattern + ")$" );
+
+    // Check if the current file extension matches the pattern
+    if ( anExtRExp.match( anExt ) < 0 ) { 
+      // find first appropriate extension in the selected filter 
+      // (it should be without wildcard symbols)
+      for ( int i = 0; i < extList.count(); i++ ) {
+        QString newExt = extList[i].replace( QRegExp( "[\\\\][+]" ),"+" );
+        int res = newExt.findRev( '.' );
+        if ( res >= 0 ) 
+          newExt = newExt.mid( res + 1 );
+        if ( newExt.find( QRegExp("[*|?]" ) ) < 0 ) {
+          mySelectedFile.stripWhiteSpace();
+          mySelectedFile += mySelectedFile.endsWith(".") ? newExt : QString(".") + newExt;
+          break;
+        }
+      }
+    }
+  }
 }
 
 /*!

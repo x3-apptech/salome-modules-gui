@@ -48,14 +48,15 @@ protected slots:
   void                addQuickDir();
 
 protected:
-  bool                myOpen;             /* open/save selector  */      
-  QString             mySelectedFile;     /* selected filename   */    
-  SUIT_FileValidator* myValidator;        /* file validator      */
-  QLabel*             myQuickLab;         /* quick dir combo box */
-  QComboBox*          myQuickCombo;       /* quick dir combo box */
+  bool                myOpen;             /* open/save selector   */      
+  QString             mySelectedFile;     /* selected filename    */    
+  SUIT_FileValidator* myValidator;        /* file validator       */
+  QLabel*             myQuickLab;         /* quick dir combo box  */
+  QComboBox*          myQuickCombo;       /* quick dir combo box  */
   QPushButton*        myQuickButton;      /* quick dir add button */
+  bool                myAccepted;         /* 'Accepted' flag      */
 
-  static QString      myLastVisitedPath;  /* last visited path   */
+  static QString      myLastVisitedPath;  /* last visited path    */
 };
 
 #endif
