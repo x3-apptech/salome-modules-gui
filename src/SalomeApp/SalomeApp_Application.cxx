@@ -74,6 +74,9 @@
 
 #include "SALOMEDS_StudyManager.hxx"
 
+#include "SALOME_ListIteratorOfListIO.hxx"
+#include "SALOME_ListIO.hxx"
+
 #define OBJECT_BROWSER_WIDTH 300
 
 static const char* imageEmptyIcon[] = {
@@ -479,7 +482,51 @@ void SalomeApp_Application::onSelection()
 
 void SalomeApp_Application::onSelectionChanged()
 {
-}
+ /*
+   SalomeApp_Module* module = dynamic_cast<SalomeApp_Module*>(activeModule());
+   if(module == NULL) return;
+   
+   QString ior = module->engineIOR();
+   if(ior.length() < 5) return; //Not a real CORBA IOR
+   CORBA::Object_var obj = orb()->string_to_object(ior.latin1());
+   if(CORBA::is_nil(obj)) return;
+   
+   SALOMEDS::Driver_var engine = SALOMEDS::Driver::_narrow(obj);
+   if(CORBA::is_nil(engine)) return;
+*/
+
+   SALOME_ListIO list;
+   SalomeApp_SelectionMgr* mgr = selectionMgr();
+   mgr->selectedObjects(list);
+   
+   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+   if(study == NULL) return;
+   
+   _PTR(Study) stdDS = study->studyDS();
+   if(!stdDS) return;
+   
+   QAction* qaction;  
+   
+   for ( SALOME_ListIteratorOfListIO it( list ); it.More(); it.Next() )
+   {
+      _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
+      qaction = action(EditCutId);
+      if( studyMgr()->CanCopy(so) ) {
+        qaction->setEnabled(true);
+	qaction = action(EditCopyId); 
+	qaction->setEnabled(true);  
+      }
+      else {
+        qaction->setEnabled(false);
+	qaction = action(EditCopyId);
+	qaction->setEnabled(false);         
+      }
+      qaction = action(EditPasteId);
+      if( studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
+      else qaction->setEnabled(false);
+   } 
+}		
+ 
 
 void SalomeApp_Application::onAboutRefresh()
 {
@@ -538,6 +585,13 @@ void SalomeApp_Application::updateCommandsStatus()
   a = action( PropertiesId );
   if( a )
     a->setEnabled( activeStudy() );
+    
+  a = action(EditCutId);
+  a->setEnabled(false);	
+  a = action(EditCopyId);
+  a->setEnabled(false);	      
+  a = action(EditPasteId);
+  a->setEnabled(false);      
 }
 
 //=======================================================================
