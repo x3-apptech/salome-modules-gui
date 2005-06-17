@@ -5,9 +5,10 @@
 
 #include "SalomeApp_Module.h"
 
+#include "SalomeApp_Study.h"
 #include "SalomeApp_DataModel.h"
 #include "SalomeApp_Application.h"
-#include "SalomeApp_Study.h"
+#include "SalomeApp_Preferences.h"
 
 #include <OB_Browser.h>
 
@@ -68,6 +69,14 @@ void SalomeApp_Module::viewManagers( QStringList& ) const
 {
 }
 
+void SalomeApp_Module::createPreferences()
+{
+}
+
+void SalomeApp_Module::preferencesChanged( const QString&, const QString& )
+{
+}
+
 SalomeApp_Application* SalomeApp_Module::getApp() const
 {
   return (SalomeApp_Application*)application();
@@ -90,6 +99,14 @@ QtxPopupMgr* SalomeApp_Module::popupMgr()
   if ( !myPopupMgr )
     myPopupMgr = new QtxPopupMgr( 0, this );
   return myPopupMgr;
+}
+
+SalomeApp_Preferences* SalomeApp_Module::preferences() const
+{
+  SalomeApp_Preferences* pref = 0;
+  if ( getApp() )
+    pref = getApp()->preferences();
+  return pref;
 }
 
 CAM_DataModel* SalomeApp_Module::createDataModel()
@@ -117,4 +134,43 @@ void SalomeApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu
 SalomeApp_Selection* SalomeApp_Module::createSelection() const
 {
   return new SalomeApp_Selection();
+}
+
+int SalomeApp_Module::addPreference( const QString& label )
+{
+  SalomeApp_Preferences* pref = preferences();
+  if ( !pref )
+    return -1;
+
+  int catId = pref->addPreference( moduleName(), -1 );
+  if ( catId == -1 )
+    return -1;
+
+  return pref->addPreference( label, catId );
+}
+
+int SalomeApp_Module::addPreference( const QString& label, const int pId, const int type,
+				     const QString& section, const QString& param )
+{
+  SalomeApp_Preferences* pref = preferences();
+  if ( !pref )
+    return -1;
+
+  return pref->addPreference( moduleName(), label, pId, type, section, param );
+}
+
+QVariant SalomeApp_Module::preferenceProperty( const int id, const QString& prop ) const
+{
+  QVariant var;
+  SalomeApp_Preferences* pref = preferences();
+  if ( pref )
+    var = pref->property( id, prop );
+  return var;
+}
+
+void SalomeApp_Module::setPreferenceProperty( const int id, const QString& prop, const QVariant& var )
+{
+  SalomeApp_Preferences* pref = preferences();
+  if ( pref )
+    pref->setProperty( id, prop, var );
 }

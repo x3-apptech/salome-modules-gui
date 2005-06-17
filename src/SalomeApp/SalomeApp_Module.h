@@ -26,6 +26,7 @@ class SUIT_DataObject;
 
 class SalomeApp_DataModel;
 class SalomeApp_Application;
+class SalomeApp_Preferences;
 class SalomeApp_SelectionManager;
 
 /*
@@ -56,16 +57,20 @@ public:
 
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
+  virtual void                        createPreferences();
+
   // Convenient shortcuts
   SalomeApp_Application*              getApp() const;
   
   void                                updateObjBrowser( bool = true, SUIT_DataObject* = 0 );
 
   virtual void                        selectionChanged();
+  virtual void                        preferencesChanged( const QString&, const QString& );
 
 public slots:
   virtual bool                        activateModule( SUIT_Study* );
   virtual bool                        deactivateModule( SUIT_Study* );
+
   void                                MenuItem();
 
 protected slots:
@@ -75,8 +80,17 @@ protected slots:
 
 protected:
   QtxPopupMgr*                        popupMgr();
+  SalomeApp_Preferences*              preferences() const;
+
   virtual CAM_DataModel*              createDataModel();
   virtual SalomeApp_Selection*        createSelection() const;
+
+  int                                 addPreference( const QString& label );
+  int                                 addPreference( const QString& label, const int pId, const int = -1,
+				                     const QString& section = QString::null,
+				                     const QString& param = QString::null );
+  QVariant                            preferenceProperty( const int, const QString& ) const;
+  void                                setPreferenceProperty( const int, const QString&, const QVariant& );
 
 private:
   QtxPopupMgr*                        myPopupMgr;

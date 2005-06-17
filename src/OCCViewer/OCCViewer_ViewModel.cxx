@@ -23,9 +23,10 @@
 #include <Prs3d_LineAspect.hxx>
 
 OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron )
-:SUIT_ViewModel() 
+: SUIT_ViewModel(),
+myBgColor( Qt::black )
 {
-    // init CasCade viewers
+  // init CasCade viewers
   myV3dViewer = OCCViewer_VService::Viewer3d( "", (short*) "Viewer3d", "", 1000.,
                                               V3d_XposYnegZpos, true, true );
 
@@ -73,11 +74,26 @@ OCCViewer_Viewer::~OCCViewer_Viewer()
 {
 }
 
+QColor OCCViewer_Viewer::backgroundColor() const
+{
+  return myBgColor;
+}
 
-SUIT_ViewWindow* OCCViewer_Viewer::createView(SUIT_Desktop* theDesktop)
+void OCCViewer_Viewer::setBackgroundColor( const QColor& c )
+{
+  if ( c.isValid() )
+    myBgColor = c;
+}
+
+SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   OCCViewer_ViewWindow* res = new OCCViewer_ViewWindow(theDesktop, this);
   res->initLayout();
+
+  OCCViewer_ViewPort3d* vp3d = res->getViewPort();
+  if ( vp3d )
+    vp3d->setBackgroundColor( myBgColor );
+
   return res;
 }
 
@@ -377,10 +393,35 @@ void OCCViewer_Viewer::setTransparency( const Handle(AIS_InteractiveObject)& obj
 //****************************************************************
 void OCCViewer_Viewer::toggleTrihedron()
 {
-  if (myTrihedron.IsNull()) return;
-  if (myAISContext->IsDisplayed(myTrihedron)) {
-    myAISContext->Erase(myTrihedron);
-  } else {
-    myAISContext->Display(myTrihedron);
-  }
+  setTrihedronShown( !isTrihedronVisible() );
+}
+
+bool OCCViewer_Viewer::isTrihedronVisible() const
+{
+  return !myTrihedron.IsNull() && !myAISContext.IsNull() && myAISContext->IsDisplayed( myTrihedron );
+}
+
+void OCCViewer_Viewer::setTrihedronShown( const bool on )
+{
+  if ( myTrihedron.IsNull() )
+    return;
+
+  if ( on )
+    myAISContext->Erase( myTrihedron );
+  else
+    myAISContext->Display( myTrihedron );
+}
+
+int OCCViewer_Viewer::trihedronSize() const
+{
+  int sz = 0;
+  if ( !myTrihedron.IsNull() )
+    sz = myTrihedron->Size();
+  return sz;
+}
+
+void OCCViewer_Viewer::setTrihedronSize( const int sz )
+{
+  if ( !myTrihedron.IsNull() )
+    myTrihedron->SetSize( sz );
 }

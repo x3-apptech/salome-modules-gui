@@ -19,7 +19,6 @@
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-//****************************************************************
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -27,7 +26,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
                                             VTKViewer_Viewer* theModel,
 					    VTKViewer_InteractorStyle* iStyle,
 					    VTKViewer_RenderWindowInteractor* rw )
-: SUIT_ViewWindow(theDesktop)
+: SUIT_ViewWindow( theDesktop )
 {
   myModel = theModel;
 
@@ -104,7 +103,6 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
   onResetView();
 }
 
-//****************************************************************
 VTKViewer_ViewWindow::~VTKViewer_ViewWindow()
 {
   myTransform->Delete();
@@ -120,12 +118,10 @@ VTKViewer_ViewWindow::~VTKViewer_ViewWindow()
   myTrihedron->Delete();
 }
 
-//****************************************************************
 bool VTKViewer_ViewWindow::isTrihedronDisplayed(){
   return myTrihedron->GetVisibility() == VTKViewer_Trihedron::eOn;
 }
 
-//****************************************************************
 /*!
     Activates 'zooming' transformation
 */

@@ -71,11 +71,41 @@ msgstr "OCC view"
 msgid "SalomeApp_Application::NEW_WINDOW_3"
 msgstr "VTK view"
 
-msgid "SalomeApp_Application::ABOUT"
-msgstr "About"
+msgid "SalomeApp_Application::TOT_DESK_LOADSCRIPT"
+msgstr "Load python script"
 
-msgid "SalomeApp_Application::APP_NAME_LONG"
-msgstr "GUI for SALOME platform v %1\nCopyright (c) CEA 2004"
+msgid "SalomeApp_Application::MEN_DESK_LOADSCRIPT"
+msgstr "Load script..."
+
+msgid "SalomeApp_Application::PRP_DESK_LOADSCRIPT"
+msgstr "Loads python script from file"
+
+msgid "SalomeApp_Application::TOT_DESK_PREFERENCES"
+msgstr "Preferences"
+
+msgid "SalomeApp_Application::MEN_DESK_PREFERENCES"
+msgstr "Preferences..."
+
+msgid "SalomeApp_Application::PRP_DESK_PREFERENCES"
+msgstr "Allow to change the preferences"
+
+msgid "SalomeApp_Application::TOT_DESK_MRU"
+msgstr "Most recently used"
+
+msgid "SalomeApp_Application::MEN_DESK_MRU"
+msgstr "Most recently used"
+
+msgid "SalomeApp_Application::TOT_DESK_PROPERTIES"
+msgstr "Study properties"
+
+msgid "SalomeApp_Application::MEN_DESK_PROPERTIES"
+msgstr "Properties..."
+
+msgid "SalomeApp_Application::PRP_DESK_PROPERTIES"
+msgstr "Edits study properties"
+
+msgid "SalomeApp_Application::MEN_REFRESH"
+msgstr "Refresh"
 
 //=======================================================================================
 
@@ -97,8 +127,37 @@ msgstr "Modules"
 msgid "SalomeApp_Application::INF_CANCELLED"
 msgstr "Module activation cancelled"
 
+//=======================================================================================
+
 msgid "SalomeApp_Application::PREFERENCES_NOT_LOADED"
 msgstr "Preferences for module \"<b>%1</b>\" will be available when the module will be loaded"
+
+msgid "SalomeApp_Application::PREF_CATEGORY_SALOME"
+msgstr "SALOME"
+
+msgid "SalomeApp_Application::PREF_TAB_GENERAL"
+msgstr "General"
+
+msgid "SalomeApp_Application::PREF_GROUP_OBJBROWSER"
+msgstr "Object browser"
+
+msgid "SalomeApp_Application::PREF_TAB_VIEWERS"
+msgstr "Viewers"
+
+msgid "SalomeApp_Application::PREF_GROUP_OCCVIEWER"
+msgstr "OCC Viewer 3d"
+
+msgid "SalomeApp_Application::PREF_GROUP_VTKVIEWER"
+msgstr "VTK Viewer 3d"
+
+msgid "SalomeApp_Application::PREF_VIEWER_BACKGROUND"
+msgstr "Background color"
+
+msgid "SalomeApp_Application::PREF_TRIHEDRON_SIZE"
+msgstr "Trihedron size"
+
+msgid "SalomeApp_Application::PREF_TRIHEDRON_SHOW"
+msgstr "Show trihedron"
 
 //=======================================================================================
 
@@ -116,6 +175,12 @@ msgstr "IOR"
 
 msgid "SalomeApp_Application::OBJ_BROWSER_COLUMN_3"
 msgstr "Reference entry"
+
+msgid "SalomeApp_Application::ALL_FILES_FILTER"
+msgstr "All files (*.*)"
+
+msgid "SalomeApp_Application::PYTHON_FILES_FILTER"
+msgstr "PYTHON Files (*.py)"
 
 //=======================================================================================
 
@@ -139,67 +204,40 @@ msgstr "Create, open or load study."
 
 //=======================================================================================
 
-msgid "SalomeApp_Application::ALL_FILES_FILTER"
-msgstr "All files ( * )"
-
-msgid "SalomeApp_Application::PYTHON_FILES_FILTER"
-msgstr "PYTHON Files ( *.py )"
+msgid "SalomeApp_PreferencesDlg::CAPTION"
+msgstr "Preferences"
 
 //=======================================================================================
 
-msgid "TOT_DESK_FILE_LOAD_SCRIPT"
-msgstr "Load python script"
-
-msgid "MEN_DESK_FILE_LOAD_SCRIPT"
-msgstr "Load script..."
-
-msgid "PRP_DESK_FILE_LOAD_SCRIPT"
-msgstr "Loads python script from file"
-
-msgid "TOT_DESK_FILE_PROPERTIES"
-msgstr "Study properties"
-
-msgid "MEN_DESK_FILE_PROPERTIES"
-msgstr "Properties..."
-
-msgid "PRP_DESK_FILE_PROPERTIES"
-msgstr "Edits study properties"
-
-
-
-## SalomeApp_StudyPropertiesDlg
-msgid "PRP_MODE_FROM_SCRATCH"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE_FROM_SCRATCH"
 msgstr "from scratch"
 
-msgid "PRP_MODE_FROM_COPYFROM"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE_FROM_COPYFROM"
 msgstr "copy from"
 
-msgid "PRP_NO"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_NO"
 msgstr "No"
 
-msgid "PRP_YES"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_YES"
 msgstr "Yes"
 
-msgid "TLT_STUDY_PROPERTIES"
+msgid "SalomeApp_StudyPropertiesDlg::TLT_STUDY_PROPERTIES"
 msgstr "Study Properties"
 
-msgid "PRP_AUTHOR"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_AUTHOR"
 msgstr "Author"
 
-msgid "PRP_DATE"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_DATE"
 msgstr "Date"
 
-msgid "PRP_MODE"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE"
 msgstr "Mode"
 
-msgid "PRP_LOCKED"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_LOCKED"
 msgstr "LOCKED"
 
-msgid "PRP_MODIFIED"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFIED"
 msgstr "MODIFIED"
 
-msgid "PRP_MODIFICATIONS"
+msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFICATIONS"
 msgstr "Modifications"
-
-msgid "MEN_REFRESH"
-msgstr "Refresh"

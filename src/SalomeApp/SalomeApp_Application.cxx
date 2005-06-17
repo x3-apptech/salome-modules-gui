@@ -17,6 +17,7 @@
 
 #include "SalomeApp_AboutDlg.h"
 #include "SalomeApp_ModuleDlg.h"
+#include "SalomeApp_Preferences.h"
 #include "SalomeApp_PreferencesDlg.h"
 #include "SalomeApp_StudyPropertiesDlg.h"
 
@@ -46,7 +47,9 @@
 #include <SUIT_Session.h>
 
 #include <QtxToolBar.h>
+#include <QtxMRUAction.h>
 #include <QtxDockAction.h>
+#include <QtxResourceEdit.h>
 
 #include <OB_Browser.h>
 
@@ -108,6 +111,8 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
   return new SalomeApp_Application();
 }
 
+SalomeApp_Preferences* SalomeApp_Application::_prefs_ = 0;
+
 /*
   Class       : SalomeApp_Application
   Description : Application containing SalomeApp module
@@ -115,7 +120,7 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 SalomeApp_Application::SalomeApp_Application()
 : CAM_Application( false ),
-myPrefDlg( 0 )
+myPrefs( 0 )
 {
   STD_TabDesktop* desk = new STD_TabDesktop();
 
@@ -173,8 +178,8 @@ void SalomeApp_Application::start()
   putInfo( "" );
 }
 
-QString SalomeApp_Application::applicationName() const 
-{ 
+QString SalomeApp_Application::applicationName() const
+{
   return tr( "APP_NAME" );
 }
 
@@ -188,7 +193,7 @@ QString SalomeApp_Application::applicationVersion() const
     if ( !path.isEmpty() )
       path += QDir::separator();
     path += QString( "bin/salome/VERSION" );
-  
+
     QFile vf( path );
     if ( vf.open( IO_ReadOnly ) )
     {
@@ -260,20 +265,27 @@ void SalomeApp_Application::createActions()
 
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-  
+
   // Load script
-  createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
-		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
+  createAction( LoadScriptId, tr( "TOT_DESK_LOADSCRIPT" ), QIconSet(),
+		tr( "MEN_DESK_LOADSCRIPT" ), tr( "PRP_DESK_LOADSCRIPT" ),
 		0, desk, false, this, SLOT( onLoadScript() ) );
-  int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
-  createMenu( LoadScriptId, fileMenu, 10, -1 );
 
-  createAction( PropertiesId, tr( "TOT_DESK_FILE_PROPERTIES" ), QIconSet(),
-	        tr( "MEN_DESK_FILE_PROPERTIES" ), tr( "PRP_DESK_FILE_PROPERTIES" ),
+  // Properties
+  createAction( PropertiesId, tr( "TOT_DESK_PROPERTIES" ), QIconSet(),
+	        tr( "MEN_DESK_PROPERTIES" ), tr( "PRP_DESK_PROPERTIES" ),
 	        0, desk, false, this, SLOT( onProperties() ) );
-  createMenu( PropertiesId, fileMenu, 10, -1 );
 
-  
+  // Preferences
+  createAction( PreferencesId, tr( "TOT_DESK_PREFERENCES" ), QIconSet(),
+		tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
+		CTRL+Key_P, desk, false, this, SLOT( onPreferences() ) );
+
+  // MRU
+  QtxMRUAction* mru = new QtxMRUAction( tr( "TOT_DESK_MRU" ), tr( "MEN_DESK_MRU" ), desk );
+  connect( mru, SIGNAL( activated( QString ) ), this, SLOT( onMRUActivated( QString ) ) );
+  registerAction( MRUId, mru );
+
   // default icon for neutral point ('SALOME' module)
   QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
   if ( defIcon.isNull() )
@@ -332,7 +344,7 @@ void SalomeApp_Application::createActions()
   }
 
   SUIT_Tools::simplifySeparators( modTBar );
-  
+
   // New window
 
   int windowMenu = createMenu( tr( "MEN_DESK_WINDOW" ), -1, 100 );
@@ -347,14 +359,31 @@ void SalomeApp_Application::createActions()
 
   for ( int id = NewGLViewId; id <= NewVTKViewId; id++ )
   {
-    QAction* a = createAction( id, tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ), QIconSet(), 
+    QAction* a = createAction( id, tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ), QIconSet(),
 			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
 			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
 			       accelMap.contains( id ) ? accelMap[id] : 0, desk, false, this, SLOT( onNewWindow() ) );
     createMenu( a, newWinMenu, -1 );
   }
-
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
+
+
+
+  int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
+
+  createMenu( separator(), fileMenu, -1, 15, -1 );
+  createMenu( LoadScriptId, fileMenu, 15, -1 );
+  createMenu( separator(), fileMenu, -1, 15, -1 );
+  createMenu( PropertiesId, fileMenu, 10, -1 );
+  createMenu( separator(), fileMenu, -1, 15, -1 );
+  createMenu( PreferencesId, fileMenu, 15, -1 );
+  createMenu( separator(), fileMenu, -1, 15, -1 );
+
+  /*
+  createMenu( separator(), fileMenu, -1, 100, -1 );
+  createMenu( MRUId, fileMenu, 100, -1 );
+  createMenu( separator(), fileMenu, -1, 100, -1 );
+  */
 }
 
 void SalomeApp_Application::onModuleActivation( QAction* a )
@@ -446,7 +475,7 @@ void SalomeApp_Application::onNewDoc()
   saveWindowsGeometry();
 
   CAM_Application::onNewDoc();
-  
+
   if ( !study ) // new study will be create in THIS application
   {
     updateWindows();
@@ -464,12 +493,28 @@ void SalomeApp_Application::onOpenDoc()
   saveWindowsGeometry();
 
   CAM_Application::onOpenDoc();
-  
+
   if ( !study ) // new study will be create in THIS application
   {
     updateWindows();
     updateViewManagers();
   }
+}
+
+bool SalomeApp_Application::onOpenDoc( const QString& aName )
+{
+  bool res = CAM_Application::onOpenDoc( aName );
+
+  QAction* a = action( MRUId );
+  if ( a && a->inherits( "QtxMRUAction" ) )
+  {
+    QtxMRUAction* mru = (QtxMRUAction*)a;
+    if ( res )
+      mru->insert( aName );
+    else
+      mru->remove( aName );
+  }
+  return res;
 }
 
 void SalomeApp_Application::onSelection()
@@ -542,7 +587,7 @@ void SalomeApp_Application::onRefresh()
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 {
   CAM_Application::setActiveStudy( study );
-    
+
   activateWindows();
 }
 
@@ -550,17 +595,17 @@ void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 // name    : createNewStudy
 // Purpose : Create new study
 //=======================================================================
-SUIT_Study* SalomeApp_Application::createNewStudy() 
-{ 
-  SalomeApp_Study* aStudy = new SalomeApp_Study( this ); 
-  
+SUIT_Study* SalomeApp_Application::createNewStudy()
+{
+  SalomeApp_Study* aStudy = new SalomeApp_Study( this );
+
   // Set up processing of major study-related events
   connect( aStudy, SIGNAL( created( SUIT_Study* ) ), this, SLOT( onStudyCreated( SUIT_Study* ) ) );
   connect( aStudy, SIGNAL( opened ( SUIT_Study* ) ), this, SLOT( onStudyOpened ( SUIT_Study* ) ) );
   connect( aStudy, SIGNAL( saved  ( SUIT_Study* ) ), this, SLOT( onStudySaved  ( SUIT_Study* ) ) );
   connect( aStudy, SIGNAL( closed ( SUIT_Study* ) ), this, SLOT( onStudyClosed ( SUIT_Study* ) ) );
 
-  return aStudy; 
+  return aStudy;
 }
 
 //=======================================================================
@@ -736,29 +781,9 @@ PythonConsole* SalomeApp_Application::pythonConsole()
   return console;
 }
 
-QtxResourceEdit* SalomeApp_Application::resourceEdit() const
+SalomeApp_Preferences* SalomeApp_Application::preferences() const
 {
-  return 0;
-  /*
-  QtxResourceEdit* edit = 0;
-  if ( !myPrefDlg )
-  {
-    SalomeApp_Application* that = (SalomeApp_Application*)this;
-    that->myPrefDlg = new SalomeApp_PreferencesDlg( that->desktop() );
-
-    edit = myPrefDlg->resourceEdit();
-
-    QStringList modList;
-    modules( modList, false );
-    for ( QStringList::const_iterator it = modList.begin(); it != modList.end(); ++it )
-    {
-      int id = edit->addItem( *it );
-      edit->setProperty( id, "info", tr( "PREFERENCES_NOT_LOADED" ).arg( *it ) );
-    }
-  }
-  else
-    edit = myPrefDlg->resourceEdit();
-  */
+  return preferences( false );
 }
 
 SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, const bool create )
@@ -784,6 +809,8 @@ SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, 
 
 SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmType )
 {
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+
   SUIT_ViewManager* viewMgr = 0;
   if ( vmType == GLViewer_Viewer::Type() )
   {
@@ -798,12 +825,17 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
   else if ( vmType == OCCViewer_Viewer::Type() )
   {
     viewMgr = new OCCViewer_ViewManager( activeStudy(), desktop() );
-    viewMgr->setViewModel( new SOCC_Viewer() );// custom view model, which extends SALOME_View interface
+    SOCC_Viewer* vm = new SOCC_Viewer();
+    vm->setBackgroundColor( resMgr->colorValue( "OCCViewer", "background", vm->backgroundColor() ) );
+    vm->setTrihedronSize( resMgr->integerValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ) );
+    viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
     new SalomeApp_OCCSelector( (OCCViewer_Viewer*)viewMgr->getViewModel(), mySelMgr );
   }
   else if ( vmType == SVTK_Viewer::Type() )
   {
     viewMgr = new SVTK_ViewManager( activeStudy(), desktop() );
+    SVTK_Viewer* vm = (SVTK_Viewer*)viewMgr->getViewModel();
+    vm->setBackgroundColor( resMgr->colorValue( "VTKViewer", "background", vm->backgroundColor() ) );
     new SalomeApp_VTKSelector((SVTK_Viewer*)viewMgr->getViewModel(),mySelMgr);
   }
 
@@ -881,28 +913,64 @@ void SalomeApp_Application::onLoadScript( )
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
   if ( !appStudy ) return;
   _PTR(Study) aStudy = appStudy->studyDS();
-  
+
   if ( aStudy->GetProperties()->IsLocked() ) {
     SUIT_MessageBox::warn1 ( desktop(),
-			     QObject::tr("WRN_WARNING"), 
+			     QObject::tr("WRN_WARNING"),
 			     QObject::tr("WRN_STUDY_LOCKED"),
 			     QObject::tr("BUT_OK") );
     return;
   }
-  
+
   QStringList filtersList;
   filtersList.append(tr("PYTHON_FILES_FILTER"));
   filtersList.append(tr("ALL_FILES_FILTER"));
-  
-  QString aFile = SUIT_FileDlg::getFileName(desktop(), "", filtersList, tr("TOT_DESK_FILE_LOAD_SCRIPT"), true, true );
-  if(!aFile.isEmpty()) {
+
+  QString aFile = SUIT_FileDlg::getFileName( desktop(), "", filtersList, tr( "TOT_DESK_LOADSCRIPT" ), true, true );
+
+  if ( !aFile.isEmpty() )
+  {
     QString command = QString("execfile(\"%1\")").arg(aFile);
-    
+
     PythonConsole* pyConsole = pythonConsole();
-    
-    if(pyConsole)
-      pyConsole->exec(command);
+
+    if ( pyConsole )
+      pyConsole->exec( command );
   }
+}
+
+void SalomeApp_Application::onPreferences()
+{
+  QApplication::setOverrideCursor( Qt::waitCursor );
+
+  SalomeApp_PreferencesDlg* prefDlg = new SalomeApp_PreferencesDlg( preferences( true ), desktop());
+
+  QApplication::restoreOverrideCursor();
+
+  if ( !prefDlg )
+    return;
+
+  prefDlg->exec();
+
+  delete prefDlg;
+}
+
+void SalomeApp_Application::onMRUActivated( QString aName )
+{
+  onOpenDoc( aName );
+}
+
+void SalomeApp_Application::onPreferenceChanged( QString& modName, QString& section, QString& param )
+{
+  SalomeApp_Module* sMod = 0;
+  CAM_Module* mod = module( modName );
+  if ( mod && mod->inherits( "SalomeApp_Module" ) )
+    sMod = (SalomeApp_Module*)mod;
+
+  if ( sMod )
+    sMod->preferencesChanged( section, param );
+  else
+    preferencesChanged( section, param );
 }
 
 QString SalomeApp_Application::getFileFilter() const
@@ -927,6 +995,8 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 {
   QWidget* wid = 0;
 
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+
   if ( flag == WT_ObjectBrowser )
   {
     OB_Browser* ob = new OB_Browser( desktop() );
@@ -937,8 +1007,13 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     ob->setFilter( new SalomeApp_OBFilter( selectionMgr() ) );
 
     ob->setNameTitle( tr( "OBJ_BROWSER_NAME" ) );
+
     for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
+    {
       ob->addColumn( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), i );
+      ob->setColumnShown( i, resMgr->booleanValue( "ObjectBrowser",
+                                                   QString().sprintf( "visibility_column_%d", i ), true ) );
+    }
 
     // Create OBSelector
     new SalomeApp_OBSelector( ob, mySelMgr );
@@ -971,11 +1046,133 @@ void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
   aMap.insert( WT_ObjectBrowser, Qt::DockLeft );
   aMap.insert( WT_PyConsole, Qt::DockBottom );
-  aMap.insert( WT_LogWindow, Qt::DockBottom );
+  //  aMap.insert( WT_LogWindow, Qt::DockBottom );
 }
 
 void SalomeApp_Application::defaultViewManagers( QStringList& ) const
 {
+}
+
+SalomeApp_Preferences* SalomeApp_Application::preferences( const bool crt ) const
+{
+  if ( myPrefs )
+    return myPrefs;
+
+  SalomeApp_Application* that = (SalomeApp_Application*)this;
+
+  if ( !_prefs_ && crt )
+  {
+    _prefs_ = new SalomeApp_Preferences( resourceMgr() );
+    that->createPreferences( _prefs_ );
+  }
+
+  that->myPrefs = _prefs_;
+
+  QPtrList<SUIT_Application> appList = SUIT_Session::session()->applications();
+  for ( QPtrListIterator<SUIT_Application> appIt ( appList ); appIt.current(); ++appIt )
+  {
+    if ( !appIt.current()->inherits( "SalomeApp_Application" ) )
+      continue;
+
+    SalomeApp_Application* app = (SalomeApp_Application*)appIt.current();
+
+    QStringList modNameList;
+    app->modules( modNameList, false );
+    for ( QStringList::const_iterator it = modNameList.begin(); it != modNameList.end(); ++it )
+    {
+      int id = _prefs_->addPreference( *it );
+      _prefs_->setProperty( id, "info", tr( "PREFERENCES_NOT_LOADED" ).arg( *it ) );
+    }
+
+    ModuleList modList;
+    app->modules( modList );
+    for ( ModuleListIterator itr( modList ); itr.current(); ++itr )
+    {
+      SalomeApp_Module* mod = 0;
+      if ( itr.current()->inherits( "SalomeApp_Module" ) )
+	mod = (SalomeApp_Module*)itr.current();
+
+      if ( mod && !_prefs_->hasModule( mod->moduleName() ) )
+	mod->createPreferences();
+    }
+  }
+
+  connect( myPrefs, SIGNAL( preferenceChanged( QString&, QString&, QString& ) ),
+           this, SLOT( onPreferenceChanged( QString&, QString&, QString& ) ) );
+
+  return myPrefs;
+}
+
+void SalomeApp_Application::moduleAdded( CAM_Module* mod )
+{
+  CAM_Application::moduleAdded( mod );
+
+  SalomeApp_Module* salomeMod = 0;
+  if ( mod && mod->inherits( "SalomeApp_Module" ) )
+    salomeMod = (SalomeApp_Module*)mod;
+
+  if ( myPrefs && salomeMod && !myPrefs->hasModule( salomeMod->moduleName() ))
+    salomeMod->createPreferences();
+}
+
+void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
+{
+  if ( !pref )
+    return;
+
+  int salomeCat = pref->addPreference( tr( "PREF_CATEGORY_SALOME" ) );
+
+  int genTab = pref->addPreference( tr( "PREF_TAB_GENERAL" ), salomeCat );
+
+  int obGroup = pref->addPreference( tr( "PREF_GROUP_OBJBROWSER" ), genTab );
+  for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
+  {
+    pref->addPreference( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), obGroup,
+                         SalomeApp_Preferences::Bool, "ObjectBrowser", QString().sprintf( "visibility_column_%d", i ) );
+  }
+  pref->setProperty( obGroup, "columns", 1 );
+
+  int viewTab = pref->addPreference( tr( "PREF_TAB_VIEWERS" ), salomeCat );
+
+  int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), viewTab );
+
+  int vtkGroup = pref->addPreference( tr( "PREF_GROUP_VTKVIEWER" ), viewTab );
+  pref->setProperty( occGroup, "columns", 1 );
+  pref->setProperty( vtkGroup, "columns", 1 );
+
+  pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
+		       SalomeApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
+  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup,
+		       SalomeApp_Preferences::Color, "OCCViewer", "background" );
+
+  pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
+		       SalomeApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
+  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGroup,
+		       SalomeApp_Preferences::Color, "VTKViewer", "background" );
+}
+
+void SalomeApp_Application::preferencesChanged( const QString& sec, const QString& param )
+{
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+  if ( !resMgr )
+    return;
+
+  if ( sec == QString( "OCCViewer" ) && param == QString( "trihedron_size" ) )
+  {
+    int sz = resMgr->integerValue( sec, param, -1 );
+    QPtrList<SUIT_ViewManager> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current() && sz >= 0; ++it )
+    {
+      SUIT_ViewModel* vm = it.current()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+	continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setTrihedronSize( sz );
+      occVM->getAISContext()->UpdateCurrentViewer();
+    }
+  }
 }
 
 void SalomeApp_Application::afterCloseDoc()
@@ -1118,7 +1315,7 @@ void SalomeApp_Application::loadWindowsGeometry()
   QString modName;
   if ( activeModule() )
     modName = moduleLibrary( activeModule()->moduleName(), false );
-  
+
   QString section = QString( "windows_geometry" );
   if ( !modName.isEmpty() )
     section += QString( "." ) + modName;
@@ -1141,7 +1338,7 @@ void SalomeApp_Application::saveWindowsGeometry()
   QString modName;
   if ( activeModule() )
     modName = moduleLibrary( activeModule()->moduleName(), false );
-  
+
   QString section = QString( "windows_geometry" );
   if ( !modName.isEmpty() )
     section += QString( "." ) + modName;
@@ -1184,6 +1381,7 @@ QString SalomeApp_Application::getFileName( bool open, const QString& initial, c
   if ( !parent )
     parent = desktop();
   QStringList fls = QStringList::split( ";", filters, false );
+
   return SUIT_FileDlg::getFileName( parent, initial, fls, caption, open, true );
 }
 

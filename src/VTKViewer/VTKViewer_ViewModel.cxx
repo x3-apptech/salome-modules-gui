@@ -15,7 +15,8 @@
 
 //****************************************************************
 VTKViewer_Viewer::VTKViewer_Viewer()
-:SUIT_ViewModel() 
+: SUIT_ViewModel(),
+myBgColor( Qt::black )
 {
 }
 
@@ -24,10 +25,23 @@ VTKViewer_Viewer::~VTKViewer_Viewer()
 {
 }
 
-//****************************************************************
-SUIT_ViewWindow* VTKViewer_Viewer::createView(SUIT_Desktop* theDesktop)
+QColor VTKViewer_Viewer::backgroundColor() const
 {
-  return new VTKViewer_ViewWindow(theDesktop, this);
+  return myBgColor;
+}
+
+void VTKViewer_Viewer::setBackgroundColor( const QColor& c )
+{
+  if ( c.isValid() )
+    myBgColor = c;
+}
+
+//****************************************************************
+SUIT_ViewWindow* VTKViewer_Viewer::createView( SUIT_Desktop* theDesktop )
+{
+  VTKViewer_ViewWindow* vw = new VTKViewer_ViewWindow( theDesktop, this );
+  vw->setBackgroundColor( myBgColor );
+  return vw;
 }
 
 //*********************************************************************

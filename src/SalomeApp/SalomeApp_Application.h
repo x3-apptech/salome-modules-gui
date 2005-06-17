@@ -28,10 +28,9 @@ class QDockWindow;
 class LogWindow;
 class OB_Browser;
 class PythonConsole;
-class QtxResourceEdit;
 class SalomeApp_Module;
+class SalomeApp_Preferences;
 class SalomeApp_SelectionMgr;
-class SalomeApp_PreferencesDlg;
 class SalomeApp_WidgetContainer;
 
 class SALOME_LifeCycleCORBA;
@@ -53,7 +52,8 @@ public:
   typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
 
   enum { ModulesListId = STD_Application::UserID, NewGLViewId,
-         NewPlot2dId, NewOCCViewId, NewVTKViewId, LoadScriptId, PropertiesId, UserID };
+         NewPlot2dId, NewOCCViewId, NewVTKViewId, LoadScriptId,
+         PropertiesId, PreferencesId, MRUId, UserID };
 
 public:
   SalomeApp_Application();
@@ -71,10 +71,10 @@ public:
   OB_Browser*                         objectBrowser();
   PythonConsole*                      pythonConsole();   
 
-  QtxResourceEdit*                    resourceEdit() const;
+  SalomeApp_Preferences*              preferences() const;
 
   virtual QString                     getFileFilter() const;
-  QString                             getFileName( bool open, const QString& initial, const QString& filters, 
+  virtual QString                     getFileName( bool open, const QString& initial, const QString& filters, 
 						   const QString& caption, QWidget* parent );
 
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
@@ -109,6 +109,7 @@ public slots:
   virtual void                        onNewDoc();
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
+  virtual bool                        onOpenDoc( const QString& );
 
 private slots:
   void                                onSelection();
@@ -130,6 +131,13 @@ protected:
   virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
 
+  virtual void                        moduleAdded( CAM_Module* );
+
+  SalomeApp_Preferences*              preferences( const bool ) const;
+
+  virtual void                        createPreferences( SalomeApp_Preferences* );
+  virtual void                        preferencesChanged( const QString&, const QString& );
+
 private slots:
   void                                onNewWindow();
   void                                onModuleActivation( QAction* );
@@ -140,8 +148,13 @@ private slots:
   void                                onStudySaved( SUIT_Study* );
   void                                onStudyClosed( SUIT_Study* );
   
-  void                                onLoadScript(); 
   void                                onProperties();
+  void                                onLoadScript(); 
+
+  void                                onPreferences();
+  void                                onMRUActivated( QString );
+
+  void                                onPreferenceChanged( QString&, QString&, QString& );
 
 private:
   void                                updateWindows();
@@ -150,6 +163,8 @@ private:
 
   void                                loadWindowsGeometry();
   void                                saveWindowsGeometry();
+
+  void                                updatePreference( const QString&, const QString&, const QString& );
 
   QString                             defaultModule() const;
   void                                currentWindows( QMap<int, int>& ) const;
@@ -164,10 +179,12 @@ private:
   typedef QMap<int, SalomeApp_WidgetContainer*> WindowMap;
 
 private:
+  SalomeApp_Preferences*              myPrefs;
   SalomeApp_SelectionMgr*             mySelMgr;
-  SalomeApp_PreferencesDlg*           myPrefDlg;
   ActionMap                           myActions;
   WindowMap                           myWindows;
+
+  static SalomeApp_Preferences*       _prefs_;
 };
 
 #ifdef WIN32

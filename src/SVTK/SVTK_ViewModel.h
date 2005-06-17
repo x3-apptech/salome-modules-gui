@@ -7,6 +7,8 @@
 #include "SALOME_Prs.h"
 #include "SALOME_InteractiveObject.hxx"
 
+#include <qcolor.h>
+
 class SVTK_EXPORT SVTK_Viewer : public SUIT_ViewModel, public SALOME_View 
 {
   Q_OBJECT;
@@ -22,6 +24,9 @@ public:
   virtual void             setViewManager(SUIT_ViewManager* theViewManager);
   virtual void             contextMenuPopup( QPopupMenu* );
   virtual QString          getType() const { return Type(); }
+
+  QColor backgroundColor() const;
+  void   setBackgroundColor( const QColor& );
 
 public:
   void enableSelection(bool isEnabled);
@@ -62,8 +67,9 @@ protected slots:
   void onChangeBgColor();
 
 private:
-  bool mySelectionEnabled;
-  bool myMultiSelectionEnabled;
+  QColor myBgColor;
+  bool   mySelectionEnabled;
+  bool   myMultiSelectionEnabled;
 };
 
 #endif

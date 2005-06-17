@@ -4,6 +4,8 @@
 #include "VTKViewer.h"
 #include "SUIT_ViewModel.h"
 
+#include <qcolor.h>
+
 class SUIT_ViewWindow;
 class SUIT_Desktop;
 
@@ -32,6 +34,9 @@ public:
 
   int  getSelectionCount() const;
 
+  QColor backgroundColor() const;
+  void   setBackgroundColor( const QColor& );
+
 signals:
   void selectionChanged();
 
@@ -45,8 +50,9 @@ protected slots:
   void onChangeBgColor();
 
 private:
-  bool mySelectionEnabled;
-  bool myMultiSelectionEnabled;
+  QColor myBgColor;
+  bool   mySelectionEnabled;
+  bool   myMultiSelectionEnabled;
 };
 
 #endif

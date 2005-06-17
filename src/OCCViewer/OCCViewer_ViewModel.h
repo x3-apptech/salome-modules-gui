@@ -1,6 +1,7 @@
 #ifndef OCCVIEWER_VIEWMODEL_H
 #define OCCVIEWER_VIEWMODEL_H
 
+#include <qcolor.h>
 #include <qcursor.h>
 
 #include "OCCViewer.h"
@@ -48,7 +49,7 @@ public:
   static QString Type() { return "OCCViewer"; }
 
   OCCViewer_Viewer( bool DisplayTrihedron = true );
-	virtual ~OCCViewer_Viewer();
+  virtual ~OCCViewer_Viewer();
 
   void update();
 
@@ -72,13 +73,22 @@ public:
   virtual void                    updateViewAspects( const viewAspectList& );
   virtual void                    clearViewAspects();
 
+  QColor                          backgroundColor() const;
+  void                            setBackgroundColor( const QColor& );
+
   //! returns true if 3d Trihedron in viewer was created
-  bool trihedronActivated() const { return !myTrihedron.IsNull(); }
-  virtual void toggleTrihedron();
+  bool                            trihedronActivated() const { return !myTrihedron.IsNull(); }
+
+  void                            toggleTrihedron();
+  bool                            isTrihedronVisible() const;
+  virtual void                    setTrihedronShown( const bool );
+
+  int                             trihedronSize() const;
+  virtual void                    setTrihedronSize( const int );
 
 public slots:
-	void onClearViewAspects();
-
+  void                            onClearViewAspects();
+ 
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
   Handle(V3d_Viewer)              getCollector3d() const { return myV3dCollector; }
@@ -121,15 +131,17 @@ protected slots:
 private:
   Handle(V3d_Viewer)              myV3dViewer;
   Handle(V3d_Viewer)              myV3dCollector;
-  Handle(AIS_InteractiveContext)  myAISContext;
+
   Handle(AIS_Trihedron)           myTrihedron;
+  Handle(AIS_InteractiveContext)  myAISContext;
 
   viewAspectList                  myViewAspects;
 
-  bool mySelectionEnabled;
-  bool myMultiSelectionEnabled;
+  bool                            mySelectionEnabled;
+  bool                            myMultiSelectionEnabled;
 
-  QPoint myStartPnt, myEndPnt;
+  QColor                          myBgColor;
+  QPoint                          myStartPnt, myEndPnt;
 };
 
 #ifdef WIN32

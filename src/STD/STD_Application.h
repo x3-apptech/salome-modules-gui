@@ -56,7 +56,7 @@ public:
   void                  viewManagers( const QString&, ViewManagerList& ) const;
 
   virtual QString       getFileFilter() const { return QString::null; }
-  QString               getFileName( bool open, const QString& initial, const QString& filters, 
+  virtual QString       getFileName( bool open, const QString& initial, const QString& filters, 
 				     const QString& caption, QWidget* parent );
 
   virtual void          start();

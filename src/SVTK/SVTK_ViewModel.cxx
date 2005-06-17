@@ -49,29 +49,36 @@ static _PTR(Study) getStudyDS()
 }
 
 //==========================================================
-SVTK_Viewer
-::SVTK_Viewer()
+SVTK_Viewer::SVTK_Viewer()
 {
 }
 
 //==========================================================
-SVTK_Viewer
-::~SVTK_Viewer() 
+SVTK_Viewer::~SVTK_Viewer() 
 {
 }
 
-//==========================================================
-SUIT_ViewWindow* 
-SVTK_Viewer
-::createView( SUIT_Desktop* theDesktop )
+QColor SVTK_Viewer::backgroundColor() const
 {
-  return new SVTK_ViewWindow( theDesktop, this );
+  return myBgColor;
+}
+
+void SVTK_Viewer::setBackgroundColor( const QColor& c )
+{
+  if ( c.isValid() )
+    myBgColor = c;
 }
 
 //==========================================================
-void 
-SVTK_Viewer
-::setViewManager(SUIT_ViewManager* theViewManager)
+SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
+{
+  SVTK_ViewWindow* vw = new SVTK_ViewWindow( theDesktop, this );
+  vw->setBackgroundColor( backgroundColor() );
+  return vw;
+}
+
+//==========================================================
+void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 {
   SUIT_ViewModel::setViewManager(theViewManager);
 
