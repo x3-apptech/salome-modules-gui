@@ -38,8 +38,8 @@ QtxResourceEdit( mgr )
   myList  = new QListBox( base );
   myStack = new QWidgetStack( base );
 
-  myList->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred ) );
-  myStack->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  myList->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Expanding ) );
+  myStack->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
   myList->setSelectionMode( QListBox::Single );
 
@@ -399,7 +399,7 @@ QtxResourceEdit::Item* QtxListResourceEdit::PrefItem::createItem( const QString&
 QtxListResourceEdit::Spacer::Spacer( QtxResourceEdit* edit, Item* pItem, QWidget* parent )
 : PrefItem( Space, edit, pItem, parent )
 {
-  setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred ) );
+  setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
 QtxListResourceEdit::Spacer::~Spacer()
