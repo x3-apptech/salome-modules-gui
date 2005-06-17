@@ -301,16 +301,18 @@ bool SUIT_FileDlg::processPath( const QString& path )
 */
 void SUIT_FileDlg::quickDir(const QString& dirPath)
 {
-  if ( !QDir(dirPath).exists() ) {
-    SUIT_MessageBox::error1(this, 
+  QString aPath = dirPath;
+  if ( !QDir(aPath).exists() ) {
+    aPath = QDir::homeDirPath();
+    /*    SUIT_MessageBox::error1(this, 
 			   tr("ERR_ERROR"),
 			   tr("ERR_DIR_NOT_EXIST").arg(dirPath), 
-			   tr("BUT_OK"));
+			   tr("BUT_OK"));*/
     
   }
-  else {
-    processPath(dirPath);
-  }
+  //  else {
+  processPath(aPath);
+    //  }
 }
 /*!
   Called when user presses "Add" button - adds current directory to quick directory
