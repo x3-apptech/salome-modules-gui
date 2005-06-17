@@ -162,17 +162,30 @@ private:
   SUIT_ExceptionHandler*  myHandler;
 };
 
-
 int main(int argc, char **argv)
 {
   qInstallMsgHandler( MessageOutput );
 
   /*
-   * Python initialisation : only once
-   */
-
   char* _argv_0[512];
   strcpy( (char*)_argv_0, (char*)argv[0] );
+  */
+
+  // QApplication should be create before all other operations
+  // When uses QApplication::libraryPaths() (example, QFile::encodeName())
+  // qApp used for detection of the executable dir path.
+  SALOME_QApplication _qappl( argc, argv );
+  ASSERT( QObject::connect(&_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) ) );
+  _qappl.setStyle( "salome" );
+  /*
+  QStringList lst = _qappl.libraryPaths();
+  for ( QStringList::const_iterator it = lst.begin(); it != lst.end(); ++it )
+    printf( "=====> Library path: %s\n", (*it).latin1() );
+  */
+
+  /*
+    Python initialisation : only once
+  */
 
   int _argc = 1;
   char* _argv[] = {""};
@@ -233,16 +246,22 @@ int main(int argc, char **argv)
 	// this thread wakes up, and lock mutex
 
 	INFOS("Session activated, Launch IAPP...");
-
+	/*
 	int qArgc = 1;
 	argv[0] = (char*)_argv_0;
 	SALOME_QApplication* _qappl = new SALOME_QApplication( qArgc, argv );
+
+	QStringList lst = _qappl->libraryPaths();
+	for ( QStringList::const_iterator it = lst.begin(); it != lst.end(); ++it )
+	  printf( "=====> Library path: %s\n", (*it).latin1() );
+
 	_qappl->setStyle( "salome" );
+
+	ASSERT ( QObject::connect(_qappl, SIGNAL(lastWindowClosed()), _qappl, SLOT(quit()) ) );
+	*/
 	
 	INFOS("creation QApplication");
 	_GUIMutex.unlock();
-
-	ASSERT ( QObject::connect(_qappl, SIGNAL(lastWindowClosed()), _qappl, SLOT(quit()) ) );
 
 	// 3.1 SUIT_Session creation	
 	SUIT_Session* aGUISession = new SALOME_Session();
@@ -257,17 +276,13 @@ int main(int argc, char **argv)
 	  {
 	    MESSAGE("run(): starting the main event loop");
 
-// 3.2 load SalomeApp dynamic library
-#ifdef WNT
-	    SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp.dll", 0, 0 );
-#else
-            SUIT_Application* aGUIApp = aGUISession->startApplication( "libSalomeApp.so", 0, 0 );
-#endif
+	    // 3.2 load SalomeApp dynamic library
+            SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
 	    if ( aGUIApp ) 
 	    {
-	      _qappl->setHandler( aGUISession->handler() ); // after loading SalomeApp application
+	      _qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
                                                             // aGUISession contains SalomeApp_ExceptionHandler
-	      result = _qappl->exec();
+	      result = _qappl.exec();
 	    }
 	    break;
 	  }
