@@ -63,6 +63,7 @@ public slots:
   void activateRotation();
   void activatePanning();
   void activateGlobalPanning();
+  void onTrihedronShow();
 
 protected slots:
   void onKeyPressed(QKeyEvent* event);
@@ -79,7 +80,7 @@ private:
 
 private:
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId };
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, TrihedronShowId };
   typedef QMap<int, QtxAction*> ActionsMap;
   
   void    createActions();

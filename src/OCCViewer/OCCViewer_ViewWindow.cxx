@@ -655,12 +655,21 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_PRESETS_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onRestoreView()));
 	myActionsMap[ RestoreId ] = aAction;
+
+  if (myModel->trihedronActivated()) {
+    aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_TRIHEDRON" ) ),
+                             tr( "MNU_SHOW_TRIHEDRE" ), 0, this);
+    aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRE"));
+    connect(aAction, SIGNAL(activated()), this, SLOT(onTrihedronShow()));
+	  myActionsMap[ TrihedronShowId ] = aAction;
+  }
 }
 
 //****************************************************************
 void OCCViewer_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
+  myActionsMap[TrihedronShowId]->addTo(myToolBar);
 
   SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar, "scale");
   aScaleBtn->AddAction(myActionsMap[FitAllId]);
@@ -872,3 +881,8 @@ void OCCViewer_ViewWindow::setRestoreFlag()
 	myRestoreFlag = 1;
 }
 
+//****************************************************************
+void OCCViewer_ViewWindow::onTrihedronShow()
+{
+  myModel->toggleTrihedron();
+}

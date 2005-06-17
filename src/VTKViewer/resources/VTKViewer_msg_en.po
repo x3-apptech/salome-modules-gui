@@ -77,12 +77,6 @@ msgstr "Reset View Point"
 msgid "MNU_RESET_VIEW"
 msgstr "Reset"
 
-msgid "DSC_VIEW_TRIHEDRON"
-msgstr "Shows - Hides Trihedron"
-
-msgid "MNU_VIEW_TRIHEDRON"
-msgstr "Shows - Hides Trihedron"
-
 msgid "DSC_FITALL"
 msgstr "Fit all objects inside the view frame"
 
@@ -151,3 +145,9 @@ msgstr "Change background..."
 
 msgid "VTKViewer_ViewManager::VTK_VIEW_TITLE"
 msgstr "VTK scene:%1 - viewer:%2"
+
+msgid "MNU_SHOW_TRIHEDRON"
+msgstr "Show/Hide trihedron"
+
+msgid "DSC_SHOW_TRIHEDRON"
+msgstr "Show/Hide trihedron in the current view"

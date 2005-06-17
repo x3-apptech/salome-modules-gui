@@ -373,3 +373,14 @@ void OCCViewer_Viewer::setTransparency( const Handle(AIS_InteractiveObject)& obj
   if( update )
     myV3dViewer->Update();
 }
+
+//****************************************************************
+void OCCViewer_Viewer::toggleTrihedron()
+{
+  if (myTrihedron.IsNull()) return;
+  if (myAISContext->IsDisplayed(myTrihedron)) {
+    myAISContext->Erase(myTrihedron);
+  } else {
+    myAISContext->Display(myTrihedron);
+  }
+}

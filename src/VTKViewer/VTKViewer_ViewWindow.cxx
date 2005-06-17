@@ -269,12 +269,19 @@ void VTKViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onResetView()));
   myActionsMap[ ResetId ] = aAction;
+
+  aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
+                           tr( "MNU_SHOW_TRIHEDRON" ), 0, this);
+  aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRON"));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onTrihedronShow()));
+  myActionsMap[ TrihedronShowId ] = aAction;
 }
 
 //****************************************************************
 void VTKViewer_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
+  myActionsMap[TrihedronShowId]->addTo(myToolBar);
 
   SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar);
   aScaleBtn->AddAction(myActionsMap[FitAllId]);
@@ -552,4 +559,14 @@ void VTKViewer_ViewWindow::MoveActor( VTKViewer_Actor* theActor)
 {
   RemoveActor(theActor);
   InsertActor(theActor,true);
+}
+
+//****************************************************************
+void VTKViewer_ViewWindow::onTrihedronShow()
+{
+  if (isTrihedronDisplayed())
+    myTrihedron->VisibilityOff();
+  else
+    myTrihedron->VisibilityOn();
+  myRenderWindow->update();
 }

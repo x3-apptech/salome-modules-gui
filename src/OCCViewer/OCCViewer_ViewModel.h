@@ -72,6 +72,10 @@ public:
   virtual void                    updateViewAspects( const viewAspectList& );
   virtual void                    clearViewAspects();
 
+  //! returns true if 3d Trihedron in viewer was created
+  bool trihedronActivated() const { return !myTrihedron.IsNull(); }
+  virtual void toggleTrihedron();
+
 public slots:
 	void onClearViewAspects();
 

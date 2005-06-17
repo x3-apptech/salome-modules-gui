@@ -280,9 +280,9 @@ SVTK_ViewWindow
   myActionsMap[ ResetId ] = aAction;
 
   // onViewTrihedron: Shows - Hides Trihedron
-  aAction = new QtxAction(tr("MNU_VIEW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
-                           tr( "MNU_VIEW_TRIHEDRON" ), 0, this);
-  aAction->setStatusTip(tr("DSC_VIEW_TRIHEDRON"));
+  aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
+                           tr( "MNU_SHOW_TRIHEDRON" ), 0, this);
+  aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRON"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewTrihedron()));
   myActionsMap[ ViewTrihedronId ] = aAction;
 }

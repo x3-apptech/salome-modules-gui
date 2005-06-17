@@ -57,6 +57,7 @@ public slots:
   void onCloneView();
   void onMemorizeView();
   void onRestoreView();
+  void onTrihedronShow();
   void setRestoreFlag();
   
 signals:
@@ -66,7 +67,9 @@ signals:
 
 protected:
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, CloneId, MemId, RestoreId };
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, CloneId, MemId, RestoreId,
+         TrihedronShowId };
+
   typedef QMap<int, QtxAction*> ActionsMap;
 
 

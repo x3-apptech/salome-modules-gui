@@ -171,3 +171,9 @@ msgstr "OCC scene:%1 - viewer:%2"
 
 msgid "OCCViewer_CreateRestoreViewDlg::CAPTION"
 msgstr "Restore view"
+
+msgid "MNU_SHOW_TRIHEDRE"
+msgstr "Show/Hide trihedron"
+
+msgid "DSC_SHOW_TRIHEDRE"
+msgstr "Show/Hide trihedron in the current view"
