@@ -4,9 +4,14 @@
 #include "SVTK_ViewModel.h"
 #include "SVTK_Selector.h"
 #include "SVTK_ViewWindow.h"
-#include "SALOME_Actor.h"
+#include "SVTK_Functor.h"
 
+#include "SALOME_Actor.h"
 #include "SALOME_ListIteratorOfListIO.hxx"
+
+#include "VTKViewer_Algorithm.h"
+
+#include <vtkRenderer.h>
 
 #include "utilities.h"
 
@@ -94,6 +99,9 @@ SalomeApp_VTKSelector
 	      TColStd_IndexedMapOfInteger anIds;
 	      aSelector->GetIndex(anIO,anIds);
 	      SALOME_Actor* anActor = aSelector->GetActor(anIO);
+	      if( !anActor )
+	        anActor = VTK::Find<SALOME_Actor>(aView->getRenderer()->GetActors(),VTK::TIsSameIObject<SALOME_Actor>(anIO));
+
 	      aList.append(new SalomeApp_SVTKDataOwner(anIO,anIds,aMode,anActor));
 	      if(MYDEBUG) MESSAGE("VTKSelector::getSelection - "<<anIO->getEntry());
 	    }
@@ -120,10 +128,12 @@ SalomeApp_VTKSelector
 	    if(const SalomeApp_SVTKDataOwner* anOwner = dynamic_cast<const SalomeApp_SVTKDataOwner*>(aDataOwner)){
 	      aSelector->SetSelectionMode(anOwner->GetMode());
 	      Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
+
 	      if( anOwner->GetActor() )
 		aSelector->AddIObject( anOwner->GetActor() );
 	      else
 		aSelector->AddIObject(anIO);
+
 	      anAppendList.Append(anIO);
 	      aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);
 	      if(MYDEBUG) MESSAGE("VTKSelector::setSelection - SVTKDataOwner - "<<anIO->getEntry());
