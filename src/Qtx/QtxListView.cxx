@@ -308,5 +308,5 @@ bool QtxListView::eventFilter( QObject* o, QEvent* e )
     }
   }
   
-  return QObject::eventFilter( o, e );
+  return QListView::eventFilter( o, e );
 }
