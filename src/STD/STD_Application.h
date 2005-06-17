@@ -58,6 +58,7 @@ public:
   virtual QString       getFileFilter() const { return QString::null; }
   virtual QString       getFileName( bool open, const QString& initial, const QString& filters, 
 				     const QString& caption, QWidget* parent );
+  QString               getDirectory( const QString& initial, const QString& caption, QWidget* parent );
 
   virtual void          start();
 

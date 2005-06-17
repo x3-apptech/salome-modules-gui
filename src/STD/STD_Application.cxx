@@ -603,10 +603,9 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
 {
   if ( !parent )
     parent = desktop();
-  QStringList fls = QStringList::split( ";", filters, false );
   if ( open ) 
   {
-    return QFileDialog::getOpenFileName( initial, fls.join( ";;" ), parent, 0, caption );
+    return QFileDialog::getOpenFileName( initial, filters, parent, 0, caption );
   }
   else
   {
