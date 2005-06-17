@@ -57,6 +57,13 @@ void QtxResourceEdit::setProperty( const int id, const QString& propName, const 
     i->setProperty( propName, propValue );
 }
 
+void QtxResourceEdit::resource( const int id, QString& sec, QString& param ) const
+{
+  Item* i = item( id );
+  if ( i )
+    i->resource( sec, param );
+}
+
 void QtxResourceEdit::store()
 {
   QMap<Item*, QString> before;

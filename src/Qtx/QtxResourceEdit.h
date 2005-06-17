@@ -27,12 +27,14 @@ public:
 
   QtxResourceMgr*      resourceMgr() const;
 
-  int                  addItem( const QString& label, const int pId = -1, const int = -1,
+  virtual int          addItem( const QString& label, const int pId = -1, const int = -1,
                                 const QString& section = QString::null,
                                 const QString& param = QString::null );
 
   QVariant             property( const int, const QString& ) const;
-  void                 setProperty( const int, const QString&, const QVariant& );
+  virtual void         setProperty( const int, const QString&, const QVariant& );
+
+  void                 resource( const int, QString&, QString& ) const;
 
   virtual void         store();
   virtual void         retrieve();
