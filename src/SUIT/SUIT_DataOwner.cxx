@@ -1,5 +1,13 @@
 #include "SUIT_DataOwner.h"
 
+#ifndef WNT
+#include <typeinfo>
+#define _typeinfo std::type_info
+#else
+#include <typeinfo.h>
+#define _typeinfo type_info
+#endif
+
 //********************************************************************
 // SUIT_DataOwner class
 //********************************************************************
@@ -30,7 +38,7 @@ bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 
 //********************************************************************
 // SUIT_DataOwnerPtrList class: implements value list with unique
-// items (uniqueness is provided by operator==() and compareItems()
+// items (uniqueness is provided by operator==())
 //********************************************************************
 
 //====================================================================
@@ -66,15 +74,12 @@ SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOw
 {
   SUIT_DataOwnerPtrList::iterator it = find( x );
   if ( it != end() )
-    return it;
+    {
+      const _typeinfo& ti1 = typeid( *((*it).operator->()) );
+      const _typeinfo& ti2 = typeid( *(x.operator->()) );
+
+      if (ti1 == ti2)
+	return it;
+    }
   return QValueList<SUIT_DataOwnerPtr>::append( x );
 }
-
-//====================================================================
-// Compares two items
-//====================================================================
-int SUIT_DataOwnerPtrList::compareItems( const SUIT_DataOwnerPtr& item1, const SUIT_DataOwnerPtr& item2 )
-{
-  return item1 == item2;
-}
-

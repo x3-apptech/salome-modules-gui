@@ -33,9 +33,6 @@ public:
 
   iterator append      ( const SUIT_DataOwnerPtr& x );
 
-protected:
-  virtual int compareItems( const SUIT_DataOwnerPtr& item1, const SUIT_DataOwnerPtr& item2 );
-
 private:
   // hide this methods: only append() should be used to add items to the list
   iterator prepend( const SUIT_DataOwnerPtr& x );

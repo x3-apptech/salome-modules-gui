@@ -43,11 +43,16 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStr
   SUIT_DataOwnerPtrList aList;
   selected( aList, theType );
 
+  QMap<QString,int> entryMap;
+
   for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
   {
     const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*>( (*itr).operator->() );
-    if( owner )
+    if( !owner ) continue;
+    
+    if ( !entryMap.contains(owner->entry()) )
       theList.Append( owner->IO() );
+    entryMap.insert(owner->entry(), 1);
   }
 }
 
