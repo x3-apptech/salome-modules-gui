@@ -88,7 +88,7 @@ public:
 			    aYears [i], 
 			    aHours [i], 
 			    aMins  [i]);
-		val = val + " : " + QString(aUsers[i].c_str());
+		val = val + " : " + QString( aUsers[i].c_str() );
 		list.prepend(val);
 	      }
 	      theWidget->setDuplicatesEnabled(true);
