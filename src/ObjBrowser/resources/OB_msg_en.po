@@ -12,5 +12,3 @@ msgstr ""
 msgid "MEN_EXPAND_ALL"
 msgstr "Expand All"
 
-msgid "MEN_REFRESH"
-msgstr "Refresh"

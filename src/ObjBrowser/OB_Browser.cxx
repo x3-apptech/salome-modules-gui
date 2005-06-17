@@ -479,14 +479,9 @@ void OB_Browser::setAppropriateColumn( const int id, const bool on )
   myView->setAppropriate( myColumnIds[id], on );
 }
 
-void OB_Browser::updateTree( SUIT_DataObject* o )
+void OB_Browser::updateTree( SUIT_DataObject* obj )
 {
-  updateTree( o ? o : getRootObject(), false );
-}
-
-void OB_Browser::updateTree( SUIT_DataObject* obj, const bool notify )
-{
-  if ( !obj )
+  if ( !obj && !(obj = getRootObject()) )
     return;
 
   DataObjectKey curKey;
@@ -496,14 +491,6 @@ void OB_Browser::updateTree( SUIT_DataObject* obj, const bool notify )
   int selNum = numberOfSelected();
 
   SUIT_DataObject* curObj = storeState( selObjs, openObjs, selKeys, openKeys, curKey );
-
-  if ( notify )
-  {
-    bool upd = isAutoUpdate();
-    setAutoUpdate( false );
-    emit aboutRefresh();
-    setAutoUpdate( upd );
-  }
 
   createConnections( obj );
   updateView( obj );
@@ -875,11 +862,6 @@ void OB_Browser::onExpand()
     expand( listViewItem( itr.current() ) );
 }
 
-void OB_Browser::onRefresh()
-{
-  updateTree( getRootObject(), true );
-}
-
 void OB_Browser::onColumnVisible( int id )
 {
   setColumnShown( id, !isColumnVisible( id ) );
@@ -997,7 +979,6 @@ void OB_Browser::contextMenuPopup( QPopupMenu* menu )
     menu->insertItem( tr( "MEN_EXPAND_ALL" ), this, SLOT( onExpand() ) );
     menu->insertSeparator();
   }
-  menu->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
 }
 
 void OB_Browser::expand( QListViewItem* item )

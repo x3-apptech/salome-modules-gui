@@ -98,13 +98,11 @@ public:
   virtual void      contextMenuPopup( QPopupMenu* );
 
 signals:
-  void              aboutRefresh();
   void              selectionChanged();
   void              dropped( DataObjectList, SUIT_DataObject*, int );
 
 private slots:
   void              onExpand();
-  void              onRefresh();
   void              onColumnVisible( int );
   void              onDestroyed( SUIT_DataObject* );
   void              onDropped( QPtrList<QListViewItem>, QListViewItem*, int );
@@ -137,7 +135,6 @@ private:
   void              removeObject( SUIT_DataObject*, const bool = true );
 
   void              updateText( QListViewItem* );
-  void              updateTree( SUIT_DataObject*, const bool );
 
   DataObjectKey     objectKey( QListViewItem* ) const;
   DataObjectKey     objectKey( SUIT_DataObject* ) const;
