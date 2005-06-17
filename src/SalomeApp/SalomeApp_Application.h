@@ -74,6 +74,9 @@ public:
   QtxResourceEdit*                    resourceEdit() const;
 
   virtual QString                     getFileFilter() const;
+  QString                             getFileName( bool open, const QString& initial, const QString& filters, 
+						   const QString& caption, QWidget* parent );
+
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
 
   void                                updateActions();
@@ -124,8 +127,6 @@ protected:
 
   virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
-
-  virtual QString                     getFileName( bool );
 
 private slots:
   void                                onNewWindow();

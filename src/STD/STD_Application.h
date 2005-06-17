@@ -56,6 +56,8 @@ public:
   void                  viewManagers( const QString&, ViewManagerList& ) const;
 
   virtual QString       getFileFilter() const { return QString::null; }
+  QString               getFileName( bool open, const QString& initial, const QString& filters, 
+				     const QString& caption, QWidget* parent );
 
   virtual void          start();
 
@@ -98,8 +100,6 @@ protected:
   virtual void          afterCloseDoc();
 
   virtual void          setActiveViewManager( SUIT_ViewManager* );
-
-  virtual QString       getFileName( bool );
 
 private:
   ViewManagerList       myViewMgrs;

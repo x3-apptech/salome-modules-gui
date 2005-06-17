@@ -1124,10 +1124,11 @@ void SalomeApp_Application::onProperties()
   //study->updateCaptions();
 }
 
-QString SalomeApp_Application::getFileName( bool open )
+QString SalomeApp_Application::getFileName( bool open, const QString& initial, const QString& filters, 
+					    const QString& caption, QWidget* parent )
 {
-  QStringList filtersList;
-  filtersList.append( getFileFilter() );
-  QString initial = open ? QString( "" ) : ( activeStudy() ? activeStudy()->studyName() : QString( "" ) );
-  return SUIT_FileDlg::getFileName( desktop(), initial, filtersList, QString::null, open, true );
+  if ( !parent )
+    parent = desktop();
+  QStringList fls = QStringList::split( ";", filters, false );
+  return SUIT_FileDlg::getFileName( parent, initial, fls, caption, open, true );
 }

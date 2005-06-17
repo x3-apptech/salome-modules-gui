@@ -27,9 +27,9 @@
 #include <qpopupmenu.h>
 #include <qtextbrowser.h>
 #include <qapplication.h>
+#include <qdatetime.h>
 
 #include <SUIT_Tools.h>
-#include <SUIT_FileDlg.h>
 #include <SUIT_Session.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_ResourceMgr.h>
@@ -214,33 +214,23 @@ void LogWindow::updateActions()
 
 void LogWindow::onSaveToFile()
 {
-  QString aUsedFilter;
-  QString aName = QFileDialog::getSaveFileName( QString::null, QString( "*.log" ), this,
-                                                0, QString::null, &aUsedFilter );
-  if ( aName.isNull() ) 
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( !app )
     return;
 
-  int aStart = aUsedFilter.find('*');
-  int aEnd = aUsedFilter.find(')', aStart + 1);
-  QString aExt = aUsedFilter.mid(aStart + 1, aEnd - aStart - 1);
-  if ( aExt.contains('*') == 0 )
-  {
-    if ( aName.contains( aExt, false ) == 0 )
-      aName += aExt;
-  }
+  // call application-specific "Save file" dialog box
+  QString aName = app->getFileName( false, QString::null, QString( "*.log" ), QString::null, 0 );
+  if ( aName.isNull() )
+    return;
 
-
-  if ( !aName.isNull() )
-  {
-    QApplication::setOverrideCursor( Qt::waitCursor );
+  QApplication::setOverrideCursor( Qt::waitCursor );
     
-    bool bOk = saveLog( aName );
+  bool bOk = saveLog( aName );
 
-    QApplication::restoreOverrideCursor();
+  QApplication::restoreOverrideCursor();
 
-    if ( !bOk )
-      SUIT_MessageBox::error1( this, tr( "Error" ), tr( "Can't save file" ), tr( "OK" ) );
-  }
+  if ( !bOk )
+    SUIT_MessageBox::error1( this, tr( "Error" ), tr( "Can't save file" ), tr( "OK" ) );
 }
 
 void LogWindow::onSelectAll()

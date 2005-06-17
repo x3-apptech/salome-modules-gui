@@ -69,6 +69,10 @@ public:
   //! Puts the message to the status bar  
   void putInfo ( const QString&, const int = 0 );
 
+  //! Invokes application-specific "Open/Save" file dialog and returns the selected file name.
+  virtual QString getFileName( bool open, const QString& initial, const QString& filters, 
+			       const QString& caption, QWidget* parent ) = 0;
+
 signals:
   void                  applicationClosed( SUIT_Application* );
   void                  activated( SUIT_Application* );

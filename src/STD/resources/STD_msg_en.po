@@ -303,7 +303,7 @@ msgid "STD_Application::ABOUT_INFO"
 msgstr "SUIT Std application"
 
 msgid "MSG_FILE_EXISTS"
-msgstr "File \"%1\" already exists.\nDo you want to continue?"
+msgstr "File \"%1\" already exists.\nDo you want to overwrite it?"
 
 msgid "MSG_CANT_SAVE"
 msgstr "Can't save file \"%1\"."

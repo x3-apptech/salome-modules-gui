@@ -225,7 +225,7 @@ void STD_Application::onNewDoc()
 void STD_Application::onOpenDoc()
 {
   // It is preferrable to use OS-specific file dialog box here !!!
-  QString aName = getFileName( true );
+  QString aName = getFileName( true, QString::null, getFileFilter(), QString::null, 0 );
   if ( aName.isNull() )
     return;
 
@@ -364,7 +364,7 @@ bool STD_Application::onSaveAsDoc()
   if ( !study )
     return false;
 
-  QString aName = getFileName( false );
+  QString aName = getFileName( false, study->studyName(), getFileFilter(), QString::null, 0 );
 
   if ( aName.isNull() ) 
     return false;
@@ -590,25 +590,28 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   delete popup;
 }
 
-QString STD_Application::getFileName( bool open )
+QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters, 
+				      const QString& caption, QWidget* parent )
 {
+  if ( !parent )
+    parent = desktop();
+  QStringList fls = QStringList::split( ";", filters, false );
   if ( open ) 
   {
-    return QFileDialog::getOpenFileName( QString::null, getFileFilter(), desktop() );
+    return QFileDialog::getOpenFileName( initial, fls.join( ";;" ), parent, 0, caption );
   }
   else
   {
-    SUIT_Study* study = activeStudy();
     QString aName;
     QString aUsedFilter;
-    QString anOldPath = study->studyName();
+    QString anOldPath = initial;
 
     bool isOk = false;
     while ( !isOk )
     {
       // It is preferrable to use OS-specific file dialog box here !!!
-      aName = QFileDialog::getSaveFileName( anOldPath, getFileFilter(), desktop(),
-					    0, QString::null, &aUsedFilter);
+      aName = QFileDialog::getSaveFileName( anOldPath, fls.join( ";;" ), parent,
+					    0, caption, &aUsedFilter);
 
       if ( aName.isNull() )
         isOk = true;
