@@ -137,9 +137,7 @@ void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
     TEvent() {}
     virtual void Execute() {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	OB_Browser* browser = anApp->objectBrowser();
-	if ( browser )
-	  browser->updateTree();
+	anApp->updateObjectBrowser();
       }
     }
   };

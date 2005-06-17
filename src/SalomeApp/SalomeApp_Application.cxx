@@ -572,16 +572,9 @@ void SalomeApp_Application::onSelectionChanged()
    } 
 }		
  
-
 void SalomeApp_Application::onRefresh()
 {
-  for ( ModuleListIterator it = modules(); it.current(); ++it )
-  {    
-    CAM_DataModel* camDM = it.current()->dataModel();
-    if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
-      ((SalomeApp_DataModel*)camDM)->update();
-  }
-  objectBrowser()->updateTree();
+  updateObjectBrowser( true );
 }
 
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
@@ -1398,3 +1391,17 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
 }
 
+void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
+{
+  if ( updateModels ) 
+  {
+    for ( ModuleListIterator it = modules(); it.current(); ++it )
+    {    
+      CAM_DataModel* camDM = it.current()->dataModel();
+      if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
+        ((SalomeApp_DataModel*)camDM)->update();
+    }
+  }
+  if ( objectBrowser() )
+    objectBrowser()->updateTree();
+}

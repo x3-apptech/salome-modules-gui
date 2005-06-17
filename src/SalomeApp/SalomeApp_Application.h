@@ -71,6 +71,8 @@ public:
   OB_Browser*                         objectBrowser();
   PythonConsole*                      pythonConsole();   
 
+  virtual void                        updateObjectBrowser( const bool = true );
+
   SalomeApp_Preferences*              preferences() const;
 
   virtual QString                     getFileFilter() const;

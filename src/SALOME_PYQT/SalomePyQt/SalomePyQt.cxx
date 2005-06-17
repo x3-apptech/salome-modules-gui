@@ -334,8 +334,8 @@ void SalomePyQt::updateObjBrowser( const int studyId, bool updateSelection )
           QPtrListIterator<SUIT_Application> it( apps );
 	  for( ; it.current(); ++it ) {
             SalomeApp_Application* anApp = dynamic_cast<SalomeApp_Application*>( it.current() );
-            if ( anApp && anApp->activeStudy() && anApp->activeStudy()->id() == myStudyId && anApp->objectBrowser() )
-	      anApp->objectBrowser()->updateTree();
+            if ( anApp && anApp->activeStudy() && anApp->activeStudy()->id() == myStudyId )
+	      anApp->updateObjectBrowser();
           }
         }
       }
