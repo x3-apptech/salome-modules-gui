@@ -659,3 +659,10 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
     return aName;
   }
 }
+
+QString STD_Application::getDirectory( const QString& initial, const QString& caption, QWidget* parent )
+{
+  if ( !parent )
+    parent = desktop();
+  return QFileDialog::getExistingDirectory( initial, parent, 0, caption, true );
+}
