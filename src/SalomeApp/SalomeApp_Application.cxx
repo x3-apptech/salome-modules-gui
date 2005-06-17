@@ -528,7 +528,7 @@ void SalomeApp_Application::onSelectionChanged()
 }		
  
 
-void SalomeApp_Application::onAboutRefresh()
+void SalomeApp_Application::onRefresh()
 {
   for ( ModuleListIterator it = modules(); it.current(); ++it )
   {    
@@ -536,6 +536,7 @@ void SalomeApp_Application::onAboutRefresh()
     if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
       ((SalomeApp_DataModel*)camDM)->update();
   }
+  objectBrowser()->updateTree();
 }
 
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
@@ -944,7 +945,6 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 
     wid = ob;
 
-    connect( ob, SIGNAL( aboutRefresh() ), this, SLOT( onAboutRefresh() ) );
     ob->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
   }
   else if ( flag == WT_PyConsole )
@@ -1186,3 +1186,11 @@ QString SalomeApp_Application::getFileName( bool open, const QString& initial, c
   QStringList fls = QStringList::split( ";", filters, false );
   return SUIT_FileDlg::getFileName( parent, initial, fls, caption, open, true );
 }
+
+void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
+{
+  CAM_Application::contextMenuPopup( type, thePopup, title );
+  thePopup->insertSeparator();
+  thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
+}
+

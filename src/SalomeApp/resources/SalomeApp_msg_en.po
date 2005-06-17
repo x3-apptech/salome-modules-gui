@@ -201,3 +201,5 @@ msgstr "MODIFIED"
 msgid "PRP_MODIFICATIONS"
 msgstr "Modifications"
 
+msgid "MEN_REFRESH"
+msgstr "Refresh"

@@ -92,6 +92,8 @@ public:
 
   virtual void                        start();
 
+  virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
+
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
   static SALOME_NamingService*        namingService();
@@ -110,7 +112,7 @@ public slots:
 
 private slots:
   void                                onSelection();
-  void                                onAboutRefresh();
+  void                                onRefresh();
 
 protected:
   virtual void                        createActions();
