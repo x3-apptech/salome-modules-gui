@@ -15,7 +15,7 @@
     <parameter name="xterm"      value="no"/>
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,SUPERV,MED,VISU"/>
+    <parameter name="modules"    value="GEOM,SMESH,SUPERV,MED,VISU,COMPONENT"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine"/>
     <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
@@ -40,6 +40,8 @@
     <parameter name="SUPERV"     value="${SUPERV_ROOT_DIR}/share/salome/resources"/>
     <parameter name="MED"        value="${MED_ROOT_DIR}/share/salome/resources"/>
     <parameter name="StdMeshers" value="${SMESH_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="COMPONENT"  value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
+
   </section>
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>
