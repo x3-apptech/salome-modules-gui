@@ -54,11 +54,11 @@ void SUIT_Application::start()
     desktop()->show();
 }
 
-void SUIT_Application::useFile( const QString& theFileName )
+bool SUIT_Application::useFile( const QString& theFileName )
 {
   createEmptyStudy();
   if ( activeStudy() )
-    activeStudy()->openDocument( theFileName );
+    return activeStudy()->openDocument( theFileName );
 }
 
 void SUIT_Application::createEmptyStudy()

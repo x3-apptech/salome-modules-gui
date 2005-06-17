@@ -35,7 +35,7 @@ public:
   virtual QString       applicationName() const;
 
   virtual bool          isPossibleToClose();
-  virtual void          useFile( const QString& );
+  virtual bool          useFile( const QString& );
 
   virtual void          createEmptyStudy();
 
@@ -70,16 +70,23 @@ signals:
 
 public slots:
   virtual void          onNewDoc();
-  virtual void          onOpenDoc();
   virtual void          onCloseDoc();
   virtual void          onSaveDoc();
   virtual bool          onSaveAsDoc();
+
+  virtual void          onOpenDoc();
+  virtual bool          onOpenDoc( const QString& );
+
   virtual void          onExit();
+
   virtual void          onCut();
   virtual void          onCopy();
   virtual void          onPaste();
+
   virtual void          onViewStatusBar( bool );
+
   virtual void          onHelpAbout();
+
   virtual void          onDesktopClosing( SUIT_Desktop*, QCloseEvent* );
   virtual void          onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* );
 

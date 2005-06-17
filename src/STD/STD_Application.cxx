@@ -229,11 +229,17 @@ void STD_Application::onOpenDoc()
   if ( aName.isNull() )
     return;
 
+  onOpenDoc( aName );
+}
+
+bool STD_Application::onOpenDoc( const QString& aName )
+{
+  bool res = true;
   if ( !activeStudy() )
   {
     // if no study - open in current desktop
     createEmptyStudy();
-    activeStudy()->openDocument( aName );
+    res = activeStudy()->openDocument( aName );
     updateDesktopTitle();
     updateCommandsStatus();
   }
@@ -254,11 +260,12 @@ void STD_Application::onOpenDoc()
     {
       aApp = startApplication( 0, 0 );
       if ( aApp )
-        aApp->useFile( aName );
+        res = aApp->useFile( aName );
     }
     else
       aApp->desktop()->setActiveWindow();
   }
+  return res;
 }
 
 void STD_Application::beforeCloseDoc( SUIT_Study* )
@@ -407,11 +414,12 @@ void STD_Application::setEditEnabled( bool theEnable )
   }
 }
 
-void STD_Application::useFile(const QString& theFileName)
+bool STD_Application::useFile(const QString& theFileName)
 {
-  SUIT_Application::useFile(theFileName);
+  bool res = SUIT_Application::useFile(theFileName);
   updateDesktopTitle();
   updateCommandsStatus();
+  return res;
 }
 
 void STD_Application::updateDesktopTitle()
