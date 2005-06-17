@@ -62,11 +62,14 @@ void QtxListView::initialize()
     myButton = but;
 
     connect( myButton, SIGNAL( clicked() ), this, SLOT( onButtonClicked() ) );
-
-    myPopup = new QPopupMenu( this );
-    connect( myPopup, SIGNAL( activated( int ) ), this, SLOT( onShowHide( int ) ) );
+  }
+  else
+  {
+    header()->installEventFilter( this );
   }
 
+  myPopup = new QPopupMenu( this );
+  connect( myPopup, SIGNAL( activated( int ) ), this, SLOT( onShowHide( int ) ) );
   connect( header(), SIGNAL( sizeChange( int, int, int ) ), this, SLOT( onHeaderResized() ) );
 }
 
@@ -252,11 +255,8 @@ void QtxListView::onHeaderResized()
   }
 }
 
-void QtxListView::onButtonClicked()
+void QtxListView::showPopup( const int x, const int y )
 {
-  if ( myHeaderState != HeaderButton )
-    return;
-
   myPopup->clear();
   for ( int i = 0; i < columns(); i++ )
   {
@@ -266,16 +266,26 @@ void QtxListView::onButtonClicked()
       myPopup->setItemChecked( id, isShown( i ) );
     }
   }
+
+  if( myPopup->count() )
+    myPopup->exec( mapToGlobal( QPoint( x, y ) ) );
+}
+
+void QtxListView::onButtonClicked()
+{
+  if ( myHeaderState != HeaderButton )
+    return;
+
   int x = myButton->x(),
       y = myButton->y() + myButton->height();
-  if ( myPopup->count() )
-    myPopup->exec( mapToGlobal( QPoint( x, y ) ) );
+
+  showPopup( x, y );
 }
 
 void QtxListView::onShowHide( int id )
 {
-  if ( myHeaderState != HeaderButton )
-    return;
+  //if ( myHeaderState != HeaderButton )
+  //  return;
 
   setShown( id, !isShown( id ) );
 }
@@ -284,4 +294,19 @@ void QtxListView::viewportResizeEvent( QResizeEvent* e )
 {
   QListView::viewportResizeEvent( e );
   onHeaderResized();
+}
+
+bool QtxListView::eventFilter( QObject* o, QEvent* e )
+{
+  if( o==header() && e->type()==QEvent::MouseButtonPress )
+  {
+    QMouseEvent* me = ( QMouseEvent* )e;
+    if( me->button()==Qt::RightButton )
+    {
+      showPopup( me->x()+2, me->y()+2 );
+      return true;
+    }
+  }
+  
+  return QObject::eventFilter( o, e );
 }

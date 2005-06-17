@@ -963,7 +963,7 @@ bool OB_Browser::eventFilter( QObject* o, QEvent* e )
 
 void OB_Browser::contextMenuPopup( QPopupMenu* menu )
 {
-  QValueList<int> cols;
+/*  QValueList<int> cols;
   for ( QMap<int, int>::ConstIterator it = myColumnIds.begin(); it != myColumnIds.end(); ++it )
   {
     if ( appropriateColumn( it.key() ) )
@@ -983,7 +983,7 @@ void OB_Browser::contextMenuPopup( QPopupMenu* menu )
     menu->setItemParameter( id, *iter );
   }
   if ( menu->count() != num )
-    menu->insertSeparator();
+    menu->insertSeparator();*/
 
   DataObjectList selected;
   getSelected( selected );

@@ -58,6 +58,8 @@ protected slots:
 
 protected:
   virtual void  viewportResizeEvent( QResizeEvent* );
+  virtual bool  eventFilter( QObject*, QEvent* );
+  virtual void  showPopup( const int x, const int y );
 
 private:
   typedef struct { int width; bool resizeable; } ColumnData;
