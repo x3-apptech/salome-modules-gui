@@ -716,5 +716,11 @@ QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
 
   SUIT_Tools::simplifySeparators( popup );
 
+  if ( !popup->count() )
+  {
+    delete popup;
+    popup = 0;
+  }
+
   return popup;
 }
