@@ -27,12 +27,17 @@ endif
 SIP_FLAGS = -t WS_X11 -t $(QT_VERS) -s ".cc" -c . -I $(PYQT_SIPS)
 
 # Sip sources
-ifeq ($(SIP_VERS),v4)
+ifeq ($(SIP_VERS),v4_old)
+SIP_SRC   = sipSalomePyQtGUIcmodule.cc
+SIP_FILES = SALOME_PYQT_GUI.sip
+else
+ifeq ($(SIP_VERS),v4_new)
 SIP_SRC   = sipSalomePyQtGUIcmodule.cc
 SIP_FILES = SALOME_PYQT_GUI.sip
 else
 SIP_SRC   = SalomePyQtGUIcmodule.cc
 SIP_FILES = SALOME_PYQT_GUI.sip
+endif
 endif
 
 ######################
