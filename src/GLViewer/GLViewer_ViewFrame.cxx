@@ -81,7 +81,7 @@ void GLViewer_ViewFrame::createActions()
   aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
                            tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewDump()));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
   myActionsMap[ DumpId ] = aAction;
 
   // FitAll
@@ -246,7 +246,7 @@ void GLViewer_ViewFrame::onUpdate( int )
 {
 }
 
-void GLViewer_ViewFrame::onViewDump()
+QImage GLViewer_ViewFrame::dumpView()
 {
     GLViewer_Widget* aWidget = ((GLViewer_ViewPort2d*)myVP)->getGLWidget();
     int width, height;
@@ -383,31 +383,7 @@ void GLViewer_ViewFrame::onViewDump()
     }
 
     delete [] imageBits;
-
-    SUIT_Application* app = getViewManager()->study()->application();
-
-    QString aFileName = app->getFileName( false, QString::null, QString( "*.bmp;*.png" ), tr( "DUMP_VIEW_SAVE_FILE_DLG_CAPTION" ), 0 );
-
-    if( aFileName.isEmpty() ) // cancelled
-      return;
-
-    QString aSaveOp = SUIT_Tools::extension( aFileName ).upper();
-
-    if ( aSaveOp != "BMP" && aSaveOp != "PNG" ) {
-      SUIT_MessageBox::error1( this,
-			       tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
-			       tr( "DUMP_VIEW_ERROR_UNSUPPORTED_FORMAT" ).arg( aSaveOp ),
-			       tr( "BUT_OK" ) );
-      return;
-    }
-
-    if( !anImage.save( aFileName, aSaveOp ) )
-    {
-        SUIT_MessageBox::error1( this,
-				 tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
-				 tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
-				 tr( "BUT_OK" ) );
-    }
+    return anImage;
 }
 
 void GLViewer_ViewFrame::onViewPan()
@@ -509,3 +485,4 @@ void GLViewer_ViewFrame::wheelEvent( QWheelEvent* e )
     break;
   }
 }
+

@@ -1463,34 +1463,6 @@ void Plot2d_ViewFrame::wheelEvent(QWheelEvent* event)
   myPnt = event->pos();
 }
 /*!
-  View operations : Dump view
-*/
-void Plot2d_ViewFrame::onDump()
-{
-  QApplication::setOverrideCursor( Qt::waitCursor );
-  QPixmap px = QPixmap::grabWindow(winId());
-  QApplication::restoreOverrideCursor();
-
-  SUIT_Application* app = ((Plot2d_ViewWindow*)parent())->getViewManager()->study()->application();
-
-  QString aFileName = app->getFileName( false, QString::null, tr("PLOT2D_IMAGE_FILES"), tr("INF_APP_DUMP_VIEW"), 0 );
-
-  if ( !aFileName.isNull() )
-  {
-    QApplication::setOverrideCursor( Qt::waitCursor );
-    QString fmt = SUIT_Tools::extension( aFileName ).upper();
-    if (fmt.isEmpty())
-      fmt = QString("BMP"); // default format
-    if (fmt == "JPG")
-      fmt = "JPEG";
-    bool bOk = px.save(aFileName, fmt.latin1());
-    QApplication::restoreOverrideCursor();
-    if (!bOk) {
-      SUIT_MessageBox::error1(this, tr("ERROR"), tr("ERR_DOC_CANT_SAVE_FILE"), tr("BUT_OK"));
-    }
-  }
-}
-/*!
   View operations : Pan view
 */
 void Plot2d_ViewFrame::onViewPan()

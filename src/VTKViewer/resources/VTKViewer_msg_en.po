@@ -117,7 +117,7 @@ msgid "DSC_DUMP_VIEW"
 msgstr "Saves the active view in the image file"
 
 msgid "MNU_DUMP_VIEW"
-msgstr "Dump"
+msgstr "Dump view..."
 
 msgid "VTK_IMAGE_FILES"
 msgstr "Images Files (*.bmp *.png *.jpg *.jpeg)"

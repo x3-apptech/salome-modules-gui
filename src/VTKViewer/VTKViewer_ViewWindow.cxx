@@ -386,36 +386,6 @@ void VTKViewer_ViewWindow::onFitAll()
 }
 
 //****************************************************************
-/*
-   Dumps 3d-Viewer contents into image file
-   File format is defined by file's extension; supported formats : PNG, BMP, GIF, JPG
-*/
-void VTKViewer_ViewWindow::onDumpView()
-{
-  QApplication::setOverrideCursor( Qt::waitCursor );
-  QPixmap px = QPixmap::grabWindow(myRenderWindow->winId());
-  QApplication::restoreOverrideCursor();
- 
-  SUIT_Application* app = getViewManager()->study()->application();
-
-  QString aFileName = app->getFileName( false, QString::null, tr("VTK_IMAGE_FILES"), tr("INF_APP_DUMP_VIEW"), 0 );
- 
-  if ( !aFileName.isNull() ) {
-    QApplication::setOverrideCursor( Qt::waitCursor );
-    QString fmt = SUIT_Tools::extension( aFileName ).upper();
-    if (fmt.isEmpty())
-      fmt = QString("BMP"); // default format
-    if (fmt == "JPG")
-      fmt = "JPEG";
-    bool bOk = px.save(aFileName, fmt.latin1());
-    QApplication::restoreOverrideCursor();
-    if (!bOk) {
-      SUIT_MessageBox::error1(this, tr("ERROR"), tr("ERR_DOC_CANT_SAVE_FILE"), tr("BUT_OK"));
-    }
-  }
-}
-
-//****************************************************************
 /*!
     Set background of the viewport
 */
@@ -565,4 +535,11 @@ void VTKViewer_ViewWindow::onTrihedronShow()
   else
     myTrihedron->VisibilityOn();
   myRenderWindow->update();
+}
+
+//****************************************************************
+QImage VTKViewer_ViewWindow::dumpView()
+{
+  QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );
+  return px.convertToImage();
 }

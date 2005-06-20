@@ -776,36 +776,6 @@ void OCCViewer_ViewWindow::onFitAll()
 }
 
 //****************************************************************
-/*
-   Dumps 3d-Viewer contents into image file
-   File format is defined by file's extension; supported formats : PNG, BMP, GIF, JPG
-*/
-void OCCViewer_ViewWindow::onDumpView()
-{
-  QApplication::setOverrideCursor( Qt::waitCursor );
-  QPixmap px = QPixmap::grabWindow(myViewPort->winId());
-  QApplication::restoreOverrideCursor();
-  
-  SUIT_Application* app = getViewManager()->study()->application();
-
-  QString aFileName = app->getFileName( false, QString::null, tr("OCC_IMAGE_FILES"), tr("INF_APP_DUMP_VIEW"), 0 );
-
-  if ( !aFileName.isNull() ) {
-    QApplication::setOverrideCursor( Qt::waitCursor );
-    QString fmt = SUIT_Tools::extension( aFileName ).upper();
-    if (fmt.isEmpty())
-      fmt = QString("BMP"); // default format
-    if (fmt == "JPG")
-      fmt = "JPEG";
-    bool bOk = px.save(aFileName, fmt.latin1());
-    QApplication::restoreOverrideCursor();
-    if (!bOk) {
-      SUIT_MessageBox::error1(this, tr("ERROR"), tr("ERR_DOC_CANT_SAVE_FILE"), tr("BUT_OK"));
-    }
-  }
-}
-
-//****************************************************************
 void OCCViewer_ViewWindow::onCloneView()
 {
   myManager->createView();
@@ -885,4 +855,11 @@ void OCCViewer_ViewWindow::setRestoreFlag()
 void OCCViewer_ViewWindow::onTrihedronShow()
 {
   myModel->toggleTrihedron();
+}
+
+//****************************************************************
+QImage OCCViewer_ViewWindow::dumpView()
+{
+  QPixmap px = QPixmap::grabWindow( myViewPort->winId() );
+  return px.convertToImage();
 }

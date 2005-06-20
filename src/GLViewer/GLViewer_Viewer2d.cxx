@@ -57,6 +57,7 @@ void GLViewer_Viewer2d::contextMenuPopup( QPopupMenu* thePopup )
   {
     if( thePopup->count() > 0 )
         thePopup->insertSeparator();
+    thePopup->insertItem( tr( "MNU_DUMP_VIEW" ),  this, SLOT( onDumpView() ) );
     thePopup->insertItem( tr( "CHANGE_BGCOLOR" ), this, SLOT( onChangeBgColor() ) );
   }
 }
@@ -993,6 +994,14 @@ void GLViewer_Viewer2d::startOperations( QWheelEvent* e )
         updateAll();
 }
 
+/*!
+    Processes "Dump view..." context popup menu command
+*/
+void GLViewer_Viewer2d::onDumpView()
+{
+  if ( getActiveView() )
+    getActiveView()->onDumpView();
+}
 
 /****************************************************************
 **  Class: GLViewer_View2dTransformer
@@ -1068,3 +1077,4 @@ void GLViewer_View2dTransformer::onTransform( TransformState state )
     }
     GLViewer_ViewTransformer::onTransform( state );
 }
+

@@ -36,7 +36,8 @@ void Plot2d_Viewer::contextMenuPopup(QPopupMenu* thePopup)
     aView->contextMenuPopup(thePopup);
 
   if (thePopup->count() > 0) thePopup->insertSeparator();
-  thePopup->insertItem("Change background...", this, SLOT(onChangeBgColor()));
+  thePopup->insertItem( tr( "MNU_DUMP_VIEW" ),                this, SLOT(onDumpView()));
+  thePopup->insertItem( tr( "MEN_PLOT2D_CHANGE_BACKGROUND" ), this, SLOT(onChangeBgColor()));
 
   if ( aView ) {
     if ( !aView->getToolBar()->isVisible() ) {
@@ -109,4 +110,12 @@ void Plot2d_Viewer::onShowToolbar() {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )
     aView->getToolBar()->show();    
+}
+
+//*********************************************************************
+void Plot2d_Viewer::onDumpView()
+{
+  Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView )
+    aView->onDumpView();    
 }

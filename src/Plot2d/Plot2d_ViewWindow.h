@@ -35,6 +35,9 @@ public:
   QToolBar*         getToolBar() { return myToolBar; };
   void              contextMenuPopup( QPopupMenu* thePopup );
 
+protected:
+  QImage dumpView();
+
 private:
   bool eventFilter(QObject* watched, QEvent* e);
 
@@ -47,7 +50,6 @@ public slots:
   void onChangeCurveMode();
   void onChangeLegendMode();
   
-  void onDumpView();
   void onFitAll();
   void onFitRect();
   void onZoom();
@@ -57,6 +59,8 @@ public slots:
   void onViewVerMode();
   void onLegend();
   void onCurves();
+
+  void onDumpView();
 
 signals:
   void cloneView();

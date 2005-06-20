@@ -12,6 +12,7 @@
 #include "SUIT.h"
 
 #include <qmainwindow.h>
+#include <qimage.h>
 
 class SUIT_Desktop;
 class SUIT_ViewManager;
@@ -25,6 +26,11 @@ public:
 
   void              setViewManager(SUIT_ViewManager* theManager) { myManager = theManager;}
   SUIT_ViewManager* getViewManager() const { return myManager; }
+
+  bool              event(QEvent*);
+
+public slots:
+  virtual void      onDumpView();
 
 signals:
   void              closing(SUIT_ViewWindow*);
@@ -40,6 +46,8 @@ signals:
 protected:
   void              closeEvent(QCloseEvent* theEvent);
   virtual void      contextMenuEvent( QContextMenuEvent * e );
+
+  virtual QImage    dumpView() { return QImage(); }
 
   SUIT_Desktop*     myDesktop;
   SUIT_ViewManager* myManager;

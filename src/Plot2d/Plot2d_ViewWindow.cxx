@@ -10,6 +10,7 @@
 
 #include <qstatusbar.h>
 #include <qlayout.h>
+#include <qapplication.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -342,12 +343,6 @@ void Plot2d_ViewWindow::onChangeLegendMode()
 }
 
 //****************************************************************
-void Plot2d_ViewWindow::onDumpView()
-{
-  myViewFrame->onDump();
-}
-
-//****************************************************************
 void Plot2d_ViewWindow::onFitAll()
 {
   myViewFrame->onViewFitAll();
@@ -424,4 +419,18 @@ void Plot2d_ViewWindow::onCurves()
     myActionsMap[CurvLinesId]->setOn( false );
     myViewFrame->setCurveType(2);
   }
+}
+
+//****************************************************************
+void Plot2d_ViewWindow::onDumpView()
+{
+  qApp->postEvent( myViewFrame, new QPaintEvent( QRect( 0, 0, myViewFrame->width(), myViewFrame->height() ), TRUE ) );
+  SUIT_ViewWindow::onDumpView();
+}
+
+//****************************************************************
+QImage Plot2d_ViewWindow::dumpView()
+{
+  QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
+  return px.convertToImage();
 }

@@ -57,13 +57,15 @@ public slots:
   void onRightView();
   void onResetView();
   void onFitAll();
-  void onDumpView();
   void activateZoom();
   void activateWindowFit();
   void activateRotation();
   void activatePanning();
   void activateGlobalPanning();
   void onTrihedronShow();
+
+protected:
+  QImage dumpView();
 
 protected slots:
   void onKeyPressed(QKeyEvent* event);

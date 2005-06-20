@@ -85,7 +85,7 @@ public:
 public slots:
   void onSelectionChanged();
 
- signals:
+signals:
  void selectionChanged();
 
 public slots:
@@ -98,7 +98,6 @@ public slots:
 
   void onResetView();     
   void onFitAll();
-  void onDumpView();
 
   void onViewTrihedron(); 
   void onAdjustTrihedron();
@@ -119,6 +118,9 @@ public slots:
   void activateRotation();
   void activatePanning(); 
   void activateGlobalPanning(); 
+
+protected:
+  QImage dumpView();
 
 protected slots:
   void onKeyPressed(QKeyEvent* event);

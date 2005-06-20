@@ -94,7 +94,6 @@ protected:
   virtual void wheelEvent( QWheelEvent* );
 
 public slots:
-  void    onDump();
   void    onViewPan(); 
   void    onViewZoom();
   void    onViewFitAll();

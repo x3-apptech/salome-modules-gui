@@ -35,6 +35,7 @@ public:
 
 protected slots:
   void onChangeBgColor();
+  void onDumpView();
   void onShowToolbar();
 
 private:

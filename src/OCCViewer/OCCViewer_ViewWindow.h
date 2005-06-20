@@ -48,7 +48,6 @@ public slots:
   void onRightView();
   void onResetView();
   void onFitAll();
-  void onDumpView();
   void activateZoom();
   void activateWindowFit();
   void activateRotation();
@@ -72,6 +71,7 @@ protected:
 
   typedef QMap<int, QtxAction*> ActionsMap;
 
+  QImage dumpView();
 
   /* Transformation selected but not started yet */
   bool transformRequested() const { return ( myOperation != NOTHING ); }

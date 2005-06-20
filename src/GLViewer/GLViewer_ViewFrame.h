@@ -56,12 +56,14 @@ protected:
   GLViewer_Viewer*        myViewer;
   GLViewer_ViewPort*      myVP;
   
+protected:
+  QImage dumpView();
+
 public:
   //ViewType       getTypeView() const { return VIEW_GL; }; 
   QWidget*       getViewWidget() { return ( QWidget* )getViewPort(); };
   
 protected slots:
-  void           onViewDump();
   void           onViewPan();
   void           onViewZoom();
   void           onViewFitAll();

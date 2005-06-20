@@ -129,6 +129,7 @@ protected:
 
 protected slots:
     void                 onMouseEvent( SUIT_ViewWindow*, QMouseEvent* );
+    void                 onDumpView();
 
 private:
     bool                 testRotation( QMouseEvent* );
