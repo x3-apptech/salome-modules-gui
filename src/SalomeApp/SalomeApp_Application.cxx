@@ -20,6 +20,7 @@
 #include "SalomeApp_Preferences.h"
 #include "SalomeApp_PreferencesDlg.h"
 #include "SalomeApp_StudyPropertiesDlg.h"
+#include "SalomeApp_CheckFileDlg.h"
 
 #include "SalomeApp_GLSelector.h"
 #include "SalomeApp_OBSelector.h"
@@ -265,10 +266,15 @@ void SalomeApp_Application::createActions()
 
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-
+  
+  // Dump study
+  createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIconSet(),
+		tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
+		0, desk, false, this, SLOT( onDumpStudy() ) );
+    
   // Load script
-  createAction( LoadScriptId, tr( "TOT_DESK_LOADSCRIPT" ), QIconSet(),
-		tr( "MEN_DESK_LOADSCRIPT" ), tr( "PRP_DESK_LOADSCRIPT" ),
+  createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
+		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
 		0, desk, false, this, SLOT( onLoadScript() ) );
 
   // Properties
@@ -367,12 +373,11 @@ void SalomeApp_Application::createActions()
   }
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
 
-
-
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
+  createMenu( DumpStudyId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 15, -1 );
-  createMenu( LoadScriptId, fileMenu, 15, -1 );
+  createMenu( LoadScriptId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 15, -1 );
   createMenu( PropertiesId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 15, -1 );
@@ -616,8 +621,13 @@ void SalomeApp_Application::updateCommandsStatus()
       a->setEnabled( activeStudy() );
   }
 
+  // Dump study menu
+  QAction* a = action( DumpStudyId );
+  if ( a )
+    a->setEnabled( activeStudy() );
+
   // Load script menu
-  QAction* a = action( LoadScriptId );
+  a = action( LoadScriptId );
   if ( a )
     a->setEnabled( activeStudy() );
   
@@ -901,6 +911,30 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
   saveWindowsGeometry();
 }
 
+void SalomeApp_Application::onDumpStudy( )
+{
+  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+  if ( !appStudy ) return;
+  _PTR(Study) aStudy = appStudy->studyDS();
+
+  QStringList aFilters;
+  aFilters.append(tr("PYTHON_FILES_FILTER"));
+
+  SalomeApp_CheckFileDlg* fd = new SalomeApp_CheckFileDlg( desktop(), false, tr("PUBLISH_IN_STUDY"), true, true);
+  fd->setCaption(tr("TOT_DESK_FILE_DUMP_STUDY"));
+  fd->setFilters( aFilters );  
+  fd->SetChecked(true);
+  fd->exec();
+  QString aFileName = fd->selectedFile();
+  bool toPublish = fd->IsChecked();
+  delete fd;
+
+  if(!aFileName.isEmpty()) {
+    QFileInfo aFileInfo(aFileName);
+    aStudy->DumpStudy(aFileInfo.dirPath(true), aFileInfo.baseName(), toPublish);
+  }
+}
+
 void SalomeApp_Application::onLoadScript( )
 {
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
@@ -919,7 +953,7 @@ void SalomeApp_Application::onLoadScript( )
   filtersList.append(tr("PYTHON_FILES_FILTER"));
   filtersList.append(tr("ALL_FILES_FILTER"));
 
-  QString aFile = SUIT_FileDlg::getFileName( desktop(), "", filtersList, tr( "TOT_DESK_LOADSCRIPT" ), true, true );
+  QString aFile = SUIT_FileDlg::getFileName( desktop(), "", filtersList, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), true, true );
 
   if ( !aFile.isEmpty() )
   {

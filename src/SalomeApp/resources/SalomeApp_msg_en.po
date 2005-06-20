@@ -71,16 +71,25 @@ msgstr "OCC view"
 msgid "SalomeApp_Application::NEW_WINDOW_3"
 msgstr "VTK view"
 
-msgid "SalomeApp_Application::TOT_DESK_LOADSCRIPT"
+msgid "SalomeApp_Application::TOT_DESK_FILE_DUMP_STUDY"
+msgstr "Dump study"
+
+msgid "SalomeApp_Application::MEN_DESK_FILE_DUMP_STUDY"
+msgstr "Dump study..."
+
+msgid "SalomeApp_Application::PRP_DESK_FILE_DUMP_STUDY"
+msgstr "Dumps study to the python script"
+
+msgid "SalomeApp_Application::TOT_DESK_FILE_LOAD_SCRIPT"
 msgstr "Load python script"
 
-msgid "SalomeApp_Application::MEN_DESK_LOADSCRIPT"
+msgid "SalomeApp_Application::MEN_DESK_FILE_LOAD_SCRIPT"
 msgstr "Load script..."
 
-msgid "SalomeApp_Application::PRP_DESK_LOADSCRIPT"
+msgid "SalomeApp_Application::PRP_DESK_FILE_LOAD_SCRIPT"
 msgstr "Loads python script from file"
 
-msgid "SalomeApp_Application::TOT_DESK_PREFERENCES"
+msgid "SalomeApp_Application::TOT_FILE_DESK_PREFERENCES"
 msgstr "Preferences"
 
 msgid "SalomeApp_Application::MEN_DESK_PREFERENCES"
@@ -241,3 +250,8 @@ msgstr "MODIFIED"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFICATIONS"
 msgstr "Modifications"
+
+//=======================================================================================
+
+msgid "SalomeApp_Application::PUBLISH_IN_STUDY"
+msgstr "Publish in study"

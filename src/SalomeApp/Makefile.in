@@ -39,7 +39,8 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_Filter.h \
 		SalomeApp_TypeFilter.h \
 		SalomeApp_OBFilter.h \
-		SalomeApp_StudyPropertiesDlg.h
+		SalomeApp_StudyPropertiesDlg.h \
+		SalomeApp_CheckFileDlg.h
 
 # .po files to transform in .qm
 PO_FILES = SalomeApp_images.po \
@@ -76,7 +77,8 @@ LIB_SRC= SalomeApp_AboutDlg.cxx \
 	 SalomeApp_TypeFilter.cxx \
 	 SalomeApp_OBFilter.cxx \
 	 SalomeApp_StudyPropertiesDlg.cxx \
-	 SalomeApp_ListView.cxx
+	 SalomeApp_ListView.cxx \
+	 SalomeApp_CheckFileDlg.cxx
 
 LIB_MOC = SalomeApp_AboutDlg.h \
           SalomeApp_Application.h \
@@ -94,7 +96,8 @@ LIB_MOC = SalomeApp_AboutDlg.h \
 	  SalomeApp_NameDlg.h \
 	  SalomeApp_ModuleDlg.h \
 	  SalomeApp_StudyPropertiesDlg.h \
-	  SalomeApp_ListView.h
+	  SalomeApp_ListView.h \
+	  SalomeApp_CheckFileDlg.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_Exception.idl \
