@@ -63,10 +63,7 @@ bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
   return res;
 }
 
-extern "C"
+extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
 {
-  SUIT_ExceptionHandler* getExceptionHandler()
-  {
-    return new SalomeApp_ExceptionHandler( true );
-  }
+  return new SalomeApp_ExceptionHandler( true );
 }
