@@ -752,9 +752,8 @@ public:
       myCaption( caption ), 
       myOpen ( open ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // myResult = QAD_FileDlg::getFileName(parent, initial, filters, caption, open);
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      myResult = anApp->getFileName( myOpen, myInitial, myFilters.join(";;"), myCaption, myParent );
     }
   }
 };
@@ -788,9 +787,8 @@ public:
       myFilters( filters ), 
       myCaption( caption ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // myResult = QAD_FileDlg::getOpenFileNames(parent, initial, filters, caption);
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      myResult = anApp->getOpenFileNames( myInitial, myFilters.join(";;"), myCaption, myParent );
     }
   }
 };
@@ -820,9 +818,8 @@ public:
       myInitial( initial ), 
       myCaption( caption ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-      // myResult = QAD_FileDlg::getExistingDirectory(parent, initial, caption);
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      myResult = anApp->getDirectory( myInitial, myCaption, myParent );
     }
   }
 };

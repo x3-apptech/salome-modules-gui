@@ -1384,6 +1384,15 @@ QString SalomeApp_Application::getDirectory( const QString& initial, const QStri
   return SUIT_FileDlg::getExistingDirectory( parent, initial, caption, true );
 }
 
+QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, const QString& filters, 
+						     const QString& caption, QWidget* parent )
+{
+  if ( !parent )
+    parent = desktop();
+  QStringList fls = QStringList::split( ";;", filters, false );
+  return SUIT_FileDlg::getOpenFileNames( parent, initial, fls, caption, true );
+}
+
 void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   CAM_Application::contextMenuPopup( type, thePopup, title );

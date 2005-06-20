@@ -78,7 +78,9 @@ public:
   virtual QString                     getFileFilter() const;
   virtual QString                     getFileName( bool open, const QString& initial, const QString& filters, 
 						   const QString& caption, QWidget* parent );
-  QString                             getDirectory( const QString& initial, const QString& caption, QWidget* parent );
+  virtual QString                     getDirectory( const QString& initial, const QString& caption, QWidget* parent );
+  virtual QStringList                 getOpenFileNames( const QString& initial, const QString& filters, 
+							const QString& caption, QWidget* parent );
 
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
 
