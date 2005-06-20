@@ -161,6 +161,7 @@ private slots:
   void                                onMRUActivated( QString );
 
   void                                onPreferenceChanged( QString&, QString&, QString& );
+  void                                onOpenWith();
 
 private:
   void                                updateWindows();

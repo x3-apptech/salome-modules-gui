@@ -582,6 +582,21 @@ void SalomeApp_Application::onRefresh()
   updateObjectBrowser( true );
 }
 
+ 
+void SalomeApp_Application::onOpenWith()
+{
+  QApplication::setOverrideCursor( Qt::waitCursor );
+  SALOME_ListIO aList;
+  SalomeApp_SelectionMgr* mgr = selectionMgr();
+  mgr->selectedObjects(aList);
+  if (aList.Extent() > 1) return;
+  Handle(SALOME_InteractiveObject) aIObj = aList.First();
+  QString aModuleName(aIObj->getComponentDataType());
+  QString aModuleTitle = moduleTitle(aModuleName);
+  activateModule(aModuleTitle);
+  QApplication::restoreOverrideCursor();
+}
+
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 {
   CAM_Application::setActiveStudy( study );
@@ -1432,6 +1447,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   CAM_Application::contextMenuPopup( type, thePopup, title );
   thePopup->insertSeparator();
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
+  thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
 }
 
 void SalomeApp_Application::updateObjectBrowser( const bool updateModels )

@@ -116,6 +116,9 @@ msgstr "Edits study properties"
 msgid "SalomeApp_Application::MEN_REFRESH"
 msgstr "Refresh"
 
+msgid "SalomeApp_Application::MEN_OPENWITH"
+msgstr "Activate Module"
+
 //=======================================================================================
 
 msgid "SalomeApp_Application::MEN_WINDOWS_NEW"
