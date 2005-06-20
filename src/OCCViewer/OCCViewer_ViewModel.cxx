@@ -407,9 +407,9 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
     return;
 
   if ( on )
-    myAISContext->Erase( myTrihedron );
-  else
     myAISContext->Display( myTrihedron );
+  else
+    myAISContext->Erase( myTrihedron );
 }
 
 int OCCViewer_Viewer::trihedronSize() const
