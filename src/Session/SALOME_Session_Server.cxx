@@ -176,12 +176,12 @@ int main(int argc, char **argv)
   // qApp used for detection of the executable dir path.
   SALOME_QApplication _qappl( argc, argv );
   ASSERT( QObject::connect(&_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) ) );
+  QString path( ::getenv( "GUI_ROOT_DIR" ) );
+  if ( !path.isEmpty() )
+    path += QDir::separator();
+  path += QString( "bin/salome" );
+  _qappl.addLibraryPath( path );
   _qappl.setStyle( "salome" );
-  /*
-  QStringList lst = _qappl.libraryPaths();
-  for ( QStringList::const_iterator it = lst.begin(); it != lst.end(); ++it )
-    printf( "=====> Library path: %s\n", (*it).latin1() );
-  */
 
   /*
     Python initialisation : only once
