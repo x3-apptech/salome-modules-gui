@@ -22,6 +22,12 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
   if ( !ico.isNull() )
     setIcon( ico );
 
+  QPalette pal = palette();
+  QColorGroup cg = pal.active();
+  cg.setColor( QColorGroup::Foreground, Qt::darkBlue ); 
+  cg.setColor( QColorGroup::Background, Qt::white );
+  pal.setActive( cg ); pal.setInactive( cg ); pal.setDisabled( cg );
+  setPalette(pal);
 
   QVBoxLayout* main = new QVBoxLayout( mainFrame() );
   QGroupBox* base = new QGroupBox( 1, Qt::Horizontal, "", mainFrame() );
