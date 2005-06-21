@@ -87,22 +87,6 @@ void QtxComboBox::setCurrentId( int num )
 {
     setCurrentItem( index( num ) );
 }
-/*
-void QtxComboBox::insertStringList( const QIntList& ids, const QStringList& list, int index )
-{
-}
-*/
-void QtxComboBox::insertItem( const int id, const QString& t, int index )
-{
-}
-
-void QtxComboBox::insertItem( const int id, const QPixmap& pixmap, int index )
-{
-}
-
-void QtxComboBox::insertItem( const int id, const QPixmap& pixmap, const QString& text, int index )
-{
-}
 
 void QtxComboBox::paintEvent( QPaintEvent* e )
 {

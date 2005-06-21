@@ -33,11 +33,6 @@ public:
     int          currentId() const;
     void         setCurrentId( int );
 
-    void         insertItem( const int, const QString&, int = -1 );
-    void         insertItem( const int, const QPixmap&, int = -1 );
-    void         insertItem( const int, const QPixmap&, const QString&, int = -1 );
-//  void         insertStringList( const QIntList&, const QStringList&, int = -1 );
-
 signals:
     void         activatedId( int );
     void         highlightedId( int );
