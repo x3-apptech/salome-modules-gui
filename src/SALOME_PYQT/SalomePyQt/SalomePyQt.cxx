@@ -18,6 +18,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_ResourceMgr.h"
+#include "SUIT_Tools.h"
 #include "STD_MDIDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
@@ -845,7 +846,7 @@ void SalomePyQt::helpContext( const QString& source, const QString& context ) {
     virtual void Execute() {
       if ( /*SalomeApp_Application* anApp =*/ getApplication() ) {
 	// VSR: TODO
-////QAD_Application::getDesktop()->helpContext(source, context);
+        // anApp->helpContext( mySource, myContext );
       }
     }
   };
@@ -865,29 +866,20 @@ public:
   TDumpViewEvent( const QString& filename ) 
     : myResult ( false ), myFileName( filename ) {}
   virtual void Execute() {
-    if ( /*SalomeApp_Study* aStudy = */getActiveStudy() ) {
-      // VSR: TODO
-//   QAD_Study* activeStudy = QAD_Application::getDesktop()->getActiveApp()->getActiveStudy();
-//   if ( !activeStudy )
-//     return false;
-//   QAD_ViewFrame* activeViewFrame = activeStudy->getActiveStudyFrame()->getRightFrame()->getViewFrame();
-//   if ( !activeViewFrame )
-//     return false;
-//   if ( !activeViewFrame->getViewWidget() )
-//     return false;
-
-//   qApp->processEvents();
-//   QPixmap px = QPixmap::grabWindow( activeViewFrame->getViewWidget()->winId() );
-//   if ( !filename.isNull() ) {
-//     QString fmt = QAD_Tools::getFileExtensionFromPath( filename ).upper();
-//     if ( fmt.isEmpty() )
-//       fmt = QString( "PNG" ); // default format
-//     if ( fmt == "JPG" )
-//       fmt = "JPEG";
-//     bool bOk = px.save( filename, fmt.latin1() );
-//     return bOk;
-//   }
-//   return false;
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SUIT_ViewManager* vm = anApp->activeViewManager();
+      if ( vm ) { 
+        SUIT_ViewWindow* vw = vm->getActiveView();
+	if ( vw ) {
+          QImage im = vw->dumpView();
+	  if ( !im.isNull() && !myFileName.isEmpty() ) {
+            QString fmt = SUIT_Tools::extension( myFileName ).upper();
+	    if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
+	    if ( fmt == "JPG" )  fmt = "JPEG";
+	    myResult = im.save( myFileName, fmt.latin1() );
+          }
+	}
+      }
     }
   }
 };
