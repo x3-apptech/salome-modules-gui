@@ -556,24 +556,27 @@ void SalomeApp_Application::onSelectionChanged()
    if(!stdDS) return;
    
    QAction* qaction;  
-   
-   for ( SALOME_ListIteratorOfListIO it( list ); it.More(); it.Next() )
+   //Varibales isEnabledCopy and isEnabledPaste are used for multi selection.
+   bool isEnabledCopy = true;  
+   bool isEnabledPaste = true;  
+
+   for ( SALOME_ListIteratorOfListIO it( list ); it.More() && (isEnabledCopy || isEnabledPaste); it.Next() )
    {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
-      qaction = action(EditCutId);
-      if( studyMgr()->CanCopy(so) ) {
-        qaction->setEnabled(true);
-	qaction = action(EditCopyId); 
-	qaction->setEnabled(true);  
-      }
-      else {
-        qaction->setEnabled(false);
-	qaction = action(EditCopyId);
+
+      qaction = action(EditCopyId); 
+      if( isEnabledCopy && studyMgr()->CanCopy(so) ) qaction->setEnabled(true);  
+      else { 
+	isEnabledCopy = false;
 	qaction->setEnabled(false);         
       }
+
       qaction = action(EditPasteId);
-      if( studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
-      else qaction->setEnabled(false);
+      if( isEnabledPaste && studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
+      else {
+	isEnabledPaste = false;
+	qaction->setEnabled(false);
+      }
    } 
 }		
  
@@ -650,8 +653,6 @@ void SalomeApp_Application::updateCommandsStatus()
   if( a )
     a->setEnabled( activeStudy() );
     
-  a = action(EditCutId);
-  a->setEnabled(false);	
   a = action(EditCopyId);
   a->setEnabled(false);	      
   a = action(EditPasteId);
