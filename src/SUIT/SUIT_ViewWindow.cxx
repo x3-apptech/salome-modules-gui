@@ -62,7 +62,7 @@ bool SUIT_ViewWindow::event( QEvent* e )
       if ( !img.isNull() ) {
         // get file name
         QString fileName = myManager->study()->application()->getFileName( false, QString::null, tr( "TLT_IMAGE_FILES" ), tr( "TLT_DUMP_VIEW" ), 0 );
-        if ( fileName ) {
+        if ( !fileName.isEmpty() ) {
           QString fmt = SUIT_Tools::extension( fileName ).upper();
           if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
 	  if ( fmt == "JPG" )  fmt = "JPEG";

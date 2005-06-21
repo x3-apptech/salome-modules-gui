@@ -29,6 +29,8 @@ public:
 
   bool              event(QEvent*);
 
+  virtual QImage    dumpView() { return QImage(); }
+
 public slots:
   virtual void      onDumpView();
 
@@ -46,8 +48,6 @@ signals:
 protected:
   void              closeEvent(QCloseEvent* theEvent);
   virtual void      contextMenuEvent( QContextMenuEvent * e );
-
-  virtual QImage    dumpView() { return QImage(); }
 
   SUIT_Desktop*     myDesktop;
   SUIT_ViewManager* myManager;
