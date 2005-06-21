@@ -108,8 +108,8 @@ void SUIT_Application::setDesktop( SUIT_Desktop* desk )
 
   delete myDesktop;
   myDesktop = desk;
-  connect( myDesktop, SIGNAL( activated() ), 
-	   this, SLOT( onDesktopActivated() ) );
+  if ( myDesktop )
+    connect( myDesktop, SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
 }
 
 SUIT_Study* SUIT_Application::createNewStudy()
