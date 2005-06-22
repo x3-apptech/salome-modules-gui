@@ -242,7 +242,7 @@ SVTK_SelectorDef
   if(!theIsModeShift)
     aMapIndex.Clear();
   
-  for(int i = 0, iEnd = theIndices.Extent(); i < iEnd; i++)
+  for(int i = 1, iEnd = theIndices.Extent(); i <= iEnd; i++)
     aMapIndex.Add(theIndices(i));
   
   if(aMapIndex.IsEmpty())
