@@ -128,7 +128,7 @@ myPrefs( 0 )
   setDesktop( desk );
 
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-  QPixmap aLogo = aResMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
+  QPixmap aLogo = aResMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ), false );
 
   desktop()->setIcon( aLogo );
   desktop()->setDockableMenuBar( true );
@@ -293,12 +293,12 @@ void SalomeApp_Application::createActions()
   registerAction( MRUId, mru );
 
   // default icon for neutral point ('SALOME' module)
-  QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ) );
+  QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ), false );
   if ( defIcon.isNull() )
     defIcon = QPixmap( imageEmptyIcon );
 
   // default icon for any module
-  QPixmap modIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_MODULE_ICO" ) );
+  QPixmap modIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_MODULE_ICO" ), false );
   if ( modIcon.isNull() )
     modIcon = QPixmap( imageEmptyIcon );
 
@@ -336,7 +336,7 @@ void SalomeApp_Application::createActions()
 
     QString modName = moduleName( *it );
 
-    QPixmap icon = resMgr->loadPixmap( modName, iconName );
+    QPixmap icon = resMgr->loadPixmap( modName, iconName, false );
     if ( icon.isNull() )
       icon = modIcon;
 
@@ -403,7 +403,9 @@ void SalomeApp_Application::onModuleActivation( QAction* a )
   // Force user to create/open a study before module activation
   QMap<QString, QString> iconMap;
   moduleIconNames( iconMap );
-  QPixmap icon = resourceMgr()->loadPixmap( moduleName( modName ), iconMap[ modName ] );
+  QPixmap icon = resourceMgr()->loadPixmap( moduleName( modName ), iconMap[ modName ], false );
+  if ( icon.isNull() )
+    icon = resourceMgr()->loadPixmap( "SalomeApp", tr( "APP_MODULE_BIG_ICO" ), false ); // default icon for any module
 
   bool cancelled = false;
   while ( !modName.isEmpty() && !activeStudy() && !cancelled ){

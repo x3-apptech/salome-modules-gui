@@ -1184,7 +1184,7 @@ myCancelBtn(0)
     
     QPixmap anIcon;
     if( mgr )
-      anIcon = mgr->loadPixmap( "STD", tr( "ICON_APPLY" ) );
+      anIcon = mgr->loadPixmap( "STD", tr( "ICON_APPLY" ), false );
 
     myApplyBtn->setPixmap(anIcon);
     myApplyBtn->setEnabled(false);
@@ -1199,7 +1199,7 @@ myCancelBtn(0)
     myCancelBtn = new QToolButton(this);
     QPixmap anIcon;
     if( mgr )
-      anIcon = mgr->loadPixmap( "STD", tr( "ICON_CANCEL" ) );
+      anIcon = mgr->loadPixmap( "STD", tr( "ICON_CANCEL" ), false );
     myCancelBtn->setPixmap(anIcon);
     myCancelBtn->setEnabled(false);
     myCancelBtn->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));

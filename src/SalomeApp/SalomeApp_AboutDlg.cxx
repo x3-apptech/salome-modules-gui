@@ -18,7 +18,7 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
 {
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
 
-  QPixmap ico = resMgr->loadPixmap( "SalomeApp", tr( "ICO_ABOUT" ) );
+  QPixmap ico = resMgr->loadPixmap( "SalomeApp", tr( "ICO_ABOUT" ), false );
   if ( !ico.isNull() )
     setIcon( ico );
 
@@ -56,7 +56,7 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
   license->setAlignment( Qt::AlignCenter );
   changeFont( license, false, false, false, 1 );
 
-  screen->setPixmap( resMgr->loadPixmap( "SalomeApp", tr( "ABOUT" ) ) );
+  screen->setPixmap( resMgr->loadPixmap( "SalomeApp", tr( "ABOUT" ), false ) );
   checkLabel( screen );
 
   QString titleText = tr( "ABOUT_TITLE" );

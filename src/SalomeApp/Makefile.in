@@ -107,6 +107,7 @@ RESOURCES_FILES = icon_about.png \
 		  icon_applogo.png \
                   icon_default.png \
                   icon_module.png \
+		  icon_module_big.png \
 		  SalomeApp.ini \
 		  SalomeApp.xml
 

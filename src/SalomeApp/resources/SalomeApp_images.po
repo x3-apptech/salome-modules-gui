@@ -22,3 +22,7 @@ msgstr "icon_default.png"
 
 msgid "APP_MODULE_ICO"
 msgstr "icon_module.png"
+
+msgid "APP_MODULE_BIG_ICO"
+msgstr "icon_module_big.png"
+
