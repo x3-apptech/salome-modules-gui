@@ -1014,10 +1014,12 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	    bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );
 	    QString execute = attribute( elem, "execute-action" );               // not used
 
-	    QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
 	    QIconSet anIcon;
-	    if ( !pixmap.isNull() )
-	      anIcon = QIconSet( pixmap );
+	    if ( !icon.isEmpty() ) {
+	      QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
+	      if ( !pixmap.isNull() )
+	        anIcon = QIconSet( pixmap );
+            }
 
 	    // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	    // also check if the action with given ID is already created
@@ -1088,10 +1090,12 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
 	    bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );
 	    QString execute = attribute( elem, "execute-action" );               // not used
 
-	    QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
 	    QIconSet anIcon;
-	    if ( !pixmap.isNull() )
-	      anIcon = QIconSet( pixmap );
+	    if ( !icon.isEmpty() ) {
+              QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
+	      if ( !pixmap.isNull() )
+	        anIcon = QIconSet( pixmap );
+            }
 
 	    // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	    // also check if the action with given ID is already created
@@ -1151,10 +1155,12 @@ void SALOME_PYQT_XmlHandler::insertPopupItems( QDomNode& parentNode, QPopupMenu*
 	bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );       // not used
 	QString execute = attribute( elem, "execute-action" );               // not used
 
-	QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
 	QIconSet anIcon;
-	if ( !pixmap.isNull() )
-	  anIcon = QIconSet( pixmap );
+	if ( !icon.isEmpty() ) {
+          QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
+	  if ( !pixmap.isNull() )
+	    anIcon = QIconSet( pixmap );
+        }
 	
 	// -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	// also check if the action with given ID is already created
@@ -1169,10 +1175,12 @@ void SALOME_PYQT_XmlHandler::insertPopupItems( QDomNode& parentNode, QPopupMenu*
 	QString label = attribute( elem, "label-id" );
 	QString icon    = attribute( elem, "icon-id" );
 
-	QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
 	QIconSet anIcon;
-	if ( !pixmap.isNull() )
-	  anIcon = QIconSet( pixmap );
+	if ( !icon.isEmpty() ) {
+  	  QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
+	  if ( !pixmap.isNull() )
+	    anIcon = QIconSet( pixmap );
+        }
 
 	QPopupMenu* newPopup = new QPopupMenu( menu, label );
 	menu->insertItem( anIcon, label, newPopup, id, pos );
