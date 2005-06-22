@@ -138,6 +138,7 @@ protected:
     SUIT_ResourceMgr* resMgr = new SUIT_ResourceMgr( appName, QString( "%1Config" ) );
     resMgr->setVersion( salomeVersion() );
     resMgr->setCurrentFormat( "xml" );
+    resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
     return resMgr;
   }
 };
