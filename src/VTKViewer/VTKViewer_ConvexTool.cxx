@@ -19,8 +19,9 @@
 #include <set>
 #include <iterator>
 #include <algorithm>
+#include <math.h>
 
-static float FACE_TOLERANCE = 0;
+static float FACE_ANGLE_TOLERANCE=1.5;
 
 typedef std::set<vtkIdType> TUIDS; // unique ids 
 typedef std::map<vtkIdType,TUIDS> TPTOIDS; // id points -> unique ids
@@ -183,14 +184,18 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
     }
     
     
-    float det = vtkMath::Determinant3x3(v1,v2,v3);
-//     float det = v1[0]*(v2[1]*v3[2]-v2[2]*v3[1]) -
-//                 v1[1]*(v2[0]*v3[2]-v2[2]*v3[0]) +
-//                 v1[2]*(v2[0]*v3[1]-v2[1]*v3[0]);
-    if(det < 0)
-      det = -det;
+    float vec_b1[3];
+    vtkMath::Cross(v2,v1,vec_b1);
+    float vec_b2[3];
+    vtkMath::Cross(v1,v3,vec_b2);
+
+    float b1 = vtkMath::Norm(vec_b1);
+
+    float b2 = vtkMath::Norm(vec_b2);
     
-    if( det <= FACE_TOLERANCE )
+    float angle=180*acosf(vtkMath::Dot(vec_b1,vec_b2)/(b1*b2))/vtkMath::Pi();
+    
+    if( angle <= FACE_ANGLE_TOLERANCE )
       status = true;
     if (MYDEBUG){
       for(int k=0;k<4;k++){
@@ -200,7 +205,7 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
 	}
 	cout << p[k][2] << ")   ";
       }
-      cout << endl;
+      cout << "angle="<<angle<<endl;
     }
     
   } else if (common_ids.size() >2){
