@@ -27,7 +27,7 @@ void SalomeApp_Selection::init( const QString& client, SalomeApp_SelectionMgr* m
       myStudy = dynamic_cast<SalomeApp_Study*>( mgr->application()->activeStudy() );
 
     SUIT_DataOwnerPtrList sel;
-    mgr->selected( sel );
+    mgr->selected( sel, client );
     SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
     for( ; anIt!=aLast; anIt++ )
     {
