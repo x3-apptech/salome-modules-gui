@@ -15,7 +15,7 @@
     <parameter name="xterm"      value="no"/>
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,SUPERV,MED,VISU,COMPONENT"/>
+    <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine"/>
     <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
