@@ -416,7 +416,7 @@ int OCCViewer_Viewer::trihedronSize() const
 {
   int sz = 0;
   if ( !myTrihedron.IsNull() )
-    sz = myTrihedron->Size();
+    sz = (int)myTrihedron->Size();
   return sz;
 }
 
@@ -429,14 +429,14 @@ void OCCViewer_Viewer::setTrihedronSize( const int sz )
 void OCCViewer_Viewer::setIsos( const int u, const int v )
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
-  if ( !ic.IsNull() )
-  {
-    ic->SetIsoNumber( u, AIS_TOI_IsoU );
-    ic->SetIsoNumber( u, AIS_TOI_IsoV );
-  }
+  if ( ic.IsNull() )
+  return;
+
+  ic->SetIsoNumber( u, AIS_TOI_IsoU );
+  ic->SetIsoNumber( u, AIS_TOI_IsoV );
 }
 
-void OCCViewer_Viewer::isos( int& u, int& v ) const 
+void OCCViewer_Viewer::isos( int& u, int& v ) const
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
   if ( !ic.IsNull() )

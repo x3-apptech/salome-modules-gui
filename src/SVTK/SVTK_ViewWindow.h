@@ -80,7 +80,9 @@ public:
   void AdjustTrihedrons( const bool forced );
   bool ComputeTrihedronSize( double& theNewSize,
 			     double& theOldSize );
-  double GetTrihedronSize() const;
+
+  int  GetTrihedronSize() const;
+  void SetTrihedronSize( const int );
 
 public slots:
   void onSelectionChanged();
@@ -151,9 +153,10 @@ private:
 
   SVTK_RenderWindow* myRenderWindow;
   SVTK_RenderWindowInteractor* myRWInteractor;
-  
-  VTKViewer_Trihedron* myTrihedron;  
+
   VTKViewer_Transform* myTransform;
+  VTKViewer_Trihedron* myTrihedron;  
+  int                  myTrihedronSize;
   
   QToolBar* myToolBar;
   ActionsMap myActionsMap;  

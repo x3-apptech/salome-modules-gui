@@ -409,26 +409,22 @@ QColor VTKViewer_ViewWindow::backgroundColor() const
   return SUIT_ViewWindow::backgroundColor();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::Repaint(bool theUpdateTrihedron)
 {
   if (theUpdateTrihedron) onAdjustTrihedron();
   myRenderWindow->update();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::GetScale( double theScale[3] ) {
   myTransform->GetScale( theScale );
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::SetScale( double theScale[3] ) {
   myTransform->SetScale( theScale[0], theScale[1], theScale[2] );
   myRWInteractor->Render();
   Repaint();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onAdjustTrihedron(){   
   if( !isTrihedronDisplayed() ) 
     return;
@@ -466,37 +462,31 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
   ::ResetCameraClippingRange(myRenderer);
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onKeyPressed(QKeyEvent* event)
 {
   emit keyPressed( this, event );
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onKeyReleased(QKeyEvent* event)
 {
   emit keyReleased( this, event );
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onMousePressed(QMouseEvent* event)
 {
   emit mousePressed(this, event);
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onMouseReleased(QMouseEvent* event)
 {
   emit mouseReleased( this, event );
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onMouseMoving(QMouseEvent* event)
 {
   emit mouseMoving( this, event );
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onMouseDoubleClicked( QMouseEvent* event )
 {
   emit mouseDoubleClicked( this, event );

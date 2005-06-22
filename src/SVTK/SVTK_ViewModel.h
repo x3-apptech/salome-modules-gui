@@ -28,6 +28,9 @@ public:
   QColor backgroundColor() const;
   void   setBackgroundColor( const QColor& );
 
+  int    trihedronSize() const;
+  void   setTrihedronSize( const int );
+
 public:
   void enableSelection(bool isEnabled);
   bool isSelectionEnabled() const { return mySelectionEnabled; }
@@ -68,6 +71,7 @@ protected slots:
 
 private:
   QColor myBgColor;
+  int    myTrihedronSize;
   bool   mySelectionEnabled;
   bool   myMultiSelectionEnabled;
 };

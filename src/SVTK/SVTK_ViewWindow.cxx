@@ -37,7 +37,8 @@
 SVTK_ViewWindow
 ::SVTK_ViewWindow( SUIT_Desktop* theDesktop, 
 		   SVTK_Viewer* theModel)
-  : SUIT_ViewWindow(theDesktop)
+  : SUIT_ViewWindow( theDesktop ),
+    myTrihedronSize( 100 )
 {
   myModel = theModel;
   mySelector = new SVTK_SelectorDef();
@@ -611,10 +612,7 @@ SVTK_ViewWindow
     aLength = max( ( aBndBox[ 5 ] - aBndBox[ 4 ] ),aLength );
   }
 
-  static float aSizeInPercents = 105;
-  //QString aSetting = QAD_CONFIG->getSetting( "Viewer:TrihedronSize" );
-  //if ( !aSetting.isEmpty() )
-  //  aSizeInPercents = aSetting.toFloat();
+  float aSizeInPercents = myTrihedronSize;
 
   static float EPS_SIZE = 5.0E-3;
   theSize = myTrihedron->GetSize();
@@ -626,14 +624,20 @@ SVTK_ViewWindow
 }
 
 //----------------------------------------------------------------------------
-double
-SVTK_ViewWindow
-::GetTrihedronSize() const
+int SVTK_ViewWindow::GetTrihedronSize() const
 {
-  return myTrihedron->GetSize();
+  return myTrihedronSize;
 }
 
-//----------------------------------------------------------------------------
+void SVTK_ViewWindow::SetTrihedronSize( const int sz )
+{
+  if ( myTrihedronSize == sz )
+    return;
+
+  myTrihedronSize = sz;
+  AdjustTrihedrons( true );
+}
+
 void
 SVTK_ViewWindow
 ::AdjustTrihedrons( const bool theIsForcedUpdate )

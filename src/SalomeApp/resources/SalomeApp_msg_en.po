@@ -168,6 +168,12 @@ msgstr "Background color"
 msgid "SalomeApp_Application::PREF_TRIHEDRON_SIZE"
 msgstr "Trihedron size"
 
+msgid "SalomeApp_Application::PREF_ISOS_U"
+msgstr "Number of isolines along U"
+
+msgid "SalomeApp_Application::PREF_ISOS_V"
+msgstr "Number of isolines along V"
+
 msgid "SalomeApp_Application::PREF_TRIHEDRON_SHOW"
 msgstr "Show trihedron"
 

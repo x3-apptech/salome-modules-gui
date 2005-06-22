@@ -51,6 +51,7 @@ static _PTR(Study) getStudyDS()
 //==========================================================
 SVTK_Viewer::SVTK_Viewer()
 {
+  myTrihedronSize = 100;
 }
 
 //==========================================================
@@ -74,7 +75,33 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   SVTK_ViewWindow* vw = new SVTK_ViewWindow( theDesktop, this );
   vw->setBackgroundColor( backgroundColor() );
+  vw->SetTrihedronSize( trihedronSize() );
   return vw;
+}
+
+int SVTK_Viewer::trihedronSize() const
+{
+  return myTrihedronSize;
+}
+
+void SVTK_Viewer::setTrihedronSize( const int sz )
+{
+  myTrihedronSize = sz;
+
+  SUIT_ViewManager* vm = getViewManager();
+  if ( !vm )
+    return;
+
+  QPtrVector<SUIT_ViewWindow> vec = vm->getViews();
+  for ( int i = 0; i < vec.count(); i++ )
+  {
+    SUIT_ViewWindow* win = vec.at( i );
+    if ( !win || !win->inherits( "SVTK_ViewWindow" ) )
+      continue;
+
+    SVTK_ViewWindow* vw = (SVTK_ViewWindow*)win;
+    vw->SetTrihedronSize( sz );
+  }
 }
 
 //==========================================================
@@ -82,7 +109,7 @@ void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 {
   SUIT_ViewModel::setViewManager(theViewManager);
 
-  if(!theViewManager)
+  if ( !theViewManager )
     return;
 
   connect(theViewManager, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), 

@@ -847,6 +847,11 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
     SOCC_Viewer* vm = new SOCC_Viewer();
     vm->setBackgroundColor( resMgr->colorValue( "OCCViewer", "background", vm->backgroundColor() ) );
     vm->setTrihedronSize( resMgr->integerValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ) );
+    int u( 1 ), v( 1 );
+    vm->isos( u, v );
+    u = resMgr->integerValue( "OCCViewer", "iso_number_u", u );
+    v = resMgr->integerValue( "OCCViewer", "iso_number_v", v );
+    //    vm->setIsos( u, v );
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
     new SalomeApp_OCCSelector( (OCCViewer_Viewer*)viewMgr->getViewModel(), mySelMgr );
   }
@@ -855,6 +860,7 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
     viewMgr = new SVTK_ViewManager( activeStudy(), desktop() );
     SVTK_Viewer* vm = (SVTK_Viewer*)viewMgr->getViewModel();
     vm->setBackgroundColor( resMgr->colorValue( "VTKViewer", "background", vm->backgroundColor() ) );
+    vm->setTrihedronSize( resMgr->integerValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ) );
     new SalomeApp_VTKSelector((SVTK_Viewer*)viewMgr->getViewModel(),mySelMgr);
   }
 
@@ -934,10 +940,10 @@ void SalomeApp_Application::onDumpStudy( )
   _PTR(Study) aStudy = appStudy->studyDS();
 
   QStringList aFilters;
-  aFilters.append(tr("PYTHON_FILES_FILTER"));
+  aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
 
   SalomeApp_CheckFileDlg* fd = new SalomeApp_CheckFileDlg( desktop(), false, tr("PUBLISH_IN_STUDY"), true, true);
-  fd->setCaption(tr("TOT_DESK_FILE_DUMP_STUDY"));
+  fd->setCaption( tr( "TOT_DESK_FILE_DUMP_STUDY" ) );
   fd->setFilters( aFilters );  
   fd->SetChecked(true);
   fd->exec();
@@ -947,7 +953,7 @@ void SalomeApp_Application::onDumpStudy( )
 
   if(!aFileName.isEmpty()) {
     QFileInfo aFileInfo(aFileName);
-    aStudy->DumpStudy(aFileInfo.dirPath(true), aFileInfo.baseName(), toPublish);
+    aStudy->DumpStudy( aFileInfo.dirPath( true ).latin1(), aFileInfo.baseName().latin1(), toPublish );
   }
 }
 
@@ -1183,15 +1189,32 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
   pref->setProperty( occGroup, "columns", 1 );
   pref->setProperty( vtkGroup, "columns", 1 );
 
-  pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
-		       SalomeApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
+  int occTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
+				   SalomeApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup,
 		       SalomeApp_Preferences::Color, "OCCViewer", "background" );
 
-  pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
-		       SalomeApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
+  pref->setProperty( occTS, "min", 1 );
+  pref->setProperty( occTS, "max", 150 );
+
+  int isoU = pref->addPreference( tr( "PREF_ISOS_U" ), occGroup,
+				  SalomeApp_Preferences::IntSpin, "OCCViewer", "iso_number_u" );
+  int isoV = pref->addPreference( tr( "PREF_ISOS_V" ), occGroup,
+				  SalomeApp_Preferences::IntSpin, "OCCViewer", "iso_number_v" );
+
+  pref->setProperty( isoU, "min", 0 );
+  pref->setProperty( isoU, "max", 100000 );
+
+  pref->setProperty( isoV, "min", 0 );
+  pref->setProperty( isoV, "max", 100000 );
+
+  int vtkTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
+				   SalomeApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGroup,
 		       SalomeApp_Preferences::Color, "VTKViewer", "background" );
+
+  pref->setProperty( vtkTS, "min", 1 );
+  pref->setProperty( vtkTS, "max", 150 );
 }
 
 void SalomeApp_Application::preferencesChanged( const QString& sec, const QString& param )
@@ -1216,6 +1239,34 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
       occVM->getAISContext()->UpdateCurrentViewer();
     }
   }
+
+  if ( sec == QString( "VTKViewer" ) && param == QString( "trihedron_size" ) )
+  {
+    int sz = resMgr->integerValue( sec, param, -1 );
+    QPtrList<SUIT_ViewManager> lst;
+    viewManagers( SVTK_Viewer::Type(), lst );
+    for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current() && sz >= 0; ++it )
+    {
+      SUIT_ViewModel* vm = it.current()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+	continue;
+
+      SVTK_Viewer* vtkVM = (SVTK_Viewer*)vm;
+      vtkVM->setTrihedronSize( sz );
+      vtkVM->Repaint();
+    }
+  }
+  /*
+  if ( sec == QString( "OCCViewer" ) && ( param == QString( "iso_number_u" ) || param == QString( "iso_number_v" ) ) )
+  {
+    QPtrList<SUIT_ViewManager> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    int u = resMgr->integerValue( sec, "iso_number_u" );
+    int v = resMgr->integerValue( sec, "iso_number_v" );
+    for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current(); ++it )
+      ((OCCViewer_Viewer*)it.current())->setIsos( u, v );
+  }
+  */
 }
 
 void SalomeApp_Application::afterCloseDoc()

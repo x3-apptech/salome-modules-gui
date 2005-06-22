@@ -95,7 +95,18 @@ void QtxResourceEdit::toBackup()
 
 void QtxResourceEdit::fromBackup()
 {
+  QMap<Item*, QString> before;
+  resourceValues( before );
+
   setResourceValues( myBackup );
+
+  QMap<Item*, QString> after;
+  resourceValues( after );
+
+  QMap<Item*, QString> changed;
+  differentValues( before, after, changed );
+
+  changedResources( changed );
 }
 
 void QtxResourceEdit::update()
