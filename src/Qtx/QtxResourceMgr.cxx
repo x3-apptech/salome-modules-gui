@@ -13,6 +13,29 @@
 
 #include <stdlib.h>
 
+/* XPM */
+static const char* pixmap_not_found_xpm[] = {
+"16 16 3 1",
+"       c None",
+".      c #000000",
+"+      c #A80000",
+"                ",
+"                ",
+"    .     .     ",
+"   .+.   .+.    ",
+"  .+++. .+++.   ",
+"   .+++.+++.    ",
+"    .+++++.     ",
+"     .+++.      ",
+"    .+++++.     ",
+"   .+++.+++.    ",
+"  .+++. .+++.   ",
+"   .+.   .+.    ",
+"    .     .     ",
+"                ",
+"                ",
+"                "};
+
 /*!
 	Class: QtxResourceMgr::Resources
 	Level: Internal
@@ -1093,13 +1116,16 @@ QString QtxResourceMgr::langSection() const
   return res;
 }
 
-QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name ) const
+QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, const bool useDefault ) const
 {
   initialize();
 
+  static QPixmap defaultPixmap( pixmap_not_found_xpm );
   QPixmap pix;
   for ( ResListIterator it( myResources ); it.current() && pix.isNull(); ++it )
     pix = it.current()->loadPixmap( resSection(), prefix, name );
+  if ( pix.isNull() && useDefault )
+     return defaultPixmap;
   return pix;
 }
 
@@ -1121,6 +1147,17 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
   }
 
   substMap.insert( 'L', lang );
+
+  QString trs;
+  if ( value( langSection(), "translators", trs, false ) && !trs.isEmpty() )
+  {
+    QStringList translators    = QStringList::split( "|", option( "translators" ) );
+    QStringList newTranslators = QStringList::split( "|", trs );
+    for ( uint i = 0; i < newTranslators.count(); i++ )
+      if ( translators.find( newTranslators[i] ) == translators.end() )
+        translators += newTranslators[i];
+    setOption( "translators", translators.join( "|" ) );
+  }
 
   QStringList trList = QStringList::split( "|", option( "translators" ) );
   if ( trList.isEmpty() )

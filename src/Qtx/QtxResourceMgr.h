@@ -96,7 +96,7 @@ public:
   QString         resSection() const;
   QString         langSection() const;
 
-  QPixmap         loadPixmap( const QString&, const QString& ) const;
+  QPixmap         loadPixmap( const QString&, const QString&, const bool = true ) const;
   void            loadLanguage( const QString& = QString::null, const QString& = QString::null );
 
   void            raiseTranslators( const QString& );
