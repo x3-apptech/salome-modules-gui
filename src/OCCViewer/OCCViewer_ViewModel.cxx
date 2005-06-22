@@ -425,3 +425,23 @@ void OCCViewer_Viewer::setTrihedronSize( const int sz )
   if ( !myTrihedron.IsNull() )
     myTrihedron->SetSize( sz );
 }
+
+void OCCViewer_Viewer::setIsos( const int u, const int v )
+{
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+  if ( !ic.IsNull() )
+  {
+    ic->SetIsoNumber( u, AIS_TOI_IsoU );
+    ic->SetIsoNumber( u, AIS_TOI_IsoV );
+  }
+}
+
+void OCCViewer_Viewer::isos( int& u, int& v ) const 
+{
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+  if ( !ic.IsNull() )
+  {
+    u = ic->IsoNumber( AIS_TOI_IsoU );
+    v = ic->IsoNumber( AIS_TOI_IsoV );
+  }
+}

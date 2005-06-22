@@ -115,6 +115,8 @@ public:
   void    setColor( const Handle(AIS_InteractiveObject)&, const QColor&, bool=true );
   void    switchRepresentation( const Handle(AIS_InteractiveObject)&, int, bool=true );
   void    setTransparency( const Handle(AIS_InteractiveObject)&, float, bool=true );
+  void    setIsos( const int u, const int v ); // number of isolines
+  void    isos( int& u, int& v ) const;
 
 signals:
   void selectionChanged();

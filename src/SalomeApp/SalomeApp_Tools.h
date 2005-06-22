@@ -16,11 +16,11 @@
 class SALOMEAPP_EXPORT SalomeApp_Tools : public SUIT_Tools
 {
 public:
-  Quantity_Color  color( const QColor& );
-  QColor          color( const Quantity_Color& );
+  static Quantity_Color  color( const QColor& );
+  static QColor          color( const Quantity_Color& );
 
-  static QString  ExceptionToString( const SALOME::SALOME_Exception& );
-  static void     QtCatchCorbaException( const SALOME::SALOME_Exception& );
+  static QString         ExceptionToString( const SALOME::SALOME_Exception& );
+  static void            QtCatchCorbaException( const SALOME::SALOME_Exception& );
 };
 
 #endif

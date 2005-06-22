@@ -24,6 +24,8 @@
 #include "SALOMEDSClient.hxx"
 #include "SALOMEDS_StudyManager.hxx"
 
+#include <AIS_TypeOfIso.hxx>
+
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
 // SALOMEDS::StudyManager - no linkage with SalomeApp. 
@@ -469,23 +471,23 @@ SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
 //=======================================================================
 void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
 {
-  Handle(AIS_InteractiveContext) anIC = getAISContext();
+  Handle(AIS_InteractiveContext) ic = getAISContext();
   
   const SOCC_Prs* anOCCPrs = dynamic_cast<const SOCC_Prs*>( thePrs );
-  if ( anIC.IsNull() )
+  if ( ic.IsNull() )
     return;
   
   // Open local context if there is no one
   bool allObjects = thePrs == 0 || thePrs->IsNull();
-  if ( !anIC->HasOpenedContext() ) {
-    anIC->ClearCurrents( false );
-    anIC->OpenLocalContext( allObjects, true, true );
+  if ( !ic->HasOpenedContext() ) {
+    ic->ClearCurrents( false );
+    ic->OpenLocalContext( allObjects, true, true );
   }
 
   AIS_ListOfInteractive anObjs;
   // Get objects to be activated
   if ( allObjects ) 
-    anIC->DisplayedObjects( anObjs );
+    ic->DisplayedObjects( anObjs );
   else
     anOCCPrs->GetObjects( anObjs );
 
@@ -497,13 +499,13 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode
     {
       if ( anAIS->IsKind( STANDARD_TYPE( AIS_Shape ) ) )
       {
-        anIC->Load( anAIS, -1, false );
-        anIC->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)theMode ) );
+        ic->Load( anAIS, -1, false );
+        ic->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)theMode ) );
       }
       else if ( anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron) )
       {
-        anIC->Load( anAIS, -1, false );
-        anIC->Activate( anAIS, theMode );
+        ic->Load( anAIS, -1, false );
+        ic->Activate( anAIS, theMode );
       }
     }
   }
@@ -515,11 +517,13 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode
 //=======================================================================
 void SOCC_Viewer::GlobalSelection( const bool update ) const
 {
-  Handle(AIS_InteractiveContext) anIC = getAISContext();
-  if ( !anIC.IsNull() )
-    anIC->CloseAllContexts( false );
-  if ( update )
-    anIC->CurrentViewer()->Redraw();
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+  if ( !ic.IsNull() )
+  {
+    ic->CloseAllContexts( false );
+    if ( update )
+      ic->CurrentViewer()->Redraw();
+  }
 }
 
 //=======================================================================
@@ -593,4 +597,3 @@ void SOCC_Viewer::Repaint()
 //  onAdjustTrihedron();
   getViewer3d()->Update();
 }
-
