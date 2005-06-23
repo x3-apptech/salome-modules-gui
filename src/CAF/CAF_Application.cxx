@@ -17,7 +17,7 @@
 #include <qstatusbar.h>
 #include <qapplication.h>
 
-extern "C" CAF_EXPORT SUIT_Application* createApplication( int, char** )
+extern "C" CAF_EXPORT SUIT_Application* createApplication()
 {
   return new CAF_Application();
 }

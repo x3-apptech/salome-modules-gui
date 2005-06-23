@@ -107,7 +107,7 @@ static const char* imageEmptyIcon[] = {
 "....................",
 "...................."};
 
-extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication( int, char** )
+extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 {
   return new SalomeApp_Application();
 }

@@ -22,7 +22,7 @@
 #include <qfiledialog.h>
 #include <qapplication.h>
 
-extern "C" STD_EXPORT SUIT_Application* createApplication( int, char** )
+extern "C" STD_EXPORT SUIT_Application* createApplication()
 {
   return new STD_Application();
 }
