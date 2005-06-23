@@ -532,6 +532,14 @@ void SalomeApp_Application::onSelection()
     ((SalomeApp_Module*)activeModule())->selectionChanged();
 }
 
+void SalomeApp_Application::onCopy() 
+{
+}
+
+void SalomeApp_Application::onPaste() 
+{
+}
+
 void SalomeApp_Application::onSelectionChanged()
 {
  /*
