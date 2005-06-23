@@ -1601,3 +1601,13 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   if ( objectBrowser() )
     objectBrowser()->updateTree();
 }
+
+
+//************************************************************
+void SalomeApp_Application::onDesktopActivated()
+{
+  CAM_Application::onDesktopActivated();
+  SalomeApp_Module* aModule = dynamic_cast<SalomeApp_Module*>(activeModule());
+  if(aModule)
+    aModule->studyActivated();
+}

@@ -148,6 +148,9 @@ protected:
   virtual void                        createPreferences( SalomeApp_Preferences* );
   virtual void                        preferencesChanged( const QString&, const QString& );
 
+protected slots:
+  virtual void          onDesktopActivated();
+
 private slots:
   void                                onNewWindow();
   void                                onModuleActivation( QAction* );

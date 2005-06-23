@@ -67,6 +67,8 @@ public:
   virtual void                        selectionChanged();
   virtual void                        preferencesChanged( const QString&, const QString& );
 
+  virtual void                        studyActivated() {};
+
 public slots:
   virtual bool                        activateModule( SUIT_Study* );
   virtual bool                        deactivateModule( SUIT_Study* );
