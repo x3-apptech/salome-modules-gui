@@ -32,6 +32,8 @@
 #include "SALOME_NamingService.hxx"
 #include "SALOMETraceCollector.hxx"
 
+#include "InquireServersQThread.h" // splash
+
 #include <iostream>
 #include <unistd.h>
 
@@ -55,6 +57,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
 #include "SUIT_MessageBox.h"
+#include "SUIT_Tools.h"
 
 
 #include "SUIT_ExceptionHandler.h"
@@ -163,14 +166,37 @@ private:
   SUIT_ExceptionHandler*  myHandler;
 };
 
+// class which calls SALOME::Session::GetInterface() from another thread
+// to avoid mutual lock (if called from the same thread as main()
+class GetInterfaceThread : public QThread
+{
+public: 
+  GetInterfaceThread( SALOME::Session_var s ) : session ( s ) {}
+protected:
+  virtual void run()
+  {
+    if ( !CORBA::is_nil( session ) )
+      session->GetInterface(); 
+    else
+      printf( "\nFATAL ERROR: SALOME::Session object is nil!  Can not display GUI\n\n" );
+  }
+private:
+  SALOME::Session_var session;
+};
+
+// returns true if 'str' is found in argv
+bool isFound( const char* str, int argc, char** argv )
+{
+  for ( int i = 1; i <= (argc-1); i++ )
+    if ( !strcmp( argv[i], str ) )
+      return true;
+  return false;
+}
+
+// ---------------------------- MAIN -----------------------
 int main(int argc, char **argv)
 {
   qInstallMsgHandler( MessageOutput );
-
-  /*
-  char* _argv_0[512];
-  strcpy( (char*)_argv_0, (char*)argv[0] );
-  */
 
   // QApplication should be create before all other operations
   // When uses QApplication::libraryPaths() (example, QFile::encodeName())
@@ -192,17 +218,17 @@ int main(int argc, char **argv)
   char* _argv[] = {""};
   KERNEL_PYTHON::init_python(_argc,_argv);
   PyEval_RestoreThread(KERNEL_PYTHON::_gtstate);
-  if(!KERNEL_PYTHON::salome_shared_modules_module) // import only once
-    {
-      KERNEL_PYTHON::salome_shared_modules_module =
-	PyImport_ImportModule("salome_shared_modules");
-    }
-  if(!KERNEL_PYTHON::salome_shared_modules_module)
-    {
-      INFOS("salome_shared_modules_module == NULL");
-      PyErr_Print();
-      PyErr_Clear();
-    }
+  if ( !KERNEL_PYTHON::salome_shared_modules_module ) // import only once
+  {
+    KERNEL_PYTHON::salome_shared_modules_module =
+      PyImport_ImportModule("salome_shared_modules");
+  }
+  if ( !KERNEL_PYTHON::salome_shared_modules_module )
+  {
+    INFOS("salome_shared_modules_module == NULL");
+    PyErr_Print();
+    PyErr_Clear();
+  }
   PyEval_ReleaseThread(KERNEL_PYTHON::_gtstate);
 
   int result = -1;
@@ -213,167 +239,138 @@ int main(int argc, char **argv)
   int orbArgc = 1;
   CORBA::ORB_var &orb = init( orbArgc , argv ) ;
   SALOMETraceCollector *myThreadTrace = SALOMETraceCollector::instance(orb);
+  GetInterfaceThread* guiThread = 0;
 
   try
+  {
+    SALOME_Event::GetSessionThread();
+
+    CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
+    PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
+
+    PortableServer::POAManager_var pman = poa->the_POAManager() ;
+    pman->activate() ;
+    INFOS("pman->activate()");
+
+    SALOME_NamingService *_NS = new SALOME_NamingService(orb);
+
+    // CORBA Servant Launcher
+    QMutex _GUIMutex ;
+    QWaitCondition _ServerLaunch;
+    _GUIMutex.lock();     // to block Launch server thread until wait(mutex)
+    
+    // 2. activate embedded CORBA servers: Registry, SALOMEDS, etc.
+    Session_ServerLauncher* myServerLauncher
+      = new Session_ServerLauncher(argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch);
+    myServerLauncher->start();
+    
+    _ServerLaunch.wait(&_GUIMutex); // to be reseased by Launch server thread when ready:
+    // show splash screen if "SPLASH" parameter was passed (default)
+    if ( isFound( "SPLASH", argc, argv ) ) 
     {
-      SALOME_Event::GetSessionThread();
+      // create temporary resource manager just to load splash icon
+      SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
+      resMgr.setVersion( salomeVersion() );
+      resMgr.setCurrentFormat( "xml" );
+      resMgr.loadLanguage( "SalomeApp", "en" );
+      // create splash object: widget (splash with progress bar) and "pinging" thread
+      InquireServersGUI splash;
+      splash.setPixmap( resMgr.loadPixmap( "SalomeApp", QObject::tr( "ABOUT" ) ) );
+      SUIT_Tools::centerWidget( &splash, _qappl.desktop() );
 
-      CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
-      PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
+      _qappl.setMainWidget( &splash );
+      QObject::connect( &_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) );
+      splash.show(); // display splash with running progress bar 
+      _qappl.exec(); // wait untill splash closes (progress runs till end or Cancel is pressed)
 
-      PortableServer::POAManager_var pman = poa->the_POAManager() ;
-      pman->activate() ;
-      INFOS("pman->activate()");
+      //int q = 0;
+      //while ( q++ < 10 )
+      //  sleep( 1 );
+    
+      if ( splash.getExitStatus() ) // 1 is error
+	exit( splash.getExitStatus() ); // quit applicaiton
+    }
 
-      SALOME_NamingService *_NS = new SALOME_NamingService(orb);
+    // call Session::GetInterface() if "GUI" parameter was passed (default) 
+    if ( isFound( "GUI", argc, argv ) ) 
+    {
+      CORBA::Object_var obj = _NS->Resolve("/Kernel/Session");
+      SALOME::Session_var session = SALOME::Session::_narrow( obj ) ;
+      ASSERT (! CORBA::is_nil( session ) );
 
-      // CORBA Servant Launcher
-      QMutex _GUIMutex ;
-      QWaitCondition _ServerLaunch;
-      _GUIMutex.lock();     // to block Launch server thread until wait(mutex)
+      INFOS("Session activated, Launch IAPP...");
+      guiThread = new GetInterfaceThread( session );
+      guiThread->start();
+    }
 
-      // 2. activate embedded CORBA servers: Registry, SALOMEDS, etc.
-      Session_ServerLauncher* myServerLauncher
-	= new Session_ServerLauncher(argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch);
-      myServerLauncher->start();
+    // 3. GUI activation
+    // Allow multiple activation/deactivation of GUI
+    while ( 1 ) 
+    {
+      MESSAGE("waiting wakeAll()");
+      _ServerLaunch.wait(&_GUIMutex); // to be reseased by Launch server thread when ready:
+      // atomic operation lock - unlock on mutex
+      // unlock mutex: serverThread runs, calls  _ServerLaunch->wakeAll()
+      // this thread wakes up, and lock mutex
+            
+      _GUIMutex.unlock();
 
-      // 3. GUI activation
-      // Allow multiple activation/deactivation of GUI
-      //while ( 1 ) {
-	MESSAGE("waiting wakeAll()");
-	_ServerLaunch.wait(&_GUIMutex); // to be reseased by Launch server thread when ready:
-	// atomic operation lock - unlock on mutex
-	// unlock mutex: serverThread runs, calls  _ServerLaunch->wakeAll()
-	// this thread wakes up, and lock mutex
+      // 3.1 SUIT_Session creation	
+      SUIT_Session* aGUISession = new SALOME_Session();
+      INFOS("creation SUIT_Application");
+      
+      SCRUTE(_NS);
+      
+      // 3.3 run GUI loop
+      // T2.12 - catch exceptions thrown on attempts to modified a locked study
+      MESSAGE("run(): starting the main event loop");
+      
+      // 3.2 load SalomeApp dynamic library
+      SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
+      if ( aGUIApp ) 
+      {
+	_qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
+	                                             // aGUISession contains SalomeApp_ExceptionHandler
+	result = _qappl.exec();
 
-	INFOS("Session activated, Launch IAPP...");
-	/*
-	int qArgc = 1;
-	argv[0] = (char*)_argv_0;
-	SALOME_QApplication* _qappl = new SALOME_QApplication( qArgc, argv );
-
-	QStringList lst = _qappl->libraryPaths();
-	for ( QStringList::const_iterator it = lst.begin(); it != lst.end(); ++it )
-	  printf( "=====> Library path: %s\n", (*it).latin1() );
-
-	_qappl->setStyle( "salome" );
-
-	ASSERT ( QObject::connect(_qappl, SIGNAL(lastWindowClosed()), _qappl, SLOT(quit()) ) );
-	*/
-	
-	INFOS("creation QApplication");
-	_GUIMutex.unlock();
-
-	// 3.1 SUIT_Session creation	
-	SUIT_Session* aGUISession = new SALOME_Session();
-	INFOS("creation SUIT_Application");
-
-	SCRUTE(_NS);
-
-	// 3.3 run GUI loop
-	// T2.12 - catch exceptions thrown on attempts to modified a locked study
-	while (1) {
-	  try 
-	  {
-	    MESSAGE("run(): starting the main event loop");
-
-	    // 3.2 load SalomeApp dynamic library
-            SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
-	    if ( aGUIApp ) 
-	    {
-	      _qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
-                                                            // aGUISession contains SalomeApp_ExceptionHandler
-	      result = _qappl.exec();
-	    }
-	    break;
-	  }
-	  catch (SALOME::SALOME_Exception& e)
-	  {
-	    INFOS("run(): SALOME_Exception was caught!");
-	    QApplication::restoreOverrideCursor();
-	    SUIT_MessageBox::warn1 ( 0,
-				    QObject::tr("WRN_WARNING"), 
-				    QObject::tr("SALOME_Exception was caught!"),
-				    QObject::tr("BUT_OK") );
-	    //QtCatchCorbaException(e);
-	  }
-	  catch(SALOMEDS::StudyBuilder::LockProtection&)
-	  {
-	    INFOS("run(): An attempt to modify a locked study has not been handled by QAD_Operation");
-	    QApplication::restoreOverrideCursor();
-	    SUIT_MessageBox::warn1 ( 0,
-				    QObject::tr("WRN_WARNING"), 
-				    QObject::tr("WRN_STUDY_LOCKED"),
-				    QObject::tr("BUT_OK") );
-	  }
-	  catch (const CORBA::Exception& e)
-	  {
-	    CORBA::Any tmp;
-	    tmp<<= e;
-	    CORBA::TypeCode_var tc = tmp.type();
-	    const char *p = tc->name();
-	    INFOS ("run(): CORBA exception of the kind : "<<p<< " is caught");
-
-	    QApplication::restoreOverrideCursor();
-	    SUIT_MessageBox::error1 ( 0,
-				     QObject::tr("ERR_ERROR"), 
-				     QObject::tr("ERR_APP_EXCEPTION")
-				     + QObject::tr(" CORBA exception ") + QObject::tr(p),
-				     QObject::tr("BUT_OK") );
-	  }
-	  catch(exception& e)
-	  {
-	    INFOS("run(): An exception has been caught");
-	    QApplication::restoreOverrideCursor();
-	    SUIT_MessageBox::error1 ( 0,
-				     QObject::tr("ERR_ERROR"), 
-				     QObject::tr("ERR_APP_EXCEPTION")+ "\n" +QObject::tr(e.what()),
-				     QObject::tr("BUT_OK") );
-	  }
-	  catch(...)
-	  {
-	    INFOS("run(): An exception has been caught");
-	    QApplication::restoreOverrideCursor();
-	    SUIT_MessageBox::error1 ( 0,
-				     QObject::tr("ERR_ERROR"), 
-				     QObject::tr("ERR_APP_EXCEPTION"),
-				     QObject::tr("BUT_OK") );
-	  }
-	}
-//}  end of "outer" while( 1 )
+	if ( result == SUIT_Session::FROM_GUI ) // desktop is closed by user from GUI
+	  break;
+      }
 
       // Prepare _GUIMutex for a new GUI activation
-      //_GUIMutex.lock(); 
-	//      }
+      _GUIMutex.lock(); 
+    }
 
-      //orb->shutdown(0);
-      //myServerLauncher->KillAll();
-    }
+    //orb->shutdown(0);
+    myServerLauncher->KillAll();  // kill embedded servers
+  }
   catch (SALOME_Exception& e)
-    {
-      INFOS("run(): SALOME::SALOME_Exception is caught: "<<e.what());
-    }
+  {
+    INFOS("run(): SALOME::SALOME_Exception is caught: "<<e.what());
+  }
   catch (CORBA::SystemException& e)
-    {
-      INFOS("Caught CORBA::SystemException.");
-    }
+  {
+    INFOS("Caught CORBA::SystemException.");
+  }
   catch (CORBA::Exception& e)
-    {
-      INFOS("Caught CORBA::Exception.");
-      CORBA::Any tmp;
-      tmp<<= e;
-      CORBA::TypeCode_var tc = tmp.type();
-      const char *p = tc->name();
-      INFOS ("run(): CORBA exception of the kind : "<<p<< " is caught");
-    }
+  {
+    INFOS("Caught CORBA::Exception.");
+    CORBA::Any tmp;
+    tmp<<= e;
+    CORBA::TypeCode_var tc = tmp.type();
+    const char *p = tc->name();
+    INFOS ("run(): CORBA exception of the kind : "<<p<< " is caught");
+  }
   catch(exception& e)
-    {
-      INFOS("run(): An exception has been caught: " <<e.what());
-    }
+  {
+    INFOS("run(): An exception has been caught: " <<e.what());
+  }
   catch (...)
-    {
-      INFOS("Caught unknown exception.");
-    }
+  {
+    INFOS("Caught unknown exception.");
+  }
   delete myThreadTrace;
+  if ( guiThread )
+    delete guiThread;
   return result ;
 }

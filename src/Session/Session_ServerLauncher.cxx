@@ -81,11 +81,11 @@ Session_ServerLauncher::~Session_ServerLauncher()
 
 void Session_ServerLauncher::run()
 {
-  //MESSAGE("Session_ServerLauncher::run");
+  MESSAGE("****>>> Session_ServerLauncher::run");
   _GUIMutex->lock(); // lock released by calling thread when ready: wait(mutex)
-  //MESSAGE("Server Launcher thread free to go...");
+  MESSAGE("****>>> Server Launcher thread free to go...");
    _GUIMutex->unlock();
-
+   _ServerLaunch->wakeAll();
   CheckArgs();
   ActivateAll();
 
@@ -205,6 +205,8 @@ std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
   }
 
   // Always launch Session Server
+
+std::cout << "*** activating [ SESSION ] " << std::endl;
 
   int argc=1;
   char** argv = new char*[argc];

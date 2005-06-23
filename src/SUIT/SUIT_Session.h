@@ -37,6 +37,9 @@ class SUIT_EXPORT SUIT_Session: public QObject
 public:
   typedef LIB_HANDLE AppLib;
 
+  enum { ASK = 0, SAVE, DONT_SAVE } CloseMode;
+  enum { FROM_GUI = 0, FROM_CORBA_SESSION } ExitStatus;
+
 public:
   SUIT_Session();
   virtual ~SUIT_Session();
@@ -50,7 +53,7 @@ public:
 
   SUIT_ResourceMgr*            resourceMgr() const;
 
-  void                         closeSession();
+  void                         closeSession( int mode = ASK );
 
   SUIT_ExceptionHandler*       handler() const;
 
@@ -82,6 +85,8 @@ private:
 
   SUIT_ExceptionHandler*       myHandler;
   static SUIT_Session*         mySession;
+
+  int                          myExitStatus;
 };
 
 #endif

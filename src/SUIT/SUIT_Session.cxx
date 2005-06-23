@@ -23,7 +23,8 @@ SUIT_Session::SUIT_Session()
 : QObject(),
 myResMgr( 0 ),
 myHandler( 0 ),
-myActiveApp( 0 )
+myActiveApp( 0 ),
+myExitStatus( FROM_GUI )
 {
   SUIT_ASSERT( !mySession )
 
@@ -193,19 +194,33 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
     myActiveApp = 0;
 
   if ( myAppList.isEmpty() )
-    qApp->quit();
+  {
+    printf( "Calling QApplication::exit() with exit code = %d\n", myExitStatus );
+    qApp->exit( myExitStatus );
+  }
 }
 
 /*!
   Destroys session by closing all applications.
 */
-void SUIT_Session::closeSession()
+void SUIT_Session::closeSession( int mode )
 {
   while ( !myAppList.isEmpty() )
   {
     SUIT_Application* app = myAppList.getFirst();
-    if ( !app->isPossibleToClose() )
+    if ( mode == ASK && !app->isPossibleToClose() )
       return;
+    else if ( mode == SAVE )
+    {
+      SUIT_Study* study = app->activeStudy();
+      if ( study->isModified() && study->isSaved() )
+	study->saveDocument();
+    }
+    else if ( mode == DONT_SAVE )
+    {
+      myExitStatus = FROM_CORBA_SESSION;
+      //....
+    }
 
     app->closeApplication();
   }

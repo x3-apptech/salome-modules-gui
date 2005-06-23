@@ -134,6 +134,8 @@ void SALOME_Session_i::NSregister()
 
 void SALOME_Session_i::GetInterface()
 {
+  _GUIMutex->lock();
+  _GUIMutex->unlock();
   if( !SUIT_Session::session() ) {    
     _GUILauncher->wakeAll();
     MESSAGE("SALOME_Session_i::GetInterface() called, starting GUI...")
@@ -149,8 +151,10 @@ class CloseEvent : public SALOME_Event
 {
 public:
   virtual void Execute() {
-//if ( SUIT_Application::getDesktop() )
-//  QAD_Application::getDesktop()->closeDesktop( true );
+    SUIT_Session* session = SUIT_Session::session();
+    session->closeSession( SUIT_Session::DONT_SAVE );
+    //if ( SUIT_Application::getDesktop() )
+    //  QAD_Application::getDesktop()->closeDesktop( true );
   }
 };
 
