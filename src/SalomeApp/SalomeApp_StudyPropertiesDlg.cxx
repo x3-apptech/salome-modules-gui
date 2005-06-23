@@ -56,15 +56,15 @@ public:
     switch(getUserType()) {
     case SalomeApp_StudyPropertiesDlg::prpModeId:
       {
-	list << QObject::tr("PRP_MODE_FROM_SCRATCH") << 
-	        QObject::tr("PRP_MODE_FROM_COPYFROM");
+	list << SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_SCRATCH") << 
+	        SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_COPYFROM");
 	theWidget->insertList(list);
 	break;
       }
     case SalomeApp_StudyPropertiesDlg::prpLockedId:
       {
-	list << QObject::tr("PRP_NO") << QObject::tr("PRP_YES");
-	theWidget->insertList(list, getValue() == QObject::tr("PRP_NO") ? 0 : 1);    
+	list << SalomeApp_StudyPropertiesDlg::tr("PRP_NO") << SalomeApp_StudyPropertiesDlg::tr("PRP_YES");
+	theWidget->insertList(list, getValue() == SalomeApp_StudyPropertiesDlg::tr("PRP_NO") ? 0 : 1);    
 	break;
       }
     case SalomeApp_StudyPropertiesDlg::prpModificationsId:

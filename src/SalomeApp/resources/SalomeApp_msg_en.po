@@ -252,10 +252,10 @@ msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE"
 msgstr "Mode"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_LOCKED"
-msgstr "LOCKED"
+msgstr "Locked"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFIED"
-msgstr "MODIFIED"
+msgstr "Modified"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFICATIONS"
 msgstr "Modifications"
