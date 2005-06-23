@@ -29,25 +29,25 @@ public:
   void               setMinValue( double );
   void               setMaxValue( double );
   void	             setRange( int, int );
-  void               setRange( double, double );
+  virtual void       setRange( double, double );
 
   double	           lineStep() const;
   void               setLineStep( int );
-  void               setLineStep( double );
+  virtual void       setLineStep( double );
 
   double             value() const;
 
   int                precision() const;
-  void               setPrecision( const int );
+  virtual void       setPrecision( const int );
   
   bool               isCleared() const;
-  void               setCleared( const bool );
+  virtual void       setCleared( const bool );
   
   virtual bool       eventFilter( QObject*, QEvent* );
     
 signals:
   void               valueChanged( double );
-  void		     valueChanged( const QString& );
+  void		           valueChanged( const QString& );
     
 public slots:
   virtual void	     stepUp();

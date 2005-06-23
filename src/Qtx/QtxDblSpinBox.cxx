@@ -83,7 +83,7 @@ myPrecision( 0 )
   rangeChange();
   updateDisplay();
 
-  //connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
+  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::QtxDblSpinBox( double min, double max, double step, QWidget* parent, const char* name )
@@ -100,7 +100,7 @@ myPrecision( 0 )
   rangeChange();
   updateDisplay();
 
-  //connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
+  connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
 QtxDblSpinBox::~QtxDblSpinBox()
@@ -177,8 +177,8 @@ void QtxDblSpinBox::setLineStep( double step )
 
 double QtxDblSpinBox::value() const
 {
-  QtxDblSpinBox* _this = ( QtxDblSpinBox* )this;
-  _this->clearFocus();
+  QSpinBox::value();
+
   return myValue;
 }
 
@@ -273,7 +273,10 @@ void QtxDblSpinBox::updateDisplay()
 {
   if ( myBlocked )
     return;
-    
+
+  bool upd = editor()->isUpdatesEnabled();
+  editor()->setUpdatesEnabled( false );
+
   bool isBlock = myBlocked;
   myBlocked = true;
     
@@ -285,11 +288,20 @@ void QtxDblSpinBox::updateDisplay()
     QSpinBox::setValue( QSpinBox::minValue() );
   else
     QSpinBox::setValue( ( QSpinBox::minValue() + QSpinBox::maxValue() ) / 2 );
-    
+  
   QSpinBox::updateDisplay();
-    
+
+  editor()->setUpdatesEnabled( upd );
+
   editor()->setText( myCleared ? QString::null : txt );
-    
+  if ( !myCleared )
+  {
+    if ( editor()->text() == specialValueText() )
+      editor()->selectAll();
+    else
+      editor()->setSelection( prefix().length(), editor()->text().length() - prefix().length() - suffix().length() );
+  }
+
   myBlocked = isBlock;
 }
 
@@ -320,7 +332,7 @@ void QtxDblSpinBox::interpretText()
 void QtxDblSpinBox::valueChange()
 {
   updateDisplay();
-  emit valueChanged( value() );
+  emit valueChanged( myValue );
   emit valueChanged( currentValueText() );
 }
 
@@ -409,8 +421,6 @@ void QtxDblSpinBox::wheelEvent( QWheelEvent* e )
 
 void QtxDblSpinBox::onTextChanged( const QString& str )
 {
-  bool isBlock = myBlocked;
-  myBlocked = true;
-  interpretText();
-  myBlocked = isBlock;
+  if ( !myBlocked )
+    myCleared = false;
 }

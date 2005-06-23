@@ -13,26 +13,30 @@ class QTX_EXPORT QtxIntSpinBox : public QSpinBox
     Q_OBJECT
 
 public:
-    QtxIntSpinBox( QWidget* = 0, const char* = 0 );
-    QtxIntSpinBox( int, int, int = 1, QWidget* = 0, const char* = 0 );
-    virtual ~QtxIntSpinBox();
+  QtxIntSpinBox( QWidget* = 0, const char* = 0 );
+  QtxIntSpinBox( int, int, int = 1, QWidget* = 0, const char* = 0 );
+  virtual ~QtxIntSpinBox();
     
-    bool         isCleared() const;
-    void         setCleared( const bool );
+  bool         isCleared() const;
+  virtual void setCleared( const bool );
     
-    virtual bool eventFilter( QObject*, QEvent* );
+  virtual bool eventFilter( QObject*, QEvent* );
     
 public slots:
-    virtual void setValue( int );
-    
+  virtual void setValue( int );
+
+protected slots:
+  virtual void onTextChanged( const QString& );
+  
 protected:
-    virtual void interpretText();
-    virtual void updateDisplay();
-    virtual void leaveEvent( QEvent* );
-    virtual void wheelEvent( QWheelEvent* );
+  virtual void interpretText();
+  virtual void updateDisplay();
+  virtual void leaveEvent( QEvent* );
+  virtual void wheelEvent( QWheelEvent* );
     
 private:
-    bool         myCleared;
+  bool         myCleared;
+  bool         myBlocked;
 };
 
 #endif
