@@ -20,7 +20,8 @@ EXPORT_HEADERS= Plot2d.h \
 		Plot2d_ViewFrame.h \
 		Plot2d_ViewManager.h \
 		Plot2d_ViewModel.h \
-		Plot2d_ViewWindow.h
+		Plot2d_ViewWindow.h \
+		Plot2d_SetupCurveDlg.h
 
 # .po files to transform in .qm
 PO_FILES = Plot2d_images.po \
@@ -35,7 +36,8 @@ LIB_SRC= Plot2d_Curve.cxx \
 	 Plot2d_ViewFrame.cxx \
 	 Plot2d_ViewManager.cxx \
 	 Plot2d_ViewModel.cxx \
-	 Plot2d_ViewWindow.cxx		
+	 Plot2d_ViewWindow.cxx \
+	 Plot2d_SetupCurveDlg.cxx
 
 LIB_MOC = \
 	Plot2d_FitDataDlg.h \
@@ -43,7 +45,8 @@ LIB_MOC = \
 	Plot2d_ViewFrame.h \
 	Plot2d_ViewManager.h \
 	Plot2d_ViewModel.h \
-	Plot2d_ViewWindow.h 
+	Plot2d_ViewWindow.h \
+	Plot2d_SetupCurveDlg.h
 
 RESOURCES_FILES = \
 plot2d_clone.png \
