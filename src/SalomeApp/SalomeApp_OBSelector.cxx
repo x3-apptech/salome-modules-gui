@@ -13,7 +13,6 @@ SalomeApp_OBSelector::SalomeApp_OBSelector( OB_Browser* ob, SUIT_SelectionMgr* m
 {
   if ( myBrowser ) {
     connect( myBrowser, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
-    connect( myBrowser, SIGNAL( destroyed() ), this, SLOT( onBrowserDestroyed() ) ); 
   }    
 }
 
@@ -68,11 +67,6 @@ void SalomeApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& list )
 void SalomeApp_OBSelector::onSelectionChanged()
 {
   selectionChanged();
-}
-
-void SalomeApp_OBSelector::onBrowserDestroyed()
-{
-  delete this;
 }
 
 void SalomeApp_OBSelector::fillEntries( QMap<QString, SalomeApp_DataObject*>& entires )
