@@ -118,11 +118,6 @@ void STD_Application::createActions()
                 tr( "MEN_DESK_FILE_SAVEAS" ), tr( "PRP_DESK_FILE_SAVEAS" ),
                 0, desk, false, this, SLOT( onSaveAsDoc() ) );
 
-  createAction( EditCutId, tr( "TOT_DESK_EDIT_CUT" ),
-                resMgr->loadPixmap( "STD", tr( "ICON_EDIT_CUT" ) ),
-                tr( "MEN_DESK_EDIT_CUT" ), tr( "PRP_DESK_EDIT_CUT" ),
-                CTRL+Key_X, desk, false, this, SLOT( onCut() ) );
-
   createAction( EditCopyId, tr( "TOT_DESK_EDIT_COPY" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_EDIT_COPY" ) ),
                 tr( "MEN_DESK_EDIT_COPY" ), tr( "PRP_DESK_EDIT_COPY" ),
@@ -170,7 +165,6 @@ void STD_Application::createActions()
   createMenu( separator(), fileMenu );
   createMenu( FileExitId, fileMenu );
 
-  createMenu( EditCutId, editMenu );
   createMenu( EditCopyId, editMenu );
   createMenu( EditPasteId, editMenu );
   createMenu( separator(), editMenu );
@@ -193,7 +187,6 @@ void STD_Application::createActions()
   createTool( FileSaveId, stdTBar );
   createTool( FileCloseId, stdTBar );
   createTool( separator(), stdTBar );
-  createTool( EditCutId, stdTBar );
   createTool( EditCopyId, stdTBar );
   createTool( EditPasteId, stdTBar );
 }
@@ -388,10 +381,6 @@ void STD_Application::onExit()
   SUIT_Session::session()->closeSession();
 }
 
-void STD_Application::onCut()
-{
-}
-
 void STD_Application::onCopy()
 {
 }
@@ -407,7 +396,7 @@ void STD_Application::setEditEnabled( bool theEnable )
   QtxActionMenuMgr* mMgr = desktop()->menuMgr();
   QtxActionToolMgr* tMgr = desktop()->toolMgr();
 
-  for ( int i = EditCutId; i <= EditPasteId; i++ )
+  for ( int i = EditCopyId; i <= EditPasteId; i++ )
   {
     mMgr->setShown( i, myEditEnabled );
     tMgr->setShown( i, myEditEnabled );

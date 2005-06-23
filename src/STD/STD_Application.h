@@ -80,7 +80,6 @@ public slots:
 
   virtual void          onExit();
 
-  virtual void          onCut();
   virtual void          onCopy();
   virtual void          onPaste();
 
