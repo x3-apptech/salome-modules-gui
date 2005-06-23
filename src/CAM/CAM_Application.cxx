@@ -19,7 +19,7 @@
 #include <dlfcn.h>
 #endif
 
-extern "C" CAM_EXPORT SUIT_Application* createApplication()
+extern "C" CAM_EXPORT SUIT_Application* createApplication( int, char** )
 {
   return new CAM_Application();
 }

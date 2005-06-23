@@ -107,7 +107,7 @@ static const char* imageEmptyIcon[] = {
 "....................",
 "...................."};
 
-extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
+extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication( int, char** )
 {
   return new SalomeApp_Application();
 }
@@ -920,7 +920,7 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
     vm->isos( u, v );
     u = resMgr->integerValue( "OCCViewer", "iso_number_u", u );
     v = resMgr->integerValue( "OCCViewer", "iso_number_v", v );
-    //    vm->setIsos( u, v );
+    vm->setIsos( u, v );
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
     new SalomeApp_OCCSelector( (OCCViewer_Viewer*)viewMgr->getViewModel(), mySelMgr );
   }
@@ -1325,7 +1325,7 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
       vtkVM->Repaint();
     }
   }
-  /*
+  
   if ( sec == QString( "OCCViewer" ) && ( param == QString( "iso_number_u" ) || param == QString( "iso_number_v" ) ) )
   {
     QPtrList<SUIT_ViewManager> lst;
@@ -1335,7 +1335,7 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
     for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current(); ++it )
       ((OCCViewer_Viewer*)it.current())->setIsos( u, v );
   }
-  */
+  
 }
 
 void SalomeApp_Application::afterCloseDoc()
