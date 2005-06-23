@@ -314,4 +314,65 @@ msgid "MNU_CLONE_VIEW"
 msgstr "Clone View"
 
 
+msgid "TLT_SETUP_CURVE"
+msgstr "Setup Curve"
 
+msgid "CURVE_LINE_TYPE_LAB"
+msgstr "Line type:"
+
+msgid "CURVE_LINE_WIDTH_LAB"
+msgstr "Line width:"
+
+msgid "CURVE_MARKER_TYPE_LAB"
+msgstr "Marker type:"
+
+msgid "CURVE_COLOR_LAB"
+msgstr "Color:"
+
+msgid "NONE_LINE_LBL"
+msgstr "None"
+
+msgid "SOLID_LINE_LBL"
+msgstr "Solid"
+
+msgid "DASH_LINE_LBL"
+msgstr "Dash"
+
+msgid "DOT_LINE_LBL"
+msgstr "Dot"
+
+msgid "DASHDOT_LINE_LBL"
+msgstr "DashDot"
+
+msgid "DAHSDOTDOT_LINE_LBL"
+msgstr "DashDotDot"
+
+msgid "NONE_MARKER_LBL"
+msgstr "None"
+
+msgid "CIRCLE_MARKER_LBL"
+msgstr "Circle"
+
+msgid "RECTANGLE_MARKER_LBL"
+msgstr "Rectangle"
+
+msgid "DIAMOND_MARKER_LBL"
+msgstr "Diamond"
+
+msgid "DTRIANGLE_MARKER_LBL"
+msgstr "Downward triangle"
+
+msgid "UTRIANGLE_MARKER_LBL"
+msgstr "Upward triangle"
+
+msgid "LTRIANGLE_MARKER_LBL"
+msgstr "Leftward triangle"
+
+msgid "RTRIANGLE_MARKER_LBL"
+msgstr "Rightward triangle"
+
+msgid "CROSS_MARKER_LBL"
+msgstr "Cross"
+
+msgid "XCROSS_MARKER_LBL"
+msgstr "Diagonal cross"
