@@ -534,27 +534,56 @@ void SalomeApp_Application::onSelection()
 
 void SalomeApp_Application::onCopy() 
 {
+  SALOME_ListIO list;
+  SalomeApp_SelectionMgr* mgr = selectionMgr();
+  mgr->selectedObjects(list);
+  
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  if(study == NULL) return;
+  
+  _PTR(Study) stdDS = study->studyDS();
+  if(!stdDS) return;
+
+  SALOME_ListIteratorOfListIO it( list ); 
+  if(it.More())
+    {
+      _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
+      try {
+	studyMgr()->Copy(so);
+	onSelectionChanged();
+      }
+      catch(...) {
+      }
+    }
 }
 
 void SalomeApp_Application::onPaste() 
 {
+  SALOME_ListIO list;
+  SalomeApp_SelectionMgr* mgr = selectionMgr();
+  mgr->selectedObjects(list);
+  
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  if(study == NULL) return;
+  
+  _PTR(Study) stdDS = study->studyDS();
+  if(!stdDS) return;
+  
+  SALOME_ListIteratorOfListIO it( list ); 
+  if(it.More())
+    {
+      _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
+      try {
+	studyMgr()->Paste(so);
+	updateObjectBrowser( true );
+      }
+      catch(...) {
+      }
+    }
 }
 
 void SalomeApp_Application::onSelectionChanged()
 {
- /*
-   SalomeApp_Module* module = dynamic_cast<SalomeApp_Module*>(activeModule());
-   if(module == NULL) return;
-   
-   QString ior = module->engineIOR();
-   if(ior.length() < 5) return; //Not a real CORBA IOR
-   CORBA::Object_var obj = orb()->string_to_object(ior.latin1());
-   if(CORBA::is_nil(obj)) return;
-   
-   SALOMEDS::Driver_var engine = SALOMEDS::Driver::_narrow(obj);
-   if(CORBA::is_nil(engine)) return;
-*/
-
    SALOME_ListIO list;
    SalomeApp_SelectionMgr* mgr = selectionMgr();
    mgr->selectedObjects(list);
@@ -566,28 +595,26 @@ void SalomeApp_Application::onSelectionChanged()
    if(!stdDS) return;
    
    QAction* qaction;  
-   //Varibales isEnabledCopy and isEnabledPaste are used for multi selection.
-   bool isEnabledCopy = true;  
-   bool isEnabledPaste = true;  
 
-   for ( SALOME_ListIteratorOfListIO it( list ); it.More() && (isEnabledCopy || isEnabledPaste); it.Next() )
+   SALOME_ListIteratorOfListIO it( list ); 
+   if(it.More() && list.Extent() == 1)
    {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
       qaction = action(EditCopyId); 
-      if( isEnabledCopy && studyMgr()->CanCopy(so) ) qaction->setEnabled(true);  
-      else { 
-	isEnabledCopy = false;
-	qaction->setEnabled(false);         
-      }
-
+      if(studyMgr()->CanCopy(so) ) qaction->setEnabled(true);  
+      else qaction->setEnabled(false);         
+     
       qaction = action(EditPasteId);
-      if( isEnabledPaste && studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
-      else {
-	isEnabledPaste = false;
-	qaction->setEnabled(false);
-      }
+      if( studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
+      else qaction->setEnabled(false);
    } 
+   else {
+     qaction = action(EditCopyId); 
+     qaction->setEnabled(false); 
+     qaction = action(EditPasteId);
+     qaction->setEnabled(false);
+   }
 }		
  
 void SalomeApp_Application::onRefresh()
