@@ -26,23 +26,25 @@
     <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>
   <section name="resources">
-    <parameter name="SUIT"       value="${SUITRoot}/resources"/>
-    <parameter name="STD"        value="${SUITRoot}/resources"/>
-    <parameter name="Plot2d"     value="${SUITRoot}/resources"/>
-    <parameter name="SPlot2d"    value="${SUITRoot}/resources"/>
-    <parameter name="GLViewer"   value="${SUITRoot}/resources"/>
-    <parameter name="OCCViewer"  value="${SUITRoot}/resources"/>
-    <parameter name="VTKViewer"  value="${SUITRoot}/resources"/>
-    <parameter name="SalomeApp"  value="${SUITRoot}/resources"/>
-    <parameter name="OB"         value="${SUITRoot}/resources"/>
-    <parameter name="CAM"        value="${SUITRoot}/resources"/>
-    <parameter name="GEOM"       value="${GEOM_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="SMESH"      value="${SMESH_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="VISU"       value="${VISU_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="SUPERV"     value="${SUPERV_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="MED"        value="${MED_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="StdMeshers" value="${SMESH_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="COMPONENT"  value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="SUIT"         value="${SUITRoot}/resources"/>
+    <parameter name="STD"          value="${SUITRoot}/resources"/>
+    <parameter name="Plot2d"       value="${SUITRoot}/resources"/>
+    <parameter name="SPlot2d"      value="${SUITRoot}/resources"/>
+    <parameter name="GLViewer"     value="${SUITRoot}/resources"/>
+    <parameter name="OCCViewer"    value="${SUITRoot}/resources"/>
+    <parameter name="VTKViewer"    value="${SUITRoot}/resources"/>
+    <parameter name="SalomeApp"    value="${SUITRoot}/resources"/>
+    <parameter name="OB"           value="${SUITRoot}/resources"/>
+    <parameter name="CAM"          value="${SUITRoot}/resources"/>
+    <parameter name="GEOM"         value="${GEOM_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="SMESH"        value="${SMESH_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="VISU"         value="${VISU_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="SUPERV"       value="${SUPERV_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="MED"          value="${MED_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="StdMeshers"   value="${SMESH_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="COMPONENT"    value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="NETGENPlugin" value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="GHS3DPlugin"  value="${GHS3DPLUGIN_ROOT_DIR}/share/salome/resources"/>
 
   </section>
   <section name="GEOM">
@@ -75,7 +77,7 @@
     <!-- Here go GEOM module user preferences -->
   </section>
   <section name="SMESH">
-    <parameter name="plugins" value="NETGENPlugin"/>
+    <parameter name="plugins" value="NETGENPlugin,GHS3DPlugin"/>
     <!-- Here go SMESH module user preferences -->
   </section>
   <!-- Here go optional sections for other modules -->
