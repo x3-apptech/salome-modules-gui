@@ -119,8 +119,8 @@ protected:
                                       const QString&, const int, QObject* = 0,
                                       const bool = false, QObject* = 0, const char* = 0 );
 
-private slots:
-  void                  onDesktopActivated();
+protected slots:
+  virtual void          onDesktopActivated();
 
 private:
   SUIT_Study*           myStudy;
