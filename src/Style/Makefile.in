@@ -33,7 +33,7 @@ LDFLAGS+=$(QT_MT_LIBS)
 LIBS+=
 
 # create $(top_builddir)/bin/salome/styles directory and copy libSalomeStyle.so there
-LIB_PLUGINDIR = $(top_builddir)/bin/salome/styles
+LIB_PLUGINDIR = $(top_builddir)/src/Session/styles
 LIB_PLUGINLIB = $(patsubst %.la, $(LIB_PLUGINDIR)/%.so, $(filter %.la, $(LIB)))
 
 lib: $(LIB) $(LIB_PLUGINDIR) $(LIB_PLUGINLIB)
@@ -41,7 +41,7 @@ lib: $(LIB) $(LIB_PLUGINDIR) $(LIB_PLUGINLIB)
 $(LIB_PLUGINDIR):
 	mkdir -p $@
 
-$(LIB_PLUGINLIB): $(top_builddir)/bin/salome/styles/%.so: .libs/%.so
+$(LIB_PLUGINLIB): $(LIB_PLUGINDIR)/%.so: .libs/%.so
 	-$(RM) $@
 	ln -sf $(CURDIR)/$< $@ || true
 
