@@ -524,6 +524,22 @@ bool SalomeApp_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
+bool SalomeApp_Application::onLoadDoc( const QString& aName )
+{
+  bool res = CAM_Application::onLoadDoc( aName );
+
+  /*jfa tmp:QAction* a = action( MRUId );
+  if ( a && a->inherits( "QtxMRUAction" ) )
+  {
+    QtxMRUAction* mru = (QtxMRUAction*)a;
+    if ( res )
+      mru->insert( aName );
+    else
+      mru->remove( aName );
+  }*/
+  return res;
+}
+
 void SalomeApp_Application::onSelection()
 {
   onSelectionChanged();
@@ -639,6 +655,18 @@ void SalomeApp_Application::onOpenWith()
   QString aModuleTitle = moduleTitle(aModuleName);
   activateModule(aModuleTitle);
   QApplication::restoreOverrideCursor();
+}
+
+bool SalomeApp_Application::useStudy(const QString& theName)
+{
+  createEmptyStudy();
+  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  bool res = false;
+  if (aStudy)
+    res = aStudy->loadDocument( theName );
+  updateDesktopTitle();
+  updateCommandsStatus();
+  return res;
 }
 
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )

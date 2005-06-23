@@ -120,16 +120,17 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 
     if ( aComponent->ComponentDataType() == "Interface Applicative" )
       continue; // skip the magic "Interface Applicative" component
-    
+
     SalomeApp_DataModel::BuildTree( aComponent, root(), this );
   }
 
   // TODO: potentially unsafe call, since base study's openDocument() might try to access the file directly - to be improved
+  //bool res = true;
   bool res = CAM_Study::openDocument( theStudyName );
 
-  emit opened( this );
+  //emit opened( this );
 
-  return res;  
+  return res;
 }
 
 //=======================================================================

@@ -50,8 +50,11 @@ public:
   //! Shows the application's main widget. For non GUI application must be redefined.
   virtual void          start();
 
-  //! Loads document <theFileName> into active Study. If Study is empty - creates it.
-  virtual bool          useFile( const QString& );
+  //! Opens document <theFileName> into active Study. If Study is empty - creates it.
+  virtual bool          useFile( const QString& theFileName);
+
+  //! Loads document <theName> into active Study. If Study is empty - creates it.
+  virtual bool          useStudy( const QString& theName);
 
   //! Creates new empty Study if active Study = 0
   virtual void          createEmptyStudy();
@@ -127,7 +130,8 @@ private:
 //! This function must return a new application instance.
 extern "C"
 {
-  typedef SUIT_Application* (*APP_CREATE_FUNC)( int, char** );
+  //jfa 22.06.2005:typedef SUIT_Application* (*APP_CREATE_FUNC)( int, char** );
+  typedef SUIT_Application* (*APP_CREATE_FUNC)();
 }
 
 #define APP_CREATE_NAME "createApplication"

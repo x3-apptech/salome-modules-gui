@@ -231,10 +231,11 @@ bool STD_Application::onOpenDoc( const QString& aName )
   if ( !activeStudy() )
   {
     // if no study - open in current desktop
-    createEmptyStudy();
-    res = activeStudy()->openDocument( aName );
-    updateDesktopTitle();
-    updateCommandsStatus();
+    // jfa 21.06.2005:createEmptyStudy();
+    // jfa 21.06.2005:res = activeStudy()->openDocument( aName );
+    // jfa 21.06.2005:updateDesktopTitle();
+    // jfa 21.06.2005:updateCommandsStatus();
+    res = useFile( aName ); // jfa 21.06.2005
   }
   else
   {
@@ -254,6 +255,43 @@ bool STD_Application::onOpenDoc( const QString& aName )
       aApp = startApplication( 0, 0 );
       if ( aApp )
         res = aApp->useFile( aName );
+    }
+    else
+      aApp->desktop()->setActiveWindow();
+  }
+  return res;
+}
+
+bool STD_Application::onLoadDoc( const QString& aName )
+{
+  bool res = true;
+  if ( !activeStudy() )
+  {
+    // if no study - load in current desktop
+    res = useStudy( aName );
+  }
+  else
+  {
+    // if study exists - load in new desktop. Check: is the same file is loaded?
+    SUIT_Session* aSession = SUIT_Session::session();
+    QPtrList<SUIT_Application> aAppList = aSession->applications();
+    bool isAlreadyOpen = false;
+    SUIT_Application* aApp = 0;
+    for ( QPtrListIterator<SUIT_Application> it( aAppList ); it.current() && !isAlreadyOpen; ++it )
+    {
+      aApp = it.current();
+      if ( aApp->activeStudy()->studyName() == aName )
+        isAlreadyOpen = true;
+    }
+    if ( !isAlreadyOpen )
+    {
+      // temporary commented because of "pure virtual method called" execution error.
+      // current state of code is not right, but works somehow.
+      // SALOMEDS::Study of the first found application is replaced by the new one,
+      // while normally the new study must be used by a new application
+      //jfa tmp:aApp = startApplication( 0, 0 );
+      if ( aApp )
+        res = aApp->useStudy( aName );
     }
     else
       aApp->desktop()->setActiveWindow();

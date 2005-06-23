@@ -66,7 +66,8 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
     return 0;
   }
 
-  myAppLibs.insert( appName, libHandle );
+  if (!myAppLibs.contains(appName) || !myAppLibs[appName]) // jfa 22.06.2005
+    myAppLibs.insert( appName, libHandle );
 
   APP_CREATE_FUNC crtInst = 0;
 
@@ -90,7 +91,8 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
     myResMgr->loadLanguage();
   }
 
-  SUIT_Application* anApp = crtInst( args, argv );
+  //jfa 22.06.2005:SUIT_Application* anApp = crtInst( args, argv );
+  SUIT_Application* anApp = crtInst();
   if ( !anApp )
   {
     SUIT_MessageBox::warn1(0, tr( "Error" ), tr( "Can not find function %1. %2").arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );

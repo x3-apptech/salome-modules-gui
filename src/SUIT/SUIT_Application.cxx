@@ -59,6 +59,12 @@ bool SUIT_Application::useFile( const QString& theFileName )
   createEmptyStudy();
   if ( activeStudy() )
     return activeStudy()->openDocument( theFileName );
+  return false;
+}
+
+bool SUIT_Application::useStudy( const QString& theName )
+{
+  return false;
 }
 
 void SUIT_Application::createEmptyStudy()

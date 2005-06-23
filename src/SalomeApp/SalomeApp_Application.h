@@ -65,6 +65,8 @@ public:
   virtual CAM_Module*                 loadModule( const QString& );
   virtual bool                        activateModule( const QString& );
   
+  virtual bool                        useStudy( const QString& );
+
   SalomeApp_SelectionMgr*             selectionMgr() const;
 
   LogWindow*                          logWindow();
@@ -115,6 +117,7 @@ public slots:
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
   virtual bool                        onOpenDoc( const QString& );
+  virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCopy();
   virtual void                        onPaste();  
 

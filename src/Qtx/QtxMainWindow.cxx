@@ -58,8 +58,8 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
 
 QtxMainWindow::QtxMainWindow( QWidget* parent, const char* name, WFlags f )
 : QMainWindow( parent, name, f ),
-myMenuBar( 0 ),
-myStatusBar( 0 )
+myMenuBar( NULL ),
+myStatusBar( NULL )
 {
 }
 
