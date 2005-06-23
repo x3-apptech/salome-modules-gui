@@ -629,7 +629,11 @@ void SalomeApp_Application::onOpenWith()
   SALOME_ListIO aList;
   SalomeApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(aList);
-  if (aList.Extent() > 1) return;
+  if (aList.Extent() != 1)
+    {
+      QApplication::restoreOverrideCursor();
+      return;
+    }
   Handle(SALOME_InteractiveObject) aIObj = aList.First();
   QString aModuleName(aIObj->getComponentDataType());
   QString aModuleTitle = moduleTitle(aModuleName);
@@ -1536,6 +1540,22 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   CAM_Application::contextMenuPopup( type, thePopup, title );
   thePopup->insertSeparator();
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
+  
+  // "Activate module" item should appear only if it's necessary
+  OB_Browser* ob = objectBrowser();
+  if ( !ob || type != ob->popupClientType() )
+    return;
+  SALOME_ListIO aList;
+  SalomeApp_SelectionMgr* mgr = selectionMgr();
+  mgr->selectedObjects(aList);
+  if (aList.Extent() != 1)
+    return;
+  Handle(SALOME_InteractiveObject) aIObj = aList.First();
+  QString aModuleName(aIObj->getComponentDataType());
+  QString aModuleTitle = moduleTitle(aModuleName);
+  CAM_Module* currentModule = activeModule();
+  if (currentModule && currentModule->moduleName() == aModuleTitle)
+    return;
   thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
 }
 
