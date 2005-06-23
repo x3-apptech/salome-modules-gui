@@ -19,6 +19,6 @@ bool SalomeApp_OBFilter::isOk( const SUIT_DataObject* theDataObj ) const
   if ( obj )
     return mySelMgr->isOk( new SalomeApp_DataOwner( obj->entry() ) );
 
-  return false;
+  return true;
 }
 
