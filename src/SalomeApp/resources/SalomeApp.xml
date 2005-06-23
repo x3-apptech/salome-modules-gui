@@ -8,6 +8,7 @@
   </section>
   <section name="launch">
     <parameter name="gui"        value="yes"/>
+    <parameter name="splash"     value="yes"/>
     <parameter name="file"       value="no"/>
     <parameter name="key"        value="no"/>
     <parameter name="interp"     value="no"/>
