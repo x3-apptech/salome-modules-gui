@@ -19,7 +19,7 @@ class PLOT2D_EXPORT Plot2d_Viewer: public SUIT_ViewModel
   Q_OBJECT
 
 public:
-  static QString Type() { return tr("Plot2d_ViewModel"); }
+  static QString Type() { return "Plot2d"; }
 
   Plot2d_Viewer(bool theAutoDel = false);
   ~Plot2d_Viewer();

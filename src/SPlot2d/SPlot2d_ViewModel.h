@@ -19,11 +19,14 @@ class SPLOT2D_EXPORT SPlot2d_Viewer : public Plot2d_Viewer, public SALOME_View
   Q_OBJECT
 
 public:
+  static QString Type() { return "Plot2d"; }
+
   /* Construction/destruction */
   SPlot2d_Viewer( bool theAutoDel = false );
   virtual ~SPlot2d_Viewer();
 
 public:
+  virtual QString          getType() const { return Type(); }
 
   /*  interactive object management */
   void highlight( const Handle(SALOME_InteractiveObject)& IObject, bool highlight, bool update = true ) {}
