@@ -10,6 +10,7 @@
 **  Created: UI team, 20.09.02
 *****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_Selector2d.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_Context.h"
@@ -51,6 +52,19 @@ void GLViewer_Selector2d::detect( int x, int y )
   myGLContext->MoveTo( x, y );
 }
 
+void GLViewer_Selector2d::undetectAll()
+{
+  if ( myLocked || !myGLContext || !myViewer || !myViewer->getActiveView() || 
+       myViewer->getSelectionMode() == GLViewer_Viewer::NoSelection )
+    return;
+
+  GLViewer_ViewPort* vp = myViewer->getActiveView()->getViewPort();
+  if( !vp->inherits( "GLViewer_ViewPort2d" ) )
+    return;
+
+  myGLContext->clearHighlighted();
+}
+
 void GLViewer_Selector2d::select( bool append )
 {
   //cout << "GLViewer_Selector2d    : select ( " << (int)append << " )" << endl;
@@ -66,6 +80,7 @@ void GLViewer_Selector2d::select( bool append )
   GLViewer_ViewPort* vp = myViewer->getActiveView()->getViewPort();
   if( !vp->inherits( "GLViewer_ViewPort2d" ) )
       return;
+
   int status = myGLContext->Select( append );
   checkSelection( selBefore, append, status );
 }
@@ -84,6 +99,7 @@ void GLViewer_Selector2d::select( const QRect& selRect, bool append )
     GLViewer_ViewPort* vp = myViewer->getActiveView()->getViewPort();
     if( !vp->inherits( "GLViewer_ViewPort2d" ) )
         return;
+
     int aStatus = myGLContext->SelectByRect( selRect, append );
     checkSelection( selBefore, append, aStatus );
 }

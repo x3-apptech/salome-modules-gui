@@ -10,14 +10,14 @@
 **  Created: UI team, 27.03.03
 ****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_Widget.h"
-
 #include "GLViewer_ViewPort2d.h"
 #include "GLViewer_Viewer2d.h"
+#include "GLViewer_Compass.h"
+#include "GLViewer_Grid.h"
 #include "GLViewer_Object.h"
-
-//#include "QAD_Application.h"
-//#include <QAD_Desktop.h>
+#include "GLViewer_CoordSystem.h"
 
 #include <cmath>
 using namespace std;
@@ -42,15 +42,15 @@ using namespace std;
 #include <qpainter.h>
 //-----------
 
-static GLuint texFont;
-static int fontW;
-static int fontH;
+//static GLuint texFont;
+//static int fontW;
+//static int fontH;
 
-
+/*
 static void genFont()
 {
     bool ok;
-    QFont aFont = QFontDialog::getFont( &ok/*, QAD_Application::getDesktop()*/ );
+    QFont aFont = QFontDialog::getFont( &ok );
     QFontMetrics aFM( aFont );
     QString aStr;
     for( int k = 32; k <= 127; k++ )
@@ -134,7 +134,7 @@ static void showFont()
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_TEXTURE_2D);
 }
-
+*/
 
 GLViewer_Widget::GLViewer_Widget( QWidget* parent, const char* name ):
 QGLWidget( parent, 0/*, WRepaintNoErase | WResizeNoErase*/ )
@@ -473,7 +473,7 @@ void GLViewer_Widget::paintGL()
     }
 
 
-    GLViewer_RectangularGrid* grid = myViewPort->getGrid();
+    GLViewer_Grid* grid = myViewPort->getGrid();
     if( grid )
         grid->draw();
     //myViewPort->drawCompass();
@@ -511,8 +511,8 @@ void GLViewer_Widget::resizeGL( int w, int h )
 
   myViewPort->initResize( w, h );
 
-  GLViewer_Viewer2d* v = ( GLViewer_Viewer2d* )getViewPort()->getViewFrame()->getViewer();
-  v->updateDrawers( GL_FALSE, myXScale, myYScale );
+  //GLViewer_Viewer2d* v = ( GLViewer_Viewer2d* )getViewPort()->getViewFrame()->getViewer();
+  //v->updateDrawers( GL_FALSE, myXScale, myYScale );
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -581,10 +581,10 @@ void GLViewer_Widget::leaveEvent( QEvent* e )
 
 inline char hex( uchar c )
 {
-    if( c>=0 && c<=9 )
-        return '0'+c;
-    else
-        return 'a'+c-10;
+  if( c<=9 )
+    return '0'+c;
+  else
+    return 'a' + c - 10;
 }
 
 void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2, 
@@ -728,14 +728,14 @@ typedef unsigned int WORD;
                     memcpy( dest + 2*i, &color, 2 );
                     break;
                 case 24:
-                    *( dest + 3*i ) = 255*b;
-                    *( dest + 3*i+1 ) = 255*g;
-                    *( dest + 3*i+2 ) = 255*r;
+                    *( dest + 3*i ) = (uchar)(255*b);
+                    *( dest + 3*i+1 ) = (uchar)(255*g);
+                    *( dest + 3*i+2 ) = (uchar)(255*r);
                     break;
                 case 32:
-                    *( dest + 4*i ) = 255*b;
-                    *( dest + 4*i+1 ) = 255*g;
-                    *( dest + 4*i+2 ) = 255*r;
+                    *( dest + 4*i ) = (uchar)(255*b);
+                    *( dest + 4*i+1 ) = (uchar)(255*g);
+                    *( dest + 4*i+2 ) = (uchar)(255*r);
                     *( dest + 4*i+3 ) = 0;
                     break;
             }

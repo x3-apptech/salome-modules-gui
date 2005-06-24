@@ -20,7 +20,7 @@
 class GLViewer_ViewPort2d;
 class GLViewer_CoordSystem;
 
-class GLVIEWER_EXPORT GLViewer_Widget : public QGLWidget
+class GLVIEWER_API GLViewer_Widget : public QGLWidget
 {
   Q_OBJECT
 

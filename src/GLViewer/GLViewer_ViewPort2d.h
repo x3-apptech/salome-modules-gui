@@ -3,7 +3,8 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-/* GLViewer_ViewPort2d Header File */
+#ifndef GLVIEWER_VIEWPORT2D_H
+#define GLVIEWER_VIEWPORT2D_H
 
 #ifdef WNT
 #include <windows.h>
@@ -13,155 +14,22 @@
 #include <GL/glu.h>
 
 #include "GLViewer_ViewPort.h"
-#include "GLViewer_Drawer.h"
+#include "GLViewer_Widget.h"
+#include "GLViewer_Geom.h"
 
+#include <qgl.h>
 #include <qcolor.h>
+#include <qwidget.h>
+#include <qpaintdevice.h>
 
-class GLViewer_ViewFrame;
-class GLViewer_Object;
-class GLViewer_Pnt;
-class GLViewer_Rect;
-
-/***************************************************************************
-**  Class:   GLViewer_RectangularGrid
-**  Descr:   OpenGL Grid for GLViewer_ViewPort2d
-**  Module:  QAD
-**  Created: UI team, 16.09.02
-****************************************************************************/
-#ifndef GLVIEWER_RECTANGULARGRID_H
-#define GLVIEWER_RECTANGULARGRID_H
-
-class GLVIEWER_EXPORT GLViewer_RectangularGrid 
-{
-public:
-  GLViewer_RectangularGrid();
-  GLViewer_RectangularGrid( float, float, float, float, float, float, float, float, float, float );
-  ~GLViewer_RectangularGrid();
-
-  void                   draw();
-
-  void                   setGridColor( GLfloat, GLfloat, GLfloat );
-  void                   setAxisColor( GLfloat, GLfloat, GLfloat );
-  void                   setGridWidth( float );
-  void                   setCenterRadius( int );
-
-  void                   setSize( float, float );
-  void                   setPan( float, float );
-  bool                   setZoom( float );
-  void                   setResize( float, float, float );
-
-  void                   getSize( float&, float& ) const;
-  void                   getPan( float&, float& ) const;
-  void                   getScale( float&, float& ) const;
-
-  void                   setScaleFactor( int );
-  int                    getScaleFactor();
-
-protected:
-  bool                   initList();
-
-  GLuint                 myGridList;
-  GLfloat                myGridColor[3];
-  GLfloat                myAxisColor[3];
-  GLfloat                myGridHeight;
-  GLfloat                myGridWidth;
-  GLfloat                myWinW;
-  GLfloat                myWinH;
-  GLfloat                myXSize;
-  GLfloat                myYSize;
-  GLfloat                myXPan;
-  GLfloat                myYPan;
-  GLfloat                myXScale;
-  GLfloat                myYScale;
-  GLfloat                myLineWidth;
-  GLfloat                myCenterWidth;
-  GLint                  myCenterRadius;
-  GLint                  myScaleFactor;
-  GLboolean              myIsUpdate;
-};
-
+#ifdef WNT
+#pragma warning( disable:4251 )
 #endif
 
-/***************************************************************************
-**  Class:   GLViewer_ViewPort2d
-**  Descr:   OpenGL ViewPort 2D
-**  Module:  QAD
-**  Created: UI team, 02.09.02
-****************************************************************************/
-
-//********* class compass for viewport******************
-class GLVIEWER_EXPORT GLViewer_Compass {   
-public:
-    enum Position { TopLeft, TopRight, BottomLeft, BottomRight };
-
-    GLViewer_Compass( const QColor& color = QColor ( 0, 255, 0 ), 
-                   const int size = 60,
-                   const Position pos = TopRight,
-                   const int WidthTop = 20,
-                   const int WidthBottom = 10,
-                   const int HeightTop = 25,
-                   const int HeightBottom = 7 );
-    ~GLViewer_Compass(){ delete myFont; }
-
-    void        setCompass( const QColor& color, const int size, const Position pos )
-                                                    {myCol=color;mySize=size;myPos=pos;};
-    void        setVisible( const bool vis = true );
-    bool        getVisible(){ return myIsVisible; };
-
-    void        setSize( const int size ){mySize=size;};
-    int         getSize(){ return mySize; };
-
-    void        setPos( const Position pos ){myPos=pos;};
-    int         getPos(){ return myPos; };
-
-    void        setColor( const QColor& color ){myCol=color;};
-    QColor      getColor(){ return myCol; };
-
-    void        setArrowWidthTop( const int WidthTop ){ if( WidthTop<myArrowWidthBottom || 
-                                                            WidthTop>mySize ) return;
-                                                        myArrowWidthTop=WidthTop; };
-    int         getArrowWidthTop(){return myArrowWidthTop;};
-
-    void        setArrowWidthBottom( const int WidthBot ){ if( WidthBot>myArrowWidthTop || WidthBot<1 )return;
-                                                           myArrowWidthBottom=WidthBot; };
-    int         getArrowWidthBottom(){return myArrowWidthBottom;};
-
-    void        setArrowHeightTop( const int HeightTop ){ if( HeightTop>(2*mySize-myArrowHeightBottom ) ||
-                                                              HeightTop<1 )return;
-                                                          myArrowHeightTop=HeightTop;};
-    int         getArrowHeightTop(){return myArrowHeightTop;};
-
-    void        setArrowHeightBottom( const int HeightBot ){ if( HeightBot>( 2*mySize-myArrowHeightTop ) ||
-                                                                 HeightBot<1)return;
-                                                          myArrowHeightBottom=HeightBot;};
-    int         getArrowHeightBottom(){return myArrowHeightBottom;};        
-
-    GLViewer_TexFont* getFont();
-    void           setFont( QFont theFont ){ delete myFont; myFont = new GLViewer_TexFont( &theFont ); } 
-
-protected:
-    QColor          myCol;
-    int             mySize;
-    int             myPos;
-    bool            myIsVisible;
-    int             myArrowWidthTop;
-    int             myArrowWidthBottom;
-    int             myArrowHeightTop;
-    int             myArrowHeightBottom;
-    GLViewer_TexFont*  myFont;
-    bool            isGenereted;
-};
-
-
-#ifndef GLVIEWER_VIEWPORT2D_H
-#define GLVIEWER_VIEWPORT2D_H
-
-#include <qwidget.h>
-#include <qmap.h>
-#include <qpaintdevice.h>
-#include <qgl.h>
-
-#include "GLViewer_Widget.h"
+class GLViewer_Compass;
+class GLViewer_Grid;
+class GLViewer_Object;
+class GLViewer_ViewFrame;
 
 class QtxToolTip;
 
@@ -176,7 +44,7 @@ public:
     ~GLViewer_ViewPort2d();
 
     void                   turnGrid( GLboolean on );
-    GLViewer_RectangularGrid* getGrid() const { return myGrid; }
+    GLViewer_Grid*         getGrid() const { return myGrid; }
     void                   setGridColor( const QColor gridColor, const QColor axisColor );
 
     GLViewer_ViewFrame*    getViewFrame() const { return myViewFrame; }
@@ -186,8 +54,8 @@ public:
     void                   setBackgroundColor( const QColor& color);
     QColor                 backgroundColor() const;
 
-    void                   setBorder( QRect* border ) { myBorder = border; }
-    QRect*                 getBorder() const { return myBorder; }
+    void                   setBorder( GLViewer_Rect* border ) { myBorder = border; }
+    GLViewer_Rect*         getBorder() const { return myBorder; }
 
     void                   setMargin( GLfloat margin ) { myMargin = margin; }
     GLfloat                getMargin() const { return myMargin; }
@@ -233,10 +101,6 @@ signals:
     void                   objectMoved();
 
 protected:
-    void                   onCreatePopup();
-    void                   onCreatePopup( QPopupMenu* );
-    void                   onDestroyPopup( QPopupMenu* );
-
     void                   onDragObject( QMouseEvent* );
     
     virtual void           mouseMoveEvent( QMouseEvent *);
@@ -263,29 +127,29 @@ protected slots:
     void                   onMaybeTip( QPoint, QString&, QFont&, QRect&, QRect& );
 
 protected:
+    GLViewer_ViewFrame*    myViewFrame;
     GLViewer_Widget*       myGLWidget;
+    GLViewer_Rect*         myBorder;
     QColor                 myBackgroundColor;
-    QRect*                 myBorder;
+
     GLfloat                myMargin;
     int                    myHeight;
     int                    myWidth;
+
     GLfloat                myXScale;
     GLfloat                myYScale;
     GLfloat                myXOldScale;
     GLfloat                myYOldScale;
     GLfloat                myXPan;
     GLfloat                myYPan;
-    GLViewer_RectangularGrid* myGrid; 
-    GLViewer_ViewFrame*    myViewFrame;
 
-    bool                   myDegenerated;
+    GLViewer_Grid*         myGrid; 
+    GLViewer_Compass*      myCompass;
 
     //dragging
     int                    myIsDragProcess;
     float*                 myCurDragPosX;
     float*                 myCurDragPosY;
-    
-    GLViewer_Compass*      myCompass;
 
     //selection by rect
     QPoint*                mypFirstPoint;
@@ -300,5 +164,9 @@ protected:
     //GLViewer_ObjectTip*    myObjectTip;
     QtxToolTip*            myObjectTip;
 };
+
+#ifdef WNT
+#pragma warning ( default:4251 )
+#endif
 
 #endif

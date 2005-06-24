@@ -12,24 +12,23 @@
 
 class SUIT_Desktop;
 
-class GLVIEWER_EXPORT GLViewer_ViewManager : public SUIT_ViewManager
+class GLVIEWER_API GLViewer_ViewManager : public SUIT_ViewManager
 {
-    Q_OBJECT
-
+  Q_OBJECT
 public:
-  GLViewer_ViewManager( SUIT_Study*, SUIT_Desktop* );
-  ~GLViewer_ViewManager();
+    GLViewer_ViewManager( SUIT_Study* theStudy, SUIT_Desktop* theDesktop );
+    ~GLViewer_ViewManager();
 
-  GLViewer_Viewer* getGLViewer() { return (GLViewer_Viewer*) myViewModel; }
-  
-  virtual void     contextMenuPopup( QPopupMenu* );
+    GLViewer_Viewer* getGLViewer() { return (GLViewer_Viewer*) myViewModel; }
 
-protected:
-    void           setViewName(SUIT_ViewWindow* theView);
+    virtual void     contextMenuPopup( QPopupMenu* );
 
 protected:
-    static  int    myMaxId;
-    int            myId;
+    void         setViewName(SUIT_ViewWindow* theView);
+
+protected:
+    static  int  myMaxId;
+    int          myId;
 };
 
 #endif // GLVIEWER_VIEWMANAGER_H

@@ -10,22 +10,20 @@
 **  Created: UI team, 05.09.00
 ****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_ViewFrame.h"
-
 #include "GLViewer_Viewer.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_ViewPort2d.h"
 
 #include <SUIT_Desktop.h>
-#include <SUIT_Application.h>
 #include <SUIT_Session.h>
 #include <SUIT_ToolButton.h>
 #include <SUIT_ResourceMgr.h>
-#include <SUIT_Tools.h>
-#include <QtxAction.h>
 #include <SUIT_MessageBox.h>
 
 #include <qcolor.h>
+#include <qfiledialog.h>
 #include <qimage.h>
 #include <qlayout.h>
 #include <qstring.h>
@@ -71,62 +69,60 @@ GLViewer_ViewFrame::~GLViewer_ViewFrame()
 //================================================================
 void GLViewer_ViewFrame::createActions()
 {
-  if ( !myActionsMap.isEmpty() )
-    return;
-
-  QtxAction* aAction;
+  if (!myActionsMap.isEmpty()) return;
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  QAction* aAction;
 
   // Dump view
-  aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
+  aAction = new QAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
                            tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onViewDump()));
   myActionsMap[ DumpId ] = aAction;
 
   // FitAll
-  aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITALL" ) ),
+  aAction = new QAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITALL" ) ),
                            tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitAll()));
   myActionsMap[ FitAllId ] = aAction;
 
   // FitRect
-  aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITAREA" ) ),
+  aAction = new QAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITAREA" ) ),
                            tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitArea()));
   myActionsMap[ FitRectId ] = aAction;
 
   // FitSelect
-  aAction = new QtxAction(tr("MNU_FITSELECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITSELECT" ) ),
-			  tr( "MNU_FITSELECT" ), 0, this);
+  aAction = new QAction(tr("MNU_FITSELECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITSELECT" ) ),
+                           tr( "MNU_FITSELECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITSELECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitSelect()));
   myActionsMap[ FitSelectId ] = aAction;
 
   // Zoom
-  aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_ZOOM" ) ),
+  aAction = new QAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewZoom()));
   myActionsMap[ ZoomId ] = aAction;
 
   // Panning
-  aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_PAN" ) ),
+  aAction = new QAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_PAN" ) ),
                            tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
   myActionsMap[ PanId ] = aAction;
 
   // Global Panning
-  aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_GLOBALPAN" ) ),
+  aAction = new QAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_GLOBALPAN" ) ),
                            tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewGlobalPan()));
   myActionsMap[ GlobalPanId ] = aAction;
 
-  aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_RESET" ) ),
+  aAction = new QAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_RESET" ) ),
                            tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
@@ -167,9 +163,9 @@ void GLViewer_ViewFrame::setViewPort( GLViewer_ViewPort* vp )
         disconnect( myVP, SIGNAL( vpDrawExternal( QPainter* ) ), this, SIGNAL( vfDrawExternal( QPainter* ) ) );
         disconnect( myVP, SIGNAL( vpMouseEvent( QMouseEvent* ) ), this, SLOT( mouseEvent( QMouseEvent* ) ) );
         disconnect( myVP, SIGNAL( vpKeyEvent( QKeyEvent* ) ), this, SLOT( keyEvent( QKeyEvent* ) ) );
-        disconnect( myVP, SIGNAL(contextMenuRequested( QContextMenuEvent * )),
-                    this, SIGNAL(contextMenuRequested( QContextMenuEvent * )) );
         disconnect( myVP, SIGNAL( vpWheelEvent( QWheelEvent* ) ), this, SLOT( wheelEvent( QWheelEvent* ) ) );
+        disconnect( myVP, SIGNAL( contextMenuRequested( QContextMenuEvent* ) ),
+                    this, SIGNAL( contextMenuRequested( QContextMenuEvent* ) ) );
     }
     myVP = vp;
     if ( myVP )
@@ -177,9 +173,9 @@ void GLViewer_ViewFrame::setViewPort( GLViewer_ViewPort* vp )
         connect( myVP, SIGNAL( vpDrawExternal( QPainter* ) ), this, SIGNAL( vfDrawExternal( QPainter* ) ) );
         connect( myVP, SIGNAL( vpMouseEvent( QMouseEvent* ) ), this, SLOT( mouseEvent( QMouseEvent* ) ) );
         connect( myVP, SIGNAL( vpKeyEvent( QKeyEvent* ) ), this, SLOT( keyEvent( QKeyEvent* ) ) );
-        connect( myVP, SIGNAL(contextMenuRequested( QContextMenuEvent * )),
-                 this, SIGNAL(contextMenuRequested( QContextMenuEvent * )) );
         connect( myVP, SIGNAL( vpWheelEvent( QWheelEvent* ) ), this, SLOT( wheelEvent( QWheelEvent* ) ) );
+        connect( myVP, SIGNAL( contextMenuRequested( QContextMenuEvent* ) ),
+                 this, SIGNAL( contextMenuRequested( QContextMenuEvent* ) ) );
     }
 }
 
@@ -246,7 +242,9 @@ void GLViewer_ViewFrame::onUpdate( int )
 {
 }
 
-QImage GLViewer_ViewFrame::dumpView()
+//#include <windows.h>
+
+void GLViewer_ViewFrame::onViewDump()
 {
     GLViewer_Widget* aWidget = ((GLViewer_ViewPort2d*)myVP)->getGLWidget();
     int width, height;
@@ -383,7 +381,52 @@ QImage GLViewer_ViewFrame::dumpView()
     }
 
     delete [] imageBits;
-    return anImage;
+
+    QString aFilter( "*.bmp\n*.png" );
+
+    QFileDialog aFileDlg( QDir::current().absPath(), aFilter, this );
+    aFileDlg.setCaption( tr( "DUMP_VIEW_SAVE_FILE_DLG_CAPTION" ) );
+    aFileDlg.setMode( QFileDialog::AnyFile );
+
+    if( !aFileDlg.exec() )
+        return;
+
+    QString aFileName = aFileDlg.selectedFile();
+    QString aFileExt = aFileDlg.selectedFilter();
+
+    if( aFileName.isEmpty() )
+    {
+        SUIT_MessageBox::error1( this,
+                                tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
+                                tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
+                                tr( "BUT_OK" ) );
+    }
+
+    QString aSaveOp = "BMP";
+    QString aTypedFileExt = QFileInfo( aFileName ).extension( false ).lower();
+
+    if( aFileExt == "*.bmp" )
+    {
+        if( aTypedFileExt.isEmpty() )
+            aFileName += ".bmp";
+        aSaveOp = "BMP";
+    }
+    else if( aFileExt == "*.png" )
+        if( aTypedFileExt.isEmpty() )
+            aFileName += ".png";
+        aSaveOp = "PNG";
+
+//#ifdef WNT
+//    if( !anImage.save( aFileName, aSaveOp ) )
+//#else
+    if( !aWidget->grabFrameBuffer().save( aFileName, aSaveOp ) )
+//#endif
+    {
+        SUIT_MessageBox::error1( this,
+                                tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
+                                tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
+                                tr( "BUT_OK" ) );
+    }
 }
 
 void GLViewer_ViewFrame::onViewPan()
@@ -485,4 +528,3 @@ void GLViewer_ViewFrame::wheelEvent( QWheelEvent* e )
     break;
   }
 }
-

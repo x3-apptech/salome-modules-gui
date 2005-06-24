@@ -13,13 +13,24 @@ VPATH=.:@srcdir@:@srcdir@/resources
 
 # header files 
 EXPORT_HEADERS= GLViewer.h \
+		GLViewer_AspectLine.h \
+		GLViewer_BaseDrawers.h \
+		GLViewer_BaseObjects.h \
+		GLViewer_Compass.h \
 		GLViewer_Context.h \
+		GLViewer_CoordSystem.h \
 		GLViewer_Defs.h \
-        	GLViewer_Drawer.h \
+		GLViewer_Drawer.h \
+		GLViewer_Geom.h \
+		GLViewer_Grid.h \
 		GLViewer_Group.h \
+		GLViewer_MimeSource.h \
 		GLViewer_Object.h \
 		GLViewer_Selector.h \
 		GLViewer_Selector2d.h \
+		GLViewer_Text.h \
+		GLViewer_Tools.h \
+		GLViewer_ToolTip.h \
 		GLViewer_ViewFrame.h \
 		GLViewer_ViewManager.h \
 		GLViewer_ViewPort.h \
@@ -35,12 +46,27 @@ PO_FILES = GLViewer_images.po \
 # Libraries targets
 LIB = libGLViewer.la
 
+<<<<<<< Makefile.in
+LIB_SRC= GLViewer_AspectLine.cxx \
+	 GLViewer_BaseDrawers.cxx \
+	 GLViewer_BaseObjects.cxx \
+	 GLViewer_Compass.cxx \
+	 GLViewer_Context.cxx \
+	 GLViewer_CoordSystem.cxx \
+=======
 LIB_SRC= GLViewer_Context.cxx \
+>>>>>>> 1.3
 	 GLViewer_Drawer.cxx \
+	 GLViewer_Geom.cxx \
+	 GLViewer_Grid.cxx \
 	 GLViewer_Group.cxx \
+	 GLViewer_MimeSource.cxx \
 	 GLViewer_Object.cxx \
 	 GLViewer_Selector.cxx \
 	 GLViewer_Selector2d.cxx \
+	 GLViewer_Text.cxx \
+	 GLViewer_Tools.cxx \
+	 GLViewer_ToolTip.cxx \
 	 GLViewer_ViewFrame.cxx \
 	 GLViewer_ViewManager.cxx \
 	 GLViewer_ViewPort.cxx \
@@ -49,11 +75,9 @@ LIB_SRC= GLViewer_Context.cxx \
 	 GLViewer_Viewer2d.cxx \
 	 GLViewer_Widget.cxx
 
-LIB_MOC = GLViewer_Context.h \
-	GLViewer_Drawer.h \
-	GLViewer_Object.h \
-	GLViewer_Selector.h \
+LIB_MOC = GLViewer_Selector.h \
 	GLViewer_Selector2d.h \
+	GLViewer_ToolTip.h \
 	GLViewer_ViewFrame.h \
 	GLViewer_ViewManager.h \
 	GLViewer_ViewPort.h \
@@ -78,6 +102,6 @@ CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES)
 
 LDFLAGS+=$(QT_MT_LIBS) $(CAS_KERNEL)
 
-LIBS+= -lsuit -L/usr/X11R6/lib -lGLU
+LIBS+= -L${GUI_ROOT_DIR}/lib/salome -lsuit -L/usr/X11R6/lib -lGLU
 
 @CONCLUDE@

@@ -32,7 +32,7 @@ class SUIT_ViewWindow;
 #pragma warning( disable:4251 )
 #endif
 
-class GLVIEWER_EXPORT GLViewer_Viewer: public SUIT_ViewModel
+class GLVIEWER_API GLViewer_Viewer: public SUIT_ViewModel
 {
     Q_OBJECT
 
@@ -50,6 +50,8 @@ public:
     virtual void                 setViewManager( SUIT_ViewManager* theViewManager );
     virtual QString              getType() const { return Type(); }
     static QString               Type() { return "GLViewer_ViewModel";  }
+
+    virtual void                 contextMenuPopup( QPopupMenu* );
 
 public:
     void                         setSelectionMode( SelectionMode );
@@ -94,6 +96,8 @@ protected slots:
     virtual void                 onSelectionCancel();
     virtual void                 onSelectionDone( bool add, SelectionChangeStatus status );
 
+    virtual void                 onChangeBgColor();
+
 private:
     void                         handleMouseMove( QMouseEvent* );
     void                         handleMousePress( QMouseEvent* );
@@ -111,7 +115,7 @@ protected:
 **  Class: GLViewer_ViewTransformer
 **
 *****************************************************************/
-class GLVIEWER_EXPORT GLViewer_ViewTransformer : public QObject
+class GLVIEWER_API GLViewer_ViewTransformer : public QObject
 {
 public:
     GLViewer_ViewTransformer( GLViewer_Viewer*, int type );
@@ -171,7 +175,7 @@ protected:
 **  Class: GLViewer_ViewSketcher
 **
 *****************************************************************/
-class GLVIEWER_EXPORT GLViewer_ViewSketcher : public QObject
+class GLVIEWER_API GLViewer_ViewSketcher : public QObject
 {
 public:
     GLViewer_ViewSketcher( GLViewer_Viewer*, int type );

@@ -20,6 +20,7 @@
 #include <qrect.h>
 
 #include "GLViewer_Viewer.h"
+#include "GLViewer_Object.h"
 #include "GLViewer_ViewFrame.h"
 #include "GLViewer_Drawer.h"
 
@@ -28,7 +29,6 @@
 #include <GL/gl.h>
 
 class GLViewer_Object;
-class GLViewer_Rect;
 class GLViewer_Context;
 class GLViewer_Selector2d;
 //class GLViewer_Sketcher;
@@ -48,7 +48,7 @@ const double Sizes[2*5] = {
 #pragma warning( disable:4251 )
 #endif
 
-class GLVIEWER_EXPORT GLViewer_Viewer2d : public GLViewer_Viewer
+class GLVIEWER_API GLViewer_Viewer2d : public GLViewer_Viewer
 {
     Q_OBJECT
 
@@ -69,27 +69,27 @@ public:
 public:
     SUIT_ViewWindow*     createView( SUIT_Desktop* );
 
-    virtual void         contextMenuPopup( QPopupMenu* );
+    void                 addPopupItems( QPopupMenu* );
 
     //void                activateGLSketching( int );
 
+    const QValueList<GLViewer_Drawer*>& getDrawers() const { return myDrawers; }
+
     GLViewer_Context*    getGLContext() const { return myGLContext; }
     void                 updateColors( QColor colorH, QColor colorS );
-    void                 updateBorders( const QRect& rect );
+    void                 updateBorders( GLViewer_Rect* theRect );
     void                 updateBorders();
 
     void                 updateAll();
     void                 updateDrawers( GLboolean update, GLfloat scX = 0.0, GLfloat scY = 0.0 );
-    void                 activateDrawers( TColStd_SequenceOfInteger& list, bool onlyUpdate,
-                                          GLboolean swap = GL_TRUE );
     void                 activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap = GL_FALSE );
-    void                 activateDrawer( int index, bool onlyUpdate, GLboolean swap = GL_FALSE );
     void                 activateDrawer( GLViewer_Object*, bool onlyUpdate, GLboolean swap = GL_FALSE );
     void                 activateAllDrawers( bool onlyUpdate, GLboolean swap = GL_FALSE );
 
     void                 transPoint( GLfloat& x, GLfloat& y );
-    QRect*               getWinObjectRect( GLViewer_Object* theObject );
-
+    QRect*               getWinObjectRect( GLViewer_Object* );
+    
+    
     GLViewer_Rect        getGLVRect( const QRect& ) const;
     QRect                getQRect( const GLViewer_Rect& ) const;
 
@@ -129,7 +129,6 @@ protected:
 
 protected slots:
     void                 onMouseEvent( SUIT_ViewWindow*, QMouseEvent* );
-    void                 onDumpView();
 
 private:
     bool                 testRotation( QMouseEvent* );
@@ -145,7 +144,7 @@ protected:
 **  Class: GLViewer_View2dTransformer
 **
 *****************************************************************/
-class GLVIEWER_EXPORT GLViewer_View2dTransformer : public GLViewer_ViewTransformer
+class GLVIEWER_API GLViewer_View2dTransformer : public GLViewer_ViewTransformer
 {
 public:
     GLViewer_View2dTransformer( GLViewer_Viewer*, int );

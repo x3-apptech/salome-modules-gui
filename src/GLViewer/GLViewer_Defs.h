@@ -6,7 +6,7 @@
 #ifndef GLVIEWER_DEFS_H
 #define GLVIEWER_DEFS_H
 
-//Selection status 
+//Selection staus 
 enum SelectionChangeStatus
 {
     SCS_Invalid,
@@ -24,5 +24,8 @@ enum DisplayTextFormat
   DTF_BITMAP    = 1
 };
 
+#define SEGMENTS   32
+#define PI         3.14159265359
+#define STEP       ( float )( 2 * PI / SEGMENTS )
 
 #endif// GLVIEWER_DEFS_H

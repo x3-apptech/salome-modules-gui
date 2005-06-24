@@ -10,9 +10,11 @@
 **  Created: UI team, 04.09.02
 ****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_Viewer2d.h"
-
 #include "GLViewer_Object.h"
+#include "GLViewer_BaseObjects.h"
+#include "GLViewer_CoordSystem.h"
 #include "GLViewer_Context.h"
 #include "GLViewer_Drawer.h"
 #include "GLViewer_Selector2d.h"
@@ -22,20 +24,24 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewWindow.h"
 
-#include <OSD_Timer.hxx>
+#include "OSD_Timer.hxx"
 #include <TColStd_MapOfInteger.hxx>
 
+#include <qpopupmenu.h>
 #include <qpointarray.h>
 #include <qcolordialog.h>
-#include <qpopupmenu.h>
 
 GLViewer_Viewer2d::GLViewer_Viewer2d( const QString& title) :
 GLViewer_Viewer( title )
 {
     myGLContext = new GLViewer_Context( this );
+
     //myGLSketcher = new GLViewer_Sketcher( this );
-    mySelMode = GLViewer_Viewer::Multiple;
+
     createSelector();
+
+    mySelMode = GLViewer_Viewer::Multiple;
+
     myDrawers.clear();
 }
 
@@ -50,14 +56,13 @@ SUIT_ViewWindow* GLViewer_Viewer2d::createView( SUIT_Desktop* theDesktop )
     return new GLViewer_ViewFrame( theDesktop, this );
 }
 
-void GLViewer_Viewer2d::contextMenuPopup( QPopupMenu* thePopup )
+void GLViewer_Viewer2d::addPopupItems( QPopupMenu* thePopup )
 {
-  // "Change background color" menu item is available if there are no selected objects
+  // CTH8434. "Change background color" menu item is available if there are no selected objects
   if ( getSelector() == 0 || getSelector()->numSelected() == 0 )
   {
     if( thePopup->count() > 0 )
         thePopup->insertSeparator();
-    thePopup->insertItem( tr( "MNU_DUMP_VIEW" ),  this, SLOT( onDumpView() ) );
     thePopup->insertItem( tr( "CHANGE_BGCOLOR" ), this, SLOT( onChangeBgColor() ) );
   }
 }
@@ -85,36 +90,33 @@ void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
         it.key()->setSColor( colorS );
     }
 */
-    ObjectMap anObjects = myGLContext->getObjects();
-    ObjectMap::Iterator beginIt = anObjects.begin();
-    ObjectMap::Iterator endIt = anObjects.end();
-    for ( ObjectMap::Iterator it = beginIt; it != endIt; ++it )
+    /*
+    ObjList anObjects = myGLContext->getObjects();
+    ObjList::Iterator beginIt = anObjects.begin();
+    ObjList::Iterator endIt = anObjects.end();
+    for ( ObjList::Iterator it = beginIt; it != endIt; ++it )
     {
-        //GLViewer_Drawer* aDrawer = it.key()->getDrawer();
+        //GLViewer_Drawer* aDrawer = (*it)->getDrawer();
         //aDrawer->setHColor( colorH );
         //aDrawer->setSColor( colorS );
     }
+    */
 
 
   activateAllDrawers( TRUE );
 }
 
-void GLViewer_Viewer2d::updateBorders( const QRect& rect )
+void GLViewer_Viewer2d::updateBorders( GLViewer_Rect* theRect )
 {
-  float xa = rect.left();
-  float xb = rect.right();
-  float ya = rect.top();
-  float yb = rect.bottom();
-
   QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
   for ( int i = 0, n = views.count(); i < n; i++ )
   {
-    QRect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
+    GLViewer_Rect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
 
-    if ( xa < border->left() )   border->setLeft( (int)xa );
-    if ( xb > border->right() )  border->setRight( (int)xb );
-    if ( ya < border->top() )    border->setTop( (int)ya );
-    if ( yb > border->bottom() ) border->setBottom( (int)yb );
+    border->setLeft( QMIN( border->left(), theRect->left() ) );
+    border->setRight( QMAX( border->right(), theRect->right() ) );
+    border->setBottom( QMIN( border->bottom(), theRect->bottom() ) );
+    border->setTop( QMAX( border->top(), theRect->top() ) );
   }
 }
 
@@ -122,36 +124,33 @@ void GLViewer_Viewer2d::updateBorders()
 {
     QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
 
-    ObjectMap anObjects = myGLContext->getObjects();
-    ObjectMap::Iterator beginIt = anObjects.begin();
-    ObjectMap::Iterator endIt = anObjects.end();
+    ObjList anObjects = myGLContext->getObjects();
+    ObjList::Iterator beginIt = anObjects.begin();
+    ObjList::Iterator endIt = anObjects.end();
     for ( int i = 0, n = views.count(); i < n; i++ )
     {
-        QRect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
-        border->setRect( 0, 0, 0, 0 );
-        for ( ObjectMap::Iterator it = beginIt; it != endIt; ++it )
+        GLViewer_Rect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
+        border->setIsEmpty( true );
+        for ( ObjList::Iterator it = beginIt; it != endIt; ++it )
         {
-            QRect* aRect = it.key()->getRect()->toQRect();
-	    if( !it.key()->getVisible() || aRect->isNull() )
+            GLViewer_Object* anObject = *it;
+            GLViewer_Rect* aRect = anObject->getRect();
+            if( !anObject->isSelectable() || !anObject->getVisible() )
                 continue;
 
-            if( border->isNull() )
-                border->setRect( aRect->left(), aRect->top(), aRect->width(), aRect->height() );
+            if( border->isEmpty() )
+            {
+                border->setIsEmpty( false );
+                border->setCoords( aRect->left(), aRect->right(), aRect->bottom(), aRect->top() );
+            }
             else
-	    {
-	      border->setLeft( QMIN( border->left(), aRect->left() ) );
-	      border->setRight( QMAX( border->right(), aRect->right() ) );
-	      border->setTop( QMIN( border->top(), aRect->top() ) );
-	      border->setBottom( QMAX( border->bottom(), aRect->bottom() ) );
-	    }
+            {
+                border->setLeft( QMIN( border->left(), aRect->left() ) );
+                border->setRight( QMAX( border->right(), aRect->right() ) );
+                border->setBottom( QMIN( border->bottom(), aRect->bottom() ) );
+                border->setTop( QMAX( border->top(), aRect->top() ) );
+            }
         }
-        /*
-        float gap = QMAX( border->width(), border->height() ) / 20;
-        border->setLeft( border->left() - gap );
-        border->setRight( border->right() + gap );
-        border->setTop( border->top() - gap );
-        border->setBottom( border->bottom() + gap );
-        */
     }
 }
 
@@ -174,41 +173,13 @@ void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat scX, GLfloat sc
     activateAllDrawers( update );
 }
 
-void GLViewer_Viewer2d::activateDrawers( TColStd_SequenceOfInteger& sequence, bool onlyUpdate, GLboolean swap )
-{
-//  cout << "GLViewer_Viewer2d::activateDrawers" << endl;
-//  if( onlyUpdate )
-//    cout << "Only update" << endl;
-//  else
-//    cout << "Not only update" << endl;
-
-  TColStd_MapOfInteger aMap;
-  for ( int i = 1, n = sequence.Length(); i <= n; i++)
-    if ( !aMap.Contains( sequence( i ) ) )
-      aMap.Add( sequence( i ) );
-
-  const ObjectMap& anObjects = myGLContext->getObjects();
-  const ObjList& objList = myGLContext->getObjList();
-  ObjList anActiveObjects;
-  for( ObjList::const_iterator it = objList.begin(); it != objList.end(); ++it )
-  {
-    if ( (*it)->getVisible() && aMap.Contains( anObjects[*it] ) )
-      anActiveObjects.append( *it );
-  }
-
-  activateDrawers( anActiveObjects, onlyUpdate, swap );
-}
-
 void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap )
 {
     //cout << "GLViewer_Viewer2d::activateDrawers " << (int)onlyUpdate << " " << (int)swap << endl;
-    float xScale;
-    float yScale;
-
     QValueList<GLViewer_Drawer*>::Iterator anIt = myDrawers.begin();
     QValueList<GLViewer_Drawer*>::Iterator endDIt = myDrawers.end();
     for( ; anIt != endDIt; anIt++ )
-            (*anIt)->clear();
+        (*anIt)->clear();
 
     QValueList<GLViewer_Drawer*> anActiveDrawers;
     QValueList<GLViewer_Object*>::Iterator endOIt = theObjects.end();
@@ -218,7 +189,8 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
         GLViewer_Drawer* aDrawer = (*oit)->getDrawer();
         if( !aDrawer )
         {
-            anIt = myDrawers.begin();            
+            anIt = myDrawers.begin();
+            endDIt = myDrawers.end();
 
             for( ; anIt != endDIt; anIt++ )
                 if( (*anIt)->getObjectType() == (*oit)->getObjectType() )
@@ -228,15 +200,26 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
                     break;
                 }
 
-            if( !aDrawer ) //are not exists
+            if( !aDrawer )
             {
                 myDrawers.append( (*oit)->createDrawer() );
                 aDrawer = (*oit)->getDrawer();
             }
         }
         aDrawer->addObject( (*oit) );
-        if( anActiveDrawers.findIndex( aDrawer ) == -1 )
-            anActiveDrawers.append( aDrawer );
+
+        int aPriority = aDrawer->getPriority();
+
+        if( anActiveDrawers.findIndex( aDrawer ) != -1 )
+            continue;
+
+        QValueList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
+        QValueList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
+        for( ; aDIt != aDEndIt; ++aDIt )
+            if( (*aDIt)->getPriority() > aPriority )
+                break;
+
+        anActiveDrawers.insert( aDIt, aDrawer );
     } 
 
     QValueList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
@@ -245,59 +228,32 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
     QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
     for ( int i = 0, n = views.count(); i < n; i++ )
     {
+        float xScale, yScale;
         GLViewer_ViewPort2d* vp = ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort();
         vp->getScale( xScale, yScale );
         vp->getGLWidget()->makeCurrent();
 
-
         for( ; aDIt != aDEndIt; aDIt++ )
-            (*aDIt)->create( xScale, yScale, onlyUpdate );
-  
-        // tmp
-        /*
-        QRect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
-        float x1 = border->left();
-        float x2 = border->right();
-        float y1 = border->bottom();
-        float y2 = border->top();
-
-        QColor color = Qt::blue;
-        glColor3f( ( GLfloat )color.red() / 255,
-        ( GLfloat )color.green() / 255,
-        ( GLfloat )color.blue() / 255 );
-        glLineWidth( 1.0 );
-
-        glBegin( GL_LINE_LOOP );
-        glVertex2f( x1, y1 );
-        glVertex2f( x1, y2 );
-        glVertex2f( x2, y2 );
-        glVertex2f( x2, y1 );
-        glEnd();
+        {
+            GLViewer_Drawer* aDrawer = *aDIt;
+            if( aDrawer )
+                aDrawer->create( xScale, yScale, onlyUpdate );
+        }
+/*
+        // draw border
+        GLViewer_Rect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
+        (*aDIt)->drawRectangle( border, Qt::blue );
 
         QString coords = QString::number( border->left() ) + " " + QString::number( border->right() ) + " " +
-                         QString::number( border->top() ) + " " + QString::number( border->bottom() );
-        (*aDIt)->drawText( "Border : " + coords, x1, y1+10/yScale, Qt::blue, &QFont( "Courier", 8, QFont::Normal ), 2 );
-        */
+                         QString::number( border->bottom() ) + " " + QString::number( border->top() );
+        (*aDIt)->drawText( "Border : " + coords, border->left(), border->top() + 10 / yScale,
+                           Qt::blue, &QFont( "Courier", 8, QFont::Normal ), 2 );
+*/
         if ( swap )
            vp->getGLWidget()->swapBuffers();
     }
 
     ( ( GLViewer_ViewPort2d* )getActiveView()->getViewPort() )->getGLWidget()->makeCurrent();
-}
-
-void GLViewer_Viewer2d::activateDrawer( int index, bool onlyUpdate, GLboolean swap )
-{
-  GLViewer_Object* anObj = 0;
-  const ObjectMap& anObjects = myGLContext->getObjects();
-  for ( ObjectMap::const_iterator it = anObjects.begin(); it != anObjects.end(); ++it )
-    if ( it.data() == index )
-    {
-      anObj = (GLViewer_Object*)it.key();
-      break;
-    }
-    
-  if ( anObj )
-    activateDrawer( anObj, onlyUpdate, swap );
 }
 
 void GLViewer_Viewer2d::activateDrawer( GLViewer_Object* theObject, bool onlyUpdate, GLboolean swap )
@@ -313,7 +269,7 @@ void GLViewer_Viewer2d::activateAllDrawers( bool onlyUpdate, GLboolean swap )
       return;
 
     ObjList anActiveObjs;
-    const ObjList& objs = myGLContext->getObjList();
+    const ObjList& objs = myGLContext->getObjects();
     for( ObjList::const_iterator it = objs.begin(); it != objs.end(); ++it )
     {
       GLViewer_Object* obj = (GLViewer_Object*)(*it);
@@ -350,8 +306,7 @@ void GLViewer_Viewer2d::onCreateGLMarkers( int theMarkersNum, int theMarkersRad 
     aMarkerSet->setYCoord( anYCoord, theMarkersNum );
     aMarkerSet->compute();
 
-    QRect* rect = aMarkerSet->getRect()->toQRect();
-    updateBorders( *rect );
+    updateBorders( aMarkerSet->getRect() );
     
     activateAllDrawers( false );
     activateTransform( GLViewer_Viewer::FitAll );
@@ -393,8 +348,7 @@ void GLViewer_Viewer2d::onCreateGLPolyline( int theAnglesNum, int theRadius, int
         aPolyline->setYCoord( anYCoord, theAnglesNum );
         aPolyline->compute();
 
-        QRect* rect = aPolyline->getRect()->toQRect();
-        updateBorders( *rect );
+        updateBorders( aPolyline->getRect() );
     }
     
     activateAllDrawers( false );
@@ -428,8 +382,7 @@ void GLViewer_Viewer2d::onCreateGLText( QString theStr, int theTextNumber )
         aText->compute();
         getGLContext()->insertObject( aText );
 
-        QRect* rect = aText->getRect()->toQRect();
-        updateBorders( *rect );
+        updateBorders( aText->getRect() );
     }
 
     activateAllDrawers( false );
@@ -479,21 +432,21 @@ QRect* GLViewer_Viewer2d::getWinObjectRect( GLViewer_Object* theObject )
     curvp->getScale( xScale, yScale );
     curvp->getPan( xPan, yPan );
 
-    QRect* aObjRect = theObject->getRect()->toQRect();
-    float aLeft = aObjRect->left() + xPan, aRight = aObjRect->right() + xPan;
-    float aTop = aObjRect->top() + yPan, aBot = aObjRect->bottom() + yPan;
+    QRect aObjRect = theObject->getRect()->toQRect();
+    float aLeft = aObjRect.left() + xPan, aRight = aObjRect.right() + xPan;
+    float aTop = aObjRect.top() + yPan, aBot = aObjRect.bottom() + yPan;
 
     GLfloat anAngle = curvp->getGLWidget()->getRotationAngle() * PI / 180.;
 
     QPointArray aPointArray(4);
-    int ls = (int)(aLeft*sin(anAngle)),  lc = (int)(aLeft*cos(anAngle)), 
-        rs = (int)(aRight*sin(anAngle)), rc = (int)(aRight*cos(anAngle)), 
-        ts = (int)(aTop*sin(anAngle)),   tc = (int)(aTop*cos(anAngle)), 
-        bs = (int)(aBot*sin(anAngle)),   bc = (int)(aBot*cos(anAngle)); 
-    aPointArray[0] = QPoint( lc - ts, ls + tc );
-    aPointArray[1] = QPoint( rc - ts, rs + tc );
-    aPointArray[2] = QPoint( rc - bs, rs + bc );
-    aPointArray[3] = QPoint( lc - bs, ls + bc );
+    aPointArray[0] = QPoint( (int)(aLeft*cos(anAngle) - aTop*sin(anAngle)),
+                             (int)(aLeft*sin(anAngle) + aTop*cos(anAngle)) );
+    aPointArray[1] = QPoint( (int)(aRight*cos(anAngle) - aTop*sin(anAngle)),
+                             (int)(aRight*sin(anAngle) + aTop*cos(anAngle)) );
+    aPointArray[2] = QPoint( (int)(aRight*cos(anAngle) - aBot*sin(anAngle)),
+                             (int)(aRight*sin(anAngle) + aBot*cos(anAngle)) );
+    aPointArray[3] = QPoint( (int)(aLeft*cos(anAngle) - aBot*sin(anAngle)),
+                             (int)(aLeft*sin(anAngle) + aBot*cos(anAngle)) );
 
     int aMinLeft = aPointArray[0].x(), aMaxRight = aPointArray[0].x(), 
         aMinTop = aPointArray[0].y(), aMaxBottom = aPointArray[0].y();
@@ -855,7 +808,7 @@ void GLViewer_Viewer2d::repaintView( GLViewer_ViewFrame* theView, bool makeCurre
       return;
 
     ObjList anActiveObjs;
-    const ObjList& objs = myGLContext->getObjList();
+    const ObjList& objs = myGLContext->getObjects();
     for( ObjList::const_iterator it = objs.begin(); it != objs.end(); ++it )
     {
       GLViewer_Object* obj = (GLViewer_Object*)(*it);
@@ -994,14 +947,6 @@ void GLViewer_Viewer2d::startOperations( QWheelEvent* e )
         updateAll();
 }
 
-/*!
-    Processes "Dump view..." context popup menu command
-*/
-void GLViewer_Viewer2d::onDumpView()
-{
-  if ( getActiveView() )
-    getActiveView()->onDumpView();
-}
 
 /****************************************************************
 **  Class: GLViewer_View2dTransformer
@@ -1033,7 +978,6 @@ void GLViewer_View2dTransformer::exec()
 
     /* additional transforms */
     GLViewer_ViewPort* vp = myViewer->getActiveView()->getViewPort();
-    //QAD_ASSERT( vp->inherits( "QAD_ViewPort3d" ) );
     GLViewer_ViewPort2d* avp = (GLViewer_ViewPort2d*)vp;
     switch ( myType )
     {
@@ -1055,7 +999,6 @@ void GLViewer_View2dTransformer::onTransform( TransformState state )
       return;
 
     GLViewer_ViewPort* vp = myViewer->getActiveView()->getViewPort();
-    //QAD_ASSERT( vp->inherits( "QAD_ViewPort3d" ) );
     GLViewer_ViewPort2d* avp = (GLViewer_ViewPort2d*)vp;
     if ( type() == GLViewer_Viewer::Rotate )
     {
@@ -1077,4 +1020,3 @@ void GLViewer_View2dTransformer::onTransform( TransformState state )
     }
     GLViewer_ViewTransformer::onTransform( state );
 }
-

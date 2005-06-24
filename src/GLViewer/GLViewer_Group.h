@@ -25,7 +25,7 @@ typedef std::list<GLViewer_Object*>::iterator OGIterator;
 **  Created: UI team, 25.03.05
 ****************************************************************************/
 
-class GLVIEWER_EXPORT GLViewer_Group
+class GLVIEWER_API GLViewer_Group
 {
 public:
   GLViewer_Group();
@@ -38,9 +38,10 @@ public:
   int     addObject( GLViewer_Object* );
   int     removeObject( GLViewer_Object* );
 
+  OGList  getObjects() const { return myList; }
 
   //operations
-  void    dragingObjects( float x, float y );
+  void    dragingObjects( float x, float y, bool once = false );
   void    updateZoom( GLViewer_Object* sender, float zoom );
 
 private:

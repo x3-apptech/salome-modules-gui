@@ -2,6 +2,7 @@
 // Created:   March, 2005
 // Author:    OCC team
 // Copyright (C) CEA 2005
+
 //#include "GLViewerAfx.h"
 #include "GLViewer_Group.h"
 #include "GLViewer_Object.h"
@@ -106,23 +107,26 @@ int GLViewer_Group::removeObject( GLViewer_Object* theObject )
 //Function: dragingObjects
 //Description: 
 //--------------------------------------------------------------------------
-void GLViewer_Group::dragingObjects( float x, float y )
+void GLViewer_Group::dragingObjects( float x, float y, bool once )
 {
-  if( !mySelObjNum )
+  if( !once )
   {
-    OGIterator it = myList.begin();
-    OGIterator end_it = myList.end();
-    for( int i = 0; it != end_it; ++it, i++ )
-      if( (*it)->isSelected() )
-        mySelObjNum++;
+    if( !mySelObjNum )
+    {
+      OGIterator it = myList.begin();
+      OGIterator end_it = myList.end();
+      for( int i = 0; it != end_it; ++it, i++ )
+        if( (*it)->isSelected() )
+          mySelObjNum++;
 
-    if( mySelObjNum )
+      if( mySelObjNum )
+        mySelObjNum--;
+    }
+    else
+    {
       mySelObjNum--;
-  }
-  else
-  {
-    mySelObjNum--;
-    return;
+      return;
+    }
   }
 
   OGIterator it = myList.begin();
@@ -143,6 +147,6 @@ void GLViewer_Group::updateZoom( GLViewer_Object* sender, float zoom )
   {
     GLViewer_Object* anObject = *it;
     if( anObject != sender )
-      anObject->setZoom( zoom, GL_TRUE );
+      anObject->setZoom( zoom, true, true );
   }
 }

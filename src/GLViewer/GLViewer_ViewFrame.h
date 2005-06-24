@@ -18,15 +18,17 @@
 class QColor;
 
 class SUIT_Desktop;
-class QtxAction;
+
 class GLViewer_Viewer;
 class GLViewer_ViewPort;
+
+#include <qaction.h>
 
 #ifdef WNT
 #pragma warning( disable:4251 )
 #endif
 
-class GLVIEWER_EXPORT GLViewer_ViewFrame: public SUIT_ViewWindow
+class GLVIEWER_API GLViewer_ViewFrame: public SUIT_ViewWindow
 {
   Q_OBJECT
     
@@ -56,14 +58,12 @@ protected:
   GLViewer_Viewer*        myViewer;
   GLViewer_ViewPort*      myVP;
   
-protected:
-  QImage dumpView();
-
 public:
   //ViewType       getTypeView() const { return VIEW_GL; }; 
   QWidget*       getViewWidget() { return ( QWidget* )getViewPort(); };
   
 protected slots:
+  void           onViewDump();
   void           onViewPan();
   void           onViewZoom();
   void           onViewFitAll();
@@ -91,7 +91,7 @@ private:
   
 private:
   enum { DumpId, FitAllId, FitRectId, FitSelectId, ZoomId, PanId, GlobalPanId, ResetId };
-  typedef QMap<int, QtxAction*> ActionsMap;
+  typedef QMap<int, QAction*> ActionsMap;
   
 private:
   ActionsMap       myActionsMap;

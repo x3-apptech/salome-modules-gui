@@ -3,7 +3,7 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-
+//#include <GLViewerAfx.h>
 #include "GLViewer_ViewManager.h"
 #include "GLViewer_ViewFrame.h"
 #include "GLViewer_Viewer2d.h"
@@ -12,9 +12,8 @@
 int GLViewer_ViewManager::myMaxId = 0;
 
 //***************************************************************
-GLViewer_ViewManager::GLViewer_ViewManager( SUIT_Study* aStudy,
-                                            SUIT_Desktop* theDesktop )
-: SUIT_ViewManager( aStudy, theDesktop )
+GLViewer_ViewManager::GLViewer_ViewManager( SUIT_Study* theStudy, SUIT_Desktop* theDesktop )
+: SUIT_ViewManager( theStudy, theDesktop )
 {
     myId = ++myMaxId;
     setViewModel( new GLViewer_Viewer2d( "GLViewer" ) );

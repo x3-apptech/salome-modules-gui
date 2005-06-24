@@ -7,14 +7,12 @@
 #ifdef WNT
 
 #ifdef GLVIEWER_EXPORTS
-#define GLVIEWER_EXPORT __declspec(dllexport)
+#define GLVIEWER_API __declspec(dllexport)
 #else
-#define GLVIEWER_EXPORT __declspec(dllimport)
+#define GLVIEWER_API __declspec(dllimport)
 #endif
+
 #else
-#define GLVIEWER_EXPORT
+#define GLVIEWER_API
 #endif // WNT
 
-#ifndef PI
-#define PI         3.14159265359
-#endif

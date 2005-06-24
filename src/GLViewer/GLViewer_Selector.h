@@ -22,7 +22,7 @@
 
 class GLViewer_Viewer;
 
-class GLVIEWER_EXPORT GLViewer_Selector : public QObject
+class GLVIEWER_API GLViewer_Selector : public QObject
 {
     Q_OBJECT
 
@@ -35,6 +35,8 @@ public:
     void                  setMinRectSize( const QSize& minSize );
 
     virtual void          detect( int, int ) = 0;
+    virtual void          undetectAll() = 0;
+
     virtual void          select( bool append = false ) = 0;
     virtual void          select( const QRect&, bool append = false ) = 0;
     virtual void          unselectAll() = 0;
@@ -54,11 +56,15 @@ signals:
     void                  selSelectionDone( bool append, SelectionChangeStatus status );
 
 protected:
+//    void                  setStatus( SelectionChangeStatus theStatus ){ myStatus = theStatus; }
+//    SelectionChangeStatus status( return myStatus; }
+
     GLViewer_Viewer*      myViewer;
     bool                  myLocked;
     QSize                 myMinRectSize;
 
 private:
+//    SelectionChangeStatus myStatus;
     static int            apppendKey;
 };
 

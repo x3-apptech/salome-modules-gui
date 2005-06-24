@@ -16,7 +16,6 @@
 #include "windows.h"
 #endif
 
-//#include "QAD.h"
 #include "GLViewer_Selector.h"
 
 #include <Quantity_NameOfColor.hxx>
@@ -24,7 +23,7 @@
 class GLViewer_Viewer2d;
 class GLViewer_Context;
 
-class GLVIEWER_EXPORT GLViewer_Selector2d : public GLViewer_Selector
+class GLVIEWER_API GLViewer_Selector2d : public GLViewer_Selector
 {
   Q_OBJECT
 
@@ -40,6 +39,8 @@ public:
   void            setSelectColor( Quantity_NameOfColor );
 
   void            detect( int, int );
+  void            undetectAll();
+
   void            select( bool append = false );
   void            select( const QRect&, bool append = false );    
   void            unselectAll();    

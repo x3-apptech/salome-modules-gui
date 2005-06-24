@@ -10,8 +10,8 @@
 **  Created: UI team, 05.09.00
 ****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_Viewer.h"
-
 #include "GLViewer_Selector.h"
 #include "GLViewer_ViewPort.h"
 #include "GLViewer_ViewFrame.h"
@@ -19,8 +19,10 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewWindow.h"
 
-#include <qpainter.h>
 #include <qapplication.h>
+#include <qpainter.h>
+#include <qpopupmenu.h>
+#include <qcolordialog.h>
 
 /* used for sketching */
 static QEvent* l_mbPressEvent = 0;
@@ -66,6 +68,30 @@ void GLViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
     connect(theViewManager, SIGNAL(wheel(SUIT_ViewWindow*, QWheelEvent*)), 
             this, SLOT(onWheelEvent(SUIT_ViewWindow*, QWheelEvent*)));
   }
+}
+
+//================================================================
+// Function : contextMenuPopup
+// Purpose  : 
+//================================================================
+void GLViewer_Viewer::contextMenuPopup( QPopupMenu* thePopup )
+{
+  if( thePopup->count() > 0 )
+      thePopup->insertSeparator();
+
+  thePopup->insertItem( tr( "CHANGE_BGCOLOR" ), this, SLOT( onChangeBgColor() ) );
+}
+
+/*!
+    Sets the background color with color selection dialog. [ virtual protected slot ]
+*/
+void GLViewer_Viewer::onChangeBgColor()
+{
+  GLViewer_ViewPort* vp = getActiveView()->getViewPort();
+  QColor selColor = QColorDialog::getColor( vp->backgroundColor() );
+
+  if( selColor.isValid() )
+    vp->setBackgroundColor( selColor );
 }
 
 /*!
@@ -218,7 +244,6 @@ void GLViewer_Viewer::onTransformationStarted()
         transform */
     if( !myTransformer )
         return;
-    //int type = myTransformer->type();
     qApp->installEventFilter( this );
 }
 
@@ -233,7 +258,6 @@ void GLViewer_Viewer::onTransformationFinished()
     /* Stop watch events */
     if( !myTransformer )
         return;
-    //int type = myTransformer->type();
     qApp->removeEventFilter( this );
 }
 
@@ -274,7 +298,7 @@ bool GLViewer_Viewer::eventFilter( QObject* o, QEvent* e )
     if( !getActiveView() )
         return false;
 
-    if( getActiveView()->getViewPort() == o->parent() ) // for QAD_GLWidget
+    if( getActiveView()->getViewPort() == o->parent() )
       o = o->parent();
 
     bool mouseClickedOutside = ( e->type() == QEvent::MouseButtonPress &&
@@ -379,7 +403,7 @@ void GLViewer_Viewer::update( int flags )
 void GLViewer_Viewer::unhilightDetected()
 {
     if ( getSelector() )
-        getSelector()->detect( -1, -1 );
+        getSelector()->undetectAll();
 }
 
 /*!
@@ -568,29 +592,24 @@ void GLViewer_ViewTransformer::exec()
     if( !avp )
         return;
 
-    //QAD_Desktop* d = QAD_Application::getDesktop();
     switch( myType )
     {
         case GLViewer_Viewer::Zoom:
             myMajorBtn = zoomButton();
             avp->setCursor( *avp->getZoomCursor() );
-            //d->putInfo( myViewer->tr( "PRP_VW_ZOOM" ) );
             break;
         case GLViewer_Viewer::Pan:
             myMajorBtn = panButton();
             avp->setCursor( *avp->getPanCursor() );
-            //d->putInfo( myViewer->tr( "PRP_VW_PAN" ) );
             break;
         case GLViewer_Viewer::PanGlobal:
             myMajorBtn = panGlobalButton();
             avp->setCursor( *avp->getPanglCursor() );
             avp->fitAll( true, false );  /* view is ready now */
-            //d->putInfo( myViewer->tr( "PRP_VW_POINTCENTER" ) );
             break;
         case GLViewer_Viewer::FitRect:
             myMajorBtn = fitRectButton();
             avp->setCursor( *avp->getHandCursor() );
-            //d->putInfo( myViewer->tr( "PRP_VW_SKETCHAREA" ) );
             break;
         case GLViewer_Viewer::Reset:
             avp->reset(); onTransform( Fin );
@@ -760,8 +779,6 @@ GLViewer_ViewSketcher::~GLViewer_ViewSketcher()
 
     if ( myType == GLViewer_Viewer::Rect )
         delete ( QRect* ) myData;
-
-    //QAD_Application::getDesktop()->clearInfo();
 }
 
 /*!

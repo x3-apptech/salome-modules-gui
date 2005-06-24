@@ -16,7 +16,6 @@
 #include "windows.h"
 #endif
 
-//#include "QAD.h"
 #include "GLViewer_Object.h"
 
 #include <qmap.h>
@@ -47,13 +46,14 @@ enum SelectionStatus
     SS_NoChanged
 };
 
-class GLVIEWER_EXPORT GLViewer_Context : public QObject
+class GLVIEWER_API GLViewer_Context
 {
-  Q_OBJECT
-
 public:
   GLViewer_Context( GLViewer_Viewer2d* );
   ~GLViewer_Context();
+
+  void                  setUpdateAll( bool on ) { myUpdateAll = on; }
+  bool                  isUpdateAll() const { return myUpdateAll; }
 
   int                   MoveTo( int x, int y, bool byCircle = FALSE );
   int                   Select( bool Append = FALSE, bool byCircle = FALSE );
@@ -63,6 +63,7 @@ public:
   void                  SetSelectionColor( Quantity_NameOfColor aCol );
   Quantity_NameOfColor  HighlightColor() { return myHighlightColor; }
   Quantity_NameOfColor  SelectionColor() { return mySelectionColor; } 
+
   int                   NbSelected();
   void                  InitSelected();
   bool                  MoreSelected();
@@ -71,34 +72,43 @@ public:
 
   bool                  isSelected( GLViewer_Object* );
 
-  int                   insertObject( GLViewer_Object*, bool display = FALSE );
+  int                   insertObject( GLViewer_Object*, bool display = false, bool isActive = true );
   bool                  replaceObject( GLViewer_Object*, GLViewer_Object* );
   void                  updateScales( GLfloat, GLfloat );
   void                  setTolerance( int tol ) { myTolerance = tol; }
-  const ObjectMap&      getObjects() { return myObjects; }
-  const ObjList&        getObjList() { return myObjList; }
-  GLViewer_Object*      getFirstObject() { return myObjects.begin().key(); }
 
+  //const ObjectMap&      getObjects() { return myObjects; }
+  const ObjList&        getObjects( bool isActive = true )
+                        { return isActive ? myActiveObjects : myInactiveObjects; }
+  GLViewer_Object*      getFirstObject() { return *( myActiveObjects.begin() ); }
+
+  void                  clearHighlighted();
   void                  clearSelected( bool updateViewer );
   void                  setSelected( GLViewer_Object*, bool updateViewer );
   void                  remSelected( GLViewer_Object*, bool updateViewer );
 
   GLViewer_Object*      getCurrentObject() { return myLastPicked; }
-  bool                  currentObjectIsChanged() { return isLastPickedChanged; }
+  bool                  currentObjectIsChanged() { return myLastPickedChanged; }
 
   void                  eraseObject( GLViewer_Object*, bool updateViewer = true );
   void                  deleteObject( GLViewer_Object*, bool updateViewer = true );
 
+  bool                  setActive( GLViewer_Object* );
+  bool                  setInactive( GLViewer_Object* );
+
 protected:
+  bool                  myUpdateAll;
+
   GLViewer_Viewer2d*    myGLViewer2d;
   GLViewer_Object*      myLastPicked;
-  bool                  isLastPickedChanged;
-  ObjectMap             myObjects;
-  ObjList               myObjList;
-  int                   myNumber;
-  QValueList<int>       mySelNumbers;
+  bool                  myLastPickedChanged;
+
+  ObjList               myActiveObjects;
+  ObjList               myInactiveObjects;
+
+  ObjList               mySelectedObjects;
   int                   mySelCurIndex;
-  int                   myHNumber;
+
   GLfloat               myXhigh;
   GLfloat               myYhigh;
   Quantity_NameOfColor  myHighlightColor;

@@ -10,6 +10,8 @@
 **  Created: UI team, 05.09.00
 ****************************************************************************/
 
+//#include <GLViewerAfx.h>
+
 #if !defined WNT
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
@@ -179,9 +181,9 @@ void GLViewer_ViewPort::createCursors ()
     panCursor   = new QCursor( SizeAllCursor );
 
     SUIT_ResourceMgr* rmgr = SUIT_Session::session()->resourceMgr();
-    zoomCursor   = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_CURSOR_ZOOM" ) ) );
-    rotCursor    = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_CURSOR_ROTATE" ) ) );
-    sketchCursor = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_CURSOR_SKETCH" ) ) );
+    zoomCursor   = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_GL_CURSOR_ZOOM" ) ) );
+    rotCursor    = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_GL_CURSOR_ROTATE" ) ) );
+    sketchCursor = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_GL_CURSOR_SKETCH" ) ) );
 }
 
 /*!
@@ -300,7 +302,7 @@ void GLViewer_ViewPort::initialize()
 
     setMouseTracking( true );
     setBackgroundMode( NoBackground );
-    // set focus policy to threat QContextMenuEvent from keyboard  
+
     setFocusPolicy( StrongFocus );
 }
 
@@ -323,8 +325,8 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
     if ( x11Display() )
     {
         /* Initialization with the default VisualID */
-        Visual *v = DefaultVisual( x11Display(), DefaultScreen( x11Display() ) );
-	/*int visualID = */XVisualIDFromVisual( v );
+        //Visual *v = DefaultVisual( x11Display(), DefaultScreen( x11Display() ) );
+        // int visualID = XVisualIDFromVisual( v ); unused
 
         /*  Here we use the settings from Optimizer_ViewInfo::TxglCreateWindow() */
         int visualAttr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
@@ -557,40 +559,6 @@ void GLViewer_ViewPort::onUpdate()
 }
 
 /*!
-    Creates the popup. [ virtual protected ]
-*/
-void GLViewer_ViewPort::onCreatePopup( QPopupMenu* popup )
-{
-/*
-    if ( popup )
-    {
-        if( myPopupActions.isEmpty() )
-            return;
-        QAction* a = new QAction( "", tr( "MEN_VP_CHANGEBGR" ), 0, this );
-        a->setStatusTip( tr( "PRP_VP_CHANGEBGR" ) );
-        connect( a, SIGNAL( activated() ), SLOT( onChangeBgColor() ) );
-        myPopupActions.append( a );
-        a->addTo( popup );
-    }
-*/
-}
-
-/*!
-    Destroys the popup. [ virtual protected ]
-*/
-void GLViewer_ViewPort::onDestroyPopup( QPopupMenu* popup )
-{
-/*
-    if ( popup )
-    {
-        for ( QAction* a = myPopupActions.first(); a; a = myPopupActions.next() )
-            a->removeFrom( popup );
-        myPopupActions.clear();
-    }
-*/
-}
-
-/*!
     Sets the background color with color selection dialog. [ virtual protected slot ]
 */
 void GLViewer_ViewPort::onChangeBgColor()
@@ -600,9 +568,7 @@ void GLViewer_ViewPort::onChangeBgColor()
         setBackgroundColor( selColor );
 }
 
-
-//****************************************************************
-void GLViewer_ViewPort::contextMenuEvent ( QContextMenuEvent * e )
+void GLViewer_ViewPort::contextMenuEvent( QContextMenuEvent* e )
 {
   //if ( e->reason() != QContextMenuEvent::Mouse )
     emit contextMenuRequested( e );

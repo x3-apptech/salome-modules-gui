@@ -10,6 +10,7 @@
 **  Created: UI team, 22.09.00
 *****************************************************************************/
 
+//#include <GLViewerAfx.h>
 #include "GLViewer_Selector.h"
 
 #include "GLViewer_Viewer.h"

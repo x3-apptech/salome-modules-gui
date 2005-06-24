@@ -39,7 +39,7 @@ enum BlockStatus
     BS_Dragging         = 0x0004
 };
 
-class GLVIEWER_EXPORT GLViewer_ViewPort: public QWidget//, public QAD_PopupServer
+class GLVIEWER_API GLViewer_ViewPort: public QWidget
 {
     Q_OBJECT
     friend class GLViewer_ViewSketcher;
@@ -111,11 +111,6 @@ protected:
     virtual void                     fitSelect() = 0;
     virtual void                     fitAll( bool keepScale = false, bool withZ = true ) = 0;
 
-// POPUP
-    virtual void                     onCreatePopup() {}
-    virtual void                     onCreatePopup( QPopupMenu* );
-    virtual void                     onDestroyPopup( QPopupMenu* );
-
 protected slots:
     virtual void                     onChangeBgColor();
 
@@ -124,7 +119,8 @@ signals:
     void                             vpMouseEvent( QMouseEvent* );
     void                             vpWheelEvent( QWheelEvent* );
     void                             vpDrawExternal( QPainter* );
-    void                             contextMenuRequested( QContextMenuEvent *e );
+
+    void                             contextMenuRequested( QContextMenuEvent* );
 
 private:
     void                             initialize();
