@@ -15,8 +15,7 @@ VPATH=.:@srcdir@:@srcdir@/resources
 EXPORT_HEADERS= GLViewer.h \
 		GLViewer_Context.h \
 		GLViewer_Defs.h \
-		GLViewer_Detector.h \
-		GLViewer_Drawer.h \
+        	GLViewer_Drawer.h \
 		GLViewer_Group.h \
 		GLViewer_Object.h \
 		GLViewer_Selector.h \
@@ -37,7 +36,6 @@ PO_FILES = GLViewer_images.po \
 LIB = libGLViewer.la
 
 LIB_SRC= GLViewer_Context.cxx \
-	 GLViewer_Detector.cxx \
 	 GLViewer_Drawer.cxx \
 	 GLViewer_Group.cxx \
 	 GLViewer_Object.cxx \
