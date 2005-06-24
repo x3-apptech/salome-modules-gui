@@ -59,18 +59,15 @@ void SalomeApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
     return;
 
   QMap<QString, GLViewer_Object*> aDisplayed;
-  const ObjectMap& displayed = cont->getObjects();
-  for ( ObjectMap::const_iterator it = displayed.begin(); it != displayed.end(); ++it )
+  const ObjList& displayed = cont->getObjects();
+  for ( ObjList::const_iterator it = displayed.begin(); it != displayed.end(); ++it )
   {
-    if ( it.key()->getVisible() )
+    GLViewer_Object* obj = *it;
+    if ( obj && obj->getVisible() )
     {
-      GLViewer_Object* obj = it.key();
-      if ( obj )
-      {
-        SALOME_GLOwner* owner = dynamic_cast< SALOME_GLOwner* >( obj->owner() );
-  	    if ( owner )
-          aDisplayed.insert( owner->entry(), obj );
-      }
+      SALOME_GLOwner* owner = dynamic_cast< SALOME_GLOwner* >( obj->owner() );
+      if ( owner )
+	aDisplayed.insert( owner->entry(), obj );
     }
   }
 

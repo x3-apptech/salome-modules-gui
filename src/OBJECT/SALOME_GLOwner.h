@@ -2,9 +2,10 @@
 #define SALOME_GLOWNER_H
 
 #include <string>
+//#include <GLViewer.h>
 #include <GLViewer_Object.h>
 
-class Standard_EXPORT SALOME_GLOwner : public GLViewer_Owner
+class GLVIEWER_API SALOME_GLOwner : public GLViewer_Owner
 {
 public:
   SALOME_GLOwner( const char* );
