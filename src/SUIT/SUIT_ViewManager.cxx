@@ -170,7 +170,7 @@ void SUIT_ViewManager::onMousePressed(SUIT_ViewWindow* theView, QMouseEvent* the
 //***************************************************************
 void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 {
-  if (view && myActiveView != view) {
+  if (view) {
     unsigned int aSize = myViews.size();
     for (uint i = 0; i < aSize; i++) {
       if (myViews[i] && myViews[i] == view) {
