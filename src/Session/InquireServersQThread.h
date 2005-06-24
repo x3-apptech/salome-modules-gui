@@ -7,11 +7,11 @@
 //  Module : SALOME
 //  $Header$
 
-#include <qapplication.h>
 #include <qthread.h> 
 #include <qvbox.h> 
 #include <qprogressbar.h> 
 #include <qlabel.h> 
+#include <qguardedptr.h> 
 
 /**********************************************************
 **  Class:   InquireEvent
@@ -40,6 +40,7 @@ class InquireServersQThread : public QThread
 {
 public:
   InquireServersQThread( InquireServersGUI* r );
+  virtual ~InquireServersQThread();
 
   //the main loop of this thread
   virtual void run() ;
@@ -63,7 +64,7 @@ private:
 
 //variables:
 
-  InquireServersGUI* receiver;
+  QGuardedPtr<InquireServersGUI> receiver;
   int _argc ;
   char ** _argv;
   //this variable is true if we are checking servers

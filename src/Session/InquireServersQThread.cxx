@@ -10,7 +10,7 @@
 using namespace std;
 #include "InquireServersQThread.h"
 
-#include <qlabel.h>
+#include <qapplication.h>
 #include <qpushbutton.h>
 #include <qabstractlayout.h> 
 #include <qlayout.h>
@@ -129,6 +129,7 @@ void InquireServersGUI::setPixmap( QPixmap pix )
 
 InquireServersGUI::~InquireServersGUI()
 {
+  // Thread deletes itself in the end of run() function
   delete myThread;
 }
 
@@ -252,22 +253,20 @@ InquireServersQThread::InquireServersQThread( InquireServersGUI* r )
 
 void InquireServersQThread::run()
 {
-  while (IsChecking)
+  while ( IsChecking && receiver )
   {
-    if ( !receiver ) 
-    {
-      myExitStatus = 0;
-      return;
-    }
     for (int i=1; i<=8; i++)
       {
 	if ( myMessages[i-1].isEmpty() ) {
-	  if (i==8) {
+	  if ( i==8 ) {
 	    IsChecking = false;
 	    //myExitStatus should be 0 because all servers exist and work
 	    myExitStatus = 0;
 	    //we should send QCloseEvent in order to close this widget (and remove from screen) 
+	    qApp->processEvents();
+	    sleep( 1 ); // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
 	    QThread::postEvent ( receiver , new QCloseEvent() );
+	    break;
 	  } else
 	    continue;
 	}
@@ -279,13 +278,16 @@ void InquireServersQThread::run()
 	if (result)
 	  {
 	    QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEvent, new int( i ) ) );
-	    if (i==8)
+	    if ( i==8 )
 	      {
 		IsChecking = false;
 		//myExitStatus should be 0 because all servers exist and work
 		myExitStatus = 0;
-		//we should send QCloseEvent in order to close this widget (and remove from screen) 
+		//we should send QCloseEvent in order to close this widget (and remove from screen)
+		qApp->processEvents();
+		sleep( 1 );  // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
 		QThread::postEvent ( receiver , new QCloseEvent() );
+		break;
 	      }
 	  }
 	else
@@ -297,6 +299,13 @@ void InquireServersQThread::run()
 	  }
       }
   }
+
+  // this outputs WARNING: QThread object is deleted while still running -- it's OK in our case!
+  //delete this;
+}
+
+InquireServersQThread::~InquireServersQThread()
+{
 }
 
 bool InquireServersQThread::AskServer(int iteration, QString ** errMessage)
