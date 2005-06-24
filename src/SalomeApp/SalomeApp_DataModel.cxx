@@ -29,7 +29,8 @@
 //=======================================================================
 SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
 						 SUIT_DataObject* parent,
-						 SalomeApp_Study* study )
+						 SalomeApp_Study* study,
+						 bool skip  )
 {
   SalomeApp_DataObject* aDataObj = 0;
   if ( !obj || !study )
@@ -39,6 +40,17 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
   if ( obj->GetName().size() || obj->ReferencedObject( refObj ) )  // skip nameless non references SObjects
   {
     _PTR(SComponent) aSComp( obj );
+
+    // patch for bug IPAL9313
+    if ( aSComp && parent && skip ) 
+    {
+      QString aSName( aSComp->GetName().c_str() );
+      DataObjectList allComponents = parent->children( /*recursive=*/false );
+      for ( DataObjectListIterator it( allComponents ); it.current(); ++it )
+	if ( it.current()->name() == aSName )
+	  return it.current();
+    }
+
     aDataObj = aSComp ? new SalomeApp_ModuleObject( aSComp, parent ) :
                         new SalomeApp_DataObject  ( obj, parent );
 

@@ -1615,6 +1615,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
 
 void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
 {
+  // update existing data models (already loaded SComponents)
   if ( updateModels ) 
   {
     for ( ModuleListIterator it = modules(); it.current(); ++it )
@@ -1624,6 +1625,25 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
         ((SalomeApp_DataModel*)camDM)->update();
     }
   }
+  // update "non-existing" (not loaded yet) data models
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  if ( study ) 
+  {
+    _PTR(Study) stdDS = study->studyDS();
+    if( stdDS ) 
+    {
+      for ( _PTR(SComponentIterator) it ( stdDS->NewComponentIterator() ); it->More(); it->Next() ) 
+      {
+	_PTR(SComponent) aComponent ( it->Value() ); 
+
+	if ( aComponent->ComponentDataType() == "Interface Applicative" )
+	  continue; // skip the magic "Interface Applicative" component
+    
+	SalomeApp_DataModel::BuildTree( aComponent, study->root(), study, /*skipExisitng=*/true );
+      }
+    }
+  }
+
   if ( objectBrowser() )
     objectBrowser()->updateTree();
 }

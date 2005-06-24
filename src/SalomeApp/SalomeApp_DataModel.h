@@ -32,7 +32,8 @@ class SALOMEAPP_EXPORT SalomeApp_DataModel : public CAM_DataModel
 public:
   static SUIT_DataObject*             BuildTree(const _PTR(SObject)& obj, 
 						SUIT_DataObject* parent, 
-						SalomeApp_Study* study );
+						SalomeApp_Study* study,
+						bool skip = false );
 
                                       SalomeApp_DataModel ( CAM_Module* theModule );
   virtual                             ~SalomeApp_DataModel();
