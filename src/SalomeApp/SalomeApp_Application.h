@@ -147,6 +147,7 @@ protected:
 
   virtual void                        createPreferences( SalomeApp_Preferences* );
   virtual void                        preferencesChanged( const QString&, const QString& );
+  virtual void                        updateDesktopTitle();
 
 protected slots:
   virtual void          onDesktopActivated();

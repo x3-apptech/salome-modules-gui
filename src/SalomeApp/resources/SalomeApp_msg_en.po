@@ -200,6 +200,9 @@ msgstr "All files (*.*)"
 msgid "SalomeApp_Application::PYTHON_FILES_FILTER"
 msgstr "PYTHON Files (*.py)"
 
+msgid "SalomeApp_Application::STUDY_LOCKED"
+msgstr "LOCKED"
+
 //=======================================================================================
 
 msgid "SalomeApp_ModuleDlg::CAPTION"

@@ -1338,6 +1338,31 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
   
 }
 
+void SalomeApp_Application::updateDesktopTitle() {
+  QString aTitle = applicationName();
+  QString aVer = applicationVersion();
+  if ( !aVer.isEmpty() )
+    aTitle += QString( " " ) + aVer;
+
+  if ( activeStudy() )
+  {
+    QString sName = SUIT_Tools::file( activeStudy()->studyName().stripWhiteSpace(), false );
+    if ( !sName.isEmpty() ) {
+      SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+      _PTR(Study) stdDS = study->studyDS();
+      if(stdDS) {
+	if ( stdDS->GetProperties()->IsLocked() ) {
+	  aTitle += QString( " - [%1 (%2)]").arg( sName ).arg( tr( "STUDY_LOCKED" ) );
+	} else {
+	  aTitle += QString( " - [%1]" ).arg( sName );
+	}
+      }
+    }
+  }
+
+  desktop()->setCaption( aTitle );
+}
+
 void SalomeApp_Application::afterCloseDoc()
 {
   updateWindows();
@@ -1536,6 +1561,7 @@ void SalomeApp_Application::onProperties()
     SB->AbortCommand();
 
   //study->updateCaptions();
+  updateDesktopTitle();
 }
 
 QString SalomeApp_Application::getFileName( bool open, const QString& initial, const QString& filters, 
