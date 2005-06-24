@@ -53,7 +53,8 @@ Session_ServerLauncher::Session_ServerLauncher(int argc,
 					       CORBA::ORB_ptr orb, 
 					       PortableServer::POA_ptr poa,
 					       QMutex *GUIMutex,
-					       QWaitCondition *ServerLaunch)
+					       QWaitCondition *ServerLaunch,
+					       QWaitCondition *SessionStarted)
 {
   _argc = argc;
   _argv = argv;
@@ -61,6 +62,7 @@ Session_ServerLauncher::Session_ServerLauncher(int argc,
   _root_poa = PortableServer::POA::_duplicate(poa);
   _GUIMutex = GUIMutex;
   _ServerLaunch = ServerLaunch;
+  _SessionStarted = SessionStarted;
 }
 
 //=============================================================================
@@ -81,13 +83,14 @@ Session_ServerLauncher::~Session_ServerLauncher()
 
 void Session_ServerLauncher::run()
 {
-  MESSAGE("****>>> Session_ServerLauncher::run");
   _GUIMutex->lock(); // lock released by calling thread when ready: wait(mutex)
-  MESSAGE("****>>> Server Launcher thread free to go...");
-   _GUIMutex->unlock();
-   _ServerLaunch->wakeAll();
+  _GUIMutex->unlock();
+  _ServerLaunch->wakeAll();
+
   CheckArgs();
   ActivateAll();
+
+  _SessionStarted->wakeAll(); // wake main thread
 
   _orb->run();       // this thread wait, during omniORB process events
 }
@@ -195,7 +198,7 @@ void Session_ServerLauncher::ActivateAll()
 	argv[i+1] = _argv[(*itServ)._firstArg + i];
     }
 
-std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
+    std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
 
     Session_ServerThread* aServerThread
       = new Session_ServerThread(argc, argv, _orb,_root_poa,_GUIMutex);
@@ -205,8 +208,7 @@ std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
   }
 
   // Always launch Session Server
-
-std::cout << "*** activating [ SESSION ] " << std::endl;
+  std::cout << "*** activating [ SESSION ] " << std::endl;
 
   int argc=1;
   char** argv = new char*[argc];
@@ -229,7 +231,7 @@ void Session_ServerLauncher::KillAll()
   MESSAGE("Session_ServerLauncher::KillAll()");
   list<Session_ServerThread*>::reverse_iterator itServ;
   for (itServ = _serverThreads.rbegin(); itServ !=_serverThreads.rend(); itServ++)
-    {
-      delete (*itServ);
-    }
+  {
+    delete (*itServ);
+  }
 }

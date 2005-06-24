@@ -256,15 +256,16 @@ int main(int argc, char **argv)
 
     // CORBA Servant Launcher
     QMutex _GUIMutex ;
-    QWaitCondition _ServerLaunch;
+    QWaitCondition _ServerLaunch, _SessionStarted;
     _GUIMutex.lock();     // to block Launch server thread until wait(mutex)
     
     // 2. activate embedded CORBA servers: Registry, SALOMEDS, etc.
     Session_ServerLauncher* myServerLauncher
-      = new Session_ServerLauncher(argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch);
+      = new Session_ServerLauncher(argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionStarted);
     myServerLauncher->start();
     
-    _ServerLaunch.wait(&_GUIMutex); // to be reseased by Launch server thread when ready:
+    _ServerLaunch.wait(&_GUIMutex); // to be reseased by Launch server thread when ready
+
     // show splash screen if "SPLASH" parameter was passed (default)
     if ( isFound( "SPLASH", argc, argv ) ) 
     {
@@ -290,6 +291,8 @@ int main(int argc, char **argv)
       if ( splash.getExitStatus() ) // 1 is error
 	exit( splash.getExitStatus() ); // quit applicaiton
     }
+    else
+      _SessionStarted.wait();
 
     // call Session::GetInterface() if "GUI" parameter was passed (default) 
     if ( isFound( "GUI", argc, argv ) ) 
