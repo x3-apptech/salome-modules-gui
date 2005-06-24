@@ -192,10 +192,12 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
     float b1 = vtkMath::Norm(vec_b1);
 
     float b2 = vtkMath::Norm(vec_b2);
+    float aCos = vtkMath::Dot(vec_b1,vec_b2)/(b1*b2);
     
-    float angle=180*acosf(vtkMath::Dot(vec_b1,vec_b2)/(b1*b2))/vtkMath::Pi();
+    float angle=90.0;
+    angle = aCos>=1.0 ? 0.0 : 180*acosf(aCos)/vtkMath::Pi();
     
-    if( angle <= FACE_ANGLE_TOLERANCE )
+    if( angle <= FACE_ANGLE_TOLERANCE)
       status = true;
     if (MYDEBUG){
       for(int k=0;k<4;k++){
@@ -205,7 +207,7 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
 	}
 	cout << p[k][2] << ")   ";
       }
-      cout << "angle="<<angle<<endl;
+      cout << "angle="<<angle<<" status="<<status<<endl;
     }
     
   } else if (common_ids.size() >2){
