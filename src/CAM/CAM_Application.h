@@ -46,6 +46,8 @@ public:
   QString             moduleName( const QString& ) const;
   QString             moduleTitle( const QString& ) const;
 
+  virtual void        createEmptyStudy();
+
 protected:
   virtual SUIT_Study* createNewStudy();
   virtual void        updateCommandsStatus();
