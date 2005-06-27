@@ -1702,3 +1702,9 @@ bool Plot2d_Plot2d::existMarker( const QwtSymbol::Style typeMarker, const QColor
   }
   return false;
 }
+
+// TEMPORARY SOLUTION!!!  TO BE IMPLEMENTED!!!
+Plot2d_Prs* Plot2d_ViewFrame::CreatePrs( const char* /*entry*/ )
+{
+  return 0;
+}
