@@ -1,23 +1,23 @@
 //  SALOME Session : implementation of Session.idl
 //
 //  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
 //
 //
 //
@@ -48,13 +48,13 @@ using namespace std;
 //=============================================================================
 /*! SALOME_Session_i
  *  constructor
- */ 
+ */
 //=============================================================================
 
-SALOME_Session_i::SALOME_Session_i(int argc, 
-				   char ** argv, 
-				   CORBA::ORB_ptr orb, 
-				   PortableServer::POA_ptr poa, 
+SALOME_Session_i::SALOME_Session_i(int argc,
+				   char ** argv,
+				   CORBA::ORB_ptr orb,
+				   PortableServer::POA_ptr poa,
 				   QMutex* GUIMutex,
 				   QWaitCondition* GUILauncher)
 {
@@ -72,7 +72,7 @@ SALOME_Session_i::SALOME_Session_i(int argc,
 //=============================================================================
 /*! GetVisuComponent
  *  returns Visu component
- */ 
+ */
 //=============================================================================
 
 Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName)
@@ -90,19 +90,19 @@ Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName
 //=============================================================================
 /*! ~SALOME_Session_i
  *  destructor
- */ 
+ */
 //=============================================================================
 
 SALOME_Session_i::~SALOME_Session_i()
 {
-  //MESSAGE("destructor end"); 
+  //MESSAGE("destructor end");
 }
 
 //=============================================================================
 /*! NSregister
  *  tries to find the Corba Naming Service and to register the session,
  *  gives naming service interface to _IAPPThread
- */ 
+ */
 //=============================================================================
 
 void SALOME_Session_i::NSregister()
@@ -122,30 +122,31 @@ void SALOME_Session_i::NSregister()
     {
       INFOS("Caught unknown exception from Naming Service");
     }
-  //MESSAGE("Session registered in Naming Service"); 
+  //MESSAGE("Session registered in Naming Service");
 }
 
 //=============================================================================
 /*! GetInterface
  *  Launches the GUI if there is none.
  *  The Corba method is oneway (corba client does'nt wait for GUI completion)
- */ 
+ */
 //=============================================================================
 
 void SALOME_Session_i::GetInterface()
 {
   _GUIMutex->lock();
   _GUIMutex->unlock();
-  if( !SUIT_Session::session() ) {    
+  if ( !SUIT_Session::session() )
+  {
     _GUILauncher->wakeAll();
     MESSAGE("SALOME_Session_i::GetInterface() called, starting GUI...")
-  }
+      }
 }
 
 //=============================================================================
 /*! StopSession
  *  Kills the session if there are no active studies nore GUI
- */ 
+ */
 //=============================================================================
 class CloseEvent : public SALOME_Event
 {
@@ -162,12 +163,12 @@ void SALOME_Session_i::StopSession()
 {
   ProcessVoidEvent( new CloseEvent() );
 }
- 
+
 //=============================================================================
 /*! StatSession
  *  Send a SALOME::StatSession structure (see idl) to the client
  *  (number of running studies and presence of GUI)
- */ 
+ */
 //=============================================================================
 
 class QtLock
@@ -181,13 +182,13 @@ public:
 SALOME::StatSession SALOME_Session_i::GetStatSession()
 {
   // update Session state
-  _GUIMutex->lock();    
+  _GUIMutex->lock();
 
   _runningStudies = 0;
   {
     QtLock lock;
     _isGUI = SUIT_Session::session();
-    if ( _isGUI && SUIT_Session::session()->activeApplication() ) 
+    if ( _isGUI && SUIT_Session::session()->activeApplication() )
       _runningStudies = SUIT_Session::session()->activeApplication()->getNbStudies();
   }
 
