@@ -1058,9 +1058,9 @@ void OB_Browser::openBranch( QListViewItem* item, const int level )
   if ( !item || level < 1 || !item->childCount() )
     return;
 
-  item->setOpen( true );
   while ( item )
   {
+    item->setOpen( true );
     openBranch( item->firstChild(), level - 1 );
     item = item->nextSibling();
   }
