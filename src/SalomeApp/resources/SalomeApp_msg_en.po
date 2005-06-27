@@ -236,12 +236,6 @@ msgstr "from scratch"
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE_FROM_COPYFROM"
 msgstr "copy from"
 
-msgid "SalomeApp_StudyPropertiesDlg::PRP_NO"
-msgstr "No"
-
-msgid "SalomeApp_StudyPropertiesDlg::PRP_YES"
-msgstr "Yes"
-
 msgid "SalomeApp_StudyPropertiesDlg::TLT_STUDY_PROPERTIES"
 msgstr "Study Properties"
 
@@ -262,6 +256,12 @@ msgstr "Modified"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODIFICATIONS"
 msgstr "Modifications"
+
+msgid "SalomeApp_StudyPropertiesDlg::PRP_YES"
+msgstr "Yes"
+
+msgid "SalomeApp_StudyPropertiesDlg::PRP_NO"
+msgstr "No"
 
 //=======================================================================================
 

@@ -63,8 +63,8 @@ public:
       }
     case SalomeApp_StudyPropertiesDlg::prpLockedId:
       {
-	list << SalomeApp_StudyPropertiesDlg::tr("PRP_NO") << SalomeApp_StudyPropertiesDlg::tr("PRP_YES");
-	theWidget->insertList(list, getValue() == SalomeApp_StudyPropertiesDlg::tr("PRP_NO") ? 0 : 1);    
+	list << SalomeApp_StudyPropertiesDlg::tr( "PRP_NO" ) << SalomeApp_StudyPropertiesDlg::tr( "PRP_YES" );
+	theWidget->insertList(list, getValue() == SalomeApp_StudyPropertiesDlg::tr( "PRP_NO" ) ? 0 : 1 );    
 	break;
       }
     case SalomeApp_StudyPropertiesDlg::prpModificationsId:
@@ -190,15 +190,16 @@ void SalomeApp_StudyPropertiesDlg::initData()
   // Locked or not
   item = new SalomeApp_PropItem(myPropList, item, tr("PRP_LOCKED")+":", true, prpLockedId);
   item->setEditingType( SalomeApp_EntityEdit::etComboBox);  
-  if (hasData) (propAttr->IsLocked()) ? item->setValue(tr("PRP_YES")) : item->setValue(tr("PRP_NO"));
+  if ( hasData )
+    item->setValue( tr( propAttr->IsLocked() ? "PRP_YES" : "PRP_NO" ) );
 
   // Saved or not
   item = new SalomeApp_PropItem(myPropList, item, tr("PRP_MODIFIED")+":", false, prpSavedId);
   if (hasData) {
     if (propAttr->IsModified())
-      item->setValue(tr("PRP_YES"));
+      item->setValue( tr( "PRP_YES" ) );
     else
-      item->setValue(tr("PRP_NO"));
+      item->setValue( tr( "PRP_NO" ) );
   }
 
   // Modifications list

@@ -12,7 +12,8 @@
 #ifndef SALOMEAPP_LISTVIEW_H
 #define SALOMEAPP_LISTVIEW_H
 
-#include <qlistview.h>
+#include <QtxListView.h>
+
 #include <qlist.h>
 #include <qstring.h>
 #include <qpixmap.h>
@@ -47,7 +48,7 @@ class SalomeApp_EntityEdit;
 // Class        : SalomeApp_ListView
 // Description  : parent class for Data Viewer and Properties Viewer
 //================================================================
-class SalomeApp_ListView : public QListView , public SUIT_PopupClient  {
+class SalomeApp_ListView : public QtxListView , public SUIT_PopupClient  {
   
   Q_OBJECT
     

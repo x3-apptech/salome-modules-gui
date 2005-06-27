@@ -9,7 +9,7 @@
 #include <qlayout.h>
 
 SalomeApp_PreferencesDlg::SalomeApp_PreferencesDlg( SalomeApp_Preferences* prefs, QWidget* parent )
-: QtxDialog( parent, 0, true, false, Standard | Apply ),
+: QtxDialog( parent, 0, true, false, OK | Cancel | Apply ),
 myPrefs( prefs )
 {
   setCaption( tr( "CAPTION" ) );
