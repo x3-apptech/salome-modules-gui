@@ -46,16 +46,12 @@ PO_FILES = GLViewer_images.po \
 # Libraries targets
 LIB = libGLViewer.la
 
-<<<<<<< Makefile.in
 LIB_SRC= GLViewer_AspectLine.cxx \
 	 GLViewer_BaseDrawers.cxx \
 	 GLViewer_BaseObjects.cxx \
 	 GLViewer_Compass.cxx \
 	 GLViewer_Context.cxx \
 	 GLViewer_CoordSystem.cxx \
-=======
-LIB_SRC= GLViewer_Context.cxx \
->>>>>>> 1.3
 	 GLViewer_Drawer.cxx \
 	 GLViewer_Geom.cxx \
 	 GLViewer_Grid.cxx \
