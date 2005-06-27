@@ -5,6 +5,7 @@
 
 #include <qmap.h>
 #include <qcolor.h>
+#include <qpixmap.h>
 #include <qstringlist.h>
 #include <qtranslator.h>
 
@@ -93,10 +94,15 @@ public:
   QString         option( const QString& ) const;
   void            setOption( const QString&, const QString& );
 
+  QPixmap         defaultPixmap() const;
+  virtual void    setDefaultPixmap( const QPixmap& );
+
   QString         resSection() const;
   QString         langSection() const;
 
-  QPixmap         loadPixmap( const QString&, const QString&, const bool = true ) const;
+  QPixmap         loadPixmap( const QString&, const QString& ) const;
+  QPixmap         loadPixmap( const QString&, const QString&, const bool ) const;
+  QPixmap         loadPixmap( const QString&, const QString&, const QPixmap& ) const;
   void            loadLanguage( const QString& = QString::null, const QString& = QString::null );
 
   void            raiseTranslators( const QString& );
@@ -142,6 +148,7 @@ private:
   ResList         myResources;
   TransListMap    myTranslator;
   QString         myCurSection;
+  QPixmap         myDefaultPix;
 };
 
 class QTX_EXPORT QtxResourceMgr::Format

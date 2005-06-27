@@ -13,32 +13,9 @@
 
 #include <stdlib.h>
 
-/* XPM */
-static const char* pixmap_not_found_xpm[] = {
-"16 16 3 1",
-"       c None",
-".      c #000000",
-"+      c #A80000",
-"                ",
-"                ",
-"    .     .     ",
-"   .+.   .+.    ",
-"  .+++. .+++.   ",
-"   .+++.+++.    ",
-"    .+++++.     ",
-"     .+++.      ",
-"    .+++++.     ",
-"   .+++.+++.    ",
-"  .+++. .+++.   ",
-"   .+.   .+.    ",
-"    .     .     ",
-"                ",
-"                ",
-"                "};
-
 /*!
-	Class: QtxResourceMgr::Resources
-	Level: Internal
+  Class: QtxResourceMgr::Resources
+  Level: Internal
 */
 
 QtxResourceMgr::Resources::Resources( const QString& fileName )
@@ -431,7 +408,7 @@ bool QtxResourceMgr::XmlFormat::load( const QString& fname, QMap<QString, Sectio
             else
               res = false;
           }
-	  else 
+	  else
 	    res = paramNode.isComment();
 
           paramNode = paramNode.nextSibling();
@@ -1116,16 +1093,35 @@ QString QtxResourceMgr::langSection() const
   return res;
 }
 
-QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, const bool useDefault ) const
+QPixmap QtxResourceMgr::defaultPixmap() const
+{
+  return myDefaultPix;
+}
+
+void QtxResourceMgr::setDefaultPixmap( const QPixmap& pix )
+{
+  myDefaultPix = pix;
+}
+
+QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name ) const
+{
+  return loadPixmap( prefix, name, true );
+}
+
+QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, const bool useDef ) const
+{
+  return loadPixmap( prefix, name, useDef ? defaultPixmap() : QPixmap() );
+}
+
+QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, const QPixmap& defPix ) const
 {
   initialize();
 
-  static QPixmap defaultPixmap( pixmap_not_found_xpm );
   QPixmap pix;
   for ( ResListIterator it( myResources ); it.current() && pix.isNull(); ++it )
     pix = it.current()->loadPixmap( resSection(), prefix, name );
-  if ( pix.isNull() && useDefault )
-     return defaultPixmap;
+  if ( pix.isNull() )
+    pix = defPix;
   return pix;
 }
 
