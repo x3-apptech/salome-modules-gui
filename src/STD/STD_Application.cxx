@@ -359,11 +359,10 @@ bool STD_Application::isPossibleToClose()
       switch ( aAnswer )
       {
       case 1:
-        if ( !activeStudy()->isSaved() )
-          if ( !onSaveAsDoc() )
-            return false;
-        else
+        if ( activeStudy()->isSaved() )
           onSaveDoc();
+        else if ( !onSaveAsDoc() )
+          return false;
         break;
       case 2:
         break;
