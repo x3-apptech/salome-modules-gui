@@ -294,7 +294,7 @@ void QtxDblSpinBox::updateDisplay()
   editor()->setUpdatesEnabled( upd );
 
   editor()->setText( myCleared ? QString::null : txt );
-  if ( !myCleared )
+  if ( !myCleared && editor()->hasFocus() )
   {
     if ( editor()->text() == specialValueText() )
       editor()->selectAll();

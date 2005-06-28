@@ -84,7 +84,7 @@ void QtxIntSpinBox::updateDisplay()
 
   if ( myCleared )
     editor()->clear();
-  else
+  else if ( editor()->hasFocus() )
   {
     if ( editor()->text() == specialValueText() )
       editor()->selectAll();
