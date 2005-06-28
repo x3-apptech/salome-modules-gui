@@ -127,6 +127,29 @@ void MessageOutput( QtMsgType type, const char* msg )
   }
 }
 
+/* XPM */
+static const char* pixmap_not_found_xpm[] = {
+"16 16 3 1",
+"       c None",
+".      c #000000",
+"+      c #A80000",
+"                ",
+"                ",
+"    .     .     ",
+"   .+.   .+.    ",
+"  .+++. .+++.   ",
+"   .+++.+++.    ",
+"    .+++++.     ",
+"     .+++.      ",
+"    .+++++.     ",
+"   .+++.+++.    ",
+"  .+++. .+++.   ",
+"   .+.   .+.    ",
+"    .     .     ",
+"                ",
+"                ",
+"                "};
+
 class SALOME_Session : public SUIT_Session
 {
 public:
@@ -140,6 +163,8 @@ protected:
     resMgr->setVersion( salomeVersion() );
     resMgr->setCurrentFormat( "xml" );
     resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
+    static QPixmap defaultPixmap( pixmap_not_found_xpm );
+    resMgr->setDefaultPixmap( defaultPixmap );
     return resMgr;
   }
 };
