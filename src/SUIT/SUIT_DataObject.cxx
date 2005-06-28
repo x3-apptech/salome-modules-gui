@@ -124,6 +124,22 @@ SUIT_DataObject* SUIT_DataObject::childObject( const int idx ) const
 }
 
 /*!
+    Returns the level of the object in the data tree.
+    0 means that object is top-level.
+*/
+
+int SUIT_DataObject::level() const
+{
+  int lev = 0;
+  SUIT_DataObject* p = parent();
+  while ( p ) {
+    p = p->parent();
+    lev++;
+  }
+  return lev;
+}
+
+/*!
     Returns the next data object in the child list of the parent.
 */
 
