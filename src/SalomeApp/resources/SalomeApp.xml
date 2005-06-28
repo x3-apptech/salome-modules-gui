@@ -73,8 +73,8 @@
     <parameter name="QuickDirList" value=""/>
     <!-- Here go other common user preferences -->
   </section>
-  <section name="GEOM">
-    <!-- Here go GEOM module user preferences -->
+  <section name="Geometry" >
+    <parameter value="255, 255, 0" name="shading_color" />
   </section>
   <section name="SMESH">
     <parameter name="plugins" value="NETGENPlugin,GHS3DPlugin"/>
