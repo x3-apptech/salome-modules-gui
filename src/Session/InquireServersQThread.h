@@ -9,8 +9,6 @@
 
 #include <qthread.h> 
 #include <qvbox.h> 
-#include <qprogressbar.h> 
-#include <qlabel.h> 
 #include <qguardedptr.h> 
 
 /**********************************************************
@@ -18,7 +16,6 @@
 **  Descr:   Contains QCustomEvents for posting to InquireServersQThread
 **  Level:   Private
 ***********************************************************/
-
 class InquireEvent : public QCustomEvent
 {
 public:
@@ -82,6 +79,9 @@ private:
 
 } ;
 
+class QLabel;
+class QFrame;
+class QProgressBar;
 class InquireServersGUI : public QVBox
 {
     Q_OBJECT
@@ -111,6 +111,7 @@ private:
   //this string contains description of currently asked server
   QLabel* myLabel;
   QLabel* mySplash;
+  QFrame* mySplashFrame;
   //  bool myGUI;
 
 private slots:

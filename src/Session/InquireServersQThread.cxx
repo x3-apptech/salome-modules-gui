@@ -20,6 +20,8 @@ using namespace std;
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qstringlist.h>
+#include <qlabel.h> 
+#include <qprogressbar.h> 
 
 //VRV: porting on Qt 3.0.5
 #if QT_VERSION >= 0x030005
@@ -59,12 +61,20 @@ InquireServersGUI::InquireServersGUI()
   setLineWidth( 2 );
   setMinimumSize( 200, 150 );
 
+  // 2. Set palette
+  QPalette pal = palette();
+  QColorGroup cg = pal.active();
+  cg.setColor( QColorGroup::Foreground, Qt::darkBlue ); 
+  cg.setColor( QColorGroup::Background, Qt::white );
+  pal.setActive( cg ); pal.setInactive( cg ); pal.setDisabled( cg );
+  setPalette( pal );
+
   // 2. Splash image
-  QFrame* frm = new QFrame( this );
-  frm->setFrameStyle( QFrame::Box | QFrame::Raised );
-  QHBoxLayout* frmLayout = new QHBoxLayout( frm );
+  mySplashFrame = new QFrame( this );
+  mySplashFrame->setFrameStyle( QFrame::Box | QFrame::Raised );
+  QHBoxLayout* frmLayout = new QHBoxLayout( mySplashFrame );
   frmLayout->setMargin( MARGIN_SIZE );
-  mySplash = new QLabel( frm, "splash" );
+  mySplash = new QLabel( mySplashFrame, "splash" );
   frmLayout->addWidget( mySplash );
 
   // setting pixmap
@@ -75,6 +85,14 @@ InquireServersGUI::InquireServersGUI()
   myPrgBar = new QProgressBar( this, "QProgressBar" );
   myPrgBar->setFixedWidth( 180 );
   //Sets the total number of steps . 
+  myPrgBar->setPercentageVisible( false );
+  myPrgBar->setIndicatorFollowsStyle( false );
+  myPrgBar->setFixedHeight( 8 );
+  myPrgBar->setFrameStyle( QFrame::Box | QFrame::Plain );
+  myPrgBar->setMargin( 0 );
+  pal = myPrgBar->palette(); cg = pal.active();
+  cg.setColor( QColorGroup::Highlight, Qt::red );
+  pal.setActive( cg ); pal.setInactive( cg ); pal.setDisabled( cg ); myPrgBar->setPalette( pal );
   myPrgBar->setTotalSteps ( myThread->getInquiredServers() );
   myPrgBar->setProgress( 0 );
 
@@ -122,8 +140,9 @@ void InquireServersGUI::setPixmap( QPixmap pix )
 {
   if ( !pix.isNull() ) {
     mySplash->setPixmap( pix );
-    myPrgBar->setFixedWidth( mySplash->sizeHint().width() );
-    myLabel->setFixedWidth( mySplash->sizeHint().width() );
+    int w = mySplash->sizeHint().width() + MARGIN_SIZE*2;
+    myPrgBar->setFixedWidth( w );
+    myLabel->setFixedWidth( w );
   }
 }
 
