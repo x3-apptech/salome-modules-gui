@@ -1121,6 +1121,9 @@ int SalomeStyle::pixelMetric( PixelMetric pm, const QWidget* widget ) const
   case PM_SpinBoxFrameWidth:
     ret = 1;
     break;
+  case PM_ProgressBarChunkWidth:
+    ret = 1;
+    break;
   default:
     ret = PARENT_STYLE::pixelMetric( pm, widget );
     break;
