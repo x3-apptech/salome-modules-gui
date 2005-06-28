@@ -1,0 +1,30 @@
+#  File   : Makefile.in
+#  Author : Vadim SANDLER (OCN)
+#  Module : SalomeApp
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+
+BIN = ResourceExporter
+BIN_SRC =
+
+CPPFLAGS += $(QT_INCLUDES)
+
+LDFLAGS += $(QT_MT_LIBS) 
+LIBS += -lsuit -lqtx
+
+LDFLAGSFORBIN = ${LDFLAGS}
+LIBSFORBIN = $(LIBS)
+@CONCLUDE@
+
+
+
+
+
