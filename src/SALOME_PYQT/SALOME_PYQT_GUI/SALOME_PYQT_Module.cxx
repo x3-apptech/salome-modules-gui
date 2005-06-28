@@ -12,10 +12,12 @@
 #include "PyInterp_Dispatcher.h"
 #include "SUIT_ResourceMgr.h"
 #include "STD_MDIDesktop.h"
+#include "STD_TabDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_DataModel.h"
 
+#include "QtxWorkstack.h"
 #include <SALOME_LifeCycleCORBA.hxx>
 
 #include <qfile.h>
@@ -93,12 +95,26 @@ private:
 // all Python-based SALOME module
 //=============================================================================
 
+// While the SalomePyQtGUI library is not imported in Python it's initialization function
+// should be called manually (and only once) in order to initialize global sip data
+#if defined(SIP_STATIC_MODULE)
+extern "C" void initSalomePyQtGUI();
+#else
+PyMODINIT_FUNC initSalomePyQtGUI();
+#endif
+
 /*!
  * This function creates an instance of SALOME_PYQT_Module object by request
  * of and application object when the module is loaded.
  */
 extern "C" {
   SALOME_PYQT_EXPORT CAM_Module* createModule() {
+    static bool alreadyInitialized = false;
+    if ( !alreadyInitialized ) {
+      // call only once (see above) !
+      initSalomePyQtGUI(); 
+      alreadyInitialized = !alreadyInitialized;
+    }
     return new SALOME_PYQT_Module();
   }
 }
@@ -697,10 +713,11 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
 
   // first try to create menu via XML parser:
   // we create popup menus without help of QtxPopupMgr
-  if ( !myXmlHandler )
+  if ( myXmlHandler )
     myXmlHandler->createPopup( thePopupMenu, aContext, aParent, aObject );
 
-  PyObjWrapper sipPopup( sipMapCppToSelf( thePopupMenu, sipClass_QPopupMenu ) );
+  PyObjWrapper sipPopup( sipBuildResult( 0, "M", thePopupMenu, sipClass_QPopupMenu ) );
+  //PyObjWrapper sipPopup( sipMapCppToSelf( thePopupMenu, sipClass_QPopupMenu ) );
 
   // then call Python module's createPopupMenu() method (for new modules)
   PyObjWrapper res1( PyObject_CallMethod( myModule,
@@ -845,17 +862,25 @@ void SALOME_PYQT_Module::setWorkSpace()
   }  
 #ifdef __CALL_OLD_METHODS__
   // ... then get workspace object
-  STD_MDIDesktop* aDesktop = dynamic_cast<STD_MDIDesktop*>( getApp()->desktop() );
-  if ( aDesktop && aDesktop->workspace() ) {
-    QWidget* aWorkspace = aDesktop->workspace();
-    PyObjWrapper pyws( sipMapCppToSelfSubClass( aWorkspace, sipClass_QWidget ) );
-    // ... and finally call Python module's setWorkspace() method (obsolete)
-    PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
-    if( !res ) {
-      // VSR: this method may not be implemented in Python module
-      // PyErr_Print();
-      return;
-    }
+  QWidget* aWorkspace = 0;
+  if ( getApp()->desktop()->inherits( "STD_MDIDesktop" ) ) {
+    STD_MDIDesktop* aDesktop = dynamic_cast<STD_MDIDesktop*>( getApp()->desktop() );
+    if ( aDesktop )
+      aWorkspace = aDesktop->workspace();
+  }
+  else if ( getApp()->desktop()->inherits( "STD_TabDesktop" ) ) {
+    STD_TabDesktop* aDesktop = dynamic_cast<STD_TabDesktop*>( getApp()->desktop() );
+    if ( aDesktop )
+      aWorkspace = aDesktop->workstack();
+  }
+  PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget ) );
+  //PyObjWrapper pyws( sipMapCppToSelfSubClass( aWorkspace, sipClass_QWidget ) );
+  // ... and finally call Python module's setWorkspace() method (obsolete)
+  PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
+  if( !res ) {
+    // VSR: this method may not be implemented in Python module
+    // PyErr_Print();
+    return;
   }
 #endif // __CALL_OLD_METHODS__
 }
