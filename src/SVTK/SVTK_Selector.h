@@ -40,7 +40,7 @@ class SALOME_Actor;
 class SVTK_Selector
 {
 public:
-  virtual ~SVTK_Selector() = 0;
+  virtual ~SVTK_Selector() {};
 
   virtual
   void 
