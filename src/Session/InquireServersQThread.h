@@ -42,11 +42,7 @@ public:
   //the main loop of this thread
   virtual void run() ;
   //stop to ask servers
-  void stop() 
-    {
-      IsChecking = false;
-      myExitStatus = 1;
-    }
+  void stop(); 
   //return exit status: 0 - OK, >0 - BAD (some servers doesn't exists or user click cancel button) 
   int getExitStatus() { return myExitStatus;}
   //return count of inquired servers
@@ -103,7 +99,6 @@ public:
 
 protected:
   virtual void customEvent( QCustomEvent* ); 
-  virtual void closeEvent ( QCloseEvent * );
 
 private:
   InquireServersQThread* myThread;

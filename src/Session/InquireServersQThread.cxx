@@ -138,7 +138,8 @@ InquireServersGUI::InquireServersGUI()
 
 void InquireServersGUI::setPixmap( QPixmap pix )
 {
-  if ( !pix.isNull() ) {
+  if ( !pix.isNull() ) 
+  {
     mySplash->setPixmap( pix );
     int w = mySplash->sizeHint().width() + MARGIN_SIZE*2;
     myPrgBar->setFixedWidth( w );
@@ -148,7 +149,6 @@ void InquireServersGUI::setPixmap( QPixmap pix )
 
 InquireServersGUI::~InquireServersGUI()
 {
-  // Thread deletes itself in the end of run() function
   delete myThread;
 }
 
@@ -164,22 +164,9 @@ void InquireServersGUI::getArgs( int& _argc, char *** _argv)
 //=================================================================================
 void InquireServersGUI::ClickOnCancel()
 {
-  //it's necessary to stop asking servers
-  myThread->stop();
-  //  myGUI = false;
-  //Also we should send QCloseEvent in order to close this widget (and remove from screen) 
-  //QThread::postEvent ( this, new QCloseEvent() );
-  qApp->exit(1);
-}
-
-void InquireServersGUI::closeEvent ( QCloseEvent * pe)
-{
-  //default implementation calls e->accept(), which hides this widget. 
-  //See the QCloseEvent documentation for more details.
-  pe->accept();
-  QApplication::flushX ();
-  QApplication::syncX ();
-  qApp->exit();
+  myThread->stop(); //it's necessary to stop asking servers
+  hide();
+  qApp->exit( 1 );
 }
 
 void InquireServersGUI::customEvent( QCustomEvent* pe )
@@ -275,52 +262,52 @@ void InquireServersQThread::run()
   while ( IsChecking && receiver )
   {
     for (int i=1; i<=8; i++)
+    {
+      if ( myMessages[i-1].isEmpty() ) 
       {
-	if ( myMessages[i-1].isEmpty() ) {
-	  if ( i==8 ) {
-	    IsChecking = false;
-	    //myExitStatus should be 0 because all servers exist and work
-	    myExitStatus = 0;
-	    //we should send QCloseEvent in order to close this widget (and remove from screen) 
-	    qApp->processEvents();
-	    sleep( 1 ); // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
-	    QThread::postEvent ( receiver , new QCloseEvent() );
-	    break;
-	  } else
-	    continue;
-	}
-	QString *message = new QString(myMessages[i-1]);
-	QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEventLabel, message ) );
-	QThread::usleep(200000);
-	QString *errMsg;
-	bool result = AskServer(i,&errMsg);
-	if (result)
-	  {
-	    QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEvent, new int( i ) ) );
-	    if ( i==8 )
-	      {
-		IsChecking = false;
-		//myExitStatus should be 0 because all servers exist and work
-		myExitStatus = 0;
-		//we should send QCloseEvent in order to close this widget (and remove from screen)
-		qApp->processEvents();
-		sleep( 1 );  // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
-		QThread::postEvent ( receiver , new QCloseEvent() );
-		break;
-	      }
-	  }
+	if ( i==8 ) 
+	{
+	  IsChecking = false;
+	  myExitStatus = 0;  //myExitStatus should be 0 because all servers exist and work
+	  sleep( 1 ); // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
+	  break;
+	} 
 	else
-	  {
-	    QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEventError, errMsg ) );
-	    //myExitStatus should be 1 because we didn't receive response from server
-	    myExitStatus = 1;
-	    return;
-	  }
+	  continue;
       }
+      QString *message = new QString(myMessages[i-1]);
+      QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEventLabel, message ) );
+      QThread::usleep(200000);
+      QString *errMsg;
+      bool result = AskServer(i,&errMsg);
+      if (result)
+      {
+	QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEvent, new int( i ) ) );
+	if ( i==8 )
+	{
+	  IsChecking = false;
+	  myExitStatus = 0; //myExitStatus should be 0 because all servers exist and work
+	  sleep( 1 );  // sleep( 1 second ) in order to see 100%.  in other case it closes on 85%..
+	  break;
+	}
+      }
+      else
+      {
+	QThread::postEvent( receiver, new InquireEvent( ( QEvent::Type )InquireEvent::ProgressEventError, errMsg ) );
+	stop();
+	break;
+      }
+    }
   }
 
-  // this outputs WARNING: QThread object is deleted while still running -- it's OK in our case!
-  //delete this;
+  receiver->hide();
+  qApp->exit( myExitStatus );
+}
+
+void InquireServersQThread::stop()
+{
+  IsChecking = false;
+  myExitStatus = 1;
 }
 
 InquireServersQThread::~InquireServersQThread()
@@ -582,3 +569,4 @@ bool InquireServersQThread::pingServer(int iteration, QString& errMessage)
     }
   return result;
 }
+
