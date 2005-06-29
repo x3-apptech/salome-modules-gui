@@ -58,6 +58,14 @@ QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
 {
   if( p=="client" )
     return myPopupClient;
+  else if ( p=="activeView" )
+    {
+      QString aViewType = "";
+      SUIT_ViewWindow* anActiveView = study()->application()->desktop()->activeWindow();
+      if (anActiveView)
+	aViewType = anActiveView->getViewManager()->getType();
+      return QtxValue(aViewType);
+    }
   else
     return QtxPopupMgr::Selection::globalParam( p );
 }
