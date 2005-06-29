@@ -224,7 +224,7 @@ void SalomeStyle::mix( const double t, QRgb& rgb1, const QRgb& rgb2 )
   int c[2][4] = { qRed( rgb1 ), qGreen( rgb1 ), qBlue( rgb1 ), qAlpha( rgb1 ),
                   qRed( rgb2 ), qGreen( rgb2 ), qBlue( rgb2 ), qAlpha( rgb2 ) };
   for( int i=0; i<4; i++ )
-    c[0][i] = c[0][i] * (1-t) + c[1][i] * t;
+    c[0][i] = (int)( c[0][i] * (1-t) + c[1][i] * t );
 
   rgb1 = qRgba( c[0][0], c[0][1], c[0][2], qAlpha( rgb1 ) );
 }
@@ -277,8 +277,8 @@ void SalomeStyle::toGrayscale( QPixmap& pix, double k )
     QRgb*  colorline = ( QRgb* ) line;
     for( int x=0; x<w; x++ )
     {
-      int gray = k*qGray( colorline[ x ] );
-      if( gray>255 )
+      int gray = (int)( k * qGray( colorline[ x ] ) );
+      if ( gray>255 )
         gray = 255;
       else if( gray<0 )
         gray = 0;
@@ -321,7 +321,7 @@ void SalomeStyle::drawGradient( QPainter* p, const QRect& r,
 }
 
 void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& r,
-				                         const QColorGroup& cg, SFlags flags, const QStyleOption& opt ) const
+				 const QColorGroup& cg, SFlags flags, const QStyleOption& opt ) const
 {
   switch ( pe )
   {
@@ -363,7 +363,7 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
           activeWidget = activeWidget->parent();
       }
 
-	    bool act = wnd == activeWnd, horiz = flags & Style_Horizontal;
+      bool act = wnd == activeWnd, horiz = flags & Style_Horizontal;
 
       QPixmap hole( (const char**)hole_xpm );
 
@@ -371,24 +371,24 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
       {
         drawGradient( p, r, cg.light(), cg.background(), horiz ? UpToDown : LeftToRight, linear );
 
-        int c = 4, i; double d = ( horiz ? r.height() : r.width() ) / (c+1);
+        int c = 4, i; double d = ( horiz ? r.height() : r.width() ) / ( c + 1 );
         QBrush fill = cg.brush( QColorGroup::Dark );
         p->setPen( Qt::red );
         for ( i = 0; i < c; i++ )
         {
           if ( horiz )
-            p->drawPixmap( r.x()+r.width()/2-1, r.y()+(i+1)*d-1, hole );
+            p->drawPixmap( r.x() + r.width() / 2 - 1, (int)( r.y() + ( i + 1 ) * d - 1 ), hole );
           else
-            p->drawPixmap( r.x()+(i+1)*d-1, r.y()+r.height()/2-1, hole );
+            p->drawPixmap( (int) ( r.x() + ( i + 1 ) * d - 1 ), r.y() + r.height() / 2 - 1, hole );
         }
 
         int dd = (int(d)/2) + (int(d)%2);
         for ( i = 0; i < c - 1; i++ )
         {
           if ( horiz )
-            p->drawPixmap( r.x()+r.width()/2+2, r.y()+dd+(i+1)*d-1, hole );
+            p->drawPixmap( r.x() + r.width() / 2 + 2, (int)( r.y() + dd + ( i + 1 ) * d - 1 ), hole );
           else
-            p->drawPixmap( r.x()+dd+(i+1)*d-1, r.y()+r.height()/2+2, hole );
+            p->drawPixmap( (int)( r.x() + dd + ( i + 1 ) * d - 1 ), r.y() + r.height() / 2 + 2, hole );
         }
       }
       else
@@ -404,6 +404,22 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
 
         drawGradient( p, rr, act ? cg.highlight() : cg.dark(), col,
                       horiz ? LeftToRight : UpToDown, linear );
+
+	int txtW = flags & Style_Horizontal ? r.height() : r.width();
+	int txtH = flags & Style_Horizontal ? r.width() : r.height();
+
+	QString title = titleText( wnd->caption(), txtW, p->fontMetrics() );
+
+ 	p->save();
+ 	if ( flags & Style_Horizontal )
+	{
+ 	  p->rotate( 270 );
+	  p->translate( -r.height() - r.y(), r.width() - r.x() );
+	  p->drawText( 0, 0, txtW, txtH, Qt::AlignCenter, title );
+	}
+	else
+	  p->drawText( r, Qt::AlignCenter, title );
+ 	p->restore();
       }
       break;
     }
@@ -1131,6 +1147,23 @@ int SalomeStyle::pixelMetric( PixelMetric pm, const QWidget* widget ) const
   return ret;
 }
 
+QString SalomeStyle::titleText( const QString& txt, const int W, const QFontMetrics& fm ) const
+{
+  QString res = txt.stripWhiteSpace();
+
+  if ( fm.width( res ) > W )
+  {
+    QString end( "..." );
+    while ( !res.isEmpty() && fm.width( res + end ) > W )
+      res.remove( res.length() - 1, 1 );
+
+    if ( !res.isEmpty() )
+      res += end;
+  }
+
+  return res;
+}
+
 /*!
     Class: SalomeStylePlugin [Internal]
     Descr: Plugin for Qt style mechanism
@@ -1146,8 +1179,6 @@ SalomeStylePlugin::~SalomeStylePlugin()
 
 QStringList SalomeStylePlugin::keys() const
 {
-  printf( "SalomeStylePlugin::keys()\n" );
-
   return QStringList() << "salome";
 }
 
