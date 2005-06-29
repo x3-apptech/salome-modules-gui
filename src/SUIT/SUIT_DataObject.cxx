@@ -33,8 +33,6 @@ SUIT_DataObject::~SUIT_DataObject()
     mySignal->setOwner( 0 );
   }
 
-  delete mySignal;
-
   SUIT_DataObject* p = myParent;
 
   myParent = 0;
@@ -44,6 +42,8 @@ SUIT_DataObject::~SUIT_DataObject()
 
   for ( QPtrListIterator<SUIT_DataObject> it( myChildren ); it.current(); ++it )
     it.current()->myParent = 0;
+
+  delete mySignal;
 }
 
 /*!
