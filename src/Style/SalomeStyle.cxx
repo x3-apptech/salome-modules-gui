@@ -405,7 +405,7 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
         drawGradient( p, rr, act ? cg.highlight() : cg.dark(), col,
                       horiz ? LeftToRight : UpToDown, linear );
 
-		    QRect rt = rr;
+	QRect rt = rr;
         if ( flags & Style_Horizontal )
           rt.addCoords( 0, 20, 0, 0 );
         else
@@ -416,20 +416,19 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
 
         QString title = titleText( wnd->caption(), textW, p->fontMetrics() );
 
-		    if ( wnd )
-        {
-		      QColorGroup cgroup = wnd->isActiveWindow() ? wnd->palette().active() : wnd->palette().inactive();
-		      p->setPen( cgroup.highlightedText() );
-
-		      if ( flags & Style_Horizontal )
-          {
-		        p->rotate( 270.0 );
-		        p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
-		        p->drawText( 0, 0, title );
-		      }
+	if ( wnd )
+	{
+	  p->setPen( act ? cg.highlightedText() : cg.text() );
+	  
+	  if ( flags & Style_Horizontal )
+	  {
+	    p->rotate( 270.0 );
+	    p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
+	    p->drawText( 0, 0, title );
+	  }
           else
-		        p->drawText( 2, 2, textW, textH, AlignLeft, title );
-	      }
+	    p->drawText( 2, 2, textW, textH, AlignLeft, title );
+	}
       }
       break;
     }
