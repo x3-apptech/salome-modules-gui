@@ -405,21 +405,31 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
         drawGradient( p, rr, act ? cg.highlight() : cg.dark(), col,
                       horiz ? LeftToRight : UpToDown, linear );
 
-	int txtW = flags & Style_Horizontal ? r.height() : r.width();
-	int txtH = flags & Style_Horizontal ? r.width() : r.height();
+		    QRect rt = rr;
+        if ( flags & Style_Horizontal )
+          rt.addCoords( 0, 20, 0, 0 );
+        else
+          rt.addCoords( 0, 0, -20, 0 );
 
-	QString title = titleText( wnd->caption(), txtW, p->fontMetrics() );
+        int textW = flags & Style_Horizontal ? rt.height() : rt.width();
+        int textH = flags & Style_Horizontal ? rt.width() : rt.height();
 
- 	p->save();
- 	if ( flags & Style_Horizontal )
-	{
- 	  p->rotate( 270 );
-	  p->translate( -r.height() - r.y(), r.width() - r.x() );
-	  p->drawText( 0, 0, txtW, txtH, Qt::AlignCenter, title );
-	}
-	else
-	  p->drawText( r, Qt::AlignCenter, title );
- 	p->restore();
+        QString title = titleText( wnd->caption(), textW, p->fontMetrics() );
+
+		    if ( wnd )
+        {
+		      QColorGroup cgroup = wnd->isActiveWindow() ? wnd->palette().active() : wnd->palette().inactive();
+		      p->setPen( cgroup.highlightedText() );
+
+		      if ( flags & Style_Horizontal )
+          {
+		        p->rotate( 270.0 );
+		        p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
+		        p->drawText( 0, 0, title );
+		      }
+          else
+		        p->drawText( 2, 2, textW, textH, AlignLeft, title );
+	      }
       }
       break;
     }
