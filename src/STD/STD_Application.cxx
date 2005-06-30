@@ -231,11 +231,7 @@ bool STD_Application::onOpenDoc( const QString& aName )
   if ( !activeStudy() )
   {
     // if no study - open in current desktop
-    // jfa 21.06.2005:createEmptyStudy();
-    // jfa 21.06.2005:res = activeStudy()->openDocument( aName );
-    // jfa 21.06.2005:updateDesktopTitle();
-    // jfa 21.06.2005:updateCommandsStatus();
-    res = useFile( aName ); // jfa 21.06.2005
+    res = useFile( aName );
   }
   else
   {
@@ -285,11 +281,7 @@ bool STD_Application::onLoadDoc( const QString& aName )
     }
     if ( !isAlreadyOpen )
     {
-      // temporary commented because of "pure virtual method called" execution error.
-      // current state of code is not right, but works somehow.
-      // SALOMEDS::Study of the first found application is replaced by the new one,
-      // while normally the new study must be used by a new application
-      //jfa tmp:aApp = startApplication( 0, 0 );
+      aApp = startApplication( 0, 0 );
       if ( aApp )
         res = aApp->useStudy( aName );
     }
