@@ -413,57 +413,65 @@ void GLViewer_Widget::leaveEvent( QEvent* e )
   updateGL();
 }
 
+
+//=======================================================================
+//! Function: hex
+//! Purpose : Returns the hex code of digit < 16
+//=======================================================================
 inline char hex( uchar c )
 {
   if( c<=9 )
     return '0'+c;
-  else
+  else if( c < 16 )
     return 'a' + c - 10;
+  else
+    ' ';
 }
 
 //=======================================================================
-// Function: AddImagePart
-// Purpose :
+//! Function: AddImagePart
+//! Purpose : Translates path of image to PS format
+/*! Image inside rectangle from w1 to w2 and from h2 to h1*/
 //=======================================================================
 void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2, 
                    GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS, 
                    double a, double b, double c, double d, double dw, double dh )
 {
-    if( aViewerCS && aPSCS )
-    {       
-        double width = w2-w1+1, height = h2-h1+1;
-        QString aBuffer = "", temp = "%1 %2 8 [ %3 %4 %5 %6 %7 %8 ]\n";
-        aBuffer += temp.arg( width ).arg( height ).
+  if( aViewerCS && aPSCS )
+  {       
+    double width = w2-w1+1, height = h2-h1+1;
+    QString aBuffer = "", temp = "%1 %2 8 [ %3 %4 %5 %6 %7 %8 ]\n";
+    aBuffer += temp.arg( width ).arg( height ).
                         arg( a ).arg( b ).arg( c ).arg( d ).
                         arg( dw ).arg( dh );
-        aBuffer += "<\n";   
-
-        char line[81]; line[80] = '\0'; int cur_index = 0;
-        int full = 0;
-        for( int i=h2; i>=h1; i-- )
-        {           
-            uchar* theCurLine = image.scanLine( i ), cur;
-            for( int j=w1; j<=w2; j++ )
-                for( int k=0; k<3; k++ )
-                {
-                    cur = *(theCurLine+4*j+2-k);
-                    *(line+cur_index) = hex( cur/16 ); //HI
-                    *(line+cur_index+1) = hex( cur%16 ); //LO
-                    full++;
-                    cur_index+=2;
-                    if( cur_index>=80 )
-                    {
-                        aBuffer += line;
-                        aBuffer += "\n";
-                        cur_index = 0;
-                    }
-                }           
-        }
-
-        aBuffer += "> false 3 colorimage\n\n";
-
-        hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    aBuffer += "<\n";   
+    
+    char line[81]; line[80] = '\0'; int cur_index = 0;
+    int full = 0;
+    for( int i=h2; i>=h1; i-- )
+    {           
+      uchar* theCurLine = image.scanLine( i ), cur;
+      for( int j=w1; j<=w2; j++ )
+	for( int k=0; k<3; k++ )
+	{
+	  cur = *(theCurLine+4*j+2-k);
+	  *(line+cur_index) = hex( cur/16 ); //HI
+	  *(line+cur_index+1) = hex( cur%16 ); //LO
+	  full++;
+	  cur_index+=2;
+	  if( cur_index>=80 )
+	  {
+	    aBuffer += line;
+	    aBuffer += "\n";
+	    cur_index = 0;
+	  }
+	}           
     }
+    
+    aBuffer += "> false 3 colorimage\n\n";
+
+    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+  }
 }
 
 //=======================================================================
@@ -472,8 +480,8 @@ void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2,
 //=======================================================================
 void GLViewer_Widget::getBackgroundRectInViewerCS( double& left, double& top, double& right, double& bottom )
 {
-    left = -myIW/2; right = myIW/2; 
-    top = myIH/2; bottom = -myIH/2;
+  left = -myIW/2; right = myIW/2; 
+  top = myIH/2; bottom = -myIH/2;
 }
 
 //=======================================================================
@@ -527,8 +535,8 @@ void GLViewer_Widget::translateBackgroundToPS( QFile& hFile, GLViewer_CoordSyste
 }
 
 //=======================================================================
-// Function: DecodeScanLine
-// Purpose :
+//! Function: DecodeScanLine
+//! Purpose : Translate image line with one color depth to line wiht other depth
 //=======================================================================
 void DecodeScanLine( int width, uchar* dest, int dest_depth, uchar* source, int source_depth )
 {
