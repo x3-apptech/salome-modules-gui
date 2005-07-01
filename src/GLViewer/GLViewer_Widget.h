@@ -9,6 +9,11 @@
 **  Module:  GLViewer
 **  Created: UI team, 27.03.03
 ****************************************************************************/
+
+/*! Class GLViewer_Widget
+ *  Class for visualization OpenGL scene (widget) for GLViewer
+ *
+ */
 #ifndef GLVIEWER_WIDGET_H
 #define GLVIEWER_WIDGET_H
 
@@ -25,91 +30,169 @@ class GLVIEWER_API GLViewer_Widget : public QGLWidget
   Q_OBJECT
 
 public:
-    GLViewer_Widget( QWidget*, const char* = 0 );
-    ~GLViewer_Widget();
+  //! A constructor
+  /*! Parameters using for QOGLWidget as is 
+  */
+  GLViewer_Widget( QWidget* theParent, const char* theName = 0 );
+ 
+  //! A destructor
+  ~GLViewer_Widget();
 
-    GLViewer_ViewPort2d*   getViewPort() const { return myViewPort; }
-    GLint                  getWidth() const { return myWidth; }
-    GLint                  getHeight() const { return myHeight; }
+  //! Returns parent GLViewer_ViewPort2d
+  /*! ViewPort2d because this class is not use for 3D Viewer */
+  GLViewer_ViewPort2d*   getViewPort() const { return myViewPort; }
+  //! Returns width of OpenGl Window
+  GLint                  getWidth() const { return myWidth; }
+  //! Returns height of OpenGl Window
+  GLint                  getHeight() const { return myHeight; }
+  
+  //! Returns scales on OpenGL scene along 3 directions
+  /*! in 2d scene zScale = 1.0 */
+  void                   getScale( GLfloat& xScale,
+				   GLfloat& yScale,
+				   GLfloat& zScale );
+  //! A function for installing the scales of OpenGL scene
+  void                   setScale( GLfloat xScale,
+				   GLfloat yScale,
+                                   GLfloat zScaleGLfloat );
+  
+  //! Returns offset parameters of Window in OpenGL global scene
+  void                   getPan( GLfloat& xPan, GLfloat& yPan, GLfloat& zPan );
+  //! A function for installing the  offset parameters of Window in OpenGL global scene
+  void                   setPan( GLfloat xPan, GLfloat yPan, GLfloat zPan );
+  
+  //! Returns rotation angle of Window in OpenGL global scene in degree
+  /*! Only in 2D */
+  GLfloat                getRotationAngle() const { return myRotationAnglePrev; }
+  //! A function for installing the rotation angle of Window in OpenGL global scene in degree
+  /*! Only in 2D */
+  void                   setRotationAngle( GLfloat a ) { myRotationAnglePrev = a; }
 
-    void                   getScale( GLfloat&, GLfloat&, GLfloat& );
-    void                   setScale( GLfloat, GLfloat, GLfloat );
+  //! Returns start point of curren rotation of Window in OpenGL global scene
+  void                   getRotationStart( GLfloat& rotationStartX,
+					   GLfloat& rotationStartY,
+					   GLfloat& rotationStartZ );
+  //! A function for installing the start point of curren rotation of Window in OpenGL global scene
+  void                   setRotationStart( GLfloat rotationStartX,
+					   GLfloat rotationStartY,
+					   GLfloat rotationStartZ );
+  //! Returns parameters of current rotation
+  void                   getRotation( GLfloat& rotationAngle,
+				      GLfloat& rotationCenterX,
+				      GLfloat& rotationCenterY,
+				      GLfloat& rotationCenterZ );
+  //! A function for installing the parameters of current rotation
+  void                   setRotation( GLfloat, GLfloat, GLfloat, GLfloat );
 
-    void                   getPan( GLfloat&, GLfloat&, GLfloat& );
-    void                   setPan( GLfloat, GLfloat, GLfloat );
-
-    GLfloat                getRotationAngle() const { return myRotationAnglePrev; }
-    void                   setRotationAngle( GLfloat a ) { myRotationAnglePrev = a; }
-    void                   getRotationStart( GLfloat&, GLfloat&, GLfloat& );
-    void                   setRotationStart( GLfloat, GLfloat, GLfloat );
-    void                   getRotation( GLfloat&, GLfloat&, GLfloat&, GLfloat& );
-    void                   setRotation( GLfloat, GLfloat, GLfloat, GLfloat );
-    void                   setBackground( QString );
-
-    void                   addToolTip( QString, QRect );
-    void                   removeToolTip();
-
-    void                   copyBuffers();
-    virtual void           translateBackgroundToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS );
-
-    void                   exportRepaint();
+  //! A function load picture from file with name theFileName and post it in center of global OpenGL scene
+  void                   setBackground( QString theFileName );
+  
+  //! A function add the tool tip with text theTTText on theTTRect rect to the widget window
+  void                   addToolTip( QString theTTText, QRect theTTRect );
+  //! A function remove tool tip form widget window
+  void                   removeToolTip();
+  
+  //! A function translate background of window in to PostScript file on disk
+  /*!
+   *\param hFile     the name of PostScript file chosen by user
+   *\param aViewerCS the GLViewer_CoordSystem of window
+   *\param aPSCS     the GLViewer_CoordSystem of PostScript page
+  */
+  virtual void           translateBackgroundToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS );
+  
+  //! A function repaints OpenGL scene in export mode
+  /* Repaints all objects in only current view */
+  void                   exportRepaint();
 
 #ifdef WIN32
-    virtual void           translateBackgroundToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
+  //! A function translate background of window in to EMF file on disk
+  //! 
+  /*!
+   *\warning WIN32 only
+   *
+   *\param dc        the name of HDC associated with file chosen by user
+   *\param aViewerCS the GLViewer_CoordSystem of window
+   *\param aEMFCS    the GLViewer_CoordSystem of EMF page
+  */
+  virtual void           translateBackgroundToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
 #endif
 
 private:
-    void                   getBackgroundRectInViewerCS( double& left, double& top, double& right, double& bottom );
-
+  //! Auxiliary function. Returns rect of window background in viewer coordinate system
+  void                   getBackgroundRectInViewerCS( double& left, double& top, double& right, double& bottom );
+  
 protected:
-    virtual void           initializeGL();
-    virtual void           paintGL();
-    virtual void           resizeGL( int, int );
+  /* Redefined QT methods */
+  //! A function is called before first display of window (create OpenGL scene)
+  virtual void           initializeGL();
+  //! A function is called in earch paint event of window
+  /* Calling by public method repaint() */
+  virtual void           paintGL();
+  //! A function is called in earch resize event of window
+  virtual void           resizeGL( int, int );
+  
+  
+  virtual void           paintEvent( QPaintEvent* );
+  virtual void           mouseMoveEvent( QMouseEvent* );
+  virtual void           mousePressEvent( QMouseEvent* );
+  virtual void           mouseReleaseEvent( QMouseEvent* );
 
-    virtual void           paintEvent( QPaintEvent* );
-    virtual void           mouseMoveEvent( QMouseEvent* );
-    virtual void           mousePressEvent( QMouseEvent* );
-    virtual void           mouseReleaseEvent( QMouseEvent* );
-    virtual void           enterEvent( QEvent* );
-    virtual void           leaveEvent( QEvent* );
-
+  /* Needs to redefine because Window must be updated highlight presentation when mouse enter window */
+  virtual void           enterEvent( QEvent* );
+  /* Needs to redefine because Window must be updated highlight presentation when mouse leave window */
+  virtual void           leaveEvent( QEvent* );
+  
 private:
-    GLint                  myWidth;
-    GLint                  myHeight;
+  //! width of window
+  GLint                  myWidth;
+  //! height of window
+  GLint                  myHeight;
+  
+  //! Scale along X direction
+  GLfloat                myXScale;
+  //! Scale along Y direction
+  GLfloat                myYScale;
+  //! Scale along Z direction
+  /* equals 1 in 2D */
+  GLfloat                myZScale;
 
-    GLfloat                myXScale;
-    GLfloat                myYScale;
-    GLfloat                myZScale;
+  //! Window offset along X direction
+  GLfloat                myXPan;
+  //! Window offset along Y direction
+  GLfloat                myYPan;
+  //! Window offset along Z direction
+  /* equals 0 in 2D */
+  GLfloat                myZPan;
 
-    GLfloat                myXPan;
-    GLfloat                myYPan;
-    GLfloat                myZPan;
+  GLfloat                myRotationStartX;
+  GLfloat                myRotationStartY;
+  GLfloat                myRotationStartZ;
+  GLfloat                myRotationAngle;
+  GLfloat                myRotationCenterX;
+  GLfloat                myRotationCenterY;
+  GLfloat                myRotationCenterZ;
+  GLfloat                myRotationAnglePrev;
+  
+  GLboolean              myStart;
+  GLViewer_ViewPort2d*   myViewPort;
+  
+  //! True if background is loaded
+  bool                   isLoadBackground;
+  //! File name of background image
+  QString                myBackgroundFile;
+  //! Texture id of loaded background image
+  GLuint                 texName;
+  //! Width of background image
+  int                    myIW;
+  //! Height of background image
+  int                    myIH;
+  //! Size of background image
+  int                    myBackgroundSize;
 
-    GLfloat                myRotationStartX;
-    GLfloat                myRotationStartY;
-    GLfloat                myRotationStartZ;
-    GLfloat                myRotationAngle;
-    GLfloat                myRotationCenterX;
-    GLfloat                myRotationCenterY;
-    GLfloat                myRotationCenterZ;
-    GLfloat                myRotationAnglePrev;
+  QRect                  myToolTipRect;
 
-    GLboolean              myStart;
-    GLViewer_ViewPort2d*   myViewPort;
-
-    //new code
-    bool                   isLoadBackground;
-    QString                myBackgroundFile;
-    GLuint                 texName;
-    int                    myIW;
-    int                    myIH;
-    int                    myBackgroundSize;
-
-    //GLubyte***             pixels;
-    QRect                  myToolTipRect;
-
-    //for export repaint
-    bool                   isExportMode;
+  //! Needs for export repaint
+  bool                   isExportMode;
 };
 
 #endif // GLVIEWER_WIDGET_H
