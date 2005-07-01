@@ -1,13 +1,18 @@
-/***************************************************************************
-**  Class:   GLViewer_AspectLine
-**  Descr:   Substitution of Prs2d_AspectLine for OpenGL
-**  Module:  GLViewer
-**  Created: UI team, 05.11.02
-****************************************************************************/
+// File:      GLViewer_AspectLine.cxx
+// Created:   26/05/2005 3:17:00 PM
+// Author:    Alexander BORODIN
+// Copyright (C) CEA 2005
 
-//#include <GLViewerAfx.h>
+//================================================================
+// Class       : GLViewer_AspectLine
+// Description : Substitution of Prs2d_AspectLine for OpenGL
+//================================================================
 #include "GLViewer_AspectLine.h"
 
+//=======================================================================
+// Function: GLViewer_AspectLine
+// Purpose :
+//=======================================================================
 GLViewer_AspectLine::GLViewer_AspectLine()
 {
     myNColor = QColor( 255, 255, 255 );
@@ -18,6 +23,10 @@ GLViewer_AspectLine::GLViewer_AspectLine()
     myLineType = 0;
 }
 
+//=======================================================================
+// Function: GLViewer_AspectLine
+// Purpose :
+//=======================================================================
 GLViewer_AspectLine::GLViewer_AspectLine( int type, float width )
 {
     myNColor = QColor( 255, 255, 255 );
@@ -31,10 +40,18 @@ GLViewer_AspectLine::GLViewer_AspectLine( int type, float width )
         myLineType = 0;
 }
 
+//=======================================================================
+// Function: ~GLViewer_AspectLine
+// Purpose :
+//=======================================================================
 GLViewer_AspectLine::~GLViewer_AspectLine()
 {
 }
 
+//=======================================================================
+// Function: setLineColors
+// Purpose :
+//=======================================================================
 void GLViewer_AspectLine::setLineColors( QColor nc, QColor hc, QColor sc )
 {
     myNColor = nc;
@@ -42,6 +59,10 @@ void GLViewer_AspectLine::setLineColors( QColor nc, QColor hc, QColor sc )
     mySColor = sc;
 }
 
+//=======================================================================
+// Function: setLineType
+// Purpose :
+//=======================================================================
 int GLViewer_AspectLine::setLineType( const int type )
 {
     if( type == 1 || type == 0 )
@@ -52,6 +73,10 @@ int GLViewer_AspectLine::setLineType( const int type )
     return 1;
 }
 
+//=======================================================================
+// Function: setLineWidth
+// Purpose :
+//=======================================================================
 int GLViewer_AspectLine::setLineWidth( const float width )
 {
     if( width > 0 )
@@ -62,6 +87,10 @@ int GLViewer_AspectLine::setLineWidth( const float width )
     return 1;
 }
 
+//=======================================================================
+// Function: getLineColors
+// Purpose :
+//=======================================================================
 void GLViewer_AspectLine::getLineColors( QColor& nc, QColor& hc, QColor& sc ) const
 {
     nc = myNColor;
@@ -69,6 +98,10 @@ void GLViewer_AspectLine::getLineColors( QColor& nc, QColor& hc, QColor& sc ) co
     sc = mySColor;
 }
 
+//=======================================================================
+// Function: getByteCopy
+// Purpose :
+//=======================================================================
 QByteArray GLViewer_AspectLine::getByteCopy() const
 {
     int anISize = sizeof( int );
@@ -122,6 +155,10 @@ QByteArray GLViewer_AspectLine::getByteCopy() const
     return aResult;
 }
 
+//=======================================================================
+// Function: fromByteCopy
+// Purpose :
+//=======================================================================
 GLViewer_AspectLine* GLViewer_AspectLine::fromByteCopy( QByteArray theBytes )
 {
 
