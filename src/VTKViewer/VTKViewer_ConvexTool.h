@@ -22,15 +22,24 @@
 #define _VTKViewer_ConvexTool_H
 
 #include <vtkUnstructuredGrid.h>
-
 #include <vector>
 #include <map>
 
 typedef std::vector<vtkIdType> TCell; // ptsIds
 typedef std::map<vtkIdType,TCell> TCellArray; // CellId, TCell
 
+/*! This package \namespace CONVEX_TOOL used for: 
+ *  calculation of VTK_POLYGON cell array from VTK_TRIANGLE (triangulation)
+ *  of VTK_CONVEX_POINT_SET cell type.
+ */
 namespace CONVEX_TOOL
 {
+  /*! \fn void CONVEX_TOOL::GetPolygonalFaces(vtkUnstructuredGrid* theCell,int cellId,TCellArray &outputCellArray)
+   *  \brief Main function.
+   *  \param theCell - vtkUnstructuredGrid cell pointer
+   *  \param cellId  - id of cell type VTK_CONVEX_POINT_SET
+   *  \retval outputCellArray - output array with new cells types VTK_POLYGON
+   */
   void GetPolygonalFaces(vtkUnstructuredGrid* theCell,int cellId,TCellArray &outputCellArray);
 }
 

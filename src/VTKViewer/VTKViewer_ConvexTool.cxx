@@ -21,19 +21,26 @@
 #include <algorithm>
 #include <math.h>
 
-static float FACE_ANGLE_TOLERANCE=1.5;
-
 typedef std::set<vtkIdType> TUIDS; // unique ids 
 typedef std::map<vtkIdType,TUIDS> TPTOIDS; // id points -> unique ids
 
 namespace CONVEX_TOOL
 {
+
+static float FACE_ANGLE_TOLERANCE=1.5;
+
 #ifdef _DEBUG_
   static int MYDEBUG = 0;
 #else
   static int MYDEBUG = 0;
 #endif
 
+/*! \fn static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
+ * \brief Calculation of geometry center.
+ * \param theGrid - vtkUnstructuredGrid cell.
+ * \param theptIds - point ids.
+ * \retval center - output array[3] with coordinates of geometry center.
+ */
 static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
 {
   float *p;
@@ -56,6 +63,11 @@ static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
     }
 }
 
+/*! \fn static void ReverseIds(TCell &theIds)
+ * \brief Reverse ids.
+ * \param theIds - points ids.
+ * \retval theIds - example input:(1,2,3,4) -> output:(4,3,2,1)
+ */
 static void ReverseIds(TCell &theIds)
 {
   int i;
@@ -69,7 +81,12 @@ static void ReverseIds(TCell &theIds)
   }
 }
 
-// caclulation of connected faces (faceId -> (faceId1,faceId2, ...))
+/*! \fn void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2face_output)
+ * \brief Caclulation of connected faces (faceId -> (faceId1,faceId2, ...))
+ * \param p2faces - point to faces ids map.
+ * \param f2points - faces to points ids map.
+ * \retval face2face_output - faces to faces ids map.
+ */
 void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2face_output)
 {
   TCellArray::const_iterator f2pIter = f2points.begin();
@@ -118,9 +135,18 @@ void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2fa
   }
 }
 
+/*! \fn bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,vtkIdType theFId1, vtkIdType theFId2,TUIDS FpIds1, TUIDS FpIds2 )
+ * \brief Check is connected faces on one plane.
+ * \param theGrid - vtkUnstructuredGrid
+ * \param theFId1 - id of first face
+ * \param theFId2 - id of second face
+ * \param FpIds1  - first face points ids.
+ * \param FpIds2  - second face points ids.
+ * \return TRUE if two faces on one plane, else FALSE.
+ */
 bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
                                  vtkIdType theFId1, vtkIdType theFId2,
-				                         TUIDS FpIds1, TUIDS FpIds2 )
+				 TUIDS FpIds1, TUIDS FpIds2 )
 {
   bool status = false;
   TUIDS common_ids;
@@ -220,6 +246,13 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
   return status;
 }
 
+/*! \fn void GetAllFacesOnOnePlane( TPTOIDS theFaces, vtkIdType faceId,TUIDS &new_faces, TCell &new_faces_v2 )
+ * \brief Calculate faces which on one plane.
+ * \param theFaces - 
+ * \param faceId - 
+ * \param new_faces - 
+ * \param new_faces_v2 - 
+ */
 void GetAllFacesOnOnePlane( TPTOIDS theFaces, vtkIdType faceId, 
                             TUIDS &new_faces, TCell &new_faces_v2 )
 {
@@ -240,6 +273,12 @@ void GetAllFacesOnOnePlane( TPTOIDS theFaces, vtkIdType faceId,
   return;
 }
 
+/*! \fn void GetSumm(TCell v1,TCell v2,TCell &output)
+ * \brief Gluing two faces (gluing points ids)
+ * \param v1 - first face
+ * \param v2 - second face
+ * \param output - output face.
+ */
 void GetSumm(TCell v1,TCell v2,TCell &output)
 {
   output.clear();
