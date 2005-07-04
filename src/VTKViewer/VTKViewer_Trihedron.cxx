@@ -73,7 +73,7 @@ void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
 //****************************************************************
 VTKViewer_Axis::VTKViewer_Axis()
 {
-  // Initialize the Line pipe-line representation
+  /*! \li Initialize the Line pipe-line representation*/
   myLineSource = vtkLineSource::New();
   myLineSource->SetPoint1(0.0,0.0,0.0);
   
@@ -84,7 +84,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   myLineActor->SetMapper(myMapper[0]);
   myLineActor->PickableOff();
   
-  // Initialize the Arrow pipe-line representation
+  /*! \li Initialize the Arrow pipe-line representation*/
   myConeSource =  vtkConeSource::New();
   myConeSource->SetResolution(2);
   myConeSource->SetAngle(10);
@@ -100,7 +100,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   
   myLineActor->SetArrowActor(myArrowActor);
   
-  // Initialize the Label pipe-line representation
+  /*! \li Initialize the Label pipe-line representation */
   myVectorText = VTKViewer_VectorText::New();
   
   myMapper[2] = vtkPolyDataMapper::New();
@@ -115,14 +115,14 @@ VTKViewer_Axis::VTKViewer_Axis()
   
   myLineActor->SetLabelActor(myLabelActor);
   
-  // Initialise visibility param.
+  /*! \li Initialise visibility param.*/
   myVisibility = VTKViewer_Trihedron::eOn;
 }
 
 //****************************************************************
 VTKViewer_Axis::~VTKViewer_Axis()
 {
-  // Destroy of the Label pipe-line representation
+  /*! \li Destroy of the Label pipe-line representation */
   myLabelActor->Delete();
   
   myMapper[2]->RemoveAllInputs();
@@ -130,7 +130,7 @@ VTKViewer_Axis::~VTKViewer_Axis()
   
   myVectorText->Delete();
   
-  // Destroy of the Arrow pipe-line representation
+  /*! \li Destroy of the Arrow pipe-line representation */
   myArrowActor->Delete();
   
   myMapper[1]->RemoveAllInputs();
@@ -138,7 +138,7 @@ VTKViewer_Axis::~VTKViewer_Axis()
   
   myConeSource->Delete();
   
-  // Destroy of the Arrow pipe-line representation
+  /*! \li Destroy of the Line pipe-line representation */
   myLineActor->Delete();
   
   myMapper[2]->RemoveAllInputs();
@@ -149,7 +149,7 @@ VTKViewer_Axis::~VTKViewer_Axis()
 
 //****************************************************************
 void VTKViewer_Axis::AddToRender(vtkRenderer* theRenderer){
-  //Order of the calls are important
+  /*! \li Order of the calls are important*/
   theRenderer->AddActor(myLineActor);
   theRenderer->AddActor(myLabelActor);
   theRenderer->AddActor(myArrowActor);
@@ -203,6 +203,9 @@ void VTKViewer_Axis::SetSize(float theSize)
 }
 
 //****************************************************************
+/*! \class VTKViewer_XAxis
+ * \brief X Axis actor
+ */
 class VTKViewer_XAxis : public VTKViewer_Axis
 {
 protected:
@@ -226,6 +229,9 @@ VTKViewer_XAxis::VTKViewer_XAxis(){
 }
 
 //==============================================================================
+/*! \class VTKViewer_YAxis
+ * \brief Y Axis actor
+ */
 class VTKViewer_YAxis : public VTKViewer_Axis{
 protected:
   VTKViewer_YAxis();
@@ -250,6 +256,9 @@ VTKViewer_YAxis::VTKViewer_YAxis()
 }
 
 //****************************************************************
+/*! \class VTKViewer_ZAxis
+ * \brief Z Axis actor
+ */
 class VTKViewer_ZAxis : public VTKViewer_Axis
 {
 protected:
