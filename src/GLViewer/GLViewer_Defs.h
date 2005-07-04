@@ -6,6 +6,10 @@
 #ifndef GLVIEWER_DEFS_H
 #define GLVIEWER_DEFS_H
 
+#include <qmap.h>
+#include <qvaluelist.h>
+
+class GLViewer_Object;
 //Selection staus 
 enum SelectionChangeStatus
 {
@@ -14,15 +18,26 @@ enum SelectionChangeStatus
     SCS_Global
 };
 
-//Fit Selection Rectangle
+//! Fit Selection Rectangle
 static const int      SELECTION_RECT_GAP = 50;
 
-//Display Text Format of Objects
+//! Display Text Format of Objects
 enum DisplayTextFormat
 {
   DTF_TEXTURE   = 0,
   DTF_BITMAP    = 1
 };
+
+enum SelectionStatus
+{
+    SS_Invalid,
+    SS_LocalChanged,
+    SS_GlobalChanged,
+    SS_NoChanged
+};
+
+typedef QMap<GLViewer_Object*,int> ObjectMap;
+typedef QValueList<GLViewer_Object*> ObjList;
 
 #define SEGMENTS   32
 #define PI         3.14159265359

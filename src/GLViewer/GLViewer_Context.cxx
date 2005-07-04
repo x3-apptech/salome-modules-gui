@@ -3,14 +3,10 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-/****************************************************************************
-**  Class:   GLViewer_Context 
-**  Descr:   OpenGL Context
-**  Module:  GLViewer
-**  Created: UI team, 20.09.02
-*****************************************************************************/
-
-//#include <GLViewerAfx.h>
+//================================================================
+// Class       : GLViewer_AspectLine
+// Description : Class for manage of presentations in GLViewer
+//================================================================
 
 #include "GLViewer_Context.h"
 
@@ -23,6 +19,10 @@
 
 #define TOLERANCE  12
 
+//=======================================================================
+// Function: GLViewer_Context
+// Purpose :
+//=======================================================================
 GLViewer_Context::GLViewer_Context( GLViewer_Viewer2d* v ) :
        myGLViewer2d( v ),
        myHighlightColor( Quantity_NOC_CYAN1 ),
@@ -40,6 +40,10 @@ GLViewer_Context::GLViewer_Context( GLViewer_Viewer2d* v ) :
   mySelCurIndex = 0;
 }
 
+//=======================================================================
+// Function: ~GLViewer_Context
+// Purpose :
+//=======================================================================
 GLViewer_Context::~GLViewer_Context()
 {
     myActiveObjects.clear();
@@ -47,6 +51,10 @@ GLViewer_Context::~GLViewer_Context()
     mySelectedObjects.clear();
 }
 
+//=======================================================================
+// Function: MoveTo
+// Purpose :
+//=======================================================================
 int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
 {
     GLfloat x = (GLfloat)xi;
@@ -155,6 +163,10 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
     return 0;
 }
 
+//=======================================================================
+// Function: GLViewer_Select
+// Purpose :
+//=======================================================================
 int GLViewer_Context::Select( bool Append, bool byCircle )
 {
     ObjList::Iterator it, itEnd, oit, oitEnd;
@@ -200,7 +212,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
             if( status == SS_Invalid )
                 status = SS_GlobalChanged;
         }
-        else if( status = SS_LocalChanged )
+        else if( status == SS_LocalChanged )
             status = SS_GlobalChanged;
 
         return status;
@@ -282,6 +294,10 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
     return SS_NoChanged;
 }
 
+//=======================================================================
+// Function: GLViewer_SelectByRect
+// Purpose :
+//=======================================================================
 int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
 {
     GLfloat aXScale;
@@ -340,6 +356,10 @@ int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
     return status;
 }
 
+//=======================================================================
+// Function: GLViewer_SetHighlightColor
+// Purpose :
+//=======================================================================
 void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
 {
   myHighlightColor = aCol;
@@ -359,6 +379,10 @@ void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
   myGLViewer2d->updateColors( colH, colS);
 }
 
+//=======================================================================
+// Function: GLViewer_SetSelectionColor
+// Purpose :
+//=======================================================================
 void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
 {
   mySelectionColor = aCol;
@@ -378,21 +402,37 @@ void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
   myGLViewer2d->updateColors( colH, colS);
 }
 
+//=======================================================================
+// Function: GLViewer_NbSelected
+// Purpose :
+//=======================================================================
 int GLViewer_Context::NbSelected()
 {
   return mySelectedObjects.count();
 }
 
+//=======================================================================
+// Function: GLViewer_InitSelected
+// Purpose :
+//=======================================================================
 void GLViewer_Context::InitSelected()
 {
   mySelCurIndex = 0;
 }
 
+//=======================================================================
+// Function: GLViewer_MoreSelected
+// Purpose :
+//=======================================================================
 bool GLViewer_Context::MoreSelected()
 {
   return ( mySelCurIndex < NbSelected() );
 }
 
+//=======================================================================
+// Function: GLViewer_NextSelected
+// Purpose :
+//=======================================================================
 bool GLViewer_Context::NextSelected()
 {
   if ( mySelCurIndex >= 0 && mySelCurIndex < NbSelected() )
@@ -404,16 +444,28 @@ bool GLViewer_Context::NextSelected()
   return FALSE;
 }
 
+//=======================================================================
+// Function: GLViewer_SelectedObject
+// Purpose :
+//=======================================================================
 GLViewer_Object* GLViewer_Context::SelectedObject()
 {
     return mySelectedObjects[ mySelCurIndex ];
 }
 
+//=======================================================================
+// Function: GLViewer_isSelected
+// Purpose :
+//=======================================================================
 bool  GLViewer_Context::isSelected( GLViewer_Object* theObj )
 {
     return mySelectedObjects.contains( theObj );
 }
 
+//=======================================================================
+// Function: GLViewer_insertObject
+// Purpose :
+//=======================================================================
 int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool isActive )
 {
 //  cout << "GLViewer_Context::insertObject" << endl;
@@ -437,6 +489,10 @@ int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool 
     return myActiveObjects.count() + myInactiveObjects.count();
 }
 
+//=======================================================================
+// Function: GLViewer_replaceObject
+// Purpose :
+//=======================================================================
 bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Object* newObject )
 {
     if( !oldObject || !newObject )
@@ -459,6 +515,10 @@ bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Objec
   return false;
 }
 
+//=======================================================================
+// Function: GLViewer_updateScales
+// Purpose :
+//=======================================================================
 void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
 {
   if( scX <= 0 || scY <= 0 )
@@ -473,6 +533,10 @@ void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
       (*it)->setScale( scX, scY );
 }
 
+//=======================================================================
+// Function: GLViewer_clearHighlighted
+// Purpose :
+//=======================================================================
 void GLViewer_Context::clearHighlighted()
 {
   if( myHFlag && myLastPicked )
@@ -484,6 +548,10 @@ void GLViewer_Context::clearHighlighted()
   }
 }
 
+//=======================================================================
+// Function: GLViewer_clearSelected
+// Purpose :
+//=======================================================================
 void GLViewer_Context::clearSelected( bool updateViewer )
 {
   if( !mySFlag )
@@ -503,6 +571,10 @@ void GLViewer_Context::clearSelected( bool updateViewer )
   mySelectedObjects.clear();    
 }
 
+//=======================================================================
+// Function: GLViewer_setSelected
+// Purpose :
+//=======================================================================
 void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
 {
   if( !object )
@@ -518,6 +590,10 @@ void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
     myGLViewer2d->activateDrawer( object, TRUE, TRUE );
 }
 
+//=======================================================================
+// Function: GLViewer_remSelected
+// Purpose :
+//=======================================================================
 void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
 {
   if( !object || !mySelectedObjects.contains( object ) )
@@ -530,6 +606,10 @@ void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
     myGLViewer2d->activateDrawer( object, TRUE, TRUE );
 }
 
+//=======================================================================
+// Function: GLViewer_eraseObject
+// Purpose :
+//=======================================================================
 void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateViewer )
 {
     if( !theObject || !myActiveObjects.contains( theObject ) )
@@ -543,6 +623,10 @@ void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateVi
         myGLViewer2d->updateAll();
 }
 
+//=======================================================================
+// Function: GLViewer_deleteObject
+// Purpose :
+//=======================================================================
 void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateViewer )
 {
     if( !theObject ||
@@ -569,6 +653,10 @@ void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateView
     myGLViewer2d->updateAll();
 }
 
+//=======================================================================
+// Function: GLViewer_setActive
+// Purpose :
+//=======================================================================
 bool GLViewer_Context::setActive( GLViewer_Object* theObject )
 {
   if( !theObject || !myInactiveObjects.contains( theObject ) )
@@ -579,6 +667,10 @@ bool GLViewer_Context::setActive( GLViewer_Object* theObject )
   return true;
 }
 
+//=======================================================================
+// Function: GLViewer_setInactive
+// Purpose :
+//=======================================================================
 bool GLViewer_Context::setInactive( GLViewer_Object* theObject )
 {
   if( !theObject || !myActiveObjects.contains( theObject ) )
