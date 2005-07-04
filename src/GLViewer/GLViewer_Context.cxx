@@ -164,7 +164,7 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
 }
 
 //=======================================================================
-// Function: GLViewer_Select
+// Function: Select
 // Purpose :
 //=======================================================================
 int GLViewer_Context::Select( bool Append, bool byCircle )
@@ -295,7 +295,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
 }
 
 //=======================================================================
-// Function: GLViewer_SelectByRect
+// Function: SelectByRect
 // Purpose :
 //=======================================================================
 int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
@@ -357,7 +357,7 @@ int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
 }
 
 //=======================================================================
-// Function: GLViewer_SetHighlightColor
+// Function: SetHighlightColor
 // Purpose :
 //=======================================================================
 void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
@@ -380,7 +380,7 @@ void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
 }
 
 //=======================================================================
-// Function: GLViewer_SetSelectionColor
+// Function: SetSelectionColor
 // Purpose :
 //=======================================================================
 void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
@@ -403,7 +403,7 @@ void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
 }
 
 //=======================================================================
-// Function: GLViewer_NbSelected
+// Function: NbSelected
 // Purpose :
 //=======================================================================
 int GLViewer_Context::NbSelected()
@@ -412,7 +412,7 @@ int GLViewer_Context::NbSelected()
 }
 
 //=======================================================================
-// Function: GLViewer_InitSelected
+// Function: InitSelected
 // Purpose :
 //=======================================================================
 void GLViewer_Context::InitSelected()
@@ -421,7 +421,7 @@ void GLViewer_Context::InitSelected()
 }
 
 //=======================================================================
-// Function: GLViewer_MoreSelected
+// Function: MoreSelected
 // Purpose :
 //=======================================================================
 bool GLViewer_Context::MoreSelected()
@@ -430,7 +430,7 @@ bool GLViewer_Context::MoreSelected()
 }
 
 //=======================================================================
-// Function: GLViewer_NextSelected
+// Function: NextSelected
 // Purpose :
 //=======================================================================
 bool GLViewer_Context::NextSelected()
@@ -445,7 +445,7 @@ bool GLViewer_Context::NextSelected()
 }
 
 //=======================================================================
-// Function: GLViewer_SelectedObject
+// Function: SelectedObject
 // Purpose :
 //=======================================================================
 GLViewer_Object* GLViewer_Context::SelectedObject()
@@ -454,7 +454,7 @@ GLViewer_Object* GLViewer_Context::SelectedObject()
 }
 
 //=======================================================================
-// Function: GLViewer_isSelected
+// Function: isSelected
 // Purpose :
 //=======================================================================
 bool  GLViewer_Context::isSelected( GLViewer_Object* theObj )
@@ -463,7 +463,7 @@ bool  GLViewer_Context::isSelected( GLViewer_Object* theObj )
 }
 
 //=======================================================================
-// Function: GLViewer_insertObject
+// Function: insertObject
 // Purpose :
 //=======================================================================
 int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool isActive )
@@ -490,7 +490,7 @@ int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool 
 }
 
 //=======================================================================
-// Function: GLViewer_replaceObject
+// Function: replaceObject
 // Purpose :
 //=======================================================================
 bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Object* newObject )
@@ -516,7 +516,7 @@ bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Objec
 }
 
 //=======================================================================
-// Function: GLViewer_updateScales
+// Function: updateScales
 // Purpose :
 //=======================================================================
 void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
@@ -534,7 +534,7 @@ void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
 }
 
 //=======================================================================
-// Function: GLViewer_clearHighlighted
+// Function: clearHighlighted
 // Purpose :
 //=======================================================================
 void GLViewer_Context::clearHighlighted()
@@ -549,7 +549,7 @@ void GLViewer_Context::clearHighlighted()
 }
 
 //=======================================================================
-// Function: GLViewer_clearSelected
+// Function: clearSelected
 // Purpose :
 //=======================================================================
 void GLViewer_Context::clearSelected( bool updateViewer )
@@ -572,7 +572,7 @@ void GLViewer_Context::clearSelected( bool updateViewer )
 }
 
 //=======================================================================
-// Function: GLViewer_setSelected
+// Function: setSelected
 // Purpose :
 //=======================================================================
 void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
@@ -591,7 +591,7 @@ void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
 }
 
 //=======================================================================
-// Function: GLViewer_remSelected
+// Function: remSelected
 // Purpose :
 //=======================================================================
 void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
@@ -607,7 +607,7 @@ void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
 }
 
 //=======================================================================
-// Function: GLViewer_eraseObject
+// Function: eraseObject
 // Purpose :
 //=======================================================================
 void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateViewer )
@@ -624,7 +624,7 @@ void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateVi
 }
 
 //=======================================================================
-// Function: GLViewer_deleteObject
+// Function: deleteObject
 // Purpose :
 //=======================================================================
 void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateViewer )
@@ -654,7 +654,7 @@ void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateView
 }
 
 //=======================================================================
-// Function: GLViewer_setActive
+// Function: setActive
 // Purpose :
 //=======================================================================
 bool GLViewer_Context::setActive( GLViewer_Object* theObject )
@@ -668,7 +668,7 @@ bool GLViewer_Context::setActive( GLViewer_Object* theObject )
 }
 
 //=======================================================================
-// Function: GLViewer_setInactive
+// Function: setInactive
 // Purpose :
 //=======================================================================
 bool GLViewer_Context::setInactive( GLViewer_Object* theObject )
