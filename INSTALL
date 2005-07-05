@@ -1,7 +1,3 @@
-This is the version 2.1.0 of KERNEL
-
-Previous versions :
-        - 2.0.0
-        - 1.4.1
-	- 1.3.0
-	- 1.2.1
+This is the version 3.0.0 of SALOMEGUI
+Compatible with :
+        - KERNEL 3.0.0
