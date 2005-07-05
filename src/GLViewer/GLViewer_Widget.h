@@ -3,16 +3,8 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Widget
-**  Descr:   OpenGL Widget for GLViewer
-**  Module:  GLViewer
-**  Created: UI team, 27.03.03
-****************************************************************************/
-
 /*! Class GLViewer_Widget
  *  Class for visualization OpenGL scene (widget) for GLViewer
- *
  */
 #ifndef GLVIEWER_WIDGET_H
 #define GLVIEWER_WIDGET_H
