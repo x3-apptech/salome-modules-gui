@@ -32,137 +32,189 @@ class GLViewer_Object;
 class GLViewer_ViewFrame;
 
 class QtxToolTip;
-
+/*! 
+ * Class GLViewer_ViewPort
+ * 2D visualisation canvas of GLViewer
+ */
 class GLViewer_ViewPort2d: public GLViewer_ViewPort
 {
   Q_OBJECT
 
-      enum vpDragState{ noDrag, initDrag, inDrag };
+  //! Dragging states
+  enum vpDragState{ noDrag, initDrag, inDrag };
 
 public:
-    GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame = NULL );
-    ~GLViewer_ViewPort2d();
+  GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame = NULL );
+  ~GLViewer_ViewPort2d();
 
-    void                   turnGrid( GLboolean on );
-    GLViewer_Grid*         getGrid() const { return myGrid; }
-    void                   setGridColor( const QColor gridColor, const QColor axisColor );
+  //! On/off rectangular grid
+  void                   turnGrid( GLboolean on );
+  //! Returns rectangular grid
+  GLViewer_Grid*         getGrid() const { return myGrid; }
+  //! Returns grid color
+  void                   setGridColor( const QColor gridColor, const QColor axisColor );
 
-    GLViewer_ViewFrame*    getViewFrame() const { return myViewFrame; }
-    GLViewer_Widget*       getGLWidget() const { return myGLWidget; }
-    virtual QPaintDevice*  getPaintDevice() { return myGLWidget; }
+  //! Returns parent window
+  GLViewer_ViewFrame*    getViewFrame() const { return myViewFrame; }
+  //! Returns painted widget
+  GLViewer_Widget*       getGLWidget() const { return myGLWidget; }
+  virtual QPaintDevice*  getPaintDevice() { return myGLWidget; }
 
-    void                   setBackgroundColor( const QColor& color);
-    QColor                 backgroundColor() const;
+  //! Sets background color
+  void                   setBackgroundColor( const QColor& color);
+  //! Returns background color
+  QColor                 backgroundColor() const;
 
-    void                   setBorder( GLViewer_Rect* border ) { myBorder = border; }
-    GLViewer_Rect*         getBorder() const { return myBorder; }
+  //! Sets borders of scene
+  void                   setBorder( GLViewer_Rect* border ) { myBorder = border; }
+  //! Get current borders of scene
+  GLViewer_Rect*         getBorder() const { return myBorder; }
+  
+  //! Sets margin of borders
+  void                   setMargin( GLfloat margin ) { myMargin = margin; }
+  //! Returns margin of borders
+  GLfloat                getMargin() const { return myMargin; }
 
-    void                   setMargin( GLfloat margin ) { myMargin = margin; }
-    GLfloat                getMargin() const { return myMargin; }
+  //! Returns width of view
+  int                    getWidth() const { return myWidth; }
+  //! Returns height of view
+  int                    getHeight() const { return myHeight; }
 
-    int                    getHeight() const { return myHeight; }
-    int                    getWidth() const { return myWidth; }
+  
+  //! Returns scale factors
+  void                   getScale( GLfloat& xSc, GLfloat& ySc ) const { xSc = myXScale; ySc = myYScale; }
+  //! returns offsets
+  void                   getPan( GLfloat& xPan, GLfloat& yPan ) const { xPan = myXPan; yPan = myYPan; }
 
-    void                   getScale( GLfloat& xSc, GLfloat& ySc ) const { xSc = myXScale; ySc = myYScale; }
-    void                   getPan( GLfloat& xPan, GLfloat& yPan ) const { xPan = myXPan; yPan = myYPan; }
+  //! Resize view
+  void                   initResize( int width, int height );
+  
+  //! Begins rotation
+  void                   startRotation( int, int );
+  //! Process rotation
+  void                   rotate( int, int );
+  //! Completes rotation
+  void                   endRotation();
+  
+  //! Checks of dragging process state
+  bool                   isDragProcess(){ return myIsDragProcess; }
+  
+  //! On/off compass
+  void                   turnCompass( GLboolean on );
+  //! Draws compass
+  void                   drawCompass();
+  
+  //! Returns unique ID of ViewPort
+  int                    getViewPortId(){ return myViewPortId; }
+  
+  //! Redefined method
+  virtual BlockStatus    currentBlock();
+  
+  //! Initializes before selecting by rect
+  void                   startSelectByRect( int x, int y );
+  //! Draw selecting rectandle
+  void                   drawSelectByRect( int x, int y );
+  //! Pass rect into selector and update
+  void                   finishSelectByRect();
+  
+  //! \warnign It is for ouv
+  bool                   startPulling( GLViewer_Pnt );
+  //! \warnign It is for ouv
+  void                   drawPulling( GLViewer_Pnt );
+  //! \warnign It is for ouv
+  void                   finishPulling();
+  //! \warnign It is for ouv
+  bool                   isPulling() const { return myIsPulling; }
 
-    void                   initResize( int, int );
-
-    void                   startRotation( int, int );
-    void                   rotate( int, int );
-    void                   endRotation();
-
-    bool                   isDragProcess(){ return myIsDragProcess; }
-
-    void                   turnCompass( GLboolean on );
-    void                   drawCompass();
-
-    int                    getViewPortId(){ return myViewPortId; }
-
-    virtual BlockStatus    currentBlock();
-
-    void                   startSelectByRect( int, int );
-    void                   drawSelectByRect( int, int );
-    void                   finishSelectByRect();
-
-    bool                   startPulling( GLViewer_Pnt );
-    void                   drawPulling( GLViewer_Pnt );
-    void                   finishPulling();
-    bool                   isPulling() const { return myIsPulling; }
-
-    //selection by rect
-    QRect                  selectionRect();
-    
-    GLViewer_Rect          win2GLV( const QRect& ) const;
-    QRect                  GLV2win( const GLViewer_Rect& ) const;
+  //! Returns selection by rect
+  QRect                  selectionRect();
+  
+  //! Transforms window rect to global rect 
+  GLViewer_Rect          win2GLV( const QRect& ) const;
+  //! Transforms global rect to window rect
+  QRect                  GLV2win( const GLViewer_Rect& ) const;
 
 signals:
-    void                   vpUpdateValues();
-    void                   objectMoved();
+  //! Emits after any transformation
+  void                   vpUpdateValues();
+
+  void                   objectMoved();
 
 protected:
-    void                   onDragObject( QMouseEvent* );
+  void                   onDragObject( QMouseEvent* );
     
-    virtual void           mouseMoveEvent( QMouseEvent *);
-    virtual void           mousePressEvent( QMouseEvent *);
-    virtual void           mouseReleaseEvent( QMouseEvent *);
+  virtual void           mouseMoveEvent( QMouseEvent *);
+  virtual void           mousePressEvent( QMouseEvent *);
+  virtual void           mouseReleaseEvent( QMouseEvent *);
+  
+  virtual void           paintEvent( QPaintEvent* );
+  virtual void           resizeEvent( QResizeEvent* );
 
-    virtual void           paintEvent( QPaintEvent* );
-    virtual void           resizeEvent( QResizeEvent* );
-
-    virtual void           reset();
-    virtual void           pan( int, int );
-    virtual void           setCenter( int, int );    
-    virtual void           zoom( int, int, int, int );
-    virtual void           fitRect( const QRect& );
-    virtual void           fitSelect();
-    virtual void           fitAll( bool keepScale = false, bool withZ = true );
+  //! Returns view to begin state
+  virtual void           reset();
+  //! Sets offset to view
+  virtual void           pan( int dx, int dy );
+  //! Sets view center in global coords
+  virtual void           setCenter( int x, int y );
+  //! Process zoming transformation with mouse tracking from ( x0, y0 ) to ( x1, y1 )
+  virtual void           zoom( int x0, int y0, int x1, int y1 );
+  //! Transforms view by certangle
+  virtual void           fitRect( const QRect& );
+  //! Transforms view by selection
+  virtual void           fitSelect();
+  //! Transform view by view borders ( if \param keepScale = true, zoom does not change )
+  virtual void           fitAll( bool keepScale = false, bool withZ = true );
 
 protected slots:
-    void                   onStartDragObject();
-    void                   onPasteObject();
-    void                   onCutObject();
-    void                   onCopyObject();
+  //! Initializes drag process
+  void                   onStartDragObject();
+  //! Pastes object from clipboard
+  void                   onPasteObject();
+  //! Cuts object to clipboard
+  void                   onCutObject();
+  //! Copies object to clipboard
+  void                   onCopyObject();
 
-    void                   onMaybeTip( QPoint, QString&, QFont&, QRect&, QRect& );
-
+  //! Sets tool tip with \param text to \param theTextReg and on \param theViewReg whan mouse is on \param thePoint
+  void                   onMaybeTip( QPoint thePoint, QString& text, QFont& font, QRect& theTextReg, QRect& theViewReg );
+  
 protected:
-    GLViewer_ViewFrame*    myViewFrame;
-    GLViewer_Widget*       myGLWidget;
-    GLViewer_Rect*         myBorder;
-    QColor                 myBackgroundColor;
+  GLViewer_ViewFrame*    myViewFrame;
+  GLViewer_Widget*       myGLWidget;
+  GLViewer_Rect*         myBorder;
+  QColor                 myBackgroundColor;
+  
+  GLfloat                myMargin;
+  int                    myHeight;
+  int                    myWidth;
+  
+  GLfloat                myXScale;
+  GLfloat                myYScale;
+  GLfloat                myXOldScale;
+  GLfloat                myYOldScale;
+  GLfloat                myXPan;
+  GLfloat                myYPan;
 
-    GLfloat                myMargin;
-    int                    myHeight;
-    int                    myWidth;
+  GLViewer_Grid*         myGrid; 
+  GLViewer_Compass*      myCompass;
 
-    GLfloat                myXScale;
-    GLfloat                myYScale;
-    GLfloat                myXOldScale;
-    GLfloat                myYOldScale;
-    GLfloat                myXPan;
-    GLfloat                myYPan;
+  //dragging
+  int                    myIsDragProcess;
+  float*                 myCurDragPosX;
+  float*                 myCurDragPosY;
+  
+  //selection by rect
+  QPoint*                mypFirstPoint;
+  QPoint*                mypLastPoint;
 
-    GLViewer_Grid*         myGrid; 
-    GLViewer_Compass*      myCompass;
-
-    //dragging
-    int                    myIsDragProcess;
-    float*                 myCurDragPosX;
-    float*                 myCurDragPosY;
-
-    //selection by rect
-    QPoint*                mypFirstPoint;
-    QPoint*                mypLastPoint;
-
-    //pulling
-    bool                   myIsPulling;
-    GLViewer_Object*       myPullingObject;
+  //pulling
+  bool                   myIsPulling;
+  GLViewer_Object*       myPullingObject;
     
-    int                    myViewPortId;
+  int                    myViewPortId;
 
-    //GLViewer_ObjectTip*    myObjectTip;
-    QtxToolTip*            myObjectTip;
+  //GLViewer_ObjectTip*    myObjectTip;
+  QtxToolTip*            myObjectTip;
 };
 
 #ifdef WNT

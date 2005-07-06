@@ -7,7 +7,7 @@
 **  Class:   GLViewer_Viewer2d
 **  Descr:   OpenGL Viewer 2D
 **  Module:  GLViewer
-**  Created: UI team, 04.09.02
+**  Created: UI team, 04.09.04
 ****************************************************************************/
 #ifndef GLVIEWER_VIEWER2D_H
 #define GLVIEWER_VIEWER2D_H
@@ -36,6 +36,7 @@ class GLViewer_Selector2d;
 class SUIT_Desktop;
 class SUIT_ViewWindow;
 
+//! Paper sizes array
 const double Sizes[2*5] = { 
     /* A1 */ 594.0, 840.0,
     /* A2 */ 420.0, 594.0,
@@ -48,96 +49,165 @@ const double Sizes[2*5] = {
 #pragma warning( disable:4251 )
 #endif
 
+/*! 
+ * Class GLViewer_Object
+ * 2D viewer for GLViewer
+ */
 class GLVIEWER_API GLViewer_Viewer2d : public GLViewer_Viewer
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    enum GLSketchingType { None, Polyline, Arc, Curve, Scribble, Oval, Rectangle };
-    enum VectorFileType { POST_SCRIPT, HPGL
+  //! Type of sketcher operation    
+  enum GLSketchingType
+  {
+    None,
+    Polyline,
+    Arc,
+    Curve,
+    Scribble,
+    Oval,
+    Rectangle
+  };
+  //! Type of export vector file
+  enum VectorFileType
+  {
+    POST_SCRIPT,
+    HPGL
 #ifdef WIN32
-        , ENH_METAFILE
+    , ENH_METAFILE
 #endif
-    };
+  };
 
-    enum PaperType { A1=0, A2, A3, A4, A5 };
+  //! Type of paper for export to vector format
+  enum PaperType
+  {
+    A1=0,
+    A2,
+    A3,
+    A4,
+    A5
+  };
 
 public:
-    GLViewer_Viewer2d( const QString& title );
-    ~GLViewer_Viewer2d();
+  //! A constructor
+  GLViewer_Viewer2d( const QString& title );
+  //! A destructor
+  ~GLViewer_Viewer2d();
 
 public:
-    SUIT_ViewWindow*     createView( SUIT_Desktop* );
+  //! Redefined method
+  /*Returns GLViewer_ViewFrame*/
+  virtual SUIT_ViewWindow*  createView( SUIT_Desktop* );
+  
+  //! Adds item for change background color
+  void                 addPopupItems( QPopupMenu* );
 
-    void                 addPopupItems( QPopupMenu* );
+  //void                activateGLSketching( int );
 
-    //void                activateGLSketching( int );
+  //! Returns all drawers
+  const QValueList<GLViewer_Drawer*>& getDrawers() const { return myDrawers; }
+  
+  //! Returns context
+  GLViewer_Context*    getGLContext() const { return myGLContext; }
+  //! Updates colors for all drawers (does not work)
+  void                 updateColors( QColor colorH, QColor colorS );
+  
+  //! Updates rect of global scene by adding new rect
+  void                 updateBorders( GLViewer_Rect* theRect );
+  //! Recomputes global scene rect
+  void                 updateBorders();
 
-    const QValueList<GLViewer_Drawer*>& getDrawers() const { return myDrawers; }
-
-    GLViewer_Context*    getGLContext() const { return myGLContext; }
-    void                 updateColors( QColor colorH, QColor colorS );
-    void                 updateBorders( GLViewer_Rect* theRect );
-    void                 updateBorders();
-
-    void                 updateAll();
-    void                 updateDrawers( GLboolean update, GLfloat scX = 0.0, GLfloat scY = 0.0 );
-    void                 activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap = GL_FALSE );
-    void                 activateDrawer( GLViewer_Object*, bool onlyUpdate, GLboolean swap = GL_FALSE );
-    void                 activateAllDrawers( bool onlyUpdate, GLboolean swap = GL_FALSE );
-
-    void                 transPoint( GLfloat& x, GLfloat& y );
-    QRect*               getWinObjectRect( GLViewer_Object* );
+  //! Redraws all active objects by updating all drawers in all views
+  void                 updateAll();
+  //! Updates all drawers with new scale factor
+  /* \param onlyUpdate is passed to method activateAllDrawersdrawers*/
+  void                 updateDrawers( GLboolean onlyUpdate, GLfloat scX = 0.0, GLfloat scY = 0.0 );
+  //! Activates drawers for objects from list \param theObjects only
+  void                 activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap = GL_FALSE );
+  //! Activates drawer for \param theObject
+  void                 activateDrawer( GLViewer_Object* theObject, bool onlyUpdate, GLboolean swap = GL_FALSE );
+  //! Updates all drawers with new scale factor
+  /* \param onlyUpdate is passed to drawers*/
+  void                 activateAllDrawers( bool onlyUpdate, GLboolean swap = GL_FALSE );
+  
+  //! Translates point (x,y) from global CS to curreent viewer CS
+  void                 transPoint( GLfloat& x, GLfloat& y );
+  //! Returns object rect in window CS
+  QRect*               getWinObjectRect( GLViewer_Object* theObject);
+  
+  //! Translates rect in window CS to rect in global CS
+  GLViewer_Rect        getGLVRect( const QRect& ) const;
+  //! Translates rect in global CS to rect in window CS
+  QRect                getQRect( const GLViewer_Rect& ) const;
+  
+  //! Inserts common text lines starting file of \param aType
+  virtual void         insertHeader( VectorFileType aType, QFile& hFile );
+  //! Inserts common text lines ending file of \param aType
+  virtual void         insertEnding( VectorFileType aType, QFile& hFile );
+  //! Translates current view content to vector file
+  /* Translates current view content to vector file with type \param aType, name \param FileName,
+   * output paper size \param aPType, with margins in mm
+  */
+  virtual bool         translateTo( VectorFileType aType, QString FileName, PaperType aPType, 
+				   double mmLeft, double mmRight, double mmTop, double mmBottom );
     
-    
-    GLViewer_Rect        getGLVRect( const QRect& ) const;
-    QRect                getQRect( const GLViewer_Rect& ) const;
+  //bool                 isSketchingActive();
+  //int                  getSketchingType();
+  
+  //virtual void         startSketching();
+  //virtual void         finishSketching();
 
-    virtual void         insertHeader( VectorFileType aType, QFile& hFile );
-    virtual void         insertEnding( VectorFileType aType, QFile& hFile );
-    virtual bool         translateTo( VectorFileType aType, QString FileName, PaperType aPType, 
-                                      double mmLeft, double mmRight, double mmTop, double mmBottom );
-    
-    //bool                 isSketchingActive();
-    //int                  getSketchingType();
-
-    //virtual void         startSketching();
-    //virtual void         finishSketching();
-
-    void                 repaintView( GLViewer_ViewFrame* theView = NULL, bool makeCurrent = false );
+  //! Repaints view \param theView. If \param theView = NULL repaints all views.
+  void                 repaintView( GLViewer_ViewFrame* theView = NULL, bool makeCurrent = false );
 
 public slots:
-    //void                 onSketchDelObject();
-    //void                 onSketchUndoLast();
-    //void                 onSketchFinish();
-    void                 onChangeBgColor();
-    void                 onCreateGLMarkers( int = 1000, int = 5 );
-    void                 onCreateGLPolyline( int = 100, int = 10, int = 100 );
-    void                 onCreateGLText( QString = "Text", int = 1 );
+  //void                 onSketchDelObject();
+  //void                 onSketchUndoLast();
+  //void                 onSketchFinish();
+
+  //! Changes background color
+  void                 onChangeBgColor();
+  //! Creates set of marker number \param number and radius = \param size
+  void                 onCreateGLMarkers( int number = 1000, int size = 5 );
+  //! Creates set of polyline number \param number, number of angles = \param angles and diameter = \param size
+  void                 onCreateGLPolyline( int number = 100, int angles = 10, int size = 100 );
+  //! Creates set of text number \param number and with text = \param text
+  void                 onCreateGLText( QString text = "Text", int number = 1 );
 
 protected:
-    GLViewer_Selector*        createSelector();
-    GLViewer_ViewTransformer* createTransformer( int );
-
-    void                 transformCoordsToPS( double& x, double& y );
-    void                 transformCoordsToHPGL( double& x, double& y );
-
-    virtual void         startOperations( QMouseEvent* );
-    virtual bool         updateOperations( QMouseEvent* );
-    virtual void         finishOperations( QMouseEvent* );
-    virtual void         startOperations( QWheelEvent* );
+  //! Returns new selector
+  GLViewer_Selector*        createSelector();
+  //! Returns new Transformer with type \param type
+  GLViewer_ViewTransformer* createTransformer( int type);
+  
+  //! Transforms point (x,y) in Viewer CS to Post Script CS
+  void                 transformCoordsToPS( double& x, double& y );
+  //! Transforms point (x,y) in Viewer CS to HPGL CS
+  void                 transformCoordsToHPGL( double& x, double& y );
+  
+  //! Starts any operations on mouse event
+  virtual void         startOperations( QMouseEvent* );
+  //! Updates started operations on mouse event
+  virtual bool         updateOperations( QMouseEvent* );
+  //! Completes started operations on mouse event
+  virtual void         finishOperations( QMouseEvent* );
+  //! Starts any operations on mouse wheel event
+  virtual void         startOperations( QWheelEvent* );
 
 protected slots:
-    void                 onMouseEvent( SUIT_ViewWindow*, QMouseEvent* );
+  void                 onMouseEvent( SUIT_ViewWindow*, QMouseEvent* );
 
 private:
-    bool                 testRotation( QMouseEvent* );
-
-protected:    
-    GLViewer_Context*    myGLContext;
-    QValueList<GLViewer_Drawer*> myDrawers;
-
-    //GLViewer_Sketcher*   myGLSketcher;
+  //! Rotation transformation
+  bool                 testRotation( QMouseEvent* );
+protected:
+  //! Current context 
+  GLViewer_Context*             myGLContext;
+  //! Map of active drawers
+  QValueList<GLViewer_Drawer*>  myDrawers;
+  
+  //GLViewer_Sketcher*   myGLSketcher;
 };
 
 /****************************************************************
@@ -147,21 +217,19 @@ protected:
 class GLVIEWER_API GLViewer_View2dTransformer : public GLViewer_ViewTransformer
 {
 public:
-    GLViewer_View2dTransformer( GLViewer_Viewer*, int );
-    ~GLViewer_View2dTransformer();
-
-public:
-    virtual void         exec();
-
-    /*! Sets/returns mouse butto which will be used for rotation ( MB1 by default ) */
-    static int           rotateButton() { return rotateBtn; }
-    static void          setRotateButton( int b ) { rotateBtn = b; }
-
-protected:
-    void                 onTransform( TransformState );
+  GLViewer_View2dTransformer( GLViewer_Viewer*, int );
+  ~GLViewer_View2dTransformer();
+  
+  virtual void         exec();
+  
+  /*! Sets/returns mouse butto which will be used for rotation ( MB1 by default ) */
+  static int           rotateButton() { return rotateBtn; }
+  static void          setRotateButton( int b ) { rotateBtn = b; }
 
 protected:
-    static  int          rotateBtn;
+  void                 onTransform( TransformState );
+
+  static  int          rotateBtn;
 };
 
 #ifdef WNT

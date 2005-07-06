@@ -1,6 +1,7 @@
 // File:      GLViewer_Tools.h
 // Created:   April, 2005
 // Author:    OCC team
+// Copyright (C) CEA 2005
 
 #ifndef GLVIEWER_TOOLS_H
 #define GLVIEWER_TOOLS_H
@@ -29,35 +30,41 @@ public:
 
 };
 
+//! Dimension of line
 enum FieldDim
 {
-  FD_X = 0,
-  FD_Y = 1
+  FD_X = 0, /*along x axis*/
+  FD_Y      /*along y axis*/
 };
 
-/****************************************************************************
-**  Class:   GLViewer_LineList 
-**  Descr:   Tools for distinct line
-**  Module:  GLViewer
-**  Created: UI team, 27.10.05
-*****************************************************************************/
+/*!
+  Class GLViewer_LineList 
+  Tools for distinct line
+  This class implmented interface for segment operations:
+  add, cut, remove and etc.
+  Memory does not changed and allocated only one time
+*/
 class GLViewer_LineList  
 {
 public:
-	GLViewer_LineList( int  );
-	virtual ~GLViewer_LineList();
+  GLViewer_LineList( int  );
+  virtual ~GLViewer_LineList();
 
+  //! Returns number of segments
   int         count() const { return mySegmentNumber; }
+  //! Returns real size
   int         size() const { return myRealSize; }
-
+  
   bool        addSegment( double coord1, double coord2 );
   bool        removeSegment( int index );
   bool        removeSegment( double coord1, double coord2 );
 
-  bool        readSegment( int index, double&, double& );
+  bool        readSegment( int index, double& coord1, double& coord2 );
 
+  //! Returns index of segment, else -1
   int         contains( double thePoint ) const;
 
+  //! Sets level of segments
   void        setMainCoord( double theVal ) { myMainCoord = theVal; }
   double      mainCoord() const { return myMainCoord; }
 
@@ -76,6 +83,7 @@ private:
   double      myMainCoord;
 };
 
+/*! struct GraphNode describe node in algorithm on rare grid*/
 struct GraphNode
 {
   int       myCount;
@@ -85,6 +93,7 @@ struct GraphNode
   int       prevNodeIndex; //feedback for searching for solution
 };
 
+/*! struct SearchPoint describe node for solving algorithm*/
 struct SearchPoint
 {
   int       myXLineIndex;
@@ -94,21 +103,21 @@ struct SearchPoint
   int       mySolveIndex;
 };
 
-/****************************************************************************
-**  Class:   GLViewer_LineField 
-**  Descr:   Tools for solving 
-**  Module:  GLViewer
-**  Created: UI team, 27.10.05
-*****************************************************************************/
+/*! Class  GLViewer_LineField 
+* Tools for solving algorithm of finding shortest path on rare grid with minimum of 
+* line turns number
+*/
 class GLViewer_LineField
 {
 public:
+  //!Searched point
   enum  FieldPoint
   {
     FP_Start = 0,
     FP_End = 1
   };
 
+  //! Status of interation
   enum IterationStatus
   {
     IS_ERROR = 0,
@@ -117,6 +126,7 @@ public:
     IS_SOLVED
   };
 
+  //! Final status of solving
   enum EndStatus
   {
     ES_ERROR = 0,
@@ -128,21 +138,30 @@ public:
   GLViewer_LineField( const int theMAXSize, const int xn, const int yn );
   virtual ~GLViewer_LineField();
 
-  //best way, if line is already sorted
+  //! Adds new line
+  /*!best way, if line is already sorted*/
   void                addLine( FieldDim, GLViewer_LineList* );
+  //! Calls previous
   void                addLine( FieldDim theDim, double theMC, double theBegin, double theEnd );
-//  void                addLine( FieldDim, double theMainCoord, double theBegin, double theEnd ):
   
-  int                 insertLine( FieldDim theDim, GLViewer_LineList*, int thePosition ); // return position
-  int                 insertLine( FieldDim theDim, double theMC, double theBegin, double theEnd, int thePosition ); // return position
+  //! Adds new line and sorted field
+  /*! Returns position*/
+  int                 insertLine( FieldDim theDim, GLViewer_LineList*, int thePosition );
+  //! Calls previous
+  int                 insertLine( FieldDim theDim, double theMC, double theBegin, double theEnd, int thePosition );
 
+  //! Returns other dimension
   static FieldDim     invertDim( FieldDim );
 
+  //! Returns line by index and dimension
   GLViewer_LineList*  getLine( int index, FieldDim );
 
+  //! Nullifys field and sets same continued segments
   void                setBorders( double X1, double X2, double Y1, double Y2 );
+  //! Cut rectangle in grid
   void                addRectangle( double top, double right, double bottom, double left );
 
+  //! returns arrey of intersects indexes with \param theLL
   int*                intersectIndexes( FieldDim theDim, int theIndex, const GLViewer_LineList* theLL , int& theSize );
 
   void                print();
@@ -150,28 +169,44 @@ public:
   void                show();  
 
   int                 getDimSize( FieldDim );
+  //! Returns number of segment
   int                 segmentNumber();
 
-  bool                setPoint( FieldPoint, double, double );
+  //! Sets start/end search point
+  bool                setPoint( FieldPoint, double x, double y );
 
+  //! Optimize field
+  /*! Removes all multiple segments*/
   void                optimize();
-  void                initialize();//needs call setPoint before
-  EndStatus           startAlgorithm();//main method
+  //! Some prepare actions
+  /*! Needs call setPoint before*/
+  void                initialize();
+  //! Main method
+  EndStatus           startAlgorithm();
 
-  double*             solution( int& );
+  //! Returns solution and size of solution
+  double*             solution( int& size );
 
 protected:
+  //! One iteration of algorithm
   void                iteration();
+  //! Checks for complete status
   IterationStatus     checkComplete();  
 
+  //! Finds LileList by counts and returns indexes
   int*                findByCount( int& theParam );
-  int                 findBySegment( FieldDim, int, int, bool inCurArray = true );
+  //! Finds LileList by segment and dimension
+  int                 findBySegment( FieldDim, int coord1, int coord2, bool inCurArray = true );
 
+  //! Returns current solution array
   GraphNode*          getCurArray();
+  //! Returns 
   GraphNode*          getSecArray();
 
+  //! Returns maximum segment number
   int                 maxSegmentNum();
 
+  //! Returns list of LileList by dimension
   GLViewer_LineList** getLLArray( FieldDim );
 
 private:

@@ -18,8 +18,9 @@
 #pragma warning( disable:4251 )
 #endif
 
-// Class:   GLViewer_Pnt
-// Descr:   Substitution of QPoint for OpenGL
+/*! Struct GLViewer_Pnt
+* Substitution of QPoint for OpenGL
+*/
 
 struct GLVIEWER_API GLViewer_Pnt
 {
@@ -41,8 +42,9 @@ private:
 
 typedef QValueList<GLViewer_Pnt> GLViewer_PntList;
 
-// Class:   GLViewer_Rect
-// Descr:   Substitution of QRect for OpenGL
+/*! Class  GLViewer_Rect
+*  Substitution of QRect for OpenGL
+*/
 
 class GLVIEWER_API GLViewer_Rect
 {
@@ -70,16 +72,22 @@ public:
   void        setCoords( float theLeft, float theRight, float theBottom, float theTop )
   { myLeft = theLeft; myRight = theRight; myBottom = theBottom; myTop = theTop; }
   
+  //! \warning This method translate only rect format
   QRect       toQRect() { return QRect( ( int )myLeft, ( int )myBottom,
                                         ( int )( myRight - myLeft ),
                                         ( int )( myTop - myBottom ) ); }
 
+  //! On/off empty status
   void        setIsEmpty( bool on ) { myIsEmpty = on; }
+  //! Checks empty status
   bool        isEmpty() const { return myIsEmpty; }
 
+  //! Checks null status
   bool        isNull() const { return myLeft == 0.0 && myRight == 0.0 && myBottom == 0.0 && myTop == 0.0; }
+  //! Checks valid status
   bool        isValid() const { return ( myLeft < myRight && myBottom < myTop ); }
 
+  //! Checks staus of contains point 
   bool        contains( GLViewer_Pnt pnt ) { return ( pnt.x() > left() &&
                                                       pnt.x() < right() &&
                                                       pnt.y() > bottom() &&
@@ -94,22 +102,23 @@ protected:
   bool        myIsEmpty;
 };
 
-// Class:   GLViewer_Segment
-// Descr:   Segment for 2d detection
+/*! Class GLViewer_Segment
+* Segment for 2d detection
+*/
 
 class GLVIEWER_API GLViewer_Segment
 {
 public:
   GLViewer_Segment( const GLViewer_Pnt& thePnt1, 
                     const GLViewer_Pnt& thePnt2 );
-  // Ordinary segment construction
+  
+  //! Ordinary segment construction
+  /*!Construction of a ray with given equation Ax + By + C = 0 */
 
   GLViewer_Segment( const GLViewer_Pnt& thePnt, 
                     const GLfloat theA, 
                     const GLfloat theB,
                     const GLfloat theC );
-  // Construction of a ray with given equation Ax + By + C = 0
-
   ~GLViewer_Segment();
 
   bool              HasIntersection( const GLViewer_Segment& theOther ) const;
@@ -123,8 +132,9 @@ private:
   GLfloat           myC;
 };
 
-// Class:   GLViewer_Poly
-// Descr:   Polygon for 2d detection
+/*! Class  GLViewer_Poly
+* Polygon for 2d detection
+*/
 
 class GLVIEWER_API GLViewer_Poly 
 {
@@ -132,20 +142,21 @@ public:
   GLViewer_Poly( const GLViewer_PntList* thePoints );
   virtual ~GLViewer_Poly();
 
+  //! Returns number of point
   int               Count() const { return myPoints->count(); }
 
+  //! Returns true if a point lies inside this polygon
   virtual bool      IsIn( const GLViewer_Pnt& thePnt ) const;
-  //virtual bool      IsIn( const GLViewer_Pnt& thePnt, const float tolerance = 0 ) const;
-  // Detects if a point lies inside this polygon
-  
+
+  //! Returns true if a other polygon covers this polygon  
   virtual bool      IsCovers( const GLViewer_Poly& thePoly ) const;
-  // Detect if a other polygon covers this polygon
 
+  //! Likes the above function
   virtual bool      IsCovers( const GLViewer_Rect& theRect ) const;
-  // likes the above function
-
+  
+  // Returns true if intersection of this polygon with a segment or a ray not empty
   virtual bool      HasIntersection( const GLViewer_Segment& theSegment ) const;
-  // Detects intersection of this polygon with a segment or a ray
+
 
 private:
   GLViewer_PntList* myPoints;

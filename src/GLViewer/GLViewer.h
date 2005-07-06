@@ -3,7 +3,7 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-// Macro for exports
+//! Macro for exports
 #ifdef WNT
 
 #ifdef GLVIEWER_EXPORTS

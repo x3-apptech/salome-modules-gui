@@ -18,54 +18,73 @@
 #pragma warning( disable:4251 )
 #endif
 
-// Class:   GLViewer_MarkerSet
-// Descr:   OpenGL MarkerSet
+/*! 
+ * Class GLViewer_MarkerSet
+ * OpenGL MarkerSet
+ */
 
 class GLVIEWER_API GLViewer_MarkerSet : public GLViewer_Object
 {
 public:
+  //! A constructor
   GLViewer_MarkerSet( int number = 1, float size = 5.0, const QString& toolTip = "GLMarker" );
+  //! A destructor
   ~GLViewer_MarkerSet();
-  
-  virtual void            compute();
+
+  // redefined  methods
+  virtual void             compute();
   virtual GLViewer_Drawer* createDrawer();
   
-  virtual GLboolean       highlight( GLfloat x, GLfloat y, GLfloat tol = 15.0, GLboolean isCircle = GL_FALSE );
-  virtual GLboolean       unhighlight();
-  virtual GLboolean       select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull = GL_FALSE,
+  virtual GLboolean        highlight( GLfloat x, GLfloat y, GLfloat tol = 15.0, GLboolean isCircle = GL_FALSE );
+  virtual GLboolean        unhighlight();
+  virtual GLboolean        select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull = GL_FALSE,
     GLboolean isCircle = GL_FALSE, GLboolean isShift = GL_FALSE );
-  virtual GLboolean       unselect();
+  virtual GLboolean        unselect();
   
-  virtual GLViewer_Rect*  getUpdateRect();
+  virtual GLViewer_Rect*   getUpdateRect();
   
-  void                    setXCoord( GLfloat* xCoord, int size );
-  void                    setYCoord( GLfloat* yCoord, int size );
-  GLfloat*                getXCoord() const { return myXCoord; }
-  GLfloat*                getYCoord() const { return myYCoord; }
-  void                    setNumMarkers( GLint );
-  GLint                   getNumMarkers() const { return myNumber; };
+  virtual void             moveObject( float, float, bool fromGroup = false );
   
-  void                    setMarkerSize( const float size ) { myMarkerSize = size; }
-  float                   getMarkerSize() const { return myMarkerSize; }
+  virtual QByteArray       getByteCopy();
+  virtual bool             initializeFromByteCopy( QByteArray );
   
-  void                    exportNumbers( QValueList<int>&, QValueList<int>& , QValueList<int>&, QValueList<int>& );
-  
-  QValueList<int>         getSelectedElements() { return mySelNumbers; }
-  bool                    addOrRemoveSelected( int index );
-  void                    addSelected( const TColStd_SequenceOfInteger& );
-  void                    setSelected( const TColStd_SequenceOfInteger& );
-  
-  virtual void            moveObject( float, float, bool fromGroup = false );
-  
-  virtual QByteArray      getByteCopy();
-  virtual bool            initializeFromByteCopy( QByteArray );
-  
-  virtual bool            translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS );
-  virtual bool            translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS );    
+  virtual bool             translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS );
+  virtual bool             translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS );    
   
 #ifdef WIN32
-  virtual bool            translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
+  virtual bool             translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
 #endif
+
+  //! Sets array of x coords of markers
+  void                     setXCoord( GLfloat* xCoord, int size );
+  //! Sets array of y coords of markers
+  void                     setYCoord( GLfloat* yCoord, int size );
+  //! Returns x coords
+  GLfloat*                 getXCoord() const { return myXCoord; }
+  //! Returns y coords
+  GLfloat*                 getYCoord() const { return myYCoord; }
+  
+  //! Sets markers number
+  void                     setNumMarkers( GLint );
+  //! returns markers number
+  GLint                    getNumMarkers() const { return myNumber; };
+  //! Sets merker radius
+  void                     setMarkerSize( const float size ) { myMarkerSize = size; }
+  //! Returns merker radius
+  float                    getMarkerSize() const { return myMarkerSize; }
+  
+  //! Export numbers of heghlighted/selected markers
+  void                     exportNumbers( QValueList<int>& high, QValueList<int>& unhigh,
+                                          QValueList<int>& sel, QValueList<int>& unsel );
+  
+  //! Returns selected numbers
+  QValueList<int>          getSelectedElements() { return mySelNumbers; }
+  //! Adds or remove selected number
+  bool                     addOrRemoveSelected( int index );
+  //! Adds selected numbers
+  void                     addSelected( const TColStd_SequenceOfInteger& );
+  //! Sets selected nembers
+  void                     setSelected( const TColStd_SequenceOfInteger& );
 
 protected:
   GLint                   myNumber;
@@ -81,15 +100,18 @@ protected:
   TColStd_SequenceOfInteger mySelectedIndexes;
 };
 
-// Class:   GLViewer_Polyline
-// Descr:   OpenGL Polyline
+/*! 
+ * Class  GLViewer_Polyline
+ * OpenGL Polyline
+ */
 
 class GLVIEWER_API GLViewer_Polyline: public GLViewer_Object
 {
 public:
   GLViewer_Polyline( int number = 1, float size = 5.0, const QString& toolTip = "GLPolyline" );
-  ~GLViewer_Polyline();
+ ~GLViewer_Polyline();
   
+  // redefined  methods
   virtual void            compute();
   virtual GLViewer_Drawer* createDrawer();
   
@@ -100,23 +122,6 @@ public:
   virtual GLboolean       unselect();
   
   virtual GLViewer_Rect*  getUpdateRect();
-  
-  void                    setXCoord( GLfloat* xCoord, int size );
-  void                    setYCoord( GLfloat* yCoord, int size );
-  GLfloat*                getXCoord() const { return myXCoord; }
-  GLfloat*                getYCoord() const { return myYCoord; }
-  void                    setNumber( GLint );
-  GLint                   getNumber() const { return myNumber; };
-  
-  void                    setClosed( GLboolean closed ) { myIsClosed = closed; }
-  GLboolean               isClosed() const { return myIsClosed; }
-  
-  void                    setHighSelAll( GLboolean highSelAll ) { myHighSelAll = highSelAll; }
-  GLboolean               isHighSelAll() const { return myHighSelAll; }
-  
-  void                    exportNumbers( QValueList<int>&, QValueList<int>& , QValueList<int>&, QValueList<int>& );
-  
-  QValueList<int>         getSelectedElements() { return mySelNumbers; }
   
   virtual void            moveObject( float, float, bool fromGroup = false );
   
@@ -129,6 +134,37 @@ public:
 #ifdef WIN32
   virtual bool            translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
 #endif
+  
+  //! Sets array of x coords of points
+  void                     setXCoord( GLfloat* xCoord, int size );
+  //! Sets array of y coords of points
+  void                     setYCoord( GLfloat* yCoord, int size );
+  //! Returns x coords
+  GLfloat*                 getXCoord() const { return myXCoord; }
+  //! Returns y coords
+  GLfloat*                 getYCoord() const { return myYCoord; }
+
+  //! SetS number of points
+  void                    setNumber( GLint );
+  //! Returns number of points
+  GLint                   getNumber() const { return myNumber; };
+  
+  //! On/off closed status of polyline
+  void                    setClosed( GLboolean closed ) { myIsClosed = closed; }
+  //! Checks closed status of polyline
+  GLboolean               isClosed() const { return myIsClosed; }
+  
+  //! On/off highlight as whole object status
+  void                    setHighSelAll( GLboolean highSelAll ) { myHighSelAll = highSelAll; }
+  //! Checks highlight as whole object status
+  GLboolean               isHighSelAll() const { return myHighSelAll; }
+  
+  //! Export numbers of heghlighted/selected lines
+  void                     exportNumbers( QValueList<int>& high, QValueList<int>& unhigh,
+                                          QValueList<int>& sel, QValueList<int>& unsel );
+
+  //! Returns numbers of selected lines
+  QValueList<int>         getSelectedElements() { return mySelNumbers; }
 
 protected:
   GLfloat*                myXCoord;

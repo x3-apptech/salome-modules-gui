@@ -18,12 +18,11 @@ class GLViewer_Object;
 typedef std::list<GLViewer_Object*> OGList;
 typedef std::list<GLViewer_Object*>::iterator OGIterator;
 
-/***************************************************************************
-**  Class:   GLViewer_Group
-**  Descr:   Group of GLViewer_Objects
-**  Module:  GLViewer
-**  Created: UI team, 25.03.05
-****************************************************************************/
+/*! Class  GLViewer_Group
+* Group of GLViewer_Objects for synchronized moving.
+* If you move one or more objects from group, than all objects from group is moved
+* If group is empty, it must be deleted
+*/
 
 class GLVIEWER_API GLViewer_Group
 {
@@ -32,20 +31,26 @@ public:
   ~GLViewer_Group();
 
   bool    isEmpty();
+  //! Returns number ob objects
   int     count();
-
+  
+  //! Returns index of position, else -1
   int     contains( GLViewer_Object* );
   int     addObject( GLViewer_Object* );
   int     removeObject( GLViewer_Object* );
 
   OGList  getObjects() const { return myList; }
 
-  //operations
+  //! Dragging operation
+  /*! Once = true, if this operation calls only one time for all object*/
   void    dragingObjects( float x, float y, bool once = false );
+  //!\warning it is for ouv
   void    updateZoom( GLViewer_Object* sender, float zoom );
 
 private:
+  //! List of objects
   OGList      myList;
+  //! This number needs for synchranization group with viewport drag methods
   int         mySelObjNum;
 };
 

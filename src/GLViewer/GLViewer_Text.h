@@ -24,39 +24,57 @@
 #pragma warning( disable:4251 )
 #endif
 
-// Class:   GLViewer_Text
-// Descr:   Substitution of Prs3d_Text for OpenGL
+/* Class GLViewer_Text
+* Substitution of Prs3d_Text for OpenGL */
 
 class GLVIEWER_API GLViewer_Text
 {
 public:
   GLViewer_Text( const QString&, float xPos = 0.0, float yPos = 0.0, const QColor& color = QColor( 0, 255, 0 ) );
-  GLViewer_Text( const QString&, float xPos, float yPos, const QColor& , QFont, int );
+  GLViewer_Text( const QString&, float xPos, float yPos, const QColor& , QFont theFont, int theSeparator);
   ~GLViewer_Text();
   
+  //! Sets text
   void                  setText( const QString& text ) { myText = text; }
+  //! Returns text
   QString               getText() const { return myText; }
   
+  //! Sets text position
   void                  setPosition( float xPos, float yPos ) { myXPos = xPos; myYPos = yPos; }
+  //! Returns text position
   void                  getPosition( float& xPos, float& yPos ) { xPos = myXPos; yPos = myYPos; }
   
+  //! Sets text color
   void                  setColor( const QColor& color ) { myColor = color; }
+  //! Returns text color
   QColor                getColor() const { return myColor; }
   
+  //! Sets text font
   void                  setFont( const QFont theQFont) { myQFont = theQFont; }
+  //! Returns text font
   QFont                 getFont() const { return myQFont; }
   
+  //! Returns text separator
   int                   getSeparator(){ return mySeparator; }
+  //! Sets text separator
   void                  setSeparator( int theSep ){ mySeparator = theSep; }
   
+  //! Returns text width
   int                   getWidth();
+  //! Returns text height
   int                   getHeight();
   
+  //! A function for coding object to the byte copy
+  /*! A function is used for copy-past technollogy in copy method   */
   QByteArray            getByteCopy() const;
   
+  //! A function for decoding object from the byte copy
+  /*! A function is used for copy-past technollogy in past method   */
   static GLViewer_Text* fromByteCopy( QByteArray );
   
+  //! Sets text format BITMAP or TEXTURE
   DisplayTextFormat     getDisplayTextFormat() const { return myDTF; }
+  //! Returns text format BITMAP or TEXTURE
   void                  setTextDisplayFormat( DisplayTextFormat theDTF ) { myDTF = theDTF; }
   
 protected:

@@ -22,6 +22,10 @@
 
 class GLViewer_Viewer;
 
+/*! Class GLViewer_Selector
+*   Based select manager for GLViewer
+*/
+
 class GLVIEWER_API GLViewer_Selector : public QObject
 {
     Q_OBJECT
@@ -31,20 +35,25 @@ public:
     ~GLViewer_Selector();
 
 public:
+    //! Sets lock status (enable/disable interavtive)
     void                  lock( bool );
     void                  setMinRectSize( const QSize& minSize );
 
-    virtual void          detect( int, int ) = 0;
+    //! Highlights in point (x,y)
+    virtual void          detect( int x, int y ) = 0;    
     virtual void          undetectAll() = 0;
 
+    //! Selects highlight objects
     virtual void          select( bool append = false ) = 0;
+    //! Selects by rect
     virtual void          select( const QRect&, bool append = false ) = 0;
     virtual void          unselectAll() = 0;
     virtual int           numSelected() const = 0;
 
     virtual void          setHilightColor( Quantity_NameOfColor ) = 0;
     virtual void          setSelectColor( Quantity_NameOfColor ) = 0;
-
+    //!Checks selection state and emits  'selSelectionDone' or 'selSelectionCancel'     
+    /*!Should be called by after non-interactive selection. */
     virtual void          checkSelection( int, bool, int ) = 0;
 
     /*! Sets/returns the key for appending selected objects ( SHIFT by default ) */

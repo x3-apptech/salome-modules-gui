@@ -14,9 +14,9 @@
 #pragma warning( disable:4251 )
 #endif
 
-/*! Class GLViewer_AspectLine
- *  Substitution of Prs2d_AspectLine for OpenGL
- *
+/*! 
+ * Class GLViewer_AspectLine
+ * Substitution of Prs2d_AspectLine for OpenGL
  */
 
 class GLVIEWER_API GLViewer_AspectLine 

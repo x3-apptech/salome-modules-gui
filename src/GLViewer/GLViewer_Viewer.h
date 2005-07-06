@@ -3,12 +3,6 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Viewer
-**  Descr:   Viewer for QAD-based application
-**  Module:  QAD
-**  Created: UI team, 05.09.00
-****************************************************************************/
 #ifndef GLVIEWER_VIEWER_H
 #define GLVIEWER_VIEWER_H
 
@@ -32,6 +26,10 @@ class SUIT_ViewWindow;
 #pragma warning( disable:4251 )
 #endif
 
+/*! 
+ * Class GLViewer_Object
+ * Base Viewer for GLViewer
+ */
 class GLVIEWER_API GLViewer_Viewer: public SUIT_ViewModel
 {
     Q_OBJECT

@@ -49,6 +49,7 @@ GLViewer_Viewer2d::~GLViewer_Viewer2d()
 {    
     //myGLSketcher = 0;
     //delete myGLSketcher;
+  GLViewer_TexFont::clearTextBases();
 }
 
 SUIT_ViewWindow* GLViewer_Viewer2d::createView( SUIT_Desktop* theDesktop )

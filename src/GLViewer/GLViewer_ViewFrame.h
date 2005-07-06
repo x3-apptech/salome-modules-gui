@@ -28,6 +28,10 @@ class GLViewer_ViewPort;
 #pragma warning( disable:4251 )
 #endif
 
+/*! Class GLViewer_ViewFrame
+*   Frame window for viewport in GLViewer
+*/
+
 class GLVIEWER_API GLViewer_ViewFrame: public SUIT_ViewWindow
 {
   Q_OBJECT
@@ -36,7 +40,7 @@ public:
   GLViewer_ViewFrame( SUIT_Desktop* , GLViewer_Viewer* );
   ~GLViewer_ViewFrame();
   
-public:
+public:  
   void                    setViewer( GLViewer_Viewer* );
   GLViewer_Viewer*        getViewer() const;
   
@@ -90,6 +94,7 @@ private:
   void           createToolBar();
   
 private:
+  //! Actions ID
   enum { DumpId, FitAllId, FitRectId, FitSelectId, ZoomId, PanId, GlobalPanId, ResetId };
   typedef QMap<int, QAction*> ActionsMap;
   

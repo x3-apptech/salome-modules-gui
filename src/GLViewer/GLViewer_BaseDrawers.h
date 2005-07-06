@@ -21,8 +21,9 @@ class GLViewer_AspectLine;
 #pragma warning( disable:4251 )
 #endif
 
-// Class:   GLViewer_MarkerDrawer
-// Descr:   Drawer for GLViewer_MarkerSet
+/*! Class GLViewer_MarkerDrawer
+*  Drawer for GLViewer_MarkerSet
+ */
 
 class GLVIEWER_API GLViewer_MarkerDrawer : public GLViewer_Drawer  
 {
@@ -30,26 +31,30 @@ public:
   GLViewer_MarkerDrawer();
   ~GLViewer_MarkerDrawer();
   
+  //! Redefined method
   virtual void       create( float, float, bool );
   
 private:
-  void               drawMarker( float&, float&, float&, QColor&, GLViewer_AspectLine* );
+  //! Draws marker in point (x,y) of \param radius with \param color and \param aspect
+  void               drawMarker( float& x, float& y, float& radius, QColor& color, GLViewer_AspectLine* aspect );
 };
 
-// Class:   GLViewer_PolylineDrawer
-// Descr:   Drawer for GLViewer_Polyline
+/*! Class  GLViewer_PolylineDrawer
+* Drawer for GLViewer_Polyline
+*/
 
 class GLVIEWER_API GLViewer_PolylineDrawer : public GLViewer_Drawer  
 {
 public:
   GLViewer_PolylineDrawer();
   ~GLViewer_PolylineDrawer();
-  
+  //! Redefined method
   virtual void       create( float, float, bool );    
 };
 
-// Class:   GLViewer_TextDrawer
-// Descr:   
+/* Class GLViewer_TextDrawer
+* Drawer for GLViewer_Text
+*/
 
 class GLVIEWER_API GLViewer_TextDrawer: public GLViewer_Drawer
 {
@@ -58,8 +63,10 @@ public:
   GLViewer_TextDrawer();
   ~GLViewer_TextDrawer();
   
+  //! Redefined method
   virtual void              create( float, float, bool );
-  void                      updateObjects(); //after update font
+  //! Updates objects after updating font
+  void                      updateObjects();
 };
 
 #ifdef WNT

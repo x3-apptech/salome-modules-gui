@@ -21,8 +21,9 @@
 
 class GLViewer_Object;
 
-// Class:   GLViewer_MimeSource
-// Descr:   Needs for a work with QClipboard
+/*! Class GLViewer_MimeSource
+* Needs for a work with QClipboard
+*/
 
 class GLVIEWER_API GLViewer_MimeSource: public QMimeSource
 {
@@ -30,10 +31,16 @@ public:
   GLViewer_MimeSource():QMimeSource(){};
   ~GLViewer_MimeSource();
   
+  //! Translate objects to byte array
   bool                                setObjects( QValueList<GLViewer_Object*> );
-  static QValueList<GLViewer_Object*> getObjects( QByteArray, QString );
-  static GLViewer_Object*             getObject( QByteArray, QString );
+  //! Gets objects from byte array
+  /*If you want to use new class, following two method must be redefined*/
+  static QValueList<GLViewer_Object*> getObjects( QByteArray, QString theType);
+  //! Get object from byte array
+  /*If you want to use new class, following two method must be redefined*/
+  static GLViewer_Object*             getObject( QByteArray, QString theType);
   
+  // Redefined methods
   virtual const char*                 format( int theIndex = 0 ) const;
   virtual QByteArray                  encodedData( const char* ) const;
   

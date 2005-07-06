@@ -5,9 +5,8 @@
 
 /***************************************************************************
 **  Class:   GLViewer_ViewPort
-**  Descr:   Visualisation canvas of QAD-based application
-**  Module:  QAD
-**  Created: UI team, 05.09.00
+**  Descr:   Visualisation canvas of GLViewer
+**  Created: UI team, 05.09.04
 ****************************************************************************/
 #ifndef GLVIEWER_VIEWPORT_H
 #define GLVIEWER_VIEWPORT_H
@@ -39,6 +38,10 @@ enum BlockStatus
     BS_Dragging         = 0x0004
 };
 
+/*! 
+ * Class GLViewer_ViewPort
+ * Visualisation canvas of GLViewer
+ */
 class GLVIEWER_API GLViewer_ViewPort: public QWidget
 {
     Q_OBJECT
@@ -50,18 +53,27 @@ public:
     ~GLViewer_ViewPort();
 
 public:
+    //! Activates/deactivates sketching
     void                             setSketchingEnabled( bool );
+    //! Checks active status of sketcher
     bool                             isSketchingEnabled() const;
+    //! Activates/deactivates transformer
     void                             setTransformEnabled( bool );
+    //! Checks active status of transformer
     bool                             isTransformEnabled() const;
 
+    //! Returns background color
     virtual QColor                   backgroundColor() const;
+    //! Sets background color
     virtual void                     setBackgroundColor( const QColor& );
 
+    //! Redraw external pa inters
     void                             redrawPainters();
 
+    //! Updates view
     virtual void                     onUpdate();
 
+    //! Returns blocking status for current started operations
     virtual BlockStatus              currentBlock(){ return BS_NoBlock; }
 
 protected:
@@ -71,7 +83,7 @@ protected:
     virtual QPaintDevice*            getPaintDevice() { return this; }
     virtual void                     contextMenuEvent( QContextMenuEvent * e );
 
-// STATICS
+//! STATICS
     static void                      createCursors();
     static void                      destroyCursors();
     static QCursor*                  getHandCursor() { return handCursor; }
@@ -92,7 +104,7 @@ public://ouv
     static void                      setSketchCursor( const QCursor& newCursor );
 
 protected:
-// EVENTS
+//! EVENTS
     virtual void                     paintEvent( QPaintEvent *);
     virtual void                     mouseMoveEvent( QMouseEvent *);
     virtual void                     mouseReleaseEvent( QMouseEvent *);
@@ -102,7 +114,7 @@ protected:
     virtual void                     keyReleaseEvent( QKeyEvent *);
     virtual void                     wheelEvent( QWheelEvent *);
 
-// TO BE REDEFINED
+//! TO BE REDEFINED
     virtual void                     reset() = 0;
     virtual void                     pan( int, int ) = 0;
     virtual void                     setCenter( int, int ) = 0;    

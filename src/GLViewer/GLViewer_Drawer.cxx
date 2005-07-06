@@ -17,29 +17,44 @@
 #include <qimage.h>
 #include <qpainter.h>
 
-static int FirstSymbolNumber = 32;
-static int LastSymbolNumber = 127;
-
-QMap<GLViewer_TexFindId,GLViewer_TexIdStored> GLViewer_TexFont::TexFontBase; 
-
 #define TEXT_GAP    5
 
-GLboolean TFLoaded = GL_FALSE;
+GLboolean          TFLoaded = GL_FALSE;
 
-GLdouble        modelMatrix[16], projMatrix[16];
-GLint           viewport[4];
-GLdouble        winx, winy, winz;
-GLint           status;
+GLdouble           modelMatrix[16], projMatrix[16];
+GLint              viewport[4];
+GLdouble           winx, winy, winz;
+GLint              status;
 
 GLViewer_TexFont*  staticGlFont;
 
+//================================================================
+// Class       : GLViewer_TexFont
+// Description : 
+//================================================================
+//! code of first font symbol
+static int FirstSymbolNumber = 32;
+//! code of last font symbol
+static int LastSymbolNumber = 127;
 
-/***************************************************************************
-**  Class:   GLViewer_TexFont
-**  Descr:   Texture Font for GLViewer_Object
-**  Module:  GLViewer
-**  Created: UI team, 01.10.01
-****************************************************************************/
+QMap<GLViewer_TexFindId,GLViewer_TexIdStored> GLViewer_TexFont::TexFontBase;
+QMap<GLViewer_TexFindId,GLuint>               GLViewer_TexFont::BitmapFontCache; 
+
+//=======================================================================
+// Function: clearTextBases
+// Purpose :
+//=======================================================================
+void GLViewer_TexFont::clearTextBases()
+{
+  //cout << "Clear font map" << endl;
+  TexFontBase.clear();
+  BitmapFontCache.clear();
+}
+
+//======================================================================
+// Function: GLViewer_TexFont
+// Purpose :
+//=======================================================================
 GLViewer_TexFont::GLViewer_TexFont()
 {
     myQFont = QFont::defaultFont();
@@ -58,6 +73,10 @@ GLViewer_TexFont::GLViewer_TexFont()
     myTexFontHeight = 0;        
 }
 
+//======================================================================
+// Function: GLViewer_TexFont
+// Purpose :
+//=======================================================================
 GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator )
 {
     myQFont = *theFont;
@@ -77,12 +96,20 @@ GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator )
     
 }
 
+//======================================================================
+// Function: ~GLViewer_TexFont
+// Purpose :
+//=======================================================================
 GLViewer_TexFont::~GLViewer_TexFont()
 {
     delete[] myWidths;
     delete[] myPositions;
-}   
-
+} 
+  
+//======================================================================
+// Function: generateTexture
+// Purpose :
+//=======================================================================
 void GLViewer_TexFont::generateTexture()
 {
     QFontMetrics aFM( myQFont );
@@ -172,6 +199,10 @@ void GLViewer_TexFont::generateTexture()
     }
 }
 
+//======================================================================
+// Function: drawString
+// Purpose :
+//=======================================================================
 void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY )
 {
     glEnable(GL_TEXTURE_2D);
@@ -211,6 +242,10 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
     glDisable(GL_TEXTURE_2D);
 }
 
+//======================================================================
+// Function: getStringWidth
+// Purpose :
+//=======================================================================
 int GLViewer_TexFont::getStringWidth( QString theStr )
 {
     int aWidth = 0;
@@ -224,25 +259,21 @@ int GLViewer_TexFont::getStringWidth( QString theStr )
     return aWidth;
 }
 
+//======================================================================
+// Function: getStringHeight
+// Purpose :
+//=======================================================================
 int GLViewer_TexFont::getStringHeight()
 {
     QFontMetrics aFM( myQFont );
     return aFM.height();
 }
 
-void GLViewer_Drawer::destroyAllTextures()
-{
-    QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anIt= GLViewer_TexFont::TexFontBase.begin();
-    QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anEndIt= GLViewer_TexFont::TexFontBase.end();
-
-    for( ; anIt != anEndIt; anIt++ )
-        glDeleteTextures( 1, &(anIt.data().myTexFontId) );
-}
-
+//! function for generation list base for bitmap fonts
 static GLuint displayListBase( QFont* theFont )
 {
   GLuint aList = 0;
-  static QMap<GLViewer_TexFindId, GLuint> fontCache;
+  //static QMap<GLViewer_TexFindId, GLuint> fontCache;
   GLViewer_TexFindId aFindFont;
   aFindFont.myFontString = theFont->toString();
 
@@ -253,13 +284,13 @@ static GLuint displayListBase( QFont* theFont )
   
   aFindFont.myViewPortId = (int)ctx;
 
-  if ( fontCache.contains( aFindFont ) )
-    aList = fontCache[aFindFont];
+  if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
+    aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
   else
   {
     GLuint listBase = 0;
-    QMap<GLViewer_TexFindId, GLuint>::iterator it = fontCache.begin();
-    for ( ; it != fontCache.end(); ++it )
+    QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
+    for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
       if ( it.key().myViewPortId == (int)ctx && it.data() > listBase )
         listBase = it.data();
@@ -271,42 +302,71 @@ static GLuint displayListBase( QFont* theFont )
     if ( !::wglUseFontBitmaps( glHdc, 0, 256, listBase ) )
       listBase = 0;
     aList = listBase;
-    fontCache[aFindFont] = aList;
+    GLViewer_TexFont::BitmapFontCache[aFindFont] = aList;
   }
 #else //X Window
   Display* aDisp = glXGetCurrentDisplay();
   if( !aDisp )
   {
+#ifdef _DEBUG_
     printf( "Can't find current dislay\n" );
+#endif
     return aList;
   }
   
   GLXContext aCont = glXGetCurrentContext();
   if( !aCont )
   {
+#ifdef _DEBUG_
     printf( "Can't find current context\n" );
+#endif
     return aList;
   }
 
   aFindFont.myViewPortId = (int)aCont;
 
-  if ( fontCache.contains( aFindFont ) )
-    aList = fontCache[aFindFont];
+  if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
+    aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
   else
   {
     GLuint listBase = 0;
-    QMap<GLViewer_TexFindId, GLuint>::iterator it = fontCache.begin();
-    for ( ; it != fontCache.end(); ++it )
+    QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
+    for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
       if ( it.key().myViewPortId == (int)aCont && it.data() > listBase )
         listBase = it.data();
     }
     listBase += 256;
-
-    glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
-
+    
+    //glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
+    int aFontCont = 0;
+    char** xFontList = XListFonts( aDisp, aFindFont.myFontString.data(), 1, &aFontCont  );
+    if( !theFont->handle() )
+    {       
+#ifdef _DEBUG_
+      printf( "Can't load font %s. loading default font....\n", aFindFont.myFontString.data() );
+#endif
+      QString aFontMask ("-*-*-*-r-*-*-");
+      aFontMask += aFindFont.myFontString.section( ',', 1, 1 );
+#ifdef _DEBUG_
+      printf( "Height of Default font: %s\n", aFindFont.myFontString.section( ',', 1, 1 ).data() );
+#endif
+      aFontMask += "-*-*-*-m-*-*-*";
+      xFontList = XListFonts( aDisp, aFontMask.data()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
+      if( aFontCont == 0 )
+      {      
+#ifdef _DEBUG_
+        printf( "Can't load default font\n" );
+#endif
+        return 0;
+      }
+      glXUseXFont( (Font)(XLoadFont( aDisp,xFontList[0] )), 0, 256, listBase );
+    }
+    else
+      glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
+    
     aList = listBase;
-    fontCache[aFindFont] = aList;
+    GLViewer_TexFont::BitmapFontCache[aFindFont] = aList;
   }
 
 #endif
@@ -320,6 +380,10 @@ static GLuint displayListBase( QFont* theFont )
 **  Module:  GLViewer
 **  Created: UI team, 01.10.01
 ****************************************************************************/
+//======================================================================
+// Function: GLViewer_Drawer
+// Purpose :
+//=======================================================================
 GLViewer_Drawer::GLViewer_Drawer()
 {
   myXScale = myYScale = 0.0;
@@ -329,12 +393,32 @@ GLViewer_Drawer::GLViewer_Drawer()
   myPriority = 0;
 }
 
+//======================================================================
+// Function: ~GLViewer_Drawer
+// Purpose :
+//=======================================================================
 GLViewer_Drawer::~GLViewer_Drawer()
 {
   myObjects.clear();
   glDeleteLists( myTextList, 1 );
 }
 
+//======================================================================
+// Function: destroyAllTextures
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::destroyAllTextures()
+{
+    QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anIt= GLViewer_TexFont::TexFontBase.begin();
+    QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anEndIt= GLViewer_TexFont::TexFontBase.end();
+
+    for( ; anIt != anEndIt; anIt++ )
+        glDeleteTextures( 1, &(anIt.data().myTexFontId) );
+}
+//======================================================================
+// Function: loadTexture
+// Purpose :
+//=======================================================================
 GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
 {
     QImage buf;
@@ -355,30 +439,28 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
     {            
         for( int j = 0; j < size; j++ )
         {
-            GLubyte r, g, b;
+            GLubyte r, g, b, a;
             if( j < w && i < h )
             {
                 QRgb pixel = buf.pixel( j, h - i - 1 );
                 r = (GLubyte)qRed( pixel );
                 g = (GLubyte)qGreen( pixel );
                 b = (GLubyte)qBlue( pixel );
+                a = (GLubyte)qAlpha( pixel );
             }
             else
             {
                 r = (GLubyte)255;
                 g = (GLubyte)255;
                 b = (GLubyte)255;
+                a = (GLubyte)255;
             }
 
             int index = 4 * ( i * size + j );
             pixels[ index ] = r;
             pixels[ index + 1 ] = g;
             pixels[ index + 2 ] = b;
-
-            if( r == (GLubyte)255 && g == (GLubyte)255 && b == (GLubyte)255 )
-                pixels[ index + 3 ] = (GLubyte)0;
-            else
-                pixels[ index + 3 ] = (GLubyte)255;
+            pixels[ index + 3 ] = a;
         }
     }
 
@@ -396,10 +478,14 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
     return texture;
 }
 
+//======================================================================
+// Function: drawTexture
+// Purpose :
+//=======================================================================
 void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y )
 {
-    float xScale = myXScale;
-    float yScale = myYScale;
+    if( !texture )
+        return;
 
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
@@ -412,16 +498,16 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
     glBegin( GL_QUADS );
 
     glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( x-size/2./xScale, y-size/2./yScale, 0.0 );
+    glVertex3f( x-size/2., y-size/2., 0.0 );
 
     glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( x-size/2./xScale, y+size/2./yScale, 0.0 );
+    glVertex3f( x-size/2., y+size/2., 0.0 );
 
     glTexCoord2f( 1.0, 1.0 );
-    glVertex3f( x+size/2./xScale, y+size/2./yScale, 0.0 );
+    glVertex3f( x+size/2., y+size/2., 0.0 );
 
     glTexCoord2f( 1.0, 0.0 );
-    glVertex3f( x+size/2./xScale, y-size/2./yScale, 0.0 );
+    glVertex3f( x+size/2., y-size/2., 0.0 );
     
     glEnd();
     glFlush();
@@ -430,6 +516,10 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
     glDisable( GL_TEXTURE_2D );
 }
 
+//======================================================================
+// Function: drawText
+// Purpose :
+//=======================================================================
 void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
                                 const QColor& color, QFont* theFont, int theSeparator, DisplayTextFormat theFormat )
 {
@@ -474,6 +564,10 @@ void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
   }
 }
 
+//======================================================================
+// Function: drawText
+// Purpose :
+//=======================================================================
 void GLViewer_Drawer::drawText( GLViewer_Object* theObject )
 {
   if( !theObject )
@@ -490,6 +584,10 @@ void GLViewer_Drawer::drawText( GLViewer_Object* theObject )
   drawText( aText->getText(), aPosX, aPosY, aText->getColor(), &aTmpVarFont, aText->getSeparator(), aText->getDisplayTextFormat() );
 }
 
+//======================================================================
+// Function: drawGLText
+// Purpose :
+//=======================================================================
 void GLViewer_Drawer::drawGLText( QString text, float x, float y,
                                   int hPosition, int vPosition, QColor color, bool smallFont )
 {
@@ -518,9 +616,13 @@ void GLViewer_Drawer::drawGLText( QString text, float x, float y,
       default : break;
   }
 
-  drawText( text, x, y, color, &aFont, 2 );
+  drawText( text, x, y, color, &aFont, 2, DTF_BITMAP ); // DTF_BITMAP or DTF_TEXTURE
 }
 
+//======================================================================
+// Function: drawRectangle
+// Purpose :
+//=======================================================================
 void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, QColor color )
 {
   if( !rect )
@@ -544,6 +646,10 @@ void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, QColor color )
   glEnd();
 }
 
+//======================================================================
+// Function: translateToHPGL
+// Purpose :
+//=======================================================================
 bool GLViewer_Drawer::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS )
 {
     bool result = true;
@@ -552,6 +658,10 @@ bool GLViewer_Drawer::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aView
     return result;
 }
 
+//======================================================================
+// Function: translateToPS
+// Purpose :
+//=======================================================================
 bool GLViewer_Drawer::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {
     bool result = true;
@@ -561,6 +671,10 @@ bool GLViewer_Drawer::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewer
 }
 
 #ifdef WIN32
+//======================================================================
+// Function: translateToEMF
+// Purpose :
+//=======================================================================
 bool GLViewer_Drawer::translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     bool result = true;

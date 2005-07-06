@@ -23,6 +23,9 @@
 class GLViewer_Viewer2d;
 class GLViewer_Context;
 
+/*! Class GLViewer_Selector2d
+*   2D select manager for GLViewer
+*/
 class GLVIEWER_API GLViewer_Selector2d : public GLViewer_Selector
 {
   Q_OBJECT
@@ -32,24 +35,26 @@ public:
   ~GLViewer_Selector2d();
 
 public:
-  void            setContext( GLViewer_Context* glc ) { myGLContext = glc; }
-  GLViewer_Context*  getContext() const { return myGLContext; }
+  //! Sets context from Viewer2d
+  void                    setContext( GLViewer_Context* glc ) { myGLContext = glc; }
+  GLViewer_Context*       getContext() const { return myGLContext; }
 
-  void            setHilightColor( Quantity_NameOfColor );
-  void            setSelectColor( Quantity_NameOfColor );
+  // Redefined methods
+  virtual void            setHilightColor( Quantity_NameOfColor );
+  virtual void            setSelectColor( Quantity_NameOfColor );
 
-  void            detect( int, int );
-  void            undetectAll();
+  virtual void            detect( int, int );
+  virtual void            undetectAll();
 
-  void            select( bool append = false );
-  void            select( const QRect&, bool append = false );    
-  void            unselectAll();    
-  int             numSelected() const;    
+  virtual void            select( bool append = false );
+  virtual void            select( const QRect&, bool append = false );    
+  virtual void            unselectAll();    
+  virtual int             numSelected() const;    
 
-  void            checkSelection( int, bool, int );
+  virtual void            checkSelection( int, bool, int );
 
 protected:
-  GLViewer_Context*  myGLContext;
+  GLViewer_Context*       myGLContext;
 };
 
 #endif

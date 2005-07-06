@@ -3,12 +3,6 @@
 // Author:    OCC team
 // Copyright (C) CEA 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Drawer
-**  Descr:   Drawer for GLViewer_Object
-**  Module:  GLViewer
-**  Created: UI team, 01.10.01
-****************************************************************************/
 #ifndef GLVIEWER_DRAWER_H
 #define GLVIEWER_DRAWER_H
 
@@ -34,18 +28,31 @@ class GLViewer_CoordSystem;
 #ifdef WNT
 #pragma warning( disable:4251 )
 #endif
-
+/*! 
+ * Struct GLViewer_TexIdStored
+ * Structure for store information about texture
+ */
 struct GLVIEWER_API GLViewer_TexIdStored
 {
+  //! Texture ID
   GLuint      myTexFontId;
+  //! Texture width
   int         myTexFontWidth;
+  //! texture height
   int         myTexFontHeight;
 };
 
+/*! 
+ * Struct GLViewer_TexFindId
+ * Structure for srorage information about texture font
+ */
 struct GLVIEWER_API GLViewer_TexFindId
 {
+  //! Font description
   QString     myFontString;
+  //! View POrt ID
   int         myViewPortId;
+  //! Overloaded operator for using struct as MAP key
   bool operator < (const GLViewer_TexFindId theStruct) const 
   { 
     if ( myViewPortId != theStruct.myViewPortId ) return myViewPortId < theStruct.myViewPortId; 
@@ -53,32 +60,68 @@ struct GLVIEWER_API GLViewer_TexFindId
   }
 };
 
+/***************************************************************************
+**  Class:   GLViewer_TexFont
+**  Descr:   Font for GLViewer_Drawer
+**  Module:  GLViewer
+**  Created: UI team, 03.10.01
+****************************************************************************/
+
+/*! 
+ * Class GLViewer_TexFont
+ * Drawing bitmap and texture fonts in GLViewer
+ */
 class GLVIEWER_API GLViewer_TexFont
 {
 public:
+  //! A default constructor
   GLViewer_TexFont();
+  //! A constructor
+  /*
+  * \param theFont      - a base font
+  * \param theSeparator - separator between letters
+  */
   GLViewer_TexFont( QFont* theFont, int theSeparator = 2 );
+  //! A destructor
   ~GLViewer_TexFont();
   
+  //! Generating font texture
   void            generateTexture();
+  //! Drawing string theStr in point with coords theX and theY
   void            drawString( QString theStr, GLdouble theX = 0.0, GLdouble theY = 0.0 );
   
+  //! Returns separator between letters
   int             getSeparator(){ return mySeparator; }
+  //! Installing separator between letters
   void            setSeparator( int theSeparator ){ mySeparator = theSeparator; }
   
-  int             getStringWidth( QString );
+  //! Returns width of string in pixels
+  int             getStringWidth( QString theString );
+  //! Returns height of string in pixels
   int             getStringHeight();
   
-  static  QMap<GLViewer_TexFindId,GLViewer_TexIdStored> TexFontBase;
-  static  int         LastmyTexStoredId;
+  //! Clears all generated fonts
+  static void     clearTextBases();
+
+  //! Map for strorage generated texture fonts
+  static QMap<GLViewer_TexFindId,GLViewer_TexIdStored> TexFontBase;
+  //! Map for strorage generated bitmaps fonts
+  static QMap<GLViewer_TexFindId,GLuint>               BitmapFontCache;
   
 protected:
+  //! Array of letter width
   int*            myWidths;
+  //! Array of letter positions in texture
   int*            myPositions;
+  //! Pointer to base font
   QFont           myQFont;
+  //! Font texture ID
   GLuint          myTexFont;
+  //! Font texture width
   int             myTexFontWidth;
+  //! Font texture height
   int             myTexFontHeight;
+  //! Separator between letters
   int             mySeparator;
 };
 
@@ -88,60 +131,162 @@ protected:
 **  Module:  GLViewer
 **  Created: UI team, 03.10.01
 ****************************************************************************/
+/*! 
+ * Class GLViewer_Drawer
+ * Drawer for GLViewer_Objects.
+ * Drawer creates only one times per one type of object
+ */
 class GLVIEWER_API GLViewer_Drawer
 {
 public:
-    enum { GLText_Center = 0, GLText_Left, GLText_Right, GLText_Top, GLText_Bottom };
+  //! Text position relatively object
+  enum
+  {
+    GLText_Center = 0,
+    GLText_Left,
+    GLText_Right,
+    GLText_Top,
+    GLText_Bottom
+  };
 
-public:
+  // Objects status ( needs for change colors )
+  //enum ObjectStatus
+  //{
+  //  OS_Normal = 0,
+  //  OS_Highlighted,
+  //  OS_Selected
+  //};
+  
+  // 
+  //enum ClosedStatus
+  //{
+  //  CS_CLOSED = 0,
+  //  CS_OPEN = 1
+  //};  
+
+  //! A constructor
   GLViewer_Drawer();
+  //! A destructor
   virtual ~GLViewer_Drawer();
   
-  enum ObjectStatus { OS_Normal = 0, OS_Highlighted = 1, OS_Selected = 2 };
-  enum ClosedStatus { CS_CLOSED = 0, CS_OPEN = 1 };  
+  //! Main method which drawing object in GLViewer
+  /*
+  *\param xScale - current scale along X-direction
+  *\param yScale - current scale along Y-direction
+  *\param onlyUpdate - = true if only update highlight-select information
+  */
+  virtual void                    create( float xScale, float yScale, bool onlyUpdate ) = 0;  
   
-  virtual void                    create( float, float, bool ) = 0;  
-  
+  //! Adds object to drawer display list
   virtual void                    addObject( GLViewer_Object* theObject ){ myObjects.append( theObject ); }
+  //! Clears drawer display list
   virtual void                    clear(){ myObjects.clear(); }
   
+  //! Returns object type (needs for dynamic search of right drawer ) 
   QString                         getObjectType() const { return myObjectType; }
+
+  //! Returns object priority
   int                             getPriority() const { return myPriority; }
   
+  //! Clears all generated textures
   static void                     destroyAllTextures();
   
+  //! A function translate object in to HPGL file on disk
+  /*!
+   *\param hFile     the name of PostScript file chosen by user
+   *\param aViewerCS the GLViewer_CoordSystem of window
+   *\param aHPGLCS   the GLViewer_CoordSystem of PostScript page
+  */
   virtual bool                    translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS );
+  
+  //! A function translate object in to PostScript file on disk
+  /*!
+   *\param hFile     the name of PostScript file chosen by user
+   *\param aViewerCS the GLViewer_CoordSystem of window
+   *\param aPSCS     the GLViewer_CoordSystem of PostScript page
+  */
   virtual bool                    translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS ); 
   
 #ifdef WIN32
+  //! A function translate object in to EMF file on disk
+  /*!
+   *\warning WIN32 only
+   *
+   *\param dc        the name of HDC associated with file chosen by user
+   *\param aViewerCS the GLViewer_CoordSystem of window
+   *\param aEMFCS    the GLViewer_CoordSystem of EMF page
+  */
   virtual bool                    translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS );
 #endif
   
-  GLuint                          loadTexture( const QString& fileName );
+  //! Loads texture from file
+  static GLuint                   loadTexture( const QString& fileName );
+
+  //! Draw square texture
+  /*!
+   *\param texture - the texture ID
+   *\param size    - the size of texture
+   *\param x       - x coord
+   *\param y       - y coord
+  */
   void                            drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y );
 
+  //! Draw text string
+  /*!
+   *\param text              - the text string
+   *\param xPos              - x coord
+   *\param yPos              - y coord
+   *\param color             - text color
+   *\param aFont             - base font of text
+   *\param theSeparator      - letter separator
+   *\param DisplayTextFormat - text format
+  */
   void                            drawText( const QString& text,
-                                            GLfloat xPos, GLfloat yPos,
+                                            GLfloat xPos,
+					    GLfloat yPos,
                                             const QColor& color,
-                                            QFont* aFont, int,
+                                            QFont* aFont,
+                                            int theSeparator,
                                             DisplayTextFormat = DTF_BITMAP );
 
-  void                            drawGLText( QString text, float x, float y,
-                                              int hPosition = GLText_Center, int vPosition = GLText_Center,
-                                              QColor color = Qt::black, bool smallFont = false );
+  //! Draw text string
+  /*!
+   *\param text      - the text string
+   *\param x         - x coord
+   *\param y         - y coord
+   *\param hPosition - horizontal alignment
+   *\param vPosition - vertical alignment
+   *\param color     - text color
+   *\param smallFont - font format
+  */
+  void                            drawGLText( QString text,
+					      float x,
+					      float y,
+                                              int hPosition = GLText_Center,
+                                              int vPosition = GLText_Center,
+                                              QColor color = Qt::black,
+                                              bool smallFont = false );
 
-  static void                     drawRectangle( GLViewer_Rect*, QColor = Qt::black );
+  //! Draw rectangle with predefined color
+  static void                     drawRectangle( GLViewer_Rect* theRect, QColor = Qt::black );
 
 protected:
-  virtual void                    drawText( GLViewer_Object* );
+  //! Draw object text
+  virtual void                    drawText( GLViewer_Object* theObject );
 
+  //! X Scale factor
   float                           myXScale;
+  //! Y scale factor
   float                           myYScale;
   
+  //! List of objects
   QValueList<GLViewer_Object*>    myObjects;
+  //! List generated textures
   GLuint                          myTextList;
   
+  //! Type of supporting object
   QString                         myObjectType;
+  //! Dislay priority
   int                             myPriority;
 };
 
