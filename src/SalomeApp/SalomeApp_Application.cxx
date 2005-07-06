@@ -592,6 +592,7 @@ void SalomeApp_Application::onPaste()
       try {
 	studyMgr()->Paste(so);
 	updateObjectBrowser( true );
+	updateActions(); //SRN: BugID IPAL9377, case 3
       }
       catch(...) {
       }
