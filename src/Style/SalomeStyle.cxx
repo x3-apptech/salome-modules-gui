@@ -405,7 +405,7 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
         drawGradient( p, rr, act ? cg.highlight() : cg.dark(), col,
                       horiz ? LeftToRight : UpToDown, linear );
 
-	QRect rt = rr;
+		    QRect rt = rr;
         if ( flags & Style_Horizontal )
           rt.addCoords( 0, 20, 0, 0 );
         else
@@ -416,19 +416,20 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
 
         QString title = titleText( wnd->caption(), textW, p->fontMetrics() );
 
-	if ( wnd )
-	{
-	  p->setPen( act ? cg.highlightedText() : cg.text() );
-	  
-	  if ( flags & Style_Horizontal )
-	  {
-	    p->rotate( 270.0 );
-	    p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
-	    p->drawText( 0, 0, title );
-	  }
+		    if ( wnd )
+        {
+		      QColorGroup cgroup = wnd->isActiveWindow() ? wnd->palette().active() : wnd->palette().inactive();
+		      p->setPen( cgroup.highlightedText() );
+
+		      if ( flags & Style_Horizontal )
+          {
+		        p->rotate( 270.0 );
+		        p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
+		        p->drawText( 0, 0, title );
+		      }
           else
-	    p->drawText( 2, 2, textW, textH, AlignLeft, title );
-	}
+		        p->drawText( 2, 2, textW, textH, AlignLeft, title );
+	      }
       }
       break;
     }
@@ -994,8 +995,10 @@ void SalomeStyle::drawControl( ControlElement element, QPainter* p, const QWidge
         r2.setRect( r2.left(), r2.top(), r2.width() - 2, r2.height() - 1 );
 
       p->setPen( cg.foreground() );
-      QBrush brsh = cg.brush( selected ? QColorGroup::Base : QColorGroup::Background );
-      p->fillRect( r2.left(), r2.top(), r2.width(), r2.height() - 1, brsh );
+      drawGradient( p, QRect( r2.left(), r2.top(), r2.width(), r2.height() - 1 ),
+                    selected ? cg.highlight() : cg.dark(), cg.background(), UpToDown, linear );
+
+//      p->fillRect( r2.left(), r2.top(), r2.width(), r2.height() - 1, selected ? cg.highlight() : cg.background() );
       p->drawRect( r2.left(), r2.top(), r2.width(), r2.height() - 1 );
 
       if ( selected )
@@ -1007,6 +1010,15 @@ void SalomeStyle::drawControl( ControlElement element, QPainter* p, const QWidge
 
 	    break;
     }
+
+    case CE_TabBarLabel:
+      {
+        QColorGroup tmp( cg );
+        if ( flags & Style_Selected )
+          tmp.setColor( QColorGroup::Foreground, tmp.highlightedText() );
+        PARENT_STYLE::drawControl( element, p, widget, r, tmp, flags, opt );
+      }
+      break;
 
     case CE_PushButton:
 	  {
