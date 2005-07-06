@@ -15,6 +15,8 @@
 #include <qwidgetstack.h>
 #include <qapplication.h>
 
+#include <stream.h>
+
 /*!
     Class: QtxWorkstack [Public]
     Descr:
@@ -104,6 +106,508 @@ void QtxWorkstack::split( const int o )
   curWid->show();
   curWid->setFocus();
 }
+
+// begin: jfa 06.07.2005
+void QtxWorkstack::Split (QWidget* wid, const Qt::Orientation o, const SplitType type)
+{
+  if (!wid) return;
+
+  // find area of the given widget
+  QtxWorkstackArea* area = NULL;
+  QPtrList<QtxWorkstackArea> allAreas;
+  areas(mySplit, allAreas, true);
+
+  QPtrListIterator<QtxWorkstackArea> it (allAreas);
+  for (; it.current() && !area; ++it) {
+    if (it.current()->contains(wid))
+      area = it.current();
+  }
+  if (!area) return;
+
+  QWidgetList wids = area->widgetList();
+  if (wids.count() < 2)
+    return;
+
+  QSplitter* s = splitter(area);
+  QPtrList<QtxWorkstackArea> areaList;
+  areas(s, areaList);
+
+  QPtrList<QSplitter> splitList;
+  splitters(s, splitList);
+
+  QSplitter* trg = 0;
+  if (areaList.count() + splitList.count() < 2 || s->orientation() == o)
+    trg = s;
+
+  if (!trg) trg = wrapSplitter(area);
+  if (!trg) return;
+
+  trg->setOrientation(o);
+
+  QtxWorkstackArea* newArea = createArea(0);
+  insertWidget(newArea, trg, area);
+
+  switch (type) {
+  case SPLIT_STAY:
+    {
+      QWidgetListIt itr (wids);
+      for (; itr.current(); ++itr)
+      {
+        QWidget* wid_i = itr.current();
+        if (wid_i != wid) {
+          area->removeWidget(wid_i);
+          newArea->insertWidget(wid_i);
+        }
+      }
+    }
+    break;
+  case SPLIT_AT:
+    {
+      QWidgetListIt itr (wids);
+      for (; itr.current() && itr.current() != wid; ++itr) {
+      }
+      for (; itr.current(); ++itr) {
+        area->removeWidget(itr.current());
+        newArea->insertWidget(itr.current());
+      }
+    }
+    break;
+  case SPLIT_MOVE:
+    area->removeWidget(wid);
+    newArea->insertWidget(wid);
+    break;
+  }
+
+  distributeSpace(trg);
+}
+
+void QtxWorkstack::OnTop (QWidget* wid)
+{
+  if (!wid) return;
+
+  // find area of the given widget
+  QtxWorkstackArea* area = NULL;
+  QPtrList<QtxWorkstackArea> allAreas;
+  areas(mySplit, allAreas, true);
+  QPtrListIterator<QtxWorkstackArea> it (allAreas);
+  for (; it.current() && !area; ++it) {
+    if (it.current()->contains(wid))
+      area = it.current();
+  }
+  if (!area) return;
+
+  area->setActiveWidget(wid);
+}
+
+void QtxWorkstack::Attract (QWidget* wid1, QWidget* wid2, const bool all)
+{
+  if (!wid1 || !wid2) return;
+
+  // find area of the widgets
+  QtxWorkstackArea *area1 = NULL, *area2 = NULL;
+  QPtrList<QtxWorkstackArea> allAreas;
+  areas(mySplit, allAreas, true);
+  QPtrListIterator<QtxWorkstackArea> it (allAreas);
+  for (; it.current() && !(area1 && area2); ++it) {
+    if (it.current()->contains(wid1))
+      area1 = it.current();
+    if (it.current()->contains(wid2))
+      area2 = it.current();
+  }
+  if (!area1 || !area2) return;
+
+  QWidget* curWid = area1->activeWidget();
+  if (!curWid) return;
+
+  if (area1 == area2) {
+    if (all) {
+      // Set wid1 at first position, wid2 at second
+      area1->insertWidget(wid1);
+      area1->insertWidget(wid2, 1);
+    } else {
+      // Set wid2 right after wid1
+      area1->removeWidget(wid2);
+      int wid1_ind = 0;
+      QWidgetList wids1 = area1->widgetList();
+      QWidgetListIt itr1 (wids1);
+      for (; itr1.current() && itr1.current() != wid1; ++itr1, ++wid1_ind);
+      area1->insertWidget(wid2, wid1_ind + 1);
+    }
+  } else {
+    int wid1_ind = 0;
+    QWidgetList wids1 = area1->widgetList();
+    QWidgetListIt itr1 (wids1);
+    for (; itr1.current() && itr1.current() != wid1; ++itr1, ++wid1_ind);
+
+    if (all) {
+      // Set wid2 right after wid1, other widgets from area2 right after wid2
+      QWidgetList wids2 = area2->widgetList();
+      QWidgetListIt itr2 (wids2);
+      for (int ind = wid1_ind + 1; itr2.current(); ++itr2, ++ind)
+      {
+        area2->removeWidget(itr2.current());
+        if (itr2.current() == wid2) {
+          area1->insertWidget(itr2.current(), wid1_ind + 1);
+        } else {
+          area1->insertWidget(itr2.current(), ind);
+        }
+      }
+    } else {
+      // Set wid2 right after wid1
+      area2->removeWidget(wid2);
+      area1->insertWidget(wid2, wid1_ind + 1);
+    }
+  }
+
+  /*area2->removeWidget(wid2);
+  area1->insertWidget(wid2);
+
+  // Reorder widgets
+  QWidgetListIt itr( wids1 );
+  for ( ; itr.current() && itr.current() != wid1; ++itr )
+  {
+  }
+  ++itr;
+  for ( ; itr.current(); ++itr )
+  {
+    if (itr.current() != wid2) {
+      area1->removeWidget( itr.current() );
+      area1->insertWidget( itr.current() );
+    }
+  }*/
+
+  area1->setActiveWidget(curWid);
+}
+
+static void setSizes (QIntList& szList, const int item_ind,
+                      const int new_near, const int new_this, const int new_farr)
+{
+  // set size to all items before an item # <item_ind>
+  int cur_pos = 0;
+  QIntList::iterator its = szList.begin();
+  for (; its != szList.end() && cur_pos < item_ind; ++its, ++cur_pos) {
+    *its = new_near;
+  }
+  if (its == szList.end()) return;
+  // set size to item # <item_ind>
+  *its = new_this;
+  ++its;
+  // set size to all items after an item # <item_ind>
+  for (; its != szList.end(); ++its) {
+    *its = new_farr;
+  }
+}
+
+void QtxWorkstack::SetRelativePositionInSplitter( QWidget* wid, const double position )
+{
+  if ( position < 0.0 || 1.0 < position)
+    return;
+  if ( !wid )
+    return;
+
+  // find area of the given widget
+  QtxWorkstackArea* area = NULL;
+  QPtrList<QtxWorkstackArea> allAreas;
+  areas(mySplit, allAreas, true);
+  for ( QPtrListIterator<QtxWorkstackArea> it( allAreas );
+       it.current() && !area;
+       ++it )
+  {
+    if (it.current()->contains(wid))
+      area = it.current();
+  }
+
+  if ( !area )
+    return;
+
+  QSplitter* split = splitter( area );
+  if ( !split )
+    return;
+
+  // find index of the area in its splitter
+  int item_ind = -1;
+  bool isFound = false;
+  const QObjectList* was = split->children();
+  for (QObjectListIt ito (*was); ito.current() && !isFound; ++ito, ++item_ind)
+  {
+    if (ito.current() == area)
+      isFound = true;
+  }
+  if (!isFound || item_ind == 0)
+    return;
+
+  QIntList szList = split->sizes();
+  int splitter_size = (split->orientation() == Horizontal ?
+                       split->width() : split->height());
+  int nb = szList.count();
+
+  int new_prev = int(splitter_size * position / item_ind);
+  int new_next  = int(splitter_size * (1.0 - position) / (nb - item_ind));
+  setSizes (szList, item_ind, new_prev, new_next, new_next);
+  split->setSizes(szList);
+}
+
+void QtxWorkstack::SetRelativePosition (QWidget* wid,
+                                        const Qt::Orientation o,
+                                        const double position)
+{
+  if (position < 0.0 || 1.0 < position)
+    return;
+  if (!wid)
+    return;
+
+  int splitter_size = (o == Horizontal ? mySplit->width() : mySplit->height());
+  int need_pos = int(position * splitter_size);
+  int splitter_pos = 0;
+
+  if (setPosition(wid, mySplit, o, need_pos, splitter_pos) != 0) {
+    // impossible to set required position
+  }
+}
+
+static int positionSimple (QIntList& szList, const int nb, const int splitter_size,
+                           const int item_ind, const int item_rel_pos,
+                           const int need_pos, const int splitter_pos)
+{
+  if (item_ind == 0) { // cannot move in this splitter
+    return (need_pos - splitter_pos);
+  }
+
+  int delta = 0;
+  int new_prev = 0;
+  int new_this = szList[item_ind];
+  int new_next = 0;
+
+  bool isToCheck = false;
+
+  if (need_pos < splitter_pos) {
+    // Set size of all previous workareas to zero <--
+    if (item_ind == nb - 1) {
+      // item iz last in the splitter, it will occupy all the splitter
+      new_this = splitter_size;
+    } else {
+      // recompute size of next items in splitter
+      new_next = (splitter_size - new_this) / (nb - item_ind - 1);
+    }
+    delta = need_pos - splitter_pos;
+
+  } else if (need_pos > (splitter_pos + splitter_size)) {
+    // Set size of all next workareas to zero -->
+    // recompute size of previous items in splitter
+    new_this = 0;
+    new_prev = (splitter_size - new_this) / item_ind;
+    delta = need_pos - (splitter_pos + splitter_size - new_this);
+
+  } else { // required position lays inside this splitter
+    // Move workarea inside splitter into required position <->
+    int new_item_rel_pos = need_pos - splitter_pos;
+    new_prev = new_item_rel_pos / item_ind;
+    if (need_pos < (splitter_pos + item_rel_pos)) {
+      // Make previous workareas smaller, next - bigger
+      // No problem to keep old size of the widget
+    } else {
+      // Make previous workareas bigger, next - smaller
+      if (new_this > splitter_size - new_item_rel_pos) {
+        new_this = splitter_size - new_item_rel_pos;
+      }
+      // jfa to do: in this case fixed size of next widgets could prevent right resizing
+      isToCheck = true;
+    }
+    if (item_ind == nb - 1) {
+      new_this = splitter_size - new_item_rel_pos;
+    } else {
+      new_next = (splitter_size - new_item_rel_pos - new_this) / (nb - item_ind - 1);
+    }
+    delta = 0;
+  }
+
+  setSizes (szList, item_ind, new_prev, new_this, new_next);
+  return delta;
+}
+
+int QtxWorkstack::setPosition (QWidget* wid, QSplitter* split,
+                               const Qt::Orientation o, const int need_pos,
+                               const int splitter_pos)
+{
+  if (!wid || !split)
+    return need_pos - splitter_pos;
+
+  // Find corresponding sub-splitter.
+  // Find also index of appropriate item in current splitter.
+  int cur_ind = 0, item_ind = 0;
+  bool isBottom = false, isFound = false;
+  QSplitter* sub_split = NULL;
+  const QObjectList* objs = split->children();
+  if (objs)
+  {
+    for (QObjectListIt it (*objs); it.current() && !isFound; ++it)
+    {
+      if (it.current()->inherits( "QtxWorkstackArea")) {
+        if (((QtxWorkstackArea*)it.current())->contains(wid)) {
+          item_ind = cur_ind;
+          isBottom = true;
+          isFound = true;
+        }
+        cur_ind++;
+      } else if (it.current()->inherits("QSplitter")) {
+        QPtrList<QtxWorkstackArea> areaList;
+        areas((QSplitter*)it.current(), areaList, true);
+        for (QPtrListIterator<QtxWorkstackArea> ita (areaList);
+             ita.current() && !isFound;
+             ++ita)
+        {
+          if (ita.current()->contains(wid)) {
+            item_ind = cur_ind;
+            isFound = true;
+            sub_split = (QSplitter*)it.current();
+          }
+        }
+        cur_ind++;
+      }
+    }
+  }
+  if (!isFound)
+    return (need_pos - splitter_pos);
+
+  if (split->orientation() == o) {
+    // Find coordinates of near and far sides of the appropriate item relatively current splitter
+    int splitter_size = (o == Horizontal ? split->width() : split->height());
+    QIntList szList = split->sizes();
+    int nb = szList.count();
+    int item_rel_pos = 0; // position of near side of item relatively this splitter
+    for (int i = 0; i < item_ind; i++) {
+      item_rel_pos += szList[i];
+    }
+    int item_size = szList[item_ind]; // size of item
+    int item_pos = splitter_pos + item_rel_pos;
+
+    // Resize splitter items to complete the conditions
+    if (isBottom) {
+      // I. Bottom of splitters stack reached
+
+      int delta = positionSimple(szList, nb, splitter_size, item_ind, item_rel_pos, need_pos, splitter_pos);
+      split->setSizes(szList);
+      // Recompute delta, as some windows can reject given size
+      int new_item_rel_pos = 0;
+      QIntList szList1 = split->sizes();
+      for (int i = 0; i < item_ind; i++) {
+        new_item_rel_pos += szList1[i];
+      }
+      delta = need_pos - (splitter_pos + new_item_rel_pos);
+      return delta;
+
+    } else {
+      // II. Bottom of splitters stack is not yet reached
+
+      if (item_ind == 0) { // cannot move in this splitter
+        // Process in sub-splitter
+        return setPosition(wid, sub_split, o, need_pos, splitter_pos);
+      }
+
+      int new_prev = 0;
+      int new_this = szList[item_ind];
+      int new_next = 0;
+
+      if (need_pos < splitter_pos) {
+        // Set size of all previous workareas to zero <--
+        if (item_ind == nb - 1) {
+          new_this = splitter_size;
+        } else {
+          new_next = (splitter_size - new_this) / (nb - item_ind - 1);
+        }
+        setSizes (szList, item_ind, new_prev, new_this, new_next);
+        split->setSizes(szList);
+        // Recompute splitter_pos, as some windows can reject given size
+        int new_item_rel_pos = 0;
+        QIntList szList1 = split->sizes();
+        for (int i = 0; i < item_ind; i++) {
+          new_item_rel_pos += szList1[i];
+        }
+        // Process in sub-splitter
+        return setPosition(wid, sub_split, o, need_pos, splitter_pos + new_item_rel_pos);
+      } else if (need_pos > (splitter_pos + splitter_size)) {
+        // Set size of all next workareas to zero -->
+        new_prev = (splitter_size - new_this) / item_ind;
+        setSizes (szList, item_ind, new_prev, new_this, new_next);
+        split->setSizes(szList);
+        // Recompute splitter_pos, as some windows can reject given size
+        int new_item_rel_pos = 0;
+        QIntList szList1 = split->sizes();
+        for (int i = 0; i < item_ind; i++) {
+          new_item_rel_pos += szList1[i];
+        }
+        // Process in sub-splitter
+        return setPosition(wid, sub_split, o, need_pos, splitter_pos + new_item_rel_pos);
+      } else {
+        // Set appropriate size of all previous/next items <->
+        int new_item_rel_pos = item_rel_pos;
+        if (need_pos < item_pos || (item_pos + item_size) < need_pos) {
+          // Move item inside splitter into required position <->
+          int new_this = szList[item_ind];
+          int new_next = 0;
+          new_item_rel_pos = need_pos - splitter_pos;
+          if ((item_pos + item_size) < need_pos) {
+            //new_item_rel_pos = need_pos - (item_pos + item_size);
+            new_item_rel_pos = item_rel_pos + (need_pos - (item_pos + item_size));
+          }
+          int new_prev = new_item_rel_pos / item_ind;
+          if (need_pos < (splitter_pos + item_rel_pos)) {
+            // Make previous workareas smaller, next - bigger
+            // No problem to keep old size of the widget
+          } else {
+            // Make previous workareas bigger, next - smaller
+            if (new_this > splitter_size - new_item_rel_pos) {
+              new_this = splitter_size - new_item_rel_pos;
+            }
+          }
+          if (item_ind == nb - 1) {
+            new_this = splitter_size - new_item_rel_pos;
+          } else {
+            new_next = (splitter_size - new_item_rel_pos - new_this) / (nb - item_ind - 1);
+          }
+          setSizes (szList, item_ind, new_prev, new_this, new_next);
+          split->setSizes(szList);
+          // Recompute new_item_rel_pos, as some windows can reject given size
+          new_item_rel_pos = 0;
+          QIntList szList1 = split->sizes();
+          for (int i = 0; i < item_ind; i++) {
+            new_item_rel_pos += szList1[i];
+          }
+        } else {
+          // Do nothing
+        }
+        // Process in sub-splitter
+        int add_pos = setPosition(wid, sub_split, o, need_pos, splitter_pos + new_item_rel_pos);
+        if (add_pos == 0)
+          return 0;
+
+        // this can be if corresponding workarea is first in sub-splitter
+        // or sub-splitter has another orientation
+
+        // Resize ones again to reach precize position <->
+        int need_pos_1 = splitter_pos + new_item_rel_pos + add_pos;
+
+        // Move workarea inside splitter into required position <->
+        int delta_1 = positionSimple(szList, nb, splitter_size, item_ind,
+                                     new_item_rel_pos, need_pos_1, splitter_pos);
+        split->setSizes(szList);
+        // Recompute new_item_rel_pos, as some windows can reject given size
+        new_item_rel_pos = 0;
+        QIntList szList1 = split->sizes();
+        for (int i = 0; i < item_ind; i++) {
+          new_item_rel_pos += szList1[i];
+        }
+        delta_1 = need_pos_1 - (splitter_pos + new_item_rel_pos);
+        return delta_1;
+      }
+    }
+  } else {
+    return setPosition(wid, sub_split, o, need_pos, splitter_pos);
+  }
+
+  return 0;
+}
+// end: jfa 06.07.2005
 
 void QtxWorkstack::distributeSpace( QSplitter* split ) const
 {

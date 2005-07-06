@@ -29,6 +29,7 @@ class QTX_EXPORT QtxWorkstack : public QWidget
   enum { SplitVertical, SplitHorizontal, Close };
 
 public:
+
   QtxWorkstack( QWidget* = 0 );
   virtual ~QtxWorkstack();
 
@@ -38,6 +39,62 @@ public:
   QWidget*            activeWindow() const;
 
   void                split( const int );
+
+  // begin: jfa 06.07.2005
+  enum SplitType {
+    SPLIT_STAY, //!< given widget stays in its workarea, others are moved into a new one
+    SPLIT_AT,   //!< widgets before a given widget stays in they workarea, others are moved into a new one
+    SPLIT_MOVE  //!< given widget is moved into a new workarea, others stay in an old one
+  };
+
+  /*!
+   * \brief Split workarea of the given widget on two parts.
+   * \param wid  - widget, belonging to this workstack
+   * \param o    - orientation of splitting (Qt::Horizontal or Qt::Vertical)
+   * \param type - type of splitting, see <VAR>SplitType</VAR> enumeration
+   */
+  void Split( QWidget* wid, const Qt::Orientation o, const SplitType type);
+
+  /*!
+   * \brief Put given widget on top of its workarea
+   * \param wid - widget, belonging to this workstack
+   */
+  void OnTop( QWidget* wid);
+
+  /*!
+   * \brief Move widget(s) from source workarea into target workarea
+   *        or just reorder widgets inside one workarea.
+   * \param wid1 - widget from target workarea
+   * \param wid2 - widget from source workarea
+   * \param all  - if this parameter is TRUE, all widgets from source workarea will
+   *               be moved into the target one, else only the \a wid2 will be moved
+   *
+   * Move \a wid2 in target workarea. Put it right after \a wid1.
+   * If value of boolean argument is TRUE, all widgets from source workarea
+   * will be moved together with \a wid2, source workarea will be deleted.
+   * If \a wid1 and \a wid2 belongs to one workarea, simple reordering will take place.
+   */
+  void Attract( QWidget* wid1, QWidget* wid2, const bool all );
+
+  /*!
+   * \brief Set position of the widget relatively its splitter.
+   * \param wid - widget to set position of
+   * \param pos - position relatively splitter. Value in range [0..1].
+   *
+   * Orientation of positioning will correspond to the splitter orientation.
+   */
+  void SetRelativePositionInSplitter( QWidget* wid, const double pos );
+
+  /*!
+   * \brief Set position of the widget relatively the entire workstack.
+   * \param wid - widget to set position of
+   * \param o   - orientation of positioning (Qt::Horizontal or Qt::Vertical).
+   *              If o = Qt::Horizontal, horizontal position of \a wid will be changed.
+   *              If o = Qt::Vertical, vertical position of \a wid will be changed.
+   * \param pos - position relatively workstack. Value in range [0..1].
+   */
+  void SetRelativePosition( QWidget* wid, const Qt::Orientation o, const double pos );
+  // end: jfa 06.07.2005
 
 signals:
   void                windowActivated( QWidget* );
@@ -80,6 +137,26 @@ private:
   void                updateState( QSplitter* );
 
   void                distributeSpace( QSplitter* ) const;
+
+  // begin: jfa 06.07.2005
+  /*!
+   * \brief Set position of given widget.
+   * \param wid          - widget to be moved
+   * \param split        - currently processed splitter (goes from more common
+   *                       to more particular splitter in recursion calls)
+   * \param o            - orientation of positioning
+   * \param need_pos     - required position of the given widget in pixels
+   *                       (from top/left side of workstack area)
+   * \param splitter_pos - position of the splitter \a split
+   *                       (from top/left side of workstack area)
+   * \retval int - returns difference between a required and a distinguished position.
+   * 
+   * Internal method. Recursively calls itself.
+   * Is called from <VAR>SetRelativePosition</VAR> public method.
+   */
+  int                 setPosition( QWidget* wid, QSplitter* split, const Qt::Orientation o,
+				   const int need_pos, const int splitter_pos);
+  // end: jfa 06.07.2005
 
 private:
   QWidget*            myWin;
