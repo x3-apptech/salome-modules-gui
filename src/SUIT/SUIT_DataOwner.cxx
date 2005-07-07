@@ -13,21 +13,21 @@
 //********************************************************************
 
 //====================================================================
-// Constructor
+//! Constructor
 //====================================================================
 SUIT_DataOwner::SUIT_DataOwner()
 {
 }
 
 //====================================================================
-// Destructor
+//! Destructor
 //====================================================================
 SUIT_DataOwner::~SUIT_DataOwner()
 {
 }
 
 //====================================================================
-// operator== : compares two owners
+//! operator== : compares two owners
 //====================================================================
 bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 {
@@ -42,7 +42,7 @@ bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 //********************************************************************
 
 //====================================================================
-// Constructor (default)
+//! Constructor (default)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList()
 : QValueList<SUIT_DataOwnerPtr>()
@@ -50,7 +50,7 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList()
 }
 
 //====================================================================
-// Constructor (copy)
+//! Constructor (copy)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l )
 : QValueList<SUIT_DataOwnerPtr>( l )
@@ -59,7 +59,7 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l )
 
 #ifndef QT_NO_STL
 //====================================================================
-// Constructor (from stl)
+//! Constructor (from stl)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l )
 : QValueList<SUIT_DataOwnerPtr>( l )
@@ -68,7 +68,7 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>
 #endif
 
 //====================================================================
-// Appends an item to the list
+//! Appends an item to the list
 //====================================================================
 SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOwnerPtr& x )
 {
