@@ -21,7 +21,9 @@ class VTKViewer_TransformFilter;
 class VTKViewer_PassThroughFilter;
 
 #define VTKViewer_POINT_SIZE 3
-
+/*! \class vtkLODActor
+ * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
+ */
 class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 {
 public:
@@ -32,11 +34,13 @@ public:
   virtual const char* getName() { return myName.c_str(); }
   virtual void setName(const char* theName){ myName = theName;}
 
-  // To generate highlight automaticaly
-  virtual bool hasHighlight() { return false; } 
-  virtual void highlight(bool theHighlight) { myIsHighlighted = theHighlight; }  
+  //! To generate highlight automaticaly
+  virtual bool hasHighlight() { return false; }
+  //! Sets highlight.
+  virtual void highlight(bool theHighlight) { myIsHighlighted = theHighlight; }
+  //! Check highlight.
   virtual bool isHighlighted() { return myIsHighlighted; }
-
+  
   virtual void SetOpacity(float theOpacity);
   virtual float GetOpacity();
 
@@ -48,14 +52,14 @@ public:
 
   virtual void SetPreSelected(bool thePreselect = false) { myIsPreselected = thePreselect;}
 
-  // Used to obtain all dependent actors
+  //! Used to obtain all dependent actors
   virtual void GetChildActors(vtkActorCollection*) {};
   
   virtual void AddToRender(vtkRenderer* theRenderer); 
   virtual void RemoveFromRender(vtkRenderer* theRenderer);
 
 
-  // For selection mapping purpose
+  /*! For selection mapping purpose */
   virtual int GetNodeObjId(int theVtkID) { return theVtkID;}
   virtual float* GetNodeCoord(int theObjID);
 
@@ -77,8 +81,8 @@ public:
   virtual int getDisplayMode();
   virtual void setDisplayMode(int theMode);
 
-  // Infinitive means actor without size (point for example),
-  // which is not taken into account in calculation of boundaries of the scene
+  //! Infinitive means actor without size (point for example),
+  //! which is not taken into account in calculation of boundaries of the scene
   void SetInfinitive(bool theIsInfinite) { myIsInfinite = theIsInfinite; }
   virtual bool IsInfinitive();
     
@@ -111,6 +115,7 @@ protected:
   int myRepresentation;
   vtkProperty *myProperty;
 
+  //! Main method, which calculate output.
   void InitPipeLine(vtkMapper* theMapper); 
 
   VTKViewer_Actor();

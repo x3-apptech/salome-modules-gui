@@ -12,8 +12,8 @@
 
 //===========================================================
 /*!
- *  Function: SALOME_OCCPrs::DisplayIn
- *  Purpose:  Dispatches display operation to proper Display()
+ *  Function: SALOME_OCCPrs::DisplayIn \n
+ *  Purpose:  Dispatches display operation to proper Display() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -24,8 +24,8 @@ void SALOME_OCCPrs::DisplayIn( SALOME_View* v ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_OCCPrs::EraseIn
- *  Purpose:  Dispatches display operation to proper Erase()
+ *  Function: SALOME_OCCPrs::EraseIn \n
+ *  Purpose:  Dispatches display operation to proper Erase() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -36,8 +36,8 @@ void SALOME_OCCPrs::EraseIn( SALOME_View* v, const bool forced ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_OCCPrs::LocalSelectionIn
- *  Purpose:  Dispatches operation to proper LocalSelectionIn()
+ *  Function: SALOME_OCCPrs::LocalSelectionIn \n
+ *  Purpose:  Dispatches operation to proper LocalSelectionIn() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -48,8 +48,8 @@ void SALOME_OCCPrs::LocalSelectionIn( SALOME_View* v, const int mode ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_OCCPrs::Update
- *  Purpose:  Dispatches update operation to proper Update()
+ *  Function: SALOME_OCCPrs::Update \n
+ *  Purpose:  Dispatches update operation to proper Update() \n
  *            method of SALOME_Displayer
  */
 //===========================================================
@@ -60,8 +60,8 @@ void SALOME_OCCPrs::Update( SALOME_Displayer* d )
 
 //===========================================================
 /*!
- *  Function: SALOME_VTKPrs::DisplayIn
- *  Purpose:  Dispatches display operation to proper Display()
+ *  Function: SALOME_VTKPrs::DisplayIn \n
+ *  Purpose:  Dispatches display operation to proper Display() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -72,8 +72,8 @@ void SALOME_VTKPrs::DisplayIn( SALOME_View* v ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_VTKPrs::EraseIn
- *  Purpose:  Dispatches display operation to proper Erase()
+ *  Function: SALOME_VTKPrs::EraseIn \n
+ *  Purpose:  Dispatches display operation to proper Erase() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -84,8 +84,8 @@ void SALOME_VTKPrs::EraseIn( SALOME_View* v, const bool forced ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_VTKPrs::LocalSelectionIn
- *  Purpose:  Dispatches operation to proper LocalSelectionIn()
+ *  Function: SALOME_VTKPrs::LocalSelectionIn \n
+ *  Purpose:  Dispatches operation to proper LocalSelectionIn() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -96,8 +96,8 @@ void SALOME_VTKPrs::LocalSelectionIn( SALOME_View* v, const int mode ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_VTKPrs::Update
- *  Purpose:  Dispatches update operation to proper Update()
+ *  Function: SALOME_VTKPrs::Update \n
+ *  Purpose:  Dispatches update operation to proper Update() \n
  *            method of SALOME_Displayer
  */
 //===========================================================
@@ -108,8 +108,8 @@ void SALOME_VTKPrs::Update( SALOME_Displayer* d )
 
 //===========================================================
 /*!
- *  Function: SALOME_Prs2d::DisplayIn
- *  Purpose:  Dispatches display operation to proper Display()
+ *  Function: SALOME_Prs2d::DisplayIn \n
+ *  Purpose:  Dispatches display operation to proper Display() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -120,8 +120,8 @@ void SALOME_Prs2d::DisplayIn( SALOME_View* v ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_Prs2d::EraseIn
- *  Purpose:  Dispatches display operation to proper Erase()
+ *  Function: SALOME_Prs2d::EraseIn \n
+ *  Purpose:  Dispatches display operation to proper Erase() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -132,8 +132,8 @@ void SALOME_Prs2d::EraseIn( SALOME_View* v, const bool forced ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_Prs2d::LocalSelectionIn
- *  Purpose:  Dispatches operation to proper LocalSelectionIn()
+ *  Function: SALOME_Prs2d::LocalSelectionIn \n
+ *  Purpose:  Dispatches operation to proper LocalSelectionIn() \n
  *            method of SALOME_View
  */
 //===========================================================
@@ -144,8 +144,8 @@ void SALOME_Prs2d::LocalSelectionIn( SALOME_View* v, const int mode ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_Prs2d::Update
- *  Purpose:  Dispatches update operation to proper Update()
+ *  Function: SALOME_Prs2d::Update \n
+ *  Purpose:  Dispatches update operation to proper Update() \n
  *            method of SALOME_Displayer
  */
 //===========================================================
@@ -156,8 +156,8 @@ void SALOME_Prs2d::Update( SALOME_Displayer* d )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Display
- *  Purpose:  Gives control to SALOME_Prs object, so that
+ *  Function: SALOME_View::Display \n
+ *  Purpose:  Gives control to SALOME_Prs object, so that \n
  *            it could perform double dispatch
  */
 //===========================================================
@@ -168,8 +168,8 @@ void SALOME_View::Display( const SALOME_Prs* prs )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Erase
- *  Purpose:  Gives control to SALOME_Prs object, so that
+ *  Function: SALOME_View::Erase \n
+ *  Purpose:  Gives control to SALOME_Prs object, so that \n
  *            it could perform double dispatch
  */
 //===========================================================
@@ -180,8 +180,8 @@ void SALOME_View::Erase( const SALOME_Prs* prs, const bool forced )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::LocalSelection
- *  Purpose:  Gives control to SALOME_Prs object, so that
+ *  Function: SALOME_View::LocalSelection \n
+ *  Purpose:  Gives control to SALOME_Prs object, so that \n
  *            it could perform double dispatch
  */
 //===========================================================
@@ -192,8 +192,8 @@ void SALOME_View::LocalSelection( const SALOME_Prs* prs, const int mode )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Display
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Display \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -204,8 +204,8 @@ void SALOME_View::Display( const SALOME_OCCPrs* )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Display
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Display \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -216,8 +216,8 @@ void SALOME_View::Display( const SALOME_VTKPrs* )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Display
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Display \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -228,8 +228,8 @@ void SALOME_View::Display( const SALOME_Prs2d* )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Erase
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Erase \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -240,8 +240,8 @@ void SALOME_View::Erase( const SALOME_OCCPrs*, const bool )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Erase
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Erase \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -252,8 +252,8 @@ void SALOME_View::Erase( const SALOME_VTKPrs*, const bool )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::Erase
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::Erase \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -264,8 +264,8 @@ void SALOME_View::Erase( const SALOME_Prs2d*, const bool )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::EraseAll
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::EraseAll \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -276,8 +276,8 @@ void SALOME_View::EraseAll( const bool )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::LocalSelection
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::LocalSelection \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -289,8 +289,8 @@ void SALOME_View::LocalSelection( const SALOME_OCCPrs*, const int )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::LocalSelection
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::LocalSelection \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -302,8 +302,8 @@ void SALOME_View::LocalSelection( const SALOME_VTKPrs*, const int )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::LocalSelection
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::LocalSelection \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -315,8 +315,8 @@ void SALOME_View::LocalSelection( const SALOME_Prs2d*, const int )
 
 //===========================================================
 /*!
- *  Function: SALOME_View::GlobalSelection
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_View::GlobalSelection \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -328,8 +328,8 @@ void SALOME_View::GlobalSelection( const bool ) const
 
 //===========================================================
 /*!
- *  Function: SALOME_Displayer::UpdatePrs
- *  Purpose:  Gives control to SALOME_Prs object, so that
+ *  Function: SALOME_Displayer::UpdatePrs \n
+ *  Purpose:  Gives control to SALOME_Prs object, so that \n
  *            it could perform double dispatch
  */
 //===========================================================
@@ -340,8 +340,8 @@ void SALOME_Displayer::UpdatePrs( SALOME_Prs* prs )
 
 //===========================================================
 /*!
- *  Function: SALOME_Displayer::Update
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_Displayer::Update \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -352,8 +352,8 @@ void SALOME_Displayer::Update( SALOME_OCCPrs* )
 
 //===========================================================
 /*!
- *  Function: SALOME_Displayer::Update
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_Displayer::Update \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================
@@ -364,8 +364,8 @@ void SALOME_Displayer::Update( SALOME_VTKPrs* )
 
 //===========================================================
 /*!
- *  Function: SALOME_Displayer::Update
- *  Purpose:  Virtual method, should be reimplemented in successors,
+ *  Function: SALOME_Displayer::Update \n
+ *  Purpose:  Virtual method, should be reimplemented in successors, \n
  *            by default issues a warning and does nothing.
  */
 //===========================================================

@@ -30,42 +30,49 @@
 
 #include <vtkPicker.h>
 
+/*! \class vtkPicker
+ * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
+ */
+/*! \class VTKViewer_RectPicker
+ * \brief Rectangular picker class.
+ */
 class VTK_EXPORT VTKViewer_RectPicker : public vtkPicker
 {
 public:
   static VTKViewer_RectPicker *New();
   vtkTypeMacro(VTKViewer_RectPicker,vtkPicker);
   
-  // Description:
-  // Perform pick operation with selection rectangle provided. Normally the 
-  // first two values for the selection top-left and right-bottom points are 
-  // x-y pixel coordinate, and the third value is =0. 
-  // Return non-zero if something was successfully picked.
+  /*! \brief Perform pick operation with selection rectangle provided. Normally the 
+   * first two values for the selection top-left and right-bottom points are 
+   * x-y pixel coordinate, and the third value is =0. 
+   * \retval Return non-zero if something was successfully picked.
+   */
   virtual int Pick(float selectionX1, float selectionY1, float selectionZ1, 
 		   float selectionX2, float selectionY2, float selectionZ2,
                    vtkRenderer *renderer);  
 
-  // Description: 
-  // Perform pick operation with selection rectangle provided. Normally the first
-  // two values for the selection top-left and right-bottom points are x-y pixel 
-  // coordinate, and the third value is =0. 
-  // Return non-zero if something was successfully picked.
+  /*!
+   * \brief Perform pick operation with selection rectangle provided. Normally the first
+   * two values for the selection top-left and right-bottom points are x-y pixel 
+   * coordinate, and the third value is =0. 
+   * \retval Return non-zero if something was successfully picked.
+   */
   int Pick(float selectionPt1[3], float selectionPt2[3], vtkRenderer *ren)
     {return this->Pick(selectionPt1[0], selectionPt1[1], selectionPt1[2], 
 		       selectionPt2[0], selectionPt2[1], selectionPt2[2],
 		       ren);};
 
-  // Description:
-  // Bounding box intersection with hexahedron. The method returns a non-zero value 
-  // if the bounding box is hit. Origin[4][4] starts the ray from corner points, 
-  // dir[4][3] is the vector components of the ray in the x-y-z directions. 
-  // (Notes: the intersection ray dir[4][3] is NOT normalized.)
+  /*! \brief Bounding box intersection with hexahedron. Origin[4][4] starts the ray from corner points, 
+   * dir[4][3] is the vector components of the ray in the x-y-z directions. 
+   * (Notes: the intersection ray dir[4][3] is NOT normalized.)
+   * \retval The method returns a non-zero value, if the bounding box is hit.
+   */
   static char HitBBox(float bounds[6], float origin[4][4], float dir[4][3]);
 
-  // Description:
-  // Position of point relative to hexahedron. The method returns a non-zero value 
-  // if the point is inside. p1[4][4] is the corner points of top face, 
-  // p2[4][4] is the corner points of bottom face. 
+  /*! \brief Position of point relative to hexahedron. p1[4][4] is the corner points of top face, 
+   * p2[4][4] is the corner points of bottom face. 
+   * \retval The method returns a non-zero value, if the point is inside.
+   */
   static char PointInside(float point[3], float p1[4][4], float p2[4][4], float tol=0);
 
 protected:
@@ -73,8 +80,8 @@ protected:
   ~VTKViewer_RectPicker() {};
 
   virtual float IntersectWithHex(float p1[4][4], float p2[4][4], float tol, 
-                          vtkAssemblyPath *path, vtkProp3D *p, 
-                          vtkAbstractMapper3D *m);
+				 vtkAssemblyPath *path, vtkProp3D *p, 
+				 vtkAbstractMapper3D *m);
 
 private:
 };

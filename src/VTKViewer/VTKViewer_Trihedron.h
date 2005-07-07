@@ -17,7 +17,9 @@ class vtkConeSource;
 class VTKViewer_Axis;
 class VTKViewer_VectorText;
 
-//****************************************************************
+/*! \class vtkFollower
+ * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
+ */
 /*! \class VTKViewer_UnScaledActor
  * \brief Same as VTK class vtkFollower
  */
