@@ -70,24 +70,20 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
 
   setStudyDS( study );
 
-  // build a SUIT_DataObject-s tree under myRoot member field
-  // 1. create myRoot
-  setRoot( new SalomeApp_RootObject( this ) );
-  // 2. iterate through all components and create corresponding sub-trees under them
-  _PTR(SComponentIterator) it ( studyDS()->NewComponentIterator() );
-  for ( ; it->More(); it->Next() ) {
-    // don't use shared_ptr here, for Data Object will take 
-    // ownership of this pointer
-    _PTR(SComponent) aComponent ( it->Value() ); 
+  setRoot( new SalomeApp_RootObject( this ) ); // create myRoot
 
-    if ( aComponent->ComponentDataType() == "Interface Applicative" )
-      continue; // skip the magic "Interface Applicative" component
-    
-    SalomeApp_DataModel::BuildTree( aComponent, root(), this );
-  }
+  // update loaded data models: call open() and update() on them.
+  ModelList dm_s;
+  dataModels( dm_s );
+  for ( ModelListIterator it( dm_s ); it.current(); ++it )
+    openDataModel( studyName(), it.current() );
+
+  // this will build a SUIT_DataObject-s tree under myRoot member field
+  // passing "false" in order NOT to rebuild existing data models' trees - it was done in previous step
+  // but tree that corresponds to not-loaded data models will be updated any way. 
+  ((SalomeApp_Application*)application())->updateObjectBrowser( false ); 
 
   bool res = CAM_Study::openDocument( theFileName );
-
   emit opened( this );
 
   return res;
