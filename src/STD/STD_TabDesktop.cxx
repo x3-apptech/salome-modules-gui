@@ -28,6 +28,10 @@ myWorkstackAction( 0 )
 
   myWorkstack = new QtxWorkstack( base );
 
+  myWorkstack->setAccel(QtxWorkstack::SplitVertical,   SHIFT + Key_V);
+  myWorkstack->setAccel(QtxWorkstack::SplitHorizontal, SHIFT + Key_H);
+  myWorkstack->setAccel(QtxWorkstack::Close,           SHIFT + Key_C);
+
   connect( myWorkstack, SIGNAL( windowActivated( QWidget* ) ),
            this, SLOT( onWindowActivated( QWidget* ) ) );
 

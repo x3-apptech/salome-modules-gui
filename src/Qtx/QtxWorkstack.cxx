@@ -4,6 +4,7 @@
 #include "QtxWorkstack.h"
 
 #include <qstyle.h>
+#include <qaction.h>
 #include <qlayout.h>
 #include <qpixmap.h>
 #include <qiconset.h>
@@ -27,6 +28,14 @@ QtxWorkstack::QtxWorkstack( QWidget* parent )
 myWin( 0 ),
 myArea( 0 )
 {
+  myActionsMap.insert( SplitVertical,   new QAction( tr( "Split vertically" ),   0, this ));
+  myActionsMap.insert( SplitHorizontal, new QAction( tr( "Split horizontally" ), 0, this ));
+  myActionsMap.insert( Close,           new QAction( tr( "Close" ),              0, this ));		       
+
+  connect( myActionsMap[SplitVertical], SIGNAL( activated() ), this, SLOT( splitVertical() ) );
+  connect( myActionsMap[SplitHorizontal], SIGNAL( activated() ), this, SLOT( splitHorizontal() ) );
+  connect( myActionsMap[Close], SIGNAL( activated() ), this, SLOT( onCloseWindow() ) );
+
   QVBoxLayout* base = new QVBoxLayout( this );
   mySplit = new QSplitter( this );
   mySplit->setChildrenCollapsible( false );
@@ -365,6 +374,21 @@ void QtxWorkstack::SetRelativePosition (QWidget* wid,
   }
 }
 
+
+void QtxWorkstack::setAccel( const int id, const int accel )
+{
+  if (!myActionsMap.contains(id))
+    return;
+  myActionsMap[id]->setAccel(accel);
+}
+
+int QtxWorkstack::accel (const int id) const
+{
+  if (!myActionsMap.contains(id))
+    return 0;
+  return myActionsMap[id]->accel();
+}
+
 static int positionSimple (QIntList& szList, const int nb, const int splitter_size,
                            const int item_ind, const int item_rel_pos,
                            const int need_pos, const int splitter_pos)
@@ -632,6 +656,12 @@ void QtxWorkstack::splitHorizontal()
   split( Qt::Horizontal );
 }
 
+void QtxWorkstack::onCloseWindow()
+{
+  if ( activeWindow() )
+    activeWindow()->close();
+}
+
 QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )
 {
   if ( !area )
@@ -693,23 +723,6 @@ void QtxWorkstack::insertWidget( QWidget* wid, QWidget* pWid, QWidget* after )
     itr.current()->reparent( pWid, QPoint( 0, 0 ), map.contains( itr.current() ) ? map[itr.current()] : false );
 }
 
-void QtxWorkstack::onPopupActivated( int id )
-{
-  switch ( id )
-  {
-  case SplitVertical:
-    splitVertical();
-    break;
-  case SplitHorizontal:
-    splitHorizontal();
-    break;
-  case Close:
-    if ( activeWindow() )
-      activeWindow()->close();
-    break;
-  }
-}
-
 void QtxWorkstack::onDestroyed( QObject* obj )
 {
   QtxWorkstackArea* area = (QtxWorkstackArea*)obj;
@@ -768,16 +781,15 @@ void QtxWorkstack::onContextMenuRequested( QPoint p )
     return;
 
   QPopupMenu* pm = new QPopupMenu();
-  connect( pm, SIGNAL( activated( int ) ), this, SLOT( onPopupActivated( int ) ) );
-
+  
   if ( lst.count() > 1 )
   {
-    pm->insertItem( tr( "Split vertically" ), SplitVertical );
-    pm->insertItem( tr( "Split horizontally" ), SplitHorizontal );
+    myActionsMap[SplitVertical]->addTo( pm );
+    myActionsMap[SplitHorizontal]->addTo( pm );
     pm->insertSeparator();
   }
-  pm->insertItem( tr( "Close" ), Close );
-
+  myActionsMap[Close]->addTo( pm );
+  
   pm->exec( p );
 
   delete pm;

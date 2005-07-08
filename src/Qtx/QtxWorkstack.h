@@ -11,6 +11,7 @@
 #include <qtabbar.h>
 #include <qwidgetlist.h>
 
+class QAction;
 class QTabBar;
 class QPainter;
 class QSplitter;
@@ -25,9 +26,7 @@ class QtxWorkstackTabBar;
 class QTX_EXPORT QtxWorkstack : public QWidget
 {
   Q_OBJECT
-
-  enum { SplitVertical, SplitHorizontal, Close };
-
+ 
 public:
 
   QtxWorkstack( QWidget* = 0 );
@@ -39,6 +38,8 @@ public:
   QWidget*            activeWindow() const;
 
   void                split( const int );
+
+  enum { SplitVertical, SplitHorizontal, Close };
 
   // begin: jfa 06.07.2005
   enum SplitType {
@@ -96,19 +97,36 @@ public:
   void SetRelativePosition( QWidget* wid, const Qt::Orientation o, const double pos );
   // end: jfa 06.07.2005
 
+  /*!
+   * \brief Sets the action's accelerator key to accel. 
+   * \param id - the key of the action in the actions map.
+   * \param accel - action's accelerator key.
+   */
+  void setAccel( const int id, const int accel );
+
+  /*!
+   * \brief Returns the action's accelerator key.
+   * \param id - the key of the action in the actions map.
+   * \retval int  - action's accelerator key.
+   */
+  int accel (const int id) const;
+
 signals:
   void                windowActivated( QWidget* );
 
 public slots:
   void                splitVertical();
   void                splitHorizontal();
-
+  
 private slots:
-  void                onPopupActivated( int );
   void                onDestroyed( QObject* );
   void                onWindowActivated( QWidget* );
   void                onContextMenuRequested( QPoint );
   void                onDeactivated( QtxWorkstackArea* );
+  /*!
+   * \brief Closes the active window.
+   */
+  void                onCloseWindow();
 
 protected:
   virtual void        childEvent( QChildEvent* );
@@ -162,6 +180,8 @@ private:
   QWidget*            myWin;
   QtxWorkstackArea*   myArea;
   QSplitter*          mySplit;
+
+  QMap<int, QAction*> myActionsMap; //!< The map of the actions. Allows to get the QAction object by the key.
 
   friend class QtxWorkstackArea;
   friend class QtxWorkstackDrag;
@@ -347,6 +367,7 @@ private:
   int                 myTab;
   QtxWorkstackArea*   myArea;
   QPainter*           myPainter;
+  
 };
 
 #endif

@@ -168,6 +168,12 @@ void QtxWorkstackAction::onAboutToShow()
   if ( !obj || !obj->inherits( "QPopupMenu" ) )
     return;
 
+  QtxWorkstack* ws = workstack();
+  if ( ws )
+    {
+      myItem[VSplit]->setAccel(ws->accel(QtxWorkstack::SplitVertical));
+      myItem[HSplit]->setAccel(ws->accel(QtxWorkstack::SplitHorizontal));
+    }
   updatePopup( (QPopupMenu*)obj );
 }
 
