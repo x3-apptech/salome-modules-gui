@@ -15,7 +15,7 @@
 class SUIT_EXPORT SUIT_Tools : public Qtx
 {
 public:
-  static void    trace( const char* pLog, const char* szFormat, ... );
+  static void    trace( const char* pLog, const char* szFormat, ... );//!< Traces output to log-file.
   static QRect   makeRect( const int x1, const int y1, const int x2, const int y2 ); 
 
   static QString fontToString( const QFont& font );
