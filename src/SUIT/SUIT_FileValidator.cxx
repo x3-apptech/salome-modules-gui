@@ -16,13 +16,13 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 
-/* constructor */
+/*! constructor */
 SUIT_FileValidator::SUIT_FileValidator(QWidget* parent) :
 myParent(parent) 
 {
 }
   
-/* returns false if can't open file */
+/*! returns false if can't open file */
 bool SUIT_FileValidator::canOpen( const QString& file ) 
 {
   if ( !QFile::exists( file ) ) {
@@ -42,7 +42,7 @@ bool SUIT_FileValidator::canOpen( const QString& file )
   return true;
 }
 
-/* returns false if can't save file */
+/*! returns false if can't save file */
 bool SUIT_FileValidator::canSave( const QString& file ) 
 {
   if ( QFile::exists( file ) ) {

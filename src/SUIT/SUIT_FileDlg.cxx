@@ -64,15 +64,14 @@
 
 #define MIN_COMBO_SIZE 100
 
-// If the selected file name has extension which does not match the selected filter
-// this extension is ignored (and new one will be added). See below for details.
+/*! If the selected file name has extension which does not match the selected filter
+ * this extension is ignored (and new one will be added). See below for details.
+ */
 const bool IGNORE_NON_MATCHING_EXTENSION = true;
 
 QString SUIT_FileDlg::myLastVisitedPath;
 
-/*!
-Constructor
-*/
+/*! Constructor */
 SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool modal ) :
 QFileDialog( parent, 0, modal ),
 myValidator( 0 ),
@@ -129,17 +128,13 @@ myAccepted( false )
   myValidator = new SUIT_FileValidator(this);
 }
 
-/*!
-Destructor
-*/
+/*! Destructor*/
 SUIT_FileDlg::~SUIT_FileDlg() 
 {
   setValidator( 0 );
 }
 
-/*!
-  Redefined from QFileDialog.
-*/
+/*! Redefined from QFileDialog.*/
 void SUIT_FileDlg::polish()
 {
   QFileDialog::polish();
@@ -177,10 +172,9 @@ void SUIT_FileDlg::polish()
   }
 }
 
-/*!
-Sets validator for file names to open/save
-Deletes previous validator if the dialog owns it.
-*/
+/*! Sets validator for file names to open/save
+ * Deletes previous validator if the dialog owns it.
+ */
 void SUIT_FileDlg::setValidator( SUIT_FileValidator* v )
 {
   if ( myValidator && myValidator->parent() == this )
@@ -188,34 +182,31 @@ void SUIT_FileDlg::setValidator( SUIT_FileValidator* v )
   myValidator = v;
 }
 
-/*!
-Returns the selected file
-*/
+/*! Returns the selected file */
 QString SUIT_FileDlg::selectedFile() const
 {
   return mySelectedFile;
 }
 
-/*!
-Returns 'true' if this is 'Open File' dialog 
-and 'false' if 'Save File' dialog
-*/
+/*! Returns 'true' if this is 'Open File' dialog 
+ *  and 'false' if 'Save File' dialog
+ */
 bool SUIT_FileDlg::isOpenDlg() const
 {
   return myOpen;
 }
 
-/*!
-Closes this dialog and sets the return code to 'Accepted'
-if the selected name is valid ( see 'acceptData()' )
-*/
+/*! Closes this dialog and sets the return code to 'Accepted'
+ * if the selected name is valid ( see 'acceptData()' )
+ */
 void SUIT_FileDlg::accept()
 {
-  /* myAccepted flag is used to warkaround the Qt 2.2.2 BUG: 
-     accept() method is called twice if user presses 'Enter' key 
-     in file name editor while file name is not acceptable by acceptData()
-     (e.g. permission denied)
-  */
+  /* myAccepted 
+   * flag is used to warkaround the Qt 2.2.2 BUG: 
+   * accept() method is called twice if user presses 'Enter' key 
+   * in file name editor while file name is not acceptable by acceptData()
+   * (e.g. permission denied)
+   */
   if ( !myAccepted ) {
     if ( mode() != ExistingFiles ) {
       mySelectedFile = QFileDialog::selectedFile();
@@ -231,21 +222,18 @@ void SUIT_FileDlg::accept()
   myAccepted = !myAccepted;
 }
 
-/*!
-Closes this dialog and sets the return code to 'Rejected'    
-*/
+/*! Closes this dialog and sets the return code to 'Rejected' */
 void SUIT_FileDlg::reject()
 {
   mySelectedFile = QString::null;
   QFileDialog::reject();        
 }
 
-/*!
-Returns 'true' if selected file is valid.
-The validity is checked by a file validator, 
-if there is no validator the file is always
-considered as valid    
-*/
+/*! Returns 'true' if selected file is valid.
+ * The validity is checked by a file validator, 
+ * if there is no validator the file is always
+ * considered as valid    
+ */
 bool SUIT_FileDlg::acceptData()
 {    
   if ( myValidator )
@@ -268,11 +256,10 @@ bool SUIT_FileDlg::acceptData()
   return true;
 }
 
-/*!
-Adds an extension to the selected file name
-if the file has not it.
-The extension is extracted from the active filter.
-*/
+/*! Adds an extension to the selected file name
+ * if the file has not it.
+ * The extension is extracted from the active filter.
+ */
 void SUIT_FileDlg::addExtension()
 {
   // check if file name entered is empty
@@ -346,9 +333,7 @@ void SUIT_FileDlg::addExtension()
   }
 }
 
-/*!
-  Processes selection : tries to set given path or filename as selection
-*/
+/*! Processes selection : tries to set given path or filename as selection */
 bool SUIT_FileDlg::processPath( const QString& path )
 {
   if ( !path.isNull() ) {
@@ -370,9 +355,7 @@ bool SUIT_FileDlg::processPath( const QString& path )
   }
   return false;
 }
-/*!
-  Called when user selects item from "Quick Dir" combo box
-*/
+/*! Called when user selects item from "Quick Dir" combo box */
 void SUIT_FileDlg::quickDir(const QString& dirPath)
 {
   QString aPath = dirPath;

@@ -15,7 +15,7 @@ public:
 
 	QtxAction*   action() const;
 
-	// GUI management
+	/** @name GUI management*/ //@{
   virtual void setAction( const QString& text, const QIconSet& icon, const QString& menuText,
                           QKeySequence accel, QObject* parent, const char* name = 0, bool toggle = false );
 
@@ -26,7 +26,7 @@ public:
   bool         addTo( QWidget* theWidget );
   bool         addTo( QWidget* theWidget, int thePos );
 
-  void         setStatusTip( const QString& theTip );
+  void         setStatusTip( const QString& theTip );//@}
 
 private:
 	QtxAction*   myAction;

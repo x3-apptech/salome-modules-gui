@@ -10,6 +10,9 @@ class QComboBox;
 class QPushButton;
 class SUIT_FileValidator;
 
+/*! \class QFileDialog
+ *  For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
+*/
 class SUIT_EXPORT SUIT_FileDlg : public QFileDialog
 {
   Q_OBJECT
@@ -48,15 +51,22 @@ protected slots:
   void                addQuickDir();
 
 protected:
-  bool                myOpen;             /* open/save selector   */      
-  QString             mySelectedFile;     /* selected filename    */    
-  SUIT_FileValidator* myValidator;        /* file validator       */
-  QLabel*             myQuickLab;         /* quick dir combo box  */
-  QComboBox*          myQuickCombo;       /* quick dir combo box  */
-  QPushButton*        myQuickButton;      /* quick dir add button */
-  bool                myAccepted;         /* 'Accepted' flag      */
+  bool                myOpen;             //!< open/save selector
+  QString             mySelectedFile;     //!< selected filename
+  SUIT_FileValidator* myValidator;        //!< file validator
+  QLabel*             myQuickLab;         //!< quick dir combo box
+  QComboBox*          myQuickCombo;       //!< quick dir combo box
+  QPushButton*        myQuickButton;      //!< quick dir add button
+  
+  /*! \var myAccepted
+   * \brief flag is used to warkaround the Qt 2.2.2
+   * \bug accept() method is called twice if user presses 'Enter' key 
+   * in file name editor while file name is not acceptable by acceptData()
+   * (e.g. permission denied)
+   */
+  bool                myAccepted;
 
-  static QString      myLastVisitedPath;  /* last visited path    */
+  static QString      myLastVisitedPath;  //!< last visited path
 };
 
 #endif

@@ -12,7 +12,9 @@ class SUIT_Desktop;
 class SUIT_Convertor;
 class SUIT_ViewModel;
 class SUIT_ResourceMgr;
-
+/*! \class QObject
+ * \brief For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
+ */
 /*!
   An <b>Application</b> is a class which defines application configuration and behaviour.
   For example Application object defines what Viewers are used in this application, what auxilliary windows
@@ -92,24 +94,28 @@ protected:
   //! Creates a new Study instance. Must be redefined in new application according to its Study type.
   virtual SUIT_Study*   createNewStudy();
   virtual void          setActiveStudy( SUIT_Study* );
-
+  
+  /** @name Create tool functions*/ //@{
   int                   createTool( const QString& );
   int                   createTool( const int, const int, const int = -1 );
   int                   createTool( const int, const QString&, const int = -1 );
   int                   createTool( QAction*, const int, const int = -1, const int = -1 );
-  int                   createTool( QAction*, const QString&, const int = -1, const int = -1 );
+  int                   createTool( QAction*, const QString&, const int = -1, const int = -1 );//@}
 
+  /** @name Create menu functions*/ //@{
   int                   createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
   int                   createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
   int                   createMenu( const int, const int, const int = -1, const int = -1 );
   int                   createMenu( const int, const QString&, const int = -1, const int = -1 );
   int                   createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
-  int                   createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
+  int                   createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );//@}
 
+  /** @name Set menu shown functions*/ //@{
   void                  setMenuShown( QAction*, const bool );
-  void                  setMenuShown( const int, const bool );
+  void                  setMenuShown( const int, const bool );//@}
+  /** @name Set tool shown functions*/ //@{
   void                  setToolShown( QAction*, const bool );
-  void                  setToolShown( const int, const bool );
+  void                  setToolShown( const int, const bool );//@}
 
   static QAction*       separator();
   QAction*              action( const int ) const;

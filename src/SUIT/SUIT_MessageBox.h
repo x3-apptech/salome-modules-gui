@@ -21,15 +21,19 @@
 class SUIT_EXPORT SUIT_MessageBox
 {
 public:
-    /* show a box with one button */
+    
+    /** @name One button message boxes.*/
+    //@{
     static int info1 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0 );
     static int warn1 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0 );
     static int error1 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0 );
+    //@}
 
-    /* show a box with two buttons */
+    /** @name Two buttons message boxes.*/
+    //@{
     static int info2 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0, const QString& textButton1,
                        int idButton0, int idButton1, int idDefault );
@@ -39,8 +43,10 @@ public:
     static int error2 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0, const QString& textButton1,
                        int idButton0, int idButton1, int idDefault );
+    //@}
 
-    /* show a box with three buttons */
+    /** @name Three buttons message boxes.*/
+    //@{
     static int info3 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0, const QString& textButton1,
                        const QString& textButton2, int idButton0, int idButton1,
@@ -53,6 +59,7 @@ public:
                        const QString& textButton0, const QString& textButton1,
                        const QString& textButton2, int idButton0, int idButton1,
                        int idButton2, int idDefault );
+    //@}
 };
 
 #endif

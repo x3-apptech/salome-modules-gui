@@ -12,23 +12,18 @@
 // SUIT_DataOwner class
 //********************************************************************
 
-//====================================================================
-//! Constructor
-//====================================================================
+
+/*! Constructor*/
 SUIT_DataOwner::SUIT_DataOwner()
 {
 }
 
-//====================================================================
-//! Destructor
-//====================================================================
+/*! Destructor*/
 SUIT_DataOwner::~SUIT_DataOwner()
 {
 }
 
-//====================================================================
-//! operator== : compares two owners
-//====================================================================
+/*! operator== : compares two owners*/
 bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 {
   if ( !p1.isNull() && !p2.isNull() )
@@ -37,8 +32,10 @@ bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 }
 
 //********************************************************************
-// SUIT_DataOwnerPtrList class: implements value list with unique
-// items (uniqueness is provided by operator==())
+/*! \class SUIT_DataOwnerPtrList 
+ * implements value list with unique items (uniqueness is 
+ * provided by operator==())
+ */
 //********************************************************************
 
 //====================================================================

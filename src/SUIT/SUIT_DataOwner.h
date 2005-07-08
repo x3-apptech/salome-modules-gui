@@ -28,6 +28,7 @@ bool operator==( const SUIT_DataOwnerPtr&, const SUIT_DataOwnerPtr& );
 
 /*! \class QValueList
  *  \brief For more documentation see <a href="http://doc.trolltech.com">QT documentation</a>.
+ * QT class
  */
 /*! \class SUIT_DataOwnerPtrList
  * \brief Manage list of SUIT_DataOwnerPtr.

@@ -23,9 +23,11 @@ public:
   virtual bool    canOpen( const QString& file );
   virtual bool    canSave( const QString& file );
 
+  //! Return parent widget
   QWidget*        parent() const { return myParent; }
   
  private:
+  
   QWidget*        myParent;
 };
 

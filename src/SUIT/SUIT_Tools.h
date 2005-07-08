@@ -10,7 +10,7 @@
 #include <qstring.h>
 #include <qpopupmenu.h>
 /*! \class Qtx
- *  \brief For more documentation see <a href="http://doc.trolltech.com">QT documentation</a>.
+ *  For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
  */
 class SUIT_EXPORT SUIT_Tools : public Qtx
 {
