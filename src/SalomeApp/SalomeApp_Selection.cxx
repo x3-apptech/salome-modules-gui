@@ -48,16 +48,13 @@ int SalomeApp_Selection::count() const
 
 QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
 {
-  if( p=="client" )
-    return myPopupClient;
-  else    
-    return QtxValue();
+  return QtxValue();
 }
 
 QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
 {
   if( p=="client" )
-    return myPopupClient;
+    return QtxValue( myPopupClient );
   else if ( p=="activeView" )
     {
       QString aViewType = "";
