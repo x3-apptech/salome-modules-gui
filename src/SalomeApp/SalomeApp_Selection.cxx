@@ -7,6 +7,7 @@
 #include "SalomeApp_Application.h"
 
 #include "SUIT_Session.h"
+#include "SUIT_ViewWindow.h"
 
 SalomeApp_Selection::SalomeApp_Selection()
 : myStudy( 0 )
@@ -53,18 +54,10 @@ QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
 
 QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
 {
-  if( p=="client" )
-    return QtxValue( myPopupClient );
-  else if ( p=="activeView" )
-    {
-      QString aViewType = "";
-      SUIT_ViewWindow* anActiveView = study()->application()->desktop()->activeWindow();
-      if (anActiveView)
-	aViewType = anActiveView->getViewManager()->getType();
-      return QtxValue(aViewType);
-    }
-  else
-    return QtxPopupMgr::Selection::globalParam( p );
+  if      ( p == "client" )        return QtxValue( myPopupClient );
+  else if ( p == "isActiveView" )  return QtxValue( (bool)activeVW() );
+  else if ( p == "activeView" )    return QtxValue( activeViewType() );
+  else                             return QtxPopupMgr::Selection::globalParam( p );
 }
 
 void SalomeApp_Selection::processOwner( const SalomeApp_DataOwner* )
@@ -76,4 +69,29 @@ QString SalomeApp_Selection::entry( const int index ) const
   if ( index >= 0 && index < count() )
     return myEntries[ index ];
   return QString();
+}
+
+QString SalomeApp_Selection::activeViewType() const
+{
+  SUIT_ViewWindow* win = activeVW();
+  if ( win ) {
+    SUIT_ViewManager* vm = win->getViewManager();
+    if ( vm )
+      return vm->getType();
+  }
+  return QString::null;
+}
+
+SUIT_ViewWindow* SalomeApp_Selection::activeVW() const
+{
+  SUIT_Session* session = SUIT_Session::session();
+  if ( session ) {
+    SUIT_Application* app = session->activeApplication();
+    if ( app ) {
+      SUIT_Desktop* desk = app->desktop();
+      if ( desk ) 
+	return desk->activeWindow();
+    }
+  }
+  return 0;
 }

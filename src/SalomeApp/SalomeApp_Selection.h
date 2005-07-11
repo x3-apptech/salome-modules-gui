@@ -35,6 +35,7 @@ class SalomeApp_SelectionMgr;
 class SalomeApp_DataOwner;
 class SalomeApp_Study;
 class SALOMEDSClient_Study;
+class SUIT_ViewWindow;
 
 
 class SalomeApp_Selection : public QtxPopupMgr::Selection
@@ -53,6 +54,8 @@ public:
 protected:
   QString                        entry( const int ) const;
   SalomeApp_Study*               study() const { return myStudy; }
+  QString                        activeViewType() const;
+  SUIT_ViewWindow*               activeVW() const;
 
 private:
   QString                        myPopupClient;
