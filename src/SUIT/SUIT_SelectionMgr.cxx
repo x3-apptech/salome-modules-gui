@@ -1,11 +1,13 @@
 #include "SUIT_SelectionMgr.h"
 
+/*!constructor. initialize myIterations and myIsSelChangeEnabled.*/
 SUIT_SelectionMgr::SUIT_SelectionMgr( const bool Feedback )
 : myIterations( Feedback ? 1 : 0 ),
 myIsSelChangeEnabled( true )
 {
 }
 
+/*!destructor. mySelectors auto delete.*/
 SUIT_SelectionMgr::~SUIT_SelectionMgr()
 {
   mySelectors.setAutoDelete( true );

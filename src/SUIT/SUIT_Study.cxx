@@ -68,8 +68,9 @@ void SUIT_Study::closeDocument()
 
 void SUIT_Study::createDocument()
 {
-  // Custom document initialization to be performed
-  // within onNewDoc() handler can be put here
+  /*! Custom document initialization to be performed \n
+   *  within onNewDoc() handler can be put here
+   */
 }
 
 bool SUIT_Study::openDocument( const QString& fileName )

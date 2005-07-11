@@ -51,7 +51,7 @@ protected:
 	virtual void      resumeOperation();
 	virtual void      suspendOperation();
 
-  // Returns TRUE if the given operator is valid for (can be started "above") the current operator
+	/*! Returns TRUE if the given operator is valid for (can be started "above") the current operator*/
 	virtual bool      isValid( SUIT_Operation* ) const;
 
 	/*!
@@ -67,7 +67,7 @@ protected:
 
 private:
 	SUIT_Application* myApp;
-	SUIT_Study*		    myStudy;
+	SUIT_Study*       myStudy;
 	OperationState	  myState;
 
 	friend class SUIT_Study;

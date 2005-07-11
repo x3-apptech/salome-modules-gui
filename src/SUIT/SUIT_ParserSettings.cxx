@@ -36,16 +36,14 @@
 #include <qtextstream.h>
 
 
-/*!
-    Constructor.
-*/
+/*! Constructor. Do nothing.*/
 SUIT_ParserSettings::SUIT_ParserSettings()
 {
 }
 
 
 /*!
-    Destructor.
+    Destructor. Do nothing.
 */
 SUIT_ParserSettings::~SUIT_ParserSettings()
 {
@@ -202,7 +200,7 @@ QString SUIT_ParserSettings::removeComments(QString s)
 
 
 /*!
-    Removes all HTML comments (between '<!--' and '-->').
+    Removes all HTML comments (between '<!--' and '-->') \image html html_comments.gif
 */
 QString SUIT_ParserSettings::removeHtmlComments(QString s)
 {

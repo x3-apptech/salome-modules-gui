@@ -5,6 +5,7 @@
 
 class SUIT_DataOwner;
 
+/*!Base class.*/
 class SUIT_EXPORT SUIT_SelectionFilter
 {
 public:

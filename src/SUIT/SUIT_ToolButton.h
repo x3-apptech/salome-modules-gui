@@ -6,14 +6,14 @@
 
 #include "SUIT.h"
 
-// Purpose:   to draw down arrow on toolbutton.
-
+/*! To draw down arrow on toolbutton.*/
 class SUIT_EXPORT SUIT_ToolButton : public QToolButton
 {
   Q_OBJECT
 
 public:
-//constructors
+  /*! @name constructors*/
+  //@{
   SUIT_ToolButton( QWidget *parent = 0, 
                    const char *name = 0,
                    bool changeItemAfterClick = true );
@@ -22,14 +22,15 @@ public:
                     QObject * receiver, const char* slot,
                     QToolBar * parent, const char* name = 0,
                     bool changeItemAfterClick = true );
+  //@}
 
-  //drawButton is redefined to draw DownArrow
+  /*!drawButton is redefined to draw DownArrow*/
   void drawButton( QPainter * pQPainter);
 
-  // Add action into popup
+  /*! Add action into popup*/
   void AddAction(QAction* theAction);
 
-  // Sets myPopup item with theIndex as current
+  /*! Sets myPopup item with theIndex as current*/
   void SetItem(int theIndex);
 
 public slots:

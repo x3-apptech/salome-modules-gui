@@ -8,11 +8,9 @@
 class QPopupMenu;
 class QContextMenuEvent;
 
-/*
-  Class: SUIT_PopupClient [public]
-  Descr: Base class for instances which creates popup menu on QContextMenuEvent
-*/
-
+/*!Class: SUIT_PopupClient [public] \n
+ * Descr: Base class for instances which creates popup menu on QContextMenuEvent
+ */
 class SUIT_EXPORT SUIT_PopupClient
 {
 public:
@@ -35,11 +33,9 @@ private:
   Signal* mySignal;
 };
 
-/*
-  Class: SUIT_PopupClient::Signal [internal]
-  Descr: invoke signal which is connected to reciever in SUIT_PopupClient
-*/
-
+/*! Class: SUIT_PopupClient::Signal [internal] \n
+ *  Descr: invoke signal which is connected to reciever in SUIT_PopupClient
+ */
 class SUIT_PopupClient::Signal : public QObject
 {
   Q_OBJECT

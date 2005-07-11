@@ -31,7 +31,7 @@
 
 #include <qstring.h>
 #include "SUIT.h"
-
+/*! \brief Text Parser.*/
 class SUIT_EXPORT SUIT_ParserSettings
 {
 public:

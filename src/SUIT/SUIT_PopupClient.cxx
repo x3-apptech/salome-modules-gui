@@ -2,16 +2,13 @@
 
 #include <qevent.h>
 
-/*
-  Class: SUIT_PopupClient [public]
-  Descr: Base class for instances which creates popup menu on QContextMenuEvent
-*/
-
+/*! constructor. initialize mySignal.*/
 SUIT_PopupClient::SUIT_PopupClient()
 : mySignal( 0 )
 {
 }
 
+/*! destructor. delete mySignal*/
 SUIT_PopupClient::~SUIT_PopupClient()
 {
   delete mySignal;
@@ -46,11 +43,13 @@ void SUIT_PopupClient::contextMenuRequest( QContextMenuEvent* e )
   Descr: invoke signal which is connected to reciever in SUIT_PopupClient
 */
 
+/*! constructor*/
 SUIT_PopupClient::Signal::Signal()
 : QObject( 0 )
 {
 }
 
+/*! destructor. do nothing*/
 SUIT_PopupClient::Signal::~Signal()
 {}
 

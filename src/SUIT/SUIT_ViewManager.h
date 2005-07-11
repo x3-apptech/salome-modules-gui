@@ -44,7 +44,7 @@ public:
   QString          getTitle() const { return myTitle;}
   void             setTitle(QString theTitle) { myTitle = theTitle; }
 
-  //! Creates View, adds it into list of views and returns just created view window
+  /*! Creates View, adds it into list of views and returns just created view window*/
   SUIT_ViewWindow* createViewWindow();
 
 public slots:
@@ -74,20 +74,15 @@ private slots:
   void             onContextMenuRequested( QContextMenuEvent* e );
   
 protected:
-  /*!
-  Inserts the View into internal Views Vector.
-  Returns true if view has been added successfully
-  */
+  /*! Inserts the View into internal Views Vector.\n
+   *  Returns true if view has been added successfully
+   */
   virtual bool     insertView(SUIT_ViewWindow* theView);
   
-  /*!
-  Removes the View from internal Views Vector.
-  */
+  /*! Removes the View from internal Views Vector.*/
   virtual void     removeView(SUIT_ViewWindow* theView);
   
-  /*
-  Used to set unique name for the view
-  */
+  /*! Used to set unique name for the view.*/
   virtual void     setViewName(SUIT_ViewWindow* theView);
 
 protected:

@@ -19,6 +19,8 @@
 
 SUIT_Session* SUIT_Session::mySession = 0;
 
+/*! Constructor.*/
+
 SUIT_Session::SUIT_Session()
 : QObject(),
 myResMgr( 0 ),
@@ -33,6 +35,7 @@ myExitStatus( FROM_GUI )
   myAppList.setAutoDelete( true );
 }
 
+/*!destructor. Clear applications list and set mySession to zero.*/
 SUIT_Session::~SUIT_Session()
 {
   myAppList.clear();
@@ -40,6 +43,7 @@ SUIT_Session::~SUIT_Session()
   mySession = 0;
 }
 
+/*! \retval return mySession */
 SUIT_Session* SUIT_Session::session()
 {
   return mySession;
@@ -226,11 +230,13 @@ void SUIT_Session::closeSession( int mode )
   }
 }
 
+/*! \retval return myHandler*/
 SUIT_ExceptionHandler* SUIT_Session::handler() const
 {
   return myHandler;
 }
 
+/*! \retval return last error string.*/
 QString SUIT_Session::lastError() const
 {
   QString str;
@@ -246,6 +252,9 @@ QString SUIT_Session::lastError() const
   return str;
 }
 
+/*! Load library to session.
+ * \retval Loaded library.
+ */
 SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name )
 {
   QString libFile = SUIT_Tools::library( name );
@@ -262,6 +271,7 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name )
   return lib;
 }
 
+/*! \retval Return file name by application name.*/
 QString SUIT_Session::applicationName( const QString& str ) const
 {
 #ifdef WIN32

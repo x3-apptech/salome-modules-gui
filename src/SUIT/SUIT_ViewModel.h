@@ -10,11 +10,11 @@
 #include <qcursor.h>
 
 /*!
-	This object manages the definition and behaviour of a View Window. 
-	In case of definition of this object in an external lib that lib must 
-	have an exported function "createViewModel" which returns newly created 
-	instance of SUIT_ViewModel.
-*/
+ * This object manages the definition and behaviour of a View Window. \n
+ * In case of definition of this object in an external lib that lib must \n
+ * have an exported function "createViewModel" which returns newly created \n
+ * instance of SUIT_ViewModel.
+ */
 
 #ifdef WIN32
 #pragma warning( disable:4251 )

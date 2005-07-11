@@ -6,6 +6,7 @@
 
 #include "SUIT.h"
 
+/*! \brief Class used for management cursors.*/
 class SUIT_EXPORT SUIT_OverrideCursor
 {
 public:
