@@ -270,6 +270,10 @@ bool STD_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
+void STD_Application::onLoadDoc()
+{     
+}
+
 bool STD_Application::onLoadDoc( const QString& aName )
 {
   bool res = true;

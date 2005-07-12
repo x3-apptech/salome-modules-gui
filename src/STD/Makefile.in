@@ -17,7 +17,8 @@ EXPORT_HEADERS= STD_Application.h \
 		STD_MDIDesktop.h \
 	        STD_SDIDesktop.h \
 		STD_TabDesktop.h \
-		STD_CloseDlg.h
+		STD_CloseDlg.h \
+		STD_LoadStudiesDlg.h
 		     
 # .po files to transform in .qm
 PO_FILES = STD_images.po \
@@ -30,13 +31,15 @@ LIB_SRC= STD_Application.cxx \
 	 STD_MDIDesktop.cxx \
 	 STD_SDIDesktop.cxx \
 	 STD_TabDesktop.cxx \
-	 STD_CloseDlg.cxx
+	 STD_CloseDlg.cxx \
+	 STD_LoadStudiesDlg.cxx
 
 LIB_MOC =  STD_Application.h \
 	   STD_MDIDesktop.h \
 	   STD_SDIDesktop.h \
 	   STD_TabDesktop.h \
-	   STD_CloseDlg.h
+	   STD_CloseDlg.h \
+	   STD_LoadStudiesDlg.h
 
 RESOURCES_FILES = \
 config \
