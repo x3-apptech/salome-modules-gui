@@ -44,6 +44,8 @@
 
 #include <STD_TabDesktop.h>
 
+#include "STD_LoadStudiesDlg.h"
+
 #include <SUIT_Tools.h>
 #include <SUIT_Session.h>
 
@@ -75,6 +77,8 @@
 #include <qcombobox.h>
 #include <qmessagebox.h>
 #include <qapplication.h>
+#include <qlistbox.h>
+#include <qregexp.h>
 
 #include "SALOMEDS_StudyManager.hxx"
 
@@ -523,6 +527,35 @@ bool SalomeApp_Application::onOpenDoc( const QString& aName )
   }
   return res;
 }
+
+void SalomeApp_Application::onLoadDoc()
+{ 
+  QString name, studyname, ext;
+  
+  STD_LoadStudiesDlg aDlg( desktop(), TRUE);
+
+  std::vector<std::string> List = studyMgr()->GetOpenStudies();
+  for (unsigned int ind = 0; ind < List.size(); ind++) {
+     studyname = List[ind];
+     aDlg.ListComponent->insertItem( studyname );
+  }
+  
+  int retVal = aDlg.exec();
+  studyname = aDlg.ListComponent->currentText();
+
+  if (retVal == QDialog::Rejected)
+    return;
+  
+  if ( studyname.isNull() || studyname.isEmpty() )
+    return;
+  
+  name = studyname;
+  name.replace( QRegExp(":"), "/" );        
+
+  onLoadDoc(name);
+}
+
+
 
 bool SalomeApp_Application::onLoadDoc( const QString& aName )
 {

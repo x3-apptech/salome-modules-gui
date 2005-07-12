@@ -117,10 +117,11 @@ public slots:
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
   virtual bool                        onOpenDoc( const QString& );
+  virtual void                        onLoadDoc();
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCopy();
   virtual void                        onPaste();  
-
+  
 private slots:
   void                                onSelection();
   void                                onRefresh();
