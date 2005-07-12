@@ -3,9 +3,8 @@
 
 #include <qdialog.h> 
 
-/*!
- * \brief 
- *
+/*!\class STD_CloseDlg
+ * \brief Describes a dialog box shown on closing the active study
  * 
  */
 class STD_CloseDlg: public QDialog
