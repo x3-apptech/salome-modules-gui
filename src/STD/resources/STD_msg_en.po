@@ -316,3 +316,23 @@ msgstr "Document has been modified.\nDo you want to save changes?"
 
 msgid "STD_Application::INF_DOCUMENT_MODIFIED"
 msgstr "Document \"%1\" has been modified.\nDo you want to save changes?"
+
+msgid "CLOSE_DLG_SAVE_CLOSE"
+msgstr "&Save&&Close"
+
+msgid "CLOSE_DLG_CLOSE"
+msgstr "&Close w/o saving"
+
+msgid "CLOSE_DLG_UNLOAD"
+msgstr "&Unload"
+
+msgid "FILE_MENU_LOAD"
+msgstr "&Load"  
+
+msgid "CLOSE_DLG_CAPTION"
+msgstr "Close active study"
+
+msgid "CLOSE_DLG_DESCRIPTION"
+msgstr "Do you want to close or only unload the study"
+
+
