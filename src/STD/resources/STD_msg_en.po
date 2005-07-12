@@ -326,8 +326,14 @@ msgstr "&Close w/o saving"
 msgid "CLOSE_DLG_UNLOAD"
 msgstr "&Unload"
 
-msgid "FILE_MENU_LOAD"
-msgstr "&Load"  
+msgid "TOT_DESK_FILE_LOAD"
+msgstr "Load document"
+
+msgid "PRP_DESK_FILE_LOAD"
+msgstr "Load a document"
+
+msgid "MEN_DESK_FILE_LOAD"
+msgstr "&Load"    
 
 msgid "CLOSE_DLG_CAPTION"
 msgstr "Close active study"
