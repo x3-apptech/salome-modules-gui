@@ -341,4 +341,12 @@ msgstr "Close active study"
 msgid "CLOSE_DLG_DESCRIPTION"
 msgstr "Do you want to close or only unload the study"
 
+msgid "DLG_LOAD_STUDY_CAPTION"
+msgstr "Load Study"
+
+msgid "MEN_STUDIES_CHOICE"
+msgstr "Choose existent study."
+
+ 
+
 
