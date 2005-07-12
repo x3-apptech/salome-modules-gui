@@ -2,6 +2,8 @@
 
 #include "STD_MDIDesktop.h"
 
+#include "STD_CloseDlg.h"
+
 #include <SUIT_Tools.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
@@ -21,6 +23,8 @@
 #include <qstatusbar.h>
 #include <qfiledialog.h>
 #include <qapplication.h>
+
+#include <iostream.h>
 
 extern "C" STD_EXPORT SUIT_Application* createApplication()
 {
@@ -141,6 +145,13 @@ void STD_Application::createActions()
                 tr( "MEN_DESK_HELP_ABOUT" ), tr( "PRP_DESK_HELP_ABOUT" ),
                 0, desk, false, this, SLOT( onHelpAbout() ) );
 
+  //SRN: BugID IPAL9021, add an action "Load"
+  createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),
+                resMgr->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
+		tr( "MEN_DESK_FILE_LOAD" ), tr( "PRP_DESK_FILE_LOAD" ),
+		CTRL+Key_L, desk, false, this, SLOT( onLoadDoc() ) );      
+  //SRN: BugID IPAL9021: End 
+
   QtxDockAction* da = new QtxDockAction( tr( "TOT_DOCK_WINDOWS" ), tr( "MEN_DOCK_WINDOWS" ), desk );
   registerAction( ViewWindowsId, da );
   da->setAutoPlace( false );
@@ -156,6 +167,7 @@ void STD_Application::createActions()
 
   createMenu( FileNewId, fileMenu, 0 );
   createMenu( FileOpenId, fileMenu, 0 );
+  createMenu( FileLoadId, fileMenu, 0 );  //SRN: BugID IPAL9021, add a menu item "Load"
   createMenu( FileCloseId, fileMenu, 0 );
   createMenu( separator(), fileMenu, -1, 0 );
   createMenu( FileSaveId, fileMenu, 0 );
@@ -346,9 +358,10 @@ bool STD_Application::isPossibleToClose()
     {
       QString sName = activeStudy()->studyName().stripWhiteSpace();
       QString msg = sName.isEmpty() ? tr( "INF_DOC_MODIFIED" ) : tr ( "INF_DOCUMENT_MODIFIED" ).arg( sName );
-      int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TOT_DESK_FILE_CLOSE" ), msg,
-                                            tr( "BUT_YES" ), tr( "BUT_NO" ), tr( "BUT_CANCEL" ), 1, 2, 3, 1 );
-      switch ( aAnswer )
+
+      //SRN: BugID: IPAL9021: Begin
+      STD_CloseDlg dlg(desktop());
+      switch( dlg.exec() )
       {
       case 1:
         if ( activeStudy()->isSaved() )
@@ -359,9 +372,12 @@ bool STD_Application::isPossibleToClose()
       case 2:
         break;
       case 3:
+        break;
+      case 4:
       default:
         return false;
       }
+     //SRN: BugID: IPAL9021: End 
     }
   }
   return true;

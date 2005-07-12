@@ -99,7 +99,7 @@ private slots:
 protected:
   enum {  FileNewId, FileOpenId, FileCloseId, FileSaveId, FileSaveAsId,
           FileExitId, EditCutId, EditCopyId, EditPasteId, ViewStatusBarId,
-          NewWindowId, HelpAboutId, ViewWindowsId, UserID };
+          NewWindowId, HelpAboutId, ViewWindowsId, FileLoadId, UserID };
  
 protected:
   virtual void          createActions();
