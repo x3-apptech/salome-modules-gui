@@ -35,6 +35,7 @@ static const char* ModuleIcon[] = {
 
 QPixmap MYPixmap( ModuleIcon );
 
+/*!Constructor.*/
 CAM_Module::CAM_Module()
 : QObject(),
 myApp( 0 ),
@@ -43,6 +44,7 @@ myDataModel( 0 )
 {
 }
 
+/*!Constructor. initialize \a name.*/
 CAM_Module::CAM_Module( const QString& name )
 : QObject(),
 myApp( 0 ),
@@ -52,27 +54,34 @@ myDataModel( 0 )
 {
 }
 
+/*!Destructor. Remove data model.*/
 CAM_Module::~CAM_Module()
 {
   delete myDataModel;
   myDataModel = 0;
 }
 
+/*!Initialize application.*/
 void CAM_Module::initialize( CAM_Application* app )
 {
   myApp = app;
 }
 
+/*!\retval Module icon.*/
 QPixmap CAM_Module::moduleIcon() const
 {
   return myIcon;
 }
 
+/*!\retval Module name.*/
 QString CAM_Module::moduleName() const
 {
   return myName;
 }
 
+/*! \brief Return data model.
+ * Create data model, if it was't created before.
+ */
 CAM_DataModel* CAM_Module::dataModel() const
 {
   if ( !myDataModel )
@@ -84,21 +93,29 @@ CAM_DataModel* CAM_Module::dataModel() const
   return myDataModel;
 }
 
+/*!\retval CAM_Application pointer - application.*/
 CAM_Application* CAM_Module::application() const
 {
   return myApp;
 }
 
+/*!Public slot
+ * \retval true.
+ */
 bool CAM_Module::activateModule( SUIT_Study* study )
 {
   return true;
 }
 
+/*!Public slot
+ * \retval true.
+ */
 bool CAM_Module::deactivateModule( SUIT_Study* )
 {
   return true;
 }
 
+/*!Public slot, remove data model from \a study.*/
 void CAM_Module::studyClosed( SUIT_Study* study )
 {
   CAM_Study* camDoc = dynamic_cast<CAM_Study*>( study );
@@ -109,25 +126,36 @@ void CAM_Module::studyClosed( SUIT_Study* study )
     camDoc->removeDataModel( dataModel() );
 }
 
+/*!Public slot, do nothing.*/
 void CAM_Module::studyChanged( SUIT_Study* , SUIT_Study* )
 {
 }
 
+/*!Create and return new instance of CAM_DataModel.*/
 CAM_DataModel* CAM_Module::createDataModel()
 { 
   return new CAM_DataModel( this );
 }
 
+/*!Sets module name to \a name.
+ * \param name - new name for module.
+ */
 void CAM_Module::setModuleName( const QString& name )
 {
   myName = name;
 }
 
+/*!Sets module icon to \a icon.
+ * \param icon - new icon for module.
+ */
 void CAM_Module::setModuleIcon( const QPixmap& icon )
 {
   myIcon = icon;
 }
 
+/*! Return menu manager pointer.
+ * \retval QtxActionMenuMgr pointer - menu manager.
+ */
 QtxActionMenuMgr* CAM_Module::menuMgr() const
 {
   QtxActionMenuMgr* mgr = 0;
@@ -136,6 +164,9 @@ QtxActionMenuMgr* CAM_Module::menuMgr() const
   return mgr;
 }
 
+/*! Return tool manager pointer.
+ * \retval QtxActionToolMgr pointer - tool manager.
+ */
 QtxActionToolMgr* CAM_Module::toolMgr() const
 {
   QtxActionToolMgr* mgr = 0;
@@ -144,6 +175,11 @@ QtxActionToolMgr* CAM_Module::toolMgr() const
   return mgr;
 }
 
+/** @name Create tool methods.*/
+//@{
+/*! Create tool bar with name \a name, if it was't created before.
+ * \retval -1 - if tool bar was already created.
+ */
 int CAM_Module::createTool( const QString& name )
 {
   if ( !toolMgr() )
@@ -151,6 +187,7 @@ int CAM_Module::createTool( const QString& name )
 
   return toolMgr()->createToolBar( name );
 }
+
 
 int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int idx )
 {
@@ -189,7 +226,10 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   int intId = toolMgr()->insert( action( id ), tBar, idx );
   return intId != -1 ? id : -1;
 }
+//@}
 
+/** @name Create menu methods.*/
+//@{
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
                             const int id, const int group, const int index )
 {
@@ -245,7 +285,13 @@ int CAM_Module::createMenu( const int id, const QString& menu, const int group, 
   int intId = menuMgr()->insert( action( id ), menu, group, index );
   return intId != -1 ? id : -1;
 }
+//@}
 
+/** @name Set Menu Shown*/
+//@{
+/*!Sets menus shown to \a on floag.
+ *\param on - flag.
+ */
 void CAM_Module::setMenuShown( const bool on )
 {
   QtxActionMenuMgr* mMgr = menuMgr();
@@ -267,17 +313,31 @@ void CAM_Module::setMenuShown( const bool on )
     mMgr->update();
 }
 
+/*!Sets menu shown for QAction \a a to \a on flag.
+ * \param a - QAction
+ * \param on - flag
+ */
 void CAM_Module::setMenuShown( QAction* a, const bool on )
 {
   if ( menuMgr() )
     menuMgr()->setShown( menuMgr()->actionId( a ), on );
 }
 
+/*!Sets menu shown for action with id=\a id to \a on flag.
+ * \param id - id of action
+ * \param on - flag
+ */
 void CAM_Module::setMenuShown( const int id, const bool on )
 {
   setMenuShown( action( id ), on );
 }
+//@}
 
+/** @name Set Tool Shown*/
+//@{
+/*!Set tools shown to \a on flag.
+ *\param on - boolean flag.
+ */
 void CAM_Module::setToolShown( const bool on )
 {
   QtxActionToolMgr* tMgr = toolMgr();
@@ -299,17 +359,30 @@ void CAM_Module::setToolShown( const bool on )
     tMgr->update();
 }
 
+/*!Set tools shown for QAction \a a to \a on flag.
+ * \param a - QAction
+ * \param on - boolean flag
+ */
 void CAM_Module::setToolShown( QAction* a, const bool on )
 {
   if ( toolMgr() )
     toolMgr()->setShown( toolMgr()->actionId( a ), on );
 }
 
+/*!Set tools shown for action with id=\a id to \a on flag.
+ * \param id - integer action id
+ * \param on - boolean flag
+ */
 void CAM_Module::setToolShown( const int id, const bool on )
 {
   setToolShown( action( id ), on );
 }
+//@}
 
+/*! Return action by id. 
+ * \param id - id of action.
+ * \retval QAction.
+ */
 QAction* CAM_Module::action( const int id ) const
 {
   QAction* a = 0;
@@ -318,6 +391,10 @@ QAction* CAM_Module::action( const int id ) const
   return a;
 }
 
+/*! Return id by action. 
+ * \param a - QAction.
+ * \retval id of action.
+ */
 int CAM_Module::actionId( const QAction* a ) const
 {
   int id = -1;
@@ -329,6 +406,18 @@ int CAM_Module::actionId( const QAction* a ) const
   return id;
 }
 
+/*! Create new instance of QtxAction and register action with \a id.
+ * \param id - id for new action.
+ * \param text - parameter for creation QtxAction
+ * \param icon - parameter for creation QtxAction
+ * \param menu - parameter for creation QtxAction
+ * \param tip  - tip status for QtxAction action.
+ * \param key  - parameter for creation QtxAction
+ * \param parent - parent for action
+ * \param toggle - parameter for creation QtxAction
+ * \param reciever - 
+ * \param member   - 
+ */
 QAction* CAM_Module::createAction( const int id, const QString& text, const QIconSet& icon,
                                    const QString& menu, const QString& tip, const int key,
                                    QObject* parent, const bool toggle, QObject* reciever, const char* member )
@@ -344,6 +433,11 @@ QAction* CAM_Module::createAction( const int id, const QString& text, const QIco
   return a;
 }
 
+/*! Register action in action map.
+ * \param id - id for action.
+ * \param a  - action
+ * \retval new id for action.
+ */
 int CAM_Module::registerAction( const int id, QAction* a )
 {
   int ident = -1;
@@ -368,6 +462,7 @@ int CAM_Module::registerAction( const int id, QAction* a )
   return ident;
 }
 
+/*! Return qt action manager separator.*/
 QAction* CAM_Module::separator()
 {
   return QtxActionMgr::separator();
