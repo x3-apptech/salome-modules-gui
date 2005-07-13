@@ -27,18 +27,18 @@ SUIT_DataObject::SUIT_DataObject( SUIT_DataObject* p )
 
 SUIT_DataObject::~SUIT_DataObject()
 {
-  if ( mySignal )
-  {
-    mySignal->emitSignal();
-    mySignal->setOwner( 0 );
-  }
-
   SUIT_DataObject* p = myParent;
 
   myParent = 0;
 
   if ( p )
     p->removeChild( this );
+
+  if ( mySignal )
+  {
+    mySignal->emitSignal();
+    mySignal->setOwner( 0 );
+  }
 
   for ( QPtrListIterator<SUIT_DataObject> it( myChildren ); it.current(); ++it )
     it.current()->myParent = 0;
