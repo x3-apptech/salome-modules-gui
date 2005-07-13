@@ -552,7 +552,10 @@ void SalomeApp_Application::onLoadDoc()
   name = studyname;
   name.replace( QRegExp(":"), "/" );        
 
-  onLoadDoc(name);
+  if(onLoadDoc(name)) {
+     updateWindows();
+     updateViewManagers(); 
+  }
 }
 
 
