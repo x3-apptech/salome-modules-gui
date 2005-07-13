@@ -120,6 +120,7 @@ private:
 
 private:
   bool                  myEditEnabled;
+  bool                  myClosePermanently;
 };
 
 #if defined WIN32
