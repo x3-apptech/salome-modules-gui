@@ -131,6 +131,7 @@ private:
   void              openBranch( QListViewItem*, const int );
 
   void              removeReferences( QListViewItem* );
+  void              removeConnections( SUIT_DataObject* );
   void              createConnections( SUIT_DataObject* );
   void              removeObject( SUIT_DataObject*, const bool = true );
 

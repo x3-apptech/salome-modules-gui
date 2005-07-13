@@ -179,6 +179,7 @@ void OB_Browser::setRootObject( SUIT_DataObject* theRoot )
   if ( theRoot )
     curObj = storeState( selObjs, openObjs, selKeys, openKeys, curKey );
 
+  removeConnections( myRoot );
   if ( myRoot != theRoot && isAutoDeleteObjects() )
     delete myRoot;
 
@@ -505,7 +506,7 @@ void OB_Browser::updateTree( SUIT_DataObject* obj )
 
 void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
 {
-  if ( !src || !trg || src->root() != getRootObject() )
+  if ( !src || !trg || src == trg || src->root() != getRootObject() )
     return;
 
   DataObjectKey curKey;
@@ -521,7 +522,8 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
 
   src->setParent( 0 );
 
-  if ( src != trg && isAutoDeleteObjects() )
+  removeConnections( src );
+  if ( isAutoDeleteObjects() )
     delete src;
 
   if ( parent && pos != -1 )
@@ -732,6 +734,7 @@ void OB_Browser::removeReferences( QListViewItem* item )
     return;
 
   SUIT_DataObject* obj = dataObject( item );
+  obj->disconnect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
   myItems.remove( obj );
 
   QListViewItem* i = item->firstChild();
@@ -754,6 +757,20 @@ void OB_Browser::createConnections( SUIT_DataObject* obj )
 
   for ( DataObjectListIterator it( childList ); it.current(); ++it )
     it.current()->connect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
+}
+
+void OB_Browser::removeConnections( SUIT_DataObject* obj )
+{
+  if ( !obj )
+    return;
+
+  DataObjectList childList;
+  obj->children( childList, true );
+
+  childList.prepend( obj );
+
+  for ( DataObjectListIterator it( childList ); it.current(); ++it )
+    it.current()->disconnect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
 }
 
 SUIT_DataObject* OB_Browser::storeState( DataObjectMap& selObjs, DataObjectMap& openObjs,
@@ -1021,6 +1038,7 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
 
   QListViewItem* item = listViewItem( obj );
 
+  obj->disconnect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
   myItems.remove( obj );
 
   if ( obj == myRoot )
