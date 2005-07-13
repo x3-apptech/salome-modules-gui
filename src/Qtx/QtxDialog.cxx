@@ -335,9 +335,9 @@ QtxDialog::QtxDialog( QWidget* parent, const char* name,
            wf | WStyle_NormalBorder | WStyle_Customize | WStyle_Title | WStyle_SysMenu ),
 #endif
 mySender( 0 ),
+myAlignment( 0 ),
 myInited( false ),
-myDialogFlags( Accept ),
-myAlignment( 0 )
+myDialogFlags( Accept | SetFocus )
 {
 	QVBoxLayout* base = new QVBoxLayout( this, 5, 0 );
 	QtxGroupBox* main = new QtxGroupBox( 1, Qt::Horizontal, "", this );
@@ -478,7 +478,9 @@ bool QtxDialog::testButtonFlags( const int f ) const
 		  Following flags can be used:
 			Accept    - Allow to control dialog accepting. See also acceptData().
 			Reject    - Allow to control dialog rejecting. See also rejectData().
-			AlignOnce - Allow to align dialog only whem it first time shown.
+			AlignOnce - Allow to align dialog only when it first time shown.
+			SetFocus  - Allow to set focus on dialog when it shown. User can use
+                  setFocusProxy() and specify own initial focus widget.
 */
 
 void QtxDialog::setDialogFlags( const int f )
@@ -827,7 +829,9 @@ void QtxDialog::show()
 {
 	QDialog::show();
 
-	setFocus();
+	if ( testDialogFlags( SetFocus ) )
+	  setFocus();
+
 	myInited = true;
 }
 
