@@ -1691,3 +1691,17 @@ void SalomeApp_Application::onDesktopActivated()
   if(aModule)
     aModule->studyActivated();
 }
+
+void SalomeApp_Application::createEmptyStudy()
+{
+  CAM_Application::createEmptyStudy();
+  if ( objectBrowser() )
+    objectBrowser()->updateTree();
+}
+
+bool SalomeApp_Application::activateModule( CAM_Module* mod )
+{
+  CAM_Application::activateModule( mod );
+  if ( objectBrowser() )
+    objectBrowser()->updateTree();
+}

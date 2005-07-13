@@ -101,6 +101,8 @@ public:
 
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
+  virtual void                        createEmptyStudy();
+
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
   static SALOME_NamingService*        namingService();
@@ -143,6 +145,7 @@ protected:
   virtual void                        afterCloseDoc();
 
   virtual void                        moduleAdded( CAM_Module* );
+  virtual bool                        activateModule( CAM_Module* = 0 );
 
   SalomeApp_Preferences*              preferences( const bool ) const;
 
