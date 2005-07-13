@@ -65,8 +65,11 @@ public:
   virtual void          contextMenuPopup( const QString&, QPopupMenu*, QString& ) {}
 
 signals:
+  /*!emit that view manager added*/
   void                  viewManagerAdded( SUIT_ViewManager* );
+  /*!emit that view manager removed*/
   void                  viewManagerRemoved( SUIT_ViewManager* );
+  /*!emit that view manager activated*/
   void                  viewManagerActivated( SUIT_ViewManager* );
 
 public slots:

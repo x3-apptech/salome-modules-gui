@@ -9,7 +9,7 @@
 using namespace std;
 
 //================================================================================
-/*! Public -
+/*!
  * \brief creates a Close dialog box
  * \param parent a parent widget
  * \param modal bool argument, if true the dialog box is a modal dialog box
@@ -70,8 +70,6 @@ STD_CloseDlg::STD_CloseDlg ( QWidget * parent, bool modal, WFlags f )
 //================================================================================
 /*!
  * \brief reaction on clicked(pressed) button
- * 
- * 
  */
 //================================================================================
 

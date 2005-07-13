@@ -3,9 +3,11 @@
 
 #include <qdialog.h> 
 
+/*! \class QDialog
+ * \brief For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
+ */
 /*!\class STD_CloseDlg
  * \brief Describes a dialog box shown on closing the active study
- * 
  */
 class STD_CloseDlg: public QDialog
 {

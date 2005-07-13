@@ -26,11 +26,13 @@
 
 #include <iostream.h>
 
+/*!Create and return new instance of STD_Application*/
 extern "C" STD_EXPORT SUIT_Application* createApplication()
 {
   return new STD_Application();
 }
 
+/*!Constructor.*/
 STD_Application::STD_Application()
 : SUIT_Application(),
 myEditEnabled( true ),
@@ -44,15 +46,18 @@ myActiveViewMgr( 0 )
   setDesktop( desk );
 }
 
+/*!Destructor.*/
 STD_Application::~STD_Application()
 {
 }
 
+/*! \retval QString "StdApplication"*/
 QString STD_Application::applicationName() const
 {
   return QString( "StdApplication" );
 }
 
+/*!Start STD_Application*/
 void STD_Application::start()
 {
   createActions();
@@ -64,6 +69,7 @@ void STD_Application::start()
   SUIT_Application::start();
 }
 
+/*!Event on closing desktop*/
 void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
 {
   if ( !isPossibleToClose() )
@@ -85,6 +91,7 @@ void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
   closeApplication();
 }
 
+/*!Create actions, menus and tools*/
 void STD_Application::createActions()
 {
   SUIT_Desktop* desk = desktop();
@@ -203,9 +210,7 @@ void STD_Application::createActions()
   createTool( EditPasteId, stdTBar );
 }
 
-/*!
-  Opens new application
-*/
+/*!Opens new application*/
 void STD_Application::onNewDoc() 
 {
   if ( !activeStudy() )
@@ -227,6 +232,7 @@ void STD_Application::onNewDoc()
   }
 }
 
+/*!Put file name from file dialog to onOpenDoc(const QString&) function*/
 void STD_Application::onOpenDoc()
 {
   // It is preferrable to use OS-specific file dialog box here !!!
@@ -237,6 +243,7 @@ void STD_Application::onOpenDoc()
   onOpenDoc( aName );
 }
 
+/*! \retval true, if document was opened successful, else false.*/
 bool STD_Application::onOpenDoc( const QString& aName )
 {
   bool res = true;
@@ -270,10 +277,7 @@ bool STD_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
-void STD_Application::onLoadDoc()
-{     
-}
-
+/*! \retval true, if document was loaded successful, else false.*/
 bool STD_Application::onLoadDoc( const QString& aName )
 {
   bool res = true;
@@ -307,14 +311,17 @@ bool STD_Application::onLoadDoc( const QString& aName )
   return res;
 }
 
+/*!Virtual function. Not implemented here.*/
 void STD_Application::beforeCloseDoc( SUIT_Study* )
 {
 }
 
+/*!Virtual function. Not implemented here.*/
 void STD_Application::afterCloseDoc()
 {
 }
 
+/*!Close document, if it's possible.*/
 void STD_Application::onCloseDoc()
 {
   if ( !isPossibleToClose() )
@@ -353,6 +360,9 @@ void STD_Application::onCloseDoc()
     closeApplication();
 }
 
+/*!Check the application on closing.
+ * \retval true if possible, else false
+ */
 bool STD_Application::isPossibleToClose()
 {
   if ( activeStudy() )
@@ -387,6 +397,7 @@ bool STD_Application::isPossibleToClose()
   return true;
 }
 
+/*!Save document if all ok, else error message.*/
 void STD_Application::onSaveDoc()
 {
   if ( !activeStudy() )
@@ -407,6 +418,7 @@ void STD_Application::onSaveDoc()
     onSaveAsDoc();
 }
 
+/*! \retval TRUE, if doument saved successful, else FALSE.*/
 bool STD_Application::onSaveAsDoc()
 {
   SUIT_Study* study = activeStudy();
@@ -425,19 +437,23 @@ bool STD_Application::onSaveAsDoc()
   return isOk;
 }
 
+/*!Closing session.*/
 void STD_Application::onExit()
 {
   SUIT_Session::session()->closeSession();
 }
 
+/*!Virtual slot. Not implemented here.*/
 void STD_Application::onCopy()
 {
 }
 
+/*!Virtual slot. Not implemented here.*/
 void STD_Application::onPaste()
 {
 }
 
+/*!Sets \a theEnable for menu manager and for tool manager.*/
 void STD_Application::setEditEnabled( bool theEnable )
 {
   myEditEnabled = theEnable;
@@ -452,6 +468,7 @@ void STD_Application::setEditEnabled( bool theEnable )
   }
 }
 
+/*!\retval true, if document opened successful, else false.*/
 bool STD_Application::useFile(const QString& theFileName)
 {
   bool res = SUIT_Application::useFile(theFileName);
@@ -460,6 +477,7 @@ bool STD_Application::useFile(const QString& theFileName)
   return res;
 }
 
+/*!Update desktop title.*/
 void STD_Application::updateDesktopTitle()
 {
   QString aTitle = applicationName();
@@ -477,6 +495,7 @@ void STD_Application::updateDesktopTitle()
   desktop()->setCaption( aTitle );
 }
 
+/*!Update commands status.*/
 void STD_Application::updateCommandsStatus()
 {
   bool aHasStudy = activeStudy() != 0;
@@ -494,6 +513,7 @@ void STD_Application::updateCommandsStatus()
     action( NewWindowId )->setEnabled( aHasStudy );
 }
 
+/*!\retval SUIT_ViewManager by viewer manager type name.*/
 SUIT_ViewManager* STD_Application::viewManager( const QString& vmType ) const
 {
   SUIT_ViewManager* vm = 0;
@@ -505,6 +525,9 @@ SUIT_ViewManager* STD_Application::viewManager( const QString& vmType ) const
   return vm;
 }
 
+/*! \param vmType - input view manager type name
+ * \param lst - output list of view managers with types \a vmType.
+ */
 void STD_Application::viewManagers( const QString& vmType, ViewManagerList& lst ) const
 {
   for ( QPtrListIterator<SUIT_ViewManager> it( myViewMgrs ); it.current(); ++it )
@@ -512,12 +535,14 @@ void STD_Application::viewManagers( const QString& vmType, ViewManagerList& lst 
       lst.append( it.current() );
 }
 
+/*!\param lst - output list of all view managers.*/
 void STD_Application::viewManagers( ViewManagerList& lst ) const
 {
   for ( QPtrListIterator<SUIT_ViewManager> it( myViewMgrs ); it.current(); ++it )
     lst.append( it.current() );
 }
 
+/*!\retval ViewManagerList - const list of all view managers.*/
 ViewManagerList STD_Application::viewManagers() const
 {
   ViewManagerList lst;
@@ -525,11 +550,13 @@ ViewManagerList STD_Application::viewManagers() const
   return lst;
 }
 
+/*!\retval SUIT_ViewManager - return pointer to active view manager.*/
 SUIT_ViewManager* STD_Application::activeViewManager() const
 {
   return myActiveViewMgr;
 }
 
+/*!Add view manager to view managers list, if it not already there.*/
 void STD_Application::addViewManager( SUIT_ViewManager* vm )
 {
   if ( !vm )
@@ -550,6 +577,7 @@ void STD_Application::addViewManager( SUIT_ViewManager* vm )
 */
 }
 
+/*!Remove view manager from view managers list.*/
 void STD_Application::removeViewManager( SUIT_ViewManager* vm )
 {
   if ( !vm )
@@ -567,6 +595,7 @@ void STD_Application::removeViewManager( SUIT_ViewManager* vm )
     myActiveViewMgr = 0;
 }
 
+/*!Remove all view managers from view managers list.*/
 void STD_Application::clearViewManagers()
 {
   ViewManagerList lst;
@@ -576,16 +605,19 @@ void STD_Application::clearViewManagers()
     removeViewManager( it.current() );
 }
 
+/*!\retval TRUE, if view manager \a vm, already in view manager list (\a myViewMgrs).*/
 bool STD_Application::containsViewManager( SUIT_ViewManager* vm ) const
 {
   return myViewMgrs.contains( vm ) > 0;
 }
 
+/*!Private slot, sets active manager to \vm, if \vm in view managers list.*/
 void STD_Application::onViewManagerActivated( SUIT_ViewManager* vm )
 {
   setActiveViewManager( vm );
 }
 
+/*!Sets status bar show, if \on = true, else status bar hide.*/
 void STD_Application::onViewStatusBar( bool on )
 {
   if ( on )
@@ -594,11 +626,15 @@ void STD_Application::onViewStatusBar( bool on )
     desktop()->statusBar()->hide();
 }
 
+/*!Call SUIT_MessageBox::info1(...) with about information.*/
 void STD_Application::onHelpAbout()
 {
   SUIT_MessageBox::info1( desktop(), tr( "About" ), tr( "ABOUT_INFO" ), "&OK" );
 }
 
+/*!Create empty study. \n
+ * Create new view manager and adding it to view managers list.
+ */
 void STD_Application::createEmptyStudy()
 {
   SUIT_Application::createEmptyStudy();
@@ -608,6 +644,7 @@ void STD_Application::createEmptyStudy()
   addViewManager( vm );
 }
 
+/*!Sets active manager to \vm, if \vm in view managers list.*/
 void STD_Application::setActiveViewManager( SUIT_ViewManager* vm )
 {
   if ( !containsViewManager( vm ) )
@@ -617,6 +654,7 @@ void STD_Application::setActiveViewManager( SUIT_ViewManager* vm )
   emit viewManagerActivated( vm );
 }
 
+/*!Public slot. */
 void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextMenuEvent* e )
 {
   QtxPopupMenu* popup = new QtxPopupMenu();
@@ -636,6 +674,7 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   delete popup;
 }
 
+/*!\retval QString - return file name from dialog.*/
 QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters, 
 				      const QString& caption, QWidget* parent )
 {
@@ -697,6 +736,7 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
   }
 }
 
+/*!\retval QString - return directory name from dialog.*/
 QString STD_Application::getDirectory( const QString& initial, const QString& caption, QWidget* parent )
 {
   if ( !parent )

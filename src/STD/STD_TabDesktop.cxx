@@ -16,6 +16,7 @@
 
 #include <stdarg.h>
 
+/*!Constructor.Create new instances of QVBox and QtxWorkstack.*/
 STD_TabDesktop::STD_TabDesktop()
 : SUIT_Desktop(),
 myWorkstack( 0 ),
@@ -38,10 +39,12 @@ myWorkstackAction( 0 )
   createActions();
 }
 
+/*!Destructor.*/
 STD_TabDesktop::~STD_TabDesktop()
 {
 }
 
+/*!\retval SUIT_ViewWindow - return const active window.*/
 SUIT_ViewWindow* STD_TabDesktop::activeWindow() const
 {
   SUIT_ViewWindow* wnd = 0;
@@ -53,6 +56,7 @@ SUIT_ViewWindow* STD_TabDesktop::activeWindow() const
   return wnd;
 }
 
+/*!\retval QPtrList<SUIT_ViewWindow> - return const active window list.*/
 QPtrList<SUIT_ViewWindow> STD_TabDesktop::windows() const
 {
   QPtrList<SUIT_ViewWindow> winList;
@@ -67,16 +71,19 @@ QPtrList<SUIT_ViewWindow> STD_TabDesktop::windows() const
   return winList;
 }
 
+/*!\retval QWidget pointer - QT work stack.*/
 QWidget* STD_TabDesktop::parentArea() const
 {
   return workstack();
 }
 
+/*!Call method perform for operation \a type.*/
 void STD_TabDesktop::windowOperation( const int type )
 {
   myWorkstackAction->perform( operationFlag( type ) );
 }
 
+/*!Sets window operations by \a first ... parameters.*/
 void STD_TabDesktop::setWindowOperations( const int first, ... )
 {
   va_list ints;
@@ -94,6 +101,7 @@ void STD_TabDesktop::setWindowOperations( const int first, ... )
 	setWindowOperations( typeList );
 }
 
+/*!Sets window operations by variable \a opList - operation list.*/
 void STD_TabDesktop::setWindowOperations( const QValueList<int>& opList )
 {
   int flags = 0;
@@ -104,17 +112,20 @@ void STD_TabDesktop::setWindowOperations( const QValueList<int>& opList )
   myWorkstackAction->setItems( flags );
 }
 
+/*!\retval QtxWorkstack pointer - QT work stack.*/
 QtxWorkstack* STD_TabDesktop::workstack() const
 {
   return myWorkstack;
 }
 
+/*!Emit window activated.*/
 void STD_TabDesktop::onWindowActivated( QWidget* w )
 {
   if ( w && w->inherits( "SUIT_ViewWindow" ) )
     emit windowActivated( (SUIT_ViewWindow*)w );
 }
 
+/*!Create actions for window.*/
 void STD_TabDesktop::createActions()
 {
   if ( myWorkstackAction )
@@ -149,6 +160,7 @@ void STD_TabDesktop::createActions()
   mMgr->insert( QtxActionMenuMgr::separator(), winMenuId, -1 );
 }
 
+/*!Convert STD_TabDesktop enumerations to QtxWorkstackAction*/
 int STD_TabDesktop::operationFlag( const int type ) const
 {
   int res = 0;

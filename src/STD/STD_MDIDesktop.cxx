@@ -15,6 +15,7 @@
 
 #include <stdarg.h>
 
+/*!Constructor.*/
 STD_MDIDesktop::STD_MDIDesktop()
 : SUIT_Desktop(),
 myWorkspace( 0 ),
@@ -33,10 +34,12 @@ myWorkspaceAction( 0 )
   createActions();
 }
 
+/*!destructor.*/
 STD_MDIDesktop::~STD_MDIDesktop()
 {
 }
 
+/*!\retval SUIT_ViewWindow - return const active window.*/
 SUIT_ViewWindow* STD_MDIDesktop::activeWindow() const
 {
   SUIT_ViewWindow* wnd = 0;
@@ -48,6 +51,7 @@ SUIT_ViewWindow* STD_MDIDesktop::activeWindow() const
   return wnd;
 }
 
+/*!\retval QPtrList<SUIT_ViewWindow> - return const active window list.*/
 QPtrList<SUIT_ViewWindow> STD_MDIDesktop::windows() const
 {
   QPtrList<SUIT_ViewWindow> winList;
@@ -62,16 +66,19 @@ QPtrList<SUIT_ViewWindow> STD_MDIDesktop::windows() const
   return winList;
 }
 
+/*!\retval QWidget - pointer to work space.*/
 QWidget* STD_MDIDesktop::parentArea() const
 {
   return workspace();
 }
 
+/*!Call method perform for operation \a type.*/
 void STD_MDIDesktop::windowOperation( const int type )
 {
   myWorkspaceAction->perform( operationFlag( type ) );
 }
 
+/*!Sets window operations by \a first ... parameters.*/
 void STD_MDIDesktop::setWindowOperations( const int first, ... )
 {
   va_list ints;
@@ -89,6 +96,7 @@ void STD_MDIDesktop::setWindowOperations( const int first, ... )
 	setWindowOperations( typeList );
 }
 
+/*!Sets window operations by variable \a opList - operation list.*/
 void STD_MDIDesktop::setWindowOperations( const QValueList<int>& opList )
 {
   int flags = 0;
@@ -99,17 +107,20 @@ void STD_MDIDesktop::setWindowOperations( const QValueList<int>& opList )
   myWorkspaceAction->setItems( flags );
 }
 
+/*!\retval QWorkspace pointer - work space.*/
 QWorkspace* STD_MDIDesktop::workspace() const
 {
   return myWorkspace;
 }
 
+/*!Emit window activated.*/
 void STD_MDIDesktop::onWindowActivated( QWidget* w )
 {
   if ( w && w->inherits( "SUIT_ViewWindow" ) )
     emit windowActivated( (SUIT_ViewWindow*)w );
 }
 
+/*!Create actions: cascade, Tile, Tile Horizontal, Tile Vertical*/
 void STD_MDIDesktop::createActions()
 {
   if ( myWorkspaceAction )
@@ -159,6 +170,7 @@ void STD_MDIDesktop::createActions()
   mMgr->insert( QtxActionMenuMgr::separator(), winMenuId, -1 );
 }
 
+/*!Convert STD_MDIDesktop enumerations to QtxWorkspaceAction.*/
 int STD_MDIDesktop::operationFlag( const int type ) const
 {
   int res = 0;

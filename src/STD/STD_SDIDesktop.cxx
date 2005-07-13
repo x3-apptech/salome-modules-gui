@@ -6,6 +6,7 @@
 #include <qmenubar.h>
 #include <qobjectlist.h>
 
+/*!Constructor. Create instance of QVBox*/
 STD_SDIDesktop::STD_SDIDesktop()
 : SUIT_Desktop()
 {
@@ -15,10 +16,12 @@ STD_SDIDesktop::STD_SDIDesktop()
   setCentralWidget( myMainWidget );
 }
 
+/*!Destructor.*/
 STD_SDIDesktop::~STD_SDIDesktop()
 {
 }
 
+/*!\retval SUIT_ViewWindow - return const active window.*/
 SUIT_ViewWindow* STD_SDIDesktop::activeWindow() const
 {
   const QObjectList* children = myMainWidget->children();
@@ -45,6 +48,7 @@ SUIT_ViewWindow* STD_SDIDesktop::activeWindow() const
   return win;
 }
 
+/*!\retval QPtrList<SUIT_ViewWindow> - return const active window list.*/
 QPtrList<SUIT_ViewWindow> STD_SDIDesktop::windows() const
 {
   QPtrList<SUIT_ViewWindow> winList;
@@ -52,6 +56,7 @@ QPtrList<SUIT_ViewWindow> STD_SDIDesktop::windows() const
   return winList;
 }
 
+/*!\retval QWidget - pointer to main window.*/
 QWidget* STD_SDIDesktop::parentArea() const
 {
   return myMainWidget;
