@@ -4,8 +4,9 @@
 #include <string>
 //#include <GLViewer.h>
 #include <GLViewer_Object.h>
+#include <SALOME_Actor.h>
 
-class GLVIEWER_API SALOME_GLOwner : public GLViewer_Owner
+class SALOME_OBJECT_EXPORT SALOME_GLOwner : public GLViewer_Owner
 {
 public:
   SALOME_GLOwner( const char* );
