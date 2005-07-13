@@ -535,9 +535,22 @@ void SalomeApp_Application::onLoadDoc()
   STD_LoadStudiesDlg aDlg( desktop(), TRUE);
 
   std::vector<std::string> List = studyMgr()->GetOpenStudies();
+  
+  SUIT_Session* aSession = SUIT_Session::session();
+  QPtrList<SUIT_Application> aAppList = aSession->applications();
+  SUIT_Application* aApp = 0;
+  
   for (unsigned int ind = 0; ind < List.size(); ind++) {
      studyname = List[ind];
-     aDlg.ListComponent->insertItem( studyname );
+     //Add to list only unloaded studies
+     bool isAlreadyOpen = false;
+     for ( QPtrListIterator<SUIT_Application> it( aAppList ); it.current() && !isAlreadyOpen; ++it )
+       {
+	 aApp = it.current();
+	 if ( aApp->activeStudy()->studyName() == studyname ) isAlreadyOpen = true;
+       }
+
+     if ( !isAlreadyOpen ) aDlg.ListComponent->insertItem( studyname );
   }
   
   int retVal = aDlg.exec();
@@ -1704,7 +1717,8 @@ void SalomeApp_Application::createEmptyStudy()
 
 bool SalomeApp_Application::activateModule( CAM_Module* mod )
 {
-  CAM_Application::activateModule( mod );
+  bool res = CAM_Application::activateModule( mod );
   if ( objectBrowser() )
     objectBrowser()->updateTree();
+  return res;
 }
