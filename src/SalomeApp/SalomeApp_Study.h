@@ -46,10 +46,6 @@ protected:
   virtual bool        openDataModel( const QString&, CAM_DataModel* );
   void                setStudyDS(const _PTR(Study)& s );
 
-protected slots:
-  virtual void        updateModelRoot( const CAM_DataModel* );  
-  // Reimplemented from CAM_Study, additionally updates object browser 
-
 private:
   QString             newStudyName() const;
 

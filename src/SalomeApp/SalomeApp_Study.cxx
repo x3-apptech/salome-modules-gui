@@ -279,12 +279,6 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
   return false;
 }
 
-void SalomeApp_Study::updateModelRoot( const CAM_DataModel* dm )
-{
-  CAM_Study::updateModelRoot( dm );
-  ((SalomeApp_Application*)application())->objectBrowser()->updateTree();
-}
-
 QString SalomeApp_Study::newStudyName() const
 {
   std::vector<std::string> studies = SalomeApp_Application::studyMgr()->GetOpenStudies();
