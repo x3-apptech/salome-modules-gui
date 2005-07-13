@@ -33,7 +33,6 @@
 
 #include "VTKViewer_CellRectPicker.h"
 #include "VTKViewer_Utilities.h"
-#include "VTKViewer_Trihedron.h"
 #include "VTKViewer_RectPicker.h"
 
 #include "SVTK_RenderWindowInteractor.h"
@@ -129,7 +128,6 @@ vtkStandardNewMacro(SVTK_InteractorStyle);
 SVTK_InteractorStyle
 ::SVTK_InteractorStyle() 
 {
-  myTrihedron = NULL;
   myViewWindow = NULL;
   this->MotionFactor = 10.0;
   this->State = VTK_INTERACTOR_STYLE_CAMERA_NONE;
@@ -209,14 +207,6 @@ SVTK_InteractorStyle
 ::setGUIWindow(QWidget* theWindow)
 {
   myGUIWindow = theWindow;
-}
-
-//----------------------------------------------------------------------------
-void
-SVTK_InteractorStyle
-::setTriedron(VTKViewer_Trihedron* theTrihedron)
-{
-  myTrihedron = theTrihedron;
 }
 
 //----------------------------------------------------------------------------
@@ -676,30 +666,6 @@ SVTK_InteractorStyle
 
 
 //----------------------------------------------------------------------------
-void  
-SVTK_InteractorStyle
-::ViewFitAll() 
-{
-  int aTriedronWasVisible = false;
-  if(myTrihedron){
-    aTriedronWasVisible = myTrihedron->GetVisibility() == VTKViewer_Trihedron::eOn;
-    if(aTriedronWasVisible) myTrihedron->VisibilityOff();
-  }
-
-  if(myTrihedron->GetVisibleActorCount(CurrentRenderer)){
-    myTrihedron->VisibilityOff();
-    ::ResetCamera(CurrentRenderer);
-  }else{
-    myTrihedron->SetVisibility(VTKViewer_Trihedron::eOnlyLineOn);
-    ::ResetCamera(CurrentRenderer,true);
-  }
-  if(aTriedronWasVisible) myTrihedron->VisibilityOn();
-  else myTrihedron->VisibilityOff();
-  ::ResetCameraClippingRange(CurrentRenderer);
-}
-
-
-//----------------------------------------------------------------------------
 // starts Global Panning operation (e.g. through menu command)
 void
 SVTK_InteractorStyle
@@ -717,7 +683,7 @@ SVTK_InteractorStyle
   vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
   myScale = cam->GetParallelScale();
 
-  ViewFitAll();
+  if (myViewWindow) myViewWindow->onFitAll();
 
   if (myGUIWindow) myGUIWindow->update();
   
@@ -1287,6 +1253,12 @@ SVTK_InteractorStyle
   aPicker->Pick(x, y, 0.0, this->CurrentRenderer);
 
   SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aPicker->GetActor());
+
+  if (aSActor && myPreSelectionActor){
+    float aPos[3];
+    aSActor->GetPosition(aPos);
+    myPreSelectionActor->SetPosition(aPos);
+  }
 
   if (vtkCellPicker* picker = vtkCellPicker::SafeDownCast(aPicker)) {
     int aVtkId = picker->GetCellId();

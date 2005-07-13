@@ -23,6 +23,7 @@ class SALOME_Actor;
 
 class SVTK_Viewer;
 class SVTK_Selector;
+class SVTK_CubeAxesActor2D;
 
 class SVTK_RenderWindow;
 class SVTK_InteractorStyle;
@@ -49,6 +50,7 @@ public:
   void SetSelectionMode(Selection_Mode theMode);
 
   bool isTrihedronDisplayed();
+  bool isCubeAxesDisplayed();
  
   /*  interactive object management */
   void highlight( const Handle(SALOME_InteractiveObject)& IObject, 
@@ -78,11 +80,14 @@ public:
   void RemoveActor(SALOME_Actor*, bool update = false);
 
   void AdjustTrihedrons( const bool forced );
-  bool ComputeTrihedronSize( double& theNewSize,
-			     double& theOldSize );
+  //merge with V2_2_0_VISU_improvements:bool ComputeTrihedronSize( double& theNewSize,
+  //merge with V2_2_0_VISU_improvements:                          double& theOldSize );
 
   int  GetTrihedronSize() const;
   void SetTrihedronSize( const int );
+
+  VTKViewer_Trihedron*  GetTrihedron() {return this->myTrihedron;};
+  SVTK_CubeAxesActor2D* GetCubeAxes() {return this->myCubeAxes;};
 
 public slots:
   void onSelectionChanged();
@@ -102,7 +107,10 @@ public slots:
   void onFitAll();
 
   void onViewTrihedron(); 
+  void onViewCubeAxes();
+
   void onAdjustTrihedron();
+  void onAdjustCubeAxes();
  
   void onPanLeft();
   void onPanRight();
@@ -154,9 +162,10 @@ private:
   SVTK_RenderWindow* myRenderWindow;
   SVTK_RenderWindowInteractor* myRWInteractor;
 
-  VTKViewer_Transform* myTransform;
-  VTKViewer_Trihedron* myTrihedron;  
-  int                  myTrihedronSize;
+  VTKViewer_Transform*  myTransform;
+  VTKViewer_Trihedron*  myTrihedron;  
+  int                   myTrihedronSize;
+  SVTK_CubeAxesActor2D* myCubeAxes;
   
   QToolBar* myToolBar;
   ActionsMap myActionsMap;  

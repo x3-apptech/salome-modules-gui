@@ -163,3 +163,27 @@ void ResetCameraClippingRange(vtkRenderer* theRenderer)
   
   anActiveCamera->SetClippingRange( range );
 }
+
+bool ComputeTrihedronSize( vtkRenderer* theRenderer,double& theNewSize,
+			   const double theSize, const float theSizeInPercents )
+{
+  // calculating diagonal of visible props of the renderer
+  float bnd[ 6 ];
+  if ( ComputeVisiblePropBounds( theRenderer, bnd ) == 0 )
+  {
+    bnd[ 1 ] = bnd[ 3 ] = bnd[ 5 ] = 100;
+    bnd[ 0 ] = bnd[ 2 ] = bnd[ 4 ] = 0;
+  }
+  float aLength = 0;
+
+  aLength = bnd[ 1 ]-bnd[ 0 ];
+  aLength = max( ( bnd[ 3 ] - bnd[ 2 ] ),aLength );
+  aLength = max( ( bnd[ 5 ] - bnd[ 4 ] ),aLength );
+
+  static float EPS_SIZE = 5.0E-3;
+  theNewSize = aLength * theSizeInPercents / 100.0;
+
+  // if the new trihedron size have sufficient difference, then apply the value
+  return fabs( theNewSize - theSize) > theSize * EPS_SIZE ||
+         fabs( theNewSize-theSize ) > theNewSize * EPS_SIZE;
+}

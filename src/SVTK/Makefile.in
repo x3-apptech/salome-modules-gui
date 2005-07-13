@@ -15,6 +15,7 @@ VPATH=.:@srcdir@
 EXPORT_HEADERS= SVTK.h \
 		SVTK_Prs.h \
 		SVTK_Actor.h \
+		SVTK_CubeAxesActor2D.h \
 		SVTK_Functor.h \
 		SVTK_ViewManager.h \
 		SVTK_ViewModel.h \
@@ -22,13 +23,15 @@ EXPORT_HEADERS= SVTK.h \
 		SVTK_RenderWindow.h \
 		SVTK_InteractorStyle.h \
 		SVTK_RenderWindowInteractor.h \
-		SVTK_Selector.h SVTK_Selection.h
+		SVTK_Selector.h \
+		SVTK_Selection.h
 
 # Libraries targets
 LIB = libSVTK.la
 
 LIB_SRC= 	SVTK_Prs.cxx \
 		SVTK_Actor.cxx \
+		SVTK_CubeAxesActor2D.cxx \
 		SVTK_Trihedron.cxx \
 		SVTK_ViewManager.cxx \
 		SVTK_ViewModel.cxx \

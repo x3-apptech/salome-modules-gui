@@ -80,7 +80,7 @@ class SVTK_EXPORT SVTK_InteractorStyle : public QObject,
 
   virtual int GetState();
 
-  void setTriedron(VTKViewer_Trihedron* theTrihedron);
+  //merge with V2_2_0_VISU_improvements:void setTriedron(VTKViewer_Trihedron* theTrihedron);
   void setPreselectionProp(const double& theRed = 0, 
 			   const double& theGreen = 1,
 			   const double& theBlue = 1, 
@@ -97,7 +97,7 @@ class SVTK_EXPORT SVTK_InteractorStyle : public QObject,
 
   void OnSelectionModeChanged();
 
-  void  ViewFitAll();
+  //merge with V2_2_0_VISU_improvements:void  ViewFitAll();
 
   void                     SetFilter( const Handle(VTKViewer_Filter)& );
   Handle(VTKViewer_Filter) GetFilter( const int );  
@@ -183,7 +183,7 @@ class SVTK_EXPORT SVTK_InteractorStyle : public QObject,
   
   SVTK_RenderWindowInteractor* myInteractor;
   SVTK_ViewWindow*          myViewWindow;
-  VTKViewer_Trihedron*      myTrihedron;
+  //merge with V2_2_0_VISU_improvements:VTKViewer_Trihedron*      myTrihedron;
   QWidget*                  myGUIWindow;
   
   std::map<int, Handle(VTKViewer_Filter)> myFilters;

@@ -420,7 +420,7 @@ void VTKViewer_ViewWindow::GetScale( double theScale[3] ) {
 }
 
 void VTKViewer_ViewWindow::SetScale( double theScale[3] ) {
-  myTransform->SetScale( theScale[0], theScale[1], theScale[2] );
+  myTransform->SetMatrixScale( theScale[0], theScale[1], theScale[2] );
   myRWInteractor->Render();
   Repaint();
 }

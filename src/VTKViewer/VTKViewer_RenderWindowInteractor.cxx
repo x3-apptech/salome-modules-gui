@@ -583,11 +583,12 @@ bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteg
 }
 
 void VTKViewer_RenderWindowInteractor::setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
-						    VTKViewer_Actor* theMapActor,
-						    VTKViewer_Actor *theActor,
+						    VTKViewer_Actor * theMapActor,
+						    VTKViewer_Actor * theActor,
 						    TUpdateActor theFun)
 {
   (*theFun)(theMapIndex,theMapActor,theActor);
+  float aPos[3];
+  theMapActor->GetPosition(aPos);
+  theActor->SetPosition(aPos);
 }
-
-

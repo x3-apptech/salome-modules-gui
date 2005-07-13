@@ -913,6 +913,9 @@ SVTK_RenderWindowInteractor
 	       TUpdateActor theFun)
 {
   (*theFun)(theMapIndex,theMapActor,theActor);
+  float aPos[3];
+  theMapActor->GetPosition(aPos);
+  theActor->SetPosition(aPos);
 }
 
 

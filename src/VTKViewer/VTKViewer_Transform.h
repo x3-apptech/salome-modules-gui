@@ -12,7 +12,9 @@ public:
   vtkTypeMacro( VTKViewer_Transform, vtkTransform );
 
   int  IsIdentity();
-  void SetScale( float theScaleX, float theScaleY, float theScaleZ );
+  //merge with V2_2_0_VISU_improvements:void SetScale( float theScaleX, float theScaleY, float theScaleZ );
+  void SetMatrixScale(double theScaleX, double theScaleY, double theScaleZ);
+  void GetMatrixScale(double theScale[3]);
 
 protected:
   VTKViewer_Transform() {}
