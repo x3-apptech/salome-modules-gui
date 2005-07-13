@@ -16,6 +16,7 @@
 
 #include <SUIT_Application.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_Session.h>
 
 #include "SALOMEDS_Tool.hxx"
 
@@ -46,9 +47,25 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
     {
       QString aSName( aSComp->GetName().c_str() );
       DataObjectList allComponents = parent->children( /*recursive=*/false );
-      for ( DataObjectListIterator it( allComponents ); it.current(); ++it )
-	if ( it.current()->name() == aSName )
-	  return it.current();
+      for ( DataObjectListIterator it( allComponents ); it.current(); ++it ) {
+	SUIT_DataObject* componentObj = it.current();
+	if ( componentObj->name() == aSName ) {
+	  //mkr : modifications for update already published in 
+	  //object browser, but not loaded yet component
+	  //get names list of loaded modules
+	  QStringList aLoadedModNames;
+	  CAM_Application* anApp = dynamic_cast<CAM_Application*>( SUIT_Session::session()->activeApplication() );
+	  if ( anApp ) anApp->modules( aLoadedModNames, /*loaded*/true );
+	  if ( !aLoadedModNames.isEmpty() && aLoadedModNames.contains( aSName ) == 0 ) {
+	    // delete DataObject and re-create it and all its sub-objects
+	    delete componentObj;
+	    // don't do anything here, because iterator may be corrupted (deleted object inside it)
+	    break;
+	  }
+	  else
+	    return componentObj;
+	}
+      }
     }
 
     aDataObj = aSComp ? new SalomeApp_ModuleObject( aSComp, parent ) :

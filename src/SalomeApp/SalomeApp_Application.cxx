@@ -541,7 +541,7 @@ void SalomeApp_Application::onLoadDoc()
   SUIT_Application* aApp = 0;
   
   for (unsigned int ind = 0; ind < List.size(); ind++) {
-     studyname = List[ind];
+     studyname = List[ind].c_str();
      //Add to list only unloaded studies
      bool isAlreadyOpen = false;
      for ( QPtrListIterator<SUIT_Application> it( aAppList ); it.current() && !isAlreadyOpen; ++it )
@@ -1688,7 +1688,7 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
 
 	if ( aComponent->ComponentDataType() == "Interface Applicative" )
 	  continue; // skip the magic "Interface Applicative" component
-    
+	    
 	SalomeApp_DataModel::BuildTree( aComponent, study->root(), study, /*skipExisitng=*/true );
       }
     }
