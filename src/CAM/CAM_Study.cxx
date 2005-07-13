@@ -14,12 +14,12 @@ CAM_Study::~CAM_Study()
 {
 }
 
-void CAM_Study::closeDocument()
+void CAM_Study::closeDocument(bool permanently)
 {
   for ( ModelListIterator it( myDataModels ); it.current(); ++it )
     it.current()->close();
 
-  SUIT_Study::closeDocument();
+  SUIT_Study::closeDocument(permanently);
 }
 
 bool CAM_Study::appendDataModel( const CAM_DataModel* dm )

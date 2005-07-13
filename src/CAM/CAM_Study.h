@@ -25,7 +25,7 @@ public:
   CAM_Study( SUIT_Application* );
   virtual ~CAM_Study();
 
-  virtual void closeDocument();
+  virtual void closeDocument(bool permanently = true);
 
   bool         appendDataModel( const CAM_DataModel* );
   virtual bool insertDataModel( const CAM_DataModel*, const int = -1 );

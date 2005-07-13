@@ -32,7 +32,7 @@ public:
   virtual bool      isSaved()  const;
   virtual bool      isModified() const;
 
-  virtual void      closeDocument();
+  virtual void      closeDocument(bool permanently = true);
   virtual void      createDocument();
   virtual bool      openDocument( const QString& );
 

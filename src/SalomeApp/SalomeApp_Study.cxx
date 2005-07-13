@@ -180,7 +180,7 @@ void SalomeApp_Study::saveDocument()
 // Function : closeDocument
 // Purpose  : 
 //================================================================
-void SalomeApp_Study::closeDocument()
+void SalomeApp_Study::closeDocument(bool permanently)
 {
   // Inform everybody that this study is going to close when it's most safe to,
   // i.e. in the very beginning
@@ -190,12 +190,12 @@ void SalomeApp_Study::closeDocument()
   _PTR(Study) studyPtr = studyDS();
   if ( studyPtr )
   {
-    SalomeApp_Application::studyMgr()->Close( studyPtr );
+    if(permanently) SalomeApp_Application::studyMgr()->Close( studyPtr );
     SALOMEDSClient_Study* aStudy = 0;
     setStudyDS( _PTR(Study)(aStudy) );
   }
 
-  CAM_Study::closeDocument();
+  CAM_Study::closeDocument(permanently);
 }
 
 //================================================================

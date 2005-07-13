@@ -28,7 +28,7 @@ public:
   virtual void        saveDocument();
   virtual bool        saveDocumentAs( const QString& );
 
-  virtual void        closeDocument();
+  virtual void        closeDocument(bool permanently = true);
 
   virtual bool        isSaved()  const;
   virtual bool        isModified() const;

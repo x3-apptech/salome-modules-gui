@@ -62,7 +62,7 @@ bool SUIT_Study::isModified() const
   return myIsModified;
 }
 
-void SUIT_Study::closeDocument()
+void SUIT_Study::closeDocument(bool permanently)
 {
 }
 
