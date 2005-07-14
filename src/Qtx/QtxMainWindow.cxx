@@ -250,8 +250,8 @@ void QtxMainWindow::saveGeometry( QtxResourceMgr* resMgr, const QString& section
 
   resMgr->setValue( sec, "pos_x", pos().x() );
   resMgr->setValue( sec, "pos_y", pos().y() );
-  resMgr->setValue( sec, "width", frameGeometry().width() );
-  resMgr->setValue( sec, "height",frameGeometry().height() );
+  resMgr->setValue( sec, "width", width() );
+  resMgr->setValue( sec, "height", height() );
 
   int winState = WS_Normal;
   if ( isMinimized() )
