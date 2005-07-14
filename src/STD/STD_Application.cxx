@@ -277,6 +277,11 @@ bool STD_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
+/*! called on loading the existent study */
+void STD_Application::onLoadDoc()
+{
+}
+
 /*! \retval true, if document was loaded successful, else false.*/
 bool STD_Application::onLoadDoc( const QString& aName )
 {
@@ -332,7 +337,7 @@ void STD_Application::onCloseDoc()
   beforeCloseDoc( study );
 
   if ( study )
-    study->closeDocument();
+    study->closeDocument(myClosePermanently);
 
   clearViewManagers();
 
@@ -365,6 +370,7 @@ void STD_Application::onCloseDoc()
  */
 bool STD_Application::isPossibleToClose()
 {
+  myClosePermanently = true; //SRN: BugID: IPAL9021
   if ( activeStudy() )
   {
     activeStudy()->abortAllOperations();
@@ -386,6 +392,7 @@ bool STD_Application::isPossibleToClose()
       case 2:
         break;
       case 3:
+	myClosePermanently = false;
         break;
       case 4:
       default:
