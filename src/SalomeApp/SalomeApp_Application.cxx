@@ -547,6 +547,7 @@ void SalomeApp_Application::onLoadDoc()
      for ( QPtrListIterator<SUIT_Application> it( aAppList ); it.current() && !isAlreadyOpen; ++it )
        {
 	 aApp = it.current();
+	 if(!aApp || !aApp->activeStudy()) continue;
 	 if ( aApp->activeStudy()->studyName() == studyname ) isAlreadyOpen = true;
        }
 
