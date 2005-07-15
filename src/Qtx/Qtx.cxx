@@ -50,7 +50,7 @@ void Qtx::setTabOrder( const QWidgetList& widgets )
 {
   if ( widgets.count() < 2 )
     return;
-    
+
   QWidget* prev = 0;
   for ( QWidgetListIt it( widgets ); it.current(); ++it )
   {
@@ -241,15 +241,15 @@ QString Qtx::dir( const QString& path, const bool abs )
   return dirPath;
 }
 
-/*!    
+/*!
 	Name: file [static public]
 	Desc: Returns file with or without extension.
 */
 QString Qtx::file( const QString& path, bool withExt )
 {
   if ( withExt )
-    return QFileInfo( path ).fileName();    
-  else 
+    return QFileInfo( path ).fileName();
+  else
     return QFileInfo( path ).baseName();
 }
 
@@ -258,8 +258,8 @@ QString Qtx::file( const QString& path, bool withExt )
 	Desc: Returns the file extension only or null string.
 */
 QString Qtx::extension( const QString& path )
-{  
-  return QFileInfo( path ).extension();
+{
+  return QFileInfo( path ).extension(false); // after the last dot
 }
 
 /*!
@@ -394,14 +394,14 @@ QString Qtx::addSlash( const QString& path )
 	Name: dos2unix [static public]
 	Desc: Convert text file. Replace symbols "LF/CR" by symbol "LF".
 */
-bool Qtx::dos2unix( const QString& absName )   
-{    
+bool Qtx::dos2unix( const QString& absName )
+{
   FILE* src = ::fopen( absName, "rb" );
   if ( !src )
 		return false;
 
   /* we'll use temporary file */
-  char temp[512] = { '\0' };        
+  char temp[512] = { '\0' };
   QString dir = Qtx::dir( absName );
   FILE* tgt = ::fopen( strcpy( temp, ::tempnam( dir, "__x" ) ), "wb" );
   if ( !tgt )
@@ -409,24 +409,24 @@ bool Qtx::dos2unix( const QString& absName )
 
   /* temp -> result of conversion */
   const char CR = 0x0d;
-  const char LF = 0x0a;    
-  bool waitingLF = false;            
+  const char LF = 0x0a;
+  bool waitingLF = false;
 
   while( true )
-  {                
+  {
     int  outcnt = 0;
     char inbuf[512], outbuf[512];
-                
+
     /* convert buffer */
     int nbread = ::fread( inbuf, 1, sizeof( inbuf ), src );
     for ( int incnt = 0; incnt < nbread; incnt++  )
-    {   
+    {
       if ( waitingLF )
       {
         waitingLF = false;
         if ( inbuf[incnt] == LF )
           outbuf[outcnt++] = LF;
-        else 
+        else
           outbuf[outcnt++] = CR;
       }
       else if ( inbuf[incnt] == CR )
