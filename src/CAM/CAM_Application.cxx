@@ -19,11 +19,15 @@
 #include <dlfcn.h>
 #endif
 
+/*!Create new instance of CAM_Application*/
 extern "C" CAM_EXPORT SUIT_Application* createApplication()
 {
   return new CAM_Application();
 }
 
+/*!Constructor. read module list.
+ * \param autoLoad - auto load flag.
+ */
 CAM_Application::CAM_Application( const bool autoLoad )
 : STD_Application(),
 myModule( 0 ),
@@ -32,10 +36,14 @@ myAutoLoad( autoLoad )
   readModuleList();
 }
 
+/*!Destructor. Do nothing.*/
 CAM_Application::~CAM_Application()
 {
 }
 
+/*! Load modules, if \a myAutoLoad flag is true.\n
+ * Start application - call start() method from parent class.
+ */
 void CAM_Application::start()
 {
   if ( myAutoLoad )
@@ -44,11 +52,17 @@ void CAM_Application::start()
   STD_Application::start();
 }
 
+/*!Get active module.
+ * \retval CAM_Module - active module.
+ */
 CAM_Module* CAM_Application::activeModule() const
 {
   return myModule;
 }
 
+/*!Get module with name \a modName from modules list.
+ * \retval CAM_Module pointer - module.
+ */
 CAM_Module* CAM_Application::module(  const QString& modName ) const
 {
   CAM_Module* mod = 0;
@@ -58,11 +72,15 @@ CAM_Module* CAM_Application::module(  const QString& modName ) const
   return mod;
 }
 
+/*!Gets modules iterator.*/
 CAM_Application::ModuleListIterator CAM_Application::modules() const
 {
   return ModuleListIterator( myModules );
 }
 
+/*!Gets modules list.
+ * \param out - output list of modules.
+ */
 void CAM_Application::modules( CAM_Application::ModuleList& out ) const
 {
   out.setAutoDelete( false );
@@ -72,6 +90,12 @@ void CAM_Application::modules( CAM_Application::ModuleList& out ) const
     out.append( it.current() );
 }
 
+/*!Gets list of names for modules.\n
+ * Get loaded modules names, if \a loaded is true, else \n
+ * get names from information list.
+ * \param lst - output list of names.
+ * \param loaded - boolean flag.
+ */
 void CAM_Application::modules( QStringList& lst, const bool loaded ) const
 {
   lst.clear();
@@ -84,6 +108,9 @@ void CAM_Application::modules( QStringList& lst, const bool loaded ) const
       lst.append( (*it).title );
 }
 
+/*!Adding module \a mod to list.
+ *\param mod - module.
+ */
 void CAM_Application::addModule( CAM_Module* mod )
 {
   if ( !mod || myModules.contains( mod ) )
@@ -122,6 +149,9 @@ void CAM_Application::addModule( CAM_Module* mod )
   moduleAdded( mod );
 }
 
+/*!Load modules from information list.
+ * \warning If some of modules not loaded, error message appear on desktop.
+ */
 void CAM_Application::loadModules()
 {
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
@@ -135,6 +165,12 @@ void CAM_Application::loadModules()
   }
 }
 
+/*!Load module with name \a modName.
+ *\param modName - module name for loading.
+ *\warning If information list is empty.
+ *\warning If module library (for module with \a modName) is empty.
+ *\warning If module library is not loaded.
+ */
 CAM_Module* CAM_Application::loadModule( const QString& modName )
 {
   if ( myInfoList.isEmpty() )
@@ -200,6 +236,12 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
   return module;
 }
 
+/**@name Activate module group.*/
+//@{
+/*!Activate module with name \a modName.
+ *\param modName - module name.
+ *\ratval true, if module loaded and activated successful, else false.
+ */
 bool CAM_Application::activateModule( const QString& modName )
 {
   if ( !modName.isEmpty() && !activeStudy() )
@@ -224,6 +266,11 @@ bool CAM_Application::activateModule( const QString& modName )
   return res;
 }
 
+/*!Activate module \a mod
+ *\param mod - module for activation.
+ *\retval true - if all sucessful.
+ *\warning Error message if module not activated in active study.
+ */
 bool CAM_Application::activateModule( CAM_Module* mod )
 {
   if ( mod && !activeStudy() )
@@ -271,12 +318,17 @@ bool CAM_Application::activateModule( CAM_Module* mod )
 
   return true;
 }
+//@}
 
+/*!Create new study for current application.
+ *\retval study pointer.
+ */
 SUIT_Study* CAM_Application::createNewStudy() 
 { 
   return new CAM_Study( this );
 }
 
+/*!Update commands status for parent class and for current class(if module is active)*/
 void CAM_Application::updateCommandsStatus()
 {
   STD_Application::updateCommandsStatus();
@@ -285,17 +337,24 @@ void CAM_Application::updateCommandsStatus()
     activeModule()->updateCommandsStatus();
 }
 
+/*!Close all modules in study \a theDoc.
+ *\param theDoc - study
+ */
 void CAM_Application::beforeCloseDoc( SUIT_Study* theDoc )
 {
   for ( ModuleListIterator it( myModules ); it.current(); ++it )
     it.current()->studyClosed( theDoc );
 }
 
+/*!Sets active study for parent class.
+ *\param study - study.
+ */
 void CAM_Application::setActiveStudy( SUIT_Study* study )
 {
   STD_Application::setActiveStudy( study );
 }
 
+/*!Do nothing.*/
 void CAM_Application::moduleAdded( CAM_Module* mod )
 {
 //  CAM_Study* study = dynamic_cast<CAM_Study*>( activeStudy() );
@@ -305,6 +364,10 @@ void CAM_Application::moduleAdded( CAM_Module* mod )
 //  study->insertDataModel( mod->dataModel() );
 }
 
+/*!Gets module name by title \a title
+ *\param title - title name
+ *\retval QString module name.
+ */
 QString CAM_Application::moduleName( const QString& title ) const
 {
   QString res;
@@ -316,6 +379,10 @@ QString CAM_Application::moduleName( const QString& title ) const
   return res;
 }
 
+/*!Gets module title by module name \a name
+ *\param name - module name
+ *\retval QString module title.
+ */
 QString CAM_Application::moduleTitle( const QString& name ) const
 {
   QString res;
@@ -327,6 +394,11 @@ QString CAM_Application::moduleTitle( const QString& name ) const
   return res;
 }
 
+/*!Get library name for module with title \a title.
+ *\param title - module title name.
+ *\param full  - boolean flag (if true - return full library name, else internal name)
+ *\retval QString - library name.
+ */
 QString CAM_Application::moduleLibrary( const QString& title, const bool full ) const
 {
   QString res;
@@ -340,6 +412,7 @@ QString CAM_Application::moduleLibrary( const QString& title, const bool full ) 
   return res;
 }
 
+/*!Read modules list*/
 void CAM_Application::readModuleList()
 {
   if ( !myInfoList.isEmpty() )
@@ -390,6 +463,11 @@ void CAM_Application::readModuleList()
     SUIT_MessageBox::error1( 0, tr( "Error" ), tr( "Can not load modules configuration file " ), tr( "Ok" ) );
 }
 
+/*!Add common items for popup menu ( if they are exist )
+ *\param type - type of popup menu
+ *\param thePopup - popup menu
+ *\param title - title of popup menu
+ */
 void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   // to do : add common items for popup menu ( if they are exist )
@@ -397,6 +475,7 @@ void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopu
     activeModule()->contextMenuPopup( type, thePopup, title );
 }
 
+/*!Create empty study.*/
 void CAM_Application::createEmptyStudy()
 {
   SUIT_Study* study = activeStudy();

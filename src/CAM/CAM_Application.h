@@ -30,9 +30,12 @@ public:
   CAM_Module*         activeModule() const;
   CAM_Module*         module(  const QString& ) const;
 
+  /** @name Modules lists.*/
+  //@{
   ModuleListIterator  modules() const;
   void                modules( ModuleList& ) const;
   void                modules( QStringList&, const bool loaded = true ) const;
+  //@}
 
   virtual void        addModule( CAM_Module* );
 

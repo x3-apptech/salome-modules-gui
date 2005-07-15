@@ -27,9 +27,12 @@ public:
 
   virtual void closeDocument(bool permanently = true);
 
+  /** @name Insert data model methods.*/
+  //@{
   bool         appendDataModel( const CAM_DataModel* );
   virtual bool insertDataModel( const CAM_DataModel*, const int = -1 );
   bool         insertDataModel( const CAM_DataModel*, const CAM_DataModel* );
+  //@}
 
   virtual bool removeDataModel( const CAM_DataModel* );
 
@@ -46,6 +49,7 @@ protected slots:
   virtual void updateModelRoot( const CAM_DataModel* );
 
 private:
+  //! Data model list
   ModelList    myDataModels;
 };
 

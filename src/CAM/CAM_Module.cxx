@@ -175,10 +175,8 @@ QtxActionToolMgr* CAM_Module::toolMgr() const
   return mgr;
 }
 
-/** @name Create tool methods.*/
-//@{
 /*! Create tool bar with name \a name, if it was't created before.
- * \retval -1 - if tool bar was already created.
+ * \retval -1 - if tool manager was't be created.
  */
 int CAM_Module::createTool( const QString& name )
 {
@@ -226,10 +224,7 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   int intId = toolMgr()->insert( action( id ), tBar, idx );
   return intId != -1 ? id : -1;
 }
-//@}
 
-/** @name Create menu methods.*/
-//@{
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
                             const int id, const int group, const int index )
 {
@@ -285,10 +280,7 @@ int CAM_Module::createMenu( const int id, const QString& menu, const int group, 
   int intId = menuMgr()->insert( action( id ), menu, group, index );
   return intId != -1 ? id : -1;
 }
-//@}
 
-/** @name Set Menu Shown*/
-//@{
 /*!Sets menus shown to \a on floag.
  *\param on - flag.
  */
@@ -331,10 +323,7 @@ void CAM_Module::setMenuShown( const int id, const bool on )
 {
   setMenuShown( action( id ), on );
 }
-//@}
 
-/** @name Set Tool Shown*/
-//@{
 /*!Set tools shown to \a on flag.
  *\param on - boolean flag.
  */
@@ -377,7 +366,6 @@ void CAM_Module::setToolShown( const int id, const bool on )
 {
   setToolShown( action( id ), on );
 }
-//@}
 
 /*! Return action by id. 
  * \param id - id of action.

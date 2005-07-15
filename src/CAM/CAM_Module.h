@@ -54,31 +54,46 @@ protected:
   QtxActionMenuMgr*      menuMgr() const;
   QtxActionToolMgr*      toolMgr() const;
 
+  /** @name Create tool methods.*/
+  //@{
   int                    createTool( const QString& );
   int                    createTool( const int, const int, const int = -1 );
   int                    createTool( const int, const QString&, const int = -1 );
   int                    createTool( QAction*, const int, const int = -1, const int = -1 );
   int                    createTool( QAction*, const QString&, const int = -1, const int = -1 );
+  //@}
 
+  /** @name Create menu methods.*/
+  //@{
   int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
   int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
   int                    createMenu( const int, const int, const int = -1, const int = -1 );
   int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
   int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
   int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
+  //@}
 
+  /** @name Set Menu Shown*/
+  //@{
   void                   setMenuShown( const bool );
   void                   setMenuShown( QAction*, const bool );
   void                   setMenuShown( const int, const bool );
+  //@}
 
+  /** @name Set Tool Shown*/
+  //@{
   void                   setToolShown( const bool );
   void                   setToolShown( QAction*, const bool );
   void                   setToolShown( const int, const bool );
+  //@}
 
   static QAction*        separator();
 
+  /**Action ids methods.*/
+  //@{
   QAction*               action( const int ) const;
   int                    actionId( const QAction* ) const;
+  //@}
 
   int                    registerAction( const int, QAction* );
   QAction*               createAction( const int, const QString&, const QIconSet&, const QString&,
