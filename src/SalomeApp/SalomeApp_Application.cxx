@@ -569,6 +569,7 @@ void SalomeApp_Application::onLoadDoc()
   if(onLoadDoc(name)) {
      updateWindows();
      updateViewManagers(); 
+     updateObjectBrowser(true);
   }
 }
 
