@@ -32,6 +32,7 @@ static void CopyPoints(vtkUnstructuredGrid* theGrid, vtkDataSet *theSourceDataSe
 vtkStandardNewMacro(VTKViewer_Actor);
 
 
+/*!Constructor.Initialize default parameters.*/
 VTKViewer_Actor::VTKViewer_Actor(){
   myIsHighlighted = myIsPreselected = false;
 
@@ -58,6 +59,7 @@ VTKViewer_Actor::VTKViewer_Actor(){
 }
 
 
+/*!Destructor.*/
 VTKViewer_Actor::~VTKViewer_Actor(){
   SetPreviewProperty(NULL);
 
@@ -76,24 +78,38 @@ VTKViewer_Actor::~VTKViewer_Actor(){
   myProperty->Delete();
 }
 
+/*!Add VTKViewer_Actor to renderer.
+ *\param theRenderer - vtkRenderer
+ */
 void VTKViewer_Actor::AddToRender(vtkRenderer* theRenderer){
   theRenderer->AddActor(this);
 }
 
+/*!Remove VTKViewer_Actor from renderer.
+ *\param theRenderer - vtkRenderer
+ */
 void VTKViewer_Actor::RemoveFromRender(vtkRenderer* theRenderer){
   theRenderer->RemoveActor(this);
 }
 
-
+/*!Add transformation to transform filter.
+ *\param theTransform - transformation.
+ */
 void VTKViewer_Actor::SetTransform(VTKViewer_Transform* theTransform){
   myTransformFilter->SetTransform(theTransform);
 }
 
-
+/*!Set mapper to pipeline.\n
+ *Call method for pipeline initialization.
+ *\param theMapper - mapper
+ */
 void VTKViewer_Actor::SetMapper(vtkMapper* theMapper){
   InitPipeLine(theMapper);
 }
 
+/*!Initialize sequence of filters for mapper, if \a theMapper is not null.
+ *\param theMapper - mapper
+ */
 void VTKViewer_Actor::InitPipeLine(vtkMapper* theMapper){
   if(theMapper){
     int anId = 0;
@@ -125,7 +141,7 @@ void VTKViewer_Actor::InitPipeLine(vtkMapper* theMapper){
   vtkLODActor::SetMapper(theMapper);
 }
 
-
+/*!*/
 void VTKViewer_Actor::Render(vtkRenderer *ren, vtkMapper* m){
   if(myIsResolveCoincidentTopology){
     int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
@@ -144,27 +160,42 @@ void VTKViewer_Actor::Render(vtkRenderer *ren, vtkMapper* m){
   }
 }
 
-
+/*!Set flag myIsResolveCoincidentTopology to \a theIsResolve.
+ *\param theIsResolve - bool flag.
+ */
 void VTKViewer_Actor::SetResolveCoincidentTopology(bool theIsResolve) {
   myIsResolveCoincidentTopology = theIsResolve;
 }
 
+/*!Sets polygon offset factor and polygon offset units.
+ *\param factor - float factor
+ *\param units  - float units
+ */
 void VTKViewer_Actor::SetPolygonOffsetParameters(float factor, float units){
   myPolygonOffsetFactor = factor;
   myPolygonOffsetUnits = units;
 }
 
+/*!Gets polygon offset factor and polygon offset units.
+ *\param factor - output float
+ *\param units  - output float
+ */
 void VTKViewer_Actor::GetPolygonOffsetParameters(float& factor, float& units){
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;
 }
 
 
+/*!Get input data set.
+ *\retval vtkDataSet pointer.
+ */
 vtkDataSet* VTKViewer_Actor::GetInput(){
   return myPassFilter.front()->GetOutput();
 }
 
-
+/*!Get modification time.
+ *\retval time - unsigned long.
+ */
 unsigned long int VTKViewer_Actor::GetMTime(){
   unsigned long mTime = this->Superclass::GetMTime();
   unsigned long time = myTransformFilter->GetMTime();
@@ -176,7 +207,9 @@ unsigned long int VTKViewer_Actor::GetMTime(){
   return mTime;
 }
 
-
+/*!Set representation mode.
+ *\param theMode - int.
+ */
 void VTKViewer_Actor::SetRepresentation(int theMode) { 
   switch(myRepresentation){
   case VTK_POINTS : 
@@ -208,16 +241,28 @@ void VTKViewer_Actor::SetRepresentation(int theMode) {
   myRepresentation = theMode;
 }
 
+/*!Get representation.
+ *\retval representation mode.
+ */
 int VTKViewer_Actor::GetRepresentation(){ 
   return myRepresentation;
 }
 
-
+/*!Get VTK cell by object ID.
+ *\param theObjID - object ID.
+ *\retval vtkCell pointer.
+ */
 vtkCell* VTKViewer_Actor::GetElemCell(int theObjID){
   return GetInput()->GetCell(theObjID);
 }
 
-
+/*!Get node coordinates by node ID.
+ *\param theObjID - node ID.
+ *\retval float array of coordinates.
+ * \li array[0] - X coordinate.
+ * \li array[1] - Y coordinate.
+ * \li array[2] - Z coordinate.
+ */
 float* VTKViewer_Actor::GetNodeCoord(int theObjID){
   return GetInput()->GetPoint(theObjID);
 }
@@ -225,8 +270,10 @@ float* VTKViewer_Actor::GetNodeCoord(int theObjID){
 
 //=================================================================================
 // function : GetObjDimension
-// purpose  : Return object dimension.
-//            Virtual method shoulb be redifined by derived classes
+/*! purpose  : Return object dimension.\n
+ *            Virtual method shoulb be redifined by derived classes
+ *\param theObjId - object ID.
+ */
 //=================================================================================
 int VTKViewer_Actor::GetObjDimension( const int theObjId )
 {
@@ -235,26 +282,40 @@ int VTKViewer_Actor::GetObjDimension( const int theObjId )
   return 0;
 }
 
-
+/*!Get infinite flag*/
 bool VTKViewer_Actor::IsInfinitive(){ 
   return myIsInfinite; 
 }
 
-
+/*!Set property - opacity.
+ *\param theOpacity - new apacity
+ */
 void VTKViewer_Actor::SetOpacity(float theOpacity){ 
   myOpacity = theOpacity;
   GetProperty()->SetOpacity(theOpacity);
 }
 
+/*!Get property - opacity.
+ *\retval float value.
+ */
 float VTKViewer_Actor::GetOpacity(){
   return myOpacity;
 }
 
-
+/*!Set property - color
+ *\param r - float Red value
+ *\param g - float Green value
+ *\param b - float Blue value
+ */
 void VTKViewer_Actor::SetColor(float r,float g,float b){
   GetProperty()->SetColor(r,g,b);
 }
 
+/*!Get property - color
+ *\param r - output float Red value
+ *\param g - output float Green value
+ *\param b - output float Blue value
+ */
 void VTKViewer_Actor::GetColor(float& r,float& g,float& b){
   float aColor[3];
   GetProperty()->GetColor(aColor);
@@ -263,11 +324,16 @@ void VTKViewer_Actor::GetColor(float& r,float& g,float& b){
   b = aColor[2];
 }
 
-
+/*!Get display mode.
+ *\retval int value
+ */
 int VTKViewer_Actor::getDisplayMode(){ 
   return myDisplayMode; 
 }
 
+/*!Set display mode
+ *\param theMode - integer value.
+ */
 void VTKViewer_Actor::setDisplayMode(int theMode){ 
   SetRepresentation(theMode+1); 
   myDisplayMode = GetRepresentation() - 1;

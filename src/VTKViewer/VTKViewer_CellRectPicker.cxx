@@ -16,7 +16,10 @@
 
 vtkStandardNewMacro(VTKViewer_CellRectPicker);
 
-//****************************************************************
+/*!Constructor.\n
+ * \li create instance of generic cell
+ * \li create two instances of Quad.
+ */
 VTKViewer_CellRectPicker::VTKViewer_CellRectPicker()
 {
   this->Cell = vtkGenericCell::New();
@@ -24,7 +27,10 @@ VTKViewer_CellRectPicker::VTKViewer_CellRectPicker()
   this->Quad2 = vtkQuad::New();
 }
 
-//****************************************************************
+/*!Destructor.
+ * \li Delete generic cell
+ * \li Delete two quads.
+ */
 VTKViewer_CellRectPicker::~VTKViewer_CellRectPicker()
 {
   this->Cell->Delete();
@@ -32,14 +38,14 @@ VTKViewer_CellRectPicker::~VTKViewer_CellRectPicker()
   this->Quad2->Delete();
 }
 
-//****************************************************************
+/*!Clear \a ActorData and call VTKViewer_RectPicker::Initialize() method*/
 void VTKViewer_CellRectPicker::Initialize()
 {
   ActorData.clear();
   this->VTKViewer_RectPicker::Initialize();
 }
 
-//****************************************************************
+/*!*/
 float VTKViewer_CellRectPicker::IntersectWithHex(float p1[4][4], float p2[4][4], float tol, 
                                                  vtkAssemblyPath *path, vtkProp3D *prop3D, 
                                                  vtkAbstractMapper3D *m)
@@ -162,7 +168,7 @@ float VTKViewer_CellRectPicker::IntersectWithHex(float p1[4][4], float p2[4][4],
   return tMin;
 }
 
-//****************************************************************
+/*!*/
 void VTKViewer_CellRectPicker::IncludeCell(vtkDataSet* input, 
                                            VTKViewer_CellData cellData, 
                                            VTKViewer_CellDataSet& dataList)
@@ -236,7 +242,7 @@ void VTKViewer_CellRectPicker::IncludeCell(vtkDataSet* input,
   cell2->Delete();
 }
 
-//****************************************************************
+/*!*/
 void VTKViewer_CellRectPicker::IncludeActor(vtkProp3D* prop, 
                                             vtkDataSet* input, 
                                             VTKViewer_CellDataSet& dataList)
@@ -302,7 +308,16 @@ void VTKViewer_CellRectPicker::IncludeActor(vtkProp3D* prop,
   cell2->Delete();
 }
 
-//****************************************************************
+/*! The method returns a non-zero value, if the cells intersect each other 
+ * in the direction dir[3].
+ * \param c1 - first vtkCell pointer
+ * \param d1 - 
+ * \param c2 - second vtkCell pointer
+ * \param d2 - 
+ * \param dir[3] - direction
+ * \retval integer - Returned value is 1 if the first cell is top of 
+ * the second one according to direction and 2 if the second cell is top.
+ */
 int VTKViewer_CellRectPicker::IntersectCells(vtkCell* c1, float d1, vtkCell* c2, float d2, float dir[3])
 {
   int i, k;
@@ -362,7 +377,11 @@ int VTKViewer_CellRectPicker::IntersectCells(vtkCell* c1, float d1, vtkCell* c2,
   return result;
 }
 
-//****************************************************************
+/*! Check point position.
+ * \param point[3] - point
+ * \param list - point data set
+ * \retval 0 or 1 - The method returns a non-zero value, if the point is inlide point data set
+ */
 char VTKViewer_CellRectPicker::PointInside(float point[3], vtkPoints* list)
 {
   int i, k, l, n;

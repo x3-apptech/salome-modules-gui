@@ -35,6 +35,9 @@ class vtkActor;
 
 namespace VTK
 {
+  /*!For each actor(for ex: someActor) from \a theCollection(that can be dynamic cast to type TActor)\n
+   * Call method \a theFun(someActor)
+   */
     template<typename TActor, typename TFunction>
       TFunction ForEach(vtkActorCollection *theCollection, TFunction theFun)
       {
@@ -47,7 +50,10 @@ namespace VTK
 	return theFun;
       }
   
-
+    /*!For each actor(for ex: someActor) from \a theCollection(that can be dynamic cast to type TActor and \n
+     * method \a thePredicate(someActor) return true) \n
+     * Call method \a theFun(someActor)
+     */
     template<typename TActor, typename TPredicate, typename TFunction>
       TFunction ForEachIf(vtkActorCollection *theCollection, 
 			  TPredicate thePredicate,
@@ -63,7 +69,10 @@ namespace VTK
 	return theFun;
       }
   
-
+    /*!Find actor from collection, that can be dynamicaly cast to \a TActor, \n
+     *and method \a thePredicate(someActor) return true) \n
+     *\retval someActor
+     */
     template<typename TActor, typename TPredicate>
       TActor* Find(vtkActorCollection *theCollection, TPredicate thePredicate)
       {
