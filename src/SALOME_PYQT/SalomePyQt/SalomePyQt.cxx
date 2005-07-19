@@ -7,10 +7,14 @@
 // $Header   : $
 //=============================================================================
 
+#include "SALOME_PYQT_Module.h" // this include must be first!!!
 #include "SalomePyQt.h"
 
 #include <qapplication.h>
 #include <qmenubar.h>
+#include <qwidget.h>
+#include <qpopupmenu.h>
+#include <qaction.h>
 #include <qstringlist.h>
 
 #include "SALOME_Event.hxx"
@@ -888,3 +892,321 @@ bool SalomePyQt::dumpView( const QString& filename )
   return ProcessEvent( new TDumpViewEvent( filename ) );
 }
 
+/*!
+  SalomePyQt::createTool
+  These methods allow operating with the toolbars:
+  - create a new toolbar or get the existing one (the toolbar name is passed as parameter);
+    this method returns an id of the toolbar;
+  - add action with given id (must be created previously) and optional index to the existing toolbar
+    (toobar is identified either by its id or by its name)
+    these methods return an id of the action.
+  If error occurs, the -1 value is returned.
+*/
+class CrTool
+{
+public:
+  CrTool( const QString& tBar ) 
+    : myCase( 0 ), myTbName( tBar ) {}
+  CrTool( const int id, const int tBar, const int idx ) 
+    : myCase( 1 ), myId( id ), myTbId( tBar ), myIndex( idx ) {}
+  CrTool( const int id, const QString& tBar, const int idx )
+    : myCase( 2 ), myId( id ), myTbName( tBar ), myIndex( idx ) {}
+  CrTool( QAction* action, const int tbId, const int id, const int idx )
+    : myCase( 3 ), myAction( action ), myTbId( tbId ), myId( id ), myIndex( idx ) {}
+  CrTool( QAction* action, const QString& tBar, const int id, const int idx )
+    : myCase( 4 ), myAction( action ), myTbName( tBar ), myId( id ), myIndex( idx ) {}
+
+  int execute( SALOME_PYQT_Module* module ) const
+  {
+    if ( module ) {
+      switch ( myCase ) {
+      case 0:
+        return module->createTool( myTbName );
+      case 1:
+        return module->createTool( myId, myTbId, myIndex );
+      case 2:
+        return module->createTool( myId, myTbName, myIndex );
+      case 3:
+        return module->createTool( myAction, myTbId, myId, myIndex );
+      case 4:
+        return module->createTool( myAction, myTbName, myId, myIndex );
+      }
+    }
+    return -1;
+  }
+private:
+   int      myCase;
+   QString  myTbName;
+   int      myTbId;
+   QAction* myAction;
+   int      myId;
+   int      myIndex;
+};
+class TCreateToolEvent: public SALOME_Event {
+public:
+  typedef int TResult;
+  TResult myResult;
+  const CrTool& myCrTool;
+  TCreateToolEvent( const CrTool& crTool ) 
+    : myResult( -1 ), myCrTool( crTool ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      myResult = myCrTool.execute( module );
+    }
+  }
+};
+// create new toolbar or get existing by name 
+int SalomePyQt::createTool( const QString& tBar )
+{
+  return ProcessEvent( new TCreateToolEvent( CrTool( tBar ) ) );
+}
+// add action with id and index to the existing tollbar
+int SalomePyQt::createTool( const int id, const int tBar, const int idx )
+{
+  return ProcessEvent( new TCreateToolEvent( CrTool( id, tBar, idx ) ) );
+}
+// add action with id and index to the existing tollbar
+int SalomePyQt::createTool( const int id, const QString& tBar, const int idx )
+{
+  return ProcessEvent( new TCreateToolEvent( CrTool( id, tBar, idx ) ) );
+}
+// add action with id and index to the existing tollbar
+int SalomePyQt::createTool( QAction* a, const int tBar, const int id, const int idx )
+{
+  return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
+}
+// add action with id and index to the existing tollbar
+int SalomePyQt::createTool( QAction* a, const QString& tBar, const int id, const int idx )
+{
+  return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
+}
+
+/*!
+  SalomePyQt::createMenu
+  These methods allow operating with the main menu:
+  - create a new menu or submenu or get the existing one (the parent menu name or id is passed as parameter, 
+    if it is empty or -1, it means that main menu is created, otherwise submenu is created);
+    this method returns an id of the menu/submenu;
+  - add action with given id (must be created previously) and optional index and group number to the existing menu
+    or submenu (menu name or id us passed as parameter)
+    these methods return an id of the action.
+  If error occurs, the -1 value is returned.
+*/
+class CrMenu
+{
+public:
+  CrMenu( const QString& subMenu, const int menu, const int group, const int idx ) 
+    : myCase( 0 ), mySubMenuName( subMenu ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( const QString& subMenu, const QString& menu, const int group, const int idx ) 
+    : myCase( 1 ), mySubMenuName( subMenu ), myMenuName( menu ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( const int id, const int menu, const int group, const int idx ) 
+    : myCase( 2 ), myId( id ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( const int id, const QString& menu, const int group, const int idx ) 
+    : myCase( 3 ), myId( id ), myMenuName( menu ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( QAction* action, const int menu, const int id, const int group, const int idx ) 
+    : myCase( 4 ), myAction( action ), myMenuId( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( QAction* action, const QString& menu, const int id, const int group, const int idx ) 
+    : myCase( 5 ), myAction( action ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+
+  int execute( SALOME_PYQT_Module* module ) const
+  {
+    if ( module ) {
+      switch ( myCase ) {
+      case 0:
+        return module->createMenu( mySubMenuName, myMenuId, -1, myGroup, myIndex );
+      case 1:
+        return module->createMenu( mySubMenuName, myMenuName, -1, myGroup, myIndex );
+      case 2:
+        return module->createMenu( myId, myMenuId, myGroup, myIndex );
+      case 3:
+        return module->createMenu( myId, myMenuName, myGroup, myIndex );
+      case 4:
+        return module->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
+      case 5:
+        return module->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
+      }
+    }
+    return -1;
+  }
+private:
+   int      myCase;
+   QString  myMenuName;
+   int      myMenuId;
+   QString  mySubMenuName;
+   int      myGroup;
+   QAction* myAction;
+   int      myId;
+   int      myIndex;
+};
+class TCreateMenuEvent: public SALOME_Event {
+public:
+  typedef int TResult;
+  TResult myResult;
+  const CrMenu& myCrMenu;
+  TCreateMenuEvent( const CrMenu& crMenu ) 
+    : myResult( -1 ), myCrMenu( crMenu ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      myResult = myCrMenu.execute( module );
+    }
+  }
+};
+int SalomePyQt::createMenu( const QString& subMenu, const int menu, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, group, idx ) ) );
+}
+
+int SalomePyQt::createMenu( const QString& subMenu, const QString& menu, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, group, idx ) ) );
+}
+
+int SalomePyQt::createMenu( const int id, const int menu, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( id, menu, group, idx ) ) );
+}
+
+int SalomePyQt::createMenu( const int id, const QString& menu, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( id, menu, group, idx ) ) );
+}
+
+int SalomePyQt::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( a, menu, id, group, idx ) ) );
+}
+
+int SalomePyQt::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
+{
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( a, menu, id, group, idx ) ) );
+}
+
+/*!
+  SalomePyQt::createSeparator
+  Create a separator action which can be then used in the menu or toolbar.
+*/
+class TCreateSepEvent: public SALOME_Event {
+public:
+  typedef QAction* TResult;
+  TResult myResult;
+  TCreateSepEvent() 
+    : myResult( 0 ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      if ( module )
+        myResult = module->createSeparator();
+    }
+  }
+};
+QAction* SalomePyQt::createSeparator()
+{
+  return ProcessEvent( new TCreateSepEvent() );
+}
+
+/*!
+  SalomePyQt::createAction
+  Create an action which can be then used in the menu or toolbar:
+  - id         : the unique id action to be registered to;
+  - menuText   : action text which should appear in menu;
+  - tipText    : text which should appear in the tooltip;
+  - statusText : text which should appear in the status bar when action is activated;
+  - icon       : the name of the icon file (the actual icon file name can be coded in the translation files);
+  - key        : the key accelrator for the action
+  - toggle     : if true the action is checkable
+*/
+class TCreateActionEvent: public SALOME_Event {
+public:
+  typedef QAction* TResult;
+  TResult myResult;
+  int     myId;
+  QString myMenuText;
+  QString myTipText;
+  QString myStatusText;
+  QString myIcon;
+  int     myKey;
+  bool    myToggle;
+  TCreateActionEvent( const int id, const QString& menuText, const QString& tipText, 
+		      const QString& statusText, const QString& icon, const int key, const bool toggle ) 
+    : myResult( 0 ), myId( id ), myMenuText( menuText ), myTipText( tipText ),
+      myStatusText( statusText ), myIcon( icon ), myKey( key ), myToggle( toggle ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      printf("TCreateActionEvent::Execute() - 1\n");
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      printf("TCreateActionEvent::Execute() - 2: module = %d\n",module);
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      printf("TCreateActionEvent::Execute() - 3: module = %d\n",module);
+      if ( module )
+        myResult = module->createAction( myId, myTipText, myIcon, myMenuText, myStatusText, myKey, myToggle );
+      printf("TCreateActionEvent::Execute() - 4: myResult = %d\n",myResult);
+    }
+  }
+};
+QAction* SalomePyQt::createAction( const int id,           const QString& menuText, 
+				   const QString& tipText, const QString& statusText, 
+				   const QString& icon,    const int key, const bool toggle )
+{
+  return ProcessEvent( new TCreateActionEvent( id, menuText, tipText, statusText, icon, key, toggle ) );
+}
+
+/*!
+  SalomePyQt::action
+  Get an action by its id. Returns 0 if the action with such id was not registered.
+*/
+class TActionEvent: public SALOME_Event {
+public:
+  typedef QAction* TResult;
+  TResult myResult;
+  int     myId;
+  TActionEvent( const int id )
+    : myResult( 0 ), myId( id ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      if ( module )
+        myResult = module->action( myId );
+    }
+  }
+};
+QAction* SalomePyQt::action( const int id )
+{
+  return ProcessEvent( new TActionEvent( id ) );
+}
+
+/*!
+  SalomePyQt::actionId
+  Get an action id. Returns -1 if the action was not registered.
+*/
+class TActionIdEvent: public SALOME_Event {
+public:
+  typedef  int TResult;
+  TResult  myResult;
+  const QAction* myAction;
+  TActionIdEvent( const QAction* action )
+    : myResult( -1 ), myAction( action ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      if ( module )
+        myResult = module->actionId( myAction );
+    }
+  }
+};
+int SalomePyQt::actionId( const QAction* a )
+{
+  return ProcessEvent( new TActionIdEvent( a ) );
+}

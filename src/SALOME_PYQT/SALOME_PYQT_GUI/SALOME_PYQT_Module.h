@@ -42,6 +42,8 @@ private:
   SALOME_PYQT_PyInterp*            myInterp;
   /* Python GUI module loaded */
   PyObjWrapper                     myModule;
+  /* Pytho GUI being initialized (not zero only during the initialization)*/
+  static SALOME_PYQT_Module* myInitModule;
 
   typedef QPtrList<QAction> ActionList;
   
@@ -75,10 +77,15 @@ public:
   Engines::Component_var getEngine() const;
 
   /******************************
-   * Inherited from CAM_Module 
+   * Inherited from SalomeApp_Module 
    ******************************/
 
 public:
+  /* little trick : provide an access to being activated Python module from outside;
+     needed by the SalomePyQt library :(
+  */
+  static SALOME_PYQT_Module* getInitModule();
+
   /* initialization */
   void            initialize  ( CAM_Application* );
 
@@ -93,9 +100,32 @@ public:
   /* get module engine IOR */
   virtual QString engineIOR() const;
 
-protected:
-  /* data model creation */
-  CAM_DataModel*  createDataModel();
+  /* called when study desktop is activated */
+  virtual void    studyActivated();
+
+  /* working with toolbars : open protected methods */
+  int                    createTool( const QString& );
+  int                    createTool( const int, const int, const int = -1 );
+  int                    createTool( const int, const QString&, const int = -1 );
+  int                    createTool( QAction*, const int, const int = -1, const int = -1 );
+  int                    createTool( QAction*, const QString&, const int = -1, const int = -1 );
+
+  /* working with menus : open protected methods */
+  int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const int, const int, const int = -1, const int = -1 );
+  int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
+
+  /* create separator : open protected method */
+  QAction*               createSeparator();
+
+  /* working with actions : open protected methods */
+  QAction*               action( const int ) const;
+  int                    actionId( const QAction* ) const;
+  QAction*               createAction( const int, const QString&, const QString&, const QString&,
+                                       const QString&, const int, const bool = false );
 
 public slots:
   /* activation */

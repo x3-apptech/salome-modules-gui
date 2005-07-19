@@ -15,7 +15,6 @@
 #include "STD_TabDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
-#include "SalomeApp_DataModel.h"
 
 #include "QtxWorkstack.h"
 #include <SALOME_LifeCycleCORBA.hxx>
@@ -34,6 +33,8 @@
 #include <sipqtQWidget.h>
 #include <sipqtQPopupMenu.h>
 
+#include <CORBA.h>
+
 using namespace std;
 
 // Default name of the module, should be replaced at the moment 
@@ -50,18 +51,6 @@ using namespace std;
 // so that ALL Python API calls are serialized with PyInterp_Dispatcher.
 //=============================================================================
 
-
-//=============================================================================
-// The default PyQt module data model.
-// Reuses common data model from SalomeApp.
-//=============================================================================
-class SALOME_PYQT_DataModel: public SalomeApp_DataModel
-{
-public:
-  SALOME_PYQT_DataModel( CAM_Module* theModule ) : SalomeApp_DataModel( theModule ) {}
-  bool isModified() const { return false; }
-  bool isSaved()  const   { return false; }
-};
 
 //=============================================================================
 // The class for parsing of the XML resource files.
@@ -123,6 +112,16 @@ extern "C" {
  * Static variables definition
  */
 SALOME_PYQT_Module::InterpMap SALOME_PYQT_Module::myInterpMap;
+SALOME_PYQT_Module* SALOME_PYQT_Module::myInitModule = 0;
+
+/*!
+ * Little trick : provide an access to being activated Python module from outside;
+ * needed by the SalomePyQt library :(
+*/
+SALOME_PYQT_Module* SALOME_PYQT_Module::getInitModule() 
+{ 
+  return myInitModule; 
+}
 
 /*!
  * Constructor
@@ -145,17 +144,6 @@ SALOME_PYQT_Module::~SALOME_PYQT_Module()
   myToolbarActionList.clear();
   if ( myXmlHandler )
     delete myXmlHandler;
-}
-
-/*!
- * Creates data model for the module.
- * Reimplemented from CAM_Module.
- */
-CAM_DataModel* SALOME_PYQT_Module::createDataModel()
-{
-  // VSR: this is a temporary solution : 
-  // should reuse default data model from SalomeApp
-  return new SALOME_PYQT_DataModel( this );
 }
 
 /*!
@@ -228,10 +216,6 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
   if ( !res )
     return res;
 
-  // activate menus, toolbars, etc
-  setMenuShown( true );
-  setToolShown( true );
-
   // ActivateReq: request class for internal activate() operation
   class ActivateReq : public PyInterp_Request
   {
@@ -256,9 +240,10 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
   // Posting the request
   PyInterp_Dispatcher::Get()->Exec( new ActivateReq( theStudy, this ) );
 
-  // connect desktop activation signal
-  connect( application()->desktop(), SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
-  
+  // activate menus, toolbars, etc
+  setMenuShown( true );
+  setToolShown( true );
+
   return true;
 }
 
@@ -301,9 +286,6 @@ bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
   // Posting the request
   PyInterp_Dispatcher::Get()->Exec( new DeactivateReq( myInterp, theStudy, this ) );
 
-  // disconnect desktop activation signal
-  disconnect( application()->desktop(), SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
-  
   return res;
 }
 
@@ -352,36 +334,6 @@ void SALOME_PYQT_Module::onGUIEvent()
 
   // Posting the request
   PyInterp_Dispatcher::Get()->Exec( new GUIEvent( myInterp, this, id ) );
-}
-
-/*!
- * Desktop activation slot. Used for notifying about changing of the active study.
- */
-void SALOME_PYQT_Module::onDesktopActivated()
-{
-  // StudyChangedReq: request class for internal studyChanged() operation
-  class StudyChangedReq : public PyInterp_Request
-  {
-  public:
-    StudyChangedReq( SUIT_Study*         _study, 
-		     SALOME_PYQT_Module* _obj ) 
-      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
-        myStudy ( _study ),
-        myObj   ( _obj   ) {}
-    
-  protected:
-    virtual void execute()
-    {
-      myObj->studyChanged( myStudy );
-    }
-
-  private:
-    SUIT_Study*         myStudy;
-    SALOME_PYQT_Module* myObj;
-  };
-
-  // Posting the request
-  PyInterp_Dispatcher::Get()->Exec( new StudyChangedReq( application()->activeStudy(), this ) );
 }
 
 /*! 
@@ -484,6 +436,8 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   if ( !myModule )
     return; // Error 
  
+  myInitModule = this;
+
 #ifdef __CALL_OLD_METHODS__
   // call Python module's setWorkspace() method
   setWorkSpace();
@@ -553,6 +507,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
       }
     }
   }
+  myInitModule = 0;
 }
 
 /*!
@@ -655,7 +610,13 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
  */
 Engines::Component_var SALOME_PYQT_Module::getEngine() const
 {
-  Engines::Component_var comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name( "" ) );
+  Engines::Component_var comp;
+  // temporary solution
+  try {
+    comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name( "" ) );
+  }
+  catch (CORBA::Exception&) {
+  }
   return comp;
 }
 
@@ -667,6 +628,37 @@ QString SALOME_PYQT_Module::engineIOR() const
   if ( !CORBA::is_nil( getEngine() ) )
     return QString( getApp()->orb()->object_to_string( getEngine() ) );
   return QString( "" );
+}
+
+/*! 
+ * Called when study desktop is activated.
+ * Used for notifying about changing of the active study.
+ */
+void SALOME_PYQT_Module::studyActivated()
+{
+  // StudyChangedReq: request class for internal studyChanged() operation
+  class StudyChangedReq : public PyInterp_Request
+  {
+  public:
+    StudyChangedReq( SUIT_Study*         _study, 
+		     SALOME_PYQT_Module* _obj ) 
+      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
+        myStudy ( _study ),
+        myObj   ( _obj   ) {}
+    
+  protected:
+    virtual void execute()
+    {
+      myObj->studyChanged( myStudy );
+    }
+
+  private:
+    SUIT_Study*         myStudy;
+    SALOME_PYQT_Module* myObj;
+  };
+
+  // Posting the request
+  PyInterp_Dispatcher::Get()->Exec( new StudyChangedReq( application()->activeStudy(), this ) );
 }
 
 /*!
@@ -903,6 +895,81 @@ void SALOME_PYQT_Module::addAction( const PyQtGUIAction type, QAction* action )
   }
 }
 
+
+/*!
+ * The next methods just call the parent implementation.
+ * This is done to open protected methods from CAM_Module class.
+*/
+int SALOME_PYQT_Module::createTool( const QString& name )
+{
+  return SalomeApp_Module::createTool( name );
+}
+int SALOME_PYQT_Module::createTool( const int id, const int tBar, const int idx )
+{
+  return SalomeApp_Module::createTool( id, tBar, idx );
+}
+int SALOME_PYQT_Module::createTool( const int id, const QString& tBar, const int idx )
+{
+  return SalomeApp_Module::createTool( id, tBar, idx );
+}
+int SALOME_PYQT_Module::createTool( QAction* a, const int tBar, const int id, const int idx )
+{
+  return SalomeApp_Module::createTool( a, tBar, id, idx );
+}
+int SALOME_PYQT_Module::createTool( QAction* a, const QString& tBar, const int id, const int idx )
+{
+  return SalomeApp_Module::createTool( a, tBar, id, idx );
+}
+int SALOME_PYQT_Module::createMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( subMenu, menu, id, group, idx );
+}
+int SALOME_PYQT_Module::createMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( subMenu, menu, id, group, idx );
+}
+int SALOME_PYQT_Module::createMenu( const int id, const int menu, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( id, menu, group, idx );
+}
+int SALOME_PYQT_Module::createMenu( const int id, const QString& menu, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( id, menu, group, idx );
+}
+int SALOME_PYQT_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( a, menu, id, group, idx );
+}
+int SALOME_PYQT_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
+{
+  return SalomeApp_Module::createMenu( a, menu, id, group, idx );
+}
+QAction* SALOME_PYQT_Module::createSeparator()
+{
+  return SalomeApp_Module::separator();
+}
+QAction* SALOME_PYQT_Module::action( const int id ) const
+{
+  return SalomeApp_Module::action( id );
+}
+int SALOME_PYQT_Module::actionId( const QAction* a ) const
+{
+  return SalomeApp_Module::actionId( a );
+}
+QAction* SALOME_PYQT_Module::createAction( const int id, const QString& text, const QString& icon, 
+					   const QString& menu, const QString& tip, const int key,
+					   const bool toggle )
+{
+  QIconSet anIcon;
+  if ( !icon.isEmpty() ) {
+    QPixmap pixmap  = getApp()->resourceMgr()->loadPixmap( name(""), tr( icon ) );
+    if ( !pixmap.isNull() )
+      anIcon = QIconSet( pixmap );
+  }
+  return SalomeApp_Module::createAction( id, text, anIcon, menu, tip, key, getApp()->desktop(), toggle, this, SLOT( onGUIEvent() ) );
+}
+
+
 //=============================================================================
 // SALOME_PYQT_XmlHandler class implementation
 //=============================================================================
@@ -1037,14 +1104,7 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	    QString tooltip = attribute( elem, "tooltip-id" );
 	    QString accel   = attribute( elem, "accel-id" );
 	    bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );
-	    QString execute = attribute( elem, "execute-action" );               // not used
-
-	    QIconSet anIcon;
-	    if ( !icon.isEmpty() ) {
-	      QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
-	      if ( !pixmap.isNull() )
-	        anIcon = QIconSet( pixmap );
-            }
+	    ////QString execute = attribute( elem, "execute-action" );               // not used
 
 	    // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	    // also check if the action with given ID is already created
@@ -1054,14 +1114,11 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	      // create menu action
 	      QAction* action = myModule->createAction( id,                               // ID
 						        tooltip,                          // tooltip
-						        anIcon,                           // icon
+						        icon,                             // icon
 						        label,                            // menu text
 						        tooltip,                          // status-bar text
 						        QKeySequence( accel ),            // keyboard accelerator
-						        myModule->getApp()->desktop(),    // desktop
-						        toggle,                           // toogled action
-						        myModule,                         // receiver
-						        SLOT( onGUIEvent() ) );           // slot
+						        toggle );                         // toogled action
 	      myModule->addAction( SALOME_PYQT_Module::PYQT_ACTION_MENU, action );
 	      myModule->createMenu( action, menuId, -1, 100, pos );
 	    }
@@ -1113,14 +1170,7 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
 	    QString tooltip = attribute( elem, "tooltip-id" );
 	    QString accel   = attribute( elem, "accel-id" );
 	    bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );
-	    QString execute = attribute( elem, "execute-action" );               // not used
-
-	    QIconSet anIcon;
-	    if ( !icon.isEmpty() ) {
-              QPixmap pixmap  = myModule->getApp()->resourceMgr()->loadPixmap( myModule->name(""), icon );
-	      if ( !pixmap.isNull() )
-	        anIcon = QIconSet( pixmap );
-            }
+	    ////QString execute = attribute( elem, "execute-action" );               // not used
 
 	    // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	    // also check if the action with given ID is already created
@@ -1130,14 +1180,11 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
 	      // create toolbar action
 	      QAction* action = myModule->createAction( id,                               // ID
 						        tooltip,                          // tooltip
-						        anIcon,                           // icon
+						        icon,                             // icon
 						        label,                            // menu text
 						        tooltip,                          // status-bar text
 						        QKeySequence( accel ),            // keyboard accelerator
-						        myModule->getApp()->desktop(),    // desktop
-						        toggle,                           // toogled action
-						        myModule,                         // receiver
-						        SLOT( onGUIEvent() ) );           // slot
+						        toggle );                         // toogled action
 	      myModule->addAction( SALOME_PYQT_Module::PYQT_ACTION_TOOLBAL, action );
 	      myModule->createTool( action, tbId, -1, pos );
 	    }
@@ -1175,10 +1222,10 @@ void SALOME_PYQT_XmlHandler::insertPopupItems( QDomNode& parentNode, QPopupMenu*
 	int     pos     = checkInt( attribute( elem, "pos-id" ) );
 	QString label   = attribute( elem, "label-id" );
 	QString icon    = attribute( elem, "icon-id" );
-	QString tooltip = attribute( elem, "tooltip-id" );                   // not used
+	/////QString tooltip = attribute( elem, "tooltip-id" );                   // not used
 	QString accel   = attribute( elem, "accel-id" );
-	bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );       // not used
-	QString execute = attribute( elem, "execute-action" );               // not used
+	/////bool    toggle  = checkBool( attribute( elem, "toggle-id" ) );       // not used
+	/////QString execute = attribute( elem, "execute-action" );               // not used
 
 	QIconSet anIcon;
 	if ( !icon.isEmpty() ) {

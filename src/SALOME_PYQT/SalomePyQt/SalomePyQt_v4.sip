@@ -63,6 +63,34 @@ public:
 
   static bool              dumpView( const QString& );
 
+  static int               createTool( const QString& );
+  static int               createTool( const int, const int,      const int = -1 );
+  static int               createTool( const int, const QString&, const int = -1 );
+  static int               createTool( QAction*,  const int,      const int = -1, const int = -1 );
+  static int               createTool( QAction*,  const QString&, const int = -1, const int = -1 );
+
+  static int               createMenu( const QString&, const int,
+				       const int = -1, const int = -1 );
+  static int               createMenu( const QString&, const QString&, 
+				       const int = -1, const int = -1 );
+  static int               createMenu( const int,      const int,
+				       const int = -1, const int = -1 );
+  static int               createMenu( const int,      const QString&, 
+				       const int = -1, const int = -1 );
+  static int               createMenu( QAction*,       const int,      const int = -1, 
+	                               const int = -1, const int = -1 );
+  static int               createMenu( QAction*,       const QString&, const int = -1, 
+	                               const int = -1, const int = -1 );
+
+  static QAction*          createSeparator();
+
+  static QAction*          createAction( const int, const QString&, 
+	                                 const QString& = QString::null, const QString& = QString::null, 
+					 const QString& = QString::null, const int = 0, const bool = false );
+
+  static QAction*          action( const int );
+  static int               actionId( const QAction* );
+
   static void              addSetting    ( const QString&, const QString&, const double );
   static void              addSetting    ( const QString&, const QString&, const int /Constrained/ );
   static void              addSetting    ( const QString&, const QString&, const QString& );
