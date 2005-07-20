@@ -169,11 +169,11 @@ void QtxWorkstackAction::onAboutToShow()
     return;
 
   QtxWorkstack* ws = workstack();
-  if ( ws )
-    {
-      myItem[VSplit]->setAccel(ws->accel(QtxWorkstack::SplitVertical));
-      myItem[HSplit]->setAccel(ws->accel(QtxWorkstack::SplitHorizontal));
-    }
+  if ( ws && myItem.contains( VSplit ) )
+    myItem[VSplit]->setAccel( ws->accel( QtxWorkstack::SplitVertical ) );
+  if ( ws && myItem.contains( HSplit ) )
+    myItem[HSplit]->setAccel( ws->accel( QtxWorkstack::SplitHorizontal ) );
+
   updatePopup( (QPopupMenu*)obj );
 }
 

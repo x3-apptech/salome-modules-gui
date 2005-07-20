@@ -16,8 +16,6 @@
 #include <qwidgetstack.h>
 #include <qapplication.h>
 
-#include <stream.h>
-
 /*!
     Class: QtxWorkstack [Public]
     Descr:
@@ -116,7 +114,12 @@ void QtxWorkstack::split( const int o )
   curWid->setFocus();
 }
 
-// begin: jfa 06.07.2005
+/*!
+* \brief Split workarea of the given widget on two parts.
+* \param wid  - widget, belonging to this workstack
+* \param o    - orientation of splitting (Qt::Horizontal or Qt::Vertical)
+* \param type - type of splitting, see <VAR>SplitType</VAR> enumeration
+*/
 void QtxWorkstack::Split (QWidget* wid, const Qt::Orientation o, const SplitType type)
 {
   if (!wid) return;
@@ -190,27 +193,48 @@ void QtxWorkstack::Split (QWidget* wid, const Qt::Orientation o, const SplitType
   distributeSpace(trg);
 }
 
+/*!
+* \brief Put given widget on top of its workarea
+* \param wid - widget, belonging to this workstack
+*/
+/*
 void QtxWorkstack::OnTop (QWidget* wid)
 {
-  if (!wid) return;
+  if ( !wid )
+    return;
 
   // find area of the given widget
-  QtxWorkstackArea* area = NULL;
+  QtxWorkstackArea* area = 0;
   QPtrList<QtxWorkstackArea> allAreas;
-  areas(mySplit, allAreas, true);
-  QPtrListIterator<QtxWorkstackArea> it (allAreas);
-  for (; it.current() && !area; ++it) {
-    if (it.current()->contains(wid))
+  areas( mySplit, allAreas, true );
+  for ( QPtrListIterator<QtxWorkstackArea> it( allAreas ); it.current() && !area; ++it )
+  {
+    if ( it.current()->contains( wid ) )
       area = it.current();
   }
-  if (!area) return;
 
-  area->setActiveWidget(wid);
+  if ( area )
+    area->setActiveWidget( wid );
 }
+*/
 
-void QtxWorkstack::Attract (QWidget* wid1, QWidget* wid2, const bool all)
+/*!
+* \brief Move widget(s) from source workarea into target workarea
+*        or just reorder widgets inside one workarea.
+* \param wid1 - widget from target workarea
+* \param wid2 - widget from source workarea
+* \param all  - if this parameter is TRUE, all widgets from source workarea will
+*               be moved into the target one, else only the \a wid2 will be moved
+*
+* Move \a wid2 in target workarea. Put it right after \a wid1.
+* If value of boolean argument is TRUE, all widgets from source workarea
+* will be moved together with \a wid2, source workarea will be deleted.
+* If \a wid1 and \a wid2 belongs to one workarea, simple reordering will take place.
+*/
+void QtxWorkstack::Attract ( QWidget* wid1, QWidget* wid2, const bool all )
 {
-  if (!wid1 || !wid2) return;
+  if ( !wid1 || !wid2 )
+    return;
 
   // find area of the widgets
   QtxWorkstackArea *area1 = NULL, *area2 = NULL;
@@ -268,24 +292,7 @@ void QtxWorkstack::Attract (QWidget* wid1, QWidget* wid2, const bool all)
     }
   }
 
-  /*area2->removeWidget(wid2);
-  area1->insertWidget(wid2);
-
-  // Reorder widgets
-  QWidgetListIt itr( wids1 );
-  for ( ; itr.current() && itr.current() != wid1; ++itr )
-  {
-  }
-  ++itr;
-  for ( ; itr.current(); ++itr )
-  {
-    if (itr.current() != wid2) {
-      area1->removeWidget( itr.current() );
-      area1->insertWidget( itr.current() );
-    }
-  }*/
-
-  area1->setActiveWidget(curWid);
+  area1->setActiveWidget( curWid );
 }
 
 static void setSizes (QIntList& szList, const int item_ind,
@@ -307,10 +314,18 @@ static void setSizes (QIntList& szList, const int item_ind,
   }
 }
 
+/*!
+* \brief Set position of the widget relatively its splitter.
+* \param wid - widget to set position of
+* \param pos - position relatively splitter. Value in range [0..1].
+*
+* Orientation of positioning will correspond to the splitter orientation.
+*/
 void QtxWorkstack::SetRelativePositionInSplitter( QWidget* wid, const double position )
 {
   if ( position < 0.0 || 1.0 < position)
     return;
+
   if ( !wid )
     return;
 
@@ -356,37 +371,57 @@ void QtxWorkstack::SetRelativePositionInSplitter( QWidget* wid, const double pos
   split->setSizes(szList);
 }
 
-void QtxWorkstack::SetRelativePosition (QWidget* wid,
-                                        const Qt::Orientation o,
-                                        const double position)
+/*!
+* \brief Set position of the widget relatively the entire workstack.
+* \param wid - widget to set position of
+* \param o   - orientation of positioning (Qt::Horizontal or Qt::Vertical).
+*              If o = Qt::Horizontal, horizontal position of \a wid will be changed.
+*              If o = Qt::Vertical, vertical position of \a wid will be changed.
+* \param pos - position relatively workstack. Value in range [0..1].
+*/
+void QtxWorkstack::SetRelativePosition( QWidget* wid, const Qt::Orientation o,
+                                        const double position )
 {
-  if (position < 0.0 || 1.0 < position)
-    return;
-  if (!wid)
+  if ( position < 0.0 || 1.0 < position )
     return;
 
-  int splitter_size = (o == Horizontal ? mySplit->width() : mySplit->height());
-  int need_pos = int(position * splitter_size);
+  if ( !wid )
+    return;
+
+  int splitter_size = o == Horizontal ? mySplit->width() : mySplit->height();
+  int need_pos = int( position * splitter_size );
   int splitter_pos = 0;
 
-  if (setPosition(wid, mySplit, o, need_pos, splitter_pos) != 0) {
+  if ( setPosition( wid, mySplit, o, need_pos, splitter_pos ) != 0 )
+  {
     // impossible to set required position
   }
 }
 
-
+/*!
+* \brief Sets the action's accelerator key to accel. 
+* \param id - the key of the action in the actions map.
+* \param accel - action's accelerator key.
+*/
 void QtxWorkstack::setAccel( const int id, const int accel )
 {
-  if (!myActionsMap.contains(id))
+  if ( !myActionsMap.contains( id ) )
     return;
-  myActionsMap[id]->setAccel(accel);
+
+  myActionsMap[id]->setAccel( accel );
 }
 
-int QtxWorkstack::accel (const int id) const
+/*!
+* \brief Returns the action's accelerator key.
+* \param id - the key of the action in the actions map.
+* \retval int  - action's accelerator key.
+*/
+int QtxWorkstack::accel( const int id ) const
 {
-  if (!myActionsMap.contains(id))
-    return 0;
-  return myActionsMap[id]->accel();
+  int res = 0;
+  if ( myActionsMap.contains( id ) )
+    res = myActionsMap[id]->accel();
+  return res;
 }
 
 static int positionSimple (QIntList& szList, const int nb, const int splitter_size,
@@ -449,11 +484,25 @@ static int positionSimple (QIntList& szList, const int nb, const int splitter_si
   return delta;
 }
 
-int QtxWorkstack::setPosition (QWidget* wid, QSplitter* split,
-                               const Qt::Orientation o, const int need_pos,
-                               const int splitter_pos)
+/*!
+* \brief Set position of given widget.
+* \param wid          - widget to be moved
+* \param split        - currently processed splitter (goes from more common
+*                       to more particular splitter in recursion calls)
+* \param o            - orientation of positioning
+* \param need_pos     - required position of the given widget in pixels
+*                       (from top/left side of workstack area)
+* \param splitter_pos - position of the splitter \a split
+*                       (from top/left side of workstack area)
+* \retval int - returns difference between a required and a distinguished position.
+* 
+* Internal method. Recursively calls itself.
+* Is called from <VAR>SetRelativePosition</VAR> public method.
+*/
+int QtxWorkstack::setPosition( QWidget* wid, QSplitter* split, const Qt::Orientation o,
+                               const int need_pos, const int splitter_pos )
 {
-  if (!wid || !split)
+  if ( !wid || !split )
     return need_pos - splitter_pos;
 
   // Find corresponding sub-splitter.
@@ -462,7 +511,7 @@ int QtxWorkstack::setPosition (QWidget* wid, QSplitter* split,
   bool isBottom = false, isFound = false;
   QSplitter* sub_split = NULL;
   const QObjectList* objs = split->children();
-  if (objs)
+  if ( objs )
   {
     for (QObjectListIt it (*objs); it.current() && !isFound; ++it)
     {
@@ -631,7 +680,6 @@ int QtxWorkstack::setPosition (QWidget* wid, QSplitter* split,
 
   return 0;
 }
-// end: jfa 06.07.2005
 
 void QtxWorkstack::distributeSpace( QSplitter* split ) const
 {
@@ -654,12 +702,6 @@ void QtxWorkstack::splitVertical()
 void QtxWorkstack::splitHorizontal()
 {
   split( Qt::Horizontal );
-}
-
-void QtxWorkstack::onCloseWindow()
-{
-  if ( activeWindow() )
-    activeWindow()->close();
 }
 
 QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )
@@ -721,6 +763,15 @@ void QtxWorkstack::insertWidget( QWidget* wid, QWidget* pWid, QWidget* after )
 
   for ( QWidgetListIt itr( moveList ); itr.current(); ++itr )
     itr.current()->reparent( pWid, QPoint( 0, 0 ), map.contains( itr.current() ) ? map[itr.current()] : false );
+}
+
+/*!
+* \brief Closes the active window.
+*/
+void QtxWorkstack::onCloseWindow()
+{
+  if ( activeWindow() )
+    activeWindow()->close();
 }
 
 void QtxWorkstack::onDestroyed( QObject* obj )
