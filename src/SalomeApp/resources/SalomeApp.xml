@@ -74,11 +74,28 @@
     <!-- Here go other common user preferences -->
   </section>
   <section name="Geometry" >
+    <parameter value="10" name="SettingsGeomStep" />
+    <parameter value="0"  name="display_mode" />
     <parameter value="255, 255, 0" name="shading_color" />
   </section>
   <section name="SMESH">
     <parameter name="plugins" value="NETGENPlugin,GHS3DPlugin"/>
-    <!-- Here go SMESH module user preferences -->
+    <parameter value="255, 0,   0" name="node_color" />
+    <parameter value="0, 170, 255" name="fill_color" />
+    <parameter value="0, 170, 255" name="outline_color" />
+    <parameter value="0, 0,   255" name="backface_color" />
+    <parameter value="3" name="node_size" />
+    <parameter value="1" name="element_width" />
+    <parameter value="75" name="shrink_coeff" />
+    <parameter value="0, 255,   255" name="highlight_color" />
+    <parameter value="255, 255,   0" name="selection_element_color" />
+    <parameter value="255, 255, 255" name="selection_object_color" />
+    <parameter value="0.001" name="selection_precision_element" />
+    <parameter value="0.025" name="selection_precision_node" />
+    <parameter value="5" name="selection_width" />
+    <parameter value="5" name="highlight_width" />
+    <parameter value="0" name="controls_precision" />
+    <parameter value="true" name="DisplayMode" />
   </section>
   <!-- Here go optional sections for other modules -->
   <section name="resources">
