@@ -46,8 +46,9 @@ public:
   class DoubleEditItem;
   class IntegerSpinItem;
   class IntegerEditItem;
+  class FontItem;
 
-  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer };
+  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, Font, User };
 
 public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
@@ -348,6 +349,33 @@ public:
 
 private:
   QWidget*         myColor;
+};
+
+/*
+  Class: QtxListResourceEdit::FontItem
+  Descr: GUI implementation of resources font item.
+*/
+
+class QtxListResourceEdit::FontItem : public PrefItem
+{
+  Q_OBJECT
+  
+public:
+  FontItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
+  virtual ~FontItem();
+
+  virtual void     store();
+  virtual void     retrieve();
+
+protected slots:
+  void onSelectFont();
+  
+protected:
+  void buildFontPrs();
+
+private:
+  QFont           myFont;
+  QLabel*         myFontPrs;
 };
 
 #endif

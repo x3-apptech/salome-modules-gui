@@ -16,6 +16,8 @@
 #include <qobjectlist.h>
 #include <qcolordialog.h>
 #include <qwidgetstack.h>
+#include <qpushbutton.h>
+#include <qfontdialog.h>
 
 #include "QtxIntSpinBox.h"
 #include "QtxDblSpinBox.h"
@@ -358,6 +360,9 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
     break;
   case Space:
     item = new Spacer( resourceEdit(), this, this );
+    break;
+  case Font:
+    item = new FontItem( title, resourceEdit(), this, this );
     break;
   }
 
@@ -802,4 +807,57 @@ void QtxListResourceEdit::ColorItem::store()
 void QtxListResourceEdit::ColorItem::retrieve()
 {
   myColor->setPaletteBackgroundColor( getColor() );
+}
+
+
+/*
+  Class: QtxListResourceEdit::FontItem
+  Descr: GUI implementation of resources font item.
+*/
+QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
+: PrefItem( Font, edit, pItem, parent )
+{
+  new QLabel( title, this );
+  myFontPrs = new QLabel( "", this );
+  QPushButton* selFont = new QPushButton( "..", this );
+  connect( selFont, SIGNAL( clicked() ), this, SLOT( onSelectFont() ) );
+}
+
+QtxListResourceEdit::FontItem::~FontItem()
+{
+}
+
+void QtxListResourceEdit::FontItem::store()
+{
+  Item::setFont( myFont );
+}
+
+void QtxListResourceEdit::FontItem::retrieve()
+{
+  myFont = getFont();
+  buildFontPrs();
+}
+
+void QtxListResourceEdit::FontItem::buildFontPrs()
+{
+  QStringList fval;
+  fval.append( myFont.family() );
+  if( myFont.bold() )
+    fval.append( "Bold" );
+  if( myFont.italic() )
+    fval.append( "Italic" );
+  fval.append( QString( "%1" ).arg( myFont.pointSize() ) );
+  
+  myFontPrs->setText( fval.join( ", " ) );
+}
+
+void QtxListResourceEdit::FontItem::onSelectFont()
+{
+  bool ok;
+  QFont newFont = QFontDialog::getFont( &ok, myFont, this );
+  if( ok )
+  {
+    myFont = newFont;
+    buildFontPrs();
+  }
 }
