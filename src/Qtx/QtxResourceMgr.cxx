@@ -670,6 +670,11 @@ bool QtxResourceMgr::value( const QString& name, QColor& val ) const
   return value( currentSection(), name, val );
 }
 
+bool QtxResourceMgr::value( const QString& name, QFont& val ) const
+{
+  return value( currentSection(), name, val );
+}
+
 bool QtxResourceMgr::value( const QString& name, QString& val, const bool subst ) const
 {
   return value( currentSection(), name, val, subst );
@@ -751,6 +756,41 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QColor& cV
   return res;
 }
 
+bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVal ) const
+{
+  QString val = stringValue( sect, name, "" ).stripWhiteSpace();
+  QStringList font_values = QStringList::split( val, "," );
+  if( font_values.count()<2 || font_values.count()>4 )
+    return false;
+  
+  QString family = font_values[0];
+  bool isBold = false, isItalic = false, isOk = false;
+  int pSize = -1;
+  for( int i=1, n=font_values.count(); i<n; i++ )
+  {
+    if( !isBold && font_values[i].lower()=="bold" )
+      isBold = true;
+    else if( !isItalic && font_values[i].lower()=="italic" )
+      isItalic = true;
+    else if( pSize<0 )
+    {
+      pSize = font_values[i].toInt( &isOk );
+      if( !isOk )
+        pSize = -1;
+    }
+  }
+
+  if( pSize>0 && !family.isEmpty() )
+  {
+    fVal = QFont( family, pSize );
+    fVal.setBold( isBold );
+    fVal.setItalic( isItalic );
+    return true;
+  }
+  else
+    return false;
+}
+
 bool QtxResourceMgr::value( const QString& sect, const QString& name, QString& val, const bool subst ) const
 {
   initialize();
@@ -781,6 +821,11 @@ bool QtxResourceMgr::booleanValue( const QString& name, const bool def ) const
   return booleanValue( currentSection(), name, def );
 }
 
+QFont QtxResourceMgr::fontValue( const QString& name, const QFont& def ) const
+{
+  return fontValue( currentSection(), name, def );
+}
+  
 QColor QtxResourceMgr::colorValue( const QString& name, const QColor& def ) const
 {
   return colorValue( currentSection(), name, def );
@@ -813,6 +858,14 @@ bool QtxResourceMgr::booleanValue( const QString& sect, const QString& name, con
   if ( !value( sect, name, val ) )
     val = def;
   return val;
+}
+
+QFont QtxResourceMgr::fontValue( const QString& sect, const QString& name, const QFont& def ) const
+{
+  QFont font;
+  if( !value( sect, name, font ) )
+    font = def;
+  return font;
 }
 
 QColor QtxResourceMgr::colorValue( const QString& sect, const QString& name, const QColor& def ) const
@@ -878,6 +931,11 @@ void QtxResourceMgr::setValue( const QString& name, const QColor& val )
   setValue( currentSection(), name, val );
 }
 
+void QtxResourceMgr::setValue( const QString& name, const QFont& val )
+{
+  setValue( currentSection(), name, val );
+}
+
 void QtxResourceMgr::setValue( const QString& name, const QString& val )
 {
   setValue( currentSection(), name, val );
@@ -901,6 +959,19 @@ void QtxResourceMgr::setValue( const QString& sect, const QString& name, bool va
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QColor& val )
 {
   setValue( sect, name, QString( "%1, %2, %3").arg( val.red() ).arg( val.green() ).arg( val.blue() ) );
+}
+
+void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QFont& f )
+{
+  QStringList val;
+  val.append( f.family() );
+  if( f.bold() )
+    val.append( "Bold" );
+  if( f.italic() )
+    val.append( "Italic" );
+  val.append( QString( "%1" ).arg( f.pointSize() ) );
+  
+  setValue( sect, name, val.join( "," ) );
 }
 
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QString& val )

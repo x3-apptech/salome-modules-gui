@@ -5,6 +5,7 @@
 
 #include <qmap.h>
 #include <qcolor.h>
+#include <qfont.h>
 #include <qpixmap.h>
 #include <qstringlist.h>
 #include <qtranslator.h>
@@ -43,25 +44,29 @@ public:
   bool            value( const QString&, double& ) const;
   bool            value( const QString&, bool& ) const;
   bool            value( const QString&, QColor& ) const;
+  bool            value( const QString&, QFont& ) const;
   bool            value( const QString&, QString&, const bool = true ) const;
 
   bool            value( const QString&, const QString&, int& ) const;
   bool            value( const QString&, const QString&, double& ) const;
   bool            value( const QString&, const QString&, bool& ) const;
   bool            value( const QString&, const QString&, QColor& ) const;
+  bool            value( const QString&, const QString&, QFont& ) const;  
   bool            value( const QString&, const QString&, QString&, const bool = true ) const;
 
   int             integerValue( const QString&, const int = 0 ) const;
-  double          doubleValue( const QString&, const double = 0 ) const;
+  double          doubleValue ( const QString&, const double = 0 ) const;
   bool            booleanValue( const QString&, const bool = false ) const;
-  QColor          colorValue( const QString&, const QColor& = QColor() ) const;
-  QString         stringValue( const QString&, const char* = 0 ) const;
+  QColor          colorValue  ( const QString&, const QColor& = QColor() ) const;
+  QFont           fontValue   ( const QString&, const QFont& = QFont() ) const;
+  QString         stringValue ( const QString&, const char* = 0 ) const;
 
   int             integerValue( const QString&, const QString&, const int = 0 ) const;
-  double          doubleValue( const QString&, const QString&, const double = 0 ) const;
+  double          doubleValue ( const QString&, const QString&, const double = 0 ) const;
   bool            booleanValue( const QString&, const QString&, const bool = false ) const;
-  QColor          colorValue( const QString&, const QString&, const QColor& = QColor() ) const;
-  QString         stringValue( const QString&, const QString&, const char* = 0 ) const;
+  QColor          colorValue  ( const QString&, const QString&, const QColor& = QColor() ) const;
+  QFont           fontValue   ( const QString&, const QString&, const QFont& = QFont() ) const;  
+  QString         stringValue ( const QString&, const QString&, const char* = 0 ) const;
 
   bool            hasSection( const QString& ) const;
   bool            hasValue( const QString& ) const;
@@ -71,12 +76,14 @@ public:
   void            setValue( const QString&, const double );
   void            setValue( const QString&, const bool );
   void            setValue( const QString&, const QColor& );
+  void            setValue( const QString&, const QFont& );
   void            setValue( const QString&, const QString& );
 
   void            setValue( const QString&, const QString&, const int );
   void            setValue( const QString&, const QString&, const double );
   void            setValue( const QString&, const QString&, const bool );
   void            setValue( const QString&, const QString&, const QColor& );
+  void            setValue( const QString&, const QString&, const QFont& );
   void            setValue( const QString&, const QString&, const QString& );
 
   void            remove( const QString& );
