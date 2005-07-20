@@ -20,7 +20,10 @@
 #include <qcursor.h>
 #endif
 
-//****************************************************************
+/*!Constructor. Create render window with parant \a parent and name \a name.
+ *\param parent - parent window
+ *\param name   - render window name.
+ */
 VTKViewer_RenderWindow::VTKViewer_RenderWindow(QWidget* parent, const char* name) :
 QWidget(parent, name, 
         Qt::WStyle_NoBorder | Qt::WDestructiveClose | 
@@ -35,19 +38,19 @@ QWidget(parent, name,
   setMouseTracking(true);
 }
 
-//****************************************************************
+/*!Destructor.*/
 VTKViewer_RenderWindow::~VTKViewer_RenderWindow() 
 {
   myRW->Delete();
 }
 
-//****************************************************************
+/*!Call Render method for render window field.*/
 void VTKViewer_RenderWindow::paintEvent(QPaintEvent* theEvent) 
 {
   myRW->Render();
 }
 
-//****************************************************************
+/*!Resize render window.*/
 void VTKViewer_RenderWindow::resizeEvent(QResizeEvent* theEvent) 
 {
   int aWidth = myRW->GetSize()[0], aHeight = myRW->GetSize()[1];
@@ -69,49 +72,49 @@ void VTKViewer_RenderWindow::resizeEvent(QResizeEvent* theEvent)
   }
 }
 
-//****************************************************************
+/*!Emit mouse move event.*/
 void VTKViewer_RenderWindow::mouseMoveEvent(QMouseEvent* event) 
 {
   emit MouseMove(event) ;
 }
 
-//****************************************************************
+/*!Emit mouse button press event.*/
 void VTKViewer_RenderWindow::mousePressEvent(QMouseEvent* event) 
 {
   emit MouseButtonPressed( event );
 }
 
-//****************************************************************
+/*!Emit mouse button release event.*/
 void VTKViewer_RenderWindow::mouseReleaseEvent( QMouseEvent *event )
 {
   emit MouseButtonReleased( event );
 }
 
-//****************************************************************
+/*!Emit mouse button double click event.*/
 void VTKViewer_RenderWindow::mouseDoubleClickEvent( QMouseEvent* event )
 {
   emit MouseDoubleClicked( event );
 }
 
-//****************************************************************
+/*!Emit key pressed event.*/
 void VTKViewer_RenderWindow::keyPressEvent (QKeyEvent* event) 
 {
   emit KeyPressed(event) ;
 }
 
-//****************************************************************
+/*!Emit key release event.*/
 void VTKViewer_RenderWindow::keyReleaseEvent (QKeyEvent * event) 
 {
   emit KeyReleased(event) ;
 }
 
-//****************************************************************
+/*!Emit wheel move event.*/
 void VTKViewer_RenderWindow::wheelEvent(QWheelEvent* event)
 {
   emit WheelMoved(event) ;
 }
 
-//****************************************************************
+/*!Reaction on change background color.*/
 void VTKViewer_RenderWindow::onChangeBackgroundColor()
 {
   //float red, green, blue;
@@ -133,7 +136,7 @@ void VTKViewer_RenderWindow::onChangeBackgroundColor()
   }
 }
 
-//****************************************************************
+/*!Emit content menu requested.*/
 void VTKViewer_RenderWindow::contextMenuEvent ( QContextMenuEvent * e )
 {
   if ( e->reason() != QContextMenuEvent::Mouse )

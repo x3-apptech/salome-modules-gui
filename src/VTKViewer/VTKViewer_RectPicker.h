@@ -39,20 +39,16 @@
 class VTK_EXPORT VTKViewer_RectPicker : public vtkPicker
 {
 public:
+  /*!Create new instance of VTKViewer_RectPicker.*/
   static VTKViewer_RectPicker *New();
   vtkTypeMacro(VTKViewer_RectPicker,vtkPicker);
   
-  /*! \brief Perform pick operation with selection rectangle provided. Normally the 
-   * first two values for the selection top-left and right-bottom points are 
-   * x-y pixel coordinate, and the third value is =0. 
-   * \retval Return non-zero if something was successfully picked.
-   */
   virtual int Pick(float selectionX1, float selectionY1, float selectionZ1, 
 		   float selectionX2, float selectionY2, float selectionZ2,
                    vtkRenderer *renderer);  
 
   /*!
-   * \brief Perform pick operation with selection rectangle provided. Normally the first
+   * Perform pick operation with selection rectangle provided. Normally the first
    * two values for the selection top-left and right-bottom points are x-y pixel 
    * coordinate, and the third value is =0. 
    * \retval Return non-zero if something was successfully picked.
@@ -62,17 +58,8 @@ public:
 		       selectionPt2[0], selectionPt2[1], selectionPt2[2],
 		       ren);};
 
-  /*! \brief Bounding box intersection with hexahedron. Origin[4][4] starts the ray from corner points, 
-   * dir[4][3] is the vector components of the ray in the x-y-z directions. 
-   * (Notes: the intersection ray dir[4][3] is NOT normalized.)
-   * \retval The method returns a non-zero value, if the bounding box is hit.
-   */
   static char HitBBox(float bounds[6], float origin[4][4], float dir[4][3]);
 
-  /*! \brief Position of point relative to hexahedron. p1[4][4] is the corner points of top face, 
-   * p2[4][4] is the corner points of bottom face. 
-   * \retval The method returns a non-zero value, if the point is inside.
-   */
   static char PointInside(float point[3], float p1[4][4], float p2[4][4], float tol=0);
 
 protected:

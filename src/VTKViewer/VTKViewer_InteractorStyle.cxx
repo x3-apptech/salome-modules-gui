@@ -93,8 +93,9 @@ static int GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId)
 */
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(VTKViewer_InteractorStyle);
-//----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+/*!Constructor.*/
 VTKViewer_InteractorStyle::VTKViewer_InteractorStyle()
 {
   m_Trihedron = 0;
@@ -113,6 +114,7 @@ VTKViewer_InteractorStyle::VTKViewer_InteractorStyle()
 }
 
 //----------------------------------------------------------------------------
+/*!Destructor.*/
 VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle() 
 {
 //  if(MYDEBUG) INFOS("VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle()");
@@ -120,6 +122,12 @@ VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle()
 }
 
 //----------------------------------------------------------------------------
+/*!Set preselection properties.
+ *\param theRed   - red color.
+ *\param theGreen - green color.
+ *\param theBlue  - blue color.
+ *\param theWidth - width..
+ */
 void VTKViewer_InteractorStyle::setPreselectionProp(const double& theRed, const double& theGreen, 
 							  const double& theBlue, const int& theWidth) 
 {
@@ -131,12 +139,18 @@ void VTKViewer_InteractorStyle::setPreselectionProp(const double& theRed, const 
 }
 
 //----------------------------------------------------------------------------
+/*!Set render window interactor
+ *\param theInteractor - interactor.
+ */
 void VTKViewer_InteractorStyle::SetInteractor(vtkRenderWindowInteractor *theInteractor){
   m_Interactor = dynamic_cast<VTKViewer_RenderWindowInteractor*>(theInteractor);
   Superclass::SetInteractor(theInteractor);
 }
 
 //----------------------------------------------------------------------------
+/*!Set view window.
+ *\param theViewWnd - SALOME VTKViewer_ViewWindow
+ */
 void VTKViewer_InteractorStyle::setViewWnd(VTKViewer_ViewWindow* theViewWnd ){
   m_ViewWnd = theViewWnd;
   m_ViewWnd->AddActor(myPreSelectionActor);
@@ -144,16 +158,26 @@ void VTKViewer_InteractorStyle::setViewWnd(VTKViewer_ViewWindow* theViewWnd ){
 }
 
 //----------------------------------------------------------------------------
+/*!Set GUI window.
+ *\param theWindow - QWidget window.
+ */
 void VTKViewer_InteractorStyle::setGUIWindow(QWidget* theWindow){
   myGUIWindow = theWindow;
 }
 
 //----------------------------------------------------------------------------
+/*!Set triedron.
+ *\param theTrihedron - SALOME VTKViewer_Trihedron
+ */
 void VTKViewer_InteractorStyle::setTriedron(VTKViewer_Trihedron* theTrihedron){
   m_Trihedron = theTrihedron;
 }
 
 //----------------------------------------------------------------------------
+/*!Rotate camera.
+ *\param dx - 
+ *\param dy - 
+ */
 void VTKViewer_InteractorStyle::RotateXY(int dx, int dy)
 {
   double rxf;
@@ -191,6 +215,7 @@ void VTKViewer_InteractorStyle::PanXY(int x, int y, int oldX, int oldY)
 
 
 //----------------------------------------------------------------------------
+/*! Move the position of the camera along the direction of projection. (dx,dy)*/
 void VTKViewer_InteractorStyle::DollyXY(int dx, int dy)
 {
   if (this->CurrentRenderer == NULL) return;
@@ -213,6 +238,7 @@ void VTKViewer_InteractorStyle::DollyXY(int dx, int dy)
 }
 
 //----------------------------------------------------------------------------
+/*!*/
 void VTKViewer_InteractorStyle::SpinXY(int x, int y, int oldX, int oldY)
 {
   vtkCamera *cam;
@@ -240,6 +266,12 @@ void VTKViewer_InteractorStyle::SpinXY(int x, int y, int oldX, int oldY)
 
 
 //----------------------------------------------------------------------------
+/*!On mouse move event.
+ *\param ctrl  - CTRL (not used)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate
+ *\param y - y coordinate
+ */
 void VTKViewer_InteractorStyle::OnMouseMove(int vtkNotUsed(ctrl), 
 						  int shift,
 						  int x, int y) 
@@ -253,6 +285,12 @@ void VTKViewer_InteractorStyle::OnMouseMove(int vtkNotUsed(ctrl),
 
 
 //----------------------------------------------------------------------------
+/*!On Left button down event.
+ *\param ctrl  - CTRL  (on/off - integer 0/1)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate
+ *\param y - y coordinate
+ */
 void VTKViewer_InteractorStyle::OnLeftButtonDown(int ctrl, int shift, 
 						       int x, int y) 
 {
@@ -284,6 +322,12 @@ void VTKViewer_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
 
 
 //----------------------------------------------------------------------------
+/*!On left button up event.
+ *\param ctrl  - CTRL  (not used)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate (not used)
+ *\param y - y coordinate (not used)
+ */
 void VTKViewer_InteractorStyle::OnLeftButtonUp(int vtkNotUsed(ctrl),
 						     int shift, 
 						     int vtkNotUsed(x),
@@ -299,6 +343,12 @@ void VTKViewer_InteractorStyle::OnLeftButtonUp(int vtkNotUsed(ctrl),
 
 
 //----------------------------------------------------------------------------
+/*!On left button up event.
+ *\param ctrl  - CTRL  (on/off - integer 0/1)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate
+ *\param y - y coordinate
+ */
 void VTKViewer_InteractorStyle::OnMiddleButtonDown(int ctrl,
 							 int shift, 
 							 int x, int y) 
@@ -331,6 +381,12 @@ void VTKViewer_InteractorStyle::OnMiddleButtonDown(int ctrl,
 
 
 //----------------------------------------------------------------------------
+/*!On middle button up event.
+ *\param ctrl  - CTRL  (not used)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate (not used)
+ *\param y - y coordinate (not used)
+ */
 void VTKViewer_InteractorStyle::OnMiddleButtonUp(int vtkNotUsed(ctrl),
 						       int shift, 
 						       int vtkNotUsed(x),
@@ -346,6 +402,12 @@ void VTKViewer_InteractorStyle::OnMiddleButtonUp(int vtkNotUsed(ctrl),
 
 
 //----------------------------------------------------------------------------
+/*!On right button down event.
+ *\param ctrl  - CTRL  (on/off - integer 0/1)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate
+ *\param y - y coordinate
+ */
 void VTKViewer_InteractorStyle::OnRightButtonDown(int ctrl,
 							int shift, 
 							int x, int y) 
@@ -377,6 +439,12 @@ void VTKViewer_InteractorStyle::OnRightButtonDown(int ctrl,
 }
 
 //----------------------------------------------------------------------------
+/*!On right button up event.
+ *\param ctrl  - CTRL  (not used)
+ *\param shift - SHIFT (on/off - integer 0/1)
+ *\param x - x coordinate (not used)
+ *\param y - y coordinate (not used)
+ */
 void VTKViewer_InteractorStyle::OnRightButtonUp(int vtkNotUsed(ctrl),
 						      int shift, 
 						      int vtkNotUsed(x),
@@ -391,7 +459,9 @@ void VTKViewer_InteractorStyle::OnRightButtonUp(int vtkNotUsed(ctrl),
 }
 
 //----------------------------------------------------------------------------
-/* XPM */
+/** @name XPM - x pixmaps. */
+//@{
+/*!Image Zoom cursor*/
 const char* imageZoomCursor[] = { 
 "32 32 3 1",
 ". c None",
@@ -430,6 +500,7 @@ const char* imageZoomCursor[] = {
 "................................",
 "................................"};
 
+/*!Image rotate cursor*/
 const char* imageRotateCursor[] = { 
 "32 32 3 1",
 ". c None",
@@ -467,10 +538,10 @@ const char* imageRotateCursor[] = {
 "................................",
 "................................",
 "................................"};
-
+//@}
 
 //----------------------------------------------------------------------------
-// loads cursors for viewer operations - zoom, pan, etc...
+/*! Loads cursors for viewer operations - zoom, pan, etc...*/
 void VTKViewer_InteractorStyle::loadCursors()
 {
   myDefCursor       = QCursor(ArrowCursor);
@@ -485,7 +556,7 @@ void VTKViewer_InteractorStyle::loadCursors()
 
 
 //----------------------------------------------------------------------------
-// event filter - controls mouse and keyboard events during viewer operations
+/*! event filter - controls mouse and keyboard events during viewer operations*/
 bool VTKViewer_InteractorStyle::eventFilter(QObject* object, QEvent* event)
 {
   if (!myGUIWindow) return false;
@@ -499,7 +570,7 @@ bool VTKViewer_InteractorStyle::eventFilter(QObject* object, QEvent* event)
 
 
 //----------------------------------------------------------------------------
-// starts Zoom operation (e.g. through menu command)
+/*! starts Zoom operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startZoom()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -514,7 +585,7 @@ void VTKViewer_InteractorStyle::startZoom()
 
 
 //----------------------------------------------------------------------------
-// starts Pan operation (e.g. through menu command)
+/*! starts Pan operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startPan()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -528,7 +599,7 @@ void VTKViewer_InteractorStyle::startPan()
 }
 
 //----------------------------------------------------------------------------
-// starts Rotate operation (e.g. through menu command)
+/*! starts Rotate operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startRotate()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -543,7 +614,7 @@ void VTKViewer_InteractorStyle::startRotate()
 
 
 //----------------------------------------------------------------------------
-// starts Spin operation (e.g. through menu command)
+/*! starts Spin operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startSpin()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -559,7 +630,7 @@ void VTKViewer_InteractorStyle::startSpin()
 
 
 //----------------------------------------------------------------------------
-// starts Fit Area operation (e.g. through menu command)
+/*! starts Fit Area operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startFitArea()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -574,6 +645,7 @@ void VTKViewer_InteractorStyle::startFitArea()
 
 
 //----------------------------------------------------------------------------
+/*!View fit all.*/
 void  VTKViewer_InteractorStyle::ViewFitAll() {
   int aTriedronWasVisible = false;
   if(m_Trihedron){
@@ -595,7 +667,7 @@ void  VTKViewer_InteractorStyle::ViewFitAll() {
 
 
 //----------------------------------------------------------------------------
-// starts Global Panning operation (e.g. through menu command)
+/*! starts Global Panning operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startGlobalPan()
 {
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -619,7 +691,7 @@ void VTKViewer_InteractorStyle::startGlobalPan()
 
 
 //----------------------------------------------------------------------------
-// returns TRUE if needs redrawing
+/*!\retval TRUE if needs redrawing*/
 bool VTKViewer_InteractorStyle::needsRedrawing()
 {
   return State == VTK_INTERACTOR_STYLE_CAMERA_ZOOM   ||
@@ -631,7 +703,12 @@ bool VTKViewer_InteractorStyle::needsRedrawing()
 
 
 //----------------------------------------------------------------------------
-// fits viewer contents to rect
+/*! fits viewer contents to rectangle
+ *\param left - left side
+ *\param top  - top side
+ *\param right  - right side
+ *\param bottom  - bottom side 
+ */
 void VTKViewer_InteractorStyle::fitRect(const int left, 
                                        const int top, 
                                        const int right, 
@@ -665,7 +742,7 @@ void VTKViewer_InteractorStyle::fitRect(const int left,
 
 
 //----------------------------------------------------------------------------
-// starts viewer operation (!internal usage!)
+/*! starts viewer operation (!internal usage!)*/
 void VTKViewer_InteractorStyle::startOperation(int operation)
 {
   switch(operation)
@@ -694,7 +771,7 @@ void VTKViewer_InteractorStyle::startOperation(int operation)
 
 
 //----------------------------------------------------------------------------
-// sets proper cursor for window when viewer operation is activated
+/*! sets proper cursor for window when viewer operation is activated*/
 void VTKViewer_InteractorStyle::setCursor(const int operation)
 {
   if (!myGUIWindow) return;
@@ -735,7 +812,7 @@ void VTKViewer_InteractorStyle::setCursor(const int operation)
 
 
 //----------------------------------------------------------------------------
-// called when viewer operation started (!put necessary initialization here!)
+/*! called when viewer operation started (!put necessary initialization here!)*/
 void VTKViewer_InteractorStyle::onStartOperation()
 {
   if (!myGUIWindow) return;
@@ -762,7 +839,7 @@ void VTKViewer_InteractorStyle::onStartOperation()
 
 
 //----------------------------------------------------------------------------
-// called when viewer operation finished (!put necessary post-processing here!)
+/*! called when viewer operation finished (!put necessary post-processing here!)*/
 void VTKViewer_InteractorStyle::onFinishOperation() 
 {
   if (!myGUIWindow) return;
@@ -1076,7 +1153,7 @@ void VTKViewer_InteractorStyle::onFinishOperation()
 */
 }
 
-// called during viewer operation when user moves mouse (!put necessary processing here!)
+/*! called during viewer operation when user moves mouse (!put necessary processing here!)*/
 void VTKViewer_InteractorStyle::onOperation(QPoint mousePos) 
 {
   if (!myGUIWindow) return;
@@ -1139,7 +1216,7 @@ void VTKViewer_InteractorStyle::onOperation(QPoint mousePos)
   this->LastPos[1] = h - mousePos.y() - 1;
 }
 
-// called when selection mode changed (!put necessary initialization here!)
+/*! called when selection mode changed (!put necessary initialization here!)*/
 void VTKViewer_InteractorStyle::OnSelectionModeChanged()
 {
   
@@ -1148,8 +1225,9 @@ void VTKViewer_InteractorStyle::OnSelectionModeChanged()
   mySelectedActor = NULL;
 }
 
-// called when user moves mouse inside viewer window and there is no active viewer operation 
-// (!put necessary processing here!)
+/*! called when user moves mouse inside viewer window and there is no active viewer operation \n
+ * (!put necessary processing here!)
+ */
 void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
   // processing highlighting
 //  SUIT_Study* anActiveStudy = SUIT_Application::getDesktop()->getActiveStudy();
@@ -1273,7 +1351,7 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
   this->LastPos[1] = y;*/
 }
 
-// called on finsh GlobalPan operation 
+/*! called on finsh GlobalPan operation */
 void VTKViewer_InteractorStyle::Place(const int theX, const int theY) 
 {
   if (this->CurrentRenderer == NULL) {
@@ -1298,7 +1376,7 @@ void VTKViewer_InteractorStyle::Place(const int theX, const int theY)
 
 
 
-// Translates view from Point to Point
+/*! Translates view from Point to Point*/
 void VTKViewer_InteractorStyle::TranslateView(int toX, int toY, int fromX, int fromY)
 {
   vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
@@ -1331,7 +1409,7 @@ void VTKViewer_InteractorStyle::TranslateView(int toX, int toY, int fromX, int f
 }
 
 
-/// Checks: is the given Actor within display coordinates?
+/*! Checks: is the given Actor within display coordinates?*/
 bool VTKViewer_InteractorStyle::IsInRect(vtkActor* theActor, 
 					       const int left, const int top, 
 					       const int right, const int bottom)
@@ -1355,7 +1433,7 @@ bool VTKViewer_InteractorStyle::IsInRect(vtkActor* theActor,
 }
 
 
-/// Checks: is the given Cell within display coordinates?
+/*! Checks: is the given Cell within display coordinates?*/
 bool VTKViewer_InteractorStyle::IsInRect(vtkCell* theCell, 
 					       const int left, const int top, 
 					       const int right, const int bottom)
@@ -1378,7 +1456,7 @@ bool VTKViewer_InteractorStyle::IsInRect(vtkCell* theCell,
   return ((aMin[0]>left) && (aMax[0]<right) && (aMin[1]>bottom) && (aMax[1]<top));
 }
 
-
+/*!Checks: is given point \a thePoint in rectangle*/
 bool VTKViewer_InteractorStyle::IsInRect(float* thePoint, 
 					       const int left, const int top, 
 					       const int right, const int bottom)
@@ -1389,23 +1467,34 @@ bool VTKViewer_InteractorStyle::IsInRect(float* thePoint,
   return ((aPnt[0]>left) && (aPnt[0]<right) && (aPnt[1]>bottom) && (aPnt[1]<top));
 }
 
+/*!Set filter \a theFilter*/
 void  VTKViewer_InteractorStyle::SetFilter( const Handle(VTKViewer_Filter)& theFilter )
 {
   myFilters[ theFilter->GetId() ] = theFilter;
 }
 
+/*!Checks: is filter present (with id \a theId)
+ *\param theId - filter id.
+ */
 bool  VTKViewer_InteractorStyle::IsFilterPresent( const int theId )
 {
   return myFilters.find( theId ) != myFilters.end();
 }
 
+/*!Remove filter with id \a theId.
+ *\param theId - filter id.
+ */
 void  VTKViewer_InteractorStyle::RemoveFilter( const int theId )
 {
   if ( IsFilterPresent( theId ) )
     myFilters.erase( theId );
 }
 
-
+/*!Checks: is valid cell(node) with id \a theId in actor \a theActor.
+ *\param theActor - VTKViewer_Actor pointer.
+ *\param theId    - cell id.
+ *\param theIsNode - boolean flag, if true - node, else - cell.
+ */
 bool VTKViewer_InteractorStyle::IsValid( VTKViewer_Actor* theActor,
                                                const int     theId,
                                                const bool    theIsNode )
@@ -1421,21 +1510,33 @@ bool VTKViewer_InteractorStyle::IsValid( VTKViewer_Actor* theActor,
   return true;
 }
 
+/*!Gets filter handle by filter id \a theId.*/
 Handle(VTKViewer_Filter) VTKViewer_InteractorStyle::GetFilter( const int theId )
 {
   return IsFilterPresent( theId ) ? myFilters[ theId ] : Handle(VTKViewer_Filter)();
 }
 
+/*!Increment pan.
+ *\param incrX - X coordinate increment.
+ *\param incrY - Y coordinate increment.
+ */
 void VTKViewer_InteractorStyle::IncrementalPan( const int incrX, const int incrY )
 {
   this->PanXY( incrX, incrY, 0, 0 );
 }
 
+/*!Increment zoom.
+ *\param incr - zoom increment.
+ */
 void VTKViewer_InteractorStyle::IncrementalZoom( const int incr )
 {
   this->DollyXY( incr, incr );
 }
 
+/*!Increment rotate.
+ *\param incrX - X coordinate increment.
+ *\param incrY - Y coordinate increment.
+ */
 void VTKViewer_InteractorStyle::IncrementalRotate( const int incrX, const int incrY )
 {
   this->RotateXY( incrX, -incrY );

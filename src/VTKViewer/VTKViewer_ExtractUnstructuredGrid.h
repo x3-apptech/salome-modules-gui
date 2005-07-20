@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 /*! \class vtkUnstructuredGridToUnstructuredGridFilter
- * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
+ * \brief For more information see <a href="http://www.vtk.org/">VTK documentation</a>
  */
 /*! \class vtkUnstructuredGridToUnstructuredGridFilter
  * \brief For more information see VTK documentation.

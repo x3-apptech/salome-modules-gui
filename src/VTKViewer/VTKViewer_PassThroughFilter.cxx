@@ -36,6 +36,13 @@
 vtkCxxRevisionMacro(VTKViewer_PassThroughFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_PassThroughFilter);
 
+/*! \class VTKViewer_PassThroughFilter
+ * Passive filter take a dataset as input and create a dataset as output.\n
+ * The form of the input geometry is not changed in these filters, \n
+ * only the point attributes (e.g. scalars, vectors, etc.). 
+ */
+
+/*!Execute method.Output calculation.*/
 void VTKViewer_PassThroughFilter::Execute()
 {
   vtkDataSet *input = static_cast<vtkDataSet*>(this->GetInput());
@@ -44,13 +51,18 @@ void VTKViewer_PassThroughFilter::Execute()
   // This has to be here because it initialized all field datas.
   output->CopyStructure( input );
   
-  // Pass all. (data object's field data is passed by the
-  // superclass after this method)
+  //! Pass all. (data object's field data is passed by the
+  //! superclass after this method)
   output->GetPointData()->PassData( input->GetPointData() );
   output->GetCellData()->PassData( input->GetCellData() );
 
 }
 
+/*!Methods invoked by print to print information about the object including superclasses.\n
+ * Typically not called by the user (use Print() instead) but used in the hierarchical \n
+ * print process to combine the output of several classes. 
+ *\param os - output stream.
+ */
 void VTKViewer_PassThroughFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

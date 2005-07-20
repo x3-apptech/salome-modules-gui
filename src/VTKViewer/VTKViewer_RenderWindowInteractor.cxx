@@ -37,7 +37,7 @@
 // QT Includes
 #include <qkeycode.h>
 
-//****************************************************************
+/*! Create new instance of VTKViewer_RenderWindowInteractor*/
 VTKViewer_RenderWindowInteractor* VTKViewer_RenderWindowInteractor::New() 
 {
   vtkObject *ret = vtkObjectFactory::CreateInstance("VTKViewer_RenderWindowInteractor") ;
@@ -47,7 +47,7 @@ VTKViewer_RenderWindowInteractor* VTKViewer_RenderWindowInteractor::New()
   return new VTKViewer_RenderWindowInteractor;
 }
 
-//****************************************************************
+/*!Constructor.*/
 VTKViewer_RenderWindowInteractor::VTKViewer_RenderWindowInteractor() 
 {
   this->Enabled = 0 ;
@@ -79,7 +79,7 @@ VTKViewer_RenderWindowInteractor::VTKViewer_RenderWindowInteractor()
   connect(mTimer, SIGNAL(timeout()), this, SLOT(TimerFunc())) ;
 }
 
-//****************************************************************
+/*!Destructor.*/
 VTKViewer_RenderWindowInteractor::~VTKViewer_RenderWindowInteractor() 
 {
   delete mTimer ;
@@ -99,7 +99,6 @@ VTKViewer_RenderWindowInteractor::~VTKViewer_RenderWindowInteractor()
   myPointPicker->Delete();
 }
 
-//****************************************************************
 void VTKViewer_RenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent) 
 {
   vtkRenderWindowInteractor::PrintSelf(os, indent) ;
@@ -111,10 +110,13 @@ void VTKViewer_RenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent)
   //
 }
 
-//****************************************************************
-// We never allow the VTKViewer_RenderWindowInteractor to control 
-// the event loop. The application always has the control. 
-//
+/*!Description:\n
+ * Initializes the event handlers without an XtAppContext.  This is \n
+ * good for when you don`t have a user interface, but you still \n
+ * want to have mouse interaction.\n
+ * We never allow the VTKViewer_RenderWindowInteractor to control \n
+ * the event loop. The application always has the control.
+ */
 void VTKViewer_RenderWindowInteractor::Initialize()
 {
   //
@@ -168,8 +170,7 @@ void VTKViewer_RenderWindowInteractor::Initialize()
   return ;
 }
 
-
-//----------------------------------------------------------------------------
+/*!Sets view window and add to it selection actors.*/
 void VTKViewer_RenderWindowInteractor::setViewWindow(VTKViewer_ViewWindow* theViewWnd){
   myViewWnd = theViewWnd;
 
@@ -180,7 +181,7 @@ void VTKViewer_RenderWindowInteractor::setViewWindow(VTKViewer_ViewWindow* theVi
   }
 }
 
-//----------------------------------------------------------------------------
+/*!Move selection actors to view window.*/
 void VTKViewer_RenderWindowInteractor::MoveInternalActors()
 {
   myViewWnd->MoveActor(myCellActor);
@@ -188,14 +189,15 @@ void VTKViewer_RenderWindowInteractor::MoveInternalActors()
   myViewWnd->MoveActor(myPointActor);
 }
 
-//----------------------------------------------------------------------------
+/*!Sets interactor style.*/
 void VTKViewer_RenderWindowInteractor::SetInteractorStyle(vtkInteractorObserver *theInteractor){
   myInteractorStyle = dynamic_cast<VTKViewer_InteractorStyle*>(theInteractor);
   vtkRenderWindowInteractor::SetInteractorStyle(theInteractor);
 }
 
 
-/*void VTKViewer_RenderWindowInteractor::SetSelectionMode(Selection_Mode theMode)
+/*
+void VTKViewer_RenderWindowInteractor::SetSelectionMode(Selection_Mode theMode)
 {
   myCellActor->SetVisibility(false);
   myEdgeActor->SetVisibility(false);
@@ -218,9 +220,15 @@ void VTKViewer_RenderWindowInteractor::SetInteractorStyle(vtkInteractorObserver 
   }
 
   myInteractorStyle->OnSelectionModeChanged();
-}*/
+}
+*/
 
-//****************************************************************
+/*!Sets selection properties.
+ *\param theRed - red component of color
+ *\param theGreen - green component of color
+ *\param theBlue - blue component of color
+ *\param theWidth - point size and line width
+ */
 void VTKViewer_RenderWindowInteractor::SetSelectionProp(const double& theRed, const double& theGreen, 
                                                         const double& theBlue, const int& theWidth) 
 {
@@ -231,7 +239,10 @@ void VTKViewer_RenderWindowInteractor::SetSelectionProp(const double& theRed, co
   myPointActor->GetProperty()->SetPointSize(theWidth);
 }
 
-//****************************************************************
+/*!Sets selection tolerance
+ *\param theTolNodes - nodes selection tolerance
+ *\param theTolItems - selection tolerance for basic and cell pickers.
+ */
 void VTKViewer_RenderWindowInteractor::SetSelectionTolerance(const double& theTolNodes, const double& theTolItems)
 {
   myTolNodes = theTolNodes;
@@ -243,7 +254,15 @@ void VTKViewer_RenderWindowInteractor::SetSelectionTolerance(const double& theTo
 
 }
 
-//****************************************************************
+/*! Description:\n
+ * Enable/Disable interactions.  By default interactors are enabled when \n
+ * initialized.  Initialize() must be called prior to enabling/disabling \n
+ * interaction. These methods are used when a window/widget is being \n
+ * shared by multiple renderers and interactors.  This allows a "modal" \n
+ * display where one interactor is active when its data is to be displayed \n
+ * and all other interactors associated with the widget are disabled \n
+ * when their data is not displayed.
+ */
 void VTKViewer_RenderWindowInteractor::Enable()
 {
   //
@@ -257,7 +276,7 @@ void VTKViewer_RenderWindowInteractor::Enable()
   this->Modified() ;
 }
 
-//****************************************************************
+/*!See Enable().*/
 void VTKViewer_RenderWindowInteractor::Disable()
 {
   if( ! this->Enabled ) {
@@ -268,7 +287,11 @@ void VTKViewer_RenderWindowInteractor::Disable()
   this->Modified() ;
 }
 
-//****************************************************************
+/*!Description:\n
+ * This will start up the X event loop and never return. If you \n
+ * call this method it will loop processing X events until the \n
+ * application is exited.
+ */
 void VTKViewer_RenderWindowInteractor::Start()
 {
   //
@@ -279,7 +302,9 @@ void VTKViewer_RenderWindowInteractor::Start()
   vtkErrorMacro(<<"VTKViewer_RenderWindowInteractor::Start() not allowed to start event loop.") ;
 }
 
-//****************************************************************
+/*! Description:\n
+ * Event loop notification member for Window size change
+ */
 void VTKViewer_RenderWindowInteractor::UpdateSize(int w, int h)
 {
   // if the size changed send this on to the RenderWindow
@@ -290,35 +315,48 @@ void VTKViewer_RenderWindowInteractor::UpdateSize(int w, int h)
   }
 }
 
-//****************************************************************
+/*! Description: 
+ * Timer methods must be overridden by platform dependent subclasses.
+ * flag is passed to indicate if this is first timer set or an update 
+ * as Win32 uses repeating timers, whereas X uses One shot more timer 
+ * if flag == VTKXI_TIMER_FIRST Win32 and X should createtimer 
+ * otherwise Win32 should exit and X should perform AddTimeOut
+ * \retval 1
+ */
 int VTKViewer_RenderWindowInteractor::CreateTimer(int vtkNotUsed(timertype))
 {
-  //
-  // Start a one-shot timer for 10ms. 
-  //
+  ///
+  /// Start a one-shot timer for 10ms.
+  ///
   mTimer->start(10, TRUE) ;
   return 1 ;
 }
 
-//****************************************************************
+/**@see CreateTimer(int )
+ *\retval 1
+ */
 int VTKViewer_RenderWindowInteractor::DestroyTimer(void)
 {
   //
   // :TRICKY: Tue May  2 00:17:32 2000 Pagey
   //
-  // QTimer will automatically expire after 10ms. So 
-  // we do not need to do anything here. In fact, we 
-  // should not even Stop() the QTimer here because doing 
-  // this will skip some of the processing that the TimerFunc()
-  // does and will result in undesirable effects. For 
-  // example, this will result in vtkLODActor to leave
-  // the models in low-res mode after the mouse stops
-  // moving. 
-  //
+  /*! QTimer will automatically expire after 10ms. So 
+   * we do not need to do anything here. In fact, we 
+   * should not even Stop() the QTimer here because doing 
+   * this will skip some of the processing that the TimerFunc()
+   * does and will result in undesirable effects. For 
+   * example, this will result in vtkLODActor to leave
+   * the models in low-res mode after the mouse stops
+   * moving. 
+   */
   return 1 ;
 }
 
-//****************************************************************
+/*! Not all of these slots are needed in VTK_MAJOR_VERSION=3,\n
+ * but moc does not understand "#if VTK_MAJOR_VERSION". Hence, \n
+ * we have to include all of these for the time being. Once,\n
+ * this bug in MOC is fixed, we can separate these. 
+ */
 void VTKViewer_RenderWindowInteractor::TimerFunc()
 {
   if( ! this->Enabled ) {
@@ -329,6 +367,8 @@ void VTKViewer_RenderWindowInteractor::TimerFunc()
   emit RenderWindowModified() ;
 }
 
+/*!Emit render window modified on mouse move,\n
+ *if interactor style needs redrawing and render window enabled.*/
 void VTKViewer_RenderWindowInteractor::MouseMove(QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -338,6 +378,10 @@ void VTKViewer_RenderWindowInteractor::MouseMove(QMouseEvent *event) {
     emit RenderWindowModified() ; 
 }
 
+/*!Reaction on left button pressed.\n
+ *Same as left button down for interactor style.\n
+ *If render window enabled.
+ */
 void VTKViewer_RenderWindowInteractor::LeftButtonPressed(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -347,6 +391,10 @@ void VTKViewer_RenderWindowInteractor::LeftButtonPressed(const QMouseEvent *even
 				      event->x(), event->y());
 }
 
+/*!Reaction on left button releases.\n
+ *Same as left button up for interactor style.\n
+ *If render window enabled.
+ */
 void VTKViewer_RenderWindowInteractor::LeftButtonReleased(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -356,6 +404,10 @@ void VTKViewer_RenderWindowInteractor::LeftButtonReleased(const QMouseEvent *eve
 				     event->x(), event->y() ) ;
 }
 
+/*!Reaction on middle button pressed.\n
+ *Same as middle button down for interactor style.\n
+ *If render window enabled.
+ */
 void VTKViewer_RenderWindowInteractor::MiddleButtonPressed(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -365,6 +417,10 @@ void VTKViewer_RenderWindowInteractor::MiddleButtonPressed(const QMouseEvent *ev
 					event->x(), event->y() ) ;
 }
 
+/*!Reaction on middle button released.\n
+ *Same as middle button up for interactor style.\n
+ *If render window enabled.
+ */
 void VTKViewer_RenderWindowInteractor::MiddleButtonReleased(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -374,6 +430,10 @@ void VTKViewer_RenderWindowInteractor::MiddleButtonReleased(const QMouseEvent *e
 				       event->x(), event->y() ) ;
 }
 
+/*!Reaction on right button pressed.\n
+ *Same as right button down for interactor style.\n
+ *If render window enabled.
+ */
 void VTKViewer_RenderWindowInteractor::RightButtonPressed(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -383,6 +443,10 @@ void VTKViewer_RenderWindowInteractor::RightButtonPressed(const QMouseEvent *eve
 					event->x(), event->y() ) ;
 }
 
+/*!Reaction on right button released.\n
+ *Same as right button up for interactor style.If render window enabled.\n
+ *Emit context menu requested, if interactor style state equal VTK_INTERACTOR_STYLE_CAMERA_NONE.
+ */
 void VTKViewer_RenderWindowInteractor::RightButtonReleased(const QMouseEvent *event) {
   if( ! this->Enabled ) {
     return ;
@@ -400,19 +464,26 @@ void VTKViewer_RenderWindowInteractor::RightButtonReleased(const QMouseEvent *ev
   }
 }
 
+/*!Reaction on button pressed.
+ *\warning Do nothing.
+ */
 void VTKViewer_RenderWindowInteractor::ButtonPressed(const QMouseEvent *event) {
   return ;
 }
 
+/*!Reaction on button released..
+ *\warning Do nothing.
+ */
 void VTKViewer_RenderWindowInteractor::ButtonReleased(const QMouseEvent *event) {
   return ;
 }
 
-
+/*!Gets display mode.*/
 int VTKViewer_RenderWindowInteractor::GetDisplayMode() {
   return myDisplayMode;
 }
 
+/*!Sets display mode.*/
 void VTKViewer_RenderWindowInteractor::SetDisplayMode(int theMode) {
   if(theMode == 0)
     ChangeRepresentationToWireframe();
@@ -421,20 +492,21 @@ void VTKViewer_RenderWindowInteractor::SetDisplayMode(int theMode) {
   myDisplayMode = theMode;
 }
 
-//****************************************************************
+/*!Change all actors to wireframe*/
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToWireframe()
-// change all actors to wireframe
 {
   ChangeRepresentationToWireframe(GetRenderer()->GetActors());
 }
 
-//****************************************************************
+/*!Change all actors to surface*/
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurface()
 {
   ChangeRepresentationToSurface(GetRenderer()->GetActors());
 }
 
-
+/*!Change all actors from \a theCollection to wireframe and
+ * emit render window modified.
+ */
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToWireframe(vtkActorCollection* theCollection)
 {
   using namespace VTK;
@@ -444,6 +516,9 @@ void VTKViewer_RenderWindowInteractor::ChangeRepresentationToWireframe(vtkActorC
   emit RenderWindowModified();
 }
 
+/*!Change all actors from \a theCollection to surface and
+ * emit render window modified.
+ */
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurface(vtkActorCollection* theCollection)
 {
   using namespace VTK;
@@ -453,7 +528,7 @@ void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurface(vtkActorCol
   emit RenderWindowModified();
 }
 
-//****************************************************************
+/*!Gets renderer.*/
 vtkRenderer* VTKViewer_RenderWindowInteractor::GetRenderer()
 {
   vtkRendererCollection * theRenderers =  this->RenderWindow->GetRenderers();
@@ -461,12 +536,14 @@ vtkRenderer* VTKViewer_RenderWindowInteractor::GetRenderer()
   return theRenderers->GetNextItem();
 }
 
-//****************************************************************
+/*!Do nothing*/
 void VTKViewer_RenderWindowInteractor::EraseAll()
 {
 }
 
-//****************************************************************
+/*!Display all actors.
+ *Sets visible for all actors from renderer collection and emit render window modified.
+ */
 void VTKViewer_RenderWindowInteractor::DisplayAll()
 {
   using namespace VTK;
@@ -476,11 +553,12 @@ void VTKViewer_RenderWindowInteractor::DisplayAll()
   emit RenderWindowModified() ;
 }
 
-//****************************************************************
+/*!Do nothing*/
 void VTKViewer_RenderWindowInteractor::Erase( VTKViewer_Actor* SActor, bool update)
 {
 }
 
+/*!Remove \a SActor from renderer and emit update window, if \a updateViewer - true*/
 void VTKViewer_RenderWindowInteractor::Remove( VTKViewer_Actor* SActor, bool updateViewer )
 {
   if ( SActor != 0 )
@@ -491,6 +569,9 @@ void VTKViewer_RenderWindowInteractor::Remove( VTKViewer_Actor* SActor, bool upd
   }
 }
 
+/*!Remove actors from render window collection(not implemented).
+ *Emit render window modified, if \a updateViewer - true.
+ */
 void VTKViewer_RenderWindowInteractor::RemoveAll( const bool updateViewer )
 {
   vtkRenderer* aRenderer = GetRenderer();
@@ -510,9 +591,10 @@ void VTKViewer_RenderWindowInteractor::RemoveAll( const bool updateViewer )
   }
 }
 
-
-
-
+/*!\brief Display the \a theActor.*/
+/*! Add actor to renderer and set visibility to true.
+ * Emit render window modified, if \a update - true.
+ */
 void VTKViewer_RenderWindowInteractor::Display( VTKViewer_Actor* theActor, bool update)
 {
   GetRenderer()->AddActor(theActor);
@@ -524,16 +606,18 @@ void VTKViewer_RenderWindowInteractor::Display( VTKViewer_Actor* theActor, bool 
 
 void VTKViewer_RenderWindowInteractor::KeyPressed(QKeyEvent *event)
 {
-  // NOT_IMPLEMENTED
+  /// NOT_IMPLEMENTED
 }
 
-
+/*!Structure with one function "operator()", which call apply properties for actor.*/
 struct TUpdateAction{
+  /*!Apply properties for \a theActor.*/
   void operator()(vtkActor* theActor){
     theActor->ApplyProperties();
   }
 };
 
+/*!Update all actors from renderer and emit render window modified.*/
 void VTKViewer_RenderWindowInteractor::Update() {
   using namespace VTK;
   vtkRenderer* aRen = GetRenderer();
@@ -544,13 +628,16 @@ void VTKViewer_RenderWindowInteractor::Update() {
   emit RenderWindowModified();  
 }
 
-
+/*!Unhighlight all selection actors.*/
 void VTKViewer_RenderWindowInteractor::unHighlightSubSelection(){
   myPointActor->SetVisibility(false);
   myEdgeActor->SetVisibility(false);
   myCellActor->SetVisibility(false);
 }
 
+/*!@see unHighlightSubSelection()
+ * Also emit render window modified.
+ */
 bool VTKViewer_RenderWindowInteractor::unHighlightAll(){
   unHighlightSubSelection();
 
@@ -559,7 +646,10 @@ bool VTKViewer_RenderWindowInteractor::unHighlightAll(){
 }
 
 
-//----------------------------------------------------------------------------
+/*! \li Sets actors data and sets visibility to true, if flag \a hilight - true, 
+ * else sets visibility to false.
+ * \li Emit render window modified, if flag \a update - true.
+ */
 bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteger& theMapIndex,
 						 VTKViewer_Actor* theMapActor, VTKViewer_Actor* theActor,
 						 TUpdateActor theFun, bool hilight, bool update)
@@ -582,6 +672,7 @@ bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteg
   return false;
 }
 
+/*!Sets actors data.*/
 void VTKViewer_RenderWindowInteractor::setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
 						    VTKViewer_Actor * theMapActor,
 						    VTKViewer_Actor * theActor,

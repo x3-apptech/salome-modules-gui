@@ -39,52 +39,33 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Initializes the event handlers without an XtAppContext.  This is
-  // good for when you don`t have a user interface, but you still
-  // want to have mouse interaction.
   virtual void Initialize();
 
   virtual void               SetInteractorStyle(vtkInteractorObserver *);
+  /*!Return interactor style pointer.*/
   VTKViewer_InteractorStyle* GetInteractorStyle() const
   {
     return myInteractorStyle;
   }
 
-  // Description:
-  // This will start up the X event loop and never return. If you
-  // call this method it will loop processing X events until the
-  // application is exited.
   virtual void Start();
   
-  // Description:
-  // Enable/Disable interactions.  By default interactors are enabled when
-  // initialized.  Initialize() must be called prior to enabling/disabling
-  // interaction. These methods are used when a window/widget is being
-  // shared by multiple renderers and interactors.  This allows a "modal"
-  // display where one interactor is active when its data is to be displayed
-  // and all other interactors associated with the widget are disabled
-  // when their data is not displayed.
   virtual void Enable();
   virtual void Disable();
 
-  // Description:
-  // Event loop notification member for Window size change
   virtual void UpdateSize(int x,int y);
 
-  // Description:
-  // Timer methods must be overridden by platform dependent subclasses.
-  // flag is passed to indicate if this is first timer set or an update
-  // as Win32 uses repeating timers, whereas X uses One shot more timer
-  // if flag==VTKXI_TIMER_FIRST Win32 and X should createtimer
-  // otherwise Win32 should exit and X should perform AddTimeOut()
-  virtual int CreateTimer(int ) ; 
+  /** @name Timer options*/
+  //@{
+  virtual int CreateTimer(int ) ;
   virtual int DestroyTimer() ; 
+  //@}
   
-  // Description:
-  // This function is called on 'q','e' keypress if exitmethod is not
-  // specified and should be overidden by platform dependent subclasses
-  // to provide a termination procedure if one is required.
+  /*! Description:\n
+   * This function is called on 'q','e' keypress if exitmethod is not\n
+   * specified and should be overidden by platform dependent subclasses\n
+   * to provide a termination procedure if one is required.
+   */
   virtual void TerminateApp(void) { /* empty */ }
   
   // Description:
@@ -95,7 +76,8 @@ public:
   //virtual void StartPickCallback();
   //virtual void EndPickCallback();
   
-  /* Selection Management */
+  /** @name Selection Management */
+  //@{
   bool highlightCell(const TColStd_IndexedMapOfInteger& MapIndex,
 		     VTKViewer_Actor* theMapActor,
 		     bool hilight,
@@ -116,20 +98,28 @@ public:
   void SetSelectionProp(const double& theRed = 1, const double& theGreen = 1,
 			const double& theBlue = 0, const int& theWidth = 5);
   void SetSelectionTolerance(const double& theTolNodes = 0.025, const double& theTolCell = 0.001);
+  //@}
 
-  // Displaymode management
+  /** @name Displaymode management*/
+  //@{
   int GetDisplayMode();
   void SetDisplayMode(int);
+  //@}
 
-  // Change all actors to wireframe or surface
+  /** @name Change all actors to wireframe or surface*/
+  //@{
   void ChangeRepresentationToWireframe();
   void ChangeRepresentationToSurface();
+  //@}
 
-  // Change to wireframe or surface a list of vtkactor
+  /** @name Change to wireframe or surface a list of vtkactor*/
+  //@{
   void ChangeRepresentationToWireframe(vtkActorCollection* ListofActors);
   void ChangeRepresentationToSurface(vtkActorCollection* ListofActors);
+  //@}
 
-  // Erase Display functions
+  /** @name Erase Display functions*/
+  //@{
   void EraseAll();
   void DisplayAll();
   void RemoveAll( const bool immediatly );
@@ -137,6 +127,7 @@ public:
   void Display( VTKViewer_Actor* SActor, bool immediatly = true );
   void Erase( VTKViewer_Actor* SActor, bool immediatly = true );
   void Remove( VTKViewer_Actor* SActor, bool updateViewer = true );
+  //@}
 
   void Update();
 
@@ -173,8 +164,9 @@ public:
 		    VTKViewer_Actor *theActor,
 		    TUpdateActor theFun);
 
-  // Timer used during various mouse events to figure 
-  // out mouse movements. 
+  /*! Timer used during various mouse events to figure 
+   * out mouse movements.
+   */
   QTimer *mTimer ;
 
   int myDisplayMode;
@@ -189,7 +181,7 @@ public:
   vtkCellPicker* myCellPicker;
   vtkPointPicker* myPointPicker;
   
-  // User for switching to stereo mode.
+  /*! User for switching to stereo mode.*/
   int PositionBeforeStereo[2];
 
  public slots:
@@ -205,10 +197,6 @@ public:
   void KeyPressed(QKeyEvent *event) ;
 
   private slots:
-    // Not all of these slots are needed in VTK_MAJOR_VERSION=3,
-    // but moc does not understand "#if VTK_MAJOR_VERSION". Hence, 
-    // we have to include all of these for the time being. Once,
-    // this bug in MOC is fixed, we can separate these. 
     void TimerFunc() ;
 
 signals:
@@ -219,7 +207,9 @@ private:
   friend class VTKViewer_ViewWindow;
 
   VTKViewer_ViewWindow* myViewWnd;
+  /** Selection node tolerance.*/
   double       myTolNodes;
+  /** Selection cell tolerance.*/
   double       myTolItems;
 };
 

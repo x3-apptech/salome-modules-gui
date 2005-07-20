@@ -51,13 +51,19 @@ using namespace std;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(VTKViewer_RectPicker);
-//----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+/*!Constructor. Do nothing*/
 VTKViewer_RectPicker::VTKViewer_RectPicker()
 {
 }
 
 //----------------------------------------------------------------------------
+/*!Perform pick operation with selection rectangle provided. Normally the 
+ * first two values for the selection top-left and right-bottom points are 
+ * x-y pixel coordinate, and the third value is =0. 
+ * \retval Return non-zero if something was successfully picked.
+ */
 int VTKViewer_RectPicker::Pick(float selectionX1, float selectionY1, float selectionZ1,
 			       float selectionX2, float selectionY2, float selectionZ2,
 			       vtkRenderer *renderer)
@@ -423,6 +429,11 @@ char GetIntersectionPoint(const float start[3], const float end[3],
 }
 
 //----------------------------------------------------------------------------
+/*! Bounding box intersection with hexahedron. Origin[4][4] starts the ray from corner points, 
+ * dir[4][3] is the vector components of the ray in the x-y-z directions. 
+ * (Notes: the intersection ray dir[4][3] is NOT normalized.)
+ * \retval The method returns a non-zero value, if the bounding box is hit.
+ */
 char VTKViewer_RectPicker::HitBBox (float bounds[6], float origin[4][4], float dir[4][3])
 {
   int i, j, k, n;
@@ -715,6 +726,10 @@ char VTKViewer_RectPicker::HitBBox (float bounds[6], float origin[4][4], float d
 }
 
 //----------------------------------------------------------------------------
+/*! Position of point relative to hexahedron. p1[4][4] is the corner points of top face, 
+ * p2[4][4] is the corner points of bottom face. 
+ * \retval The method returns a non-zero value, if the point is inside.
+ */
 char VTKViewer_RectPicker::PointInside (float p[3], float p1[4][4], float p2[4][4], float tol)
 {
   int i, j, k;

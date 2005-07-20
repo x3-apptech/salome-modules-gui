@@ -31,27 +31,38 @@ using namespace std;
 IMPLEMENT_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared)
 IMPLEMENT_STANDARD_RTTIEXT(VTKViewer_Filter, MMgt_TShared)
 
-/*
-  Class       : VTKViewer_Filter
-  Description : Base class of filters of for VTK viewer. Method IsValid 
-                should be redefined in derived classes
-*/
+/*!
+ * \class       VTKViewer_Filter
+ * Description : Base class of filters of for <a href="http://www.vtk.org/">VTK</a> viewer. Method IsValid \n
+ *               should be redefined in derived classes
+ */
 
+/*!Constructor.*/
 VTKViewer_Filter::VTKViewer_Filter()
 {
   myActor = 0;
 }
 
+/*!Virtual Destructor.*/
 VTKViewer_Filter::~VTKViewer_Filter()
 {
 }
 
+/*!Check correctness of \a theCellId for actor \a theActor by
+ * call virtual method IsValid( const int theId ).
+ * \param theActor - actor
+ * \param theCellId - cell id.
+ * \retval TRUE - if cell id is valid, else false.
+ */
 bool VTKViewer_Filter::IsValid( VTKViewer_Actor* theActor, const int theCellId )
 {
   SetActor( theActor );
   return IsValid( theCellId );
 }
 
+/*!Virtual method.Set actor to \a theActor.
+ * \param theActor - actor.
+ */
 void VTKViewer_Filter::SetActor( VTKViewer_Actor* theActor )
 {
   myActor = theActor;

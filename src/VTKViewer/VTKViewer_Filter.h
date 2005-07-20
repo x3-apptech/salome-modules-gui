@@ -35,11 +35,11 @@
 
 class VTKViewer_Actor;
 
-DEFINE_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared);
 
 /*
   Class       : VTKViewer_Filter
-  Description : Base class of filters of for VTK viewer. Method IsValid 
+  Description : Base class of filters of for <a href="http://www.vtk.org/">VTK</a> viewer. Method IsValid 
                 should be redefined in derived classes
 */
 

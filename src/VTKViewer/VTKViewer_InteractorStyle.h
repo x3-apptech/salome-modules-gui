@@ -56,13 +56,14 @@ class VTKViewer_RenderWindowInteractor;
 #define VTK_INTERACTOR_STYLE_CAMERA_SELECT     6
 #define VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN 7
 
+/*! Description:\n
+ * This class must be supplied with a vtkRenderWindowInteractor wrapper or\n
+ * parent. This class should not normally be instantiated by application\n
+ * programmers.
+ */
 class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInteractorStyle
 {
-public:
-  // Description:
-  // This class must be supplied with a vtkRenderWindowInteractor wrapper or
-  // parent. This class should not normally be instantiated by application
-  // programmers.
+ public:
   static VTKViewer_InteractorStyle *New();
   vtkTypeMacro(VTKViewer_InteractorStyle, vtkInteractorStyle);
 
@@ -176,10 +177,12 @@ public:
   
   std::map<int, Handle(VTKViewer_Filter) > myFilters;
 
-  //  members from old version
+  /**  @name members from old version*/
+  //@{
   double                    DeltaElevation;
   double                    DeltaAzimuth;
   int                       LastPos[2];
+  //@}
 };
 
 #endif
