@@ -350,6 +350,12 @@ QColor QtxResourceEdit::Item::getColor( const QColor& val ) const
   return resMgr ? resMgr->colorValue( myResSection, myResParameter, val ) : val;
 }
 
+QFont QtxResourceEdit::Item::getFont( const QFont& val ) const
+{
+  QtxResourceMgr* resMgr = resourceMgr();
+  return resMgr ? resMgr->fontValue( myResSection, myResParameter, val ) : val;
+}
+
 void QtxResourceEdit::Item::setInteger( const int val )
 {
   QtxResourceMgr* resMgr = resourceMgr();
@@ -379,6 +385,13 @@ void QtxResourceEdit::Item::setString( const QString& val )
 }
 
 void QtxResourceEdit::Item::setColor( const QColor& val )
+{
+  QtxResourceMgr* resMgr = resourceMgr();
+  if ( resMgr )
+    resMgr->setValue( myResSection, myResParameter, val );
+}
+
+void QtxResourceEdit::Item::setFont( const QFont& val )
 {
   QtxResourceMgr* resMgr = resourceMgr();
   if ( resMgr )

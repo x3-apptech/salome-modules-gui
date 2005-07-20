@@ -15,6 +15,7 @@ class QtxResourceMgr;
 
 #include <qcolor.h>
 #include <qvariant.h>
+#include <qfont.h>
 
 class QTX_EXPORT QtxResourceEdit
 {
@@ -123,12 +124,14 @@ protected:
   double               getDouble( const double = 0.0 ) const;
   bool                 getBoolean( const bool = false ) const;
   QColor               getColor( const QColor& = QColor() ) const;
+  QFont                getFont( const QFont& = QFont() ) const;
   QString              getString( const QString& = QString::null ) const;
 
   void                 setInteger( const int );
   void                 setDouble( const double );
   void                 setBoolean( const bool );
   void                 setColor( const QColor& );
+  void                 setFont( const QFont& );  
   void                 setString( const QString& );
 
   Item*                item( const int ) const;
