@@ -758,8 +758,8 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QColor& cV
 
 bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVal ) const
 {
-  QString val = stringValue( sect, name, "" ).stripWhiteSpace();
-  QStringList font_values = QStringList::split( val, "," );
+  QString val = stringValue( sect, name, "" );
+  QStringList font_values = QStringList::split( ",", val );
   if( font_values.count()<2 || font_values.count()>4 )
     return false;
   
@@ -768,13 +768,14 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVa
   int pSize = -1;
   for( int i=1, n=font_values.count(); i<n; i++ )
   {
-    if( !isBold && font_values[i].lower()=="bold" )
+    QString curval = font_values[i].stripWhiteSpace().lower();
+    if( !isBold && curval=="bold" )
       isBold = true;
-    else if( !isItalic && font_values[i].lower()=="italic" )
+    else if( !isItalic && curval=="italic" )
       isItalic = true;
     else if( pSize<0 )
     {
-      pSize = font_values[i].toInt( &isOk );
+      pSize = curval.toInt( &isOk );
       if( !isOk )
         pSize = -1;
     }

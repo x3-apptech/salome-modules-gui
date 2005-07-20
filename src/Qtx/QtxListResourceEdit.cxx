@@ -16,7 +16,7 @@
 #include <qobjectlist.h>
 #include <qcolordialog.h>
 #include <qwidgetstack.h>
-#include <qpushbutton.h>
+#include <qtoolbutton.h>
 #include <qfontdialog.h>
 
 #include "QtxIntSpinBox.h"
@@ -819,7 +819,13 @@ QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* 
 {
   new QLabel( title, this );
   myFontPrs = new QLabel( "", this );
-  QPushButton* selFont = new QPushButton( "..", this );
+  myFontPrs->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myFontPrs->setAutoResize( true );
+  myFontPrs->setAlignment( Qt::AlignLeft );
+  
+  QToolButton* selFont = new QToolButton( this );
+  selFont->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
+  selFont->setText( "..." );
   connect( selFont, SIGNAL( clicked() ), this, SLOT( onSelectFont() ) );
 }
 
