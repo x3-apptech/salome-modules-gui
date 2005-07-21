@@ -124,6 +124,7 @@ void SALOME_Selection::ClearFilters()
         mySelMgr->clearFilters();
     }
   };
+  ProcessVoidEvent( new TEvent( mySelMgr ) );
 }
 
 //====================================================================================
@@ -1140,15 +1141,11 @@ public:
       myStatusText( statusText ), myIcon( icon ), myKey( key ), myToggle( toggle ) {}
   virtual void Execute() {
     if ( SalomeApp_Application* anApp = getApplication() ) {
-      printf("TCreateActionEvent::Execute() - 1\n");
       SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
-      printf("TCreateActionEvent::Execute() - 2: module = %d\n",module);
       if ( !module )
         module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
-      printf("TCreateActionEvent::Execute() - 3: module = %d\n",module);
       if ( module )
         myResult = module->createAction( myId, myTipText, myIcon, myMenuText, myStatusText, myKey, myToggle );
-      printf("TCreateActionEvent::Execute() - 4: myResult = %d\n",myResult);
     }
   }
 };
