@@ -760,11 +760,11 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVa
 {
   QString val = stringValue( sect, name, "" );
   QStringList font_values = QStringList::split( ",", val );
-  if( font_values.count()<2 || font_values.count()>4 )
+  if( font_values.count()<2 || font_values.count()>5 )
     return false;
   
   QString family = font_values[0];
-  bool isBold = false, isItalic = false, isOk = false;
+  bool isBold = false, isItalic = false, isUnderline = false, isOk = false;
   int pSize = -1;
   for( int i=1, n=font_values.count(); i<n; i++ )
   {
@@ -773,6 +773,8 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVa
       isBold = true;
     else if( !isItalic && curval=="italic" )
       isItalic = true;
+    else if( !isUnderline && curval=="underline" )
+      isUnderline = true;
     else if( pSize<0 )
     {
       pSize = curval.toInt( &isOk );
@@ -786,6 +788,7 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVa
     fVal = QFont( family, pSize );
     fVal.setBold( isBold );
     fVal.setItalic( isItalic );
+    fVal.setUnderline( isUnderline );
     return true;
   }
   else
@@ -970,6 +973,8 @@ void QtxResourceMgr::setValue( const QString& sect, const QString& name, const Q
     val.append( "Bold" );
   if( f.italic() )
     val.append( "Italic" );
+  if( f.underline() )
+    val.append( "Underline" );
   val.append( QString( "%1" ).arg( f.pointSize() ) );
   
   setValue( sect, name, val.join( "," ) );
