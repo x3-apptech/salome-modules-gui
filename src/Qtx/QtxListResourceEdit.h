@@ -365,26 +365,60 @@ private:
   Descr: GUI implementation of resources font item.
 */
 
+class QtxComboBox;
+
 class QtxListResourceEdit::FontItem : public PrefItem
 {
   Q_OBJECT
+
+public:
+  typedef enum
+  {
+    Family    = 0x01,
+    Size      = 0x02,
+    UserSize  = 0x04,
+    Bold      = 0x08,
+    Italic    = 0x10,
+    Underline = 0x20,
+
+    All = Family | Size | UserSize | Bold | Italic | Underline
+    
+  } WidgetFlags;
   
 public:
   FontItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
   virtual ~FontItem();
 
-  virtual void     store();
-  virtual void     retrieve();
+  void        setWidgetFlags( const WidgetFlags );
+  WidgetFlags widgetFlags() const;
 
-protected slots:
-  void onSelectFont();
+  void        setIsSystem( const bool );
+  bool        isSystem() const;
   
-protected:
-  void buildFontPrs();
+  virtual void store();
+  virtual void retrieve();
 
+  virtual QVariant property( const QString& ) const;
+  virtual void     setProperty( const QString&, const QVariant& );
+
+private slots:
+  void onActivateFamily( int );
+  
 private:
-  QFont           myFont;
-  QLabel*         myFontPrs;
+  void       setFamily( const QString& );
+  QString    family() const;
+  void       setSize( const int );
+  int        size() const;
+  void       setParams( const bool, const bool, const bool );
+  void       params( bool&, bool&, bool& );
+  void       internalUpdate();
+  
+private:
+  WidgetFlags    myFlags;
+  bool           myIsSystem;
+  QtxComboBox   *myFamilies, *mySizes;
+  QCheckBox     *myBold, *myItalic, *myUnderline;
+  QMap<QString, QVariant>   myProperties;
 };
 
 

@@ -18,10 +18,11 @@
 #include <qwidgetstack.h>
 #include <qtoolbutton.h>
 #include <qfontdialog.h>
+#include <qfontdatabase.h>
 
 #include "QtxIntSpinBox.h"
 #include "QtxDblSpinBox.h"
-
+#include "QtxComboBox.h"
 #include "QtxDirListEditor.h"
 
 /*
@@ -923,19 +924,22 @@ void QtxListResourceEdit::ColorItem::retrieve()
   Class: QtxListResourceEdit::FontItem
   Descr: GUI implementation of resources font item.
 */
-QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
+QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* edit,
+                                         Item* pItem, QWidget* parent )
 : PrefItem( Font, edit, pItem, parent )
 {
   new QLabel( title, this );
-  myFontPrs = new QLabel( "", this );
-  myFontPrs->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  myFontPrs->setAutoResize( true );
-  myFontPrs->setAlignment( Qt::AlignLeft );
-  
-  QToolButton* selFont = new QToolButton( this );
-  selFont->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
-  selFont->setText( "..." );
-  connect( selFont, SIGNAL( clicked() ), this, SLOT( onSelectFont() ) );
+  myFamilies = new QtxComboBox( this );
+  mySizes = new QtxComboBox( true, this );
+  mySizes->setInsertionPolicy( QComboBox::NoInsertion );
+  myBold = new QCheckBox( tr( "Bold" ), this );
+  myItalic = new QCheckBox( tr( "Italic" ), this );
+  myUnderline = new QCheckBox( tr( "Underline" ), this );
+
+  connect( myFamilies, SIGNAL( activated( int ) ), this, SLOT( onActivateFamily( int ) ) );
+
+  setWidgetFlags( All );
+  setIsSystem( true );
 }
 
 QtxListResourceEdit::FontItem::~FontItem()
@@ -944,39 +948,257 @@ QtxListResourceEdit::FontItem::~FontItem()
 
 void QtxListResourceEdit::FontItem::store()
 {
-  Item::setFont( myFont );
+  QFont f( family(), size() );
+  bool bold, italic, underline;
+  params( bold, italic, underline );
+  f.setBold( bold );
+  f.setItalic( italic );
+  f.setUnderline( underline );
+  Item::setFont( f );
 }
 
 void QtxListResourceEdit::FontItem::retrieve()
 {
-  myFont = getFont();
-  buildFontPrs();
+  QFont f = getFont();
+  setFamily( f.family() );
+  setSize( f.pointSize() );
+  setParams( f.bold(), f.italic(), f.underline() );
 }
 
-void QtxListResourceEdit::FontItem::buildFontPrs()
+void QtxListResourceEdit::FontItem::setWidgetFlags( const WidgetFlags wf )
 {
-  QStringList fval;
-  fval.append( myFont.family() );
-  if( myFont.bold() )
-    fval.append( "Bold" );
-  if( myFont.italic() )
-    fval.append( "Italic" );
-  fval.append( QString( "%1" ).arg( myFont.pointSize() ) );
-  
-  myFontPrs->setText( fval.join( ", " ) );
+  myFlags = wf;
+  myFamilies ->setShown( wf & Family );
+  mySizes    ->setShown( wf & Size );
+  mySizes->lineEdit()->setReadOnly( ( wf & UserSize )==0 );
+  myBold     ->setShown( wf & Bold );
+  myItalic   ->setShown( wf & Italic );
+  myUnderline->setShown( wf & Underline );
+
+  internalUpdate();
 }
 
-void QtxListResourceEdit::FontItem::onSelectFont()
+QtxListResourceEdit::FontItem::WidgetFlags QtxListResourceEdit::FontItem::widgetFlags() const
 {
-  bool ok;
-  QFont newFont = QFontDialog::getFont( &ok, myFont, this );
-  if( ok )
+  return myFlags;
+}
+
+void QtxListResourceEdit::FontItem::setIsSystem( const bool isSystem )
+{
+  if( myIsSystem==isSystem )
+    return;
+
+  myIsSystem = isSystem;
+
+  QVariant families = property( "families" );
+  QString fam = family();
+
+  myFamilies->clear();
+  if( families.canCast( QVariant::StringList ) )
   {
-    myFont = newFont;
-    buildFontPrs();
+    QStringList list = families.toStringList();
+    myFamilies->insertStringList( list );
   }
+
+  setFamily( fam );
 }
 
+bool QtxListResourceEdit::FontItem::isSystem() const
+{
+  return myIsSystem;
+}
+
+QVariant QtxListResourceEdit::FontItem::property( const QString& name ) const
+{
+  if( isSystem() )
+  {
+    if( name=="families" )
+    {
+      QFontDatabase fdb;
+      return fdb.families();
+    }
+
+    else if( name=="default_family" )
+    {
+      QFontDatabase fdb;
+      QStringList fam = fdb.families();
+      if( fam.count()>0 )
+        return fam.first();
+      else
+        return QString::null;
+    }
+
+    else
+    {
+      QStringList parts = QStringList::split( ":", name );
+      if( parts.count()==2 )
+      {
+        if( parts[1]=="default_bold" || parts[1]=="default_italic" || parts[1]=="default_underline" )
+          return false;
+
+        else if( parts[1]=="sizes" )
+        {
+          QFontDatabase fdb;
+          QValueList<int> sizes = fdb.pointSizes( parts[0] );
+          QValueList<QVariant> vsizes;
+          QValueList<int>::const_iterator anIt = sizes.begin(),
+                                          aLast = sizes.end();
+          for( ; anIt!=aLast; anIt++ )
+            vsizes.append( *anIt );
+
+          return vsizes;
+        }
+
+        else if( parts[1]=="default_size" )
+        {
+          QFontDatabase fdb;
+          QValueList<int> sizes = fdb.pointSizes( parts[0] );
+          if( sizes.count()>0 )
+            return sizes.first();
+          else
+            return 0;
+        }
+      }
+    }
+  }
+
+  else if( myProperties.contains( name ) )
+    return myProperties[ name ];
+
+  return QVariant();
+}
+
+void QtxListResourceEdit::FontItem::setProperty( const QString& name, const QVariant& value )
+{
+  myProperties[ name ] = value;
+}
+
+void QtxListResourceEdit::FontItem::setFamily( const QString& f )
+{
+  QString curtext;
+  if( myFamilies->isShown() )
+  {
+    if( myFamilies->listBox()->findItem( f, Qt::ExactMatch ) )
+      curtext = f;
+  }
+  else
+  {
+    QVariant deffam = property( "default_family" );
+    if( deffam.canCast( QVariant::String ) )
+      curtext = deffam.toString();
+  }
+
+  if( curtext!=family() )
+    myFamilies->setCurrentText( curtext );
+}
+
+QString QtxListResourceEdit::FontItem::family() const
+{
+  return myFamilies->currentText();
+}
+
+void QtxListResourceEdit::FontItem::setSize( const int s )
+{
+  int cursize = -1;
+  if( mySizes->isShown() )
+  {
+    if( ( myFlags & UserSize ) || mySizes->listBox()->findItem( QString( "%1" ).arg( s ), Qt::ExactMatch ) )
+      cursize = s;
+  }
+  else
+  {
+    QVariant defsize = property( QString( "%1:default_size" ).arg( family() ) );
+    if( defsize.canCast( QVariant::Int ) )
+      cursize = defsize.toInt();
+  }
+
+  mySizes->setCurrentText( cursize>0 ? QString( "%1" ).arg( cursize ) : "" );
+}
+
+int QtxListResourceEdit::FontItem::size() const
+{
+  QString s = mySizes->currentText();
+  bool ok;
+  int pSize = s.toInt( &ok );
+  return ( ok ? pSize : 0 );
+}
+
+void QtxListResourceEdit::FontItem::setParams( const bool bold, const bool italic, const bool underline )
+{
+  bool curbold = false, curitalic = false, curunderline = false;
+  if( myBold->isShown() )
+    curbold = bold;
+  else
+  {
+    QVariant def = property( QString( "%1:default_bold" ).arg( family() ) );
+    if( def.canCast( QVariant::Bool ) )
+      curbold = def.toBool();
+  }
+  if( myItalic->isShown() )
+    curitalic = italic;
+  else
+  {
+    QVariant def = property( QString( "%1:default_italic" ).arg( family() ) );
+    if( def.canCast( QVariant::Bool ) )
+      curitalic = def.toBool();
+  }
+  if( myUnderline->isShown() )
+    curunderline = underline;
+  else
+  {
+    QVariant def = property( QString( "%1:default_underline" ).arg( family() ) );
+    if( def.canCast( QVariant::Bool ) )
+      curunderline = def.toBool();
+  }
+  myBold->setChecked( curbold );
+  myItalic->setChecked( curitalic );
+  myUnderline->setChecked( curunderline );
+}
+
+void QtxListResourceEdit::FontItem::params( bool& bold, bool& italic, bool& underline )
+{
+  bold = myBold->isChecked();
+  italic = myItalic->isChecked();
+  underline = myUnderline->isChecked();
+}
+
+void QtxListResourceEdit::FontItem::internalUpdate()
+{
+  //update internal selection of font properties
+  setFamily( family() );
+  setSize( size() );
+  bool b1, b2, b3;
+  params( b1, b2, b3 );
+  setParams( b1, b2, b3 );
+}
+
+void QtxListResourceEdit::FontItem::onActivateFamily( int )
+{
+  QVariant sizes = property( QString( "%1:sizes" ).arg( family() ) );
+
+  int s = size();
+  mySizes->clear();
+  if( sizes.canCast( QVariant::List ) )
+  {
+    QValueList<QVariant> list = sizes.toList();
+    QStringList sizeItems;
+    QValueList<QVariant>::const_iterator anIt = list.begin(),
+                                         aLast = list.end();
+    for( ; anIt!=aLast; anIt++ )
+      if( (*anIt).canCast( QVariant::Int ) && (*anIt).toInt()>0 )
+        sizeItems.append( QString( "%1" ).arg( (*anIt).toInt() ) );
+    mySizes->insertStringList( sizeItems );
+  }
+  setSize( s );
+}
+
+
+
+
+/*
+  Class: QtxListResourceEdit::DirListItem
+  Descr: 
+*/
 QtxListResourceEdit::DirListItem::DirListItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
 : PrefItem( Font, edit, pItem, parent )
 {
