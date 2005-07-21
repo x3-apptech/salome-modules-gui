@@ -935,11 +935,12 @@ QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* 
   myBold = new QCheckBox( tr( "Bold" ), this );
   myItalic = new QCheckBox( tr( "Italic" ), this );
   myUnderline = new QCheckBox( tr( "Underline" ), this );
+  ( new QFrame( this ) )->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
   connect( myFamilies, SIGNAL( activated( int ) ), this, SLOT( onActivateFamily( int ) ) );
 
-  setWidgetFlags( All );
-  setIsSystem( true );
+  setProperty( "widget_flags", ( int )All );
+  setProperty( "system", ( bool )true );
 }
 
 QtxListResourceEdit::FontItem::~FontItem()
@@ -965,52 +966,15 @@ void QtxListResourceEdit::FontItem::retrieve()
   setParams( f.bold(), f.italic(), f.underline() );
 }
 
-void QtxListResourceEdit::FontItem::setWidgetFlags( const WidgetFlags wf )
-{
-  myFlags = wf;
-  myFamilies ->setShown( wf & Family );
-  mySizes    ->setShown( wf & Size );
-  mySizes->lineEdit()->setReadOnly( ( wf & UserSize )==0 );
-  myBold     ->setShown( wf & Bold );
-  myItalic   ->setShown( wf & Italic );
-  myUnderline->setShown( wf & Underline );
-
-  internalUpdate();
-}
-
-QtxListResourceEdit::FontItem::WidgetFlags QtxListResourceEdit::FontItem::widgetFlags() const
-{
-  return myFlags;
-}
-
-void QtxListResourceEdit::FontItem::setIsSystem( const bool isSystem )
-{
-  if( myIsSystem==isSystem )
-    return;
-
-  myIsSystem = isSystem;
-
-  QVariant families = property( "families" );
-  QString fam = family();
-
-  myFamilies->clear();
-  if( families.canCast( QVariant::StringList ) )
-  {
-    QStringList list = families.toStringList();
-    myFamilies->insertStringList( list );
-  }
-
-  setFamily( fam );
-}
-
-bool QtxListResourceEdit::FontItem::isSystem() const
-{
-  return myIsSystem;
-}
-
 QVariant QtxListResourceEdit::FontItem::property( const QString& name ) const
 {
-  if( isSystem() )
+  if( name=="system" )
+    return myIsSystem;
+
+  else if( name=="widget_flags" )
+    return ( int )myFlags;
+  
+  if( myIsSystem )
   {
     if( name=="families" )
     {
@@ -1051,6 +1015,9 @@ QVariant QtxListResourceEdit::FontItem::property( const QString& name ) const
 
         else if( parts[1]=="default_size" )
         {
+          if( parts[0].isEmpty() )
+            return 0;
+            
           QFontDatabase fdb;
           QValueList<int> sizes = fdb.pointSizes( parts[0] );
           if( sizes.count()>0 )
@@ -1070,7 +1037,50 @@ QVariant QtxListResourceEdit::FontItem::property( const QString& name ) const
 
 void QtxListResourceEdit::FontItem::setProperty( const QString& name, const QVariant& value )
 {
-  myProperties[ name ] = value;
+  if( name=="system" )
+  {
+    if( !value.canCast( QVariant::Bool ) )
+      return;
+
+    bool isSystem = value.toBool();
+    if( myIsSystem==isSystem )
+      return;
+
+    myIsSystem = isSystem;
+
+    QVariant families = property( "families" );
+    QString fam = family();
+
+    myFamilies->clear();
+    if( families.canCast( QVariant::StringList ) )
+    {
+      QStringList list = families.toStringList();
+      myFamilies->insertStringList( list );
+    }
+
+    setFamily( fam );
+  }
+  
+  else if( name=="widget_flags" )
+  {
+    if( !value.canCast( QVariant::Int ) )
+      return;
+
+    int wf = value.toInt();
+    
+    myFlags = wf;
+    myFamilies ->setShown( wf & Family );
+    mySizes    ->setShown( wf & Size );
+    mySizes->lineEdit()->setReadOnly( ( wf & UserSize )==0 );
+    myBold     ->setShown( wf & Bold );
+    myItalic   ->setShown( wf & Italic );
+    myUnderline->setShown( wf & Underline );
+
+    internalUpdate();
+  }
+  
+  else
+    myProperties[ name ] = value;
 }
 
 void QtxListResourceEdit::FontItem::setFamily( const QString& f )

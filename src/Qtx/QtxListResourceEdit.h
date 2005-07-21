@@ -389,12 +389,6 @@ public:
   FontItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
   virtual ~FontItem();
 
-  void        setWidgetFlags( const WidgetFlags );
-  WidgetFlags widgetFlags() const;
-
-  void        setIsSystem( const bool );
-  bool        isSystem() const;
-  
   virtual void store();
   virtual void retrieve();
 
@@ -414,7 +408,7 @@ private:
   void       internalUpdate();
   
 private:
-  WidgetFlags    myFlags;
+  int            myFlags;
   bool           myIsSystem;
   QtxComboBox   *myFamilies, *mySizes;
   QCheckBox     *myBold, *myItalic, *myUnderline;
