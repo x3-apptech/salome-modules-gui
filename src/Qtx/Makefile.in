@@ -32,6 +32,7 @@ EXPORT_HEADERS= Qtx.h \
                 QtxPopupMgr.h \
 		QtxResourceMgr.h \
                 QtxStdOperations.h \
+                QtxTable.h \
 		QtxToolBar.h \
 		QtxToolTip.h \
 		QtxParser.h \
@@ -75,6 +76,7 @@ LIB_SRC= \
         QtxPopupMgr.cxx \
 	QtxResourceMgr.cxx \
         QtxStdOperations.cxx \
+        QtxTable.cxx \
 	QtxToolBar.cxx \
 	QtxToolTip.cxx \
 	QtxOperations.cxx \
@@ -108,6 +110,7 @@ LIB_MOC = \
         QtxPathDialog.h \
         QtxPopupMgr.h \
         QtxPopupMenu.h \
+        QtxTable.h \
 	QtxToolBar.h \
         QtxToolTip.h \
 	QtxActionMgr.h \
