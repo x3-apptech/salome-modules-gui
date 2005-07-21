@@ -439,7 +439,7 @@ int CAM_Module::registerAction( const int id, QAction* a )
   static int generatedId = -1;
   ident = id < 0 ? --generatedId : id;
 
-  myActionMap.insert( id, a );
+  myActionMap.insert( ident, a );
 
   if ( menuMgr() )
     menuMgr()->registerAction( a );
