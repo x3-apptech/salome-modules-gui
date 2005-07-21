@@ -13,6 +13,12 @@ myHeaderEditor( 0 ),
 myEditedHeader( 0 ),
 myEditedSection( -1 )
 {
+  connect( verticalHeader(), SIGNAL( sizeChange( int, int, int ) ),
+           this, SLOT( onHeaderSizeChange( int, int, int ) ) );
+  connect( horizontalHeader(), SIGNAL( sizeChange( int, int, int ) ),
+           this, SLOT( onHeaderSizeChange( int, int, int ) ) );
+  connect( verticalScrollBar(), SIGNAL( valueChanged( int ) ), this, SLOT( onScrollBarMoved( int ) ) );
+  connect( horizontalScrollBar(), SIGNAL( valueChanged( int ) ), this, SLOT( onScrollBarMoved( int ) ) );
 }
 
 QtxTable::QtxTable( int numRows, int numCols, QWidget* parent, const char* name )
@@ -21,6 +27,12 @@ myHeaderEditor( 0 ),
 myEditedHeader( 0 ),
 myEditedSection( -1 )
 {
+  connect( verticalHeader(), SIGNAL( sizeChange( int, int, int ) ),
+           this, SLOT( onHeaderSizeChange( int, int, int ) ) );
+  connect( horizontalHeader(), SIGNAL( sizeChange( int, int, int ) ),
+           this, SLOT( onHeaderSizeChange( int, int, int ) ) );
+  connect( verticalScrollBar(), SIGNAL( valueChanged( int ) ), this, SLOT( onScrollBarMoved( int ) ) );
+  connect( horizontalScrollBar(), SIGNAL( valueChanged( int ) ), this, SLOT( onScrollBarMoved( int ) ) );
 }
 
 QtxTable::~QtxTable()
@@ -58,6 +70,13 @@ bool QtxTable::editHeader( Orientation o, const int sec )
 void QtxTable::endEditHeader( const bool accept )
 {
   endHeaderEdit( accept );
+}
+
+void QtxTable::hide()
+{
+  endHeaderEdit();
+
+  QTable::hide();
 }
 
 bool QtxTable::eventFilter( QObject* o, QEvent* e )
@@ -108,6 +127,24 @@ bool QtxTable::eventFilter( QObject* o, QEvent* e )
   return QTable::eventFilter( o, e );
 }
 
+void QtxTable::onScrollBarMoved( int )
+{
+  updateHeaderEditor();
+}
+
+void QtxTable::onHeaderSizeChange( int, int, int )
+{
+  if ( sender() == myEditedHeader )
+    updateHeaderEditor();
+}
+
+void QtxTable::resizeEvent( QResizeEvent* e )
+{
+  QTable::resizeEvent( e );
+
+  updateHeaderEditor();
+}
+
 bool QtxTable::beginHeaderEdit( Orientation o, const int section )
 {
   if ( !headerEditable( o ) || !header( o ) || !header( o )->isVisibleTo( this ) )
@@ -134,11 +171,14 @@ bool QtxTable::beginHeaderEdit( Orientation o, const int section )
   myEditedSection = section;
 
   myHeaderEditor->reparent( this, QPoint( 0, 0 ), false );
-  myHeaderEditor->resize( r.size() );
-  myHeaderEditor->move( r.topLeft() );
+
+  updateHeaderEditor();
+
   myHeaderEditor->show();
+
   myHeaderEditor->setActiveWindow();
   myHeaderEditor->setFocus();
+
   myHeaderEditor->installEventFilter( this );
 
   return true;
@@ -226,6 +266,30 @@ QRect QtxTable::headerSectionRect( QHeader* hdr, const int sec ) const
     r = QRect( mapFromGlobal( hdr->mapToGlobal( r.topLeft() ) ), r.size() );
 
   return r;
+}
+
+void QtxTable::updateHeaderEditor()
+{
+  if ( !myHeaderEditor || !myEditedHeader || myEditedSection < 0 )
+    return;
+
+  QRect r = headerSectionRect( myEditedHeader, myEditedSection );
+  if ( !r.isValid() )
+    return;
+
+  if ( myEditedHeader == horizontalHeader() )
+  {
+    r.setLeft( QMAX( r.left(), leftMargin() ) );
+    r.setRight( QMIN( r.right(), width() - rightMargin() - 2 ) );
+  }
+  else
+  {
+    r.setTop( QMAX( r.top(), topMargin() ) );
+    r.setBottom( QMIN( r.bottom(), height() - bottomMargin() - 2 ) );
+  }
+
+  myHeaderEditor->resize( r.size() );
+  myHeaderEditor->move( r.topLeft() );
 }
 
 #endif

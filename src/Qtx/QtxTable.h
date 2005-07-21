@@ -35,9 +35,16 @@ signals:
   void             headerEdited( Orientation, int );
 
 public slots:
+  virtual void     hide();
   virtual void     setHeaderEditable( Orientation, bool );
 
+private slots:
+  void             onScrollBarMoved( int );
+  void             onHeaderSizeChange( int, int, int );
+
 protected:
+  virtual void     resizeEvent( QResizeEvent* );
+
   virtual bool     beginHeaderEdit( Orientation, const int );
   virtual void     endHeaderEdit( const bool = true );
   bool             isHeaderEditing() const;
@@ -47,6 +54,7 @@ protected:
   QHeader*         header( Orientation o ) const;
 
 private:
+  void             updateHeaderEditor();
   void             beginHeaderEdit( Orientation, const QPoint& );
   QRect            headerSectionRect( QHeader*, const int ) const;
 
