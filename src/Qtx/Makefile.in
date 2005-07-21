@@ -46,7 +46,8 @@ EXPORT_HEADERS= Qtx.h \
 		QtxListResourceEdit.h \
 		QtxWorkstack.h \
 		QtxResourceEdit.h \
-		QtxListView.h
+		QtxListView.h \
+		QtxDirListEditor.h
 
 # .po files to transform in .qm
 
@@ -91,7 +92,8 @@ LIB_SRC= \
         QtxListResourceEdit.cxx \
 	QtxResourceEdit.cxx \
 	QtxWorkstack.cxx \
-	QtxListView.cxx
+	QtxListView.cxx \
+	QtxDirListEditor.cxx
 
 LIB_MOC = \
 	QtxAction.h \
@@ -121,7 +123,8 @@ LIB_MOC = \
 	QtxWorkstackAction.h \
 	QtxWorkstack.h \
 	QtxListView.h \
-	QtxListResourceEdit.h
+	QtxListResourceEdit.h \
+	QtxDirListEditor.h
 
 RESOURCES_FILES = \
 

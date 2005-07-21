@@ -177,6 +177,12 @@ msgstr "Number of isolines along V"
 msgid "SalomeApp_Application::PREF_TRIHEDRON_SHOW"
 msgstr "Show trihedron"
 
+msgid "SalomeApp_Application::PREF_TAB_DIRECTORIES"
+msgstr "Directories"
+
+msgid "SalomeApp_Application::PREF_GROUP_DIRECTORIES"
+msgstr "Quick directory list"
+
 //=======================================================================================
 
 msgid "SalomeApp_Application::OBJ_BROWSER_NAME"

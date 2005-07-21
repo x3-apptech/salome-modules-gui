@@ -22,6 +22,8 @@ class QWidgetStack;
 class QtxIntSpinBox;
 class QtxDblSpinBox;
 
+class QtxDirListEditor;
+
 /*
   Class: QtxListResourceEdit
   Descr: GUI implementation of QtxResourceEdit - manager of resources
@@ -47,8 +49,9 @@ public:
   class IntegerSpinItem;
   class IntegerEditItem;
   class FontItem;
+  class DirListItem;
 
-  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, GroupBox, Font, User };
+  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, GroupBox, Font, DirList, User };
 
 public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
@@ -382,6 +385,41 @@ protected:
 private:
   QFont           myFont;
   QLabel*         myFontPrs;
+};
+
+
+/*!
+ * \brief GUI implementation of resources directory list item.
+ *
+ * 
+ */
+class QtxListResourceEdit::DirListItem : public PrefItem
+{
+  Q_OBJECT
+  
+public:
+
+  /*!
+   * \brief Constructor
+   */
+  DirListItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
+  /*!
+   * \brief Destructor
+   */
+  virtual ~DirListItem();
+
+  /*!
+   * \brief Stores the data
+   */
+  virtual void     store();
+
+  /*!
+   * \brief Retrieves the data
+   */
+  virtual void     retrieve();
+
+private:
+  QtxDirListEditor* myDirListEditor; //!< The widget wich implements in GUI the list of directories
 };
 
 #endif

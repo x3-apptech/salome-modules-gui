@@ -22,6 +22,8 @@
 #include "QtxIntSpinBox.h"
 #include "QtxDblSpinBox.h"
 
+#include "QtxDirListEditor.h"
+
 /*
   Class: QtxListResourceEdit
   Descr: GUI implementation of QtxResourceEdit - manager of resources
@@ -453,6 +455,9 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
     break;
   case Font:
     item = new FontItem( title, resourceEdit(), this, this );
+    break;
+  case DirList:
+    item = new DirListItem( title, resourceEdit(), this, this );
     break;
   }
 
@@ -970,4 +975,26 @@ void QtxListResourceEdit::FontItem::onSelectFont()
     myFont = newFont;
     buildFontPrs();
   }
+}
+
+QtxListResourceEdit::DirListItem::DirListItem( const QString& title, QtxResourceEdit* edit, Item* pItem, QWidget* parent )
+: PrefItem( Font, edit, pItem, parent )
+{
+  myDirListEditor = new QtxDirListEditor( this ); 
+}
+
+QtxListResourceEdit::DirListItem::~DirListItem()
+{
+}
+
+void QtxListResourceEdit::DirListItem::store()
+{
+  QStringList list;
+  myDirListEditor->getPathList(list);
+  setString( QString(list.join(";")) );
+}
+
+void QtxListResourceEdit::DirListItem::retrieve()
+{
+  myDirListEditor->setPathList(QStringList::split(";", getString()));
 }

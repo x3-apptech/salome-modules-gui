@@ -1344,6 +1344,12 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 
   pref->setItemProperty( vtkTS, "min", 1 );
   pref->setItemProperty( vtkTS, "max", 150 );
+
+  int dirTab = pref->addPreference( tr( "PREF_TAB_DIRECTORIES" ), salomeCat );
+  int dirGroup = pref->addPreference( tr( "PREF_GROUP_DIRECTORIES" ), dirTab );
+  pref->setItemProperty( dirGroup, "columns", 1 );
+  pref->addPreference( tr( "" ), dirGroup,
+		       SalomeApp_Preferences::DirList, "FileDlg", "QuickDirList" );
 }
 
 void SalomeApp_Application::preferencesChanged( const QString& sec, const QString& param )
