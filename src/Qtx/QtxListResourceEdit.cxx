@@ -56,13 +56,51 @@ QtxListResourceEdit::~QtxListResourceEdit()
 {
 }
 
-void QtxListResourceEdit::onSelectionChanged()
+void QtxListResourceEdit::setItemProperty( const int id, const QString& prop, const QVariant& val )
 {
-  int idx = myList->index( myList->selectedItem() );
-  if ( idx < 0 )
+  Item* i = item( id );
+  if ( !i )
     return;
 
-  myStack->raiseWidget( idx );
+  bool prev = i->isEmpty();
+
+  QtxResourceEdit::setItemProperty( id, prop, val );
+
+  bool next = i->isEmpty();
+
+  if ( prev != next )
+    updateVisible();
+}
+
+void QtxListResourceEdit::onSelectionChanged()
+{
+  QString title = myList->text( myList->index( myList->selectedItem() ) );
+  if ( title.isEmpty() )
+    return;
+
+  Item* i = 0;
+  QPtrList<Item> lst;
+  childItems( lst );
+  for ( QPtrListIterator<Item> it( lst ); it.current() && !i; ++it )
+  {
+    if ( it.current()->title() == title )
+      i = it.current();
+  }
+
+  if ( i )
+    myStack->raiseWidget( i->id() );
+}
+
+void QtxListResourceEdit::itemAdded( QtxResourceEdit::Item* i )
+{
+  if ( !i )
+    return;
+
+  QPtrList<Item> items;
+  childItems( items );
+
+  if ( items.contains( i ) || items.contains( i->parentItem() ) )
+    updateVisible();
 }
 
 QtxResourceEdit::Item* QtxListResourceEdit::createItem( const QString& title, const int )
@@ -72,9 +110,9 @@ QtxResourceEdit::Item* QtxListResourceEdit::createItem( const QString& title, co
     return i;
 
   Category* category = new Category( this, myStack );
-  myList->insertItem( title );
-  int id = myList->count() - 1;
-  myStack->addWidget( category, id );
+  myStack->addWidget( category, category->id() );
+
+  updateVisible();
 
   if ( !myList->selectedItem() )
     myList->setSelected( 0, true );
@@ -103,10 +141,38 @@ void QtxListResourceEdit::changedResources( const QMap<Item*, QString>& map )
 
 void QtxListResourceEdit::updateState()
 {
-  if ( myStack->visibleWidget() )
+  if ( myList->selectedItem() &&  myStack->visibleWidget() )
     myStack->show();
   else
     myStack->hide();
+}
+
+void QtxListResourceEdit::updateVisible()
+{
+  QPtrList<Item> items;
+  childItems( items );
+
+  QString name = myList->text( myList->index( myList->selectedItem() ) );
+
+  myList->clear();
+  for ( QPtrListIterator<Item> it( items ); it.current(); ++it )
+  {
+    if ( it.current()->isEmpty() )
+      continue;
+
+    myList->insertItem( it.current()->title() );
+  }
+
+  int idx = -1;
+  for ( int i = 0; i < (int)myList->count() && idx == -1; i++ )
+  {
+    if ( myList->text( i ) == name )
+      idx = i;
+  }
+
+  myList->setSelected( QMAX( idx, 0 ), true );
+
+  updateState();
 }
 
 /*
@@ -136,6 +202,11 @@ Item( edit )
 
 QtxListResourceEdit::Category::~Category()
 {
+}
+
+bool QtxListResourceEdit::Category::isEmpty() const
+{
+  return Item::isEmpty() && myInfo->text().isEmpty();
 }
 
 int QtxListResourceEdit::Category::type() const
@@ -309,6 +380,10 @@ QVariant QtxListResourceEdit::Group::property( const QString& prop ) const
   QVariant var;
   if ( prop == "columns" )
     var = QVariant( columns() );
+  else if ( prop == "orientation" )
+    var = QVariant( orientation() );
+  else if ( prop == "frame" )
+    var = QVariant( frameStyle() != QFrame::NoFrame );
   return var;
 }
 
@@ -318,8 +393,20 @@ void QtxListResourceEdit::Group::setProperty( const QString& name, const QVarian
   if ( !prop.cast( QVariant::Int ) )
     return;
 
-  if ( name == QString( "columns" ) && prop.toInt() > 0 )
+  if ( name == QString( "columns" ) && prop.cast( QVariant::Int ) && prop.toInt() > 0 )
     setColumns( prop.toInt() );
+  else if ( name == QString( "orientation" ) && prop.cast( QVariant::Int ) )
+  {
+    int o = prop.toInt();
+    if ( o == Qt::Horizontal || o == Qt::Vertical )
+      setOrientation( (Orientation)o );
+  }
+  else if ( name == "frame" && prop.cast( QVariant::Bool ) )
+  {
+    setInsideMargin( prop.toBool() ? 5 : 0 );
+    QGroupBox::setTitle( prop.toBool() ? Item::title() : QString::null );
+    setFrameStyle( prop.toBool() ? QFrame::Box | QFrame::Sunken : QFrame::NoFrame );
+  }
 }
 
 void QtxListResourceEdit::Group::setTitle( const QString& title )
@@ -344,7 +431,7 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
     item = new StringItem( title, resourceEdit(), this, this );
     break;
   case Selector:
-    item = new ListItem( title, resourceEdit(), this, this );
+    item = new SelectItem( title, resourceEdit(), this, this );
     break;
   case DblSpin:
     item = new DoubleSpinItem( title, resourceEdit(), this, this );
@@ -360,6 +447,9 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
     break;
   case Space:
     item = new Spacer( resourceEdit(), this, this );
+    break;
+  case GroupBox:
+    item = new Group( title, resourceEdit(), this, this );
     break;
   case Font:
     item = new FontItem( title, resourceEdit(), this, this );
@@ -420,12 +510,12 @@ void QtxListResourceEdit::Spacer::retrieve()
 }
 
 /*
-  Class: QtxListResourceEdit::ListItem
+  Class: QtxListResourceEdit::SelectItem
   Descr: GUI implementation of resources list item.
 */
 
-QtxListResourceEdit::ListItem::ListItem( const QString& title, QtxResourceEdit* edit,
-                                         Item* pItem, QWidget* parent )
+QtxListResourceEdit::SelectItem::SelectItem( const QString& title, QtxResourceEdit* edit,
+					     Item* pItem, QWidget* parent )
 : PrefItem( Selector, edit, pItem, parent )
 {
   new QLabel( title, this );
@@ -433,18 +523,18 @@ QtxListResourceEdit::ListItem::ListItem( const QString& title, QtxResourceEdit* 
   myList->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
 }
 
-QtxListResourceEdit::ListItem::~ListItem()
+QtxListResourceEdit::SelectItem::~SelectItem()
 {
 }
 
-void QtxListResourceEdit::ListItem::store()
+void QtxListResourceEdit::SelectItem::store()
 {
   int idx = myList->currentItem();
   if ( myIndex.contains( idx ) )
     setInteger( myIndex[idx] );
 }
 
-void QtxListResourceEdit::ListItem::retrieve()
+void QtxListResourceEdit::SelectItem::retrieve()
 {
   int id = getInteger( -1 );
 
@@ -458,7 +548,7 @@ void QtxListResourceEdit::ListItem::retrieve()
   myList->setCurrentItem( idx );
 }
 
-QVariant QtxListResourceEdit::ListItem::property( const QString& name ) const
+QVariant QtxListResourceEdit::SelectItem::property( const QString& name ) const
 {
   QVariant val;
   if ( name == QString( "strings" ) )
@@ -478,7 +568,7 @@ QVariant QtxListResourceEdit::ListItem::property( const QString& name ) const
   return val;
 }
 
-void QtxListResourceEdit::ListItem::setProperty( const QString& name, const QVariant& val )
+void QtxListResourceEdit::SelectItem::setProperty( const QString& name, const QVariant& val )
 {
   if ( name == QString( "strings" ) )
     setStrings( val );
@@ -486,7 +576,7 @@ void QtxListResourceEdit::ListItem::setProperty( const QString& name, const QVar
     setIndexes( val );
 }
 
-void QtxListResourceEdit::ListItem::setStrings( const QVariant& var )
+void QtxListResourceEdit::SelectItem::setStrings( const QVariant& var )
 {
   if ( var.type() != QVariant::StringList )
     return;
@@ -494,7 +584,7 @@ void QtxListResourceEdit::ListItem::setStrings( const QVariant& var )
   setStrings( var.toStringList() );
 }
 
-void QtxListResourceEdit::ListItem::setIndexes( const QVariant& var )
+void QtxListResourceEdit::SelectItem::setIndexes( const QVariant& var )
 {
   if ( var.type() != QVariant::List )
     return;
@@ -509,13 +599,13 @@ void QtxListResourceEdit::ListItem::setIndexes( const QVariant& var )
   setIndexes( lst );
 }
 
-void QtxListResourceEdit::ListItem::setStrings( const QStringList& lst )
+void QtxListResourceEdit::SelectItem::setStrings( const QStringList& lst )
 {
   myList->clear();
   myList->insertStringList( lst );
 }
 
-void QtxListResourceEdit::ListItem::setIndexes( const QValueList<int>& lst )
+void QtxListResourceEdit::SelectItem::setIndexes( const QValueList<int>& lst )
 {
   myIndex.clear();
 
@@ -643,22 +733,31 @@ QVariant QtxListResourceEdit::IntegerSpinItem::property( const QString& name ) c
     var = QVariant( myInteger->maxValue() );
   else if ( name == QString( "step" ) )
     var = QVariant( myInteger->lineStep() );
+  else if ( name == QString( "special" ) )
+    var = QVariant( myInteger->specialValueText() );
+  else if ( name == QString( "prefix" ) )
+    var = QVariant( myInteger->prefix() );
+  else if ( name == QString( "suffix" ) )
+    var = QVariant( myInteger->suffix() );
   return var;
 }
 
 void QtxListResourceEdit::IntegerSpinItem::setProperty( const QString& name, const QVariant& var )
 {
   QVariant prop = var;
-  if ( !prop.cast( QVariant::Int ) )
-    return;
 
-  int val = prop.toInt();
-  if ( name == QString( "minimum" ) || name == QString( "min" ) )
-    myInteger->setMinValue( val );
-  else if ( name == QString( "maximum" ) || name == QString( "max" ) )
-    myInteger->setMaxValue( val );
-  else if ( name == QString( "step" ) && val > 0 )
-    myInteger->setLineStep( val );
+  if ( ( name == QString( "minimum" ) || name == QString( "min" ) ) && prop.cast( QVariant::Int ) )
+    myInteger->setMinValue( prop.toInt() );
+  else if ( ( name == QString( "maximum" ) || name == QString( "max" ) ) && prop.cast( QVariant::Int ) )
+    myInteger->setMaxValue( prop.toInt() );
+  else if ( name == QString( "step" ) && prop.cast( QVariant::Int ) && prop.toInt() > 0 )
+    myInteger->setLineStep( prop.toInt() );
+  else if ( name == QString( "special" ) && prop.cast( QVariant::String ) )
+    myInteger->setSpecialValueText( prop.toString() );
+  else if ( name == QString( "prefix" ) && prop.cast( QVariant::String ) )
+    myInteger->setPrefix( prop.toString() );
+  else if ( name == QString( "suffix" ) && prop.cast( QVariant::String ) )
+    myInteger->setSuffix( prop.toString() );
 }
 
 /*
@@ -729,28 +828,33 @@ QVariant QtxListResourceEdit::DoubleSpinItem::property( const QString& name ) co
     var = QVariant( myDouble->precision() );
   else if ( name == QString( "step" ) )
     var = QVariant( myDouble->lineStep() );
+  else if ( name == QString( "special" ) )
+    var = QVariant( myDouble->specialValueText() );
+  else if ( name == QString( "prefix" ) )
+    var = QVariant( myDouble->prefix() );
+  else if ( name == QString( "suffix" ) )
+    var = QVariant( myDouble->suffix() );
   return var;
 }
 
 void QtxListResourceEdit::DoubleSpinItem::setProperty( const QString& name, const QVariant& var )
 {
   QVariant prop = var;
-  if ( prop.cast( QVariant::Double ) )
-  {
-    double val = prop.toDouble();
-    if ( name == QString( "minimum" ) || name == QString( "min" ) )
-      myDouble->setMinValue( val );
-    else if ( name == QString( "maximum" ) || name == QString( "max" ) )
-      myDouble->setMaxValue( val );
-    else if ( name == QString( "step" ) && val > 0 )
-      myDouble->setLineStep( val );
-  }
-  else
-  {
-    QVariant prop = var;
-    if ( prop.cast( QVariant::Int ) && name == QString( "precision" ) && prop.toInt() > 0 )
-      myDouble->setPrecision( prop.toInt() );
-  }
+
+  if ( ( name == QString( "minimum" ) || name == QString( "min" ) ) && prop.cast( QVariant::Double ) )
+    myDouble->setMinValue( prop.toDouble() );
+  else if ( ( name == QString( "maximum" ) || name == QString( "max" ) ) && prop.cast( QVariant::Double ) )
+    myDouble->setMaxValue( prop.toDouble() );
+  else if ( name == QString( "step" ) && prop.cast( QVariant::Double ) && prop.toDouble() > 0 )
+    myDouble->setLineStep( prop.toDouble() );
+  else if ( name == QString( "precision" ) && prop.cast( QVariant::Int ) && prop.toInt() > 0 )
+    myDouble->setPrecision( prop.toInt() );
+  else if ( name == QString( "special" ) && prop.cast( QVariant::String ) )
+    myDouble->setSpecialValueText( prop.toString() );
+  else if ( name == QString( "prefix" ) && prop.cast( QVariant::String ) )
+    myDouble->setPrefix( prop.toString() );
+  else if ( name == QString( "suffix" ) && prop.cast( QVariant::String ) )
+    myDouble->setSuffix( prop.toString() );
 }
 
 /*

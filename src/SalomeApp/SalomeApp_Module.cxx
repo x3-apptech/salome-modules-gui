@@ -164,7 +164,7 @@ QVariant SalomeApp_Module::preferenceProperty( const int id, const QString& prop
   QVariant var;
   SalomeApp_Preferences* pref = preferences();
   if ( pref )
-    var = pref->property( id, prop );
+    var = pref->itemProperty( id, prop );
   return var;
 }
 
@@ -172,5 +172,5 @@ void SalomeApp_Module::setPreferenceProperty( const int id, const QString& prop,
 {
   SalomeApp_Preferences* pref = preferences();
   if ( pref )
-    pref->setProperty( id, prop, var );
+    pref->setItemProperty( id, prop, var );
 }

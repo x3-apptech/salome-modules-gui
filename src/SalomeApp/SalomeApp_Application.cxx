@@ -1251,7 +1251,7 @@ SalomeApp_Preferences* SalomeApp_Application::preferences( const bool crt ) cons
     for ( QStringList::const_iterator it = modNameList.begin(); it != modNameList.end(); ++it )
     {
       int id = _prefs_->addPreference( *it );
-      _prefs_->setProperty( id, "info", tr( "PREFERENCES_NOT_LOADED" ).arg( *it ) );
+      _prefs_->setItemProperty( id, "info", tr( "PREFERENCES_NOT_LOADED" ).arg( *it ) );
     }
 
     ModuleList modList;
@@ -1263,7 +1263,11 @@ SalomeApp_Preferences* SalomeApp_Application::preferences( const bool crt ) cons
 	mod = (SalomeApp_Module*)itr.current();
 
       if ( mod && !_prefs_->hasModule( mod->moduleName() ) )
+      {
+	int modCat = _prefs_->addPreference( mod->moduleName() );
+	_prefs_->setItemProperty( modCat, "info", QString::null );
 	mod->createPreferences();
+      }
     }
   }
 
@@ -1281,8 +1285,12 @@ void SalomeApp_Application::moduleAdded( CAM_Module* mod )
   if ( mod && mod->inherits( "SalomeApp_Module" ) )
     salomeMod = (SalomeApp_Module*)mod;
 
-  if ( myPrefs && salomeMod && !myPrefs->hasModule( salomeMod->moduleName() ))
+  if ( myPrefs && salomeMod && !myPrefs->hasModule( salomeMod->moduleName() ) )
+  {
+    int modCat = myPrefs->addPreference( mod->moduleName() );
+    myPrefs->setItemProperty( modCat, "info", QString::null );
     salomeMod->createPreferences();
+  }
 }
 
 void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
@@ -1300,42 +1308,42 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
     pref->addPreference( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), obGroup,
                          SalomeApp_Preferences::Bool, "ObjectBrowser", QString().sprintf( "visibility_column_%d", i ) );
   }
-  pref->setProperty( obGroup, "columns", 1 );
+  pref->setItemProperty( obGroup, "columns", 1 );
 
   int viewTab = pref->addPreference( tr( "PREF_TAB_VIEWERS" ), salomeCat );
 
   int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), viewTab );
 
   int vtkGroup = pref->addPreference( tr( "PREF_GROUP_VTKVIEWER" ), viewTab );
-  pref->setProperty( occGroup, "columns", 1 );
-  pref->setProperty( vtkGroup, "columns", 1 );
+  pref->setItemProperty( occGroup, "columns", 1 );
+  pref->setItemProperty( vtkGroup, "columns", 1 );
 
   int occTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
 				   SalomeApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup,
 		       SalomeApp_Preferences::Color, "OCCViewer", "background" );
 
-  pref->setProperty( occTS, "min", 1 );
-  pref->setProperty( occTS, "max", 150 );
+  pref->setItemProperty( occTS, "min", 1 );
+  pref->setItemProperty( occTS, "max", 150 );
 
   int isoU = pref->addPreference( tr( "PREF_ISOS_U" ), occGroup,
 				  SalomeApp_Preferences::IntSpin, "OCCViewer", "iso_number_u" );
   int isoV = pref->addPreference( tr( "PREF_ISOS_V" ), occGroup,
 				  SalomeApp_Preferences::IntSpin, "OCCViewer", "iso_number_v" );
 
-  pref->setProperty( isoU, "min", 0 );
-  pref->setProperty( isoU, "max", 100000 );
+  pref->setItemProperty( isoU, "min", 0 );
+  pref->setItemProperty( isoU, "max", 100000 );
 
-  pref->setProperty( isoV, "min", 0 );
-  pref->setProperty( isoV, "max", 100000 );
+  pref->setItemProperty( isoV, "min", 0 );
+  pref->setItemProperty( isoV, "max", 100000 );
 
   int vtkTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
 				   SalomeApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGroup,
 		       SalomeApp_Preferences::Color, "VTKViewer", "background" );
 
-  pref->setProperty( vtkTS, "min", 1 );
-  pref->setProperty( vtkTS, "max", 150 );
+  pref->setItemProperty( vtkTS, "min", 1 );
+  pref->setItemProperty( vtkTS, "max", 150 );
 }
 
 void SalomeApp_Application::preferencesChanged( const QString& sec, const QString& param )

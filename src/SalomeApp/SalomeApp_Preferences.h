@@ -18,9 +18,6 @@ class SALOMEAPP_EXPORT SalomeApp_Preferences : public QtxListResourceEdit
   Q_OBJECT
 
 public:
-  enum { Space = QtxListResourceEdit::Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer };
-
-public:
   SalomeApp_Preferences( QtxResourceMgr*, QWidget* = 0 );
   virtual ~SalomeApp_Preferences();
 
@@ -28,9 +25,6 @@ public:
 				      const QString& section = QString::null, const QString& param = QString::null );
   int                  addPreference( const QString& modName, const QString& label, const int pId = -1, const int = -1,
 				      const QString& section = QString::null, const QString& param = QString::null );
-
-  QVariant             property( const int, const QString& ) const;
-  virtual void         setProperty( const int, const QString&, const QVariant& );
 
   bool                 hasModule( const QString& ) const;
 

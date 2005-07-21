@@ -38,9 +38,9 @@ public:
   class PrefItem;
 
   class Spacer;
-  class ListItem;
   class ColorItem;
   class StateItem;
+  class SelectItem;
   class StringItem;
   class DoubleSpinItem;
   class DoubleEditItem;
@@ -48,11 +48,13 @@ public:
   class IntegerEditItem;
   class FontItem;
 
-  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, Font, User };
+  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, GroupBox, Font, User };
 
 public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
   virtual ~QtxListResourceEdit();
+
+  virtual void  setItemProperty( const int, const QString&, const QVariant& );
 
 signals:
   void          resourceChanged( int );
@@ -63,11 +65,13 @@ private slots:
   void          onSelectionChanged();
 
 protected:
+  virtual void  itemAdded( Item* );
   virtual Item* createItem( const QString&, const int );
   virtual void  changedResources( const QMap<Item*, QString>& );
 
 private:
   void          updateState();
+  void          updateVisible();
 
 private:
   QListBox*     myList;
@@ -84,6 +88,8 @@ class QtxListResourceEdit::Category : public QFrame, public Item
 public:
   Category( QtxListResourceEdit*, QWidget* = 0 );
   virtual ~Category();
+
+  virtual bool     isEmpty() const;
 
   virtual int      type() const;
   virtual void     store();
@@ -191,15 +197,15 @@ public:
 };
 
 /*
-  Class: QtxListResourceEdit::ListItem
-  Descr: GUI implementation of resources list item.
+  Class: QtxListResourceEdit::SelectItem
+  Descr: GUI implementation of resources selector item.
 */
 
-class QtxListResourceEdit::ListItem : public PrefItem
+class QtxListResourceEdit::SelectItem : public PrefItem
 {
 public:
-  ListItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
-  virtual ~ListItem();
+  SelectItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
+  virtual ~SelectItem();
 
   virtual void     store();
   virtual void     retrieve();

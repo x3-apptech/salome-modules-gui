@@ -31,16 +31,6 @@ int SalomeApp_Preferences::addPreference( const QString& mod, const QString& lab
   return id;
 }
 
-QVariant SalomeApp_Preferences::property( const int id, const QString& param ) const
-{
-  return QtxResourceEdit::property( id, param );
-}
-
-void SalomeApp_Preferences::setProperty( const int id, const QString& param, const QVariant& prop )
-{
-  QtxResourceEdit::setProperty( id, param, prop );
-}
-
 bool SalomeApp_Preferences::hasModule( const QString& mod ) const
 {
   bool res = false;

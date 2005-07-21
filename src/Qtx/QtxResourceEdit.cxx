@@ -33,15 +33,23 @@ int QtxResourceEdit::addItem( const QString& label, const int pId, const int typ
   if ( !i )
     return -1;
 
-  myItems.insert( i->id(), i );
+  if ( !myItems.contains( i->id() ) )
+  {
+    myItems.insert( i->id(), i );
 
-  i->setTitle( label );
-  i->setResource( section, param );
+    i->setTitle( label );
+    i->setResource( section, param );
+
+    if ( !i->parentItem() && !myChildren.contains( i ) )
+      myChildren.append( i );
+
+    itemAdded( i );
+  }
 
   return i->id();
 }
 
-QVariant QtxResourceEdit::property( const int id, const QString& propName ) const
+QVariant QtxResourceEdit::itemProperty( const int id, const QString& propName ) const
 {
   QVariant propValue;
   Item* i = item( id );
@@ -50,7 +58,7 @@ QVariant QtxResourceEdit::property( const int id, const QString& propName ) cons
   return propValue;
 }
 
-void QtxResourceEdit::setProperty( const int id, const QString& propName, const QVariant& propValue )
+void QtxResourceEdit::setItemProperty( const int id, const QString& propName, const QVariant& propValue )
 {
   Item* i = item( id );
   if ( i )
@@ -153,7 +161,10 @@ QtxResourceEdit::Item* QtxResourceEdit::createItem( const QString& label, const 
   {
     Item* pItem = item( pId );
     if ( pItem )
+    {
       i = pItem->createItem( label, type );
+      pItem->insertChild( i );
+    }
   }
 
   return i;
@@ -164,7 +175,17 @@ void QtxResourceEdit::removeItem( Item* item )
   if ( !item )
     return;
 
+  myChildren.remove( item );
   myItems.remove( item->id() );
+
+  itemRemoved( item );
+}
+
+void QtxResourceEdit::childItems( QPtrList<Item>& lst ) const
+{
+  lst.clear();
+  for ( QPtrListIterator<Item> it( myChildren ); it.current(); ++it )
+    lst.append( it.current() );
 }
 
 void QtxResourceEdit::resourceValues( QMap<int, QString>& map ) const
@@ -228,6 +249,14 @@ void QtxResourceEdit::changedResources( const QMap<Item*, QString>& )
 {
 }
 
+void QtxResourceEdit::itemAdded( Item* )
+{
+}
+
+void QtxResourceEdit::itemRemoved( Item* )
+{
+}
+
 /*
   Class: QtxResourceEdit::Item
   Descr: Class for incapsulation of one preference item
@@ -235,9 +264,12 @@ void QtxResourceEdit::changedResources( const QMap<Item*, QString>& )
 
 QtxResourceEdit::Item::Item( QtxResourceEdit* edit, Item* parent )
 : myEdit( edit ),
-myParent( parent )
+myParent( 0 )
 {
   myId = generateId();
+
+  if ( parent )
+    parent->insertChild( this );
 }
 
 QtxResourceEdit::Item::~Item()
@@ -256,10 +288,36 @@ QtxResourceEdit::Item* QtxResourceEdit::Item::parentItem() const
   return myParent;
 }
 
+void QtxResourceEdit::Item::insertChild( Item* item )
+{
+  if ( !item || myChildren.contains( item ) )
+    return;
+
+  if ( item->parentItem() && item->parentItem() != this )
+    item->parentItem()->removeChild( item );
+
+  item->myParent = this;
+  myChildren.append( item );
+}
+
+void QtxResourceEdit::Item::removeChild( Item* item )
+{
+  if ( !item || !myChildren.contains( item ) )
+    return;
+
+  myChildren.remove( item );
+  item->myParent = 0;
+}
+
 void QtxResourceEdit::Item::childItems( QPtrList<Item>& lst ) const
 {
   for ( ItemListIterator it( myChildren ); it.current(); ++it )
     lst.append( it.current() );
+}
+
+bool QtxResourceEdit::Item::isEmpty() const
+{
+  return myChildren.isEmpty();
 }
 
 QString QtxResourceEdit::Item::title() const

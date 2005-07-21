@@ -32,8 +32,8 @@ public:
                                 const QString& section = QString::null,
                                 const QString& param = QString::null );
 
-  QVariant             property( const int, const QString& ) const;
-  virtual void         setProperty( const int, const QString&, const QVariant& );
+  QVariant             itemProperty( const int, const QString& ) const;
+  virtual void         setItemProperty( const int, const QString&, const QVariant& );
 
   void                 resource( const int, QString&, QString& ) const;
 
@@ -65,6 +65,11 @@ protected:
 
   virtual void         changedResources( const QMap<Item*, QString>& );
 
+  virtual void         itemAdded( Item* );
+  virtual void         itemRemoved( Item* );
+
+  void                 childItems( QPtrList<Item>& ) const;
+
 private:
   void                 removeItem( Item* );
   Item*                createItem( const QString&, const int, const int );
@@ -76,6 +81,7 @@ private:
   ItemMap              myItems;
   QtxResourceMgr*      myResMgr;
   QMap<Item*, QString> myBackup;
+  QPtrList<Item>       myChildren;
 
   friend class QtxResourceEdit::Item;
 };
@@ -97,6 +103,8 @@ public:
   Item*                parentItem() const;
   void                 childItems( QPtrList<Item>& ) const;
 
+  virtual bool         isEmpty() const;
+
   QString              title() const;
   void                 resource( QString&, QString& ) const;
 
@@ -115,6 +123,9 @@ public:
 
   QString              resourceValue() const;
   void                 setResourceValue( const QString& );
+
+  virtual void         insertChild( Item* );
+  virtual void         removeChild( Item* );
 
 protected:
   QtxResourceMgr*      resourceMgr() const;
