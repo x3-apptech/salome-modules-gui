@@ -87,6 +87,7 @@
 
 #define OBJECT_BROWSER_WIDTH 300
 
+/*!Image for empty icon.*/
 static const char* imageEmptyIcon[] = {
 "20 20 1 1",
 ". 	c None",
@@ -111,6 +112,7 @@ static const char* imageEmptyIcon[] = {
 "....................",
 "...................."};
 
+/*!Create new instance of SalomeApp_Application.*/
 extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 {
   return new SalomeApp_Application();
@@ -123,6 +125,7 @@ SalomeApp_Preferences* SalomeApp_Application::_prefs_ = 0;
   Description : Application containing SalomeApp module
 */
 
+/*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
 : CAM_Application( false ),
 myPrefs( 0 )
@@ -148,6 +151,13 @@ myPrefs( 0 )
   connect( mySelMgr, SIGNAL( selectionChanged() ), this, SLOT( onSelection() ) );
 }
 
+/*!Destructor.
+ *\li Save window geometry.
+ *\li Save desktop geometry.
+ *\li Save resource maneger.
+ *\li Delete selection manager.
+ *\li Destroy event filter.
+ */
 SalomeApp_Application::~SalomeApp_Application()
 {
   saveWindowsGeometry();
@@ -164,6 +174,7 @@ SalomeApp_Application::~SalomeApp_Application()
   SalomeApp_EventFilter::Destroy();
 }
 
+/*!Start application.*/
 void SalomeApp_Application::start()
 {
   if ( desktop() )
@@ -183,11 +194,13 @@ void SalomeApp_Application::start()
   putInfo( "" );
 }
 
+/*!Gets application name.*/
 QString SalomeApp_Application::applicationName() const
 {
   return tr( "APP_NAME" );
 }
 
+/*!Gets application version.*/
 QString SalomeApp_Application::applicationVersion() const
 {
   static QString _app_version;
@@ -221,6 +234,7 @@ QString SalomeApp_Application::applicationVersion() const
   return _app_version;
 }
 
+/*!Load module by \a name.*/
 CAM_Module* SalomeApp_Application::loadModule( const QString& name )
 {
   CAM_Module* mod = CAM_Application::loadModule( name );
@@ -233,6 +247,7 @@ CAM_Module* SalomeApp_Application::loadModule( const QString& name )
   return mod;
 }
 
+/*!Activate module by \a modName*/
 bool SalomeApp_Application::activateModule( const QString& modName )
 {
   QString actName;
@@ -259,11 +274,13 @@ bool SalomeApp_Application::activateModule( const QString& modName )
   return true;
 }
 
+/*!Gets selection manager.*/
 SalomeApp_SelectionMgr* SalomeApp_Application::selectionMgr() const
 {
   return mySelMgr;
 }
 
+/*!Create actions:*/
 void SalomeApp_Application::createActions()
 {
   STD_Application::createActions();
@@ -271,37 +288,37 @@ void SalomeApp_Application::createActions()
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
   
-  // Dump study
+  //! Dump study
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIconSet(),
 		tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
 		0, desk, false, this, SLOT( onDumpStudy() ) );
     
-  // Load script
+  //! Load script
   createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
 		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
 		0, desk, false, this, SLOT( onLoadScript() ) );
 
-  // Properties
+  //! Properties
   createAction( PropertiesId, tr( "TOT_DESK_PROPERTIES" ), QIconSet(),
 	        tr( "MEN_DESK_PROPERTIES" ), tr( "PRP_DESK_PROPERTIES" ),
 	        0, desk, false, this, SLOT( onProperties() ) );
 
-  // Preferences
+  //! Preferences
   createAction( PreferencesId, tr( "TOT_DESK_PREFERENCES" ), QIconSet(),
 		tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
 		CTRL+Key_P, desk, false, this, SLOT( onPreferences() ) );
 
-  // MRU
+  //! MRU
   QtxMRUAction* mru = new QtxMRUAction( tr( "TOT_DESK_MRU" ), tr( "MEN_DESK_MRU" ), desk );
   connect( mru, SIGNAL( activated( QString ) ), this, SLOT( onMRUActivated( QString ) ) );
   registerAction( MRUId, mru );
 
-  // default icon for neutral point ('SALOME' module)
+  //! default icon for neutral point ('SALOME' module)
   QPixmap defIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ), false );
   if ( defIcon.isNull() )
     defIcon = QPixmap( imageEmptyIcon );
 
-  // default icon for any module
+  //! default icon for any module
   QPixmap modIcon = resMgr->loadPixmap( "SalomeApp", tr( "APP_MODULE_ICO" ), false );
   if ( modIcon.isNull() )
     modIcon = QPixmap( imageEmptyIcon );
@@ -355,7 +372,7 @@ void SalomeApp_Application::createActions()
 
   SUIT_Tools::simplifySeparators( modTBar );
 
-  // New window
+  //! New window
 
   int windowMenu = createMenu( tr( "MEN_DESK_WINDOW" ), -1, 100 );
   int newWinMenu = createMenu( tr( "MEN_DESK_NEWWINDOW" ), windowMenu, -1, 0 );
@@ -395,6 +412,7 @@ void SalomeApp_Application::createActions()
   */
 }
 
+/*!On module activation action.*/
 void SalomeApp_Application::onModuleActivation( QAction* a )
 {
   if ( !a )
@@ -438,15 +456,17 @@ void SalomeApp_Application::onModuleActivation( QAction* a )
     activateModule( modName );
 }
 
+/*!Default module activation.*/
 QString SalomeApp_Application::defaultModule() const
 {
   QStringList aModuleNames;
   modules( aModuleNames, false ); // obtain a complete list of module names for the current configuration
-  // If there's the one and only module --> activate it automatically
-  // TODO: Possible improvement - default module can be taken from preferences
+  //! If there's the one and only module --> activate it automatically
+  //! TODO: Possible improvement - default module can be taken from preferences
   return aModuleNames.count() > 1 ? "" : ( aModuleNames.count() ? aModuleNames.first() : "" );
 }
 
+/*!On new window slot.*/
 void SalomeApp_Application::onNewWindow()
 {
   const QObject* obj = sender();
@@ -476,8 +496,8 @@ void SalomeApp_Application::onNewWindow()
 }
 
 //=======================================================================
-// name    : onNewDoc
-// Purpose : SLOT. Create new document
+//  name    : onNewDoc
+/*! Purpose : SLOT. Create new document*/
 //=======================================================================
 void SalomeApp_Application::onNewDoc()
 {
@@ -496,7 +516,7 @@ void SalomeApp_Application::onNewDoc()
 
 //=======================================================================
 // name    : onOpenDoc
-// Purpose : SLOT. Open new document
+/*! Purpose : SLOT. Open new document*/
 //=======================================================================
 void SalomeApp_Application::onOpenDoc()
 {
@@ -512,6 +532,7 @@ void SalomeApp_Application::onOpenDoc()
   }
 }
 
+/*! Purpose : SLOT. Open new document with \a aName.*/
 bool SalomeApp_Application::onOpenDoc( const QString& aName )
 {
   bool res = CAM_Application::onOpenDoc( aName );
@@ -528,6 +549,7 @@ bool SalomeApp_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
+/*!SLOT. Load document.*/
 void SalomeApp_Application::onLoadDoc()
 { 
   QString name, studyname, ext;
@@ -574,7 +596,7 @@ void SalomeApp_Application::onLoadDoc()
 }
 
 
-
+/*!SLOT. Load document with \a aName.*/
 bool SalomeApp_Application::onLoadDoc( const QString& aName )
 {
   bool res = CAM_Application::onLoadDoc( aName );
@@ -591,6 +613,7 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
   return res;
 }
 
+/*!Private SLOT. Selection.*/
 void SalomeApp_Application::onSelection()
 {
   onSelectionChanged();
@@ -599,6 +622,7 @@ void SalomeApp_Application::onSelection()
     ((SalomeApp_Module*)activeModule())->selectionChanged();
 }
 
+/*!SLOT. Copy objects to study maneger from selection maneger..*/
 void SalomeApp_Application::onCopy() 
 {
   SALOME_ListIO list;
@@ -624,6 +648,7 @@ void SalomeApp_Application::onCopy()
     }
 }
 
+/*!SLOT. Paste objects to study maneger from selection manager.*/
 void SalomeApp_Application::onPaste() 
 {
   SALOME_ListIO list;
@@ -650,6 +675,7 @@ void SalomeApp_Application::onPaste()
     }
 }
 
+/*!Sets enable or disable some actions on selection changed.*/
 void SalomeApp_Application::onSelectionChanged()
 {
    SALOME_ListIO list;
@@ -684,13 +710,14 @@ void SalomeApp_Application::onSelectionChanged()
      qaction->setEnabled(false);
    }
 }		
- 
+
+/*!Update object browser.*/ 
 void SalomeApp_Application::onRefresh()
 {
   updateObjectBrowser( true );
 }
 
- 
+/*!Private SLOT. */
 void SalomeApp_Application::onOpenWith()
 {
   QApplication::setOverrideCursor( Qt::waitCursor );
@@ -721,6 +748,9 @@ bool SalomeApp_Application::useStudy(const QString& theName)
   return res;
 }
 
+/*!Set active study.
+ *\param stupa - SUIT_Study.
+ */
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 {
   CAM_Application::setActiveStudy( study );
@@ -730,7 +760,7 @@ void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 
 //=======================================================================
 // name    : createNewStudy
-// Purpose : Create new study
+/*! Purpose : Create new study*/
 //=======================================================================
 SUIT_Study* SalomeApp_Application::createNewStudy()
 {
@@ -747,7 +777,7 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
 
 //=======================================================================
 // name    : createNewStudy
-// Purpose : Enable/Disable menu items and toolbar buttons. Rebuild menu
+/*! Purpose : Enable/Disable menu items and toolbar buttons. Rebuild menu*/
 //=======================================================================
 void SalomeApp_Application::updateCommandsStatus()
 {
@@ -782,7 +812,7 @@ void SalomeApp_Application::updateCommandsStatus()
 
 //=======================================================================
 // name    : onHelpAbout
-// Purpose : SLOT. Display "About" message box
+/*! Purpose : SLOT. Display "About" message box*/
 //=======================================================================
 void SalomeApp_Application::onHelpAbout()
 {
@@ -810,6 +840,12 @@ QWidget* SalomeApp_Application::window( const int flag, const int studyId ) cons
   return wid;
 }
 
+/*!Adds window to application.
+ *\param wid - QWidget
+ *\param flag - key wor window
+ *\param studyId - study id
+ * Flag used how identificator of window in windows list.
+ */
 void SalomeApp_Application::addWindow( QWidget* wid, const int flag, const int studyId )
 {
   if ( !wid )
@@ -843,6 +879,11 @@ void SalomeApp_Application::addWindow( QWidget* wid, const int flag, const int s
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
 
+/*!Remove window from application.
+ *\param flag - key wor window
+ *\param studyId - study id
+ * Flag used how identificator of window in windows list.
+ */
 void SalomeApp_Application::removeWindow( const int flag, const int studyId )
 {
   if ( !myWindows.contains( flag ) )
@@ -864,6 +905,11 @@ void SalomeApp_Application::removeWindow( const int flag, const int studyId )
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
 
+/*!Gets window.
+ *\param flag - key wor window
+ *\param studyId - study id
+ * Flag used how identificator of window in windows list.
+ */
 QWidget* SalomeApp_Application::getWindow( const int flag, const int studyId )
 {
   QWidget* wid = window( flag, studyId );
@@ -873,6 +919,7 @@ QWidget* SalomeApp_Application::getWindow( const int flag, const int studyId )
   return wid;
 }
 
+/*!Check*/
 bool SalomeApp_Application::isWindowVisible( const int type ) const
 {
   bool res = false;

@@ -10,8 +10,7 @@
 
 #include <QtxDialog.h>
 
-/*
-  Class: SalomeApp_AboutDlg
+/*!
   Descr: Salome help about dialog
 */
 

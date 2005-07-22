@@ -13,6 +13,7 @@
 #include <qpixmap.h>
 #include <qgroupbox.h>
 
+/*!Constructor.*/
 SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& defVer, QWidget* parent )
 : QtxDialog( parent, "salome_about_dialog", true, false, None )
 {
@@ -85,15 +86,25 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
   setSizeGripEnabled( false );
 }
 
+/*!Destructor.*/
 SalomeApp_AboutDlg::~SalomeApp_AboutDlg()
 {
+  //! Do nothing.
 }
 
+/*!On mouse press event.*/
 void SalomeApp_AboutDlg::mousePressEvent( QMouseEvent* )
 {
   accept();
 }
 
+/*!Change font of widget \a wid.
+ *\param wid - QWidget
+ *\param bold - boolean value
+ *\param italic - boolean value
+ *\param underline - boolean value
+ *\param inc - integer increment for font point size.
+ */
 void SalomeApp_AboutDlg::changeFont( QWidget* wid, const bool bold, const bool italic,
                                      const bool underline, const int inc ) const
 {
@@ -107,6 +118,7 @@ void SalomeApp_AboutDlg::changeFont( QWidget* wid, const bool bold, const bool i
   widFont.setPointSize( widFont.pointSize() + inc );
 }
 
+/*!Check lable \a lab.*/
 void SalomeApp_AboutDlg::checkLabel( QLabel* lab ) const
 {
   if ( !lab )

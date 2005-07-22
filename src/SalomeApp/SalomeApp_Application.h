@@ -39,8 +39,7 @@ class SALOME_LifeCycleCORBA;
 #pragma warning( disable:4251 )
 #endif
 
-/*
-  Class       : SalomeApp_Application
+/*!
   Description : Application containing SalomeApp module
 */
 
