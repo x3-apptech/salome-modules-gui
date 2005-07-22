@@ -929,14 +929,15 @@ QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* 
 : PrefItem( Font, edit, pItem, parent )
 {
   new QLabel( title, this );
-  myFamilies = new QtxComboBox( true, this );
-  myFamilies->lineEdit()->setReadOnly( true );
+  myFamilies = new QtxComboBox( false, this );
   mySizes = new QtxComboBox( true, this );
   mySizes->setInsertionPolicy( QComboBox::NoInsertion );
   myBold = new QCheckBox( tr( "Bold" ), this );
   myItalic = new QCheckBox( tr( "Italic" ), this );
   myUnderline = new QCheckBox( tr( "Underline" ), this );
-  ( new QFrame( this ) )->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+
+  myFamilies->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
+  mySizes->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
   connect( myFamilies, SIGNAL( activated( int ) ), this, SLOT( onActivateFamily( int ) ) );
 
@@ -1099,8 +1100,15 @@ void QtxListResourceEdit::FontItem::setFamily( const QString& f )
       curtext = deffam.toString();
   }
 
-  if( curtext!=family() )
-    myFamilies->setCurrentText( curtext );
+  int idx = -1;
+  for ( int i = 0; i < (int)myFamilies->count() && idx < 0; i++ )
+  {
+    if ( myFamilies->text( i ) == curtext )
+      idx = i;
+  }
+
+  if ( idx >= 0 )
+    myFamilies->setCurrentItem( idx );
 }
 
 QString QtxListResourceEdit::FontItem::family() const
