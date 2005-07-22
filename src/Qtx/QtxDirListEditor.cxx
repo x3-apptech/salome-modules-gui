@@ -1,19 +1,18 @@
-#include <QtxDirListEditor.h>
+#include "QtxDirListEditor.h"
 
-#include <qlayout.h>
 #include <qlabel.h>
+#include <qlayout.h>
 #include <qpushbutton.h>
-#include <qapplication.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
-using namespace std;
+#include <qapplication.h>
 
 #define MARGIN_SIZE    11
 #define SPACING_SIZE    6
 #define SPACER_SIZE     5
 
-static const char *delete_icon[] = {
-"    16    16        3            1",
+static const char* delete_icon[] = {
+"16 16 3 1",
 "` c #810000",
 "  c none",
 "# c #ffffff",
@@ -35,8 +34,8 @@ static const char *delete_icon[] = {
 "                "
 };
 
-static const char *insert_icon[] = {
-"    16    16        5            1",
+static const char* insert_icon[] = {
+"16 16 5 1",
 "` c #000000",
 ". c #ffff00",
 "# c #9d9da1",
@@ -60,8 +59,8 @@ static const char *insert_icon[] = {
 "                "
 };
 
-static const char *movedown_icon[] = {
-"    16    16        2            1",
+static const char* movedown_icon[] = {
+"16 16 2 1",
 "` c #000000",
 "  c none",
 "                ",
@@ -82,8 +81,8 @@ static const char *movedown_icon[] = {
 "                "
 };
 
-static const char *moveup_icon[] = {
-"    16    16        2            1",
+static const char* moveup_icon[] = {
+"16 16 2 1",
 "` c #000000",
 "  c none",
 "                ",
@@ -104,12 +103,11 @@ static const char *moveup_icon[] = {
 "                "
 };
 
-
 /*!
   Constructor
 */
-QtxDirListEditor::QtxDirListEditor(QWidget* parent) 
-     : QWidget(parent) 
+QtxDirListEditor::QtxDirListEditor( QWidget* parent )
+: QWidget( parent )
 {
   myEdited       = false;
   myLastSelected = 0;
@@ -181,13 +179,15 @@ QtxDirListEditor::QtxDirListEditor(QWidget* parent)
 /*!
   Destructor
 */
-QtxDirListEditor::~QtxDirListEditor() {
+QtxDirListEditor::~QtxDirListEditor()
+{
 }
 
 /*!
   Gets list of paths
 */
-void QtxDirListEditor::getPathList(QStringList& list) {
+void QtxDirListEditor::getPathList(QStringList& list)
+{
   list.clear();
   for (unsigned i = 0; i < myDirList->count()-1; i++)
     list.append(myDirList->text(i));
@@ -206,12 +206,12 @@ void QtxDirListEditor::setPathList(const QStringList& list) {
 /*!
   Validates entered path, returns true if OK
 */
-#ifndef WNT
-#include <pwd.h>
-#endif
-bool QtxDirListEditor::validate() {
-  if (myEdited) {
-    QString dirPath = myEdit->text().stripWhiteSpace();
+bool QtxDirListEditor::validate()
+{
+  if ( myEdited )
+  {
+    QString dirPath = QFileInfo( myEdit->text().stripWhiteSpace() ).absFilePath();
+/*
 #ifndef WNT
     if ( dirPath.startsWith( "~") ) {
       dirPath = dirPath.remove(0,1);
@@ -241,6 +241,7 @@ bool QtxDirListEditor::validate() {
       dirPath = user_data->pw_dir + dirPath;
     }
 #endif
+*/
     QDir dir(dirPath);
     QListBoxItem* found = 0;
     for (unsigned i = 0; i < myDirList->count()-1; i++) {
@@ -424,8 +425,8 @@ void QtxDirListEditor::onEditFinished() {
       myDirList->setSelected(myLastSelected, true);
       return;
     }
-    delete myEdit;
-    delete myBtn;
+    myEdit->deleteLater();
+    myBtn->deleteLater();
     myEdit = 0;
     myBtn  = 0;
     myEdited = false;
