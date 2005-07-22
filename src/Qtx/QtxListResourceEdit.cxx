@@ -929,7 +929,8 @@ QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* 
 : PrefItem( Font, edit, pItem, parent )
 {
   new QLabel( title, this );
-  myFamilies = new QtxComboBox( this );
+  myFamilies = new QtxComboBox( true, this );
+  myFamilies->lineEdit()->setReadOnly( true );
   mySizes = new QtxComboBox( true, this );
   mySizes->setInsertionPolicy( QComboBox::NoInsertion );
   myBold = new QCheckBox( tr( "Bold" ), this );
