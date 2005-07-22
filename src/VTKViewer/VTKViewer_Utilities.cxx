@@ -8,8 +8,7 @@
 #include "VTKViewer_Utilities.h"
 
 
-//****************************************************************
-//see vtkRenderer::ResetCamera(float bounds[6]) method
+/*!@see vtkRenderer::ResetCamera(float bounds[6]) method*/
 void ResetCamera(vtkRenderer* theRenderer, int theUsingZeroFocalPoint)
 {  
   if(!theRenderer) return;
@@ -65,8 +64,7 @@ void ResetCamera(vtkRenderer* theRenderer, int theUsingZeroFocalPoint)
   ResetCameraClippingRange(theRenderer);
 }
 
-//****************************************************************
-// Compute the bounds of the visible props
+/*! Compute the bounds of the visible props*/
 int ComputeVisiblePropBounds(vtkRenderer* theRenderer, float theBounds[6])
 {
   float      *bounds;
@@ -123,8 +121,7 @@ int ComputeVisiblePropBounds(vtkRenderer* theRenderer, float theBounds[6])
   return aCount;
 }
 
-//****************************************************************
-//see vtkRenderer::ResetCameraClippingRange(float bounds[6]) method
+/*!@see vtkRenderer::ResetCameraClippingRange(float bounds[6]) method*/
 void ResetCameraClippingRange(vtkRenderer* theRenderer)
 {
   if(!theRenderer || !theRenderer->VisibleActorCount()) return;
@@ -164,6 +161,7 @@ void ResetCameraClippingRange(vtkRenderer* theRenderer)
   anActiveCamera->SetClippingRange( range );
 }
 
+/*!Compute trihedron size.*/
 bool ComputeTrihedronSize( vtkRenderer* theRenderer,double& theNewSize,
 			   const double theSize, const float theSizeInPercents )
 {

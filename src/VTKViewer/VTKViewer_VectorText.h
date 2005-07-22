@@ -39,7 +39,9 @@
 #define __VTKViewer_VectorText_h
 
 #include "vtkPolyDataSource.h"
-
+/*!Generates vtkPolyData from an input text string.
+ *@see vtkVectorText
+ */
 class VTKViewer_VectorText : public vtkPolyDataSource 
 {
 public:

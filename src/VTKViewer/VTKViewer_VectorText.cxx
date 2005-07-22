@@ -1545,7 +1545,7 @@ char *VTK_VECTOR_TEXT_126 = (char *) "25 0.971429 "
 ;
 
 
-// Construct object with no string set and backing enabled.
+/*! Construct object with no string set and backing enabled.*/
 VTKViewer_VectorText::VTKViewer_VectorText()
 {
   this->Text = NULL;
@@ -1647,6 +1647,7 @@ VTKViewer_VectorText::VTKViewer_VectorText()
   
 }
 
+/*!Calculate output.*/
 void VTKViewer_VectorText::Execute()
 {
   vtkPolyData *output = this->GetOutput();
@@ -1739,6 +1740,7 @@ void VTKViewer_VectorText::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Text: " << (this->Text ? this->Text : "(none)") << "\n";
 }
 
+/*!Destructor.*/
 VTKViewer_VectorText::~VTKViewer_VectorText()
 {
   if (this->Text)

@@ -19,9 +19,7 @@
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+/*! Construction*/
 VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop, 
                                             VTKViewer_Viewer* theModel,
 					    VTKViewer_InteractorStyle* iStyle,
@@ -103,6 +101,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
   onResetView();
 }
 
+/*!Destructor.*/
 VTKViewer_ViewWindow::~VTKViewer_ViewWindow()
 {
   myTransform->Delete();
@@ -130,7 +129,6 @@ void VTKViewer_ViewWindow::activateZoom()
   myRWInteractor->GetInteractorStyle()->startZoom();
 }
 
-//****************************************************************
 /*!
     Activates 'panning' transformation
 */
@@ -139,7 +137,6 @@ void VTKViewer_ViewWindow::activatePanning()
   myRWInteractor->GetInteractorStyle()->startPan();
 }
 
-//****************************************************************
 /*!
     Activates 'rotation' transformation
 */
@@ -148,14 +145,12 @@ void VTKViewer_ViewWindow::activateRotation()
   myRWInteractor->GetInteractorStyle()->startRotate();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::activateGlobalPanning()
 {
   //if(myTrihedron->GetVisibleActorCount(myRenderer))
   myRWInteractor->GetInteractorStyle()->startGlobalPan();
 }
 
-//****************************************************************
 /*!
     Activates 'fit area' transformation
 */
@@ -164,7 +159,6 @@ void VTKViewer_ViewWindow::activateWindowFit()
   myRWInteractor->GetInteractorStyle()->startFitArea();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
@@ -273,7 +267,6 @@ void VTKViewer_ViewWindow::createActions()
   myActionsMap[ TrihedronShowId ] = aAction;
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
@@ -301,7 +294,6 @@ void VTKViewer_ViewWindow::createToolBar()
   myActionsMap[ResetId]->addTo(myToolBar);
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onFrontView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -311,7 +303,6 @@ void VTKViewer_ViewWindow::onFrontView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onBackView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -321,7 +312,6 @@ void VTKViewer_ViewWindow::onBackView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onTopView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -331,7 +321,6 @@ void VTKViewer_ViewWindow::onTopView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onBottomView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -341,7 +330,6 @@ void VTKViewer_ViewWindow::onBottomView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onLeftView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera(); 
@@ -351,7 +339,6 @@ void VTKViewer_ViewWindow::onLeftView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onRightView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -361,7 +348,6 @@ void VTKViewer_ViewWindow::onRightView()
   onFitAll();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onResetView()
 {
   int aTriedronIsVisible = isTrihedronDisplayed();
@@ -378,14 +364,12 @@ void VTKViewer_ViewWindow::onResetView()
   Repaint();
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onFitAll()
 {
   myRWInteractor->GetInteractorStyle()->ViewFitAll();
   Repaint();
 }
 
-//****************************************************************
 /*!
     Set background of the viewport
 */
@@ -395,7 +379,6 @@ void VTKViewer_ViewWindow::setBackgroundColor( const QColor& color )
     myRenderer->SetBackground( color.red()/255., color.green()/255., color.blue()/255. );
 }
 
-//****************************************************************
 /*!
     Returns background of the viewport
 */
@@ -517,7 +500,6 @@ void VTKViewer_ViewWindow::MoveActor( VTKViewer_Actor* theActor)
   InsertActor(theActor,true);
 }
 
-//****************************************************************
 void VTKViewer_ViewWindow::onTrihedronShow()
 {
   if (isTrihedronDisplayed())
@@ -527,7 +509,6 @@ void VTKViewer_ViewWindow::onTrihedronShow()
   myRenderWindow->update();
 }
 
-//****************************************************************
 QImage VTKViewer_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );

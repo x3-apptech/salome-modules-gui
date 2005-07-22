@@ -19,10 +19,12 @@
 
 vtkStandardNewMacro(VTKViewer_UnScaledActor);
 
-//****************************************************************
-VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() {}
+/*!Constructor*/
+VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() {/*!Do nothing*/}
 
-//****************************************************************
+/*!This causes the actor to be rendered.
+ * Set new scale for actor.
+ */
 void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
 {
   if(theRenderer){
@@ -46,7 +48,9 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
   vtkFollower::Render(theRenderer);
 }
 
-//****************************************************************
+/*! Sets \a mySize= \a theSize variable.
+ * \param  theSize - integer size
+ */
 void VTKViewer_UnScaledActor::SetSize(int theSize){
   mySize = theSize;
 }
@@ -56,7 +60,7 @@ vtkStandardNewMacro(VTKViewer_LineActor);
 vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,VTKViewer_UnScaledActor);
 vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,VTKViewer_UnScaledActor);
 
-//****************************************************************
+/*!Adds Label and Arrow actors to \a theRenderer.*/
 void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
 {
   if(LabelActor && LabelActor->GetVisibility()){
@@ -70,7 +74,6 @@ void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
   vtkFollower::Render(theRenderer);
 }
 
-//****************************************************************
 VTKViewer_Axis::VTKViewer_Axis()
 {
   /*! \li Initialize the Line pipe-line representation*/
@@ -119,7 +122,6 @@ VTKViewer_Axis::VTKViewer_Axis()
   myVisibility = VTKViewer_Trihedron::eOn;
 }
 
-//****************************************************************
 VTKViewer_Axis::~VTKViewer_Axis()
 {
   /*! \li Destroy of the Label pipe-line representation */
@@ -147,7 +149,6 @@ VTKViewer_Axis::~VTKViewer_Axis()
   myLineSource->Delete();
 }
 
-//****************************************************************
 void VTKViewer_Axis::AddToRender(vtkRenderer* theRenderer){
   /*! \li Order of the calls are important*/
   theRenderer->AddActor(myLineActor);
@@ -155,7 +156,6 @@ void VTKViewer_Axis::AddToRender(vtkRenderer* theRenderer){
   theRenderer->AddActor(myArrowActor);
 }
 
-//****************************************************************
 void VTKViewer_Axis::SetVisibility(VTKViewer_Trihedron::TVisibility theVis)
 {
   switch(theVis){
@@ -181,14 +181,12 @@ void VTKViewer_Axis::SetCamera(vtkCamera* theCamera){
   myLabelActor->SetCamera(theCamera);
 }
 
-//****************************************************************  
 void VTKViewer_Axis::SetProperty(vtkProperty* theProperty){
   myLabelActor->SetProperty(theProperty);
   myArrowActor->SetProperty(theProperty);
   myLineActor->SetProperty(theProperty);
 }
 
-//****************************************************************
 void VTKViewer_Axis::SetSize(float theSize)
 {
   float aPosition[3] = {myDir[0]*theSize, myDir[1]*theSize, myDir[2]*theSize};
@@ -202,7 +200,6 @@ void VTKViewer_Axis::SetSize(float theSize)
   myLabelActor->AddPosition(aPosition);
 }
 
-//****************************************************************
 /*! \class VTKViewer_XAxis
  * \brief X Axis actor
  */
@@ -218,6 +215,7 @@ public:
 
 vtkStandardNewMacro(VTKViewer_XAxis);
 
+/*!Initialize X Axis*/
 VTKViewer_XAxis::VTKViewer_XAxis(){ 
   myDir[0] = 1.0; myDir[1] = 0.0; myDir[2] = 0.0;
   myRot[0] = 0.0; myRot[1] = 0.0; myRot[2] = 0.0;
@@ -228,7 +226,6 @@ VTKViewer_XAxis::VTKViewer_XAxis(){
   aProperty->Delete();
 }
 
-//==============================================================================
 /*! \class VTKViewer_YAxis
  * \brief Y Axis actor
  */
@@ -243,7 +240,7 @@ public:
 
 vtkStandardNewMacro(VTKViewer_YAxis);
 
-//****************************************************************
+/*!Initialize Y Axis*/
 VTKViewer_YAxis::VTKViewer_YAxis()
 { 
   myDir[0] = 0.0; myDir[1] = 1.0; myDir[2] = 0.0;
@@ -255,7 +252,6 @@ VTKViewer_YAxis::VTKViewer_YAxis()
   aProperty->Delete();
 }
 
-//****************************************************************
 /*! \class VTKViewer_ZAxis
  * \brief Z Axis actor
  */
@@ -271,7 +267,7 @@ public:
 
 vtkStandardNewMacro(VTKViewer_ZAxis);
 
-//****************************************************************
+/*!Initialize Z Axis*/
 VTKViewer_ZAxis::VTKViewer_ZAxis()
 {
   myDir[0] = 0.0; myDir[1] = 0.0; myDir[2] = 1.0;
@@ -285,7 +281,6 @@ VTKViewer_ZAxis::VTKViewer_ZAxis()
 
 vtkStandardNewMacro(VTKViewer_Trihedron);
 
-//****************************************************************
 VTKViewer_Trihedron::VTKViewer_Trihedron()
 {
   myPresent = vtkActorCollection::New();
@@ -296,7 +291,6 @@ VTKViewer_Trihedron::VTKViewer_Trihedron()
   SetSize(aSize);
 }
 
-//****************************************************************
 VTKViewer_Trihedron::~VTKViewer_Trihedron()
 {
   myPresent->RemoveAllItems();
@@ -305,7 +299,6 @@ VTKViewer_Trihedron::~VTKViewer_Trihedron()
     myAxis[i]->Delete();
 }
 
-//****************************************************************
 void VTKViewer_Trihedron::SetSize(float theSize)
 {
   mySize = theSize;
@@ -313,20 +306,17 @@ void VTKViewer_Trihedron::SetSize(float theSize)
     myAxis[i]->SetSize(theSize);
 }
 
-//****************************************************************
 void VTKViewer_Trihedron::SetVisibility(TVisibility theVis)
 {
   for(int i = 0; i < 3; i++)
     myAxis[i]->SetVisibility(theVis);
 }
 
-//****************************************************************
 VTKViewer_Trihedron::TVisibility VTKViewer_Trihedron::GetVisibility()
 {
   return myAxis[0]->GetVisibility();
 }
 
-//****************************************************************
 void VTKViewer_Trihedron::AddToRender(vtkRenderer* theRenderer)
 {
   vtkCamera* aCamera = theRenderer->GetActiveCamera();
@@ -336,7 +326,6 @@ void VTKViewer_Trihedron::AddToRender(vtkRenderer* theRenderer)
   }
 }
 
-//****************************************************************
 void VTKViewer_Trihedron::RemoveFromRender(vtkRenderer* theRenderer)
 {
   myPresent->InitTraversal();
@@ -344,7 +333,6 @@ void VTKViewer_Trihedron::RemoveFromRender(vtkRenderer* theRenderer)
     theRenderer->RemoveActor(anActor);
 }
 
-//****************************************************************
 int VTKViewer_Trihedron::GetVisibleActorCount(vtkRenderer* theRenderer)
 {
   //TVisibility aVis = GetVisibility();

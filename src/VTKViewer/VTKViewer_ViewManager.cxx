@@ -3,7 +3,9 @@
 
 int VTKViewer_ViewManager::_VTKViewMgr_Id = 0;
 
-//***************************************************************
+/*!Constructor.Initialize SIUT_ViewManager by \a study and \a theDesktop.
+ * Create new instance of VTKViewer_Viewer and set view model by it.
+ */
 VTKViewer_ViewManager::VTKViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* theDesktop ) 
 : SUIT_ViewManager( study, theDesktop )
 {
@@ -11,12 +13,13 @@ VTKViewer_ViewManager::VTKViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* t
   setViewModel( new VTKViewer_Viewer() );
 }
 
-//***************************************************************
+/*!Destructor.*/
 VTKViewer_ViewManager::~VTKViewer_ViewManager()
 {
+  /*!Do nothing.*/
 }
 
-//***************************************************************
+/*!Sets view window name*/
 void VTKViewer_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
   int aPos = myViews.find(theView);

@@ -46,16 +46,17 @@ static int MYDEBUGWITHFILES = 0;
 vtkCxxRevisionMacro(VTKViewer_ShrinkFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_ShrinkFilter);
 
-
+/*!Constructor. Sets store mapping to zero.*/
 VTKViewer_ShrinkFilter::VTKViewer_ShrinkFilter(): 
   myStoreMapping(0)
 {}
 
-
+/*!Destructor.*/
 VTKViewer_ShrinkFilter::~VTKViewer_ShrinkFilter()
 {}
 
 
+/*!Execute method. Calculate output.*/
 void VTKViewer_ShrinkFilter::Execute()
 {
   vtkPoints *newPts;
@@ -163,13 +164,16 @@ void VTKViewer_ShrinkFilter::Execute()
   newPts->Delete();
 }
 
-
+/*!Sets store mapping.*/
 void VTKViewer_ShrinkFilter::SetStoreMapping(int theStoreMapping){
   myStoreMapping = theStoreMapping;
   this->Modified();
 }
 
 
+/*!Return node object id by vtk node id.
+ *\retval -1 - if no object, else return id.
+ */
 vtkIdType VTKViewer_ShrinkFilter::GetNodeObjId(int theVtkID){
   if(myVTK2ObjIds.empty() || theVtkID > myVTK2ObjIds.size()) return -1;
   return myVTK2ObjIds.at(theVtkID);

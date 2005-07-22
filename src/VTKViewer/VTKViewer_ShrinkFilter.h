@@ -7,16 +7,22 @@
 
 #include <vector>
 
+/*!Shrink cells composing an arbitrary data set.
+ *\warning It is possible to turn cells inside out or cause self intersection in special cases.
+ */
 class VTKVIEWER_EXPORT VTKViewer_ShrinkFilter : public vtkShrinkFilter 
 {
 public:
+  /*!Create new instance of VTKViewer_ShrinkFilter.*/
   static VTKViewer_ShrinkFilter *New();
   vtkTypeRevisionMacro(VTKViewer_ShrinkFilter, vtkShrinkFilter);
 
   void SetStoreMapping(int theStoreMapping);
+  /*!Gets store mapping flag.*/
   int GetStoreMapping(){ return myStoreMapping;}
 
   virtual vtkIdType GetNodeObjId(int theVtkID);
+  /*!Return element id by vtk id.*/
   virtual vtkIdType GetElemObjId(int theVtkID) { return theVtkID;}
 
 protected:
@@ -24,6 +30,7 @@ protected:
   ~VTKViewer_ShrinkFilter();
   
   void Execute();
+  /*!Not implemented.*/
   void UnstructuredGridExecute();
     
 private:

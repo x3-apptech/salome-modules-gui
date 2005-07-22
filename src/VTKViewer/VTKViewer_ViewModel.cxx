@@ -13,30 +13,32 @@
 #include <qpalette.h>
 #include <qpopupmenu.h>
 
-//****************************************************************
+/*!Constructor.Sets background color to black.*/
 VTKViewer_Viewer::VTKViewer_Viewer()
 : SUIT_ViewModel(),
 myBgColor( Qt::black )
 {
 }
 
-//****************************************************************
+/*!Destructor.*/
 VTKViewer_Viewer::~VTKViewer_Viewer() 
 {
 }
 
+/*!Gets background color.*/
 QColor VTKViewer_Viewer::backgroundColor() const
 {
   return myBgColor;
 }
 
+/*!Sets background color.*/
 void VTKViewer_Viewer::setBackgroundColor( const QColor& c )
 {
   if ( c.isValid() )
     myBgColor = c;
 }
 
-//****************************************************************
+/*!Create new instance of VTKViewer_ViewWindow, sets background color and return pointer to it.*/
 SUIT_ViewWindow* VTKViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   VTKViewer_ViewWindow* vw = new VTKViewer_ViewWindow( theDesktop, this );
@@ -44,7 +46,7 @@ SUIT_ViewWindow* VTKViewer_Viewer::createView( SUIT_Desktop* theDesktop )
   return vw;
 }
 
-//*********************************************************************
+/*!Sets view manager and connect slots.*/
 void VTKViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 {
   SUIT_ViewModel::setViewManager(theViewManager);
@@ -58,7 +60,7 @@ void VTKViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
           this, SLOT(onMouseRelease(SUIT_ViewWindow*, QMouseEvent*)));
 }
 
-//*********************************************************************
+/*!Insert context into popup menu.*/
 void VTKViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
 {
   thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
@@ -71,7 +73,7 @@ void VTKViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
     thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
-//*********************************************************************
+/*!On mouse press event.*/
 void VTKViewer_Viewer::onMousePress(SUIT_ViewWindow* vw, QMouseEvent* event)
 {
   VTKViewer_RenderWindowInteractor* rwi = 0;
@@ -95,7 +97,7 @@ void VTKViewer_Viewer::onMousePress(SUIT_ViewWindow* vw, QMouseEvent* event)
   }
 }
 
-//*********************************************************************
+/*!On mouse move event.*/
 void VTKViewer_Viewer::onMouseMove(SUIT_ViewWindow* vw, QMouseEvent* event)
 {
   VTKViewer_RenderWindowInteractor* rwi = 0;
@@ -105,7 +107,7 @@ void VTKViewer_Viewer::onMouseMove(SUIT_ViewWindow* vw, QMouseEvent* event)
     rwi->MouseMove( event );
 }
 
-//*********************************************************************
+/*!On mouse release event.*/
 void VTKViewer_Viewer::onMouseRelease(SUIT_ViewWindow* vw, QMouseEvent* event)
 {
   VTKViewer_RenderWindowInteractor* rwi = 0;
@@ -129,20 +131,21 @@ void VTKViewer_Viewer::onMouseRelease(SUIT_ViewWindow* vw, QMouseEvent* event)
   }
 }
 
-//*********************************************************************
+/*!Sets flag to enable selection \a isEnable.*/
 void VTKViewer_Viewer::enableSelection(bool isEnabled)
 {
   mySelectionEnabled = isEnabled;
   //!! To be done for view windows
 }
 
-//*********************************************************************
+/*!Sets flag to multi selection enable \a isEnable.*/
 void VTKViewer_Viewer::enableMultiselection(bool isEnable)
 {
   myMultiSelectionEnabled = isEnable;
   //!! To be done for view windows
 }
 
+/*!On dump view event.*/
 void VTKViewer_Viewer::onDumpView()
 {
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
@@ -150,7 +153,7 @@ void VTKViewer_Viewer::onDumpView()
     aView->onDumpView();
 }
 
-//*********************************************************************
+/*!On change back ground color event.*/
 void VTKViewer_Viewer::onChangeBgColor()
 {
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
@@ -162,7 +165,7 @@ void VTKViewer_Viewer::onChangeBgColor()
     aView->setBackgroundColor(aColor);
 }
 
-//*********************************************************************
+/*!On show tool bar event.*/
 void VTKViewer_Viewer::onShowToolbar() {
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )

@@ -36,6 +36,7 @@ static double EPS = 10e-4;
 
 vtkStandardNewMacro(VTKViewer_Transform);
 
+/*!Sets matrix scale.*/
 void VTKViewer_Transform::SetMatrixScale(double theScaleX, double theScaleY, double theScaleZ){ 
   double aMatrix[16] = {theScaleX,0,0,0, 
                         0,theScaleY,0,0, 
@@ -44,6 +45,7 @@ void VTKViewer_Transform::SetMatrixScale(double theScaleX, double theScaleY, dou
   this->SetMatrix(aMatrix);
 }
 
+/*!Gets matrix scale.*/
 void VTKViewer_Transform::GetMatrixScale(double theScale[3]){
   vtkMatrix4x4 *aTMatrix=this->GetMatrix();
   const double aScaleX = aTMatrix->GetElement(0,0);
@@ -54,6 +56,9 @@ void VTKViewer_Transform::GetMatrixScale(double theScale[3]){
   theScale[2] = aScaleZ;
 }
 
+/*!Checks: Is matrix identity, where used EPS value.
+ *If |aScaleX-1|<EPS && |aScaleY-1|<EPS && |aScaleY-1|<EPS return 1, esle 0.
+ */
 int VTKViewer_Transform::IsIdentity(){ 
   double aScale[3];
   this->GetMatrixScale(aScale);

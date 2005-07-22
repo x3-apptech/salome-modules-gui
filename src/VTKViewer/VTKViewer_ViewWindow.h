@@ -31,13 +31,17 @@ public:
 			VTKViewer_RenderWindowInteractor* = 0 );
   virtual ~VTKViewer_ViewWindow();
   
+  /*!Gets tool bar.*/
   QToolBar*    getToolBar() { return myToolBar; }
   
   void         setBackgroundColor( const QColor& );
   QColor       backgroundColor() const;
 
+  /*!Gets renderer.*/
   vtkRenderer*                      getRenderer()     { return myRenderer;     }
+  /*!Gets render window.*/
   VTKViewer_RenderWindow*	    getRenderWindow() { return myRenderWindow; }
+  /*!Gets render window interactor.*/
   VTKViewer_RenderWindowInteractor* getRWInteractor() { return myRWInteractor; }
   bool                              isTrihedronDisplayed();
 

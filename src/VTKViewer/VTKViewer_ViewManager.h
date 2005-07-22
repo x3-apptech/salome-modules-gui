@@ -7,6 +7,7 @@
 
 class SUIT_Desktop;
 
+/*!View manager.*/
 class VTKVIEWER_EXPORT VTKViewer_ViewManager : public SUIT_ViewManager
 {
   Q_OBJECT

@@ -5,9 +5,13 @@
 
 #include <vtkTransform.h>
 
+/*!\brief Describes linear transformations via a 4x4 matrix.
+ *@see vtkTransform class
+ */
 class VTKVIEWER_EXPORT VTKViewer_Transform : public vtkTransform
 {
 public:
+  /*!Create new instance of VTKViewer_Transform.*/
   static VTKViewer_Transform *New();
   vtkTypeMacro( VTKViewer_Transform, vtkTransform );
 
@@ -17,11 +21,15 @@ public:
   void GetMatrixScale(double theScale[3]);
 
 protected:
-  VTKViewer_Transform() {}
-  VTKViewer_Transform(const VTKViewer_Transform&) {}
-  ~VTKViewer_Transform() {}
+  /*!Constructor.*/
+  VTKViewer_Transform() {/*!Do nothing*/}
+  /*!Copy contructor.*/
+  VTKViewer_Transform(const VTKViewer_Transform&) {/*!Do nothing*/}
+  /*!Destructor.*/
+  ~VTKViewer_Transform() {/*!Do nothing*/}
 
-  void operator=( const VTKViewer_Transform& ) {}
+  /*!Operator = */
+  void operator=( const VTKViewer_Transform& ) {/*!Do nothing*/}
 };
 
 #endif

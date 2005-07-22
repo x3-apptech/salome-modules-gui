@@ -38,6 +38,7 @@
 
 vtkStandardNewMacro(VTKViewer_TransformFilter);
 
+/*!Execution method. Calculate output.*/
 void VTKViewer_TransformFilter::Execute(){
   vtkPoints *inPts;
   vtkPoints *newPts;
