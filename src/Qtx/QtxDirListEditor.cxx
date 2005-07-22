@@ -232,9 +232,9 @@ bool QtxDirListEditor::validate()
       if ( user_data == NULL ) {
 	// unknown user or something another error
 	QMessageBox::critical(this, 
-			      tr("ERR_ERROR"),
+			      tr("Error"),
 			      tr("Unknown user %1").arg(user), 
-			      tr("BUT_OK"));
+			      tr("Ok"));
 	myEdit->setFocus();
         return false;
       }
@@ -268,9 +268,9 @@ bool QtxDirListEditor::validate()
         if (found != myLastSelected) {
           // it is forbidden to add directory more then once
 	  QMessageBox::critical(this, 
-		                tr("ERR_ERROR"),
+		                tr("Error"),
 			        tr("Directory already specified."), 
-			        tr("BUT_OK"));
+			        tr("Ok"));
 	  myEdit->setFocus();
           return false;
         }
@@ -278,9 +278,9 @@ bool QtxDirListEditor::validate()
       else {
         if (!dir.exists()) {
 	  if ( QMessageBox::information(this, 
-					tr("WRN_WARNING"),
+					tr("Warning"),
 					tr("%1\n\nThe directory doesn't exist.\nAdd directory anyway?").arg(dir.absPath()),
-					tr("BUT_YES"), tr("BUT_NO"), QString::null, 1, 1) == 1) {
+					tr("Yes"), tr("No"), QString::null, 1, 1) == 1) {
 	    myEdit->setFocus();
             return false;
 	  }
@@ -338,8 +338,8 @@ void QtxDirListEditor::resizeEvent(QResizeEvent* event) {
   Called when user clicks inside directories list box
 */
 void QtxDirListEditor::onMouseButtonClicked(int           button, 
-					  QListBoxItem* item, 
-					  const QPoint& point) {
+					    QListBoxItem* item, 
+					    const QPoint& point) {
   if (myEdited) {
     if (!validate()) {
       myDirList->setCurrentItem(myLastSelected);
