@@ -1061,6 +1061,8 @@ void QtxListResourceEdit::FontItem::setProperty( const QString& name, const QVar
     }
 
     setFamily( fam );
+    setSize( -1 ); //set default size
+    onActivateFamily( -1 );
   }
   
   else if( name=="widget_flags" )
@@ -1119,7 +1121,7 @@ QString QtxListResourceEdit::FontItem::family() const
 void QtxListResourceEdit::FontItem::setSize( const int s )
 {
   int cursize = -1;
-  if( mySizes->isShown() )
+  if( mySizes->isShown() && s>0 )
   {
     if( ( myFlags & UserSize ) || mySizes->listBox()->findItem( QString( "%1" ).arg( s ), Qt::ExactMatch ) )
       cursize = s;
