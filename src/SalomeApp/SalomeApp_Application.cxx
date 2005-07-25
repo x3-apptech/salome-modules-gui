@@ -874,7 +874,14 @@ void SalomeApp_Application::addWindow( QWidget* wid, const int flag, const int s
     myWindows[flag]->setName( QString( "dock_window_%1" ).arg( flag ) );
   }
 
+  QFont f;
+  if( wid->inherits( "PythonConsole" ) )
+    f = ( ( PythonConsole* )wid )->font();
+  else
+    f = wid->font();
+
   myWindows[flag]->insert( sId, wid );
+  wid->setFont( f );
 
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
@@ -1225,11 +1232,13 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 
     ob->setNameTitle( tr( "OBJ_BROWSER_NAME" ) );
 
+    bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
     for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
     {
       ob->addColumn( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), i );
       ob->setColumnShown( i, resMgr->booleanValue( "ObjectBrowser",
                                                    QString().sprintf( "visibility_column_%d", i ), true ) );
+      //ob->listView()->setColumnWidthMode( i, autoSize ? QListView::Maximum : QListView::Manual );
     }
 
     // Create OBSelector
@@ -1243,6 +1252,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   {
     PythonConsole* pyCons = new PythonConsole( desktop(), new SalomeApp_PyInterp() );
     pyCons->setCaption( tr( "PYTHON_CONSOLE" ) );
+    pyCons->setFont( resMgr->fontValue( "PyConsole", "font" ) );
     wid = pyCons;
 
     //    pyCons->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
@@ -1348,14 +1358,40 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
   int salomeCat = pref->addPreference( tr( "PREF_CATEGORY_SALOME" ) );
 
   int genTab = pref->addPreference( tr( "PREF_TAB_GENERAL" ), salomeCat );
+  int studyGroup = pref->addPreference( tr( "PREF_GROUP_STUDY" ), genTab );
+  pref->setItemProperty( studyGroup, "columns", 1 );
 
-  int obGroup = pref->addPreference( tr( "PREF_GROUP_OBJBROWSER" ), genTab );
+  pref->addPreference( tr( "PREF_MULTI_FILE" ), studyGroup, SalomeApp_Preferences::Bool, "Study", "multi_file" );
+  pref->addPreference( tr( "PREF_ASCII_FILE" ), studyGroup, SalomeApp_Preferences::Bool, "Study", "ascii_file" );
+  int undoPref = pref->addPreference( tr( "PREF_UNDO_LEVEL" ), studyGroup, SalomeApp_Preferences::IntSpin, "Study", "undo_level" );
+  pref->setItemProperty( undoPref, "min", 1 );
+  pref->setItemProperty( undoPref, "max", 100 );
+
+  int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab );
+  pref->setItemProperty( extgroup, "columns", 1 );
+  int apppref = pref->addPreference( tr( "PREF_APP" ), extgroup, SalomeApp_Preferences::File, "ExternalBrowser", "application" );
+  pref->setItemProperty( apppref, "existing", true );
+  pref->setItemProperty( apppref, "flags", QFileInfo::ExeUser );
+
+  pref->addPreference( tr( "PREF_PARAM" ), extgroup, SalomeApp_Preferences::String, "ExternalBrowser", "parameters" );
+
+  int pythonConsoleGroup = pref->addPreference( tr( "PREF_GROUP_PY_CONSOLE" ), genTab );
+  pref->setItemProperty( pythonConsoleGroup, "columns", 1 );
+  pref->addPreference( tr( "PREF_FONT" ), pythonConsoleGroup, SalomeApp_Preferences::Font, "PyConsole", "font" );
+  
+  
+
+  int obTab = pref->addPreference( tr( "PREF_TAB_OBJBROWSER" ), salomeCat );
+  int defCols = pref->addPreference( tr( "PREF_GROUP_DEF_COLUMNS" ), obTab );
   for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
   {
-    pref->addPreference( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), obGroup,
+    pref->addPreference( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), defCols,
                          SalomeApp_Preferences::Bool, "ObjectBrowser", QString().sprintf( "visibility_column_%d", i ) );
   }
-  pref->setItemProperty( obGroup, "columns", 1 );
+  pref->setItemProperty( defCols, "columns", 1 );
+
+  int objSetGroup = pref->addPreference( tr( "PREF_OBJ_BROWSER_SETTINGS" ), obTab );
+  pref->addPreference( tr( "PREF_AUTO_SIZE" ), objSetGroup, SalomeApp_Preferences::Bool, "ObjectBrowser", "auto_size" );
 
   int viewTab = pref->addPreference( tr( "PREF_TAB_VIEWERS" ), salomeCat );
 
@@ -1448,7 +1484,30 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
     for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current(); ++it )
       ((OCCViewer_Viewer*)it.current())->setIsos( u, v );
   }
-  
+
+  if( sec=="ObjectBrowser" )
+  {
+    if( param=="auto_size" )
+    {
+      OB_Browser* ob = objectBrowser();
+      if( !ob )
+	return;
+
+      bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
+      /*for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
+        ob->listView()->setColumnWidthMode( i, autoSize ? QListView::Maximum : QListView::Manual );
+
+      if( autoSize )
+	ob->listView()->adjustSize();*/
+    }
+  }
+
+  if( sec=="PyConsole" )
+  {
+    if( param=="font" )
+      if( pythonConsole() )
+	pythonConsole()->setFont( resMgr->fontValue( "PyConsole", "font" ) );
+  }
 }
 
 void SalomeApp_Application::updateDesktopTitle() {

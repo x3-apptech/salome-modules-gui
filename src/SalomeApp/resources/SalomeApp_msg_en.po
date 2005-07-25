@@ -144,20 +144,56 @@ msgstr "Module activation cancelled"
 msgid "SalomeApp_Application::PREFERENCES_NOT_LOADED"
 msgstr "Preferences for module \"<b>%1</b>\" will be available when the module will be loaded"
 
+msgid "SalomeApp_Application::PREF_FONT"
+msgstr "Font"
+
 msgid "SalomeApp_Application::PREF_CATEGORY_SALOME"
 msgstr "SALOME"
 
 msgid "SalomeApp_Application::PREF_TAB_GENERAL"
 msgstr "General"
 
-msgid "SalomeApp_Application::PREF_GROUP_OBJBROWSER"
+msgid "SalomeApp_Application::PREF_TAB_OBJBROWSER"
 msgstr "Object browser"
+
+msgid "SalomeApp_Application::PREF_GROUP_EXT_BROWSER"
+msgstr "External browser"
+
+msgid "SalomeApp_Application::PREF_APP"
+msgstr "Application"
+
+msgid "SalomeApp_Application::PREF_PARAM"
+msgstr "Parameters"
+
+msgid "SalomeApp_Application::PREF_GROUP_DEF_COLUMNS"
+msgstr "Default columns"
+
+msgid "SalomeApp_Application::PREF_OBJ_BROWSER_SETTINGS"
+msgstr "Settings"
+
+msgid "SalomeApp_Application::PREF_AUTO_SIZE"
+msgstr "Auto size columns"
+
+msgid "SalomeApp_Application::PREF_GROUP_STUDY"
+msgstr "Study properties"
+
+msgid "SalomeApp_Application::PREF_GROUP_PY_CONSOLE"
+msgstr "Python console properties"
 
 msgid "SalomeApp_Application::PREF_TAB_VIEWERS"
 msgstr "Viewers"
 
 msgid "SalomeApp_Application::PREF_GROUP_OCCVIEWER"
 msgstr "OCC Viewer 3d"
+
+msgid "SalomeApp_Application::PREF_MULTI_FILE"
+msgstr "Multi file save"
+
+msgid "SalomeApp_Application::PREF_ASCII_FILE"
+msgstr "ASCII save"
+
+msgid "SalomeApp_Application::PREF_UNDO_LEVEL"
+msgstr "Undo level"
 
 msgid "SalomeApp_Application::PREF_GROUP_VTKVIEWER"
 msgstr "VTK Viewer 3d"
