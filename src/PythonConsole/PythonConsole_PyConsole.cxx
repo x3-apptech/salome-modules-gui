@@ -37,3 +37,19 @@ void PythonConsole::exec( const QString& command )
   if ( myEditor )
     myEditor->exec( command );
 }
+
+//****************************************************************
+void PythonConsole::setFont( const QFont& f )
+{
+  if( myEditor )
+    myEditor->setFont( f );
+}
+
+//****************************************************************
+QFont PythonConsole::font() const
+{
+  QFont res;
+  if( myEditor )
+    res = myEditor->font();
+  return res;
+}

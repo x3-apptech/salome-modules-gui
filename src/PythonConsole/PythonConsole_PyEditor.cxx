@@ -103,7 +103,7 @@ PythonConsole_PyEditor::PythonConsole_PyEditor(PyInterp_base* theInterp, QWidget
   QString fntSet( "" );
   QFont aFont = SUIT_Tools::stringToFont( fntSet );
   setFont(aFont);
-  setTextFormat(QTextEdit::PlainText);
+  //setTextFormat(QTextEdit::PlainText);
   setUndoRedoEnabled( false );
 
   _currentPrompt = READY_PROMPT;

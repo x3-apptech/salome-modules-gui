@@ -17,6 +17,8 @@ public:
   virtual ~PythonConsole();
 
   PyInterp_base* getInterp() { return myInterp; } 
+  QFont          font() const;
+  virtual void   setFont( const QFont& );
 
   void           exec( const QString& command );
 
