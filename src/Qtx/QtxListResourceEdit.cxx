@@ -19,6 +19,8 @@
 #include <qtoolbutton.h>
 #include <qfontdialog.h>
 #include <qfontdatabase.h>
+#include <qfileinfo.h>
+#include <qfiledialog.h>
 
 #include "QtxIntSpinBox.h"
 #include "QtxDblSpinBox.h"
@@ -459,6 +461,9 @@ QtxResourceEdit::Item* QtxListResourceEdit::Group::createItem( const QString& ti
     break;
   case DirList:
     item = new DirListItem( title, resourceEdit(), this, this );
+    break;
+  case File:
+    item = new FileItem( title, resourceEdit(), this, this );
     break;
   }
 
@@ -935,14 +940,17 @@ QtxListResourceEdit::FontItem::FontItem( const QString& title, QtxResourceEdit* 
   myBold = new QCheckBox( tr( "Bold" ), this );
   myItalic = new QCheckBox( tr( "Italic" ), this );
   myUnderline = new QCheckBox( tr( "Underline" ), this );
+  myPreview = new QToolButton( this );
+  myPreview->setText( "..." );
 
   myFamilies->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
   mySizes->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
   connect( myFamilies, SIGNAL( activated( int ) ), this, SLOT( onActivateFamily( int ) ) );
+  connect( myPreview, SIGNAL( clicked() ), this, SLOT( onPreview() ) );
 
-  setProperty( "widget_flags", ( int )All );
   setProperty( "system", ( bool )true );
+  setProperty( "widget_flags", ( int )All );
 }
 
 QtxListResourceEdit::FontItem::~FontItem()
@@ -1062,7 +1070,6 @@ void QtxListResourceEdit::FontItem::setProperty( const QString& name, const QVar
 
     setFamily( fam );
     setSize( -1 ); //set default size
-    onActivateFamily( -1 );
   }
   
   else if( name=="widget_flags" )
@@ -1079,6 +1086,8 @@ void QtxListResourceEdit::FontItem::setProperty( const QString& name, const QVar
     myBold     ->setShown( wf & Bold );
     myItalic   ->setShown( wf & Italic );
     myUnderline->setShown( wf & Underline );
+    bool isSystem = property( "system" ).canCast( QVariant::Bool ) ? property( "system" ).toBool() : false;
+    myPreview->setShown( ( wf & Preview ) && isSystem );
 
     internalUpdate();
   }
@@ -1111,6 +1120,8 @@ void QtxListResourceEdit::FontItem::setFamily( const QString& f )
 
   if ( idx >= 0 )
     myFamilies->setCurrentItem( idx );
+
+  onActivateFamily( idx );  
 }
 
 QString QtxListResourceEdit::FontItem::family() const
@@ -1213,6 +1224,27 @@ void QtxListResourceEdit::FontItem::onActivateFamily( int )
   setSize( s );
 }
 
+void QtxListResourceEdit::FontItem::onPreview()
+{
+  QFont f( family(), size() );
+  bool bold, italic, underline;
+  params( bold, italic, underline );
+  f.setBold( bold );
+  f.setItalic( italic );
+  f.setUnderline( underline );
+
+  bool ok;
+  f = QFontDialog::getFont( &ok, f );
+
+  if( ok )
+  {
+    setFamily( f.family() );
+    setSize( f.pointSize() );
+    setParams( f.bold(), f.italic(), f.underline() );
+  }
+}
+
+
 
 
 
@@ -1240,4 +1272,126 @@ void QtxListResourceEdit::DirListItem::store()
 void QtxListResourceEdit::DirListItem::retrieve()
 {
   myDirListEditor->setPathList(QStringList::split(";", getString()));
+}
+
+
+
+/*
+  Class: QtxListResourceEdit::FileItem
+  Descr: GUI implementation of resources file item.
+*/
+QtxListResourceEdit::FileItem::FileItem( const QString& title, QtxResourceEdit* edit,
+                                         Item* pItem, QWidget* parent )
+: PrefItem( Font, edit, pItem, parent ),
+  myFlags( QFileInfo::ReadUser ),
+  myIsExisting( true ),
+  myFileDlg( 0 )
+{
+  new QLabel( title, this );
+  myFile = new QLineEdit( this );
+  myFile->setValidator( new FileValidator( this, myFile ) );
+  myFile->setReadOnly( true );
+  myOpenFile = new QToolButton( this );
+  myOpenFile->setText( "..." );
+  connect( myOpenFile, SIGNAL( clicked() ), this, SLOT( onOpenFile() ) );
+}
+
+QtxListResourceEdit::FileItem::~FileItem()
+{
+  if( myFileDlg ) 
+    delete myFileDlg;
+}
+
+void QtxListResourceEdit::FileItem::store()
+{
+  setString( myFile->text() );
+}
+
+void QtxListResourceEdit::FileItem::retrieve()
+{
+  myFile->setText( getString() );
+}
+
+QVariant QtxListResourceEdit::FileItem::property( const QString& name ) const
+{
+  if( name=="filter" )
+    return myFilter;
+  else if( name=="existing" )
+    return myIsExisting;
+  else if( name=="flags" )
+    return myFlags;
+
+  return QVariant();
+}
+
+void QtxListResourceEdit::FileItem::setProperty( const QString& name, const QVariant& value )
+{
+  if( name=="filter" )
+  {
+    if( value.canCast( QVariant::String ) )
+    {
+      myFilter.clear();
+      myFilter.append( value.toString() );
+    }
+    else if( value.canCast( QVariant::StringList ) )
+      myFilter = value.toStringList();
+  }
+  else if( name=="existing" && value.canCast( QVariant::Bool ) )
+    myIsExisting = value.toBool();
+
+  else if( name=="flags" && value.canCast( QVariant::UInt ) )
+    myFlags = value.toUInt();
+}
+
+void QtxListResourceEdit::FileItem::onOpenFile()
+{
+  if( !myFileDlg )
+  {
+    myFileDlg = new QFileDialog( "." );
+    connect( myFileDlg, SIGNAL( fileHighlighted( const QString& ) ), this, SLOT( onFileSelected( const QString& ) ) );
+  }
+  
+  myFileDlg->setFilters( myFilter );
+  myFileDlg->setMode( myIsExisting ? QFileDialog::ExistingFile : QFileDialog::AnyFile );
+
+  if( myFileDlg->exec()==QDialog::Accepted )
+  {
+    myFile->setText( myFileDlg->selectedFile() ); 
+  }
+}
+
+bool QtxListResourceEdit::FileItem::isFileCorrect( const QString& f ) const
+{
+  bool res = false;
+  QFileInfo info( f );
+  if( !myIsExisting || info.exists() )
+    res = info.isFile() && info.permission( myFlags );
+
+  return res;
+}
+
+void QtxListResourceEdit::FileItem::onFileSelected( const QString& f )
+{
+  if( myFileDlg && !isFileCorrect( f ) )
+    myFileDlg->setSelection( "" );
+}
+
+
+
+QtxListResourceEdit::FileItem::FileValidator::FileValidator( FileItem* item, QObject* parent )
+: QValidator( parent ),
+  myItem( item )
+{
+}
+
+QtxListResourceEdit::FileItem::FileValidator::~FileValidator()
+{
+}
+
+QValidator::State QtxListResourceEdit::FileItem::FileValidator::validate( QString& f, int& ) const
+{
+  if( myItem && myItem->isFileCorrect( f ) )
+    return QValidator::Acceptable;
+  else
+    return QValidator::Intermediate;
 }

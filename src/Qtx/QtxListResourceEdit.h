@@ -10,6 +10,7 @@
 #include <qhbox.h>
 #include <qframe.h>
 #include <qgroupbox.h>
+#include <qvalidator.h>
 
 class QLabel;
 class QListBox;
@@ -49,9 +50,10 @@ public:
   class IntegerSpinItem;
   class IntegerEditItem;
   class FontItem;
+  class FileItem;
   class DirListItem;
 
-  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, GroupBox, Font, DirList, User };
+  enum { Space, Bool, Color, String, Selector, DblSpin, IntSpin, Double, Integer, GroupBox, Font, DirList, File, User };
 
 public:
   QtxListResourceEdit( QtxResourceMgr*, QWidget* = 0 );
@@ -366,6 +368,7 @@ private:
 */
 
 class QtxComboBox;
+class QToolButton;
 
 class QtxListResourceEdit::FontItem : public PrefItem
 {
@@ -380,8 +383,9 @@ public:
     Bold      = 0x08,
     Italic    = 0x10,
     Underline = 0x20,
+    Preview   = 0x40,
 
-    All = Family | Size | UserSize | Bold | Italic | Underline
+    All = Family | Size | UserSize | Bold | Italic | Underline | Preview
     
   } WidgetFlags;
   
@@ -397,6 +401,7 @@ public:
 
 private slots:
   void onActivateFamily( int );
+  void onPreview();
   
 private:
   void       setFamily( const QString& );
@@ -412,6 +417,7 @@ private:
   bool           myIsSystem;
   QtxComboBox   *myFamilies, *mySizes;
   QCheckBox     *myBold, *myItalic, *myUnderline;
+  QToolButton   *myPreview;
   QMap<QString, QVariant>   myProperties;
 };
 
@@ -449,5 +455,57 @@ public:
 private:
   QtxDirListEditor* myDirListEditor; //!< The widget wich implements in GUI the list of directories
 };
+
+/*
+  Class: QtxListResourceEdit::FontItem
+  Descr: GUI implementation of resources font item.
+*/
+
+class QtxComboBox;
+class QToolButton;
+class QFileDialog;
+
+class QtxListResourceEdit::FileItem : public PrefItem
+{
+  Q_OBJECT
+
+private:
+  class FileValidator : public QValidator
+  {
+  public:
+    FileValidator( FileItem*, QObject* );
+    ~FileValidator();
+
+    virtual QValidator::State validate( QString&, int& ) const;
+
+  private:
+    FileItem* myItem;
+  };
+
+public:
+  FileItem( const QString&, QtxResourceEdit*, Item*, QWidget* = 0 );
+  virtual ~FileItem();
+
+  virtual void store();
+  virtual void retrieve();
+  
+  virtual QVariant property( const QString& ) const;
+  virtual void     setProperty( const QString&, const QVariant& );
+
+  virtual bool isFileCorrect( const QString& ) const;
+
+private slots:
+  void onOpenFile();
+  void onFileSelected( const QString& );
+
+private:
+  uint          myFlags;
+  QStringList   myFilter;
+  bool          myIsExisting;
+  QLineEdit*    myFile;
+  QToolButton*  myOpenFile;
+  QFileDialog*  myFileDlg;
+};
+
 
 #endif
