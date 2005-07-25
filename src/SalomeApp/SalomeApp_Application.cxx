@@ -1238,7 +1238,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
       ob->addColumn( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), i );
       ob->setColumnShown( i, resMgr->booleanValue( "ObjectBrowser",
                                                    QString().sprintf( "visibility_column_%d", i ), true ) );
-      //ob->listView()->setColumnWidthMode( i, autoSize ? QListView::Maximum : QListView::Manual );
+      ob->listView()->setColumnWidthMode( i, autoSize ? QListView::Maximum : QListView::Manual );
     }
 
     // Create OBSelector
@@ -1494,11 +1494,10 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
 	return;
 
       bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
-      /*for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
+      for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
         ob->listView()->setColumnWidthMode( i, autoSize ? QListView::Maximum : QListView::Manual );
 
-      if( autoSize )
-	ob->listView()->adjustSize();*/
+      updateObjectBrowser( false );
     }
   }
 
@@ -1817,7 +1816,10 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   }
 
   if ( objectBrowser() )
+  {
+    objectBrowser()->updateGeometry();
     objectBrowser()->updateTree();
+  }
 }
 
 
