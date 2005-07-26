@@ -18,6 +18,7 @@ public:
 
   OB_Browser*  browser() const;
 
+  /*!Return "ObjectBrowser"*/
   virtual QString type() const { return "ObjectBrowser"; }
 
 private slots:

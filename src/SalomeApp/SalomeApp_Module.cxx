@@ -19,16 +19,19 @@
 
 #include <QtxPopupMgr.h>
 
+/*!Constructor.*/
 SalomeApp_Module::SalomeApp_Module( const QString& name )
 : CAM_Module( name ),
 myPopupMgr( 0 )
 {
 }
 
+/*!Destructor.*/
 SalomeApp_Module::~SalomeApp_Module()
 {
 }
 
+/*!Initialize module.*/
 void SalomeApp_Module::initialize( CAM_Application* app )
 {
   CAM_Module::initialize( app );
@@ -38,6 +41,7 @@ void SalomeApp_Module::initialize( CAM_Application* app )
     resMgr->raiseTranslators( name() );
 }
 
+/*!Activate module.*/
 bool SalomeApp_Module::activateModule( SUIT_Study* study )
 {
   bool res = CAM_Module::activateModule( study );
@@ -48,52 +52,64 @@ bool SalomeApp_Module::activateModule( SUIT_Study* study )
   return res;
 }
 
+/*!Deactivate module.*/
 bool SalomeApp_Module::deactivateModule( SUIT_Study* )
 {
   return true;
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::selectionChanged()
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::MenuItem()
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::windows( QMap<int, int>& ) const
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::viewManagers( QStringList& ) const
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::createPreferences()
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::preferencesChanged( const QString&, const QString& )
 {
 }
 
+/*!Gets application.*/
 SalomeApp_Application* SalomeApp_Module::getApp() const
 {
   return (SalomeApp_Application*)application();
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::onModelOpened()
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::onModelSaved()
 {
 }
 
+/*!NOT IMPLEMENTED*/
 void SalomeApp_Module::onModelClosed()
 {
 }
 
+/*!Gets popup manager.(create if not exist)*/
 QtxPopupMgr* SalomeApp_Module::popupMgr()
 {
   if ( !myPopupMgr )
@@ -101,6 +117,7 @@ QtxPopupMgr* SalomeApp_Module::popupMgr()
   return myPopupMgr;
 }
 
+/*!Gets preferences.*/
 SalomeApp_Preferences* SalomeApp_Module::preferences() const
 {
   SalomeApp_Preferences* pref = 0;
@@ -109,11 +126,13 @@ SalomeApp_Preferences* SalomeApp_Module::preferences() const
   return pref;
 }
 
+/*!Create new instance of data model and return it.*/
 CAM_DataModel* SalomeApp_Module::createDataModel()
 {
   return new SalomeApp_DataModel(this);
 }
 
+/*!Update object browser.*/
 void SalomeApp_Module::updateObjBrowser( bool updateDataModel, SUIT_DataObject* root )
 {
   if( updateDataModel )
@@ -123,6 +142,7 @@ void SalomeApp_Module::updateObjBrowser( bool updateDataModel, SUIT_DataObject* 
   getApp()->objectBrowser()->updateTree( root );
 }
 
+/*!Context menu popup.*/
 void SalomeApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
 {
   SalomeApp_Selection* sel = createSelection();
@@ -131,11 +151,13 @@ void SalomeApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu
   delete sel;
 }
 
+/*!Create and return instance of SalomeApp_Selection.*/
 SalomeApp_Selection* SalomeApp_Module::createSelection() const
 {
   return new SalomeApp_Selection();
 }
 
+/*!Add preference to preferences.*/
 int SalomeApp_Module::addPreference( const QString& label )
 {
   SalomeApp_Preferences* pref = preferences();
@@ -149,6 +171,7 @@ int SalomeApp_Module::addPreference( const QString& label )
   return pref->addPreference( label, catId );
 }
 
+/*!Add preference to preferences.*/
 int SalomeApp_Module::addPreference( const QString& label, const int pId, const int type,
 				     const QString& section, const QString& param )
 {
@@ -159,6 +182,7 @@ int SalomeApp_Module::addPreference( const QString& label, const int pId, const 
   return pref->addPreference( moduleName(), label, pId, type, section, param );
 }
 
+/*!Gets property of preferences.*/
 QVariant SalomeApp_Module::preferenceProperty( const int id, const QString& prop ) const
 {
   QVariant var;
@@ -168,6 +192,8 @@ QVariant SalomeApp_Module::preferenceProperty( const int id, const QString& prop
   return var;
 }
 
+
+/*!Set property of preferences.*/
 void SalomeApp_Module::setPreferenceProperty( const int id, const QString& prop, const QVariant& var )
 {
   SalomeApp_Preferences* pref = preferences();

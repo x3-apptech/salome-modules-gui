@@ -16,6 +16,9 @@
 class SALOME_Actor;
 class SVTK_Viewer;
 
+/*!
+  Provide salome vtk data owner list.
+*/
 class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
 {
  public:
@@ -25,11 +28,13 @@ class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
 			     SALOME_Actor* theActor = NULL);
     virtual ~SalomeApp_SVTKDataOwner();
 
+    /*!Gets dataowners ids list.*/
     const TColStd_IndexedMapOfInteger& GetIds() const
     {
       return myIds;
     }
 
+    /*!Gets selection mode.*/
     Selection_Mode GetMode() const 
     { 
       return mySelectionMode; 
@@ -44,6 +49,9 @@ class SalomeApp_SVTKDataOwner : public SalomeApp_DataOwner
 };
 
 
+/*!
+  Provide salome vtk selection of data owners.
+*/
 class SALOMEAPP_EXPORT SalomeApp_VTKSelector : public SUIT_Selector
 {
   Q_OBJECT;

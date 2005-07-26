@@ -10,12 +10,14 @@
 
 #include <qstring.h>
 
+/*!Constructor. Initialize by \a floatSignal.*/
 SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 : SUIT_ExceptionHandler()
 {
   OSD::SetSignal( floatSignal );
 }
 
+/*!Try to call SUIT_ExceptionHandler::internalHandle(o, e), catch if failure.*/
 bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
   try {
@@ -37,6 +39,7 @@ bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 #undef catch
 #endif
 
+/*!Try to call handleSignals( o, e ), catch and show error message.*/
 bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
 {
   bool res = false;
@@ -63,6 +66,7 @@ bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
   return res;
 }
 
+/*!Create new SUIT_ExceptionHandler*/
 extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
 {
   return new SalomeApp_ExceptionHandler( true );

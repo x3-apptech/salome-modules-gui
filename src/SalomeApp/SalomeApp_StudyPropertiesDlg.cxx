@@ -30,7 +30,7 @@ using namespace std;
 class SalomeApp_PropItem : public SalomeApp_ListViewItem
 {
 public:
-// constructor  
+  /*! constructor  */
   SalomeApp_PropItem(SalomeApp_ListView* parent,
 		     const QString       theName,
 		     const bool          theEditable,
@@ -39,7 +39,7 @@ public:
   {
     setUserType(theUserType);
   }
-// constructor
+  /*! constructor */
   SalomeApp_PropItem(SalomeApp_ListView*     parent,
 		     SalomeApp_ListViewItem* after,
 		     const QString     theName,
@@ -49,7 +49,7 @@ public:
   {
     setUserType(theUserType);
   }
-// fills widget with initial values (list or single value)
+  /*! fills widget with initial values (list or single value)*/
   void fillWidgetWithValues( SalomeApp_EntityEdit* theWidget )
   {
     QStringList list;
@@ -105,7 +105,7 @@ public:
       }
     }
   }
-// finishes editing of entity
+  /*! finishes editing of entity */
   virtual UpdateType finishEditing( SalomeApp_EntityEdit* theWidget ) {
     if ( getUserType() == SalomeApp_StudyPropertiesDlg::prpModificationsId )
       return utCancel;
@@ -114,6 +114,7 @@ public:
   }
 };
 
+/*!Constructor. Initialize study properties dialog.*/
 SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
      : QDialog(parent, "", TRUE, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu ),
        myChanged( false )
@@ -154,10 +155,16 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   connect(myCancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_StudyPropertiesDlg::~SalomeApp_StudyPropertiesDlg()
 {
 }
 
+/*!
+  Data initializetion for dialog.(Study author's name, date of creation etc.)
+*/
 void SalomeApp_StudyPropertiesDlg::initData()
 {
   bool hasData = myStudyDoc;
@@ -226,11 +233,17 @@ void SalomeApp_StudyPropertiesDlg::initData()
   myOKBtn->setEnabled(hasData);
 }
 
+/*!
+  accept data. Return true.
+*/
 bool SalomeApp_StudyPropertiesDlg::acceptData()
 {
   return TRUE;
 }
 
+/*!
+  Fill properties attributes.
+*/
 void SalomeApp_StudyPropertiesDlg::onOK()
 {
   myPropList->accept();
@@ -262,6 +275,9 @@ void SalomeApp_StudyPropertiesDlg::onOK()
   }
 }
 
+/*!
+  Check is properties chenged?
+*/
 bool SalomeApp_StudyPropertiesDlg::propChanged() {
   _PTR(AttributeStudyProperties) propAttr = myStudyDoc->GetProperties();
   if ( propAttr ) {

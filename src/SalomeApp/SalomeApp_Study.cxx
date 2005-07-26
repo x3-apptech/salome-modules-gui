@@ -12,15 +12,24 @@
 
 #include "utilities.h"
 
+/*!
+  Constructor.
+*/
 SalomeApp_Study::SalomeApp_Study( SUIT_Application* app )
 : CAM_Study( app )
 {
 }  
 
+/*!
+  Destructor.
+*/
 SalomeApp_Study::~SalomeApp_Study()
 {
 }
 
+/*!
+  Gets study id.
+*/
 int SalomeApp_Study::id() const
 {
   int id = -1;
@@ -29,11 +38,17 @@ int SalomeApp_Study::id() const
   return id;
 }
 
+/*!
+  Gets studyDS pointer.
+*/
 _PTR(Study) SalomeApp_Study::studyDS() const
 {
   return myStudyDS;
 }
 
+/*!
+  Create document.
+*/
 void SalomeApp_Study::createDocument()
 {
   MESSAGE( "openDocument" );
@@ -57,7 +72,7 @@ void SalomeApp_Study::createDocument()
 
 //=======================================================================
 // name    : openDocument
-// Purpose : Open document
+/*! Purpose : Open document*/
 //=======================================================================
 bool SalomeApp_Study::openDocument( const QString& theFileName )
 {
@@ -91,7 +106,7 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
 
 //=======================================================================
 // name    : loadDocument
-// Purpose : Connects GUI study to SALOMEDS one already loaded into StudyManager
+/*! Purpose : Connects GUI study to SALOMEDS one already loaded into StudyManager*/
 //=======================================================================
 bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 {
@@ -129,7 +144,7 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 
 //=======================================================================
 // name    : saveDocumentAs
-// Purpose : Save document
+/*! Purpose : Save document */
 //=======================================================================
 bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 {
@@ -159,7 +174,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 
 //=======================================================================
 // name    : saveDocument
-// Purpose : Save document
+/*! Purpose : Save document */
 //=======================================================================
 void SalomeApp_Study::saveDocument()
 {
@@ -186,7 +201,7 @@ void SalomeApp_Study::saveDocument()
 
 //================================================================
 // Function : closeDocument
-// Purpose  : 
+/*! Purpose  : Close document */
 //================================================================
 void SalomeApp_Study::closeDocument(bool permanently)
 {
@@ -208,7 +223,7 @@ void SalomeApp_Study::closeDocument(bool permanently)
 
 //================================================================
 // Function : isModified
-// Purpose  : 
+/*! Purpose  : Check data model on modifications.*/
 //================================================================
 bool SalomeApp_Study::isModified() const
 {
@@ -226,7 +241,7 @@ bool SalomeApp_Study::isModified() const
 
 //================================================================
 // Function : isSaved
-// Purpose  : 
+/*! Purpose  : Check: data model is saved?*/
 //================================================================
 bool SalomeApp_Study::isSaved() const
 {
@@ -242,11 +257,17 @@ bool SalomeApp_Study::isSaved() const
   return isAllSaved; 
 }
 
+/*!
+  Set studyDS.
+*/
 void SalomeApp_Study::setStudyDS( const _PTR(Study)& s )
 {
   myStudyDS = s;
 }
 
+/*!
+  Insert data model.
+*/
 void SalomeApp_Study::dataModelInserted (const CAM_DataModel* dm)
 {
   MESSAGE("SalomeApp_Study::dataModelInserted() : module name() = " << dm->module()->name());
@@ -272,6 +293,9 @@ void SalomeApp_Study::dataModelInserted (const CAM_DataModel* dm)
   }
 }
 
+/*!
+  Open data model
+*/
 bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm )
 {
   if (!dm)
@@ -287,6 +311,9 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
   return false;
 }
 
+/*!
+  Create new study name.
+*/
 QString SalomeApp_Study::newStudyName() const
 {
   std::vector<std::string> studies = SalomeApp_Application::studyMgr()->GetOpenStudies();

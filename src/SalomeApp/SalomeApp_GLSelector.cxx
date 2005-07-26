@@ -6,6 +6,7 @@
 
 #include <GLViewer_Context.h>
 
+/*!Constructor. Initialize by GLViewer_Viewer2d and SUIT_SelectionMgr.*/
 SalomeApp_GLSelector::SalomeApp_GLSelector( GLViewer_Viewer2d* viewer, SUIT_SelectionMgr* mgr )
 : SUIT_Selector( mgr, viewer ),
   myViewer( viewer )
@@ -14,20 +15,24 @@ SalomeApp_GLSelector::SalomeApp_GLSelector( GLViewer_Viewer2d* viewer, SUIT_Sele
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
 }
 
+/*!Destructor. Do nothing.*/
 SalomeApp_GLSelector::~SalomeApp_GLSelector()
 {
 }
 
+/*!Gets viewer*/
 GLViewer_Viewer2d* SalomeApp_GLSelector::viewer() const
 {
   return myViewer;
 }
 
+/*!On selection changed event.*/
 void SalomeApp_GLSelector::onSelectionChanged()
 {
   selectionChanged();
 }
 
+/*!Gets list of selected Data Owner objects.*/
 void SalomeApp_GLSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
 {
   if ( !myViewer )
@@ -49,6 +54,7 @@ void SalomeApp_GLSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
   }
 }
 
+/*!Sets to selected list of Data Owner objects.*/
 void SalomeApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
 {
   if ( !myViewer )

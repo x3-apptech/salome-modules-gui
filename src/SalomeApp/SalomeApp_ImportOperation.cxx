@@ -31,6 +31,7 @@
 
 using namespace std;
 
+/*!Constructor. Do nothing.*/
 SalomeApp_ImportOperation::SalomeApp_ImportOperation( SUIT_Application* app ) :
 SUIT_Operation( app )
 {

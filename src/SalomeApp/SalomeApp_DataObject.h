@@ -32,13 +32,15 @@ public:
   virtual SUIT_DataObjectKey*     key() const;
   virtual QString                 entry() const;
 
-  virtual _PTR(SObject)           object() const; // location of corresponding SALOMEDS::SObject  
+  /*! location of corresponding SALOMEDS::SObject  */
+  virtual _PTR(SObject)           object() const;
 
   bool                            isReference() const;
   _PTR(SObject)                   referencedObject() const;
 
   SUIT_DataObject*                componentObject() const;
-  QString                         componentDataType() const; // GEOM, SMESH, VISU, etc.
+  /*! GEOM, SMESH, VISU, etc.*/
+  QString                         componentDataType() const;
 
 private:
   QString                         ior( const _PTR(SObject)& ) const;

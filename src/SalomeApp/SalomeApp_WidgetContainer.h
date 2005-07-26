@@ -8,6 +8,9 @@
 class QWidget;
 class QWidgetStack;
 
+/*!
+  Class which privade widget container.
+*/
 class SALOMEAPP_EXPORT SalomeApp_WidgetContainer : public QDockWindow
 {
     Q_OBJECT

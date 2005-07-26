@@ -17,6 +17,7 @@
 #include <qpixmap.h>
 using namespace std;
 
+/*!Default icon*/
 static const char* const default_icon[] = { 
 "48 48 17 1",
 ". c None",
@@ -87,9 +88,9 @@ static const char* const default_icon[] = {
 
 //==============================================================================================================================
 /*!
- *  SalomeApp_ModuleDlg::SalomeApp_ModuleDlg
+ *  SalomeApp_ModuleDlg::SalomeApp_ModuleDlg \n
  *
- *  Constructor
+ *  Constructor.
  */
 //==============================================================================================================================
 SalomeApp_ModuleDlg::SalomeApp_ModuleDlg ( QWidget * parent, const QString& component, const QPixmap icon )

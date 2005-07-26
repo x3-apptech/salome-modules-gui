@@ -53,6 +53,7 @@ public:
 
 protected:
   QString                        entry( const int ) const;
+  /*!Gets study.*/
   SalomeApp_Study*               study() const { return myStudy; }
   QString                        activeViewType() const;
   SUIT_ViewWindow*               activeVW() const;

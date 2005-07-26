@@ -5,6 +5,9 @@
 
 #include "SalomeApp_Filter.h"
 
+/*!
+  Class which provide data owner validation.
+*/
 class SALOMEAPP_EXPORT SalomeApp_TypeFilter: public SalomeApp_Filter
 {
 public:

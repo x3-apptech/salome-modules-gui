@@ -21,6 +21,9 @@ static int MYDEBUG = 1;
 static int MYDEBUG = 0;
 #endif
 
+/*!
+  Constructor.
+*/
 SalomeApp_SVTKDataOwner
 ::SalomeApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
 			   const TColStd_IndexedMapOfInteger& theIds,
@@ -33,11 +36,17 @@ SalomeApp_SVTKDataOwner
   myIds = theIds; // workaround - there is no constructor copy for the container
 }
 
+/*!
+  Destuctor.
+*/
 SalomeApp_SVTKDataOwner
 ::~SalomeApp_SVTKDataOwner()
 {
 }
 
+/*!
+  Gets actor pointer.
+*/
 SALOME_Actor* 
 SalomeApp_SVTKDataOwner
 ::GetActor() const
@@ -45,7 +54,9 @@ SalomeApp_SVTKDataOwner
   return myActor.GetPointer();
 }
 
-
+/*!
+  Constructor.
+*/
 SalomeApp_VTKSelector
 ::SalomeApp_VTKSelector( SVTK_Viewer* viewer, 
 			 SUIT_SelectionMgr* mgr ): 
@@ -56,11 +67,17 @@ SalomeApp_VTKSelector
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_VTKSelector
 ::~SalomeApp_VTKSelector()
 {
 }
 
+/*!
+  Gets viewer.
+*/
 SVTK_Viewer* 
 SalomeApp_VTKSelector
 ::viewer() const
@@ -68,6 +85,9 @@ SalomeApp_VTKSelector
   return myViewer;
 }
 
+/*!
+  Gets type of salome vtk viewer.
+*/
 QString
 SalomeApp_VTKSelector
 ::type() const
@@ -75,6 +95,9 @@ SalomeApp_VTKSelector
   return SVTK_Viewer::Type(); 
 }
 
+/*!
+  On selection changed.
+*/
 void
 SalomeApp_VTKSelector
 ::onSelectionChanged()
@@ -82,6 +105,9 @@ SalomeApp_VTKSelector
   selectionChanged();
 }
 
+/*!
+  Gets list of selected data owners.(output \a aList).
+*/
 void
 SalomeApp_VTKSelector
 ::getSelection( SUIT_DataOwnerPtrList& aList ) const
@@ -112,6 +138,9 @@ SalomeApp_VTKSelector
   }
 }
 
+/*!
+  Sets selection to selector from data owner list \a theList.
+*/
 void 
 SalomeApp_VTKSelector
 ::setSelection( const SUIT_DataOwnerPtrList& theList )

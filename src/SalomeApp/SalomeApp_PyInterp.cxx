@@ -45,13 +45,16 @@ SalomeApp_PyInterp::SalomeApp_PyInterp(): PythonConsole_PyInterp()
 {
 }
 
+/*!
+ * Destructor.
+ */
 SalomeApp_PyInterp::~SalomeApp_PyInterp()
 {
 }
  
-/*!
+/*!\class SalomeApp_PyInterp
  * EDF-CCAR
- * When SALOME uses multi Python interpreter feature,
+ * Wasashen SALOME uses multi Python interpreter feature,
  * Every study has its own interpreter and thread state (_tstate = Py_NewInterpreter())
  * This is fine because every study has its own modules (sys.modules) stdout and stderr
  * BUT some Python modules must be imported only once. In multi interpreter context Python
@@ -70,7 +73,7 @@ SalomeApp_PyInterp::~SalomeApp_PyInterp()
 
 bool SalomeApp_PyInterp::initContext()
 {
-  /*
+  /*!
    * The GIL is assumed to be held
    * It is the caller responsability caller to acquire the GIL
    * It will still be held on initContext output

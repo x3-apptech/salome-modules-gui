@@ -13,6 +13,9 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOME_Exception)
 
+/*! 
+  Class which provide color converter and exception message box.
+*/
 class SALOMEAPP_EXPORT SalomeApp_Tools : public SUIT_Tools
 {
 public:

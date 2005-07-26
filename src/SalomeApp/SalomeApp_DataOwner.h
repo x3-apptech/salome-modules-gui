@@ -5,6 +5,9 @@
 #include "SUIT_DataOwner.h"
 #include "SALOME_InteractiveObject.hxx"
 
+/*!
+  This class provide data owner objects.
+*/
 class SalomeApp_DataOwner : public SUIT_DataOwner
 {
 public:

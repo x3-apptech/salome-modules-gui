@@ -17,24 +17,32 @@
 
 #include "SALOMEDSClient.hxx"
 
+/*!
+  Constructor.
+*/
 SalomeApp_SelectionMgr::SalomeApp_SelectionMgr( SalomeApp_Application* app, const bool fb )
 : SUIT_SelectionMgr( fb ),
 myApp( app )
 {
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_SelectionMgr::~SalomeApp_SelectionMgr()
 {
 }
 
+/*!
+  Gets application.
+*/
 SalomeApp_Application* SalomeApp_SelectionMgr::application() const
 {
   return myApp;
 }
 
-/*
-  get all selected objects from selection manager
-
+/*!
+  Get all selected objects from selection manager
 */
 void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QString& theType ) const
 {
@@ -56,6 +64,9 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStr
   }
 }
 
+/*!
+  Append selected objects.
+*/
 void SalomeApp_SelectionMgr::setSelectedObjects( const SALOME_ListIO& lst, const bool append )
 {
   SUIT_DataOwnerPtrList owners;
@@ -68,6 +79,9 @@ void SalomeApp_SelectionMgr::setSelectedObjects( const SALOME_ListIO& lst, const
   setSelected( owners, append );
 }
 
+/*!
+  Emit current selection changed.
+*/
 void SalomeApp_SelectionMgr::selectionChanged( SUIT_Selector* theSel )
 {
   SUIT_SelectionMgr::selectionChanged( theSel );
@@ -75,9 +89,8 @@ void SalomeApp_SelectionMgr::selectionChanged( SUIT_Selector* theSel )
   emit currentSelectionChanged();
 }
 
-/*
+/*!
   get map of indexes for the given SALOME_InteractiveObject
-
 */
 void SalomeApp_SelectionMgr::GetIndexes( const Handle(SALOME_InteractiveObject)& IObject, 
 					 TColStd_IndexedMapOfInteger& theIndex)
@@ -97,9 +110,8 @@ void SalomeApp_SelectionMgr::GetIndexes( const Handle(SALOME_InteractiveObject)&
   
 }
 
-/*
+/*!
   get map of indexes for the given entry of SALOME_InteractiveObject
-
 */
 void SalomeApp_SelectionMgr::GetIndexes( const QString& theEntry, TColStd_IndexedMapOfInteger& theIndex )
 {
@@ -118,6 +130,9 @@ void SalomeApp_SelectionMgr::GetIndexes( const QString& theEntry, TColStd_Indexe
 
 }
 
+/*!
+  Add or remove interactive objects from selection manager.
+*/
 bool SalomeApp_SelectionMgr::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& IObject, 
 					       const TColStd_MapOfInteger& theIndexes, 
 					       bool modeShift)
@@ -163,9 +178,8 @@ bool SalomeApp_SelectionMgr::AddOrRemoveIndex( const Handle(SALOME_InteractiveOb
 
 }
 
-/*
+/*!
   select 'subobjects' with given indexes
-
 */
 void SalomeApp_SelectionMgr::selectObjects( const Handle(SALOME_InteractiveObject)& IObject, 
 					    TColStd_IndexedMapOfInteger theIndex, bool append )
@@ -185,9 +199,8 @@ void SalomeApp_SelectionMgr::selectObjects( const Handle(SALOME_InteractiveObjec
 
 }
 
-/*
+/*!
   select 'subobjects' with given indexes
-
 */
 void SalomeApp_SelectionMgr::selectObjects( MapIOOfMapOfInteger theMapIO, bool append )
 {
@@ -210,9 +223,8 @@ void SalomeApp_SelectionMgr::selectObjects( MapIOOfMapOfInteger theMapIO, bool a
 
 }
 
-/*
+/*!
   get map of selected subowners : object's entry <-> map of indexes
-
 */
 void SalomeApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
 {

@@ -6,6 +6,9 @@
 
 #include <utilities.h>
 
+/*!
+  Convert QColor to Quantity_Color, if QColor is valid.
+*/
 Quantity_Color SalomeApp_Tools::color( const QColor& c )
 {
 	Quantity_Color aColor;
@@ -14,11 +17,17 @@ Quantity_Color SalomeApp_Tools::color( const QColor& c )
 	return aColor;
 }
 
+/*!
+  Convert Quantity_Color to QColor.
+*/
 QColor SalomeApp_Tools::color( const Quantity_Color& c )
 {
 	return QColor( (int)( c.Red() * 255 ), (int)( c.Green() * 255 ), (int)( c.Blue() * 255 ) );
 }
 
+/*!
+  Gets message on exception \a S_ex.
+*/
 QString SalomeApp_Tools::ExceptionToString( const SALOME::SALOME_Exception& S_ex )
 {
   QString message;
@@ -59,6 +68,9 @@ QString SalomeApp_Tools::ExceptionToString( const SALOME::SALOME_Exception& S_ex
   return message;
 }
 
+/*!
+  Gets message box on exception \a S_ex.
+*/
 void SalomeApp_Tools::QtCatchCorbaException( const SALOME::SALOME_Exception& S_ex )
 {
   QString message = ExceptionToString( S_ex );

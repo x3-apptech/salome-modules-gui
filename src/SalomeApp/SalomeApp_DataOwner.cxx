@@ -8,12 +8,14 @@
 
 #include <iostream.h>
 
+/*!Constructor. Initialize by \a theEntry.*/
 SalomeApp_DataOwner
 ::SalomeApp_DataOwner( const QString& theEntry ): 
   myEntry( theEntry )
 {
 }
 
+/*!Constructor. Initialize by \a SALOME_InteractiveObject.*/
 SalomeApp_DataOwner
 ::SalomeApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO ):
   myEntry(!theIO.IsNull()? theIO->getEntry(): ""),
@@ -21,11 +23,13 @@ SalomeApp_DataOwner
 {
 }
 
+/*!Destructor. Do nothing.*/
 SalomeApp_DataOwner
 ::~SalomeApp_DataOwner()
 {
 }
 
+/*!Checks: Is current data owner equal \a obj.*/
 bool
 SalomeApp_DataOwner
 ::isEqual( const SUIT_DataOwner& obj ) const
@@ -35,6 +39,7 @@ SalomeApp_DataOwner
   return other && entry() == other->entry();
 }
 
+/*!Gets entry.*/
 QString
 SalomeApp_DataOwner
 ::entry() const
@@ -42,6 +47,7 @@ SalomeApp_DataOwner
   return myEntry;
 }
 
+/*!Gets SALOME_InteractiveObject.*/
 const Handle(SALOME_InteractiveObject)&
 SalomeApp_DataOwner
 ::IO() const

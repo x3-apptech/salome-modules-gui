@@ -5,16 +5,25 @@
 
 #include <SALOMEDS_SObject.hxx>
 
+/*!
+  Constructor.
+*/
 SalomeApp_TypeFilter::SalomeApp_TypeFilter( SalomeApp_Study* study, const QString& kind )
   : SalomeApp_Filter( study ) 
 {
   myKind = kind;
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_TypeFilter::~SalomeApp_TypeFilter()
 {
 }
 
+/*!
+  Check: data owner is valid?
+*/
 bool SalomeApp_TypeFilter::isOk( const SUIT_DataOwner* sOwner ) const
 {  
   const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*> ( sOwner );

@@ -29,8 +29,7 @@ class SalomeApp_Application;
 class SalomeApp_Preferences;
 class SalomeApp_SelectionManager;
 
-/*
-  Class : SalomeApp_Module
+/*!
   Description : Base class for all salome modules
 */
 
@@ -46,20 +45,19 @@ public:
   virtual void                        windows( QMap<int, int>& ) const;
   virtual void                        viewManagers( QStringList& ) const;
 
-  // engineIOR() should be a pure virtual method, to avoid logical errors!
-  //
-  // Implementation in derived classes can return the following values:
-  // "" (empty string)   - means that this is a light module, default engine should be used for interaction with SALOMEDS persistence
-  // "-1"                - means that this is a light module, SALOMEDS persistence is not used at all
-  // module`s engine IOR - means that this is a standard SALOME module with a CORBA engine
-  //
+  /*! engineIOR() should be a pure virtual method, to avoid logical errors!\n
+   * Implementation in derived classes can return the following values:\n
+   * module`s engine IOR - means that this is a standard SALOME module with a CORBA engine
+   * \li "" (empty string)   - means that this is a light module, default engine should be used for interaction with SALOMEDS persistence
+   * \li "-1"                - means that this is a light module, SALOMEDS persistence is not used at all\n
+   */
   virtual QString                     engineIOR() const = 0;
 
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
   virtual void                        createPreferences();
 
-  // Convenient shortcuts
+  /*! Convenient shortcuts*/
   SalomeApp_Application*              getApp() const;
   
   void                                updateObjBrowser( bool = true, SUIT_DataObject* = 0 );

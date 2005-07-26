@@ -8,6 +8,9 @@
 #include <qvbox.h>
 #include <qlayout.h>
 
+/*!
+  Constructor.
+*/
 SalomeApp_PreferencesDlg::SalomeApp_PreferencesDlg( SalomeApp_Preferences* prefs, QWidget* parent )
 : QtxDialog( parent, 0, true, false, OK | Cancel | Apply ),
 myPrefs( prefs )
@@ -29,6 +32,9 @@ myPrefs( prefs )
   connect( this, SIGNAL( dlgApply() ), this, SLOT( onApply() ) );
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_PreferencesDlg::~SalomeApp_PreferencesDlg()
 {
   if ( !myPrefs )
@@ -38,6 +44,7 @@ SalomeApp_PreferencesDlg::~SalomeApp_PreferencesDlg()
   myPrefs = 0;
 }
 
+/*!Show dialog.*/
 void SalomeApp_PreferencesDlg::show()
 {
   myPrefs->retrieve();
@@ -46,6 +53,7 @@ void SalomeApp_PreferencesDlg::show()
   QtxDialog::show();
 }
 
+/*!Store preferences on accept.*/
 void SalomeApp_PreferencesDlg::accept()
 {
   QtxDialog::accept();
@@ -53,6 +61,7 @@ void SalomeApp_PreferencesDlg::accept()
   myPrefs->store();
 }
 
+/*!Reject. Restore preferences from backup.*/
 void SalomeApp_PreferencesDlg::reject()
 {
   QtxDialog::reject();
@@ -60,10 +69,12 @@ void SalomeApp_PreferencesDlg::reject()
   myPrefs->fromBackup();
 }
 
+/*!Do nothing.*/
 void SalomeApp_PreferencesDlg::onHelp()
 {
 }
 
+/*!Store preferences on apply.*/
 void SalomeApp_PreferencesDlg::onApply()
 {
   myPrefs->store();

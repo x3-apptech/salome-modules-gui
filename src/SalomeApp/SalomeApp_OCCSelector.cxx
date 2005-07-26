@@ -7,7 +7,9 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
-
+/*!
+  Constructor
+*/
 SalomeApp_OCCSelector::SalomeApp_OCCSelector( OCCViewer_Viewer* viewer, SUIT_SelectionMgr* mgr )
 : SUIT_Selector( mgr, viewer ),
   myViewer( viewer )
@@ -16,20 +18,28 @@ SalomeApp_OCCSelector::SalomeApp_OCCSelector( OCCViewer_Viewer* viewer, SUIT_Sel
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_OCCSelector::~SalomeApp_OCCSelector()
 {
 }
 
+/*!
+  Gets viewer.
+*/
 OCCViewer_Viewer* SalomeApp_OCCSelector::viewer() const
 {
   return myViewer;
 }
 
+/*!On selection changed.*/
 void SalomeApp_OCCSelector::onSelectionChanged()
 {
   selectionChanged();
 }
 
+/*!Gets selection list.*/
 void SalomeApp_OCCSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
 {
   if ( !myViewer )
@@ -46,6 +56,7 @@ void SalomeApp_OCCSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
     }
 }
 
+/*!Sets selection list.*/
 void SalomeApp_OCCSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
 {
   if ( !myViewer )
@@ -77,6 +88,7 @@ void SalomeApp_OCCSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
   myViewer->setObjectsSelected( aSelList );
 }
 
+/*!Gets entry ob object.*/
 QString SalomeApp_OCCSelector::entry( const Handle(AIS_InteractiveObject)& anAIS ) const
 {
   if ( anAIS.IsNull() || !anAIS->HasOwner() )

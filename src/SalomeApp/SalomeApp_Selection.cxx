@@ -9,15 +9,24 @@
 #include "SUIT_Session.h"
 #include "SUIT_ViewWindow.h"
 
+/*!
+  Constructor
+*/
 SalomeApp_Selection::SalomeApp_Selection()
 : myStudy( 0 )
 {
 }
 
+/*!
+  Destructor.
+*/
 SalomeApp_Selection::~SalomeApp_Selection()
 {
 }
 
+/*!
+  Initializetion.
+*/
 void SalomeApp_Selection::init( const QString& client, SalomeApp_SelectionMgr* mgr)
 {
   myPopupClient = client;
@@ -42,16 +51,25 @@ void SalomeApp_Selection::init( const QString& client, SalomeApp_SelectionMgr* m
   }
 }
 
+/*!
+  Gets count of entries.
+*/
 int SalomeApp_Selection::count() const
 {
   return myEntries.count();
 }
 
+/*!
+  Gets QtxValue();
+*/
 QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
 {
   return QtxValue();
 }
 
+/*!
+  Gets global parameters. client, isActiveView, activeView etc.
+*/
 QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
 {
   if      ( p == "client" )        return QtxValue( myPopupClient );
@@ -60,10 +78,16 @@ QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
   else                             return QtxPopupMgr::Selection::globalParam( p );
 }
 
+/*!
+  Do nothing.
+*/
 void SalomeApp_Selection::processOwner( const SalomeApp_DataOwner* )
 {
 }
 
+/*!
+  Gets entry with index \a index.
+*/
 QString SalomeApp_Selection::entry( const int index ) const
 {
   if ( index >= 0 && index < count() )
@@ -71,6 +95,9 @@ QString SalomeApp_Selection::entry( const int index ) const
   return QString();
 }
 
+/*!
+  Gets type of active view manager.
+*/
 QString SalomeApp_Selection::activeViewType() const
 {
   SUIT_ViewWindow* win = activeVW();
@@ -82,6 +109,9 @@ QString SalomeApp_Selection::activeViewType() const
   return QString::null;
 }
 
+/*!
+  Gets active view window.
+*/
 SUIT_ViewWindow* SalomeApp_Selection::activeVW() const
 {
   SUIT_Session* session = SUIT_Session::session();

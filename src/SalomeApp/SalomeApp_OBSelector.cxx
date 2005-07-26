@@ -7,6 +7,9 @@
 
 #include <SUIT_DataObjectIterator.h>
 
+/*!
+  Constructor
+*/
 SalomeApp_OBSelector::SalomeApp_OBSelector( OB_Browser* ob, SUIT_SelectionMgr* mgr )
 : SUIT_Selector( mgr, ob ),
   myBrowser( ob )
@@ -16,16 +19,24 @@ SalomeApp_OBSelector::SalomeApp_OBSelector( OB_Browser* ob, SUIT_SelectionMgr* m
   }    
 }
 
+/*!
+  Destructor
+*/
 SalomeApp_OBSelector::~SalomeApp_OBSelector()
 {
 }
 
+/*!
+  Gets browser.
+*/
 OB_Browser* SalomeApp_OBSelector::browser() const
 {
   return myBrowser;
 }
 
-
+/*!
+  Gets selection.
+*/
 void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& list ) const
 {
   if ( !myBrowser )
@@ -45,6 +56,7 @@ void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& list ) const
   }
 }
 
+/*!Sets selection.*/
 void SalomeApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& list )
 {
   if ( !myBrowser )
@@ -64,11 +76,13 @@ void SalomeApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& list )
   myBrowser->setSelected( objList );
 }
 
+/*!On selection changed.*/
 void SalomeApp_OBSelector::onSelectionChanged()
 {
   selectionChanged();
 }
 
+/*!Fill entries.*/
 void SalomeApp_OBSelector::fillEntries( QMap<QString, SalomeApp_DataObject*>& entires )
 {
   entires.clear();

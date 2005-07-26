@@ -10,6 +10,9 @@
 
 class SALOME_Event;
 
+/*!
+  Class provide event filter.
+*/
 class SALOMEAPP_EXPORT SalomeApp_EventFilter: public QObject 
 {
 public:
@@ -21,7 +24,7 @@ protected:
   virtual ~SalomeApp_EventFilter();
 
 private:
-  /* global event filter for qapplication */
+  /*! global event filter for qapplication */
   virtual bool eventFilter( QObject* o, QEvent* e );
   void processEvent( SALOME_Event* );
 

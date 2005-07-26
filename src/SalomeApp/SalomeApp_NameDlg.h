@@ -19,7 +19,7 @@ class QPushButton;
 
 //=================================================================================
 // class    : SalomeApp_NameDlg
-// purpose  : Common <Rename> dialog box class
+/*! purpose  : Common <Rename> dialog box class*/
 //=================================================================================
 class SalomeApp_NameDlg : public QDialog
 { 

@@ -6,6 +6,7 @@
 
 SalomeApp_EventFilter* SalomeApp_EventFilter::myFilter = NULL;
 
+/*!Constructor.*/
 SalomeApp_EventFilter::SalomeApp_EventFilter()
 : QObject()
 {
@@ -13,6 +14,7 @@ SalomeApp_EventFilter::SalomeApp_EventFilter()
   qApp->installEventFilter( this );
 }
 
+/*!Destructor.*/
 SalomeApp_EventFilter::~SalomeApp_EventFilter()
 {
   qApp->removeEventFilter( this );
@@ -30,6 +32,7 @@ bool SalomeApp_EventFilter::eventFilter( QObject* o, QEvent* e )
   return QObject::eventFilter( o, e );
 }
 
+/*!Process event.*/
 void SalomeApp_EventFilter::processEvent( SALOME_Event* theEvent )
 {
   if(theEvent){
@@ -39,12 +42,14 @@ void SalomeApp_EventFilter::processEvent( SALOME_Event* theEvent )
   }
 }
 
+/*!Create new instance of SalomeApp_EventFilter*/
 void SalomeApp_EventFilter::Init()
 {
   if( myFilter==NULL )
     myFilter = new SalomeApp_EventFilter();
 }
 
+/*!Destroy filter.*/
 void SalomeApp_EventFilter::Destroy()
 {
   if( myFilter )

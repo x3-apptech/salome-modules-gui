@@ -10,6 +10,7 @@
 
 class SalomeApp_Preferences;
 
+/*!Preferences dialog.*/
 class SALOMEAPP_EXPORT SalomeApp_PreferencesDlg : public QtxDialog
 {
   Q_OBJECT

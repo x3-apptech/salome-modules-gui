@@ -749,7 +749,7 @@ bool SalomeApp_Application::useStudy(const QString& theName)
 }
 
 /*!Set active study.
- *\param stupa - SUIT_Study.
+ *\param study - SUIT_Study.
  */
 void SalomeApp_Application::setActiveStudy( SUIT_Study* study )
 {
@@ -926,7 +926,7 @@ QWidget* SalomeApp_Application::getWindow( const int flag, const int studyId )
   return wid;
 }
 
-/*!Check*/
+/*!Check is window visible?(with identificator \a type)*/
 bool SalomeApp_Application::isWindowVisible( const int type ) const
 {
   bool res = false;
@@ -938,6 +938,10 @@ bool SalomeApp_Application::isWindowVisible( const int type ) const
   return res;
 }
 
+/*!Sets window show or hide.
+ *\param type - window identificator.
+ *\param on   - true/false (window show/hide)
+ */
 void SalomeApp_Application::setWindowShown( const int type, const bool on )
 {
   if ( !desktop() || !myWindows.contains( type ) )
@@ -957,6 +961,7 @@ OB_Browser* SalomeApp_Application::objectBrowser()
   return ob;
 }
 
+/*!Gets "LogWindow".*/
 LogWindow* SalomeApp_Application::logWindow()
 {
   LogWindow* lw = 0;
@@ -966,6 +971,7 @@ LogWindow* SalomeApp_Application::logWindow()
   return lw;
 }
 
+/*!Get "PythonConsole"*/
 PythonConsole* SalomeApp_Application::pythonConsole()
 {
   PythonConsole* console = 0;
@@ -975,11 +981,13 @@ PythonConsole* SalomeApp_Application::pythonConsole()
   return console;
 }
 
+/*!Gets preferences.*/
 SalomeApp_Preferences* SalomeApp_Application::preferences() const
 {
   return preferences( false );
 }
 
+/*!Gets view manager*/
 SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, const bool create )
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
@@ -1001,6 +1009,7 @@ SUIT_ViewManager* SalomeApp_Application::getViewManager( const QString& vmType, 
   return aVM;
 }
 
+/*!Create view manager.*/
 SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmType )
 {
   SUIT_ResourceMgr* resMgr = resourceMgr();
@@ -1059,6 +1068,7 @@ void SalomeApp_Application::onCloseView( SUIT_ViewManager* theVM )
   removeViewManager( theVM );
 }
 
+/*!Private SLOT. On study created.*/
 void SalomeApp_Application::onStudyCreated( SUIT_Study* theStudy )
 {
   SUIT_DataObject* aRoot = 0;
@@ -1075,6 +1085,7 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* theStudy )
   activateWindows();
 }
 
+/*!Private SLOT. On study opened.*/
 void SalomeApp_Application::onStudyOpened( SUIT_Study* theStudy )
 {
   SUIT_DataObject* aRoot = 0;
@@ -1099,6 +1110,7 @@ void SalomeApp_Application::onStudySaved( SUIT_Study* )
   emit studySaved();
 }
 
+/*!Private SLOT. On study closed.*/
 void SalomeApp_Application::onStudyClosed( SUIT_Study* )
 {
   emit studyClosed();
@@ -1108,6 +1120,7 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
   saveWindowsGeometry();
 }
 
+/*!Private SLOT. On dump study.*/
 void SalomeApp_Application::onDumpStudy( )
 {
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
@@ -1132,6 +1145,7 @@ void SalomeApp_Application::onDumpStudy( )
   }
 }
 
+/*!Private SLOT. On load script.*/
 void SalomeApp_Application::onLoadScript( )
 {
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
@@ -1163,6 +1177,7 @@ void SalomeApp_Application::onLoadScript( )
   }
 }
 
+/*!Private SLOT. On preferences.*/
 void SalomeApp_Application::onPreferences()
 {
   QApplication::setOverrideCursor( Qt::waitCursor );
@@ -1179,11 +1194,13 @@ void SalomeApp_Application::onPreferences()
   delete prefDlg;
 }
 
+/*!Private SLOT. On open document with name \a aName.*/
 void SalomeApp_Application::onMRUActivated( QString aName )
 {
   onOpenDoc( aName );
 }
 
+/*!Private SLOT. On preferences changed.*/
 void SalomeApp_Application::onPreferenceChanged( QString& modName, QString& section, QString& param )
 {
   SalomeApp_Module* sMod = 0;
@@ -1197,11 +1214,15 @@ void SalomeApp_Application::onPreferenceChanged( QString& modName, QString& sect
     preferencesChanged( section, param );
 }
 
+/*!Gets file filter.
+ *\retval QString "(*.hdf)"
+ */
 QString SalomeApp_Application::getFileFilter() const
 {
   return "(*.hdf)";
 }
 
+/*!Remove all windows from study.*/
 void SalomeApp_Application::beforeCloseDoc( SUIT_Study* s )
 {
   CAM_Application::beforeCloseDoc( s );
@@ -1210,11 +1231,13 @@ void SalomeApp_Application::beforeCloseDoc( SUIT_Study* s )
     removeWindow( itr.key(), s->id() );
 }
 
+/*!Update actions.*/
 void SalomeApp_Application::updateActions()
 {
   updateCommandsStatus();
 }
 
+/*!Create window.*/
 QWidget* SalomeApp_Application::createWindow( const int flag )
 {
   QWidget* wid = 0;
@@ -1269,6 +1292,9 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   return wid;
 }
 
+/*!Default windows(Object Browser, Python Console).
+ * Adds to map \a aMap.
+ */
 void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
   aMap.insert( WT_ObjectBrowser, Qt::DockLeft );
@@ -1276,10 +1302,15 @@ void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
   //  aMap.insert( WT_LogWindow, Qt::DockBottom );
 }
 
+/*!Default view manager.*/
 void SalomeApp_Application::defaultViewManagers( QStringList& ) const
 {
+  /*!Do nothing.*/
 }
 
+/*!Gets preferences.
+ * Create preferences, if \a crt = true.
+ */
 SalomeApp_Preferences* SalomeApp_Application::preferences( const bool crt ) const
 {
   if ( myPrefs )
@@ -1334,6 +1365,7 @@ SalomeApp_Preferences* SalomeApp_Application::preferences( const bool crt ) cons
   return myPrefs;
 }
 
+/*!Add new module to application.*/
 void SalomeApp_Application::moduleAdded( CAM_Module* mod )
 {
   CAM_Application::moduleAdded( mod );
@@ -1350,6 +1382,7 @@ void SalomeApp_Application::moduleAdded( CAM_Module* mod )
   }
 }
 
+/*!Create preferences.*/
 void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 {
   if ( !pref )
@@ -1509,6 +1542,7 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
   }
 }
 
+/*!Update desktop title.*/
 void SalomeApp_Application::updateDesktopTitle() {
   QString aTitle = applicationName();
   QString aVer = applicationVersion();
@@ -1534,6 +1568,7 @@ void SalomeApp_Application::updateDesktopTitle() {
   desktop()->setCaption( aTitle );
 }
 
+/*!Update windows after close document.*/
 void SalomeApp_Application::afterCloseDoc()
 {
   updateWindows();
@@ -1541,6 +1576,7 @@ void SalomeApp_Application::afterCloseDoc()
   CAM_Application::afterCloseDoc();
 }
 
+/*!Gets CORBA::ORB_var*/
 CORBA::ORB_var SalomeApp_Application::orb()
 {
   ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
@@ -1548,18 +1584,21 @@ CORBA::ORB_var SalomeApp_Application::orb()
   return _orb;
 }
 
+/*!Create and return SALOMEDS_StudyManager.*/
 SALOMEDSClient_StudyManager* SalomeApp_Application::studyMgr()
 {
   static SALOMEDSClient_StudyManager* _sm = new SALOMEDS_StudyManager();
   return _sm;
 }
 
+/*!Create and return SALOME_NamingService.*/
 SALOME_NamingService* SalomeApp_Application::namingService()
 {
   static SALOME_NamingService* _ns = new SALOME_NamingService( orb() );
   return _ns;
 }
 
+/*!Create and return SALOME_LifeCycleCORBA.*/
 SALOME_LifeCycleCORBA* SalomeApp_Application::lcc()
 {
   static SALOME_LifeCycleCORBA* _lcc = new SALOME_LifeCycleCORBA( namingService() );
@@ -1568,7 +1607,7 @@ SALOME_LifeCycleCORBA* SalomeApp_Application::lcc()
 
 QString SalomeApp_Application::defaultEngineIOR()
 {
-  // Look for a default module engine (needed for CORBAless modules to use SALOMEDS persistence)
+  /// Look for a default module engine (needed for CORBAless modules to use SALOMEDS persistence)
   QString anIOR( "" );
   CORBA::Object_ptr anEngine = namingService()->Resolve( "/SalomeAppEngine" );
   if ( !CORBA::is_nil( anEngine ) )
@@ -1576,6 +1615,7 @@ QString SalomeApp_Application::defaultEngineIOR()
   return anIOR;
 }
 
+/*!Adds icon names for modules.*/
 void SalomeApp_Application::moduleIconNames( QMap<QString, QString>& iconMap ) const
 {
   iconMap.clear();
@@ -1603,6 +1643,7 @@ void SalomeApp_Application::moduleIconNames( QMap<QString, QString>& iconMap ) c
   }
 }
 
+/*!Update module action.*/
 void SalomeApp_Application::updateModuleActions()
 {
   QString modName;
@@ -1613,6 +1654,9 @@ void SalomeApp_Application::updateModuleActions()
     myActions[modName]->setOn( true );
 }
 
+/*!Gets current windows.
+ *\param winMap - output current windows map.
+ */
 void SalomeApp_Application::currentWindows( QMap<int, int>& winMap ) const
 {
   winMap.clear();
@@ -1625,6 +1669,9 @@ void SalomeApp_Application::currentWindows( QMap<int, int>& winMap ) const
     defaultWindows( winMap );
 }
 
+/*!Gets current view managers.
+ *\param lst - output current view managers list.
+ */
 void SalomeApp_Application::currentViewManagers( QStringList& lst ) const
 {
   lst.clear();
@@ -1637,6 +1684,7 @@ void SalomeApp_Application::currentViewManagers( QStringList& lst ) const
     defaultViewManagers( lst );
 }
 
+/*!Update windows.*/
 void SalomeApp_Application::updateWindows()
 {
   QMap<int, int> winMap;
@@ -1651,6 +1699,7 @@ void SalomeApp_Application::updateWindows()
     setWindowShown( itr.key(), !itr.data()->isEmpty() && winMap.contains( itr.key() ) );
 }
 
+/*!Update view managers.*/
 void SalomeApp_Application::updateViewManagers()
 {
   QStringList lst;
@@ -1660,6 +1709,7 @@ void SalomeApp_Application::updateViewManagers()
     getViewManager( *it, true );
 }
 
+/*!Load windows geometry.*/
 void SalomeApp_Application::loadWindowsGeometry()
 {
   QtxDockAction* dockMgr = 0;
@@ -1683,6 +1733,7 @@ void SalomeApp_Application::loadWindowsGeometry()
   dockMgr->restoreGeometry();
 }
 
+/*!Save windows geometry.*/
 void SalomeApp_Application::saveWindowsGeometry()
 {
   QtxDockAction* dockMgr = 0;
@@ -1706,6 +1757,7 @@ void SalomeApp_Application::saveWindowsGeometry()
   dockMgr->saveGeometry( resourceMgr(), section, false );
 }
 
+/*!Activate windows.*/
 void SalomeApp_Application::activateWindows()
 {
   if ( activeStudy() )
@@ -1715,6 +1767,7 @@ void SalomeApp_Application::activateWindows()
   }
 }
 
+/*!Private SLOT. On preferences.*/
 void SalomeApp_Application::onProperties()
 {
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
@@ -1735,6 +1788,7 @@ void SalomeApp_Application::onProperties()
   updateDesktopTitle();
 }
 
+/*!*/
 QString SalomeApp_Application::getFileName( bool open, const QString& initial, const QString& filters, 
 					    const QString& caption, QWidget* parent )
 {
@@ -1744,6 +1798,7 @@ QString SalomeApp_Application::getFileName( bool open, const QString& initial, c
   return SUIT_FileDlg::getFileName( parent, initial, fls, caption, open, true );
 }
 
+/*!*/
 QString SalomeApp_Application::getDirectory( const QString& initial, const QString& caption, QWidget* parent )
 {
   if ( !parent )
@@ -1751,6 +1806,7 @@ QString SalomeApp_Application::getDirectory( const QString& initial, const QStri
   return SUIT_FileDlg::getExistingDirectory( parent, initial, caption, true );
 }
 
+/*!*/
 QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, const QString& filters, 
 						     const QString& caption, QWidget* parent )
 {
@@ -1760,6 +1816,7 @@ QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, con
   return SUIT_FileDlg::getOpenFileNames( parent, initial, fls, caption, true );
 }
 
+/*!*/
 void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   CAM_Application::contextMenuPopup( type, thePopup, title );
@@ -1784,6 +1841,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
 }
 
+/*!Update obect browser*/
 void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
 {
   // update existing data models (already loaded SComponents)
@@ -1822,8 +1880,7 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   }
 }
 
-
-//************************************************************
+/*!Protected SLOT.On desktop activated.*/
 void SalomeApp_Application::onDesktopActivated()
 {
   CAM_Application::onDesktopActivated();
@@ -1832,6 +1889,7 @@ void SalomeApp_Application::onDesktopActivated()
     aModule->studyActivated();
 }
 
+/*!Create empty study.*/
 void SalomeApp_Application::createEmptyStudy()
 {
   CAM_Application::createEmptyStudy();
@@ -1839,6 +1897,7 @@ void SalomeApp_Application::createEmptyStudy()
     objectBrowser()->updateTree();
 }
 
+/*!Activate module \a mod.*/
 bool SalomeApp_Application::activateModule( CAM_Module* mod )
 {
   bool res = CAM_Application::activateModule( mod );

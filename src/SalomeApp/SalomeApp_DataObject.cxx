@@ -19,7 +19,6 @@
 	Class: SalomeApp_DataObject::Key
 	Level: Internal
 */
-
 class SalomeApp_DataObject::Key : public SUIT_DataObjectKey
 {
 public:
@@ -33,48 +32,57 @@ private:
   QString myEntry;
 };
 
+/*!Constructor. Initialize by \a entry.*/
 SalomeApp_DataObject::Key::Key( const QString& entry )
 : SUIT_DataObjectKey(),
   myEntry( entry )
 {
 }
 
+/*!Destructor. Do nothing.*/
 SalomeApp_DataObject::Key::~Key()
 {
 }
 
+/*!Checks: Is current key less than \a other.*/
 bool SalomeApp_DataObject::Key::isLess( const SUIT_DataObjectKey* other ) const
 {
   Key* that = (Key*)other;
   return myEntry < that->myEntry;
 }
 
+/*!Checks: Is current key equal with \a other.*/
 bool SalomeApp_DataObject::Key::isEqual( const SUIT_DataObjectKey* other ) const
 {
   Key* that = (Key*)other;
   return myEntry == that->myEntry;
 }
 
-/*!
+/*
 	Class: SalomeApp_DataObject
 	Level: Public
 */
-
+/*!Constructor. Initialize by \a parent*/
 SalomeApp_DataObject::SalomeApp_DataObject( SUIT_DataObject* parent )
 : CAM_DataObject( parent )
 {
 }
 
+/*!Constructor. Initialize by \a parent and SObject*/
 SalomeApp_DataObject::SalomeApp_DataObject( const _PTR(SObject)& sobj, SUIT_DataObject* parent )
 : CAM_DataObject( parent )
 {
   myObject = sobj;
 }
 
+/*!Destructor. Do nothing.*/
 SalomeApp_DataObject::~SalomeApp_DataObject()
 {
 }
 
+/*!Gets object ID.
+ *\retval QString
+ */
 QString SalomeApp_DataObject::entry() const
 {
   if ( myObject )
@@ -82,12 +90,14 @@ QString SalomeApp_DataObject::entry() const
   return QString::null;
 }
 
+/*!Create and return new key object.*/
 SUIT_DataObjectKey* SalomeApp_DataObject::key() const
 {
   QString str = entry();
   return new Key( str );
 }
 
+/*!Gets name of object.*/
 QString SalomeApp_DataObject::name() const
 {
   QString str;
@@ -108,6 +118,7 @@ QString SalomeApp_DataObject::name() const
   return str;
 }
 
+/*!Gets icon picture of object.*/
 QPixmap SalomeApp_DataObject::icon() const
 {
   _PTR(GenericAttribute) anAttr;
@@ -125,6 +136,12 @@ QPixmap SalomeApp_DataObject::icon() const
   return QPixmap();
 }
 
+/*!Gets text value for one of entity:
+ *\li Value           (id = SalomeApp_DataObject::CT_Value)
+ *\li Entry           (id = SalomeApp_DataObject::CT_Entry)
+ *\li IOR             (id = SalomeApp_DataObject::CT_IOR)
+ *\li Reference entry (id = SalomeApp_DataObject::CT_RefEntry)
+ */
 QString SalomeApp_DataObject::text( const int id ) const
 {
   QString txt;
@@ -148,6 +165,11 @@ QString SalomeApp_DataObject::text( const int id ) const
   return txt;
 }
 
+/*!Get color value for one of entity:
+ *\li Text color
+ *\li Highlight color
+ *\li Higlighted text color
+ */
 QColor SalomeApp_DataObject::color( const ColorRole cr ) const
 {
   QColor clr;
@@ -178,12 +200,16 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   return clr;
 }
 
+/*!Gets tooltip.*/
 QString SalomeApp_DataObject::toolTip() const
 {
   //return object()->Name();
   return QString( "Object \'%1\', module \'%2\', ID=%3" ).arg( name() ).arg( componentDataType() ).arg( entry() );
 }
 
+/*!Gets component object.
+ *\retval SUIT_DataObject.
+ */
 SUIT_DataObject* SalomeApp_DataObject::componentObject() const
 {
   SUIT_DataObject* compObj = 0;  // for root object (invisible SALOME_ROOT_OBJECT) 
@@ -200,6 +226,7 @@ SUIT_DataObject* SalomeApp_DataObject::componentObject() const
   return compObj;
 }
 
+/*!Get component type.*/
 QString SalomeApp_DataObject::componentDataType() const
 {
   const SalomeApp_DataObject* compObj = dynamic_cast<SalomeApp_DataObject*>( componentObject() );
@@ -213,11 +240,13 @@ QString SalomeApp_DataObject::componentDataType() const
   return "";
 }
 
+/*!Gets object.*/
 _PTR(SObject) SalomeApp_DataObject::object() const
 {
   return myObject;
 }
 
+/*!Checks: Is object reference.*/
 bool SalomeApp_DataObject::isReference() const
 {
   bool isRef = false;
@@ -229,6 +258,7 @@ bool SalomeApp_DataObject::isReference() const
   return isRef;
 }
 
+/*!Gets reference object.*/
 _PTR(SObject) SalomeApp_DataObject::referencedObject() const
 {
   _PTR(SObject) refObj;
@@ -239,6 +269,7 @@ _PTR(SObject) SalomeApp_DataObject::referencedObject() const
   return obj;
 }
 
+/*!Gets IOR*/
 QString SalomeApp_DataObject::ior( const _PTR(SObject)& obj ) const
 {
   QString txt;
@@ -258,6 +289,7 @@ QString SalomeApp_DataObject::ior( const _PTR(SObject)& obj ) const
   return txt;
 }
 
+/*!Gets Entry*/
 QString SalomeApp_DataObject::entry( const _PTR(SObject)& obj ) const
 {
   QString txt;
@@ -269,6 +301,7 @@ QString SalomeApp_DataObject::entry( const _PTR(SObject)& obj ) const
   return txt;
 }
 
+/*!Value*/
 QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
 {
   if ( !obj )
@@ -317,11 +350,12 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   return val;
 }
 
-/*!
+/*
 	Class: SalomeApp_ModuleObject
 	Level: Public
 */
 
+/*!Constructor.Initialize by \a parent.*/
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( SUIT_DataObject* parent )
 : SalomeApp_DataObject( parent ), 
   CAM_RootObject( parent ),
@@ -329,6 +363,7 @@ SalomeApp_ModuleObject::SalomeApp_ModuleObject( SUIT_DataObject* parent )
 {
 }
 
+/*!Constructor.Initialize by \a parent and SObject.*/
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( const _PTR(SObject)& sobj, SUIT_DataObject* parent )
 : SalomeApp_DataObject( sobj, parent ), 
   CAM_RootObject( 0, parent ),
@@ -336,6 +371,7 @@ SalomeApp_ModuleObject::SalomeApp_ModuleObject( const _PTR(SObject)& sobj, SUIT_
 {
 }
 
+/*!Constructor.Initialize by \a parent and CAM_DataModel.*/
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( CAM_DataModel* dm, const _PTR(SObject)& sobj, SUIT_DataObject* parent )
 : SalomeApp_DataObject( sobj, parent ), 
   CAM_RootObject( dm, parent ),
@@ -343,6 +379,7 @@ SalomeApp_ModuleObject::SalomeApp_ModuleObject( CAM_DataModel* dm, const _PTR(SO
 {
 }
 
+/*!Destructor. Do nothing.*/
 SalomeApp_ModuleObject::~SalomeApp_ModuleObject()
 {
 }

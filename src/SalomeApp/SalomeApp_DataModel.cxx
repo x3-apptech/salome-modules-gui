@@ -25,8 +25,9 @@
 
 //=======================================================================
 // name    : BuildTree
-// Purpose : static method used by SalomeApp_Study and SalomeApp_DataModel classes
-//           to create default SALOMEDS-based data object tree
+/*!Purpose : static method used by SalomeApp_Study and SalomeApp_DataModel classes
+ *           to create default SALOMEDS-based data object tree
+ */
 //=======================================================================
 SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
 						 SUIT_DataObject* parent,
@@ -84,7 +85,7 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
 
 //=======================================================================
 // name    : SalomeApp_DataModel::SalomeApp_DataModel
-// Purpose : Constructor
+/*!Purpose : Constructor*/
 //=======================================================================
 SalomeApp_DataModel::SalomeApp_DataModel( CAM_Module* theModule )
 : CAM_DataModel( theModule )
@@ -93,7 +94,7 @@ SalomeApp_DataModel::SalomeApp_DataModel( CAM_Module* theModule )
 
 //=======================================================================
 // name    : SalomeApp_DataModel::~SalomeApp_DataModel
-// Purpose : Destructor
+/*! Purpose : Destructor*/
 //=======================================================================
 SalomeApp_DataModel::~SalomeApp_DataModel()
 {
@@ -101,7 +102,7 @@ SalomeApp_DataModel::~SalomeApp_DataModel()
 
 //================================================================
 // Function : open
-// Purpose  :
+/*! Purpose  : Open data model*/
 //================================================================
 bool SalomeApp_DataModel::open( const QString&, CAM_Study* study )
 {
@@ -154,7 +155,7 @@ bool SalomeApp_DataModel::open( const QString&, CAM_Study* study )
 
 //================================================================
 // Function : save
-// Purpose  :
+/*! Purpose  : Emit saved()*/
 //================================================================
 bool SalomeApp_DataModel::save()
 {
@@ -164,7 +165,7 @@ bool SalomeApp_DataModel::save()
 
 //================================================================
 // Function : saveAs
-// Purpose  :
+/*! Purpose  : Emit saved() */
 //================================================================
 bool SalomeApp_DataModel::saveAs( const QString&, CAM_Study* )
 {
@@ -174,7 +175,7 @@ bool SalomeApp_DataModel::saveAs( const QString&, CAM_Study* )
 
 //================================================================
 // Function : close
-// Purpose  :
+/*! Purpose  : Emit closed()*/
 //================================================================
 bool SalomeApp_DataModel::close()
 {
@@ -184,7 +185,7 @@ bool SalomeApp_DataModel::close()
 
 //================================================================
 // Function : update
-// Purpose  :
+/*! Purpose  : Update application.*/
 //================================================================
 void SalomeApp_DataModel::update( SalomeApp_DataObject*, SalomeApp_Study* study )
 {
@@ -217,7 +218,7 @@ void SalomeApp_DataModel::update( SalomeApp_DataObject*, SalomeApp_Study* study 
 
 //================================================================
 // Function : buildTree
-// Purpose  : private method
+/*! Purpose  : private method, build tree.*/
 //================================================================
 void SalomeApp_DataModel::buildTree( const _PTR(SObject)& obj,
 				     SUIT_DataObject* parent,
@@ -236,7 +237,7 @@ void SalomeApp_DataModel::buildTree( const _PTR(SObject)& obj,
 
 //================================================================
 // Function : getModule
-// Purpose  :
+/*! Purpose  : gets module*/
 //================================================================
 
 SalomeApp_Module* SalomeApp_DataModel::getModule() const
@@ -246,7 +247,7 @@ SalomeApp_Module* SalomeApp_DataModel::getModule() const
 
 //================================================================
 // Function : getStudy
-// Purpose  :
+/*! Purpose  : gets study */
 //================================================================
 SalomeApp_Study* SalomeApp_DataModel::getStudy() const
 {
@@ -258,7 +259,7 @@ SalomeApp_Study* SalomeApp_DataModel::getStudy() const
 
 //================================================================
 // Function : getRootEntry
-// Purpose  : returns study entry corresponding to this data model
+/*! Purpose  : returns study entry corresponding to this data model*/
 //================================================================
 QString SalomeApp_DataModel::getRootEntry( SalomeApp_Study* study ) const
 {
@@ -278,7 +279,7 @@ QString SalomeApp_DataModel::getRootEntry( SalomeApp_Study* study ) const
 
 //================================================================
 // Function : isModified
-// Purpose  : default implementation, always returns false so as not to mask study's isModified()
+/*! Purpose  : default implementation, always returns false so as not to mask study's isModified()*/
 //================================================================
 bool SalomeApp_DataModel::isModified() const
 {
@@ -287,7 +288,7 @@ bool SalomeApp_DataModel::isModified() const
 
 //================================================================
 // Function : isSaved
-// Purpose  : default implementation, always returns true so as not to mask study's isSaved()
+/*! Purpose  : default implementation, always returns true so as not to mask study's isSaved()*/
 //================================================================
 bool SalomeApp_DataModel::isSaved() const
 {
@@ -298,7 +299,7 @@ bool SalomeApp_DataModel::isSaved() const
 
 //================================================================
 // Function : GetListOfFiles
-// Purpose  : to be used by CORBAless modules
+/*! Purpose  : to be used by CORBAless modules*/
 //================================================================
 std::vector<std::string> SalomeApp_DataModel::GetListOfFiles() const
        //(const int theStudyId, const char* theComponentName) const
@@ -318,7 +319,7 @@ std::vector<std::string> SalomeApp_DataModel::GetListOfFiles() const
 
 //================================================================
 // Function : SetListOfFiles
-// Purpose  : to be used by CORBAless modules
+/*! Purpose  : to be used by CORBAless modules*/
 //================================================================
 void SalomeApp_DataModel::SetListOfFiles (const std::vector<std::string> theListOfFiles)
      //(const std::vector<std::string> theListOfFiles,
@@ -337,7 +338,7 @@ void SalomeApp_DataModel::SetListOfFiles (const std::vector<std::string> theList
 
 //================================================================
 // Function : GetTmpDir
-// Purpose  : Static method. To be used by CORBAless modules
+/*! Purpose  : Static method. To be used by CORBAless modules*/
 //================================================================
 std::string SalomeApp_DataModel::GetTmpDir (const char* theURL,
                                             const bool  isMultiFile)
@@ -349,7 +350,7 @@ std::string SalomeApp_DataModel::GetTmpDir (const char* theURL,
 
 //================================================================
 // Function : RemoveTemporaryFiles
-// Purpose  : to be used by CORBAless modules
+/*! Purpose  : to be used by CORBAless modules*/
 //================================================================
 void SalomeApp_DataModel::RemoveTemporaryFiles (const bool isMultiFile) const
 {

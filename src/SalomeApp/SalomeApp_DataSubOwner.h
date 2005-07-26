@@ -4,6 +4,9 @@
 
 #include <SalomeApp_DataOwner.h>
 
+/*!
+  Class provide sub owner.
+ */
 class SalomeApp_DataSubOwner : public SalomeApp_DataOwner
 {
 public:

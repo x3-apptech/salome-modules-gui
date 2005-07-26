@@ -25,11 +25,15 @@ SalomeApp_CheckFileDlg::~SalomeApp_CheckFileDlg()
 
 }
 
+/*!Sets checked.*/
 void SalomeApp_CheckFileDlg::SetChecked( bool check )
 {
   myCheckBox->setChecked(check);
 }
 
+/*!Is checked?
+ *\retval boolean - true, check box is checked, else false.
+ */
 bool SalomeApp_CheckFileDlg::IsChecked() const
 {
   return myCheckBox->isChecked();
