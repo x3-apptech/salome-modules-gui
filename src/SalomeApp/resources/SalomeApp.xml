@@ -97,6 +97,32 @@
     <parameter value="0" name="controls_precision" />
     <parameter value="true" name="DisplayMode" />
   </section>
+  <section name="VISU" >
+  <parameter value="false" name="full_med_loading" />
+  <parameter value="0.12" name="scalar_bar_horizontal_height" />
+  <parameter value="0.6" name="scalar_bar_horizontal_width" />
+  <parameter value="0.2" name="scalar_bar_horizontal_x" />
+  <parameter value="0.01" name="scalar_bar_horizontal_y" />
+  <parameter value="255, 255, 255" name="scalar_bar_label_color" />
+  <parameter value="Arial,Bold,Italic,Underline,12" name="scalar_bar_label_font" />
+  <parameter value="false" name="scalar_bar_logarithmic" />
+  <parameter value="0" name="scalar_bar_mode" />
+  <parameter value="64" name="scalar_bar_num_colors" />
+  <parameter value="5" name="scalar_bar_num_labels" />
+  <parameter value="0" name="scalar_bar_orientation" />
+  <parameter value="255, 255, 255" name="scalar_bar_title_color" />
+  <parameter value="Arial,Bold,Italic,Underline,12" name="scalar_bar_title_font" />
+  <parameter value="0.8" name="scalar_bar_vertical_height" />
+  <parameter value="0.1" name="scalar_bar_vertical_width" />
+  <parameter value="0.01" name="scalar_bar_vertical_x" />
+  <parameter value="0.1" name="scalar_bar_vertical_y" />
+  <parameter value="0" name="scalar_range_max" />
+  <parameter value="0" name="scalar_range_min" />
+  <parameter value="0" name="scalar_range_type" />
+  <parameter value="1" name="sweeping_number_cycles" />
+  <parameter value="20" name="sweeping_number_steps" />
+  <parameter value="0.2" name="sweeping_time_step" />
+  </section>
   <!-- Here go optional sections for other modules -->
   <section name="resources">
     <parameter name="salome" value="${KERNEL_ROOT_DIR}/share/salome/res"/>
