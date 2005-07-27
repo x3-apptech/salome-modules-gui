@@ -95,6 +95,21 @@
     <parameter value="5" name="selection_width" />
     <parameter value="5" name="highlight_width" />
     <parameter value="0" name="controls_precision" />
+    <parameter value="0.12" name="scalar_bar_horizontal_height" />
+    <parameter value="0.6" name="scalar_bar_horizontal_width" />
+    <parameter value="0.2" name="scalar_bar_horizontal_x" />
+    <parameter value="0.01" name="scalar_bar_horizontal_y" />
+    <parameter value="255, 255, 255" name="scalar_bar_label_color" />
+    <parameter value="Arial,12" name="scalar_bar_label_font" />
+    <parameter value="64" name="scalar_bar_num_colors" />
+    <parameter value="5" name="scalar_bar_num_labels" />
+    <parameter value="0" name="scalar_bar_orientation" />
+    <parameter value="255, 255, 255" name="scalar_bar_title_color" />
+    <parameter value="Arial,12" name="scalar_bar_title_font" />
+    <parameter value="0.8" name="scalar_bar_vertical_height" />
+    <parameter value="0.1" name="scalar_bar_vertical_width" />
+    <parameter value="0.01" name="scalar_bar_vertical_x" />
+    <parameter value="0.1" name="scalar_bar_vertical_y" />
     <parameter value="true" name="DisplayMode" />
   </section>
   <section name="VISU" >
