@@ -104,7 +104,7 @@ fi
 chmod u-w configure.in.base 
 
 if [ -e "${CONF_DIR}/salome_adm" ] ; then
-    \rm -f ${CONF_DIR}/salome_adm
+    \rm -rf ${CONF_DIR}/salome_adm
 fi
 
 # make a link allowing AC_OUTPUT to find the salome_adm/.../*.in  files
