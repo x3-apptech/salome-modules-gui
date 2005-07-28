@@ -203,7 +203,7 @@ void QtxTable::endHeaderEdit( const bool accept )
   myEditedSection = -1;
 
   myHeaderEditor->hide();
-  delete myHeaderEditor;
+  myHeaderEditor->deleteLater();
   myHeaderEditor = 0;
 
   if ( oldTxt != newTxt )
