@@ -387,7 +387,7 @@ void QtxMRUAction::saveLinks( QtxResourceMgr* resMgr, const QString& section, co
     return;
 
   if ( clear )
-    resMgr->removeSection( section );
+    resMgr->remove( section );
 
   QStringList lst;
   QMap<QString, int> map;

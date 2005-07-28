@@ -415,7 +415,7 @@ void QtxDockAction::saveGeometry( QtxResourceMgr* resMgr, const QString& section
     collectNames( i, that->myNames );
 
   if ( clear )
-    resMgr->removeSection( sec );
+    resMgr->remove( sec );
 
   resMgr->setValue( sec, "windows_list", myNames.join( "|" ) );
 
@@ -798,7 +798,7 @@ void QtxDockAction::loadPlaceInfo() const
     winList.append( mIt.data() );
 
   QMap<int, DockWinList> winMap;
-  QMap<QDockWindow*, GeomInfo> geomMap;
+  QMap<QDockWindow*, GeomInfo*> geomMap;
 
   for ( QPtrListIterator<QDockWindow> it( winList ); it.current(); ++it )
   {
@@ -809,11 +809,12 @@ void QtxDockAction::loadPlaceInfo() const
     if ( !myGeom.contains( name ) )
       continue;
 
-    GeomInfo inf( myGeom[name] );
+    //! collect pointer of info to have fresh info data after processEvents();
+    GeomInfo* inf = (GeomInfo*)&( myGeom[name] );
     geomMap.insert( it.current(), inf );
-    if ( !winMap.contains( inf.place ) )
-      winMap.insert( inf.place, DockWinList() );
-    winMap[inf.place].append( it.current() );
+    if ( !winMap.contains( inf->place ) )
+      winMap.insert( inf->place, DockWinList() );
+    winMap[inf->place].append( it.current() );
   }
 
   loadPlaceArea( DockMinimized, mw, 0,
@@ -831,15 +832,15 @@ void QtxDockAction::loadPlaceInfo() const
 
 void QtxDockAction::loadPlaceArea( const int place, QMainWindow* mw, QDockArea* area,
                                    const QPtrList<QDockWindow>& dockList,
-                                   const QMap<QDockWindow*, GeomInfo>& geomMap ) const
+                                   const QMap<QDockWindow*, GeomInfo*>& geomMap ) const
 {
   for ( QPtrListIterator<QDockWindow> it( dockList ); it.current(); ++it )
   {
     if ( !geomMap.contains( it.current() ) )
       continue;
 
-    const GeomInfo& inf = geomMap[it.current()];
-    mw->moveDockWindow( it.current(), (Qt::Dock)place, inf.newLine, inf.index, inf.offset );
+    GeomInfo* inf = geomMap[it.current()];
+    mw->moveDockWindow( it.current(), (Qt::Dock)place, inf->newLine, inf->index, inf->offset );
   }
 
   if ( !area )
@@ -853,17 +854,17 @@ void QtxDockAction::loadPlaceArea( const int place, QMainWindow* mw, QDockArea* 
     if ( !geomMap.contains( dw ) )
       continue;
 
-    const GeomInfo& inf = geomMap[dw];
+    GeomInfo* inf = geomMap[dw];
     if ( place != DockTornOff )
     {
-      dw->setNewLine( inf.newLine );
-		  dw->setOffset( inf.offset );
-		  dw->setFixedExtentWidth( inf.fixW );
-		  dw->setFixedExtentHeight( inf.fixH );
+      dw->setNewLine( inf->newLine );
+		  dw->setOffset( inf->offset );
+		  dw->setFixedExtentWidth( inf->fixW );
+		  dw->setFixedExtentHeight( inf->fixH );
     }
-    dw->setGeometry( inf.x, inf.y, inf.w, inf.h );
+    dw->setGeometry( inf->x, inf->y, inf->w, inf->h );
 
-    inf.vis ? dw->show() : dw->hide();
+    inf->vis ? dw->show() : dw->hide();
   }
 
   QWidget* wid = area;

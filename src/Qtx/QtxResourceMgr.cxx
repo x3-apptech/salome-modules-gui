@@ -274,7 +274,7 @@ bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Sectio
     if ( data.startsWith( comment ) )
       continue;
 
-    QRegExp rx( "^\\[([\\w\\s]*)\\]$" );
+    QRegExp rx( "^\\[([\\w\\s\\._]*)\\]$" );
     if ( rx.search( data ) != -1 )
     {
       section = rx.cap( 1 );
@@ -510,25 +510,43 @@ QString QtxResourceMgr::XmlFormat::valueAttribute() const
 	Level: Public
 */
 
+/*!
+  \brief Constructs the format object with specified name.
+  \param fmt - name of the format
+*/
 QtxResourceMgr::Format::Format( const QString& fmt )
 : myFmt( fmt )
 {
 }
 
+/*!
+  \brief Destructs the format object.
+*/
 QtxResourceMgr::Format::~Format()
 {
 }
 
+/*!
+  \brief Returns the format name.
+*/
 QString QtxResourceMgr::Format::format() const
 {
   return myFmt;
 }
 
+/*!
+  \brief Returns the string list of the format options.
+*/
 QStringList QtxResourceMgr::Format::options() const
 {
   return myOpt.keys();
 }
 
+/*!
+  \brief Returns the value of the option with specified name.
+         If option doesn't exist then empty string returned.
+  \param opt - name of the option
+*/
 QString QtxResourceMgr::Format::option( const QString& opt ) const
 {
   QString val;
@@ -536,11 +554,21 @@ QString QtxResourceMgr::Format::option( const QString& opt ) const
     val = myOpt[opt];
   return val;
 }
+
+/*!
+  \brief Sets the value of the option with specified name.
+  \param opt - name of the option
+  \param opt - value of the option
+*/
 void QtxResourceMgr::Format::setOption( const QString& opt, const QString& val )
 {
   myOpt.insert( opt, val );
 }
 
+/*!
+  \brief Perform the loading of the resources from resource file.
+  \param res - resources object which will be loaded
+*/
 bool QtxResourceMgr::Format::load( Resources* res )
 {
   if ( !res )
@@ -556,6 +584,10 @@ bool QtxResourceMgr::Format::load( Resources* res )
   return status;
 }
 
+/*!
+  \brief Perform the saving of the resources into resource file.
+  \param res - resources object which will be saved
+*/
 bool QtxResourceMgr::Format::save( Resources* res )
 {
   if ( !res )
@@ -571,8 +603,28 @@ bool QtxResourceMgr::Format::save( Resources* res )
 	Level: Public
 */
 
+/*!
+  \brief Constructs the resource manager object for application.
+  \param appName - name of the application which resources will be used.
+  \param resVarTemplate - template for the resource environment variable name which
+                          should point to the resource directory list.
+                          Default value is "%1Resources". Its mean that for application
+                          with name "MyApp" environment variable "MyAppResources" will
+                          be used. Template may not have the parameter '%1' substituted
+                          by application name. In this case this string will be used as
+                          is without substitution.
+  Resource environment variable should contains one or several resource directories
+  separated by symbol ';'. Resource directories list transfered into the setDirList().
+  These directories and the user home directory used for the loading application resources.
+  Each of the resource directories can contains resource file. The name of this file defined
+  by the function globalFileName(). Resource file name in the user home defined by the
+  function userFileName(). Any resource looking firstly in the user home resources then
+  resource directories used in the specified order. All setted resources always stored into
+  the resource file at the user home. Only user home resource file is saved.
+*/
 QtxResourceMgr::QtxResourceMgr( const QString& appName, const QString& resVarTemplate )
-: myAppName( appName )
+: myAppName( appName ),
+myCheckExist( true )
 {
   QString envVar = !resVarTemplate.isEmpty() ? resVarTemplate : QString( "%1Resources" );
   if ( envVar.contains( "%1" ) )
@@ -590,6 +642,9 @@ QtxResourceMgr::QtxResourceMgr( const QString& appName, const QString& resVarTem
   setOption( "translators", QString( "%P_msg_%L.qm|%P_images.qm" ) );
 }
 
+/*!
+  \brief Destructs the resource manager object and free allocated memory.
+*/
 QtxResourceMgr::~QtxResourceMgr()
 {
   QStringList prefList = myTranslator.keys();
@@ -597,25 +652,45 @@ QtxResourceMgr::~QtxResourceMgr()
     removeTranslators( *it );
 }
 
+/*!
+  \brief Returns the application name.
+*/
 QString QtxResourceMgr::appName() const
 {
   return myAppName;
 }
 
+/*!
+  \brief Returns the checking of the existance flag. If its 'true' then resource
+         will be setted into the manager only if it doesn't exist or has different
+         value that existing value.
+*/
+bool QtxResourceMgr::checkExisting() const
+{
+  return myCheckExist;
+}
+
+/*!
+  \brief Sets the checking of the existance flag.
+  \param on - boolean value of the flag.
+*/
+void QtxResourceMgr::setCheckExisting( const bool on )
+{
+  myCheckExist = on;
+}
+
+/*!
+  \brief Returns the resource directories list except user home directory.
+*/
 QStringList QtxResourceMgr::dirList() const
 {
   return myDirList;
 }
 
-void QtxResourceMgr::setDirList( const QStringList& dl )
-{
-  myDirList = dl;
-  for ( ResListIterator it( myResources ); it.current(); ++it )
-    delete it.current();
-
-  myResources.clear();
-}
-
+/*!
+  \brief Initialise the manager. Prepare the resource containers and load resources.
+  \param autoLoad - if 'true' then all resources will be loaded.
+*/
 void QtxResourceMgr::initialize( const bool autoLoad ) const
 {
   if ( !myResources.isEmpty() )
@@ -634,52 +709,22 @@ void QtxResourceMgr::initialize( const bool autoLoad ) const
     that->load();
 }
 
+/*!
+  \brief Removes all resources from the manager.
+*/
 void QtxResourceMgr::clear()
 {
   for ( ResListIterator it( myResources ); it.current(); ++it )
     it.current()->clear();
 }
 
-QString QtxResourceMgr::currentSection() const
-{
-  return myCurSection;
-}
-
-void QtxResourceMgr::setCurrentSection( const QString& str )
-{
-  myCurSection = str;
-}
-
-bool QtxResourceMgr::value( const QString& name, int& val ) const
-{
-  return value( currentSection(), name, val );
-}
-
-bool QtxResourceMgr::value( const QString& name, double& val ) const
-{
-  return value( currentSection(), name, val );
-}
-
-bool QtxResourceMgr::value( const QString& name, bool& val ) const
-{
-  return value( currentSection(), name, val );
-}
-
-bool QtxResourceMgr::value( const QString& name, QColor& val ) const
-{
-  return value( currentSection(), name, val );
-}
-
-bool QtxResourceMgr::value( const QString& name, QFont& val ) const
-{
-  return value( currentSection(), name, val );
-}
-
-bool QtxResourceMgr::value( const QString& name, QString& val, const bool subst ) const
-{
-  return value( currentSection(), name, val, subst );
-}
-
+/*!
+  \brief Get the resource value as integer. Returns 'true' if it successfull otherwise
+         returns 'false'.
+  \param sect - Resource section name which contains resource.
+  \param name - Name of the resource.
+  \param iVal - Reference on the variable which should contains the resource output.
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, int& iVal ) const
 {
   QString val;
@@ -692,6 +737,13 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, int& iVal 
   return ok;
 }
 
+/*!
+  \brief Get the resource value as double. Returns 'true' if it successfull otherwise
+         returns 'false'.
+  \param sect - Resource section name which contains resource.
+  \param name - Name of the resource.
+  \param dVal - Reference on the variable which should contains the resource output.
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, double& dVal ) const
 {
   QString val;
@@ -704,6 +756,13 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, double& dV
   return ok;
 }
 
+/*!
+  \brief Get the resource value as boolean. Returns 'true' if it successfull otherwise
+         returns 'false'.
+  \param sect - Resource section name which contains resource.
+  \param name - Name of the resource.
+  \param bVal - Reference on the variable which should contains the resource output.
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, bool& bVal ) const
 {
   QString val;
@@ -731,6 +790,13 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, bool& bVal
   return res;
 }
 
+/*!
+  \brief Get the resource value as color. Returns 'true' if it successfull otherwise
+         returns 'false'.
+  \param sect - Resource section name which contains resource.
+  \param name - Name of the resource.
+  \param cVal - Reference on the variable which should contains the resource output.
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, QColor& cVal ) const
 {
   QString val;
@@ -756,45 +822,61 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QColor& cV
   return res;
 }
 
+/*!
+  \brief Get the resource value as font. Returns 'true' if it successfull otherwise
+         returns 'false'.
+  \param sect - Resource section name which contains resource.
+  \param name - Name of the resource.
+  \param fVal - Reference on the variable which should contains the resource output.
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, QFont& fVal ) const
 {
-  QString val = stringValue( sect, name, "" );
-  QStringList font_values = QStringList::split( ",", val );
-  if( font_values.count()<2 || font_values.count()>5 )
+  QString val;
+  if ( !value( sect, name, val, true ) )
     return false;
-  
-  QString family = font_values[0];
-  bool isBold = false, isItalic = false, isUnderline = false, isOk = false;
-  int pSize = -1;
-  for( int i=1, n=font_values.count(); i<n; i++ )
+
+  QStringList fontDescr = QStringList::split( ",", val );
+
+  if ( fontDescr.count() < 2 )
+    return false;
+
+  QString family = fontDescr[0];
+  if ( family.isEmpty() )
+    return false;
+
+  fVal = QFont( family );
+
+  for ( int i = 1; i < (int)fontDescr.count(); i++ )
   {
-    QString curval = font_values[i].stripWhiteSpace().lower();
-    if( !isBold && curval=="bold" )
-      isBold = true;
-    else if( !isItalic && curval=="italic" )
-      isItalic = true;
-    else if( !isUnderline && curval=="underline" )
-      isUnderline = true;
-    else if( pSize<0 )
+    QString curval = fontDescr[i].stripWhiteSpace().lower();
+    if ( curval == QString( "bold" ) )
+      fVal.setBold( true );
+    else if ( curval == QString( "italic" ) )
+      fVal.setItalic( true );
+    else if ( curval == QString( "underline" ) )
+      fVal.setUnderline( true );
+    else
     {
-      pSize = curval.toInt( &isOk );
-      if( !isOk )
-        pSize = -1;
+      bool isOk = false;
+      int ps = curval.toInt( &isOk );
+      if ( isOk )
+        fVal.setPointSize( ps );
     }
   }
 
-  if( pSize>0 && !family.isEmpty() )
-  {
-    fVal = QFont( family, pSize );
-    fVal.setBold( isBold );
-    fVal.setItalic( isItalic );
-    fVal.setUnderline( isUnderline );
-    return true;
-  }
-  else
-    return false;
+  return true;
 }
 
+/*!
+  \brief Get the resource value as string (native format). Returns 'true' if it
+         successfull otherwise returns 'false'.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param val   - Reference on the variable which should contains the resource output.
+  \param subst - If 'true' then manager substitute reference on environment variables
+                 and other resources by thier values. Default value of this parameter
+                 is 'true'
+*/
 bool QtxResourceMgr::value( const QString& sect, const QString& name, QString& val, const bool subst ) const
 {
   initialize();
@@ -810,36 +892,13 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QString& v
   return ok;
 }
 
-int QtxResourceMgr::integerValue( const QString& name, const int def ) const
-{
-  return integerValue( currentSection(), name, def );
-}
-
-double QtxResourceMgr::doubleValue( const QString& name, const double def ) const
-{
-  return doubleValue( currentSection(), name, def );
-}
-
-bool QtxResourceMgr::booleanValue( const QString& name, const bool def ) const
-{
-  return booleanValue( currentSection(), name, def );
-}
-
-QFont QtxResourceMgr::fontValue( const QString& name, const QFont& def ) const
-{
-  return fontValue( currentSection(), name, def );
-}
-  
-QColor QtxResourceMgr::colorValue( const QString& name, const QColor& def ) const
-{
-  return colorValue( currentSection(), name, def );
-}
-
-QString QtxResourceMgr::stringValue( const QString& name, const char* def ) const
-{
-  return stringValue( currentSection(), name, def );
-}
-
+/*!
+  \brief Returns the integer resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
 int QtxResourceMgr::integerValue( const QString& sect, const QString& name, const int def ) const
 {
   int val;
@@ -848,6 +907,13 @@ int QtxResourceMgr::integerValue( const QString& sect, const QString& name, cons
   return val;
 }
 
+/*!
+  \brief Returns the double resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
 double QtxResourceMgr::doubleValue( const QString& sect, const QString& name, const double def ) const
 {
   double val;
@@ -856,6 +922,13 @@ double QtxResourceMgr::doubleValue( const QString& sect, const QString& name, co
   return val;
 }
 
+/*!
+  \brief Returns the boolean resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
 bool QtxResourceMgr::booleanValue( const QString& sect, const QString& name, const bool def ) const
 {
   bool val;
@@ -864,6 +937,13 @@ bool QtxResourceMgr::booleanValue( const QString& sect, const QString& name, con
   return val;
 }
 
+/*!
+  \brief Returns the font resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
 QFont QtxResourceMgr::fontValue( const QString& sect, const QString& name, const QFont& def ) const
 {
   QFont font;
@@ -872,6 +952,13 @@ QFont QtxResourceMgr::fontValue( const QString& sect, const QString& name, const
   return font;
 }
 
+/*!
+  \brief Returns the color resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
 QColor QtxResourceMgr::colorValue( const QString& sect, const QString& name, const QColor& def ) const
 {
   QColor val;
@@ -880,7 +967,14 @@ QColor QtxResourceMgr::colorValue( const QString& sect, const QString& name, con
   return val;
 }
 
-QString QtxResourceMgr::stringValue( const QString& sect, const QString& name, const char* def ) const
+/*!
+  \brief Returns the string resource value. If resource can not be found or converted
+         then specified default value will be returned.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+  \param def   - Default resource value which will be used when resource not found.
+*/
+QString QtxResourceMgr::stringValue( const QString& sect, const QString& name, const QString& def ) const
 {
   QString val;
   if ( !value( sect, name, val ) )
@@ -888,11 +982,11 @@ QString QtxResourceMgr::stringValue( const QString& sect, const QString& name, c
   return val;
 }
 
-bool QtxResourceMgr::hasValue( const QString& name ) const
-{
-  return hasValue( currentSection(), name );
-}
-
+/*!
+  \brief Checks existance of the specified resource.
+  \param sect  - Resource section name which contains resource.
+  \param name  - Name of the resource.
+*/
 bool QtxResourceMgr::hasValue( const QString& sect, const QString& name ) const
 {
   initialize();
@@ -904,6 +998,10 @@ bool QtxResourceMgr::hasValue( const QString& sect, const QString& name ) const
   return ok;
 }
 
+/*!
+  \brief Checks existance of the specified resource section.
+  \param sect  - Resource section name which contains resource.
+*/
 bool QtxResourceMgr::hasSection( const QString& sect ) const
 {
   initialize();
@@ -915,84 +1013,123 @@ bool QtxResourceMgr::hasSection( const QString& sect ) const
   return ok;
 }
 
-void QtxResourceMgr::setValue( const QString& name, int val )
-{
-  setValue( currentSection(), name, val );
-}
-
-void QtxResourceMgr::setValue( const QString& name, double val )
-{
-  setValue( currentSection(), name, val );
-}
-
-void QtxResourceMgr::setValue( const QString& name, bool val )
-{
-  setValue( currentSection(), name, val );
-}
-
-void QtxResourceMgr::setValue( const QString& name, const QColor& val )
-{
-  setValue( currentSection(), name, val );
-}
-
-void QtxResourceMgr::setValue( const QString& name, const QFont& val )
-{
-  setValue( currentSection(), name, val );
-}
-
-void QtxResourceMgr::setValue( const QString& name, const QString& val )
-{
-  setValue( currentSection(), name, val );
-}
-
+/*!
+  \brief Sets the integer resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, int val )
 {
-  setValue( sect, name, QString::number( val ) );
+  int res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, QString::number( val ) );
 }
 
+/*!
+  \brief Sets the double resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, double val )
 {
-  setValue( sect, name, QString::number( val, 'g', 12 ) );
+  double res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, QString::number( val, 'g', 12 ) );
 }
 
+/*!
+  \brief Sets the boolean resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, bool val )
 {
-  setValue( sect, name, QString( val ? "true" : "false" ) );
+  bool res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, QString( val ? "true" : "false" ) );
 }
 
+/*!
+  \brief Sets the color resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QColor& val )
 {
-  setValue( sect, name, QString( "%1, %2, %3").arg( val.red() ).arg( val.green() ).arg( val.blue() ) );
+  QColor res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, QString( "%1, %2, %3" ).arg( val.red() ).arg( val.green() ).arg( val.blue() ) );
 }
 
-void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QFont& f )
+/*!
+  \brief Sets the font resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
+void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QFont& val )
 {
-  QStringList val;
-  val.append( f.family() );
-  if( f.bold() )
-    val.append( "Bold" );
-  if( f.italic() )
-    val.append( "Italic" );
-  if( f.underline() )
-    val.append( "Underline" );
-  val.append( QString( "%1" ).arg( f.pointSize() ) );
-  
-  setValue( sect, name, val.join( "," ) );
+  QFont res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  QStringList fontDescr;
+  fontDescr.append( val.family() );
+  if ( val.bold() )
+    fontDescr.append( "Bold" );
+  if ( val.italic() )
+    fontDescr.append( "Italic" );
+  if ( val.underline() )
+    fontDescr.append( "Underline" );
+  fontDescr.append( QString( "%1" ).arg( val.pointSize() ) );
+
+  setResource( sect, name, fontDescr.join( "," ) );
 }
 
+/*!
+  \brief Sets the string resource value.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+  \param val   - Resource value.
+*/
 void QtxResourceMgr::setValue( const QString& sect, const QString& name, const QString& val )
+{
+  QString res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, val );
+}
+
+/*!
+  \brief Remove the all specified resource section.
+  \param sect  - Resource section name.
+*/
+void QtxResourceMgr::remove( const QString& sect )
 {
   initialize();
 
-  if ( !myResources.isEmpty() )
-    myResources.first()->setValue( sect, name, val );
+  for ( ResListIterator it( myResources ); it.current(); ++it )
+    it.current()->removeSection( sect );
 }
 
-void QtxResourceMgr::remove( const QString& name )
-{
-  remove( currentSection(), name );
-}
-
+/*!
+  \brief Remove the specified resource.
+  \param sect  - Resource section name.
+  \param name  - Name of the resource.
+*/
 void QtxResourceMgr::remove( const QString& sect, const QString& name )
 {
   initialize();
@@ -1001,14 +1138,9 @@ void QtxResourceMgr::remove( const QString& sect, const QString& name )
     it.current()->removeValue( sect, name );
 }
 
-void QtxResourceMgr::removeSection( const QString& sect )
-{
-  initialize();
-
-  for ( ResListIterator it( myResources ); it.current(); ++it )
-    it.current()->removeSection( sect );
-}
-
+/*!
+  \brief Returns the current format which operates with resource files.
+*/
 QString QtxResourceMgr::currentFormat() const
 {
   QString fmt;
@@ -1017,6 +1149,10 @@ QString QtxResourceMgr::currentFormat() const
   return fmt;
 }
 
+/*!
+  \brief Sets the current format which operates with resource files.
+  \param fmt - Resource format name.
+*/
 void QtxResourceMgr::setCurrentFormat( const QString& fmt )
 {
   Format* form = format( fmt );
@@ -1038,6 +1174,10 @@ void QtxResourceMgr::setCurrentFormat( const QString& fmt )
     resIt.current()->setFile( Qtx::addSlash( *it ) + globalFileName( appName() ) );
 }
 
+/*!
+  \brief Returns the resource format object by it name.
+  \param fmt - Resource format name.
+*/
 QtxResourceMgr::Format* QtxResourceMgr::format( const QString& fmt ) const
 {
   Format* form = 0;
@@ -1050,22 +1190,38 @@ QtxResourceMgr::Format* QtxResourceMgr::format( const QString& fmt ) const
   return form;
 }
 
+/*!
+  \brief Add the resource format to the manager. Newly added become current.
+  \param form - Resource format object.
+*/
 void QtxResourceMgr::installFormat( QtxResourceMgr::Format* form )
 {
   if ( !myFormats.contains( form ) )
     myFormats.prepend( form );
 }
 
+/*!
+  \brief Remove the resource format from the manager.
+  \param form - Resource format object.
+*/
 void QtxResourceMgr::removeFormat( QtxResourceMgr::Format* form )
 {
   myFormats.remove( form );
 }
 
+/*!
+  \brief Returns the string list of the resource format options names.
+*/
 QStringList QtxResourceMgr::options() const
 {
   return myOptions.keys();
 }
 
+/*!
+  \brief Returns the string value for the specified option. If option doesn't exist
+         then empty string will be returned.
+  \param opt - Option name.
+*/
 QString QtxResourceMgr::option( const QString& opt ) const
 {
   QString val;
@@ -1074,11 +1230,19 @@ QString QtxResourceMgr::option( const QString& opt ) const
   return val;
 }
 
+/*!
+  \brief Sets the string value for the specified option.
+  \param opt - Option name.
+  \param val - Option value.
+*/
 void QtxResourceMgr::setOption( const QString& opt, const QString& val )
 {
   myOptions.insert( opt, val );
 }
 
+/*!
+  \brief Load the all resources from the resource files.
+*/
 bool QtxResourceMgr::load()
 {
   initialize( false );
@@ -1094,6 +1258,9 @@ bool QtxResourceMgr::load()
   return res;
 }
 
+/*!
+  \brief Save the changed resources in to the user resource file.
+*/
 bool QtxResourceMgr::save()
 {
   initialize( false );
@@ -1108,6 +1275,9 @@ bool QtxResourceMgr::save()
   return fmt->save( myResources.getFirst() );
 }
 
+/*!
+  \brief Returns the string list of the existing section names..
+*/
 QStringList QtxResourceMgr::sections() const
 {
   initialize();
@@ -1127,6 +1297,10 @@ QStringList QtxResourceMgr::sections() const
   return res;
 }
 
+/*!
+  \brief Returns the string list of the existing resource names in the specified section.
+  \param sec - Resource section name.
+*/
 QStringList QtxResourceMgr::parameters( const QString& sec ) const
 {
   initialize();
@@ -1308,8 +1482,25 @@ void QtxResourceMgr::refresh()
   {
     QStringList pl = parameters( *it );
     for ( QStringList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-      setValue( *it, *itr, stringValue( *it, *itr ) );
+      setResource( *it, *itr, stringValue( *it, *itr ) );
   }
+}
+
+void QtxResourceMgr::setDirList( const QStringList& dl )
+{
+  myDirList = dl;
+  for ( ResListIterator it( myResources ); it.current(); ++it )
+    delete it.current();
+
+  myResources.clear();
+}
+
+void QtxResourceMgr::setResource( const QString& sect, const QString& name, const QString& val )
+{
+  initialize();
+
+  if ( !myResources.isEmpty() )
+    myResources.first()->setValue( sect, name, val );
 }
 
 QString QtxResourceMgr::userFileName( const QString& appName ) const

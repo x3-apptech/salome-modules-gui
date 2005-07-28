@@ -197,9 +197,14 @@ private:
   QtxWorkstackChild*  child( QWidget* ) const;
 
 private:
+  struct WidgetInfo
+  {
+    WidgetInfo() : id( 0 ), vis( false ) {}
+    int id; bool vis;
+  };
+
   typedef QMap<QWidget*, bool>               BlockMap;
   typedef QMap<QWidget*, QtxWorkstackChild*> ChildMap;
-  typedef struct { int id; bool vis; }       WidgetInfo;
   typedef QMap<QWidget*, WidgetInfo>         WidgetInfoMap;
 
 private:

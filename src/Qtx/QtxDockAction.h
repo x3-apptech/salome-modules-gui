@@ -120,7 +120,7 @@ private:
                              const QString&, const GeomInfo& ) const;
   void         loadPlaceArea( const int, QMainWindow*, QDockArea*,
                               const QPtrList<QDockWindow>&,
-                              const QMap<QDockWindow*, GeomInfo>& ) const;
+                              const QMap<QDockWindow*, GeomInfo*>& ) const;
 
 private:
   InfoMap      myInfo;
