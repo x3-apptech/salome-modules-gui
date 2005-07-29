@@ -4,34 +4,51 @@
 
 #include <QtxAction.h>
 
+/*!
+  Constructor.
+*/
 SUIT_ActionOperation::SUIT_ActionOperation( SUIT_Application* app )
 : SUIT_Operation( app ),
 myAction( 0 )
 {
 }
 
+/*!
+  Destructor.
+*/
 SUIT_ActionOperation::~SUIT_ActionOperation()
 {
 }
 
+/*!
+  Gets action.
+*/
 QtxAction* SUIT_ActionOperation::action() const
 {
   return myAction;
 }
 
+/*!Set action.
+ * Create new instance of QtxAction and set.
+ */
 void SUIT_ActionOperation::setAction( const QString& text, const QIconSet& icon,
-				                              const QString& menuText, QKeySequence accel,
+				      const QString& menuText, QKeySequence accel,
                                       QObject* parent, const char* name, bool toggle )
 {
   setAction( new QtxAction( text, icon, menuText, accel, parent, name, toggle ) );
 }
 
+/*!Set action.
+ * Create new instance of QtxAction and set.
+ */
 void SUIT_ActionOperation::setAction( const QString& text, const QString& menuText,
-				                              QKeySequence accel, QObject* parent, const char* name, bool toggle )
+				      QKeySequence accel, QObject* parent, const char* name, bool toggle )
 {
   setAction( new QtxAction(text, menuText, accel, parent, name, toggle ) );
 }
 
+/*!Set action.
+ */
 void SUIT_ActionOperation::setAction( QtxAction* a )
 {
   if ( myAction == a )
@@ -44,6 +61,9 @@ void SUIT_ActionOperation::setAction( QtxAction* a )
   connect( myAction, SIGNAL( activated() ), SLOT( start() ) );
 }
 
+/*! Add action to widget \a wid.
+ *\retval TRUE - successful, FALSE - not successful.
+ */
 bool SUIT_ActionOperation::addTo( QWidget* wid )
 {
   if ( !action() )
@@ -52,6 +72,9 @@ bool SUIT_ActionOperation::addTo( QWidget* wid )
   return action()->addTo( wid );
 }
 
+/*! Add action to widget \a wid.
+ *\retval TRUE - successful, FALSE - not successful.
+ */
 bool SUIT_ActionOperation::addTo( QWidget* wid, int idx )
 {
   if ( !action() )
@@ -60,8 +83,10 @@ bool SUIT_ActionOperation::addTo( QWidget* wid, int idx )
   return action()->addTo( wid, idx );
 }
 
+/*! Set status tip for action.
+*/
 void SUIT_ActionOperation::setStatusTip( const QString& tip )
 {
-	if ( action() )
-		action()->setStatusTip( tip );
+  if ( action() )
+    action()->setStatusTip( tip );
 }

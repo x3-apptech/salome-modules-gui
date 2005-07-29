@@ -20,16 +20,14 @@
 class SUIT_ResourceMgr;
 class SUIT_ExceptionHandler;
 
-/*!
-  The class Sesssion manages launching of Applications. Application must be returned
-  by static function "createApplication" in external library. The Library must be loaded with 
-  loadLibrary method and after that application can be started.
-*/
-
 #ifdef WNT
 #pragma warning( disable:4251 )
 #endif
-
+/*!
+  The class Sesssion manages launching of Applications. Application must be returned \n
+  by static function "createApplication" in external library. The Library must be loaded with \n
+  loadLibrary method and after that application can be started.
+*/
 class SUIT_EXPORT SUIT_Session: public QObject
 {
   Q_OBJECT

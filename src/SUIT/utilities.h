@@ -38,15 +38,15 @@
 
 #include "LocalTraceBufferPool.hxx"
 
-/*!
- * For each message to put in the trace, a specific ostingstream object is
- * created and destroyed automatically at the end of the message macro.
- * The insert function of LocalTraceBufferPool class gets a buffer in a
- * buffer pool (unique with the help of mutexes and semaphores) and copy the
- * message in the buffer.
- * This buffer is read later by a specific thread in charge of trace print.
- * Order of trace entries is globally respected. Nevertheless, if there are
- * several threads waiting for a free buffer to trace, the order of
+/** \file utilities.h
+ * For each message to put in the trace, a specific ostingstream object is \n
+ * created and destroyed automatically at the end of the message macro. \n
+ * The insert function of LocalTraceBufferPool class gets a buffer in a \n
+ * buffer pool (unique with the help of mutexes and semaphores) and copy the \n
+ * message in the buffer.\n
+ * This buffer is read later by a specific thread in charge of trace print.\n
+ * Order of trace entries is globally respected. Nevertheless, if there are \n
+ * several threads waiting for a free buffer to trace, the order of \n
  * thread waken up is not garanteed (no fifo or priority rules in Linux Kernel)
  */
 
@@ -90,8 +90,8 @@
 				       << " at " << __TIME__ << MESS_END }
 #ifdef _DEBUG_
 
-// --- the following MACROS are useful at debug time
-
+/** @name the following MACROS are useful at debug time*/
+//@{
 #define MESSAGE(msg) {MESS_BEGIN("- Trace ") << msg << MESS_END}
 #define SCRUTE(var)  {MESS_BEGIN("- Trace ") << #var << "=" << var <<MESS_END}
 
@@ -103,7 +103,7 @@
 #define ASSERT(condition) \
         if (!(condition)){INTERRUPTION("CONDITION "<<#condition<<" NOT VERIFIED")}
 #endif /* ASSERT */
-
+//@}
 
 #else /* ifdef _DEBUG_*/
 

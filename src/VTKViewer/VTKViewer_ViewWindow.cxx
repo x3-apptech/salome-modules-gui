@@ -117,48 +117,43 @@ VTKViewer_ViewWindow::~VTKViewer_ViewWindow()
   myTrihedron->Delete();
 }
 
+/*!Checks: is trihedron displayed.*/
 bool VTKViewer_ViewWindow::isTrihedronDisplayed(){
   return myTrihedron->GetVisibility() == VTKViewer_Trihedron::eOn;
 }
 
-/*!
-    Activates 'zooming' transformation
-*/
+/*!Activates 'zooming' transformation*/
 void VTKViewer_ViewWindow::activateZoom()
 {
   myRWInteractor->GetInteractorStyle()->startZoom();
 }
 
-/*!
-    Activates 'panning' transformation
-*/
+/*!Activates 'panning' transformation*/
 void VTKViewer_ViewWindow::activatePanning()
 {
   myRWInteractor->GetInteractorStyle()->startPan();
 }
 
-/*!
-    Activates 'rotation' transformation
-*/
+/*!Activates 'rotation' transformation*/
 void VTKViewer_ViewWindow::activateRotation()
 {
   myRWInteractor->GetInteractorStyle()->startRotate();
 }
 
+/*!Activate global panning.*/
 void VTKViewer_ViewWindow::activateGlobalPanning()
 {
   //if(myTrihedron->GetVisibleActorCount(myRenderer))
   myRWInteractor->GetInteractorStyle()->startGlobalPan();
 }
 
-/*!
-    Activates 'fit area' transformation
-*/
+/*!Activates 'fit area' transformation*/
 void VTKViewer_ViewWindow::activateWindowFit()
 {
   myRWInteractor->GetInteractorStyle()->startFitArea();
 }
 
+/*!Create actions:*/
 void VTKViewer_ViewWindow::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
@@ -167,99 +162,105 @@ void VTKViewer_ViewWindow::createActions()
   
   QtxAction* aAction;
 
-  // Dump view
+  //! \li Dump view
   aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_DUMP" ) ),
                            tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
   myActionsMap[ DumpId ] = aAction;
 
-  // FitAll
+  //! \li FitAll
   aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITALL" ) ),
                            tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onFitAll()));
   myActionsMap[ FitAllId ] = aAction;
 
-  // FitRect
+  //! \li FitRect
   aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITAREA" ) ),
                            tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(activateWindowFit()));
   myActionsMap[ FitRectId ] = aAction;
 
-  // Zoom
+  //! \li Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(activateZoom()));
   myActionsMap[ ZoomId ] = aAction;
 
-  // Panning
+  //! \li Panning
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_PAN" ) ),
                            tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(activatePanning()));
   myActionsMap[ PanId ] = aAction;
 
-  // Global Panning
+  //! \li Global Panning
   aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_GLOBALPAN" ) ),
                            tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(activateGlobalPanning()));
   myActionsMap[ GlobalPanId ] = aAction;
 
-  // Rotation
+  //! \li Rotation
   aAction = new QtxAction(tr("MNU_ROTATE_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ROTATE" ) ),
                            tr( "MNU_ROTATE_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ROTATE_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(activateRotation()));
   myActionsMap[ RotationId ] = aAction;
 
-  // Projections
+  //! \li Projections
   aAction = new QtxAction(tr("MNU_FRONT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FRONT" ) ),
                            tr( "MNU_FRONT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_FRONT_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onFrontView()));
   myActionsMap[ FrontId ] = aAction;
 
+  //! \li Back view
   aAction = new QtxAction(tr("MNU_BACK_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BACK" ) ),
                            tr( "MNU_BACK_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_BACK_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onBackView()));
   myActionsMap[ BackId ] = aAction;
 
+  //! \li Top view
   aAction = new QtxAction(tr("MNU_TOP_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TOP" ) ),
                            tr( "MNU_TOP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_TOP_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onTopView()));
   myActionsMap[ TopId ] = aAction;
 
+  //! \li Bottom view
   aAction = new QtxAction(tr("MNU_BOTTOM_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BOTTOM" ) ),
                            tr( "MNU_BOTTOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_BOTTOM_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onBottomView()));
   myActionsMap[ BottomId ] = aAction;
 
+  //! \li Left view
   aAction = new QtxAction(tr("MNU_LEFT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_LEFT" ) ),
                            tr( "MNU_LEFT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_LEFT_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onLeftView()));
   myActionsMap[ LeftId ] = aAction;
 
+  //! \li Right view
   aAction = new QtxAction(tr("MNU_RIGHT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RIGHT" ) ),
                            tr( "MNU_RIGHT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RIGHT_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onRightView()));
   myActionsMap[ RightId ] = aAction;
 
-  // Reset
+  //! \li Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RESET" ) ),
                            tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onResetView()));
   myActionsMap[ ResetId ] = aAction;
 
+  //! \li Trihedron shown
   aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
                            tr( "MNU_SHOW_TRIHEDRON" ), 0, this);
   aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRON"));
@@ -267,6 +268,7 @@ void VTKViewer_ViewWindow::createActions()
   myActionsMap[ TrihedronShowId ] = aAction;
 }
 
+/*!Create tool bar.*/
 void VTKViewer_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
@@ -294,6 +296,7 @@ void VTKViewer_ViewWindow::createToolBar()
   myActionsMap[ResetId]->addTo(myToolBar);
 }
 
+/*!On front view event.*/
 void VTKViewer_ViewWindow::onFrontView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -303,6 +306,7 @@ void VTKViewer_ViewWindow::onFrontView()
   onFitAll();
 }
 
+/*!On back view slot.*/
 void VTKViewer_ViewWindow::onBackView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -312,6 +316,7 @@ void VTKViewer_ViewWindow::onBackView()
   onFitAll();
 }
 
+/*!On back view slot.*/
 void VTKViewer_ViewWindow::onTopView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -321,6 +326,7 @@ void VTKViewer_ViewWindow::onTopView()
   onFitAll();
 }
 
+/*!On bottom view slot.*/
 void VTKViewer_ViewWindow::onBottomView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -330,6 +336,7 @@ void VTKViewer_ViewWindow::onBottomView()
   onFitAll();
 }
 
+/*!On left view slot.*/
 void VTKViewer_ViewWindow::onLeftView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera(); 
@@ -339,6 +346,7 @@ void VTKViewer_ViewWindow::onLeftView()
   onFitAll();
 }
 
+/*!On right view slot.*/
 void VTKViewer_ViewWindow::onRightView()
 {
   vtkCamera* camera = myRenderer->GetActiveCamera();
@@ -348,6 +356,7 @@ void VTKViewer_ViewWindow::onRightView()
   onFitAll();
 }
 
+/*!On reset view slot.*/
 void VTKViewer_ViewWindow::onResetView()
 {
   int aTriedronIsVisible = isTrihedronDisplayed();
@@ -364,24 +373,21 @@ void VTKViewer_ViewWindow::onResetView()
   Repaint();
 }
 
+/*!On fit all slot.*/
 void VTKViewer_ViewWindow::onFitAll()
 {
   myRWInteractor->GetInteractorStyle()->ViewFitAll();
   Repaint();
 }
 
-/*!
-    Set background of the viewport
-*/
+/*!Set background of the viewport*/
 void VTKViewer_ViewWindow::setBackgroundColor( const QColor& color )
 {
   if ( myRenderer )
     myRenderer->SetBackground( color.red()/255., color.green()/255., color.blue()/255. );
 }
 
-/*!
-    Returns background of the viewport
-*/
+/*!Returns background of the viewport*/
 QColor VTKViewer_ViewWindow::backgroundColor() const
 {
   float backint[3];
@@ -392,22 +398,26 @@ QColor VTKViewer_ViewWindow::backgroundColor() const
   return SUIT_ViewWindow::backgroundColor();
 }
 
+/*!Repaint window. If \a theUpdateTrihedron is true - recalculate trihedron.*/
 void VTKViewer_ViewWindow::Repaint(bool theUpdateTrihedron)
 {
   if (theUpdateTrihedron) onAdjustTrihedron();
   myRenderWindow->update();
 }
 
+/*!Get scale of transformation filter.*/
 void VTKViewer_ViewWindow::GetScale( double theScale[3] ) {
   myTransform->GetScale( theScale );
 }
 
+/*!Set scale of transformation filter and repaint window.*/
 void VTKViewer_ViewWindow::SetScale( double theScale[3] ) {
   myTransform->SetMatrixScale( theScale[0], theScale[1], theScale[2] );
   myRWInteractor->Render();
   Repaint();
 }
 
+/*!Calculation trihedron size.*/
 void VTKViewer_ViewWindow::onAdjustTrihedron(){   
   if( !isTrihedronDisplayed() ) 
     return;
@@ -445,36 +455,45 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
   ::ResetCameraClippingRange(myRenderer);
 }
 
+/*!Emit key pressed.*/
 void VTKViewer_ViewWindow::onKeyPressed(QKeyEvent* event)
 {
   emit keyPressed( this, event );
 }
 
+/*!Emit key released.*/
 void VTKViewer_ViewWindow::onKeyReleased(QKeyEvent* event)
 {
   emit keyReleased( this, event );
 }
 
+/*!Emit key pressed.*/
 void VTKViewer_ViewWindow::onMousePressed(QMouseEvent* event)
 {
   emit mousePressed(this, event);
 }
 
+/*!Emit mouse released.*/
 void VTKViewer_ViewWindow::onMouseReleased(QMouseEvent* event)
 {
   emit mouseReleased( this, event );
 }
 
+/*!Emit mouse moving.*/
 void VTKViewer_ViewWindow::onMouseMoving(QMouseEvent* event)
 {
   emit mouseMoving( this, event );
 }
 
+/*!Emit mouse double clicked.*/
 void VTKViewer_ViewWindow::onMouseDoubleClicked( QMouseEvent* event )
 {
   emit mouseDoubleClicked( this, event );
 }
 
+/*!Insert actor to renderer and transformation filter.
+ *Move Internal actors, if \a theMoveInternalActors is true.
+ */
 void VTKViewer_ViewWindow::InsertActor( VTKViewer_Actor* theActor, bool theMoveInternalActors ){
   theActor->AddToRender(myRenderer);
   theActor->SetTransform(myTransform);
@@ -482,24 +501,30 @@ void VTKViewer_ViewWindow::InsertActor( VTKViewer_Actor* theActor, bool theMoveI
     myRWInteractor->MoveInternalActors();
 }
 
+/*!Add actor.Repaint window if \a theUpdate is true.
+ *@see InsertActor( VTKViewer_Actor* theActor, bool theMoveInternalActors )
+ */
 void VTKViewer_ViewWindow::AddActor( VTKViewer_Actor* theActor, bool theUpdate /*=false*/ ){
   InsertActor(theActor);
   if(theUpdate) 
     Repaint();
 }
 
+/*!Remove \a theActor from renderer and pepaint, if \a theUpdate is true.*/
 void VTKViewer_ViewWindow::RemoveActor( VTKViewer_Actor* theActor, bool theUpdate /*=false*/ ){
   theActor->RemoveFromRender(myRenderer);
   if(theUpdate) 
     Repaint();
 }
 
+/*!@see RemoveActor() and InsertActor().*/
 void VTKViewer_ViewWindow::MoveActor( VTKViewer_Actor* theActor)
 {
   RemoveActor(theActor);
   InsertActor(theActor,true);
 }
 
+/*!On trihedron show slot.*/
 void VTKViewer_ViewWindow::onTrihedronShow()
 {
   if (isTrihedronDisplayed())
@@ -509,6 +534,7 @@ void VTKViewer_ViewWindow::onTrihedronShow()
   myRenderWindow->update();
 }
 
+/*!Dump view.*/
 QImage VTKViewer_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );

@@ -1,5 +1,8 @@
 #include "SUIT_DataObjectIterator.h"
 
+/*!
+  Constructor.
+*/
 SUIT_DataObjectIterator::SUIT_DataObjectIterator( SUIT_DataObject* root, const int det, const bool fromTrueRoot )
 : myRoot( root ),
 myDetourType( det ),
@@ -11,6 +14,9 @@ myCurrentLevel( 0 )
   myCurrent = myExtremeChild = myRoot;
 }
 
+/*!
+  Gets parent for object \a obj.
+*/
 SUIT_DataObject* SUIT_DataObjectIterator::parent( SUIT_DataObject* obj ) const
 {
   SUIT_DataObject* result = 0;
@@ -19,6 +25,9 @@ SUIT_DataObject* SUIT_DataObjectIterator::parent( SUIT_DataObject* obj ) const
   return result;
 }
 
+/*!
+  Increment operator.
+*/
 void SUIT_DataObjectIterator::operator++()
 {
   SUIT_DataObject* aNext = 0;
@@ -86,21 +95,33 @@ void SUIT_DataObjectIterator::operator++()
   }
 }
 
+/*!
+  Gets current data object.
+*/
 SUIT_DataObject* SUIT_DataObjectIterator::current() const
 {
   return myCurrent;
 }
 
+/*!
+  Gets depth of current lavel.
+*/
 int SUIT_DataObjectIterator::depth() const
 {
   return myCurrentLevel;
 }
 
+/*!
+  Gets detour type.
+*/
 int SUIT_DataObjectIterator::detour() const
 {
   return myDetourType;
 }
 
+/*!
+  Gets global sibling for object \a obj
+*/
 SUIT_DataObject* SUIT_DataObjectIterator::globalSibling( SUIT_DataObject* obj, bool next ) const
 {
   SUIT_DataObject* par;
@@ -124,6 +145,10 @@ SUIT_DataObject* SUIT_DataObjectIterator::globalSibling( SUIT_DataObject* obj, b
     return 0;
 }
 
+/*!
+ * Gets first or last data object from list.
+ * Get firls, if \a FromLeft == true, else last.
+ */
 SUIT_DataObject* SUIT_DataObjectIterator::extreme( DataObjectList& aList, bool FromLeft ) const
 {
   if ( FromLeft )
@@ -132,7 +157,9 @@ SUIT_DataObject* SUIT_DataObjectIterator::extreme( DataObjectList& aList, bool F
     return aList.getLast();
 }
 
-
+/*!
+  Constructor.
+*/
 SUIT_DataObjectLevelIterator::SUIT_DataObjectLevelIterator( SUIT_DataObject* root,
                                                             int start, int end, bool LeftToRight )
 : SUIT_DataObjectIterator( root, LeftToRight ? BreadthLeft : BreadthRight )
@@ -147,6 +174,9 @@ SUIT_DataObjectLevelIterator::SUIT_DataObjectLevelIterator( SUIT_DataObject* roo
     SUIT_DataObjectIterator::operator++();
 }
 
+/*!
+  Increment operator.
+*/
 void SUIT_DataObjectLevelIterator::operator++()
 {
   if ( myCurrent )

@@ -485,6 +485,9 @@ myOwner( o )
 {
 }
 
+/*!
+  Destructor.
+*/
 SUIT_DataObject::Signal::~Signal()
 {
   SUIT_DataObject* o = myOwner;
@@ -496,11 +499,17 @@ SUIT_DataObject::Signal::~Signal()
   }
 }
 
+/*!
+  Set owner \a o.
+*/
 void SUIT_DataObject::Signal::setOwner( SUIT_DataObject* o )
 {
   myOwner = o;
 }
 
+/*!
+  emit signal destroed owner.
+*/
 void SUIT_DataObject::Signal::emitSignal()
 {
   if ( myOwner )

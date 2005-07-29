@@ -5,6 +5,7 @@
 
 class QtxAction;
 
+/*!Provide support QtxAction*/
 class SUIT_EXPORT SUIT_ActionOperation : public SUIT_Operation
 {
 	Q_OBJECT
@@ -15,19 +16,21 @@ public:
 
 	QtxAction*   action() const;
 
-	/** @name GUI management*/ //@{
-  virtual void setAction( const QString& text, const QIconSet& icon, const QString& menuText,
-                          QKeySequence accel, QObject* parent, const char* name = 0, bool toggle = false );
+	/** @name GUI management*/
+	//@{
+	virtual void setAction( const QString& text, const QIconSet& icon, const QString& menuText,
+				QKeySequence accel, QObject* parent, const char* name = 0, bool toggle = false );
 
-  virtual void setAction( const QString& text, const QString& menuText, QKeySequence accel,
-                          QObject* parent, const char* name = 0, bool toggle = false );
+	virtual void setAction( const QString& text, const QString& menuText, QKeySequence accel,
+				QObject* parent, const char* name = 0, bool toggle = false );
 	virtual void setAction( QtxAction* theAction );
 	
-  bool         addTo( QWidget* theWidget );
-  bool         addTo( QWidget* theWidget, int thePos );
-
-  void         setStatusTip( const QString& theTip );//@}
-
+	bool         addTo( QWidget* theWidget );
+	bool         addTo( QWidget* theWidget, int thePos );
+	
+	void         setStatusTip( const QString& theTip );
+	//@}
+	
 private:
 	QtxAction*   myAction;
 

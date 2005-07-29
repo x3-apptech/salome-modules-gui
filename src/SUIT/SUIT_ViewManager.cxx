@@ -11,7 +11,11 @@
 #include <windows.h>
 #endif
 
-//***************************************************************
+/*!\class SUIT_ViewManager.
+ * Class provide manipulation with view windows.
+ */
+
+/*!Constructor.*/
 SUIT_ViewManager::SUIT_ViewManager( SUIT_Study* theStudy,
                                     SUIT_Desktop* theDesktop,
                                     SUIT_ViewModel* theViewModel )
@@ -31,7 +35,7 @@ myStudy( NULL )
     connect( myStudy, SIGNAL( destroyed() ), this, SLOT( onDeleteStudy() ) );
 }
 
-//***************************************************************
+/*!Destructor.*/
 SUIT_ViewManager::~SUIT_ViewManager()
 {
   if (myViewModel) {
@@ -40,7 +44,7 @@ SUIT_ViewManager::~SUIT_ViewManager()
   }
 }
 
-//***************************************************************
+/*!Sets view model \a theViewModel to view manager.*/
 void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel) 
 {
   if (myViewModel && myViewModel != theViewModel) {
@@ -52,14 +56,14 @@ void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel)
     myViewModel->setViewManager(this);
 }
 
-//***************************************************************
+/*!Sets view name for view window \a theView.*/
 void SUIT_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
   int aPos = myViews.find(theView);
   theView->setCaption(myTitle + QString(":%1").arg(aPos+1));
 }
 
-//***************************************************************
+/*! Creates View, adds it into list of views and returns just created view window*/
 SUIT_ViewWindow* SUIT_ViewManager::createViewWindow()
 {
   SUIT_ViewWindow* aView = myViewModel->createView(myDesktop);
@@ -86,13 +90,15 @@ SUIT_ViewWindow* SUIT_ViewManager::createViewWindow()
   return aView;
 }
 
-//***************************************************************
+/*!Create view window.*/
 void SUIT_ViewManager::createView()
 {
   createViewWindow();
 }
 
-//***************************************************************
+/*!Insert view window to view manager.
+ *\retval false - if something wrong, else true.
+ */
 bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
 {
   unsigned int aSize = myViews.size();
@@ -141,15 +147,17 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
   return false;
 }
 
-
-//***************************************************************
+/*!Emit delete view. Remove view window \a theView from view manager.
+*/
 void SUIT_ViewManager::onDeleteView(SUIT_ViewWindow* theView)
 {
   emit deleteView(theView);
   removeView(theView);
 }
 
-//***************************************************************
+/*!Remove view window \a theView from view manager.
+ *And close the last view, if it has \a theView.
+*/
 void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView) 
 {
   theView->disconnect(this);
@@ -161,13 +169,14 @@ void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView)
     emit lastViewClosed(this);
 }
 
-//***************************************************************
+/*!Emit on \a theEvent mouse pressed in \a theView.*/
 void SUIT_ViewManager::onMousePressed(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   emit mousePress(theView, theEvent);
 }
 
-//***************************************************************
+/*!Emit activated for view \a view.
+*/
 void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 {
   if (view) {
@@ -182,7 +191,8 @@ void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
   }
 }
 
-//***************************************************************
+/*!Close all views.
+*/
 void SUIT_ViewManager::closeAllViews()
 {
   unsigned int aSize = myViews.size();
@@ -192,33 +202,37 @@ void SUIT_ViewManager::closeAllViews()
   }
 }
 
-
-//***************************************************************
+/*!
+ *\retval QString - type of view model.
+ */
 QString  SUIT_ViewManager::getType() const 
 { 
   return (!myViewModel)? "": myViewModel->getType(); 
 }
 
-//***************************************************************
+/*!
+ *\retval SUIT_Study* - current study.
+ */
 SUIT_Study* SUIT_ViewManager::study() const
 {
     return myStudy;
 }
 
-//***************************************************************
+/*!
+ * Sets stydy to NULL.
+ */
 void SUIT_ViewManager::onDeleteStudy()
 {
     myStudy = NULL;
 }
 
-//***************************************************************
 void SUIT_ViewManager::onContextMenuRequested( QContextMenuEvent* e )
 {
   /*! invoke method of SUIT_PopupClient, which notifies about popup*/
   contextMenuRequest( e );
 }
 
-//***************************************************************
+/*!Context menu popup for \a popup.*/
 void SUIT_ViewManager::contextMenuPopup( QPopupMenu* popup )
 {
   SUIT_ViewModel* vm = getViewModel();

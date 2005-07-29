@@ -4,6 +4,7 @@
 #include <qpopupmenu.h>
 #include <qstyle.h>
 
+/*!Constructor.*/
 SUIT_ToolButton::SUIT_ToolButton( QWidget *parent, 
                                         const char *name,
                                         bool changeItemAfterClick)
@@ -13,7 +14,7 @@ SUIT_ToolButton::SUIT_ToolButton( QWidget *parent,
   initialize();
 }
 
-
+/*!Constructor.*/
 SUIT_ToolButton::SUIT_ToolButton( const QPixmap & pm,
                                         const QString &textLabel,
                                         const QString& grouptext,
@@ -29,7 +30,7 @@ SUIT_ToolButton::SUIT_ToolButton( const QPixmap & pm,
 }
 
 
-//********************************************************************************
+/*!Initialize tool buttons.*/
 void SUIT_ToolButton::initialize()
 {
   mySignal = NULL;
@@ -39,7 +40,7 @@ void SUIT_ToolButton::initialize()
   setPopupDelay(250);
 }
 
-//********************************************************************************
+/*!drawButton is redefined to draw DownArrow*/
 void SUIT_ToolButton::drawButton( QPainter * p )
 {
   QToolButton::drawButton(p);
@@ -53,7 +54,7 @@ void SUIT_ToolButton::drawButton( QPainter * p )
 }
 
 
-//********************************************************************************
+/*! Add action into popup*/
 void SUIT_ToolButton::AddAction(QAction* theAction)
 {
   bool aIsFirst = false;
@@ -73,8 +74,7 @@ void SUIT_ToolButton::AddAction(QAction* theAction)
     theAction->addTo( myPopup );
 }
 
-
-//********************************************************************************
+/*! Sets myPopup item with theIndex as current*/
 void SUIT_ToolButton::SetItem(int theIndex)
 {
   int anId = myPopup->idAt(theIndex);
@@ -92,7 +92,9 @@ void SUIT_ToolButton::SetItem(int theIndex)
   }
 }
 
-//********************************************************************************
+/*!Public SLOT.
+ * On select action (icon and text set with id = \a theItemID)
+ */
 void SUIT_ToolButton::OnSelectAction(int theItemID)
 {
   if (myChangeItemAfterClick)
@@ -111,7 +113,7 @@ void SUIT_ToolButton::OnSelectAction(int theItemID)
 
 
 
-//********************************************************************************
+/*!On mouse release event.*/
 void SUIT_ToolButton::mouseReleaseEvent ( QMouseEvent * theEvent)
 {
   QToolButton::mouseReleaseEvent(theEvent);

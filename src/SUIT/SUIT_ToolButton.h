@@ -24,13 +24,10 @@ public:
                     bool changeItemAfterClick = true );
   //@}
 
-  /*!drawButton is redefined to draw DownArrow*/
   void drawButton( QPainter * pQPainter);
 
-  /*! Add action into popup*/
   void AddAction(QAction* theAction);
 
-  /*! Sets myPopup item with theIndex as current*/
   void SetItem(int theIndex);
 
 public slots:

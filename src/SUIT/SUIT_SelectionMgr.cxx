@@ -1,5 +1,9 @@
 #include "SUIT_SelectionMgr.h"
 
+/*!\class SUIT_SelectionMgr
+ * Provide selection manager. Manipulate by selection filters, modes, data owners.
+ */
+
 /*!constructor. initialize myIterations and myIsSelChangeEnabled.*/
 SUIT_SelectionMgr::SUIT_SelectionMgr( const bool Feedback )
 : myIterations( Feedback ? 1 : 0 ),
@@ -13,17 +17,20 @@ SUIT_SelectionMgr::~SUIT_SelectionMgr()
   mySelectors.setAutoDelete( true );
 }
 
+/*!Add selector \a sel to selectors list,if it's not exists in list.*/
 void SUIT_SelectionMgr::installSelector( SUIT_Selector* sel )
 {
   if ( sel && !mySelectors.contains( sel ) )
     mySelectors.append( sel );
 }
 
+/*!Remove selector \a sel from list.*/
 void SUIT_SelectionMgr::removeSelector( SUIT_Selector* sel )
 {
   mySelectors.remove( sel );
 }
 
+/*!Gets selectors list to \a lst.*/
 void SUIT_SelectionMgr::selectors( QPtrList<SUIT_Selector>& lst ) const
 {
   lst.clear();
@@ -31,6 +38,7 @@ void SUIT_SelectionMgr::selectors( QPtrList<SUIT_Selector>& lst ) const
     lst.append( it.current() );
 }
 
+/*!Gets selectors list to \a lst with type \a typ.*/
 void SUIT_SelectionMgr::selectors( const QString& typ, QPtrList<SUIT_Selector>& lst ) const
 {
   lst.clear();
@@ -41,6 +49,8 @@ void SUIT_SelectionMgr::selectors( const QString& typ, QPtrList<SUIT_Selector>& 
   }
 }
 
+/*! Sets ebabled to \a on for all data owners with type \a typ.
+*/
 void SUIT_SelectionMgr::setEnabled( const bool on, const QString& typ )
 {
   for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
@@ -50,6 +60,8 @@ void SUIT_SelectionMgr::setEnabled( const bool on, const QString& typ )
   }
 }
 
+/*! Gets selected data owners from list with type \a type to list \a lst.
+*/
 void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& type ) const
 {
   lst.clear();
@@ -71,6 +83,8 @@ void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& typ
   }
 }
 
+/*! Sets selected data owners from \a lst and append to list, if \a append - true.
+*/
 void SUIT_SelectionMgr::setSelected( const SUIT_DataOwnerPtrList& lst, const bool append )
 {
   SUIT_DataOwnerPtrList owners;
@@ -89,11 +103,15 @@ void SUIT_SelectionMgr::setSelected( const SUIT_DataOwnerPtrList& lst, const boo
   }
 }
 
+/*! Clear selected data owners.
+*/
 void SUIT_SelectionMgr::clearSelected()
 {
   setSelected( SUIT_DataOwnerPtrList() );
 }
 
+/*! On selection \a sel changed.
+*/
 void SUIT_SelectionMgr::selectionChanged( SUIT_Selector* sel )
 {
   if ( !sel || !myIsSelChangeEnabled || !sel->isEnabled() )
@@ -121,16 +139,22 @@ void SUIT_SelectionMgr::selectionChanged( SUIT_Selector* sel )
   emit selectionChanged();
 }
 
+/*! Checks: Is selection manager has selection mode \a mode?
+*/
 bool SUIT_SelectionMgr::hasSelectionMode( const int mode ) const
 {
   return mySelModes.contains( mode );
 }
 
+/*! Gets selection modes to list \a vals.
+*/
 void SUIT_SelectionMgr::selectionModes( QValueList<int>& vals ) const
 {
   vals = mySelModes;
 }
 
+/*! Set selection mode \a mode to list of selection modes.
+*/
 void SUIT_SelectionMgr::setSelectionModes( const int mode )
 {
   QValueList<int> lst;
@@ -138,11 +162,15 @@ void SUIT_SelectionMgr::setSelectionModes( const int mode )
   setSelectionModes( lst );
 }
 
+/*! Sets selection modes list from \a lst.
+*/
 void SUIT_SelectionMgr::setSelectionModes( const QValueList<int>& lst )
 {
   mySelModes = lst;
 }
 
+/*! Append selection mode \a mode to list of selection modes.
+*/
 void SUIT_SelectionMgr::appendSelectionModes( const int mode )
 {
   QValueList<int> lst;
@@ -150,6 +178,8 @@ void SUIT_SelectionMgr::appendSelectionModes( const int mode )
   appendSelectionModes( lst );
 }
 
+/*! Append selection modes \a lst list.
+*/
 void SUIT_SelectionMgr::appendSelectionModes( const QValueList<int>& lst )
 {
   QMap<int, int> map;
@@ -163,6 +193,8 @@ void SUIT_SelectionMgr::appendSelectionModes( const QValueList<int>& lst )
   }
 }
 
+/*! Remove selection mode \a mode from list.
+*/
 void SUIT_SelectionMgr::removeSelectionModes( const int mode )
 {
   QValueList<int> lst;
@@ -170,6 +202,8 @@ void SUIT_SelectionMgr::removeSelectionModes( const int mode )
   removeSelectionModes( lst );
 }
 
+/*! Remove selection modea \a lst from list.
+*/
 void SUIT_SelectionMgr::removeSelectionModes( const QValueList<int>& lst )
 {
   QMap<int, int> map;
@@ -184,6 +218,8 @@ void SUIT_SelectionMgr::removeSelectionModes( const QValueList<int>& lst )
     mySelModes.append( iter.key() );
 }
 
+/*! Checks data owner is ok?
+*/
 bool SUIT_SelectionMgr::isOk( const SUIT_DataOwner* owner ) const
 {
   if ( !owner )
@@ -196,6 +232,8 @@ bool SUIT_SelectionMgr::isOk( const SUIT_DataOwner* owner ) const
   return ok;
 }
 
+/*! Checks data owner pointer is ok?
+*/
 bool SUIT_SelectionMgr::isOk( const SUIT_DataOwnerPtr& ptr ) const
 {
   if ( ptr.isNull() )
@@ -204,11 +242,15 @@ bool SUIT_SelectionMgr::isOk( const SUIT_DataOwnerPtr& ptr ) const
   return isOk( ptr.operator->() );
 }
 
+/*! Checks selection manager has filter \a f?
+*/
 bool SUIT_SelectionMgr::hasFilter( SUIT_SelectionFilter* f ) const
 {
   return myFilters.contains( f );
 }
 
+/*! Install filter \a f and set selected, if \a update = true.
+*/
 void SUIT_SelectionMgr::installFilter( SUIT_SelectionFilter* f, const bool updateSelection )
 {
   if ( !hasFilter( f ) )
@@ -224,26 +266,36 @@ void SUIT_SelectionMgr::installFilter( SUIT_SelectionFilter* f, const bool updat
   }
 }
 
+/*! Remove filter \a f from filters list.
+*/
 void SUIT_SelectionMgr::removeFilter( SUIT_SelectionFilter* f )
 {
   myFilters.remove( f );
 }
 
+/*! Clear filters list.
+*/
 void SUIT_SelectionMgr::clearFilters()
 {
   myFilters.clear();
 }
 
+/*! Sets auto delete filter.
+*/
 bool SUIT_SelectionMgr::autoDeleteFilter() const
 {
   return myFilters.autoDelete();
 }
 
+/*! Sets auto delete filter to \a on.
+*/
 void SUIT_SelectionMgr::setAutoDeleteFilter( const bool on )
 {
   myFilters.setAutoDelete( on );
 }
 
+/*! Gets good data owners list to \a out from \a in.
+*/
 void SUIT_SelectionMgr::filterOwners( const SUIT_DataOwnerPtrList& in, SUIT_DataOwnerPtrList& out ) const
 {
   out.clear();

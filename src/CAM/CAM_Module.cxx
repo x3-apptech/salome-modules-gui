@@ -8,6 +8,7 @@
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
 
+/*!Icon.*/
 static const char* ModuleIcon[] = {
 "20 20 2 1",
 " 	c None",
@@ -186,7 +187,15 @@ int CAM_Module::createTool( const QString& name )
   return toolMgr()->createToolBar( name );
 }
 
-
+/*! Create tool. Register action \a a with id \a id.
+ * Insert QAction to tool manager.
+ *\param a - QAction
+ *\param tBar - integer
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int idx )
 {
   if ( !toolMgr() )
@@ -197,6 +206,15 @@ int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int 
   return intId != -1 ? regId : -1;
 }
 
+/*! Create tool. Register action \a a with id \a id.
+ * Insert QAction to tool manager.
+ *\param a - QAction
+ *\param tBar - QString&
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const int idx )
 {
   if ( !toolMgr() )
@@ -207,6 +225,15 @@ int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const
   return intId != -1 ? regId : -1;
 }
 
+/*! Create tool.
+ * Insert QAction with id \a id from action map(myActionMap) to tool manager.
+ *\param a - QAction
+ *\param tBar - integer
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createTool( const int id, const int tBar, const int idx )
 {
   if ( !toolMgr() )
@@ -216,6 +243,15 @@ int CAM_Module::createTool( const int id, const int tBar, const int idx )
   return intId != -1 ? id : -1;
 }
 
+/*! Create tool.
+ * Insert QAction with id \a id from action map(myActionMap) to tool manager.
+ *\param a - QAction
+ *\param tBar - QString&
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
 {
   if ( !toolMgr() )
@@ -225,6 +261,16 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   return intId != -1 ? id : -1;
 }
 
+/*! Create menu.
+ * Insert submenu \a subMenu to menu manager.
+ *\param subMenu - QString&
+ *\param menu    - integer
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
                             const int id, const int group, const int index )
 {
@@ -234,6 +280,16 @@ int CAM_Module::createMenu( const QString& subMenu, const int menu,
   return menuMgr()->insert( subMenu, menu, group, index );
 }
 
+/*! Create menu.
+ * Insert submenu \a subMenu to menu manager.
+ *\param subMenu - QString&
+ *\param menu    - QString&
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( const QString& subMenu, const QString& menu,
                             const int id, const int group, const int index )
 {
@@ -243,6 +299,17 @@ int CAM_Module::createMenu( const QString& subMenu, const QString& menu,
   return menuMgr()->insert( subMenu, menu, group, index );
 }
 
+
+/*! Create menu. Register action \a a with id \a id.
+ * Insert QAction to menu manager.
+ *\param a       - Qaction
+ *\param menu    - integer
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int index )
 {
   if ( !a || !menuMgr() )
@@ -253,6 +320,16 @@ int CAM_Module::createMenu( QAction* a, const int menu, const int id, const int 
   return intId != -1 ? regId : -1;
 }
 
+/*! Create menu. Register action \a a with id \a id.
+ * Insert QAction to menu manager.
+ *\param a       - Qaction
+ *\param menu    - QString&
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int index )
 {
   if ( !a || !menuMgr() )
@@ -263,6 +340,15 @@ int CAM_Module::createMenu( QAction* a, const QString& menu, const int id, const
   return intId != -1 ? regId : -1;
 }
 
+/*! Create menu.
+ * Insert QAction with id \a id from action map(myActionMap) to menu manager.
+ *\param menu    - integer
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( const int id, const int menu, const int group, const int index )
 {
   if ( !menuMgr() )
@@ -272,6 +358,15 @@ int CAM_Module::createMenu( const int id, const int menu, const int group, const
   return intId != -1 ? id : -1;
 }
 
+/*! Create menu.
+ * Insert QAction with id \a id from action map(myActionMap) to menu manager.
+ *\param menu    - QString&
+ *\param id      - integer
+ *\param group   - integer
+ *\param index   - integer
+ *\retval integer id of new menu in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int CAM_Module::createMenu( const int id, const QString& menu, const int group, const int index )
 {
   if ( !menuMgr() )

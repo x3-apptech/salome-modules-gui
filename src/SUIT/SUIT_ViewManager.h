@@ -44,7 +44,6 @@ public:
   QString          getTitle() const { return myTitle;}
   void             setTitle(QString theTitle) { myTitle = theTitle; }
 
-  /*! Creates View, adds it into list of views and returns just created view window*/
   SUIT_ViewWindow* createViewWindow();
 
 public slots:

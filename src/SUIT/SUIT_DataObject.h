@@ -18,6 +18,9 @@ typedef QPtrListIterator<SUIT_DataObject> DataObjectListIterator;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  Class provide support data object.
+*/
 class SUIT_EXPORT SUIT_DataObject  
 {
 public:

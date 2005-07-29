@@ -13,45 +13,50 @@
 #include "qpopupmenu.h"
 #include "qapplication.h"
 
-// Dump view custom event
+/*!\class SUIT_ViewWindow
+ * Class provide view window.
+ */
+
+/*! Dump view custom event*/
 const int DUMP_EVENT = QEvent::User + 123;
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+/*! Constructor.*/
 SUIT_ViewWindow::SUIT_ViewWindow(SUIT_Desktop* theDesktop)
 : QMainWindow( theDesktop, "SUIT_ViewWindow", Qt::WDestructiveClose )
 {
   myDesktop = theDesktop;
 }
-
+/*! Destructor.*/
 SUIT_ViewWindow::~SUIT_ViewWindow()
 {
 }
 
-//***************************************************************
+/*! Close event \a theEvent.
+*/
 void SUIT_ViewWindow::closeEvent(QCloseEvent* theEvent)
 {
   QMainWindow::closeEvent( theEvent );
   emit closing( this );
 }
 
-//****************************************************************
+/*! Context menu requested for event \a e.
+*/
 void SUIT_ViewWindow::contextMenuEvent ( QContextMenuEvent * e )
 {
   if ( e->reason() != QContextMenuEvent::Mouse )
     emit contextMenuRequested( e );
 }
 
-//****************************************************************
+/*! Post events on dump view.
+*/
 void SUIT_ViewWindow::onDumpView()
 {
   qApp->postEvent( this, new QPaintEvent( QRect( 0, 0, width(), height() ), TRUE ) );
   qApp->postEvent( this, new QCustomEvent( DUMP_EVENT ) );
 }
 
-//****************************************************************
+/*! Reaction view window on event \a e.
+*/
 bool SUIT_ViewWindow::event( QEvent* e )
 {
   if ( e->type() == DUMP_EVENT ) {
@@ -82,5 +87,3 @@ bool SUIT_ViewWindow::event( QEvent* e )
   }
   return QMainWindow::event( e );
 }
-
-//****************************************************************

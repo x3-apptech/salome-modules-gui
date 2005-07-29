@@ -12,6 +12,16 @@
 #include <qstatusbar.h>
 #include <qapplication.h>
 
+/*!\class SUIT_Desktop
+ * Provide desktop management:\n
+ * \li menu manager
+ * \li tool manager
+ * \li windows
+ */
+
+/*!
+  Constructor.
+*/
 SUIT_Desktop::SUIT_Desktop()
 : QtxMainWindow()
 {
@@ -19,10 +29,16 @@ SUIT_Desktop::SUIT_Desktop()
   myToolMgr = new QtxActionToolMgr( this );
 }
 
+/*!
+  Destructor.
+*/
 SUIT_Desktop::~SUIT_Desktop()
 {
 }
 
+/*!
+  Emit on event \a e.
+*/
 bool SUIT_Desktop::event( QEvent* e )
 {
   if ( !e )
@@ -41,12 +57,18 @@ bool SUIT_Desktop::event( QEvent* e )
   return QMainWindow::event( e );
 }
 
+/*!
+  Close event \a e.
+*/
 void SUIT_Desktop::closeEvent( QCloseEvent* e )
 {
   emit closing( this, e );
   e->ignore();
 }
 
+/*!
+  Child event.
+*/
 void SUIT_Desktop::childEvent( QChildEvent* e )
 {
   if ( e->type() == QEvent::ChildInserted && parentArea() &&
@@ -56,11 +78,17 @@ void SUIT_Desktop::childEvent( QChildEvent* e )
     QtxMainWindow::childEvent( e );
 }
 
+/*!
+  Gets menu manager.
+*/
 QtxActionMenuMgr* SUIT_Desktop::menuMgr() const
 {
   return myMenuMgr;
 }
 
+/*!
+  Gets tool manager.
+*/
 QtxActionToolMgr* SUIT_Desktop::toolMgr() const
 {
   return myToolMgr;

@@ -8,7 +8,7 @@
 class QPopupMenu;
 class QContextMenuEvent;
 
-/*!Class: SUIT_PopupClient [public] \n
+/*!\class SUIT_PopupClient
  * Descr: Base class for instances which creates popup menu on QContextMenuEvent
  */
 class SUIT_EXPORT SUIT_PopupClient

@@ -14,6 +14,9 @@ SUIT_PopupClient::~SUIT_PopupClient()
   delete mySignal;
 }
 
+/*!
+  Connect popup request.
+*/
 bool SUIT_PopupClient::connectPopupRequest( QObject* reciever, const char* slot )
 {
   if ( !reciever || !slot )
@@ -24,6 +27,9 @@ bool SUIT_PopupClient::connectPopupRequest( QObject* reciever, const char* slot 
                            reciever, slot );
 }
 
+/*!
+  Disconnect popup request.
+*/
 bool SUIT_PopupClient::disconnectPopupRequest( QObject* reciever, const char* slot )
 {
   if ( !reciever || !slot || !mySignal )
@@ -32,16 +38,19 @@ bool SUIT_PopupClient::disconnectPopupRequest( QObject* reciever, const char* sl
                               reciever, slot );
 }
 
+/*!
+  Send signal on context menu request.
+*/
 void SUIT_PopupClient::contextMenuRequest( QContextMenuEvent* e )
 {
   if ( mySignal )
     mySignal->sendSignal( this, e );
 }
 
-/*
-  Class: SUIT_PopupClient::Signal [internal]
-  Descr: invoke signal which is connected to reciever in SUIT_PopupClient
-*/
+/*!
+ *  \class SUIT_PopupClient::Signal
+ * Descr: invoke signal which is connected to reciever in SUIT_PopupClient
+ */
 
 /*! constructor*/
 SUIT_PopupClient::Signal::Signal()
@@ -53,6 +62,8 @@ SUIT_PopupClient::Signal::Signal()
 SUIT_PopupClient::Signal::~Signal()
 {}
 
+/*! Send signal to \a client on context menu request \a e.
+ */
 void SUIT_PopupClient::Signal::sendSignal( SUIT_PopupClient* client, QContextMenuEvent* e )
 {
   emit contextMenuRequest( client, e );

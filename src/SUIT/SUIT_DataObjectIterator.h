@@ -3,6 +3,9 @@
 
 #include "SUIT_DataObject.h"
 
+/*!
+  Class provide data object iterator.
+*/
 class SUIT_EXPORT SUIT_DataObjectIterator
 {
 public:

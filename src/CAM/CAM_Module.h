@@ -18,6 +18,9 @@ class QtxActionToolMgr;
 #pragma warning( disable: 4251 )
 #endif
 
+/*! 
+ * Class provide support of tool and menu managers.
+ */
 class CAM_EXPORT CAM_Module : public QObject
 {
   Q_OBJECT
