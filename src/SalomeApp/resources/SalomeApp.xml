@@ -74,7 +74,7 @@
     <!-- Here go other common user preferences -->
   </section>
   <section name="ObjectBrowser" >
-    <parameter value="true" name="auto_size" />
+    <parameter value="false" name="auto_size" />
   </section>
   <section name="Geometry" >
     <parameter value="10" name="SettingsGeomStep" />

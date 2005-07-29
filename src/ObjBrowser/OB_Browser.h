@@ -86,6 +86,8 @@ public:
   bool              isColumnVisible( const int ) const;
   virtual void      setColumnShown( const int, const bool );
 
+  virtual void      setWidthMode( QListView::WidthMode );
+
   QValueList<int>   columns() const;
 
   bool              appropriateColumn( const int ) const;

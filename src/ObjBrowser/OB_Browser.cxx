@@ -456,6 +456,12 @@ void OB_Browser::setColumnShown( const int id, const bool on )
   myView->setShown( myColumnIds[id], on );
 }
 
+void OB_Browser::setWidthMode( QListView::WidthMode mode )
+{
+  for ( int i = 0, n = myView->columns(); i < n; i++ )
+    myView->setColumnWidthMode( i, mode );
+}
+
 QValueList<int> OB_Browser::columns() const
 {
   QValueList<int> lst;
