@@ -146,6 +146,7 @@ protected:
   virtual void           mouseMoveEvent( QMouseEvent *);
   virtual void           mousePressEvent( QMouseEvent *);
   virtual void           mouseReleaseEvent( QMouseEvent *);
+  virtual void           mouseDoubleClickEvent( QMouseEvent *);
   
   virtual void           paintEvent( QPaintEvent* );
   virtual void           resizeEvent( QResizeEvent* );
@@ -215,6 +216,8 @@ protected:
 
   //GLViewer_ObjectTip*    myObjectTip;
   QtxToolTip*            myObjectTip;
+  //! flag to block mouse release event just after mouse double-click
+  bool                   myIsMouseReleaseBlock;
 };
 
 #ifdef WNT

@@ -48,7 +48,8 @@ GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* t
        GLViewer_ViewPort( parent ),
        myMargin( MARGIN ), myWidth( WIDTH ), myHeight( HEIGHT ),
        myXScale( 1.0 ), myYScale( 1.0 ), myXOldScale( 1.0 ), myYOldScale( 1.0 ),
-       myXPan( 0.0 ), myYPan( 0.0 )
+       myXPan( 0.0 ), myYPan( 0.0 ),
+       myIsMouseReleaseBlock( false )
 {
     if( theViewFrame == NULL )
         myViewFrame = ( GLViewer_ViewFrame* )parent;
@@ -331,6 +332,13 @@ void GLViewer_ViewPort2d::mouseMoveEvent( QMouseEvent* e )
 */
 void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
 {    
+    if ( myIsMouseReleaseBlock )
+    {
+      // skip mouse release after double click
+      myIsMouseReleaseBlock = false;
+      return;
+    }
+
     /* show popup menu */
     if ( e->button() == Qt::RightButton )
     {
@@ -372,6 +380,14 @@ void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
         aViewer->updateBorders();
       }
     }
+}
+
+void GLViewer_ViewPort2d::mouseDoubleClickEvent( QMouseEvent * e )
+{
+  //redefined to block mouse release after mouse double click
+  myIsMouseReleaseBlock = true;
+  // invoke base implementation
+  GLViewer_ViewPort::mouseDoubleClickEvent( e );
 }
 
 void GLViewer_ViewPort2d::turnCompass( GLboolean on )
