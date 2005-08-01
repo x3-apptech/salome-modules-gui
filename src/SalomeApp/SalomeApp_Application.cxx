@@ -287,12 +287,12 @@ void SalomeApp_Application::createActions()
 
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-  
+
   //! Dump study
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIconSet(),
 		tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
 		0, desk, false, this, SLOT( onDumpStudy() ) );
-    
+
   //! Load script
   createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
 		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
@@ -551,17 +551,17 @@ bool SalomeApp_Application::onOpenDoc( const QString& aName )
 
 /*!SLOT. Load document.*/
 void SalomeApp_Application::onLoadDoc()
-{ 
+{
   QString name, studyname, ext;
-  
+
   STD_LoadStudiesDlg aDlg( desktop(), TRUE);
 
   std::vector<std::string> List = studyMgr()->GetOpenStudies();
-  
+
   SUIT_Session* aSession = SUIT_Session::session();
   QPtrList<SUIT_Application> aAppList = aSession->applications();
   SUIT_Application* aApp = 0;
-  
+
   for (unsigned int ind = 0; ind < List.size(); ind++) {
      studyname = List[ind].c_str();
      //Add to list only unloaded studies
@@ -575,22 +575,22 @@ void SalomeApp_Application::onLoadDoc()
 
      if ( !isAlreadyOpen ) aDlg.ListComponent->insertItem( studyname );
   }
-  
+
   int retVal = aDlg.exec();
   studyname = aDlg.ListComponent->currentText();
 
   if (retVal == QDialog::Rejected)
     return;
-  
+
   if ( studyname.isNull() || studyname.isEmpty() )
     return;
-  
+
   name = studyname;
-  name.replace( QRegExp(":"), "/" );        
+  name.replace( QRegExp(":"), "/" );
 
   if(onLoadDoc(name)) {
      updateWindows();
-     updateViewManagers(); 
+     updateViewManagers();
      updateObjectBrowser(true);
   }
 }
@@ -623,19 +623,19 @@ void SalomeApp_Application::onSelection()
 }
 
 /*!SLOT. Copy objects to study maneger from selection maneger..*/
-void SalomeApp_Application::onCopy() 
+void SalomeApp_Application::onCopy()
 {
   SALOME_ListIO list;
   SalomeApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(list);
-  
+
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
   if(study == NULL) return;
-  
+
   _PTR(Study) stdDS = study->studyDS();
   if(!stdDS) return;
 
-  SALOME_ListIteratorOfListIO it( list ); 
+  SALOME_ListIteratorOfListIO it( list );
   if(it.More())
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
@@ -649,19 +649,19 @@ void SalomeApp_Application::onCopy()
 }
 
 /*!SLOT. Paste objects to study maneger from selection manager.*/
-void SalomeApp_Application::onPaste() 
+void SalomeApp_Application::onPaste()
 {
   SALOME_ListIO list;
   SalomeApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(list);
-  
+
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
   if(study == NULL) return;
-  
+
   _PTR(Study) stdDS = study->studyDS();
   if(!stdDS) return;
-  
-  SALOME_ListIteratorOfListIO it( list ); 
+
+  SALOME_ListIteratorOfListIO it( list );
   if(it.More())
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
@@ -681,37 +681,37 @@ void SalomeApp_Application::onSelectionChanged()
    SALOME_ListIO list;
    SalomeApp_SelectionMgr* mgr = selectionMgr();
    mgr->selectedObjects(list);
-   
+
    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
    if(study == NULL) return;
-   
+
    _PTR(Study) stdDS = study->studyDS();
    if(!stdDS) return;
-   
-   QAction* qaction;  
 
-   SALOME_ListIteratorOfListIO it( list ); 
+   QAction* qaction;
+
+   SALOME_ListIteratorOfListIO it( list );
    if(it.More() && list.Extent() == 1)
    {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
-      qaction = action(EditCopyId); 
-      if(studyMgr()->CanCopy(so) ) qaction->setEnabled(true);  
-      else qaction->setEnabled(false);         
-     
+      qaction = action(EditCopyId);
+      if(studyMgr()->CanCopy(so) ) qaction->setEnabled(true);
+      else qaction->setEnabled(false);
+
       qaction = action(EditPasteId);
       if( studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
       else qaction->setEnabled(false);
-   } 
+   }
    else {
-     qaction = action(EditCopyId); 
-     qaction->setEnabled(false); 
+     qaction = action(EditCopyId);
+     qaction->setEnabled(false);
      qaction = action(EditPasteId);
      qaction->setEnabled(false);
    }
-}		
+}
 
-/*!Update object browser.*/ 
+/*!Update object browser.*/
 void SalomeApp_Application::onRefresh()
 {
   updateObjectBrowser( true );
@@ -799,15 +799,15 @@ void SalomeApp_Application::updateCommandsStatus()
   a = action( LoadScriptId );
   if ( a )
     a->setEnabled( activeStudy() );
-  
+
   a = action( PropertiesId );
   if( a )
     a->setEnabled( activeStudy() );
-    
+
   a = action(EditCopyId);
-  a->setEnabled(false);	      
+  a->setEnabled(false);
   a = action(EditPasteId);
-  a->setEnabled(false);      
+  a->setEnabled(false);
 }
 
 //=======================================================================
@@ -1132,7 +1132,7 @@ void SalomeApp_Application::onDumpStudy( )
 
   SalomeApp_CheckFileDlg* fd = new SalomeApp_CheckFileDlg( desktop(), false, tr("PUBLISH_IN_STUDY"), true, true);
   fd->setCaption( tr( "TOT_DESK_FILE_DUMP_STUDY" ) );
-  fd->setFilters( aFilters );  
+  fd->setFilters( aFilters );
   fd->SetChecked(true);
   fd->exec();
   QString aFileName = fd->selectedFile();
@@ -1411,8 +1411,8 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
   int pythonConsoleGroup = pref->addPreference( tr( "PREF_GROUP_PY_CONSOLE" ), genTab );
   pref->setItemProperty( pythonConsoleGroup, "columns", 1 );
   pref->addPreference( tr( "PREF_FONT" ), pythonConsoleGroup, SalomeApp_Preferences::Font, "PyConsole", "font" );
-  
-  
+
+
 
   int obTab = pref->addPreference( tr( "PREF_TAB_OBJBROWSER" ), salomeCat );
   int defCols = pref->addPreference( tr( "PREF_GROUP_DEF_COLUMNS" ), obTab );
@@ -1507,7 +1507,7 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
       vtkVM->Repaint();
     }
   }
-  
+
   if ( sec == QString( "OCCViewer" ) && ( param == QString( "iso_number_u" ) || param == QString( "iso_number_v" ) ) )
   {
     QPtrList<SUIT_ViewManager> lst;
@@ -1788,7 +1788,7 @@ void SalomeApp_Application::onProperties()
 }
 
 /*!*/
-QString SalomeApp_Application::getFileName( bool open, const QString& initial, const QString& filters, 
+QString SalomeApp_Application::getFileName( bool open, const QString& initial, const QString& filters,
 					    const QString& caption, QWidget* parent )
 {
   if ( !parent )
@@ -1806,7 +1806,7 @@ QString SalomeApp_Application::getDirectory( const QString& initial, const QStri
 }
 
 /*!*/
-QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, const QString& filters, 
+QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, const QString& filters,
 						     const QString& caption, QWidget* parent )
 {
   if ( !parent )
@@ -1819,13 +1819,15 @@ QStringList SalomeApp_Application::getOpenFileNames( const QString& initial, con
 void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   CAM_Application::contextMenuPopup( type, thePopup, title );
-  thePopup->insertSeparator();
-  thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
-  
-  // "Activate module" item should appear only if it's necessary
+
   OB_Browser* ob = objectBrowser();
   if ( !ob || type != ob->popupClientType() )
     return;
+
+  thePopup->insertSeparator();
+  thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
+
+  // "Activate module" item should appear only if it's necessary
   SALOME_ListIO aList;
   SalomeApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(aList);
@@ -1844,10 +1846,10 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
 void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
 {
   // update existing data models (already loaded SComponents)
-  if ( updateModels ) 
+  if ( updateModels )
   {
     for ( ModuleListIterator it = modules(); it.current(); ++it )
-    {    
+    {
       CAM_DataModel* camDM = it.current()->dataModel();
       if ( camDM && camDM->inherits( "SalomeApp_DataModel" ) )
         ((SalomeApp_DataModel*)camDM)->update();
@@ -1855,18 +1857,18 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   }
   // update "non-existing" (not loaded yet) data models
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
-  if ( study ) 
+  if ( study )
   {
     _PTR(Study) stdDS = study->studyDS();
-    if( stdDS ) 
+    if( stdDS )
     {
-      for ( _PTR(SComponentIterator) it ( stdDS->NewComponentIterator() ); it->More(); it->Next() ) 
+      for ( _PTR(SComponentIterator) it ( stdDS->NewComponentIterator() ); it->More(); it->Next() )
       {
-	_PTR(SComponent) aComponent ( it->Value() ); 
+	_PTR(SComponent) aComponent ( it->Value() );
 
 	if ( aComponent->ComponentDataType() == "Interface Applicative" )
 	  continue; // skip the magic "Interface Applicative" component
-	    
+
 	SalomeApp_DataModel::BuildTree( aComponent, study->root(), study, /*skipExisitng=*/true );
       }
     }
