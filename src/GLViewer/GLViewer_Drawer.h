@@ -187,6 +187,9 @@ public:
 
   //! Returns object priority
   int                             getPriority() const { return myPriority; }
+
+  //! The function enables and disables antialiasing in Open GL (for points, lines and polygons).
+  void                            setAntialiasing(const bool on);
   
   //! Clears all generated textures
   static void                     destroyAllTextures();

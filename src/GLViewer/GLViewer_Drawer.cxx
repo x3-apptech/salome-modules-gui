@@ -415,6 +415,34 @@ void GLViewer_Drawer::destroyAllTextures()
     for( ; anIt != anEndIt; anIt++ )
         glDeleteTextures( 1, &(anIt.data().myTexFontId) );
 }
+
+//=======================================================================
+// Function: setAntialiasing
+// Purpose : The function enables and disables antialiasing in Open GL (for points, lines and polygons).
+//=======================================================================
+void GLViewer_Drawer::setAntialiasing(const bool on)
+{
+	if (on)
+	{
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POLYGON_SMOOTH);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		glEnable (GL_BLEND);
+	}
+	else
+	{
+		glDisable(GL_POINT_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POLYGON_SMOOTH);
+		glBlendFunc (GL_ONE, GL_ZERO);
+		glDisable (GL_BLEND);
+	}
+}
+
 //======================================================================
 // Function: loadTexture
 // Purpose :
