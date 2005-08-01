@@ -758,7 +758,7 @@ SVTK_ViewWindow
     if(aCDisplayed) myCubeAxes->VisibilityOff();
 
     SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-    QString aSetting = aResMgr->stringValue("Viewer:TrihedronSize", "105");
+    QString aSetting = aResMgr->stringValue("Viewer", "TrihedronSize", "105");
     static float aSizeInPercents = aSetting.toFloat();
 
     //bool isComputeTrihedronSize =
