@@ -4,7 +4,12 @@
 #include <string>
 //#include <GLViewer.h>
 #include <GLViewer_Object.h>
-#include <SALOME_Actor.h>
+
+#ifdef WNT
+#define SALOME_OBJECT_EXPORT __declspec (dllexport)
+#else
+#define SALOME_OBJECT_EXPORT
+#endif
 
 class SALOME_OBJECT_EXPORT SALOME_GLOwner : public GLViewer_Owner
 {
