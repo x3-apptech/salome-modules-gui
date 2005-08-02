@@ -309,3 +309,7 @@ msgstr "No"
 
 msgid "SalomeApp_Application::PUBLISH_IN_STUDY"
 msgstr "Publish in study"
+
+msgid "SalomeApp_Application::ACTIVATING_MODULE"
+msgstr "Trying to activate module \"%1\""
+

@@ -259,11 +259,15 @@ bool SalomeApp_Application::activateModule( const QString& modName )
   if ( actName == modName )
     return true;
 
+  putInfo( tr( "ACTIVATING_MODULE" ).arg( modName ) );  
+
   saveWindowsGeometry();
 
   bool status = CAM_Application::activateModule( modName );
 
   updateModuleActions();
+
+  putInfo( "" );  
 
   if ( !status )
     return false;
