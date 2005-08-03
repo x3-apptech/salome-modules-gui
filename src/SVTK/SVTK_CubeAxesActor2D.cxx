@@ -204,7 +204,11 @@ static void ChangeValues(float* aArray1,float* aArray2,float *aRange1,float* aRa
     for (int i=0; i<4; i++){
       tmp = aArray1[i]; aArray1[i] = aArray2[i]; aArray2[i] = tmp;
     }
+#ifndef WNT
     for(int i=0;i<2; i++){
+#else
+    for(i=0;i<2; i++){
+#endif
       tmp = aRange1[i]; aRange1[i] = aRange2[i]; aRange2[i] = tmp;
     }
   }
@@ -440,19 +444,31 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 
   // XCoords coordinates for X grid
   vtkFloatArray *XCoords = vtkFloatArray::New();
+#ifndef WNT
   for(int i=0;i<numOfLabelsX;i++){
+#else
+  for(i=0;i<numOfLabelsX;i++){
+#endif
     float val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
     XCoords->InsertNextValue(val);
   }
   // YCoords coordinates for Y grid
   vtkFloatArray *YCoords = vtkFloatArray::New();
+#ifndef WNT
   for(int i=0;i<numOfLabelsX;i++){
+#else
+  for(i=0;i<numOfLabelsX;i++){
+#endif
     float val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
     YCoords->InsertNextValue(val);
   }
   // ZCoords coordinates for Z grid
   vtkFloatArray *ZCoords = vtkFloatArray::New();
+#ifndef WNT
   for(int i=0;i<numOfLabelsZ;i++){
+#else
+  for(i=0;i<numOfLabelsZ;i++){
+#endif
     float val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
     ZCoords->InsertNextValue(val);
   }
@@ -512,7 +528,11 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   p[5][1] = YCoords->GetValue(numOfLabelsY-1);
   p[5][2] = aMiddleZ;
 
+#ifndef WNT
   for(int i=0;i<3;i++) 
+#else
+  for(i=0;i<3;i++) 
+#endif
     for(int j=0;j<6;j++) vecs[j][i] = p[j][i] - aCPosition[i];
 
   if ( vtkMath::Dot(vecs[0],aCDirection) < vtkMath::Dot(vecs[1],aCDirection))

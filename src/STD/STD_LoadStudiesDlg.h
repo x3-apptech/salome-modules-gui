@@ -3,6 +3,7 @@
 
 #include <qvariant.h>
 #include <qdialog.h>
+#include <STD.h>
 class QVBoxLayout; 
 class QHBoxLayout; 
 class QGridLayout; 
@@ -15,7 +16,7 @@ class QPushButton;
  * \brief Describes a dialog box that gives a list of opened studies.
  * 
  */
-class STD_LoadStudiesDlg : public QDialog
+class STD_EXPORT STD_LoadStudiesDlg : public QDialog
 { 
    Q_OBJECT
 

@@ -6,7 +6,9 @@
 #include <qlabel.h> 
 #include <qmessagebox.h>
 
+#ifndef WNT
 using namespace std;
+#endif
 
 //================================================================================
 /*!

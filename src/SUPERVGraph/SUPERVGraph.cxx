@@ -26,9 +26,10 @@
 //  Module : SALOME
 //  $Header$
 
-using namespace std;
 #include "SUPERVGraph.h"
 #include "SUPERVGraph_ViewFrame.h"
+
+using namespace std;
 
 SUIT_ViewWindow* SUPERVGraph::createView(SUIT_Desktop* parent)
 {

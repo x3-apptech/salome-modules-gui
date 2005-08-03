@@ -148,7 +148,11 @@ QString SalomeApp_DataObject::text( const int id ) const
   switch ( id )
   {
   case CT_Value:
+#ifndef WNT
     if ( componentObject() != this )
+#else
+    if ( componentObject() != (SUIT_DataObject*)this )
+#endif
       txt = value( referencedObject() );
     break;
   case CT_Entry:

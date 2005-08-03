@@ -6,7 +6,7 @@
 #include <typeinfo.h>
 #endif
 
-#include <iostream.h>
+#include <iostream>
 
 /*!Constructor. Initialize by \a theEntry.*/
 SalomeApp_DataOwner

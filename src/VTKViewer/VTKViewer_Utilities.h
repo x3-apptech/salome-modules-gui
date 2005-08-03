@@ -1,12 +1,14 @@
 #ifndef VTKVIEWER_UTILITIES_H
 #define VTKVIEWER_UTILITIES_H
 
+#include <VTKViewer.h>
+
 class vtkRenderer;
 
-extern void  ResetCamera(vtkRenderer* theRenderer, int theUsingZeroFocalPoint = false);
-extern int   ComputeVisiblePropBounds(vtkRenderer* theRenderer, float theBounds[6]);
-extern void  ResetCameraClippingRange(vtkRenderer* theRenderer);
-extern bool  ComputeTrihedronSize(vtkRenderer* theRenderer, double& theNewSize, 
+VTKVIEWER_EXPORT extern void  ResetCamera(vtkRenderer* theRenderer, int theUsingZeroFocalPoint = false);
+VTKVIEWER_EXPORT extern int   ComputeVisiblePropBounds(vtkRenderer* theRenderer, float theBounds[6]);
+VTKVIEWER_EXPORT extern void  ResetCameraClippingRange(vtkRenderer* theRenderer);
+VTKVIEWER_EXPORT extern bool  ComputeTrihedronSize(vtkRenderer* theRenderer, double& theNewSize, 
 				  const double theSize, const float theSizeInPercents);
 
 #ifndef max

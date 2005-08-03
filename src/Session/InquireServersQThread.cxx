@@ -7,7 +7,6 @@
 //  Module : SALOME
 //  $Header$
 
-using namespace std;
 #include "InquireServersQThread.h"
 
 #include <qapplication.h>
@@ -38,6 +37,8 @@ using namespace std;
 #include "SALOME_NamingService.hxx"
 #include "utilities.h"
 #include "OpUtil.hxx"
+
+using namespace std;
 
 #include CORBA_CLIENT_HEADER(SALOME_Session)
 #include CORBA_CLIENT_HEADER(SALOME_Registry)
@@ -324,11 +325,18 @@ bool InquireServersQThread::AskServer(int iteration, QString ** errMessage)
   //will be set true if we get response from server
   bool IsPassed = false;
   QString errDescription;
+#ifdef WNT
+  int i;
+#endif
   switch (iteration)
     {
     case 1:
       //First checking - existence of Naming Service
+#ifndef WNT
       for (int i = myRepeat; i ; i--)
+#else
+	  for (i = myRepeat; i ; i--)
+#endif
 	{
 	  try
 	    {

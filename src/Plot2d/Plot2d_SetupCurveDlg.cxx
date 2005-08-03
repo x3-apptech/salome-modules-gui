@@ -19,7 +19,10 @@
 #include <qtoolbutton.h>
 #include <qgroupbox.h>
 #include <qcolordialog.h>
+
+#ifndef WNT
 using namespace std;
+#endif
 
 #define MARGIN_SIZE      11
 #define SPACING_SIZE     6

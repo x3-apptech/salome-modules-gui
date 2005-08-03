@@ -118,7 +118,11 @@ void Session_ServerThread::Init()
   MESSAGE("Session_ServerThread::Init "<< _argv[0]); 
 
   for (int i=0; i<_argc; i++) SCRUTE(_argv[i]);
+#ifndef WNT
   for (int i=0; i<NB_SRV_TYP; i++)
+#else
+  for (i=0; i<NB_SRV_TYP; i++)
+#endif
     if (strcmp(_argv[0],_serverTypes[i])==0)
       {
 	_servType = i;

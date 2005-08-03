@@ -29,7 +29,9 @@
 #include "SalomeApp_ImportOperation.h"
 #include <SUIT_Application.h>
 
+#ifndef WNT
 using namespace std;
+#endif
 
 /*!Constructor. Do nothing.*/
 SalomeApp_ImportOperation::SalomeApp_ImportOperation( SUIT_Application* app ) :

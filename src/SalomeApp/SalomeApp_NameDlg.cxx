@@ -19,7 +19,10 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
+
+#ifndef WNT
 using namespace std;
+#endif
 
 /*!
   Constructor

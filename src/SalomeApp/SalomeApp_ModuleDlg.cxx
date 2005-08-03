@@ -15,7 +15,10 @@
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpixmap.h>
+
+#ifndef WNT
 using namespace std;
+#endif
 
 /*!Default icon*/
 static const char* const default_icon[] = { 

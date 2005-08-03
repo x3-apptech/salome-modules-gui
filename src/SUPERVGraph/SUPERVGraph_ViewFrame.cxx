@@ -26,7 +26,6 @@
 //  Module : SALOME
 //  $Header$
 
-using namespace std;
 #include "SUPERVGraph_ViewFrame.h"
 
 #include "utilities.h"
@@ -34,6 +33,8 @@ using namespace std;
 //QT Include
 #include <qlayout.h>
 #include <qcolordialog.h>
+
+using namespace std;
 
 
 SUPERVGraph_View::SUPERVGraph_View( QWidget* theParent ): QWidget( theParent )

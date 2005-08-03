@@ -32,7 +32,9 @@
 
 #include "utilities.h"
 
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
 
 SalomeApp_Engine_i* SalomeApp_Engine_i::myInstance = NULL;
 

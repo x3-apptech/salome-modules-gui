@@ -439,7 +439,11 @@ void SPlot2d_SetupPlot2dDlg::enableControls()
       break;
     }
   }
+#ifndef WNT
   for ( int i = 0; i < myItems.count(); i++ ) {
+#else
+  for ( i = 0; i < myItems.count(); i++ ) {
+#endif
     if ( myItems.at( i )->isVerticalOn() )
       bVSet = true;
     myItems.at( i )->enableWidgets( bHSet && myItems.at( i )->isVerticalOn() );

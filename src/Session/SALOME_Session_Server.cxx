@@ -34,7 +34,9 @@
 #include "InquireServersQThread.h" // splash
 
 #include <iostream>
+#ifndef WNT
 #include <unistd.h>
+#endif
 
 #include <qdir.h>
 #include <qfile.h>

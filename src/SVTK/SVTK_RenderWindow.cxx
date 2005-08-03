@@ -14,6 +14,8 @@
 //#include <GL/gl.h>
 //#include <GL/glu.h>
 //#include <qgl.h>
+#else
+#include <vtkRenderWindow.h>
 #endif
 
 #if QT_VERSION > 300

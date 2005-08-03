@@ -11,12 +11,18 @@
 #include <qvbox.h> 
 #include <qguardedptr.h> 
 
+#ifdef WNT
+#include <SALOME_WNT.hxx>
+#else
+#define SALOME_WNT_EXPORT
+#endif
+
 /**********************************************************
 **  Class:   InquireEvent
 **  Descr:   Contains QCustomEvents for posting to InquireServersQThread
 **  Level:   Private
 ***********************************************************/
-class InquireEvent : public QCustomEvent
+class SALOME_WNT_EXPORT InquireEvent : public QCustomEvent
 {
 public:
 
@@ -33,7 +39,7 @@ public:
 
 class InquireServersGUI;
 
-class InquireServersQThread : public QThread
+class SALOME_WNT_EXPORT InquireServersQThread : public QThread
 {
 public:
   InquireServersQThread( InquireServersGUI* r );
@@ -78,7 +84,7 @@ private:
 class QLabel;
 class QFrame;
 class QProgressBar;
-class InquireServersGUI : public QVBox
+class SALOME_WNT_EXPORT InquireServersGUI : public QVBox
 {
     Q_OBJECT
 

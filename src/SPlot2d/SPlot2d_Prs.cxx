@@ -3,7 +3,9 @@
 //  Module : SUIT
 
 #include "SPlot2d_Prs.h"
+#ifndef WNT
 using namespace std;
+#endif
 
 //==========================================================
 /*!

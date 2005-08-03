@@ -91,7 +91,7 @@ private:
   Descr: Class for incapsulation of one preference item
 */
 
-class QtxResourceEdit::Item
+class QTX_EXPORT QtxResourceEdit::Item
 {
 public:
   Item( QtxResourceEdit*, Item* = 0 );

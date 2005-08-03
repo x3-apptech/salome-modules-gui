@@ -37,7 +37,13 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SalomeApp_Engine)
 
-class SalomeApp_Engine_i: public POA_SalomeApp::Engine,
+#ifdef WNT
+#include <SALOME_WNT.hxx>
+#else
+#define SALOME_WNT_EXPORT
+#endif
+
+class SALOME_WNT_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
                           public Engines_Component_i
 {
 public:

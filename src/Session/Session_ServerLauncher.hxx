@@ -38,6 +38,13 @@
 #include <qthread.h>
 #include <qwaitcondition.h>
 
+
+#ifdef WNT
+#include <SALOME_WNT.hxx>
+#else
+#define SALOME_WNT_EXPORT
+#endif
+
 using namespace std;
 
 class ServArg
@@ -53,7 +60,7 @@ inline ServArg::ServArg(int servType, int firstArg, int lastArg):
   _servType(servType),_firstArg(firstArg),_lastArg(lastArg)
 {}
 
-class Session_ServerLauncher: public QThread
+class SALOME_WNT_EXPORT Session_ServerLauncher: public QThread
 {
 public:
   Session_ServerLauncher();

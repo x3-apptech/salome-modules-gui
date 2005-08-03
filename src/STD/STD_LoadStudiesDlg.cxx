@@ -4,7 +4,10 @@
 #include <qlayout.h>
 #include <qlistbox.h>
 #include <qpushbutton.h>
+
+#ifndef WNT
 using namespace std;
+#endif
 
 #define SPACING_SIZE             6
 #define MARGIN_SIZE             11
