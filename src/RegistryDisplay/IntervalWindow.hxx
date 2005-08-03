@@ -16,7 +16,9 @@
 # include <qpushbutton.h>
 # include <qspinbox.h>
 
+#ifndef WNT
 using namespace std;
+#endif
 
 class IntervalWindow : public QDialog
 {

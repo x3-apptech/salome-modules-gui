@@ -26,9 +26,10 @@
 //  Module : SALOME
 //  $Header$
 
-using namespace std;
 # include "RegWidget.h"
 # include "utilities.h"
+
+using namespace std;
 
 extern "C"
 {
