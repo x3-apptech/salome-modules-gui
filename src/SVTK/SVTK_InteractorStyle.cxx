@@ -1054,7 +1054,7 @@ SVTK_InteractorStyle
 			}
 		      }
 		      if (!anIndices.IsEmpty()) {
-			GetSelector()->AddOrRemoveIndex(anIO,anIndices,false);
+			GetSelector()->AddOrRemoveIndex(anIO,anIndices,true); // ENK false to true
 			GetSelector()->AddIObject(aSActor);
 			anIndices.Clear();
 		      }else{
