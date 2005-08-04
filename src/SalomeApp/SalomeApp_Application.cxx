@@ -85,6 +85,9 @@
 #include "SALOME_ListIteratorOfListIO.hxx"
 #include "SALOME_ListIO.hxx"
 
+#include "ToolsGUI_CatalogGeneratorDlg.h"
+#include "ToolsGUI_RegWidget.h"
+
 #define OBJECT_BROWSER_WIDTH 300
 
 /*!Image for empty icon.*/
@@ -312,6 +315,16 @@ void SalomeApp_Application::createActions()
 		tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
 		CTRL+Key_P, desk, false, this, SLOT( onPreferences() ) );
 
+  //! Catalog Generator
+  createAction( CatalogGenId, tr( "TOT_DESK_CATALOG_GENERATOR" ),  QIconSet(),
+		tr( "MEN_DESK_CATALOG_GENERATOR" ), tr( "PRP_DESK_CATALOG_GENERATOR" ),
+		0, desk, false, this, SLOT( onCatalogGen() ) );
+
+  //! Registry Display
+  createAction( RegDisplayId, tr( "TOT_DESK_REGISTRY_DISPLAY" ),  QIconSet(),
+		tr( "MEN_DESK_REGISTRY_DISPLAY" ), tr( "PRP_DESK_REGISTRY_DISPLAY" ),
+		0, desk, false, this, SLOT( onRegDisplay() ) );
+
   //! MRU
   QtxMRUAction* mru = new QtxMRUAction( tr( "TOT_DESK_MRU" ), tr( "MEN_DESK_MRU" ), desk );
   connect( mru, SIGNAL( activated( QString ) ), this, SLOT( onMRUActivated( QString ) ) );
@@ -408,6 +421,11 @@ void SalomeApp_Application::createActions()
   createMenu( separator(), fileMenu, -1, 15, -1 );
   createMenu( PreferencesId, fileMenu, 15, -1 );
   createMenu( separator(), fileMenu, -1, 15, -1 );
+
+  int toolsMenu = createMenu( tr( "MEN_DESK_TOOLS" ), -1, -1, 50 );
+  createMenu( CatalogGenId, toolsMenu, 10, -1 );
+  createMenu( RegDisplayId, toolsMenu, 10, -1 );
+  createMenu( separator(), toolsMenu, -1, 15, -1 );
 
   /*
   createMenu( separator(), fileMenu, -1, 100, -1 );
@@ -1909,4 +1927,20 @@ bool SalomeApp_Application::activateModule( CAM_Module* mod )
   if ( objectBrowser() )
     objectBrowser()->updateTree();
   return res;
+}
+
+/*!Display Catalog Genenerator dialog */
+void SalomeApp_Application::onCatalogGen()
+{
+  ToolsGUI_CatalogGeneratorDlg( desktop() ).exec();
+}
+
+/*!Display Registry Display dialog */
+void SalomeApp_Application::onRegDisplay()
+{
+  CORBA::ORB_var anOrb = orb();
+  ToolsGUI_RegWidget* regWnd = ToolsGUI_RegWidget::GetRegWidget( anOrb, desktop(), "Registry" );
+  regWnd->show();
+  regWnd->raise();
+  regWnd->setActiveWindow();
 }

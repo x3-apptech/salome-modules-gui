@@ -52,7 +52,8 @@ public:
 
   enum { ModulesListId = STD_Application::UserID, NewGLViewId,
          NewPlot2dId, NewOCCViewId, NewVTKViewId, DumpStudyId,
-	 LoadScriptId,PropertiesId, PreferencesId, MRUId, UserID };
+	 LoadScriptId, PropertiesId, PreferencesId, MRUId, 
+	 CatalogGenId, RegDisplayId, UserID };
 
 public:
   SalomeApp_Application();
@@ -153,7 +154,7 @@ protected:
   virtual void                        updateDesktopTitle();
 
 protected slots:
-  virtual void          onDesktopActivated();
+  virtual void                        onDesktopActivated();
 
 private slots:
   void                                onNewWindow();
@@ -171,6 +172,9 @@ private slots:
 
   void                                onPreferences();
   void                                onMRUActivated( QString );
+
+  void                                onCatalogGen();
+  void                                onRegDisplay();
 
   void                                onPreferenceChanged( QString&, QString&, QString& );
   void                                onOpenWith();
