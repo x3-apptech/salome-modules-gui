@@ -1,4 +1,4 @@
-//  SALOME TOOLSGUI : implementation of desktop "Tools" optioins
+//  SALOME RegistryDisplay : GUI for Registry server implementation
 //
 //  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
@@ -21,38 +21,31 @@
 //
 //
 //
-//  File   : ToolsGUI.h
-//  Author : Nicolas REJNERI
+//  File   : HelpWindow.hxx
+//  Author : Pascale NOYRET, EDF
 //  Module : SALOME
 //  $Header$
 
-#ifndef ToolsGUI_HeaderFile
-#define ToolsGUI_HeaderFile
+# ifndef __HELPWINDOW_H__
+# define __HELPWINDOW_H__
 
-#include "utilities.h"
+# include <qapplication.h>
+# include <qmainwindow.h>
 
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
+class QTextView;
 
-#include "SALOMEDSClient.hxx"
-
-class Standard_EXPORT ToolsGUI  
+class ToolsGUI_HelpWindow : public QMainWindow
 {
+public:
+  ToolsGUI_HelpWindow( QWidget* parent = 0, const char* name = 0);
+  ~ToolsGUI_HelpWindow();
 
-public :
+  void setText( const QString& text );
+  QTextView* textView() const { return myTextView; }
 
-  static int                runCommand( string&  );
-//  static bool               OnGUIEvent( int theCommandID, QAD_Desktop* parent );
-
-  static bool               GetVisibility( _PTR(Study)   theStudy,
-                                           _PTR(SObject) theObj,
-                                           void*         theId );
-
-  static bool               SetVisibility( _PTR(Study) theStudy,
-                                           const char* theEntry,
-                                           const bool  theValue,
-                                           void*       theId );
+private:
+  QTextView* myTextView;
 };
+# endif         /* __HELPWINDOW_H__ */
 
-#endif
+

@@ -35,7 +35,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl:@srcdir@/resources
 @COMMENCE@
 
 # header files 
-EXPORT_HEADERS = ToolsGUI.h
+EXPORT_HEADERS = ToolsGUI_RegWidget.h \
+		 ToolsGUI_CatalogGeneratorDlg.h
 
 # .po files to transform in .qm
 PO_FILES = ToolsGUI_icons.po \
@@ -44,17 +45,20 @@ PO_FILES = ToolsGUI_icons.po \
 # Libraries targets
 LIB = libToolsGUI.la
 
-LIB_SRC = ToolsGUI.cxx \
-	  ToolsGUI_CatalogGeneratorDlg.cxx
+LIB_SRC = ToolsGUI_CatalogGeneratorDlg.cxx \
+	  ToolsGUI_HelpWindow.cxx \
+	  ToolsGUI_RegWidget.cxx \
+	  ToolsGUI_IntervalWindow.cxx
 
-LIB_MOC = ToolsGUI_CatalogGeneratorDlg.h
+LIB_MOC = ToolsGUI_CatalogGeneratorDlg.h \
+          ToolsGUI_RegWidget.h
 
-# additionnal information to compil and link file
+LIB_CLIENT_IDL = SALOME_Registry.idl
 
 CPPFLAGS += $(QT_INCLUDES) $(OCC_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS += $(OCC_CXXFLAGS) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS += -lsuit $(CAS_LDPATH) -lTKernel
+LDFLAGS += $(QT_MT_LIBS) -lsuit $(CAS_LDPATH) -lTKernel -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lOpUtil
 
 @CONCLUDE@
 
