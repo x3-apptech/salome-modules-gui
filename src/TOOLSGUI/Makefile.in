@@ -35,7 +35,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl:@srcdir@/resources
 @COMMENCE@
 
 # header files 
-EXPORT_HEADERS = ToolsGUI_RegWidget.h \
+EXPORT_HEADERS = ToolsGUI.h \
+		 ToolsGUI_RegWidget.h \
 		 ToolsGUI_CatalogGeneratorDlg.h
 
 # .po files to transform in .qm
@@ -48,7 +49,8 @@ LIB = libToolsGUI.la
 LIB_SRC = ToolsGUI_CatalogGeneratorDlg.cxx \
 	  ToolsGUI_HelpWindow.cxx \
 	  ToolsGUI_RegWidget.cxx \
-	  ToolsGUI_IntervalWindow.cxx
+	  ToolsGUI_IntervalWindow.cxx \
+	  ToolsGUI.cxx
 
 LIB_MOC = ToolsGUI_CatalogGeneratorDlg.h \
           ToolsGUI_RegWidget.h
