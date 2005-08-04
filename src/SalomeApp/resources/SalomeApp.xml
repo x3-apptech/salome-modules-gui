@@ -45,7 +45,7 @@
     <parameter name="COMPONENT"    value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
     <parameter name="NETGENPlugin" value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources"/>
     <parameter name="GHS3DPlugin"  value="${GHS3DPLUGIN_ROOT_DIR}/share/salome/resources"/>
-
+    <parameter name="ToolsGUI"     value="${SUITRoot}/resources"/>
   </section>
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>

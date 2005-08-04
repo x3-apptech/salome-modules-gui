@@ -98,6 +98,27 @@ msgstr "Preferences..."
 msgid "SalomeApp_Application::PRP_DESK_PREFERENCES"
 msgstr "Allow to change the preferences"
 
+msgid "SalomeApp_Application::MEN_DESK_TOOLS"
+msgstr "Tools"
+
+msgid "SalomeApp_Application::TOT_DESK_CATALOG_GENERATOR"
+msgstr "Catalog generator"
+
+msgid "SalomeApp_Application::MEN_DESK_CATALOG_GENERATOR"
+msgstr "Catalog generator"
+
+msgid "SalomeApp_Application::PRP_DESK_CATALOG_GENERATOR"
+msgstr "Generates XML catalog of a component's interface"
+
+msgid "SalomeApp_Application::TOT_DESK_REGISTRY_DISPLAY"
+msgstr "Registry display"
+
+msgid "SalomeApp_Application::MEN_DESK_REGISTRY_DISPLAY"
+msgstr "Registry display"
+
+msgid "SalomeApp_Application::PRP_DESK_REGISTRY_DISPLAY"
+msgstr "Displays content of the Registry CORBA server"
+
 msgid "SalomeApp_Application::TOT_DESK_MRU"
 msgstr "Most recently used"
 
