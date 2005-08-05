@@ -36,8 +36,11 @@ myBgColor( Qt::black )
                                                  V3d_XposYnegZpos, true, true );
   myV3dCollector->Init();
 
-    // init selector
+  // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer, myV3dCollector);
+  
+  // display isoline on planar faces (box for ex.)
+  myAISContext->IsoOnPlane( true );
 
   clearViewAspects();
 
