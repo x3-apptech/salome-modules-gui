@@ -51,17 +51,13 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
       for ( DataObjectListIterator it( allComponents ); it.current(); ++it ) {
 	SUIT_DataObject* componentObj = it.current();
 	if ( componentObj->name() == aSName ) {
-	  //mkr : modifications for update already published in 
-	  //object browser, but not loaded yet component
-	  //get names list of loaded modules
-	  QStringList aLoadedModNames;
+	  // mkr : modifications for update of already published in object browser, but not loaded yet components
+	  // asv : corresponding DataObjects are DELETED before update (so they are re-built). 
 	  CAM_Application* anApp = dynamic_cast<CAM_Application*>( SUIT_Session::session()->activeApplication() );
-	  if ( anApp ) anApp->modules( aLoadedModNames, /*loaded*/true );
-	  if ( !aLoadedModNames.isEmpty() && aLoadedModNames.contains( aSName ) == 0 ) {
-	    // delete DataObject and re-create it and all its sub-objects
-	    delete componentObj;
+	  if ( anApp && !anApp->module( aSName ) ) { // if module is not loaded, delete it's DataObject
+	    delete componentObj; // delete DataObject and re-create it and all its sub-objects
+	    break; // proceed to build_a_data_object code below
 	    // don't do anything here, because iterator may be corrupted (deleted object inside it)
-	    break;
 	  }
 	  else
 	    return componentObj;
