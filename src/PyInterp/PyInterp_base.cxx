@@ -205,7 +205,11 @@ int compile_command(const char *command,PyObject *context)
     return 1;
   }else{
     // Complete and correct text. We evaluate it.
+#ifndef WNT
     PyObjWrapper r(PyEval_EvalCode(v,context,context));
+#else
+    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)&v,context,context));
+#endif
     if(!r){
       // Execution error. We return -1
       PyErr_Print();

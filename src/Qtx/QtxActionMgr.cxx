@@ -381,7 +381,7 @@ void QtxActionMgr::XMLReader::read( const QDomNode& parent_node,
   for( int i=0, n=children.count(); i<n; i++ )
   {
     QDomNode node = children.item( i );
-    QString n = node.nodeName();
+    //QString n = node.nodeName();
     if( node.isElement() /*&& node.hasAttributes()*/ &&
         ( items.contains( node.nodeName() ) || node.nodeName()==option( "separator" ) ) )
     {

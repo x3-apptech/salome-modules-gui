@@ -24,7 +24,9 @@
 
 #include <Python.h>   // must be before qt includes ...
 
+#ifndef WNT
 extern "C" PyObject * PyEval_EvalCode(PyObject *co, PyObject *g, PyObject *l);
+#endif
 
 #define TOP_HISTORY_PY "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"

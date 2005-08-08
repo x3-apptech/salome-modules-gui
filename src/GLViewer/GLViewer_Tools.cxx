@@ -7,7 +7,9 @@
 
 #include <GL/gl.h>
 
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
 
 /****************************************************************************
 **  Class:   GLViewer_LineList 

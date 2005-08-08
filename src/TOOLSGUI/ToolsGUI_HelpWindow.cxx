@@ -26,7 +26,6 @@
 //  Module : SALOME
 //  $Header$
 
-using namespace std;
 # include "ToolsGUI_HelpWindow.h"
 # include "utilities.h"
 
@@ -34,6 +33,8 @@ using namespace std;
 # include <qpushbutton.h>
 # include <qtextstream.h> 
 # include <qfile.h> 
+
+using namespace std;
 
 ToolsGUI_HelpWindow::ToolsGUI_HelpWindow(QWidget* parent, const char* name ) 
      : QMainWindow( parent, name, WType_TopLevel | WDestructiveClose )

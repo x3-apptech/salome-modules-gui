@@ -24,7 +24,7 @@
 #include <qfiledialog.h>
 #include <qapplication.h>
 
-#include <iostream.h>
+#include <iostream>
 
 /*!Create and return new instance of STD_Application*/
 extern "C" STD_EXPORT SUIT_Application* createApplication()

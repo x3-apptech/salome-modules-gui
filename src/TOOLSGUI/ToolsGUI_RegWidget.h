@@ -45,10 +45,12 @@ class QTextView;
 class QPushButton;
 #endif
 
+#include <Standard_Macro.hxx>
+
 class ToolsGUI_HelpWindow;
 class ToolsGUI_IntervalWindow;
 
-class ToolsGUI_InfoWindow : public QMainWindow {
+class Standard_EXPORT  ToolsGUI_InfoWindow : public QMainWindow {
 public:
   ToolsGUI_InfoWindow( QWidget* parent = 0, const char* name = 0);
 
@@ -62,7 +64,7 @@ private:
   QTextView* myTextView;
 };
 
-class ToolsGUI_RegWidget : public QMainWindow
+class Standard_EXPORT  ToolsGUI_RegWidget : public QMainWindow
 {
   
   Q_OBJECT

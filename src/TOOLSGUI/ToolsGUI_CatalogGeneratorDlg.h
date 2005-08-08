@@ -31,6 +31,8 @@
 
 #include <qdialog.h>
 
+#include <Standard_Macro.hxx>
+
 class QLineEdit;
 class QPushButton;
 
@@ -38,7 +40,7 @@ class QPushButton;
 // class    : ToolsGUI_CatalogGeneratorDlg
 // purpose  :
 //=================================================================================
-class ToolsGUI_CatalogGeneratorDlg : public QDialog
+class Standard_EXPORT ToolsGUI_CatalogGeneratorDlg : public QDialog
 { 
     Q_OBJECT
 

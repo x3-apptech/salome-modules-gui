@@ -25,7 +25,7 @@
 
 #include <qwt_math.h>
 #include <qwt_plot_canvas.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 
 //#include "utilities.h"
