@@ -24,7 +24,8 @@
 #include <qworkspace.h>
 #include <qpopupmenu.h>
 
-#if QT_VERSION > 0x030005
+#include "SALOME_PYQT_SipDefs.h"
+#if defined(SIP_VERS_v4_old) || defined(SIP_VERS_v4_new)
 #include "sipAPISalomePyQtGUI.h"
 #else
 #include "sipSalomePyQtGUIDeclSalomePyQtGUI.h"
@@ -37,20 +38,27 @@
 
 using namespace std;
 
-// Default name of the module, should be replaced at the moment 
-// of module creation
+///////////////////////////////////////////////////////////////////////////////
+// Default name of the module, replaced at the moment of module creation
 #define __DEFAULT_NAME__ "SALOME_PYQT_Module"
-// Comment this define to block invoking of obsolete Python module's
-// methods like setSetting(), definePopup(), etc.
-#define __CALL_OLD_METHODS__
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// If __CALL_OLD_METHODS__ macro is not defined the invoking of obsolete Python 
+// module's methods like setSetting(), definePopup(), etc. is blocked.
+// This macro is defined by default (in Makefile)
+#ifdef __CALL_OLD_METHODS__
+const bool IsCallOldMethods = true;
+#else 
+const bool IsCallOldMethods = false;
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// NB: Python requests.
 // General rule for Python requests created by SALOME_PYQT_Module:
 // all requests should be executed SYNCHRONOUSLY within the main GUI thread.
 // However, it is obligatory that ANY Python call is wrapped with a request object,
 // so that ALL Python API calls are serialized with PyInterp_Dispatcher.
-//=============================================================================
-
+///////////////////////////////////////////////////////////////////////////////
 
 //=============================================================================
 // The class for parsing of the XML resource files.
@@ -438,10 +446,10 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
  
   myInitModule = this;
 
-#ifdef __CALL_OLD_METHODS__
-  // call Python module's setWorkspace() method
-  setWorkSpace();
-#endif // __CALL_OLD_METHODS__
+  if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+    // call Python module's setWorkspace() method
+    setWorkSpace();
+  }                         //__CALL_OLD_METHODS__
 
   // then call Python module's initialize() method
   // ... first get python lock
@@ -536,14 +544,14 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
   // get python lock
   PyLockWrapper aLock = myInterp->GetLockWrapper();
 
-#ifdef __CALL_OLD_METHODS__
-  // call Python module's setSettings() method (obsolete)
-  PyObjWrapper res( PyObject_CallMethod( myModule, "setSettings", "" ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-  }
-#endif // __CALL_OLD_METHODS__
+  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+    // call Python module's setSettings() method (obsolete)
+    PyObjWrapper res( PyObject_CallMethod( myModule, "setSettings", "" ) );
+    if( !res ) {
+      // VSR: this method may not be implemented in Python module
+      // PyErr_Print();
+    }
+  }                         //__CALL_OLD_METHODS__
 
   // call Python module's activate() method (for the new modules)
   PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
@@ -679,29 +687,30 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     return;
   
   QString aContext( theContext ), aObject( "" ), aParent( "" );
-#ifdef __CALL_OLD_METHODS__
-  // call definePopup() Python module's function
-  // this is obsolete function, used only for compatibility reasons
-  PyObjWrapper res(PyObject_CallMethod( myModule, 
-				        "definePopup", 
-				        "sss",
-				        aContext.latin1(), 
-				        aObject.latin1(), 
-				        aParent.latin1() ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-  }
-  else {
-    // parse return value
-    char *co, *ob, *pa;
-    if( PyArg_ParseTuple( res, "sss", &co, &ob, &pa ) ) {
-      aContext = co;
-      aObject  = ob;
-      aParent  = pa;
+
+  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+    // call definePopup() Python module's function
+    // this is obsolete function, used only for compatibility reasons
+    PyObjWrapper res(PyObject_CallMethod( myModule, 
+					  "definePopup", 
+					  "sss",
+					  aContext.latin1(), 
+					  aObject.latin1(), 
+					  aParent.latin1() ) );
+    if( !res ) {
+      // VSR: this method may not be implemented in Python module
+      // PyErr_Print();
     }
-  }
-#endif // __CALL_OLD_METHODS__
+    else {
+      // parse return value
+      char *co, *ob, *pa;
+      if( PyArg_ParseTuple( res, "sss", &co, &ob, &pa ) ) {
+        aContext = co;
+	aObject  = ob;
+	aParent  = pa;
+      }
+    }
+  }                        //__CALL_OLD_METHODS__
 
   // first try to create menu via XML parser:
   // we create popup menus without help of QtxPopupMgr
@@ -709,7 +718,6 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     myXmlHandler->createPopup( thePopupMenu, aContext, aParent, aObject );
 
   PyObjWrapper sipPopup( sipBuildResult( 0, "M", thePopupMenu, sipClass_QPopupMenu ) );
-  //PyObjWrapper sipPopup( sipMapCppToSelf( thePopupMenu, sipClass_QPopupMenu ) );
 
   // then call Python module's createPopupMenu() method (for new modules)
   PyObjWrapper res1( PyObject_CallMethod( myModule,
@@ -722,21 +730,21 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     // PyErr_Print();
   }
 
-#ifdef __CALL_OLD_METHODS__
-  // call customPopup() Python module's function
-  // this is obsolete function, used only for compatibility reasons
-  PyObjWrapper res2( PyObject_CallMethod( myModule,
-					  "customPopup",
- 				          "Osss",
-					  sipPopup.get(),
-					  aContext.latin1(), 
-					  aObject.latin1(), 
-					  aParent.latin1() ) );
-  if( !res2 ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-  }
-#endif // __CALL_OLD_METHODS__
+  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+    // call customPopup() Python module's function
+    // this is obsolete function, used only for compatibility reasons
+    PyObjWrapper res2( PyObject_CallMethod( myModule,
+					    "customPopup",
+					    "Osss",
+					    sipPopup.get(),
+					    aContext.latin1(), 
+					    aObject.latin1(), 
+					    aParent.latin1() ) );
+    if( !res2 ) {
+      // VSR: this method may not be implemented in Python module
+      // PyErr_Print();
+    }
+  }                        //__CALL_OLD_METHODS__
 }
 
 /*!
@@ -852,29 +860,29 @@ void SALOME_PYQT_Module::setWorkSpace()
     PyErr_Print();
     return;
   }  
-#ifdef __CALL_OLD_METHODS__
-  // ... then get workspace object
-  QWidget* aWorkspace = 0;
-  if ( getApp()->desktop()->inherits( "STD_MDIDesktop" ) ) {
-    STD_MDIDesktop* aDesktop = dynamic_cast<STD_MDIDesktop*>( getApp()->desktop() );
-    if ( aDesktop )
-      aWorkspace = aDesktop->workspace();
-  }
-  else if ( getApp()->desktop()->inherits( "STD_TabDesktop" ) ) {
-    STD_TabDesktop* aDesktop = dynamic_cast<STD_TabDesktop*>( getApp()->desktop() );
-    if ( aDesktop )
-      aWorkspace = aDesktop->workstack();
-  }
-  PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget ) );
-  //PyObjWrapper pyws( sipMapCppToSelfSubClass( aWorkspace, sipClass_QWidget ) );
-  // ... and finally call Python module's setWorkspace() method (obsolete)
-  PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    return;
-  }
-#endif // __CALL_OLD_METHODS__
+
+  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+    // ... then get workspace object
+    QWidget* aWorkspace = 0;
+    if ( getApp()->desktop()->inherits( "STD_MDIDesktop" ) ) {
+      STD_MDIDesktop* aDesktop = dynamic_cast<STD_MDIDesktop*>( getApp()->desktop() );
+      if ( aDesktop )
+        aWorkspace = aDesktop->workspace();
+    }
+    else if ( getApp()->desktop()->inherits( "STD_TabDesktop" ) ) {
+      STD_TabDesktop* aDesktop = dynamic_cast<STD_TabDesktop*>( getApp()->desktop() );
+      if ( aDesktop )
+        aWorkspace = aDesktop->workstack();
+    }
+    PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget ) );
+    // ... and finally call Python module's setWorkspace() method (obsolete)
+    PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
+    if( !res ) {
+      // VSR: this method may not be implemented in Python module
+      // PyErr_Print();
+      return;
+    }
+  }                         //__CALL_OLD_METHODS__
 }
 
 /*!
@@ -1089,7 +1097,7 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
       int menuId = myModule->createMenu( plabel,         // label
 					 parentMenuId,   // parent menu ID, should be -1 for main menu
 					 pid,            // ID
-					 100,            // group ID
+					 80,             // group ID
 					 ppos );         // position
       QDomNode node = parentNode.firstChild();
       while ( !node.isNull() ) {
@@ -1120,7 +1128,7 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 						        QKeySequence( accel ),            // keyboard accelerator
 						        toggle );                         // toogled action
 	      myModule->addAction( SALOME_PYQT_Module::PYQT_ACTION_MENU, action );
-	      myModule->createMenu( action, menuId, -1, 100, pos );
+	      myModule->createMenu( action, menuId, -1, 80, pos );
 	    }
 	  }
 	  else if ( aTagName == "submenu" ) {
@@ -1130,8 +1138,8 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	  else if ( aTagName == "separator" ) {
 	    // create menu separator
 	    int     pos     = checkInt( attribute( elem, "pos-id" ) );
-	    QAction* action = myModule->separator();
-	    myModule->createMenu( action, menuId, -1, 100, pos );
+	    QAction* action = myModule->createSeparator();
+	    myModule->createMenu( action, menuId, -1, 80, pos );
 	  }
 	}
 	node = node.nextSibling();
@@ -1192,7 +1200,7 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
 	  else if ( aTagName == "separatorTB" ) {
 	    // create toolbar separator
 	    int     pos     = checkInt( attribute( elem, "pos-id" ) );
-	    QAction* action = myModule->separator();
+	    QAction* action = myModule->createSeparator();
 	    myModule->createTool( action, tbId, -1, pos );
 	  }
 	}
