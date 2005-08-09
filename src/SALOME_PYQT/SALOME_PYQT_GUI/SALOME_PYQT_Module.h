@@ -140,8 +140,6 @@ public slots:
 public slots:
   /* GUI action processing slot */
   void            onGUIEvent();
-  /* desktop activation slot */ 
-  void            onDesktopActivated();
 
 private:
   /* internal initizalition */ 
