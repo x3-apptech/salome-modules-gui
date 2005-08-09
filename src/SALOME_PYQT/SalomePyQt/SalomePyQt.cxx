@@ -14,7 +14,6 @@
 #include <qmenubar.h>
 #include <qwidget.h>
 #include <qpopupmenu.h>
-#include <qaction.h>
 #include <qstringlist.h>
 
 #include "SALOME_Event.hxx"
@@ -28,6 +27,7 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_SelectionMgr.h"
 #include "OB_Browser.h"
+#include "QtxAction.h"
 
 using namespace std;
 
@@ -58,17 +58,44 @@ static SalomeApp_Study* getActiveStudy()
 //====================================================================================
 // SALOME_Selection class.
 //====================================================================================
+static QMap<SalomeApp_Application*, SALOME_Selection*> SelMap;
+
+/*!
+  SALOME_Selection::GetSelection
+  Creates or finds the selection object (one per study).
+*/
+SALOME_Selection* SALOME_Selection::GetSelection( SalomeApp_Application* app )
+{
+  SALOME_Selection* sel = 0;
+  if ( app && SelMap.find( app ) != SelMap.end() )
+    sel = SelMap[ app ];
+  else 
+    sel = SelMap[ app ] = new SALOME_Selection( app );
+  return sel;
+}
+
 /*!
   SALOME_Selection::SALOME_Selection
-  Selection constructor. Gets an instance of selection manager.
+  Selection constructor.
 */
-SALOME_Selection::SALOME_Selection() : mySelMgr( 0 )
+SALOME_Selection::SALOME_Selection( QObject* p ) : QObject( p ), mySelMgr( 0 )
 {
-  if ( SalomeApp_Application* anApp = getApplication() ) {
-    mySelMgr = anApp->selectionMgr();
+  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( p );
+  if ( app ) {
+    mySelMgr = app->selectionMgr();
     connect( mySelMgr, SIGNAL( selectionChanged() ), this, SIGNAL( currentSelectionChanged() ) );
     connect( mySelMgr, SIGNAL( destroyed() ),        this, SLOT  ( onSelMgrDestroyed() ) );
   }
+}
+/*!
+  SALOME_Selection::~SALOME_Selection
+  Selection destructor. Removes selection object from the map.
+*/
+SALOME_Selection::~SALOME_Selection()
+{
+  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( parent() );
+  if ( app && SelMap.find( app ) != SelMap.end() )
+    SelMap.remove( app );
 }
 
 /*!
@@ -266,7 +293,7 @@ public:
   TResult myResult;
   TGetSelectionEvent() : myResult( 0 ) {}
   virtual void Execute() {
-    myResult = new SALOME_Selection();
+    myResult = SALOME_Selection::GetSelection( getApplication() );
   }
 };
 SALOME_Selection* SalomePyQt::getSelection()
@@ -912,9 +939,9 @@ public:
     : myCase( 1 ), myId( id ), myTbId( tBar ), myIndex( idx ) {}
   CrTool( const int id, const QString& tBar, const int idx )
     : myCase( 2 ), myId( id ), myTbName( tBar ), myIndex( idx ) {}
-  CrTool( QAction* action, const int tbId, const int id, const int idx )
+  CrTool( QtxAction* action, const int tbId, const int id, const int idx )
     : myCase( 3 ), myAction( action ), myTbId( tbId ), myId( id ), myIndex( idx ) {}
-  CrTool( QAction* action, const QString& tBar, const int id, const int idx )
+  CrTool( QtxAction* action, const QString& tBar, const int id, const int idx )
     : myCase( 4 ), myAction( action ), myTbName( tBar ), myId( id ), myIndex( idx ) {}
 
   int execute( SALOME_PYQT_Module* module ) const
@@ -936,12 +963,12 @@ public:
     return -1;
   }
 private:
-   int      myCase;
-   QString  myTbName;
-   int      myTbId;
-   QAction* myAction;
-   int      myId;
-   int      myIndex;
+   int        myCase;
+   QString    myTbName;
+   int        myTbId;
+   QtxAction* myAction;
+   int        myId;
+   int        myIndex;
 };
 class TCreateToolEvent: public SALOME_Event {
 public:
@@ -975,12 +1002,12 @@ int SalomePyQt::createTool( const int id, const QString& tBar, const int idx )
   return ProcessEvent( new TCreateToolEvent( CrTool( id, tBar, idx ) ) );
 }
 // add action with id and index to the existing tollbar
-int SalomePyQt::createTool( QAction* a, const int tBar, const int id, const int idx )
+int SalomePyQt::createTool( QtxAction* a, const int tBar, const int id, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
 }
 // add action with id and index to the existing tollbar
-int SalomePyQt::createTool( QAction* a, const QString& tBar, const int id, const int idx )
+int SalomePyQt::createTool( QtxAction* a, const QString& tBar, const int id, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
 }
@@ -1007,9 +1034,9 @@ public:
     : myCase( 2 ), myId( id ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
   CrMenu( const int id, const QString& menu, const int group, const int idx ) 
     : myCase( 3 ), myId( id ), myMenuName( menu ), myGroup( group ), myIndex( idx ) {}
-  CrMenu( QAction* action, const int menu, const int id, const int group, const int idx ) 
+  CrMenu( QtxAction* action, const int menu, const int id, const int group, const int idx ) 
     : myCase( 4 ), myAction( action ), myMenuId( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
-  CrMenu( QAction* action, const QString& menu, const int id, const int group, const int idx ) 
+  CrMenu( QtxAction* action, const QString& menu, const int id, const int group, const int idx ) 
     : myCase( 5 ), myAction( action ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
 
   int execute( SALOME_PYQT_Module* module ) const
@@ -1033,14 +1060,14 @@ public:
     return -1;
   }
 private:
-   int      myCase;
-   QString  myMenuName;
-   int      myMenuId;
-   QString  mySubMenuName;
-   int      myGroup;
-   QAction* myAction;
-   int      myId;
-   int      myIndex;
+   int        myCase;
+   QString    myMenuName;
+   int        myMenuId;
+   QString    mySubMenuName;
+   int        myGroup;
+   QtxAction* myAction;
+   int        myId;
+   int        myIndex;
 };
 class TCreateMenuEvent: public SALOME_Event {
 public:
@@ -1078,12 +1105,12 @@ int SalomePyQt::createMenu( const int id, const QString& menu, const int group, 
   return ProcessEvent( new TCreateMenuEvent( CrMenu( id, menu, group, idx ) ) );
 }
 
-int SalomePyQt::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
+int SalomePyQt::createMenu( QtxAction* a, const int menu, const int id, const int group, const int idx )
 {
   return ProcessEvent( new TCreateMenuEvent( CrMenu( a, menu, id, group, idx ) ) );
 }
 
-int SalomePyQt::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
+int SalomePyQt::createMenu( QtxAction* a, const QString& menu, const int id, const int group, const int idx )
 {
   return ProcessEvent( new TCreateMenuEvent( CrMenu( a, menu, id, group, idx ) ) );
 }
@@ -1094,7 +1121,7 @@ int SalomePyQt::createMenu( QAction* a, const QString& menu, const int id, const
 */
 class TCreateSepEvent: public SALOME_Event {
 public:
-  typedef QAction* TResult;
+  typedef QtxAction* TResult;
   TResult myResult;
   TCreateSepEvent() 
     : myResult( 0 ) {}
@@ -1104,11 +1131,11 @@ public:
       if ( !module )
         module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
       if ( module )
-        myResult = module->createSeparator();
+        myResult = (QtxAction*)module->createSeparator();
     }
   }
 };
-QAction* SalomePyQt::createSeparator()
+QtxAction* SalomePyQt::createSeparator()
 {
   return ProcessEvent( new TCreateSepEvent() );
 }
@@ -1126,7 +1153,7 @@ QAction* SalomePyQt::createSeparator()
 */
 class TCreateActionEvent: public SALOME_Event {
 public:
-  typedef QAction* TResult;
+  typedef QtxAction* TResult;
   TResult myResult;
   int     myId;
   QString myMenuText;
@@ -1145,13 +1172,13 @@ public:
       if ( !module )
         module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
       if ( module )
-        myResult = module->createAction( myId, myTipText, myIcon, myMenuText, myStatusText, myKey, myToggle );
+        myResult = (QtxAction*)module->createAction( myId, myTipText, myIcon, myMenuText, myStatusText, myKey, myToggle );
     }
   }
 };
-QAction* SalomePyQt::createAction( const int id,           const QString& menuText, 
-				   const QString& tipText, const QString& statusText, 
-				   const QString& icon,    const int key, const bool toggle )
+QtxAction* SalomePyQt::createAction( const int id,           const QString& menuText, 
+				     const QString& tipText, const QString& statusText, 
+				     const QString& icon,    const int key, const bool toggle )
 {
   return ProcessEvent( new TCreateActionEvent( id, menuText, tipText, statusText, icon, key, toggle ) );
 }
@@ -1162,7 +1189,7 @@ QAction* SalomePyQt::createAction( const int id,           const QString& menuTe
 */
 class TActionEvent: public SALOME_Event {
 public:
-  typedef QAction* TResult;
+  typedef QtxAction* TResult;
   TResult myResult;
   int     myId;
   TActionEvent( const int id )
@@ -1173,11 +1200,11 @@ public:
       if ( !module )
         module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
       if ( module )
-        myResult = module->action( myId );
+        myResult = (QtxAction*)module->action( myId );
     }
   }
 };
-QAction* SalomePyQt::action( const int id )
+QtxAction* SalomePyQt::action( const int id )
 {
   return ProcessEvent( new TActionEvent( id ) );
 }
@@ -1190,8 +1217,8 @@ class TActionIdEvent: public SALOME_Event {
 public:
   typedef  int TResult;
   TResult  myResult;
-  const QAction* myAction;
-  TActionIdEvent( const QAction* action )
+  const QtxAction* myAction;
+  TActionIdEvent( const QtxAction* action )
     : myResult( -1 ), myAction( action ) {}
   virtual void Execute() {
     if ( SalomeApp_Application* anApp = getApplication() ) {
@@ -1203,7 +1230,7 @@ public:
     }
   }
 };
-int SalomePyQt::actionId( const QAction* a )
+int SalomePyQt::actionId( const QtxAction* a )
 {
   return ProcessEvent( new TActionIdEvent( a ) );
 }

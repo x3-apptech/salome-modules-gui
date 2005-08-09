@@ -13,17 +13,17 @@
 
 class SALOME_Selection : QObject
 {
-
 %HeaderCode
 #include <SalomePyQt.h>
 %End
 
 public:
-  SALOME_Selection();
-
   void Clear();
   void ClearIObjects();
   void ClearFilters();
+
+private:
+  SALOME_Selection( QObject* /TransferThis/ );
 
 signals:
   void currentSelectionChanged();
@@ -39,9 +39,51 @@ enum MenuName {
   Help        = 7  
 };
 
+class QtxAction
+{
+%TypeHeaderCode
+#include <QtxAction.h>
+%End
+
+public:
+  void setIconSet( const QIconSet& );
+  QIconSet iconSet() const;
+  void setText( const QString& );
+  QString text() const;
+  void setMenuText( const QString& );
+  QString menuText() const;
+  void setToolTip( const QString& );
+  QString toolTip() const;
+  void setStatusTip( const QString& );
+  QString statusTip() const;
+  void setWhatsThis( const QString& );
+  QString whatsThis() const;
+  void setAccel( const QKeySequence& );
+  QKeySequence accel() const;
+  void setToggleAction( bool );
+  bool isToggleAction() const;
+  bool isOn() const;
+  bool isEnabled() const;
+  bool isVisible() const;
+
+public slots:
+  void activate();
+  void toggle();
+  void setOn( bool );
+  void setEnabled( bool );
+  void setDisabled( bool );
+  void setVisible( bool );
+
+signals:
+  void activated();
+  void toggled( bool );
+
+private:
+  QtxAction(const QtxAction &);
+};
+
 class SalomePyQt
 {
-
 %HeaderCode
 #include <SalomePyQt.h>
 %End
@@ -66,10 +108,10 @@ public:
   static bool              dumpView( const QString& );
 
   static int               createTool( const QString& );
-  static int               createTool( const int, const int,      int = -1 );
-  static int               createTool( const int, const QString&, int = -1 );
-  static int               createTool( QAction*,  const int,      int = -1, int = -1 );
-  static int               createTool( QAction*,  const QString&, int = -1, int = -1 );
+  static int               createTool( const int,  const int,      int = -1 );
+  static int               createTool( const int,  const QString&, int = -1 );
+  static int               createTool( QtxAction*, const int,      int = -1, int = -1 );
+  static int               createTool( QtxAction*, const QString&, int = -1, int = -1 );
 
   static int               createMenu( const QString&, const int,
 				       int = -1,       int = -1 );
@@ -79,19 +121,19 @@ public:
 				       int = -1,       int = -1 );
   static int               createMenu( const int,      const QString&, 
 				       int = -1,       int = -1 );
-  static int               createMenu( QAction*,       const int,      int = -1, 
+  static int               createMenu( QtxAction*,     const int,      int = -1, 
 	                               int = -1,       int = -1 );
-  static int               createMenu( QAction*,       const QString&, int = -1, 
+  static int               createMenu( QtxAction*,     const QString&, int = -1, 
 	                               int = -1,       int = -1 );
 
-  static QAction*          createSeparator();
+  static QtxAction*        createSeparator();
 
-  static QAction*          createAction( const int, const QString&, 
+  static QtxAction*        createAction( const int, const QString&, 
 	                                 const QString& = QString::null, const QString& = QString::null, 
 					 const QString& = QString::null, int = 0, bool = false );
 
-  static QAction*          action( const int );
-  static int               actionId( const QAction* );
+  static QtxAction*        action( const int );
+  static int               actionId( const QtxAction* );
 
   static void              addSetting    ( const QString&, const QString&, const double );
   static void              addSetting    ( const QString&, const QString&, const int /Constrained/ );
