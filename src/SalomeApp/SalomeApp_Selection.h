@@ -31,6 +31,8 @@
 
 #include <QtxPopupMgr.h>
 
+#include <SalomeApp.h>
+
 class SalomeApp_SelectionMgr;
 class SalomeApp_DataOwner;
 class SalomeApp_Study;
@@ -38,7 +40,7 @@ class SALOMEDSClient_Study;
 class SUIT_ViewWindow;
 
 
-class SalomeApp_Selection : public QtxPopupMgr::Selection
+class SALOMEAPP_EXPORT SalomeApp_Selection : public QtxPopupMgr::Selection
 {
 public:
   SalomeApp_Selection();

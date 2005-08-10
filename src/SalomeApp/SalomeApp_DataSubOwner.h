@@ -2,12 +2,13 @@
 #ifndef SALOMEAPP_DATASUBOWNER_H
 #define SALOMEAPP_DATASUBOWNER_H
 
+#include <SalomeApp.h>
 #include <SalomeApp_DataOwner.h>
 
 /*!
   Class provide sub owner.
  */
-class SalomeApp_DataSubOwner : public SalomeApp_DataOwner
+class SALOMEAPP_EXPORT SalomeApp_DataSubOwner : public SalomeApp_DataOwner
 {
 public:
     SalomeApp_DataSubOwner( const QString&, const int );

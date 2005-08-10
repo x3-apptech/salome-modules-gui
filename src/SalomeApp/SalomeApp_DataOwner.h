@@ -2,13 +2,14 @@
 #ifndef SALOMEAPP_DATAOWNER_H
 #define SALOMEAPP_DATAOWNER_H
 
+#include <SalomeApp.h>
 #include "SUIT_DataOwner.h"
 #include "SALOME_InteractiveObject.hxx"
 
 /*!
   This class provide data owner objects.
 */
-class SalomeApp_DataOwner : public SUIT_DataOwner
+class SALOMEAPP_EXPORT SalomeApp_DataOwner : public SUIT_DataOwner
 {
 public:
     SalomeApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO );
