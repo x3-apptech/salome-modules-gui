@@ -1932,7 +1932,8 @@ bool SalomeApp_Application::activateModule( CAM_Module* mod )
 /*!Display Catalog Genenerator dialog */
 void SalomeApp_Application::onCatalogGen()
 {
-  ToolsGUI_CatalogGeneratorDlg( desktop() ).exec();
+  ToolsGUI_CatalogGeneratorDlg aDlg( desktop() );
+  aDlg.exec();
 }
 
 /*!Display Registry Display dialog */
