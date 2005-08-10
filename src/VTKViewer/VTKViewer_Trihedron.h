@@ -23,7 +23,7 @@ class VTKViewer_VectorText;
 /*!a subclass of actor that always faces the camera
  *@see vtkFollower
  */
-class VTKViewer_UnScaledActor: public vtkFollower
+class VTKVIEWER_EXPORT VTKViewer_UnScaledActor: public vtkFollower
 {
   VTKViewer_UnScaledActor(const VTKViewer_UnScaledActor&);
   
@@ -48,7 +48,7 @@ protected:
 /*!a subclass of actor that always faces the camera
  *@see vtkFollower
  */
-class VTKViewer_LineActor: public vtkFollower
+class VTKVIEWER_EXPORT VTKViewer_LineActor: public vtkFollower
 {
   VTKViewer_LineActor(const VTKViewer_LineActor&);
   
@@ -94,7 +94,7 @@ protected:
 
 //****************************************************************
 /*!This class provide support trihedron object in vtk viewer.*/
-class VTKVIEWER_EXPORT VTKViewer_Trihedron : public vtkObject
+class VTKVIEWER_EXPORT VTKVIEWER_EXPORT VTKViewer_Trihedron : public vtkObject
 {
 protected:
   /*!Initialize fields by default values.*/
@@ -171,7 +171,7 @@ protected:
  * Its only duty is to give correct initialization and destruction
  * of its pipe-lines
  */
-class VTKViewer_Axis : public vtkObject
+class VTKVIEWER_EXPORT VTKViewer_Axis : public vtkObject
 {
 protected:
   VTKViewer_Axis();

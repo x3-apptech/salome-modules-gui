@@ -29,11 +29,12 @@
 #ifndef SVTK_Prs_H
 #define SVTK_Prs_H
 
+#include <SVTK.h>
 #include "SALOME_Prs.h"
 
 #include <vtkActorCollection.h>
 
-class SVTK_Prs : public SALOME_VTKPrs
+class SVTK_EXPORT SVTK_Prs : public SALOME_VTKPrs
 {
 public:
   SVTK_Prs();
