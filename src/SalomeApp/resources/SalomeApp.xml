@@ -18,7 +18,7 @@
     <parameter name="killall"    value="no"/>
     <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT"/>
     <parameter name="pyModules"  value=""/>
-    <parameter name="embedded"   value="SalomeAppEngine"/>
+    <parameter name="embedded"   value="SalomeAppEngine,study"/>
     <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
   </section>
   <section name="language">
