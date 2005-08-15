@@ -23,7 +23,7 @@
   </section>
   <section name="language">
     <parameter name="language"    value="en"/>
-    <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
+    <parameter name="translators" value="%P_msg_%L.qm|%PM_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>
   <section name="resources">
     <parameter name="SUIT"         value="${SUITRoot}/resources"/>
