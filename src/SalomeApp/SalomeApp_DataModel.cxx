@@ -51,17 +51,26 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
       for ( DataObjectListIterator it( allComponents ); it.current(); ++it ) {
 	SUIT_DataObject* componentObj = it.current();
 	if ( componentObj->name() == aSName ) {
-	  // mkr : modifications for update of already published in object browser, but not loaded yet components
+	  // mkr : modifications for update of already published in
+          // object browser, but not loaded yet components
+	  CAM_Application* anApp = dynamic_cast<CAM_Application*>
+            (SUIT_Session::session()->activeApplication());
+
 	  // asv : corresponding DataObjects are DELETED before update (so they are re-built). 
-	  CAM_Application* anApp = dynamic_cast<CAM_Application*>( SUIT_Session::session()->activeApplication() );
-	  if ( anApp && !anApp->module( aSName ) ) { // if module is not loaded, delete it's DataObject
-	    delete componentObj; // delete DataObject and re-create it and all its sub-objects
-	    break; // proceed to build_a_data_object code below
+	  if (anApp && !anApp->module(aSName)) { // if module is not loaded, delete it's DataObject
+            // jfa: remove children before DataObject deletion
+            DataObjectList chilren = componentObj->children(/*recursive=*/true);
+            for (DataObjectListIterator itc (chilren); itc.current(); ++itc)
+              componentObj->removeChild(itc.current());
+
+            // delete DataObject itself and re-create it and all its sub-objects
+	    delete componentObj;
 	    // don't do anything here, because iterator may be corrupted (deleted object inside it)
-	  }
-	  else
-	    return componentObj;
-	}
+	    break; // proceed to build_a_data_object code below
+          }
+          else
+            return componentObj;
+        }
       }
     }
 
@@ -69,7 +78,7 @@ SUIT_DataObject* SalomeApp_DataModel::BuildTree( const _PTR(SObject)& obj,
                         new SalomeApp_DataObject  ( obj, parent );
 
     _PTR(ChildIterator) it ( study->studyDS()->NewChildIterator( obj ) );
-    for ( ; it->More();it->Next() ) {
+    for ( ; it->More(); it->Next() ) {
       // don't use shared_ptr here, for Data Object will take
       // ownership of this pointer
       _PTR(SObject) aSO( it->Value() );
