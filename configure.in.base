@@ -97,6 +97,8 @@ cc_ok=no
 dnl inutil car libtool
 dnl AC_PROG_CC
 AC_PROG_CXX
+AC_CXX_WARNINGS
+AC_CXX_TEMPLATE_OPTIONS
 AC_DEPEND_FLAG
 # AC_CC_WARNINGS([ansi])
 cc_ok=yes
@@ -369,7 +371,7 @@ do
   case "$local_bin" in
         *.in | *~)                    ;;
         ./bin/CVS | ./bin/salome)                    ;;
-        *) /usr/bin/install -C $i .; echo $local_bin ;;
+        *) $INSTALL $i . ; echo $local_bin ;;
   esac
 done
 cd $ROOT_BUILDDIR
