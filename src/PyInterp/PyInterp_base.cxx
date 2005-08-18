@@ -208,7 +208,7 @@ int compile_command(const char *command,PyObject *context)
 #ifndef WNT
     PyObjWrapper r(PyEval_EvalCode(v,context,context));
 #else
-    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)&v,context,context));
+    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)(void *)v,context,context));
 #endif
     if(!r){
       // Execution error. We return -1
