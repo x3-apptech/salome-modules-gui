@@ -20,7 +20,26 @@
 vtkStandardNewMacro(VTKViewer_UnScaledActor);
 
 /*!Constructor*/
-VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() {/*!Do nothing*/}
+VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() 
+{
+  Bounds[0] = Bounds[2] = Bounds[4] = VTK_LARGE_FLOAT;
+  Bounds[1] = Bounds[3] = Bounds[5] = -VTK_LARGE_FLOAT;
+}
+
+float* 
+VTKViewer_UnScaledActor
+::GetBounds()
+{
+  return Bounds;
+}
+
+/*! Sets \a mySize= \a theSize variable.
+ * \param  theSize - integer size
+ */
+void VTKViewer_UnScaledActor::SetSize(int theSize)
+{
+  mySize = theSize;
+}
 
 /*!This causes the actor to be rendered.
  * Set new scale for actor.
@@ -46,13 +65,6 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
     }
   }
   vtkFollower::Render(theRenderer);
-}
-
-/*! Sets \a mySize= \a theSize variable.
- * \param  theSize - integer size
- */
-void VTKViewer_UnScaledActor::SetSize(int theSize){
-  mySize = theSize;
 }
 
 vtkStandardNewMacro(VTKViewer_LineActor);

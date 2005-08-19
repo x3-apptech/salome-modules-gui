@@ -34,9 +34,10 @@ public:
   /*!Create new instance of VTKViewer_UnScaledActor.*/
   static VTKViewer_UnScaledActor *New();
   
+  virtual float* GetBounds();
   virtual void SetSize(int theSize);
   virtual void Render(vtkRenderer *theRenderer);
-  
+
 protected:
   VTKViewer_UnScaledActor();
   /*!Destructor. Do nothing.*/
