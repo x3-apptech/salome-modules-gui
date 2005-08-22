@@ -290,7 +290,7 @@ public:
 const char* SALOMEGUI_Swig::getSelected( int index )
 {
   QString result = ProcessEvent( new TGetSelectedEvent( index ) );
-  return result.isEmpty() ? NULL : result.latin1();
+  return result.isEmpty() ? NULL : strdup(result.latin1());
 }
 
 /*!
