@@ -40,10 +40,10 @@
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
 
-#include "VTKViewer_ViewManager.h"
-#include "VTKViewer_ViewWindow.h"
-#include "VTKViewer_RenderWindow.h"
-#include "VTKViewer_RenderWindowInteractor.h"
+#include "SVTK_ViewManager.h"
+#include "SVTK_ViewWindow.h"
+#include "SVTK_RenderWindow.h"
+#include "SVTK_RenderWindowInteractor.h"
 
 using namespace std;
 
@@ -76,7 +76,8 @@ static PyObject* GetPyClass(const char* theClassName){
   return aPyClass;
 }
 
-static VTKViewer_ViewWindow* GetVTKViewWindow() {
+static SVTK_ViewWindow* GetVTKViewWindow() {
+  SVTK_ViewWindow* aVW = NULL;
   if ( SUIT_Session::session() ) {
     // get application
     SalomeApp_Application* anApp = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
@@ -85,18 +86,18 @@ static VTKViewer_ViewWindow* GetVTKViewWindow() {
       SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() );
       if ( aStudy ) {
 	// find or create VTK view manager
-	VTKViewer_ViewManager* aVM = dynamic_cast<VTKViewer_ViewManager*>( anApp->getViewManager( "VTKViewer", true ) );
+	SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->getViewManager( "VTKViewer", true ) );
 	if ( aVM ) {
-	  VTKViewer_ViewWindow* aVW = dynamic_cast<VTKViewer_ViewWindow*>( aVM->getActiveView() );
+	  aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
 	  // VSR : When new view window is created it can be not active yet at this moment,
 	  // so the following is a some workaround
 	  if ( !aVW && !aVM->getViews().isEmpty() )
-	    return dynamic_cast<VTKViewer_ViewWindow*>( aVM->getViews()[ 0 ] );
+	    aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[ 0 ] );
 	}
       }
     }
   }
-  return NULL;
+  return aVW;
 }
 
 /*!
@@ -108,7 +109,7 @@ public:
   TResult myResult;
   TGetRendererEvent() : myResult( Py_None ) {}
   virtual void Execute() {
-    if( VTKViewer_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
+    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
       PyObject* aPyClass = GetPyClass("vtkRenderer");
       vtkRenderer* aVTKObject = aVTKViewWindow->getRenderer();
       myResult = PyVTKObject_New(aPyClass,aVTKObject);
@@ -129,7 +130,7 @@ public:
   TResult myResult;
   TGetRenderWindowEvent() : myResult( Py_None ) {}
   virtual void Execute() {
-    if( VTKViewer_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
+    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
       PyObject* aPyClass = GetPyClass("vtkRenderWindow");
       vtkRenderWindow* aVTKObject = aVTKViewWindow->getRenderWindow()->getRenderWindow();
       myResult = PyVTKObject_New(aPyClass,aVTKObject);
@@ -150,7 +151,7 @@ public:
   TResult myResult;
   TGetRenderWindowInteractorEvent() : myResult( Py_None ) {}
   virtual void Execute() {
-    if( VTKViewer_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
+    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow() ) {
       PyObject* aPyClass = GetPyClass("vtkRenderWindowInteractor");
       vtkRenderWindowInteractor* aVTKObject = aVTKViewWindow->getRWInteractor();
       myResult = PyVTKObject_New(aPyClass,aVTKObject);
