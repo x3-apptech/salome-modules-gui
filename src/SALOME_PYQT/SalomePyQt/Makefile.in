@@ -24,7 +24,8 @@ QT_VERS = Qt_3_3_0
 endif
 
 # Sip flags
-SIP_FLAGS = -t WS_X11 -t $(QT_VERS) -s ".cc" -c . -I $(PYQT_SIPS)
+SIP_FLAGS = -t WS_X11 -t $(QT_VERS) $(PYQT_SIPFLAGS) -s ".cc" -c . -I $(PYQT_SIPS)
+
 # Sip common sources
 SIP_SRC = sipSalomePyQtSalomePyQt.cc \
 	  sipSalomePyQtSALOME_Selection.cc \
