@@ -26,6 +26,7 @@ SUIT_ViewWindow::SUIT_ViewWindow(SUIT_Desktop* theDesktop)
 {
   myDesktop = theDesktop;
 }
+
 /*! Destructor.*/
 SUIT_ViewWindow::~SUIT_ViewWindow()
 {
@@ -86,4 +87,17 @@ bool SUIT_ViewWindow::event( QEvent* e )
     return TRUE;
   }
   return QMainWindow::event( e );
+}
+
+/*! Called by SUIT_Accel::onActivated() when a key accelerator was activated and this window was active
+*/
+void SUIT_ViewWindow::onAccelAction( int _action )
+{
+  action( _action );
+}
+
+/*! action  handle standard action (zoom, pan) or custom action.  to be redefined in successors.
+*/
+void SUIT_ViewWindow::action( const int  )
+{
 }

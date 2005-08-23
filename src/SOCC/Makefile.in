@@ -14,15 +14,18 @@ VPATH=.:@srcdir@
 # header files
 EXPORT_HEADERS= SOCC.h \
 		SOCC_ViewModel.h \
-		SOCC_Prs.h
+		SOCC_Prs.h \
+	 	SOCC_ViewWindow.h
 
 # Libraries targets
 LIB = libSOCC.la
 
 LIB_SRC= SOCC_ViewModel.cxx \
-	 SOCC_Prs.cxx
+	 SOCC_Prs.cxx \
+	 SOCC_ViewWindow.cxx
 
-LIB_MOC = SOCC_ViewModel.h
+LIB_MOC = SOCC_ViewModel.h \
+	  SOCC_ViewWindow.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_Exception.idl \

@@ -13,6 +13,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_ToolButton.h"
 #include "SUIT_MessageBox.h"
+#include "SUIT_Accel.h"
 
 #include "SUIT_Tools.h"
 #include "SUIT_ResourceMgr.h"
@@ -1029,4 +1030,24 @@ SVTK_ViewWindow
 {
   QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );
   return px.convertToImage();
+}
+
+//----------------------------------------------------------------------------
+void 
+SVTK_ViewWindow
+::action( const int theAction  )
+{
+  switch ( theAction ) {
+  case SUIT_Accel::PanLeft     : onPanLeft();     break;
+  case SUIT_Accel::PanRight    : onPanRight();    break;
+  case SUIT_Accel::PanUp       : onPanUp();       break;
+  case SUIT_Accel::PanDown     : onPanDown();     break;
+  case SUIT_Accel::ZoomIn      : onZoomIn();      break;
+  case SUIT_Accel::ZoomOut     : onZoomOut();     break;
+  case SUIT_Accel::ZoomFit     : onFitAll();      break;
+  case SUIT_Accel::RotateLeft  : onRotateLeft();  break;
+  case SUIT_Accel::RotateRight : onRotateRight(); break;
+  case SUIT_Accel::RotateUp    : onRotateUp();    break;
+  case SUIT_Accel::RotateDown  : onRotateDown();  break;
+  }   
 }

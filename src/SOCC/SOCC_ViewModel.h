@@ -28,6 +28,8 @@ public:
 
   void      rename( const Handle(SALOME_InteractiveObject)&, const QString& );
 
+  virtual   SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
+
   /* Reimplemented from SALOME_View */
   virtual void                Display( const SALOME_OCCPrs* );
   virtual void                Erase( const SALOME_OCCPrs*, const bool = false );

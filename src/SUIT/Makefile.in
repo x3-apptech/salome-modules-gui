@@ -40,7 +40,8 @@ EXPORT_HEADERS= SUIT.h \
 	 SUIT_ViewManager.h \
 	 SUIT_ViewModel.h \
 	 SUIT_ViewWindow.h \
-	 SUIT_SelectionFilter.h
+	 SUIT_SelectionFilter.h \
+	 SUIT_Accel.h
 
 # .po files to transform in .qm
 PO_FILES = SUIT_images.po \
@@ -74,7 +75,8 @@ LIB_SRC= SUIT_ActionOperation.cxx \
 	 SUIT_ViewManager.cxx \
 	 SUIT_ViewModel.cxx \
 	 SUIT_ViewWindow.cxx \
-	 SUIT_SelectionFilter.cxx
+	 SUIT_SelectionFilter.cxx \
+	 SUIT_Accel.cxx 
 
 LIB_MOC = SUIT_ActionOperation.h \
           SUIT_Application.h \
@@ -90,7 +92,8 @@ LIB_MOC = SUIT_ActionOperation.h \
 	  SUIT_ViewWindow.h \
 	  SUIT_ViewManager.h \
 	  SUIT_SelectionMgr.h \
-          SUIT_Selector.h
+          SUIT_Selector.h \
+	  SUIT_Accel.h 
 
 RESOURCES_FILES = \
 	cascade.png \

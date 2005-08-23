@@ -1,6 +1,7 @@
 #include "SOCC_ViewModel.h"
 
 #include "SOCC_Prs.h"
+#include "SOCC_ViewWindow.h"
 
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
@@ -596,4 +597,15 @@ void SOCC_Viewer::Repaint()
 {
 //  onAdjustTrihedron();
   getViewer3d()->Update();
+}
+
+//=======================================================================
+// name    : createView
+// Purpose : create SOCC_ViewWindow
+//=======================================================================
+SUIT_ViewWindow* SOCC_Viewer::createView( SUIT_Desktop* theDesktop )
+{
+  SOCC_ViewWindow* view = new SOCC_ViewWindow(theDesktop, this);
+  initView( view );
+  return view;
 }

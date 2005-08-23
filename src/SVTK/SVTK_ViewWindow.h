@@ -131,6 +131,7 @@ public slots:
 
 protected:
   QImage dumpView();
+  virtual void      action( const int );
 
 protected slots:
   void onKeyPressed(QKeyEvent* event);
