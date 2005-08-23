@@ -1331,6 +1331,7 @@ bool Plot2d_ViewFrame::isModeVerLinear()
 */
 void Plot2d_ViewFrame::plotMousePressed(const QMouseEvent& me )
 {
+  ((Plot2d_ViewWindow*)parent())->putInfo(getInfo(me.pos()));
   if ( myOperation == NoOpId )
     myOperation = testOperation( me );
   if ( myOperation != NoOpId ) {
