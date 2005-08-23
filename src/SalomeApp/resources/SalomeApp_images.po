@@ -26,3 +26,5 @@ msgstr "icon_module.png"
 msgid "APP_MODULE_BIG_ICO"
 msgstr "icon_module_big.png"
 
+msgid "ICON_SELECT"
+msgstr "icon_select.png"
