@@ -40,7 +40,11 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_TypeFilter.h \
 		SalomeApp_OBFilter.h \
 		SalomeApp_StudyPropertiesDlg.h \
-		SalomeApp_CheckFileDlg.h
+		SalomeApp_CheckFileDlg.h \
+		SalomeApp_Operation.h \
+		SalomeApp_Dialog.h \
+		SalomeApp_UpdateFlags.h \
+		SalomeApp_SwitchOp.cxx
 
 # .po files to transform in .qm
 PO_FILES = SalomeApp_images.po \
@@ -49,7 +53,8 @@ PO_FILES = SalomeApp_images.po \
 # Libraries targets
 LIB = libSalomeApp.la
 
-LIB_SRC= SalomeApp_AboutDlg.cxx \
+LIB_SRC= SalomeApp_Module.cxx \
+	 SalomeApp_AboutDlg.cxx \
          SalomeApp_Application.cxx \
 	 SalomeApp_DataModel.cxx \
 	 SalomeApp_DataObject.cxx \
@@ -58,7 +63,6 @@ LIB_SRC= SalomeApp_AboutDlg.cxx \
 	 SalomeApp_VTKSelector.cxx \
 	 SalomeApp_OBSelector.cxx \
 	 SalomeApp_GLSelector.cxx \
-	 SalomeApp_Module.cxx \
 	 SalomeApp_Study.cxx \
 	 SalomeApp_WidgetContainer.cxx \
 	 SalomeApp_ExceptionHandler.cxx \
@@ -78,7 +82,10 @@ LIB_SRC= SalomeApp_AboutDlg.cxx \
 	 SalomeApp_OBFilter.cxx \
 	 SalomeApp_StudyPropertiesDlg.cxx \
 	 SalomeApp_ListView.cxx \
-	 SalomeApp_CheckFileDlg.cxx
+	 SalomeApp_CheckFileDlg.cxx \
+	 SalomeApp_Operation.cxx \
+	 SalomeApp_Dialog.cxx \
+	 SalomeApp_SwitchOp.cxx
 
 LIB_MOC = SalomeApp_AboutDlg.h \
           SalomeApp_Application.h \
@@ -97,7 +104,10 @@ LIB_MOC = SalomeApp_AboutDlg.h \
 	  SalomeApp_ModuleDlg.h \
 	  SalomeApp_StudyPropertiesDlg.h \
 	  SalomeApp_ListView.h \
-	  SalomeApp_CheckFileDlg.h
+	  SalomeApp_CheckFileDlg.h \
+	  SalomeApp_Operation.h \
+	  SalomeApp_Dialog.h \
+	  SalomeApp_SwitchOp.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_Exception.idl \
@@ -108,6 +118,7 @@ RESOURCES_FILES = icon_about.png \
                   icon_default.png \
                   icon_module.png \
 		  icon_module_big.png \
+		  icon_select.png \
 		  SalomeApp.ini \
 		  SalomeApp.xml
 
