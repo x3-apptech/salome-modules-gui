@@ -28,11 +28,12 @@ class SalomeApp_DataModel;
 class SalomeApp_Application;
 class SalomeApp_Preferences;
 class SalomeApp_SelectionManager;
+class SalomeApp_Operation;
+class SalomeApp_SwitchOp;
 
 /*!
-  Description : Base class for all salome modules
+ * \brief Base class for all salome modules
 */
-
 class SALOMEAPP_EXPORT SalomeApp_Module : public CAM_Module
 {
   Q_OBJECT
@@ -56,12 +57,20 @@ public:
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
   virtual void                        createPreferences();
-
-  /*! Convenient shortcuts*/
-  SalomeApp_Application*              getApp() const;
   
-  void                                updateObjBrowser( bool = true, SUIT_DataObject* = 0 );
+  /*! Convenient shortcuts*/
+ 
+  SalomeApp_Application*              getApp() const;
 
+  virtual void                        update( const int );
+  // Update viewer or/and object browser etc. in accordance with update flags
+  // ( see SalomeApp_UpdateFlags enumeration ). Derived modules can redefine this method
+  // for their own purposes
+    
+  void                                updateObjBrowser( bool = true, SUIT_DataObject* = 0 );
+  // Update object bropwser ( for updating model or whole object browser use update() method
+  // can be used )
+  
   virtual void                        selectionChanged();
   virtual void                        preferencesChanged( const QString&, const QString& );
 
@@ -77,6 +86,8 @@ protected slots:
   virtual void                        onModelSaved();
   virtual void                        onModelOpened();
   virtual void                        onModelClosed();
+  virtual void                        onOperationStopped( SUIT_Operation* );
+  virtual void                        onOperationDestroyed();
 
 protected:
   QtxPopupMgr*                        popupMgr();
@@ -84,16 +95,33 @@ protected:
 
   virtual CAM_DataModel*              createDataModel();
   virtual SalomeApp_Selection*        createSelection() const;
+  virtual void                        updateControls();
+
+  /*! Module stores operations in map. This method starts operation by id.
+   *  If operation isn't in map, then it will be created by createOperation method
+   *  and will be inserted to map
+   */
+  void                                startOperation( const int );
+
+  /*! Create operation by its id. You must not call this method, it will be called automatically
+   *  by startOperation. Please redefine this method in current module
+   */
+  virtual SalomeApp_Operation*        createOperation( const int ) const;
 
   int                                 addPreference( const QString& label );
   int                                 addPreference( const QString& label, const int pId, const int = -1,
-				                     const QString& section = QString::null,
-				                     const QString& param = QString::null );
+                                                     const QString& section = QString::null,
+                                                     const QString& param = QString::null );
   QVariant                            preferenceProperty( const int, const QString& ) const;
   void                                setPreferenceProperty( const int, const QString&, const QVariant& );
 
 private:
-  QtxPopupMgr*                        myPopupMgr;
+  typedef QMap<int,SalomeApp_Operation*> MapOfOperation;
+  
+private:
+  QtxPopupMgr*          myPopupMgr;
+  MapOfOperation        myOperations;
+  SalomeApp_SwitchOp*   mySwitchOp;
 };
 
 #endif
