@@ -88,16 +88,23 @@ void OCCViewer_Viewer::setBackgroundColor( const QColor& c )
     myBgColor = c;
 }
 
+void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
+{
+  if ( view ) {
+    view->initLayout();
+    
+    OCCViewer_ViewPort3d* vp3d = view->getViewPort();
+    if ( vp3d )
+      vp3d->setBackgroundColor( myBgColor );
+  }
+}
+
+
 SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
-  OCCViewer_ViewWindow* res = new OCCViewer_ViewWindow(theDesktop, this);
-  res->initLayout();
-
-  OCCViewer_ViewPort3d* vp3d = res->getViewPort();
-  if ( vp3d )
-    vp3d->setBackgroundColor( myBgColor );
-
-  return res;
+  OCCViewer_ViewWindow* view = new OCCViewer_ViewWindow(theDesktop, this);
+  initView( view );
+  return view;
 }
 
 //*********************************************************************

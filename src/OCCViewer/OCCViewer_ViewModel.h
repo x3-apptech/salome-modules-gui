@@ -15,6 +15,7 @@
 
 class SUIT_ViewWindow;
 class SUIT_Desktop;
+class OCCViewer_ViewWindow;
 
 struct viewAspect
 {
@@ -120,6 +121,9 @@ public:
 
 signals:
   void selectionChanged();
+
+protected:
+  void initView( OCCViewer_ViewWindow* view );
 
 protected slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
