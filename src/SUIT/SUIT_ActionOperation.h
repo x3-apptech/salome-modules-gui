@@ -4,6 +4,10 @@
 #include "SUIT_Operation.h"
 
 class QtxAction;
+class QString;
+class QIconSet;
+class QKeySequence;
+class QWidget;
 
 /*!Provide support QtxAction*/
 class SUIT_EXPORT SUIT_ActionOperation : public SUIT_Operation

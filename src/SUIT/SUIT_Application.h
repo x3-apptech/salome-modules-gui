@@ -12,6 +12,8 @@ class SUIT_Desktop;
 class SUIT_Convertor;
 class SUIT_ViewModel;
 class SUIT_ResourceMgr;
+class QString;
+class QIconSet;
 /*! \class QObject
  * \brief For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
  */
