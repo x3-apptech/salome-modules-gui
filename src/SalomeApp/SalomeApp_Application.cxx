@@ -48,6 +48,7 @@
 
 #include <SUIT_Tools.h>
 #include <SUIT_Session.h>
+#include <SUIT_Accel.h>
 
 #include <QtxToolBar.h>
 #include <QtxMRUAction.h>
@@ -147,6 +148,30 @@ myPrefs( 0 )
   clearViewManagers();
 
   mySelMgr = new SalomeApp_SelectionMgr( this );
+
+  myAccel = new SUIT_Accel( desktop() );
+  myAccel->setActionKey( SUIT_Accel::PanLeft,     CTRL+Key_Left,     OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanRight,    CTRL+Key_Right,    OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanUp,       CTRL+Key_Up,       OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanDown,     CTRL+Key_Down,     OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomIn,      CTRL+Key_Plus,     OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomOut,     CTRL+Key_Minus,    OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomFit,     CTRL+Key_Asterisk, OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateLeft,  ALT+Key_Left,      OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateRight, ALT+Key_Right,     OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      OCCViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanLeft,     CTRL+Key_Left,     VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanRight,    CTRL+Key_Right,    VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanUp,       CTRL+Key_Up,       VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanDown,     CTRL+Key_Down,     VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomIn,      CTRL+Key_Plus,     VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomOut,     CTRL+Key_Minus,    VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomFit,     CTRL+Key_Asterisk, VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateLeft,  ALT+Key_Left,      VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateRight, ALT+Key_Right,     VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      VTKViewer_Viewer::Type() );
 
   connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
            this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
@@ -1944,4 +1969,10 @@ void SalomeApp_Application::onRegDisplay()
   regWnd->show();
   regWnd->raise();
   regWnd->setActiveWindow();
+}
+
+/*!return keyborad accelerators manager object */
+SUIT_Accel* SalomeApp_Application::accel() const
+{
+  return myAccel;
 }

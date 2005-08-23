@@ -32,6 +32,7 @@ class SalomeApp_Module;
 class SalomeApp_Preferences;
 class SalomeApp_SelectionMgr;
 class SalomeApp_WidgetContainer;
+class SUIT_Accel;
 
 class SALOME_LifeCycleCORBA;
 
@@ -102,6 +103,8 @@ public:
   virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
 
   virtual void                        createEmptyStudy();
+
+  SUIT_Accel*                         accel() const;
 
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
@@ -206,6 +209,8 @@ private:
   SalomeApp_SelectionMgr*             mySelMgr;
   ActionMap                           myActions;
   WindowMap                           myWindows;
+
+  SUIT_Accel*                         myAccel;
 
   static SalomeApp_Preferences*       _prefs_;
 };
