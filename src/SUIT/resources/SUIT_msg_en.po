@@ -83,3 +83,27 @@ msgstr "Images Files (*.bmp *.png *.jpg *.jpeg)""
 
 msgid "ERR_CANT_DUMP_VIEW"
 msgstr "Can't dump view contents to the file."
+
+msgid "CONTINUE"
+msgstr "Continue"
+
+msgid "CANCEL"
+msgstr "Cancel"
+
+#======================================================================
+
+msgid "SUIT_Study::OPERATION_LAUNCH"
+msgstr "Operation launch"
+
+msgid "SUIT_Study::PREVIOUS_NOT_FINISHED"
+msgstr "Previous operation is not finished and will be aborted"
+
+#======================================================================
+
+
+
+
+
+
+
+                                            
