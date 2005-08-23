@@ -6,10 +6,11 @@
 #include "SUIT_Operation.h"
 
 #include <qobject.h>
-#include <qptrstack.h>
+#include <qptrlist.h>
 
 class SUIT_DataObject;
 class SUIT_Application;
+class QDialog;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -18,6 +19,7 @@ class SUIT_Application;
 class SUIT_EXPORT SUIT_Study : public QObject
 {
   Q_OBJECT
+  
 public:
   SUIT_Study( SUIT_Application* );
   virtual ~SUIT_Study();
@@ -27,7 +29,6 @@ public:
   SUIT_DataObject*  root() const;
   QString           studyName() const;
   SUIT_Application* application() const;
-  SUIT_Operation*   activeOperation() const;
 
   virtual bool      isSaved()  const;
   virtual bool      isModified() const;
@@ -39,11 +40,22 @@ public:
   bool              saveDocument();
   virtual bool      saveDocumentAs( const QString& );
 
-  virtual void      abortAllOperations();
-
   virtual void      update();
 
   virtual void      sendChangesNotification();
+
+  // Operation management
+  SUIT_Operation*   activeOperation() const;
+  virtual void      abortAllOperations();
+  const QPtrList<SUIT_Operation>& operations() const;
+  
+  virtual SUIT_Operation* blockingOperation( SUIT_Operation* ) const;
+
+  bool              start( SUIT_Operation*, const bool check = true );
+  bool              abort( SUIT_Operation* );
+  bool              commit( SUIT_Operation* );
+  bool              suspend( SUIT_Operation* );
+  bool              resume( SUIT_Operation* );
 
 signals:
   void              studyModified( SUIT_Study* );
@@ -54,14 +66,9 @@ protected:
   virtual void      setRoot( SUIT_DataObject* );
   virtual void      setStudyName( const QString& );
 
-  void              stopOperation();
-  bool              canStartOperation( SUIT_Operation* );
-
-protected:
-  typedef QPtrStack<SUIT_Operation> OperationsStack;
-
-protected:
-  OperationsStack   myOperations;
+private:
+  typedef QPtrList<SUIT_Operation> Operations;
+  void              stop( SUIT_Operation* );
 
 private:
   int               myId;
@@ -70,8 +77,8 @@ private:
   QString           myName;
   bool              myIsSaved;
   bool              myIsModified;
-
-  friend class SUIT_Operation;
+  Operations        myOperations;
+  bool              myBlockChangeState;
 };
 
 #ifdef WIN32
