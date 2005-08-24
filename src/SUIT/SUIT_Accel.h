@@ -8,7 +8,7 @@
 #include "SUIT.h"
 
 #include <qobject.h>
-#include <qstringlist.h>
+#include <qstring.h>
 #include <qmap.h>
 
 class QAccel;
@@ -19,10 +19,25 @@ class SUIT_EXPORT SUIT_Accel: public QObject
   Q_OBJECT
 
 public:
+  enum Actions { 
+    PanLeft = 1, 
+    PanRight, 
+    PanUp, 
+    PanDown, 
+    ZoomIn, 
+    ZoomOut, 
+    ZoomFit, 
+    RotateLeft, 
+    RotateRight, 
+    RotateUp, 
+    RotateDown, 
+    LastAction 
+  };
+
+public:
   SUIT_Accel( SUIT_Desktop* theDesktop );
   virtual ~SUIT_Accel();
 
-  enum Actions { PanLeft = 1, PanRight, PanUp, PanDown, ZoomIn, ZoomOut, ZoomFit, RotateLeft, RotateRight, RotateUp, RotateDown, UserAction };
   void setActionKey( const int action, const int key, const QString& type );
 
 protected slots:
@@ -32,10 +47,9 @@ private:
   QAccel* myAccel; 
   SUIT_Desktop* myDesktop;
 
-  typedef QMap<int, int> KeyActionMap; // key-to-action map
-  typedef QMap<int, QStringList> ActionViewerTypesMap; // key=action id
-  KeyActionMap myKeyActionMap;
-  ActionViewerTypesMap myActionViewerTypesMap;
+  typedef QMap<int, int> IdActionMap; // internal_id - to - action map
+  typedef QMap<QString, IdActionMap> ViewerTypeIdActionMap; // viewer_type - to - IdActionMap
+  ViewerTypeIdActionMap myMap;
 };
 
 #endif

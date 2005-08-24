@@ -31,30 +31,29 @@ SUIT_Accel::~SUIT_Accel()
 /*! setActionKey  assign a ceratain action for a key accelerator */
 void SUIT_Accel::setActionKey( const int action, const int key, const QString& type )
 {    
-  if ( myKeyActionMap.contains( key ) )
-    myAccel->removeItem( action );
+  // 1. get or generate interal "id" of action
+  int id = myAccel->findKey( key );
+  if ( id == -1 )
+    id = myAccel->insertItem( key );
 
-  myKeyActionMap[key] = action;
-  QStringList vTypes;
-  if ( myActionViewerTypesMap.contains( action ) )
-    vTypes = myActionViewerTypesMap[action];
-  if ( !vTypes.contains( type ) )
-    vTypes.append( type );
-  myActionViewerTypesMap[action] = vTypes;
+  IdActionMap idActionMap;
+  if ( myMap.contains( type ) )
+    idActionMap = myMap[type];
 
-  myAccel->insertItem( key, action );
+  idActionMap[id] = action;
+  myMap[type] = idActionMap;
 }
 
 /*! onActivated  slot called when a registered key accelerator was activated */
-void SUIT_Accel::onActivated( int action )
+void SUIT_Accel::onActivated( int id )
 {
   if ( myDesktop ) {
     if ( SUIT_ViewWindow* vw = myDesktop->activeWindow() ) {
       QString type = vw->getViewManager()->getViewModel()->getType();
-      if (  myActionViewerTypesMap.contains( action ) ) {
-	QStringList vTypes = myActionViewerTypesMap[action];
-	if ( vTypes.contains( type ) ) {
-	  vw->onAccelAction( action );
+      if (  myMap.contains( type ) ) {
+	IdActionMap idActionMap = myMap[type];
+	if ( idActionMap.contains( id ) ) {
+	  vw->onAccelAction( idActionMap[id] );
 	}
       }
     }
