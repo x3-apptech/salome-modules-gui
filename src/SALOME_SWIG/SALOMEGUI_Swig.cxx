@@ -138,6 +138,7 @@ void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
     virtual void Execute() {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	anApp->updateObjectBrowser();
+	anApp->updateActions(); //SRN: added in order to update the toolbar
       }
     }
   };
