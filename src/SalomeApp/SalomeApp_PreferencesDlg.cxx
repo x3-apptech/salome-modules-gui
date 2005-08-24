@@ -12,7 +12,7 @@
   Constructor.
 */
 SalomeApp_PreferencesDlg::SalomeApp_PreferencesDlg( SalomeApp_Preferences* prefs, QWidget* parent )
-: QtxDialog( parent, 0, true, false, OK | Cancel | Apply ),
+: QtxDialog( parent, 0, true, false, OK | Close | Apply ),
 myPrefs( prefs )
 {
   setCaption( tr( "CAPTION" ) );
@@ -25,6 +25,8 @@ myPrefs( prefs )
   myPrefs->reparent( base, QPoint( 0, 0 ), true );
 
   setFocusProxy( myPrefs );
+
+  setButtonPosition( Right, Close );
 
   setDialogFlags( AlignOnce );
 
