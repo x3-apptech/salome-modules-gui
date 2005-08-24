@@ -91,7 +91,7 @@ protected:
   SUIT_Application*     startApplication( int, char** ) const;
   SUIT_Application*     startApplication( const QString&, int, char** ) const;
 
-  void                  setDesktop( SUIT_Desktop* );
+  virtual void          setDesktop( SUIT_Desktop* );
 
   //! Creates a new Study instance. Must be redefined in new application according to its Study type.
   virtual SUIT_Study*   createNewStudy();

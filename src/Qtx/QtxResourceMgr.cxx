@@ -287,7 +287,7 @@ bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Sectio
     else if ( data.contains( "=" ) && !section.isEmpty() )
     {
       int pos = data.find( separator );
-      QString key = data.left( pos - 1 ).stripWhiteSpace();
+      QString key = data.left( pos ).stripWhiteSpace();
       QString val = data.mid( pos + 1 ).stripWhiteSpace();
       secMap[section].insert( key, val );
     }

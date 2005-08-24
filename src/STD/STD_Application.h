@@ -109,6 +109,8 @@ protected:
   virtual void          updateDesktopTitle();
   virtual void          updateCommandsStatus();
 
+  virtual void          setDesktop( SUIT_Desktop* );
+
   virtual void          beforeCloseDoc( SUIT_Study* theDoc );
   virtual void          afterCloseDoc();
 
