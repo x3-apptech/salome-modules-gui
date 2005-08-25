@@ -46,7 +46,7 @@ Plot2d_ViewWindow::~Plot2d_ViewWindow()
 void Plot2d_ViewWindow::putInfo(QString theMsg)
 {
   QStatusBar*	aStatusBar = myDesktop->statusBar();
-  aStatusBar->message(theMsg, 3000);
+  aStatusBar->message(theMsg/*, 3000*/);
 }
 
 //****************************************************************
