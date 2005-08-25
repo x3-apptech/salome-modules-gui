@@ -140,6 +140,9 @@ msgstr "Refresh"
 msgid "SalomeApp_Application::MEN_OPENWITH"
 msgstr "Activate Module"
 
+msgid "SalomeApp_Application::MEN_DELETE_REFERENCE"
+msgstr "Delete Reference"
+
 //=======================================================================================
 
 msgid "SalomeApp_Application::MEN_WINDOWS_NEW"
@@ -233,6 +236,54 @@ msgstr "Number of isolines along V"
 
 msgid "SalomeApp_Application::PREF_TRIHEDRON_SHOW"
 msgstr "Show trihedron"
+
+msgid "SalomeApp_Application::PREF_GROUP_PLOT2DVIEWER"
+msgstr "Plot2d Viewer"
+
+msgid "SalomeApp_Application::PREF_SHOW_LEGEND"
+msgstr "Show legend"
+
+msgid "SalomeApp_Application::PREF_LEGEND_POSITION"
+msgstr "Legend position:"
+
+msgid "SalomeApp_Application::PREF_LEFT"
+msgstr "Left"
+
+msgid "SalomeApp_Application::PREF_RIGHT"
+msgstr "Right"
+
+msgid "SalomeApp_Application::PREF_TOP"
+msgstr "Top"
+
+msgid "SalomeApp_Application::PREF_BOTTOM"
+msgstr "Bottom"
+
+msgid "SalomeApp_Application::PREF_CURVE_TYPE"
+msgstr "Curve type:"
+
+msgid "SalomeApp_Application::PREF_POINTS"
+msgstr "Points"
+
+msgid "SalomeApp_Application::PREF_LINES"
+msgstr "Lines"
+
+msgid "SalomeApp_Application::PREF_SPLINE"
+msgstr "Spline"
+
+msgid "SalomeApp_Application::PREF_MARKER_SIZE"
+msgstr "Marker size:"
+
+msgid "SalomeApp_Application::PREF_LINEAR"
+msgstr "Linear"
+
+msgid "SalomeApp_Application::PREF_LOGARITHMIC"
+msgstr "Logarithmic"
+
+msgid "SalomeApp_Application::PREF_HOR_AXIS_SCALE"
+msgstr "Horizontal axis scale:"
+
+msgid "SalomeApp_Application::PREF_VERT_AXIS_SCALE"
+msgstr "Vertical axis scale:"
 
 msgid "SalomeApp_Application::PREF_TAB_DIRECTORIES"
 msgstr "Directories"

@@ -1478,8 +1478,12 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
   int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), viewTab );
 
   int vtkGroup = pref->addPreference( tr( "PREF_GROUP_VTKVIEWER" ), viewTab );
+
+  int plot2dGroup = pref->addPreference( tr( "PREF_GROUP_PLOT2DVIEWER" ), viewTab );
+
   pref->setItemProperty( occGroup, "columns", 1 );
   pref->setItemProperty( vtkGroup, "columns", 1 );
+  pref->setItemProperty( plot2dGroup, "columns", 1 );
 
   int occTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
 				   SalomeApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
@@ -1507,7 +1511,71 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 
   pref->setItemProperty( vtkTS, "min", 1 );
   pref->setItemProperty( vtkTS, "max", 150 );
+  
+  pref->addPreference( tr( "PREF_SHOW_LEGEND" ), plot2dGroup,
+		       SalomeApp_Preferences::Bool, "Plot2d", "ShowLegend" );
 
+  int legendPosition = pref->addPreference( tr( "PREF_LEGEND_POSITION" ), plot2dGroup,
+					    SalomeApp_Preferences::Selector, "Plot2d", "LegendPos" );
+  QStringList aLegendPosList;
+  aLegendPosList.append( tr("PREF_LEFT") );
+  aLegendPosList.append( tr("PREF_RIGHT") );
+  aLegendPosList.append( tr("PREF_TOP") );
+  aLegendPosList.append( tr("PREF_BOTTOM") );
+  
+  QValueList<QVariant> anIndexesList;
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+  anIndexesList.append(2);
+  anIndexesList.append(3);
+  
+  pref->setItemProperty( legendPosition, "strings", aLegendPosList );
+  pref->setItemProperty( legendPosition, "indexes", anIndexesList );
+  
+  int curveType = pref->addPreference( tr( "PREF_CURVE_TYPE" ), plot2dGroup,
+				       SalomeApp_Preferences::Selector, "Plot2d", "CurveType" );
+  QStringList aCurveTypesList;
+  aCurveTypesList.append( tr("PREF_POINTS") );
+  aCurveTypesList.append( tr("PREF_LINES") );
+  aCurveTypesList.append( tr("PREF_SPLINE") );
+  
+  anIndexesList.clear();
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+  anIndexesList.append(2);
+  
+  pref->setItemProperty( curveType, "strings", aCurveTypesList );
+  pref->setItemProperty( curveType, "indexes", anIndexesList );
+
+  int markerSize = pref->addPreference( tr( "PREF_MARKER_SIZE" ), plot2dGroup,
+					SalomeApp_Preferences::IntSpin, "Plot2d", "MarkerSize" );
+
+  pref->setItemProperty( markerSize, "min", 0 );
+  pref->setItemProperty( markerSize, "max", 100 );
+  
+  QStringList aScaleModesList;
+  aScaleModesList.append( tr("PREF_LINEAR") );
+  aScaleModesList.append( tr("PREF_LOGARITHMIC") );
+  
+  anIndexesList.clear();
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+  
+  int horScale = pref->addPreference( tr( "PREF_HOR_AXIS_SCALE" ), plot2dGroup,
+				      SalomeApp_Preferences::Selector, "Plot2d", "HorScaleMode" );
+
+  pref->setItemProperty( horScale, "strings", aScaleModesList );
+  pref->setItemProperty( horScale, "indexes", anIndexesList );
+
+  int verScale = pref->addPreference( tr( "PREF_VERT_AXIS_SCALE" ), plot2dGroup,
+				      SalomeApp_Preferences::Selector, "Plot2d", "VerScaleMode" );
+  
+  pref->setItemProperty( verScale, "strings", aScaleModesList );
+  pref->setItemProperty( verScale, "indexes", anIndexesList );
+
+  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), plot2dGroup,
+		       SalomeApp_Preferences::Color, "Plot2d", "Background" );
+  
   int dirTab = pref->addPreference( tr( "PREF_TAB_DIRECTORIES" ), salomeCat );
   int dirGroup = pref->addPreference( tr( "PREF_GROUP_DIRECTORIES" ), dirTab );
   pref->setItemProperty( dirGroup, "columns", 1 );
