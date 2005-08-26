@@ -114,7 +114,7 @@ QString SalomeApp_DataObject::name() const
 
   if ( isReference() )
     {
-      if ( !(QString(referencedObject()->GetName()).isEmpty()) )
+      if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
 	str = QString( "* " ) + str;
       else
 	str = QString( "<Invalid Reference>" );
@@ -187,7 +187,7 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   case Text:
     if ( isReference() )
       {
-	if ( !(QString(referencedObject()->GetName()).isEmpty()) )
+	if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
 	  clr = QColor( 255, 0, 0 );
 	else
 	  clr = QColor( 200, 200, 200 );
@@ -205,7 +205,7 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   case Highlight:
     if ( isReference() )
       {
-	if ( !(QString(referencedObject()->GetName()).isEmpty()) )
+	if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
 	  clr = QColor( 255, 0, 0 );
 	else
 	  clr = QColor( 200, 200, 200 );
