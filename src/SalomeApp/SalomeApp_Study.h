@@ -35,6 +35,9 @@ public:
 
   _PTR(Study)         studyDS() const;
 
+  // to delete all references to object, whose have the same component
+  void                deleteReferencesTo( _PTR( SObject ) );
+
 signals:
   void                saved( SUIT_Study* );
   void                opened( SUIT_Study* );

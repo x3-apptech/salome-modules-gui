@@ -332,3 +332,18 @@ QString SalomeApp_Study::newStudyName() const
   }
   return newName;
 }
+
+void SalomeApp_Study::deleteReferencesTo( _PTR( SObject ) obj )
+{
+  _PTR(StudyBuilder) sb = studyDS()->NewBuilder();
+  std::vector<_PTR(SObject)> aRefs = studyDS()->FindDependances( obj );
+  for( int i=0, n=aRefs.size(); i<n; i++ )
+  {
+    _PTR( SObject ) o = aRefs[i];
+    if( o->GetFatherComponent()->ComponentDataType()==obj->GetFatherComponent()->ComponentDataType() )
+    {
+      sb->RemoveReference( o );
+      sb->RemoveObjectWithChildren( o );
+    }
+  }
+}
