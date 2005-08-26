@@ -764,6 +764,33 @@ void SalomeApp_Application::onRefresh()
   updateObjectBrowser( true );
 }
 
+/*!Delete references.*/
+void SalomeApp_Application::onDeleteReferences()
+{
+  SALOME_ListIO aList;
+  SalomeApp_SelectionMgr* mgr = selectionMgr();
+  mgr->selectedObjects(aList);
+
+  if (aList.Extent() < 1) return;
+
+  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  _PTR(Study) aStudyDS = aStudy->studyDS();
+  _PTR(StudyBuilder) aStudyBuilder = aStudyDS->NewBuilder();
+  _PTR(SObject) anObj;
+  
+  for ( SALOME_ListIteratorOfListIO it( aList ); it.More(); it.Next() )
+    {
+      if ( it.Value()->hasEntry() )
+	{
+	  _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() );
+	  if ( aSObject->ReferencedObject(anObj) )
+	    aStudyBuilder->RemoveReference(aSObject);
+	}
+    }
+
+  updateObjectBrowser();
+}
+
 /*!Private SLOT. */
 void SalomeApp_Application::onOpenWith()
 {
@@ -1942,10 +1969,45 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   thePopup->insertSeparator();
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
 
-  // "Activate module" item should appear only if it's necessary
+  // Get selected objects
   SALOME_ListIO aList;
   SalomeApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(aList);
+
+  // "Delete reference" item should appear only for invalid references
+  
+  // Check if selected objects is invalid references
+  bool isInvalidRefs = true;
+  
+  if ( aList.Extent() < 1 )
+    isInvalidRefs = false;
+  
+  if ( isInvalidRefs )
+    {
+      SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
+      _PTR(Study) aStudyDS = aStudy->studyDS();
+      _PTR(SObject) anObj;
+      
+      for ( SALOME_ListIteratorOfListIO it( aList ); it.More() && isInvalidRefs; it.Next() )
+	{
+	  if ( it.Value()->hasEntry() )
+	    {
+	      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() );
+	      if ( aSObject->ReferencedObject(anObj) == false || !QString(anObj->GetIOR().c_str()).isEmpty() )
+		isInvalidRefs = false;
+	    }
+	}
+    }
+  
+  // Add "Delete refrence" item to popup
+  if ( isInvalidRefs )
+    {
+      thePopup->insertSeparator();
+      thePopup->insertItem( tr( "MEN_DELETE_REFERENCE" ), this, SLOT( onDeleteReferences() ) );
+      return;
+    }
+
+  // "Activate module" item should appear only if it's necessary
   if (aList.Extent() != 1)
     return;
   Handle(SALOME_InteractiveObject) aIObj = aList.First();
@@ -1955,6 +2017,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   if (currentModule && currentModule->moduleName() == aModuleTitle)
     return;
   thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
+  
 }
 
 /*!Update obect browser*/

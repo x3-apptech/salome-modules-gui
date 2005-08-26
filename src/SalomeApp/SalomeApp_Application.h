@@ -130,6 +130,7 @@ public slots:
 private slots:
   void                                onSelection();
   void                                onRefresh();
+  void                                onDeleteReferences();
 
 protected:
   virtual void                        createActions();

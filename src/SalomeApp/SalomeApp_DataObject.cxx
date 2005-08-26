@@ -113,7 +113,12 @@ QString SalomeApp_DataObject::name() const
   }
 
   if ( isReference() )
-    str = QString( "* " ) + str;
+    {
+      if ( !(text(CT_IOR).isEmpty()) )
+	str = QString( "* " ) + str;
+      else
+	str = QString( "<Invalid Reference>" );
+    }
 
   return str;
 }
@@ -181,7 +186,12 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
   {
   case Text:
     if ( isReference() )
-      clr = QColor( 255, 0, 0 );
+      {
+	if ( !(text(CT_IOR).isEmpty()) )
+	  clr = QColor( 255, 0, 0 );
+	else
+	  clr = QColor( 200, 200, 200 );
+      }
     else if ( myObject )
     {
       _PTR(GenericAttribute) anAttr;
@@ -194,7 +204,12 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
     break;
   case Highlight:
     if ( isReference() )
-      clr = QColor( 255, 0, 0 );
+      {
+	if ( !(text(CT_IOR).isEmpty()) )
+	  clr = QColor( 255, 0, 0 );
+	else
+	  clr = QColor( 200, 200, 200 );
+      }
     break;
   case HighlightedText:
     if ( isReference() )
