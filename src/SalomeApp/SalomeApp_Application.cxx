@@ -1993,7 +1993,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
 	  if ( it.Value()->hasEntry() )
 	    {
 	      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() );
-	      if ( aSObject->ReferencedObject(anObj) == false || !QString(anObj->GetName()).isEmpty() )
+	      if ( aSObject->ReferencedObject(anObj) == false || !QString(anObj->GetName().c_str()).isEmpty() )
 		isInvalidRefs = false;
 	    }
 	}
