@@ -10,6 +10,11 @@
 
 #include <qstring.h>
 
+#include <CASCatch_CatchSignals.hxx>
+#include <CASCatch_ErrorHandler.hxx>
+#include <CASCatch_Failure.hxx> 
+
+
 /*!Constructor. Initialize by \a floatSignal.*/
 SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 : SUIT_ExceptionHandler()
@@ -20,14 +25,21 @@ SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 /*!Try to call SUIT_ExceptionHandler::internalHandle(o, e), catch if failure.*/
 bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
-  try {
+
+  CASCatch_CatchSignals aCatchSignals;
+  aCatchSignals.Activate();
+    
+    
+  CASCatch_TRY {   
     SUIT_ExceptionHandler::internalHandle( o, e );
   }
-  catch( Standard_Failure )
-  {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    throw std::runtime_error( aFail->GetMessageString() );
+  CASCatch_CATCH(CASCatch_Failure) {
+    aCatchSignals.Deactivate();
+    Handle(CASCatch_Failure) aFail = CASCatch_Failure::Caught();          
+    throw std::runtime_error( aFail->GetError() );
   }
+  
+  aCatchSignals.Deactivate();   
   return true;
 }
 

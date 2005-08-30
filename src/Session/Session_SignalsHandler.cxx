@@ -21,18 +21,25 @@
 #include <stdexcept>
 #include <qapplication.h>
 
-#include "CASCatch_SignalsHandler.h" // CAREFUL ! position of this file is critic : see Lucien PIGNOLONI / OCC
-
+#include <CASCatch_CatchSignals.hxx>
+#include <CASCatch_ErrorHandler.hxx>
+#include <CASCatch_Failure.hxx>
 
 extern "C" int HandleSignals(QApplication *theQApplication)
 {
-  CASCatch_SignalsHandler aSignalsHandler;
-  int aRet = -1;
-  try {
+  int aRet = -1; 
+  CASCatch_CatchSignals aCatchSignals;
+  aCatchSignals.Activate();
+        
+  CASCatch_TRY {       
     aRet = theQApplication->exec();
-  }catch(Standard_Failure){
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    throw std::runtime_error(aFail->GetMessageString());
   }
+  CASCatch_CATCH(CASCatch_Failure) {
+    aCatchSignals.Deactivate();    
+    Handle(CASCatch_Failure) aFail = CASCatch_Failure::Caught();
+    throw std::runtime_error( aFail->GetError() );   
+  }
+  
+  aCatchSignals.Deactivate(); 
   return aRet;
 }
