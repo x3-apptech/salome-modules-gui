@@ -75,8 +75,22 @@
   </section>
   <section name="ObjectBrowser" >
     <parameter value="false" name="auto_size" />
+    <parameter value="true" name="visibility_column_0" />
+    <parameter value="false" name="visibility_column_1" />
+    <parameter value="false" name="visibility_column_2" />
+    <parameter value="false" name="visibility_column_3" />
   </section>
-  <section name="Plot2d" >
+  <section name="OCCViewer" >
+    <parameter value="35, 136, 145" name="background" />
+    <parameter value="1" name="iso_number_u" />
+    <parameter value="1" name="iso_number_v" />
+    <parameter value="100" name="trihedron_size" />
+ </section>
+ <section name="VTKViewer" >
+    <parameter value="0, 0, 0" name="background" />
+    <parameter value="100" name="trihedron_size" />
+ </section>
+ <section name="Plot2d" >
     <parameter value="255, 255, 255" name="Background" />
     <parameter value="1" name="CurveType" />
     <parameter value="0" name="HorScaleMode" />
