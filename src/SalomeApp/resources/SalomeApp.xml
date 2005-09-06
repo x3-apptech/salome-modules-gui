@@ -137,6 +137,8 @@
     <parameter value="0.01" name="scalar_bar_vertical_x" />
     <parameter value="0.1" name="scalar_bar_vertical_y" />
     <parameter value="true" name="DisplayMode" />
+    <parameter value="true" name="auto_update" />
+    <parameter value="1" name="display_mode" />
   </section>
   <section name="VISU" >
   <parameter value="false" name="full_med_loading" />
