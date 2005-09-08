@@ -37,7 +37,7 @@ OB_Browser* SalomeApp_OBSelector::browser() const
 /*!
   Gets selection.
 */
-void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& list ) const
+void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& thelist ) const
 {
   if ( !myBrowser )
     return;
@@ -51,26 +51,27 @@ void SalomeApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& list ) const
     {
       Handle( SALOME_InteractiveObject ) aSObj = new SALOME_InteractiveObject
 	( obj->entry(), obj->componentDataType(), obj->name() );
-      list.append( SUIT_DataOwnerPtr( new SalomeApp_DataOwner( aSObj  ) ) );
+      SalomeApp_DataOwner* owner = new SalomeApp_DataOwner( aSObj  );
+      thelist.append( SUIT_DataOwnerPtr( owner ) );
     }
   }
 }
 
 /*!Sets selection.*/
-void SalomeApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& list )
+void SalomeApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& thelist )
 {
   if ( !myBrowser )
     return;
 
-  QMap<QString, SalomeApp_DataObject*> map;
-  fillEntries( map );
+  QMap<QString, SalomeApp_DataObject*> themap;
+  fillEntries( themap );
 
   DataObjectList objList;
-  for ( SUIT_DataOwnerPtrList::const_iterator it = list.begin(); it != list.end(); ++it )
+  for ( SUIT_DataOwnerPtrList::const_iterator it = thelist.begin(); it != thelist.end(); ++it )
   {
     const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*>( (*it).operator->() );
-    if ( owner && map.contains( owner->entry() ) )
-      objList.append( map[owner->entry()] );
+    if ( owner && themap.contains( owner->entry() ) )
+      objList.append( themap[owner->entry()] );
   }
 
   myBrowser->setSelected( objList );
