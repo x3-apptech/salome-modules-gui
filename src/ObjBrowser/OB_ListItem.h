@@ -12,10 +12,11 @@ class SUIT_DataObject;
   base template class for ListViewItems and CheckListItems
 */
 
-template<class T> class ListItem : public T
+template<class T> class ListItemF
 {
 public:
-  ListItem( SUIT_DataObject*, QListView* );
+	ListItemF(T&, SUIT_DataObject* );
+  /*ListItem( SUIT_DataObject*, QListView* );
   ListItem( SUIT_DataObject*, QListViewItem* );
   ListItem( SUIT_DataObject*, QListView*, QListViewItem* );
   ListItem( SUIT_DataObject*, QListViewItem*, QListViewItem* );
@@ -23,25 +24,26 @@ public:
   ListItem( SUIT_DataObject*, QListView*, int );
   ListItem( SUIT_DataObject*, QListViewItem*, int );
   ListItem( SUIT_DataObject*, QListView*, QListViewItem*, int );
-  ListItem( SUIT_DataObject*, QListViewItem*, QListViewItem*, int );
+  ListItem( SUIT_DataObject*, QListViewItem*, QListViewItem*, int );*/
 
-  virtual void            setSelected( bool s );
+  void            setSel( bool s );
   inline SUIT_DataObject* dataObject() const { return myObject; }
-  virtual void            paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
-  virtual void            paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
+  void            paintFoc( QPainter* p, const QColorGroup& cg, const QRect& r );
+  void            paintC( QPainter* p, const QColorGroup& cg, int c, int w, int align );
 
-private:
+protected:
   void                     update();
 
-private:
+protected:
   SUIT_DataObject* myObject;
+  T& myT;
 };
 
 /* 
    ListViewItem class
 */
 
-class OB_EXPORT OB_ListItem : public ListItem<QListViewItem>
+class OB_EXPORT OB_ListItem : public ListItemF<QListViewItem>, public QListViewItem
 {
 public:
 	OB_ListItem( SUIT_DataObject*, QListView* );
@@ -50,6 +52,11 @@ public:
 	OB_ListItem( SUIT_DataObject*, QListViewItem*, QListViewItem* );
 
 	virtual ~OB_ListItem();
+
+  virtual void            setSelected( bool s );
+  virtual void            paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
+  virtual void            paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
+
 
   virtual int      rtti() const;
 
@@ -60,7 +67,7 @@ public:
    CheckListItem class
 */
 
-class OB_EXPORT OB_CheckListItem : public ListItem<QCheckListItem>
+class OB_EXPORT OB_CheckListItem : public ListItemF<QCheckListItem>, public QCheckListItem
 {
 public:
   OB_CheckListItem( SUIT_DataObject*, QListView*, Type = CheckBox );
@@ -70,6 +77,11 @@ public:
 
   virtual ~OB_CheckListItem();
 
+  virtual void            setSelected( bool s );
+  virtual void            paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
+  virtual void            paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
+
+
   virtual int      rtti() const;
 
   static int       RTTI();
@@ -77,8 +89,8 @@ public:
 protected:
   void             stateChange( bool );
 
-private:
-  void             update();
+//private:
+//  void             update();
 };
 
 #endif

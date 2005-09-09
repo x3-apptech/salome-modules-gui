@@ -7,84 +7,23 @@
 #include <qpainter.h>
 #include <qwmatrix.h>
 
+#include <iostream>
+using namespace std;
+
 /*!
     Class: ListItem
     Descr: base template class
 */
+
 template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListView* parent )
-: T( parent ),
+ListItemF<T>::ListItemF(T& theT, SUIT_DataObject* obj) :
+myT(theT),
 myObject( obj )
 {
-  update();
 }
 
 template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListViewItem* parent )
-: T( parent ),
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after )
-: T( parent, after ),
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after )
-: T( parent, after ),
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListView* parent, int type )
-: T( parent, "", (typename T::Type)type ),
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListViewItem* parent, int type )
-: T( parent, "", (typename T::Type)type ),
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after, int type )
-#if defined(QT_VERSION) && QT_VERSION >= 0x030101
-: T( parent, after, "", (typename T::Type)type ),
-#else
-: T( parent, "", (typename T::Type)type ),
-#endif
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-ListItem<T>::ListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after, int type )
-#if defined(QT_VERSION) && QT_VERSION >= 0x030101
-: T( parent, after, "", (typename T::Type)type ),
-#else
-: T( parent, "", (typename T::Type)type ),
-#endif
-myObject( obj )
-{
-  update();
-}
-
-template<class T>
-void ListItem<T>::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align )
+void ListItemF<T>::paintC( QPainter* p, const QColorGroup& cg, int c, int w, int align )
 { 
   QColorGroup colorGrp( cg );
   if ( myObject )
@@ -104,41 +43,41 @@ void ListItem<T>::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, i
   }
 
   
-  p->fillRect( 0, 0, w, this->height(), colorGrp.brush( QColorGroup::Base ) );
-  int itemW = width( p->fontMetrics(), this->listView(), c );
+  p->fillRect( 0, 0, w, myT.height(), colorGrp.brush( QColorGroup::Base ) );
+  int itemW = myT.width( p->fontMetrics(), myT.listView(), c );
     
-  T::paintCell( p, colorGrp, c, itemW,  align );
+  //myT.paintCell( p, colorGrp, c, itemW,  align );
 }
 
 template<class T>
-void ListItem<T>::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r )
+void ListItemF<T>::paintFoc( QPainter* p, const QColorGroup& cg, const QRect& r )
 {
   QRect rect = r;
-  rect.setWidth( width( p->fontMetrics(), this->listView(), 0 ) );
-  T::paintFocus( p, cg, rect );
+  rect.setWidth( myT.width( p->fontMetrics(), myT.listView(), 0 ) );
+  //myT.paintFocus( p, cg, rect );
 }
 
 template<class T>
-void ListItem<T>::setSelected( bool s )
+void ListItemF<T>::setSel( bool s )
 {
-  QListView* lv = T::listView();
+  QListView* lv = myT.listView();
   if ( s && lv && lv->inherits( "OB_ListView" ) )
   {
     OB_ListView* objlv = (OB_ListView*)lv;
-    s = s && objlv->isOk( this );
+    s = s && objlv->isOk( &myT );
   }
 
-  QListViewItem::setSelected( s );
+  //myT.setSelected( s );
 }
 
 template<class T>
-void ListItem<T>::update()
+void ListItemF<T>::update()
 {
   SUIT_DataObject* obj = dataObject();
   if ( !obj )
     return;
 
-  setText( 0, obj->name() );
+  myT.setText( 0, obj->name() );
 
   int aIconW = obj->icon().width();
   if ( aIconW > 0 )
@@ -148,14 +87,14 @@ void ListItem<T>::update()
       QWMatrix aM;
       double aScale = 20.0 / aIconW;
       aM.scale( aScale, aScale );
-      setPixmap( 0, obj->icon().xForm( aM ) );
+      myT.setPixmap( 0, obj->icon().xForm( aM ) );
     }
     else
-      setPixmap( 0, obj->icon() );
+      myT.setPixmap( 0, obj->icon() );
   }
 
-  this->setDragEnabled( obj->isDragable() );
-  this->setDropEnabled( true );
+  myT.setDragEnabled( obj->isDragable() );
+  myT.setDropEnabled( true );
 }
 
 /*!
@@ -164,27 +103,53 @@ void ListItem<T>::update()
 */
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListView* parent )
-: ListItem<QListViewItem>( obj, parent )
+: ListItemF<QListViewItem>( *this, obj ),
+ QListViewItem(parent)
 {
+	update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListViewItem* parent )
-: ListItem<QListViewItem>( obj, parent )
+: ListItemF<QListViewItem>( *this, obj),
+ QListViewItem(parent)
 {
+	update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after )
-: ListItem<QListViewItem>( obj, parent, after )
+: ListItemF<QListViewItem>( *this, obj),
+QListViewItem(parent, after )
 {
+	update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after )
-: ListItem<QListViewItem>( obj, parent, after )
+: ListItemF<QListViewItem>( *this,obj),
+QListViewItem(parent, after )
 {
+	update();
 }
 
 OB_ListItem::~OB_ListItem()
 {
+}
+
+void OB_ListItem::setSelected( bool s ) {
+	cout << "OB_ListItem::setSelected" << endl;
+	setSel(s);
+	QListViewItem::setSelected(s);
+}
+
+void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
+	cout << "OB_ListItem::paintFocus" << endl;
+	paintFoc(p, cg, r);
+	QListViewItem::paintFocus(p, cg, r);
+}
+
+void OB_ListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
+	cout << "OB_ListItem::paintCell" << endl;
+	paintC(p, cg, c ,w, align);
+	QListViewItem::paintCell(p, cg, c, w, align);
 }
 
 int OB_ListItem::RTTI()
@@ -203,27 +168,61 @@ int OB_ListItem::rtti() const
 */
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListView* parent, Type type )
-: ListItem<QCheckListItem>( obj, parent, type )
+: ListItemF<QCheckListItem>( *this, obj),
+QCheckListItem( parent, "", type )
 {
+	update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListViewItem* parent, Type type )
-: ListItem<QCheckListItem>( obj, parent, type )
+: ListItemF<QCheckListItem>( *this, obj),
+QCheckListItem( parent, "", type )
 {
+	update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after, Type type )
-: ListItem<QCheckListItem>( obj, parent, after, type )
+: ListItemF<QCheckListItem>( *this, obj),
+#if defined(QT_VERSION) && QT_VERSION >= 0x030101
+ QCheckListItem( parent, after, "", type )
+#else
+ QCheckListItem( parent, "", type )
+#endif
 {
+	update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after, Type type )
-: ListItem<QCheckListItem>( obj, parent, after, type )
+: ListItemF<QCheckListItem>( *this, obj),
+#if defined(QT_VERSION) && QT_VERSION >= 0x030101
+ QCheckListItem( parent, after, "", type )
+#else
+ QCheckListItem( parent, "", type )
+#endif
 {
+	update();
 }
 
 OB_CheckListItem::~OB_CheckListItem()
 {
+}
+
+void OB_CheckListItem::setSelected( bool s ) {
+	cout << "OB_CheckListItem::setSelected" << endl;
+	setSel(s);
+	QCheckListItem::setSelected(s);
+}
+
+void OB_CheckListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
+	cout << "OB_CheckListItem::paintFocus" << endl;
+	paintFoc(p, cg, r);
+	QCheckListItem::paintFocus(p, cg, r);
+}
+
+void OB_CheckListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
+	cout << "OB_CheckListItem::paintCell" << endl;
+	paintC(p, cg, c ,w, align);
+	QCheckListItem::paintCell(p, cg, c, w, align);
 }
 
 int OB_CheckListItem::RTTI()
