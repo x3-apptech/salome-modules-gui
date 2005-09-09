@@ -135,19 +135,16 @@ OB_ListItem::~OB_ListItem()
 }
 
 void OB_ListItem::setSelected( bool s ) {
-	cout << "OB_ListItem::setSelected" << endl;
 	setSel(s);
 	QListViewItem::setSelected(s);
 }
 
 void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
-	cout << "OB_ListItem::paintFocus" << endl;
 	paintFoc(p, cg, r);
 	QListViewItem::paintFocus(p, cg, r);
 }
 
 void OB_ListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
-	cout << "OB_ListItem::paintCell" << endl;
 	paintC(p, cg, c ,w, align);
 	QListViewItem::paintCell(p, cg, c, w, align);
 }
@@ -208,19 +205,16 @@ OB_CheckListItem::~OB_CheckListItem()
 }
 
 void OB_CheckListItem::setSelected( bool s ) {
-	cout << "OB_CheckListItem::setSelected" << endl;
 	setSel(s);
 	QCheckListItem::setSelected(s);
 }
 
 void OB_CheckListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
-	cout << "OB_CheckListItem::paintFocus" << endl;
 	paintFoc(p, cg, r);
 	QCheckListItem::paintFocus(p, cg, r);
 }
 
 void OB_CheckListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
-	cout << "OB_CheckListItem::paintCell" << endl;
 	paintC(p, cg, c ,w, align);
 	QCheckListItem::paintCell(p, cg, c, w, align);
 }
