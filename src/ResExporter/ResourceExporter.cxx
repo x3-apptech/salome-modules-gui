@@ -96,7 +96,6 @@ int main( int argc, char** argv )
   if ( argc > 1 ) {
     SUIT_ResourceMgr* resMgr = new SUIT_ResourceMgr( QString( "SalomeApp" ), QString( "%1Config" ) );
     resMgr->setVersion( salomeVersion() );
-    resMgr->setVersion( QString( "3.0.0" ));
     resMgr->setCurrentFormat( QString( "xml" ) );
     resMgr->loadLanguage();
     for ( int i = 1; i < argc; i ++ ) {
