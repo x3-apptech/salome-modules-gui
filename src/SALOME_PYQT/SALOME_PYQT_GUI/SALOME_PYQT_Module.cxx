@@ -344,6 +344,37 @@ void SALOME_PYQT_Module::onGUIEvent()
   PyInterp_Dispatcher::Get()->Exec( new GUIEvent( myInterp, this, id ) );
 }
 
+/*!
+ * Processes GUI action (from context popup menu, only for XML-based actions!)
+ */
+void SALOME_PYQT_Module::onGUIEvent( int id ) 
+{
+  // perform synchronous request to Python event dispatcher
+  class GUIEvent : public PyInterp_LockRequest
+  {
+  public:
+    GUIEvent( PyInterp_base*      _py_interp, 
+  	      SALOME_PYQT_Module* _obj,
+	      int                 _id ) 
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myId    ( _id  ),
+        myObj   ( _obj ) {}
+    
+  protected:
+    virtual void execute()
+    {
+      myObj->guiEvent( myId );
+    }
+
+  private:
+    int                 myId;
+    SALOME_PYQT_Module* myObj;
+  };
+
+  // Posting the request
+  PyInterp_Dispatcher::Get()->Exec( new GUIEvent( myInterp, this, id ) );
+}
+
 /*! 
   Context popup menu request.
   Called when user activates popup menu in some window (view, object browser, etc).
@@ -1245,7 +1276,7 @@ void SALOME_PYQT_XmlHandler::insertPopupItems( QDomNode& parentNode, QPopupMenu*
 	// -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	// also check if the action with given ID is already created
 	if ( id != -1 ) {
-	  menu->insertItem( anIcon, label, myModule, SLOT( onGUIEvent() ), QKeySequence( accel ), id, pos );
+	  menu->insertItem( anIcon, label, myModule, SLOT( onGUIEvent(int) ), QKeySequence( accel ), id, pos );
 	}
       }
       else if ( aTagName == "submenu" ) {

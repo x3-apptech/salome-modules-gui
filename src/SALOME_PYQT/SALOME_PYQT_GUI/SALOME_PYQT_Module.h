@@ -138,8 +138,9 @@ public slots:
    ******************************/
 
 public slots:
-  /* GUI action processing slot */
+  /* GUI action processing slots */
   void            onGUIEvent();
+  void            onGUIEvent( int );
 
 private:
   /* internal initizalition */ 
