@@ -256,6 +256,7 @@ SalomeApp_Module* SalomeApp_DataModel::getModule() const
 //================================================================
 SalomeApp_Study* SalomeApp_DataModel::getStudy() const
 {
+  if(!root()) return 0;
   SalomeApp_RootObject* aRoot = dynamic_cast<SalomeApp_RootObject*>( root()->root() );
   if ( !aRoot )
     return 0;
