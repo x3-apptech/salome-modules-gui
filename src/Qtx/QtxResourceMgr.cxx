@@ -447,7 +447,7 @@ bool QtxResourceMgr::XmlFormat::save( const QString& fname, const QMap<QString, 
     QDomElement sect = doc.createElement( sectionTag() );
     sect.setAttribute( nameAttribute(), it.key() );
     root.appendChild( sect );
-    for ( QMap<QString, QString>::ConstIterator iter = it.data().begin(); iter != it.data().end(); ++iter )
+    for ( Section::ConstIterator iter = it.data().begin(); iter != it.data().end(); ++iter )
     {
       QDomElement val = doc.createElement( parameterTag() );
       val.setAttribute( nameAttribute(), iter.key() );
@@ -698,7 +698,9 @@ void QtxResourceMgr::initialize( const bool autoLoad ) const
 
   QtxResourceMgr* that = (QtxResourceMgr*)this;
 
-  that->myResources.append( new Resources( userFileName( appName() ) ) );
+  if ( !userFileName( appName() ).isEmpty() )
+    that->myResources.append( new Resources( userFileName( appName() ) ) );
+
   for ( QStringList::const_iterator it = myDirList.begin(); it != myDirList.end(); ++it )
   {
     QString path = Qtx::addSlash( *it ) + globalFileName( appName() );
@@ -1166,9 +1168,10 @@ void QtxResourceMgr::setCurrentFormat( const QString& fmt )
     return;
 
   ResListIterator resIt( myResources );
-  if ( resIt.current() )
+  if ( myResources.count() > myDirList.count() && resIt.current() ) {
     resIt.current()->setFile( userFileName( appName() ) );
-  ++resIt;
+    ++resIt;
+  }
 
   for ( QStringList::const_iterator it = myDirList.begin(); it != myDirList.end() && resIt.current(); ++it, ++resIt )
     resIt.current()->setFile( Qtx::addSlash( *it ) + globalFileName( appName() ) );
@@ -1305,16 +1308,22 @@ QStringList QtxResourceMgr::parameters( const QString& sec ) const
 {
   initialize();
 
-  QMap<QString, int> map;
-  for ( ResListIterator it( myResources ); it.current(); ++it )
-  {
+#if defined(QTX_NO_INDEXED_MAP)
+  typedef QMap<QString, int> PMap;
+#else
+  typedef IMap<QString, int> PMap;
+#endif
+  PMap pmap;
+  ResListIterator it( myResources );
+  it.toLast();
+  for ( ; it.current(); --it ) {
     QStringList lst = it.current()->parameters( sec );
     for ( QStringList::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
-      map.insert( *itr, 0 );
+      pmap.insert( *itr, 0, false );
   }
 
   QStringList res;
-  for ( QMap<QString, int>::ConstIterator iter = map.begin(); iter != map.end(); ++iter )
+  for ( PMap::ConstIterator iter = pmap.begin(); iter != pmap.end(); ++iter )
     res.append( iter.key() );
 
   return res;
@@ -1428,8 +1437,26 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
     for ( QStringList::const_iterator it = trList.begin(); it != trList.end(); ++it )
       trs.append( substMacro( *it, substMap ).stripWhiteSpace() );
 
-    for ( QStringList::const_iterator itr = trs.begin(); itr != trs.end(); ++itr )
-      loadTranslator( prefix, *itr );
+    loadTranslators( prefix, trs );
+  }
+}
+
+void QtxResourceMgr::loadTranslators( const QString& prefix, const QStringList& translators )
+{
+  initialize();
+
+  QTranslator* trans = 0;
+  ResListIterator it( myResources );
+  it.toLast();
+  for ( ; it.current(); --it ) {
+    for ( QStringList::const_iterator itr = translators.begin(); itr != translators.end(); ++itr ) {
+      trans = it.current()->loadTranslator( resSection(), prefix, *itr );
+      if ( trans ) {
+        if ( !myTranslator[prefix].contains( trans ) )
+          myTranslator[prefix].append( trans );
+        qApp->installTranslator( trans );
+      }
+    }
   }
 }
 
@@ -1438,15 +1465,16 @@ void QtxResourceMgr::loadTranslator( const QString& prefix, const QString& name 
   initialize();
 
   QTranslator* trans = 0;
-  for ( ResListIterator it( myResources ); it.current() && !trans; ++it )
+  ResListIterator it( myResources );
+  it.toLast();
+  for ( ; it.current(); --it ) {
     trans = it.current()->loadTranslator( resSection(), prefix, name );
-
-  if ( !trans )
-    return;
-
-  if ( !myTranslator[prefix].contains( trans ) )
-    myTranslator[prefix].append( trans );
-  qApp->installTranslator( trans );
+    if ( trans ) {
+      if ( !myTranslator[prefix].contains( trans ) )
+        myTranslator[prefix].append( trans );
+      qApp->installTranslator( trans );
+    }
+  }
 }
 
 void QtxResourceMgr::removeTranslators( const QString& prefix )
