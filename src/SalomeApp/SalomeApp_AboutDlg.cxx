@@ -19,7 +19,7 @@ SalomeApp_AboutDlg::SalomeApp_AboutDlg( const QString& defName, const QString& d
 {
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
 
-  QPixmap ico = resMgr->loadPixmap( "SalomeApp", tr( "ICO_ABOUT" ), false );
+  QPixmap ico = resMgr->loadPixmap( "SalomeApp", tr( "APP_DEFAULT_ICO" ), false );
   if ( !ico.isNull() )
     setIcon( ico );
 
