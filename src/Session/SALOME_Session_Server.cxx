@@ -59,6 +59,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
 #include "SUIT_MessageBox.h"
+#include "SUIT_ResourceMgr.h"
 
 #include "SUIT_ExceptionHandler.h"
 
@@ -81,35 +82,6 @@ extern "C" int HandleSignals( QApplication *theQApplication );
  * - stop Session ( must be idle )
  * - get session state
  */
-
-QString salomeVersion()
-{
-  QString path( ::getenv( "GUI_ROOT_DIR" ) );
-  if ( !path.isEmpty() )
-    path += QDir::separator();
-  path += QString( "bin/salome/VERSION" );
-
-  QFile vf( path );
-  if ( !vf.open( IO_ReadOnly ) )
-    return QString::null;
-
-  QString line;
-  vf.readLine( line, 1024 );
-  vf.close();
-
-  if ( line.isEmpty() )
-    return QString::null;
-
-  while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
-    line.remove( line.length() - 1, 1 );
-
-  QString ver;
-  int idx = line.findRev( ":" );
-  if ( idx != -1 )
-    ver = line.mid( idx + 1 ).stripWhiteSpace();
-
-  return ver;
-}
 
 PyObject* salome_shared_modules_module = 0;
 
@@ -152,6 +124,78 @@ static const char* pixmap_not_found_xpm[] = {
 "                ",
 "                "};
 
+QString salomeVersion()
+{
+  QString path( ::getenv( "GUI_ROOT_DIR" ) );
+  if ( !path.isEmpty() )
+    path += QDir::separator();
+  path += QString( "bin/salome/VERSION" );
+
+  QFile vf( path );
+  if ( !vf.open( IO_ReadOnly ) )
+    return QString::null;
+
+  QString line;
+  vf.readLine( line, 1024 );
+  vf.close();
+
+  if ( line.isEmpty() )
+    return QString::null;
+
+  while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
+    line.remove( line.length() - 1, 1 );
+
+  QString ver;
+  int idx = line.findRev( ":" );
+  if ( idx != -1 )
+    ver = line.mid( idx + 1 ).stripWhiteSpace();
+
+  return ver;
+}
+
+class SALOME_ResourceMgr : public SUIT_ResourceMgr
+{
+public:
+  SALOME_ResourceMgr( const QString& app, const QString& resVarTemplate ) : SUIT_ResourceMgr( app, resVarTemplate )
+  {
+    setCurrentFormat( "xml" );
+    setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
+    setDefaultPixmap( QPixmap( pixmap_not_found_xpm ) );
+  }
+  static void initResourceMgr()
+  {
+    if ( myExtAppName.isNull() || myExtAppVersion.isNull() ) {
+      SALOME_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
+      resMgr.loadLanguage( "SalomeApp", "en" );
+
+      myExtAppName = QObject::tr( "APP_NAME" ).stripWhiteSpace();
+      if ( myExtAppName == "APP_NAME" || myExtAppName.lower() == "salome" ) 
+        myExtAppName = "SalomeApp";
+      myExtAppVersion = QObject::tr( "APP_VERSION" );
+      if ( myExtAppVersion == "APP_VERSION" ) {
+        if ( myExtAppName != "SalomeApp" )
+          myExtAppVersion = "";
+	else myExtAppVersion = salomeVersion();
+      }
+    }
+  }
+  QString version() const { return myExtAppVersion; }
+
+protected:
+  QString userFileName( const QString& appName ) const
+  { 
+    if ( version().isNull()  ) return ""; 
+    return SUIT_ResourceMgr::userFileName( myExtAppName );
+  }
+
+public:
+  static QString myExtAppName;
+  static QString myExtAppVersion;
+};
+
+QString SALOME_ResourceMgr::myExtAppName    = QString::null;
+QString SALOME_ResourceMgr::myExtAppVersion = QString::null;
+
 class SALOME_Session : public SUIT_Session
 {
 public:
@@ -161,12 +205,8 @@ public:
 protected:
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
   {
-    SUIT_ResourceMgr* resMgr = new SUIT_ResourceMgr( appName, QString( "%1Config" ) );
-    resMgr->setVersion( salomeVersion() );
-    resMgr->setCurrentFormat( "xml" );
-    resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
-    static QPixmap defaultPixmap( pixmap_not_found_xpm );
-    resMgr->setDefaultPixmap( defaultPixmap );
+    SALOME_ResourceMgr::initResourceMgr();
+    SALOME_ResourceMgr* resMgr = new SALOME_ResourceMgr( appName, QString( "%1Config" ) );
     return resMgr;
   }
 };
@@ -320,14 +360,12 @@ int main( int argc, char **argv )
     if ( isFound( "SPLASH", argc, argv ) )
     {
       // create temporary resource manager just to load splash icon
-      SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
-      resMgr.setVersion( salomeVersion() );
-      resMgr.setCurrentFormat( "xml" );
+      SALOME_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
       resMgr.loadLanguage( "SalomeApp", "en" );
 
       // create splash object: widget ( splash with progress bar ) and "pinging" thread
       InquireServersGUI splash;
-      splash.setPixmap( resMgr.loadPixmap( "SalomeApp", QObject::tr( "ABOUT" ) ) );
+      splash.setPixmap( resMgr.loadPixmap( "SalomeApp", QObject::tr( "ABOUT_SPLASH" ) ) );
       SUIT_Tools::centerWidget( &splash, _qappl.desktop() );
       
       _qappl.setMainWidget( &splash );
