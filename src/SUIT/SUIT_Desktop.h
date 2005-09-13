@@ -3,6 +3,7 @@
 
 #include "SUIT.h"
 
+#include <qmap.h>
 #include <QtxMainWindow.h>
 
 class QPopupMenu;
@@ -14,6 +15,23 @@ class SUIT_EXPORT SUIT_Desktop : public QtxMainWindow
 {
   Q_OBJECT
 
+  class LogoManager
+  {
+  public:
+    LogoManager( SUIT_Desktop* );
+    void                   addLogo( const QString&, const QPixmap& );
+    void                   removeLogo( const QString& );
+    void                   clearLogo();
+
+  private:
+    void                   generateLogo();
+    
+  private:
+    SUIT_Desktop*          myDesktop;
+    QMap<QString, QPixmap> myLogoMap;
+    int                    myId;
+  };
+
 public:
   SUIT_Desktop();
   virtual ~SUIT_Desktop();
@@ -23,6 +41,10 @@ public:
 
   virtual SUIT_ViewWindow* activeWindow() const = 0;
   virtual QPtrList<SUIT_ViewWindow> windows() const = 0;
+
+  void                     addLogo( const QString&, const QPixmap& );
+  void                     removeLogo( const QString& );
+  void                     clearLogo();
 
 signals:
   void                     activated();
@@ -40,6 +62,7 @@ protected:
 private:
   QtxActionMenuMgr*        myMenuMgr;
   QtxActionToolMgr*        myToolMgr;
+  LogoManager              myLogoMan;
 };
 
 #endif
