@@ -668,8 +668,9 @@ void OCCViewer_ViewWindow::createActions()
 //****************************************************************
 void OCCViewer_ViewWindow::createToolBar()
 {
-  myActionsMap[DumpId]->addTo(myToolBar);
-  myActionsMap[TrihedronShowId]->addTo(myToolBar);
+  myActionsMap[DumpId]->addTo(myToolBar);  
+  if ( myModel->trihedronActivated() ) 
+    myActionsMap[TrihedronShowId]->addTo(myToolBar);
 
   SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar, "scale");
   aScaleBtn->AddAction(myActionsMap[FitAllId]);
