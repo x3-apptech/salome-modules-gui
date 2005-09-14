@@ -27,14 +27,9 @@ LIB_SRC= SOCC_ViewModel.cxx \
 LIB_MOC = SOCC_ViewModel.h \
 	  SOCC_ViewWindow.h
 
-LIB_CLIENT_IDL = SALOMEDS.idl \
-		 SALOME_Exception.idl \
-		 SALOME_ModuleCatalog.idl \
-		 SALOME_GenericObj.idl
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(BOOST_CPPFLAGS) 
 
-CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
-
-LDFLAGS+=$(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome
-LIBS+= -lsuit -lSalomeObject -lSalomePrs -lOCCViewer -lOpUtil
+LDFLAGS+=$(QT_MT_LIBS)
+LIBS+= -lsuit -lSalomeObject -lSalomePrs -lOCCViewer
 
 @CONCLUDE@

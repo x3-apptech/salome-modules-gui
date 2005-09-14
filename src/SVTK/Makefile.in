@@ -48,14 +48,9 @@ LIB_MOC = 	SVTK_RenderWindowInteractor.h \
 		SVTK_ViewModel.h \
 		SVTK_ViewManager.h
 
-LIB_CLIENT_IDL = SALOMEDS.idl \
-		 SALOME_Exception.idl \
-		 SALOME_ModuleCatalog.idl \
-		 SALOME_GenericObj.idl
+CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS)
 
-CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome
-
-LDFLAGS+=$(QT_MT_LIBS) $(OCC_LIBS) $(VTK_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome
-LIBS+= -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer -lOpUtil
+LDFLAGS+=$(QT_MT_LIBS) $(OCC_LIBS) $(VTK_LIBS)
+LIBS+= -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer
 
 @CONCLUDE@

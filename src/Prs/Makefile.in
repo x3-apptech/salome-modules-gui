@@ -20,7 +20,7 @@ LIB_CLIENT_IDL =
 BIN = 
 BIN_SRC	=
 
-CPPFLAGS+= -I${KERNEL_ROOT_DIR}/include/salome
+CPPFLAGS+=
 LDFLAGS+=
 
 

@@ -54,16 +54,7 @@
 
 #include <TColStd_IndexedMapOfInteger.hxx>
 
-#include "utilities.h"
-
 using namespace std;
-
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
-
 
 SVTK_RenderWindowInteractor* 
 SVTK_RenderWindowInteractor
@@ -113,8 +104,6 @@ SVTK_RenderWindowInteractor
 SVTK_RenderWindowInteractor
 ::~SVTK_RenderWindowInteractor() 
 {
-  if(MYDEBUG) INFOS("SVTK_RenderWindowInteractor::~SVTK_RenderWindowInteractor()");
-
   delete mTimer ;
 
   myViewWindow->RemoveActor(myCellActor);

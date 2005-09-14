@@ -64,12 +64,6 @@
 using namespace std;
 
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
-
 /*
 static int GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId){
   int anEdgeId = -1;
@@ -117,7 +111,6 @@ VTKViewer_InteractorStyle::VTKViewer_InteractorStyle()
 /*!Destructor.*/
 VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle() 
 {
-//  if(MYDEBUG) INFOS("VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle()");
   m_ViewWnd->RemoveActor(myPreSelectionActor);
 }
 
@@ -899,7 +892,6 @@ void VTKViewer_InteractorStyle::onFinishOperation()
 		Handle(SALOME_InteractiveObject) IO = SActor->getIO();
 		if(aSelectionMode != EdgeOfCellSelection) {
 		  if(CheckDimensionId(aSelectionMode,SActor,anObjId)){
-		    if(MYDEBUG) INFOS(" CellId : "<<anObjId);
 		    if (IsSelected(IO,aSel)) {
 		      // This IO is already in the selection
 		      aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
@@ -919,7 +911,6 @@ void VTKViewer_InteractorStyle::onFinishOperation()
 		  }
 		  int anEdgeId = GetEdgeId(picker,SActor,anObjId);
 		  if (anEdgeId >= 0) {
-		    if(MYDEBUG) INFOS(" CellId : "<<anObjId<<"; EdgeId : "<<anEdgeId);
 		    aSel->AddOrRemoveIndex( IO, anObjId, true, false);
 		    aSel->AddOrRemoveIndex( IO, -anEdgeId-1, true, true );
 		    aSel->AddIObject( IO, false );
@@ -945,7 +936,6 @@ void VTKViewer_InteractorStyle::onFinishOperation()
 		      this->HighlightProp( NULL );
 		      aSel->ClearIObjects();
 		    }
-		    if(MYDEBUG) INFOS(" PointId : "<<anObjId);
 		    aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
 		    aSel->AddIObject( IO, false );
 		  }
@@ -1076,7 +1066,6 @@ void VTKViewer_InteractorStyle::onFinishOperation()
 		      continue;
 		    VTKViewer_CellDataSet cellList = picker->GetCellData(aActor);
 		    if ( !cellList.empty() ) {
-		      if(MYDEBUG) INFOS ( " NAME Actor : " << aSActor->getName() );
 		      SALOME_Selection::TContainerOfId anIndexes;
 		      VTKViewer_CellDataSet::iterator it;
 		      for ( it = cellList.begin(); it != cellList.end(); ++it ) {
@@ -1260,7 +1249,6 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
 	    if(aResult){
 	      mySelectedActor = SActor;
 	      myElemId = anObjId;
-	      if(MYDEBUG) INFOS(" CellId : "<<anObjId);
 	      m_Interactor->setCellData(anObjId,SActor,myPreSelectionActor);
 	    }
 	  }
@@ -1275,7 +1263,6 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
 	      mySelectedActor = SActor;
 	      myEdgeId = anEdgeId;
 	      myElemId = anObjId;
-	      if(MYDEBUG) INFOS(" CellId : "<<anObjId<<"; EdgeId : "<<anEdgeId);
 	      m_Interactor->setEdgeData(anObjId,SActor,-anEdgeId-1,myPreSelectionActor);
 	    } 
 	  }
@@ -1296,7 +1283,6 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
 	if(!anIsSameObjId) {
 	  mySelectedActor = SActor;
 	  myNodeId = anObjId;
-	  if(MYDEBUG) INFOS(" PointId : "<<anObjId);
 	  m_Interactor->setPointData(anObjId,SActor,myPreSelectionActor);
 	}
 	myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
@@ -1328,7 +1314,6 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
 		}
 	      }
 	    }
-	    //if(MYDEBUG) INFOS ( " NAME PREVIEW " << SActor->getName() );
 	  }
 	}
       }

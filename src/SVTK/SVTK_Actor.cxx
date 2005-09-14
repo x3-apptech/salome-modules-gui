@@ -31,8 +31,6 @@
 #include <vtkPolyData.h>
 #include <vtkShrinkFilter.h>
 
-//#include "utilities.h"
-
 using namespace std;
 
 #ifdef _DEBUG_

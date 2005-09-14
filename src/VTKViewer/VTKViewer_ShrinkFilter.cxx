@@ -35,14 +35,6 @@
 #include <vtkPointData.h>
 #include <vtkUnstructuredGrid.h>
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-static int MYDEBUGWITHFILES = 0;
-#else
-static int MYDEBUG = 0;
-static int MYDEBUGWITHFILES = 0;
-#endif
-
 vtkCxxRevisionMacro(VTKViewer_ShrinkFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_ShrinkFilter);
 
