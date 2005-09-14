@@ -3,7 +3,7 @@
 
 #include "SalomeApp.h"
 
-#include <CAM_Study.h>
+#include <LightApp_Study.h>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -11,7 +11,7 @@
 
 #include "SALOMEDSClient.hxx"
 
-class SALOMEAPP_EXPORT SalomeApp_Study : public CAM_Study
+class SALOMEAPP_EXPORT SalomeApp_Study : public LightApp_Study
 {
   Q_OBJECT
 
@@ -35,14 +35,14 @@ public:
 
   _PTR(Study)         studyDS() const;
 
+  virtual std::vector<std::string> GetListOfFiles () const;
+  virtual void        SetListOfFiles (const std::vector<std::string> theListOfFiles);
+  virtual std::string GetTmpDir (const char* theURL,
+                                 const bool  isMultiFile);
+  virtual void        RemoveTemporaryFiles (const bool isMultiFile) const;
+
   // to delete all references to object, whose have the same component
   void                deleteReferencesTo( _PTR( SObject ) );
-
-signals:
-  void                saved( SUIT_Study* );
-  void                opened( SUIT_Study* );
-  void                closed( SUIT_Study* );
-  void                created( SUIT_Study* );
 
 protected:
   virtual void        dataModelInserted( const CAM_DataModel* );
@@ -55,7 +55,6 @@ private:
 private:
   _PTR(Study)         myStudyDS;
 };
-
 
 #ifdef WIN32
 #pragma warning( default:4251 )

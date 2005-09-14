@@ -12,7 +12,7 @@
 #include <SalomeApp_Module.h>
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Operation.h>
-#include <SalomeApp_SelectionMgr.h>
+#include <LightApp_SelectionMgr.h>
 #include <SalomeApp_Dialog.h>
 
 #include <SUIT_Desktop.h>
@@ -209,7 +209,7 @@ SUIT_Operation* SalomeApp_Operation::activeOperation() const
 *
 * This method provided for convinience calls SalomeApp_Application::selectionMgr() one
 */
-SalomeApp_SelectionMgr* SalomeApp_Operation::selectionMgr() const
+LightApp_SelectionMgr* SalomeApp_Operation::selectionMgr() const
 {
   SUIT_Application* app = application();
   if ( app != 0 && app->inherits( "SalomeApp_Application" ) )

@@ -37,6 +37,8 @@ public:
   SalomeApp_PyInterp();
   virtual ~SalomeApp_PyInterp();
 
+  virtual void init_python();
+
 protected:
   virtual bool initContext();
 };

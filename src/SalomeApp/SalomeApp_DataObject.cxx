@@ -1,7 +1,7 @@
 #include "SalomeApp_DataObject.h"
 
 #include "SalomeApp_Study.h"
-#include "SalomeApp_RootObject.h"
+#include "LightApp_RootObject.h"
 
 #include <SUIT_Application.h>
 #include <SUIT_ResourceMgr.h>
@@ -15,62 +15,21 @@
 #include <SALOMEDSClient_AttributeTableOfReal.hxx>
 #include <SALOMEDSClient_AttributeTableOfInteger.hxx>
 
-/*!
-	Class: SalomeApp_DataObject::Key
-	Level: Internal
-*/
-class SalomeApp_DataObject::Key : public SUIT_DataObjectKey
-{
-public:
-  Key( const QString& );
-  virtual ~Key();
-
-  virtual bool isLess( const SUIT_DataObjectKey* ) const;
-  virtual bool isEqual( const SUIT_DataObjectKey* ) const;
-
-private:
-  QString myEntry;
-};
-
-/*!Constructor. Initialize by \a entry.*/
-SalomeApp_DataObject::Key::Key( const QString& entry )
-: SUIT_DataObjectKey(),
-  myEntry( entry )
-{
-}
-
-/*!Destructor. Do nothing.*/
-SalomeApp_DataObject::Key::~Key()
-{
-}
-
-/*!Checks: Is current key less than \a other.*/
-bool SalomeApp_DataObject::Key::isLess( const SUIT_DataObjectKey* other ) const
-{
-  Key* that = (Key*)other;
-  return myEntry < that->myEntry;
-}
-
-/*!Checks: Is current key equal with \a other.*/
-bool SalomeApp_DataObject::Key::isEqual( const SUIT_DataObjectKey* other ) const
-{
-  Key* that = (Key*)other;
-  return myEntry == that->myEntry;
-}
-
 /*
 	Class: SalomeApp_DataObject
 	Level: Public
 */
 /*!Constructor. Initialize by \a parent*/
 SalomeApp_DataObject::SalomeApp_DataObject( SUIT_DataObject* parent )
-: CAM_DataObject( parent )
+: LightApp_DataObject( parent ),
+  CAM_DataObject( parent )
 {
 }
 
 /*!Constructor. Initialize by \a parent and SObject*/
 SalomeApp_DataObject::SalomeApp_DataObject( const _PTR(SObject)& sobj, SUIT_DataObject* parent )
-: CAM_DataObject( parent )
+: LightApp_DataObject( parent ),
+  CAM_DataObject( parent )
 {
   myObject = sobj;
 }
@@ -88,13 +47,6 @@ QString SalomeApp_DataObject::entry() const
   if ( myObject )
     return myObject->GetID().c_str();
   return QString::null;
-}
-
-/*!Create and return new key object.*/
-SUIT_DataObjectKey* SalomeApp_DataObject::key() const
-{
-  QString str = entry();
-  return new Key( str );
 }
 
 /*!Gets name of object.*/
@@ -131,7 +83,7 @@ QPixmap SalomeApp_DataObject::icon() const
     _PTR(AttributePixMap) aPixAttr ( anAttr );
     if ( aPixAttr->HasPixMap() ){
       QString pixmapName = QObject::tr( aPixAttr->GetPixMap().c_str() );
-      SalomeApp_RootObject* aRoot = dynamic_cast<SalomeApp_RootObject*>( root() );
+      LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
       if ( aRoot && aRoot->study() ) {
 	QPixmap pixmap = aRoot->study()->application()->resourceMgr()->loadPixmap( componentDataType(), pixmapName, false ); 
 	return pixmap;
@@ -224,25 +176,6 @@ QString SalomeApp_DataObject::toolTip() const
 {
   //return object()->Name();
   return QString( "Object \'%1\', module \'%2\', ID=%3" ).arg( name() ).arg( componentDataType() ).arg( entry() );
-}
-
-/*!Gets component object.
- *\retval SUIT_DataObject.
- */
-SUIT_DataObject* SalomeApp_DataObject::componentObject() const
-{
-  SUIT_DataObject* compObj = 0;  // for root object (invisible SALOME_ROOT_OBJECT) 
-
-  if ( parent() && parent() == root() ) 
-    compObj = (SUIT_DataObject*)this; // for component-level objects
-  else 
-  {
-    compObj = parent(); // for lower level objects
-    while ( compObj && compObj->parent() != root() )
-      compObj = compObj->parent();
-  }
-
-  return compObj;
 }
 
 /*!Get component type.*/

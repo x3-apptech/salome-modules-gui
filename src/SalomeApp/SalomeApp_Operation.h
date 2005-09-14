@@ -17,7 +17,7 @@
 class SalomeApp_Module;
 class SalomeApp_Application;
 class SalomeApp_Operation;
-class SalomeApp_SelectionMgr;
+class LightApp_SelectionMgr;
 class SalomeApp_Dialog;
 class SUIT_Desktop;
 
@@ -67,7 +67,7 @@ protected:
   
   SUIT_Desktop*             desktop() const;
   SUIT_Operation*           activeOperation() const;
-  SalomeApp_SelectionMgr*   selectionMgr() const;
+  LightApp_SelectionMgr*   selectionMgr() const;
   void                      update( const int );
   void                      setAutoResumed( const bool );
       
