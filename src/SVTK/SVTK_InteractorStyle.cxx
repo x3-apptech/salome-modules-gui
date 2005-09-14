@@ -29,6 +29,8 @@
 
 #include "SVTK_InteractorStyle.h"
 
+#include "utilities.h"
+
 #include "VTKViewer_CellRectPicker.h"
 #include "VTKViewer_Utilities.h"
 #include "VTKViewer_RectPicker.h"
@@ -71,6 +73,12 @@
 
 using namespace std;
 
+
+#ifdef _DEBUG_
+static int MYDEBUG = 0;
+#else
+static int MYDEBUG = 0;
+#endif
 
 namespace
 {
@@ -139,6 +147,7 @@ SVTK_InteractorStyle
 SVTK_InteractorStyle
 ::~SVTK_InteractorStyle() 
 {
+  if(MYDEBUG) INFOS("SVTK_InteractorStyle::~SVTK_InteractorStyle()");
   myViewWindow->RemoveActor(myPreSelectionActor);
 }
 
@@ -902,6 +911,7 @@ SVTK_InteractorStyle
 		Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
 		if(aSelectionMode != EdgeOfCellSelection) {
 		  if(CheckDimensionId(aSelectionMode,aSActor,anObjId)){
+		    if(MYDEBUG) INFOS(" CellId : "<<anObjId);
 		    if (GetSelector()->IsSelected(anIO)) {
 		      // This IO is already in the selection
 		      GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
@@ -921,6 +931,7 @@ SVTK_InteractorStyle
 		  }
 		  int anEdgeId = GetEdgeId(picker,aSActor,anObjId);
 		  if (anEdgeId >= 0) {
+		    if(MYDEBUG) INFOS(" CellId : "<<anObjId<<"; EdgeId : "<<anEdgeId);
 		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,false);
 		    GetSelector()->AddOrRemoveIndex(anIO,-anEdgeId-1,true);
 		    GetSelector()->AddIObject(aSActor);
@@ -946,6 +957,7 @@ SVTK_InteractorStyle
 		      this->HighlightProp( NULL );
 		      GetSelector()->ClearIObjects();
 		    }
+		    if(MYDEBUG) INFOS(" PointId : "<<anObjId);
 		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
 		    GetSelector()->AddIObject(aSActor);
 		  }
@@ -1075,6 +1087,7 @@ SVTK_InteractorStyle
 		      continue;
 		    VTKViewer_CellDataSet cellList = picker->GetCellData(aActor);
 		    if ( !cellList.empty() ) {
+		      if(MYDEBUG) INFOS ( " NAME Actor : " << aSActor->getName() );
 		      TColStd_MapOfInteger anIndexes;
 		      VTKViewer_CellDataSet::iterator it;
 		      for ( it = cellList.begin(); it != cellList.end(); ++it ) {
@@ -1260,6 +1273,7 @@ SVTK_InteractorStyle
 	    if(aResult){
 	      mySelectedActor = aSActor;
 	      myElemId = anObjId;
+	      if(MYDEBUG) INFOS(" CellId : "<<anObjId);
 	      myInteractor->setCellData(anObjId,aSActor,myPreSelectionActor);
 	    }
 	  }
@@ -1274,6 +1288,7 @@ SVTK_InteractorStyle
 	      mySelectedActor = aSActor;
 	      myEdgeId = anEdgeId;
 	      myElemId = anObjId;
+	      if(MYDEBUG) INFOS(" CellId : "<<anObjId<<"; EdgeId : "<<anEdgeId);
 	      myInteractor->setEdgeData(anObjId,aSActor,-anEdgeId-1,myPreSelectionActor);
 	    } 
 	  }
@@ -1294,6 +1309,7 @@ SVTK_InteractorStyle
 	if(!anIsSameObjId) {
 	  mySelectedActor = aSActor;
 	  myNodeId = anObjId;
+	  if(MYDEBUG) INFOS(" PointId : "<<anObjId);
 	  myInteractor->setPointData(anObjId,aSActor,myPreSelectionActor);
 	}
 	myPreSelectionActor->GetProperty()->SetRepresentationToSurface();

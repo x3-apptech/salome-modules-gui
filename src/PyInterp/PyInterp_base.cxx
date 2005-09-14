@@ -14,29 +14,46 @@
 #include <vector>
 
 #include "PyInterp_base.h" // this include must be first (see PyInterp_base.h)!
+#include <Container_init_python.hxx>
 #include <cStringIO.h>
+
+#include <utilities.h>
+
 
 using namespace std;
 
+
+//#ifdef _DEBUG_
+//static int MYDEBUG = 1;
+//static int MYPYDEBUG = 1;
+//#else
+//static int MYDEBUG = 0;
+//static int MYPYDEBUG = 0;
+//#endif
+
+
 PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState): 
   myThreadState(theThreadState),
-  mySaveThreadState(0)
+  mySaveThreadState(KERNEL_PYTHON::_gtstate)
 {
   PyEval_AcquireLock();
   mySaveThreadState = PyThreadState_Swap(myThreadState); // store previous current in save,
                                                          // set local in current
+//  if(MYDEBUG) MESSAGE(" PyLockWrapper "<<this<<" aqcuired: new thread state "<<myThreadState<<" ; old thread state "<<mySaveThreadState);
 }
 
 
 PyLockWrapper::~PyLockWrapper(){
   PyThreadState_Swap(mySaveThreadState); // restore previous current (no need to get local,
   PyEval_ReleaseLock();                  // local thread state* already in _tstate
+//  if(MYDEBUG) MESSAGE(" PyLockWrapper "<<this<<" released: new thread state "<<mySaveThreadState);
 }
 
 
 class PyReleaseLock{
 public:
   ~PyReleaseLock(){
+//    if(MYPYDEBUG) MESSAGE("~PyReleaseLock()");
     PyEval_ReleaseLock();
   }
 };
@@ -62,10 +79,12 @@ PyObject *PyInterp_base::builtinmodule = NULL;
  */
 PyInterp_base::PyInterp_base(): _tstate(0), _vout(0), _verr(0), _g(0), _atFirst(true)
 {
+//  if(MYPYDEBUG) MESSAGE("PyInterp_base::PyInterp_base() - this = "<<this);
 }
 
 PyInterp_base::~PyInterp_base()
 {
+//  if(MYPYDEBUG) MESSAGE("PyInterp_base::~PyInterp_base() - this = "<<this);
   PyLockWrapper aLock(_tstate);
   //Py_EndInterpreter(_tstate);
 }
@@ -84,6 +103,7 @@ void PyInterp_base::initialize()
 
   init_python();
   // Here the global lock is released
+//  if(MYPYDEBUG) MESSAGE("PyInterp_base::initialize() - this = "<<this<<"; _gtstate = "<<_gtstate);
 
   // The lock will be acquired in initState. Make provision to release it on exit
   PyReleaseLock aReleaseLock;
@@ -94,7 +114,9 @@ void PyInterp_base::initialize()
   // used to interpret & compile commands
   PyObjWrapper m(PyImport_ImportModule("codeop"));
   if(!m){
+//    INFOS("PyInterp_base::initialize() - PyImport_ImportModule('codeop') failed");
     PyErr_Print();
+    ASSERT(0);
     return;
   }   
   
@@ -110,17 +132,14 @@ void PyInterp_base::initialize()
 
 void PyInterp_base::init_python()
 {
-  static PyThreadState *_gtstate = 0;
-
-  _atFirst = false;
-  if (Py_IsInitialized())
-    return;
-
-  Py_SetProgramName(_argv[0]);
-  Py_Initialize(); // Initialize the interpreter
-  PySys_SetArgv(_argc, _argv);
-  PyEval_InitThreads(); // Create (and acquire) the interpreter lock
-  _gtstate = PyEval_SaveThread(); // Release global thread state
+  /*
+   * Initialize the main state (_gtstate) if not already done
+   * The lock is released on init_python output
+   * It is the caller responsability to acquire it if needed
+   */
+  MESSAGE("PyInterp_base::init_python");
+  ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
+  SCRUTE(KERNEL_PYTHON::_gtstate);
 //  if(!_gtstate){
 //    PyReleaseLock aReleaseLock;
 //    Py_Initialize(); // Initialize the interpreter
@@ -152,6 +171,7 @@ int PyInterp_base::initRun()
   PySys_SetObject("stdout",PySys_GetObject("__stdout__"));
   PySys_SetObject("stderr",PySys_GetObject("__stderr__"));
 
+//  if(MYPYDEBUG) MESSAGE("PyInterp_base::initRun() - this = "<<this<<"; _verr = "<<_verr<<"; _vout = "<<_vout);
   return 0;
 }
 

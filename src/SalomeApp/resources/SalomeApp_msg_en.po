@@ -47,8 +47,29 @@ msgstr "GNU LGPL"
 
 //=======================================================================================
 
+msgid "SalomeApp_Application::OBJECT_BROWSER"
+msgstr "Object Browser"
+
 msgid "SalomeApp_Application::PYTHON_CONSOLE"
 msgstr "Python Console"
+
+msgid "SalomeApp_Application::LOG_WINDOW"
+msgstr "Message Window"
+
+msgid "SalomeApp_Application::DATA_MODELS"
+msgstr "Data models"
+
+msgid "SalomeApp_Application::NEW_WINDOW_0"
+msgstr "GL view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_1"
+msgstr "Plot2d view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_2"
+msgstr "OCC view"
+
+msgid "SalomeApp_Application::NEW_WINDOW_3"
+msgstr "VTK view"
 
 msgid "SalomeApp_Application::TOT_DESK_FILE_DUMP_STUDY"
 msgstr "Dump study"
@@ -70,6 +91,12 @@ msgstr "Loads python script from file"
 
 msgid "SalomeApp_Application::TOT_FILE_DESK_PREFERENCES"
 msgstr "Preferences"
+
+msgid "SalomeApp_Application::MEN_DESK_PREFERENCES"
+msgstr "Preferences..."
+
+msgid "SalomeApp_Application::PRP_DESK_PREFERENCES"
+msgstr "Allow to change the preferences"
 
 msgid "SalomeApp_Application::MEN_DESK_TOOLS"
 msgstr "Tools"
@@ -107,14 +134,11 @@ msgstr "Properties..."
 msgid "SalomeApp_Application::PRP_DESK_PROPERTIES"
 msgstr "Edits study properties"
 
-msgid "SalomeApp_Application::PREF_CATEGORY_SALOME"
-msgstr "SALOME"
-
-msgid "SalomeApp_Application::PREF_TAB_OBJBROWSER"
-msgstr "Object browser"
+msgid "SalomeApp_Application::MEN_REFRESH"
+msgstr "Refresh"
 
 msgid "SalomeApp_Application::MEN_OPENWITH"
-msgstr "Activate module"
+msgstr "Activate Module"
 
 msgid "SalomeApp_Application::MEN_DELETE_REFERENCE"
 msgstr "Delete Reference"
@@ -127,7 +151,43 @@ msgstr "New window"
 msgid "SalomeApp_Application::MEN_VIEW_WNDS"
 msgstr "Windows"
 
+msgid "SalomeApp_Application::PRP_MODULE"
+msgstr "Switch to the module \"%1\""
+
+msgid "SalomeApp_Application::PRP_APP_MODULE"
+msgstr "Switch to SALOME platform neutral point"
+
+msgid "SalomeApp_Application::INF_TOOLBAR_MODULES"
+msgstr "Modules"
+
+msgid "SalomeApp_Application::INF_CANCELLED"
+msgstr "Module activation cancelled"
+
 //=======================================================================================
+
+msgid "SalomeApp_Application::PREFERENCES_NOT_LOADED"
+msgstr "Preferences for module \"<b>%1</b>\" will be available when the module will be loaded"
+
+msgid "SalomeApp_Application::PREF_FONT"
+msgstr "Font"
+
+msgid "SalomeApp_Application::PREF_CATEGORY_SALOME"
+msgstr "SALOME"
+
+msgid "SalomeApp_Application::PREF_TAB_GENERAL"
+msgstr "General"
+
+msgid "SalomeApp_Application::PREF_TAB_OBJBROWSER"
+msgstr "Object browser"
+
+msgid "SalomeApp_Application::PREF_GROUP_EXT_BROWSER"
+msgstr "External browser"
+
+msgid "SalomeApp_Application::PREF_APP"
+msgstr "Application"
+
+msgid "SalomeApp_Application::PREF_PARAM"
+msgstr "Parameters"
 
 msgid "SalomeApp_Application::PREF_GROUP_DEF_COLUMNS"
 msgstr "Default columns"
@@ -137,6 +197,99 @@ msgstr "Settings"
 
 msgid "SalomeApp_Application::PREF_AUTO_SIZE"
 msgstr "Auto size columns"
+
+msgid "SalomeApp_Application::PREF_GROUP_STUDY"
+msgstr "Study properties"
+
+msgid "SalomeApp_Application::PREF_GROUP_PY_CONSOLE"
+msgstr "Python console properties"
+
+msgid "SalomeApp_Application::PREF_TAB_VIEWERS"
+msgstr "Viewers"
+
+msgid "SalomeApp_Application::PREF_GROUP_OCCVIEWER"
+msgstr "OCC Viewer 3d"
+
+msgid "SalomeApp_Application::PREF_MULTI_FILE"
+msgstr "Multi file save"
+
+msgid "SalomeApp_Application::PREF_ASCII_FILE"
+msgstr "ASCII save"
+
+msgid "SalomeApp_Application::PREF_UNDO_LEVEL"
+msgstr "Undo level"
+
+msgid "SalomeApp_Application::PREF_GROUP_VTKVIEWER"
+msgstr "VTK Viewer 3d"
+
+msgid "SalomeApp_Application::PREF_VIEWER_BACKGROUND"
+msgstr "Background color"
+
+msgid "SalomeApp_Application::PREF_TRIHEDRON_SIZE"
+msgstr "Trihedron size"
+
+msgid "SalomeApp_Application::PREF_ISOS_U"
+msgstr "Number of isolines along U"
+
+msgid "SalomeApp_Application::PREF_ISOS_V"
+msgstr "Number of isolines along V"
+
+msgid "SalomeApp_Application::PREF_TRIHEDRON_SHOW"
+msgstr "Show trihedron"
+
+msgid "SalomeApp_Application::PREF_GROUP_PLOT2DVIEWER"
+msgstr "Plot2d Viewer"
+
+msgid "SalomeApp_Application::PREF_SHOW_LEGEND"
+msgstr "Show legend"
+
+msgid "SalomeApp_Application::PREF_LEGEND_POSITION"
+msgstr "Legend position:"
+
+msgid "SalomeApp_Application::PREF_LEFT"
+msgstr "Left"
+
+msgid "SalomeApp_Application::PREF_RIGHT"
+msgstr "Right"
+
+msgid "SalomeApp_Application::PREF_TOP"
+msgstr "Top"
+
+msgid "SalomeApp_Application::PREF_BOTTOM"
+msgstr "Bottom"
+
+msgid "SalomeApp_Application::PREF_CURVE_TYPE"
+msgstr "Curve type:"
+
+msgid "SalomeApp_Application::PREF_POINTS"
+msgstr "Points"
+
+msgid "SalomeApp_Application::PREF_LINES"
+msgstr "Lines"
+
+msgid "SalomeApp_Application::PREF_SPLINE"
+msgstr "Spline"
+
+msgid "SalomeApp_Application::PREF_MARKER_SIZE"
+msgstr "Marker size:"
+
+msgid "SalomeApp_Application::PREF_LINEAR"
+msgstr "Linear"
+
+msgid "SalomeApp_Application::PREF_LOGARITHMIC"
+msgstr "Logarithmic"
+
+msgid "SalomeApp_Application::PREF_HOR_AXIS_SCALE"
+msgstr "Horizontal axis scale:"
+
+msgid "SalomeApp_Application::PREF_VERT_AXIS_SCALE"
+msgstr "Vertical axis scale:"
+
+msgid "SalomeApp_Application::PREF_TAB_DIRECTORIES"
+msgstr "Directories"
+
+msgid "SalomeApp_Application::PREF_GROUP_DIRECTORIES"
+msgstr "Quick directory list"
 
 //=======================================================================================
 
@@ -163,6 +316,31 @@ msgstr "PYTHON Files (*.py)"
 
 msgid "SalomeApp_Application::STUDY_LOCKED"
 msgstr "LOCKED"
+
+//=======================================================================================
+
+msgid "SalomeApp_ModuleDlg::CAPTION"
+msgstr "Activate module"
+
+msgid "SalomeApp_ModuleDlg::NEW"
+msgstr "&New"
+
+msgid "SalomeApp_ModuleDlg::OPEN"
+msgstr "&Open"
+
+msgid "SalomeApp_ModuleDlg::LOAD"
+msgstr "&Load"
+
+msgid "SalomeApp_ModuleDlg::CANCEL"
+msgstr "&Cancel"
+
+msgid "SalomeApp_ModuleDlg::ActivateComponent_DESCRIPTION"
+msgstr "Create, open or load study."
+
+//=======================================================================================
+
+msgid "SalomeApp_PreferencesDlg::CAPTION"
+msgstr "Preferences"
 
 //=======================================================================================
 
@@ -203,4 +381,7 @@ msgstr "No"
 
 msgid "SalomeApp_Application::PUBLISH_IN_STUDY"
 msgstr "Publish in study"
+
+msgid "SalomeApp_Application::ACTIVATING_MODULE"
+msgstr "Trying to activate module \"%1\""
 

@@ -14,7 +14,7 @@
 #include <qobject.h>
 #include <qcolor.h>
 
-class LightApp_SelectionMgr;
+class SalomeApp_SelectionMgr;
 class SalomeApp_Application;
 class QMenuBar;
 class QPopupMenu;
@@ -40,7 +40,7 @@ private slots:
   void onSelMgrDestroyed();
 
 private:
-  LightApp_SelectionMgr* mySelMgr;
+  SalomeApp_SelectionMgr* mySelMgr;
   SALOME_Selection( QObject* );
 };
 

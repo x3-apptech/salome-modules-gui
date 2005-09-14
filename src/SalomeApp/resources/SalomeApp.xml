@@ -16,7 +16,7 @@
     <parameter name="xterm"      value="no"/>
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
-    <parameter name="modules"    value="GEOM,LIGHT,SMESH,VISU,SUPERV,MED,COMPONENT"/>
+    <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study"/>
     <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
@@ -36,9 +36,7 @@
     <parameter name="SalomeApp"    value="${SUITRoot}/resources"/>
     <parameter name="OB"           value="${SUITRoot}/resources"/>
     <parameter name="CAM"          value="${SUITRoot}/resources"/>
-    <parameter name="LightApp"     value="${SUITRoot}/resources"/>
     <parameter name="GEOM"         value="${GEOM_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources"/>
     <parameter name="SMESH"        value="${SMESH_ROOT_DIR}/share/salome/resources"/>
     <parameter name="VISU"         value="${VISU_ROOT_DIR}/share/salome/resources"/>
     <parameter name="SUPERV"       value="${SUPERV_ROOT_DIR}/share/salome/resources"/>
@@ -52,10 +50,6 @@
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>
     <parameter name="icon"       value="ModuleGeom.png"/>
-  </section>
-  <section name="LIGHT">
-    <parameter name="name"       value="Light"/>
-    <parameter name="icon"       value="LIGHT.png"/>
   </section>
   <section name="SMESH">
     <parameter name="name"       value="Mesh"/>
@@ -80,7 +74,7 @@
     <!-- Here go other common user preferences -->
   </section>
   <section name="ObjectBrowser" >
-    <parameter value="true" name="auto_size" />
+    <parameter value="false" name="auto_size" />
     <parameter value="true" name="visibility_column_0" />
     <parameter value="false" name="visibility_column_1" />
     <parameter value="false" name="visibility_column_2" />

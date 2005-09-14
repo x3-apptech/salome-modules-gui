@@ -482,11 +482,11 @@ void CAM_Application::createEmptyStudy()
 
   STD_Application::createEmptyStudy();
 
-  //SUIT_Study* newStudy = activeStudy();
-  //if ( study != newStudy ) 
-  //{
-  //  CAM_Study* camStudy = dynamic_cast<CAM_Study*>( newStudy );
-  //  for ( ModuleListIterator it( myModules ); it.current(); ++it )
-  //    camStudy->insertDataModel( it.current()->dataModel() );
-  //}
+  SUIT_Study* newStudy = activeStudy();
+  if ( study != newStudy ) 
+  {
+    CAM_Study* camStudy = dynamic_cast<CAM_Study*>( newStudy );
+    for ( ModuleListIterator it( myModules ); it.current(); ++it )
+      camStudy->insertDataModel( it.current()->dataModel() );
+  }
 }

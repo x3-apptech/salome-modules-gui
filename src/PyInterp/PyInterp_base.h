@@ -51,10 +51,7 @@ class PYINTERP_EXPORT PyInterp_base{
   ~PyInterp_base();
   
   virtual void initialize();
-  virtual void init_python();
-  // init_python() made virtual to:
-  // 1. Remove dependency on KERNEL in light SALOME configuration
-  // 2. Allow redefinition of this method in SalomeApp_PyInterp class (it should be empty there and rely on KERNEL_PYTHON)
+  static void init_python();
 
   virtual int run(const char *command); 
 
