@@ -25,7 +25,7 @@
 #include "STD_MDIDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
-#include "SalomeApp_SelectionMgr.h"
+#include "LightApp_SelectionMgr.h"
 #include "OB_Browser.h"
 #include "QtxAction.h"
 
@@ -114,9 +114,9 @@ void SALOME_Selection::onSelMgrDestroyed()
 void SALOME_Selection::Clear()
 {
   class TEvent: public SALOME_Event {
-    SalomeApp_SelectionMgr* mySelMgr;
+    LightApp_SelectionMgr* mySelMgr;
   public:
-    TEvent( SalomeApp_SelectionMgr* selMgr ) 
+    TEvent( LightApp_SelectionMgr* selMgr ) 
       : mySelMgr( selMgr ) {}
     virtual void Execute() {
       if ( mySelMgr )
@@ -142,9 +142,9 @@ void SALOME_Selection::ClearIObjects()
 void SALOME_Selection::ClearFilters()
 {
   class TEvent: public SALOME_Event {
-    SalomeApp_SelectionMgr* mySelMgr;
+    LightApp_SelectionMgr* mySelMgr;
   public:
-    TEvent( SalomeApp_SelectionMgr* selMgr ) 
+    TEvent( LightApp_SelectionMgr* selMgr ) 
       : mySelMgr( selMgr ) {}
     virtual void Execute() {
       if ( mySelMgr )
