@@ -12,8 +12,6 @@
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Application.h"
 
-//#include "utilities.h"
-
 #include "qapplication.h"
 #include <qtoolbar.h>
 #include <qtoolbutton.h>
@@ -381,7 +379,6 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
     if ( xmark-2 == pnt.x() ) {
       xCoord = majXmark; 
       xFound = true;
-//      MESSAGE("Plot2d_ViewFrame::getInfo : close maj X mark("<<i<<") = "<<majXmark<<" "<<xmark<<" "<<pnt.x());
       break;
     }
   }
@@ -392,7 +389,6 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
       if ( xmark-2 == pnt.x() ) {
         xCoord = minXmark; 
         xFound = true;
-//        MESSAGE("Plot2d_ViewFrame::getInfo : close min X mark("<<i<<") = "<<minXmark<<" "<<xmark<<" "<<pnt.x());
         break;
       }
     }
@@ -890,12 +886,6 @@ void Plot2d_ViewFrame::onSettings()
     if ( cols[ "blue-min" ] > color.blue() )
       cols[ "blue-min" ] = color.blue();
   }
-  for (IList::Iterator it = mars.begin();  it != mars.end(); ++it)
-    MESSAGE("markers( " << it.key() << ") = " << it.data() );
-  for (IList::Iterator it = lins.begin();  it != lins.end(); ++it)
-    MESSAGE("lines( " << it.key() << ") = " << it.data() );
-  for (SList::Iterator it = cols.begin();  it != cols.end(); ++it)
-    MESSAGE("colors( " << it.key() << ") = " << it.data() );
 #endif
   
   Plot2d_SetupViewDlg* dlg = new Plot2d_SetupViewDlg( this, true, mySecondY );

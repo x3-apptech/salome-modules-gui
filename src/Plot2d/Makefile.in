@@ -66,9 +66,9 @@ plot2d_settings.png \
 plot2d_splines.png \
 plot2d_zoom.png
 
-CPPFLAGS+=$(QT_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) -I$(KERNEL_ROOT_DIR)/include/salome
+CPPFLAGS+=$(QT_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES)
 
-LDFLAGS+=$(QWT_LIBS) $(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lsuit
+LDFLAGS+=$(QWT_LIBS) $(QT_MT_LIBS) -lsuit
 
 @CONCLUDE@
 
