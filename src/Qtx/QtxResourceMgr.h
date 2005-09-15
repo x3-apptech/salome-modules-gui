@@ -105,8 +105,8 @@ class QTX_EXPORT QtxResourceMgr
   public:
     typedef IMapIterator<Key,Value>      Iterator;
     typedef IMapConstIterator<Key,Value> ConstIterator;
-    friend class Iterator;
-    friend class ConstIterator;
+    friend class IMap<Key,Value>::Iterator;
+    friend class IMap<Key,Value>::ConstIterator;
     
     IMap() {}
     IMap( const IMap& m ) : myKeys( m.myKeys ), myData( m.myData ) {}
