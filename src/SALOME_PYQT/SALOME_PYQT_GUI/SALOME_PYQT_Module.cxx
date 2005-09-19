@@ -18,6 +18,7 @@
 
 #include "QtxWorkstack.h"
 #include <SALOME_LifeCycleCORBA.hxx>
+#include <Container_init_python.hxx>
 
 #include <qfile.h>
 #include <qdom.h>
@@ -94,6 +95,7 @@ private:
 
 // While the SalomePyQtGUI library is not imported in Python it's initialization function
 // should be called manually (and only once) in order to initialize global sip data
+// and to get C API from sip : sipBuildResult for example
 #if defined(SIP_STATIC_MODULE)
 extern "C" void initSalomePyQtGUI();
 #else
@@ -109,7 +111,9 @@ extern "C" {
     static bool alreadyInitialized = false;
     if ( !alreadyInitialized ) {
       // call only once (see above) !
+      PyEval_RestoreThread( KERNEL_PYTHON::_gtstate );
       initSalomePyQtGUI(); 
+      PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate );
       alreadyInitialized = !alreadyInitialized;
     }
     return new SALOME_PYQT_Module();
