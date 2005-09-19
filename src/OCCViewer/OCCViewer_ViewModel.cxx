@@ -443,7 +443,7 @@ void OCCViewer_Viewer::setIsos( const int u, const int v )
   return;
 
   ic->SetIsoNumber( u, AIS_TOI_IsoU );
-  ic->SetIsoNumber( u, AIS_TOI_IsoV );
+  ic->SetIsoNumber( v, AIS_TOI_IsoV );
 }
 
 void OCCViewer_Viewer::isos( int& u, int& v ) const
