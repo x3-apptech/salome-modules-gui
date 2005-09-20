@@ -14,11 +14,21 @@
 #include "SalomeApp_Study.h"
 
 #include "SUIT_Session.h"
+#include <SUIT_Desktop.h>
+#include <SUIT_MessageBox.h>
 
-#include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
+// OCCT Includes
+#include <OSD_Process.hxx>
+#include <Quantity_Date.hxx>
 
+// CORBA Headers
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
+
+// QT Includes
 #include <qpushbutton.h>
 #include <qlayout.h>
+
 using namespace std;
 
 #define  DEFAULT_MARGIN 11
@@ -54,23 +64,24 @@ public:
   {
     QStringList list;
     switch(getUserType()) {
-    case SalomeApp_StudyPropertiesDlg::prpModeId:
-      {
-	list << SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_SCRATCH") << 
-	        SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_COPYFROM");
-	theWidget->insertList(list);
-	break;
-      }
+    //case SalomeApp_StudyPropertiesDlg::prpModeId:
+    //  {
+    //    list << SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_SCRATCH") <<
+    //        SalomeApp_StudyPropertiesDlg::tr("PRP_MODE_FROM_COPYFROM");
+    //    theWidget->insertList(list);
+    //    break;
+    //  }
     case SalomeApp_StudyPropertiesDlg::prpLockedId:
       {
 	list << SalomeApp_StudyPropertiesDlg::tr( "PRP_NO" ) << SalomeApp_StudyPropertiesDlg::tr( "PRP_YES" );
-	theWidget->insertList(list, getValue() == SalomeApp_StudyPropertiesDlg::tr( "PRP_NO" ) ? 0 : 1 );    
+	theWidget->insertList(list, getValue() == SalomeApp_StudyPropertiesDlg::tr( "PRP_NO" ) ? 0 : 1 );
 	break;
       }
     case SalomeApp_StudyPropertiesDlg::prpModificationsId:
       {
-	SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
-	if (study) { 
+	SalomeApp_Study* study =
+          dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
+	if (study) {
 	  _PTR(Study) studyDoc = study->studyDS();
 	  _PTR(AttributeStudyProperties) propAttr;
 	  if ( studyDoc ) {
@@ -82,17 +93,17 @@ public:
 	      int aCnt = aUsers.size();
 	      for ( int i = 0; i < aCnt; i++ ) {
 		QString val;
-		val.sprintf("%2.2d/%2.2d/%2d %2.2d:%2.2d", 
-			    aDays  [i], 
-			    aMonths[i], 
-			    aYears [i], 
-			    aHours [i], 
+		val.sprintf("%2.2d/%2.2d/%2d %2.2d:%2.2d",
+			    aDays  [i],
+			    aMonths[i],
+			    aYears [i],
+			    aHours [i],
 			    aMins  [i]);
 		val = val + " : " + QString( aUsers[i].c_str() );
 		list.prepend(val);
 	      }
 	      theWidget->setDuplicatesEnabled(true);
-	      theWidget->insertList(list);    
+	      theWidget->insertList(list);
 	    }
 	  }
 	}
@@ -127,7 +138,7 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   QGridLayout* mainLayout = new QGridLayout(this);
   mainLayout->setMargin(DEFAULT_MARGIN);
   mainLayout->setSpacing(DEFAULT_SPACING);
-  
+
   myPropList = new SalomeApp_ListView(this);
   myPropList->addColumn("");
   myPropList->addColumn("");
@@ -141,11 +152,13 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   myCancelBtn = new QPushButton(tr("BUT_CANCEL"), this);
   mainLayout->addWidget(myCancelBtn, 1, 2);
 
-  QSpacerItem* spacer1 = new QSpacerItem(SPACER_SIZE, SPACER_SIZE, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QSpacerItem* spacer1 =
+    new QSpacerItem(SPACER_SIZE, SPACER_SIZE, QSizePolicy::Expanding, QSizePolicy::Minimum);
   mainLayout->addItem(spacer1, 1, 1);
 
   // Display study properties
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
+  SalomeApp_Study* study =
+    dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
   if (study)
     myStudyDoc = study->studyDS();
 
@@ -169,7 +182,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
 {
   bool hasData = myStudyDoc;
   _PTR(AttributeStudyProperties) propAttr;
-  if (hasData) 
+  if (hasData)
     propAttr = myStudyDoc->GetProperties();
   hasData = hasData && propAttr;
 
@@ -188,7 +201,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
       item->setValue(strDate);
     }
   }
-  
+
   // Creation mode
 //  item = new SalomeApp_PropItem(myPropList, item, tr("PRP_MODE")+":", true, prpModeId);
 //  item->setEditingType( SalomeApp_EntityEdit::etComboBox);
@@ -196,12 +209,23 @@ void SalomeApp_StudyPropertiesDlg::initData()
 
   // Locked or not
   item = new SalomeApp_PropItem(myPropList, item, tr("PRP_LOCKED")+":", true, prpLockedId);
-  item->setEditingType( SalomeApp_EntityEdit::etComboBox);  
+  item->setEditingType( SalomeApp_EntityEdit::etComboBox);
   if ( hasData )
     item->setValue( tr( propAttr->IsLocked() ? "PRP_YES" : "PRP_NO" ) );
 
   // Saved or not
   item = new SalomeApp_PropItem(myPropList, item, tr("PRP_MODIFIED")+":", false, prpSavedId);
+  bool isModified = false;
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>
+    (SUIT_Session::session()->activeApplication()->activeStudy());
+  if (study) {
+    isModified = study->isModified();
+    if (hasData) {
+      if (propAttr->IsModified() != isModified) {
+        propAttr->SetModified((int)isModified);
+      }
+    }
+  }
   if (hasData) {
     if (propAttr->IsModified())
       item->setValue( tr( "PRP_YES" ) );
@@ -210,20 +234,20 @@ void SalomeApp_StudyPropertiesDlg::initData()
   }
 
   // Modifications list
-  item = new SalomeApp_PropItem(myPropList, item, tr("PRP_MODIFICATIONS")+":", true, prpModificationsId); 
-  item->setEditingType( SalomeApp_EntityEdit::etComboBox);  
-  if (hasData) { 
+  item = new SalomeApp_PropItem(myPropList, item, tr("PRP_MODIFICATIONS")+":", true, prpModificationsId);
+  item->setEditingType( SalomeApp_EntityEdit::etComboBox);
+  if (hasData) {
     std::vector<std::string> aUsers;
     std::vector<int> aMins, aHours, aDays, aMonths, aYears;
     propAttr->GetModificationsList(aUsers, aMins, aHours, aDays, aMonths, aYears, false);
     int aLast = aUsers.size()-1;
     if (aLast >= 0) {
       QString val;
-      val.sprintf("%2.2d/%2.2d/%2d %2.2d:%2.2d", 
-		  aDays  [aLast], 
-		  aMonths[aLast], 
-		  aYears [aLast], 
-		  aHours [aLast], 
+      val.sprintf("%2.2d/%2.2d/%2d %2.2d:%2.2d",
+		  aDays  [aLast],
+		  aMonths[aLast],
+		  aYears [aLast],
+		  aHours [aLast],
 		  aMins  [aLast]);
       val = val + " : " + QString(aUsers[aUsers.size()-1].c_str());
       item->setValue(val);
@@ -250,21 +274,37 @@ void SalomeApp_StudyPropertiesDlg::onOK()
 
   if (acceptData()) {
     _PTR(AttributeStudyProperties) propAttr = myStudyDoc->GetProperties();
-    myChanged = propChanged();
-    if ( propAttr && myChanged ) {
+    //myChanged = propChanged();
+    if ( propAttr /*&& myChanged*/ ) {
       QListViewItemIterator it( myPropList );
       // iterate through all items of the listview
       for ( ; it.current(); ++it ) {
 	SalomeApp_PropItem* item = (SalomeApp_PropItem*)(it.current());
 	switch (item->getUserType()) {
 	case prpAuthorId:
-	  propAttr->SetUserName(item->getValue().stripWhiteSpace().latin1());
+          if (QString(propAttr->GetUserName().c_str()) != item->getValue().stripWhiteSpace()) {
+            if (!propAttr->IsLocked()) {
+              propAttr->SetUserName(item->getValue().stripWhiteSpace().latin1());
+              myChanged = true;
+            } else {
+              SUIT_MessageBox::warn1(SUIT_Session::session()->activeApplication()->desktop(),
+                                     QObject::tr("WRN_WARNING"),
+                                     QObject::tr("WRN_STUDY_LOCKED"),
+                                     QObject::tr("BUT_OK"));
+            }
+          }
 	  break;
-	case prpModeId:
-	  propAttr->SetCreationMode(item->getValue().stripWhiteSpace().latin1());
-	  break;
+        //case prpModeId:
+	//  propAttr->SetCreationMode(item->getValue().stripWhiteSpace().latin1());
+	//  break;
 	case prpLockedId:
-	  propAttr->SetLocked(item->getValue().compare(tr("PRP_YES")) == 0);
+          {
+            bool bLocked = item->getValue().compare(tr("PRP_YES")) == 0;
+            if (propAttr->IsLocked() != bLocked) {
+              propAttr->SetLocked(bLocked);
+              myChanged = true;
+            }
+          }
 	  break;
 	default:
 	  break;
@@ -276,14 +316,15 @@ void SalomeApp_StudyPropertiesDlg::onOK()
 }
 
 /*!
-  Check is properties chenged?
+  Check is properties changed?
 */
-bool SalomeApp_StudyPropertiesDlg::propChanged() {
+bool SalomeApp_StudyPropertiesDlg::propChanged()
+{
   _PTR(AttributeStudyProperties) propAttr = myStudyDoc->GetProperties();
-  if ( propAttr ) {
-    QListViewItemIterator it( myPropList );
+  if (propAttr) {
+    QListViewItemIterator it (myPropList);
     // iterate through all items of the listview
-    for ( ; it.current(); ++it ) {
+    for (; it.current(); ++it) {
       SalomeApp_PropItem* item = (SalomeApp_PropItem*)(it.current());
       switch (item->getUserType()) {
       case prpAuthorId:
@@ -291,11 +332,11 @@ bool SalomeApp_StudyPropertiesDlg::propChanged() {
 	  return true;
 	}
 	break;
-      case prpModeId:
-	if ( QString( propAttr->GetCreationMode().c_str() ) != item->getValue().stripWhiteSpace() ) {
-	  return true;
-        }
-	break;
+      //case prpModeId:
+      //  if ( QString( propAttr->GetCreationMode().c_str() ) != item->getValue().stripWhiteSpace() ) {
+      //    return true;
+      //  }
+      //  break;
       case prpLockedId:
 	{
 	  bool bLocked = item->getValue().compare( tr( "PRP_YES" ) ) == 0;

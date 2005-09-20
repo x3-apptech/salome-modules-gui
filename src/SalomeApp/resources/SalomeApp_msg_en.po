@@ -357,7 +357,7 @@ msgid "SalomeApp_StudyPropertiesDlg::PRP_AUTHOR"
 msgstr "Author"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_DATE"
-msgstr "Date"
+msgstr "Created"
 
 msgid "SalomeApp_StudyPropertiesDlg::PRP_MODE"
 msgstr "Mode"

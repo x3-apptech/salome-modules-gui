@@ -241,11 +241,11 @@ QString SalomeApp_Application::applicationVersion() const
   if ( _app_version.isEmpty() )
   {
     QString resVersion = tr( "APP_VERSION" );
-    if ( resVersion != "APP_VERSION" ) 
+    if ( resVersion != "APP_VERSION" )
     {
       _app_version = resVersion;
     }
-    else 
+    else
     {
       QString path( ::getenv( "GUI_ROOT_DIR" ) );
       if ( !path.isEmpty() )
@@ -258,15 +258,15 @@ QString SalomeApp_Application::applicationVersion() const
         QString line;
 	vf.readLine( line, 1024 );
 	vf.close();
-	
+
 	if ( !line.isEmpty() )
         {
 	  while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
 	    line.remove( line.length() - 1, 1 );
-	  
+
 	  int idx = line.findRev( ":" );
 	  if ( idx != -1 )
-	    _app_version = line.mid( idx + 1 ).stripWhiteSpace(); 
+	    _app_version = line.mid( idx + 1 ).stripWhiteSpace();
         }
       }
     }
@@ -299,7 +299,7 @@ bool SalomeApp_Application::activateModule( const QString& modName )
   if ( actName == modName )
     return true;
 
-  putInfo( tr( "ACTIVATING_MODULE" ).arg( modName ) );  
+  putInfo( tr( "ACTIVATING_MODULE" ).arg( modName ) );
 
   saveWindowsGeometry();
 
@@ -307,7 +307,7 @@ bool SalomeApp_Application::activateModule( const QString& modName )
 
   updateModuleActions();
 
-  putInfo( "" );  
+  putInfo( "" );
 
   if ( !status )
     return false;
@@ -789,7 +789,7 @@ void SalomeApp_Application::onDeleteReferences()
   _PTR(Study) aStudyDS = aStudy->studyDS();
   _PTR(StudyBuilder) aStudyBuilder = aStudyDS->NewBuilder();
   _PTR(SObject) anObj;
-  
+
   for ( SALOME_ListIteratorOfListIO it( aList ); it.More(); it.Next() )
     {
       if ( it.Value()->hasEntry() )
@@ -1550,7 +1550,7 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 
   pref->setItemProperty( vtkTS, "min", 1 );
   pref->setItemProperty( vtkTS, "max", 150 );
-  
+
   pref->addPreference( tr( "PREF_SHOW_LEGEND" ), plot2dGroup,
 		       SalomeApp_Preferences::Bool, "Plot2d", "ShowLegend" );
 
@@ -1561,28 +1561,28 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
   aLegendPosList.append( tr("PREF_RIGHT") );
   aLegendPosList.append( tr("PREF_TOP") );
   aLegendPosList.append( tr("PREF_BOTTOM") );
-  
+
   QValueList<QVariant> anIndexesList;
   anIndexesList.append(0);
   anIndexesList.append(1);
   anIndexesList.append(2);
   anIndexesList.append(3);
-  
+
   pref->setItemProperty( legendPosition, "strings", aLegendPosList );
   pref->setItemProperty( legendPosition, "indexes", anIndexesList );
-  
+
   int curveType = pref->addPreference( tr( "PREF_CURVE_TYPE" ), plot2dGroup,
 				       SalomeApp_Preferences::Selector, "Plot2d", "CurveType" );
   QStringList aCurveTypesList;
   aCurveTypesList.append( tr("PREF_POINTS") );
   aCurveTypesList.append( tr("PREF_LINES") );
   aCurveTypesList.append( tr("PREF_SPLINE") );
-  
+
   anIndexesList.clear();
   anIndexesList.append(0);
   anIndexesList.append(1);
   anIndexesList.append(2);
-  
+
   pref->setItemProperty( curveType, "strings", aCurveTypesList );
   pref->setItemProperty( curveType, "indexes", anIndexesList );
 
@@ -1591,15 +1591,15 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 
   pref->setItemProperty( markerSize, "min", 0 );
   pref->setItemProperty( markerSize, "max", 100 );
-  
+
   QStringList aScaleModesList;
   aScaleModesList.append( tr("PREF_LINEAR") );
   aScaleModesList.append( tr("PREF_LOGARITHMIC") );
-  
+
   anIndexesList.clear();
   anIndexesList.append(0);
   anIndexesList.append(1);
-  
+
   int horScale = pref->addPreference( tr( "PREF_HOR_AXIS_SCALE" ), plot2dGroup,
 				      SalomeApp_Preferences::Selector, "Plot2d", "HorScaleMode" );
 
@@ -1608,13 +1608,13 @@ void SalomeApp_Application::createPreferences( SalomeApp_Preferences* pref )
 
   int verScale = pref->addPreference( tr( "PREF_VERT_AXIS_SCALE" ), plot2dGroup,
 				      SalomeApp_Preferences::Selector, "Plot2d", "VerScaleMode" );
-  
+
   pref->setItemProperty( verScale, "strings", aScaleModesList );
   pref->setItemProperty( verScale, "indexes", anIndexesList );
 
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), plot2dGroup,
 		       SalomeApp_Preferences::Color, "Plot2d", "Background" );
-  
+
   int dirTab = pref->addPreference( tr( "PREF_TAB_DIRECTORIES" ), salomeCat );
   int dirGroup = pref->addPreference( tr( "PREF_GROUP_DIRECTORIES" ), dirTab );
   pref->setItemProperty( dirGroup, "columns", 1 );
@@ -1939,6 +1939,7 @@ void SalomeApp_Application::onProperties()
 
   //study->updateCaptions();
   updateDesktopTitle();
+  updateActions();
 }
 
 /*!*/
@@ -1987,19 +1988,19 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   mgr->selectedObjects(aList);
 
   // "Delete reference" item should appear only for invalid references
-  
+
   // Check if selected objects is invalid references
   bool isInvalidRefs = true;
-  
+
   if ( aList.Extent() < 1 )
     isInvalidRefs = false;
-  
+
   if ( isInvalidRefs )
     {
       SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
       _PTR(Study) aStudyDS = aStudy->studyDS();
       _PTR(SObject) anObj;
-      
+
       for ( SALOME_ListIteratorOfListIO it( aList ); it.More() && isInvalidRefs; it.Next() )
 	{
 	  if ( it.Value()->hasEntry() )
@@ -2010,7 +2011,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
 	    }
 	}
     }
-  
+
   // Add "Delete refrence" item to popup
   if ( isInvalidRefs )
     {
@@ -2029,7 +2030,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   if (currentModule && currentModule->moduleName() == aModuleTitle)
     return;
   thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
-  
+
 }
 
 /*!Update obect browser*/
