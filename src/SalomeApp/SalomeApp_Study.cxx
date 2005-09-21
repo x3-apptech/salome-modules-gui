@@ -99,8 +99,9 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
   ((SalomeApp_Application*)application())->updateObjectBrowser( false ); 
 
   bool res = CAM_Study::openDocument( theFileName );
+  
   emit opened( this );
-
+  study->IsSaved(true);
   return res;
 }
 
