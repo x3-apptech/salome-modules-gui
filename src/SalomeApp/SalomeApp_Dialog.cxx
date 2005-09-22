@@ -525,8 +525,8 @@ void SalomeApp_Dialog::onToggled( bool on )
   if( id!=-1 )
     if( on )
     {
-      emit objectActivated( id );
       updateButtons( id );
+      emit objectActivated( id );
     }
     else
       emit objectDeactivated( id );
