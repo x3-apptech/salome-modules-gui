@@ -156,8 +156,8 @@ void STD_Application::createActions()
   createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
 		tr( "MEN_DESK_FILE_LOAD" ), tr( "PRP_DESK_FILE_LOAD" ),
-		CTRL+Key_L, desk, false, this, SLOT( onLoadDoc() ) );      
-  //SRN: BugID IPAL9021: End 
+		CTRL+Key_L, desk, false, this, SLOT( onLoadDoc() ) );
+  //SRN: BugID IPAL9021: End
 
   QtxDockAction* da = new QtxDockAction( tr( "TOT_DOCK_WINDOWS" ), tr( "MEN_DOCK_WINDOWS" ), desk );
   registerAction( ViewWindowsId, da );
@@ -211,7 +211,7 @@ void STD_Application::createActions()
 }
 
 /*!Opens new application*/
-void STD_Application::onNewDoc() 
+void STD_Application::onNewDoc()
 {
   if ( !activeStudy() )
   {
@@ -398,7 +398,7 @@ bool STD_Application::isPossibleToClose()
       default:
         return false;
       }
-     //SRN: BugID: IPAL9021: End 
+     //SRN: BugID: IPAL9021: End
     }
   }
   return true;
@@ -413,10 +413,16 @@ void STD_Application::onSaveDoc()
   bool isOk = false;
   if ( activeStudy()->isSaved() )
   {
+    putInfo(tr("INF_DOC_SAVING") + activeStudy()->studyName());
     isOk = activeStudy()->saveDocument();
-    if ( !isOk )
+    if ( !isOk ) {
+      putInfo("");
       SUIT_MessageBox::error1( desktop(), tr( "TIT_FILE_SAVEAS" ),
-			       tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ), tr( "BUT_OK" ) );
+			       tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ),
+                               tr( "BUT_OK" ) );
+    } else {
+      putInfo(tr("INF_DOC_SAVED").arg(""));
+    }
   }
 
   if ( isOk )
@@ -433,10 +439,16 @@ bool STD_Application::onSaveAsDoc()
     return false;
 
   QString aName = getFileName( false, study->studyName(), getFileFilter(), QString::null, 0 );
-
-  if ( aName.isNull() ) 
+  if ( aName.isNull() )
     return false;
+
+  putInfo(tr("INF_DOC_SAVING") + aName);
   bool isOk = study->saveDocumentAs( aName );
+
+  if (isOk)
+    putInfo(tr("INF_DOC_SAVED").arg(aName));
+  else
+    putInfo("");
 
   updateDesktopTitle();
   updateCommandsStatus();
@@ -507,7 +519,7 @@ void STD_Application::updateCommandsStatus()
 {
   bool aHasStudy = activeStudy() != 0;
   bool aIsNeedToSave = false;
-  if ( aHasStudy ) 
+  if ( aHasStudy )
     aIsNeedToSave = !activeStudy()->isSaved() || activeStudy()->isModified();
 
   if ( action( FileSaveId ) )
@@ -673,7 +685,7 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   popup->insertSeparator();
   // add items from popup client
   client->contextMenuPopup( popup );
-  
+
   SUIT_Tools::simplifySeparators( popup );
 
   if ( popup->count() )
@@ -682,12 +694,12 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
 }
 
 /*!\retval QString - return file name from dialog.*/
-QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters, 
+QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters,
 				      const QString& caption, QWidget* parent )
 {
   if ( !parent )
     parent = desktop();
-  if ( open ) 
+  if ( open )
   {
     return QFileDialog::getOpenFileName( initial, filters, parent, 0, caption );
   }

@@ -317,6 +317,12 @@ msgstr "Document has been modified.\nDo you want to save changes?"
 msgid "STD_Application::INF_DOCUMENT_MODIFIED"
 msgstr "Document \"%1\" has been modified.\nDo you want to save changes?"
 
+msgid "STD_Application::INF_DOC_SAVED"
+msgstr "Study %1 saved"
+
+msgid "STD_Application::INF_DOC_SAVING"
+msgstr "Saving study "
+
 msgid "CLOSE_DLG_SAVE_CLOSE"
 msgstr "&Save&&Close"
 
