@@ -1876,7 +1876,7 @@ void SalomeApp_Application::loadWindowsGeometry()
 
   QString modName;
   if ( activeModule() )
-    modName = moduleLibrary( activeModule()->moduleName(), false );
+    modName = activeModule()->name("");
 
   QString section = QString( "windows_geometry" );
   if ( !modName.isEmpty() )
@@ -1900,7 +1900,7 @@ void SalomeApp_Application::saveWindowsGeometry()
 
   QString modName;
   if ( activeModule() )
-    modName = moduleLibrary( activeModule()->moduleName(), false );
+    modName = activeModule()->name("");
 
   QString section = QString( "windows_geometry" );
   if ( !modName.isEmpty() )
