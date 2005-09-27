@@ -44,7 +44,7 @@ EXPORT_HEADERS= SalomeApp.h \
 		SalomeApp_Operation.h \
 		SalomeApp_Dialog.h \
 		SalomeApp_UpdateFlags.h \
-		SalomeApp_SwitchOp.cxx
+		SalomeApp_Displayer.h
 
 # .po files to transform in .qm
 PO_FILES = SalomeApp_images.po \
@@ -85,7 +85,9 @@ LIB_SRC= SalomeApp_Module.cxx \
 	 SalomeApp_CheckFileDlg.cxx \
 	 SalomeApp_Operation.cxx \
 	 SalomeApp_Dialog.cxx \
-	 SalomeApp_SwitchOp.cxx
+	 SalomeApp_SwitchOp.cxx \
+	 SalomeApp_Displayer.cxx \
+	 SalomeApp_ShowHideOp.cxx
 
 LIB_MOC = SalomeApp_AboutDlg.h \
           SalomeApp_Application.h \
@@ -107,7 +109,8 @@ LIB_MOC = SalomeApp_AboutDlg.h \
 	  SalomeApp_CheckFileDlg.h \
 	  SalomeApp_Operation.h \
 	  SalomeApp_Dialog.h \
-	  SalomeApp_SwitchOp.h
+	  SalomeApp_SwitchOp.h \
+	  SalomeApp_ShowHideOp.h
 
 LIB_CLIENT_IDL = SALOMEDS.idl \
 		 SALOME_Exception.idl \
@@ -125,7 +128,7 @@ RESOURCES_FILES = icon_about.png \
 CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
 LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS) 
-LIBS+= -lsuit -lstd -lCAM -lObjBrowser -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lSPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole -lLogWindow -lSalomeContainer -lToolsGUI
+LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lSalomePrs -L$(KERNEL_ROOT_DIR)/lib/salome -lOpUtil -lSALOMELocalTrace $(CAS_KERNEL) -lSPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSVTK -lSOCC -lPyInterp -lPythonConsole -lLogWindow -lSalomeContainer -lToolsGUI
 
 @CONCLUDE@
 

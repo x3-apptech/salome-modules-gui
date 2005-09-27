@@ -422,7 +422,11 @@ SVTK_Viewer
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i))
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewWindow))
 	if(SVTK_RenderWindow* aRW = aView->getRenderWindow())
+	{
+	  aView->getRenderer()->Render();
+	  aView->getRWInteractor()->unHighlightAll();
 	  aRW->update();
+	}
 }
 
 void 

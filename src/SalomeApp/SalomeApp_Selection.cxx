@@ -1,10 +1,10 @@
 
 #include "SalomeApp_Selection.h"
-
 #include "SalomeApp_SelectionMgr.h"
 #include "SalomeApp_DataOwner.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Application.h"
+#include "SalomeApp_Displayer.h"
 
 #include "SUIT_Session.h"
 #include "SUIT_ViewWindow.h"
@@ -62,8 +62,27 @@ int SalomeApp_Selection::count() const
 /*!
   Gets QtxValue();
 */
-QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
+QtxValue SalomeApp_Selection::param( const int ind, const QString& p ) const
 {
+  if( !( ind>=0 && ind<count() ) )
+    return QtxValue();
+
+  if( p=="isVisible" )
+  {
+    SalomeApp_Displayer d;
+    bool vis = d.IsDisplayed( myEntries[ ind ] );
+    return QtxValue( vis, 0 );
+  }
+  else if( p=="component" )
+  {
+    _PTR(SObject) obj( study()->studyDS()->FindObjectID( myEntries[ ind ] ) );
+    _PTR(SComponent) comp = obj->GetFatherComponent();
+    QString mod_name = comp->ComponentDataType().c_str();
+    //cout << "component : " << ind << " >> " << mod_name.latin1() << endl;
+    if( !mod_name.isEmpty() )
+      return mod_name;
+  }
+
   return QtxValue();
 }
 
@@ -73,6 +92,16 @@ QtxValue SalomeApp_Selection::param( const int, const QString& p ) const
 QtxValue SalomeApp_Selection::globalParam( const QString& p ) const
 {
   if      ( p == "client" )        return QtxValue( myPopupClient );
+  else if ( p == "activeModule" )
+  {
+    SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( myStudy->application() );
+    QString mod_name = app ? QString( app->activeModule()->name() ) : QString::null;
+    //cout << "activeModule : " << mod_name.latin1() << endl;
+    if( !mod_name.isEmpty() )
+      return mod_name;
+    else
+      return QtxValue();
+  }
   else if ( p == "isActiveView" )  return QtxValue( (bool)activeVW() );
   else if ( p == "activeView" )    return QtxValue( activeViewType() );
 #ifndef WNT

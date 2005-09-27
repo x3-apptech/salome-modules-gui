@@ -12,6 +12,7 @@
 #include "SalomeApp_UpdateFlags.h"
 #include "SalomeApp_Operation.h"
 #include "SalomeApp_SwitchOp.h"
+#include "SalomeApp_ShowHideOp.h"
 
 #include <OB_Browser.h>
 
@@ -33,7 +34,10 @@
 SalomeApp_Module::SalomeApp_Module( const QString& name )
 : CAM_Module( name ),
 myPopupMgr( 0 ),
-mySwitchOp( 0 )
+mySwitchOp( 0 ),
+myDisplay( -1 ),
+myErase( -1 ),
+myDisplayOnly( -1 )
 {
 }
 
@@ -132,7 +136,33 @@ void SalomeApp_Module::onModelClosed()
 QtxPopupMgr* SalomeApp_Module::popupMgr()
 {
   if ( !myPopupMgr )
+  {
     myPopupMgr = new QtxPopupMgr( 0, this );
+
+    QPixmap p;
+    SUIT_Desktop* d = application()->desktop();
+    
+    QAction 
+      *disp = createAction( -1, tr( "TOP_DISPLAY" ), p, tr( "MEN_DISPLAY" ), tr( "STB_DISPLAY" ),
+			    0, d, false, this, SLOT( onShowHide() ) ),
+      *erase = createAction( -1, tr( "TOP_ERASE" ), p, tr( "MEN_ERASE" ), tr( "STB_ERASE" ),
+			     0, d, false, this, SLOT( onShowHide() ) ),
+      *dispOnly = createAction( -1, tr( "TOP_DISPLAY_ONLY" ), p, tr( "MEN_DISPLAY_ONLY" ), tr( "STB_DISPLAY_ONLY" ),
+			        0, d, false, this, SLOT( onShowHide() ) );
+    myDisplay     = actionId( disp );
+    myErase       = actionId( erase );
+    myDisplayOnly = actionId( dispOnly );
+
+    myPopupMgr->insert( disp, -1, 0 ); 
+    myPopupMgr->insert( erase, -1, 0 );
+    myPopupMgr->insert( dispOnly, -1, 0 );
+    myPopupMgr->insert( separator(), -1, 0 );
+
+    QString uniform = "( count( $component ) = 1 ) and ( component != activeModule )";
+    myPopupMgr->setRule( disp, QString( "( not isVisible ) and " ) + uniform, true );
+    myPopupMgr->setRule( erase, QString( "( isVisible ) and " ) + uniform, true );
+    myPopupMgr->setRule( dispOnly, uniform, true );
+  }
   return myPopupMgr;
 }
 
@@ -305,9 +335,19 @@ void SalomeApp_Module::startOperation( const int id )
 * automatically from startOperation. You may redefine this method in concrete module to
 * create operations. 
 */
-SalomeApp_Operation* SalomeApp_Module::createOperation( const int /*id*/ ) const
+SalomeApp_Operation* SalomeApp_Module::createOperation( const int id ) const
 {
-  return 0;
+  if( id==-1 )
+    return 0;
+
+  if( id==myDisplay )
+    return new SalomeApp_ShowHideOp( SalomeApp_ShowHideOp::DISPLAY );
+  else if( id==myErase )
+    return new SalomeApp_ShowHideOp( SalomeApp_ShowHideOp::ERASE );
+  else if( id==myDisplayOnly )
+    return new SalomeApp_ShowHideOp( SalomeApp_ShowHideOp::DISPLAY_ONLY );
+  else
+    return 0;
 }
 
 /*!
@@ -344,4 +384,20 @@ void SalomeApp_Module::onOperationDestroyed()
         break;
       }
   }
+}
+
+SalomeApp_Displayer* SalomeApp_Module::displayer()
+{
+  return 0;
+}
+
+void SalomeApp_Module::onShowHide()
+{
+  if( !sender()->inherits( "QAction" ) || !popupMgr() )
+    return;
+
+  QAction* act = ( QAction* )sender();
+  int id = actionId( act );
+  if( id!=-1 )
+    startOperation( id );
 }

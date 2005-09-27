@@ -30,6 +30,7 @@ class SalomeApp_Preferences;
 class SalomeApp_SelectionManager;
 class SalomeApp_Operation;
 class SalomeApp_SwitchOp;
+class SalomeApp_Displayer;
 
 /*!
  * \brief Base class for all salome modules
@@ -45,6 +46,7 @@ public:
   virtual void                        initialize( CAM_Application* );
   virtual void                        windows( QMap<int, int>& ) const;
   virtual void                        viewManagers( QStringList& ) const;
+  virtual SalomeApp_Displayer*        displayer();
 
   /*! engineIOR() should be a pure virtual method, to avoid logical errors!\n
    * Implementation in derived classes can return the following values:\n
@@ -88,6 +90,7 @@ protected slots:
   virtual void                        onModelClosed();
   virtual void                        onOperationStopped( SUIT_Operation* );
   virtual void                        onOperationDestroyed();
+  virtual void                        onShowHide();
 
 protected:
   QtxPopupMgr*                        popupMgr();
@@ -122,6 +125,7 @@ private:
   QtxPopupMgr*          myPopupMgr;
   MapOfOperation        myOperations;
   SalomeApp_SwitchOp*   mySwitchOp;
+  int                   myDisplay, myErase, myDisplayOnly;
 };
 
 #endif

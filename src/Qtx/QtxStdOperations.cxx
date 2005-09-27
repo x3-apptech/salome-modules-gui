@@ -289,6 +289,8 @@ QtxLogic::QtxLogic()
 
     ListOfTypes aTypes;
     aTypes.append( QVariant::Bool );
+    aTypes.append( QVariant::Int );
+    aTypes.append( QVariant::UInt );
     addTypes( aTypes );
 }
 
@@ -308,9 +310,9 @@ bool QtxLogic::createValue( const QString& str, QtxValue& v ) const
 {
     bool ok = true;
     if( str.lower()=="true" )
-        v = true;
+        v = QtxValue( true, 0 );
     else if( str.lower()=="false" )
-        v = false;
+        v = QtxValue( false, 0 );
     else
         ok = QtxStdOperations::createValue( str, v );
 
@@ -338,6 +340,18 @@ int QtxLogic::prior( const QString& op, bool isBin ) const
             return 0;
 }
 
+bool boolean_value( const QtxValue& v )
+{
+  if( v.type()==QVariant::Bool )
+    return v.toBool();
+  else if( v.type()==QVariant::Int )
+    return v.toInt()!=0;
+  else if( v.type()==QVariant::UInt )
+    return v.toUInt()!=0;
+  else
+    return false;
+}
+
 //================================================================
 // Function : 
 // Purpose  : 
@@ -346,22 +360,24 @@ QtxParser::Error QtxLogic::calculate( const QString& op,
                                           QtxValue& v1, QtxValue& v2 ) const
 {
     QtxParser::Error err = QtxParser::OK;
+    bool val1 = boolean_value( v1 ),
+         val2 = boolean_value( v2 );
     if( v1.isValid() && v2.isValid() )
     {
         if( op=="and" || op=="&&" )
-            set( v1, v1.toBool() && v2.toBool() );
+            set( v1, val1 && val2 );
         else if( op=="or" || op=="||" )
-            set( v1, v1.toBool() || v2.toBool() );
+            set( v1, val1 || val2 );
         else if( op=="xor" )
-            set( v1, ( !v1.toBool() && v2.toBool() ) || ( v1.toBool() && !v2.toBool() ) );
+            set( v1, ( !val1 && val2 ) || ( val1 && !val2 ) );
         else if( op=="imp" )
-            set( v1, !v1.toBool() || v2.toBool() );
+            set( v1, !val1 || val2 );
         else if( op=="=" )
-            set( v1, v1.toBool()==v2.toBool() );
+            set( v1, val1==val2 );
     }
     else
         if( op=="not" || op=="!" )
-            set( v2, !v2.toBool() );
+            set( v2, !val2 );
 
     return err;
 }

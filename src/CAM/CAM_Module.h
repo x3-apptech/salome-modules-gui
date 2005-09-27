@@ -41,6 +41,20 @@ public:
   virtual void           contextMenuPopup( const QString&, QPopupMenu*, QString& title ) {};
   virtual void           updateCommandsStatus() {};
 
+  /** @name Set Menu Shown*/
+  //@{
+  void                   setMenuShown( const bool );
+  void                   setMenuShown( QAction*, const bool );
+  void                   setMenuShown( const int, const bool );
+  //@}
+
+  /** @name Set Tool Shown*/
+  //@{
+  void                   setToolShown( const bool );
+  void                   setToolShown( QAction*, const bool );
+  void                   setToolShown( const int, const bool );
+  //@}
+
 public slots:
   virtual bool           activateModule( SUIT_Study* );
   virtual bool           deactivateModule( SUIT_Study* );
@@ -74,20 +88,6 @@ protected:
   int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
   int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
   int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
-  //@}
-
-  /** @name Set Menu Shown*/
-  //@{
-  void                   setMenuShown( const bool );
-  void                   setMenuShown( QAction*, const bool );
-  void                   setMenuShown( const int, const bool );
-  //@}
-
-  /** @name Set Tool Shown*/
-  //@{
-  void                   setToolShown( const bool );
-  void                   setToolShown( QAction*, const bool );
-  void                   setToolShown( const int, const bool );
   //@}
 
   static QAction*        separator();

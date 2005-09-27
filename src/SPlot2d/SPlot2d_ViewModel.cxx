@@ -223,8 +223,11 @@ void SPlot2d_Viewer::Erase( const SALOME_Prs2d* prs, const bool )
 SALOME_Prs* SPlot2d_Viewer::CreatePrs( const char* entry )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
-  if(aViewFrame) {
-    return new SPlot2d_Prs(aViewFrame->CreatePrs(entry));
+  if(aViewFrame)
+  {
+    Plot2d_Prs* prs = aViewFrame->CreatePrs(entry);
+    if( prs )
+      return new SPlot2d_Prs( prs );
   }
 
   return NULL;
