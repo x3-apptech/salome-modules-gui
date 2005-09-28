@@ -28,8 +28,8 @@ public:
 
   void            setSel( bool s );
   inline SUIT_DataObject* dataObject() const { return myObject; }
-  void            paintFoc( QPainter* p, const QColorGroup& cg, const QRect& r );
-  void            paintC( QPainter* p, const QColorGroup& cg, int c, int w, int align );
+  void            paintFoc( QPainter* p, QColorGroup& cg, const QRect& r );
+  void            paintC( QPainter* p, QColorGroup& cg, int c, int w, int align );
 
 protected:
   void                     update();

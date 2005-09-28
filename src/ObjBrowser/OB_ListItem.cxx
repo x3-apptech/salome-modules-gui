@@ -23,34 +23,34 @@ myObject( obj )
 }
 
 template<class T>
-void ListItemF<T>::paintC( QPainter* p, const QColorGroup& cg, int c, int w, int align )
+void ListItemF<T>::paintC( QPainter* p, QColorGroup& cg, int c, int w, int align )
 { 
-  QColorGroup colorGrp( cg );
+//  QColorGroup colorGrp( cg );
   if ( myObject )
   {
     if ( myObject->color( SUIT_DataObject::Text ).isValid() )
-      colorGrp.setColor( QColorGroup::Text, myObject->color( SUIT_DataObject::Text ) );
+      cg.setColor( QColorGroup::Text, myObject->color( SUIT_DataObject::Text ) );
     if ( myObject->color( SUIT_DataObject::Base ).isValid() )
-      colorGrp.setColor( QColorGroup::Base, myObject->color( SUIT_DataObject::Base ) );
+      cg.setColor( QColorGroup::Base, myObject->color( SUIT_DataObject::Base ) );
     if ( myObject->color( SUIT_DataObject::Foreground ).isValid() )
-      colorGrp.setColor( QColorGroup::Foreground, myObject->color( SUIT_DataObject::Foreground ) );
+      cg.setColor( QColorGroup::Foreground, myObject->color( SUIT_DataObject::Foreground ) );
     if ( myObject->color( SUIT_DataObject::Background ).isValid() )
-      colorGrp.setColor( QColorGroup::Background, myObject->color( SUIT_DataObject::Background ) );
+      cg.setColor( QColorGroup::Background, myObject->color( SUIT_DataObject::Background ) );
     if ( myObject->color( SUIT_DataObject::Highlight ).isValid() )
-      colorGrp.setColor( QColorGroup::Highlight, myObject->color( SUIT_DataObject::Highlight ) );
+      cg.setColor( QColorGroup::Highlight, myObject->color( SUIT_DataObject::Highlight ) );
     if ( myObject->color( SUIT_DataObject::HighlightedText ).isValid() )
-      colorGrp.setColor( QColorGroup::HighlightedText, myObject->color( SUIT_DataObject::HighlightedText ) );
+      cg.setColor( QColorGroup::HighlightedText, myObject->color( SUIT_DataObject::HighlightedText ) );
   }
 
   
-  p->fillRect( 0, 0, w, myT.height(), colorGrp.brush( QColorGroup::Base ) );
-  int itemW = myT.width( p->fontMetrics(), myT.listView(), c );
+  p->fillRect( 0, 0, w, myT.height(), cg.brush( QColorGroup::Base ) );
+  //int itemW = myT.width( p->fontMetrics(), myT.listView(), c );
     
   //myT.paintCell( p, colorGrp, c, itemW,  align );
 }
 
 template<class T>
-void ListItemF<T>::paintFoc( QPainter* p, const QColorGroup& cg, const QRect& r )
+void ListItemF<T>::paintFoc( QPainter* p, QColorGroup& cg, const QRect& r )
 {
   QRect rect = r;
   rect.setWidth( myT.width( p->fontMetrics(), myT.listView(), 0 ) );
@@ -140,13 +140,15 @@ void OB_ListItem::setSelected( bool s ) {
 }
 
 void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
-	paintFoc(p, cg, r);
-	QListViewItem::paintFocus(p, cg, r);
+  QColorGroup col_group( cg );
+	paintFoc(p, col_group, r);
+	QListViewItem::paintFocus(p, col_group, r);
 }
 
 void OB_ListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
-	paintC(p, cg, c ,w, align);
-	QListViewItem::paintCell(p, cg, c, w, align);
+  QColorGroup col_group( cg );
+	paintC(p, col_group, c ,w, align);
+	QListViewItem::paintCell( p, col_group, c, w, align);
 }
 
 int OB_ListItem::RTTI()
@@ -210,13 +212,15 @@ void OB_CheckListItem::setSelected( bool s ) {
 }
 
 void OB_CheckListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
-	paintFoc(p, cg, r);
-	QCheckListItem::paintFocus(p, cg, r);
+  QColorGroup col_group( cg );
+	paintFoc(p, col_group, r);
+	QCheckListItem::paintFocus(p, col_group, r);
 }
 
 void OB_CheckListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
-	paintC(p, cg, c ,w, align);
-	QCheckListItem::paintCell(p, cg, c, w, align);
+  QColorGroup col_group( cg );
+	paintC(p, col_group, c ,w, align);
+	QCheckListItem::paintCell(p, col_group, c, w, align);
 }
 
 int OB_CheckListItem::RTTI()
