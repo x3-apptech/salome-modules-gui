@@ -993,11 +993,25 @@ QAction* SALOME_PYQT_Module::createSeparator()
 }
 QAction* SALOME_PYQT_Module::action( const int id ) const
 {
-  return SalomeApp_Module::action( id );
+  QAction* a = SalomeApp_Module::action( id );
+  if ( !a ) // try own action map for menu items
+    a = SalomeApp_Module::action( id + PYQT_ACTION_MENU );
+  if ( !a ) // try own action map for toolbar items
+    a = SalomeApp_Module::action( id + PYQT_ACTION_TOOLBAL );
+  if ( !a ) // try own action map for popup items
+    a = SalomeApp_Module::action( id + PYQT_ACTION_POPUP );
+  return a;
 }
 int SALOME_PYQT_Module::actionId( const QAction* a ) const
 {
-  return SalomeApp_Module::actionId( a );
+  int id = SalomeApp_Module::actionId( a );
+  if ( myMenuActionList.contains( a ) )    // check own action map for menu items
+    id -= PYQT_ACTION_MENU;
+  if ( myToolbarActionList.contains( a ) ) // check own action map for toolbar items
+    id -= PYQT_ACTION_TOOLBAL;
+  if ( myPopupActionList.contains( a ) )   // check own action map for popup items
+    id -= PYQT_ACTION_POPUP;
+  return id;
 }
 QAction* SALOME_PYQT_Module::createAction( const int id, const QString& text, const QString& icon, 
 					   const QString& menu, const QString& tip, const int key,
