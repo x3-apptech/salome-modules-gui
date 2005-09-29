@@ -1351,6 +1351,7 @@ void QtxListResourceEdit::FileItem::onOpenFile()
     connect( myFileDlg, SIGNAL( fileHighlighted( const QString& ) ), this, SLOT( onFileSelected( const QString& ) ) );
   }
   
+  myFileDlg->setCaption( title() );
   myFileDlg->setFilters( myFilter );
   myFileDlg->setMode( myIsExisting ? QFileDialog::ExistingFile : QFileDialog::AnyFile );
 
