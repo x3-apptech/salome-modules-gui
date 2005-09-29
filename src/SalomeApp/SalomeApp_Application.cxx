@@ -755,11 +755,11 @@ void SalomeApp_Application::onSelectionChanged()
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
       qaction = action(EditCopyId);
-      if(studyMgr()->CanCopy(so) ) qaction->setEnabled(true);
+      if( so && studyMgr()->CanCopy(so) ) qaction->setEnabled(true);
       else qaction->setEnabled(false);
 
       qaction = action(EditPasteId);
-      if( studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
+      if( so && studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
       else qaction->setEnabled(false);
    }
    else {
