@@ -2,6 +2,7 @@
 
 """
 
+import SALOME_Session_idl
 
 # this function is required
 
