@@ -314,12 +314,6 @@ void SALOME_PYQT_Module::onGUIEvent()
 
   // get action ID
   int id = actionId( action );
-  if ( myMenuActionList.contains( action ) )
-    id -= PYQT_ACTION_MENU;
-  if ( myToolbarActionList.contains( action ) )
-    id -= PYQT_ACTION_TOOLBAL;
-  if ( myPopupActionList.contains( action ) )
-    id -= PYQT_ACTION_POPUP;
   MESSAGE( "SALOME_PYQT_Module::onGUIEvent: id = " << id );
 
   // perform synchronous request to Python event dispatcher
