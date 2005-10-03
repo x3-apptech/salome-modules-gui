@@ -128,6 +128,7 @@ SVTK_SelectorDef
 
   myIObjects.erase(theIO);
   myIO2Actors.erase(theIO);
+  myMapIOSubIndex.erase(theIO);
 
   return anIsIOBound;
 }
