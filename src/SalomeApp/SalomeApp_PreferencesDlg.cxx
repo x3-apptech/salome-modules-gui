@@ -80,4 +80,5 @@ void SalomeApp_PreferencesDlg::onHelp()
 void SalomeApp_PreferencesDlg::onApply()
 {
   myPrefs->store();
+  myPrefs->toBackup();
 }
