@@ -139,8 +139,8 @@ VTKViewer_Axis::~VTKViewer_Axis()
   /*! \li Destroy of the Label pipe-line representation */
   myLabelActor->Delete();
   
-  myMapper[2]->RemoveAllInputs();
-  myMapper[2]->Delete();
+  myMapper[0]->RemoveAllInputs();
+  myMapper[0]->Delete();
   
   myVectorText->Delete();
   
@@ -166,6 +166,13 @@ void VTKViewer_Axis::AddToRender(vtkRenderer* theRenderer){
   theRenderer->AddActor(myLineActor);
   theRenderer->AddActor(myLabelActor);
   theRenderer->AddActor(myArrowActor);
+}
+
+void VTKViewer_Axis::RemoveFromRender(vtkRenderer* theRenderer){
+  /*! \li Order of the calls are important*/
+  theRenderer->RemoveActor(myLineActor);
+  theRenderer->RemoveActor(myLabelActor);
+  theRenderer->RemoveActor(myArrowActor);
 }
 
 void VTKViewer_Axis::SetVisibility(VTKViewer_Trihedron::TVisibility theVis)
@@ -343,6 +350,8 @@ void VTKViewer_Trihedron::RemoveFromRender(vtkRenderer* theRenderer)
   myPresent->InitTraversal();
   while(vtkActor* anActor = myPresent->GetNextActor())
     theRenderer->RemoveActor(anActor);
+  for(int i = 0; i < 3; i++)
+    myAxis[i]->RemoveFromRender(theRenderer);
 }
 
 int VTKViewer_Trihedron::GetVisibleActorCount(vtkRenderer* theRenderer)

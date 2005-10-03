@@ -186,6 +186,7 @@ public:
   /*! Add to \a theRenderer actors: myLineActor,myLabelActor,myArrowActor
    */
   virtual void AddToRender(vtkRenderer* theRenderer);
+  virtual void RemoveFromRender(vtkRenderer* theRenderer);
   
   /*! Sets visibility for actors: myLineActor,myLabelActor,myArrowActor
    */
