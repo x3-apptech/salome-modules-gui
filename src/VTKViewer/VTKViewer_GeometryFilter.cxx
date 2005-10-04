@@ -53,10 +53,8 @@ using namespace std;
 
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
-static int MYDEBUGWITHFILES = 0;
 #else
 static int MYDEBUG = 0;
-static int MYDEBUGWITHFILES = 0;
 #endif
 
 #if defined __GNUC__
@@ -279,7 +277,7 @@ void VTKViewer_GeometryFilter::UnstructuredGridExecute()
 
         case VTK_LINE: 
         case VTK_POLY_LINE:
-          newCellId = output->InsertNextCell(VTK_LINE,npts,pts);
+          newCellId = output->InsertNextCell(aCellType,npts,pts);
 	  if(myStoreMapping){
 	    myVTK2ObjIds.push_back(cellId); //apo
 	  }
@@ -494,14 +492,175 @@ void VTKViewer_GeometryFilter::UnstructuredGridExecute()
           break;
 	}
         //Quadratic cells
-        case VTK_QUADRATIC_EDGE:
-        case VTK_QUADRATIC_TRIANGLE:
-        case VTK_QUADRATIC_QUAD:
-        case VTK_QUADRATIC_TETRA:
-        case VTK_QUADRATIC_HEXAHEDRON:
-          
-          break; //done with quadratic cells
-          
+        case VTK_QUADRATIC_EDGE: {
+	  newCellId = output->InsertNextCell(VTK_POLY_LINE,npts,pts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+          break;
+	}
+        case VTK_QUADRATIC_TRIANGLE: {
+	  numFacePts = 6;
+	  aCellType = VTK_POLYGON;
+	  
+	  aNewPts[0] = pts[0];
+	  aNewPts[1] = pts[3];
+	  aNewPts[2] = pts[1];
+	  aNewPts[3] = pts[4];
+	  aNewPts[4] = pts[2];
+	  aNewPts[5] = pts[5];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+	  break;
+	}
+        case VTK_QUADRATIC_QUAD: {
+	  numFacePts = 8;
+	  aCellType = VTK_POLYGON;
+	  
+	  aNewPts[0] = pts[0];
+	  aNewPts[1] = pts[4];
+	  aNewPts[2] = pts[1];
+	  aNewPts[3] = pts[5];
+	  aNewPts[4] = pts[2];
+	  aNewPts[5] = pts[6];
+	  aNewPts[6] = pts[3];
+	  aNewPts[7] = pts[7];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+	  break;
+	}
+        case VTK_QUADRATIC_TETRA: {
+	  numFacePts = 8;
+	  aCellType = VTK_POLYGON;
+	  
+	  aNewPts[0] = pts[0];
+	  aNewPts[1] = pts[4];
+	  aNewPts[2] = pts[1];
+	  aNewPts[3] = pts[5];
+	  aNewPts[4] = pts[2];
+	  aNewPts[5] = pts[6];
+	  aNewPts[6] = pts[3];
+	  aNewPts[7] = pts[7];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+	  break;
+	}
+        case VTK_QUADRATIC_HEXAHEDRON: {
+	  numFacePts = 8;
+	  aCellType = VTK_POLYGON;
+	  
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[0];
+	  aNewPts[1] = pts[8];
+	  aNewPts[2] = pts[1];
+	  aNewPts[3] = pts[17];
+	  aNewPts[4] = pts[5];
+	  aNewPts[5] = pts[12];
+	  aNewPts[6] = pts[4];
+	  aNewPts[7] = pts[16];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[1];
+	  aNewPts[1] = pts[9];
+	  aNewPts[2] = pts[2];
+	  aNewPts[3] = pts[18];
+	  aNewPts[4] = pts[6];
+	  aNewPts[5] = pts[13];
+	  aNewPts[6] = pts[5];
+	  aNewPts[7] = pts[17];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[2];
+	  aNewPts[1] = pts[10];
+	  aNewPts[2] = pts[3];
+	  aNewPts[3] = pts[19];
+	  aNewPts[4] = pts[7];
+	  aNewPts[5] = pts[14];
+	  aNewPts[6] = pts[6];
+	  aNewPts[7] = pts[18];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[3];
+	  aNewPts[1] = pts[11];
+	  aNewPts[2] = pts[0];
+	  aNewPts[3] = pts[16];
+	  aNewPts[4] = pts[4];
+	  aNewPts[5] = pts[15];
+	  aNewPts[6] = pts[7];
+	  aNewPts[7] = pts[19];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[0];
+	  aNewPts[1] = pts[8];
+	  aNewPts[2] = pts[1];
+	  aNewPts[3] = pts[9];
+	  aNewPts[4] = pts[2];
+	  aNewPts[5] = pts[10];
+	  aNewPts[6] = pts[3];
+	  aNewPts[7] = pts[11];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  //---------------------------------------------------------------
+	  aNewPts[0] = pts[4];
+	  aNewPts[1] = pts[12];
+	  aNewPts[2] = pts[5];
+	  aNewPts[3] = pts[13];
+	  aNewPts[4] = pts[6];
+	  aNewPts[5] = pts[14];
+	  aNewPts[6] = pts[7];
+	  aNewPts[7] = pts[15];
+
+	  newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	  if(myStoreMapping)
+	    myVTK2ObjIds.push_back(cellId);
+
+          outputCD->CopyData(cd,cellId,newCellId);
+
+	  break;
+	}
         } //switch
       } //if visible
     } //for all cells
