@@ -17,19 +17,17 @@ doxygen=@DOXYGEN@
 @COMMENCE@
 
 docs:
-	cp -fr $(srcdir)/KERNEL ./INPUT; \
+	cp -fr $(srcdir)/SUIT ./INPUT; \
 	cd INPUT; \
 	sed 's|../../../share/salome|$(root_srcdir)|' ./doxyfile > ./doxyfile1; \
 	mv -f doxyfile1 doxyfile; \
 	$(doxygen) ./doxyfile; \
-	cd ..; \
-	cp -fr $(srcdir)/KERNEL/sources/static/*.* ./KERNEL/
-	cp -fr $(srcdir)/KERNEL/sources/ KERNEL/
-	cp -fr $(srcdir)/KERNEL/HTML/ KERNEL/
+	cd ../; \
+	cp -fr $(srcdir)/SUIT/sources/ SUIT ; \
 	rm -fr INPUT
 
 clean:
-	rm -fr KERNEL
+	rm -fr SUIT
 
 distclean: clean
 	rm -fr INPUT
@@ -37,7 +35,7 @@ distclean: clean
 install:
 	$(INSTALL) -d $(docdir); \
 	mkdir -p $(docdir)/tui
-	cp -fr KERNEL $(docdir)/tui
+	cp -fr SUIT $(docdir)/tui
 
 uninstall:
-	rm -fr $(docdir)/tui/KERNEL
+	rm -fr $(docdir)/tui/SUIT

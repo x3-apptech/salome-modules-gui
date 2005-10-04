@@ -11,7 +11,7 @@ top_builddir=../..
 srcdir=@srcdir@
 VPATH=.:@srcdir@
 
-SUBDIRS= tui DevelopersGuide gui
+SUBDIRS= tui gui
 
 @COMMENCE@
 
@@ -19,7 +19,7 @@ docs:
 	@@SETX@; for d in $(SUBDIRS); do 	\
 	   (cd $$d && $(MAKE) $@) || exit 1; 	\
 	done; \
-	cp -f $(srcdir)/KERNEL_index.html KERNEL_index.html
+	cp -f $(srcdir)/SUIT_index.html SUIT_index.html
 
 clean:
 	@@SETX@; for d in $(SUBDIRS); do 	\
@@ -35,10 +35,10 @@ install:
 	$(MAKE) docs
 	(cd tui && $(MAKE) install);
 	(cd gui && $(MAKE) install);
-	cp -f KERNEL_index.html $(docdir)
+	cp -f SUIT_index.html $(docdir)
 
 uninstall:
 	@@SETX@; for d in $(SUBDIRS); do 	\
 	   (cd $$d && $(MAKE) $@) || exit 1; 	\
 	done; \
-	rm -fr $(docdir)/KERNEL_index.html
+	rm -fr $(docdir)/SUIT_index.html
