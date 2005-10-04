@@ -4,6 +4,8 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_ResourceMgr.h"
 
+#include <qlabel.h>
+#include <qtimer.h>
 #include <qstatusbar.h>
 
 #include <QtxAction.h>
@@ -13,7 +15,8 @@
 SUIT_Application::SUIT_Application()
 : QObject( 0 ),
 myStudy( 0 ),
-myDesktop( 0 )
+myDesktop( 0 ),
+myStatusLabel( 0 )
 { 
 }
 
@@ -89,8 +92,15 @@ SUIT_ResourceMgr* SUIT_Application::resourceMgr() const
 #define DEFAULT_MESSAGE_DELAY 3000
 void SUIT_Application::putInfo ( const QString& msg, const int msec )
 {
-  if ( desktop() )
-    desktop()->statusBar()->message( msg, msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec );
+  if ( desktop() ) {
+    //desktop()->statusBar()->message( msg, msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec );
+    if ( !myStatusLabel ) {
+      myStatusLabel = new QLabel (desktop()->statusBar());
+      desktop()->statusBar()->addWidget(myStatusLabel, /*int stretch = */1);
+    }
+    myStatusLabel->setText(msg);
+    QTimer::singleShot(msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec, myStatusLabel, SLOT(clear()));
+  }
 }
 
 SUIT_Application* SUIT_Application::startApplication( int argc, char** argv ) const

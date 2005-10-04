@@ -14,6 +14,7 @@ class SUIT_ViewModel;
 class SUIT_ResourceMgr;
 class QString;
 class QIconSet;
+class QLabel;
 /*! \class QObject
  * \brief For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
  */
@@ -133,6 +134,8 @@ protected slots:
 private:
   SUIT_Study*           myStudy;
   SUIT_Desktop*         myDesktop;
+
+  QLabel*               myStatusLabel;
 };
 
 //! This function must return a new application instance.
