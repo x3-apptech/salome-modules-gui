@@ -279,3 +279,8 @@ void SUPERVGraph_ViewFrame::redo( const _PTR(Study)& aStudy,
   MESSAGE ( "SUPERVGraph_ViewFrame::redo" )
 }
 
+void SUPERVGraph_ViewFrame::resizeEvent( QResizeEvent* theEvent )
+{
+  QMainWindow::resizeEvent( theEvent );
+  if ( myView ) myView->resizeView( theEvent );
+}

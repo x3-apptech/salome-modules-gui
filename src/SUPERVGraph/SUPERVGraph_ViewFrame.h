@@ -52,8 +52,11 @@ class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_View: public QWidget, public SUIT_Popup
   virtual QString popupClientType() const { return Type(); }
   virtual void    contextMenuPopup( QPopupMenu* );
   
+  virtual void resizeView( QResizeEvent* theEvent ) {};
+  
  protected:
   void init(QWidget* theParent);
+  
 };
 
 class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
@@ -111,6 +114,9 @@ class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   void           onViewBottom();
   void           onViewTop();
   void           onViewTrihedron(); 
+
+ protected:
+  void resizeEvent( QResizeEvent* theEvent );
   
  private:
   SUPERVGraph_View* myView;
