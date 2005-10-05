@@ -33,6 +33,7 @@
     <parameter name="GLViewer"     value="${SUITRoot}/resources"/>
     <parameter name="OCCViewer"    value="${SUITRoot}/resources"/>
     <parameter name="VTKViewer"    value="${SUITRoot}/resources"/>
+    <parameter name="SVTK"         value="${SUITRoot}/resources"/>
     <parameter name="SalomeApp"    value="${SUITRoot}/resources"/>
     <parameter name="OB"           value="${SUITRoot}/resources"/>
     <parameter name="CAM"          value="${SUITRoot}/resources"/>

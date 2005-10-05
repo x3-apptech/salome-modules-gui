@@ -166,17 +166,17 @@ myPrefs( 0 )
   myAccel->setActionKey( SUIT_Accel::RotateRight, ALT+Key_Right,     OCCViewer_Viewer::Type() );
   myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        OCCViewer_Viewer::Type() );
   myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      OCCViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::PanLeft,     CTRL+Key_Left,     VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::PanRight,    CTRL+Key_Right,    VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::PanUp,       CTRL+Key_Up,       VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::PanDown,     CTRL+Key_Down,     VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::ZoomIn,      CTRL+Key_Plus,     VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::ZoomOut,     CTRL+Key_Minus,    VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::ZoomFit,     CTRL+Key_Asterisk, VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::RotateLeft,  ALT+Key_Left,      VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::RotateRight, ALT+Key_Right,     VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        VTKViewer_Viewer::Type() );
-  myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      VTKViewer_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanLeft,     CTRL+Key_Left,     SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanRight,    CTRL+Key_Right,    SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanUp,       CTRL+Key_Up,       SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanDown,     CTRL+Key_Down,     SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomIn,      CTRL+Key_Plus,     SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomOut,     CTRL+Key_Minus,    SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomFit,     CTRL+Key_Asterisk, SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateLeft,  ALT+Key_Left,      SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateRight, ALT+Key_Right,     SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        SVTK_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      SVTK_Viewer::Type() );
 
   connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
            this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
@@ -546,7 +546,7 @@ void SalomeApp_Application::onNewWindow()
     type = OCCViewer_Viewer::Type();
     break;
   case NewVTKViewId:
-    type = VTKViewer_Viewer::Type();
+    type = SVTK_Viewer::Type();
     break;
   }
 
@@ -1128,10 +1128,13 @@ SUIT_ViewManager* SalomeApp_Application::createViewManager( const QString& vmTyp
   else if ( vmType == SVTK_Viewer::Type() )
   {
     viewMgr = new SVTK_ViewManager( activeStudy(), desktop() );
-    SVTK_Viewer* vm = (SVTK_Viewer*)viewMgr->getViewModel();
-    vm->setBackgroundColor( resMgr->colorValue( "VTKViewer", "background", vm->backgroundColor() ) );
-    vm->setTrihedronSize( resMgr->integerValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ) );
-    new SalomeApp_VTKSelector((SVTK_Viewer*)viewMgr->getViewModel(),mySelMgr);
+    SVTK_Viewer* vm = dynamic_cast<SVTK_Viewer*>( viewMgr->getViewModel() );
+    if( vm )
+    {
+      vm->setBackgroundColor( resMgr->colorValue( "VTKViewer", "background", vm->backgroundColor() ) );
+      vm->setTrihedronSize( resMgr->integerValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ) );
+      new SalomeApp_VTKSelector( vm, mySelMgr );
+    }
   }
 
   if ( !viewMgr )
@@ -1656,9 +1659,12 @@ void SalomeApp_Application::preferencesChanged( const QString& sec, const QStrin
       if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
 	continue;
 
-      SVTK_Viewer* vtkVM = (SVTK_Viewer*)vm;
-      vtkVM->setTrihedronSize( sz );
-      vtkVM->Repaint();
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM )
+      {
+	vtkVM->setTrihedronSize( sz );
+	vtkVM->Repaint();
+      }
     }
   }
 
