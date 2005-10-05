@@ -6,7 +6,7 @@
 top_srcdir=@top_srcdir@
 top_builddir=../..
 srcdir=@srcdir@
-VPATH=.:@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
 
 
 @COMMENCE@
@@ -25,6 +25,8 @@ EXPORT_HEADERS= SVTK.h \
 		SVTK_RenderWindowInteractor.h \
 		SVTK_Selector.h \
 		SVTK_Selection.h
+
+PO_FILES = SVTK_msg_en.po
 
 # Libraries targets
 LIB = libSVTK.la

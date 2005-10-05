@@ -125,14 +125,14 @@ void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 //==========================================================
 void SVTK_Viewer::contextMenuPopup( QPopupMenu* thePopup )
 {
-  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
 
   thePopup->insertSeparator();
 
   SVTK_ViewWindow* aView = (SVTK_ViewWindow*)(myViewManager->getActiveView());
   if ( aView && !aView->getToolBar()->isVisible() )
-    thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
+    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
 //==========================================================
