@@ -9,6 +9,7 @@
 
 class QAction;
 class SUIT_Study;
+class CAM_Study;
 class CAM_DataModel;
 class CAM_Application;
 class QtxActionMenuMgr;
@@ -58,6 +59,8 @@ public:
 public slots:
   virtual bool           activateModule( SUIT_Study* );
   virtual bool           deactivateModule( SUIT_Study* );
+
+  virtual void           connectToStudy( CAM_Study* );
 
   virtual void           studyClosed( SUIT_Study* );
   virtual void           studyChanged( SUIT_Study*, SUIT_Study* );

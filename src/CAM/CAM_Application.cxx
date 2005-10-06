@@ -290,20 +290,7 @@ bool CAM_Application::activateModule( CAM_Module* mod )
 
   if ( myModule ){
     // Connect the module to the active study
-    CAM_Study* camStudy = dynamic_cast<CAM_Study*>( activeStudy() );
-    if ( camStudy ){
-      CAM_DataModel* prev = 0;
-      for ( ModuleListIterator it( myModules ); it.current(); ++it ) {
-	CAM_DataModel* dm = it.current()->dataModel();
-	if ( it.current() == myModule && !camStudy->containsDataModel( dm ) ){
-	  if ( prev )
-	    camStudy->insertDataModel( it.current()->dataModel(), prev );
-	  else
-	    camStudy->insertDataModel( it.current()->dataModel(), 0 );
-	}
-	prev = dm;
-      }
-    }
+    myModule->connectToStudy( dynamic_cast<CAM_Study*>( activeStudy() ) );
     if ( !myModule->activateModule( activeStudy() ) )
     {
       myModule->setMenuShown( false );

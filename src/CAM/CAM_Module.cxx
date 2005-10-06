@@ -550,3 +550,25 @@ QAction* CAM_Module::separator()
 {
   return QtxActionMgr::separator();
 }
+
+/*! Connect data model of module with active study */
+void CAM_Module::connectToStudy( CAM_Study* camStudy )
+{
+  CAM_Application* app = camStudy ? dynamic_cast<CAM_Application*>( camStudy->application() ) : 0;
+  if( !app )
+    return;
+
+  CAM_DataModel* prev = 0;
+  for( CAM_Application::ModuleListIterator it = app->modules(); it.current(); ++it )
+  {
+    CAM_DataModel* dm = it.current()->dataModel();
+    if( it.current() == this && !camStudy->containsDataModel( dm ) )
+    {
+      if( prev )
+	camStudy->insertDataModel( it.current()->dataModel(), prev );
+      else
+	camStudy->insertDataModel( it.current()->dataModel(), 0 );
+    }
+    prev = dm;
+  }
+}
