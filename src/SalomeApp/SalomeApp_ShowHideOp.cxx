@@ -6,6 +6,7 @@
 #include "SalomeApp_Selection.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_Displayer.h"
+#include "CAM_Study.h"
 
 SalomeApp_ShowHideOp::SalomeApp_ShowHideOp( ActionType type )
 : SalomeApp_Operation(),
@@ -40,6 +41,7 @@ void SalomeApp_ShowHideOp::startOperation()
   {
     m = dynamic_cast<SalomeApp_Module*>( app->loadModule( mod_name ) );
     app->addModule( m );
+    m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
     m->setMenuShown( false );
     m->setToolShown( false );
   }
