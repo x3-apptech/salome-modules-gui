@@ -208,8 +208,8 @@ SALOME::StatSession SALOME_Session_i::GetStatSession()
 CORBA::Long SALOME_Session_i::GetActiveStudyId()
 {
   long aStudyId=-1;
-  //if ( SUIT_Session::session() && SUIT_Session::session()->activeApplication() ) {
-  //  aStudyId = SUIT_Session::session()->getActiveStudy()->getStudyId();
-  //}
+  if ( SUIT_Session::session() && SUIT_Session::session()->activeApplication() ) {
+    aStudyId = SUIT_Session::session()->activeApplication()->activeStudy()->id();
+  }
   return aStudyId;
 }
