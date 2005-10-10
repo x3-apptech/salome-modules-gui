@@ -75,7 +75,7 @@ QtxValue SalomeApp_Selection::param( const int ind, const QString& p ) const
   }
   else if( p=="component" )
   {
-    _PTR(SObject) obj( study()->studyDS()->FindObjectID( myEntries[ ind ] ) );
+    _PTR(SObject) obj( study()->studyDS()->FindObjectID( myEntries[ ind ].latin1() ) );
     _PTR(SComponent) comp = obj->GetFatherComponent();
     QString mod_name = comp->ComponentDataType().c_str();
     //cout << "component : " << ind << " >> " << mod_name.latin1() << endl;
