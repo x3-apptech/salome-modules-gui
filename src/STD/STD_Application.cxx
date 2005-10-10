@@ -72,6 +72,11 @@ void STD_Application::start()
 /*!Event on closing desktop*/
 void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
 {
+  if (SUIT_Session::session()->applications().count() < 2) {
+    onExit();
+    return;
+  }
+
   if ( !isPossibleToClose() )
   {
     e->ignore();
