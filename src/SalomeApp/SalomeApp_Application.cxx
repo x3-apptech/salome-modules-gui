@@ -178,9 +178,6 @@ myPrefs( 0 )
   myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        SVTK_Viewer::Type() );
   myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      SVTK_Viewer::Type() );
 
-  connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
-           this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
-
   connect( mySelMgr, SIGNAL( selectionChanged() ), this, SLOT( onSelection() ) );
 }
 

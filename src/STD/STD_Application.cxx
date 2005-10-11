@@ -40,9 +40,6 @@ myActiveViewMgr( 0 )
 {
   STD_MDIDesktop* desk = new STD_MDIDesktop();
 
-  connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
-           this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
-
   setDesktop( desk );
 }
 
