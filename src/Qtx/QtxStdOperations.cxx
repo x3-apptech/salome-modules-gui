@@ -777,9 +777,9 @@ QtxParser::Error QtxSets::calculate( const QString& op, QtxValue& v1, QtxValue& 
                 remove( aNewList, v2.toList() );
 
                 if( op=="=" )
-                    set( v1, aNewList.isEmpty() );
+                    set( v1, aNewList.isEmpty() && v1.toList().count()==v2.toList().count() );
                 else if( op=="<>" || op=="!=" )
-                    set( v1, !aNewList.isEmpty() );
+                    set( v1, !aNewList.isEmpty() || v1.toList().count()!=v2.toList().count() );
                 else
                     v1 = aNewList;
             }
