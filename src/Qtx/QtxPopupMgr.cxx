@@ -234,9 +234,9 @@ void QtxPopupMgr::createOperations()
     myOperations = new QtxListOfOperations;
     myOperations->prepend( "logic",   new QtxLogic(),           0 );
     myOperations->prepend( "arithm",  new QtxArithmetics(),    50 );
-    myOperations->prepend( "strings", new QtxStrings(),       100 );
-    myOperations->prepend( "sets",    new QtxSets(),          150 );
-    myOperations->prepend( "custom",  new Operations( this ), 200 );
+    myOperations->append( "strings", new QtxStrings(),       100 );
+    myOperations->append( "sets",    new QtxSets(),          150 );
+    myOperations->append( "custom",  new Operations( this ), 200 );
 }
 
 //================================================================
