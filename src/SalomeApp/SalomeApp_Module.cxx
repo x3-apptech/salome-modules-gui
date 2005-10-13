@@ -29,6 +29,7 @@
 #include <GLViewer_ViewFrame.h>
 #include <GLViewer_ViewPort.h>
 #include <Plot2d_ViewWindow.h>
+#include <Plot2d_ViewFrame.h>
 
 /*!Constructor.*/
 SalomeApp_Module::SalomeApp_Module( const QString& name )
