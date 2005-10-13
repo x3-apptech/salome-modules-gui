@@ -2,14 +2,11 @@
 #define PLOT2D_VIEWMANAGER_H
 
 #include "Plot2d.h"
-
-#include "Plot2d_ViewWindow.h"
-
-#include "SUIT_Desktop.h"
-#include "SUIT_ViewWindow.h"
 #include "SUIT_ViewManager.h"
 
 class SUIT_Desktop;
+class Plot2d_Viewer;
+class Plot2d_ViewFrame;
 
 class PLOT2D_EXPORT Plot2d_ViewManager : public SUIT_ViewManager
 {
@@ -19,7 +16,7 @@ public:
   Plot2d_ViewManager( SUIT_Study*, SUIT_Desktop* );
   ~Plot2d_ViewManager();
 
-  Plot2d_Viewer*     getPlot2dModel() { return (Plot2d_Viewer*)myViewModel; };
+  Plot2d_Viewer*     getPlot2dModel() const;
 
 protected:
   void         setViewName(SUIT_ViewWindow* theView);
@@ -28,6 +25,11 @@ protected:
 public slots:
   void         createView();
 
+protected slots:
+  void         onCloneView();
+
+signals:
+  void cloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* );
 
 protected:
   static  int  myMaxId;

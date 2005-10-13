@@ -323,3 +323,23 @@ SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObje
   return NULL;
 }
 
+void SPlot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* newVF )
+{
+  if( !clonedVF || !newVF )
+    return;
+
+  // 1) Copy all properties of view
+
+  newVF->copyPreferences( clonedVF );
+
+  // 2) Display all curves displayed in cloned view
+
+  QList<Plot2d_Curve> aCurves;
+  clonedVF->getCurves( aCurves );
+  QList<Plot2d_Curve>::const_iterator anIt = aCurves.begin(), aLast = aCurves.end();
+
+  for( ; anIt!=aLast; anIt++ )
+    if( clonedVF->isVisible( *anIt ) )
+      newVF->displayCurve( *anIt, false );
+  newVF->Repaint();
+}

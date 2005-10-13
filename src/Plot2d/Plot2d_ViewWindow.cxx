@@ -2,15 +2,20 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "Plot2d_ViewWindow.h"
+#include "Plot2d_ViewFrame.h"
 
 #include "SUIT_ViewManager.h"
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 #include "SUIT_ToolButton.h"
+#include "SUIT_Desktop.h"
+
+#include "QtxAction.h"
 
 #include <qstatusbar.h>
 #include <qlayout.h>
 #include <qapplication.h>
+#include <qpopupmenu.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

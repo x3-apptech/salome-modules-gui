@@ -3,16 +3,13 @@
 
 #include "Plot2d.h"
 #include "SUIT_ViewModel.h"
-#include "SUIT_ViewWindow.h"
-#include "SUIT_Desktop.h"
-#include "SUIT_ViewManager.h"
-#include "Plot2d_Prs.h"
-
-#include <qstring.h>
-#include <qpopupmenu.h>
 
 class SUIT_ViewWindow;
 class SUIT_Desktop;
+class Plot2d_ViewFrame;
+class Plot2d_Prs;
+class QString;
+class QPopupMenu;
 
 class PLOT2D_EXPORT Plot2d_Viewer: public SUIT_ViewModel
 {
@@ -24,6 +21,7 @@ public:
   Plot2d_Viewer(bool theAutoDel = false);
   ~Plot2d_Viewer();
 
+  virtual void             setViewManager( SUIT_ViewManager* );
   virtual SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
   virtual QString getType() const { return Type(); }
   virtual void contextMenuPopup(QPopupMenu*);
@@ -37,6 +35,7 @@ protected slots:
   void onChangeBgColor();
   void onDumpView();
   void onShowToolbar();
+  virtual void onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* );
 
 private:
   Plot2d_Prs* myPrs;

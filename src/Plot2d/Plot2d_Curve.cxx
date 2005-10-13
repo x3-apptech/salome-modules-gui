@@ -1,4 +1,5 @@
 #include "Plot2d_Curve.h"
+#include <qcolor.h>
 
 /*!
   Constructor
@@ -251,7 +252,7 @@ bool Plot2d_Curve::isAutoAssign() const
 /*!
   Sets curve's color ( and resets AutoAssign flag )
 */
-void Plot2d_Curve::setColor( const QColor color )
+void Plot2d_Curve::setColor( const QColor& color )
 {
   myColor = color;
   myAutoAssign = false;

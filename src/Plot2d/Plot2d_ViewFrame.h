@@ -1,16 +1,12 @@
 #ifndef PLOT2D_VIEWFRAME_H
 #define PLOT2D_VIEWFRAME_H
 
-#include "Plot2d_Prs.h"
 #include "Plot2d_Curve.h"
-
 #include <qwidget.h>
 #include <qintdict.h>
 
-#include <qwt_plot.h>
-#include <qwt_legend.h>
-
 class Plot2d_Plot2d;
+class Plot2d_Prs;
 
 typedef QIntDict<Plot2d_Curve> CurveDict;
 
@@ -44,10 +40,10 @@ public:
   void    setTitle( const QString& title );
   QString getTitle() const { return myTitle; }
   void    displayCurve( Plot2d_Curve* curve, bool update = false );
-  void    displayCurves( curveList curves, bool update = false );
+  void    displayCurves( const curveList& curves, bool update = false );
   void    eraseCurve( Plot2d_Curve* curve, bool update = false );
-  void    eraseCurves( curveList& curves, bool update = false );
-  int     getCurves( QList<Plot2d_Curve>& clist );
+  void    eraseCurves( const curveList& curves, bool update = false );
+  int     getCurves( curveList& clist );
   const   CurveDict& getCurves() { return myCurves; }
   int     hasCurve( Plot2d_Curve* curve );
   bool    isVisible( Plot2d_Curve* curve );
@@ -57,6 +53,7 @@ public:
   void    fitArea( const QRect& area );
 
   /* view parameters */
+  void    copyPreferences( Plot2d_ViewFrame* );
   void    setCurveType( int curveType, bool update = true );
   int     getCurveType() const { return myCurveType; }
   void    setCurveTitle( int curveKey, const QString& title );

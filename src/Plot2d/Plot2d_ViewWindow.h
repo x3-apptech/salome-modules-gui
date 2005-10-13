@@ -2,24 +2,17 @@
 #define PLOT2D_VIEWWINDOW_H
 
 #include "Plot2d.h"
-
-#include "Plot2d_ViewModel.h"
-#include "Plot2d_ViewFrame.h"
-
-#include <SUIT_Desktop.h>
 #include <SUIT_ViewWindow.h>
-#include <SUIT_ToolButton.h>
-
-#include <QtxAction.h>
-
-#include <qstring.h>
-#include <qstring.h>
-#include <qtoolbar.h>
-#include <qpopupmenu.h>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
+
+class SUIT_Desktop;
+class Plot2d_Viewer;
+class Plot2d_ViewFrame;
+class QtxAction;
+class SUIT_ToolButton;
 
 class PLOT2D_EXPORT Plot2d_ViewWindow : public SUIT_ViewWindow  
 {

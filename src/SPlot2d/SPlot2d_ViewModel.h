@@ -55,6 +55,8 @@ public:
   Plot2d_ViewFrame*                getActiveViewFrame();
   Handle(SALOME_InteractiveObject) FindIObject( const char* Entry );
 
+protected slots:
+  virtual void onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* );
 };
 
 

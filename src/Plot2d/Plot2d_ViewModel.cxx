@@ -4,7 +4,11 @@
 
 #include "Plot2d_ViewModel.h"
 #include "Plot2d_ViewWindow.h"
+#include "Plot2d_ViewManager.h"
+#include "Plot2d_ViewFrame.h"
+#include "Plot2d_Prs.h"
 
+#include <qpopupmenu.h>
 
 Plot2d_Viewer::Plot2d_Viewer(bool theAutoDel)
 :SUIT_ViewModel() 
@@ -118,4 +122,20 @@ void Plot2d_Viewer::onDumpView()
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )
     aView->onDumpView();    
+}
+
+//*********************************************************************
+void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* )
+{
+}
+//*********************************************************************
+void Plot2d_Viewer::setViewManager( SUIT_ViewManager* mgr )
+{
+  SUIT_ViewModel::setViewManager( mgr );
+  if( mgr && mgr->inherits( "Plot2d_ViewManager" ) )
+  {
+    Plot2d_ViewManager* pmgr = ( Plot2d_ViewManager* )mgr;
+    connect( pmgr, SIGNAL( cloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* ) ),
+	     this, SLOT( onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* ) ) );
+  }
 }

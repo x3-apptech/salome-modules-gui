@@ -11,6 +11,10 @@
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qvalidator.h>
+#include <qpushbutton.h>
+#include <qradiobutton.h>
+#include <qbuttongroup.h>
+#include <qlineedit.h>
 
 #define SPACING_SIZE      6
 #define MARGIN_SIZE       11

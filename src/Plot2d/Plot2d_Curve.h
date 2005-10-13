@@ -2,12 +2,11 @@
 #define PLOT2D_CURVE_H
 
 #include "Plot2d.h"
-
+#include <qvaluelist.h>
+#include <qptrlist.h>
 #include <qwt_plot.h>
 
-#include <qcolor.h>
-#include <qstring.h>
-#include <qvaluelist.h>
+class QColor;
 
 typedef struct
 {
@@ -53,7 +52,7 @@ public:
 
   void        setAutoAssign( bool on );
   bool        isAutoAssign() const;
-  void        setColor( const QColor color );
+  void        setColor( const QColor& color );
   QColor      getColor() const;
   void        setMarker( MarkerType marker );
   MarkerType  getMarker() const;
@@ -77,5 +76,7 @@ protected:
 
   pointList   myPoints;
 };
+
+typedef QPtrList<Plot2d_Curve> curveList;
 
 #endif

@@ -28,6 +28,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <qwt_legend.h>
+
 //#include "utilities.h"
 
 #define DEFAULT_LINE_WIDTH     0     // (default) line width
@@ -629,7 +631,7 @@ void Plot2d_ViewFrame::displayCurve( Plot2d_Curve* curve, bool update )
 /*!
   Adds curves into view
 */
-void Plot2d_ViewFrame::displayCurves( curveList curves, bool update )
+void Plot2d_ViewFrame::displayCurves( const curveList& curves, bool update )
 {
   myPlot->setUpdatesEnabled( false );
   QPtrListIterator<Plot2d_Curve> it(curves);
@@ -664,7 +666,7 @@ void Plot2d_ViewFrame::eraseCurve( Plot2d_Curve* curve, bool update )
 /*!
   Erases curves
 */
-void Plot2d_ViewFrame::eraseCurves( curveList& curves, bool update )
+void Plot2d_ViewFrame::eraseCurves( const curveList& curves, bool update )
 {
   QPtrListIterator<Plot2d_Curve> it(curves);
   Plot2d_Curve* aCurve;
@@ -1708,4 +1710,39 @@ bool Plot2d_Plot2d::existMarker( const QwtSymbol::Style typeMarker, const QColor
 Plot2d_Prs* Plot2d_ViewFrame::CreatePrs( const char* /*entry*/ )
 {
   return 0;
+}
+
+void Plot2d_ViewFrame::copyPreferences( Plot2d_ViewFrame* vf )
+{
+  if( !vf )
+    return;
+
+  myCurveType = vf->myCurveType;
+  myShowLegend = vf->myShowLegend;
+  myLegendPos = vf->myLegendPos;
+  myMarkerSize = vf->myMarkerSize;
+  myBackground = vf->myBackground;
+  myTitle = vf->myTitle; 
+  myXTitle = vf->myXTitle;
+  myYTitle = vf->myYTitle;
+  myY2Title = vf->myY2Title;
+  myTitleEnabled = vf->myTitleEnabled;
+  myXTitleEnabled = vf->myXTitleEnabled;
+  myYTitleEnabled = vf->myYTitleEnabled;
+  myY2TitleEnabled = vf->myY2TitleEnabled;
+  myXGridMajorEnabled = vf->myXGridMajorEnabled;
+  myYGridMajorEnabled = vf->myYGridMajorEnabled;
+  myY2GridMajorEnabled = vf->myY2GridMajorEnabled;
+  myXGridMinorEnabled = vf->myXGridMinorEnabled;
+  myYGridMinorEnabled = vf->myYGridMinorEnabled;
+  myY2GridMinorEnabled = vf->myY2GridMinorEnabled;
+  myXGridMaxMajor = vf->myXGridMaxMajor;
+  myYGridMaxMajor = vf->myYGridMaxMajor;
+  myY2GridMaxMajor = vf->myY2GridMaxMajor;
+  myXGridMaxMinor = vf->myXGridMaxMinor;
+  myYGridMaxMinor = vf->myYGridMaxMinor;
+  myY2GridMaxMinor = vf->myY2GridMaxMinor;
+  myXMode = vf->myXMode;
+  myYMode = vf->myYMode;
+  mySecondY = vf->mySecondY;
 }

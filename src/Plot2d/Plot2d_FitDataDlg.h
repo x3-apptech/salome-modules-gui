@@ -2,12 +2,12 @@
 #define PLOT2D_FITDATADLG_H
 
 #include "Plot2d.h"
-
 #include <qdialog.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qbuttongroup.h>
-#include <qradiobutton.h>
+
+class QButtonGroup;
+class QRadioButton;
+class QLineEdit;
+class QPushButton;
 
 class PLOT2D_EXPORT Plot2d_FitDataDlg : public QDialog
 {
