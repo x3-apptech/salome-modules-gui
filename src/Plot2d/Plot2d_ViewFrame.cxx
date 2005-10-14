@@ -1138,6 +1138,9 @@ void Plot2d_ViewFrame::setXGrid( bool xMajorEnabled, const int xMajorMax,
          bool xMinorEnabled, const int xMinorMax, 
          bool update )
 {
+  if( xMinorMax>=xMajorMax )
+    return;
+
   myXGridMajorEnabled = xMajorEnabled;
   myXGridMinorEnabled = xMinorEnabled;
   myXGridMaxMajor = xMajorMax;

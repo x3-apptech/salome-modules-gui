@@ -128,7 +128,7 @@ public:
   bool                isEmpty() const;
 
   void                insertWidget( QWidget*, const int = -1 );
-  void                removeWidget( QWidget* );
+  void                removeWidget( QWidget*, const bool = true );
 
   QWidget*            activeWidget() const;
   void                setActiveWidget( QWidget* );
@@ -161,6 +161,8 @@ public slots:
 private slots:
   void                onClose();
   void                onSelected( int );
+
+  void                onWidgetDestroyed();
 
   void                onDragActiveTab();
   void                onChildDestroyed( QObject* );

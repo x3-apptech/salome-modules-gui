@@ -1145,6 +1145,7 @@ void QtxWorkstackArea::insertWidget( QWidget* wid, const int idx )
     myInfo[wid].vis = wid->isVisibleTo( wid->parentWidget() );
 
     connect( child, SIGNAL( destroyed( QObject* ) ), this, SLOT( onChildDestroyed( QObject* ) ) );
+    connect( wid, SIGNAL( destroyed() ), this, SLOT( onWidgetDestroyed() ) );
     connect( child, SIGNAL( shown( QtxWorkstackChild* ) ), this, SLOT( onChildShown( QtxWorkstackChild* ) ) );
     connect( child, SIGNAL( hided( QtxWorkstackChild* ) ), this, SLOT( onChildHided( QtxWorkstackChild* ) ) );
     connect( child, SIGNAL( activated( QtxWorkstackChild* ) ), this, SLOT( onChildActivated( QtxWorkstackChild* ) ) );
@@ -1156,7 +1157,13 @@ void QtxWorkstackArea::insertWidget( QWidget* wid, const int idx )
   setWidgetActive( wid );
 }
 
-void QtxWorkstackArea::removeWidget( QWidget* wid )
+void QtxWorkstackArea::onWidgetDestroyed()
+{
+  if( sender() )
+    removeWidget( (QWidget*)sender(), false );
+}
+
+void QtxWorkstackArea::removeWidget( QWidget* wid, const bool del )
 {
   if ( !myList.contains( wid ) )
     return;
@@ -1169,10 +1176,14 @@ void QtxWorkstackArea::removeWidget( QWidget* wid )
   myInfo.remove( wid );
   myChild.remove( wid );
 
-  delete child( wid );
-
-  if ( myList.isEmpty() )
-    delete this;
+  if( del )
+  {
+    delete child( wid );
+    if( myList.isEmpty() )
+      delete this;
+    else
+      updateState();
+  }
   else
     updateState();
 }
