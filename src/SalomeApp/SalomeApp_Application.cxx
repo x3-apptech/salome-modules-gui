@@ -80,6 +80,7 @@
 #include <qapplication.h>
 #include <qlistbox.h>
 #include <qregexp.h>
+#include <qstatusbar.h>
 
 #include "SALOMEDS_StudyManager.hxx"
 
@@ -222,6 +223,7 @@ void SalomeApp_Application::start()
   updateViewManagers();
 
   putInfo( "" );
+  desktop()->statusBar()->message( "" );
 }
 
 /*!Gets application name.*/
