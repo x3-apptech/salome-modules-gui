@@ -63,7 +63,7 @@ CPPFLAGS += $(QT_MT_INCLUDES) $(PYTHON_INCLUDES) $(HDF5_INCLUDES) $(BOOST_CPPFLA
 CXXFLAGS += $(OCC_CXXFLAGS) $(BOOST_CPPFLAGS)
 LDFLAGS += $(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lsuit -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace -lSALOMETraceCollector -lEvent -lCASCatch -lSalomeCatalog -lSalomeDS $(CAS_LDPATH) -lTKernel
 
-LDFLAGSFORBIN= $(LDFLAGS) -lqtx -lSalomeContainer -lSalomeResourcesManager -lTOOLSDS -lSalomeHDFPersist -lSalomeDSImpl -lSalomeGenericObj -lRegistry -lSalomeNotification
+LDFLAGSFORBIN= $(LDFLAGS) $(OMNIORB_LIBS) $(HDF5_LIBS) -lqtx -lSalomeContainer -lSalomeResourcesManager -lTOOLSDS -lSalomeHDFPersist -lSalomeDSImpl -lSalomeGenericObj -lRegistry -lSalomeNotification
 
 @CONCLUDE@
 
