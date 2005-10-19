@@ -17,183 +17,24 @@ class QPixmap;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  Class: QtxResourceMgr
+*/
+
 class QTX_EXPORT QtxResourceMgr
 {
   class IniFormat;
   class XmlFormat;
   class Resources;
 
-  template <class Key, class Value> class IMap;
-  template <class Key, class Value> class IMapConstIterator;
-  template <class Key, class Value> class IMapIterator
-  {
-  private:
-    IMap<Key,Value>* myMap;
-    int              myIndex;
-
-  public:
-    IMapIterator()                           : myMap( 0 ), myIndex( 0 )                                   { init(); }
-    IMapIterator( const IMap<Key,Value>* m ) : myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( 0 ) { init(); }
-    IMapIterator( const IMapIterator& i )    : myMap( i.myMap ), myIndex( i.myIndex )                     { init(); }
-
-    bool operator==( const IMapIterator& i ) { return !operator!=( i );                                   }
-    bool operator!=( const IMapIterator& i ) { return !myMap || myMap != i.myMap || myIndex != i.myIndex; }
-    
-    operator bool() const { return myIndex >= 0; }
-
-    const Key&   key() const  { return myMap->key( myIndex );   }
-    Value&       data()       { return myMap->value( myIndex ); }
-    const Value& data() const { return myMap->value( myIndex ); }
-    
-    Value& operator*() { return data(); }
-    
-    IMapIterator& operator++()      { myIndex++; init(); return *this;                     }
-    IMapIterator  operator++( int ) { IMapIterator i = *this; myIndex++; init(); return i; }
-    IMapIterator& operator--()      { myIndex--; init(); return *this;                     }
-    IMapIterator  operator--( int ) { IMapIterator i = *this; myIndex--; init(); return i; }
-    
-  private:
-    IMapIterator( const IMap<Key,Value>* m, const int index ) : myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( index ) { init(); }
-    void init() { if ( !myMap || myIndex >= myMap->count() ) myIndex = -1; }
-    
-    friend class IMap<Key,Value>;
-    friend class IMapConstIterator<Key,Value>;
-  };
-  
-  template <class Key, class Value> class IMapConstIterator
-  {
-  private:
-    IMap<Key,Value>* myMap;
-    int              myIndex;
-    
-  public:
-    IMapConstIterator()                                    : myMap( 0 ), myIndex( 0 )                                    { init(); }
-    IMapConstIterator( const IMap<Key,Value>* m )          : myMap( const_cast< IMap<Key,Value>* >( m )  ), myIndex( 0 ) { init(); }
-    IMapConstIterator( const IMapConstIterator& i )        : myMap( i.myMap ), myIndex( i.myIndex )                      { init(); }
-    IMapConstIterator( const IMapIterator<Key, Value>& i ) : myMap( i.myMap ), myIndex( i.myIndex )                      { init(); }
-    
-    bool operator==( const IMapConstIterator& i ) { return !operator!=( i );                                   }
-    bool operator!=( const IMapConstIterator& i ) { return !myMap || myMap != i.myMap || myIndex != i.myIndex; }
-    
-    operator bool() const { return myIndex >= 0; }
-    
-    const Key&   key() const   { return myMap->key( myIndex );   }
-    const Value& data () const { return myMap->value( myIndex ); }
-    
-    const Value& operator*() const { return data(); }
-    
-    IMapConstIterator& operator++()      { myIndex++; init(); return *this;                          }
-    IMapConstIterator  operator++( int ) { IMapConstIterator i = *this; myIndex++; init(); return i; }
-    IMapConstIterator& operator--()      { myIndex--; init(); return *this;                          }
-    IMapConstIterator  operator--( int ) { IMapConstIterator i = *this; myIndex--; init(); return i; }
-    
-  private:
-    IMapConstIterator( const IMap<Key,Value>* m, const int index ): myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( index ) { init(); }
-    void init() { if ( !myMap || myIndex >= myMap->count() ) myIndex = -1; }
-    
-    friend class IMap<Key,Value>;
-  };
-
-  template <class Key, class Value> class IMap
-  {
-  private:
-    QValueList<Key> myKeys;
-    QMap<Key,Value> myData;
-    Key             dummyKey;
-    Value           dummyValue;
-
-  public:
-    typedef IMapIterator<Key,Value>      Iterator;
-    typedef IMapConstIterator<Key,Value> ConstIterator;
-    friend class IMap<Key,Value>::Iterator;
-    friend class IMap<Key,Value>::ConstIterator;
-    
-    IMap() {}
-    IMap( const IMap& m ) : myKeys( m.myKeys ), myData( m.myData ) {}
-    IMap& operator=( const IMap& m ) { myKeys = m.myKeys; myData = m.myData; return *this; }
-    
-    int  count() const   { return myData.count(); }
-    int  size() const    { return myData.count(); }
-    bool empty() const   { return myData.empty(); }
-    bool isEmpty() const { return myData.empty(); }
-    
-    void clear() { myKeys.clear(); myData.clear(); }
-    
-    QValueList<Key>   keys()   const { return myKeys; }
-    QValueList<Value> values() const { QValueList<Value> l; for ( int i = 0; i < count(); i++ ) l.append( value( i ) ); return l; }
-    bool              contains ( const Key& key ) const { return myData.contains( key ); }
-    
-    Iterator      begin()       { return Iterator( this );               }
-    Iterator      end()         { return Iterator( this, count() );      }
-    ConstIterator begin() const { return ConstIterator( this );          }
-    ConstIterator end() const   { return ConstIterator( this, count() ); }
-    
-    Iterator insert( const Key& key, const Value& value, bool overwrite = true )
-    { 
-      if ( myData.find( key ) == myData.end() || overwrite ) {
-	if ( myData.find( key ) != myData.end() && overwrite )
-	  myKeys.remove( myKeys.find( key ) );
-	myKeys.append( key );
-	myData[ key ] = value;
-      }
-      return Iterator( this, index( key ) );
-    }
-    Iterator replace( const Key& key, const Value& value )
-    { 
-      if ( myData.find( key ) == myData.end() )
-	myKeys.append( key );
-      myData[ key ] = value;
-      return Iterator( this, index( key ) );
-    }
-    
-    int           index( const Key& key ) const { return myKeys.findIndex( key );      }
-    Iterator      at( const int index )         { return Iterator( this, index );      }
-    ConstIterator at( const int index ) const   { return ConstIterator( this, index ); }
-
-    Key& key( const int index )
-    {
-      if( index < 0 || index >= myKeys.count() ) 
-	return dummyKey;
-      return myKeys[index];
-    }
-    Value& value( const int index )
-    {
-      if( index < 0 || index >= myKeys.count() ) 
-	return dummyValue;
-      return myData[ myKeys[index] ];
-    }
-    Value& operator[]( const Key& key )
-    {
-      if ( myData.find( key ) == myData.end() )
-	insert( key, Value() );
-      return myData[ key ];
-    }
-    const Value& operator[]( const Key& key ) const
-    {
-      if ( myData.find( key ) == myData.end() )
-	return dummyValue;
-      return myData[ key ];
-    }
-
-    void erase( Iterator it )     { remove( it );    }
-    void erase( const Key& key )  { remove( key );   }
-    void erase( const int index ) { remove( index ); }
-    void remove( Iterator it )    { if ( it.myMap != this ) return; remove( it.myIndex ); }
-    void remove( const Key& key ) { remove( index( key ) ); }
-    void remove( const int index )
-    {
-      if( index >= 0 && index < myKeys.count() ) {
-	myData.remove( myKeys[ index ] );
-	myKeys.remove( myKeys.at( index ) );
-      }
-    }
-  };
-
 public:
-
   class Format;
 
-#if defined(QTX_NO_INDEXED_MAP)
+  template <class Key, class Value> class IMap;
+  template <class Key, class Value> class IMapIterator;
+  template <class Key, class Value> class IMapConstIterator;
+
+#ifdef QTX_NO_INDEXED_MAP
   typedef QMap<QString, QString> Section;
 #else
   typedef IMap<QString, QString> Section;
@@ -308,6 +149,10 @@ private:
   QPixmap         myDefaultPix;
 };
 
+/*!
+  Class: QtxResourceMgr::Format
+*/
+
 class QTX_EXPORT QtxResourceMgr::Format
 {
 public:
@@ -331,6 +176,10 @@ private:
   QString                myFmt;
   QMap<QString, QString> myOpt;
 };
+
+/*!
+  Class: QtxResourceMgr::Resources
+*/
 
 class QtxResourceMgr::Resources
 {
@@ -370,10 +219,197 @@ private:
   QString                fileName( const QString&, const QString&, const QString& ) const;
 
 private:
-  QMap<QString, Section> mySections;
+  typedef QMap<QString, Section> SectionMap;
+
+private:
+  SectionMap             mySections;
   QString                myFileName;
 
   friend class QtxResourceMgr::Format;
+};
+
+/*!
+  Class: QtxResourceMgr::IMapIterator
+*/
+
+template <class Key, class Value> class QtxResourceMgr::IMapIterator
+{
+public:
+  IMapIterator()                           : myMap( 0 ), myIndex( 0 )                                   { init(); }
+  IMapIterator( const IMap<Key,Value>* m ) : myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( 0 ) { init(); }
+  IMapIterator( const IMapIterator& i )    : myMap( i.myMap ), myIndex( i.myIndex )                     { init(); }
+
+  bool operator==( const IMapIterator& i ) { return !operator!=( i );                                   }
+  bool operator!=( const IMapIterator& i ) { return !myMap || myMap != i.myMap || myIndex != i.myIndex; }
+  
+  operator bool() const { return myIndex >= 0; }
+
+  const Key&   key() const  { return myMap->key( myIndex );   }
+  Value&       data()       { return myMap->value( myIndex ); }
+  const Value& data() const { return myMap->value( myIndex ); }
+
+  Value& operator*() { return data(); }
+
+  IMapIterator& operator++()      { myIndex++; init(); return *this;                     }
+  IMapIterator  operator++( int ) { IMapIterator i = *this; myIndex++; init(); return i; }
+  IMapIterator& operator--()      { myIndex--; init(); return *this;                     }
+  IMapIterator  operator--( int ) { IMapIterator i = *this; myIndex--; init(); return i; }
+
+private:
+  IMapIterator( const IMap<Key,Value>* m, const int index ) : myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( index ) { init(); }
+  void init() { if ( !myMap || myIndex >= myMap->count() ) myIndex = -1; }
+
+private:
+  IMap<Key,Value>* myMap;
+  int              myIndex;
+
+  friend class IMap<Key, Value>;
+  friend class IMapConstIterator<Key, Value>;
+};
+
+/*!
+  Class: QtxResourceMgr::IMapConstIterator
+*/
+
+template <class Key, class Value> class QtxResourceMgr::IMapConstIterator
+{
+public:
+  IMapConstIterator()                                    : myMap( 0 ), myIndex( 0 )                                    { init(); }
+  IMapConstIterator( const IMap<Key,Value>* m )          : myMap( const_cast< IMap<Key,Value>* >( m )  ), myIndex( 0 ) { init(); }
+  IMapConstIterator( const IMapConstIterator& i )        : myMap( i.myMap ), myIndex( i.myIndex )                      { init(); }
+  IMapConstIterator( const IMapIterator<Key, Value>& i ) : myMap( i.myMap ), myIndex( i.myIndex )                      { init(); }
+  
+  bool operator==( const IMapConstIterator& i ) { return !operator!=( i );                                   }
+  bool operator!=( const IMapConstIterator& i ) { return !myMap || myMap != i.myMap || myIndex != i.myIndex; }
+  
+  operator bool() const { return myIndex >= 0; }
+  
+  const Key&   key() const  { return myMap->key( myIndex );   }
+  const Value& data() const { return myMap->value( myIndex ); }
+  
+  const Value& operator*() const { return data(); }
+  
+  IMapConstIterator& operator++()      { myIndex++; init(); return *this;                          }
+  IMapConstIterator  operator++( int ) { IMapConstIterator i = *this; myIndex++; init(); return i; }
+  IMapConstIterator& operator--()      { myIndex--; init(); return *this;                          }
+  IMapConstIterator  operator--( int ) { IMapConstIterator i = *this; myIndex--; init(); return i; }
+  
+private:
+  IMapConstIterator( const IMap<Key,Value>* m, const int index ): myMap( const_cast< IMap<Key,Value>* >( m ) ), myIndex( index ) { init(); }
+  void init() { if ( !myMap || myIndex >= myMap->count() ) myIndex = -1; }
+  
+private:
+  IMap<Key,Value>* myMap;
+  int              myIndex;
+  
+  friend class IMap<Key,Value>;
+};
+
+/*!
+  Class: QtxResourceMgr::IMap
+*/
+
+template <class Key, class Value> class QtxResourceMgr::IMap
+{
+public:
+  typedef IMapIterator<Key,Value>      Iterator;
+  typedef IMapConstIterator<Key,Value> ConstIterator;
+
+public:
+  IMap() {}
+  IMap( const IMap& m ) : myKeys( m.myKeys ), myData( m.myData ) {}
+  IMap& operator=( const IMap& m ) { myKeys = m.myKeys; myData = m.myData; return *this; }
+  
+  int  count() const   { return myData.count(); }
+  int  size() const    { return myData.count(); }
+  bool empty() const   { return myData.empty(); }
+  bool isEmpty() const { return myData.empty(); }
+  
+  void clear() { myKeys.clear(); myData.clear(); }
+  
+  QValueList<Key>   keys()   const { return myKeys; }
+  QValueList<Value> values() const { QValueList<Value> l; for ( int i = 0; i < count(); i++ ) l.append( value( i ) ); return l; }
+  bool              contains ( const Key& key ) const { return myData.contains( key ); }
+  
+  Iterator      begin()       { return Iterator( this );               }
+  Iterator      end()         { return Iterator( this, count() );      }
+  ConstIterator begin() const { return ConstIterator( this );          }
+  ConstIterator end() const   { return ConstIterator( this, count() ); }
+  
+  Iterator insert( const Key& key, const Value& value, bool overwrite = true )
+  { 
+    if ( myData.find( key ) == myData.end() || overwrite )
+    {
+      if ( myData.find( key ) != myData.end() && overwrite )
+        myKeys.remove( myKeys.find( key ) );
+      myKeys.append( key );
+      myData[key] = value;
+    }
+    return Iterator( this, index( key ) );
+  }
+
+  Iterator replace( const Key& key, const Value& value )
+  { 
+    if ( myData.find( key ) == myData.end() )
+      myKeys.append( key );
+    myData[ key ] = value;
+    return Iterator( this, index( key ) );
+  }
+
+  int           index( const Key& key ) const { return myKeys.findIndex( key );      }
+  Iterator      at( const int index )         { return Iterator( this, index );      }
+  ConstIterator at( const int index ) const   { return ConstIterator( this, index ); }
+
+  Key& key( const int index )
+  {
+    if ( index < 0 || index >= (int)myKeys.count() ) 
+      return dummyKey;
+    return myKeys[index];
+  }
+
+  Value& value( const int index )
+  {
+    if ( index < 0 || index >= (int)myKeys.count() ) 
+      return dummyValue;
+    return myData[ myKeys[index] ];
+  }
+
+  Value& operator[]( const Key& key )
+  {
+    if ( myData.find( key ) == myData.end() )
+      insert( key, Value() );
+    return myData[ key ];
+  }
+
+  const Value& operator[]( const Key& key ) const
+  {
+    if ( myData.find( key ) == myData.end() )
+      return dummyValue;
+    return myData[ key ];
+  }
+
+  void erase( Iterator it )     { remove( it );    }
+  void erase( const Key& key )  { remove( key );   }
+  void erase( const int index ) { remove( index ); }
+  void remove( Iterator it )    { if ( it.myMap != this ) return; remove( it.myIndex ); }
+  void remove( const Key& key ) { remove( index( key ) ); }
+  void remove( const int index )
+  {
+    if ( index >= 0 && index < (int)myKeys.count() )
+    {
+      myData.remove( myKeys[ index ] );
+      myKeys.remove( myKeys.at( index ) );
+    }
+  }
+
+private:
+  QValueList<Key> myKeys;
+  QMap<Key,Value> myData;
+  Key             dummyKey;
+  Value           dummyValue;
+
+  friend class IMapIterator<Key,Value>;
+  friend class IMapConstIterator<Key,Value>;
 };
 
 #endif

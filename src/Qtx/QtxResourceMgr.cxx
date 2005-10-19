@@ -1448,10 +1448,13 @@ void QtxResourceMgr::loadTranslators( const QString& prefix, const QStringList& 
   QTranslator* trans = 0;
   ResListIterator it( myResources );
   it.toLast();
-  for ( ; it.current(); --it ) {
-    for ( QStringList::const_iterator itr = translators.begin(); itr != translators.end(); ++itr ) {
+  for ( ; it.current(); --it )
+  {
+    for ( QStringList::const_iterator itr = translators.begin(); itr != translators.end(); ++itr )
+    {
       trans = it.current()->loadTranslator( resSection(), prefix, *itr );
-      if ( trans ) {
+      if ( trans )
+      {
         if ( !myTranslator[prefix].contains( trans ) )
           myTranslator[prefix].append( trans );
         qApp->installTranslator( trans );
@@ -1467,9 +1470,11 @@ void QtxResourceMgr::loadTranslator( const QString& prefix, const QString& name 
   QTranslator* trans = 0;
   ResListIterator it( myResources );
   it.toLast();
-  for ( ; it.current(); --it ) {
+  for ( ; it.current(); --it )
+  {
     trans = it.current()->loadTranslator( resSection(), prefix, name );
-    if ( trans ) {
+    if ( trans )
+    {
       if ( !myTranslator[prefix].contains( trans ) )
         myTranslator[prefix].append( trans );
       qApp->installTranslator( trans );
