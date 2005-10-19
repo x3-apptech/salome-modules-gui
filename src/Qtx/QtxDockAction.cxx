@@ -150,7 +150,11 @@ bool QtxDockAction::isSeparate() const
 
 void QtxDockAction::setSeparate( const bool on )
 {
+  if ( mySeparate == on )
+    return;
+
   mySeparate = on;
+  updateMenus();
 }
 
 /*!
@@ -230,6 +234,15 @@ bool QtxDockAction::removeFrom( QWidget* wid )
   }
 
   return QtxAction::removeFrom( wid );
+}
+
+void QtxDockAction::setMenuText( const QString& txt )
+{
+  if ( menuText() == txt )
+    return;
+
+  QtxAction::setMenuText( txt );
+  updateMenus();
 }
 
 /*!
@@ -1165,5 +1178,45 @@ void QtxDockAction::collectNames( const int place, QStringList& lst ) const
       continue;
 
     lst.append( name );
+  }
+}
+
+void QtxDockAction::updateMenus()
+{
+  for ( MenuMap::Iterator it = myMenu.begin(); it != myMenu.end(); ++it )
+  {
+    QPopupMenu* pm = it.key();
+    MenuInfo& inf = it.data();
+
+    int toolId = findId( pm, inf.tool );
+    int dockId = findId( pm, inf.dock );
+
+    int index = pm->indexOf( dockId );
+
+    if ( isSeparate() && !inf.tool )
+      inf.tool = new QPopupMenu( pm );
+
+    pm->removeItem( dockId );
+    pm->removeItem( toolId );
+
+    if ( !isSeparate() && inf.tool )
+    {
+      delete inf.tool;
+      inf.tool = 0;
+    }
+
+    QString dock, tool;
+    splitMenuText( dock, tool );
+
+    if ( inf.dock )
+      iconSet().isNull() ? pm->insertItem ( dock, inf.dock, -1, index ) :
+                           pm->insertItem ( iconSet(), dock, inf.dock, -1, index );
+
+    if ( index >= 0 )
+      index++;
+
+    if ( inf.tool )
+      iconSet().isNull() ? pm->insertItem ( tool, inf.tool, -1, index ) :
+                          pm->insertItem ( iconSet(), tool, inf.tool, -1, index );
   }
 }

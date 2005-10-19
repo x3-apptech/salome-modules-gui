@@ -48,6 +48,7 @@ public:
   virtual bool addTo( QWidget* );
   virtual bool addTo( QWidget*, const int );
   virtual bool removeFrom( QWidget* );
+  virtual void setMenuText( const QString& );
 
   bool         addDockWindow( QDockWindow* );
   bool         removeDockWindow( QDockWindow* );
@@ -99,6 +100,8 @@ private:
   int          dockPlace( const QString& ) const;
 
   void         collectNames( const int, QStringList& ) const;
+
+  void         updateMenus();
 
 private:
   enum { AutoAdd = QEvent::User, LoadArea };
