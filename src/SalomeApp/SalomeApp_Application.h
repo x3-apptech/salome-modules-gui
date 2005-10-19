@@ -121,6 +121,7 @@ public slots:
   virtual void                        onNewDoc();
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
+  virtual void                        onHelpContentsModule();
   virtual bool                        onOpenDoc( const QString& );
   virtual void                        onLoadDoc();
   virtual bool                        onLoadDoc( const QString& );

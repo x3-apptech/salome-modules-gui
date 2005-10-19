@@ -80,6 +80,7 @@
 #include <qapplication.h>
 #include <qlistbox.h>
 #include <qregexp.h>
+#include <qthread.h>
 #include <qstatusbar.h>
 
 #include "SALOMEDS_StudyManager.hxx"
@@ -91,6 +92,7 @@
 #include "ToolsGUI_RegWidget.h"
 
 #define OBJECT_BROWSER_WIDTH 300
+#define DEFAULT_BROWSER "mozilla"
 
 /*!Image for empty icon.*/
 static const char* imageEmptyIcon[] = {
@@ -447,6 +449,44 @@ void SalomeApp_Application::createActions()
   }
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
 
+  //! Help for modules
+  int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
+  int helpModuleMenu = createMenu( tr( "MEN_DESK_MODULE_HELP" ), helpMenu, -1, 0 );
+  createMenu( separator(), helpMenu, -1, 1 );
+
+  QStringList aModuleList;
+  modules( aModuleList, false );
+  
+  int id = SalomeApp_Application::UserID;
+  // help for KERNEL and GUI
+  QCString dir;
+  if (dir = getenv("GUI_ROOT_DIR")) {
+    a = createAction( id, tr( QString("Kernel & GUI Help") ), QIconSet(),
+		      tr( QString("Kernel && GUI Help") ),
+		      tr( QString("Kernel & GUI Help") ),
+		      0, desk, false, this, SLOT( onHelpContentsModule() ) );
+    a->setName( QString("GUI") );
+    createMenu( a, helpModuleMenu, -1 );
+    id++;
+  }
+  // help for other existing modules
+  for ( QStringList::Iterator it = aModuleList.begin(); it != aModuleList.end(); ++it )
+  {
+    if ( (*it).isEmpty() )
+      continue;
+
+    QString modName = moduleName( *it );
+    if ( modName.compare("GEOM") == 0 ) { // to be removed when documentation for other modules will be done
+      QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
+				 tr( moduleTitle(modName) + QString(" Help") ),
+				 tr( moduleTitle(modName) + QString(" Help") ),
+				 0, desk, false, this, SLOT( onHelpContentsModule() ) );
+      a->setName( modName );
+      createMenu( a, helpModuleMenu, -1 );
+      id++;
+    }
+  }
+
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
   createMenu( DumpStudyId, fileMenu, 10, -1 );
@@ -463,6 +503,7 @@ void SalomeApp_Application::createActions()
   createMenu( RegDisplayId, toolsMenu, 10, -1 );
   createMenu( separator(), toolsMenu, -1, 15, -1 );
 
+  
   /*
   createMenu( separator(), fileMenu, -1, 100, -1 );
   createMenu( MRUId, fileMenu, 100, -1 );
@@ -904,6 +945,83 @@ void SalomeApp_Application::onHelpAbout()
   SalomeApp_AboutDlg* dlg = new SalomeApp_AboutDlg( applicationName(), applicationVersion(), desktop() );
   dlg->exec();
   delete dlg;
+}
+
+// Helps to execute command
+class RunBrowser: public QThread {
+public:
+  
+  RunBrowser(QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL): 
+    myApp(theApp), myParams(theParams), myHelpFile("file:" + theHelpFile + theContext), myStatus(0) {};
+  
+  virtual void run()
+  {
+    QString aCommand;
+    
+    if ( !myApp.isEmpty())
+      {
+	aCommand.sprintf("%s %s %s",myApp.latin1(),myParams.latin1(),myHelpFile.latin1());
+	myStatus = system(aCommand);
+	if(myStatus != 0)
+	  {
+	    QCustomEvent* ce2000 = new QCustomEvent (2000);
+	    postEvent (qApp, ce2000);
+	  }
+      }
+    
+    if( myStatus != 0 || myApp.isEmpty())
+      {
+	myParams = "";
+	aCommand.sprintf("%s %s %s", QString(DEFAULT_BROWSER).latin1(),myParams.latin1(), myHelpFile.latin1());	
+	myStatus = system(aCommand);
+	if(myStatus != 0)
+	  {
+	    QCustomEvent* ce2001 = new QCustomEvent (2001);
+	    postEvent (qApp, ce2001);
+	  }
+      }
+  }
+
+private:
+  QString myApp;
+  QString myParams;
+  QString myHelpFile;
+  int myStatus;
+  
+};
+
+//=======================================================================
+// name    : onHelpContentsModule
+/*! Purpose : SLOT. Display help contents for choosen module*/
+//=======================================================================
+void SalomeApp_Application::onHelpContentsModule()
+{
+  const QAction* obj = (QAction*) sender();
+  
+  QString aComponentName = obj->name();
+  QString aFileName = aComponentName.lower() + ".htm";
+
+  QCString dir;
+  QString root;
+  QString homeDir;
+  if (dir = getenv( aComponentName + "_ROOT_DIR")) {
+    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome")  +  Qtx::addSlash(aComponentName));
+    if ( QFileInfo( root + aFileName ).exists() ) {
+      homeDir = root;
+    } else {
+      SUIT_MessageBox::warn1( desktop(), tr("WRN_WARNING"), 
+			      QString( "%1"+ aFileName + " doesn't exist." ).arg(root), tr ("BUT_OK") );
+      return;
+    }
+  }
+
+  QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();   
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+  QString anApp = resMgr->stringValue("ExternalBrowser", "application");
+  QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
+   
+  RunBrowser* rs = new RunBrowser(anApp, aParams, helpFile);
+  rs->start();
 }
 
 QWidget* SalomeApp_Application::window( const int flag, const int studyId ) const
