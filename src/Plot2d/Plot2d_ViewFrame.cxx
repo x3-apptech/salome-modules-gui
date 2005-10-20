@@ -825,6 +825,49 @@ void Plot2d_ViewFrame::fitArea( const QRect& area )
 }
 
 /*!
+  "Fit Data" command for TUI interface
+*/
+void Plot2d_ViewFrame::fitData(const int mode,
+			       const double xMin, const double xMax,
+			       const double yMin, const double yMax,
+			       double y2Min, double y2Max)
+{
+  if ( mode == 0 || mode == 2 ) {
+    myPlot->setAxisScale( QwtPlot::yLeft, yMax, yMin );
+    if (mySecondY)
+      myPlot->setAxisScale( QwtPlot::yRight, y2Max, y2Min );
+  }
+  if ( mode == 0 || mode == 1 ) 
+    myPlot->setAxisScale( QwtPlot::xBottom, xMin, xMax ); 
+  myPlot->replot();
+}
+
+/*!
+  Gets current fit ranges for view frame
+*/
+void Plot2d_ViewFrame::getFitRanges(double& xMin,double& xMax,
+				    double& yMin, double& yMax,
+				    double& y2Min, double& y2Max)
+{
+  int ixMin = myPlot->canvasMap( QwtPlot::xBottom ).i1();
+  int ixMax = myPlot->canvasMap( QwtPlot::xBottom ).i2();
+  int iyMin = myPlot->canvasMap( QwtPlot::yLeft ).i1();
+  int iyMax = myPlot->canvasMap( QwtPlot::yLeft ).i2();
+  xMin = myPlot->invTransform(QwtPlot::xBottom, ixMin);
+  xMax = myPlot->invTransform(QwtPlot::xBottom, ixMax);
+  yMin = myPlot->invTransform(QwtPlot::yLeft, iyMin);
+  yMax = myPlot->invTransform(QwtPlot::yLeft, iyMax);
+  y2Min = 0;
+  y2Max = 0;
+  if (mySecondY) {
+    int iyMin = myPlot->canvasMap( QwtPlot::yRight ).i1();
+    int iyMax = myPlot->canvasMap( QwtPlot::yRight ).i2();
+    y2Min = myPlot->invTransform(QwtPlot::yRight, iyMin);
+    y2Max = myPlot->invTransform(QwtPlot::yRight, iyMax);
+  }
+}
+
+/*!
   Tests if it is necessary to start operation on mouse action
 */
 int Plot2d_ViewFrame::testOperation( const QMouseEvent& me )
@@ -980,34 +1023,13 @@ void Plot2d_ViewFrame::onSettings()
 void Plot2d_ViewFrame::onFitData()
 {
   Plot2d_FitDataDlg* dlg = new Plot2d_FitDataDlg( this, mySecondY );
-  int ixMin = myPlot->canvasMap( QwtPlot::xBottom ).i1();
-  int ixMax = myPlot->canvasMap( QwtPlot::xBottom ).i2();
-  int iyMin = myPlot->canvasMap( QwtPlot::yLeft ).i1();
-  int iyMax = myPlot->canvasMap( QwtPlot::yLeft ).i2();
-  double xMin = myPlot->invTransform(QwtPlot::xBottom, ixMin);
-  double xMax = myPlot->invTransform(QwtPlot::xBottom, ixMax);
-  double yMin = myPlot->invTransform(QwtPlot::yLeft, iyMin);
-  double yMax = myPlot->invTransform(QwtPlot::yLeft, iyMax);
-  double y2Min = 0;
-  double y2Max = 0;
-  if (mySecondY) {
-    int iyMin = myPlot->canvasMap( QwtPlot::yRight ).i1();
-    int iyMax = myPlot->canvasMap( QwtPlot::yRight ).i2();
-    y2Min = myPlot->invTransform(QwtPlot::yRight, iyMin);
-    y2Max = myPlot->invTransform(QwtPlot::yRight, iyMax);
-  }
+  double xMin,xMax,yMin,yMax,y2Min,y2Max;
+  getFitRanges(xMin,xMax,yMin,yMax,y2Min,y2Max);
   
   dlg->setRange( xMin, xMax, yMin, yMax, y2Min, y2Max );
   if ( dlg->exec() == QDialog::Accepted ) {
     int mode = dlg->getRange( xMin, xMax, yMin, yMax, y2Min, y2Max );
-    if ( mode == 0 || mode == 2 ) {
-      myPlot->setAxisScale( QwtPlot::yLeft, yMax, yMin );
-      if (mySecondY)
-        myPlot->setAxisScale( QwtPlot::yRight, y2Max, y2Min );
-    }
-    if ( mode == 0 || mode == 1 ) 
-      myPlot->setAxisScale( QwtPlot::xBottom, xMin, xMax ); 
-    myPlot->replot();
+    fitData(mode,xMin,xMax,yMin,yMax,y2Min,y2Max);
   }
   delete dlg;
 }
