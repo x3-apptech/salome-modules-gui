@@ -85,7 +85,7 @@ Plot2d_SetupCurveDlg::Plot2d_SetupCurveDlg( QWidget* parent )
 
   QLabel* aColorLab = new QLabel( tr( "CURVE_COLOR_LAB" ), TopGroup );
   myColorBtn = new QToolButton( TopGroup );
-  myColorBtn->setMinimumWidth(25);
+  myColorBtn->setMinimumSize(25, 25);
 
   TopGroupLayout->addWidget( aLineTypeLab, 0, 0 );
   TopGroupLayout->addMultiCellWidget( myLineCombo, 0, 0, 1, 2 );

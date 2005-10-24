@@ -508,7 +508,8 @@ void SPlot2d_ItemContainer::createWidgets( QWidget* parentWidget )
   myMarkerCombo->setCurrentItem( 1 ); // CIRCLE by default
 
   myColorBtn = new QToolButton( parentWidget );
-
+  myColorBtn->setMinimumWidth( 20 );
+ 
   connect( myAutoCheck, SIGNAL( clicked() ),       this, SLOT( onAutoChanged() ) );
   connect( myColorBtn,  SIGNAL( clicked() ),       this, SLOT( onColorChanged() ) );
   connect( myHBtn,      SIGNAL( toggled( bool ) ), this, SLOT( onHVToggled( bool ) ) );
