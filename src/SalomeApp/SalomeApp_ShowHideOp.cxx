@@ -2,11 +2,12 @@
 #include "SalomeApp_ShowHideOp.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_SelectionMgr.h"
-#include "SalomeApp_DataOwner.h"
 #include "SalomeApp_Selection.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_Displayer.h"
 #include "CAM_Study.h"
+#include <SALOME_ListIO.hxx>
+#include <SALOME_ListIteratorOfListIO.hxx>
 
 SalomeApp_ShowHideOp::SalomeApp_ShowHideOp( ActionType type )
 : SalomeApp_Operation(),
@@ -56,19 +57,18 @@ void SalomeApp_ShowHideOp::startOperation()
   if( myActionType==DISPLAY_ONLY )
     d->EraseAll( false, false, 0 );
 
-  SUIT_DataOwnerPtrList selected;
-  mgr->selected( selected );
-  SUIT_DataOwnerPtrList::const_iterator anIt = selected.begin(), aLast = selected.end();
-  for( ; anIt!=aLast; anIt++ )
+  SALOME_ListIO selObjs;
+  mgr->selectedObjects( selObjs );
+  SALOME_ListIteratorOfListIO anIt( selObjs );
+  for( ; anIt.More(); anIt.Next() )
   {
-    SalomeApp_DataOwner* owner = dynamic_cast<SalomeApp_DataOwner*>( (*anIt).operator->() );
-    if( !owner )
+    if( anIt.Value().IsNull() )
       continue;
 
     if( myActionType==DISPLAY || myActionType==DISPLAY_ONLY )
-      d->Display( owner->entry(), false, 0 );
+      d->Display( anIt.Value()->getEntry(), false, 0 );
     else if( myActionType==ERASE )
-      d->Erase( owner->entry(), false, false, 0 );
+      d->Erase( anIt.Value()->getEntry(), false, false, 0 );
   }
   d->UpdateViewer();
   commit();

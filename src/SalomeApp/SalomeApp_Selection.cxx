@@ -36,6 +36,12 @@ void SalomeApp_Selection::init( const QString& client, SalomeApp_SelectionMgr* m
     if ( mgr->application() )
       myStudy = dynamic_cast<SalomeApp_Study*>( mgr->application()->activeStudy() );
 
+    if( !myStudy )
+      return;
+
+    _PTR(Study) studyds = myStudy->studyDS();
+    _PTR(SObject) refobj;
+
     SUIT_DataOwnerPtrList sel;
     mgr->selected( sel, client );
     SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
@@ -43,8 +49,19 @@ void SalomeApp_Selection::init( const QString& client, SalomeApp_SelectionMgr* m
     {
       SUIT_DataOwner* owner = ( SUIT_DataOwner* )( (*anIt ).get() );
       SalomeApp_DataOwner* sowner = dynamic_cast<SalomeApp_DataOwner*>( owner );
-      if( sowner ) {
-	myEntries.append( sowner->entry() );
+      if( sowner )
+      {
+	_PTR(SObject) obj = studyds->FindObjectID( sowner->entry() );
+	if( obj->ReferencedObject( refobj ) )
+	{
+	  myEntries.append( refobj->GetID() );
+	  myIsReferences.append( true );
+	}
+	else
+	{
+	  myEntries.append( sowner->entry() );
+	  myIsReferences.append( false );
+	}
 	processOwner( sowner );
       }
     }
@@ -82,6 +99,8 @@ QtxValue SalomeApp_Selection::param( const int ind, const QString& p ) const
     if( !mod_name.isEmpty() )
       return mod_name;
   }
+  else if( p=="isReference" )
+    return QtxValue( isReference( ind ), false );
 
   return QtxValue();
 }
@@ -126,6 +145,17 @@ QString SalomeApp_Selection::entry( const int index ) const
   if ( index >= 0 && index < count() )
     return myEntries[ index ];
   return QString();
+}
+
+/*!
+  Returns true if i-th selected object was reference to object with entry( i )
+*/
+bool SalomeApp_Selection::isReference( const int index ) const
+{
+  if( index >= 0 && index < count() )
+    return myIsReferences[ index ];
+  else
+    return false;
 }
 
 /*!

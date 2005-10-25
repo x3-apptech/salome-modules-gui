@@ -26,7 +26,7 @@ public:
 
   SalomeApp_Application* application() const;
 
-  void                   selectedObjects( SALOME_ListIO&, const QString& = QString::null ) const;
+  void                   selectedObjects( SALOME_ListIO&, const QString& = QString::null, const bool = true ) const;
   void                   setSelectedObjects( const SALOME_ListIO&, const bool = false );
 
   void                   GetIndexes( const Handle(SALOME_InteractiveObject)& IObject, 

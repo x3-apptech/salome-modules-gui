@@ -44,7 +44,8 @@ SalomeApp_Application* SalomeApp_SelectionMgr::application() const
 /*!
   Get all selected objects from selection manager
 */
-void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QString& theType ) const
+void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QString& theType,
+					      const bool convertReferences ) const
 {
   theList.Clear();
 
@@ -52,15 +53,37 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStr
   selected( aList, theType );
 
   QMap<QString,int> entryMap;
+  SalomeApp_Study* st = dynamic_cast<SalomeApp_Study*>( application()->activeStudy() );
+  if( !st )
+    return;
+
+  _PTR(Study) dstudy = st->studyDS();
+  QString entry;
+  _PTR(SObject) refobj;
 
   for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
   {
     const SalomeApp_DataOwner* owner = dynamic_cast<const SalomeApp_DataOwner*>( (*itr).operator->() );
-    if( !owner ) continue;
-    
-    if ( !entryMap.contains(owner->entry()) )
-      theList.Append( owner->IO() );
-    entryMap.insert(owner->entry(), 1);
+    if( !owner ) 
+      continue;
+
+    _PTR(SObject) obj = dstudy->FindObjectID( owner->entry() );
+    if( convertReferences && obj->ReferencedObject( refobj ) )
+    {
+      entry = refobj->GetID();
+      if( !entryMap.contains( entry ) )
+	theList.Append( new SALOME_InteractiveObject( refobj->GetID().c_str(),
+						      refobj->GetFatherComponent()->ComponentDataType().c_str(),
+						      refobj->Name().c_str() ) );
+    }
+    else
+    {
+      entry = owner->entry();
+      if( !entryMap.contains( entry ) )
+	theList.Append( owner->IO() );
+    }
+
+    entryMap.insert( entry , 1);
   }
 }
 

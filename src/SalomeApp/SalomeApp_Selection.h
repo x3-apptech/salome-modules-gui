@@ -55,6 +55,7 @@ public:
 
 protected:
   QString                        entry( const int ) const;
+  bool                           isReference( const int ) const;
   /*!Gets study.*/
   SalomeApp_Study*               study() const { return myStudy; }
   QString                        activeViewType() const;
@@ -63,6 +64,7 @@ protected:
 private:
   QString                        myPopupClient;
   QStringList                    myEntries; // entries of selected objects
+  QValueList<bool>               myIsReferences; // whether i-th selected object was a reference
   SalomeApp_Study*               myStudy;						 
 };
 
