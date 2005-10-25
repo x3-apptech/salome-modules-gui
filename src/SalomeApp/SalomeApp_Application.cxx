@@ -56,6 +56,7 @@
 #include <QtxResourceEdit.h>
 
 #include <OB_Browser.h>
+#include <OB_ListItem.h>
 
 #include <PythonConsole_PyConsole.h>
 
@@ -1460,6 +1461,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     ob->setFilter( new SalomeApp_OBFilter( selectionMgr() ) );
 
     ob->setNameTitle( tr( "OBJ_BROWSER_NAME" ) );
+    connect( ob->listView(), SIGNAL( doubleClicked( QListViewItem* ) ), this, SLOT( onDblClick( QListViewItem* ) ) );
 
     bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
     for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
@@ -2242,4 +2244,47 @@ void SalomeApp_Application::onRegDisplay()
 SUIT_Accel* SalomeApp_Application::accel() const
 {
   return myAccel;
+}
+
+/*!find original object by double click on item */
+void SalomeApp_Application::onDblClick( QListViewItem* it )
+{
+  OB_ListItem* item = dynamic_cast<OB_ListItem*>( it );
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+
+  if( study && item )
+  {
+    SalomeApp_DataObject* obj = dynamic_cast<SalomeApp_DataObject*>( item->dataObject() );
+    if( !obj )
+      return;
+
+    QString entry = obj->entry();
+    _PTR(SObject) sobj = study->studyDS()->FindObjectID( entry.latin1() ), ref;
+    
+    if( sobj && sobj->ReferencedObject( ref ) )
+    {
+      entry = ref->GetID();
+      QListViewItemIterator anIt( item->listView() );
+      for( ; anIt.current(); anIt++ )
+      {
+	OB_ListItem* item = dynamic_cast<OB_ListItem*>( anIt.current() );
+	if( !item )
+	  continue;
+
+	SalomeApp_DataObject* original = dynamic_cast<SalomeApp_DataObject*>( item->dataObject() );
+	if( original->entry()!=entry )
+	  continue;
+
+	OB_Browser* br = objectBrowser();
+	br->setSelected( original );
+	SUIT_DataObject* p = original->parent();
+	while( p )
+	{
+	  br->setOpen( p );
+	  p = p->parent();
+	}
+	break;
+      }
+    }
+  }
 }
