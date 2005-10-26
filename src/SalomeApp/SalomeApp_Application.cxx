@@ -93,6 +93,7 @@
 #include "ToolsGUI_RegWidget.h"
 
 #define OBJECT_BROWSER_WIDTH 300
+#define OBJECT_COLUMN_WIDTH 150
 #define DEFAULT_BROWSER "mozilla"
 
 /*!Image for empty icon.*/
@@ -1457,6 +1458,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     ob->setAutoUpdate( true );
     ob->setAutoOpenLevel( 1 );
     ob->setCaption( tr( "OBJECT_BROWSER" ) );
+    ob->listView()->setColumnWidth( 0, OBJECT_COLUMN_WIDTH );
     ob->resize( OBJECT_BROWSER_WIDTH, ob->height() );
     ob->setFilter( new SalomeApp_OBFilter( selectionMgr() ) );
 
