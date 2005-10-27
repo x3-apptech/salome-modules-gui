@@ -473,7 +473,7 @@ void QtxMRUAction::onActivated( int id )
 
 void QtxMRUAction::onDestroyed( QObject* obj )
 {
-  if ( !obj || !obj->inherits( "QPopupMenu" ) )
+  if ( !obj )
     return;
 
   myItems.remove( (QPopupMenu*)obj );
