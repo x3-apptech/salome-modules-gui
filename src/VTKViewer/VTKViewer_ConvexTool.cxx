@@ -41,26 +41,27 @@ static float FACE_ANGLE_TOLERANCE=1.5;
  * \param theptIds - point ids.
  * \retval center - output array[3] with coordinates of geometry center.
  */
-static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
+static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float center[3])
 {
-  float *p;
+  float p[3];
   center[0] = center[1] = center[2] = 0.0;
-  
-  int numIds=theptIds.size();
+
+  int numIds = theptIds.size();
+  if (numIds == 0) return;
 
   // get the center of the cell
-  for (int i=0; i < numIds; i++)
+  for (int i = 0; i < numIds; i++)
+  {
+    theGrid->GetPoint(theptIds[i], p);
+    for (int j = 0; j < 3; j++)
     {
-      p = theGrid->GetPoint(theptIds[i]);
-      for (int j=0; j < 3; j++)
-	{
-	  center[j] += p[j];
-	}
+      center[j] += p[j];
     }
-  for (int j=0; j<3; j++)
-    {
-      center[j] /= numIds;
-    }
+  }
+  for (int j = 0; j < 3; j++)
+  {
+    center[j] /= numIds;
+  }
 }
 
 /*! \fn static void ReverseIds(TCell &theIds)
@@ -350,18 +351,18 @@ void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outpu
       int numPts = convex->GetNumberOfPoints();
       TCell convex_ids;
       TPTOIDS p2faces; // key=pointId , value facesIds set
-      
+
       for(int i=0;i<numPts;i++)
 	  convex_ids.push_back(convex->GetPointId(i));
-      
+
       GetCenter(theGrid,convex_ids,convex_center);
 
       for (vtkIdType faceId=0; faceId < aNbFaces; faceId++){
 	vtkCell *aFace = convex->GetFace(faceId);
 	int numFacePts = aFace->GetNumberOfPoints();
 	TCell aIds;
-	
-  int i = 0;
+
+        int i = 0;
  	for(i=0;i<numFacePts;i++)
 	  aIds.push_back(aFace->GetPointId(i));
 
