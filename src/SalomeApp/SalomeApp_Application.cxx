@@ -458,7 +458,7 @@ void SalomeApp_Application::createActions()
 
   QStringList aModuleList;
   modules( aModuleList, false );
-  
+
   int id = SalomeApp_Application::UserID;
   // help for KERNEL and GUI
   QCString dir;
@@ -505,7 +505,7 @@ void SalomeApp_Application::createActions()
   createMenu( RegDisplayId, toolsMenu, 10, -1 );
   createMenu( separator(), toolsMenu, -1, 15, -1 );
 
-  
+
   /*
   createMenu( separator(), fileMenu, -1, 100, -1 );
   createMenu( MRUId, fileMenu, 100, -1 );
@@ -636,7 +636,85 @@ void SalomeApp_Application::onOpenDoc()
 /*! Purpose : SLOT. Open new document with \a aName.*/
 bool SalomeApp_Application::onOpenDoc( const QString& aName )
 {
-  bool res = CAM_Application::onOpenDoc( aName );
+  bool res = false, toOpen = true, isAlreadyOpen = false;
+
+  // Look among opened studies
+  if (activeStudy()) { // at least one study is opened
+    SUIT_Session* aSession = SUIT_Session::session();
+    QPtrList<SUIT_Application> aAppList = aSession->applications();
+    QPtrListIterator<SUIT_Application> it (aAppList);
+    SUIT_Application* aApp = 0;
+    // iterate on all applications
+    for (; (aApp = it.current()) && !isAlreadyOpen; ++it) {
+      if (aApp->activeStudy()->studyName() == aName) {
+        isAlreadyOpen = true; // Already opened, ask user what to do
+
+        // The document ... is already open.
+        // Do you want to reload it?
+        int aAnswer = SUIT_MessageBox::warn2(desktop(), tr("WRN_WARNING"),
+                                             tr("QUE_DOC_ALREADYOPEN").arg(aName),
+                                             tr("BUT_YES"), tr("BUT_NO"), 1, 2, 2);
+        if (aAnswer == 1) { // reload
+          if (activeStudy()->studyName() == aName && aAppList.count() > 1) {
+            // Opened in THIS (active) application.
+            STD_Application* app1 = (STD_Application*)aAppList.at(0);
+            STD_Application* app2 = (STD_Application*)aAppList.at(1);
+            if (!app1 || !app2) {
+              // Error
+              return false;
+            }
+            if (app1->activeStudy()->studyName() == aName) {
+              // app1 is this application, we need another one
+              app1 = app2;
+            }
+            // Close document of this application. This application will be destroyed.
+            onCloseDoc(/*ask = */false);
+            // Open the file with another application, as this one will be destroyed.
+            return app1->onOpenDoc(aName);
+          } else {
+            // Opened in another application.
+            STD_Application* app = (STD_Application*)aApp;
+            if (app)
+              app->onCloseDoc(/*ask = */false);
+          }
+        } else { // do not reload
+          // OK, the study will not be reloaded, but we call
+          // CAM_Application::onOpenDoc( aName ) all the same.
+          // It will activate a desktop of the study <aName>.
+        }
+      }
+    }
+  }
+
+  // Look among unloaded studies
+  if (!isAlreadyOpen) {
+    std::vector<std::string> List = studyMgr()->GetOpenStudies();
+
+    QString studyName;
+    for (unsigned int ind = 0; ind < List.size() && !isAlreadyOpen; ind++) {
+      studyName = List[ind].c_str();
+      if (aName == studyName) {
+        // Already exists unloaded, ask user what to do
+        isAlreadyOpen = true;
+
+        // The document ... already exists in the study manager.
+        // Do you want to reload it?
+        int aAnswer = SUIT_MessageBox::warn2(desktop(), tr("WRN_WARNING"),
+                                             tr("QUE_DOC_ALREADYEXIST").arg(aName),
+                                             tr("BUT_YES"), tr("BUT_NO"), 1, 2, 2);
+        if (aAnswer == 1) {
+          _PTR(Study) aStudy = studyMgr()->GetStudyByName(aName.latin1());
+          if (aStudy)
+            studyMgr()->Close(aStudy);
+        } else {
+          toOpen = false;
+        }
+      }
+    }
+  }
+
+  if (toOpen)
+    res = CAM_Application::onOpenDoc( aName );
 
   QAction* a = action( MRUId );
   if ( a && a->inherits( "QtxMRUAction" ) )
@@ -952,14 +1030,14 @@ void SalomeApp_Application::onHelpAbout()
 // Helps to execute command
 class RunBrowser: public QThread {
 public:
-  
-  RunBrowser(QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL): 
+
+  RunBrowser(QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL):
     myApp(theApp), myParams(theParams), myHelpFile("file:" + theHelpFile + theContext), myStatus(0) {};
-  
+
   virtual void run()
   {
     QString aCommand;
-    
+
     if ( !myApp.isEmpty())
       {
 	aCommand.sprintf("%s %s %s",myApp.latin1(),myParams.latin1(),myHelpFile.latin1());
@@ -970,11 +1048,11 @@ public:
 	    postEvent (qApp, ce2000);
 	  }
       }
-    
+
     if( myStatus != 0 || myApp.isEmpty())
       {
 	myParams = "";
-	aCommand.sprintf("%s %s %s", QString(DEFAULT_BROWSER).latin1(),myParams.latin1(), myHelpFile.latin1());	
+	aCommand.sprintf("%s %s %s", QString(DEFAULT_BROWSER).latin1(),myParams.latin1(), myHelpFile.latin1());
 	myStatus = system(aCommand);
 	if(myStatus != 0)
 	  {
@@ -989,7 +1067,7 @@ private:
   QString myParams;
   QString myHelpFile;
   int myStatus;
-  
+
 };
 
 //=======================================================================
@@ -999,7 +1077,7 @@ private:
 void SalomeApp_Application::onHelpContentsModule()
 {
   const QAction* obj = (QAction*) sender();
-  
+
   QString aComponentName = obj->name();
   QString aFileName = aComponentName.lower() + ".htm";
 
@@ -1011,17 +1089,17 @@ void SalomeApp_Application::onHelpContentsModule()
     if ( QFileInfo( root + aFileName ).exists() ) {
       homeDir = root;
     } else {
-      SUIT_MessageBox::warn1( desktop(), tr("WRN_WARNING"), 
+      SUIT_MessageBox::warn1( desktop(), tr("WRN_WARNING"),
 			      QString( "%1"+ aFileName + " doesn't exist." ).arg(root), tr ("BUT_OK") );
       return;
     }
   }
 
-  QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();   
+  QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();
   QString anApp = resMgr->stringValue("ExternalBrowser", "application");
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
-   
+
   RunBrowser* rs = new RunBrowser(anApp, aParams, helpFile);
   rs->start();
 }
@@ -1324,6 +1402,10 @@ void SalomeApp_Application::onStudyClosed( SUIT_Study* )
   emit studyClosed();
 
   activateModule( "" );
+
+  // Bug 10396: remove all selectors
+  delete mySelMgr;
+  mySelMgr = new SalomeApp_SelectionMgr( this );
 
   saveWindowsGeometry();
 }
@@ -2262,7 +2344,7 @@ void SalomeApp_Application::onDblClick( QListViewItem* it )
 
     QString entry = obj->entry();
     _PTR(SObject) sobj = study->studyDS()->FindObjectID( entry.latin1() ), ref;
-    
+
     if( sobj && sobj->ReferencedObject( ref ) )
     {
       entry = ref->GetID();
