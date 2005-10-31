@@ -74,7 +74,7 @@ signals:
 
 public slots:
   virtual void          onNewDoc();
-  virtual void          onCloseDoc();
+  virtual void          onCloseDoc( bool ask = true );
   virtual void          onSaveDoc();
   virtual bool          onSaveAsDoc();
 

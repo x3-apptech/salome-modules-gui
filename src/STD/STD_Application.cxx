@@ -329,10 +329,11 @@ void STD_Application::afterCloseDoc()
 }
 
 /*!Close document, if it's possible.*/
-void STD_Application::onCloseDoc()
+void STD_Application::onCloseDoc(bool ask)
 {
-  if ( !isPossibleToClose() )
-    return;
+  if (ask)
+    if ( !isPossibleToClose() )
+      return;
 
   SUIT_Study* study = activeStudy();
 

@@ -322,6 +322,9 @@ msgstr "PYTHON Files (*.py)"
 msgid "SalomeApp_Application::STUDY_LOCKED"
 msgstr "LOCKED"
 
+msgid "SalomeApp_Application::QUE_DOC_ALREADYEXIST"
+msgstr "The document %1 already exists in study manager.\nDo you want to reload it ?"
+
 //=======================================================================================
 
 msgid "SalomeApp_ModuleDlg::CAPTION"
