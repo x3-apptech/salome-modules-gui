@@ -161,14 +161,14 @@ QString SalomeApp_DataObject::text( const int id ) const
       txt = value( referencedObject() );
     break;
   case CT_Entry:
-    txt = entry( referencedObject() );
+    txt = entry( object() );
     break;
   case CT_IOR:
     txt = ior( referencedObject() );
     break;
   case CT_RefEntry:
     if ( isReference() )
-      txt = entry( object() );
+      txt = entry( referencedObject() );
     break;
   }
   return txt;
