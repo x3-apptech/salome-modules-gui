@@ -68,7 +68,7 @@ void SalomeApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStr
       continue;
 
     _PTR(SObject) obj = dstudy->FindObjectID( owner->entry() );
-    if( convertReferences && obj->ReferencedObject( refobj ) )
+    if( obj && convertReferences && obj->ReferencedObject( refobj ) )
     {
       entry = refobj->GetID();
       if( !entryMap.contains( entry ) )
