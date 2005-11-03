@@ -34,6 +34,6 @@ VPATH=.:@srcdir@
 
 SUBDIRS = Qtx SUIT STD CAF CAM SUITApp VTKViewer OCCViewer GLViewer \
           LogWindow Event OBJECT Prs PyInterp PythonConsole ObjBrowser \
-          RegistryDisplay Plot2d TOOLSGUI SOCC SVTK SPlot2d Session SalomeApp SALOME_SWIG SALOME_PY SUPERVGraph SALOME_PYQT Style ResExporter
+          RegistryDisplay Plot2d TOOLSGUI SOCC SVTK SPlot2d LightApp Session SalomeApp SALOME_SWIG SALOME_PY SUPERVGraph SALOME_PYQT Style ResExporter
 
 @MODULE@
