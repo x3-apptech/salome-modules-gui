@@ -44,7 +44,7 @@ LIB_SRC= PyInterp_base.cxx \
 
 LIB_MOC = PyInterp_Watcher.h
 
-CPPFLAGS+= $(PYTHON_INCLUDES) $(QT_INCLUDES) -I$(KERNEL_ROOT_DIR)/include/salome
+CPPFLAGS+= $(PYTHON_INCLUDES) $(QT_INCLUDES)
 
 LDFLAGS+= $(PYTHON_LIBS) $(QT_MT_LIBS)
 
