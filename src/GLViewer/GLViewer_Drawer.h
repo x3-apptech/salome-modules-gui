@@ -1,7 +1,26 @@
+//  Copyright (C) 2005 OPEN CASCADE
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
+//
+//  Author : OPEN CASCADE
+//
+
 // File:      GLViewer_Drawer.h
 // Created:   November, 2004
-// Author:    OCC team
-// Copyright (C) CEA 2004
 
 #ifndef GLVIEWER_DRAWER_H
 #define GLVIEWER_DRAWER_H
@@ -78,10 +97,15 @@ public:
   GLViewer_TexFont();
   //! A constructor
   /*
-  * \param theFont      - a base font
-  * \param theSeparator - separator between letters
+  * \param theFont         - a base font
+  * \param theSeparator    - separator between letters
+  * \param theIsResizeable - specifies whether text drawn by this object can be scaled along with the scene
+  * \param theMinMagFilter - min/mag filter, affects text sharpness
   */
-  GLViewer_TexFont( QFont* theFont, int theSeparator = 2 );
+  GLViewer_TexFont( QFont* theFont, 
+                    int theSeparator = 2, 
+                    bool theIsResizeable = false, 
+                    GLuint theMinMagFilter = GL_LINEAR/*_ATTENUATION*/ );
   //! A destructor
   ~GLViewer_TexFont();
   
@@ -123,6 +147,10 @@ protected:
   int             myTexFontHeight;
   //! Separator between letters
   int             mySeparator;
+  //! Flag controlling scalability of this texmapped font
+  bool            myIsResizeable;
+  //! Min/mag filter
+  GLuint          myMinMagFilter;
 };
 
 /***************************************************************************
@@ -188,8 +216,8 @@ public:
   //! Returns object priority
   int                             getPriority() const { return myPriority; }
 
-  //! The function enables and disables antialiasing in Open GL (for points, lines and polygons).
-  void                            setAntialiasing(const bool on);
+	//! The function enables and disables antialiasing in Open GL (for points, lines and polygons).
+	void                            setAntialiasing(const bool on);
   
   //! Clears all generated textures
   static void                     destroyAllTextures();
@@ -270,6 +298,24 @@ public:
                                               QColor color = Qt::black,
                                               bool smallFont = false );
 
+  //! Sets a default font to be used by drawGLText method
+  /*!
+   *\param font      - the default font
+  */
+  inline void                     setFont( const QFont& font ) { myFont = font; }
+
+  //! Returns a default font used by drawGLText method
+  inline QFont                    font() const { return myFont; }
+
+  //! Sets a default text displaying format to be used by drawGLText method
+  /*!
+   *\param format    - the default text displaying format
+  */
+  inline void                     setTextFormat( DisplayTextFormat format ) { myTextFormat = format; }
+
+  //! Returns a default text displaying format used by drawGLText method
+  inline DisplayTextFormat        textFormat() const { return myTextFormat; }
+
   //! Draw rectangle with predefined color
   static void                     drawRectangle( GLViewer_Rect* theRect, QColor = Qt::black );
 
@@ -291,6 +337,11 @@ protected:
   QString                         myObjectType;
   //! Dislay priority
   int                             myPriority;
+
+  //! Default font for drawGLText() method
+  QFont                           myFont;
+  //! Default text displaying format for drawGLText() method
+  DisplayTextFormat               myTextFormat;
 };
 
 #ifdef WNT

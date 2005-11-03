@@ -1,7 +1,26 @@
+//  Copyright (C) 2005 OPEN CASCADE
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
+//
+//  Author : OPEN CASCADE
+//
+
 // File:      GLViewer_Drawer.cxx
 // Created:   November, 2004
-// Author:    OCC team
-// Copyright (C) CEA 2004
 
 //#include <GLViewerAfx.h>
 #include "GLViewer_Drawer.h"
@@ -70,14 +89,17 @@ GLViewer_TexFont::GLViewer_TexFont()
     }
 
     myTexFontWidth = 0;
-    myTexFontHeight = 0;        
+    myTexFontHeight = 0; 
+    myIsResizeable = false;
+    //myMinMagFilter = GL_NEAREST;
+    myMinMagFilter = GL_LINEAR_ATTENUATION ;
 }
 
 //======================================================================
 // Function: GLViewer_TexFont
 // Purpose :
 //=======================================================================
-GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator )
+GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator, bool theIsResizeable, GLuint theMinMagFilter )
 {
     myQFont = *theFont;
     QFontMetrics aFM( myQFont );        
@@ -93,6 +115,8 @@ GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator )
 
     myTexFontWidth = 0;
     myTexFontHeight = 0;
+    myIsResizeable = theIsResizeable;
+    myMinMagFilter = theMinMagFilter;
     
 }
 
@@ -182,11 +206,18 @@ void GLViewer_TexFont::generateTexture()
         glBindTexture(GL_TEXTURE_2D, myTexFont);  
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, myMinMagFilter);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, myMinMagFilter);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glTexImage2D(GL_TEXTURE_2D, 0, 2, myTexFontWidth,
-            myTexFontHeight, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, pixels);
+        glTexImage2D(GL_TEXTURE_2D, 
+                     0, 
+                     GL_INTENSITY, 
+                     myTexFontWidth,
+                     myTexFontHeight, 
+                     0, 
+                     GL_LUMINANCE_ALPHA, 
+                     GL_UNSIGNED_BYTE, 
+                     pixels);
     
         delete[] pixels;
         
@@ -205,41 +236,62 @@ void GLViewer_TexFont::generateTexture()
 //=======================================================================
 void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY )
 {
+    double aXScale = 1., aYScale = 1.;
+    // store attributes
+    glPushAttrib( GL_ENABLE_BIT | GL_TEXTURE_BIT );
+
+    if ( !myIsResizeable )
+    {
+      glGetDoublev (GL_MODELVIEW_MATRIX, modelMatrix);
+      aXScale = modelMatrix[0];
+      aYScale = modelMatrix[5];
+    }
+
     glEnable(GL_TEXTURE_2D);
+
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, myMinMagFilter);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, myMinMagFilter);
+
     glPixelTransferi(GL_MAP_COLOR, 0);
-    glAlphaFunc(GL_GEQUAL, 0.5F);
+
+    glAlphaFunc(GL_GEQUAL, 0.05F);
     glEnable(GL_ALPHA_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
     glBindTexture(GL_TEXTURE_2D, myTexFont);
     glBegin(GL_QUADS);
 
-    QFontMetrics aFM( myQFont );
-    int pixelsHeight = aFM.height();
+    theY = theY - ( myTexFontHeight - QFontMetrics( myQFont ).height() ) / aYScale;
 
-    theY = theY - myTexFontHeight + pixelsHeight;
-
-    for( int i = 0, aGap = 0; i < theStr.length(); i++ )
+    double aLettBegin, aLettEnd, aDY = ( myTexFontHeight - 1 ) / aYScale, aDX;
+    char aLetter;
+    int aLettIndex;
+    for( int i = 0; i < theStr.length(); i++ )
     {
-        char aLetter = theStr.data()[i];
-        int aLettIndex = (int)aLetter - FirstSymbolNumber;
+        aLetter    = theStr.data()[i];
+        aLettIndex = (int)aLetter - FirstSymbolNumber;
 
-        float aLettBegin = (float)myPositions[aLettIndex];
-        float aLettEnd = aLettBegin + myWidths[aLettIndex]-1;
+        aLettBegin = (double)myPositions[aLettIndex] / ( (double)myTexFontWidth - 1. );
+        aLettEnd   = aLettBegin + ( (double)myWidths[aLettIndex] - 1. ) / ( (double)myTexFontWidth - 1. );
 
-        aLettBegin = aLettBegin / myTexFontWidth;
-        aLettEnd = aLettEnd / myTexFontWidth;
+        aDX = ( (double)myWidths[aLettIndex] - 1. ) / aXScale;
 
-        glTexCoord2f( aLettBegin, 0.0 ); glVertex3f( theX + aGap, theY, 1.0 );
-        glTexCoord2f( aLettBegin, 1.0 ); glVertex3f( theX + aGap, theY + myTexFontHeight, 1.0 );
-        glTexCoord2f( aLettEnd, 1.0 ); glVertex3f( theX + aGap + myWidths[aLettIndex]-1, theY + myTexFontHeight, 1.0 );
-        glTexCoord2f( aLettEnd, 0.0 ); glVertex3f( theX + aGap + myWidths[aLettIndex]-1, theY, 1.0 );
+        glTexCoord2d( aLettBegin, 0.0 ); glVertex3d( theX,       theY,       1.0 );
+        glTexCoord2d( aLettBegin, 1.0 ); glVertex3d( theX,       theY + aDY, 1.0 );
+        glTexCoord2d( aLettEnd,   1.0 ); glVertex3d( theX + aDX, theY + aDY, 1.0 );
+        glTexCoord2d( aLettEnd,   0.0 ); glVertex3d( theX + aDX, theY,       1.0 );
 
-        aGap += myWidths[aLettIndex]-1 + mySeparator;
+        theX += aDX + mySeparator / aXScale;
     }
 
     glEnd();
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_TEXTURE_2D);
+    // restore attributes
+    glPopAttrib();
 }
 
 //======================================================================
@@ -385,12 +437,14 @@ static GLuint displayListBase( QFont* theFont )
 // Purpose :
 //=======================================================================
 GLViewer_Drawer::GLViewer_Drawer()
+: myFont( "Helvetica", 10, QFont::Bold )
 {
   myXScale = myYScale = 0.0;
   myObjects.clear();
   myTextList = 0/*-1*/;
   myObjectType = "GLViewer_Object";
   myPriority = 0;
+  myTextFormat = DTF_BITMAP;
 }
 
 //======================================================================
@@ -496,8 +550,8 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     glGenTextures( 1, &texture );
     glBindTexture( GL_TEXTURE_2D, texture );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
                   GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
@@ -515,16 +569,14 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
     if( !texture )
         return;
 
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-
     glEnable( GL_TEXTURE_2D );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-    glAlphaFunc( GL_GREATER, 0.95F );
-    glEnable( GL_ALPHA_TEST );
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+    bool hasAlpha = glIsEnabled( GL_ALPHA_TEST );
+    glDisable( GL_ALPHA_TEST );
     
     glBindTexture( GL_TEXTURE_2D, texture );
     glBegin( GL_QUADS );
-
+    
     glTexCoord2f( 0.0, 0.0 );
     glVertex3f( x-size/2., y-size/2., 0.0 );
 
@@ -538,9 +590,9 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
     glVertex3f( x+size/2., y-size/2., 0.0 );
     
     glEnd();
-    glFlush();
 
-    glDisable( GL_ALPHA_TEST );
+    if ( hasAlpha )
+      glEnable( GL_ALPHA_TEST );
     glDisable( GL_TEXTURE_2D );
 }
 
@@ -551,41 +603,18 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
 void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
                                 const QColor& color, QFont* theFont, int theSeparator, DisplayTextFormat theFormat )
 {
-  if( theFormat == DTF_TEXTURE )
+  glColor3f( ( GLfloat )color.red() / 255, 
+             ( GLfloat )color.green() / 255, 
+             ( GLfloat )color.blue() / 255 );
+
+  if( theFormat != DTF_BITMAP )
   {
-    GLViewer_TexFont aTexFont( theFont, theSeparator );
+    GLViewer_TexFont aTexFont( theFont, theSeparator, theFormat == DTF_TEXTURE_SCALABLE, GL_LINEAR );
     aTexFont.generateTexture();
-
-    glGetIntegerv (GL_VIEWPORT, viewport);
-    glGetDoublev (GL_MODELVIEW_MATRIX, modelMatrix);
-    glGetDoublev (GL_PROJECTION_MATRIX, projMatrix);
-    status = gluProject (xPos, yPos, 0, modelMatrix, projMatrix, viewport, &winx, &winy, &winz);
-
-    glPushAttrib( GL_TRANSFORM_BIT | GL_VIEWPORT_BIT | GL_LIST_BIT );
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0,viewport[2],0,viewport[3],-100,100);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    glColor3f( ( GLfloat )color.red() / 255, 
-               ( GLfloat )color.green() / 255, 
-               ( GLfloat )color.blue() / 255 );
-
-    aTexFont.drawString( text, winx, winy );
-
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glPopAttrib();
+    aTexFont.drawString( text, xPos, yPos );
   }
-  else if( theFormat == DTF_BITMAP )
+  else
   {
-    glColor3f( ( GLfloat )color.red() / 255, 
-               ( GLfloat )color.green() / 255, 
-               ( GLfloat )color.blue() / 255 );
     glRasterPos2f( xPos, yPos );
     glListBase( displayListBase( theFont ) );
     glCallLists( text.length(), GL_UNSIGNED_BYTE, text.local8Bit().data() );
@@ -619,13 +648,13 @@ void GLViewer_Drawer::drawText( GLViewer_Object* theObject )
 void GLViewer_Drawer::drawGLText( QString text, float x, float y,
                                   int hPosition, int vPosition, QColor color, bool smallFont )
 {
-  QFont aFont( "Arial", 10, QFont::Bold );
+  QFont aFont( myFont );
   if( smallFont )
-    aFont.setPointSize( 8 );
+    aFont.setPointSize( aFont.pointSize() * 0.8 );
 
   QFontMetrics aFontMetrics( aFont );
-  float width = aFontMetrics.width( text ) / myXScale;
-  float height = aFontMetrics.height() / myXScale;
+  float width  = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.width( text ) : aFontMetrics.width( text ) / myXScale;
+  float height = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.height() : aFontMetrics.height() / myYScale;
   float gap = 5 / myXScale;
 
   switch( hPosition )
@@ -644,7 +673,7 @@ void GLViewer_Drawer::drawGLText( QString text, float x, float y,
       default : break;
   }
 
-  drawText( text, x, y, color, &aFont, 2, DTF_BITMAP ); // DTF_BITMAP or DTF_TEXTURE
+  drawText( text, x, y, color, &aFont, 2, myTextFormat );
 }
 
 //======================================================================

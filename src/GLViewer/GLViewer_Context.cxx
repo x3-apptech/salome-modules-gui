@@ -1,7 +1,26 @@
+//  Copyright (C) 2005 OPEN CASCADE
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
+//
+//  Author : OPEN CASCADE
+//
+
 // File:      GLViewer_Context.cxx
 // Created:   November, 2004
-// Author:    OCC team
-// Copyright (C) CEA 2004
 
 //================================================================
 // Class       : GLViewer_AspectLine
@@ -141,15 +160,13 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
     else if( myLastPicked && isHigh )
     {
         //cout << 3 << endl;
-        //myLastPicked->highlight( x, y, myTolerance, byCircle );
+        myLastPicked->highlight( x, y, myTolerance, byCircle );
+        anUpdatedObjects.append( myLastPicked );
         if( myLastPicked != lastPicked )
         {
             myLastPicked->unhighlight();
-            if( myLastPicked != lastPicked )
-            {
-                myLastPicked = lastPicked;
-                anUpdatedObjects.append( myLastPicked );
-            }
+            myLastPicked = lastPicked;
+            anUpdatedObjects.append( myLastPicked );
         }
     }
 
@@ -202,6 +219,17 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
                 status = SS_GlobalChanged;
             mySelectedObjects.clear();
         } 
+        else if( myLastPicked->isSelected() && status != SS_LocalChanged )
+        {
+            mySelectedObjects.remove( myLastPicked );
+            myLastPicked->unselect();
+            myGLViewer2d->updateAll();
+
+            if( mySelectedObjects.count() != 0 && status == SS_Invalid )
+              status = SS_GlobalChanged;
+
+            return status;
+        }
 
         if ( myLastPicked->select( myXhigh, myYhigh, myTolerance, GLViewer_Rect(), false, byCircle, Append )
              && mySelectedObjects.findIndex( myLastPicked ) == -1 )
@@ -537,13 +565,14 @@ void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
 // Function: clearHighlighted
 // Purpose :
 //=======================================================================
-void GLViewer_Context::clearHighlighted()
+void GLViewer_Context::clearHighlighted( bool updateViewer )
 {
   if( myHFlag && myLastPicked )
   {
-      myLastPicked->unhighlight();
-      myLastPicked = 0;
-
+    myLastPicked->unhighlight();
+    myLastPicked = 0;
+    
+    if( updateViewer )
       myGLViewer2d->updateAll();
   }
 }
