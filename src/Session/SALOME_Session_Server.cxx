@@ -358,12 +358,13 @@ int main( int argc, char **argv )
     if ( isFound( "SPLASH", argc, argv ) )
     {
       // create temporary resource manager just to load splash icon
-      SALOME_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
-      resMgr.loadLanguage( "SalomeApp", "en" );
+      SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
+      resMgr.setCurrentFormat( "xml" );
+      resMgr.loadLanguage( "LightApp", "en" );
 
       // create splash object: widget ( splash with progress bar ) and "pinging" thread
       InquireServersGUI splash;
-      splash.setPixmap( resMgr.loadPixmap( "SalomeApp", QObject::tr( "ABOUT_SPLASH" ) ) );
+      splash.setPixmap( resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) ) );
       SUIT_Tools::centerWidget( &splash, _qappl.desktop() );
       
       _qappl.setMainWidget( &splash );
