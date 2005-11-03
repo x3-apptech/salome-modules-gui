@@ -276,6 +276,9 @@ bool SUIT_DataObject::replaceChild( SUIT_DataObject* src, SUIT_DataObject* trg, 
 
 void SUIT_DataObject::reparentChildren( const SUIT_DataObject* obj )
 {
+  if ( !obj )
+    return;
+
   DataObjectList lst;
   obj->children( lst );
   for ( DataObjectListIterator it( lst ); it.current(); ++it )
