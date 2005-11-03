@@ -36,7 +36,7 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_DataObject.h"
-#include "SalomeApp_SelectionMgr.h"
+#include "LightApp_SelectionMgr.h"
 #include "SALOME_Prs.h"
 #include "SOCC_ViewModel.h"
 #include "SVTK_ViewModel.h"
@@ -241,8 +241,8 @@ public:
   TSelectedCountEvent() : myResult( 0 ) {}
   virtual void Execute() {
     if ( SalomeApp_Application* anApp = getApplication() ) {
-      SalomeApp_Study*        aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-      SalomeApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
+      SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+      LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
       if ( aStudy && aSelMgr ) {
 	SALOME_ListIO anIOList;
 	aSelMgr->selectedObjects( anIOList );
@@ -268,8 +268,8 @@ public:
   TGetSelectedEvent( int theIndex ) : myIndex( theIndex ) {}
   virtual void Execute() {
     if ( SalomeApp_Application* anApp = getApplication() ) {
-      SalomeApp_Study*        aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-      SalomeApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
+      SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+      LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
       if ( aStudy && aSelMgr ) {
 	SALOME_ListIO anIOList;
 	aSelMgr->selectedObjects( anIOList );
@@ -305,8 +305,8 @@ void SALOMEGUI_Swig::AddIObject( const char* theEntry )
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
     virtual void Execute() {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	SalomeApp_Study*        aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-	SalomeApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
+	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr ) {
 	  SALOME_ListIO anIOList;
 	  anIOList.Append( new SALOME_InteractiveObject( myEntry, "", "" ) );
@@ -329,11 +329,11 @@ void SALOMEGUI_Swig::RemoveIObject( const char* theEntry )
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
     virtual void Execute() {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	SalomeApp_Study*        aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-	SalomeApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
+	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr ) {
 	  SALOME_ListIO anIOList;
-	  // VSR: temporary solution, until SalomeApp_SelectionMgr::unsetSelectedObjects() method appears
+	  // VSR: temporary solution, until LightApp_SelectionMgr::unsetSelectedObjects() method appears
 	  // Lately this should be replaced by the following:
 	  // anIOList.Append( new SALOME_InteractiveObject( myEntry, "", "" ) );
 	  // aSelMgr->unsetSelectedObjects( anIOList );
@@ -364,8 +364,8 @@ void SALOMEGUI_Swig::ClearIObjects()
     TEvent() {}
     virtual void Execute() {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	SalomeApp_Study*        aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-	SalomeApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
+	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr )
 	  aSelMgr->clearSelected();
       }
