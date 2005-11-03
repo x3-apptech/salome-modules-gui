@@ -6,6 +6,7 @@
 #include <qpixmap.h>
 #include <qobject.h>
 #include <qpopupmenu.h>
+#include <qstring.h>
 
 class QAction;
 class SUIT_Study;
@@ -38,6 +39,8 @@ public:
 
   CAM_DataModel*         dataModel() const;
   CAM_Application*       application() const;
+
+  virtual QString        iconName() const;
 
   virtual void           contextMenuPopup( const QString&, QPopupMenu*, QString& title ) {};
   virtual void           updateCommandsStatus() {};

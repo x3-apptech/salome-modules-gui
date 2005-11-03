@@ -74,6 +74,12 @@ QPixmap CAM_Module::moduleIcon() const
   return myIcon;
 }
 
+/*!\retval Module icon name.*/
+QString CAM_Module::iconName() const
+{
+  return "";
+}
+
 /*!\retval Module name.*/
 QString CAM_Module::moduleName() const
 {
