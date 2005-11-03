@@ -7,7 +7,7 @@
 
 #include "SalomeApp_DataModel.h"
 #include "SalomeApp_Application.h"
-#include "SalomeApp_Selection.h"
+#include "LightApp_Selection.h"
 
 #include "LightApp_Operation.h"
 #include "LightApp_Preferences.h"
@@ -45,5 +45,5 @@ CAM_DataModel* SalomeApp_Module::createDataModel()
 /*!Create and return instance of LightApp_Selection.*/
 LightApp_Selection* SalomeApp_Module::createSelection() const
 {
-  return LightApp_Module::createSelection();//new SalomeApp_Selection();
+  return LightApp_Module::createSelection();
 }
