@@ -74,7 +74,8 @@ uc_new.png \
 uc_clear.png \
 channel.cfg \
 
-BIN_SCRIPT= VERSION 
+BIN_SCRIPT= VERSION \
+runLightSalome.csh
 
 # copy header files in common directory
 OWN_CONFIG_H=@OWN_CONFIG_H@
