@@ -3,16 +3,15 @@
 
 #include "SalomeApp.h"
 
-#include "CAM_DataObject.h"
+#include "LightApp_DataObject.h"
 #include "CAM_RootObject.h"
 
 #include "SALOMEDSClient.hxx"
 
 class SalomeApp_Study;
 
-class SALOMEAPP_EXPORT SalomeApp_DataObject : public virtual CAM_DataObject
+class SALOMEAPP_EXPORT SalomeApp_DataObject : public LightApp_DataObject
 {
-  class Key;
 
 public:
   enum { CT_Value, CT_Entry, CT_IOR, CT_RefEntry };
@@ -29,7 +28,6 @@ public:
   virtual QString                 text( const int ) const;
   virtual QColor                  color( const ColorRole ) const;
 
-  virtual SUIT_DataObjectKey*     key() const;
   virtual QString                 entry() const;
 
   /*! location of corresponding SALOMEDS::SObject  */
@@ -38,9 +36,8 @@ public:
   bool                            isReference() const;
   _PTR(SObject)                   referencedObject() const;
 
-  SUIT_DataObject*                componentObject() const;
   /*! GEOM, SMESH, VISU, etc.*/
-  QString                         componentDataType() const;
+  virtual QString                 componentDataType() const;
 
 private:
   QString                         ior( const _PTR(SObject)& ) const;
@@ -64,6 +61,8 @@ public:
   SalomeApp_ModuleObject( const _PTR(SObject)&, SUIT_DataObject* = 0 );
   SalomeApp_ModuleObject( CAM_DataModel*, const _PTR(SObject)&, SUIT_DataObject* = 0 );
   virtual ~SalomeApp_ModuleObject();
+
+  virtual QString        name() const;
 };
 
 #endif

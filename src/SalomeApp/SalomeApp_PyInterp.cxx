@@ -30,11 +30,13 @@
 
 #include <utilities.h>
 #include <Container_init_python.hxx>
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
+
+#include <string>
+#include <vector>
+
+#include "PyInterp_base.h" // this include must be first (see PyInterp_base.h)!
+
+#include <cStringIO.h>
 
 /*!
  * constructor : multi Python interpreter, one per SALOME study.
@@ -107,3 +109,23 @@ bool SalomeApp_PyInterp::initContext()
 
   return true;
 }
+
+void SalomeApp_PyInterp::init_python()
+{
+  /*
+   * Initialize the main state (_gtstate) if not already done
+   * The lock is released on init_python output
+   * It is the caller responsability to acquire it if needed
+   */
+  MESSAGE("PyInterp_base::init_python");
+  ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
+  SCRUTE(KERNEL_PYTHON::_gtstate);
+//  if(!_gtstate){
+//  PyReleaseLock aReleaseLock;
+//  Py_Initialize(); // Initialize the interpreter
+//  PyEval_InitThreads(); // Initialize and acquire the global interpreter lock
+//  PySys_SetArgv(_argc,_argv); // initialize sys.argv
+//    _gtstate = PyThreadState_Get();
+//  }
+}
+
