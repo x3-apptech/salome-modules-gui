@@ -36,7 +36,6 @@
 #include "SVTK_ViewWindow.h"
 
 #include "SVTK_SelectorDef.h"
-#include "utilities.h"
 
 SVTK_SelectorDef
 ::SVTK_SelectorDef()

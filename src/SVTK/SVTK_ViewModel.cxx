@@ -12,41 +12,48 @@
 #include "SVTK_ViewWindow.h"
 #include "SVTK_Prs.h"
 
+#include "VTKViewer_ViewModel.h"
+
 #include "SVTK_RenderWindowInteractor.h"
 #include "SVTK_RenderWindow.h"
 
-#include "ToolsGUI.h"
+//#include <ToolsGUI.h>
 
-#include "SALOME_Actor.h"
-#include "SALOME_InteractiveObject.hxx"
+#include <SALOME_Actor.h>
+#include <SALOME_InteractiveObject.hxx>
 
-#include "Utils_ORB_INIT.hxx"
-#include "Utils_SINGLETON.hxx"
-#include "SALOME_ModuleCatalog_impl.hxx"
-#include "SALOME_NamingService.hxx"
+// Temporarily commented to avoid awful dependecy on SALOMEDS
+// TODO: better mechanism of storing display/erse status in a study
+// should be provided...
+//#include "Utils_ORB_INIT.hxx"
+//#include "Utils_SINGLETON.hxx"
+//#include "SALOME_ModuleCatalog_impl.hxx"
+//#include "SALOME_NamingService.hxx"
 
-#include "SALOMEDSClient.hxx"
-#include "SALOMEDS_StudyManager.hxx"
+//#include "SALOMEDSClient.hxx"
+//#include "SALOMEDS_StudyManager.hxx"
 
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
 // SALOMEDS::StudyManager - no linkage with SalomeApp. 
 
-static _PTR(Study) getStudyDS() 
-{
-  SALOMEDSClient_Study* aStudy = NULL;
-  _PTR(StudyManager) aMgr( new SALOMEDS_StudyManager() );
-
+// Temporarily commented to avoid awful dependecy on SALOMEDS
+// TODO: better mechanism of storing display/erse status in a study
+// should be provided...
+//static _PTR(Study) getStudyDS() 
+//{
+//  SALOMEDSClient_Study* aStudy = NULL;
+//  _PTR(StudyManager) aMgr( new SALOMEDS_StudyManager() );
   // get id of SUIT_Study, if it's a SalomeApp_Study, it will return
   //    id of its underlying SALOMEDS::Study
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if ( !app )  return _PTR(Study)(aStudy); 
-  SUIT_Study* stud = app->activeStudy();
-  if ( !stud ) return _PTR(Study)(aStudy);  
-  const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
+//  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+//  if ( !app )  return _PTR(Study)(aStudy); 
+//  SUIT_Study* stud = app->activeStudy();
+//  if ( !stud ) return _PTR(Study)(aStudy);  
+//  const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
   // get SALOMEDS_Study with this id from StudyMgr
-  return aMgr->GetStudyByID( id );
-}
+//  return aMgr->GetStudyByID( id );
+//}
 
 //==========================================================
 SVTK_Viewer::SVTK_Viewer()
@@ -125,14 +132,14 @@ void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 //==========================================================
 void SVTK_Viewer::contextMenuPopup( QPopupMenu* thePopup )
 {
-  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
 
   thePopup->insertSeparator();
 
   SVTK_ViewWindow* aView = (SVTK_ViewWindow*)(myViewManager->getActiveView());
   if ( aView && !aView->getToolBar()->isVisible() )
-    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
+    thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
 //==========================================================
@@ -254,15 +261,21 @@ SVTK_Viewer
       return;
     if(vtkActorCollection* anActorCollection = aPrs->GetObjects()){
       // get SALOMEDS Study
-      _PTR(Study) aStudy(getStudyDS());
+      // Temporarily commented to avoid awful dependecy on SALOMEDS
+      // TODO: better mechanism of storing display/erse status in a study
+      // should be provided...
+      // _PTR(Study) aStudy(getStudyDS());
       anActorCollection->InitTraversal();
       while(vtkActor* anActor = anActorCollection->GetNextActor()){
 	if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
 	  // Set visibility flag
-	  Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	  if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
-	    ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),true,this);
-	  }
+          // Temporarily commented to avoid awful dependecy on SALOMEDS
+          // TODO: better mechanism of storing display/erse status in a study
+          // should be provided...
+	  //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+	  //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
+	  //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),true,this);
+	  //}
 	  // just display the object
 	  QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
 	  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
@@ -295,15 +308,21 @@ SVTK_Viewer
       return;
     if(vtkActorCollection* anActorCollection = aPrs->GetObjects()){
       // get SALOMEDS Study
-      _PTR(Study) aStudy(getStudyDS());
+      // Temporarily commented to avoid awful dependecy on SALOMEDS
+      // TODO: better mechanism of storing display/erse status in a study
+      // should be provided...
+      //_PTR(Study) aStudy(getStudyDS());
       anActorCollection->InitTraversal();
       while(vtkActor* anActor = anActorCollection->GetNextActor())
 	if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
 	  // Set visibility flag
-	  Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	  if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
-	    ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
-	  }
+          // Temporarily commented to avoid awful dependecy on SALOMEDS
+          // TODO: better mechanism of storing display/erse status in a study
+          // should be provided...
+	  //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+	  //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
+	  //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
+	  //}
 	  // just display the object
 	  QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
 	  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
@@ -325,7 +344,10 @@ void
 SVTK_Viewer
 ::EraseAll( const bool forced )
 {
-  _PTR(Study) aStudy(getStudyDS());
+  // Temporarily commented to avoid awful dependecy on SALOMEDS
+  // TODO: better mechanism of storing display/erse status in a study
+  // should be provided...
+  //_PTR(Study) aStudy(getStudyDS());
   QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i)){
@@ -336,9 +358,12 @@ SVTK_Viewer
 	while(vtkActor* anActor = anActorCollection->GetNextActor()){
 	  if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
 	    // Set visibility flag
-	    Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	    if(!anObj.IsNull() && anObj->hasEntry() && aStudy)
-	      ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
+            // Temporarily commented to avoid awful dependecy on SALOMEDS
+            // TODO: better mechanism of storing display/erse status in a study
+            // should be provided...
+	    //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+	    //if(!anObj.IsNull() && anObj->hasEntry() && aStudy)
+	    //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
 	    if(forced)
 	      aRenderer->RemoveActor(anAct);
 	    else{
@@ -422,11 +447,7 @@ SVTK_Viewer
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i))
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewWindow))
 	if(SVTK_RenderWindow* aRW = aView->getRenderWindow())
-	{
-	  aView->getRenderer()->Render();
-	  aView->getRWInteractor()->unHighlightAll();
 	  aRW->update();
-	}
 }
 
 void 
