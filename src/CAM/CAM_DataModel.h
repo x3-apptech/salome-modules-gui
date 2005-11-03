@@ -4,6 +4,7 @@
 #include "CAM.h"
 
 #include <qobject.h>
+#include <qstringlist.h>
 
 class CAM_Module;
 class CAM_DataObject;
@@ -25,9 +26,9 @@ public:
 
   /** @name These methods should be redefined in successors.*/
   //@{
-  virtual bool     open( const QString&, CAM_Study* ) { return true; }//!< return true
-  virtual bool     save() { return true; };
-  virtual bool     saveAs( const QString&, CAM_Study* ) { return true; };
+  virtual bool     open( const QString&, CAM_Study*, QStringList ) { return true; }//!< return true
+  virtual bool     save( QStringList& ) { return true; };
+  virtual bool     saveAs( const QString&, CAM_Study*, QStringList&  ) { return true; };
   virtual bool     close() { return true; };
   virtual bool     create( CAM_Study* ) { return true; }
   //@}
