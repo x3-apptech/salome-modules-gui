@@ -18,6 +18,8 @@ public:
   CAM_RootObject( CAM_DataModel*, SUIT_DataObject* = 0 );
   virtual ~CAM_RootObject();
 
+  virtual QString        name() const;
+
   virtual CAM_DataModel* dataModel() const;
   virtual void           setDataModel( CAM_DataModel* );
 

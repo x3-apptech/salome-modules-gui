@@ -1,6 +1,7 @@
 #include "CAM_RootObject.h"
 
 #include "CAM_DataModel.h"
+#include "CAM_Module.h"
 
 /*!Constructor. Initialize by \a parent.
  * Set data model to 0.
@@ -24,6 +25,17 @@ myDataModel( data )
 /*!Destructor. Do nothing.*/
 CAM_RootObject::~CAM_RootObject()
 {
+}
+
+/*!
+    Returns module name
+*/
+QString CAM_RootObject::name() const
+{
+  QString aName = "";
+  if (myDataModel)
+    aName = myDataModel->module()->moduleName();
+  return aName;
 }
 
 /*!Get data model
