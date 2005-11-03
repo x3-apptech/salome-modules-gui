@@ -499,7 +499,6 @@ void OB_Browser::updateTree( SUIT_DataObject* obj )
 
   SUIT_DataObject* curObj = storeState( selObjs, openObjs, selKeys, openKeys, curKey );
 
-  createConnections( obj );
   updateView( obj );
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
@@ -537,8 +536,8 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
 
   trg->setParent( parent );
 
-  createConnections( trg );
   updateView( trg );
+  createConnections( trg );
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
 
@@ -680,6 +679,7 @@ QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
   }
 
   myItems.insert( obj, item );
+  obj->connect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
 
   updateText( item );
 
