@@ -1,0 +1,33 @@
+// File:      LightApp_images.po
+// Created:   May, 2005
+// Author:    OCC team
+// Copyright (C) CEA 2005
+
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2002-05-28 10:57:43 AM CEST\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+
+msgid "ABOUT"
+msgstr "icon_about.png"
+
+msgid "ABOUT_SPLASH"
+msgstr "icon_about.png"
+
+msgid "APP_DEFAULT_ICO"
+msgstr "icon_default.png"
+
+msgid "APP_MODULE_ICO"
+msgstr "icon_module.png"
+
+msgid "APP_MODULE_BIG_ICO"
+msgstr "icon_module_big.png"
+
+msgid "ICON_SELECT"
+msgstr "icon_select.png"
+
+msgid "APP_BASE_LOGO"
+msgstr "icon_applogo.png"

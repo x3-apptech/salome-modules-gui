@@ -1,0 +1,70 @@
+<document>
+  <section name="desktop" >
+    <parameter name="state"  value="max"/>
+    <parameter name="pos_x"  value="100"/>
+    <parameter name="pos_y"  value="050"/>
+    <parameter name="width"  value="640"/>
+    <parameter name="height" value="480"/>
+  </section>
+  <section name="launch">
+    <parameter name="gui"        value="yes"/>
+    <parameter name="splash"     value="yes"/>
+    <parameter name="file"       value="no"/>
+    <parameter name="key"        value="no"/>
+    <parameter name="interp"     value="no"/>
+    <parameter name="modules"    value="LIGHT"/>
+  </section>
+  <section name="language">
+    <parameter name="language"    value="en"/>
+    <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
+  </section>
+  <section name="resources">
+    <parameter name="SUIT"         value="${SUITRoot}/resources"/>
+    <parameter name="STD"          value="${SUITRoot}/resources"/>
+    <parameter name="Plot2d"       value="${SUITRoot}/resources"/>
+    <parameter name="SPlot2d"      value="${SUITRoot}/resources"/>
+    <parameter name="GLViewer"     value="${SUITRoot}/resources"/>
+    <parameter name="OCCViewer"    value="${SUITRoot}/resources"/>
+    <parameter name="VTKViewer"    value="${SUITRoot}/resources"/>
+    <parameter name="SalomeApp"    value="${SUITRoot}/resources"/>
+    <parameter name="OB"           value="${SUITRoot}/resources"/>
+    <parameter name="CAM"          value="${SUITRoot}/resources"/>
+    <parameter name="LightApp"     value="${SUITRoot}/resources"/>
+    <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="ToolsGUI"     value="${SUITRoot}/resources"/>
+  </section>
+  <section name="LIGHT">
+    <parameter name="name"       value="Light"/>
+    <parameter name="icon"       value="LIGHT.png"/>
+  </section>
+
+<!-- values below this line are just an example, they are not used  -->
+  <section name="application">
+    <parameter name="QuickDirList" value=""/>
+    <!-- Here go other common user preferences -->
+  </section>
+  <section name="OCCViewer" >
+    <parameter value="35, 136, 145" name="background" />
+    <parameter value="1" name="iso_number_u" />
+    <parameter value="1" name="iso_number_v" />
+    <parameter value="100" name="trihedron_size" />
+ </section>
+ <section name="VTKViewer" >
+    <parameter value="0, 0, 0" name="background" />
+    <parameter value="100" name="trihedron_size" />
+ </section>
+ <section name="Plot2d" >
+    <parameter value="255, 255, 255" name="Background" />
+    <parameter value="1" name="CurveType" />
+    <parameter value="0" name="HorScaleMode" />
+    <parameter value="1" name="LegendPos" />
+    <parameter value="9" name="MarkerSize" />
+    <parameter value="true" name="ShowLegend" />
+    <parameter value="0" name="VerScaleMode" />
+  </section>
+  <!-- Here go optional sections for other modules -->
+  <section name="resources">
+    <parameter name="salome" value="${KERNEL_ROOT_DIR}/share/salome/res"/>
+    <!-- Here go resource directories for other modules -->
+  </section>
+</document>

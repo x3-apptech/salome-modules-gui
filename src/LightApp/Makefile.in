@@ -1,0 +1,114 @@
+#  File   : Makefile.in
+#  Author : OCC team (OCN)
+#  Module : LightApp
+#  $Header$
+
+top_srcdir=@top_srcdir@
+top_builddir=../..
+srcdir=@srcdir@
+VPATH=.:@srcdir@:@srcdir@/resources
+
+
+@COMMENCE@
+
+# header files 
+EXPORT_HEADERS= LightApp.h \
+		LightApp_AboutDlg.h \
+		LightApp_Application.h \
+		LightApp_DataModel.h \
+		LightApp_DataObject.h \
+		LightApp_DataOwner.h \
+		LightApp_DataSubOwner.h \
+		LightApp_Dialog.h \
+		LightApp_Displayer.h \
+		LightApp_Driver.h \
+		LightApp_GLSelector.h \
+		LightApp_Module.h \
+		LightApp_ModuleDlg.h \
+		LightApp_NameDlg.h \
+		LightApp_OBFilter.h \
+		LightApp_OBSelector.h \
+		LightApp_OCCSelector.h \
+		LightApp_Operation.h \
+		LightApp_Selection.h \
+		LightApp_SelectionMgr.h \
+		LightApp_ShowHideOp.h \
+		LightApp_Study.h \
+		LightApp_SwitchOp.h \
+		LightApp_Preferences.h \
+		LightApp_PreferencesDlg.h \
+		LightApp_RootObject.h \
+		LightApp_UpdateFlags.h \
+		LightApp_VTKSelector.h \
+		LightApp_WidgetContainer.h
+
+# .po files to transform in .qm
+PO_FILES = LightApp_images.po \
+	   LightApp_msg_en.po
+
+# Libraries targets
+LIB = libLightApp.la
+
+LIB_SRC= LightApp_AboutDlg.cxx \
+	 LightApp_Application.cxx \
+	 LightApp_DataModel.cxx \
+	 LightApp_DataObject.cxx \
+	 LightApp_DataOwner.cxx \
+	 LightApp_DataSubOwner.cxx \
+	 LightApp_Dialog.cxx \
+	 LightApp_Displayer.cxx \
+	 LightApp_Driver.cxx \
+	 LightApp_GLSelector.cxx \
+	 LightApp_Module.cxx \
+	 LightApp_ModuleDlg.cxx \
+	 LightApp_NameDlg.cxx \
+	 LightApp_OBFilter.cxx \
+	 LightApp_OBSelector.cxx \
+	 LightApp_OCCSelector.cxx \
+	 LightApp_Operation.cxx \
+	 LightApp_Selection.cxx \
+	 LightApp_SelectionMgr.cxx \
+	 LightApp_ShowHideOp.cxx \
+	 LightApp_Study.cxx \
+	 LightApp_SwitchOp.cxx \
+	 LightApp_Preferences.cxx \
+	 LightApp_PreferencesDlg.cxx \
+	 LightApp_VTKSelector.cxx \
+	 LightApp_WidgetContainer.cxx
+
+LIB_MOC = LightApp_AboutDlg.h \
+	  LightApp_Application.h \
+	  LightApp_DataModel.h \
+	  LightApp_Dialog.h \
+	  LightApp_Driver.h \
+	  LightApp_GLSelector.h \
+	  LightApp_OBSelector.h \
+	  LightApp_OCCSelector.h \
+	  LightApp_Operation.h \
+	  LightApp_Module.h \
+	  LightApp_ModuleDlg.h \
+	  LightApp_NameDlg.h \
+	  LightApp_SelectionMgr.h \
+	  LightApp_ShowHideOp.h \
+	  LightApp_Study.h \
+	  LightApp_SwitchOp.h \
+	  LightApp_Preferences.h \
+	  LightApp_PreferencesDlg.h \
+	  LightApp_VTKSelector.h \
+	  LightApp_WidgetContainer.h
+
+RESOURCES_FILES = icon_about.png \
+		  icon_applogo.png \
+		  icon_default.png \
+		  icon_module.png \
+		  icon_module_big.png \
+		  icon_select.png \
+		  LightApp.ini \
+		  LightApp.xml
+
+CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES)
+
+LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS)
+LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lPyInterp -lPythonConsole
+
+@CONCLUDE@
