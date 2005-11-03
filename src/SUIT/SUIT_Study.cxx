@@ -192,6 +192,10 @@ void SUIT_Study::setRoot( SUIT_DataObject* obj )
   if ( myRoot == obj )
     return;
 
+  // This is necessary in order not to destroy the complete tree of objects
+  if ( obj )
+    obj->reparentChildren( myRoot );
+
   delete myRoot;
   myRoot = obj;
 }
