@@ -489,6 +489,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   if( !res ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
   
   // get the windows list from the Python module by calling windows() method
@@ -502,6 +503,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   if( !res1 ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
   else {
     myWindowsMap.clear();
@@ -526,6 +528,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   if( !res2 ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
   else {
     // parse the return value
@@ -579,6 +582,7 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
     if( !res ) {
       // VSR: this method may not be implemented in Python module
       // PyErr_Print();
+      PyErr_Clear();
     }
   }                         //__CALL_OLD_METHODS__
 
@@ -587,6 +591,7 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
   if( !res1 ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
 }
 
@@ -606,6 +611,7 @@ void SALOME_PYQT_Module::deactivate( SUIT_Study* theStudy )
   if( !res ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
 }
 
@@ -639,6 +645,7 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
   if( !res ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
 }
 
@@ -729,6 +736,7 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     if( !res ) {
       // VSR: this method may not be implemented in Python module
       // PyErr_Print();
+      PyErr_Clear();
     }
     else {
       // parse return value
@@ -757,6 +765,7 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
   if( !res1 ) {
     // VSR: this method may not be implemented in Python module
     // PyErr_Print();
+    PyErr_Clear();
   }
 
   if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
@@ -772,6 +781,7 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     if( !res2 ) {
       // VSR: this method may not be implemented in Python module
       // PyErr_Print();
+      PyErr_Clear();
     }
   }                        //__CALL_OLD_METHODS__
 }
@@ -909,7 +919,7 @@ void SALOME_PYQT_Module::setWorkSpace()
     if( !res ) {
       // VSR: this method may not be implemented in Python module
       // PyErr_Print();
-      return;
+      PyErr_Clear();
     }
   }                         //__CALL_OLD_METHODS__
 }
