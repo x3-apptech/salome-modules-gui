@@ -76,9 +76,19 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
 QFileDialog( parent, 0, modal ),
 myValidator( 0 ),
 myQuickCombo( 0 ), myQuickButton( 0 ), myQuickLab( 0 ),
-myOpen( open ),
-myAccepted( false )
+myOpen( open )//,
+//myAccepted( false )
 {    
+  const QObjectList* child = children();
+  QObjectList::const_iterator anIt = child->begin(), aLast = child->end();
+  for( ; anIt!=aLast; anIt++ )
+    if( (*anIt)->inherits( "QPushButton" ) )
+    {
+      QPushButton* bt = ( QPushButton* )( *anIt );
+      bt->setDefault( false );
+      bt->setAutoDefault( false );
+    }
+
   if ( parent->icon() )
     setIcon( *parent->icon() );       
   setSizeGripEnabled( true );
@@ -207,7 +217,7 @@ void SUIT_FileDlg::accept()
    * in file name editor while file name is not acceptable by acceptData()
    * (e.g. permission denied)
    */
-  if ( !myAccepted ) {
+//  if ( !myAccepted ) {
     if ( mode() != ExistingFiles ) {
       mySelectedFile = QFileDialog::selectedFile();
       addExtension();
@@ -216,10 +226,10 @@ void SUIT_FileDlg::accept()
     if ( acceptData() ) {
       myLastVisitedPath = dirPath();
       QFileDialog::accept();        
-      myAccepted = true;
+//      myAccepted = true;
     }
-  }
-  myAccepted = !myAccepted;
+//  }
+//  myAccepted = !myAccepted;
 }
 
 /*! Closes this dialog and sets the return code to 'Rejected' */

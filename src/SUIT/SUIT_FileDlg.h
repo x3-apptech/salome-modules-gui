@@ -64,7 +64,10 @@ protected:
    * in file name editor while file name is not acceptable by acceptData()
    * (e.g. permission denied)
    */
-  bool                myAccepted;
+//  bool                myAccepted;
+  /*! ASL: this bug can be fixed with help of call setDefault( false ) 
+   *       and setAutoDefault( false ) methods for all QPushButtons of this dialog
+   */
 
   static QString      myLastVisitedPath;  //!< last visited path
 };
