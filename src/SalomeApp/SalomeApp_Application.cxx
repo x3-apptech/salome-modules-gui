@@ -815,7 +815,7 @@ void SalomeApp_Application::onDblClick( QListViewItem* it )
 
     if( sobj && sobj->ReferencedObject( ref ) )
     {
-      entry = ref->GetID();
+      entry = ref->GetID().c_str();
       QListViewItemIterator anIt( item->listView() );
       for( ; anIt.current(); anIt++ )
       {
