@@ -369,12 +369,12 @@ void SalomeApp_Study::addComponent(const CAM_DataModel* dm)
       // Create SComponent
       _PTR(StudyBuilder) aBuilder = aStudy->NewBuilder();
       aComp = aBuilder->NewComponent(dm->module()->name());
-      aBuilder->SetName(aComp, dm->module()->moduleName());
+      aBuilder->SetName(aComp, dm->module()->moduleName().latin1());
       QString anIconName = dm->module()->iconName();
       if (!anIconName.isEmpty()) {
         _PTR(AttributePixMap) anAttr = aBuilder->FindOrCreateAttribute(aComp, "AttributePixMap");
         if (anAttr)
-          anAttr->SetPixMap(anIconName);
+          anAttr->SetPixMap(anIconName.latin1());
       }
       // Set default engine IOR
       aBuilder->DefineComponentInstance(aComp, SalomeApp_Application::defaultEngineIOR().latin1());
@@ -553,11 +553,11 @@ void SalomeApp_Study::deleteReferencesTo( _PTR( SObject ) obj )
 //================================================================
 QString SalomeApp_Study::referencedToEntry( const QString& entry )
 {
-  _PTR(SObject) obj = studyDS()->FindObjectID( entry );
+  _PTR(SObject) obj = studyDS()->FindObjectID( entry.latin1() );
   _PTR(SObject) refobj;
 
   if( obj && obj->ReferencedObject( refobj ) )
-    return refobj->GetID();
+    return refobj->GetID().c_str();
   return LightApp_Study::referencedToEntry( entry );
 }
 
@@ -567,7 +567,7 @@ QString SalomeApp_Study::referencedToEntry( const QString& entry )
 //================================================================
 QString SalomeApp_Study::componentDataType( const QString& entry )
 {
-  _PTR(SObject) obj( studyDS()->FindObjectID( entry ) );
+  _PTR(SObject) obj( studyDS()->FindObjectID( entry.latin1() ) );
   if ( !obj )
     return LightApp_Study::componentDataType( entry );
   return obj->GetFatherComponent()->ComponentDataType().c_str();
