@@ -353,7 +353,8 @@ void LightApp_Application::createActions()
     id++;
   }
   // help for other existing modules
-  for ( QStringList::Iterator it = aModuleList.begin(); it != aModuleList.end(); ++it )
+  QStringList::Iterator it;
+  for ( it = aModuleList.begin(); it != aModuleList.end(); ++it )
   {
     if ( (*it).isEmpty() )
       continue;
@@ -408,7 +409,7 @@ void LightApp_Application::createActions()
   QStringList modList;
   modules( modList, false );
 
-  for ( QStringList::Iterator it = modList.begin(); it != modList.end(); ++it )
+  for ( it = modList.begin(); it != modList.end(); ++it )
   {
     if ( (*it).isEmpty() )
       continue;
@@ -445,7 +446,7 @@ void LightApp_Application::createActions()
   accelMap[NewOCCViewId] = ALT+Key_O;
   accelMap[NewVTKViewId] = ALT+Key_K;
 
-  for ( int id = NewGLViewId; id <= NewVTKViewId; id++ )
+  for ( id = NewGLViewId; id <= NewVTKViewId; id++ )
   {
     QAction* a = createAction( id, tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ), QIconSet(),
 			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
