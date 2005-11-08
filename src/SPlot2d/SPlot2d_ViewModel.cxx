@@ -8,7 +8,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
 
-#include "utilities.h"
+//#include "utilities.h"
 #include "qapplication.h"
 #include <qtoolbar.h>
 #include <qtoolbutton.h>
@@ -17,7 +17,6 @@
 #include <qwt_math.h>
 #include <qwt_plot_canvas.h>
 #include <stdlib.h>
-#include "utilities.h"
 
 using namespace std;
 
