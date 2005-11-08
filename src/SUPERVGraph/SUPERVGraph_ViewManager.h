@@ -1,12 +1,14 @@
 #ifndef SUPERVGRAPH_VIEWMANAGER_H
 #define SUPERVGRAPH_VIEWMANAGER_H
 
+#include "SUPERVGraph.h"
+
 #include "SUPERVGraph_ViewModel.h"
 #include "SUIT_ViewManager.h"
 
 class SUIT_Desktop;
 
-class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewManager : public SUIT_ViewManager
+class SUPERVGRAPH_EXPORT SUPERVGraph_ViewManager : public SUIT_ViewManager
 {
   Q_OBJECT
 

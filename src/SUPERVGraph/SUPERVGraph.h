@@ -32,7 +32,21 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewWindow.h"
 
-class SUPERVGraph : public QObject
+#ifdef WNT
+#ifdef SUPERVGRAPH_EXPORTS
+#define SUPERVGRAPH_EXPORT __declspec(dllexport)
+#else
+#define SUPERVGRAPH_EXPORT __declspec(dllimport)
+#endif
+#else
+#define SUPERVGRAPH_EXPORT
+#endif
+
+#if defined WNT
+#pragma warning ( disable: 4251 )
+#endif
+
+class SUPERVGRAPH_EXPORT SUPERVGraph : public QObject
 {
   Q_OBJECT
 

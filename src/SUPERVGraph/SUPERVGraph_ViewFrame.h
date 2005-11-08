@@ -29,11 +29,13 @@
 #ifndef SUPERVGraph_ViewFrame_H
 #define SUPERVGraph_ViewFrame_H
 
+#include "SUPERVGraph.h"
+
 #include "SALOME_InteractiveObject.hxx"
 #include "SUIT_PopupClient.h"
 #include "SUIT_ViewWindow.h"
 
-class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_View: public QWidget, public SUIT_PopupClient {
+class SUPERVGRAPH_EXPORT SUPERVGraph_View: public QWidget, public SUIT_PopupClient {
   Q_OBJECT;
  public:
   static QString Type() { return "SUPERVGraphViewer"; }
@@ -55,7 +57,7 @@ class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_View: public QWidget, public SUIT_Popup
   
 };
 
-class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
+class SUPERVGRAPH_EXPORT SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   Q_OBJECT
 
     public:
