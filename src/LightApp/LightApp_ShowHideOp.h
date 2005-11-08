@@ -4,7 +4,7 @@
 
 #include "LightApp_Operation.h"
 
-class LightApp_ShowHideOp : public LightApp_Operation
+class LIGHTAPP_EXPORT LightApp_ShowHideOp : public LightApp_Operation
 {
   Q_OBJECT
 
