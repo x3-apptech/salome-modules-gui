@@ -195,6 +195,18 @@ msgstr "Quick directory list"
 msgid "LightApp_Application::MEN_REFRESH"
 msgstr "Refresh"
 
+msgid "LightApp_Application::PREF_GROUP_SUPERV"
+msgstr "Graph Supervisor"
+
+msgid "LightApp_Application::PREF_GROUP_SUPERV"
+msgstr "Graph Supervisor"
+
+msgid "LightApp_Application::PREF_SUPERV_TITLE_COLOR"
+msgstr "Title color"
+
+msgid "LightApp_Application::PREF_SUPERV_CTRL_COLOR"
+msgstr "Ctrl color"
+
 //=======================================================================================
 
 msgid "LightApp_PreferencesDlg::CAPTION"
@@ -249,4 +261,3 @@ msgstr "&Cancel"
 
 msgid "LightApp_ModuleDlg::ActivateComponent_DESCRIPTION"
 msgstr "Create, open or load study."
-

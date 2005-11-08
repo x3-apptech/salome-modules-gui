@@ -111,6 +111,10 @@
     <parameter value="true" name="ShowLegend" />
     <parameter value="0" name="VerScaleMode" />
   </section>
+  <section name="SUPERVGraph" >
+    <parameter value="144, 208, 211" name="Background" />
+    <parameter value="63, 213, 255" name="Title" />
+  </section>
   <section name="Geometry" >
     <parameter value="10" name="SettingsGeomStep" />
     <parameter value="0"  name="display_mode" />

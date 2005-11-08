@@ -57,6 +57,10 @@
 #include <SVTK_ViewManager.h>
 #include <VTKViewer_ViewModel.h>
 
+#include <SUPERVGraph_ViewModel.h>
+#include <SUPERVGraph_ViewFrame.h>
+#include <SUPERVGraph_ViewManager.h>
+
 #include <qdir.h>
 #include <qimage.h>
 #include <qstring.h>
@@ -1020,17 +1024,32 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   SUIT_ResourceMgr* resMgr = resourceMgr();
 
   SUIT_ViewManager* viewMgr = 0;
-  if ( vmType == GLViewer_Viewer::Type() )
+  if( vmType == GLViewer_Viewer::Type() )
   {
     viewMgr = new GLViewer_ViewManager( activeStudy(), desktop() );
     new LightApp_GLSelector( (GLViewer_Viewer2d*)viewMgr->getViewModel(), mySelMgr );
   }
-  else if ( vmType == Plot2d_Viewer::Type() )
+  else if( vmType == Plot2d_Viewer::Type() )
   {
     viewMgr = new Plot2d_ViewManager( activeStudy(), desktop() );
-    viewMgr->setViewModel( new SPlot2d_Viewer() );// custom view model, which extends SALOME_View interface
+    SPlot2d_Viewer* vm = new SPlot2d_Viewer();
+    viewMgr->setViewModel( vm  );// custom view model, which extends SALOME_View interface 
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( viewMgr->getActiveView() );
+    if( wnd )
+    {
+      Plot2d_ViewFrame* frame = wnd->getViewFrame();
+      frame->setBackgroundColor( resMgr->colorValue( "Plot2d", "Background", frame->backgroundColor() ) );
+    }
   }
-  else if ( vmType == OCCViewer_Viewer::Type() )
+  else if( vmType == SUPERVGraph_Viewer::Type() )
+  {
+    viewMgr = new SUPERVGraph_ViewManager( activeStudy(), desktop() );
+    SUPERVGraph_Viewer* vm = new SUPERVGraph_Viewer();
+    SUPERVGraph_ViewFrame* view = dynamic_cast<SUPERVGraph_ViewFrame*>( vm->getViewManager()->getActiveView() );
+    if( view )
+      view->setBackgroundColor( resMgr->colorValue( "SUPERVGraph", "Background", view->backgroundColor() ) );
+  }
+  else if( vmType == OCCViewer_Viewer::Type() )
   {
     viewMgr = new OCCViewer_ViewManager( activeStudy(), desktop() );
     SOCC_Viewer* vm = new SOCC_Viewer();
@@ -1425,6 +1444,8 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   int plot2dGroup = pref->addPreference( tr( "PREF_GROUP_PLOT2DVIEWER" ), viewTab );
 
+  int supervGroup = pref->addPreference( tr( "PREF_GROUP_SUPERV" ), viewTab );
+
   pref->setItemProperty( occGroup, "columns", 1 );
   pref->setItemProperty( vtkGroup, "columns", 1 );
   pref->setItemProperty( plot2dGroup, "columns", 1 );
@@ -1525,6 +1546,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( dirGroup, "columns", 1 );
   pref->addPreference( tr( "" ), dirGroup,
 		       LightApp_Preferences::DirList, "FileDlg", "QuickDirList" );
+
+  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), supervGroup,
+		       LightApp_Preferences::Color, "SUPERVGraph", "Background" );
+  pref->addPreference( tr( "PREF_SUPERV_TITLE_COLOR" ), supervGroup,
+		       LightApp_Preferences::Color, "SUPERVGraph", "Title" );
+//  pref->addPreference( tr( "PREF_SUPERV_CTRL_COLOR" ), supervGroup,
+//		       LightApp_Preferences::Color, "SUPERVGraph", "Ctrl" );
 }
 
 /*!Changed preferences */

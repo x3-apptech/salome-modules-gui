@@ -62,6 +62,10 @@
     <parameter value="true" name="ShowLegend" />
     <parameter value="0" name="VerScaleMode" />
   </section>
+  <section name="SUPERVGraph" >
+    <parameter value="144, 208, 211" name="Background" />
+    <parameter value="63, 213, 255" name="Title" />
+  </section>
   <!-- Here go optional sections for other modules -->
   <section name="resources">
     <parameter name="salome" value="${KERNEL_ROOT_DIR}/share/salome/res"/>

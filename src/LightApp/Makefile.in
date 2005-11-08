@@ -109,6 +109,6 @@ RESOURCES_FILES = icon_about.png \
 CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES)
 
 LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS)
-LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lPlot2d -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lPyInterp -lPythonConsole
+LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lSPlot2d -lSUPERVGraph -lPyInterp -lPythonConsole
 
 @CONCLUDE@
