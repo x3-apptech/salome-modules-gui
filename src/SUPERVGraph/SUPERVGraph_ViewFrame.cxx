@@ -28,8 +28,6 @@
 
 #include "SUPERVGraph_ViewFrame.h"
 
-#include "utilities.h"
-
 //QT Include
 #include <qlayout.h>
 #include <qcolordialog.h>
@@ -103,7 +101,7 @@ void SUPERVGraph_ViewFrame::setViewWidget( SUPERVGraph_View* theView )
 */
 void SUPERVGraph_ViewFrame::onViewTrihedron()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewTrihedron" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewTrihedron" )
 }
 
 /*!
@@ -111,7 +109,7 @@ void SUPERVGraph_ViewFrame::onViewTrihedron()
 */
 void SUPERVGraph_ViewFrame::onViewTop()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewTop" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewTop" )
 }
 
 /*!
@@ -119,7 +117,7 @@ void SUPERVGraph_ViewFrame::onViewTop()
 */
 void SUPERVGraph_ViewFrame::onViewBottom()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewBottom" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewBottom" )
 }
 
 /*!
@@ -127,7 +125,7 @@ void SUPERVGraph_ViewFrame::onViewBottom()
 */
 void SUPERVGraph_ViewFrame::onViewLeft()    
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewLeft" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewLeft" )
 }
 
 /*!
@@ -135,7 +133,7 @@ void SUPERVGraph_ViewFrame::onViewLeft()
 */
 void SUPERVGraph_ViewFrame::onViewRight()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewRight" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewRight" )
 }
 
 /*!
@@ -143,7 +141,7 @@ void SUPERVGraph_ViewFrame::onViewRight()
 */
 void SUPERVGraph_ViewFrame::onViewBack()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewBack" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewBack" )
 }
 
 /*!
@@ -151,7 +149,7 @@ void SUPERVGraph_ViewFrame::onViewBack()
 */
 void SUPERVGraph_ViewFrame::onViewFront()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFront" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFront" )
 }
 
 /*!
@@ -159,7 +157,7 @@ void SUPERVGraph_ViewFrame::onViewFront()
 */
 void SUPERVGraph_ViewFrame::onViewReset()    
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewReset" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewReset" )
     if (myView)
       myView->ResetView();
 }
@@ -169,7 +167,7 @@ void SUPERVGraph_ViewFrame::onViewReset()
 */
 void SUPERVGraph_ViewFrame::onViewRotate()
 {
-   MESSAGE ( "SUPERVGraph_ViewFrame::onViewRotate" )
+//   MESSAGE ( "SUPERVGraph_ViewFrame::onViewRotate" )
 }
 
 /*!
@@ -177,7 +175,7 @@ void SUPERVGraph_ViewFrame::onViewRotate()
 */
 void SUPERVGraph_ViewFrame::onViewGlobalPan()
 {
-   MESSAGE ( "SUPERVGraph_ViewFrame::onViewGlobalPan" )
+//   MESSAGE ( "SUPERVGraph_ViewFrame::onViewGlobalPan" )
 }
 
 /*!
@@ -185,7 +183,7 @@ void SUPERVGraph_ViewFrame::onViewGlobalPan()
 */
 void SUPERVGraph_ViewFrame::onViewZoom()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewZoom" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewZoom" )
 }
 
 /*!
@@ -193,7 +191,7 @@ void SUPERVGraph_ViewFrame::onViewZoom()
 */
 void SUPERVGraph_ViewFrame::onViewPan()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewPan" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewPan" )
     if (myView != NULL)
       myView->ActivatePanning();
 }
@@ -203,7 +201,7 @@ void SUPERVGraph_ViewFrame::onViewPan()
 */
 void SUPERVGraph_ViewFrame::onViewFitArea()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFitArea" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFitArea" )
 }
 
 /*!
@@ -211,7 +209,7 @@ void SUPERVGraph_ViewFrame::onViewFitArea()
 */
 void SUPERVGraph_ViewFrame::onViewFitAll()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFitAll" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onViewFitAll" )
 }
 
 /*!
@@ -235,48 +233,36 @@ QColor SUPERVGraph_ViewFrame::backgroundColor() const
 
 void SUPERVGraph_ViewFrame::onAdjustTrihedron()
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::onAdjustTrihedron" )  
+//  MESSAGE ( "SUPERVGraph_ViewFrame::onAdjustTrihedron" )  
 }
 
 void SUPERVGraph_ViewFrame::rename( const Handle(SALOME_InteractiveObject)& IObject, 
 				    QString newName )
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::rename" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::rename" )
 }
 
 void SUPERVGraph_ViewFrame::unHighlightAll() 
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::unHighlightAll" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::unHighlightAll" )
 }
 
 void SUPERVGraph_ViewFrame::highlight( const Handle(SALOME_InteractiveObject)& IObject, 
 				       bool highlight, bool immediatly ) 
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::highlight" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::highlight" )
 }
 
 bool SUPERVGraph_ViewFrame::isInViewer( const Handle(SALOME_InteractiveObject)& IObject ) 
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::isInViewer" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::isInViewer" )
   return false;
 }
 
 bool SUPERVGraph_ViewFrame::isVisible( const Handle(SALOME_InteractiveObject)& IObject ) 
 {
-  MESSAGE ( "SUPERVGraph_ViewFrame::isVisible" )
+//  MESSAGE ( "SUPERVGraph_ViewFrame::isVisible" )
   return false;
-}
-
-void SUPERVGraph_ViewFrame::undo( const _PTR(Study)& aStudy,
-				  const char* StudyFrameEntry )
-{
-  MESSAGE ( "SUPERVGraph_ViewFrame::undo" )
-}
-
-void SUPERVGraph_ViewFrame::redo( const _PTR(Study)& aStudy,
-				  const char* StudyFrameEntry )
-{
-  MESSAGE ( "SUPERVGraph_ViewFrame::redo" )
 }
 
 void SUPERVGraph_ViewFrame::resizeEvent( QResizeEvent* theEvent )

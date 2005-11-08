@@ -2,7 +2,6 @@
 #define SUPERVGRAPH_VIEWMANAGER_H
 
 #include "SUPERVGraph_ViewModel.h"
-
 #include "SUIT_ViewManager.h"
 
 class SUIT_Desktop;

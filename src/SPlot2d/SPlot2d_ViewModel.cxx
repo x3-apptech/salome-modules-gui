@@ -21,14 +21,16 @@
 
 using namespace std;
 
-#include "SALOMEDSClient.hxx"
-#include "SALOMEDS_StudyManager.hxx"
+//ASL: Temporary commented in order to avoir dependency on SALOMEDS
+
+//#include "SALOMEDSClient.hxx"
+//#include "SALOMEDS_StudyManager.hxx"
 
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from
 // SALOMEDS::StudyManager - no linkage with SalomeApp.  
 
-static _PTR(Study) getStudyDS()
+/*static _PTR(Study) getStudyDS()
 {
   SALOMEDSClient_Study* aStudy = NULL;
   _PTR(StudyManager) aMgr( new SALOMEDS_StudyManager() );
@@ -42,7 +44,7 @@ static _PTR(Study) getStudyDS()
   const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
   // get SALOMEDS_Study with this id from StudyMgr
   return aMgr->GetStudyByID( id );
-}                
+} */               
 
 //=================================================================================
 // SPlot2d_Viewer implementation
@@ -152,7 +154,8 @@ void SPlot2d_Viewer::Erase( const Handle(SALOME_InteractiveObject)& IObject, boo
     aViewFrame->eraseCurve( curve, update );
 
   // it can be table or container object selected
-  _PTR(Study) aStudy = getStudyDS();
+  //ASL: Temporary commented in order to avoid dependency on SALOMEDS
+/*  _PTR(Study) aStudy = getStudyDS();
   _PTR(SObject) aSO = aStudy->FindObjectID(IObject->getEntry());
   if ( aSO ) {
     _PTR(ChildIterator) aIter = aStudy->NewChildIterator( aSO );
@@ -166,7 +169,7 @@ void SPlot2d_Viewer::Erase( const Handle(SALOME_InteractiveObject)& IObject, boo
 	aViewFrame->eraseCurve( curve, update );
     }
   }
-
+*/
 
 }
 

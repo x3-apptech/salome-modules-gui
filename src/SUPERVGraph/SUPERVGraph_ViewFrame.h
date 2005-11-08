@@ -30,10 +30,6 @@
 #define SUPERVGraph_ViewFrame_H
 
 #include "SALOME_InteractiveObject.hxx"
-
-#include "SALOMEDSClient.hxx"
-
-#include "SalomeApp_Application.h"
 #include "SUIT_PopupClient.h"
 #include "SUIT_ViewWindow.h"
 
@@ -82,11 +78,6 @@ class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
 					 QString newName );
   bool                           isInViewer( const Handle(SALOME_InteractiveObject)& IObject );
   bool                           isVisible( const Handle(SALOME_InteractiveObject)& IObject );
-
-  /*  undo/redo management */
-  void              undo(const _PTR(Study)& aStudy, const char* StudyFrameEntry);
-  void              redo(const _PTR(Study)& aStudy, const char* StudyFrameEntry);
-
   
   /* selection */
   Handle(SALOME_InteractiveObject) FindIObject(const char* Entry) { Handle(SALOME_InteractiveObject) o; return o; };
@@ -120,6 +111,5 @@ class /*SUPERVGRAPH_EXPORT*/ SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   
  private:
   SUPERVGraph_View* myView;
-  SalomeApp_Application* myApp;
 }; 
 #endif
