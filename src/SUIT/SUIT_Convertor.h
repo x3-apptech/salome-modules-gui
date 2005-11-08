@@ -16,7 +16,7 @@
 /*! Provides convertation of selected object of specified viewer into SUIT_DataObject.
  *  Instance of Convertor class is created by Application according to data type and viewers used.
  */
-class SUIT_EXPORT SUIT_Convertor  
+class SUIT_Convertor  
 {
 public:
   virtual DataObjectList getSelectedObjects(const SUIT_ViewModel* theViewer) = 0;
