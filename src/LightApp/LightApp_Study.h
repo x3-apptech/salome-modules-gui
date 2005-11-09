@@ -38,8 +38,11 @@ public:
 
   virtual std::string GetTmpDir      ( const char* theURL, const bool  isMultiFile );
 
-  virtual QString     componentDataType( const QString& );
-  virtual QString     referencedToEntry( const QString& );
+  virtual QString     componentDataType( const QString& ) const;
+  virtual QString     referencedToEntry( const QString& ) const;
+  virtual bool        isComponent( const QString& ) const;
+  virtual void        children( const QString&, QStringList& ) const;
+  virtual void        components( QStringList& ) const;
 
 protected:
   virtual void        saveModuleData ( QString theModuleName, QStringList theListOfFiles );

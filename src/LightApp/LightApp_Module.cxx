@@ -23,12 +23,15 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <SVTK_ViewWindow.h>
+#include <SVTK_ViewModel.h>
 #include <OCCViewer_ViewWindow.h>
 #include <OCCViewer_ViewPort3d.h>
+#include <SOCC_ViewModel.h>
 #include <GLViewer_ViewFrame.h>
 #include <GLViewer_ViewPort.h>
 #include <Plot2d_ViewWindow.h>
 #include <Plot2d_ViewFrame.h>
+#include <SPlot2d_ViewModel.h>
 
 #include <OB_Browser.h>
 
@@ -45,7 +48,8 @@ LightApp_Module::LightApp_Module( const QString& name )
   mySwitchOp( 0 ),
   myDisplay( -1 ),
   myErase( -1 ),
-  myDisplayOnly( -1 )
+  myDisplayOnly( -1 ),
+  myEraseAll( -1 )
 {
 }
 
@@ -235,14 +239,18 @@ QtxPopupMgr* LightApp_Module::popupMgr()
       *erase = createAction( -1, tr( "TOP_ERASE" ), p, tr( "MEN_ERASE" ), tr( "STB_ERASE" ),
 			     0, d, false, this, SLOT( onShowHide() ) ),
       *dispOnly = createAction( -1, tr( "TOP_DISPLAY_ONLY" ), p, tr( "MEN_DISPLAY_ONLY" ), tr( "STB_DISPLAY_ONLY" ),
+			        0, d, false, this, SLOT( onShowHide() ) ),
+      *eraseAll = createAction( -1, tr( "TOP_ERASE_ALL" ), p, tr( "MEN_ERASE_ALL" ), tr( "STB_ERASE_ALL" ),
 			        0, d, false, this, SLOT( onShowHide() ) );
     myDisplay     = actionId( disp );
     myErase       = actionId( erase );
     myDisplayOnly = actionId( dispOnly );
+    myEraseAll    = actionId( eraseAll );
 
     myPopupMgr->insert( disp, -1, 0 ); 
     myPopupMgr->insert( erase, -1, 0 );
     myPopupMgr->insert( dispOnly, -1, 0 );
+    myPopupMgr->insert( eraseAll, -1, 0 );
     myPopupMgr->insert( separator(), -1, 0 );
 
     QString uniform = "( count( $component ) = 1 ) and ( component != activeModule ) and ( activeModule = '%1' )";
@@ -250,6 +258,9 @@ QtxPopupMgr* LightApp_Module::popupMgr()
     myPopupMgr->setRule( disp, /*QString( "( not isVisible ) and " ) + */ uniform, true );
     myPopupMgr->setRule( erase, /*QString( "( isVisible ) and " ) + */ uniform, true );
     myPopupMgr->setRule( dispOnly, uniform, true );
+    QString viewers = "{ '%1' '%2' '%3' }";
+    viewers = viewers.arg( SOCC_Viewer::Type() ).arg( SVTK_Viewer::Type() ).arg( SPlot2d_Viewer::Type() );
+    myPopupMgr->setRule( eraseAll, QString( "client in %1" ).arg( viewers ), true );
   }
   return myPopupMgr;
 }
@@ -355,6 +366,8 @@ LightApp_Operation* LightApp_Module::createOperation( const int id ) const
     return new LightApp_ShowHideOp( LightApp_ShowHideOp::ERASE );
   else if( id==myDisplayOnly )
     return new LightApp_ShowHideOp( LightApp_ShowHideOp::DISPLAY_ONLY );
+  else if( id==myEraseAll )
+    return new LightApp_ShowHideOp( LightApp_ShowHideOp::ERASE_ALL );
   else
     return 0;
 }

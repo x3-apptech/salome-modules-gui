@@ -14,6 +14,7 @@ class LightApp_Preferences;
 class LightApp_Selection;
 class LightApp_Operation;
 class LightApp_SwitchOp;
+class LightApp_ShowHideOp;
 class LightApp_Displayer;
 
 class SUIT_Study;
@@ -113,7 +114,9 @@ private:
   QtxPopupMgr*          myPopupMgr;
   MapOfOperation        myOperations;
   LightApp_SwitchOp*    mySwitchOp;
-  int                   myDisplay, myErase, myDisplayOnly;
+
+protected:
+  int                   myDisplay, myErase, myDisplayOnly, myEraseAll;
 };
 
 #endif

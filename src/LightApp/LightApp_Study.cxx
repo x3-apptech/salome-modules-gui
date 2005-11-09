@@ -186,15 +186,33 @@ void LightApp_Study::closeDocument(bool permanently)
 // Function : referencedToEntry
 /*! Purpose  : Return current entry*/
 //================================================================
-QString LightApp_Study::referencedToEntry( const QString& entry )
+QString LightApp_Study::referencedToEntry( const QString& entry ) const
 {
   return entry;
 }
+
+//================================================================
+// Function : children
+/*! Purpose : Return entries of children of object*/
+//================================================================
+void LightApp_Study::children( const QString&, QStringList& ) const
+{
+}
+
+//================================================================
+// Function : isComponent
+/*! Purpose : Return true if entry corresponds to component*/
+//================================================================
+bool LightApp_Study::isComponent( const QString& entry ) const
+{
+  return false;
+}
+
 //================================================================
 // Function : componentDataType
 /*! Purpose  : Return component data type from entry*/
 //================================================================
-QString LightApp_Study::componentDataType( const QString& entry )
+QString LightApp_Study::componentDataType( const QString& entry ) const
 {
   LightApp_DataObject* aCurObj;
   for ( SUIT_DataObjectIterator it( root(), SUIT_DataObjectIterator::DepthLeft ); it.current(); ++it ) {
@@ -390,4 +408,20 @@ void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool
     return;
   bool isDirDeleted = true;
   myDriver->RemoveTemporaryFiles(theModuleName, isDirDeleted);
+}
+
+//================================================================
+// Function : RemoveTemporaryFiles
+/*! Purpose  : to be used by modules*/
+//================================================================
+void LightApp_Study::components( QStringList& comp ) const
+{
+  DataObjectList children = root()->children();
+  DataObjectList::const_iterator anIt = children.begin(), aLast = children.end();
+  for( ; anIt!=aLast; anIt++ )
+  {
+    LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( *anIt );
+    if( obj && obj->entry()!="Interface Applicative" )
+      comp.append( obj->entry() );
+  }
 }
