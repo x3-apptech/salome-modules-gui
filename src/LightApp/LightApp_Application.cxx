@@ -771,13 +771,13 @@ void LightApp_Application::onHelpContentsModule()
   const QAction* obj = (QAction*) sender();
 
   QString aComponentName = obj->name();
-  QString aFileName = aComponentName.lower() + ".htm";
+  QString aFileName = aComponentName + "_index.html";
 
   QCString dir;
   QString root;
   QString homeDir;
   if (dir = getenv( aComponentName + "_ROOT_DIR")) {
-    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome")  +  Qtx::addSlash(aComponentName));
+    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
     if ( QFileInfo( root + aFileName ).exists() ) {
       homeDir = root;
     } else {
