@@ -551,7 +551,7 @@ void SalomeApp_Study::deleteReferencesTo( _PTR( SObject ) obj )
 // Function : referencedToEntry
 /*! Purpose  : Return referenced entry from entry*/
 //================================================================
-QString SalomeApp_Study::referencedToEntry( const QString& entry )
+QString SalomeApp_Study::referencedToEntry( const QString& entry ) const
 {
   _PTR(SObject) obj = studyDS()->FindObjectID( entry.latin1() );
   _PTR(SObject) refobj;
@@ -565,10 +565,47 @@ QString SalomeApp_Study::referencedToEntry( const QString& entry )
 // Function : componentDataType
 /*! Purpose  : Return component data type from entry*/
 //================================================================
-QString SalomeApp_Study::componentDataType( const QString& entry )
+QString SalomeApp_Study::componentDataType( const QString& entry ) const
 {
   _PTR(SObject) obj( studyDS()->FindObjectID( entry.latin1() ) );
   if ( !obj )
     return LightApp_Study::componentDataType( entry );
   return obj->GetFatherComponent()->ComponentDataType().c_str();
+}
+
+//================================================================
+// Function : componentDataType
+/*! Purpose  : Return component data type from entry*/
+//================================================================
+bool SalomeApp_Study::isComponent( const QString& entry ) const
+{
+  _PTR(SObject) obj( studyDS()->FindObjectID( entry.latin1() ) );
+  return obj && QString( obj->GetID().c_str() ) == obj->GetFatherComponent()->GetID().c_str();
+}
+
+//================================================================
+// Function : children
+/*! Purpose : Return entries of children of object*/
+//================================================================
+void SalomeApp_Study::children( const QString& entry, QStringList& child_entries ) const
+{
+  _PTR(SObject) SO = studyDS()->FindObjectID( entry.latin1() );
+  _PTR(ChildIterator) anIter ( studyDS()->NewChildIterator( SO ) );
+  anIter->InitEx( true );
+  while( anIter->More() )
+  {
+    _PTR(SObject) val( anIter->Value() );
+    child_entries.append( val->GetID() );
+  }
+}
+
+void SalomeApp_Study::components( QStringList& comps ) const
+{
+  for( _PTR(SComponentIterator) it ( studyDS()->NewComponentIterator() ); it->More(); it->Next() ) 
+  {
+    _PTR(SComponent) aComponent ( it->Value() );
+    if( aComponent && aComponent->ComponentDataType() == "Interface Applicative" )
+      continue; // skip the magic "Interface Applicative" component
+    comps.append( aComponent->ComponentDataType() );
+  }
 }
