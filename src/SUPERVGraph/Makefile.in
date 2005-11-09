@@ -9,7 +9,8 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 EXPORT_HEADERS = SUPERVGraph_ViewFrame.h \
 		 SUPERVGraph_ViewManager.h \
-		 SUPERVGraph_ViewModel.h
+		 SUPERVGraph_ViewModel.h \
+		 SUPERVGraph.h
 
 # Libraries targets
 
