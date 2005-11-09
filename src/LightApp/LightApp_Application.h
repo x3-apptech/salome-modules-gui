@@ -141,6 +141,8 @@ protected slots:
   void                                onStudySaved( SUIT_Study* );
   void                                onStudyClosed( SUIT_Study* );
 
+  void                                onWCDestroyed( QObject* );
+
 private slots:
   void                                onSelection();
   void                                onRefresh();

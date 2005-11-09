@@ -850,7 +850,9 @@ void LightApp_Application::addWindow( QWidget* wid, const int flag, const int st
     QMap<int, int> winMap;
     currentWindows( winMap );
 
-    myWindows.insert( flag, new LightApp_WidgetContainer( flag, desktop() ) );
+    LightApp_WidgetContainer* newWC = new LightApp_WidgetContainer( flag, desktop() );
+    connect( newWC, SIGNAL(  destroyed ( QObject* ) ), this, SLOT( onWCDestroyed( QObject* ) ) );
+    myWindows.insert( flag, newWC );
     if ( winMap.contains( flag ) )
       desktop()->moveDockWindow( myWindows[flag], (Dock)winMap[flag] );
 
@@ -1837,4 +1839,19 @@ bool LightApp_Application::activateModule( CAM_Module* mod )
 SUIT_Accel* LightApp_Application::accel() const
 {
   return myAccel;
+}
+
+/*! remove dead widget container from map */
+void LightApp_Application::onWCDestroyed( QObject* ob )
+{
+  // remove destroyed widget container from windows map
+  for ( WindowMap::ConstIterator itr = myWindows.begin(); itr != myWindows.end(); ++itr )
+  {
+    if ( itr.data() != ob )
+      continue;
+
+    int key = itr.key();
+    myWindows.remove( key );
+    break;
+  }
 }
