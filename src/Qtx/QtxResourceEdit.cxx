@@ -190,14 +190,24 @@ void QtxResourceEdit::childItems( QPtrList<Item>& lst ) const
 
 void QtxResourceEdit::resourceValues( QMap<int, QString>& map ) const
 {
+  QString sect, name;
   for ( ItemMap::ConstIterator it = myItems.begin(); it != myItems.end(); ++it )
-    map.insert( it.key(), it.data()->resourceValue() );
+  {
+    it.data()->resource( sect, name );
+    if( myResMgr->hasValue( sect, name ) )
+      map.insert( it.key(), it.data()->resourceValue() );
+  }
 }
 
 void QtxResourceEdit::resourceValues( QMap<Item*, QString>& map ) const
 {
+  QString sect, name;
   for ( ItemMap::ConstIterator it = myItems.begin(); it != myItems.end(); ++it )
-    map.insert( it.data(), it.data()->resourceValue() );
+  {
+    it.data()->resource( sect, name );
+    if( myResMgr->hasValue( sect, name ) )
+      map.insert( it.data(), it.data()->resourceValue() );
+  }
 }
 
 void QtxResourceEdit::setResourceValues( QMap<int, QString>& map ) const
