@@ -596,6 +596,7 @@ void SalomeApp_Study::children( const QString& entry, QStringList& child_entries
   {
     _PTR(SObject) val( anIter->Value() );
     child_entries.append( val->GetID() );
+    anIter->Next();
   }
 }
 
