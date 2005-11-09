@@ -198,9 +198,6 @@ msgstr "Refresh"
 msgid "LightApp_Application::PREF_GROUP_SUPERV"
 msgstr "Graph Supervisor"
 
-msgid "LightApp_Application::PREF_GROUP_SUPERV"
-msgstr "Graph Supervisor"
-
 msgid "LightApp_Application::PREF_SUPERV_TITLE_COLOR"
 msgstr "Title color"
 
@@ -241,6 +238,14 @@ msgstr "Display only"
 msgid "LightApp_Module::STB_DISPLAY_ONLY"
 msgstr "Display only"
 
+msgid "LightApp_Module::TOP_ERASE_ALL"
+msgstr "Erase all"
+
+msgid "LightApp_Module::MEN_ERASE_ALL"
+msgstr "Erase all"
+
+msgid "LightApp_Module::STB_ERASE_ALL"
+msgstr "Erase all"
 //=======================================================================================
 
 
