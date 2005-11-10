@@ -251,7 +251,7 @@ bool SUIT_FileDlg::acceptData()
     if ( isOpenDlg() )
       if ( mode() == ExistingFiles ) {
 	QStringList fileNames = selectedFiles();
-	for ( int i = 0; i < fileNames.count(); i++ ) {
+	for ( int i = 0; i < (int)fileNames.count(); i++ ) {
 	  if ( !myValidator->canOpen( fileNames[i] ) )
 	    return false;
 	}
@@ -325,10 +325,12 @@ void SUIT_FileDlg::addExtension()
     QRegExp anExtRExp( "^("+ aPattern + ")$" );
 
     // Check if the current file extension matches the pattern
-    if ( anExtRExp.match( anExt ) < 0 ) { 
+    if ( anExtRExp.match( anExt ) < 0 )
+    {
       // find first appropriate extension in the selected filter 
       // (it should be without wildcard symbols)
-      for ( int i = 0; i < extList.count(); i++ ) {
+      for ( int i = 0; i < (int)extList.count(); i++ )
+      {
         QString newExt = extList[i].replace( QRegExp( "[\\\\][+]" ),"+" );
         int res = newExt.findRev( '.' );
         if ( res >= 0 ) 
