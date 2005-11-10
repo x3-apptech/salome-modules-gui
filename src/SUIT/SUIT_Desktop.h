@@ -4,6 +4,7 @@
 #include "SUIT.h"
 
 #include <qmap.h>
+#include <qpixmap.h>
 #include <QtxMainWindow.h>
 
 class QPopupMenu;
