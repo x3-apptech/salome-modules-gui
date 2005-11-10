@@ -1153,8 +1153,9 @@ void LightApp_Application::onStudyClosed( SUIT_Study* )
   activateModule( "" );
 
   // Bug 10396: remove all selectors
-  delete mySelMgr;
-  mySelMgr = new LightApp_SelectionMgr( this );
+  //delete mySelMgr;
+  //mySelMgr = new LightApp_SelectionMgr( this );
+  mySelMgr->clearSelected();
 
   saveWindowsGeometry();
 }
