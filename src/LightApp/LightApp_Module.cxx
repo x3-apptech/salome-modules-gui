@@ -343,7 +343,11 @@ void LightApp_Module::startOperation( const int id )
   }
 
   if( op )
+  {
+    // be sure that operation has correct study pointer
+    op->setStudy( application() ? application()->activeStudy() : 0 );
     op->start();
+  }
 }
 
 /*!
