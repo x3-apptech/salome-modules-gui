@@ -26,9 +26,6 @@ myBlockChangeState( false )
 
   myRoot = new SUIT_DataObject();
   myOperations.setAutoDelete( false );
-
-  connect( this, SIGNAL( changeOperationState( bool ) ), this, SLOT( onChangeOperationState( bool ) ) );
-
   myOperations.setAutoDelete( false );
 }
 
