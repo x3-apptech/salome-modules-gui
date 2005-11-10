@@ -230,6 +230,8 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
                 aDrawer = (*oit)->getDrawer();
             }
         }
+        if ( !aDrawer )
+          continue;
         aDrawer->addObject( (*oit) );
 
         int aPriority = aDrawer->getPriority();
