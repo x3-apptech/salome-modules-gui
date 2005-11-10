@@ -6,19 +6,15 @@
 
 #include <CAF.h>
 
-#include <qnamespace.h>
-#include <qstring.h>
+#include <SUIT_Tools.h>
+
 #include <TCollection_ExtendedString.hxx>
 
-class CAF_EXPORT CAF_Tools : public Qt
+class CAF_EXPORT CAF_Tools : public SUIT_Tools
 {
 public:
-  /* converting strings */
-  static QString                    toQString ( const TCollection_ExtendedString& );
-  static TCollection_ExtendedString toExtString ( const QString& );
+  static QString                    toQString( const TCollection_ExtendedString& );
+  static TCollection_ExtendedString toExtString( const QString& );
 };
 
-#endif // CAF_TOOLS_H
-
-
-
+#endif
