@@ -60,7 +60,7 @@ LIB_CLIENT_IDL = SALOME_Registry.idl SALOME_Exception.idl
 CPPFLAGS += $(QT_INCLUDES) $(OCC_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 CXXFLAGS += $(OCC_CXXFLAGS) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS += $(QT_MT_LIBS) -lsuit $(CAS_LDPATH) -lTKernel -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lOpUtil
+LDFLAGS += $(QT_MT_LIBS) -lsuit $(CAS_KERNEL) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lOpUtil
 
 @CONCLUDE@
 

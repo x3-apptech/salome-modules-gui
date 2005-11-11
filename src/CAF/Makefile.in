@@ -42,7 +42,7 @@ undo.png
 
 CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) -I${QTDIR}/src/kernel -I$(QTDIR)/mkspecs/linux-g++
 
-LDFLAGS+=$(QT_MT_LIBS) $(CAS_KERNEL) $(CAS_OCAF)
+LDFLAGS+=$(QT_MT_LIBS) $(CAS_OCAF) $(CAS_OCAFVIS)
 LIBS+= -lstd -lsuit
 
 @CONCLUDE@
