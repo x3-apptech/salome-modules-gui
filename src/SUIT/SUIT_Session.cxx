@@ -61,17 +61,18 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   if ( myAppLibs.contains( appName ) )
     libHandle = myAppLibs[appName];
 
+  QString lib;
   if ( !libHandle )
-    libHandle = loadLibrary( name );
+    libHandle = loadLibrary( name, lib );
 
   if ( !libHandle )
   {
     SUIT_MessageBox::warn1( 0, tr( "Error" ),
-                            tr( "Can not find function %1. %2").arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );
+                            tr( "Can not load application library \"%1\": %2").arg( lib ).arg( lastError() ), tr( "Ok" ) );
     return 0;
   }
 
-  if (!myAppLibs.contains(appName) || !myAppLibs[appName]) // jfa 22.06.2005
+  if ( !myAppLibs.contains( appName ) || !myAppLibs[appName] ) // jfa 22.06.2005
     myAppLibs.insert( appName, libHandle );
 
   APP_CREATE_FUNC crtInst = 0;
@@ -85,7 +86,7 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   if ( !crtInst )
   {
     SUIT_MessageBox::warn1( 0, tr( "Error" ),
-                            tr( "Can not find function %1. %2").arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );
+                            tr( "Can not find function \"%1\": %2" ).arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );
     return 0;
   }
 
@@ -100,7 +101,7 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   SUIT_Application* anApp = crtInst();
   if ( !anApp )
   {
-    SUIT_MessageBox::warn1(0, tr( "Error" ), tr( "Can not find function %1. %2").arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );
+    SUIT_MessageBox::warn1( 0, tr( "Error" ), tr( "Can not create application \"%1\": %2").arg( appName ).arg( lastError() ), tr( "Ok" ) );
     return 0;
   }
 
@@ -109,7 +110,7 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   connect( anApp, SIGNAL( applicationClosed( SUIT_Application* ) ),
            this, SLOT( onApplicationClosed( SUIT_Application* ) ) );
   connect( anApp, SIGNAL( activated( SUIT_Application* ) ), 
-	   this, SLOT( onApplicationActivated( SUIT_Application* ) ) );
+	         this, SLOT( onApplicationActivated( SUIT_Application* ) ) );
 
   myAppList.append( anApp );
 
@@ -126,6 +127,10 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   }
 
   anApp->start();
+
+  // Application can be closed during starting (not started).
+  if ( !myAppList.contains( anApp ) )
+    anApp = 0;
 
   return anApp;
 }
@@ -255,10 +260,11 @@ QString SUIT_Session::lastError() const
 /*! Load library to session.
  * \retval Loaded library.
  */
-SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name )
+SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& libName )
 {
   QString libFile = SUIT_Tools::library( name );
 
+  libName = libFile;
   if ( libFile.isEmpty() )
     return 0;
 

@@ -249,18 +249,23 @@ bool SUIT_FileDlg::acceptData()
   if ( myValidator )
   {
     if ( isOpenDlg() )
-      if ( mode() == ExistingFiles ) {
-	QStringList fileNames = selectedFiles();
-	for ( int i = 0; i < (int)fileNames.count(); i++ ) {
-	  if ( !myValidator->canOpen( fileNames[i] ) )
-	    return false;
-	}
-	return true;
+    {
+      if ( mode() == ExistingFiles )
+      {
+	      QStringList fileNames = selectedFiles();
+	      for ( int i = 0; i < (int)fileNames.count(); i++ )
+        {
+	        if ( !myValidator->canOpen( fileNames[i] ) )
+	          return false;
+	      }
+	      return true;
       }
-      else {
-	return myValidator->canOpen( selectedFile() );
+      else
+      {
+	      return myValidator->canOpen( selectedFile() );
       }
-    else 
+    }
+    else
       return myValidator->canSave( selectedFile() );
   }
   return true;
@@ -333,9 +338,10 @@ void SUIT_FileDlg::addExtension()
       {
         QString newExt = extList[i].replace( QRegExp( "[\\\\][+]" ),"+" );
         int res = newExt.findRev( '.' );
-        if ( res >= 0 ) 
+        if ( res >= 0 )
           newExt = newExt.mid( res + 1 );
-        if ( newExt.find( QRegExp("[*|?]" ) ) < 0 ) {
+        if ( newExt.find( QRegExp("[*|?]" ) ) < 0 )
+        {
           mySelectedFile.stripWhiteSpace();
           mySelectedFile += mySelectedFile.endsWith(".") ? newExt : QString(".") + newExt;
           break;

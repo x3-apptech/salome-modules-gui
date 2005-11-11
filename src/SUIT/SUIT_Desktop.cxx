@@ -16,92 +16,165 @@
 #include <qstyle.h>
 
 /*!
- Class: LogoBox
+ Class: SUIT_Desktop::LogoMgr
  Level: Internal
 */
 
-class LogoBox : public QHBox
+class SUIT_Desktop::LogoMgr : public QObject
 {
 public:
-  LogoBox( QWidget* parent = 0, const char* name = 0, WFlags f = 0 ) : QHBox( parent, name, f )
-  {
-    setFrameStyle( Plain | NoFrame );
-    setMargin( 0 ); setSpacing( 2 );
-  }
-  void addSpacing( int spacing )
-  {
-    QApplication::sendPostedEvents( this, QEvent::ChildInserted );
-    ((QHBoxLayout*)layout())->addSpacing( spacing );
-  }
-protected:
-  void drawContents( QPainter* p )
-  {
-    if ( parentWidget()->inherits( "QMenuBar" ) )
-      style().drawControl( QStyle::CE_MenuBarEmptyArea, p, this, contentsRect(), colorGroup() );
-    else
-      QHBox::drawContents( p );
-  }
+  LogoMgr( QMenuBar* );
+  virtual ~LogoMgr();
+
+  int                    count() const;
+
+  void                   insert( const QString&, const QPixmap&, const int = -1 );
+  void                   remove( const QString& );
+  void                   clear();
+
+  QMenuBar*              menuBar() const;
+
+private:
+  void                   generate();
+  int                    find( const QString& ) const;
+
+private:
+  typedef struct { QString id; QPixmap pix; } LogoInfo;
+  typedef QValueList<LogoInfo>                LogoList;
+
+private:
+  int                    myId;
+  QMenuBar*              myMenus;
+  LogoList               myLogos;
 };
 
-/*!
- Class: SUIT_Desktop::LogoManager
- Level: Internal
-*/
-
-SUIT_Desktop::LogoManager::LogoManager( SUIT_Desktop* desktop)
-: myDesktop( desktop ), myId( 0 ) 
+SUIT_Desktop::LogoMgr::LogoMgr( QMenuBar* mb )
+: QObject( mb ),
+myMenus( mb ),
+myId( 0 )
 {
 } 
 
-void SUIT_Desktop::LogoManager::addLogo( const QString& logoID, const QPixmap& logo )
+SUIT_Desktop::LogoMgr::~LogoMgr()
 {
-  if ( !myDesktop || logo.isNull() )
+}
+
+QMenuBar* SUIT_Desktop::LogoMgr::menuBar() const
+{
+  return myMenus;
+}
+
+int SUIT_Desktop::LogoMgr::count() const
+{
+  return myLogos.count();
+}
+
+void SUIT_Desktop::LogoMgr::insert( const QString& id, const QPixmap& pix, const int index )
+{
+  if ( pix.isNull() )
     return;
-  myLogoMap[ logoID ] = logo;
-  generateLogo();
+
+  LogoInfo* inf = 0;
+
+  int idx = find( id );
+  if ( idx < 0 )
+  {
+    idx = index < (int)myLogos.count() ? index : -1;
+    if ( idx < 0 )
+      inf = &( *myLogos.append( LogoInfo() ) );
+    else
+      inf = &( *myLogos.insert( myLogos.at( idx ), LogoInfo() ) );
+  }
+  else
+    inf = &( *myLogos.at( idx ) );
+
+
+  inf->id = id;
+  inf->pix = pix;
+
+  generate();
 }
 
-void SUIT_Desktop::LogoManager::removeLogo( const QString& logoID )
+void SUIT_Desktop::LogoMgr::remove( const QString& id )
 {
-  if ( !myDesktop || myLogoMap.find( logoID ) == myLogoMap.end() )
+  int idx = find( id );
+  if ( idx < 0 )
     return;
-  myLogoMap.remove( logoID );
-  generateLogo();
+
+  myLogos.remove( myLogos.at( idx ) );
+
+  generate();
 }
 
-void SUIT_Desktop::LogoManager::clearLogo()
+void SUIT_Desktop::LogoMgr::clear()
 {
-  myLogoMap.clear();
-  generateLogo();
+  myLogos.clear();
+  generate();
 }
 
-void SUIT_Desktop::LogoManager::generateLogo()
+void SUIT_Desktop::LogoMgr::generate()
 {
-  if ( !myDesktop ) return;
+  if ( !menuBar() )
+    return;
 
   if ( myId ) 
-    myDesktop->menuBar()->removeItem( myId );
+    menuBar()->removeItem( myId );
+
   myId = 0;
 
-  if ( !myLogoMap.count() )
+  if ( myLogos.isEmpty() )
     return;
 
-  LogoBox* cnt = new LogoBox( myDesktop );
-  
-  QMap<QString, QPixmap>::Iterator it;
-  for ( it = myLogoMap.begin(); it != myLogoMap.end(); ++it ) {
+  class LogoBox : public QHBox
+  {
+  public:
+    LogoBox( QWidget* parent = 0, const char* name = 0, WFlags f = 0 ) : QHBox( parent, name, f ) {};
+
+    void addSpacing( int spacing )
+    {
+      QApplication::sendPostedEvents( this, QEvent::ChildInserted );
+      ((QHBoxLayout*)layout())->addSpacing( spacing );
+    }
+
+  protected:
+    void drawContents( QPainter* p )
+    {
+      if ( parentWidget()->inherits( "QMenuBar" ) )
+        style().drawControl( QStyle::CE_MenuBarEmptyArea, p, this, contentsRect(), colorGroup() );
+      else
+        QHBox::drawContents( p );
+    }
+  };
+
+  LogoBox* cnt = new LogoBox( menuBar() );
+  cnt->setSpacing( 2 );
+
+  for ( LogoList::const_iterator it = myLogos.begin(); it != myLogos.end(); ++it )
+  {
     QLabel* logoLab = new QLabel( cnt );
-    logoLab->setPixmap( *it );
-    logoLab->setAlignment( QLabel::AlignCenter ); 
+    logoLab->setPixmap( (*it).pix );
     logoLab->setScaledContents( false );
+    logoLab->setAlignment( QLabel::AlignCenter ); 
   }
+  QApplication::sendPostedEvents( cnt, QEvent::ChildInserted );
   cnt->addSpacing( 2 );
 
-  myId = myDesktop->menuBar()->insertItem( cnt );
-  QApplication::sendPostedEvents( myDesktop->menuBar()->parentWidget(), QEvent::LayoutHint );
-  QApplication::postEvent( myDesktop->menuBar()->parentWidget(), new QEvent( QEvent::LayoutHint ) );
+  myId = menuBar()->insertItem( cnt );
+
+  QApplication::sendPostedEvents( menuBar()->parentWidget(), QEvent::LayoutHint );
+  QApplication::postEvent( menuBar()->parentWidget(), new QEvent( QEvent::LayoutHint ) );
 }
 
+int SUIT_Desktop::LogoMgr::find( const QString& id ) const
+{
+  int idx = -1;
+  for ( uint i = 0; i < myLogos.count() && idx < 0; i++ )
+  {
+    if ( (*myLogos.at( i ) ).id == id )
+      idx = i;
+  }
+  return idx;
+}
 
 /*!\class SUIT_Desktop
  * Provide desktop management:\n
@@ -115,10 +188,11 @@ void SUIT_Desktop::LogoManager::generateLogo()
   Constructor.
 */
 SUIT_Desktop::SUIT_Desktop()
-: QtxMainWindow(), myLogoMan( this )
+: QtxMainWindow()
 {
   myMenuMgr = new QtxActionMenuMgr( this );
   myToolMgr = new QtxActionToolMgr( this );
+  myLogoMgr = new LogoMgr( menuBar() );
 }
 
 /*!
@@ -187,27 +261,61 @@ QtxActionToolMgr* SUIT_Desktop::toolMgr() const
 }
 
 /*!
+  Returns the count of the existed logos.
+*/
+int SUIT_Desktop::logoCount() const
+{
+  if ( !myLogoMgr )
+    return 0;
+  else
+    return myLogoMgr->count();
+}
+
+/*!
+  Adds new logo to the menu bar area.
+  Obsolete. Not should be used.
+  Use SUIT_Desktop::logoInsert();
+*/
+void SUIT_Desktop::addLogo( const QString& id, const QPixmap& pix )
+{
+  logoInsert( id, pix );
+}
+
+/*!
+  Removes a logo.
+  Obsolete. Not should be used.
+  Use SUIT_Desktop::logoRemove();
+*/
+void SUIT_Desktop::removeLogo( const QString& id )
+{
+  logoRemove( id );
+}
+
+/*!
   Adds new logo to the menu bar area
 */
-void SUIT_Desktop::addLogo( const QString& logoID, const QPixmap& logo )
+void SUIT_Desktop::logoInsert( const QString& logoID, const QPixmap& logo, const int idx )
 {
-  myLogoMan.addLogo( logoID, logo );
+  if ( myLogoMgr )
+    myLogoMgr->insert( logoID, logo, idx );
 }
 
 /*!
   Removes a logo
 */
-void SUIT_Desktop::removeLogo( const QString& logoID )
+void SUIT_Desktop::logoRemove( const QString& logoID )
 {
-  myLogoMan.removeLogo( logoID );
+  if ( myLogoMgr )
+    myLogoMgr->remove( logoID );
 }
 
 /*!
   Removes all logos 
 */
-void SUIT_Desktop::clearLogo()
+void SUIT_Desktop::logoClear()
 {
-  myLogoMan.clearLogo();
+  if ( myLogoMgr )
+    myLogoMgr->clear();
 }
 
 

@@ -72,7 +72,7 @@ private:
 
 private:
   QString                      lastError() const;
-  AppLib                       loadLibrary( const QString& );
+  AppLib                       loadLibrary( const QString&, QString& );
   QString                      applicationName( const QString& ) const;
 
 private:

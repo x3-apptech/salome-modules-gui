@@ -16,22 +16,7 @@ class SUIT_EXPORT SUIT_Desktop : public QtxMainWindow
 {
   Q_OBJECT
 
-  class LogoManager
-  {
-  public:
-    LogoManager( SUIT_Desktop* );
-    void                   addLogo( const QString&, const QPixmap& );
-    void                   removeLogo( const QString& );
-    void                   clearLogo();
-
-  private:
-    void                   generateLogo();
-    
-  private:
-    SUIT_Desktop*          myDesktop;
-    QMap<QString, QPixmap> myLogoMap;
-    int                    myId;
-  };
+  class LogoMgr;
 
 public:
   SUIT_Desktop();
@@ -43,9 +28,14 @@ public:
   virtual SUIT_ViewWindow* activeWindow() const = 0;
   virtual QPtrList<SUIT_ViewWindow> windows() const = 0;
 
-  void                     addLogo( const QString&, const QPixmap& );
-  void                     removeLogo( const QString& );
-  void                     clearLogo();
+  void                     addLogo( const QString&, const QPixmap& ); // Not should be used. Will be removed.
+  void                     removeLogo( const QString& );              // Not should be used. Will be removed.
+
+  int                      logoCount() const;
+
+  void                     logoClear();
+  void                     logoRemove( const QString& );
+  void                     logoInsert( const QString&, const QPixmap&, const int = -1 );
 
 signals:
   void                     activated();
@@ -63,7 +53,7 @@ protected:
 private:
   QtxActionMenuMgr*        myMenuMgr;
   QtxActionToolMgr*        myToolMgr;
-  LogoManager              myLogoMan;
+  LogoMgr*                 myLogoMgr;
 };
 
 #endif
