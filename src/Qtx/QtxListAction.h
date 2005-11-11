@@ -26,6 +26,8 @@ class QTX_EXPORT QtxListAction : public QtxAction
 {
     Q_OBJECT
 
+    Q_PROPERTY( QStringList names READ names WRITE addNames )
+
     class ToolButton;
 
 public:
@@ -47,6 +49,7 @@ public:
     int                     popupMode() const;
     void                    setPopupMode( const int );
 
+    QStringList             names() const;
     void                    addNames( const QStringList&, bool = true );
     void                    setComment( const QString&, const QString& = QString::null );
 

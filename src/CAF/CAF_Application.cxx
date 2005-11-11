@@ -160,18 +160,25 @@ void CAF_Application::updateCommandsStatus()
     cafStudy = (CAF_Study*)activeStudy();
 
   QAction* undo = action( EditUndoId );
-  if ( cafStudy && undo->inherits( "QtxListAction" ) )
-    ((QtxListAction*)undo)->addNames( cafStudy->undoNames() );
+  if ( cafStudy && undo )
+    undo->setProperty( "names", cafStudy->undoNames() );
 
   QAction* redo = action( EditRedoId );
-  if ( cafStudy && redo->inherits( "QtxListAction" ) )
-    ((QtxListAction*)redo)->addNames( cafStudy->redoNames() );
+  if ( cafStudy && redo )
+    redo->setProperty( "names", cafStudy->redoNames() );
 
-  undo->setEnabled( cafStudy && cafStudy->canUndo() );
-  redo->setEnabled( cafStudy && cafStudy->canRedo() );
+  if ( undo )
+    undo->setEnabled( cafStudy && cafStudy->canUndo() );
+  if ( redo )
+    redo->setEnabled( cafStudy && cafStudy->canRedo() );
 }
 
 void CAF_Application::onHelpAbout()
 {
   SUIT_MessageBox::info1( desktop(), tr( "About" ), tr( "ABOUT_INFO" ), "&OK" );
+}
+
+SUIT_Study* CAF_Application::createNewStudy()
+{
+  return new CAF_Study( this );
 }

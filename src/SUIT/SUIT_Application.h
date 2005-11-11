@@ -120,6 +120,9 @@ protected:
   void                  setToolShown( QAction*, const bool );
   void                  setToolShown( const int, const bool );//@}
 
+  void                  setActionShown( QAction*, const bool );
+  void                  setActionShown( const int, const bool );
+
   static QAction*       separator();
   QAction*              action( const int ) const;
   int                   actionId( const QAction* ) const;

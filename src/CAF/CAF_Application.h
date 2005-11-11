@@ -23,24 +23,26 @@ public:
   CAF_Application();
   virtual ~CAF_Application();
 
-  virtual QString applicationName() const;
+  virtual QString     applicationName() const;
 
 public slots:  
-  virtual void    onHelpAbout();
+  virtual void        onHelpAbout();
 
 protected slots:
-  virtual bool    onUndo( int );
-  virtual bool    onRedo( int );
+  virtual bool        onUndo( int );
+  virtual bool        onRedo( int );
   
 protected:
   enum {  EditUndoId = STD_Application::UserID, EditRedoId, UserID };
 
 protected:
-  virtual void    createActions();
-  virtual void    updateCommandsStatus();
+  virtual void        createActions();
+  virtual void        updateCommandsStatus();
 
-  bool				    undo( CAF_Study* doc );
-  bool				    redo( CAF_Study* doc );
+  virtual SUIT_Study* createNewStudy();
+
+  bool				        undo( CAF_Study* doc );
+  bool				        redo( CAF_Study* doc );
 };
 
 #if defined WIN32

@@ -257,6 +257,18 @@ void SUIT_Application::setToolShown( const int id, const bool on )
     desktop()->toolMgr()->setShown( id, on );
 }
 
+void SUIT_Application::setActionShown( QAction* a, const bool on )
+{
+  setMenuShown( a, on );
+  setToolShown( a, on );
+}
+
+void SUIT_Application::setActionShown( const int id, const bool on )
+{
+  setMenuShown( id, on );
+  setToolShown( id, on );
+}
+
 QAction* SUIT_Application::action( const int id ) const
 {
   SUIT_Application* that = (SUIT_Application*)this;

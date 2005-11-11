@@ -153,6 +153,14 @@ void QtxListAction::setPopupMode( const int mode )
   myMode = mode;
 }
 
+QStringList QtxListAction::names() const
+{
+  QStringList lst;
+  if ( myFrame )
+    lst = myFrame->names();
+  return lst;
+}
+
 /*!
 	Name: addNames [public]
 	Desc: Fills the list of actions. Removes the old contents from
