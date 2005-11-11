@@ -1,31 +1,33 @@
 #if defined WNT
+
 #undef SUIT_ENABLE_PYTHON
 //#else
 //#include "SUITconfig.h"
 #endif
 
-#include <qapplication.h>
+#include "SUITApp_Application.h"
 
 #include "SUIT_Session.h"
 #include "SUIT_ResourceMgr.h"
-#include "SUITApp_Application.h"
+
 
 #ifdef SUIT_ENABLE_PYTHON
 #include <Python.h>
 #endif
 
-#include <stdlib.h>
-
-#include <qstringlist.h>
-#include <qfile.h>
 #include <qdir.h>
+#include <qfile.h>
 #include <qstring.h>
+#include <qstringlist.h>
+
+#include <stdlib.h>
 
 QString salomeVersion()
 {
   QString path( ::getenv( "GUI_ROOT_DIR" ) );
   if ( !path.isEmpty() )
     path += QDir::separator();
+
   path += QString( "bin/salome/VERSION" );
 
   QFile vf( path );
@@ -49,6 +51,7 @@ QString salomeVersion()
 
   return ver;
 }
+
 
 /* XPM */
 static const char* pixmap_not_found_xpm[] = {
@@ -82,23 +85,31 @@ public:
 protected:
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
   {
-    SUIT_ResourceMgr* resMgr;
+    SUIT_ResourceMgr* resMgr = 0;
     if ( myIniFormat )
+    {
       resMgr = new SUIT_ResourceMgr( appName );
-    else {
+      resMgr->setCurrentFormat( "ini" );
+    }
+    else
+    {
       resMgr = new SUIT_ResourceMgr( appName, QString( "%1Config" ) );
       resMgr->setVersion( salomeVersion() );
       resMgr->setCurrentFormat( "xml" );
-      resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
+    }
+
+    if ( resMgr )
+    {
       static QPixmap defaultPixmap( pixmap_not_found_xpm );
       resMgr->setDefaultPixmap( defaultPixmap );
+      resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
     }
     return resMgr;
   }
+
 private:
   bool  myIniFormat;
 };
-
 
 int main( int args, char* argv[] )
 {
@@ -106,7 +117,7 @@ int main( int args, char* argv[] )
   Py_Initialize();
   PySys_SetArgv( args, argv );
 #endif
-  
+
   QStringList argList;
   bool noExceptHandling = false;
   bool iniFormat = false;
@@ -119,7 +130,6 @@ int main( int args, char* argv[] )
     else
       argList.append( QString( argv[i] ) );
   }
-
 
   SUITApp_Application app( args, argv );
 
