@@ -39,7 +39,9 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
       return;
 
     SUIT_DataOwnerPtrList sel;
-    mgr->selected( sel, client );
+    //asl: fix for PAL10471
+    //mgr->selected( sel, client );
+    mgr->selected( sel );
     SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
 
     QString entry, curEntry;
