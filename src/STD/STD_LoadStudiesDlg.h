@@ -1,16 +1,18 @@
 #ifndef STD_LOADSTUDIESDLG_H
 #define STD_LOADSTUDIESDLG_H
 
-#include <qvariant.h>
-#include <qdialog.h>
 #include <STD.h>
+
+#include <qdialog.h>
+#include <qvariant.h>
+
+class QLabel;
+class QListBox;
+class QPushButton;
 class QVBoxLayout; 
 class QHBoxLayout; 
 class QGridLayout; 
-class QLabel;
-class QListBox;
 class QListBoxItem;
-class QPushButton;
 
 /*!\class STD_LoadStudiesDlg
  * \brief Describes a dialog box that gives a list of opened studies.

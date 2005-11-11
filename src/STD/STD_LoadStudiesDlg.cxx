@@ -5,26 +5,20 @@
 #include <qlistbox.h>
 #include <qpushbutton.h>
 
-#ifndef WNT
-using namespace std;
-#endif
-
 #define SPACING_SIZE             6
 #define MARGIN_SIZE             11
 #define MIN_LISTBOX_WIDTH      150
 #define MIN_LISTBOX_HEIGHT     100
 
-//================================================================================
-/*! Public -
- * \brief creates a Load study dialog box
- * \param parent a parent widget
- * \param modal bool argument, if true the dialog box is a modal dialog box
- * \param f style flags
- * 
- */
-//================================================================================
+/*!
+* \brief creates a Load study dialog box
+* \param parent a parent widget
+* \param modal bool argument, if true the dialog box is a modal dialog box
+* \param f style flags
+*/
+
 STD_LoadStudiesDlg::STD_LoadStudiesDlg( QWidget* parent,  bool modal, WFlags fl )
-    : QDialog(parent, "STD_LoadStudiesDlg", modal, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu)
+: QDialog( parent, "STD_LoadStudiesDlg", modal, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
 {
     resize( 321, 181 ); 
     setCaption( tr("DLG_LOAD_STUDY_CAPTION") );

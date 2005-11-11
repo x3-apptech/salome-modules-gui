@@ -1,35 +1,33 @@
 #include "STD_CloseDlg.h"
 
-#include <qpushbutton.h>
-#include <qhbuttongroup.h>
-#include <qlayout.h> 
 #include <qlabel.h> 
+#include <qlayout.h> 
+#include <qpushbutton.h>
 #include <qmessagebox.h>
+#include <qhbuttongroup.h>
 
 #ifndef WNT
 using namespace std;
 #endif
 
-//================================================================================
 /*!
  * \brief creates a Close dialog box
  * \param parent a parent widget
  * \param modal bool argument, if true the dialog box is a modal dialog box
  * \param f style flags
- * 
  */
-//================================================================================
 
-STD_CloseDlg::STD_CloseDlg ( QWidget * parent, bool modal, WFlags f )
-     : QDialog ( parent, "", TRUE,  WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
+STD_CloseDlg::STD_CloseDlg( QWidget* parent, bool modal, WFlags f )
+: QDialog( parent, "", true,  WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
 {
-  setSizeGripEnabled ( TRUE ) ;
+  setSizeGripEnabled( true );
   setCaption( tr( "CLOSE_DLG_CAPTION" ) );
 
   QVBoxLayout* m_vbL = new QVBoxLayout( this );
-  m_vbL->setMargin( 11 ); m_vbL->setSpacing( 6 );
+  m_vbL->setMargin( 11 );
+  m_vbL->setSpacing( 6 );
 
-  QLabel* m_lIcon  = new QLabel (this, "m_lDescr");
+  QLabel* m_lIcon = new QLabel( this, "m_lDescr" );
   QPixmap pm = QMessageBox::standardIcon( QMessageBox::Warning );
   m_lIcon->setPixmap( pm );
   m_lIcon->setScaledContents( false );
