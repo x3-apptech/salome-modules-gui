@@ -31,6 +31,16 @@ CAF_Study::~CAF_Study()
 {
 }
 
+Handle(TDocStd_Document) CAF_Study::stdDocument() const
+{
+  return myStdDoc;
+}
+
+void CAF_Study::setStdDocument( Handle(TDocStd_Document)& aStdDoc )
+{
+  myStdDoc = aStdDoc;
+}
+
 bool CAF_Study::startOperation()
 {
 	if ( myStdDoc.IsNull() )

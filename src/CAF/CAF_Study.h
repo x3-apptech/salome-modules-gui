@@ -20,28 +20,28 @@ class CAF_EXPORT CAF_Study : public SUIT_Study
 
 public:
 	CAF_Study( SUIT_Application* theApp );
-	CAF_Study( SUIT_Application* theApp, Handle (TDocStd_Document)& aStdDoc );
+	CAF_Study( SUIT_Application* theApp, Handle(TDocStd_Document)& aStdDoc );
 	virtual ~CAF_Study();
 
-	virtual bool startOperation();
-	virtual void abortOperation();
-	virtual void commitOperation();
+	virtual bool             startOperation();
+	virtual void             abortOperation();
+	virtual void             commitOperation();
 
-	bool         isSaved() const;
-	bool         isModified() const;
-	void         doModified( bool undoable = true);
-	void         undoModified();
-	void         clearModified();
+	bool                     isSaved() const;
+	bool                     isModified() const;
+	void                     doModified( bool undoable = true);
+	void                     undoModified();
+	void                     clearModified();
 
-  bool         undo();
-	bool         redo();
-	bool         canUndo() const;
-	bool         canRedo() const;
-	QStringList  undoNames() const;
-	QStringList  redoNames() const;
+  bool                     undo();
+	bool                     redo();
+	bool                     canUndo() const;
+	bool                     canRedo() const;
+	QStringList              undoNames() const;
+	QStringList              redoNames() const;
 
-  void         setStdDocument( Handle(TDocStd_Document)& aStdDoc ) { myStdDoc = aStdDoc; }
-  Handle(TDocStd_Document) getStdDocument() { return myStdDoc; }
+  Handle(TDocStd_Document) stdDocument() const;
+  void                     setStdDocument( Handle(TDocStd_Document)& );
 
 protected:
 	Handle(TDocStd_Document) myStdDoc;
