@@ -47,11 +47,38 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList()
 }
 
 //====================================================================
+//! Constructor (default)
+//====================================================================
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const bool skipAllEqal )
+: QValueList<SUIT_DataOwnerPtr>(),
+mySkipEqual( skipAllEqal )
+{
+}
+
+//====================================================================
 //! Constructor (copy)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l )
 : QValueList<SUIT_DataOwnerPtr>( l )
 {
+}
+
+//====================================================================
+//! Constructor (copy)
+//====================================================================
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqal )
+: QValueList<SUIT_DataOwnerPtr>(),
+mySkipEqual( skipAllEqal )
+{
+  if ( skipAllEqal == l.mySkipEqual )
+    operator =( l );
+  else
+  {
+    SUIT_DataOwnerPtrList::const_iterator beginIt = l.begin();
+    SUIT_DataOwnerPtrList::const_iterator endIt = l.end();
+    for( ; beginIt != endIt; ++beginIt )
+      append( *beginIt );
+  }
 }
 
 #ifndef QT_NO_STL
@@ -64,6 +91,21 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>
 }
 #endif
 
+#ifndef QT_NO_STL
+//====================================================================
+//! Constructor (from stl)
+//====================================================================
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l, const bool skipAllEqal )
+: QValueList<SUIT_DataOwnerPtr>(),
+mySkipEqual( skipAllEqal )
+{
+  std::list<SUIT_DataOwnerPtr>::const_iterator beginIt = l.begin();
+  std::list<SUIT_DataOwnerPtr>::const_iterator endIt = l.begin();
+  for( ; beginIt != endIt; ++beginIt )
+    append( *beginIt );
+}
+#endif
+
 //====================================================================
 //! Appends an item to the list
 //====================================================================
@@ -71,12 +113,14 @@ SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOw
 {
   SUIT_DataOwnerPtrList::iterator it = find( x );
   if ( it != end() )
-    {
-      const _typeinfo& ti1 = typeid( *((*it).operator->()) );
-      const _typeinfo& ti2 = typeid( *(x.operator->()) );
+  {
+    if ( mySkipEqual )
+      return it;
+    const _typeinfo& ti1 = typeid( *((*it).operator->()) );
+    const _typeinfo& ti2 = typeid( *(x.operator->()) );
 
-      if (ti1 == ti2)
-	return it;
-    }
+    if (ti1 == ti2)
+      return it;
+  }
   return QValueList<SUIT_DataOwnerPtr>::append( x );
 }

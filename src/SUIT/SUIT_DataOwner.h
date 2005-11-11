@@ -37,9 +37,12 @@ class SUIT_EXPORT SUIT_DataOwnerPtrList : public QValueList<SUIT_DataOwnerPtr>
 {
 public:
   SUIT_DataOwnerPtrList();//!< constructor
+  SUIT_DataOwnerPtrList( const bool skipAllEqal );//!< constructor
   SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l );//!< copy constructor
+  SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqal );//!< copy constructor
 #ifndef QT_NO_STL
   SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l );//!< copy constructor for STL list
+  SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l, const bool skipAllEqal );//!< copy constructor for STL list
 #endif
 
   iterator append      ( const SUIT_DataOwnerPtr& x );//!< append function
@@ -50,6 +53,8 @@ private:
   iterator insert ( iterator it, const SUIT_DataOwnerPtr& x );//!< hide method
   void push_front ( const SUIT_DataOwnerPtr& x );//!< hide method
   void push_back  ( const SUIT_DataOwnerPtr& x );//!< hide method
+private:
+  bool mySkipEqual;
 };
 
 #ifdef WIN32
