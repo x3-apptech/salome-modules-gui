@@ -2,10 +2,13 @@
 
 #include "CAF_Tools.h"
 #include "CAF_Operation.h"
+#include "CAF_Application.h"
 
 #include <SUIT_Desktop.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_Application.h>
+
+#include <qdir.h>
 
 #include <TDF_Delta.hxx>
 #include <TDF_ListIteratorOfDeltaList.hxx>
@@ -31,14 +34,91 @@ CAF_Study::~CAF_Study()
 {
 }
 
-Handle(TDocStd_Document) CAF_Study::stdDocument() const
+Handle(TDocStd_Document) CAF_Study::stdDoc() const
 {
   return myStdDoc;
 }
 
-void CAF_Study::setStdDocument( Handle(TDocStd_Document)& aStdDoc )
+void CAF_Study::setStdDoc( Handle(TDocStd_Document)& aStdDoc )
 {
   myStdDoc = aStdDoc;
+}
+
+void CAF_Study::createDocument()
+{
+  SUIT_Study::createDocument();
+
+  CAF_Application* app = cafApplication();
+  if ( app && !app->stdApp().IsNull() )
+  {
+    try {
+      TColStd_SequenceOfExtendedString formats;
+	    app->stdApp()->Formats( formats );
+      if ( !formats.IsEmpty() )
+        app->stdApp()->NewDocument( formats.First(), myStdDoc );
+    }
+    catch ( Standard_Failure ) {
+    }
+  }
+}
+
+void CAF_Study::closeDocument( bool permanent )
+{
+  Handle(TDocStd_Application) app = stdApp();
+  if ( !app.IsNull() && !stdDoc().IsNull() )
+    app->Close( stdDoc() );
+
+  SUIT_Study::closeDocument( permanent );
+}
+
+bool CAF_Study::openDocument( const QString& fname )
+{
+  Handle(TDocStd_Application) app = stdApp();
+  if ( app.IsNull() )
+    return false;
+
+  try {
+    app->Open( CAF_Tools::toExtString( fname ), myStdDoc );
+  }
+  catch ( Standard_Failure ) {
+    return false;
+  }
+
+  return SUIT_Study::openDocument( fname );
+}
+
+bool CAF_Study::saveDocumentAs( const QString& fname )
+{
+  Handle(TDocStd_Application) app = stdApp();
+  if ( app.IsNull() )
+    return false;
+
+  bool save = false;
+  if ( !stdDoc().IsNull() && stdDoc()->IsSaved() )
+  {
+    QString path = QDir::convertSeparators( CAF_Tools::toQString( stdDoc()->GetPath() ) );
+    save = path == QDir::convertSeparators( fname );
+  }
+
+  try {
+    if ( save )
+      app->Save( stdDoc() );
+    else
+    {
+      TCollection_ExtendedString format, path( CAF_Tools::toExtString( fname ) );
+      app->Format( path, format );
+
+      if ( format.Length() )
+        stdDoc()->ChangeStorageFormat( format );
+
+      app->SaveAs( stdDoc(), path );
+    }
+  }
+  catch ( Standard_Failure ) {
+    return false;
+  }
+
+  return SUIT_Study::saveDocumentAs( fname );
 }
 
 bool CAF_Study::startOperation()
@@ -53,7 +133,7 @@ bool CAF_Study::startOperation()
 
     myStdDoc->OpenCommand();
   }
-  catch( Standard_Failure ) {
+  catch ( Standard_Failure ) {
     res = false;
   }
 
@@ -236,4 +316,24 @@ QStringList CAF_Study::redoNames() const
       names.append( CAF_Tools::toQString( it.Value()->Name() ) );
   }
   return names;
+}
+
+/*!
+    Returns the standard OCAF application from owner application. [ protected ]
+*/
+Handle(TDocStd_Application) CAF_Study::stdApp() const
+{
+  Handle(TDocStd_Application) stdApp;
+  CAF_Application* app = cafApplication();
+  if ( app )
+    stdApp = app->stdApp();
+  return stdApp;
+}
+
+/*!
+    Returns the application casted to type CAF_Application. [ protected ]
+*/
+CAF_Application* CAF_Study::cafApplication() const
+{
+  return ::qt_cast<CAF_Application*>( application() );
 }

@@ -699,6 +699,8 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   delete popup;
 }
 
+#include <qregexp.h>
+
 /*!\retval QString - return file name from dialog.*/
 QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters,
 				      const QString& caption, QWidget* parent )
@@ -719,42 +721,45 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
     while ( !isOk )
     {
       // It is preferrable to use OS-specific file dialog box here !!!
-      aName = QFileDialog::getSaveFileName( anOldPath, filters, parent,
-					    0, caption, &aUsedFilter);
+      aName = QFileDialog::getSaveFileName( anOldPath, filters, parent, 0, caption, &aUsedFilter );
 
       if ( aName.isNull() )
         isOk = true;
       else
       {
-        if ( !getFileFilter().isNull() ) // check extension and add if it is necessary
+	      int aEnd = aUsedFilter.findRev( ')' );
+	      int aStart = aUsedFilter.findRev( '(', aEnd );
+	      QString wcStr = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
+
+        int idx = 0;
+        QStringList extList;
+        QRegExp rx( "[\b\\*]*\\.([\\w]+)" );
+        while ( ( idx = rx.search( wcStr, idx ) ) != -1 )
         {
-	  int aStart = aUsedFilter.find( '*' );
-	  int aEnd = aUsedFilter.find( ')', aStart + 1 );
-	  QString aExt = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
-	  if ( aExt.contains( '*' ) == 0 ) // if it is not *.*
-	  {
-	    // Check that there is an extension at the end of the name
-  	    QString aNameTail = aName.right( aExt.length() );
-	    if ( aNameTail != aExt )
-              aName += aExt;
-	  }
+          extList.append( rx.cap( 1 ) );
+          idx += rx.matchedLength();
         }
-	if ( QFileInfo( aName ).exists() )
+
+        if ( !extList.isEmpty() && !extList.contains( QFileInfo( aName ).extension() ) )
+          aName += QString( ".%1" ).arg( extList.first() );
+
+	      if ( QFileInfo( aName ).exists() )
         {
-	  int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TIT_FILE_SAVEAS" ),
-					        tr( "MSG_FILE_EXISTS" ).arg( aName ),
-					        tr( "BUT_YES" ), tr( "BUT_NO" ), tr( "BUT_CANCEL" ), 1, 2, 3, 1 );
-	  if ( aAnswer == 3 ) {     // cancelled
+	        int aAnswer = SUIT_MessageBox::warn3( desktop(), tr( "TIT_FILE_SAVEAS" ),
+					                                      tr( "MSG_FILE_EXISTS" ).arg( aName ),
+					                                      tr( "BUT_YES" ), tr( "BUT_NO" ), tr( "BUT_CANCEL" ), 1, 2, 3, 1 );
+	        if ( aAnswer == 3 )
+          {     // cancelled
             aName = QString::null;
-	    isOk = true;
+	          isOk = true;
           }
-	  else if ( aAnswer == 2 ) // not save to this file
-	    anOldPath = aName;             // not to return to the same initial dir at each "while" step
-	  else                     // overwrite the existing file
-	    isOk = true;
+	        else if ( aAnswer == 2 ) // not save to this file
+	          anOldPath = aName;             // not to return to the same initial dir at each "while" step
+	        else                     // overwrite the existing file
+	          isOk = true;
         }
-	else
-	  isOk = true;
+	      else
+	        isOk = true;
       }
     }
     return aName;

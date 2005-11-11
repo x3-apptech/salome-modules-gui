@@ -6,9 +6,11 @@
 #include "SUIT_Study.h"
 
 #include <qobject.h>
-#include <qptrstack.h>
 
 #include <TDocStd_Document.hxx>
+#include <TDocStd_Application.hxx>
+
+class CAF_Application;
 
 #if defined WNT
 #pragma warning ( disable: 4251 )
@@ -23,29 +25,40 @@ public:
 	CAF_Study( SUIT_Application* theApp, Handle(TDocStd_Document)& aStdDoc );
 	virtual ~CAF_Study();
 
-	virtual bool             startOperation();
-	virtual void             abortOperation();
-	virtual void             commitOperation();
+  virtual void                createDocument();
+  virtual void                closeDocument( bool = true );
+  virtual bool                openDocument( const QString& );
 
-	bool                     isSaved() const;
-	bool                     isModified() const;
-	void                     doModified( bool undoable = true);
-	void                     undoModified();
-	void                     clearModified();
+  virtual bool                saveDocumentAs( const QString& );
 
-  bool                     undo();
-	bool                     redo();
-	bool                     canUndo() const;
-	bool                     canRedo() const;
-	QStringList              undoNames() const;
-	QStringList              redoNames() const;
+	virtual bool                startOperation();
+	virtual void                abortOperation();
+	virtual void                commitOperation();
 
-  Handle(TDocStd_Document) stdDocument() const;
-  void                     setStdDocument( Handle(TDocStd_Document)& );
+	bool                        isSaved() const;
+	bool                        isModified() const;
+	void                        doModified( bool = true );
+	void                        undoModified();
+	void                        clearModified();
+
+  bool                        undo();
+	bool                        redo();
+	bool                        canUndo() const;
+	bool                        canRedo() const;
+	QStringList                 undoNames() const;
+	QStringList                 redoNames() const;
+
+  Handle(TDocStd_Document)    stdDoc() const;
 
 protected:
-	Handle(TDocStd_Document) myStdDoc;
-	int                      myModifiedCnt;
+  Handle(TDocStd_Application) stdApp() const;
+  CAF_Application*            cafApplication() const;
+
+  virtual void                setStdDoc( Handle(TDocStd_Document)& );
+
+private:
+	Handle(TDocStd_Document)    myStdDoc;
+	int                         myModifiedCnt;
 
   friend class CAF_Operation;
 };

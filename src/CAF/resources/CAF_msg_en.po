@@ -41,3 +41,9 @@ msgstr " Undoes %1 action(s) "
 
 msgid "CAF_Application::INF_APP_REDOACTIONS"
 msgstr " Redoes %1 action(s) "
+
+msgid "CAF_Application::INF_ALL_DOCUMENTS_FILTER"
+msgstr "All Readable Documents"
+
+msgid "CAF_Application::INF_ALL_FILTER"
+msgstr "All Files (*.*)"

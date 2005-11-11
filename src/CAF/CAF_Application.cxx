@@ -1,21 +1,26 @@
 #include "CAF_Application.h"
 
+#include "CAF_Tools.h"
 #include "CAF_Study.h"
 
-#include "SUIT_Desktop.h"
-#include "SUIT_Session.h"
-#include "SUIT_ViewModel.h"
-#include "SUIT_Operation.h"
-#include "SUIT_MessageBox.h"
-#include "SUIT_ResourceMgr.h"
+#include <SUIT_Desktop.h>
+#include <SUIT_Session.h>
+#include <SUIT_ViewModel.h>
+#include <SUIT_Operation.h>
+#include <SUIT_MessageBox.h>
+#include <SUIT_ResourceMgr.h>
 
-#include "QtxListAction.h"
+#include <QtxListAction.h>
 
 #include <qtoolbar.h>
 #include <qmenubar.h>
 #include <qpopupmenu.h>
 #include <qstatusbar.h>
 #include <qapplication.h>
+
+#include <Resource_Manager.hxx>
+
+#include <TColStd_SequenceOfExtendedString.hxx>
 
 extern "C" CAF_EXPORT SUIT_Application* createApplication()
 {
@@ -27,6 +32,12 @@ CAF_Application::CAF_Application()
 {
 }
 
+CAF_Application::CAF_Application( const Handle(TDocStd_Application)& app )
+: STD_Application(),
+myStdApp( app )
+{
+}
+
 CAF_Application::~CAF_Application()
 {
 }
@@ -34,6 +45,64 @@ CAF_Application::~CAF_Application()
 QString CAF_Application::applicationName() const
 {
   return QString( "CAFApplication" );
+}
+
+QString CAF_Application::storageFormat() const
+{
+  return QString( "MDTV-Standard" );
+}
+
+Handle(TDocStd_Application) CAF_Application::stdApp() const
+{
+  return myStdApp;
+}
+
+QString CAF_Application::getFileFilter() const
+{
+  if ( stdApp().IsNull() )
+    return QString::null;
+
+  TColStd_SequenceOfExtendedString formats;
+  stdApp()->Formats( formats );
+
+  QStringList allWC;
+  QMap<QString, QStringList> wildCards;
+  Handle(Resource_Manager) resMgr = new Resource_Manager( stdApp()->ResourcesName() );
+  for ( int i = 1; i <= formats.Length(); i++ )
+  {
+    QString extension;
+    QString extResStr = CAF_Tools::toQString( formats.Value( i ) ) + QString( ".FileExtension" );
+    if ( resMgr->Find( (char*)extResStr.latin1() ) )
+      extension = QString( resMgr->Value( (char*)extResStr.latin1() ) );
+
+    QString descr;
+    QString descrResStr = CAF_Tools::toQString( formats.Value( i ) ) + QString( ".Description" );
+    if ( resMgr->Find( (char*)descrResStr.latin1() ) )
+      descr = QString( resMgr->Value( (char*)descrResStr.latin1() ) );
+
+    if ( !descr.isEmpty() && !extension.isEmpty() )
+    {
+      if ( !wildCards.contains( descr ) )
+        wildCards.insert( descr, QStringList() );
+      wildCards[descr].append( QString( "*.%1" ).arg( extension ) );
+      allWC.append( QString( "*.%1" ).arg( extension ) );
+    }
+  }
+
+  if ( wildCards.isEmpty() )
+    return QString::null;
+
+  QStringList filters;
+  for ( QMap<QString, QStringList>::ConstIterator it = wildCards.begin(); it != wildCards.end(); ++it )
+    filters.append( QString( "%1 (%2)" ).arg( it.key() ).arg( it.data().join( "; " ) ) );
+
+  if ( wildCards.count() > 1 )
+    filters.prepend( QString( "%1 (%2)" ).arg( tr( "INF_ALL_DOCUMENTS_FILTER" ) ).arg( allWC.join( "; " ) ) );
+
+  if ( !filters.isEmpty() )
+    filters.append( tr( "INF_ALL_FILTER" ) );
+
+  return filters.join( ";;" );
 }
 
 void CAF_Application::createActions()
@@ -181,4 +250,9 @@ void CAF_Application::onHelpAbout()
 SUIT_Study* CAF_Application::createNewStudy()
 {
   return new CAF_Study( this );
+}
+
+void CAF_Application::setStdApp( const Handle(TDocStd_Application)& app )
+{
+  myStdApp = app;
 }
