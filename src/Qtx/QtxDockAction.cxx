@@ -877,7 +877,17 @@ void QtxDockAction::loadPlaceArea( const int place, QMainWindow* mw, QDockArea* 
     }
     dw->setGeometry( inf->x, inf->y, inf->w, inf->h );
 
-    inf->vis ? dw->show() : dw->hide();
+    QAction* a = action( dw );
+    if ( a )
+    {
+      bool block = a->signalsBlocked();
+      a->blockSignals( true );
+      a->setOn( inf->vis );
+      a->blockSignals( block );
+    }
+
+    if ( mainWindow() && mainWindow()->appropriate( dw ) )
+      inf->vis ? dw->show() : dw->hide();
   }
 
   QWidget* wid = area;
