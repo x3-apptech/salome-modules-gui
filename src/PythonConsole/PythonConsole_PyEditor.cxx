@@ -35,6 +35,7 @@
 #include <qclipboard.h>
 #include <qdragobject.h>
 #include <qapplication.h>
+#include <qpopupmenu.h>
 
 using namespace std;
 
