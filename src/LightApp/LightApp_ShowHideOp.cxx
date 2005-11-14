@@ -31,12 +31,14 @@ LightApp_Displayer* LightApp_ShowHideOp::displayer( const QString& mod_name ) co
   {
     m = dynamic_cast<LightApp_Module*>( app->loadModule( mod_name ) );
     if( m )
-    {
       app->addModule( m );
-      m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
-      m->setMenuShown( false );
-      m->setToolShown( false );
-    }
+  }
+
+  if( m )
+  {
+    m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
+    m->setMenuShown( false );
+    m->setToolShown( false );
   }
   return m ? m->displayer() : 0;
 }
