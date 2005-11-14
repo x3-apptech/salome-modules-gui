@@ -93,6 +93,8 @@ myRootDecorated( true )
   connect( myView, SIGNAL( dropped( QPtrList<QListViewItem>, QListViewItem*, int ) ),
            this, SLOT( onDropped( QPtrList<QListViewItem>, QListViewItem*, int ) ) );
   connect( myView, SIGNAL( selectionChanged() ), this, SIGNAL( selectionChanged() ) );
+  connect( myView, SIGNAL( doubleClicked( QListViewItem* ) ),
+           this, SLOT( onDoubleClicked( QListViewItem* ) ) );
 
   setRootObject( root );
 }
@@ -1088,4 +1090,10 @@ void OB_Browser::openBranch( QListViewItem* item, const int level )
     openBranch( item->firstChild(), level - 1 );
     item = item->nextSibling();
   }
+}
+
+void OB_Browser::onDoubleClicked( QListViewItem* item )
+{
+  if ( item )
+    emit doubleClicked( dataObject( item ) );
 }

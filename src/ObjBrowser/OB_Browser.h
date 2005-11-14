@@ -101,12 +101,14 @@ public:
 
 signals:
   void              selectionChanged();
+  void              doubleClicked( SUIT_DataObject* );
   void              dropped( DataObjectList, SUIT_DataObject*, int );
 
 private slots:
   void              onExpand();
   void              onColumnVisible( int );
   void              onDestroyed( SUIT_DataObject* );
+  void              onDoubleClicked ( QListViewItem* );
   void              onDropped( QPtrList<QListViewItem>, QListViewItem*, int );
 
 protected:
