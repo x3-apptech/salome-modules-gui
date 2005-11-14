@@ -1856,3 +1856,12 @@ void LightApp_Application::onWCDestroyed( QObject* ob )
     break;
   }
 }
+
+/*! redefined to remove view manager from memory */
+void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
+{
+  disconnect( vm, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
+           this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
+  STD_Application::removeViewManager( vm );
+  delete vm;
+}

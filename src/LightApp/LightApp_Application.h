@@ -79,6 +79,7 @@ public:
   void                                updateActions();
 
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
+  virtual void                        removeViewManager( SUIT_ViewManager* );
   QWidget*                            getWindow( const int, const int = -1 );
   QWidget*                            window( const int, const int = -1 ) const;
   void                                addWindow( QWidget*, const int, const int = -1 );
