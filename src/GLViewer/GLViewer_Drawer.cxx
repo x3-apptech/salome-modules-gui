@@ -566,33 +566,35 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
 //=======================================================================
 void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y )
 {
-    if( !texture )
-        return;
+    float xScale = myXScale;
+    float yScale = myYScale;
+
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
     glEnable( GL_TEXTURE_2D );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-    bool hasAlpha = glIsEnabled( GL_ALPHA_TEST );
-    glDisable( GL_ALPHA_TEST );
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    glAlphaFunc( GL_GREATER, 0.95F );
+    glEnable( GL_ALPHA_TEST );
     
     glBindTexture( GL_TEXTURE_2D, texture );
     glBegin( GL_QUADS );
-    
+
     glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( x-size/2., y-size/2., 0.0 );
+    glVertex3f( x-size/2./xScale, y-size/2./yScale, 0.0 );
 
     glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( x-size/2., y+size/2., 0.0 );
+    glVertex3f( x-size/2./xScale, y+size/2./yScale, 0.0 );
 
     glTexCoord2f( 1.0, 1.0 );
-    glVertex3f( x+size/2., y+size/2., 0.0 );
+    glVertex3f( x+size/2./xScale, y+size/2./yScale, 0.0 );
 
     glTexCoord2f( 1.0, 0.0 );
-    glVertex3f( x+size/2., y-size/2., 0.0 );
+    glVertex3f( x+size/2./xScale, y-size/2./yScale, 0.0 );
     
     glEnd();
+    glFlush();
 
-    if ( hasAlpha )
-      glEnable( GL_ALPHA_TEST );
+    glDisable( GL_ALPHA_TEST );
     glDisable( GL_TEXTURE_2D );
 }
 
