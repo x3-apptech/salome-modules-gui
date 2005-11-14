@@ -37,9 +37,7 @@ void SUIT_Tools::trace( const char* lpszLog, const char* lpszFormat, ... )
 */	
 QRect SUIT_Tools::makeRect( const int x1, const int y1, const int x2, const int y2 )
 {  
-  QRect aRect;
-  aRect.setRect( QMIN( x1, x2 ), QMIN( y1, y2 ), QABS( x2 - x1 ), QABS( y2 - y1 ) );
-  return aRect;
+  return QRect( QMIN( x1, x2 ), QMIN( y1, y2 ), QABS( x2 - x1 ), QABS( y2 - y1 ) );
 }
 
 /*!
@@ -61,52 +59,10 @@ QString SUIT_Tools::fontToString( const QFont& font )
   return font.toString();
 }
 
+/*!
+  Center widget 'src' relative to widget 'ref'.
+*/
 void SUIT_Tools::centerWidget( QWidget* src, const QWidget* ref )
 {
-  SUIT_Tools::alignWidget(src, ref, Qt::AlignCenter);
-}
-
-/*!
-  Aligns widget 'w' as refered to widget 'ref' [ static ]
-*/
-void SUIT_Tools::alignWidget ( QWidget* src, const QWidget* ref, int alignFlags )
-{
-  if ( !src || !ref || !alignFlags ) return;
-
-  QPoint srcOri = src->mapToGlobal( QPoint( 1, 1 ) );
-  QPoint refOri = ref->mapToGlobal( QPoint( 1, 1 ) );
-
-  int x = srcOri.x(), y = srcOri.y();
-  int refWidth = ref->width(), refHei = ref->height();
-  int srcWidth = src->width(), srcHei = src->height();
-  if ( srcWidth <= 1 )
-    srcWidth = src->sizeHint().width();
-  if ( srcHei <= 1 )
-    srcHei = src->sizeHint().height();
-
-  if ( alignFlags & AlignLeft )
-    x = refOri.x();
-  if ( alignFlags & AlignRight )
-    x = refOri.x() + refWidth - srcWidth;
-  if ( alignFlags & AlignTop )
-    y = refOri.y();
-  if ( alignFlags & AlignBottom )
-    y = refOri.y() + refHei - srcHei;
-  if ( alignFlags & AlignHCenter )
-    x = refOri.x() + ( refWidth - srcWidth ) / 2;
-  if ( alignFlags & AlignVCenter )
-    y = refOri.y() + ( refHei - srcHei ) / 2;
-
-  if ( src->parentWidget() &&        /* we move a widget inside its parent */
-      !src->inherits( "QDialog" ))   /* dialogs use global coordinates  */
-    {
-      QPoint pos = src->parentWidget()->mapFromGlobal( QPoint(x,y) );
-      x = pos.x(); y = pos.y();
-    }
-#ifdef WNT
-  x -= 4;                             /* - frame border width ( approx. ) */
-  y -= 30;                            /* - caption height ( approx. ) */
-#endif
-
-  src->move( x, y );
+  SUIT_Tools::alignWidget( src, ref, Qt::AlignCenter );
 }

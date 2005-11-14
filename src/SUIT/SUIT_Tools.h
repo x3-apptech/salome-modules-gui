@@ -8,10 +8,7 @@
 #include <qrect.h>
 #include <qfont.h>
 #include <qstring.h>
-#include <qpopupmenu.h>
-/*! \class Qtx
- *  For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
- */
+
 class SUIT_EXPORT SUIT_Tools : public Qtx
 {
 public:
@@ -22,8 +19,6 @@ public:
   static QFont   stringToFont( const QString& fontDescription );
 
   static void    centerWidget( QWidget* src, const QWidget* ref );
-  static void    alignWidget ( QWidget* src, const QWidget* ref, int alignFlags = AlignCenter );
-
 };
 
 #endif
