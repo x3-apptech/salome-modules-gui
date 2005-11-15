@@ -29,6 +29,7 @@ public:
   ListOfFiles         GetListOfFiles (const char* theModuleName);
   virtual void        SetListOfFiles (const char* theModuleName, const ListOfFiles theListOfFiles);
   virtual void        RemoveTemporaryFiles(const char* theModuleName, const bool IsDirDeleted);
+  void                RemoveFiles( const ListOfFiles& theFiles, const bool IsDirDeleted);
 
   virtual void        ClearDriverContents();
 
@@ -44,6 +45,7 @@ private:
 private:
   typedef std::map<std::string, ListOfFiles> MapOfListOfFiles;
   MapOfListOfFiles                           myMap;
+  std::string                                myTmpDir;
 };
 
 #endif 

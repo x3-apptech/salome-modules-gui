@@ -23,6 +23,7 @@
 #include <OSD_SingleProtection.hxx>
 #include <OSD_FileIterator.hxx>
 
+#include <set>
 #include <qstring.h>
 
 /*!
@@ -121,17 +122,52 @@ bool LightApp_Study::loadDocument( const QString& theStudyName )
 //=======================================================================
 bool LightApp_Study::saveDocumentAs( const QString& theFileName )
 {
-  ModelList list; dataModels( list );
+  SUIT_ResourceMgr* resMgr = application()->resourceMgr();
+  if( !resMgr )
+    return false;
+
+  ModelList list; 
+  dataModels( list );
 
   LightApp_DataModel* aModel = (LightApp_DataModel*)list.first();
 
-  myDriver->ClearDriverContents();
   QStringList listOfFiles;
-  for ( ; aModel; aModel = (LightApp_DataModel*)list.next() ) {
+  bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
+  for ( ; aModel; aModel = (LightApp_DataModel*)list.next() ) 
+  {
+    std::vector<std::string> anOldList = myDriver->GetListOfFiles( aModel->module()->name() );
     listOfFiles.clear();
     aModel->saveAs( theFileName, this, listOfFiles );
     if ( !listOfFiles.isEmpty() )
       saveModuleData(aModel->module()->name(), listOfFiles);
+
+    // Remove files if necessary. File is removed if it was in the list of files before
+    // saving and it is not contained in the list after saving. This provides correct 
+    // removing previous temporary files. These files are not removed before saving
+    // because they may be required for it.
+
+    std::vector<std::string> aNewList = myDriver->GetListOfFiles( aModel->module()->name() );
+    
+    std::set<std::string> aNewNames;
+    std::set<std::string> toRemove;
+    int i, n;
+    for( i = 0, n = aNewList.size(); i < n; i++ )
+      aNewNames.insert( aNewList[ i ] );
+    for( i = 0, n = anOldList.size(); i < n; i++ )
+    {
+      if ( i == 0 ) // directory is always inserted in list
+        toRemove.insert( anOldList[ i ] );
+      else if ( aNewNames.find( anOldList[ i ] ) == aNewNames.end() )
+        toRemove.insert( anOldList[ i ] );
+    }
+        
+    std::vector<std::string> toRemoveList( toRemove.size() );
+    std::set<std::string>::iterator anIter;
+    for( anIter = toRemove.begin(), i = 0; anIter != toRemove.end(); ++anIter, ++i )
+      toRemoveList[ i ] = *anIter;
+
+    
+    myDriver->RemoveFiles( toRemoveList, isMultiFile );
   }
 
   bool res = saveStudyData(theFileName);
@@ -175,6 +211,11 @@ bool LightApp_Study::saveDocument()
 //================================================================
 void LightApp_Study::closeDocument(bool permanently)
 {
+  // Remove temporary files
+  ModelList aList;
+  dataModels( aList );
+  myDriver->ClearDriverContents();
+
   // Inform everybody that this study is going to close when it's most safe to,
   // i.e. in the very beginning
   emit closed( this );
@@ -248,16 +289,7 @@ bool LightApp_Study::isModified() const
 //================================================================
 bool LightApp_Study::isSaved() const
 {
-  bool isAllSaved = CAM_Study::isSaved();
-  ModelList list; dataModels( list );
-
-  LightApp_DataModel* aModel = 0;
-  for ( QPtrListIterator<CAM_DataModel> it( list ); it.current() && isAllSaved; ++it ){
-    aModel = dynamic_cast<LightApp_DataModel*>( it.current() );
-    if ( aModel )
-      isAllSaved = aModel->isSaved();
-  }
-  return isAllSaved; 
+  return CAM_Study::isSaved();
 }
 
 //=======================================================================
@@ -319,11 +351,6 @@ bool LightApp_Study::saveStudyData( const QString& theFileName )
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
 
   bool aRes = myDriver->SaveDatasInFile(theFileName.latin1(), isMultiFile);
-  // clear map
-  std::vector<std::string> aList(0);
-  for ( ModelListIterator it( list ); it.current(); ++it )
-    myDriver->SetListOfFiles(it.current()->module()->name(), aList);
-
   return aRes;
 }
 
@@ -354,12 +381,7 @@ bool LightApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm 
   QStringList listOfFiles;
   openModuleData(dm->module()->name(), listOfFiles);
   if (dm && dm->open(studyName, this, listOfFiles)) {
-    // Remove the files and temporary directory, created
-    // for this module by LightApp_Driver::OpenStudyData()
-    bool isMultiFile = false; // TODO: decide, how to access this parameter
-    RemoveTemporaryFiles( dm->module()->name(), isMultiFile );
-
-     // Something has been read -> create data model tree
+    // Something has been read -> create data model tree
     LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>( dm );
     if ( aDM )
       aDM->update(NULL, this);
@@ -425,3 +447,4 @@ void LightApp_Study::components( QStringList& comp ) const
       comp.append( obj->entry() );
   }
 }
+

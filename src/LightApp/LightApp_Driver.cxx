@@ -11,6 +11,9 @@
 #include <OSD_SingleProtection.hxx>
 #include <OSD_FileIterator.hxx>
 
+#include <qfileinfo.h>
+#include <qdir.h>
+
 #ifdef WIN32
 #include <time.h>
 #endif
@@ -55,9 +58,6 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
     PutFilesToStream(aName, aBuffer[i], aBufferSize[i], isMultiFile);
     aFileBufferSize += 8;                                //Add 8 bytes: a length of the buffer
     aFileBufferSize += aBufferSize[i];
-    // Remove the files and tmp directory, created by the component storage procedure
-    if (!isMultiFile)
-      RemoveTemporaryFiles(aModuleName[i], true);
     i++;
   }
   int n = i;
@@ -65,6 +65,8 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
   unsigned char* aFileBuffer = new unsigned char[aFileBufferSize];
   if(aFileBuffer == NULL)
     return false;
+
+  myTmpDir = QDir::convertSeparators( QFileInfo( theFileName ).dirPath( true ) + "/" ).latin1() ;
 
   int aCurrentPos = 0;
 
@@ -96,7 +98,11 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
     aCurrentPos += aBufferSize[i];
   }
 
+#ifdef WNT  
+  ofstream aFile(theFileName, ios::out | ios::binary);
+#else
   ofstream aFile(theFileName);
+#endif
   aFile.write((char*)aFileBuffer, aFileBufferSize); 
   aFile.close();    
 
@@ -104,6 +110,7 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
   delete[] aBufferSize;
   delete[] aModuleName;
   delete[] aFileBuffer;
+
   return true;
 }
 
@@ -118,6 +125,8 @@ bool LightApp_Driver::ReadDatasFromFile( const char* theFileName, bool isMultiFi
 #else
   ifstream aFile(theFileName);
 #endif  
+
+  myTmpDir = QDir::convertSeparators( QFileInfo( theFileName ).dirPath( true ) + "/" ).latin1() ;
 
   aFile.seekg(0, ios::end);
   int aFileBufferSize = aFile.tellg();
@@ -159,7 +168,9 @@ bool LightApp_Driver::ReadDatasFromFile( const char* theFileName, bool isMultiFi
     delete[] aModuleName;
     delete[] aBuffer;
   }
+
   delete[] aFileBuffer;
+  
   return true;
 }
 
@@ -251,7 +262,6 @@ void LightApp_Driver::PutFilesToStream( const std::string& theModuleName, unsign
     aBufferSize += (theNamesOnly)?4:12;       //Add 4 bytes: a length of the file name,
                                               //    8 bytes: length of the file itself
     aNbFiles++;
-    delete[] aFName;
   }
 
   aBufferSize += 4;      //4 bytes for a number of the files that will be written to the stream;
@@ -355,7 +365,13 @@ LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned c
       aCurrentPos += 8;    
       
       TCollection_AsciiString aFullPath = aTmpDir + aFileName;
-      ofstream aFile(aFullPath.ToCString());
+      
+#ifdef WNT  
+  ofstream aFile(aFullPath.ToCString(), ios::out | ios::binary);
+#else
+  ofstream aFile(aFullPath.ToCString());
+#endif
+
       aFile.write((char *)(theBuffer+aCurrentPos), aFileSize); 
       aFile.close();  
       aCurrentPos += aFileSize;
@@ -368,33 +384,27 @@ LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned c
 }
 
 //============================================================================
-// function : RemoveTemporaryFiles
-/*! Purpose  : removes files which was created from module theModuleName if <IsDirDeleted> is true tmp directory is also deleted if it is empty*/
+// function : RemoveFiles
+/*! Purpose  : Remove files. First item in <theFiles> is a directory with slash at the end.
+               Other items are names of files. If <IsDirDeleted> is true,
+	       then the directory is also deleted.
+*/
 //============================================================================
-void LightApp_Driver::RemoveTemporaryFiles( const char* theModuleName, const bool IsDirDeleted )
+void LightApp_Driver::RemoveFiles( const ListOfFiles& theFiles, const bool IsDirDeleted)
 {
-  std::string aModuleName(theModuleName);
-  ListOfFiles aFiles = myMap[aModuleName];
-  // aFiles must contain temporary directory name in its first item
-  // and names of files (relatively the temporary directory) in the others
-
-  int i, aLength = aFiles.size() - 1;
+  int i, aLength = theFiles.size() - 1;
   if(aLength <= 0) {
     return;
   }
   //Get a temporary directory for saved a file
-  TCollection_AsciiString aDirName(const_cast<char*>(aFiles[0].c_str()));
+  TCollection_AsciiString aDirName(const_cast<char*>(theFiles[0].c_str()));
 
   for(i = 0; i < aLength; i++) {
     TCollection_AsciiString aFile(aDirName);
-    aFile += const_cast<char*>(aFiles[i+1].c_str());
+    aFile += const_cast<char*>(theFiles[i+1].c_str());
     OSD_Path anOSDPath(aFile);
     OSD_File anOSDFile(anOSDPath);
     if(!anOSDFile.Exists()) continue;
-
-    OSD_Protection aProtection = anOSDFile.Protection();
-    aProtection.SetUser(OSD_RW);
-    anOSDFile.SetProtection(aProtection);
 
     anOSDFile.Remove();
   }
@@ -409,11 +419,32 @@ void LightApp_Driver::RemoveTemporaryFiles( const char* theModuleName, const boo
 }
 
 //============================================================================
+// function : RemoveTemporaryFiles
+/*! Purpose  : removes files which was created from module theModuleName if 
+               <IsDirDeleted> is true tmp directory is also deleted if it is empty*/
+//============================================================================
+void LightApp_Driver::RemoveTemporaryFiles( const char* theModuleName, const bool IsDirDeleted )
+{
+  std::string aModuleName(theModuleName);
+  ListOfFiles aFiles = myMap[aModuleName];
+  // aFiles must contain temporary directory name in its first item
+  // and names of files (relatively the temporary directory) in the others
+  RemoveFiles( aFiles, IsDirDeleted );
+
+}
+
+//============================================================================
 // function : ClearDriverContents
 /*! Purpose  : clear map of list files*/ 
 //============================================================================ 
 void LightApp_Driver::ClearDriverContents()
 {
+  std::map<std::string, ListOfFiles>::iterator it;
+  for ( it = myMap.begin(); it != myMap.end(); ++it ) 
+  {
+    const char* aModuleName = const_cast<char*>(it->first.c_str());
+    RemoveTemporaryFiles( aModuleName, false );
+  }
   myMap.clear();
 }
 
@@ -423,11 +454,19 @@ void LightApp_Driver::ClearDriverContents()
 //============================================================================ 
 std::string LightApp_Driver::GetTmpDir()
 {
+  if ( myTmpDir.length() != 0 )
+    return myTmpDir;
+
   //Find a temporary directory to store a file
   TCollection_AsciiString aTmpDir;
 
   char *Tmp_dir = getenv("SALOME_TMP_DIR");
-  if(Tmp_dir != NULL) {
+  if ( !Tmp_dir )
+    Tmp_dir = getenv ( "TEMP" );
+  if ( !Tmp_dir )
+    Tmp_dir = getenv ( "TMP" );
+  if ( Tmp_dir ) 
+  {
     aTmpDir = TCollection_AsciiString(Tmp_dir);
 #ifdef WIN32
     if(aTmpDir.Value(aTmpDir.Length()) != '\\') aTmpDir+='\\';
@@ -435,7 +474,8 @@ std::string LightApp_Driver::GetTmpDir()
     if(aTmpDir.Value(aTmpDir.Length()) != '/') aTmpDir+='/';
 #endif      
   }
-  else {
+  else 
+  {
 #ifdef WIN32
     aTmpDir = TCollection_AsciiString("C:\\");
 #else
@@ -465,8 +505,7 @@ std::string LightApp_Driver::GetTmpDir()
     aDir = OSD_Directory(aPath);
   }
 
-  OSD_Protection aProtection(OSD_RW, OSD_RWX, OSD_RX, OSD_RX);
-  aDir.Build(aProtection);
+  myTmpDir = aTmpDir.ToCString();
 
   return aTmpDir.ToCString();
 }

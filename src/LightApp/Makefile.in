@@ -80,7 +80,6 @@ LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_Application.h \
 	  LightApp_DataModel.h \
 	  LightApp_Dialog.h \
-	  LightApp_Driver.h \
 	  LightApp_GLSelector.h \
 	  LightApp_OBSelector.h \
 	  LightApp_OCCSelector.h \

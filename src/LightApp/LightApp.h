@@ -18,11 +18,12 @@
 #define LIGHTAPP_EXPORT __declspec(dllimport)
 #endif
 
+#pragma warning ( disable:4251 )
+#pragma warning ( disable:4786 )
+#pragma warning ( disable:4503 )
+
 #else
 #define LIGHTAPP_EXPORT
 #endif               //WNT
 
 #define APP_VERSION "0.1"
-
-#pragma warning ( disable:4251 )
-#pragma warning ( disable:4786 )
