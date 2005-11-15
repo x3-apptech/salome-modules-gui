@@ -633,8 +633,12 @@ myCheckExist( true )
   QString dirs;
   if ( ::getenv( envVar ) )
     dirs = ::getenv( envVar );
-
-  setDirList( QStringList::split( ";", dirs ) );
+#ifdef WNT
+  QString dirsep = ";";      // for Windows: ";" is used as directories separator
+#else
+  QString dirsep = "[:|;]";  // for Linux: both ":" and ";" can be used
+#endif
+  setDirList( QStringList::split( QRegExp(dirsep), dirs ) );
 
   installFormat( new XmlFormat() );
   installFormat( new IniFormat() );
