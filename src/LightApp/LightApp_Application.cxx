@@ -1610,7 +1610,11 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     int u = resMgr->integerValue( sec, "iso_number_u" );
     int v = resMgr->integerValue( sec, "iso_number_v" );
     for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current(); ++it )
-      ((OCCViewer_Viewer*)it.current())->setIsos( u, v );
+    {
+      OCCViewer_ViewManager* mgr = dynamic_cast<OCCViewer_ViewManager*>( it.current() );
+      if( mgr && mgr->getOCCViewer() )
+	mgr->getOCCViewer()->setIsos( u, v );
+    }
   }
 
   if( sec=="ObjectBrowser" )
