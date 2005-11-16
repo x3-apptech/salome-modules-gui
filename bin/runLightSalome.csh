@@ -6,4 +6,4 @@ if ( ! $?SUITRoot )          setenv SUITRoot ${GUI_ROOT_DIR}/share/salome
 if ( ! $?LightAppConfig )    setenv LightAppConfig ${GUI_ROOT_DIR}/share/salome/resources
 if ( ! $?LightAppResources ) setenv LightAppResources ${GUI_ROOT_DIR}/share/salome/resources
 
-SUITApp LightApp $1
+SUITApp LightApp -style salome $* &
