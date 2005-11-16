@@ -37,7 +37,7 @@ msgid "LightApp_Application::PRP_APP_MODULE"
 msgstr "Switch to SALOME platform neutral point"
 
 msgid "LightApp_Application::PRP_MODULE"
-msgstr "Switch to the mocule \"%1\""
+msgstr "Switch to the module \"%1\""
 
 msgid "LightApp_Application::NEW_WINDOW_0"
 msgstr "GL view"
