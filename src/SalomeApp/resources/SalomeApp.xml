@@ -114,6 +114,7 @@
   <section name="SUPERVGraph" >
     <parameter value="144, 208, 211" name="Background" />
     <parameter value="63, 213, 255" name="Title" />
+    <parameter value="255, 249, 147" name="NodeBody" />
   </section>
   <section name="Geometry" >
     <parameter value="10" name="SettingsGeomStep" />
