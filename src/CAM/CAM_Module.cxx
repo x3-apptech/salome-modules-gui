@@ -129,8 +129,11 @@ void CAM_Module::studyClosed( SUIT_Study* study )
   if ( !camDoc ) 
     return;
 
-  if ( camDoc->containsDataModel( dataModel() ) )
-    camDoc->removeDataModel( dataModel() );
+  CAM_DataModel* dm = dataModel();
+  if ( dm && camDoc->containsDataModel( dm ) ) {
+    dm->close();
+    camDoc->removeDataModel( dm );
+  }
 }
 
 /*!Public slot, do nothing.*/
