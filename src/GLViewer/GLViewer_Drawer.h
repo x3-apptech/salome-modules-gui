@@ -251,16 +251,64 @@ public:
 #endif
   
   //! Loads texture from file
-  static GLuint                   loadTexture( const QString& fileName );
+  /*!
+   *\param fileName - the name of texture file
+   *\param x_size   - the horizontal size of picture ( less or equal texture horizontal size )
+   *\param y_size   - the vertical size of picture ( less or equal texture vertical size )
+   *\param t_size   - the size of texture ( texture vertical size equals texture horizontal size )
+  */
+  static GLuint                   loadTexture( const QString& fileName,
+                                               GLint* x_size = 0,
+                                               GLint* y_size = 0,
+                                               GLint* t_size = 0);
 
   //! Draw square texture
   /*!
    *\param texture - the texture ID
-   *\param size    - the size of texture
+   *\param size    - the size of square texture
    *\param x       - x coord
    *\param y       - y coord
   */
-  void                            drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y );
+  void                            drawTexture( GLuint texture,
+                                               GLint size,
+                                               GLfloat x,
+                                               GLfloat y );
+
+  //! Draw texture
+  /*!
+   *\param texture - the texture ID
+   *\param x_size  - the horizontal size of texture
+   *\param y_size  - the vertical size of texture
+   *\param x       - x coord
+   *\param y       - y coord
+  */
+  void                            drawTexture( GLuint texture,
+                                               GLint x_size,
+                                               GLint y_size,
+                                               GLfloat x,
+                                               GLfloat y );
+
+  //! Draw texture part
+  /*!
+   *\param texture - the texture ID
+   *\param x_ratio - the horizontal ratio of texture part
+   *\param y_ratio - the vertical ratio of texture part
+   *\param x_size  - the horizontal size of texture
+   *\param y_size  - the vertical size of texture
+   *\param x       - x coord
+   *\param y       - y coord
+   *\param scale   - common scale factor ( if = 0, use drawer scales )
+  */
+  void                            drawTexturePart( GLuint texture,
+                                                   GLfloat x_ratio,
+                                                   GLfloat y_ratio,
+                                                   GLint x_size,
+                                                   GLint y_size,
+                                                   GLfloat x,
+                                                   GLfloat y,
+                                                   GLfloat scale = 0 );
+
+
 
   //! Draw text string
   /*!
@@ -274,7 +322,7 @@ public:
   */
   void                            drawText( const QString& text,
                                             GLfloat xPos,
-					    GLfloat yPos,
+					                                  GLfloat yPos,
                                             const QColor& color,
                                             QFont* aFont,
                                             int theSeparator,
@@ -291,8 +339,8 @@ public:
    *\param smallFont - font format
   */
   void                            drawGLText( QString text,
-					      float x,
-					      float y,
+					                                    float x,
+					                                    float y,
                                               int hPosition = GLText_Center,
                                               int vPosition = GLText_Center,
                                               QColor color = Qt::black,

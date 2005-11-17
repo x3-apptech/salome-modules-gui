@@ -501,7 +501,10 @@ void GLViewer_Drawer::setAntialiasing(const bool on)
 // Function: loadTexture
 // Purpose :
 //=======================================================================
-GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
+GLuint GLViewer_Drawer::loadTexture( const QString& fileName,
+                                     GLint* x_size,
+                                     GLint* y_size,
+                                     GLint* t_size )
 {
     QImage buf;
     if ( fileName.isEmpty() || !buf.load( fileName ) )
@@ -557,6 +560,15 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
 
     delete[] pixels;
 
+    if ( x_size )
+      *(x_size) = w;
+
+    if ( y_size )
+      *(y_size) = h;
+
+    if ( t_size )
+      *(t_size) = size;
+
     return texture;
 }
 
@@ -566,7 +578,7 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName )
 //=======================================================================
 void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y )
 {
-    float xScale = myXScale;
+    /*float xScale = myXScale;
     float yScale = myYScale;
 
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
@@ -595,7 +607,93 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
     glFlush();
 
     glDisable( GL_ALPHA_TEST );
-    glDisable( GL_TEXTURE_2D );
+    glDisable( GL_TEXTURE_2D );*/
+
+  drawTexture( texture, size, size, x, y );
+}
+
+//======================================================================
+// Function: drawTexture
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawTexture( GLuint texture, GLint x_size, GLint y_size, GLfloat x, GLfloat y )
+{
+    /*float xScale = myXScale;
+    float yScale = myYScale;
+
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
+
+    glEnable( GL_TEXTURE_2D );
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    glAlphaFunc( GL_GREATER, 0.95F );
+    glEnable( GL_ALPHA_TEST );
+    
+    glBindTexture( GL_TEXTURE_2D, texture );
+    glBegin( GL_QUADS );
+
+    glTexCoord2f( 0.0, 0.0 );
+    glVertex3f( x-x_size/2./xScale, y-y_size/2./yScale, 0.0 );
+
+    glTexCoord2f( 0.0, 1.0 );
+    glVertex3f( x-x_size/2./xScale, y+y_size/2./yScale, 0.0 );
+
+    glTexCoord2f( 1.0, 1.0 );
+    glVertex3f( x+x_size/2./xScale, y+y_size/2./yScale, 0.0 );
+
+    glTexCoord2f( 1.0, 0.0 );
+    glVertex3f( x+x_size/2./xScale, y-y_size/2./yScale, 0.0 );
+    
+    glEnd();
+    glFlush();
+
+    glDisable( GL_ALPHA_TEST );
+    glDisable( GL_TEXTURE_2D );*/
+  drawTexturePart( texture, 1.0, 1.0, x_size, y_size, x, y );
+}
+
+//======================================================================
+// Function: drawTexture
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawTexturePart( GLuint texture,
+                                       GLfloat x_ratio,
+                                       GLfloat y_ratio,
+                                       GLint x_size,
+                                       GLint y_size,
+                                       GLfloat x,
+                                       GLfloat y,
+                                       GLfloat scale )
+{
+  float xScale = scale > 0. ? 1./scale : myXScale;
+  float yScale = scale > 0. ? 1./scale : myYScale;
+
+  glColor4f( 1.0, 1.0, 1.0, 1.0 );
+
+  glEnable( GL_TEXTURE_2D );
+  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+  glAlphaFunc( GL_GREATER, 0.95F );
+  glEnable( GL_ALPHA_TEST );
+  
+  glBindTexture( GL_TEXTURE_2D, texture );
+  glBegin( GL_QUADS );
+
+  glTexCoord2f( 0.0, 0.0 );
+  glVertex3f( x-x_size/2./xScale, y-y_size/2./yScale, 0.0 );
+
+  glTexCoord2f( 0.0, y_ratio );
+  glVertex3f( x-x_size/2./xScale, y+y_size/2./yScale, 0.0 );
+
+  glTexCoord2f( x_ratio, y_ratio );
+  glVertex3f( x+x_size/2./xScale, y+y_size/2./yScale, 0.0 );
+
+  glTexCoord2f( x_ratio, 0.0 );
+  glVertex3f( x+x_size/2./xScale, y-y_size/2./yScale, 0.0 );
+  
+  glEnd();
+  glFlush();
+
+  glDisable( GL_ALPHA_TEST );
+  glDisable( GL_TEXTURE_2D );
 }
 
 //======================================================================
