@@ -799,8 +799,9 @@ void SALOME_PYQT_Module::guiEvent( const int theId )
   
   PyObjWrapper res( PyObject_CallMethod( myModule, "OnGUIEvent", "i", theId ) );
   if( !res ) {
-    // Error!
-    PyErr_Print();
+    // VSR: this method may not be implemented in Python module
+    // PyErr_Print();
+    PyErr_Clear();
   }
 }
 
