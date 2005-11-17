@@ -110,7 +110,15 @@ public:
   bool        contains( GLViewer_Pnt pnt ) { return ( pnt.x() > left() &&
                                                       pnt.x() < right() &&
                                                       pnt.y() > bottom() &&
-                                                      pnt.y() < top() ); } 
+                                                      pnt.y() < top() ); }
+  
+  void        move( const float x, const float y )
+                  {
+                    myLeft   += x;
+                    myRight  += x;
+                    myTop    += y;
+                    myBottom += y;
+                  }
 
 protected:
   float       myLeft;
