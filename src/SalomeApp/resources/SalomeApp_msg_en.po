@@ -207,3 +207,6 @@ msgstr "No"
 msgid "SalomeApp_Application::PUBLISH_IN_STUDY"
 msgstr "Publish in study"
 
+msgid "SalomeApp_Application::WRN_DUMP_STUDY_FAILED"
+msgstr "Dump study failed"
+

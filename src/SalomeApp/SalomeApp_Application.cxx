@@ -496,7 +496,12 @@ void SalomeApp_Application::onDumpStudy( )
 
   if(!aFileName.isEmpty()) {
     QFileInfo aFileInfo(aFileName);
-    aStudy->DumpStudy( aFileInfo.dirPath( true ).latin1(), aFileInfo.baseName().latin1(), toPublish );
+    bool res = aStudy->DumpStudy( aFileInfo.dirPath( true ).latin1(), aFileInfo.baseName().latin1(), toPublish );
+    if ( !res )
+    SUIT_MessageBox::warn1 ( desktop(),
+			     QObject::tr("WRN_WARNING"),
+			     tr("WRN_DUMP_STUDY_FAILED"),
+			     QObject::tr("BUT_OK") );
   }
 }
 
