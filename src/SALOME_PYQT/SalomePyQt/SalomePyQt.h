@@ -14,6 +14,8 @@
 #include <qobject.h>
 #include <qcolor.h>
 
+#include <LightApp_Application.h>
+
 class LightApp_SelectionMgr;
 class SalomeApp_Application;
 class QMenuBar;
@@ -52,6 +54,13 @@ enum MenuName {
   Tools       = 5,
   Window      = 6,
   Help        = 7  
+};
+
+enum {
+  WT_ObjectBrowser = LightApp_Application::WT_ObjectBrowser,
+  WT_PyConsole     = LightApp_Application::WT_PyConsole,
+  WT_LogWindow     = LightApp_Application::WT_LogWindow,
+  WT_User          = LightApp_Application::WT_User
 };
 
 class SalomePyQt

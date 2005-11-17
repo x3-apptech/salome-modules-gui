@@ -39,6 +39,13 @@ enum MenuName {
   Help        = 7  
 };
 
+enum {
+  WT_ObjectBrowser,
+  WT_PyConsole,
+  WT_LogWindow,
+  WT_User
+};
+
 class QtxAction : QAction
 {
 %TypeHeaderCode
