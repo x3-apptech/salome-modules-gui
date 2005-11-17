@@ -696,12 +696,12 @@ void QtxWorkstack::distributeSpace( QSplitter* split ) const
 
 void QtxWorkstack::splitVertical()
 {
-  split( Qt::Vertical );
+  split( Qt::Horizontal );
 }
 
 void QtxWorkstack::splitHorizontal()
 {
-  split( Qt::Horizontal );
+  split( Qt::Vertical );
 }
 
 QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )

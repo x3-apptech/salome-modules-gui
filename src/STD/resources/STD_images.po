@@ -58,10 +58,10 @@ msgid "ICON_DESK_WINDOW_HTILE"
 msgstr "htile.png"
 
 msgid "ICON_DESK_WINDOW_VSPLIT"
-msgstr "htile.png"
+msgstr "vtile.png"
 
 msgid "ICON_DESK_WINDOW_HSPLIT"
-msgstr "vtile.png"
+msgstr "htile.png"
 
 msgid "ICON_APP_EDIT_UNDO"
 msgstr "undo.png"
