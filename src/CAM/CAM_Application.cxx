@@ -12,6 +12,7 @@
 #include <qtextstream.h>
 #include <qlabel.h>
 #include <qfont.h>
+#include <qapplication.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -407,8 +408,34 @@ void CAM_Application::readModuleList()
 
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
 
-  QString modStr = resMgr->stringValue( "launch", "modules", QString::null );
-  QStringList modList = QStringList::split( ",", modStr );
+  QStringList modList;
+
+  // parse command line arguments
+  int nbArgs = qApp->argc();
+  char** CmdLine = qApp->argv();
+  QString CmdStr;
+  for ( int i = 0; i < nbArgs; i++ )
+  {
+    CmdStr.append(CmdLine[i]);
+    CmdStr.append(" ");
+  }
+  int startId = CmdStr.find("--modules (");
+  if ( startId != -1 ) { // application launch with --modules option
+    startId = CmdStr.find("(", startId);
+    int stopId = CmdStr.find(" )", startId);
+    QString ModStr = CmdStr.mid( startId+1, stopId - (startId+1) ).stripWhiteSpace();
+    int i = 0;
+    while ( i < ModStr.length() )
+    {
+      int nextId = ModStr.find( ":", i );
+      modList.append( ModStr.mid( i, nextId - i ).stripWhiteSpace() );
+      i = nextId + 1;
+    }
+  }
+  else {
+    QString modStr = resMgr->stringValue( "launch", "modules", QString::null );
+    modList = QStringList::split( ",", modStr );
+  }
 
   for ( QStringList::const_iterator it = modList.begin(); it != modList.end(); ++it )
   {
