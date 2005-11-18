@@ -595,7 +595,7 @@ void SalomeApp_Study::children( const QString& entry, QStringList& child_entries
   while( anIter->More() )
   {
     _PTR(SObject) val( anIter->Value() );
-    child_entries.append( val->GetID() );
+    child_entries.append( val->GetID().c_str() );
     anIter->Next();
   }
 }
@@ -607,6 +607,6 @@ void SalomeApp_Study::components( QStringList& comps ) const
     _PTR(SComponent) aComponent ( it->Value() );
     if( aComponent && aComponent->ComponentDataType() == "Interface Applicative" )
       continue; // skip the magic "Interface Applicative" component
-    comps.append( aComponent->ComponentDataType() );
+    comps.append( aComponent->ComponentDataType().c_str() );
   }
 }
