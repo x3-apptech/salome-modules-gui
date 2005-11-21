@@ -30,23 +30,6 @@ msgstr "&Cancel"
 
 //=======================================================================================
 
-msgid "APP_NAME"
-msgstr "SALOME"
-
-msgid "ABOUT_CAPTION"
-msgstr "About %1"
-
-msgid "ABOUT_VERSION"
-msgstr "Version %1"
-
-msgid "ABOUT_COPYRIGHT"
-msgstr "Copyright (C) 2003-2005 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
-
-msgid "ABOUT_LICENSE"
-msgstr "GNU LGPL"
-
-//=======================================================================================
-
 msgid "SalomeApp_Application::PYTHON_CONSOLE"
 msgstr "Python Console"
 
