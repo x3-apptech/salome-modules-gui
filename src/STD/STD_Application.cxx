@@ -272,6 +272,8 @@ bool STD_Application::onOpenDoc( const QString& aName )
       aApp = startApplication( 0, 0 );
       if ( aApp )
         res = aApp->useFile( aName );
+      if ( !res )
+        aApp->closeApplication();
     }
     else
       aApp->desktop()->setActiveWindow();
