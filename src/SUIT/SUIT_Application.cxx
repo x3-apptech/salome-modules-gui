@@ -24,6 +24,8 @@ SUIT_Application::~SUIT_Application()
 {
   delete myStudy;
   myStudy = 0;
+
+  setDesktop( 0 );
 }
 
 SUIT_Desktop* SUIT_Application::desktop()
@@ -60,9 +62,17 @@ void SUIT_Application::start()
 bool SUIT_Application::useFile( const QString& theFileName )
 {
   createEmptyStudy();
-  if ( activeStudy() )
-    return activeStudy()->openDocument( theFileName );
-  return false;
+  SUIT_Study* study = activeStudy();
+
+  bool status = study ? study->openDocument( theFileName ) : false;
+
+  if ( !status )
+  {
+    setActiveStudy( 0 );
+    delete study;
+  }
+
+  return status;
 }
 
 bool SUIT_Application::useStudy( const QString& theName )
