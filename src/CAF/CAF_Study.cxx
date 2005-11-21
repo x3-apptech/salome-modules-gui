@@ -77,14 +77,15 @@ bool CAF_Study::openDocument( const QString& fname )
   if ( app.IsNull() )
     return false;
 
+  bool status = false;
   try {
-    app->Open( CAF_Tools::toExtString( fname ), myStdDoc );
+    status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == CDF_RS_OK;
   }
   catch ( Standard_Failure ) {
-    return false;
+    status = false;
   }
 
-  return SUIT_Study::openDocument( fname );
+  return status && SUIT_Study::openDocument( fname );
 }
 
 bool CAF_Study::saveDocumentAs( const QString& fname )
@@ -100,9 +101,10 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
     save = path == QDir::convertSeparators( fname );
   }
 
+  bool status = false;
   try {
     if ( save )
-      app->Save( stdDoc() );
+      status = app->Save( stdDoc() ) == CDF_SS_OK;
     else
     {
       TCollection_ExtendedString format, path( CAF_Tools::toExtString( fname ) );
@@ -111,14 +113,14 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
       if ( format.Length() )
         stdDoc()->ChangeStorageFormat( format );
 
-      app->SaveAs( stdDoc(), path );
+      status = app->SaveAs( stdDoc(), path ) == CDF_SS_OK;
     }
   }
   catch ( Standard_Failure ) {
-    return false;
+    status = false;
   }
 
-  return SUIT_Study::saveDocumentAs( fname );
+  return status && SUIT_Study::saveDocumentAs( fname );
 }
 
 bool CAF_Study::startOperation()
