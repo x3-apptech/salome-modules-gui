@@ -46,6 +46,8 @@ public:
 
   SUIT_ViewWindow* createViewWindow();
 
+  virtual void     setShown( const bool );
+
 public slots:
   void             createView();
   void             closeAllViews();

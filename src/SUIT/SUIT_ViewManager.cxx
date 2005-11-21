@@ -38,8 +38,9 @@ myStudy( NULL )
 /*!Destructor.*/
 SUIT_ViewManager::~SUIT_ViewManager()
 {
-  if (myViewModel) {
-    myViewModel->setViewManager(0);
+  if ( myViewModel )
+  {
+    myViewModel->setViewManager( 0 );
     delete myViewModel;
   }
 }
@@ -167,6 +168,15 @@ void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView)
   int aNumItems = myViews.count();
   if (aNumItems == 0)
     emit lastViewClosed(this);
+}
+
+/*!
+  Show or hide all views (view windows)
+*/
+void SUIT_ViewManager::setShown( const bool on )
+{
+  for ( uint i = 0; i < myViews.count(); i++ )
+    myViews.at( i )->setShown( on );
 }
 
 /*!Emit on \a theEvent mouse pressed in \a theView.*/
