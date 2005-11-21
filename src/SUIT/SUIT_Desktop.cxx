@@ -239,7 +239,12 @@ void SUIT_Desktop::childEvent( QChildEvent* e )
 {
   if ( e->type() == QEvent::ChildInserted && parentArea() &&
        e->child()->isWidgetType() && e->child()->inherits( "SUIT_ViewWindow" ) )
-    ((QWidget*)e->child())->reparent( parentArea(), QPoint( 0, 0 ), true );
+  {
+    QWidget* wid = (QWidget*)e->child();
+    bool vis = wid->isVisibleTo( wid->parentWidget() );
+    wid->reparent( parentArea(), QPoint( 0, 0 ), vis );
+    wid->setShown( vis );
+  }
   else
     QtxMainWindow::childEvent( e );
 }
