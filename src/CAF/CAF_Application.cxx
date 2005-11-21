@@ -47,11 +47,6 @@ QString CAF_Application::applicationName() const
   return QString( "CAFApplication" );
 }
 
-QString CAF_Application::storageFormat() const
-{
-  return QString( "MDTV-Standard" );
-}
-
 Handle(TDocStd_Application) CAF_Application::stdApp() const
 {
   return myStdApp;

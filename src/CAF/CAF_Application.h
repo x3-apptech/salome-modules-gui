@@ -30,8 +30,6 @@ public:
 
   Handle(TDocStd_Application) stdApp() const;
 
-  virtual QString             storageFormat() const;
-
   virtual QString             getFileFilter() const;
 
 public slots:  
