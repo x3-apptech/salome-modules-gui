@@ -13,9 +13,9 @@
 #include "SUIT_Operation.h"
 
 #include "SUIT_Study.h"
-#include "SUIT_Application.h"
-#include "SUIT_MessageBox.h"
 #include "SUIT_Desktop.h"
+#include "SUIT_MessageBox.h"
+#include "SUIT_Application.h"
 
 /*!
  * \brief Constructor
@@ -30,7 +30,8 @@ SUIT_Operation::SUIT_Operation( SUIT_Application* app )
 : QObject(),
 myApp( app ),
 myStudy( 0 ),
-myState( Waiting )
+myState( Waiting ),
+myFlags( Transaction )
 {
 }
 
@@ -108,6 +109,50 @@ void SUIT_Operation::setState( const SUIT_Operation::OperationState theState )
 }
 
 /*!
+ * \brief Sets the flags of operation
+  * \param f - flags of operation to be set
+*
+*  Sets flags of operation (see Flags enumeration)
+*/
+void SUIT_Operation::setFlags( const int f )
+{
+  myFlags = myFlags | f;
+}
+
+/*!
+ * \brief Clears the flags of operation
+  * \param f - flags of operation to be cleared
+*
+*  Clears flags of operation (see Flags enumeration)
+*/
+void SUIT_Operation::clearFlags( const int f )
+{
+  myFlags = myFlags & ~f;
+}
+
+/*!
+ * \brief Test the flags of operation
+  * \param f - flags of operation to be tested
+*
+*  Returns TRUE if the specified flags setted in the operation (see Flags enumeration)
+*/
+bool SUIT_Operation::testFlags( const int f ) const
+{
+  return ( myFlags & f ) == f;
+}
+
+/*!
+ * \brief Name of the operation
+*
+*  Returns string name of the operation. This name will be used for
+*  automatically commited transaction.
+*/
+QString SUIT_Operation::operationName() const
+{
+  return QString::null;
+}
+
+/*!
  * \brief Starts operation
 *
 * Public slot. Verifies whether operation can be started and starts operation.
@@ -142,6 +187,8 @@ void SUIT_Operation::abort()
     abortOperation();
     myState = Waiting;
     emit aborted( this );
+
+    stopOperation();
     emit stopped( this );
   }
 }
@@ -161,6 +208,8 @@ void SUIT_Operation::commit()
     commitOperation();
     myState = Waiting;
     emit committed( this );
+
+    stopOperation();
     emit stopped( this );
   }
 }
@@ -223,6 +272,15 @@ void SUIT_Operation::startOperation()
 {
   emit callSlot();
   commit();
+}
+
+/*!
+ * \brief Virtual method called when operation is started
+*
+* Virtual method called when operation stopped - comitted or aborted.
+*/
+void SUIT_Operation::stopOperation()
+{
 }
 
 /*!
@@ -304,15 +362,27 @@ bool SUIT_Operation::isGranted() const
 }
 
 /*!
- * \brief Verifies whether operation is an active one (state()==Running)
+ * \brief Verifies whether operation is an runned one (state()==Running)
   * \return TRUE if operation is active, FALSE otherwise
 *
-* Verifies whether operation is an active on. Returns TRUE if state of operator
+* Verifies whether operation is an running. Returns TRUE if state of operator
 * is Running
+*/
+bool SUIT_Operation::isRunning() const
+{
+  return state() == Running;
+}
+
+/*!
+ * \brief Verifies whether operation is an active for study.
+  * \return TRUE if operation is active, FALSE otherwise
+*
+* Verifies whether operation is an active on. Returns TRUE if this operator
+* is active for study
 */
 bool SUIT_Operation::isActive() const
 {
-  return state()==Running;
+  return study() ? study()->activeOperation() == this : false;
 }
 
 /*!
@@ -322,7 +392,7 @@ bool SUIT_Operation::isActive() const
 * Start operator above this one. Use this method if you want to call other operator
 * from this one
 */
-void SUIT_Operation::start( SUIT_Operation* op )
+void SUIT_Operation::start( SUIT_Operation* op, const bool check )
 {
   if ( !op )
     return;
@@ -358,10 +428,46 @@ int SUIT_Operation::execStatus() const
   return myExecStatus;
 }
 
+/*!
+ * \brief Opens transaction for data modifications.
+*/
+bool SUIT_Operation::openTransaction()
+{
+  if ( !study() )
+    return false;
 
+  return study()->openTransaction();
+}
 
+/*!
+ * \brief Aborts transaction and all performed data modifications.
+*/
+bool SUIT_Operation::abortTransaction()
+{
+  if ( !study() )
+    return false;
 
+  return study()->abortTransaction();
+}
 
+/*!
+ * \brief Commits transaction and all performed data modifications.
+*/
+bool SUIT_Operation::commitTransaction( const QString& name )
+{
+  if ( !study() )
+    return false;
 
+  return study()->commitTransaction( name );
+}
 
+/*!
+ * \brief Returns TRUE if transaction is opened.
+*/
+bool SUIT_Operation::hasTransaction() const
+{
+  if ( !study() )
+    return false;
 
+  return study()->hasTransaction();
+}

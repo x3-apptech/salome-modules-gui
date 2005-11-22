@@ -257,10 +257,10 @@ bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
     while( SUIT_Operation* anOp = blockingOperation( theOp ) )
     {
       int anAnsw = SUIT_MessageBox::warn2( application()->desktop(),
-         tr( "OPERATION_LAUNCH" ), tr( "PREVIOUS_NOT_FINISHED" ),
-         tr( "CONTINUE" ), tr( "CANCEL" ), 0, 1, 1 );
+                                           tr( "OPERATION_LAUNCH" ), tr( "PREVIOUS_NOT_FINISHED" ),
+                                           tr( "CONTINUE" ), tr( "CANCEL" ), 0, 1, 1 );
 
-      if( anAnsw == 1 )
+      if ( anAnsw == 1 )
         return false;
       else
         anOp->abort();
@@ -276,9 +276,11 @@ bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 
   theOp->setState( SUIT_Operation::Running );
   myOperations.append( theOp );
+ 
   emit theOp->started( theOp );
+  operationStarted( theOp );
   theOp->startOperation();
-  
+
   return true;
 }
 
@@ -295,10 +297,14 @@ bool SUIT_Study::abort( SUIT_Operation* theOp )
   if ( !theOp || myOperations.find( theOp ) == -1 )
     return false;
 
-  theOp->abortOperation();
   theOp->setExecStatus( SUIT_Operation::Rejected );
+
+  theOp->abortOperation();
+  operationAborted( theOp );
   emit theOp->aborted( theOp );
+
   stop( theOp );
+
   return true;
 }
 
@@ -315,11 +321,16 @@ bool SUIT_Study::commit( SUIT_Operation* theOp )
   if ( !theOp || myOperations.find( theOp ) == -1 )
     return false;
 
-  theOp->commitOperation();
   theOp->setExecStatus( SUIT_Operation::Accepted );
+
+  theOp->commitOperation();
+  operationCommited( theOp );
   emit theOp->committed( theOp );
+
   stop( theOp );
+
   emit studyModified( this );
+
   return true;
 }
 
@@ -387,14 +398,19 @@ void SUIT_Study::stop( SUIT_Operation* theOp )
 
   // get last operation which can be resumed
   SUIT_Operation* anOp, *aResultOp = 0;
-  for( anOp = myOperations.last(); anOp; anOp = myOperations.prev() )
+  for ( anOp = myOperations.last(); anOp; anOp = myOperations.prev() )
+  {
     if ( anOp && anOp != theOp && blockingOperation( anOp ) == 0 )
     {
       aResultOp = anOp;
       break;
     }
+  }
 
+  theOp->stopOperation();
+  operationStopped( theOp );
   emit theOp->stopped( theOp );
+
   if ( aResultOp )
     resume( aResultOp );
 }
@@ -408,12 +424,71 @@ const QPtrList<SUIT_Operation>& SUIT_Study::operations() const
   return myOperations;
 }
 
+/*!
+ * \brief Perform some actions when operation starting
+*/
+void SUIT_Study::operationStarted( SUIT_Operation* op )
+{
+  if ( !op )
+    return;
 
+  if ( op->testFlags( SUIT_Operation::Transaction ) )
+    openTransaction();
+}
 
+/*!
+ * \brief Perform some actions when operation aborted
+*/
+void SUIT_Study::operationAborted( SUIT_Operation* op )
+{
+  if ( op->testFlags( SUIT_Operation::Transaction ) )
+    abortTransaction();
+}
 
+/*!
+ * \brief Perform some actions when operation commited
+*/
+void SUIT_Study::operationCommited( SUIT_Operation* op )
+{
+  if ( op->testFlags( SUIT_Operation::Transaction ) )
+    commitTransaction( op->operationName() );
+}
 
+/*!
+ * \brief Perform some actions when operation stopped
+*/
+void SUIT_Study::operationStopped( SUIT_Operation* )
+{
+}
 
+/*!
+ * \brief Opens transaction for data modifications.
+*/
+bool SUIT_Study::openTransaction()
+{
+  return true;
+}
 
+/*!
+ * \brief Aborts transaction and all performed data modifications.
+*/
+bool SUIT_Study::abortTransaction()
+{
+  return true;
+}
 
+/*!
+ * \brief Commits transaction and all performed data modifications.
+*/
+bool SUIT_Study::commitTransaction( const QString& )
+{
+  return true;
+}
 
-
+/*!
+ * \brief Returns TRUE if transaction is opened.
+*/
+bool SUIT_Study::hasTransaction() const
+{
+  return false;
+}

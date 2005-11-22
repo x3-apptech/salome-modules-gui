@@ -41,7 +41,6 @@ class SUIT_EXPORT SUIT_Operation : public QObject
   Q_OBJECT
 
 public:
-
   /*! Enum describes state of operation */
   enum OperationState
   {
@@ -61,13 +60,22 @@ public:
     Accepted  //!< Operation has performed an actions and must be stopped
   };
 
-public:
+  /*!
+  * Enum describes setting of the operation.
+  */
+  enum Flags
+  {
+    None        = 0x00, //!< None options
+    Transaction = 0x01  //!< Automatically open (commit/abort) transaction during start (commit/abort).
+  };
 
+public:
   SUIT_Operation( SUIT_Application* );
   virtual ~SUIT_Operation();
 
   OperationState    state() const;
   bool              isActive() const;
+  bool              isRunning() const;
 
   SUIT_Study*       study() const;
   virtual void      setStudy( SUIT_Study* theStudy );
@@ -80,45 +88,55 @@ public:
 
   bool              setSlot( const QObject* theReceiver, const char* theSlot );
 
-public slots:
+  void              setFlags( const int );
+  void              clearFlags( const int );
+  bool              testFlags( const int ) const;
 
+  virtual QString   operationName() const;
+
+signals:
+  void              started( SUIT_Operation* );
+  void              aborted( SUIT_Operation* );
+  void              committed( SUIT_Operation* );
+
+  void              stopped( SUIT_Operation* );
+  void              resumed( SUIT_Operation* );
+  void              suspended( SUIT_Operation* );
+
+  void              callSlot();
+
+public slots:
   void              start();
   void              abort();
   void              commit();
-  void              suspend();
   void              resume();
-
-signals:
-
-  void              started( SUIT_Operation* );
-  void              aborted( SUIT_Operation* );
-  void              resumed( SUIT_Operation* );
-  void              committed( SUIT_Operation* );
-  void              suspended( SUIT_Operation* );
-  void              stopped( SUIT_Operation* );
-  
-  void              callSlot();
+  void              suspend();
 
 protected:
-
   virtual bool      isReadyToStart() const;
-  
+
+  virtual void      stopOperation();
   virtual void      startOperation();
   virtual void      abortOperation();
   virtual void      commitOperation();
-  virtual void      suspendOperation();
   virtual void      resumeOperation();
+  virtual void      suspendOperation();
 
-  void              setExecStatus( const int theStatus );
+  virtual bool      openTransaction();
+  virtual bool      abortTransaction();
+  virtual bool      hasTransaction() const;
+  virtual bool      commitTransaction( const QString& = QString::null );
+
   int               execStatus() const;
+  void              setExecStatus( const int );
 
-  void              setState( const OperationState theState );
+  void              setState( const OperationState );
 
-  void              start( SUIT_Operation* theOp );
+  void              start( SUIT_Operation*, const bool = false );
 
 private:
-
   SUIT_Application* myApp;        //!< application for this operation
+  int               myFlags;      //!< operation flags
   SUIT_Study*       myStudy;      //!< study for this operation
   OperationState    myState;      //!< Operation state
   ExecStatus        myExecStatus; //!< Execution status

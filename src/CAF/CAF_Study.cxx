@@ -13,6 +13,8 @@
 #include <TDF_Delta.hxx>
 #include <TDF_ListIteratorOfDeltaList.hxx>
 
+#include <Standard_ErrorHandler.hxx>
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -123,7 +125,7 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
   return status && SUIT_Study::saveDocumentAs( fname );
 }
 
-bool CAF_Study::startOperation()
+bool CAF_Study::openTransaction()
 {
 	if ( myStdDoc.IsNull() )
     return false;
@@ -142,40 +144,50 @@ bool CAF_Study::startOperation()
   return res;
 }
 
-void CAF_Study::abortOperation()
+bool CAF_Study::abortTransaction()
 {
 	if ( myStdDoc.IsNull() )
-    return;
+    return false;
 
+  bool res = true;
 	try {
     myStdDoc->AbortCommand();
 		update();
   }
   catch ( Standard_Failure ) {
+    res = false;
   }
+  return res;
 }
 
-void CAF_Study::commitOperation()
+bool CAF_Study::commitTransaction( const QString& name )
 {
 	if ( myStdDoc.IsNull() )
-    return;
+    return false;
 
+  bool res = true;
 	try {
     myStdDoc->CommitCommand();
 
     if ( canUndo() )
     {
-      CAF_Operation* cafOp = 0;
-      if ( activeOperation() && activeOperation()->inherits( "CAF_Operation" ) )
-        cafOp = (CAF_Operation*)activeOperation();
-
       Handle(TDF_Delta) d = myStdDoc->GetUndos().Last();
-			if ( cafOp && !d.IsNull() )
-        d->SetName( CAF_Tools::toExtString( cafOp->getName() ) );
+			if ( !d.IsNull() )
+        d->SetName( CAF_Tools::toExtString( name ) );
     }
   }
   catch ( Standard_Failure ) {
+    res = false;
   }
+  return res;
+}
+
+bool CAF_Study::hasTransaction() const
+{
+	if ( myStdDoc.IsNull() )
+    return false;
+
+  return myStdDoc->HasOpenCommand();
 }
 
 /*!

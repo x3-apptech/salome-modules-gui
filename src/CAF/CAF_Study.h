@@ -31,11 +31,7 @@ public:
 
   virtual bool                saveDocumentAs( const QString& );
 
-	virtual bool                startOperation();
-	virtual void                abortOperation();
-	virtual void                commitOperation();
-
-	bool                        isSaved() const;
+  bool                        isSaved() const;
 	bool                        isModified() const;
 	void                        doModified( bool = true );
 	void                        undoModified();
@@ -53,6 +49,11 @@ public:
 protected:
   Handle(TDocStd_Application) stdApp() const;
   CAF_Application*            cafApplication() const;
+
+  virtual bool                openTransaction();
+  virtual bool                abortTransaction();
+  virtual bool                hasTransaction() const;
+  virtual bool                commitTransaction( const QString& = QString::null );
 
   virtual void                setStdDoc( Handle(TDocStd_Document)& );
 
