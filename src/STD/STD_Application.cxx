@@ -215,6 +215,8 @@ void STD_Application::createActions()
 /*!Opens new application*/
 void STD_Application::onNewDoc()
 {
+  QApplication::setOverrideCursor( Qt::waitCursor );
+
   if ( !activeStudy() )
   {
     createEmptyStudy();
@@ -232,6 +234,8 @@ void STD_Application::onNewDoc()
       aApp->activeStudy()->createDocument();
     }
   }
+
+  QApplication::restoreOverrideCursor();
 }
 
 /*!Put file name from file dialog to onOpenDoc(const QString&) function*/
@@ -248,6 +252,8 @@ void STD_Application::onOpenDoc()
 /*! \retval true, if document was opened successful, else false.*/
 bool STD_Application::onOpenDoc( const QString& aName )
 {
+  QApplication::setOverrideCursor( Qt::waitCursor );
+
   bool res = true;
   if ( !activeStudy() )
   {
@@ -278,6 +284,9 @@ bool STD_Application::onOpenDoc( const QString& aName )
     else
       aApp->desktop()->setActiveWindow();
   }
+
+  QApplication::restoreOverrideCursor();
+
   return res;
 }
 
@@ -331,11 +340,10 @@ void STD_Application::afterCloseDoc()
 }
 
 /*!Close document, if it's possible.*/
-void STD_Application::onCloseDoc(bool ask)
+void STD_Application::onCloseDoc( bool ask )
 {
-  if (ask)
-    if ( !isPossibleToClose() )
-      return;
+  if ( ask && !isPossibleToClose() )
+    return;
 
   SUIT_Study* study = activeStudy();
 
@@ -397,7 +405,7 @@ bool STD_Application::isPossibleToClose()
       case 2:
         break;
       case 3:
-	myClosePermanently = false;
+	      myClosePermanently = false;
         break;
       case 4:
       default:
@@ -418,16 +426,22 @@ void STD_Application::onSaveDoc()
   bool isOk = false;
   if ( activeStudy()->isSaved() )
   {
-    putInfo(tr("INF_DOC_SAVING") + activeStudy()->studyName());
+    putInfo( tr( "INF_DOC_SAVING" ) + activeStudy()->studyName() );
+
+    QApplication::setOverrideCursor( Qt::waitCursor );
+
     isOk = activeStudy()->saveDocument();
-    if ( !isOk ) {
-      putInfo("");
+
+    QApplication::restoreOverrideCursor();
+
+    if ( !isOk )
+    {
+      putInfo( "" );
       SUIT_MessageBox::error1( desktop(), tr( "TIT_FILE_SAVEAS" ),
-			       tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ),
-                               tr( "BUT_OK" ) );
-    } else {
-      putInfo(tr("INF_DOC_SAVED").arg(""));
+			                         tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ), tr( "BUT_OK" ) );
     }
+    else
+      putInfo( tr( "INF_DOC_SAVED" ).arg( "" ) );
   }
 
   if ( isOk )
@@ -443,17 +457,26 @@ bool STD_Application::onSaveAsDoc()
   if ( !study )
     return false;
 
-  QString aName = getFileName( false, study->studyName(), getFileFilter(), QString::null, 0 );
-  if ( aName.isNull() )
-    return false;
+  bool isOk = false;
+  while ( !isOk )
+  {
+    QString aName = getFileName( false, study->studyName(), getFileFilter(), QString::null, 0 );
+    if ( aName.isNull() )
+      return false;
 
-  putInfo(tr("INF_DOC_SAVING") + aName);
-  bool isOk = study->saveDocumentAs( aName );
+    QApplication::setOverrideCursor( Qt::waitCursor );
 
-  if (isOk)
-    putInfo(tr("INF_DOC_SAVED").arg(aName));
-  else
-    putInfo("");
+    putInfo( tr( "INF_DOC_SAVING" ) + aName );
+    isOk = study->saveDocumentAs( aName );
+
+    putInfo( isOk ? tr( "INF_DOC_SAVED" ).arg( aName ) : "" );
+
+    QApplication::restoreOverrideCursor();
+
+    if ( !isOk )
+      SUIT_MessageBox::error1( desktop(), tr( "ERROR" ),
+                             tr( "INF_DOC_SAVING_FAILS" ).arg( aName ), tr( "BUT_OK" ) );
+  }
 
   updateDesktopTitle();
   updateCommandsStatus();
@@ -464,9 +487,9 @@ bool STD_Application::onSaveAsDoc()
 /*!Closing session.*/
 void STD_Application::onExit()
 {
-  int aAnswer = SUIT_MessageBox::info2(desktop(), tr("INF_DESK_EXIT"), tr("QUE_DESK_EXIT"),
-                                       tr ("BUT_OK"), tr ("BUT_CANCEL"), 1, 2, 2);
-  if (aAnswer == 1)
+  int aAnswer = SUIT_MessageBox::info2( desktop(), tr( "INF_DESK_EXIT" ), tr( "QUE_DESK_EXIT" ),
+                                        tr( "BUT_OK" ), tr( "BUT_CANCEL" ), 1, 2, 2 );
+  if ( aAnswer == 1 )
     SUIT_Session::session()->closeSession();
 }
 

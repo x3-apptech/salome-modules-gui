@@ -323,6 +323,9 @@ msgstr "Study %1 saved"
 msgid "STD_Application::INF_DOC_SAVING"
 msgstr "Saving study "
 
+msgid "STD_Application::INF_DOC_SAVING_FAILS"
+msgstr "Can't save file \"%1\".\nPossible reason is permission denied or disc full.\nTry to use another file name."
+
 msgid "CLOSE_DLG_SAVE_CLOSE"
 msgstr "&Save&&Close"
 
