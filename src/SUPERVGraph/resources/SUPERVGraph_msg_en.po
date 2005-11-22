@@ -1,0 +1,19 @@
+// File:      SUPERVGraph_msg_en.po
+// Created:   11/22/2005 10:55:36 PM
+// Author:    Margarita Karpunina
+// Copyright (C) CEA 2005
+
+msgid "LBL_TOOLBAR_LABEL"
+msgstr "View Operations"
+
+msgid "DSC_RESET_VIEW"
+msgstr "Reset View Point"
+
+msgid "MNU_RESET_VIEW"
+msgstr "Reset"
+
+msgid "DSC_PAN_VIEW"
+msgstr "Panning the view"
+
+msgid "MNU_PAN_VIEW"
+msgstr "Panning"

@@ -1,0 +1,11 @@
+// File:      SUPERVGraph_images.po
+// Created:   11/22/2005 10:52:37 PM
+// Author:    Margarita Karpunina
+// Copyright (C) CEA 2005
+
+msgid "ICON_SUPERVGraph_PAN"
+msgstr "view_pan.png"
+
+msgid "ICON_SUPERVGraph_RESET"
+msgstr "view_reset.png"
+

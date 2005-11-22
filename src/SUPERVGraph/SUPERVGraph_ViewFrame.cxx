@@ -28,6 +28,9 @@
 
 #include "SUPERVGraph_ViewFrame.h"
 
+#include <SUIT_ResourceMgr.h>
+#include <SUIT_Session.h>
+
 //QT Include
 #include <qlayout.h>
 #include <qcolordialog.h>
@@ -77,6 +80,43 @@ SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame( SUIT_Desktop* theDesktop )
   int G = QAD_CONFIG->getSetting("SUPERVGraph:BackgroundColorGreen").toInt();
   int B = QAD_CONFIG->getSetting("SUPERVGraph:BackgroundColorBlue").toInt();
   setBackgroundColor(QColor(R,G,B));*/
+
+  myToolBar = new QToolBar(this);
+  myToolBar->setCloseMode(QDockWindow::Undocked);
+  myToolBar->setLabel(tr("LBL_TOOLBAR_LABEL"));
+  createActions();
+  createToolBar();
+}
+
+void SUPERVGraph_ViewFrame::createActions()
+{
+  if (!myActionsMap.isEmpty()) return;
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  QAction* aAction;
+
+  // Panning
+  aAction = new QAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_PAN" ) ),
+			tr( "MNU_PAN_VIEW" ), 0, this);
+  aAction->setStatusTip(tr("DSC_PAN_VIEW"));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
+  myActionsMap[ PanId ] = aAction;
+
+  // Reset
+  aAction = new QAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_RESET" ) ),
+			tr( "MNU_RESET_VIEW" ), 0, this);
+  aAction->setStatusTip(tr("DSC_RESET_VIEW"));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
+  myActionsMap[ ResetId ] = aAction;
+}
+
+//================================================================
+// Function : createToolBar
+// Purpose  : 
+//================================================================
+void SUPERVGraph_ViewFrame::createToolBar()
+{
+  myActionsMap[PanId]->addTo(myToolBar);
+  myActionsMap[ResetId]->addTo(myToolBar);
 }
 
 SUPERVGraph_ViewFrame::~SUPERVGraph_ViewFrame() {}

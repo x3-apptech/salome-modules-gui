@@ -35,6 +35,8 @@
 #include "SUIT_PopupClient.h"
 #include "SUIT_ViewWindow.h"
 
+#include <qaction.h>
+
 class SUPERVGRAPH_EXPORT SUPERVGraph_View: public QWidget, public SUIT_PopupClient {
   Q_OBJECT;
  public:
@@ -109,9 +111,19 @@ class SUPERVGRAPH_EXPORT SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   void           onViewTrihedron(); 
 
  protected:
-  void resizeEvent( QResizeEvent* theEvent );
+  void           resizeEvent( QResizeEvent* theEvent );
   
  private:
+  void           createActions();
+  void           createToolBar();
+
+  //! Actions ID
+  enum { PanId, ResetId };
+  typedef QMap<int, QAction*> ActionsMap;
+
+  ActionsMap       myActionsMap;
+  QToolBar*        myToolBar;
+
   SUPERVGraph_View* myView;
 }; 
 #endif
