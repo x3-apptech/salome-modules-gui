@@ -7,8 +7,9 @@
 
 #include "SUITApp_Application.h"
 
-#include "SUIT_Session.h"
-#include "SUIT_ResourceMgr.h"
+#include <SUIT_Session.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_ResourceMgr.h>
 
 
 #ifdef SUIT_ENABLE_PYTHON
@@ -137,10 +138,14 @@ int main( int args, char* argv[] )
   if ( !argList.isEmpty() )
   {
     SUITApp_Session* aSession = new SUITApp_Session( iniFormat );
-    if ( aSession->startApplication( argList.first() ) )
+    SUIT_Application* theApp = aSession->startApplication( argList.first() );
+    if ( theApp )
     {
       if ( !noExceptHandling )
         app.setHandler( aSession->handler() );
+
+      if ( !app.mainWidget() )
+        app.setMainWidget( theApp->desktop() );
 
       result = app.exec();
     }
