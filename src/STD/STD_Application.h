@@ -111,6 +111,10 @@ protected:
 
   virtual void          setDesktop( SUIT_Desktop* );
 
+  virtual void          studySaved( SUIT_Study* );
+  virtual void          studyOpened( SUIT_Study* );
+  virtual void          studyCreated( SUIT_Study* );
+
   virtual void          beforeCloseDoc( SUIT_Study* theDoc );
   virtual void          afterCloseDoc();
 

@@ -221,15 +221,15 @@ void STD_Application::onNewDoc()
   {
     createEmptyStudy();
     activeStudy()->createDocument();
-    updateDesktopTitle();
-    updateCommandsStatus();
+    studyCreated( activeStudy() );
   }
   else
   {
     SUIT_Application* aApp = startApplication( 0, 0 );
     if ( aApp->inherits( "STD_Application" ) )
       ((STD_Application*)aApp)->onNewDoc();
-    else {
+    else
+    {
       aApp->createEmptyStudy();
       aApp->activeStudy()->createDocument();
     }
@@ -445,7 +445,7 @@ void STD_Application::onSaveDoc()
   }
 
   if ( isOk )
-    updateCommandsStatus();
+    studySaved( activeStudy() );
   else
     onSaveAsDoc();
 }
@@ -478,8 +478,7 @@ bool STD_Application::onSaveAsDoc()
                              tr( "INF_DOC_SAVING_FAILS" ).arg( aName ), tr( "BUT_OK" ) );
   }
 
-  updateDesktopTitle();
-  updateCommandsStatus();
+  studySaved( activeStudy() );
 
   return isOk;
 }
@@ -521,9 +520,11 @@ void STD_Application::setEditEnabled( bool theEnable )
 /*!\retval true, if document opened successful, else false.*/
 bool STD_Application::useFile(const QString& theFileName)
 {
-  bool res = SUIT_Application::useFile(theFileName);
-  updateDesktopTitle();
-  updateCommandsStatus();
+  bool res = SUIT_Application::useFile( theFileName );
+
+  if ( res )
+    studyOpened( activeStudy() );
+
   return res;
 }
 
@@ -808,4 +809,22 @@ void STD_Application::setDesktop( SUIT_Desktop* desk )
   if ( prev != desk && desk )
     connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
              this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
+}
+
+void STD_Application::studyCreated( SUIT_Study* )
+{
+  updateDesktopTitle();
+  updateCommandsStatus();
+}
+
+void STD_Application::studyOpened( SUIT_Study* )
+{
+  updateDesktopTitle();
+  updateCommandsStatus();
+}
+
+void STD_Application::studySaved( SUIT_Study* )
+{
+  updateDesktopTitle();
+  updateCommandsStatus();
 }
