@@ -679,7 +679,8 @@ void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateView
     if( myLastPicked == theObject )
         myLastPicked = 0;
 
-    myGLViewer2d->updateAll();
+    if ( updateViewer )
+      myGLViewer2d->updateAll();
 }
 
 //=======================================================================
