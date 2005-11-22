@@ -433,7 +433,7 @@ void SUIT_Study::operationStarted( SUIT_Operation* op )
     return;
 
   if ( op->testFlags( SUIT_Operation::Transaction ) )
-    openTransaction();
+    op->openTransaction();
 }
 
 /*!
@@ -442,7 +442,7 @@ void SUIT_Study::operationStarted( SUIT_Operation* op )
 void SUIT_Study::operationAborted( SUIT_Operation* op )
 {
   if ( op->testFlags( SUIT_Operation::Transaction ) )
-    abortTransaction();
+    op->abortTransaction();
 }
 
 /*!
@@ -451,7 +451,7 @@ void SUIT_Study::operationAborted( SUIT_Operation* op )
 void SUIT_Study::operationCommited( SUIT_Operation* op )
 {
   if ( op->testFlags( SUIT_Operation::Transaction ) )
-    commitTransaction( op->operationName() );
+    op->commitTransaction( op->operationName() );
 }
 
 /*!
