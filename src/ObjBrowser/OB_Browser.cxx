@@ -1050,7 +1050,11 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
   myItems.remove( obj );
 
   if ( obj == myRoot )
-    myRoot = 0;
+  {
+    // remove all child list view items
+    setRootObject( 0 );
+    return;
+  }
 
   if ( !autoUpd )
     return;
