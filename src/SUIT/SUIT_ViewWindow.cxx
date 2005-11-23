@@ -25,6 +25,9 @@ SUIT_ViewWindow::SUIT_ViewWindow(SUIT_Desktop* theDesktop)
 : QMainWindow( theDesktop, "SUIT_ViewWindow", Qt::WDestructiveClose )
 {
   myDesktop = theDesktop;
+
+  if ( myDesktop->icon() )
+    setIcon( *myDesktop->icon() );
 }
 
 /*! Destructor.*/
