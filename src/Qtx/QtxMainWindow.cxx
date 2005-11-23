@@ -58,6 +58,7 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
 
 QtxMainWindow::QtxMainWindow( QWidget* parent, const char* name, WFlags f )
 : QMainWindow( parent, name, f ),
+myMode( -1 ),
 myMenuBar( NULL ),
 myStatusBar( NULL )
 {
@@ -205,7 +206,18 @@ void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section
   resize( win_w, win_h );
   move( win_x, win_y );
 
-  switch ( winState )
+  myMode = winState;
+
+  vis ? show() : hide();
+}
+
+void QtxMainWindow::show()
+{
+  int mode = myMode;
+
+  myMode = -1;
+
+  switch ( mode )
   {
   case WS_Normal:
     showNormal();
@@ -216,12 +228,9 @@ void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section
   case WS_Maximized:
     showMaximized();
     break;
-  case WS_Hidden:
-    vis = false;
-    break;
   }
 
-  vis ? show() : hide();
+  QMainWindow::show();
 }
 
 int QtxMainWindow::relativeCoordinate( const int type, const int WH, const int wh ) const

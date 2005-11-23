@@ -36,6 +36,7 @@ public:
   virtual bool      eventFilter( QObject*, QEvent* );
 
 public slots:
+  virtual void      show();
   virtual void      setAppropriate( QDockWindow*, bool );
 
 protected:
@@ -50,6 +51,7 @@ private:
   int               relativeCoordinate( const int, const int, const int ) const;
 
 private:
+  int               myMode;
   QDockWindow*      myMenuBar;
   QDockWindow*      myStatusBar;
 };
