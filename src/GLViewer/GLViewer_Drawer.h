@@ -302,8 +302,8 @@ public:
   void                            drawTexturePart( GLuint texture,
                                                    GLfloat x_ratio,
                                                    GLfloat y_ratio,
-                                                   GLint x_size,
-                                                   GLint y_size,
+                                                   GLfloat x_size,
+                                                   GLfloat y_size,
                                                    GLfloat x,
                                                    GLfloat y,
                                                    GLfloat scale = 0 );

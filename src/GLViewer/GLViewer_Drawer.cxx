@@ -658,8 +658,8 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint x_size, GLint y_size, G
 void GLViewer_Drawer::drawTexturePart( GLuint texture,
                                        GLfloat x_ratio,
                                        GLfloat y_ratio,
-                                       GLint x_size,
-                                       GLint y_size,
+                                       GLfloat x_size,
+                                       GLfloat y_size,
                                        GLfloat x,
                                        GLfloat y,
                                        GLfloat scale )
