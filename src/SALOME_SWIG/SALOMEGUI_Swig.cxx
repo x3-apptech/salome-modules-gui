@@ -195,13 +195,14 @@ const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
   if ( SalomeApp_Application* anApp = getApplication() ) { 
     CORBA::Object_var anObject = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
     if ( !CORBA::is_nil( anObject ) ) {
-      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue = SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
+      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
+        SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
       SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
       for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-	string aModuleName     = CORBA::string_dup( aModules[ ind ].modulename ) ;
-	string aModuleUserName = CORBA::string_dup( aModules[ ind ].moduleusername ) ;
-	if ( componentUserName == aModuleUserName )
-	  return aModuleName.c_str();
+	CORBA::String_var aModuleName     = aModules[ ind ].modulename;
+	CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
+	if ( strcmp(componentUserName, aModuleUserName.in()) == 0 )
+	  return aModuleName._retn();
       }
     }
   }
@@ -217,13 +218,14 @@ const char* SALOMEGUI_Swig::getComponentUserName( const char* componentName )
   if ( SalomeApp_Application* anApp = getApplication() ) { 
     CORBA::Object_var anObject = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
     if ( !CORBA::is_nil( anObject ) ) {
-      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue = SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
+      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
+        SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
       SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
       for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-	string aModuleName     = CORBA::string_dup( aModules[ ind ].modulename ) ;
-	string aModuleUserName = CORBA::string_dup( aModules[ ind ].moduleusername ) ;
-	if ( componentName == aModuleName )
-	  return aModuleUserName.c_str();
+	CORBA::String_var aModuleName     = aModules[ ind ].modulename;
+	CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
+	if ( strcmp(componentName, aModuleName.in()) == 0 )
+	  return aModuleUserName._retn();
       }
     }
   }
