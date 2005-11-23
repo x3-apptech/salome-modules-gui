@@ -779,7 +779,8 @@ void OCCViewer_ViewWindow::onFitAll()
 //****************************************************************
 void OCCViewer_ViewWindow::onCloneView()
 {
-  myManager->createView();
+  SUIT_ViewWindow* vw = myManager->createViewWindow();
+  vw->show();
 }
 
 //****************************************************************
