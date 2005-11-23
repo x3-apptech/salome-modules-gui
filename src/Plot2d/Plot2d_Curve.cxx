@@ -54,6 +54,11 @@ Plot2d_Curve& Plot2d_Curve::operator=( const Plot2d_Curve& curve )
   return *this;
 }
 
+QString Plot2d_Curve::getTableTitle() const
+{
+  return QString();
+}
+
 /*!
   Sets curve's horizontal title
 */

@@ -618,6 +618,7 @@ void Plot2d_ViewFrame::displayCurve( Plot2d_Curve* curve, bool update )
       myPlot->setCurveStyle( curveKey, QwtCurve::Spline );
     myPlot->setCurveData( curveKey, curve->horData(), curve->verData(), curve->nbPoints() );
   }
+  updateTitles();
   if ( update )
     myPlot->replot();
 }
@@ -1758,4 +1759,61 @@ void Plot2d_ViewFrame::copyPreferences( Plot2d_ViewFrame* vf )
   myXMode = vf->myXMode;
   myYMode = vf->myYMode;
   mySecondY = vf->mySecondY;
+}
+
+/*!
+  Updates titles according to curves
+*/
+#define BRACKETIZE(x) QString( "[ " ) + x + QString( " ]" )
+void Plot2d_ViewFrame::updateTitles() 
+{
+  QIntDictIterator<Plot2d_Curve> it( myCurves );
+  QStringList aXTitles;
+  QStringList aYTitles;
+  QStringList aXUnits;
+  QStringList aYUnits;
+  QStringList aTables;
+  int i = 0;
+  while ( it.current() ) {
+    // collect titles and units from all curves...
+    QString xTitle = it.current()->getHorTitle().stripWhiteSpace();
+    QString yTitle = it.current()->getVerTitle().stripWhiteSpace();
+    QString xUnits = it.current()->getHorUnits().stripWhiteSpace();
+    QString yUnits = it.current()->getVerUnits().stripWhiteSpace();
+    
+    aYTitles.append( yTitle );
+    if ( aXTitles.find( xTitle ) == aXTitles.end() )
+      aXTitles.append( xTitle );
+    if ( aXUnits.find( xUnits ) == aXUnits.end() )
+      aXUnits.append( xUnits );
+    if ( aYUnits.find( yUnits ) == aYUnits.end() )
+      aYUnits.append( yUnits );
+
+    QString aName = it.current()->getTableTitle();
+    if( !aName.isEmpty() && aTables.find( aName ) == aTables.end() )
+      aTables.append( aName );
+
+    ++it;
+    ++i;
+  }
+  // ... and update plot 2d view
+  QString xUnits, yUnits;
+  if ( aXUnits.count() == 1 && !aXUnits[0].isEmpty() )
+    xUnits = BRACKETIZE( aXUnits[0] );
+  if ( aYUnits.count() == 1 && !aYUnits[0].isEmpty())
+    yUnits = BRACKETIZE( aYUnits[0] );
+  QString xTitle, yTitle;
+  if ( aXTitles.count() == 1 && aXUnits.count() == 1 )
+    xTitle = aXTitles[0];
+  if ( aYTitles.count() == 1 )
+    yTitle = aYTitles[0];
+
+  if ( !xTitle.isEmpty() && !xUnits.isEmpty() )
+    xTitle += " ";
+  if ( !yTitle.isEmpty() && !yUnits.isEmpty() )
+    yTitle += " ";
+
+  setTitle( myXTitleEnabled, xTitle + xUnits, XTitle, true );
+  setTitle( myYTitleEnabled, yTitle + yUnits, YTitle, true );
+  setTitle( true, aTables.join("; "), MainTitle, true );
 }

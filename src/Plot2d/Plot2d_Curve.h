@@ -29,6 +29,8 @@ public:
   Plot2d_Curve( const Plot2d_Curve& curve );
   Plot2d_Curve& operator= ( const Plot2d_Curve& curve );
 
+  virtual QString getTableTitle() const;
+  
   void        setHorTitle( const QString& title );
   QString     getHorTitle() const;
   void        setVerTitle( const QString& title );

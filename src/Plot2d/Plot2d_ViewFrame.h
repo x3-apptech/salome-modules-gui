@@ -95,6 +95,7 @@ protected:
   int     testOperation( const QMouseEvent& );
   void    readPreferences();
   void    writePreferences();
+  void    updateTitles();
   QString getInfo( const QPoint& pnt );
   virtual void wheelEvent( QWheelEvent* );
 

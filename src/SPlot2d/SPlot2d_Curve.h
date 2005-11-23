@@ -26,13 +26,15 @@ public:
   SPlot2d_Curve( const SPlot2d_Curve& curve );
   SPlot2d_Curve& operator= ( const SPlot2d_Curve& curve );
 
-  virtual bool                             hasIO() { return !myIO.IsNull(); }
-  virtual Handle(SALOME_InteractiveObject) getIO() const { return myIO; }
-  virtual void                             setIO( const Handle(SALOME_InteractiveObject)& io ) { myIO = io; }
+  virtual QString                          getTableTitle() const;
 
-  virtual bool                             hasTableIO() { return !myTableIO.IsNull(); }
-  virtual Handle(SALOME_InteractiveObject) getTableIO() const { return myTableIO; }
-  virtual void                             setTableIO( const Handle(SALOME_InteractiveObject)& io ) { myTableIO = io; }
+  virtual bool                             hasIO() const;
+  virtual Handle(SALOME_InteractiveObject) getIO() const;
+  virtual void                             setIO( const Handle(SALOME_InteractiveObject)& );
+
+  virtual bool                             hasTableIO() const;
+  virtual Handle(SALOME_InteractiveObject) getTableIO() const;
+  virtual void                             setTableIO( const Handle(SALOME_InteractiveObject)& );
   
 private:
   Handle(SALOME_InteractiveObject) myIO;
