@@ -4,6 +4,7 @@
 #include "QtxWorkstack.h"
 
 #include <qstyle.h>
+#include <qimage.h>
 #include <qaction.h>
 #include <qlayout.h>
 #include <qpixmap.h>
@@ -1428,7 +1429,11 @@ void QtxWorkstackArea::updateTab( QWidget* wid )
 
   QIconSet icoSet;
   if ( wid->icon() )
-    icoSet = QIconSet( *wid->icon() );
+  {
+    QPixmap pix = *wid->icon();
+    pix.convertFromImage( pix.convertToImage().smoothScale( pix.width(), 16, QImage::ScaleMin ) );
+    icoSet = QIconSet( pix );
+  }
 
   tab->setIconSet( icoSet );
   tab->setText( wid->caption() );
