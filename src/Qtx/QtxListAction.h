@@ -97,6 +97,7 @@ private:
     QToolTipGroup*          myTipGroup;
 
     friend class ToolButton;
+    friend class QtxListFrame;
 };
 
 /*************************************
@@ -111,7 +112,7 @@ class QtxListFrame : public QFrame
     class ScrollEvent;
 
 public:
-    QtxListFrame( QWidget* parent, WFlags f = 0 );
+    QtxListFrame( QtxListAction*, QWidget* parent, WFlags f = 0 );
     virtual ~QtxListFrame();
 
     void                    clear();
@@ -159,6 +160,7 @@ private:
     QListBox*               myList;
     QStringList             myNames;
     QWidget*                myOwner;
+    QtxListAction*          myAction;
     QLabel*                 myComment;
     
     QString                 mySingleComment;

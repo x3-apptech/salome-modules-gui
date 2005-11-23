@@ -423,7 +423,7 @@ void QtxListAction::initialize()
 {
 	myTipGroup = new QToolTipGroup( this );
 
-	myFrame = new QtxListFrame( qApp->mainWidget() );
+	myFrame = new QtxListFrame( this, qApp->mainWidget() );
   myFrame->setMaxLines( 5 );
   myFrame->setMaxLineChars( 7 );
 
@@ -628,10 +628,11 @@ private:
 /*!
     Constructor
 */
-QtxListFrame::QtxListFrame( QWidget* parent, WFlags f )
+QtxListFrame::QtxListFrame( QtxListAction* a, QWidget* parent, WFlags f )
 : QFrame( parent, 0, WStyle_Customize | WStyle_NoBorderEx | WType_Popup | WStyle_Tool | WStyle_StaysOnTop ),
 myList( 0 ),
 myOwner( 0 ),
+myAction( a ),
 myComment( 0 ),
 myMaxLines( 5 ),
 myMaxLineChars( 10 ),
@@ -670,6 +671,8 @@ myScrollBlock( false )
 
 QtxListFrame::~QtxListFrame()
 {
+  if ( myAction )
+    myAction->myFrame = 0;
 }
 
 /*!
