@@ -16,8 +16,8 @@ using namespace std;
 */
 
 template<class T>
-ListItemF<T>::ListItemF(T& theT, SUIT_DataObject* obj) :
-myT(theT),
+ListItemF<T>::ListItemF( T& theT, SUIT_DataObject* obj ) :
+myT( theT ),
 myObject( obj )
 {
 }
@@ -134,21 +134,34 @@ OB_ListItem::~OB_ListItem()
 {
 }
 
-void OB_ListItem::setSelected( bool s ) {
-	setSel(s);
-	QListViewItem::setSelected(s);
+void OB_ListItem::setSelected( bool s )
+{
+	setSel( s );
+	QListViewItem::setSelected( s );
 }
 
-void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
+void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r )
+{
   QColorGroup col_group( cg );
-	paintFoc(p, col_group, r);
-	QListViewItem::paintFocus(p, col_group, r);
+	paintFoc( p, col_group, r );
+
+  QRect R( r );
+  if ( listView() && !listView()->allColumnsShowFocus() )
+    R.setWidth( width( p->fontMetrics(), listView(), 0 ) );
+
+  QListViewItem::paintFocus( p, col_group, R );
 }
 
-void OB_ListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
+void OB_ListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align )
+{
   QColorGroup col_group( cg );
-	paintC(p, col_group, c ,w, align);
-	QListViewItem::paintCell( p, col_group, c, w, align);
+	paintC( p, col_group, c ,w, align );
+
+  int W = w;
+  if ( listView() && !listView()->allColumnsShowFocus() )
+    W = width( p->fontMetrics(), listView(), c );
+
+	QListViewItem::paintCell( p, col_group, c, W, align );
 }
 
 int OB_ListItem::RTTI()
@@ -206,21 +219,34 @@ OB_CheckListItem::~OB_CheckListItem()
 {
 }
 
-void OB_CheckListItem::setSelected( bool s ) {
-	setSel(s);
-	QCheckListItem::setSelected(s);
+void OB_CheckListItem::setSelected( bool s )
+{
+	setSel( s );
+	QCheckListItem::setSelected( s );
 }
 
-void OB_CheckListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r ){
+void OB_CheckListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r )
+{
   QColorGroup col_group( cg );
-	paintFoc(p, col_group, r);
-	QCheckListItem::paintFocus(p, col_group, r);
+	paintFoc( p, col_group, r );
+
+  QRect R( r );
+  if ( listView() && !listView()->allColumnsShowFocus() )
+    R.setWidth( width( p->fontMetrics(), listView(), 0 ) );
+
+	QCheckListItem::paintFocus( p, col_group, R );
 }
 
-void OB_CheckListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align ) {
+void OB_CheckListItem::paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align )
+{
   QColorGroup col_group( cg );
-	paintC(p, col_group, c ,w, align);
-	QCheckListItem::paintCell(p, col_group, c, w, align);
+	paintC( p, col_group, c ,w, align );
+
+  int W = w;
+  if ( listView() && !listView()->allColumnsShowFocus() )
+    W = width( p->fontMetrics(), listView(), c );
+
+  QCheckListItem::paintCell( p, col_group, c, W, align );
 }
 
 int OB_CheckListItem::RTTI()
