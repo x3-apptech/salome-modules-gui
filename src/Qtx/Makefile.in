@@ -25,6 +25,7 @@ EXPORT_HEADERS= Qtx.h \
 		QtxListAction.h \
 		QtxListBox.h \
                 QtxListOfOperations.h \
+                QtxLogoMgr.h \
 		QtxMenuButton.h \
 		QtxMRUAction.h \
 		QtxOperations.h \
@@ -71,6 +72,7 @@ LIB_SRC= \
 	QtxListAction.cxx \
 	QtxListBox.cxx \
         QtxListOfOperations.cxx \
+        QtxLogoMgr.cxx \
 	QtxMenuButton.cxx \
 	QtxMRUAction.cxx \
 	QtxPathDialog.cxx \
@@ -107,6 +109,7 @@ LIB_MOC = \
         QtxIntSpinBox.h \
         QtxListAction.h \
         QtxListBox.h \
+        QtxLogoMgr.h \
         QtxMenuButton.h \
         QtxMRUAction.h \
         QtxPathDialog.h \
