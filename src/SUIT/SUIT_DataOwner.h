@@ -36,8 +36,7 @@ bool operator==( const SUIT_DataOwnerPtr&, const SUIT_DataOwnerPtr& );
 class SUIT_EXPORT SUIT_DataOwnerPtrList : public QValueList<SUIT_DataOwnerPtr> 
 {
 public:
-  SUIT_DataOwnerPtrList();//!< constructor
-  SUIT_DataOwnerPtrList( const bool skipAllEqal );//!< constructor
+  SUIT_DataOwnerPtrList( const bool skipAllEqal = true );//!< constructor
   SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l );//!< copy constructor
   SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqal );//!< copy constructor
 #ifndef QT_NO_STL

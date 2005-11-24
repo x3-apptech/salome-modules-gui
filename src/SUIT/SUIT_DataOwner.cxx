@@ -41,14 +41,6 @@ bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 //====================================================================
 //! Constructor (default)
 //====================================================================
-SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList()
-: QValueList<SUIT_DataOwnerPtr>()
-{
-}
-
-//====================================================================
-//! Constructor (default)
-//====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const bool skipAllEqal )
 : QValueList<SUIT_DataOwnerPtr>(),
 mySkipEqual( skipAllEqal )
@@ -116,6 +108,7 @@ SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOw
   {
     if ( mySkipEqual )
       return it;
+
     const _typeinfo& ti1 = typeid( *((*it).operator->()) );
     const _typeinfo& ti2 = typeid( *(x.operator->()) );
 
