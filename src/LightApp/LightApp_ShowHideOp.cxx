@@ -37,8 +37,11 @@ LightApp_Displayer* LightApp_ShowHideOp::displayer( const QString& mod_name ) co
   if( m )
   {
     m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
-    m->setMenuShown( false );
-    m->setToolShown( false );
+    if( m!=app->activeModule() )
+    {
+      m->setMenuShown( false );
+      m->setToolShown( false );
+    }
   }
   return m ? m->displayer() : 0;
 }
