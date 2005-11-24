@@ -8,6 +8,7 @@
 #include <QtxMainWindow.h>
 
 class QPopupMenu;
+class QtxLogoMgr;
 class SUIT_ViewWindow;
 class QtxActionMenuMgr;
 class QtxActionToolMgr;
@@ -15,8 +16,6 @@ class QtxActionToolMgr;
 class SUIT_EXPORT SUIT_Desktop : public QtxMainWindow
 {
   Q_OBJECT
-
-  class LogoMgr;
 
 public:
   SUIT_Desktop();
@@ -53,7 +52,7 @@ protected:
 private:
   QtxActionMenuMgr*        myMenuMgr;
   QtxActionToolMgr*        myToolMgr;
-  LogoMgr*                 myLogoMgr;
+  QtxLogoMgr*              myLogoMgr;
 };
 
 #endif
