@@ -94,6 +94,8 @@ class SUPERVGRAPH_EXPORT SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   void           EraseAll(){};
   void           Repaint() {};
 
+  QToolBar*      getToolBar() { return myToolBar; }
+
  public slots:
   void           onViewPan(); 
   void           onViewZoom();
