@@ -38,7 +38,7 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
     if ( !myStudy )
       return;
 
-    SUIT_DataOwnerPtrList sel;
+    SUIT_DataOwnerPtrList sel( false );
     //asl: fix for PAL10471
     //mgr->selected( sel, client );
     mgr->selected( sel );
