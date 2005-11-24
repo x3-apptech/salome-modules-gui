@@ -941,7 +941,7 @@ void QtxDockAction::initialize( QMainWindow* mw )
   dockWindows( lst, mw );
 
   for ( QPtrListIterator<QDockWindow> it( lst ); it.current(); ++it )
-    autoAddDockWindow( it.current() );
+    QApplication::postEvent( this, new QCustomEvent( (QEvent::Type)AutoAdd, it.current() ) );
 
   if ( mw->topDock() )
     mw->topDock()->installEventFilter( this );
