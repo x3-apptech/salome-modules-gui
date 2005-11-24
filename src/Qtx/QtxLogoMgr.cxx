@@ -123,7 +123,7 @@ void QtxLogoMgr::generate()
   };
 
   LogoBox* cnt = new LogoBox( menuBar() );
-  cnt->setSpacing( 10 );
+  cnt->setSpacing( 3 );
 
   for ( LogoList::const_iterator it = myLogos.begin(); it != myLogos.end(); ++it )
   {
