@@ -37,6 +37,7 @@ public:
   Plot2d_Prs* CreatePrs( const char* entry = 0 );
 
   /* operations */
+  void    updateTitles();
   void    setTitle( const QString& title );
   QString getTitle() const { return myTitle; }
   void    displayCurve( Plot2d_Curve* curve, bool update = false );
@@ -95,7 +96,6 @@ protected:
   int     testOperation( const QMouseEvent& );
   void    readPreferences();
   void    writePreferences();
-  void    updateTitles();
   QString getInfo( const QPoint& pnt );
   virtual void wheelEvent( QWheelEvent* );
 

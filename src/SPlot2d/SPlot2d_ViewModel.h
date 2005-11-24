@@ -31,7 +31,8 @@ public:
   /*  interactive object management */
   void highlight( const Handle(SALOME_InteractiveObject)& IObject, bool highlight, bool update = true ) {}
   void unHighlightAll() {}
-  void rename( const Handle(SALOME_InteractiveObject)& IObject, QString newName );
+  void rename( const Handle(SALOME_InteractiveObject)&, const QString&, Plot2d_ViewFrame* = 0 );
+  void renameAll( const Handle(SALOME_InteractiveObject)&, const QString& );
   bool isInViewer( const Handle(SALOME_InteractiveObject)& IObject );
   
   /* display */		
@@ -51,7 +52,7 @@ public:
 
 
   /* operations */
-  SPlot2d_Curve*                   getCurveByIO( const Handle(SALOME_InteractiveObject)& theIObject );
+  SPlot2d_Curve*                   getCurveByIO( const Handle(SALOME_InteractiveObject)&, Plot2d_ViewFrame* = 0 );
   Plot2d_ViewFrame*                getActiveViewFrame();
   Handle(SALOME_InteractiveObject) FindIObject( const char* Entry );
 

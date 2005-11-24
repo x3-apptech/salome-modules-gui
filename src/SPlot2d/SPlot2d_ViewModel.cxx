@@ -67,17 +67,41 @@ SPlot2d_Viewer::~SPlot2d_Viewer()
 /*!
   Renames curve if it is found
 */
-void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject, QString newName ) 
+void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject,
+			     const QString& newName, Plot2d_ViewFrame* fr ) 
 {
-  Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
-  if(aViewFrame == NULL) return;
+  Plot2d_ViewFrame* aViewFrame = fr ? fr : getActiveViewFrame();
+  if( !aViewFrame )
+    return;
 
-  Plot2d_Curve* curve = getCurveByIO( IObject );
-  if ( curve ) {
-    curve->setVerTitle( newName );
-    int key = aViewFrame->hasCurve( curve );
-    if ( key ) {
-      aViewFrame->setCurveTitle( key, newName );
+  QIntDictIterator<Plot2d_Curve> it( aViewFrame->getCurves() );
+  for( ; it.current(); ++it )
+  {
+    SPlot2d_Curve* aCurve = dynamic_cast<SPlot2d_Curve*>( it.current() );
+    if( aCurve && aCurve->hasIO() && aCurve->getIO()->isSame( IObject ) )
+    {
+      aCurve->setVerTitle( newName );
+      int key = aViewFrame->hasCurve( aCurve );
+      if( key )
+	aViewFrame->setCurveTitle( key, newName );
+    }
+
+    if( aCurve && aCurve->hasTableIO() && aCurve->getTableIO()->isSame( IObject ) )
+      aCurve->getTableIO()->setName( newName.latin1() );
+  }
+  aViewFrame->updateTitles();
+}
+
+void SPlot2d_Viewer::renameAll( const Handle(SALOME_InteractiveObject)& IObj, const QString& name )
+{
+  SUIT_ViewManager* vm = getViewManager();
+  if( vm )
+  {
+    const QPtrVector<SUIT_ViewWindow>& wnds = vm->getViews();
+    for( int i=0; i<wnds.size(); i++ )
+    {
+      Plot2d_ViewWindow* pwnd = dynamic_cast<Plot2d_ViewWindow*>( wnds.at( i ) );
+      rename( IObj, name, pwnd->getViewFrame() );
     }
   }
 }
@@ -307,10 +331,11 @@ Plot2d_ViewFrame* SPlot2d_Viewer::getActiveViewFrame()
   return NULL;
 }
 
-SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObject)& theIObject )
+SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObject)& theIObject,
+					     Plot2d_ViewFrame* fr )
 {
   if ( !theIObject.IsNull() ) {
-    Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
+    Plot2d_ViewFrame* aViewFrame = fr ? fr : getActiveViewFrame();
     if(aViewFrame) {
       QIntDictIterator<Plot2d_Curve> it( aViewFrame->getCurves() );
       for ( ; it.current(); ++it ) {
