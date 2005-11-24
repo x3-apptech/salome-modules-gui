@@ -177,7 +177,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
     return false;
 
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false ),
-       isAscii = resMgr->booleanValue( "Study", "ascii_file", true );
+       isAscii = resMgr->booleanValue( "Study", "ascii_file", false );
   isAscii ? SalomeApp_Application::studyMgr()->SaveAsASCII( theFileName.latin1(), studyDS(), isMultiFile ) :
             SalomeApp_Application::studyMgr()->SaveAs     ( theFileName.latin1(), studyDS(), isMultiFile );
 
@@ -212,7 +212,7 @@ bool SalomeApp_Study::saveDocument()
     return false;
 
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false ),
-       isAscii = resMgr->booleanValue( "Study", "ascii_file", true );
+       isAscii = resMgr->booleanValue( "Study", "ascii_file", false );
   isAscii ? SalomeApp_Application::studyMgr()->SaveASCII( studyDS(), isMultiFile ) :
             SalomeApp_Application::studyMgr()->Save     ( studyDS(), isMultiFile );
 
