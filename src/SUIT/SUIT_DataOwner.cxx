@@ -41,9 +41,18 @@ bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 //====================================================================
 //! Constructor (default)
 //====================================================================
-SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const bool skipAllEqal )
-: QValueList<SUIT_DataOwnerPtr>(),
-mySkipEqual( skipAllEqal )
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList()
+  : QValueList<SUIT_DataOwnerPtr>(),
+    mySkipEqual( true )
+{
+}
+
+//====================================================================
+//! Constructor (default)
+//====================================================================
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const bool skipAllEqual )
+  : QValueList<SUIT_DataOwnerPtr>(),
+    mySkipEqual( skipAllEqual )
 {
 }
 
@@ -51,18 +60,19 @@ mySkipEqual( skipAllEqal )
 //! Constructor (copy)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l )
-: QValueList<SUIT_DataOwnerPtr>( l )
+  : QValueList<SUIT_DataOwnerPtr>( l ),
+    mySkipEqual( true )
 {
 }
 
 //====================================================================
 //! Constructor (copy)
 //====================================================================
-SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqal )
-: QValueList<SUIT_DataOwnerPtr>(),
-mySkipEqual( skipAllEqal )
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqual )
+  : QValueList<SUIT_DataOwnerPtr>(),
+    mySkipEqual( skipAllEqual )
 {
-  if ( skipAllEqal == l.mySkipEqual )
+  if ( skipAllEqual == l.mySkipEqual )
     operator =( l );
   else
   {
@@ -78,7 +88,8 @@ mySkipEqual( skipAllEqal )
 //! Constructor (from stl)
 //====================================================================
 SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l )
-: QValueList<SUIT_DataOwnerPtr>( l )
+  : QValueList<SUIT_DataOwnerPtr>( l ),
+    mySkipEqual( true )
 {
 }
 #endif
@@ -87,9 +98,9 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>
 //====================================================================
 //! Constructor (from stl)
 //====================================================================
-SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l, const bool skipAllEqal )
-: QValueList<SUIT_DataOwnerPtr>(),
-mySkipEqual( skipAllEqal )
+SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l, const bool skipAllEqual )
+  : QValueList<SUIT_DataOwnerPtr>(),
+    mySkipEqual( skipAllEqual )
 {
   std::list<SUIT_DataOwnerPtr>::const_iterator beginIt = l.begin();
   std::list<SUIT_DataOwnerPtr>::const_iterator endIt = l.begin();

@@ -21,9 +21,11 @@ LightApp_DataSubOwner::~LightApp_DataSubOwner()
 /*!Checks: Is current data sub owner equal \a obj.*/
 bool LightApp_DataSubOwner::isEqual( const SUIT_DataOwner& obj ) const
 {  
-  const LightApp_DataSubOwner* other = dynamic_cast<const LightApp_DataSubOwner*>( &obj );
-
-  return other && entry() == other->entry() && index() == other->index();
+  if (LightApp_DataOwner::isEqual(obj)) {
+    const LightApp_DataSubOwner* other = dynamic_cast<const LightApp_DataSubOwner*>( &obj );
+    return other && index() == other->index();
+  }
+  return false;
 }
 
 /*!Gets index.*/
