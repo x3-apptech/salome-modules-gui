@@ -765,8 +765,11 @@ void OCCViewer_ViewWindow::onRightView()
 void OCCViewer_ViewWindow::onResetView()
 {
   emit vpTransformationStarted( RESETVIEW );
-  myViewPort->getView()->Reset();
-  myViewPort->fitAll();
+  bool upd = myViewPort->getView()->SetImmediateUpdate( false );
+  myViewPort->getView()->Reset( false );
+  myViewPort->fitAll( false, true, false );
+  myViewPort->getView()->SetImmediateUpdate( upd );
+  myViewPort->getView()->Update();
 }
 
 //****************************************************************

@@ -371,20 +371,17 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 /*!
     Fits all objects in view. [ virtual protected ]
 */
-void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ )
+void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
 {
 	if ( activeView().IsNull() )
-        return;
+    return;
 
 
-    if ( keepScale )
-        myScale = activeView()->Scale();
+  if ( keepScale )
+    myScale = activeView()->Scale();
 
-    Standard_Real margin = 0.01;
-    activeView()->FitAll( margin, withZ );
-
-//    double zsize = getZSize();
-//    setZSize( zsize );
+  Standard_Real margin = 0.01;
+  activeView()->FitAll( margin, withZ, upd );
 }
 
 /*!

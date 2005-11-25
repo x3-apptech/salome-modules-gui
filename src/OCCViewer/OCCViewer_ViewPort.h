@@ -59,7 +59,7 @@ protected:
 	virtual void	                 setCenter( int, int ) = 0;
 	virtual void	                 fitRect( const QRect& ) = 0;
   virtual void	                 zoom( int, int, int, int ) = 0;
-  virtual void	                 fitAll( bool keepScale = false, bool withZ = true ) = 0;
+  virtual void	                 fitAll( bool keepScale = false, bool withZ = true, bool upd = true ) = 0;
 
 // POPUP
 //  void                             onCreatePopup( QPopupMenu* );

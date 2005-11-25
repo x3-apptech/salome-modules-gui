@@ -44,7 +44,7 @@ public:
 	virtual void	        setCenter( int , int );
 	virtual void	        fitRect( const QRect& );
 	virtual void	        zoom( int, int, int, int );
-  virtual void	        fitAll( bool keepScale = false, bool withZ = true );
+  virtual void	        fitAll( bool keepScale = false, bool withZ = true, bool upd = true );
 
 	void	                startRotation( int, int );
 	void	                rotate( int, int );
