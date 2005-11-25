@@ -38,12 +38,6 @@ bool
 LightApp_DataOwner
 ::isEqual( const SUIT_DataOwner& obj ) const
 {
-  const _typeinfo& ti1 = typeid( obj );
-  const _typeinfo& ti2 = typeid( *(this) );
-
-  if (ti1 != ti2)
-    return false;
-
   const LightApp_DataOwner* other = dynamic_cast<const LightApp_DataOwner*>( &obj );
 
   return other && entry() == other->entry();

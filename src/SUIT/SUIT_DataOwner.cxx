@@ -27,7 +27,7 @@ SUIT_DataOwner::~SUIT_DataOwner()
 bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 {
   if ( !p1.isNull() && !p2.isNull() )
-    return p1->isEqual( *p2 );
+    return (p1->isEqual( *p2 ) && p2->isEqual( *p1 ));
   return p1.isNull() && p2.isNull();
 }
 
