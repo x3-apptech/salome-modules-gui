@@ -32,7 +32,7 @@ class QTX_EXPORT QtxWorkstack : public QWidget
   Q_OBJECT
 
 public:
-  enum { SplitVertical, SplitHorizontal, Close };
+  enum { SplitVertical, SplitHorizontal, Close, Rename };
     
   enum SplitType {
     SPLIT_STAY, //!< given widget stays in its workarea, others are moved into a new one
@@ -68,12 +68,14 @@ signals:
 public slots:
   void                splitVertical();
   void                splitHorizontal();
+  void                onRenameActive();
   
 private slots:
+  void                onRename();
   void                onCloseWindow();
   void                onDestroyed( QObject* );
   void                onWindowActivated( QWidget* );
-  void                onContextMenuRequested( QPoint );
+  void                onContextMenuRequested( QWidget*, QPoint );
   void                onDeactivated( QtxWorkstackArea* );
 
 protected:
@@ -87,6 +89,7 @@ private:
 
   QSplitter*          wrapSplitter( QtxWorkstackArea* );
   void                insertWidget( QWidget*, QWidget*, QWidget* );
+  void                renameWindow( QWidget* );
 
   QtxWorkstackArea*   areaAt( const QPoint& ) const;
 
@@ -107,7 +110,7 @@ private:
 				                           const int need_pos, const int splitter_pos );
 
 private:
-  QWidget*            myWin;
+  QWidget*            myWin, *myWinForAction;
   QtxWorkstackArea*   myArea;
   QSplitter*          mySplit;
 
@@ -151,7 +154,7 @@ public:
 
 signals:
   void                activated( QWidget* );
-  void                contextMenuRequested( QPoint );
+  void                contextMenuRequested( QWidget*, QPoint );
   void                deactivated( QtxWorkstackArea* );
 
 public slots:
@@ -170,6 +173,7 @@ private slots:
   void                onChildHided( QtxWorkstackChild* );
   void                onChildActivated( QtxWorkstackChild* );
   void                onChildCaptionChanged( QtxWorkstackChild* );
+  void                onBarRequestContextMenu( QPoint );
 
 protected:
   virtual void        customEvent( QCustomEvent* );

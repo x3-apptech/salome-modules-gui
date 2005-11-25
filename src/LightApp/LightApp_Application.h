@@ -45,7 +45,7 @@ public:
   typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
 
   enum { NewGLViewId = STD_Application::UserID, NewPlot2dId, NewOCCViewId, NewVTKViewId,
-         PreferencesId, MRUId, UserID };
+         PreferencesId, MRUId, RenameId, UserID };
 public:
   LightApp_Application();
   virtual ~LightApp_Application();

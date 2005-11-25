@@ -61,6 +61,8 @@
 #include <SUPERVGraph_ViewFrame.h>
 #include <SUPERVGraph_ViewManager.h>
 
+#include <QtxWorkstack.h>
+
 #include <qdir.h>
 #include <qimage.h>
 #include <qstring.h>
@@ -453,6 +455,14 @@ void LightApp_Application::createActions()
 			       tr( QString( "NEW_WINDOW_%1" ).arg( id - NewGLViewId ) ),
 			       accelMap.contains( id ) ? accelMap[id] : 0, desk, false, this, SLOT( onNewWindow() ) );
     createMenu( a, newWinMenu, -1 );
+  }
+
+  STD_TabDesktop* tab_desk = dynamic_cast<STD_TabDesktop*>( desk );
+  if( tab_desk )
+  {
+    QAction* a = createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_RENAME" ), tr( "PRP_RENAME" ),
+			       0, desk, false, tab_desk->workstack(), SLOT( onRenameActive() ) );
+    createMenu( a, windowMenu, -1 );
   }
 
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );

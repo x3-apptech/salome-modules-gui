@@ -32,6 +32,15 @@ msgstr "GNU LGPL"
 msgid "LightApp_Application::ACTIVATING_MODULE"
 msgstr "Trying to activate module \"%1\""
 
+msgid "LightApp_Application::TOT_RENAME"
+msgstr "Rename"
+
+msgid "LightApp_Application::MEN_RENAME"
+msgstr "Rename"
+
+msgid "LightApp_Application::PRP_RENAME"
+msgstr "Rename active window"
+
 msgid "LightApp_Application::TOT_DESK_PREFERENCES"
 msgstr "Preferences"
 
