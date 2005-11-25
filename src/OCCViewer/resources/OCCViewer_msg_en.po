@@ -119,6 +119,9 @@ msgstr "Create new OCC viewer for the active scene"
 msgid "MNU_CLONE_VIEW"
 msgstr "Clone View"
 
+msgid "MNU_DUMP_VIEW"
+msgstr "Dump view"
+
 msgid "DSC_DUMP_VIEW"
 msgstr "Saves the active view in the image file"
 
