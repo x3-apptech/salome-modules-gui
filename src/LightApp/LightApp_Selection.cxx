@@ -25,38 +25,47 @@ LightApp_Selection::~LightApp_Selection()
 }
 
 /*!
-  Initializetion.
+  Initialization.
 */
 void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr)
 {
   myPopupClient = client;
+  myStudy = 0;
   
   if( mgr )
   {
-    if ( mgr->application() )
+    if( mgr->application() )
       myStudy = dynamic_cast<LightApp_Study*>( mgr->application()->activeStudy() );
-    if ( !myStudy )
+    if( !myStudy )
       return;
 
-    SUIT_DataOwnerPtrList sel( false );
-    //asl: fix for PAL10471
-    //mgr->selected( sel, client );
-    mgr->selected( sel );
-    SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
+    //1) to take owners from current popup client
+    SUIT_DataOwnerPtrList sel( true ), cur_sel( true );
+    mgr->selected( sel, client );
 
-    QString entry, curEntry;
+    //2) to take such owners from other popup clients that it's entry is different with every entry from current list
+    QPtrList<SUIT_Selector> aSelectors;
+    mgr->selectors( aSelectors );
+    for( SUIT_Selector* selector = aSelectors.first(); selector; selector = aSelectors.next() )
+      if( selector->type()!=client )
+      {
+	mgr->selected( cur_sel, selector->type() );
+	SUIT_DataOwnerPtrList::const_iterator aLIt = cur_sel.begin(), aLLast = cur_sel.end();
+	for( ; aLIt!=aLLast; aLIt++ )
+	  sel.append( *aLIt ); //check entry and don't append if such entry is in list already
+      }
+
+    //3) to analyse owner and fill internal data structures
+    SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
+    QString entry;
     for( ; anIt!=aLast; anIt++ )
     {
-      SUIT_DataOwner* owner = ( SUIT_DataOwner* )( (*anIt ).get() );
-      LightApp_DataOwner* sowner = dynamic_cast<LightApp_DataOwner*>( owner );
-      if( sowner ) {
-        curEntry = sowner->entry();
-        entry = myStudy->referencedToEntry( curEntry );
+      LightApp_DataOwner* sowner = dynamic_cast<LightApp_DataOwner*>( (*anIt ).get() );
+      if( sowner )
+      {
+        entry = myStudy->referencedToEntry( sowner->entry() );
         myEntries.append( entry );
-        if ( curEntry == entry )
-	  myIsReferences.append( true );
-        else
-	  myIsReferences.append( false );
+	myIsReferences.append( sowner->entry() == entry );
         processOwner( sowner );
       }
     }
@@ -120,7 +129,7 @@ QtxValue LightApp_Selection::globalParam( const QString& p ) const
 }
 
 /*!
-  Do nothing.
+  Do nothing. To be redefined by successors
 */
 void LightApp_Selection::processOwner( const LightApp_DataOwner* )
 {
