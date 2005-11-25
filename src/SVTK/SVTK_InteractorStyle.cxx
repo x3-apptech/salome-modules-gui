@@ -120,7 +120,10 @@ vtkStandardNewMacro(SVTK_InteractorStyle);
 SVTK_InteractorStyle
 ::SVTK_InteractorStyle() 
 {
+  myPreViewActor = NULL;
+  myInteractor = NULL;
   myViewWindow = NULL;
+  myGUIWindow = NULL;
   this->MotionFactor = 10.0;
   this->State = VTK_INTERACTOR_STYLE_CAMERA_NONE;
   this->RadianToDegree = 180.0 / vtkMath::Pi();
