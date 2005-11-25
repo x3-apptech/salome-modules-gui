@@ -2,7 +2,6 @@
 // Author:    Sergey TELKOV
 
 #include "QtxWorkstack.h"
-#include "QtxNameDlg.h"
 
 #include <qstyle.h>
 #include <qimage.h>
@@ -17,6 +16,7 @@
 #include <qpushbutton.h>
 #include <qwidgetstack.h>
 #include <qapplication.h>
+#include <qinputdialog.h>
 
 /*!
     Class: QtxWorkstack [Public]
@@ -27,12 +27,12 @@ QtxWorkstack::QtxWorkstack( QWidget* parent )
 : QWidget( parent ),
 myWin( 0 ),
 myArea( 0 ),
-myWinForAction( 0 )
+myWorkWin( 0 )
 {
-  myActionsMap.insert( SplitVertical,   new QAction( tr( "Split vertically" ),   0, this ));
-  myActionsMap.insert( SplitHorizontal, new QAction( tr( "Split horizontally" ), 0, this ));
-  myActionsMap.insert( Close,           new QAction( tr( "Close" ),       0, this ));
-  myActionsMap.insert( Rename,          new QAction( tr( "Rename" ),      0, this ));
+  myActionsMap.insert( SplitVertical,   new QAction( tr( "Split vertically" ),   0, this ) );
+  myActionsMap.insert( SplitHorizontal, new QAction( tr( "Split horizontally" ), 0, this ) );
+  myActionsMap.insert( Close,           new QAction( tr( "Close" ),       0, this ) );
+  myActionsMap.insert( Rename,          new QAction( tr( "Rename" ),      0, this ) );
 
   connect( myActionsMap[SplitVertical], SIGNAL( activated() ), this, SLOT( splitVertical() ) );
   connect( myActionsMap[SplitHorizontal], SIGNAL( activated() ), this, SLOT( splitHorizontal() ) );
@@ -711,12 +711,14 @@ void QtxWorkstack::splitHorizontal()
 
 void QtxWorkstack::renameWindow( QWidget* w )
 {
-  if( !w )
+  if ( !w )
     return;
 
-  QString new_name = QtxNameDlg::getName( ( QWidget* )parent(), w->caption() );
-  if( !new_name.isEmpty() )
-    w->setCaption( new_name );
+  bool ok = false;
+  QString newName = QInputDialog::getText( tr( "Rename" ), tr( "Enter new name:" ), QLineEdit::Normal,
+                                           w->caption(), &ok, topLevelWidget() );
+  if ( ok )
+    w->setCaption( newName );
 }
 
 void QtxWorkstack::onRenameActive()
@@ -726,7 +728,7 @@ void QtxWorkstack::onRenameActive()
 
 void QtxWorkstack::onRename()
 {
-  renameWindow( myWinForAction );
+  renameWindow( myWorkWin );
 }
 
 QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )
@@ -795,10 +797,8 @@ void QtxWorkstack::insertWidget( QWidget* wid, QWidget* pWid, QWidget* after )
 */
 void QtxWorkstack::onCloseWindow()
 {
-  //if ( activeWindow() )
-    //activeWindow()->close();
-  if( myWinForAction )
-    myWinForAction->close();
+  if ( myWorkWin )
+    myWorkWin->close();
 }
 
 void QtxWorkstack::onDestroyed( QObject* obj )
@@ -851,7 +851,6 @@ void QtxWorkstack::onDeactivated( QtxWorkstackArea* area )
 
 void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
 {
-  myWinForAction = 0;
   if ( !activeArea() )
     return;
 
@@ -859,7 +858,8 @@ void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
   if ( lst.isEmpty() )
     return;
 
-  myWinForAction = w;
+  myWorkWin = w;
+
   QPopupMenu* pm = new QPopupMenu();
   
   if ( lst.count() > 1 )
@@ -869,12 +869,18 @@ void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
     pm->insertSeparator();
   }
 
-  myActionsMap[Close]->addTo( pm );
-  myActionsMap[Rename]->addTo( pm );
-  
-  pm->exec( p );
+  if ( w )
+  {
+    myActionsMap[Close]->addTo( pm );
+    myActionsMap[Rename]->addTo( pm );
+  }
+
+  if ( pm->count() )
+    pm->exec( p );
 
   delete pm;
+
+  myWorkWin = 0;
 }
 
 void QtxWorkstack::childEvent( QChildEvent* e )
@@ -1134,7 +1140,7 @@ QtxWorkstackArea::QtxWorkstackArea( QWidget* parent )
   connect( myClose, SIGNAL( clicked() ), this, SLOT( onClose() ) );
   connect( myBar, SIGNAL( selected( int ) ), this, SLOT( onSelected( int ) ) );
   connect( myBar, SIGNAL( dragActiveTab() ), this, SLOT( onDragActiveTab() ) );
-  connect( myBar, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( onBarRequestContextMenu( QPoint ) ) );
+  connect( myBar, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( onContextMenuRequested( QPoint ) ) );
 
   updateState();
 
@@ -1189,16 +1195,23 @@ void QtxWorkstackArea::insertWidget( QWidget* wid, const int idx )
   setWidgetActive( wid );
 }
 
-void QtxWorkstackArea::onBarRequestContextMenu( QPoint p )
+void QtxWorkstackArea::onContextMenuRequested( QPoint p )
 {
-  const QtxWorkstackTabBar* bar = dynamic_cast<const QtxWorkstackTabBar*>( sender() );
-  if( bar )
-    emit contextMenuRequested( widget( myBar->tabAt( tabAt( p ) )->identifier() ), p );
+  const QtxWorkstackTabBar* bar = ::qt_cast<const QtxWorkstackTabBar*>( sender() );
+  if ( !bar )
+    return;
+
+  QWidget* wid = 0;
+  QTab* tab = myBar->tabAt( tabAt( p ) );
+  if ( tab )
+    wid = widget( tab->identifier() );
+
+  emit contextMenuRequested( wid, p );
 }
 
 void QtxWorkstackArea::onWidgetDestroyed()
 {
-  if( sender() )
+  if ( sender() )
     removeWidget( (QWidget*)sender(), false );
 }
 

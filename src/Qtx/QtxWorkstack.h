@@ -34,7 +34,8 @@ class QTX_EXPORT QtxWorkstack : public QWidget
 public:
   enum { SplitVertical, SplitHorizontal, Close, Rename };
     
-  enum SplitType {
+  enum SplitType
+  {
     SPLIT_STAY, //!< given widget stays in its workarea, others are moved into a new one
     SPLIT_AT,   //!< widgets before a given widget stays in they workarea, others are moved into a new one
     SPLIT_MOVE  //!< given widget is moved into a new workarea, others stay in an old one
@@ -110,9 +111,10 @@ private:
 				                           const int need_pos, const int splitter_pos );
 
 private:
-  QWidget*            myWin, *myWinForAction;
+  QWidget*            myWin;
   QtxWorkstackArea*   myArea;
   QSplitter*          mySplit;
+  QWidget*            myWorkWin;
 
   QMap<int, QAction*> myActionsMap; //!< The map of the actions. Allows to get the QAction object by the key.
 
@@ -167,13 +169,14 @@ private slots:
 
   void                onWidgetDestroyed();
 
-  void                onDragActiveTab();
   void                onChildDestroyed( QObject* );
   void                onChildShown( QtxWorkstackChild* );
   void                onChildHided( QtxWorkstackChild* );
   void                onChildActivated( QtxWorkstackChild* );
   void                onChildCaptionChanged( QtxWorkstackChild* );
-  void                onBarRequestContextMenu( QPoint );
+
+  void                onDragActiveTab();
+  void                onContextMenuRequested( QPoint );
 
 protected:
   virtual void        customEvent( QCustomEvent* );
