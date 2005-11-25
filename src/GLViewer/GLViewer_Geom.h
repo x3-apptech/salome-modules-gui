@@ -169,6 +169,9 @@ public:
   GLViewer_Poly( const GLViewer_PntList* thePoints );
   virtual ~GLViewer_Poly();
 
+  //! Adds point to polygon
+  void              AddPoint( GLViewer_Pnt& pnt ) { myPoints->append( pnt ); }
+
   //! Returns number of point
   int               Count() const { return myPoints->count(); }
 
@@ -183,7 +186,6 @@ public:
   
   // Returns true if intersection of this polygon with a segment or a ray not empty
   virtual bool      HasIntersection( const GLViewer_Segment& theSegment ) const;
-
 
 private:
   GLViewer_PntList* myPoints;
