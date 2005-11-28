@@ -44,7 +44,7 @@ class LIGHTAPP_EXPORT LightApp_Application : public CAM_Application
 public:
   typedef enum { WT_ObjectBrowser, WT_PyConsole, WT_LogWindow, WT_User } WindowTypes;
 
-  enum { NewGLViewId = STD_Application::UserID, NewPlot2dId, NewOCCViewId, NewVTKViewId,
+  enum { NewGLViewId = CAM_Application::UserID, NewPlot2dId, NewOCCViewId, NewVTKViewId,
          PreferencesId, MRUId, RenameId, UserID };
 public:
   LightApp_Application();
@@ -150,6 +150,7 @@ private slots:
   void                                onPreferences();
   void                                onMRUActivated( QString );
   void                                onPreferenceChanged( QString&, QString&, QString& );
+  void                                onRenameWindow();
 
 protected:
   void                                updateWindows();

@@ -73,6 +73,7 @@
 #include <qmap.h>
 #include <qstatusbar.h>
 #include <qthread.h>
+#include <qinputdialog.h>
 
 #define OBJECT_BROWSER_WIDTH 300
 #define OBJECT_COLUMN_WIDTH 150
@@ -457,13 +458,9 @@ void LightApp_Application::createActions()
     createMenu( a, newWinMenu, -1 );
   }
 
-  STD_TabDesktop* tab_desk = dynamic_cast<STD_TabDesktop*>( desk );
-  if( tab_desk )
-  {
-    QAction* a = createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_RENAME" ), tr( "PRP_RENAME" ),
-			       0, desk, false, tab_desk->workstack(), SLOT( onRenameActive() ) );
-    createMenu( a, windowMenu, -1 );
-  }
+  createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_RENAME" ), tr( "PRP_RENAME" ),
+		0, desk, false, this, SLOT( onRenameWindow() ) );
+  createMenu( RenameId, windowMenu, -1 );
 
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
 
@@ -1876,4 +1873,20 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
            this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
   STD_Application::removeViewManager( vm );
   delete vm;
+}
+
+/*! rename active window of desktop */
+void LightApp_Application::onRenameWindow()
+{
+  if( !desktop() )
+    return;
+
+  QWidget* w = desktop()->activeWindow();
+  if( !w )
+    return;
+
+  bool ok;
+  QString name = QInputDialog::getText( tr( "TOT_RENAME" ), tr( "PRP_RENAME" ), QLineEdit::Normal, w->caption(), &ok, w );
+  if( ok && !name.isEmpty() )
+    w->setCaption( name );
 }

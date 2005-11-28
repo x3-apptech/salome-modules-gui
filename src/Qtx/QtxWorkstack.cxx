@@ -709,26 +709,16 @@ void QtxWorkstack::splitHorizontal()
   split( Qt::Vertical );
 }
 
-void QtxWorkstack::renameWindow( QWidget* w )
+void QtxWorkstack::onRename()
 {
-  if ( !w )
+  if ( !myWorkWin )
     return;
 
   bool ok = false;
   QString newName = QInputDialog::getText( tr( "Rename" ), tr( "Enter new name:" ), QLineEdit::Normal,
-                                           w->caption(), &ok, topLevelWidget() );
-  if ( ok )
-    w->setCaption( newName );
-}
-
-void QtxWorkstack::onRenameActive()
-{
-  renameWindow( activeWindow() );
-}
-
-void QtxWorkstack::onRename()
-{
-  renameWindow( myWorkWin );
+                                           myWorkWin->caption(), &ok, topLevelWidget() );
+  if ( ok && !newName.isEmpty() )
+    myWorkWin->setCaption( newName );
 }
 
 QSplitter* QtxWorkstack::wrapSplitter( QtxWorkstackArea* area )

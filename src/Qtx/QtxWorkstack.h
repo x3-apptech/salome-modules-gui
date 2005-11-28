@@ -69,7 +69,6 @@ signals:
 public slots:
   void                splitVertical();
   void                splitHorizontal();
-  void                onRenameActive();
   
 private slots:
   void                onRename();
@@ -90,7 +89,6 @@ private:
 
   QSplitter*          wrapSplitter( QtxWorkstackArea* );
   void                insertWidget( QWidget*, QWidget*, QWidget* );
-  void                renameWindow( QWidget* );
 
   QtxWorkstackArea*   areaAt( const QPoint& ) const;
 
