@@ -363,7 +363,7 @@ void LightApp_Application::createActions()
       continue;
 
     QString modName = moduleName( *it );
-    if ( modName.compare("GEOM") == 0 ) { // to be removed when documentation for other modules will be done
+    if ( modName.compare("GEOM") == 0 || modName.compare("SMESH") == 0 ) { // to be removed when documentation for other modules will be done
       QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
 				 tr( moduleTitle(modName) + QString(" Help") ),
 				 tr( moduleTitle(modName) + QString(" Help") ),
