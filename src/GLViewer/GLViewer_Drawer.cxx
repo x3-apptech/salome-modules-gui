@@ -671,7 +671,7 @@ void GLViewer_Drawer::drawTexturePart( GLuint texture,
 
   glEnable( GL_TEXTURE_2D );
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-  glAlphaFunc( GL_GREATER, 0.95F );
+  glAlphaFunc( GL_GREATER, 0.05F );
   glEnable( GL_ALPHA_TEST );
   
   glBindTexture( GL_TEXTURE_2D, texture );
