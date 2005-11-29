@@ -128,6 +128,8 @@ myRaise( false )
 
 QtxListAction::~QtxListAction()
 {
+  if ( myFrame )
+    myFrame->myAction = 0;
 }
 
 /*!
@@ -300,6 +302,10 @@ bool QtxListAction::removeFrom( QWidget* w )
   }
   else if ( w->inherits( "QPopupMenu" ) )
     myPopups.remove( w );
+
+#if QT_VER >= 3
+	disconnect( w, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
+#endif
 
   return true;
 }
