@@ -345,15 +345,21 @@ void LightApp_Application::createActions()
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
   // help for KERNEL and GUI
   QCString dir;
+  QString aFileName;
+  QString root;
   QAction* a;
   if (dir = getenv("GUI_ROOT_DIR")) {
-    a = createAction( id, tr( QString("Kernel & GUI Help") ), QIconSet(),
-		      tr( QString("Kernel && GUI Help") ),
-		      tr( QString("Kernel & GUI Help") ),
-		      0, desk, false, this, SLOT( onHelpContentsModule() ) );
-    a->setName( QString("GUI") );
-    createMenu( a, helpModuleMenu, -1 );
-    id++;
+    aFileName = "GUI_index_v3.1.0.html";
+    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
+    if ( QFileInfo( root + aFileName ).exists() ) {
+      a = createAction( id, tr( QString("Kernel & GUI Help") ), QIconSet(),
+			tr( QString("Kernel && GUI Help") ),
+			tr( QString("Kernel & GUI Help") ),
+			0, desk, false, this, SLOT( onHelpContentsModule() ) );
+      a->setName( QString("GUI") );
+      createMenu( a, helpModuleMenu, -1 );
+      id++;
+    }
   }
   // help for other existing modules
   QStringList::Iterator it;
@@ -363,14 +369,20 @@ void LightApp_Application::createActions()
       continue;
 
     QString modName = moduleName( *it );
-    if ( modName.compare("GEOM") == 0 || modName.compare("SMESH") == 0 ) { // to be removed when documentation for other modules will be done
-      QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
-				 tr( moduleTitle(modName) + QString(" Help") ),
-				 tr( moduleTitle(modName) + QString(" Help") ),
-				 0, desk, false, this, SLOT( onHelpContentsModule() ) );
-      a->setName( modName );
-      createMenu( a, helpModuleMenu, -1 );
-      id++;
+    aFileName = modName + "_index_v3.1.0.html";
+    
+    if (dir = getenv( modName + "_ROOT_DIR")) {
+      root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
+      if ( QFileInfo( root + aFileName ).exists() ) {
+
+	QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
+				   tr( moduleTitle(modName) + QString(" Help") ),
+				   tr( moduleTitle(modName) + QString(" Help") ),
+				   0, desk, false, this, SLOT( onHelpContentsModule() ) );
+	a->setName( modName );
+	createMenu( a, helpModuleMenu, -1 );
+	id++;
+      }
     }
   }
 
@@ -778,21 +790,10 @@ void LightApp_Application::onHelpContentsModule()
   const QAction* obj = (QAction*) sender();
 
   QString aComponentName = obj->name();
-  QString aFileName = aComponentName + "_index.html";
+  QString aFileName = aComponentName + "_index_v3.1.0.html";
 
-  QCString dir;
-  QString root;
-  QString homeDir;
-  if (dir = getenv( aComponentName + "_ROOT_DIR")) {
-    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
-    if ( QFileInfo( root + aFileName ).exists() ) {
-      homeDir = root;
-    } else {
-      SUIT_MessageBox::warn1( desktop(), tr("WRN_WARNING"),
-			      QString( "%1"+ aFileName + " doesn't exist." ).arg(root), tr ("BUT_OK") );
-      return;
-    }
-  }
+  QCString dir = getenv( aComponentName + "_ROOT_DIR");
+  QString homeDir = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
 
   QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();
