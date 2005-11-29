@@ -75,7 +75,9 @@ protected:
   virtual void       wheelEvent( QWheelEvent* );
   
   double             bound( double );
-  
+
+  QString            removeTrailingZeroes( const QString& ) const;
+
 private:
   double             myMin;
   double             myMax;

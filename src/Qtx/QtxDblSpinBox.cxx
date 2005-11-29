@@ -371,15 +371,15 @@ QString QtxDblSpinBox::currentValueText()
 QString QtxDblSpinBox::mapValueToText( double v )
 {
 	QString s;
-  s.setNum( v, myPrecision < 0 ? 'f' : 'g', myPrecision == 0 ? 6 : QABS( myPrecision ) );
-  return s;
+  s.setNum( v, myPrecision >= 0 ? 'f' : 'g', myPrecision == 0 ? 6 : QABS( myPrecision ) );
+  return removeTrailingZeroes( s );
 }
 
 QString QtxDblSpinBox::mapValueToText( int )
 {
   QString s;
-  s.setNum( myValue, myPrecision < 0 ? 'f' : 'g', myPrecision == 0 ? 6 : QABS( myPrecision ) );
-  return s;
+  s.setNum( myValue, myPrecision >= 0 ? 'f' : 'g', myPrecision == 0 ? 6 : QABS( myPrecision ) );
+  return removeTrailingZeroes( s );
 }
 
 double QtxDblSpinBox::mapTextToDoubleValue( bool* ok )
@@ -423,4 +423,25 @@ void QtxDblSpinBox::onTextChanged( const QString& str )
 {
   if ( !myBlocked )
     myCleared = false;
+}
+
+QString QtxDblSpinBox::removeTrailingZeroes( const QString& src ) const
+{
+  QString delim( "." );
+
+  int idx = src.findRev( delim );
+  if ( idx == -1 )
+    return src;
+
+  QString iPart = src.left( idx );
+  QString fPart = src.mid( idx + 1 );
+
+  while ( !fPart.isEmpty() && fPart.at( fPart.length() - 1 ) == '0' )
+    fPart.remove( fPart.length() - 1, 1 );
+
+  QString res = iPart;
+  if ( !fPart.isEmpty() )
+    res += delim + fPart;
+
+  return res;
 }
