@@ -789,6 +789,8 @@ void QtxWorkstack::onCloseWindow()
 {
   if ( myWorkWin )
     myWorkWin->close();
+  else
+    activeWindow()->close();
 }
 
 void QtxWorkstack::onDestroyed( QObject* obj )
