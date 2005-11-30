@@ -505,6 +505,9 @@ std::string LightApp_Driver::GetTmpDir()
     aDir = OSD_Directory(aPath);
   }
 
+  OSD_Protection aProtection(OSD_RW, OSD_RWX, OSD_RX, OSD_RX);
+  aDir.Build(aProtection);
+
   myTmpDir = aTmpDir.ToCString();
 
   return aTmpDir.ToCString();
