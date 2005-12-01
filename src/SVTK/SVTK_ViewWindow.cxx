@@ -204,6 +204,7 @@ SVTK_ViewWindow
 }
 
 //----------------------------------------------------------------------------
+//#pragma optimize( "", off )
 void
 SVTK_ViewWindow
 ::createActions()
@@ -314,6 +315,7 @@ SVTK_ViewWindow
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewTrihedron()));
   myActionsMap[ ViewTrihedronId ] = aAction;
 }
+#pragma optimize( "", on )
 
 //----------------------------------------------------------------------------
 void
