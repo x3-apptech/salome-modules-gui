@@ -73,6 +73,8 @@
 #include <qmap.h>
 #include <qstatusbar.h>
 #include <qthread.h>
+#include <qobjectlist.h>
+#include <qcombobox.h>
 #include <qinputdialog.h>
 
 #define OBJECT_BROWSER_WIDTH 300
@@ -419,7 +421,16 @@ void LightApp_Application::createActions()
   const int iconSize = 20;
 
   modGroup->addTo( modTBar );
-  modTBar->addSeparator();
+  QObjectList *l = modTBar->queryList( "QComboBox" );
+  QObjectListIt oit( *l );
+  while ( QObject* obj = oit.current() ) {
+    QComboBox* cb = (QComboBox*)obj;
+    if ( cb ) cb->setFocusPolicy( QWidget::NoFocus );
+    ++oit;
+  }
+  delete l;
+  
+   modTBar->addSeparator();
 
   QStringList modList;
   modules( modList, false );
