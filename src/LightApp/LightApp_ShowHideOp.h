@@ -18,7 +18,6 @@ public:
   
 protected:
   virtual void startOperation();
-  virtual LightApp_Displayer* displayer( const QString& ) const;
 
 private:
   ActionType   myActionType;

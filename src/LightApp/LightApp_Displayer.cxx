@@ -1,6 +1,9 @@
 
 #include "LightApp_Displayer.h"
 #include "LightApp_Application.h"
+#include "LightApp_Module.h"
+
+#include <CAM_Study.h>
 
 #include <SALOME_InteractiveObject.hxx>
 
@@ -142,4 +145,49 @@ SALOME_View* LightApp_Displayer::GetActiveView()
     }
   }
   return 0;
+}
+
+bool LightApp_Displayer::canBeDisplayed( const QString&, const QString& ) const
+{
+  return true;
+}
+
+bool LightApp_Displayer::canBeDisplayed( const QString& entry ) const
+{
+  QString viewerType;
+  SUIT_Session* session = SUIT_Session::session();
+  if(  SUIT_Application* app = session->activeApplication() )
+    if( LightApp_Application* sApp = dynamic_cast<LightApp_Application*>( app ) )
+      if( SUIT_ViewManager* vman = sApp->activeViewManager() )
+	if( SUIT_ViewModel* vmod = vman->getViewModel() )
+	  viewerType = vmod->getType();
+  return !viewerType.isNull() && canBeDisplayed( entry, viewerType );
+}
+
+LightApp_Displayer* LightApp_Displayer::FindDisplayer( const QString& mod_name, const bool load )
+{
+  SUIT_Session* session = SUIT_Session::session();
+  SUIT_Application* sapp = session ? session->activeApplication() : 0;
+  LightApp_Application* app = dynamic_cast<LightApp_Application*>( sapp );
+  if( !app )
+    return 0;
+
+  LightApp_Module* m = dynamic_cast<LightApp_Module*>( app ? app->module( mod_name ) : 0 );
+  if( !m && load )
+  {
+    m = dynamic_cast<LightApp_Module*>( app->loadModule( mod_name ) );
+    if( m )
+      app->addModule( m );
+  }
+
+  if( m )
+  {
+    m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
+    if( m!=app->activeModule() && load )
+    {
+      m->setMenuShown( false );
+      m->setToolShown( false );
+    }
+  }
+  return m ? m->displayer() : 0;
 }

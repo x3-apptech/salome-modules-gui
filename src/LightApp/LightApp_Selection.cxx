@@ -85,20 +85,45 @@ int LightApp_Selection::count() const
 */
 QtxValue LightApp_Selection::param( const int ind, const QString& p ) const
 {
-  if( !( ind>=0 && ind<count() ) )
+  LightApp_Application* app = dynamic_cast<LightApp_Application*>( myStudy ? myStudy->application() : 0 );
+  if( !( ind>=0 && ind<count() ) || !app )
     return QtxValue();
 
   if( p=="isVisible" )
   {
-    LightApp_Displayer d;
-    bool vis = d.IsDisplayed( myEntries[ ind ] );
+    QString mod_name = app->moduleTitle( param( ind, "component" ).toString() );
+    LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, false );
+    // false in last parameter means that now we doesn't load module, if it isn't loaded
+
+    bool vis = false;
+    if( d )
+      vis = d->IsDisplayed( myEntries[ ind ] );
+    else
+    {
+      LightApp_Displayer local_d;
+      vis = local_d.IsDisplayed( myEntries[ ind ] );
+    }
     return QtxValue( vis, 0 );
   }
-  else if( p=="component" ) {
+
+  else if( p=="component" )
+  {
     return myStudy->componentDataType( myEntries[ ind ] );
   }
+
   else if( p=="isReference" )
     return QtxValue( isReference( ind ), false );
+
+  else if( p=="canBeDisplayed" )
+  {
+    QString mod_name = app->moduleTitle( param( ind, "component" ).toString() );
+    LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, false );
+    // false in last parameter means that now we doesn't load module, if it isn't loaded
+
+    return QtxValue( d ? d->canBeDisplayed( myEntries[ ind ] ) : true, 0 );
+    //now if displayer is null, it means, that according module isn't loaded, so that we allow to all display/erase
+    //operations under object
+  }
 
   return QtxValue();
 }

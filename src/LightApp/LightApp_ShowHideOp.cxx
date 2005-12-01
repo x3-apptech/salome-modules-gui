@@ -23,29 +23,6 @@ LightApp_ShowHideOp::~LightApp_ShowHideOp()
 {
 }
 
-LightApp_Displayer* LightApp_ShowHideOp::displayer( const QString& mod_name ) const
-{
-  LightApp_Application* app = dynamic_cast<LightApp_Application*>( application() );
-  LightApp_Module* m = dynamic_cast<LightApp_Module*>( app ? app->module( mod_name ) : 0 );
-  if( !m )
-  {
-    m = dynamic_cast<LightApp_Module*>( app->loadModule( mod_name ) );
-    if( m )
-      app->addModule( m );
-  }
-
-  if( m )
-  {
-    m->connectToStudy( dynamic_cast<CAM_Study*>( app->activeStudy() ) );
-    if( m!=app->activeModule() )
-    {
-      m->setMenuShown( false );
-      m->setToolShown( false );
-    }
-  }
-  return m ? m->displayer() : 0;
-}
-
 void LightApp_ShowHideOp::startOperation()
 {
   LightApp_Application* app = dynamic_cast<LightApp_Application*>( application() );
@@ -65,7 +42,7 @@ void LightApp_ShowHideOp::startOperation()
   }
   QString aStr =  sel.param( 0, "component" ).toString();
   QString mod_name = app->moduleTitle( aStr );//sel.param( 0, "component" ).toString() );
-  LightApp_Displayer* d = displayer( mod_name );
+  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, true );
   if( !d )
   {
     abort();
@@ -80,7 +57,7 @@ void LightApp_ShowHideOp::startOperation()
     QStringList::const_iterator anIt = comps.begin(), aLast = comps.end();
     for( ; anIt!=aLast; anIt++ )
     {
-      LightApp_Displayer* disp = displayer( app->moduleTitle( *anIt ) );
+      LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( app->moduleTitle( *anIt ), true );
       if( disp )
 	disp->EraseAll( false, false, 0 );
     }

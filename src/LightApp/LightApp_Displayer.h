@@ -19,7 +19,11 @@ public:
   bool IsDisplayed( const QString&, SALOME_View* = 0 ) const;
   void UpdateViewer() const;
 
-  static SALOME_View*  GetActiveView();
+  static SALOME_View*        GetActiveView();
+  static LightApp_Displayer* FindDisplayer( const QString&, const bool );
+
+  virtual bool canBeDisplayed( const QString& /*entry*/, const QString& /*viewer_type*/ ) const;
+          bool canBeDisplayed( const QString& /*entry*/ ) const;
 
 protected:
   virtual SALOME_Prs* buildPresentation( const QString&, SALOME_View* = 0 );

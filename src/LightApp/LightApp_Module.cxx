@@ -253,8 +253,9 @@ QtxPopupMgr* LightApp_Module::popupMgr()
     myPopupMgr->insert( eraseAll, -1, 0 );
     myPopupMgr->insert( separator(), -1, 0 );
 
-    QString uniform = "( count( $component ) = 1 ) and ( component != activeModule ) and ( activeModule = '%1' )";
-    uniform = uniform.arg( name() );
+    QString oneAndNotActive = "( count( $component ) = 1 ) and ( component != activeModule )";
+    QString uniform = "true in $canBeDisplayed and %1 and ( activeModule = '%2' )";
+    uniform = uniform.arg( oneAndNotActive ).arg( name() );
     myPopupMgr->setRule( disp, /*QString( "( not isVisible ) and " ) + */ uniform, true );
     myPopupMgr->setRule( erase, /*QString( "( isVisible ) and " ) + */ uniform, true );
     myPopupMgr->setRule( dispOnly, uniform, true );
