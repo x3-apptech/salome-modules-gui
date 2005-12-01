@@ -789,7 +789,7 @@ void QtxWorkstack::onCloseWindow()
 {
   if ( myWorkWin )
     myWorkWin->close();
-  else
+  else if( activeWindow() )
     activeWindow()->close();
 }
 
