@@ -454,9 +454,9 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
                                   theEvent->pos(), theEvent->globalPos(),
                                   theEvent->state() );
         emit contextMenuRequested( &aEvent );
-        break;
       }
     }
+    break;
   case ROTATE:
     myViewPort->endRotation();
     resetState();
