@@ -30,6 +30,7 @@
     <parameter name="OB"           value="${SUITRoot}/resources"/>
     <parameter name="CAM"          value="${SUITRoot}/resources"/>
     <parameter name="LightApp"     value="${SUITRoot}/resources"/>
+    <parameter name="SVTK"         value="${SUITRoot}/resources"/>
     <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources"/>
     <parameter name="ToolsGUI"     value="${SUITRoot}/resources"/>
   </section>
