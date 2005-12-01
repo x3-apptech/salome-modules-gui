@@ -204,7 +204,7 @@ SVTK_ViewWindow
 }
 
 //----------------------------------------------------------------------------
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void
 SVTK_ViewWindow
 ::createActions()
