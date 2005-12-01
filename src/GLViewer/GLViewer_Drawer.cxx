@@ -664,16 +664,20 @@ void GLViewer_Drawer::drawTexturePart( GLuint texture,
                                        GLfloat y,
                                        GLfloat scale )
 {
+  if( !texture )
+    return;
+
   float xScale = scale > 0. ? 1./scale : myXScale;
   float yScale = scale > 0. ? 1./scale : myYScale;
 
   glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
+
   glEnable( GL_TEXTURE_2D );
-  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-  glAlphaFunc( GL_GREATER, 0.05F );
-  glEnable( GL_ALPHA_TEST );
-  
+  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+  bool hasAlpha = glIsEnabled( GL_ALPHA_TEST );
+  glDisable( GL_ALPHA_TEST );
+
   glBindTexture( GL_TEXTURE_2D, texture );
   glBegin( GL_QUADS );
 
@@ -692,7 +696,9 @@ void GLViewer_Drawer::drawTexturePart( GLuint texture,
   glEnd();
   glFlush();
 
-  glDisable( GL_ALPHA_TEST );
+  if ( hasAlpha )
+    glEnable( GL_ALPHA_TEST );
+
   glDisable( GL_TEXTURE_2D );
 }
 
