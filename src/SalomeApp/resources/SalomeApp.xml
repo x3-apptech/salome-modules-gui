@@ -157,6 +157,7 @@
     <parameter value="true" name="DisplayMode" />
     <parameter value="true" name="auto_update" />
     <parameter value="1" name="display_mode" />
+    <parameter value="false" name="auto_groups" />
   </section>
   <section name="VISU" >
   <parameter value="false" name="full_med_loading" />
