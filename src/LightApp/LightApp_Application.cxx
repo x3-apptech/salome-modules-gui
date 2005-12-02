@@ -80,7 +80,11 @@
 #define OBJECT_BROWSER_WIDTH 300
 #define OBJECT_COLUMN_WIDTH 150
 
+#ifdef WIN32
+#define DEFAULT_BROWSER "start iexplore.exe"
+#else
 #define DEFAULT_BROWSER "mozilla"
+#endif
 
 #define FIRST_HELP_ID 1000000
 
@@ -754,7 +758,13 @@ class RunBrowser: public QThread {
 public:
 
   RunBrowser(QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL):
-    myApp(theApp), myParams(theParams), myHelpFile("file:" + theHelpFile + theContext), myStatus(0) {};
+    myApp(theApp), myParams(theParams), 
+#ifdef WIN32
+      myHelpFile("file://" + theHelpFile + theContext), 
+#else
+      myHelpFile("file:" + theHelpFile + theContext),
+#endif
+      myStatus(0) {};
 
   virtual void run()
   {
