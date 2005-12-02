@@ -24,7 +24,7 @@
 
 #include <Python.h>   // must be before qt includes ...
 
-#ifndef WNT
+#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
 extern "C" PyObject * PyEval_EvalCode(PyObject *co, PyObject *g, PyObject *l);
 #endif
 
