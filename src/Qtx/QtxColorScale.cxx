@@ -604,7 +604,7 @@ QSize QtxColorScale::calculateSize( const bool min, const int flags, const bool 
 	{
 		scaleWidth = colorWidth + textWidth + ( textWidth ? 3 : 2 ) * spacer;
 		if ( min )
-			scaleHeight = QMAX( 2 * num, 3 * textHeight );
+			scaleHeight = 3 * textHeight;
 		else
 			scaleHeight = (int)( 1.5 * ( num + 1 ) * textHeight );
 	}
