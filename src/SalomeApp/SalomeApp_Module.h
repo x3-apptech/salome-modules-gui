@@ -16,7 +16,7 @@ class CAM_DataModel;
 class SalomeApp_Application;
 class LightApp_Operation;
 class LightApp_Selection;
-
+class SALOME_ListIO;
 class QString;
 
 /*!
@@ -44,7 +44,7 @@ public:
 protected:
   virtual CAM_DataModel*              createDataModel();
   virtual LightApp_Selection*         createSelection() const;
-
+  virtual void                        extractContainers( const SALOME_ListIO&, SALOME_ListIO& ) const;
 };
 
 #endif

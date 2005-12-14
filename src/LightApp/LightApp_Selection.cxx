@@ -128,6 +128,11 @@ QtxValue LightApp_Selection::param( const int ind, const QString& p ) const
   {
     return myStudy->componentDataType( myEntries[ ind ] );
   }
+  
+  else if( p=="isComponent" )
+  {
+    return QtxValue( myStudy->isComponent( myEntries[ ind ] ), 0 );
+  }
 
   else if( p=="isReference" )
     return QtxValue( isReference( ind ), false );
