@@ -1384,8 +1384,13 @@ void QtxWorkstackArea::customEvent( QCustomEvent* e )
     emit activated( activeWidget() );
     break;
   case FocusWidget:
-    if ( activeWidget() && !activeWidget()->focusWidget() )
-      activeWidget()->setFocus();
+    if ( activeWidget() )
+    {
+      if ( !activeWidget()->focusWidget() )
+        activeWidget()->setFocus();
+      else
+        activeWidget()->focusWidget()->setFocus();
+    }
     break;
   case RemoveWidget:
     removeWidget( (QWidget*)e->data() );
