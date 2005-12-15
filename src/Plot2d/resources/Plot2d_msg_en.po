@@ -376,3 +376,6 @@ msgstr "Cross"
 
 msgid "XCROSS_MARKER_LBL"
 msgstr "Diagonal cross"
+
+msgid "POSTSCRIPT_FILES"
+msgstr "PostScript files (*.ps)"
