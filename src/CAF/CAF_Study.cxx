@@ -224,7 +224,10 @@ bool CAF_Study::isSaved() const
 */
 bool CAF_Study::isModified() const
 {
-  return ( myModifiedCnt != 0 );
+	if ( myStdDoc.IsNull() )
+    return false;
+
+  return myStdDoc->IsModified();
 }
 
 /*!
