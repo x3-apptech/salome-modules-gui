@@ -30,44 +30,46 @@
 #include "SUIT.h"
 
 #include <qmainwindow.h>
-#include <qimage.h>
 
 class SUIT_Desktop;
 class SUIT_ViewManager;
+class QImage;
 
 class SUIT_EXPORT SUIT_ViewWindow: public QMainWindow 
 {
   Q_OBJECT
 public:
-  SUIT_ViewWindow(SUIT_Desktop* theDesktop);
+  SUIT_ViewWindow( SUIT_Desktop* );
   virtual ~SUIT_ViewWindow();
 
-  void              setViewManager(SUIT_ViewManager* theManager) { myManager = theManager;}
-  SUIT_ViewManager* getViewManager() const { return myManager; }
+  void              setViewManager( SUIT_ViewManager* );
+  SUIT_ViewManager* getViewManager() const;
 
   bool              event(QEvent*);
 
-  virtual QImage    dumpView() { return QImage(); }
+  virtual QImage    dumpView();
+  virtual bool      dumpViewToFormat( const QString& fileName, const QString& format );
+
   void              onAccelAction( int );
 
 public slots:
   virtual void      onDumpView();
 
 signals:
-  void              closing(SUIT_ViewWindow*);
-  void              mousePressed(SUIT_ViewWindow*, QMouseEvent*);
-  void              mouseReleased(SUIT_ViewWindow*, QMouseEvent*);
-  void              mouseDoubleClicked(SUIT_ViewWindow*, QMouseEvent*);
-  void              mouseMoving(SUIT_ViewWindow*, QMouseEvent*);
-  void              wheeling(SUIT_ViewWindow*, QWheelEvent*);
-  void              keyPressed(SUIT_ViewWindow*, QKeyEvent*);
-  void              keyReleased(SUIT_ViewWindow*, QKeyEvent*);
+  void              closing( SUIT_ViewWindow* );
+  void              mousePressed( SUIT_ViewWindow*, QMouseEvent* );
+  void              mouseReleased( SUIT_ViewWindow*, QMouseEvent* );
+  void              mouseDoubleClicked( SUIT_ViewWindow*, QMouseEvent* );
+  void              mouseMoving( SUIT_ViewWindow*, QMouseEvent* );
+  void              wheeling( SUIT_ViewWindow*, QWheelEvent* );
+  void              keyPressed( SUIT_ViewWindow*, QKeyEvent* );
+  void              keyReleased( SUIT_ViewWindow*, QKeyEvent* );
   void              contextMenuRequested( QContextMenuEvent *e );
 
 protected:
-  void              closeEvent(QCloseEvent* theEvent);
-  virtual void      contextMenuEvent( QContextMenuEvent * e );
-
+  void              closeEvent( QCloseEvent* );
+  virtual void      contextMenuEvent( QContextMenuEvent* );
+  virtual QString   filter() const;
   virtual void      action( const int );
 
   SUIT_Desktop*     myDesktop;

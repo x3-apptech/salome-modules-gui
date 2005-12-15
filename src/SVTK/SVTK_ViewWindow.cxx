@@ -19,6 +19,7 @@
 #include "SALOME_Actor.h"
 
 #include <qapplication.h>
+#include <qimage.h>
 
 #include <vtkTextProperty.h>
 #include <vtkActorCollection.h>

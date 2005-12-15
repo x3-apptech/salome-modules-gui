@@ -110,6 +110,8 @@ public:
   bool    isModeVerLinear();
   bool    isLegendShow() { return myShowLegend; };
 
+  virtual bool print( const QString& file, const QString& format ) const;
+
 protected:
   int     testOperation( const QMouseEvent& );
   void    readPreferences();

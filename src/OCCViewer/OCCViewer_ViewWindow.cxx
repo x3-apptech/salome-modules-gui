@@ -40,6 +40,7 @@
 #include <qpainter.h>
 #include <qapplication.h>
 #include <qdatetime.h>
+#include <qimage.h>
 
 const char* imageZoomCursor[] = { 
 "32 32 3 1",

@@ -34,6 +34,7 @@
 #include <qlayout.h>
 #include <qapplication.h>
 #include <qpopupmenu.h>
+#include <qimage.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -456,4 +457,18 @@ QImage Plot2d_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
   return px.convertToImage();
+}
+
+bool Plot2d_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
+{
+  bool res = myViewFrame ? myViewFrame->print( fileName, format ) : false;
+  if( !res )
+    res = SUIT_ViewWindow::dumpViewToFormat( fileName, format );
+
+  return res;
+}
+
+QString Plot2d_ViewWindow::filter() const
+{
+  return SUIT_ViewWindow::filter() + ";;" + tr( "POSTSCRIPT_FILES" );
 }

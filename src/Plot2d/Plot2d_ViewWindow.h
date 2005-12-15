@@ -47,7 +47,9 @@ public:
   void              contextMenuPopup( QPopupMenu* thePopup );
 
 protected:
-  QImage dumpView();
+  virtual QImage    dumpView();
+  virtual QString   filter() const;
+  virtual bool      dumpViewToFormat( const QString& fileName, const QString& format );
 
 private:
   bool eventFilter(QObject* watched, QEvent* e);

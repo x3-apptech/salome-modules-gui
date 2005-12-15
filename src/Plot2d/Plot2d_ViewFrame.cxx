@@ -38,11 +38,14 @@
 #include <qptrlist.h>
 #include <qlayout.h>
 #include <qmap.h>
+#include <qpainter.h>
+#include <qpaintdevicemetrics.h>
 
 #include <qwt_math.h>
 #include <qwt_plot_canvas.h>
 #include <iostream>
 #include <stdlib.h>
+#include <qprinter.h>
 
 #include <qwt_legend.h>
 
@@ -1834,4 +1837,35 @@ void Plot2d_ViewFrame::updateTitles()
   setTitle( myXTitleEnabled, xTitle + xUnits, XTitle, true );
   setTitle( myYTitleEnabled, yTitle + yUnits, YTitle, true );
   setTitle( true, aTables.join("; "), MainTitle, true );
+}
+
+bool Plot2d_ViewFrame::print( const QString& file, const QString& format ) const
+{
+#ifdef WIN32
+  return false;
+
+#else
+  bool res = false;
+  if( myPlot )
+  {
+    QPaintDevice* pd = 0;
+    if( format=="PS" )
+    {
+      QPrinter* pr = new QPrinter( QPrinter::HighResolution );
+      pr->setPageSize( QPrinter::A4 );
+      pr->setOutputToFile( true );
+      pr->setOutputFileName( file );
+      pr->setPrintProgram( "" );
+      pd = pr;
+    }
+
+    if( pd )
+    {
+      myPlot->print( *pd );
+      res = true;
+      delete pd;
+    }
+  }
+  return res;
+#endif
 }
