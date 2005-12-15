@@ -107,7 +107,7 @@ protected:
   QWidget*                  controlWidget() const;
 
   Handle(DDS_DicItem)       dicItem() const;
-  void                      setDicItem( Handle(DDS_DicItem)& );
+  void                      setDicItem( const Handle(DDS_DicItem)& );
 
   int                       flags() const;
 

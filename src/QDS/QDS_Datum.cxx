@@ -755,7 +755,7 @@ Handle(DDS_DicItem) QDS_Datum::dicItem() const
 /*!
   Set the dictionary item in to the datum.
 */
-void QDS_Datum::setDicItem( Handle(DDS_DicItem)& item )
+void QDS_Datum::setDicItem( const Handle(DDS_DicItem)& item )
 {
   myDicItem = item;
 }
@@ -982,7 +982,7 @@ QString QDS_Datum::format( const int num, const QString& id, const bool convert 
       aType = anItem->GetType();
       aFormat = toQString( anItem->GetFormat( false ) );
       if ( convert )
-        aNum = anItem->FromSI( aNum );
+        aNum = ( int )anItem->FromSI( aNum );
     }
   }
 
