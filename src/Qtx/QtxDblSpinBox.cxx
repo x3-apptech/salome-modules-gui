@@ -360,8 +360,9 @@ void QtxDblSpinBox::rangeChange()
   double max = QMAX( myMin, myMax );
   myMin = min;
   myMax = max;
-  if ( validator()->inherits( "QDoubleValidator" ) )
-    ((QDoubleValidator*)validator())->setRange( myMin, myMax );
+  QDoubleValidator* v = ::qt_cast<QDoubleValidator*>( validator() );
+  if ( v )
+    v->setRange( myMin, myMax );
 
 	if ( myMin == myMax )
 		QSpinBox::setRange( 0, 0 );
