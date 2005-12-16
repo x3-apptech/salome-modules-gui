@@ -1,4 +1,4 @@
-#include "LightApp_ClippingDlg.h"
+#include "OCCViewer_ClippingDlg.h"
 
 #include <QtxDblSpinBox.h>
 
@@ -34,11 +34,11 @@
 #include <qcheckbox.h>
 
 //=================================================================================
-// class    : LightApp_ClippingDlg()
+// class    : OCCViewer_ClippingDlg()
 // purpose  : 
 //=================================================================================
-LightApp_ClippingDlg::LightApp_ClippingDlg( OCCViewer_ViewWindow* view, QWidget* parent, const char* name, bool modal, WFlags fl )
-  : QDialog( parent, "LightApp_ClippingDlg", modal, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu ), myView( view )
+OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidget* parent, const char* name, bool modal, WFlags fl )
+  : QDialog( parent, "OCCViewer_ClippingDlg", modal, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu ), myView( view )
 {
   setCaption( tr( "Clipping" ) );
   
@@ -196,10 +196,10 @@ LightApp_ClippingDlg::LightApp_ClippingDlg( OCCViewer_ViewWindow* view, QWidget*
 }
 
 //=================================================================================
-// function : ~ LightApp_ClippingDlg()
+// function : ~ OCCViewer_ClippingDlg()
 // purpose  : Destroys the object and frees any allocated resources
 //=================================================================================
-LightApp_ClippingDlg::~ LightApp_ClippingDlg()
+OCCViewer_ClippingDlg::~ OCCViewer_ClippingDlg()
 {
   // no need to delete child widgets, Qt does it all for us
 }
@@ -209,7 +209,7 @@ LightApp_ClippingDlg::~ LightApp_ClippingDlg()
 // function : closeEvent
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::closeEvent( QCloseEvent* e )
+void OCCViewer_ClippingDlg::closeEvent( QCloseEvent* e )
 {
   erasePreview();
   QDialog::closeEvent( e );
@@ -220,7 +220,7 @@ void LightApp_ClippingDlg::closeEvent( QCloseEvent* e )
 // function : showEvent
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::showEvent( QShowEvent* e )
+void OCCViewer_ClippingDlg::showEvent( QShowEvent* e )
 {
   QDialog::showEvent( e );
   onPreview( PreviewChB->isChecked() );
@@ -231,7 +231,7 @@ void LightApp_ClippingDlg::showEvent( QShowEvent* e )
 // function : hideEvent
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::hideEvent( QHideEvent* e )
+void OCCViewer_ClippingDlg::hideEvent( QHideEvent* e )
 {
   erasePreview();
   QDialog::hideEvent( e );
@@ -242,7 +242,7 @@ void LightApp_ClippingDlg::hideEvent( QHideEvent* e )
 // function : ClickOnClose()
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::ClickOnClose()
+void OCCViewer_ClippingDlg::ClickOnClose()
 {
   erasePreview();
   reject();
@@ -253,7 +253,7 @@ void LightApp_ClippingDlg::ClickOnClose()
 // function : ClickOnApply()
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::ClickOnApply()
+void OCCViewer_ClippingDlg::ClickOnApply()
 {
   qApp->processEvents();
   QApplication::setOverrideCursor( Qt::WaitCursor );
@@ -272,7 +272,7 @@ void LightApp_ClippingDlg::ClickOnApply()
 // function : onReset()
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::onReset()
+void OCCViewer_ClippingDlg::onReset()
 {
   myBusy = true;
   SpinBox_X->setValue(0);
@@ -292,7 +292,7 @@ void LightApp_ClippingDlg::onReset()
 // function : onInvert()
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::onInvert()
+void OCCViewer_ClippingDlg::onInvert()
 {
   double Dx = SpinBox_Dx->value();
   double Dy = SpinBox_Dy->value();
@@ -316,7 +316,7 @@ void LightApp_ClippingDlg::onInvert()
 // function : onModeChanged()
 // purpose  :
 //=================================================================================
-void LightApp_ClippingDlg::onModeChanged( int mode )
+void OCCViewer_ClippingDlg::onModeChanged( int mode )
 {
   bool isUserMode = (mode==0);
   
@@ -381,7 +381,7 @@ void LightApp_ClippingDlg::onModeChanged( int mode )
 // Function : displayPreview
 // Purpose  : 
 //================================================================
-void LightApp_ClippingDlg::displayPreview()
+void OCCViewer_ClippingDlg::displayPreview()
 {
   if ( myBusy || !isValid() )
     return;
@@ -456,7 +456,7 @@ void LightApp_ClippingDlg::displayPreview()
 // Function : erasePreview
 // Purpose  : 
 //================================================================
-void LightApp_ClippingDlg::erasePreview ()
+void OCCViewer_ClippingDlg::erasePreview ()
 {
   OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
   if (!anOCCViewer)
@@ -479,7 +479,7 @@ void LightApp_ClippingDlg::erasePreview ()
 // Function : onValueChanged
 // Purpose  : 
 //================================================================
-void LightApp_ClippingDlg::onValueChanged()
+void OCCViewer_ClippingDlg::onValueChanged()
 {
   if ( PreviewChB->isChecked() )
     {
@@ -493,7 +493,7 @@ void LightApp_ClippingDlg::onValueChanged()
 // Function : onPreview
 // Purpose  : 
 //================================================================
-void LightApp_ClippingDlg::onPreview( bool on )
+void OCCViewer_ClippingDlg::onPreview( bool on )
 {
   erasePreview();
 
@@ -505,7 +505,7 @@ void LightApp_ClippingDlg::onPreview( bool on )
 // Function : onPreview
 // Purpose  : 
 //================================================================
-bool LightApp_ClippingDlg::isValid()
+bool OCCViewer_ClippingDlg::isValid()
 {
   return ( SpinBox_Dx->value()!=0 || SpinBox_Dy->value()!=0 || SpinBox_Dz->value()!=0 );
 }

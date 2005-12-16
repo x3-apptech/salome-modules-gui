@@ -31,7 +31,7 @@
 class SUIT_Desktop;
 class OCCViewer_ViewPort3d;
 
-class LightApp_ClippingDlg;
+class OCCViewer_ClippingDlg;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -145,7 +145,7 @@ protected:
   double myCurScale;
 
 private:
-  LightApp_ClippingDlg* myClippingDlg;
+  OCCViewer_ClippingDlg* myClippingDlg;
   
 };
 

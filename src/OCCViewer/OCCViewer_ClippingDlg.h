@@ -1,7 +1,7 @@
-#ifndef LIGHTAPP_CLIPPINGDLG_H
-#define LIGHTAPP_CLIPPINGDLG_H
+#ifndef OCCVIEWER_CLIPPINGDLG_H
+#define OCCVIEWER_CLIPPINGDLG_H
 
-#include "LightApp.h"
+#include "OCCViewer.h"
 
 #include <qdialog.h>
 
@@ -18,16 +18,16 @@ class OCCViewer_ViewWindow;
 
 
 //=================================================================================
-// class    : LightApp_ClippingDlg
+// class    : OCCViewer_ClippingDlg
 // purpose  :
 //=================================================================================
-class LightApp_ClippingDlg : public QDialog
+class OCCViewer_ClippingDlg : public QDialog
 {
     Q_OBJECT
     
     public:
-    LightApp_ClippingDlg(OCCViewer_ViewWindow* , QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0);
-    ~LightApp_ClippingDlg();
+    OCCViewer_ClippingDlg(OCCViewer_ViewWindow* , QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0);
+    ~OCCViewer_ClippingDlg();
     
 private :
 
@@ -81,4 +81,4 @@ private slots:
   void onPreview( bool on );
 };
 
-#endif // LIGHTAPP_CLIPPINGDLG_H
+#endif // OCCVIEWER_CLIPPINGDLG_H

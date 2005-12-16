@@ -40,8 +40,7 @@ EXPORT_HEADERS= LightApp.h \
 		LightApp_RootObject.h \
 		LightApp_UpdateFlags.h \
 		LightApp_VTKSelector.h \
-		LightApp_WidgetContainer.h \
-		LightApp_ClippingDlg.h
+		LightApp_WidgetContainer.h
 
 # .po files to transform in .qm
 PO_FILES = LightApp_images.po \
@@ -75,8 +74,7 @@ LIB_SRC= LightApp_AboutDlg.cxx \
 	 LightApp_Preferences.cxx \
 	 LightApp_PreferencesDlg.cxx \
 	 LightApp_VTKSelector.cxx \
-	 LightApp_WidgetContainer.cxx \
-	 LightApp_ClippingDlg.cxx
+	 LightApp_WidgetContainer.cxx
 
 LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_Application.h \
@@ -96,8 +94,7 @@ LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_Preferences.h \
 	  LightApp_PreferencesDlg.h \
 	  LightApp_VTKSelector.h \
-	  LightApp_WidgetContainer.h \
-	  LightApp_ClippingDlg.h
+	  LightApp_WidgetContainer.h
 
 RESOURCES_FILES = icon_about.png \
 		  icon_applogo.png \

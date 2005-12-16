@@ -24,6 +24,7 @@
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewPort3d.h"
 #include "OCCViewer_CreateRestoreViewDlg.h"
+#include "OCCViewer_ClippingDlg.h"
 
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
@@ -32,8 +33,6 @@
 #include "SUIT_Tools.h"
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_MessageBox.h"
-
-#include "LightApp_ClippingDlg.h"
 
 #include <qptrlist.h>
 #include <qhbox.h>
@@ -840,7 +839,7 @@ void OCCViewer_ViewWindow::onClipping( bool on )
   if ( on )
     {
       if ( !myClippingDlg )
-	myClippingDlg = new LightApp_ClippingDlg( this, myDesktop );
+	myClippingDlg = new OCCViewer_ClippingDlg( this, myDesktop );
 
       if ( !myClippingDlg->isShown() )
 	myClippingDlg->show();
