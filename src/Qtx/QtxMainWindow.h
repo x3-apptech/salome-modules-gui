@@ -59,6 +59,7 @@ public slots:
 
 protected:
   virtual void      setUpLayout();
+  virtual void      customEvent( QCustomEvent* );
 
 private slots:
   void              onDestroyed( QObject* );

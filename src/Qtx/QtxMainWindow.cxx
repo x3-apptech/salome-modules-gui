@@ -224,17 +224,29 @@ void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section
   resize( win_w, win_h );
   move( win_x, win_y );
 
-  myMode = winState;
+  myMode = -1;
 
-  vis ? show() : hide();
+  if ( vis )
+    QApplication::postEvent( this, new QCustomEvent( QEvent::User, (void*)winState ) );
+  else
+    myMode = winState;
 }
 
 void QtxMainWindow::show()
 {
-  int mode = myMode;
+  if ( myMode != -1 )
+    QApplication::postEvent( this, new QCustomEvent( QEvent::User, (void*)myMode ) );
 
   myMode = -1;
 
+  QMainWindow::show();
+}
+
+void QtxMainWindow::customEvent( QCustomEvent* e )
+{
+  QMainWindow::customEvent( e );
+
+  int mode = (int)e->data();
   switch ( mode )
   {
   case WS_Normal:
@@ -247,8 +259,6 @@ void QtxMainWindow::show()
     showMaximized();
     break;
   }
-
-  QMainWindow::show();
 }
 
 int QtxMainWindow::relativeCoordinate( const int type, const int WH, const int wh ) const
