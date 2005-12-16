@@ -32,7 +32,7 @@ class SUIT_EXPORT SUIT_SelectionMgr : public QObject
   Q_OBJECT
 
 public:
-  SUIT_SelectionMgr( const bool = true );
+  SUIT_SelectionMgr( const bool = true, QObject* = 0 );
   virtual ~SUIT_SelectionMgr();
 
   void            clearSelected();

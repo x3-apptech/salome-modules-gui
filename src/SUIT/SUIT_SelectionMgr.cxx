@@ -23,8 +23,9 @@
  */
 
 /*!constructor. initialize myIterations and myIsSelChangeEnabled.*/
-SUIT_SelectionMgr::SUIT_SelectionMgr( const bool Feedback )
-: myIterations( Feedback ? 1 : 0 ),
+SUIT_SelectionMgr::SUIT_SelectionMgr( const bool Feedback, QObject* p )
+: QObject( p ),
+myIterations( Feedback ? 1 : 0 ),
 myIsSelChangeEnabled( true )
 {
 }
