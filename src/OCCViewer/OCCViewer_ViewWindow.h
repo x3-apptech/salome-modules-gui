@@ -31,6 +31,8 @@
 class SUIT_Desktop;
 class OCCViewer_ViewPort3d;
 
+class LightApp_ClippingDlg;
+
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
@@ -58,6 +60,9 @@ public:
 
   void updateEnabledDrawMode();
 
+  void setCuttingPlane( bool on, const double x = 0 , const double y = 0 , const double z = 0,
+                                 const double dx = 0, const double dy = 0, const double dz = 1);
+ 
 public slots:
   void onFrontView();
   void onViewFitAll();
@@ -74,6 +79,7 @@ public slots:
   void activatePanning();
   void activateGlobalPanning();
   void onCloneView();
+  void onClipping( bool on );
   void onMemorizeView();
   void onRestoreView();
   void onTrihedronShow();
@@ -86,7 +92,7 @@ signals:
 
 protected:
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, CloneId, MemId, RestoreId,
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, CloneId, ClippingId, MemId, RestoreId,
          TrihedronShowId };
 
   typedef QMap<int, QtxAction*> ActionsMap;
@@ -137,6 +143,10 @@ protected:
   ActionsMap myActionsMap;
 
   double myCurScale;
+
+private:
+  LightApp_ClippingDlg* myClippingDlg;
+  
 };
 
 #ifdef WIN32

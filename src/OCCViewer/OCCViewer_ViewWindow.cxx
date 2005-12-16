@@ -33,6 +33,8 @@
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_MessageBox.h"
 
+#include "LightApp_ClippingDlg.h"
+
 #include <qptrlist.h>
 #include <qhbox.h>
 #include <qlabel.h>
@@ -41,6 +43,10 @@
 #include <qapplication.h>
 #include <qdatetime.h>
 #include <qimage.h>
+
+#include <V3d_Plane.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pln.hxx>
 
 const char* imageZoomCursor[] = { 
 "32 32 3 1",
@@ -181,6 +187,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_V
   myRestoreFlag = 0;
   myEnableDrawMode = false;
   updateEnabledDrawMode();
+  myClippingDlg = 0;
 }
 
 //****************************************************************
@@ -669,6 +676,13 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(activated()), this, SLOT(onCloneView()));
 	myActionsMap[ CloneId ] = aAction;
 
+  aAction = new QtxAction(tr("MNU_CLIPPING"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" ) ),
+                           tr( "MNU_CLIPPING" ), 0, this);
+  aAction->setStatusTip(tr("DSC_CLIPPING"));
+  aAction->setToggleAction( true );
+  connect(aAction, SIGNAL(toggled( bool )), this, SLOT(onClipping( bool )));
+	myActionsMap[ ClippingId ] = aAction;
+
   aAction = new QtxAction(tr("MNU_SHOOT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SHOOT_VIEW" ) ),
                            tr( "MNU_SHOOT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_SHOOT_VIEW"));
@@ -724,6 +738,9 @@ void OCCViewer_ViewWindow::createToolBar()
 
   myToolBar->addSeparator();
   myActionsMap[CloneId]->addTo(myToolBar);
+  
+  myToolBar->addSeparator();
+  myActionsMap[ClippingId]->addTo(myToolBar);
 }
 
 //****************************************************************
@@ -812,6 +829,31 @@ void OCCViewer_ViewWindow::onCloneView()
 }
 
 //****************************************************************
+void OCCViewer_ViewWindow::onClipping( bool on )
+{
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  if ( on )
+    myActionsMap[ ClippingId ]->setIconSet(aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING_PRESSED" )));
+  else
+    myActionsMap[ ClippingId ]->setIconSet(aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" )));
+  
+  if ( on )
+    {
+      if ( !myClippingDlg )
+	myClippingDlg = new LightApp_ClippingDlg( this, myDesktop );
+
+      if ( !myClippingDlg->isShown() )
+	myClippingDlg->show();
+    }
+  else
+    {
+      if ( myClippingDlg->isShown() )
+	myClippingDlg->hide();
+      setCuttingPlane(false);
+    }
+}
+
+//****************************************************************
 void OCCViewer_ViewWindow::onMemorizeView()
 {
   double centerX, centerY, projX, projY, projZ, twist;
@@ -892,4 +934,54 @@ QImage OCCViewer_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myViewPort->winId() );
   return px.convertToImage();
+}
+                                                                              
+void  OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const double y,  const double z,
+                				      const double dx, const double dy, const double dz )
+{
+  if ( on ) {
+    Handle(V3d_Viewer) viewer = myViewPort->getViewer();
+    Handle(V3d_View) view = myViewPort->getView();
+    
+    // try to use already existing plane or create a new one
+    Handle(V3d_Plane) clipPlane;
+    view->InitActivePlanes();
+    if ( view->MoreActivePlanes() )
+      clipPlane = view->ActivePlane();
+    else
+      clipPlane = new V3d_Plane( viewer );
+    
+    // set new a,b,c,d values for the plane
+    gp_Pln pln( gp_Pnt( x, y, z ), gp_Dir( dx, dy, dz ) );
+    double a, b, c, d;
+    pln.Coefficients( a, b, c, d );
+    clipPlane->SetPlane( a, b, c, d );
+    
+    Handle(V3d_View) v = myViewPort->getView();
+    v->SetPlaneOn( clipPlane );
+    v->Update();
+    v->Redraw();
+  } 
+  else {
+    Handle(V3d_View) view = myViewPort->getView();
+
+    // try to use already existing plane 
+    Handle(V3d_Plane) clipPlane;
+    view->InitActivePlanes();
+    if ( view->MoreActivePlanes() )
+      clipPlane = view->ActivePlane();
+    
+    Handle(V3d_View) v =  myViewPort->getView();
+    if ( !clipPlane.IsNull() )
+      v->SetPlaneOff( clipPlane );
+    else 
+      v->SetPlaneOff();
+    
+    v->Update();
+    v->Redraw();
+  }
+ 
+  Handle(V3d_View) v = myViewPort->getView();
+  v->Update();
+  v->Redraw();
 }

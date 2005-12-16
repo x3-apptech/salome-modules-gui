@@ -122,6 +122,12 @@ msgstr "Clone View"
 msgid "MNU_DUMP_VIEW"
 msgstr "Dump view"
 
+msgid "DSC_CLIPPING"
+msgstr "Define clipping plane"
+
+msgid "MNU_CLIPPING"
+msgstr "Clipping"
+
 msgid "DSC_DUMP_VIEW"
 msgstr "Saves the active view in the image file"
 

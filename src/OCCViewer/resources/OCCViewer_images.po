@@ -80,6 +80,12 @@ msgstr "view_camera_dump.png"
 msgid "ICON_OCCVIEWER_CLONE_VIEW"
 msgstr "view_clone.png"
 
+msgid "ICON_OCCVIEWER_CLIPPING"
+msgstr "view_clipping.png"
+
+msgid "ICON_OCCVIEWER_CLIPPING_PRESSED"
+msgstr "view_clipping_pressed.png"
+
 msgid "ICON_OCCVIEWER_SHOOT_VIEW"
 msgstr "view_shoot.png"
 
