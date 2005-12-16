@@ -178,8 +178,9 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_V
 : SUIT_ViewWindow(theDesktop)
 {
   myModel = theModel;
-  myEnableDrawMode = true;
   myRestoreFlag = 0;
+  myEnableDrawMode = false;
+  updateEnabledDrawMode();
 }
 
 //****************************************************************
@@ -265,6 +266,11 @@ bool OCCViewer_ViewWindow::eventFilter(QObject* watched, QEvent* e)
   return SUIT_ViewWindow::eventFilter(watched, e);
 }
 
+void OCCViewer_ViewWindow::updateEnabledDrawMode()
+{
+  if ( myModel )
+    myEnableDrawMode = myModel->isSelectionEnabled() && myModel->isMultiSelectionEnabled();
+}
 
 //****************************************************************
 void OCCViewer_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)

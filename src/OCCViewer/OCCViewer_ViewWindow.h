@@ -56,6 +56,8 @@ public:
   
   virtual void initLayout();
 
+  void updateEnabledDrawMode();
+
 public slots:
   void onFrontView();
   void onViewFitAll();

@@ -158,7 +158,8 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
   if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
-  myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView->getViewPort()->getView());
+  if ( isSelectionEnabled() )
+    myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView->getViewPort()->getView());
 }
 
 
@@ -215,6 +216,16 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
 {
   mySelectionEnabled = isEnabled;
   //!! To be done for view windows
+  if ( !myViewManager )
+    return;
+
+  QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
+  for ( int i = 0; i < wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->updateEnabledDrawMode();
+  }
 }
 
 //*********************************************************************
@@ -222,6 +233,16 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
 {
   myMultiSelectionEnabled = isEnable;
   //!! To be done for view windows
+  if ( !myViewManager )
+    return;
+
+  QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
+  for ( int i = 0; i < wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->updateEnabledDrawMode();
+  }
 }
 
 //*********************************************************************
