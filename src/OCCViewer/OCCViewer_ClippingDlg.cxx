@@ -4,8 +4,6 @@
 
 #include "SUIT_Session.h"
 #include "SUIT_ViewWindow.h"
-#include "SVTK_ViewWindow.h"
-#include "SVTK_ViewModel.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
 
