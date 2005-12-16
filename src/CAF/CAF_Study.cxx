@@ -140,7 +140,13 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
     status = false;
   }
 
-  return status && SUIT_Study::saveDocumentAs( fname );
+  if ( status )
+    status = SUIT_Study::saveDocumentAs( fname );
+
+  if ( status )
+    myModifiedCnt = 0;
+
+  return status;
 }
 
 bool CAF_Study::openTransaction()
@@ -227,7 +233,8 @@ bool CAF_Study::isModified() const
 	if ( myStdDoc.IsNull() )
     return false;
 
-  return myStdDoc->IsModified();
+//  return myStdDoc->IsModified();
+  return myModifiedCnt;
 }
 
 /*!
