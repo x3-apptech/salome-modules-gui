@@ -32,6 +32,7 @@
 #include <qmenubar.h>
 #include <qwidget.h>
 #include <qpopupmenu.h>
+#include <qimage.h>
 #include <qstringlist.h>
 
 #include "SALOME_Event.hxx"
