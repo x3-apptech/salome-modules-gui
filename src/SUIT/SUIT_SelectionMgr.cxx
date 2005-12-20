@@ -144,12 +144,21 @@ void SUIT_SelectionMgr::selectionChanged( SUIT_Selector* sel )
     {
       // Temporary action(to avoid selection of the objects which don't pass the filters):
       //if ( aSel != sel )
-	aSel->setSelected( newOwners );
+	    aSel->setSelected( newOwners );
     }
   }
   myIsSelChangeEnabled = true;
 
   emit selectionChanged();
+}
+
+/*!
+  Returns true if selection manger is in synchronising mode
+  (during synchonisation of the selectors selection).
+*/
+bool SUIT_SelectionMgr::isSynchronizing() const
+{
+  return !myIsSelChangeEnabled;
 }
 
 /*! Checks: Is selection manager has selection mode \a mode?

@@ -71,6 +71,8 @@ public:
   bool            autoDeleteFilter() const;
   void            setAutoDeleteFilter( const bool );
 
+  bool            isSynchronizing() const;
+
 signals:
   void            selectionChanged();
 
