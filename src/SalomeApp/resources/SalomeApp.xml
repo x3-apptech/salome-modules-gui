@@ -101,7 +101,8 @@
  </section>
  <section name="VTKViewer" >
     <parameter value="0, 0, 0" name="background" />
-    <parameter value="100" name="trihedron_size" />
+    <parameter value="105" name="trihedron_size" />
+    <parameter value="true" name="relative_size" />
  </section>
  <section name="Plot2d" >
     <parameter value="255, 255, 255" name="Background" />

@@ -1504,6 +1504,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   int vtkTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
 				   LightApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
+  pref->addPreference( tr( "PREF_RELATIVE_SIZE" ), vtkGroup, LightApp_Preferences::Bool, "VTKViewer", "relative_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGroup,
 		       LightApp_Preferences::Color, "VTKViewer", "background" );
 
@@ -1612,9 +1613,9 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 
-  if ( sec == QString( "VTKViewer" ) && param == QString( "trihedron_size" ) )
+  if ( sec == QString( "VTKViewer" ) && (param == QString( "trihedron_size" ) || param == QString( "relative_size" )) )
   {
-    int sz = resMgr->integerValue( sec, param, -1 );
+    int sz = resMgr->integerValue( "VTKViewer", "trihedron_size", -1 );
     QPtrList<SUIT_ViewManager> lst;
     viewManagers( SVTK_Viewer::Type(), lst );
     for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current() && sz >= 0; ++it )

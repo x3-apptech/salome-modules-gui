@@ -749,9 +749,6 @@ int SVTK_ViewWindow::GetTrihedronSize() const
 
 void SVTK_ViewWindow::SetTrihedronSize( const int sz )
 {
-  if ( myTrihedronSize == sz )
-    return;
-
   myTrihedronSize = sz;
   AdjustTrihedrons( true );
 }
@@ -774,8 +771,12 @@ SVTK_ViewWindow
   myCubeAxes->GetBounds(bnd);
 
   int aVisibleNum = myTrihedron->GetVisibleActorCount( myRenderer );
+
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  bool isRelativeSize = aResMgr->booleanValue( "VTKViewer", "relative_size", true );
+  
   //if (aVisibleNum || theIsForcedUpdate) {
-  if (aVisibleNum) {
+  if (aVisibleNum || !isRelativeSize) {
     // if the new trihedron size have sufficient difference, then apply the value
     double aNewSize = 100, anOldSize=myTrihedron->GetSize();
     bool aTDisplayed = isTrihedronDisplayed();
@@ -783,13 +784,16 @@ SVTK_ViewWindow
     if(aTDisplayed) myTrihedron->VisibilityOff();
     if(aCDisplayed) myCubeAxes->VisibilityOff();
 
-    SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-    QString aSetting = aResMgr->stringValue("Viewer", "TrihedronSize", "105");
-    static float aSizeInPercents = aSetting.toFloat();
-
+    int aDefaultSize = 100;
+    if (isRelativeSize) aDefaultSize = 105;
+    int aSizeFromPreferences = aResMgr->integerValue( "VTKViewer", "trihedron_size", aDefaultSize );
+    
     //bool isComputeTrihedronSize =
-      ::ComputeTrihedronSize(myRenderer, aNewSize, anOldSize, aSizeInPercents);
-
+    if (isRelativeSize)
+      ::ComputeTrihedronSize(myRenderer, aNewSize, anOldSize, (float)aSizeFromPreferences);
+    else
+      aNewSize = (double)aSizeFromPreferences;
+    
     myTrihedron->SetSize( aNewSize );
 
     // iterate through displayed objects and set size if necessary
