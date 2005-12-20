@@ -156,6 +156,9 @@ msgstr "Background color"
 msgid "LightApp_Application::PREF_TRIHEDRON_SIZE"
 msgstr "Trihedron size"
 
+msgid "LightApp_Application::PREF_RELATIVE_SIZE"
+msgstr "Relative size"
+
 msgid "LightApp_Application::PREF_ISOS_U"
 msgstr "Number of isolines along U"
 msgid "LightApp_Application::PREF_ISOS_V"
