@@ -22,6 +22,7 @@
 #include "SUIT_SmartPtr.h"
 
 #include <qvaluelist.h>
+#include <qmap.h>
 
 #ifdef WIN32
 #pragma warning( disable:4275 )
@@ -64,6 +65,8 @@ public:
 #endif
 
   iterator append      ( const SUIT_DataOwnerPtr& x );//!< append function
+  void     clear       ();
+  uint     remove      (const SUIT_DataOwnerPtr& x );
 
 private:
   // hide this methods: only append() should be used to add items to the list
@@ -71,8 +74,10 @@ private:
   iterator insert ( iterator it, const SUIT_DataOwnerPtr& x );//!< hide method
   void push_front ( const SUIT_DataOwnerPtr& x );//!< hide method
   void push_back  ( const SUIT_DataOwnerPtr& x );//!< hide method
+
 private:
-  bool mySkipEqual;
+  bool                              mySkipEqual;
+  QMap<SUIT_DataOwnerPtr, iterator> myMap;
 };
 
 #ifdef WIN32

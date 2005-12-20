@@ -43,13 +43,13 @@ public:
     public:
         virtual int      count() const = 0;
         virtual QtxValue param( const int, const QString& ) const = 0;
-	      virtual QtxValue globalParam( const QString& ) const;
+	virtual QtxValue globalParam( const QString& ) const;
 
-	      virtual QChar   equality() const;
-	      virtual QString selCountParam() const;
+	virtual QChar    equality() const;
+	virtual QString  selCountParam() const;
 
-	      static QChar    defEquality();
-	      static QString  defSelCountParam();
+	static QChar    defEquality();
+	static QString  defSelCountParam();
     };
 
 protected:
@@ -109,9 +109,9 @@ protected:
     void createOperations();
 
 private:
-    RulesMap             myVisibility, myToggle;
-    Selection*           myCurrentSelection;
-    QtxListOfOperations* myOperations;
+    RulesMap                 myVisibility, myToggle;
+    Selection*               myCurrentSelection;
+    QtxListOfOperations*     myOperations;
 };
 
 

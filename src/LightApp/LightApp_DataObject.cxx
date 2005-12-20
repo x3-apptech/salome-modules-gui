@@ -79,7 +79,7 @@ bool LightApp_DataObject::Key::isEqual( const SUIT_DataObjectKey* other ) const
 */
 /*!Constructor. Initialize by \a parent*/
 LightApp_DataObject::LightApp_DataObject( SUIT_DataObject* parent )
-: CAM_DataObject( parent )
+: CAM_DataObject( parent ), myCompObject( 0 ), myCompDataType( "" )
 {
 }
 
@@ -108,30 +108,38 @@ SUIT_DataObjectKey* LightApp_DataObject::key() const
  */
 SUIT_DataObject* LightApp_DataObject::componentObject() const
 {
+  if ( !myCompObject ) {
   SUIT_DataObject* compObj = 0; // for root object
 
-  if ( parent() && parent() == root() ) 
-    compObj = (SUIT_DataObject*)this; // for component-level objects
-  else 
-  {
-    compObj = parent(); // for lower level objects
-    while ( compObj && compObj->parent() != root() )
-      compObj = compObj->parent();
+    if ( parent() && parent() == root() ) 
+      compObj = (SUIT_DataObject*)this; // for component-level objects
+    else 
+    {
+      compObj = parent(); // for lower level objects
+      while ( compObj && compObj->parent() != root() )
+        compObj = compObj->parent();
+    }
+    LightApp_DataObject* that = (LightApp_DataObject*)this;
+    that->myCompObject = compObj;
   }
-  return compObj;
+  return myCompObject;
 }
 
 /*!Get component type.*/
 QString LightApp_DataObject::componentDataType() const
 {
+  if ( myCompDataType.isEmpty() ) {
   SUIT_DataObject* aCompObj = componentObject();
-  LightApp_ModuleObject* anObj = dynamic_cast<LightApp_ModuleObject*>( aCompObj );
-  if ( anObj ) {
-    CAM_DataModel* aModel = anObj->dataModel();
-    if ( aModel )
-      return aModel->module()->name();
+    LightApp_ModuleObject* anObj = dynamic_cast<LightApp_ModuleObject*>( aCompObj );
+    if ( anObj ) {
+      CAM_DataModel* aModel = anObj->dataModel();
+      if ( aModel ) {
+        LightApp_DataObject* that = (LightApp_DataObject*)this;
+        that->myCompDataType = aModel->module()->name();
+      }
+    }
   }
-  return "";
+  return myCompDataType;
 }
 
 /*

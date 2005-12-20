@@ -65,6 +65,8 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
     QPtrList<SUIT_Selector> aSelectors;
     mgr->selectors( aSelectors );
     for( SUIT_Selector* selector = aSelectors.first(); selector; selector = aSelectors.next() )
+    {
+      qDebug( selector->type() );
       if( selector->type()!=client )
       {
 	mgr->selected( cur_sel, selector->type() );
@@ -72,19 +74,27 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
 	for( ; aLIt!=aLLast; aLIt++ )
 	  sel.append( *aLIt ); //check entry and don't append if such entry is in list already
       }
+    }
 
     //3) to analyse owner and fill internal data structures
     SUIT_DataOwnerPtrList::const_iterator anIt = sel.begin(), aLast = sel.end();
+    QMap<QString,int> entries;
     QString entry;
+    int num=0;
     for( ; anIt!=aLast; anIt++ )
     {
       LightApp_DataOwner* sowner = dynamic_cast<LightApp_DataOwner*>( (*anIt ).get() );
       if( sowner )
       {
+	if( entries.contains( sowner->entry() ) )
+	  continue;
+
         entry = myStudy->referencedToEntry( sowner->entry() );
-        myEntries.append( entry );
-	myIsReferences.append( sowner->entry() == entry );
+	entries.insert( entry, 0 );
+        myEntries.insert( num, entry );
+	myIsReferences.insert( num, sowner->entry() == entry );
         processOwner( sowner );
+	num++;
       }
     }
   }

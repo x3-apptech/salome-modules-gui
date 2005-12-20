@@ -24,6 +24,7 @@
 #include <OB_Browser.h>
 
 #include <SUIT_DataObjectIterator.h>
+#include <qdatetime.h>
 
 /*!
   Constructor
@@ -57,22 +58,25 @@ OB_Browser* LightApp_OBSelector::browser() const
 */
 void LightApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
 {
-  if ( !myBrowser )
-    return;
-
-  DataObjectList objlist;
-  myBrowser->getSelected( objlist );
-  for ( DataObjectListIterator it( objlist ); it.current(); ++it )
-  {
-    LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( it.current() );
-    if ( obj )
+  if (mySelectedList.count() == 0 ) {
+    if ( !myBrowser )
+      return;
+    DataObjectList objlist;
+    myBrowser->getSelected( objlist );
+    LightApp_OBSelector* that = (LightApp_OBSelector*)this;
+    for ( DataObjectListIterator it( objlist ); it.current(); ++it )
     {
-      Handle( SALOME_InteractiveObject ) aSObj = new SALOME_InteractiveObject
-	( obj->entry(), obj->componentDataType(), obj->name() );
-      LightApp_DataOwner* owner = new LightApp_DataOwner( aSObj  );
-      theList.append( SUIT_DataOwnerPtr( owner ) );
+      LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( it.current() );
+      if ( obj )
+      {
+        Handle(SALOME_InteractiveObject) aSObj = new SALOME_InteractiveObject
+          ( obj->entry(), obj->componentDataType(), obj->name() );
+        LightApp_DataOwner* owner = new LightApp_DataOwner( aSObj  );
+        that->mySelectedList.append( SUIT_DataOwnerPtr( owner ) );
+      }
     }
   }
+  theList = mySelectedList;
 }
 
 /*!Sets selection.*/
@@ -98,7 +102,11 @@ void LightApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& theList )
 /*!On selection changed.*/
 void LightApp_OBSelector::onSelectionChanged()
 {
+  QTime t1 = QTime::currentTime();
+  mySelectedList.clear();
   selectionChanged();
+  QTime t2 = QTime::currentTime();
+  qDebug( QString( "selection time = %1 msecs" ).arg( t1.msecsTo( t2 ) ) );
 }
 
 /*!Fill entries.*/

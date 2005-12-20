@@ -60,10 +60,10 @@ protected:
   QString                        activeViewType() const;
   SUIT_ViewWindow*               activeVW() const;
 
-protected:
+private:
   QString                        myPopupClient;
-  QStringList                    myEntries; // entries of selected objects
-  QValueList<bool>               myIsReferences; // whether i-th selected object was a reference
+  QMap<int,QString>              myEntries; // entries of selected objects
+  QMap<int,bool>                 myIsReferences; // whether i-th selected object was a reference
   LightApp_Study*                myStudy;
 };
 

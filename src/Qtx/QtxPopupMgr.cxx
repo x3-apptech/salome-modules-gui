@@ -23,6 +23,7 @@
 #include "QtxAction.h"
 
 #include <qpopupmenu.h>
+#include <qdatetime.h>
 
 //================================================================
 // Function : 
@@ -88,6 +89,97 @@ QString QtxPopupMgr::Selection::defSelCountParam()
 {
     return "selcount";
 }
+
+
+
+
+
+//================================================================
+// Class : 
+// Purpose  : 
+//================================================================
+class QtxCacheSelection : public QtxPopupMgr::Selection
+{
+public:
+  QtxCacheSelection( QtxPopupMgr::Selection* );
+  virtual ~QtxCacheSelection();
+
+  virtual int      count() const;
+  virtual QtxValue param( const int, const QString& ) const;
+  virtual QtxValue globalParam( const QString& ) const;
+
+private:
+  typedef QMap< QString, QtxValue >  CacheMap;
+
+  QtxPopupMgr::Selection*    mySel;
+  CacheMap                   myParamCache;
+};
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QtxCacheSelection::QtxCacheSelection( QtxPopupMgr::Selection* sel )
+: mySel( sel )
+{
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QtxCacheSelection::~QtxCacheSelection()
+{
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+int QtxCacheSelection::count() const
+{
+  return mySel ? mySel->count() : 0;
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QtxValue QtxCacheSelection::param( const int i, const QString& name ) const
+{
+  QString param_name = name + "#####" + QString::number( i );
+  if( myParamCache.contains( param_name ) )
+    return myParamCache[ param_name ];
+  else
+  {
+    QtxValue v;
+    if( mySel )
+      v = mySel->param( i, name );
+    if( v.isValid() )
+      ( ( CacheMap& )myParamCache ).insert( param_name, v );
+    return v;
+  }
+}
+
+//================================================================
+// Function : 
+// Purpose  : 
+//================================================================
+QtxValue QtxCacheSelection::globalParam( const QString& name ) const
+{
+  if( myParamCache.contains( name ) )
+    return myParamCache[ name ];
+  else
+  {
+    QtxValue v;
+    if( mySel )
+      v = mySel->globalParam( name );
+    if( v.isValid() )
+      ( ( CacheMap& )myParamCache ).insert( name, v );
+    return v;
+  }
+}
+
 
 
 
@@ -381,50 +473,111 @@ void QtxPopupMgr::setParams( QtxParser* p, QStringList& specific ) const
     }
 }
 
+bool operator<( const QtxValue& v1, const QtxValue& v2 )
+{
+  QVariant::Type t1 = v1.type(), t2 = v2.type();
+  if( t1==t2 )
+  {
+    switch( t1 )
+    {
+    case QVariant::Int:
+      return v1.toInt() < v2.toInt();
+      
+    case QVariant::Double:
+      return v1.toDouble() < v2.toDouble();
+
+    case QVariant::CString:
+    case QVariant::String:
+      return v1.toString() < v2.toString();
+
+    case QVariant::StringList:
+    case QVariant::List:
+    {
+      const QValueList<QtxValue>& aList1 = v1.toList(), aList2 = v2.toList();
+      QValueList<QtxValue>::const_iterator
+	anIt1 = aList1.begin(), aLast1 = aList1.end(),
+        anIt2 = aList2.begin(), aLast2 = aList2.end();
+      for( ; anIt1!=aLast1 && anIt2!=aLast2; anIt1++, anIt2++ )
+	if( (*anIt1)!=(*anIt2) )
+	  return (*anIt1)<(*anIt2);
+
+      return anIt1==aLast1 && anIt2!=aLast2;
+    }
+
+    default:
+      return v1.toString()<v2.toString();
+    }
+  }
+  else
+    return t1<t2;
+}
+
 //================================================================
 // Function : 
 // Purpose  : 
 //================================================================
 bool QtxPopupMgr::isSatisfied( QAction* act, bool visibility ) const
 {
-    QString menu = act->menuText();
-    //const char* mmm = menu.latin1();
+  QString menu = act->menuText();
 
-    bool res = false;
-    if( !act )
-        return res;
-
-    if( hasRule( act, visibility ) )
-    {
-        QtxParser* p = map( visibility )[ act ];
-        //QString pdump = p->dump();
-	    //const char* pdd = pdump.latin1();
-
-
-        QStringList specific;
-        p->clear();
-        ( ( Operations* )myOperations->operations( "custom" ) )->clear();
-
-        setParams( p, specific );
-
-        if( specific.count()>0 )
-            if( myCurrentSelection )
-                for( int i=0, n=myCurrentSelection->count(); i<n; i++ )
-                {
-                    QStringList::const_iterator anIt1 = specific.begin(),
-                                                aLast1 = specific.end();
-                    for( ; anIt1!=aLast1; anIt1++ )
-                        p->set( *anIt1, myCurrentSelection->param( i, *anIt1 ) );
-
-                    res = res || result( p );
-                }
-            else
-                res = false;
-        else
-            res = result( p );
-    }
-
+  bool res = false;
+  if( !act )
     return res;
+
+  if( hasRule( act, visibility ) )
+  {
+    QtxParser* p = map( visibility )[ act ];
+    QStringList specific;
+    p->clear();
+    ( ( Operations* )myOperations->operations( "custom" ) )->clear();
+
+    setParams( p, specific );
+
+    QMap<QValueList<QtxValue>,int> aCorteges;
+    QValueList<QtxValue> c;
+
+    if( specific.count()>0 )
+      if( myCurrentSelection )
+      {
+	res = false;
+
+	for( int i=0, n=myCurrentSelection->count(); i<n && !res; i++ )
+	{
+	  QStringList::const_iterator anIt1 = specific.begin(), aLast1 = specific.end();
+	  c.clear();
+	  for( ; anIt1!=aLast1; anIt1++ )
+	    c.append( myCurrentSelection->param( i, *anIt1 ) );
+	  aCorteges.insert( c, 0 );
+	}
+	
+	//qDebug( QString( "%1 corteges" ).arg( aCorteges.count() ) );
+	QMap<QValueList<QtxValue>,int>::const_iterator anIt = aCorteges.begin(), aLast = aCorteges.end();
+	for( ; anIt!=aLast; anIt++ )
+	{
+	  QStringList::const_iterator anIt1 = specific.begin(), aLast1 = specific.end();
+	  const QValueList<QtxValue>& aCortege = anIt.key();
+	  QValueList<QtxValue>::const_iterator anIt2 = aCortege.begin();
+	  for( ; anIt1!=aLast1; anIt1++, anIt2++ )
+	    p->set( *anIt1, *anIt2 );
+	  res = res || result( p );
+	}
+
+	/*
+	for( int i=0, n=myCurrentSelection->count(); i<n && !res; i++ )
+	{
+	  QStringList::const_iterator anIt1 = specific.begin(), aLast1 = specific.end();
+	  for( ; anIt1!=aLast1; anIt1++ )
+	    p->set( *anIt1, myCurrentSelection->param( i, *anIt1 ) );
+	  res = res || result( p );
+	}*/
+      }
+      else
+	res = false;
+    else
+      res = result( p );
+  }
+
+  return res;
 }
 
 //================================================================
@@ -446,19 +599,25 @@ bool QtxPopupMgr::isVisible( const int actId, const int place ) const
 //================================================================
 void QtxPopupMgr::updatePopup( QPopupMenu* p, Selection* sel )
 {
-    if( !p || !sel )
-        return;
+  QTime t1 = QTime::currentTime();
 
-    myCurrentSelection = sel;
+  if( !p || !sel )
+    return;
 
-    RulesMap::iterator anIt = myToggle.begin(),
-                       aLast = myToggle.end();
-    for( ; anIt!=aLast; anIt++ )
-        if( anIt.key()->isToggleAction() && hasRule( anIt.key(), false ) )
-            anIt.key()->setOn( isSatisfied( anIt.key(), false ) );
+  myCurrentSelection = new QtxCacheSelection( sel );
+  RulesMap::iterator anIt = myToggle.begin(),
+                            aLast = myToggle.end();
+  for( ; anIt!=aLast; anIt++ )
+    if( anIt.key()->isToggleAction() && hasRule( anIt.key(), false ) )
+      anIt.key()->setOn( isSatisfied( anIt.key(), false ) );
 
-    setWidget( ( QWidget* )p );
-    updateMenu();
+  setWidget( ( QWidget* )p );
+  updateMenu();
+  QTime t2 = QTime::currentTime();
+  qDebug( QString( "update popup time = %1 msecs" ).arg( t1.msecsTo( t2 ) ) );
+  qDebug( QString( "number of objects = %1" ).arg( myCurrentSelection->count() ) );
+
+  delete myCurrentSelection;
 }
 
 //================================================================

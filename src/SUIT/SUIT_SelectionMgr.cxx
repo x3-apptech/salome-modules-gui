@@ -85,7 +85,6 @@ void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& typ
 {
   lst.clear();
 
-  QMap<const SUIT_DataOwner*, int> map;
   for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
   {
     if ( !type.isEmpty() && it.current()->type() != type )
@@ -93,12 +92,7 @@ void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& typ
     SUIT_DataOwnerPtrList curList;
     it.current()->selected( curList );
     for ( SUIT_DataOwnerPtrList::const_iterator itr = curList.begin(); itr != curList.end(); ++itr )
-    {
-      const SUIT_DataOwnerPtr& ptr = *itr;
-      if ( !map.contains( ptr.operator->() ) )
-        lst.append( ptr );
-      map.insert( ptr.operator->(), 0 );
-    }
+      lst.append( *itr );
   }
 }
 

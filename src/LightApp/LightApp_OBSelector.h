@@ -22,6 +22,7 @@
 #include "LightApp.h"
 
 #include <SUIT_Selector.h>
+#include <SUIT_DataOwner.h>
 
 class OB_Browser;
 class LightApp_DataObject;
@@ -51,6 +52,7 @@ private:
 
 private:
   OB_Browser*  myBrowser;
+  SUIT_DataOwnerPtrList  mySelectedList;
 };
 
 #endif

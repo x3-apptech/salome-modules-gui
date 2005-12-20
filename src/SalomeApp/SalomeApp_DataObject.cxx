@@ -40,16 +40,20 @@
 /*!Constructor. Initialize by \a parent*/
 SalomeApp_DataObject::SalomeApp_DataObject( SUIT_DataObject* parent )
 : LightApp_DataObject( parent ),
-  CAM_DataObject( parent )
+  CAM_DataObject( parent ),
+  myEntry( "" ),
+  myName( "" )
 {
 }
 
 /*!Constructor. Initialize by \a parent and SObject*/
 SalomeApp_DataObject::SalomeApp_DataObject( const _PTR(SObject)& sobj, SUIT_DataObject* parent )
 : LightApp_DataObject( parent ),
-  CAM_DataObject( parent )
+  CAM_DataObject( parent ),
+  myName( "" )
 {
   myObject = sobj;
+  myEntry = myObject->GetID().c_str();
 }
 
 /*!Destructor. Do nothing.*/
@@ -62,35 +66,39 @@ SalomeApp_DataObject::~SalomeApp_DataObject()
  */
 QString SalomeApp_DataObject::entry() const
 {
-  if ( myObject )
+ if ( myObject )
     return myObject->GetID().c_str();
   return QString::null;
+  //return myEntry;
 }
 
 /*!Gets name of object.*/
 QString SalomeApp_DataObject::name() const
 {
-  QString str;
-
-  if ( myObject )
-    str = myObject->GetName().c_str();
-
-  if ( str.isEmpty() )
+  //if ( myName.isEmpty() )
   {
-    _PTR(SObject) refObj = referencedObject();
-    if ( refObj )
-      str = refObj->GetName().c_str();
-  }
+    QString str;
+    if ( myObject )
+      str = myObject->GetName().c_str();
 
-  if ( isReference() )
+    if ( str.isEmpty() )
     {
-      if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
-	str = QString( "* " ) + str;
-      else
-	str = QString( "<Invalid Reference>" );
+      _PTR(SObject) refObj = referencedObject();
+      if ( refObj )
+        str = refObj->GetName().c_str();
     }
 
-  return str;
+    if ( isReference() )
+      {
+        if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
+	  str = QString( "* " ) + str;
+        else
+	  str = QString( "<Invalid Reference>" );
+      }
+    SalomeApp_DataObject* that = (SalomeApp_DataObject*)this;
+    that->myName = str;
+  }
+  return myName;
 }
 
 /*!Gets icon picture of object.*/
@@ -199,15 +207,18 @@ QString SalomeApp_DataObject::toolTip() const
 /*!Get component type.*/
 QString SalomeApp_DataObject::componentDataType() const
 {
-  const SalomeApp_DataObject* compObj = dynamic_cast<SalomeApp_DataObject*>( componentObject() );
-  if ( compObj && compObj->object() )
-  {
-    _PTR(SComponent) aComp( compObj->object() );
-    if ( aComp )
-      return aComp->ComponentDataType().c_str();
-  }
-
-  return "";
+  //  if ( myCompDataType.isEmpty() ) {
+    const SalomeApp_DataObject* compObj = dynamic_cast<SalomeApp_DataObject*>( componentObject() );
+    if ( compObj && compObj->object() )
+    {
+      _PTR(SComponent) aComp( compObj->object() );
+      if ( aComp ) {
+        SalomeApp_DataObject* that = (SalomeApp_DataObject*)this;
+        that->myCompDataType = aComp->ComponentDataType().c_str();
+      }
+    }
+    //  }
+  return myCompDataType;
 }
 
 /*!Gets object.*/

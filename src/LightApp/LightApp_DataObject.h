@@ -46,6 +46,9 @@ public:
   virtual SUIT_DataObject*        componentObject() const;
   virtual QString                 componentDataType() const;
 
+protected:
+  QString                         myCompDataType;
+  SUIT_DataObject*                myCompObject;
 };
 
 /*!

@@ -64,6 +64,8 @@ private:
 
 private:
   _PTR(SObject)                   myObject;
+  QString                         myEntry;
+  QString                         myName;
 };
 
 /*!

@@ -132,17 +132,33 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>
 //====================================================================
 SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOwnerPtr& x )
 {
-  SUIT_DataOwnerPtrList::iterator it = find( x );
-  if ( it != end() )
-  {
-    if ( mySkipEqual )
-      return it;
+  if( mySkipEqual && myMap.contains( x ) ) //contains uses SUIT_DataOwnerPtr::operator==
+    return myMap[ x ];
 
-    const _typeinfo& ti1 = typeid( *((*it).operator->()) );
-    const _typeinfo& ti2 = typeid( *(x.operator->()) );
+  iterator it = QValueList<SUIT_DataOwnerPtr>::append( x );
 
-    if (ti1 == ti2)
-      return it;
-  }
-  return QValueList<SUIT_DataOwnerPtr>::append( x );
+  if( mySkipEqual )
+    myMap.insert( x, it );
+
+  return it;
+}
+
+//====================================================================
+//! Clear list
+//====================================================================
+void SUIT_DataOwnerPtrList::clear()
+{
+  if( mySkipEqual )
+    myMap.clear();
+  QValueList<SUIT_DataOwnerPtr>::clear();
+}
+
+//====================================================================
+//! Remove an item from the list
+//====================================================================
+uint SUIT_DataOwnerPtrList::remove(const SUIT_DataOwnerPtr& x )
+{
+  if( mySkipEqual && myMap.contains(x) )
+    myMap.remove(x);
+  return QValueList<SUIT_DataOwnerPtr>::remove( x );
 }

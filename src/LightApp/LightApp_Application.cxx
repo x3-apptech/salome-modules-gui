@@ -972,8 +972,8 @@ void LightApp_Application::setWindowShown( const int type, const bool on )
 OB_Browser* LightApp_Application::objectBrowser()
 {
   OB_Browser* ob = 0;
-  QWidget* wid = getWindow( WT_ObjectBrowser );
-  if ( wid->inherits( "OB_Browser" ) )
+  QWidget* wid = window( WT_ObjectBrowser );
+  if ( wid && wid->inherits( "OB_Browser" ) )
     ob = (OB_Browser*)wid;
   return ob;
 }
@@ -1140,6 +1140,7 @@ void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
     aRoot = theStudy->root();
     //aRoot->setName( tr( "DATA_MODELS" ) );
   }
+  getWindow( WT_ObjectBrowser );
   if ( objectBrowser() != 0 )
     objectBrowser()->setRootObject( aRoot );
 
@@ -1157,6 +1158,7 @@ void LightApp_Application::onStudyOpened( SUIT_Study* theStudy )
     aRoot = theStudy->root();
     //aRoot->dump();
   }
+  getWindow( WT_ObjectBrowser );
   if ( objectBrowser() != 0 ) {
     objectBrowser()->setRootObject( aRoot );
   }
