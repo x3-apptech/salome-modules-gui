@@ -7,6 +7,8 @@
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
 
+//#include "utilities.h"
+
 #include <V3d_View.hxx>
 #include <V3d.hxx>
 #include <V3d_Plane.hxx>
