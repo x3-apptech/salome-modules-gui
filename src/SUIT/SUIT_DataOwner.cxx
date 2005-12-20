@@ -162,3 +162,11 @@ uint SUIT_DataOwnerPtrList::remove(const SUIT_DataOwnerPtr& x )
     myMap.remove(x);
   return QValueList<SUIT_DataOwnerPtr>::remove( x );
 }
+
+//====================================================================
+//! 
+//====================================================================
+bool operator<( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
+{
+  return p1.get()<p2.get();
+}
