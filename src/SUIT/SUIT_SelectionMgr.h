@@ -27,6 +27,10 @@
 #include <qptrlist.h>
 #include <qvaluelist.h>
 
+#ifdef WIN32
+#pragma warning ( disable : 4251 )
+#endif
+
 class SUIT_EXPORT SUIT_SelectionMgr : public QObject
 {
   Q_OBJECT
@@ -102,5 +106,9 @@ private:
 
   friend class SUIT_Selector;
 };
+
+#ifdef WIN32
+#pragma warning ( default : 4251 )
+#endif
 
 #endif
