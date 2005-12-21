@@ -271,6 +271,9 @@ void QtxDblSpinBox::selectAll()
 
 bool QtxDblSpinBox::eventFilter( QObject* o, QEvent* e )
 {
+  if ( e->type() == QEvent::FocusOut && o == editor() )
+    updateDisplay();
+
   if ( !myCleared || o != editor() || !editor()->text().stripWhiteSpace().isEmpty() )
     return QSpinBox::eventFilter( o, e );
 
@@ -319,6 +322,8 @@ void QtxDblSpinBox::updateDisplay()
     else
       editor()->setSelection( prefix().length(), editor()->text().length() - prefix().length() - suffix().length() );
   }
+  else
+    editor()->setCursorPosition( 0 );
 
   myBlocked = isBlock;
 }
