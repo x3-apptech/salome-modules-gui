@@ -273,10 +273,10 @@ bool QtxDblSpinBox::eventFilter( QObject* o, QEvent* e )
 {
   if ( !myCleared || o != editor() || !editor()->text().stripWhiteSpace().isEmpty() )
   {
-    bool res = QSpinBox::eventFilter( o, e );
+    bool state = QSpinBox::eventFilter( o, e );
     if ( e->type() == QEvent::FocusOut && o == editor() )
       updateDisplay();
-    return res;
+    return state;
   }
 
   if ( e->type() == QEvent::FocusOut || e->type() == QEvent::Leave || e->type() == QEvent::Hide )
