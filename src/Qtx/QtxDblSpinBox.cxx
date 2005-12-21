@@ -271,11 +271,13 @@ void QtxDblSpinBox::selectAll()
 
 bool QtxDblSpinBox::eventFilter( QObject* o, QEvent* e )
 {
-  if ( e->type() == QEvent::FocusOut && o == editor() )
-    updateDisplay();
-
   if ( !myCleared || o != editor() || !editor()->text().stripWhiteSpace().isEmpty() )
-    return QSpinBox::eventFilter( o, e );
+  {
+    bool res = QSpinBox::eventFilter( o, e );
+    if ( e->type() == QEvent::FocusOut && o == editor() )
+      updateDisplay();
+    return res;
+  }
 
   if ( e->type() == QEvent::FocusOut || e->type() == QEvent::Leave || e->type() == QEvent::Hide )
     return false;
