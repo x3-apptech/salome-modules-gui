@@ -1058,9 +1058,12 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
   // Otherwise, "delete item" line will destroy all item's children,
   // and <myItems> will contain invalid pointers (see ~QListViewItem() description in Qt docs)
   DataObjectList childList;
-  obj->children( childList );
+  obj->children( childList, true );
   for ( DataObjectListIterator it( childList ); it.current(); ++it )
-    removeObject( it.current(), false );
+  {
+    it.current()->disconnect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
+    myItems.remove( it.current() );
+  }
 
   QListViewItem* item = listViewItem( obj );
 
