@@ -35,7 +35,9 @@
 #include <qwidgetstack.h>
 #include <qapplication.h>
 #include <qinputdialog.h>
+#include <qevent.h>
 
+#define DARK_COLOR_LIGHT      250
 /*!
     Class: QtxWorkstack [Public]
     Descr:
@@ -45,7 +47,8 @@ QtxWorkstack::QtxWorkstack( QWidget* parent )
 : QWidget( parent ),
 myWin( 0 ),
 myArea( 0 ),
-myWorkWin( 0 )
+myWorkWin( 0 ),
+myWorkArea( 0 )
 {
   myActionsMap.insert( SplitVertical,   new QAction( tr( "Split vertically" ),   0, this ) );
   myActionsMap.insert( SplitHorizontal, new QAction( tr( "Split horizontally" ), 0, this ) );
@@ -95,7 +98,9 @@ QWidget* QtxWorkstack::activeWindow() const
 
 void QtxWorkstack::split( const int o )
 {
-  QtxWorkstackArea* area = activeArea();
+  QtxWorkstackArea* area = myWorkArea;
+  if ( !area )
+    area = activeArea();
   if ( !area )
     return;
 
@@ -861,14 +866,19 @@ void QtxWorkstack::onDeactivated( QtxWorkstackArea* area )
 
 void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
 {
-  if ( !activeArea() )
+  QtxWorkstackArea* anArea = dynamic_cast<QtxWorkstackArea*>( (QObject*)sender()  );
+  if ( !anArea )
+    anArea = activeArea();
+
+  if ( !anArea )
     return;
 
-  QWidgetList lst = activeArea()->widgetList();
+  QWidgetList lst = anArea->widgetList();
   if ( lst.isEmpty() )
     return;
 
   myWorkWin = w;
+  myWorkArea = anArea;
 
   QPopupMenu* pm = new QPopupMenu();
   
@@ -891,6 +901,7 @@ void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
   delete pm;
 
   myWorkWin = 0;
+  myWorkArea = 0;
 }
 
 void QtxWorkstack::childEvent( QChildEvent* e )
@@ -1203,6 +1214,7 @@ void QtxWorkstackArea::insertWidget( QWidget* wid, const int idx )
   updateState();
 
   setWidgetActive( wid );
+  wid->setFocus();
 }
 
 void QtxWorkstackArea::onContextMenuRequested( QPoint p )
@@ -1388,8 +1400,14 @@ void QtxWorkstackArea::customEvent( QCustomEvent* e )
     {
       if ( !activeWidget()->focusWidget() )
         activeWidget()->setFocus();
-      else
-        activeWidget()->focusWidget()->setFocus();
+      else {
+        if ( activeWidget()->focusWidget()->hasFocus()) {
+          QFocusEvent in(QEvent::FocusIn);
+	  QApplication::sendEvent(this, &in);
+	}
+        else
+          activeWidget()->focusWidget()->setFocus();
+      }
     }
     break;
   case RemoveWidget:
@@ -1775,6 +1793,18 @@ void QtxWorkstackTabBar::setActive( const bool on )
 {
   QFont aFont = font();
   aFont.setUnderline( on );
+  QColorGroup* aColGrp = new QColorGroup();
+  QPalette aPal = palette();
+  if ( !on ) {
+    aPal.setColor( QColorGroup::HighlightedText, aColGrp->foreground() );
+    aPal.setColor( QColorGroup::Highlight, colorGroup().dark().light( DARK_COLOR_LIGHT ) );
+    setPalette( aPal );
+  }
+  else {
+    aPal.setColor( QColorGroup::HighlightedText, aColGrp->highlightedText() );
+    aPal.setColor( QColorGroup::Highlight, aColGrp->highlight() );
+    unsetPalette();
+  }
   setFont( aFont );
 
   update();

@@ -131,6 +131,7 @@ private:
   QtxWorkstackArea*   myArea;
   QSplitter*          mySplit;
   QWidget*            myWorkWin;
+  QtxWorkstackArea*   myWorkArea;
 
   QMap<int, QAction*> myActionsMap; //!< The map of the actions. Allows to get the QAction object by the key.
 
