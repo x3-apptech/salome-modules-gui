@@ -80,6 +80,8 @@ public:
 
   virtual void          start();
 
+  virtual void          closeApplication();
+
   virtual void          contextMenuPopup( const QString&, QPopupMenu*, QString& ) {}
 
 signals:
@@ -128,6 +130,9 @@ protected:
   virtual void          updateCommandsStatus();
 
   virtual void          setDesktop( SUIT_Desktop* );
+
+  virtual void          loadPreferences();
+  virtual void          savePreferences();
 
   virtual void          studySaved( SUIT_Study* );
   virtual void          studyOpened( SUIT_Study* );

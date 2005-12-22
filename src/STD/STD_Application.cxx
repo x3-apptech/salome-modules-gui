@@ -81,13 +81,27 @@ void STD_Application::start()
   updateCommandsStatus();
   setEditEnabled( myEditEnabled );
 
+  loadPreferences();
+
   SUIT_Application::start();
+}
+
+/*!
+  Close the Application
+*/
+void STD_Application::closeApplication()
+{
+  if ( desktop() )
+    savePreferences();
+
+  SUIT_Application::closeApplication();
 }
 
 /*!Event on closing desktop*/
 void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
 {
-  if (SUIT_Session::session()->applications().count() < 2) {
+  if ( SUIT_Session::session()->applications().count() < 2 )
+  {
     onExit();
     return;
   }
@@ -105,6 +119,8 @@ void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
 
   setActiveStudy( 0 );
   delete study;
+
+  savePreferences();
 
   setDesktop( 0 );
 
@@ -383,7 +399,10 @@ void STD_Application::onCloseDoc( bool ask )
   // STV: aNbStudies - number of currently existing studies (exclude currently closed)
   // STV: aNbStudies should be compared with 0.
   if ( aNbStudies )
+  {
+    savePreferences();
     setDesktop( 0 );
+  }
   else
   {
     updateDesktopTitle();
@@ -827,6 +846,20 @@ void STD_Application::setDesktop( SUIT_Desktop* desk )
   if ( prev != desk && desk )
     connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
              this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
+}
+
+/*!
+  Allow to load preferences before the desktop will be shown.
+*/
+void STD_Application::loadPreferences()
+{
+}
+
+/*!
+  Allow to save preferences before the application will be closed.
+*/
+void STD_Application::savePreferences()
+{
 }
 
 void STD_Application::studyCreated( SUIT_Study* )
