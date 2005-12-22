@@ -162,8 +162,8 @@ int main( int args, char* argv[] )
       if ( !noExceptHandling )
         app.setHandler( aSession->handler() );
 
-      if ( !app.mainWidget() )
-        app.setMainWidget( theApp->desktop() );
+//      if ( !app.mainWidget() )
+//        app.setMainWidget( theApp->desktop() );
 
       result = app.exec();
     }
