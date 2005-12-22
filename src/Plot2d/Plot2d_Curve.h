@@ -82,6 +82,12 @@ public:
   void        setYAxis(QwtPlot::Axis theYAxis);
   QwtPlot::Axis getYAxis() const;
 
+  // Protection against QwtCurve::drawLines() bug in Qwt 0.4.x: 
+  // it crashes if switched to X/Y logarithmic mode, when one or more points have
+  // non-positive X/Y coordinate
+  double      getMinX() const;
+  double      getMinY() const;
+
 protected:
   bool        myAutoAssign;
   QString     myHorTitle;

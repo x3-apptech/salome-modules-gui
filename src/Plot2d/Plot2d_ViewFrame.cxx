@@ -600,6 +600,15 @@ void Plot2d_ViewFrame::displayCurve( Plot2d_Curve* curve, bool update )
 {
   if ( !curve )
     return;
+  // san -- Protection against QwtCurve bug in Qwt 0.4.x: 
+  // it crashes if switched to X/Y logarithmic mode, when one or more points have
+  // non-positive X/Y coordinate
+  if ( myXMode && curve->getMinX() <= 0. )
+    setHorScaleMode( 0, false );
+  if ( myYMode && curve->getMinY() <= 0. )
+    setVerScaleMode( 0, false );
+
+
   if ( hasCurve( curve ) ) {
     updateCurve( curve, update );
   }
@@ -1170,9 +1179,6 @@ void Plot2d_ViewFrame::setXGrid( bool xMajorEnabled, const int xMajorMax,
          bool xMinorEnabled, const int xMinorMax, 
          bool update )
 {
-  if( xMinorMax>=xMajorMax )
-    return;
-
   myXGridMajorEnabled = xMajorEnabled;
   myXGridMinorEnabled = xMinorEnabled;
   myXGridMaxMajor = xMajorMax;
@@ -1317,6 +1323,14 @@ void Plot2d_ViewFrame::setFont( const QFont& font, ObjectType type, bool update)
 */
 void Plot2d_ViewFrame::setHorScaleMode( const int mode, bool update )
 {
+  // san -- Protection against QwtCurve bug in Qwt 0.4.x: 
+  // it crashes if switched to X/Y logarithmic mode, when one or more points have
+  // non-positive X/Y coordinate
+  if ( mode && !isXLogEnabled() ){
+    SUIT_MessageBox::warn1(this, tr("WARNING"), tr("WRN_XLOG_NOT_ALLOWED"), tr("BUT_OK"));
+    return;
+  }
+
   myXMode = mode;
   if ( myXMode == 0 ) // linear
     myPlot->changeAxisOptions( QwtPlot::xBottom, QwtAutoScale::Logarithmic, false );
@@ -1332,6 +1346,14 @@ void Plot2d_ViewFrame::setHorScaleMode( const int mode, bool update )
 */
 void Plot2d_ViewFrame::setVerScaleMode( const int mode, bool update )
 {
+  // san -- Protection against QwtCurve bug in Qwt 0.4.x: 
+  // it crashes if switched to X/Y logarithmic mode, when one or more points have
+  // non-positive X/Y coordinate
+  if ( mode && !isYLogEnabled() ){
+    SUIT_MessageBox::warn1(this, tr("WARNING"), tr("WRN_YLOG_NOT_ALLOWED"), tr("BUT_OK"));
+    return;
+  }
+
   myYMode = mode;
   if ( myYMode == 0 ) { // linear
     myPlot->changeAxisOptions( QwtPlot::yLeft, QwtAutoScale::Logarithmic, false );
@@ -1558,6 +1580,32 @@ void Plot2d_ViewFrame::onViewGlobalPan()
   fitAll();
   myOperation = GlPanId;
   qApp->installEventFilter( this );
+}
+
+/*!
+  Precaution for logarithmic X scale
+*/
+bool Plot2d_ViewFrame::isXLogEnabled() const
+{
+  bool allPositive = true;
+  QIntDictIterator<Plot2d_Curve> it( myCurves );
+  for ( ; allPositive && it.current(); ++it ) {
+    allPositive = ( it.current()->getMinX() > 0. );
+  }
+  return allPositive;
+}
+
+/*!
+  Precaution for logarithmic Y scale
+*/
+bool Plot2d_ViewFrame::isYLogEnabled() const
+{
+  bool allPositive = true;
+  QIntDictIterator<Plot2d_Curve> it( myCurves );
+  for ( ; allPositive && it.current(); ++it ) {
+    allPositive = ( it.current()->getMinY() > 0. );
+  }
+  return allPositive;
 }
 
 //=================================================================================

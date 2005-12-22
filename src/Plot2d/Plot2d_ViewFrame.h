@@ -110,6 +110,12 @@ public:
   bool    isModeVerLinear();
   bool    isLegendShow() { return myShowLegend; };
 
+  // Protection against QwtCurve::drawLines() bug in Qwt 0.4.x: 
+  // it crashes if switched to X/Y logarithmic mode, when one or more points have
+  // non-positive X/Y coordinate
+  bool    isXLogEnabled() const;
+  bool    isYLogEnabled() const;
+
   virtual bool print( const QString& file, const QString& format ) const;
 
 protected:
