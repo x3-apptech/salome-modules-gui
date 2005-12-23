@@ -318,7 +318,7 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
 
   TCollection_AsciiString aBaseKeyWord = DDS_Dictionary::KeyWord( "DATUM_UNITS" );
 
-  for ( Standard_Integer j = 0; j < theSystems.Length(); j++ )
+  for ( Standard_Integer j = 1; j <= theSystems.Length(); j++ )
   {
     UnitSystem anUnitSystem = theSystems.Value( j );
     if ( !anUnitSystem.Length() )

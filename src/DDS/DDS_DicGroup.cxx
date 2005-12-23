@@ -68,8 +68,6 @@ void DDS_DicGroup::operator=( const DDS_DicGroup& )
 
 void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM_Element& theDocElement )
 {
-  TColStd_SequenceOfAsciiString unitSystems;
-
   TCollection_AsciiString aCompName = theComponentData.getAttribute( DDS_Dictionary::KeyWord( "COMPONENT_NAME" ) );
 
   LDOM_Element systems = theComponentData.GetChildByTagName( DDS_Dictionary::KeyWord( "UNIT_SYSTEMS" ) );
@@ -87,8 +85,6 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
 
       if ( !myUnitSystem.IsBound( aName ) )
         myUnitSystem.Bind( aName, aLabel );
-
-      unitSystems.Append( aName );
     }
   }
 
@@ -97,6 +93,9 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
     printf( "Warning: Mandatory unit system SI not defined in component: \"%s\". Added automaticaly", aCompName.ToCString() );
     myUnitSystem.Bind( UNIT_SYSTEM_SI, TCollection_ExtendedString( "System international" ) );
   }
+
+  TColStd_SequenceOfAsciiString unitSystems;
+  GetUnitSystems( unitSystems );
 
   LDOM_NodeList aData = theComponentData.getElementsByTagName( DDS_Dictionary::KeyWord( "DATUM" ) );
   if ( !aData.getLength() )

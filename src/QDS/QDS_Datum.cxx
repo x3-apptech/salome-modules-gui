@@ -922,7 +922,6 @@ void QDS_Datum::unitSystemChanged( const QString& unitSystem )
   if ( labelWidget() )
     labelWidget()->setText( labText );
 
-
   if ( unitsWidget() )
     unitsWidget()->setText( unitText );
 
