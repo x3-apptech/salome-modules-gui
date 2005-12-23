@@ -121,18 +121,22 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent, bool showDefCheck, bo
   QGridLayout* aGridLayoutX = new QGridLayout( aGridGrpX->layout() );
   aGridLayoutX->setMargin( MARGIN_SIZE ); aGridLayoutX->setSpacing( SPACING_SIZE );
   myXGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_HOR_MAJOR" ), aGridGrpX );
+  QLabel* aXMajLbl  = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpX);
   myXGridSpin       = new QSpinBox( 1, 100, 1, aGridGrpX );
   myXGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myXGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
   myXMinGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_HOR_MINOR" ), aGridGrpX );
+  QLabel* aXMinLbl     = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpX);
   myXMinGridSpin       = new QSpinBox( 1, 100, 1, aGridGrpX );
   myXMinGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myXMinGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
 
   aGridLayoutX->addWidget( myXGridCheck,    0, 0 );
-  aGridLayoutX->addWidget( myXGridSpin,     0, 1 );
+  aGridLayoutX->addWidget( aXMajLbl,        0, 1 );
+  aGridLayoutX->addWidget( myXGridSpin,     0, 2 );
   aGridLayoutX->addWidget( myXMinGridCheck, 1, 0 );
-  aGridLayoutX->addWidget( myXMinGridSpin,  1, 1 );
+  aGridLayoutX->addWidget( aXMinLbl,        1, 1 );
+  aGridLayoutX->addWidget( myXMinGridSpin,  1, 2 );
   aXLayout->addMultiCellWidget( aGridGrpX, 3, 3, 0, 3 );
 
   aTabWidget->addTab( aXWidget, tr( "INF_AXES_X" ) );
@@ -156,18 +160,22 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent, bool showDefCheck, bo
   QGridLayout* aGridLayoutY = new QGridLayout( aGridGrpY->layout() );
   aGridLayoutY->setMargin( MARGIN_SIZE ); aGridLayoutY->setSpacing( SPACING_SIZE );
   myYGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_VER_MAJOR" ), aGridGrpY );
+  QLabel* aYMajLbl  = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpY);
   myYGridSpin       = new QSpinBox( 1, 100, 1, aGridGrpY );
   myYGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myYGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
   myYMinGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_VER_MINOR" ), aGridGrpY );
+  QLabel* aYMinLbl     = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpY);
   myYMinGridSpin       = new QSpinBox( 1, 100, 1, aGridGrpY );
   myYMinGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myYMinGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
 
   aGridLayoutY->addWidget( myYGridCheck,    0, 0 );
-  aGridLayoutY->addWidget( myYGridSpin,     0, 1 );
+  aGridLayoutY->addWidget( aYMajLbl,        0, 1 );
+  aGridLayoutY->addWidget( myYGridSpin,     0, 2 );
   aGridLayoutY->addWidget( myYMinGridCheck, 1, 0 );
-  aGridLayoutY->addWidget( myYMinGridSpin,  1, 1 );
+  aGridLayoutY->addWidget( aYMinLbl,        1, 1 );
+  aGridLayoutY->addWidget( myYMinGridSpin,  1, 2 );
   aYLayout->addMultiCellWidget( aGridGrpY, 3, 3, 0, 3 );
 
   aTabWidget->addTab( aYWidget, tr( "INF_AXES_Y_LEFT" ) );
@@ -193,18 +201,22 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent, bool showDefCheck, bo
     QGridLayout* aGridLayoutY2 = new QGridLayout( aGridGrpY2->layout() );
     aGridLayoutY2->setMargin( MARGIN_SIZE ); aGridLayoutY2->setSpacing( SPACING_SIZE );
     myY2GridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_VER_MAJOR" ), aGridGrpY2 );
+    QLabel* aY2MajLbl  = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpY2);
     myY2GridSpin       = new QSpinBox( 1, 100, 1, aGridGrpY2 );
     myY2GridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
     myY2GridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
     myY2MinGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_VER_MINOR" ), aGridGrpY2 );
+    QLabel* aY2MinLbl     = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpY2);
     myY2MinGridSpin       = new QSpinBox( 1, 100, 1, aGridGrpY2 );
     myY2MinGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
     myY2MinGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
 
     aGridLayoutY2->addWidget( myY2GridCheck,    0, 0 );
-    aGridLayoutY2->addWidget( myY2GridSpin,     0, 1 );
+    aGridLayoutY2->addWidget( aY2MajLbl,        0, 1 );
+    aGridLayoutY2->addWidget( myY2GridSpin,     0, 2 );
     aGridLayoutY2->addWidget( myY2MinGridCheck, 1, 0 );
-    aGridLayoutY2->addWidget( myY2MinGridSpin,  1, 1 );
+    aGridLayoutY2->addWidget( aY2MinLbl,        1, 1 );
+    aGridLayoutY2->addWidget( myY2MinGridSpin,  1, 2 );
     aYLayout2->addMultiCellWidget( aGridGrpY2, 3, 3, 0, 3 );
 
     aTabWidget->addTab( aYWidget2, tr( "INF_AXES_Y_RIGHT" ) );

@@ -237,6 +237,9 @@ msgstr "Horizontal minor"
 msgid "PLOT2D_GRID_ENABLE_VER_MINOR"
 msgstr "Vertical minor"
 
+msgid "PLOT2D_MAX_INTERVALS"
+msgstr "Max intervals"
+
 msgid "PLOT2D_SET_AS_DEFAULT_CHECK"
 msgstr "Save settings as default"
 
