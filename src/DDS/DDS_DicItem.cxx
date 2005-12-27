@@ -565,7 +565,7 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
     }
 
     if ( !aStatus )
-      printf( "Error in DataDictionary: Different dimensions for %s item", theID );
+      printf( "Error in DataDictionary: Different dimensions for %s item", theID.ToCString() );
   }
 
   myId                = theID;
