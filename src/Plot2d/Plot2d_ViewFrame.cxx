@@ -1390,7 +1390,9 @@ bool Plot2d_ViewFrame::isModeVerLinear()
 */
 void Plot2d_ViewFrame::plotMousePressed(const QMouseEvent& me )
 {
-  ((Plot2d_ViewWindow*)parent())->putInfo(getInfo(me.pos()));
+  Plot2d_ViewWindow* aParent = dynamic_cast<Plot2d_ViewWindow*>(parent());
+   if (aParent)
+     aParent->putInfo(getInfo(me.pos()));
   if ( myOperation == NoOpId )
     myOperation = testOperation( me );
   if ( myOperation != NoOpId ) {
@@ -1471,7 +1473,9 @@ void Plot2d_ViewFrame::plotMouseMoved( const QMouseEvent& me )
     }
   }
   else {
-    ((Plot2d_ViewWindow*)parent())->putInfo(getInfo(me.pos()));
+     Plot2d_ViewWindow* aParent = dynamic_cast<Plot2d_ViewWindow*>(parent());
+     if (aParent)
+       aParent->putInfo(getInfo(me.pos()));
   }
 }
 /*!
@@ -1493,7 +1497,9 @@ void Plot2d_ViewFrame::plotMouseReleased( const QMouseEvent& me )
   myPlot->canvas()->setCursor( QCursor( Qt::CrossCursor ) );
   myPlot->setOutlineStyle( Qwt::Triangle );
 
-  ((Plot2d_ViewWindow*)parent())->putInfo(tr("INF_READY"));
+  Plot2d_ViewWindow* aParent = dynamic_cast<Plot2d_ViewWindow*>(parent());
+   if (aParent)
+     aParent->putInfo(tr("INF_READY"));
   myOperation = NoOpId;
 }
 /*!
