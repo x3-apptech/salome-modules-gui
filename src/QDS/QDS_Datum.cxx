@@ -128,7 +128,10 @@ myInitialised( false )
   TCollection_AsciiString anId = toAsciiString( id );
   TCollection_AsciiString aComp = toAsciiString( comp );
 
-  setDicItem( aDict->GetDicItem( anId, aComp ) );
+  if ( aComp.IsEmpty() )
+    setDicItem( aDict->GetDicItem( anId ) );
+  else
+    setDicItem( aDict->GetDicItem( anId, aComp ) );
 
   QTimer::singleShot( 0, this, SLOT( onInitDatum() ) );
 
