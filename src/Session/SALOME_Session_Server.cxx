@@ -295,7 +295,6 @@ int main( int argc, char **argv )
     {
       INFOS( "salome_shared_modules_module == NULL" );
       PyErr_Print();
-      PyErr_Clear();
     }
     PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate );
 
@@ -413,8 +412,9 @@ int main( int argc, char **argv )
       SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
       if ( aGUIApp )
       {
-	_qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
-	                                             // aGUISession contains SalomeApp_ExceptionHandler
+	if ( !isFound( "noexcepthandler", argc, argv ) )
+	  _qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
+	                                               // aGUISession contains SalomeApp_ExceptionHandler
 	// Run GUI loop
 	MESSAGE( "run(): starting the main event loop" );
 	result = _qappl.exec();

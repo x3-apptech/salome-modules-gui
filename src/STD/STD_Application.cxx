@@ -163,7 +163,7 @@ void STD_Application::createActions()
 
   createAction( FileSaveAsId, tr( "TOT_DESK_FILE_SAVEAS" ), QIconSet(),
                 tr( "MEN_DESK_FILE_SAVEAS" ), tr( "PRP_DESK_FILE_SAVEAS" ),
-                0, desk, false, this, SLOT( onSaveAsDoc() ) );
+                CTRL+Key_A, desk, false, this, SLOT( onSaveAsDoc() ) );
 
   createAction( EditCopyId, tr( "TOT_DESK_EDIT_COPY" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_EDIT_COPY" ) ),
@@ -177,7 +177,7 @@ void STD_Application::createActions()
 
   QAction* a = createAction( ViewStatusBarId, tr( "TOT_DESK_VIEW_STATUSBAR" ),
                              QIconSet(), tr( "MEN_DESK_VIEW_STATUSBAR" ),
-                             tr( "PRP_DESK_VIEW_STATUSBAR" ), 0, desk, true );
+                             tr( "PRP_DESK_VIEW_STATUSBAR" ), SHIFT+Key_S, desk, true );
   a->setOn( desk->statusBar()->isVisibleTo( desk ) );
   connect( a, SIGNAL( toggled( bool ) ), this, SLOT( onViewStatusBar( bool ) ) );
 
@@ -186,7 +186,7 @@ void STD_Application::createActions()
 
   createAction( HelpAboutId, tr( "TOT_DESK_HELP_ABOUT" ), QIconSet(),
                 tr( "MEN_DESK_HELP_ABOUT" ), tr( "PRP_DESK_HELP_ABOUT" ),
-                0, desk, false, this, SLOT( onHelpAbout() ) );
+                SHIFT+Key_A, desk, false, this, SLOT( onHelpAbout() ) );
 
   //SRN: BugID IPAL9021, add an action "Load"
   createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),

@@ -134,7 +134,7 @@ void OB_Browser::setRootIsDecorated( const bool decor )
     return;
 
   myRootDecorated = decor;
-  updateTree();
+  updateTree( 0, false );
 }
 
 int OB_Browser::autoOpenLevel() const
@@ -506,7 +506,7 @@ void OB_Browser::setAppropriateColumn( const int id, const bool on )
   myView->setAppropriate( myColumnIds[id], on );
 }
 
-void OB_Browser::updateTree( SUIT_DataObject* obj )
+void OB_Browser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
 {
   if ( !obj && !(obj = getRootObject()) )
     return;
@@ -523,7 +523,8 @@ void OB_Browser::updateTree( SUIT_DataObject* obj )
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
 
-  autoOpenBranches();
+  if( autoOpen )
+    autoOpenBranches();
 
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
@@ -860,11 +861,22 @@ void OB_Browser::restoreState( const DataObjectMap& selObjs, const DataObjectMap
 
     if ( openObjs.contains( obj ) )
     {
-      if ( openObjs[obj] )
+      bool parentOpen = true;
+      if( item && item->parent() )
+	parentOpen = item->parent()->isOpen();
+	
+      if ( openObjs[obj] && parentOpen )
         lv->setOpen( item, true );
     }
     else if ( !key.isNull() && openKeys.contains( key ) )
-      lv->setOpen( item, true );
+    {
+      bool parentOpen = true;
+      if( item && item->parent() )
+	parentOpen = item->parent()->isOpen();
+
+      if( parentOpen )
+	lv->setOpen( item, true );
+    }
 
     if ( !curItem && ( curObj == obj || ( !curKey.isNull() && curKey == key )) )
       curItem = item;
@@ -892,7 +904,7 @@ OB_Browser::DataObjectKey OB_Browser::objectKey( SUIT_DataObject* obj ) const
 void OB_Browser::keyPressEvent( QKeyEvent* e )
 {
   if ( e->key() == Qt::Key_F5 )
-    updateTree();
+    updateTree( 0, false );
 
   QFrame::keyPressEvent( e );
 }
@@ -1083,7 +1095,7 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
   if ( isAutoUpdate() )
   {
     SUIT_DataObject* pObj = item && item->parent() ? dataObject( item->parent() ) : 0;
-    updateTree( pObj );
+    updateTree( pObj, false );
   }
   else
     delete item;

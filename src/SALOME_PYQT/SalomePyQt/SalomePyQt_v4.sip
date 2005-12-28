@@ -73,7 +73,7 @@ public:
   static const QString     getActiveComponent();
   static void              updateObjBrowser( const int = 0, bool = true );
 
-  static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool );
+  static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool ) /ReleaseGIL/ ;
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& );
 

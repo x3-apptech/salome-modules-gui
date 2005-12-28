@@ -41,6 +41,7 @@
 
 #include <LogWindow.h>
 #include <OB_Browser.h>
+#include <OB_ListView.h>
 #include <PythonConsole_PyConsole.h>
 
 #include <GLViewer_Viewer.h>
@@ -76,15 +77,7 @@
 #include <qobjectlist.h>
 #include <qcombobox.h>
 #include <qinputdialog.h>
-
-#define OBJECT_BROWSER_WIDTH 300
-#define OBJECT_COLUMN_WIDTH 150
-
-#ifdef WIN32
-#define DEFAULT_BROWSER "start iexplore.exe"
-#else
-#define DEFAULT_BROWSER "mozilla"
-#endif
+#include <qmessagebox.h>
 
 #define FIRST_HELP_ID 1000000
 
@@ -338,7 +331,7 @@ void LightApp_Application::createActions()
   //! Preferences
   createAction( PreferencesId, tr( "TOT_DESK_PREFERENCES" ), QIconSet(),
 		tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
-		CTRL+Key_P, desk, false, this, SLOT( onPreferences() ) );
+		CTRL+Key_F, desk, false, this, SLOT( onPreferences() ) );
 
   //! Help for modules
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
@@ -485,8 +478,8 @@ void LightApp_Application::createActions()
     createMenu( a, newWinMenu, -1 );
   }
 
-  createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_RENAME" ), tr( "PRP_RENAME" ),
-		0, desk, false, this, SLOT( onRenameWindow() ) );
+  createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_DESK_RENAME" ), tr( "PRP_RENAME" ),
+		SHIFT+Key_R, desk, false, this, SLOT( onRenameWindow() ) );
   createMenu( RenameId, windowMenu, -1 );
 
   connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
@@ -780,17 +773,13 @@ public:
 	    postEvent (qApp, ce2000);
 	  }
       }
-
-    if( myStatus != 0 || myApp.isEmpty())
+      if( myStatus != 0)
       {
-	myParams = "";
-	aCommand.sprintf("%s %s %s", QString(DEFAULT_BROWSER).latin1(),myParams.latin1(), myHelpFile.latin1());
-	myStatus = system(aCommand);
-	if(myStatus != 0)
-	  {
-	    QCustomEvent* ce2001 = new QCustomEvent (2001);
-	    postEvent (qApp, ce2001);
-	  }
+        qApp->lock();
+        SUIT_MessageBox::warn1(0, QObject::tr("WRN_WARNING"),
+                               QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").arg(myApp).arg(myHelpFile),
+                               QObject::tr("BUT_OK"));
+        qApp->unlock();
       }
   }
 
@@ -821,8 +810,15 @@ void LightApp_Application::onHelpContentsModule()
   QString anApp = resMgr->stringValue("ExternalBrowser", "application");
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
 
-  RunBrowser* rs = new RunBrowser(anApp, aParams, helpFile);
-  rs->start();
+  if (!anApp.isEmpty()) {
+    RunBrowser* rs = new RunBrowser(anApp, aParams, helpFile);
+    rs->start();
+  }
+  else {
+    SUIT_MessageBox::warn1(desktop(), tr("WRN_WARNING"),
+                           tr("DEFINE_EXTERNAL_BROWSER"),
+                           tr("BUT_OK"));
+  }
 }
 
 /*!Sets enable or disable some actions on selection changed.*/
@@ -888,11 +884,21 @@ void LightApp_Application::addWindow( QWidget* wid, const int flag, const int st
     myWindows[flag]->setResizeEnabled( true );
     myWindows[flag]->setCloseMode( QDockWindow::Always );
     myWindows[flag]->setName( QString( "dock_window_%1" ).arg( flag ) );
+    myWindows[flag]->setFixedExtentWidth( wid->width() );
+    myWindows[flag]->setFixedExtentHeight( wid->height() );
   }
 
   QFont f;
   if( wid->inherits( "PythonConsole" ) )
-    f = ( ( PythonConsole* )wid )->font();
+  {
+    if( resourceMgr()->hasValue( "PyConsole", "font" ) )
+      f = resourceMgr()->fontValue( "PyConsole", "font" );
+    else
+    {
+      f = ( ( PythonConsole* )wid )->font();
+      resourceMgr()->setValue( "PyConsole", "font", f );
+    }
+  }
   else
     f = wid->font();
 
@@ -1018,7 +1024,7 @@ void LightApp_Application::updateObjectBrowser( const bool updateModels )
   if ( objectBrowser() )
   {
     objectBrowser()->updateGeometry();
-    objectBrowser()->updateTree();
+    objectBrowser()->updateTree( 0, false );
   }
 }
 
@@ -1252,7 +1258,11 @@ void LightApp_Application::onPreferences()
   if ( !prefDlg )
     return;
 
-  prefDlg->exec();
+  if ( ( prefDlg->exec() == QDialog::Accepted || prefDlg->isSaved() ) &&  resourceMgr() ) {
+    if ( desktop() )
+      desktop()->saveGeometry( resourceMgr(), "desktop" );
+    resourceMgr()->save();
+  }
 
   delete prefDlg;
 }
@@ -1319,10 +1329,12 @@ QWidget* LightApp_Application::createWindow( const int flag )
     ob->setAutoUpdate( true );
     ob->setAutoOpenLevel( 1 );
     ob->setCaption( tr( "OBJECT_BROWSER" ) );
-    ob->listView()->setColumnWidth( 0, OBJECT_COLUMN_WIDTH );
-    ob->resize( OBJECT_BROWSER_WIDTH, ob->height() );
-    ob->setFilter( new LightApp_OBFilter( selectionMgr() ) );
 
+    OB_ListView* ob_list = dynamic_cast<OB_ListView*>( const_cast<QListView*>( ob->listView() ) );
+    if( ob_list )
+      ob_list->setColumnMaxWidth( 0, desktop()->width()/4 );
+
+    ob->setFilter( new LightApp_OBFilter( selectionMgr() ) );
     ob->setNameTitle( tr( "OBJ_BROWSER_NAME" ) );
 
     // Create OBSelector
@@ -1375,7 +1387,8 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
 
   LightApp_Application* that = (LightApp_Application*)this;
 
-  if ( !_prefs_ && crt )
+  bool toCreate = !_prefs_ && crt;
+  if( toCreate )
   {
     _prefs_ = new LightApp_Preferences( resourceMgr() );
     that->createPreferences( _prefs_ );
@@ -1411,7 +1424,8 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
       {
 	int modCat = _prefs_->addPreference( mod->moduleName() );
 	_prefs_->setItemProperty( modCat, "info", QString::null );
-	mod->createPreferences();
+	if( toCreate )
+	  mod->createPreferences();
       }
     }
   }
@@ -1456,12 +1470,14 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int undoPref = pref->addPreference( tr( "PREF_UNDO_LEVEL" ), studyGroup, LightApp_Preferences::IntSpin, "Study", "undo_level" );
   pref->setItemProperty( undoPref, "min", 1 );
   pref->setItemProperty( undoPref, "max", 100 );
+  pref->addPreference( tr( "PREF_STORE_POS" ), studyGroup, LightApp_Preferences::Bool, "Study", "store_positions" );
 
   int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab );
   pref->setItemProperty( extgroup, "columns", 1 );
   int apppref = pref->addPreference( tr( "PREF_APP" ), extgroup, LightApp_Preferences::File, "ExternalBrowser", "application" );
   pref->setItemProperty( apppref, "existing", true );
   pref->setItemProperty( apppref, "flags", QFileInfo::ExeUser );
+  pref->setItemProperty( apppref, "readOnly", false );
 
   pref->addPreference( tr( "PREF_PARAM" ), extgroup, LightApp_Preferences::String, "ExternalBrowser", "parameters" );
 
@@ -1587,6 +1603,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 		       LightApp_Preferences::Color, "SUPERVGraph", "Title" );
 //  pref->addPreference( tr( "PREF_SUPERV_CTRL_COLOR" ), supervGroup,
 //		       LightApp_Preferences::Color, "SUPERVGraph", "Ctrl" );
+
+  int obTab = pref->addPreference( tr( "PREF_TAB_OBJBROWSER" ), salomeCat );
+  int objSetGroup = pref->addPreference( tr( "PREF_OBJ_BROWSER_SETTINGS" ), obTab );
+  pref->addPreference( tr( "PREF_AUTO_SIZE_FIRST" ), objSetGroup, LightApp_Preferences::Bool,
+		       "ObjectBrowser", "auto_size_first" );
+  pref->addPreference( tr( "PREF_AUTO_SIZE" ), objSetGroup, LightApp_Preferences::Bool,
+		       "ObjectBrowser", "auto_size" );
 }
 
 /*!Changed preferences */
@@ -1649,17 +1672,24 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
   if( sec=="ObjectBrowser" )
   {
-    if( param=="auto_size" )
+    if( param=="auto_size" || param=="auto_size_first" )
     {
       OB_Browser* ob = objectBrowser();
       if( !ob )
 	return;
 
-      bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
+      bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false ),
+           autoSizeFirst = resMgr->booleanValue( "ObjectBrowser", "auto_size_first", true );
       ob->setWidthMode( autoSize ? QListView::Maximum : QListView::Manual );
-
+      ob->listView()->setColumnWidthMode( 0, autoSizeFirst ? QListView::Maximum : QListView::Manual );
       updateObjectBrowser( false );
     }
+  }
+
+  if( sec=="Study" )
+  { 
+    if( param=="store_positions" )
+      updateWindows();
   }
 
   if( sec=="PyConsole" )
@@ -1757,6 +1787,10 @@ void LightApp_Application::updateViewManagers()
 /*!Load windows geometry.*/
 void LightApp_Application::loadWindowsGeometry()
 {
+  bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
+  if( !store )
+    return;
+
   QtxDockAction* dockMgr = 0;
 
   QAction* a = action( ViewWindowsId );
@@ -1781,6 +1815,10 @@ void LightApp_Application::loadWindowsGeometry()
 /*!Save windows geometry.*/
 void LightApp_Application::saveWindowsGeometry()
 {
+  bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
+  if( !store )
+    return;
+
   QtxDockAction* dockMgr = 0;
 
   QAction* a = action( ViewWindowsId );

@@ -92,6 +92,7 @@ bool PythonConsole_PyInterp::initState()
     _tstate->interp->builtins = PyModule_GetDict(builtinmodule);
     Py_INCREF(_tstate->interp->builtins);
   }
+  PyEval_ReleaseThread(_tstate);
   return true;
 }
 

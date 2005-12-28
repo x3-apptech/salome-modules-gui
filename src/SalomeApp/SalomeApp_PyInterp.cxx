@@ -37,6 +37,7 @@
 #include "PyInterp_base.h" // this include must be first (see PyInterp_base.h)!
 
 #include <cStringIO.h>
+using namespace std;
 
 /*!
  * constructor : multi Python interpreter, one per SALOME study.
@@ -56,7 +57,7 @@ SalomeApp_PyInterp::~SalomeApp_PyInterp()
  
 /*!\class SalomeApp_PyInterp
  * EDF-CCAR
- * Wasashen SALOME uses multi Python interpreter feature,
+ * When SALOME uses multi Python interpreter feature,
  * Every study has its own interpreter and thread state (_tstate = Py_NewInterpreter())
  * This is fine because every study has its own modules (sys.modules) stdout and stderr
  * BUT some Python modules must be imported only once. In multi interpreter context Python
@@ -83,14 +84,12 @@ bool SalomeApp_PyInterp::initContext()
   if ( !PythonConsole_PyInterp::initContext() )
     return false;
 
-  // Debut modif CCAR
   // Import special module to change the import mechanism
   PyObjWrapper m1( PyImport_ImportModule( "import_hook" ) );
   if ( !m1 )
   {
     MESSAGE( "initContext: problem with import_hook import" );
     PyErr_Print();
-    PyErr_Clear();
     ASSERT( 0 );
     return false;
   }
@@ -100,10 +99,9 @@ bool SalomeApp_PyInterp::initContext()
   PyObjWrapper m2( PyObject_CallMethod( m1, "init_shared_modules", "O", KERNEL_PYTHON::salome_shared_modules_module ) );
   if ( !m2 )
   {
-	  MESSAGE( "initContext: problem with init_shared_modules call" );
-	  PyErr_Print();
-	  PyErr_Clear();
-	  ASSERT( 0 );
+    MESSAGE( "initContext: problem with init_shared_modules call" );
+    PyErr_Print();
+    ASSERT( 0 );
     return false;
   }
 
@@ -113,19 +111,13 @@ bool SalomeApp_PyInterp::initContext()
 void SalomeApp_PyInterp::init_python()
 {
   /*
-   * Initialize the main state (_gtstate) if not already done
-   * The lock is released on init_python output
-   * It is the caller responsability to acquire it if needed
+   * Do nothing
+   * The initialization has been done in main
    */
   MESSAGE("PyInterp_base::init_python");
   ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
   SCRUTE(KERNEL_PYTHON::_gtstate);
-//  if(!_gtstate){
-//  PyReleaseLock aReleaseLock;
-//  Py_Initialize(); // Initialize the interpreter
-//  PyEval_InitThreads(); // Initialize and acquire the global interpreter lock
-//  PySys_SetArgv(_argc,_argv); // initialize sys.argv
-//    _gtstate = PyThreadState_Get();
-//  }
+  _gtstate=KERNEL_PYTHON::_gtstate;
+  _interp=KERNEL_PYTHON::_interp;
 }
 

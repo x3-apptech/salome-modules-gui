@@ -121,12 +121,18 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
 }
 
 /*!Deactivate module.*/
-bool LightApp_Module::deactivateModule( SUIT_Study* )
+bool LightApp_Module::deactivateModule( SUIT_Study* study )
 {
   delete mySwitchOp;
   mySwitchOp = 0;
 
-  return true;
+  // abort all operations
+  MapOfOperation::const_iterator anIt;
+  for( anIt = myOperations.begin(); anIt != myOperations.end(); anIt++ ) {
+    anIt.data()->abort();
+  }
+
+  return CAM_Module::activateModule( study );
 }
 
 /*!NOT IMPLEMENTED*/

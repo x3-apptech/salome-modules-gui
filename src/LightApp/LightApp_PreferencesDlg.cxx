@@ -31,7 +31,7 @@
 */
 LightApp_PreferencesDlg::LightApp_PreferencesDlg( LightApp_Preferences* prefs, QWidget* parent )
 : QtxDialog( parent, 0, true, false, OK | Close | Apply ),
-myPrefs( prefs )
+myPrefs( prefs ), mySaved ( false )
 {
   setCaption( tr( "CAPTION" ) );
 
@@ -79,6 +79,7 @@ void LightApp_PreferencesDlg::accept()
   QtxDialog::accept();
 
   myPrefs->store();
+  mySaved = true;
 }
 
 /*!Reject. Restore preferences from backup.*/
@@ -99,4 +100,5 @@ void LightApp_PreferencesDlg::onApply()
 {
   myPrefs->store();
   myPrefs->toBackup();
+  mySaved = true;
 }

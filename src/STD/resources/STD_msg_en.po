@@ -123,7 +123,7 @@ msgid "MEN_DESK_VIEW_TOOLBARS"
 msgstr "T&oolbars"
 
 msgid "MEN_DESK_VIEW_STATUSBAR"
-msgstr "Stat&us Bar"
+msgstr "&Status Bar"
 
 msgid "MEN_DESK_VIEW_STDTOOLBAR"
 msgstr "&Standard"

@@ -37,7 +37,7 @@ msgid "SalomeApp_Application::TOT_DESK_FILE_DUMP_STUDY"
 msgstr "Dump study"
 
 msgid "SalomeApp_Application::MEN_DESK_FILE_DUMP_STUDY"
-msgstr "Dump study..."
+msgstr "&Dump study..."
 
 msgid "SalomeApp_Application::PRP_DESK_FILE_DUMP_STUDY"
 msgstr "Dumps study to the python script"
@@ -46,7 +46,7 @@ msgid "SalomeApp_Application::TOT_DESK_FILE_LOAD_SCRIPT"
 msgstr "Load python script"
 
 msgid "SalomeApp_Application::MEN_DESK_FILE_LOAD_SCRIPT"
-msgstr "Load script..."
+msgstr "Load scrip&t..."
 
 msgid "SalomeApp_Application::PRP_DESK_FILE_LOAD_SCRIPT"
 msgstr "Loads python script from file"
@@ -55,13 +55,13 @@ msgid "SalomeApp_Application::TOT_FILE_DESK_PREFERENCES"
 msgstr "Preferences"
 
 msgid "SalomeApp_Application::MEN_DESK_TOOLS"
-msgstr "Tools"
+msgstr "&Tools"
 
 msgid "SalomeApp_Application::TOT_DESK_CATALOG_GENERATOR"
 msgstr "Catalog generator"
 
 msgid "SalomeApp_Application::MEN_DESK_CATALOG_GENERATOR"
-msgstr "Catalog generator"
+msgstr "Catalog &generator"
 
 msgid "SalomeApp_Application::PRP_DESK_CATALOG_GENERATOR"
 msgstr "Generates XML catalog of a component's interface"
@@ -70,7 +70,7 @@ msgid "SalomeApp_Application::TOT_DESK_REGISTRY_DISPLAY"
 msgstr "Registry display"
 
 msgid "SalomeApp_Application::MEN_DESK_REGISTRY_DISPLAY"
-msgstr "Registry display"
+msgstr "Registry &display"
 
 msgid "SalomeApp_Application::PRP_DESK_REGISTRY_DISPLAY"
 msgstr "Displays content of the Registry CORBA server"
@@ -85,7 +85,7 @@ msgid "SalomeApp_Application::TOT_DESK_PROPERTIES"
 msgstr "Study properties"
 
 msgid "SalomeApp_Application::MEN_DESK_PROPERTIES"
-msgstr "Properties..."
+msgstr "Pro&perties..."
 
 msgid "SalomeApp_Application::PRP_DESK_PROPERTIES"
 msgstr "Edits study properties"
@@ -99,8 +99,8 @@ msgstr "Object browser"
 msgid "SalomeApp_Application::MEN_OPENWITH"
 msgstr "Activate Module"
 
-msgid "SalomeApp_Application::MEN_DELETE_REFERENCE"
-msgstr "Delete Reference"
+msgid "SalomeApp_Application::MEN_DELETE_INVALID_REFERENCE"
+msgstr "Delete Invalid Reference"
 
 //=======================================================================================
 
@@ -117,9 +117,6 @@ msgstr "Default columns"
 
 msgid "SalomeApp_Application::PREF_OBJ_BROWSER_SETTINGS"
 msgstr "Settings"
-
-msgid "SalomeApp_Application::PREF_AUTO_SIZE"
-msgstr "Auto size columns"
 
 //=======================================================================================
 

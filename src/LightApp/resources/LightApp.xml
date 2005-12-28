@@ -44,6 +44,9 @@
     <parameter name="QuickDirList" value=""/>
     <!-- Here go other common user preferences -->
   </section>
+  <section name="Study">
+    <parameter value="true" name="store_positions" />
+  </section>
   <section name="OCCViewer" >
     <parameter value="35, 136, 145" name="background" />
     <parameter value="1" name="iso_number_u" />

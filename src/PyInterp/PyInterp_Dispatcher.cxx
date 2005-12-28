@@ -31,7 +31,8 @@ void PyInterp_Request::process()
   safeExecute();
 
   myMutex.lock();
-  if ( !IsSync() && getListener() && getEvent() )
+  //if ( !IsSync() && getListener() && getEvent() )
+  if ( getListener() && getEvent() )
     postEvent();
   myMutex.unlock();
 }
@@ -56,7 +57,8 @@ QEvent* PyInterp_Request::createEvent() const
 
 QEvent* PyInterp_Request::getEvent()
 {
-  if ( !myEvent && !IsSync() )
+  //if ( !myEvent && !IsSync() )
+  if ( !myEvent )
     myEvent = createEvent();
   return myEvent;
 }
@@ -142,7 +144,8 @@ void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
   if ( !theRequest )
     return;
 
-  if ( theRequest->IsSync() && !IsBusy() ) // synchronous processing - nothing is done if dispatcher is busy!
+  //if ( theRequest->IsSync() && !IsBusy() ) // synchronous processing - nothing is done if dispatcher is busy!
+  if ( theRequest->IsSync() ) // synchronous processing - nothing is done if dispatcher is busy!
     processRequest( theRequest );
   else { // asynchronous processing
     myQueueMutex.lock();

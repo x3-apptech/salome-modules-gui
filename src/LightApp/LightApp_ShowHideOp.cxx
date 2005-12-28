@@ -58,8 +58,16 @@ void LightApp_ShowHideOp::startOperation()
     abort();
     return;
   }
-  QString aStr =  sel.param( 0, "component" ).toString();
-  QString mod_name = app->moduleTitle( aStr );//sel.param( 0, "component" ).toString() );
+
+  QString mod_name;
+  if( sel.count()>0 )
+  {
+    QString aStr =  sel.param( 0, "component" ).toString();
+    mod_name = app->moduleTitle( aStr );
+  }
+  else if( app->activeModule() )
+    mod_name = app->moduleTitle( app->activeModule()->name() );
+
   LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, true );
   if( !d )
   {

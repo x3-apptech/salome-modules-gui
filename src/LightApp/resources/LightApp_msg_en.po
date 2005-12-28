@@ -35,8 +35,8 @@ msgstr "Trying to activate module \"%1\""
 msgid "LightApp_Application::TOT_RENAME"
 msgstr "Rename"
 
-msgid "LightApp_Application::MEN_RENAME"
-msgstr "Rename"
+msgid "LightApp_Application::MEN_DESK_RENAME"
+msgstr "&Rename"
 
 msgid "LightApp_Application::PRP_RENAME"
 msgstr "Rename active window"
@@ -45,7 +45,7 @@ msgid "LightApp_Application::TOT_DESK_PREFERENCES"
 msgstr "Preferences"
 
 msgid "LightApp_Application::MEN_DESK_PREFERENCES"
-msgstr "Preferences..."
+msgstr "Pre&ferences..."
 
 msgid "LightApp_Application::TOT_DESK_MRU"
 msgstr "Most recently used"
@@ -66,19 +66,25 @@ msgid "LightApp_Application::PRP_MODULE"
 msgstr "Switch to the module \"%1\""
 
 msgid "LightApp_Application::NEW_WINDOW_0"
-msgstr "GL view"
+msgstr "&GL view"
 
 msgid "LightApp_Application::NEW_WINDOW_1"
-msgstr "Plot2d view"
+msgstr "&Plot2d view"
 
 msgid "LightApp_Application::NEW_WINDOW_2"
-msgstr "OCC view"
+msgstr "&OCC view"
 
 msgid "LightApp_Application::NEW_WINDOW_3"
-msgstr "VTK view"
+msgstr "VT&K view"
 
 msgid "LightApp_Application::INF_CANCELLED"
 msgstr "Module activation cancelled"
+
+msgid "EXTERNAL_BROWSER_CANNOT_SHOW_PAGE"
+msgstr "External browser \"%1\" can not show help page \"%2\""
+
+msgid "LightApp_Application::DEFINE_EXTERNAL_BROWSER"
+msgstr "Define external browser in preferences"
 
 msgid "LightApp_Application::DATA_MODELS"
 msgstr "Data models"
@@ -120,6 +126,9 @@ msgstr "ASCII save"
 msgid "LightApp_Application::PREF_UNDO_LEVEL"
 msgstr "Undo level"
 
+msgid "LightApp_Application::PREF_STORE_POS"
+msgstr "Store positions of windows"
+
 msgid "LightApp_Application::PREF_GROUP_EXT_BROWSER"
 msgstr "External browser"
 
@@ -137,6 +146,9 @@ msgstr "Font"
 
 msgid "LightApp_Application::PREF_TAB_OBJBROWSER"
 msgstr "Object browser"
+
+msgid "LightApp_Application::PREF_OBJ_BROWSER_SETTINGS"
+msgstr "Object browser settings"
 
 msgid "LightApp_Application::PREF_GROUP_DEF_COLUMNS"
 msgstr "Default columns"
@@ -232,6 +244,12 @@ msgstr "Title color"
 
 msgid "LightApp_Application::PREF_SUPERV_CTRL_COLOR"
 msgstr "Ctrl color"
+
+msgid "LightApp_Application::PREF_AUTO_SIZE"
+msgstr "Auto size for other columns"
+
+msgid "LightApp_Application::PREF_AUTO_SIZE_FIRST"
+msgstr "Auto size for first column"
 
 //=======================================================================================
 

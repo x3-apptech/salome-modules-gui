@@ -1303,12 +1303,13 @@ QtxListResourceEdit::FileItem::FileItem( const QString& title, QtxResourceEdit* 
 : PrefItem( Font, edit, pItem, parent ),
   myFlags( QFileInfo::ReadUser ),
   myIsExisting( true ),
+  myIsReadOnly ( true ),
   myFileDlg( 0 )
 {
   new QLabel( title, this );
   myFile = new QLineEdit( this );
   myFile->setValidator( new FileValidator( this, myFile ) );
-  myFile->setReadOnly( true );
+  myFile->setReadOnly( myIsReadOnly );
   myOpenFile = new QToolButton( this );
   myOpenFile->setText( "..." );
   connect( myOpenFile, SIGNAL( clicked() ), this, SLOT( onOpenFile() ) );
@@ -1338,6 +1339,8 @@ QVariant QtxListResourceEdit::FileItem::property( const QString& name ) const
     return myIsExisting;
   else if( name=="flags" )
     return myFlags;
+  else if( name=="readOnly")
+    return myIsReadOnly;
 
   return QVariant();
 }
@@ -1359,6 +1362,11 @@ void QtxListResourceEdit::FileItem::setProperty( const QString& name, const QVar
 
   else if( name=="flags" && value.canCast( QVariant::UInt ) )
     myFlags = value.toUInt();
+
+  else if( name=="readOnly" && value.canCast( QVariant::Bool) ) {
+    myIsReadOnly = value.toBool();
+    myFile->setReadOnly( myIsReadOnly );
+  }
 }
 
 void QtxListResourceEdit::FileItem::onOpenFile()

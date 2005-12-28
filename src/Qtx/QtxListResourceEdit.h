@@ -518,6 +518,7 @@ private slots:
 
 private:
   uint          myFlags;
+  bool          myIsReadOnly;
   QStringList   myFilter;
   bool          myIsExisting;
   QLineEdit*    myFile;

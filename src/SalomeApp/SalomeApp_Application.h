@@ -85,7 +85,7 @@ protected:
   virtual void                        updateDesktopTitle();
 
 private slots:
-  void                                onDeleteReferences();
+  void                                onDeleteInvalidReferences();
   void                                onDblClick( QListViewItem* );
   void                                onProperties();
   void                                onDumpStudy();

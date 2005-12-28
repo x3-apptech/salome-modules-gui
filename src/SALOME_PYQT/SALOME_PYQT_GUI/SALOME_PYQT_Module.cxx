@@ -503,11 +503,11 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   PyLockWrapper aLock = myInterp->GetLockWrapper();
   // ... (the Python module is already imported)
   // ... finally call Python module's initialize() method
-  PyObjWrapper res( PyObject_CallMethod( myModule, "initialize", "" ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+  if(PyObject_HasAttrString(myModule , "initialize")){
+    PyObjWrapper res( PyObject_CallMethod( myModule, "initialize", "" ) );
+    if( !res ) {
+      PyErr_Print();
+    }
   }
   
   // get the windows list from the Python module by calling windows() method
@@ -517,51 +517,51 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   // VSR: LogWindow is not yet implemented
   // myWindowsMap.insert( SalomeApp_Application::WT_LogWindow,     Qt::DockBottom );
 
-  PyObjWrapper res1( PyObject_CallMethod( myModule, "windows", "" ) );
-  if( !res1 ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
-  }
-  else {
-    myWindowsMap.clear();
-    if ( PyDict_Check( res1 ) ) {
-      PyObject* key;
-      PyObject* value;
-      int pos = 0;
-      while ( PyDict_Next( res1, &pos, &key, &value ) ) {
-	// parse the return value
-	// it should be a map: {integer:integer}
-	int aKey, aValue;
-	if( key && PyInt_Check( key ) && value && PyInt_Check( value ) ) {
-	  aKey   = PyInt_AsLong( key );
-	  aValue = PyInt_AsLong( value );
-	  myWindowsMap[ aKey ] = aValue;
-	}
+  if(PyObject_HasAttrString(myModule , "windows")){
+    PyObjWrapper res1( PyObject_CallMethod( myModule, "windows", "" ) );
+    if( !res1 ) {
+      PyErr_Print();
+    }
+    else {
+      myWindowsMap.clear();
+      if ( PyDict_Check( res1 ) ) {
+        PyObject* key;
+        PyObject* value;
+        int pos = 0;
+        while ( PyDict_Next( res1, &pos, &key, &value ) ) {
+	  // parse the return value
+	  // it should be a map: {integer:integer}
+	  int aKey, aValue;
+	  if( key && PyInt_Check( key ) && value && PyInt_Check( value ) ) {
+	    aKey   = PyInt_AsLong( key );
+	    aValue = PyInt_AsLong( value );
+	    myWindowsMap[ aKey ] = aValue;
+	  }
+        }
       }
     }
   }
   // get the windows list from the Python module by calling views() method
-  PyObjWrapper res2( PyObject_CallMethod( myModule, "views", "" ) );
-  if( !res2 ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
-  }
-  else {
-    // parse the return value
-    // result can be one string...
-    if ( PyString_Check( res2 ) ) {
-      myViewMgrList.append( PyString_AsString( res2 ) );
+  if(PyObject_HasAttrString(myModule , "views")){
+    PyObjWrapper res2( PyObject_CallMethod( myModule, "views", "" ) );
+    if( !res2 ) {
+      PyErr_Print();
     }
-    // ... or list of strings
-    else if ( PyList_Check( res2 ) ) {
-      int size = PyList_Size( res2 );
-      for ( int i = 0; i < size; i++ ) {
-	PyObject* value = PyList_GetItem( res2, i );
-	if( value && PyString_Check( value ) ) {
-	  myViewMgrList.append( PyString_AsString( value ) );
-	}
+    else {
+      // parse the return value
+      // result can be one string...
+      if ( PyString_Check( res2 ) ) {
+        myViewMgrList.append( PyString_AsString( res2 ) );
+      }
+      // ... or list of strings
+      else if ( PyList_Check( res2 ) ) {
+        int size = PyList_Size( res2 );
+        for ( int i = 0; i < size; i++ ) {
+	  PyObject* value = PyList_GetItem( res2, i );
+	  if( value && PyString_Check( value ) ) {
+	    myViewMgrList.append( PyString_AsString( value ) );
+	  }
+        }
       }
     }
   }
@@ -596,20 +596,20 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
 
   if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
     // call Python module's setSettings() method (obsolete)
-    PyObjWrapper res( PyObject_CallMethod( myModule, "setSettings", "" ) );
-    if( !res ) {
-      // VSR: this method may not be implemented in Python module
-      // PyErr_Print();
-      PyErr_Clear();
+    if(PyObject_HasAttrString(myModule , "setSettings")){
+      PyObjWrapper res( PyObject_CallMethod( myModule, "setSettings", "" ) );
+      if( !res ) {
+        PyErr_Print();
+      }
     }
   }                         //__CALL_OLD_METHODS__
 
   // call Python module's activate() method (for the new modules)
-  PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
-  if( !res1 ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+  if(PyObject_HasAttrString(myModule , "activate")){
+    PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
+    if( !res1 ) {
+      PyErr_Print();
+    }
   }
 }
 
@@ -625,11 +625,11 @@ void SALOME_PYQT_Module::deactivate( SUIT_Study* theStudy )
     return;
   }
   // then call Python module's deactivate() method
-  PyObjWrapper res( PyObject_CallMethod( myModule, "deactivate", "" ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+  if(PyObject_HasAttrString(myModule , "deactivate")){
+    PyObjWrapper res( PyObject_CallMethod( myModule, "deactivate", "" ) );
+    if( !res ) {
+      PyErr_Print();
+    }
   }
 }
 
@@ -659,11 +659,11 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
   PyLockWrapper aLock = myInterp->GetLockWrapper();
 
   // call Python module's activeStudyChanged() method
-  PyObjWrapper res( PyObject_CallMethod( myModule, "activeStudyChanged", "i", aStudyId ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+  if(PyObject_HasAttrString(myModule , "activeStudyChanged")){
+    PyObjWrapper res( PyObject_CallMethod( myModule, "activeStudyChanged", "i", aStudyId ) );
+    if( !res ) {
+      PyErr_Print();
+    }
   }
 }
 
@@ -741,8 +741,8 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
     return;
   
   QString aContext( theContext ), aObject( "" ), aParent( "" );
-
-  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+ 
+  if ( IsCallOldMethods && PyObject_HasAttrString(myModule , "definePopup") ) { //__CALL_OLD_METHODS__
     // call definePopup() Python module's function
     // this is obsolete function, used only for compatibility reasons
     PyObjWrapper res(PyObject_CallMethod( myModule, 
@@ -752,9 +752,7 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
 					  aObject.latin1(), 
 					  aParent.latin1() ) );
     if( !res ) {
-      // VSR: this method may not be implemented in Python module
-      // PyErr_Print();
-      PyErr_Clear();
+      PyErr_Print();
     }
     else {
       // parse return value
@@ -775,18 +773,18 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
   PyObjWrapper sipPopup( sipBuildResult( 0, "M", thePopupMenu, sipClass_QPopupMenu ) );
 
   // then call Python module's createPopupMenu() method (for new modules)
-  PyObjWrapper res1( PyObject_CallMethod( myModule,
+  if ( PyObject_HasAttrString(myModule , "createPopupMenu") ) { 
+    PyObjWrapper res1( PyObject_CallMethod( myModule,
 					  "createPopupMenu",
  				          "Os",
 					  sipPopup.get(),
 					  aContext.latin1() ) );
-  if( !res1 ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+    if( !res1 ) {
+      PyErr_Print();
+    }
   }
 
-  if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
+  if ( IsCallOldMethods && PyObject_HasAttrString(myModule , "customPopup") ) { //__CALL_OLD_METHODS__
     // call customPopup() Python module's function
     // this is obsolete function, used only for compatibility reasons
     PyObjWrapper res2( PyObject_CallMethod( myModule,
@@ -797,9 +795,7 @@ void SALOME_PYQT_Module::contextMenu( const QString& theContext, QPopupMenu* the
 					    aObject.latin1(), 
 					    aParent.latin1() ) );
     if( !res2 ) {
-      // VSR: this method may not be implemented in Python module
-      // PyErr_Print();
-      PyErr_Clear();
+      PyErr_Print();
     }
   }                        //__CALL_OLD_METHODS__
 }
@@ -815,11 +811,11 @@ void SALOME_PYQT_Module::guiEvent( const int theId )
   if ( !myInterp || !myModule )
     return;
   
-  PyObjWrapper res( PyObject_CallMethod( myModule, "OnGUIEvent", "i", theId ) );
-  if( !res ) {
-    // VSR: this method may not be implemented in Python module
-    // PyErr_Print();
-    PyErr_Clear();
+  if ( PyObject_HasAttrString(myModule , "OnGUIEvent") ) { 
+    PyObjWrapper res( PyObject_CallMethod( myModule, "OnGUIEvent", "i", theId ) );
+    if( !res ) {
+      PyErr_Print();
+    }
   }
 }
 
@@ -934,11 +930,11 @@ void SALOME_PYQT_Module::setWorkSpace()
     }
     PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget ) );
     // ... and finally call Python module's setWorkspace() method (obsolete)
-    PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
-    if( !res ) {
-      // VSR: this method may not be implemented in Python module
-      // PyErr_Print();
-      PyErr_Clear();
+    if ( PyObject_HasAttrString(myModule , "setWorkSpace") ) { 
+      PyObjWrapper res( PyObject_CallMethod( myModule, "setWorkSpace", "O", pyws.get() ) );
+      if( !res ) {
+        PyErr_Print();
+      }
     }
   }                         //__CALL_OLD_METHODS__
 }

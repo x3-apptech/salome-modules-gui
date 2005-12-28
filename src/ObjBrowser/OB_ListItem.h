@@ -75,6 +75,7 @@ public:
   virtual void            paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r );
   virtual void            paintCell( QPainter* p, const QColorGroup& cg, int c, int w, int align );
 
+  virtual void setText ( int column, const QString & text );
 
   virtual int      rtti() const;
 

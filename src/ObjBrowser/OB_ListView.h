@@ -47,6 +47,11 @@ public:
   void                    setFilter( OB_Filter* );
 
   bool                    isOk( QListViewItem* ) const;
+  virtual void            setColumnWidth( int, int );
+  int                     columnMaxWidth( const int ) const;
+  void                    setColumnMaxWidth( const int, const int );
+  double                  columnMaxRatio( const int ) const;
+  void                    setColumnMaxRatio( const int, const double );
 
 signals:
   void                    dropped( QPtrList<QListViewItem>, QListViewItem*, int );
@@ -69,6 +74,8 @@ private:
 protected:
   QPtrList<QListViewItem> myItems;
   OB_Filter*              myFilter;
+  QMap<int,int>           myMaxColWidth;
+  QMap<int,double>        myMaxColRatio;
 };
 
 #ifdef WIN32

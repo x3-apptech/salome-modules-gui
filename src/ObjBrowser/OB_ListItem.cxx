@@ -192,6 +192,17 @@ int OB_ListItem::rtti() const
   return RTTI();
 }
 
+void OB_ListItem::setText( int column, const QString& text )
+{
+  QListViewItem::setText( column, text );
+  QFontMetrics fm = listView()->fontMetrics();
+  int necessary = width( fm, listView(), column ),
+      current = listView()->columnWidth( column );
+
+  if( listView()->columnWidthMode( column )==QListView::Maximum && necessary>current )
+    listView()->setColumnWidth( column, necessary );
+}
+
 /*!
     Class: OB_CheckListItem
     Descr: Check list view item for OB_Browser.

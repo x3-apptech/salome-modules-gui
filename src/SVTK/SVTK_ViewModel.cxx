@@ -238,7 +238,7 @@ SVTK_Viewer
 
 void SVTK_Viewer::onDumpView()
 {
-  SVTK_ViewWindow* aView = (SVTK_ViewWindow*)(myViewManager->getActiveView());
+  SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(myViewManager->getActiveView());
   if ( aView )
     aView->onDumpView();
 }
@@ -246,14 +246,12 @@ void SVTK_Viewer::onDumpView()
 //==========================================================
 void SVTK_Viewer::onChangeBgColor()
 {
-  QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
-  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)
-    if(SUIT_ViewWindow* aViewWindow = aViews.at(i))
-      if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewWindow)){
-	QColor aColor = QColorDialog::getColor( aView->backgroundColor(), aView);
-	if ( aColor.isValid() )
-	  aView->setBackgroundColor(aColor);
-      }
+  SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(myViewManager->getActiveView());
+  if ( aView ) {
+    QColor aColor = QColorDialog::getColor( aView->backgroundColor(), aView );
+    if ( aColor.isValid() )
+      aView->setBackgroundColor( aColor );
+  }
 }
 
 //==========================================================
@@ -370,6 +368,9 @@ SVTK_Viewer
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i)){
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewWindow)){
+
+	aView->unHighlightAll();
+
 	vtkRenderer* aRenderer =  aView->getRenderer();
 	vtkActorCollection* anActorCollection = aRenderer->GetActors();
 	anActorCollection->InitTraversal();

@@ -16,10 +16,11 @@
     <parameter name="xterm"      value="no"/>
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
+    <parameter name="noexcepthandler"  value="no"/>
     <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT"/>
     <parameter name="pyModules"  value=""/>
-    <parameter name="embedded"   value="SalomeAppEngine,study"/>
-    <parameter name="standalone" value="pyContainer,cppContainer,registry,moduleCatalog"/>
+    <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
+    <parameter name="standalone" value="pyContainer,supervContainer"/>
   </section>
   <section name="language">
     <parameter name="language"    value="en"/>
@@ -47,10 +48,17 @@
     <parameter name="MED"          value="${MED_ROOT_DIR}/share/salome/resources"/>
     <parameter name="StdMeshers"   value="${SMESH_ROOT_DIR}/share/salome/resources"/>
     <parameter name="COMPONENT"    value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="HELLO"        value="${HELLO1_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="HELLO"        value="${HELLO_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="PYHELLO"      value="${PYHELLO_ROOT_DIR}/share/salome/resources"/>
     <parameter name="NETGENPlugin" value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources"/>
     <parameter name="GHS3DPlugin"  value="${GHS3DPLUGIN_ROOT_DIR}/share/salome/resources"/>
     <parameter name="ToolsGUI"     value="${SUITRoot}/resources"/>
+  </section>
+  <section name="PyConsole">
+    <parameter name="font" value="Helvetic,12" />
+  </section>
+  <section name="Study">
+    <parameter name="store_positions" value="false" />
   </section>
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>
@@ -80,6 +88,11 @@
     <parameter name="name"       value="Hello"/>
     <parameter name="icon"       value="HELLO.png"/>
   </section>
+  <section name="PYHELLO">
+    <parameter name="name"       value="PyHello"/>
+    <parameter name="icon"       value="PYHELLO.png"/>
+    <parameter name="library"    value="SalomePyQtGUI"/>
+  </section>
 
 <!-- values below this line are just an example, they are not used  -->
   <section name="application">
@@ -88,7 +101,8 @@
   </section>
   <section name="ObjectBrowser" >
     <parameter value="false" name="auto_size" />
-    <parameter value="true" name="visibility_column_0" />
+    <parameter value="true"  name="auto_size_first" />
+    <parameter value="true"  name="visibility_column_0" />
     <parameter value="false" name="visibility_column_1" />
     <parameter value="false" name="visibility_column_2" />
     <parameter value="false" name="visibility_column_3" />
@@ -104,6 +118,9 @@
     <parameter value="105" name="trihedron_size" />
     <parameter value="true" name="relative_size" />
  </section>
+ <section name="ExternalBrowser" >
+    <parameter value="/usr/bin/mozilla" name="application" />
+  </section>
  <section name="Plot2d" >
     <parameter value="255, 255, 255" name="Background" />
     <parameter value="1" name="CurveType" />
@@ -140,9 +157,9 @@
     <parameter value="5" name="selection_width" />
     <parameter value="5" name="highlight_width" />
     <parameter value="0" name="controls_precision" />
-    <parameter value="0.12" name="scalar_bar_horizontal_height" />
-    <parameter value="0.6" name="scalar_bar_horizontal_width" />
-    <parameter value="0.2" name="scalar_bar_horizontal_x" />
+    <parameter value="0.05" name="scalar_bar_horizontal_height" />
+    <parameter value="0.5" name="scalar_bar_horizontal_width" />
+    <parameter value="0.01" name="scalar_bar_horizontal_x" />
     <parameter value="0.01" name="scalar_bar_horizontal_y" />
     <parameter value="255, 255, 255" name="scalar_bar_label_color" />
     <parameter value="Arial,12" name="scalar_bar_label_font" />
@@ -151,10 +168,10 @@
     <parameter value="0" name="scalar_bar_orientation" />
     <parameter value="255, 255, 255" name="scalar_bar_title_color" />
     <parameter value="Arial,12" name="scalar_bar_title_font" />
-    <parameter value="0.8" name="scalar_bar_vertical_height" />
-    <parameter value="0.1" name="scalar_bar_vertical_width" />
+    <parameter value="0.5" name="scalar_bar_vertical_height" />
+    <parameter value="0.05" name="scalar_bar_vertical_width" />
     <parameter value="0.01" name="scalar_bar_vertical_x" />
-    <parameter value="0.1" name="scalar_bar_vertical_y" />
+    <parameter value="0.01" name="scalar_bar_vertical_y" />
     <parameter value="true" name="DisplayMode" />
     <parameter value="true" name="auto_update" />
     <parameter value="1" name="display_mode" />
@@ -162,9 +179,10 @@
   </section>
   <section name="VISU" >
   <parameter value="false" name="full_med_loading" />
-  <parameter value="0.12" name="scalar_bar_horizontal_height" />
-  <parameter value="0.6" name="scalar_bar_horizontal_width" />
-  <parameter value="0.2" name="scalar_bar_horizontal_x" />
+  <parameter value="false" name="represent_shading" />
+  <parameter value="0.05" name="scalar_bar_horizontal_height" />
+  <parameter value="0.5" name="scalar_bar_horizontal_width" />
+  <parameter value="0.01" name="scalar_bar_horizontal_x" />
   <parameter value="0.01" name="scalar_bar_horizontal_y" />
   <parameter value="255, 255, 255" name="scalar_bar_label_color" />
   <parameter value="Arial,Bold,Italic,Underline,12" name="scalar_bar_label_font" />
@@ -175,10 +193,10 @@
   <parameter value="0" name="scalar_bar_orientation" />
   <parameter value="255, 255, 255" name="scalar_bar_title_color" />
   <parameter value="Arial,Bold,Italic,Underline,12" name="scalar_bar_title_font" />
-  <parameter value="0.8" name="scalar_bar_vertical_height" />
-  <parameter value="0.1" name="scalar_bar_vertical_width" />
+  <parameter value="0.5" name="scalar_bar_vertical_height" />
+  <parameter value="0.05" name="scalar_bar_vertical_width" />
   <parameter value="0.01" name="scalar_bar_vertical_x" />
-  <parameter value="0.1" name="scalar_bar_vertical_y" />
+  <parameter value="0.01" name="scalar_bar_vertical_y" />
   <parameter value="0" name="scalar_range_max" />
   <parameter value="0" name="scalar_range_min" />
   <parameter value="0" name="scalar_range_type" />

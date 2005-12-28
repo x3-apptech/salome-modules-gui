@@ -47,7 +47,7 @@ myWorkstackAction( 0 )
 
   myWorkstack = new QtxWorkstack( base );
   // setting Expanding size policy for central workstack.  If there are several widgets
-  // in central area of Desktop, other widgets will be added below the workstack (CATHARE, TIRPOLI modules).  
+  // in central area of Desktop, other widgets will be added below the workstack (CATHARE, TRIPOLI modules).  
   // But the workstack must occupy as much space as possible -- set Expanding for it.
   myWorkstack->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 

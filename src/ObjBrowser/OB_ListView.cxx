@@ -162,3 +162,39 @@ bool OB_ListView::isDropAccepted( QListViewItem* drag, QListViewItem* drop ) con
 
   return dropObj->isDropAccepted( dragObj );
 }
+
+void OB_ListView::setColumnWidth( int col, int width )
+{
+  int max = columnMaxWidth( col );
+  if( max>0 && width>max )
+    width = max;
+  QListView::setColumnWidth( col, width );
+}
+
+int OB_ListView::columnMaxWidth( const int col ) const
+{
+  int res = -1;
+  if( myMaxColWidth.contains( col ) )
+    res = myMaxColWidth[col];
+  else if( myMaxColRatio.contains( col ) )
+    res = int( myMaxColRatio[col]*height() );
+  return res;
+}
+
+void OB_ListView::setColumnMaxWidth( const int col, const int w )
+{
+  myMaxColWidth.insert( col, w );
+}
+
+double OB_ListView::columnMaxRatio( const int col ) const
+{
+  double res = 0.0;
+  if( myMaxColRatio.contains( col ) )
+    res = myMaxColRatio[col];
+  return res;
+}
+
+void OB_ListView::setColumnMaxRatio( const int col, const double r )
+{
+  myMaxColRatio.insert( col, r );
+}

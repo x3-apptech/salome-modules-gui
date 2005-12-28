@@ -168,6 +168,7 @@ void Session_ServerThread::Init()
 	    {
 	      NamingService_WaitForServerReadiness(_NS,"/myStudyManager");
 	      ActivateEngine(_argc, _argv);
+	      break;
 	    }
 	  case 6: // Container Manager
 	    {

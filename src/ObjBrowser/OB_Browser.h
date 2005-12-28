@@ -70,7 +70,7 @@ public:
   bool              isAutoDeleteObjects() const;
   virtual void      setAutoDeleteObjects( const bool );
 
-  virtual void      updateTree( SUIT_DataObject* = 0 );
+  virtual void      updateTree( SUIT_DataObject* = 0, const bool autoOpen = true );
   virtual void      replaceTree( SUIT_DataObject*, SUIT_DataObject* );
 
   bool              isShowToolTips();

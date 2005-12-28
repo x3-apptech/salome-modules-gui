@@ -23,9 +23,16 @@
 //#include <pthread.h>  // must be before Python.h !
 
 #include <Python.h>   // must be before qt includes ...
+#include <compile.h>   // Python include needed for versions before 2.4. Included in Python.h now.
+#include <eval.h>   // Python include needed for versions before 2.4. Included in Python.h now.
 
-#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
-extern "C" PyObject * PyEval_EvalCode(PyObject *co, PyObject *g, PyObject *l);
+//#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
+//extern "C" PyObject * PyEval_EvalCode(PyObject *co, PyObject *g, PyObject *l);
+//#endif
+
+/* For 2.3, use the PyGILState_ calls */
+#if (PY_VERSION_HEX >= 0x02030000)
+#define USE_GILSTATE
 #endif
 
 #define TOP_HISTORY_PY "--- top of history ---"
@@ -35,17 +42,21 @@ class PYINTERP_EXPORT PyLockWrapper
 {
   PyThreadState* myThreadState;
   PyThreadState* mySaveThreadState;
+#if defined(USE_GILSTATE)
+  PyGILState_STATE _savestate ;
+#endif
  public:
   PyLockWrapper(PyThreadState* theThreadState);
   ~PyLockWrapper();
 };
-
 
 class PYINTERP_EXPORT PyInterp_base{
  public:
   static int _argc;
   static char* _argv[];
   static PyObject *builtinmodule;
+  static PyThreadState *_gtstate;
+  static PyInterpreterState *_interp;
   
   PyInterp_base();
   ~PyInterp_base();

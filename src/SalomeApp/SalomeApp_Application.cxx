@@ -80,7 +80,8 @@ SalomeApp_Application::SalomeApp_Application()
  */
 SalomeApp_Application::~SalomeApp_Application()
 {
-  SalomeApp_EventFilter::Destroy();
+  // Do not destroy. It's a singleton !
+  //SalomeApp_EventFilter::Destroy();
 }
 
 /*!Start application.*/
@@ -101,27 +102,27 @@ void SalomeApp_Application::createActions()
   //! Dump study
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIconSet(),
 		tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
-		0, desk, false, this, SLOT( onDumpStudy() ) );
+		CTRL+Key_D, desk, false, this, SLOT( onDumpStudy() ) );
     
   //! Load script
   createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIconSet(),
 		tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
-		0, desk, false, this, SLOT( onLoadScript() ) );
+		CTRL+Key_T, desk, false, this, SLOT( onLoadScript() ) );
 
   //! Properties
   createAction( PropertiesId, tr( "TOT_DESK_PROPERTIES" ), QIconSet(),
 	        tr( "MEN_DESK_PROPERTIES" ), tr( "PRP_DESK_PROPERTIES" ),
-	        0, desk, false, this, SLOT( onProperties() ) );
+	        CTRL+Key_P, desk, false, this, SLOT( onProperties() ) );
 
   //! Catalog Generator
   createAction( CatalogGenId, tr( "TOT_DESK_CATALOG_GENERATOR" ),  QIconSet(),
 		tr( "MEN_DESK_CATALOG_GENERATOR" ), tr( "PRP_DESK_CATALOG_GENERATOR" ),
-		0, desk, false, this, SLOT( onCatalogGen() ) );
+		SHIFT+Key_G, desk, false, this, SLOT( onCatalogGen() ) );
 
   //! Registry Display
   createAction( RegDisplayId, tr( "TOT_DESK_REGISTRY_DISPLAY" ),  QIconSet(),
 		tr( "MEN_DESK_REGISTRY_DISPLAY" ), tr( "PRP_DESK_REGISTRY_DISPLAY" ),
-		0, desk, false, this, SLOT( onRegDisplay() ) );
+		SHIFT+Key_D, desk, false, this, SLOT( onRegDisplay() ) );
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
@@ -347,67 +348,60 @@ void SalomeApp_Application::onSelectionChanged()
    LightApp_SelectionMgr* mgr = selectionMgr();
    mgr->selectedObjects(list);
 
+   bool canCopy  = false;
+   bool canPaste = false;
+
    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
-   if(study == NULL) return;
+   if (study != NULL) {
+     _PTR(Study) stdDS = study->studyDS();
 
-   _PTR(Study) stdDS = study->studyDS();
-   if(!stdDS) return;
+     if (stdDS) {
+       SALOME_ListIteratorOfListIO it ( list );
 
-   QAction* qaction;
+       if (it.More() && list.Extent() == 1) {
+         _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
-   SALOME_ListIteratorOfListIO it( list );
-   if(it.More() && list.Extent() == 1)
-   {
-      _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
+         if ( so ) {
+           SALOMEDS_SObject* aSO = dynamic_cast<SALOMEDS_SObject*>(so.get());
 
-      qaction = action(EditCopyId);
-      if( so ) {
-        SALOMEDS_SObject* aSO = dynamic_cast<SALOMEDS_SObject*>(so.get());
-        if ( aSO && studyMgr()->CanCopy(so) ) qaction->setEnabled(true);  
-        else qaction->setEnabled(false);
-      }
-      else qaction->setEnabled(false);
-
-      qaction = action(EditPasteId);
-      if( so ) {
-        SALOMEDS_SObject* aSO = dynamic_cast<SALOMEDS_SObject*>(so.get());
-        if( aSO && studyMgr()->CanPaste(so) ) qaction->setEnabled(true);
-        qaction->setEnabled(false);
-      }
-      else qaction->setEnabled(false);
+           if ( aSO ) {
+             canCopy = studyMgr()->CanCopy(so);
+             canPaste = studyMgr()->CanPaste(so);
+           }
+         }
+       }
+     }
    }
-   else {
-     qaction = action(EditCopyId);
-     qaction->setEnabled(false);
-     qaction = action(EditPasteId);
-     qaction->setEnabled(false);
-   }
+
+   action(EditCopyId)->setEnabled(canCopy);
+   action(EditPasteId)->setEnabled(canPaste);
 }
 
 /*!Delete references.*/
-void SalomeApp_Application::onDeleteReferences()
+void SalomeApp_Application::onDeleteInvalidReferences()
 {
   SALOME_ListIO aList;
   LightApp_SelectionMgr* mgr = selectionMgr();
-  mgr->selectedObjects(aList);
+  mgr->selectedObjects( aList, QString::null, false );
 
-  if (aList.Extent() < 1) return;
+  if( aList.IsEmpty() )
+    return;
 
   SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
   _PTR(Study) aStudyDS = aStudy->studyDS();
   _PTR(StudyBuilder) aStudyBuilder = aStudyDS->NewBuilder();
   _PTR(SObject) anObj;
 
-  for ( SALOME_ListIteratorOfListIO it( aList ); it.More(); it.Next() )
+  for( SALOME_ListIteratorOfListIO it( aList ); it.More(); it.Next() )
+    if ( it.Value()->hasEntry() )
     {
-      if ( it.Value()->hasEntry() )
-	{
-	  _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() );
-	  if ( aSObject->ReferencedObject(anObj) )
-	    aStudyBuilder->RemoveReference(aSObject);
-	}
-    }
+      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
+      while( aRefObj && aRefObj->ReferencedObject( anObj ) )
+	aRefObj = anObj;
 
+      if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
+	 aStudyBuilder->RemoveReference( aSObject );
+    }
   updateObjectBrowser();
 }
 
@@ -469,10 +463,8 @@ void SalomeApp_Application::updateCommandsStatus()
   if( a )
     a->setEnabled( activeStudy() );
 
-  a = action(EditCopyId);
-  a->setEnabled(false);
-  a = action(EditPasteId);
-  a->setEnabled(false);
+  // update state of Copy/Paste menu items
+  onSelectionChanged();
 }
 
 /*!Private SLOT. On dump study.*/
@@ -548,7 +540,8 @@ QString SalomeApp_Application::getFileFilter() const
 /*!Create window.*/
 QWidget* SalomeApp_Application::createWindow( const int flag )
 {
-  QWidget* wid = LightApp_Application::createWindow(flag);
+  QWidget* wid = 0;
+  if ( flag != WT_PyConsole ) wid = LightApp_Application::createWindow(flag);
 
   SUIT_ResourceMgr* resMgr = resourceMgr();
 
@@ -556,7 +549,8 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   {
     OB_Browser* ob = (OB_Browser*)wid;
     connect( ob->listView(), SIGNAL( doubleClicked( QListViewItem* ) ), this, SLOT( onDblClick( QListViewItem* ) ) );
-    bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false );
+    bool autoSize = resMgr->booleanValue( "ObjectBrowser", "auto_size", false ),
+         autoSizeFirst = resMgr->booleanValue( "ObjectBrowser", "auto_size_first", true );
     for ( int i = SalomeApp_DataObject::CT_Value; i <= SalomeApp_DataObject::CT_RefEntry; i++ )
     {
       ob->addColumn( tr( QString().sprintf( "OBJ_BROWSER_COLUMN_%d", i ) ), i );
@@ -564,15 +558,16 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
                                                    QString().sprintf( "visibility_column_%d", i ), true ) );
     }
     ob->setWidthMode( autoSize ? QListView::Maximum : QListView::Manual );
+    ob->listView()->setColumnWidthMode( 0, autoSizeFirst ? QListView::Maximum : QListView::Manual );
+    ob->resize( desktop()->width()/3, ob->height() );
   }
   else if ( flag == WT_PyConsole )
   {
-    delete wid;
-    wid = 0;
     PythonConsole* pyCons = new PythonConsole( desktop(), new SalomeApp_PyInterp() );
     pyCons->setCaption( tr( "PYTHON_CONSOLE" ) );
     wid = pyCons;
-    //    pyCons->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
+    pyCons->resize( pyCons->width(), desktop()->height()/4 );
+    //pyCons->connectPopupRequest(this, SLOT(onConnectPopupRequest(SUIT_PopupClient*, QContextMenuEvent*)));
   }
   return wid;
 }
@@ -594,9 +589,6 @@ void SalomeApp_Application::createPreferences( LightApp_Preferences* pref )
                          LightApp_Preferences::Bool, "ObjectBrowser", QString().sprintf( "visibility_column_%d", i ) );
   }
   pref->setItemProperty( defCols, "columns", 1 );
-
-  int objSetGroup = pref->addPreference( tr( "PREF_OBJ_BROWSER_SETTINGS" ), obTab );
-  pref->addPreference( tr( "PREF_AUTO_SIZE" ), objSetGroup, LightApp_Preferences::Bool, "ObjectBrowser", "auto_size" );
 }
 
 /*!Update desktop title.*/
@@ -701,42 +693,37 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   // Get selected objects
   SALOME_ListIO aList;
   LightApp_SelectionMgr* mgr = selectionMgr();
-  mgr->selectedObjects(aList);
+  mgr->selectedObjects( aList, QString::null, false );
 
   // "Delete reference" item should appear only for invalid references
 
-  // Check if selected objects is invalid references
-  bool isInvalidRefs = true;
+  // isInvalidRefs will be true, if at least one of selected objects is invalid reference
+  bool isInvalidRefs = false;
+  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  _PTR(Study) aStudyDS = aStudy->studyDS();
+  _PTR(SObject) anObj;
 
-  if ( aList.Extent() < 1 )
-    isInvalidRefs = false;
-
-  if ( isInvalidRefs )
+  for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
+    if( it.Value()->hasEntry() )
     {
-      SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
-      _PTR(Study) aStudyDS = aStudy->studyDS();
-      _PTR(SObject) anObj;
+      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
+      while( aRefObj && aRefObj->ReferencedObject( anObj ) )
+	aRefObj = anObj;
 
-      for ( SALOME_ListIteratorOfListIO it( aList ); it.More() && isInvalidRefs; it.Next() )
-	{
-	  if ( it.Value()->hasEntry() )
-	    {
-	      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() );
-              SALOMEDS_SObject* aSO = dynamic_cast<SALOMEDS_SObject*>(aSObject.get());
-              if( aSO )
-                if ( aSObject->ReferencedObject(anObj) == false || !QString(anObj->GetName().c_str()).isEmpty() )
-                  isInvalidRefs = false;
-	    }
-	}
+      if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
+	isInvalidRefs = true;
     }
 
-  // Add "Delete refrence" item to popup
+  // Add "Delete reference" item to popup
   if ( isInvalidRefs )
-    {
-      thePopup->insertSeparator();
-      thePopup->insertItem( tr( "MEN_DELETE_REFERENCE" ), this, SLOT( onDeleteReferences() ) );
-      return;
-    }
+  {
+    thePopup->insertSeparator();
+    thePopup->insertItem( tr( "MEN_DELETE_INVALID_REFERENCE" ), this, SLOT( onDeleteInvalidReferences() ) );
+    return;
+  }
+
+  aList.Clear();
+  mgr->selectedObjects( aList );
 
   // "Activate module" item should appear only if it's necessary
   if (aList.Extent() != 1)
@@ -748,7 +735,6 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QPopupMenu* t
   if (currentModule && currentModule->moduleName() == aModuleTitle)
     return;
   thePopup->insertItem( tr( "MEN_OPENWITH" ), this, SLOT( onOpenWith() ) );
-
 }
 
 /*!Update obect browser:
@@ -782,7 +768,7 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   if ( objectBrowser() )
   {
     objectBrowser()->updateGeometry();
-    objectBrowser()->updateTree();
+    objectBrowser()->updateTree( 0, false );
   }
 }
 

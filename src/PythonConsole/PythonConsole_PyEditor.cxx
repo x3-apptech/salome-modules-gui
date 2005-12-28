@@ -56,8 +56,10 @@ static QString DOTS_PROMPT  = "... ";
 class ExecCommand : public PyInterp_LockRequest
 {
 public:
-  ExecCommand(PyInterp_base* theInterp, const char* theCommand, PythonConsole_PyEditor* theListener)
-: PyInterp_LockRequest( theInterp, theListener ), myCommand(theCommand), myState( PyInterp_Event::OK )
+  ExecCommand(PyInterp_base* theInterp, const char* theCommand,
+              PythonConsole_PyEditor* theListener, bool sync = false)
+    : PyInterp_LockRequest( theInterp, theListener, sync ),
+      myCommand( theCommand ), myState( PyInterp_Event::OK )
   {}
 
 protected:

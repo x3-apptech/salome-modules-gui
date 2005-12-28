@@ -38,9 +38,9 @@ bool SALOME_PYQT_PyInterp::initState()
   */
   SCRUTE(KERNEL_PYTHON::_gtstate);
   _tstate = KERNEL_PYTHON::_gtstate;
-  PyEval_AcquireLock();
-  PyThreadState_Swap(_tstate);
+  PyEval_AcquireThread(_tstate);
   SCRUTE(_tstate);
+  PyEval_ReleaseThread(_tstate);
   return true;
 }
 
@@ -67,11 +67,11 @@ int SALOME_PYQT_PyInterp::run(const char *command)
     PyErr_Print();
     return -1;
   }
-#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
-  PyObject *r = PyEval_EvalCode(code,_g,_g);
-#else
-  PyObject *r = PyEval_EvalCode((PyCodeObject*)code,_g,_g);
-#endif
+  //#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
+  //  PyObject *r = PyEval_EvalCode(code,_g,_g);
+  //#else
+  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_g,_g);
+  //#endif
   Py_DECREF(code);
   if(!r){
     // Une erreur s est produite a l execution
@@ -81,4 +81,3 @@ int SALOME_PYQT_PyInterp::run(const char *command)
   Py_DECREF(r);
   return 0;
 }
-

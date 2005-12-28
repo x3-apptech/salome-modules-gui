@@ -48,6 +48,8 @@ public:
                        const QString& textButton0 );
     static int error1 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0 );
+    static int question1 ( QWidget* parent, const QString& caption, const QString& text,
+			   const QString& textButton0 );
     //@}
 
     /** @name Two buttons message boxes.*/
@@ -61,6 +63,9 @@ public:
     static int error2 ( QWidget* parent, const QString& caption, const QString& text,
                        const QString& textButton0, const QString& textButton1,
                        int idButton0, int idButton1, int idDefault );
+    static int question2 ( QWidget* parent, const QString& caption, const QString& text,
+			   const QString& textButton0, const QString& textButton1,
+			   int idButton0, int idButton1, int idDefault );
     //@}
 
     /** @name Three buttons message boxes.*/
@@ -77,6 +82,10 @@ public:
                        const QString& textButton0, const QString& textButton1,
                        const QString& textButton2, int idButton0, int idButton1,
                        int idButton2, int idDefault );
+    static int question3 ( QWidget* parent, const QString& caption, const QString& text,
+			   const QString& textButton0, const QString& textButton1,
+			   const QString& textButton2, int idButton0, int idButton1,
+			   int idButton2, int idDefault );
     //@}
 };
 

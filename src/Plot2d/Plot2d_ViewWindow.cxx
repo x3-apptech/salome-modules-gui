@@ -357,7 +357,12 @@ void Plot2d_ViewWindow::onChangeVerMode()
 //****************************************************************
 void Plot2d_ViewWindow::onChangeCurveMode()
 {
-  myCurveBtn->SetItem(myViewFrame->getCurveType());
+  int aCurveType = myViewFrame->getCurveType();
+  myCurveBtn->SetItem(aCurveType);
+
+  myActionsMap[CurvPointsId]->setOn(aCurveType == 0);
+  myActionsMap[CurvLinesId]->setOn(aCurveType == 1);
+  myActionsMap[CurvSplinesId]->setOn(aCurveType == 2);
 }
 
 //****************************************************************
@@ -425,26 +430,14 @@ void Plot2d_ViewWindow::onLegend()
 void Plot2d_ViewWindow::onCurves()
 {
   QtxAction* aSender = (QtxAction*) sender();
-  if(aSender == myActionsMap[CurvPointsId]) {
-    myActionsMap[CurvPointsId]->setOn(true);
-    myActionsMap[CurvLinesId]->setOn(false);
-    myActionsMap[CurvSplinesId]->setOn(false);
+  if(aSender == myActionsMap[CurvPointsId])
     myViewFrame->setCurveType(0);
-  }
-  else if(aSender == myActionsMap[CurvLinesId]) {
-    myActionsMap[CurvLinesId]->setOn(true);
-    myActionsMap[CurvPointsId]->setOn(false);
-    myActionsMap[CurvSplinesId]->setOn(false);
+  else if(aSender == myActionsMap[CurvLinesId])
     myViewFrame->setCurveType(1);
-  }
-  else if(aSender == myActionsMap[CurvSplinesId]) {
-    myActionsMap[CurvSplinesId]->setOn( true );
-    myActionsMap[CurvPointsId]->setOn( false );
-    myActionsMap[CurvLinesId]->setOn( false );
+  else if(aSender == myActionsMap[CurvSplinesId])
     myViewFrame->setCurveType(2);
-  }
 }
-
+ 
 //****************************************************************
 void Plot2d_ViewWindow::onDumpView()
 {

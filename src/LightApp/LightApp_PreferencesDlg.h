@@ -40,12 +40,16 @@ public:
   virtual void          accept();
   virtual void          reject();
 
+  bool                  isSaved() { return mySaved; }
+  void                  setSaved( bool saved ) { mySaved = saved; } 
+
 private slots:
   void                  onHelp();
   void                  onApply();
 
 private:
   LightApp_Preferences* myPrefs;
+  bool                  mySaved;
 };
 
 #endif
