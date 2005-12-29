@@ -141,8 +141,8 @@ private:
   void                                       operator=( const DDS_DicItem& );
   // Assignment operator
 
-  void                                       FillDataMap( TCollection_AsciiString,
-                                                          const LDOM_Element&,const LDOM_Element&,
+  void                                       FillDataMap( TCollection_AsciiString, const LDOM_Element&,
+                                                          const LDOM_Element&, const LDOM_Element&,
                                                           const TColStd_SequenceOfAsciiString& );
   // prepares formants for each unit systems
 

@@ -110,7 +110,7 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
     Handle(DDS_DicItem) aDicItem = new DDS_DicItem();
 
     aDicItem->myComponent = this;
-    aDicItem->FillDataMap( anID, aQuantity, theComponentData, unitSystems );
+    aDicItem->FillDataMap( anID, aQuantity, theComponentData, theDocElement, unitSystems );
     myDataMap.Add( anID, aDicItem );
   }
 }
