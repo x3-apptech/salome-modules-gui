@@ -40,6 +40,9 @@ public:
   /*!Return "ObjectBrowser"*/
   virtual QString type() const { return "ObjectBrowser"; }
 
+  void         setModified();
+  unsigned long getModifiedTime() { return myModifiedTime; }
+
 private slots:
   void         onSelectionChanged();
 
@@ -53,6 +56,10 @@ private:
 private:
   OB_Browser*  myBrowser;
   SUIT_DataOwnerPtrList  mySelectedList;
+
+  QMap<QString, LightApp_DataObject*> myEntries;
+
+  unsigned long myModifiedTime;
 };
 
 #endif

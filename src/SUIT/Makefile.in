@@ -41,7 +41,8 @@ EXPORT_HEADERS= SUIT.h \
 	 SUIT_ViewModel.h \
 	 SUIT_ViewWindow.h \
 	 SUIT_SelectionFilter.h \
-	 SUIT_Accel.h
+	 SUIT_Accel.h \
+	 SUIT_TreeSync.h
 
 # .po files to transform in .qm
 PO_FILES = SUIT_images.po \

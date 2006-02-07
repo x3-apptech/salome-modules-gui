@@ -21,980 +21,641 @@
 //
 //
 //
-//  File   : VTKViewer_RenderWindowInteractor.cxx
-//  Author : Nicolas REJNERI
+//  File   : 
+//  Author : 
 //  Module : SALOME
 //  $Header$
 
 #include "SVTK_RenderWindowInteractor.h"
+#include "SVTK_GenericRenderWindowInteractor.h"
 
 #include "SVTK_InteractorStyle.h"
-#include "SVTK_RenderWindow.h"
-#include "SVTK_ViewWindow.h"
+#include "SVTK_Renderer.h"
+#include "SVTK_Functor.h"
+#include "SALOME_Actor.h"
+
+#include "SVTK_SpaceMouse.h" 
+#include "SVTK_Event.h" 
 
 #include "VTKViewer_Algorithm.h"
-#include "SVTK_Functor.h"
-#include "SVTK_Actor.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
 // VTK Includes
 #include <vtkObjectFactory.h>
-#include <vtkPicker.h>
-#include <vtkCellPicker.h>
-#include <vtkPointPicker.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
+#include <vtkGenericRenderWindowInteractor.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+#include <vtkPicker.h>
+#include <vtkCamera.h>
 
 // QT Includes
-#include <qkeycode.h>
-
-#include <TColStd_IndexedMapOfInteger.hxx>
+#include <qtimer.h>
+#include <qapplication.h>
+#include <qcolordialog.h>
+#include <qpaintdevice.h>
 
 using namespace std;
 
-SVTK_RenderWindowInteractor* 
-SVTK_RenderWindowInteractor
-::New() 
+static bool GENERATE_SUIT_EVENTS = false;
+static bool FOCUS_UNDER_MOUSE = false;
+
+
+//----------------------------------------------------------------------------
+QVTK_RenderWindowInteractor
+::QVTK_RenderWindowInteractor(QWidget* theParent, 
+			      const char* theName):
+  QWidget(theParent,theName,Qt::WNoAutoErase),
+  myRenderWindow(vtkRenderWindow::New())
 {
-  vtkObject *ret = vtkObjectFactory::CreateInstance("SVTK_RenderWindowInteractor") ;
-  if( ret ) {
-    return dynamic_cast<SVTK_RenderWindowInteractor *>(ret) ;
+  setMouseTracking(true);
+
+  myRenderWindow->Delete();
+  myRenderWindow->DoubleBufferOn();
+
+#ifndef WNT
+  myRenderWindow->SetDisplayId((void*)x11Display());
+#endif
+  myRenderWindow->SetWindowId((void*)winId());
+}
+
+
+void 
+QVTK_RenderWindowInteractor
+::Initialize(vtkGenericRenderWindowInteractor* theDevice)
+{
+  if(GetDevice())
+    myDevice->SetRenderWindow(NULL);
+
+  myDevice = theDevice;
+
+  if(theDevice)
+    theDevice->SetRenderWindow(getRenderWindow());
+}
+
+//----------------------------------------------------------------------------
+QVTK_RenderWindowInteractor
+::~QVTK_RenderWindowInteractor() 
+{
+  if(SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance())
+    if(aSpaceMouse->isSpaceMouseOn())
+      aSpaceMouse->close(x11Display());
+}
+
+
+//----------------------------------------------------------------------------
+vtkGenericRenderWindowInteractor* 
+QVTK_RenderWindowInteractor
+::GetDevice()
+{
+  return myDevice.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow*
+QVTK_RenderWindowInteractor
+::getRenderWindow()
+{
+  return myRenderWindow.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::InvokeEvent(unsigned long theEvent, void* theCallData)
+{
+  GetDevice()->InvokeEvent(theEvent,theCallData);
+}
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::show()
+{
+  QWidget::show();
+  update(); // needed for initial contents display on Win32
+}
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::polish()
+{
+  // Final initialization just before the widget is displayed
+  GetDevice()->SetSize(width(),height());
+  if(!GetDevice()->GetInitialized()){
+    GetDevice()->Initialize();
+    GetDevice()->ConfigureEvent();
   }
-  return new SVTK_RenderWindowInteractor;
 }
 
-SVTK_RenderWindowInteractor
-::SVTK_RenderWindowInteractor() 
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::resize(int w, int h) 
 {
-  this->Enabled = 0 ;
-  this->mTimer = new QTimer( this ) ;
-  myDisplayMode = 0;
-  myGUIWindow = 0;
+  GetDevice()->UpdateSize(w,h);
+}
 
-  myBasicPicker = vtkPicker::New();
-  myCellPicker = vtkCellPicker::New();
-  myPointPicker = vtkPointPicker::New();
-
-  myCellActor = SVTK_Actor::New(); 
-  myCellActor->PickableOff();
-  myCellActor->GetProperty()->SetColor(1,1,0);
-  myCellActor->GetProperty()->SetLineWidth(5);
-  myCellActor->GetProperty()->SetRepresentationToSurface();
-
-  myEdgeActor = SVTK_Actor::New(); 
-  myEdgeActor->PickableOff();
-  myEdgeActor->GetProperty()->SetColor(1,0,0);
-  myEdgeActor->GetProperty()->SetLineWidth(5);
-  myEdgeActor->GetProperty()->SetRepresentationToWireframe();
-
-  myPointActor = SVTK_Actor::New(); 
-  myPointActor->PickableOff();
-  myPointActor->GetProperty()->SetColor(1,1,0);
-  myPointActor->GetProperty()->SetPointSize(5);
-  myPointActor->GetProperty()->SetRepresentationToPoints();
-
-  connect(mTimer, SIGNAL(timeout()), this, SLOT(TimerFunc())) ;
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::paintEvent( QPaintEvent* theEvent ) 
+{
+  GetDevice()->Render();
 }
 
 
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::resizeEvent( QResizeEvent* theEvent )
+{
+  int* aSize = getRenderWindow()->GetSize();
+  int aWidth = aSize[0];
+  int aHeight = aSize[1];
+
+  GetDevice()->UpdateSize(width(),height());
+
+  if(isVisible() && aWidth && aHeight){
+    if( aWidth != width() || aHeight != height() ) {
+      vtkRendererCollection * aRenderers = getRenderWindow()->GetRenderers();
+      aRenderers->InitTraversal();
+      double aCoeff = 1.0;
+      if(vtkRenderer *aRenderer = aRenderers->GetNextItem()) {
+	vtkCamera *aCamera = aRenderer->GetActiveCamera();
+	double aScale = aCamera->GetParallelScale();
+	if((aWidth - width())*(aHeight - height()) > 0)
+	  aCoeff = sqrt(double(aWidth)/double(width())*double(height())/double(aHeight));
+	else
+	  aCoeff = double(aWidth)/double(width());
+	aCamera->SetParallelScale(aScale*aCoeff);
+      }
+    }
+  }
+
+  update(); 
+}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::contextMenuEvent( QContextMenuEvent* event )
+{}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::mouseMoveEvent( QMouseEvent* event ) 
+{
+  GetDevice()->SetEventInformationFlipY(event->x(), 
+					event->y(),
+					event->state() & ControlButton,
+					event->state() & ShiftButton);
+  GetDevice()->MouseMoveEvent();
+}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::mousePressEvent( QMouseEvent* event ) 
+{
+  GetDevice()->SetEventInformationFlipY(event->x(), 
+					event->y(),
+					event->state() & ControlButton,
+					event->state() & ShiftButton);
+  if( event->button() & LeftButton )
+    GetDevice()->LeftButtonPressEvent();
+  else if( event->button() & MidButton )
+    GetDevice()->MiddleButtonPressEvent();
+  else if( event->button() & RightButton )
+    GetDevice()->RightButtonPressEvent();
+}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::mouseReleaseEvent( QMouseEvent *event )
+{
+  GetDevice()->SetEventInformationFlipY(event->x(), 
+					event->y(),
+					event->state() & ControlButton,
+					event->state() & ShiftButton);
+
+  if( event->button() & LeftButton )
+    GetDevice()->LeftButtonReleaseEvent();
+  else if( event->button() & MidButton )
+    GetDevice()->MiddleButtonReleaseEvent();
+  else if( event->button() & RightButton )
+    GetDevice()->RightButtonReleaseEvent();
+}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::mouseDoubleClickEvent( QMouseEvent* event )
+{}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::wheelEvent( QWheelEvent* event )
+{
+  setActiveWindow();
+  setFocus();
+}
+
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::keyPressEvent( QKeyEvent* event ) 
+{
+  GetDevice()->SetKeyEventInformation(event->state() & ControlButton,
+				      event->state() & ShiftButton,
+				      event->key());
+  GetDevice()->KeyPressEvent();
+  GetDevice()->CharEvent();
+}
+
+//----------------------------------------------------------------------------
+void
+QVTK_RenderWindowInteractor
+::keyReleaseEvent( QKeyEvent * event ) 
+{
+  GetDevice()->SetKeyEventInformation(event->state() & ControlButton,
+				      event->state() & ShiftButton,
+				      event->key());
+  GetDevice()->KeyReleaseEvent();
+}
+
+
+//----------------------------------------------------------------------------
+void  
+QVTK_RenderWindowInteractor
+::enterEvent( QEvent* event )
+{
+  if(FOCUS_UNDER_MOUSE){
+    setActiveWindow();
+    setFocus();
+  }
+  GetDevice()->EnterEvent();
+}
+
+//----------------------------------------------------------------------------
+void  
+QVTK_RenderWindowInteractor
+::leaveEvent( QEvent * )
+{
+  GetDevice()->LeaveEvent();
+}
+
+
+//----------------------------------------------------------------------------
+void  
+QVTK_RenderWindowInteractor
+::focusInEvent( QFocusEvent* event )
+{
+  QWidget::focusInEvent( event );
+
+  // register set space mouse events receiver
+  if(SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance()){
+    if(!aSpaceMouse->isSpaceMouseOn()) {// initialize 3D space mouse driver 
+      aSpaceMouse->initialize(x11Display(),winId());
+    }else{
+      aSpaceMouse->setWindow(x11Display(),winId());
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void  
+QVTK_RenderWindowInteractor
+::focusOutEvent ( QFocusEvent* event )
+{
+  QWidget::focusOutEvent( event );
+
+  // unregister set space mouse events receiver
+  if(SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance()){
+    if(aSpaceMouse->isSpaceMouseOn())
+      aSpaceMouse->setWindow(x11Display(),0);
+  }
+}
+
+
+//----------------------------------------------------------------------------
+bool 
+QVTK_RenderWindowInteractor
+::x11Event( XEvent *xEvent )
+{
+  // handle 3d space mouse events
+  if(SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance()){
+    if(aSpaceMouse->isSpaceMouseOn() && xEvent->type == ClientMessage){
+      SVTK_SpaceMouse::MoveEvent anEvent;
+      int type = aSpaceMouse->translateEvent( x11Display(), xEvent, &anEvent, 1.0, 1.0 );
+      switch( type ){
+      case SVTK_SpaceMouse::SpaceMouseMove : 
+	GetDevice()->InvokeEvent(SVTK::SpaceMouseMoveEvent, anEvent.data );
+	break;
+      case SVTK_SpaceMouse::SpaceButtonPress :
+	GetDevice()->InvokeEvent( SVTK::SpaceMouseButtonEvent, &anEvent.button );
+	break;
+      case SVTK_SpaceMouse::SpaceButtonRelease :
+	break;
+      }
+      return true; // stop handling the event
+    }
+  }
+
+  return QWidget::x11Event( xEvent );
+}
+
+
+//----------------------------------------------------------------------------
+SVTK_RenderWindowInteractor
+::SVTK_RenderWindowInteractor(QWidget* theParent, 
+			       const char* theName):
+  QVTK_RenderWindowInteractor(theParent,theName),
+  myEventCallbackCommand(vtkCallbackCommand::New())
+{
+  myEventCallbackCommand->Delete();
+
+  myEventCallbackCommand->SetClientData(this); 
+  myPriority = 0.0;
+
+  myEventCallbackCommand->SetCallback(SVTK_RenderWindowInteractor::ProcessEvents);
+}
+
+void
+SVTK_RenderWindowInteractor
+::Initialize(vtkGenericRenderWindowInteractor* theDevice,
+	     SVTK_Renderer* theRenderer,
+	     SVTK_Selector* theSelector)
+{
+  QVTK_RenderWindowInteractor::Initialize(theDevice);
+  SetRenderer(theRenderer);
+  SetSelector(theSelector);
+}
+
+//----------------------------------------------------------------------------
 SVTK_RenderWindowInteractor
 ::~SVTK_RenderWindowInteractor() 
 {
-  delete mTimer ;
-
-  myViewWindow->RemoveActor(myCellActor);
-  myViewWindow->RemoveActor(myEdgeActor);
-  myViewWindow->RemoveActor(myPointActor);
-
-  myCellActor->Delete();
-  myEdgeActor->Delete();
-  myPointActor->Delete();
-
-  myBasicPicker->Delete();
-  myCellPicker->Delete();
-  myPointPicker->Delete();
-}
-
-//
-// We never allow the SVTK_RenderWindowInteractor to control 
-// the event loop. The application always has the control. 
-//
-void
-SVTK_RenderWindowInteractor
-::Initialize() 
-{
-  //
-  // We cannot do much unless there is a render window 
-  // associated with this interactor. 
-  //
-  if( ! RenderWindow ) {
-    vtkErrorMacro(<< "SVTK_RenderWindowInteractor::Initialize(): No render window attached!") ;
-    return ;
+  // Sequence of the destruction call are fixed and should be changed.
+  // vtkRenderWindow instance should be destroyed after all vtkRenderer's
+  GetDevice()->SetInteractorStyle(NULL); 
+  while(!myInteractorStyles.empty()){
+    const PInteractorStyle& aStyle = myInteractorStyles.top();
+    aStyle->SetInteractor(NULL);
+    myInteractorStyles.pop();
   }
 
-  //
-  // We cannot hand a render window which is not a VTKViewer_RenderWindow. 
-  // One way to force this is to use dynamic_cast and hope that 
-  // it works. If the dynamic_cast does not work, we flag an error
-  // and get the hell out.
-  //
-  vtkRenderWindow *aRenderWindow = dynamic_cast<vtkRenderWindow *>(RenderWindow) ;
-  if( !aRenderWindow ) {
-    vtkErrorMacro(<< "SVTK_RenderWindowInteractor::Initialize() can only handle VTKViewer_RenderWindow.") ;
-    return ;
+  SetRenderer(NULL);
+
+  GetDevice()->SetRenderWindow(NULL);
+}
+
+//----------------------------------------------------------------------------
+SVTK_Renderer* 
+SVTK_RenderWindowInteractor
+::GetRenderer()
+{
+  return myRenderer.GetPointer();
+}
+
+vtkRenderer* 
+SVTK_RenderWindowInteractor
+::getRenderer()
+{
+  return GetRenderer()->GetDevice();
+}
+
+void
+SVTK_RenderWindowInteractor
+::SetRenderer(SVTK_Renderer* theRenderer)
+{
+  if(theRenderer == myRenderer.GetPointer())
+    return;
+
+  if(GetRenderer())
+    myRenderWindow->RemoveRenderer(getRenderer());
+
+  myRenderer = theRenderer;
+
+  if(GetRenderer())
+    myRenderWindow->AddRenderer(getRenderer());
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::InitInteractorStyle(vtkInteractorStyle* theStyle)
+{
+  GetDevice()->SetInteractorStyle(theStyle); 
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::PushInteractorStyle(vtkInteractorStyle* theStyle)
+{
+  myInteractorStyles.push(PInteractorStyle(theStyle));
+  InitInteractorStyle(theStyle);
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::PopInteractorStyle()
+{
+  if(GetInteractorStyle())
+    myInteractorStyles.pop();
+  
+  if(GetInteractorStyle()) 
+    InitInteractorStyle(GetInteractorStyle());
+}
+
+
+//----------------------------------------------------------------------------
+vtkInteractorStyle* 
+SVTK_RenderWindowInteractor
+::GetInteractorStyle()
+{
+  return myInteractorStyles.empty() ? 0 : myInteractorStyles.top().GetPointer();
+}
+
+
+//----------------------------------------------------------------------------
+SVTK_Selector* 
+SVTK_RenderWindowInteractor
+::GetSelector() 
+{ 
+  return mySelector.GetPointer(); 
+}
+
+
+void
+SVTK_RenderWindowInteractor
+::SetSelector(SVTK_Selector* theSelector)
+{ 
+  if(mySelector.GetPointer())
+    mySelector->RemoveObserver(myEventCallbackCommand.GetPointer());
+
+  mySelector = theSelector; 
+
+  if(mySelector.GetPointer())
+    mySelector->AddObserver(vtkCommand::EndPickEvent, 
+			    myEventCallbackCommand.GetPointer(), 
+			    myPriority);
+}
+
+
+//----------------------------------------------------------------------------
+void 
+SVTK_RenderWindowInteractor
+::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
+		unsigned long theEvent,
+		void* theClientData, 
+		void* vtkNotUsed(theCallData))
+{
+  SVTK_RenderWindowInteractor* self = reinterpret_cast<SVTK_RenderWindowInteractor*>(theClientData);
+
+  switch(theEvent){
+  case vtkCommand::EndPickEvent:
+    self->onEmitSelectionChanged();
+    break;
   }
-
-  //
-  // If the render window has zero size, then set it to a default 
-  // value of 300x300.
-  // 
-  int* aSize = aRenderWindow->GetSize();
-  this->Size[0] = ((aSize[0] > 0) ? aSize[0] : 300);
-  this->Size[1] = ((aSize[1] > 0) ? aSize[1] : 300);
-
-  this->SetPicker(myBasicPicker);
-
-  SetSelectionTolerance();
-
-  //
-  // Enable the interactor. 
-  //
-  this->Enable() ;
-
-  //
-  // Start the rendering of the window. 
-  //
-  aRenderWindow->Start() ;
-
-  //
-  // The interactor has been initialized.
-  //
-  this->Initialized = 1 ;
-
-  return ;
 }
 
 
-//----------------------------------------------------------------------------
-void
-SVTK_RenderWindowInteractor
-::setGUIWindow(QWidget* theWindow)
-{
-  myGUIWindow = theWindow;
-}
-
-//----------------------------------------------------------------------------
-void
-SVTK_RenderWindowInteractor
-::setViewWindow(SVTK_ViewWindow* theViewWindow)
-{
-  myViewWindow = theViewWindow;
-
-  myViewWindow->InsertActor(myCellActor);
-  myViewWindow->InsertActor(myEdgeActor);
-  myViewWindow->InsertActor(myPointActor);
-}
-
-//----------------------------------------------------------------------------
-void
-SVTK_RenderWindowInteractor
-::MoveInternalActors()
-{
-  myViewWindow->MoveActor(myCellActor);
-  myViewWindow->MoveActor(myEdgeActor);
-  myViewWindow->MoveActor(myPointActor);
-}
-
-//----------------------------------------------------------------------------
-void
-SVTK_RenderWindowInteractor
-::SetInteractorStyle(vtkInteractorObserver *theInteractor)
-{
-  myInteractorStyle = dynamic_cast<SVTK_InteractorStyle*>(theInteractor);
-  vtkRenderWindowInteractor::SetInteractorStyle(theInteractor);
-}
-
-
+//----------------------------------------------------------------
 void
 SVTK_RenderWindowInteractor
 ::SetSelectionMode(Selection_Mode theMode)
 {
-  myCellActor->SetVisibility(false);
-  myEdgeActor->SetVisibility(false);
-  myPointActor->SetVisibility(false);
-
-  switch(theMode){
-  case ActorSelection:
-    this->SetPicker(myBasicPicker);
-    break;
-  case NodeSelection:
-    this->SetPicker(myPointPicker);
-    break;
-  case CellSelection:
-  case EdgeSelection:
-  case FaceSelection:
-  case VolumeSelection:
-  case EdgeOfCellSelection:
-    this->SetPicker(myCellPicker);
-    break;
-  }
-
-  myInteractorStyle->OnSelectionModeChanged();
+  mySelector->SetSelectionMode(theMode);
 }
 
+
+//----------------------------------------------------------------
+Selection_Mode
+SVTK_RenderWindowInteractor
+::SelectionMode() const
+{
+  return mySelector->SelectionMode();
+}
+
+
+//----------------------------------------------------------------
 void
 SVTK_RenderWindowInteractor
-::SetSelectionProp(const double& theRed, 
-		   const double& theGreen, 
-		   const double& theBlue, 
-		   const int& theWidth) 
+::onEmitSelectionChanged()
 {
-  myCellActor->GetProperty()->SetColor(theRed, theGreen, theBlue);
-  myCellActor->GetProperty()->SetLineWidth(theWidth);
-
-  myPointActor->GetProperty()->SetColor(theRed, theGreen, theBlue);
-  myPointActor->GetProperty()->SetPointSize(theWidth);
-}
-
-void
-SVTK_RenderWindowInteractor
-::SetSelectionTolerance(const double& theTolNodes, 
-			const double& theTolItems)
-{
-  myTolNodes = theTolNodes;
-  myTolItems = theTolItems;
-
-  myBasicPicker->SetTolerance(myTolItems);
-  myCellPicker->SetTolerance(myTolItems);
-  myPointPicker->SetTolerance(myTolNodes);
-
-}
-
-// ================================== 
-void
-SVTK_RenderWindowInteractor
-::Start() 
-{
-  //
-  // We do not allow this interactor to control the 
-  // event loop. Only the QtApplication objects are
-  // allowed to do that. 
-  //
-  vtkErrorMacro(<<"SVTK_RenderWindowInteractor::Start() not allowed to start event loop.") ;
-  return ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::UpdateSize(int w, int h) 
-{
-  // if the size changed send this on to the RenderWindow
-  if ((w != this->Size[0])||(h != this->Size[1])) {
-    this->Size[0] = w;
-    this->Size[1] = h;
-    this->RenderWindow->SetSize(w,h);
-  }
-}
-
-int
-SVTK_RenderWindowInteractor
-::CreateTimer(int vtkNotUsed(timertype)) 
-{
-  //
-  // Start a one-shot timer for 10ms. 
-  //
-  mTimer->start(10, TRUE) ;
-  return 1 ;
-}
-
-int
-SVTK_RenderWindowInteractor
-::DestroyTimer(void) 
-{
-  //
-  // :TRICKY: Tue May  2 00:17:32 2000 Pagey
-  //
-  // QTimer will automatically expire after 10ms. So 
-  // we do not need to do anything here. In fact, we 
-  // should not even Stop() the QTimer here because doing 
-  // this will skip some of the processing that the TimerFunc()
-  // does and will result in undesirable effects. For 
-  // example, this will result in vtkLODActor to leave
-  // the models in low-res mode after the mouse stops
-  // moving. 
-  //
-  return 1 ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::TimerFunc() 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-
-  myInteractorStyle->OnTimer();
-
-  emit RenderWindowModified();
-}
-
-void
-SVTK_RenderWindowInteractor
-::MouseMove(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnMouseMove(0, 0, event->x(), event->y()/*this->Size[1] - event->y() - 1*/) ;
-  if (myInteractorStyle->needsRedrawing() )
-    emit RenderWindowModified() ; 
-}
-
-void
-SVTK_RenderWindowInteractor
-::LeftButtonPressed(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnLeftButtonDown((event->state() & ControlButton), 
-				      (event->state() & ShiftButton), 
-				      event->x(), event->y());
-}
-
-void
-SVTK_RenderWindowInteractor
-::LeftButtonReleased(const QMouseEvent *event) {
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnLeftButtonUp( (event->state() & ControlButton), 
-				     (event->state() & ShiftButton), 
-				     event->x(), event->y() ) ;
-}
-
-void 
-SVTK_RenderWindowInteractor
-::MiddleButtonPressed(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnMiddleButtonDown((event->state() & ControlButton), 
-					(event->state() & ShiftButton), 
-					event->x(), event->y() ) ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::MiddleButtonReleased(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnMiddleButtonUp( (event->state() & ControlButton), 
-				       (event->state() & ShiftButton), 
-				       event->x(), event->y() ) ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::RightButtonPressed(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnRightButtonDown( (event->state() & ControlButton), 
-					(event->state() & ShiftButton), 
-					event->x(), event->y() ) ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::RightButtonReleased(const QMouseEvent *event) 
-{
-  if( ! this->Enabled ) {
-    return ;
-  }
-  myInteractorStyle->OnRightButtonUp( (event->state() & ControlButton), 
-				      (event->state() & ShiftButton), 
-				      event->x(), event->y() ) ;
-
-  if(myInteractorStyle->GetState() == VTK_INTERACTOR_STYLE_CAMERA_NONE && !( event->state() & KeyButtonMask )){
-    QContextMenuEvent aEvent( QContextMenuEvent::Mouse,
-                              event->pos(), event->globalPos(),
-                              event->state() );
-    emit contextMenuRequested( &aEvent );
-  }
-}
-
-void
-SVTK_RenderWindowInteractor
-::ButtonPressed(const QMouseEvent *event) 
-{
-  return ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::ButtonReleased(const QMouseEvent *event) 
-{
-  return ;
-}
-
-
-int
-SVTK_RenderWindowInteractor
-::GetDisplayMode() 
-{
-  return myDisplayMode;
-}
-
-void
-SVTK_RenderWindowInteractor
-::SetDisplayMode(int theMode)
-{
-  if(theMode == 0) 
-    ChangeRepresentationToWireframe();
-  else 
-    ChangeRepresentationToSurface();
-  myDisplayMode = theMode;
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::SetDisplayMode(const Handle(SALOME_InteractiveObject)& theIObject, 
-		 int theMode)
-{
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetFunction<SALOME_Actor,int>
-			  (&SALOME_Actor::setDisplayMode,theMode));
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::ChangeRepresentationToWireframe()
-{
-  ChangeRepresentationToWireframe(GetRenderer()->GetActors());
-}
-
-void
-SVTK_RenderWindowInteractor
-::ChangeRepresentationToSurface()
-{
-  ChangeRepresentationToSurface(GetRenderer()->GetActors());
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::ChangeRepresentationToWireframe(vtkActorCollection* theCollection)
-{
-  using namespace VTK;
-  ForEach<SALOME_Actor>(theCollection,
-			TSetFunction<SALOME_Actor,int>
-			(&SALOME_Actor::setDisplayMode,0));
-  emit RenderWindowModified();
-}
-
-void
-SVTK_RenderWindowInteractor
-::ChangeRepresentationToSurface(vtkActorCollection* theCollection)
-{
-  using namespace VTK;
-  ForEach<SALOME_Actor>(theCollection,
-			TSetFunction<SALOME_Actor,int>
-			(&SALOME_Actor::setDisplayMode,1));
-  emit RenderWindowModified();
-}
-
-
-vtkRenderer* 
-SVTK_RenderWindowInteractor
-::GetRenderer()
-{
-  vtkRendererCollection * theRenderers =  this->RenderWindow->GetRenderers();
-  theRenderers->InitTraversal();
-  return theRenderers->GetNextItem();
-}
-
-
-struct TErase{
-  VTK::TSetFunction<vtkActor,int> mySetFunction;
-  TErase():
-    mySetFunction(&vtkActor::SetVisibility,false)
-  {}
-  void operator()(SALOME_Actor* theActor){
-    theActor->SetVisibility(false);
-    // Erase dependent actors
-    vtkActorCollection* aCollection = vtkActorCollection::New(); 
-    theActor->GetChildActors(aCollection);
-    VTK::ForEach<vtkActor>(aCollection,mySetFunction);
-    aCollection->Delete();
-  }
-};
-
-void
-SVTK_RenderWindowInteractor
-::EraseAll()
-{   
-  using namespace VTK;
-  ForEach<SALOME_Actor>(GetRenderer()->GetActors(),
-			TErase());
-
-  emit RenderWindowModified() ;
-}
-
-void
-SVTK_RenderWindowInteractor
-::DisplayAll()
-{ 
-  vtkActorCollection* aCollection = GetRenderer()->GetActors();
-  using namespace VTK;
-  ForEach<SALOME_Actor>(aCollection,TSetVisibility<SALOME_Actor>(true));
-
-  emit RenderWindowModified() ;
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::Erase(SALOME_Actor* theActor, bool update)
-{
-  TErase()(theActor);
-
-  if(update)
-    emit RenderWindowModified();
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::Erase(const Handle(SALOME_InteractiveObject)& theIObject, 
-	bool update)
-{
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TErase());
-
-  if(update)
-    emit RenderWindowModified();
-}
-
-
-struct TRemoveAction{
-  vtkRenderer* myRen;
-  TRemoveAction(vtkRenderer* theRen): myRen(theRen){}
-  void operator()(SALOME_Actor* theActor){
-    myRen->RemoveActor(theActor);
-  }
-};
-
-void
-SVTK_RenderWindowInteractor
-::Remove(const Handle(SALOME_InteractiveObject)& theIObject, 
-	 bool update)
-{
-  vtkRenderer* aRen = GetRenderer();
-
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(aRen->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TRemoveAction(aRen));
-}
-
-void
-SVTK_RenderWindowInteractor
-::Remove( SALOME_Actor* SActor, bool updateViewer )
-{
-  if ( SActor != 0 )
-  {
-    GetRenderer()->RemoveProp( SActor );
-    if ( updateViewer )
-      emit RenderWindowModified();
-  }
-}
-
-void
-SVTK_RenderWindowInteractor
-::RemoveAll( const bool updateViewer )
-{
-  vtkRenderer* aRenderer = GetRenderer();
-  vtkActorCollection* anActors = aRenderer->GetActors();
-  if ( anActors )
-  {
-    anActors->InitTraversal();
-    while ( vtkActor *anAct = anActors->GetNextActor() )
-    {
-      if ( anAct->IsA( "SALOME_Actor" ) )
-      {
-        SALOME_Actor* aSAct = (SALOME_Actor*)anAct;
-        if ( aSAct->hasIO() && aSAct->getIO()->hasEntry() )
-          aRenderer->RemoveActor( anAct );
-      }
-    }
-
-    if ( updateViewer )
-      emit RenderWindowModified();
-  }
-}
-
-
-float
-SVTK_RenderWindowInteractor
-::GetTransparency(const Handle(SALOME_InteractiveObject)& theIObject) 
-{
-  using namespace VTK;
-  SALOME_Actor* anActor = 
-    Find<SALOME_Actor>(GetRenderer()->GetActors(),
-		       TIsSameIObject<SALOME_Actor>(theIObject));
-  if(anActor)
-    return 1.0 - anActor->GetOpacity();
-  return -1.0;
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::SetTransparency(const Handle(SALOME_InteractiveObject)& theIObject, 
-		  float theTrans)
-{
-  float anOpacity = 1.0 - theTrans;
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetFunction<SALOME_Actor,float>
-			  (&SALOME_Actor::SetOpacity,anOpacity));
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::Display(SALOME_Actor* theActor, bool update)
-{
-  GetRenderer()->AddActor(theActor);
-  theActor->SetVisibility(true);
-
-  if(update)
-    emit RenderWindowModified();
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::Display(const Handle(SALOME_InteractiveObject)& theIObject, bool update)
-{
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetVisibility<SALOME_Actor>(true));
-
-  if(update)
-    emit RenderWindowModified() ;
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::KeyPressed(QKeyEvent *event)
-{}
-
-
-struct THighlightAction{
-  bool myIsHighlight;
-  SVTK_InteractorStyle* myInteractorStyle;
-  THighlightAction(SVTK_InteractorStyle* theInteractorStyle,
-		   bool theIsHighlight): 
-    myInteractorStyle(theInteractorStyle),
-    myIsHighlight(theIsHighlight)
-  {}
-  void operator()(SALOME_Actor* theActor){
-    if(theActor->GetMapper()){
-      if(theActor->hasHighlight())
-	theActor->highlight(myIsHighlight);
-      else{
-	if(theActor->GetVisibility() && myIsHighlight)
-	  myInteractorStyle->HighlightProp(theActor);
-	else if(!myIsHighlight)
-	  myInteractorStyle->HighlightProp(NULL);
-      }
-    }
-  }
-};
-
-bool
-SVTK_RenderWindowInteractor
-::highlight( const Handle(SALOME_InteractiveObject)& theIObject, 
-	     bool hilight, 
-	     bool update)
-{
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  THighlightAction(myInteractorStyle,hilight));
-
-  if(update)
-    emit RenderWindowModified();
-
-  return false;
-}
-
-
-struct TUpdateAction{
-  void operator()(vtkActor* theActor){
-    theActor->ApplyProperties();
-  }
-};
-
-void
-SVTK_RenderWindowInteractor
-::Update() 
-{
-  vtkRenderer* aRen = GetRenderer();
-
-  using namespace VTK;
-  ForEach<vtkActor>(aRen->GetActors(),TUpdateAction());
-
-  aRen->ResetCamera();
-
-  emit RenderWindowModified();  
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::unHighlightSubSelection()
-{
-  myPointActor->SetVisibility(false);
-  myEdgeActor->SetVisibility(false);
-  myCellActor->SetVisibility(false);
-}
-
-
-bool
-SVTK_RenderWindowInteractor
-::unHighlightAll()
-{
-  unHighlightSubSelection();
-
-  using namespace VTK;
-  ForEach<SALOME_Actor>(GetRenderer()->GetActors(),
-			THighlightAction(myInteractorStyle,false));
-
-  emit RenderWindowModified() ;
-
-  return false;
-}
-
-//-----------------
-// Color methods
-//-----------------
-
-void
-SVTK_RenderWindowInteractor
-::SetColor(const Handle(SALOME_InteractiveObject)& theIObject,QColor theColor) 
-{
-  float aColor[3] = {theColor.red()/255., theColor.green()/255., theColor.blue()/255.};
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetFunction<SALOME_Actor,const float*>
-			  (&SALOME_Actor::SetColor,aColor));
-}
-
-
-QColor
-SVTK_RenderWindowInteractor
-::GetColor(const Handle(SALOME_InteractiveObject)& theIObject) 
-{
-  using namespace VTK;
-  SALOME_Actor* anActor = 
-    Find<SALOME_Actor>(GetRenderer()->GetActors(),
-		       TIsSameIObject<SALOME_Actor>(theIObject));
-  if(anActor){
-    float r,g,b;
-    anActor->GetColor(r,g,b);
-    return QColor(int(r*255),int(g*255),int(b*255));
-  }
-  return QColor(0,0,0);
-}
-
-
-bool
-SVTK_RenderWindowInteractor
-::isInViewer(const Handle(SALOME_InteractiveObject)& theIObject)
-{
-  using namespace VTK;
-  SALOME_Actor* anActor = 
-    Find<SALOME_Actor>(GetRenderer()->GetActors(),
-		       TIsSameIObject<SALOME_Actor>(theIObject));
-  return anActor != NULL;
-}
-
-
-bool
-SVTK_RenderWindowInteractor
-::isVisible(const Handle(SALOME_InteractiveObject)& theIObject)
-{
-  using namespace VTK;
-  SALOME_Actor* anActor = 
-    Find<SALOME_Actor>(GetRenderer()->GetActors(),
-		       TIsSameIObject<SALOME_Actor>(theIObject));
-  return anActor != NULL && anActor->GetVisibility();
-}
-
-
-void
-SVTK_RenderWindowInteractor
-::rename(const Handle(SALOME_InteractiveObject)& theIObject, QString theName)
-{
-  using namespace VTK;
-  ForEachIf<SALOME_Actor>(GetRenderer()->GetActors(),
-			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetFunction<SALOME_Actor,const char*,QString>
-			  (&SALOME_Actor::setName,theName.latin1()));
+  return emit selectionChanged();
 }
 
 
 //----------------------------------------------------------------------------
-bool
-SVTK_RenderWindowInteractor
-::highlight(const TColStd_IndexedMapOfInteger& theMapIndex,
-	    SALOME_Actor* theMapActor, 
-	    SVTK_Actor* theActor,
-	    TUpdateActor theFun, 
-	    bool hilight, 
-	    bool update)
-{
-  if(theMapIndex.Extent() == 0) return false;
-  
-  if (hilight) {
-    setActorData(theMapIndex,theMapActor,theActor,theFun);
-    theActor->SetVisibility(true);
-  }
-  else {
-    theActor->SetVisibility(false);
-  }
-
-  if(update){
-    this->RenderWindow->Render();  
-    emit RenderWindowModified() ;
-  }
-
-  return false;
-}
-  
 void
 SVTK_RenderWindowInteractor
-::setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
-	       SALOME_Actor* theMapActor,
-	       SVTK_Actor *theActor,
-	       TUpdateActor theFun)
+::mouseMoveEvent( QMouseEvent* event ) 
 {
-  (*theFun)(theMapIndex,theMapActor,theActor);
-  float aPos[3];
-  theMapActor->GetPosition(aPos);
-  theActor->SetPosition(aPos);
+  QVTK_RenderWindowInteractor::mouseMoveEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit MouseMove( event );
 }
 
 
 //----------------------------------------------------------------------------
-static void CellsUpdateActor(const TColStd_IndexedMapOfInteger& theMapIndex,
-			     SALOME_Actor* theMapActor, 
-			     SVTK_Actor* theActor)
-{
-  theActor->MapCells(theMapActor,theMapIndex);
-}
-  
-bool
-SVTK_RenderWindowInteractor
-::highlightCell(const TColStd_IndexedMapOfInteger& theMapIndex,
-		SALOME_Actor* theMapActor, 
-		bool hilight, 
-		bool update)
-{
-  return highlight(theMapIndex,theMapActor,myCellActor,&CellsUpdateActor,hilight,update);
-}
-  
-void 
-SVTK_RenderWindowInteractor
-::setCellData(const int& theIndex, 
-	      SALOME_Actor* theMapActor,
-	      SVTK_Actor* theActor)
-{
-  TColStd_IndexedMapOfInteger MapIndex; 
-  MapIndex.Add(theIndex);
-  theActor->MapCells(theMapActor,MapIndex);
-}
-
-
-//----------------------------------------------------------------------------
-static void PointsUpdateActor(const TColStd_IndexedMapOfInteger& theMapIndex,
-			      SALOME_Actor* theMapActor, 
-			      SVTK_Actor* theActor)
-{
-  theActor->MapPoints(theMapActor,theMapIndex);
-}
-  
-bool
-SVTK_RenderWindowInteractor
-::highlightPoint(const TColStd_IndexedMapOfInteger& theMapIndex,
-		 SALOME_Actor* theMapActor, 
-		 bool hilight, 
-		 bool update)
-{
-  return highlight(theMapIndex,theMapActor,myPointActor,&PointsUpdateActor,hilight,update);
-}
-  
 void
 SVTK_RenderWindowInteractor
-::setPointData(const int& theIndex, 
-	       SALOME_Actor* theMapActor,
-	       SVTK_Actor* theActor)
+::mousePressEvent( QMouseEvent* event ) 
 {
-  TColStd_IndexedMapOfInteger MapIndex; 
-  MapIndex.Add(theIndex);
-  theActor->MapPoints(theMapActor,MapIndex);
+  QVTK_RenderWindowInteractor::mousePressEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit MouseButtonPressed( event );
 }
 
-  
+
 //----------------------------------------------------------------------------
-static void EdgesUpdateActor(const TColStd_IndexedMapOfInteger& theMapIndex,
-			     SALOME_Actor* theMapActor, 
-			     SVTK_Actor* theActor)
-{
-  theActor->MapEdge(theMapActor,theMapIndex);
-}
-  
-bool
+void
 SVTK_RenderWindowInteractor
-::highlightEdge(const TColStd_IndexedMapOfInteger& theMapIndex,
-		SALOME_Actor* theMapActor, 
-		bool hilight, 
-		bool update)
+::mouseReleaseEvent( QMouseEvent *event )
 {
-  return highlight(theMapIndex,theMapActor,myEdgeActor,&EdgesUpdateActor,hilight,update);
+  QVTK_RenderWindowInteractor::mouseReleaseEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit MouseButtonReleased( event );
 }
-  
-void 
+
+
+//----------------------------------------------------------------------------
+void
 SVTK_RenderWindowInteractor
-::setEdgeData(const int& theCellIndex, 
-	      SALOME_Actor* theMapActor,
-	      const int& theEdgeIndex, 
-	      SVTK_Actor* theActor )
+::mouseDoubleClickEvent( QMouseEvent* event )
 {
-  TColStd_IndexedMapOfInteger MapIndex; 
-  MapIndex.Add(theCellIndex); 
-  MapIndex.Add(theEdgeIndex);
-  theActor->MapEdge(theMapActor,MapIndex);
+  QVTK_RenderWindowInteractor::mouseDoubleClickEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit MouseDoubleClicked( event );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::wheelEvent( QWheelEvent* event )
+{
+  QVTK_RenderWindowInteractor::wheelEvent(event);
+
+  if(event->delta() > 0)
+    GetDevice()->InvokeEvent(SVTK::ZoomInEvent,NULL);
+  else
+    GetDevice()->InvokeEvent(SVTK::ZoomOutEvent,NULL);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit WheelMoved( event );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::keyPressEvent( QKeyEvent* event ) 
+{
+  QVTK_RenderWindowInteractor::keyPressEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit KeyPressed( event );
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::keyReleaseEvent( QKeyEvent * event ) 
+{
+  QVTK_RenderWindowInteractor::keyReleaseEvent(event);
+
+  if(GENERATE_SUIT_EVENTS)
+    emit KeyReleased( event );
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_RenderWindowInteractor
+::contextMenuEvent( QContextMenuEvent* event )
+{
+  if( !( event->state() & KeyButtonMask ) )
+    emit contextMenuRequested( event );
 }

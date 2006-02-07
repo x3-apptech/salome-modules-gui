@@ -1,7 +1,7 @@
 #  File   : Makefile.in
 #  Author : Alexander Solovyov(OCN)
 #  Module : SVTK
-# $Header: /dn06/SALOME_CVS/GUI_SRC/src/SVTK/Makefile.in,v 1.1
+# $Header: 
 
 top_srcdir=@top_srcdir@
 top_builddir=../..
@@ -12,47 +12,88 @@ VPATH=.:@srcdir@:@srcdir@/resources
 @COMMENCE@
 
 # header files
-EXPORT_HEADERS= SVTK.h \
-		SVTK_Prs.h \
-		SVTK_Actor.h \
-		SVTK_CubeAxesActor2D.h \
-		SVTK_Functor.h \
-		SVTK_ViewManager.h \
-		SVTK_ViewModel.h \
-		SVTK_ViewWindow.h \
-		SVTK_RenderWindow.h \
-		SVTK_InteractorStyle.h \
-		SVTK_RenderWindowInteractor.h \
-		SVTK_Selector.h \
-		SVTK_Selection.h
+EXPORT_HEADERS= \
+	SVTK.h \
+	SVTK_Prs.h \
+	SVTK_Actor.h \
+	SALOME_Actor.h \
+	SVTK_RectPicker.h \
+	SVTK_DeviceActor.h \
+	SVTK_FontWidget.h \
+	SVTK_CubeAxesActor2D.h \
+	SVTK_Functor.h \
+	SVTK_MainWindow.h \
+	SVTK_View.h \
+	SVTK_ViewManager.h \
+	SVTK_ViewModel.h \
+	SVTK_ViewWindow.h \
+	SVTK_Renderer.h \
+	SVTK_InteractorStyle.h \
+	SVTK_RenderWindowInteractor.h \
+	SVTK_GenericRenderWindowInteractor.h \
+	SVTK_Selector.h \
+	SVTK_Selection.h \
+	SVTK_SelectionEvent.h \
+	SVTK_SpaceMouse.h \
+	SVTK_Event.h \
+	SVTK_ViewModelBase.h
 
 PO_FILES = SVTK_msg_en.po
 
 # Libraries targets
 LIB = libSVTK.la
 
-LIB_SRC= 	SVTK_Prs.cxx \
-		SVTK_Actor.cxx \
-		SVTK_CubeAxesActor2D.cxx \
-		SVTK_Trihedron.cxx \
-		SVTK_ViewManager.cxx \
-		SVTK_ViewModel.cxx \
-		SVTK_ViewWindow.cxx \
-		SVTK_RenderWindow.cxx \
-		SVTK_InteractorStyle.cxx \
-		SVTK_RenderWindowInteractor.cxx \
-		SVTK_Selector.cxx
+LIB_SRC= \
+	SVTK_Prs.cxx \
+	SVTK_Actor.cxx \
+	SALOME_Actor.cxx \
+	SVTK_RectPicker.cxx \
+	SVTK_DeviceActor.cxx \
+	SVTK_CubeAxesActor2D.cxx \
+	SVTK_NonIsometricDlg.cxx \
+	SVTK_CubeAxesDlg.cxx \
+	SVTK_FontWidget.cxx \
+	SVTK_Trihedron.cxx \
+	SVTK_MainWindow.cxx \
+	SVTK_View.cxx \
+	SVTK_ViewManager.cxx \
+	SVTK_ViewModel.cxx \
+	SVTK_Renderer.cxx \
+	SVTK_ViewWindow.cxx \
+	SVTK_InteractorStyle.cxx \
+	SVTK_RenderWindowInteractor.cxx \
+	SVTK_GenericRenderWindowInteractor.cxx \
+	SVTK_SpaceMouse.cxx \
+	SVTK_Selector.cxx
 
-LIB_MOC = 	SVTK_RenderWindowInteractor.h \
-		SVTK_InteractorStyle.h \
-		SVTK_RenderWindow.h \
-		SVTK_ViewWindow.h \
-		SVTK_ViewModel.h \
-		SVTK_ViewManager.h
+LIB_MOC = \
+	SVTK_GenericRenderWindowInteractor.h \
+	SVTK_RenderWindowInteractor.h \
+	SVTK_NonIsometricDlg.h \
+	SVTK_CubeAxesDlg.h \
+	SVTK_FontWidget.h \
+	SVTK_ViewModelBase.h \
+	SVTK_ViewManager.h \
+	SVTK_ViewWindow.h \
+	SVTK_MainWindow.h \
+	SVTK_ViewModel.h \
+	SVTK_View.h
 
-CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) $(BOOST_CPPFLAGS)
+BIN = SVTK
 
-LDFLAGS+=$(QT_MT_LIBS) $(OCC_LIBS) $(VTK_LIBS)
-LIBS+= -lsuit -lCAM -lSalomeObject -lSalomePrs -lVTKViewer
+CPPFLAGS+= \
+	$(QT_INCLUDES) \
+	$(OCC_INCLUDES) \
+	$(VTK_INCLUDES) \
+	$(BOOST_CPPFLAGS)
+
+LDFLAGS+= \
+	$(QT_MT_LIBS) \
+	$(OCC_LIBS) \
+	$(VTK_LIBS)
+
+LIBS+= -lqtx -lsuit -lstd -lCAM -lSalomeObject -lSalomePrs -lVTKViewer
+
+LDFLAGSFORBIN=$(LDFLAGS) $(LIBS)
 
 @CONCLUDE@

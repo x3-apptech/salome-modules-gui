@@ -25,6 +25,7 @@
 #include <qmap.h>
 
 #ifdef WIN32
+#pragma warning( disable:4251 )
 #pragma warning( disable:4275 )
 #endif
 
@@ -81,6 +82,7 @@ private:
 };
 
 #ifdef WIN32
+#pragma warning( default:4251 )
 #pragma warning( default:4275 )
 #endif
 

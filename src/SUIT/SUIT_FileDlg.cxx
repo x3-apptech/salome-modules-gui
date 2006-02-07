@@ -521,3 +521,19 @@ QString SUIT_FileDlg::getExistingDirectory( QWidget*       parent,
   return dirname;
   
 }
+
+/*!
+  QFileDialog::dirPath() has a bug on Linux Debian (1 level up from correct
+  directory is returned).  This function fixes the bug. 
+*/
+QString SUIT_FileDlg::dirPath() const
+{
+  if ( !mySelectedFile.isNull() )
+    return QFileInfo( mySelectedFile ).dirPath();
+
+  const QDir* aDir = dir();
+  if ( aDir->exists() )
+    return aDir->absPath();
+  
+  return QFileDialog::dirPath();
+}

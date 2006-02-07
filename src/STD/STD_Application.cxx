@@ -93,7 +93,17 @@ void STD_Application::closeApplication()
 {
   if ( desktop() )
     savePreferences();
+  SUIT_Study* study = activeStudy();
 
+  if ( study ){
+    study->closeDocument();
+
+    setActiveStudy( 0 );
+    delete study;
+  }
+
+  setDesktop( 0 );
+  
   SUIT_Application::closeApplication();
 }
 
@@ -111,18 +121,6 @@ void STD_Application::onDesktopClosing( SUIT_Desktop*, QCloseEvent* e )
     e->ignore();
     return;
   }
-
-  SUIT_Study* study = activeStudy();
-
-  if ( study )
-    study->closeDocument();
-
-  setActiveStudy( 0 );
-  delete study;
-
-  savePreferences();
-
-  setDesktop( 0 );
 
   closeApplication();
 }

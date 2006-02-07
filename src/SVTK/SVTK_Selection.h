@@ -30,16 +30,16 @@
 #define SVTK_SELECTION_H
 
 
-enum Selection_Mode 
-{ 
-  NodeSelection, 
-  CellSelection,
-  EdgeOfCellSelection,
-  EdgeSelection, 
-  FaceSelection, 
-  VolumeSelection, 
-  ActorSelection 
-};
+//! It is possible to introduce new type of selection 
+typedef int Selection_Mode; 
+
+const Selection_Mode NodeSelection = 0;
+const Selection_Mode CellSelection = 1;
+const Selection_Mode EdgeOfCellSelection = 2;
+const Selection_Mode EdgeSelection = 3;
+const Selection_Mode FaceSelection = 4;
+const Selection_Mode VolumeSelection = 5;
+const Selection_Mode ActorSelection = 6;
 
 
 #endif

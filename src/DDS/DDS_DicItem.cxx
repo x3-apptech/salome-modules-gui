@@ -306,6 +306,14 @@ Standard_Real DDS_DicItem::FromSI( const Standard_Real theVal, const UnitSystem&
 }
 
 /*!
+  Returns 'true' if specified data exist.
+*/
+Standard_Boolean DDS_DicItem::HasData( const Standard_Integer flag ) const
+{
+  return ( myData & flag ) == flag;
+}
+
+/*!
   Parse record in XML file and retrieve information relevant for this data dic item
 */
 void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element& theDatum,
@@ -436,15 +444,22 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
       else if ( aType.IsEqual( "Integer" ) )
         aEnumType = Integer;
 
+      if ( !aValueDescr.getAttributeNode( DDS_Dictionary::KeyWord( "VD_MINV" ) ).isNull() )
+        myData |= MinValue;
       aMinV = aValueDescr.getAttribute( DDS_Dictionary::KeyWord( "VD_MINV" ) );
       aMinV.RemoveAll( ' ' );
       if ( aMinV.IsRealValue() )
         aRealMinV = aMinV.RealValue();
+      if ( !aValueDescr.getAttributeNode( DDS_Dictionary::KeyWord( "VD_MAXV" ) ).isNull() )
+        myData |= MaxValue;
       aMaxV = aValueDescr.getAttribute( DDS_Dictionary::KeyWord( "VD_MAXV" ) );
       aMaxV.RemoveAll( ' ' );
       if ( aMaxV.IsRealValue() )
         aRealMaxV = aMaxV.RealValue();
       aDefV = aValueDescr.getAttribute( DDS_Dictionary::KeyWord( "VD_DEFV" ) );
+      if ( !aValueDescr.getAttributeNode( DDS_Dictionary::KeyWord( "VD_DEFV" ) ).isNull() )
+        myData |= DefaultValue;
+
       aDefV.RemoveAll( ' ' );
       if ( aDefV.IsRealValue() )
         aRealDefV = aDefV.RealValue();

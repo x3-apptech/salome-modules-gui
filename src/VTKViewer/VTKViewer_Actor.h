@@ -1,164 +1,327 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
+//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
+//
+//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
+//  This library is free software; you can redistribute it and/or 
+//  modify it under the terms of the GNU Lesser General Public 
+//  License as published by the Free Software Foundation; either 
+//  version 2.1 of the License. 
 // 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  This library is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//  Lesser General Public License for more details. 
+// 
+//  You should have received a copy of the GNU Lesser General Public 
+//  License along with this library; if not, write to the Free Software 
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
+// 
+//  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
 //
+//  File   : SALOME_Actor.h
+//  Author : Nicolas REJNERI
+//  Module : SALOME
+//  $Header$
+
 #ifndef VTKVIEVER_ACTOR_H
 #define VTKVIEVER_ACTOR_H
 
 #include "VTKViewer.h"
 
-#include <vtkLODActor.h>
-#include <vtkProperty.h>
-#include <vtkShrinkFilter.h>
-#include <vtkDataSetMapper.h>
-#include <vtkUnstructuredGrid.h>
-
+#include <string>
 #include <vector>
 
+#include <vtkLODActor.h>
+
 class vtkCell;
+class vtkPointPicker;
+class vtkCellPicker;
 class vtkDataSet;
-class vtkPolyData;
+class vtkCamera;
+class vtkProperty;
+class vtkRenderer;
 
 class VTKViewer_Transform;
 class VTKViewer_GeometryFilter;
 class VTKViewer_TransformFilter;
 class VTKViewer_PassThroughFilter;
 
-#define VTKViewer_POINT_SIZE 3
+extern int VTKViewer_POINT_SIZE;
+extern int VTKViewer_LINE_WIDTH;
+
 /*! \class vtkLODActor
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation</a>
  */
-class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
+class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor 
 {
-public:
-  /*!Create new instance of actor.*/
+ public:
   static VTKViewer_Actor* New();
-
-  vtkTypeMacro( VTKViewer_Actor, vtkLODActor );
-
-  /*!Get name of the actor*/
-  virtual const char* getName() { return myName.c_str(); }
-  /*!Set name of the actor*/
-  virtual void setName(const char* theName){ myName = theName;}
-
-  //! To generate highlight automaticaly
-  virtual bool hasHighlight() { return false; }
-  //! Sets highlight.
-  virtual void highlight(bool theHighlight) { myIsHighlighted = theHighlight; }
-  //! Check highlight.
-  virtual bool isHighlighted() { return myIsHighlighted; }
   
-  virtual void SetOpacity(float theOpacity);
-  virtual float GetOpacity();
+  vtkTypeMacro(VTKViewer_Actor,vtkLODActor);
 
-  virtual void SetColor(float r,float g,float b);
-  virtual void GetColor(float& r,float& g,float& b);
-  void SetColor(const float theRGB[3]){ SetColor(theRGB[0],theRGB[1],theRGB[2]); }
+  //----------------------------------------------------------------------------
+  //! Get its name
+  virtual 
+  const char* 
+  getName();
 
-  vtkSetObjectMacro(PreviewProperty,vtkProperty);
+  //! Name the #VTKViewer_Actor
+  virtual
+  void
+  setName(const char* theName);
 
-  virtual void SetPreSelected(bool thePreselect = false) { myIsPreselected = thePreselect;}
+  //----------------------------------------------------------------------------
+  //! Change opacity
+  virtual
+  void
+  SetOpacity(float theOpacity);
+
+  //! Get current opacity
+  virtual
+  float 
+  GetOpacity();
+
+  //! Change color
+  virtual
+  void
+  SetColor(float r,float g,float b);
+
+  //! Get current color
+  virtual
+  void
+  GetColor(float& r,float& g,float& b);
+
+  //! Change color
+  virtual
+  void
+  SetColor(const float theRGB[3]);
+
+  //----------------------------------------------------------------------------
+  // For selection mapping purpose
+  //! Maps VTK index of a node to corresponding object index
+  virtual
+  int 
+  GetNodeObjId(int theVtkID);
+
+  //! Get coordinates of a node for given object index
+  virtual
+  float*
+  GetNodeCoord(int theObjID);
+
+  //! Maps VTK index of a cell to corresponding object index
+  virtual 
+  int
+  GetElemObjId(int theVtkID);
+
+  //! Get corresponding #vtkCell for given object index
+  virtual
+  vtkCell* 
+  GetElemCell(int theObjID);
+
+  //----------------------------------------------------------------------------
+  //! Get dimension of corresponding mesh element
+  virtual
+  int
+  GetObjDimension( const int theObjId );
+
+  //! To insert some additional filters and then sets the given #vtkMapper
+  virtual
+  void
+  SetMapper(vtkMapper* theMapper); 
+
+  //! Allows to get initial #vtkDataSet
+  virtual
+  vtkDataSet* 
+  GetInput(); 
+
+  //! Apply view transformation
+  virtual
+  void
+  SetTransform(VTKViewer_Transform* theTransform); 
+
+  //! To calculatate last modified time
+  virtual
+  unsigned long int
+  GetMTime();
+
+  //----------------------------------------------------------------------------
+  //! Set representation (VTK_SURFACE, VTK_POINTS, VTK_WIREFRAME and so on)
+  virtual
+  void
+  SetRepresentation(int theMode);
+
+  //! Get current representation mode
+  virtual
+  int
+  GetRepresentation();
+
+  //! Get current display mode (obsolete)
+  virtual
+  int
+  getDisplayMode();
+
+  //! Set display mode (obsolete)
+  virtual
+  void
+  setDisplayMode(int theMode);
+
+  //----------------------------------------------------------------------------
+  //! Set infinive flag
+  /*!
+    Infinitive means actor without size (point for example),
+    which is not taken into account in calculation of boundaries of the scene
+  */
+  void
+  SetInfinitive(bool theIsInfinite);
+
+  //! Get infinive flag
+  virtual
+  bool
+  IsInfinitive();
+    
+  //! To calcualte current bounding box
+  virtual
+  float* 
+  GetBounds();
+
+  //! To calcualte current bounding box
+  void
+  GetBounds(float bounds[6]);
+
+  //----------------------------------------------------------------------------
+  virtual
+  bool
+  IsSetCamera() const;
+
+  virtual
+  bool
+  IsResizable() const;
+
+  virtual
+  void
+  SetSize( const float );
+
+  virtual
+  void 
+  SetCamera( vtkCamera* );
+
+  //----------------------------------------------------------------------------
+  //! Set ResolveCoincidentTopology flag
+  void
+  SetResolveCoincidentTopology(bool theIsResolve);
+
+  //! Set ResolveCoincidentTopology parameters
+  void
+  SetPolygonOffsetParameters(float factor, float units);
+
+  //! Get current ResolveCoincidentTopology parameters
+  void
+  GetPolygonOffsetParameters(float& factor, float& units);
+
+  virtual
+  void
+  Render(vtkRenderer *, vtkMapper *);
+
+  //----------------------------------------------------------------------------
+  //! Get current shrink factor
+  virtual
+  float
+  GetShrinkFactor();
+
+  //! Is the actor is shrunkable
+  virtual
+  bool
+  IsShrunkable();
+
+  //! Is the actor is shrunk
+  virtual
+  bool
+  IsShrunk();
+
+  //! Insert shrink filter into pipeline
+  virtual
+  void
+  SetShrink();
+
+  //! Remove shrink filter from pipeline
+  virtual
+  void
+  UnShrink();
+
+  //----------------------------------------------------------------------------
+  //! To publish the actor an all its internal devices
+  virtual
+  void
+  AddToRender(vtkRenderer* theRendere); 
+
+  //! To remove the actor an all its internal devices
+  virtual
+  void
+  RemoveFromRender(vtkRenderer* theRendere);
 
   //! Used to obtain all dependent actors
-  virtual void GetChildActors(vtkActorCollection*) {};
-  
-  virtual void AddToRender(vtkRenderer* theRenderer); 
-  virtual void RemoveFromRender(vtkRenderer* theRenderer);
+  virtual
+  void
+  GetChildActors(vtkActorCollection*);
 
+  //----------------------------------------------------------------------------
+  //! Ask, if the descendant of the VTKViewer_Actor will implement its own highlight or not
+  virtual
+  bool
+  hasHighlight(); 
 
-  /** @name For selection mapping purpose */
-  //@{
-  virtual int GetNodeObjId(int theVtkID) { return theVtkID;}
-  virtual float* GetNodeCoord(int theObjID);
+  //! Ask, if the VTKViewer_Actor is already highlighted
+  virtual
+  bool
+  isHighlighted();
 
-  virtual int GetElemObjId(int theVtkID) { return theVtkID;}
-  virtual vtkCell* GetElemCell(int theObjID);
-  //@}
+  //! Set preselection mode
+  virtual
+  void
+  SetPreSelected(bool thePreselect = false);
 
-  virtual int GetObjDimension( const int theObjId );
+  //----------------------------------------------------------------------------
+  //! Just to update visibility of the highlight devices
+  virtual
+  void
+  highlight(bool theHighlight);  
 
-  virtual void SetMapper(vtkMapper* theMapper); 
-  virtual vtkDataSet* GetInput(); 
+  void
+  SetPreviewProperty(vtkProperty* theProperty);
 
-  virtual void SetTransform(VTKViewer_Transform* theTransform); 
-  virtual unsigned long int GetMTime();
-
-  virtual void SetRepresentation(int theMode);
-  virtual int GetRepresentation();
-
-  virtual int getDisplayMode();
-  virtual void setDisplayMode(int theMode);
-
-  /*! Infinitive means actor without size (point for example), \n
-   * which is not taken into account in calculation of boundaries of the scene
-   */
-  void SetInfinitive(bool theIsInfinite) { myIsInfinite = theIsInfinite; }
-  virtual bool IsInfinitive();
-    
-  void SetResolveCoincidentTopology(bool theIsResolve);
-  void SetPolygonOffsetParameters(float factor, float units);
-  void GetPolygonOffsetParameters(float& factor, float& units);
-
-  virtual void Render(vtkRenderer *, vtkMapper *);
-
-protected:
-  /*!resolve coincedent topology flag*/
+ protected:
+  //----------------------------------------------------------------------------
   bool myIsResolveCoincidentTopology;
-  /*!polygon offset factor*/
   float myPolygonOffsetFactor;
-  /*!polygon offset units*/
   float myPolygonOffsetUnits;
 
-  /*!Actor name.*/
   std::string myName;
 
-  /*!preview property*/
-  vtkProperty *PreviewProperty;
-  /*!preselected flag*/
-  bool myIsPreselected;
-
-  /*!opacity*/
   float myOpacity;
-  /*!highlighted flag*/
-  bool myIsHighlighted;
-  /*!display mode*/
   int myDisplayMode;
-  /*!infinite flag*/
   bool myIsInfinite;
 
-  /*!store mapping flag*/
   bool myStoreMapping;
-  /*!geometry filter*/
   VTKViewer_GeometryFilter *myGeomFilter;
-  /*!transform filter*/
   VTKViewer_TransformFilter *myTransformFilter;
-  /*!vector of passive filters(siz filters used)*/
   std::vector<VTKViewer_PassThroughFilter*> myPassFilter;
 
-  /*!presentation mode*/
   int myRepresentation;
-  /*!property*/
   vtkProperty *myProperty;
 
-  //! Main method, which calculate output.
-  void InitPipeLine(vtkMapper* theMapper); 
+  void
+  InitPipeLine(vtkMapper* theMapper); 
 
   VTKViewer_Actor();
   ~VTKViewer_Actor();
+
+ protected:
+  vtkProperty *PreviewProperty;
+  bool myIsPreselected;
+  bool myIsHighlighted;
 };
 
-#endif
+#endif // VTKVIEVER_ACTOR_H

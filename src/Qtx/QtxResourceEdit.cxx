@@ -35,8 +35,13 @@ QtxResourceEdit::QtxResourceEdit( QtxResourceMgr* mgr )
 
 QtxResourceEdit::~QtxResourceEdit()
 {
+  ItemMap items;
   for ( ItemMap::ConstIterator it = myItems.begin(); it != myItems.end(); ++it )
-    delete it.data();
+    items.insert( it.key(), it.data() );
+
+  for ( ItemMap::ConstIterator itr = items.begin(); itr != items.end(); ++itr )
+    if ( myItems.contains( itr.key() ) )
+      delete itr.data();
 }
 
 QtxResourceMgr* QtxResourceEdit::resourceMgr() const

@@ -416,7 +416,7 @@ void SUIT_Operation::start( SUIT_Operation* op, const bool check )
     return;
     
   if ( study() )
-    study()->start( op, false );
+    study()->start( op, check );
   else
   {
     connect( this, SIGNAL( stopped( SUIT_Operation* ) ), op, SLOT( abort() ) );

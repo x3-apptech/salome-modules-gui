@@ -23,7 +23,8 @@
 #include "LightApp_DataModel.h"
 #include "LightApp_DataObject.h"
 #include "LightApp_RootObject.h"
-#include "LightApp_Driver.h"
+// HDF persistence not yet completed
+//#include "LightApp_HDFDriver.h"
 
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_DataObjectIterator.h"
@@ -50,6 +51,8 @@
 LightApp_Study::LightApp_Study( SUIT_Application* app )
 : CAM_Study( app )
 {
+  // HDF persistence not yet completed
+  //myDriver = new LightApp_HDFDriver();
   myDriver = new LightApp_Driver();
 }
  
@@ -229,16 +232,14 @@ bool LightApp_Study::saveDocument()
 //================================================================
 void LightApp_Study::closeDocument(bool permanently)
 {
-  // Remove temporary files
-  ModelList aList;
-  dataModels( aList );
-  myDriver->ClearDriverContents();
-
   // Inform everybody that this study is going to close when it's most safe to,
   // i.e. in the very beginning
   emit closed( this );
 
   CAM_Study::closeDocument(permanently);
+  
+  // Remove temporary files
+  myDriver->ClearDriverContents();
 }
 
 //================================================================
@@ -264,6 +265,18 @@ void LightApp_Study::children( const QString&, QStringList& ) const
 //================================================================
 bool LightApp_Study::isComponent( const QString& entry ) const
 {
+  if( !root() )
+    return false;
+
+  DataObjectList ch;
+  root()->children( ch );
+  DataObjectList::const_iterator anIt = ch.begin(), aLast = ch.end();
+  for( ; anIt!=aLast; anIt++ )
+  {
+    LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( *anIt );
+    if( obj && obj->entry()==entry )
+      return true;
+  }
   return false;
 }
 
@@ -311,8 +324,8 @@ bool LightApp_Study::isSaved() const
 }
 
 //=======================================================================
-// name    : saveModuleData
-/*! Purpose :  Create SComponent for module, necessary for SalomeApp study */
+// name    : addComponent
+/*! Purpose : Create SComponent for module, necessary for SalomeApp study */
 //=======================================================================
 void LightApp_Study::addComponent(const CAM_DataModel* dm)
 {
@@ -451,7 +464,7 @@ void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool
 }
 
 //================================================================
-// Function : RemoveTemporaryFiles
+// Function : components
 /*! Purpose  : to be used by modules*/
 //================================================================
 void LightApp_Study::components( QStringList& comp ) const
@@ -465,4 +478,3 @@ void LightApp_Study::components( QStringList& comp ) const
       comp.append( obj->entry() );
   }
 }
-

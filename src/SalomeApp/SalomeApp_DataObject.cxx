@@ -111,8 +111,8 @@ QPixmap SalomeApp_DataObject::icon() const
       QString pixmapName = QObject::tr( aPixAttr->GetPixMap().c_str() );
       LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
       if ( aRoot && aRoot->study() ) {
-	QPixmap pixmap = aRoot->study()->application()->resourceMgr()->loadPixmap( componentDataType(), pixmapName, false ); 
-	return pixmap;
+	SUIT_ResourceMgr* mgr = aRoot->study()->application()->resourceMgr();
+	return mgr->loadPixmap( componentDataType(), pixmapName, false ); 
       }
     }
   }

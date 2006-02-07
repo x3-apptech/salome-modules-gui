@@ -33,7 +33,7 @@ class SUIT_DataObject;
 template<class T> class ListItemF
 {
 public:
-	ListItemF(T&, SUIT_DataObject* );
+	ListItemF( T*, SUIT_DataObject* );
   /*ListItem( SUIT_DataObject*, QListView* );
   ListItem( SUIT_DataObject*, QListViewItem* );
   ListItem( SUIT_DataObject*, QListView*, QListViewItem* );
@@ -49,12 +49,12 @@ public:
   void            paintFoc( QPainter* p, QColorGroup& cg, const QRect& r );
   void            paintC( QPainter* p, QColorGroup& cg, int c, int w, int align );
 
-protected:
+//protected:
   void                     update();
 
 protected:
   SUIT_DataObject* myObject;
-  T& myT;
+  T*  myT;
 };
 
 /* 

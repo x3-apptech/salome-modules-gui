@@ -50,6 +50,7 @@
 #include <vtkMapper.h>
 #include <vtkDataSet.h>
 #include <vtkSmartPointer.h>
+#include <vtkProperty.h>
 
 #include <qapplication.h>
 //VRV: porting on Qt 3.0.5

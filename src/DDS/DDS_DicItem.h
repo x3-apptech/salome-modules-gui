@@ -30,6 +30,7 @@ class DDS_DicItem : public MMgt_TShared
 {
 public:
   enum Type { String, Float, Integer, List, Unknown };
+  enum Data { MinValue = 0x01, MaxValue = 0x02, DefaultValue = 0x04 };
 
   // This struct is intended for map of Format, Units, Precision and Scale
   struct UnitData
@@ -134,6 +135,8 @@ public:
   Standard_EXPORT Standard_Real FromSI( const Standard_Real, const UnitSystem& ) const;
   // convert value to and from default SI units according to current units
 
+  Standard_EXPORT Standard_Boolean           HasData( const Standard_Integer ) const;
+
 private:
   DDS_DicItem( const DDS_DicItem& );
   // Copy constructor
@@ -199,6 +202,8 @@ private:
   Standard_Real                              myMin;
   Standard_Real                              myDefValue;
   TCollection_ExtendedString                 myDefString;
+
+  Standard_Integer                           myData;
 
   // valueList
   TCollection_ExtendedString                 myListName;

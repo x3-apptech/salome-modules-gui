@@ -143,7 +143,7 @@ myMenu( mw )
 
 QtxActionMenuMgr::~QtxActionMenuMgr()
 {
-  for ( NodeListIterator it( myRoot.children ); it.current(); ++it )
+  for ( NodeListIterator it( myRoot.children ); it.current() && myMenu; ++it )
   {
     QAction* a = itemAction( it.current()->id );
     if ( !a )

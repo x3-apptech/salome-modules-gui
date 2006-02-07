@@ -180,6 +180,11 @@ public:
   //! Repaints view \param theView. If \param theView = NULL repaints all views.
   void                 repaintView( GLViewer_ViewFrame* theView = NULL, bool makeCurrent = false );
 
+signals:
+  //! Signal needs for optimum recompute of zoom depending objects
+  //! Warning: use recompute without update viewer
+  void                 wheelZoomChange( bool );
+
 public slots:
   //void                 onSketchDelObject();
   //void                 onSketchUndoLast();

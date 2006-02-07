@@ -31,7 +31,7 @@
 
 //#include <GLViewerAfx.h>
 
-#if !defined WNT
+#if !(defined WNT) && !(defined QT_CLEAN_NAMESPACE)
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
 

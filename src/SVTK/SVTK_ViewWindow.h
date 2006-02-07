@@ -24,132 +24,293 @@
 #endif
 
 #include "SVTK.h"
-#include "SUIT_ViewWindow.h"
-
 #include "SVTK_Selection.h"
+#include "SUIT_ViewWindow.h"
 #include "SALOME_InteractiveObject.hxx"
 
-class vtkRenderer;
-
-class QtxAction;
 class SUIT_Desktop;
 
+class VTKViewer_Actor;
 class VTKViewer_Trihedron;
-class VTKViewer_Transform;
 
-class SALOME_Actor;
-
-class SVTK_Viewer;
+class SVTK_ViewModelBase;
+class SVTK_MainWindow;
 class SVTK_Selector;
+class SVTK_View;
+
+class SVTK_InteractorStyle;
 class SVTK_CubeAxesActor2D;
 
 class SVTK_RenderWindow;
-class SVTK_InteractorStyle;
 class SVTK_RenderWindowInteractor;
 
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+
+//! Define a container for SALOME VTK view window
 class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
 {
   Q_OBJECT;
 
-public:
-  SVTK_ViewWindow( SUIT_Desktop*, SVTK_Viewer* );
-  virtual ~SVTK_ViewWindow();
-  
-  QToolBar* getToolBar() { return myToolBar; }
-  
-  void setBackgroundColor( const QColor& );
-  QColor backgroundColor() const;
+ public:
+  //! To construct #SVTK_ViewWindow instance
+  SVTK_ViewWindow(SUIT_Desktop* theDesktop);
 
-  vtkRenderer* getRenderer() {return myRenderer;}
-  SVTK_Selector* GetSelector() {return mySelector;}
-  SVTK_RenderWindow* getRenderWindow() {return myRenderWindow;}
-  SVTK_RenderWindowInteractor* getRWInteractor() {return myRWInteractor;}
-  Selection_Mode SelectionMode() const;
-  void SetSelectionMode(Selection_Mode theMode);
+  virtual
+  ~SVTK_ViewWindow();
+  
+  //! To initialize #SVTK_ViewWindow instance
+  virtual
+  void
+  Initialize(SVTK_ViewModelBase* theModel);
 
-  bool isTrihedronDisplayed();
-  bool isCubeAxesDisplayed();
+  //! Get #SVTK_View
+  SVTK_View* 
+  getView();
+
+  //! Get #SVTK_MainWindow
+  SVTK_MainWindow* 
+  getMainWindow();
+
+  //! Redirect the request to #SVTK_MainWindow::getRenderWindow
+  vtkRenderWindow* 
+  getRenderWindow();
+
+  //! Redirect the request to #SVTK_MainWindow::getInteractor
+  vtkRenderWindowInteractor*
+  getInteractor();
+
+  //! Redirect the request to #SVTK_MainWindow::getRenderer 
+  vtkRenderer* 
+  getRenderer();
+
+  //! Redirect the request to #SVTK_MainWindow::GetSelector 
+  SVTK_Selector* 
+  GetSelector();
+  
+  //! Redirect the request to #SVTK_Selector::SelectionMode
+  Selection_Mode
+  SelectionMode() const;
+  
+  //! Change selection mode
+  virtual
+  void
+  SetSelectionMode(Selection_Mode theMode);
+
+  //! Redirect the request to #SVTK_MainWindow::SetBackgroundColor 
+  virtual
+  void
+  setBackgroundColor( const QColor& );
+
+  //! Redirect the request to #SVTK_MainWindow::SetBackgroundColor 
+  QColor
+  backgroundColor() const;
+
+  //! Redirect the request to #SVTK_Renderer::IsTrihedronDisplayed
+  bool
+  isTrihedronDisplayed();
+
+  //! Redirect the request to #SVTK_Renderer::IsCubeAxesDisplayed
+  bool
+  isCubeAxesDisplayed();
  
   /*  interactive object management */
-  void highlight( const Handle(SALOME_InteractiveObject)& IObject, 
-                  bool highlight, bool immediatly = true );
-  void unHighlightAll();
-  bool isInViewer( const Handle(SALOME_InteractiveObject)& IObject );
-  bool isVisible( const Handle(SALOME_InteractiveObject)& IObject );
+  //! Redirect the request to #SVTK_View::highlight (to support old code)
+  virtual
+  void
+  highlight(const Handle(SALOME_InteractiveObject)& theIO, 
+	    bool theIsHighlight = true, 
+	    bool theIsUpdate = true);
+
+  //! Redirect the request to #SVTK_View::unHighlightAll (to support old code)
+  virtual
+  void
+  unHighlightAll();
+
+  //! Redirect the request to #SVTK_View::isInViewer (to support old code)
+  bool
+  isInViewer(const Handle(SALOME_InteractiveObject)& theIObject);
+
+  //! Redirect the request to #SVTK_View::isVisible (to support old code)
+  bool
+  isVisible(const Handle(SALOME_InteractiveObject)& theIObject);
 
   /* selection */
-  Handle(SALOME_InteractiveObject) FindIObject(const char* Entry);
+  //----------------------------------------------------------------------------
+  Handle(SALOME_InteractiveObject) 
+  FindIObject(const char* theEntry);
   
   /* display */		
-  void Display( const Handle(SALOME_InteractiveObject)& IObject,
-                bool immediatly = true );
-  void DisplayOnly( const Handle(SALOME_InteractiveObject)& IObject );
-  void Erase( const Handle(SALOME_InteractiveObject)& IObject,
-              bool immediatly = true );
-  void DisplayAll();
-  void EraseAll();
-  void Repaint( bool theUpdateTrihedron );
-  void Repaint() { Repaint(true); }
+  //----------------------------------------------------------------------------
+  //! Redirect the request to #SVTK_View::Display (to support old code)
+  virtual
+  void
+  Display(const Handle(SALOME_InteractiveObject)& theIObject,
+	  bool theImmediatly = true);
 
-  //apply existing transformation on adding SALOME_Actor
-  void SetScale( double theScale[3] );
-  void GetScale( double theScale[3] );
-  void AddActor( SALOME_Actor*, bool update = false );
-  void RemoveActor(SALOME_Actor*, bool update = false);
+  //! Redirect the request to #SVTK_View::DisplayOnly (to support old code)
+  virtual
+  void
+  DisplayOnly(const Handle(SALOME_InteractiveObject)& theIObject);
 
-  void AdjustTrihedrons( const bool forced );
-  //merge with V2_2_0_VISU_improvements:bool ComputeTrihedronSize( double& theNewSize,
-  //merge with V2_2_0_VISU_improvements:                          double& theOldSize );
+  //! Redirect the request to #SVTK_View::Erase (to support old code)
+  virtual
+  void
+  Erase(const Handle(SALOME_InteractiveObject)& theIObject,
+	bool theImmediatly = true);
 
-  int  GetTrihedronSize() const;
-  void SetTrihedronSize( const int );
+  //! Redirect the request to #SVTK_View::DisplayAll (to support old code)
+  virtual
+  void 
+  DisplayAll();
 
-  VTKViewer_Trihedron*  GetTrihedron() {return this->myTrihedron;};
-  SVTK_CubeAxesActor2D* GetCubeAxes() {return this->myCubeAxes;};
+  //! Redirect the request to #SVTK_View::EraseAll (to support old code)
+  virtual
+  void 
+  EraseAll();
 
+  //! To repaint the viewer
+  virtual
+  void
+  Repaint(bool theUpdateTrihedron = true);
+
+  //----------------------------------------------------------------------------
+  //! Redirect the request to #SVTK_Renderer::SetScale
+  virtual
+  void 
+  SetScale( double theScale[3] );
+
+  //! Redirect the request to #SVTK_Renderer::GetScale
+  virtual
+  void
+  GetScale( double theScale[3] );
+
+  //! Redirect the request to #SVTK_Renderer::AddActor
+  virtual
+  void
+  AddActor(VTKViewer_Actor* theActor,
+	   bool theIsUpdate = false);
+
+  //! Redirect the request to #SVTK_Renderer::RemoveActor
+  virtual
+  void
+  RemoveActor(VTKViewer_Actor* theActor,
+	      bool theIsUpdate = false);
+
+  //----------------------------------------------------------------------------
+  //! Redirect the request to #SVTK_Renderer::AdjustActors
+  virtual
+  void
+  AdjustTrihedrons(const bool theIsForced);
+
+  //! Redirect the request to #SVTK_Renderer::GetTrihedron
+  VTKViewer_Trihedron*  
+  GetTrihedron();
+
+  //! Redirect the request to #SVTK_Renderer::GetCubeAxes
+  SVTK_CubeAxesActor2D* 
+  GetCubeAxes();
+
+  //! Redirect the request to #SVTK_Renderer::GetTrihedronSize
+  int  
+  GetTrihedronSize() const;
+
+  //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
+  virtual
+  void 
+  SetTrihedronSize( const int );
+
+  //! Redirect the request to #SVTK_Renderer::SetSelectionProp
+  virtual
+  void
+  SetSelectionProp(const double& theRed = 1, 
+		   const double& theGreen = 1,
+		   const double& theBlue = 0, 
+		   const int& theWidth = 5);
+
+  //! Redirect the request to #SVTK_Renderer::SetPreselectionProp
+  virtual
+  void
+  SetPreselectionProp(const double& theRed = 0, 
+		      const double& theGreen = 1,
+		      const double& theBlue = 1, 
+		      const int& theWidth = 5);
+
+  //! Redirect the request to #SVTK_Renderer::SetSelectionTolerance
+  virtual
+  void
+  SetSelectionTolerance(const double& theTolNodes = 0.025, 
+			const double& theTolCell = 0.001);
+  
 public slots:
-  void onSelectionChanged();
+  virtual
+  void
+  onSelectionChanged();
 
 signals:
  void selectionChanged();
 
 public slots:
-  void onFrontView(); 
-  void onBackView(); 
-  void onTopView();
-  void onBottomView();
-  void onRightView(); 
-  void onLeftView();     
+  //! Redirect the request to #SVTK_Renderer::OnFrontView
+  virtual
+  void
+  onFrontView(); 
 
-  void onResetView();     
-  void onFitAll();
+  //! Redirect the request to #SVTK_Renderer::OnBackView
+  virtual
+  void
+  onBackView(); 
 
-  void onViewTrihedron(); 
-  void onViewCubeAxes();
+  //! Redirect the request to #SVTK_Renderer::OnTopView
+  virtual
+  void
+  onTopView();
 
-  void onAdjustTrihedron();
-  void onAdjustCubeAxes();
- 
-  void onPanLeft();
-  void onPanRight();
-  void onPanUp();
-  void onPanDown();
-  void onZoomIn();
-  void onZoomOut();
-  void onRotateLeft();
-  void onRotateRight();
-  void onRotateUp();
-  void onRotateDown();
+  //! Redirect the request to #SVTK_Renderer::OnBottomView
+  virtual
+  void
+  onBottomView();
 
-  void activateZoom();
-  void activateWindowFit();
-  void activateRotation();
-  void activatePanning(); 
-  void activateGlobalPanning(); 
+  //! Redirect the request to #SVTK_Renderer::OnRightView
+  virtual
+  void 
+  onRightView(); 
 
-protected:
-  QImage dumpView();
-  virtual void      action( const int );
+  //! Redirect the request to #SVTK_Renderer::OnLeftView
+  virtual
+  void 
+  onLeftView();     
+
+  //! Redirect the request to #SVTK_Renderer::OnResetView
+  virtual
+  void
+  onResetView();     
+
+  //! Redirect the request to #SVTK_Renderer::OnFitAll
+  virtual
+  void 
+  onFitAll();
+
+  //! Redirect the request to #SVTK_Renderer::OnViewTrihedron
+  virtual
+  void
+  onViewTrihedron(); 
+
+  //! Redirect the request to #SVTK_Renderer::OnViewCubeAxes
+  virtual
+  void
+  onViewCubeAxes();
+
+  //! Redirect the request to #SVTK_Renderer::OnAdjustTrihedron
+  virtual
+  void
+  onAdjustTrihedron();
+
+  //! Redirect the request to #SVTK_Renderer::OnAdjustCubeAxes
+  virtual
+  void 
+  onAdjustCubeAxes();
 
 protected slots:
   void onKeyPressed(QKeyEvent* event);
@@ -159,39 +320,18 @@ protected slots:
   void onMouseReleased(QMouseEvent* event);
   void onMouseMoving(QMouseEvent* event);
 
-private:
-  void InitialSetup();
-  void InsertActor( SALOME_Actor* theActor,
-                    bool theMoveInternalActors = false );
-  void MoveActor( SALOME_Actor* theActor );
+protected:
+  virtual
+  void
+  Initialize(SVTK_View* theView,
+	     SVTK_ViewModelBase* theModel);
 
-private:  
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, ViewTrihedronId };
-  typedef QMap<int, QtxAction*> ActionsMap;
-  
-  void createActions();
-  void createToolBar();
-  
-  vtkRenderer* myRenderer;
+  QImage dumpView();
+  virtual void action( const int );
 
-  SVTK_Viewer* myModel;
-  SVTK_Selector* mySelector;
-
-  SVTK_RenderWindow* myRenderWindow;
-  SVTK_RenderWindowInteractor* myRWInteractor;
-
-  VTKViewer_Transform*  myTransform;
-  VTKViewer_Trihedron*  myTrihedron;  
-  int                   myTrihedronSize;
-  SVTK_CubeAxesActor2D* myCubeAxes;
-  
-  QToolBar* myToolBar;
-  ActionsMap myActionsMap;  
-  
-  double myCurScale;
-
-  friend class SVTK_RenderWindowInteractor;
+  SVTK_View* myView;
+  SVTK_MainWindow* myMainWindow;
+  SVTK_ViewModelBase* myModel;
 };
 
 #ifdef WIN32

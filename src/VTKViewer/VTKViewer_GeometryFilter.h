@@ -47,6 +47,16 @@ public:
    * \retval myShowInside
    */
   int GetInside();
+  /*! \fn void SetWireframeMode(int theIsWireframeMode)
+   * \brief Sets \a myIsWireframeMode flag. \a myIsWireframeMode is changed, call this->Modified().
+   * \param theIsWireframeMode - used for changing value of \a myIsWireframeMode variable.
+   */
+  void SetWireframeMode(int theIsWireframeMode);
+  /*! \fn int GetWireframeMode()
+   * \brief Return value of \a myIsWireframeMode
+   * \retval myIsWireframeMode
+   */
+  int GetWireframeMode();
   /*! \fn void SetStoreMapping(int theStoreMapping);
    * \brief Sets \a myStoreMapping flag and call this->Modified()
    * \param theStoreMapping - used for changing value of \a myStoreMapping variable.
@@ -56,7 +66,7 @@ public:
    * \brief Return value of \a myStoreMapping
    * \retval myStoreMapping
    */
-  int GetStoreMapping(){ return myStoreMapping;}
+  int GetStoreMapping();
   /*! \fn virtual vtkIdType GetNodeObjId(int theVtkID)
    * \brief Return input value theVtkID
    * \retval theVtkID
@@ -93,6 +103,7 @@ private:
   TVectorId myVTK2ObjIds;
   int       myShowInside;
   int       myStoreMapping;
+  int       myIsWireframeMode;
 };
 
 #endif

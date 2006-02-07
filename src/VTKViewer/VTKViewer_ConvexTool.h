@@ -40,6 +40,8 @@ namespace CONVEX_TOOL
    *  \param cellId  - id of cell type VTK_CONVEX_POINT_SET
    *  \retval outputCellArray - output array with new cells types VTK_POLYGON
    */
+  void
+    WriteToFile(vtkUnstructuredGrid* theDataSet, const std::string& theFileName);
   void GetPolygonalFaces(vtkUnstructuredGrid* theCell,int cellId,TCellArray &outputCellArray);
 }
 

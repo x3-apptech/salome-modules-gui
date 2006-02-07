@@ -41,6 +41,7 @@ EXPORT_HEADERS= LightApp.h \
 		LightApp_UpdateFlags.h \
 		LightApp_VTKSelector.h \
 		LightApp_WidgetContainer.h
+#               LightApp_HDFDriver.h \
 
 # .po files to transform in .qm
 PO_FILES = LightApp_images.po \
@@ -75,6 +76,7 @@ LIB_SRC= LightApp_AboutDlg.cxx \
 	 LightApp_PreferencesDlg.cxx \
 	 LightApp_VTKSelector.cxx \
 	 LightApp_WidgetContainer.cxx
+#        LightApp_HDFDriver.cxx \
 
 LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_Application.h \
@@ -105,9 +107,11 @@ RESOURCES_FILES = icon_about.png \
 		  LightApp.ini \
 		  LightApp.xml
 
-CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES)
+CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) 
+	#$(HDF5_INCLUDES)
 
 LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS)
-LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lSPlot2d -lSUPERVGraph -lPyInterp -lPythonConsole
+LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lSPlot2d -lSUPERVGraph -lPyInterp -lPythonConsole 
+	#$(HDF5_LIBS) -lSalomeHDFPersistCopy
 
 @CONCLUDE@

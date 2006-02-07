@@ -25,6 +25,8 @@
 #include <qvalidator.h>
 #include <qapplication.h>
 
+#include <float.h>
+
 /*
 	Class: QtxDblSpinBox::Validator [internal]
 	Descr: Validator for QtxDblSpinBox (getted from Trolltech Qt - SpinBoxValidator)
@@ -93,10 +95,10 @@ myCleared( false ),
 myBlocked( false ),
 myPrecision( 0 )
 {
-  myMin = QRangeControl::minValue();
-  myMax = QRangeControl::maxValue();
+  myMin = -DBL_MAX;
+  myMax = DBL_MAX;
   myStep = QRangeControl::lineStep();
-	myValue = myMin;
+	myValue = 0;
   setValidator( new Validator( this, "double_spinbox_validator" ) );
   rangeChange();
   updateDisplay();

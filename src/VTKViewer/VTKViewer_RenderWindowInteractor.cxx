@@ -51,6 +51,7 @@
 #include <vtkVertex.h>
 #include <vtkRendererCollection.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkProperty.h>
 
 // QT Includes
 #include <qkeycode.h>

@@ -18,8 +18,7 @@
 //  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org
 
 #include "SVTK_Actor.h"
-
-#include "VTKViewer_PassThroughFilter.h"
+#include "SALOME_Actor.h"
 
 // VTK Includes
 #include <vtkObjectFactory.h>
@@ -29,18 +28,14 @@
 
 #include <vtkCell.h>
 #include <vtkPolyData.h>
-#include <vtkShrinkFilter.h>
 
 using namespace std;
 
-#ifdef _DEBUG_
-static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
-#endif
 
-
-static void CopyPoints(vtkUnstructuredGrid* theGrid, vtkDataSet *theSourceDataSet){
+static 
+void
+CopyPoints(vtkUnstructuredGrid* theGrid, vtkDataSet *theSourceDataSet)
+{
   vtkPoints *aPoints = vtkPoints::New();
   vtkIdType iEnd = theSourceDataSet->GetNumberOfPoints();
   aPoints->SetNumberOfPoints(iEnd);
@@ -55,90 +50,81 @@ static void CopyPoints(vtkUnstructuredGrid* theGrid, vtkDataSet *theSourceDataSe
 
 vtkStandardNewMacro(SVTK_Actor);
 
-SVTK_Actor::SVTK_Actor()
+SVTK_Actor
+::SVTK_Actor():
+  myUnstructuredGrid(vtkUnstructuredGrid::New())
 {
-  myRenderer = NULL;
-  myIsInfinite = true;
+  myIsShaded = true;
 
   Visibility = Pickable = false;
 
-  myUnstructuredGrid = vtkUnstructuredGrid::New();
+  myUnstructuredGrid->Delete();
+  myUnstructuredGrid->Allocate();
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_Actor
+::Initialize()
+{
+  SetInput(GetSource());
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_Actor
+::SetSource(vtkUnstructuredGrid* theUnstructuredGrid)
+{
+  if(GetSource() == theUnstructuredGrid)
+    return;
+
+  myUnstructuredGrid = theUnstructuredGrid;
+
+  SetInput(theUnstructuredGrid);
+}
+
+vtkUnstructuredGrid*
+SVTK_Actor
+::GetSource()
+{
+  return myUnstructuredGrid.GetPointer();
+}
+
+
+//----------------------------------------------------------------------------
+SVTK_Actor
+::~SVTK_Actor()
+{
+}
+
+
+//----------------------------------------------------------------------------
+const TColStd_IndexedMapOfInteger&
+SVTK_Actor
+::GetMapIndex() const
+{
+  return myMapIndex;
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_Actor
+::MapCells(SALOME_Actor* theMapActor,
+	   const TColStd_IndexedMapOfInteger& theMapIndex)
+{
+  myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
 
-  myIsShrunk = false;
-  myIsShrinkable = true;
-  myShrinkFilter = vtkShrinkFilter::New();
-
-  myMapper = vtkDataSetMapper::New();
-
-  myMapper->SetInput(myUnstructuredGrid);
-  Superclass::InitPipeLine(myMapper);
-
-  SetResolveCoincidentTopology(false);
-}
-
-void SVTK_Actor::SetShrinkFactor(float theValue){
-  myShrinkFilter->SetShrinkFactor(theValue);
-  Modified();
-}
-
-void SVTK_Actor::SetShrink()
-{
-  if ( !myIsShrinkable ) return;
-  if ( vtkDataSet* aDataSet = myPassFilter[0]->GetOutput() )
-  {
-    myShrinkFilter->SetInput( aDataSet );
-    myPassFilter[1]->SetInput( myShrinkFilter->GetOutput() );
-    myIsShrunk = true;
-  }
-}
-
-void SVTK_Actor::UnShrink()
-{
-  if ( !myIsShrunk ) return;
-  if ( vtkDataSet* aDataSet = myPassFilter[0]->GetOutput() )
-  {
-    myPassFilter[1]->SetInput( aDataSet );
-    myPassFilter[1]->Modified();
-    myIsShrunk = false;
-    Modified();
-  }
-}
-
-
-//----------------------------------------------------------------------------
-SVTK_Actor::~SVTK_Actor()
-{
-  //if(MYDEBUG) INFOS("VTKViewer_Actor::~VTKViewer_Actor()");
-
-  myMapper->RemoveAllInputs();
-  myMapper->Delete();
-
-  myShrinkFilter->UnRegisterAllOutputs();
-  myShrinkFilter->Delete();
-
-  myUnstructuredGrid->Delete();
-}
-
-
-//----------------------------------------------------------------------------
-void SVTK_Actor::MapCells(SALOME_Actor* theMapActor,
-			       const TColStd_IndexedMapOfInteger& theMapIndex)
-{
-  myUnstructuredGrid->Reset();
-
   vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  CopyPoints(myUnstructuredGrid,aSourceDataSet);
+  CopyPoints(GetSource(),aSourceDataSet);
 
   int aNbOfParts = theMapIndex.Extent();
   for(int ind = 1; ind <= aNbOfParts; ind++){
     int aPartId = theMapIndex( ind );
-    vtkCell* aCell = theMapActor->GetElemCell(aPartId);
-    myUnstructuredGrid->InsertNextCell(aCell->GetCellType(),aCell->GetPointIds());
-    //for (int i = 0, iEnd = aCell->GetNumberOfEdges(); i < iEnd; i++){
-    //  vtkCell* anEdgeCell = aCell->GetEdge(i);
-    //  myUnstructuredGrid->InsertNextCell(VTK_LINE,anEdgeCell->GetPointIds());
-    //}
+    if(vtkCell* aCell = theMapActor->GetElemCell(aPartId))
+      myUnstructuredGrid->InsertNextCell(aCell->GetCellType(),aCell->GetPointIds());
   }
 
   UnShrink();
@@ -146,74 +132,67 @@ void SVTK_Actor::MapCells(SALOME_Actor* theMapActor,
     SetShrinkFactor(theMapActor->GetShrinkFactor());
     SetShrink();
   }
+
+  myMapIndex = theMapIndex;
 }
 
 
 //----------------------------------------------------------------------------
-void SVTK_Actor::MapPoints(SALOME_Actor* theMapActor,
-				const TColStd_IndexedMapOfInteger& theMapIndex)
+void 
+SVTK_Actor
+::MapPoints(SALOME_Actor* theMapActor,
+	    const TColStd_IndexedMapOfInteger& theMapIndex)
 {
-  myUnstructuredGrid->Reset();
+  myUnstructuredGrid->Initialize();
+  myUnstructuredGrid->Allocate();
+
   if(int aNbOfParts = theMapIndex.Extent()){
     vtkPoints *aPoints = vtkPoints::New();
     aPoints->SetNumberOfPoints(aNbOfParts);
     for(int i = 0; i < aNbOfParts; i++){
       int aPartId = theMapIndex( i+1 );
-      float* aCoord = theMapActor->GetNodeCoord(aPartId);
-      aPoints->SetPoint(i,aCoord);
-      myUnstructuredGrid->InsertNextCell(VTK_VERTEX,1,&i);
+      if(float* aCoord = theMapActor->GetNodeCoord(aPartId)){
+	aPoints->SetPoint(i,aCoord);
+	myUnstructuredGrid->InsertNextCell(VTK_VERTEX,1,&i);
+      }
     }
     myUnstructuredGrid->SetPoints(aPoints);
     aPoints->Delete();
   }
 
   UnShrink();
+
+  myMapIndex = theMapIndex;
 }
 
 
 //----------------------------------------------------------------------------
-void SVTK_Actor::MapEdge(SALOME_Actor* theMapActor,
-			      const TColStd_IndexedMapOfInteger& theMapIndex)
+void
+SVTK_Actor
+::MapEdge(SALOME_Actor* theMapActor,
+	  const TColStd_IndexedMapOfInteger& theMapIndex)
 {
-  myUnstructuredGrid->Reset();
+  myUnstructuredGrid->Initialize();
+  myUnstructuredGrid->Allocate();
 
   vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  CopyPoints(myUnstructuredGrid,aSourceDataSet);
+  CopyPoints(GetSource(),aSourceDataSet);
 
-  int iEnd = theMapIndex.Extent();
-  int aCellId = -1, aCellCounter = 0;
-  for(int i = 1; i <= iEnd; i++){
-    int anId = theMapIndex( i );
-    if(anId > 0) {
-      aCellCounter++;
-      aCellId = anId;
-    }
-  }
 
-  if(aCellCounter == 1){
-    vtkCell* aCell = theMapActor->GetElemCell(aCellId);
-    if(aCell->GetCellType() <= VTK_LINE){
-      myUnstructuredGrid->InsertNextCell(aCell->GetCellType(),aCell->GetPointIds());
-    }else{
-      int aNbOfParts = aCell->GetNumberOfEdges();
-      for(int i = 1; i <= iEnd; i++){
-        int aPartId = theMapIndex(i);
-	if( aPartId < 0){
-          aPartId = -aPartId-1;
-	  if(0 > aPartId || aPartId >= aNbOfParts) break;
-	  vtkCell* anEdgeCell = aCell->GetEdge(aPartId);
-	  myUnstructuredGrid->InsertNextCell(VTK_LINE,anEdgeCell->GetPointIds());
+  if(theMapIndex.Extent() == 2){
+    int anEdgeId = theMapIndex(1) < 0 ? theMapIndex(1) : theMapIndex(2);
+    int aCellId = theMapIndex(1) < 0 ? theMapIndex(2) : theMapIndex(1);
+
+    if(aCellId > 0){
+      if(vtkCell* aCell = theMapActor->GetElemCell(aCellId)){
+	if(anEdgeId < 0){
+	  anEdgeId = -anEdgeId - 1;
+	  int aNbOfEdges = aCell->GetNumberOfEdges();
+	  if(0 <= anEdgeId || anEdgeId < aNbOfEdges){
+	    if(vtkCell* anEdge = aCell->GetEdge(anEdgeId))
+	      myUnstructuredGrid->InsertNextCell(VTK_LINE,anEdge->GetPointIds());
+	  }
 	}
-      }
-    }
-  }else{
-    int aNbOfParts = aSourceDataSet->GetNumberOfCells();
-    for(int i = 1; i <= iEnd; i++){
-      int aPartId = theMapIndex( i );
-      if(aPartId > 0){
-	if(aPartId >= aNbOfParts) break;
-	vtkCell* aCell = aSourceDataSet->GetCell(aPartId);
-	myUnstructuredGrid->InsertNextCell(aCell->GetCellType(),aCell->GetPointIds());
       }
     }
   }
@@ -223,6 +202,8 @@ void SVTK_Actor::MapEdge(SALOME_Actor* theMapActor,
     SetShrinkFactor(theMapActor->GetShrinkFactor());
     SetShrink();
   }
+
+  myMapIndex = theMapIndex;
 }
 
 //----------------------------------------------------------------------------

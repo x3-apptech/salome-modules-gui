@@ -31,7 +31,7 @@
 #define TOOLTIP_HIDE_DELAY 7000
 
 QtxToolTip::QtxToolTip( QWidget* parent )
-: QLabel( parent, "", WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WStyle_StaysOnTop | WType_TopLevel )
+: QLabel( parent, "", WStyle_Customize | WStyle_NoBorder | WX11BypassWM | WStyle_Tool | WStyle_StaysOnTop | WType_TopLevel )
 {
   setIndent( 3 );
 	setAlignment( Qt::AlignLeft | Qt::AlignVCenter );

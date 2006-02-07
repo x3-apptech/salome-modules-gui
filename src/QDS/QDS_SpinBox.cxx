@@ -1,6 +1,7 @@
 #include "QDS_SpinBox.h"
 
-#include <qspinbox.h>
+#include <QtxIntSpinBox.h>
+
 #include <qvalidator.h>
 
 /*!
@@ -24,8 +25,8 @@ QDS_SpinBox::~QDS_SpinBox()
 QString QDS_SpinBox::getString() const
 {
   QString res;
-  QSpinBox* aSpinBox = spinBox();
-  if ( aSpinBox )
+  QtxIntSpinBox* aSpinBox = spinBox();
+  if ( aSpinBox && !aSpinBox->isCleared() )
   {
     res = aSpinBox->text();
     if ( !aSpinBox->suffix().isEmpty() )
@@ -41,16 +42,20 @@ QString QDS_SpinBox::getString() const
 */
 void QDS_SpinBox::setString( const QString& txt )
 {
-  if ( spinBox() )
+  if ( !spinBox() )
+    return;
+
+  spinBox()->setCleared( txt.isEmpty() );
+  if ( !txt.isEmpty() )
     spinBox()->setValue( txt.toInt() );
 }
 
 /*!
   Returns pointer to QSpinBox widget.
 */
-QSpinBox* QDS_SpinBox::spinBox() const
+QtxIntSpinBox* QDS_SpinBox::spinBox() const
 {
-  return ::qt_cast<QSpinBox*>( controlWidget() );
+  return ::qt_cast<QtxIntSpinBox*>( controlWidget() );
 }
 
 /*!
@@ -58,7 +63,7 @@ QSpinBox* QDS_SpinBox::spinBox() const
 */
 QWidget* QDS_SpinBox::createControl( QWidget* parent )
 {
-  QSpinBox* aSpinBox = new QSpinBox( parent );
+  QtxIntSpinBox* aSpinBox = new QtxIntSpinBox( parent );
   aSpinBox->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   connect( aSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( onValueChanged( int ) ) );
   return aSpinBox;

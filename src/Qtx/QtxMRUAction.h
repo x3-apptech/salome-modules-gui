@@ -38,9 +38,11 @@ class QTX_EXPORT QtxMRUAction : public QtxAction
 {
   Q_OBJECT
 
+  Q_PROPERTY( int visibleCount READ visibleCount WRITE setVisibleCount )
+
 public:
-  typedef enum { Items, SubMenu }                         PopupMode;
-  typedef enum { MoveFirst, MoveLast, AddFirst, AddLast } InsertMode;
+  enum { Items, SubMenu };
+  enum { MoveFirst, MoveLast, AddFirst, AddLast };
 
 public:
   QtxMRUAction( QObject* = 0, const char* = 0 );

@@ -40,9 +40,9 @@ public:
 
   typedef std::vector<std::string> ListOfFiles;
 
-  bool                SaveDatasInFile   (const char* theFileName, bool isMultiFile );
-  bool                ReadDatasFromFile (const char* theFileName,  bool isMultiFile );
-  virtual std::string GetTmpDir      (const char* theURL, const bool  isMultiFile);
+  virtual bool        SaveDatasInFile   (const char* theFileName, bool isMultiFile);
+  virtual bool        ReadDatasFromFile (const char* theFileName, bool isMultiFile);
+  virtual std::string GetTmpDir      (const char* theURL, const bool isMultiFile);
 
   ListOfFiles         GetListOfFiles (const char* theModuleName);
   virtual void        SetListOfFiles (const char* theModuleName, const ListOfFiles theListOfFiles);
@@ -51,7 +51,7 @@ public:
 
   virtual void        ClearDriverContents();
 
-private:
+protected:
   void                PutFilesToStream(const std::string& theModuleName, unsigned char*& theBuffer,
                                        long& theBufferSize, bool theNamesOnly = false);
   ListOfFiles         PutStreamToFiles(const unsigned char* theBuffer,
@@ -60,10 +60,16 @@ private:
   std::string GetTmpDir();
   std::string GetDirFromPath(const std::string& thePath);
 
-private:
+  void                SetIsTemporary( bool theFlag ) { myIsTemp = theFlag; }
+  bool                IsTemporary() const { return myIsTemp; }
+
+protected:
   typedef std::map<std::string, ListOfFiles> MapOfListOfFiles;
   MapOfListOfFiles                           myMap;
   std::string                                myTmpDir;
+
+private:
+  bool                                       myIsTemp;
 };
 
 #endif 

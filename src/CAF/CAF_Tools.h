@@ -26,13 +26,24 @@
 
 #include <SUIT_Tools.h>
 
+#include <qcolor.h>
+
+#include <Quantity_Color.hxx>
+
+#include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 
 class CAF_EXPORT CAF_Tools : public SUIT_Tools
 {
 public:
+  static QString                    toQString( const TCollection_AsciiString& );
   static QString                    toQString( const TCollection_ExtendedString& );
+
   static TCollection_ExtendedString toExtString( const QString& );
+  static TCollection_AsciiString    toAsciiString( const QString& );
+
+  static Quantity_Color             color( const QColor& );
+  static QColor                     color( const Quantity_Color& );
 };
 
 #endif

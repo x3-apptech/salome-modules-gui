@@ -236,7 +236,7 @@ void QtxDialog::Area::layoutButtons()
 			center.append( it.current() );
 	}
 
-    delete layout();
+  delete layout();
 
 	QBoxLayout* buttonLayout = 0;
 	if ( myOrientation == Qt::Vertical )
@@ -267,6 +267,22 @@ void QtxDialog::Area::layoutButtons()
 				buttonLayout->addStretch( 1 );
 		}
 	}
+
+  QWidgetList wids;
+  if ( layout() )
+  {
+    for ( QLayoutIterator it = layout()->iterator(); it.current(); ++it )
+    {
+      if ( !it.current()->widget() )
+        continue;
+
+      if ( QApplication::reverseLayout() )
+        wids.prepend( it.current()->widget() );
+      else
+        wids.append( it.current()->widget() );
+    }
+  }
+  Qtx::setTabOrder( wids );
 }
 
 /*!

@@ -26,6 +26,7 @@
 
 #include <qmap.h>
 #include <qobject.h>
+#include <qguardedptr.h>
 
 class QAction;
 class QDomNode;
@@ -81,7 +82,8 @@ protected:
   int              generateId() const;
 
 private:
-  typedef QMap<int, QAction*>  ActionMap;
+  typedef QGuardedPtr<QAction> ActionPtr;
+  typedef QMap<int, ActionPtr> ActionMap;
 
 private:
   bool             myUpdate;

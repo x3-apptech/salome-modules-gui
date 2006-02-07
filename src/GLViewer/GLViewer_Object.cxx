@@ -283,6 +283,9 @@ bool GLViewer_Object::initializeFromByteCopy( QByteArray theArray )
 
 void GLViewer_Object::setGroup( GLViewer_Group* theGroup )
 {
+  if ( myGroup == theGroup )
+    return;
+
   if( myGroup )
     myGroup->removeObject( this );
   

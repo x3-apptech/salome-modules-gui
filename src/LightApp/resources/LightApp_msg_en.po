@@ -256,6 +256,15 @@ msgstr "Auto size for first column"
 msgid "LightApp_PreferencesDlg::CAPTION"
 msgstr "Preferences"
 
+msgid "LightApp_PreferencesDlg::DEFAULT_BTN_TEXT"
+msgstr "Defaults"
+
+msgid "LightApp_PreferencesDlg::WARNING"
+msgstr "Warning"
+
+msgid "LightApp_PreferencesDlg::DEFAULT_QUESTION"
+msgstr "Do you want to retrieve default preferences?" 
+
 //=======================================================================================
 
 msgid "LightApp_Module::TOP_DISPLAY"

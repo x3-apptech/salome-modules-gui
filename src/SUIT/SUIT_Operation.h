@@ -31,9 +31,10 @@
 #ifndef SUIT_OPERATION_H
 #define SUIT_OPERATION_H
 
-#include <qobject.h>
-
 #include "SUIT.h"
+
+#include <qobject.h>
+#include <qguardedptr.h>
 
 class SUIT_Study;
 class SUIT_Application;
@@ -54,6 +55,10 @@ class SUIT_Application;
  *  - virtual void      resumeOperation();
  *  - virtual void      suspendOperation();
 */
+#ifdef WIN32
+#pragma warning( disable:4251 )
+#endif
+
 class SUIT_EXPORT SUIT_Operation : public QObject
 {
   Q_OBJECT
@@ -153,13 +158,20 @@ protected:
   void              start( SUIT_Operation*, const bool = false );
 
 private:
+  typedef QGuardedPtr<SUIT_Study> StudyPtr;
+
+private:
   SUIT_Application* myApp;        //!< application for this operation
   int               myFlags;      //!< operation flags
-  SUIT_Study*       myStudy;      //!< study for this operation
+  StudyPtr          myStudy;      //!< study for this operation
   OperationState    myState;      //!< Operation state
   ExecStatus        myExecStatus; //!< Execution status
 
   friend class SUIT_Study;
 };
+
+#ifdef WIN32
+#pragma warning( default:4251 )
+#endif
 
 #endif

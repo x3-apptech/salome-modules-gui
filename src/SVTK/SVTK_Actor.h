@@ -28,41 +28,58 @@ class vtkDataSetMapper;
 class vtkUnstructuredGrid;
 
 #include "SVTK.h"
-#include "SALOME_Actor.h"
+#include "SVTK_DeviceActor.h"
 
-class SVTK_EXPORT SVTK_Actor : public SALOME_Actor
+#include <vtkSmartPointer.h>
+
+class SALOME_Actor;
+
+//! This class used for internal SVTK package purpose (highlight and prehighlight)
+class SVTK_EXPORT SVTK_Actor : public SVTK_DeviceActor
 {
 public:
-  virtual ~SVTK_Actor();
-
   static SVTK_Actor* New();
 
-  vtkTypeMacro(SVTK_Actor,SALOME_Actor);
+  vtkTypeMacro(SVTK_Actor,SVTK_DeviceActor);
 
-  void  SetShrinkFactor(float value);
-  virtual void SetShrink(); 
-  virtual void UnShrink(); 
+  //! Initialiaze the instance completely
+  void
+  Initialize();
 
-  void MapCells(SALOME_Actor* theMapActor, 
-		const TColStd_IndexedMapOfInteger& theMapIndex);
+  //! Allows to set an external source 
+  void
+  SetSource(vtkUnstructuredGrid* theUnstructuredGrid);
 
-  void MapPoints(SALOME_Actor* theMapActor, 
-		 const TColStd_IndexedMapOfInteger& theMapIndex);
+  //! Get its internal data set
+  vtkUnstructuredGrid*
+  GetSource();
 
-  void MapEdge(SALOME_Actor* theMapActor, 
-	       const TColStd_IndexedMapOfInteger& theMapIndex);
+  //! Allow to recostruct selected cells from source SALOME_Actor and map of subindexes
+  void
+  MapCells(SALOME_Actor* theMapActor, 
+	   const TColStd_IndexedMapOfInteger& theMapIndex);
+
+  //! Allow to recostruct selected points from source SALOME_Actor and map of subindexes
+  void 
+  MapPoints(SALOME_Actor* theMapActor, 
+	    const TColStd_IndexedMapOfInteger& theMapIndex);
+
+  //! Allow to recostruct selected edges from source SALOME_Actor and map of subindexes
+  void 
+  MapEdge(SALOME_Actor* theMapActor, 
+	  const TColStd_IndexedMapOfInteger& theMapIndex);
+
+  const TColStd_IndexedMapOfInteger&
+  GetMapIndex() const;
 
  protected:
-  vtkUnstructuredGrid* myUnstructuredGrid;
-  vtkDataSetMapper* myMapper;
+  TColStd_IndexedMapOfInteger myMapIndex;
 
-  vtkRenderer* myRenderer;
-
-  vtkShrinkFilter* myShrinkFilter;
-  bool myIsShrinkable;
-  bool myIsShrunk;
+  vtkSmartPointer<vtkUnstructuredGrid> myUnstructuredGrid;
 
   SVTK_Actor();
+  virtual
+  ~SVTK_Actor();
 };
 
 #endif

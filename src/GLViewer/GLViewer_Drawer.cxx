@@ -33,19 +33,20 @@
 #include <GL/glx.h>
 #endif
 
+#include <gp_Pnt2d.hxx>
+
 #include <qimage.h>
 #include <qpainter.h>
 
 #define TEXT_GAP    5
+// Two texture components for texmapped fonts: luminance and alpha
+#define NB_TEX_COMP 2
+// A font is split into rows each containing 32 characters
+#define TEX_ROW_LEN 32
+// Gap in pixels between two character rows in a font texture
+#define TEX_ROW_GAP 2
 
-GLboolean          TFLoaded = GL_FALSE;
-
-GLdouble           modelMatrix[16], projMatrix[16];
-GLint              viewport[4];
-GLdouble           winx, winy, winz;
-GLint              status;
-
-GLViewer_TexFont*  staticGlFont;
+GLfloat modelMatrix[16];
 
 //================================================================
 // Class       : GLViewer_TexFont
@@ -75,24 +76,14 @@ void GLViewer_TexFont::clearTextBases()
 // Purpose :
 //=======================================================================
 GLViewer_TexFont::GLViewer_TexFont()
+: myMaxRowWidth( 0 ), myFontHeight( 0 )
 {
     myQFont = QFont::defaultFont();
-    QFontMetrics aFM( myQFont );        
-    myWidths = new int[LastSymbolNumber - FirstSymbolNumber+1];
-    myPositions = new int[LastSymbolNumber - FirstSymbolNumber+1];
     mySeparator = 2;
-    for( int k = FirstSymbolNumber, aWidth = 0; k <= LastSymbolNumber; k++ )
-    {
-        myWidths[ k - FirstSymbolNumber ] = aFM.width( k );
-        myPositions[ k - FirstSymbolNumber ] = aWidth;
-        aWidth += myWidths[ k - FirstSymbolNumber ] + 2;//mySeparator;
-    }
-
-    myTexFontWidth = 0;
-    myTexFontHeight = 0; 
     myIsResizeable = false;
-    //myMinMagFilter = GL_NEAREST;
-    myMinMagFilter = GL_LINEAR_ATTENUATION ;
+    myMinMagFilter = GL_LINEAR;
+
+    init();
 }
 
 //======================================================================
@@ -100,24 +91,14 @@ GLViewer_TexFont::GLViewer_TexFont()
 // Purpose :
 //=======================================================================
 GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator, bool theIsResizeable, GLuint theMinMagFilter )
+: myMaxRowWidth( 0 ), myFontHeight( 0 )
 {
     myQFont = *theFont;
-    QFontMetrics aFM( myQFont );        
-    myWidths = new int[LastSymbolNumber - FirstSymbolNumber+1];
-    myPositions = new int[LastSymbolNumber - FirstSymbolNumber+1];
     mySeparator = theSeparator;
-    for( int k = FirstSymbolNumber, aWidth = 0; k <= LastSymbolNumber; k++ )
-    {
-        myWidths[ k - FirstSymbolNumber ] = aFM.width( k );
-        myPositions[ k - FirstSymbolNumber ] = aWidth;
-        aWidth += myWidths[ k - FirstSymbolNumber ] + 2;//mySeparator;
-    }
-
-    myTexFontWidth = 0;
-    myTexFontHeight = 0;
     myIsResizeable = theIsResizeable;
     myMinMagFilter = theMinMagFilter;
-    
+
+    init();
 }
 
 //======================================================================
@@ -129,17 +110,56 @@ GLViewer_TexFont::~GLViewer_TexFont()
     delete[] myWidths;
     delete[] myPositions;
 } 
+
+//======================================================================
+// Function: init
+// Purpose :
+//=======================================================================
+void GLViewer_TexFont::init()
+{
+    myNbSymbols = LastSymbolNumber - FirstSymbolNumber + 1;
+
+    // It is unsafe to draw all characters in a single row -
+    // this leads to problems on some graphic cards with small GL_MAX_TEXTURE_SIZE.
+    // So splitting the characters into rows each containing 32 characters (or less).
+    // Assuming contant height of each row (64 pixels) to simplify texture mapping.
+    // However, this can be improved if necessary.
+    QFontMetrics aFM( myQFont ); 
+    myFontHeight = aFM.height();
+    
+    myWidths    = new int[myNbSymbols];
+    myPositions = new int[myNbSymbols];
+
+    for( int i = 0, k = FirstSymbolNumber, aWidth = 0; i < myNbSymbols; i++, k++ )
+    {
+        // is it time to start a new row?
+        if ( !( i % TEX_ROW_LEN ) )
+        {
+          if( aWidth > myMaxRowWidth )
+            myMaxRowWidth = aWidth;
+          aWidth = 0;
+        }
+        myWidths[i]    = aFM.width( k );
+        myPositions[i] = aWidth;
+        aWidth += myWidths[i] + 2;
+    }
+
+    myTexFontWidth  = 0;
+    myTexFontHeight = 0;
+}
   
 //======================================================================
 // Function: generateTexture
 // Purpose :
 //=======================================================================
-void GLViewer_TexFont::generateTexture()
+bool GLViewer_TexFont::generateTexture()
 {
-    QFontMetrics aFM( myQFont );
-
     GLViewer_TexFindId aFindFont;
-    aFindFont.myFontString = myQFont.toString();
+    aFindFont.myFontFamily = myQFont.family();//myQFont.toString();
+    aFindFont.myIsBold = myQFont.bold();
+    aFindFont.myIsItal = myQFont.italic();
+    aFindFont.myIsUndl = myQFont.underline();
+    aFindFont.myPointSize = myQFont.pointSize();
     aFindFont.myViewPortId = (int)QGLContext::currentContext();
         
     if( TexFontBase.contains( aFindFont ) )
@@ -151,34 +171,51 @@ void GLViewer_TexFont::generateTexture()
     }    
     else    
     {
-        QString aStr;
-        int pixelsWidth = 0;
-        int pixelsHight = aFM.height();
-        myTexFontWidth = 64;
-        myTexFontHeight = 64;
-    
-        pixelsWidth = myWidths[LastSymbolNumber - FirstSymbolNumber] + 
-                      myPositions[LastSymbolNumber - FirstSymbolNumber];
+        // Adding some pixels to have a gap between rows
+        int aRowPixelHeight = myFontHeight + TEX_ROW_GAP;
+        int aDescent = QFontMetrics( myQFont ).descent();
 
-        while( myTexFontWidth < pixelsWidth )
-            myTexFontWidth = myTexFontWidth * 2;
+        int aNumRows = myNbSymbols / TEX_ROW_LEN;
+        if ( myNbSymbols % TEX_ROW_LEN ) 
+          aNumRows++;
+        int pixelsHight = aNumRows * aRowPixelHeight;
+
+        myTexFontWidth  = 64;
+        myTexFontHeight = 64;
+
+        while( myTexFontWidth < myMaxRowWidth )
+            myTexFontWidth <<= 1;
         while( myTexFontHeight < pixelsHight )
-            myTexFontHeight = myTexFontHeight * 2;
+            myTexFontHeight <<= 1;
+        
+        // Checking whether the texture dimensions for the requested font
+        // do not exceed the maximum size supported by the OpenGL implementation
+        int maxSize;
+        glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxSize );
+        if ( myTexFontWidth > maxSize || myTexFontHeight > maxSize )
+          return false;
 
         QPixmap aPixmap( myTexFontWidth, myTexFontHeight );
         aPixmap.fill( QColor( 0, 0, 0) );
         QPainter aPainter( &aPixmap );
         aPainter.setFont( myQFont );
-        for( int l = 0/*, gap = 0*/; l < LastSymbolNumber - FirstSymbolNumber; l++  )
+        int row;
+        for( int l = 0; l < myNbSymbols; l++  )
         {
+            row = l / TEX_ROW_LEN;
             QString aLetter;
             aLetter += (char)(FirstSymbolNumber + l);
             aPainter.setPen( QColor( 255,255,255) );
-            aPainter.drawText ( myPositions[l], pixelsHight, aLetter );
+            aPainter.drawText( myPositions[l], ( row + 1 ) * aRowPixelHeight - aDescent, aLetter );
         }
     
         QImage aImage = aPixmap.convertToImage();
-        char* pixels = new char[myTexFontWidth * myTexFontHeight * 2];
+
+        //int qqq = 0;
+        //if (qqq)
+        //  aImage.save("w:\\work\\CATHARE\\texture.png", "PNG");
+
+        char* pixels = new char[myTexFontWidth * myTexFontHeight * NB_TEX_COMP];
 
         for( int i = 0; i < myTexFontHeight; i++ )
         {            
@@ -190,13 +227,13 @@ void GLViewer_TexFont::generateTexture()
           
                 if( aRed != 0 || aGreen != 0 || aBlue != 0 )
                 {
-                    pixels[i * myTexFontWidth * 2 + j * 2] = (GLubyte)( (aRed + aGreen + aBlue)/3 );
-                    pixels[i * myTexFontWidth * 2 + j * 2 + 1]= (GLubyte) 255;
+                    pixels[i * myTexFontWidth * NB_TEX_COMP + j * NB_TEX_COMP] = (GLubyte)( (aRed + aGreen + aBlue)/3 );
+                    pixels[i * myTexFontWidth * NB_TEX_COMP + j * NB_TEX_COMP + 1]= (GLubyte) 255;
                 }
                 else
                 {
-                    pixels[i * myTexFontWidth * 2 + j * 2] = (GLubyte) 0;
-                    pixels[i * myTexFontWidth * 2 + j * 2 + 1]= (GLubyte) 0;
+                    pixels[i * myTexFontWidth * NB_TEX_COMP + j * NB_TEX_COMP] = (GLubyte) 0;
+                    pixels[i * myTexFontWidth * NB_TEX_COMP + j * NB_TEX_COMP + 1]= (GLubyte) 0;
                 }                
             }
         }
@@ -204,11 +241,8 @@ void GLViewer_TexFont::generateTexture()
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glGenTextures(1, &myTexFont);
         glBindTexture(GL_TEXTURE_2D, myTexFont);  
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, myMinMagFilter);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, myMinMagFilter);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         glTexImage2D(GL_TEXTURE_2D, 
                      0, 
                      GL_INTENSITY, 
@@ -228,33 +262,35 @@ void GLViewer_TexFont::generateTexture()
 
         TexFontBase.insert( aFindFont, aTexture );
     }
+    return true;
 }
 
 //======================================================================
 // Function: drawString
 // Purpose :
 //=======================================================================
-void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY )
+void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY, GLfloat theScale )
 {
-    double aXScale = 1., aYScale = 1.;
+    // Adding some pixels to have a gap between rows
+    int aRowPixelHeight = myFontHeight + TEX_ROW_GAP;
+
+    float aXScale = 1.f, aYScale = 1.f;
+    if ( !myIsResizeable )
+    {
+      glGetFloatv (GL_MODELVIEW_MATRIX, modelMatrix);
+      aXScale = modelMatrix[0];
+      aYScale = modelMatrix[5];     
+    } 
+    else if ( theScale > 0.f )
+    {
+      aXScale = aXScale / theScale;
+      aYScale = aYScale / theScale;
+    }
+
     // store attributes
     glPushAttrib( GL_ENABLE_BIT | GL_TEXTURE_BIT );
 
-    if ( !myIsResizeable )
-    {
-      glGetDoublev (GL_MODELVIEW_MATRIX, modelMatrix);
-      aXScale = modelMatrix[0];
-      aYScale = modelMatrix[5];
-    }
-
     glEnable(GL_TEXTURE_2D);
-
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, myMinMagFilter);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, myMinMagFilter);
-
     glPixelTransferi(GL_MAP_COLOR, 0);
 
     glAlphaFunc(GL_GEQUAL, 0.05F);
@@ -264,27 +300,31 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D, myTexFont);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
     glBegin(GL_QUADS);
 
-    theY = theY - ( myTexFontHeight - QFontMetrics( myQFont ).height() ) / aYScale;
-
-    double aLettBegin, aLettEnd, aDY = ( myTexFontHeight - 1 ) / aYScale, aDX;
+    float aLettBeginS, aLettEndS, aLettBeginT, aLettEndT;
+    float aDY = ( aRowPixelHeight - 1 ) / aYScale, aDX;
     char aLetter;
-    int aLettIndex;
+    int aLettIndex, row;
     for( int i = 0; i < theStr.length(); i++ )
     {
         aLetter    = theStr.data()[i];
         aLettIndex = (int)aLetter - FirstSymbolNumber;
+        row        = aLettIndex / TEX_ROW_LEN;
 
-        aLettBegin = (double)myPositions[aLettIndex] / ( (double)myTexFontWidth - 1. );
-        aLettEnd   = aLettBegin + ( (double)myWidths[aLettIndex] - 1. ) / ( (double)myTexFontWidth - 1. );
+        aLettBeginS = (float)myPositions[aLettIndex] / ( (float)myTexFontWidth - 1.f );
+        aLettEndS   = aLettBeginS + ( (float)myWidths[aLettIndex] - 1.f ) / ( (float)myTexFontWidth - 1.f );
+        aLettBeginT = ( myTexFontHeight - ( row + 1 ) * aRowPixelHeight ) / ( (float)myTexFontHeight - 1.f ); 
+        aLettEndT   = aLettBeginT + ( (float)aRowPixelHeight - 1.f ) / ( (float)myTexFontHeight - 1.f );
 
-        aDX = ( (double)myWidths[aLettIndex] - 1. ) / aXScale;
+        aDX = ( (float)myWidths[aLettIndex] - 1.f ) / aXScale;
 
-        glTexCoord2d( aLettBegin, 0.0 ); glVertex3d( theX,       theY,       1.0 );
-        glTexCoord2d( aLettBegin, 1.0 ); glVertex3d( theX,       theY + aDY, 1.0 );
-        glTexCoord2d( aLettEnd,   1.0 ); glVertex3d( theX + aDX, theY + aDY, 1.0 );
-        glTexCoord2d( aLettEnd,   0.0 ); glVertex3d( theX + aDX, theY,       1.0 );
+        glTexCoord2f( aLettBeginS, aLettBeginT ); glVertex3f( theX,       theY,       1.f );
+        glTexCoord2f( aLettBeginS, aLettEndT   ); glVertex3f( theX,       theY + aDY, 1.f );
+        glTexCoord2f( aLettEndS,   aLettEndT   ); glVertex3f( theX + aDX, theY + aDY, 1.f );
+        glTexCoord2f( aLettEndS,   aLettBeginT ); glVertex3f( theX + aDX, theY,       1.f );
 
         theX += aDX + mySeparator / aXScale;
     }
@@ -324,10 +364,16 @@ int GLViewer_TexFont::getStringHeight()
 //! function for generation list base for bitmap fonts
 static GLuint displayListBase( QFont* theFont )
 {
+  if ( !theFont )
+    return 0;
   GLuint aList = 0;
   //static QMap<GLViewer_TexFindId, GLuint> fontCache;
   GLViewer_TexFindId aFindFont;
-  aFindFont.myFontString = theFont->toString();
+  aFindFont.myFontFamily = theFont->family();//theFont->toString();
+  aFindFont.myIsBold = theFont->bold();
+  aFindFont.myIsItal = theFont->italic();
+  aFindFont.myIsUndl = theFont->underline();
+  aFindFont.myPointSize = theFont->pointSize();
 
 #ifdef WIN32
   HGLRC ctx = ::wglGetCurrentContext();
@@ -392,16 +438,17 @@ static GLuint displayListBase( QFont* theFont )
     
     //glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
     int aFontCont = 0;
-    char** xFontList = XListFonts( aDisp, aFindFont.myFontString.data(), 1, &aFontCont  );
+    QString aFontDef = theFont->toString();
+    char** xFontList = XListFonts( aDisp, aFontDef.latin1()/*aFindFont.myFontString.data()*/, 1, &aFontCont  );
     if( !theFont->handle() )
     {       
 #ifdef _DEBUG_
-      printf( "Can't load font %s. loading default font....\n", aFindFont.myFontString.data() );
+      printf( "Can't load font %s. loading default font....\n", aFontDef.latin1()/*aFindFont.myFontString.data()*/ );
 #endif
       QString aFontMask ("-*-*-*-r-*-*-");
-      aFontMask += aFindFont.myFontString.section( ',', 1, 1 );
+      aFontMask += aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 );
 #ifdef _DEBUG_
-      printf( "Height of Default font: %s\n", aFindFont.myFontString.section( ',', 1, 1 ).data() );
+      printf( "Height of Default font: %s\n", aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 ).data() );
 #endif
       aFontMask += "-*-*-*-m-*-*-*";
       xFontList = XListFonts( aDisp, aFontMask.data()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
@@ -445,6 +492,7 @@ GLViewer_Drawer::GLViewer_Drawer()
   myObjectType = "GLViewer_Object";
   myPriority = 0;
   myTextFormat = DTF_BITMAP;
+  myTextScale = 0.125;
 }
 
 //======================================================================
@@ -716,8 +764,14 @@ void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
   if( theFormat != DTF_BITMAP )
   {
     GLViewer_TexFont aTexFont( theFont, theSeparator, theFormat == DTF_TEXTURE_SCALABLE, GL_LINEAR );
-    aTexFont.generateTexture();
-    aTexFont.drawString( text, xPos, yPos );
+    // Font texture was not found or generated --> cannot draw text
+    if ( !aTexFont.generateTexture() )
+      return;
+
+    if ( theFormat == DTF_TEXTURE_SCALABLE )
+      aTexFont.drawString( text, xPos, yPos, textScale() );
+    else
+      aTexFont.drawString( text, xPos, yPos );
   }
   else
   {
@@ -758,9 +812,11 @@ void GLViewer_Drawer::drawGLText( QString text, float x, float y,
   if( smallFont )
     aFont.setPointSize( aFont.pointSize() * 0.8 );
 
+  GLfloat scale = textScale() > 0. ? textScale() : 1.;
+
   QFontMetrics aFontMetrics( aFont );
-  float width  = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.width( text ) : aFontMetrics.width( text ) / myXScale;
-  float height = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.height() : aFontMetrics.height() / myYScale;
+  float width  = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.width( text ) * scale : aFontMetrics.width( text ) / myXScale;
+  float height = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.height() * scale : aFontMetrics.height() / myYScale;
   float gap = 5 / myXScale;
 
   switch( hPosition )
@@ -780,6 +836,21 @@ void GLViewer_Drawer::drawGLText( QString text, float x, float y,
   }
 
   drawText( text, x, y, color, &aFont, 2, myTextFormat );
+}
+
+//======================================================================
+// Function: textRect
+// Purpose :
+//=======================================================================
+GLViewer_Rect GLViewer_Drawer::textRect( const QString& text ) const
+{
+  GLfloat scale = textScale() > 0. ? textScale() : 1.;
+
+  QFontMetrics aFontMetrics( myFont );
+  float width  = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.width( text ) * scale : aFontMetrics.width( text );
+  float height = myTextFormat == DTF_TEXTURE_SCALABLE ? aFontMetrics.height() * scale : aFontMetrics.height();
+
+  return GLViewer_Rect( 0, width, height, 0 );
 }
 
 //======================================================================
@@ -846,3 +917,224 @@ bool GLViewer_Drawer::translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, 
     return result;
 }
 #endif
+
+//======================================================================
+// Function: drawRectangle
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, GLfloat lineWidth, GLfloat gap,
+				     QColor color, bool filled, QColor fillingColor )
+{
+  if( !rect )
+    return;
+
+  float x1 = rect->left() - gap;
+  float x2 = rect->right() + gap;
+  float y1 = rect->bottom() - gap;
+  float y2 = rect->top() + gap;
+  
+  if( filled )
+  {
+    glColor3f( ( GLfloat )fillingColor.red() / 255,
+      ( GLfloat )fillingColor.green() / 255,
+      ( GLfloat )fillingColor.blue() / 255 );
+    glBegin( GL_POLYGON );
+    glVertex2f( x1, y1 );
+    glVertex2f( x1, y2 );
+    glVertex2f( x2, y2 );
+    glVertex2f( x2, y1 );
+    glEnd();
+  }
+
+  glColor3f( ( GLfloat )color.red() / 255,
+    ( GLfloat )color.green() / 255,
+    ( GLfloat )color.blue() / 255 );
+  glLineWidth( lineWidth );
+  
+  glBegin( GL_LINE_LOOP );
+  glVertex2f( x1, y1 );
+  glVertex2f( x1, y2 );
+  glVertex2f( x2, y2 );
+  glVertex2f( x2, y1 );
+  glEnd();
+}
+
+//======================================================================
+// Function: drawContour
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawContour( const GLViewer_PntList& pntList, QColor color, GLfloat lineWidth )
+{
+  glColor3f( ( GLfloat )color.red() / 255,
+    ( GLfloat )color.green() / 255,
+    ( GLfloat )color.blue() / 255 );
+  glLineWidth( lineWidth );
+  
+  glBegin( GL_LINES );
+  QValueList<GLViewer_Pnt>::const_iterator it = pntList.begin();
+  for( ; it != pntList.end(); ++it )
+    glVertex2f( (*it).x(), (*it).y() );
+  glEnd();
+}
+
+//======================================================================
+// Function: drawContour
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawContour( GLViewer_Rect* rect, QColor color, GLfloat lineWidth,
+				   GLushort pattern, bool isStripe )
+{
+  float x1 = rect->left();
+  float x2 = rect->right();
+  float y1 = rect->bottom();
+  float y2 = rect->top();
+  
+  glColor3f( ( GLfloat )color.red() / 255,
+    ( GLfloat )color.green() / 255,
+    ( GLfloat )color.blue() / 255 );
+  glLineWidth( lineWidth );
+  
+  if ( isStripe )
+  {
+    glEnable( GL_LINE_STIPPLE );
+    glLineStipple( 1, pattern );
+  }
+
+  glBegin( GL_LINE_LOOP );
+
+  glVertex2f( x1, y1 );
+  glVertex2f( x1, y2 );
+  glVertex2f( x2, y2 );
+  glVertex2f( x2, y1 );
+
+  glEnd();
+  glDisable( GL_LINE_STIPPLE );
+}
+
+//======================================================================
+// Function: drawPolygon
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawPolygon( const GLViewer_PntList& pntList, QColor color )
+{
+  glColor3f( ( GLfloat )color.red() / 255,
+    ( GLfloat )color.green() / 255,
+    ( GLfloat )color.blue() / 255 );
+  glBegin( GL_POLYGON );
+  QValueList<GLViewer_Pnt>::const_iterator it = pntList.begin();
+  for( ; it != pntList.end(); ++it )
+    glVertex2f( (*it).x(), (*it).y() );
+  glEnd();
+}
+
+//======================================================================
+// Function: drawPolygon
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawPolygon( GLViewer_Rect* rect, QColor color,
+                                      GLushort pattern, bool isStripe )
+{
+  float x1 = rect->left();
+  float x2 = rect->right();
+  float y1 = rect->bottom();
+  float y2 = rect->top();
+  glColor3f( ( GLfloat )color.red() / 255,
+    ( GLfloat )color.green() / 255,
+    ( GLfloat )color.blue() / 255 );
+
+  if ( isStripe )
+  {
+    glEnable( GL_LINE_STIPPLE );
+    glLineStipple( 1, pattern );
+  }
+  glBegin( GL_POLYGON );
+
+  glVertex2f( x1, y1 );
+  glVertex2f( x1, y2 );
+  glVertex2f( x2, y2 );
+  glVertex2f( x2, y1 );
+
+  glEnd();
+  glDisable( GL_LINE_STIPPLE );
+}
+
+//======================================================================
+// Function: drawVertex
+// Purpose :
+//=======================================================================
+GLubyte rasterVertex[5] = { 0x70, 0xf8, 0xf8, 0xf8, 0x70 };
+void GLViewer_Drawer::drawVertex( GLfloat x, GLfloat y, QColor color )
+{
+  glColor3f( ( GLfloat )color.red() / 255, ( GLfloat )color.green() / 255, ( GLfloat )color.blue() / 255 );
+  glRasterPos2f( x, y );
+  glBitmap( 5, 5, 2, 2, 0, 0, rasterVertex );
+}
+
+//======================================================================
+// Function: drawCross
+// Purpose :
+//=======================================================================
+GLubyte rasterCross[7] =  { 0x82, 0x44, 0x28, 0x10, 0x28, 0x44, 0x82 };
+void GLViewer_Drawer::drawCross( GLfloat x, GLfloat y, QColor color )
+{
+  glColor3f( ( GLfloat )color.red() / 255, ( GLfloat )color.green() / 255, ( GLfloat )color.blue() / 255 );
+  glRasterPos2f( x, y );
+  glBitmap( 7, 7, 3, 3, 0, 0, rasterCross );
+}
+
+//======================================================================
+// Function: drawArrow
+// Purpose :
+//=======================================================================
+void GLViewer_Drawer::drawArrow( const GLfloat red, const GLfloat green, const GLfloat blue,
+				 GLfloat lineWidth,
+				 GLfloat staff, GLfloat length, GLfloat width,
+				 GLfloat x, GLfloat y, GLfloat angle, GLboolean filled )
+{
+  GLfloat vx1 = x;
+  GLfloat vy1 = y + staff + length;
+  GLfloat vx2 = vx1 - width / 2;
+  GLfloat vy2 = vy1 - length;
+  GLfloat vx3 = vx1 + width / 2;
+  GLfloat vy3 = vy1 - length;
+
+  gp_Pnt2d p0( x, y );
+  gp_Pnt2d p1( vx1, vy1 );
+  gp_Pnt2d p2( vx2, vy2 );
+  gp_Pnt2d p3( vx3, vy3 );
+
+  p1.Rotate( p0, angle );
+  p2.Rotate( p0, angle );
+  p3.Rotate( p0, angle );
+  
+  vx1 = p1.X(); vy1 = p1.Y();
+  vx2 = p2.X(); vy2 = p2.Y();
+  vx3 = p3.X(); vy3 = p3.Y();
+
+  glColor3f( red, green, blue );
+  glLineWidth( lineWidth );
+
+  glBegin( GL_LINES );
+  glVertex2f( x, y );
+  glVertex2f( vx1, vy1 );
+  glEnd();
+
+  filled = true;
+  if( !filled )
+  {
+    glBegin( GL_LINES );
+    glVertex2f( vx1, vy1 );
+    glVertex2f( vx2, vy2 );
+    glVertex2f( vx1, vy1 );
+    glVertex2f( vx3, vy3 );
+    glEnd();
+  }
+  else
+  {
+    glBegin( GL_POLYGON );
+    glVertex2f( vx1, vy1 );
+    glVertex2f( vx2, vy2 );
+    glVertex2f( vx3, vy3 );
+    glEnd();
+  }
+}

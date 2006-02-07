@@ -32,45 +32,66 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkTriangle.h>
 #include <vtkConvexPointSet.h>
+#include <vtkUnstructuredGridWriter.h>
 #include <vtkMath.h>
+#include <vtkSmartPointer.h>
 
 #include <set>
 #include <iterator>
 #include <algorithm>
 #include <math.h>
 
+typedef vtkUnstructuredGrid TInput;
+
 typedef std::set<vtkIdType> TUIDS; // unique ids 
 typedef std::map<vtkIdType,TUIDS> TPTOIDS; // id points -> unique ids
 
 namespace CONVEX_TOOL
 {
+  // all pairs
+  typedef std::pair<vtkIdType,vtkIdType> TPair;
+  typedef std::set<TPair> TSet;
+  
+  void
+  WriteToFile(vtkUnstructuredGrid* theDataSet, const std::string& theFileName)
+  {
+    vtkUnstructuredGridWriter* aWriter = vtkUnstructuredGridWriter::New();
+    aWriter->SetFileName(theFileName.c_str());
+    aWriter->SetInput(theDataSet);
+    aWriter->Write();
+    aWriter->Delete();
+  }
 
 static float FACE_ANGLE_TOLERANCE=1.5;
+#define EPS 1.0e-38
+#define EPS_T 1.0e-3
 
 #ifdef _DEBUG_
   static int MYDEBUG = 0;
+  static int MYDEBUG_REMOVE = 0;
 #else
   static int MYDEBUG = 0;
+  static int MYDEBUG_REMOVE = 0;
 #endif
 
-/*! \fn static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float *center)
+/*! \fn static void GetCenter(TInput* theGrid,TCell theptIds,float *center)
  * \brief Calculation of geometry center.
- * \param theGrid - vtkUnstructuredGrid cell.
+ * \param theGrid - TInput cell.
  * \param theptIds - point ids.
  * \retval center - output array[3] with coordinates of geometry center.
  */
-static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float center[3])
+static void GetCenter(vtkPoints* thePoints,float center[3])
 {
   float p[3];
   center[0] = center[1] = center[2] = 0.0;
 
-  int numIds = theptIds.size();
-  if (numIds == 0) return;
+  int numPts = thePoints->GetNumberOfPoints();
+  if (numPts == 0) return;
 
   // get the center of the cell
-  for (int i = 0; i < numIds; i++)
+  for (int i = 0; i < numPts; i++)
   {
-    theGrid->GetPoint(theptIds[i], p);
+    thePoints->GetPoint(i, p);
     for (int j = 0; j < 3; j++)
     {
       center[j] += p[j];
@@ -78,7 +99,7 @@ static void GetCenter(vtkUnstructuredGrid* theGrid,TCell theptIds,float center[3
   }
   for (int j = 0; j < 3; j++)
   {
-    center[j] /= numIds;
+    center[j] /= numPts;
   }
 }
 
@@ -154,16 +175,16 @@ void GetFriends(const TPTOIDS p2faces,const TCellArray f2points,TPTOIDS& face2fa
   }
 }
 
-/*! \fn bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,vtkIdType theFId1, vtkIdType theFId2,TUIDS FpIds1, TUIDS FpIds2 )
+/*! \fn bool IsConnectedFacesOnOnePlane( TInput* theGrid,vtkIdType theFId1, vtkIdType theFId2,TUIDS FpIds1, TUIDS FpIds2 )
  * \brief Check is connected faces on one plane.
- * \param theGrid - vtkUnstructuredGrid
+ * \param theGrid - TInput
  * \param theFId1 - id of first face
  * \param theFId2 - id of second face
  * \param FpIds1  - first face points ids.
  * \param FpIds2  - second face points ids.
  * \return TRUE if two faces on one plane, else FALSE.
  */
-bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
+bool IsConnectedFacesOnOnePlane( TInput* theGrid,
                                  vtkIdType theFId1, vtkIdType theFId2,
 				 TUIDS FpIds1, TUIDS FpIds2 )
 {
@@ -252,7 +273,7 @@ bool IsConnectedFacesOnOnePlane( vtkUnstructuredGrid* theGrid,
 	}
 	cout << p[k][2] << ")   ";
       }
-      cout << "angle="<<angle<<" status="<<status<<endl;
+      if(status) cout << "angle="<<angle<<" status="<<status<<endl;
     }
     
   } else if (common_ids.size() >2){
@@ -358,22 +379,271 @@ void GetSumm(TCell v1,TCell v2,TCell &output)
   if(MYDEBUG) cout << endl;
 }
 
+static void GetAndRemoveIdsOnOneLine(vtkPoints* points,
+				     TUIDS input_points_ids,
+				     TUIDS input_two_points_ids,
+				     TUIDS& out_two_points_ids,
+				     TUIDS& removed_points_ids){
+  if (MYDEBUG_REMOVE) cout << EPS <<endl;
+  float P[3][3];
+  vtkIdType current_points_ids[2];
+  if(MYDEBUG_REMOVE) 
+    if(input_two_points_ids.size()!=2) cout << "Error. Must be two ids in variable input_two_points_ids="<<input_two_points_ids.size()<<endl;
+  TUIDS::const_iterator aInPointsIter = input_two_points_ids.begin();
+  for(int i=0;i<2 && aInPointsIter!=input_two_points_ids.end();aInPointsIter++,i++){
+    current_points_ids[i] = *aInPointsIter;
+    if (MYDEBUG_REMOVE) cout << " " << *aInPointsIter;
+  }
+  if (MYDEBUG_REMOVE) cout << endl;
+  bool iscurrent_points_changed = false;
+  points->GetPoint(current_points_ids[0],P[0]);
+  points->GetPoint(current_points_ids[1],P[1]);
+  TUIDS::iterator aPointsIter = input_points_ids.begin();
+  for(;aPointsIter!=input_points_ids.end();aPointsIter++){
+    if(iscurrent_points_changed){
+      points->GetPoint(current_points_ids[0],P[0]);
+      points->GetPoint(current_points_ids[1],P[1]);
+      iscurrent_points_changed = false;
+      if (MYDEBUG_REMOVE) 
+	cout << " " << current_points_ids[0] << " " << current_points_ids[1] << endl;
+    }
+    // check: is point on line input_two_points_ids
+    points->GetPoint(*aPointsIter,P[2]);
+    if (MYDEBUG_REMOVE) {
+      cout << "\t" << current_points_ids[0] << ":"<<P[0][0]<<","<<P[0][1]<<","<<P[0][2]<<endl;
+      cout << "\t" << current_points_ids[1] << ":"<<P[1][0]<<","<<P[1][1]<<","<<P[1][2]<<endl;
+      cout << "\t" << *aPointsIter << ":"<<P[2][0]<<","<<P[2][1]<<","<<P[2][2]<<endl;
+    }
+  
+    // x-x1=(x2-x1)*t -> coeff[0][0] = (x-x1), coeff[0][1] = x2-x1
+    // y-y1=(y2-y1)*t -> coeff[1][0] = (y-y1), coeff[1][1] = y2-y1
+    // z-z1=(z2-z1)*t -> coeff[2][0] = (z-z1), coeff[2][1] = z2-z1
+    float coeff[3][2];
+    for(int i=0;i<3;i++){
+      coeff[i][0] = P[2][i]-P[0][i];
+      coeff[i][1] = P[1][i]-P[0][i];
+    }
+    bool isok_coord[3];
+    bool isok = true;
+    float t[3];
+    for(int i=0;i<3;i++){
+      isok_coord[i] = false;
+      if( fabs(coeff[i][0]) <= EPS && fabs(coeff[i][1]) <= EPS) {
+	isok_coord[i] = true;
+	continue;
+      }
+      if( fabs(coeff[i][1]) <= EPS && fabs(coeff[i][0]) > EPS) {isok = false;t[i]=1.0/EPS;break;}
+      t[i] = (coeff[i][0])/(coeff[i][1]);
+    }
+    for(int i=0;i<3;i++)
+      if (MYDEBUG_REMOVE) 
+	cout << __LINE__ << "          " 
+	     << coeff[i][0] << ","<<coeff[i][1]
+	     <<"   t="<<t[i]<<" isok_coord="<<isok_coord[i]<<endl;
+    if(!isok) continue;
+
+    if (!isok_coord[0] && !isok_coord[1]){
+      if (fabs(t[0]-t[1]) <= EPS_T) isok = true;
+      else isok = false;
+    }
+    if (MYDEBUG_REMOVE) cout << __LINE__ << "          1000 " << isok << endl;
+    if(!isok) continue;
+    if (!isok_coord[1] && !isok_coord[2]){
+      if (fabs(t[1] - t[2]) <= EPS_T) isok = true;
+      else isok = false;
+    }
+    if (MYDEBUG_REMOVE) cout << __LINE__ << "          2000 " << isok << endl;
+    if(!isok) continue;
+    if (!isok_coord[0] && !isok_coord[2]){
+      if (fabs(t[0] - t[2]) <= EPS_T) isok = true;
+      else isok = false;
+    }
+    if (MYDEBUG_REMOVE) cout << __LINE__ << "          3000 " << isok<<endl;
+    if(!isok) continue;
+    
+    float param[3]; // parametric coord for P[0],P[1],P[2] <--->t[0],t[1],t[2]
+    // anilize bounds of line
+    for(int i=0;i<3;i++){
+      for(int j=0;j<3;j++)
+	if(!isok_coord[j]) param[i] = (P[i][j]-P[0][j])/(P[1][j]-P[0][j]);
+    }
+    if (MYDEBUG_REMOVE) cout << "Params: " << param[0] << "," << param[1] << "," << param[2] << endl;
+    vtkIdType imax,imin;
+    float min,max;
+    for(vtkIdType i=0;i<3;i++)
+      if(!isok_coord[i]){
+	min = param[0];imin=0;
+	max = param[0];imax=0;
+	break;
+      }
+    for(vtkIdType i=0;i<3;i++){
+	if(min > param[i]) {min = param[i]; imin=i;}
+	if(max < param[i]) {max = param[i]; imax=i;}
+    }
+    if (MYDEBUG_REMOVE) 
+      cout << "\t min="<<min<<"  max="<<max<<" - "<<"imin="<<imin<<"  imax="<<imax<<endl;
+    // imin - index of left point
+    // imax - index of right point
+    
+    // add id to removed point
+    vtkIdType rem_id,id1,id2;
+    for(vtkIdType i=0;i<3;i++)
+      if (i!=imin && i!=imax) {rem_id = i; break;}
+    
+    if(rem_id == 0) {
+      rem_id = current_points_ids[0];
+      id1=current_points_ids[1];
+      id2=*aPointsIter;
+    }
+    else if (rem_id == 1) {
+      rem_id = current_points_ids[1];
+      id1=current_points_ids[0];
+      id2=*aPointsIter;
+    }
+    else if (rem_id == 2) {
+      rem_id = *aPointsIter;
+      id1=current_points_ids[0];
+      id2=current_points_ids[1];
+    }
+    if (MYDEBUG_REMOVE) 
+      cout << " " << current_points_ids[0] <<","<<current_points_ids[1]<<"---->"<<id1<<","<<id2<<endl;
+    if((current_points_ids[0] == id1 && current_points_ids[1] == id2) ||
+       (current_points_ids[0] == id2 && current_points_ids[1] == id1))
+      {}
+    else {
+      iscurrent_points_changed = true;
+      current_points_ids[0] = id1;
+      current_points_ids[1] = id2;
+    }
+    
+    removed_points_ids.insert(rem_id);
+  }
+  out_two_points_ids.insert(current_points_ids[0]);
+  out_two_points_ids.insert(current_points_ids[1]);
+}
+
+static vtkSmartPointer<vtkConvexPointSet> RemoveAllUnneededPoints(vtkConvexPointSet* convex){
+  vtkSmartPointer<vtkConvexPointSet> out = vtkConvexPointSet::New();
+  
+  TUIDS two_points,input_points,out_two_points_ids,removed_points_ids,loc_removed_points_ids;
+  vtkIdList* aPointIds = convex->GetPointIds();
+  int numIds = aPointIds->GetNumberOfIds();
+  if (numIds<2) return out;
+  TSet good_point_ids;
+  TSet aLists[numIds-2];
+  for(int i=0;i<numIds-2;i++){
+    for(int j=i+1;j<numIds-1;j++){
+      TPair aPair(i,j);
+      aLists[i].insert(aPair);
+    }
+  }
+  for(vtkIdType i=0;i<numIds-2;i++){
+    TUIDS::iterator aRemIter=removed_points_ids.find(i);
+    if(aRemIter!=removed_points_ids.end()) continue;
+    TSet::iterator aPairIter=aLists[i].begin();
+    loc_removed_points_ids.clear();
+    out_two_points_ids.clear();
+    input_points.clear();
+    two_points.clear();
+    for(;aPairIter!=aLists[i].end();aPairIter++){
+      vtkIdType aFirId = (*aPairIter).first;
+      vtkIdType aSecId = (*aPairIter).second;
+      aRemIter=removed_points_ids.find(aSecId);
+      if(aRemIter!=removed_points_ids.end()) continue;
+      TPair aPair1(aFirId,aSecId);
+      TPair aPair2(aSecId,aFirId);
+      TSet::iterator aGoodIter=good_point_ids.find(aPair1);
+      if(aGoodIter!=good_point_ids.end()) continue;
+      aGoodIter=good_point_ids.find(aPair2);
+      if(aGoodIter!=good_point_ids.end()) continue;
+      two_points.insert(aFirId);
+      two_points.insert(aSecId);
+      if (MYDEBUG_REMOVE) 
+	cout << "\nInput: " << aFirId<<":"<<aPointIds->GetId(aFirId) << "," << aSecId <<":"<<aPointIds->GetId(aSecId)<< "  --- ";
+      for(vtkIdType k=aSecId+1;k<numIds;k++) {
+	input_points.insert(k);
+	if (MYDEBUG_REMOVE) cout << k<<":"<<aPointIds->GetId(k) << ",";
+      }
+      if (MYDEBUG_REMOVE) {
+	cout << endl;
+	cout << "\t";
+	for(TUIDS::iterator aDelIter = loc_removed_points_ids.begin();aDelIter!=loc_removed_points_ids.end();aDelIter++) 
+	  cout << *aDelIter<<",";
+	cout << endl;
+      }
+      GetAndRemoveIdsOnOneLine(convex->Points,
+			       input_points,
+			       two_points,
+			       out_two_points_ids,
+			       loc_removed_points_ids);
+      TUIDS::iterator aOutIter = out_two_points_ids.begin();
+      vtkIdType aFirst=*aOutIter;aOutIter++;vtkIdType aSecond=*aOutIter;
+      TPair aPair(aFirst,aSecond);
+      good_point_ids.insert(aPair);
+      if (MYDEBUG_REMOVE){
+	cout << "Output: ";
+	TUIDS::iterator aIter = out_two_points_ids.begin();
+	for(;aIter!=out_two_points_ids.end();aIter++)
+	  cout << *aIter << ",";
+	cout << " --- ";
+      }
+      TUIDS::iterator aDelIter = loc_removed_points_ids.begin();
+      for(;aDelIter!=loc_removed_points_ids.end();aDelIter++){
+	removed_points_ids.insert(*aDelIter);
+	if (MYDEBUG_REMOVE) cout << *aDelIter << ",";
+      }
+      if (MYDEBUG_REMOVE) cout << endl;
+    }
+  }
+  if (MYDEBUG_REMOVE) {
+    cout << "============ Resultat ================" <<endl;
+    cout << "Removed:";
+    for(TUIDS::iterator aIter=removed_points_ids.begin();aIter!=removed_points_ids.end();aIter++)
+      cout << *aIter << ",";
+    cout << endl;
+  }
+  
+  TUIDS result_ids,all_ids;
+  for(vtkIdType i=0;i<numIds;i++) all_ids.insert(i);
+  std::set_difference(all_ids.begin(),
+		      all_ids.end(),
+		      removed_points_ids.begin(),
+		      removed_points_ids.end(),
+		      std::inserter(result_ids,result_ids.begin()));
+
+  out->Points->SetNumberOfPoints(result_ids.size());
+  out->PointIds->SetNumberOfIds(result_ids.size());
+  int aId=0;
+  if(MYDEBUG_REMOVE) cout << "Result out:";
+  for(TUIDS::iterator aIter=result_ids.begin();aIter!=result_ids.end();aIter++,aId++){
+    float P[3];
+    convex->Points->GetPoint(*aIter,P);
+    out->Points->SetPoint(aId,P);
+    out->PointIds->SetId(aId,aPointIds->GetId(*aIter));
+    if (MYDEBUG_REMOVE) cout << *aIter << ":" << aPointIds->GetId(*aIter) << " , ";
+  }
+  if(MYDEBUG_REMOVE) cout << endl;
+  out->Modified();
+  out->Initialize();
+  
+  return out;
+}
+
 void GetPolygonalFaces(vtkUnstructuredGrid* theGrid,int cellId,TCellArray &outputCellArray)
 {
   if (theGrid->GetCellType(cellId) == VTK_CONVEX_POINT_SET){
     // get vtkCell type = VTK_CONVEX_POINT_SET
-    if(vtkConvexPointSet* convex = static_cast<vtkConvexPointSet*>(theGrid->GetCell(cellId))){
+    if(vtkConvexPointSet* convex_in = static_cast<vtkConvexPointSet*>(theGrid->GetCell(cellId))){
+      vtkSmartPointer<vtkConvexPointSet> convex = RemoveAllUnneededPoints(convex_in);
       TCellArray f2points;
       float convex_center[3]; // convex center point coorinat
       int aNbFaces = convex->GetNumberOfFaces();
       int numPts = convex->GetNumberOfPoints();
-      TCell convex_ids;
+      if(MYDEBUG_REMOVE) cout << "aNbFaces="<<aNbFaces<<endl;
+      if(MYDEBUG_REMOVE) cout << "numPts="<<numPts<<endl;
       TPTOIDS p2faces; // key=pointId , value facesIds set
 
-      for(int i=0;i<numPts;i++)
-	  convex_ids.push_back(convex->GetPointId(i));
-
-      GetCenter(theGrid,convex_ids,convex_center);
+      GetCenter(convex->Points,convex_center);
 
       for (vtkIdType faceId=0; faceId < aNbFaces; faceId++){
 	vtkCell *aFace = convex->GetFace(faceId);

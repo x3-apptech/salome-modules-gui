@@ -593,6 +593,7 @@ void Plot2d_ViewFrame::displayCurve( Plot2d_Curve* curve, bool update )
 {
   if ( !curve )
     return;
+
   // san -- Protection against QwtCurve bug in Qwt 0.4.x: 
   // it crashes if switched to X/Y logarithmic mode, when one or more points have
   // non-positive X/Y coordinate
@@ -600,7 +601,6 @@ void Plot2d_ViewFrame::displayCurve( Plot2d_Curve* curve, bool update )
     setHorScaleMode( 0, false );
   if ( myYMode && curve->getMinY() <= 0. )
     setVerScaleMode( 0, false );
-
 
   if ( hasCurve( curve ) ) {
     updateCurve( curve, update );
@@ -1330,10 +1330,8 @@ void Plot2d_ViewFrame::setHorScaleMode( const int mode, bool update )
   }
 
   myXMode = mode;
-  if ( myXMode == 0 ) // linear
-    myPlot->changeAxisOptions( QwtPlot::xBottom, QwtAutoScale::Logarithmic, false );
-  else                // logarithmic
-    myPlot->changeAxisOptions( QwtPlot::xBottom, QwtAutoScale::Logarithmic, true );
+
+  myPlot->changeAxisOptions( QwtPlot::xBottom, QwtAutoScale::Logarithmic, myXMode != 0 );
 
   if ( update )
     fitAll();
@@ -1353,16 +1351,10 @@ void Plot2d_ViewFrame::setVerScaleMode( const int mode, bool update )
   }
 
   myYMode = mode;
-  if ( myYMode == 0 ) { // linear
-    myPlot->changeAxisOptions( QwtPlot::yLeft, QwtAutoScale::Logarithmic, false );
-    if (mySecondY)
-      myPlot->changeAxisOptions( QwtPlot::yRight, QwtAutoScale::Logarithmic, false );
-  }
-  else {               // logarithmic
-    myPlot->changeAxisOptions( QwtPlot::yLeft, QwtAutoScale::Logarithmic, true );
-    if (mySecondY)
-      myPlot->changeAxisOptions( QwtPlot::yRight, QwtAutoScale::Logarithmic, true );
-  }
+  myPlot->changeAxisOptions( QwtPlot::yLeft, QwtAutoScale::Logarithmic, myYMode != 0 );
+  if (mySecondY)
+    myPlot->changeAxisOptions( QwtPlot::yRight, QwtAutoScale::Logarithmic, myYMode != 0 );
+
   if ( update )
     fitAll();
   emit vpModeVerChanged();

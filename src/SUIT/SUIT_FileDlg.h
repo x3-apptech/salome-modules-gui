@@ -45,6 +45,9 @@ public:
 
   void                setValidator( SUIT_FileValidator* );
 
+  QString             dirPath() const; // QFileDialog::dirPath() has a bug on Linux Debian (1 level up from correct 
+                                       // directory is returned).  This redefinition fixes the bug.  
+
   static QString      getFileName( QWidget* parent, const QString& initial, const QStringList& filters, 
 				   const QString& caption, const bool open, const bool showQuickDir = true,
                                    SUIT_FileValidator* validator = 0 );

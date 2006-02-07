@@ -150,6 +150,15 @@ msgstr "Error"
 msgid "BUT_OK"
 msgstr "Ok"
 
+msgid "WARNING"
+msgstr "Warning"
+
+msgid "WRN_XLOG_NOT_ALLOWED"
+msgstr "Some points with non-positive abscissa values have been detected.\nLogarithmic scale for abscissa axis is not allowed."
+
+msgid "WRN_YLOG_NOT_ALLOWED"
+msgstr "Some points with non-positive ordinate values have been detected.\nLogarithmic scale for ordinate axis is not allowed."
+
 # ------------------------------------
 # Plot2d_SetupViewDlg
 # ------------------------------------

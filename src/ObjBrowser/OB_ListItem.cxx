@@ -34,7 +34,7 @@ using namespace std;
 */
 
 template<class T>
-ListItemF<T>::ListItemF( T& theT, SUIT_DataObject* obj ) :
+ListItemF<T>::ListItemF( T* theT, SUIT_DataObject* obj ) :
 myT( theT ),
 myObject( obj )
 {
@@ -61,7 +61,7 @@ void ListItemF<T>::paintC( QPainter* p, QColorGroup& cg, int c, int w, int align
   }
 
   
-  p->fillRect( 0, 0, w, myT.height(), cg.brush( QColorGroup::Base ) );
+  p->fillRect( 0, 0, w, myT->height(), cg.brush( QColorGroup::Base ) );
   //int itemW = myT.width( p->fontMetrics(), myT.listView(), c );
     
   //myT.paintCell( p, colorGrp, c, itemW,  align );
@@ -71,18 +71,18 @@ template<class T>
 void ListItemF<T>::paintFoc( QPainter* p, QColorGroup& cg, const QRect& r )
 {
   QRect rect = r;
-  rect.setWidth( myT.width( p->fontMetrics(), myT.listView(), 0 ) );
+  rect.setWidth( myT->width( p->fontMetrics(), myT->listView(), 0 ) );
   //myT.paintFocus( p, cg, rect );
 }
 
 template<class T>
 void ListItemF<T>::setSel( bool s )
 {
-  QListView* lv = myT.listView();
+  QListView* lv = myT->listView();
   if ( s && lv && lv->inherits( "OB_ListView" ) )
   {
     OB_ListView* objlv = (OB_ListView*)lv;
-    s = s && objlv->isOk( &myT );
+    s = s && objlv->isOk( myT );
   }
 
   //myT.setSelected( s );
@@ -95,24 +95,27 @@ void ListItemF<T>::update()
   if ( !obj )
     return;
 
-  myT.setText( 0, obj->name() );
+  QString n = obj->name();
+  if( myT->text( 0 )!=n )
+    myT->setText( 0, n );
 
-  int aIconW = obj->icon().width();
-  if ( aIconW > 0 )
+  QPixmap p = obj->icon();
+  int aIconW = p.width();
+  if( aIconW > 0 )
   {
-    if ( aIconW > 20 )
+    if( aIconW > 20 )
     {
       QWMatrix aM;
       double aScale = 20.0 / aIconW;
       aM.scale( aScale, aScale );
-      myT.setPixmap( 0, obj->icon().xForm( aM ) );
+      myT->setPixmap( 0, p.xForm( aM ) );
     }
     else
-      myT.setPixmap( 0, obj->icon() );
+      myT->setPixmap( 0, p );
   }
 
-  myT.setDragEnabled( obj->isDragable() );
-  myT.setDropEnabled( true );
+  myT->setDragEnabled( obj->isDragable() );
+  myT->setDropEnabled( true );
 }
 
 /*!
@@ -121,31 +124,31 @@ void ListItemF<T>::update()
 */
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListView* parent )
-: ListItemF<QListViewItem>( *this, obj ),
+: ListItemF<QListViewItem>( this, obj ),
  QListViewItem(parent)
 {
-	update();
+  update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListViewItem* parent )
-: ListItemF<QListViewItem>( *this, obj),
+: ListItemF<QListViewItem>( this, obj ),
  QListViewItem(parent)
 {
-	update();
+  update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after )
-: ListItemF<QListViewItem>( *this, obj),
+: ListItemF<QListViewItem>( this, obj),
 QListViewItem(parent, after )
 {
-	update();
+  update();
 }
 
 OB_ListItem::OB_ListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after )
-: ListItemF<QListViewItem>( *this,obj),
+: ListItemF<QListViewItem>( this,obj),
 QListViewItem(parent, after )
 {
-	update();
+  update();
 }
 
 OB_ListItem::~OB_ListItem()
@@ -154,8 +157,8 @@ OB_ListItem::~OB_ListItem()
 
 void OB_ListItem::setSelected( bool s )
 {
-	setSel( s );
-	QListViewItem::setSelected( s );
+  setSel( s );
+  QListViewItem::setSelected( s );
 }
 
 void OB_ListItem::paintFocus( QPainter* p, const QColorGroup& cg, const QRect& r )
@@ -209,39 +212,39 @@ void OB_ListItem::setText( int column, const QString& text )
 */
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListView* parent, Type type )
-: ListItemF<QCheckListItem>( *this, obj),
+: ListItemF<QCheckListItem>( this, obj),
 QCheckListItem( parent, "", type )
 {
-	update();
+  update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListViewItem* parent, Type type )
-: ListItemF<QCheckListItem>( *this, obj),
+: ListItemF<QCheckListItem>( this, obj),
 QCheckListItem( parent, "", type )
 {
-	update();
+  update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListView* parent, QListViewItem* after, Type type )
-: ListItemF<QCheckListItem>( *this, obj),
+: ListItemF<QCheckListItem>( this, obj),
 #if defined(QT_VERSION) && QT_VERSION >= 0x030101
  QCheckListItem( parent, after, "", type )
 #else
  QCheckListItem( parent, "", type )
 #endif
 {
-	update();
+  update();
 }
 
 OB_CheckListItem::OB_CheckListItem( SUIT_DataObject* obj, QListViewItem* parent, QListViewItem* after, Type type )
-: ListItemF<QCheckListItem>( *this, obj),
+: ListItemF<QCheckListItem>( this, obj),
 #if defined(QT_VERSION) && QT_VERSION >= 0x030101
  QCheckListItem( parent, after, "", type )
 #else
  QCheckListItem( parent, "", type )
 #endif
 {
-	update();
+  update();
 }
 
 OB_CheckListItem::~OB_CheckListItem()

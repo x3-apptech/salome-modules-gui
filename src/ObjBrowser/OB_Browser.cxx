@@ -22,6 +22,9 @@
 #include "OB_ListItem.h"
 #include "OB_ListView.h"
 
+#include <SUIT_DataObjectIterator.h>
+#include <SUIT_TreeSync.h>
+
 #include <qcursor.h>
 #include <qlayout.h>
 #include <qtooltip.h>
@@ -29,6 +32,9 @@
 #include <qwmatrix.h>
 #include <qlistview.h>
 #include <qpopupmenu.h>
+#include <qdatetime.h>
+
+#include <time.h>
 
 /*!
     Class: OB_Browser::ToolTip
@@ -79,6 +85,138 @@ void OB_Browser::ToolTip::maybeTip( const QPoint& pos )
   tip( aRect, aText );
 }
 
+
+typedef SUIT_DataObject*   ObjPtr;
+typedef OB_ListItem*       ItemPtr;
+/*!
+    Class: OB_BrowserSync
+    Descr: Auxiliary class for synchronizing tree of SUIT_DataObjects and list view items
+*/
+
+class OB_BrowserSync
+{
+public:
+  OB_BrowserSync( OB_Browser* );
+  bool     isEqual( const ObjPtr&, const ItemPtr& ) const;
+  ObjPtr   nullSrc() const;
+  ItemPtr  nullTrg() const;
+  ItemPtr  createItem( const ObjPtr&, const ItemPtr&, const ItemPtr&, const bool ) const;
+  void     updateItem( const ItemPtr& ) const;
+  void     deleteItemWithChildren( const ItemPtr& ) const;
+  void     children( const ObjPtr&, QValueList<ObjPtr>& ) const;
+  void     children( const ItemPtr&, QValueList<ItemPtr>& ) const;
+  ItemPtr  parent( const ItemPtr& ) const;
+private:
+  bool     needUpdate( const ItemPtr& ) const;
+  OB_Browser*   myBrowser;
+};
+
+
+OB_BrowserSync::OB_BrowserSync( OB_Browser* ob )
+: myBrowser( ob )
+{
+}
+
+bool OB_BrowserSync::needUpdate( const ItemPtr& item ) const
+{
+  bool update = false;
+  if ( item ) {
+    SUIT_DataObject* obj = item->dataObject();
+    if ( obj ) {
+      // 1. check text
+      update = ( item->text( 0 ) != obj->name() );
+      if ( !update ) { 
+	// 2. check pixmap (compare serialNumber()-s)
+	QPixmap objPix = obj->icon();
+	const QPixmap* itemPix = item->pixmap( 0 );
+	update = (  objPix.isNull() && (  itemPix && !itemPix->isNull() ) ) || 
+	         ( !objPix.isNull() && ( !itemPix ||  itemPix->isNull() ) ); 
+	if ( !update && !objPix.isNull() && itemPix && !itemPix->isNull() ) {
+	  int aIconW = objPix.width();
+	  if( aIconW > 20 ) {
+	    QWMatrix aM;
+	    double aScale = 20.0 / aIconW;
+	    aM.scale( aScale, aScale );
+	    objPix = objPix.xForm( aM );
+	  }
+	  update = ( objPix.serialNumber() != itemPix->serialNumber() );
+	}
+      }
+    }
+  }
+  return update;
+}
+
+void OB_BrowserSync::updateItem( const ItemPtr& p ) const
+{
+  if ( p && needUpdate( p ) ) { 
+    //    printf( "--- needUpdate for %s = true ---\n", p->text( 0 ).latin1() );
+    p->update();
+  }
+}
+
+ItemPtr OB_BrowserSync::createItem( const ObjPtr& src,
+				    const ItemPtr& parent, const ItemPtr& after,
+				    const bool asFirst ) const
+{
+  ItemPtr i = myBrowser ? dynamic_cast<ItemPtr>( myBrowser->createItem( src, parent, after, asFirst ) ) : 0;
+  if( i )
+    i->setOpen( src->isOpen() );
+  return i;
+}
+
+void OB_BrowserSync::deleteItemWithChildren( const ItemPtr& i ) const
+{
+  if( myBrowser && myBrowser->myItems.contains( i->dataObject() ) )
+  {
+    myBrowser->removeReferences( i );
+    delete i;
+  }
+}
+
+bool OB_BrowserSync::isEqual( const ObjPtr& p, const ItemPtr& q ) const
+{
+  return ( !p && !q ) || ( p && q && q->dataObject()==p );
+}
+
+ObjPtr OB_BrowserSync::nullSrc() const
+{
+  return 0;
+}
+
+ItemPtr OB_BrowserSync::nullTrg() const
+{
+  return 0;
+}
+
+void OB_BrowserSync::children( const ObjPtr& p, QValueList<ObjPtr>& ch ) const
+{
+  DataObjectList l;
+  if( p )
+  {
+    p->children( l );
+    ch.clear();
+    for( SUIT_DataObject* o = l.first(); o; o = l.next() )
+      ch.append( o );
+  }
+}
+
+void OB_BrowserSync::children( const ItemPtr& p, QValueList<ItemPtr>& ch ) const
+{
+  for( QListViewItem* item = p->firstChild(); item; item = item->nextSibling() )
+  {
+    ItemPtr p = dynamic_cast<ItemPtr>( item );
+    if( p )
+      ch.append( p );
+  }
+}
+
+ItemPtr OB_BrowserSync::parent( const ItemPtr& p ) const
+{
+  return p ? dynamic_cast<ItemPtr>( p->parent() ) : 0;
+}
+
+
 /*!
     Class: OB_Browser
     Descr: Hierarchical tree object browser.
@@ -115,6 +253,8 @@ myRootDecorated( true )
            this, SLOT( onDoubleClicked( QListViewItem* ) ) );
 
   setRootObject( root );
+
+  setModified();
 }
 
 OB_Browser::~OB_Browser()
@@ -218,6 +358,8 @@ void OB_Browser::setRootObject( SUIT_DataObject* theRoot )
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
 
   autoOpenBranches();
+
+  setModified();
 
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
@@ -508,6 +650,8 @@ void OB_Browser::setAppropriateColumn( const int id, const bool on )
 
 void OB_Browser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
 {
+//  QTime t1 = QTime::currentTime();
+
   if ( !obj && !(obj = getRootObject()) )
     return;
 
@@ -526,8 +670,13 @@ void OB_Browser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
   if( autoOpen )
     autoOpenBranches();
 
+  setModified();
+
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
+
+//  QTime t2 = QTime::currentTime();
+//  qDebug( QString( "update tree time = %1 msecs" ).arg( t1.msecsTo( t2 ) ) );
 }
 
 void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
@@ -564,88 +713,73 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
 
   autoOpenBranches();
 
+  setModified();
+
   if ( selNum != numberOfSelected() )
     emit selectionChanged();
 }
 
-void OB_Browser::updateView( const SUIT_DataObject* theStartObj )
+void OB_Browser::updateView( SUIT_DataObject* startObj )
 {
   QListView* lv = listView();
   if ( !lv )
     return;
 
-  if ( !theStartObj || theStartObj->root() != getRootObject() )
+  if ( !startObj || startObj->root() != getRootObject() )
     return;
 
-  QListViewItem* after = 0;
-  QListViewItem* parent = 0;
-  QListViewItem* startItem = listViewItem( theStartObj );
-
-  if ( theStartObj->parent() )
-    parent = listViewItem( theStartObj->parent() );
-
-  QListViewItem* prv = 0;
-  QListViewItem* cur = parent ? parent->firstChild() : lv->firstChild();
-  while ( !after && cur )
+  if( startObj==myRoot )
   {
-    if ( cur == startItem )
-      after = prv;
+    DataObjectList ch;
+    myRoot->children( ch );
 
-    prv = cur;
-    cur = cur->nextSibling();
-  }
+    ItemMap exist;
+    QListViewItem* st = lv->firstChild();
+    for( ; st; st =  st->nextSibling() )
+    {
+      OB_ListItem* ob_item = dynamic_cast<OB_ListItem*>( st );
+      exist.insert( ob_item->dataObject(), ob_item );
+    }
 
-  QPtrList<QListViewItem> delList;
-  if ( !startItem && theStartObj == getRootObject() )
-  {
-    for ( QListViewItem* item = lv->firstChild(); item; item = item->nextSibling() )
-      delList.append( item );
-  }
-  else
-    delList.append( startItem );
+    SUIT_DataObject* local_root = ch.first();
+    for( ; local_root; local_root = ch.next() )
+    {
+      OB_BrowserSync sync( this );
+      OB_ListItem* local_item = dynamic_cast<OB_ListItem*>( listViewItem( local_root ) );
+      
+      //      QString srcName = ( local_root && !local_root->name().isNull() ) ? local_root->name() : "";
+      //      QString trgName = ( local_item && !local_item->text(0).isNull() ) ? local_item->text(0) : "";
+      //      printf( "--- OB_Browser::updateView() calls synchronize()_1: src = %s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
 
-  for ( QPtrListIterator<QListViewItem> it( delList ); it.current(); ++it )
-  {
-    removeReferences( it.current() );
-    delete it.current();
-  }
+      synchronize<ObjPtr,ItemPtr,OB_BrowserSync>( local_root, local_item, sync );
+      exist[local_root] = 0;
+    }
 
-  // for myRoot object, if myShowRoot==false, then creating multiple top-level QListViewItem-s
-  // (which will correspond to myRoot's children = Modules).  
-  if ( rootIsDecorated() && theStartObj == myRoot )
-  {
-    DataObjectList lst;
-    theStartObj->children( lst );
-    DataObjectListIterator it ( lst );
-    // iterating backward to preserve the order of elements in the tree
-    for ( it.toLast(); it.current(); --it )
-      createTree( it.current(), 0, 0 );
+    ItemMap::const_iterator anIt = exist.begin(), aLast = exist.end();
+    for( ; anIt!=aLast; anIt++ )
+      if( anIt.data() )
+      {
+	removeReferences( anIt.data() );
+	OB_ListItem* item = dynamic_cast<OB_ListItem*>( anIt.data() );
+	if( item && myItems.contains( item->dataObject() ) )
+	  delete anIt.data();
+      }
   }
   else
-    createTree( theStartObj, parent, after ? after : parent );
+  {
+    OB_BrowserSync sync( this );
+    OB_ListItem* startItem = dynamic_cast<OB_ListItem*>( listViewItem( startObj ) );
+
+    //    QString srcName = ( startObj && !startObj->name().isNull() ) ? startObj->name() : "";
+    //    QString trgName = ( startItem && !startItem->text(0).isNull() ) ? startItem->text(0) : "";
+    //    printf( "--- OB_Browser::updateView() calls synchronize()_2: src = %s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
+
+    synchronize<ObjPtr,ItemPtr,OB_BrowserSync>( startObj, startItem, sync );
+  }
 }
 
-QListViewItem* OB_Browser::createTree( const SUIT_DataObject* obj,
-                                       QListViewItem* parent, QListViewItem* after )
-{
-  if ( !obj )
-    return 0;
-  
-  QListViewItem* item = createItem( obj, parent, after );
-
-  DataObjectList lst;
-  obj->children( lst );
-  for ( DataObjectListIterator it ( lst ); it.current(); ++it )
-    createTree( it.current(), item );
-
-  if ( item )
-    item->setOpen( obj->isOpen() );
-
-  return item;
-}
-
-QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
-                                       QListViewItem* parent, QListViewItem* after )
+QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o, QListViewItem* parent,
+				       QListViewItem* after, const bool asFirstChild )
 {
   QListView* lv = listView();
 
@@ -676,7 +810,7 @@ QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
         after = after->nextSibling();
     }
 
-    if ( after )
+    if ( after && !asFirstChild )
     {
       if ( type == -1 )
         item = new OB_ListItem( obj, parent, after );
@@ -701,7 +835,6 @@ QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o,
 
   myItems.insert( obj, item );
   obj->connect( this, SLOT( onDestroyed( SUIT_DataObject* ) ) );
-
   updateText( item );
 
   return item;
@@ -1089,7 +1222,7 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
     return;
   }
 
-  if ( !autoUpd )
+  if( !autoUpd )
     return;
 
   if ( isAutoUpdate() )
@@ -1097,8 +1230,8 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
     SUIT_DataObject* pObj = item && item->parent() ? dataObject( item->parent() ) : 0;
     updateTree( pObj, false );
   }
-  else
-    delete item;
+
+  delete item;
 }
 
 void OB_Browser::autoOpenBranches()
@@ -1134,3 +1267,9 @@ void OB_Browser::onDoubleClicked( QListViewItem* item )
   if ( item )
     emit doubleClicked( dataObject( item ) );
 }
+
+void OB_Browser::setModified()
+{
+  myModifiedTime = clock();
+}
+

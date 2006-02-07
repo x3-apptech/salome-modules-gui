@@ -185,7 +185,7 @@ public:
   virtual bool              finishMove() { return true; }
   
   //! Returns visible object status
-  bool                      getVisible() const { return myIsVisible; }
+  virtual bool              getVisible() const { return myIsVisible; }
   //! Installs visible object status
   virtual void              setVisible( bool theStatus ) { myIsVisible = theStatus; }
   

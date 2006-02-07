@@ -21,8 +21,8 @@
 //
 //
 //
-//  File   : SVTK_RenderWindowInteractor.h
-//  Author : Nicolas REJNERI
+//  File   : 
+//  Author : 
 //  Module : SALOME
 //  $Header$
 
@@ -30,242 +30,223 @@
 #define SVTK_RenderWindowInteractor_h
 
 #include "SVTK.h"
-
 #include "SVTK_Selection.h"
-#include "SALOME_InteractiveObject.hxx"
 
-// QT Includes
-#include <qobject.h>
-#include <qtimer.h>
+#include <vtkSmartPointer.h>
+#include <qwidget.h>
 
-// VTK Includes
-#include <vtkVersion.h>
-#include <vtkRenderWindowInteractor.h>
+// undefining min and max because CASCADE's defines them and
+// it clashes with std::min(), std::max()
+#undef min
+#undef max
 
-// Open CASCADE Includes
-#include <TColStd_MapOfInteger.hxx>
-#include <TColStd_IndexedMapOfInteger.hxx>
-#include <TColStd_MapIteratorOfMapOfInteger.hxx>
+#include <stack>
 
-class vtkPicker;
-class vtkCellPicker;
-class vtkPointPicker;
-class vtkActorCollection;
+class vtkGenericRenderWindowInteractor;
+class vtkInteractorStyle;
+class vtkCallbackCommand;
+class vtkRenderWindow;
+class vtkRenderer;
+class vtkObject;
 
-class SALOME_Actor;
-class SVTK_Actor;
+class SVTK_Selector;
+class SVTK_Renderer;
 
-class SVTK_ViewWindow;
-class SVTK_RenderWindow;
-class SVTK_InteractorStyle;
-
-// ------------------------------------------------------------
-// :TRICKY: Fri Apr 21 22:19:27 2000 Pagey
-// The Signal/Slot mechanism used by Qt requires that QObject 
-// appear as the first class when using multiple inheritance. 
-// Hence the order of the two classes QObject and vtkRenderWindowInteractor
-// matters here. Be careful not to change it by accident. 
-// ------------------------------------------------------------
-class SVTK_EXPORT SVTK_RenderWindowInteractor: public QObject, 
-  public vtkRenderWindowInteractor
+//============================================================================
+//! Implemements Qt based vtkRenderWindowInteractor.
+/*!
+  The class inherits #QWidget class in order to be possible process Qt events.
+  It invokes corresponding VTK events through usage of its device - a #vtkGenericRenderWindowInteractor.
+  Also, it creates, initialize and holds vtkRenderWindow instance.
+*/
+class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
 {
-  Q_OBJECT ;   
-  friend class SVTK_ViewWindow;
-public:
+  Q_OBJECT;
 
-  static SVTK_RenderWindowInteractor *New() ; 
+ public:
+  QVTK_RenderWindowInteractor(QWidget* theParent, 
+			      const char* theName);
 
-  vtkTypeMacro(SVTK_RenderWindowInteractor,vtkRenderWindowInteractor);
+  ~QVTK_RenderWindowInteractor();
 
-  // Description:
-  // Initializes the event handlers without an XtAppContext.  This is
-  // good for when you don`t have a user interface, but you still
-  // want to have mouse interaction.
-  virtual void Initialize();
+  //! To initialize by #vtkGenericRenderWindowInteractor instance
+  virtual
+  void
+  Initialize(vtkGenericRenderWindowInteractor* theDevice);
 
-  virtual void SetInteractorStyle(vtkInteractorObserver *);
-  SVTK_InteractorStyle* GetSInteractorStyle(){ return myInteractorStyle;}
+  vtkGenericRenderWindowInteractor* 
+  GetDevice();
 
-  // Description:
-  // This will start up the X event loop and never return. If you
-  // call this method it will loop processing X events until the
-  // application is exited.
-  virtual void Start();
-  
-  // Description:
-  // Event loop notification member for Window size change
-  virtual void UpdateSize(int x,int y);
+  vtkRenderWindow*
+  getRenderWindow();
 
-  // Description:
-  // Timer methods must be overridden by platform dependent subclasses.
-  // flag is passed to indicate if this is first timer set or an update
-  // as Win32 uses repeating timers, whereas X uses One shot more timer
-  // if flag==VTKXI_TIMER_FIRST Win32 and X should createtimer
-  // otherwise Win32 should exit and X should perform AddTimeOut()
-  virtual int CreateTimer(int ) ; 
-  virtual int DestroyTimer() ; 
-  
-  /* Selection Management */
-  bool highlightCell(const TColStd_IndexedMapOfInteger& MapIndex, 
-		     SALOME_Actor* theMapActor, 
-		     bool hilight, 
-		     bool update = true );
-  bool highlightEdge(const TColStd_IndexedMapOfInteger& MapIndex, 
-		     SALOME_Actor* theMapActor, 
-		     bool hilight, 
-		     bool update = true );
-  bool highlightPoint(const TColStd_IndexedMapOfInteger& MapIndex, 
-		      SALOME_Actor* theMapActor, 
-		      bool hilight, 
-		      bool update = true );
-  bool highlight(const Handle(SALOME_InteractiveObject)& IObject, 
-		 bool hiligth, 
-		 bool immediatly = true );
-  void unHighlightSubSelection();
-  bool unHighlightAll();
-
-  bool isInViewer( const Handle(SALOME_InteractiveObject)& IObject);
-  bool isVisible( const Handle(SALOME_InteractiveObject)& IObject);
-  void rename(const Handle(SALOME_InteractiveObject)& IObject, QString newName);
-
-  void SetSelectionMode(Selection_Mode mode);
-  void SetSelectionProp(const double& theRed = 1, 
-			const double& theGreen = 1,
-			const double& theBlue = 0, 
-			const int& theWidth = 5);
-  void SetSelectionTolerance(const double& theTolNodes = 0.025, 
-			     const double& theTolCell = 0.001);
-
-  // Displaymode management
-  int GetDisplayMode();
-  void SetDisplayMode(int);
-
-  // Switch representation wireframe/shading
-  void SetDisplayMode(const Handle(SALOME_InteractiveObject)& IObject, int theMode);
-
-  // Change all actors to wireframe or surface
-  void ChangeRepresentationToWireframe();
-  void ChangeRepresentationToSurface();
-
-  // Change to wireframe or surface a list of vtkactor
-  void ChangeRepresentationToWireframe(vtkActorCollection* ListofActors);
-  void ChangeRepresentationToSurface(vtkActorCollection* ListofActors);
-
-  // Erase Display functions
-  void EraseAll();
-  void DisplayAll();
-  void RemoveAll( const bool immediatly );
-  void Erase(const Handle(SALOME_InteractiveObject)& IObject, 
-	     bool immediatly=true);
-  void Remove(const Handle(SALOME_InteractiveObject)& IObject, 
-	      bool immediatly=true);
-  void Display(const Handle(SALOME_InteractiveObject)& IObject, 
-	       bool immediatly=true);
-
-  void Display( SALOME_Actor* SActor, 
-		bool immediatly = true );
-  void Erase( SALOME_Actor* SActor, 
-	      bool immediatly = true );
-  void Remove( SALOME_Actor* SActor, 
-	       bool updateViewer = true );
-
-  // Transparency
-  void SetTransparency(const Handle(SALOME_InteractiveObject)& IObject,
-		       float trans);
-  float GetTransparency(const Handle(SALOME_InteractiveObject)& IObject);
-
-  // Color
-  void SetColor(const Handle(SALOME_InteractiveObject)& IObject,
-		QColor thecolor);
-  QColor GetColor(const Handle(SALOME_InteractiveObject)& IObject);
-
-  void Update();
-
-  vtkRenderer* GetRenderer();
-
-  void setGUIWindow(QWidget* theWindow);
-
-  void setViewWindow(SVTK_ViewWindow* theViewWindow);
-  
-  void setCellData(const int& theIndex, 
-		   SALOME_Actor* theMapActor,
-		   SVTK_Actor* theActor);
-  void setEdgeData(const int& theCellIndex, 
-		   SALOME_Actor* theMapActor,
-		   const int& theEdgeIndex, 
-		   SVTK_Actor* theActor ); //NB
-  void setPointData(const int& theIndex, 
-		    SALOME_Actor* theMapActor,
-		    SVTK_Actor* theActor);
-
-  typedef void (*TUpdateActor)(const TColStd_IndexedMapOfInteger& theMapIndex,
-			       SALOME_Actor* theMapActor, 
-			       SVTK_Actor* theActor);
- protected:
-
-  SVTK_RenderWindowInteractor();
-  ~SVTK_RenderWindowInteractor();
-
-  SVTK_InteractorStyle* myInteractorStyle;
-
-  bool highlight(const TColStd_IndexedMapOfInteger& theMapIndex, 
-		 SALOME_Actor* theMapActor, 
-		 SVTK_Actor* theActor,
-		 TUpdateActor theFun, 
-		 bool hilight, 
-		 bool update);
-  void setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
-		    SALOME_Actor* theMapActor,
-		    SVTK_Actor *theActor,
-		    TUpdateActor theFun);
-  
-  // Timer used during various mouse events to figure 
-  // out mouse movements. 
-  QTimer *mTimer ;
-
-  int myDisplayMode;
-
-  //NRI: Selection mode
-  SVTK_Actor* myPointActor;
-  SVTK_Actor* myEdgeActor;
-  SVTK_Actor* myCellActor;
-  void MoveInternalActors();
-
-  vtkPicker* myBasicPicker;
-  vtkCellPicker* myCellPicker;
-  vtkPointPicker* myPointPicker;
-  
-  // User for switching to stereo mode.
-  int PositionBeforeStereo[2];
+  //! Just to simplify usage of its device (#vtkGenericRenderWindowInteractor)
+  virtual
+  void
+  InvokeEvent(unsigned long theEvent, void* theCallData);
 
  public slots:
-  void MouseMove(const QMouseEvent *event) ;
-  void LeftButtonPressed(const QMouseEvent *event) ;
-  void LeftButtonReleased(const QMouseEvent *event) ;
-  void MiddleButtonPressed(const QMouseEvent *event) ;
-  void MiddleButtonReleased(const QMouseEvent *event) ;
-  void RightButtonPressed(const QMouseEvent *event) ;
-  void RightButtonReleased(const QMouseEvent *event) ;
-  void ButtonPressed(const QMouseEvent *event) ;
-  void ButtonReleased(const QMouseEvent *event) ;
-  void KeyPressed(QKeyEvent *event) ;
+   //! Need for initial contents display on Win32
+  virtual void show();
 
- private slots:
-  // Not all of these slots are needed in VTK_MAJOR_VERSION=3,
-  // but moc does not understand "#if VTK_MAJOR_VERSION". Hence, 
-  // we have to include all of these for the time being. Once,
-  // this bug in MOC is fixed, we can separate these. 
-  void TimerFunc() ;
+  //! To implement final initialization, just before the widget is displayed
+  virtual void polish();
 
+  //! To adjust widget and vtkRenderWindow size
+  virtual void resize(int w, int h);
+
+ protected:
+  virtual void paintEvent( QPaintEvent* );
+  virtual void resizeEvent( QResizeEvent* );
+
+  virtual void mouseMoveEvent( QMouseEvent* );
+  virtual void mousePressEvent( QMouseEvent* );
+  virtual void mouseReleaseEvent( QMouseEvent* );
+  virtual void mouseDoubleClickEvent( QMouseEvent* );
+  virtual void wheelEvent( QWheelEvent* );
+  virtual void keyPressEvent( QKeyEvent* );
+  virtual void keyReleaseEvent( QKeyEvent* );
+  virtual void enterEvent( QEvent * );
+  virtual void leaveEvent( QEvent * );
+
+  virtual void contextMenuEvent( QContextMenuEvent * e );
+
+  // reimplemented from QWidget in order to set window - receiver
+  // of space mouse events. 
+  virtual void focusInEvent( QFocusEvent* );
+  virtual void focusOutEvent( QFocusEvent* );
+
+  //! To handle native X11 events (from such devices as SpaceMouse)
+  virtual bool x11Event( XEvent *e );
+
+  vtkSmartPointer<vtkRenderWindow> myRenderWindow;
+  vtkSmartPointer<vtkGenericRenderWindowInteractor> myDevice;
+};
+
+
+//============================================================================
+//! Extends QVTK_RenderWindowInteractor functionality.
+/*!
+  Implements such features as 
+  support of selection, 
+  run-time interactor style management,
+  one render window per one renderer collaboration and
+  SUIT_ViewWindow events invocation.
+*/
+class SVTK_EXPORT SVTK_RenderWindowInteractor: public QVTK_RenderWindowInteractor
+{
+  Q_OBJECT;
+
+ public:
+  SVTK_RenderWindowInteractor(QWidget* theParent, 
+			      const char* theName);
+
+  ~SVTK_RenderWindowInteractor();
+
+  //! To initialize properly the class
+  virtual
+  void
+  Initialize(vtkGenericRenderWindowInteractor* theDevice,
+	     SVTK_Renderer* theRenderer,
+	     SVTK_Selector* theSelector);
+
+  //----------------------------------------------------------------------------
+  //! To get corresponding SVTK_Renderer instance
+  SVTK_Renderer* 
+  GetRenderer();
+
+  //! To get corresponding SVTK_Renderer device (just to simplify collobaration with SVTK_Renderer)
+  vtkRenderer* 
+  getRenderer();
+
+  //----------------------------------------------------------------------------
+  //! To get current interactor style
+  vtkInteractorStyle* 
+  GetInteractorStyle();
+
+  //! To change current interactor style by pushing the new one into the container
+  void
+  PushInteractorStyle(vtkInteractorStyle* theStyle);
+
+  //! To restore previous interactor style
+  void
+  PopInteractorStyle();
+
+  //----------------------------------------------------------------------------
+  //! To get corresponding SVTK_Selector
+  SVTK_Selector* 
+  GetSelector();
+
+  //! To get current selection mode (just to simplify collobaration with SVTK_Selector)
+  Selection_Mode 
+  SelectionMode() const;
+
+  //! To change selection mode (just to simplify collobaration with SVTK_Selector)
+  void 
+  SetSelectionMode(Selection_Mode theMode);
+
+ public:
+  //! To transform vtkCommand::EndPickEvent to Qt selectionChanged signal
+  void
+  onEmitSelectionChanged();
+
+ public:
  signals:
-  void RenderWindowModified() ;
+  void MouseMove( QMouseEvent* );
+  void MouseButtonPressed( QMouseEvent* );
+  void MouseButtonReleased( QMouseEvent* );
+  void MouseDoubleClicked( QMouseEvent* );
+  void ButtonPressed(const QMouseEvent *event);
+  void ButtonReleased(const QMouseEvent *event);
+  void WheelMoved( QWheelEvent* );
+  void KeyPressed( QKeyEvent* );
+  void KeyReleased( QKeyEvent* );
   void contextMenuRequested( QContextMenuEvent *e );
 
- private:
-  SVTK_ViewWindow* myViewWindow;  
-  QWidget* myGUIWindow;  
-  double myTolNodes;
-  double myTolItems;
+  void selectionChanged();
+
+ protected:
+  virtual void mouseMoveEvent( QMouseEvent* );
+  virtual void mousePressEvent( QMouseEvent* );
+  virtual void mouseReleaseEvent( QMouseEvent* );
+  virtual void mouseDoubleClickEvent( QMouseEvent* );
+  virtual void wheelEvent( QWheelEvent* );
+  virtual void keyPressEvent( QKeyEvent* );
+  virtual void keyReleaseEvent( QKeyEvent* );
+  virtual void contextMenuEvent( QContextMenuEvent * e );
+
+  void
+  SetRenderer(SVTK_Renderer *theRenderer);
+
+  void
+  SetSelector(SVTK_Selector* theSelector);
+
+  void
+  InitInteractorStyle(vtkInteractorStyle* theStyle);
+
+  //----------------------------------------------------------------
+  // Main process VTK event method
+  static
+  void
+  ProcessEvents(vtkObject* theObject, 
+		unsigned long theEvent,
+		void* theClientData, 
+		void* theCallData);
+
+  // Used to process VTK events
+  vtkSmartPointer<vtkCallbackCommand> myEventCallbackCommand;
+
+  // Priority at which events are processed
+  float myPriority;
+
+  //----------------------------------------------------------------
+  vtkSmartPointer<SVTK_Selector> mySelector;
+
+  vtkSmartPointer<SVTK_Renderer> myRenderer;
+
+  typedef vtkSmartPointer<vtkInteractorStyle> PInteractorStyle;
+  typedef std::stack<PInteractorStyle> TInteractorStyles;
+  TInteractorStyles myInteractorStyles;
 };
 
 

@@ -1210,6 +1210,8 @@ void LightApp_Application::onDesktopActivated()
 QString LightApp_Application::getFileFilter() const
 {
   return "(*.bin)";
+  // HDF persistence not yet completed - to be uncommented later
+  //return "(*.hdf)";
 }
 
 /*! Gets file name*/

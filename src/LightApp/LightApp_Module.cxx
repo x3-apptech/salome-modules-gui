@@ -9,6 +9,7 @@
 
 #include "LightApp_Application.h"
 #include "LightApp_DataModel.h"
+#include "LightApp_DataObject.h"
 #include "LightApp_Study.h"
 #include "LightApp_Preferences.h"
 #include "LightApp_Selection.h"
@@ -92,13 +93,27 @@ void LightApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu,
 /*!Update object browser.
  * For updating model or whole object browser use update() method can be used.
 */
-void LightApp_Module::updateObjBrowser( bool updateDataModel, SUIT_DataObject* root )
+void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel, 
+					SUIT_DataObject* theDataObject )
 {
-  if( updateDataModel )
-    if( CAM_DataModel* aDataModel = dataModel() )
-      if( LightApp_DataModel* aModel = dynamic_cast<LightApp_DataModel*>( aDataModel ) )
-        aModel->update( 0, dynamic_cast<LightApp_Study*>( getApp()->activeStudy() ) );
-  getApp()->objectBrowser()->updateTree( root );
+  SUIT_DataObject* aDataObject = theDataObject;
+  if( theIsUpdateDataModel ){
+    if( CAM_DataModel* aDataModel = dataModel() ){
+      if ( LightApp_DataModel* aModel = dynamic_cast<LightApp_DataModel*>( aDataModel ) ) {
+	SUIT_DataObject* aParent = NULL;
+	if(theDataObject && theDataObject != aDataModel->root())
+	  aParent = theDataObject->parent();
+
+	LightApp_DataObject* anObject = dynamic_cast<LightApp_DataObject*>(theDataObject);
+	LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(getApp()->activeStudy());
+        aModel->update( anObject, aStudy );
+
+	if(aParent && aParent->childPos(anObject) < 0)
+	  aDataObject = dynamic_cast<LightApp_DataObject*>(aParent);
+      }
+    }
+  }
+  getApp()->objectBrowser()->updateTree( aDataObject );
 }
 
 /*!NOT IMPLEMENTED*/

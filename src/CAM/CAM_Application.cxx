@@ -31,6 +31,7 @@
 #include <qlabel.h>
 #include <qfont.h>
 #include <qapplication.h>
+#include <qregexp.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -428,31 +429,23 @@ void CAM_Application::readModuleList()
 
   QStringList modList;
 
-  // parse command line arguments
-  int nbArgs = qApp->argc();
-  char** CmdLine = qApp->argv();
-  QString CmdStr;
-  for ( int i = 0; i < nbArgs; i++ )
-  {
-    CmdStr.append(CmdLine[i]);
-    CmdStr.append(" ");
-  }
-  int startId = CmdStr.find("--modules (");
-  if ( startId != -1 ) { // application launch with --modules option
-    startId = CmdStr.find("(", startId);
-    int stopId = CmdStr.find(" )", startId);
-    QString ModStr = CmdStr.mid( startId+1, stopId - (startId+1) ).stripWhiteSpace();
-    int i = 0;
-    while ( i < ModStr.length() )
-    {
-      int nextId = ModStr.find( ":", i );
-      modList.append( ModStr.mid( i, nextId - i ).stripWhiteSpace() );
-      i = nextId + 1;
+  QStringList args;
+  for (int i = 1; i < qApp->argc(); i++)
+    args.append( qApp->argv()[i] );
+
+  QRegExp rx("--modules\\s+\\(\\s*(.*)\\s*\\)");
+  rx.setMinimal( true );
+  if ( rx.search( args.join(" ") ) >= 0 && rx.capturedTexts().count() > 0 ) {
+    QString modules = rx.capturedTexts()[1];
+    QStringList mods = QStringList::split(":",modules,false);
+    for ( uint i = 0; i < mods.count(); i++ ) {
+      if ( !mods[i].stripWhiteSpace().isEmpty() )
+	modList.append( mods[i].stripWhiteSpace() );
     }
   }
-  else {
-    QString modStr = resMgr->stringValue( "launch", "modules", QString::null );
-    modList = QStringList::split( ",", modStr );
+  if ( modList.isEmpty() ) {
+    QString mods = resMgr->stringValue( "launch", "modules", QString::null );
+    modList = QStringList::split( ",", mods );
   }
 
   for ( QStringList::const_iterator it = modList.begin(); it != modList.end(); ++it )

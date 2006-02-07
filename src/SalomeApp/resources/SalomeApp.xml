@@ -17,14 +17,14 @@
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
     <parameter name="noexcepthandler"  value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT"/>
+    <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT,PYCALCULATOR"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
     <parameter name="standalone" value="pyContainer,supervContainer"/>
   </section>
   <section name="language">
     <parameter name="language"    value="en"/>
-    <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
+    <parameter name="translators" value="%P_msg_%L.qm|%PM_msg_%L.qm|%P_icons.qm|%P_images.qm|%PM_images.qm"/>
   </section>
   <section name="resources">
     <parameter name="SUIT"         value="${SUITRoot}/resources"/>
@@ -48,6 +48,7 @@
     <parameter name="MED"          value="${MED_ROOT_DIR}/share/salome/resources"/>
     <parameter name="StdMeshers"   value="${SMESH_ROOT_DIR}/share/salome/resources"/>
     <parameter name="COMPONENT"    value="${COMPONENT_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="PYCALCULATOR" value="${PYCALCULATOR_ROOT_DIR}/share/salome/resources"/>
     <parameter name="HELLO"        value="${HELLO_ROOT_DIR}/share/salome/resources"/>
     <parameter name="PYHELLO"      value="${PYHELLO_ROOT_DIR}/share/salome/resources"/>
     <parameter name="NETGENPlugin" value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources"/>
@@ -152,8 +153,8 @@
     <parameter value="0, 255,   255" name="highlight_color" />
     <parameter value="255, 255,   0" name="selection_element_color" />
     <parameter value="255, 255, 255" name="selection_object_color" />
-    <parameter value="0.001" name="selection_precision_element" />
-    <parameter value="0.025" name="selection_precision_node" />
+    <parameter value="0.005" name="selection_precision_element" />
+    <parameter value="0.005" name="selection_precision_node" />
     <parameter value="5" name="selection_width" />
     <parameter value="5" name="highlight_width" />
     <parameter value="0" name="controls_precision" />
@@ -203,6 +204,71 @@
   <parameter value="1" name="sweeping_number_cycles" />
   <parameter value="20" name="sweeping_number_steps" />
   <parameter value="0.2" name="sweeping_time_step" />
+  <parameter value="0" name="mouse_behaviour" />
+  <parameter value="10" name="speed_increment" />
+  <parameter value="1" name="spacemouse_func1_btn" />
+  <parameter value="2" name="spacemouse_func2_btn" />
+  <parameter value="10" name="spacemouse_func3_btn" />
+  <parameter value="11" name="spacemouse_func4_btn" />
+  <parameter value="9" name="spacemouse_func5_btn" />
+  <parameter value="10" name="camera_movement_steps" />
+  <parameter value="true" name="point_sprite_results" />
+  <parameter value="0" name="point_sprite_primitive_type" />
+  <parameter value="256" name="point_sprite_clamp" />
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_texture.bmp" name="point_sprite_main_texture"/>
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_alpha.bmp" name="point_sprite_alpha_texture"/>
+  <parameter value="0.5" name="point_sprite_alpha_threshold" />
+  <parameter value="10" name="point_sprite_min_size" />
+  <parameter value="33" name="point_sprite_max_size" />
+  <parameter value="100" name="point_sprite_magnification" />
+  <parameter value="2" name="point_sprite_increment" />
+  <parameter value="15" name="point_sprite_size" />
+  <parameter value="0, 0, 255" name="point_sprite_color" />
+  <parameter value="8" name="geom_sphere_resolution" />
+  <parameter value="50000" name="geom_sphere_face_limit" />
+  <parameter value="true" name="scalar_bar_display_global" />
+  <parameter value="0" name="scalar_bar_active_local" />
+  <parameter value="1" name="scalar_bar_bicolor" />
+  <parameter value="0.01" name="scalar_bar_spacing" />
+  <parameter value="0" name="inside_point_sprite_primitive_type" />
+  <parameter value="256" name="inside_point_sprite_clamp" />
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_texture.bmp" name="inside_point_sprite_main_texture"/>
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_alpha.bmp" name="inside_point_sprite_alpha_texture"/>
+  <parameter value="0.5" name="inside_point_sprite_alpha_threshold" />
+  <parameter value="10" name="inside_point_sprite_min_size" />
+  <parameter value="33" name="inside_point_sprite_max_size" />
+  <parameter value="100" name="inside_point_sprite_magnification" />
+  <parameter value="2" name="inside_point_sprite_increment" />
+  <parameter value="8" name="inside_geom_sphere_resolution" />
+  <parameter value="50000" name="inside_geom_sphere_face_limit" />
+  <parameter value="0" name="outside_point_sprite_primitive_type" />
+  <parameter value="256" name="outside_point_sprite_clamp" />
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_texture.bmp" name="outside_point_sprite_main_texture"/>
+  <parameter value="${VISU_ROOT_DIR}/share/salome/resources/sprite_alpha.bmp" name="outside_point_sprite_alpha_texture"/>
+  <parameter value="0.5" name="outside_point_sprite_alpha_threshold" />
+  <parameter value="25" name="outside_point_sprite_size" />
+  <parameter value="true" name="outside_point_sprite_uniform" />
+  <parameter value="85, 0, 127" name="outside_point_sprite_color" />
+  <parameter value="8" name="outside_geom_sphere_resolution" />
+  <parameter value="50000" name="outside_geom_sphere_face_limit" />
+  <parameter value="0.5" name="picking_cursor_size" />
+  <parameter value="1.0" name="picking_pyramid_height" />
+  <parameter value="255, 255, 0" name="picking_selection_color" />
+  <parameter value="0.01" name="picking_point_tolerance" />
+  <parameter value="50" name="picking_transparency" />
+  <parameter value="0" name="picking_position" />
+  <parameter value="1.5" name="picking_zoom_factor" />
+  <parameter value="10" name="picking_step_number" />
+  <parameter value="false" name="picking_display_parent_mesh" />
+  <parameter value="false" name="build_at_once" />
+  <parameter value="true" name="build_fields" />
+  <parameter value="true" name="build_min_max" />
+  <parameter value="true" name="build_groups" />
+  <parameter value="true" name="close_at_finish" />
+  <parameter value="1" name="recorder_mode" />
+  <parameter value="17.3" name="recorder_fps" />
+  <parameter value="100" name="recorder_quality" />
+  <parameter value="true" name="recorder_progressive" />
   </section>
   <!-- Here go optional sections for other modules -->
   <section name="resources">

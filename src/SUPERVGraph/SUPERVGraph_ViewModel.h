@@ -34,6 +34,7 @@ public:
   virtual ~SUPERVGraph_Viewer();
 
   virtual SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
+  virtual QString          getType() const { return Type(); }
 
 };
 

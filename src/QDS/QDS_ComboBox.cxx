@@ -98,6 +98,8 @@ int QDS_ComboBox::integerValue() const
 */
 double QDS_ComboBox::doubleValue() const
 {
+  initDatum();
+
   QComboBox* cb = comboBox();
   QString cur = getString();
   if ( cb && cb->count() > 0 && cb->currentItem() >= 0 )
@@ -114,6 +116,8 @@ double QDS_ComboBox::doubleValue() const
 */
 void QDS_ComboBox::setIntegerValue( const int id )
 {
+  initDatum();
+
   if ( myValue.contains( id ) )
     setString( myValue[id] );
   else 
@@ -125,6 +129,8 @@ void QDS_ComboBox::setIntegerValue( const int id )
 */
 void QDS_ComboBox::setDoubleValue( const double val )
 {
+  initDatum();
+
   int id = (int)val;
   if ( myValue.contains( id ) )
     setString( myValue[id] );
@@ -166,6 +172,8 @@ void QDS_ComboBox::setState( const bool on, const int id, const bool append )
 */
 void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bool append )
 {
+  initDatum();
+
   if ( ids.isEmpty() && append )
     return;
 
@@ -200,6 +208,8 @@ void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bo
 */
 void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& names )
 {
+  initDatum();
+
   if ( ids.count() != names.count() )
     return;
 
@@ -214,6 +224,8 @@ void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& nam
 */
 void QDS_ComboBox::setValues( const QStringList& names )
 {
+  initDatum();
+
   QValueList< int > ids;
   for ( int i = 0, n = names.count(); i < n; i++ )
     ids.append( i );

@@ -29,7 +29,26 @@
 */
 QString CAF_Tools::toQString ( const TCollection_ExtendedString& src )
 {
-    return QString( (const QChar*)src.ToExtString(), src.Length() );
+  return QString( (const QChar*)src.ToExtString(), src.Length() );
+}
+
+/*!
+    Converts TCollection_AsciiString'src' to Qt string. [ static ]
+*/
+QString CAF_Tools::toQString( const TCollection_AsciiString& src )
+{
+  return QString( src.ToCString() );
+}
+
+/*!
+    Converts Qt string to TCollection_AsciiString. [ static ]
+*/
+TCollection_AsciiString CAF_Tools::toAsciiString( const QString& src )
+{
+  TCollection_AsciiString res;
+  if ( !src.isEmpty() )
+    res = TCollection_AsciiString( (char*)src.latin1() );
+  return res;
 }
 
 /*!
@@ -37,8 +56,24 @@ QString CAF_Tools::toQString ( const TCollection_ExtendedString& src )
 */
 TCollection_ExtendedString CAF_Tools::toExtString ( const QString& src )
 {
-    TCollection_ExtendedString result;
-    for ( int i = 0; i < (int)src.length(); i++ )
-        result.Insert( i + 1, src[ i ].unicode() );
-    return result;
+  TCollection_ExtendedString result;
+  for ( int i = 0; i < (int)src.length(); i++ )
+    result.Insert( i + 1, src[ i ].unicode() );
+  return result;
+}
+
+Quantity_Color CAF_Tools::color( const QColor& c )
+{
+  Quantity_Color aColor;
+  if ( c.isValid() )
+    aColor = Quantity_Color( c.red()   / 255., c.green() / 255.,
+                             c.blue()  / 255., Quantity_TOC_RGB );
+  return aColor;
+}
+
+QColor CAF_Tools::color( const Quantity_Color& c )
+{
+  return QColor ( int( c.Red()   * 255 ),
+                  int( c.Green() * 255 ),
+                  int( c.Blue()  * 255 ) );
 }

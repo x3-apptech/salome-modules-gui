@@ -38,6 +38,7 @@
 
 /*! Constructor.*/
 LightApp_Driver::LightApp_Driver()
+: myIsTemp( false )
 {
 }
  
@@ -354,6 +355,10 @@ LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned c
   // Create a temporary directory for the component's data files
   std::string aDir = GetTmpDir();
 
+  // Remember that the files are in a temporary location that should be deleted
+  // when a study is closed
+  SetIsTemporary( true );
+
   //Get a temporary directory for saving a file
   TCollection_AsciiString aTmpDir(const_cast<char*>(aDir.c_str()));
 
@@ -430,9 +435,17 @@ void LightApp_Driver::RemoveFiles( const ListOfFiles& theFiles, const bool IsDir
   if(IsDirDeleted) {
     OSD_Path aPath(aDirName);
     OSD_Directory aDir(aPath);
-    OSD_FileIterator anIterator(aPath, '*');
-
-    if(aDir.Exists() && !anIterator.More()) aDir.Remove();
+    // san -- Using a special code block below is essential - it ensures that
+    // OSD_FileIterator instance is destroyed by the moment when
+    // OSD_Directory::Remove() is called.
+    // Otherwise, the directory remains locked (at least on Windows)
+    // by the iterator and cannot be removed.
+    {
+      OSD_FileIterator anIterator(aPath, '*');
+      if(!aDir.Exists() || anIterator.More())
+        return;
+    }
+    aDir.Remove();
   }
 }
 
@@ -461,9 +474,13 @@ void LightApp_Driver::ClearDriverContents()
   for ( it = myMap.begin(); it != myMap.end(); ++it ) 
   {
     const char* aModuleName = const_cast<char*>(it->first.c_str());
-    RemoveTemporaryFiles( aModuleName, false );
+    // If the driver contains temporary files - 
+    // remove them along with the temporary directory
+    RemoveTemporaryFiles( aModuleName, IsTemporary() );
   }
-  myMap.clear();
+  myMap.clear();  
+  // Reset the "temporary" flag
+  SetIsTemporary( false );
 }
 
 //============================================================================
@@ -523,7 +540,12 @@ std::string LightApp_Driver::GetTmpDir()
     aDir = OSD_Directory(aPath);
   }
 
-  OSD_Protection aProtection(OSD_RW, OSD_RWX, OSD_RX, OSD_RX);
+#ifdef WIN32
+  // Workaround for OSD_Protection bug on Windows
+  OSD_Protection aProtection(OSD_RWXD, OSD_RWXD, OSD_RWXD, OSD_RWXD);
+#else
+  OSD_Protection aProtection(OSD_RX, OSD_RWXD, OSD_RX, OSD_RX);
+#endif
   aDir.Build(aProtection);
 
   myTmpDir = aTmpDir.ToCString();

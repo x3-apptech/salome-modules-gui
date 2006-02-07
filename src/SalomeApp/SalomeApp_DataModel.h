@@ -26,15 +26,14 @@ class SALOMEAPP_EXPORT SalomeApp_DataModel : public LightApp_DataModel
   Q_OBJECT
 
 public:
-  static SUIT_DataObject*             BuildTree(const _PTR(SObject)& obj, 
-						SUIT_DataObject* parent, 
-						SalomeApp_Study* study,
-						bool skip = false );
+  static SUIT_DataObject*             synchronize( const _PTR( SComponent )&, SalomeApp_Study* );
+  static SUIT_DataObject*             synchronize( const _PTR( SObject )&, SUIT_DataObject*, SalomeApp_Study* );
 
                                       SalomeApp_DataModel ( CAM_Module* theModule );
   virtual                             ~SalomeApp_DataModel();
 
   virtual bool                        open( const QString&, CAM_Study*, QStringList );
+  virtual bool                        create( CAM_Study* );
   virtual void                        update( LightApp_DataObject* = 0, LightApp_Study* = 0 );
 
   QString                             getRootEntry( SalomeApp_Study* ) const;
@@ -42,8 +41,8 @@ public:
 
 protected:
   SalomeApp_Study*                    getStudy() const;
-
-  virtual void                        buildTree(const _PTR(SObject)&, SUIT_DataObject*, SalomeApp_Study* );
+  virtual void                        updateTree( const _PTR( SComponent )&, SalomeApp_Study* );
 };
+
 
 #endif 

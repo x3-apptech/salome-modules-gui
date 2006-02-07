@@ -3,7 +3,7 @@
 
 #include "QDS_Datum.h"
 
-class QSpinBox;
+class QtxIntSpinBox;
 
 class QDS_EXPORT QDS_SpinBox : public QDS_Datum
 {
@@ -20,7 +20,7 @@ private slots:
   void             onValueChanged( int );
 
 protected:
-  QSpinBox*        spinBox() const;
+  QtxIntSpinBox*   spinBox() const;
 
   virtual QWidget* createControl( QWidget* );
 

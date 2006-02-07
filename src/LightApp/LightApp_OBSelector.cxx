@@ -36,6 +36,8 @@ LightApp_OBSelector::LightApp_OBSelector( OB_Browser* ob, SUIT_SelectionMgr* mgr
   if ( myBrowser ) {
     connect( myBrowser, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
   }    
+
+  setModified();
 }
 
 /*!
@@ -85,15 +87,16 @@ void LightApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& theList )
   if ( !myBrowser )
     return;
 
-  QMap<QString, LightApp_DataObject*> themap;
-  fillEntries( themap );
+  if( myEntries.count() == 0 ||
+      myModifiedTime < myBrowser->getModifiedTime() )
+    fillEntries( myEntries );
 
   DataObjectList objList;
   for ( SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); it != theList.end(); ++it )
   {
     const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*it).operator->() );
-    if ( owner && themap.contains( owner->entry() ) )
-      objList.append( themap[owner->entry()] );
+    if ( owner && myEntries.contains( owner->entry() ) )
+      objList.append( myEntries[owner->entry()] );
   }
 
   myBrowser->setSelected( objList );
@@ -124,4 +127,12 @@ void LightApp_OBSelector::fillEntries( QMap<QString, LightApp_DataObject*>& enti
     if ( obj )
       entires.insert( obj->entry(), obj );
   }
+
+  setModified();
+}
+
+/*!Update modified time.*/
+void LightApp_OBSelector::setModified()
+{
+  myModifiedTime = clock();
 }

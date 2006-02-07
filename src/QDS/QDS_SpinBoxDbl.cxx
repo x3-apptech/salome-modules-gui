@@ -28,7 +28,7 @@ QString QDS_SpinBoxDbl::getString() const
 {
   QString res;
   QtxDblSpinBox* sb = spinBox();
-  if ( sb )
+  if ( sb && !sb->isCleared() )
   {
     bool hasFocus = sb->hasFocus();
     if ( hasFocus )
@@ -52,12 +52,16 @@ QString QDS_SpinBoxDbl::getString() const
 */
 void QDS_SpinBoxDbl::setString( const QString& txt )
 {
-  if ( spinBox() )
+  if ( !spinBox() )
+    return;
+
+  spinBox()->setCleared( txt.isEmpty() );
+  if ( !txt.isEmpty() )
     spinBox()->setValue( txt.toDouble() );
 }
 
 /*!
-  Returns pointer to XMLGUI_SpinBoxDbl widget.
+  Returns pointer to QtxDblSpinBox widget.
 */
 QtxDblSpinBox* QDS_SpinBoxDbl::spinBox() const
 {
@@ -130,6 +134,6 @@ void QDS_SpinBoxDbl::unitSystemChanged( const QString& system )
   sb->setPrecision( aPreci );
 
   sb->setLineStep( .1 );
-  sb->setMinValue( minValue().toDouble() );
-  sb->setMaxValue( maxValue().toDouble() );
+  sb->setMinValue( minValue().isEmpty() ? -DBL_MAX : minValue().toDouble() );
+  sb->setMaxValue( maxValue().isEmpty() ? DBL_MAX : maxValue().toDouble() );
 }

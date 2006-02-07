@@ -9,7 +9,6 @@ VPATH=.:@srcdir@:@top_srcdir@/idl
 
 EXPORT_HEADERS = SALOME_InteractiveObject.hxx \
 		 Handle_SALOME_InteractiveObject.hxx \
-		 SALOME_Actor.h \
 		 SALOME_GLOwner.h \
 		 SALOME_AISShape.hxx \
 		 Handle_SALOME_AISShape.hxx \
@@ -33,7 +32,6 @@ EXPORT_HEADERS = SALOME_InteractiveObject.hxx \
 
 LIB = libSalomeObject.la
 LIB_SRC =	 SALOME_InteractiveObject.cxx \
-		 SALOME_Actor.cxx \
 		 SALOME_GLOwner.cxx \
 		 SALOME_AISShape.cxx\
 		 SALOME_AISObject.cxx\

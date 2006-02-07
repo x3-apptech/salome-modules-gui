@@ -28,8 +28,8 @@ private slots:
   void                 onTextChanged( const QString& );
 
 protected:
-  QLineEdit*           lineEdit() const;
   virtual QWidget*     createControl( QWidget* );
+  QLineEdit*           lineEdit() const;
 
   virtual QString      getString() const;
   virtual void         setString( const QString& );

@@ -120,16 +120,19 @@ SUIT_ResourceMgr* SUIT_Application::resourceMgr() const
 #define DEFAULT_MESSAGE_DELAY 3000
 void SUIT_Application::putInfo ( const QString& msg, const int msec )
 {
-  if ( desktop() ) {
-    //desktop()->statusBar()->message( msg, msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec );
-    if ( !myStatusLabel ) {
-      myStatusLabel = new QLabel (desktop()->statusBar());
-      desktop()->statusBar()->addWidget(myStatusLabel, /*int stretch = */1);
-    }
-    myStatusLabel->setText(msg);
-    if( msec != -1 )
-      QTimer::singleShot(msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec, myStatusLabel, SLOT(clear()));
+  if ( !desktop() )
+    return;
+
+  if ( !myStatusLabel )
+  {
+    myStatusLabel = new QLabel( desktop()->statusBar() );
+    desktop()->statusBar()->addWidget( myStatusLabel, 1 );
+    myStatusLabel->show();
   }
+
+  myStatusLabel->setText( msg );
+  if ( msec != -1 )
+    QTimer::singleShot( msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec, myStatusLabel, SLOT( clear() ) );
 }
 
 SUIT_Application* SUIT_Application::startApplication( int argc, char** argv ) const

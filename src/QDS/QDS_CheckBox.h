@@ -16,11 +16,14 @@ public:
   bool                 isChecked() const;
   void                 setChecked( const bool );
 
+  virtual void         clear();
+
 signals:
   void                 toggled( bool );
 
 private slots:
   void                 onParamChanged();
+  void                 onStateChanged( int );
 
 protected:
   QCheckBox*           checkBox() const;

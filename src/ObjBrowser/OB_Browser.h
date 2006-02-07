@@ -37,6 +37,7 @@
 class QToolTip;
 class OB_Filter;
 class OB_ListView;
+class OB_ListItem;
 
 class OB_EXPORT OB_Browser : public QFrame, public SUIT_PopupClient
 {
@@ -117,6 +118,9 @@ public:
 
   virtual void      contextMenuPopup( QPopupMenu* );
 
+  void              setModified();
+  unsigned long     getModifiedTime() { return myModifiedTime; }
+
 signals:
   void              selectionChanged();
   void              doubleClicked( SUIT_DataObject* );
@@ -131,7 +135,7 @@ private slots:
 
 protected:
   void              adjustWidth( QListViewItem* );
-  virtual void      updateView( const SUIT_DataObject* theStartObj = 0 );
+  virtual void      updateView( SUIT_DataObject* = 0 );
   virtual void      updateText();
 
   virtual void      keyPressEvent( QKeyEvent* );
@@ -162,8 +166,8 @@ private:
   DataObjectKey     objectKey( QListViewItem* ) const;
   DataObjectKey     objectKey( SUIT_DataObject* ) const;
 
-  QListViewItem*    createTree( const SUIT_DataObject*, QListViewItem*, QListViewItem* = 0 );
-  QListViewItem*    createItem( const SUIT_DataObject*, QListViewItem*, QListViewItem* = 0 );
+  QListViewItem*    createTree( const SUIT_DataObject*, QListViewItem*, QListViewItem* = 0, const bool = false );
+  QListViewItem*    createItem( const SUIT_DataObject*, QListViewItem*, QListViewItem* = 0, const bool = false );
 
   SUIT_DataObject*  storeState( DataObjectMap&, DataObjectMap&,
                                 DataObjectKeyMap&, DataObjectKeyMap&, DataObjectKey& ) const;
@@ -171,6 +175,8 @@ private:
                                   const DataObjectKeyMap&, const DataObjectKeyMap&, const DataObjectKey& );
 
 private:
+  friend class OB_BrowserSync;
+
   OB_ListView*      myView;
   SUIT_DataObject*  myRoot;
   ItemMap           myItems;
@@ -183,6 +189,8 @@ private:
   int               myAutoOpenLevel;
 
   friend class OB_Browser::ToolTip;
+
+  unsigned long     myModifiedTime;
 };
 
 #endif

@@ -46,6 +46,7 @@ public:
 private slots:
   void                  onHelp();
   void                  onApply();
+  void                  onDefault();
 
 private:
   LightApp_Preferences* myPrefs;

@@ -21,31 +21,26 @@
 //
 //
 //
-//  File   : SVTK_InteractorStyle.cxx
-//  Author : Christophe ATTANASIO
+//  File   : 
+//  Author : 
 //  Module : SALOME
 //  $Header$
 
 
 #include "SVTK_InteractorStyle.h"
 
-#include "VTKViewer_CellRectPicker.h"
 #include "VTKViewer_Utilities.h"
-#include "VTKViewer_RectPicker.h"
+#include "SVTK_GenericRenderWindowInteractor.h"
 
-#include "SVTK_RenderWindowInteractor.h"
-#include "SVTK_RenderWindow.h"
-#include "SVTK_ViewWindow.h"
+#include "SVTK_Selection.h"
+#include "SVTK_Event.h" 
+#include "SVTK_Selector.h"
+#include "SVTK_Functor.h"
+
+#include "VTKViewer_Algorithm.h"
+#include "SVTK_Functor.h"
 
 #include "SALOME_Actor.h"
-#include "SVTK_Actor.h"
-#include "SVTK_Selector.h"
-
-#include "SALOME_ListIteratorOfListIO.hxx"
-#include "SALOME_ListIO.hxx"
-
-#include "SUIT_Session.h"
-#include "CAM_Application.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkMath.h>
@@ -53,15 +48,13 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkPicker.h>
-#include <vtkPointPicker.h>
-#include <vtkCellPicker.h>
-#include <vtkLine.h> 
-#include <vtkMapper.h>
-#include <vtkDataSet.h>
-#include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkCallbackCommand.h>
+#include <vtkRendererCollection.h>
 
 #include <qapplication.h>
+#include <qpixmap.h>
 //VRV: porting on Qt 3.0.5
 #if QT_VERSION >= 0x030005
 #include <qpainter.h>
@@ -71,136 +64,128 @@
 
 using namespace std;
 
-
 namespace
 {
-  int
-  GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId)
+  inline 
+  void
+  GetEventPosition(vtkRenderWindowInteractor* theInteractor,
+		   int& theX, 
+		   int& theY)
   {
-    int anEdgeId = -1;
-    if (vtkCell* aPickedCell = theActor->GetElemCell(theObjId)) {
-      float aPickPosition[3];
-      thePicker->GetPickPosition(aPickPosition);
-      float aMinDist = 1000000.0, aDist = 0;
-      for (int i = 0, iEnd = aPickedCell->GetNumberOfEdges(); i < iEnd; i++){
-	if(vtkLine* aLine = vtkLine::SafeDownCast(aPickedCell->GetEdge(i))){
-	  int subId;  float pcoords[3], closestPoint[3], weights[3];
-	  aLine->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
-	  if (aDist < aMinDist) {
-	    aMinDist = aDist;
-	    anEdgeId = i;
-	  }
-	}
-      }
-    }
-    return anEdgeId;
+    theInteractor->GetEventPosition(theX,theY);
+    theY = theInteractor->GetSize()[1] - theY - 1;
   }
-  
 
-  
-  bool CheckDimensionId(Selection_Mode theMode, SALOME_Actor *theActor, vtkIdType theObjId){
-    switch(theMode){
-    case CellSelection:
-      return true;
-    case EdgeSelection:
-      return ( theActor->GetObjDimension( theObjId ) == 1 );
-    case FaceSelection:
-      return ( theActor->GetObjDimension( theObjId ) == 2 );
-    case VolumeSelection:
-      return ( theActor->GetObjDimension( theObjId ) == 3 );
-    };
-    return false;
+  //==================================================================
+  // function : GetFirstSALOMEActor
+  // purpose  :
+  //==================================================================
+  struct THaveIO
+  {
+    bool
+    operator()(SALOME_Actor* theActor)
+    {
+      return theActor->hasIO();
+    }
+  };
+
+  inline
+  SALOME_Actor* 
+  GetFirstSALOMEActor(vtkPicker *thePicker)
+  {
+    return VTK::Find<SALOME_Actor>(thePicker->GetActors(),THaveIO());
   }
-}  
-  
+}
+
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(SVTK_InteractorStyle);
 //----------------------------------------------------------------------------
-
 SVTK_InteractorStyle
-::SVTK_InteractorStyle() 
+::SVTK_InteractorStyle():
+  mySelectionEvent(new SVTK_SelectionEvent()),
+  myPicker(vtkPicker::New()),
+  myLastHighlitedActor(NULL),
+  myLastPreHighlitedActor(NULL),
+  myControllerIncrement(SVTK_ControllerIncrement::New()),
+  myControllerOnKeyDown(SVTK_ControllerOnKeyDown::New())
 {
-  myPreViewActor = NULL;
-  myInteractor = NULL;
-  myViewWindow = NULL;
-  myGUIWindow = NULL;
+  myPicker->Delete();
+
   this->MotionFactor = 10.0;
   this->State = VTK_INTERACTOR_STYLE_CAMERA_NONE;
   this->RadianToDegree = 180.0 / vtkMath::Pi();
   this->ForcedState = VTK_INTERACTOR_STYLE_CAMERA_NONE;
+
   loadCursors();
 
-  myPreSelectionActor = SVTK_Actor::New();
-  myPreSelectionActor->GetProperty()->SetColor(0,1,1);
-  myPreSelectionActor->GetProperty()->SetLineWidth(5);
-  myPreSelectionActor->GetProperty()->SetPointSize(5);
+  // set custom event handling function (to handle 3d space mouse events)
+  EventCallbackCommand->SetCallback( SVTK_InteractorStyle::ProcessEvents );
 
-  OnSelectionModeChanged();
+  // set default values of properties.  user may edit them in preferences.
+  mySMDecreaseSpeedBtn = 1;
+  mySMIncreaseSpeedBtn = 2;
+  mySMDominantCombinedSwitchBtn = 9;
+  //
+  myControllerIncrement->Delete();
+  myControllerOnKeyDown->Delete();
 }
 
 //----------------------------------------------------------------------------
 SVTK_InteractorStyle
 ::~SVTK_InteractorStyle() 
 {
-  myViewWindow->RemoveActor(myPreSelectionActor);
 }
 
 //----------------------------------------------------------------------------
+QWidget*
+SVTK_InteractorStyle
+::GetRenderWidget()
+{
+  return myInteractor->GetRenderWidget();
+}
+
 SVTK_Selector*
 SVTK_InteractorStyle
 ::GetSelector() 
 {
-  return myViewWindow->GetSelector();
+  return myInteractor->GetSelector();
 }
 
 //----------------------------------------------------------------------------
-void
+SVTK_SelectionEvent*
 SVTK_InteractorStyle
-::setPreselectionProp(const double& theRed, 
-		      const double& theGreen, 
-		      const double& theBlue, 
-		      const int& theWidth) 
+::GetSelectionEvent()
 {
-  if ( myPreSelectionActor->GetProperty() == 0 )
-    return;
-  myPreSelectionActor->GetProperty()->SetColor(theRed, theGreen, theBlue);
-  myPreSelectionActor->GetProperty()->SetLineWidth(theWidth);
-  myPreSelectionActor->GetProperty()->SetPointSize(theWidth);
+  mySelectionEvent->mySelectionMode = GetSelector()->SelectionMode();
+
+  mySelectionEvent->myIsCtrl = Interactor->GetControlKey();
+  mySelectionEvent->myIsShift = Interactor->GetShiftKey();
+
+  mySelectionEvent->myLastX = mySelectionEvent->myX;
+  mySelectionEvent->myLastY = mySelectionEvent->myY;
+
+  GetEventPosition( this->Interactor, mySelectionEvent->myX, mySelectionEvent->myY );
+
+  return mySelectionEvent.get();
 }
 
 //----------------------------------------------------------------------------
-void
+SVTK_SelectionEvent*
 SVTK_InteractorStyle
-::SetInteractor(vtkRenderWindowInteractor *theInteractor)
+::GetSelectionEventFlipY()
 {
-  myInteractor = dynamic_cast<SVTK_RenderWindowInteractor*>(theInteractor);
-  Superclass::SetInteractor(theInteractor);
-}
+  mySelectionEvent->mySelectionMode = GetSelector()->SelectionMode();
 
-//----------------------------------------------------------------------------
-int
-SVTK_InteractorStyle
-::GetState()
-{
-  return State | ForcedState;
-}
+  mySelectionEvent->myIsCtrl = Interactor->GetControlKey();
+  mySelectionEvent->myIsShift = Interactor->GetShiftKey();
 
-//----------------------------------------------------------------------------
-void 
-SVTK_InteractorStyle
-::setViewWindow(SVTK_ViewWindow* theViewWindow)
-{
-  myViewWindow = theViewWindow;
-  myViewWindow->AddActor(myPreSelectionActor);
-  myPreSelectionActor->Delete();
-}
+  mySelectionEvent->myLastX = mySelectionEvent->myX;
+  mySelectionEvent->myLastY = mySelectionEvent->myY;
 
-//----------------------------------------------------------------------------
-void
-SVTK_InteractorStyle
-::setGUIWindow(QWidget* theWindow)
-{
-  myGUIWindow = theWindow;
+  this->Interactor->GetEventPosition(mySelectionEvent->myX, mySelectionEvent->myY);
+
+  return mySelectionEvent.get();
 }
 
 //----------------------------------------------------------------------------
@@ -208,29 +193,24 @@ void
 SVTK_InteractorStyle
 ::RotateXY(int dx, int dy)
 {
-  double rxf;
-  double ryf;
-  vtkCamera *cam;
+  if(GetCurrentRenderer() == NULL)
+    return;
   
-  if (this->CurrentRenderer == NULL)
-    {
-      return;
-    }
+  int *size = GetCurrentRenderer()->GetRenderWindow()->GetSize();
+  double aDeltaElevation = -20.0 / size[1];
+  double aDeltaAzimuth = -20.0 / size[0];
   
-  int *size = this->CurrentRenderer->GetRenderWindow()->GetSize();
-  this->DeltaElevation = -20.0 / size[1];
-  this->DeltaAzimuth = -20.0 / size[0];
+  double rxf = double(dx) * aDeltaAzimuth * this->MotionFactor;
+  double ryf = double(dy) * aDeltaElevation * this->MotionFactor;
   
-  rxf = (double)dx * this->DeltaAzimuth *  this->MotionFactor;
-  ryf = (double)dy * this->DeltaElevation * this->MotionFactor;
-  
-  cam = this->CurrentRenderer->GetActiveCamera();
+  vtkCamera *cam = GetCurrentRenderer()->GetActiveCamera();
   cam->Azimuth(rxf);
   cam->Elevation(ryf);
   cam->OrthogonalizeViewUp();
-  ::ResetCameraClippingRange(this->CurrentRenderer); 
-  //this->Interactor->Render();
-  myGUIWindow->update();
+
+  GetCurrentRenderer()->ResetCameraClippingRange(); 
+
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -239,8 +219,7 @@ SVTK_InteractorStyle
 ::PanXY(int x, int y, int oldX, int oldY)
 {
   TranslateView(x, y, oldX, oldY);   
-  //this->Interactor->Render();
-  myGUIWindow->update();
+  this->Render();
 }
 
 
@@ -249,23 +228,23 @@ void
 SVTK_InteractorStyle
 ::DollyXY(int dx, int dy)
 {
-  if (this->CurrentRenderer == NULL) return;
+  if (GetCurrentRenderer() == NULL) 
+    return;
 
-  double dxf = this->MotionFactor * (double)(dx) / (double)(this->CurrentRenderer->GetCenter()[1]);
-  double dyf = this->MotionFactor * (double)(dy) / (double)(this->CurrentRenderer->GetCenter()[1]);
+  double dxf = this->MotionFactor * (double)(dx) / (double)(GetCurrentRenderer()->GetCenter()[1]);
+  double dyf = this->MotionFactor * (double)(dy) / (double)(GetCurrentRenderer()->GetCenter()[1]);
 
   double zoomFactor = pow((double)1.1, dxf + dyf);
   
-  vtkCamera *aCam = this->CurrentRenderer->GetActiveCamera();
+  vtkCamera *aCam = GetCurrentRenderer()->GetActiveCamera();
   if (aCam->GetParallelProjection())
     aCam->SetParallelScale(aCam->GetParallelScale()/zoomFactor);
   else{
     aCam->Dolly(zoomFactor);
-    ::ResetCameraClippingRange(this->CurrentRenderer);
+    GetCurrentRenderer()->ResetCameraClippingRange(); 
   }
 
-  //this->Interactor->Render();
-  myGUIWindow->update();
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -275,25 +254,122 @@ SVTK_InteractorStyle
 {
   vtkCamera *cam;
 
-  if (this->CurrentRenderer == NULL)
-    {
-      return;
-    }
+  if (GetCurrentRenderer() == NULL)
+    return;
 
-  double newAngle = atan2((double)(y - this->CurrentRenderer->GetCenter()[1]),
-			  (double)(x - this->CurrentRenderer->GetCenter()[0]));
-  double oldAngle = atan2((double)(oldY -this->CurrentRenderer->GetCenter()[1]),
-			  (double)(oldX - this->CurrentRenderer->GetCenter()[0]));
+  double newAngle = atan2((double)(y - GetCurrentRenderer()->GetCenter()[1]),
+			  (double)(x - GetCurrentRenderer()->GetCenter()[0]));
+  double oldAngle = atan2((double)(oldY -GetCurrentRenderer()->GetCenter()[1]),
+			  (double)(oldX - GetCurrentRenderer()->GetCenter()[0]));
   
   newAngle *= this->RadianToDegree;
   oldAngle *= this->RadianToDegree;
 
-  cam = this->CurrentRenderer->GetActiveCamera();
+  cam = GetCurrentRenderer()->GetActiveCamera();
   cam->Roll(newAngle - oldAngle);
   cam->OrthogonalizeViewUp();
       
-  //this->Interactor->Render();
-  myGUIWindow->update();
+  this->Render();
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnConfigure() 
+{
+  this->FindPokedRenderer(0,0);
+  this->GetCurrentRenderer()->InvokeEvent(vtkCommand::ConfigureEvent,NULL);
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnMouseMove() 
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnMouseMove( this->Interactor->GetControlKey(),
+		     this->Interactor->GetShiftKey(),
+		     x, y );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnLeftButtonDown()
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnLeftButtonDown( this->Interactor->GetControlKey(),
+			  this->Interactor->GetShiftKey(),
+			  x, y );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnLeftButtonUp()
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnLeftButtonUp( this->Interactor->GetControlKey(),
+			this->Interactor->GetShiftKey(),
+			x, y );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnMiddleButtonDown() 
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnMiddleButtonDown( this->Interactor->GetControlKey(),
+			    this->Interactor->GetShiftKey(),
+			    x, y );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnMiddleButtonUp()
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnMiddleButtonUp( this->Interactor->GetControlKey(),
+			  this->Interactor->GetShiftKey(),
+			  x, y );
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnRightButtonDown() 
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnRightButtonDown( this->Interactor->GetControlKey(),
+			   this->Interactor->GetShiftKey(),
+			   x, y );
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnRightButtonUp()
+{
+  int x, y;
+  GetEventPosition( this->Interactor, x, y );
+  this->OnRightButtonUp( this->Interactor->GetControlKey(),
+			 this->Interactor->GetShiftKey(),
+			 x, y );
 }
 
 
@@ -318,14 +394,10 @@ SVTK_InteractorStyle
 ::OnLeftButtonDown(int ctrl, int shift, 
 		   int x, int y) 
 {
-  if (this->HasObserver(vtkCommand::LeftButtonPressEvent)) {
-    this->InvokeEvent(vtkCommand::LeftButtonPressEvent,NULL);
-    return;
-  }
   this->FindPokedRenderer(x, y);
-  if (this->CurrentRenderer == NULL) {
+  if(GetCurrentRenderer() == NULL)
     return;
-  }
+
   myShiftState = shift;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
@@ -369,16 +441,10 @@ SVTK_InteractorStyle
 		     int shift, 
 		     int x, int y) 
 {
-  if (this->HasObserver(vtkCommand::MiddleButtonPressEvent)) 
-    {
-      this->InvokeEvent(vtkCommand::MiddleButtonPressEvent,NULL);
-      return;
-    }
   this->FindPokedRenderer(x, y);
-  if (this->CurrentRenderer == NULL)
-    {
-      return;
-    }
+  if(GetCurrentRenderer() == NULL)
+    return;
+
   myShiftState = shift;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
@@ -420,16 +486,10 @@ SVTK_InteractorStyle
 		    int shift, 
 		    int x, int y) 
 {
-  if (this->HasObserver(vtkCommand::RightButtonPressEvent)) 
-    {
-      this->InvokeEvent(vtkCommand::RightButtonPressEvent,NULL);
-      return;
-    }
   this->FindPokedRenderer(x, y);
-  if (this->CurrentRenderer == NULL)
-    {
-      return;
-    }
+  if(GetCurrentRenderer() == NULL)
+    return;
+
   myShiftState = shift;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
@@ -547,30 +607,14 @@ void
 SVTK_InteractorStyle
 ::loadCursors()
 {
-  myDefCursor       = QCursor(ArrowCursor);
-  myHandCursor      = QCursor(PointingHandCursor);
-  myPanCursor       = QCursor(SizeAllCursor);
+  myDefCursor       = QCursor(Qt::ArrowCursor);
+  myHandCursor      = QCursor(Qt::PointingHandCursor);
+  myPanCursor       = QCursor(Qt::SizeAllCursor);
   myZoomCursor      = QCursor(QPixmap(imageZoomCursor));
   myRotateCursor    = QCursor(QPixmap(imageRotateCursor));
   mySpinCursor      = QCursor(QPixmap(imageRotateCursor)); // temporarly !!!!!!
-  myGlobalPanCursor = QCursor(CrossCursor);
+  myGlobalPanCursor = QCursor(Qt::CrossCursor);
   myCursorState     = false;
-}
-
-
-//----------------------------------------------------------------------------
-// event filter - controls mouse and keyboard events during viewer operations
-bool
-SVTK_InteractorStyle
-::eventFilter(QObject* object, QEvent* event)
-{
-  if (!myGUIWindow) return false;
-  if ( (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::KeyPress) && object != myGUIWindow)
-  {
-    qApp->removeEventFilter(this);
-    startOperation(VTK_INTERACTOR_STYLE_CAMERA_NONE);
-  }
-  return QObject::eventFilter(object, event);
 }
 
 
@@ -587,7 +631,6 @@ SVTK_InteractorStyle
   }
   setCursor(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_ZOOM;
-  qApp->installEventFilter(this);
 }
 
 
@@ -604,7 +647,6 @@ SVTK_InteractorStyle
   }
   setCursor(VTK_INTERACTOR_STYLE_CAMERA_PAN);
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_PAN;
-  qApp->installEventFilter(this);
 }
 
 //----------------------------------------------------------------------------
@@ -620,7 +662,6 @@ SVTK_InteractorStyle
   }
   setCursor(VTK_INTERACTOR_STYLE_CAMERA_ROTATE);
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_ROTATE;
-  qApp->installEventFilter(this);
 }
 
 
@@ -637,7 +678,6 @@ SVTK_InteractorStyle
   }
   setCursor(VTK_INTERACTOR_STYLE_CAMERA_SPIN);
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_SPIN;
-  qApp->installEventFilter(this);
 }
 
 
@@ -655,7 +695,6 @@ SVTK_InteractorStyle
   }
   setCursor(VTK_INTERACTOR_STYLE_CAMERA_FIT);
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_FIT;
-  qApp->installEventFilter(this);
 }
 
 
@@ -674,28 +713,11 @@ SVTK_InteractorStyle
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN;
 
   // store current zoom scale
-  vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
-  myScale = cam->GetParallelScale();
+  myScale = GetCurrentRenderer()->GetActiveCamera()->GetParallelScale();
 
-  if (myViewWindow) myViewWindow->onFitAll();
+  GetCurrentRenderer()->ResetCamera();
 
-  if (myGUIWindow) myGUIWindow->update();
-  
-  qApp->installEventFilter(this);
-}
-
-
-//----------------------------------------------------------------------------
-// returns TRUE if needs redrawing
-bool
-SVTK_InteractorStyle
-::needsRedrawing()
-{
-  return State == VTK_INTERACTOR_STYLE_CAMERA_ZOOM   ||
-         State == VTK_INTERACTOR_STYLE_CAMERA_PAN    ||
-         State == VTK_INTERACTOR_STYLE_CAMERA_ROTATE ||
-         State == VTK_INTERACTOR_STYLE_CAMERA_SPIN   ||
-         State == VTK_INTERACTOR_STYLE_CAMERA_NONE;
+  this->Render();
 }
 
 
@@ -708,30 +730,31 @@ SVTK_InteractorStyle
 	  const int right, 
 	  const int bottom)
 {
-  if (this->CurrentRenderer == NULL) return;
+  if (GetCurrentRenderer() == NULL) 
+    return;
  
   // move camera
   int x = (left + right)/2;
   int y = (top + bottom)/2;
-  int *aSize = this->CurrentRenderer->GetRenderWindow()->GetSize();
+  int *aSize = GetCurrentRenderer()->GetRenderWindow()->GetSize();
   int oldX = aSize[0]/2;
   int oldY = aSize[1]/2;
   TranslateView(oldX, oldY, x, y);
 
   // zoom camera
-  double dxf = (double)(aSize[0]) / (double)(abs(right - left));
-  double dyf = (double)(aSize[1]) / (double)(abs(bottom - top));
+  double dxf = right == left ? 1.0 : (double)(aSize[0]) / (double)(abs(right - left));
+  double dyf = bottom == top ? 1.0 : (double)(aSize[1]) / (double)(abs(bottom - top));
   double zoomFactor = (dxf + dyf)/2 ;
 
-  vtkCamera *aCam = this->CurrentRenderer->GetActiveCamera();
+  vtkCamera *aCam = GetCurrentRenderer()->GetActiveCamera();
   if(aCam->GetParallelProjection())
     aCam->SetParallelScale(aCam->GetParallelScale()/zoomFactor);
   else{
     aCam->Dolly(zoomFactor);
-    ::ResetCameraClippingRange(this->CurrentRenderer);
+    GetCurrentRenderer()->ResetCameraClippingRange();
   }
   
-  myGUIWindow->update();
+  this->Render();
 }
 
 
@@ -772,37 +795,37 @@ void
 SVTK_InteractorStyle
 ::setCursor(const int operation)
 {
-  if (!myGUIWindow) return;
+  if (!GetRenderWidget()) return;
   switch (operation)
   {
     case VTK_INTERACTOR_STYLE_CAMERA_ZOOM:
-      myGUIWindow->setCursor(myZoomCursor); 
+      GetRenderWidget()->setCursor(myZoomCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_PAN:
-      myGUIWindow->setCursor(myPanCursor); 
+      GetRenderWidget()->setCursor(myPanCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_ROTATE:
-      myGUIWindow->setCursor(myRotateCursor); 
+      GetRenderWidget()->setCursor(myRotateCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_SPIN:
-      myGUIWindow->setCursor(mySpinCursor); 
+      GetRenderWidget()->setCursor(mySpinCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN:
-      myGUIWindow->setCursor(myGlobalPanCursor); 
+      GetRenderWidget()->setCursor(myGlobalPanCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
-      myGUIWindow->setCursor(myHandCursor); 
+      GetRenderWidget()->setCursor(myHandCursor); 
       myCursorState = true;
       break;
     case VTK_INTERACTOR_STYLE_CAMERA_NONE:
     default:
-      myGUIWindow->setCursor(myDefCursor); 
+      GetRenderWidget()->setCursor(myDefCursor); 
       myCursorState = false;
       break;
   }
@@ -815,14 +838,14 @@ void
 SVTK_InteractorStyle
 ::onStartOperation()
 {
-  if (!myGUIWindow) return;
+  if (!GetRenderWidget()) return;
   // VSV: LOD actor activisation
   //  this->Interactor->GetRenderWindow()->SetDesiredUpdateRate(this->Interactor->GetDesiredUpdateRate());
   switch (State) {
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      QPainter p(myGUIWindow);
+      QPainter p(GetRenderWidget());
       p.setPen(Qt::lightGray);
       p.setRasterOp(Qt::XorROP);
       p.drawRect(QRect(myPoint, myOtherPoint));
@@ -844,285 +867,81 @@ void
 SVTK_InteractorStyle
 ::onFinishOperation() 
 {
-  if (!myGUIWindow) 
+  if (!GetRenderWidget()) 
     return;
 
   // VSV: LOD actor activisation
   //  rwi->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
 
-  Selection_Mode aSelectionMode = myViewWindow->SelectionMode();
-  bool aSelActiveCompOnly = false;
-
-  QString aComponentDataType;
-  if(SUIT_Session* aSession = SUIT_Session::session())
-    if(SUIT_Application* aSUITApp = aSession->activeApplication())
-      if(CAM_Application* aCAMApp = dynamic_cast<CAM_Application*>(aSUITApp))
-	if(CAM_Module* aModule = aCAMApp->activeModule())
-	  aComponentDataType = aModule->name();
+  SVTK_SelectionEvent* aSelectionEvent = GetSelectionEventFlipY();
 
   switch (State) {
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      QPainter p(myGUIWindow);
-      p.setPen(Qt::lightGray);
-      p.setRasterOp(Qt::XorROP);
-      QRect rect(myPoint, myOtherPoint);
-      p.drawRect(rect);
-      rect = rect.normalize();
+      QPainter aPainter(GetRenderWidget());
+      aPainter.setPen(Qt::lightGray);
+      aPainter.setRasterOp(Qt::XorROP);
+      QRect aRect(myPoint, myOtherPoint);
+      aPainter.drawRect(aRect);
+      aRect = aRect.normalize();
+
       if (State == VTK_INTERACTOR_STYLE_CAMERA_FIT) {
         // making fit rect opeation 
         int w, h;
-        myInteractor->GetSize(w, h);
-        int x1, y1, x2, y2;
-        x1 = rect.left(); 
-        y1 = h - rect.top() - 1;
-        x2 = rect.right(); 
-        y2 = h - rect.bottom() - 1;
+        Interactor->GetSize(w, h);
+        int x1 = aRect.left(); 
+        int y1 = h - aRect.top() - 1;
+        int x2 = aRect.right(); 
+        int y2 = h - aRect.bottom() - 1;
         fitRect(x1, y1, x2, y2);
       }
       else {
         if (myPoint == myOtherPoint) {
 	  // process point selection
-          int w, h, x, y;
-          myInteractor->GetSize(w, h);
-          x = myPoint.x(); 
-          y = h - myPoint.y() - 1;
+          this->FindPokedRenderer(aSelectionEvent->myX, aSelectionEvent->myY);
+	  Interactor->StartPickCallback();
 
-          this->FindPokedRenderer(x, y);
-	  myInteractor->StartPickCallback();
-
-	  vtkPicker* aPicker = vtkPicker::SafeDownCast(myInteractor->GetPicker());
-          aPicker->Pick(x, y, 0.0, this->CurrentRenderer);
-    
-	  SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aPicker->GetActor());
-
-          if (vtkCellPicker* picker = vtkCellPicker::SafeDownCast(aPicker)) {
-	    int aVtkId = picker->GetCellId();
-	    if ( aVtkId >= 0 && aSActor && aSActor->hasIO() && IsValid( aSActor, aVtkId ) ) {
-	      int anObjId = aSActor->GetElemObjId(aVtkId);
-	      if(anObjId >= 0){
-		Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-		if(aSelectionMode != EdgeOfCellSelection) {
-		  if(CheckDimensionId(aSelectionMode,aSActor,anObjId)){
-		    if (GetSelector()->IsSelected(anIO)) {
-		      // This IO is already in the selection
-		      GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
-		    } else {
-		      if (!myShiftState) {
-			this->HighlightProp( NULL );
-			GetSelector()->ClearIObjects();
-		      }
-		      GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
-		      GetSelector()->AddIObject(aSActor);
-		    }
-		  }
-		}else{
-		  if (!myShiftState) {
-		    this->HighlightProp( NULL );
-		    GetSelector()->ClearIObjects();
-		  }
-		  int anEdgeId = GetEdgeId(picker,aSActor,anObjId);
-		  if (anEdgeId >= 0) {
-		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,false);
-		    GetSelector()->AddOrRemoveIndex(anIO,-anEdgeId-1,true);
-		    GetSelector()->AddIObject(aSActor);
-		  } 
-		}
-	      }
-	    } else {
-	      this->HighlightProp( NULL );
+          myPicker->Pick(aSelectionEvent->myX, 
+			 aSelectionEvent->myY, 
+			 0.0, 
+			 GetCurrentRenderer());
+	  //
+	  SALOME_Actor* anActor = GetFirstSALOMEActor(myPicker.GetPointer());
+	  aSelectionEvent->myIsRectangle = false;
+	  if(anActor){
+	    anActor->Highlight( this, aSelectionEvent, true );
+	  }else{
+	    if(myLastHighlitedActor.GetPointer() && myLastHighlitedActor.GetPointer() != anActor)
+	      myLastHighlitedActor->Highlight( this, aSelectionEvent, false );
+	    if(!myShiftState)
 	      GetSelector()->ClearIObjects();
-	    }
-          } else if ( vtkPointPicker* picker = vtkPointPicker::SafeDownCast(aPicker) ) {
-	    int aVtkId = picker->GetPointId();
-	    if ( aVtkId >= 0 && IsValid( aSActor, aVtkId, true ) ) {
-	      if ( aSActor && aSActor->hasIO() ) {
-		int anObjId = aSActor->GetNodeObjId(aVtkId);
-		if(anObjId >= 0){
-		  Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-		  if(GetSelector()->IsSelected(anIO)) {
-		    // This IO is already in the selection
-		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
-		  } else {
-		    if(!myShiftState) {
-		      this->HighlightProp( NULL );
-		      GetSelector()->ClearIObjects();
-		    }
-		    GetSelector()->AddOrRemoveIndex(anIO,anObjId,myShiftState);
-		    GetSelector()->AddIObject(aSActor);
-		  }
-		}
-	      }
-	    } else {
-	      this->HighlightProp( NULL );
-	      GetSelector()->ClearIObjects();
-	    } 
-	  } else {
-	    if ( aSActor && aSActor->hasIO() ) {
-	      this->PropPicked++;
-	      Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-	      if(GetSelector()->IsSelected(anIO)) {
-		// This IO is already in the selection
-		if(myShiftState) {
-		  GetSelector()->RemoveIObject(aSActor);
-		}
-	      }
-	      else {
-		if(!myShiftState) {
-		  this->HighlightProp( NULL );
-		  GetSelector()->ClearIObjects();
-		}
-		GetSelector()->AddIObject(aSActor);
-	      }
-	    }else{
-	      // No selection clear all
-	      this->PropPicked = 0;
-	      this->HighlightProp( NULL );
-	      GetSelector()->ClearIObjects();
-	    }
 	  }
-	  myInteractor->EndPickCallback();
-        } else {
+	  myLastHighlitedActor = anActor;
+	} 
+	else {
           //processing rectangle selection
-	  if(aSelActiveCompOnly && aComponentDataType.isEmpty()) return;
-	  myInteractor->StartPickCallback();
+	  Interactor->StartPickCallback();
+	  GetSelector()->StartPickCallback();
+	  aSelectionEvent->myIsRectangle = true;
 
-	  if (!myShiftState) {
-	    this->PropPicked = 0;
-	    this->HighlightProp( NULL );
+	  if(!myShiftState)
 	    GetSelector()->ClearIObjects();
-	  }
 
-	  // Compute bounds
-	  //	  vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
-	  QRect rect(myPoint, myOtherPoint);
-	  rect = rect.normalize();
-	  int w, h;
-	  myInteractor->GetSize(w, h);
-	  int x1, y1, x2, y2;
-	  x1 = rect.left(); 
-	  y1 = h - rect.top() - 1;
-	  x2 = rect.right(); 
-	  y2 = h - rect.bottom() - 1;
-
-	  switch (aSelectionMode) {
-	  case NodeSelection: {
-	    if ( vtkPointPicker* aPointPicker = vtkPointPicker::SafeDownCast(myInteractor->GetPicker()) ) {
-	      vtkActorCollection* aListActors = this->CurrentRenderer->GetActors();
-	      aListActors->InitTraversal();
-	      while (vtkActor* aActor = aListActors->GetNextActor()) {
-		if (!aActor->GetVisibility()) 
-		  continue;
-		if(SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (aSActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-		    if (anIO.IsNull()) 
-		      continue;
-		    if (aSelActiveCompOnly && aComponentDataType != anIO->getComponentDataType())
-		      continue;
-		    if (vtkDataSet* aDataSet = aSActor->GetInput()) {
-		      TColStd_MapOfInteger anIndices;
-		      for(int i = 0; i < aDataSet->GetNumberOfPoints(); i++) {
-			float aPoint[3];
-			aDataSet->GetPoint(i,aPoint);
-			if (IsInRect(aPoint,x1,y1,x2,y2)){
-			  float aDisp[3];
-			  ComputeWorldToDisplay(aPoint[0],aPoint[1],aPoint[2],aDisp);
-			  if(aPointPicker->Pick(aDisp[0],aDisp[1],0.0,CurrentRenderer)){
-			    if(vtkActorCollection *anActorCollection = aPointPicker->GetActors()){
-			      if(anActorCollection->IsItemPresent(aSActor)){
-				float aPickedPoint[3];
-				aPointPicker->GetMapperPosition(aPickedPoint);
-				vtkIdType aVtkId = aDataSet->FindPoint(aPickedPoint);
-				if ( aVtkId >= 0 && IsValid( aSActor, aVtkId, true ) ){
-				  int anObjId = aSActor->GetNodeObjId(aVtkId);
-				  anIndices.Add(anObjId);
-				}
-			      }
-			    }
-			  }
-			}
-		      }
-		      if (!anIndices.IsEmpty()) {
-			GetSelector()->AddOrRemoveIndex(anIO,anIndices,true); // ENK false to true
-			GetSelector()->AddIObject(aSActor);
-			anIndices.Clear();
-		      }else{
-			GetSelector()->RemoveIObject(aSActor);
-		      }
-		    }
-		  }
+	  vtkActorCollection* aListActors = GetCurrentRenderer()->GetActors();
+	  aListActors->InitTraversal();
+	  while(vtkActor* aActor = aListActors->GetNextActor()){
+	    if(aActor->GetVisibility()){
+	      if(SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)){
+		if(aSActor->hasIO()){
+		  aSActor->Highlight( this, aSelectionEvent, true );
 		}
 	      }
 	    }
-	    break;
 	  }
-	  case CellSelection:
-	  case EdgeOfCellSelection:
-	  case EdgeSelection:
-	  case FaceSelection:
-	  case VolumeSelection: 
-	    {
-	      vtkSmartPointer<VTKViewer_CellRectPicker> picker = VTKViewer_CellRectPicker::New();
-	      picker->SetTolerance(0.001);
-	      picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
-	      
-	      vtkActorCollection* aListActors = picker->GetActors();
-	      aListActors->InitTraversal();
-	      while(vtkActor* aActor = aListActors->GetNextActor()) {
-		if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (aSActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-		    if (aSelActiveCompOnly && aComponentDataType != anIO->getComponentDataType())
-		      continue;
-		    VTKViewer_CellDataSet cellList = picker->GetCellData(aActor);
-		    if ( !cellList.empty() ) {
-		      TColStd_MapOfInteger anIndexes;
-		      VTKViewer_CellDataSet::iterator it;
-		      for ( it = cellList.begin(); it != cellList.end(); ++it ) {
-			int aCellId = (*it).cellId;
-			
-			if ( !IsValid( aSActor, aCellId ) )
-			  continue;
-			
-			int anObjId = aSActor->GetElemObjId(aCellId);
-			if (anObjId != -1){
-			  if ( CheckDimensionId(aSelectionMode,aSActor,anObjId) ) {
-			    anIndexes.Add(anObjId);
-			  }
-			}
-		      }
-		      GetSelector()->AddOrRemoveIndex(anIO,anIndexes,true);
-		      GetSelector()->AddIObject(aSActor);
-		    }
-		  }
-		}
-	      }
-	    }
-	    break;	    
-	  case ActorSelection: // objects selection
-	    {
-	      vtkSmartPointer<VTKViewer_RectPicker> picker = VTKViewer_RectPicker::New();
-	      picker->SetTolerance(0.001);
-	      picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
-
-	      vtkActorCollection* aListActors = picker->GetActors();
-	      aListActors->InitTraversal();
-	      while(vtkActor* aActor = aListActors->GetNextActor()) {
-		if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (aSActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) anIO = aSActor->getIO();
-		    GetSelector()->AddIObject(aSActor);
-		    this->PropPicked++;
-		  }
-		}
-	      }
-	    } // end case 4
-	  } //end switch
-	  myInteractor->EndPickCallback();
 	}
-	myViewWindow->onSelectionChanged();
+	Interactor->EndPickCallback();
+	GetSelector()->EndPickCallback();
       } 
     } 
     break;
@@ -1134,55 +953,48 @@ SVTK_InteractorStyle
   case VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN: 
     {
       int w, h, x, y;
-      myInteractor->GetSize(w, h);
+      Interactor->GetSize(w, h);
       x = myPoint.x(); 
       y = h - myPoint.y() - 1;
       Place(x, y);
     }
     break;
   }
-  if (myGUIWindow) myGUIWindow->update();
 
+  this->Render();
 }
 
 
 // called during viewer operation when user moves mouse (!put necessary processing here!)
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::onOperation(QPoint mousePos) 
 {
-  if (!myGUIWindow) return;
-  int w, h;
-  GetInteractor()->GetSize(w, h);
+  if (!GetRenderWidget()) 
+    return;
+
   switch (State) {
   case VTK_INTERACTOR_STYLE_CAMERA_PAN: 
     {
-      // processing panning
-      //this->FindPokedCamera(mousePos.x(), mousePos.y());
       this->PanXY(mousePos.x(), myPoint.y(), myPoint.x(), mousePos.y());
       myPoint = mousePos;
       break;
     }
   case VTK_INTERACTOR_STYLE_CAMERA_ZOOM: 
     {    
-      // processing zooming
-      //this->FindPokedCamera(mousePos.x(), mousePos.y());
       this->DollyXY(mousePos.x() - myPoint.x(), mousePos.y() - myPoint.y());
       myPoint = mousePos;
       break;
     }
   case VTK_INTERACTOR_STYLE_CAMERA_ROTATE: 
     {
-      // processing rotation
-      //this->FindPokedCamera(mousePos.x(), mousePos.y());
       this->RotateXY(mousePos.x() - myPoint.x(), myPoint.y() - mousePos.y());
       myPoint = mousePos;
       break;
     }
   case VTK_INTERACTOR_STYLE_CAMERA_SPIN: 
     {
-      // processing spinning
-      //this->FindPokedCamera(mousePos.x(), mousePos.y());
       this->SpinXY(mousePos.x(), mousePos.y(), myPoint.x(), myPoint.y());
       myPoint = mousePos;
       break;
@@ -1198,7 +1010,7 @@ SVTK_InteractorStyle
     }
   case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      QPainter p(myGUIWindow);
+      QPainter p(GetRenderWidget());
       p.setPen(Qt::lightGray);
       p.setRasterOp(Qt::XorROP);
       p.drawRect(QRect(myPoint, myOtherPoint));
@@ -1207,182 +1019,73 @@ SVTK_InteractorStyle
       break;
     }
   }
-  this->LastPos[0] = mousePos.x();
-  this->LastPos[1] = h - mousePos.y() - 1;
-}
-
-// called when selection mode changed (!put necessary initialization here!)
-void
-SVTK_InteractorStyle
-::OnSelectionModeChanged()
-{
-  
-  myPreSelectionActor->SetVisibility(false);
-  myElemId = myEdgeId = myNodeId = -1;
-  mySelectedActor = NULL;
 }
 
 // called when user moves mouse inside viewer window and there is no active viewer operation 
 // (!put necessary processing here!)
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::onCursorMove(QPoint mousePos) 
 {
   // processing highlighting
-  Selection_Mode aSelectionMode = myViewWindow->SelectionMode();
+  SVTK_SelectionEvent* aSelectionEvent = GetSelectionEventFlipY();
+  this->FindPokedRenderer(aSelectionEvent->myX,aSelectionEvent->myY);
 
-  int w, h, x, y;
-  myInteractor->GetSize(w, h);
-  x = mousePos.x(); y = h - mousePos.y() - 1;
+  bool anIsChanged = false;
 
-  this->FindPokedRenderer(x,y);
-  myInteractor->StartPickCallback();
-  myPreSelectionActor->SetVisibility(false);
-
-  vtkPicker* aPicker = vtkPicker::SafeDownCast(myInteractor->GetPicker());
-  aPicker->Pick(x, y, 0.0, this->CurrentRenderer);
-
-  SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aPicker->GetActor());
-
-  if (aSActor && myPreSelectionActor){
-    float aPos[3];
-    aSActor->GetPosition(aPos);
-    myPreSelectionActor->SetPosition(aPos);
-  }
-
-  if (vtkCellPicker* picker = vtkCellPicker::SafeDownCast(aPicker)) {
-    int aVtkId = picker->GetCellId();
-    if ( aVtkId >= 0 ) {
-      int anObjId = aSActor->GetElemObjId(aVtkId);
-      if ( aSActor && aSActor->hasIO() && IsValid( aSActor, aVtkId ) ) {
-	bool anIsSameObjId = (mySelectedActor == aSActor && myElemId == anObjId);
-	bool aResult = anIsSameObjId;
-	if(!anIsSameObjId) {
-	  if(aSelectionMode != EdgeOfCellSelection) {
-	    aResult = CheckDimensionId(aSelectionMode,aSActor,anObjId);
-	    if(aResult){
-	      mySelectedActor = aSActor;
-	      myElemId = anObjId;
-	      myInteractor->setCellData(anObjId,aSActor,myPreSelectionActor);
-	    }
-	  }
-	}
-	if(aSelectionMode == EdgeOfCellSelection){
-	  int anEdgeId = GetEdgeId(picker,aSActor,anObjId);
-	  bool anIsSameEdgeId = (myEdgeId != anEdgeId) && anIsSameObjId;
-	  aResult = anIsSameEdgeId;
-	  if(!anIsSameEdgeId) {
-	    aResult = (anEdgeId >= 0);
-	    if (aResult) {
-	      mySelectedActor = aSActor;
-	      myEdgeId = anEdgeId;
-	      myElemId = anObjId;
-	      myInteractor->setEdgeData(anObjId,aSActor,-anEdgeId-1,myPreSelectionActor);
-	    } 
-	  }
-	}
-	if(aResult) {
-	  myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
-	  myPreSelectionActor->SetVisibility(true);
-	}
-      }
-    }
-  }
-  else if (vtkPointPicker* picker = vtkPointPicker::SafeDownCast(aPicker)) {
-    int aVtkId = picker->GetPointId();
-    if ( aVtkId >= 0 && IsValid( aSActor, aVtkId, true ) ) {
-      if ( aSActor && aSActor->hasIO() ) {
-	int anObjId = aSActor->GetNodeObjId(aVtkId);
-	bool anIsSameObjId = (mySelectedActor == aSActor && myNodeId == anObjId);
-	if(!anIsSameObjId) {
-	  mySelectedActor = aSActor;
-	  myNodeId = anObjId;
-	  myInteractor->setPointData(anObjId,aSActor,myPreSelectionActor);
-	}
-	myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
-	myPreSelectionActor->SetVisibility(true);
-      }
-    }
-  }
-  else if ( vtkPicker::SafeDownCast(aPicker) ) {
-    if ( aSActor ) {
-      if ( myPreViewActor != aSActor ) {
-	if ( myPreViewActor != NULL ) {
-	  myPreViewActor->SetPreSelected( false );
-	}
-	myPreViewActor = aSActor;
-	      
-	if ( aSActor->hasIO() ) {
-	  Handle( SALOME_InteractiveObject) IO = aSActor->getIO();
-	  if ( !GetSelector()->IsSelected(IO) ) {
-            // Find All actors with same IO
-	    vtkActorCollection* theActors = this->CurrentRenderer->GetActors();
-	    theActors->InitTraversal();
-	    while( vtkActor *ac = theActors->GetNextActor() ) {
-	      if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) ) {
-		if ( anActor->hasIO() ) {
-		  Handle(SALOME_InteractiveObject) IOS = anActor->getIO();
-		  if(IO->isSame(IOS)) {
-		    anActor->SetPreSelected( true );
-		  }
-		}
-	      }
-	    }
-	  }
-	}
-      }
-    } else {
-      myPreViewActor = NULL;
-      vtkActorCollection* theActors = this->CurrentRenderer->GetActors();
-      theActors->InitTraversal();
-      while( vtkActor *ac = theActors->GetNextActor() ) {
-        if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) ) {
-          anActor->SetPreSelected( false );
-        }
-      }
-    }
-  }
-  myInteractor->EndPickCallback();
-  //myInteractor->Render();
-  myGUIWindow->update();
+  myPicker->Pick(aSelectionEvent->myX, 
+		 aSelectionEvent->myY, 
+		 0.0, 
+		 GetCurrentRenderer());
   
-  this->LastPos[0] = x;
-  this->LastPos[1] = y;
+  SALOME_Actor *anActor = GetFirstSALOMEActor(myPicker.GetPointer());
+  if (anActor){
+    anIsChanged |= anActor->PreHighlight( this, aSelectionEvent, true );
+  }
+
+  if(myLastPreHighlitedActor.GetPointer() && myLastPreHighlitedActor.GetPointer() != anActor)
+    anIsChanged |= myLastPreHighlitedActor->PreHighlight( this, aSelectionEvent, false );   
+
+  myLastPreHighlitedActor = anActor;
+
+  if(anIsChanged)
+    this->Render();
 }
 
 // called on finsh GlobalPan operation 
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::Place(const int theX, const int theY) 
 {
-  if (this->CurrentRenderer == NULL) {
+  if (GetCurrentRenderer() == NULL)
     return;
-  }
 
   //translate view
-  int *aSize = this->CurrentRenderer->GetRenderWindow()->GetSize();
+  int *aSize = GetCurrentRenderer()->GetRenderWindow()->GetSize();
   int centerX = aSize[0]/2;
   int centerY = aSize[1]/2;
 
   TranslateView(centerX, centerY, theX, theY);
 
   // restore zoom scale
-  vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
+  vtkCamera *cam = GetCurrentRenderer()->GetActiveCamera();
   cam->SetParallelScale(myScale);
-  ::ResetCameraClippingRange(this->CurrentRenderer);
+  GetCurrentRenderer()->ResetCameraClippingRange();
 
-  if (myGUIWindow) myGUIWindow->update();
-
+  this->Render();
 }
 
 
 
 // Translates view from Point to Point
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::TranslateView(int toX, int toY, int fromX, int fromY)
 {
-  vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
+  vtkCamera *cam = GetCurrentRenderer()->GetActiveCamera();
   double viewFocus[4], focalDepth, viewPoint[3];
   float newPickPoint[4], oldPickPoint[4], motionVector[3];
   cam->GetFocalPoint(viewFocus);
@@ -1411,118 +1114,7 @@ SVTK_InteractorStyle
 		   motionVector[2] + viewPoint[2]);
 }
 
-
-/// Checks: is the given Actor within display coordinates?
-bool
-SVTK_InteractorStyle
-::IsInRect(vtkActor* theActor, 
-	   const int left, const int top, 
-	   const int right, const int bottom)
-{
-  float* aBounds = theActor->GetBounds();
-  float aMin[3], aMax[3];
-  ComputeWorldToDisplay(aBounds[0], aBounds[2], aBounds[4], aMin);
-  ComputeWorldToDisplay(aBounds[1], aBounds[3], aBounds[5], aMax);
-  if (aMin[0] > aMax[0]) {
-    float aBuf = aMin[0];
-    aMin[0] = aMax[0];
-    aMax[0] = aBuf;
-  }
-  if (aMin[1] > aMax[1]) {
-    float aBuf = aMin[1];
-    aMin[1] = aMax[1];
-    aMax[1] = aBuf;    
-  }
-
-  return ((aMin[0]>left) && (aMax[0]<right) && (aMin[1]>bottom) && (aMax[1]<top));
-}
-
-
-/// Checks: is the given Cell within display coordinates?
-bool
-SVTK_InteractorStyle
-::IsInRect(vtkCell* theCell, 
-	   const int left, const int top, 
-	   const int right, const int bottom)
-{
-  float* aBounds = theCell->GetBounds();
-  float aMin[3], aMax[3];
-  ComputeWorldToDisplay(aBounds[0], aBounds[2], aBounds[4], aMin);
-  ComputeWorldToDisplay(aBounds[1], aBounds[3], aBounds[5], aMax);
-  if (aMin[0] > aMax[0]) {
-    float aBuf = aMin[0];
-    aMin[0] = aMax[0];
-    aMax[0] = aBuf;
-  }
-  if (aMin[1] > aMax[1]) {
-    float aBuf = aMin[1];
-    aMin[1] = aMax[1];
-    aMax[1] = aBuf;    
-  }
-
-  return ((aMin[0]>left) && (aMax[0]<right) && (aMin[1]>bottom) && (aMax[1]<top));
-}
-
-
-bool
-SVTK_InteractorStyle
-::IsInRect(float* thePoint, 
-	   const int left, const int top, 
-	   const int right, const int bottom)
-{
-  float aPnt[3];
-  ComputeWorldToDisplay(thePoint[0], thePoint[1], thePoint[2], aPnt);
-
-  return ((aPnt[0]>left) && (aPnt[0]<right) && (aPnt[1]>bottom) && (aPnt[1]<top));
-}
-
-void
-SVTK_InteractorStyle
-::SetFilter( const Handle(VTKViewer_Filter)& theFilter )
-{
-  myFilters[ theFilter->GetId() ] = theFilter;
-}
-
-bool
-SVTK_InteractorStyle
-::IsFilterPresent( const int theId )
-{
-  return myFilters.find( theId ) != myFilters.end();
-}
-
-void  
-SVTK_InteractorStyle
-::RemoveFilter( const int theId )
-{
-  if ( IsFilterPresent( theId ) )
-    myFilters.erase( theId );
-}
-
-
-bool
-SVTK_InteractorStyle
-::IsValid( SALOME_Actor* theActor,
-	   const int     theId,
-	   const bool    theIsNode )
-{
-  std::map<int, Handle(VTKViewer_Filter)>::const_iterator anIter;
-  for ( anIter = myFilters.begin(); anIter != myFilters.end(); ++anIter )
-  {
-    const Handle(VTKViewer_Filter)& aFilter = anIter->second;
-    if ( theIsNode == aFilter->IsNodeFilter() &&
-         !aFilter->IsValid( theActor, theId ) )
-      return false;
-  }
-  return true;
-}
-
-Handle(VTKViewer_Filter) 
-SVTK_InteractorStyle
-::GetFilter( const int theId )
-{
-  return IsFilterPresent( theId ) ? myFilters[ theId ] : Handle(VTKViewer_Filter)();
-}
-
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalPan( const int incrX, const int incrY )
@@ -1530,6 +1122,7 @@ SVTK_InteractorStyle
   this->PanXY( incrX, incrY, 0, 0 );
 }
 
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalZoom( const int incr )
@@ -1537,9 +1130,294 @@ SVTK_InteractorStyle
   this->DollyXY( incr, incr );
 }
 
+//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalRotate( const int incrX, const int incrY )
 {
   this->RotateXY( incrX, -incrY );
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::SetInteractor( vtkRenderWindowInteractor* theInteractor )
+{
+  // register EventCallbackCommand as observer of standard events (keypress, mousemove, etc)
+  Superclass::SetInteractor( theInteractor );
+ 
+  myInteractor = dynamic_cast<SVTK_GenericRenderWindowInteractor*>(theInteractor);
+
+  if(theInteractor) { 
+    // register EventCallbackCommand as observer of custorm event (3d space mouse event)
+    theInteractor->AddObserver( SVTK::SpaceMouseMoveEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::SpaceMouseButtonEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::PanLeftEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::PanRightEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::PanUpEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::PanDownEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::ZoomInEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::ZoomOutEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::RotateLeftEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::RotateRightEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::RotateUpEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::RotateDownEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::PlusSpeedIncrementEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::MinusSpeedIncrementEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::SetSpeedIncrementEvent, EventCallbackCommand, Priority );
+
+    theInteractor->AddObserver( SVTK::SetSMDecreaseSpeedEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::SetSMIncreaseSpeedEvent, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::SetSMDominantCombinedSwitchEvent, EventCallbackCommand, Priority );
+
+    theInteractor->AddObserver( SVTK::StartZoom, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::StartPan, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::StartRotate, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::StartGlobalPan, EventCallbackCommand, Priority );
+    theInteractor->AddObserver( SVTK::StartFitArea, EventCallbackCommand, Priority );
+  }
+}
+
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::OnTimer() 
+{
+  //vtkInteractorStyle::OnTimer();
+  this->Interactor->Render();
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::Render() 
+{
+  this->Interactor->CreateTimer(VTKI_TIMER_FIRST);
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::onSpaceMouseMove( double* data )
+{
+  // general things, do SetCurrentRenderer() within FindPokedRenderer() 
+  int x, y;
+  GetEventPosition( this->Interactor, x, y ); // current mouse position (from last mouse move event or any other event)
+  FindPokedRenderer( x, y ); // calls SetCurrentRenderer
+  
+  IncrementalZoom( (int)data[2] );        // 1. push toward / pull backward = zoom out / zoom in
+  IncrementalPan(  (int)data[0],  (int)data[1] );// 2. pull up / push down = pan up / down, 3. move left / right = pan left / right
+  IncrementalRotate( 0,  (int)data[4] );   // 4. twist the control = rotate around Y axis
+  IncrementalRotate( (int)data[3], 0  );   // 5. tilt the control forward/backward = rotate around X axis (Z axis of local coordinate system of space mouse)
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::onSpaceMouseButton( int button )
+{
+  if( mySMDecreaseSpeedBtn == button ) {   
+    ControllerIncrement()->Decrease();
+  }
+  if( mySMIncreaseSpeedBtn == button ) {    
+    ControllerIncrement()->Increase();
+  }
+  if( mySMDominantCombinedSwitchBtn == button )    
+    DominantCombinedSwitch();
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::DominantCombinedSwitch()
+{
+  printf( "\n--DominantCombinedSwitch() NOT IMPLEMENTED--\n" );
+}
+
+//----------------------------------------------------------------------------
+void
+SVTK_InteractorStyle
+::ProcessEvents( vtkObject* object,
+		 unsigned long event,
+		 void* clientData, 
+		 void* callData )
+{
+  if ( clientData ) {
+    vtkObject* anObject = reinterpret_cast<vtkObject*>( clientData );
+    SVTK_InteractorStyle* self = dynamic_cast<SVTK_InteractorStyle*>( anObject );
+    int aSpeedIncrement=self->ControllerIncrement()->Current();
+    if ( self ) {
+      switch ( event ) {
+      case SVTK::SpaceMouseMoveEvent : 
+	self->onSpaceMouseMove( (double*)callData ); 
+	return;
+      case SVTK::SpaceMouseButtonEvent : 
+	self->onSpaceMouseButton( *((int*)callData) ); 
+	return;
+      case SVTK::PanLeftEvent: 
+	self->IncrementalPan(-aSpeedIncrement, 0);
+	return;
+      case SVTK::PanRightEvent:
+	self->IncrementalPan(aSpeedIncrement, 0);
+	return;
+      case SVTK::PanUpEvent:
+	self->IncrementalPan(0, aSpeedIncrement);
+	return;
+      case SVTK::PanDownEvent:
+	self->IncrementalPan(0, -aSpeedIncrement);
+	return;
+      case SVTK::ZoomInEvent:
+	self->IncrementalZoom(aSpeedIncrement);
+	return;
+      case SVTK::ZoomOutEvent:
+	self->IncrementalZoom(-aSpeedIncrement);
+	return;
+      case SVTK::RotateLeftEvent: 
+	self->IncrementalRotate(-aSpeedIncrement, 0);
+	return;
+      case SVTK::RotateRightEvent:
+	self->IncrementalRotate(aSpeedIncrement, 0);
+	return;
+      case SVTK::RotateUpEvent:
+	self->IncrementalRotate(0, -aSpeedIncrement);
+	return;
+      case SVTK::RotateDownEvent:
+	self->IncrementalRotate(0, aSpeedIncrement);
+	return;
+      case SVTK::PlusSpeedIncrementEvent:
+	self->ControllerIncrement()->Increase();
+	return;
+      case SVTK::MinusSpeedIncrementEvent:
+	self->ControllerIncrement()->Decrease();
+	return;
+      case SVTK::SetSpeedIncrementEvent:
+	self->ControllerIncrement()->SetStartValue(*((int*)callData));
+	return;
+
+      case SVTK::SetSMDecreaseSpeedEvent:
+	self->mySMDecreaseSpeedBtn = *((int*)callData);
+	return;
+      case SVTK::SetSMIncreaseSpeedEvent:
+	self->mySMIncreaseSpeedBtn = *((int*)callData);
+	return;
+      case SVTK::SetSMDominantCombinedSwitchEvent:
+	self->mySMDominantCombinedSwitchBtn = *((int*)callData);
+	return;
+
+      case SVTK::StartZoom:
+	self->startZoom();
+	return;
+      case SVTK::StartPan:
+	self->startPan();
+	return;
+      case SVTK::StartRotate:
+	self->startRotate();
+	return;
+      case SVTK::StartGlobalPan:
+	self->startGlobalPan();
+	return;
+      case SVTK::StartFitArea:
+	self->startFitArea();
+	return;
+      }
+    }
+  }
+
+  Superclass::ProcessEvents( object, event, clientData, callData );
+}
+//----------------------------------------------------------------------------
+void SVTK_InteractorStyle::OnChar()
+{
+}
+//----------------------------------------------------------------------------
+void SVTK_InteractorStyle::OnKeyDown()
+{
+  bool bInvokeSuperclass=myControllerOnKeyDown->OnKeyDown(this);
+  if (bInvokeSuperclass){
+    Superclass::OnKeyDown();
+  }
+}
+//----------------------------------------------------------------------------
+void SVTK_InteractorStyle::ActionPicking()
+{
+  int x, y;
+  Interactor->GetEventPosition( x, y ); 
+  FindPokedRenderer( x, y ); 
+  
+  myOtherPoint = myPoint = QPoint(x, y);
+  
+  startOperation(VTK_INTERACTOR_STYLE_CAMERA_SELECT);
+  onFinishOperation();
+  startOperation(VTK_INTERACTOR_STYLE_CAMERA_NONE);
+}
+//----------------------------------------------------------------------------
+void SVTK_InteractorStyle::SetControllerOnKeyDown(SVTK_ControllerOnKeyDown* theController)
+{
+  myControllerOnKeyDown=theController;
+}
+//----------------------------------------------------------------------------
+SVTK_ControllerOnKeyDown* SVTK_InteractorStyle::ControllerOnKeyDown()
+{
+  return myControllerOnKeyDown.GetPointer();
+}
+//----------------------------------------------------------------------------
+void SVTK_InteractorStyle::SetControllerIncrement(SVTK_ControllerIncrement* theController)
+{
+  myControllerIncrement=theController;
+}
+//----------------------------------------------------------------------------
+SVTK_ControllerIncrement* SVTK_InteractorStyle::ControllerIncrement()
+{
+  return myControllerIncrement.GetPointer();
+}
+
+vtkStandardNewMacro(SVTK_ControllerIncrement);
+//----------------------------------------------------------------------------
+SVTK_ControllerIncrement::SVTK_ControllerIncrement()
+{
+  myIncrement=10;
+}
+//----------------------------------------------------------------------------
+SVTK_ControllerIncrement::~SVTK_ControllerIncrement()
+{
+}
+//----------------------------------------------------------------------------
+void SVTK_ControllerIncrement::SetStartValue(const int theValue)
+{
+  myIncrement=theValue;
+}
+//----------------------------------------------------------------------------
+int SVTK_ControllerIncrement::Current()const
+{
+  return myIncrement;
+}
+//----------------------------------------------------------------------------
+int SVTK_ControllerIncrement::Increase()
+{
+  ++myIncrement;
+  return myIncrement;
+}
+//----------------------------------------------------------------------------
+int SVTK_ControllerIncrement::Decrease()
+{
+  if (myIncrement>1){
+    --myIncrement;
+  }
+  return myIncrement;
+}
+
+vtkStandardNewMacro(SVTK_ControllerOnKeyDown);
+//----------------------------------------------------------------------------
+SVTK_ControllerOnKeyDown::SVTK_ControllerOnKeyDown()
+{
+}
+//----------------------------------------------------------------------------
+SVTK_ControllerOnKeyDown::~SVTK_ControllerOnKeyDown()
+{
+}
+//----------------------------------------------------------------------------
+bool SVTK_ControllerOnKeyDown::OnKeyDown(vtkInteractorStyle* theIS)
+{
+  return true;
 }

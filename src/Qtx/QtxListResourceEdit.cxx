@@ -168,6 +168,8 @@ void QtxListResourceEdit::updateState()
     myStack->show();
   else
     myStack->hide();
+
+  myList->setShown( myList->count() > 1 );
 }
 
 void QtxListResourceEdit::updateVisible()

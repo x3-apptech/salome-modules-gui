@@ -43,6 +43,7 @@ myWid( 0 )
 {
   QHBoxLayout* base = new QHBoxLayout( this );
   base->setAutoAdd( true );
+  setFocusPolicy( StrongFocus );
 }
 
 QDS_Datum::Wrapper::~Wrapper()
@@ -70,6 +71,7 @@ void QDS_Datum::Wrapper::setWidget( QWidget* wid )
   if ( myWid->parent() != this )
     myWid->reparent( this, QPoint( 0, 0 ) );
 
+  setTabOrder( this, myWid );
   setFocusProxy( myWid );
 
   myWid->updateGeometry();
@@ -152,6 +154,11 @@ QDS_Datum::~QDS_Datum()
   for ( QMap<int, Wrapper*>::Iterator it = myWrapper.begin(); it != myWrapper.end(); ++it )
     delete it.data();
 */
+}
+
+QDS_Datum::operator QWidget*() const
+{
+  return widget( Control );
 }
 
 QString QDS_Datum::id() const
@@ -241,8 +248,8 @@ QString QDS_Datum::minimumValue() const
   initDatum();
 
   QString min;
-  if ( !myDicItem.IsNull() )
-    min = format( format(), type(), myDicItem->GetMinValue() );
+  if ( !myDicItem.IsNull() && myDicItem->HasData( DDS_DicItem::MinValue ) )
+      min = format( format(), type(), myDicItem->GetMinValue() );
   return min;
 }
 
@@ -251,7 +258,7 @@ QString QDS_Datum::maximumValue() const
   initDatum();
 
   QString max;
-  if ( !myDicItem.IsNull() )
+  if ( !myDicItem.IsNull() && myDicItem->HasData( DDS_DicItem::MaxValue ) )
     max = format( format(), type(), myDicItem->GetMaxValue() );
   return max;
 }
@@ -274,6 +281,14 @@ QString QDS_Datum::shortDescription() const
   if ( !myDicItem.IsNull() )
     sdStr = toQString( myDicItem->GetLongDescription() );
   return sdStr;
+}
+
+QVariant QDS_Datum::value() const
+{
+  QVariant val;
+  if ( !isEmpty() )
+    val = stringValue();
+  return val;
 }
 
 QString QDS_Datum::stringValue() const
@@ -373,6 +388,14 @@ void QDS_Datum::clear()
     emit paramChanged();
     emit paramChanged( str );
   }
+}
+
+void QDS_Datum::setValue( const QVariant& val )
+{
+  if ( val.isValid() && val.canCast( QVariant::String ) )
+    setStringValue( val.toString() );
+  else
+    clear();
 }
 
 void QDS_Datum::setStringValue( const QString& txt )
@@ -541,10 +564,15 @@ bool QDS_Datum::isValid( const bool msgBox, const QString& extMsg, const QString
   if ( type() == DDS_DicItem::String && isDoubleFormat( format() ) )
     return true;
 
+  QString req;
+  if ( !dicItem().IsNull() )
+    req = toQString( dicItem()->GetRequired() );
+
   bool aState = true;
   QString aStr = getString();
+
   if ( aStr.isEmpty() )
-    aState = false;
+    aState = !( req == QString( "yes" ) || req == QString( "true" ) || req.toInt() );
   else
     aState = validate( aStr );
 
@@ -604,7 +632,7 @@ bool QDS_Datum::isValid( const bool msgBox, const QString& extMsg, const QString
     info = QString( "<p><nobr>%1</nobr></p>" ).arg( msg );
 
     QMessageBox::critical( controlWidget() ? controlWidget()->topLevelWidget() : 0,
-                           tr( "DATA_ERR_TITLE" ), info, tr( "BUT_OK" ) );
+                           tr( "DATA_ERR_TITLE" ), info, tr( "OK" ) );
     if ( controlWidget() )
       controlWidget()->setFocus();
   }
