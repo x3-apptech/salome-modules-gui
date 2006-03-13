@@ -152,7 +152,9 @@ private:
 	  QSize                 calculateSize( const bool, const int,
 										                     const bool, const bool, const bool ) const;
 
-	  friend class Dock;
+#if QT_VER == 3
+	  friend class QtxColorScale::Dock;
+#endif
 
 private:
 	  double                myMin;

@@ -37,6 +37,7 @@ class STD_EXPORT STD_MDIDesktop: public SUIT_Desktop
   Q_OBJECT
 
 public:
+  enum { MenuWindowId = 6 };
   enum { Cascade, Tile, HTile, VTile };
 
 public:

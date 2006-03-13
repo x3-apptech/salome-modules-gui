@@ -11,6 +11,7 @@
 #include "LightApp_Selection.h"
 #include "LightApp_Operation.h"
 #include "LightApp_Preferences.h"
+//#include "LightApp_Displayer.h"
 
 #include "CAM_DataModel.h"
 
@@ -19,11 +20,23 @@
 #include <SALOME_ListIO.hxx>
 #include <SALOME_ListIteratorOfListIO.hxx>
 #include <SALOME_InteractiveObject.hxx>
+//#include <SALOME_Actor.h>
+
+//#include "SALOMEDS_IParameters.hxx"
 
 #include <SUIT_Session.h>
+#include <SUIT_ViewModel.h>
+
+#include <SVTK_ViewWindow.h>
+//#include <SVTK_ViewModel.h>
+//#include <SVTK_MainWindow.h>
+//#include <SVTK_RenderWindowInteractor.h>
 
 #include <qstring.h>
 #include <qmap.h>
+
+//#include <vtkActorCollection.h>
+//#include <vtkRenderer.h>
 
 /*!Constructor.*/
 SalomeApp_Module::SalomeApp_Module( const QString& name )
@@ -97,3 +110,24 @@ void SalomeApp_Module::extractContainers( const SALOME_ListIO& source, SALOME_Li
     dest.Append( obj );
   }
 }
+
+/*!
+ * \brief Virtual public
+ *
+ * This method is called just before the study document is saved, so the module has a possibility
+ * to store visual parameters in AttributeParameter attribue(s)
+ */
+void SalomeApp_Module::storeVisualParameters(int savePoint)
+{
+}
+
+/*!
+ * \brief Virtual public
+ *
+ * This method is called after the study document is opened, so the module has a possibility to restore
+ * visual parameters
+ */
+void SalomeApp_Module::restoreVisualParameters(int savePoint)
+{
+}
+

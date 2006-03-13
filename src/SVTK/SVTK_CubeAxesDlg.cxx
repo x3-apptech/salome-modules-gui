@@ -33,6 +33,7 @@
 #include "SVTK_CubeAxesActor2D.h"
 
 #include "QtxAction.h"
+#include "QtxIntSpinBox.h"
 
 #include <qlayout.h>
 #include <qframe.h>
@@ -88,15 +89,13 @@ SVTK_AxisWidget::SVTK_AxisWidget (QWidget* theParent)
   aHBox = new QHBox(myLabelsGrp);
   aHBox->setSpacing(5);
   aLabel = new QLabel(tr("NUMBER"), aHBox);
-  myLabelNumber = new QLineEdit(aHBox);
-  myLabelNumber->setValidator(new QIntValidator(0, 25, this));
-  myLabelNumber->installEventFilter(this);
+  myLabelNumber = new QtxIntSpinBox(0,25,1,aHBox,"SpinBoxLabelNumber");
   aLabels.append(aLabel);
 
   aHBox = new QHBox(myLabelsGrp);
   aHBox->setSpacing(5);
   aLabel = new QLabel(tr("OFFSET"), aHBox);
-  myLabelOffset = new QLineEdit(aHBox);
+  myLabelOffset = new QtxIntSpinBox(0,100,1,aHBox,"SpinBoxLabellOffset");
   aLabels.append(aLabel);
 
   aHBox = new QHBox(myLabelsGrp);
@@ -113,7 +112,8 @@ SVTK_AxisWidget::SVTK_AxisWidget (QWidget* theParent)
   aHBox = new QHBox(myTicksGrp);
   aHBox->setSpacing(5);
   aLabel = new QLabel(tr("LENGTH"), aHBox);
-  myTickLength = new QLineEdit(aHBox);
+  myTickLength = new QtxIntSpinBox(0,100,1,aHBox,"SpinBoxTickLength");
+  
   aLabels.append(aLabel);
 
   // Layout
@@ -152,16 +152,6 @@ void SVTK_AxisWidget::updateControlState()
   onNameChecked();
   onLabelsChecked();
   onTicksChecked();
-}
-
-bool SVTK_AxisWidget::eventFilter(QObject* o, QEvent* e)
-{
-  if (e->type() == QEvent::FocusOut) {
-    bool isOK = false;
-    int k = myLabelNumber->text().toInt(&isOK);
-    if (isOK && k > 25) myLabelNumber->setText("25");
-  }
-  return false;
 }
 
 //=======================================================================
@@ -296,8 +286,8 @@ bool SVTK_AxisWidget::ReadData(vtkAxisActor2D* theActor)
   }
 
   myIsLabelsVisible->setChecked(useLabels);
-  myLabelNumber->setText(QString("%1").arg(nbLabels));
-  myLabelOffset->setText(QString("%1").arg(anOffset));
+  myLabelNumber->setValue(nbLabels);
+  myLabelOffset->setValue(anOffset);
   myLabelsFont->SetData(aLabelsColor, aLabelsFontFamily, isLabelsBold, isLabelsItalic, isLabelsShadow);
 
   // Tick marks
@@ -305,7 +295,7 @@ bool SVTK_AxisWidget::ReadData(vtkAxisActor2D* theActor)
   int aTickLength = theActor->GetTickLength();
 
   myIsTicksVisible->setChecked(useTickMarks);
-  myTickLength->setText(QString("%1").arg(aTickLength));
+  myTickLength->setValue(aTickLength);
 
   return true;
 }
@@ -350,14 +340,11 @@ bool SVTK_AxisWidget::Apply(vtkAxisActor2D* theActor)
 
   theActor->SetLabelVisibility(myIsLabelsVisible->isChecked() ? 1 : 0);
 
-  bool isOk = false;
-  int nbLabels = myLabelNumber->text().toInt(&isOk);
-  if (isOk)
-    theActor->SetNumberOfLabels(nbLabels);
+  int nbLabels = myLabelNumber->value();
+  theActor->SetNumberOfLabels(nbLabels);
 
-  int anOffset = myLabelOffset->text().toInt(&isOk);
-  if (isOk)
-    theActor->SetTickOffset(anOffset);
+  int anOffset = myLabelOffset->value();
+  theActor->SetTickOffset(anOffset);
 
   QColor aLabelsColor(255, 255, 255);
   int aLabelsFontFamily = VTK_ARIAL;
@@ -385,9 +372,8 @@ bool SVTK_AxisWidget::Apply(vtkAxisActor2D* theActor)
 
   // Tick marks
   theActor->SetTickVisibility(myIsTicksVisible->isChecked());
-  int aTickLength = myTickLength->text().toInt(&isOk);
-  if (isOk)
-    theActor->SetTickLength(aTickLength);
+  int aTickLength = myTickLength->value();
+  theActor->SetTickLength(aTickLength);
 
   return true;
 }
@@ -518,6 +504,10 @@ bool SVTK_CubeAxesDlg::onApply()
 
   try
   {
+    QWidget *aCurrWid = this->focusWidget();
+    aCurrWid->clearFocus();
+    aCurrWid->setFocus();
+
     isOk = isOk && myAxes[ 0 ]->Apply(myActor->GetXAxisActor2D());
     isOk = isOk && myAxes[ 1 ]->Apply(myActor->GetYAxisActor2D());
     isOk = isOk && myAxes[ 2 ]->Apply(myActor->GetZAxisActor2D());

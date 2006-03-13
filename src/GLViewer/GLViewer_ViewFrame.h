@@ -72,6 +72,9 @@ public:
   QSize                   sizeHint() const;
   
   virtual void            onUpdate( int );
+
+  virtual QString         getVisualParameters();
+  virtual void            setVisualParameters( const QString& parameters );  
   
 signals:
   void                    vfDrawExternal( QPainter* );

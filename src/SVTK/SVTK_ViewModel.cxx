@@ -63,6 +63,7 @@
 SVTK_Viewer::SVTK_Viewer()
 {
   myTrihedronSize = 105;
+  myTrihedronRelative = true;
 }
 
 //==========================================================
@@ -88,7 +89,7 @@ SVTK_Viewer
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i)){
       if(TViewWindow* aView = dynamic_cast<TViewWindow*>(aViewWindow)){
-	aView->getMainWindow()->SetBackgroundColor(theColor);
+	aView->setBackgroundColor(theColor);
       }
     }
   }
@@ -97,15 +98,15 @@ SVTK_Viewer
 }
 
 //==========================================================
-SUIT_ViewWindow* 
+SUIT_ViewWindow*
 SVTK_Viewer::
 createView( SUIT_Desktop* theDesktop )
 {
-  SVTK_ViewWindow* aViewWindow = new SVTK_ViewWindow(theDesktop);
+  TViewWindow* aViewWindow = new TViewWindow(theDesktop);
   aViewWindow->Initialize(this);
-    
+
   aViewWindow->setBackgroundColor( backgroundColor() );
-  aViewWindow->SetTrihedronSize( trihedronSize() );
+  aViewWindow->SetTrihedronSize( trihedronSize(), trihedronRelative() );
 
   return aViewWindow;
 }
@@ -115,23 +116,23 @@ int SVTK_Viewer::trihedronSize() const
   return myTrihedronSize;
 }
 
-void SVTK_Viewer::setTrihedronSize( const int sz )
+bool SVTK_Viewer::trihedronRelative() const
 {
-  myTrihedronSize = sz;
+  return myTrihedronRelative;
+}
 
-  SUIT_ViewManager* vm = getViewManager();
-  if ( !vm )
-    return;
+void SVTK_Viewer::setTrihedronSize( const int theSize, const bool theRelative )
+{
+  myTrihedronSize = theSize;
+  myTrihedronRelative = theRelative;
 
-  QPtrVector<SUIT_ViewWindow> vec = vm->getViews();
-  for ( int i = 0; i < vec.count(); i++ )
-  {
-    SUIT_ViewWindow* win = vec.at( i );
-    if ( !win || !win->inherits( "SVTK_ViewWindow" ) )
-      continue;
-
-    SVTK_ViewWindow* vw = (SVTK_ViewWindow*)win;
-    vw->SetTrihedronSize( sz );
+  if (SUIT_ViewManager* aViewManager = getViewManager()) {
+    QPtrVector<SUIT_ViewWindow> aViews = aViewManager->getViews();
+    for (int i = 0; i < aViews.count(); i++) {
+      if (TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at(i))) {
+	aView->SetTrihedronSize(theSize, theRelative);
+      }
+    }
   }
 }
 
@@ -164,7 +165,7 @@ SVTK_Viewer
   thePopup->insertSeparator();
 
   if(TViewWindow* aView = dynamic_cast<TViewWindow*>(myViewManager->getActiveView())){
-    if ( !aView->getView()->GetMainWindow()->getToolBar()->isVisible() ){
+    if ( !aView->getMainWindow()->getToolBar()->isVisible() ){
       thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
     }
   }
@@ -233,7 +234,7 @@ SVTK_Viewer
   QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at(i))){
-      aView->getView()->GetMainWindow()->getToolBar()->show();
+      aView->getMainWindow()->getToolBar()->show();
     }
   }
 }
@@ -415,10 +416,11 @@ SVTK_Viewer
 {
   QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)
-    if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i)))
-      if(SVTK_View* aView = aViewWindow->getView())
-	if(!aView->isVisible( io ))
-	  return false;
+    if(SUIT_ViewWindow* aViewWindow = aViews.at(i))
+      if(TViewWindow* aViewWnd = dynamic_cast<TViewWindow*>(aViewWindow))
+        if(SVTK_View* aView = aViewWnd->getView())
+          if(!aView->isVisible( io ))
+            return false;
 
   return true;
 }
@@ -431,7 +433,7 @@ SVTK_Viewer
 //  if (theUpdateTrihedron) onAdjustTrihedron();
   QPtrVector<SUIT_ViewWindow> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)
-    if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i)))
+    if(TViewWindow* aViewWindow = dynamic_cast<TViewWindow*>(aViews.at(i)))
       if(SVTK_View* aView = aViewWindow->getView())
 	aView->Repaint();
 }

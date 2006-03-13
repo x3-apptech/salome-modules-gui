@@ -29,9 +29,6 @@
 #include <qstring.h>
 #include <qmap.h>
 
-class QAccel;
-class SUIT_Desktop;
-
 class SUIT_EXPORT SUIT_Accel: public QObject
 {
   Q_OBJECT
@@ -53,21 +50,28 @@ public:
   };
 
 public:
-  SUIT_Accel( SUIT_Desktop* theDesktop );
-  virtual ~SUIT_Accel();
+  static SUIT_Accel* getAccel();
 
   void setActionKey( const int action, const int key, const QString& type );
+  void unsetActionKey( const int key, const QString& type );
 
-protected slots:
-  void onActivated( int );
+protected:
+  bool eventFilter( QObject *, QEvent * );
 
 private:
-  QAccel* myAccel; 
-  SUIT_Desktop* myDesktop;
+  SUIT_Accel();
 
-  typedef QMap<int, int> IdActionMap; // internal_id - to - action map
+  int getAccelKey( QEvent* ); // returns key pressed if 1) event was KeyPress 
+                              // 2) pressed key is a registered accelerator 
+
+  typedef QMap<int, int> IdActionMap; // key - to - action_id map
   typedef QMap<QString, IdActionMap> ViewerTypeIdActionMap; // viewer_type - to - IdActionMap
   ViewerTypeIdActionMap myMap;
+
+  QMap<int, bool> myOptMap; // key - to - <not_used> map, used for optimazation.  all registered keys (accelerators)
+                            // are stored in this map.
+
+  static SUIT_Accel* myself;
 };
 
 #endif

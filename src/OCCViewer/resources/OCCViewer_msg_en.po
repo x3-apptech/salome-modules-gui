@@ -123,7 +123,7 @@ msgid "MNU_DUMP_VIEW"
 msgstr "Dump view"
 
 msgid "DSC_CLIPPING"
-msgstr "Define clipping plane"
+msgstr "Set clipping plane"
 
 msgid "MNU_CLIPPING"
 msgstr "Clipping"

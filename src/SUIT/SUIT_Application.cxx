@@ -186,8 +186,9 @@ int SUIT_Application::createTool( QAction* a, const int tBar, const int id, cons
   if ( !desktop() || !desktop()->toolMgr() )
     return -1;
 
-  int regId = desktop()->toolMgr()->registerAction( a, id );
-  return desktop()->toolMgr()->insert( regId, tBar, idx );
+  int regId = registerAction( id, a );
+  int intId = desktop()->toolMgr()->insert( a, tBar, idx );
+  return intId != -1 ? regId : -1;
 }
 
 int SUIT_Application::createTool( QAction* a, const QString& tBar, const int id, const int idx )
@@ -195,7 +196,9 @@ int SUIT_Application::createTool( QAction* a, const QString& tBar, const int id,
   if ( !desktop() || !desktop()->toolMgr() )
     return -1;
 
-  return desktop()->toolMgr()->insert( a, tBar, idx );
+  int regId = registerAction( id, a );
+  int intId = desktop()->toolMgr()->insert( a, tBar, idx );
+  return intId != -1 ? regId : -1;
 }
 
 int SUIT_Application::createTool( const int id, const int tBar, const int idx )
@@ -203,7 +206,8 @@ int SUIT_Application::createTool( const int id, const int tBar, const int idx )
   if ( !desktop() || !desktop()->toolMgr() )
     return -1;
 
-  return desktop()->toolMgr()->insert( id, tBar, idx );
+  int intId = desktop()->toolMgr()->insert( action( id ), tBar, idx );
+  return intId != -1 ? id : -1;
 }
 
 int SUIT_Application::createTool( const int id, const QString& tBar, const int idx )
@@ -211,7 +215,8 @@ int SUIT_Application::createTool( const int id, const QString& tBar, const int i
   if ( !desktop() || !desktop()->toolMgr() )
     return -1;
 
-  return desktop()->toolMgr()->insert( id, tBar, idx );
+  int intId = desktop()->toolMgr()->insert( action( id ), tBar, idx );
+  return intId != -1 ? id : -1;
 }
 
 int SUIT_Application::createMenu( const QString& subMenu, const int menu,
@@ -220,7 +225,7 @@ int SUIT_Application::createMenu( const QString& subMenu, const int menu,
   if ( !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  return desktop()->menuMgr()->insert( subMenu, menu, group, index );
+  return desktop()->menuMgr()->insert( subMenu, menu, group, id, index );
 }
 
 int SUIT_Application::createMenu( const QString& subMenu, const QString& menu,
@@ -229,7 +234,7 @@ int SUIT_Application::createMenu( const QString& subMenu, const QString& menu,
   if ( !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  return desktop()->menuMgr()->insert( subMenu, menu, group, index );
+  return desktop()->menuMgr()->insert( subMenu, menu, group, id, index );
 }
 
 int SUIT_Application::createMenu( QAction* a, const int menu, const int id, const int group, const int index )
@@ -237,8 +242,9 @@ int SUIT_Application::createMenu( QAction* a, const int menu, const int id, cons
   if ( !a || !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  int regId = desktop()->menuMgr()->registerAction( a, id );
-  return desktop()->menuMgr()->insert( regId, menu, group, index );
+  int regId = registerAction( id, a );
+  int intId = desktop()->menuMgr()->insert( a, menu, group, index );
+  return intId != -1 ? regId : -1;
 }
 
 int SUIT_Application::createMenu( QAction* a, const QString& menu, const int id, const int group, const int index )
@@ -246,8 +252,9 @@ int SUIT_Application::createMenu( QAction* a, const QString& menu, const int id,
   if ( !a || !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  int regId = desktop()->menuMgr()->registerAction( a, id );
-  return desktop()->menuMgr()->insert( regId, menu, group, index );
+  int regId = registerAction( id, a );
+  int intId = desktop()->menuMgr()->insert( a, menu, group, index );
+  return intId != -1 ? regId : -1;
 }
 
 int SUIT_Application::createMenu( const int id, const int menu, const int group, const int index )
@@ -255,7 +262,8 @@ int SUIT_Application::createMenu( const int id, const int menu, const int group,
   if ( !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  return desktop()->menuMgr()->insert( id, menu, group, index );
+  int intId = desktop()->menuMgr()->insert( action( id ), menu, group, index );
+  return intId != -1 ? id : -1;
 }
 
 int SUIT_Application::createMenu( const int id, const QString& menu, const int group, const int index )
@@ -263,7 +271,8 @@ int SUIT_Application::createMenu( const int id, const QString& menu, const int g
   if ( !desktop() || !desktop()->menuMgr() )
     return -1;
 
-  return desktop()->menuMgr()->insert( id, menu, group, index );
+  int intId = desktop()->menuMgr()->insert( action( id ), menu, group, index );
+  return intId != -1 ? id : -1;
 }
 
 void SUIT_Application::setMenuShown( QAction* a, const bool on )
@@ -302,31 +311,21 @@ void SUIT_Application::setActionShown( const int id, const bool on )
 
 QAction* SUIT_Application::action( const int id ) const
 {
-  SUIT_Application* that = (SUIT_Application*)this;
-  SUIT_Desktop* desk = that->desktop();
-  if ( !desk )
-    return 0;
-
   QAction* a = 0;
-  if ( desk->menuMgr() )
-    a = desk->menuMgr()->action( id );
-  if ( !a && desk->toolMgr() )
-    a = desk->toolMgr()->action( id );
+  if ( myActionMap.contains( id ) )
+    a = myActionMap[id];
   return a;
 }
 
 int SUIT_Application::actionId( const QAction* a ) const
 {
-  SUIT_Application* that = (SUIT_Application*)this;
-  SUIT_Desktop* desk = that->desktop();
-  if ( !desk )
-    return 0;
-
   int id = -1;
-  if ( desk->menuMgr() )
-    id = desk->menuMgr()->actionId( a );
-  if ( id == -1 && desk->toolMgr() )
-    id = desk->toolMgr()->actionId( a );
+  for ( QMap<int, QAction*>::ConstIterator it = myActionMap.begin(); 
+	it != myActionMap.end() && id == -1;
+	++it ) {
+    if ( it.data() == a )
+      id = it.key();
+  }
   return id;
 }
 
@@ -345,13 +344,27 @@ QAction* SUIT_Application::createAction( const int id, const QString& text, cons
   return a;
 }
 
-void SUIT_Application::registerAction( const int id, QAction* a )
+int SUIT_Application::registerAction( const int id, QAction* a )
 {
+  int ident = actionId( a );
+  if ( ident != -1 )
+    return ident;
+
+  static int generatedId = -1;
+  ident = id == -1 ? --generatedId : id;
+
+  if ( action( ident ) ) 
+    qWarning( "Action registration id is already in use: %d", ident );
+
+  myActionMap.insert( ident, a );
+
   if ( desktop() && desktop()->menuMgr() )
-    desktop()->menuMgr()->registerAction( a, id );
+    desktop()->menuMgr()->registerAction( a );
 
   if ( desktop() && desktop()->toolMgr() )
-    desktop()->toolMgr()->registerAction( a, id );
+    desktop()->toolMgr()->registerAction( a );
+
+  return ident;
 }
 
 QAction* SUIT_Application::separator()

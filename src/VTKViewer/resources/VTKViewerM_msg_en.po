@@ -6,7 +6,6 @@ msgstr ""
 "Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 
-
 #: SVTK_NonIsometricDlg.cxx
 
 msgid "SVTK_NonIsometricDlg::MEN_SCALING"

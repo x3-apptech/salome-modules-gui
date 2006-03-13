@@ -14,7 +14,13 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:./bin/salome:@top_srcdir@/resources:./bin:@top
 
 @COMMENCE@
 
-SUBDIRS = idl src doc
+SUBDIRS = src
+
+ifeq ($(GUI_DISABLE_CORBA),no)
+  SUBDIRS+= idl
+endif
+
+SUBDIRS+= doc adm_local
 
 RESOURCES_FILES = \
 back.xpm \

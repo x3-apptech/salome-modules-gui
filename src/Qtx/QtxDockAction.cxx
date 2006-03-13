@@ -28,6 +28,7 @@
 #include <qdockarea.h>
 #include <qdockwindow.h>
 #include <qmainwindow.h>
+#include <qobjectlist.h>
 #include <qapplication.h>
 
 /*!
@@ -707,7 +708,36 @@ void QtxDockAction::dockWindows( QPtrList<QDockWindow>& lst, QMainWindow* main )
   if ( !mw )
     return;
 
-  lst = mw->dockWindows();
+  QObjectList* objs = mw->queryList( "QDockWindow" );
+  if ( objs )
+  {
+    for ( QObjectListIt it( *objs ); it.current(); ++it )
+    {
+      QDockWindow* dockWin = ::qt_cast<QDockWindow*>( it.current() );
+      if ( dockWin && dockMainWindow( mw, dockWin ) )
+        lst.append( dockWin );
+    }
+  }
+  delete objs;
+}
+
+bool QtxDockAction::dockMainWindow( QMainWindow* mw, QObject* win ) const
+{
+  if ( !mw || !win )
+    return false;
+
+  while ( win )
+  {
+    if ( win->parent() && win->parent() == mw )
+      return true;
+
+    if ( ::qt_cast<QMainWindow*>( win->parent() ) )
+      return false;
+
+    win = win->parent();
+  }
+
+  return false;
 }
 
 /*!
@@ -772,6 +802,14 @@ void QtxDockAction::loadPlaceInfo( QDockWindow* dw ) const
   if ( !myInfo.contains( dw ) )
     return;
 
+  QMainWindow* mw = mainWindow();
+  if ( !mw )
+    return;
+
+  QObject* p = dw->parent();
+  if ( !( !p || p == mw || ( p->parent() && p->parent() == mw ) ) )
+    return;
+
   QString winName = myInfo[dw].name;
   if ( winName.isEmpty() || !myGeom.contains( winName ) )
     return;
@@ -807,6 +845,10 @@ void QtxDockAction::loadPlaceInfo() const
   QMap<QString, QDockWindow*> nameMap;
   for ( QPtrListIterator<QDockWindow> itr( lst ); itr.current(); ++itr )
   {
+    QObject* p = itr.current()->parent();
+    if ( !( !p || p == mw || ( p->parent() && p->parent() == mw ) ) )
+      continue;
+
     QString name;
     if ( myInfo.contains( itr.current() ) )
       name = myInfo[itr.current()].name;

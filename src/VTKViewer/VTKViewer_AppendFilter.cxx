@@ -28,38 +28,15 @@
 
 #include "VTKViewer_AppendFilter.h"
 
-#include "VTKViewer_ConvexTool.h"
-
-#include <vtkSmartPointer.h>
-#include <vtkCellArray.h>
+#include <vtkCell.h>
 #include <vtkCellData.h>
-#include <vtkGenericCell.h>
-#include <vtkHexahedron.h>
-#include <vtkMergePoints.h>
+#include <vtkDataSetAttributes.h>
+#include <vtkDataSetCollection.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
-#include <vtkPolyData.h>
-#include <vtkPyramid.h>
-#include <vtkStructuredGrid.h>
-#include <vtkTetra.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkVoxel.h>
-#include <vtkWedge.h>
-#include <vtkDataSetCollection.h>
 
-#include <vector>
-#include <map>
-using namespace std;
-
-
-#ifdef _DEBUG_
-//static int MYDEBUG = 0;
-//static int MYDEBUGWITHFILES = 0;
-#else
-//static int MYDEBUG = 0;
-//static int MYDEBUGWITHFILES = 0;
-#endif
+#include <vtkPoints.h>
 
 #if defined __GNUC__
   #if __GNUC__ == 2
@@ -73,7 +50,7 @@ vtkStandardNewMacro(VTKViewer_AppendFilter);
 VTKViewer_AppendFilter
 ::VTKViewer_AppendFilter() 
 {
-  myDoMappingFlag=false;
+  myDoMappingFlag = false;
 }
 
 VTKViewer_AppendFilter
@@ -84,7 +61,12 @@ void
 VTKViewer_AppendFilter
 ::SetDoMappingFlag(const bool theFlag)
 {
-  myDoMappingFlag=theFlag;
+  if(myDoMappingFlag == theFlag)
+    return;
+
+  myDoMappingFlag = theFlag;
+
+  this->Modified();
 }
 
 bool 
@@ -98,7 +80,12 @@ void
 VTKViewer_AppendFilter
 ::SetPoints(vtkPoints* thePoints)
 {
+  if(GetPoints() == thePoints)
+    return;
+
   myPoints = thePoints;
+
+  this->Modified();
 }
 
 vtkPoints*
@@ -112,28 +99,16 @@ void
 VTKViewer_AppendFilter
 ::Execute()
 {
-  if (myPoints.GetPointer()) {
+  if(myPoints.GetPointer())
     MakeOutput();
-  }
-  else {
-    vtkAppendFilter::Execute();
-  }
-  if (myDoMappingFlag){
+  else
+    Superclass::Execute();
+
+  if(myDoMappingFlag)
     DoMapping();
-  }
 }
 
-void 
-VTKViewer_AppendFilter
-::Reset()
-{
-  myNodeIds.clear();
-  myCellIds.clear();
-  myNodeRanges.clear();
-  myCellRanges.clear();
-  myNodeMapObjIDVtkID.clear();
-  myCellMapObjIDVtkID.clear();
-}
+
 //==================================================================
 // function: DoMapping
 // purpose :
@@ -142,165 +117,140 @@ void
 VTKViewer_AppendFilter
 ::DoMapping()
 {
-  int i, j, i1, i2, iNodeCnt, iCellCnt; 
-  IteratorOfDataMapOfIntegerInteger aMapIt;
-  vtkIdType aNbPnts, aNbCells, aId;
-  vtkDataSet *pDS;
-  //
-  Reset();
-  //
-  iNodeCnt=0;
-  iCellCnt=0;
-  for (i=0; i<NumberOfInputs; ++i) {
-    pDS=(vtkDataSet *)Inputs[i];
-    //
-    // Nodes
-    if (!myPoints.GetPointer()) {
-      aNbPnts=pDS->GetNumberOfPoints();
-      i1=myNodeIds.size();
-      i2=i1+aNbPnts-1;
-      myNodeRanges.push_back(i1);
-      myNodeRanges.push_back(i2);
-      //
-      for(j=0; j<aNbPnts; ++j) {
-	aId=(vtkIdType)j;
-	myNodeIds.push_back(aId);
-	//
-	aMapIt=myNodeMapObjIDVtkID.find(aId);
-	if (aMapIt==myNodeMapObjIDVtkID.end()) {
-	  // if not found
-	  myNodeMapObjIDVtkID[aId]=iNodeCnt;
-	}
-	++iNodeCnt;
-      }
+  myNodeRanges.clear();
+  myCellRanges.clear();
+
+  vtkIdType aPntStartId = 0;
+  vtkIdType aCellStartId = 0;
+
+  for(vtkIdType aDataSetId = 0; aDataSetId < this->NumberOfInputs; ++aDataSetId){
+    vtkDataSet* aDataSet = (vtkDataSet *)(this->Inputs[aDataSetId]);
+    // Do mapping of the nodes
+    if(!myPoints.GetPointer()){
+      vtkIdType aNbPnts = aDataSet->GetNumberOfPoints();
+      myNodeRanges.push_back(aPntStartId + aNbPnts);
+      aPntStartId += aNbPnts;
     }
-    //
-    // Cells
-    aNbCells=pDS->GetNumberOfCells();
-    i1=myCellIds.size();
-    i2=i1+aNbCells-1;
-    myCellRanges.push_back(i1);
-    myCellRanges.push_back(i2);
-    for(j=0; j<aNbCells; ++j) {
-      aId=(vtkIdType)j;
-      myCellIds.push_back(aId);
-      //
-      aMapIt=myCellMapObjIDVtkID.find(aId);
-      if (aMapIt==myCellMapObjIDVtkID.end()) {
-	// if not found
-	myCellMapObjIDVtkID[aId]=iCellCnt;
-      }
-      ++iCellCnt;
-    }
+    // Do mapping of the cells
+    vtkIdType aNbCells = aDataSet->GetNumberOfCells();
+    myCellRanges.push_back(aCellStartId + aNbCells);
+    aCellStartId += aNbCells;
   }
 }
 
 //---------------------------------------------------------------
+namespace
+{
+  inline
+  vtkIdType
+  GetOutputID(vtkIdType theInputID,
+	      vtkIdType theInputDataSetID,
+	      const VTKViewer_AppendFilter::TVectorIds& theRanges)
+  {
+    theInputID = theInputDataSetID = -1;
+
+    vtkIdType aNbInputs = theRanges.size();
+    if(theInputDataSetID < 0 || theInputDataSetID >= aNbInputs)
+      return -1;
+    
+    vtkIdType aStartId = theRanges[theInputDataSetID];
+    return aStartId + theInputID;
+  }
+}
+
 vtkIdType
 VTKViewer_AppendFilter
-::GetPointOutputID(vtkIdType theInputID)
+::GetPointOutputID(vtkIdType theInputID,
+		   vtkIdType theInputDataSetID)
 {
-  if (myPoints.GetPointer()) {
+  if(myPoints.GetPointer())
     return theInputID;
-  }
-  //
-  int aVtkID=-1;
-  IteratorOfDataMapOfIntegerInteger aMapIt;
-  //
-  aMapIt=myNodeMapObjIDVtkID.find(theInputID);
-  if (aMapIt!=myNodeMapObjIDVtkID.end()) {
-    // found
-    PairOfDataMapOfIntegerInteger& aPair=(*aMapIt);
-    aVtkID=aPair.second;
-  }
-  return aVtkID;
+
+  return GetOutputID(theInputID,theInputDataSetID,myNodeRanges);
 }
 
 
 //---------------------------------------------------------------
 vtkIdType 
 VTKViewer_AppendFilter
-::GetCellOutputID(vtkIdType theInputID)
+::GetCellOutputID(vtkIdType theInputID,
+		   vtkIdType theInputDataSetID)
 {
-  int aVtkID=-1;
-  IteratorOfDataMapOfIntegerInteger aMapIt;
-  //
-  aMapIt=myCellMapObjIDVtkID.find(theInputID);
-  if (aMapIt!=myCellMapObjIDVtkID.end()) {
-    // found
-    PairOfDataMapOfIntegerInteger& aPair=(*aMapIt);
-    aVtkID=aPair.second;
-  }
-  return aVtkID;
+  if(myPoints.GetPointer())
+    return theInputID;
+
+  return GetOutputID(theInputID,theInputDataSetID,myCellRanges);
 }
 
 
 //---------------------------------------------------------------
-vtkIdType 
+namespace
+{
+  void
+  GetInputID(vtkIdType theOutputID,
+	     vtkIdType& theInputID,
+	     vtkIdType& theStartID,
+	     vtkIdType& theInputDataSetID,
+	     const VTKViewer_AppendFilter::TVectorIds& theRanges)
+  {
+    theInputID = theStartID = theInputDataSetID = -1;
+
+    if(theRanges.empty())
+      return;
+
+    const vtkIdType& aRangeEnd = theRanges.back();
+    if(theOutputID < 0 ||  theOutputID >= aRangeEnd)
+      return;
+
+    vtkIdType aStartId = 0;
+    vtkIdType aNbInputs = theRanges.size();
+    for(vtkIdType aDataSetId = 0; aDataSetId < aNbInputs; ++aDataSetId){
+      vtkIdType aRange = theRanges[aDataSetId];
+      if(aRange > theOutputID){
+	theInputID = theOutputID - aStartId;
+	theInputDataSetID = aDataSetId;
+	theStartID = aStartId;
+	break;
+      }
+      aStartId = aRange;
+    }
+  }
+}
+
+void 
 VTKViewer_AppendFilter
-::GetPointInputID(vtkIdType theOutputID, 
+::GetPointInputID(vtkIdType theOutputID,
+		  vtkIdType& theInputID,
+		  vtkIdType& theStartID,
 		  vtkIdType& theInputDataSetID)
 {
-  if (myPoints.GetPointer()) {
-    theInputDataSetID=0;
-    return theOutputID;
+  if(myPoints.GetPointer()) {
+    theStartID = theInputDataSetID = 0;
+    theInputID = theOutputID;
+    return;
   }
-  //
-  int aNb, aNbRanges, aRetID, i, i1, i2, j;
-  //
-  aRetID=-1;
-  theInputDataSetID=-1;
-  //
-  aNb=myNodeIds.size();
-  if (theOutputID<0 ||  theOutputID>=aNb) {
-    return aRetID;
-  }
-  //
-  aRetID=(int)myNodeIds[theOutputID];
-  //
-  aNbRanges=myNodeRanges.size()/2;
-  for (i=0; i<aNbRanges; ++i) {
-    j=2*i;
-    i1=myNodeRanges[j];
-    i2=myNodeRanges[j+1];
-    if (theOutputID>=i1 && theOutputID<=i2) {
-      theInputDataSetID=i;
-    }
-  }
-  //
-  return aRetID;
+
+  ::GetInputID(theOutputID,
+	       theInputID,
+	       theStartID,
+	       theInputDataSetID,
+	       myNodeRanges);
 }
 
 
 //---------------------------------------------------------------
-vtkIdType 
+void
 VTKViewer_AppendFilter
-::GetCellInputID(vtkIdType theOutputID, 
+::GetCellInputID(vtkIdType theOutputID,
+		 vtkIdType& theInputID,
+		 vtkIdType& theStartID,
 		 vtkIdType& theInputDataSetID)
 {
-  int aNb, aNbRanges, aRetID, i, i1, i2, j;
-  //
-  aRetID=-1;
-  theInputDataSetID=-1;
-  //
-  aNb=myCellIds.size();
-  if (theOutputID<0 ||  theOutputID>=aNb) {
-    return aRetID;
-  }
-  //
-  aRetID=(int)myCellIds[theOutputID];
-  //
-  aNbRanges=myCellRanges.size()/2;
-  for (i=0; i<aNbRanges; ++i) {
-    j=2*i;
-    i1=myCellRanges[j];
-    i2=myCellRanges[j+1];
-    if (theOutputID>=i1 && theOutputID<=i2) {
-      theInputDataSetID=i;
-    }
-  }
-  //
-  return aRetID;
+  ::GetInputID(theOutputID,
+	       theInputID,
+	       theStartID,
+	       theInputDataSetID,
+	       myCellRanges);
 }
 
 

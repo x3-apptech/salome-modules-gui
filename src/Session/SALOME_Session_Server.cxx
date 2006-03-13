@@ -63,8 +63,6 @@
 
 #include "SUIT_ExceptionHandler.h"
 
-extern "C" int HandleSignals( QApplication *theQApplication );
-
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
  * - create and run a thread for launch of all servers

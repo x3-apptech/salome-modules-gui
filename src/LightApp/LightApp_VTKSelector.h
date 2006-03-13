@@ -19,20 +19,20 @@
 #ifndef LIGHTAPP_VTKSELECTOR_H
 #define LIGHTAPP_VTKSELECTOR_H
 
-#include <vtkSmartPointer.h>
-
-#include <TColStd_IndexedMapOfInteger.hxx>
-
 #include "SUIT_Selector.h"
-
 #include "LightApp.h"
 #include "LightApp_DataOwner.h"
 
-#include "SVTK_Selection.h"
-#include "SALOME_InteractiveObject.hxx"
-
-class SALOME_Actor;
-class SVTK_ViewModelBase;
+#ifndef DISABLE_VTKVIEWER
+  #include <vtkSmartPointer.h>
+  #include <TColStd_IndexedMapOfInteger.hxx>
+  #include "SVTK_Selection.h"
+#ifndef DISABLE_SALOMEOBJECT
+  #include "SALOME_InteractiveObject.hxx"
+#endif
+  class SALOME_Actor;
+  class SVTK_ViewModelBase;
+#endif
 
 /*!
   Provide salome vtk data owner list.
@@ -40,10 +40,13 @@ class SVTK_ViewModelBase;
 class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 {
  public:
+#ifndef DISABLE_VTKVIEWER
+   #ifndef DISABLE_SALOMEOBJECT
     LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
                             const TColStd_IndexedMapOfInteger& theIds,
                             Selection_Mode theMode = ActorSelection,
                             SALOME_Actor* theActor = NULL);
+   #endif
     virtual ~LightApp_SVTKDataOwner();
 
     /*!Gets dataowners ids list.*/
@@ -64,6 +67,9 @@ class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
     TColStd_IndexedMapOfInteger myIds;
     Selection_Mode mySelectionMode;
     vtkSmartPointer<SALOME_Actor> myActor;
+#else
+  LightApp_SVTKDataOwner( const QString& );
+#endif
 };
 
 
@@ -75,22 +81,29 @@ class LIGHTAPP_EXPORT LightApp_VTKSelector : public SUIT_Selector
   Q_OBJECT;
 
 public:
+#ifndef DISABLE_VTKVIEWER
   LightApp_VTKSelector( SVTK_ViewModelBase*, SUIT_SelectionMgr* );
   virtual ~LightApp_VTKSelector();
 
   SVTK_ViewModelBase* viewer() const;
 
   virtual QString type() const;
+#else
+  LightApp_VTKSelector( SUIT_SelectionMgr* );
+#endif
 
 private slots:
   void              onSelectionChanged();
 
+#ifndef DISABLE_VTKVIEWER
 protected:
   virtual void      getSelection( SUIT_DataOwnerPtrList& ) const;
   virtual void      setSelection( const SUIT_DataOwnerPtrList& );
 
 private:
   SVTK_ViewModelBase* myViewer;
+
+#endif
 };
 
 #endif

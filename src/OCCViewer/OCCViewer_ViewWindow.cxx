@@ -851,37 +851,7 @@ void OCCViewer_ViewWindow::onClipping( bool on )
 //****************************************************************
 void OCCViewer_ViewWindow::onMemorizeView()
 {
-  double centerX, centerY, projX, projY, projZ, twist;
-  double atX, atY, atZ, eyeX, eyeY, eyeZ;
-
-  Handle(V3d_View) aView3d = myViewPort->getView();
-
-  aView3d->Center( centerX, centerY );
-  aView3d->Proj( projX, projY, projZ );
-  aView3d->At( atX, atY, atZ );
-  aView3d->Eye( eyeX, eyeY, eyeZ );
-  twist = aView3d->Twist();
-
-  viewAspect params;
-  QString aName = QTime::currentTime().toString() + QString::fromLatin1( " h:m:s" );
-
-  params.scale    = aView3d->Scale();
-  params.centerX  = centerX;
-  params.centerY  = centerY;
-  params.projX    = projX;
-  params.projY    = projY;
-  params.projZ    = projZ;
-  params.twist    = twist;
-  params.atX      = atX;
-  params.atY      = atY;
-  params.atZ      = atZ;
-  params.eyeX     = eyeX;
-  params.eyeY     = eyeY;
-  params.eyeZ     = eyeZ;
-  params.name	  = aName;
-
-  myModel->appendViewAspect( params );
-
+  myModel->appendViewAspect( getViewParams() );
 }
 
 //****************************************************************
@@ -904,11 +874,11 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem )
 	Standard_Boolean prev = aView3d->SetImmediateUpdate( Standard_False );
 	aView3d->SetScale( anItem.scale );
 	aView3d->SetCenter( anItem.centerX, anItem.centerY );
-	aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
 	aView3d->SetTwist( anItem.twist );
 	aView3d->SetAt( anItem.atX, anItem.atY, anItem.atZ );
 	aView3d->SetImmediateUpdate( prev );
 	aView3d->SetEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
+	aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
 		
 	myRestoreFlag = 0;
 }
@@ -979,4 +949,78 @@ void  OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const dou
   Handle(V3d_View) v = myViewPort->getView();
   v->Update();
   v->Redraw();
+}
+
+/*! The method returns the visual parameters of this view as a viewAspect object
+ */
+viewAspect OCCViewer_ViewWindow::getViewParams() const
+{
+  double centerX, centerY, projX, projY, projZ, twist;
+  double atX, atY, atZ, eyeX, eyeY, eyeZ;
+
+  Handle(V3d_View) aView3d = myViewPort->getView();
+
+  aView3d->Center( centerX, centerY );
+  aView3d->Proj( projX, projY, projZ );
+  aView3d->At( atX, atY, atZ );
+  aView3d->Eye( eyeX, eyeY, eyeZ );
+  twist = aView3d->Twist();
+
+  QString aName = QTime::currentTime().toString() + QString::fromLatin1( " h:m:s" );
+
+  viewAspect params;
+  params.scale    = aView3d->Scale();
+  params.centerX  = centerX;
+  params.centerY  = centerY;
+  params.projX    = projX;
+  params.projY    = projY;
+  params.projZ    = projZ;
+  params.twist    = twist;
+  params.atX      = atX;
+  params.atY      = atY;
+  params.atZ      = atZ;
+  params.eyeX     = eyeX;
+  params.eyeY     = eyeY;
+  params.eyeZ     = eyeZ;
+  params.name	  = aName;
+
+  return params;
+}
+
+
+/*! The method returns the visual parameters of this view as a formated string
+ */
+QString OCCViewer_ViewWindow::getVisualParameters()
+{
+  viewAspect params = getViewParams();
+  QString retStr;
+  retStr.sprintf( "%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e", params.scale,
+		  params.centerX, params.centerY, params.projX, params.projY, params.projZ, params.twist,
+		  params.atX, params.atY, params.atZ, params.eyeX, params.eyeY, params.eyeZ );
+  return retStr;
+}
+
+/* The method restors visual parameters of this view from a formated string
+ */
+void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
+{
+  QStringList paramsLst = QStringList::split( '*', parameters, true );
+  if ( paramsLst.size() == 13 ) {
+    viewAspect params;
+    params.scale    = paramsLst[0].toDouble();
+    params.centerX  = paramsLst[1].toDouble();
+    params.centerY  = paramsLst[2].toDouble();
+    params.projX    = paramsLst[3].toDouble();
+    params.projY    = paramsLst[4].toDouble();
+    params.projZ    = paramsLst[5].toDouble();
+    params.twist    = paramsLst[6].toDouble();
+    params.atX      = paramsLst[7].toDouble();
+    params.atY      = paramsLst[8].toDouble();
+    params.atZ      = paramsLst[9].toDouble();
+    params.eyeX     = paramsLst[10].toDouble();
+    params.eyeY     = paramsLst[11].toDouble();
+    params.eyeZ     = paramsLst[12].toDouble();
+
+    performRestoring( params );
+  }
 }

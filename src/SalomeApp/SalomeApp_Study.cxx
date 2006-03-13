@@ -23,6 +23,7 @@
 #include "SalomeApp_DataObject.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Engine_i.hxx"
+#include "SalomeApp_VisualState.h"
 
 #include "LightApp_RootObject.h"
 
@@ -31,15 +32,24 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <qptrlist.h>
+#include <qapplication.h>
+#include <qdict.h>
 
 #include "utilities.h"
-#include "string.h"
-#include "vector.h"
+#include <iostream.h>
+#include <string>
+#include <vector>
+
+#include <SUIT_Session.h>
 
 #include "SALOMEDS_Tool.hxx"
 
+#include "SALOMEDS_IParameters.hxx"
+
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Exception)
+
+using namespace std;
 
 /*!
   Constructor.
@@ -130,6 +140,14 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
   
   emit opened( this );
   study->IsSaved(true);
+
+  bool restore = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
+  if ( restore ) {
+    std::vector<int> savePoints = getSavePoints();
+    if ( savePoints.size() > 0 )
+      SalomeApp_VisualState( (SalomeApp_Application*)application() ).restoreState( savePoints[savePoints.size()-1] );
+  }
+
   return res;
 }
 
@@ -167,6 +185,13 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
   bool res = CAM_Study::openDocument( theStudyName );
   emit opened( this );
 
+  bool restore = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
+  if ( restore ) {
+    std::vector<int> savePoints = getSavePoints();
+    if ( savePoints.size() > 0 )
+      SalomeApp_VisualState( (SalomeApp_Application*)application() ).restoreState( savePoints[savePoints.size()-1] );
+  }
+
   //SRN: BugID IPAL9021: End
 
   return res;
@@ -178,6 +203,10 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 //=======================================================================
 bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 {
+  bool store = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
+  if ( store )
+    SalomeApp_VisualState( (SalomeApp_Application*)application() ).storeState();
+  
   ModelList list; dataModels( list );
 
   SalomeApp_DataModel* aModel = (SalomeApp_DataModel*)list.first();
@@ -214,6 +243,10 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 //=======================================================================
 bool SalomeApp_Study::saveDocument()
 {
+  bool store = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
+  if ( store )
+    SalomeApp_VisualState( (SalomeApp_Application*)application() ).storeState();
+
   ModelList list; dataModels( list );
 
   SalomeApp_DataModel* aModel = (SalomeApp_DataModel*)list.first();
@@ -221,7 +254,7 @@ bool SalomeApp_Study::saveDocument()
   for ( ; aModel; aModel = (SalomeApp_DataModel*)list.next() ) {
     listOfFiles.clear();
     aModel->save(listOfFiles);
-    if ( !listOfFiles.isEmpty() )
+    if ( !listOfFiles.isEmpty() ) 
       saveModuleData(aModel->module()->name(), listOfFiles);
   }
 
@@ -628,4 +661,90 @@ void SalomeApp_Study::components( QStringList& comps ) const
       continue; // skip the magic "Interface Applicative" component
     comps.append( aComponent->ComponentDataType().c_str() );
   }
+}
+
+//================================================================
+// Function : getSavePoints
+/*! Purpose : returns a list of saved points' IDs
+*/
+//================================================================
+std::vector<int> SalomeApp_Study::getSavePoints()
+{
+  std::vector<int> v;
+
+  _PTR(SObject) so = studyDS()->FindComponent("Interface Applicative");
+  if(!so) return v;
+
+  _PTR(StudyBuilder) builder = studyDS()->NewBuilder();
+  _PTR(ChildIterator) anIter ( studyDS()->NewChildIterator( so ) );
+  for(; anIter->More(); anIter->Next())
+  {
+    _PTR(SObject) val( anIter->Value() );
+    _PTR(GenericAttribute) genAttr;
+    if(builder->FindAttribute(val, genAttr, "AttributeParameter")) v.push_back(val->Tag());
+  }
+
+  return v;
+}
+
+//================================================================
+// Function :removeSavePoint
+/*! Purpose : remove a given save point
+*/
+//================================================================
+void SalomeApp_Study::removeSavePoint(int savePoint)
+{
+  if(savePoint <= 0) return;
+ _PTR(AttributeParameter) AP = studyDS()->GetCommonParameters(getVisualComponentName(), savePoint);
+  _PTR(SObject) so = AP->GetSObject();
+  _PTR(StudyBuilder) builder = studyDS()->NewBuilder();
+  builder->RemoveObjectWithChildren(so);
+}
+
+//================================================================
+// Function : getNameOfSavePoint
+/*! Purpose : returns a name of save point
+*/
+//================================================================
+QString SalomeApp_Study::getNameOfSavePoint(int savePoint)
+{
+  _PTR(AttributeParameter) AP = studyDS()->GetCommonParameters(getVisualComponentName(), savePoint);
+  SALOMEDS_IParameters ip(AP);
+  return ip.getProperty("AP_SAVEPOINT_NAME");
+}
+
+//================================================================
+// Function : setNameOfSavePoint
+/*! Purpose : sets a name of save point
+*/
+//================================================================
+void SalomeApp_Study::setNameOfSavePoint(int savePoint, const QString& nameOfSavePoint)
+{
+  _PTR(AttributeParameter) AP = studyDS()->GetCommonParameters(getVisualComponentName(), savePoint);
+  SALOMEDS_IParameters ip(AP);
+  ip.setProperty("AP_SAVEPOINT_NAME", nameOfSavePoint.latin1());
+}
+
+//================================================================
+// Function : getVisualComponentName
+/*! Purpose : returns a name of the component where visual
+ *             parameters are stored
+*/
+//================================================================
+std::string SalomeApp_Study::getVisualComponentName()
+{
+  return "Interface Applicative";
+}
+
+//================================================================
+// Function : updateModelRoot
+/*! Purpose : slot called on change of a root of a data model. redefined from CAM_Study*/
+//================================================================
+void SalomeApp_Study::updateModelRoot( const CAM_DataModel* dm )
+{
+  LightApp_Study::updateModelRoot( dm );
+
+  // calling updateSavePointDataObjects in order to set correct order of "Gui states" object
+  // it must always be the last one.
+  ((SalomeApp_Application*)application())->updateSavePointDataObjects( this );
 }

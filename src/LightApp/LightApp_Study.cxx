@@ -23,8 +23,7 @@
 #include "LightApp_DataModel.h"
 #include "LightApp_DataObject.h"
 #include "LightApp_RootObject.h"
-// HDF persistence not yet completed
-//#include "LightApp_HDFDriver.h"
+#include "LightApp_HDFDriver.h"
 
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_DataObjectIterator.h"
@@ -51,11 +50,11 @@
 LightApp_Study::LightApp_Study( SUIT_Application* app )
 : CAM_Study( app )
 {
-  // HDF persistence not yet completed
-  //myDriver = new LightApp_HDFDriver();
-  myDriver = new LightApp_Driver();
+  // HDF persistence
+  myDriver = new LightApp_HDFDriver();
+  //myDriver = new LightApp_Driver();
 }
- 
+
 /*!
   Destructor.
 */
@@ -68,6 +67,8 @@ LightApp_Study::~LightApp_Study()
 */
 void LightApp_Study::createDocument()
 {
+  setStudyName( QString( "Study%1" ).arg( LightApp_Application::studyId() ) );
+
   // create myRoot
   setRoot( new LightApp_RootObject( this ) );
 

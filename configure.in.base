@@ -26,6 +26,41 @@ AC_SUBST(PACKAGE)
 VERSION=0.0.1
 AC_SUBST(VERSION)
 
+########################################################################
+# Check --disable-corba option
+
+GUI_DISABLE_CORBA="no"
+DISABLE_PYCONSOLE="no"
+DISABLE_GLVIEWER="no"
+DISABLE_PLOT2DVIEWER="no"
+DISABLE_SUPERVGRAPHVIEWER="no"
+DISABLE_OCCVIEWER="no"
+DISABLE_VTKVIEWER="no"
+DISABLE_SALOMEOBJECT="no"
+
+for option
+do
+  case $option in
+      -disable-corba=yes | --disable-corba=yes | -disable-corba | --disable-corba)
+          GUI_DISABLE_CORBA="yes";;
+      -disable-pyConsole=yes | --disable-pyConsole=yes | -disable-pyConsole | --disable-pyConsole)
+          DISABLE_PYCONSOLE="yes";;
+      -disable-glViewer=yes | --disable-glViewer=yes | -disable-glViewer | --disable-glViewer)
+          DISABLE_GLVIEWER="yes";;
+      -disable-plot2dViewer=yes | --disable-plot2dViewer=yes | -disable-plot2dViewer | --disable-plot2dViewer)
+          DISABLE_PLOT2DVIEWER="yes";;
+      -disable-supervGraphViewer=yes | --disable-supervGraphViewer=yes | \
+      -disable-supervGraphViewer | --disable-supervGraphViewer)
+          DISABLE_SUPERVGRAPHVIEWER="yes";;
+      -disable-occViewer=yes | --disable-occViewer=yes | -disable-occViewer | --disable-occViewer)
+          DISABLE_OCCVIEWER="yes";;
+      -disable-vtkViewer=yes | --disable-vtkViewer=yes | -disable-vtkViewer | --disable-vtkViewer)
+          DISABLE_VTKVIEWER="yes";;
+      -disable-salomeObject=yes | --disable-salomeObject=yes | -disable-salomeObject | --disable-salomeObject)
+          DISABLE_SALOMEOBJECT="yes";;
+  esac
+done
+
 dnl
 dnl Initialize source and build root directories
 dnl
@@ -153,11 +188,23 @@ dnl CHECK_JAVA
 
 echo
 echo ---------------------------------------------
+echo Testing Disable Corba
+echo ---------------------------------------------
+echo
+
+CHECK_DISABLE_CORBA
+echo "GUI_DISABLE_CORBA = "$GUI_DISABLE_CORBA
+
+if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
+
+echo
+echo ---------------------------------------------
 echo testing swig
 echo ---------------------------------------------
 echo
 
 CHECK_SWIG
+fi
 
 echo
 echo ---------------------------------------------
@@ -167,6 +214,7 @@ echo
 
 ENABLE_PTHREADS
 
+if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
 echo
 echo ---------------------------------------------
 echo testing omniORB
@@ -190,12 +238,20 @@ echo ---------------------------------------------
 echo
 
 DEFAULT_ORB=omniORB
+
+echo
+echo ---------------------------------------------
+echo testing Corba
+echo ---------------------------------------------
+echo
+
 CHECK_CORBA
 
 AC_SUBST_FILE(CORBA)
 corba=make_$ORB
 CORBA=adm_local/unix/$corba
 
+fi
 echo
 echo ---------------------------------------------
 echo testing openGL
@@ -278,19 +334,122 @@ CHECK_QWT
 
 echo
 echo ---------------------------------------------
+echo Testing PyConsole
+echo ---------------------------------------------
+echo
+
+CHECK_PYCONSOLE
+echo "DISABLE_PYCONSOLE = "$DISABLE_PYCONSOLE
+
+echo
+echo ---------------------------------------------
+echo Testing GlViewer
+echo ---------------------------------------------
+echo
+
+CHECK_GLVIEWER
+echo "DISABLE_GLVIEWER = "$DISABLE_GLVIEWER
+
+echo
+echo ---------------------------------------------
+echo Testing Plot2dViewer
+echo ---------------------------------------------
+echo
+
+CHECK_PLOT2DVIEWER
+echo "DISABLE_PLOT2DVIEWER = "$DISABLE_PLOT2DVIEWER
+
+echo
+echo ---------------------------------------------
+echo Testing SupervGraphViewer
+echo ---------------------------------------------
+echo
+
+CHECK_SUPERVGRAPHVIEWER
+echo "DISABLE_SUPERVGRAPHVIEWER = "$DISABLE_SUPERVGRAPHVIEWER
+
+echo
+echo ---------------------------------------------
+echo Testing OCCViewer
+echo ---------------------------------------------
+echo
+
+CHECK_OCCVIEWER
+echo "DISABLE_OCCVIEWER = "$DISABLE_OCCVIEWER
+
+echo
+echo ---------------------------------------------
+echo Testing VTKViewer
+echo ---------------------------------------------
+echo
+
+CHECK_VTKVIEWER
+echo "DISABLE_VTKVIEWER = "$DISABLE_VTKVIEWER
+
+echo
+echo ---------------------------------------------
+echo Testing SalomeObject
+echo ---------------------------------------------
+echo
+
+CHECK_SALOMEOBJECT
+echo "DISABLE_SALOMEOBJECT = "$DISABLE_SALOMEOBJECT
+
+if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
+  if test "x${DISABLE_PYCONSOLE}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable PyConsole !"
+    exit
+  fi
+  if test "x${DISABLE_GLVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable GlViewer !"
+    exit
+  fi
+  if test "x${DISABLE_PLOT2DVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable Plot2dViewer !"
+    exit
+  fi
+  if test "x${DISABLE_SUPERVGRAPHVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable SupervGraphViewer !"
+    exit
+  fi
+  if test "x${DISABLE_OCCVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable OCCViewer !"
+    exit
+  fi
+  if test "x${DISABLE_VTKVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable VTKViewer !"
+    exit
+  fi
+  if test "x${DISABLE_SALOMEOBJECT}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable SalomeObject !"
+    exit
+  fi
+fi
+
+echo
+echo ---------------------------------------------
 echo Testing html generators
 echo ---------------------------------------------
 echo 
 
 CHECK_HTML_GENERATORS
 
+if test "$GUI_DISABLE_CORBA" == "no"; then 
+  echo
+  echo ---------------------------------------------
+  echo Testing Kernel
+  echo ---------------------------------------------
+  echo
+  CHECK_KERNEL
+fi
+
 echo
 echo ---------------------------------------------
-echo Testing Kernel
+echo Testing CPPUNIT only required for unit testing
 echo ---------------------------------------------
 echo
 
-CHECK_KERNEL
+CHECK_CPPUNIT
 
 echo
 echo ---------------------------------------------
@@ -298,8 +457,18 @@ echo Summary
 echo ---------------------------------------------
 echo
 
-echo Configure
+if test "$GUI_DISABLE_CORBA" == "yes"; then 
+   echo "Configure (without Corba)"
+else
+   echo Configure
+fi
+
+
+if test "$GUI_DISABLE_CORBA" != "yes"; then 
 variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok msg2qm_ok vtk_ok hdf5_ok omniORB_ok boost_ok occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok"
+else
+variables="cc_ok lex_yacc_ok python_ok threads_ok OpenGL_ok qt_ok msg2qm_ok vtk_ok hdf5_ok boost_ok occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok"
+fi
 
 for var in $variables
 do
@@ -307,14 +476,27 @@ do
    eval echo \$$var
 done
 
+echo "---Optional:"
+variables="cppunit_ok"
+ 
+for var in $variables
+do
+   eval toto=\$$var
+   if test x$toto != "x"; then
+     printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
+     eval echo \$$var
+   fi
+done
+
+if test "$GUI_DISABLE_CORBA" != "yes"; then 
 echo
 echo "Default ORB   : $DEFAULT_ORB"
 echo
-
+fi
 dnl generals files which could be included in every makefile
 
 AC_SUBST_FILE(COMMENCE) COMMENCE=adm_local/unix/make_commence
-AC_SUBST_FILE(CONCLUDE) CONCLUDE=salome_adm/unix/make_conclude
+AC_SUBST_FILE(CONCLUDE) CONCLUDE=adm_local/unix/make_conclude
 AC_SUBST_FILE(MODULE) MODULE=salome_adm/unix/make_module
 
 dnl les dependences
@@ -329,7 +511,13 @@ else
 fi
 
 # make other build directories
-for rep in salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources idl
+if test "$GUI_DISABLE_CORBA" == "yes"; then 
+dir_variables="salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources idl"
+else
+dir_variables="salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources"
+fi
+
+for rep in $dir_variables
 do
 #   if test ! -d $rep ; then
 #      eval mkdir $rep

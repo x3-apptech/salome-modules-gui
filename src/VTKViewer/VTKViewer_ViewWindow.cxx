@@ -559,3 +559,54 @@ QImage VTKViewer_ViewWindow::dumpView()
   QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );
   return px.convertToImage();
 }
+
+/*! The method returns the visual parameters of this view as a formated string
+ */
+QString VTKViewer_ViewWindow::getVisualParameters()
+{
+  double pos[3], focalPnt[3], viewUp[3], parScale, scale[3];
+
+  vtkCamera* camera = myRenderer->GetActiveCamera();
+  camera->GetPosition( pos );
+  camera->GetFocalPoint( focalPnt );
+  camera->GetViewUp( viewUp );
+  parScale = camera->GetParallelScale();
+  GetScale( scale );
+
+  QString retStr;
+  retStr.sprintf( "%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e", 
+		  pos[0], pos[1], pos[2], focalPnt[0], focalPnt[1], focalPnt[2], viewUp[0], viewUp[1], 
+		  viewUp[2], parScale, scale[0], scale[1], scale[2] );
+  return retStr;
+}
+
+/* The method restors visual parameters of this view from a formated string
+ */
+void VTKViewer_ViewWindow::setVisualParameters( const QString& parameters )
+{
+  QStringList paramsLst = QStringList::split( '*', parameters, true );
+  if ( paramsLst.size() == 13 ) {
+    double pos[3], focalPnt[3], viewUp[3], parScale, scale[3];
+    pos[0] = paramsLst[0].toDouble();
+    pos[1] = paramsLst[1].toDouble();
+    pos[2] = paramsLst[2].toDouble();
+    focalPnt[0] = paramsLst[3].toDouble();
+    focalPnt[1] = paramsLst[4].toDouble();
+    focalPnt[2] = paramsLst[5].toDouble();
+    viewUp[0] = paramsLst[6].toDouble();
+    viewUp[1] = paramsLst[7].toDouble();
+    viewUp[2] = paramsLst[8].toDouble();
+    parScale = paramsLst[9].toDouble();
+    scale[0] = paramsLst[10].toDouble();
+    scale[1] = paramsLst[11].toDouble();
+    scale[2] = paramsLst[12].toDouble();
+
+    vtkCamera* camera = myRenderer->GetActiveCamera();
+    camera->SetPosition( pos );
+    camera->SetFocalPoint( focalPnt );
+    camera->SetViewUp( viewUp );
+    camera->SetParallelScale( parScale );
+    myTransform->SetMatrixScale( scale[0], scale[1], scale[2] );
+    myRWInteractor->Render();
+  }
+}

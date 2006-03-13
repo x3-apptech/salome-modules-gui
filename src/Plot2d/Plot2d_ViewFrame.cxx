@@ -1918,3 +1918,43 @@ bool Plot2d_ViewFrame::print( const QString& file, const QString& format ) const
   return res;
 #endif
 }
+
+QString Plot2d_ViewFrame::getVisualParameters()
+{
+  double xmin, xmax, ymin, ymax, y2min, y2max;
+  getFitRanges( xmin, xmax, ymin, ymax, y2min, y2max );
+  QString retStr;
+  retStr.sprintf( "%d*%d*%d*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e", myXMode,
+		  myYMode, mySecondY, xmin, xmax, ymin, ymax, y2min, y2max );
+  return retStr; 
+}
+
+void Plot2d_ViewFrame::setVisualParameters( const QString& parameters )
+{
+  QStringList paramsLst = QStringList::split( '*', parameters, true );
+  if ( paramsLst.size() == 9 ) {
+    double xmin, xmax, ymin, ymax, y2min, y2max;
+    myXMode = paramsLst[0].toInt();
+    myYMode = paramsLst[1].toInt();
+    mySecondY = (bool)paramsLst[2].toInt();
+    xmin =  paramsLst[3].toDouble();
+    xmax =  paramsLst[4].toDouble();
+    ymin =  paramsLst[5].toDouble();
+    ymax =  paramsLst[6].toDouble();
+    y2min = paramsLst[7].toDouble();
+    y2max = paramsLst[8].toDouble();
+
+    if (mySecondY)
+      setTitle( myY2TitleEnabled, myY2Title, Y2Title, false );
+    setHorScaleMode( myXMode, /*update=*/false );
+    setVerScaleMode( myYMode, /*update=*/false );
+    
+    if (mySecondY) {
+      QwtDiMap yMap2 = myPlot->canvasMap( QwtPlot::yRight );
+      myYDistance2 = yMap2.d2() - yMap2.d1();
+    }
+
+    fitData( 0, xmin, xmax, ymin, ymax, y2min, y2max );
+    fitData( 0, xmin, xmax, ymin, ymax, y2min, y2max );
+  }  
+}

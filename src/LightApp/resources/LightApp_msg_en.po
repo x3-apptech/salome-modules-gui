@@ -322,3 +322,9 @@ msgstr "&Cancel"
 
 msgid "LightApp_ModuleDlg::ActivateComponent_DESCRIPTION"
 msgstr "Create, open or load study."
+
+msgid "LightApp_NameDlg::TLT_RENAME"
+msgstr "Rename"
+
+msgid "LightApp_NameDlg::NAME_LBL"
+msgstr "Name: "

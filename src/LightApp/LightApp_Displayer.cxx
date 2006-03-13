@@ -23,8 +23,6 @@
 
 #include <CAM_Study.h>
 
-#include <SALOME_InteractiveObject.hxx>
-
 #include <SUIT_Session.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
@@ -32,6 +30,9 @@
 #include <SUIT_ViewWindow.h>
 
 #include <qstring.h>
+#ifndef DISABLE_SALOMEOBJECT
+  #include "SALOME_InteractiveObject.hxx"
+#endif
 
 LightApp_Displayer::LightApp_Displayer()
 {
@@ -122,14 +123,16 @@ void LightApp_Displayer::EraseAll( const bool forced, const bool updateViewer, S
 bool LightApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theViewFrame ) const
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
+  bool res = false;
   if( vf )
   {
+#ifndef DISABLE_SALOMEOBJECT
     Handle( SALOME_InteractiveObject ) temp = new SALOME_InteractiveObject();
     temp->setEntry( entry.latin1() );
-    return vf->isVisible( temp );
+    res = vf->isVisible( temp );
+#endif
   }
-  else
-    return false;
+  return res;
 }
 
 void LightApp_Displayer::UpdateViewer() const

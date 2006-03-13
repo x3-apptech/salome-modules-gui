@@ -25,13 +25,15 @@
 
 #include <SUIT_Session.h>
 
-#include <SALOME_ListIO.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
+#ifndef DISABLE_SALOMEOBJECT
+  #include <SALOME_ListIO.hxx>
+  #include <SALOME_ListIteratorOfListIO.hxx>
 
-// Open CASCADE Include
-#include <TColStd_MapOfInteger.hxx>
-#include <TColStd_MapIteratorOfMapOfInteger.hxx>
-#include <TColStd_IndexedMapOfInteger.hxx>
+  // Open CASCADE Include
+  #include <TColStd_MapOfInteger.hxx>
+  #include <TColStd_MapIteratorOfMapOfInteger.hxx>
+  #include <TColStd_IndexedMapOfInteger.hxx>
+#endif
 
 /*!
   Constructor.
@@ -57,6 +59,7 @@ LightApp_Application* LightApp_SelectionMgr::application() const
   return myApp;
 }
 
+#ifndef DISABLE_SALOMEOBJECT
 /*!
   Get all selected objects from selection manager
 */
@@ -117,6 +120,37 @@ void LightApp_SelectionMgr::setSelectedObjects( const SALOME_ListIO& lst, const 
   setSelected( owners, append );
 }
 
+#else
+/*!
+  Get all selected objects from selection manager
+*/
+void LightApp_SelectionMgr::selectedObjects( QStringList& theList, const QString& theType,
+                                             const bool convertReferences ) const
+{
+  theList.clear();
+
+  SUIT_DataOwnerPtrList aList;
+  selected( aList, theType );
+
+  QString entry;
+  for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
+  {
+    const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
+    if( !owner )
+      continue;
+
+    LightApp_Study* study = dynamic_cast<LightApp_Study*>( application()->activeStudy() );
+    if ( !study )
+      return;
+
+    entry = owner->entry();
+    if( !theList.contains( entry ) )
+      theList.append( entry );
+  }
+}
+
+#endif
+
 /*!
   Emit current selection changed.
 */
@@ -126,6 +160,8 @@ void LightApp_SelectionMgr::selectionChanged( SUIT_Selector* theSel )
 
   emit currentSelectionChanged();
 }
+
+#ifndef DISABLE_SALOMEOBJECT
 
 /*!
   get map of indexes for the given SALOME_InteractiveObject
@@ -287,3 +323,5 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
     }
   }
 }
+
+#endif

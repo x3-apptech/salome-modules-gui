@@ -20,8 +20,9 @@
 #include "LightApp_DataOwner.h"
 #include "LightApp_OCCSelector.h"
 
-#include <SALOME_InteractiveObject.hxx>
-
+#ifndef DISABLE_SALOMEOBJECT
+  #include <SALOME_InteractiveObject.hxx>
+#endif
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
@@ -68,9 +69,13 @@ void LightApp_OCCSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
   for ( AIS_ListIteratorOfListOfInteractive anIt( aSelList ); anIt.More(); anIt.Next() )
     if ( !anIt.Value().IsNull() )
     {
+#ifndef DISABLE_SALOMEOBJECT
       Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast(anIt.Value()->GetOwner());
       if( !anObj.IsNull() )
         aList.append( SUIT_DataOwnerPtr( new LightApp_DataOwner( anObj ) ) );
+#else
+      aList.append( SUIT_DataOwnerPtr( new LightApp_DataOwner( entry( anIt.Value() ) ) ) );
+#endif
     }
 }
 
@@ -112,10 +117,13 @@ QString LightApp_OCCSelector::entry( const Handle(AIS_InteractiveObject)& anAIS 
   if ( anAIS.IsNull() || !anAIS->HasOwner() )
     return QString::null;
 
-  Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast(anAIS->GetOwner());
-
   QString res;
+
+#ifndef DISABLE_SALOMEOBJECT
+  Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast(anAIS->GetOwner());
   if ( !anObj.IsNull() )
     res = QString( anObj->getEntry() );
+#endif
+
   return res;
 }

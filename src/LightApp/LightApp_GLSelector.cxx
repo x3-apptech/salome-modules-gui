@@ -20,8 +20,6 @@
 
 #include "LightApp_DataOwner.h"
 
-#include <SALOME_GLOwner.h>
-
 #include <GLViewer_Context.h>
 
 /*!Constructor. Initialize by GLViewer_Viewer2d and SUIT_SelectionMgr.*/
@@ -66,7 +64,7 @@ void LightApp_GLSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
     GLViewer_Object* obj = cont->SelectedObject();
     if ( obj )
     {
-      SALOME_GLOwner* owner = dynamic_cast< SALOME_GLOwner* >( obj->owner() );
+      LightApp_GLOwner* owner = dynamic_cast< LightApp_GLOwner* >( obj->owner() );
       if( owner )
         aList.append( SUIT_DataOwnerPtr( new LightApp_DataOwner( owner->entry() ) ) );
     }
@@ -90,7 +88,7 @@ void LightApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
     GLViewer_Object* obj = *it;
     if ( obj && obj->getVisible() )
     {
-      SALOME_GLOwner* owner = dynamic_cast< SALOME_GLOwner* >( obj->owner() );
+      LightApp_GLOwner* owner = dynamic_cast< LightApp_GLOwner* >( obj->owner() );
       if ( owner )
 	aDisplayed.insert( owner->entry(), obj );
     }
@@ -114,4 +112,25 @@ void LightApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
 
   if ( Nb > 0 )
     myViewer->updateAll();
+}
+
+
+LightApp_GLOwner::LightApp_GLOwner( const char* entry )
+: GLViewer_Owner()
+{
+  setEntry( entry );
+}
+
+LightApp_GLOwner::~LightApp_GLOwner()
+{
+}
+
+const char* LightApp_GLOwner::entry() const
+{
+  return myEntry.c_str();
+}
+
+void LightApp_GLOwner::setEntry( const char* entry )
+{
+  myEntry = entry;
 }

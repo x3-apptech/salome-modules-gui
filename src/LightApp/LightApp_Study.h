@@ -86,6 +86,8 @@ signals:
 
 private:
   LightApp_Driver*    myDriver;
+
+  friend class LightApp_Application;
 };
 
 #endif 

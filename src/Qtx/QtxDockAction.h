@@ -121,6 +121,8 @@ private:
 
   void         updateMenus();
 
+  bool         dockMainWindow( QMainWindow*, QObject* ) const;
+
 private:
   enum { AutoAdd = QEvent::User, LoadArea };
 

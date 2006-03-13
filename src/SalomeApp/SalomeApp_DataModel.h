@@ -27,10 +27,9 @@ class SALOMEAPP_EXPORT SalomeApp_DataModel : public LightApp_DataModel
 
 public:
   static SUIT_DataObject*             synchronize( const _PTR( SComponent )&, SalomeApp_Study* );
-  static SUIT_DataObject*             synchronize( const _PTR( SObject )&, SUIT_DataObject*, SalomeApp_Study* );
 
-                                      SalomeApp_DataModel ( CAM_Module* theModule );
-  virtual                             ~SalomeApp_DataModel();
+  SalomeApp_DataModel ( CAM_Module* theModule );
+  virtual ~SalomeApp_DataModel();
 
   virtual bool                        open( const QString&, CAM_Study*, QStringList );
   virtual bool                        create( CAM_Study* );

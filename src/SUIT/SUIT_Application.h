@@ -146,7 +146,7 @@ protected:
   static QAction*       separator();
   QAction*              action( const int ) const;
   int                   actionId( const QAction* ) const;
-  void                  registerAction( const int, QAction* );
+  int                   registerAction( const int, QAction* );
   QAction*              createAction( const int, const QString&, const QIconSet&, const QString&,
                                       const QString&, const int, QObject* = 0,
                                       const bool = false, QObject* = 0, const char* = 0 );
@@ -157,6 +157,7 @@ protected slots:
 private:
   SUIT_Study*           myStudy;
   SUIT_Desktop*         myDesktop;
+  QMap<int, QAction*>   myActionMap;
 
   QLabel*               myStatusLabel;
 };

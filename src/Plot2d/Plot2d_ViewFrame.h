@@ -118,6 +118,9 @@ public:
 
   virtual bool print( const QString& file, const QString& format ) const;
 
+  QString getVisualParameters();
+  void    setVisualParameters( const QString& parameters );
+
 protected:
   int     testOperation( const QMouseEvent& );
   void    readPreferences();

@@ -21,60 +21,116 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "SUIT_Accel.h"
-#include "SUIT_Desktop.h"
-#include "SUIT_ViewManager.h"
 #include "SUIT_ViewWindow.h"
+#include "SUIT_ViewManager.h"
 #include "SUIT_ViewModel.h"
 
-#include <qaccel.h>
+#include <qobjectlist.h>
+#include <qapplication.h>
+#include <qnamespace.h>
+
 
 /*!\class SUIT_Accel
  * Class handles keyboard accelerator bindings.
  */
+SUIT_Accel* SUIT_Accel::myself = 0;
 
-/*! Constructor.*/
-SUIT_Accel::SUIT_Accel(SUIT_Desktop* theDesktop)
-  : QObject( theDesktop, "SUIT_Accel" ),
-    myDesktop( theDesktop )
+/*! Constructor [private].*/
+SUIT_Accel::SUIT_Accel()
+  : QObject( qApp, "SUIT_Accel" )
 {
-  myAccel = new QAccel( theDesktop, "SUIT_Accel_interal_qaccel" );
-  connect( myAccel, SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
+  qApp->installEventFilter( this );
 }
 
-/*! Destructor.*/
-SUIT_Accel::~SUIT_Accel()
+/*! getAccel() : public interface for SUIT_Accel object.  Only one instance is created and returned. */
+SUIT_Accel* SUIT_Accel::getAccel() 
 {
+  if ( !myself )
+    myself = new SUIT_Accel();
+  return myself;
 }
 
-/*! setActionKey  assign a ceratain action for a key accelerator */
+/*! setActionKey() : assign a ceratain action for a key accelerator */
 void SUIT_Accel::setActionKey( const int action, const int key, const QString& type )
-{    
-  // 1. get or generate interal "id" of action
-  int id = myAccel->findKey( key );
-  if ( id == -1 )
-    id = myAccel->insertItem( key );
-
+{
   IdActionMap idActionMap;
   if ( myMap.contains( type ) )
     idActionMap = myMap[type];
 
-  idActionMap[id] = action;
+  idActionMap[key] = action;
   myMap[type] = idActionMap;
+
+  myOptMap[key] = true;
 }
 
-/*! onActivated  slot called when a registered key accelerator was activated */
-void SUIT_Accel::onActivated( int id )
+/*! unsetActionKey() : unregister a certain key accelerator */
+void SUIT_Accel::unsetActionKey( const int key, const QString& type )
 {
-  if ( myDesktop ) {
-    if ( SUIT_ViewWindow* vw = myDesktop->activeWindow() ) {
-      QString type = vw->getViewManager()->getViewModel()->getType();
-      if (  myMap.contains( type ) ) {
-	IdActionMap idActionMap = myMap[type];
-	if ( idActionMap.contains( id ) ) {
-	  vw->onAccelAction( idActionMap[id] );
-	}
-      }
+  if ( myMap.contains( type ) ) {
+    IdActionMap idActionMap = myMap[type];
+    if ( idActionMap.contains( key ) ) {
+      idActionMap.erase( key );
+      myMap[type] = idActionMap;
     }
   }
 }
 
+/*! getParentViewWindow() : returns given object or any of its parents-grandparents-.. if it is a SUIT_ViewWindow */ 
+SUIT_ViewWindow* getParentViewWindow( const QObject* obj )
+{
+  if ( obj ) {
+    if ( obj->inherits( "SUIT_ViewWindow" ) )
+      return (SUIT_ViewWindow*)obj;
+    else
+      return getParentViewWindow( obj->parent() );
+  }
+  return 0;
+}
+
+/*! getKey() : returns integer key code (with modifiers) made of key pressed 'inside' given event */
+int getKey( QKeyEvent *keyEvent )
+{
+  int key = keyEvent->key(), 
+    state = keyEvent->state();
+  if ( state & Qt::ShiftButton )   
+    key += Qt::SHIFT;
+  if ( state & Qt::ControlButton ) 
+    key += Qt::CTRL;
+  if ( state & Qt::AltButton )     
+    key += Qt::ALT;
+  if ( state & Qt::MetaButton )    
+    key += Qt::META;
+  return key;
+}
+
+/*! getAccelKey() : returns key pressed if 1) event was KeyPress 2) pressed key is a registered accelerator */ 
+int SUIT_Accel::getAccelKey( QEvent *event )
+{
+  if ( event && event->type() == QEvent::KeyPress ) {
+    int key = ::getKey( (QKeyEvent*)event );
+    if ( myOptMap.contains( key ) )
+      return key;
+  }
+  return 0;
+}
+
+/*! eventFilter() : filtering ALL events of QApplication. */
+bool SUIT_Accel::eventFilter( QObject *obj, QEvent *event )
+{
+  const int key = getAccelKey( event );
+  if ( key ) {
+    SUIT_ViewWindow* vw = ::getParentViewWindow( obj ); 
+    if ( vw ) {
+      QString type = vw->getViewManager()->getViewModel()->getType();
+      if ( myMap.contains( type ) ) {
+	IdActionMap idActionMap = myMap[type];
+	if ( idActionMap.contains( key ) ) {
+	  vw->onAccelAction( idActionMap[key] );
+	  return true;
+	}
+      }
+    }
+  }
+  return false;
+}
+ 

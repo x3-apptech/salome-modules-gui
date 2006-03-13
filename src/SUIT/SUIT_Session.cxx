@@ -290,7 +290,7 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& li
 #ifdef WIN32
   lib = ::LoadLibrary( (char*)libFile.latin1() );
 #else
-  lib = dlopen( (char*)libFile.latin1(), RTLD_LAZY );
+  lib = dlopen( (char*)libFile.latin1(), RTLD_LAZY /*| RTLD_GLOBAL */ );
 #endif
   return lib;
 }

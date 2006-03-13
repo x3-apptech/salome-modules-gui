@@ -183,7 +183,7 @@ void STD_MDIDesktop::createActions()
   if ( !mMgr )
     return;
 
-  int winMenuId = mMgr->insert( tr( "MEN_DESK_WINDOW" ), -1, 100 );
+  int winMenuId = mMgr->insert( tr( "MEN_DESK_WINDOW" ), -1, 100, MenuWindowId );
   mMgr->insert( myWorkspaceAction, winMenuId, -1 );
   mMgr->insert( QtxActionMenuMgr::separator(), winMenuId, -1 );
 }

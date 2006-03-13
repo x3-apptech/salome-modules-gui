@@ -70,6 +70,9 @@ public:
   void AddActor( VTKViewer_Actor*, bool update = false );
   void RemoveActor( VTKViewer_Actor*, bool update = false);
 
+  virtual QString   getVisualParameters();
+  virtual void      setVisualParameters( const QString& parameters );
+
 public slots:
   void onFrontView();
   void onBackView();

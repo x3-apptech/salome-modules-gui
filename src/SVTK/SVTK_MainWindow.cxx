@@ -265,9 +265,9 @@ SVTK_MainWindow
 //----------------------------------------------------------------------------
 void 
 SVTK_MainWindow
-::SetTrihedronSize( const int theSize )
+::SetTrihedronSize( const int theSize, const bool theRelative )
 {
-  GetRenderer()->SetTrihedronSize(theSize);
+  GetRenderer()->SetTrihedronSize(theSize, theRelative);
   Repaint();
 }
 

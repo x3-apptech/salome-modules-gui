@@ -408,7 +408,12 @@ bool
 VTKViewer_Actor
 ::IsInfinitive()
 { 
-  return myIsInfinite; 
+  static float MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+
+  if(myIsInfinite || GetLength() < MIN_DISTANCE)
+    return true;
+  else
+    return false;
 }
 
 

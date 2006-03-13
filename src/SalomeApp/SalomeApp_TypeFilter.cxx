@@ -21,8 +21,6 @@
 #include "LightApp_DataOwner.h"
 #include "SalomeApp_Study.h"
 
-#include <SALOMEDS_SObject.hxx>
-
 /*!
   Constructor.
 */

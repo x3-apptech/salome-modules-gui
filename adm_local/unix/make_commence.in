@@ -1,6 +1,14 @@
 # common directories to put headerfiles
 inc_builddir=$(top_builddir)/include/salome
 
+GUI_DISABLE_CORBA=@GUI_DISABLE_CORBA@
+DISABLE_GLVIEWER=@DISABLE_GLVIEWER@
+DISABLE_PYCONSOLE=@DISABLE_PYCONSOLE@
+DISABLE_PLOT2DVIEWER=@DISABLE_PLOT2DVIEWER@
+DISABLE_SUPERVGRAPHVIEWER=@DISABLE_SUPERVGRAPHVIEWER@
+DISABLE_OCCVIEWER=@DISABLE_OCCVIEWER@
+DISABLE_VTKVIEWER=@DISABLE_VTKVIEWER@
+DISABLE_SALOMEOBJECT=@DISABLE_SALOMEOBJECT@
 @SET_MAKE@
 SHELL=/bin/sh
 
@@ -254,14 +262,9 @@ $(top_srcdir)/configure.in: $(top_srcdir)/configure.in.base
 
 
 ACLOCAL_SRC = \
-ac_cxx_bool.m4                    check_corba.m4     check_vtk.m4	\
-ac_cxx_depend_flag.m4             check_hdf5.m4      enable_pthreads.m4	\
-ac_cxx_mutable.m4                 check_mico.m4      libtool.m4		\
-ac_cxx_namespaces.m4              check_omniorb.m4   pyembed.m4		\
-ac_cxx_partial_specialization.m4  check_opengl.m4    python.m4		\
-ac_cxx_typename.m4                check_pthreads.m4  check_cas.m4	\
-ac_cc_warnings.m4                 check_qt.m4        check_swig.m4      \
-check_boost.m4                    check_msg2qm.m4 
+check_qt.m4                        check_vtk.m4       check_qwt.m4 \
+check_sip.m4                       check_msg2qm.m4    check_pyqt.m4 \
+check_opengl.m4
 
-$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=@KERNEL_ROOT_DIR@/salome_adm/unix/config_files/%)
+$(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=$(top_srcdir)/adm_local/unix/config_files/%)
 	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files

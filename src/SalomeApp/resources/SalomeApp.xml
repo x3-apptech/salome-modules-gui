@@ -1,10 +1,10 @@
 <document>
   <section name="desktop" >
-    <parameter name="state"  value="max"/>
-    <parameter name="pos_x"  value="100"/>
-    <parameter name="pos_y"  value="050"/>
-    <parameter name="width"  value="640"/>
-    <parameter name="height" value="480"/>
+    <parameter name="state"  value="normal"/>
+    <parameter name="pos_x"  value="center"/>
+    <parameter name="pos_y"  value="center"/>
+    <parameter name="width"  value="800"/>
+    <parameter name="height" value="600"/>
   </section>
   <section name="launch">
     <parameter name="gui"        value="yes"/>
@@ -59,7 +59,8 @@
     <parameter name="font" value="Helvetic,12" />
   </section>
   <section name="Study">
-    <parameter name="store_positions" value="false" />
+    <parameter name="store_positions" 		value="false" />
+    <parameter name="store_visual_state"	value="false" />
   </section>
   <section name="GEOM">
     <parameter name="name"       value="Geometry"/>
@@ -179,6 +180,7 @@
     <parameter value="false" name="auto_groups" />
   </section>
   <section name="VISU" >
+  <parameter value="false" name="use_build_progress" />
   <parameter value="false" name="full_med_loading" />
   <parameter value="false" name="represent_shading" />
   <parameter value="0.05" name="scalar_bar_horizontal_height" />

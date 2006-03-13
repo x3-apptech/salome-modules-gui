@@ -1,4 +1,5 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
+// Copyright (C) 2006  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,30 +17,23 @@
 //
 // See http://www.salome-platform.org/
 //
-#ifndef SALOME_GLOWNER_H
-#define SALOME_GLOWNER_H
 
-#include <string>
-//#include <GLViewer.h>
-#include <GLViewer_Object.h>
+#ifndef _SalomeAppTEST_HXX_
+#define _SalomeAppTEST_HXX_
 
-#ifdef WNT
-#define SALOME_OBJECT_EXPORT __declspec (dllexport)
-#else
-#define SALOME_OBJECT_EXPORT
-#endif
+#include <cppunit/extensions/HelperMacros.h>
 
-class SALOME_OBJECT_EXPORT SALOME_GLOwner : public GLViewer_Owner
+class SalomeAppTest : public CppUnit::TestFixture
 {
+  CPPUNIT_TEST_SUITE( SalomeAppTest );
+  CPPUNIT_TEST( testSalomeApp );
+  CPPUNIT_TEST_SUITE_END();
+
 public:
-  SALOME_GLOwner( const char* );
-  ~SALOME_GLOwner();
 
-  const char*       entry() const;
-  void              setEntry( const char* );
-
-private:
-  std::string       myEntry;
+  void setUp();
+  void tearDown();
+  void testSalomeApp();
 };
 
 #endif

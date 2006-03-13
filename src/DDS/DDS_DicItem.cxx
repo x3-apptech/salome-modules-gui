@@ -506,7 +506,10 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
             if ( aListValueID.IsIntegerValue() )
             {
               //  Read the text in the element "value"
-              LDOM_Text aListItemTxt = (const LDOM_Text&)aListItemValue.getFirstChild();
+              //LDOM_Text aListItemTxt = (const LDOM_Text&)aListItemValue.getFirstChild();
+	      LDOM_Node aNode = aListItemValue.getFirstChild();
+	      const LDOM_Text& aText = (const LDOM_Text&) aNode;
+	      LDOM_Text aListItemTxt(aText);
               if ( !aListItemTxt.isNull() )
               {
                 // adding ID and text value to sequence
@@ -533,7 +536,10 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
     if ( !aShDescr.isNull() )
     {
       // text is always a sub-node of element, containing it
-      LDOM_Text aShDescrTxt = (const LDOM_Text&)aShDescr.getFirstChild();
+      //LDOM_Text aShDescrTxt = (const LDOM_Text&)aShDescr.getFirstChild();
+      LDOM_Node aNode = aShDescr.getFirstChild();
+      const LDOM_Text& aText = (const LDOM_Text&) aNode;
+      LDOM_Text aShDescrTxt(aText);
       if ( !aShDescrTxt.isNull() )
         aShortD = aShDescrTxt.getData();
     }
@@ -543,7 +549,10 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
     if ( !aLDescr.isNull() )
     {
       // text is always a sub-node of element, containing it
-      LDOM_Text aLDescrTxt = (const LDOM_Text&)aLDescr.getFirstChild();
+      //LDOM_Text aLDescrTxt = (const LDOM_Text&)aLDescr.getFirstChild();
+      LDOM_Node aNode = aLDescr.getFirstChild();
+      const LDOM_Text& aText = (const LDOM_Text&) aNode;
+      LDOM_Text aLDescrTxt(aText);
       if ( !aLDescrTxt.isNull() )
         aLongD = aLDescrTxt.getData();
     }

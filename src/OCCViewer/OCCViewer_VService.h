@@ -115,11 +115,12 @@ public:
                                   const Standard_Integer hiwin,
                                   const Standard_Integer lowin,
                                   const Quantity_NameOfColor color = Quantity_NOC_GRAY69 );
-    static Handle_Aspect_WindowDriver
+    /*static Handle_Aspect_WindowDriver
                     XdpsDriver( const Standard_CString display,
                                 const Standard_Integer hiwin,
                                 const Standard_Integer lowin,
                                 const Quantity_NameOfColor color = Quantity_NOC_GRAY69 );
+    */
     static Handle_Aspect_WindowDriver
                     ImageDriver( const Standard_CString display,
                                  const Standard_Integer hiwin,

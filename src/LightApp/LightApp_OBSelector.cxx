@@ -71,9 +71,13 @@ void LightApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
       LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( it.current() );
       if ( obj )
       {
+#ifndef DISABLE_SALOMEOBJECT
         Handle(SALOME_InteractiveObject) aSObj = new SALOME_InteractiveObject
           ( obj->entry(), obj->componentDataType(), obj->name() );
         LightApp_DataOwner* owner = new LightApp_DataOwner( aSObj  );
+#else
+        LightApp_DataOwner* owner = new LightApp_DataOwner( obj->entry() );
+#endif
         that->mySelectedList.append( SUIT_DataOwnerPtr( owner ) );
       }
     }

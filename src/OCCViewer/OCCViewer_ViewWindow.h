@@ -62,6 +62,9 @@ public:
 
   void setCuttingPlane( bool on, const double x = 0 , const double y = 0 , const double z = 0,
                                  const double dx = 0, const double dy = 0, const double dz = 1);
+
+  virtual QString   getVisualParameters();
+  virtual void      setVisualParameters( const QString& parameters );
  
 public slots:
   void onFrontView();
@@ -118,6 +121,8 @@ protected:
   void createToolBar();
  
   virtual OperationType getButtonState(QMouseEvent* theEvent);
+
+  viewAspect getViewParams() const;
 
   OperationType         myOperation;
   OCCViewer_Viewer*     myModel;

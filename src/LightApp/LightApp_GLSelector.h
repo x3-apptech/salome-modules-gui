@@ -25,6 +25,9 @@
 
 #include <GLViewer_Viewer2d.h>
 
+#include <string>
+#include <GLViewer_Object.h>
+
 class LIGHTAPP_EXPORT LightApp_GLSelector : public SUIT_Selector
 {
   Q_OBJECT
@@ -46,6 +49,23 @@ protected:
 
 private:
   GLViewer_Viewer2d*  myViewer;
+};
+
+
+/*!
+  This class provide data owner objects for GLViewer.
+*/
+class LIGHTAPP_EXPORT LightApp_GLOwner : public GLViewer_Owner
+{
+public:
+  LightApp_GLOwner( const char* );
+  ~LightApp_GLOwner();
+
+  const char*       entry() const;
+  void              setEntry( const char* );
+
+private:
+  std::string       myEntry;
 };
 
 #endif

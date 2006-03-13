@@ -112,8 +112,10 @@ void PyInterp_base::initialize()
 
   // Create cStringIO to capture stdout and stderr
   PycString_IMPORT;
-  _vout = PycStringIO->NewOutput(128);
-  _verr = PycStringIO->NewOutput(128);
+  if (PycStringIO) { // CTH11627 : additional check
+    _vout = PycStringIO->NewOutput(128);
+    _verr = PycStringIO->NewOutput(128);
+  }
 
   // All the initRun outputs are redirected to the standard output (console)
   initRun();

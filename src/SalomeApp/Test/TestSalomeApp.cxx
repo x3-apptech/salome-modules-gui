@@ -1,4 +1,5 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
+// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,24 +18,14 @@
 // See http://www.salome-platform.org/
 //
 
-#include <SALOME_GLOwner.h>
+// --- include all SalomeApp Test from basics until the present directory
 
-SALOME_GLOwner::SALOME_GLOwner( const char* entry )
-: GLViewer_Owner()
-{
-  setEntry( entry );
-}
+#include "SalomeAppTest.hxx"
 
-SALOME_GLOwner::~SALOME_GLOwner()
-{
-}
+// --- Registers the fixture into the 'registry'
 
-const char* SALOME_GLOwner::entry() const
-{
-  return myEntry.c_str();
-}
+CPPUNIT_TEST_SUITE_REGISTRATION( SalomeAppTest );
 
-void SALOME_GLOwner::setEntry( const char* entry )
-{
-  myEntry = entry;
-}
+// --- generic Main program from Basic/Test
+
+#include "BasicMainTest.hxx"

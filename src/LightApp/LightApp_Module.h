@@ -20,6 +20,7 @@ class LightApp_Displayer;
 class SUIT_Study;
 class SUIT_DataObject;
 class SUIT_Operation;
+class SUIT_ViewManager;
 class CAM_Application;
 
 class QtxPopupMgr;
@@ -80,6 +81,8 @@ protected slots:
   virtual void                        onOperationStopped( SUIT_Operation* );
   virtual void                        onOperationDestroyed();
   virtual void                        onShowHide();
+  virtual void                        onViewManagerAdded( SUIT_ViewManager* );
+  virtual void                        onViewManagerRemoved( SUIT_ViewManager* );
 
 protected:
   virtual QtxPopupMgr*                popupMgr();

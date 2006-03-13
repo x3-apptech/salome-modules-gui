@@ -4,6 +4,9 @@
 
 import SALOME_Session_idl
 
+from import_hook import register_name
+register_name("SalomePyQt")
+   
 # this function is required
 
 def init_shared_modules():

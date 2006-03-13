@@ -81,6 +81,8 @@ public:
 
   static bool              dumpView( const QString& );
 
+  static int               defaultMenuGroup();
+
   static int               createTool( const QString& );
   static int               createTool( const int,  const int,      int = -1 );
   static int               createTool( const int,  const QString&, int = -1 );
@@ -88,9 +90,9 @@ public:
   static int               createTool( QtxAction*, const QString&, int = -1, int = -1 );
 
   static int               createMenu( const QString&, const int,
-				       int = -1,       int = -1 );
+				       int = -1, int = -1, int = -1 );
   static int               createMenu( const QString&, const QString&, 
-				       int = -1,       int = -1 );
+				       int = -1, int = -1, int = -1 );
   static int               createMenu( const int,      const int,
 				       int = -1,       int = -1 );
   static int               createMenu( const int,      const QString&, 
@@ -109,13 +111,16 @@ public:
   static QtxAction*        action( const int );
   static int               actionId( const QtxAction* );
 
+  static bool              clearMenu( int = 0, int = 0,
+				      bool = true  );
+
   static void              addSetting    ( const QString&, const QString&, const double );
   static void              addSetting    ( const QString&, const QString&, const int /Constrained/ );
   static void              addSetting    ( const QString&, const QString&, const QString& );
   static void              addSetting    ( const QString&, const QString&, const QColor& );
   static int               integerSetting( const QString&, const QString&, int = 0 );
   static double            doubleSetting ( const QString&, const QString&, int = 0 );
-  static bool              boolSetting   ( const QString&, const QString&, bool = 0 );
+  static bool              boolSetting   ( const QString&, const QString&, bool = false );
   static QString           stringSetting ( const QString&, const QString&, const QString& = QString("") );
   static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
   static void              removeSetting ( const QString&, const QString& );

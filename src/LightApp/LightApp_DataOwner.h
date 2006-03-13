@@ -22,7 +22,10 @@
 
 #include "LightApp.h"
 #include "SUIT_DataOwner.h"
-#include "SALOME_InteractiveObject.hxx"
+
+#ifndef DISABLE_SALOMEOBJECT
+  #include "SALOME_InteractiveObject.hxx"
+#endif
 
 /*!
   This class provide data owner objects.
@@ -30,17 +33,25 @@
 class LIGHTAPP_EXPORT LightApp_DataOwner : public SUIT_DataOwner
 {
 public:
+#ifndef DISABLE_SALOMEOBJECT
     LightApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO );
+#endif
     LightApp_DataOwner( const QString& );
     virtual ~LightApp_DataOwner();
 
     virtual bool isEqual( const SUIT_DataOwner& ) const;
+    virtual bool operator<( const SUIT_DataOwner& ) const;
+
+#ifndef DISABLE_SALOMEOBJECT
     const Handle(SALOME_InteractiveObject)& IO() const;
+#endif
     QString entry() const;
 
 private:
     QString  myEntry;
+#ifndef DISABLE_SALOMEOBJECT
     Handle(SALOME_InteractiveObject) myIO;
+#endif
 };
 
 typedef SMART(LightApp_DataOwner) LightApp_DataOwnerPtr;

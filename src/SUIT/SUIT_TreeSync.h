@@ -38,10 +38,12 @@ const typename QValueList<TrgItem>::const_iterator findEqual( const QValueList<T
 template <class SrcItem, class TrgItem, class TreeData>
 TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
 {
-  //  printf( "--- synchronize : %d ---\n", ++gSync );
-
   if( td.isEqual( r1, r2 ) )
   {
+    // update items themselves
+    td.updateItem( r2 );
+
+    // iterate 'siblings' (direct children) 
     QValueList< DiffItem< SrcItem, TrgItem > > d;
     diffSiblings( r1, r2, d, td );
 

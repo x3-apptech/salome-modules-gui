@@ -299,12 +299,13 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
  *\retval Return -1 if something wrong.
  */
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
-                            const int id, const int group, const int index )
+                            const int id, const int group, const int index,
+			    const bool enableEmpty )
 {
   if ( !menuMgr() )
     return -1;
 
-  return menuMgr()->insert( subMenu, menu, group, index );
+  return menuMgr()->insert( subMenu, menu, group, id, index, enableEmpty );
 }
 
 /*! Create menu.
@@ -318,12 +319,13 @@ int CAM_Module::createMenu( const QString& subMenu, const int menu,
  *\retval Return -1 if something wrong.
  */
 int CAM_Module::createMenu( const QString& subMenu, const QString& menu,
-                            const int id, const int group, const int index )
+                            const int id, const int group, const int index,
+			    const bool enableEmpty )
 {
   if ( !menuMgr() )
     return -1;
 
-  return menuMgr()->insert( subMenu, menu, group, index );
+  return menuMgr()->insert( subMenu, menu, group, id, index, enableEmpty );
 }
 
 
@@ -570,6 +572,40 @@ int CAM_Module::registerAction( const int id, QAction* a )
     toolMgr()->registerAction( a );
 
   return ident;
+}
+
+/*! Unregister an action.
+ * \param id - id for action.
+ * \retval true if succeded, false if action is used
+ */
+bool CAM_Module::unregisterAction( const int id )
+{
+  return unregisterAction( action( id ) );
+}
+
+/*! Unregister an action.
+ * \param a  - action
+ * \retval true if succeded, false if action is used
+ */
+bool CAM_Module::unregisterAction( QAction* a )
+{
+  if ( !a )
+    return false;
+  if ( menuMgr() ) {
+    int id = menuMgr()->actionId( a );
+    if ( id != -1 && menuMgr()->containsMenu( id, -1 ) )
+      return false;
+  }
+  if ( toolMgr() ) {
+    int id = toolMgr()->actionId( a );
+    if ( id != -1 && toolMgr()->containsAction( id ) )
+      return false;
+  }
+  if ( menuMgr() )
+    menuMgr()->unRegisterAction( menuMgr()->actionId( a ) );
+  if ( toolMgr() )
+    toolMgr()->unRegisterAction( toolMgr()->actionId( a ) );
+  return true;
 }
 
 /*! Return qt action manager separator.*/

@@ -38,6 +38,7 @@ class STD_EXPORT STD_TabDesktop: public SUIT_Desktop
   Q_OBJECT
 
 public:
+  enum { MenuWindowId = 6 };
   enum { VSplit, HSplit };
 
 public:

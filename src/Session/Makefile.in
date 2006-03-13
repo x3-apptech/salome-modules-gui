@@ -46,7 +46,6 @@ LIB = libSalomeSession.la
 LIB_SRC=Session_Session_i.cxx \
 	Session_ServerThread.cxx \
 	Session_ServerLauncher.cxx \
-	Session_SignalsHandler.cxx \
 	SalomeApp_Engine_i.cxx \
 	InquireServersQThread.cxx
 
@@ -61,7 +60,7 @@ BIN_CLIENT_IDL = SALOMEDS.idl SALOMEDS_Attributes.idl SALOME_Component.idl SALOM
 
 CPPFLAGS += $(QT_MT_INCLUDES) $(PYTHON_INCLUDES) $(HDF5_INCLUDES) $(BOOST_CPPFLAGS) -I$(KERNEL_ROOT_DIR)/include/salome -I$(OCC_INCLUDES)
 CXXFLAGS += $(OCC_CXXFLAGS) $(BOOST_CPPFLAGS)
-LDFLAGS += $(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lsuit -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace -lwith_loggerTraceCollector -lEvent -lCASCatch -lSalomeCatalog -lSalomeDS $(CAS_KERNEL)
+LDFLAGS += $(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lsuit -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace -lwith_loggerTraceCollector -lEvent -lSalomeCatalog -lSalomeDSClient $(CAS_KERNEL)
 
 LDFLAGSFORBIN= $(LDFLAGS) $(OMNIORB_LIBS) $(HDF5_LIBS) -lqtx -lSalomeContainer -lSalomeResourcesManager -lTOOLSDS -lSalomeHDFPersist -lSalomeDSImpl -lSalomeGenericObj -lRegistry -lSalomeNotification -lSALOMEBasics
 

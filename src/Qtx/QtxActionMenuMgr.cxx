@@ -40,7 +40,7 @@
 class QtxActionMenuMgr::MenuAction : public QtxAction
 {
 public:
-  MenuAction( const QString&, const QString&, QObject* );
+  MenuAction( const QString&, const QString&, QObject*, const bool = false );
   virtual ~MenuAction();
 
   virtual bool addTo( QWidget* );
@@ -52,12 +52,17 @@ public:
 private:
   int          myId;
   QPopupMenu*  myPopup;
+  bool         myEmptyEnabled;
 };
 
-QtxActionMenuMgr::MenuAction::MenuAction( const QString& text, const QString& menuText, QObject* parent )
+QtxActionMenuMgr::MenuAction::MenuAction( const QString& text,
+					  const QString& menuText,
+					  QObject*       parent,
+					  const bool     allowEmpty )
 : QtxAction( text, menuText, 0, parent ),
-myId( -1 ),
-myPopup( 0 )
+  myId( -1 ),
+  myPopup( 0 ),
+  myEmptyEnabled( allowEmpty )
 {
   myPopup = new QPopupMenu();
 }
@@ -73,6 +78,12 @@ bool QtxActionMenuMgr::MenuAction::addTo( QWidget* w )
     return false;
 
   if ( !w->inherits( "QPopupMenu" ) && !w->inherits( "QMenuBar" ) )
+    return false;
+
+  if ( !myPopup )
+    return false;
+
+  if ( !myEmptyEnabled && !myPopup->count() )
     return false;
 
   if ( w->inherits( "QPopupMenu" ) && QAction::addTo( w ) )
@@ -126,8 +137,11 @@ myMenu( p ? p->menuBar() : 0 )
   myRoot.id = -1;
   myRoot.group = -1;
 
-  if ( myMenu )
+  if ( myMenu ) {
     connect( myMenu, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
+    if ( myMenu->inherits( "QMenuBar" ) )
+      connect( myMenu, SIGNAL( highlighted( int ) ), this, SLOT( onHighlighted( int ) ) );
+  }
 }
 
 QtxActionMenuMgr::QtxActionMenuMgr( QWidget* mw, QObject* p )
@@ -209,12 +223,10 @@ int QtxActionMenuMgr::insert( const int id, const int pId, const int group, cons
 
   MenuNode* node = new MenuNode( pNode );
   node->id = id;
+  node->idx = idx;
   node->group = group;
 
-  if ( idx < 0 || idx >= (int)pNode->children.count() )
-    pNode->children.append( node );
-  else
-    pNode->children.insert( idx, node );
+  pNode->children.append( node );
 
   updateMenu( pNode, false );
 
@@ -226,53 +238,54 @@ int QtxActionMenuMgr::insert( QAction* a, const int pId, const int group, const 
   return insert( registerAction( a ), pId, group, idx );
 }
 
-int QtxActionMenuMgr::insert( const QString& title, const int pId, const int group, const int idx )
+int QtxActionMenuMgr::insert( const QString& title, const int pId, const int group, const int id, const int idx, const bool allowEmpty )
 {
   MenuNode* pNode = pId == -1 ? &myRoot : find( pId );
   if ( !pNode )
     return -1;
 
-  int id = -1;
-  for ( NodeListIterator it( pNode->children ); it.current() && id == -1; ++it )
+  MenuNode* eNode = id == -1 ? 0 : find( id );
+
+  int fid = -1;
+  for ( NodeListIterator it( pNode->children ); it.current() && fid == -1; ++it )
   {
     if ( myMenus.contains( it.current()->id ) &&
          clearTitle( myMenus[it.current()->id]->menuText() ) == clearTitle( title ) )
-      id = it.current()->id;
+      fid = it.current()->id;
   }
 
-  if ( id != -1 )
-    return id;
+  if ( fid != -1 )
+    return fid;
 
-  MenuAction* ma = new MenuAction( clearTitle( title ), title, this );
+  MenuAction* ma = new MenuAction( clearTitle( title ), title, this, allowEmpty );
+  connect( ma->popup(), SIGNAL( highlighted( int ) ), this, SLOT( onHighlighted( int ) ) );
 
   MenuNode* node = new MenuNode( pNode );
   node->group = group;
-  node->id = myMenus.insert( generateId(), ma ).key();
+  node->idx = idx;
+  node->id = myMenus.insert( (id == -1 || eNode ) ? generateId() : id, ma ).key();
 
-  if ( idx < 0 || idx >= (int)pNode->children.count() )
-    pNode->children.append( node );
-  else
-    pNode->children.insert( idx, node );
+  pNode->children.append( node );
 
   updateMenu( pNode, false );
 
   return node->id;
 }
 
-int QtxActionMenuMgr::insert( const QString& title, const QString& menus, const int group, const int idx )
+int QtxActionMenuMgr::insert( const QString& title, const QString& menus, const int group, const int id, const int idx, const bool allowEmpty )
 {
-  return insert( title, QStringList::split( "|", menus ), group, idx );
+  return insert( title, QStringList::split( "|", menus ), group, id, idx, allowEmpty );
 }
 
-int QtxActionMenuMgr::insert( const QString& title, const QStringList& menus, const int group, const int idx )
+int QtxActionMenuMgr::insert( const QString& title, const QStringList& menus, const int group, const int id, const int idx, const bool allowEmpty )
 {
   int pId = createMenu( menus, -1 );
-  return insert( title, pId, group, idx );
+  return insert( title, pId, group, id, idx, allowEmpty );
 }
 
-int QtxActionMenuMgr::append( const QString& title, const int pId, const int group )
+int QtxActionMenuMgr::append( const QString& title, const int pId, const int group, const int id, const bool allowEmpty )
 {
-  return insert( title, pId, group );
+  return insert( title, pId, group, id, allowEmpty );
 }
 
 int QtxActionMenuMgr::append( const int id, const int pId, const int group )
@@ -285,9 +298,9 @@ int QtxActionMenuMgr::append( QAction* a, const int pId, const int group )
   return insert( a, pId, group );
 }
 
-int QtxActionMenuMgr::prepend( const QString& title, const int pId, const int group )
+int QtxActionMenuMgr::prepend( const QString& title, const int pId, const int group, const int id, const bool allowEmpty )
 {
-  return insert( title, pId, group, 0 );
+  return insert( title, pId, group, id, 0, allowEmpty );
 }
 
 int QtxActionMenuMgr::prepend( const int id, const int pId, const int group )
@@ -308,7 +321,7 @@ void QtxActionMenuMgr::remove( const int id )
 
 void QtxActionMenuMgr::remove( const int id, const int pId, const int group )
 {
-  MenuNode* pNode = find( pId );
+  MenuNode* pNode = pId == -1 ? &myRoot : find( pId );
   if ( !pNode )
     return;
 
@@ -369,6 +382,30 @@ void QtxActionMenuMgr::onDestroyed( QObject* obj )
     myMenu = 0;
 }
 
+void QtxActionMenuMgr::onHighlighted( int id )
+{
+  const QObject* snd = sender();
+  int pid = 0, realId;
+  if ( myMenu && snd == myMenu )
+    pid = -1;
+  else {
+    for ( MenuMap::Iterator itr = myMenus.begin(); itr != myMenus.end(); ++itr ) {
+      if ( itr.data()->popup() && itr.data()->popup() == snd )
+	pid = itr.key();
+    }
+  }
+  if ( pid ) {
+    realId = findId( id, pid );
+    if ( realId != -1 ) {
+      bool updatesEnabled = isUpdatesEnabled();
+      setUpdatesEnabled( false );
+      emit menuHighlighted( pid, realId );
+      setUpdatesEnabled( updatesEnabled );
+      updateMenu( find( realId ) );
+    }
+  }
+}
+
 void QtxActionMenuMgr::setWidget( QWidget* mw )
 {
   if ( myMenu == mw )
@@ -383,12 +420,12 @@ void QtxActionMenuMgr::setWidget( QWidget* mw )
     connect( myMenu, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
 }
 
-QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const int actId, const int pId ) const
+QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const int actId, const int pId, const bool rec ) const
 {
-  return find( actId, find( pId ) );
+  return find( actId, find( pId ), rec );
 }
 
-QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const int id, MenuNode* startNode ) const
+QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const int id, MenuNode* startNode, const bool rec ) const
 {
   MenuNode* node = 0;
   MenuNode* start = startNode ? startNode : (MenuNode*)&myRoot;
@@ -396,8 +433,8 @@ QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const int id, MenuNode* star
   {
     if ( it.current()->id == id )
       node = it.current();
-    else
-      node = find( id, it.current() );
+    else if ( rec )
+      node = find( id, it.current(), rec );
   }
   return node;
 }
@@ -413,6 +450,55 @@ bool QtxActionMenuMgr::find( const int id, NodeList& lst, MenuNode* startNode ) 
     find( id, lst, it.current() );
   }
   return !lst.isEmpty();
+}
+
+QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const QString& title, const int pId, const bool rec ) const
+{
+  return find( title, find( pId ), rec );
+}
+
+bool QtxActionMenuMgr::find( const QString& title, NodeList& lst, MenuNode* startNode ) const
+{
+  MenuNode* start = startNode ? startNode : (MenuNode*)&myRoot;
+  for ( NodeListIterator it( start->children ); it.current(); ++it )
+  {
+    QAction* a = itemAction( it.current()->id );
+    if ( !a )
+      a = menuAction( it.current()->id );
+    if ( a && clearTitle( a->menuText() ) == clearTitle( title ) )
+      lst.prepend( it.current() );
+
+    find( title, lst, it.current() );
+  }
+  return !lst.isEmpty();
+}
+
+QtxActionMenuMgr::MenuNode* QtxActionMenuMgr::find( const QString& title, MenuNode* startNode, const bool rec ) const
+{
+  MenuNode* node = 0;
+  MenuNode* start = startNode ? startNode : (MenuNode*)&myRoot;
+  for ( NodeListIterator it( start->children ); it.current() && !node; ++it )
+  {
+    QAction* a = itemAction( it.current()->id );
+    if ( !a )
+      a = menuAction( it.current()->id );
+    if ( a && clearTitle( a->menuText() ) == clearTitle( title ) )
+      node = it.current();
+    if ( !node && rec )
+      node = find( title, it.current(), rec );
+  }
+  return node;
+}
+
+int QtxActionMenuMgr::findId( const int id, const int pid ) const
+{
+  MenuNode* start = pid != -1 ? find( pid ) : (MenuNode*)&myRoot;
+  if ( start ) {
+    for ( NodeListIterator it( start->children ); it.current(); ++it ) {
+      if ( it.current()->id == id ) return id;
+    }
+  }
+  return -1;
 }
 
 void QtxActionMenuMgr::removeMenu( const int id, MenuNode* startNode )
@@ -465,23 +551,20 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
       a->removeFrom( mw );
   }
 
-  if ( node != &myRoot )
-  {
-    if ( mw->inherits( "QMenuBar" ) )
-      ((QMenuBar*)mw)->clear();
-    else if ( mw->inherits( "QPopupMenu" ) )
-      ((QPopupMenu*)mw)->clear();
-  }
+  if ( mw->inherits( "QMenuBar" ) )
+    ((QMenuBar*)mw)->clear();
+  else if ( mw->inherits( "QPopupMenu" ) )
+    ((QPopupMenu*)mw)->clear();
 
   QMap<int, NodeList> idMap;
   for ( NodeListIterator it2( node->children ); it2.current(); ++it2 )
   {
-    MenuNode* par = it2.current()->parent;
-    if ( isVisible( it2.current()->id, par ? par->id : -1 ) )
-    {
-      NodeList& lst = idMap[it2.current()->group];
+    NodeList& lst = idMap[it2.current()->group];
+    int idx = it2.current()->idx;
+    if ( idx < 0 || idx >= lst.count() )
       lst.append( it2.current() );
-    }
+    else
+      lst.insert( idx, it2.current() );
   }
 
   QIntList groups = idMap.keys();
@@ -498,17 +581,27 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
     const NodeList& lst = idMap[*gIt];
     for ( NodeListIterator iter( lst ); iter.current(); ++iter )
     {
+      MenuNode* par = iter.current()->parent;
+      if ( !isVisible( iter.current()->id, par ? par->id : -1 ) )
+	continue;
+
       if ( rec )
         updateMenu( iter.current(), rec, false );
 
       QAction* a = itemAction( iter.current()->id );
-      if ( a )
-        a->addTo( mw );
-      else
-      {
-        MenuAction* ma = menuAction( iter.current()->id );
-        if ( ma && ma->popup() && ma->popup()->count() )
-          ma->addTo( mw );
+      if ( !a )
+        a = menuAction( iter.current()->id );
+      if ( a ) {
+	QMenuData* md = dynamic_cast<QMenuData*>( mw );
+	int cnt = 0;
+	if ( md ) cnt = md->count();
+	a->addTo( mw );
+	if ( md && md->count() - cnt == 1 ) { //&& iter.current()->id > 0
+	  int lid = md->idAt( cnt ); 
+	  QMenuItem* mi = md->findItem( lid );
+	  if ( mi && !mi->isSeparator() )
+	    md->setId( cnt, iter.current()->id );
+	}
       }
     }
   }
@@ -590,6 +683,15 @@ bool QtxActionMenuMgr::load( const QString& fname, QtxActionMgr::Reader& r )
   return r.read( fname, cr );
 }
 
+bool QtxActionMenuMgr::containsMenu( const QString& title, const int pid ) const
+{
+  return (bool)find( title, pid, false );
+}
+
+bool QtxActionMenuMgr::containsMenu( const int id, const int pid ) const
+{
+  return (bool)find( id, pid, false );
+}
 
 /*!
 	Class: QtxActionMenuMgr::MenuCreator

@@ -22,6 +22,7 @@
 #include "SalomeApp.h"
 
 #include <LightApp_Study.h>
+#include <string>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -66,6 +67,12 @@ public:
   virtual void        children( const QString&, QStringList& ) const;
   virtual void        components( QStringList& ) const;
 
+  std::vector<int>    getSavePoints();
+  void                removeSavePoint(int savePoint);
+  QString             getNameOfSavePoint(int savePoint);
+  void                setNameOfSavePoint(int savePoint, const QString& nameOfSavePoint);
+  virtual std::string getVisualComponentName();
+
 protected:
   virtual void        saveModuleData ( QString theModuleName, QStringList theListOfFiles );
   virtual void        openModuleData ( QString theModuleName, QStringList& theListOfFiles );
@@ -81,6 +88,9 @@ protected:
   virtual void        dataModelInserted( const CAM_DataModel* );
   virtual bool        openDataModel( const QString&, CAM_DataModel* );
   void                setStudyDS(const _PTR(Study)& s );
+
+protected slots:
+  virtual void        updateModelRoot( const CAM_DataModel* );
 
 private:
   QString             newStudyName() const;

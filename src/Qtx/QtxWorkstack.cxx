@@ -36,8 +36,10 @@
 #include <qapplication.h>
 #include <qinputdialog.h>
 #include <qevent.h>
+#include <qregexp.h>
 
 #define DARK_COLOR_LIGHT      250
+
 /*!
     Class: QtxWorkstack [Public]
     Descr:
@@ -1130,6 +1132,266 @@ void QtxWorkstack::updateState( QSplitter* split )
   else
     split->hide();
 }
+
+void QtxWorkstack::splitterInfo( QSplitter* split, QString& info ) const
+{
+  if ( !split )
+    return;
+
+  const QObjectList* objs = split->children();
+  if ( objs )
+  {
+    // make up a sizes string: integer values are separated by ':' char
+    QValueList<int> sizes = split->sizes();
+    QString sizesStr;
+    for ( QValueList<int>::Iterator sIt = sizes.begin(); sIt != sizes.end(); ++sIt ) {
+      if ( *sIt > 1 ) // size 1 pixel usually means empty Workstack area, which will NOT be re-created,
+	sizesStr += QString( ":%1" ).arg( *sIt );  // so we don't need to store its size
+    }
+    if ( !sizesStr.isEmpty() ) // cut the first ':'
+      sizesStr = sizesStr.right( sizesStr.length()-1 );    
+
+    // count all QSplitter-s and QtxWorkstackArea-s
+    //    int nChilds( 0 );
+    //    QObjectListIt it( *objs );
+    //    for ( ; it.current(); ++it )
+    //    {
+    //      if ( it.current()->inherits( "QSplitter" ) ||
+    //           it.current()->inherits( "QtxWorkstackArea" ) )
+    //	nChilds++;
+    //    }
+      
+    info += QString( "(splitter orientation=%1 sizes=%3 " ).arg( split->orientation() ).arg( sizesStr );
+    
+    for ( QObjectListIt it( *objs ); it.current(); ++it )
+    {
+      if ( it.current()->inherits( "QSplitter" ) )
+	splitterInfo( (QSplitter*)it.current(), info );
+      else if ( it.current()->inherits( "QtxWorkstackArea" ) ) {
+	QtxWorkstackArea* area = (QtxWorkstackArea*)it.current();
+	if ( area->isEmpty() )
+	  continue;
+	info += QString( "(views active='%1'" ).arg( area->activeWidget()->name() );
+	QWidgetList views = area->widgetList();
+	for ( QWidgetListIt wIt( views ); wIt.current(); ++wIt )
+	  info += QString( " '%1'" ).arg( wIt.current()->name() );
+	info += ')';
+      }
+    }
+  }
+  info += ')';
+}
+
+
+// cuts starting '(' symbol and ending '(' symbol
+void cutBrackets( QString& parameters )
+{
+  if ( !parameters.isEmpty() && parameters[0] == '(' && parameters[parameters.length()-1] == ')' )
+    parameters = parameters.mid( 1, parameters.length()-2 );
+}
+
+// for strings like "(splitter orientation=0 children=2 sizes=332:478" returns values of
+// parameters.  For example, getValue( example, "children" ) returns "2"
+// getValue( example, "sizes" ) returns "332:478"
+QString getValue( const QString& str, const QString& valName )
+{
+  int i = str.find( valName );
+  if ( i != -1 ) {
+    int equal_i = str.find( '=', i );
+    if ( equal_i != -1 ) {
+      int space_i = str.find( ' ', ++equal_i );
+      if ( space_i != -1 )
+	return str.mid( equal_i, space_i-equal_i );
+    }
+  }
+  return QString( "" );
+}
+
+// checks format of splitter parameters string
+bool checkFormat( const QString& parameters )
+{
+  QString params( parameters );
+  // 1. begins and ends with brackets
+  bool ok = ( params[0] == '(' && params[params.length()-1] == ')' );
+  if ( !ok ) return ok;
+  ::cutBrackets( params );
+  // 2. has splitter word
+  ok = ( params.left( 8 ) == "splitter" );
+  if ( !ok ) return ok;
+  // 3. has children?  = '(' is found
+  int i = params.find( '(' );
+  ok = i != -1;
+  if ( !ok ) return ok;
+  params = params.left( i ); // cut all children, they will be checked later
+  // 4. has orientation word and correct value
+  ::getValue( params, "orientation" ).toInt( &ok );
+  if ( !ok ) return ok;
+  // 5. has sizes word and values
+  ok = ! ::getValue( params, "sizes" ).isEmpty();
+  if ( !ok ) return ok;
+  // 6. check children -> number of '(' == number of ')' in original string
+  ok = ( parameters.contains( '(' ) == parameters.contains( ')' ) );
+  return ok;
+}
+
+// returns children of splitter in a list.  Children are separated by '(' and ')' symbols
+QStringList getChildren( const QString& str )
+{
+  QStringList lst;
+  if ( !str.startsWith( "(" ) )
+    return lst;
+  
+  int i = 1,
+  nOpen = 1, // count brackets: '(' increments nOpen, ')' decrements
+  start = 0;
+  while ( i < str.length() ) {
+    if ( str[i] == '(' ) {
+      nOpen++;
+      if ( nOpen == 1 )
+	start = i;
+    }
+    else if ( str[i] == ')' ) {
+      nOpen--;
+      if ( nOpen == 0 ) 
+	lst.append( str.mid( start, i-start+1 ) );
+    }
+    i++;
+  }
+
+  return lst;
+}
+
+// for a string like "views active='AnotherView' 'GLView' 'AnotherView'"
+// getViewName( example, 0 ) returns "GLView", 
+// getViewName( example, 1 ) -> "AnotherView", etc.
+QString getViewName( const QString& str, int i )
+{
+  QRegExp exp( "\\s'\\w+'" );
+  int start = 0; // start index of view name in the string
+  int num = 0 ; // index of found match
+  while ( ( start = exp.search( str, start ) ) != -1 && num < i ) {
+    start += exp.matchedLength();
+    num ++;
+  }
+  if ( start != -1 )      // +2 and -3 avoid starting space and starting and ending ' symbols
+    return str.mid( start+2, exp.matchedLength()-3 );
+
+  return QString( "" );
+}
+
+// returns widget with given name
+QWidget* getView( const QWidget* parent, const QString& aName )
+{
+  QWidget* view = 0;
+  QObjectList *l = parent->topLevelWidget()->queryList( "QWidget", aName, false, true );
+  if ( !l->isEmpty() )
+    view = dynamic_cast<QWidget*>( l->first() );
+  delete l;
+  return view;
+}
+
+// installs a splitter described by given parameters string
+void QtxWorkstack::setSplitter( QSplitter* splitter, const QString& parameters, QMap< QSplitter*, QValueList<int> >& sMap )
+{
+  if ( !::checkFormat( parameters ) ) {
+    printf( "\nInvalid format of workstack parameters.  Positions of viewers can not be restored.\n" );
+    return;
+  }
+
+  QString params( parameters );
+  ::cutBrackets( params );
+
+  // get splitter sizes and store it in the map for future setting
+  QValueList<int> sizes;
+  QStringList sizesLst = QStringList::split( ':', ::getValue( params, "sizes" ) );
+  for ( QStringList::Iterator it = sizesLst.begin(); it != sizesLst.end(); ++it )
+    sizes.append( (*it).toInt() );
+  sMap[ splitter ] = sizes;
+
+  // set orientation of splitter
+  int orient = ::getValue( params, "orientation" ).toInt();
+  splitter->setOrientation( (Qt::Orientation)orient );
+
+  // get children
+  QString options = params.left( params.find( '(' ) );
+  QString childrenStr = params.right( params.length()-options.length() );
+  QStringList children = ::getChildren( childrenStr );
+
+  // debug output..
+  //  printf (" splitter orient=%d, sizes_count=%d, children=%d\n", orient, sizes.count(), children.count() ); 
+  //  for ( QStringList::Iterator tit = children.begin(); tit != children.end(); ++tit ) 
+  //    printf ("   |-> child = [%s]\n", (*tit).latin1() );
+
+  for ( QStringList::Iterator it = children.begin(); it != children.end(); ++it ) {
+    if ( (*it).startsWith( "(splitter" ) ) {
+      QSplitter* newSplitter = new QSplitter( splitter );
+      setSplitter( newSplitter, *it, sMap );
+    }
+    else if ( (*it).startsWith( "(views" ) ) {
+      QtxWorkstackArea* newArea = createArea( splitter );
+      QString activeViewName = ::getValue( *it, "active" );
+      QWidget* activeView( 0 );
+      activeViewName = activeViewName.mid( 1, activeViewName.length()-2 ); // chop off ' symbols
+      int i = 0;
+      QString viewName = ::getViewName( *it, i );
+      while ( !viewName.isEmpty() ) {
+	if ( QWidget* view = ::getView( splitter, viewName ) ) {
+	  newArea->insertWidget( view );
+	  if ( activeViewName == view->name() )
+	    activeView = view;
+	}
+	viewName = ::getViewName( *it, ++i );
+      }
+      if ( activeView )
+      	newArea->setActiveWidget( activeView );
+    }
+  }
+}
+
+// Restore workstack's configuration stored in 'parameters' string
+QtxWorkstack& QtxWorkstack::operator<<( const QString& parameters )
+{
+  // clear the main splitter - remove all child splitters and empty areas from it
+  QPtrList<QSplitter> splitList;
+  QPtrList<QtxWorkstackArea> areaList;
+  splitters( mySplit, splitList, false );
+  areas( mySplit, areaList, false );
+  for ( QPtrListIterator<QSplitter> iter( splitList ); iter.current(); ++iter )
+    delete iter.current();
+  for ( QPtrListIterator<QtxWorkstackArea> it( areaList ); it.current(); ++it ) 
+    if ( it.current()->isEmpty() )
+      delete it.current();
+
+  // restore splitter recursively
+  QMap< QSplitter*, QValueList<int> > sMap;
+  setSplitter( mySplit, parameters, sMap );  
+
+  // now mySplit may contains empty area (where all views were located before restoring)
+  // in order setSize to work correctly we have to exclude this area
+  areaList.clear();
+  areas( mySplit, areaList, false );
+  for ( QPtrListIterator<QtxWorkstackArea> delIt( areaList ); delIt.current(); ++delIt ) 
+    if ( delIt.current()->isEmpty() )
+      delete delIt.current();
+
+  qApp->processEvents();
+
+  // restore splitters' sizes (map of sizes is filled in setSplitters)
+  for ( QMap< QSplitter*, QValueList<int> >::Iterator it = sMap.begin(); it != sMap.end(); ++it )
+    it.key()->setSizes( it.data() );
+
+  return (*this);
+}
+
+// Example of string produced by operator>> :
+// "(splitter orientation=0 sizes=186:624 (views active='OCCViewer_0_0' 'OCCViewer_0_0')
+// (views active='VTKViewer_0_0' 'VTKViewer_0_0'))"
+QtxWorkstack& QtxWorkstack::operator>>( QString& outParameters )
+{
+  splitterInfo( mySplit, outParameters );
+  return (*this);
+}
+
 
 /*!
     Class: QtxWorkstackArea [Internal]

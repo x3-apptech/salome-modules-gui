@@ -10,8 +10,6 @@
 
 #include <LightApp_Module.h>
 
-#include <string>
-
 class CAM_DataModel;
 class SalomeApp_Application;
 class LightApp_Operation;
@@ -40,6 +38,9 @@ public:
   /*! Convenient shortcuts*/
 
   SalomeApp_Application*              getApp() const;
+
+  virtual void                        storeVisualParameters(int savePoint);
+  virtual void                        restoreVisualParameters(int savePoint);
 
 protected:
   virtual CAM_DataModel*              createDataModel();

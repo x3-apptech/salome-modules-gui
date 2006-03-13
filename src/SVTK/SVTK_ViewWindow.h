@@ -219,7 +219,7 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
   virtual
   void 
-  SetTrihedronSize( const int );
+  SetTrihedronSize( const int, const bool = true );
 
   //! Redirect the request to #SVTK_Renderer::SetSelectionProp
   virtual
@@ -242,6 +242,19 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
 			const double& theTolCell = 0.001);
+
+  //! Methods to save/restore visual parameters of a view (pan, zoom, etc.)
+  virtual 
+  QString   
+  getVisualParameters();
+  
+  virtual
+  void
+  setVisualParameters( const QString& parameters );
+
+  virtual
+  bool
+  eventFilter( QObject*, QEvent* );
   
 public slots:
   virtual
@@ -326,12 +339,17 @@ protected:
   Initialize(SVTK_View* theView,
 	     SVTK_ViewModelBase* theModel);
 
+  void
+  doSetVisualParameters( const QString& );
+
   QImage dumpView();
   virtual void action( const int );
 
   SVTK_View* myView;
   SVTK_MainWindow* myMainWindow;
   SVTK_ViewModelBase* myModel;
+
+  QString myVisualParams; // used for delayed setting of view parameters 
 };
 
 #ifdef WIN32

@@ -34,7 +34,8 @@
 
 #include "SALOME_Container_i.hxx"
 #include "SALOME_ContainerManager.hxx"
-#include "SALOMEDS_StudyManager_i.hxx"
+#include <SALOMEDSClient.hxx>
+#include <SALOMEDSClient_ClientFactory.hxx>
 #include "SALOME_ModuleCatalog_impl.hxx"
 #include "RegistryService.hxx"
 #include "Session_Session_i.hxx"
@@ -246,15 +247,7 @@ void Session_ServerThread::ActivateSALOMEDS(int argc,
       // counted objects, they will be deleted by the POA when they are no
       // longer needed.    
 
-      SALOMEDS_StudyManager_i * myStudyManager_i
-	= new  SALOMEDS_StudyManager_i(_orb,_root_poa);
-      
-      // Activate the objects.  This tells the POA that the objects are
-      // ready to accept requests.
-
-      PortableServer::ObjectId_var myStudyManager_iid
-	= _root_poa->activate_object(myStudyManager_i);
-      myStudyManager_i->register_name("/myStudyManager");
+      ClientFactory::createStudyManager(_orb,_root_poa);
     }
   catch(CORBA::SystemException&)
     {

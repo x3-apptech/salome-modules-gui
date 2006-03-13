@@ -35,7 +35,7 @@ RESOURCES_FILES = view_pan.png \
 LIB_CLIENT_IDL = 
 
 CPPFLAGS+=$(QT_INCLUDES) $(OCC_INCLUDES) $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) -I${KERNEL_ROOT_DIR}/include/salome
-LDFLAGS+=$(QT_MT_LIBS) -L$(top_builddir)/lib
+LDFLAGS+=$(QT_MT_LIBS) -L$(top_builddir)/lib -lsuit
 
 
 @CONCLUDE@

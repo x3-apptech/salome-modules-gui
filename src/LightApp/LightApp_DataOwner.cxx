@@ -37,6 +37,7 @@ LightApp_DataOwner
 {
 }
 
+#ifndef DISABLE_SALOMEOBJECT
 /*!Constructor. Initialize by \a SALOME_InteractiveObject.*/
 LightApp_DataOwner
 ::LightApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO ):
@@ -44,6 +45,7 @@ LightApp_DataOwner
   myIO(theIO)
 {
 }
+#endif
 
 /*!Destructor. Do nothing.*/
 LightApp_DataOwner
@@ -61,6 +63,12 @@ LightApp_DataOwner
   return other && entry() == other->entry();
 }
 
+bool LightApp_DataOwner::operator<( const SUIT_DataOwner& obj ) const
+{
+  const LightApp_DataOwner* other = dynamic_cast<const LightApp_DataOwner*>( &obj );
+  return entry() < other->entry();
+}
+
 /*!Gets entry.*/
 QString
 LightApp_DataOwner
@@ -69,6 +77,7 @@ LightApp_DataOwner
   return myEntry;
 }
 
+#ifndef DISABLE_SALOMEOBJECT
 /*!Gets SALOME_InteractiveObject.*/
 const Handle(SALOME_InteractiveObject)&
 LightApp_DataOwner
@@ -76,3 +85,4 @@ LightApp_DataOwner
 {
   return myIO;
 }
+#endif

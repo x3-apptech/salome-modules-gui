@@ -46,6 +46,9 @@ public:
   QToolBar*         getToolBar() { return myToolBar; };
   void              contextMenuPopup( QPopupMenu* thePopup );
 
+  virtual QString   getVisualParameters();
+  virtual void      setVisualParameters( const QString& parameters );
+
 protected:
   virtual QImage    dumpView();
   virtual QString   filter() const;

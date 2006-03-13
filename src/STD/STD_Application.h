@@ -120,9 +120,19 @@ private slots:
   virtual void          onViewManagerActivated( SUIT_ViewManager* );
 
 protected:
-  enum {  FileNewId, FileOpenId, FileCloseId, FileSaveId, FileSaveAsId,
-          FileExitId, EditCutId, EditCopyId, EditPasteId, ViewStatusBarId,
-          NewWindowId, HelpAboutId, ViewWindowsId, FileLoadId, UserID };
+  enum {  MenuFileId = 1,
+          MenuViewId = 2,
+          MenuEditId = 3,
+          MenuHelpId = 7
+       };
+
+  enum {  FileNewId,   FileOpenId,   FileLoadId, FileCloseId,
+	  FileSaveId,  FileSaveAsId, FileExitId, 
+	  ViewStatusBarId, ViewWindowsId, NewWindowId,
+          EditCutId, EditCopyId, EditPasteId,
+          HelpAboutId,
+	  UserID
+       };
  
 protected:
   virtual void          createActions();

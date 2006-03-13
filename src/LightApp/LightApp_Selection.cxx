@@ -153,7 +153,12 @@ QtxValue LightApp_Selection::param( const int ind, const QString& p ) const
     LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, false );
     // false in last parameter means that now we doesn't load module, if it isn't loaded
 
-    return QtxValue( d ? d->canBeDisplayed( myEntries[ ind ] ) : true, 0 );
+    if ( d )
+      return d->canBeDisplayed( myEntries[ ind ] );
+    else if ( myEntries[ ind ].startsWith( QObject::tr( "SAVE_POINT_DEF_NAME" ) ) ) // object is a Save Point object
+      return false;
+
+    return true;
     //now if displayer is null, it means, that according module isn't loaded, so that we allow to all display/erase
     //operations under object
   }

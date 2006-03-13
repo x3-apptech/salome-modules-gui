@@ -158,3 +158,12 @@ void SUIT_ViewWindow::onAccelAction( int _action )
 void SUIT_ViewWindow::action( const int  )
 {
 }
+
+QString   SUIT_ViewWindow::getVisualParameters()
+{
+  return "empty";
+}
+ 
+void SUIT_ViewWindow::setVisualParameters( const QString& parameters )
+{
+}

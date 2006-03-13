@@ -19,18 +19,24 @@
 #include "LightApp_VTKSelector.h"
 #include "LightApp_DataOwner.h"
 
-#include "SVTK_ViewModelBase.h"
-#include "SVTK_Selector.h"
-#include "SVTK_ViewWindow.h"
-#include "SVTK_Functor.h"
+#ifndef DISABLE_VTKVIEWER
+  #include "SVTK_ViewModelBase.h"
+  #include "SVTK_Selector.h"
+  #include "SVTK_ViewWindow.h"
+  #include "SVTK_Functor.h"
+  #include "VTKViewer_Algorithm.h"
+  #include <vtkRenderer.h>
+#endif
 
-#include "SALOME_Actor.h"
-#include "SALOME_ListIteratorOfListIO.hxx"
+#ifndef DISABLE_SALOMEOBJECT
+  #include "SALOME_Actor.h"
+  #include "SALOME_ListIteratorOfListIO.hxx"
+#endif
 
-#include "VTKViewer_Algorithm.h"
 
-#include <vtkRenderer.h>
 
+#ifndef DISABLE_VTKVIEWER
+#ifndef DISABLE_SALOMEOBJECT
 /*!
   Constructor.
 */
@@ -45,6 +51,7 @@ LightApp_SVTKDataOwner
 {
   myIds = theIds; // workaround - there is no constructor copy for the container
 }
+#endif
 
 /*!
   Destuctor.
@@ -64,6 +71,10 @@ LightApp_SVTKDataOwner
   return myActor.GetPointer();
 }
 
+#endif
+
+
+#ifndef DISABLE_VTKVIEWER
 /*!
   Constructor.
 */
@@ -105,6 +116,7 @@ LightApp_VTKSelector
   return myViewer->getType(); 
 }
 
+#endif
 /*!
   On selection changed.
 */
@@ -114,6 +126,8 @@ LightApp_VTKSelector
 {
   selectionChanged();
 }
+
+#ifndef DISABLE_VTKVIEWER
 
 /*!
   Gets list of selected data owners.(output \a aList).
@@ -204,3 +218,5 @@ LightApp_VTKSelector
     }
   }
 }
+
+#endif

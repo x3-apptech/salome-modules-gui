@@ -82,7 +82,45 @@ public:
   SalomeApp_ModuleObject( CAM_DataModel*, const _PTR(SObject)&, SUIT_DataObject* = 0 );
   virtual ~SalomeApp_ModuleObject();
 
-  virtual QString        name() const;
+  virtual QString                 name() const;
+};
+
+/*!
+ * SalomeApp_SavePointObject - class that represents persistent visual_state object
+ * these objects are stored in data model, but NOT in SObjects structure, so we
+ * must handle them separately using this special class for them
+ */
+
+class SALOMEAPP_EXPORT SalomeApp_SavePointObject : public virtual LightApp_DataObject
+{
+public:
+  SalomeApp_SavePointObject( SUIT_DataObject* parent, const int, SalomeApp_Study* study );
+  virtual ~SalomeApp_SavePointObject();
+  
+  virtual QString                 entry() const;
+
+  virtual QString                 name() const;
+  virtual QPixmap                 icon() const;
+  virtual QString                 toolTip() const;
+
+  int                             getId() const;
+
+private:
+  int                             myId;
+  SalomeApp_Study*                myStudy;
+};
+
+/*!
+ * SalomeApp_SavePointRootObject - class that represents parent object for visual_state objects
+ */
+
+class SALOMEAPP_EXPORT SalomeApp_SavePointRootObject : public SUIT_DataObject
+{
+public:
+  SalomeApp_SavePointRootObject( SUIT_DataObject* parent ) : SUIT_DataObject( parent ) {}
+  
+  virtual QString                 name() const   { return QObject::tr( "SAVE_POINT_ROOT_NAME" ); }
+  virtual QString                 toolTip() const{ return QObject::tr( "SAVE_POINT_ROOT_TOOLTIP" ); }
 };
 
 #endif

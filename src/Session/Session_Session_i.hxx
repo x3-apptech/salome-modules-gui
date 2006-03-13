@@ -67,6 +67,9 @@ public:
   
   void ping(){};
 
+  //! Restors a visual state of the study at theSavePoint
+  bool restoreVisualState(CORBA::Long theSavePoint);
+
 protected:
 
   //! Naming service interface

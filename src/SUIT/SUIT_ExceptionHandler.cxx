@@ -49,6 +49,9 @@ void SUIT_ExceptionHandler::showMessage( const QString& title, const QString& ms
 {
   if ( !qApp )
     return;
-
+  
+  while ( QApplication::overrideCursor() )
+    QApplication::restoreOverrideCursor();
+  
   SUIT_MessageBox::error1( qApp->mainWidget(), title, msg, "OK" );
 }

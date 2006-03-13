@@ -105,6 +105,9 @@ module SALOME
     Get Active study ID
 */
     long GetActiveStudyId();
+/*!
+    Restores a state of the study at theSavePoint
+*/
+    boolean restoreVisualState(in long theSavePoint);
   } ;
-
 } ;

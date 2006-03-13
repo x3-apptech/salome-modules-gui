@@ -22,8 +22,6 @@
 
 #include "SUIT_DataObjectKey.h"
 
-#include <iostream> // for cout in dump()
-
 /*!
     Constructor
 */
@@ -491,7 +489,7 @@ SUIT_DataObjectKey* SUIT_DataObject::key() const
 void SUIT_DataObject::dump( const int indent ) const
 {
   QString strIndent = QString().fill( ' ', indent ); // indentation string 
-  std::cout << strIndent << name() << std::endl;     // dump to cout
+  printf( "%s%s\n", strIndent.latin1(), name().latin1() );
   for ( DataObjectListIterator it( myChildren ); it.current(); ++it ) // iterate all children
     it.current()->dump( indent + 2 );  // dump every child with indent + 2 spaces
 }

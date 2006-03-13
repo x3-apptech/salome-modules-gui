@@ -22,13 +22,12 @@ EXPORT_HEADERS= LightApp.h \
 		LightApp_Dialog.h \
 		LightApp_Displayer.h \
 		LightApp_Driver.h \
-		LightApp_GLSelector.h \
+		LightApp_HDFDriver.h \
 		LightApp_Module.h \
 		LightApp_ModuleDlg.h \
 		LightApp_NameDlg.h \
 		LightApp_OBFilter.h \
 		LightApp_OBSelector.h \
-		LightApp_OCCSelector.h \
 		LightApp_Operation.h \
 		LightApp_Selection.h \
 		LightApp_SelectionMgr.h \
@@ -39,9 +38,19 @@ EXPORT_HEADERS= LightApp.h \
 		LightApp_PreferencesDlg.h \
 		LightApp_RootObject.h \
 		LightApp_UpdateFlags.h \
-		LightApp_VTKSelector.h \
 		LightApp_WidgetContainer.h
-#               LightApp_HDFDriver.h \
+
+ifneq ($(DISABLE_VTKVIEWER),yes)
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  EXPORT_HEADERS+= LightApp_VTKSelector.h
+endif
+endif
+ifneq ($(DISABLE_OCCVIEWER),yes)
+  EXPORT_HEADERS+= LightApp_OCCSelector.h
+endif
+ifneq ($(DISABLE_GLVIEWER),yes)
+  EXPORT_HEADERS+= LightApp_GLSelector.h
+endif
 
 # .po files to transform in .qm
 PO_FILES = LightApp_images.po \
@@ -59,13 +68,12 @@ LIB_SRC= LightApp_AboutDlg.cxx \
 	 LightApp_Dialog.cxx \
 	 LightApp_Displayer.cxx \
 	 LightApp_Driver.cxx \
-	 LightApp_GLSelector.cxx \
+	 LightApp_HDFDriver.cxx \
 	 LightApp_Module.cxx \
 	 LightApp_ModuleDlg.cxx \
 	 LightApp_NameDlg.cxx \
 	 LightApp_OBFilter.cxx \
 	 LightApp_OBSelector.cxx \
-	 LightApp_OCCSelector.cxx \
 	 LightApp_Operation.cxx \
 	 LightApp_Selection.cxx \
 	 LightApp_SelectionMgr.cxx \
@@ -74,17 +82,25 @@ LIB_SRC= LightApp_AboutDlg.cxx \
 	 LightApp_SwitchOp.cxx \
 	 LightApp_Preferences.cxx \
 	 LightApp_PreferencesDlg.cxx \
-	 LightApp_VTKSelector.cxx \
 	 LightApp_WidgetContainer.cxx
-#        LightApp_HDFDriver.cxx \
+
+ifneq ($(DISABLE_VTKVIEWER),yes)
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIB_SRC+= LightApp_VTKSelector.cxx
+endif
+endif
+ifneq ($(DISABLE_OCCVIEWER),yes)
+  LIB_SRC+= LightApp_OCCSelector.cxx
+endif
+ifneq ($(DISABLE_GLVIEWER),yes)
+  LIB_SRC+= LightApp_GLSelector.cxx
+endif
 
 LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_Application.h \
 	  LightApp_DataModel.h \
 	  LightApp_Dialog.h \
-	  LightApp_GLSelector.h \
 	  LightApp_OBSelector.h \
-	  LightApp_OCCSelector.h \
 	  LightApp_Operation.h \
 	  LightApp_Module.h \
 	  LightApp_ModuleDlg.h \
@@ -95,8 +111,19 @@ LIB_MOC = LightApp_AboutDlg.h \
 	  LightApp_SwitchOp.h \
 	  LightApp_Preferences.h \
 	  LightApp_PreferencesDlg.h \
-	  LightApp_VTKSelector.h \
 	  LightApp_WidgetContainer.h
+
+ifneq ($(DISABLE_VTKVIEWER),yes)
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIB_MOC+= LightApp_VTKSelector.h
+endif
+endif
+ifneq ($(DISABLE_OCCVIEWER),yes)
+  LIB_MOC+= LightApp_OCCSelector.h
+endif
+ifneq ($(DISABLE_GLVIEWER),yes)
+  LIB_MOC+= LightApp_GLSelector.h
+endif
 
 RESOURCES_FILES = icon_about.png \
 		  icon_applogo.png \
@@ -107,11 +134,74 @@ RESOURCES_FILES = icon_about.png \
 		  LightApp.ini \
 		  LightApp.xml
 
-CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES) $(OCC_INCLUDES) $(VTK_INCLUDES) 
-	#$(HDF5_INCLUDES)
+CPPFLAGS+=$(PYTHON_INCLUDES) $(QT_INCLUDES) $(OCC_INCLUDES) \
+	$(HDF5_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
 
-LDFLAGS+=$(PYTHON_LIBS) $(QT_MT_LIBS)
-LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lGLViewer -lOCCViewer -lVTKViewer -lSalomeObject -lSOCC -lSVTK -lSPlot2d -lSUPERVGraph -lPyInterp -lPythonConsole 
-	#$(HDF5_LIBS) -lSalomeHDFPersistCopy
+ifneq ($(DISABLE_VTKVIEWER),yes)
+  CPPFLAGS+= $(VTK_INCLUDES)
+else
+  CPPFLAGS+= -DDISABLE_VTKVIEWER
+endif
+ifneq ($(DISABLE_PLOT2DVIEWER),yes)
+  CPPFLAGS+= $(QWT_INCLUDES)
+else
+  CPPFLAGS+= -DDISABLE_PLOT2DVIEWER
+endif
+ifeq ($(DISABLE_OCCVIEWER),yes)
+  CPPFLAGS+= -DDISABLE_OCCVIEWER
+endif
+ifneq ($(DISABLE_PYCONSOLE),yes)
+  CPPFLAGS+= $(PYTHON_INCLUDES)
+else
+  CPPFLAGS+= -DDISABLE_PYCONSOLE
+endif
+ifeq ($(DISABLE_GLVIEWER),yes)
+  CPPFLAGS+= -DDISABLE_GLVIEWER
+endif
+ifeq ($(DISABLE_SUPERVGRAPHVIEWER),yes)
+  CPPFLAGS+= -DDISABLE_SUPERVGRAPHVIEWER
+endif
+ifeq ($(DISABLE_SALOMEOBJECT),yes)
+  CPPFLAGS+= -DDISABLE_SALOMEOBJECT
+endif
+
+LDFLAGS+=$(QT_MT_LIBS)
+ifneq ($(DISABLE_PYCONSOLE),yes)
+  LDFLAGS+= $(PYTHON_LIBS)
+endif
+
+LIBS+= -lsuit -lstd -lCAM -lObjBrowser -lLogWindow $(CAS_KERNEL) -lSalomePrs \
+	$(HDF5_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeHDFPersist
+
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIBS+= -lSalomeObject
+endif
+ifneq ($(DISABLE_VTKVIEWER),yes)
+  LIBS+= -lVTKViewer
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIBS+= -lSVTK
+endif
+endif
+ifneq ($(DISABLE_OCCVIEWER),yes)
+  LIBS+= -lOCCViewer
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIBS+= -lSOCC
+endif
+endif
+ifneq ($(DISABLE_GLVIEWER),yes)
+  LIBS+= -lGLViewer
+endif
+ifneq ($(DISABLE_PLOT2DVIEWER),yes)
+  LIBS+= -lPlot2d
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  LIBS+= -lSPlot2d
+endif
+endif
+ifneq ($(DISABLE_PYCONSOLE),yes)
+  LIBS+= -lPyInterp -lPythonConsole
+endif
+ifneq ($(DISABLE_SUPERVGRAPHVIEWER),yes)
+  LIBS+= -lSUPERVGraph
+endif
 
 @CONCLUDE@

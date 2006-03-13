@@ -27,6 +27,7 @@ class QDockWindow;
 
 class LightApp_Preferences;
 class SalomeApp_Module;
+class SalomeApp_Study;
 
 class SALOME_LifeCycleCORBA;
 
@@ -45,8 +46,9 @@ class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
   Q_OBJECT
 
 public:
+  enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
-         CatalogGenId, RegDisplayId, UserID };
+         CatalogGenId, RegDisplayId, SaveGUIStateId, UserID };
 
 public:
   SalomeApp_Application();
@@ -66,12 +68,19 @@ public:
   static SALOME_LifeCycleCORBA*       lcc();
   static QString                      defaultEngineIOR();
 
+  SUIT_ViewManager*                   newViewManager(const QString&);
+  void                                updateSavePointDataObjects( SalomeApp_Study* );
+
 public slots:
   virtual bool                        onOpenDoc( const QString& );
   virtual void                        onLoadDoc();
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCopy();
   virtual void                        onPaste();
+
+protected slots:
+  void                                onStudySaved( SUIT_Study* );
+  void                                onStudyOpened( SUIT_Study* );
 
 protected:
   virtual void                        createActions();
@@ -90,10 +99,14 @@ private slots:
   void                                onProperties();
   void                                onDumpStudy();
   void                                onLoadScript(); 
+  void                                onSaveGUIState(); 
+  void                                onDeleteGUIState(); 
 
   void                                onCatalogGen();
   void                                onRegDisplay();
   void                                onOpenWith();
+  void                                onRestoreGUIState();
+  void                                onRenameGUIState();
 };
 
 #ifdef WIN32

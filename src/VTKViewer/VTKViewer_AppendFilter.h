@@ -36,18 +36,26 @@ public:
   GetPoints();
 
   vtkIdType
-  GetPointOutputID(vtkIdType theInputID);
+  GetPointOutputID(vtkIdType theInputID,
+		   vtkIdType theInputDataSetID);
 
   vtkIdType
-  GetCellOutputID(vtkIdType theInputID);
+  GetCellOutputID(vtkIdType theInputID,
+		  vtkIdType theInputDataSetID);
 
-  vtkIdType 
-  GetPointInputID(vtkIdType theOutputID, 
-		  vtkIdType& theInputDataSetID);
-
-  vtkIdType
-  GetCellInputID(vtkIdType theOutputID, 
+  void 
+  GetPointInputID(vtkIdType theOutputID,
+		 vtkIdType& theInputID,
+		 vtkIdType& theStartID,
 		 vtkIdType& theInputDataSetID);
+
+  void
+  GetCellInputID(vtkIdType theOutputID,
+		 vtkIdType& theInputID,
+		 vtkIdType& theStartID,
+		 vtkIdType& theInputDataSetID);
+
+  typedef std::vector<vtkIdType> TVectorIds;
 
 protected:
   /*! \fn VTKViewer_AppendFilter();
@@ -69,23 +77,10 @@ protected:
 
   void MakeOutput();
 
-  //
+  bool myDoMappingFlag;
+  TVectorIds myNodeRanges;
+  TVectorIds myCellRanges;
   vtkSmartPointer<vtkPoints> myPoints;
-
-private:
-  typedef std::vector<vtkIdType> TVectorId;
-  typedef std::vector<int> VectorInt;
-  typedef std::map <int,int>                  DataMapOfIntegerInteger;
-  typedef DataMapOfIntegerInteger::iterator   IteratorOfDataMapOfIntegerInteger;
-  typedef DataMapOfIntegerInteger::value_type PairOfDataMapOfIntegerInteger;
-private:
-  bool      myDoMappingFlag;
-  TVectorId myNodeIds;
-  TVectorId myCellIds;
-  VectorInt myNodeRanges;
-  VectorInt myCellRanges;
-  DataMapOfIntegerInteger myNodeMapObjIDVtkID;
-  DataMapOfIntegerInteger myCellMapObjIDVtkID;
 };
 
 #endif

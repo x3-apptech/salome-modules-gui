@@ -940,6 +940,24 @@ bool SalomePyQt::dumpView( const QString& filename )
 }
 
 /*!
+  SalomePyQt::defaultMenuGroup
+  Returns default menu group
+*/
+class TDefMenuGroupEvent: public SALOME_Event {
+public:
+  typedef int TResult;
+  TResult myResult;
+  TDefMenuGroupEvent() : myResult( -1 ) {}
+  virtual void Execute() {
+    myResult = SALOME_PYQT_Module::defaultMenuGroup();
+  }
+};
+int SalomePyQt::defaultMenuGroup()
+{
+  return ProcessEvent( new TDefMenuGroupEvent() );
+}
+
+/*!
   SalomePyQt::createTool
   These methods allow operating with the toolbars:
   - create a new toolbar or get the existing one (the toolbar name is passed as parameter);
@@ -1045,10 +1063,10 @@ int SalomePyQt::createTool( QtxAction* a, const QString& tBar, const int id, con
 class CrMenu
 {
 public:
-  CrMenu( const QString& subMenu, const int menu, const int group, const int idx ) 
-    : myCase( 0 ), mySubMenuName( subMenu ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
-  CrMenu( const QString& subMenu, const QString& menu, const int group, const int idx ) 
-    : myCase( 1 ), mySubMenuName( subMenu ), myMenuName( menu ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx ) 
+    : myCase( 0 ), mySubMenuName( subMenu ), myMenuId( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+  CrMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx ) 
+    : myCase( 1 ), mySubMenuName( subMenu ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
   CrMenu( const int id, const int menu, const int group, const int idx ) 
     : myCase( 2 ), myId( id ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
   CrMenu( const int id, const QString& menu, const int group, const int idx ) 
@@ -1063,9 +1081,9 @@ public:
     if ( module ) {
       switch ( myCase ) {
       case 0:
-        return module->createMenu( mySubMenuName, myMenuId, -1, myGroup, myIndex );
+        return module->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
       case 1:
-        return module->createMenu( mySubMenuName, myMenuName, -1, myGroup, myIndex );
+        return module->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
       case 2:
         return module->createMenu( myId, myMenuId, myGroup, myIndex );
       case 3:
@@ -1104,14 +1122,14 @@ public:
     }
   }
 };
-int SalomePyQt::createMenu( const QString& subMenu, const int menu, const int group, const int idx )
+int SalomePyQt::createMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx )
 {
-  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, group, idx ) ) );
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, id, group, idx ) ) );
 }
 
-int SalomePyQt::createMenu( const QString& subMenu, const QString& menu, const int group, const int idx )
+int SalomePyQt::createMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx )
 {
-  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, group, idx ) ) );
+  return ProcessEvent( new TCreateMenuEvent( CrMenu( subMenu, menu, id, group, idx ) ) );
 }
 
 int SalomePyQt::createMenu( const int id, const int menu, const int group, const int idx )
@@ -1253,3 +1271,32 @@ int SalomePyQt::actionId( const QtxAction* a )
 {
   return ProcessEvent( new TActionIdEvent( a ) );
 }
+
+/*!
+  SalomePyQt::clearMenu
+  Clears given menu (recursively if necessary)
+*/
+class TClearMenuEvent: public SALOME_Event {
+public:
+  typedef  bool TResult;
+  TResult  myResult;
+  int      myId;
+  int      myMenu;
+  bool     myRemoveActions;
+  TClearMenuEvent( const int id, const int menu, const bool removeActions )
+    : myResult( false ), myId( id ), myMenu( menu ), myRemoveActions( removeActions ) {}
+  virtual void Execute() {
+    if ( SalomeApp_Application* anApp = getApplication() ) {
+      SALOME_PYQT_Module* module = SALOME_PYQT_Module::getInitModule();
+      if ( !module )
+        module = dynamic_cast<SALOME_PYQT_Module*>( anApp->activeModule() );
+      if ( module )
+        myResult = module->clearMenu( myId, myMenu, myRemoveActions );
+    }
+  }
+};
+bool SalomePyQt::clearMenu( const int id, const int menu, const bool removeActions )
+{
+  return ProcessEvent( new TClearMenuEvent( id, menu, removeActions ) );
+}
+

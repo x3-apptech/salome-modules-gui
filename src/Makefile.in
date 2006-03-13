@@ -32,9 +32,52 @@ VPATH=.:@srcdir@
 
 @COMMENCE@
 
-SUBDIRS = Qtx DDS QDS SUIT STD CAF CAM SUITApp VTKViewer OCCViewer GLViewer \
-          LogWindow Event OBJECT Prs PyInterp PythonConsole ObjBrowser \
-          RegistryDisplay Plot2d TOOLSGUI SOCC SVTK SPlot2d SUPERVGraph \
-	  LightApp Session SalomeApp SALOME_SWIG SALOME_PY SALOME_PYQT Style ResExporter
+SUBDIRS = Qtx DDS QDS SUIT STD CAF CAM SUITApp LogWindow ObjBrowser Prs
+
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  SUBDIRS += OBJECT
+endif
+
+ifneq ($(DISABLE_GLVIEWER),yes)
+  SUBDIRS += GLViewer
+endif
+
+ifneq ($(DISABLE_VTKVIEWER),yes)
+  SUBDIRS += VTKViewer
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  SUBDIRS += SVTK
+endif
+endif
+ifneq ($(DISABLE_OCCVIEWER),yes)
+ SUBDIRS += OCCViewer
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  SUBDIRS += SOCC
+endif
+endif
+ifneq ($(DISABLE_PYCONSOLE),yes)
+  SUBDIRS += PyInterp PythonConsole
+endif
+ifneq ($(DISABLE_PLOT2DVIEWER),yes)
+  SUBDIRS += Plot2d
+ifneq ($(DISABLE_SALOMEOBJECT),yes)
+  SUBDIRS += SPlot2d
+endif
+endif
+ifneq ($(DISABLE_SUPERVGRAPHVIEWER),yes)
+  SUBDIRS += SUPERVGraph
+endif
+SUBDIRS += LightApp Style ResExporter
+
+ifneq ($(GUI_DISABLE_CORBA),yes)
+  SUBDIRS +=  RegistryDisplay TOOLSGUI \
+	  Event Session SalomeApp SALOME_SWIG SALOME_PY SALOME_PYQT
+endif
+
+ifeq (@cppunit_ok@,yes)
+ifneq ($(GUI_DISABLE_CORBA),yes)
+ SUBDIRS+= \
+ SalomeApp/Test 
+endif
+endif
 
 @MODULE@

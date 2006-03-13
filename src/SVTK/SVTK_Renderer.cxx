@@ -74,7 +74,8 @@ SVTK_Renderer
   myTransform(VTKViewer_Transform::New()),
   myCubeAxes(SVTK_CubeAxesActor2D::New()),
   myTrihedron(SVTK_Trihedron::New()),
-  myTrihedronSize(105)
+  myTrihedronSize(105),
+  myIsTrihedronRelative(true)
 {
   myDevice->Delete();
   myTransform->Delete();
@@ -363,8 +364,13 @@ SVTK_Renderer
 
     // if the new trihedron size have sufficient difference, then apply the value
     double aSize = myTrihedron->GetSize();
-    ComputeTrihedronSize(GetDevice(),aSize,aSize,myTrihedronSize);
-    myTrihedron->SetSize(aSize);
+    if ( IsTrihedronRelative() )
+      {
+	ComputeTrihedronSize(GetDevice(),aSize,aSize,myTrihedronSize);
+	myTrihedron->SetSize(aSize);
+      }
+    else
+      myTrihedron->SetSize( myTrihedronSize );
 
     // iterate through displayed objects and set size if necessary
     vtkActorCollection* anActors = GetDevice()->GetActors();
@@ -418,10 +424,11 @@ SVTK_Renderer
 
 void
 SVTK_Renderer
-::SetTrihedronSize(int theSize)
+::SetTrihedronSize(int theSize, const bool theRelative)
 {
-  if(myTrihedronSize != theSize){
+  if(myTrihedronSize != theSize || myIsTrihedronRelative != theRelative){
     myTrihedronSize = theSize;
+    myIsTrihedronRelative = theRelative;
     AdjustActors();
   }
 }
@@ -433,6 +440,12 @@ SVTK_Renderer
   return myTrihedronSize;
 }
 
+bool 
+SVTK_Renderer
+::IsTrihedronRelative() const
+{
+  return myIsTrihedronRelative;
+}
 
 //----------------------------------------------------------------------------
 VTKViewer_Trihedron* 

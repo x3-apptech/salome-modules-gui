@@ -1,10 +1,10 @@
 <document>
   <section name="desktop" >
-    <parameter name="state"  value="max"/>
-    <parameter name="pos_x"  value="100"/>
-    <parameter name="pos_y"  value="050"/>
-    <parameter name="width"  value="640"/>
-    <parameter name="height" value="480"/>
+    <parameter name="state"  value="normal"/>
+    <parameter name="pos_x"  value="center"/>
+    <parameter name="pos_y"  value="center"/>
+    <parameter name="width"  value="800"/>
+    <parameter name="height" value="600"/>
   </section>
   <section name="launch">
     <parameter name="gui"        value="yes"/>

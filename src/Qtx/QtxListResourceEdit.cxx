@@ -39,6 +39,7 @@
 #include <qfontdatabase.h>
 #include <qfileinfo.h>
 #include <qfiledialog.h>
+#include <qapplication.h>
 
 #include "QtxIntSpinBox.h"
 #include "QtxDblSpinBox.h"
@@ -1130,6 +1131,9 @@ void QtxListResourceEdit::FontItem::setFamily( const QString& f )
     if( deffam.canCast( QVariant::String ) )
       curtext = deffam.toString();
   }
+  
+  if ( curtext.isEmpty() )
+    curtext = (QApplication::font()).family();
 
   int idx = -1;
   for ( int i = 0; i < (int)myFamilies->count() && idx < 0; i++ )

@@ -162,7 +162,7 @@ void
 QVTK_RenderWindowInteractor
 ::paintEvent( QPaintEvent* theEvent ) 
 {
-  GetDevice()->Render();
+  GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
 }
 
 

@@ -58,7 +58,7 @@
 #include <Xw_Window.hxx>
 #include <Graphic3d_GraphicDevice.hxx>
 #include <Xw_Driver.hxx>
-#include <Xdps_Driver.hxx>
+//#include <Xdps_Driver.hxx>
 #include <Xw_TypeOfMapping.hxx>
 #endif
 
@@ -280,6 +280,7 @@ Handle(Aspect_WindowDriver) OCCViewer_VService::WindowDriver( const Standard_CSt
     Creates Xdps window driver [ static ]
     On Win32 the same as OCCViewer_VService::WindowDriver()
 */
+/*
 Handle(Aspect_WindowDriver) OCCViewer_VService::XdpsDriver( const Standard_CString aDisplay,
                                                       const Standard_Integer ahiwin,
                                                       const Standard_Integer alowin,
@@ -298,7 +299,7 @@ Handle(Aspect_WindowDriver) OCCViewer_VService::XdpsDriver( const Standard_CStri
     return new Xdps_Driver( W );
 #endif
 }
-
+*/
 /*!
     Creates Xw window driver [ static ]
     On Win32 the same as OCCViewer_VService::WindowDriver()

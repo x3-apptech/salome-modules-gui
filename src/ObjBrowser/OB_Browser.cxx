@@ -157,9 +157,9 @@ void OB_BrowserSync::updateItem( const ItemPtr& p ) const
 
 ItemPtr OB_BrowserSync::createItem( const ObjPtr& src,
 				    const ItemPtr& parent, const ItemPtr& after,
-				    const bool asFirst ) const
+				    const bool prepend ) const
 {
-  ItemPtr i = myBrowser ? dynamic_cast<ItemPtr>( myBrowser->createItem( src, parent, after, asFirst ) ) : 0;
+  ItemPtr i = myBrowser ? dynamic_cast<ItemPtr>( myBrowser->createItem( src, parent, after, prepend ) ) : 0;
   if( i )
     i->setOpen( src->isOpen() );
   return i;
@@ -728,7 +728,7 @@ void OB_Browser::updateView( SUIT_DataObject* startObj )
   if ( !startObj || startObj->root() != getRootObject() )
     return;
 
-  if( startObj==myRoot )
+  if ( startObj == myRoot )
   {
     DataObjectList ch;
     myRoot->children( ch );
@@ -746,40 +746,32 @@ void OB_Browser::updateView( SUIT_DataObject* startObj )
     {
       OB_BrowserSync sync( this );
       OB_ListItem* local_item = dynamic_cast<OB_ListItem*>( listViewItem( local_root ) );
-      
-      //      QString srcName = ( local_root && !local_root->name().isNull() ) ? local_root->name() : "";
-      //      QString trgName = ( local_item && !local_item->text(0).isNull() ) ? local_item->text(0) : "";
-      //      printf( "--- OB_Browser::updateView() calls synchronize()_1: src = %s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
-
       synchronize<ObjPtr,ItemPtr,OB_BrowserSync>( local_root, local_item, sync );
       exist[local_root] = 0;
     }
 
     ItemMap::const_iterator anIt = exist.begin(), aLast = exist.end();
     for( ; anIt!=aLast; anIt++ )
-      if( anIt.data() )
+    {
+      if( anIt.data() ) // exist[local_root]==1 -> this local root was NOT in data model, should be removed
       {
 	removeReferences( anIt.data() );
 	OB_ListItem* item = dynamic_cast<OB_ListItem*>( anIt.data() );
 	if( item && myItems.contains( item->dataObject() ) )
 	  delete anIt.data();
       }
+    }
   }
   else
   {
     OB_BrowserSync sync( this );
     OB_ListItem* startItem = dynamic_cast<OB_ListItem*>( listViewItem( startObj ) );
-
-    //    QString srcName = ( startObj && !startObj->name().isNull() ) ? startObj->name() : "";
-    //    QString trgName = ( startItem && !startItem->text(0).isNull() ) ? startItem->text(0) : "";
-    //    printf( "--- OB_Browser::updateView() calls synchronize()_2: src = %s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
-
     synchronize<ObjPtr,ItemPtr,OB_BrowserSync>( startObj, startItem, sync );
   }
 }
 
 QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o, QListViewItem* parent,
-				       QListViewItem* after, const bool asFirstChild )
+				       QListViewItem* after, const bool prepend )
 {
   QListView* lv = listView();
 
@@ -803,34 +795,57 @@ QListViewItem* OB_Browser::createItem( const SUIT_DataObject* o, QListViewItem* 
 
   if ( parent )
   {
-    if ( parent->childCount() && !after )
+    if ( after ) 
+    {
+      if ( type == -1 )
+	item = new OB_ListItem( obj, parent, after );
+      else
+	item = new OB_CheckListItem( obj, parent, after, (QCheckListItem::Type)type );
+    }
+    else if ( prepend )
+    {
+      if ( type == -1 )
+	item = new OB_ListItem( obj, parent );
+      else
+	item = new OB_CheckListItem( obj, parent,  (QCheckListItem::Type)type );
+    }
+    else // append
     {
       after = parent->firstChild();
-      while ( after->nextSibling() )
-        after = after->nextSibling();
-    }
-
-    if ( after && !asFirstChild )
-    {
+      while ( after && after->nextSibling() )
+	after = after->nextSibling();
       if ( type == -1 )
-        item = new OB_ListItem( obj, parent, after );
+	item = new OB_ListItem( obj, parent, after );
       else
-        item = new OB_CheckListItem( obj, parent, after, (QCheckListItem::Type)type );
-    }
-    else
-    {
-      if ( type == -1 )
-        item = new OB_ListItem( obj, parent );
-      else
-        item = new OB_CheckListItem( obj, parent,  (QCheckListItem::Type)type );
+	item = new OB_CheckListItem( obj, parent, after, (QCheckListItem::Type)type );
     }
   }
-  else // ROOT item
+  else
   {
-    if ( type == -1 )
-      item = new OB_ListItem( obj, lv );
-    else
-      item = new OB_CheckListItem( obj, lv,  (QCheckListItem::Type)type );
+    if ( after ) 
+    {
+      if ( type == -1 )
+	item = new OB_ListItem( obj, lv, after );
+      else
+	item = new OB_CheckListItem( obj, lv, after, (QCheckListItem::Type)type );
+    }
+    else if ( prepend )
+    {
+      if ( type == -1 )
+	item = new OB_ListItem( obj, lv );
+      else
+	item = new OB_CheckListItem( obj, lv,  (QCheckListItem::Type)type );
+    }
+    else // append
+    {
+      after = lv->firstChild();
+      while ( after && after->nextSibling() )
+	after = after->nextSibling();
+      if ( type == -1 )
+	item = new OB_ListItem( obj, lv, after );
+      else
+	item = new OB_CheckListItem( obj, lv, after, (QCheckListItem::Type)type );
+    }
   }
 
   myItems.insert( obj, item );

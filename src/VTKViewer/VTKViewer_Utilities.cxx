@@ -29,56 +29,70 @@
 /*!@see vtkRenderer::ResetCamera(float bounds[6]) method*/
 void ResetCamera(vtkRenderer* theRenderer, int theUsingZeroFocalPoint)
 {  
-  if(!theRenderer) return;
-  float bounds[6];
-  int aCount = ComputeVisiblePropBounds(theRenderer,bounds);
+  if(!theRenderer)
+    return;
+
+  vtkCamera* aCamera = theRenderer->GetActiveCamera();
+  if(!aCamera) 
+    return;
+
+  float aBounds[6];
+  int aCount = ComputeVisiblePropBounds(theRenderer,aBounds);
+
   if(theUsingZeroFocalPoint || aCount){
-    float aLength = bounds[1]-bounds[0];
-    aLength = max((bounds[3]-bounds[2]),aLength);
-    aLength = max((bounds[5]-bounds[4]),aLength);
+    static float MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+
+    float aLength = aBounds[1]-aBounds[0];
+    aLength = max((aBounds[3]-aBounds[2]),aLength);
+    aLength = max((aBounds[5]-aBounds[4]),aLength);
     
-    double vn[3];
-    if ( theRenderer->GetActiveCamera() != NULL )
-      theRenderer->GetActiveCamera()->GetViewPlaneNormal(vn);
-    else{
+    if(aLength < MIN_DISTANCE)
       return;
-    }
+
+    float aWidth = 
+      sqrt((aBounds[1]-aBounds[0])*(aBounds[1]-aBounds[0]) +
+	   (aBounds[3]-aBounds[2])*(aBounds[3]-aBounds[2]) +
+	   (aBounds[5]-aBounds[4])*(aBounds[5]-aBounds[4]));
     
-    float center[3] = {0.0, 0.0, 0.0};
+    if(aWidth < MIN_DISTANCE)
+      return;
+
+    double aViewPlaneNormal[3];
+    aCamera->GetViewPlaneNormal(aViewPlaneNormal);
+    
+    float aCenter[3] = {0.0, 0.0, 0.0};
     if(!theUsingZeroFocalPoint){
-      center[0] = (bounds[0] + bounds[1])/2.0;
-      center[1] = (bounds[2] + bounds[3])/2.0;
-      center[2] = (bounds[4] + bounds[5])/2.0;
+      aCenter[0] = (aBounds[0] + aBounds[1])/2.0;
+      aCenter[1] = (aBounds[2] + aBounds[3])/2.0;
+      aCenter[2] = (aBounds[4] + aBounds[5])/2.0;
     }
-    theRenderer->GetActiveCamera()->SetFocalPoint(center[0],center[1],center[2]);
+    aCamera->SetFocalPoint(aCenter[0],aCenter[1],aCenter[2]);
     
-    float width = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0]) +
-      (bounds[3]-bounds[2])*(bounds[3]-bounds[2]) +
-      (bounds[5]-bounds[4])*(bounds[5]-bounds[4]));
-    
-    double ang = theRenderer->GetActiveCamera()->GetViewAngle();
-    float distance = 2.0*width/tan(ang*vtkMath::Pi()/360.0);
+    double aViewAngle = aCamera->GetViewAngle();
+    float aDistance = 2.0*aWidth/tan(aViewAngle*vtkMath::Pi()/360.0);
     
     // check view-up vector against view plane normal
-    double *vup = theRenderer->GetActiveCamera()->GetViewUp();
-    if ( fabs(vtkMath::Dot(vup,vn)) > 0.999 ){
-      theRenderer->GetActiveCamera()->SetViewUp(-vup[2], vup[0], vup[1]);
-    }
+    double aViewUp[3];
+    aCamera->GetViewUp(aViewUp);
+    if(fabs(vtkMath::Dot(aViewUp,aViewPlaneNormal)) > 0.999)
+      aCamera->SetViewUp(-aViewUp[2], aViewUp[0], aViewUp[1]);
     
     // update the camera
-    theRenderer->GetActiveCamera()->SetPosition(center[0]+distance*vn[0],
-                                                center[1]+distance*vn[1],
-                                                center[2]+distance*vn[2]);
+    aCamera->SetPosition(aCenter[0]+aDistance*aViewPlaneNormal[0],
+			 aCenter[1]+aDistance*aViewPlaneNormal[1],
+			 aCenter[2]+aDistance*aViewPlaneNormal[2]);
+
     // find size of the window
-    int* winsize = theRenderer->GetSize();
-    if(winsize[0] < winsize[1]) width *= float(winsize[1])/float(winsize[0]);
+    int* aWinSize = theRenderer->GetSize();
+    if(aWinSize[0] < aWinSize[1]) 
+      aWidth *= float(aWinSize[1])/float(aWinSize[0]);
     
-    if(theUsingZeroFocalPoint) width *= sqrt(2.0);
+    if(theUsingZeroFocalPoint) 
+      aWidth *= sqrt(2.0);
     
-    theRenderer->GetActiveCamera()->SetParallelScale(width/2.0);
+    aCamera->SetParallelScale(aWidth/2.0);
   }
-  //workaround on VTK
-  //theRenderer->ResetCameraClippingRange(bounds);
+
   ResetCameraClippingRange(theRenderer);
 }
 

@@ -72,7 +72,7 @@ bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
 suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
 					     const suitPtr& parent,
 					     const suitPtr& after,
-					     const bool asFirst ) const
+					     const bool prepend ) const
 {
   if( !isCorrect( so ) )
     return 0;
@@ -91,9 +91,9 @@ suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
       else
 	parent->appendChild( nitem );
     }
-    else if( asFirst )
+    else if( prepend )
       parent->insertChild( nitem, 0 );
-    else
+    else // append
       parent->appendChild( nitem );
   else if( myRoot )
     myRoot->appendChild( nitem );
@@ -285,31 +285,7 @@ SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sob
 
   SalomeApp_DataModelSync sync( study->studyDS(), study->root() );
 
-  //  QString srcName = sobj ? sobj->GetName().c_str() : "";
-  //  QString trgName = ( suitObj && !suitObj->name().isNull() ) ? suitObj->name() : "";
-  //  printf( "--- SalomeApp_DataModel::syncronize() calls synchronize()_1: src = %s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
-
-  SUIT_DataObject* o = ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
-//  showTree( o );
-  return o;
-}
-
-//================================================================
-// Function : synchronize
-/*! Purpose  : synchronizes kernel tree and suit data tree starting from 'sobj' and 'obj' correspondly */
-//================================================================
-SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SObject )& sobj, SUIT_DataObject* obj,
-						   SalomeApp_Study* study )
-{
-  if( !study )
-    return 0;
-  SalomeApp_DataModelSync sync( study->studyDS(), study->root() );
-
-  //  QString srcName = sobj ? sobj->GetName().c_str() : "";
-  //  QString trgName = ( obj && !obj->name().isNull() ) ? obj->name() : "";
-  //  printf( "--- SalomeApp_DataModel::syncronize() calls synchronize()_2: src = s, trg = %s ---\n",  srcName.latin1(), trgName.latin1() );
-
-  return ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, obj, sync );
+  return ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
 }
 
 //================================================================

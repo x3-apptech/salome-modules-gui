@@ -42,6 +42,15 @@ msgstr "&Dump study..."
 msgid "SalomeApp_Application::PRP_DESK_FILE_DUMP_STUDY"
 msgstr "Dumps study to the python script"
 
+msgid "SalomeApp_Application::TOT_DESK_FILE_SAVE_GUI_STATE"
+msgstr "Save GUI state"
+
+msgid "SalomeApp_Application::MEN_DESK_FILE_SAVE_GUI_STATE"
+msgstr "Save GUI state..."
+
+msgid "SalomeApp_Application::PRP_DESK_FILE_SAVE_GUI_STATE"
+msgstr "Saves current state of viewers, displayed objects, etc."
+
 msgid "SalomeApp_Application::TOT_DESK_FILE_LOAD_SCRIPT"
 msgstr "Load python script"
 
@@ -101,6 +110,17 @@ msgstr "Activate Module"
 
 msgid "SalomeApp_Application::MEN_DELETE_INVALID_REFERENCE"
 msgstr "Delete Invalid Reference"
+
+msgid "SalomeApp_Application::PREF_STORE_VISUAL_STATE"
+msgstr "Store/restore last GUI state"
+
+//=======================================================================================
+
+msgid "PUBLISH_IN_STUDY"
+msgstr "Publish in study"
+
+msgid "SAVE_GUI_STATE"
+msgstr "Save GUI state"
 
 //=======================================================================================
 
@@ -190,3 +210,25 @@ msgstr "Publish in study"
 msgid "SalomeApp_Application::WRN_DUMP_STUDY_FAILED"
 msgstr "Dump study failed"
 
+msgid "SAVE_POINT_OBJECT_TOOLTIP"
+msgstr "Saved GUI state: %1"
+
+msgid "SAVE_POINT_DEF_NAME"
+msgstr "GUI state: "
+
+msgid "SAVE_POINT_ROOT_TOOLTIP"
+msgstr "Persistent GUI states"
+
+msgid "SAVE_POINT_ROOT_NAME"
+msgstr "GUI states"
+
+//=======================================================================================
+
+msgid "SalomeApp_Application::MEN_RESTORE_VS"
+msgstr "Restore"
+
+msgid "SalomeApp_Application::MEN_RENAME_VS"
+msgstr "Rename"
+
+msgid "SalomeApp_Application::MEN_DELETE_VS"
+msgstr "Delete"

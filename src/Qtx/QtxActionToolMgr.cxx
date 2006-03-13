@@ -227,6 +227,20 @@ bool QtxActionToolMgr::hasToolBar( const QString& tname ) const
   return find( tname ) != -1;
 }
 
+bool QtxActionToolMgr::containsAction( const int id, const int tid ) const
+{
+  for ( ToolBarMap::ConstIterator it = myToolBars.begin(); it != myToolBars.end(); ++it )
+  {
+    if ( tid == -1 || it.key() == tid ) {
+      const NodeList& list = it.data().nodes;
+      for ( NodeList::const_iterator nit = list.begin(); nit != list.end(); ++nit )
+	if ( (*nit).id == id )
+	  return true;
+    }
+  }
+  return false;
+}
+
 void QtxActionToolMgr::onToolBarDestroyed()
 {
   myToolBars.remove( find( (QToolBar*)sender() ) );

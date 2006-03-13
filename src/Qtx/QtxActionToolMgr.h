@@ -95,6 +95,8 @@ public:
   bool            hasToolBar( const int ) const;
   bool            hasToolBar( const QString& ) const;
 
+  bool            containsAction( const int, const int = -1 ) const;
+
   virtual bool    load( const QString&, QtxActionMgr::Reader& );
 
 protected slots:

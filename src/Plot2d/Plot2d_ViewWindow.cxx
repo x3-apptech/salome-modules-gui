@@ -465,3 +465,17 @@ QString Plot2d_ViewWindow::filter() const
 {
   return SUIT_ViewWindow::filter() + ";;" + tr( "POSTSCRIPT_FILES" );
 }
+
+/*! The method returns the visual parameters of this view as a formated string
+ */
+QString Plot2d_ViewWindow::getVisualParameters()
+{
+  return myViewFrame->getVisualParameters();
+}
+
+/* The method restors visual parameters of this view from a formated string
+ */
+void Plot2d_ViewWindow::setVisualParameters( const QString& parameters )
+{
+  myViewFrame->setVisualParameters( parameters );
+}

@@ -28,8 +28,10 @@
 #include "LightApp_SelectionMgr.h"
 #include "LightApp_Selection.h"
 
-#include <SALOME_ListIO.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
+#ifndef DISABLE_SALOMEOBJECT
+  #include <SALOME_ListIO.hxx>
+  #include <SALOME_ListIteratorOfListIO.hxx>
+#endif
 
 LightApp_ShowHideOp::LightApp_ShowHideOp( ActionType type )
 : LightApp_Operation(),
@@ -95,21 +97,33 @@ void LightApp_ShowHideOp::startOperation()
     }
   }
 
+  QStringList entries;
+
+#ifndef DISABLE_SALOMEOBJECT
   SALOME_ListIO selObjs;
   mgr->selectedObjects( selObjs );
-
-  QStringList entries;
   SALOME_ListIteratorOfListIO anIt( selObjs );
   for( ; anIt.More(); anIt.Next() )
-  {
-    if( anIt.Value().IsNull() )
-      continue;
+    if( !anIt.Value().IsNull() )
+#else
+  QStringList selObjs;
+  mgr->selectedObjects( selObjs );
+  QStringList::const_iterator anIt = selObjs.begin(), aLast = selObjs.end();
+  for( ; ; anIt!=aLast )
+#endif
+    {
+      QString entry = 
+#ifndef DISABLE_SALOMEOBJECT
+        anIt.Value()->getEntry();
+#else
+        *anIt;
+#endif
 
-    if( study->isComponent( anIt.Value()->getEntry() ) )
-      study->children( anIt.Value()->getEntry(), entries );
-    else
-      entries.append( anIt.Value()->getEntry() );
-  }
+      if( study->isComponent( entry ) )
+        study->children( entry, entries );
+      else
+        entries.append( entry );
+    }
 
   for( QStringList::const_iterator it = entries.begin(), last = entries.end(); it!=last; it++ )
   {

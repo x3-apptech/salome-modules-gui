@@ -39,6 +39,7 @@ class QLineEdit;
 class QGroupBox;
 
 class QtxAction;
+class QtxIntSpinBox;
 
 class vtkAxisActor2D;
 class SVTK_CubeAxesActor2D;
@@ -107,9 +108,6 @@ public:
   bool            ReadData( vtkAxisActor2D* );
   bool            Apply( vtkAxisActor2D* );
 
-protected:
-  bool            eventFilter(QObject*, QEvent*);
-
 private slots:
   void            onNameChecked();
   void            onLabelsChecked();
@@ -129,14 +127,14 @@ private:
   // labels
   QGroupBox*      myLabelsGrp;
   QCheckBox*      myIsLabelsVisible;
-  QLineEdit*      myLabelNumber;
-  QLineEdit*      myLabelOffset;
+  QtxIntSpinBox*  myLabelNumber;
+  QtxIntSpinBox*  myLabelOffset;
   SVTK_FontWidget* myLabelsFont;
 
   // tick marks
   QGroupBox*      myTicksGrp;
   QCheckBox*      myIsTicksVisible;
-  QLineEdit*      myTickLength;
+  QtxIntSpinBox*  myTickLength;
 
   friend class SVTK_CubeAxesDlg;
 };

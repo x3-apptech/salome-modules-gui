@@ -74,7 +74,7 @@ protected:
    * \brief Validates entered path
    * \retval bool - returns status (true if OK)
    */
-  bool          validate();
+  bool          validate( const bool quietMode = false );
 
   /*!
    * \brief Appends/changes path

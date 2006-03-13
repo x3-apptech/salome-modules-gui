@@ -510,3 +510,18 @@ bool SUIT_Study::hasTransaction() const
 {
   return false;
 }
+
+/*!
+ * \brief Stores the study state
+*/
+int SUIT_Study::storeState()
+{
+  return -1;
+}
+ 
+/*!
+ * \brief Restores the study state
+*/
+void SUIT_Study::restoreState(int savePoint)
+{
+}

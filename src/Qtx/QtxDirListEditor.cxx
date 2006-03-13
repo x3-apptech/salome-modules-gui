@@ -206,6 +206,18 @@ QtxDirListEditor::~QtxDirListEditor()
 */
 void QtxDirListEditor::getPathList(QStringList& list)
 {
+  // Finish the path editing
+  if (myEdit) {
+    validate(true);
+    
+    myEdit->deleteLater();
+    myBtn->deleteLater();
+    myEdit = 0;
+    myBtn  = 0;
+    myEdited = false;
+    myDirList->setFocus();
+  }
+
   list.clear();
   for (unsigned i = 0; i < myDirList->count()-1; i++)
     list.append(myDirList->text(i));
@@ -224,11 +236,11 @@ void QtxDirListEditor::setPathList(const QStringList& list) {
 /*!
   Validates entered path, returns true if OK
 */
-bool QtxDirListEditor::validate()
+bool QtxDirListEditor::validate( const bool quietMode )
 {
   if ( myEdited )
   {
-    QString dirPath = QFileInfo( myEdit->text().stripWhiteSpace() ).absFilePath();
+    QString dirPath = QFileInfo( myEdit->text().stripWhiteSpace() ).filePath();
 /*
 #ifndef WNT
     if ( dirPath.startsWith( "~") ) {
@@ -285,20 +297,21 @@ bool QtxDirListEditor::validate()
       if (found) {
         if (found != myLastSelected) {
           // it is forbidden to add directory more then once
-	  QMessageBox::critical(this, 
-		                tr("Error"),
-			        tr("Directory already specified."), 
-			        tr("Ok"));
+	  if ( !quietMode )
+	    QMessageBox::critical(this, 
+				  tr("Error"),
+				  tr("Directory already specified."), 
+				  tr("Ok"));
 	  myEdit->setFocus();
           return false;
         }
       }
       else {
         if (!dir.exists()) {
-	  if ( QMessageBox::information(this, 
-					tr("Warning"),
-					tr("%1\n\nThe directory doesn't exist.\nAdd directory anyway?").arg(dir.absPath()),
-					tr("Yes"), tr("No"), QString::null, 1, 1) == 1) {
+	  if ( !quietMode && QMessageBox::information(this, 
+						      tr("Warning"),
+						      tr("%1\n\nThe directory doesn't exist.\nAdd directory anyway?").arg(dir.absPath()),
+						      tr("Yes"), tr("No"), QString::null, 1, 1) == 1) {
 	    myEdit->setFocus();
             return false;
 	  }

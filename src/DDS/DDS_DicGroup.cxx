@@ -76,7 +76,10 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
     LDOM_NodeList systemList = systems.getElementsByTagName( DDS_Dictionary::KeyWord( "UNIT_SYSTEM" ) );
     for ( Standard_Integer i = 0; i < systemList.getLength(); i++ )
     {
-      LDOM_Element aSystem = (const LDOM_Element &)systemList.item( i );
+      //const LDOM_Element& aSystem = (const LDOM_Element &)systemList.item( i );
+      LDOM_Node aNode = systemList.item( i );
+      const LDOM_Element& anElem = (const LDOM_Element&) aNode;
+      LDOM_Element aSystem(anElem);
       TCollection_AsciiString aName = aSystem.getAttribute( DDS_Dictionary::KeyWord( "UNIT_SYSTEM_NAME" ) );
       TCollection_ExtendedString aLabel = aSystem.getAttribute( DDS_Dictionary::KeyWord( "UNIT_SYSTEM_LABEL" ) );
 
@@ -103,7 +106,10 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
 
   for ( Standard_Integer i = 0; i < aData.getLength(); i++ )
   {
-    LDOM_Element aQuantity = (const LDOM_Element&)aData.item( i );
+    //LDOM_Element aQuantity = (const LDOM_Element&)aData.item( i );
+    LDOM_Node aNode = aData.item( i );
+    const LDOM_Element& anElem = (const LDOM_Element&) aNode;
+    LDOM_Element aQuantity(anElem);
 
     // 1. Attributes (id,label,units?,format?,required?)
     TCollection_AsciiString anID = aQuantity.getAttribute( DDS_Dictionary::KeyWord( "DATUM_ID" ) );

@@ -51,6 +51,7 @@ class QTX_EXPORT QtxActionMenuMgr : public QtxActionMgr
     MenuNode( MenuNode* p ) : parent( p ), visible( true ) { children.setAutoDelete( true ); };
 
     int       id;
+    int       idx;
     int       group;
     MenuNode* parent;
     bool      visible;
@@ -79,17 +80,17 @@ public:
   virtual int  insert( const int, const int, const int, const int = -1 );
   int          insert( QAction*, const int, const int, const int = -1 );
 
-  int          insert( const QString&, const QString&, const int, const int = -1 );
-  int          insert( const QString&, const QStringList&, const int, const int = -1 );
-  virtual int  insert( const QString&, const int, const int, const int = -1 );
+  int          insert( const QString&, const QString&, const int, const int = -1, const int = -1, const bool = false );
+  int          insert( const QString&, const QStringList&, const int, const int = -1, const int = -1, const bool = false );
+  virtual int  insert( const QString&, const int, const int, const int = -1, const int = -1, const bool = false );
 
   int          append( const int, const int, const int );
   int          append( QAction*, const int, const int );
-  int          append( const QString&, const int, const int );
+  int          append( const QString&, const int, const int, const int = -1, const bool = false );
 
   int          prepend( const int, const int, const int );
   int          prepend( QAction*, const int, const int );
-  int          prepend( const QString&, const int, const int );
+  int          prepend( const QString&, const int, const int, const int = -1, const bool = false );
 
   void         remove( const int );
   void         remove( const int, const int, const int = -1 );
@@ -102,14 +103,26 @@ public:
 
   virtual bool load( const QString&, QtxActionMgr::Reader& );
 
+  bool         containsMenu( const QString&, const int ) const;
+  bool         containsMenu( const int, const int ) const;
+
+
 private slots:
   void         onDestroyed( QObject* );
+  void         onHighlighted( int );
+
+signals:
+  void         menuHighlighted( int, int );
 
 protected:
   void         setWidget( QWidget* );
-  MenuNode*    find( const int, const int ) const;
-  MenuNode*    find( const int, MenuNode* = 0 ) const;
+  MenuNode*    find( const int, const int, const bool = true ) const;
+  MenuNode*    find( const int, MenuNode* = 0, const bool = true ) const;
   bool         find( const int, NodeList&, MenuNode* = 0 ) const;
+  MenuNode*    find( const QString&, const int, const bool = true ) const;
+  MenuNode*    find( const QString&, MenuNode* = 0, const bool = true ) const;
+  bool         find( const QString&, NodeList&, MenuNode* = 0 ) const;
+  int          findId( const int, const int = -1 ) const;
 
   void         removeMenu( const int, MenuNode* );
 
