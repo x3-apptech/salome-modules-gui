@@ -39,7 +39,7 @@ enum MenuName {
   Help        = 7  
 };
 
-enum {
+enum WindowType {
   WT_ObjectBrowser,
   WT_PyConsole,
   WT_LogWindow,
