@@ -135,7 +135,7 @@ int SalomeApp_VisualState::storeState()
     
     QPtrVector<SUIT_ViewWindow> views = vm->getViews();
     for(int i = 0; i<view_count; i++) {
-      ip.append( viewerEntry, views[i]->caption() );
+      ip.append( viewerEntry, views[i]->caption().latin1() );
       ip.append( viewerEntry, views[i]->getVisualParameters().latin1() );
     }
   }
