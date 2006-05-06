@@ -16,12 +16,13 @@
 //
 // See http://www.salome-platform.org/
 //
-/********************************************************************
-**  Class:   SUIT_MessageBox
-**  Descr:   Message dialog box for SUIT-based application
-**  Module:  SUIT
-**  Created: UI team, 02.10.00
-*********************************************************************/
+
+/*!
+  \class:   SUIT_MessageBox
+  Message dialog box for SUIT-based application
+  Module:  SUIT
+  Created: UI team, 02.10.00
+*/
 
 #include "SUIT_MessageBox.h"
 #include "SUIT_OverrideCursor.h"

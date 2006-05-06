@@ -49,16 +49,16 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+
 vtkStandardNewMacro(VTKViewer_RectPicker);
 
-//----------------------------------------------------------------------------
+
 /*!Constructor. Do nothing*/
 VTKViewer_RectPicker::VTKViewer_RectPicker()
 {
 }
 
-//----------------------------------------------------------------------------
+
 /*!Perform pick operation with selection rectangle provided. Normally the 
  * first two values for the selection top-left and right-bottom points are 
  * x-y pixel coordinate, and the third value is =0. 
@@ -428,7 +428,7 @@ char GetIntersectionPoint(const float start[3], const float end[3],
   return result;
 }
 
-//----------------------------------------------------------------------------
+
 /*! Bounding box intersection with hexahedron. Origin[4][4] starts the ray from corner points, 
  * dir[4][3] is the vector components of the ray in the x-y-z directions. 
  * (Notes: the intersection ray dir[4][3] is NOT normalized.)
@@ -725,7 +725,6 @@ char VTKViewer_RectPicker::HitBBox (float bounds[6], float origin[4][4], float d
   return inside;
 }
 
-//----------------------------------------------------------------------------
 /*! Position of point relative to hexahedron. p1[4][4] is the corner points of top face, 
  * p2[4][4] is the corner points of bottom face. 
  * \retval The method returns a non-zero value, if the point is inside.
@@ -851,7 +850,6 @@ char VTKViewer_RectPicker::PointInside (float p[3], float p1[4][4], float p2[4][
   return inside;
 }
 
-//----------------------------------------------------------------------------
 float VTKViewer_RectPicker::IntersectWithHex(float p1[4][4], float p2[4][4], float tol, 
 					     vtkAssemblyPath *path, vtkProp3D *prop3D, 
 					     vtkAbstractMapper3D *mapper)

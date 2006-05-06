@@ -28,6 +28,10 @@
 
 class LightApp_Preferences;
 
+/*!
+  \class LightApp_PreferencesDlg
+  Dialog for preferences edition
+*/
 class LIGHTAPP_EXPORT LightApp_PreferencesDlg : public QtxDialog
 {
   Q_OBJECT
@@ -47,6 +51,7 @@ private slots:
   void                  onHelp();
   void                  onApply();
   void                  onDefault();
+  void                  onImportPref();
 
 private:
   LightApp_Preferences* myPrefs;

@@ -29,24 +29,18 @@
 #include <qwt_plot.h>
 #include "Plot2d_Prs.h"
 
-//==========================================================
 /*!
- *  Plot2d_Prs::Plot2d_Prs
- *  Default constructor
- */
-//==========================================================
+  Default constructor
+*/
 Plot2d_Prs::Plot2d_Prs( bool theDelete )
 : mySecondY( false)
 {
   setAutoDel(theDelete);
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::Plot2d_Prs
- *  Standard constructor
- */
-//==========================================================
+  Standard constructor
+*/
 Plot2d_Prs::Plot2d_Prs( const Plot2d_Curve* obj, bool theDelete )
 : mySecondY( false)
 {
@@ -54,33 +48,24 @@ Plot2d_Prs::Plot2d_Prs( const Plot2d_Curve* obj, bool theDelete )
   AddObject( obj ); 
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::~Plot2d_Prs
- *  Destructor
- */
-//==========================================================
+  Destructor
+*/
 Plot2d_Prs::~Plot2d_Prs()
 { 
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::GetObjects
- *  Get curves list
- */
-//==========================================================
+  Get curves list
+*/
 curveList Plot2d_Prs::getCurves() const
 {
   return myCurves;
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::AddObject
- *  Add curbe
- */
-//==========================================================
+  Add curve
+*/
 void Plot2d_Prs::AddObject( const Plot2d_Curve* obj )
 {
   myCurves.append((Plot2d_Curve*)obj);
@@ -89,38 +74,25 @@ void Plot2d_Prs::AddObject( const Plot2d_Curve* obj )
     mySecondY = true;
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::IsNull
- *  Return 0 if list of the curves is empty
- *  [ Reimplemented from SALOME_Prs ]
- */
-//==========================================================
+  \return 0 if list of the curves is empty [ Reimplemented from SALOME_Prs ]
+*/
 bool Plot2d_Prs::IsNull() const 
 { 
   return myCurves.isEmpty();
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::IsSecondY
- *  Return 1 if in the list of curves exist at least one curve
- *  with axis Qwt::yRight
- *  [ Reimplemented from SALOME_Prs ]
- */
-//==========================================================
+  \return 1 if in the list of curves exist at least one curve with axis Qwt::yRight [ Reimplemented from SALOME_Prs ]
+*/
 bool Plot2d_Prs::isSecondY() const
 {
   return mySecondY;
 }
 
-//==========================================================
 /*!
- *  Plot2d_Prs::IsNull
- *  Return 0 if list of the curves is empty
- *  [ Reimplemented from SALOME_Prs ]
- */
-//==========================================================
+  \return 0 if list of the curves is empty [ Reimplemented from SALOME_Prs ]
+*/
 void Plot2d_Prs::setAutoDel(bool theDel)
 {
   myCurves.setAutoDelete(theDel);

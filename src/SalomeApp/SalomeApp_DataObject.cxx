@@ -35,10 +35,6 @@
 #include <SALOMEDSClient_AttributeTableOfReal.hxx>
 #include <SALOMEDSClient_AttributeTableOfInteger.hxx>
 
-/*
-	Class: SalomeApp_DataObject
-	Level: Public
-*/
 /*!Constructor. Initialize by \a parent*/
 SalomeApp_DataObject::SalomeApp_DataObject( SUIT_DataObject* parent )
 : LightApp_DataObject( parent ),
@@ -333,10 +329,9 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   return val;
 }
 
-/*
-	Class: SalomeApp_ModuleObject
-	Level: Public
-*/
+
+
+
 
 /*!Constructor.Initialize by \a parent.*/
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( SUIT_DataObject* parent )
@@ -373,10 +368,8 @@ QString SalomeApp_ModuleObject::name() const
   return SalomeApp_DataObject::name();
 }
 
-/*
-	Class: SalomeApp_SavePointObject
-	Level: Public
-*/
+
+
 
 /*!Constructor.Initialize by \a parent.*/
 SalomeApp_SavePointObject::SalomeApp_SavePointObject( SUIT_DataObject* _parent, const int id, SalomeApp_Study* study )
@@ -410,11 +403,13 @@ QString SalomeApp_SavePointObject::name() const
   return myStudy->getNameOfSavePoint( myId );
 }
 
+/*!Gets icon picture of object.*/
 QPixmap SalomeApp_SavePointObject::icon() const
 {
   return QPixmap();
 }
 
+/*!Gets tooltip.*/
 QString SalomeApp_SavePointObject::toolTip() const
 {
   return QObject::tr( "SAVE_POINT_OBJECT_TOOLTIP" ).arg( name() );

@@ -16,17 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-/**
-*  SALOME SalomeApp
-*
-*  Copyright (C) 2005  CEA/DEN, EDF R&D
-*
-*
-*
-*  File   : SUIT_Operation.h
-*  Author : Unknown
-*  Module : SALOME
-*/
 
 #ifndef SUIT_OPERATION_H
 #define SUIT_OPERATION_H
@@ -40,6 +29,7 @@ class SUIT_Study;
 class SUIT_Application;
 
 /*!
+   \class SUIT_Operation
  * \brief Base class for all operations
  *
  *  Base class for all operations. If you perform an action it is reasonable to create

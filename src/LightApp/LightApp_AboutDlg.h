@@ -10,12 +10,12 @@
 
 #include <QtxDialog.h>
 
-/*!
-  Descr: LightApp help about dialog
-*/
-
 class QLabel;
 
+/*!
+  \class LightApp_AboutDlg
+  LightApp help about dialog
+*/
 class LIGHTAPP_EXPORT LightApp_AboutDlg : public QtxDialog
 {
   Q_OBJECT

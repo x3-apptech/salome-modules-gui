@@ -23,19 +23,24 @@
 
 #include <TDocStd_Document.hxx>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+/*!
+  Default constructor
+*/
 CAF_Operation::CAF_Operation(SUIT_Application* theApp)
 :SUIT_Operation(theApp)
 {
 }
 
+/*!
+  Destructor
+*/
 CAF_Operation::~CAF_Operation()
 {
 }
 
+/*!
+  \return OCAF document
+*/
 Handle(TDocStd_Document) CAF_Operation::stdDoc() const
 {
   Handle(TDocStd_Document) doc;

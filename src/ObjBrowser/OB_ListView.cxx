@@ -25,28 +25,44 @@
 
 #include <qdragobject.h>
 
+/*!
+  Constructor
+*/
 OB_ListView::OB_ListView( QWidget* parent, const char* name, WFlags f )
 : QtxListView( parent, name, f ),
 myFilter( 0 )
 {
 }
 
+/*!
+  Constructor
+*/
 OB_ListView::OB_ListView( const int state, QWidget* parent, const char* name, WFlags f )
 : QtxListView( state, parent, name, f ),
 myFilter( 0 )
 {
 }
 
+/*!
+  Destructor
+*/
 OB_ListView::~OB_ListView()
 {
   delete myFilter;
 }
 
+/*!
+  \return filter
+*/
 OB_Filter* OB_ListView::filter() const
 {
   return myFilter;
 }
 
+/*!
+  Changes filter
+  \param f - new filter
+*/
 void OB_ListView::setFilter( OB_Filter* f )
 {
   if ( myFilter == f )
@@ -56,6 +72,9 @@ void OB_ListView::setFilter( OB_Filter* f )
   myFilter = f;
 }
 
+/*!
+  \return true if item passes filter
+*/
 bool OB_ListView::isOk( QListViewItem* item ) const
 {
   bool ok = true;
@@ -65,6 +84,9 @@ bool OB_ListView::isOk( QListViewItem* item ) const
   return ok;
 }
 
+/*!
+  Creates new drag object
+*/
 QDragObject* OB_ListView::dragObject()
 {
   myItems.clear();
@@ -76,11 +98,17 @@ QDragObject* OB_ListView::dragObject()
   return new QTextDrag( "", this );
 }
 
+/*!
+  Custom drag enter event filter
+*/
 void OB_ListView::dragEnterEvent( QDragEnterEvent* e )
 {
   e->accept();
 }
 
+/*!
+  Custom drag move event filter
+*/
 void OB_ListView::dragMoveEvent( QDragMoveEvent* e )
 {
   QListViewItem* item = dropItem( e );
@@ -94,6 +122,9 @@ void OB_ListView::dragMoveEvent( QDragMoveEvent* e )
     e->accept( false );
 }
 
+/*!
+  Custom drop event filter
+*/
 void OB_ListView::dropEvent( QDropEvent* e )
 {
   QListViewItem* item = dropItem( e );
@@ -105,6 +136,9 @@ void OB_ListView::dropEvent( QDropEvent* e )
   myItems.clear();
 }
 
+/*!
+  Custom key press event filter
+*/
 void OB_ListView::keyPressEvent( QKeyEvent* ke )
 {
   if ( ( ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Minus ) && ke->state() & ControlButton )
@@ -118,6 +152,10 @@ void OB_ListView::keyPressEvent( QKeyEvent* ke )
     QtxListView::keyPressEvent( ke );
 }
 
+/*!
+  Finds item, in that dragged objects are dropped by QDropEvent
+  \return tree item
+*/
 QListViewItem* OB_ListView::dropItem( QDropEvent* e ) const
 {
   QListViewItem* item = 0;
@@ -127,6 +165,10 @@ QListViewItem* OB_ListView::dropItem( QDropEvent* e ) const
   return item;
 }
 
+/*!
+  \return SUIT object by tree item
+  \param item - tree item
+*/
 SUIT_DataObject* OB_ListView::dataObject( QListViewItem* item ) const
 {
   if ( !item )
@@ -142,6 +184,10 @@ SUIT_DataObject* OB_ListView::dataObject( QListViewItem* item ) const
   return obj;
 }
 
+/*!
+  \return true if it is possible to drop into item
+  \param item - tree item to be checked
+*/
 bool OB_ListView::isDropAccepted( QListViewItem* item ) const
 {
   bool res = true;
@@ -152,6 +198,11 @@ bool OB_ListView::isDropAccepted( QListViewItem* item ) const
   return res;
 }
 
+/*!
+  \return true if it is possible to drop one item into other
+  \param drag - dragged item
+  \param drop - destination item
+*/
 bool OB_ListView::isDropAccepted( QListViewItem* drag, QListViewItem* drop ) const
 {
   SUIT_DataObject* dragObj = dataObject( drag );
@@ -163,6 +214,11 @@ bool OB_ListView::isDropAccepted( QListViewItem* drag, QListViewItem* drop ) con
   return dropObj->isDropAccepted( dragObj );
 }
 
+/*!
+  Sets column width
+  \param col - column index
+  \param width - column width
+*/ 
 void OB_ListView::setColumnWidth( int col, int width )
 {
   int max = columnMaxWidth( col );
@@ -171,6 +227,10 @@ void OB_ListView::setColumnWidth( int col, int width )
   QListView::setColumnWidth( col, width );
 }
 
+/*!
+  \return column max width
+  \param col - column index
+*/ 
 int OB_ListView::columnMaxWidth( const int col ) const
 {
   int res = -1;
@@ -181,11 +241,20 @@ int OB_ListView::columnMaxWidth( const int col ) const
   return res;
 }
 
+/*!
+  Changes column max width
+  \param col - column index
+  \param w - column max width
+*/ 
 void OB_ListView::setColumnMaxWidth( const int col, const int w )
 {
   myMaxColWidth.insert( col, w );
 }
 
+/*!
+  \return column max ratio
+  \param col - column index
+*/ 
 double OB_ListView::columnMaxRatio( const int col ) const
 {
   double res = 0.0;
@@ -194,6 +263,11 @@ double OB_ListView::columnMaxRatio( const int col ) const
   return res;
 }
 
+/*!
+  Changes column max ratio
+  \param col - column index
+  \param w - column max ratio
+*/ 
 void OB_ListView::setColumnMaxRatio( const int col, const double r )
 {
   myMaxColRatio.insert( col, r );

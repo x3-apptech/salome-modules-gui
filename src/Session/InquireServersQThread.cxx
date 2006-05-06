@@ -49,6 +49,9 @@ using namespace std;
 #define MARGIN_SIZE  5
 #define SPACING_SIZE 3
 
+/*!
+  Constructor
+*/
 InquireServersGUI::InquireServersGUI()
      : QVBox(0, "SFA splash", Qt::WDestructiveClose | Qt::WStyle_Customize | Qt::WStyle_NoBorder | WType_TopLevel | WStyle_StaysOnTop | WX11BypassWM  )
 {
@@ -137,6 +140,10 @@ InquireServersGUI::InquireServersGUI()
   myThread->start();
 }
 
+/*!
+  Sets pixmap of splash screen
+  \param pix - new pixmap
+*/
 void InquireServersGUI::setPixmap( QPixmap pix )
 {
   if ( !pix.isNull() ) 
@@ -148,21 +155,28 @@ void InquireServersGUI::setPixmap( QPixmap pix )
   }
 }
 
+/*!
+  Destructor
+*/
 InquireServersGUI::~InquireServersGUI()
 {
   delete myThread;
 }
 
+/*!
+  Gets parameters from qApp
+  \param _argc - variable to return number of arguments
+  \param _argv - variable to return array of arguments
+*/
 void InquireServersGUI::getArgs( int& _argc, char *** _argv)
 {
   _argc = qApp->argc();
   *_argv = qApp->argv();
 }
 
-//=================================================================================
-// function : ClickOnCancel()
-// purpose  : cancel loading of SALOME
-//=================================================================================
+/*!
+  Cancel loading of SALOME
+*/
 void InquireServersGUI::ClickOnCancel()
 {
   myThread->stop(); //it's necessary to stop asking servers
@@ -170,6 +184,9 @@ void InquireServersGUI::ClickOnCancel()
   qApp->exit( 1 );
 }
 
+/*!
+  Custom event filter
+*/
 void InquireServersGUI::customEvent( QCustomEvent* pe )
 {
   switch( pe->type() )
@@ -204,11 +221,17 @@ void InquireServersGUI::customEvent( QCustomEvent* pe )
     }
 }
 
+/*!
+  \return status of thread exit
+*/
 int InquireServersGUI::getExitStatus()
 {
   return myThread->getExitStatus();
 }
 
+/*!
+  Constructor
+*/
 InquireServersQThread::InquireServersQThread( InquireServersGUI* r )
      : receiver(r),  myExitStatus(0)
 {
@@ -258,6 +281,9 @@ InquireServersQThread::InquireServersQThread( InquireServersGUI* r )
   }
 }
 
+/*!
+  The main loop of this thread
+*/
 void InquireServersQThread::run()
 {
   while ( IsChecking && receiver )
@@ -305,12 +331,18 @@ void InquireServersQThread::run()
   qApp->exit( myExitStatus );
 }
 
+/*!
+  Stops this thread
+*/
 void InquireServersQThread::stop()
 {
   IsChecking = false;
   myExitStatus = 1;
 }
 
+/*!
+  Destructor
+*/
 InquireServersQThread::~InquireServersQThread()
 {
 }

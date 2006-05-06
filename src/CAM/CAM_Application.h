@@ -31,6 +31,13 @@ class QPopupMenu;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class CAM_Application
+  Defines application configuration and behaviour for application with modules.
+  Every module has own data model, necessary windows and viewers, etc.
+  Application provides all necessary functionality for module management
+  (loading of modules/activation/deactivation, etc)
+*/
 class CAM_EXPORT CAM_Application : public STD_Application  
 {
   Q_OBJECT

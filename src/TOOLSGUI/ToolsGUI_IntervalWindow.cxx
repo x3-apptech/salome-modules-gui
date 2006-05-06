@@ -20,8 +20,11 @@
 #define SPACING_SIZE      6
 #define MIN_SPIN_WIDTH  100 
 
+/*!
+  Constructor
+*/
 ToolsGUI_IntervalWindow::ToolsGUI_IntervalWindow ( QWidget* parent )
-     : QDialog( parent, "ToolsGUI_IntervalWindow" , true, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu | WDestructiveClose )
+: QDialog( parent, "ToolsGUI_IntervalWindow" , true, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu | WDestructiveClose )
 {
   BEGIN_OF("ToolsGUI_IntervalWindow constructor")
   setCaption( tr( "Refresh Interval"  ) );
@@ -73,8 +76,13 @@ ToolsGUI_IntervalWindow::ToolsGUI_IntervalWindow ( QWidget* parent )
 
   END_OF("ToolsGUI_IntervalWindow constructor")
 }
+
+/*!
+  Destructor
+*/
 ToolsGUI_IntervalWindow::~ToolsGUI_IntervalWindow() {}
-/* 
+
+/*!
    Sets start interval size
 */
 void ToolsGUI_IntervalWindow::setValue(const int size)
@@ -82,24 +90,24 @@ void ToolsGUI_IntervalWindow::setValue(const int size)
   mySpinBox->setValue(size);
 }
 
-/*
-   Gets interval size
+/*!
+   \return interval size
 */
 int ToolsGUI_IntervalWindow::getValue()
 {
   return mySpinBox->value();
 }
 
-/*
-   gets a pointer to myButtonOk
+/*!
+   \return a pointer to myButtonOk
 */
 QPushButton* ToolsGUI_IntervalWindow::Ok()
 {
   return myButtonOk;
 }
 
-/*
-   gets a pointer to myButtonCancel
+/*!
+   \return a pointer to myButtonCancel
 */
 QPushButton* ToolsGUI_IntervalWindow::Cancel()
 {

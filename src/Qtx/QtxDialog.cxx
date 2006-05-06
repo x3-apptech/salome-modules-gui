@@ -33,7 +33,6 @@
 	Class: QtxDialog::Area
 	Level: Internal
 */
-
 class QtxDialog::Area : public QFrame
 {
 public:
@@ -68,6 +67,9 @@ private:
 	Orientation              myOrientation;
 };
 
+/*!
+  Contructor
+*/
 QtxDialog::Area::Area( Orientation o, QtxDialog* dlg, QWidget* parent )
 : QFrame( parent ),
 myDlg( dlg ),
@@ -84,10 +86,17 @@ myOrientation( o )
 	hide();
 }
 
+/*!
+  Destructor
+*/
 QtxDialog::Area::~Area()
 {
 }
 
+/*!
+  Inserts button to area
+  \param b - button
+*/
 void QtxDialog::Area::insertButton( QButton* b )
 {
 	if ( !b || myButtons.findRef( b ) != -1 )
@@ -108,6 +117,10 @@ void QtxDialog::Area::insertButton( QButton* b )
 	updateBorder();
 }
 
+/*!
+  Removes button from area
+  \param b - button
+*/
 void QtxDialog::Area::removeButton( QButton* b )
 {
 	if ( !b )
@@ -126,16 +139,27 @@ void QtxDialog::Area::removeButton( QButton* b )
 	layoutButtons();
 }
 
+/*!
+  \return true if area contains button
+  \param b - button
+*/
 bool QtxDialog::Area::contains( QButton* b ) const
 {
 	return myButtons.containsRef( b );
 }
 
+/*!
+  \return policy of button layouting.
+*/
 int QtxDialog::Area::policy() const
 {
 	return myPolicy;
 }
 
+/*!
+  Changes policy of button layouting.
+  \param p - new policy
+*/
 void QtxDialog::Area::setPolicy( const int p )
 {
 	if ( myPolicy == p )
@@ -145,11 +169,18 @@ void QtxDialog::Area::setPolicy( const int p )
 	layoutButtons();
 }
 
+/*!
+  \return true if border enabled
+*/
 bool QtxDialog::Area::isBorderEnabled() const
 {
 	return myLine && myBorder;
 }
 
+/*!
+  Enables/disable separator between main frame and button frame
+  \param on - new state
+*/
 void QtxDialog::Area::setBorderEnabled( const bool on )
 {
 	if ( !myLine || myBorder == on )
@@ -159,6 +190,10 @@ void QtxDialog::Area::setBorderEnabled( const bool on )
 	updateBorder();
 }
 
+/*!
+  Sets label as separator between main frame and button frame
+  \param line - new separator
+*/
 void QtxDialog::Area::setBorderWidget( QLabel* line )
 {
 	if ( myLine == line )
@@ -169,11 +204,17 @@ void QtxDialog::Area::setBorderWidget( QLabel* line )
 	updateBorder();
 }
 
+/*!
+  \return const reference to list of buttons
+*/
 const QPtrList<QButton>& QtxDialog::Area::buttons() const
 {
 	return myButtons;
 }
 
+/*!
+  Updates visibility of border
+*/
 void QtxDialog::Area::updateBorder()
 {
 	if ( !myLine )
@@ -192,6 +233,9 @@ void QtxDialog::Area::updateBorder()
 	myLine->setLineWidth( myBorder ? 1 : 0 );
 }
 
+/*!
+  Installs buttons into layout
+*/
 void QtxDialog::Area::layoutButtons()
 {
 	int aPolicy = policy();
@@ -285,11 +329,12 @@ void QtxDialog::Area::layoutButtons()
   Qtx::setTabOrder( wids );
 }
 
-/*!
-	Class: QtxDialog::Border
-	Level: Internal
-*/
 
+/*!
+  \class QtxDialog::Border
+
+  Special label used as separator between main frame and button frame
+*/
 class QtxDialog::Border : public QLabel
 {
 public:
@@ -302,16 +347,26 @@ public:
 	virtual QSize minimumSizeHint() const;
 };
 
+/*!
+  Constructor
+*/
 QtxDialog::Border::Border( QWidget* parent )
 : QLabel( parent )
 {
     setAlignment( Qt::AlignCenter );
 }
 
+/*!
+  Destructor
+*/
 QtxDialog::Border::~Border()
 {
 }
 
+/*!
+  Set line width of separator
+  \param lw - new line width
+*/
 void QtxDialog::Border::setLineWidth( int lw )
 {
   bool isOn = lineWidth() > 0;
@@ -322,6 +377,9 @@ void QtxDialog::Border::setLineWidth( int lw )
     updateGeometry();
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxDialog::Border::sizeHint() const
 {
   QSize sz( 5, 5 );
@@ -339,26 +397,22 @@ QSize QtxDialog::Border::sizeHint() const
   return sz;
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxDialog::Border::minimumSizeHint() const
 {
 	return sizeHint();
 }
 
 /*!
-	Class: QtxDialog
-	Level: Public
+  Constructor
+  Construct a dialog with specified parent and name.
+  \param modal define modal status of dialog (default non modal dialog created).
+  \param allowResize - if it is true then dialog can be resize by user (default non resizable dialog created).
+  \param Button flags specified control buttons for dialog (default buttons is OK, Cancel and Help).
+  \param Widget flags used as in any widget.
 */
-
-/*!
-	Name: QtxDialog [public]
-	Desc: Construct a dialog with specified parent and name.
-          Parameter 'modal' define modal status of dialog (default non modal
-		  dialog created). If parameter 'allowResize' is true then dialog
-		  can be resize by user (default non resizable dialog created).
-		  Button flags specified control buttons for dialog (default buttons
-		  is OK, Cancel and Help). Widget flags used as in any widget.
-*/
-
 QtxDialog::QtxDialog( QWidget* parent, const char* name,
 					  bool modal, bool allowResize, const int f, WFlags wf )
 : QDialog( parent, name, modal,

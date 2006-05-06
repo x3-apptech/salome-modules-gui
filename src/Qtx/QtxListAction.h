@@ -118,11 +118,9 @@ private:
     friend class QtxListFrame;
 };
 
-/*************************************
-**  Class: QtxListFrame
-**  Level: Internal
-*************************************/
-
+/*!
+  \class QtxListFrame
+*/
 class QtxListFrame : public QFrame
 {
     Q_OBJECT

@@ -38,6 +38,9 @@ SalomeApp_EventFilter::~SalomeApp_EventFilter()
   qApp->removeEventFilter( this );
 }
 
+/*!
+  Custom event filter
+*/
 bool SalomeApp_EventFilter::eventFilter( QObject* o, QEvent* e )
 {
   if ( e->type() == SALOME_EVENT )

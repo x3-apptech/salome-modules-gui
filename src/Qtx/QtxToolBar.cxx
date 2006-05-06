@@ -66,6 +66,9 @@ private:
   bool         myVisible;
 };
 
+/*!
+  Constructor
+*/
 QtxToolBar::Watcher::Watcher( QtxToolBar* cont )
 : QObject( cont ),
 myCont( cont ),
@@ -81,6 +84,9 @@ myEmpty( true )
   installFilters();
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxToolBar::Watcher::eventFilter( QObject* o, QEvent* e )
 {
   if ( o == myCont && e->type() == QEvent::ChildInserted )
@@ -108,6 +114,9 @@ bool QtxToolBar::Watcher::eventFilter( QObject* o, QEvent* e )
   return false;
 }
 
+/*!
+  Sets internal visibility state to true
+*/
 void QtxToolBar::Watcher::shown( QtxToolBar* tb )
 {
   if ( tb != myCont )
@@ -116,6 +125,9 @@ void QtxToolBar::Watcher::shown( QtxToolBar* tb )
   myVisible = true;
 }
 
+/*!
+  Sets internal visibility state to false
+*/
 void QtxToolBar::Watcher::hided( QtxToolBar* tb )
 {
   if ( tb != myCont )
@@ -124,6 +136,9 @@ void QtxToolBar::Watcher::hided( QtxToolBar* tb )
   myVisible = false;
 }
 
+/*!
+  Shows corresponding QtxToolBar
+*/
 void QtxToolBar::Watcher::showContainer()
 {
   if ( !myCont )
@@ -135,6 +150,9 @@ void QtxToolBar::Watcher::showContainer()
   myCont = cont;
 }
 
+/*!
+  Hides corresponding QtxToolBar
+*/
 void QtxToolBar::Watcher::hideContainer()
 {
   if ( !myCont )
@@ -146,6 +164,9 @@ void QtxToolBar::Watcher::hideContainer()
   myCont = cont;
 }
 
+/*!
+  Event handler of custom events
+*/
 void QtxToolBar::Watcher::customEvent( QCustomEvent* e )
 {
   switch ( e->type() )
@@ -159,6 +180,9 @@ void QtxToolBar::Watcher::customEvent( QCustomEvent* e )
   }
 }
 
+/*!
+  Installs event filters
+*/
 void QtxToolBar::Watcher::installFilters()
 {
   if ( !myCont )
@@ -176,6 +200,9 @@ void QtxToolBar::Watcher::installFilters()
   }
 }
 
+/*!
+  Update visibility state
+*/
 void QtxToolBar::Watcher::updateVisibility()
 {
   if ( !myCont )
@@ -215,6 +242,9 @@ void QtxToolBar::Watcher::updateVisibility()
     vis ? showContainer() : hideContainer();
 }
 
+/*!
+  Updates icon
+*/
 void QtxToolBar::Watcher::updateIcon()
 {
   if ( !myCont || !myCont->widget() )
@@ -224,6 +254,9 @@ void QtxToolBar::Watcher::updateIcon()
   myCont->setIcon( ico ? *ico : QPixmap() );
 }
 
+/*!
+  Updates caption
+*/
 void QtxToolBar::Watcher::updateCaption()
 {
   if ( myCont && myCont->widget() && !myCont->widget()->caption().isNull() )
@@ -231,10 +264,8 @@ void QtxToolBar::Watcher::updateCaption()
 }
 
 /*!
-    Class: QtxToolBar [Public]
-    Descr: 
+  Constructor
 */
-
 QtxToolBar::QtxToolBar( const bool watch, const QString& label, QMainWindow* main,
                         QWidget* parent, bool newLine, const char* name, WFlags f )
 : QToolBar( label, main, parent, newLine, name, f ),
@@ -245,6 +276,9 @@ myStretch( false )
     myWatcher = new Watcher( this );
 }
 
+/*!
+  Constructor
+*/
 QtxToolBar::QtxToolBar( const QString& label, QMainWindow* main,
                         QWidget* parent, bool newLine, const char* name, WFlags f )
 : QToolBar( label, main, parent, newLine, name, f ),
@@ -253,6 +287,9 @@ myStretch( false )
 {
 }
 
+/*!
+  Constructor
+*/
 QtxToolBar::QtxToolBar( const bool watch, QMainWindow* main, const char* name )
 : QToolBar( main, name ),
 myWatcher( 0 ),
@@ -262,6 +299,9 @@ myStretch( false )
     myWatcher = new Watcher( this );
 }
 
+/*!
+  Constructor
+*/
 QtxToolBar::QtxToolBar( QMainWindow* main, const char* name )
 : QToolBar( main, name ),
 myWatcher( 0 ),
@@ -269,10 +309,17 @@ myStretch( false )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxToolBar::~QtxToolBar()
 {
 }
 
+/*!
+  Change the toolbar's main widget
+  \param wid - new main widget
+*/
 void QtxToolBar::setWidget( QWidget* wid )
 {
   if ( wid )
@@ -293,11 +340,18 @@ void QtxToolBar::setWidget( QWidget* wid )
   }
 }
 
+/*!
+  \return true if toolbar is stretchable
+*/
 bool QtxToolBar::isStretchable() const
 {
   return myStretch;
 }
 
+/*!
+  Sets stretchable state of toolbar
+  \param on - new state
+*/
 void QtxToolBar::setStretchable( const bool on )
 {
   if ( myStretch == on )
@@ -317,6 +371,9 @@ void QtxToolBar::setStretchable( const bool on )
   }
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxToolBar::sizeHint() const
 {
   QSize sz = QToolBar::sizeHint();
@@ -332,6 +389,9 @@ QSize QtxToolBar::sizeHint() const
   return sz;
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxToolBar::minimumSizeHint() const
 {
   QSize sz = QToolBar::minimumSizeHint();
@@ -347,6 +407,9 @@ QSize QtxToolBar::minimumSizeHint() const
   return sz;
 }
 
+/*!
+  Shows toolbar
+*/
 void QtxToolBar::show()
 {
   if ( myWatcher )
@@ -355,6 +418,9 @@ void QtxToolBar::show()
   QToolBar::show();
 }
 
+/*!
+  Hides toolbar
+*/
 void QtxToolBar::hide()
 {
   if ( myWatcher )

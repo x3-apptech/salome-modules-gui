@@ -52,9 +52,9 @@ class vtkObject;
 class SVTK_Selector;
 class SVTK_Renderer;
 
-//============================================================================
-//! Implemements Qt based vtkRenderWindowInteractor.
 /*!
+  \class QVTK_RenderWindowInteractor
+  Implements Qt based vtkRenderWindowInteractor.
   The class inherits #QWidget class in order to be possible process Qt events.
   It invokes corresponding VTK events through usage of its device - a #vtkGenericRenderWindowInteractor.
   Also, it creates, initialize and holds vtkRenderWindow instance.
@@ -124,9 +124,9 @@ class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
 };
 
 
-//============================================================================
 //! Extends QVTK_RenderWindowInteractor functionality.
 /*!
+  \class SVTK_RenderWindowInteractor
   Implements such features as 
   support of selection, 
   run-time interactor style management,

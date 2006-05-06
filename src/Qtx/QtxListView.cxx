@@ -48,6 +48,9 @@ static const char* list_xpm[] = {
 "................",
 "................" };
 
+/*!
+  Constructor
+*/
 QtxListView::QtxListView( const int state, QWidget* parent, const char* name, WFlags f )
 : QListView( parent, name, f ),
 myButton( 0 ),
@@ -56,6 +59,9 @@ myHeaderState( state )
   initialize();
 }
 
+/*!
+  Constructor
+*/
 QtxListView::QtxListView( QWidget* parent, const char* name, WFlags f )
 : QListView( parent, name, f ),
 myButton( 0 ),
@@ -64,6 +70,9 @@ myHeaderState( HeaderAuto )
   initialize();
 }
 
+/*!
+  Initialization
+*/
 void QtxListView::initialize()
 {
   if ( myHeaderState == HeaderButton )
@@ -91,10 +100,18 @@ void QtxListView::initialize()
   connect( header(), SIGNAL( sizeChange( int, int, int ) ), this, SLOT( onHeaderResized() ) );
 }
 
+/*!
+  Destructor
+*/
 QtxListView::~QtxListView()
 {
 }
 
+/*!
+  Add new column
+  \param label - column title
+  \param width - column width
+*/
 int QtxListView::addColumn( const QString& label, int width )
 {
   int res = QListView::addColumn( label, width );
@@ -104,6 +121,12 @@ int QtxListView::addColumn( const QString& label, int width )
   return res;
 }
 
+/*!
+  Add new column
+  \param iconset - column icon
+  \param label - column title
+  \param width - column width
+*/
 int QtxListView::addColumn( const QIconSet& iconset, const QString& label, int width ) 
 {
   int res = QListView::addColumn( iconset, label, width );
@@ -113,6 +136,10 @@ int QtxListView::addColumn( const QIconSet& iconset, const QString& label, int w
   return res;
 }
 
+/*!
+  Removes column
+  \param index - column index
+*/
 void QtxListView::removeColumn( int index ) 
 {
   QListView::removeColumn( index );
@@ -121,11 +148,19 @@ void QtxListView::removeColumn( int index )
   onHeaderResized();
 }
 
+/*!
+  \return true if column is situated in popup for show/hide columns
+*/
 bool QtxListView::appropriate( const int index ) const
 {
   return index >= 0 && index < (int)myAppropriate.count() && myAppropriate[index];
 }
 
+/*!
+  Sets appropriate state: whether column is situated in popup for show/hide columns
+  \param index - column index
+  \param on - new state
+*/
 void QtxListView::setAppropriate( const int index, const bool on )
 {
   if ( index < 0 || index >= (int)myAppropriate.count() )
@@ -134,18 +169,27 @@ void QtxListView::setAppropriate( const int index, const bool on )
   myAppropriate[index] = on ? 1 : 0;
 }
 
+/*!
+  Resizes list view and header
+*/
 void QtxListView::resize( int w, int h )
 {
   QListView::resize( w, h );
   onHeaderResized();
 }
 
+/*!
+  Shows list view
+*/
 void QtxListView::show()
 {
   QListView::show();
   onHeaderResized();
 }
 
+/*!
+  Update on resize contents
+*/
 void QtxListView::resizeContents( int w, int h )
 {
 /*
@@ -162,16 +206,28 @@ void QtxListView::resizeContents( int w, int h )
   onHeaderResized();
 }
 
+/*!
+  Shows column
+  \param ind - column index
+*/
 void QtxListView::show( int ind )
 {
   setShown( ind, true );
 }
 
+/*!
+  Hides column
+  \param ind - column index
+*/
 void QtxListView::hide( int ind )
 {
   setShown( ind, false );
 }
 
+/*!
+  \return true if column is shown
+  \param ind - column index
+*/
 bool QtxListView::isShown( int ind ) const
 {
   if ( ind>=0 && ind<header()->count() )
@@ -180,6 +236,11 @@ bool QtxListView::isShown( int ind ) const
     return false;
 }
 
+/*!
+  Shows/hides column
+  \param ind - column index
+  \param sh - new is shown state
+*/
 void QtxListView::setShown( int ind, bool sh )
 {
   if( ind<0 || ind>=header()->count() || isShown( ind )==sh )
@@ -207,6 +268,11 @@ void QtxListView::setShown( int ind, bool sh )
   updateContents();
 }
 
+/*!
+  Changes column width
+  \param c - column index
+  \param w - new width
+*/
 void QtxListView::setColumnWidth( int c, int w )
 {
   if ( myColumns.contains( c ) )
@@ -215,6 +281,9 @@ void QtxListView::setColumnWidth( int c, int w )
   QListView::setColumnWidth( c, !myColumns.contains( c ) ? w : 0 );
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxListView::sizeHint() const
 {
   QSize sz = QListView::sizeHint();
@@ -225,6 +294,9 @@ QSize QtxListView::sizeHint() const
   return sz;
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxListView::minimumSizeHint() const
 {
   QSize sz = QListView::minimumSizeHint();
@@ -235,6 +307,9 @@ QSize QtxListView::minimumSizeHint() const
   return sz;
 }
 
+/*!
+  SLOT: called if header is resized
+*/
 void QtxListView::onHeaderResized()
 {
   if ( myHeaderState == HeaderAuto )
@@ -273,6 +348,10 @@ void QtxListView::onHeaderResized()
   }
 }
 
+/*!
+  Shows popup filled with column names to show/hide column
+  \param x, y - position of popup
+*/
 void QtxListView::showPopup( const int x, const int y )
 {
   myPopup->clear();
@@ -289,6 +368,9 @@ void QtxListView::showPopup( const int x, const int y )
     myPopup->exec( mapToGlobal( QPoint( x, y ) ) );
 }
 
+/*!
+  SLOT: shows popup on button ".." click
+*/
 void QtxListView::onButtonClicked()
 {
   if ( myHeaderState != HeaderButton )
@@ -300,6 +382,10 @@ void QtxListView::onButtonClicked()
   showPopup( x, y );
 }
 
+/*!
+  SLOT: called on popup action is activated, toggles shown state of column
+  \param id - column index
+*/
 void QtxListView::onShowHide( int id )
 {
   //if ( myHeaderState != HeaderButton )
@@ -308,12 +394,18 @@ void QtxListView::onShowHide( int id )
   setShown( id, !isShown( id ) );
 }
 
+/*!
+  Receives all resize events sent to the viewport
+*/
 void QtxListView::viewportResizeEvent( QResizeEvent* e )
 {
   QListView::viewportResizeEvent( e );
   onHeaderResized();
 }
 
+/*!
+  Custom event filter, shows popup on right button click
+*/
 bool QtxListView::eventFilter( QObject* o, QEvent* e )
 {
   if( o==header() && e->type()==QEvent::MouseButtonPress )

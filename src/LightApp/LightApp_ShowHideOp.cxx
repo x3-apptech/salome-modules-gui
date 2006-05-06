@@ -33,16 +33,25 @@
   #include <SALOME_ListIteratorOfListIO.hxx>
 #endif
 
+/*!
+  Constructor
+*/
 LightApp_ShowHideOp::LightApp_ShowHideOp( ActionType type )
 : LightApp_Operation(),
   myActionType( type )
 {
 }
 
+/*!
+  Destructor
+*/
 LightApp_ShowHideOp::~LightApp_ShowHideOp()
 {
 }
 
+/*!
+  Makes show/hide operation
+*/
 void LightApp_ShowHideOp::startOperation()
 {
   LightApp_Application* app = dynamic_cast<LightApp_Application*>( application() );

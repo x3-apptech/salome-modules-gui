@@ -4,6 +4,7 @@ AC_DEFUN([CHECK_PYQT],[
 AC_REQUIRE([CHECK_PYTHON])dnl
 AC_REQUIRE([CHECK_QT])dnl
 AC_REQUIRE([CHECK_SIP])dnl
+AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
@@ -119,15 +120,15 @@ if test "x${PYQTDIR}" != "x"; then
     fi
   fi
   if test "x$pyqt_lib_ok" == "xno"; then
-    dnl try {PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages
-    if test -d {PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages; then
-      AC_CHECK_FILE(${PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+    dnl try {PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+    if test -d {PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages; then
+      AC_CHECK_FILE(${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
       if test "x$pyqt_lib_ok" == "xyes"; then
-        PYQT_LIBS="-L${PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages -lqtcmodule"
+        PYQT_LIBS="-L${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
       else 
-        AC_CHECK_FILE(${PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+        AC_CHECK_FILE(${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
         if test "x$pyqt_lib_ok" == "xyes"; then
-          PYQT_LIBS="-L${PYQTDIR}/lib/python${PYTHON_VERSION}/site-packages"
+          PYQT_LIBS="-L${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
         fi
       fi
     fi
@@ -160,30 +161,30 @@ if test "x$pyqt_lib_ok" == "xno"; then
   fi
 fi
 if test "x$pyqt_lib_ok" == "xno"; then
-  dnl try ${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages
+  dnl try ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
   if test "x${PYTHONHOME}" != "x"; then
-    if test -d ${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages ; then
-      AC_CHECK_FILE(${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+    if test -d ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages ; then
+      AC_CHECK_FILE(${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
       if test "x$pyqt_lib_ok" == "xyes"; then
-        PYQT_LIBS="-L${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages -lqtcmodule"
+        PYQT_LIBS="-L${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
       else 
-        AC_CHECK_FILE(${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+        AC_CHECK_FILE(${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
         if test "x$pyqt_lib_ok" == "xyes"; then
-          PYQT_LIBS="-L${PYTHONHOME}/lib/python${PYTHON_VERSION}/site-packages"
+          PYQT_LIBS="-L${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
         fi
       fi
     fi
   fi	
 fi
 if test "x$pyqt_lib_ok" == "xno"; then
-  dnl try /usr/lib/python${PYTHON_VERSION}/site-packages
-  AC_CHECK_FILE(/usr/lib/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+  dnl try /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+  AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
   if test "x$pyqt_lib_ok" == "xyes"; then
-    PYQT_LIBS="-L/usr/lib/python${PYTHON_VERSION}/site-packages -lqtcmodule"
+    PYQT_LIBS="-L/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
   else 
-    AC_CHECK_FILE(/usr/lib/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
+    AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
     if test "x$pyqt_lib_ok" == "xyes"; then
-      PYQT_LIBS="-L/usr/lib/python${PYTHON_VERSION}/site-packages"
+      PYQT_LIBS="-L/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
     fi
   fi
 fi

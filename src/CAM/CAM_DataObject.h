@@ -26,6 +26,10 @@
 class CAM_Module;
 class CAM_DataModel;
 
+/*!
+  \class CAM_DataObject
+  Provides only additional link to CAM_DataModel
+*/
 class CAM_EXPORT CAM_DataObject : public SUIT_DataObject
 {
 public:

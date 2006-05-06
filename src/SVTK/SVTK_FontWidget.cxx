@@ -39,10 +39,9 @@
  * Description : Dialog for specifynig font
  */
 
-//=======================================================================
-// name    : SVTK_FontWidget
-// Purpose : Constructor
-//=======================================================================
+/*!
+  Constructor
+*/
 SVTK_FontWidget::SVTK_FontWidget( QWidget* theParent )
 : QHBox( theParent )
 {
@@ -62,36 +61,23 @@ SVTK_FontWidget::SVTK_FontWidget( QWidget* theParent )
   connect( myColorBtn, SIGNAL( clicked() ), SLOT( onColor() ) );
 }
 
-//=======================================================================
-// name    : ~SVTK_FontWidget
-// Purpose : Destructor
-//=======================================================================
+/*!
+  Destructor
+*/
 SVTK_FontWidget::~SVTK_FontWidget()
 {
 }
 
-//=======================================================================
-// name    : SetColor
-// Purpose :
-//=======================================================================
 void SVTK_FontWidget::SetColor( const QColor& theColor )
 {
   myColorBtn->setPaletteBackgroundColor( theColor );
 }
 
-//=======================================================================
-// name    : GetColor
-// Purpose :
-//=======================================================================
 QColor SVTK_FontWidget::GetColor() const
 {
   return myColorBtn->paletteBackgroundColor();
 }
 
-//=======================================================================
-// name    : onColor
-// Purpose :
-//=======================================================================
 void SVTK_FontWidget::onColor()
 {
   QColor aColor = QColorDialog::getColor( GetColor(), this );
@@ -99,10 +85,6 @@ void SVTK_FontWidget::onColor()
     SetColor( aColor );
 }
 
-//=======================================================================
-// name    : SetData
-// Purpose :
-//=======================================================================
 void SVTK_FontWidget::SetData( const QColor& theColor,
                               const int theFamily,
                               const bool theBold,
@@ -123,10 +105,6 @@ void SVTK_FontWidget::SetData( const QColor& theColor,
   myShadow->setChecked( theShadow );
 }
 
-//=======================================================================
-// name    : GetData
-// Purpose :
-//=======================================================================
 void SVTK_FontWidget::GetData( QColor& theColor,
 			       int& theFamily,
 			       bool& theBold,

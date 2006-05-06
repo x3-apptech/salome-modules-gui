@@ -123,6 +123,9 @@ QString LightApp_NameDlg::name()
   return myLineEdit->text();
 }
 
+/*!
+  Accepts if name isn't empty
+*/
 void LightApp_NameDlg::accept()
 {
   if ( name().stripWhiteSpace().isEmpty() )

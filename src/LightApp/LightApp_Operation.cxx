@@ -121,10 +121,6 @@ void LightApp_Operation::suspendOperation()
   setDialogActive( false );
 }
 
-//=======================================================================
-// name    : abortOperation
-// Purpose : Hide dialog box (if it is exists)
-//=======================================================================
 /*!
  * \brief Performs actions needed for aborting operation
 *

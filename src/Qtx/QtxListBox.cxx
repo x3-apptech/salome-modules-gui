@@ -24,6 +24,9 @@
 #include <qpixmap.h>
 #include <qlineedit.h>
 
+/*!
+  Constructor
+*/
 QtxListBox::QtxListBox( QWidget* parent, const char* name, WFlags f )
 : QListBox( parent, name, f ),
 myEditor( 0 ),
@@ -36,15 +39,25 @@ myModifEnabled( true )
            this, SLOT( onContentsMoving( int, int ) ) );
 }
 
+/*!
+  Destructor
+*/
 QtxListBox::~QtxListBox()
 {
 }
 
+/*!
+  \return true if editing is enabled
+*/
 bool QtxListBox::isEditEnabled() const
 {
   return myEditState;
 }
 
+/*!
+  Enables/disables editing
+  \param on - new state
+*/
 void QtxListBox::setEditEnabled( bool on )
 {
   if ( isEditEnabled() == on )
@@ -56,36 +69,66 @@ void QtxListBox::setEditEnabled( bool on )
     endEdition( defaultEditAction() );
 }
 
+/*!
+  \return default edit action
+  \sa setDefaultEditAction()
+*/
 bool QtxListBox::defaultEditAction() const
 {
   return myEditDefault;
 }
 
+/*!
+  Changes default edit action. 
+  Pressing of ENTER button always accepts new value of edited item.
+  But other ways, such as focus out or edition of other item accepts
+  new value of edited item only if "default edit action" is true
+  \param def - new value
+*/
 void QtxListBox::setDefaultEditAction( bool def )
 {
   myEditDefault = def;
 }
 
+/*!
+  \return modification enabled state
+  \sa setModificationEnabled()
+*/
 bool QtxListBox::isModificationEnabled() const
 {
   return myModifEnabled;
 }
 
+/*!
+  Changes "modification enabled" state
+  If it is true, then pressing of CTRL + { Up, Down, Home, End } allows move items in list
+  \param on - new state
+*/
 void QtxListBox::setModificationEnabled( bool on )
 {
   myModifEnabled = on;
 }
 
+/*!
+  \return current edited item
+*/
 QListBoxItem* QtxListBox::editedItem() const
 {
   return item( editedIndex() );
 }
 
+/*!
+  \return current edited index
+*/
 int QtxListBox::editedIndex() const
 {
   return myEditIndex;
 }
 
+/*!
+  Starts edition of item
+  \param idx - index of item
+*/
 void QtxListBox::startEdition( const int idx )
 {
   if ( idx < 0 || editedIndex() == idx || !isEditEnabled() )
@@ -108,11 +151,19 @@ void QtxListBox::startEdition( const int idx )
   ed->setFocus();
 }
 
+/*!
+  Starts edition of item
+  \param item - item to be edited
+*/
 void QtxListBox::startEdition( const QListBoxItem* item )
 {
   startEdition( index( item ) );
 }
 
+/*!
+  Finishes edition of item
+  \param action - if it is true, then new values must be accepted
+*/
 void QtxListBox::endEdition( const bool action )
 {
   int idx = editedIndex();
@@ -141,6 +192,10 @@ void QtxListBox::endEdition( const bool action )
   }
 }
 
+/*!
+  Ensures that the item is visible.
+  \param idx - index of item
+*/
 void QtxListBox::ensureItemVisible( const int idx )
 {
   if ( idx < 0 )
@@ -152,11 +207,18 @@ void QtxListBox::ensureItemVisible( const int idx )
   setTopItem( idx );
 }
 
+/*!
+  Ensures that the item is visible.
+  \param item - item to be made visible
+*/
 void QtxListBox::ensureItemVisible( const QListBoxItem* item )
 {
   ensureItemVisible( index( item ) );
 }
 
+/*!
+  \return validator of item editor
+*/
 const QValidator* QtxListBox::validator() const
 {
   const QValidator* v = 0;
@@ -165,28 +227,48 @@ const QValidator* QtxListBox::validator() const
   return v;
 }
 
+/*!
+  Removes validator of item editor
+*/
 void QtxListBox::clearValidator()
 {
   if ( editor() )
     editor()->clearValidator();
 }
 
+/*!
+  Changes validator of item editor
+  \param v - new validator
+*/
 void QtxListBox::setValidator( const QValidator* v )
 {
   if ( editor() )
     editor()->setValidator( v );
 }
 
+/*!
+  Moves item to top
+  \param idx - index of item
+*/
 void QtxListBox::moveItemToTop( const int idx )
 {
   moveItem( idx, -idx );
 }
 
+/*!
+  Moves item to bottom
+  \param idx - index of item
+*/
 void QtxListBox::moveItemToBottom( const int idx )
 {
   moveItem( idx, count() - idx );
 }
 
+/*!
+  Moves item
+  \param idx - index of item
+  \param step - changing of position
+*/
 void QtxListBox::moveItem( const int idx, const int step )
 {
   QListBoxItem* i = item( idx );
@@ -210,6 +292,10 @@ void QtxListBox::moveItem( const int idx, const int step )
     emit itemMoved( idx, pos );
 }
 
+/*!
+  Inserts empty item
+  \param i - position of item (if it is less than 0, then current position is used)
+*/
 void QtxListBox::createItem( const int i )
 {
   if ( !isEditEnabled() )
@@ -224,6 +310,10 @@ void QtxListBox::createItem( const int i )
   startEdition( idx );
 }
 
+/*!
+  Removes item
+  \param i - position of item (if it is less than 0, then current position is used)
+*/
 void QtxListBox::deleteItem( const int i )
 {
   if ( !isEditEnabled() )
@@ -240,6 +330,10 @@ void QtxListBox::deleteItem( const int i )
   updateEditor();
 }
 
+/*!
+  Scrolls the content so that the point is in the top-left corner.
+  \param x, y - point co-ordinates
+*/
 void QtxListBox::setContentsPos( int x, int y )
 {
   QListBox::setContentsPos( x, y );
@@ -247,6 +341,9 @@ void QtxListBox::setContentsPos( int x, int y )
   updateEditor();
 }
 
+/*!
+  Custom event filter, performs finish of edition on focus out, escape/return/enter pressing
+*/
 bool QtxListBox::eventFilter( QObject* o, QEvent* e )
 {
   if ( editor() == o )
@@ -267,6 +364,10 @@ bool QtxListBox::eventFilter( QObject* o, QEvent* e )
   return QListBox::eventFilter( o, e );
 }
 
+/*!
+  Custom key press event handler
+  Allows to move items by CTRL + { Up, Down, Home, End }
+*/
 void QtxListBox::keyPressEvent( QKeyEvent* e )
 {
   if ( e->key() == Key_Up && e->state() & ControlButton && isModificationEnabled() )
@@ -285,6 +386,9 @@ void QtxListBox::keyPressEvent( QKeyEvent* e )
     QListBox::keyPressEvent( e );
 }
 
+/*!
+  Custom resize event handler
+*/
 void QtxListBox::viewportResizeEvent( QResizeEvent* e )
 {
   QListBox::viewportResizeEvent( e );
@@ -292,6 +396,9 @@ void QtxListBox::viewportResizeEvent( QResizeEvent* e )
   updateEditor();
 }
 
+/*!
+  Custom mouse double click event handler
+*/
 void QtxListBox::mouseDoubleClickEvent( QMouseEvent* e )
 {
   if ( isEditEnabled() )
@@ -300,11 +407,17 @@ void QtxListBox::mouseDoubleClickEvent( QMouseEvent* e )
     QListBox::mouseDoubleClickEvent( e );
 }
 
+/*!
+  Updates editor on contents moving
+*/
 void QtxListBox::onContentsMoving( int, int )
 {
   updateEditor();
 }
 
+/*!
+  \return item editor
+*/
 QLineEdit* QtxListBox::editor() const
 {
   if ( !myEditor )
@@ -315,6 +428,9 @@ QLineEdit* QtxListBox::editor() const
   return myEditor;
 }
 
+/*!
+  Creates item editor
+*/
 void QtxListBox::createEditor()
 {
   if ( myEditor )
@@ -332,6 +448,9 @@ void QtxListBox::createEditor()
   addChild( myEditor );
 }
 
+/*!
+  Updates item editor
+*/
 void QtxListBox::updateEditor()
 {
   if ( !editedItem() || !editor() )

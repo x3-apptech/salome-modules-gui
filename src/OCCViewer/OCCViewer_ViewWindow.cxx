@@ -17,8 +17,7 @@
 // See http://www.salome-platform.org/
 //
 // OCCViewer_ViewWindow.cxx: implementation of the OCCViewer_ViewWindow class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewModel.h"
@@ -162,10 +161,11 @@ const char* imageCrossCursor[] = {
   "................................"};
 
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+/*!
+  Constructor
+  \param theDesktop - main window of application
+  \param theModel - OCC 3D viewer
+*/
 OCCViewer_ViewWindow::OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel)
 : SUIT_ViewWindow(theDesktop)
 {
@@ -176,7 +176,9 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_V
   myClippingDlg = 0;
 }
 
-//****************************************************************
+/*!
+  Initialization of view window
+*/
 void OCCViewer_ViewWindow::initLayout()
 {
   myViewPort = new OCCViewer_ViewPort3d( this, myModel->getViewer3d(), V3d_ORTHOGRAPHIC );
@@ -196,7 +198,10 @@ void OCCViewer_ViewWindow::initLayout()
   createToolBar();
 }
 
-//****************************************************************
+/*!
+  \return type of operation by states of mouse and keyboard buttons
+  \param theEvent - mouse event
+*/
 OCCViewer_ViewWindow::OperationType OCCViewer_ViewWindow::getButtonState(QMouseEvent* theEvent)
 {
   OperationType aOp = NOTHING;
@@ -213,7 +218,9 @@ OCCViewer_ViewWindow::OperationType OCCViewer_ViewWindow::getButtonState(QMouseE
   return aOp;
 }
 
-//****************************************************************
+/*!
+  Custom event handler
+*/
 bool OCCViewer_ViewWindow::eventFilter(QObject* watched, QEvent* e)
 {
   if ( watched == myViewPort ) {
@@ -259,13 +266,18 @@ bool OCCViewer_ViewWindow::eventFilter(QObject* watched, QEvent* e)
   return SUIT_ViewWindow::eventFilter(watched, e);
 }
 
+/*!
+  Updates state of enable draw mode state
+*/
 void OCCViewer_ViewWindow::updateEnabledDrawMode()
 {
   if ( myModel )
     myEnableDrawMode = myModel->isSelectionEnabled() && myModel->isMultiSelectionEnabled();
 }
 
-//****************************************************************
+/*!
+  Handler of mouse press event
+*/
 void OCCViewer_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
 {
   myStartX = theEvent->x();
@@ -324,7 +336,9 @@ void OCCViewer_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
 }
 
 
-//****************************************************************
+/*!
+  Starts zoom operation, sets corresponding cursor
+*/
 void OCCViewer_ViewWindow::activateZoom()
 {
   if ( !transformRequested() && !myCursorIsHand )
@@ -339,9 +353,8 @@ void OCCViewer_ViewWindow::activateZoom()
 }
 
 
-//****************************************************************
 /*!
-    Activates 'panning' transformation
+  Starts panning operation, sets corresponding cursor
 */
 void OCCViewer_ViewWindow::activatePanning()
 {
@@ -355,9 +368,8 @@ void OCCViewer_ViewWindow::activatePanning()
   }
 }
 
-//****************************************************************
 /*!
-    Activates 'rotation' transformation
+  Starts rotation operation, sets corresponding cursor
 */
 void OCCViewer_ViewWindow::activateRotation()
 {
@@ -372,7 +384,9 @@ void OCCViewer_ViewWindow::activateRotation()
   }
 }
 
-//****************************************************************
+/*!
+  Starts global panning operation, sets corresponding cursor
+*/
 void OCCViewer_ViewWindow::activateGlobalPanning()
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
@@ -388,9 +402,8 @@ void OCCViewer_ViewWindow::activateGlobalPanning()
   }
 }
 
-//****************************************************************
 /*!
-    Activates 'fit' transformation
+  Starts fit operation, sets corresponding cursor
 */
 void OCCViewer_ViewWindow::activateWindowFit()
 {
@@ -405,9 +418,8 @@ void OCCViewer_ViewWindow::activateWindowFit()
   }
 }
 
-//****************************************************************
 /*!
-    Sets the active operation 'op'
+  Stores which viewer operation is requesting
 */
 void OCCViewer_ViewWindow::setTransformRequested ( OperationType op )
 {    
@@ -416,7 +428,9 @@ void OCCViewer_ViewWindow::setTransformRequested ( OperationType op )
 }
 
 
-//****************************************************************/
+/*!
+  Handler of mouse move event
+*/
 void OCCViewer_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
 {
   myCurrX = theEvent->x();
@@ -468,7 +482,9 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
   }
 }
 
-//****************************************************************/
+/*!
+  Handler of mouse release event
+*/
 void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 {
   switch ( myOperation ) {
@@ -524,10 +540,9 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
   }
 }
 
-//****************************************************************
 /*!
-    Sets the viewport to its initial state
-    ( no transformations in process etc. )
+  Sets the viewport to its initial state
+  ( no transformations in process etc. )
 */
 void OCCViewer_ViewWindow::resetState()
 {
@@ -549,7 +564,9 @@ void OCCViewer_ViewWindow::resetState()
 }
 
 
-//****************************************************************/
+/*!
+  Draws rectangle by starting and current points
+*/
 void OCCViewer_ViewWindow::drawRect()
 {
   QPainter aPainter(myViewPort);
@@ -562,7 +579,9 @@ void OCCViewer_ViewWindow::drawRect()
   myRect = aRect;
 }
 
-//****************************************************************/
+/*!
+  Creates actions of OCC view window
+*/
 void OCCViewer_ViewWindow::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
@@ -671,12 +690,12 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(activated()), this, SLOT(onCloneView()));
 	myActionsMap[ CloneId ] = aAction;
 
-  aAction = new QtxAction(tr("MNU_CLIPPING"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" ) ),
+  myClippingAction = new QtxAction(tr("MNU_CLIPPING"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" ) ),
                            tr( "MNU_CLIPPING" ), 0, this);
-  aAction->setStatusTip(tr("DSC_CLIPPING"));
-  aAction->setToggleAction( true );
-  connect(aAction, SIGNAL(toggled( bool )), this, SLOT(onClipping( bool )));
-	myActionsMap[ ClippingId ] = aAction;
+  myClippingAction->setStatusTip(tr("DSC_CLIPPING"));
+  myClippingAction->setToggleAction( true );
+  connect(myClippingAction, SIGNAL(toggled( bool )), this, SLOT(onClipping( bool )));
+	myActionsMap[ ClippingId ] = myClippingAction;
 
   aAction = new QtxAction(tr("MNU_SHOOT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SHOOT_VIEW" ) ),
                            tr( "MNU_SHOOT_VIEW" ), 0, this);
@@ -699,7 +718,9 @@ void OCCViewer_ViewWindow::createActions()
   }
 }
 
-//****************************************************************
+/*!
+  Creates toolbar of OCC view window
+*/
 void OCCViewer_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);  
@@ -738,13 +759,17 @@ void OCCViewer_ViewWindow::createToolBar()
   myActionsMap[ClippingId]->addTo(myToolBar);
 }
 
-//****************************************************************
+/*!
+  Processes operation fit all
+*/
 void OCCViewer_ViewWindow::onViewFitAll()
 {
   myViewPort->fitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "front view"
+*/
 void OCCViewer_ViewWindow::onFrontView()
 {
   emit vpTransformationStarted ( FRONTVIEW );
@@ -753,7 +778,9 @@ void OCCViewer_ViewWindow::onFrontView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "back view"
+*/
 void OCCViewer_ViewWindow::onBackView()
 {
   emit vpTransformationStarted ( BACKVIEW );
@@ -762,7 +789,9 @@ void OCCViewer_ViewWindow::onBackView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "top view"
+*/
 void OCCViewer_ViewWindow::onTopView()
 {
   emit vpTransformationStarted ( TOPVIEW );
@@ -771,7 +800,9 @@ void OCCViewer_ViewWindow::onTopView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "bottom view"
+*/
 void OCCViewer_ViewWindow::onBottomView()
 {
   emit vpTransformationStarted ( BOTTOMVIEW );
@@ -780,7 +811,9 @@ void OCCViewer_ViewWindow::onBottomView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "left view"
+*/
 void OCCViewer_ViewWindow::onLeftView()
 {
   emit vpTransformationStarted ( LEFTVIEW );
@@ -789,7 +822,9 @@ void OCCViewer_ViewWindow::onLeftView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "right view"
+*/
 void OCCViewer_ViewWindow::onRightView()
 {
   emit vpTransformationStarted ( RIGHTVIEW );
@@ -798,7 +833,9 @@ void OCCViewer_ViewWindow::onRightView()
   onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "reset view": sets default orientation of viewport camera
+*/
 void OCCViewer_ViewWindow::onResetView()
 {
   emit vpTransformationStarted( RESETVIEW );
@@ -809,21 +846,27 @@ void OCCViewer_ViewWindow::onResetView()
   myViewPort->getView()->Update();
 }
 
-//****************************************************************
+/*!
+  Processes transformation "fit all"
+*/
 void OCCViewer_ViewWindow::onFitAll()
 {
   emit vpTransformationStarted( FITALLVIEW );
   myViewPort->fitAll();
 }
 
-//****************************************************************
+/*!
+  Creates one more window with same content
+*/
 void OCCViewer_ViewWindow::onCloneView()
 {
   SUIT_ViewWindow* vw = myManager->createViewWindow();
   vw->show();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if clipping operation is activated, enables/disables of clipping plane
+*/
 void OCCViewer_ViewWindow::onClipping( bool on )
 {
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
@@ -835,7 +878,10 @@ void OCCViewer_ViewWindow::onClipping( bool on )
   if ( on )
     {
       if ( !myClippingDlg )
-	myClippingDlg = new OCCViewer_ClippingDlg( this, myDesktop );
+	{
+	  myClippingDlg = new OCCViewer_ClippingDlg( this, myDesktop );
+	  myClippingDlg->SetAction( myClippingAction );
+	}
 
       if ( !myClippingDlg->isShown() )
 	myClippingDlg->show();
@@ -848,13 +894,17 @@ void OCCViewer_ViewWindow::onClipping( bool on )
     }
 }
 
-//****************************************************************
+/*!
+  Stores view parameters
+*/
 void OCCViewer_ViewWindow::onMemorizeView()
 {
   myModel->appendViewAspect( getViewParams() );
 }
 
-//****************************************************************
+/*!
+  Restores view parameters
+*/
 void OCCViewer_ViewWindow::onRestoreView()
 {
 	OCCViewer_CreateRestoreViewDlg* aDlg = new OCCViewer_CreateRestoreViewDlg( centralWidget(), myModel );
@@ -865,8 +915,9 @@ void OCCViewer_ViewWindow::onRestoreView()
 		performRestoring( aDlg->currentItem() );
 }
 
-//****************************************************************
-
+/*!
+  Restores view parameters from structure viewAspect
+*/
 void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem )
 {
 	Handle(V3d_View) aView3d = myViewPort->getView();
@@ -883,30 +934,50 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem )
 	myRestoreFlag = 0;
 }
 
+/*!
+  Sets restore flag
+*/
 void OCCViewer_ViewWindow::setRestoreFlag()
 {
 	myRestoreFlag = 1;
 }
 
-//****************************************************************
+/*!
+  SLOT: called when action "show/hide" trihedron is activated
+*/
 void OCCViewer_ViewWindow::onTrihedronShow()
 {
   myModel->toggleTrihedron();
 }
 
-//****************************************************************
+/*!
+  \return QImage, containing all scene rendering in window
+*/
 QImage OCCViewer_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myViewPort->winId() );
   return px.convertToImage();
 }
-                                                                              
+
+/*!
+  Sets parameters of cutting plane
+  \param on - is cutting plane enabled
+  \param x - x-position of plane point 
+  \param y - y-position of plane point 
+  \param z - z-position of plane point 
+  \param dx - x-coordinate of plane normal
+  \param dy - y-coordinate of plane normal
+  \param dz - z-coordinate of plane normal
+*/
 void  OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const double y,  const double z,
                 				      const double dx, const double dy, const double dz )
 {
+  Handle(V3d_View) view = myViewPort->getView();
+  if ( view.IsNull() )
+    return;
+
   if ( on ) {
     Handle(V3d_Viewer) viewer = myViewPort->getViewer();
-    Handle(V3d_View) view = myViewPort->getView();
     
     // try to use already existing plane or create a new one
     Handle(V3d_Plane) clipPlane;
@@ -922,37 +993,28 @@ void  OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const dou
     pln.Coefficients( a, b, c, d );
     clipPlane->SetPlane( a, b, c, d );
     
-    Handle(V3d_View) v = myViewPort->getView();
-    v->SetPlaneOn( clipPlane );
-    v->Update();
-    v->Redraw();
+    view->SetPlaneOn( clipPlane );
   } 
-  else {
-    Handle(V3d_View) view = myViewPort->getView();
-
-    // try to use already existing plane 
-    Handle(V3d_Plane) clipPlane;
-    view->InitActivePlanes();
-    if ( view->MoreActivePlanes() )
-      clipPlane = view->ActivePlane();
-    
-    Handle(V3d_View) v =  myViewPort->getView();
-    if ( !clipPlane.IsNull() )
-      v->SetPlaneOff( clipPlane );
-    else 
-      v->SetPlaneOff();
-    
-    v->Update();
-    v->Redraw();
-  }
- 
-  Handle(V3d_View) v = myViewPort->getView();
-  v->Update();
-  v->Redraw();
+  else
+    view->SetPlaneOff();
+  
+  view->Update();
+  view->Redraw();
 }
 
-/*! The method returns the visual parameters of this view as a viewAspect object
- */
+/*!
+  \return true if there is at least one cutting plane
+*/
+bool OCCViewer_ViewWindow::isCuttingPlane()
+{
+  Handle(V3d_View) view = myViewPort->getView();
+  view->InitActivePlanes();
+  return (view->MoreActivePlanes());
+}
+
+/*!
+  The method returns the visual parameters of this view as a viewAspect object
+*/
 viewAspect OCCViewer_ViewWindow::getViewParams() const
 {
   double centerX, centerY, projX, projY, projZ, twist;
@@ -988,8 +1050,9 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
 }
 
 
-/*! The method returns the visual parameters of this view as a formated string
- */
+/*!
+  The method returns the visual parameters of this view as a formated string
+*/
 QString OCCViewer_ViewWindow::getVisualParameters()
 {
   viewAspect params = getViewParams();
@@ -1000,8 +1063,9 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   return retStr;
 }
 
-/* The method restors visual parameters of this view from a formated string
- */
+/*!
+  The method restors visual parameters of this view from a formated string
+*/
 void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
 {
   QStringList paramsLst = QStringList::split( '*', parameters, true );

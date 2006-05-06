@@ -29,10 +29,6 @@
 
 class QtxListOfOperations;
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
 class QTX_EXPORT QtxPopupMgr : public QtxActionMenuMgr
 {
     Q_OBJECT

@@ -33,16 +33,18 @@
 
 #include <Standard_ErrorHandler.hxx>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+/*!
+  Constructor
+*/
 CAF_Study::CAF_Study(SUIT_Application* theApp)
 : SUIT_Study( theApp ),
 myModifiedCnt( 0 )
 {
 }
 
+/*!
+  Constructor
+*/
 CAF_Study::CAF_Study(SUIT_Application* theApp, Handle (TDocStd_Document)& aStdDoc)
 : SUIT_Study( theApp ),
 myStdDoc( aStdDoc ),
@@ -50,20 +52,33 @@ myModifiedCnt( 0 )
 {
 }
 
+/*!
+  Destructor
+*/
 CAF_Study::~CAF_Study()
 {
 }
 
+/*!
+  \return OCAF document
+*/
 Handle(TDocStd_Document) CAF_Study::stdDoc() const
 {
   return myStdDoc;
 }
 
+/*!
+  Sets new OCAF document
+  \param aStdDoc - new OCAF document
+*/
 void CAF_Study::setStdDoc( Handle(TDocStd_Document)& aStdDoc )
 {
   myStdDoc = aStdDoc;
 }
 
+/*!
+  Custom document initialization
+*/
 void CAF_Study::createDocument()
 {
   SUIT_Study::createDocument();
@@ -82,6 +97,9 @@ void CAF_Study::createDocument()
   }
 }
 
+/*!
+  Close document
+*/
 void CAF_Study::closeDocument( bool permanent )
 {
   Handle(TDocStd_Application) app = stdApp();
@@ -91,6 +109,10 @@ void CAF_Study::closeDocument( bool permanent )
   SUIT_Study::closeDocument( permanent );
 }
 
+/*!
+  Open document
+  \param fname - name of file
+*/
 bool CAF_Study::openDocument( const QString& fname )
 {
   Handle(TDocStd_Application) app = stdApp();
@@ -108,6 +130,10 @@ bool CAF_Study::openDocument( const QString& fname )
   return status && SUIT_Study::openDocument( fname );
 }
 
+/*!
+  Save document with other name
+  \param fname - name of file
+*/
 bool CAF_Study::saveDocumentAs( const QString& fname )
 {
   Handle(TDocStd_Application) app = stdApp();
@@ -149,9 +175,12 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
   return status;
 }
 
+/*!
+  Open OCAF transaction
+*/
 bool CAF_Study::openTransaction()
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
   bool res = true;
@@ -168,13 +197,16 @@ bool CAF_Study::openTransaction()
   return res;
 }
 
+/*!
+  Abort OCAF transaction
+*/
 bool CAF_Study::abortTransaction()
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
   bool res = true;
-	try {
+  try {
     myStdDoc->AbortCommand();
 		update();
   }
@@ -184,13 +216,16 @@ bool CAF_Study::abortTransaction()
   return res;
 }
 
+/*!
+  Commit OCAF transaction
+*/
 bool CAF_Study::commitTransaction( const QString& name )
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
   bool res = true;
-	try {
+  try {
     myStdDoc->CommitCommand();
 
     if ( canUndo() )
@@ -206,31 +241,34 @@ bool CAF_Study::commitTransaction( const QString& name )
   return res;
 }
 
+/*!
+  \return true, if there is opened OCAF transaction
+*/
 bool CAF_Study::hasTransaction() const
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
   return myStdDoc->HasOpenCommand();
 }
 
 /*!
-    Returns whether the document was saved in file. [ public ]
+  \return whether the document was saved in file. [ public ]
 */
 bool CAF_Study::isSaved() const
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
   return myStdDoc->IsSaved();
 }
 
 /*!
-    Returns whether the document is modified. [ public ]
+  \return whether the document is modified. [ public ]
 */
 bool CAF_Study::isModified() const
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return false;
 
 //  return myStdDoc->IsModified();
@@ -311,7 +349,7 @@ bool CAF_Study::redo()
 }
 
 /*!
-    Check if possible to perform 'undo' command. [ public ]
+  \return true if possible to perform 'undo' command. [ public ]
 */
 bool CAF_Study::canUndo() const
 {
@@ -322,7 +360,7 @@ bool CAF_Study::canUndo() const
 }
 
 /*!
-    Check if possible to perform 'redo' command. [ public ]
+  \return true if possible to perform 'redo' command. [ public ]
 */
 bool CAF_Study::canRedo() const
 {
@@ -333,7 +371,7 @@ bool CAF_Study::canRedo() const
 }
 
 /*!
-    Returns the list of names of 'undo' actions available. [ public ]
+  \return the list of names of 'undo' actions available. [ public ]
 */
 QStringList CAF_Study::undoNames() const
 {
@@ -347,7 +385,7 @@ QStringList CAF_Study::undoNames() const
 }
 
 /*!
-    Returns the list of names of 'redo' actions available. [ public ]
+  \return the list of names of 'redo' actions available. [ public ]
 */
 QStringList CAF_Study::redoNames() const
 {
@@ -361,7 +399,7 @@ QStringList CAF_Study::redoNames() const
 }
 
 /*!
-    Returns the standard OCAF application from owner application. [ protected ]
+  \return the standard OCAF application from owner application. [ protected ]
 */
 Handle(TDocStd_Application) CAF_Study::stdApp() const
 {
@@ -373,7 +411,7 @@ Handle(TDocStd_Application) CAF_Study::stdApp() const
 }
 
 /*!
-    Returns the application casted to type CAF_Application. [ protected ]
+  \return the application casted to type CAF_Application. [ protected ]
 */
 CAF_Application* CAF_Study::cafApplication() const
 {

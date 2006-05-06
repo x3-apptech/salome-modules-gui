@@ -48,7 +48,6 @@
 vtkCxxRevisionMacro(SVTK_CubeAxesActor2D, "$Revision$");
 vtkStandardNewMacro(SVTK_CubeAxesActor2D);
 
-//----------------------------------------------------------------------------
 // Instantiate this object.
 SVTK_CubeAxesActor2D::SVTK_CubeAxesActor2D()
 {
@@ -130,7 +129,6 @@ SVTK_CubeAxesActor2D::SVTK_CubeAxesActor2D()
   
 }
 
-//----------------------------------------------------------------------------
 SVTK_CubeAxesActor2D::~SVTK_CubeAxesActor2D()
 {
   this->wireActorXY->Delete();
@@ -146,12 +144,10 @@ SVTK_CubeAxesActor2D::~SVTK_CubeAxesActor2D()
   this->rgridMapperXZ->Delete();
 }
 
-//----------------------------------------------------------------------------
 // Static variable describes connections in cube.
 static int Conn[8][3] = {{1,2,4}, {0,3,5}, {3,0,6}, {2,1,7},
                          {5,6,0}, {4,7,1}, {7,4,2}, {6,5,3}};
 
-//----------------------------------------------------------------------------
 // Project the bounding box and compute edges on the border of the bounding
 // cube. Determine which parts of the edges are visible via intersection 
 // with the boundary of the viewport (minus borders).
@@ -198,8 +194,13 @@ int SVTK_CubeAxesActor2D::RenderOverlay(vtkViewport *viewport)
   return renderedSomething;
 }
 
-static void ChangeValues(float* aArray1,float* aArray2,float *aRange1,float* aRange2,bool theY){
-  float tmp=-1000;
+static void ChangeValues(vtkFloatingPointType* aArray1,
+			 vtkFloatingPointType* aArray2,
+			 vtkFloatingPointType *aRange1,
+			 vtkFloatingPointType* aRange2,
+			 bool theY)
+{
+  vtkFloatingPointType tmp=-1000;
   if (!theY){
     for (int i=0; i<4; i++){
       tmp = aArray1[i]; aArray1[i] = aArray2[i]; aArray2[i] = tmp;
@@ -223,9 +224,15 @@ static void ChangeValues(float* aArray1,float* aArray2,float *aRange1,float* aRa
   }
 }
 
-static void ChangeArrays(float* xCoords,float* yCoords,float* zCoords,
-			 float* xRange,float* yRange,float* zRange,
-			 const int xAxes,const int yAxes, const int zAxes)
+static void ChangeArrays(vtkFloatingPointType* xCoords,
+			 vtkFloatingPointType* yCoords,
+			 vtkFloatingPointType* zCoords,
+			 vtkFloatingPointType* xRange,
+			 vtkFloatingPointType* yRange,
+			 vtkFloatingPointType* zRange,
+			 const int xAxes,
+			 const int yAxes, 
+			 const int zAxes)
 {
   if ( xAxes == 0 && yAxes == 2 && zAxes == 1)
     ChangeValues(yCoords,zCoords,yRange,zRange,true);
@@ -243,14 +250,13 @@ static void ChangeArrays(float* xCoords,float* yCoords,float* zCoords,
     ChangeValues(zCoords,xCoords,zRange,xRange,false);
 }
 
-//----------------------------------------------------------------------------
 // Project the bounding box and compute edges on the border of the bounding
 // cube. Determine which parts of the edges are visible via intersection 
 // with the boundary of the viewport (minus borders).
 int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 {
-  float bounds[6], slope = 0.0, minSlope, num, den;
-  float pts[8][3], d2, d2Min, min;
+  vtkFloatingPointType bounds[6], slope = 0.0, minSlope, num, den;
+  vtkFloatingPointType pts[8][3], d2, d2Min, min;
   int i, idx = 0;
   int xIdx, yIdx = 0, zIdx = 0, zIdx2, renderedSomething=0;
   int xAxes = 0, yAxes, zAxes;
@@ -308,7 +314,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
       }
     else
       {
-      float e1[2], e2[2], e3[2];
+      vtkFloatingPointType e1[2], e2[2], e3[2];
 
       // Find distance to origin
       d2Min = VTK_LARGE_FLOAT;
@@ -401,7 +407,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
     }
 
   // Setup the axes for plotting
-  float xCoords[4], yCoords[4], zCoords[4], xRange[2], yRange[2], zRange[2];
+  vtkFloatingPointType xCoords[4], yCoords[4], zCoords[4], xRange[2], yRange[2], zRange[2];
   this->AdjustAxes(pts, bounds, idx, xIdx, yIdx, zIdx, zIdx2, 
                    xAxes, yAxes, zAxes, 
                    xCoords, yCoords, zCoords, xRange, yRange, zRange);
@@ -449,7 +455,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 #else
   for(i=0;i<numOfLabelsX;i++){
 #endif
-    float val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
+    vtkFloatingPointType val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
     XCoords->InsertNextValue(val);
   }
   // YCoords coordinates for Y grid
@@ -459,7 +465,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 #else
   for(i=0;i<numOfLabelsX;i++){
 #endif
-    float val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
+    vtkFloatingPointType val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
     YCoords->InsertNextValue(val);
   }
   // ZCoords coordinates for Z grid
@@ -469,7 +475,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 #else
   for(i=0;i<numOfLabelsZ;i++){
 #endif
-    float val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
+    vtkFloatingPointType val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
     ZCoords->InsertNextValue(val);
   }
 
@@ -485,8 +491,8 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 
   rgrid->Delete();
 
-  float aCPosition[3];
-  float aCDirection[3];
+  vtkFloatingPointType aCPosition[3];
+  vtkFloatingPointType aCDirection[3];
   this->Camera->GetPosition(aCPosition);
   this->Camera->GetDirectionOfProjection(aCDirection);
 
@@ -494,12 +500,12 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   bool replaceXY=false;
   bool replaceYZ=false;
   bool replaceXZ=false;
-  float p[6][3]; // centers of planes
-  float vecs[6][3]; // 6 vectors from camera position to centers
+  vtkFloatingPointType p[6][3]; // centers of planes
+  vtkFloatingPointType vecs[6][3]; // 6 vectors from camera position to centers
 
-  float aMiddleX = (XCoords->GetValue(0) + XCoords->GetValue(numOfLabelsX-1))/2;
-  float aMiddleY = (YCoords->GetValue(0) + YCoords->GetValue(numOfLabelsY-1))/2;
-  float aMiddleZ = (ZCoords->GetValue(0) + ZCoords->GetValue(numOfLabelsZ-1))/2;
+  vtkFloatingPointType aMiddleX = (XCoords->GetValue(0) + XCoords->GetValue(numOfLabelsX-1))/2;
+  vtkFloatingPointType aMiddleY = (YCoords->GetValue(0) + YCoords->GetValue(numOfLabelsY-1))/2;
+  vtkFloatingPointType aMiddleZ = (ZCoords->GetValue(0) + ZCoords->GetValue(numOfLabelsZ-1))/2;
 
   // plane XY
   p[0][0] = aMiddleX; // plane X=0.5 Y=0.5 Z=0
@@ -555,7 +561,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   YCoords->Delete();
   ZCoords->Delete();
 
-  float color[3];
+  vtkFloatingPointType color[3];
 
   this->GetProperty()->GetColor(color);
   this->wireActorXY->GetProperty()->SetColor(color);
@@ -644,7 +650,6 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   return renderedSomething;
 }
 
-//----------------------------------------------------------------------------
 // Release any graphics resources that are being consumed by this actor.
 // The parameter window could be used to determine which graphic
 // resources to release.

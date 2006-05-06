@@ -254,9 +254,8 @@ int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const
 
 /*! Create tool.
  * Insert QAction with id \a id from action map(myActionMap) to tool manager.
- *\param a - QAction
- *\param tBar - integer
  *\param id   - integer
+ *\param tBar - integer
  *\param idx  - integer
  *\retval integer id of new action in tool manager.
  *\retval Return -1 if something wrong.
@@ -272,9 +271,8 @@ int CAM_Module::createTool( const int id, const int tBar, const int idx )
 
 /*! Create tool.
  * Insert QAction with id \a id from action map(myActionMap) to tool manager.
- *\param a - QAction
- *\param tBar - QString&
  *\param id   - integer
+ *\param tBar - QString&
  *\param idx  - integer
  *\retval integer id of new action in tool manager.
  *\retval Return -1 if something wrong.

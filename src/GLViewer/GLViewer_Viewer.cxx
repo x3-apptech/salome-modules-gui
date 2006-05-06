@@ -22,13 +22,6 @@
 // File:      GLViewer_Viewer.cxx
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Viewer
-**  Descr:   Viewer for QAD-based application
-**  Module:  QAD
-**  Created: UI team, 05.09.00
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Viewer.h"
 #include "GLViewer_Selector.h"
@@ -66,10 +59,10 @@ GLViewer_Viewer::~GLViewer_Viewer()
     delete mySelector;
 }
 
-//================================================================
-// Function : setViewManager
-// Purpose  : 
-//================================================================
+/*!
+  Sets new view manager
+  \param theViewManager - new view manager
+*/
 void GLViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 {
   SUIT_ViewModel::setViewManager(theViewManager);
@@ -89,10 +82,9 @@ void GLViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
   }
 }
 
-//================================================================
-// Function : contextMenuPopup
-// Purpose  : 
-//================================================================
+/*!
+  Builds popup for GL viewer
+*/
 void GLViewer_Viewer::contextMenuPopup( QPopupMenu* thePopup )
 {
   if( thePopup->count() > 0 )
@@ -530,10 +522,6 @@ void GLViewer_Viewer::handleWheel( QWheelEvent* e )
     startOperations( e );
 }
 
-/****************************************************************
-**  Class: GLViewer_ViewTransformer
-**  Level: Public
-*****************************************************************/
 int GLViewer_ViewTransformer::panBtn = Qt::MidButton;
 int GLViewer_ViewTransformer::zoomBtn = Qt::LeftButton;
 int GLViewer_ViewTransformer::fitRectBtn = Qt::LeftButton;
@@ -758,10 +746,6 @@ int GLViewer_ViewTransformer::type() const
 }
 
 
-/****************************************************************
-**  Class: GLViewer_ViewSketcher
-**  Level: Public
-*****************************************************************/
 int GLViewer_ViewSketcher::sketchBtn = LeftButton;
 
 /*!

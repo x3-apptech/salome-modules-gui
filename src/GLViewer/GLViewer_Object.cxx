@@ -19,13 +19,6 @@
 //  Author : OPEN CASCADE
 //
 
-/***************************************************************************
-**  Class:   GLViewer_Object
-**  Descr:   OpenGL Object
-**  Module:  GLViewer
-**  Created: UI team, 03.09.02
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Object.h"
 #include "GLViewer_Drawer.h"
@@ -37,6 +30,9 @@
 //#include <cmath>
 //using namespace std;
 
+/*!
+  Default constructor
+*/
 GLViewer_Object::GLViewer_Object()
 {
   myXScale = 1.0; 
@@ -65,6 +61,9 @@ GLViewer_Object::GLViewer_Object()
   myGroup = NULL;
 }
 
+/*!
+  Destructor
+*/
 GLViewer_Object::~GLViewer_Object()
 {
   if( myRect )
@@ -80,16 +79,27 @@ GLViewer_Object::~GLViewer_Object()
     delete myAspectLine;
 }
 
+/*!
+  \return priority of object
+*/
 int GLViewer_Object::getPriority() const
 {
     return myDrawer ? myDrawer->getPriority() : 0;
 }
 
+/*!
+  \return true if object is inside rectangle
+  \param theRect - rectangle
+*/
 GLboolean GLViewer_Object::isInside( GLViewer_Rect theRect )
 {
     return theRect.toQRect().contains( myRect->toQRect() );
 }
 
+/*!
+  Sets zoom factor
+  \param zoom - zoom factor
+*/
 GLboolean GLViewer_Object::setZoom( GLfloat zoom, bool, bool )
 {
     if( myZoom == zoom )
@@ -99,6 +109,10 @@ GLboolean GLViewer_Object::setZoom( GLfloat zoom, bool, bool )
     return GL_TRUE;
 }
 
+/*!
+  Performs zoom change by step
+  \param zoomIn - to increase to decrease zoom
+*/
 GLboolean GLViewer_Object::updateZoom( bool zoomIn )
 {
     float newZoom;
@@ -118,6 +132,10 @@ GLboolean GLViewer_Object::updateZoom( bool zoomIn )
     return setZoom( newZoom, true );
 }
 
+/*!
+  Codes object as byte copy
+  \return byte array
+*/
 QByteArray GLViewer_Object::getByteCopy()
 {
     int i = 0;
@@ -185,6 +203,10 @@ QByteArray GLViewer_Object::getByteCopy()
     return aResult;
 }
 
+/*!
+  Initialize object by byte array
+  \param theArray - byte array
+*/
 bool GLViewer_Object::initializeFromByteCopy( QByteArray theArray )
 {
     int i = 0;
@@ -281,6 +303,10 @@ bool GLViewer_Object::initializeFromByteCopy( QByteArray theArray )
     return true;        
 }
 
+/*!
+  Sets object's group
+  \param theGroup - group
+*/
 void GLViewer_Object::setGroup( GLViewer_Group* theGroup )
 {
   if ( myGroup == theGroup )
@@ -294,6 +320,9 @@ void GLViewer_Object::setGroup( GLViewer_Group* theGroup )
     myGroup->addObject( this );
 }
 
+/*!
+  \return object's group
+*/
 GLViewer_Group* GLViewer_Object::getGroup() const
 {
   return myGroup;

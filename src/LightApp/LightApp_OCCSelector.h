@@ -27,6 +27,10 @@
 
 class Handle_AIS_InteractiveObject;
 
+/*!
+  \class LightApp_OCCSelector
+  Custom selector to get/set selection from OCC viewer
+*/
 class LIGHTAPP_EXPORT LightApp_OCCSelector : public SUIT_Selector
 {
   Q_OBJECT

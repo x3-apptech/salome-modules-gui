@@ -45,31 +45,50 @@ extern "C" CAF_EXPORT SUIT_Application* createApplication()
   return new CAF_Application();
 }
 
+/*!
+  Default constructor
+*/
 CAF_Application::CAF_Application()
 : STD_Application()
 {
 }
 
-CAF_Application::CAF_Application( const Handle(TDocStd_Application)& app )
+/*!
+  Constructor with OCAF application
+  \param app - OCAF application
+*/
+CAF_Application::CAF_Application( const Handle( TDocStd_Application )& app )
 : STD_Application(),
 myStdApp( app )
 {
 }
 
+/*!
+  Destructor
+*/
 CAF_Application::~CAF_Application()
 {
 }
 
+/*!
+  \return application name
+*/
 QString CAF_Application::applicationName() const
 {
   return QString( "CAFApplication" );
 }
 
-Handle(TDocStd_Application) CAF_Application::stdApp() const
+/*!
+  \return OCAF application
+*/
+Handle( TDocStd_Application ) CAF_Application::stdApp() const
 {
   return myStdApp;
 }
 
+/*!
+  \return file filters for open/save document
+*/
 QString CAF_Application::getFileFilter() const
 {
   if ( stdApp().IsNull() )
@@ -118,6 +137,9 @@ QString CAF_Application::getFileFilter() const
   return filters.join( ";;" );
 }
 
+/*!
+  Creates actions of application
+*/
 void CAF_Application::createActions()
 {
   STD_Application::createActions();
@@ -255,16 +277,25 @@ void CAF_Application::updateCommandsStatus()
     redo->setEnabled( cafStudy && cafStudy->canRedo() );
 }
 
+/*!
+  SLOT: called by clicking on Help->About in main menu
+*/
 void CAF_Application::onHelpAbout()
 {
   SUIT_MessageBox::info1( desktop(), tr( "About" ), tr( "ABOUT_INFO" ), "&OK" );
 }
 
+/*!
+  Creates new study
+*/
 SUIT_Study* CAF_Application::createNewStudy()
 {
   return new CAF_Study( this );
 }
 
+/*!
+  Sets OCAF application
+*/
 void CAF_Application::setStdApp( const Handle(TDocStd_Application)& app )
 {
   myStdApp = app;

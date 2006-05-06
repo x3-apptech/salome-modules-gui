@@ -1,3 +1,21 @@
+// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/
+//
 
 #ifndef SUIT_TREE_SYNC_HEADER
 #define SUIT_TREE_SYNC_HEADER
@@ -5,25 +23,49 @@
 #include <qptrlist.h>
 #include <qvaluelist.h>
 
+/*!
+  \struct DiffItem
+  \brief Struct representing difference between items
+*/
 template <class SrcItem, class TrgItem>
 struct DiffItem
 {
-  SrcItem  mySrc;  //if it is null, then this item is to deleted
-  TrgItem  myTrg;  //if it is null, then this item is to added
-  //if both fields aren't null, then this item is to update
+  SrcItem  mySrc;
+  /*! 
+    \var mySrc
+    if it is null, then this item is to deleted
+  */
+  TrgItem  myTrg;
+  /*!
+    \var myTrg
+    if it is null, then this item is to added
+    if both fields aren't null, then this item is to update
+  */
 };
 
+/*!
+  \brief synchronizes two trees
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 TrgItem synchronize( const SrcItem&, const TrgItem&, const TreeData& );
 
+/*!
+  \brief compares children 
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 void diffSiblings( const SrcItem&, const TrgItem&,
                    QValueList < DiffItem < SrcItem,TrgItem > >&,
                    const TreeData& );
 
+/*!
+  \brief create item with children (subtree)
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 TrgItem createSubTree( const SrcItem&, const TrgItem&, const TrgItem&, const bool, const TreeData& );
 
+/*!
+  \brief find equal element in list
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 const typename QValueList<TrgItem>::const_iterator findEqual( const QValueList<TrgItem>& l,
 							      const typename QValueList<TrgItem>::const_iterator& first,
@@ -33,8 +75,31 @@ const typename QValueList<TrgItem>::const_iterator findEqual( const QValueList<T
 
 
 
-
-//int gSync = 0;
+/*!
+  Synchronizes two trees by comparing corresponding items
+  \param r1 - start item from first tree
+  \param r2 - start item from second tree
+  \param td - auxiliary class providing following methods:
+  <ul>
+  <li> bool     isEqual( const SrcItem&, const TrgItem& ) const - returns true if items are equal
+  <li> SrcItem  nullSrc() const - returns null SrcItem
+  <li> TrgItem  nullTrg() const - returns null TrgItem
+  <li> TrgItem  createItem( 
+    <ol>
+      <li> const SrcItem& src,    - corresponding SrcItem
+      <li> const TrgItem& parent, - parent TrgItem
+      <li> const TrgItem& after,  - TrgItem after that new item must be added
+      <li> const bool prepend     - whether new item must be added as first 
+    </ol>
+    ) const - creates new TrgItem
+  <li> void     updateItem( const TrgItem& ) const - updates TrgItem without recreation
+  <li> void     deleteItemWithChildren( const TrgItem& ) const - deletes TrgItem with all children
+  <li> void     children( const SrcItem&, QValueList<SrcItem>& ) const - fills list with children
+  <li> void     children( const TrgItem&, QValueList<TrgItem>& ) const - fills list with children
+  <li> SrcItem  parent( const SrcItem& ) const - return parent SrcItem
+  <li> TrgItem  parent( const TrgItem& ) const - return parent SrcItem
+  </ul>
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
 {
@@ -48,7 +113,6 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
     diffSiblings( r1, r2, d, td );
 
     typename QValueList< DiffItem< SrcItem, TrgItem > >::const_iterator anIt = d.begin(), aLast = d.end();
-    bool isFirst = true;
     TrgItem lastItem = td.nullTrg();
     //    TrgItem tail = td.nullTrg();
     for( ; anIt!=aLast; anIt++ )
@@ -64,7 +128,9 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
 	if( item.myTrg==td.nullTrg() )
 	{
 	  //to add
-	  lastItem = createSubTree( item.mySrc, r2, lastItem, isFirst, td );
+	  TrgItem nitem = createSubTree( item.mySrc, r2, lastItem, lastItem==td.nullTrg(), td );
+	  if( nitem!=td.nullTrg() )
+	    lastItem = nitem;
 	}
         else
 	{
@@ -73,10 +139,9 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
 	  synchronize( item.mySrc, item.myTrg, td );
 	  lastItem = item.myTrg;
 	}
-	isFirst = false;
       }
     }
-      
+
     return r2;
   }
   else
@@ -88,6 +153,14 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
   }
 }
 
+/*!
+  Finds equal element in list
+  \return iterator
+  \param l - list to search
+  \param first - start iterator 
+  \param it - item to be found
+  \param td - tree data object (provides auxiliary methods)
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 const typename QValueList<TrgItem>::const_iterator findEqual( const QValueList<TrgItem>& l,
 							      const typename QValueList<TrgItem>::const_iterator& first,
@@ -101,13 +174,20 @@ const typename QValueList<TrgItem>::const_iterator findEqual( const QValueList<T
   return last;
 }
 
+/*!
+  Compares children of objects src and trg
+  \param src - SrcItem to be checked
+  \param trg - TrgItem to be checked
+  \param d - map of difference to be filled
+  \param td - tree data object (provides auxiliary methods)
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 void diffSiblings( const SrcItem& src, const TrgItem& trg,
 		   QValueList < DiffItem < SrcItem,TrgItem > >& d,
 		   const TreeData& td )
 {
-  if( src==td.nullSrc() || trg==td.nullTrg() )
-    return;
+  //if( src==td.nullSrc() || trg==td.nullTrg() )
+  //  return;
 
   QValueList<SrcItem> src_ch;
   QValueList<TrgItem> trg_ch;
@@ -155,6 +235,15 @@ void diffSiblings( const SrcItem& src, const TrgItem& trg,
   }
 }
 
+/*!
+  Creates sub-tree
+  \return root of just created sub-tree
+  \param src - corresponding SrcItem
+  \param parent - parent of new TrgItem
+  \param after - TrgItem, after that new item must be added
+  \param asFirst - true if TrgItem must be added as first
+  \param td - tree data object (provides auxiliary methods)
+*/
 template <class SrcItem, class TrgItem, class TreeData>
 TrgItem createSubTree( const SrcItem& src, const TrgItem& parent,
 		       const TrgItem& after, const bool asFirst,

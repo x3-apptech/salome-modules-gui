@@ -23,6 +23,11 @@
 
 class SUIT_DataObject;
 
+/*!
+  \class OB_Filter
+  Base class for ObjectBrowser filter.
+  Filters selected objects by some condition.
+*/
 class OB_EXPORT OB_Filter
 {
 public:

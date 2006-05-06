@@ -25,14 +25,13 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Exception)
 
-//=======================================================================
-// name    : SalomeApp_DataModelSync
-/*!Purpose : Auxiliary class for synchronizing tree of kernel objects and SUIT_DataObjects  */
-//=======================================================================
-
 typedef _PTR(SObject)     kerPtr;
 typedef SUIT_DataObject*  suitPtr;
 
+/*!
+  \class SalomeApp_DataModelSync
+  Auxiliary class for synchronizing tree of kernel objects and SUIT_DataObjects
+*/
 class SalomeApp_DataModelSync
 {
 public:
@@ -54,13 +53,18 @@ private:
   SUIT_DataObject*  myRoot;
 };
 
-
+/*!
+  Constructor
+*/
 SalomeApp_DataModelSync::SalomeApp_DataModelSync( _PTR( Study ) aStudy, SUIT_DataObject* aRoot )
 : myStudy( aStudy ),
   myRoot( aRoot )
 {
 }
 
+/*!
+  \return true if kernel object is correct (has non empty name or is reference)
+*/
 bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
 {
   kerPtr refObj;
@@ -69,6 +73,13 @@ bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
   return res;
 }
 
+/*!
+  Creates SUIT object by KERNEL object
+  \param so - corresponding KERNEL object
+  \param parent - parent for SUIT object
+  \param after - previous sibling for SUIT object
+  \param prepend - SUIT object must be added to start of children list
+*/
 suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
 					     const suitPtr& parent,
 					     const suitPtr& after,
@@ -100,6 +111,10 @@ suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
   return nitem;
 }
 
+/*!
+  Deletes object with all children
+  \param p - SUIT object
+*/
 void SalomeApp_DataModelSync::deleteItemWithChildren( const suitPtr& p ) const
 {
   if( !p )
@@ -113,22 +128,43 @@ void SalomeApp_DataModelSync::deleteItemWithChildren( const suitPtr& p ) const
   delete p;
 }
 
+/*!
+  \return true if objects correspond each other at all
+  \param p - kernel object
+  \param q - suit object
+*/
 bool SalomeApp_DataModelSync::isEqual( const kerPtr& p, const suitPtr& q ) const
 {
-  LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( q );
-  return ( !p && !q ) || ( obj && isCorrect( p ) && p->GetID().c_str()==obj->entry() );
+  LightApp_ModuleObject* lobj = dynamic_cast<LightApp_ModuleObject*>( q );
+  SalomeApp_DataObject* sobj = dynamic_cast<SalomeApp_DataObject*>( q );
+  _PTR( SComponent ) aComp( p );
+  bool res = ( !p && !q ) ||
+             ( lobj && !sobj && aComp ) ||
+	     ( sobj && isCorrect( p ) && p->GetID().c_str()==sobj->entry() );
+  return res;
 }
 
+/*!
+  \return null kernel object
+*/
 kerPtr SalomeApp_DataModelSync::nullSrc() const
 {
   return kerPtr();
 }
 
+/*!
+  \return null suit object
+*/
 suitPtr SalomeApp_DataModelSync::nullTrg() const
 {
   return suitPtr( 0 );
 }
 
+/*!
+  Fills list with children of kernel object
+  \param obj - kernel object
+  \param ch - list to be filled
+*/
 void SalomeApp_DataModelSync::children( const kerPtr& obj, QValueList<kerPtr>& ch ) const
 {
   ch.clear();
@@ -137,6 +173,11 @@ void SalomeApp_DataModelSync::children( const kerPtr& obj, QValueList<kerPtr>& c
     ch.append( it->Value() );
 }
 
+/*!
+  Fills list with children of SUIT object
+  \param p - SUIT object
+  \param ch - list to be filled
+*/
 void SalomeApp_DataModelSync::children( const suitPtr& p, QValueList<suitPtr>& ch ) const
 {
   DataObjectList l;
@@ -149,15 +190,26 @@ void SalomeApp_DataModelSync::children( const suitPtr& p, QValueList<suitPtr>& c
   }
 }
 
+/*!
+  \return parent of SUIT object
+  \param p - SUIT object
+*/
 suitPtr SalomeApp_DataModelSync::parent( const suitPtr& p ) const
 {
   return p ? p->parent(): 0;
 }
 
+/*!
+  Updates SUIT object
+  \param p - SUIT object
+*/
 void SalomeApp_DataModelSync::updateItem( const suitPtr& ) const
 {
 }
 
+/*!
+  Auxiliary function, shows SUIT tree
+*/
 void showTree( SUIT_DataObject* root )
 {
   qDebug( root ? "<tree>" : "<empty tree>" );
@@ -173,27 +225,24 @@ void showTree( SUIT_DataObject* root )
   }
 }
 
-//=======================================================================
-// name    : SalomeApp_DataModel::SalomeApp_DataModel
-/*!Purpose : Constructor*/
-//=======================================================================
+/*!
+  Constructor
+*/
 SalomeApp_DataModel::SalomeApp_DataModel( CAM_Module* theModule )
 : LightApp_DataModel( theModule )
 {
 }
 
-//=======================================================================
-// name    : SalomeApp_DataModel::~SalomeApp_DataModel
-/*! Purpose : Destructor*/
-//=======================================================================
+/*!
+  Destructor
+*/
 SalomeApp_DataModel::~SalomeApp_DataModel()
 {
 }
 
-//================================================================
-// Function : open
-/*! Purpose  : Open data model*/
-//================================================================
+/*!
+  Opens data model
+*/
 bool SalomeApp_DataModel::open( const QString& name, CAM_Study* study, QStringList )
 {
   SalomeApp_Study* aDoc = dynamic_cast<SalomeApp_Study*>( study );
@@ -214,20 +263,18 @@ bool SalomeApp_DataModel::open( const QString& name, CAM_Study* study, QStringLi
   return true;
 }
 
-//================================================================
-// Function : create
-/*! Purpose  : Create data model*/
-//================================================================
+/*!
+  Creates data model
+*/
 bool SalomeApp_DataModel::create( CAM_Study* theStudy )
 {
   update(NULL, (LightApp_Study*)theStudy);
   return true;
 }
 
-//================================================================
-// Function : update
-/*! Purpose  : Update application.*/
-//================================================================
+/*!
+  Updates application.
+*/
 void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
 {
   SalomeApp_Study* aSStudy = dynamic_cast<SalomeApp_Study*>(study);
@@ -261,10 +308,9 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
     updateTree( sobj, aSStudy );
 }
 
-//================================================================
-// Function : synchronize
-/*! Purpose  : synchronizes kernel tree and suit data tree starting from component 'sobj' */
-//================================================================
+/*!
+  Synchronizes kernel tree and suit data tree starting from component 'sobj'
+*/
 SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sobj, SalomeApp_Study* study )
 {
   if( !study || !study->root() || !sobj )
@@ -272,11 +318,11 @@ SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sob
 
   DataObjectList ch; study->root()->children( ch );
   DataObjectList::const_iterator anIt = ch.begin(), aLast = ch.end();
-  SalomeApp_DataObject* suitObj = 0;
+  SUIT_DataObject* suitObj = 0;
   for( ; anIt!=aLast; anIt++ )
   {
-    SalomeApp_DataObject* dobj = dynamic_cast<SalomeApp_DataObject*>( *anIt );
-    if( dobj && dobj->name()==sobj->GetName().c_str() )
+    LightApp_DataObject* dobj = dynamic_cast<LightApp_DataObject*>( *anIt );
+    if( dobj && dobj->name() == sobj->GetName().c_str() )
     {
       suitObj = dobj;
       break;
@@ -285,13 +331,15 @@ SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sob
 
   SalomeApp_DataModelSync sync( study->studyDS(), study->root() );
 
-  return ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
+  if( !suitObj || dynamic_cast<SalomeApp_DataObject*>( suitObj ) )
+    return ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
+  else
+    return 0;
 }
 
-//================================================================
-// Function : updateTree
-/*! Purpose  : updates tree.*/
-//================================================================
+/*!
+  Updates tree.
+*/
 void SalomeApp_DataModel::updateTree( const _PTR( SComponent )& comp, SalomeApp_Study* study )
 {
   SalomeApp_ModuleObject* aNewRoot = dynamic_cast<SalomeApp_ModuleObject*>( synchronize( comp, study ) );
@@ -302,20 +350,17 @@ void SalomeApp_DataModel::updateTree( const _PTR( SComponent )& comp, SalomeApp_
   }
 }
 
-//================================================================
-// Function : getModule
-/*! Purpose  : gets module*/
-//================================================================
-
+/*!
+  \return module
+*/
 SalomeApp_Module* SalomeApp_DataModel::getModule() const
 {
   return dynamic_cast<SalomeApp_Module*>( module() );
 }
 
-//================================================================
-// Function : getStudy
-/*! Purpose  : gets study */
-//================================================================
+/*!
+  \return study
+*/
 SalomeApp_Study* SalomeApp_DataModel::getStudy() const
 {
   if(!root()) return 0;
@@ -328,10 +373,9 @@ SalomeApp_Study* SalomeApp_DataModel::getStudy() const
   return aStudy;
 }
 
-//================================================================
-// Function : getRootEntry
-/*! Purpose  : returns study entry corresponding to this data model*/
-//================================================================
+/*!
+  \return study entry corresponding to this data model
+*/
 QString SalomeApp_DataModel::getRootEntry( SalomeApp_Study* study ) const
 {
   QString anEntry;

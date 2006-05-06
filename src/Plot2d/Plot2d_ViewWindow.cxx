@@ -17,8 +17,7 @@
 // See http://www.salome-platform.org/
 //
 // Plot2d_ViewWindow.cxx: implementation of the Plot2d_ViewWindow class.
-//
-//////////////////////////////////////////////////////////////////////
+
 #include "Plot2d_ViewWindow.h"
 #include "Plot2d_ViewFrame.h"
 
@@ -36,10 +35,9 @@
 #include <qpopupmenu.h>
 #include <qimage.h>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+/*!
+  Constructor
+*/
 Plot2d_ViewWindow::Plot2d_ViewWindow(SUIT_Desktop* theDesktop, Plot2d_Viewer* theModel)
 : SUIT_ViewWindow(theDesktop)
 {
@@ -62,18 +60,27 @@ Plot2d_ViewWindow::Plot2d_ViewWindow(SUIT_Desktop* theDesktop, Plot2d_Viewer* th
 
 }
 
+/*!
+  Destructor
+*/
 Plot2d_ViewWindow::~Plot2d_ViewWindow()
 {
 }
 
-//****************************************************************
+/*!
+  Puts message to status bar
+  \param theMsg - message text
+*/
 void Plot2d_ViewWindow::putInfo(QString theMsg)
 {
   QStatusBar*	aStatusBar = myDesktop->statusBar();
   aStatusBar->message(theMsg/*, 3000*/);
 }
 
-//****************************************************************
+/*!
+  Fills popup menu with custom actions
+ \param popup - popup menu to be filled with
+*/
 void Plot2d_ViewWindow::contextMenuPopup( QPopupMenu* thePopup )
 {
   // scaling
@@ -101,7 +108,9 @@ void Plot2d_ViewWindow::contextMenuPopup( QPopupMenu* thePopup )
   myActionsMap[ CurvSettingsId ]->addTo(thePopup);
 }
 
-//****************************************************************
+/*!
+  Custom event filter
+*/
 bool Plot2d_ViewWindow::eventFilter(QObject* watched, QEvent* e)
 {
   if (watched == myViewFrame) {
@@ -126,7 +135,9 @@ bool Plot2d_ViewWindow::eventFilter(QObject* watched, QEvent* e)
   return SUIT_ViewWindow::eventFilter(watched, e);
 }
 
-//****************************************************************
+/*!
+  Create actions for Plot2d view window
+*/
 void Plot2d_ViewWindow::createActions()
 {
   if ( !myActionsMap.isEmpty() )
@@ -282,7 +293,9 @@ void Plot2d_ViewWindow::createActions()
 
 }
 
-//****************************************************************
+/*!
+  Create toolbar for Plot2d view window
+*/
 void Plot2d_ViewWindow::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
@@ -314,7 +327,9 @@ void Plot2d_ViewWindow::createToolBar()
   onChangeLegendMode();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if scale mode for horizontal axis is changed
+*/
 void Plot2d_ViewWindow::onChangeHorMode()
 {
   bool aLinear = myViewFrame->isModeHorLinear();
@@ -334,7 +349,9 @@ void Plot2d_ViewWindow::onChangeHorMode()
   myActionsMap[GlobalPanId]->setEnabled( myViewFrame->isModeVerLinear() && myViewFrame->isModeHorLinear() );
 }
 
-//****************************************************************
+/*!
+  SLOT: called if scale mode for vertical axis is changed
+*/
 void Plot2d_ViewWindow::onChangeVerMode()
 {
   bool aLinear = myViewFrame->isModeVerLinear();
@@ -354,7 +371,9 @@ void Plot2d_ViewWindow::onChangeVerMode()
   myActionsMap[GlobalPanId]->setEnabled( myViewFrame->isModeVerLinear() && myViewFrame->isModeHorLinear() );
 }
 
-//****************************************************************
+/*!
+  SLOT: called if curve type is changed
+*/
 void Plot2d_ViewWindow::onChangeCurveMode()
 {
   int aCurveType = myViewFrame->getCurveType();
@@ -365,43 +384,57 @@ void Plot2d_ViewWindow::onChangeCurveMode()
   myActionsMap[CurvSplinesId]->setOn(aCurveType == 2);
 }
 
-//****************************************************************
+/*!
+  SLOT: called if legend mode is changed
+*/
 void Plot2d_ViewWindow::onChangeLegendMode()
 {
   myActionsMap[ LegendId ]->setOn(myViewFrame->isLegendShow());
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Fit all" is activated
+*/
 void Plot2d_ViewWindow::onFitAll()
 {
   myViewFrame->onViewFitAll();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Fit rect" is activated
+*/
 void Plot2d_ViewWindow::onFitRect()
 {
   myViewFrame->onViewFitArea();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Zoom" is activated
+*/
 void Plot2d_ViewWindow::onZoom()
 {
   myViewFrame->onViewZoom();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Panning" is activated
+*/
 void Plot2d_ViewWindow::onPanning()
 {
   myViewFrame->onViewPan();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Global panning" is activated
+*/
 void Plot2d_ViewWindow::onGlobalPanning()
 {
   myViewFrame->onViewGlobalPan();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action of scale mode for horizontal axis changing is activated
+*/
 void Plot2d_ViewWindow::onViewHorMode()
 {
   if (myViewFrame->isModeHorLinear())
@@ -410,7 +443,9 @@ void Plot2d_ViewWindow::onViewHorMode()
     myViewFrame->setHorScaleMode(0);
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action of scale mode for vertical axis changing is activated
+*/
 void Plot2d_ViewWindow::onViewVerMode()
 {
   if (myViewFrame->isModeVerLinear())
@@ -419,14 +454,18 @@ void Plot2d_ViewWindow::onViewVerMode()
     myViewFrame->setVerScaleMode(0);
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Show legend" is activated
+*/
 void Plot2d_ViewWindow::onLegend()
 {
   myViewFrame->showLegend(!myViewFrame->isLegendShow());
   onChangeLegendMode();
 }
 
-//****************************************************************
+/*!
+  SLOT: called if action "Change curve type" is activated
+*/
 void Plot2d_ViewWindow::onCurves()
 {
   QtxAction* aSender = (QtxAction*) sender();
@@ -438,20 +477,29 @@ void Plot2d_ViewWindow::onCurves()
     myViewFrame->setCurveType(2);
 }
  
-//****************************************************************
+/*!
+  SLOT: called if action "Dump view" is activated
+*/
 void Plot2d_ViewWindow::onDumpView()
 {
   qApp->postEvent( myViewFrame, new QPaintEvent( QRect( 0, 0, myViewFrame->width(), myViewFrame->height() ), TRUE ) );
   SUIT_ViewWindow::onDumpView();
 }
 
-//****************************************************************
+/*!
+  \return QImage, containing all scene rendering in window
+*/
 QImage Plot2d_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
   return px.convertToImage();
 }
 
+/*!
+  Saves scene rendering in window to file
+  \param fileName - name of file
+  \param format - string contains name of format (for example, "BMP"(default) or "JPEG", "JPG")
+*/
 bool Plot2d_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
 {
   bool res = myViewFrame ? myViewFrame->print( fileName, format ) : false;
@@ -461,20 +509,25 @@ bool Plot2d_ViewWindow::dumpViewToFormat( const QString& fileName, const QString
   return res;
 }
 
+/*!
+  \return filter of image files
+*/
 QString Plot2d_ViewWindow::filter() const
 {
   return SUIT_ViewWindow::filter() + ";;" + tr( "POSTSCRIPT_FILES" );
 }
 
-/*! The method returns the visual parameters of this view as a formated string
+/*!
+  \return the visual parameters of this view as a formated string
  */
 QString Plot2d_ViewWindow::getVisualParameters()
 {
   return myViewFrame->getVisualParameters();
 }
 
-/* The method restors visual parameters of this view from a formated string
- */
+/*!
+  The method restors visual parameters of this view from a formated string
+*/
 void Plot2d_ViewWindow::setVisualParameters( const QString& parameters )
 {
   myViewFrame->setVisualParameters( parameters );

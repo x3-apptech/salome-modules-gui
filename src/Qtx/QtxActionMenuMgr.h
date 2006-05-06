@@ -35,6 +35,18 @@ class QMainWindow;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class QtxActionMenuMgr
+  Allows to use set of action to automatically build main menu.
+  With help of methods insert/append/remove it is possible to 
+  describe whole structure of menu. Method hide allows
+  to temporary remove some items from menu, method show allows to 
+  recreate them.
+  Actions can be grouped with help of group identifictor.
+  Inside popup or menu bar items have order by increasing group id.
+  This manager is able to attune menu: to remove excess separators,
+  to remove empty popup menu etc.
+*/
 class QTX_EXPORT QtxActionMenuMgr : public QtxActionMgr
 {
   Q_OBJECT
@@ -44,6 +56,11 @@ class QTX_EXPORT QtxActionMenuMgr : public QtxActionMgr
   typedef QPtrList<MenuNode>         NodeList;
   typedef QPtrListIterator<MenuNode> NodeListIterator;
 
+  /*!
+    \class MenuNode
+    Represents a menu item inside main menu structure.
+    For internal purposes only
+  */
   class MenuNode
   {
   public:
@@ -148,6 +165,10 @@ private:
   MenuMap      myMenus;
 };
 
+/*!
+  \class QtxActionMenuMgr::MenuCreator
+  Allows to create automatically main menu by data read from file
+*/
 class QtxActionMenuMgr::MenuCreator : public QtxActionMgr::Creator
 {
 public:

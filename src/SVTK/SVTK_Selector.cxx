@@ -36,6 +36,9 @@
 
 #include <vtkCallbackCommand.h>
 
+/*!
+  \return new SVTK_Selector
+*/
 SVTK_Selector* 
 SVTK_Selector
 ::New()
@@ -43,19 +46,26 @@ SVTK_Selector
   return new SVTK_SelectorDef();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Default constructor
+*/
 SVTK_SelectorDef
 ::SVTK_SelectorDef()
 {
   mySelectionMode = ActorSelection;
 }
 
+/*!
+  Destructor
+*/
 SVTK_SelectorDef
 ::~SVTK_SelectorDef()
 {
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To invoke selectionChanged signals
+*/
 void 
 SVTK_SelectorDef
 ::StartPickCallback()
@@ -63,7 +73,9 @@ SVTK_SelectorDef
   this->InvokeEvent(vtkCommand::StartPickEvent,NULL);
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To invoke selectionChanged signals
+*/
 void 
 SVTK_SelectorDef
 ::EndPickCallback()
@@ -71,7 +83,9 @@ SVTK_SelectorDef
   this->InvokeEvent(vtkCommand::EndPickEvent,NULL);
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To change current Selection_Mode (as outside effect, it invokes selectionChange signal)
+*/
 void 
 SVTK_SelectorDef
 ::SetSelectionMode(Selection_Mode theMode)
@@ -83,6 +97,9 @@ SVTK_SelectorDef
   }
 }
 
+/*!
+  Clear selection
+*/
 void 
 SVTK_SelectorDef
 ::ClearIObjects() 
@@ -92,7 +109,9 @@ SVTK_SelectorDef
   myMapIOSubIndex.clear();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return true if the SALOME_InteractiveObject presents into selection
+*/
 bool
 SVTK_SelectorDef
 ::IsSelected(const Handle(SALOME_InteractiveObject)& theIO) const
@@ -100,6 +119,9 @@ SVTK_SelectorDef
   return !theIO.IsNull() && (myIObjects.find(theIO) != myIObjects.end());
 }
 
+/*!
+  \return true if the SALOME_Actor presents into selection
+*/
 bool
 SVTK_SelectorDef
 ::IsSelected(SALOME_Actor* theActor) const
@@ -108,6 +130,10 @@ SVTK_SelectorDef
   return IsSelected(anIO) && myIO2Actors.find(anIO) != myIO2Actors.end();
 }
 
+/*!
+  \return corresponding SALOME_Actor for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+*/
 SALOME_Actor*
 SVTK_SelectorDef
 ::GetActor(const Handle(SALOME_InteractiveObject)& theIO) const
@@ -118,7 +144,10 @@ SVTK_SelectorDef
   return NULL;
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Adds SALOME_InteractiveObject into selection
+  \param theIO - SALOME_InteractiveObject
+*/
 bool 
 SVTK_SelectorDef
 ::AddIObject(const Handle(SALOME_InteractiveObject)& theIO) 
@@ -130,6 +159,10 @@ SVTK_SelectorDef
   return false;
 }
 
+/*!
+  Adds SALOME_Actor into selection
+  \param theActor - SALOME_Actor
+*/
 bool 
 SVTK_SelectorDef
 ::AddIObject(SALOME_Actor* theActor) 
@@ -147,7 +180,10 @@ SVTK_SelectorDef
   return !anIsIOBound || !anIsActorBound;
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Removes SALOME_InteractiveObject from selection
+  \param theIO - SALOME_InteractiveObject
+*/
 bool 
 SVTK_SelectorDef
 ::RemoveIObject(const Handle(SALOME_InteractiveObject)& theIO) 
@@ -161,6 +197,10 @@ SVTK_SelectorDef
   return anIsIOBound;
 }
 
+/*!
+  Removes SALOME_Actor from selection
+  \param theActor - SALOME_Actor
+*/
 bool 
 SVTK_SelectorDef
 ::RemoveIObject(SALOME_Actor* theActor) 
@@ -174,7 +214,9 @@ SVTK_SelectorDef
   return RemoveIObject(anIO) || anIsActorBound;
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return list of all SALOME_InteractiveObject presenting in selection
+*/
 const SALOME_ListIO& 
 SVTK_SelectorDef
 ::StoredIObjects() const
@@ -188,6 +230,9 @@ SVTK_SelectorDef
   return myIObjectList;
 }
 
+/*!
+  \return number of selected objects
+*/
 int
 SVTK_SelectorDef
 ::IObjectCount() const
@@ -195,6 +240,10 @@ SVTK_SelectorDef
   return myIObjects.size();
 }
 
+/*!
+  \return true if the SALOME_InteractiveObject has a subselection
+  \param theIO - SALOME_InteractiveObject
+*/
 bool 
 SVTK_SelectorDef
 ::HasIndex( const Handle(SALOME_InteractiveObject)& theIO) const
@@ -202,6 +251,10 @@ SVTK_SelectorDef
   return myMapIOSubIndex.find(theIO) != myMapIOSubIndex.end();
 }
 
+/*!
+  Gets indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+*/
 void 
 SVTK_SelectorDef
 ::GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -214,6 +267,11 @@ SVTK_SelectorDef
     theIndex.Clear();
 }
 
+/*!
+  \return true if the index presents in subselection 
+  \param theIO - SALOME_InteractiveObject
+  \param theIndex - index
+*/
 bool
 SVTK_SelectorDef
 ::IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
@@ -253,7 +311,12 @@ removeIndex(TColStd_IndexedMapOfInteger& theMapIndex,
   return anId;
 }
 
-
+/*!
+  Changes indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIndices - indices
+  \param theIsModeShift - if it is false, then map will be cleared before indices are added
+*/
 bool
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -283,6 +346,12 @@ SVTK_SelectorDef
 }
 
 
+/*!
+  Changes indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIndices - indices
+  \param theIsModeShift - if it is false, then map will be cleared before indices are added
+*/
 bool
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -313,6 +382,12 @@ SVTK_SelectorDef
 }
 
 
+/*!
+  Changes indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIndex - index
+  \param theIsModeShift - if it is false, then map will be cleared before indices are added
+*/
 bool 
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -344,6 +419,11 @@ SVTK_SelectorDef
 }
 
 
+/*!
+  Removes index of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIndex - index
+*/
 void
 SVTK_SelectorDef
 ::RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -356,6 +436,9 @@ SVTK_SelectorDef
   }
 }
 
+/*!
+  Clears all indices of subselection
+*/
 void 
 SVTK_SelectorDef
 ::ClearIndex()
@@ -363,7 +446,10 @@ SVTK_SelectorDef
   myMapIOSubIndex.clear();  
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To apply a filter on the selection
+  \param theFilter - new filter
+*/
 void
 SVTK_SelectorDef
 ::SetFilter(const Handle(VTKViewer_Filter)& theFilter)
@@ -371,7 +457,10 @@ SVTK_SelectorDef
   myFilters.insert(TFilters::value_type(theFilter->GetId(),theFilter));
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return true if filter with given number is applyed
+  \param theId - filter id
+*/
 bool
 SVTK_SelectorDef
 ::IsFilterPresent(const TFilterID theId) const
@@ -379,7 +468,10 @@ SVTK_SelectorDef
   return myFilters.find(theId) != myFilters.end();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To remove a filter from the selection
+  \param theId - filter id
+*/
 void  
 SVTK_SelectorDef
 ::RemoveFilter(const TFilterID theId)
@@ -388,7 +480,12 @@ SVTK_SelectorDef
     myFilters.erase(theId);
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return true if the index satisfy installed filters
+  \param theActor - actor
+  \param theId - filter id
+  \param theIsNode - whether it is node
+*/
 bool
 SVTK_SelectorDef
 ::IsValid(SALOME_Actor* theActor,
@@ -405,7 +502,10 @@ SVTK_SelectorDef
   return true;
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return filter by it's id
+  \param theId - filter id
+*/
 Handle(VTKViewer_Filter) 
 SVTK_SelectorDef
 ::GetFilter(const TFilterID theId) const

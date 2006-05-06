@@ -118,6 +118,11 @@ VTKViewer_RenderWindowInteractor::~VTKViewer_RenderWindowInteractor()
   myPointPicker->Delete();
 }
 
+/*!
+  Print interactor to stream
+  \param os - stream
+  \param indent
+*/
 void VTKViewer_RenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent) 
 {
   vtkRenderWindowInteractor::PrintSelf(os, indent) ;
@@ -213,34 +218,6 @@ void VTKViewer_RenderWindowInteractor::SetInteractorStyle(vtkInteractorObserver 
   myInteractorStyle = dynamic_cast<VTKViewer_InteractorStyle*>(theInteractor);
   vtkRenderWindowInteractor::SetInteractorStyle(theInteractor);
 }
-
-
-/*
-void VTKViewer_RenderWindowInteractor::SetSelectionMode(Selection_Mode theMode)
-{
-  myCellActor->SetVisibility(false);
-  myEdgeActor->SetVisibility(false);
-  myPointActor->SetVisibility(false);
-
-  switch(theMode){
-  case ActorSelection:
-    this->SetPicker(myBasicPicker);
-    break;
-  case NodeSelection:
-    this->SetPicker(myPointPicker);
-    break;
-  case CellSelection:
-  case EdgeSelection:
-  case FaceSelection:
-  case VolumeSelection:
-  case EdgeOfCellSelection:
-    this->SetPicker(myCellPicker);
-    break;
-  }
-
-  myInteractorStyle->OnSelectionModeChanged();
-}
-*/
 
 /*!Sets selection properties.
  *\param theRed - red component of color
@@ -351,8 +328,9 @@ int VTKViewer_RenderWindowInteractor::CreateTimer(int vtkNotUsed(timertype))
   return 1 ;
 }
 
-/**@see CreateTimer(int )
- *\retval 1
+/*! 
+  \sa CreateTimer(int )
+  \retval 1
  */
 int VTKViewer_RenderWindowInteractor::DestroyTimer(void)
 {
@@ -623,6 +601,9 @@ void VTKViewer_RenderWindowInteractor::Display( VTKViewer_Actor* theActor, bool 
     emit RenderWindowModified();
 }
 
+/*!
+  default key press event (empty implementation)
+*/
 void VTKViewer_RenderWindowInteractor::KeyPressed(QKeyEvent *event)
 {
   /// NOT_IMPLEMENTED
@@ -698,7 +679,7 @@ void VTKViewer_RenderWindowInteractor::setActorData(const TColStd_IndexedMapOfIn
 						    TUpdateActor theFun)
 {
   (*theFun)(theMapIndex,theMapActor,theActor);
-  float aPos[3];
+  vtkFloatingPointType aPos[3];
   theMapActor->GetPosition(aPos);
   theActor->SetPosition(aPos);
 }

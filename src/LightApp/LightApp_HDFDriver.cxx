@@ -36,10 +36,9 @@ LightApp_HDFDriver::~LightApp_HDFDriver()
 
 using namespace std;
 
-//================================================================
-//  Function : SaveDatasInFile
-/*! Purpose  : save in file 'theFileName' datas from this driver*/
-//================================================================
+/*!
+  Saves in file 'theFileName' datas from this driver
+*/
 bool LightApp_HDFDriver::SaveDatasInFile( const char* theFileName, bool isMultiFile )
 {
   bool isASCII = false;
@@ -163,10 +162,9 @@ bool LightApp_HDFDriver::SaveDatasInFile( const char* theFileName, bool isMultiF
   return !isError;
 }
 
-//=======================================================================
-//  Function : ReadDatasFromFile
-/*! Purpose  : filling current driver from file 'theFileName'*/
-//=======================================================================
+/*!
+  Filling current driver from file 'theFileName'
+*/
 bool LightApp_HDFDriver::ReadDatasFromFile( const char* theFileName, bool isMultiFile )
 {
   bool isASCII = false;

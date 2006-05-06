@@ -19,26 +19,23 @@
 
 #include "QtxOperations.h"
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Default constructor
+*/
 QtxOperations::QtxOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Destructor
+*/
 QtxOperations::~QtxOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates QtxValue by it's string representation
+*/
 bool QtxOperations::createValue( const QString& str, QtxValue& v ) const
 {
     v = str;

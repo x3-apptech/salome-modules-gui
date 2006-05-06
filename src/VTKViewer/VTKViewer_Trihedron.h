@@ -52,7 +52,7 @@ public:
   /*!Create new instance of VTKViewer_UnScaledActor.*/
   static VTKViewer_UnScaledActor *New();
   
-  virtual float* GetBounds();
+  virtual vtkFloatingPointType* GetBounds();
   virtual void SetSize(int theSize);
   virtual void Render(vtkRenderer *theRenderer);
 
@@ -111,7 +111,6 @@ protected:
   VTKViewer_UnScaledActor* ArrowActor;
 };
 
-//****************************************************************
 /*!This class provide support trihedron object in vtk viewer.*/
 class VTKVIEWER_EXPORT VTKVIEWER_EXPORT VTKViewer_Trihedron : public vtkObject
 {
@@ -133,14 +132,14 @@ public:
   static VTKViewer_Trihedron *New();
   
   /*!Sets size of trihedron.
-   * \param theSize - float value
+   * \param theSize - vtkFloatingPointType value
    */
-  virtual void        SetSize(float theSize);
+  virtual void        SetSize(vtkFloatingPointType theSize);
 
   /*! Get size of trihedron.
-   * \retval mySize - float value
+   * \retval mySize - vtkFloatingPointType value
    */
-  virtual float       GetSize() { return mySize;}
+  virtual vtkFloatingPointType  GetSize() { return mySize;}
   
   enum TVisibility{eOff, eOn, eOnlyLineOn};
   
@@ -182,10 +181,9 @@ protected:
   VTKViewer_Axis*     myAxis[3];
   
   /*! Common size for trihedron, for each axis.*/
-  float               mySize;
+  vtkFloatingPointType mySize;
 };
 
-//****************************************************************
 /*!The base class for concreate Axis.
  * Its only duty is to give correct initialization and destruction
  * of its pipe-lines
@@ -225,7 +223,7 @@ public:
   
   /*! Set size of VTKViewer_Axis
    */
-  virtual void SetSize(float theSize);
+  virtual void SetSize(vtkFloatingPointType theSize);
   
   /*! Get label actor.
    * \retval Return myLabelActor.
@@ -248,7 +246,7 @@ protected:
   /*! \var myRot[3]
    * Orientation vector
    */
-  float myDir[3], myRot[3];
+  vtkFloatingPointType myDir[3], myRot[3];
   
   /*! VTKViewer_LineActor actor pointer
    */

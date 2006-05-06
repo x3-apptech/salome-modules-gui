@@ -17,8 +17,6 @@
 // See http://www.salome-platform.org/
 //
 // SUIT_Accel.cxx: implementation of the SUIT_Accel class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "SUIT_Accel.h"
 #include "SUIT_ViewWindow.h"
@@ -30,9 +28,6 @@
 #include <qnamespace.h>
 
 
-/*!\class SUIT_Accel
- * Class handles keyboard accelerator bindings.
- */
 SUIT_Accel* SUIT_Accel::myself = 0;
 
 /*! Constructor [private].*/
@@ -125,8 +120,7 @@ bool SUIT_Accel::eventFilter( QObject *obj, QEvent *event )
       if ( myMap.contains( type ) ) {
 	IdActionMap idActionMap = myMap[type];
 	if ( idActionMap.contains( key ) ) {
-	  vw->onAccelAction( idActionMap[key] );
-	  return true;
+	  return vw->onAccelAction( idActionMap[key] );
 	}
       }
     }

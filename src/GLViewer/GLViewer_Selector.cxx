@@ -22,13 +22,6 @@
 // File:      GLViewer_Selector.cxx
 // Created:   November, 2004
 
-/****************************************************************************
-**  Class:   GLViewer_Selector
-**  Descr:   Base class for object selection in QAD-based application
-**  Module:  GLViewer
-**  Created: UI team, 22.09.00
-*****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Selector.h"
 

@@ -108,12 +108,12 @@ bool SalomeApp_PyInterp::initContext()
   return true;
 }
 
+/*!
+  Do nothing
+  The initialization has been done in main
+ */
 void SalomeApp_PyInterp::init_python()
 {
-  /*
-   * Do nothing
-   * The initialization has been done in main
-   */
   MESSAGE("PyInterp_base::init_python");
   ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
   SCRUTE(KERNEL_PYTHON::_gtstate);

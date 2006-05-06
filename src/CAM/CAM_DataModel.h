@@ -29,6 +29,11 @@ class CAM_DataObject;
 class CAM_Study;
 class SUIT_DataObject;
 
+/*!
+  \class CAM_DataModel
+  Base class for all data models used in CAM-based applications.
+  Represents data model of CAM module. Provides necessary interface (default implementation is empty)
+*/
 class CAM_EXPORT CAM_DataModel : public QObject
 {
   Q_OBJECT

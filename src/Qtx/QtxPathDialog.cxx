@@ -60,11 +60,9 @@ static const char* open_icon[] = {
 "                "
 };
 
-//================================================================
-// Function : QtxPathDialog
-// Purpose  : Constructor.
-//================================================================
-
+/*!
+  Constructor.
+*/
 QtxPathDialog::QtxPathDialog( const bool import, QWidget* parent, const bool modal, const bool resize, const int buttons, WFlags f )
 : QtxDialog( parent, 0, modal, resize, buttons, f ),
 myDefault( -1 ),
@@ -85,11 +83,9 @@ myOptionsFrame( 0 )
 	setFocusProxy( le );
 }
 
-//================================================================
-// Function : QtxPathDialog
-// Purpose  : Constructor.
-//================================================================
-
+/*!
+  Constructor.
+*/
 QtxPathDialog::QtxPathDialog( QWidget* parent, const bool modal, const bool resize, const int buttons, WFlags f )
 : QtxDialog( parent, 0, modal, resize, buttons, f ),
 myDefault( -1 ),
@@ -99,60 +95,51 @@ myOptionsFrame( 0 )
 	initialize();
 }
 
-//================================================================
-// Function : ~QtxPathDialog
-// Purpose  : Destructor.
-//================================================================
-
+/*!
+  Destructor.
+*/
 QtxPathDialog::~QtxPathDialog()
 {
 }
 
-//================================================================
-// Function : fileName
-// Purpose  : 
-//================================================================
-
+/*!
+  \return file name
+*/
 QString QtxPathDialog::fileName() const
 {
 	return fileName( defaultEntry() );
 }
 
-//================================================================
-// Function : setFileName
-// Purpose  : 
-//================================================================
-
+/*!
+  Sets file name
+  \param txt - new file name
+  \param autoExtension - auto extension determination by file
+*/
 void QtxPathDialog::setFileName( const QString& txt, const bool autoExtension )
 {
 	setFileName( defaultEntry(), txt, autoExtension );
 }
 
-//================================================================
-// Function : filter
-// Purpose  : 
-//================================================================
-
+/*!
+  \return filter
+*/
 QString QtxPathDialog::filter() const
 {
 	return myFilter;
 }
 
-//================================================================
-// Function : setFilter
-// Purpose  : 
-//================================================================
-
+/*!
+  Changes filter (filter is a list of masks, separated by ';;')
+  \param fltr - new filter
+*/
 void QtxPathDialog::setFilter( const QString& fltr )
 {
 	myFilter = fltr;
 }
 
-//================================================================
-// Function : show
-// Purpose  : 
-//================================================================
-
+/*!
+  Shows path dialog
+*/
 void QtxPathDialog::show()
 {
 	if ( hasVisibleChildren( myEntriesFrame ) )
@@ -168,11 +155,9 @@ void QtxPathDialog::show()
 	QtxDialog::show();
 }
 
-//================================================================
-// Function : onBrowse
-// Purpose  : 
-//================================================================
-
+/*!
+  SLOT: called if user click button to show standard file dialog
+*/
 void QtxPathDialog::onBrowse()
 {
 	const QObject* obj = sender();
@@ -247,11 +232,9 @@ void QtxPathDialog::onBrowse()
 		emit fileNameChanged( fName );
 }
 
-//================================================================
-// Function : onReturnPressed
-// Purpose  : 
-//================================================================
-
+/*!
+  SLOT: called if user presses RETURN in line edit
+*/
 void QtxPathDialog::onReturnPressed()
 {
 	const QObject* obj = sender();
@@ -270,31 +253,25 @@ void QtxPathDialog::onReturnPressed()
 		emit fileNameChanged( fileName() );
 }
 
-//================================================================
-// Function : onTextChanged
-// Purpose  : 
-//================================================================
-
+/*!
+  SLOT: called if text in line edit is changed
+*/
 void QtxPathDialog::onTextChanged( const QString& )
 {
 	validate();
 }
 
-//================================================================
-// Function : validate
-// Purpose  : 
-//================================================================
-
+/*!
+  Checks validity of text and according to it enables/disables OK, Yes buttons
+*/
 void QtxPathDialog::validate()
 {
 	setButtonEnabled( isValid(), OK | Yes );
 }
 
-//================================================================
-// Function : isValid
-// Purpose  : 
-//================================================================
-
+/*!
+  \return true if selected file is valid
+*/
 bool QtxPathDialog::isValid()
 {
 	bool ok = true;
@@ -305,11 +282,9 @@ bool QtxPathDialog::isValid()
 	return ok;
 }
 
-//================================================================
-// Function : acceptData
-// Purpose  : 
-//================================================================
-
+/*!
+  \return true entered data is accepted
+*/
 bool QtxPathDialog::acceptData() const
 {
 	bool ok = true;
@@ -383,30 +358,25 @@ bool QtxPathDialog::acceptData() const
 	return ok;
 }
 
-//================================================================
-// Function : fileNameChanged
-// Purpose  : 
-//================================================================
-
+/*!
+  Some custom activity on file name changing (must be redefined, default implementation is empty
+*/
 void QtxPathDialog::fileNameChanged( int, QString )
 {
 }
 
-//================================================================
-// Function : optionsFrame
-// Purpose  : 
-//================================================================
-
+/*!
+  \return frame with options
+*/
 QFrame* QtxPathDialog::optionsFrame()
 {
 	return myOptionsFrame;
 }
 
-//================================================================
-// Function : getFileName
-// Purpose  : 
-//================================================================
-
+/*!
+  \return file name
+  \param id - id of file entry
+*/
 QString QtxPathDialog::fileName( const int id ) const
 {
 	QString res;
@@ -416,11 +386,12 @@ QString QtxPathDialog::fileName( const int id ) const
 	return res;
 }
 
-//================================================================
-// Function : setFileName
-// Purpose  : 
-//================================================================
-
+/*!
+  Change file name of file entry
+  \param id - id of file entry
+  \param txt - new file name
+  \param autoExt - assign extension automatically
+*/
 void QtxPathDialog::setFileName( const int id, const QString& txt, const bool autoExt )
 {
 	int mode;
@@ -435,11 +406,10 @@ void QtxPathDialog::setFileName( const int id, const QString& txt, const bool au
 	}
 }
 
-//================================================================
-// Function : fileEntry
-// Purpose  : 
-//================================================================
-
+/*!
+  \return line edit of file entry
+  \param id - id of file entry
+*/
 QLineEdit* QtxPathDialog::fileEntry( const int id ) const
 {
 	QLineEdit* le = 0;
@@ -449,11 +419,11 @@ QLineEdit* QtxPathDialog::fileEntry( const int id ) const
 	return le;
 }
 
-//================================================================
-// Function : fileEntry
-// Purpose  : 
-//================================================================
-
+/*!
+  \return line edit and mode of file entry
+  \param id - id of file entry
+  \param theMode - for return mode of file entry
+*/
 QLineEdit* QtxPathDialog::fileEntry( const int theId, int& theMode ) const
 {
 	QLineEdit* le = 0;
@@ -466,11 +436,13 @@ QLineEdit* QtxPathDialog::fileEntry( const int theId, int& theMode ) const
 	return le;
 }
 
-//================================================================
-// Function : createFileEntry
-// Purpose  : 
-//================================================================
-
+/*!
+  Creates file entry
+  \return id of just created file entry
+  \param lab - title of entry
+  \param mode - mode of entry
+  \param id - proposed id (if it is -1, then id will be chosen automatically)
+*/
 int QtxPathDialog::createFileEntry( const QString& lab, const int mode, const int id )
 {
 	int num = id;
@@ -500,31 +472,26 @@ int QtxPathDialog::createFileEntry( const QString& lab, const int mode, const in
 	return num;
 }
 
-//================================================================
-// Function : defaultEntry
-// Purpose  : 
-//================================================================
-
+/*!
+  \return id of default entry
+*/
 int QtxPathDialog::defaultEntry() const
 {
 	return myDefault;
 }
 
-//================================================================
-// Function : setDefaultEntry
-// Purpose  : 
-//================================================================
-
+/*!
+  Change default entry id
+  \param id - new default entry id
+*/
 void QtxPathDialog::setDefaultEntry( const int id )
 {
 	myDefault = id;
 }
 
-//================================================================
-// Function : initialize
-// Purpose  : 
-//================================================================
-
+/*!
+  Initialize dialog layout
+*/
 void QtxPathDialog::initialize()
 {
 	setCaption( tr( "File dialog" ) );
@@ -539,11 +506,9 @@ void QtxPathDialog::initialize()
 	myOptionsFrame = new QFrame( mainGroup );
 }
 
-//================================================================
-// Function : prepareFilters
-// Purpose  : 
-//================================================================
-
+/*!
+  \return list of filters
+*/
 QStringList QtxPathDialog::prepareFilters() const
 {
 	QStringList res;
@@ -564,11 +529,9 @@ QStringList QtxPathDialog::prepareFilters() const
 	return res;
 }
 
-//================================================================
-// Function : filterWildCards
-// Purpose  : 
-//================================================================
-
+/*!
+  \return list of filters with filtered wild cards
+*/
 QStringList QtxPathDialog::filterWildCards( const QString& theFilter ) const
 {
 	QStringList res;
@@ -586,11 +549,11 @@ QStringList QtxPathDialog::filterWildCards( const QString& theFilter ) const
 	return res;
 }
 
-//================================================================
-// Function : autoExtension
-// Purpose  : 
-//================================================================
-
+/*!
+  \return file name with assigned extension
+  \param theFileName - source file name
+  \param theFilter - list of filters
+*/
 QString QtxPathDialog::autoExtension( const QString& theFileName, const QString& theFilter ) const
 {
 	QString fName = theFileName;
@@ -620,11 +583,10 @@ QString QtxPathDialog::autoExtension( const QString& theFileName, const QString&
 	return fName;
 }
 
-//================================================================
-// Function : hasVisibleChildren
-// Purpose  : 
-//================================================================
-
+/*!
+  \return true if widget has visible children
+  \param wid - widget
+*/
 bool QtxPathDialog::hasVisibleChildren( QWidget* wid ) const
 {
 	bool res = false;

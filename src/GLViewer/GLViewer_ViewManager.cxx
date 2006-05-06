@@ -30,7 +30,7 @@
 
 int GLViewer_ViewManager::myMaxId = 0;
 
-//***************************************************************
+/*!Constructor.*/
 GLViewer_ViewManager::GLViewer_ViewManager( SUIT_Study* theStudy, SUIT_Desktop* theDesktop )
 : SUIT_ViewManager( theStudy, theDesktop )
 {
@@ -38,19 +38,19 @@ GLViewer_ViewManager::GLViewer_ViewManager( SUIT_Study* theStudy, SUIT_Desktop* 
     setViewModel( new GLViewer_Viewer2d( "GLViewer" ) );
 }
 
-//***************************************************************
+/*!Destructor.*/
 GLViewer_ViewManager::~GLViewer_ViewManager()
 {
 }
 
-//***************************************************************
+/*!Sets view name for view window \a theView.*/
 void GLViewer_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
     int aPos = myViews.find(theView);
     theView->setCaption( QString( "GL scene:%1 - viewer:%2" ).arg(myId).arg(aPos+1));
 }
 
-//***************************************************************
+/*!Context menu popup for \a popup.*/
 void GLViewer_ViewManager::contextMenuPopup( QPopupMenu* popup )
 {
   SUIT_ViewManager::contextMenuPopup( popup );

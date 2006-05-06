@@ -40,10 +40,18 @@
 
 class Standard_Transient;
 class Handle_Standard_Type;
+/*!
+  \class Handle(TCollection_MapNode)
+  Smart pointer (handle) to TCollection_MapNode
+*/
 class Handle(TCollection_MapNode);
 class SALOME_ListNodeOfListIO;
 Standard_EXPORT Handle_Standard_Type& STANDARD_TYPE(SALOME_ListNodeOfListIO);
 
+/*!
+  \class Handle(SALOME_ListNodeOfListIO)
+  Smart pointer (handle) to SALOME_ListNodeOfListIO
+*/
 class Handle(SALOME_ListNodeOfListIO) : public Handle(TCollection_MapNode) {
   public:
     void* operator new(size_t,void* anAddress) 

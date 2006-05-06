@@ -29,6 +29,12 @@
 #pragma warning( disable:4275 )
 #endif
 
+/*!
+  \class SUIT_DataOwner
+  Represents abstract selected objects.
+  Used for selection synchronizing between windows(e.g. ObjectBrowser) and viewers
+*/
+
 class SUIT_EXPORT SUIT_DataOwner : public RefCount 
 {
 public:

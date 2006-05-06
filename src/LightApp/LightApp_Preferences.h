@@ -31,6 +31,11 @@
 
 class QtxResourceMgr;
 
+/*!
+  \class LightApp_Preferences
+  Custom preference container. Assign each preference category with module.
+  Emits signal on preference changing
+*/
 class LIGHTAPP_EXPORT LightApp_Preferences : public QtxListResourceEdit
 {
   Q_OBJECT

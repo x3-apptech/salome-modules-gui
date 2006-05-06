@@ -109,10 +109,6 @@ VTKViewer_AppendFilter
 }
 
 
-//==================================================================
-// function: DoMapping
-// purpose :
-//==================================================================
 void 
 VTKViewer_AppendFilter
 ::DoMapping()
@@ -138,7 +134,6 @@ VTKViewer_AppendFilter
   }
 }
 
-//---------------------------------------------------------------
 namespace
 {
   inline
@@ -170,7 +165,6 @@ VTKViewer_AppendFilter
 }
 
 
-//---------------------------------------------------------------
 vtkIdType 
 VTKViewer_AppendFilter
 ::GetCellOutputID(vtkIdType theInputID,
@@ -183,7 +177,6 @@ VTKViewer_AppendFilter
 }
 
 
-//---------------------------------------------------------------
 namespace
 {
   void
@@ -238,7 +231,6 @@ VTKViewer_AppendFilter
 }
 
 
-//---------------------------------------------------------------
 void
 VTKViewer_AppendFilter
 ::GetCellInputID(vtkIdType theOutputID,
@@ -254,7 +246,6 @@ VTKViewer_AppendFilter
 }
 
 
-//---------------------------------------------------------------
 void 
 VTKViewer_AppendFilter
 ::MakeOutput()

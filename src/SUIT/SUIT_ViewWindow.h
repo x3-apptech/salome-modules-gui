@@ -18,7 +18,6 @@
 //
 // SUIT_ViewWindow.h: interface for the SUIT_ViewWindow class.
 //
-//////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_SUIT_VIEWWINDOW_H__82C3D51A_6F10_45B0_BCFE_3CB3EF596A4D__INCLUDED_)
 #define AFX_SUIT_VIEWWINDOW_H__82C3D51A_6F10_45B0_BCFE_3CB3EF596A4D__INCLUDED_
@@ -50,7 +49,7 @@ public:
   virtual QImage    dumpView();
   virtual bool      dumpViewToFormat( const QString& fileName, const QString& format );
 
-  void              onAccelAction( int );
+  bool              onAccelAction( int );
 
   virtual QString   getVisualParameters();
   virtual void      setVisualParameters( const QString& parameters );
@@ -73,7 +72,7 @@ protected:
   void              closeEvent( QCloseEvent* );
   virtual void      contextMenuEvent( QContextMenuEvent* );
   virtual QString   filter() const;
-  virtual void      action( const int );
+  virtual bool      action( const int );
 
   SUIT_Desktop*     myDesktop;
   SUIT_ViewManager* myManager;

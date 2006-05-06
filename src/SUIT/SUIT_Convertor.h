@@ -18,7 +18,6 @@
 //
 // SUIT_Convertor.h: interface for the SUIT_Convertor class.
 //
-//////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_SUIT_CONVERTOR_H__4C27F4C7_DC7C_4BEF_9DC1_EFB97B387EBF__INCLUDED_)
 #define AFX_SUIT_CONVERTOR_H__4C27F4C7_DC7C_4BEF_9DC1_EFB97B387EBF__INCLUDED_

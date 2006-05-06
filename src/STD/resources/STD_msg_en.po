@@ -1,3 +1,21 @@
+#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/
+#
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. "Foo::Bar"
 # would be translated to "Pub", not "Foo::Pub".
@@ -13,25 +31,25 @@ msgid "INF_READY"
 msgstr "Ready"
 
 msgid "BUT_OK"
-msgstr "OK"
+msgstr "&Ok"
 
 msgid "BUT_CANCEL"
-msgstr "Cancel"
+msgstr "&Cancel"
 
 msgid "BUT_CLOSE"
-msgstr "Close"
+msgstr "&Close"
 
 msgid "BUT_HELP"
-msgstr "Help"
+msgstr "&Help"
 
 msgid "BUT_YES"
-msgstr "Yes"
+msgstr "&Yes"
 
 msgid "BUT_NO"
-msgstr "No"
+msgstr "&No"
 
 msgid "BUT_APPLY"
-msgstr "Apply"
+msgstr "&Apply"
 
 msgid "ERR_ERROR"
 msgstr "Error"
@@ -330,7 +348,7 @@ msgid "CLOSE_DLG_SAVE_CLOSE"
 msgstr "&Save&&Close"
 
 msgid "CLOSE_DLG_CLOSE"
-msgstr "&Close w/o saving"
+msgstr "C&lose w/o saving"
 
 msgid "CLOSE_DLG_UNLOAD"
 msgstr "&Unload"
@@ -342,7 +360,7 @@ msgid "PRP_DESK_FILE_LOAD"
 msgstr "Load a document"
 
 msgid "MEN_DESK_FILE_LOAD"
-msgstr "Conn&ect"    
+msgstr "Conn&ect..."    
 
 msgid "CLOSE_DLG_CAPTION"
 msgstr "Close active study"

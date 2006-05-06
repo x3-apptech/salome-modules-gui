@@ -28,9 +28,9 @@ class QtxPopupMgr;
 class QString;
 class QVariant;
 
-/*
-  Class : LightApp_Module
-  Description : Base class for all light modules
+/*!
+  \class LightApp_Module
+  Base class for all light modules
 */
 
 class LIGHTAPP_EXPORT LightApp_Module : public CAM_Module

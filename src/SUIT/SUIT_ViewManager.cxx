@@ -254,9 +254,9 @@ void SUIT_ViewManager::onDeleteStudy()
     myStudy = NULL;
 }
 
+/*! invoke method of SUIT_PopupClient, which notifies about popup*/
 void SUIT_ViewManager::onContextMenuRequested( QContextMenuEvent* e )
 {
-  /*! invoke method of SUIT_PopupClient, which notifies about popup*/
   contextMenuRequest( e );
 }
 

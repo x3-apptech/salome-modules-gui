@@ -12,11 +12,11 @@
 #ifndef LightApp_UpdateFlags_H
 #define LightApp_UpdateFlags_H
 
-/*
-  Enum        : UpdateFlags
-  Description : Enumeration for update flags. First byte is reserved for LightApp_Module.
-                Modules derived from this model must use other 3 bytes to define their
-                own update flags
+/*!
+  \enum UpdateFlags
+  Enumeration for update flags. First byte is reserved for LightApp_Module.
+  Modules derived from this model must use other 3 bytes to define their
+  own update flags
 */
 
 typedef enum

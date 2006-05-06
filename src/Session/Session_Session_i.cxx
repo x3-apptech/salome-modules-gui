@@ -45,12 +45,9 @@
 
 using namespace std;
 
-//=============================================================================
-/*! SALOME_Session_i
- *  constructor
- */
-//=============================================================================
-
+/*!
+  constructor
+*/
 SALOME_Session_i::SALOME_Session_i(int argc,
 				   char ** argv,
 				   CORBA::ORB_ptr orb,
@@ -69,12 +66,9 @@ SALOME_Session_i::SALOME_Session_i(int argc,
   //MESSAGE("constructor end");
 }
 
-//=============================================================================
-/*! GetVisuComponent
- *  returns Visu component
- */
-//=============================================================================
-
+/*!
+  returns Visu component
+*/
 Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName)
 {
   typedef Engines::Component_ptr TGetImpl(CORBA::ORB_ptr,
@@ -87,24 +81,18 @@ Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName
   return Engines::Component::_nil();
 }
 
-//=============================================================================
-/*! ~SALOME_Session_i
- *  destructor
- */
-//=============================================================================
-
+/*!
+  destructor
+*/
 SALOME_Session_i::~SALOME_Session_i()
 {
   //MESSAGE("destructor end");
 }
 
-//=============================================================================
-/*! NSregister
- *  tries to find the Corba Naming Service and to register the session,
- *  gives naming service interface to _IAPPThread
- */
-//=============================================================================
-
+/*!
+  tries to find the Corba Naming Service and to register the session,
+  gives naming service interface to _IAPPThread
+*/
 void SALOME_Session_i::NSregister()
 {
   SALOME::Session_ptr pSession = SALOME::Session::_narrow(_this());
@@ -125,13 +113,10 @@ void SALOME_Session_i::NSregister()
   //MESSAGE("Session registered in Naming Service");
 }
 
-//=============================================================================
-/*! GetInterface
- *  Launches the GUI if there is none.
- *  The Corba method is oneway (corba client does'nt wait for GUI completion)
- */
-//=============================================================================
-
+/*!
+  Launches the GUI if there is none.
+  The Corba method is oneway (corba client does'nt wait for GUI completion)
+*/
 void SALOME_Session_i::GetInterface()
 {
   _GUIMutex->lock();
@@ -143,11 +128,9 @@ void SALOME_Session_i::GetInterface()
       }
 }
 
-//=============================================================================
-/*! StopSession
- *  Kills the session if there are no active studies nore GUI
- */
-//=============================================================================
+/*!
+  Kills the session if there are no active studies nore GUI
+*/
 class CloseEvent : public SALOME_Event
 {
 public:
@@ -159,18 +142,18 @@ public:
   }
 };
 
+/*!
+  Processes event to close session
+*/
 void SALOME_Session_i::StopSession()
 {
   ProcessVoidEvent( new CloseEvent() );
 }
 
-//=============================================================================
-/*! StatSession
- *  Send a SALOME::StatSession structure (see idl) to the client
- *  (number of running studies and presence of GUI)
- */
-//=============================================================================
-
+/*!
+  Send a SALOME::StatSession structure (see idl) to the client
+  (number of running studies and presence of GUI)
+*/
 class QtLock
 {
 public:
@@ -209,7 +192,8 @@ CORBA::Long SALOME_Session_i::GetActiveStudyId()
 {
   long aStudyId=-1;
   if ( SUIT_Session::session() && SUIT_Session::session()->activeApplication() ) {
-    aStudyId = SUIT_Session::session()->activeApplication()->activeStudy()->id();
+    if ( SUIT_Session::session()->activeApplication()->activeStudy() ) // mkr : IPAL12128
+      aStudyId = SUIT_Session::session()->activeApplication()->activeStudy()->id();
   }
   return aStudyId;
 }

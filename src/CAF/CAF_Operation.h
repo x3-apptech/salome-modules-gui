@@ -29,8 +29,14 @@
 #include <Standard.hxx>
 
 class CAF_Study;
+//! OCC OCAF Std document
 class Handle(TDocStd_Document);
 
+/*!
+  \class CAF_Operation
+  Base operation for all operations used in CAF package
+  Operation has link to OCC OCAF std document
+*/
 class CAF_EXPORT CAF_Operation : public SUIT_Operation
 {
 	Q_OBJECT

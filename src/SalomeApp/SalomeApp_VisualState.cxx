@@ -31,7 +31,8 @@
 #include <qapplication.h>
 #include <qdict.h>
 
-#include <SALOMEDS_IParameters.hxx>
+#include <SALOMEDSClient_ClientFactory.hxx>
+#include <SALOMEDSClient_IParameters.hxx>
 
 #include <vector>
 #include <string>
@@ -51,18 +52,16 @@ SalomeApp_VisualState::~SalomeApp_VisualState()
 {
 }
 
-//================================================================
-// Function : nameViewWindows
-/*! Purpose : set names of all view windows in given list.  This is used
-//  in order to apply the same naming algorithm when saving and restoring
-//  view windows.  Names of view windows must be the same before saving
-//  workstack (splitters) information, and before its restoring! 
-//  Naming rule: ViewerType_IndexOfViewerOfThisType_IndexOfViewInThisViewer
-//               VTKViewer_0_0
-//               OCCViewer_0_0  OCCViewer_0_1  OCCViewer_0_2
-//               VTKViewer_1_0
+/*!
+  Sets names of all view windows in given list.  This is used
+  in order to apply the same naming algorithm when saving and restoring
+  view windows.  Names of view windows must be the same before saving
+  workstack (splitters) information, and before its restoring! 
+  Naming rule: ViewerType_IndexOfViewerOfThisType_IndexOfViewInThisViewer
+               VTKViewer_0_0
+               OCCViewer_0_0  OCCViewer_0_1  OCCViewer_0_2
+               VTKViewer_1_0
 */
-//================================================================
 void nameViewWindows( const ViewManagerList& lst )
 {
   QDict<int> viewersCounter; // map viewerType - to - index_of_this_viewer_type
@@ -89,11 +88,9 @@ void nameViewWindows( const ViewManagerList& lst )
   }
 }
 
-//================================================================
-// Function : storeState
-/*! Purpose : store the visual parameters of the viewers
+/*!
+  Stores the visual parameters of the viewers
 */
-//================================================================
 int SalomeApp_VisualState::storeState()
 {
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( myApp->activeStudy() );
@@ -107,7 +104,7 @@ int SalomeApp_VisualState::storeState()
     savePoint = savePoints[savePoints.size()-1] + 1;
 
   _PTR(AttributeParameter) ap = study->studyDS()->GetCommonParameters( study->getVisualComponentName(), savePoint );
-  SALOMEDS_IParameters ip( ap );
+  _PTR(IParameters) ip = ClientFactory::getIParameters( ap );
 
   ViewManagerList lst;
   myApp->viewManagers( lst );
@@ -120,7 +117,7 @@ int SalomeApp_VisualState::storeState()
   // store active window's name
   SUIT_ViewWindow* win = myApp->desktop()->activeWindow();  
   if ( win )
-    ip.setProperty("AP_ACTIVE_VIEW", win->name() );
+    ip->setProperty("AP_ACTIVE_VIEW", win->name() );
 
   int viewerID = 0;
   SUIT_ViewManager* vm = 0;
@@ -131,12 +128,12 @@ int SalomeApp_VisualState::storeState()
       continue; //No views is opened in the viewer
       
     std::string viewerEntry = QString( "%1_%2" ).arg( vm->getType() ).arg( ++viewerID ).latin1();
-    ip.append("AP_VIEWERS_LIST", viewerEntry);
+    ip->append("AP_VIEWERS_LIST", viewerEntry);
     
     QPtrVector<SUIT_ViewWindow> views = vm->getViews();
     for(int i = 0; i<view_count; i++) {
-      ip.append( viewerEntry, views[i]->caption().latin1() );
-      ip.append( viewerEntry, views[i]->getVisualParameters().latin1() );
+      ip->append( viewerEntry, views[i]->caption().latin1() );
+      ip->append( viewerEntry, views[i]->getVisualParameters().latin1() );
     }
   }
 
@@ -145,12 +142,12 @@ int SalomeApp_VisualState::storeState()
     QtxWorkstack* workstack = ((STD_TabDesktop*)myApp->desktop())->workstack();
     QString workstackInfo;
     (*workstack) >> workstackInfo;
-    ip.setProperty( "AP_WORKSTACK_INFO", workstackInfo.latin1() );
+    ip->setProperty( "AP_WORKSTACK_INFO", workstackInfo.latin1() );
   }
   
   //Save a name of the active module
   if ( CAM_Module* activeModule = myApp->activeModule() ) 
-    ip.setProperty( "AP_ACTIVE_MODULE", activeModule->moduleName().latin1() );
+    ip->setProperty( "AP_ACTIVE_MODULE", activeModule->moduleName().latin1() );
 
   //Store visual parameters of the modules
   QPtrList<CAM_Module> mlist; 
@@ -158,7 +155,7 @@ int SalomeApp_VisualState::storeState()
   CAM_Module* module = 0;
   for ( module = mlist.first(); module; module = mlist.next() ) {
     if ( SalomeApp_Module* sModule = dynamic_cast<SalomeApp_Module*>( module ) ) {
-      ip.append( "AP_MODULES_LIST", sModule->moduleName().latin1() );
+      ip->append( "AP_MODULES_LIST", sModule->moduleName().latin1() );
       sModule->storeVisualParameters( savePoint );
     }
   }
@@ -169,11 +166,9 @@ int SalomeApp_VisualState::storeState()
   return savePoint;
 }
 
-//================================================================
-// Function : restoreState
-/*! Purpose : restore the visual parameters of the viewers
+/*!
+  Restores the visual parameters of the viewers
 */
-//================================================================
 void SalomeApp_VisualState::restoreState(int savePoint)
 {
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( myApp->activeStudy() );
@@ -181,28 +176,32 @@ void SalomeApp_VisualState::restoreState(int savePoint)
     return;
 
   _PTR(AttributeParameter) ap = study->studyDS()->GetCommonParameters( study->getVisualComponentName(), savePoint );
-  SALOMEDS_IParameters ip(ap);
+  _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
 
   //Remove all already existent veiwers and their views
   ViewManagerList lst;
   myApp->viewManagers( lst );
-  for ( QPtrListIterator<SUIT_ViewManager> it(lst); it.current(); ++it )
+  for ( QPtrListIterator<SUIT_ViewManager> it(lst); it.current(); ++it ) {
     myApp->removeViewManager( it.current() );
-
+    qApp->processEvents();
+  }
   //Restore the viewers and view windows
-  int nbViewers = ip.nbValues( "AP_VIEWERS_LIST" );
+  int nbViewers = ip->nbValues( "AP_VIEWERS_LIST" );
   SUIT_ViewWindow* viewWin = 0;
 
+  // parameters of view windows are stored in a map for restoring after restoring of the workstack
+  QMap<SUIT_ViewWindow*, QString> viewersParameters;
+
   for ( int i = 0; i < nbViewers; i++ ) {
-    std::string viewerEntry = ip.getValue( "AP_VIEWERS_LIST", i );
-    std::vector<std::string> veiewerParams = ip.parseValue(viewerEntry,'_');
+    std::string viewerEntry = ip->getValue( "AP_VIEWERS_LIST", i );
+    std::vector<std::string> veiewerParams = ip->parseValue(viewerEntry,'_');
     std::string type = veiewerParams[0];
     std::string viewerID = veiewerParams[1];
     SUIT_ViewManager* vm = myApp->newViewManager( type.c_str() );
     if ( !vm ) 
       continue; //Unknown viewer
     
-    int nbViews = (ip.nbValues(viewerEntry))/2;
+    int nbViews = (ip->nbValues(viewerEntry))/2;
     
     //Create nbViews-1 view (-1 because 1 view is created by createViewManager)
     for ( int i = 1; i< nbViews; i++ ) { 
@@ -227,69 +226,80 @@ void SalomeApp_VisualState::restoreState(int savePoint)
       while ( !viewWin->isVisible() )
 	qApp->processEvents();
       
-      viewWin->setCaption(ip.getValue(viewerEntry, j).c_str());
-      viewWin->setVisualParameters(ip.getValue(viewerEntry, j+1).c_str());
+      viewWin->setCaption(ip->getValue(viewerEntry, j).c_str());
+      
+      //      printf ( "VP for viewWin \"%s\": %s\n", viewerEntry.c_str(), ip->getValue(viewerEntry, j+1).c_str() );
+      viewersParameters[ viewWin ] = ip->getValue(viewerEntry, j+1).c_str();
+      //viewWin->setVisualParameters(ip->getValue(viewerEntry, j+1).c_str());
     }
   }
 
   // restore modules' visual parameters
-  std::vector<std::string> v = ip.getValues("AP_MODULES_LIST");
+  std::vector<std::string> v = ip->getValues("AP_MODULES_LIST");
   for ( int i = 0; i < v.size(); i++ ) {
     myApp->activateModule( v[i].c_str() );
     if ( SalomeApp_Module* module = dynamic_cast<SalomeApp_Module*>( myApp->activeModule() ) )
       module->restoreVisualParameters( savePoint );
   }
 
+  // new view windows may have been created in  module->restoreVisualParameters() [GAUSS]
+  // so here we store their visual parameters for later restoring..
+  lst.clear();
+  myApp->viewManagers(lst);
+  QPtrListIterator<SUIT_ViewManager> it( lst );
+  for ( ; it.current(); ++it ) {
+    int view_count = it.current()->getViewsCount();
+    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
+    for ( int i = 0; i < view_count; i++ ) {
+      if ( !viewersParameters.contains( views[i] ) ) {
+	viewersParameters[ views[i] ] = views[i]->getVisualParameters();
+	//	printf ( "store VP for viewWin \"%s\": %s\n", views[i]->name(), views[i]->getVisualParameters().latin1() );
+      }
+    }
+  }  
+
   // activate module that was active on save
-  QString activeModuleName( ip.getProperty("AP_ACTIVE_MODULE" ).c_str() );
+  QString activeModuleName( ip->getProperty("AP_ACTIVE_MODULE" ).c_str() );
   if ( !activeModuleName.isEmpty() ) 
     myApp->activateModule( activeModuleName );
 
   // setting unique names for view windows in order to restore positions of view windows inside 
   // workstack's structure (see below).  During save the same naming algorithm was used, 
   // so the same views will get the same names.
-  lst.clear();
-  myApp->viewManagers(lst);
   nameViewWindows( lst );
-
-  // work-around to bug of setting visual parameters of views: all view windows now have
-  // correct visual parameters, bug after restoring the workstack the visual parameters 
-  // are messted, and must be re-set again.  So here we store them in a map and set them
-  // later back again.  why we don't store these parameters in a map on views creation?
-  // because 1) names of view windows are not set at that time 2) some view windows
-  // are created by modules' restoreVisualParameters (like Gauss Viewers), which is NOT here..
-  QMap<QString, QString> viewersParameters;
-  QPtrListIterator<SUIT_ViewManager> it( lst );
-  for ( ; it.current(); ++it ) {
-    int view_count = it.current()->getViewsCount();
-    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
-    for ( int i = 0; i < view_count; i++ )
-      viewersParameters[ views[i]->name() ] = views[i]->getVisualParameters();
-  }  
 
   // restore workstack parameters.  should be done after module's restoreVisualParameters(), because
   // some modules can create their own viewers (like VISU creates GaussViewers)
   if ( myApp->desktop()->inherits( "STD_TabDesktop" ) ) {
     QtxWorkstack* workstack = ((STD_TabDesktop*)myApp->desktop())->workstack();
-    (*workstack) << ip.getProperty( "AP_WORKSTACK_INFO" ).c_str();
+    (*workstack) << ip->getProperty( "AP_WORKSTACK_INFO" ).c_str();
   }
 
   // restore visual parameters of view windows.  it must be done AFTER restoring workstack.
-  for ( it.toFirst(); it.current(); ++it ) {
-    int view_count = it.current()->getViewsCount();
-    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
-    for ( int i = 0; i < view_count; i++ )
-      views[i]->setVisualParameters( viewersParameters[ views[i]->name() ] );
+  // also set active view
+  std::string activeViewName = ip->getProperty("AP_ACTIVE_VIEW");
+  QMap<SUIT_ViewWindow*, QString>::Iterator mapIt;
+  for ( mapIt = viewersParameters.begin(); mapIt != viewersParameters.end(); ++mapIt ) {
+    mapIt.key()->setVisualParameters( mapIt.data() );
+    if ( activeViewName == mapIt.key()->name() )
+      mapIt.key()->setFocus();
   }
+  
+  //  for ( it.toFirst(); it.current(); ++it ) {
+  //    int view_count = it.current()->getViewsCount();
+  //    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
+  //    for ( int i = 0; i < view_count; i++ )
+  //      views[i]->setVisualParameters( viewersParameters[ views[i]->name() ] );
+  //  }
 
   // set focus to previously saved active view window
-  std::string activeViewName = ip.getProperty("AP_ACTIVE_VIEW");
-  for ( it.toFirst(); it.current(); ++it ) {
-    int view_count = it.current()->getViewsCount();
-    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
-    for ( int i = 0; i < view_count; i++ )  {
-      if ( activeViewName == views[i]->name() )
-	views[i]->setFocus();
-    }
-  }
+  //  std::string activeViewName = ip->getProperty("AP_ACTIVE_VIEW");
+  //  for ( it.toFirst(); it.current(); ++it ) {
+  //    int view_count = it.current()->getViewsCount();
+  //    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
+  //    for ( int i = 0; i < view_count; i++ )  {
+  //      if ( activeViewName == views[i]->name() )
+  //	views[i]->setFocus();
+  //    }
+  //  }
 }

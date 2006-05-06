@@ -51,6 +51,9 @@ static DWORD myThread;
 static pthread_t myThread;
 #endif
 
+/*!
+  \return thread id
+*/
 void SALOME_Event::GetSessionThread(){
 #ifdef WIN32
   myThread = ::GetCurrentThreadId();
@@ -59,6 +62,9 @@ void SALOME_Event::GetSessionThread(){
 #endif
 }
 
+/*!
+  \return true if it is session thread
+*/
 bool SALOME_Event::IsSessionThread(){
   bool aResult = false;
 #ifdef WIN32
@@ -71,12 +77,9 @@ bool SALOME_Event::IsSessionThread(){
 }
 
 
-//===========================================================
 /*!
- *  SALOME_Event::SALOME_Event
- *  Constructor
- */
-//===========================================================
+  Constructor
+*/
 SALOME_Event::SALOME_Event(){
 //  if(MYDEBUG) MESSAGE( "SALOME_Event::SALOME_Event(): this = "<<this );
   // Prepare the semaphore 
@@ -84,12 +87,9 @@ SALOME_Event::SALOME_Event(){
   *mySemaphore += 2;
 }
 
-//===========================================================
 /*!
- *  SALOME_Event::~SALOME_Event
- *  Destructor
- */
-//===========================================================
+  Destructor
+*/
 SALOME_Event::~SALOME_Event(){
 //  if(MYDEBUG) MESSAGE( "SALOME_Event::~SALOME_Event(): this = "<<this );
   if ( mySemaphore->available() < mySemaphore->total() )
@@ -97,12 +97,9 @@ SALOME_Event::~SALOME_Event(){
   delete mySemaphore;
 }
 
-//===========================================================
 /*!
- *  SALOME_Event::process
- *  Posts the event and optionally waits for its completion
- */
-//===========================================================
+  Posts the event and optionally waits for its completion
+*/
 void SALOME_Event::process()
 {
   QThread::postEvent( qApp, new QCustomEvent( SALOME_EVENT, (void*)this ) );
@@ -111,12 +108,9 @@ void SALOME_Event::process()
 //  if(MYDEBUG) MESSAGE( "SALOME_Event::process(): this = "<<this<<" - COMPLETED" );
 }
 
-//===========================================================
 /*!
- *  SALOME_Event::processed
- *  Signals that this event has been processed
- */
-//===========================================================
+  Signals that this event has been processed
+*/
 void SALOME_Event::processed()
 {
 //  if(MYDEBUG) MESSAGE( "SALOME_Event::processed(): this = "<<this );

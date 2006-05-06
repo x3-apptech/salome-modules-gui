@@ -19,16 +19,12 @@
 //  Author : OPEN CASCADE
 //
 
-/***************************************************************************
-**  Class:   GLViewer_Text
-**  Descr:   Substitution of Prs3d_Text for OpenGL
-**  Module:  GLViewer
-**  Created: UI team, 10.07.03
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Text.h"
 
+/*!
+  Constructor
+*/
 GLViewer_Text::GLViewer_Text( const QString& text, float xPos, float yPos, const QColor& color )
 {
   myText = text;
@@ -40,6 +36,9 @@ GLViewer_Text::GLViewer_Text( const QString& text, float xPos, float yPos, const
   myDTF = DTF_BITMAP;
 }
 
+/*!
+  Constructor
+*/
 GLViewer_Text::GLViewer_Text( const QString& text, float xPos, float yPos, const QColor& color, QFont theFont, int theSeparator )
 {
   myText = text;
@@ -51,10 +50,16 @@ GLViewer_Text::GLViewer_Text( const QString& text, float xPos, float yPos, const
   myDTF = DTF_BITMAP;
 }
 
+/*!
+  Destructor
+*/
 GLViewer_Text::~GLViewer_Text()
 {
 }
 
+/*!
+  \return width of text
+*/
 int GLViewer_Text::getWidth()
 {
     int aResult = 0;
@@ -64,12 +69,19 @@ int GLViewer_Text::getWidth()
     return aResult;
 }
 
+/*!
+  \return height of text
+*/
 int GLViewer_Text::getHeight()
 {
     QFontMetrics aFM( myQFont );
     return aFM.height();
 }
 
+/*!
+  Codes object as byte copy
+  \return byte array
+*/
 QByteArray GLViewer_Text::getByteCopy() const
 {
     int i;
@@ -121,6 +133,10 @@ QByteArray GLViewer_Text::getByteCopy() const
     return aResult;
 }
 
+/*!
+  Initialize text from binary representation
+  \param theBuf - byte array
+*/
 GLViewer_Text* GLViewer_Text::fromByteCopy( QByteArray theBuf )
 {
     int i = 0;

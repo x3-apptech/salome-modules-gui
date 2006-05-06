@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <fts>
-<chunkinfo url="whfwdata0.xml" first="__version__" last="zon"/>
+<chunkinfo url="whfwdata0.xml" first="__version__" last="zoom"/>
 
-<tchunkinfo first="0" last="27" url="whftdata0.xml" />
+<tchunkinfo first="0" last="26" url="whftdata0.xml" />
 
 </fts>

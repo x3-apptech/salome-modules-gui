@@ -25,10 +25,6 @@
 #include "Qtx.h"
 #include "QtxParser.h"
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
 class QTX_EXPORT QtxOperations
 {
 public:

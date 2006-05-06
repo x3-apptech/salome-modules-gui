@@ -72,6 +72,9 @@ Plot2d_Curve& Plot2d_Curve::operator=( const Plot2d_Curve& curve )
   return *this;
 }
 
+/*!
+  \return title of table
+*/
 QString Plot2d_Curve::getTableTitle() const
 {
   return QString();

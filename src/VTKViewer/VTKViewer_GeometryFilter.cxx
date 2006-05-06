@@ -27,6 +27,7 @@
 //  $Header$
 
 #include "VTKViewer_GeometryFilter.h"
+#include "VTKViewer_ConvexTool.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkCellArray.h>
@@ -45,11 +46,6 @@
 #include <vtkVoxel.h>
 #include <vtkWedge.h>
 
-#include <vtkMath.h>
-#include <vtkPlane.h>
-#include <vtkDelaunay3D.h>
-#include <vtkGeometryFilter.h>
-
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -62,9 +58,8 @@
   #endif
 #endif
 
-#define USE_ROBUST_TRIANGULATION
+//#define USE_ROBUST_TRIANGULATION
 
-//----------------------------------------------------------------------------
 vtkCxxRevisionMacro(VTKViewer_GeometryFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_GeometryFilter);
 
@@ -81,7 +76,6 @@ VTKViewer_GeometryFilter
 {}
 
 
-//----------------------------------------------------------------------------
 void
 VTKViewer_GeometryFilter
 ::Execute()
@@ -102,7 +96,6 @@ VTKViewer_GeometryFilter
 }
 
 
-//----------------------------------------------------------------------------
 void
 VTKViewer_GeometryFilter
 ::UnstructuredGridExecute()
@@ -128,20 +121,11 @@ VTKViewer_GeometryFilter
   vtkPolyData *output = this->GetOutput();
   vtkPointData *outputPD = output->GetPointData();
   
-#ifdef USE_ROBUST_TRIANGULATION
-  vtkUnstructuredGrid* anUnstructuredGrid = vtkUnstructuredGrid::New();
-  vtkPoints* aDelaunayPoints = vtkPoints::New();
-
-  vtkDelaunay3D* aDelaunay3D = vtkDelaunay3D::New();
-  aDelaunay3D->SetInput(anUnstructuredGrid);
-  
-  vtkGeometryFilter* aGeometryFilter = vtkGeometryFilter::New();
-  aGeometryFilter->SetInput(aDelaunay3D->GetOutput());
-#endif
+  VTKViewer_OrderedTriangulator anOrderedTriangulator;
+  VTKViewer_DelaunayTriangulator aDelaunayTriangulator;
 
   vtkCellData *outputCD = output->GetCellData();
   vtkGenericCell *cell = vtkGenericCell::New();
-
 
   vtkIdList *cellIds = vtkIdList::New();
   vtkIdList *faceIds = vtkIdList::New();
@@ -149,7 +133,7 @@ VTKViewer_GeometryFilter
   char *cellVis;
   vtkIdType newCellId;
   int faceId, *faceVerts, numFacePts;
-  float *x;
+  vtkFloatingPointType *x;
   int PixelConvert[4], aNewPts[VTK_CELL_SIZE];
   // ghost cell stuff
   unsigned char  updateLevel = (unsigned char)(output->GetUpdateGhostLevel());
@@ -306,299 +290,30 @@ VTKViewer_GeometryFilter
           break;
 	  
 	case VTK_CONVEX_POINT_SET: {
-	  //cout<<"cellId = "<<cellId<<"\n";
-
-	  vtkIdType aNumPts;
-	  vtkPoints *aPoints;
-#ifdef USE_ROBUST_TRIANGULATION
-	  aPoints = aDelaunayPoints;
-	  anUnstructuredGrid->Initialize();
-	  anUnstructuredGrid->Allocate();
-	  anUnstructuredGrid->SetPoints(aDelaunayPoints);
-
-	  vtkIdType *aPts;
-	  input->GetCellPoints(cellId,aNumPts,aPts); 
-	  {
-	    float aPntCoord[3];
-	    aDelaunayPoints->SetNumberOfPoints(aNumPts);
-	    vtkPoints *anInputPoints = input->GetPoints();
-	    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
-	      anInputPoints->GetPoint(aPts[aPntId],aPntCoord);
-	      aDelaunayPoints->SetPoint(aPntId,aPntCoord);
-	    }
-	  }
-#else
-	  input->GetCell(cellId,cell);
-	  aPoints = input->GetPoints();
-	  aNumPts = cell->GetNumberOfPoints();
-#endif
-	  // To calculate the bary center of the cell
-	  float aCellCenter[3] = {0.0, 0.0, 0.0};
-	  {
-	    float aPntCoord[3];
-	    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
-#ifdef USE_ROBUST_TRIANGULATION
-	      aPoints->GetPoint(aPntId,aPntCoord);
-#else
-	      aPoints->GetPoint(cell->GetPointId(aPntId),aPntCoord);
-#endif
-	      //cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}\n";
-	      aCellCenter[0] += aPntCoord[0];
-	      aCellCenter[1] += aPntCoord[1];
-	      aCellCenter[2] += aPntCoord[2];
-	    }
-	    aCellCenter[0] /= aNumPts;
-	    aCellCenter[1] /= aNumPts;
-	    aCellCenter[2] /= aNumPts;
-	  }
-
-#ifdef USE_ROBUST_TRIANGULATION
-	  aGeometryFilter->Update();
-	  vtkPolyData* aPolyData = aGeometryFilter->GetOutput();
-
-	  float aCellLength = aPolyData->GetLength();
-          int aNumFaces = aPolyData->GetNumberOfCells();
-#else
-	  float aCellLength = sqrt(cell->GetLength2());
-          int aNumFaces = cell->GetNumberOfFaces();
-#endif
-	  
-	  static float EPS = 1.0E-5;
-	  float aDistEps = aCellLength * EPS;
-
-	  // To initialize set of points that belong to the cell
-	  typedef std::set<vtkIdType> TPointIds;
-	  TPointIds anInitialPointIds;
-	  for(vtkIdType aPntId = 0; aPntId < aNumPts; aPntId++){
-#ifdef USE_ROBUST_TRIANGULATION
-	    anInitialPointIds.insert(aPntId);
-#else
-	    anInitialPointIds.insert(cell->GetPointId(aPntId));
-#endif
-	  }
-
-	  // To initialize set of points by face that belong to the cell and backward
-	  typedef std::set<vtkIdType> TFace2Visibility;
-	  TFace2Visibility aFace2Visibility;
-
-	  typedef std::set<TPointIds> TFace2PointIds;
-	  TFace2PointIds aFace2PointIds;
-
-          for (int aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
-#ifdef USE_ROBUST_TRIANGULATION
-            vtkCell* aFace = aPolyData->GetCell(aFaceId);
-#else
-            vtkCell* aFace = cell->GetFace(aFaceId);
-#endif
-	    vtkIdList *anIdList = aFace->PointIds;  
-	    aNewPts[0] = anIdList->GetId(0);
-	    aNewPts[1] = anIdList->GetId(1);
-	    aNewPts[2] = anIdList->GetId(2);
-
-#ifdef USE_ROBUST_TRIANGULATION
-            faceIds->Reset();
-            faceIds->InsertNextId(aPts[aNewPts[0]]);
-            faceIds->InsertNextId(aPts[aNewPts[1]]);
-            faceIds->InsertNextId(aPts[aNewPts[2]]);
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
-#else
-            input->GetCellNeighbors(cellId, anIdList, cellIds);
-#endif
-	    if((!allVisible && !cellVis[cellIds->GetId(0)]) || 
-	       cellIds->GetNumberOfIds() <= 0 ||
-	       myShowInside)
-	    {
-	      TPointIds aPointIds;
-	      aPointIds.insert(aNewPts[0]);
-	      aPointIds.insert(aNewPts[1]);
-	      aPointIds.insert(aNewPts[2]);
-
-	      aFace2PointIds.insert(aPointIds);
-	      aFace2Visibility.insert(aFaceId);
-	    }
-	  }
-
-          for (int aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
-            if(aFace2Visibility.find(aFaceId) == aFace2Visibility.end())
-	      continue;
-
-#ifdef USE_ROBUST_TRIANGULATION
-            vtkCell* aFace = aPolyData->GetCell(aFaceId);
-#else
-            vtkCell* aFace = cell->GetFace(aFaceId);
-#endif
-	    vtkIdList *anIdList = aFace->PointIds;
-	    aNewPts[0] = anIdList->GetId(0);
-	    aNewPts[1] = anIdList->GetId(1);
-	    aNewPts[2] = anIdList->GetId(2);
-	    
-	    // To initialize set of points for the plane where the trinangle face belong to
-	    TPointIds aPointIds;
-	    aPointIds.insert(aNewPts[0]);
-	    aPointIds.insert(aNewPts[1]);
-	    aPointIds.insert(aNewPts[2]);
-
-	    // To get know, if the points of the trinagle were already observed
-	    bool anIsObserved = aFace2PointIds.find(aPointIds) == aFace2PointIds.end();
-	    //cout<<"\taFaceId = "<<aFaceId<<"; anIsObserved = "<<anIsObserved;
-	    //cout<<"; aNewPts = {"<<aNewPts[0]<<", "<<aNewPts[1]<<", "<<aNewPts[2]<<"}\n";
+	  bool anIsOk = anOrderedTriangulator.Execute(input,
+						      cd,
+						      cellId,
+						      myShowInside,
+						      allVisible,
+						      cellVis,
+						      output,
+						      outputCD,
+						      myStoreMapping,
+						      myVTK2ObjIds,
+						      true);
+	  if(!anIsOk)
+	    aDelaunayTriangulator.Execute(input,
+					  cd,
+					  cellId,
+					  myShowInside,
+					  allVisible,
+					  cellVis,
+					  output,
+					  outputCD,
+					  myStoreMapping,
+					  myVTK2ObjIds,
+					  false);
 	      
-	    if(!anIsObserved){
-	      // To get coordinates of the points of the traingle face
-	      float aCoord[3][3];
-	      aPoints->GetPoint(aNewPts[0],aCoord[0]);
-	      aPoints->GetPoint(aNewPts[1],aCoord[1]);
-	      aPoints->GetPoint(aNewPts[2],aCoord[2]);
-	      
-	      // To calculate plane normal
-	      float aVector01[3] = { aCoord[1][0] - aCoord[0][0],
-				     aCoord[1][1] - aCoord[0][1],
-				     aCoord[1][2] - aCoord[0][2] };
-	      
-	      float aVector02[3] = { aCoord[2][0] - aCoord[0][0],
-				     aCoord[2][1] - aCoord[0][1],
-				     aCoord[2][2] - aCoord[0][2] };
-	      
-	      float aCross21[3];
-	      vtkMath::Cross(aVector02,aVector01,aCross21);
-	      
-	      vtkMath::Normalize(aCross21);
-	      
-	      // To calculate what points belong to the plane
-	      // To calculate bounds of the point set
-	      float aCenter[3] = {0.0, 0.0, 0.0};
-	      {
-		TPointIds::const_iterator anIter = anInitialPointIds.begin();
-		TPointIds::const_iterator anEndIter = anInitialPointIds.end();
-		for(; anIter != anEndIter; anIter++){
-		  float aPntCoord[3];
-		  vtkIdType aPntId = *anIter;
-		  aPoints->GetPoint(aPntId,aPntCoord);
-		  float aDist = vtkPlane::DistanceToPlane(aPntCoord,aCross21,aCoord[0]);
-		  //cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}; aDist = "<<aDist<<"\n";
-		  if(fabs(aDist) < aDistEps){
-		    aPointIds.insert(aPntId);
-		    aCenter[0] += aPntCoord[0];
-		    aCenter[1] += aPntCoord[1];
-		    aCenter[2] += aPntCoord[2];
-		  }
-		}
-		int aNbPoints = aPointIds.size();
-		aCenter[0] /= aNbPoints;
-		aCenter[1] /= aNbPoints;
-		aCenter[2] /= aNbPoints;
-	      }
-	      
-	      // To calculate the primary direction for point set
-	      float aVector0[3] = { aCoord[0][0] - aCenter[0],
-				    aCoord[0][1] - aCenter[1],
-				    aCoord[0][2] - aCenter[2] };
-
-	      //To sinchronize orientation of the cell and its face
-	      float aVectorC[3] = { aCenter[0] - aCellCenter[0],
-				    aCenter[1] - aCellCenter[1],
-				    aCenter[2] - aCellCenter[2] };
-	      vtkMath::Normalize(aVectorC);
-
-	      float aDot = vtkMath::Dot(aCross21,aVectorC);
-	      //cout<<"\t\taCross21 = {"<<aCross21[0]<<", "<<aCross21[1]<<", "<<aCross21[2]<<"}";
-	      //cout<<"; aVectorC = {"<<aVectorC[0]<<", "<<aVectorC[1]<<", "<<aVectorC[2]<<"}\n";
-	      //cout<<"\t\taDot = "<<aDot<<"\n";
-	      if(aDot > 0){
-		aCross21[0] = -aCross21[0];
-		aCross21[1] = -aCross21[1];
-		aCross21[2] = -aCross21[2];
-	      }
-		
-	      vtkMath::Normalize(aVector0);
-	      
-	      //cout<<"\t\taCenter = {"<<aCenter[0]<<", "<<aCenter[1]<<", "<<aCenter[2]<<"}";
-	      //cout<<"; aVector0 = {"<<aVector0[0]<<", "<<aVector0[1]<<", "<<aVector0[2]<<"}\n";
-
-	      // To calculate the set of points by face those that belong to the plane
-	      TFace2PointIds aRemoveFace2PointIds;
-	      {
-		TFace2PointIds::const_iterator anIter = aFace2PointIds.begin();
-		TFace2PointIds::const_iterator anEndIter = aFace2PointIds.end();
-		for(; anIter != anEndIter; anIter++){
-		  const TPointIds& anIds = *anIter;
-		  TPointIds anIntersection;
-		  std::set_intersection(aPointIds.begin(),aPointIds.end(),
-					anIds.begin(),anIds.end(),
-					std::inserter(anIntersection,anIntersection.begin()));
-
-		  if(anIntersection == anIds){
-		    aRemoveFace2PointIds.insert(anIds);
-		  }
-		}
-	      }
-
-	      // To remove from the set of points by face those that belong to the plane
-	      {
-		TFace2PointIds::const_iterator anIter = aRemoveFace2PointIds.begin();
-		TFace2PointIds::const_iterator anEndIter = aRemoveFace2PointIds.end();
-		for(; anIter != anEndIter; anIter++){
-		  const TPointIds& anIds = *anIter;
-		  aFace2PointIds.erase(anIds);
-		}
-	      }
-
-	      // To sort the planar set of the points accrding to the angle
-	      {
-		typedef std::map<float,vtkIdType> TSortedPointIds;
-		TSortedPointIds aSortedPointIds;
-
-		TPointIds::const_iterator anIter = aPointIds.begin();
-		TPointIds::const_iterator anEndIter = aPointIds.end();
-		for(; anIter != anEndIter; anIter++){
-		  float aPntCoord[3];
-		  vtkIdType aPntId = *anIter;
-		  aPoints->GetPoint(aPntId,aPntCoord);
-		  float aVector[3] = { aPntCoord[0] - aCenter[0],
-				       aPntCoord[1] - aCenter[1],
-				       aPntCoord[2] - aCenter[2] };
-		  vtkMath::Normalize(aVector);
-
-		  float aCross[3];
-		  vtkMath::Cross(aVector,aVector0,aCross);
-		  bool aGreaterThanPi = vtkMath::Dot(aCross,aCross21) < 0;
-		  float aCosinus = vtkMath::Dot(aVector,aVector0);
-		  if(aCosinus > 1.0)
-		    aCosinus = 1.0;
-		  if(aCosinus < -1.0)
-		    aCosinus = -1.0;
-		  static float a2Pi = 2.0 * vtkMath::Pi();
-		  float anAngle = acos(aCosinus);
-		  //cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}";
-		  //cout<<"; aGreaterThanPi = "<<aGreaterThanPi<<"; aCosinus = "<<aCosinus<<"; anAngle = "<<anAngle<<"\n";
-		  if(aGreaterThanPi)
-		    anAngle = a2Pi - anAngle;
-		  aSortedPointIds[anAngle] = aPntId;
-		  //cout<<"\t\t\tanAngle = "<<anAngle<<"\n";
-		}
-		if(!aSortedPointIds.empty()){
-		  aCellType = VTK_POLYGON;
-		  int numFacePts = aSortedPointIds.size();
-		  std::vector<vtkIdType> aConnectivities(numFacePts);
-		  TSortedPointIds::const_iterator anIter = aSortedPointIds.begin();
-		  TSortedPointIds::const_iterator anEndIter = aSortedPointIds.end();
-		  for(vtkIdType anId = 0; anIter != anEndIter; anIter++, anId++){
-		    vtkIdType aPntId = anIter->second;
-#ifdef USE_ROBUST_TRIANGULATION
-		    aConnectivities[anId] = aPts[aPntId];
-#else
-		    aConnectivities[anId] = aPntId;
-#endif
-		  }
-		  newCellId = output->InsertNextCell(aCellType,numFacePts,&aConnectivities[0]);
-		  if(myStoreMapping)
-		    myVTK2ObjIds.push_back(cellId);
-		  outputCD->CopyData(cd,cellId,newCellId);
-		}
-	      }
-	    }
-	  }
-
 	  break;
 	}
         case VTK_TETRA: {
@@ -1029,14 +744,6 @@ VTKViewer_GeometryFilter
   vtkDebugMacro(<<"Extracted " << input->GetNumberOfPoints() << " points,"
   << output->GetNumberOfCells() << " cells.");
 
-#ifdef USE_ROBUST_TRIANGULATION
-  anUnstructuredGrid->Delete();
-  aDelaunayPoints->Delete();
-
-  aDelaunay3D->Delete();
-  aGeometryFilter->Delete();
-#endif
-
   cell->Delete();
 
   cellIds->Delete();
@@ -1049,7 +756,6 @@ VTKViewer_GeometryFilter
 }
 
 
-//----------------------------------------------------------------------------
 void
 VTKViewer_GeometryFilter
 ::SetInside(int theShowInside)
@@ -1069,7 +775,6 @@ VTKViewer_GeometryFilter
 }
 
 
-//----------------------------------------------------------------------------
 void 
 VTKViewer_GeometryFilter
 ::SetWireframeMode(int theIsWireframeMode)
@@ -1089,7 +794,6 @@ VTKViewer_GeometryFilter
 }
 
 
-//----------------------------------------------------------------------------
 void
 VTKViewer_GeometryFilter
 ::SetStoreMapping(int theStoreMapping)
@@ -1109,7 +813,6 @@ VTKViewer_GeometryFilter
 }
 
 
-//----------------------------------------------------------------------------
 vtkIdType VTKViewer_GeometryFilter::GetElemObjId(int theVtkID){
   if(myVTK2ObjIds.empty() || theVtkID > myVTK2ObjIds.size()) return -1;
 #if defined __GNUC_2__

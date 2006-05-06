@@ -35,6 +35,12 @@ class CAF_Study;
 #pragma warning ( disable: 4251 )
 #endif
 
+/*!
+  \class CAF_Application
+  Defines application configuration and behaviour for application with 
+  link to standard OCC OCAF data model. Allows to use OCC OCAF serives
+  (for example, undo/redo)
+*/
 class CAF_EXPORT CAF_Application : public STD_Application
 {
   Q_OBJECT

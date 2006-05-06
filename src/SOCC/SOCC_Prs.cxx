@@ -29,84 +29,63 @@
 #include "SOCC_Prs.h"
 using namespace std;
 
-//==========================================================
 /*!
- *  SOCC_Prs::SOCC_Prs
- *  Default constructor
- */
-//==========================================================
+  Default constructor
+*/
 SOCC_Prs::SOCC_Prs() 
 {
   myToActivate = true;
 }
 
-//==========================================================
 /*!
- *  SOCC_Prs::SOCC_Prs
- *  Standard constructor
- */
-//==========================================================
+  Standard constructor
+*/
 SOCC_Prs::SOCC_Prs( const Handle(AIS_InteractiveObject)& obj ) 
 {  
   AddObject( obj ); 
 }
 
-//==========================================================
 /*!
- *  SOCC_Prs::~SOCC_Prs
- *  Destructor
- */
-//==========================================================
+  Destructor
+*/
 SOCC_Prs::~SOCC_Prs()
 { 
   myObjects.Clear(); 
 }
 
-//==========================================================
 /*!
- *  SOCC_Prs::GetObjects
- *  Get interactive objects list
- */
-//==========================================================
+  Get interactive objects list
+*/
 void SOCC_Prs::GetObjects( AIS_ListOfInteractive& list ) const 
 { 
   list = myObjects; 
 }
 
-//==========================================================
 /*!
- *  SOCC_Prs::AddObject
- *  Add interactive object
- */
-//==========================================================
+  Add interactive object
+*/
 void SOCC_Prs::AddObject( const Handle(AIS_InteractiveObject)& obj ) 
 { 
   myObjects.Append( obj ); 
 }
 
-//==========================================================
 /*!
- *  SOCC_Prs::IsNull
- *  Return 0 if list of the interactive objects is empty
- *  [ Reimplemented from SALOME_Prs ]
- */
-//==========================================================
+  \return 0 if list of the interactive objects is empty [ Reimplemented from SALOME_Prs ]
+*/
 bool SOCC_Prs::IsNull() const 
 { 
   return myObjects.IsEmpty(); 
 }
 
-//=================================================================
 /*!
- *  GEOM_Displayer::SetToActivate
- *  This method is used for activisation/deactivisation of
- *  objects in the moment of displaying
+  This method is used for activisation/deactivisation of
+  objects in the moment of displaying
 */   
-//=================================================================
 void SOCC_Prs::SetToActivate( const bool toActivate )
 {
   myToActivate = toActivate;
 }
+
 bool SOCC_Prs::ToActivate() const
 {
   return myToActivate;

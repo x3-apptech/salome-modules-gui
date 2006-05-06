@@ -46,10 +46,9 @@ static const char* list_arrow_icon[] = {
 };
 
 /*!
-	Class: QtxListAction::ToolButton
-	Level: Internal
+  \class QtxListAction::ToolButton
+  Custom tool button
 */
-
 class QtxListAction::ToolButton : public QToolButton
 {
 public:
@@ -62,6 +61,9 @@ private:
   QtxListAction* myAction;
 };
 
+/*!
+  Constructor
+*/
 QtxListAction::ToolButton::ToolButton( QtxListAction* a, QWidget* parent, const char* name )
 : QToolButton( parent, name ),
 myAction( a )
@@ -69,12 +71,18 @@ myAction( a )
   setIconSet( QPixmap( list_arrow_icon ) );
 }
 
+/*!
+  Destructor
+*/
 QtxListAction::ToolButton::~ToolButton()
 {
   if ( myAction )
     myAction->controlDeleted( this );
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxListAction::ToolButton::sizeHint() const
 {
   QSize sz = iconSet().pixmap().size();
@@ -82,16 +90,9 @@ QSize QtxListAction::ToolButton::sizeHint() const
 }
 
 /*!
-	Class: QtxListAction
-	Level: Public
+  Constructs an list action with given parent and name. If toggle is true the
+  action will be a toggle action, otherwise it will be a command action.
 */
-
-/*!
-	Name: QtxListAction [public]
-	Desc: Constructs an list action with given parent and name. If toggle is true the
-		    action will be a toggle action, otherwise it will be a command action.
-*/
-
 QtxListAction::QtxListAction( QObject* parent, const char* name, bool toggle )
 : QtxAction( parent, name, toggle ),
 myFrame( 0 ),
@@ -102,12 +103,11 @@ myRaise( false )
 }
 
 /*!
-	Name: QtxListAction [public]
-	Desc: This constructor creates an action with the following properties: the
-		    description text, the icon or iconset icon, the menu text and keyboard
-		    accelerator. It is a child of given parent and named specified name.
-		    If toggle is true the action will be a toggle action, otherwise it will
-		    be a command action.
+  This constructor creates an action with the following properties: the
+  description text, the icon or iconset icon, the menu text and keyboard
+  accelerator. It is a child of given parent and named specified name.
+  If toggle is true the action will be a toggle action, otherwise it will
+  be a command action.
 */
 
 QtxListAction::QtxListAction( const QString& text, const QIconSet& icon,
@@ -122,11 +122,10 @@ myRaise( false )
 }
 
 /*!
-	Name: QtxListAction [public]
-	Desc: This constructor creates an action with the following properties: the
-		  description text, the menu text and keyboard accelerator. It is a child
-		  of given parent and named specified name. If toggle is true the action
-		  will be a toggle action, otherwise it will be a command action.
+  This constructor creates an action with the following properties: the
+  description text, the menu text and keyboard accelerator. It is a child
+  of given parent and named specified name. If toggle is true the action
+  will be a toggle action, otherwise it will be a command action.
 */
 
 QtxListAction::QtxListAction( const QString& text, const QString& menuText,
@@ -140,8 +139,7 @@ myRaise( false )
 }
 
 /*!
-	Name: ~QtxListAction [virtual public]
-	Desc: Destructor.
+  Destructor.
 */
 
 QtxListAction::~QtxListAction()
@@ -173,6 +171,9 @@ void QtxListAction::setPopupMode( const int mode )
   myMode = mode;
 }
 
+/*!
+  \return list of names
+*/
 QStringList QtxListAction::names() const
 {
   QStringList lst;
@@ -505,6 +506,9 @@ void QtxListAction::onExpand( bool on )
     myFrame->hide();
 }
 
+/*!
+  SLOT: called when frame is hidden
+*/
 void QtxListAction::onHided()
 {
   for ( ButtonsMap::Iterator bit = myButtons.begin(); bit != myButtons.end(); ++bit )
@@ -624,12 +628,10 @@ void QtxListAction::controlDeleted( QWidget* wid )
   }
 }
 
-/**********************************************************************
-**  Class:  QtxListFrame
-**  Descr:  Frame for the list of actions
-**  Level:  Internal
-***********************************************************************/
-
+/*!
+  \class QtxListFrame
+  Frame for the list of actions
+*/
 class QtxListFrame::ScrollEvent : public QCustomEvent
 {
 public:
@@ -693,6 +695,9 @@ myScrollBlock( false )
   setFrameStyle( Panel | Raised );
 }
 
+/*!
+  Destructor
+*/
 QtxListFrame::~QtxListFrame()
 {
   if ( myAction )
@@ -709,6 +714,11 @@ void QtxListFrame::clear()
 	setNames( myNames );
 }
 
+/*!
+    Adds a names to the list. Truncates the name to fit to the frame width.
+    Use QtxListAction::setMaxLineChar( int ) to set the width in characters. [ public ]
+*/
+  
 void QtxListFrame::addNames( const QStringList& names )
 {
 	for ( QStringList::ConstIterator it = names.begin(); it != names.end(); ++it )
@@ -754,6 +764,9 @@ void QtxListFrame::setNames( const QStringList& names )
   }
 }
 
+/*!
+  \return list of names
+*/
 const QStringList QtxListFrame::names() const
 {
 	return myNames;
@@ -822,6 +835,10 @@ void QtxListFrame::updateComment()
   myComment->setText( com );
 }
 
+/*!
+  Sets owner
+  \param wo - new owner
+*/
 void QtxListFrame::setOwner( QWidget* wo )
 {
   myOwner = wo;
@@ -1005,6 +1022,9 @@ bool QtxListFrame::handleMouseEvent( QObject* o, QMouseEvent* e )
   return true;
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxListFrame::event( QEvent* e )
 {
   if ( e->type() != (int)ScrollEvent::Scroll )
@@ -1089,6 +1109,9 @@ void QtxListFrame::setSelected( const int lastSel )
   updateComment();
 }
 
+/*!
+  return number of selected items
+*/
 int QtxListFrame::selected() const
 {
 	uint sel = 0;

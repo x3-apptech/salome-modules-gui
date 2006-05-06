@@ -40,10 +40,10 @@
 
 class GLViewer_Object;
 
-/*! Class GLViewer_MimeSource
-* Needs for a work with QClipboard
+/*! 
+  \class GLViewer_MimeSource
+  Needs for a work with QClipboard
 */
-
 class GLVIEWER_API GLViewer_MimeSource: public QMimeSource
 {
 public:

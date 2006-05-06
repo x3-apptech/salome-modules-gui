@@ -19,13 +19,6 @@
 //  Author : OPEN CASCADE
 //
 
-/***************************************************************************
-**  Class:   GLViewer_BaseObjects
-**  Descr:   Internal OpenGL Objects
-**  Module:  GLViewer
-**  Created: UI team, 02.09.02
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_BaseObjects.h"
 #include "GLViewer_BaseDrawers.h"
@@ -39,13 +32,9 @@
 //#include <cmath>
 //using namespace std;
 
-/***************************************************************************
-**  Class:   GLViewer_MarkerSet
-**  Descr:   OpenGL MarkerSet
-**  Module:  GLViewer
-**  Created: UI team, 03.09.02
-****************************************************************************/
-
+/*!
+  Constructor
+*/
 GLViewer_MarkerSet::GLViewer_MarkerSet( int number, float size, const QString& toolTip ) :
   GLViewer_Object(),
   myNumber( 0 ),
@@ -67,6 +56,9 @@ GLViewer_MarkerSet::GLViewer_MarkerSet( int number, float size, const QString& t
     setNumMarkers( number );    
 }
 
+/*!
+  Destructor
+*/
 GLViewer_MarkerSet::~GLViewer_MarkerSet()
 {
     if ( myXCoord )
@@ -75,6 +67,16 @@ GLViewer_MarkerSet::~GLViewer_MarkerSet()
         delete[] myYCoord;
 }
 
+/*!
+  Adds coords to text buffer in HPGL format
+  \param buffer - text buffer
+  \param command - command to be added with coords
+  \param aViewerCS - viewer co-ordinates system
+  \param aPaperCS - paper co-ordinates system
+  \param x - x co-ordinate
+  \param y - y co-ordinate
+  \param NewLine - adds new line to buffer
+*/
 void AddCoordsToHPGL( QString& buffer, QString command, GLViewer_CoordSystem* aViewerCS, 
                       GLViewer_CoordSystem* aPaperCS, double x, double y, bool NewLine = true )
 {
@@ -87,6 +89,16 @@ void AddCoordsToHPGL( QString& buffer, QString command, GLViewer_CoordSystem* aV
         buffer += ";\n";
 }
 
+/*!
+  Adds coords to text buffer in PostScript format
+  \param buffer - text buffer
+  \param command - command to be added with coords
+  \param aViewerCS - viewer co-ordinates system
+  \param aPaperCS - paper co-ordinates system
+  \param x - x co-ordinate
+  \param y - y co-ordinate
+  \param NewLine - adds new line to buffer
+*/
 void AddCoordsToPS( QString& buffer, QString command, GLViewer_CoordSystem* aViewerCS, 
                     GLViewer_CoordSystem* aPaperCS, double x, double y, bool NewLine = true )
 {
@@ -99,6 +111,13 @@ void AddCoordsToPS( QString& buffer, QString command, GLViewer_CoordSystem* aVie
         buffer += "\n";
 }
 
+/*!
+  Adds line aspect description to text buffer in PostScript format
+  \param buffer - text buffer
+  \param anAspect - line aspect
+  \param aViewerCS - viewer co-ordinates system
+  \param aPaperCS - paper co-ordinates system
+*/
 void AddLineAspectToPS( QString& buffer, GLViewer_AspectLine* anAspect, 
                         GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPaperCS )
 {
@@ -129,6 +148,13 @@ void AddLineAspectToPS( QString& buffer, GLViewer_AspectLine* anAspect,
 }
 
 #ifdef WIN32
+/*!
+  Adds line aspect description EMF image
+  \param hDC - descriptor of EMF
+  \param anAspect - line aspect
+  \param aViewerCS - viewer co-ordinates system
+  \param aPaperCS - paper co-ordinates system
+*/
 HPEN AddLineAspectToEMF( HDC hDC, GLViewer_AspectLine* anAspect, 
                          GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPaperCS )
 {
@@ -150,6 +176,12 @@ HPEN AddLineAspectToEMF( HDC hDC, GLViewer_AspectLine* anAspect,
 }
 #endif
 
+/*!
+  Saves to file PostScript set of markers
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aPSCS - paper co-ordinates system
+*/
 bool GLViewer_MarkerSet::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {   
     int noPoints = 20;
@@ -187,6 +219,12 @@ bool GLViewer_MarkerSet::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVie
     return true;
 }
 
+/*!
+  Saves to file HPGL set of markers
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aHPGLCS - paper co-ordinates system
+*/
 bool GLViewer_MarkerSet::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS,
                                        GLViewer_CoordSystem* aHPGLCS )
 {
@@ -221,6 +259,12 @@ bool GLViewer_MarkerSet::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aV
 }
 
 #ifdef WIN32
+/*!
+  Saves to EMF image set of markers
+  \param dc - EMF image descriptor
+  \param aViewerCS - viewer co-ordinates system
+  \param aEMFCS - paper co-ordinates system
+*/
 bool GLViewer_MarkerSet::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     int noPoints = 20;
@@ -256,7 +300,9 @@ bool GLViewer_MarkerSet::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS
 }
 #endif
 
-
+/*! 
+  Computes all necessary information about object for presentation in drawer
+*/
 void GLViewer_MarkerSet::compute()
 {
 //  cout << "GLViewer_MarkerSet::compute" << endl;
@@ -282,13 +328,23 @@ void GLViewer_MarkerSet::compute()
   myRect->setBottom( ya - myYGap );
 }
 
+/*!
+  Creates corresponding drawer
+*/
 GLViewer_Drawer* GLViewer_MarkerSet::createDrawer()
 {
 //  cout << "GLViewer_MarkerSet::createDrawer" << endl;
   return myDrawer = new GLViewer_MarkerDrawer();
 }
 
-
+/*!
+  Computes highlight presentation
+  \param x        - x coord
+  \param y        - y coord
+  \param tol      - tolerance of detecting
+  \param isCircle - true if sensitive area of detection is round
+  \return true if highlight status is changed
+*/
 GLboolean GLViewer_MarkerSet::highlight( GLfloat x, GLfloat y, GLfloat tol, GLboolean isCircle )
 {
     if( !myIsVisible )
@@ -342,6 +398,9 @@ GLboolean GLViewer_MarkerSet::highlight( GLfloat x, GLfloat y, GLfloat tol, GLbo
   return update;
 }
 
+/*!
+  Unhilights object
+*/
 GLboolean GLViewer_MarkerSet::unhighlight()
 {
   if( !myHNumbers.isEmpty() )
@@ -356,6 +415,15 @@ GLboolean GLViewer_MarkerSet::unhighlight()
   return GL_FALSE;
 }
 
+/*!
+  Selects marker set
+  /param x, y - co-ordinates of mouse
+  /param tol - tolerance
+  /param rect - rectangle (in case of rectangular selection)
+  /param isFull - if it is true, then object may selected only if it lays whole in selection zone
+  \param isCircle - true if sensitive area of detection is round
+  \param isShift  - true if selection exec with append option
+*/
 GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull,
                                       GLboolean isCircle, GLboolean isShift )
 {
@@ -480,6 +548,9 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
   return myIsSel;
 }
 
+/*!
+  Unselects marker set
+*/
 GLboolean GLViewer_MarkerSet::unselect()
 {
   if( !mySelNumbers.isEmpty() )
@@ -493,6 +564,10 @@ GLboolean GLViewer_MarkerSet::unselect()
   return GL_FALSE;
 }
 
+/*!
+  \return update object rectangle
+  Does not equal getRect() if object have a persistence to some viewer transformations
+*/
 GLViewer_Rect* GLViewer_MarkerSet::getUpdateRect()
 {
   GLViewer_Rect* rect = new GLViewer_Rect();
@@ -510,7 +585,11 @@ GLViewer_Rect* GLViewer_MarkerSet::getUpdateRect()
   return rect;
 }
 
-
+/*!
+  Sets array of x coords of points
+  \param xCoord - array of co-ordinates
+  \param size - array size
+*/
 void GLViewer_MarkerSet::setXCoord( GLfloat* xCoord, int size )
 {
   myXCoord = new GLfloat[ size ];
@@ -518,6 +597,11 @@ void GLViewer_MarkerSet::setXCoord( GLfloat* xCoord, int size )
      myXCoord[i] = xCoord[i];
 }
 
+/*!
+  Sets array of y coords of points
+  \param yCoord - array of co-ordinates
+  \param size - array size
+*/
 void GLViewer_MarkerSet::setYCoord( GLfloat* yCoord, int size )
 {
   myYCoord = new GLfloat[ size ];
@@ -525,6 +609,10 @@ void GLViewer_MarkerSet::setYCoord( GLfloat* yCoord, int size )
      myYCoord[i] = yCoord[i];
 }
 
+/*!
+  Sets number of markers
+  \param number - new number of markers
+*/
 void GLViewer_MarkerSet::setNumMarkers( GLint number )
 {
   if ( myNumber == number )
@@ -540,22 +628,10 @@ void GLViewer_MarkerSet::setNumMarkers( GLint number )
   myXCoord = new GLfloat[ myNumber ];
   myYCoord = new GLfloat[ myNumber ];
 }
-/*
-void GLViewer_MarkerSet::onSelectionDone( bool append)
-{
-  mySelectedIndexes.Clear();
-  QValueList<int>::Iterator it;
-  //for( it = myMarkers->mySelNumbers.begin(); it != myMarkers->mySelNumbers.end(); ++it )
-  //  mySelectedIndexes.Append( *it / 2 ); //!!!
 
-  emit dvMarkersSelected( mySelectedIndexes );
-}
 
-void GLViewer_MarkerSet::onSelectionCancel()
-{
-  mySelectedIndexes.Clear();
-  emit dvMarkersSelected( mySelectedIndexes );
-}
+/*!
+  Export numbers of highlighted/selected lines
 */
 void GLViewer_MarkerSet::exportNumbers( QValueList<int>& highlight,
                      QValueList<int>& unhighlight,
@@ -570,6 +646,10 @@ void GLViewer_MarkerSet::exportNumbers( QValueList<int>& highlight,
     myUHNumbers = myHNumbers;
 }
 
+/*!
+  Adds or remove selected number
+  \param index - selected index
+*/
 bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
 {
   if( index < 0 || index > myNumber )
@@ -588,6 +668,10 @@ bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
   return TRUE;
 }
 
+/*!
+  Adds some selected numbers
+  \param seq - sequence of indices
+*/
 void GLViewer_MarkerSet::addSelected( const TColStd_SequenceOfInteger& seq )
 {
   for ( int i = 1; i <= seq.Length(); i++ )
@@ -595,6 +679,10 @@ void GLViewer_MarkerSet::addSelected( const TColStd_SequenceOfInteger& seq )
       mySelNumbers.append( seq.Value( i ) - 1 );
 }
 
+/*!
+  Sets some numbers as selected
+  \param seq - sequence of indices
+*/
 void GLViewer_MarkerSet::setSelected( const TColStd_SequenceOfInteger& seq )
 {
 //   for( QValueList<int>::Iterator it = mySelNumbers.begin(); it != mySelNumbers.end(); ++it )
@@ -608,6 +696,11 @@ void GLViewer_MarkerSet::setSelected( const TColStd_SequenceOfInteger& seq )
     mySelNumbers.append( seq.Value( i ) - 1 );
 }
 
+/*! Moves object by recomputing
+  \param dx        - moving along X coord
+  \param dy        - moving along Y coord
+  \param fromGroup - is true if this method called from group
+*/
 void GLViewer_MarkerSet::moveObject( float theX, float theY, bool fromGroup )
 {
     if( !fromGroup && myGroup)
@@ -623,6 +716,10 @@ void GLViewer_MarkerSet::moveObject( float theX, float theY, bool fromGroup )
     compute();    
 }
 
+/*!
+  Codes marker set as byte copy
+  \return byte array
+*/
 QByteArray GLViewer_MarkerSet::getByteCopy()
 {
     int i = 0;
@@ -655,6 +752,10 @@ QByteArray GLViewer_MarkerSet::getByteCopy()
     return aResult;
 }
 
+/*!
+  Initialize marker set by byte array
+  \param theArray - byte array
+*/
 bool GLViewer_MarkerSet::initializeFromByteCopy( QByteArray theArray )
 {
     int i = 0;
@@ -701,16 +802,20 @@ bool GLViewer_MarkerSet::initializeFromByteCopy( QByteArray theArray )
     return true;        
 }
 
-/***************************************************************************
-**  Class:   GLViewer_Polyline
-**  Descr:   OpenGL Polyline
-**  Module:  GLViewer
-**  Created: UI team, 03.09.02
-****************************************************************************/
+/*!
+  \class GLViewer_Polyline
+  OpenGL Polyline
+*/
 
 #define SECTIONS 100
 #define DISTANTION 5
 
+/*!
+  Constructor
+  \param number - number of segments
+  \param size - size of polyline
+  \param toolTip - tool tip of polyline
+*/
 GLViewer_Polyline::GLViewer_Polyline( int number, float size, const QString& toolTip ):
   GLViewer_Object(),
   myNumber( 0 ),
@@ -732,6 +837,9 @@ GLViewer_Polyline::GLViewer_Polyline( int number, float size, const QString& too
   myToolTipText = toolTip;
 }
 
+/*!
+  Destructor, destroys internal arrays of co-ordinates
+*/
 GLViewer_Polyline::~GLViewer_Polyline()
 {
   if ( myXCoord )
@@ -740,6 +848,12 @@ GLViewer_Polyline::~GLViewer_Polyline()
     delete[] myYCoord;
 }
 
+/*!
+  Saves polyline to file PostScript
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aPSCS - paper co-ordinates system
+*/
 bool GLViewer_Polyline::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {
     QString aBuffer = "newpath\n";
@@ -762,6 +876,12 @@ bool GLViewer_Polyline::translateToPS( QFile& hFile, GLViewer_CoordSystem* aView
     return true;
 }
 
+/*!
+  Saves polyline to file HPGL
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aHPGLCS - paper co-ordinates system
+*/
 bool GLViewer_Polyline::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS )
 {
     QString aBuffer = "";
@@ -783,6 +903,12 @@ bool GLViewer_Polyline::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aVi
 }
 
 #ifdef WIN32
+/*!
+  Saves polyline to EMF image
+  \param dc - EMF image descriptor
+  \param aViewerCS - viewer co-ordinates system
+  \param aEMFCS - paper co-ordinates system
+*/
 bool GLViewer_Polyline::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     if( !aViewerCS || !aEMFCS )
@@ -819,6 +945,9 @@ bool GLViewer_Polyline::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS,
 }
 #endif
 
+/*! 
+  Computes all necessary information about object for presentation in drawer
+*/
 void GLViewer_Polyline::compute()
 {
 //  cout << "GLViewer_MarkerSet::compute" << endl;
@@ -844,6 +973,10 @@ void GLViewer_Polyline::compute()
   myRect->setBottom( ya - yGap );
 }
 
+/*!
+  \return update object rectangle
+  Does not equal getRect() if object have a persistence to some viewer transformations
+*/
 GLViewer_Rect* GLViewer_Polyline::getUpdateRect()
 {
     GLViewer_Rect* rect = new GLViewer_Rect();
@@ -856,12 +989,23 @@ GLViewer_Rect* GLViewer_Polyline::getUpdateRect()
     return rect;
 }
 
+/*!
+  Creates corresponding drawer
+*/
 GLViewer_Drawer* GLViewer_Polyline::createDrawer()
 {
 //  cout << "GLViewer_MarkerSet::createDrawer" << endl;
     return myDrawer = new GLViewer_PolylineDrawer();
 }
 
+/*!
+  Computes highlight presentation
+  \param x        - x coord
+  \param y        - y coord
+  \param tol      - tolerance of detecting
+  \param isCircle - true if sensitive area of detection is round
+  \return true if highlight status is changed
+*/
 GLboolean GLViewer_Polyline::highlight( GLfloat x, GLfloat y, GLfloat tol, GLboolean isCircle )
 {
     if( !myIsVisible )
@@ -916,6 +1060,9 @@ GLboolean GLViewer_Polyline::highlight( GLfloat x, GLfloat y, GLfloat tol, GLboo
     return update;
 }
 
+/*!
+  Unhilights object
+*/
 GLboolean GLViewer_Polyline::unhighlight()
 {
 //   if( !myHNumbers.isEmpty() )
@@ -934,6 +1081,15 @@ GLboolean GLViewer_Polyline::unhighlight()
   return GL_FALSE;
 }
 
+/*!
+  Selects polyline
+  /param x, y - co-ordinates of mouse
+  /param tol - tolerance
+  /param rect - rectangle (in case of rectangular selection)
+  /param isFull - if it is true, then object may selected only if it lays whole in selection zone
+  \param isCircle - true if sensitive area of detection is round
+  \param isShift  - true if selection exec with append option
+*/
 GLboolean GLViewer_Polyline::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull,
                                      GLboolean isCircle, GLboolean isShift )
 {
@@ -994,6 +1150,9 @@ GLboolean GLViewer_Polyline::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer
     return myIsSel;
 }
 
+/*!
+  Unselects polyline
+*/
 GLboolean GLViewer_Polyline::unselect()
 {
 //   if( !mySelNumbers.isEmpty() )
@@ -1013,6 +1172,11 @@ GLboolean GLViewer_Polyline::unselect()
   return GL_FALSE;
 }
 
+/*!
+  Sets array of abscisses for points of polyline
+  \param xCoord - array of of abscisses
+  \param size - size of array
+*/
 void GLViewer_Polyline::setXCoord( GLfloat* xCoord, int size )
 {
   myXCoord = new GLfloat[ size ];
@@ -1020,6 +1184,11 @@ void GLViewer_Polyline::setXCoord( GLfloat* xCoord, int size )
      myXCoord[i] = xCoord[i];
 }
 
+/*!
+  Sets array of ordinates for points of polyline
+  \param xCoord - array of of ordinates
+  \param size - size of array
+*/
 void GLViewer_Polyline::setYCoord( GLfloat* yCoord, int size )
 {
   myYCoord = new GLfloat[ size ];
@@ -1027,6 +1196,10 @@ void GLViewer_Polyline::setYCoord( GLfloat* yCoord, int size )
      myYCoord[i] = yCoord[i];
 }
 
+/*!
+  Sets number of points
+  \param number - new number of points
+*/
 void GLViewer_Polyline::setNumber( GLint number )
 {
   if ( myNumber == number )
@@ -1042,19 +1215,9 @@ void GLViewer_Polyline::setNumber( GLint number )
   myXCoord = new GLfloat[ myNumber ];
   myYCoord = new GLfloat[ myNumber ];
 }
-/*
-void GLViewer_Polyline::onSelectionDone( bool append)
-{
-  mySelectedIndexes.Clear();
-  QValueList<int>::Iterator it;
-  //for( it = myMarkers->mySelNumbers.begin(); it != myMarkers->mySelNumbers.end(); ++it )
-  //  mySelectedIndexes.Append( *it / 2 ); //!!!
-}
 
-void GLViewer_Polyline::onSelectionCancel()
-{
-  mySelectedIndexes.Clear();
-}
+/*!
+  Export numbers of highlighted/selected lines
 */
 void GLViewer_Polyline::exportNumbers( QValueList<int>& highlight,
                      QValueList<int>& unhighlight,
@@ -1067,6 +1230,12 @@ void GLViewer_Polyline::exportNumbers( QValueList<int>& highlight,
   unselect = myUSelNumbers;
 }
 
+/*!
+  Moves object by recomputing
+  \param dx        - moving along X coord
+  \param dy        - moving along Y coord
+  \param fromGroup - is true if this method called from group
+*/
 void GLViewer_Polyline::moveObject( float theX, float theY, bool fromGroup )
 {
   if( !fromGroup && myGroup)
@@ -1082,6 +1251,10 @@ void GLViewer_Polyline::moveObject( float theX, float theY, bool fromGroup )
   compute();    
 }
 
+/*!
+  Codes polyline as byte copy
+  \return byte array
+*/
 QByteArray GLViewer_Polyline::getByteCopy()
 {
     int i = 0;
@@ -1118,6 +1291,10 @@ QByteArray GLViewer_Polyline::getByteCopy()
 }
 
 
+/*!
+  Initialize polyline by byte array
+  \param theArray - byte array
+*/
 bool GLViewer_Polyline::initializeFromByteCopy( QByteArray theArray )
 {
     int i = 0;
@@ -1167,13 +1344,16 @@ bool GLViewer_Polyline::initializeFromByteCopy( QByteArray theArray )
     return true;        
 }
 
-/***************************************************************************
-**  Class:   GLViewer_TextObject
-**  Descr:   Text as Object for OpenGL
-**  Module:  GLViewer
-**  Created: UI team, 12.02.04
-****************************************************************************/
 
+
+/*!
+  Constructor
+  \param theStr - text string
+  \param xPos - x position
+  \param yPos - y position
+  \param color - color of text
+  \param toolTip - tooltip of text object
+*/
 GLViewer_TextObject::GLViewer_TextObject( const QString& theStr, float xPos, float yPos, 
                                     const QColor& color, const QString& toolTip )
                                     : GLViewer_Object()
@@ -1186,12 +1366,22 @@ GLViewer_TextObject::GLViewer_TextObject( const QString& theStr, float xPos, flo
 
     myToolTipText = toolTip;
 }
+
+/*!
+  Destructor
+*/
 GLViewer_TextObject::~GLViewer_TextObject()
 {
   if ( myGLText )
     delete myGLText;
 }
 
+/*!
+  Saves text object to file PostScript
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aPSCS - paper co-ordinates system
+*/
 bool GLViewer_TextObject::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {
     QString aText = myGLText->getText();    
@@ -1209,6 +1399,12 @@ bool GLViewer_TextObject::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVi
     return true;
 }
 
+/*!
+  Saves text object to file HPGL
+  \param hFile - file instance
+  \param aViewerCS - viewer co-ordinates system
+  \param aHPGLCS - paper co-ordinates system
+*/
 bool GLViewer_TextObject::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS )
 {
     QString aText = myGLText->getText();    
@@ -1226,6 +1422,12 @@ bool GLViewer_TextObject::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* a
 }
 
 #ifdef WIN32
+/*!
+  Saves text object to EMF image
+  \param dc - EMF image descriptor
+  \param aViewerCS - viewer co-ordinates system
+  \param aEMFCS - paper co-ordinates system
+*/
 bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     QString aText = myGLText->getText();    
@@ -1276,6 +1478,9 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
 }
 #endif
 
+/*!
+  Creates corresponding drawer
+*/
 GLViewer_Drawer* GLViewer_TextObject::createDrawer()
 {
     myDrawer = new GLViewer_TextDrawer();
@@ -1283,6 +1488,9 @@ GLViewer_Drawer* GLViewer_TextObject::createDrawer()
     return myDrawer;
 }
 
+/*! 
+  Computes all necessary information about object for presentation in drawer
+*/
 void GLViewer_TextObject::compute()
 {
     float xPos, yPos;
@@ -1297,12 +1505,20 @@ void GLViewer_TextObject::compute()
     myRect->setBottom( yPos );
 }
 
+/*!
+  Installing already exist drawer with same type
+  \param theDrawer - new drawer
+*/
 void GLViewer_TextObject::setDrawer( GLViewer_Drawer* theDrawer )
 {
     myDrawer = theDrawer;
     //compute();
 }
 
+/*!
+  \return update object rectangle
+  Does not equal getRect() if object have a persistence to some viewer transformations
+*/
 GLViewer_Rect* GLViewer_TextObject::getUpdateRect()
 {    
     GLViewer_Rect* rect = new GLViewer_Rect();
@@ -1319,6 +1535,14 @@ GLViewer_Rect* GLViewer_TextObject::getUpdateRect()
     return rect;
 }
 
+/*!
+  Computes highlight presentation
+  \param x        - x coord
+  \param y        - y coord
+  \param tol      - tolerance of detecting
+  \param isCircle - true if sensitive area of detection is round
+  \return true if highlight status is changed
+*/
 GLboolean GLViewer_TextObject::highlight( GLfloat theX, GLfloat theY, GLfloat theTol, GLboolean isCircle )
 {
     if( !myIsVisible )
@@ -1366,6 +1590,9 @@ GLboolean GLViewer_TextObject::highlight( GLfloat theX, GLfloat theY, GLfloat th
     return myIsHigh;
 }
 
+/*!
+  Unhilights object
+*/
 GLboolean GLViewer_TextObject::unhighlight()
 {
     if( myIsHigh )
@@ -1377,6 +1604,15 @@ GLboolean GLViewer_TextObject::unhighlight()
     return GL_FALSE;
 }
 
+/*!
+  Selects text object
+  /param x, y - co-ordinates of mouse
+  /param tol - tolerance
+  /param rect - rectangle (in case of rectangular selection)
+  /param isFull - if it is true, then object may selected only if it lays whole in selection zone
+  \param isCircle - true if sensitive area of detection is round
+  \param isShift  - true if selection exec with append option
+*/
 GLboolean GLViewer_TextObject::select( GLfloat theX, GLfloat theY, GLfloat theTol, GLViewer_Rect rect,
                                        GLboolean isFull, GLboolean isCircle, GLboolean isShift )
 { 
@@ -1415,6 +1651,9 @@ GLboolean GLViewer_TextObject::select( GLfloat theX, GLfloat theY, GLfloat theTo
     return myIsSel;
 }
 
+/*!
+  Unselects text object
+*/
 GLboolean GLViewer_TextObject::unselect()
 {
     if( myIsSel )
@@ -1426,6 +1665,12 @@ GLboolean GLViewer_TextObject::unselect()
     return GL_FALSE;
 }
 
+/*!
+  Moves object by recomputing
+  \param dx        - moving along X coord
+  \param dy        - moving along Y coord
+  \param fromGroup - is true if this method called from group
+*/
 void GLViewer_TextObject::moveObject( float theX, float theY, bool fromGroup )
 {
   if( !fromGroup && myGroup)
@@ -1441,6 +1686,10 @@ void GLViewer_TextObject::moveObject( float theX, float theY, bool fromGroup )
   compute();
 }
 
+/*!
+  Codes text object as byte copy
+  \return byte array
+*/
 QByteArray GLViewer_TextObject::getByteCopy()
 {
     QByteArray aObject = GLViewer_Object::getByteCopy();
@@ -1448,6 +1697,10 @@ QByteArray GLViewer_TextObject::getByteCopy()
     return aObject;
 }
 
+/*!
+  Initialize text object by byte array
+  \param theArray - byte array
+*/
 bool GLViewer_TextObject::initializeFromByteCopy( QByteArray theArray )
 {
     if( !GLViewer_Object::initializeFromByteCopy( theArray ) || myType != "GLViewer_TextObject" )

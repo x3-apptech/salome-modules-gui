@@ -1,27 +1,45 @@
-//======================================================================================================
-// File:      ResourceExporter.cxx
-// Created:   27/06/05
-// Author:    Vadim SANDLER
-// Copyright (C) CEA 2005
+// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
 //
-// This tool provides command-line interface allowing to modify user preferences.
-// The tool can be used by the compilation procedures in order to set default preferences for the module.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-// Usage:
-//    ResourceExporter <parameters-list>
-// Parameters have the following format:
-//    '<section>:<name>=<new_value>'            - to set <new_value> for the user 
-//                                                preference <name> from the <section> section;
-//    '<section>:<name>+=<value>[|<separator>]' - the <value> is appended to the current value 
-//                                                of the preference <name> from the <section> section;
-//                                                separator is used to concatenate old and new values,
-//                                                by default comma (',') symbol is used
-//    '-<section>:<name>'                       - to remove user preference <name> from the <section>
-//                                                section. Note that only use preference file is 
-//                                                influenced, you may need to use '<section>:<name>=""'
-//                                                option
-// The number of parameters is limeted only by maximum possible length of the command line.
-//======================================================================================================
+// This library is distributed in the hope that it will be useful
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/
+//
+/*!
+ File:      ResourceExporter.cxx
+ Created:   27/06/05
+ Author:    Vadim SANDLER
+ Copyright (C) CEA 2005
+
+ This tool provides command-line interface allowing to modify user preferences.
+ The tool can be used by the compilation procedures in order to set default preferences for the module.
+
+ Usage:
+    ResourceExporter <parameters-list>
+ Parameters have the following format:
+    '<section>:<name>=<new_value>'            - to set <new_value> for the user 
+                                                preference <name> from the <section> section;
+    '<section>:<name>+=<value>[|<separator>]' - the <value> is appended to the current value 
+                                                of the preference <name> from the <section> section;
+                                                separator is used to concatenate old and new values,
+                                                by default comma (',') symbol is used
+    '-<section>:<name>'                       - to remove user preference <name> from the <section>
+                                                section. Note that only use preference file is 
+                                                influenced, you may need to use '<section>:<name>=""'
+                                                option
+ The number of parameters is limeted only by maximum possible length of the command line.
+*/
 
 #include "SUIT_ResourceMgr.h"
 #include <qfile.h>
@@ -30,9 +48,9 @@
 #include <qapplication.h>
 #include <iostream>
 
-//============================================================
-// salomeVersion(): get the SALOME version number
-//============================================================
+/*!
+  \return the SALOME version number
+*/
 static QString salomeVersion()
 {
   QString path( ::getenv( "GUI_ROOT_DIR" ) );
@@ -62,9 +80,9 @@ static QString salomeVersion()
   return ver;
 }
 
-//============================================================
-// help(): print the help information
-//============================================================
+/*!
+  print the help information
+*/
 static void help()
 {
   std::cout << ""                                                                                                     << std::endl;
@@ -87,9 +105,9 @@ static void help()
   std::cout << ""                                                                                                     << std::endl;
 }
 
-//============================================================
-// main(): application main() function
-//============================================================
+/*!
+  application main() function
+*/
 int main( int argc, char** argv )
 {
   QApplication app( argc, argv );

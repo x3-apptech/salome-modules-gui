@@ -26,6 +26,9 @@
 #include <qpopupmenu.h>
 #include <qwidgetlist.h>
 
+/*!
+  Constructor
+*/
 QtxWorkstackAction::QtxWorkstackAction( QtxWorkstack* ws, QObject* parent, const char* name )
 : QtxAction( tr( "Controls windows into workstack" ), tr( "Workstack management" ), 0, parent, name ),
 myFlags( Standard ),
@@ -40,20 +43,33 @@ myWorkstack( ws )
   connect( myItem[HSplit], SIGNAL( activated() ), ws, SLOT( splitHorizontal() ) );
 }
 
+/*!
+  Destructor
+*/
 QtxWorkstackAction::~QtxWorkstackAction()
 {
 }
 
+/*!
+  \return corresponding workstack
+*/
 QtxWorkstack* QtxWorkstackAction::workstack() const
 {
   return myWorkstack;
 }
 
+/*!
+  \return set of action flags
+*/
 int QtxWorkstackAction::items() const
 {
   return myFlags;
 }
 
+/*!
+  Sets action flags
+  \param flags - new set of flags
+*/
 void QtxWorkstackAction::setItems( const int flags )
 {
   if ( !flags || flags == myFlags || !( flags & Split ) )
@@ -62,11 +78,19 @@ void QtxWorkstackAction::setItems( const int flags )
   myFlags = flags;
 }
 
+/*!
+  \return true if action contains all flags
+  \param flags - new set of flags
+*/
 bool QtxWorkstackAction::hasItems( const int flags ) const
 {
   return ( myFlags & flags ) == flags;
 }
 
+/*!
+  \return accelerator of item
+  \param id - item id
+*/
 int QtxWorkstackAction::accel( const int id ) const
 {
   int a = 0;
@@ -75,6 +99,10 @@ int QtxWorkstackAction::accel( const int id ) const
   return a;
 }
 
+/*!
+  \return icons of item
+  \param id - item id
+*/
 QIconSet QtxWorkstackAction::iconSet( const int id ) const
 {
   QIconSet ico;
@@ -83,6 +111,10 @@ QIconSet QtxWorkstackAction::iconSet( const int id ) const
   return ico;
 }
 
+/*!
+  \return menu text of item
+  \param id - item id
+*/
 QString QtxWorkstackAction::menuText( const int id ) const
 {
   QString txt;
@@ -91,6 +123,10 @@ QString QtxWorkstackAction::menuText( const int id ) const
   return txt;
 }
 
+/*!
+  \return status tip of item
+  \param id - item id
+*/
 QString QtxWorkstackAction::statusTip( const int id ) const
 {
   QString txt;
@@ -99,35 +135,64 @@ QString QtxWorkstackAction::statusTip( const int id ) const
   return txt;
 }
 
+/*!
+  Changes accelerator of item
+  \param id - item id
+  \param a - new accelerator
+*/
 void QtxWorkstackAction::setAccel( const int id, const int a )
 {
   if ( myItem.contains( id ) )
     myItem[id]->setAccel( a );
 }
 
+/*!
+  Changes icons of item
+  \param id - item id
+  \param ico - new icons
+*/
 void QtxWorkstackAction::setIconSet( const int id, const QIconSet& ico )
 {
   if ( myItem.contains( id ) )
     myItem[id]->setIconSet( ico );
 }
 
+/*!
+  Changes menu text of item
+  \param id - item id
+  \param txt - new menu text
+*/
 void QtxWorkstackAction::setMenuText( const int id, const QString& txt )
 {
   if ( myItem.contains( id ) )
     myItem[id]->setMenuText( txt );
 }
 
+/*!
+  Changes status tip of item
+  \param id - item id
+  \param txt - new status tip
+*/
 void QtxWorkstackAction::setStatusTip( const int id, const QString& txt )
 {
   if ( myItem.contains( id ) )
     myItem[id]->setStatusTip( txt );
 }
 
+/*!
+  Adds action to widget
+  \param wid - widget
+*/
 bool QtxWorkstackAction::addTo( QWidget* wid )
 {
   return addTo( wid, -1 );
 }
 
+/*!
+  Adds action to widget
+  \param wid - widget
+  \param idx - position
+*/
 bool QtxWorkstackAction::addTo( QWidget* wid, const int idx )
 {
   if ( !wid || !wid->inherits( "QPopupMenu" ) )
@@ -148,6 +213,10 @@ bool QtxWorkstackAction::addTo( QWidget* wid, const int idx )
   return true;
 }
 
+/*!
+  Removes action from widget
+  \param wid - widget
+*/
 bool QtxWorkstackAction::removeFrom( QWidget* wid )
 {
   if ( !wid || !wid->inherits( "QPopupMenu" ) )
@@ -167,6 +236,10 @@ bool QtxWorkstackAction::removeFrom( QWidget* wid )
   return true;
 }
 
+/*!
+  Performs action
+  \param type - action type
+*/
 void QtxWorkstackAction::perform( const int type )
 {
   switch ( type )
@@ -180,6 +253,9 @@ void QtxWorkstackAction::perform( const int type )
   }
 }
 
+/*!
+  SLOT: called just before the popup menu is displayed, updates popup
+*/
 void QtxWorkstackAction::onAboutToShow()
 {
   const QObject* obj = sender();
@@ -195,11 +271,18 @@ void QtxWorkstackAction::onAboutToShow()
   updatePopup( (QPopupMenu*)obj );
 }
 
+/*!
+  SLOT: called when popup menu is destroyed, removes it from menu
+*/
 void QtxWorkstackAction::onPopupDestroyed( QObject* obj )
 {
   myMenu.remove( (QPopupMenu*)obj );
 }
 
+/*!
+  Updates popup
+  \param pm - popup menu
+*/
 void QtxWorkstackAction::checkPopup( QPopupMenu* pm )
 {
   if ( !myMenu.contains( pm ) )
@@ -223,6 +306,10 @@ void QtxWorkstackAction::checkPopup( QPopupMenu* pm )
   }
 }
 
+/*!
+  Clears and refills popup and updates state of actions
+  \param pm - popup menu
+*/
 void QtxWorkstackAction::updatePopup( QPopupMenu* pm )
 {
   if ( !myMenu.contains( pm ) )
@@ -235,6 +322,10 @@ void QtxWorkstackAction::updatePopup( QPopupMenu* pm )
   myItem[HSplit]->setEnabled( count > 1 );
 }
 
+/*!
+  Clears popup
+  \param pm - popup menu
+*/
 int QtxWorkstackAction::clearPopup( QPopupMenu* pm )
 {
   if ( !myMenu.contains( pm ) )
@@ -254,6 +345,11 @@ int QtxWorkstackAction::clearPopup( QPopupMenu* pm )
   return idx;
 }
 
+/*!
+  Fills popup with items
+  \param pm - popup menu
+  \param idx - position
+*/
 void QtxWorkstackAction::fillPopup( QPopupMenu* pm, const int idx )
 {
   if ( !pm )
@@ -294,6 +390,9 @@ void QtxWorkstackAction::fillPopup( QPopupMenu* pm, const int idx )
   }
 }
 
+/*!
+  SLOT: called when popup item corresponding to window is activated, activates window
+*/
 void QtxWorkstackAction::onItemActivated( int idx )
 {
   QtxWorkstack* ws = workstack();

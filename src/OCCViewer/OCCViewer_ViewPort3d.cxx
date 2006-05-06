@@ -16,12 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-/***************************************************************************
-**  Class:   OCCViewer_ViewPort3D
-**  Descr:   Visualisation canvas with CasCade 3D view
-**  Module:  OCCViewer
-**  Created: UI team, 05.09.00
-****************************************************************************/
 
 #include "OCCViewer_ViewPort3d.h"
 
@@ -259,6 +253,10 @@ void OCCViewer_ViewPort3d::setBackgroundColor( const QColor& color )
 	}
 }
 
+/*!
+  Set animation mode
+  \param theDegenerated - degenerated mode
+*/
 void OCCViewer_ViewPort3d::setAnimationMode(bool theDegenerated)
 {
 	if ( !activeView().IsNull() )
@@ -348,6 +346,8 @@ void OCCViewer_ViewPort3d::endRotation()
 		if ( !myDegenerated )
       activeView()->SetDegenerateModeOff();
     activeView()->ZFitAll(1.);
+    activeView()->SetZSize(0.);
+    activeView()->Update();
 	}
 }
 
@@ -400,6 +400,7 @@ void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
 
   Standard_Real margin = 0.01;
   activeView()->FitAll( margin, withZ, upd );
+  activeView()->SetZSize(0.);
 }
 
 /*!

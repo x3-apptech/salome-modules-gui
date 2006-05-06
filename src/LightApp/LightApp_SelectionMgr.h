@@ -36,6 +36,10 @@
 
 class LightApp_Application;
 
+/*!
+  Custom selection manager, allowing to work with object selection
+  (additionally to data owners) and to access to sub-selection of objects
+*/
 class LIGHTAPP_EXPORT LightApp_SelectionMgr : public SUIT_SelectionMgr
 {
   Q_OBJECT

@@ -40,10 +40,18 @@
 
 class Standard_Transient;
 class Handle_Standard_Type;
+/*!
+  \class Handle(AIS_Shape)
+  Smart pointer (handle) to AIS_Shape
+*/
 class Handle(AIS_Shape);
 class SALOME_AISShape;
 Standard_EXPORT Handle_Standard_Type& STANDARD_TYPE(SALOME_AISShape);
 
+/*!
+  \class Handle(SALOME_AISShape)
+  Smart pointer (handle) to SALOME_AISShape
+*/
 class Handle(SALOME_AISShape) : public Handle(AIS_Shape) {
   public:
     inline void* operator new(size_t,void* anAddress) 

@@ -2,6 +2,7 @@ dnl Copyright (C) 2003  CEA/DEN, EDF R&D
 
 AC_DEFUN([CHECK_QWT],[
 AC_REQUIRE([CHECK_QT])dnl
+AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 
 AC_CHECKING(for qwt)
 
@@ -26,7 +27,7 @@ if test -z $QWTHOME; then
   exits_ok=no	
   if test "x$exits_ok" = "xno"; then
      for d in /usr/local /usr ; do
-        AC_CHECK_FILE(${d}/lib/libqwt.so,exits_ok=yes,exits_ok=no)
+        AC_CHECK_FILE(${d}/lib${LIB_LOCATION_SUFFIX}/libqwt.so,exits_ok=yes,exits_ok=no)
         if test "x$exits_ok" = "xyes"; then
            QWTHOME=$d
            AC_MSG_RESULT(libqwt.so detected in $d/lib)
@@ -91,7 +92,7 @@ then
   then
     LIBS="$LIBS -lqt-mt"
   else
-    LIBS="$LIBS -L$QTDIR/lib -lqt-mt"
+    LIBS="$LIBS -L$QTDIR/lib${LIB_LOCATION_SUFFIX} -lqt-mt"
   fi
   if test "x$QWTHOME" = "x/usr"
   then

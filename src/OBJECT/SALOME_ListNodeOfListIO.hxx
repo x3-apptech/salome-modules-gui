@@ -47,7 +47,10 @@ class SALOME_InteractiveObject;
 class SALOME_ListIO;
 class SALOME_ListIteratorOfListIO;
 
-
+/*!
+  \class SALOME_ListNodeOfListIO
+  Auxiliary class, represents list node for SALOME_ListIO
+*/
 class SALOME_ListNodeOfListIO : public TCollection_MapNode {
 
 public:

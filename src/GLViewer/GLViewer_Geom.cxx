@@ -19,23 +19,15 @@
 //  Author : OPEN CASCADE
 //
 
-/***************************************************************************
-**  Class:   GLViewer_Geom
-**  Descr:   
-**  Module:  GLViewer
-**  Created: UI team, 16.11.04
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include <GLViewer_Geom.h>
 
 #define FAR_POINT 1e10  // Value used as a "very distant" co-ordinate
 #define TOLERANCE 1e-3
 
-//================================================================
-// Function : GLViewer_Segment
-// Purpose  : constructs a real segment bounded by two points
-//================================================================
+/*!
+  constructs a real segment bounded by two points
+*/
 GLViewer_Segment::GLViewer_Segment( const GLViewer_Pnt& thePnt1, 
                                     const GLViewer_Pnt& thePnt2 )
 : myPnt1( thePnt1 ), 
@@ -46,11 +38,9 @@ GLViewer_Segment::GLViewer_Segment( const GLViewer_Pnt& thePnt1,
   myC = myPnt1.x() * myPnt2.y() - myPnt2.x() * myPnt1.y();
 }
 
-//================================================================
-// Function : GLViewer_Segment
-// Purpose  : constructs a ray starting at <thePnt> and directed
-//            along positive X axis direction (or Y axis if vertical )
-//================================================================
+/*!
+  constructs a ray starting at <thePnt> and directed along positive X axis direction (or Y axis if vertical )
+*/
 GLViewer_Segment::GLViewer_Segment( const GLViewer_Pnt& thePnt, 
                                     const GLfloat theA, 
                                     const GLfloat theB,
@@ -66,18 +56,16 @@ GLViewer_Segment::GLViewer_Segment( const GLViewer_Pnt& thePnt,
     myPnt2 = GLViewer_Pnt( FAR_POINT, - myA / myB * FAR_POINT - myC / myB );
 }
 
-//================================================================
-// Function : GLViewer_Segment
-// Purpose  : destructor, does nothing
-//================================================================
+/*!
+  destructor, does nothing
+*/
 GLViewer_Segment::~GLViewer_Segment()
 {
 }
 
-//================================================================
-// Function : HasIntersection
-// Purpose  : detects intersection with segment <theOther>
-//================================================================
+/*!
+  detects intersection with segment <theOther>
+*/
 bool GLViewer_Segment::HasIntersection( const GLViewer_Segment& theOther ) const
 {
   bool aRes = false;
@@ -113,27 +101,24 @@ bool GLViewer_Segment::HasIntersection( const GLViewer_Segment& theOther ) const
   return aRes;
 }
 
-//================================================================
-// Function : GLViewer_Poly
-// Purpose  : constructs a closed polygon from the given ordered list of points
-//================================================================
+/*!
+  constructs a closed polygon from the given ordered list of points
+*/
 GLViewer_Poly::GLViewer_Poly( const GLViewer_PntList* thePoints )
 : myPoints( (GLViewer_PntList*)thePoints )
 {
 }
 
-//================================================================
-// Function : ~GLViewer_Poly
-// Purpose  : destructor, <myPoints> mustn't be deleted here!
-//================================================================
+/*!
+  destructor, <myPoints> mustn't be deleted here!
+*/
 GLViewer_Poly::~GLViewer_Poly()
 {
 }
 
-//================================================================
-// Function : IsIn
-// Purpose  : returns true if <thePnt> lies within this polygon
-//================================================================
+/*!
+  \return true if <thePnt> lies within this polygon
+*/
 bool GLViewer_Poly::IsIn( const GLViewer_Pnt& thePnt ) const
 {
   if ( !myPoints )
@@ -159,11 +144,10 @@ bool GLViewer_Poly::IsIn( const GLViewer_Pnt& thePnt ) const
 
   return ( aNbInter % 2 == 1 );
 }
+/*!
+  \return true if <thePnt> lies within this polygon
+*/
 /*
-//================================================================
-// Function : IsIn
-// Purpose  : returns true if <thePnt> lies within this polygon
-//================================================================
 bool GLViewer_Poly::IsIn( const GLViewer_Pnt& thePnt, const float tolerance ) const
 {
   if ( !myPoints )
@@ -184,10 +168,9 @@ bool GLViewer_Poly::IsIn( const GLViewer_Pnt& thePnt, const float tolerance ) co
   return res;
 }
 */
-//================================================================
-// Function : IsCovers
-// Purpose  : returns true if <thePoly> covers this polygon
-//================================================================
+/*!
+  \return true if <thePoly> covers this polygon
+*/
 bool GLViewer_Poly::IsCovers( const GLViewer_Poly& thePoly ) const
 {
     if ( !myPoints || !thePoly.Count() )
@@ -204,10 +187,9 @@ bool GLViewer_Poly::IsCovers( const GLViewer_Poly& thePoly ) const
     return true;
 }
 
-//================================================================
-// Function : IsCovers
-// Purpose  : returns true if <theRect> covers this polygon
-//================================================================
+/*!
+  \return true if <theRect> covers this polygon
+*/
 bool GLViewer_Poly::IsCovers( const GLViewer_Rect& theRect ) const
 {
     if ( !myPoints ) //needs check for <theRect>
@@ -224,10 +206,10 @@ bool GLViewer_Poly::IsCovers( const GLViewer_Rect& theRect ) const
     return IsCovers( GLViewer_Poly( &aList ) );
 }
 
-//================================================================
-// Function : HasIntersection
-// Purpose  : looks for any 
-//================================================================
+/*!
+  \return true if polygon has intersection with segment or ray
+  \param theSegment - segment to check intersection
+*/
 bool GLViewer_Poly::HasIntersection( const GLViewer_Segment& theSegment ) const
 {
   if ( !myPoints )

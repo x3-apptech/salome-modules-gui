@@ -27,11 +27,10 @@
 
 #include <float.h>
 
-/*
-	Class: QtxDblSpinBox::Validator [internal]
-	Descr: Validator for QtxDblSpinBox (getted from Trolltech Qt - SpinBoxValidator)
+/*!
+  \class  QtxDblSpinBox::Validator [internal]
+  Validator for QtxDblSpinBox (getted from Trolltech Qt - SpinBoxValidator)
 */
-
 class QtxDblSpinBox::Validator : public QDoubleValidator
 {
 public:
@@ -44,6 +43,10 @@ private:
     QtxDblSpinBox* spinBox;
 };
 
+
+/*!
+  Checks string and \return QValidator::State
+*/
 QValidator::State QtxDblSpinBox::Validator::validate( QString& str, int& pos ) const
 {
   QString pref = spinBox->prefix();
@@ -84,11 +87,9 @@ QValidator::State QtxDblSpinBox::Validator::validate( QString& str, int& pos ) c
   return state;
 }
 
-/*
-	Class: QtxDblSpinBox
-	Descr: Spin box for real numbers.
+/*!
+  Constructor
 */
-
 QtxDblSpinBox::QtxDblSpinBox( QWidget* parent, const char* name )
 : QSpinBox( parent, name ),
 myCleared( false ),
@@ -106,6 +107,9 @@ myPrecision( 0 )
   connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
+/*!
+  Constructor
+*/
 QtxDblSpinBox::QtxDblSpinBox( double min, double max, double step, QWidget* parent, const char* name )
 : QSpinBox( parent, name ),
 myMin( min ),
@@ -123,25 +127,42 @@ myPrecision( 0 )
   connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
+/*!
+  Destructor
+*/
 QtxDblSpinBox::~QtxDblSpinBox()
 {
 }
 
+/*!
+  \return min value of spin box
+*/
 double QtxDblSpinBox::minValue() const
 {
   return myMin;
 }
 
+/*!
+  \return max value of spin box
+*/
 double QtxDblSpinBox::maxValue() const
 {
   return myMax;
 }
 
+/*!
+  Changes min value of spin box
+  \param min - new min value
+*/
 void QtxDblSpinBox::setMinValue( int min )
 {
 	setMinValue( (double)min );
 }
 
+/*!
+  Changes min value of spin box
+  \param min - new min value
+*/
 void QtxDblSpinBox::setMinValue( double min )
 {
   if ( myMin != min )
@@ -151,11 +172,19 @@ void QtxDblSpinBox::setMinValue( double min )
   }
 }
 
+/*!
+  Changes max value of spin box
+  \param max - new max value
+*/
 void QtxDblSpinBox::setMaxValue( int max )
 {
 	setMaxValue( (double)max );
 }
 
+/*!
+  Changes max value of spin box
+  \param max - new max value
+*/
 void QtxDblSpinBox::setMaxValue( double max )
 {
   if ( myMax != max )
@@ -165,11 +194,21 @@ void QtxDblSpinBox::setMaxValue( double max )
   }
 }
 
+/*!
+  Changes min and max value of spin box
+  \param min - new min value
+  \param max - new max value
+*/
 void QtxDblSpinBox::setRange( int min, int max )
 {
 	setRange( (double)min, (double)max );
 }
 
+/*!
+  Changes min and max value of spin box
+  \param min - new min value
+  \param max - new max value
+*/
 void QtxDblSpinBox::setRange( double min, double max )
 {
   if ( myMin != min || myMax != max )
@@ -180,21 +219,35 @@ void QtxDblSpinBox::setRange( double min, double max )
   }
 }
 
+/*!
+  \return step of spin box
+*/
 double QtxDblSpinBox::lineStep() const
 {
   return myStep;
 }
 
+/*!
+  Changes step of spin box
+  \param step - new step
+*/
 void QtxDblSpinBox::setLineStep( int step )
 {
   setLineStep( (double)step );
 }
 
+/*!
+  Changes step of spin box
+  \param step - new step
+*/
 void QtxDblSpinBox::setLineStep( double step )
 {
   myStep = step;
 }
 
+/*!
+  \return value of spin box
+*/
 double QtxDblSpinBox::value() const
 {
   QSpinBox::value();
@@ -202,11 +255,19 @@ double QtxDblSpinBox::value() const
   return myValue;
 }
 
+/*!
+  Changes value of spin box
+  \param val - new value of spin box
+*/
 void QtxDblSpinBox::setValue( int val )
 {
 	setValue( (double)val );
 }
 
+/*!
+  Changes value of spin box
+  \param val - new value of spin box
+*/
 void QtxDblSpinBox::setValue( double val )
 {
 	myCleared = false;
@@ -216,6 +277,9 @@ void QtxDblSpinBox::setValue( double val )
     valueChange();
 }
 
+/*!
+  Adds step to value
+*/
 void QtxDblSpinBox::stepUp()
 {
 	interpretText();
@@ -225,6 +289,9 @@ void QtxDblSpinBox::stepUp()
 		setValue( myValue + myStep );
 }
 
+/*!
+  Subtracks step from value
+*/
 void QtxDblSpinBox::stepDown()
 {
 	interpretText();
@@ -234,11 +301,18 @@ void QtxDblSpinBox::stepDown()
 		setValue( myValue - myStep );
 }
 
+/*!
+  \return number of digit after comma
+*/
 int QtxDblSpinBox::precision() const
 {
 	return myPrecision;
 }
 
+/*!
+  Changes number of digit after comma
+  \param prec - new digit number
+*/
 void QtxDblSpinBox::setPrecision( const int prec )
 {
 	int newPrec = QMAX( prec, 0 );
@@ -248,11 +322,18 @@ void QtxDblSpinBox::setPrecision( const int prec )
 		updateDisplay();
 }
 
+/*!
+  \return true if spin box is cleared
+*/
 bool QtxDblSpinBox::isCleared() const
 {
 	return myCleared;
 }
 
+/*!
+  Changes cleared status of spin box
+  \param on - new status
+*/
 void QtxDblSpinBox::setCleared( const bool on )
 {
 	if ( myCleared == on )
@@ -262,6 +343,9 @@ void QtxDblSpinBox::setCleared( const bool on )
 	updateDisplay();
 }
 
+/*!
+  Selects all content of spin box editor
+*/
 void QtxDblSpinBox::selectAll()
 {
 #if QT_VER >= 3
@@ -271,6 +355,9 @@ void QtxDblSpinBox::selectAll()
 #endif
 }
 
+/*!
+  Custom event filter, updates text of spin box editor
+*/
 bool QtxDblSpinBox::eventFilter( QObject* o, QEvent* e )
 {
   if ( !myCleared || o != editor() || !editor()->text().stripWhiteSpace().isEmpty() )
@@ -294,6 +381,9 @@ bool QtxDblSpinBox::eventFilter( QObject* o, QEvent* e )
   return QSpinBox::eventFilter( o, e );
 }
 
+/*!
+  Updates text of editor
+*/
 void QtxDblSpinBox::updateDisplay()
 {
   if ( myBlocked )
@@ -332,6 +422,9 @@ void QtxDblSpinBox::updateDisplay()
   myBlocked = isBlock;
 }
 
+/*!
+  Sets double value by text in editor
+*/
 void QtxDblSpinBox::interpretText()
 {
   myCleared = false;
@@ -356,6 +449,9 @@ void QtxDblSpinBox::interpretText()
   updateDisplay();
 }
 
+/*!
+  Emits signal "valueChanged"
+*/
 void QtxDblSpinBox::valueChange()
 {
   updateDisplay();
@@ -363,6 +459,9 @@ void QtxDblSpinBox::valueChange()
   emit valueChanged( currentValueText() );
 }
 
+/*!
+  Attune parameters on range changing
+*/
 void QtxDblSpinBox::rangeChange()
 {
   double min = QMIN( myMin, myMax );
@@ -382,6 +481,9 @@ void QtxDblSpinBox::rangeChange()
   updateDisplay();
 }
 
+/*!
+  \return text of editor
+*/
 QString QtxDblSpinBox::currentValueText()
 {
   QString s;
@@ -396,6 +498,10 @@ QString QtxDblSpinBox::currentValueText()
   return s;
 }
 
+/*!
+  Converts number to string
+  \param v - number to be converted
+*/
 QString QtxDblSpinBox::mapValueToText( double v )
 {
 	QString s;
@@ -403,6 +509,9 @@ QString QtxDblSpinBox::mapValueToText( double v )
   return removeTrailingZeroes( s );
 }
 
+/*!
+  Converts value to string
+*/
 QString QtxDblSpinBox::mapValueToText( int )
 {
   QString s;
@@ -410,6 +519,9 @@ QString QtxDblSpinBox::mapValueToText( int )
   return removeTrailingZeroes( s );
 }
 
+/*!
+  Converts current text of editor to double
+*/
 double QtxDblSpinBox::mapTextToDoubleValue( bool* ok )
 {
   QString s = text();
@@ -422,6 +534,10 @@ double QtxDblSpinBox::mapTextToDoubleValue( bool* ok )
   return newVal;
 }
 
+/*!
+  \return value corrected in accordance with borders
+  \param val - value to be corrected
+*/
 double QtxDblSpinBox::bound( double val )
 {
   double newVal = val;
@@ -432,12 +548,18 @@ double QtxDblSpinBox::bound( double val )
   return newVal;
 }
 
+/*!
+  Custom handler for leave event
+*/
 void QtxDblSpinBox::leaveEvent( QEvent* e )
 {
 	if ( !myCleared )
 		QSpinBox::leaveEvent( e );
 }
 
+/*!
+  Custom handler for wheel event
+*/
 void QtxDblSpinBox::wheelEvent( QWheelEvent* e )
 {
   if ( !isEnabled() )
@@ -447,12 +569,18 @@ void QtxDblSpinBox::wheelEvent( QWheelEvent* e )
   updateDisplay();
 }
 
+/*!
+  SLOT: called if text is changed
+*/
 void QtxDblSpinBox::onTextChanged( const QString& str )
 {
   if ( !myBlocked )
     myCleared = false;
 }
 
+/*!
+  \return string without excess zeros in start and in end
+*/
 QString QtxDblSpinBox::removeTrailingZeroes( const QString& src ) const
 {
   QString delim( "." );

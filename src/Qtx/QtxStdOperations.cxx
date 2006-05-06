@@ -21,26 +21,23 @@
 #include <math.h>
 #include <stdlib.h>
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxStdOperations::QtxStdOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxStdOperations::~QtxStdOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Fills list of brackets treated as open (when 'open' is 'true') or close ('open' is 'false')
+*/
 void QtxStdOperations::bracketsList( QStringList& list, bool open ) const
 {
     if( open )
@@ -49,19 +46,17 @@ void QtxStdOperations::bracketsList( QStringList& list, bool open ) const
         list.append( ")" );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Fills list with operation names by copying of internal list of operations
+*/
 void QtxStdOperations::opersList( QStringList& list ) const
 {
-    list += myOpers;
+  list += myOpers;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Add operation names from list to internal list of operations
+*/
 void QtxStdOperations::addOperations( const QStringList& list )
 {
     QStringList::const_iterator anIt = list.begin(),
@@ -71,10 +66,9 @@ void QtxStdOperations::addOperations( const QStringList& list )
             myOpers.append( *anIt );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Append operation names from 'list' to internal list of operations
+*/
 void QtxStdOperations::addTypes( const ListOfTypes& list )
 {
     ListOfTypes::const_iterator anIt = list.begin(),
@@ -84,10 +78,12 @@ void QtxStdOperations::addTypes( const ListOfTypes& list )
             myTypes.append( *anIt );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   \return whether values with passed types are valid for arguments of operation
+   \param op - name of operation
+   \param t1 - type of first argument
+   \param t2 - type of second argument
+*/
 QtxParser::Error QtxStdOperations::isValid( const QString& op,
                                             const QVariant::Type t1,
                                             const QVariant::Type t2 ) const
@@ -110,10 +106,9 @@ QtxParser::Error QtxStdOperations::isValid( const QString& op,
 
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxArithmetics::QtxArithmetics()
 : QtxStdOperations()
 {
@@ -138,18 +133,16 @@ QtxArithmetics::QtxArithmetics()
     addTypes( aTypes );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxArithmetics::~QtxArithmetics()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates numbers by it's string representation [redefined virtual]
+*/
 bool QtxArithmetics::createValue( const QString& str, QtxValue& v ) const
 {
     bool ok = false;
@@ -164,10 +157,10 @@ bool QtxArithmetics::createValue( const QString& str, QtxValue& v ) const
     return ok;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    \return priority of arithmetic operation 'op'.
+    \param isBin indicate whether the operation is binary
+*/
 int QtxArithmetics::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
@@ -191,10 +184,13 @@ void set( QVariant& v1, bool v2 )
     v1 = QVariant( v2, 0 );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxArithmetics::calculate( const QString& op, 
                                                 QtxValue& v1, QtxValue& v2 ) const
 {
@@ -286,10 +282,9 @@ QtxParser::Error QtxArithmetics::calculate( const QString& op,
 
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxLogic::QtxLogic()
 : QtxStdOperations()
 {
@@ -312,18 +307,16 @@ QtxLogic::QtxLogic()
     addTypes( aTypes );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxLogic::~QtxLogic()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates value 'true' or 'false' it's string representation [redefined virtual]
+*/
 bool QtxLogic::createValue( const QString& str, QtxValue& v ) const
 {
     bool ok = true;
@@ -337,10 +330,10 @@ bool QtxLogic::createValue( const QString& str, QtxValue& v ) const
     return ok;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    \return priority of arithmetic operation 'op'.
+    \param isBin indicate whether the operation is binary
+*/
 int QtxLogic::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
@@ -370,10 +363,13 @@ bool boolean_value( const QtxValue& v )
     return false;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxLogic::calculate( const QString& op,
                                           QtxValue& v1, QtxValue& v2 ) const
 {
@@ -405,10 +401,9 @@ QtxParser::Error QtxLogic::calculate( const QString& op,
 
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxFunctions::QtxFunctions()
 : QtxStdOperations()
 {
@@ -427,18 +422,16 @@ QtxFunctions::QtxFunctions()
     addTypes( aTypes );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxFunctions::~QtxFunctions()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates numbers by it's string representation [redefined virtual]
+*/
 bool QtxFunctions::createValue( const QString& str, QtxValue& v ) const
 {
     bool ok = false;
@@ -453,10 +446,10 @@ bool QtxFunctions::createValue( const QString& str, QtxValue& v ) const
     return ok;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    \return priority of arithmetic operation 'op'.
+    \param isBin indicate whether the operation is binary
+*/
 int QtxFunctions::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
@@ -468,10 +461,13 @@ int QtxFunctions::prior( const QString& op, bool isBin ) const
         return 0;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxFunctions::calculate( const QString& op,
                                           QtxValue& v1, QtxValue& v2 ) const
 {
@@ -506,10 +502,9 @@ QtxParser::Error QtxFunctions::calculate( const QString& op,
 
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxStrings::QtxStrings()
 : QtxStdOperations()
 {
@@ -536,18 +531,16 @@ QtxStrings::QtxStrings()
 }
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxStrings::~QtxStrings()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates string QtxValue by it's Qt string representation [redefined virtual]
+*/
 bool QtxStrings::createValue( const QString& str, QtxValue& v ) const
 {
     QChar st = str[0],
@@ -561,10 +554,10 @@ bool QtxStrings::createValue( const QString& str, QtxValue& v ) const
         return QtxStdOperations::createValue( str, v );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    \return priority of arithmetic operation 'op'.
+    \param isBin indicate whether the operation is binary
+*/
 int QtxStrings::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
@@ -582,10 +575,13 @@ int QtxStrings::prior( const QString& op, bool isBin ) const
             return 0;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxStrings::calculate( const QString& op,
                                             QtxValue& v1, QtxValue& v2 ) const
 {
@@ -628,10 +624,9 @@ QtxParser::Error QtxStrings::calculate( const QString& op,
 
 
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Default constructor
+*/
 QtxSets::QtxSets()
 {
     QStringList aList;
@@ -652,18 +647,16 @@ QtxSets::QtxSets()
     addTypes( aTypes );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Destructor
+*/
 QtxSets::~QtxSets()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Fills list of brackets treated as open (when 'open' is 'true') or close ('open' is 'false')
+*/
 void QtxSets::bracketsList( QStringList& list, bool open ) const
 {
     if( open )
@@ -673,19 +666,18 @@ void QtxSets::bracketsList( QStringList& list, bool open ) const
     QtxStdOperations::bracketsList( list, open );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Creates set of QtxValues by their string representation [redefined virtual]
+*/
 bool QtxSets::createValue( const QString& str, QtxValue& val ) const
 {
     return QtxStdOperations::createValue( str, val );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    \return priority of arithmetic operation 'op'.
+    \param isBin indicate whether the operation is binary
+*/
 int QtxSets::prior( const QString& op, bool isBin ) const
 {
     if( isBin )
@@ -707,10 +699,12 @@ int QtxSets::prior( const QString& op, bool isBin ) const
             return 0;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   \return whether values with passed types are valid for arguments of operation
+   \param op - name of operation
+   \param t1 - type of first argument
+   \param t2 - type of second argument
+*/
 QtxParser::Error QtxSets::isValid( const QString& op,
                                    const QVariant::Type t1,
                                    const QVariant::Type t2 ) const
@@ -726,20 +720,18 @@ QtxParser::Error QtxSets::isValid( const QString& op,
         return QtxStdOperations::isValid( op, t1, t2 );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Adds new value 'v' to set 'set' [static]
+*/
 void QtxSets::add( ValueSet& set, const QtxValue& v )
 {
     if( v.isValid() && set.contains( v )==0 )
         set.append( v );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Adds values from set 's2' to set 's1'
+*/
 void QtxSets::add( ValueSet& s1, const ValueSet& s2 )
 {
     ValueSet::const_iterator anIt = s2.begin(),
@@ -748,19 +740,17 @@ void QtxSets::add( ValueSet& s1, const ValueSet& s2 )
         add( s1, *anIt );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Removes value 'v' from set 'set'
+*/
 void QtxSets::remove( ValueSet& set, const QtxValue& v )
 {
     set.remove( v );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   Removes values of set 's2' from set 's1'
+*/
 void QtxSets::remove( ValueSet& s1, const ValueSet& s2 )
 {
     ValueSet::const_iterator anIt = s2.begin(),
@@ -769,10 +759,13 @@ void QtxSets::remove( ValueSet& s1, const ValueSet& s2 )
         s1.remove( *anIt );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxSets::calculate( const QString& op, QtxValue& v1, QtxValue& v2 ) const
 {
     QtxParser::Error err = QtxParser::OK;

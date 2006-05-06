@@ -30,6 +30,7 @@
 #define SVTK_Renderer_h
 
 #include "SVTK.h"
+#include "VTKViewer.h"
 
 #include <vtkObject.h>
 #include <vtkSmartPointer.h>
@@ -52,13 +53,13 @@ class VTKViewer_Actor;
 class SVTK_Selector;
 
 
-//! The class is a container for #vtkRenderer instance.
-/*!
+/*! 
+  \class SVTK_Renderer
+  The class is a container for #vtkRenderer instance.
   Main goal of the class is to apply common behaviour to all #SALOME_Actor, like
   selection and preselection colors.
   Also, the class is responsible for management of internal actors like trihedron an so on.
  */
-//============================================================================
 class SVTK_EXPORT SVTK_Renderer : public vtkObject
 {
  public:
@@ -77,12 +78,12 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
 	     SVTK_Selector* theSelector);
 
   //----------------------------------------------------------------------------
-  //! This method publishes pointed actor into the renderer
+  //! Publishes pointed actor into the renderer
   virtual
   void 
   AddActor(VTKViewer_Actor* theActor);
 
-  //! This method removes pointed actor from the renderer
+  //! Removes pointed actor from the renderer
   virtual
   void 
   RemoveActor(VTKViewer_Actor* theActor);
@@ -91,12 +92,12 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   VTKViewer_Transform* 
   GetTransform();
 
-  //! This method allow to apply a scale on the whole scene
+  //! Allows to apply a scale on the whole scene
   virtual
   void
   SetScale( double theScale[3] );
 
-  //! This method allow to get a scale that is applied on the whole scene
+  //! Allows to get a scale that is applied on the whole scene
   void
   GetScale( double theScale[3] );
 
@@ -115,7 +116,7 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
 		      const double& theBlue = 1, 
 		      const int& theWidth = 5);
 
-  //! Setup requested tollerance for the picking
+  //! Setup requested tolerance for the picking
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
 			const double& theTolCell = 0.001);
@@ -209,7 +210,7 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
 
   //----------------------------------------------------------------------------
   // Priority at which events are processed
-  float myPriority;
+  vtkFloatingPointType myPriority;
 
   // Used to process events
   vtkSmartPointer<vtkCallbackCommand> myEventCallbackCommand;
@@ -244,7 +245,7 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   vtkSmartPointer<VTKViewer_Trihedron> myTrihedron;  
   int  myTrihedronSize;
   bool myIsTrihedronRelative;
-  float myBndBox[6];
+  vtkFloatingPointType myBndBox[6];
 };
 
 #endif

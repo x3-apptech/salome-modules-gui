@@ -22,7 +22,10 @@
 #include "SUIT_DataObject.h"
 
 /*!
-  Class provide data object iterator.
+  \class SUIT_DataObjectIterator
+  Provides functionality of SUIT tree detour
+  It is possible to use "to-depth" or "to-breadth" detour and
+  to control level detour (from left or from right)
 */
 class SUIT_EXPORT SUIT_DataObjectIterator
 {
@@ -51,6 +54,11 @@ private:
   int               myDetourType, myCurrentLevel;
 };
 
+/*!
+  \class SUIT_DataObjectIterator
+  Provides functionality of SUIT tree detour between certain levels 
+  Only "to-breadth" detour is used
+*/
 class SUIT_DataObjectLevelIterator : public SUIT_DataObjectIterator
 {
 public:

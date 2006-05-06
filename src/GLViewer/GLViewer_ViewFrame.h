@@ -22,12 +22,6 @@
 // File:      GLViewer_ViewFrame.h
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_ViewFrame
-**  Descr:   Frame window for viewport in QAD-based application
-**  Module:  QAD
-**  Created: UI team, 05.09.00
-****************************************************************************/
 #ifndef GLVIEWER_VIEWFRAME_H
 #define GLVIEWER_VIEWFRAME_H
 
@@ -47,8 +41,9 @@ class GLViewer_ViewPort;
 #pragma warning( disable:4251 )
 #endif
 
-/*! Class GLViewer_ViewFrame
-*   Frame window for viewport in GLViewer
+/*!
+  \class GLViewer_ViewFrame
+  Frame window for viewport in QAD-based application
 */
 
 class GLVIEWER_API GLViewer_ViewFrame: public SUIT_ViewWindow

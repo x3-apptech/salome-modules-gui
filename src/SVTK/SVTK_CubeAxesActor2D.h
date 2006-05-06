@@ -41,7 +41,8 @@ class vtkPolyDataMapper;
 class vtkRectilinearGridGeometryFilter;
 class VTKViewer_Transform;
 
-#include <SVTK.h>
+#include "SVTK.h"
+#include "VTKViewer.h"
 
 #ifndef WNT
 class VTK_HYBRID_EXPORT SVTK_CubeAxesActor2D : public vtkCubeAxesActor2D

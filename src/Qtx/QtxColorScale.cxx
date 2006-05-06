@@ -34,12 +34,9 @@
 
 #include <math.h>
 
-/*********************************************************************
-**  Class:  QtxColorScale
-**  Descr:  Color Scale widget.
-**  Level:  Public
-*********************************************************************/
-
+/*!
+  Constructor
+*/
 QtxColorScale::QtxColorScale( QWidget* parent, const char* name, WFlags f )
 : QFrame( parent, name, f | WResizeNoErase | WRepaintNoErase ),
 myDock( 0 ),
@@ -59,6 +56,9 @@ myFlags( AtBorder | WrapTitle )
 	setCaption( tr ( "Color scale" ) );
 }
 
+/*!
+  Constructor
+*/
 QtxColorScale::QtxColorScale( const int num, QWidget* parent, const char* name, WFlags f )
 : QFrame( parent, name, f | WResizeNoErase | WRepaintNoErase ),
 myDock( 0 ),
@@ -80,6 +80,9 @@ myFlags( AtBorder | WrapTitle )
 
 #if QT_VER == 3
 
+/*!
+  Constructor
+*/
 QtxColorScale::QtxColorScale( Dock* dock, const char* name, WFlags f )
 : QFrame( dock, name, f | WResizeNoErase | WRepaintNoErase ),
 myMin( 0.0 ),
@@ -101,107 +104,89 @@ myFlags( AtBorder | WrapTitle )
 
 #endif
 
+/*!
+  Destructor
+*/
 QtxColorScale::~QtxColorScale()
 {
 }
 
-//================================================================
-// Function : minimum
-// Purpose  : Returns minimal limit of scale.
-//================================================================
-
+/*!
+  \returns minimal limit of scale.
+*/
 double QtxColorScale::minimum() const
 {
 	return myMin;
 }
 
-//================================================================
-// Function : maximum
-// Purpose  : Returns maximal limit of scale.
-//================================================================
-
+/*!
+  \return maximal limit of scale.
+*/
 double QtxColorScale::maximum() const
 {
 	return myMax;
 }
 
-//================================================================
-// Function : range
-// Purpose  : Returns range (minimal and maximal limits) of scale.
-//================================================================
-
+/*!
+  \return range (minimal and maximal limits) of scale.
+*/
 void QtxColorScale::range( double& min, double& max ) const
 {
 	min = myMin;
 	max = myMax;
 }
 
-//================================================================
-// Function : title
-// Purpose  : Returns the current title string.
-//================================================================
-
+/*!
+  \return the current title string.
+*/
 QString QtxColorScale::title() const
 {
 	return myTitle;
 }
 
-//================================================================
-// Function : format
-// Purpose  : Returns the current format of number presentation in
-//            labels for Auto label mode (sprintf specification).
-//================================================================
-
+/*!
+  \returns the current format of number presentation in labels for Auto label mode (sprintf specification).
+*/
 QString QtxColorScale::format() const
 {
 	return myFormat;
 }
 
-//================================================================
-// Function : dumpMode
-// Purpose  : Returns dump mode.
-//================================================================
-
+/*!
+  \return dump mode.
+*/
 int QtxColorScale::dumpMode() const
 {
 	return myDumpMode;
 }
 
-//================================================================
-// Function : labelMode
-// Purpose  : Returns label mode.
-//================================================================
-
+/*!
+  \return label mode.
+*/
 int QtxColorScale::labelMode() const
 {
 	return myLabelMode;
 }
 
-//================================================================
-// Function : colorMode
-// Purpose  : Returns color mode.
-//================================================================
-
+/*!
+  \return color mode.
+*/
 int QtxColorScale::colorMode() const
 {
 	return myColorMode;
 }
 
-//================================================================
-// Function : intervalsNumber
-// Purpose  : Returns intervals number of color scale.
-//================================================================
-
+/*!
+  \return intervals number of color scale.
+*/
 int QtxColorScale::intervalsNumber() const
 {
 	return myInterval;
 }
 
-//================================================================
-// Function : label
-// Purpose  : Returns the user label of specified interval.
-//================================================================
-
+/*!
+  \return the user label of specified interval.
+*/
 QString QtxColorScale::label( const int idx ) const
 {
 	QString res;
@@ -210,11 +195,9 @@ QString QtxColorScale::label( const int idx ) const
 	return res;
 }
 
-//================================================================
-// Function : color
-// Purpose  : Returns the user color of specified interval.
-//================================================================
-
+/*!
+  \return the user color of specified interval.
+*/
 QColor QtxColorScale::color( const int idx ) const
 {
 	QColor res;
@@ -223,71 +206,57 @@ QColor QtxColorScale::color( const int idx ) const
 	return res;
 }
 
-//================================================================
-// Function : labels
-// Purpose  : Returns the user labels.
-//================================================================
-
+/*!
+  \return the user labels.
+*/
 void QtxColorScale::labels( QStringList& list ) const
 {
 	list = myLabels;
 }
 
-//================================================================
-// Function : colors
-// Purpose  : Returns the user color.
-//================================================================
-
+/*!
+  \return the user color.
+*/
 void QtxColorScale::colors( QValueList<QColor>& list ) const
 {
 	list = myColors;
 }
 
-//================================================================
-// Function : labelPosition
-// Purpose  : Returns the label position.
-//================================================================
-
+/*!
+  \return the label position.
+*/
 int QtxColorScale::labelPosition() const
 {
 	return myLabelPos;
 }
 
-//================================================================
-// Function : titlePosition
-// Purpose  : Returns the title position.
-//================================================================
-
+/*!
+  \return the title position.
+*/
 int QtxColorScale::titlePosition() const
 {
 	return myTitlePos;
 }
 
-//================================================================
-// Function : setMinimum
-// Purpose  : Sets the minimum limit.
-//================================================================
-
+/*!
+  Sets the minimum limit.
+*/
 void QtxColorScale::setMinimum( const double val )
 {
 	setRange( val, maximum() );
 }
 
-//================================================================
-// Function : setMaximum
-// Purpose  : Sets the maximum limit.
-//================================================================
-
+/*!
+  Sets the maximum limit.
+*/
 void QtxColorScale::setMaximum( const double val )
 {
 	setRange( minimum(), val );
 }
 
-//================================================================
-// Function : setRange
-// Purpose  : Sets the minimum and maximum limits.
-//================================================================
-
+/*!
+  Sets the minimum and maximum limits.
+*/
 void QtxColorScale::setRange( const double min, const double max )
 {
 	if ( myMin == min && myMax == max )
@@ -302,11 +271,9 @@ void QtxColorScale::setRange( const double min, const double max )
 		updateScale();
 }
 
-//================================================================
-// Function : setTitle
-// Purpose  : Sets the title string.
-//================================================================
-
+/*!
+  Sets the title string.
+*/
 void QtxColorScale::setTitle( const QString& str )
 {
 	if ( myTitle == str )
@@ -316,12 +283,10 @@ void QtxColorScale::setTitle( const QString& str )
 	updateScale();
 }
 
-//================================================================
-// Function : setFormat
-// Purpose  : Sets the format of number presentation in labels for
-//            Auto label mode (sprintf specification).
-//================================================================
-
+/*!
+  Sets the format of number presentation in labels for
+  Auto label mode (sprintf specification).
+*/
 void QtxColorScale::setFormat( const QString& format )
 {
 	if ( myFormat == format )
@@ -333,11 +298,9 @@ void QtxColorScale::setFormat( const QString& format )
 		updateScale();
 }
 
-//================================================================
-// Function : setIntervalsNumber
-// Purpose  : Sets the number of intervals.
-//================================================================
-
+/*!
+  Sets the number of intervals.
+*/
 void QtxColorScale::setIntervalsNumber( const int num )
 {
 	if ( myInterval == num || num < 1 )
@@ -349,13 +312,11 @@ void QtxColorScale::setIntervalsNumber( const int num )
 	updateScale();
 }
 
-//================================================================
-// Function : setLabel
-// Purpose  : Sets the user label for specified interval. If number
-//            of interval is negative then user label will be added
-//            as new at the end of list.
-//================================================================
-
+/*!
+  Sets the user label for specified interval. If number
+  of interval is negative then user label will be added
+  as new at the end of list.
+*/
 void QtxColorScale::setLabel( const QString& txt, const int idx )
 {
 	bool changed = false;
@@ -376,13 +337,11 @@ void QtxColorScale::setLabel( const QString& txt, const int idx )
 		updateScale();
 }
 
-//================================================================
-// Function : setColor
-// Purpose  : Sets the user color for specified interval. If number
-//            of interval is negative then user color will be added
-//            as new at the end of list.
-//================================================================
-
+/*!
+  Sets the user color for specified interval. If number
+  of interval is negative then user color will be added
+  as new at the end of list.
+*/
 void QtxColorScale::setColor( const QColor& clr, const int idx )
 {
 	bool changed = false;
@@ -403,11 +362,9 @@ void QtxColorScale::setColor( const QColor& clr, const int idx )
 		updateScale();
 }
 
-//================================================================
-// Function : setLabels
-// Purpose  : Replace the all user label with specified list.
-//================================================================
-
+/*!
+  Replace the all user label with specified list.
+*/
 void QtxColorScale::setLabels( const QStringList& list )
 {
 	if ( list.isEmpty() )
@@ -417,11 +374,9 @@ void QtxColorScale::setLabels( const QStringList& list )
 	updateScale();
 }
 
-//================================================================
-// Function : setColors
-// Purpose  : Replace the all user colors with specified list.
-//================================================================
-
+/*!
+  Replace the all user colors with specified list.
+*/
 void QtxColorScale::setColors( const QValueList<QColor>& list )
 {
 	if ( list.isEmpty() )
@@ -431,11 +386,9 @@ void QtxColorScale::setColors( const QValueList<QColor>& list )
 	updateScale();
 }
 
-//================================================================
-// Function : setColorMode
-// Purpose  : Sets the color mode (Auto or User).
-//================================================================
-
+/*!
+  Sets the color mode (Auto or User).
+*/
 void QtxColorScale::setColorMode( const int mode )
 {
 	if ( myColorMode == mode )
@@ -445,21 +398,17 @@ void QtxColorScale::setColorMode( const int mode )
 	updateScale();
 }
 
-//================================================================
-// Function : setDumpMode
-// Purpose  : Sets the dump mode.
-//================================================================
-
+/*!
+  Sets the dump mode.
+*/
 void QtxColorScale::setDumpMode( const int mode )
 {
 	myDumpMode = mode;
 }
 
-//================================================================
-// Function : setLabelMode
-// Purpose  : Sets the label mode (Auto or User).
-//================================================================
-
+/*!
+  Sets the label mode (Auto or User).
+*/
 void QtxColorScale::setLabelMode( const int mode )
 {
 	if ( myLabelMode != mode )
@@ -469,11 +418,9 @@ void QtxColorScale::setLabelMode( const int mode )
 	}
 }
 
-//================================================================
-// Function : setLabelPosition
-// Purpose  : Sets the label position.
-//================================================================
-
+/*!
+  Sets the label position.
+*/
 void QtxColorScale::setLabelPosition( const int pos )
 {
 	if ( myLabelPos != pos && pos >= None && pos <= Center )
@@ -483,11 +430,9 @@ void QtxColorScale::setLabelPosition( const int pos )
 	}
 }
 
-//================================================================
-// Function : setTitlePosition
-// Purpose  : Sets the title position.
-//================================================================
-
+/*!
+  Sets the title position.
+*/
 void QtxColorScale::setTitlePosition( const int pos )
 {
 	if ( myTitlePos != pos && pos >= None && pos <= Center )
@@ -497,11 +442,9 @@ void QtxColorScale::setTitlePosition( const int pos )
 	}
 }
 
-//================================================================
-// Function : setFlags
-// Purpose  : Set the specified flags.
-//================================================================
-
+/*!
+  Set the specified flags.
+*/
 void QtxColorScale::setFlags( const int flags )
 {
 	int prev = myFlags;
@@ -510,21 +453,17 @@ void QtxColorScale::setFlags( const int flags )
 		updateScale();
 }
 
-//================================================================
-// Function : testFlags
-// Purpose  : Returns true if specified flags are setted.
-//================================================================
-
+/*!
+  \return true if specified flags are setted.
+*/
 bool QtxColorScale::testFlags( const int flags ) const
 {
 	return ( myFlags & flags ) == flags;
 }
 
-//================================================================
-// Function : clearFlags
-// Purpose  : Clear (reset) the specified flags.
-//================================================================
-
+/*!
+  Clear (reset) the specified flags.
+*/
 void QtxColorScale::clearFlags( const int flags )
 {
 	int prev = myFlags;
@@ -533,33 +472,27 @@ void QtxColorScale::clearFlags( const int flags )
 		updateScale();
 }
 
-//================================================================
-// Function : minimumSizeHint
-// Purpose  : 
-//================================================================
-
+/*!
+  \return minimum size hint
+*/
 QSize QtxColorScale::minimumSizeHint() const
 {
   QSize sz = calculateSize( true, myFlags, titlePosition() != None, labelPosition() != None, true );
 	return sz + QSize( frameWidth(), frameWidth() );
 }
 
-//================================================================
-// Function : sizeHint
-// Purpose  : 
-//================================================================
-
+/*!
+  \return size hint
+*/
 QSize QtxColorScale::sizeHint() const
 {
   QSize sz = calculateSize( false, myFlags, titlePosition() != None, labelPosition() != None, true );
 	return sz + QSize( frameWidth(), frameWidth() );
 }
 
-//================================================================
-// Function : calculateSize
-// Purpose  : Dump color scale into pixmap with current size.
-//================================================================
-
+/*!
+  Dump color scale into pixmap with current size.
+*/
 QSize QtxColorScale::calculateSize( const bool min, const int flags, const bool title,
 								                    const bool labels, const bool colors ) const
 {
@@ -631,11 +564,9 @@ QSize QtxColorScale::calculateSize( const bool min, const int flags, const bool 
 	return QSize( W, H );
 }
 
-//================================================================
-// Function : dump
-// Purpose  : Dump color scale into pixmap with current size.
-//================================================================
-
+/*!
+  Dump color scale into pixmap with current size.
+*/
 QPixmap QtxColorScale::dump() const
 {
 	QPixmap aPix;
@@ -667,11 +598,9 @@ QPixmap QtxColorScale::dump() const
 	return aPix;
 }
 
-//================================================================
-// Function : dump
-// Purpose  : Dump color scale into pixmap with specified size.
-//================================================================
-
+/*!
+  Dump color scale into pixmap with specified size.
+*/
 QPixmap QtxColorScale::dump( const int w, const int h ) const
 {
 #if QT_VER < 3
@@ -681,12 +610,9 @@ QPixmap QtxColorScale::dump( const int w, const int h ) const
 #endif
 }
 
-//================================================================
-// Function : dump
-// Purpose  : Dump color scale into pixmap with specified size
-//            and background color.
-//================================================================
-
+/*!
+  Dump color scale into pixmap with specified size and background color.
+*/
 QPixmap QtxColorScale::dump( const QColor& bg, const int w, const int h ) const
 {
 	QPixmap aPix;
@@ -724,11 +650,9 @@ QPixmap QtxColorScale::dump( const QColor& bg, const int w, const int h ) const
 	return aPix;
 }
 
-//================================================================
-// Function : show
-// Purpose  : Show the color scale. [Reimplemented]
-//================================================================
-
+/*!
+  Show the color scale. [Reimplemented]
+*/
 void QtxColorScale::show()
 {
 #if QT_VER == 3
@@ -739,11 +663,9 @@ void QtxColorScale::show()
 	QFrame::show();
 }
 
-//================================================================
-// Function : hide
-// Purpose  : Hides the color scale. [Reimplemented]
-//================================================================
-
+/*!
+  Hides the color scale. [Reimplemented]
+*/
 void QtxColorScale::hide()
 {
 #if QT_VER == 3
@@ -754,11 +676,9 @@ void QtxColorScale::hide()
 	QFrame::hide();
 }
 
-//================================================================
-// Function : drawContents
-// Purpose  : Draw color scale contents. [Reimplemented]
-//================================================================
-
+/*!
+  Draw color scale contents. [Reimplemented]
+*/
 void QtxColorScale::drawContents( QPainter* p )
 {
 	if ( !isUpdatesEnabled() )
@@ -771,11 +691,9 @@ void QtxColorScale::drawContents( QPainter* p )
 			   titlePosition() != None, labelPosition() != None, true );
 }
 
-//================================================================
-// Function : drawScale
-// Purpose  : Draw color scale contents.
-//================================================================
-
+/*!
+  Draw color scale contents.
+*/
 void QtxColorScale::drawScale( QPainter* p, const bool transp, const int X, const int Y,
                                const int W, const int H, const bool title,
                                const bool label, const bool scale ) const
@@ -793,11 +711,9 @@ void QtxColorScale::drawScale( QPainter* p, const bool transp, const int X, cons
 	p->drawPixmap( X, Y, cache );
 }
 
-//================================================================
-// Function : drawScale
-// Purpose  : Draw color scale contents.
-//================================================================
-
+/*!
+  Draw color scale contents.
+*/
 void QtxColorScale::drawScale( QPainter* p, const QColor& bg, const bool transp,
                                const int X, const int Y, const int W, const int H,
                                const bool drawTitle, const bool drawLabel, const bool drawColors ) const
@@ -964,11 +880,9 @@ void QtxColorScale::drawScale( QPainter* p, const QColor& bg, const bool transp,
 	}
 }
 
-//================================================================
-// Function : getFormat
-// Purpose  : Returns the format for number labels.
-//================================================================
-
+/*!
+  \return the format for number labels.
+*/
 QString QtxColorScale::getFormat() const
 {
 	QString aFormat = format();
@@ -1029,11 +943,9 @@ QString QtxColorScale::getFormat() const
 	return aFormat;
 }
 
-//================================================================
-// Function : getNumber
-// Purpose  : Returns the number for specified interval.
-//================================================================
-
+/*!
+  \return the number for specified interval.
+*/
 double QtxColorScale::getNumber( const int idx ) const
 {
 	double val = 0;
@@ -1042,12 +954,9 @@ double QtxColorScale::getNumber( const int idx ) const
 	return val;
 }
 
-//================================================================
-// Function : getLabel
-// Purpose  : Returns the label for specified interval according
-//            to the current label mode.
-//================================================================
-
+/*!
+  \return the label for specified interval according to the current label mode.
+*/
 QString QtxColorScale::getLabel( const int idx ) const
 {
 	QString res;
@@ -1061,12 +970,9 @@ QString QtxColorScale::getLabel( const int idx ) const
 	return res;
 }
 
-//================================================================
-// Function : getColor
-// Purpose  : Returns the color for specified interval according
-//            to the current color mode.
-//================================================================
-
+/*!
+  \return the color for specified interval according to the current color mode.
+*/
 QColor QtxColorScale::getColor( const int idx ) const
 {
 	QColor res;
@@ -1077,24 +983,20 @@ QColor QtxColorScale::getColor( const int idx ) const
 	return res;
 }
 
-//================================================================
-// Function : updateScale
-// Purpose  : Update color scale if it required.
-//================================================================
-
+/*!
+  Update color scale if it required.
+*/
 void QtxColorScale::updateScale()
 {
   update();
 	updateGeometry();
 }
 
-//================================================================
-// Function : simpleRichText
-// Purpose  : Return QSimpleRichText object for title. If title
-//            not defined (empty string) then return null pointer.
-//            Object should be deleted by caller function.
-//================================================================
-
+/*!
+  \return QSimpleRichText object for title. If title
+  not defined (empty string) then return null pointer.
+  Object should be deleted by caller function.
+*/
 QSimpleRichText* QtxColorScale::simpleRichText( const int flags ) const
 {
 	QSimpleRichText* srt = 0;
@@ -1141,17 +1043,14 @@ QSimpleRichText* QtxColorScale::simpleRichText( const int flags ) const
 
 #if QT_VER == 3
 
-/*********************************************************************
-**  Class:  QtxColorScale::Dock
-**  Descr:  Dockable window contains the color scale.
-**  Level:  Public
-*********************************************************************/
+/*!
+  \class QtxColorScale::Dock
+  Dockable window contains the color scale.
+*/
 
-//================================================================
-// Function : Dock
-// Purpose  : Constructor.
-//================================================================
-
+/*!
+  Constructor
+*/
 QtxColorScale::Dock::Dock( Place p, QWidget* parent, const char* name, WFlags f )
 : QDockWindow( p, parent, name, f ),
 myBlockShow( false ),
@@ -1169,30 +1068,24 @@ myBlockResize( false )
 	setCaption( tr ( "Color scale" ) );
 }
 
-//================================================================
-// Function : ~Dock
-// Purpose  : Destructor.
-//================================================================
-
+/*!
+  Destructor.
+*/
 QtxColorScale::Dock::~Dock()
 {
 }
 
-//================================================================
-// Function : colorScale
-// Purpose  : Returns color scale widget.
-//================================================================
-
+/*!
+  \return color scale widget.
+*/
 QtxColorScale* QtxColorScale::Dock::colorScale() const
 {
 	return myScale;
 }
 
-//================================================================
-// Function : activate
-// Purpose  : Set the dockable window is visible for main window.
-//================================================================
-
+/*!
+  Set the dockable window is visible for main window.
+*/
 void QtxColorScale::Dock::activate()
 {
 	if ( myBlockShow )
@@ -1210,11 +1103,9 @@ void QtxColorScale::Dock::activate()
 		mw->setAppropriate( this, true );
 }
 
-//================================================================
-// Function : deactivate
-// Purpose  : Set the dockable window is hidden for main window.
-//================================================================
-
+/*!
+  Set the dockable window is hidden for main window.
+*/
 void QtxColorScale::Dock::deactivate()
 {
 	if ( myBlockShow )
@@ -1232,11 +1123,9 @@ void QtxColorScale::Dock::deactivate()
 		mw->setAppropriate( this, false );
 }
 
-//================================================================
-// Function : isActive
-// Purpose  : Returns true if the dockable window is visible.
-//================================================================
-
+/*!
+  \return true if the dockable window is visible.
+*/
 bool QtxColorScale::Dock::isActive() const
 {
 	QMainWindow* mw = 0;
@@ -1253,11 +1142,9 @@ bool QtxColorScale::Dock::isActive() const
 		return false;
 }
 
-//================================================================
-// Function : show
-// Purpose  : Reimplemented for internal reasons.
-//================================================================
-
+/*!
+  Redefined show
+*/
 void QtxColorScale::Dock::show()
 {
 	bool f = myBlockShow;
@@ -1266,11 +1153,9 @@ void QtxColorScale::Dock::show()
 	myBlockShow = f;
 }
 
-//================================================================
-// Function : hide
-// Purpose  : Reimplemented for internal reasons.
-//================================================================
-
+/*!
+  Redefined hide
+*/
 void QtxColorScale::Dock::hide()
 {
 	bool f = myBlockShow;
@@ -1279,11 +1164,9 @@ void QtxColorScale::Dock::hide()
 	myBlockShow = f;
 }
 
-//================================================================
-// Function : resize
-// Purpose  : Make extent width as maximum value of widget width.
-//================================================================
-
+/*!
+  Make extent width as maximum value of widget width.
+*/
 void QtxColorScale::Dock::resize( int w, int h )
 {
 	QDockWindow::resize( w, h );
@@ -1297,11 +1180,10 @@ void QtxColorScale::Dock::resize( int w, int h )
 		setFixedExtentHeight( QMAX( fixedExtent().height(), h ) );
 }
 
-//================================================================
-// Function : setOrientation
-// Purpose  : 
-//================================================================
-
+/*!
+  Set orientation
+  \param o - new orientation
+*/
 void QtxColorScale::Dock::setOrientation( Orientation o )
 {
 	bool b = myBlockResize;

@@ -1,3 +1,21 @@
+// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/
+//
 #ifndef SVTK_MAINWINDOW_H
 #define SVTK_MAINWINDOW_H
 
@@ -25,6 +43,7 @@ class SUIT_ViewWindow;
 
 class SVTK_RenderWindowInteractor;
 class SVTK_NonIsometricDlg;
+class SVTK_UpdateRateDlg;
 class SVTK_CubeAxesActor2D;
 class SVTK_CubeAxesDlg;
 
@@ -36,7 +55,6 @@ class SVTK_Renderer;
 class SVTK_Selector;
 
 
-//----------------------------------------------------------------------------
 //! The class is a container for #SVTK_RenderWindowInteractor.
 /*!
   The class contains #SVTK_RenderWindowInteractor instance and
@@ -175,7 +193,14 @@ public:
   //----------------------------------------------------------------------------
   QToolBar* getToolBar();
 
+ signals:
+  void Show( QShowEvent * );
+  void Hide( QHideEvent * );
+  
  public slots:
+  virtual void showEvent( QShowEvent * );
+  virtual void hideEvent( QHideEvent * );
+
   void activateZoom();
   void activateWindowFit();
   void activateRotation();
@@ -195,6 +220,7 @@ public:
   void onViewTrihedron(); 
   void onViewCubeAxes();
 
+  void onUpdateRate(bool theIsActivate);
   void onNonIsometric(bool theIsActivate);
   void onGraduatedAxes(bool theIsActivate);
 
@@ -216,12 +242,13 @@ public:
 
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, 
-	 ViewTrihedronId, NonIsometric, GraduatedAxes};
+	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate};
   typedef QMap<int, QtxAction*> TActionsMap;
 
   SUIT_ViewWindow* myViewWindow;
 
   SVTK_NonIsometricDlg* myNonIsometricDlg;
+  SVTK_UpdateRateDlg* myUpdateRateDlg;
   SVTK_CubeAxesDlg* myCubeAxesDlg;
 
   vtkSmartPointer<vtkObject> myEventDispatcher;

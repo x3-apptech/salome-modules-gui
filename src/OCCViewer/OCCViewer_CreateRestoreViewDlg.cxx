@@ -25,6 +25,9 @@
 #include <qpainter.h>
 #include <qimage.h>
 
+/*!
+  Constructor
+*/
 OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, OCCViewer_Viewer* curModel )
 : QDialog( aWin )
 {
@@ -95,10 +98,17 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
   connect( theClearAll, SIGNAL( clicked() ), this, SLOT( clearList() ) );
 }
 
+/*!
+  Destructor
+*/
 OCCViewer_CreateRestoreViewDlg::~OCCViewer_CreateRestoreViewDlg()
 {
 }
 
+/*!
+  Changes image in accordance with item
+  \param curItem - item contains info about view parameters
+*/
 void OCCViewer_CreateRestoreViewDlg::changeImage( QListBoxItem* curItem )
 {
 	if( curItem && myListBox->isEditEnabled() )
@@ -146,11 +156,17 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListBoxItem* curItem )
 	 }
 }
 
+/*!
+  \return current view parameters (corresponding to current item)
+*/
 viewAspect OCCViewer_CreateRestoreViewDlg::currentItem() const
 {
 	return myCurrentItem;
 }
 
+/*!
+  Deletes selected items from list view
+*/
 void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
 {
 	if( myListBox->count() && myListBox->isEditEnabled() )
@@ -185,6 +201,9 @@ void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
 	}
 }
 
+/*!
+  Clears list of view aspects
+*/
 void OCCViewer_CreateRestoreViewDlg::clearList()
 {
 	myListBox->clear();
@@ -194,17 +213,27 @@ void OCCViewer_CreateRestoreViewDlg::clearList()
 	myParametersMap.clear();
 }
 
+/*!
+  \return const reference to all view aspects
+*/
 const viewAspectList& OCCViewer_CreateRestoreViewDlg::parameters() const
 {
 	return myParametersMap;
 }
 
+/*!
+  Renames key of view aspect map in accordance with item name
+  \param anItem - item
+*/
 void OCCViewer_CreateRestoreViewDlg::editItemText( QListBoxItem* anItem )
 {
 	int index = anItem->listBox()->index( anItem );
 	myParametersMap[ index ].name = anItem->text().latin1();
 }
 
+/*!
+  Custom event filter
+*/
 bool OCCViewer_CreateRestoreViewDlg::eventFilter( QObject* anObj, QEvent* anEv )
 {
 	if( anEv->type() == QEvent::KeyPress )
@@ -234,6 +263,9 @@ bool OCCViewer_CreateRestoreViewDlg::eventFilter( QObject* anObj, QEvent* anEv )
 	return QWidget::eventFilter( anObj, anEv );
 }
 
+/*!
+  SLOT: called on OK click, emits dlgOk() and closes dialog
+*/
 void OCCViewer_CreateRestoreViewDlg::OKpressed()
 {
 	emit dlgOk();

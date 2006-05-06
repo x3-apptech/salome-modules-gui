@@ -36,6 +36,9 @@
 
 using namespace std;
 
+/*!
+  Constructor
+*/
 ToolsGUI_HelpWindow::ToolsGUI_HelpWindow(QWidget* parent, const char* name ) 
      : QMainWindow( parent, name, WType_TopLevel | WDestructiveClose )
 {

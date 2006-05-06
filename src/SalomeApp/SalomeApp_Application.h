@@ -38,7 +38,8 @@ class QListViewItem;
 #endif
 
 /*!
-  Description : Application containing SalomeApp module or LightApp module
+  \class SalomeApp_Application
+  \brief Application containing SalomeApp module or LightApp module
 */
 
 class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
@@ -77,6 +78,7 @@ public slots:
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCopy();
   virtual void                        onPaste();
+  void                                onSaveGUIState();// called from VISU
 
 protected slots:
   void                                onStudySaved( SUIT_Study* );
@@ -99,14 +101,14 @@ private slots:
   void                                onProperties();
   void                                onDumpStudy();
   void                                onLoadScript(); 
-  void                                onSaveGUIState(); 
+
   void                                onDeleteGUIState(); 
+  void                                onRestoreGUIState();
+  void                                onRenameGUIState();
 
   void                                onCatalogGen();
   void                                onRegDisplay();
   void                                onOpenWith();
-  void                                onRestoreGUIState();
-  void                                onRenameGUIState();
 };
 
 #ifdef WIN32

@@ -19,6 +19,11 @@ class QFrame;
 class QLabel;
 class QPushButton;
 
+/*!
+  \class LightApp_ModuleDlg
+  Dialog allows to choose action on module activation when there is no document.
+  It is possible to create new document, to open existing or to cancel module activation
+*/
 class LIGHTAPP_EXPORT LightApp_ModuleDlg : public QDialog
 {
   Q_OBJECT

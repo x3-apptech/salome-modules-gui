@@ -52,9 +52,8 @@
 #include <qpushbutton.h>
 #include <qlabel.h>
 
-#include "SALOMEDS_StudyManager.hxx"
-#include "SALOMEDS_SObject.hxx"
-#include "SALOMEDS_IParameters.hxx"
+#include "SALOMEDSClient_ClientFactory.hxx"
+#include "SALOMEDSClient_IParameters.hxx"
 
 #include "SALOME_ListIteratorOfListIO.hxx"
 #include "SALOME_ListIO.hxx"
@@ -69,11 +68,6 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 {
   return new SalomeApp_Application();
 }
-
-/*
-  Class       : SalomeApp_Application
-  Description : Application containing SalomeApp module or LightApp module
-*/
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
@@ -106,10 +100,11 @@ void SalomeApp_Application::createActions()
   SUIT_Desktop* desk = desktop();
   
   //! Save GUI state
-  createAction( SaveGUIStateId, tr( "TOT_DESK_FILE_SAVE_GUI_STATE" ), QIconSet(),
-		tr( "MEN_DESK_FILE_SAVE_GUI_STATE" ), tr( "PRP_DESK_FILE_SAVE_GUI_STATE" ),
-		0, desk, false, this, SLOT( onSaveGUIState() ) );
-
+  // "Save GUI State" command is moved to VISU module
+  //  createAction( SaveGUIStateId, tr( "TOT_DESK_FILE_SAVE_GUI_STATE" ), QIconSet(),
+  //  		tr( "MEN_DESK_FILE_SAVE_GUI_STATE" ), tr( "PRP_DESK_FILE_SAVE_GUI_STATE" ),
+  //  		0, desk, false, this, SLOT( onSaveGUIState() ) );
+  
   //! Dump study
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIconSet(),
 		tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
@@ -137,7 +132,10 @@ void SalomeApp_Application::createActions()
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
-  createMenu( SaveGUIStateId, fileMenu, 10, -1 );
+  // "Save GUI State" command is renamed to "Save VISU State" and 
+  // creation of menu item is moved to VISU
+  //  createMenu( SaveGUIStateId, fileMenu, 10, -1 ); 
+
   createMenu( DumpStudyId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 15, -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
@@ -339,6 +337,14 @@ void SalomeApp_Application::onPaste()
   _PTR(Study) stdDS = study->studyDS();
   if(!stdDS) return;
 
+  if ( stdDS->GetProperties()->IsLocked() ) {
+    SUIT_MessageBox::warn1 ( desktop(),
+			     QObject::tr("WRN_WARNING"),
+			     QObject::tr("WRN_STUDY_LOCKED"),
+			     QObject::tr("BUT_OK") );
+    return;
+  }
+
   SALOME_ListIteratorOfListIO it( list );
   if(it.More())
     {
@@ -374,12 +380,8 @@ void SalomeApp_Application::onSelectionChanged()
          _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
          if ( so ) {
-           SALOMEDS_SObject* aSO = dynamic_cast<SALOMEDS_SObject*>(so.get());
-
-           if ( aSO ) {
              canCopy = studyMgr()->CanCopy(so);
              canPaste = studyMgr()->CanPaste(so);
-           }
          }
        }
      }
@@ -436,10 +438,9 @@ void SalomeApp_Application::onOpenWith()
   QApplication::restoreOverrideCursor();
 }
 
-//=======================================================================
-// name    : createNewStudy
-/*! Purpose : Create new study*/
-//=======================================================================
+/*!
+  Creates new study
+*/
 SUIT_Study* SalomeApp_Application::createNewStudy()
 {
   SalomeApp_Study* aStudy = new SalomeApp_Study( this );
@@ -453,10 +454,9 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
   return aStudy;
 }
 
-//=======================================================================
-// name    : updateCommandsStatus
-/*! Purpose : Enable/Disable menu items and toolbar buttons. Rebuild menu*/
-//=======================================================================
+/*!
+  Enable/Disable menu items and toolbar buttons. Rebuild menu
+*/
 void SalomeApp_Application::updateCommandsStatus()
 {
   LightApp_Application::updateCommandsStatus();
@@ -485,10 +485,10 @@ void SalomeApp_Application::updateCommandsStatus()
   onSelectionChanged();
 }
 
-/*
-  Class       : DumpStudyFileDlg
-  Description : Private class used in Dump Study operation.  Consists 2 check boxes: 
-                "Publish in study" and "Save GUI parameters"
+/*!
+  \class DumpStudyFileDlg
+  Private class used in Dump Study operation.  Consists 2 check boxes: 
+  "Publish in study" and "Save GUI parameters"
 */
 class DumpStudyFileDlg : public SUIT_FileDlg
 {
@@ -530,11 +530,12 @@ void SalomeApp_Application::onDumpStudy( )
   if ( !aFileName.isEmpty() ) {
     QFileInfo aFileInfo(aFileName);
     int savePoint;
+    _PTR(AttributeParameter) ap;
+    _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
+    if(ip->isDumpPython(appStudy->studyDS())) ip->setDumpPython(appStudy->studyDS()); //Unset DumpPython flag.
     if ( toSaveGUI ) { //SRN: Store a visual state of the study at the save point for DumpStudy method
-      SALOMEDS_IParameters::setDumpPython(appStudy->studyDS());
-      savePoint = SalomeApp_VisualState( this ).storeState(); //SRN: create a temporary save point
-      //prefix = SALOMEDS_IParameters::getStudyScript(appStudy->studyDS(), appStudy->getVisualComponentName(), savePoint);
-      
+      ip->setDumpPython(appStudy->studyDS());
+      savePoint = SalomeApp_VisualState( this ).storeState(); //SRN: create a temporary save point      
     }
     bool res = aStudy->DumpStudy( aFileInfo.dirPath( true ).latin1(), aFileInfo.baseName().latin1(), toPublish);
     if ( toSaveGUI ) 
@@ -588,6 +589,7 @@ void SalomeApp_Application::onSaveGUIState()
     updateSavePointDataObjects( study );
     objectBrowser()->updateTree( study->root() );
   }
+  updateActions();
 }
 
 /*!Gets file filter.
@@ -845,16 +847,13 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
         //SalomeApp_DataModel::BuildTree( aComponent, study->root(), study, /*skipExisitng=*/true );
       }
     }
-    // create data objects that correspond to GUI state save points
-    updateSavePointDataObjects( study );
   }
+
+  // create data objects that correspond to GUI state save points
+  if ( study ) updateSavePointDataObjects( study );
 
   // update existing data models (already loaded SComponents)
   LightApp_Application::updateObjectBrowser( updateModels );
-
-  // -- debug -- 
-  //  if ( study && study->root() )
-  //    study->root()->dump();
 }
 
 /*!Display Catalog Genenerator dialog */
@@ -917,6 +916,10 @@ void SalomeApp_Application::onDblClick( QListViewItem* it )
   }
 }
 
+/*!
+  Creates new view manager
+  \param type - type of view manager
+*/
 SUIT_ViewManager* SalomeApp_Application::newViewManager(const QString& type)
 {
   return createViewManager(type);
@@ -961,6 +964,7 @@ void SalomeApp_Application::onRenameGUIState()
   if ( !newName.isNull() && !newName.isEmpty() ) {
     study->setNameOfSavePoint( savePoint, newName );
     updateSavePointDataObjects( study );
+    objectBrowser()->updateTree( study->root() );
   }
 }
 
@@ -1052,11 +1056,10 @@ void SalomeApp_Application::updateSavePointDataObjects( SalomeApp_Study* study )
   // case 4: everything already exists.. here may be a problem: we want "GUI states" root object
   // to be always the last one in the tree.  Here we check - if it is not the last one - remove and
   // re-create it.
-  bool isOpen( false );
   if ( guiRootObj->nextBrother() ) {
-    isOpen = isListViewItemOpen( ob->listView(), guiRootObj );
-    delete guiRootObj;
-    guiRootObj = new SalomeApp_SavePointRootObject( study->root() );
+    study->root()->removeChild(guiRootObj);
+    study->root()->appendChild(guiRootObj);
+    //study->root()->dump();
   }
 
   // store data objects in a map id-to-DataObject
@@ -1074,15 +1077,11 @@ void SalomeApp_Application::updateSavePointDataObjects( SalomeApp_Study* study )
   for ( int i = 0; i < savePoints.size(); i++ )
     if ( !mapDO.contains( savePoints[i] ) )
       new SalomeApp_SavePointObject( guiRootObj, savePoints[i], study );
-    else {
-      ob->updateTree( mapDO[ savePoints[i] ] );
+    else
       mapDO.remove( savePoints[i] );
-    }
+
   // delete DataObjects that are still in the map -- their IDs were not found in data model
   for ( QMap<int,SalomeApp_SavePointObject*>::Iterator it = mapDO.begin(); it != mapDO.end(); ++it )
     delete it.data();
-
-  if ( isOpen ) // set open if we recreated guiRootObj and it was previously open..
-    guiRootObj->setOpen( true );
 }
 

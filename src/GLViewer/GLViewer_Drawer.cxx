@@ -48,10 +48,7 @@
 
 GLfloat modelMatrix[16];
 
-//================================================================
-// Class       : GLViewer_TexFont
-// Description : 
-//================================================================
+
 //! code of first font symbol
 static int FirstSymbolNumber = 32;
 //! code of last font symbol
@@ -60,10 +57,9 @@ static int LastSymbolNumber = 127;
 QMap<GLViewer_TexFindId,GLViewer_TexIdStored> GLViewer_TexFont::TexFontBase;
 QMap<GLViewer_TexFindId,GLuint>               GLViewer_TexFont::BitmapFontCache; 
 
-//=======================================================================
-// Function: clearTextBases
-// Purpose :
-//=======================================================================
+/*!
+  Clears all generated fonts
+*/
 void GLViewer_TexFont::clearTextBases()
 {
   //cout << "Clear font map" << endl;
@@ -71,10 +67,9 @@ void GLViewer_TexFont::clearTextBases()
   BitmapFontCache.clear();
 }
 
-//======================================================================
-// Function: GLViewer_TexFont
-// Purpose :
-//=======================================================================
+/*!
+  Default constructor
+*/
 GLViewer_TexFont::GLViewer_TexFont()
 : myMaxRowWidth( 0 ), myFontHeight( 0 )
 {
@@ -86,10 +81,13 @@ GLViewer_TexFont::GLViewer_TexFont()
     init();
 }
 
-//======================================================================
-// Function: GLViewer_TexFont
-// Purpose :
-//=======================================================================
+/*!
+  Constructor
+  \param theFont         - a base font
+  \param theSeparator    - separator between letters
+  \param theIsResizeable - specifies whether text drawn by this object can be scaled along with the scene
+  \param theMinMagFilter - min/mag filter, affects text sharpness
+*/
 GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator, bool theIsResizeable, GLuint theMinMagFilter )
 : myMaxRowWidth( 0 ), myFontHeight( 0 )
 {
@@ -101,20 +99,18 @@ GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator, bool theIs
     init();
 }
 
-//======================================================================
-// Function: ~GLViewer_TexFont
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_TexFont::~GLViewer_TexFont()
 {
     delete[] myWidths;
     delete[] myPositions;
 } 
 
-//======================================================================
-// Function: init
-// Purpose :
-//=======================================================================
+/*!
+  Initializes font parameters
+*/
 void GLViewer_TexFont::init()
 {
     myNbSymbols = LastSymbolNumber - FirstSymbolNumber + 1;
@@ -148,10 +144,9 @@ void GLViewer_TexFont::init()
     myTexFontHeight = 0;
 }
   
-//======================================================================
-// Function: generateTexture
-// Purpose :
-//=======================================================================
+/*!
+  Generating font texture
+*/
 bool GLViewer_TexFont::generateTexture()
 {
     GLViewer_TexFindId aFindFont;
@@ -160,7 +155,7 @@ bool GLViewer_TexFont::generateTexture()
     aFindFont.myIsItal = myQFont.italic();
     aFindFont.myIsUndl = myQFont.underline();
     aFindFont.myPointSize = myQFont.pointSize();
-    aFindFont.myViewPortId = (int)QGLContext::currentContext();
+    aFindFont.myViewPortId = size_t(QGLContext::currentContext());
         
     if( TexFontBase.contains( aFindFont ) )
     {
@@ -265,10 +260,13 @@ bool GLViewer_TexFont::generateTexture()
     return true;
 }
 
-//======================================================================
-// Function: drawString
-// Purpose :
-//=======================================================================
+/*!
+  Drawing string in viewer
+  \param theStr - string to be drawn
+  \param theX - X position
+  \param theY - Y position
+  \param theScale - scale coefficient
+*/
 void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY, GLfloat theScale )
 {
     // Adding some pixels to have a gap between rows
@@ -334,10 +332,9 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
     glPopAttrib();
 }
 
-//======================================================================
-// Function: getStringWidth
-// Purpose :
-//=======================================================================
+/*!
+  \return width of string in pixels
+*/
 int GLViewer_TexFont::getStringWidth( QString theStr )
 {
     int aWidth = 0;
@@ -351,17 +348,18 @@ int GLViewer_TexFont::getStringWidth( QString theStr )
     return aWidth;
 }
 
-//======================================================================
-// Function: getStringHeight
-// Purpose :
-//=======================================================================
+/*!
+  \return height of string in pixels
+*/
 int GLViewer_TexFont::getStringHeight()
 {
     QFontMetrics aFM( myQFont );
     return aFM.height();
 }
 
-//! function for generation list base for bitmap fonts
+/*!
+  Generates list base for bitmap fonts
+*/
 static GLuint displayListBase( QFont* theFont )
 {
   if ( !theFont )
@@ -421,7 +419,7 @@ static GLuint displayListBase( QFont* theFont )
     return aList;
   }
 
-  aFindFont.myViewPortId = (int)aCont;
+  aFindFont.myViewPortId = size_t(aCont);
 
   if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
     aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
@@ -431,7 +429,7 @@ static GLuint displayListBase( QFont* theFont )
     QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
     for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
-      if ( it.key().myViewPortId == (int)aCont && it.data() > listBase )
+      if ( it.key().myViewPortId == size_t(aCont) && it.data() > listBase )
         listBase = it.data();
     }
     listBase += 256;
@@ -473,16 +471,9 @@ static GLuint displayListBase( QFont* theFont )
   return aList;
 }
 
-/***************************************************************************
-**  Class:   GLViewer_Drawer
-**  Descr:   Drawer for GLViewer_Object
-**  Module:  GLViewer
-**  Created: UI team, 01.10.01
-****************************************************************************/
-//======================================================================
-// Function: GLViewer_Drawer
-// Purpose :
-//=======================================================================
+/*!
+  Default constructor
+*/
 GLViewer_Drawer::GLViewer_Drawer()
 : myFont( "Helvetica", 10, QFont::Bold )
 {
@@ -495,20 +486,18 @@ GLViewer_Drawer::GLViewer_Drawer()
   myTextScale = 0.125;
 }
 
-//======================================================================
-// Function: ~GLViewer_Drawer
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_Drawer::~GLViewer_Drawer()
 {
   myObjects.clear();
   glDeleteLists( myTextList, 1 );
 }
 
-//======================================================================
-// Function: destroyAllTextures
-// Purpose :
-//=======================================================================
+/*!
+  Clears all generated textures
+*/
 void GLViewer_Drawer::destroyAllTextures()
 {
     QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anIt= GLViewer_TexFont::TexFontBase.begin();
@@ -518,10 +507,10 @@ void GLViewer_Drawer::destroyAllTextures()
         glDeleteTextures( 1, &(anIt.data().myTexFontId) );
 }
 
-//=======================================================================
-// Function: setAntialiasing
-// Purpose : The function enables and disables antialiasing in Open GL (for points, lines and polygons).
-//=======================================================================
+/*!
+  Enables and disables antialiasing in Open GL (for points, lines and polygons).
+  \param on - if it is true, antialiasing is enabled
+*/
 void GLViewer_Drawer::setAntialiasing(const bool on)
 {
 	if (on)
@@ -545,10 +534,12 @@ void GLViewer_Drawer::setAntialiasing(const bool on)
 	}
 }
 
-//======================================================================
-// Function: loadTexture
-// Purpose :
-//=======================================================================
+/*! Loads texture from file
+  \param fileName - the name of texture file
+  \param x_size   - the horizontal size of picture ( less or equal texture horizontal size )
+  \param y_size   - the vertical size of picture ( less or equal texture vertical size )
+  \param t_size   - the size of texture ( texture vertical size equals texture horizontal size )
+*/
 GLuint GLViewer_Drawer::loadTexture( const QString& fileName,
                                      GLint* x_size,
                                      GLint* y_size,
@@ -620,10 +611,12 @@ GLuint GLViewer_Drawer::loadTexture( const QString& fileName,
     return texture;
 }
 
-//======================================================================
-// Function: drawTexture
-// Purpose :
-//=======================================================================
+/*! Draw square texture
+   \param texture - the texture ID
+   \param size    - the size of square texture
+   \param x       - x coord
+   \param y       - y coord
+*/
 void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloat y )
 {
     /*float xScale = myXScale;
@@ -660,10 +653,13 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint size, GLfloat x, GLfloa
   drawTexture( texture, size, size, x, y );
 }
 
-//======================================================================
-// Function: drawTexture
-// Purpose :
-//=======================================================================
+/*! Draw texture
+   \param texture - the texture ID
+   \param x_size  - the horizontal size of texture
+   \param y_size  - the vertical size of texture
+   \param x       - x coord
+   \param y       - y coord
+*/
 void GLViewer_Drawer::drawTexture( GLuint texture, GLint x_size, GLint y_size, GLfloat x, GLfloat y )
 {
     /*float xScale = myXScale;
@@ -699,10 +695,16 @@ void GLViewer_Drawer::drawTexture( GLuint texture, GLint x_size, GLint y_size, G
   drawTexturePart( texture, 1.0, 1.0, x_size, y_size, x, y );
 }
 
-//======================================================================
-// Function: drawTexture
-// Purpose :
-//=======================================================================
+/*! Draw texture part
+   \param texture - the texture ID
+   \param x_ratio - the horizontal ratio of texture part
+   \param y_ratio - the vertical ratio of texture part
+   \param x_size  - the horizontal size of texture
+   \param y_size  - the vertical size of texture
+   \param x       - x coord
+   \param y       - y coord
+   \param scale   - common scale factor ( if = 0, use drawer scales )
+*/
 void GLViewer_Drawer::drawTexturePart( GLuint texture,
                                        GLfloat x_ratio,
                                        GLfloat y_ratio,
@@ -750,10 +752,16 @@ void GLViewer_Drawer::drawTexturePart( GLuint texture,
   glDisable( GL_TEXTURE_2D );
 }
 
-//======================================================================
-// Function: drawText
-// Purpose :
-//=======================================================================
+/*!
+  Draw text
+  \param text - text to be drawn
+  \param xPos - x position
+  \param yPos - y position
+  \param color - color of text
+  \param theFont - font of text
+  \param theSeparator - letter separator
+  \param theFormat - text format (by default DTF_BITMAP)
+*/
 void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
                                 const QColor& color, QFont* theFont, int theSeparator, DisplayTextFormat theFormat )
 {
@@ -781,10 +789,9 @@ void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
   }
 }
 
-//======================================================================
-// Function: drawText
-// Purpose :
-//=======================================================================
+/*!
+  Draws object-text
+*/
 void GLViewer_Drawer::drawText( GLViewer_Object* theObject )
 {
   if( !theObject )
@@ -801,16 +808,21 @@ void GLViewer_Drawer::drawText( GLViewer_Object* theObject )
   drawText( aText->getText(), aPosX, aPosY, aText->getColor(), &aTmpVarFont, aText->getSeparator(), aText->getDisplayTextFormat() );
 }
 
-//======================================================================
-// Function: drawGLText
-// Purpose :
-//=======================================================================
+/*! Draw text
+   \param text      - the text string
+   \param x         - x coord
+   \param y         - y coord
+   \param hPosition - horizontal alignment
+   \param vPosition - vertical alignment
+   \param color     - text color
+   \param smallFont - font format
+*/
 void GLViewer_Drawer::drawGLText( QString text, float x, float y,
                                   int hPosition, int vPosition, QColor color, bool smallFont )
 {
   QFont aFont( myFont );
   if( smallFont )
-    aFont.setPointSize( aFont.pointSize() * 0.8 );
+    aFont.setPointSize( int(aFont.pointSize() * 0.8) );
 
   GLfloat scale = textScale() > 0. ? textScale() : 1.;
 
@@ -838,10 +850,9 @@ void GLViewer_Drawer::drawGLText( QString text, float x, float y,
   drawText( text, x, y, color, &aFont, 2, myTextFormat );
 }
 
-//======================================================================
-// Function: textRect
-// Purpose :
-//=======================================================================
+/*!
+  \return a rectangle of text (without viewer scale)
+*/
 GLViewer_Rect GLViewer_Drawer::textRect( const QString& text ) const
 {
   GLfloat scale = textScale() > 0. ? textScale() : 1.;
@@ -853,10 +864,11 @@ GLViewer_Rect GLViewer_Drawer::textRect( const QString& text ) const
   return GLViewer_Rect( 0, width, height, 0 );
 }
 
-//======================================================================
-// Function: drawRectangle
-// Purpose :
-//=======================================================================
+/*!
+  Draws rectangle
+  \param rect - instance of primitive
+  \param color - color of primitive
+*/
 void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, QColor color )
 {
   if( !rect )
@@ -880,10 +892,12 @@ void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, QColor color )
   glEnd();
 }
 
-//======================================================================
-// Function: translateToHPGL
-// Purpose :
-//=======================================================================
+/*!
+  Saves object to file with format of HPGL
+  \param hFile - file
+  \param aViewerCS - viewer co-ordinate system
+  \param aHPGLCS - paper co-ordinate system
+*/
 bool GLViewer_Drawer::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aHPGLCS )
 {
     bool result = true;
@@ -892,10 +906,12 @@ bool GLViewer_Drawer::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aView
     return result;
 }
 
-//======================================================================
-// Function: translateToPS
-// Purpose :
-//=======================================================================
+/*!
+  Saves object to file with format of PostScript
+  \param hFile - file
+  \param aViewerCS - viewer co-ordinate system
+  \param aPSCS - paper co-ordinate system
+*/
 bool GLViewer_Drawer::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {
     bool result = true;
@@ -905,10 +921,12 @@ bool GLViewer_Drawer::translateToPS( QFile& hFile, GLViewer_CoordSystem* aViewer
 }
 
 #ifdef WIN32
-//======================================================================
-// Function: translateToEMF
-// Purpose :
-//=======================================================================
+/*!
+  Saves object to file with format of EMF
+  \param hFile - file
+  \param aViewerCS - viewer co-ordinate system
+  \param aEMFCS - paper co-ordinate system
+*/
 bool GLViewer_Drawer::translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     bool result = true;
@@ -918,10 +936,15 @@ bool GLViewer_Drawer::translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, 
 }
 #endif
 
-//======================================================================
-// Function: drawRectangle
-// Purpose :
-//=======================================================================
+/*!
+  Draws rectangle
+  \param rect - instance of primitive
+  \param lineWidth - width of line
+  \param gap - gap of rectangle
+  \param color - color of primitive
+  \param filled - if it is true, then rectangle will be drawn filled with color "fillingColor"
+  \param fillingColor - color of filling
+*/
 void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, GLfloat lineWidth, GLfloat gap,
 				     QColor color, bool filled, QColor fillingColor )
 {
@@ -959,10 +982,12 @@ void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, GLfloat lineWidth, GLf
   glEnd();
 }
 
-//======================================================================
-// Function: drawContour
-// Purpose :
-//=======================================================================
+/*!
+  Draws contour
+  \param pntList - list of points
+  \param color - color of contour
+  \param lineWidth - width of line
+*/
 void GLViewer_Drawer::drawContour( const GLViewer_PntList& pntList, QColor color, GLfloat lineWidth )
 {
   glColor3f( ( GLfloat )color.red() / 255,
@@ -977,10 +1002,14 @@ void GLViewer_Drawer::drawContour( const GLViewer_PntList& pntList, QColor color
   glEnd();
 }
 
-//======================================================================
-// Function: drawContour
-// Purpose :
-//=======================================================================
+/*!
+  Draws rectangular contour
+  \param rect - instance of rectangle
+  \param color - color of primitive
+  \param lineWidth - width of line
+  \param pattern - pattern of line
+  \param isStripe - enables line stipple
+*/
 void GLViewer_Drawer::drawContour( GLViewer_Rect* rect, QColor color, GLfloat lineWidth,
 				   GLushort pattern, bool isStripe )
 {
@@ -1011,10 +1040,11 @@ void GLViewer_Drawer::drawContour( GLViewer_Rect* rect, QColor color, GLfloat li
   glDisable( GL_LINE_STIPPLE );
 }
 
-//======================================================================
-// Function: drawPolygon
-// Purpose :
-//=======================================================================
+/*!
+  Draws polygon
+  \param pntList - list of points
+  \param color - color of polygon
+*/
 void GLViewer_Drawer::drawPolygon( const GLViewer_PntList& pntList, QColor color )
 {
   glColor3f( ( GLfloat )color.red() / 255,
@@ -1027,10 +1057,13 @@ void GLViewer_Drawer::drawPolygon( const GLViewer_PntList& pntList, QColor color
   glEnd();
 }
 
-//======================================================================
-// Function: drawPolygon
-// Purpose :
-//=======================================================================
+/*!
+  Draws rectangle
+  \param rect - instance of rectangle
+  \param color - color of polygon
+  \param pattern - pattern of line
+  \param isStripe - enables line stipple
+*/
 void GLViewer_Drawer::drawPolygon( GLViewer_Rect* rect, QColor color,
                                       GLushort pattern, bool isStripe )
 {
@@ -1058,11 +1091,14 @@ void GLViewer_Drawer::drawPolygon( GLViewer_Rect* rect, QColor color,
   glDisable( GL_LINE_STIPPLE );
 }
 
-//======================================================================
-// Function: drawVertex
-// Purpose :
-//=======================================================================
 GLubyte rasterVertex[5] = { 0x70, 0xf8, 0xf8, 0xf8, 0x70 };
+
+/*!
+  Draws vertex
+  \param x - x position
+  \param y - y position
+  \param color - color of vertex
+*/
 void GLViewer_Drawer::drawVertex( GLfloat x, GLfloat y, QColor color )
 {
   glColor3f( ( GLfloat )color.red() / 255, ( GLfloat )color.green() / 255, ( GLfloat )color.blue() / 255 );
@@ -1070,11 +1106,14 @@ void GLViewer_Drawer::drawVertex( GLfloat x, GLfloat y, QColor color )
   glBitmap( 5, 5, 2, 2, 0, 0, rasterVertex );
 }
 
-//======================================================================
-// Function: drawCross
-// Purpose :
-//=======================================================================
 GLubyte rasterCross[7] =  { 0x82, 0x44, 0x28, 0x10, 0x28, 0x44, 0x82 };
+
+/*!
+  Draws cross
+  \param x - x position
+  \param y - y position
+  \param color - color of cross
+*/
 void GLViewer_Drawer::drawCross( GLfloat x, GLfloat y, QColor color )
 {
   glColor3f( ( GLfloat )color.red() / 255, ( GLfloat )color.green() / 255, ( GLfloat )color.blue() / 255 );
@@ -1082,10 +1121,18 @@ void GLViewer_Drawer::drawCross( GLfloat x, GLfloat y, QColor color )
   glBitmap( 7, 7, 3, 3, 0, 0, rasterCross );
 }
 
-//======================================================================
-// Function: drawArrow
-// Purpose :
-//=======================================================================
+/*!
+  Draws arrow
+  \param red, green, blue - components of color
+  \param lineWidth - width of line
+  \param staff - 
+  \param length - length of arrow
+  \param width - width of arrow
+  \param x - x position
+  \param y - y position
+  \param angle - angle of arrow
+  \param filled - drawn as filled
+*/
 void GLViewer_Drawer::drawArrow( const GLfloat red, const GLfloat green, const GLfloat blue,
 				 GLfloat lineWidth,
 				 GLfloat staff, GLfloat length, GLfloat width,

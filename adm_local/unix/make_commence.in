@@ -19,8 +19,8 @@ HAVE_SSTREAM=@HAVE_SSTREAM@
 
 LIBS=@LIBS@ 
 LIBSFORBIN=@LIBS@
-LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib/salome -Xlinker -rpath-link -Xlinker -L$(top_builddir)/lib/salome
-LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib/salome
+LDFLAGS=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
+LDFLAGSFORBIN=@LDFLAGS@ -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome
 # add libstdc++ to link c++ library with libtool !
 LDFLAGS+= -lstdc++
 LDFLAGSFORBIN+= -lstdc++
@@ -62,8 +62,8 @@ PYTHONHOME = @PYTHONHOME@
 PYTHON_INCLUDES = @PYTHON_INCLUDES@
 PYTHON_LIBS = @PYTHON_LIBS@
 PYTHON_VERSION = @PYTHON_VERSION@
-PYTHON_SITE = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages
-PYTHON_SITE_INSTALL = $(prefix)/lib/python$(PYTHON_VERSION)/site-packages/salome
+PYTHON_SITE = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages
+PYTHON_SITE_INSTALL = $(prefix)/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome
 # QT
 
 QT_ROOT = @QT_ROOT@
@@ -116,12 +116,6 @@ HDF5_MT_LIBS=@HDF5_MT_LIBS@
 OCC_INCLUDES=@CAS_CPPFLAGS@
 OCC_CXXFLAGS=@CAS_CXXFLAGS@
 
-#OCC_KERNEL_LIBS=@CAS_KERNEL@
-#OCC_OCAF_LIBS=@CAS_OCAF@
-#OCC_VIEWER_LIBS=@CAS_VIEWER@
-#OCC_MODELER_LIBS=@CAS_MODELER@
-#OCC_DATAEXCHANGE_LIBS=@CAS_DATAEXCHANGE@
-#OCC_LIBS=@CAS_LDFLAGS@
 CAS_KERNEL=@CAS_KERNEL@
 CAS_MATH=@CAS_MATH@
 CAS_OCAF=@CAS_OCAF@
@@ -131,6 +125,7 @@ CAS_VIEWER=@CAS_VIEWER@
 CAS_MODELER=@CAS_MODELER@
 CAS_DATAEXCHANGE=@CAS_DATAEXCHANGE@
 CAS_LDPATH=@CAS_LDPATH@
+
 # MPICH
 
 MPICH_INCLUDES=@MPICH_INCLUDES@
@@ -183,11 +178,9 @@ IDL_SRV_OBJ = @IDL_SRV_OBJ@
 CPPFLAGS+= $(CORBA_INCLUDES) 
 CXXFLAGS+= $(CORBA_CXXFLAGS)
 
-# add corba libs when link salome application ! 
-#LDFLAGS+= $(CORBA_LIBS)
-#LIBS+=$(CORBA_LIBS)
-
 DOXYGEN = @DOXYGEN@
+DOXYGEN_WITH_PYTHON = @DOXYGEN_WITH_PYTHON@
+DOXYGEN_WITH_STL = @DOXYGEN_WITH_STL@
 
 ## Shared libraries
 LT_STATIC_EXEC=@LT_STATIC_EXEC@
@@ -209,16 +202,22 @@ INSTALL_DATA=@INSTALL_DATA@
 # create a symbolic link (or a copie ?)
 LN_S=@LN_S@
 
+KERNEL_ROOT_DIR=@KERNEL_ROOT_DIR@
+KERNEL_SITE_DIR=@KERNEL_SITE_DIR@
+
+KERNEL_LDFLAGS=@KERNEL_LDFLAGS@
+KERNEL_CXXFLAGS=@KERNEL_CXXFLAGS@
+
 ## Installation points
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-bindir=@bindir@/salome
-libdir=@libdir@/salome
+bindir=@exec_prefix@/bin/salome
+libdir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/salome
 # warning : if user give this path in configure we could have salome/salome :-(
 includedir=@includedir@/salome
 datadir=@datadir@/salome
 idldir=${prefix}/idl/salome
-sharedpydir=@libdir@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
+sharedpydir=@exec_prefix@/lib@LIB_LOCATION_SUFFIX@/python$(PYTHON_VERSION)/site-packages/salome/shared_modules
 incmakedir=${prefix}/salome_adm/unix
 
 docdir=${prefix}/doc/salome
@@ -246,7 +245,13 @@ all:
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in
 	cd $(top_builddir) ; ./config.status
 
-$(top_builddir)/config.status: $(top_srcdir)/configure
+LOCAL_MAKE = make_commence make_conclude make_omniorb
+
+KERNEL_MAKE = make_module depend SALOMEconfig.h F77config.h sstream envScript
+
+$(top_builddir)/config.status: $(top_srcdir)/configure \
+			       $(LOCAL_MAKE:%=$(top_srcdir)/adm_local/unix/%.in) \
+			       $(KERNEL_MAKE:%=$(KERNEL_ROOT_DIR)/salome_adm/unix/%.in)
 	cd $(top_builddir) ; ./config.status --recheck
 
 # VPATH contain $(srcdir), so make configure is good in top_srcdir and we must add target configure otherwise :-)
@@ -267,4 +272,4 @@ check_sip.m4                       check_msg2qm.m4    check_pyqt.m4 \
 check_opengl.m4
 
 $(top_srcdir)/aclocal.m4: $(ACLOCAL_SRC:%=$(top_srcdir)/adm_local/unix/config_files/%)
-	cd $(top_srcdir) ; aclocal --acdir=adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files
+	cd $(top_srcdir) ; aclocal -I adm_local/unix/config_files -I @KERNEL_ROOT_DIR@/salome_adm/unix/config_files

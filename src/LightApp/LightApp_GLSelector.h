@@ -28,6 +28,10 @@
 #include <string>
 #include <GLViewer_Object.h>
 
+/*!
+  \class LightApp_GLSelector
+  Custom selector to get/set selection from GL viewer
+*/
 class LIGHTAPP_EXPORT LightApp_GLSelector : public SUIT_Selector
 {
   Q_OBJECT

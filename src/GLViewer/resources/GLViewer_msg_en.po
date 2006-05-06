@@ -74,9 +74,6 @@ msgstr "Cannot save file"
 msgid "ERROR"
 msgstr "Error"
 
-msgid "BUT_OK"
-msgstr "Ok"
-
 msgid "CHANGE_BGCOLOR"
 msgstr "Change background..."
 

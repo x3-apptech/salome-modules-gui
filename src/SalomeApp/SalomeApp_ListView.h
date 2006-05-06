@@ -44,10 +44,10 @@ enum UpdateType {
 class SalomeApp_ListViewItem;
 class SalomeApp_EntityEdit;
 
-//================================================================
-// Class        : SalomeApp_ListView
-// Description  : parent class for Data Viewer and Properties Viewer
-//================================================================
+/*!
+  \class SalomeApp_ListView
+  parent class for Data Viewer and Properties Viewer
+*/
 class SalomeApp_ListView : public QtxListView , public SUIT_PopupClient  {
   
   Q_OBJECT

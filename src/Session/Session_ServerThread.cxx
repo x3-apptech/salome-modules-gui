@@ -62,58 +62,44 @@ const char* Session_ServerThread::_serverTypes[NB_SRV_TYP] = {"Container",
 							      "SalomeAppEngine",
                                                               "ContainerManager"};
 
-//=============================================================================
 /*! 
- *  default constructor not for use
- */
-//=============================================================================
-
+  default constructor not for use
+*/
 Session_ServerThread::Session_ServerThread()
 {
   ASSERT(0); // must not be called
 }
 
-//=============================================================================
 /*! 
- *  constructor
- */
-//=============================================================================
-
+  constructor
+*/
 Session_ServerThread::Session_ServerThread(int argc,
 					   char ** argv, 
 					   CORBA::ORB_ptr orb, 
-					   PortableServer::POA_ptr poa,
-					   QMutex *GUIMutex)
+					   PortableServer::POA_ptr poa)
 {
   //MESSAGE("Session_ServerThread Constructor " << argv[0]);
   _argc = argc;
   _argv = argv;
   _orb = CORBA::ORB::_duplicate(orb);
   _root_poa = PortableServer::POA::_duplicate(poa);
-  _GUIMutex = GUIMutex;
   _servType =-1;
   _NS = new SALOME_NamingService(_orb); // one instance per server to limit
                                         // multi thread coherence problems
 }
 
-//=============================================================================
 /*! 
- *  destructor 
- */
-//=============================================================================
-
+  destructor 
+*/
 Session_ServerThread::~Session_ServerThread()
 {
   //MESSAGE("~Session_ServerThread "<< _argv[0]);
 }
 
-//=============================================================================
 /*! 
- *  run the thread : activate one servant, the servant type is given by
- *  argument _argv[0]
- */
-//=============================================================================
-
+  run the thread : activate one servant, the servant type is given by
+  argument _argv[0]
+*/
 void Session_ServerThread::Init()
 {
   MESSAGE("Session_ServerThread::Init "<< _argv[0]); 
@@ -186,12 +172,6 @@ void Session_ServerThread::Init()
       }
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerThread::ActivateModuleCatalog(int argc,
 						 char ** argv)
 {
@@ -231,12 +211,6 @@ void Session_ServerThread::ActivateModuleCatalog(int argc,
     }
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerThread::ActivateSALOMEDS(int argc,
 					    char ** argv)
 {
@@ -269,12 +243,6 @@ void Session_ServerThread::ActivateSALOMEDS(int argc,
       INFOS( "Caught unknown exception." );
     }
 }
-
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
 
 void Session_ServerThread::ActivateRegistry(int argc,
 					    char ** argv)
@@ -332,12 +300,6 @@ void Session_ServerThread::ActivateRegistry(int argc,
     }
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerThread::ActivateContainerManager(int argc,
 					     char ** argv)
 {
@@ -369,12 +331,6 @@ void Session_ServerThread::ActivateContainerManager(int argc,
       INFOS("Caught unknown exception.");
     }
 }
-
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
 
 void Session_ServerThread::ActivateContainer(int argc,
 					     char ** argv)
@@ -460,12 +416,6 @@ void Session_ServerThread::ActivateContainer(int argc,
     }
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerThread::ActivateEngine(int /*argc*/, char ** /*argv*/)
 {
     try
@@ -493,29 +443,30 @@ void Session_ServerThread::ActivateEngine(int /*argc*/, char ** /*argv*/)
       }  
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerThread::ActivateSession(int argc,
 					   char ** argv)
 {
   MESSAGE("Session_ServerThread::ActivateSession() not implemented!");
 }
 
+/*! 
+  constructor 
+*/
 Session_SessionThread::Session_SessionThread(int argc,
 					     char** argv, 
 					     CORBA::ORB_ptr orb, 
 					     PortableServer::POA_ptr poa,
 					     QMutex* GUIMutex,
 					     QWaitCondition* GUILauncher)
-: Session_ServerThread(argc, argv, orb, poa, GUIMutex),
+: Session_ServerThread(argc, argv, orb, poa),
+  _GUIMutex( GUIMutex ),
   _GUILauncher( GUILauncher )
 {
 }
 
+/*! 
+  destructor 
+*/
 Session_SessionThread::~Session_SessionThread()
 {
 }

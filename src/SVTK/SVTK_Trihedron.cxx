@@ -23,16 +23,20 @@
 #include <vtkActorCollection.h>
 #include <vtkRenderer.h>
 
-//****************************************************************
 vtkStandardNewMacro(SVTK_Trihedron);
 
-//****************************************************************
+/*!
+  Constructor
+*/
 SVTK_Trihedron
 ::SVTK_Trihedron()
 {
 }
 
-//****************************************************************
+/*!
+  \return count of visible actors
+  \param theRenderer - renderer to be checked
+*/
 int 
 SVTK_Trihedron
 ::GetVisibleActorCount(vtkRenderer* theRenderer)

@@ -17,11 +17,10 @@
 #define SALOME_WNT_EXPORT
 #endif
 
-/**********************************************************
-**  Class:   InquireEvent
-**  Descr:   Contains QCustomEvents for posting to InquireServersQThread
-**  Level:   Private
-***********************************************************/
+/*!
+  \class InquireEvent
+  Contains QCustomEvents for posting to InquireServersQThread
+*/
 class SALOME_WNT_EXPORT InquireEvent : public QCustomEvent
 {
 public:

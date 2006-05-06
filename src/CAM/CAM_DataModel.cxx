@@ -33,10 +33,12 @@ CAM_DataModel::~CAM_DataModel()
 {
 }
 
+/*!
+  Default implementation, does nothing.
+  Can be used for creation of root object.
+*/
 void CAM_DataModel::initialize()
 {
-  //! Default implementation, does nothing.\n
-  //! Can be used for creation of root object.
 }
 
 /*!Get root object.

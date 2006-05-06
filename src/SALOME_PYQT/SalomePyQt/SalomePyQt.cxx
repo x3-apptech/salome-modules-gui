@@ -16,14 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-//=============================================================================
-// File      : SalomePyQt.cxx
-// Created   : 25/04/05
-// Author    : Vadim SANDLER
-// Project   : SALOME
-// Copyright : 2003-2005 CEA/DEN, EDF R&D
-// $Header   : $
-//=============================================================================
 
 #include "SALOME_PYQT_Module.h" // this include must be first!!!
 #include "SalomePyQt.h"
@@ -50,12 +42,8 @@
 
 using namespace std;
 
-//====================================================================================
-// static functions
-//====================================================================================
 /*!
-  getApplication()
-  Returns active application object [ static ]
+  \return active application object [ static ]
 */
 static SalomeApp_Application* getApplication() {
   if ( SUIT_Session::session() )
@@ -64,8 +52,7 @@ static SalomeApp_Application* getApplication() {
 }
 
 /*!
-  getActiveStudy()
-  Gets active study or 0 if there is no study opened [ static ]
+  \return active study or 0 if there is no study opened [ static ]
 */
 static SalomeApp_Study* getActiveStudy()
 {
@@ -74,13 +61,9 @@ static SalomeApp_Study* getActiveStudy()
   return 0;
 }
 
-//====================================================================================
-// SALOME_Selection class.
-//====================================================================================
 static QMap<SalomeApp_Application*, SALOME_Selection*> SelMap;
 
 /*!
-  SALOME_Selection::GetSelection
   Creates or finds the selection object (one per study).
 */
 SALOME_Selection* SALOME_Selection::GetSelection( SalomeApp_Application* app )
@@ -94,7 +77,6 @@ SALOME_Selection* SALOME_Selection::GetSelection( SalomeApp_Application* app )
 }
 
 /*!
-  SALOME_Selection::SALOME_Selection
   Selection constructor.
 */
 SALOME_Selection::SALOME_Selection( QObject* p ) : QObject( p ), mySelMgr( 0 )
@@ -107,7 +89,6 @@ SALOME_Selection::SALOME_Selection( QObject* p ) : QObject( p ), mySelMgr( 0 )
   }
 }
 /*!
-  SALOME_Selection::~SALOME_Selection
   Selection destructor. Removes selection object from the map.
 */
 SALOME_Selection::~SALOME_Selection()
@@ -118,7 +99,6 @@ SALOME_Selection::~SALOME_Selection()
 }
 
 /*!
-  SALOME_Selection::onSelMgrDestroyed
   Watches for the selection manager destroying when study is closed.
 */
 void SALOME_Selection::onSelMgrDestroyed()
@@ -127,7 +107,6 @@ void SALOME_Selection::onSelMgrDestroyed()
 }
 
 /*!
-  SALOME_Selection::Clear
   Clears the selection.
 */
 void SALOME_Selection::Clear()
@@ -146,7 +125,6 @@ void SALOME_Selection::Clear()
 }
 
 /*!
-  SALOME_Selection::ClearIObjects
   Clears the selection.
 */
 void SALOME_Selection::ClearIObjects()
@@ -155,7 +133,6 @@ void SALOME_Selection::ClearIObjects()
 }
 
 /*!
-  SALOME_Selection::ClearFilters
   Removes all selection filters.
 */
 void SALOME_Selection::ClearFilters()
@@ -173,13 +150,8 @@ void SALOME_Selection::ClearFilters()
   ProcessVoidEvent( new TEvent( mySelMgr ) );
 }
 
-//====================================================================================
-// SalomePyQt class
-//====================================================================================
-
 /*!
-  SalomePyQt::getDesktop
-  Gets desktop. Returns 0 in error.
+  \return desktop (0 if error)
 */
 class TGetDesktopEvent: public SALOME_Event {
 public:
@@ -191,14 +163,17 @@ public:
       myResult = (QWidget*)( getApplication()->desktop() );
   }
 };
+
+/*!
+  \return desktop
+*/
 QWidget* SalomePyQt::getDesktop()
 {
   return ProcessEvent( new TGetDesktopEvent() );
 }
 
 /*!
-  SalomePyQt::getMainFrame
-  Gets workspace widget. Returns 0 in error.
+  \return workspace widget (0 if error)
 */
 class TGetMainFrameEvent: public SALOME_Event {
 public:
@@ -212,6 +187,10 @@ public:
     }
   }
 };
+
+/*!
+  \return workspace widget (0 if error)
+*/
 QWidget* SalomePyQt::getMainFrame()
 {
   return ProcessEvent( new TGetMainFrameEvent() );
@@ -232,6 +211,11 @@ public:
     }
   }
 };
+
+/*!
+  \return main menu
+  \retval 0 in error.
+*/
 QMenuBar* SalomePyQt::getMainMenuBar() 
 {
   return ProcessEvent( new TGetMainMenuBarEvent() );
@@ -277,6 +261,11 @@ public:
     }
   }
 };
+
+/*!
+  \return popup menu
+  \param menu - menu name
+*/
 QPopupMenu* SalomePyQt::getPopupMenu( const MenuName menu )
 {
   return ProcessEvent( new TGetPopupMenuEvent( menu ) );
@@ -297,6 +286,11 @@ public:
     }
   }
 };
+
+/*!
+  SalomePyQt::getStudyId
+  Returns active study's ID or 0 if there is no active study.
+*/
 int SalomePyQt::getStudyId()
 {
   return ProcessEvent( new TGetStudyIdEvent() );
@@ -315,6 +309,11 @@ public:
     myResult = SALOME_Selection::GetSelection( getApplication() );
   }
 };
+
+/*!
+  Creates a Selection object (to provide a compatibility with previous SALOME GUI).
+  \return just created selection object
+*/
 SALOME_Selection* SalomePyQt::getSelection()
 {
   return ProcessEvent( new TGetSelectionEvent() );
@@ -336,6 +335,13 @@ public:
     }
   }
 };
+
+/*!
+  Puts an information message to the desktop's status bar
+  (with optional delay parameter given in seconds)
+  \param msg - message text 
+  \param sec - delay in seconds
+*/
 void SalomePyQt::putInfo( const QString& msg, const int sec )
 {
   ProcessVoidEvent( new TPutInfoEvent( msg, sec ) );
@@ -358,6 +364,10 @@ public:
     }
   }
 };
+
+/*!
+  \return an active component name or empty string if there is no active component
+*/
 const QString SalomePyQt::getActiveComponent()
 {
   return ProcessEvent( new TGetActiveComponentEvent() );
@@ -532,6 +542,12 @@ public:
     }
   }
 };
+
+/*!
+  \return a setting value (as string)
+  This function is obsolete. Use stringSetting(), integerSetting(), 
+  boolSetting(), stringSetting() or colorSetting() instead.
+*/
 QString SalomePyQt::getSetting( const QString& name )
 {
   return ProcessEvent( new TGetSettingEvent( name ) );
@@ -653,6 +669,10 @@ public:
     }
   }
 };
+
+/*!
+  \return an integer setting from the application preferences
+*/
 int SalomePyQt::integerSetting( const QString& section, const QString& name, const int def )
 {
   return ProcessEvent( new TGetIntSettingEvent( section, name, def ) );
@@ -678,6 +698,10 @@ public:
     }
   }
 };
+
+/*!
+  \return an double setting from the application preferences
+*/
 double SalomePyQt::doubleSetting( const QString& section, const QString& name, const int def )
 {
   return ProcessEvent( new TGetDblSettingEvent( section, name, def ) );
@@ -703,6 +727,10 @@ public:
     }
   }
 };
+
+/*!
+  \return an boolean setting from the application preferences
+*/
 bool SalomePyQt::boolSetting( const QString& section, const QString& name, const bool def )
 {
   return ProcessEvent( new TGetBoolSettingEvent( section, name, def ) );
@@ -728,6 +756,10 @@ public:
     }
   }
 };
+
+/*!
+  \return an string setting from the application preferences
+*/
 QString SalomePyQt::stringSetting( const QString& section, const QString& name, const QString& def )
 {
   return ProcessEvent( new TGetStrSettingEvent( section, name, def ) );
@@ -753,6 +785,10 @@ public:
     }
   }
 };
+
+/*!
+  \return a color setting from the application preferences
+*/
 QColor SalomePyQt::colorSetting ( const QString& section, const QString& name, const QColor& def )
 {
   return ProcessEvent( new TGetColorSettingEvent( section, name, def ) );
@@ -809,6 +845,10 @@ public:
     }
   }
 };
+
+/*!
+  Displays 'Open/Save file' dialog box and returns a user's choice (file name)
+*/
 QString SalomePyQt::getFileName( QWidget*           parent, 
 				 const QString&     initial, 
 				 const QStringList& filters, 
@@ -844,6 +884,10 @@ public:
     }
   }
 };
+
+/*!
+  Displays 'Open files' dialog box and returns a user's choice (a list of file names)
+*/
 QStringList SalomePyQt::getOpenFileNames( QWidget*           parent, 
 					  const QString&     initial, 
 					  const QStringList& filters, 
@@ -875,6 +919,10 @@ public:
     }
   }
 };
+
+/*!
+  Displays 'Get Directory' dialog box and returns a user's choice (a directory name)
+*/
 QString SalomePyQt::getExistingDirectory( QWidget*       parent,
 					  const QString& initial,
 					  const QString& caption )
@@ -934,6 +982,11 @@ public:
     }
   }
 };
+
+/*!
+  Dumps the contents of the currently active view to the image file 
+  in the given format (JPEG, PNG, BMP are supported)
+*/
 bool SalomePyQt::dumpView( const QString& filename )
 {
   return ProcessEvent( new TDumpViewEvent( filename ) );
@@ -952,6 +1005,10 @@ public:
     myResult = SALOME_PYQT_Module::defaultMenuGroup();
   }
 };
+
+/*!
+  \return default menu group
+*/
 int SalomePyQt::defaultMenuGroup()
 {
   return ProcessEvent( new TDefMenuGroupEvent() );
@@ -1023,27 +1080,34 @@ public:
     }
   }
 };
-// create new toolbar or get existing by name 
+
+/*!
+  create new toolbar or get existing by name 
+*/
 int SalomePyQt::createTool( const QString& tBar )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( tBar ) ) );
 }
-// add action with id and index to the existing tollbar
+/*! add action with id and index to the existing tollbar
+*/
 int SalomePyQt::createTool( const int id, const int tBar, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( id, tBar, idx ) ) );
 }
-// add action with id and index to the existing tollbar
+/*! add action with id and index to the existing tollbar
+*/
 int SalomePyQt::createTool( const int id, const QString& tBar, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( id, tBar, idx ) ) );
 }
-// add action with id and index to the existing tollbar
+/*! add action with id and index to the existing tollbar
+*/
 int SalomePyQt::createTool( QtxAction* a, const int tBar, const int id, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
 }
-// add action with id and index to the existing tollbar
+/*! add action with id and index to the existing tollbar
+*/
 int SalomePyQt::createTool( QtxAction* a, const QString& tBar, const int id, const int idx )
 {
   return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );

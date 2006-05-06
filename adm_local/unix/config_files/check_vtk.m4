@@ -25,6 +25,7 @@ AC_REQUIRE([AC_PROG_CC])dnl
 AC_REQUIRE([AC_PROG_CXX])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
 AC_REQUIRE([AC_PROG_CXXCPP])dnl
+AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 
 AC_CHECKING(for VTK)
 
@@ -41,13 +42,11 @@ VTKPY_MODULES=""
 
 vtk_ok=no
 
-AC_PATH_X
-
-if test "x$OpenGL_ok" != "xyes"
-then
-   AC_MSG_WARN(vtk needs OpenGL correct configuration, check configure output)
+if test "x$OpenGL_ok" != "xyes" ; then
+   AC_MSG_WARN(VTK needs OpenGL correct configuration, check configure output)
 fi
 
+AC_PATH_X
 if test "x$x_libraries" != "x"
 then
    LXLIB="-L$x_libraries"
@@ -86,8 +85,8 @@ fi
 if test ! -z $VTKHOME
 then
    LOCAL_INCLUDES="-I$VTKHOME/include/vtk $LOCAL_INCLUDES"
-   LOCAL_LIBS="-L$VTKHOME/lib/vtk $LOCAL_LIBS"
-   TRY_LINK_LIBS="-L$VTKHOME/lib/vtk $TRY_LINK_LIBS"
+   LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk/python $LOCAL_LIBS"
+   TRY_LINK_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk/python $TRY_LINK_LIBS"
 fi
 
 dnl vtk headers
@@ -115,10 +114,10 @@ AC_CHECK_HEADER(vtkPlane.h,vtk_ok="yes",vtk_ok="no")
  dnl  VTKPY_MODULES="$VTKHOME/python"
 
    AC_CACHE_VAL(salome_cv_lib_vtk,[
-     AC_TRY_LINK(
-#include "vtkPlane.h"
-,   vtkPlane *p = vtkPlane::New();,
-    eval "salome_cv_lib_vtk=yes",eval "salome_cv_lib_vtk=no")
+     AC_TRY_LINK([#include "vtkPlane.h"],
+		 [vtkPlane::New()],
+		 [salome_cv_lib_vtk=yes],
+		 [salome_cv_lib_vtk=no])
   ])
   vtk_ok="$salome_cv_lib_vtk"
   LIBS="$LIBS_old"
@@ -128,15 +127,15 @@ fi
 
 if  test "x$vtk_ok" = "xno"
 then
-  AC_MSG_RESULT("no")
+  AC_MSG_RESULT(no)
   AC_MSG_WARN(unable to link with vtk library)
 else
-  AC_MSG_RESULT("yes")
+  AC_MSG_RESULT(yes)
   VTK_LIBS="$LOCAL_LIBS"
   VTK_MT_LIBS="$LOCAL_LIBS"
 fi
 
-AC_MSG_RESULT("for vtk: $vtk_ok")
+AC_MSG_RESULT(for VTK: $vtk_ok)
 
 AC_LANG_RESTORE
 
@@ -144,5 +143,3 @@ AC_LANG_RESTORE
 AC_CACHE_SAVE
 
 ])dnl
-
-

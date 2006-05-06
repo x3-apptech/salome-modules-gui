@@ -31,29 +31,24 @@
 #include "Utils_SALOME_Exception.hxx"
 #include "utilities.h"
 using namespace std;
-//=============================================================================
 /*! 
- *  default constructor not for use
+   default constructor not for use
  */
-//=============================================================================
-
 Session_ServerLauncher::Session_ServerLauncher()
 {
   ASSERT(0); // must not be called
 }
 
-//=============================================================================
 /*! 
- *  constructor
- */
-//=============================================================================
-
+  constructor
+*/
 Session_ServerLauncher::Session_ServerLauncher(int argc,
 					       char ** argv, 
 					       CORBA::ORB_ptr orb, 
 					       PortableServer::POA_ptr poa,
 					       QMutex *GUIMutex,
 					       QWaitCondition *ServerLaunch,
+					       QMutex *SessionMutex,
 					       QWaitCondition *SessionStarted)
 {
   _argc = argc;
@@ -62,45 +57,51 @@ Session_ServerLauncher::Session_ServerLauncher(int argc,
   _root_poa = PortableServer::POA::_duplicate(poa);
   _GUIMutex = GUIMutex;
   _ServerLaunch = ServerLaunch;
+  _SessionMutex = SessionMutex;
   _SessionStarted = SessionStarted;
+
+  // start thread
+  start();
 }
 
-//=============================================================================
 /*! 
- *  destructor
- */
-//=============================================================================
-
+  destructor
+*/
 Session_ServerLauncher::~Session_ServerLauncher()
 {
 }
 
-//=============================================================================
 /*! 
- *  Check args and activate servers
- */
-//=============================================================================
-
+  Check args and activate servers
+*/
 void Session_ServerLauncher::run()
 {
-  _GUIMutex->lock(); // lock released by calling thread when ready: wait(mutex)
-  _GUIMutex->unlock();
+  // wait until main thread is ready
+  _GUIMutex->lock();          // ... lock mutex (it is unlocked my calling thread 
+                              // wait condition's wait(mutex)
+  _GUIMutex->unlock();        // ... and unlock it 'cause it is not more needed
+
+  // wake main thread
   _ServerLaunch->wakeAll();
 
   CheckArgs();
   ActivateAll();
 
-  _SessionStarted->wakeAll(); // wake main thread
+  // wait until main thread is ready
+  _GUIMutex->lock();          // ... lock mutex (it is unlocked my calling thread 
+                              // wait condition's wait(mutex)
+  _GUIMutex->unlock();        // ... and unlock it 'cause it is not more needed
 
-  _orb->run();       // this thread wait, during omniORB process events
+  // wake main thread
+  _ServerLaunch->wakeAll();
+
+  // run ORB
+  _orb->run(); // this thread waits, during omniORB process events
 }
 
-//=============================================================================
 /*! 
- *  controls and dispatchs arguments given with command
- */
-//=============================================================================
-
+  controls and dispatchs arguments given with command
+*/
 void Session_ServerLauncher::CheckArgs()
 {
   int argState = 0;
@@ -175,12 +176,6 @@ void Session_ServerLauncher::CheckArgs()
     throw SALOME_Exception(LOCALIZED("Error in command arguments, missing parenthesis ')'"));
 }
 
-//=============================================================================
-/*! 
- *  
- */
-//=============================================================================
-
 void Session_ServerLauncher::ActivateAll()
 {
   list<ServArg>::iterator itServ;
@@ -201,7 +196,7 @@ void Session_ServerLauncher::ActivateAll()
     std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
 
     Session_ServerThread* aServerThread
-      = new Session_ServerThread(argc, argv, _orb,_root_poa,_GUIMutex);
+      = new Session_ServerThread(argc, argv, _orb,_root_poa);
     _serverThreads.push_front(aServerThread);
     
     aServerThread->Init();
@@ -214,18 +209,15 @@ void Session_ServerLauncher::ActivateAll()
   char** argv = new char*[argc];
   argv[0] = "Session";
   Session_SessionThread* aServerThread
-    = new Session_SessionThread(argc, argv, _orb,_root_poa,_GUIMutex,_ServerLaunch);
+    = new Session_SessionThread(argc, argv, _orb,_root_poa,_SessionMutex,_SessionStarted);
   _serverThreads.push_front(aServerThread);
 
   aServerThread->Init();
 }
 
-//=============================================================================
 /*! 
- *  Destruction des classes serveur dans l'ordre inverse de creation
- */
-//=============================================================================
-
+  Destruction des classes serveur dans l'ordre inverse de creation
+*/
 void Session_ServerLauncher::KillAll()
 {
   MESSAGE("Session_ServerLauncher::KillAll()");

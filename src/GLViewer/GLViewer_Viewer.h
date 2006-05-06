@@ -46,9 +46,9 @@ class SUIT_ViewWindow;
 #endif
 
 /*! 
- * Class GLViewer_Object
- * Base Viewer for GLViewer
- */
+  \class GLViewer_Object
+  Base Viewer for GLViewer
+*/
 class GLVIEWER_API GLViewer_Viewer: public SUIT_ViewModel
 {
     Q_OBJECT
@@ -128,10 +128,6 @@ protected:
     GLViewer_ViewTransformer*    myTransformer;     /* transform manipulator */
 };
 
-/****************************************************************
-**  Class: GLViewer_ViewTransformer
-**
-*****************************************************************/
 class GLVIEWER_API GLViewer_ViewTransformer : public QObject
 {
 public:
@@ -188,10 +184,6 @@ protected:
     int                          myMajorBtn;
 };
 
-/****************************************************************
-**  Class: GLViewer_ViewSketcher
-**
-*****************************************************************/
 class GLVIEWER_API GLViewer_ViewSketcher : public QObject
 {
 public:

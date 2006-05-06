@@ -21,6 +21,7 @@
 
 #ifndef DISABLE_VTKVIEWER
   #include "SVTK_ViewModelBase.h"
+  #include "SVTK_ViewManager.h"
   #include "SVTK_Selector.h"
   #include "SVTK_ViewWindow.h"
   #include "SVTK_Functor.h"
@@ -42,15 +43,10 @@
 */
 LightApp_SVTKDataOwner
 ::LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
-			  const TColStd_IndexedMapOfInteger& theIds,
-			  Selection_Mode theMode,
-			  SALOME_Actor* theActor):
+			  SUIT_Desktop* theDesktop ):
   LightApp_DataOwner( theIO ),
-  mySelectionMode(theMode),
-  myActor(theActor)
-{
-  myIds = theIds; // workaround - there is no constructor copy for the container
-}
+  myDesktop( theDesktop )
+{}
 #endif
 
 /*!
@@ -62,13 +58,63 @@ LightApp_SVTKDataOwner
 }
 
 /*!
+  \return active SVTK view window
+*/
+SVTK_ViewWindow* 
+LightApp_SVTKDataOwner
+::GetActiveViewWindow() const
+{
+  if(SUIT_ViewWindow* aViewWindow = myDesktop->activeWindow())
+    return dynamic_cast<SVTK_ViewWindow*>(aViewWindow);
+
+  return NULL;
+}
+
+/*!
+  Gets dataowners ids list.
+*/
+const TColStd_IndexedMapOfInteger& 
+LightApp_SVTKDataOwner
+::GetIds() const
+{
+  if(SVTK_ViewWindow* aViewWindow = GetActiveViewWindow()){
+    if(SVTK_Selector* aSelector = aViewWindow->GetSelector()){
+      aSelector->GetIndex(IO(),myIds);
+    }
+  }
+
+  return myIds;
+}
+
+/*!
+  Gets selection mode.
+*/
+Selection_Mode
+LightApp_SVTKDataOwner
+::GetMode() const
+{
+  if(SVTK_ViewWindow* aViewWindow = GetActiveViewWindow()){
+    if(SVTK_Selector* aSelector = aViewWindow->GetSelector()){
+      return aSelector->SelectionMode();
+    }
+  }
+  
+  return -1;
+}
+
+/*!
   Gets actor pointer.
 */
 SALOME_Actor* 
 LightApp_SVTKDataOwner
 ::GetActor() const
 {
-  return myActor.GetPointer();
+  if(SVTK_ViewWindow* aViewWindow = GetActiveViewWindow()){
+    using namespace SVTK;
+    return Find<SALOME_Actor>(aViewWindow->getRenderer()->GetActors(),TIsSameIObject<SALOME_Actor>(IO()));
+  }
+
+  return NULL;
 }
 
 #endif
@@ -137,23 +183,16 @@ LightApp_VTKSelector
 ::getSelection( SUIT_DataOwnerPtrList& aList ) const
 {
   if(myViewer){
-    if(SUIT_ViewManager* aViewMgr = myViewer->getViewManager()){
-      if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
-	if(SVTK_Selector* aSelector = aView->GetSelector()){
-	  Selection_Mode aMode = aSelector->SelectionMode();
-	  const SALOME_ListIO& aListIO = aSelector->StoredIObjects();
-	  SALOME_ListIteratorOfListIO anIter(aListIO);
-	  for(; anIter.More(); anIter.Next()){
-	    Handle(SALOME_InteractiveObject) anIO = anIter.Value();
-	    if(anIO->hasEntry()){
-	      TColStd_IndexedMapOfInteger anIds;
-	      aSelector->GetIndex(anIO,anIds);
-	      SALOME_Actor* anActor = aSelector->GetActor(anIO);
-	      if( !anActor ){
-		using namespace SVTK;
-	        anActor = Find<SALOME_Actor>(aView->getRenderer()->GetActors(),TIsSameIObject<SALOME_Actor>(anIO));
-	      }
-	      aList.append(new LightApp_SVTKDataOwner(anIO,anIds,aMode,anActor));
+    if(SUIT_ViewManager* aViewManager = myViewer->getViewManager()){
+      if(SVTK_ViewManager* aViewMgr = dynamic_cast<SVTK_ViewManager*>(aViewManager)){
+	if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
+	  if(SVTK_Selector* aSelector = aView->GetSelector()){
+	    const SALOME_ListIO& aListIO = aSelector->StoredIObjects();
+	    SALOME_ListIteratorOfListIO anIter(aListIO);
+	    for(; anIter.More(); anIter.Next()){
+	      Handle(SALOME_InteractiveObject) anIO = anIter.Value();
+	      if(anIO->hasEntry())
+		aList.append(new LightApp_SVTKDataOwner(anIO,aViewMgr->getDesktop()));
 	    }
 	  }
 	}
@@ -182,10 +221,7 @@ LightApp_VTKSelector
 	      aSelector->SetSelectionMode(anOwner->GetMode());
 	      Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
 
-	      if( anOwner->GetActor() )
-		aSelector->AddIObject( anOwner->GetActor() );
-	      else
-		aSelector->AddIObject(anIO);
+	      aSelector->AddIObject(anIO);
 
 	      anAppendList.Append(anIO);
 	      aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);

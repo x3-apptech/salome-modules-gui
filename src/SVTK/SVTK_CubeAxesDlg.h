@@ -27,7 +27,8 @@
 #ifndef SVTK_CubeAxesDlg_H
 #define SVTK_CubeAxesDlg_H
 
-#include <qdialog.h>
+#include "SVTK_DialogBase.h"
+
 #include <qframe.h>
 
 class QWidget;
@@ -52,14 +53,14 @@ class SVTK_MainWindow;
  * Class       : SVTK_CubeAxesDlg
  * Description : Dialog for specifynig cube axes properties
  */
-class SVTK_CubeAxesDlg : public QDialog
+class SVTK_CubeAxesDlg : public SVTK_DialogBase
 {
   Q_OBJECT
 
 public:
-                  SVTK_CubeAxesDlg(SVTK_MainWindow* theParent,
-				   const char* theName,
-				   QtxAction* theAction);
+                  SVTK_CubeAxesDlg(QtxAction* theAction,
+				   SVTK_MainWindow* theParent,
+				   const char* theName);
   virtual         ~SVTK_CubeAxesDlg();
 
   void            Update();
@@ -69,8 +70,6 @@ private slots:
   bool            onApply();
   void            onClose();
 
-  virtual void    done( int );
-
 private:
   QWidget*        createButtonFrame( QWidget* );
   QWidget*        createMainFrame  ( QWidget* );
@@ -79,7 +78,6 @@ private:
 private:
   SVTK_MainWindow *myMainWindow;
   SVTK_CubeAxesActor2D* myActor;
-  QtxAction* myAction;
 
   QTabWidget*     myTabWg;
   QCheckBox*      myIsVisible;

@@ -43,9 +43,10 @@
 #pragma warning( disable:4251 )
 #endif
 
-/* Class GLViewer_Text
-* Substitution of Prs3d_Text for OpenGL */
-
+/*!
+  \class GLViewer_Text
+  Substitution of Prs3d_Text for OpenGL
+*/
 class GLVIEWER_API GLViewer_Text
 {
 public:

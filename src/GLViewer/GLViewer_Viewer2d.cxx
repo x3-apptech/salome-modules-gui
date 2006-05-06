@@ -22,13 +22,6 @@
 // File:      GLViewer_Viewer2d.cxx
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Viewer2d
-**  Descr:   OpenGL Viewer 2D
-**  Module:  GLViewer
-**  Created: UI team, 04.09.02
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_Object.h"
@@ -50,6 +43,10 @@
 #include <qpointarray.h>
 #include <qcolordialog.h>
 
+/*!
+  Constructor
+  \param title - viewer title
+*/
 GLViewer_Viewer2d::GLViewer_Viewer2d( const QString& title) :
 GLViewer_Viewer( title )
 {
@@ -64,6 +61,9 @@ GLViewer_Viewer( title )
     myDrawers.clear();
 }
 
+/*!
+  Destructor
+*/
 GLViewer_Viewer2d::~GLViewer_Viewer2d()
 {    
     //myGLSketcher = 0;
@@ -71,11 +71,18 @@ GLViewer_Viewer2d::~GLViewer_Viewer2d()
   GLViewer_TexFont::clearTextBases();
 }
 
+/*!Create new instance of view window on desktop \a theDesktop.
+ *\retval SUIT_ViewWindow* - created view window pointer.
+ */
 SUIT_ViewWindow* GLViewer_Viewer2d::createView( SUIT_Desktop* theDesktop )
 {
     return new GLViewer_ViewFrame( theDesktop, this );
 }
 
+/*!
+  Adds item for change background color
+  \param thePopup - menu
+*/
 void GLViewer_Viewer2d::addPopupItems( QPopupMenu* thePopup )
 {
   // CTH8434. "Change background color" menu item is available if there are no selected objects
@@ -87,6 +94,9 @@ void GLViewer_Viewer2d::addPopupItems( QPopupMenu* thePopup )
   }
 }
 
+/*!
+  Changes background color
+*/
 void GLViewer_Viewer2d::onChangeBgColor()
 {
   if( !getActiveView() )
@@ -99,6 +109,9 @@ void GLViewer_Viewer2d::onChangeBgColor()
   }
 }
 
+/*!
+  Updates colors for all drawers (does not work)
+*/
 void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
 {
 //  cout << "GLViewer_Viewer2d::updateColors" << endl;
@@ -126,6 +139,10 @@ void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
   activateAllDrawers( TRUE );
 }
 
+/*!
+  Updates rect of global scene by adding new rectangle
+  \param theRect - rectangle
+*/
 void GLViewer_Viewer2d::updateBorders( GLViewer_Rect* theRect )
 {
   QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
@@ -140,6 +157,9 @@ void GLViewer_Viewer2d::updateBorders( GLViewer_Rect* theRect )
   }
 }
 
+/*!
+  Recomputes global scene rect
+*/
 void GLViewer_Viewer2d::updateBorders()
 {
     QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
@@ -178,6 +198,9 @@ void GLViewer_Viewer2d::updateBorders()
     }
 }
 
+/*!
+  Redraws all active objects by updating all drawers in all views
+*/
 void GLViewer_Viewer2d::updateAll()
 {
   if ( !getActiveView() )
@@ -188,6 +211,9 @@ void GLViewer_Viewer2d::updateAll()
     ( ( GLViewer_ViewPort2d* )( ( GLViewer_ViewFrame* )views[i] )->getViewPort() )->getGLWidget()->updateGL();
 }
 
+/*!
+   \param onlyUpdate is passed to method activateAllDrawers drawers
+*/
 void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat scX, GLfloat scY )
 {
 //  cout << "GLViewer_Viewer2d::updateDrawers" << endl;
@@ -197,6 +223,9 @@ void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat scX, GLfloat sc
     activateAllDrawers( update );
 }
 
+/*!
+  Activates drawers for objects from list \param theObjects only
+*/
 void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap )
 {
     //cout << "GLViewer_Viewer2d::activateDrawers " << (int)onlyUpdate << " " << (int)swap << endl;
@@ -282,6 +311,9 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
     ( ( GLViewer_ViewPort2d* )getActiveView()->getViewPort() )->getGLWidget()->makeCurrent();
 }
 
+/*!
+  Activates drawer for \param theObject
+*/
 void GLViewer_Viewer2d::activateDrawer( GLViewer_Object* theObject, bool onlyUpdate, GLboolean swap )
 {
   ObjList aList;
@@ -289,6 +321,9 @@ void GLViewer_Viewer2d::activateDrawer( GLViewer_Object* theObject, bool onlyUpd
   activateDrawers( aList, onlyUpdate, swap );
 }
 
+/*!
+   \param onlyUpdate is passed to drawers
+*/
 void GLViewer_Viewer2d::activateAllDrawers( bool onlyUpdate, GLboolean swap )
 {
     if ( !getActiveView() )
@@ -306,6 +341,11 @@ void GLViewer_Viewer2d::activateAllDrawers( bool onlyUpdate, GLboolean swap )
     activateDrawers( anActiveObjs, onlyUpdate, swap );
 }
 
+/*!
+  Creates set of marker
+  \param theMarkersNum - number of markers 
+  \param theMarkersRad - radius of markers
+*/
 void GLViewer_Viewer2d::onCreateGLMarkers( int theMarkersNum, int theMarkersRad )
 {
     if ( !getActiveView() )
@@ -341,6 +381,12 @@ void GLViewer_Viewer2d::onCreateGLMarkers( int theMarkersNum, int theMarkersRad 
     delete[] anYCoord;
 }
 
+/*!
+  Creates GL polyline
+  \param theAnglesNum - number of angles
+  \param theRadius - radius
+  \param thePolylineNumber - number
+*/
 void GLViewer_Viewer2d::onCreateGLPolyline( int theAnglesNum, int theRadius, int thePolylineNumber )
 {
     if ( !getActiveView() )
@@ -384,6 +430,11 @@ void GLViewer_Viewer2d::onCreateGLPolyline( int theAnglesNum, int theRadius, int
     delete[] anYCoord;
 }
 
+/*!
+  Creates text
+  \param theStr - text string
+  \param theTextNumber - number
+*/
 void GLViewer_Viewer2d::onCreateGLText( QString theStr, int theTextNumber )
 {
     if ( !getActiveView() )
@@ -414,6 +465,10 @@ void GLViewer_Viewer2d::onCreateGLText( QString theStr, int theTextNumber )
     activateAllDrawers( false );
 }
 
+/*!
+  Translates point from global CS to curreent viewer CS
+  \param x, y - co-ordinates to be translated
+*/
 void GLViewer_Viewer2d::transPoint( GLfloat& x, GLfloat& y )
 {
     if ( !getActiveView() )
@@ -442,6 +497,10 @@ void GLViewer_Viewer2d::transPoint( GLfloat& x, GLfloat& y )
     y -= yPan;
 }
 
+/*!
+  \return object rect in window CS
+  \param theObject - object
+*/
 QRect* GLViewer_Viewer2d::getWinObjectRect( GLViewer_Object* theObject )
 {
     if ( !getActiveView() )
@@ -497,6 +556,11 @@ QRect* GLViewer_Viewer2d::getWinObjectRect( GLViewer_Object* theObject )
     return newRect;
 }
 
+/*!
+  Translates rect in window CS to rect in global CS
+  \param theRect - rectangle to be translated
+  \return transformed rect
+*/
 GLViewer_Rect GLViewer_Viewer2d::getGLVRect( const QRect& theRect ) const
 {
   if ( !getActiveView() )
@@ -510,6 +574,11 @@ GLViewer_Rect GLViewer_Viewer2d::getGLVRect( const QRect& theRect ) const
   return vp->win2GLV( theRect );
 }
 
+/*!
+  Translates rect in global CS to rect in window CS
+  \param theRect - rectangle to be translated
+  \return transformed rect
+*/
 QRect GLViewer_Viewer2d::getQRect( const GLViewer_Rect& theRect ) const
 {
   if ( !getActiveView() )
@@ -523,87 +592,25 @@ QRect GLViewer_Viewer2d::getQRect( const GLViewer_Rect& theRect ) const
   return vp->GLV2win( theRect );
 }
 
+/*!
+  \return new selector
+*/
 GLViewer_Selector* GLViewer_Viewer2d::createSelector()
 {
   return new GLViewer_Selector2d( this, getGLContext() );
 }
 
+/*!
+  \return new Transformer 
+  \param type - type of new transformer
+*/
 GLViewer_ViewTransformer* GLViewer_Viewer2d::createTransformer( int type )
 {
     return new GLViewer_View2dTransformer( this, type );
 }
-/*
-GLViewer_Sketcher* GLViewer_Viewer2d::createGLSketcher( int type )
-{
-    return new GLViewer_Sketcher( this, type );
-}
 
-void GLViewer_Viewer2d::activateGLSketching( int type )
-{
-    GLViewer_ViewPort2d* vp = 0;
-    if ( !getActiveView() || !( vp = ( GLViewer_ViewPort2d* )getActiveView()->getViewPort() ) )
-        return;
-
-    // Finish current sketching
-    if ( type == None )
-    {
-        if ( myGLSketcher->getType() != None )
-        {
-            myGLSketcher->setType( None );
-            finishSketching();
-        }
-    }
-    // Activate new sketching
-    else
-    {
-        activateGLSketching( None );  // concurrency not supported
-        myGLSketcher->setType( type );
-        startSketching();
-    }
-}
-
-void GLViewer_Viewer2d::startSketching()
-{
-    GLViewer_ViewPort2d* avp = (GLViewer_ViewPort2d*)getActiveView()->getViewPort();
-    avp->setCursor( *avp->getSketchCursor() );
-    //avp->enablePopup( false );
-    myGLSketcher->startSketching();
-}
-
-void GLViewer_Viewer2d::finishSketching()
-{
-    GLViewer_ViewPort2d* avp = (GLViewer_ViewPort2d*)getActiveView()->getViewPort();
-    avp->setCursor( *avp->getDefaultCursor() );
-    //avp->enablePopup( true );
-    myGLSketcher->finishSketching();
-}
-
-bool GLViewer_Viewer2d::isSketchingActive()
-{
-    return myGLSketcher->getType() != None; 
-}
-
-int GLViewer_Viewer2d::getSketchingType()
-{
-    return myGLSketcher->getType();
-}
-
-void GLViewer_Viewer2d::onSketchDelObject()
-{
-    GLViewer_ViewPort2d* avp = (GLViewer_ViewPort2d*)getActiveView()->getViewPort();
-    avp->setCursor( *avp->getDefaultCursor() );    
-    myGLSketcher->finishSketching( true );
-}
-
-void GLViewer_Viewer2d::onSketchUndoLast()
-{
-
-}
-
-void GLViewer_Viewer2d::onSketchFinish()
-{
-    finishSketching();
-}
+/*!
+  Custom mouse event handler
 */
 void GLViewer_Viewer2d::onMouseEvent( SUIT_ViewWindow*, QMouseEvent* e )
 {
@@ -626,6 +633,9 @@ void GLViewer_Viewer2d::onMouseEvent( SUIT_ViewWindow*, QMouseEvent* e )
     GLViewer_Viewer::onMouseEvent( 0, e );
 }
 
+/*!
+  Rotation transformation
+*/
 bool GLViewer_Viewer2d::testRotation( QMouseEvent* e )
 {
     if ( ( e->button() == GLViewer_View2dTransformer::rotateButton() ) &&
@@ -638,7 +648,11 @@ bool GLViewer_Viewer2d::testRotation( QMouseEvent* e )
     return false;
 }
 
-
+/*!
+  Inserts text lines as header for file
+  \param aType - file type
+  \param hFile - file instance
+*/
 void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
 {
     if( aType == POST_SCRIPT )
@@ -671,6 +685,11 @@ void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
     }
 }
 
+/*!
+  Inserts text lines as ending for file
+  \param aType - file type
+  \param hFile - file instance
+*/
 void GLViewer_Viewer2d::insertEnding( VectorFileType aType, QFile& hFile )
 {
     if( aType == POST_SCRIPT )
@@ -698,6 +717,13 @@ inline void mm2custom( GLViewer_Viewer2d::VectorFileType aType, double& value )
 #endif 
 }
 
+/*!
+  Translates current view content to vector file
+  \param aType - type of file
+  \param FileName - name of file,
+  \param aPType - paper size type
+  \param mmLeft, mmRight, mmTop, mmBottom - margins
+*/
 bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, PaperType aPType, 
                                   double mmLeft, double mmRight, double mmTop, double mmBottom )
 {
@@ -821,7 +847,10 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
     return true;
 }
 
-
+/*!
+  Repaints view
+  \param theView - view to be repainted. If it is NULL then all views will be repainted
+*/
 void GLViewer_Viewer2d::repaintView( GLViewer_ViewFrame* theView, bool makeCurrent )
 {
     GLViewer_ViewFrame* aCurView;
@@ -897,6 +926,9 @@ void GLViewer_Viewer2d::repaintView( GLViewer_ViewFrame* theView, bool makeCurre
 //    ( ( GLViewer_ViewPort2d* )getActiveView()->getViewPort() )->getGLWidget()->makeCurrent();
 }
 
+/*!
+  Starts some operation on mouse event
+*/
 void GLViewer_Viewer2d::startOperations( QMouseEvent* e )
 {
     GLViewer_ViewPort2d* vp = ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)getActiveView())->getViewPort();
@@ -913,6 +945,9 @@ void GLViewer_Viewer2d::startOperations( QMouseEvent* e )
         vp->startSelectByRect( e->x(), e->y() );
 }
 
+/*!
+  Updates started operation on mouse event
+*/
 bool GLViewer_Viewer2d::updateOperations( QMouseEvent* e )
 {
     GLViewer_ViewPort2d* vp = ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)getActiveView())->getViewPort();
@@ -936,6 +971,9 @@ bool GLViewer_Viewer2d::updateOperations( QMouseEvent* e )
     return false;
 }
 
+/*!
+  Completes started operation on mouse event
+*/
 void GLViewer_Viewer2d::finishOperations( QMouseEvent* e )
 {
     GLViewer_ViewPort2d* vp = ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)getActiveView())->getViewPort();
@@ -959,6 +997,9 @@ void GLViewer_Viewer2d::finishOperations( QMouseEvent* e )
     }
 }
 
+/*!
+  Starts some operation on mouse wheel event
+*/
 void GLViewer_Viewer2d::startOperations( QWheelEvent* e )
 {
     bool zoomIn = e->delta() > 0;
@@ -976,13 +1017,11 @@ void GLViewer_Viewer2d::startOperations( QWheelEvent* e )
 }
 
 
-/****************************************************************
-**  Class: GLViewer_View2dTransformer
-**
-*****************************************************************/
-
 int GLViewer_View2dTransformer::rotateBtn = RightButton;
 
+/*!
+  Constructor
+*/
 GLViewer_View2dTransformer::GLViewer_View2dTransformer( GLViewer_Viewer* viewer, int typ )
 : GLViewer_ViewTransformer( viewer, typ )
 {
@@ -990,6 +1029,9 @@ GLViewer_View2dTransformer::GLViewer_View2dTransformer( GLViewer_Viewer* viewer,
         initTransform( true );
 }
 
+/*!
+  Destructor
+*/
 GLViewer_View2dTransformer::~GLViewer_View2dTransformer()
 {
     if ( type() == GLViewer_Viewer::Rotate )

@@ -18,10 +18,16 @@
 //
 #include "OB_Filter.h"
 
+/*!
+  Default constructor
+*/
 OB_Filter::OB_Filter()
 {
 }
 
+/*!
+  Destructor
+*/
 OB_Filter::~OB_Filter()
 {
 }

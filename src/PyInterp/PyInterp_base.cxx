@@ -224,7 +224,7 @@ int PyInterp_base::run(const char *command)
       _atFirst = false;
       return ret;
     }
-    ret = simpleRun("salome.salome_init()");
+    ret = simpleRun("salome.salome_init(0,1)");
     if (ret) { 
       _atFirst = false;
       return ret;

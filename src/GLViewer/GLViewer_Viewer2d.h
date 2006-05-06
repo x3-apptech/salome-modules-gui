@@ -22,12 +22,6 @@
 // File:      GLViewer_Viewer2d.h
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_Viewer2d
-**  Descr:   OpenGL Viewer 2D
-**  Module:  GLViewer
-**  Created: UI team, 04.09.04
-****************************************************************************/
 #ifndef GLVIEWER_VIEWER2D_H
 #define GLVIEWER_VIEWER2D_H
 
@@ -68,10 +62,11 @@ const double Sizes[2*5] = {
 #pragma warning( disable:4251 )
 #endif
 
-/*! 
- * Class GLViewer_Object
- * 2D viewer for GLViewer
- */
+/*!
+  \class GLViewer_Viewer2d
+  OpenGL Viewer 2D
+*/
+
 class GLVIEWER_API GLViewer_Viewer2d : public GLViewer_Viewer
 {
   Q_OBJECT
@@ -234,10 +229,6 @@ protected:
   //GLViewer_Sketcher*   myGLSketcher;
 };
 
-/****************************************************************
-**  Class: GLViewer_View2dTransformer
-**
-*****************************************************************/
 class GLVIEWER_API GLViewer_View2dTransformer : public GLViewer_ViewTransformer
 {
 public:

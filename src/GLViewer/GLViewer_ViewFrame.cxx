@@ -22,13 +22,6 @@
 // File:      GLViewer_ViewFrame.cxx
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_ViewFrame
-**  Descr:   Frame window for viewport in QAD-based application
-**  Module:  QAD
-**  Created: UI team, 05.09.00
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_ViewFrame.h"
 #include "GLViewer_Viewer.h"
@@ -82,10 +75,9 @@ GLViewer_ViewFrame::~GLViewer_ViewFrame()
 {
 }
 
-//================================================================
-// Function : createActions
-// Purpose  : 
-//================================================================
+/*!
+  Creates actions of GL view frame
+*/
 void GLViewer_ViewFrame::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
@@ -148,10 +140,9 @@ void GLViewer_ViewFrame::createActions()
   myActionsMap[ ResetId ] = aAction;
 }
 
-//================================================================
-// Function : createToolBar
-// Purpose  : 
-//================================================================
+/*!
+  Creates toolbar of GL view frame
+*/
 void GLViewer_ViewFrame::createToolBar()
 {
   myActionsMap[DumpId]->addTo(myToolBar);
@@ -248,7 +239,7 @@ QSize GLViewer_ViewFrame::sizeHint() const
 {
     QWidget* p = parentWidget();
     if ( p && p->inherits( "QWorkspaceChild" ) )
-        p = p->parentWidget();      /* QWorkspaceChild: internal impl class in QWorkspace */
+        p = p->parentWidget();
     if ( !p )
         return QMainWindow::sizeHint();
     return QSize( 9 * p->width() / 10 , 9 * p->height() / 10  );
@@ -263,6 +254,9 @@ void GLViewer_ViewFrame::onUpdate( int )
 
 //#include <windows.h>
 
+/*!
+  SLOT: called on dump view operation is activated, stores scene to raster file
+*/
 void GLViewer_ViewFrame::onViewDump()
 {
     GLViewer_Widget* aWidget = ((GLViewer_ViewPort2d*)myVP)->getGLWidget();
@@ -448,50 +442,73 @@ void GLViewer_ViewFrame::onViewDump()
     }
 }
 
+/*!
+  Start panning
+*/
 void GLViewer_ViewFrame::onViewPan()
 {
     myViewer->activateTransform( GLViewer_Viewer::Pan );
 }
 
+/*!
+  Start zooming
+*/
 void GLViewer_ViewFrame::onViewZoom()
 {
     myViewer->activateTransform( GLViewer_Viewer::Zoom );
 }
 
+/*!
+  Start fit all
+*/
 void GLViewer_ViewFrame::onViewFitAll()
 {
     myViewer->activateTransform( GLViewer_Viewer::FitAll );
 }
 
+/*!
+  Start fit area
+*/
 void GLViewer_ViewFrame::onViewFitArea()
 { 
     myViewer->activateTransform( GLViewer_Viewer::FitRect );
 }
 
+/*!
+  Start fit selected
+*/
 void GLViewer_ViewFrame::onViewFitSelect()
 { 
     myViewer->activateTransform( GLViewer_Viewer::FitSelect );
 }
 
+/*!
+  Start global panning
+*/
 void GLViewer_ViewFrame::onViewGlobalPan()
 { 
     myViewer->activateTransform( GLViewer_Viewer::PanGlobal );
 }
 
+/*!
+  Start rotating
+*/
 void GLViewer_ViewFrame::onViewRotate()
 { 
     //myViewer->activateTransform( GLViewer_Viewer::Rotate );
 }
 
+/*!
+  Start reset default view aspects
+*/
 void GLViewer_ViewFrame::onViewReset()
 { 
     myViewer->activateTransform( GLViewer_Viewer::Reset );
 }
-  
-//================================================================
-// Function : mouseEvent
-// Purpose  : dispatches mouse events
-//================================================================
+ 
+/*! 
+  Dispatches mouse events
+*/
 void GLViewer_ViewFrame::mouseEvent( QMouseEvent* e )
 {
   switch ( e->type() )
@@ -513,10 +530,9 @@ void GLViewer_ViewFrame::mouseEvent( QMouseEvent* e )
   }
 }
 
-//================================================================
-// Function : keyEvent
-// Purpose  : dispatches key events
-//================================================================
+/*!
+  Dispatches key events
+*/
 void GLViewer_ViewFrame::keyEvent( QKeyEvent* e )
 {
   switch ( e->type() )
@@ -532,10 +548,9 @@ void GLViewer_ViewFrame::keyEvent( QKeyEvent* e )
   }
 }
 
-//================================================================
-// Function : wheelEvent
-// Purpose  : dispatches wheel events
-//================================================================
+/*!
+  Dispatches wheel events
+*/
 void GLViewer_ViewFrame::wheelEvent( QWheelEvent* e )
 {
   switch ( e->type() )
@@ -548,8 +563,9 @@ void GLViewer_ViewFrame::wheelEvent( QWheelEvent* e )
   }
 }
 
-/*! The method returns the visual parameters of this view as a formated string
- */
+/*!
+  \return the visual parameters of this view as a formated string
+*/
 QString GLViewer_ViewFrame::getVisualParameters()
 {
   QString retStr;
@@ -563,8 +579,9 @@ QString GLViewer_ViewFrame::getVisualParameters()
   return retStr;
 }
 
-/* The method restors visual parameters of this view from a formated string
- */
+/*!
+  The method restores visual parameters of this view from a formated string
+*/
 void GLViewer_ViewFrame::setVisualParameters( const QString& parameters )
 {
   QStringList paramsLst = QStringList::split( '*', parameters, true );

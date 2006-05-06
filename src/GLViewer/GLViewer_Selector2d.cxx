@@ -22,19 +22,15 @@
 // File:      GLViewer_Selector2d.cxx
 // Created:   November, 2004
 
-/****************************************************************************
-**  Class:   GLViewer_Selector2d 
-**  Descr:   OpenGL Selector 2D
-**  Module:  GLViewer
-**  Created: UI team, 20.09.02
-*****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_Selector2d.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_Context.h"
 #include "GLViewer_ViewPort2d.h"
 
+/*!
+  Constructor
+*/
 GLViewer_Selector2d::GLViewer_Selector2d( GLViewer_Viewer2d* v2d, GLViewer_Context* glc ) :
 GLViewer_Selector( v2d ),
 myGLContext( glc )
@@ -43,20 +39,35 @@ myGLContext( glc )
 //  myGLContext->SetSelectionColor( Quantity_NOC_RED );
 }
 
+/*!
+  Destructor
+*/
 GLViewer_Selector2d::~GLViewer_Selector2d()
 {
 }
 
+/*!
+  Changes hilight color of context
+  \param color - new hilight color
+*/
 void GLViewer_Selector2d::setHilightColor( Quantity_NameOfColor color )
 {
   myGLContext->SetHighlightColor( color );
 }
 
+/*!
+  Changes selection color of context
+  \param color - new selection color
+*/
 void GLViewer_Selector2d::setSelectColor( Quantity_NameOfColor color )
 {
   myGLContext->SetSelectionColor( color );
 }
 
+/*!
+  Detects object at point
+  \param x, y - point co-ordinates
+*/
 void GLViewer_Selector2d::detect( int x, int y )
 {
   //cout << "GLViewer_Selector2d    : detect ( " << x << " , " << y << " )" << endl;
@@ -71,6 +82,9 @@ void GLViewer_Selector2d::detect( int x, int y )
   myGLContext->MoveTo( x, y );
 }
 
+/*!
+  Undetects all objects
+*/
 void GLViewer_Selector2d::undetectAll()
 {
   if ( myLocked || !myGLContext || !myViewer || !myViewer->getActiveView() || 
@@ -84,6 +98,10 @@ void GLViewer_Selector2d::undetectAll()
   myGLContext->clearHighlighted( true );
 }
 
+/*!
+  Selects previously hilighted objects
+  \param append - append objects to selection
+*/
 void GLViewer_Selector2d::select( bool append )
 {
   //cout << "GLViewer_Selector2d    : select ( " << (int)append << " )" << endl;
@@ -104,6 +122,11 @@ void GLViewer_Selector2d::select( bool append )
   checkSelection( selBefore, append, status );
 }
 
+/*!
+  Selects objects in rectangle
+  \param selRect - selection rectangle
+  \param append - append objects to selection
+*/
 void GLViewer_Selector2d::select( const QRect& selRect, bool append )
 {
     GLViewer_Viewer::SelectionMode selMode = myViewer->getSelectionMode();
@@ -123,6 +146,9 @@ void GLViewer_Selector2d::select( const QRect& selRect, bool append )
     checkSelection( selBefore, append, aStatus );
 }
 
+/*!
+  Unselects all objects
+*/
 void GLViewer_Selector2d::unselectAll()
 {
   if ( myLocked || !myViewer ) 
@@ -137,8 +163,10 @@ void GLViewer_Selector2d::unselectAll()
   if ( hadSelection ) emit selSelectionCancel();
 }
 
-/*  Checks selection state and emits  'selSelectionDone' or 'selSelectionCancel'     
-    Should be called by after non-interactive selection. */
+/*!
+  Checks selection state and emits  'selSelectionDone' or 'selSelectionCancel'     
+  Should be called by after non-interactive selection.
+*/
 void GLViewer_Selector2d::checkSelection( int selBefore, bool append, int aStatus )
 {
     int selAfter = numSelected();
@@ -158,6 +186,9 @@ void GLViewer_Selector2d::checkSelection( int selBefore, bool append, int aStatu
     }
 }
 
+/*!
+  \return number of selected objects
+*/
 int GLViewer_Selector2d::numSelected() const
 {
   return myGLContext->NbSelected();

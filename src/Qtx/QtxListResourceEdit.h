@@ -43,9 +43,9 @@ class QtxDblSpinBox;
 
 class QtxDirListEditor;
 
-/*
-  Class: QtxListResourceEdit
-  Descr: GUI implementation of QtxResourceEdit - manager of resources
+/*!
+  \class QtxListResourceEdit
+  GUI implementation of QtxResourceEdit - manager of resources
 */
 
 class QTX_EXPORT QtxListResourceEdit : public QFrame, public QtxResourceEdit
@@ -101,9 +101,9 @@ private:
   QWidgetStack* myStack;
 };
 
-/*
-  Class: QtxListResourceEdit::Category
-  Descr: GUI implementation of 'Category' frame
+/*!
+  \class QtxListResourceEdit::Category
+  GUI implementation of 'Category' frame
 */
 
 class QtxListResourceEdit::Category : public QFrame, public Item
@@ -132,9 +132,9 @@ private:
   QTabWidget*      myTabs;
 };
 
-/*
-  Class: QtxListResourceEdit::Tab
-  Descr: GUI implementation of resources tab.
+/*!
+  \class QtxListResourceEdit::Tab
+  GUI implementation of resources tab.
 */
 
 class QtxListResourceEdit::Tab : public QFrame, public Item
@@ -160,9 +160,9 @@ private:
   QWidget*      myMainFrame;
 };
 
-/*
-  Class: QtxListResourceEdit::Group
-  Descr: GUI implementation of resources group.
+/*!
+  \class QtxListResourceEdit::Group
+  GUI implementation of resources group.
 */
 
 class QtxListResourceEdit::Group : public QGroupBox, public Item
@@ -184,9 +184,9 @@ protected:
   virtual Item*    createItem( const QString&, const int );
 };
 
-/*
-  Class: QtxListResourceEdit::PrefItem
-  Descr: Base class for preferences items.
+/*!
+  \class QtxListResourceEdit::PrefItem
+  Base class for preferences items.
 */
 
 class QtxListResourceEdit::PrefItem : public QHBox, public Item
@@ -204,9 +204,9 @@ private:
   int           myType;
 };
 
-/*
-  Class: QtxListResourceEdit::Spacer
-  Descr: GUI implementation of resources spacer.
+/*!
+  \class QtxListResourceEdit::Spacer
+  GUI implementation of resources spacer.
 */
 
 class QtxListResourceEdit::Spacer : public PrefItem
@@ -219,9 +219,9 @@ public:
   virtual void retrieve();
 };
 
-/*
-  Class: QtxListResourceEdit::SelectItem
-  Descr: GUI implementation of resources selector item.
+/*!
+  \class QtxListResourceEdit::SelectItem
+  GUI implementation of resources selector item.
 */
 
 class QtxListResourceEdit::SelectItem : public PrefItem
@@ -248,11 +248,10 @@ private:
   QMap<int, int>   myIndex;
 };
 
-/*
-  Class: QtxListResourceEdit::StateItem
-  Descr: GUI implementation of resources bool item.
+/*!
+  \class  QtxListResourceEdit::StateItem
+  GUI implementation of resources bool item.
 */
-
 class QtxListResourceEdit::StateItem : public PrefItem
 {
 public:
@@ -266,9 +265,9 @@ private:
   QCheckBox*       myState;
 };
 
-/*
-  Class: QtxListResourceEdit::StringItem
-  Descr: GUI implementation of resources string item.
+/*!
+  \class  QtxListResourceEdit::StringItem
+  GUI implementation of resources string item.
 */
 
 class QtxListResourceEdit::StringItem : public PrefItem
@@ -284,9 +283,9 @@ private:
   QLineEdit*       myString;
 };
 
-/*
-  Class: QtxListResourceEdit::IntegerEditItem
-  Descr: GUI implementation of resources integer item.
+/*!
+  \class  QtxListResourceEdit::IntegerEditItem
+  GUI implementation of resources integer item.
 */
 
 class QtxListResourceEdit::IntegerEditItem : public PrefItem
@@ -302,9 +301,9 @@ private:
   QLineEdit*       myInteger;
 };
 
-/*
-  Class: QtxListResourceEdit::IntegerSpinItem
-  Descr: GUI implementation of resources integer item.
+/*!
+  \class  QtxListResourceEdit::IntegerSpinItem
+  GUI implementation of resources integer item.
 */
 
 class QtxListResourceEdit::IntegerSpinItem : public PrefItem
@@ -323,9 +322,9 @@ private:
   QtxIntSpinBox*  myInteger;
 };
 
-/*
-  Class: QtxListResourceEdit::DoubleEditItem
-  Descr: GUI implementation of resources double item.
+/*!
+  \class  QtxListResourceEdit::DoubleEditItem
+  GUI implementation of resources double item.
 */
 
 class QtxListResourceEdit::DoubleEditItem : public PrefItem
@@ -341,9 +340,9 @@ private:
   QLineEdit*       myDouble;
 };
 
-/*
-  Class: QtxListResourceEdit::DoubleSpinItem
-  Descr: GUI implementation of resources double item.
+/*!
+  \class  QtxListResourceEdit::DoubleSpinItem
+  GUI implementation of resources double item.
 */
 
 class QtxListResourceEdit::DoubleSpinItem : public PrefItem
@@ -362,9 +361,9 @@ private:
   QtxDblSpinBox*   myDouble;
 };
 
-/*
-  Class: QtxListResourceEdit::ColorItem
-  Descr: GUI implementation of resources color item.
+/*!
+  \class  QtxListResourceEdit::ColorItem
+  GUI implementation of resources color item.
 */
 
 class QtxListResourceEdit::ColorItem : public PrefItem
@@ -380,14 +379,13 @@ private:
   QWidget*         myColor;
 };
 
-/*
-  Class: QtxListResourceEdit::FontItem
-  Descr: GUI implementation of resources font item.
-*/
-
 class QtxComboBox;
 class QToolButton;
 
+/*!
+  \class  QtxListResourceEdit::FontItem
+  GUI implementation of resources font item.
+*/
 class QtxListResourceEdit::FontItem : public PrefItem
 {
   Q_OBJECT
@@ -441,10 +439,9 @@ private:
 
 
 /*!
- * \brief GUI implementation of resources directory list item.
- *
- * 
- */
+  \class QtxListResourceEdit
+  \brief GUI implementation of resources directory list item.
+*/
 class QtxListResourceEdit::DirListItem : public PrefItem
 {
   Q_OBJECT
@@ -474,20 +471,25 @@ private:
   QtxDirListEditor* myDirListEditor; //!< The widget wich implements in GUI the list of directories
 };
 
-/*
-  Class: QtxListResourceEdit::FontItem
-  Descr: GUI implementation of resources font item.
-*/
-
 class QtxComboBox;
 class QToolButton;
 class QFileDialog;
+
+/*!
+  \class QtxListResourceEdit::FontItem
+  GUI implementation of resources font item.
+*/
 
 class QtxListResourceEdit::FileItem : public PrefItem
 {
   Q_OBJECT
 
 private:
+  /*!
+    \class QtxListResourceEdit::FileItem::FileValidator
+    custom file validator: checks files on some rights
+  */
+
   class FileValidator : public QValidator
   {
   public:

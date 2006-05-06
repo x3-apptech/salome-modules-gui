@@ -33,14 +33,13 @@
 #pragma warning( disable:4251 )
 #endif
 
+class GLViewer_TexFont;
+
 /*! Class GLViewer_Compass
  * Class implement representatiof of compass in one of corner in GLViewer.
  * Compass it's a some round visual pointer rotated with view window and 
  * located in fixed place (in one fixed corner)
  */
-
-class GLViewer_TexFont;
-
 class GLVIEWER_API GLViewer_Compass
 {
 public:

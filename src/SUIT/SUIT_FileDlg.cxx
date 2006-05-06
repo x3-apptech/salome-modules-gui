@@ -16,51 +16,51 @@
 //
 // See http://www.salome-platform.org/
 //
-//*********************************************************************************
-// SUIT_FileDlg class is the extension of the Qt's Open/Save file dialog box.
-// To get the file/directory name(s) call static methods:
-//
-// to invoke "Open file" or "Save file" dialog box
-//    static QString getFileName(QWidget* parent, const QString& initial, const QStringList& filters, 
-//                               const QString& caption, const bool open, const bool showQuickDir = true,
-//                               SUIT_FileValidator* validator = 0);
-//
-// to invoke "Open files" dialog box (to get the multiple file selection)
-//    static QStringList getOpenFileNames(QWidget* parent, const QString& initial, const QStringList& filters, 
-//                                        const QString& caption, bool showQuickDir = true, 
-//                                        SUIT_FileValidator* validator = 0);
-//
-// to invoke "Select directory" dialog box
-//    static QString getExistingDirectory(QWidget* parent, const QString& initial,
-//                                        const QString& caption, const bool showQuickDir = true);
-//
-// The parameters:
-// - parent        parent widget (if 0, the current desktop is used)
-// - initial       starting directory or file name (if null, last visited directory is used)
-// - filters       file filters list; patterns inside the filter can be separated by ';','|' or ' ' 
-//                 symbols
-// - caption       dialog box's caption: if null, the default one is used
-// - open          open flag - true for "Open File" and false for "Save File" dialog box
-// - showQuickDir  this flag enables/disables "Quick directory list" controls
-// - validator     you can provide custom file validator with this parameter
-//
-// Examples:
-//   ...
-//   QStringList flist;
-//   flist.append( "Image files (*.bmp *.gif *.jpg )" );
-//   flist.append( "All files (*.*)" );
-//   QMyFileValidator* v = new QMyFileValidator( 0 );
-//   QString fileName =  SUIT_FileDlg::getFileName( 0, QString::null, flist, "Dump view", false, true, v );
-//   if ( !fileName.isEmpty() ) {
-//      ... writing image to the file 
-//   }
-//   ...
-//   QStringList flist;
-//   flist.append( "*.cpp | *.cxx | *.c++" );
-//   flist.append( "*.h | *.hpp | *.hxx" );
-//   QString fileName =  SUIT_FileDlg::getFileName( desktop(), QString::null, flist, QString::null, true, true );
-//
-//*********************************************************************************
+
+/*!
+  SUIT_FileDlg class is the extension of the Qt's Open/Save file dialog box.
+  To get the file/directory name(s) call static methods:
+
+  to invoke "Open file" or "Save file" dialog box
+  static QString getFileName(QWidget* parent, const QString& initial, const QStringList& filters, 
+                               const QString& caption, const bool open, const bool showQuickDir = true,
+                               SUIT_FileValidator* validator = 0);
+
+  to invoke "Open files" dialog box (to get the multiple file selection)
+  static QStringList getOpenFileNames(QWidget* parent, const QString& initial, const QStringList& filters, 
+                                        const QString& caption, bool showQuickDir = true, 
+                                        SUIT_FileValidator* validator = 0);
+
+ to invoke "Select directory" dialog box
+    static QString getExistingDirectory(QWidget* parent, const QString& initial,
+                                        const QString& caption, const bool showQuickDir = true);
+
+ The parameters:
+ - parent        parent widget (if 0, the current desktop is used)
+ - initial       starting directory or file name (if null, last visited directory is used)
+ - filters       file filters list; patterns inside the filter can be separated by ';','|' or ' ' 
+                 symbols
+ - caption       dialog box's caption: if null, the default one is used
+ - open          open flag - true for "Open File" and false for "Save File" dialog box
+ - showQuickDir  this flag enables/disables "Quick directory list" controls
+ - validator     you can provide custom file validator with this parameter
+
+ Examples:
+   ...
+   QStringList flist;
+   flist.append( "Image files (*.bmp *.gif *.jpg )" );
+   flist.append( "All files (*.*)" );
+   QMyFileValidator* v = new QMyFileValidator( 0 );
+   QString fileName =  SUIT_FileDlg::getFileName( 0, QString::null, flist, "Dump view", false, true, v );
+   if ( !fileName.isEmpty() ) {
+      ... writing image to the file 
+   }
+   ...
+   QStringList flist;
+   flist.append( "*.cpp | *.cxx | *.c++" );
+   flist.append( "*.h | *.hpp | *.hxx" );
+   QString fileName =  SUIT_FileDlg::getFileName( desktop(), QString::null, flist, QString::null, true, true );
+*/
 
 #include "SUIT_FileDlg.h"
 

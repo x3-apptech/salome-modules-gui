@@ -26,6 +26,10 @@
 
 #include <qspinbox.h>
 
+/*!
+  \class  QtxDblSpinBox
+  Spin box for real numbers.
+*/
 class QTX_EXPORT QtxDblSpinBox : public QSpinBox
 {
   Q_OBJECT

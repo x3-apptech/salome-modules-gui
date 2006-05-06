@@ -36,6 +36,9 @@
 
 using namespace std;
 
+/*!
+  Constructor
+*/
 HelpWindow::HelpWindow(QWidget* parent, const char* name ) 
      : QMainWindow( parent, name, WType_TopLevel | WDestructiveClose )
 {

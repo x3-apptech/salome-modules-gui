@@ -20,26 +20,25 @@
 #include "QtxListOfOperations.h"
 #include <stdarg.h>
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Constructor
+*/
 QtxListOfOperations::QtxListOfOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Destructor
+*/
 QtxListOfOperations::~QtxListOfOperations()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return fills list with brackets symbols
+  \param list - list to be filled
+  \param open - if it is true, it is necessary to fill with open brackets otherwise with close
+*/
 void QtxListOfOperations::bracketsList( QStringList& list, bool open ) const
 {
     OperationSetsIterator anIt = mySets.begin(),
@@ -57,10 +56,9 @@ void QtxListOfOperations::bracketsList( QStringList& list, bool open ) const
     }
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Fills list with operation names
+*/
 void QtxListOfOperations::opersList( QStringList& list ) const
 {
     OperationSetsIterator anIt = mySets.begin(),
@@ -78,10 +76,9 @@ void QtxListOfOperations::opersList( QStringList& list ) const
     }
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Create some value by it's string representation
+*/
 bool QtxListOfOperations::createValue( const QString& str, QtxValue& val ) const
 {
     bool ok;
@@ -96,10 +93,9 @@ bool QtxListOfOperations::createValue( const QString& str, QtxValue& val ) const
     return ok;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return priority of operation
+*/
 int QtxListOfOperations::prior( const QString& op, bool isBin ) const
 {
     OperationSetsIterator anIt = mySets.begin(),
@@ -117,10 +113,12 @@ int QtxListOfOperations::prior( const QString& op, bool isBin ) const
     return prior>0 ? prior : 0;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+   \return whether values with passed types are valid for arguments of operation
+   \param op - name of operation
+   \param t1 - type of first argument
+   \param t2 - type of second argument
+*/
 QtxParser::Error QtxListOfOperations::isValid( const QString& op,
                                                const QVariant::Type t1,
                                                const QVariant::Type t2 ) const
@@ -137,10 +135,13 @@ QtxParser::Error QtxListOfOperations::isValid( const QString& op,
     return err;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+    Calculates result of operation
+    \return one of error states
+    \param op - name of operation
+    \param v1 - first operation argument (must be used also to store result)
+    \param v2 - second operation argument
+*/
 QtxParser::Error QtxListOfOperations::calculate( const QString& op,
                                                  QtxValue& v1,
                                                  QtxValue& v2 ) const
@@ -169,19 +170,18 @@ QtxParser::Error QtxListOfOperations::calculate( const QString& op,
     return QtxParser::InvalidOperation;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Clears list of operations
+*/
 void QtxListOfOperations::clear()
 {
     mySets.clear();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return true if list contains operations
+  \param name - name of operation
+*/
 bool QtxListOfOperations::has( const QString& name ) const
 {
     OperationSetsIterator anIt = mySets.begin(),
@@ -192,30 +192,37 @@ bool QtxListOfOperations::has( const QString& name ) const
     return false;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Appends operations to list
+  \param name - name of operations
+  \param oper - operations
+  \param prior - additional prior
+*/
 void QtxListOfOperations::append( const QString& name, QtxOperations* oper,
                                   int prior )
 {
     insert( name, oper, prior );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Prepends operations to list
+  \param name - name of operations
+  \param oper - operations
+  \param prior - additional prior
+*/
 void QtxListOfOperations::prepend( const QString& name, QtxOperations* oper,
                                    int prior )
 {
     insert( name, oper, prior, 0 );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Inserts operations to list
+  \param name - name of operations
+  \param oper - operations
+  \param prior - additional prior
+  \param pos - insert position 
+*/
 void QtxListOfOperations::insert( const QString& name, QtxOperations* oper,
                                   int prior, int pos )
 {
@@ -232,10 +239,10 @@ void QtxListOfOperations::insert( const QString& name, QtxOperations* oper,
         mySets.insert( mySets.at( pos ), op );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Removes operations from list
+  \param name - name of operations
+*/
 void QtxListOfOperations::remove( const QString& name )
 {
     OperationSets::iterator anIt = mySets.begin(),
@@ -248,19 +255,18 @@ void QtxListOfOperations::remove( const QString& name )
         }
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return count of operations in list
+*/
 int QtxListOfOperations::count() const
 {
     return mySets.count();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return operations by name
+  \name - name of operations
+*/
 QtxOperations* QtxListOfOperations::operations( const QString& name ) const
 {
     OperationSetsIterator anIt = mySets.begin(),

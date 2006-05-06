@@ -22,12 +22,6 @@
 // File:      GLViewer_Selector.h
 // Created:   November, 2004
 
-/****************************************************************************
-**  Class:   GLViewer_Selector
-**  Descr:   Base class for object selection in QAD-based application
-**  Module:  GLViewer
-**  Created: UI team, 22.09.00
-*****************************************************************************/
 #ifndef GLVIEWER_SELECTOR_H
 #define GLVIEWER_SELECTOR_H
 
@@ -41,10 +35,10 @@
 
 class GLViewer_Viewer;
 
-/*! Class GLViewer_Selector
-*   Based select manager for GLViewer
+/*!
+  \Class GLViewer_Selector
+  Base class for object selection in SUIT-based application
 */
-
 class GLVIEWER_API GLViewer_Selector : public QObject
 {
     Q_OBJECT

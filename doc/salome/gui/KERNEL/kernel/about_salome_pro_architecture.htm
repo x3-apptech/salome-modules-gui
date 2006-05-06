@@ -104,7 +104,7 @@ else
  dramatically without affecting other components. </span></p>
 
 <p class="whs3"><span style="font-weight: normal;">All 
- software components (VISU, GEOM, SMESH...) integrated into </span>SALOME 
+ software components (Post-Pro, Geometry, Mesh...) integrated into </span>SALOME 
  <span style="font-weight: normal;">platform &nbsp;implement 
  predefined interfaces. Each component provides data for the </span>SALOME<span 
  style="font-weight: normal;"> study in a form of links (stored in the 
@@ -118,16 +118,15 @@ else
 
 <p class="whs2">&nbsp;</p>
 
-<p class="whs5">Actually, starting with SALOME 3.0.0 
- version, it is possible to create engine-independent modules. These modules 
- may not use CORBA at all, and can have internal data structure which can 
- be written in pure C++ (or python). Such modules are located inside SALOME 
- GUI process and from the point of view of the end user have no difference 
- with standard components. Such modules not using the standard tools of 
- SALOME platform are defined on a special separated level named CAM. CAM 
- component is the basis for new SALOME GUI and contains all basic functionality 
- for working with modules (loading; saving, closing, customization of toolbar 
- and menu).</p>
+<p class="whs5">It is equally possible to create engine-independent 
+ modules. These modules may not use CORBA at all, and can have internal 
+ data structure which can be written in pure C++ (or python). Such modules 
+ are located inside SALOME GUI process and from the point of view of the 
+ end user have no difference with standard components. Such modules not 
+ using the standard tools of SALOME platform are defined on a special separated 
+ level named CAM. CAM component is the basis for new SALOME GUI and contains 
+ all basic functionality for working with modules (loading; saving, closing, 
+ customization of toolbar and menu).</p>
 
 <p class="whs5">Another fundamental piece of the <span 
  style="font-weight: bold;"><B>SALOME</B></span> architecture is the use of the 
@@ -147,7 +146,7 @@ else
 <p class="whs6"><span 
  style="font-weight: normal;">&nbsp;<img src="../note1.gif" x-maintain-ratio="TRUE" width="35px" height="37px" border="0" class="img_whs7">In </span>SALOME<span style="font-weight: normal;"> there 
  is a possibility to run definite components in the so-called </span><a href="running_salome_pro.htm#batchmode">batch mode</a><span style="font-weight: normal;"> 
- without GUI provided by IAPP component. In this case you can work with 
+ without GUI provided by GUI component. In this case you can work with 
  these components with the help of Python commands and scripts. </span>&nbsp;</p>
 
 <p class="whs8">&nbsp;</p>

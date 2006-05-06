@@ -136,7 +136,7 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   bool
   isVisible(const Handle(SALOME_InteractiveObject)& theIObject);
 
-  /* selection */
+  //! Redirect the request to #SVTK_View::FindIObject (to support old code)
   //----------------------------------------------------------------------------
   Handle(SALOME_InteractiveObject) 
   FindIObject(const char* theEntry);
@@ -343,7 +343,7 @@ protected:
   doSetVisualParameters( const QString& );
 
   QImage dumpView();
-  virtual void action( const int );
+  virtual bool action( const int );
 
   SVTK_View* myView;
   SVTK_MainWindow* myMainWindow;

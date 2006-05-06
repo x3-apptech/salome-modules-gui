@@ -1,12 +1,6 @@
 <document>
-  <section name="desktop" >
-    <parameter name="state"  value="normal"/>
-    <parameter name="pos_x"  value="center"/>
-    <parameter name="pos_y"  value="center"/>
-    <parameter name="width"  value="800"/>
-    <parameter name="height" value="600"/>
-  </section>
   <section name="launch">
+    <!-- SALOME launching parameters -->
     <parameter name="gui"        value="yes"/>
     <parameter name="splash"     value="yes"/>
     <parameter name="file"       value="no"/>
@@ -15,10 +9,18 @@
     <parameter name="modules"    value="LIGHT"/>
   </section>
   <section name="language">
+    <!-- Language settings (resource manager)-->
     <parameter name="language"    value="en"/>
     <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>
+  <section name="splash" >
+    <!-- Splash screen settings -->
+    <parameter name="image"       value="${SUITRoot}/resources/icon_about.png" />
+    <parameter name="info"        value="%A : %V" />
+    <parameter name="text_colors" value="#F0CC6D|#7F7138" />
+  </section>
   <section name="resources">
+    <!-- Resource directories (resource manager)-->
     <parameter name="SUIT"         value="${SUITRoot}/resources"/>
     <parameter name="STD"          value="${SUITRoot}/resources"/>
     <parameter name="Plot2d"       value="${SUITRoot}/resources"/>
@@ -31,48 +33,60 @@
     <parameter name="CAM"          value="${SUITRoot}/resources"/>
     <parameter name="LightApp"     value="${SUITRoot}/resources"/>
     <parameter name="SVTK"         value="${SUITRoot}/resources"/>
-    <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources"/>
     <parameter name="ToolsGUI"     value="${SUITRoot}/resources"/>
+    <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources"/>
+  </section>
+  <section name="desktop" >
+    <!-- Default GUI desktop state, position, size -->
+    <parameter name="state"  value="normal"/>
+    <parameter name="pos_x"  value="center"/>
+    <parameter name="pos_y"  value="center"/>
+    <parameter name="width"  value="800"/>
+    <parameter name="height" value="600"/>
   </section>
   <section name="LIGHT">
+    <!-- LIGHT module settings -->
     <parameter name="name"       value="Light"/>
     <parameter name="icon"       value="LIGHT.png"/>
   </section>
-
-<!-- values below this line are just an example, they are not used  -->
-  <section name="application">
+  <section name="PyConsole">
+    <!-- Python console preferences -->
+    <parameter name="font"                value="Helvetic,12" />
+    <parameter name="additional_families" value="Helvetic;Helvetica;Helvetica[Adobe];Times;Times[Adobe];Sans Serif;Serif;Monospace;Lucida"/>
+  </section>
+  <section name="FileDlg">
+    <!-- "Open/Save File" dialog box preferences-->
     <parameter name="QuickDirList" value=""/>
-    <!-- Here go other common user preferences -->
   </section>
   <section name="Study">
-    <parameter value="true" name="store_positions" />
+    <!-- General study settings -->
+    <parameter name="store_positions" value="true" />
   </section>
   <section name="OCCViewer" >
-    <parameter value="35, 136, 145" name="background" />
-    <parameter value="1" name="iso_number_u" />
-    <parameter value="1" name="iso_number_v" />
-    <parameter value="100" name="trihedron_size" />
+    <!-- OCC viewer preferences -->
+    <parameter name="background"     value="35, 136, 145" />
+    <parameter name="iso_number_u"   value="1" />
+    <parameter name="iso_number_v"   value="1" />
+    <parameter name="trihedron_size" value="100" />
  </section>
  <section name="VTKViewer" >
-    <parameter value="0, 0, 0" name="background" />
-    <parameter value="100" name="trihedron_size" />
+    <!-- OCC viewer preferences -->
+    <parameter name="background"     value="0, 0, 0"/>
+    <parameter name="trihedron_size" value="100" />
  </section>
  <section name="Plot2d" >
-    <parameter value="255, 255, 255" name="Background" />
-    <parameter value="1" name="CurveType" />
-    <parameter value="0" name="HorScaleMode" />
-    <parameter value="1" name="LegendPos" />
-    <parameter value="9" name="MarkerSize" />
-    <parameter value="true" name="ShowLegend" />
-    <parameter value="0" name="VerScaleMode" />
+    <!-- Plot2d viewer preferences -->
+    <parameter name="Background"   value="255, 255, 255" />
+    <parameter name="CurveType"    value="1" />
+    <parameter name="HorScaleMode" value="0" />
+    <parameter name="LegendPos"    value="1" />
+    <parameter name="MarkerSize"   value="9" />
+    <parameter name="ShowLegend"   value="true" />
+    <parameter name="VerScaleMode" value="0" />
   </section>
   <section name="SUPERVGraph" >
-    <parameter value="144, 208, 211" name="Background" />
-    <parameter value="63, 213, 255" name="Title" />
-  </section>
-  <!-- Here go optional sections for other modules -->
-  <section name="resources">
-    <parameter name="salome" value="${KERNEL_ROOT_DIR}/share/salome/res"/>
-    <!-- Here go resource directories for other modules -->
+    <!-- Supervision viewer preferences -->
+    <parameter name="Background" value="144, 208, 211" />
+    <parameter name="Title"      value="63, 213, 255"  />
   </section>
 </document>

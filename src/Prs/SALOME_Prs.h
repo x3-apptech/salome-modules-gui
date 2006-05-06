@@ -33,13 +33,11 @@ class SALOME_View;
 class SALOME_Displayer;
 class Handle_SALOME_InteractiveObject;
 
-//===========================================================
 /*!
- *  Class:       SALOME_Prs \n
- *  Description: Base class for SALOME graphic object wrappers - presentations.\n
- *  Presentations are temporary objects, so they can be created on the stack.
- */
-//===========================================================
+ \class SALOME_Prs
+ Base class for SALOME graphic object wrappers - presentations.
+ Presentations are temporary objects, so they can be created on the stack.
+*/
 
 class PRS_EXPORT SALOME_Prs
 {
@@ -63,13 +61,11 @@ public:
   virtual void LocalSelectionIn( SALOME_View*, const int ) const = 0;
 };
 
-//===========================================================
 /*!
- *  Class: SALOME_OCCPrs \n
- *  Description: Base class for OpenCASCADE graphic object (AIS_InteractiveObject) wrappers.\n
- *  This intermediate class is necessary to avoid dependencies from OCC libs.
- */
-//===========================================================
+ \class SALOME_OCCPrs
+ Base class for OpenCASCADE graphic object (AIS_InteractiveObject) wrappers.
+ This intermediate class is necessary to avoid dependencies from OCC libs.
+*/
 
 class PRS_EXPORT SALOME_OCCPrs : public SALOME_Prs
 {
@@ -90,13 +86,11 @@ public:
   virtual void LocalSelectionIn( SALOME_View*, const int ) const;
 };
 
-//===========================================================
 /*!
- *  Class:       SALOME_VTKPrs \n
- *  Description: Base class for VTK graphic object (vtkActor) wrappers \n
- *               This intermediate class is necessary to avoid dependencies from VTK libs.
- */
-//===========================================================
+ \class SALOME_VTKPrs
+ Base class for VTK graphic object (vtkActor) wrappers.
+ This intermediate class is necessary to avoid dependencies from VTK libs.
+*/
 class PRS_EXPORT SALOME_VTKPrs : public SALOME_Prs
 {
 public:
@@ -116,13 +110,10 @@ public:
   virtual void LocalSelectionIn( SALOME_View*, const int ) const;
 };
 
-//===========================================================
 /*!
- *  Class:       SALOME_Prs2d \n
- *  Description: Base class for Plot2d graphic object (Plot2d_Curve) wrappers.
- */
-//===========================================================
-
+ \class SALOME_Prs2d
+ Base class for Plot2d graphic object (Plot2d_Curve) wrappers.
+*/
 class PRS_EXPORT SALOME_Prs2d : public SALOME_Prs
 {
 public:
@@ -142,18 +133,13 @@ public:
   virtual void LocalSelectionIn( SALOME_View*, const int ) const;
 };
 
-/////////////////////////////////////////////////////////////////////////
-// Base classes for object wrappers for any other visualization libraries
-// should be added here!
-/////////////////////////////////////////////////////////////////////////
-
-//===========================================================
 /*!
- *  Class:       SALOME_View \n
- *  Description: Base class for SALOME views (or view frames)
- */
-//===========================================================
-
+  Base classes for object wrappers for any other visualization libraries should be added here!
+*/
+/*!
+ \class SALOME_View
+ Base class for SALOME views (or view frames)
+*/
 class PRS_EXPORT SALOME_View
 {
 public:
@@ -211,24 +197,18 @@ public:
   virtual void Repaint() {} //!< Null body here.
 };
 
-//===========================================================
-/*
- *  Classes:     SALOME_Displayer
- *  Description: These classes are used to specify type of view
- *               VTK, OCC or Plot2d
- */
-//===========================================================
+/*!
+ \class SALOME_Displayer
+ These classes are used to specify type of view VTK, OCC or Plot2d
+*/
 class PRS_EXPORT SALOME_OCCViewType    {};
 class PRS_EXPORT SALOME_VTKViewType    {};
 class PRS_EXPORT SALOME_Plot2dViewType {};
 
-//===========================================================
 /*!
- *  Class:       SALOME_Displayer \n
- *  Description: Base class for SALOME displayers
- */
-//===========================================================
-
+ \class SALOME_Displayer
+ Base class for SALOME displayers
+*/
 class PRS_EXPORT SALOME_Displayer
 {
 public:

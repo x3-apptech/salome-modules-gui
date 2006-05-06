@@ -27,6 +27,13 @@
 class SUIT_SelectionMgr;
 class SUIT_DataOwnerPtrList;
 
+/*!
+  \class SUIT_Selector
+  Base class for all selectors used in SUIT-based applications.
+  Provides functionality to get/set selection from/into some widget
+  (ObjectBrowser, viewers, etc)
+  Used by selection manager for selection synhronizing
+*/
 class SUIT_EXPORT SUIT_Selector : public QObject
 {
   Q_OBJECT

@@ -356,9 +356,11 @@ QString ToolsGUI_RegWidget::setlongText( const Registry::Infos &c_info)
   a.append( BOLD( QString::number( int( c_info.uid ) ) ) );
   a.append( QString( " )<br> " ) + tr( "in directory" ) + QString( " " ));
   a.append( BOLD( c_info.cdir ) );
-  
+
+  time_t aTime;
   a.append( QString( "<br>" ) + tr( "begins" ) + QString( " " ) );
-  char * t1 = (char * )duplicate(ctime(&c_info.tc_start));
+  aTime = time_t(c_info.tc_start);
+  char * t1 = (char * )duplicate(ctime(&aTime));
   t1 [strlen(t1) -1 ] = ' ';
   a.append( BOLD( t1 ) ); 
   delete [] t1;
@@ -366,7 +368,8 @@ QString ToolsGUI_RegWidget::setlongText( const Registry::Infos &c_info)
   
   if (c_info.tc_hello != 0 )
     {
-      char * t2 = (char * )duplicate(ctime(&c_info.tc_hello));
+      aTime = time_t(c_info.tc_hello);
+      char * t2 = (char * )duplicate(ctime(&aTime));
       t2 [strlen(t2) -1 ] = ' ';
       a.append( tr( "last signal" ) + QString(" : ") ); 
       a.append( BOLD( t2 ) ); 
@@ -375,7 +378,8 @@ QString ToolsGUI_RegWidget::setlongText( const Registry::Infos &c_info)
     }
   if ((c_info.tc_end - c_info.difftime) != 0)
     {
-      char * t3 = (char * )duplicate(ctime(&c_info.tc_end));
+      aTime = time_t(c_info.tc_end);
+      char * t3 = (char * )duplicate(ctime(&aTime));
       t3 [strlen(t3) -1 ] = ' ';
       a.append( tr( "ends" ) + QString( " " ) ); 
       a.append( BOLD( t3 ) ); 
@@ -463,6 +467,7 @@ void ToolsGUI_RegWidget::InfoHistory()
     _history->clear();
   try
     {
+      time_t aTime;
       _serverhistory = _VarComponents->history();
       for (CORBA::ULong i=0; i<_serverhistory->length(); i++)
 	{       
@@ -470,9 +475,11 @@ void ToolsGUI_RegWidget::InfoHistory()
 	  ASSERT( c_info.name!=NULL);
 	  QString a;
 	  a.setNum(int(c_info.pid));
-	  char * t1 = (char * )duplicate(ctime(&c_info.tc_start));
+	  aTime = time_t(c_info.tc_start);
+	  char * t1 = (char * )duplicate(ctime(&aTime));
 	  t1 [strlen(t1) -1 ] = ' ';
-	  char * t2 = (char * )duplicate(ctime(&c_info.tc_end));
+	  aTime = time_t(c_info.tc_end);
+	  char * t2 = (char * )duplicate(ctime(&aTime));
 	  t2 [strlen(t2) -1 ] = ' ';
 	  QListViewItem * item = new QListViewItem(_history, QString(c_info.name),\
 						   a, QString(c_info.pwname), QString(c_info.machine), \
@@ -503,6 +510,7 @@ void ToolsGUI_RegWidget::InfoReg()
   _clients->clear();
   try
     {
+      time_t aTime;
       _serverclients = _VarComponents->getall();
       for (CORBA::ULong i=0; i<_serverclients->length(); i++)
 	{       
@@ -510,9 +518,11 @@ void ToolsGUI_RegWidget::InfoReg()
 	  ASSERT( c_info.name!=NULL);
 	  QString a;
 	  a.setNum(int(c_info.pid));
-	  char * t1 = (char * )duplicate(ctime(&c_info.tc_start));
+	  aTime = time_t(c_info.tc_start);
+	  char * t1 = (char * )duplicate(ctime(&aTime));
 	  t1 [strlen(t1) -1 ] = ' ';
-	  char * t2 = (char * )duplicate(ctime(&c_info.tc_hello));
+	  aTime = time_t(c_info.tc_hello);
+	  char * t2 = (char * )duplicate(ctime(&aTime));
 	  t2 [strlen(t2) -1 ] = ' ';
 	  QListViewItem * item = new QListViewItem(_clients, QString(c_info.name),\
 						   a, QString(c_info.pwname), QString(c_info.machine), \
@@ -567,6 +577,9 @@ void ToolsGUI_RegWidget::slotSelectRefresh()
   END_OF("slotSelectRefresh");
 }
 
+/*!
+  SLOT: called when IntervalWindow's OK button is clicked
+*/
 void ToolsGUI_RegWidget::slotIntervalOk()
 {
   BEGIN_OF("slotIntervalOk");

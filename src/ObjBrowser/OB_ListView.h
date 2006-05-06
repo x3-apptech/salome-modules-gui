@@ -34,6 +34,11 @@ class OB_Filter;
 class QListViewItem;
 class SUIT_DataObject;
 
+/*!
+  \class OB_ListView
+  Special list view for ObjectBrowser.
+  Allows drag-n-drop, filtering of selected objects, column management.
+*/
 class OB_EXPORT OB_ListView : public QtxListView
 {
   Q_OBJECT

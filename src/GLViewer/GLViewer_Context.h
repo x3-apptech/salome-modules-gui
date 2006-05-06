@@ -23,10 +23,6 @@
 // Created:   November, 2004
 
 
-/*! Class GLViewer_Context
- *  Class for manage of presentations in GLViewer
- */
-
 #ifndef GLVIEWER_CONTEXT_H
 #define GLVIEWER_CONTEXT_H
 
@@ -52,6 +48,9 @@ class GLViewer_Viewer2d;
 #pragma warning( disable:4251 )
 #endif
 
+/*! \class GLViewer_Context
+ *  Class for manage of presentations in GLViewer
+ */
 class GLVIEWER_API GLViewer_Context
 {
 public:
@@ -73,14 +72,12 @@ public:
   *function search object rectangle which intersect with sensitive area and call object highlight method
   */
   int                   MoveTo( int x, int y, bool byCircle = FALSE );
-  //! A function selecting already highlighting object by calling object method select
-  /*!
+  /*! A function selecting already highlighting object by calling object method select
   *\param Append - true if new selection will be append to existing selection, false - another
   *\param byCircle - true if needs round selection area in complex object
   */
   int                   Select( bool Append = FALSE, bool byCircle = FALSE );
-  //! A function selecting objects on scene by rectangle
-  /*!
+  /*! A function selecting objects on scene by rectangle
   *\param theRect - rectangle of selection
   *\param Append - true if new selection will be append to existing selection, false - another
   *function search object rectangle which intersect with theRect and call object select method
@@ -119,7 +116,7 @@ public:
   int                   insertObject( GLViewer_Object* theObject, bool display = false, bool isActive = true );
   //! Replacing objects in context
   /*!
-  * Function search activ and incative objects
+  * Function search active and incative objects
   */
   bool                  replaceObject( GLViewer_Object* oldObject, GLViewer_Object* newObject );
   //! A function updating scales of all objects in context
@@ -129,7 +126,7 @@ public:
 
   //! Returns list of context objects
   /*!
-  * Returns active objects if isActive = true, else inactive objects
+  * \return active objects if isActive = true, else inactive objects
   */
   const ObjList&        getObjects( bool isActive = true )
                         { return isActive ? myActiveObjects : myInactiveObjects; }

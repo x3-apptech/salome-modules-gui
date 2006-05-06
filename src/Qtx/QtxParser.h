@@ -33,21 +33,44 @@
 
 class QtxOperations;
 
+/*! \var QtxValue
+    \brief Alias for QVariant
+*/
 typedef QVariant QtxValue;
 
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxParser
+
+  This class allows to calculate values of expressions using different set of operations.
+  It is provided some of standard set of operations (arithmetics, logic, strings, etc - in QtxStdOperations.h).
+  This parser allows to use parameters with help of methods has(), set(), remove(), value(). It uses
+  postfix representation of expressions and uses class QtxOperations in order to make certain operation
+  Every instance of parser contains only one postfix, so that if expression has been changed, then postfix
+  must be rebuilt. In order to increase performance of frequent calculation for many of expressions it is 
+  recommended to use different instances of parser for expressions
+
+*/
 class QTX_EXPORT QtxParser
 {
 public:
+    /*!
+      \enum Error
+      \brief Errors during parsing
+    */
     typedef enum
     {
-        OK, OperandsNotMatch, InvalidResult, InvalidOperation,
-        OperationsNull, InvalidToken, CloseExpected, ExcessClose,
-        BracketsNotMatch, StackUnderflow, ExcessData
+        OK,               /*! \var All right */
+	OperandsNotMatch, /*! \var Types of arguments are invalid for this operation */
+	InvalidResult,    /*! \var Operation cannot find result (for example, division by zero) */
+	InvalidOperation, /*! \var Name of operation is unknown */
+        OperationsNull,   /*! \var Internal operations pointer of parser is null */
+	InvalidToken,     /*! \var It isn't operation, parameter of value  */
+	CloseExpected,    /*! \var Close bracket is expected */
+	ExcessClose,      /*! \var The one of close bracket is excess */
+        BracketsNotMatch, /*! \var Last open and this close bracket are different, for example [) */
+	StackUnderflow,   /*! \var There is no arguments in stack for operation */
+	ExcessData        /*! \var The parsing is finished, but there is more then one value in stack */
 
     } Error;
 
@@ -74,8 +97,23 @@ public:
     static QString toString( const QValueList< QtxValue >& );
 
 protected:
-    typedef enum { Value, Param, Open, Close, Pre, Post, Binary } PostfixItemType;
+    /*!
+      \enum PostfixItemType
+      \brief Types of postfix representation elements
+    */  
+    typedef enum
+    {
+      Value, /*! \var Value (number, string, etc.)*/
+      Param, /*! \var Parameter */
+      Open,  /*! \var Open bracket */
+      Close, /*! \var Close bracket */
+      Pre,   /*! \var Unary prefix operation */
+      Post,  /*! \var Unary postfix operation */
+      Binary /*! \var Binary operation */
 
+    } PostfixItemType;
+
+    /*! \var postfix representation element */
     typedef struct
     {
         QtxValue          myValue;
@@ -83,7 +121,10 @@ protected:
 
     } PostfixItem;
 
+    /*! \var postfix representation */
     typedef QValueList< PostfixItem > Postfix;
+
+    /*! \var postfix representation iterator */
     typedef Postfix::const_iterator PostfixIterator;
 
 protected:
@@ -105,6 +146,7 @@ protected:
     static int       globalBrackets( const Postfix&, int, int );
 
 private:
+    /*! \var stack of QtxValues */
     typedef QValueStack < QtxValue >  QtxValueStack;
 
 private:

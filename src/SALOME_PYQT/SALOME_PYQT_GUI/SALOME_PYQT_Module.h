@@ -16,14 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-//=============================================================================
-// File      : SALOME_PYQT_Module.h
-// Created   : 25/04/05
-// Author    : Vadim SANDLER
-// Project   : SALOME
-// Copyright : 2003-2005 CEA/DEN, EDF R&D
-// $Header   : $
-//=============================================================================
 
 #ifndef SALOME_PYQT_MODULE_H
 #define SALOME_PYQT_MODULE_H
@@ -152,6 +144,8 @@ public:
   int                    actionId( const QAction* ) const;
   QAction*               createAction( const int, const QString&, const QString&, const QString&,
                                        const QString&, const int, const bool = false );
+  /* load icon from resource file */
+  QIconSet               loadIcon( const QString& fileName );
 
   /* Show/hide menus/toolbars */
   void                   setMenuShown( const bool );
@@ -190,6 +184,8 @@ private:
   void            activate    ( SUIT_Study* );
   /* internal deactivation */ 
   void            deactivate  ( SUIT_Study* );
+  /* customization */ 
+  void            customize   ( SUIT_Study* );
   /* study activation */ 
   void            studyChanged( SUIT_Study* );
   /* context popup menu processing */

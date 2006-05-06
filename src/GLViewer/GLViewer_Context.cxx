@@ -22,10 +22,10 @@
 // File:      GLViewer_Context.cxx
 // Created:   November, 2004
 
-//================================================================
-// Class       : GLViewer_AspectLine
-// Description : Class for manage of presentations in GLViewer
-//================================================================
+/*!
+  \class GLViewer_AspectLine
+  \brief Class for manage of presentations in GLViewer
+*/
 
 #include "GLViewer_Context.h"
 
@@ -38,10 +38,9 @@
 
 #define TOLERANCE  12
 
-//=======================================================================
-// Function: GLViewer_Context
-// Purpose :
-//=======================================================================
+/*!
+  Constructor
+*/
 GLViewer_Context::GLViewer_Context( GLViewer_Viewer2d* v ) :
        myGLViewer2d( v ),
        myHighlightColor( Quantity_NOC_CYAN1 ),
@@ -59,10 +58,9 @@ GLViewer_Context::GLViewer_Context( GLViewer_Viewer2d* v ) :
   mySelCurIndex = 0;
 }
 
-//=======================================================================
-// Function: ~GLViewer_Context
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_Context::~GLViewer_Context()
 {
     myActiveObjects.clear();
@@ -70,10 +68,13 @@ GLViewer_Context::~GLViewer_Context()
     mySelectedObjects.clear();
 }
 
-//=======================================================================
-// Function: MoveTo
-// Purpose :
-//=======================================================================
+/*!
+  Hiilights objects under cursor
+  \param x - X coord of mouse cursor
+  \param y - Y coord of mouse cursor
+  \param byCircle - true if needs round sensitive area around mouse cursor, else rectangle
+  function search object rectangle which intersect with sensitive area and call object highlight method
+*/
 int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
 {
     GLfloat x = (GLfloat)xi;
@@ -180,10 +181,10 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
     return 0;
 }
 
-//=======================================================================
-// Function: Select
-// Purpose :
-//=======================================================================
+/*! Selects already highlighting object by calling object method select
+  \param Append - true if new selection will be append to existing selection, false - another
+  \param byCircle - true if needs round selection area in complex object
+*/
 int GLViewer_Context::Select( bool Append, bool byCircle )
 {
     ObjList::Iterator it, itEnd, oit, oitEnd;
@@ -322,10 +323,11 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
     return SS_NoChanged;
 }
 
-//=======================================================================
-// Function: SelectByRect
-// Purpose :
-//=======================================================================
+/*! Selects objects on scene by rectangle
+  \param theRect - rectangle of selection
+  \param Append - true if new selection will be append to existing selection, false - another
+  function search object rectangle which intersect with theRect and call object select method
+*/
 int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
 {
     GLfloat aXScale;
@@ -384,10 +386,10 @@ int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
     return status;
 }
 
-//=======================================================================
-// Function: SetHighlightColor
-// Purpose :
-//=======================================================================
+/*!
+  Sets color of hilighting
+  \param aCol - new color of highlighting
+*/
 void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
 {
   myHighlightColor = aCol;
@@ -407,10 +409,10 @@ void GLViewer_Context::SetHighlightColor( Quantity_NameOfColor aCol )
   myGLViewer2d->updateColors( colH, colS);
 }
 
-//=======================================================================
-// Function: SetSelectionColor
-// Purpose :
-//=======================================================================
+/*!
+  Sets color of selection
+  \param aCol - new color of selection
+*/
 void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
 {
   mySelectionColor = aCol;
@@ -430,37 +432,33 @@ void GLViewer_Context::SetSelectionColor( Quantity_NameOfColor aCol )
   myGLViewer2d->updateColors( colH, colS);
 }
 
-//=======================================================================
-// Function: NbSelected
-// Purpose :
-//=======================================================================
+/*!
+  \return number of selected objects
+*/
 int GLViewer_Context::NbSelected()
 {
   return mySelectedObjects.count();
 }
 
-//=======================================================================
-// Function: InitSelected
-// Purpose :
-//=======================================================================
+/*!
+  Inits iteration through selected objects
+*/
 void GLViewer_Context::InitSelected()
 {
   mySelCurIndex = 0;
 }
 
-//=======================================================================
-// Function: MoreSelected
-// Purpose :
-//=======================================================================
+/*!
+  Checks if iteration through selected objects may be continued
+*/
 bool GLViewer_Context::MoreSelected()
 {
   return ( mySelCurIndex < NbSelected() );
 }
 
-//=======================================================================
-// Function: NextSelected
-// Purpose :
-//=======================================================================
+/*!
+  Iterates to next selected object
+*/
 bool GLViewer_Context::NextSelected()
 {
   if ( mySelCurIndex >= 0 && mySelCurIndex < NbSelected() )
@@ -472,28 +470,28 @@ bool GLViewer_Context::NextSelected()
   return FALSE;
 }
 
-//=======================================================================
-// Function: SelectedObject
-// Purpose :
-//=======================================================================
+/*!
+  \return current selected object (must be used only in cycle as "for( InitSelected(); MoreSelected(); NextSelected() ) {...}" )
+*/
 GLViewer_Object* GLViewer_Context::SelectedObject()
 {
     return mySelectedObjects[ mySelCurIndex ];
 }
 
-//=======================================================================
-// Function: isSelected
-// Purpose :
-//=======================================================================
+/*!
+  \return true if object is selected
+  \param theObj - object to be checked
+*/
 bool  GLViewer_Context::isSelected( GLViewer_Object* theObj )
 {
     return mySelectedObjects.contains( theObj );
 }
 
-//=======================================================================
-// Function: insertObject
-// Purpose :
-//=======================================================================
+/*! Inserts new object in context
+  \param theObject - object to be inserted
+  \param display - true if needs display object immediatly after inserting, else false
+  \param isActive - true if needs inserting object in active list
+*/
 int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool isActive )
 {
 //  cout << "GLViewer_Context::insertObject" << endl;
@@ -517,10 +515,11 @@ int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool 
     return myActiveObjects.count() + myInactiveObjects.count();
 }
 
-//=======================================================================
-// Function: replaceObject
-// Purpose :
-//=======================================================================
+/*!
+  Replaces object in context
+  \param oldObject - object to be replaced
+  \param newObject - object for replacing
+*/
 bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Object* newObject )
 {
     if( !oldObject || !newObject )
@@ -543,10 +542,9 @@ bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Objec
   return false;
 }
 
-//=======================================================================
-// Function: updateScales
-// Purpose :
-//=======================================================================
+/*!
+  Updates scales of all objects in context
+*/
 void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
 {
   if( scX <= 0 || scY <= 0 )
@@ -561,10 +559,10 @@ void GLViewer_Context::updateScales( GLfloat scX, GLfloat scY )
       (*it)->setScale( scX, scY );
 }
 
-//=======================================================================
-// Function: clearHighlighted
-// Purpose :
-//=======================================================================
+/*!
+  Clears hilighting of objects
+  \param updateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::clearHighlighted( bool updateViewer )
 {
   if( myHFlag && myLastPicked )
@@ -577,10 +575,10 @@ void GLViewer_Context::clearHighlighted( bool updateViewer )
   }
 }
 
-//=======================================================================
-// Function: clearSelected
-// Purpose :
-//=======================================================================
+/*!
+  Clears selection of objects
+  \param updateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::clearSelected( bool updateViewer )
 {
   if( !mySFlag )
@@ -600,10 +598,10 @@ void GLViewer_Context::clearSelected( bool updateViewer )
   mySelectedObjects.clear();    
 }
 
-//=======================================================================
-// Function: setSelected
-// Purpose :
-//=======================================================================
+/*!
+  Selects object, other selected objects are left as selected
+  \param updateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
 {
   if( !object )
@@ -619,10 +617,10 @@ void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
     myGLViewer2d->activateDrawer( object, TRUE, TRUE );
 }
 
-//=======================================================================
-// Function: remSelected
-// Purpose :
-//=======================================================================
+/*!
+  Unselects object, other selected objects are left as selected
+  \param updateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
 {
   if( !object || !mySelectedObjects.contains( object ) )
@@ -635,10 +633,10 @@ void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
     myGLViewer2d->activateDrawer( object, TRUE, TRUE );
 }
 
-//=======================================================================
-// Function: eraseObject
-// Purpose :
-//=======================================================================
+/*!
+  Erases object in viewer
+  \param theUpdateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateViewer )
 {
     if( !theObject || !myActiveObjects.contains( theObject ) )
@@ -652,10 +650,10 @@ void GLViewer_Context::eraseObject( GLViewer_Object* theObject, bool theUpdateVi
         myGLViewer2d->updateAll();
 }
 
-//=======================================================================
-// Function: deleteObject
-// Purpose :
-//=======================================================================
+/*!
+  Deletes object in
+  \param updateViewer - if it is true, viewer must be updated
+*/
 void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateViewer )
 {
     if( !theObject ||
@@ -683,10 +681,10 @@ void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateView
       myGLViewer2d->updateAll();
 }
 
-//=======================================================================
-// Function: setActive
-// Purpose :
-//=======================================================================
+/*!
+  Installs active status to object
+  \param theObject
+*/
 bool GLViewer_Context::setActive( GLViewer_Object* theObject )
 {
   if( !theObject || !myInactiveObjects.contains( theObject ) )
@@ -697,10 +695,10 @@ bool GLViewer_Context::setActive( GLViewer_Object* theObject )
   return true;
 }
 
-//=======================================================================
-// Function: setInactive
-// Purpose :
-//=======================================================================
+/*!
+  Installs inactive status to object
+  \param theObject
+*/
 bool GLViewer_Context::setInactive( GLViewer_Object* theObject )
 {
   if( !theObject || !myActiveObjects.contains( theObject ) )

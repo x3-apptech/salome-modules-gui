@@ -24,6 +24,9 @@
 #include <qlineedit.h>
 #include <qapplication.h>
 
+/*!
+  Constructor
+*/
 QtxIntSpinBox::QtxIntSpinBox( QWidget* parent, const char* name )
 : QSpinBox( parent, name ),
 myCleared( false ),
@@ -32,6 +35,9 @@ myBlocked( false )
   connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
+/*!
+  Constructor
+*/
 QtxIntSpinBox::QtxIntSpinBox( int min, int max, int step, QWidget* parent, const char* name )
 : QSpinBox( min, max, step, parent, name ),
 myCleared( false ),
@@ -40,15 +46,25 @@ myBlocked( false )
   connect( editor(), SIGNAL( textChanged( const QString& ) ), this, SLOT( onTextChanged( const QString& ) ) );
 }
 
+/*!
+  Destructor
+*/
 QtxIntSpinBox::~QtxIntSpinBox()
 {
 }
 
+/*!
+  \return true if spin box is cleared
+*/
 bool QtxIntSpinBox::isCleared() const
 {
   return myCleared;
 }
 
+/*!
+  Changes cleared status of spin box
+  \param on - new status
+*/
 void QtxIntSpinBox::setCleared( const bool on )
 {
   if ( myCleared == on )
@@ -58,6 +74,10 @@ void QtxIntSpinBox::setCleared( const bool on )
   updateDisplay();
 }
 
+/*!
+  Changes value of spin box
+  \param val - new value of spin box
+*/
 void QtxIntSpinBox::setValue( int value )
 {
   myCleared = false;
@@ -65,6 +85,9 @@ void QtxIntSpinBox::setValue( int value )
   QSpinBox::setValue( value );
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxIntSpinBox::eventFilter( QObject* o, QEvent* e )
 {
   if ( !myCleared || o != editor() || !editor()->text().stripWhiteSpace().isEmpty() )
@@ -83,6 +106,9 @@ bool QtxIntSpinBox::eventFilter( QObject* o, QEvent* e )
   return QSpinBox::eventFilter( o, e );
 }
 
+/*!
+  Sets integer value by text in editor
+*/
 void QtxIntSpinBox::interpretText()
 {
   myCleared = false;
@@ -90,6 +116,9 @@ void QtxIntSpinBox::interpretText()
   QSpinBox::interpretText();
 }
 
+/*!
+  Updates text of editor
+*/
 void QtxIntSpinBox::updateDisplay()
 {
   if ( myBlocked )
@@ -113,12 +142,18 @@ void QtxIntSpinBox::updateDisplay()
   myBlocked = block;
 }
 
+/*!
+  Custom handler for leave event
+*/
 void QtxIntSpinBox::leaveEvent( QEvent* e )
 {
   if ( !myCleared )
     QSpinBox::leaveEvent( e );
 }
 
+/*!
+  Custom handler for wheel event
+*/
 void QtxIntSpinBox::wheelEvent( QWheelEvent* e )
 {
   if ( !isEnabled() )
@@ -128,6 +163,9 @@ void QtxIntSpinBox::wheelEvent( QWheelEvent* e )
   updateDisplay();
 }
 
+/*!
+  SLOT: called if text is changed
+*/
 void QtxIntSpinBox::onTextChanged( const QString& )
 {
   if ( !myBlocked )

@@ -24,6 +24,11 @@
 
 class QString;
 
+/*!
+  \class LightApp_Displayer
+  Uniform mechanism of display/erase of objects in different views.
+  Objects are specified by string entry
+*/
 class LightApp_Displayer : public SALOME_Displayer
 {
 public:

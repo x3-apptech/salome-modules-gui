@@ -38,6 +38,10 @@ class QSimpleRichText;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class QtxColorScale
+  Color Scale widget.
+*/
 class QTX_EXPORT QtxColorScale : public QFrame
 {
 	  Q_OBJECT

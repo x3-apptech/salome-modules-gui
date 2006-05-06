@@ -49,10 +49,9 @@ LightApp_Driver::~LightApp_Driver()
 
 using namespace std;
 
-//================================================================
-// Function : SaveDatasInFile
-/*! Purpose  : save in file 'theFileName' datas from this driver*/
-//================================================================
+/*!
+  Save in file 'theFileName' datas from this driver
+*/
 bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile )
 {
   int aNbModules = 0;
@@ -133,10 +132,9 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
   return true;
 }
 
-//=======================================================================
-// name    : ReaDatasFromFile
-/*! Purpose : filling current driver from file 'theFileName'*/
-//=======================================================================
+/*!
+  Filling current driver from file 'theFileName'
+*/
 bool LightApp_Driver::ReadDatasFromFile( const char* theFileName, bool isMultiFile )
 {
 #ifdef WNT
@@ -193,10 +191,9 @@ bool LightApp_Driver::ReadDatasFromFile( const char* theFileName, bool isMultiFi
   return true;
 }
 
-//================================================================
-// Function : GetTmpDir
-/*! Purpose  : returns temp directory for path 'theURL'*/
-//================================================================
+/*!
+  \return temp directory for path 'theURL'
+*/
 std::string LightApp_Driver::GetTmpDir (const char* theURL, const bool  isMultiFile)
 {
   std::string anURLDir = GetDirFromPath(theURL);
@@ -205,10 +202,9 @@ std::string LightApp_Driver::GetTmpDir (const char* theURL, const bool  isMultiF
   return aTmpDir;
 }
 
-//================================================================
-// Function : GetListOfFiles
-/*! Purpose  : returns list of files for module with name 'theModuleName'*/
-//================================================================
+/*!
+  \return list of files for module with name 'theModuleName'
+*/
 LightApp_Driver::ListOfFiles LightApp_Driver::GetListOfFiles( const char* theModuleName )
 {
   ListOfFiles aListOfFiles;
@@ -220,20 +216,18 @@ LightApp_Driver::ListOfFiles LightApp_Driver::GetListOfFiles( const char* theMod
     return aListOfFiles;
 }
 
-//================================================================
-// Function : SetListOfFiles
-/*! Purpose  : sets list of files for module with name 'theModuleName'*/
-//================================================================
+/*!
+  Sets list of files for module with name 'theModuleName'
+*/
 void LightApp_Driver::SetListOfFiles( const char* theModuleName, const ListOfFiles theListOfFiles )
 {
   std::string aName (theModuleName);
   myMap[aName] = theListOfFiles;
 }
 
-//============================================================================
-// function : PutFilesToStream
-/*! Purpose  : converts files which was created from module <theModuleName> into a byte sequence unsigned char*/
-//============================================================================
+/*!
+  Converts files which was created from module <theModuleName> into a byte sequence unsigned char
+*/
 void LightApp_Driver::PutFilesToStream( const std::string& theModuleName, unsigned char*& theBuffer,
                                         long& theBufferSize, bool theNamesOnly )
 {
@@ -342,10 +336,9 @@ void LightApp_Driver::PutFilesToStream( const std::string& theModuleName, unsign
   theBufferSize = aBufferSize;
 }
 
-//============================================================================
-// function : PutStreamToFile
-/*! Purpose  : converts a byte sequence <theBuffer> to files and return list of them*/
-//============================================================================
+/*!
+  Converts a byte sequence <theBuffer> to files and return list of them
+*/
 LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned char* theBuffer,
                                                                 const long theBufferSize, bool theNamesOnly )
 {
@@ -406,13 +399,11 @@ LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned c
   return aFiles;
 }
 
-//============================================================================
-// function : RemoveFiles
-/*! Purpose  : Remove files. First item in <theFiles> is a directory with slash at the end.
-               Other items are names of files. If <IsDirDeleted> is true,
-	       then the directory is also deleted.
+/*!
+  Remove files. First item in <theFiles> is a directory with slash at the end.
+  Other items are names of files. If <IsDirDeleted> is true,
+  then the directory is also deleted.
 */
-//============================================================================
 void LightApp_Driver::RemoveFiles( const ListOfFiles& theFiles, const bool IsDirDeleted)
 {
   int i, aLength = theFiles.size() - 1;
@@ -449,11 +440,10 @@ void LightApp_Driver::RemoveFiles( const ListOfFiles& theFiles, const bool IsDir
   }
 }
 
-//============================================================================
-// function : RemoveTemporaryFiles
-/*! Purpose  : removes files which was created from module theModuleName if 
-               <IsDirDeleted> is true tmp directory is also deleted if it is empty*/
-//============================================================================
+/*!
+  Removes files which was created from module theModuleName if 
+  <IsDirDeleted> is true tmp directory is also deleted if it is empty
+*/
 void LightApp_Driver::RemoveTemporaryFiles( const char* theModuleName, const bool IsDirDeleted )
 {
   std::string aModuleName(theModuleName);
@@ -464,10 +454,9 @@ void LightApp_Driver::RemoveTemporaryFiles( const char* theModuleName, const boo
 
 }
 
-//============================================================================
-// function : ClearDriverContents
-/*! Purpose  : clear map of list files*/ 
-//============================================================================ 
+/*!
+  Clears map of list files
+*/ 
 void LightApp_Driver::ClearDriverContents()
 {
   std::map<std::string, ListOfFiles>::iterator it;
@@ -483,10 +472,9 @@ void LightApp_Driver::ClearDriverContents()
   SetIsTemporary( false );
 }
 
-//============================================================================
-// function : GetTempDir
-/*! Purpose  : return a temp directory to store created files like "/tmp/sub_dir/" */
-//============================================================================ 
+/*!
+  \return a temp directory to store created files like "/tmp/sub_dir/"
+*/
 std::string LightApp_Driver::GetTmpDir()
 {
   if ( myTmpDir.length() != 0 )
@@ -553,10 +541,9 @@ std::string LightApp_Driver::GetTmpDir()
   return aTmpDir.ToCString();
 }
 
-//============================================================================
-// function : GetDirFromPath
-/*! Purpose  : returns the dir by the path*/
-//============================================================================
+/*!
+  \return the dir by the path
+*/
 std::string LightApp_Driver::GetDirFromPath( const std::string& thePath ) {
   if(thePath == "")
     return "";

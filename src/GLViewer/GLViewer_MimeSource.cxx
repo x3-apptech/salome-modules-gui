@@ -19,13 +19,6 @@
 //  Author : OPEN CASCADE
 //
 
-/***************************************************************************
-**  Class:   GLViewer_MimeSource
-**  Descr:   Needs for a work with QClipboard
-**  Module:  GLViewer
-**  Created: UI team, 22.03.04
-****************************************************************************/
-
 //#include <GLViewerAfx.h>
 #include "GLViewer_MimeSource.h"
 #include "GLViewer_BaseObjects.h"
@@ -33,10 +26,17 @@
 //#include <cmath>
 //using namespace std;
 
+/*!
+  Destructor
+*/
 GLViewer_MimeSource::~GLViewer_MimeSource()
 {
 }
 
+/*!
+  Translate objects to byte array
+  \param theObjects - list of objects
+*/
 bool GLViewer_MimeSource::setObjects( QValueList<GLViewer_Object*> theObjects )
 {
     if( !theObjects.empty() )
@@ -109,9 +109,12 @@ bool GLViewer_MimeSource::setObjects( QValueList<GLViewer_Object*> theObjects )
 
     return false;
 }
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!NOTE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//If you want to use new class, following two method must be redefined
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!NOTE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/*!
+  Creates object by it's representation (byte array)
+  \param theArray - byte array
+  \param theType - type of object
+*/
 GLViewer_Object* GLViewer_MimeSource::getObject( QByteArray theArray, QString theType )
 {
     if( !theArray.isEmpty() )
@@ -139,6 +142,11 @@ GLViewer_Object* GLViewer_MimeSource::getObject( QByteArray theArray, QString th
     return NULL;
 }
 
+/*!
+  Creates list of objects by its representation (byte array)
+  \param theArray - byte array
+  \param theType - type of object
+*/
 QValueList<GLViewer_Object*> GLViewer_MimeSource::getObjects( QByteArray theArray, QString theType )
 {
     if( !theArray.isEmpty() )
@@ -210,6 +218,10 @@ QValueList<GLViewer_Object*> GLViewer_MimeSource::getObjects( QByteArray theArra
     return QValueList<GLViewer_Object*>();    
 }
 
+/*!
+  \return format by index
+  \param theIndex - index
+*/
 const char* GLViewer_MimeSource::format( int theIndex ) const
 {
     switch( theIndex )
@@ -223,6 +235,9 @@ const char* GLViewer_MimeSource::format( int theIndex ) const
 
 }
 
+/*!
+  \return internal byte array
+*/
 QByteArray GLViewer_MimeSource::encodedData( const char* theObjectType ) const
 {
     if( theObjectType == "GLViewer_Objects" )

@@ -25,9 +25,6 @@ class PyInterp_base;
 class PyInterp_Watcher;
 class PyInterp_Dispatcher;
 
-//////////////////////////////////////////////////////////
-// class : PyInterp_Request
-//////////////////////////////////////////////////////////
 class PYINTERP_EXPORT PyInterp_Request
 {
   friend class PyInterp_Dispatcher;
@@ -88,9 +85,6 @@ private:
   PyInterp_base*  myInterp;
 };
 
-//////////////////////////////////////////////////////////
-// class : PyInterp_Event
-//////////////////////////////////////////////////////////
 class PYINTERP_EXPORT PyInterp_Event : public QCustomEvent
 {
   PyInterp_Event();
@@ -111,9 +105,6 @@ private:
   PyInterp_Request* myRequest;
 };
 
-//////////////////////////////////////////////////////////
-// class : PyInterp_Dispatcher
-//////////////////////////////////////////////////////////
 class PYINTERP_EXPORT PyInterp_Dispatcher : protected QThread
 {
   PyInterp_Dispatcher(); // private constructor

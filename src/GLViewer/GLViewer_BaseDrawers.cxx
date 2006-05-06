@@ -33,16 +33,12 @@
 #include <GL/glx.h>
 #endif
 
-/***************************************************************************
-**  Class:   GLViewer_MarkerDrawer
-**  Descr:   Drawer for GLViewer_MarkerSet
-**  Module:  GLViewer
-**  Created: UI team, 03.10.01
-****************************************************************************/
-
 GLfloat sin_table[SEGMENTS];
 GLfloat cos_table[SEGMENTS];
 
+/*!
+  Default constructor
+*/
 GLViewer_MarkerDrawer::GLViewer_MarkerDrawer()
 : GLViewer_Drawer()
 {
@@ -56,10 +52,18 @@ GLViewer_MarkerDrawer::GLViewer_MarkerDrawer()
     myObjectType = "GLViewer_MarkerSet";
 }
 
+/*!
+  Destructor
+*/
 GLViewer_MarkerDrawer::~GLViewer_MarkerDrawer()
 {
 }
 
+/*! Draws object in GLViewer
+  \param xScale - current scale along X-direction
+  \param yScale - current scale along Y-direction
+  \param onlyUpdate - = true if only update highlight-select information
+*/
 void GLViewer_MarkerDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
     QValueList<int>::Iterator it;
@@ -134,6 +138,13 @@ void GLViewer_MarkerDrawer::create( float xScale, float yScale, bool onlyUpdate 
     }
 }
 
+/*! Draws marker
+  \param theXCoord - X position
+  \param theYCoord - Y position
+  \param theRadius - radius
+  \param theColor - color
+  \param theAspectLine - line aspect
+*/
 void GLViewer_MarkerDrawer::drawMarker( float& theXCoord, float& theYCoord,
                                      float& theRadius, QColor& theColor, GLViewer_AspectLine* theAspectLine )
 {
@@ -154,23 +165,28 @@ void GLViewer_MarkerDrawer::drawMarker( float& theXCoord, float& theYCoord,
     glEnd();
 }
 
-/***************************************************************************
-**  Class:   GLViewer_PolylineDrawer
-**  Descr:   Drawer for GLViewer_Polyline
-**  Module:  GLViewer
-**  Created: UI team, 03.10.01
-****************************************************************************/
 
+/*!
+  Default constructor
+*/
 GLViewer_PolylineDrawer::GLViewer_PolylineDrawer()
 :GLViewer_Drawer()
 {
     myObjectType = "GLViewer_Polyline";
 }
 
+/*!
+  Destructor
+*/
 GLViewer_PolylineDrawer::~GLViewer_PolylineDrawer()
 {
 }
 
+/*! Draws object in GLViewer
+  \param xScale - current scale along X-direction
+  \param yScale - current scale along Y-direction
+  \param onlyUpdate - = true if only update highlight-select information
+*/
 void GLViewer_PolylineDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
     QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
@@ -239,23 +255,27 @@ void GLViewer_PolylineDrawer::create( float xScale, float yScale, bool onlyUpdat
     }
 }
 
-/***************************************************************************
-**  Class:   GLViewer_TextDrawer
-**  Descr:   
-**  Module:  GLViewer
-**  Created: UI team, 27.02.04
-****************************************************************************/
-
+/*!
+  Default constructor
+*/
 GLViewer_TextDrawer::GLViewer_TextDrawer()
 : GLViewer_Drawer()
 {
     myObjectType = "GLViewer_TextObject";
 }
 
+/*!
+  Destructor
+*/
 GLViewer_TextDrawer::~GLViewer_TextDrawer()
 {
 }
 
+/*! Draws object in GLViewer
+  \param xScale - current scale along X-direction
+  \param yScale - current scale along Y-direction
+  \param onlyUpdate - = true if only update highlight-select information
+*/
 void GLViewer_TextDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
     QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
@@ -297,6 +317,9 @@ void GLViewer_TextDrawer::create( float xScale, float yScale, bool onlyUpdate )
     }
 }
 
+/*!
+  Updates objects after updating font
+*/
 void GLViewer_TextDrawer::updateObjects()
 {
     QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();

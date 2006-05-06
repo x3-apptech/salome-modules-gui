@@ -115,21 +115,35 @@ void LightApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
 }
 
 
+/*!
+  Constructor
+  \param entry - entry of object
+*/
 LightApp_GLOwner::LightApp_GLOwner( const char* entry )
 : GLViewer_Owner()
 {
   setEntry( entry );
 }
 
+/*!
+  Destructor
+*/
 LightApp_GLOwner::~LightApp_GLOwner()
 {
 }
 
+/*!
+  \return entry
+*/
 const char* LightApp_GLOwner::entry() const
 {
   return myEntry.c_str();
 }
 
+/*!
+  Sets new entry
+  \param entry - entry of object
+*/
 void LightApp_GLOwner::setEntry( const char* entry )
 {
   myEntry = entry;

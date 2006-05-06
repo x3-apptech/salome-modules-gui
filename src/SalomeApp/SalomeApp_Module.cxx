@@ -22,8 +22,6 @@
 #include <SALOME_InteractiveObject.hxx>
 //#include <SALOME_Actor.h>
 
-//#include "SALOMEDS_IParameters.hxx"
-
 #include <SUIT_Session.h>
 #include <SUIT_ViewModel.h>
 
@@ -67,6 +65,12 @@ LightApp_Selection* SalomeApp_Module::createSelection() const
   return LightApp_Module::createSelection();
 }
 
+/*!
+  Converts objects-containers to list of objects, those are contained
+  Other objects must be added without conversion
+  \param source - source list of objects
+  \param dest - list of converted objects
+*/
 void SalomeApp_Module::extractContainers( const SALOME_ListIO& source, SALOME_ListIO& dest ) const
 {
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );

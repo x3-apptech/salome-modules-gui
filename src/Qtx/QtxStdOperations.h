@@ -25,10 +25,11 @@
 #include "Qtx.h"
 #include "QtxOperations.h"
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxStdOperations
+  Provides simplified interface for standard operations.
+  Conatins list of operation names, priority and possible types
+*/
 class QTX_EXPORT QtxStdOperations : public QtxOperations
 {
 public:
@@ -52,10 +53,10 @@ private:
     ListOfTypes myTypes;
 };
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxArithmetics
+  Provides set of arithmetic operations for parser
+*/
 class QTX_EXPORT QtxArithmetics : public QtxStdOperations
 {
 public:
@@ -67,10 +68,10 @@ public:
     virtual QtxParser::Error calculate( const QString&, QtxValue&, QtxValue& ) const;
 };
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxLogic
+  Provides set of logic operations for parser
+*/
 class QTX_EXPORT QtxLogic : public QtxStdOperations
 {
 public:
@@ -82,10 +83,10 @@ public:
     virtual QtxParser::Error calculate( const QString&, QtxValue&, QtxValue& ) const;
 };
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxFunctions
+  Provides set of more complex operations for parser (sqrt, sin, cos, etc)
+*/
 class QTX_EXPORT QtxFunctions : public QtxStdOperations
 {
 public:
@@ -97,10 +98,10 @@ public:
     virtual QtxParser::Error calculate( const QString&, QtxValue&, QtxValue& ) const;
 };
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxStrings
+  Provides set of string operations for parser
+*/
 class QTX_EXPORT QtxStrings : public QtxStdOperations
 {
 public:
@@ -112,10 +113,10 @@ public:
     virtual QtxParser::Error calculate( const QString&, QtxValue&, QtxValue& ) const;
 };
 
-//================================================================
-// Class    : 
-// Purpose  : 
-//================================================================
+/*!
+  \class QtxSets
+  Provides set of operations with sets for parser
+*/
 class QTX_EXPORT QtxSets : public QtxStdOperations
 {
 public:

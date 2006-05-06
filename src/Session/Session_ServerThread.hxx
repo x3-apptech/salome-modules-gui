@@ -50,8 +50,7 @@ public:
   Session_ServerThread(int argc,
 		       char ** argv, 
 		       CORBA::ORB_ptr orb, 
-		       PortableServer::POA_ptr poa,
-		       QMutex *GUIMutex);
+		       PortableServer::POA_ptr poa);
   virtual ~Session_ServerThread();
   void         Init();
 protected:
@@ -68,7 +67,6 @@ protected:
   int                     _servType;
   CORBA::ORB_var          _orb;
   PortableServer::POA_var _root_poa;
-  QMutex*                 _GUIMutex;
   SALOME_NamingService *  _NS;
 };
 
@@ -88,6 +86,7 @@ public:
 protected:
   virtual void ActivateSession       ( int argc, char ** argv );
 private:
+  QMutex*                 _GUIMutex;
   QWaitCondition*         _GUILauncher;
 };
 

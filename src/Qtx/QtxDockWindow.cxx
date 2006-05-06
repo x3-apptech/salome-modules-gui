@@ -28,10 +28,9 @@
 #include <qapplication.h>
 
 /*!
-    Class: QtxDockWindow::Watcher [Internal]
-    Descr: Internal object with event filter.
+  \class QtxDockWindow::Watcher [Internal]
+  Internal object with event filter.
 */
-
 class QtxDockWindow::Watcher : public QObject
 {
 public:
@@ -62,6 +61,9 @@ private:
   bool           myVisible;
 };
 
+/*!
+  Constructor
+*/
 QtxDockWindow::Watcher::Watcher( QtxDockWindow* cont )
 : QObject( cont ), myCont( cont ),
 myState( true ),
@@ -76,6 +78,9 @@ myEmpty( true )
   installFilters();
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxDockWindow::Watcher::eventFilter( QObject* o, QEvent* e )
 {
   if ( o == myCont &&
@@ -98,6 +103,9 @@ bool QtxDockWindow::Watcher::eventFilter( QObject* o, QEvent* e )
   return false;
 }
 
+/*!
+  Sets internal status to shown
+*/
 void QtxDockWindow::Watcher::shown( QtxDockWindow* dw )
 {
   if ( dw != myCont )
@@ -106,6 +114,9 @@ void QtxDockWindow::Watcher::shown( QtxDockWindow* dw )
   myVisible = true;
 }
 
+/*!
+  Sets internal status to hidden
+*/
 void QtxDockWindow::Watcher::hided( QtxDockWindow* dw )
 {
   if ( dw != myCont )
@@ -114,6 +125,9 @@ void QtxDockWindow::Watcher::hided( QtxDockWindow* dw )
   myVisible = false;
 }
 
+/*!
+  Shows corresponding dock window
+*/
 void QtxDockWindow::Watcher::showContainer()
 {
   if ( !myCont )
@@ -125,6 +139,9 @@ void QtxDockWindow::Watcher::showContainer()
   myCont = cont;
 }
 
+/*!
+  Hides corresponding dock window
+*/
 void QtxDockWindow::Watcher::hideContainer()
 {
   if ( !myCont )
@@ -136,6 +153,9 @@ void QtxDockWindow::Watcher::hideContainer()
   myCont = cont;
 }
 
+/*!
+  Event filter of custom events
+*/
 void QtxDockWindow::Watcher::customEvent( QCustomEvent* e )
 {
   installFilters();
@@ -145,6 +165,9 @@ void QtxDockWindow::Watcher::customEvent( QCustomEvent* e )
   updateVisibility();
 }
 
+/*!
+  Installs this object as event filter to all widgets inside corresponding main window
+*/
 void QtxDockWindow::Watcher::installFilters()
 {
   if ( !myCont )
@@ -161,6 +184,9 @@ void QtxDockWindow::Watcher::installFilters()
   }
 }
 
+/*!
+  Updates visibility of all widgets inside corresponding main window
+*/
 void QtxDockWindow::Watcher::updateVisibility()
 {
   if ( !myCont )
@@ -192,6 +218,9 @@ void QtxDockWindow::Watcher::updateVisibility()
     vis ? showContainer() : hideContainer();
 }
 
+/*!
+  Updates icon of corresponding main window
+*/
 void QtxDockWindow::Watcher::updateIcon()
 {
   if ( !myCont || !myCont->widget() )
@@ -201,6 +230,9 @@ void QtxDockWindow::Watcher::updateIcon()
   myCont->setIcon( ico ? *ico : QPixmap() );
 }
 
+/*!
+  Updates caption of corresponding main window
+*/
 void QtxDockWindow::Watcher::updateCaption()
 {
   if ( myCont && myCont->widget() && !myCont->widget()->caption().isNull() )
@@ -208,10 +240,8 @@ void QtxDockWindow::Watcher::updateCaption()
 }
 
 /*!
-    Class: QtxDockWindow [Public]
-    Descr: 
+  Constructor
 */
-
 QtxDockWindow::QtxDockWindow( Place p, QWidget* parent, const char* name, WFlags f )
 : QDockWindow( p, parent, name, f ),
 myWatcher( 0 ),
@@ -219,6 +249,9 @@ myStretch( false )
 {
 }
 
+/*!
+  Constructor
+*/
 QtxDockWindow::QtxDockWindow( const bool watch, QWidget* parent, const char* name, WFlags f )
 : QDockWindow( InDock, parent, name, f ),
 myWatcher( 0 ),
@@ -228,6 +261,9 @@ myStretch( false )
     myWatcher = new Watcher( this );
 }
 
+/*!
+  Constructor
+*/
 QtxDockWindow::QtxDockWindow( QWidget* parent, const char* name, WFlags f )
 : QDockWindow( InDock, parent, name, f ),
 myWatcher( 0 ),
@@ -235,10 +271,17 @@ myStretch( false )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxDockWindow::~QtxDockWindow()
 {
 }
 
+/*!
+  Sets the dock window's main widget
+  \param wid - new main widget
+*/
 void QtxDockWindow::setWidget( QWidget* wid )
 {
   if ( wid )
@@ -247,11 +290,18 @@ void QtxDockWindow::setWidget( QWidget* wid )
   QDockWindow::setWidget( wid );
 }
 
+/*!
+  \return true if the dock window is stretchable
+*/
 bool QtxDockWindow::isStretchable() const
 {
   return myStretch;
 }
 
+/*!
+  Sets the dock window "stretchable" state
+  \param on - new state
+*/
 void QtxDockWindow::setStretchable( const bool on )
 {
   if ( myStretch == on )
@@ -271,6 +321,9 @@ void QtxDockWindow::setStretchable( const bool on )
   }
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxDockWindow::sizeHint() const
 {
   QSize sz = QDockWindow::sizeHint();
@@ -286,6 +339,9 @@ QSize QtxDockWindow::sizeHint() const
   return sz;
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxDockWindow::minimumSizeHint() const
 {
   QSize sz = QDockWindow::minimumSizeHint();
@@ -306,6 +362,9 @@ QSize QtxDockWindow::minimumSizeHint() const
   return sz;
 }
 
+/*!
+  \return corresponding main window
+*/
 QMainWindow* QtxDockWindow::mainWindow() const
 {
   QMainWindow* mw = 0;
@@ -321,6 +380,9 @@ QMainWindow* QtxDockWindow::mainWindow() const
   return mw;
 }
 
+/*!
+  Shows window
+*/
 void QtxDockWindow::show()
 {
   if ( myWatcher )
@@ -329,6 +391,9 @@ void QtxDockWindow::show()
   QDockWindow::show();
 }
 
+/*!
+  Hides window
+*/
 void QtxDockWindow::hide()
 {
   if ( myWatcher )

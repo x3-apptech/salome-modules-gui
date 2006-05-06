@@ -44,15 +44,13 @@ using namespace std;
   Constructor
 */
 SVTK_NonIsometricDlg
-::SVTK_NonIsometricDlg(SVTK_MainWindow* theParent,
-		       const char* theName,
-		       QtxAction* theAction):
-  QDialog(theParent, 
-	  theName, 
-	  false, 
-	  WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu ),
-  m_MainWindow(theParent),
-  m_Action(theAction)
+::SVTK_NonIsometricDlg(QtxAction* theAction,
+		       SVTK_MainWindow* theParent,
+		       const char* theName):
+  SVTK_DialogBase(theAction,
+		  theParent, 
+		  theName),
+  m_MainWindow(theParent)
 {
   setCaption(tr("DLG_TITLE"));
   setSizeGripEnabled(TRUE);
@@ -63,66 +61,70 @@ SVTK_NonIsometricDlg
   layoutDlg->setMargin(11);
 
   // Create croup box with grid layout
-  QGroupBox* GroupBox = new QGroupBox(this, "GroupBox");
-  QGridLayout* glGroupBox = new QGridLayout(GroupBox);
-  glGroupBox->setMargin(11);
-  glGroupBox->setSpacing(6);
+  QGroupBox* aGroupBox = new QGroupBox(this, "GroupBox");
+  QHBoxLayout* aHBoxLayout = new QHBoxLayout(aGroupBox);
+  aHBoxLayout->setMargin(11);
+  aHBoxLayout->setSpacing(6);
 
   // "X" scaling
-  QLabel* TextLabelX = new QLabel (tr("LBL_X"), GroupBox, "TextLabelX");
-  m_sbXcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, GroupBox);
+  QLabel* TextLabelX = new QLabel (tr("LBL_X"), aGroupBox, "TextLabelX");
+  TextLabelX->setFixedWidth(15);
+  m_sbXcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
   m_sbXcoeff->setMinimumWidth(80);
   m_sbXcoeff->setValue(1.0);
 
   // "Y" scaling
-  QLabel* TextLabelY = new QLabel (tr("LBL_Y"), GroupBox, "TextLabelY");
-  m_sbYcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, GroupBox);
+  QLabel* TextLabelY = new QLabel (tr("LBL_Y"), aGroupBox, "TextLabelY");
+  TextLabelY->setFixedWidth(15);
+  m_sbYcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
   m_sbYcoeff->setMinimumWidth(80);
   m_sbYcoeff->setValue(1.0);
 
   // "Z" scaling
-  QLabel* TextLabelZ = new QLabel (tr("LBL_Z"), GroupBox, "TextLabelZ");
-  m_sbZcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, GroupBox);
+  QLabel* TextLabelZ = new QLabel (tr("LBL_Z"), aGroupBox, "TextLabelZ");
+  TextLabelZ->setFixedWidth(15);
+  m_sbZcoeff = new QtxDblSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
   m_sbZcoeff->setMinimumWidth(80);
   m_sbZcoeff->setValue(1.0);
 
   // Create <Reset> button
-  m_bReset = new QPushButton(tr("&Reset"), GroupBox, "m_bReset");
+  m_bReset = new QPushButton(tr("&Reset"), aGroupBox, "m_bReset");
 
   // Layout widgets in the group box
-  glGroupBox->addWidget(TextLabelX, 0, 0);
-  glGroupBox->addWidget(m_sbXcoeff, 0, 1);
-  glGroupBox->addWidget(TextLabelY, 0, 2);
-  glGroupBox->addWidget(m_sbYcoeff, 0, 3);
-  glGroupBox->addWidget(TextLabelZ, 0, 4);
-  glGroupBox->addWidget(m_sbZcoeff, 0, 5);
-  glGroupBox->addWidget(m_bReset,   0, 6);
+  aHBoxLayout->addWidget(TextLabelX);
+  aHBoxLayout->addWidget(m_sbXcoeff);
+  aHBoxLayout->addWidget(TextLabelY);
+  aHBoxLayout->addWidget(m_sbYcoeff);
+  aHBoxLayout->addWidget(TextLabelZ);
+  aHBoxLayout->addWidget(m_sbZcoeff);
+  //aHBoxLayout->addStretch();
+  aHBoxLayout->addWidget(m_bReset);
 
   // OK, CANCEL, Apply button
-  QGroupBox* aWgt = new QGroupBox(this);
-  QHBoxLayout* aHBoxLayout = new QHBoxLayout(aWgt);
-  aHBoxLayout->setMargin(11);
-  aHBoxLayout->setSpacing(6);
+  QGroupBox* aGroupBox2 = new QGroupBox(this);
+  QHBoxLayout* aHBoxLayout2 = new QHBoxLayout(aGroupBox2);
+  aHBoxLayout2->setMargin(11);
+  aHBoxLayout2->setSpacing(6);
   // Create <OK> button
-  QPushButton* m_bOk = new QPushButton(tr("O&K"), aWgt, "m_bOk");
+  QPushButton* m_bOk = new QPushButton(tr("O&K"), aGroupBox2, "m_bOk");
   m_bOk->setDefault(TRUE);
   m_bOk->setAutoDefault(TRUE);
   // Create <Apply> button
-  QPushButton* m_bApply = new QPushButton(tr("&Apply"), aWgt, "m_bApply");
+  QPushButton* m_bApply = new QPushButton(tr("&Apply"), aGroupBox2, "m_bApply");
   m_bApply->setAutoDefault(TRUE);
   // Create <Cancel> button
-  QPushButton* m_bCancel = new QPushButton(tr("&Cancel"), aWgt, "m_bCancel");
+  QPushButton* m_bCancel = new QPushButton(tr("&Cancel"), aGroupBox2, "m_bCancel");
   m_bCancel->setAutoDefault(TRUE);
 
   // Layout buttons
-  aHBoxLayout->addWidget(m_bOk);
-  aHBoxLayout->addWidget(m_bApply);
-  aHBoxLayout->addStretch();
-  aHBoxLayout->addWidget(m_bCancel);
+  aHBoxLayout2->addWidget(m_bOk);
+  aHBoxLayout2->addWidget(m_bApply);
+  aHBoxLayout2->addStretch();
+  aHBoxLayout2->addWidget(m_bCancel);
 
   // Layout top level widgets
-  layoutDlg->addWidget(GroupBox,0,0);
-  layoutDlg->addWidget(aWgt,1,0);
+  layoutDlg->addWidget(aGroupBox,0,0);
+  layoutDlg->addWidget(aGroupBox2,1,0);
 
   // signals and slots connections
   connect(m_bCancel, SIGNAL(clicked()), this, SLOT(onClickClose()));
@@ -187,14 +189,4 @@ SVTK_NonIsometricDlg
 ::onClickClose()
 {
   reject();
-
-  m_Action->setOn( false );
-}
-
-void 
-SVTK_NonIsometricDlg
-::done( int r )
-{
-  m_Action->setOn( false );
-  QDialog::done( r );
 }

@@ -18,7 +18,6 @@
 //
 // SUIT_ViewWindow.cxx: implementation of the SUIT_ViewWindow class.
 //
-//////////////////////////////////////////////////////////////////////
 
 #include "SUIT_ViewWindow.h"
 #include "SUIT_Desktop.h"
@@ -54,21 +53,36 @@ SUIT_ViewWindow::~SUIT_ViewWindow()
 {
 }
 
+/*!
+  Sets new view manager for window
+  \param theManager - new view manager
+*/
 void SUIT_ViewWindow::setViewManager( SUIT_ViewManager* theManager )
 {
   myManager = theManager;
 }
 
+/*!
+  \return view manager of window
+*/
 SUIT_ViewManager* SUIT_ViewWindow::getViewManager() const
 {
   return myManager;
 }
 
+/*!
+  \return QImage, containing all scene rendering in window
+*/
 QImage SUIT_ViewWindow::dumpView()
 {
   return QImage();
 }
 
+/*!
+  Saves scene rendering in window to file
+  \param fileName - name of file
+  \param format - string contains name of format (for example, "BMP"(default) or "JPEG", "JPG")
+*/
 bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
 {
   QImage img = dumpView();
@@ -111,6 +125,9 @@ void SUIT_ViewWindow::onDumpView()
   qApp->postEvent( this, new QCustomEvent( DUMP_EVENT ) );
 }
 
+/*!
+  \return filters for image files
+*/
 QString SUIT_ViewWindow::filter() const
 {
   return tr( "TLT_IMAGE_FILES" );
@@ -148,22 +165,30 @@ bool SUIT_ViewWindow::event( QEvent* e )
 
 /*! Called by SUIT_Accel::onActivated() when a key accelerator was activated and this window was active
 */
-void SUIT_ViewWindow::onAccelAction( int _action )
+bool SUIT_ViewWindow::onAccelAction( int _action )
 {
-  action( _action );
+  return action( _action );
 }
 
 /*! action  handle standard action (zoom, pan) or custom action.  to be redefined in successors.
 */
-void SUIT_ViewWindow::action( const int  )
+bool SUIT_ViewWindow::action( const int  )
 {
+  return true;
 }
 
+/*!
+  \return string containing visual parameters of window
+*/
 QString   SUIT_ViewWindow::getVisualParameters()
 {
   return "empty";
 }
- 
+
+/*!
+  Sets visual parameters of window by its string representation
+  \param parameters - string with visual parameters
+*/ 
 void SUIT_ViewWindow::setVisualParameters( const QString& parameters )
 {
 }

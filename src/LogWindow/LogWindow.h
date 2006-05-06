@@ -52,6 +52,10 @@
 class QAction;
 class QTextBrowser;
 
+/*!
+  \class LogWindow
+  Widget, showing logs message. Allows to show, to clear, to copy messages and to save then to file
+*/
 class LOGWINDOW_EXPORT LogWindow : public QFrame, public SUIT_PopupClient
 {
   Q_OBJECT

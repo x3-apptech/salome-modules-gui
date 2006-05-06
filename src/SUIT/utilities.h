@@ -26,7 +26,7 @@
 //  Module : SALOME
 //  $Header$
 
-/* ---  Definition macros file to print informations if _DEBUG_ is defined --- */
+/*! ---  Definition macros file to print informations if _DEBUG_ is defined --- */
 
 #ifndef UTILITIES_H
 #define UTILITIES_H
@@ -38,7 +38,7 @@
 
 #include "LocalTraceBufferPool.hxx"
 
-/** \file utilities.h
+/*! \file utilities.h
  * For each message to put in the trace, a specific ostingstream object is \n
  * created and destroyed automatically at the end of the message macro. \n
  * The insert function of LocalTraceBufferPool class gets a buffer in a \n
@@ -65,7 +65,7 @@
                                std::cerr << "ABORT return code= "<< code << std::endl; \
                                std::exit(code);}
 
-/* --- To print date and time of compilation of current source --- */
+/*! --- To print date and time of compilation of current source --- */
 
 #if defined ( __GNUC__ )
 #define COMPILER		"g++" 
@@ -90,7 +90,7 @@
 				       << " at " << __TIME__ << MESS_END }
 #ifdef _DEBUG_
 
-/** @name the following MACROS are useful at debug time*/
+/*! @name the following MACROS are useful at debug time*/
 //@{
 #define MESSAGE(msg) {MESS_BEGIN("- Trace ") << msg << MESS_END}
 #define SCRUTE(var)  {MESS_BEGIN("- Trace ") << #var << "=" << var <<MESS_END}

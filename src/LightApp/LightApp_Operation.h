@@ -22,15 +22,10 @@ class LightApp_SelectionMgr;
 class LightApp_Dialog;
 class SUIT_Desktop;
 
-/*
-  Class       : LightApp_Operation
-  Description : Base class for all operations
-*/
-
 /*!
- * \brief Base class for all operations
- *
- *  Base class for all operations (see SUIT_Operation for more description)
+  \class LightApp_Operation
+  \brief Base class for all operations
+  Base class for all operations (see SUIT_Operation for more description)
 */
 class LIGHTAPP_EXPORT LightApp_Operation : public SUIT_Operation
 {

@@ -472,8 +472,11 @@ void STD_Application::onSaveDoc()
     if ( !isOk )
     {
       putInfo( "" );
-      SUIT_MessageBox::error1( desktop(), tr( "TIT_FILE_SAVEAS" ),
-			                         tr( "MSG_CANT_SAVE" ).arg( activeStudy()->studyName() ), tr( "BUT_OK" ) );
+      // displaying a message box as SUIT_Validator in case file can't be written (the most frequent case)
+      SUIT_MessageBox::error1( desktop(), 
+			       tr( "ERR_ERROR" ),
+			       tr( "ERR_PERMISSION_DENIED" ).arg( activeStudy()->studyName() ),
+			       tr( "BUT_OK" ) );
     }
     else
       putInfo( tr( "INF_DOC_SAVED" ).arg( "" ) );
@@ -510,7 +513,8 @@ bool STD_Application::onSaveAsDoc()
 
     if ( !isOk )
       SUIT_MessageBox::error1( desktop(), tr( "ERROR" ),
-                             tr( "INF_DOC_SAVING_FAILS" ).arg( aName ), tr( "BUT_OK" ) );
+			       tr( "INF_DOC_SAVING_FAILS" ).arg( aName ), 
+			       tr( "BUT_OK" ) );
   }
 
   studySaved( activeStudy() );
@@ -835,6 +839,10 @@ QString STD_Application::getDirectory( const QString& initial, const QString& ca
   return QFileDialog::getExistingDirectory( initial, parent, 0, caption, true );
 }
 
+/*!
+  Changes desktop
+  \param desk - new desktop
+*/
 void STD_Application::setDesktop( SUIT_Desktop* desk )
 {
   SUIT_Desktop* prev = desktop();
@@ -860,18 +868,30 @@ void STD_Application::savePreferences()
 {
 }
 
+/*!
+  Custom activity after study is created
+  Updates desktop and actions
+*/
 void STD_Application::studyCreated( SUIT_Study* )
 {
   updateDesktopTitle();
   updateCommandsStatus();
 }
 
+/*!
+  Custom activity after study is opened
+  Updates desktop and actions
+*/
 void STD_Application::studyOpened( SUIT_Study* )
 {
   updateDesktopTitle();
   updateCommandsStatus();
 }
 
+/*!
+  Custom activity after study is opened
+  Updates desktop and actions
+*/
 void STD_Application::studySaved( SUIT_Study* )
 {
   updateDesktopTitle();

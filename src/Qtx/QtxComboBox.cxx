@@ -25,6 +25,9 @@
 #include <qlineedit.h>
 #include <qvaluelist.h>
 
+/*!
+  Constructor
+*/
 QtxComboBox::QtxComboBox( QWidget* parent, const char* name )
 : QComboBox( parent, name ),
 myCleared( false )
@@ -33,6 +36,9 @@ myCleared( false )
     connect( this, SIGNAL( activated( const QString& ) ), this, SLOT( onActivated( const QString& ) ) );
 }
 
+/*!
+  Constructor
+*/
 QtxComboBox::QtxComboBox( bool rw, QWidget* parent, const char* name )
 : QComboBox( rw, parent, name ),
 myCleared( false )
@@ -41,15 +47,25 @@ myCleared( false )
     connect( this, SIGNAL( activated( const QString& ) ), this, SLOT( onActivated( const QString& ) ) );
 }
 
+/*!
+  Destructor
+*/
 QtxComboBox::~QtxComboBox()
 {
 }
 
+/*!
+  \return true if combobox is cleared
+*/
 bool QtxComboBox::isCleared() const
 {
     return myCleared;
 }
 
+/*!
+  Sets cleared status
+  \param isClear - new status
+*/
 void QtxComboBox::setCleared( const bool isClear )
 {
     if ( myCleared == isClear )
@@ -68,6 +84,10 @@ void QtxComboBox::setCleared( const bool isClear )
     update();
 }
 
+/*!
+  Sets currently selected item
+  \param idx - index of item
+*/
 void QtxComboBox::setCurrentItem( int idx )
 {
     if ( idx < 0 || idx >= count() )
@@ -77,6 +97,10 @@ void QtxComboBox::setCurrentItem( int idx )
     QComboBox::setCurrentItem( idx );
 }
 
+/*!
+  Sets current text
+  \param txt - new current text
+*/
 void QtxComboBox::setCurrentText( const QString& txt )
 {
     myCleared = false;
@@ -96,16 +120,25 @@ void QtxComboBox::setCurrentText( const QString& txt )
 #endif
 }
 
+/*!
+  \return current selected id
+*/
 int QtxComboBox::currentId() const
 {
     return id( currentItem() );
 }
 
+/*!
+  Sets current selected id
+*/
 void QtxComboBox::setCurrentId( int num )
 {
     setCurrentItem( index( num ) );
 }
 
+/*!
+  Custom paint event handler
+*/
 void QtxComboBox::paintEvent( QPaintEvent* e )
 {
     if ( !count() || !myCleared || editable() )
@@ -114,6 +147,10 @@ void QtxComboBox::paintEvent( QPaintEvent* e )
         paintClear( e );
 }
 
+/*!
+  SLOT: called if some item is activated
+  \param idx - index of activated item
+*/
 void QtxComboBox::onActivated( int idx )
 {
     resetClear();
@@ -122,11 +159,16 @@ void QtxComboBox::onActivated( int idx )
         emit activatedId( myIndexId[idx] );
 }
 
-void QtxComboBox::onActivated( const QString& )
+/*!
+  SLOT: called if some item is activated
+*/void QtxComboBox::onActivated( const QString& )
 {
     resetClear();
 }
 
+/*!
+  Strips "cleared" state and updates
+*/
 void QtxComboBox::resetClear()
 {
     if ( !myCleared )
@@ -136,6 +178,9 @@ void QtxComboBox::resetClear()
     update();
 }
 
+/*!
+  Draws combobox when it is cleared or isn't editable
+*/
 void QtxComboBox::paintClear( QPaintEvent* e )
 {
     int curIndex = currentItem();
@@ -159,6 +204,9 @@ void QtxComboBox::paintClear( QPaintEvent* e )
     setUpdatesEnabled( upd );
 }
 
+/*!
+  \return id by index
+*/
 int QtxComboBox::id( const int idx ) const
 {
     int id = -1;
@@ -167,6 +215,9 @@ int QtxComboBox::id( const int idx ) const
     return id;
 }
 
+/*!
+  \return index by id
+*/
 int QtxComboBox::index( const int id ) const
 {
     int idx = -1;

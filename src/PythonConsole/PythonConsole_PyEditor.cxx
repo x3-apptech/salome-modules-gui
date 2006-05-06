@@ -173,7 +173,7 @@ void PythonConsole_PyEditor::handleReturn()
   PyInterp_Dispatcher::Get()->Exec( new ExecCommand( myInterp, _buf.latin1(), this ) );
 }
 
-/*
+/*!
    Processes drop event: paste dragged text
 */
 void PythonConsole_PyEditor::contentsDropEvent( QDropEvent* event )
@@ -197,7 +197,7 @@ void PythonConsole_PyEditor::contentsDropEvent( QDropEvent* event )
   }
 }
 
-/*
+/*!
    Processes middle button release event - paste clipboard's contents
 */
 void PythonConsole_PyEditor::contentsMouseReleaseEvent( QMouseEvent* event )
@@ -703,6 +703,9 @@ void PythonConsole_PyEditor::onPyInterpChanged( PyInterp_base* interp )
   }
 }
 
+/*!
+  Creates popup menu
+*/
 QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
 {
   QPopupMenu* popup = QTextEdit::createPopupMenu( pos );

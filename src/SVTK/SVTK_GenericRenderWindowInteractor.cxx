@@ -36,9 +36,11 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(QVTK_GenericRenderWindowInteractor);
 
+/*!
+  Constructor
+*/
 QVTK_GenericRenderWindowInteractor
 ::QVTK_GenericRenderWindowInteractor()
 {
@@ -46,14 +48,18 @@ QVTK_GenericRenderWindowInteractor
   connect(myTimer, SIGNAL(timeout()), this, SLOT(OnTimeOut())) ;
 }
 
+/*!
+  Destructor
+*/
 QVTK_GenericRenderWindowInteractor
 ::~QVTK_GenericRenderWindowInteractor()
 {
   delete myTimer;
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  The slot connects to QTimer::timeout signal to invoke vtkCommand::TimerEvent
+*/
 void
 QVTK_GenericRenderWindowInteractor
 ::OnTimeOut() 
@@ -63,6 +69,9 @@ QVTK_GenericRenderWindowInteractor
   }
 }
 
+/*!
+  Starts the QTimer instance on defined microseconds
+*/
 int
 QVTK_GenericRenderWindowInteractor
 ::CreateTimer(int vtkNotUsed(timertype)) 
@@ -75,6 +84,9 @@ QVTK_GenericRenderWindowInteractor
   return 1;
 }
 
+/*!
+  Stops the QTimer instance
+*/
 int
 QVTK_GenericRenderWindowInteractor
 ::DestroyTimer(void) 
@@ -95,20 +107,28 @@ QVTK_GenericRenderWindowInteractor
 }
 
 
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(SVTK_GenericRenderWindowInteractor);
 
+/*!
+  Constructor
+*/
 SVTK_GenericRenderWindowInteractor
 ::SVTK_GenericRenderWindowInteractor():
   myRenderWidget(NULL)
 {
 }
 
+/*!
+  Destructor
+*/
 SVTK_GenericRenderWindowInteractor
 ::~SVTK_GenericRenderWindowInteractor()
 {
 }
 
+/*!
+  To get access to SVTK_Selector
+*/
 SVTK_Selector*
 SVTK_GenericRenderWindowInteractor
 ::GetSelector()
@@ -116,6 +136,10 @@ SVTK_GenericRenderWindowInteractor
   return mySelector.GetPointer();
 }
 
+/*!
+  To initialize mySelector field
+  \param theSelector - new selector
+*/
 void
 SVTK_GenericRenderWindowInteractor
 ::SetSelector(SVTK_Selector* theSelector)
@@ -123,6 +147,9 @@ SVTK_GenericRenderWindowInteractor
   mySelector = theSelector;
 }
 
+/*!
+  To get access to QWidget, where vtkRenderWindow maps to.
+*/
 QWidget*
 SVTK_GenericRenderWindowInteractor
 ::GetRenderWidget()
@@ -130,6 +157,9 @@ SVTK_GenericRenderWindowInteractor
   return myRenderWidget;
 }
 
+/*!
+  To initialize myRenderWidget field.
+*/
 void
 SVTK_GenericRenderWindowInteractor
 ::SetRenderWidget(QWidget* theRenderWidget)

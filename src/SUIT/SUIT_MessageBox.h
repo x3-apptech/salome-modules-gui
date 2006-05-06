@@ -16,12 +16,7 @@
 //
 // See http://www.salome-platform.org/
 //
-/********************************************************************
-**  Class:   SUIT_MessageBox
-**  Descr:   Message dialog box for SUIT-based application
-**  Module:  SUIT
-**  Created: UI team, 02.10.00
-*********************************************************************/
+
 #ifndef SUIT_MESSAGEBOX_H
 #define SUIT_MESSAGEBOX_H
 
@@ -36,6 +31,10 @@
 #define SUIT_NO                      4
 #define SUIT_HELP                    5
 
+/*!
+  \class SUIT_MessageBox
+  \brief Message dialog box for SUIT-based application
+*/
 class SUIT_EXPORT SUIT_MessageBox
 {
 public:

@@ -29,6 +29,9 @@
 #ifndef SVTK_DEVICE_ACTOR_H
 #define SVTK_DEVICE_ACTOR_H
 
+#include "SVTK.h"
+#include "VTKViewer.h"
+
 #include <vector>
 
 #include <vtkLODActor.h>
@@ -44,7 +47,6 @@ class vtkDataSet;
 class vtkShrinkFilter;
 class vtkDataSetMapper;
 
-//----------------------------------------------------------------------------
 namespace SVTK
 {
   namespace Representation
@@ -58,8 +60,7 @@ namespace SVTK
 }
 
 
-//----------------------------------------------------------------------------
-class SVTK_DeviceActor: public vtkLODActor
+class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 {
  public:
   vtkTypeMacro(SVTK_DeviceActor,vtkLODActor);
@@ -95,7 +96,7 @@ class SVTK_DeviceActor: public vtkLODActor
   GetNodeObjId(int theVtkID);
 
   virtual
-  float* 
+  vtkFloatingPointType* 
   GetNodeCoord(int theObjID);
 
   virtual
@@ -118,12 +119,12 @@ class SVTK_DeviceActor: public vtkLODActor
 
   /** @name For shrink mamnagement purpose */
   //@{
-  float
+  vtkFloatingPointType
   GetShrinkFactor();
 
   virtual 
   void  
-  SetShrinkFactor(float value);
+  SetShrinkFactor(vtkFloatingPointType value);
 
   virtual
   void
@@ -153,11 +154,11 @@ class SVTK_DeviceActor: public vtkLODActor
   GetRepresentation();
 
   virtual
-  float
+  vtkFloatingPointType
   GetDefaultPointSize();
 
   virtual
-  float
+  vtkFloatingPointType
   GetDefaultLineWidth();
 
   bool
@@ -190,11 +191,13 @@ class SVTK_DeviceActor: public vtkLODActor
   bool myIsShrunk;
   
   bool myIsResolveCoincidentTopology;
-  float myPolygonOffsetFactor;
-  float myPolygonOffsetUnits;
+  vtkFloatingPointType myPolygonOffsetFactor;
+  vtkFloatingPointType myPolygonOffsetUnits;
 
-  void SetPolygonOffsetParameters(float factor, float units);
-  void GetPolygonOffsetParameters(float& factor, float& units);
+  void SetPolygonOffsetParameters(vtkFloatingPointType factor, 
+				  vtkFloatingPointType units);
+  void GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
+				  vtkFloatingPointType& units);
 
   SVTK_DeviceActor();
   ~SVTK_DeviceActor();

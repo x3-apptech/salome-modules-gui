@@ -30,14 +30,26 @@
 
 #include <qstring.h>
 
+/*!
+  Default constructor
+*/
 SalomeApp_Displayer::SalomeApp_Displayer()
 {
 }
 
+/*!
+  Destructor
+*/
 SalomeApp_Displayer::~SalomeApp_Displayer()
 {
 }
 
+/*!
+  Displays object in view
+  \param entry - object entry
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void SalomeApp_Displayer::Display( const QString& entry, const bool updateViewer, SALOME_View* theViewFrame )
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -59,6 +71,11 @@ void SalomeApp_Displayer::Display( const QString& entry, const bool updateViewer
   }
 }
 
+/*!
+  Redisplays object in view
+  \param entry - object entry
+  \param updateViewer - is it necessary to update viewer
+*/
 void SalomeApp_Displayer::Redisplay( const QString& entry, const bool updateViewer )
 {
   // Remove the object permanently (<forced> == true)
@@ -89,6 +106,13 @@ void SalomeApp_Displayer::Redisplay( const QString& entry, const bool updateView
   }
 }
 
+/*!
+  Erases object in view
+  \param entry - object entry
+  \param forced - deletes object from viewer (otherwise it will be erased, but cached)
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void SalomeApp_Displayer::Erase( const QString& entry, const bool forced,
 				 const bool updateViewer, SALOME_View* theViewFrame )
 {
@@ -105,6 +129,12 @@ void SalomeApp_Displayer::Erase( const QString& entry, const bool forced,
   }
 }
 
+/*!
+  Erases all objects in view
+  \param forced - deletes objects from viewer
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void SalomeApp_Displayer::EraseAll( const bool forced, const bool updateViewer, SALOME_View* theViewFrame ) const
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -116,6 +146,11 @@ void SalomeApp_Displayer::EraseAll( const bool forced, const bool updateViewer, 
   }
 }
 
+/*!
+  \return true if object is displayed in viewer
+  \param entry - object entry
+  \param theViewFrame - view
+*/
 bool SalomeApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theViewFrame ) const
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -129,6 +164,9 @@ bool SalomeApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theVie
     return false;
 }
 
+/*!
+  Updates active view
+*/
 void SalomeApp_Displayer::UpdateViewer() const
 {
   SALOME_View* vf = GetActiveView();
@@ -136,6 +174,12 @@ void SalomeApp_Displayer::UpdateViewer() const
     vf->Repaint();
 }
 
+/*!
+  \return presentation of object, built with help of CreatePrs method
+  \param entry - object entry
+  \param theViewFrame - view
+  \sa CreatePrs()
+*/
 SALOME_Prs* SalomeApp_Displayer::buildPresentation( const QString& entry, SALOME_View* theViewFrame )
 {
   SALOME_Prs* prs = 0;
@@ -148,6 +192,9 @@ SALOME_Prs* SalomeApp_Displayer::buildPresentation( const QString& entry, SALOME
   return prs;
 }
 
+/*!
+  \return active view
+*/
 SALOME_View* SalomeApp_Displayer::GetActiveView()
 {
   SUIT_Session* session = SUIT_Session::session();

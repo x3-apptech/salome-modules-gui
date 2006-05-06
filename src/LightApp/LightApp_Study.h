@@ -32,6 +32,11 @@
 class SUIT_Application;
 class CAM_DataModel;
 
+/*!
+  Custom study, using for open/close of documents HDF format.
+  Data of each module can be saved to different files, those 
+  after that are combined into one HDF file
+*/
 class LIGHTAPP_EXPORT LightApp_Study : public CAM_Study
 {
   Q_OBJECT

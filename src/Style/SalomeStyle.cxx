@@ -129,16 +129,25 @@ static const char* const minimize_xpm[] = {
     Descr: Style for SALOME platform
 */
 
+/*!
+  Constructor
+*/
 SalomeStyle::SalomeStyle()
 : myTitleParent( 0 )
 {
   qApp->installEventFilter( this ); 
 }
 
+/*!
+  Destructor
+*/
 SalomeStyle::~SalomeStyle()
 {
 }
 
+/*!
+  Delayed initialization of style
+*/
 void SalomeStyle::polish( QWidget* w )
 {
   if ( !w )
@@ -182,6 +191,9 @@ void SalomeStyle::polish( QWidget* w )
     PARENT_STYLE::polish( w );
 }
 
+/*!
+  Custom event filter
+*/
 bool SalomeStyle::eventFilter( QObject* o, QEvent* e )
 {
   if ( e->type() == QEvent::FocusIn || e->type() == QEvent::FocusOut )
@@ -223,6 +235,12 @@ double linear( double x )
   return x;
 }
 
+/*!
+  Mixes two colors, part of first is 1-t, part of second is t
+  \param t - part parameter
+  \param c1, c2 - colors
+  \param res - result color
+*/
 void SalomeStyle::mix( const double t, const QColor& c1, const QColor& c2, QColor& res )
 {
   if( t<0.0 || t>1.0 )
@@ -234,6 +252,11 @@ void SalomeStyle::mix( const double t, const QColor& c1, const QColor& c2, QColo
   res.setRgb( r, g, b );
 }
 
+/*!
+  Mixes two colors, part of first is 1-t, part of second is t
+  \param t - part parameter
+  \param rgb1, rgb2 - colors (result is stored in rgb1)
+*/
 void SalomeStyle::mix( const double t, QRgb& rgb1, const QRgb& rgb2 )
 {
   if( t<0.0 || t>1.0 )
@@ -247,6 +270,12 @@ void SalomeStyle::mix( const double t, QRgb& rgb1, const QRgb& rgb2 )
   rgb1 = qRgba( c[0][0], c[0][1], c[0][2], qAlpha( rgb1 ) );
 }
 
+/*!
+  Mixes colors of pixmap points with other color
+  \param t - part parameter
+  \param pix - pixmap to be processed
+  \param col - other color
+*/
 void SalomeStyle::mix( const double t, QPixmap& pix, const QColor& col )
 {
   if( t<0.0 || t>1.0 )
@@ -277,6 +306,11 @@ void SalomeStyle::mix( const double t, QPixmap& pix, const QColor& col )
   pix = anImage;
 }
 
+/*!
+  Converts pixmap to grayscale
+  \param pix - pixmap to be processed
+  \param k - factor (gray value after conversion will be multiplied on it and truncated by 255.0)
+*/
 void SalomeStyle::toGrayscale( QPixmap& pix, double k )
 {
   QImage anImage = pix.convertToImage();
@@ -306,6 +340,14 @@ void SalomeStyle::toGrayscale( QPixmap& pix, double k )
   pix = anImage;
 }
 
+/*!
+  Draws gradient filling
+  \param p - painter
+  \param r - rect
+  \param c1, c2 - two colors of gradient
+  \param d - direction of gradient
+  \param f - gradient function (maps co-ordinate to part parameter)
+*/
 void SalomeStyle::drawGradient( QPainter* p, const QRect& r,
                                     const QColor& c1, const QColor& c2,
                                     const Direction d, gradient_func f ) const 
@@ -338,6 +380,15 @@ void SalomeStyle::drawGradient( QPainter* p, const QRect& r,
   p->restore();
 }
 
+/*!
+  Draws primitive element
+  \param pe - type of primitive element
+  \param p - painter
+  \param r - rect
+  \param cg - group of colors
+  \param flags - is used to control how the PrimitiveElement is drawn
+  \param opt - can be used to control how various PrimitiveElements are drawn
+*/
 void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& r,
 				 const QColorGroup& cg, SFlags flags, const QStyleOption& opt ) const
 {
@@ -551,6 +602,16 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
   }
 }
 
+/*!
+  Draws control element
+  \param element - type of control element
+  \param p - painter
+  \param widget - widget
+  \param r - rect
+  \param cg - group of colors
+  \param flags - is used to control how the element is drawn
+  \param opt - can be used to control how various elements are drawn
+*/
 void SalomeStyle::drawControl( ControlElement element, QPainter* p, const QWidget* widget, const QRect& r,
                                const QColorGroup& cg, SFlags flags, const QStyleOption& opt ) const 
 {
@@ -1058,6 +1119,11 @@ void SalomeStyle::drawControl( ControlElement element, QPainter* p, const QWidge
   }
 }
 
+/*!
+  \return the sub-area for the widget in logical coordinates
+  \param subrect - type of sub area
+  \param w - widget
+*/
 QRect SalomeStyle::subRect( SubRect subrect, const QWidget* w ) const
 {
   QRect r = PARENT_STYLE::subRect( subrect, w );
@@ -1076,6 +1142,16 @@ QRect SalomeStyle::subRect( SubRect subrect, const QWidget* w ) const
   return r;
 }
 
+/*!
+  Draws the ComplexControl
+  \param control - type of complex control element
+  \param p - painter
+  \param widget - widget
+  \param r - rect
+  \param cg - group of colors
+  \param flags, controls, active - is used to control how the element is drawn
+  \param opt - can be used to control how various elements are drawn
+*/
 void SalomeStyle::drawComplexControl( ComplexControl control, QPainter* p, const QWidget* widget,
 				                              const QRect& r, const QColorGroup& cg, SFlags flags,
 				                              SCFlags controls, SCFlags active, const QStyleOption& opt ) const
@@ -1127,6 +1203,12 @@ void SalomeStyle::drawComplexControl( ComplexControl control, QPainter* p, const
   }
 }
 
+/*!
+  \return pixmap by type
+  \param st - type of pixmap
+  \param w - widget
+  \param opt - style option flags
+*/
 QPixmap SalomeStyle::stylePixmap( StylePixmap st, const QWidget* w, const QStyleOption& opt ) const
 {
   switch ( st )
@@ -1145,6 +1227,11 @@ QPixmap SalomeStyle::stylePixmap( StylePixmap st, const QWidget* w, const QStyle
   }
 }
 
+/*!
+  \return the pixel size
+  \param pm - type of pixel metrics
+  \param widget - widget
+*/
 int SalomeStyle::pixelMetric( PixelMetric pm, const QWidget* widget ) const
 {
   int ret = 0;
@@ -1186,6 +1273,12 @@ int SalomeStyle::pixelMetric( PixelMetric pm, const QWidget* widget ) const
   return ret;
 }
 
+/*!
+  \return corrected title text
+  \param txt - title text
+  \param w - possible width
+  \param fm - font metrics
+*/
 QString SalomeStyle::titleText( const QString& txt, const int W, const QFontMetrics& fm ) const
 {
   QString res = txt.stripWhiteSpace();
@@ -1205,22 +1298,31 @@ QString SalomeStyle::titleText( const QString& txt, const int W, const QFontMetr
 
 /*!
     Class: SalomeStylePlugin [Internal]
-    Descr: Plugin for Qt style mechanism
+    Constructor
 */
-
 SalomeStylePlugin::SalomeStylePlugin()
 {
 }
 
+/*!
+  Destructor
+*/
 SalomeStylePlugin::~SalomeStylePlugin()
 {
 }
 
+/*!
+  \return keys of styles of plugin
+*/
 QStringList SalomeStylePlugin::keys() const
 {
   return QStringList() << "salome";
 }
 
+/*!
+  \return just created style 
+  \param str - style key
+*/
 QStyle* SalomeStylePlugin::create( const QString& str )
 {
   if ( str == "salome" )

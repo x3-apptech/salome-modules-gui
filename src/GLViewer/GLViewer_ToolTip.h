@@ -35,12 +35,10 @@
 
 class GLViewer_ViewPort2d;
 class QLabel;
-/***************************************************************************
-**  Class:   GLViewer_ObjectTip
-**  Descr:   ToolTip of GLViewer_Objects
-**  Module:  GLViewer
-**  Created: UI team, 28.03.05
-****************************************************************************/
+/*!
+  \class GLViewer_ObjectTip
+  ToolTip of GLViewer_Objects
+*/
 class GLVIEWER_API GLViewer_ObjectTip: public QObject//QToolTip//QtxToolTip
 {
   Q_OBJECT

@@ -512,9 +512,9 @@ fi
 
 # make other build directories
 if test "$GUI_DISABLE_CORBA" == "yes"; then 
-dir_variables="salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources idl"
+  dir_variables="salome_adm adm_local doc bin/salome include/salome lib${LIB_LOCATION_SUFFIX}/salome share/salome/resources idl"
 else
-dir_variables="salome_adm adm_local doc bin/salome include/salome lib/salome share/salome/resources"
+  dir_variables="salome_adm adm_local doc bin/salome include/salome lib${LIB_LOCATION_SUFFIX}/salome share/salome/resources"
 fi
 
 for rep in $dir_variables

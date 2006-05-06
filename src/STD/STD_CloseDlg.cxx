@@ -85,12 +85,9 @@ STD_CloseDlg::STD_CloseDlg( QWidget* parent, bool modal, WFlags f )
   connect( m_pb4, SIGNAL( clicked() ), this, SLOT( reject() ) );
 }
 
-//================================================================================
 /*!
  * \brief reaction on clicked(pressed) button
  */
-//================================================================================
-
 void STD_CloseDlg::onButtonClicked()
 {
   QPushButton* btn = ( QPushButton* )sender();

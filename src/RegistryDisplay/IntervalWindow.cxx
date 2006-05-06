@@ -20,6 +20,9 @@
 #define SPACING_SIZE      6
 #define MIN_SPIN_WIDTH  100 
 
+/*!
+  Constructor
+*/
 IntervalWindow::IntervalWindow ( QWidget* parent )
      : QDialog( parent, "IntervalWindow" , true, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu | WDestructiveClose )
 {
@@ -73,8 +76,13 @@ IntervalWindow::IntervalWindow ( QWidget* parent )
 
   END_OF("IntervalWindow constructor")
 }
+
+/*!
+  Destructor
+*/
 IntervalWindow::~IntervalWindow() {}
-/* 
+
+/*!
    Sets start interval size
 */
 void IntervalWindow::setValue(const int size)
@@ -82,7 +90,7 @@ void IntervalWindow::setValue(const int size)
   mySpinBox->setValue(size);
 }
 
-/*
+/*!
    Gets interval size
 */
 int IntervalWindow::getValue()
@@ -90,7 +98,7 @@ int IntervalWindow::getValue()
   return mySpinBox->value();
 }
 
-/*
+/*!
    gets a pointer to myButtonOk
 */
 QPushButton* IntervalWindow::Ok()
@@ -98,7 +106,7 @@ QPushButton* IntervalWindow::Ok()
   return myButtonOk;
 }
 
-/*
+/*!
    gets a pointer to myButtonCancel
 */
 QPushButton* IntervalWindow::Cancel()

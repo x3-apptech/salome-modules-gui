@@ -36,9 +36,8 @@
 
 class QSemaphore;
 
-//===========================================================
 /*!
- *  Class: SALOME_Event
+ *  \class SALOME_Event
  *  Description: 
  *  This class encapsulates data and functionality required for 
  *  posting component-specific events to perform arbitrary operations in main GUI thread. 
@@ -66,7 +65,6 @@ class QSemaphore;
  *  Caveats: 
  *    There is no.
  */
-//===========================================================
 
 #include <Event.h>
 
@@ -93,10 +91,11 @@ private:
 };
 
 
-// Template classes for member function
-//-------------------------------------
-template<class TObject, typename TRes>
-class EVENT_EXPORT TMemFunEvent: public SALOME_Event{
+/*!
+  \class TMemFunEvent
+  \brief Template class for member function
+*/
+template<class TObject, typename TRes> class EVENT_EXPORT TMemFunEvent: public SALOME_Event{
 public:
   typedef TRes TResult;
   TResult myResult;
@@ -116,8 +115,11 @@ private:
 };
 
 
-template<class TObject>
-class EVENT_EXPORT TVoidMemFunEvent: public SALOME_Event{
+/*!
+  \class TVoidMemFunEvent
+  \brief Template class for member function
+*/
+template<class TObject> class EVENT_EXPORT TVoidMemFunEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)();
   TVoidMemFunEvent(TObject* theObject, TAction theAction):
@@ -133,11 +135,12 @@ private:
 };
 
 
-// Template for member function with one argument
-//-----------------------------------------------
-template<class TObject, typename TRes, 
-	 typename TArg, typename TStoreArg = TArg>
-class EVENT_EXPORT TMemFun1ArgEvent: public SALOME_Event{
+/*!
+  \class TMemFun1ArgEvent
+  \brief Template for member function with one argument
+*/
+template<class TObject, typename TRes, typename TArg, typename TStoreArg = TArg> class EVENT_EXPORT TMemFun1ArgEvent:
+public SALOME_Event{
 public:
   typedef TRes TResult;
   TResult myResult;
@@ -159,8 +162,11 @@ private:
 };
 
 
-template<class TObject, typename TArg, typename TStoreArg = TArg>
-class EVENT_EXPORT TVoidMemFun1ArgEvent: public SALOME_Event{
+/*!
+  \class TVoidMemFun1ArgEvent
+  \brief Template for member function with one argument
+*/
+template<class TObject, typename TArg, typename TStoreArg = TArg> class EVENT_EXPORT TVoidMemFun1ArgEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)(TArg);
   TVoidMemFun1ArgEvent(TObject* theObject, TAction theAction, TArg theArg):
@@ -178,12 +184,12 @@ private:
 };
 
 
-// Template for member function with one argument
-//-----------------------------------------------
-template<class TObject, typename TRes,
-	 typename TArg, typename TArg1, 
-	 typename TStoreArg = TArg, typename TStoreArg1 = TArg1>
-class EVENT_EXPORT TMemFun2ArgEvent: public SALOME_Event{
+/*!
+  \class TMemFun2ArgEvent
+  \brief Template for member function with two arguments
+*/
+template<class TObject, typename TRes, typename TArg, typename TArg1, typename TStoreArg = TArg, typename TStoreArg1 = TArg1> class
+EVENT_EXPORT TMemFun2ArgEvent: public SALOME_Event{
 public:
   typedef TRes TResult;
   TResult myResult;
@@ -208,9 +214,12 @@ private:
 };
 
 
-template<class TObject, typename TArg, typename TArg1, 
-	 typename TStoreArg = TArg, typename TStoreArg1 = TArg1>
-class EVENT_EXPORT TVoidMemFun2ArgEvent: public SALOME_Event{
+/*!
+  \class TVoidMemFun2ArgEvent
+  \brief Template for member function with two arguments
+*/
+template<class TObject, typename TArg, typename TArg1, typename TStoreArg = TArg, typename TStoreArg1 = TArg1> class
+EVENT_EXPORT TVoidMemFun2ArgEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)(TArg,TArg1);
   TVoidMemFun2ArgEvent(TObject* theObject, TAction theAction, TArg theArg, TArg1 theArg1):
@@ -230,7 +239,10 @@ private:
 };
 
 
-// Template function for processing events with result returing
+/*!
+  \fn ProcessEvent
+  \brief Template function for processing events with result returing
+*/
 template<class TEvent> inline typename TEvent::TResult ProcessEvent(TEvent* theEvent){
   typename TEvent::TResult aResult;
   if(SALOME_Event::IsSessionThread()){
@@ -245,7 +257,10 @@ template<class TEvent> inline typename TEvent::TResult ProcessEvent(TEvent* theE
 }
 
 
-// Template function for processing events without result
+/*!
+  \fn ProcessEvent
+  \brief Template function for processing events without result
+*/
 inline void ProcessVoidEvent(SALOME_Event* theEvent){
   if(SALOME_Event::IsSessionThread()){
     theEvent->Execute();

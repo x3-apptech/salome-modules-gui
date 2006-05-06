@@ -24,6 +24,10 @@
 
 class LightApp_SelectionMgr;
 
+/*!
+  \class LightApp_OBFilter
+  Custom Object Browser filter, that checks correctness of object by all filters set in selection manager
+*/
 class LIGHTAPP_EXPORT LightApp_OBFilter: public OB_Filter
 {
 public:

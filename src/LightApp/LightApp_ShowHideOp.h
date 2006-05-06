@@ -23,6 +23,12 @@
 #include "LightApp_Operation.h"
 
 class LightApp_Displayer;
+
+/*!
+  \class LightApp_ShowHideOp
+  Standard operation allowing to show/hide selected objects
+  corresponding to any module with help of module displayer
+*/
 class LIGHTAPP_EXPORT LightApp_ShowHideOp : public LightApp_Operation
 {
   Q_OBJECT

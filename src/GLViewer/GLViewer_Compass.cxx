@@ -22,18 +22,19 @@
 // File:      GLViewer_Compass.cxx
 // Created:   November, 2004
 
-//================================================================
-// Class       : GLViewer_Compass
-// Description : Class implement representatiof of compass in one of corner in GLViewer
-//================================================================
-
 #include "GLViewer_Compass.h"
 #include "GLViewer_Drawer.h"
 
-//=======================================================================
-// Function: GLViewer_Compass
-// Purpose :
-//=======================================================================
+/*!
+  Constructor
+  \param color        - a color of compass
+  \param size         - a diameter of compass
+  \param pos          - a position
+  \param WidthTop     - width of wide part of arrow
+  \param WidthBottom  - width of base part of arrow
+  \param HeightTop    - height of arrow header
+  \param HeightBottom - height of arrow cut on bottom
+*/
 GLViewer_Compass::GLViewer_Compass ( const QColor& color, const int size, const Position pos,
                                const int WidthTop, const int WidthBottom, const int HeightTop,
                                const int HeightBottom )
@@ -52,19 +53,20 @@ GLViewer_Compass::GLViewer_Compass ( const QColor& color, const int size, const 
     //myFont->generateTexture();
 }
 
-//=======================================================================
-// Function: ~GLViewer_Compass
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_Compass::~GLViewer_Compass()
 {
     delete myFont;
 }
 
-//=======================================================================
-// Function: setCompass
-// Purpose :
-//=======================================================================
+/*!
+  Sets parameters of compass
+  \param color        - a color of compass
+  \param size         - a diameter of compass
+  \param pos          - a position
+*/
 void GLViewer_Compass::setCompass( const QColor& color, const int size, const Position pos )
 {
   myCol = color;
@@ -72,29 +74,29 @@ void GLViewer_Compass::setCompass( const QColor& color, const int size, const Po
   myPos = pos;
 }
 
-//=======================================================================
-// Function: setVisible
-// Purpose :
-//=======================================================================
+/*!
+  Sets visibility of compass 
+  \param vis - new visibility state
+*/
 void GLViewer_Compass::setVisible( const bool vis )
 {
   myIsVisible = vis;
 }
 
-//=======================================================================
-// Function: setSize
-// Purpose :
-//=======================================================================
+/*!
+  Sets size of compass
+  \param size - new size
+*/
 void GLViewer_Compass::setSize( const int size )
 {
   if( size > 0 )
     mySize=size;
 }
 
-//=======================================================================
-// Function: setArrowWidthTop
-// Purpose :
-//=======================================================================
+/*!
+  Sets arrow width top
+  \param WidthTop - new arrow width top
+*/
 void GLViewer_Compass::setArrowWidthTop( const int WidthTop )
 {
   if( WidthTop < myArrowWidthBottom || WidthTop > mySize )
@@ -102,10 +104,10 @@ void GLViewer_Compass::setArrowWidthTop( const int WidthTop )
   myArrowWidthTop=WidthTop;
 }
 
-//=======================================================================
-// Function: setArrowWidthBottom
-// Purpose :
-//=======================================================================
+/*!
+  Sets arrow width bottom
+  \param WidthBot - new arrow width bottom
+*/
 void GLViewer_Compass::setArrowWidthBottom( const int WidthBot )
 { 
   if( WidthBot > myArrowWidthTop || WidthBot < 1 )
@@ -113,10 +115,10 @@ void GLViewer_Compass::setArrowWidthBottom( const int WidthBot )
   myArrowWidthBottom=WidthBot;
 }
 
-//=======================================================================
-// Function: setArrowHeightTop
-// Purpose :
-//=======================================================================
+/*!
+  Sets arrow height top
+  \param HeightTop - new arrow height top
+*/
 void GLViewer_Compass::setArrowHeightTop( const int HeightTop )
 {
   if( HeightTop > (2*mySize-myArrowHeightBottom ) || HeightTop < 1 )
@@ -124,10 +126,10 @@ void GLViewer_Compass::setArrowHeightTop( const int HeightTop )
   myArrowHeightTop=HeightTop;
 }
 
-//=======================================================================
-// Function: setArrowHeightBottom
-// Purpose :
-//=======================================================================
+/*!
+  Sets arrow height bottom
+  \param HeightBot - new arrow height bottom
+*/
 void GLViewer_Compass::setArrowHeightBottom( const int HeightBot )
 {
   if( HeightBot > ( 2*mySize-myArrowHeightTop ) || HeightBot < 1)
@@ -135,10 +137,9 @@ void GLViewer_Compass::setArrowHeightBottom( const int HeightBot )
   myArrowHeightBottom=HeightBot;
 }
 
-//=======================================================================
-// Function: getFont
-// Purpose :
-//=======================================================================
+/*!
+  \return font of compass
+*/
 GLViewer_TexFont* GLViewer_Compass::getFont()
 { 
     if(!isGenereted) 
@@ -149,10 +150,10 @@ GLViewer_TexFont* GLViewer_Compass::getFont()
     return myFont;
 }
 
-//=======================================================================
-// Function: setFont
-// Purpose :
-//=======================================================================
+/*!
+  Sets font of compass
+  \param theFont - new font
+*/
 void GLViewer_Compass::setFont( QFont theFont )
 {
     delete myFont;

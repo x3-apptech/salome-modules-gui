@@ -35,10 +35,22 @@ class QMainWindow;
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class QtxActionToolMgr
+  Allows to use set of action to automatically build set of toolbars.
+  With help of methods insert/append/remove it is possible to 
+  describe toolbars and its internal structure.
+  This manager is able to attune toolbar by removing excess separators
+*/
 class QTX_EXPORT QtxActionToolMgr : public QtxActionMgr
 {
   Q_OBJECT
 
+  /*!
+    \class ToolNode
+    Represents a toolbutton inside toolbar
+    For internal purposes only
+  */
   class ToolNode
   {
   public:
@@ -122,6 +134,10 @@ private:
   QMainWindow*    myMainWindow;
 };
 
+/*!
+  \class QtxActionToolMgr::ToolCreator
+  Allows to create automatically toolbar by data read from file
+*/
 class QtxActionToolMgr::ToolCreator : public QtxActionMgr::Creator
 {
 public:

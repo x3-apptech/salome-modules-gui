@@ -16,14 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-//=============================================================================
-// File      : SALOME_PYQT_Module.cxx
-// Created   : 25/04/05
-// Author    : Vadim SANDLER
-// Project   : SALOME
-// Copyright : 2003-2005 CEA/DEN, EDF R&D
-// $Header   : $
-//=============================================================================
 
 #include "SALOME_PYQT_Module.h"
 
@@ -43,6 +35,7 @@
 #include <qfile.h>
 #include <qdom.h>
 #include <qworkspace.h>
+#include <qmenubar.h>
 #include <qpopupmenu.h>
 
 #include "SALOME_PYQT_SipDefs.h"
@@ -59,15 +52,16 @@
 
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////
-// Default name of the module, replaced at the moment of module creation
+/*!
+  \var __DEFAULT_NAME__ - Default name of the module, replaced at the moment of module creation
+*/
 const char* __DEFAULT_NAME__  = "SALOME_PYQT_Module";
 
-///////////////////////////////////////////////////////////////////////////////
-// Default menu group number
+/*!
+  \var __DEFAULT_GROUP__ - Default menu group number
+*/
 const int   __DEFAULT_GROUP__ = 40;
 
-///////////////////////////////////////////////////////////////////////////////
 // If __CALL_OLD_METHODS__ macro is not defined the invoking of obsolete Python
 // module's methods like setSetting(), definePopup(), etc. is blocked.
 // This macro is defined by default (in Makefile)
@@ -77,32 +71,33 @@ const bool IsCallOldMethods = true;
 const bool IsCallOldMethods = false;
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
 // NB: Python requests.
 // General rule for Python requests created by SALOME_PYQT_Module:
 // all requests should be executed SYNCHRONOUSLY within the main GUI thread.
 // However, it is obligatory that ANY Python call is wrapped with a request object,
 // so that ALL Python API calls are serialized with PyInterp_Dispatcher.
-///////////////////////////////////////////////////////////////////////////////
 
-//=============================================================================
-// The class for parsing of the XML resource files.
-// Used for backward compatibility with existing Python modules.
-//=============================================================================
+/*!
+  \class SALOME_PYQT_XmlHandler
+  The class for parsing of the XML resource files.
+  Used for backward compatibility with existing Python modules.
+*/
 class SALOME_PYQT_XmlHandler
 {
 public:
   SALOME_PYQT_XmlHandler( SALOME_PYQT_Module* module, const QString& fileName );
   void createActions();
+  void clearActions();
   void createPopup  ( QPopupMenu*    menu,
 		      const QString& context,
 		      const QString& parent,
 		      const QString& object );
 
 protected:
-  void createToolBar   ( QDomNode& parentNode );
-  void createMenu      ( QDomNode& parentNode,
-			 const int parentMenuId = -1 );
+  void createToolBar   ( QDomNode&   parentNode );
+  void createMenu      ( QDomNode&   parentNode,
+			 const int   parentMenuId = -1,
+			 QPopupMenu* parentPopup = 0 );
 
   void insertPopupItems( QDomNode&   parentNode,
 			 QPopupMenu* menu );
@@ -110,12 +105,13 @@ protected:
 private:
   SALOME_PYQT_Module* myModule;
   QDomDocument        myDoc;
+  QStringList         myMenuItems;
+  QStringList         myCurrentMenu;
+  bool                myMenuCreated;
 };
 
-//=============================================================================
 // SALOME_PYQT_Module class implementation (implements CAM_Module API for
 // all Python-based SALOME module
-//=============================================================================
 
 // While the SalomePyQtGUI library is not imported in Python it's initialization function
 // should be called manually (and only once) in order to initialize global sip data
@@ -168,8 +164,10 @@ SALOME_PYQT_Module* SALOME_PYQT_Module::getInitModule()
 /*!
  * Constructor
  */
-SALOME_PYQT_Module::SALOME_PYQT_Module() :
-       SalomeApp_Module( __DEFAULT_NAME__ ), myModule( 0 ), myXmlHandler ( 0 )
+SALOME_PYQT_Module::SALOME_PYQT_Module()
+  : SalomeApp_Module( __DEFAULT_NAME__ ),
+    myModule( 0 ), 
+    myXmlHandler ( 0 )
 {
 }
 
@@ -197,6 +195,8 @@ SALOME_PYQT_Module::~SALOME_PYQT_Module()
  */
 void SALOME_PYQT_Module::initialize( CAM_Application* app )
 {
+  MESSAGE( "SALOME_PYQT_Module::initialize" );
+
   SalomeApp_Module::initialize( app );
 
   // Try to get XML resource file name
@@ -207,11 +207,9 @@ void SALOME_PYQT_Module::initialize( CAM_Application* app )
   QString aFileName = aName + "_" + aLang + ".xml";
   aFileName = aResMgr->path( "resources", aName, aFileName );
 
-  // parse XML file if it is found and create actions
-  if ( !myXmlHandler && !aFileName.isEmpty() ) {
+  // create XML handler instance
+  if ( !myXmlHandler && !aFileName.isEmpty() && QFile::exists( aFileName ) )
     myXmlHandler = new SALOME_PYQT_XmlHandler( this, aFileName );
-    myXmlHandler->createActions();
-  }
 
   // perform internal initialization and call module's initialize() method
   // InitializeReq: request class for internal init() operation
@@ -284,6 +282,34 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
     connect( menuMgr(), SIGNAL( menuHighlighted( int, int ) ),
 	     this,      SLOT( onMenuHighlighted( int, int ) ) );
 
+  // create menus & toolbars from XML file if required
+  if ( myXmlHandler )
+    myXmlHandler->createActions();
+
+  // CustomizeReq: request class for internal customize() operation
+  class CustomizeReq : public PyInterp_Request
+  {
+  public:
+    CustomizeReq( SUIT_Study*         _study,
+		  SALOME_PYQT_Module* _obj )
+      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
+        myStudy ( _study ),
+        myObj   ( _obj   ) {}
+
+  protected:
+    virtual void execute()
+    {
+      myObj->customize( myStudy );
+    }
+
+  private:
+    SUIT_Study*         myStudy;
+    SALOME_PYQT_Module* myObj;
+  };
+
+  // Posting the request
+  PyInterp_Dispatcher::Get()->Exec( new CustomizeReq( theStudy, this ) );
+
   return true;
 }
 
@@ -299,7 +325,9 @@ bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
     disconnect( menuMgr(), SIGNAL( menuHighlighted( int, int ) ),
 		this,      SLOT( onMenuHighlighted( int, int ) ) );
 
-  bool res = SalomeApp_Module::deactivateModule( theStudy );
+  // remove menus & toolbars created from XML file if required
+  if ( myXmlHandler )
+    myXmlHandler->clearActions();
 
   // deactivate menus, toolbars, etc
   setMenuShown( false );
@@ -330,7 +358,38 @@ bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
   // Posting the request
   PyInterp_Dispatcher::Get()->Exec( new DeactivateReq( myInterp, theStudy, this ) );
 
-  return res;
+  return SalomeApp_Module::deactivateModule( theStudy );
+}
+
+/*!
+ * Called when study desktop is activated.
+ * Used for notifying about changing of the active study.
+ */
+void SALOME_PYQT_Module::studyActivated()
+{
+  // StudyChangedReq: request class for internal studyChanged() operation
+  class StudyChangedReq : public PyInterp_Request
+  {
+  public:
+    StudyChangedReq( SUIT_Study*         _study,
+		     SALOME_PYQT_Module* _obj )
+      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
+        myStudy ( _study ),
+        myObj   ( _obj   ) {}
+
+  protected:
+    virtual void execute()
+    {
+      myObj->studyChanged( myStudy );
+    }
+
+  private:
+    SUIT_Study*         myStudy;
+    SALOME_PYQT_Module* myObj;
+  };
+
+  // Posting the request
+  PyInterp_Dispatcher::Get()->Exec( new StudyChangedReq( application()->activeStudy(), this ) );
 }
 
 /*!
@@ -543,11 +602,6 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
 
   myInitModule = this;
 
-  if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
-    // call Python module's setWorkspace() method
-    setWorkSpace();
-  }                         //__CALL_OLD_METHODS__
-
   // then call Python module's initialize() method
   // ... first get python lock
   PyLockWrapper aLock = myInterp->GetLockWrapper();
@@ -622,8 +676,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
  * Performs internal activation:
  * - initializes/gets the Python interpreter (one per study)
  * - imports the Python GUI module
- * - calls Python module's setSettings() method (obsolete function, used for compatibility with old code)
- *   or activate() method (for new modules)
+ * - calls Python module's activate() method (for new modules)
  */
 void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
 {
@@ -644,6 +697,45 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
   // get python lock
   PyLockWrapper aLock = myInterp->GetLockWrapper();
 
+  // call Python module's activate() method (for the new modules)
+  if(PyObject_HasAttrString(myModule , "activate")){
+    PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
+    if( !res1 ) {
+      PyErr_Print();
+    }
+  }
+}
+
+/*!
+ * Performs additional customization after module is activated:
+ * - gets the Python interpreter (one per study)
+ * - imports the Python GUI module
+ * - calls Python module's setSettings() method (obsolete function, used for compatibility with old code)
+ */
+void SALOME_PYQT_Module::customize ( SUIT_Study* theStudy )
+{
+  // get study Id
+  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>( theStudy );
+  int aStudyId = aStudy ? aStudy->studyDS()->StudyId() : 0;
+
+  // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
+  initInterp( aStudyId );
+  if ( !myInterp )
+    return; // Error
+
+  // import Python GUI module
+  importModule();
+  if ( !myModule )
+    return; // Error
+
+  if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+    // call Python module's setWorkspace() method
+    setWorkSpace();
+  }                         //__CALL_OLD_METHODS__
+
+  // get python lock
+  PyLockWrapper aLock = myInterp->GetLockWrapper();
+
   if ( IsCallOldMethods ) { //__CALL_OLD_METHODS__
     // call Python module's setSettings() method (obsolete)
     if(PyObject_HasAttrString(myModule , "setSettings")){
@@ -653,14 +745,6 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
       }
     }
   }                         //__CALL_OLD_METHODS__
-
-  // call Python module's activate() method (for the new modules)
-  if(PyObject_HasAttrString(myModule , "activate")){
-    PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
-    if( !res1 ) {
-      PyErr_Print();
-    }
-  }
 }
 
 /*!
@@ -705,6 +789,11 @@ void SALOME_PYQT_Module::studyChanged( SUIT_Study* theStudy )
   if ( !myModule )
     return; // Error
 
+  if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+    // call Python module's setWorkspace() method
+    setWorkSpace();
+  }                         //__CALL_OLD_METHODS__
+
   // get python lock
   PyLockWrapper aLock = myInterp->GetLockWrapper();
 
@@ -740,37 +829,6 @@ QString SALOME_PYQT_Module::engineIOR() const
   if ( !CORBA::is_nil( getEngine() ) )
     return QString( getApp()->orb()->object_to_string( getEngine() ) );
   return QString( "" );
-}
-
-/*!
- * Called when study desktop is activated.
- * Used for notifying about changing of the active study.
- */
-void SALOME_PYQT_Module::studyActivated()
-{
-  // StudyChangedReq: request class for internal studyChanged() operation
-  class StudyChangedReq : public PyInterp_Request
-  {
-  public:
-    StudyChangedReq( SUIT_Study*         _study,
-		     SALOME_PYQT_Module* _obj )
-      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
-        myStudy ( _study ),
-        myObj   ( _obj   ) {}
-
-  protected:
-    virtual void execute()
-    {
-      myObj->studyChanged( myStudy );
-    }
-
-  private:
-    SUIT_Study*         myStudy;
-    SALOME_PYQT_Module* myObj;
-  };
-
-  // Posting the request
-  PyInterp_Dispatcher::Get()->Exec( new StudyChangedReq( application()->activeStudy(), this ) );
 }
 
 /*!
@@ -926,7 +984,8 @@ void SALOME_PYQT_Module::initInterp( int theStudyId )
     return;
   }
   // ... then call a method
-  PyObjWrapper aRes( PyObject_CallMethod( aMod, "salome_init", "" ) );
+  int embedded = 1;
+  PyObjWrapper aRes( PyObject_CallMethod( aMod, "salome_init", "ii", theStudyId, embedded ) );
   if( !aRes ) {
     // Error!
     PyErr_Print();
@@ -1022,26 +1081,66 @@ int SALOME_PYQT_Module::defaultMenuGroup()
  * Also these methods are used to register created from outside menus
  * in order to enable dynamic menus handling.
  */
+
+
+/*! Create tool bar with name \a name, if it was't created before.
+ * \retval -1 - if tool manager was't be created.
+ */
 int SALOME_PYQT_Module::createTool( const QString& name )
 {
   return SalomeApp_Module::createTool( name );
 }
+/*! Create tool.
+ * Insert QAction with id \a id from action map(myActionMap) to tool manager.
+ *\param id   - integer
+ *\param tBar - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int SALOME_PYQT_Module::createTool( const int id, const int tBar, const int idx )
 {
   return SalomeApp_Module::createTool( id, tBar, idx );
 }
+/*! Create tool.
+ * Insert QAction with id \a id from action map(myActionMap) to tool manager.
+ *\param id   - integer
+ *\param tBar - QString&
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int SALOME_PYQT_Module::createTool( const int id, const QString& tBar, const int idx )
 {
   return SalomeApp_Module::createTool( id, tBar, idx );
 }
+/*! Create tool. Register action \a a with id \a id.
+ * Insert QAction to tool manager.
+ *\param a - QAction
+ *\param tBar - integer
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int SALOME_PYQT_Module::createTool( QAction* a, const int tBar, const int id, const int idx )
 {
   return SalomeApp_Module::createTool( a, tBar, id, idx );
 }
+/*! Create tool. Register action \a a with id \a id.
+ * Insert QAction to tool manager.
+ *\param a - QAction
+ *\param tBar - QString&
+ *\param id   - integer
+ *\param idx  - integer
+ *\retval integer id of new action in tool manager.
+ *\retval Return -1 if something wrong.
+ */
 int SALOME_PYQT_Module::createTool( QAction* a, const QString& tBar, const int id, const int idx )
 {
   return SalomeApp_Module::createTool( a, tBar, id, idx );
 }
+
 int SALOME_PYQT_Module::createMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx, const bool constantMenu )
 {
   bool exists = hasMenu( subMenu, menu );
@@ -1050,6 +1149,7 @@ int SALOME_PYQT_Module::createMenu( const QString& subMenu, const int menu, cons
     registerMenu( regId, menu, constantMenu );
   return regId;
 }
+
 int SALOME_PYQT_Module::createMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx, const bool constantMenu )
 {
   QStringList menus = QStringList::split( "|", menu, false );
@@ -1062,6 +1162,7 @@ int SALOME_PYQT_Module::createMenu( const QString& subMenu, const QString& menu,
     pid = createMenu( subMenu, pid, id, group, idx, constantMenu );
   return pid;
 }
+
 int SALOME_PYQT_Module::createMenu( const int id, const int menu, const int group, const int idx, const bool constantMenu )
 {
   int regId = SalomeApp_Module::createMenu( id, menu, group, idx );
@@ -1069,6 +1170,7 @@ int SALOME_PYQT_Module::createMenu( const int id, const int menu, const int grou
     registerMenu( regId, menu, constantMenu );
   return regId;
 }
+
 int SALOME_PYQT_Module::createMenu( const int id, const QString& menu, const int group, const int idx, const bool constantMenu )
 {
   QStringList menus = QStringList::split( "|", menu, false );
@@ -1081,6 +1183,7 @@ int SALOME_PYQT_Module::createMenu( const int id, const QString& menu, const int
     pid = createMenu( id, pid, group, idx, constantMenu );
   return pid;
 }
+
 int SALOME_PYQT_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int idx, const bool constantMenu )
 {
   int regId = SalomeApp_Module::createMenu( a, menu, id, group, idx );
@@ -1088,6 +1191,7 @@ int SALOME_PYQT_Module::createMenu( QAction* a, const int menu, const int id, co
     registerMenu( regId, menu, constantMenu );
   return regId;
 }
+
 int SALOME_PYQT_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx, const bool constantMenu )
 {
   QStringList menus = QStringList::split( "|", menu, false );
@@ -1100,28 +1204,27 @@ int SALOME_PYQT_Module::createMenu( QAction* a, const QString& menu, const int i
     pid = createMenu( a, pid, id, group, idx, constantMenu );
   return pid;
 }
+
 QAction* SALOME_PYQT_Module::createSeparator()
 {
   return SalomeApp_Module::separator();
 }
+
 QAction* SALOME_PYQT_Module::action( const int id ) const
 {
   return SalomeApp_Module::action( id );
 }
+
 int SALOME_PYQT_Module::actionId( const QAction* a ) const
 {
   return SalomeApp_Module::actionId( a );
 }
+
 QAction* SALOME_PYQT_Module::createAction( const int id, const QString& text, const QString& icon,
 					   const QString& menu, const QString& tip, const int key,
 					   const bool toggle )
 {
-  QIconSet anIcon;
-  if ( !icon.isEmpty() ) {
-    QPixmap pixmap  = getApp()->resourceMgr()->loadPixmap( name(""), tr( icon ) );
-    if ( !pixmap.isNull() )
-      anIcon = QIconSet( pixmap );
-  }
+  QIconSet anIcon = loadIcon( icon );
   QAction* a = action( id );
   if ( a ) {
     if ( a->text().isEmpty()      && !text.isEmpty() )  a->setText( text );
@@ -1137,6 +1240,19 @@ QAction* SALOME_PYQT_Module::createAction( const int id, const QString& text, co
     a = SalomeApp_Module::createAction( id, text, anIcon, menu, tip, key, getApp()->desktop(), toggle, this, SLOT( onGUIEvent() ) );
   }
   return a;
+}
+/*! 
+ * Load icon from resource file
+ */
+QIconSet SALOME_PYQT_Module::loadIcon( const QString& fileName )
+{
+  QIconSet anIcon;
+  if ( !fileName.isEmpty() ) {
+    QPixmap pixmap  = getApp()->resourceMgr()->loadPixmap( name(""), tr( fileName ) );
+    if ( !pixmap.isNull() )
+      anIcon = QIconSet( pixmap );
+  }
+  return anIcon;
 }
 
 /*!
@@ -1318,9 +1434,7 @@ bool SALOME_PYQT_Module::clearMenu( const int id, const int menu, const bool rem
   return false;
 }
 
-//=============================================================================
 // SALOME_PYQT_XmlHandler class implementation
-//=============================================================================
 
 // gets an tag name for the dom element [ static ]
 // returns an empty string if the element does not have tag name
@@ -1335,44 +1449,68 @@ static QString attribute( const QDomElement& element, const QString& attName ) {
 }
 
 // checks the given value for the boolean value [ static ]
-// returns TRUE if string is "true", "yes" or "1"
-static bool checkBool( const QString& value ) {
-  return ( value == "true" || value == "yes" || value == "1" );
+// returns TRUE if string represents boolean value: 
+// - "true", "yes" or "1" for true
+// - "false", "no" or "0" for false
+// second parameter allows to check certain boolean value
+// - 1: true
+// - 0: false
+// - other value is not taken into account
+static bool checkBool( const QString& value, const int check = -1 ) {
+  QString v = value.lower();
+  if ( ( v == "true"  || v == "yes"  || v == "1" ) && ( check != 0 ) )
+    return true;
+  if ( ( v == "false" || v == "no" || v == "0" ) && ( check != 1 ) )
+    return true;
+  return false;
 }
 
 // checks the given value for the integer value [ static ]
 // returns -1 if item is empty or presents and invalid number
-static int checkInt( const QString& value, const int def = -1 )
+static int checkInt( const QString& value, const int def = -1, const int shift = -1 )
 {
-  return value.isEmpty() ? def : value.toInt();
+  bool bOk;
+  int val = value.toInt( &bOk );
+  if ( !bOk ) val = def;
+  if ( shift > 0 && bOk && val < 0 )
+    val += shift;
+  return val;
 }
 
 /*!
  * Constructor
  */
-SALOME_PYQT_XmlHandler::SALOME_PYQT_XmlHandler( SALOME_PYQT_Module* module, const QString& fileName )
-     : myModule( module )
+SALOME_PYQT_XmlHandler::SALOME_PYQT_XmlHandler( SALOME_PYQT_Module* module, 
+						const QString&      fileName )
+  : myModule( module ),
+    myMenuCreated( false )
 {
+  if (fileName.isEmpty() ) 
+    return;
   QFile aFile( fileName );
   if ( !aFile.open( IO_ReadOnly ) )
     return;
   if ( !myDoc.setContent( &aFile ) ) {
-      aFile.close();
-      return;
+    aFile.close();
+    return;
   }
   aFile.close();
 }
 
 /*!
-  Called by SALOME_PYQT_Module::initialize() in order to create actions
-  (menus, toolbars, popup menus)
+ * Called by SALOME_PYQT_Module::activate() in order to create actions
+ * (menus, toolbars, popup menus)
  */
 void SALOME_PYQT_XmlHandler::createActions()
 {
+  // check flag : are menus already created?
+  if ( myMenuCreated && !IsCallOldMethods ) 
+    return;
+  
   // get document element
   QDomElement aDocElem = myDoc.documentElement();
 
-  // get main menu actions
+  // create main menu actions
   QDomNodeList aMenuList = aDocElem.elementsByTagName( "menu-item" );
   for ( int i = 0; i < aMenuList.count(); i++ ) {
     QDomNode n = aMenuList.item( i );
@@ -1385,6 +1523,36 @@ void SALOME_PYQT_XmlHandler::createActions()
     QDomNode n = aToolsList.item( i );
     createToolBar( n );
   }
+  // set flag : menus are already created
+  myMenuCreated = true;
+}
+
+/*!
+ * Called by SALOME_PYQT_Module::deactivate() in order to remove actions
+ * (menus, toolbars, popup menus)
+ */
+void SALOME_PYQT_XmlHandler::clearActions()
+{
+  for ( uint i = 0; i < myMenuItems.count(); i++ ) {
+    QMenuData* md = dynamic_cast<QMenuData*>( myModule->getApp()->desktop()->menuBar() );
+    QStringList menus = QStringList::split( ":", myMenuItems[ i ] );
+    for ( uint j = 0; j < menus.count(); j++) {
+      int id = menus[ j ].toInt();
+      QMenuData* smd;
+      QMenuItem* mi = md->findItem( id, &smd );
+      if ( mi && md == smd ) {
+	if ( j == menus.count()-1 || !mi->popup() ) { // last item or not popup
+	  md->removeItem( id );
+	  break;
+	}
+	else if ( mi->popup() )
+	  md = dynamic_cast<QMenuData*>( mi->popup() );
+      }
+      else
+	break;
+    }
+  }
+  myMenuItems.clear();
 }
 
 /*!
@@ -1419,7 +1587,9 @@ void SALOME_PYQT_XmlHandler::createPopup( QPopupMenu*    menu,
 /*!
   Create main menu with child actions
  */
-void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentMenuId )
+void SALOME_PYQT_XmlHandler::createMenu( QDomNode&   parentNode, 
+					 const int   parentMenuId, 
+					 QPopupMenu* parentPopup )
 {
   if ( !myModule )
     return;
@@ -1435,13 +1605,52 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
     int     group  = checkInt( attribute( parentElement, "group-id" ), 
 			       myModule->defaultMenuGroup() );
     if ( !plabel.isEmpty() ) {
+      QPopupMenu* popup = 0;
+      int menuId = -1;
       // create menu
-      int menuId = myModule->createMenu( plabel,         // label
-					 parentMenuId,   // parent menu ID, should be -1 for main menu
-					 pid,            // ID
-					 group,          // group ID
-					 ppos,           // position
-					 true );         // create constant menu (not removed by clearMenu())
+      if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+	SUIT_Desktop* desktop = myModule->getApp()->desktop();
+	if ( parentMenuId == -1 ) { // top-level menu
+	  QMenuBar* mb = desktop->menuBar();
+	  QMenuItem* mi = mb->findItem( pid );
+	  if ( mi ) popup = mi->popup();
+	  if ( !popup ) {
+	    popup = new QPopupMenu( desktop );
+	    ppos = checkInt( attribute( parentElement, "pos-id" ), -1, mb->count() );
+	    menuId = mb->insertItem( plabel, popup, pid, ppos );
+	    myCurrentMenu.push_back( QString::number( menuId ) );
+	    myMenuItems.append( myCurrentMenu.join( ":" ) );
+	  }
+	  else {
+	    menuId = pid;
+	    myCurrentMenu.push_back( QString::number( menuId ) );
+	  }
+	}
+	else {
+	  // parentPopup should not be 0 here!
+	  QMenuItem* mi = parentPopup->findItem( pid );
+	  if ( mi ) popup = mi->popup();
+	  if ( !popup ) {
+	    popup = new QPopupMenu( desktop );
+	    ppos = checkInt( attribute( parentElement, "pos-id" ), -1, popup->count() );
+	    menuId = parentPopup->insertItem( plabel, popup, pid, ppos );
+	    myCurrentMenu.push_back( QString::number( menuId ) );
+	    myMenuItems.append( myCurrentMenu.join( ":" ) );
+	  }
+	  else {
+	    menuId = pid;
+	    myCurrentMenu.push_back( QString::number( menuId ) );
+	  }
+	}
+      }
+      else {                    //!__CALL_OLD_METHODS__
+	menuId = myModule->createMenu( plabel,         // label
+				       parentMenuId,   // parent menu ID, should be -1 for main menu
+				       pid,            // ID
+				       group,          // group ID
+				       ppos,           // position
+				       true );         // create constant menu (not removed by clearMenu())
+      }                         // __CALL_OLD_METHODS__
       QDomNode node = parentNode.firstChild();
       while ( !node.isNull() ) {
 	if ( node.isElement() ) {
@@ -1462,25 +1671,49 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	    // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
 	    // also check if the action with given ID is already created
 	    if ( id != -1 ) {
-	      // create menu action
-	      QAction* action = myModule->createAction( id,                               // ID
-						        tooltip,                          // tooltip
-						        icon,                             // icon
-						        label,                            // menu text
-						        tooltip,                          // status-bar text
-						        QKeySequence( accel ),            // keyboard accelerator
-						        toggle );                         // toogled action
-	      myModule->createMenu( action,   // action
-				    menuId,   // parent menu ID
-				    id,       // ID (same as for createAction())
-				    group,    // group ID
-				    pos,      // position
-				    true );   // create constant menu (not removed by clearMenu())
+	      if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+		QIconSet iconSet = myModule->loadIcon( icon );
+		pos = checkInt( attribute( elem, "pos-id" ), -1, popup->count() );
+		int aid = iconSet.isNull() ? popup->insertItem( label, 
+								myModule,
+								SLOT( onGUIEvent(int) ),
+								QKeySequence( accel ),
+								id,
+								pos ) :
+		                             popup->insertItem( iconSet, 
+								label, 
+								myModule,
+								SLOT( onGUIEvent(int) ),
+								QKeySequence( accel ),
+								id,
+								pos );
+		myCurrentMenu.push_back( QString::number( aid ) );
+		myMenuItems.append( myCurrentMenu.join( ":" ) );
+		myCurrentMenu.pop_back();
+		if ( toggle )
+		  popup->setItemChecked( aid, checkBool( attribute( elem, "toggle-id" ), 1 ) );
+	      }
+	      else {                    //!__CALL_OLD_METHODS__
+		// create menu action
+		QAction* action = myModule->createAction( id,                               // ID
+							  tooltip,                          // tooltip
+							  icon,                             // icon
+							  label,                            // menu text
+							  tooltip,                          // status-bar text
+							  QKeySequence( accel ),            // keyboard accelerator
+							  toggle );                         // toogled action
+		myModule->createMenu( action,   // action
+				      menuId,   // parent menu ID
+				      id,       // ID (same as for createAction())
+				      group,    // group ID
+				      pos,      // position
+				      true );   // create constant menu (not removed by clearMenu())
+	      }                         // __CALL_OLD_METHODS__
 	    }
 	  }
 	  else if ( aTagName == "submenu" ) {
 	    // create sub-menu
-	    createMenu( node, menuId );
+	    createMenu( node, menuId, popup );
 	  }
 	  else if ( aTagName == "separator" ) {
 	    // create menu separator
@@ -1488,17 +1721,27 @@ void SALOME_PYQT_XmlHandler::createMenu( QDomNode& parentNode, const int parentM
 	    int pos   = checkInt( attribute( elem, "pos-id" ) );
 	    int group = checkInt( attribute( elem, "group-id" ), 
 				  myModule->defaultMenuGroup() );
-	    QAction* action = myModule->createSeparator();
-	    myModule->createMenu( action,  // separator action
-				  menuId,  // parent menu ID
-				  id,      // ID
-				  group,   // group ID
-				  pos,     // position
-				  true );  // create constant menu (not removed by clearMenu())
+	    if ( IsCallOldMethods ) { // __CALL_OLD_METHODS__
+	      pos = checkInt( attribute( elem, "pos-id" ), -1, popup->count() );
+	      int sid = popup->insertSeparator( pos );
+	      myCurrentMenu.push_back( QString::number( sid ) );
+	      myMenuItems.append( myCurrentMenu.join( ":" ) );
+	      myCurrentMenu.pop_back();
+	    }
+	    else {                    //!__CALL_OLD_METHODS__
+	      QAction* action = myModule->createSeparator();
+	      myModule->createMenu( action,  // separator action
+				    menuId,  // parent menu ID
+				    id,      // ID
+				    group,   // group ID
+				    pos,     // position
+				    true );  // create constant menu (not removed by clearMenu())
+	    }                         // __CALL_OLD_METHODS__
 	  }
 	}
 	node = node.nextSibling();
       }
+      myCurrentMenu.pop_back();
     }
   }
 }
@@ -1549,7 +1792,7 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
 	      myModule->createTool( action, tbId, -1, pos );
 	    }
 	  }
-	  else if ( aTagName == "separatorTB" ) {
+	  else if ( aTagName == "separatorTB" || aTagName == "separator" ) {
 	    // create toolbar separator
 	    int     pos     = checkInt( attribute( elem, "pos-id" ) );
 	    QAction* action = myModule->createSeparator();
@@ -1562,6 +1805,9 @@ void SALOME_PYQT_XmlHandler::createToolBar( QDomNode& parentNode )
   }
 }
 
+/*!
+ * Fill popup menu with items
+ */
 void SALOME_PYQT_XmlHandler::insertPopupItems( QDomNode& parentNode, QPopupMenu* menu )
 {
   if ( !myModule )

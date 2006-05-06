@@ -27,6 +27,10 @@
 #include <qfont.h>
 #include <qstring.h>
 
+/*!
+  \class SUIT_Tools
+  Prodives set of auxiliary static methods
+*/
 class SUIT_EXPORT SUIT_Tools : public Qtx
 {
 public:

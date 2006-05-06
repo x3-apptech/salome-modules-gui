@@ -18,6 +18,9 @@
 //
 #include "SUIT_ResourceMgr.h"
 
+#include <qfileinfo.h>
+#include <qdir.h>
+
 /*!
     Constructor
 */
@@ -61,15 +64,59 @@ QString SUIT_ResourceMgr::loadDoc( const QString& prefix, const QString& id ) co
   return path( docSection, prefix, id );
 }
 
+#include <unistd.h>
 /*!
     Returns the user file name for specified application
 */
-QString SUIT_ResourceMgr::userFileName( const QString& appName ) const
+QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_load ) const
 {
   QString pathName = QtxResourceMgr::userFileName( appName );
 
   if ( !version().isEmpty() )
     pathName += QString( "." ) + version();
 
+  if( !QFileInfo( pathName ).exists() && for_load )
+  {
+    QString newName = findAppropriateUserFile( pathName );
+    if( !newName.isEmpty() )
+      pathName = newName;
+  }
+
   return pathName;
+}
+
+/*!
+    Finds other the most appropriate user file instead missing one
+*/
+QString SUIT_ResourceMgr::findAppropriateUserFile( const QString& fname ) const
+{
+  QDir d( QFileInfo( fname ).dir( true ) );
+  d.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
+  QStringList l = d.entryList();
+  QString appr_file;
+  int id0 = userFileId( fname ), id, appr=-1;
+  if( id0<0 )
+    return appr_file;
+
+  for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
+  {
+    id = userFileId( *anIt );
+    if( id<0 )
+      continue;
+
+    if( abs( id-id0 ) < abs( appr-id0 ) )
+    {
+      appr = id;
+      appr_file = d.absFilePath( *anIt );
+    }
+  }
+  return appr_file;
+}
+
+/*!
+    Calculates integer extended version number by user file name for comparing
+*/
+int SUIT_ResourceMgr::userFileId( const QString& ) const
+{
+  return -1;
 }

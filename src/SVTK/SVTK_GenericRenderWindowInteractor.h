@@ -42,9 +42,9 @@ class SVTK_Selector;
 class SVTK_Renderer;
 
 
-//============================================================================
-//! Introduction of the class is intended to implement Qt based #CreateTimer and #DestroyTimer functionality.
 /*!
+  \class QVTK_GenericRenderWindowInteractor
+  Introduction of the class is intended to implement Qt based #CreateTimer and #DestroyTimer functionality.
   The class intendes to implement platform indepenedant subclass of vtkRenderWindowInteractor.
   This is done by usage of Qt library.
   \note
@@ -86,9 +86,9 @@ class SVTK_EXPORT QVTK_GenericRenderWindowInteractor:
 };
 
 
-//============================================================================
-//! This class introduce SALOME specific to the base one
 /*!
+  \class SVTK_GenericRenderWindowInteractor
+  This class introduce SALOME specific to the base one
   In this class new members is added (#mySelector and #myRenderWidget).
   They are used for initialization of #SVTK_InteractorStyle by redefinition of
   #SVTK_InteractorStyle::SetInteractor method

@@ -36,6 +36,12 @@ class QDomNode;
 #pragma warning( disable:4251 )
 #endif
 
+
+/*!
+  \class QtxActionMgr
+  Contains set of actions accessible by id.
+  Base class for menu, popup creators and other action containers.
+*/
 class QTX_EXPORT QtxActionMgr : public QObject
 {
   Q_OBJECT 
@@ -93,6 +99,10 @@ private:
 
 QTX_EXPORT typedef QMap<QString, QString> ItemAttributes;
 
+/*!
+  \class QtxActionMgr::Creator
+  Allows to fill automatically action manager with actions created by data from file
+*/
 class QtxActionMgr::Creator
 {
 public:
@@ -115,6 +125,11 @@ private:
   QtxActionMgr::Reader*  myReader;
 };
 
+/*!
+  \class QtxActionMgr::Reader
+  This class is used to read files of some format
+  to create actions and to fill action manager automatically
+*/
 class QtxActionMgr::Reader
 {
 public:
@@ -131,6 +146,11 @@ private:
   QMap< QString, QString > myOptions;
 };
 
+/*!
+  \class QtxActionMgr::Reader
+  This class is used to read files of XML format
+  to create actions and to fill action manager automatically
+*/
 class QtxActionMgr::XMLReader : public Reader
 {
 public:

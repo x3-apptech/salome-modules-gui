@@ -35,6 +35,10 @@ class QPainter;
 class OCCViewer_ViewSketcher;
 class OCCViewer_ViewTransformer;
 
+/*!
+  \class OCCViewer_ViewPort
+  Visualisation canvas of SUIT-based application
+*/
 class OCCVIEWER_EXPORT OCCViewer_ViewPort : public QWidget
 {
 	Q_OBJECT

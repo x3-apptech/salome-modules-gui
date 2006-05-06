@@ -63,10 +63,6 @@ using namespace std;
   return aMgr->GetStudyByID( id );
 } */               
 
-//=================================================================================
-// SPlot2d_Viewer implementation
-//=================================================================================
-
 /*!
   Constructor
 */
@@ -110,6 +106,11 @@ void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject,
   aViewFrame->updateTitles();
 }
 
+/*!
+  Renames all copies of object in all view windows
+  \param IObj - object to be renamed
+  \param name - new name
+*/
 void SPlot2d_Viewer::renameAll( const Handle(SALOME_InteractiveObject)& IObj, const QString& name )
 {
   SUIT_ViewManager* vm = getViewManager();
@@ -232,12 +233,9 @@ void SPlot2d_Viewer::Repaint()
   if(aViewFrame) aViewFrame->Repaint();
 }
 
-//==========================================================
 /*!
- *  SPlot2d_Viewer::Display
- *  Display presentation
- */
-//==========================================================
+  Display presentation
+*/
 void SPlot2d_Viewer::Display( const SALOME_Prs2d* prs )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
@@ -245,12 +243,9 @@ void SPlot2d_Viewer::Display( const SALOME_Prs2d* prs )
   if(aViewFrame && aPrs) aViewFrame->Display(aPrs);
 }
 
-//==========================================================
 /*!
- *  SPlot2d_Viewer::Erase
- *  Erase presentation
- */
-//==========================================================
+  Erase presentation
+*/
 void SPlot2d_Viewer::Erase( const SALOME_Prs2d* prs, const bool )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
@@ -258,12 +253,9 @@ void SPlot2d_Viewer::Erase( const SALOME_Prs2d* prs, const bool )
   if(aViewFrame && aPrs) aViewFrame->Erase(aPrs);
 }
   
-//==========================================================
 /*!
- *  SPlot2d_Viewer::CreatePrs
- *  Create presentation by entry
- */
-//==========================================================
+  Create presentation by entry
+*/
 SALOME_Prs* SPlot2d_Viewer::CreatePrs( const char* entry )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
@@ -277,23 +269,17 @@ SALOME_Prs* SPlot2d_Viewer::CreatePrs( const char* entry )
   return NULL;
 }
 
-//==========================================================
 /*!
- *  SPlot2d_Viewer::BeforeDisplay
- *  Axiluary method called before displaying of objects
- */
-//==========================================================
+  Axiluary method called before displaying of objects
+*/
 void  SPlot2d_Viewer::BeforeDisplay( SALOME_Displayer* d )
 {
   d->BeforeDisplay( this, SALOME_Plot2dViewType() );
 }
 
-//==========================================================
 /*!
- *  SPlot2d_Viewer::AfterDisplay
- *  Axiluary method called after displaying of objects
- */
-//==========================================================
+  Axiluary method called after displaying of objects
+*/
 void  SPlot2d_Viewer::AfterDisplay( SALOME_Displayer* d )
 {
   d->AfterDisplay( this, SALOME_Plot2dViewType() );
@@ -331,12 +317,9 @@ Handle(SALOME_InteractiveObject) SPlot2d_Viewer::FindIObject( const char* Entry 
   return anIO;
 }
 
-//==========================================================
 /*!
- *  SPlot2d_Viewer::getActiveViewFrame
- *  Returns an active Plot2d ViewFrame or NULL
- */
-//==========================================================
+  Returns an active Plot2d ViewFrame or NULL
+*/
 Plot2d_ViewFrame* SPlot2d_Viewer::getActiveViewFrame()
 {
   SUIT_ViewManager* aViewMgr = getViewManager();
@@ -349,6 +332,11 @@ Plot2d_ViewFrame* SPlot2d_Viewer::getActiveViewFrame()
   return NULL;
 }
 
+/*!
+  \return curve by object and viewframe
+  \param theIObject - object
+  \param fr - viewframe
+*/
 SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObject)& theIObject,
 					     Plot2d_ViewFrame* fr )
 {
@@ -368,6 +356,9 @@ SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObje
   return NULL;
 }
 
+/*!
+  SLOT: called when action "Clone view" is activated
+*/
 void SPlot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* newVF )
 {
   if( !clonedVF || !newVF )

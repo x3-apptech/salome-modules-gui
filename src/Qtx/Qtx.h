@@ -87,6 +87,10 @@ typedef QValueList<int>    QIntList;
 typedef QValueList<short>  QShortList;
 typedef QValueList<double> QDoubleList;
 
+/*!
+  \class Qtx
+  \brief Set of auxiliary static methods
+*/
 class QTX_EXPORT Qtx : public Qt
 {
 public:

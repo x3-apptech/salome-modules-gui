@@ -26,52 +26,40 @@
 #include "GLViewer_Group.h"
 #include "GLViewer_Object.h"
 
-/***************************************************************************
-**  Class:   GLViewer_Group
-**  Descr:   Group of GLViewer_Objects
-**  Module:  GLViewer
-**  Created: UI team, 25.03.05
-****************************************************************************/
-
-//--------------------------------------------------------------------------
-//Function: GLViewer_Group()
-//Description: constructor
-//--------------------------------------------------------------------------
+/*!
+  constructor
+*/
 GLViewer_Group::GLViewer_Group()
 {
   mySelObjNum = 0;
 }
 
-//--------------------------------------------------------------------------
-//Function: GLViewer_Group()
-//Description: destructor
-//--------------------------------------------------------------------------
+/*!
+  destructor
+*/
 GLViewer_Group::~GLViewer_Group()
 {  
 }
 
-//--------------------------------------------------------------------------
-//Function: isEmpty
-//Description: detection of empty group
-//--------------------------------------------------------------------------
+/*!
+  detection of empty group
+*/
 bool GLViewer_Group::isEmpty()
 {
   return myList.empty(); 
 }
 
-//--------------------------------------------------------------------------
-//Function: count
-//Description: number of elements
-//--------------------------------------------------------------------------
+/*!
+  \return number of elements
+*/
 int GLViewer_Group::count()
 {
   return myList.size();
 }
 
-//--------------------------------------------------------------------------
-//Function: contains
-//Description: return the position of object, else -1
-//--------------------------------------------------------------------------
+/*!
+  \return the position of object if group contains it, else -1
+*/
 int GLViewer_Group::contains( GLViewer_Object* theObject )
 {
   if( !theObject )
@@ -86,10 +74,9 @@ int GLViewer_Group::contains( GLViewer_Object* theObject )
   return -1;
 }
 
-//--------------------------------------------------------------------------
-//Function: addObject
-//Description: adding object to group
-//--------------------------------------------------------------------------
+/*!
+  adding object to group
+*/
 int GLViewer_Group::addObject( GLViewer_Object* theObject )
 {
   if( theObject && contains( theObject ) == -1 )
@@ -100,10 +87,9 @@ int GLViewer_Group::addObject( GLViewer_Object* theObject )
   return count();
 }
 
-//--------------------------------------------------------------------------
-//Function: removeObject
-//Description: removing object from group
-//--------------------------------------------------------------------------
+/*!
+  removing object from group
+*/
 int GLViewer_Group::removeObject( GLViewer_Object* theObject )
 {
   if( theObject )
@@ -122,10 +108,11 @@ int GLViewer_Group::removeObject( GLViewer_Object* theObject )
     return count();
 }
 
-//--------------------------------------------------------------------------
-//Function: dragingObjects
-//Description: 
-//--------------------------------------------------------------------------
+/*!
+  Dragging operation
+  \param Once is true, if this operation calls only one time for all object
+  \param x, y - dragging position
+*/
 void GLViewer_Group::dragingObjects( float x, float y, bool once )
 {
   if( !once )
@@ -154,10 +141,11 @@ void GLViewer_Group::dragingObjects( float x, float y, bool once )
     (*it)->moveObject( x, y, true );  
 }
 
-//--------------------------------------------------------------------------
-//Function: updateZoom
-//Description: 
-//--------------------------------------------------------------------------
+/*!
+  Updates zoom of object
+  \param sender - object to be updated
+  \param zoom - zoom coefficient
+*/
 void GLViewer_Group::updateZoom( GLViewer_Object* sender, float zoom )
 {
   OGIterator it = myList.begin();

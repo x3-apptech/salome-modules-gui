@@ -31,6 +31,12 @@
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class CAM_Study
+  Represents study for using in CAM, contains list of
+  data model references from all modules. Provides
+  necessary functionality for data models management.
+*/
 class CAM_EXPORT CAM_Study : public SUIT_Study
 {
   Q_OBJECT

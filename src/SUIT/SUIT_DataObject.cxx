@@ -464,11 +464,17 @@ void SUIT_DataObject::setOn( const bool on )
   myCheck = on;
 }
 
+/*!
+    \return the opened state of the object (used in Object Browser).
+*/
 bool SUIT_DataObject::isOpen() const
 {
   return myOpen;
 }
 
+/*!
+    Sets the opened state of the object (used in Object Browser).
+*/
 void SUIT_DataObject::setOpen( const bool on )
 {
   myOpen = on;

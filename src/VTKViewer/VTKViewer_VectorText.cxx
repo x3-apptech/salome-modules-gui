@@ -1751,6 +1751,11 @@ void VTKViewer_VectorText::Execute()
   newPolys->Delete();
 }
   
+/*!
+  Print text to stream
+  \param os - stream
+  \param indent
+*/
 void VTKViewer_VectorText::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

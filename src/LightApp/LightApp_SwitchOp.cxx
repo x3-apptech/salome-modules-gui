@@ -16,17 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-/**
-*  LIGHT LightApp
-*
-*  Copyright (C) 2005  CEA/DEN, EDF R&D
-*
-*
-*
-*  File   : LightApp_SwitchOp.h
-*  Author : Sergey LITONIN
-*  Module : LIGHT
-*/
 
 #include "LightApp_SwitchOp.h"
 #include "LightApp_Module.h"

@@ -36,10 +36,6 @@
 class QLineEdit;
 class QPushButton;
 
-//=================================================================================
-// class    : ToolsGUI_CatalogGeneratorDlg
-// purpose  :
-//=================================================================================
 class Standard_EXPORT ToolsGUI_CatalogGeneratorDlg : public QDialog
 { 
     Q_OBJECT

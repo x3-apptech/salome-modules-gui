@@ -81,11 +81,11 @@
   #include <VTKViewer_ViewModel.h>
 #endif
 
-#ifndef DISABLE_SUPERVGRAPHVIEWER
-  #include <SUPERVGraph_ViewModel.h>
-  #include <SUPERVGraph_ViewFrame.h>
-  #include <SUPERVGraph_ViewManager.h>
-#endif
+//#ifndef DISABLE_SUPERVGRAPHVIEWER
+//  #include <SUPERVGraph_ViewModel.h>
+//  #include <SUPERVGraph_ViewFrame.h>
+//  #include <SUPERVGraph_ViewManager.h>
+//#endif
 
 #include <QtxWorkstack.h>
 
@@ -103,6 +103,7 @@
 #include <qcombobox.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
+#include <qfontdatabase.h>
 
 #define FIRST_HELP_ID 1000000
 
@@ -137,6 +138,9 @@ static const char* imageEmptyIcon[] = {
 
 int LightApp_Application::lastStudyId = 0;
 
+/*!
+  \return last global id of study
+*/
 int LightApp_Application::studyId()
 {
   return LightApp_Application::lastStudyId;
@@ -148,11 +152,12 @@ extern "C" LIGHTAPP_EXPORT SUIT_Application* createApplication()
   return new LightApp_Application();
 }
 
+/*! \var global preferences of LightApp */
 LightApp_Preferences* LightApp_Application::_prefs_ = 0;
 
-/*
-  Class       : LightApp_Application
-  Description : Application containing LightApp module
+/*!
+  \class LightApp_Application
+  Application containing LightApp module
 */
 
 /*!Constructor.*/
@@ -210,6 +215,30 @@ myPrefs( 0 )
 #endif
 
   connect( mySelMgr, SIGNAL( selectionChanged() ), this, SLOT( onSelection() ) );
+
+  // Set existing font for the python console in resources
+  if( !aResMgr->hasValue( "PyConsole", "font" ) )
+    return;
+  
+  QFont f = aResMgr->fontValue( "PyConsole", "font" );
+  QFontDatabase fdb;
+  QStringList famdb = fdb.families();
+  
+  if ( famdb.contains(f.family()) || !aResMgr->hasValue( "PyConsole", "additional_families" ) )
+    return;
+  
+  QStringList anAddFamilies = QStringList::split( ";", aResMgr->stringValue( "PyConsole", "additional_families" ) );
+  QString aFamily;
+  for ( QStringList::Iterator it = anAddFamilies.begin(); it != anAddFamilies.end(); ++it )
+    {
+      aFamily = *it;
+      if ( famdb.contains(aFamily) )
+	{
+	  f.setFamily( aFamily );
+	  aResMgr->setValue( "PyConsole", "font", f );
+	  break;
+	}
+    }
 }
 
 /*!Destructor.
@@ -333,6 +362,10 @@ bool LightApp_Application::activateModule( const QString& modName )
   return true;
 }
 
+/*!
+  Opens other study into active Study. If Study is empty - creates it.
+  \param theName - name of study
+*/
 bool LightApp_Application::useStudy(const QString& theName)
 {
   createEmptyStudy();
@@ -479,7 +512,10 @@ void LightApp_Application::createActions()
   for ( it = modList.begin(); it != modList.end(); ++it )
   {
     if ( !isLibExists( *it ) )
+    {
+      qDebug( QString( "Library '%1' cannot be found" ).arg( *it ) );
       continue;
+    }
 
     QString iconName;
     if ( iconMap.contains( *it ) )
@@ -630,10 +666,9 @@ void LightApp_Application::onNewWindow()
     createViewManager( type );
 }
 
-//=======================================================================
-//  name    : onNewDoc
-/*! Purpose : SLOT. Create new document*/
-//=======================================================================
+/*!
+  SLOT: Creates new document
+*/
 void LightApp_Application::onNewDoc()
 {
   SUIT_Study* study = activeStudy();
@@ -649,10 +684,9 @@ void LightApp_Application::onNewDoc()
   }
 }
 
-//=======================================================================
-// name    : onOpenDoc
-/*! Purpose : SLOT. Open new document*/
-//=======================================================================
+/*!
+  SLOT: Opens new document
+*/
 void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
@@ -668,7 +702,11 @@ void LightApp_Application::onOpenDoc()
 }
 
 #include "SUIT_MessageBox.h"
-/*! Purpose : SLOT. Open new document with \a aName.*/
+
+/*!
+  SLOT: Opens new document.
+  \param aName - name of file
+*/
 bool LightApp_Application::onOpenDoc( const QString& aName )
 {
   bool isAlreadyOpen = false;
@@ -735,10 +773,9 @@ bool LightApp_Application::onOpenDoc( const QString& aName )
   return res;
 }
 
-//=======================================================================
-// name    : onHelpAbout
-/*! Purpose : SLOT. Display "About" message box*/
-//=======================================================================
+/*!
+  SLOT: Displays "About" message box
+*/
 void LightApp_Application::onHelpAbout()
 {
   LightApp_AboutDlg* dlg = new LightApp_AboutDlg( applicationName(), applicationVersion(), desktop() );
@@ -746,7 +783,10 @@ void LightApp_Application::onHelpAbout()
   delete dlg;
 }
 
-/*!SLOT. Load document with \a aName.*/
+/*!
+  SLOT: Loads document
+  \param aName - name of document
+*/
 bool LightApp_Application::onLoadDoc( const QString& aName )
 {
   bool res = CAM_Application::onLoadDoc( aName );
@@ -763,7 +803,10 @@ bool LightApp_Application::onLoadDoc( const QString& aName )
   return res;
 }
 
-/*!Private SLOT. Selection.*/
+/*!
+  Private SLOT: Called on selection is changed
+  Dispatchs active module that selection is changed
+*/
 void LightApp_Application::onSelection()
 {
   onSelectionChanged();
@@ -772,9 +815,10 @@ void LightApp_Application::onSelection()
     ((LightApp_Module*)activeModule())->selectionChanged();
 }
 
-/*!Set active study.
- *\param study - SUIT_Study.
- */
+/*!
+  Sets active study.
+ \param study - SUIT_Study.
+*/
 void LightApp_Application::setActiveStudy( SUIT_Study* study )
 {
   CAM_Application::setActiveStudy( study );
@@ -782,10 +826,9 @@ void LightApp_Application::setActiveStudy( SUIT_Study* study )
   activateWindows();
 }
 
-//=======================================================================
-// name    : updateCommandsStatus
-/*! Purpose : Enable/Disable menu items and toolbar buttons. Rebuild menu*/
-//=======================================================================
+/*!
+  Enables/Disables menu items and toolbar buttons. Rebuild menu
+*/
 void LightApp_Application::updateCommandsStatus()
 {
   CAM_Application::updateCommandsStatus();
@@ -816,18 +859,24 @@ void LightApp_Application::updateCommandsStatus()
 #endif
 }
 
-// Helps to execute command
+/*!
+  \class RunBrowser
+  Runs system command in separate thread
+*/
 class RunBrowser: public QThread {
 public:
 
-  RunBrowser(QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL):
+  RunBrowser( LightApp_Application* app, QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL):
     myApp(theApp), myParams(theParams), 
 #ifdef WIN32
       myHelpFile("file://" + theHelpFile + theContext), 
 #else
       myHelpFile("file:" + theHelpFile + theContext),
 #endif
-      myStatus(0) {};
+      myStatus(0),
+      myLApp( app )
+{
+};
 
   virtual void run()
   {
@@ -839,17 +888,11 @@ public:
 	myStatus = system(aCommand);
 	if(myStatus != 0)
 	  {
-	    QCustomEvent* ce2000 = new QCustomEvent (2000);
-	    postEvent (qApp, ce2000);
+	    QCustomEvent* ce2000 = new QCustomEvent( 2000 );
+	    QString* msg = new QString( QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").arg(myApp).arg(myHelpFile) );
+	    ce2000->setData( msg );
+	    postEvent( myLApp, ce2000 );
 	  }
-      }
-      if( myStatus != 0)
-      {
-        qApp->lock();
-        SUIT_MessageBox::warn1(0, QObject::tr("WRN_WARNING"),
-                               QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").arg(myApp).arg(myHelpFile),
-                               QObject::tr("BUT_OK"));
-        qApp->unlock();
       }
   }
 
@@ -858,13 +901,12 @@ private:
   QString myParams;
   QString myHelpFile;
   int myStatus;
-
+  LightApp_Application* myLApp;
 };
 
-//=======================================================================
-// name    : onHelpContentsModule
-/*! Purpose : SLOT. Display help contents for choosen module*/
-//=======================================================================
+/*!
+  SLOT: Displays help contents for choosen module
+*/
 void LightApp_Application::onHelpContentsModule()
 {
   const QAction* obj = (QAction*) sender();
@@ -881,26 +923,55 @@ void LightApp_Application::onHelpContentsModule()
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
 
   if (!anApp.isEmpty()) {
-    RunBrowser* rs = new RunBrowser(anApp, aParams, helpFile);
+    RunBrowser* rs = new RunBrowser( this, anApp, aParams, helpFile );
     rs->start();
   }
   else {
-    SUIT_MessageBox::warn1(desktop(), tr("WRN_WARNING"),
+    if( SUIT_MessageBox::warn2(desktop(), tr("WRN_WARNING"),
                            tr("DEFINE_EXTERNAL_BROWSER"),
-                           tr("BUT_OK"));
+                           tr("BUT_OK"),tr("BUT_CANCEL"),0,1,0 )==0 )
+      onPreferences();
   }
 }
 
-/*!Sets enable or disable some actions on selection changed.*/
+/*!
+  SLOT: Displays help contents for choosen dialog
+*/
+void LightApp_Application::onHelpContextModule(const QString& theComponentName, const QString& theFileName)
+{
+  QCString dir = getenv( theComponentName + "_ROOT_DIR");
+  QString homeDir = Qtx::addSlash(Qtx::addSlash(dir)+Qtx::addSlash("doc")+Qtx::addSlash("salome")+Qtx::addSlash("gui")+Qtx::addSlash(theComponentName));
+
+  QString helpFile = QFileInfo( homeDir + theFileName ).absFilePath();
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+  QString anApp = resMgr->stringValue("ExternalBrowser", "application");
+  QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
+
+  if (!anApp.isEmpty()) {
+    RunBrowser* rs = new RunBrowser( this, anApp, aParams, helpFile );
+    rs->start();
+  }
+  else {
+    if( SUIT_MessageBox::warn2(desktop(), tr("WRN_WARNING"),
+                           tr("DEFINE_EXTERNAL_BROWSER"),
+                           tr("BUT_OK"), tr("BUT_CANCEL"),0,1,0)==0 )
+      onPreferences();
+  }
+}
+
+/*!
+  Sets enable or disable some actions on selection changed.
+*/
 void LightApp_Application::onSelectionChanged()
 {
 }
 
-/*!Return window.
- *\param flag - key for window
- *\param studyId - study id
- * Flag used how identificator of window in windows list.
- */
+/*!
+  \return window by key
+  \param flag - key for window
+  \param studyId - study id
+  Flag used how identificator of window in windows list.
+*/
 QWidget* LightApp_Application::window( const int flag, const int studyId ) const
 {
   QWidget* wid = 0;
@@ -920,12 +991,13 @@ QWidget* LightApp_Application::window( const int flag, const int studyId ) const
   return wid;
 }
 
-/*!Adds window to application.
- *\param wid - QWidget
- *\param flag - key wor window
- *\param studyId - study id
- * Flag used how identificator of window in windows list.
- */
+/*!
+  Adds window to application.
+  \param wid - QWidget
+  \param flag - key for window
+  \param studyId - study id
+  Flag used how identificator of window in windows list.
+*/
 void LightApp_Application::addWindow( QWidget* wid, const int flag, const int studyId )
 {
   if ( !wid )
@@ -947,6 +1019,8 @@ void LightApp_Application::addWindow( QWidget* wid, const int flag, const int st
 
     LightApp_WidgetContainer* newWC = new LightApp_WidgetContainer( flag, desktop() );
     connect( newWC, SIGNAL(  destroyed ( QObject* ) ), this, SLOT( onWCDestroyed( QObject* ) ) );
+    // asv: connecting a slot for storing visibility flag of a window 
+    connect( newWC, SIGNAL( visibilityChanged ( bool ) ), SLOT( onVisibilityChanged( bool ) ) );
     myWindows.insert( flag, newWC );
     if ( winMap.contains( flag ) )
       desktop()->moveDockWindow( myWindows[flag], (Dock)winMap[flag] );
@@ -965,10 +1039,10 @@ void LightApp_Application::addWindow( QWidget* wid, const int flag, const int st
     if( resourceMgr()->hasValue( "PyConsole", "font" ) )
       f = resourceMgr()->fontValue( "PyConsole", "font" );
     else
-    {
-      f = ( ( PythonConsole* )wid )->font();
-      resourceMgr()->setValue( "PyConsole", "font", f );
-    }
+      {
+	f = ( ( PythonConsole* )wid )->font();
+	resourceMgr()->setValue( "PyConsole", "font", f );
+      }
   }
   else
 #endif
@@ -980,11 +1054,12 @@ void LightApp_Application::addWindow( QWidget* wid, const int flag, const int st
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
 
-/*!Remove window from application.
- *\param flag - key wor window
- *\param studyId - study id
- * Flag used how identificator of window in windows list.
- */
+/*!
+  Removes window from application.
+  \param flag - key for window
+  \param studyId - study id
+  Flag used how identificator of window in windows list.
+*/
 void LightApp_Application::removeWindow( const int flag, const int studyId )
 {
   if ( !myWindows.contains( flag ) )
@@ -1006,11 +1081,12 @@ void LightApp_Application::removeWindow( const int flag, const int studyId )
   setWindowShown( flag, !myWindows[flag]->isEmpty() );
 }
 
-/*!Gets window.
- *\param flag - key wor window
- *\param studyId - study id
- * Flag used how identificator of window in windows list.
- */
+/*!
+  Gets window.
+  \param flag - key for window
+  \param studyId - study id
+  Flag used how identificator of window in windows list.
+*/
 QWidget* LightApp_Application::getWindow( const int flag, const int studyId )
 {
   QWidget* wid = window( flag, studyId );
@@ -1020,7 +1096,10 @@ QWidget* LightApp_Application::getWindow( const int flag, const int studyId )
   return wid;
 }
 
-/*!Check is window visible?(with identificator \a type)*/
+/*!
+  \return is window visible
+  \param type - flag of window
+*/
 bool LightApp_Application::isWindowVisible( const int type ) const
 {
   bool res = false;
@@ -1032,10 +1111,11 @@ bool LightApp_Application::isWindowVisible( const int type ) const
   return res;
 }
 
-/*!Sets window show or hide.
- *\param type - window identificator.
- *\param on   - true/false (window show/hide)
- */
+/*!
+  Sets window show or hide.
+  \param type - window identificator.
+  \param on   - true/false (window show/hide)
+*/
 void LightApp_Application::setWindowShown( const int type, const bool on )
 {
   if ( !desktop() || !myWindows.contains( type ) )
@@ -1043,10 +1123,18 @@ void LightApp_Application::setWindowShown( const int type, const bool on )
 
   QDockWindow* dw = myWindows[type];
   desktop()->setAppropriate( dw, on );
-  on ? dw->show() : dw->hide();
+  if( on )
+    dw->show();
+  else if( dw->isShown() )
+  {
+    dw->hide();
+    myWindowsVisible[ type ] = true;
+  }
 }
 
-/*!Gets "ObjectBrowser".*/
+/*!
+  \return Object Browser
+*/
 OB_Browser* LightApp_Application::objectBrowser()
 {
   OB_Browser* ob = 0;
@@ -1056,7 +1144,9 @@ OB_Browser* LightApp_Application::objectBrowser()
   return ob;
 }
 
-/*!Gets "LogWindow".*/
+/*!
+  \return Log Window
+*/
 LogWindow* LightApp_Application::logWindow()
 {
   LogWindow* lw = 0;
@@ -1067,7 +1157,9 @@ LogWindow* LightApp_Application::logWindow()
 }
 
 #ifndef DISABLE_PYCONSOLE
-/*!Get "PythonConsole"*/
+/*!
+  \return Python Console
+*/
 PythonConsole* LightApp_Application::pythonConsole()
 {
   PythonConsole* console = 0;
@@ -1078,12 +1170,19 @@ PythonConsole* LightApp_Application::pythonConsole()
 }
 #endif
 
-/*!Update obect browser*/
+/*!
+  Updates object browser and maybe data models
+  \param updateModels - if it is true, then data models are updated
+*/
 void LightApp_Application::updateObjectBrowser( const bool updateModels )
 {
   // update existing data models
   if ( updateModels ) 
   {
+    const bool isAutoUpdate = objectBrowser() ? objectBrowser()->isAutoUpdate() : true;
+    if( objectBrowser() )
+      objectBrowser()->setAutoUpdate( false );
+
     LightApp_Study* study = dynamic_cast<LightApp_Study*>(activeStudy());
     if ( study ) {
       CAM_Study::ModelList dm_list;
@@ -1094,6 +1193,9 @@ void LightApp_Application::updateObjectBrowser( const bool updateModels )
           ((LightApp_DataModel*)camDM)->update();
       }
     }
+
+    if( objectBrowser() )
+      objectBrowser()->setAutoUpdate( isAutoUpdate );
   }
   if ( objectBrowser() )
   {
@@ -1102,13 +1204,19 @@ void LightApp_Application::updateObjectBrowser( const bool updateModels )
   }
 }
 
-/*!Gets preferences.*/
+/*!
+  \return preferences
+*/
 LightApp_Preferences* LightApp_Application::preferences() const
 {
   return preferences( false );
 }
 
-/*!Gets view manager*/
+/*!
+  \return first view manager of some type
+  \param vmType - type of view manager
+  \param create - is it necessary to create view manager in case, when there is no manager of such type
+*/
 SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, const bool create )
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
@@ -1130,7 +1238,10 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
   return aVM;
 }
 
-/*!Create view manager.*/
+/*!
+  Creates view manager of some type
+  \param vmType - type of view manager
+*/
 SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType )
 {
   SUIT_ResourceMgr* resMgr = resourceMgr();
@@ -1162,16 +1273,12 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     }
   }
 #endif
-#ifndef DISABLE_SUPERVGRAPHVIEWER
-  if( vmType == SUPERVGraph_Viewer::Type() )
-  {
-    viewMgr = new SUPERVGraph_ViewManager( activeStudy(), desktop() );
-    SUPERVGraph_Viewer* vm = new SUPERVGraph_Viewer();
-    SUPERVGraph_ViewFrame* view = dynamic_cast<SUPERVGraph_ViewFrame*>( vm->getViewManager()->getActiveView() );
-    if( view )
-      view->setBackgroundColor( resMgr->colorValue( "SUPERVGraph", "Background", view->backgroundColor() ) );
-  }
-#endif
+  //#ifndef DISABLE_SUPERVGRAPHVIEWER
+  //  if( vmType == SUPERVGraph_Viewer::Type() )
+  //  {
+  //    viewMgr = new SUPERVGraph_ViewManager( activeStudy(), desktop(), new SUPERVGraph_Viewer() );
+  //  }
+  //#endif
 #ifndef DISABLE_OCCVIEWER
   if( vmType == OCCViewer_Viewer::Type() )
   {
@@ -1228,22 +1335,21 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   if ( viewWin && desktop() )
     viewWin->resize( (int)( desktop()->width() * 0.6 ), (int)( desktop()->height() * 0.6 ) );
 
-  connect( viewMgr, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
-           this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
-
   return viewMgr;
 }
 
-//=======================================================================
-// name    : onCloseView
-/*! Purpose : SLOT. Remove view manager from application*/
-//=======================================================================
+/*!
+  SLOT: Removes view manager from application
+*/
 void LightApp_Application::onCloseView( SUIT_ViewManager* theVM )
 {
   removeViewManager( theVM );
 }
 
-/*!Protected SLOT. On study created.*/
+/*!
+  Protected SLOT: On study created.
+  \param theStudy - just created study
+*/
 void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
 {
   SUIT_DataObject* aRoot = 0;
@@ -1261,7 +1367,10 @@ void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
   activateWindows();
 }
 
-/*!Protected SLOT. On study opened.*/
+/*!
+  Protected SLOT: On study opened.
+  \param theStudy - just opened  study
+*/
 void LightApp_Application::onStudyOpened( SUIT_Study* theStudy )
 {
   SUIT_DataObject* aRoot = 0;
@@ -1320,7 +1429,9 @@ QString LightApp_Application::getFileFilter() const
   return "(*.hdf)";
 }
 
-/*! Gets file name*/
+/*!
+  Shows file dialog and return user selected file name
+*/
 QString LightApp_Application::getFileName( bool open, const QString& initial, const QString& filters, 
                                            const QString& caption, QWidget* parent )
 {
@@ -1410,10 +1521,9 @@ void LightApp_Application::updateActions()
   updateCommandsStatus();
 }
 
-//=======================================================================
-// name    : createNewStudy
-/*! Purpose : Create new study*/
-//=======================================================================
+/*!
+  Creates new study
+*/
 SUIT_Study* LightApp_Application::createNewStudy()
 {
   LightApp_Application::lastStudyId++;
@@ -1429,7 +1539,10 @@ SUIT_Study* LightApp_Application::createNewStudy()
   return aStudy;
 }
 
-/*!Create window.*/
+/*!
+  Creates window by flag.
+  \param flag - identificator of window type
+*/
 QWidget* LightApp_Application::createWindow( const int flag )
 {
   QWidget* wid = 0;
@@ -1473,8 +1586,9 @@ QWidget* LightApp_Application::createWindow( const int flag )
   return wid;
 }
 
-/*!Default windows(Object Browser, Python Console).
- * Adds to map \a aMap.
+/*!
+  \return default windows( Object Browser, Python Console )
+  Adds to map \a aMap.
  */
 void LightApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {  
@@ -1485,15 +1599,16 @@ void LightApp_Application::defaultWindows( QMap<int, int>& aMap ) const
   //  aMap.insert( WT_LogWindow, Qt::DockBottom );
 }
 
-/*!Default view manager.*/
+/*!Default view managers*/
 void LightApp_Application::defaultViewManagers( QStringList& ) const
 {
   /*!Do nothing.*/
 }
 
-/*!Gets preferences.
- * Create preferences, if \a crt = true.
- */
+/*!
+  \return preferences.
+  Create preferences, if \a crt = true.
+*/
 LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
 {
   if ( myPrefs )
@@ -1550,7 +1665,9 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
   return myPrefs;
 }
 
-/*!Add new module to application.*/
+/*!
+  Adds new module to application
+*/
 void LightApp_Application::moduleAdded( CAM_Module* mod )
 {
   CAM_Application::moduleAdded( mod );
@@ -1567,7 +1684,9 @@ void LightApp_Application::moduleAdded( CAM_Module* mod )
   }
 }
 
-/*!Create preferences.*/
+/*!
+  Create preferences
+*/
 void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 {
   if ( !pref )
@@ -1581,9 +1700,6 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   pref->addPreference( tr( "PREF_MULTI_FILE" ), studyGroup, LightApp_Preferences::Bool, "Study", "multi_file" );
   pref->addPreference( tr( "PREF_ASCII_FILE" ), studyGroup, LightApp_Preferences::Bool, "Study", "ascii_file" );
-  int undoPref = pref->addPreference( tr( "PREF_UNDO_LEVEL" ), studyGroup, LightApp_Preferences::IntSpin, "Study", "undo_level" );
-  pref->setItemProperty( undoPref, "min", 1 );
-  pref->setItemProperty( undoPref, "max", 100 );
   pref->addPreference( tr( "PREF_STORE_POS" ), studyGroup, LightApp_Preferences::Bool, "Study", "store_positions" );
 
   int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab );
@@ -1619,7 +1735,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 		       LightApp_Preferences::Color, "OCCViewer", "background" );
 
   pref->setItemProperty( occTS, "min", 1 );
-  pref->setItemProperty( occTS, "max", 150 );
+  pref->setItemProperty( occTS, "max", 1000 );
 
   int isoU = pref->addPreference( tr( "PREF_ISOS_U" ), occGroup,
 				  LightApp_Preferences::IntSpin, "OCCViewer", "iso_number_u" );
@@ -1726,7 +1842,11 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 		       "ObjectBrowser", "auto_size" );
 }
 
-/*!Changed preferences */
+/*!
+  Changes appearance of application according to changed preferences
+  \param sec - section
+  \param param - name of changed parameter
+*/
 void LightApp_Application::preferencesChanged( const QString& sec, const QString& param )
 {
   SUIT_ResourceMgr* resMgr = resourceMgr();
@@ -1805,6 +1925,10 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
            autoSizeFirst = resMgr->booleanValue( "ObjectBrowser", "auto_size_first", true );
       ob->setWidthMode( autoSize ? QListView::Maximum : QListView::Manual );
       ob->listView()->setColumnWidthMode( 0, autoSizeFirst ? QListView::Maximum : QListView::Manual );
+      if( autoSize )
+	for( int i=1; i<ob->listView()->columns(); i++ )
+	  if( ob->listView()->columnWidth( i )>0 )
+	    ob->listView()->adjustColumn( i );
       updateObjectBrowser( false );
     }
   }
@@ -1825,7 +1949,9 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #endif
 }
 
-/*!Save preferences */
+/*!
+  Saves preferences
+*/
 void LightApp_Application::savePreferences()
 {
   saveWindowsGeometry();
@@ -1838,7 +1964,9 @@ void LightApp_Application::savePreferences()
     }
 }
 
-/*!Update desktop title.*/
+/*!
+  Updates desktop title
+*/
 void LightApp_Application::updateDesktopTitle() {
   QString aTitle = applicationName();
   QString aVer = applicationVersion();
@@ -1853,7 +1981,9 @@ void LightApp_Application::updateDesktopTitle() {
   desktop()->setCaption( aTitle );
 }
 
-/*!Update windows after close document.*/
+/*!
+  Updates windows after close document
+*/
 void LightApp_Application::afterCloseDoc()
 {
   updateWindows();
@@ -1861,7 +1991,9 @@ void LightApp_Application::afterCloseDoc()
   CAM_Application::afterCloseDoc();
 }
 
-/*!Update module action.*/
+/*!
+  Updates actions of active module
+*/
 void LightApp_Application::updateModuleActions()
 {
   QString modName;
@@ -1872,9 +2004,10 @@ void LightApp_Application::updateModuleActions()
     myActions[modName]->setOn( true );
 }
 
-/*!Gets current windows.
- *\param winMap - output current windows map.
- */
+/*!
+  Gets current windows.
+  \param winMap - output current windows map.
+*/
 void LightApp_Application::currentWindows( QMap<int, int>& winMap ) const
 {
   winMap.clear();
@@ -1887,9 +2020,10 @@ void LightApp_Application::currentWindows( QMap<int, int>& winMap ) const
     defaultWindows( winMap );
 }
 
-/*!Gets current view managers.
- *\param lst - output current view managers list.
- */
+/*!
+  Gets current view managers.
+  \param lst - output current view managers list.
+*/
 void LightApp_Application::currentViewManagers( QStringList& lst ) const
 {
   lst.clear();
@@ -1902,7 +2036,9 @@ void LightApp_Application::currentViewManagers( QStringList& lst ) const
     defaultViewManagers( lst );
 }
 
-/*!Update windows.*/
+/*!
+  Updates windows
+*/
 void LightApp_Application::updateWindows()
 {
   QMap<int, int> winMap;
@@ -1917,11 +2053,19 @@ void LightApp_Application::updateWindows()
 
   // setWindowShown should be done even if no study is active (open). in this case all open windows
   // will be hidden, which is neccessary in this case.
-  for ( WindowMap::ConstIterator itr = myWindows.begin(); itr != myWindows.end(); ++itr )
+  for ( WindowMap::ConstIterator itr = myWindows.begin(); itr != myWindows.end(); ++itr ) {
+    
+    if ( myWindowsVisible.contains( itr.key() ) && 
+	 !myWindowsVisible[ itr.key() ] )
+      continue;
+
     setWindowShown( itr.key(), !itr.data()->isEmpty() && winMap.contains( itr.key() ) );
+  }
 }
 
-/*!Update view managers.*/
+/*!
+  Updates view managers
+*/
 void LightApp_Application::updateViewManagers()
 {
   QStringList lst;
@@ -1931,7 +2075,9 @@ void LightApp_Application::updateViewManagers()
     getViewManager( *it, true );
 }
 
-/*!Load windows geometry.*/
+/*!
+  Loads windows geometry
+*/
 void LightApp_Application::loadWindowsGeometry()
 {
   bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
@@ -1959,7 +2105,9 @@ void LightApp_Application::loadWindowsGeometry()
   dockMgr->restoreGeometry();
 }
 
-/*!Save windows geometry.*/
+/*!
+  Saves windows geometry
+*/
 void LightApp_Application::saveWindowsGeometry()
 {
   bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
@@ -1987,7 +2135,9 @@ void LightApp_Application::saveWindowsGeometry()
   dockMgr->saveGeometry( resourceMgr(), section, false );
 }
 
-/*!Activate windows.*/
+/*!
+  Activates windows
+*/
 void LightApp_Application::activateWindows()
 {
   if ( activeStudy() )
@@ -1997,7 +2147,9 @@ void LightApp_Application::activateWindows()
   }
 }
 
-/*!Adds icon names for modules.*/
+/*!
+  Adds icon names for modules
+*/
 void LightApp_Application::moduleIconNames( QMap<QString, QString>& iconMap ) const
 {
   iconMap.clear();
@@ -2025,7 +2177,9 @@ void LightApp_Application::moduleIconNames( QMap<QString, QString>& iconMap ) co
   }
 }
 
-/*!Insert items in popup, which necessary for current application*/
+/*!
+  Inserts items in popup, which necessary for current application
+*/
 void LightApp_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
 {
   CAM_Application::contextMenuPopup( type, thePopup, title );
@@ -2038,7 +2192,9 @@ void LightApp_Application::contextMenuPopup( const QString& type, QPopupMenu* th
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
 }
 
-/*!Create empty study.*/
+/*!
+  Create empty study
+*/
 void LightApp_Application::createEmptyStudy()
 {
   CAM_Application::createEmptyStudy();
@@ -2046,7 +2202,10 @@ void LightApp_Application::createEmptyStudy()
     objectBrowser()->updateTree();
 }
 
-/*!Activate module \a mod.*/
+/*!
+  Activates module
+  \param mod - module to be activated
+*/
 bool LightApp_Application::activateModule( CAM_Module* mod )
 {
   bool res = CAM_Application::activateModule( mod );
@@ -2055,13 +2214,17 @@ bool LightApp_Application::activateModule( CAM_Module* mod )
   return res;
 }
 
-/*!return keyborad accelerators manager object */
+/*!
+  \return keyborad accelerators manager object
+*/
 SUIT_Accel* LightApp_Application::accel() const
 {
   return myAccel;
 }
 
-/*! remove dead widget container from map */
+/*!
+  Removes dead widget container from map
+*/
 void LightApp_Application::onWCDestroyed( QObject* ob )
 {
   // remove destroyed widget container from windows map
@@ -2076,7 +2239,19 @@ void LightApp_Application::onWCDestroyed( QObject* ob )
   }
 }
 
-/*! redefined to remove view manager from memory */
+/*!
+  Connects just added view manager
+*/
+void LightApp_Application::addViewManager( SUIT_ViewManager* vm )
+{
+  connect( vm, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
+           this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
+  STD_Application::addViewManager( vm );
+}
+
+/*!
+  Remove view manager from memory
+*/
 void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
 {
   disconnect( vm, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
@@ -2085,7 +2260,9 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
   delete vm;
 }
 
-/*! rename active window of desktop */
+/*!
+  Renames active window of desktop
+*/
 void LightApp_Application::onRenameWindow()
 {
   if( !desktop() )
@@ -2101,6 +2278,10 @@ void LightApp_Application::onRenameWindow()
     w->setCaption( name );
 }
 
+/*!
+  \return if the library of module exists
+  \param moduleTitle - title of module
+*/
 bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
 {
   if( moduleTitle.isEmpty() )
@@ -2124,7 +2305,9 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
   return false;
 }
 
-/*! default name for an active study */
+/*!
+  \return default name for an active study
+*/
 void LightApp_Application::setDefaultStudyName( const QString& theName )
 {
   QStringList anInfoList;
@@ -2137,4 +2320,37 @@ void LightApp_Application::setDefaultStudyName( const QString& theName )
     aStudy->setStudyName( theName );
     updateDesktopTitle();
   }
+}
+
+/*! slot, called on show/hide of a dock window */
+void LightApp_Application::onVisibilityChanged( bool visible )
+{
+  const QObject* win = sender();
+ 
+  for ( WindowMap::ConstIterator itr = myWindows.begin(); itr != myWindows.end(); ++itr )
+    if ( itr.data() == win ) 
+    {
+      myWindowsVisible[ itr.key() ] = visible;
+      return;
+    }
+}
+
+/*!
+  Custom event handler
+*/
+bool LightApp_Application::event( QEvent* e )
+{
+  if( e && e->type()==2000 )
+  {
+    QCustomEvent* ce = ( QCustomEvent* )e;
+    QString* d = ( QString* )ce->data();
+    if( SUIT_MessageBox::warn2(0, tr("WRN_WARNING"),
+			   d ? *d : "",
+			   tr("BUT_OK"), tr("BUT_CANCEL"), 0, 1, 0 )==0 )
+       onPreferences();
+    if( d )
+      delete d;
+    return true;
+  }
+  return CAM_Application::event( e );
 }

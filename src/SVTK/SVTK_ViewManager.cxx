@@ -21,7 +21,9 @@
 
 int SVTK_ViewManager::_SVTKViewMgr_Id = 0;
 
-//***************************************************************
+/*!
+  Constructor
+*/
 SVTK_ViewManager::SVTK_ViewManager( SUIT_Study* study, 
 		    SUIT_Desktop* theDesktop ) 
 : SUIT_ViewManager( study, theDesktop )
@@ -30,12 +32,24 @@ SVTK_ViewManager::SVTK_ViewManager( SUIT_Study* study,
   setViewModel( new SVTK_Viewer() );
 }
 
-//***************************************************************
+/*!
+  Destructor
+*/
 SVTK_ViewManager::~SVTK_ViewManager()
 {
 }
 
-//***************************************************************
+/*!
+  \return corresponding main window
+*/
+SUIT_Desktop* SVTK_ViewManager::getDesktop()
+{
+  return myDesktop;
+}
+
+/*!
+  Sets default name of view
+*/
 void SVTK_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
   int aPos = myViews.find(theView);

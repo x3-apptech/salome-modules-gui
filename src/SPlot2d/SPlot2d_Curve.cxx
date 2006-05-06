@@ -77,36 +77,59 @@ SPlot2d_Curve& SPlot2d_Curve::operator=( const SPlot2d_Curve& curve )
   return *this;
 }
 
+/*!
+  \return corresponding SALOME_InteractiveObject
+*/
 Handle(SALOME_InteractiveObject) SPlot2d_Curve::getIO() const
 {
   return myIO;
 }
 
+/*!
+  Sets corresponding SALOME_InteractiveObject
+  \param io - SALOME_InteractiveObject
+*/
 void SPlot2d_Curve::setIO( const Handle(SALOME_InteractiveObject)& io )
 {
   myIO = io;
 }
 
+/*!
+  \return true if curve has table interactive object
+*/
 bool SPlot2d_Curve::hasTableIO() const
 {
   return !myTableIO.IsNull();
 }
 
+/*!
+  \return table interactive object of curve
+*/
 Handle(SALOME_InteractiveObject) SPlot2d_Curve::getTableIO() const
 {
   return myTableIO;
 }
 
+/*!
+  Sets table interactive object of curve
+  \param io - SALOME_InteractiveObject
+*/
 void SPlot2d_Curve::setTableIO( const Handle(SALOME_InteractiveObject)& io )
 {
   myTableIO = io;
 }
 
+/*!
+  \return SALOME_InteractiveObject
+*/
 bool SPlot2d_Curve::hasIO() const
 {
   return !myIO.IsNull();
 }
 
+/*!
+  \return table title
+*/
 QString SPlot2d_Curve::getTableTitle() const
 {
   QString title;

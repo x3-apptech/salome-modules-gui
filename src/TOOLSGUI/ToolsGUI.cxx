@@ -28,10 +28,9 @@
 
 #include "ToolsGUI.h"
 
-//=======================================================================
-// name    : GetVisibility
-// Purpose : Verify whether object is visible or not
-//=======================================================================
+/*!
+  \return true if object is visible
+*/
 bool ToolsGUI::GetVisibility( _PTR(Study)   theStudy,
                               _PTR(SObject) theObj,
                               void*         theId )
@@ -46,10 +45,13 @@ bool ToolsGUI::GetVisibility( _PTR(Study)   theStudy,
   return false;
 }
 
-//=======================================================================
-// name    : SetVisibility
-// Purpose : Set flag visibility of object
-//=======================================================================
+/*!
+  Set flag visibility of object
+  \param theStudy - study
+  \param theEntry - entry
+  \param theValue - flag visibility
+  \param theId - id
+*/
 bool ToolsGUI::SetVisibility( _PTR(Study) theStudy,
                               const char* theEntry,
                               const bool  theValue,
@@ -76,9 +78,4 @@ bool ToolsGUI::SetVisibility( _PTR(Study) theStudy,
 
   return false;
 }
-
-
-
-
-
 

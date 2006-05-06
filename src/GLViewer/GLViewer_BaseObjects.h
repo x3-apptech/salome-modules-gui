@@ -38,10 +38,9 @@
 #endif
 
 /*! 
- * Class GLViewer_MarkerSet
- * OpenGL MarkerSet
- */
-
+ \class GLViewer_MarkerSet
+ OpenGL MarkerSet
+*/
 class GLVIEWER_API GLViewer_MarkerSet : public GLViewer_Object
 {
 public:
@@ -120,10 +119,9 @@ protected:
 };
 
 /*! 
- * Class  GLViewer_Polyline
- * OpenGL Polyline
- */
-
+ \class  GLViewer_Polyline
+ OpenGL Polyline
+*/
 class GLVIEWER_API GLViewer_Polyline: public GLViewer_Object
 {
 public:
@@ -178,7 +176,7 @@ public:
   //! Checks highlight as whole object status
   GLboolean               isHighSelAll() const { return myHighSelAll; }
   
-  //! Export numbers of heghlighted/selected lines
+  //! Export numbers of highlighted/selected lines
   void                     exportNumbers( QValueList<int>& high, QValueList<int>& unhigh,
                                           QValueList<int>& sel, QValueList<int>& unsel );
 
@@ -203,9 +201,10 @@ protected:
   GLboolean               myHighFlag;
 };
 
-// Class:   GLViewer_TextObject
-// Descr:   Text as Object for OpenGL
-
+/*!
+  \class GLViewer_TextObject
+  Text as Object for OpenGL
+*/
 class GLVIEWER_API GLViewer_TextObject : public GLViewer_Object
 {
 public:  

@@ -27,6 +27,9 @@
 #include <qmenubar.h>
 #include <qapplication.h>
 
+/*!
+  Constructor
+*/
 QtxLogoMgr::QtxLogoMgr( QMenuBar* mb )
 : QObject( mb ),
 myMenus( mb ),
@@ -34,6 +37,9 @@ myId( 0 )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxLogoMgr::~QtxLogoMgr()
 {
 }
@@ -106,6 +112,9 @@ void QtxLogoMgr::clear()
   generate();
 }
 
+/*!
+  Inserts logo to menu bar
+*/
 void QtxLogoMgr::generate()
 {
   if ( !menuBar() )
@@ -175,6 +184,10 @@ void QtxLogoMgr::generate()
   QApplication::postEvent( menuBar()->parentWidget(), new QEvent( QEvent::LayoutHint ) );
 }
 
+/*!
+  \return index of found logo
+  \param id - logo id
+*/
 int QtxLogoMgr::find( const QString& id ) const
 {
   int idx = -1;

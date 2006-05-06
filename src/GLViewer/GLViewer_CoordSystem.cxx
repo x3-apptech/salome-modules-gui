@@ -22,17 +22,18 @@
 // File:      GLViewer_Context.cxx
 // Created:   November, 2004
 
-//================================================================
-// Class       : GLViewer_CoordSystem
-// Description : Class implementing mathematical model of 2D coordinate system 
-//================================================================
 #include "GLViewer_CoordSystem.h"
 #include <math.h>
 
-//=======================================================================
-// Function: GLViewer_CoordSystem
-// Purpose :
-//=======================================================================
+/*!
+  Constructor
+  \param aType - type of CS
+  \param X0 - X of origin in reference CS
+  \param Y0 - Y of origin in reference CS
+  \param XUnit - X unit in reference CS
+  \param YUnit - Y unit in reference CS
+  \param Rotation - rotation relative reference CS
+*/
 GLViewer_CoordSystem::GLViewer_CoordSystem( CSType aType, double X0, double Y0, 
                                             double XUnit, double YUnit, double Rotation )
 {
@@ -42,40 +43,36 @@ GLViewer_CoordSystem::GLViewer_CoordSystem( CSType aType, double X0, double Y0,
     setRotation( Rotation );
 }
 
-//=======================================================================
-// Function: getOrigin
-// Purpose :
-//=======================================================================
+/*!
+  \return origin in reference CS
+*/
 void GLViewer_CoordSystem::getOrigin( double& x, double& y ) const
 {
     x = myX0;
     y = myY0;
 }
 
-//=======================================================================
-// Function: setOrigin
-// Purpose :
-//=======================================================================
+/*!
+  Sets origin in reference CS
+*/
 void GLViewer_CoordSystem::setOrigin( double x, double y )
 {
     myX0 = x;
     myY0 = y;
 }
 
-//=======================================================================
-// Function: getUnits
-// Purpose :
-//=======================================================================
+/*!
+  \return units
+*/
 void GLViewer_CoordSystem::getUnits( double& x, double& y ) const
 {
     x = myXUnit;
     y = myYUnit;
 }
 
-//=======================================================================
-// Function: setUnits
-// Purpose :
-//=======================================================================
+/*!
+  Sets units
+*/
 void GLViewer_CoordSystem::setUnits( double x, double y )
 {
     if( x>0 )
@@ -88,46 +85,43 @@ void GLViewer_CoordSystem::setUnits( double x, double y )
     else
         myYUnit = 1.0;
 }
-//=======================================================================
-// Function: getRotation
-// Purpose :
-//=======================================================================
+
+/*!
+  \return rotation
+*/
 double GLViewer_CoordSystem::getRotation() const
 {
     return myRotation;
 }
 
-//=======================================================================
-// Function: setRotation
-// Purpose :
-//=======================================================================
+/*!
+  Sets rotation
+*/
 void GLViewer_CoordSystem::setRotation( double rotation )
 {
     myRotation = rotation;
 }
 
-//=======================================================================
-// Function: getType
-// Purpose :
-//=======================================================================
+/*!
+  \return type
+*/
 GLViewer_CoordSystem::CSType GLViewer_CoordSystem::getType() const
 {
     return myType;
 }
 
-//=======================================================================
-// Function: setType
-// Purpose :
-//=======================================================================
+/*!
+  Sets type
+*/
 void GLViewer_CoordSystem::setType( CSType type )
 {
     myType = type;
 }
 
-//=======================================================================
-// Function: toReference
-// Purpose :
-//=======================================================================
+/*!
+  Recalculate co-ordinates to reference co-ordinates
+  \param x, y - co-ordinates
+*/
 void GLViewer_CoordSystem::toReference( double& x, double& y )
 {
     if( myType==Cartesian )
@@ -145,10 +139,10 @@ void GLViewer_CoordSystem::toReference( double& x, double& y )
     }
 }
 
-//=======================================================================
-// Function: fromReference
-// Purpose :
-//=======================================================================
+/*!
+  Recalculate co-ordinates from reference co-ordinates
+  \param x, y - co-ordinates
+*/
 void GLViewer_CoordSystem::fromReference( double& x, double& y )
 {
     x = (x - myX0) / myXUnit;
@@ -185,20 +179,20 @@ void GLViewer_CoordSystem::fromReference( double& x, double& y )
     }
 }
 
-//=======================================================================
-// Function: transform
-// Purpose :
-//=======================================================================
+/*!
+  Recalculate co-ordinates to co-ordinates of other CS
+  \param aSystem - other CS
+  \param x, y - co-ordinates
+*/
 void GLViewer_CoordSystem::transform( GLViewer_CoordSystem& aSystem, double& x, double& y )
 {
     toReference( x, y );
     aSystem.fromReference( x, y );
 }
 
-//=======================================================================
-// Function: getStretching
-// Purpose :
-//=======================================================================
+/*!
+  \return stretching of CS along X and Y axis
+*/
 void GLViewer_CoordSystem::getStretching( GLViewer_CoordSystem& aSystem, double& theX, double& theY )
 {
     theX = myXUnit / aSystem.myXUnit;

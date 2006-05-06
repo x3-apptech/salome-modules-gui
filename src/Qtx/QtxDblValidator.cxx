@@ -21,16 +21,31 @@
 
 #include "QtxDblValidator.h"
 
+/*!
+  Constructor
+  \param bot - minimal possible value
+  \param top - maximal possible value
+  \param dec - number of digits
+  \param o - parent object
+  \param name - name of validator
+*/
 QtxDblValidator::QtxDblValidator( const double bot, const double top, const int dec,
 				  QObject* o, const char* name )
 : QDoubleValidator( bot, top, dec, o, name )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxDblValidator::~QtxDblValidator()
 {
 }
 
+/*!
+  Corrects string: if it represent double value less then bottom, it becomes equal to bottom,
+  if it is more then top, it becomes equal to top, if it isn't number is becomes '0'
+*/
 void QtxDblValidator::fixup( QString& str ) const
 {
   bool ok = false;

@@ -34,14 +34,26 @@
   #include "SALOME_InteractiveObject.hxx"
 #endif
 
+/*!
+  Default constructor
+*/
 LightApp_Displayer::LightApp_Displayer()
 {
 }
 
+/*!
+  Destructor
+*/
 LightApp_Displayer::~LightApp_Displayer()
 {
 }
 
+/*!
+  Displays object in view
+  \param entry - object entry
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void LightApp_Displayer::Display( const QString& entry, const bool updateViewer, SALOME_View* theViewFrame )
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -63,6 +75,11 @@ void LightApp_Displayer::Display( const QString& entry, const bool updateViewer,
   }
 }
 
+/*!
+  Redisplays object in view
+  \param entry - object entry
+  \param updateViewer - is it necessary to update viewer
+*/
 void LightApp_Displayer::Redisplay( const QString& entry, const bool updateViewer )
 {
   // Remove the object permanently (<forced> == true)
@@ -93,6 +110,13 @@ void LightApp_Displayer::Redisplay( const QString& entry, const bool updateViewe
   }
 }
 
+/*!
+  Erases object in view
+  \param entry - object entry
+  \param forced - deletes object from viewer (otherwise it will be erased, but cached)
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void LightApp_Displayer::Erase( const QString& entry, const bool forced,
                                 const bool updateViewer, SALOME_View* theViewFrame )
 {
@@ -109,6 +133,12 @@ void LightApp_Displayer::Erase( const QString& entry, const bool forced,
   }
 }
 
+/*!
+  Erases all objects in view
+  \param forced - deletes objects from viewer
+  \param updateViewer - is it necessary to update viewer
+  \param theViewFrame - view
+*/
 void LightApp_Displayer::EraseAll( const bool forced, const bool updateViewer, SALOME_View* theViewFrame ) const
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -120,6 +150,11 @@ void LightApp_Displayer::EraseAll( const bool forced, const bool updateViewer, S
   }
 }
 
+/*!
+  \return true if object is displayed in viewer
+  \param entry - object entry
+  \param theViewFrame - view
+*/
 bool LightApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theViewFrame ) const
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
@@ -135,6 +170,9 @@ bool LightApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theView
   return res;
 }
 
+/*!
+  Updates active view
+*/
 void LightApp_Displayer::UpdateViewer() const
 {
   SALOME_View* vf = GetActiveView();
@@ -142,6 +180,12 @@ void LightApp_Displayer::UpdateViewer() const
     vf->Repaint();
 }
 
+/*!
+  \return presentation of object, built with help of CreatePrs method
+  \param entry - object entry
+  \param theViewFrame - view
+  \sa CreatePrs()
+*/
 SALOME_Prs* LightApp_Displayer::buildPresentation( const QString& entry, SALOME_View* theViewFrame )
 {
   SALOME_Prs* prs = 0;
@@ -154,6 +198,9 @@ SALOME_Prs* LightApp_Displayer::buildPresentation( const QString& entry, SALOME_
   return prs;
 }
 
+/*!
+  \return active view
+*/
 SALOME_View* LightApp_Displayer::GetActiveView()
 {
   SUIT_Session* session = SUIT_Session::session();
@@ -168,11 +215,20 @@ SALOME_View* LightApp_Displayer::GetActiveView()
   return 0;
 }
 
-bool LightApp_Displayer::canBeDisplayed( const QString&, const QString& ) const
+/*!
+  \return true, if object can be displayed in this type of viewer
+  \param entry - object entry
+  \param viewer_type - type of viewer
+*/
+bool LightApp_Displayer::canBeDisplayed( const QString& /*entry*/, const QString& /*viewer_type*/ ) const
 {
   return true;
 }
 
+/*!
+  \return true, if object can be displayed in any type of viewer
+  \param entry - object entry
+*/
 bool LightApp_Displayer::canBeDisplayed( const QString& entry ) const
 {
   QString viewerType;
@@ -185,6 +241,11 @@ bool LightApp_Displayer::canBeDisplayed( const QString& entry ) const
   return !viewerType.isNull() && canBeDisplayed( entry, viewerType );
 }
 
+/*!
+  \return displayer, corresponding to module
+  \param mod_name - name of module
+  \param load - is module has to be forced loaded
+*/
 LightApp_Displayer* LightApp_Displayer::FindDisplayer( const QString& mod_name, const bool load )
 {
   SUIT_Session* session = SUIT_Session::session();

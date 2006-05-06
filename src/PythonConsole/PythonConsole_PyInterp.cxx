@@ -48,6 +48,9 @@ PythonConsole_PyInterp::PythonConsole_PyInterp(): PyInterp_base()
 {
 }
 
+/*!
+  Destructor
+*/
 PythonConsole_PyInterp::~PythonConsole_PyInterp()
 {
 }
@@ -96,14 +99,13 @@ bool PythonConsole_PyInterp::initState()
   return true;
 }
 
-
+/*!
+   The GIL is assumed to be held
+   It is the caller responsability caller to acquire the GIL
+   It will still be held on initContext output
+*/
 bool PythonConsole_PyInterp::initContext()
 {
-  /*
-   * The GIL is assumed to be held
-   * It is the caller responsability caller to acquire the GIL
-   * It will still be held on initContext output
-   */
   PyObject *m = PyImport_AddModule("__main__");  // interpreter main module (module context)
   if(!m){
 //    if(MYDEBUG) MESSAGE("problem...");

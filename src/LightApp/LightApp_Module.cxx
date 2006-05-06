@@ -117,6 +117,9 @@ void LightApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu,
 void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel, 
 					SUIT_DataObject* theDataObject )
 {
+  bool upd = getApp()->objectBrowser()->isAutoUpdate();
+  getApp()->objectBrowser()->setAutoUpdate( false );
+
   SUIT_DataObject* aDataObject = theDataObject;
   if( theIsUpdateDataModel ){
     if( CAM_DataModel* aDataModel = dataModel() ){
@@ -134,7 +137,8 @@ void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel,
       }
     }
   }
-  getApp()->objectBrowser()->updateTree( aDataObject );
+  getApp()->objectBrowser()->setAutoUpdate( upd );
+  getApp()->objectBrowser()->updateTree( 0, false /*aDataObject*/ );
 }
 
 /*!NOT IMPLEMENTED*/
@@ -509,11 +513,18 @@ void LightApp_Module::onOperationDestroyed()
   }
 }
 
+/*!
+  Must be redefined in order to use standard displayer mechanism
+  \return displayer of module
+*/
 LightApp_Displayer* LightApp_Module::displayer()
 {
   return 0;
 }
 
+/*!
+  SLOT: called on activating of standard operations show/hide
+*/
 void LightApp_Module::onShowHide()
 {
   if( !sender()->inherits( "QAction" ) || !popupMgr() )
@@ -525,10 +536,16 @@ void LightApp_Module::onShowHide()
     startOperation( id );
 }
 
+/*!
+  virtual SLOT: called on view manager adding
+*/
 void LightApp_Module::onViewManagerAdded( SUIT_ViewManager* )
 {
 }
 
+/*!
+  virtual SLOT: called on view manager removing
+*/
 void LightApp_Module::onViewManagerRemoved( SUIT_ViewManager* )
 {
 }

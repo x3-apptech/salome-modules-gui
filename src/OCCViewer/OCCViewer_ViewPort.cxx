@@ -16,12 +16,7 @@
 //
 // See http://www.salome-platform.org/
 //
-/***************************************************************************
-**  Class:   OCCViewer_ViewPort
-**  Descr:   Visualisation canvas of SUIT-based application
-**  Module:  SUIT
-**  Created: UI team, 05.09.00
-****************************************************************************/
+
 #if !defined WNT
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
@@ -59,6 +54,9 @@ struct CMapEntry
 	XStandardColormap scmap;
 };
 
+/*!
+  Constructor
+*/
 CMapEntry::CMapEntry()
 {
 	cmap = 0;
@@ -66,6 +64,9 @@ CMapEntry::CMapEntry()
 	scmap.colormap = 0;
 }
 
+/*!
+  Destructor
+*/
 CMapEntry::~CMapEntry()
 {
 	if ( alloc )

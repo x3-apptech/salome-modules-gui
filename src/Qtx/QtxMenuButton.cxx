@@ -39,6 +39,11 @@ private:
     QtxMenuButton* myMenuButton;
 };
 
+/*!
+  Sets the widget's minimum size
+  \param w - width
+  \param h - height
+*/
 void QtxMenuButton::PopupMenu::setMinimumSize( int w, int h )
 {
     if ( myMenuButton->isAlignWidth() &&
@@ -49,6 +54,12 @@ void QtxMenuButton::PopupMenu::setMinimumSize( int w, int h )
 }
 
 
+/*!
+  Constructor
+  \param pos - position
+  \param parent - parent widget
+  \param name - name
+*/
 QtxMenuButton::QtxMenuButton( int pos, QWidget* parent, const char* name )
 : QPushButton( parent, name ),
 myPos( pos )
@@ -56,6 +67,12 @@ myPos( pos )
 	initialize();
 }
 
+/*!
+  Constructor
+  \param text - button text
+  \param parent - parent widget
+  \param name - name
+*/
 QtxMenuButton::QtxMenuButton( const QString& text, QWidget* parent, const char* name )
 : QPushButton( parent, name ),
 myPos( Bottom )
@@ -64,6 +81,13 @@ myPos( Bottom )
 	initialize();
 }
 
+/*!
+  Constructor
+  \param pos - position
+  \param text - button text
+  \param parent - parent widget
+  \param name - name
+*/
 QtxMenuButton::QtxMenuButton( int pos, const QString& text, QWidget* parent, const char* name )
 : QPushButton( parent, name ),
 myPos( pos )
@@ -72,6 +96,11 @@ myPos( pos )
 	initialize();
 }
 
+/*!
+  Constructor
+  \param parent - parent widget
+  \param name - name
+*/
 QtxMenuButton::QtxMenuButton( QWidget* parent, const char* name )
 : QPushButton( parent, name ),
 myPos( Bottom )
@@ -79,10 +108,16 @@ myPos( Bottom )
 	initialize();
 }
 
+/*!
+  Destructor
+*/
 QtxMenuButton::~QtxMenuButton()
 {
 }
 
+/*!
+  Initialization
+*/
 void QtxMenuButton::initialize()
 {
 	myArrow = true;
@@ -96,21 +131,34 @@ void QtxMenuButton::initialize()
 	connect( this, SIGNAL( clicked() ), this, SLOT( onShowPopup() ) );
 }
 
+/*!
+  \return position
+*/
 int QtxMenuButton::position() const
 {
 	return myPos;
 }
 
+/*!
+  \return true if align is enabled
+*/
 bool QtxMenuButton::isAlignWidth() const
 {
     return myAlign;
 }
 
+/*!
+  \return true if arrow is shown
+*/
 bool QtxMenuButton::isArrowEnabled() const
 {
 	return myArrow;
 }
 
+/*!
+  Changes position
+  \param pos - new position
+*/
 void QtxMenuButton::setPosition( const int pos )
 {
 	if ( myPos == pos )
@@ -121,6 +169,10 @@ void QtxMenuButton::setPosition( const int pos )
         onShowPopup();
 }
 
+/*!
+  Changes align state
+  \param on - new align state
+*/
 void QtxMenuButton::setAlignWidth( const bool on )
 {
     if ( myAlign == on )
@@ -130,6 +182,10 @@ void QtxMenuButton::setAlignWidth( const bool on )
     updateGeometry();
 }
 
+/*!
+  Enables/disable arrow
+  \param on - new enabled state
+*/
 void QtxMenuButton::setArrowEnabled( const bool on )
 {
 	if ( myArrow == on )
@@ -139,6 +195,9 @@ void QtxMenuButton::setArrowEnabled( const bool on )
     repaint();
 }
 
+/*!
+  Clears popup
+*/
 void QtxMenuButton::clear()
 {
 	if ( myPopup )
@@ -147,13 +206,21 @@ void QtxMenuButton::clear()
 	updateGeometry();
 }
 
+/*!
+  Removes item from popup
+  \param id - item id
+*/
 void QtxMenuButton::removeItem( int id )
 {
 	if ( myPopup )
-		removeItem( id );
+		myPopup->removeItem( id );
 	updateGeometry();
 }
 
+/*!
+  Inserts separator into popup
+  \param id - position
+*/
 int QtxMenuButton::insertSeparator( int id )
 {
 	int res = -1;
@@ -162,6 +229,12 @@ int QtxMenuButton::insertSeparator( int id )
     return res;
 }
 
+/*!
+  Inserts item into popup
+  \param t - menu text
+  \param id - item id
+  \param index - position
+*/
 int QtxMenuButton::insertItem( const QString& t, int id, int index )
 {
 	int resId = -1;
@@ -174,6 +247,13 @@ int QtxMenuButton::insertItem( const QString& t, int id, int index )
 	return resId;
 }
 
+/*!
+  Inserts item into popup
+  \param is - icons
+  \param t - menu text
+  \param id - item id
+  \param index - position
+*/
 int QtxMenuButton::insertItem( const QIconSet& is, const QString& t, int id, int index )
 {
 	int resId = -1;
@@ -186,6 +266,9 @@ int QtxMenuButton::insertItem( const QIconSet& is, const QString& t, int id, int
 	return resId;
 }
 
+/*!
+  SLOT: calls when button is clicked, shows popup
+*/
 void QtxMenuButton::onShowPopup()
 {
 	if ( !myPopup || !myPopup->count() )
@@ -224,6 +307,9 @@ void QtxMenuButton::onShowPopup()
 	myPopup->exec( QPoint( x, y ) );
 }
 
+/*!
+  Custom event handler
+*/
 bool QtxMenuButton::event( QEvent* e )
 {
 	if ( e->type() == QEvent::MouseButtonPress ||
@@ -237,6 +323,9 @@ bool QtxMenuButton::event( QEvent* e )
 	return QPushButton::event( e );
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxMenuButton::sizeHint() const
 {
 	QSize sz = QPushButton::sizeHint();
@@ -246,6 +335,9 @@ QSize QtxMenuButton::sizeHint() const
 	return sz;
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxMenuButton::minimumSizeHint() const
 {
 	QSize sz = QPushButton::minimumSizeHint();
@@ -255,6 +347,9 @@ QSize QtxMenuButton::minimumSizeHint() const
 	return sz;
 }
 
+/*!
+  Custom resize event handler
+*/
 void QtxMenuButton::resizeEvent( QResizeEvent* re )
 {
 	if ( re )
@@ -264,11 +359,17 @@ void QtxMenuButton::resizeEvent( QResizeEvent* re )
         myPopup->setMinimumWidth( re ? re->size().width() : width() );
 }
 
+/*!
+  \return corresponding popup
+*/
 QPopupMenu* QtxMenuButton::popup() const
 {
     return myPopup;
 }
 
+/*!
+  Draws label
+*/
 void QtxMenuButton::drawButtonLabel( QPainter* p )
 {
     QPushButton::drawButtonLabel( p );

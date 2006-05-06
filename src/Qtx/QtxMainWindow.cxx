@@ -47,6 +47,9 @@ private:
   QWidget*     myWidget;
 };
 
+/*!
+  Constructor
+*/
 QtxMainWindow::Filter::Filter( QWidget* wid, QtxMainWindow* mw, QObject* parent )
 : QObject( parent ),
 myMain( mw ),
@@ -55,10 +58,16 @@ myWidget( wid )
   myMain->installEventFilter( this );
 };
 
+/*!
+  Destructor
+*/
 QtxMainWindow::Filter::~Filter()
 {
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
 {
   if ( myMain == o && e->type() == QEvent::ChildRemoved &&
@@ -73,7 +82,6 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
     Descr: Main window with support of dockable menubar/status bar
            and geometry store/retrieve.
 */
-
 QtxMainWindow::QtxMainWindow( QWidget* parent, const char* name, WFlags f )
 : QMainWindow( parent, name, f ),
 myMode( -1 ),
@@ -82,17 +90,27 @@ myStatusBar( NULL )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxMainWindow::~QtxMainWindow()
 {
   setDockableMenuBar( false );
   setDockableStatusBar( false );
 }
 
+/*!
+  \return true if menu bar exists
+*/
 bool QtxMainWindow::isDockableMenuBar() const
 {
   return myMenuBar;
 }
 
+/*!
+  Creates or deletes menu bar
+  \param on - if it is true, then to create, otherwise - to delete
+*/
 void QtxMainWindow::setDockableMenuBar( const bool on )
 {
   if ( isDockableMenuBar() == on )
@@ -134,11 +152,18 @@ void QtxMainWindow::setDockableMenuBar( const bool on )
   setUpLayout();
 }
 
+/*!
+  \return true if status bar exists
+*/
 bool QtxMainWindow::isDockableStatusBar() const
 {
   return myStatusBar;
 }
 
+/*!
+  Creates or deletes status bar
+  \param on - if it is true, then to create, otherwise - to delete
+*/
 void QtxMainWindow::setDockableStatusBar( const bool on )
 {
   if ( isDockableStatusBar() == on )
@@ -185,6 +210,11 @@ void QtxMainWindow::setDockableStatusBar( const bool on )
   setUpLayout();
 }
 
+/*!
+  Retrieve the geometry information from the specified resource manager section.
+  \param resMgr - instance of ersource manager
+  \param section - section name
+*/
 void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section )
 {
   QString sec = section.stripWhiteSpace();
@@ -232,6 +262,9 @@ void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section
     myMode = winState;
 }
 
+/*!
+  Shows main window
+*/
 void QtxMainWindow::show()
 {
   if ( myMode != -1 )
@@ -242,11 +275,14 @@ void QtxMainWindow::show()
   QMainWindow::show();
 }
 
+/*!
+  Handler of custom events
+*/
 void QtxMainWindow::customEvent( QCustomEvent* e )
 {
   QMainWindow::customEvent( e );
 
-  int mode = (int)e->data();
+  size_t mode = size_t(e->data());
   switch ( mode )
   {
   case WS_Normal:
@@ -261,6 +297,12 @@ void QtxMainWindow::customEvent( QCustomEvent* e )
   }
 }
 
+/*!
+  \return relative co-ordinate by two points
+  \param type - type of result: WP_Center (center), WP_Left (left), WP_Right (right)
+  \param wh - left point
+  \param WH - right point
+*/
 int QtxMainWindow::relativeCoordinate( const int type, const int WH, const int wh ) const
 {
   int res = 0;
@@ -279,6 +321,11 @@ int QtxMainWindow::relativeCoordinate( const int type, const int WH, const int w
   return res;
 }
 
+/*!
+  Store the geometry information into the specified resource manager section.
+  \param resMgr - instance of ersource manager
+  \param section - section name
+*/
 void QtxMainWindow::saveGeometry( QtxResourceMgr* resMgr, const QString& section ) const
 {
   QString sec = section.stripWhiteSpace();
@@ -299,16 +346,28 @@ void QtxMainWindow::saveGeometry( QtxResourceMgr* resMgr, const QString& section
   resMgr->setValue( sec, "state", winState );
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxMainWindow::eventFilter( QObject* o, QEvent* e )
 {
   return QMainWindow::eventFilter( o, e );
 }
 
+/*!
+  Controls whether or not the dw dock window's caption should appear
+  as a menu item on the dock window menu that lists the dock windows.
+  \param dw - window
+  \param a - if it is true, then it appears in menu
+*/
 void QtxMainWindow::setAppropriate( QDockWindow* dw, bool a )
 {
   QMainWindow::setAppropriate( dw, myStatusBar != dw && myMenuBar != dw && a );
 }
 
+/*!
+  Sets up layout
+*/
 void QtxMainWindow::setUpLayout()
 {
   QMainWindow::setUpLayout();
@@ -317,6 +376,9 @@ void QtxMainWindow::setUpLayout()
     layout()->setMenuBar( 0 );
 }
 
+/*!
+  SLOT: called on object destroyed, clears internal fields in case of deletion of menu bar or status bar
+*/
 void QtxMainWindow::onDestroyed( QObject* obj )
 {
   QObject* o = 0;
@@ -338,6 +400,10 @@ void QtxMainWindow::onDestroyed( QObject* obj )
   }
 }
 
+/*!
+  \return flag of window state by it's name
+  \param str - name of flag
+*/
 int QtxMainWindow::windowState( const QString& str ) const
 {
   static QMap<QString, int> winStateMap;
@@ -363,6 +429,10 @@ int QtxMainWindow::windowState( const QString& str ) const
   return res;
 }
 
+/*!
+  \return flag of position by it's name
+  \param str - name of position
+*/
 int QtxMainWindow::windowPosition( const QString& str ) const
 {
   static QMap<QString, int> winPosMap;

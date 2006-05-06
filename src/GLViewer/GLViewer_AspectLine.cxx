@@ -22,16 +22,11 @@
 // File:      GLViewer_AspectLine.cxx
 // Created:   26/05/2005 3:17:00 PM
 
-//================================================================
-// Class       : GLViewer_AspectLine
-// Description : Substitution of Prs2d_AspectLine for OpenGL
-//================================================================
 #include "GLViewer_AspectLine.h"
 
-//=======================================================================
-// Function: GLViewer_AspectLine
-// Purpose :
-//=======================================================================
+/*!
+  Default constructor
+*/
 GLViewer_AspectLine::GLViewer_AspectLine()
 {
     myNColor = QColor( 255, 255, 255 );
@@ -42,10 +37,11 @@ GLViewer_AspectLine::GLViewer_AspectLine()
     myLineType = 0;
 }
 
-//=======================================================================
-// Function: GLViewer_AspectLine
-// Purpose :
-//=======================================================================
+/*!
+  Constructor
+  \param type: 0 for normal line and 1 for strip line
+  \param width - width of line
+*/
 GLViewer_AspectLine::GLViewer_AspectLine( int type, float width )
 {
     myNColor = QColor( 255, 255, 255 );
@@ -59,18 +55,19 @@ GLViewer_AspectLine::GLViewer_AspectLine( int type, float width )
         myLineType = 0;
 }
 
-//=======================================================================
-// Function: ~GLViewer_AspectLine
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_AspectLine::~GLViewer_AspectLine()
 {
 }
 
-//=======================================================================
-// Function: setLineColors
-// Purpose :
-//=======================================================================
+/*!
+  Sets line color
+  \param nc - normal color
+  \param hc - hilighting color
+  \param sc - selection color
+*/
 void GLViewer_AspectLine::setLineColors( QColor nc, QColor hc, QColor sc )
 {
     myNColor = nc;
@@ -78,10 +75,10 @@ void GLViewer_AspectLine::setLineColors( QColor nc, QColor hc, QColor sc )
     mySColor = sc;
 }
 
-//=======================================================================
-// Function: setLineType
-// Purpose :
-//=======================================================================
+/*!
+  Sets type of line
+  \param type: 0 for normal line and 1 for strip line
+*/
 int GLViewer_AspectLine::setLineType( const int type )
 {
     if( type == 1 || type == 0 )
@@ -92,10 +89,10 @@ int GLViewer_AspectLine::setLineType( const int type )
     return 1;
 }
 
-//=======================================================================
-// Function: setLineWidth
-// Purpose :
-//=======================================================================
+/*!
+  Sets width of line
+  \param width - new width of line
+*/
 int GLViewer_AspectLine::setLineWidth( const float width )
 {
     if( width > 0 )
@@ -106,10 +103,12 @@ int GLViewer_AspectLine::setLineWidth( const float width )
     return 1;
 }
 
-//=======================================================================
-// Function: getLineColors
-// Purpose :
-//=======================================================================
+/*!
+  \return colors of line
+  \param nc - variable for normal color
+  \param hc - variable for hilighting color
+  \param sc - variable for selection color
+*/
 void GLViewer_AspectLine::getLineColors( QColor& nc, QColor& hc, QColor& sc ) const
 {
     nc = myNColor;
@@ -117,10 +116,9 @@ void GLViewer_AspectLine::getLineColors( QColor& nc, QColor& hc, QColor& sc ) co
     sc = mySColor;
 }
 
-//=======================================================================
-// Function: getByteCopy
-// Purpose :
-//=======================================================================
+/*!
+  \return binary representation of line aspect
+*/
 QByteArray GLViewer_AspectLine::getByteCopy() const
 {
     int anISize = sizeof( int );
@@ -174,10 +172,9 @@ QByteArray GLViewer_AspectLine::getByteCopy() const
     return aResult;
 }
 
-//=======================================================================
-// Function: fromByteCopy
-// Purpose :
-//=======================================================================
+/*!
+  Sets line aspect from binary representation
+*/
 GLViewer_AspectLine* GLViewer_AspectLine::fromByteCopy( QByteArray theBytes )
 {
 

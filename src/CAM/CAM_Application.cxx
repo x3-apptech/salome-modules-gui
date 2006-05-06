@@ -256,7 +256,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
   return module;
 }
 
-/**@name Activate module group.*/
+/*! @name Activate module group. */
 //@{
 /*!Activate module with name \a modName.
  *\param modName - module name.
@@ -485,7 +485,7 @@ void CAM_Application::readModuleList()
   }
 
   if ( myInfoList.isEmpty() )
-    SUIT_MessageBox::error1( 0, tr( "Error" ), tr( "Can not load modules configuration file " ), tr( "Ok" ) );
+    SUIT_MessageBox::warn1( 0, tr( "Warning" ), tr( "Modules list is empty" ), tr( "&OK" ) );
 }
 
 /*!Add common items for popup menu ( if they are exist )
@@ -503,7 +503,6 @@ void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopu
 /*!Create empty study.*/
 void CAM_Application::createEmptyStudy()
 {
-  SUIT_Study* study = activeStudy();
-
+  /*SUIT_Study* study = */activeStudy();
   STD_Application::createEmptyStudy();
 }

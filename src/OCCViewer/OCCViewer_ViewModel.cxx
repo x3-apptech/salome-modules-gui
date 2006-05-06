@@ -40,6 +40,10 @@
 #include <Prs3d_DatumAspect.hxx>
 #include <Prs3d_LineAspect.hxx>
 
+/*!
+  Constructor
+  \param DisplayTrihedron - is trihedron displayed
+*/
 OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron )
 : SUIT_ViewModel(),
 myBgColor( Qt::black )
@@ -92,22 +96,35 @@ myBgColor( Qt::black )
   myMultiSelectionEnabled = true;
 }
 
-
+/*!
+  Destructor
+*/
 OCCViewer_Viewer::~OCCViewer_Viewer() 
 {
 }
 
+/*!
+  \return background color of viewer
+*/
 QColor OCCViewer_Viewer::backgroundColor() const
 {
   return myBgColor;
 }
 
+/*!
+  Sets background color
+  \param c - new background color
+*/
 void OCCViewer_Viewer::setBackgroundColor( const QColor& c )
 {
   if ( c.isValid() )
     myBgColor = c;
 }
 
+/*!
+  Start initialization of view window
+  \param view - view window to be initialized
+*/
 void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
 {
   if ( view ) {
@@ -119,7 +136,10 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
   }
 }
 
-
+/*!
+  Creates new view window
+  \param theDesktop - main window of application
+*/
 SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   OCCViewer_ViewWindow* view = new OCCViewer_ViewWindow(theDesktop, this);
@@ -127,7 +147,10 @@ SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
   return view;
 }
 
-//*********************************************************************
+/*!
+  Sets new view manager
+  \param theViewManager - new view manager
+*/
 void OCCViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 {
   SUIT_ViewModel::setViewManager(theViewManager);
@@ -143,15 +166,17 @@ void OCCViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
   }
 }
 
-
-//*********************************************************************
+/*!
+  SLOT: called on mouse button press, stores current mouse position as start point for transformations
+*/
 void OCCViewer_Viewer::onMousePress(SUIT_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
   myStartPnt.setX(theEvent->x()); myStartPnt.setY(theEvent->y());
 }
 
-
-//*********************************************************************
+/*!
+  SLOT: called on mouse move, processes transformation or hilighting
+*/
 void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
   if (!mySelectionEnabled) return;
@@ -163,7 +188,9 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
 }
 
 
-//*********************************************************************
+/*!
+  SLOT: called on mouse button release, finishes transformation or selection
+*/
 void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
   if (!mySelectionEnabled) return;
@@ -211,7 +238,10 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
 }
 
 
-//*********************************************************************
+/*!
+  Sets selection enabled status
+  \param isEnabled - new status
+*/
 void OCCViewer_Viewer::enableSelection(bool isEnabled)
 {
   mySelectionEnabled = isEnabled;
@@ -228,7 +258,10 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
   }
 }
 
-//*********************************************************************
+/*!
+  Sets multiselection enabled status
+  \param isEnabled - new status
+*/
 void OCCViewer_Viewer::enableMultiselection(bool isEnable)
 {
   myMultiSelectionEnabled = isEnable;
@@ -245,7 +278,9 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
   }
 }
 
-//*********************************************************************
+/*!
+  Builds popup for occ viewer
+*/
 void OCCViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
 {
   thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
@@ -258,6 +293,9 @@ void OCCViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
     thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
+/*!
+  SLOT: called on dump view operation is activated, stores scene to raster file
+*/
 void OCCViewer_Viewer::onDumpView()
 {
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
@@ -265,7 +303,9 @@ void OCCViewer_Viewer::onDumpView()
     aView->onDumpView();
 }
 
-//*********************************************************************
+/*!
+  SLOT: called if background color is to be changed changed, passes new color to view port
+*/
 void OCCViewer_Viewer::onChangeBgColor()
 {
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
@@ -281,21 +321,28 @@ void OCCViewer_Viewer::onChangeBgColor()
     aViewPort3d->setBackgroundColor(selColor);
 }
 
-//*********************************************************************
+/*!
+  SLOT: called when popup item "Show toolbar" is activated, shows toolbar of active view window
+*/
 void OCCViewer_Viewer::onShowToolbar() {
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )
     aView->getToolBar()->show();    
 }
 
-//*********************************************************************
+/*!
+  Updates OCC 3D viewer
+*/
 void OCCViewer_Viewer::update()
 {
   if (!myV3dViewer.IsNull())
     myV3dViewer->Update();
 }
 
-//*********************************************************************
+/*!
+  \return objects selected in 3D viewer
+  \param theList - list to be filled with selected objects
+*/
 void OCCViewer_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
 {
   theList.Clear();
@@ -303,7 +350,10 @@ void OCCViewer_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
     theList.Append(myAISContext->SelectedInteractive());
 }
 
-//*********************************************************************
+/*!
+  Selects objects in 3D viewer. Other selected objects are left as selected
+  \param theList - list objects to be selected
+*/
 void OCCViewer_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 {
   AIS_ListIteratorOfListOfInteractive aIt;
@@ -312,47 +362,62 @@ void OCCViewer_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
   myAISContext->UpdateCurrentViewer();
 }
 
-//*********************************************************************
+/*!
+  Auxiliary method to emit signal selectionChanged()
+*/
 void OCCViewer_Viewer::performSelectionChanged()
 {
     emit selectionChanged();
 }
 
-//****************************************************************
-
+/*!
+  SLOT, clears view aspects
+*/
 void OCCViewer_Viewer::onClearViewAspects()
 {
     clearViewAspects();
 }
 
-//****************************************************************
-
+/*!
+  Clears view aspects
+*/
 void OCCViewer_Viewer::clearViewAspects()
 {
 	myViewAspects.clear();
 }
 
-//****************************************************************
-
+/*!
+  \return const reference to list of view aspects
+*/
 const viewAspectList& OCCViewer_Viewer::getViewAspects()
 {
 	return myViewAspects;
 }
 
-//****************************************************************
-
+/*!
+  Appends new view aspect
+  \param aParams - new view aspects
+*/
 void OCCViewer_Viewer::appendViewAspect( const viewAspect& aParams )
 {
 	myViewAspects.append( aParams );
 }
 
-//****************************************************************
-
+/*!
+  Replaces old view aspects by new ones
+  \param aViewList - list of new view aspects
+*/
 void OCCViewer_Viewer::updateViewAspects( const viewAspectList& aViewList )
 {
 	myViewAspects = aViewList;
 }
 
+/*!
+  Hilights/unhilights object in viewer
+  \param obj - object to be updated
+  \param hilight - if it is true, object will be hilighted, otherwise it will be unhilighted
+  \param update - update current viewer
+*/
 bool OCCViewer_Viewer::highlight( const Handle(AIS_InteractiveObject)& obj,
                                   bool hilight, bool update )
 {
@@ -372,6 +437,10 @@ bool OCCViewer_Viewer::highlight( const Handle(AIS_InteractiveObject)& obj,
   return false;
 }
 
+/*!
+  Unhilights all objects in viewer
+  \param updateviewer - update current viewer
+*/
 bool OCCViewer_Viewer::unHighlightAll( bool updateviewer )
 {
   if ( myAISContext->HasOpenedContext() )
@@ -381,6 +450,11 @@ bool OCCViewer_Viewer::unHighlightAll( bool updateviewer )
   return false;
 }
 
+/*!
+  \return true if object is in viewer or in collector
+  \param obj - object to be checked
+  \param onlyInViewer - search object only in viewer (so object must be displayed)
+*/
 bool OCCViewer_Viewer::isInViewer( const Handle(AIS_InteractiveObject)& obj,
                                    bool onlyInViewer )
 {
@@ -402,11 +476,21 @@ bool OCCViewer_Viewer::isInViewer( const Handle(AIS_InteractiveObject)& obj,
   return false;
 }
 
+/*!
+  \return true if object is displayed in viewer
+  \param obj - object to be checked
+*/
 bool OCCViewer_Viewer::isVisible( const Handle(AIS_InteractiveObject)& obj )
 {
   return myAISContext->IsDisplayed( obj );
 }
 
+/*!
+  Sets color of object
+  \param obj - object to be updated
+  \param color - new color
+  \param update - update current viewer
+*/
 void OCCViewer_Viewer::setColor( const Handle(AIS_InteractiveObject)& obj,
                                  const QColor& color,
                                  bool update )
@@ -424,6 +508,12 @@ void OCCViewer_Viewer::setColor( const Handle(AIS_InteractiveObject)& obj,
     myV3dViewer->Update();
 }
 
+/*!
+  Changes display mode of object
+  \param obj - object to be processed
+  \param mode - new display mode
+  \param update - update current viewer
+*/
 void OCCViewer_Viewer::switchRepresentation( const Handle(AIS_InteractiveObject)& obj,
                                              int mode, bool update )
 {
@@ -432,6 +522,12 @@ void OCCViewer_Viewer::switchRepresentation( const Handle(AIS_InteractiveObject)
     myV3dViewer->Update();
 }
 
+/*!
+  Changes transparency of object
+  \param obj - object to be processed
+  \param trans - new transparency
+  \param update - update current viewer
+*/
 void OCCViewer_Viewer::setTransparency( const Handle(AIS_InteractiveObject)& obj,
                                         float trans, bool update )
 {
@@ -441,16 +537,26 @@ void OCCViewer_Viewer::setTransparency( const Handle(AIS_InteractiveObject)& obj
     myV3dViewer->Update();
 }
 
-//****************************************************************
+/*!
+  Changes visibility of trihedron to opposite
+*/
 void OCCViewer_Viewer::toggleTrihedron()
 {
   setTrihedronShown( !isTrihedronVisible() );
 }
 
+/*!
+  \return true if trihedron is visible
+*/
 bool OCCViewer_Viewer::isTrihedronVisible() const
 {
   return !myTrihedron.IsNull() && !myAISContext.IsNull() && myAISContext->IsDisplayed( myTrihedron );
 }
+
+/*!
+  Sets visibility state of trihedron
+  \param on - new state
+*/
 
 void OCCViewer_Viewer::setTrihedronShown( const bool on )
 {
@@ -463,6 +569,9 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
     myAISContext->Erase( myTrihedron );
 }
 
+/*!
+  \return trihedron size
+*/
 int OCCViewer_Viewer::trihedronSize() const
 {
   int sz = 0;
@@ -471,12 +580,21 @@ int OCCViewer_Viewer::trihedronSize() const
   return sz;
 }
 
+/*!
+  Changes trihedron size
+  \param sz - new size
+*/
 void OCCViewer_Viewer::setTrihedronSize( const int sz )
 {
   if ( !myTrihedron.IsNull() )
     myTrihedron->SetSize( sz );
 }
 
+/*!
+  Set number of isolines
+  \param u - u-isolines (first parametric co-ordinate)
+  \param v - v-isolines (second parametric co-ordinate)
+*/
 void OCCViewer_Viewer::setIsos( const int u, const int v )
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
@@ -487,6 +605,11 @@ void OCCViewer_Viewer::setIsos( const int u, const int v )
   ic->SetIsoNumber( v, AIS_TOI_IsoV );
 }
 
+/*!
+  \return number of isolines
+  \param u - to return u-isolines (first parametric co-ordinate)
+  \param v - to return v-isolines (second parametric co-ordinate)
+*/
 void OCCViewer_Viewer::isos( int& u, int& v ) const
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();

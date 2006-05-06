@@ -59,10 +59,9 @@ using namespace std;
 #define MARGIN_SIZE             11
 #define MIN_EDIT_SIZE          250
 
-//=================================================================================
-// class    : ToolsGUI_CatalogGeneratorDlg()
-// purpose  : Constructor
-//=================================================================================
+/*!
+  Constructor
+*/
 ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, const char* name )
     : QDialog( parent, name, TRUE, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
 {
@@ -202,98 +201,88 @@ ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, con
   updateButtonState();
 }
 
-//=================================================================================
-// function : ~ToolsGUI_CatalogGeneratorDlg()
-// purpose  : destructor
-//=================================================================================
+/*!
+  destructor
+*/
 ToolsGUI_CatalogGeneratorDlg::~ToolsGUI_CatalogGeneratorDlg()
 {  
 }
 
-//=================================================================================
-// function : getIdlFile()
-// purpose  : gets IDL file name entered
-//=================================================================================
+/*!
+  \return IDL file name entered
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getIdlFile()
 {
   return myIdlEdit->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getXmlFile()
-// purpose  : gets XML file name entered
-//=================================================================================
+/*!
+  \return  XML file name entered
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getXmlFile()
 {
   return myXmlEdit->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getPngFile()
-// purpose  : gets PNG file name entered
-//=================================================================================
+/*!
+  \return PNG file name entered
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getPngFile()
 {
   return myPngEdit->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getAuthor()
-// purpose  : gets author 
-//=================================================================================
+/*!
+  \return author 
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getAuthor()
 {
   return myAuthorEdit->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getVersion()
-// purpose  : gets version number 
-//=================================================================================
+/*!
+  \return version number 
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getVersion()
 {
   return myVersionEdit->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getCompName()
-// purpose  : gets name of the component
-//=================================================================================
+/*!
+  \return name of the component
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getCompName()
 {
   return myCompName->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getCompUserName()
-// purpose  : gets username of the component
-//=================================================================================
+/*!
+  \return username of the component
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getCompUserName()
 {
   return myCompUserName->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getCompType()
-// purpose  : gets type of the component
-//=================================================================================
+/*!
+  \return type of the component
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getCompMultiStd()
 {
   return myCompMultiStd->text().stripWhiteSpace();
 }
-//=================================================================================
-// function : getComptype()
-// purpose  : gets type of the component
-//=================================================================================
+
+/*!
+  \return type of the component
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getCompType()
 {
   return myCompType->text().stripWhiteSpace();
 }
 
-//=================================================================================
-// function : getIdlPath()
-// purpose  : gets IDL path of modules
-//=================================================================================
+/*!
+  \return IDL path of modules
+*/
 QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
 {
   cout << "QAD_Desktop::getCatalogue() is not implemented!!";
@@ -325,10 +314,9 @@ QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
 */
 }
 
-//=================================================================================
-// function : onBrowseBtnClicked()
-// purpose  : <...> (Browse) buttons slot
-//=================================================================================
+/*!
+  SLOT: called on Browse button click
+*/
 void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
 {
   QPushButton* send = (QPushButton*)sender();
@@ -356,20 +344,18 @@ void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
   updateButtonState();
 }
 
-//=================================================================================
-// function : updateButtonState()
-// purpose  : Updates <OK> button's state
-//=================================================================================
+/*!
+  Updates <OK> button's state
+*/
 void ToolsGUI_CatalogGeneratorDlg::updateButtonState()
 {
   myApplyBtn->setEnabled( !myIdlEdit->text().stripWhiteSpace().isEmpty() && 
 			  !myXmlEdit->text().stripWhiteSpace().isEmpty() );
 }
 
-//=================================================================================
-// function : onApply()
-// purpose  : <Apply> button slot, performs IDL->XML conversion
-//=================================================================================
+/*!
+  <Apply> button slot, performs IDL->XML conversion
+*/
 void ToolsGUI_CatalogGeneratorDlg::onApply()
 {
   QString IDLpath = getIdlPath();

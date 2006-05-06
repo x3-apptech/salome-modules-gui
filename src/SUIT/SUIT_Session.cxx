@@ -290,7 +290,7 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& li
 #ifdef WIN32
   lib = ::LoadLibrary( (char*)libFile.latin1() );
 #else
-  lib = dlopen( (char*)libFile.latin1(), RTLD_LAZY /*| RTLD_GLOBAL */ );
+  lib = dlopen( (char*)libFile.latin1(), RTLD_LAZY | RTLD_GLOBAL  );
 #endif
   return lib;
 }
@@ -313,7 +313,7 @@ QString SUIT_Session::applicationName( const QString& str ) const
 */
 SUIT_ResourceMgr* SUIT_Session::createResourceMgr( const QString& appName ) const
 {
-  return new SUIT_ResourceMgr( appName );
+  return new SUIT_ResourceMgr( applicationName( appName ) );
 }
 
 /*!

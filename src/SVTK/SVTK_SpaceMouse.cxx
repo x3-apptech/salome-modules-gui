@@ -38,10 +38,11 @@
 
 #include "SVTK_SpaceMouse.h"
 
-//---------------------------------------------
 SVTK_SpaceMouse* SVTK_SpaceMouse::myInstance = 0;
 
-//---------------------------------------------
+/*!
+  \return shared instance of object (creates if there is no one)
+*/
 SVTK_SpaceMouse* SVTK_SpaceMouse::getInstance()
 {
   if ( !myInstance )
@@ -49,14 +50,18 @@ SVTK_SpaceMouse* SVTK_SpaceMouse::getInstance()
   return myInstance;
 }
 
-//---------------------------------------------
+/*!
+  Constructor
+*/
 SVTK_SpaceMouse::SVTK_SpaceMouse()
 {
   win = InputFocus;
   spaceMouseOn = 0;
 }
 
-//---------------------------------------------
+/*!
+  Initialization
+*/
 int SVTK_SpaceMouse::initialize( Display *display, Window window )
 {
  XMotionEvent        = XInternAtom( display, "MotionEvent",        1 );
@@ -78,7 +83,6 @@ int SVTK_SpaceMouse::initialize( Display *display, Window window )
  return spaceMouseOn; 
 }
 
-//---------------------------------------------
 static int errorCallback( Display *display, XErrorEvent *Error )
 {
   char msg[ 128 ];
@@ -89,7 +93,9 @@ static int errorCallback( Display *display, XErrorEvent *Error )
   return 0;
 }
 
-//---------------------------------------------
+/*!
+  Initialize by window
+*/
 int SVTK_SpaceMouse::setWindow( Display *display, Window window )
 {
   XTextProperty winName;
@@ -146,7 +152,9 @@ int SVTK_SpaceMouse::setWindow( Display *display, Window window )
   return result;
 }
 
-//---------------------------------------------
+/*!
+  Close
+*/
 int SVTK_SpaceMouse::close(Display *display)
 {
   initialize( display, (Window)InputFocus );
@@ -155,7 +163,9 @@ int SVTK_SpaceMouse::close(Display *display)
   return 1;
 }
 
-//---------------------------------------------
+/*!
+  Custom event handler
+*/
 int SVTK_SpaceMouse::translateEvent( Display* display, XEvent* xEvent, MoveEvent* spaceMouseEvent,
 		    double scale, double rScale )
 {

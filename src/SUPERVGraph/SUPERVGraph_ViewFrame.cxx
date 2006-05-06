@@ -38,21 +38,33 @@
 using namespace std;
 
 
+/*!
+  Constructor
+*/
 SUPERVGraph_View::SUPERVGraph_View( QWidget* theParent ): QWidget( theParent )
 {
   init(theParent);
 }
 
+/*!
+  Constructor
+*/
 SUPERVGraph_View::SUPERVGraph_View( SUPERVGraph_View* theParent ): QWidget( theParent )
 {
   init(theParent);
 }
 
+/*!
+  Builds popup for SUPERVGraph viewer
+*/
 void SUPERVGraph_View::contextMenuPopup( QPopupMenu* )
 {
   // to be implemented
 }
 
+/*!
+  Initialization
+*/
 void SUPERVGraph_View::init( QWidget* theParent )
 {
   if ( theParent->inherits( "QMainWindow" ) ) {
@@ -88,6 +100,9 @@ SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame( SUIT_Desktop* theDesktop )
   createToolBar();
 }
 
+/*!
+  Creates actions of SUPERVGraph view window
+*/
 void SUPERVGraph_ViewFrame::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
@@ -109,16 +124,18 @@ void SUPERVGraph_ViewFrame::createActions()
   myActionsMap[ ResetId ] = aAction;
 }
 
-//================================================================
-// Function : createToolBar
-// Purpose  : 
-//================================================================
+/*!
+  Creates toolbar of SUPERVGraph view window
+*/
 void SUPERVGraph_ViewFrame::createToolBar()
 {
   myActionsMap[PanId]->addTo(myToolBar);
   myActionsMap[ResetId]->addTo(myToolBar);
 }
 
+/*!
+  Destructor
+*/
 SUPERVGraph_ViewFrame::~SUPERVGraph_ViewFrame() {}
 
 /*!
@@ -130,10 +147,13 @@ SUPERVGraph_View* SUPERVGraph_ViewFrame::getViewWidget()
 }
 
 
+/*!
+  Sets new view widget
+  \param theView - new view widget
+*/
 void SUPERVGraph_ViewFrame::setViewWidget( SUPERVGraph_View* theView )
 {
   myView = theView;
-  setFocusProxy( myView ); // mkr : IPAL11388
 }
 
 
@@ -272,40 +292,69 @@ QColor SUPERVGraph_ViewFrame::backgroundColor() const
   return QMainWindow::backgroundColor();
 }
 
+/*!
+*/
 void SUPERVGraph_ViewFrame::onAdjustTrihedron()
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::onAdjustTrihedron" )  
 }
 
+/*!
+  Changes name of object
+  \param obj - object to be renamed
+  \param name - new name
+*/
 void SUPERVGraph_ViewFrame::rename( const Handle(SALOME_InteractiveObject)& IObject, 
 				    QString newName )
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::rename" )
 }
 
+/*!
+  Unhilights all object in viewer
+  \param updateviewer - update current viewer
+*/
 void SUPERVGraph_ViewFrame::unHighlightAll() 
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::unHighlightAll" )
 }
 
+/*!
+  Hilights/unhilights object in viewer
+  \param obj - object to be updated
+  \param hilight - if it is true, object will be hilighted, otherwise it will be unhilighted
+  \param update - update current viewer
+*/
 void SUPERVGraph_ViewFrame::highlight( const Handle(SALOME_InteractiveObject)& IObject, 
 				       bool highlight, bool immediatly ) 
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::highlight" )
 }
 
+/*!
+  \return true if object is in viewer or in collector
+  \param obj - object to be checked
+  \param onlyInViewer - search object only in viewer (so object must be displayed)
+*/
 bool SUPERVGraph_ViewFrame::isInViewer( const Handle(SALOME_InteractiveObject)& IObject ) 
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::isInViewer" )
   return false;
 }
 
+/*!
+  \return true if object is displayed in viewer
+  \param obj - object to be checked
+*/
 bool SUPERVGraph_ViewFrame::isVisible( const Handle(SALOME_InteractiveObject)& IObject ) 
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::isVisible" )
   return false;
 }
 
+/*!
+  Custom resize event handler
+*/
 void SUPERVGraph_ViewFrame::resizeEvent( QResizeEvent* theEvent )
 {
   QMainWindow::resizeEvent( theEvent );

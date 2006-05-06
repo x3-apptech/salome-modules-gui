@@ -16,14 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-//=============================================================================
-// File      : SALOME_PYQT_PyInterp.h
-// Created   : 25/04/05
-// Author    : Christian CAREMOLI, Paul RASCLE, EDF
-// Project   : SALOME
-// Copyright : 2003-2005 CEA/DEN, EDF R&D
-// $Header   : $
-//=============================================================================
 
 #ifndef SALOME_PYQT_PYINTERP_H
 #define SALOME_PYQT_PYINTERP_H

@@ -45,10 +45,6 @@
 #pragma warning( disable:4251 )
 #endif
 
-/*! 
- * Class GLViewer_Object
- * Base Object for GLViewer
- */
 class GLViewer_Drawer;
 class GLViewer_AspectLine;
 class GLViewer_Group;
@@ -56,6 +52,10 @@ class GLViewer_CoordSystem;
 class GLViewer_Text;
 class GLViewer_Owner;
 
+/*! 
+ * Class GLViewer_Object
+ * Base Object for all GLViewer objects
+ */
 class GLVIEWER_API GLViewer_Object
 {
 public:

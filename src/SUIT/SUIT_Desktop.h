@@ -31,6 +31,11 @@ class SUIT_ViewWindow;
 class QtxActionMenuMgr;
 class QtxActionToolMgr;
 
+/*!
+  \class SUIT_Desktop
+  Provides standard desktop: main window with
+  main menu manager, toolbars manager and logo.
+*/
 class SUIT_EXPORT SUIT_Desktop : public QtxMainWindow
 {
   Q_OBJECT

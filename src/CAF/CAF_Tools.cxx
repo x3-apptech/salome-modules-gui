@@ -62,6 +62,9 @@ TCollection_ExtendedString CAF_Tools::toExtString ( const QString& src )
   return result;
 }
 
+/*!
+    Converts Qt color to OCC color
+*/
 Quantity_Color CAF_Tools::color( const QColor& c )
 {
   Quantity_Color aColor;
@@ -71,6 +74,9 @@ Quantity_Color CAF_Tools::color( const QColor& c )
   return aColor;
 }
 
+/*!
+    Converts OCC color to Qt color
+*/
 QColor CAF_Tools::color( const Quantity_Color& c )
 {
   return QColor ( int( c.Red()   * 255 ),

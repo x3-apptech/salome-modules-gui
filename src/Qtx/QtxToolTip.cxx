@@ -30,6 +30,9 @@
 #define TOOLTIP_SHOW_DELAY 0500
 #define TOOLTIP_HIDE_DELAY 7000
 
+/*!
+  Constructor
+*/
 QtxToolTip::QtxToolTip( QWidget* parent )
 : QLabel( parent, "", WStyle_Customize | WStyle_NoBorder | WX11BypassWM | WStyle_Tool | WStyle_StaysOnTop | WType_TopLevel )
 {
@@ -55,10 +58,16 @@ QtxToolTip::QtxToolTip( QWidget* parent )
   myShowDelayTime = 5000;
 }
 
+/*!
+  Destructor
+*/
 QtxToolTip::~QtxToolTip()
 {
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxToolTip::eventFilter( QObject* o, QEvent* e )
 {
 	if ( ( e->type() == QEvent::Destroy ) || ( e->type() == QEvent::Close ) || ( e->type() == QEvent::Hide ) )
@@ -106,6 +115,12 @@ bool QtxToolTip::eventFilter( QObject* o, QEvent* e )
 	return false;
 }
 
+/*!
+  Shows tool tip
+  \param aPos - position
+  \param text - tooltip text
+  \param aWidgetRegion - rectangle
+*/
 void QtxToolTip::showTip( const QPoint& aPos, const QString& text, const QRect& aWidgetRegion )
 {
 	QFontMetrics theFM = fontMetrics();
@@ -114,6 +129,12 @@ void QtxToolTip::showTip( const QPoint& aPos, const QString& text, const QRect& 
 	showTip( QRect( QPoint( aPos.x(), aPos.y() + 10 ), QSize( theWidth, theHeight ) ), text, aWidgetRegion );
 }
 
+/*!
+  Shows tool tip
+  \param aRegion - tooltip region
+  \param text - tooltip text
+  \param aWidgetRegion - widget rectangle
+*/
 void QtxToolTip::showTip( const QRect& aRegion, const QString& text, const QRect& aWidgetRegion )
 {
 	setText( text );
@@ -124,6 +145,9 @@ void QtxToolTip::showTip( const QRect& aRegion, const QString& text, const QRect
 	show();
 }
 
+/*!
+  Hides tooltip
+*/
 void QtxToolTip::hideTip()
 {
 	hide();
@@ -131,6 +155,11 @@ void QtxToolTip::hideTip()
 	mySleepTimer->stop();
 }
 
+/*!
+  It is called when there is a possibility that a tool tip should be shown and
+  must decide whether there is a tool tip for the point p in the widget that this QToolTip object relates to
+  \param pos - position
+*/
 void QtxToolTip::maybeTip( const QPoint& pos )
 {
 	QString text;
@@ -152,12 +181,18 @@ void QtxToolTip::maybeTip( const QPoint& pos )
 	}
 }
 
+/*!
+  SLOT: called when sleep time is out
+*/
 void QtxToolTip::onSleepTimeOut()
 {
 	mySleepTimer->stop();
 	hideTip();
 }
 
+/*!
+  SLOT: called when wake time is out
+*/
 void QtxToolTip::onWakeUpTimeOut()
 {
 	myWakeUpTimer->stop();
@@ -167,6 +202,9 @@ void QtxToolTip::onWakeUpTimeOut()
   maybeTip( pos );
 }
 
+/*!
+  Custom mouse press event handler
+*/
 void QtxToolTip::mousePressEvent( QMouseEvent* e )
 {
 	hideTip();
@@ -177,6 +215,9 @@ void QtxToolTip::mousePressEvent( QMouseEvent* e )
 	QApplication::sendEvent( reciever, me );
 }
 
+/*!
+  Custom mouse double click event handler
+*/
 void QtxToolTip::mouseDoubleClickEvent( QMouseEvent* e )
 {
 	hideTip();
@@ -187,23 +228,37 @@ void QtxToolTip::mouseDoubleClickEvent( QMouseEvent* e )
 	QApplication::sendEvent( reciever, me );
 }
 
+/*!
+  Sets wake delay time
+  \param theTime
+*/
 void QtxToolTip::setWakeUpDelayTime( int theTime )
 {
   if( !(theTime < 0) )
     myWakeUpDelayTime = theTime;
 }
 
+/*!
+  Sets show delay time
+  \param theTime
+*/
 void QtxToolTip::setShowDelayTime( int theTime )
 {
   if( !(theTime < 0) )
     myShowDelayTime = theTime;
 }
 
+/*!
+  \return timer measuring time of sleeping
+*/
 QTimer* QtxToolTip::sleepTimer() const
 {
   return mySleepTimer;
 }
 
+/*!
+  \return timer measuring time of waking up
+*/
 QTimer* QtxToolTip::wakeUpTimer() const
 {
   return myWakeUpTimer;

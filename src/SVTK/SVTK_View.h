@@ -1,3 +1,21 @@
+// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/
+//
 #ifndef SVTK_VIEW_H
 #define SVTK_VIEW_H
 
@@ -18,7 +36,6 @@ class SVTK_Renderer;
 
 class SALOME_Actor;
 
-//----------------------------------------------------------------------------
 //! Main purpose of the class is to provide a way to customize #SVTK_MainWindow.
 /*!
   This class is initialized by #SVTK_MainWindow and just pass Qt signals from 
@@ -78,7 +95,6 @@ public:
 };
 
 
-//----------------------------------------------------------------------------
 //! This class is introduced just for compatibility with old code.
 /*!
   This class contains frequantly used functionality in old code.
@@ -106,7 +122,7 @@ public:
   void
   unHighlightAll();
 
-  /* Selection Management */
+  //! Try to find a SALOME_InteractiveObject in the view that corresponds to the entry
   Handle(SALOME_InteractiveObject) 
   FindIObject(const char* Entry);
 

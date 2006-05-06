@@ -22,11 +22,6 @@
 // File:      GLViewer_ViewPort.h
 // Created:   November, 2004
 
-/***************************************************************************
-**  Class:   GLViewer_ViewPort
-**  Descr:   Visualisation canvas of GLViewer
-**  Created: UI team, 05.09.04
-****************************************************************************/
 #ifndef GLVIEWER_VIEWPORT_H
 #define GLVIEWER_VIEWPORT_H
 
@@ -57,10 +52,10 @@ enum BlockStatus
     BS_Dragging         = 0x0004
 };
 
-/*! 
- * Class GLViewer_ViewPort
- * Visualisation canvas of GLViewer
- */
+/*!
+  \class GLViewer_ViewPort
+  Visualisation canvas of GLViewer
+*/
 class GLVIEWER_API GLViewer_ViewPort: public QWidget
 {
     Q_OBJECT

@@ -63,6 +63,9 @@ void rotate_point( float& theX, float& theY, float theAngle )
     theY = aTempY;
 }
 
+/*!
+  Constructor
+*/
 GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame ) :
        GLViewer_ViewPort( parent ),
        myMargin( MARGIN ), myWidth( WIDTH ), myHeight( HEIGHT ),
@@ -105,6 +108,9 @@ GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* t
 //    myGLWidget->installEventFilter( myObjectTip );
 }
 
+/*!
+  Destructor
+*/
 GLViewer_ViewPort2d::~GLViewer_ViewPort2d()
 {
     if( myCompass )
@@ -117,6 +123,9 @@ GLViewer_ViewPort2d::~GLViewer_ViewPort2d()
     delete myGLWidget;
 }
 
+/*!
+  SLOT: initializes drag process
+*/
 void GLViewer_ViewPort2d::onStartDragObject( )
 {
     if( myIsDragProcess == noDrag )
@@ -132,6 +141,9 @@ void GLViewer_ViewPort2d::onStartDragObject( )
     } 
 }
 
+/*!
+  SLOT: cuts object to clipboard
+*/
 void GLViewer_ViewPort2d::onCutObject()
 { 
     /*GLViewer_Object* aMovingObject = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext()->getCurrentObject();
@@ -167,6 +179,9 @@ void GLViewer_ViewPort2d::onCutObject()
     }
 }
 
+/*!
+  SLOT: copies object to clipboard
+*/
 void GLViewer_ViewPort2d::onCopyObject()
 {
     /*GLViewer_Object* aMovingObject = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext()->getCurrentObject();
@@ -198,6 +213,9 @@ void GLViewer_ViewPort2d::onCopyObject()
     }
 }
 
+/*!
+  SLOT: pastes object from clipboard
+*/
 void GLViewer_ViewPort2d::onPasteObject()
 {
     /*QClipboard *aClipboard = QApplication::clipboard();
@@ -243,6 +261,9 @@ void GLViewer_ViewPort2d::onPasteObject()
     */
 }
 
+/*!
+  SLOT: called when object is being dragged
+*/
 void GLViewer_ViewPort2d::onDragObject( QMouseEvent* e )
 {
   //cout << "---GLViewer_ViewPort2d::onDragObject()---" << endl;
@@ -401,6 +422,9 @@ void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
     }
 }
 
+/*!
+  Custom mouse double click event handler
+*/
 void GLViewer_ViewPort2d::mouseDoubleClickEvent( QMouseEvent * e )
 {
   //redefined to block mouse release after mouse double click
@@ -409,6 +433,10 @@ void GLViewer_ViewPort2d::mouseDoubleClickEvent( QMouseEvent * e )
   GLViewer_ViewPort::mouseDoubleClickEvent( e );
 }
 
+/*!
+  Creates or deletes compass
+  \param on - if it is true, then to create
+*/
 void GLViewer_ViewPort2d::turnCompass( GLboolean on )
 {
     if( on )
@@ -417,6 +445,10 @@ void GLViewer_ViewPort2d::turnCompass( GLboolean on )
         delete myCompass;
 }
 
+/*!
+  Creates or deletes grid
+  \param on - if it is true, then to create
+*/
 void GLViewer_ViewPort2d::turnGrid( GLboolean on )
 {
     if( on )
@@ -431,6 +463,11 @@ void GLViewer_ViewPort2d::turnGrid( GLboolean on )
         delete myGrid;
 }
 
+/*!
+  Changes grid color
+  \param gridColor - new grid color
+  \param axisColor - new axis color
+*/
 void GLViewer_ViewPort2d::setGridColor( const QColor gridColor, const QColor axisColor )
 {
     if( myGrid )
@@ -444,6 +481,10 @@ void GLViewer_ViewPort2d::setGridColor( const QColor gridColor, const QColor axi
     }
 }
 
+/*!
+  Changes background color
+  \param color - new background color
+*/
 void GLViewer_ViewPort2d::setBackgroundColor( const QColor& color )
 {
     GLViewer_ViewPort::setBackgroundColor( color );
@@ -454,11 +495,17 @@ void GLViewer_ViewPort2d::setBackgroundColor( const QColor& color )
     myGLWidget->repaint();
 }
 
+/*!
+  \return background color
+*/
 QColor GLViewer_ViewPort2d::backgroundColor() const
 {
     return GLViewer_ViewPort::backgroundColor();
 }
 
+/*!
+  Resize view
+*/
 void GLViewer_ViewPort2d::initResize( int x, int y )
 {
     float xa, xb, ya, yb;
@@ -509,6 +556,9 @@ void GLViewer_ViewPort2d::initResize( int x, int y )
     myGLWidget->setScale( myXScale, myYScale, 1.0 );
 }
 
+/*!
+  Custom paint event handler
+*/
 void GLViewer_ViewPort2d::paintEvent( QPaintEvent* e )
 {
     //cout << "GLViewer_ViewPort2d::paintEvent" << endl;
@@ -516,12 +566,18 @@ void GLViewer_ViewPort2d::paintEvent( QPaintEvent* e )
     GLViewer_ViewPort::paintEvent( e );
 }
 
+/*!
+  Custom resize event handler
+*/
 void GLViewer_ViewPort2d::resizeEvent( QResizeEvent* e )
 {
     //cout << "GLViewer_ViewPort2d::resizeEvent" << endl;
     GLViewer_ViewPort::resizeEvent( e );
 }
 
+/*!
+  Resets view to start state
+*/
 void GLViewer_ViewPort2d::reset()
 {
     //cout << "GLViewer_ViewPort2d::reset" << endl;
@@ -557,6 +613,11 @@ void GLViewer_ViewPort2d::reset()
     myGLWidget->updateGL();
 }
 
+/*!
+  Sets offset to view
+  \param dx - X offset
+  \param dy - Y offset
+*/
 void GLViewer_ViewPort2d::pan( int dx, int dy )
 {
     //cout << "GLViewer_ViewPort2d::pan " << dx << " " << dy << endl;
@@ -588,6 +649,10 @@ void GLViewer_ViewPort2d::pan( int dx, int dy )
     myGLWidget->updateGL();
 }
 
+/*!
+  Sets view center in global coords
+  \param x, y - global co-ordinates of center
+*/
 void GLViewer_ViewPort2d::setCenter( int x, int y )
 {
     //cout << "GLViewer_ViewPort2d::setCenter" << endl;
@@ -617,6 +682,9 @@ void GLViewer_ViewPort2d::setCenter( int x, int y )
     myGLWidget->updateGL();
 }
 
+/*!
+  Process zoming transformation with mouse tracking from ( x0, y0 ) to ( x1, y1 )
+*/
 void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
 {
     //cout << "GLViewer_ViewPort2d::zoom" << endl;
@@ -659,6 +727,10 @@ void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
     }
 }
 
+/*!
+  Transforms view by rectangle
+  \param rect - rectangle
+*/
 void GLViewer_ViewPort2d::fitRect( const QRect& rect )
 {
     float x0, x1, y0, y1;
@@ -711,6 +783,9 @@ void GLViewer_ViewPort2d::fitRect( const QRect& rect )
     myGLWidget->updateGL();
 }
 
+/*!
+  Transforms view by selection
+*/
 void GLViewer_ViewPort2d::fitSelect()
 {
   GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
@@ -732,6 +807,10 @@ void GLViewer_ViewPort2d::fitSelect()
   }
 }
 
+/*!
+  Transform view by view borders
+  \param keepScale - if it is true, zoom does not change
+*/
 void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
 {
     //cout << "GLViewer_ViewPort2d::fitAll" << endl;
@@ -820,11 +899,19 @@ void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
         emit vpUpdateValues();
 }
 
+/*!
+  Begins rotation
+  \param x, y - start point
+*/
 void GLViewer_ViewPort2d::startRotation( int x, int y )
 {
     myGLWidget->setRotationStart( x, y, 1.0 );
 }
 
+/*!
+  Performs rotation
+  \param intX, intY - current point
+*/
 void GLViewer_ViewPort2d::rotate( int intX, int intY )
 {
     GLint val[4];
@@ -871,6 +958,9 @@ void GLViewer_ViewPort2d::rotate( int intX, int intY )
     myGLWidget->updateGL();
 }
 
+/*!
+  Finishes rotation
+*/
 void GLViewer_ViewPort2d::endRotation()
 {
     float ra, rx, ry, rz;
@@ -878,6 +968,9 @@ void GLViewer_ViewPort2d::endRotation()
     myGLWidget->setRotationAngle( ra );
 }
 
+/*!
+  Draws compass
+*/
 void GLViewer_ViewPort2d::drawCompass()
 {
     if( !myCompass->getVisible() )
@@ -1038,6 +1131,9 @@ void GLViewer_ViewPort2d::drawCompass()
         glCallList( aTextList );
 }
 
+/*!
+  \return blocking status for current started operations
+*/
 BlockStatus GLViewer_ViewPort2d::currentBlock()
 {
     if( myIsDragProcess == inDrag && myCurDragPosX != NULL && myCurDragPosY != NULL)
@@ -1049,6 +1145,10 @@ BlockStatus GLViewer_ViewPort2d::currentBlock()
     return BS_NoBlock;
 }
 
+/*!
+  Initializes rectangle selection
+  \param x, y - start point
+*/
 void GLViewer_ViewPort2d::startSelectByRect( int x, int y )
 {
     if( !mypFirstPoint && !mypLastPoint )
@@ -1057,6 +1157,11 @@ void GLViewer_ViewPort2d::startSelectByRect( int x, int y )
         mypLastPoint = new QPoint( x, y );
     }
 }
+
+/*!
+  Draws rectangle selection
+  \param x, y - current point
+*/
 void GLViewer_ViewPort2d::drawSelectByRect( int x, int y )
 {
     if( mypFirstPoint && mypLastPoint )
@@ -1075,6 +1180,10 @@ void GLViewer_ViewPort2d::drawSelectByRect( int x, int y )
     }
 
 }
+
+/*!
+  Finishes rectangle selection
+*/
 void GLViewer_ViewPort2d::finishSelectByRect()
 {
     if( mypFirstPoint && mypLastPoint )
@@ -1094,6 +1203,9 @@ void GLViewer_ViewPort2d::finishSelectByRect()
     }
 }
 
+/*!
+  \return rectangle selection
+*/
 QRect GLViewer_ViewPort2d::selectionRect()
 {
     QRect aRect;
@@ -1108,6 +1220,8 @@ QRect GLViewer_ViewPort2d::selectionRect()
     return aRect;
 }
 
+/*!
+*/
 bool GLViewer_ViewPort2d::startPulling( GLViewer_Pnt point )
 {
     GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
@@ -1131,6 +1245,8 @@ bool GLViewer_ViewPort2d::startPulling( GLViewer_Pnt point )
     return false;
 }
 
+/*!
+*/
 void GLViewer_ViewPort2d::drawPulling( GLViewer_Pnt point )
 {
     GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
@@ -1156,6 +1272,8 @@ void GLViewer_ViewPort2d::drawPulling( GLViewer_Pnt point )
     myPullingObject->pull( point, aLockedObject );
 }
 
+/*!
+*/
 void GLViewer_ViewPort2d::finishPulling()
 {
     myIsPulling = false;
@@ -1163,6 +1281,10 @@ void GLViewer_ViewPort2d::finishPulling()
     setCursor( *getDefaultCursor() );
 }
 
+/*!
+  Convert rectangle in window co-ordinates to GL co-ordinates
+  \return converted rectangle
+*/
 GLViewer_Rect GLViewer_ViewPort2d::win2GLV( const QRect& theRect ) const
 {
   GLViewer_Rect aRect;
@@ -1189,6 +1311,10 @@ GLViewer_Rect GLViewer_ViewPort2d::win2GLV( const QRect& theRect ) const
   return aRect;
 }
 
+/*!
+  Convert rectangle in GL co-ordinates to window co-ordinates
+  \return converted rectangle
+*/
 QRect GLViewer_ViewPort2d::GLV2win( const GLViewer_Rect& theRect ) const
 {
   QRect aRect;
@@ -1215,6 +1341,9 @@ QRect GLViewer_ViewPort2d::GLV2win( const GLViewer_Rect& theRect ) const
   return aRect;
 }
 
+/*!
+  SLOT: called when tooltip should be shown
+*/
 void GLViewer_ViewPort2d::onMaybeTip( QPoint thePoint, QString& theText, QFont& theFont, QRect& theTextReg, QRect& theRegion )
 {
   GLViewer_Context* aContext = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext();

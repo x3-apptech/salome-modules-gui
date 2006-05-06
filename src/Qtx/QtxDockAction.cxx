@@ -255,6 +255,10 @@ bool QtxDockAction::removeFrom( QWidget* wid )
   return QtxAction::removeFrom( wid );
 }
 
+/*!
+  Sets menu text of action
+  \param txt - new menu text
+*/
 void QtxDockAction::setMenuText( const QString& txt )
 {
   if ( menuText() == txt )
@@ -721,6 +725,11 @@ void QtxDockAction::dockWindows( QPtrList<QDockWindow>& lst, QMainWindow* main )
   delete objs;
 }
 
+/*!
+  \return true if main window is parent of object
+  \param mw - main window
+  \param win - object
+*/
 bool QtxDockAction::dockMainWindow( QMainWindow* mw, QObject* win ) const
 {
   if ( !mw || !win )
@@ -1251,6 +1260,9 @@ void QtxDockAction::collectNames( const int place, QStringList& lst ) const
   }
 }
 
+/*!
+  Updates menu of action
+*/
 void QtxDockAction::updateMenus()
 {
   for ( MenuMap::Iterator it = myMenu.begin(); it != myMenu.end(); ++it )

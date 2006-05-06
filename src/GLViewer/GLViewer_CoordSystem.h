@@ -35,6 +35,10 @@
 #pragma warning( disable:4251 )
 #endif
 
+/*!
+  \class GLViewer_CoordSystem
+  \brief Class implementing mathematical model of 2D coordinate system 
+*/
 class GLVIEWER_API GLViewer_CoordSystem
 {
 public:

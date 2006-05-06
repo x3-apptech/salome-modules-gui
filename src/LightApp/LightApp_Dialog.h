@@ -35,9 +35,13 @@ class QLabel;
 
 class SUIT_ResourceMgr;
 
-/*
-  Class       : LightApp_Dialog
-  Description : Base class for all LightApp dialogs
+/*!
+  \class LightApp_Dialog
+  Base class for all LightApp dialogs.
+  Provides standard widget for object selection: line edit, button;
+  it is necessary to call corresponding methods on selection change.
+  Standard dialog provides filtering, selection string representation,
+  possibility to indicate necessary selection by text with list of ids.
 */
 class LIGHTAPP_EXPORT LightApp_Dialog : public QtxDialog
 {

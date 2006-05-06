@@ -29,6 +29,7 @@
 #define __SVTK_RectPicker_h
 
 #include "SVTK.h"
+#include "VTKViewer.h"
 
 #include <map>
 #include <vector>
@@ -40,7 +41,7 @@ class vtkRenderer;
 /*! \class vtkAbstractPropPicker
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
  */
-/*! \class VTKViewer_RectPicker
+/*! \class SVTK_RectPicker
  * \brief Rectangular picker class.
  */
 class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
@@ -56,8 +57,8 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
     as fraction of rendering window size. (Rendering window size is measured
     across diagonal.)
   */
-  vtkSetMacro(Tolerance,float);
-  vtkGetMacro(Tolerance,float);
+  vtkSetMacro(Tolerance,vtkFloatingPointType);
+  vtkGetMacro(Tolerance,vtkFloatingPointType);
 
   //! Use these methods to pick points or points and cells
   vtkSetMacro(PickPoints,int);
@@ -66,12 +67,18 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
 
   virtual 
   int
-  Pick(float theSelectionX, float theSelectionY, float theSelectionZ, 
-       float theSelectionX2, float theSelectionY2, float theSelectionZ2,
+  Pick(vtkFloatingPointType theSelectionX, 
+       vtkFloatingPointType theSelectionY, 
+       vtkFloatingPointType theSelectionZ, 
+       vtkFloatingPointType theSelectionX2, 
+       vtkFloatingPointType theSelectionY2, 
+       vtkFloatingPointType theSelectionZ2,
        vtkRenderer *theRenderer);  
 
   int
-  Pick(float theSelection[3], float theSelection2[3], vtkRenderer *theRenderer);
+  Pick(vtkFloatingPointType theSelection[3], 
+       vtkFloatingPointType theSelection2[3], 
+       vtkRenderer *theRenderer);
 
   typedef std::vector<vtkIdType> TVectorIds;
   typedef std::map<vtkActor*,TVectorIds> TVectorIdsMap;
@@ -87,16 +94,16 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
   ~SVTK_RectPicker();
 
   //! tolerance for computation (% of window)
-  float Tolerance;
+  vtkFloatingPointType Tolerance;
 
   //! use the following to control picking mode
   int PickPoints;
 
   //! second rectangle selection point in window (pixel) coordinates
-  float SelectionPoint2[3]; 
+  vtkFloatingPointType SelectionPoint2[3]; 
 
   //! second rectangle selection point in world coordinates
-  float PickPosition2[3]; 
+  vtkFloatingPointType PickPosition2[3]; 
 
   TVectorIdsMap myPointIdsMap;
   TVectorIdsMap myCellIdsMap;
@@ -104,7 +111,10 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
  private:
   virtual 
   int
-  Pick(float, float, float, vtkRenderer*);
+  Pick(vtkFloatingPointType, 
+       vtkFloatingPointType, 
+       vtkFloatingPointType, 
+       vtkRenderer*);
 };
 
 #endif

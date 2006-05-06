@@ -34,6 +34,9 @@
 
 #include "SALOME_InteractiveObject.ixx"
 
+/*!
+  Default constructor
+*/
 SALOME_InteractiveObject::SALOME_InteractiveObject()
 {
   myEntry = "";
@@ -42,6 +45,12 @@ SALOME_InteractiveObject::SALOME_InteractiveObject()
   myReference = "";
 }
 
+/*!
+  Constructor
+  \param anEntry - entry of object
+  \param aComponentDataType - component data type name
+  \param aName - name of object
+*/
 SALOME_InteractiveObject::SALOME_InteractiveObject(const char* anEntry, 
 						   const char* aComponentDataType,
 						   const char* aName):
@@ -51,34 +60,62 @@ SALOME_InteractiveObject::SALOME_InteractiveObject(const char* anEntry,
   myReference("")
 {}
 
+/*!
+  Sets entry
+  \param anEntry - new entry of object
+*/
 void SALOME_InteractiveObject::setEntry(const char* anEntry){
   myEntry = anEntry;
 }
 
+/*!
+  \return entry
+*/
 const char* SALOME_InteractiveObject::getEntry(){
   return myEntry.c_str();
 }
 
+/*!
+  Sets component data type
+  \param aComponentDataType - component data type name
+*/
 void SALOME_InteractiveObject::setComponentDataType(const char* aComponentDataType){
   myComponentDataType = aComponentDataType; 
 }
 
+/*!
+  \return component data type
+*/
 const char* SALOME_InteractiveObject::getComponentDataType(){
   return myComponentDataType.c_str();
 }
 
+/*!
+  Sets name
+  \param aName - new name of object
+*/
 void SALOME_InteractiveObject::setName(const char* aName){
   myName = aName;
 }
 
+/*!
+  \return name
+*/
 const char* SALOME_InteractiveObject::getName(){
   return myName.c_str();
 }
 
+/*!
+  \return true if entry isn't empty
+*/
 Standard_Boolean SALOME_InteractiveObject::hasEntry(){
   return myEntry != "";
 }
 
+/*!
+  \return true if objects have same entries
+  \param anIO - other object
+*/
 Standard_Boolean SALOME_InteractiveObject::isSame(const Handle(SALOME_InteractiveObject)& anIO ){
   if ( anIO->hasEntry() && this->hasEntry() ) {
     if ( myEntry == anIO->getEntry() )
@@ -88,6 +125,10 @@ Standard_Boolean SALOME_InteractiveObject::isSame(const Handle(SALOME_Interactiv
   return Standard_False;
 }
 
+/*!
+  \return true if component data types are same
+  \param ComponentDataType - component data type to be checked
+*/
 Standard_Boolean SALOME_InteractiveObject::isComponentType(const char* ComponentDataType){
   if ( myComponentDataType == ComponentDataType )
     return Standard_True;
@@ -95,16 +136,26 @@ Standard_Boolean SALOME_InteractiveObject::isComponentType(const char* Component
     return Standard_False;
 }
 
+/*!
+  \return true if object has reference
+*/
 Standard_Boolean SALOME_InteractiveObject::hasReference()
 {
   return myReference != "";
 }
 
+/*!
+  \return reference
+*/
 const char* SALOME_InteractiveObject::getReference()
 {
   return myReference.c_str();
 }
 
+/*!
+  Sets reference
+  \param aReference - new reference
+*/
 void SALOME_InteractiveObject::setReference(const char* aReference)
 {
   myReference = aReference;

@@ -77,10 +77,9 @@ void LightApp_Study::createDocument()
   emit created( this );
 }
 
-//=======================================================================
-// name    : openDocument
-/*! Purpose : Open document*/
-//=======================================================================
+/*!
+  Opens document
+*/
 bool LightApp_Study::openDocument( const QString& theFileName )
 {
   myDriver->ClearDriverContents();
@@ -106,10 +105,9 @@ bool LightApp_Study::openDocument( const QString& theFileName )
   return res;
 }
 
-//=======================================================================
-// name    : loadDocument
-/*! Purpose : Load document */
-//=======================================================================
+/*!
+  Loads document
+*/
 bool LightApp_Study::loadDocument( const QString& theStudyName )
 {
   myDriver->ClearDriverContents();
@@ -138,10 +136,9 @@ bool LightApp_Study::loadDocument( const QString& theStudyName )
   return res;
 }
 
-//=======================================================================
-// name    : saveDocumentAs
-/*! Purpose : Save document */
-//=======================================================================
+/*!
+  Saves document
+*/
 bool LightApp_Study::saveDocumentAs( const QString& theFileName )
 {
   SUIT_ResourceMgr* resMgr = application()->resourceMgr();
@@ -201,10 +198,9 @@ bool LightApp_Study::saveDocumentAs( const QString& theFileName )
   return res;
 }
 
-//=======================================================================
-// name    : saveDocument
-/*! Purpose : Save document */
-//=======================================================================
+/*!
+  Saves document
+*/
 bool LightApp_Study::saveDocument()
 {
   ModelList list; dataModels( list );
@@ -227,10 +223,9 @@ bool LightApp_Study::saveDocument()
   return res;
 }
 
-//================================================================
-// Function : closeDocument
-/*! Purpose  : Close document */
-//================================================================
+/*!
+  Closes document
+*/
 void LightApp_Study::closeDocument(bool permanently)
 {
   // Inform everybody that this study is going to close when it's most safe to,
@@ -243,27 +238,25 @@ void LightApp_Study::closeDocument(bool permanently)
   myDriver->ClearDriverContents();
 }
 
-//================================================================
-// Function : referencedToEntry
-/*! Purpose  : Return current entry*/
-//================================================================
+/*!
+  \return real entry by entry of reference
+  \param entry - entry of reference object
+*/
 QString LightApp_Study::referencedToEntry( const QString& entry ) const
 {
   return entry;
 }
 
-//================================================================
-// Function : children
-/*! Purpose : Return entries of children of object*/
-//================================================================
+/*!
+  \return entries of object children
+*/
 void LightApp_Study::children( const QString&, QStringList& ) const
 {
 }
 
-//================================================================
-// Function : isComponent
-/*! Purpose : Return true if entry corresponds to component*/
-//================================================================
+/*!
+  \return true if entry corresponds to component
+*/
 bool LightApp_Study::isComponent( const QString& entry ) const
 {
   if( !root() )
@@ -281,10 +274,9 @@ bool LightApp_Study::isComponent( const QString& entry ) const
   return false;
 }
 
-//================================================================
-// Function : componentDataType
-/*! Purpose  : Return component data type from entry*/
-//================================================================
+/*!
+  \return component data type for entry
+*/
 QString LightApp_Study::componentDataType( const QString& entry ) const
 {
   LightApp_DataObject* aCurObj;
@@ -297,10 +289,9 @@ QString LightApp_Study::componentDataType( const QString& entry ) const
   return "";
 }
 
-//================================================================
-// Function : isModified
-// Purpose  : 
-//================================================================
+/*!
+  \return true if study is modified
+*/
 bool LightApp_Study::isModified() const
 {
   bool isAnyChanged = CAM_Study::isModified();
@@ -315,27 +306,24 @@ bool LightApp_Study::isModified() const
   return isAnyChanged; 
 }
 
-//================================================================
-// Function : isSaved
-/*! Purpose  : Check: data model is saved?*/
-//================================================================
+/*!
+  \return true if data model is saved
+*/
 bool LightApp_Study::isSaved() const
 {
   return CAM_Study::isSaved();
 }
 
-//=======================================================================
-// name    : addComponent
-/*! Purpose : Create SComponent for module, necessary for SalomeApp study */
-//=======================================================================
+/*!
+  Creates SComponent for module, necessary for SalomeApp study
+*/
 void LightApp_Study::addComponent(const CAM_DataModel* dm)
 {
 }
 
-//=======================================================================
-// name    : saveModuleData
-/*! Purpose : save list file for module 'theModuleName' */
-//=======================================================================
+/*!
+  Saves list file for module 'theModuleName'
+*/
 void LightApp_Study::saveModuleData(QString theModuleName, QStringList theListOfFiles)
 {
   int aNb = theListOfFiles.count();
@@ -353,10 +341,9 @@ void LightApp_Study::saveModuleData(QString theModuleName, QStringList theListOf
   myDriver->SetListOfFiles(theModuleName, aListOfFiles);
 }
 
-//=======================================================================
-// name    : openModuleData
-/*! Purpose : gets list of file for module 'theModuleNam' */
-//=======================================================================
+/*!
+  Gets list of file for module 'theModuleNam'
+*/
 void LightApp_Study::openModuleData(QString theModuleName, QStringList& theListOfFiles)
 {
   std::vector<std::string> aListOfFiles =  myDriver->GetListOfFiles(theModuleName);
@@ -370,10 +357,9 @@ void LightApp_Study::openModuleData(QString theModuleName, QStringList& theListO
     theListOfFiles.append(aListOfFiles[i+1].c_str());
 }
 
-//=======================================================================
-// name    : saveStudyData
-/*! Purpose : save data from study */
-//=======================================================================
+/*!
+  Saves data from study
+*/
 bool LightApp_Study::saveStudyData( const QString& theFileName )
 {
   ModelList list; dataModels( list );
@@ -386,10 +372,9 @@ bool LightApp_Study::saveStudyData( const QString& theFileName )
   return aRes;
 }
 
-//=======================================================================
-// name    : openStudyData
-/*! Purpose : open data for study */
-//=======================================================================
+/*!
+  Opens data for study
+*/
 bool LightApp_Study::openStudyData( const QString& theFileName )
 {
   SUIT_ResourceMgr* resMgr = application()->resourceMgr();
@@ -401,10 +386,9 @@ bool LightApp_Study::openStudyData( const QString& theFileName )
   return aRes;
 }
 
-//================================================================
-// Function : openDataModel
-/*! Purpose  : Open data model */
-//================================================================
+/*!
+  Opens data model
+*/
 bool LightApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm )
 {
   if (!dm)
@@ -422,20 +406,19 @@ bool LightApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm 
   return false;
 }
 
-//================================================================
-// Function : GetTmpDir
-/*! Purpose  : to be used by modules*/
-//================================================================
+/*!
+  \return temporary directory for saving files of modules
+*/
 std::string LightApp_Study::GetTmpDir (const char* theURL,
                                        const bool  isMultiFile)
 {
   return myDriver->GetTmpDir(theURL, isMultiFile);
 }
 
-//================================================================
-// Function : GetListOfFiles
-/*! Purpose  : to be used by modules*/
-//================================================================
+/*!
+  \return list of files necessary for module
+  \param theModuleName - name of module
+*/
 std::vector<std::string> LightApp_Study::GetListOfFiles(const char* theModuleName) const
 {
   std::vector<std::string> aListOfFiles;
@@ -443,19 +426,19 @@ std::vector<std::string> LightApp_Study::GetListOfFiles(const char* theModuleNam
   return aListOfFiles;
 }
 
-//================================================================
-// Function : SetListOfFiles
-/*! Purpose  : to be used by modules*/
-//================================================================
+/*!
+  Sets list of files necessary for module
+  \param theModuleName - name of module
+  \param theListOfFiles - list of files
+*/
 void LightApp_Study::SetListOfFiles (const char* theModuleName, const std::vector<std::string> theListOfFiles)
 {
   myDriver->SetListOfFiles(theModuleName, theListOfFiles);
 }
 
-//================================================================
-// Function : RemoveTemporaryFiles
-/*! Purpose  : to be used by modules*/
-//================================================================
+/*!
+  Removes temporary files
+*/
 void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool isMultiFile) const
 {
   if (isMultiFile)
@@ -464,10 +447,10 @@ void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool
   myDriver->RemoveTemporaryFiles(theModuleName, isDirDeleted);
 }
 
-//================================================================
-// Function : components
-/*! Purpose  : to be used by modules*/
-//================================================================
+/*!
+  Fills list with components names
+  \param comp - list to be filled
+*/
 void LightApp_Study::components( QStringList& comp ) const
 {
   DataObjectList children = root()->children();

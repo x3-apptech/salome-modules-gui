@@ -66,7 +66,7 @@
   // get id of SUIT_Study, if it's a SalomeApp_Study, it will return
   //    id of its underlying SALOMEDS::Study
 //  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-//  if ( !app )  return _PTR(Study)(aStudy); 
+//  if ( !app )  return _PTR(Study)(aStudy);
 //  SUIT_Study* stud = app->activeStudy();
 //  if ( !stud ) return _PTR(Study)(aStudy);  
 //  const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
@@ -74,15 +74,28 @@
 //  return aMgr->GetStudyByID( id );
 //}
 
+/*!
+  Constructor
+  \param DisplayTrihedron - is trihedron displayed
+*/
 SOCC_Viewer::SOCC_Viewer( bool DisplayTrihedron )
 : OCCViewer_Viewer( DisplayTrihedron )
 {
 }
 
+/*!
+  Destructor
+*/
 SOCC_Viewer::~SOCC_Viewer()
 {
 }
 
+/*!
+  Hilights/unhilights object in viewer
+  \param obj - object to be updated
+  \param hilight - if it is true, object will be hilighted, otherwise it will be unhilighted
+  \param update - update current viewer
+*/
 bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
                              bool hilight, bool upd )
 {
@@ -124,6 +137,11 @@ bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
   return false;
 }
 
+/*!
+  \return true if object is in viewer or in collector
+  \param obj - object to be checked
+  \param onlyInViewer - search object only in viewer (so object must be displayed)
+*/
 bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
                               bool onlyInViewer )
 {
@@ -148,6 +166,10 @@ bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
   return false;
 }
 
+/*!
+  \return true if object is displayed in viewer
+  \param obj - object to be checked
+*/
 bool SOCC_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& obj )
 {
   AIS_ListOfInteractive List;
@@ -166,6 +188,12 @@ bool SOCC_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& obj )
   return false;
 }
 
+/*!
+  Sets color of object
+  \param obj - object to be updated
+  \param color - new color
+  \param update - update current viewer
+*/
 void SOCC_Viewer::setColor( const Handle(SALOME_InteractiveObject)& obj,
                             const QColor& color, bool update )
 {
@@ -186,6 +214,12 @@ void SOCC_Viewer::setColor( const Handle(SALOME_InteractiveObject)& obj,
   }
 }
 
+/*!
+  Changes display mode of object
+  \param obj - object to be processed
+  \param mode - new display mode
+  \param update - update current viewer
+*/
 void SOCC_Viewer::switchRepresentation( const Handle(SALOME_InteractiveObject)& obj,
                                         int mode, bool update )
 {
@@ -206,6 +240,12 @@ void SOCC_Viewer::switchRepresentation( const Handle(SALOME_InteractiveObject)& 
   }
 }
 
+/*!
+  Changes transparency of object
+  \param obj - object to be processed
+  \param trans - new transparency
+  \param update - update current viewer
+*/
 void SOCC_Viewer::setTransparency( const Handle(SALOME_InteractiveObject)& obj,
                                    float trans, bool update )
 {
@@ -226,6 +266,11 @@ void SOCC_Viewer::setTransparency( const Handle(SALOME_InteractiveObject)& obj,
   }
 }
 
+/*!
+  Changes name of object
+  \param obj - object to be renamed
+  \param name - new name
+*/
 void SOCC_Viewer::rename( const Handle(SALOME_InteractiveObject)& obj,
                           const QString& name )
 {
@@ -259,10 +304,11 @@ void SOCC_Viewer::rename( const Handle(SALOME_InteractiveObject)& obj,
   }
 }
 
-//=======================================================================
-// name    : Display
-// Purpose : Display presentation
-//=======================================================================
+
+/*!
+  Display presentation
+  \param prs - presentation
+*/
 void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
 {
   // try do downcast object
@@ -379,10 +425,12 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
   }
 }
 
-//=======================================================================
-// name    : Erase
-// Purpose : Erase presentation
-//=======================================================================
+
+/*!
+  Erase presentation
+  \param prs - presentation
+  \param forced - removes object from context
+*/
 void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
 {
   // try do downcast object
@@ -428,10 +476,11 @@ void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
   }
 }
 
-//=======================================================================
-// name    : EraseAll
-// Purpose : Erase all presentations
-//=======================================================================
+
+/*!
+  Erase all presentations
+  \param forced - removes all objects from context
+*/
 void SOCC_Viewer::EraseAll( const bool forced )
 {
   // get SALOMEDS Study
@@ -480,10 +529,10 @@ void SOCC_Viewer::EraseAll( const bool forced )
     Repaint();
 }
 
-//=======================================================================
-// name    : CreatePrs
-// Purpose : Create presentation corresponding to the entry
-//=======================================================================
+/*!
+  Create presentation corresponding to the entry
+  \param entry - entry
+*/
 SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
 {
   SOCC_Prs* prs = new SOCC_Prs();
@@ -513,10 +562,9 @@ SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
   return prs;
 }
 
-//=======================================================================
-// name    : LocalSelection
-// Purpose : Activates selection of sub shapes
-//=======================================================================
+/*!
+  Activates selection of sub shapes
+*/
 void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
@@ -559,10 +607,9 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode
   }
 }
 
-//=======================================================================
-// name    : GlobalSelection
-// Purpose : Deactivates selection of sub shapes
-//=======================================================================
+/*!
+  Deactivates selection of sub shapes
+*/
 void SOCC_Viewer::GlobalSelection( const bool update ) const
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
@@ -574,29 +621,25 @@ void SOCC_Viewer::GlobalSelection( const bool update ) const
   }
 }
 
-//=======================================================================
-// name    : BeforeDisplay
-// Purpose : Axiluary method called before displaying of objects
-//=======================================================================
+/*!
+  Auxiliary method called before displaying of objects
+*/
 void  SOCC_Viewer::BeforeDisplay( SALOME_Displayer* d )
 {
   d->BeforeDisplay( this, SALOME_OCCViewType() );
 }
 
-//=======================================================================
-// name    : AfterDisplay
-// Purpose : Axiluary method called after displaying of objects
-//=======================================================================
+/*!
+  Auxiliary method called after displaying of objects
+*/
 void SOCC_Viewer::AfterDisplay( SALOME_Displayer* d )
 {
   d->AfterDisplay( this, SALOME_OCCViewType() );
 }
 
-//=======================================================================
-// name    : getTrihedronSize
-// Purpose : Get new and current trihedron size corresponding to the
-//           current model size
-//=======================================================================
+/*!
+  Get new and current trihedron size corresponding to the current model size
+*/
 bool SOCC_Viewer::getTrihedronSize( double& theNewSize, double& theSize )
 {
   theNewSize = 100;
@@ -636,20 +679,20 @@ bool SOCC_Viewer::getTrihedronSize( double& theNewSize, double& theSize )
          fabs( theNewSize - theSize) > theNewSize * EPS;
 }
 
-//=======================================================================
-// name    : Repaint
-// Purpose : 
-//=======================================================================
+
+/*!
+  Updates current viewer
+*/
 void SOCC_Viewer::Repaint()
 {
 //  onAdjustTrihedron();
   getViewer3d()->Update();
 }
 
-//=======================================================================
-// name    : createView
-// Purpose : create SOCC_ViewWindow
-//=======================================================================
+
+/*!
+  create SOCC_ViewWindow
+*/
 SUIT_ViewWindow* SOCC_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   SOCC_ViewWindow* view = new SOCC_ViewWindow(theDesktop, this);

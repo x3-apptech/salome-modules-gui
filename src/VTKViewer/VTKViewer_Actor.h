@@ -77,27 +77,31 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //! Change opacity
   virtual
   void
-  SetOpacity(float theOpacity);
+  SetOpacity(vtkFloatingPointType theOpacity);
 
   //! Get current opacity
   virtual
-  float 
+  vtkFloatingPointType 
   GetOpacity();
 
   //! Change color
   virtual
   void
-  SetColor(float r,float g,float b);
+  SetColor(vtkFloatingPointType r,
+	   vtkFloatingPointType g,
+	   vtkFloatingPointType b);
 
   //! Get current color
   virtual
   void
-  GetColor(float& r,float& g,float& b);
+  GetColor(vtkFloatingPointType& r,
+	   vtkFloatingPointType& g,
+	   vtkFloatingPointType& b);
 
   //! Change color
   virtual
   void
-  SetColor(const float theRGB[3]);
+  SetColor(const vtkFloatingPointType theRGB[3]);
 
   //----------------------------------------------------------------------------
   // For selection mapping purpose
@@ -108,7 +112,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   //! Get coordinates of a node for given object index
   virtual
-  float*
+  vtkFloatingPointType*
   GetNodeCoord(int theObjID);
 
   //! Maps VTK index of a cell to corresponding object index
@@ -184,12 +188,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
     
   //! To calcualte current bounding box
   virtual
-  float* 
+  vtkFloatingPointType* 
   GetBounds();
 
   //! To calcualte current bounding box
   void
-  GetBounds(float bounds[6]);
+  GetBounds(vtkFloatingPointType bounds[6]);
 
   //----------------------------------------------------------------------------
   virtual
@@ -202,7 +206,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   virtual
   void
-  SetSize( const float );
+  SetSize( const vtkFloatingPointType );
 
   virtual
   void 
@@ -215,11 +219,13 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   //! Set ResolveCoincidentTopology parameters
   void
-  SetPolygonOffsetParameters(float factor, float units);
+  SetPolygonOffsetParameters(vtkFloatingPointType factor, 
+			     vtkFloatingPointType units);
 
   //! Get current ResolveCoincidentTopology parameters
   void
-  GetPolygonOffsetParameters(float& factor, float& units);
+  GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
+			     vtkFloatingPointType& units);
 
   virtual
   void
@@ -228,7 +234,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //----------------------------------------------------------------------------
   //! Get current shrink factor
   virtual
-  float
+  vtkFloatingPointType
   GetShrinkFactor();
 
   //! Is the actor is shrunkable
@@ -295,12 +301,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
  protected:
   //----------------------------------------------------------------------------
   bool myIsResolveCoincidentTopology;
-  float myPolygonOffsetFactor;
-  float myPolygonOffsetUnits;
+  vtkFloatingPointType myPolygonOffsetFactor;
+  vtkFloatingPointType myPolygonOffsetUnits;
 
   std::string myName;
 
-  float myOpacity;
+  vtkFloatingPointType myOpacity;
   int myDisplayMode;
   bool myIsInfinite;
 

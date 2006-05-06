@@ -46,10 +46,17 @@
 #include "SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger.hxx"
 #endif
 using namespace std;
+
+/*!
+  Destructor
+*/
 SALOME_DataMapNodeOfDataMapOfIOMapOfInteger::~SALOME_DataMapNodeOfDataMapOfIOMapOfInteger() {}
  
 
 
+/*!
+  \return OCC Handle Type
+*/
 Standard_EXPORT Handle_Standard_Type& SALOME_DataMapNodeOfDataMapOfIOMapOfInteger_Type_()
 {
 
@@ -72,9 +79,9 @@ Standard_EXPORT Handle_Standard_Type& SALOME_DataMapNodeOfDataMapOfIOMapOfIntege
 }
 
 
-// DownCast method
-//   allow safe downcasting
-//
+/*!
+  DownCast method: allows safe downcasting
+*/
 const Handle(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger) Handle(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger)::DownCast(const Handle(Standard_Transient)& AnObject) 
 {
   Handle(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger) _anOtherObject;
@@ -87,14 +94,26 @@ const Handle(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger) Handle(SALOME_DataMapN
 
   return _anOtherObject ;
 }
+
+/*!
+  \return OCC Handle dynamic Type
+*/
 const Handle(Standard_Type)& SALOME_DataMapNodeOfDataMapOfIOMapOfInteger::DynamicType() const 
 { 
   return STANDARD_TYPE(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger) ; 
 }
+
+/*!
+  \return true if other type is the same
+  \param AType - type to be checked
+*/
 Standard_Boolean SALOME_DataMapNodeOfDataMapOfIOMapOfInteger::IsKind(const Handle(Standard_Type)& AType) const 
 { 
   return (STANDARD_TYPE(SALOME_DataMapNodeOfDataMapOfIOMapOfInteger) == AType || TCollection_MapNode::IsKind(AType)); 
 }
+/*!
+  Destructor
+*/
 Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger::~Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger() {}
 #define TheKey Handle_SALOME_InteractiveObject
 #define TheKey_hxx "SALOME_InteractiveObject.hxx"

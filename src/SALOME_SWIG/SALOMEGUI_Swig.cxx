@@ -53,22 +53,22 @@
 
 using namespace std;
 
-//////////////////////////////////////////////////////////////////////////////
-// asv : 3.12.04 : added checking for NULL GUI objects in almost all methods.
-// In the scope of fixing bug PAL6869.
-//////////////////////////////////////////////////////////////////////////////
-// (PR : modify comments)
-// Instance of this class is created every time "import salome" line is typed 
-// - in IAPP embedded Python interpretor  (SALOME_Session_Server executable),
-// - in inline Python nodes in Supervisor (in SALOME_Container executable),
-// - in stand-alone Python console outside any executable.
-// SALOME GUI(desktop and other objects) is only available in SALOME_Session_Server
-//////////////////////////////////////////////////////////////////////////////
-// VSR : 19.04.05 : Reimplemented for new SALOME GUI (SUIT-based)
-// All methods are implemeted using Event mechanism.
-// Display/Erase methods use SALOME_Prs/SALOME_View mechanism. It is currently
-// implemented only for OCC and VTK viewers.
-//////////////////////////////////////////////////////////////////////////////
+/*!
+  asv : 3.12.04 : added checking for NULL GUI objects in almost all methods.
+  In the scope of fixing bug PAL6869.
+
+  (PR : modify comments)
+  Instance of this class is created every time "import salome" line is typed 
+  - in IAPP embedded Python interpretor  (SALOME_Session_Server executable),
+  - in inline Python nodes in Supervisor (in SALOME_Container executable),
+  - in stand-alone Python console outside any executable.
+  SALOME GUI(desktop and other objects) is only available in SALOME_Session_Server
+
+  VSR : 19.04.05 : Reimplemented for new SALOME GUI (SUIT-based)
+  All methods are implemeted using Event mechanism.
+  Display/Erase methods use SALOME_Prs/SALOME_View mechanism. It is currently
+  implemented only for OCC and VTK viewers.
+*/
 
 /*!
   getApplication()
@@ -120,6 +120,10 @@ public:
     myResult = (bool)( getApplication() && getApplication()->desktop() );
   }
 };
+
+/*!
+  \return true if GUI is available.
+*/
 bool SALOMEGUI_Swig::hasDesktop()
 {
   return ProcessEvent( new THasDesktopEvent() );
@@ -160,6 +164,10 @@ public:
     }
   }
 };
+
+/*!
+  \return active study's ID or 0 if there is no active study.
+*/
 int SALOMEGUI_Swig::getActiveStudyId()
 {
   return ProcessEvent( new TGetActiveStudyIdEvent() );
@@ -180,6 +188,10 @@ public:
     }
   }
 };
+
+/*!
+  \return active study's name or NULL if there is no active study.
+*/
 const char* SALOMEGUI_Swig::getActiveStudyName()
 {
   string result = ProcessEvent( new TGetActiveStudyNameEvent() );
@@ -190,20 +202,32 @@ const char* SALOMEGUI_Swig::getActiveStudyName()
   SALOMEGUI_Swig::getComponentName
   Returns the name of the component by its user name.
 */
+class TGetModulCatalogEvent: public SALOME_Event {
+public:
+  typedef CORBA::Object_var TResult;
+  TResult myResult;
+  TGetModulCatalogEvent() : myResult(CORBA::Object::_nil()) {}
+  virtual void Execute() {
+    if (SalomeApp_Application* anApp = getApplication())
+      myResult = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
+  }
+};
+
+/*!
+  \return the name of the component by its user name.
+*/
 const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
 {
-  if ( SalomeApp_Application* anApp = getApplication() ) { 
-    CORBA::Object_var anObject = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
-    if ( !CORBA::is_nil( anObject ) ) {
-      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
-        SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
-      SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
-      for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-	CORBA::String_var aModuleName     = aModules[ ind ].modulename;
-	CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
-	if ( strcmp(componentUserName, aModuleUserName.in()) == 0 )
-	  return aModuleName._retn();
-      }
+  CORBA::Object_var anObject = ProcessEvent(new TGetModulCatalogEvent());
+  if (!CORBA::is_nil(anObject)) {
+    SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
+      SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
+    SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
+    for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
+      CORBA::String_var aModuleName     = aModules[ ind ].modulename;
+      CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
+      if ( strcmp(componentUserName, aModuleUserName.in()) == 0 )
+        return aModuleName._retn();
     }
   }
   return 0;
@@ -215,18 +239,16 @@ const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
 */
 const char* SALOMEGUI_Swig::getComponentUserName( const char* componentName )
 {
-  if ( SalomeApp_Application* anApp = getApplication() ) { 
-    CORBA::Object_var anObject = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
-    if ( !CORBA::is_nil( anObject ) ) {
-      SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
-        SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
-      SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
-      for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-	CORBA::String_var aModuleName     = aModules[ ind ].modulename;
-	CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
-	if ( strcmp(componentName, aModuleName.in()) == 0 )
-	  return aModuleUserName._retn();
-      }
+  CORBA::Object_var anObject = ProcessEvent(new TGetModulCatalogEvent());
+  if (!CORBA::is_nil(anObject)) {
+    SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
+      SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
+    SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
+    for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
+      CORBA::String_var aModuleName     = aModules[ ind ].modulename;
+      CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
+      if ( strcmp(componentName, aModuleName.in()) == 0 )
+        return aModuleUserName._retn();
     }
   }
   return 0;
@@ -253,6 +275,10 @@ public:
     }
   }
 };
+
+/*!
+  \return the number of selected objects.
+*/
 int SALOMEGUI_Swig::SelectedCount()
 {
   return ProcessEvent( new TSelectedCountEvent() );
@@ -290,6 +316,10 @@ public:
     }
   }
 };
+
+/*!
+  \return the selected object entry by the given index.
+*/
 const char* SALOMEGUI_Swig::getSelected( int index )
 {
   QString result = ProcessEvent( new TGetSelectedEvent( index ) );
@@ -530,6 +560,11 @@ public:
     }
   }
 };
+
+/*!
+  \return TRUE if the object with given entry is in the current viewer.
+  VSR: For the current moment implemented for OCC and VTK viewers only.
+*/
 bool SALOMEGUI_Swig::IsInCurrentView( const char* theEntry )
 {
   return ProcessEvent( new TIsInViewerEvent( theEntry ) );

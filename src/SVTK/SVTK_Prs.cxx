@@ -29,55 +29,40 @@
 #include "SVTK_Prs.h"
 using namespace std;
 
-//==========================================================
 /*!
- *  SVTK_Prs::SVTK_Prs
- *  Default constructor
- */
-//==========================================================
+  Default constructor
+*/
 SVTK_Prs::SVTK_Prs() : myObjects( 0 )
 {
 }
  
-//==========================================================
 /*!
- *  SVTK_Prs::SVTK_Prs
- *  tandard constructora
- */
-//==========================================================
+  Standard constructor
+*/
 SVTK_Prs::SVTK_Prs( const vtkActor* obj ) 
 { 
   AddObject( obj ); 
 }
 
-//==========================================================
 /*!
- *  SVTK_Prs::~SVTK_Prs
- *  Destructor
- */
-//==========================================================
+  Destructor
+*/
 SVTK_Prs:: ~SVTK_Prs() 
 { 
   if ( myObjects ) myObjects->Delete(); 
 }
 
-//==========================================================
 /*!
- *  SVTK_Prs::GetObjects
- *  Get actors list
- */
-//==========================================================
+  \return actors list
+*/
 vtkActorCollection* SVTK_Prs::GetObjects() const 
 { 
   return myObjects; 
 }
 
-//==========================================================
 /*!
- *  SVTK_Prs::AddObject
- *  Add actor
- */
-//==========================================================
+  Add actor
+*/
 void SVTK_Prs::AddObject( const vtkActor* obj ) 
 { 
   if ( !myObjects) 
@@ -85,13 +70,9 @@ void SVTK_Prs::AddObject( const vtkActor* obj )
   myObjects->AddItem( (vtkActor*)obj ); 
 }
   
-//==========================================================
 /*!
- *  SVTK_Prs::IsNull
- *  Return 0 if list of the actors is empty
- *  [ Reimplemented from SALOME_Prs ]
- */
-//==========================================================
+  \return 0 if list of the actors is empty [ Reimplemented from SALOME_Prs ]
+*/
 bool SVTK_Prs::IsNull() const 
 { 
   return !myObjects || myObjects->GetNumberOfItems() <= 0; 

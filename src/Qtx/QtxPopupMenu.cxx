@@ -45,6 +45,9 @@ private:
   int           myAlign;
 };
 
+/*!
+  Constructor
+*/
 QtxPopupMenu::TitleMenuItem::TitleMenuItem( const QString& txt, const QIconSet& ico, const int align )
 : QCustomMenuItem(),
 myText( txt ),
@@ -53,26 +56,42 @@ myAlign( align )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxPopupMenu::TitleMenuItem::~TitleMenuItem()
 {
 }
 
+/*!
+  \return  TRUE if this item wants to span the entire popup menu width  
+*/
 bool QtxPopupMenu::TitleMenuItem::fullSpan() const
 {
   return true;
 }
 
+/*!
+  \return TRUE if this item is just a separator
+*/
 bool QtxPopupMenu::TitleMenuItem::isSeparator() const
 {
   return false;
 }
 
+/*!
+  Changes font of item
+  \param font - new font
+*/
 void QtxPopupMenu::TitleMenuItem::setFont( const QFont& font )
 {
   myFont = font;
   myFont.setBold( true );
 }
 
+/*!
+  Draws item
+*/
 void QtxPopupMenu::TitleMenuItem::paint( QPainter* p, const QColorGroup& cg,
                                          bool act, bool enabled, int x, int y, int w, int h )
 {
@@ -119,6 +138,9 @@ void QtxPopupMenu::TitleMenuItem::paint( QPainter* p, const QColorGroup& cg,
   p->setFont( f );
 }
 
+/*!
+  \return the recommended size for item
+*/
 QSize QtxPopupMenu::TitleMenuItem::sizeHint()
 {
   QFontMetrics fM( myFont );
@@ -132,10 +154,8 @@ QSize QtxPopupMenu::TitleMenuItem::sizeHint()
 }
 
 /*!
-    Class: QtxPopupMenu [Public]
-    Descr: Popup menu item with title.
+  Constructor
 */
-
 QtxPopupMenu::QtxPopupMenu( QWidget* parent, const char* name )
 : QPopupMenu( parent, name ),
 myId( -1 ),
@@ -144,30 +164,49 @@ myAlign( AlignCenter )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxPopupMenu::~QtxPopupMenu()
 {
 }
 
+/*!
+  \return popup menu title
+*/
 QString QtxPopupMenu::titleText() const
 {
   return myText;
 }
 
+/*!
+  \return popup menu icon
+*/
 QIconSet QtxPopupMenu::titleIcon() const
 {
   return myIcon;
 }
 
+/*!
+  \return popup menu title policy
+*/
 int QtxPopupMenu::titlePolicy() const
 {
   return myPolicy;
 }
 
+/*!
+  \return popup menu title alignment
+*/
 int QtxPopupMenu::titleAlignment() const
 {
   return myAlign;
 }
 
+/*!
+  Changes title text
+  \param txt - new text
+*/
 void QtxPopupMenu::setTitleText( const QString& txt )
 {
   if ( myText == txt )
@@ -178,6 +217,10 @@ void QtxPopupMenu::setTitleText( const QString& txt )
   updateTitle();
 }
 
+/*!
+  Changes title icon
+  \param icon - new icon
+*/
 void QtxPopupMenu::setTitleIcon( const QIconSet& ico )
 {
   myIcon = ico;
@@ -185,6 +228,10 @@ void QtxPopupMenu::setTitleIcon( const QIconSet& ico )
   updateTitle();
 }
 
+/*!
+  Changes title policy
+  \param p - new policy
+*/
 void QtxPopupMenu::setTitlePolicy( const int p )
 {
   if ( myPolicy == p )
@@ -195,6 +242,10 @@ void QtxPopupMenu::setTitlePolicy( const int p )
   updateTitle();
 }
 
+/*!
+  Changes title alignment
+  \param a - new alignment
+*/
 void QtxPopupMenu::setTitleAlignment( const int a )
 {
   if ( myAlign == a )
@@ -205,6 +256,9 @@ void QtxPopupMenu::setTitleAlignment( const int a )
   updateTitle();
 }
 
+/*!
+  Shows menu
+*/
 void QtxPopupMenu::show()
 {
   insertTitle();
@@ -212,6 +266,9 @@ void QtxPopupMenu::show()
   QPopupMenu::show();
 }
 
+/*!
+  Hides menu
+*/
 void QtxPopupMenu::hide()
 {
   QPopupMenu::hide();
@@ -219,12 +276,21 @@ void QtxPopupMenu::hide()
   removeTitle();
 }
 
+/*!
+  Creates title item
+  \param txt - item text
+  \param icon - item icon
+  \param align - item alignment
+*/
 QtxPopupMenu::TitleMenuItem* QtxPopupMenu::createTitleItem( const QString& txt, const QIconSet& ico,
                                                             const int align ) const
 {
   return new TitleMenuItem( txt, ico, align );
 }
 
+/*!
+  Inserts title item to popup menu
+*/
 void QtxPopupMenu::insertTitle()
 {
   if ( myId != -1 || titlePolicy() == TitleOff ||
@@ -237,6 +303,9 @@ void QtxPopupMenu::insertTitle()
   setItemEnabled( myId, false );
 }
 
+/*!
+  Removes title item from popup menu
+*/
 void QtxPopupMenu::removeTitle()
 {
   if ( myId == -1 )
@@ -246,6 +315,9 @@ void QtxPopupMenu::removeTitle()
   myId = -1;
 }
 
+/*!
+  Updates title item
+*/
 void QtxPopupMenu::updateTitle()
 {
   if ( myId != -1 )

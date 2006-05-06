@@ -55,13 +55,13 @@ void VTKViewer_ShrinkFilter::Execute()
   int i, j, numIds, abort=0;
   vtkIdType cellId, numCells, numPts;
   vtkIdType oldId, newId;
-  float center[3], *p, pt[3];
+  vtkFloatingPointType center[3], *p, pt[3];
   vtkPointData *pd, *outPD;;
   vtkIdList *ptIds, *newPtIds;
   vtkDataSet *input= this->GetInput();
   vtkUnstructuredGrid *output = this->GetOutput();
   vtkIdType tenth;
-  float decimal;
+  vtkFloatingPointType decimal;
 
   vtkDebugMacro(<<"Shrinking cells");
 

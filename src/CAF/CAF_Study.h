@@ -34,6 +34,12 @@ class CAF_Application;
 #pragma warning ( disable: 4251 )
 #endif
 
+/*!
+  \class CAF_Study
+  Represents study for using in CAF, contains reference
+  to OCAF std document and allows to use OCAF services.
+  Provides necessary functionality for OCC transactions management.
+*/
 class CAF_EXPORT CAF_Study : public SUIT_Study
 {
   Q_OBJECT

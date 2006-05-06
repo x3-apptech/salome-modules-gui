@@ -61,7 +61,7 @@ int LightApp_Preferences::addPreference( const QString& mod, const QString& labe
   return id;
 }
 
-/*
+/*!
   Checks: is preferences has module with name \a mod.
 */
 bool LightApp_Preferences::hasModule( const QString& mod ) const

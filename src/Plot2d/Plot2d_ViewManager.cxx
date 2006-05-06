@@ -22,6 +22,9 @@
 
 int Plot2d_ViewManager::myMaxId = 0;
 
+/*!
+  Constructor
+*/
 Plot2d_ViewManager::Plot2d_ViewManager( SUIT_Study* study, SUIT_Desktop* desk ) 
 : SUIT_ViewManager( study, desk )
 {
@@ -30,21 +33,35 @@ Plot2d_ViewManager::Plot2d_ViewManager( SUIT_Study* study, SUIT_Desktop* desk )
   setViewModel( v );
 }
 
+/*!
+  Destructor
+*/
 Plot2d_ViewManager::~Plot2d_ViewManager()
 {
 }
 
+/*!
+  \return corresponding viewer
+*/
 Plot2d_Viewer* Plot2d_ViewManager::getPlot2dModel() const
 {
   return (Plot2d_Viewer*)myViewModel;
 }
 
+/*!
+  Sets default name of view
+  \param the View - view to be renamed
+*/
 void Plot2d_ViewManager::setViewName( SUIT_ViewWindow* theView )
 {
   int aPos = myViews.find(theView);
   theView->setCaption( QString( "Plot2d scene:%1 - viewer:%2" ).arg(myId).arg(aPos+1));
 }
 
+/*!
+  Adds new view
+  \param theView - view to be added
+*/
 bool Plot2d_ViewManager::insertView( SUIT_ViewWindow* theView )
 {
   bool res = SUIT_ViewManager::insertView( theView );
@@ -56,11 +73,17 @@ bool Plot2d_ViewManager::insertView( SUIT_ViewWindow* theView )
   return res;
 }
 
+/*!
+  Creates new view
+*/
 void Plot2d_ViewManager::createView()
 {
   createViewWindow();
 }
 
+/*!
+  SLOT: called if action "Clone view" is activated, emits signal cloneView()
+*/
 void Plot2d_ViewManager::onCloneView()
 {
   SUIT_ViewWindow* vw = createViewWindow();

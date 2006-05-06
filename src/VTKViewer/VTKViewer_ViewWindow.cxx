@@ -387,7 +387,7 @@ void VTKViewer_ViewWindow::onResetView()
   ::ResetCamera(myRenderer,true);  
   if(aTriedronIsVisible) myTrihedron->VisibilityOn();
   else myTrihedron->VisibilityOff();
-  static float aCoeff = 3.0;
+  static vtkFloatingPointType aCoeff = 3.0;
   aCamera->SetParallelScale(aCoeff*aCamera->GetParallelScale());
   Repaint();
 }
@@ -409,7 +409,7 @@ void VTKViewer_ViewWindow::setBackgroundColor( const QColor& color )
 /*!Returns background of the viewport*/
 QColor VTKViewer_ViewWindow::backgroundColor() const
 {
-  float backint[3];
+  vtkFloatingPointType backint[3];
   if ( myRenderer ) {
     myRenderer->GetBackground( backint );
     return QColor(int(backint[0]*255), int(backint[1]*255), int(backint[2]*255));
@@ -443,11 +443,11 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
   int aVisibleNum = myTrihedron->GetVisibleActorCount(myRenderer);
   if(aVisibleNum){
     // calculating diagonal of visible props of the renderer
-    float bnd[6];
+    vtkFloatingPointType bnd[6];
     myTrihedron->VisibilityOff();
     ::ComputeVisiblePropBounds(myRenderer,bnd);
     myTrihedron->VisibilityOn();
-    float aLength = 0;
+    vtkFloatingPointType aLength = 0;
     static bool CalcByDiag = false;
     if(CalcByDiag){
       aLength = sqrt((bnd[1]-bnd[0])*(bnd[1]-bnd[0])+
@@ -459,13 +459,13 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
       aLength = max((bnd[5]-bnd[4]),aLength);
     }
    
-    static float aSizeInPercents = 105;
+    static vtkFloatingPointType aSizeInPercents = 105;
     QString aSetting;// = SUIT_CONFIG->getSetting("Viewer:TrihedronSize");
     if(!aSetting.isEmpty()) aSizeInPercents = aSetting.toFloat();
 
-    static float EPS_SIZE = 5.0E-3;
-    float aSize = myTrihedron->GetSize();
-    float aNewSize = aLength*aSizeInPercents/100.0;
+    static vtkFloatingPointType EPS_SIZE = 5.0E-3;
+    vtkFloatingPointType aSize = myTrihedron->GetSize();
+    vtkFloatingPointType aNewSize = aLength*aSizeInPercents/100.0;
     // if the new trihedron size have sufficient difference, then apply the value
     if(fabs(aNewSize-aSize) > aSize*EPS_SIZE || fabs(aNewSize-aSize) > aNewSize*EPS_SIZE){
       myTrihedron->SetSize(aNewSize);
@@ -580,7 +580,7 @@ QString VTKViewer_ViewWindow::getVisualParameters()
   return retStr;
 }
 
-/* The method restors visual parameters of this view from a formated string
+/*! The method restors visual parameters of this view from a formated string
  */
 void VTKViewer_ViewWindow::setVisualParameters( const QString& parameters )
 {

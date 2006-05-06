@@ -3,6 +3,7 @@ dnl Copyright (C) 2003  CEA/DEN, EDF R&D
 AC_DEFUN([CHECK_SIP],[
 AC_REQUIRE([CHECK_PYTHON])dnl
 AC_REQUIRE([CHECK_QT])dnl
+AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 
 sip_ok=yes
 
@@ -110,44 +111,44 @@ else
 	fi
 
         if test "x$sip_lib_ok" == "xno" ; then
-            dnl look for (lib)sip.so in ${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages
-	    if test -d ${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages ; then
-		AC_CHECK_FILE(${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
+            dnl look for (lib)sip.so in ${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+	    if test -d ${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages ; then
+		AC_CHECK_FILE(${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
       	        if test "x$sip_lib_ok" == "xyes" ; then
-	            SIP_LIBS="-L${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages -lsip"
+	            SIP_LIBS="-L${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lsip"
 	        else
-	            AC_CHECK_FILE(${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
+	            AC_CHECK_FILE(${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
 	            if test "x$sip_lib_ok" == "xyes" ; then
-	                SIP_LIBS="-L${SIPDIR}/lib/python${PYTHON_VERSION}/site-packages"
+	                SIP_LIBS="-L${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
 	            fi
 		fi
 	    fi
 	fi
     fi
     if test "x$sip_lib_ok" == "xno" ; then
-        dnl look for (lib)sip.so in ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages
-	if test -d ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages ; then
-            AC_CHECK_FILE(${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
+        dnl look for (lib)sip.so in ${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+	if test -d ${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages ; then
+            AC_CHECK_FILE(${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
 	    if test "x$sip_lib_ok" == "xyes" ; then
-	        SIP_LIBS="-L${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages -lsip"
+	        SIP_LIBS="-L${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lsip"
 	    else
-	        AC_CHECK_FILE(${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
+	        AC_CHECK_FILE(${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
                 if test "x$sip_lib_ok" == "xyes" ; then
-	            SIP_LIBS="-L${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/site-packages"
+	            SIP_LIBS="-L${PYTHON_PREFIX}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
                 fi
 	    fi
 	fi
     fi
     if test "x$sip_lib_ok" == "xno" ; then
-        dnl look for (lib)sip.so in /usr/lib/python${PYTHON_VERSION}/site-packages
-	if test -d /usr/lib/python${PYTHON_VERSION}/site-packages ; then
-            AC_CHECK_FILE(/usr/lib/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
+        dnl look for (lib)sip.so in /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+	if test -d /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages ; then
+            AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libsip.so,sip_lib_ok=yes,sip_lib_ok=no)
 	    if test "x$sip_lib_ok" == "xyes" ; then
-	        SIP_LIBS="-L$/usr/lib/python${PYTHON_VERSION}/site-packages -lsip"
+	        SIP_LIBS="-L$/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lsip"
 	    else
-	        AC_CHECK_FILE(/usr/lib/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
+	        AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/sip.so,sip_lib_ok=yes,sip_lib_ok=no)
                 if test "x$sip_lib_ok" == "xyes" ; then
-	            SIP_LIBS="-L/usr/lib/python${PYTHON_VERSION}/site-packages"
+	            SIP_LIBS="-L/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
 	        fi
             fi
 	fi

@@ -20,6 +20,9 @@
 
 int SUPERVGraph_ViewManager::myMaxId = 0;
 
+/*!
+  Constructor
+*/
 SUPERVGraph_ViewManager::SUPERVGraph_ViewManager( SUIT_Study* theStudy, 
 						  SUIT_Desktop* theDesktop, 
 						  SUIT_ViewModel* theViewModel )
@@ -28,16 +31,27 @@ SUPERVGraph_ViewManager::SUPERVGraph_ViewManager( SUIT_Study* theStudy,
   myId = ++myMaxId;
 }
 
+/*!
+  Destructor
+*/
 SUPERVGraph_ViewManager::~SUPERVGraph_ViewManager()
 {
 }
 
+/*!
+  Sets view name
+  \param theView - view to assign name
+*/
 void SUPERVGraph_ViewManager::setViewName(SUIT_ViewWindow* theView)
 {
   int aPos = myViews.find(theView);
   theView->setCaption( QString( "SUPERVISION  scene:%1 - viewer:%2" ).arg( myId ).arg(aPos+1));
 }
 
+/*!
+  Fills popup menu with custom actions
+ \param popup - popup menu to be filled with
+*/
 void SUPERVGraph_ViewManager::contextMenuPopup( QPopupMenu* thePopup)
 {
   SUIT_ViewManager::contextMenuPopup( thePopup );

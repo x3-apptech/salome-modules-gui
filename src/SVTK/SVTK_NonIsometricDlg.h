@@ -29,7 +29,7 @@
 #ifndef SVTK_NONISOMETRICDLG_H
 #define SVTK_NONISOMETRICDLG_H
 
-#include <qdialog.h>
+#include "SVTK_DialogBase.h"
 
 class SVTK_MainWindow;
 
@@ -39,14 +39,14 @@ class QtxAction;
 class QPushButton;
 
 
-class SVTK_NonIsometricDlg : public QDialog
+class SVTK_NonIsometricDlg : public SVTK_DialogBase
 {
   Q_OBJECT;
 
 public:
-  SVTK_NonIsometricDlg(SVTK_MainWindow* theParent,
-		       const char* theName,
-		       QtxAction* theAction);
+  SVTK_NonIsometricDlg(QtxAction* theAction,
+		       SVTK_MainWindow* theParent,
+		       const char* theName);
 
   ~SVTK_NonIsometricDlg();
 
@@ -54,7 +54,6 @@ public:
 
 protected:
   SVTK_MainWindow *m_MainWindow;
-  QtxAction* m_Action;
 
   QtxDblSpinBox* m_sbXcoeff;
   QtxDblSpinBox* m_sbYcoeff;
@@ -66,8 +65,6 @@ protected slots:
   void onClickReset();
   void onClickOk();
   void onClickClose();
-
-  virtual void done( int );
 };
 
 #endif // SVTK_NONISOMETRICDLG_H

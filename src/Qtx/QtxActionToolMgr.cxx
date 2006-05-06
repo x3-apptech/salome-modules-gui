@@ -27,21 +27,36 @@
 #include <qmainwindow.h>
 #include <qobjectlist.h>
 
+/*!
+  Constructor
+*/
 QtxActionToolMgr::QtxActionToolMgr( QMainWindow* p )
 : QtxActionMgr( p ),
 myMainWindow( p )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxActionToolMgr::~QtxActionToolMgr()
 {
 }
 
+/*!
+  \return desktop
+*/
 QMainWindow* QtxActionToolMgr::mainWindow() const
 {
   return myMainWindow;
 }
 
+/*!
+  Creates toolbar 
+  \return id of just created toolbar
+  \param name - name of toolbar
+  \param tid - proposed id (if such id is used already, then it will be returned without creation)
+*/
 int QtxActionToolMgr::createToolBar( const QString& name, const int tid )
 {
   static int _toolBarId = -1;
@@ -75,6 +90,11 @@ int QtxActionToolMgr::createToolBar( const QString& name, const int tid )
   return tbId;
 }
 
+/*!
+  \return toolbar by title
+  \param label - toolbar title
+  \param mw - desktop
+*/
 QToolBar* QtxActionToolMgr::find( const QString& label, QMainWindow* mw ) const
 {
   if ( !mw )
@@ -96,6 +116,10 @@ QToolBar* QtxActionToolMgr::find( const QString& label, QMainWindow* mw ) const
   return res;
 }
 
+/*!
+  Removes toolbar
+  \param tid - toolbar id
+*/
 void QtxActionToolMgr::removeToolBar( const int tid )
 {
   if ( !myToolBars.contains( tid ) )
@@ -105,15 +129,28 @@ void QtxActionToolMgr::removeToolBar( const int tid )
   myToolBars.remove( tid );
 }
 
+/*!
+  Removes toolbar
+  \param tname - toolbar name
+*/
 void QtxActionToolMgr::removeToolBar( const QString& tname )
 {
   removeToolBar( find( tname ) );
 }
 
+/*!
+  Insert action into toolbar
+  \param id - identificator of action
+  \param tId - identificator of toolbar
+  \param idx - position inside toolbar
+*/
 int QtxActionToolMgr::insert( const int id, const int tid, const int idx )
 {
   if ( !contains( id ) || !hasToolBar( tid ) )
     return -1;
+
+  if ( containsAction( id, tid ) )
+    remove( id, tid );
 
   ToolNode node;
   node.id = id;
@@ -126,61 +163,124 @@ int QtxActionToolMgr::insert( const int id, const int tid, const int idx )
   return id;
 }
 
+/*!
+  Insert action into toolbar
+  \param act - action
+  \param tId - identificator of toolbar
+  \param pos - position inside toolbar
+*/
 int QtxActionToolMgr::insert( QAction* act, const int tid, const int pos )
 {
   return insert( registerAction( act ), tid, pos );
 }
 
+/*!
+  Insert action into toolbar
+  \param id - identificator of action
+  \param tname - name of toolbar
+  \param pos - position inside toolbar
+*/
 int QtxActionToolMgr::insert( const int id, const QString& tname, const int pos )
 {
   return insert( id, createToolBar( tname ), pos );
 }
 
+/*!
+  Insert action into toolbar
+  \param act - action
+  \param tname - name of toolbar
+  \param pos - position inside toolbar
+*/
 int QtxActionToolMgr::insert( QAction* act, const QString& tname, const int pos )
 {
   return insert( registerAction( act ), createToolBar( tname ), pos );
 }
 
+/*!
+  Append action into toolbar as last toolbutton
+  \param id - identificator of action
+  \param tId - identificator of toolbar
+*/
 int QtxActionToolMgr::append( const int id, const int tid )
 {
   return insert( id, tid );
 }
 
+/*!
+  Append action into toolbar as last toolbutton
+  \param act - action
+  \param tId - identificator of toolbar
+*/
 int QtxActionToolMgr::append( QAction* act, const int tid )
 {
   return insert( act, tid );
 }
 
+/*!
+  Append action into toolbar as last toolbutton
+  \param id - identificator of action
+  \param tname - toolbar name
+*/
 int QtxActionToolMgr::append( const int id, const QString& tname )
 {
   return insert( id, tname );
 }
 
+/*!
+  Append action into toolbar as last toolbutton
+  \param act - action
+  \param tname - toolbar name
+*/
 int QtxActionToolMgr::append( QAction* act, const QString& tname )
 {
   return insert( act, tname );
 }
 
+/*!
+  Append action into toolbar as first toolbutton
+  \param id - identificator of action
+  \param tId - identificator of toolbar
+*/
 int QtxActionToolMgr::prepend( const int id, const int tid )
 {
   return insert( id, tid, 0 );
 }
 
+/*!
+  Append action into toolbar as first toolbutton
+  \param act - action
+  \param tId - identificator of toolbar
+*/
 int QtxActionToolMgr::prepend( QAction* act, const int tid )
 {
   return insert( act, tid, 0 );
 }
 
+/*!
+  Append action into toolbar as first toolbutton
+  \param id - identificator of action
+  \param tname - toolbar name
+*/
 int QtxActionToolMgr::prepend( const int id, const QString& tname )
 {
   return insert( id, tname, 0 );
 }
 
+/*!
+  Append action into toolbar as first toolbutton
+  \param act - action
+  \param tname - toolbar name
+*/
 int QtxActionToolMgr::prepend( QAction* act, const QString& tname )
 {
   return insert( act, tname, 0 );
 }
 
+/*!
+  Remove action from toolbar
+  \param id - identificator of action
+  \param tId - identificator of toolbar
+*/
 void QtxActionToolMgr::remove( const int id, const int tid )
 {
   if ( !myToolBars.contains( tid ) )
@@ -199,11 +299,20 @@ void QtxActionToolMgr::remove( const int id, const int tid )
   updateToolBar( tid );
 }
 
+/*!
+  Remove action from toolbar
+  \param id - identificator of action
+  \param tname - name of toolbar
+*/
 void QtxActionToolMgr::remove( const int id, const QString& tname )
 {
   remove( id, find( tname ) );
 }
 
+/*!
+  \return toolbar by it's id
+  \param tId - identificator of toolbar
+*/
 QToolBar* QtxActionToolMgr::toolBar( const int tid ) const
 {
   QToolBar* tb = 0;
@@ -212,21 +321,38 @@ QToolBar* QtxActionToolMgr::toolBar( const int tid ) const
   return tb;
 }
 
+/*!
+  \return toolbar by it's name
+  \param tname - name of toolbar
+*/
 QToolBar* QtxActionToolMgr::toolBar( const QString& tname ) const
 {
   return toolBar( find( tname ) );
 }
 
+/*!
+  \return true if manager contains toolbar with such id
+  \param tId - identificator of toolbar
+*/
 bool QtxActionToolMgr::hasToolBar( const int tid ) const
 {
   return myToolBars.contains( tid );
 }
 
+/*!
+  \return true if manager contains toolbar with such name
+  \param tname - name of toolbar
+*/
 bool QtxActionToolMgr::hasToolBar( const QString& tname ) const
 {
   return find( tname ) != -1;
 }
 
+/*!
+  \return true if toolbar contains action
+  \param id - identificator of action
+  \param tId - identificator of toolbar
+*/
 bool QtxActionToolMgr::containsAction( const int id, const int tid ) const
 {
   for ( ToolBarMap::ConstIterator it = myToolBars.begin(); it != myToolBars.end(); ++it )
@@ -241,11 +367,18 @@ bool QtxActionToolMgr::containsAction( const int id, const int tid ) const
   return false;
 }
 
+/*!
+  SLOT: called when toolbar is destroyed, removes just destroyed toolbar from map
+*/
 void QtxActionToolMgr::onToolBarDestroyed()
 {
   myToolBars.remove( find( (QToolBar*)sender() ) );
 }
 
+/*!
+  \return id of toolbar by it's name
+  \param tname - name of toolbar
+*/
 int QtxActionToolMgr::find( const QString& tname ) const
 {
   int id = -1;
@@ -257,6 +390,10 @@ int QtxActionToolMgr::find( const QString& tname ) const
   return id;
 }
 
+/*!
+  \return id of toolbar
+  \param t - toolbar
+*/
 int QtxActionToolMgr::find( QToolBar* t ) const
 {
   int id = -1;
@@ -268,6 +405,10 @@ int QtxActionToolMgr::find( QToolBar* t ) const
   return id;
 }
 
+/*!
+  Updates toolbar
+  \param tId - toolbar id
+*/
 void QtxActionToolMgr::updateToolBar( const int tId )
 {
   if ( !isUpdatesEnabled() )
@@ -301,34 +442,57 @@ void QtxActionToolMgr::updateToolBar( const int tId )
   simplifySeparators( tb );
 }
 
+/*!
+  Updates all toolbars
+*/
 void QtxActionToolMgr::internalUpdate()
 {
   for ( ToolBarMap::ConstIterator it1 = myToolBars.begin(); it1 != myToolBars.end(); ++it1 )
     updateToolBar( it1.key() );
 }
 
+/*!
+  Removes excess separators from toolbar
+*/
 void QtxActionToolMgr::simplifySeparators( QToolBar* t )
 {
   if ( t )
     Qtx::simplifySeparators( t );
 }
 
+/*!
+  Shows action in all toolbars
+  \param actId - action id
+*/
 void QtxActionToolMgr::show( const int actId )
 {
   setShown( actId, true );
 }
 
+/*!
+  Hides action in all toolbars
+  \param actId - action id
+*/
 void QtxActionToolMgr::hide( const int actId )
 {
   setShown( actId, false );
 }
 
+/*!
+  Changes shown status of action in all toolbars
+  \param id - action id
+  \param on - new shown status
+*/
 void QtxActionToolMgr::setShown( const int id, const bool on )
 {
   for ( ToolBarMap::Iterator it = myToolBars.begin(); it != myToolBars.end(); ++it )
     setVisible( id, it.key(), on );
 }
 
+/*!
+  \return true if action is shown in all toolbars
+  \param id - action id
+*/
 bool QtxActionToolMgr::isShown( const int id ) const
 {
   QPtrList<ToolNode> nodes;
@@ -353,6 +517,11 @@ bool QtxActionToolMgr::isShown( const int id ) const
   return vis;
 }
 
+/*!
+  \return shown status of action in toolbar
+  \param id - action id
+  \param tId - toolbar id
+*/
 bool QtxActionToolMgr::isVisible( const int id, const int tId ) const
 {
   if ( !myToolBars.contains( tId ) )
@@ -369,6 +538,12 @@ bool QtxActionToolMgr::isVisible( const int id, const int tId ) const
   return vis;
 }
 
+/*!
+  Changes action shown status in certain toolbar
+  \param id - action id
+  \param tId - toolbar id
+  \param on - new shown status
+*/
 void QtxActionToolMgr::setVisible( const int id, const int tId, const bool on )
 {
   if ( !myToolBars.contains( tId ) )
@@ -390,6 +565,11 @@ void QtxActionToolMgr::setVisible( const int id, const int tId, const bool on )
     updateToolBar( tId );
 }
 
+/*!
+  Loads toolbar content from file
+  \param fname - file name
+  \param r - reader
+*/
 bool QtxActionToolMgr::load( const QString& fname, QtxActionMgr::Reader& r )
 {
   ToolCreator cr( &r, this );
@@ -398,8 +578,7 @@ bool QtxActionToolMgr::load( const QString& fname, QtxActionMgr::Reader& r )
 
 
 /*!
-	Class: QtxActionToolMgr::ToolCreator
-	Level: Public
+  Constructor
 */
 QtxActionToolMgr::ToolCreator::ToolCreator( QtxActionMgr::Reader* r,
                                             QtxActionToolMgr* mgr )
@@ -408,10 +587,20 @@ QtxActionToolMgr::ToolCreator::ToolCreator( QtxActionMgr::Reader* r,
 {
 }
 
+/*!
+  Destructor
+*/
 QtxActionToolMgr::ToolCreator::~ToolCreator()
 {
 }
 
+/*!
+  Appends new tool buttons
+  \param tag - tag of toolmenu
+  \param subMenu - it has submenu (not used here)
+  \param attr - list of attributes
+  \param pId - id of action corresponding to parent item
+*/
 int QtxActionToolMgr::ToolCreator::append( const QString& tag, const bool subMenu,
                                            const ItemAttributes& attr, const int tId )
 {  

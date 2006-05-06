@@ -1,3 +1,21 @@
+#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/
+#
 # -* Makefile *- 
 #
 # Author : Patrick GOLDBRONN (CEA)
@@ -14,13 +32,7 @@ VPATH=.:@srcdir@:@top_srcdir@/bin:./bin/salome:@top_srcdir@/resources:./bin:@top
 
 @COMMENCE@
 
-SUBDIRS = src
-
-ifeq ($(GUI_DISABLE_CORBA),no)
-  SUBDIRS+= idl
-endif
-
-SUBDIRS+= doc adm_local
+SUBDIRS = src doc adm_local
 
 RESOURCES_FILES = \
 back.xpm \
@@ -124,10 +136,10 @@ include/salome/sstream: salome_adm/unix/sstream
 	-$(RM) $@
 	$(LN_S) ../../$< $@
 
-depend: depend_idl
-
-depend_idl:
-	(cd idl ; $(MAKE) $@) || exit 1
+depend:
+#depend: depend_idl
+#depend_idl:
+#	(cd idl ; $(MAKE) $@) || exit 1
 
 # doc is already build : if you want to had documents, go manually to doc and run 'make doc'
 #doc:
@@ -156,10 +168,10 @@ install-bin: $(BIN_SCRIPT)
 	$(INSTALL) -d  $(bindir)
 	$(INSTALL_PROGRAM) $^ $(bindir)
 
-uninstall: uninstall-idl
-
-uninstall-idl:
-	$(RM) $(idldir)/*.idl
+uninstall:
+#uninstall: uninstall-idl
+#uninstall-idl:
+#	$(RM) $(idldir)/*.idl
 
 distclean: distclean-other
 

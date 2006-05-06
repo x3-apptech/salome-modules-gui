@@ -14,10 +14,10 @@
 
 #include <qdialog.h>
 
-//=================================================================================
-// class    : Plot2d_SetupCurveDlg
-// purpose  : Dialog box for setup Plot2d curve
-//=================================================================================
+/*!
+  \class Plot2d_SetupCurveDlg
+  Dialog box for setup Plot2d curve
+*/
 
 class QPushButton;
 class QComboBox;

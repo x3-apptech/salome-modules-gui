@@ -178,7 +178,7 @@ protected:
   virtual void           setCenter( int x, int y );
   //! Process zoming transformation with mouse tracking from ( x0, y0 ) to ( x1, y1 )
   virtual void           zoom( int x0, int y0, int x1, int y1 );
-  //! Transforms view by certangle
+  //! Transforms view by rectangle
   virtual void           fitRect( const QRect& );
   //! Transforms view by selection
   virtual void           fitSelect();

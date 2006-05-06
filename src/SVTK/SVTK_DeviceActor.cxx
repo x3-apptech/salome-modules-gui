@@ -46,11 +46,11 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(SVTK_DeviceActor);
 
-
-//----------------------------------------------------------------------------
+/*!
+  Constructor
+*/
 SVTK_DeviceActor
 ::SVTK_DeviceActor()
 {
@@ -77,8 +77,9 @@ SVTK_DeviceActor
     myPassFilter.push_back(VTKViewer_PassThroughFilter::New());
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  Destructor
+*/
 SVTK_DeviceActor
 ::~SVTK_DeviceActor()
 {
@@ -96,8 +97,9 @@ SVTK_DeviceActor
     myPassFilter[i]->Delete();
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To insert some additional filters and then sets the given vtkMapper
+*/
 void
 SVTK_DeviceActor
 ::SetMapper(vtkMapper* theMapper)
@@ -105,6 +107,9 @@ SVTK_DeviceActor
   InitPipeLine(theMapper);
 }
 
+/*!
+  To initialize internal pipeline
+*/
 void
 SVTK_DeviceActor
 ::InitPipeLine(vtkMapper* theMapper)
@@ -139,7 +144,9 @@ SVTK_DeviceActor
   Superclass::SetMapper(theMapper);
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Allows to get initial vtkDataSet
+*/
 vtkDataSet* 
 SVTK_DeviceActor
 ::GetInput()
@@ -147,6 +154,9 @@ SVTK_DeviceActor
   return myPassFilter.front()->GetOutput();
 }
 
+/*!
+  Allows to set initial vtkDataSet
+*/
 void
 SVTK_DeviceActor
 ::SetInput(vtkDataSet* theDataSet)
@@ -155,7 +165,9 @@ SVTK_DeviceActor
   InitPipeLine(myMapper);
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To provide VTK to Object and backward mapping
+*/
 void
 SVTK_DeviceActor::
 SetStoreMapping(bool theStoreMapping)
@@ -164,8 +176,9 @@ SetStoreMapping(bool theStoreMapping)
 }
 
 
-
-//----------------------------------------------------------------------------
+/*!
+  \return time of modification
+*/
 unsigned long int 
 SVTK_DeviceActor
 ::GetMTime()
@@ -185,8 +198,10 @@ SVTK_DeviceActor
   return mTime;
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  Apply a view transformation
+  \param theTransform - transformation
+*/
 void 
 SVTK_DeviceActor
 ::SetTransform(VTKViewer_Transform* theTransform)
@@ -194,15 +209,20 @@ SVTK_DeviceActor
   myTransformFilter->SetTransform(theTransform);
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  \return true if actor is shrinkable
+*/
 bool
 SVTK_DeviceActor
 ::IsShrunkable() 
 { 
   return myIsShrinkable;
 }
-  
+
+/*!
+  Changes shrinkable state of actor
+  theIsShrinkable - new shrinkable state
+*/  
 void
 SVTK_DeviceActor
 ::SetShrinkable(bool theIsShrinkable) 
@@ -210,6 +230,9 @@ SVTK_DeviceActor
   myIsShrinkable = theIsShrinkable;
 }
   
+/*!
+  \return true if actor is shrunkable
+*/
 bool
 SVTK_DeviceActor
 ::IsShrunk() 
@@ -217,6 +240,9 @@ SVTK_DeviceActor
   return myIsShrunk;
 }
 
+/*!
+  Insert shrink filter into pipeline
+*/
 void
 SVTK_DeviceActor
 ::SetShrink() 
@@ -231,6 +257,9 @@ SVTK_DeviceActor
   }
 }
 
+/*!
+  Remove shrink filter from pipeline
+*/
 void 
 SVTK_DeviceActor
 ::UnShrink() 
@@ -243,23 +272,32 @@ SVTK_DeviceActor
   }
 }
 
-float
+/*!
+  \return shrink factor
+*/
+vtkFloatingPointType
 SVTK_DeviceActor
 ::GetShrinkFactor()
 {
   return myShrinkFilter->GetShrinkFactor();
 }
 
+/*!
+  Changes shrink factor
+  \param theValue - new shrink factor
+*/
 void 
 SVTK_DeviceActor
-::SetShrinkFactor(float theValue)
+::SetShrinkFactor(vtkFloatingPointType theValue)
 {
   myShrinkFilter->SetShrinkFactor(theValue);
 }
 
 
-
-//----------------------------------------------------------------------------
+/*!
+  Set representation (VTK_SURFACE, VTK_POINTS, VTK_WIREFRAME and so on)
+  param theMode - new mode
+*/
 void
 SVTK_DeviceActor
 ::SetRepresentation(SVTK::Representation::Type theMode)
@@ -311,6 +349,9 @@ SVTK_DeviceActor
   myRepresentation = theMode;
 }
 
+/*!
+  \return current representation mode
+*/
 SVTK::Representation::Type 
 SVTK_DeviceActor
 ::GetRepresentation()
@@ -318,21 +359,29 @@ SVTK_DeviceActor
   return myRepresentation;
 }
 
-float
+/*!
+  \return default point size
+*/
+vtkFloatingPointType
 SVTK_DeviceActor
 ::GetDefaultPointSize()
 {
   return 5;
 }
 
-float
+/*!
+  \return default line width
+*/
+vtkFloatingPointType
 SVTK_DeviceActor
 ::GetDefaultLineWidth()
 {
   return 3;
 }
 
-
+/*!
+  \return true if actor is shaded
+*/
 bool
 SVTK_DeviceActor
 ::IsShaded()
@@ -340,6 +389,10 @@ SVTK_DeviceActor
   return myIsShaded;
 }
 
+/*!
+  Sets shaded state of actor
+  \param theShaded - new shaded state
+*/
 void
 SVTK_DeviceActor
 ::SetShaded(bool theShaded)
@@ -347,8 +400,9 @@ SVTK_DeviceActor
   myIsShaded = theShaded;
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  Maps VTK index of a node to corresponding object index
+*/
 int
 SVTK_DeviceActor
 ::GetNodeObjId(int theVtkID)
@@ -356,7 +410,10 @@ SVTK_DeviceActor
   return theVtkID;
 }
 
-float* 
+/*!
+  Get coordinates of a node for given object index
+*/
+vtkFloatingPointType* 
 SVTK_DeviceActor
 ::GetNodeCoord(int theObjID)
 {
@@ -364,6 +421,9 @@ SVTK_DeviceActor
 }
 
 
+/*!
+  Get corresponding #vtkCell for given object index
+*/
 vtkCell* 
 SVTK_DeviceActor
 ::GetElemCell(int theObjID)
@@ -371,6 +431,9 @@ SVTK_DeviceActor
   return GetInput()->GetCell(theObjID);
 }
 
+/*!
+  Maps VTK index of a cell to corresponding object index
+*/
 int
 SVTK_DeviceActor
 ::GetElemObjId(int theVtkID) 
@@ -378,15 +441,16 @@ SVTK_DeviceActor
   return theVtkID;
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  Renders actor
+*/
 void
 SVTK_DeviceActor
 ::Render(vtkRenderer *ren, vtkMapper* m)
 {
   if(myIsResolveCoincidentTopology){
     int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
-    float aFactor, aUnit; 
+    vtkFloatingPointType aFactor, aUnit; 
     vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
     
     vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
@@ -401,18 +465,27 @@ SVTK_DeviceActor
   }
 }
 
-
+/*!
+  Set polygon offset parameters
+  \param factor, units  - Opengl polygon offset parameters
+*/
 void
 SVTK_DeviceActor
-::SetPolygonOffsetParameters(float factor, float units)
+::SetPolygonOffsetParameters(vtkFloatingPointType factor, 
+			     vtkFloatingPointType units)
 {
   myPolygonOffsetFactor = factor;
   myPolygonOffsetUnits = units;
 }
 
+/*!
+  Get polygon offset parameters
+  \param factor, units  - Opengl polygon offset parameters
+*/
 void
 SVTK_DeviceActor
-::GetPolygonOffsetParameters(float& factor, float& units)
+::GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
+			     vtkFloatingPointType& units)
 {
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;

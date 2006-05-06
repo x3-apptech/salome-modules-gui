@@ -23,6 +23,8 @@
 #include "LightApp.h"
 #include "LightApp_DataOwner.h"
 
+class SUIT_Desktop;
+
 #ifndef DISABLE_VTKVIEWER
   #include <vtkSmartPointer.h>
   #include <TColStd_IndexedMapOfInteger.hxx>
@@ -31,6 +33,7 @@
   #include "SALOME_InteractiveObject.hxx"
 #endif
   class SALOME_Actor;
+  class SVTK_ViewWindow;
   class SVTK_ViewModelBase;
 #endif
 
@@ -43,30 +46,25 @@ class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 #ifndef DISABLE_VTKVIEWER
    #ifndef DISABLE_SALOMEOBJECT
     LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
-                            const TColStd_IndexedMapOfInteger& theIds,
-                            Selection_Mode theMode = ActorSelection,
-                            SALOME_Actor* theActor = NULL);
+			    SUIT_Desktop* theDesktop );
    #endif
     virtual ~LightApp_SVTKDataOwner();
 
     /*!Gets dataowners ids list.*/
-    const TColStd_IndexedMapOfInteger& GetIds() const
-    {
-      return myIds;
-    }
+    const TColStd_IndexedMapOfInteger& GetIds() const;
 
     /*!Gets selection mode.*/
-    Selection_Mode GetMode() const 
-    { 
-      return mySelectionMode; 
-    }
+    Selection_Mode GetMode() const;
 
+    /*!Finds corresponding actor in the active viewer.*/
     SALOME_Actor* GetActor() const;
 
  protected:
-    TColStd_IndexedMapOfInteger myIds;
-    Selection_Mode mySelectionMode;
-    vtkSmartPointer<SALOME_Actor> myActor;
+    mutable TColStd_IndexedMapOfInteger myIds;
+
+    SVTK_ViewWindow* GetActiveViewWindow() const;
+    SUIT_Desktop* myDesktop;
+    
 #else
   LightApp_SVTKDataOwner( const QString& );
 #endif
@@ -74,7 +72,8 @@ class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 
 
 /*!
-  Provide vtk selection of data owners.
+  \class LightApp_VTKSelector
+  Custom selector to get/set selection from object browser
 */
 class LIGHTAPP_EXPORT LightApp_VTKSelector : public SUIT_Selector
 {

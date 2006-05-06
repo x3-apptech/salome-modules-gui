@@ -104,6 +104,7 @@ void LightApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& theList )
   }
 
   myBrowser->setSelected( objList );
+  mySelectedList.clear();
 }
 
 /*!On selection changed.*/

@@ -31,6 +31,9 @@
 
 using namespace std;
 
+/*!
+  Creates view
+*/
 SUIT_ViewWindow* SUPERVGraph::createView(SUIT_Desktop* parent)
 {
   return new SUPERVGraph_ViewFrame( parent/*, "vtkView"*/ ); 
@@ -38,6 +41,9 @@ SUIT_ViewWindow* SUPERVGraph::createView(SUIT_Desktop* parent)
 
 extern "C"
 {
+  /*!
+    Creates view
+  */
   SUIT_ViewWindow* createView(SUIT_Desktop* parent)
   {
     return SUPERVGraph::createView(parent);

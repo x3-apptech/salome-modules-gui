@@ -29,6 +29,12 @@
 //using namespace std;
 #include "SALOME_AISShape.ixx"
 
-SALOME_AISShape::SALOME_AISShape(const TopoDS_Shape& shape): AIS_Shape(shape) {
+/*!
+  Constructor
+  \param shape - TopoDS shape 
+*/
+SALOME_AISShape::SALOME_AISShape(const TopoDS_Shape& shape)
+: AIS_Shape(shape)
+{
 }
 

@@ -13,9 +13,6 @@ msgstr ""
 
 //=======================================================================================
 
-msgid "BUT_OK"
-msgstr "&OK"
-
 msgid "BUT_NEW"
 msgstr "&New"
 
@@ -24,9 +21,6 @@ msgstr "&Open"
 
 msgid "BUT_LOAD"
 msgstr "&Load"
-
-msgid "BUT_CANCEL"
-msgstr "&Cancel"
 
 //=======================================================================================
 
@@ -46,7 +40,7 @@ msgid "SalomeApp_Application::TOT_DESK_FILE_SAVE_GUI_STATE"
 msgstr "Save GUI state"
 
 msgid "SalomeApp_Application::MEN_DESK_FILE_SAVE_GUI_STATE"
-msgstr "Save GUI state..."
+msgstr "Save GUI state"
 
 msgid "SalomeApp_Application::PRP_DESK_FILE_SAVE_GUI_STATE"
 msgstr "Saves current state of viewers, displayed objects, etc."

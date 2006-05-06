@@ -37,7 +37,9 @@ typedef QPtrListIterator<SUIT_DataObject> DataObjectListIterator;
 #endif
 
 /*!
-  Class provide support data object.
+  \class SUIT_DataObject
+  Data Object represents uniform data tree structure recommended to use in SUIT-based applications
+  Many of standard classes (DataModel,ObjectBrowser) deal with SUIT_DataObjects
 */
 class SUIT_EXPORT SUIT_DataObject  
 {
@@ -116,6 +118,13 @@ private:
   friend class SUIT_DataObjectIterator;
 };
 
+/*!
+  \class SUIT_DataObject::Signal
+  Auxiliary class providing functionality to use signals of data object state change
+  SUIT_DataObject cannot have signals, because it isn't QObject, but
+  methods connect/disconnect of SUIT_DataObject with help of this it is possible
+  to emulate Qt signal processing
+*/
 class SUIT_DataObject::Signal : public QObject
 {
   Q_OBJECT

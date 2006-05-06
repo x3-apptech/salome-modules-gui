@@ -36,6 +36,8 @@ public:
   //! Destroy the view manager
   virtual ~SVTK_ViewManager();
 
+  SUIT_Desktop* getDesktop();
+
 protected:
   void setViewName( SUIT_ViewWindow* theView );
 

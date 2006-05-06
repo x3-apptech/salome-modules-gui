@@ -22,11 +22,6 @@
 // File:      GLViewer_Widget.cxx
 // Created:   November, 2004
 
-//================================================================
-// Class       : GLViewer_Widget
-// Description : OpenGL QWidget for GLViewer
-//================================================================
-
 #include "GLViewer_Widget.h"
 #include "GLViewer_ViewPort2d.h"
 #include "GLViewer_Viewer2d.h"
@@ -49,10 +44,10 @@ using namespace std;
 #include <qsize.h>
 #include <qtooltip.h>
 
-//=======================================================================
-// Function: GLViewer_Widget
-// Purpose :
-//=======================================================================
+/*!
+  A constructor
+  Parameters using for QOGLWidget as is 
+*/
 GLViewer_Widget::GLViewer_Widget( QWidget* parent, const char* name ):
 QGLWidget( parent, 0/*, WRepaintNoErase | WResizeNoErase*/ )
 {
@@ -78,18 +73,16 @@ QGLWidget( parent, 0/*, WRepaintNoErase | WResizeNoErase*/ )
   setMouseTracking( true );
 }
 
-//=======================================================================
-// Function: GLViewer_Widget
-// Purpose :
-//=======================================================================
+/*!
+  Destructor
+*/
 GLViewer_Widget::~GLViewer_Widget()
 {
 }
 
-//=======================================================================
-// Function: ~GLViewer_Widget
-// Purpose :
-//=======================================================================
+/*!
+  \return offset parameters of Window in OpenGL global scene
+*/
 void GLViewer_Widget::getPan( GLfloat& xPan, GLfloat& yPan, GLfloat& zPan )
 {
   xPan = myXPan;
@@ -97,10 +90,9 @@ void GLViewer_Widget::getPan( GLfloat& xPan, GLfloat& yPan, GLfloat& zPan )
   zPan = myZPan;
 }
 
-//=======================================================================
-// Function: setPan
-// Purpose :
-//=======================================================================
+/*!
+  A function for installing the  offset parameters of Window in OpenGL global scene
+*/
 void GLViewer_Widget::setPan( GLfloat xPan, GLfloat yPan, GLfloat zPan )
 {
   myXPan = xPan;
@@ -108,10 +100,9 @@ void GLViewer_Widget::setPan( GLfloat xPan, GLfloat yPan, GLfloat zPan )
   myZPan = zPan;
 }
 
-//=======================================================================
-// Function: getScale
-// Purpose :
-//=======================================================================
+/*!
+  \return scales on OpenGL scene along 3 directions in 2d scene zScale = 1.0
+*/
 void GLViewer_Widget::getScale( GLfloat& xScale, GLfloat& yScale, GLfloat& zScale )
 {
   xScale = myXScale;
@@ -119,10 +110,9 @@ void GLViewer_Widget::getScale( GLfloat& xScale, GLfloat& yScale, GLfloat& zScal
   zScale = myZScale;
 }
 
-//=======================================================================
-// Function: setScale
-// Purpose :
-//=======================================================================
+/*!
+  A function for installing the scales of OpenGL scene
+*/
 void GLViewer_Widget::setScale( GLfloat xScale, GLfloat yScale, GLfloat zScale )
 {
   if ( xScale > 0 && yScale > 0 && zScale > 0 )
@@ -133,10 +123,9 @@ void GLViewer_Widget::setScale( GLfloat xScale, GLfloat yScale, GLfloat zScale )
   }
 }
 
-//=======================================================================
-// Function: getRotationStart
-// Purpose :
-//=======================================================================
+/*!
+  \return start point of curren rotation of Window in OpenGL global scene
+*/
 void GLViewer_Widget::getRotationStart( GLfloat& rotationStartX,
 				        GLfloat& rotationStartY,
                                         GLfloat& rotationStartZ )
@@ -146,10 +135,9 @@ void GLViewer_Widget::getRotationStart( GLfloat& rotationStartX,
     rotationStartZ = myRotationStartZ;
 }
 
-//=======================================================================
-// Function: setRotationStart
-// Purpose :
-//=======================================================================
+/*!
+  A function for installing the rotation angle of Window in OpenGL global scene in degree (Only in 2D)
+*/
 void GLViewer_Widget::setRotationStart( GLfloat rotationStartX,
 				        GLfloat rotationStartY,
                                         GLfloat rotationStartZ )
@@ -159,10 +147,13 @@ void GLViewer_Widget::setRotationStart( GLfloat rotationStartX,
     myRotationStartZ = rotationStartZ;
 }
 
-//=======================================================================
-// Function: getRotation
-// Purpose :
-//=======================================================================
+/*!
+  \return parameters of rotation
+  \param rotationAngle - angle
+  \param rotationCenterX - center x
+  \param rotationCenterY - center y
+  \param rotationCenterZ - center z
+*/
 void GLViewer_Widget::getRotation( GLfloat& rotationAngle,
 				   GLfloat& rotationCenterX,
 				   GLfloat& rotationCenterY,
@@ -174,10 +165,13 @@ void GLViewer_Widget::getRotation( GLfloat& rotationAngle,
     rotationCenterZ = myRotationCenterZ;
 }
 
-//=======================================================================
-// Function: setRotation
-// Purpose :
-//=======================================================================
+/*!
+  Sets parameters of rotation
+  \param rotationAngle - angle
+  \param rotationCenterX - center x
+  \param rotationCenterY - center y
+  \param rotationCenterZ - center z
+*/
 void GLViewer_Widget::setRotation( GLfloat rotationAngle,
 				   GLfloat rotationCenterX,
 				   GLfloat rotationCenterY,
@@ -189,10 +183,11 @@ void GLViewer_Widget::setRotation( GLfloat rotationAngle,
     myRotationCenterZ = rotationCenterZ;
 }
 
-//=======================================================================
-// Function: setBackground
-// Purpose :
-//=======================================================================
+
+/*!
+  Sets image as background
+  \param filename - name of file
+*/
 void GLViewer_Widget::setBackground( QString filename )
 {
     
@@ -245,29 +240,28 @@ void GLViewer_Widget::setBackground( QString filename )
     }
 }
 
-//=======================================================================
-// Function: addToolTip
-// Purpose :
-//=======================================================================
+/*!
+  Adds tooltip
+  \param theString - tooltip text
+  \param theRect - tooltip rectangle
+*/
 void GLViewer_Widget::addToolTip( QString theString, QRect theRect )
 {
     myToolTipRect = theRect;
     QToolTip::add( this, myToolTipRect, theString );
 }
 
-//=======================================================================
-// Function: removeToolTip
-// Purpose :
-//=======================================================================
+/*!
+  Removes tooltip
+*/
 void GLViewer_Widget::removeToolTip()
 {
     QToolTip::remove( this, myToolTipRect );
 }
 
-//=======================================================================
-// Function: initializeGL
-// Purpose :
-//=======================================================================
+/*!
+  Initialization (redefined virtual from QGLWidget)
+*/
 void GLViewer_Widget::initializeGL()
 {
     setAutoBufferSwap( true );
@@ -289,10 +283,9 @@ void GLViewer_Widget::initializeGL()
         isLoadBackground = false;
 }
 
-//=======================================================================
-// Function: paintGL
-// Purpose :
-//=======================================================================
+/*!
+  Paints content
+*/
 void GLViewer_Widget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -335,10 +328,11 @@ void GLViewer_Widget::paintGL()
         v->repaintView( getViewPort()->getViewFrame() );
 }
 
-//=======================================================================
-// Function: resizeGL
-// Purpose :
-//=======================================================================
+/*!
+  Resets OpenGl parameters after resize
+  \param w - new width
+  \param h - new height
+*/
 void GLViewer_Widget::resizeGL( int w, int h )
 {
 
@@ -365,10 +359,9 @@ void GLViewer_Widget::resizeGL( int w, int h )
   glLoadIdentity(); 
 }
 
-//=======================================================================
-// Function: exportRepaint
-// Purpose :
-//=======================================================================
+/*!
+  Provides repaint in export mode
+*/
 void GLViewer_Widget::exportRepaint()
 {
     isExportMode = true;
@@ -378,65 +371,59 @@ void GLViewer_Widget::exportRepaint()
     isExportMode = false;
 }
 
-//=======================================================================
-// Function: paintEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom paint event handler
+*/
 void GLViewer_Widget::paintEvent( QPaintEvent* e )
 {
   QApplication::sendEvent( myViewPort, e );
 }
 
-//=======================================================================
-// Function: mouseMoveEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom mouse move event handler
+*/
 void GLViewer_Widget::mouseMoveEvent( QMouseEvent* e )
 {
   QApplication::sendEvent( myViewPort, e );
 }
 
-//=======================================================================
-// Function: mousePressEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom mouse press event handler
+*/
 void GLViewer_Widget::mousePressEvent( QMouseEvent* e )
 {
   QApplication::sendEvent( myViewPort, e );
 }
 
-//=======================================================================
-// Function: mouseReleaseEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom mouse release event handler
+*/
 void GLViewer_Widget::mouseReleaseEvent( QMouseEvent* e )
 {
   QApplication::sendEvent( myViewPort, e );
 }
 
-//=======================================================================
-// Function: enterEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom enter event handler
+*/
 void GLViewer_Widget::enterEvent( QEvent* e )
 {
   updateGL();
 }
 
-//=======================================================================
-// Function: leaveEvent
-// Purpose :
-//=======================================================================
+/*!
+  Custom leave event handler
+*/
 void GLViewer_Widget::leaveEvent( QEvent* e )
 {
   updateGL();
 }
 
 
-//=======================================================================
-//! Function: hex
-//! Purpose : Returns the hex code of digit < 16
-//=======================================================================
+/*!
+  \return the hex code of digit < 16
+  \param c - digit
+*/
 inline char hex( uchar c )
 {
   if( c<=9 )
@@ -447,11 +434,23 @@ inline char hex( uchar c )
   return ' ';
 }
 
-//=======================================================================
-//! Function: AddImagePart
-//! Purpose : Translates path of image to PS format
-/*! Image inside rectangle from w1 to w2 and from h2 to h1*/
-//=======================================================================
+/*!
+  Translates part of image inside rectangle from w1 to w2 and from h2 to h1 to PS format
+  \param hFile - PostScript file 
+  \param image - image to be tarnslated
+  \param w1 - x start position
+  \param w2 - x end position
+  \param h1 - y start position
+  \param h2 - y end position
+  \param aViewerCS - viewer co-ordinate system
+  \param aPSCS - paper co-ordinate system
+  \param a
+  \param b
+  \param c
+  \param d
+  \param dw
+  \param dh
+*/
 void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2, 
                    GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS, 
                    double a, double b, double c, double d, double dw, double dh )
@@ -493,20 +492,21 @@ void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2,
   }
 }
 
-//=======================================================================
-// Function: getBackgroundRectInViewerCS
-// Purpose :
-//=======================================================================
+/*!
+  \return background rectangle in viewer CS
+*/
 void GLViewer_Widget::getBackgroundRectInViewerCS( double& left, double& top, double& right, double& bottom )
 {
   left = -myIW/2; right = myIW/2; 
   top = myIH/2; bottom = -myIH/2;
 }
 
-//=======================================================================
-// Function: translateBackgroundToPS
-// Purpose :
-//=======================================================================
+/*!
+  Translates background to PostScript
+  \param hFile - PostScript file 
+  \param aViewerCS - viewer co-ordinate system
+  \param aPSCS - paper co-ordinate system
+*/
 void GLViewer_Widget::translateBackgroundToPS( QFile& hFile, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aPSCS )
 {
     QImage buf; 
@@ -553,10 +553,9 @@ void GLViewer_Widget::translateBackgroundToPS( QFile& hFile, GLViewer_CoordSyste
     }
 }
 
-//=======================================================================
-//! Function: DecodeScanLine
-//! Purpose : Translate image line with one color depth to line wiht other depth
-//=======================================================================
+/*!
+  Translates image line with one color depth to line with other depth
+*/
 void DecodeScanLine( int width, uchar* dest, int dest_depth, uchar* source, int source_depth )
 {
 #ifndef WIN32
@@ -620,11 +619,13 @@ typedef unsigned int WORD;
     }
 }
 
-//=======================================================================
-// Function: translateBackgroundToEMF
-// Purpose :
-//=======================================================================
 #ifdef WIN32
+/*!
+  Translates background to EMF
+  \param dc - descriptor of EMF
+  \param aViewerCS - viewer co-ordinate system
+  \param aPSCS - paper co-ordinate system
+*/
 void GLViewer_Widget::translateBackgroundToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS )
 {
     QImage buf; 

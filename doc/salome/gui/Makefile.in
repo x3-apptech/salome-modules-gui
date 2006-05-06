@@ -16,7 +16,7 @@ VPATH=.:@srcdir@
 
 docs:
 	cp -fr $(srcdir)/KERNEL ./
-	-find $(PWD) -name CVS -exec rm -rf {} \;
+	-find $(PWD) -name CVS -prune -exec rm -rf {} \;
 
 clean:
 	rm -fr `ls | grep -v "Makefile"`
@@ -27,7 +27,7 @@ distclean: clean
 install:
 	mkdir -p $(docdir)/gui
 	cp -rf KERNEL $(docdir)/gui
-	-find $(PWD) -name CVS -exec rm -rf {} \;
+	-find $(PWD) -name CVS -prune -exec rm -rf {} \;
 
 uninstall:
 	rm -rf $(docdir)/gui/KERNEL

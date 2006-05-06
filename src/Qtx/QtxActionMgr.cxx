@@ -58,15 +58,25 @@ private:
   QMap<QToolBar*, QWidgetList> myTools;
 };
 
+/*!
+  Constructor
+*/
 QtxActionMgr::SeparatorAction::SeparatorAction( QObject* parent )
 : QtxAction( parent )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxActionMgr::SeparatorAction::~SeparatorAction()
 {
 }
 
+/*!
+  Adds action to widget
+  \param wid - widget
+*/
 bool QtxActionMgr::SeparatorAction::addTo( QWidget* wid )
 {
   if ( !wid )
@@ -90,6 +100,10 @@ bool QtxActionMgr::SeparatorAction::addTo( QWidget* wid )
   return res;
 }
 
+/*!
+  Removes action from widget
+  \param wid - widget
+*/
 bool QtxActionMgr::SeparatorAction::removeFrom( QWidget* wid )
 {
   if ( !wid )
@@ -140,16 +154,28 @@ bool QtxActionMgr::SeparatorAction::removeFrom( QWidget* wid )
 	Level: Public
 */
 
+/*!
+  Constructor
+*/
 QtxActionMgr::QtxActionMgr( QObject* parent )
 : QObject( parent ),
 myUpdate( true )
 {
 }
 
+/*!
+  Destructor
+*/
 QtxActionMgr::~QtxActionMgr()
 {
 }
 
+/*!
+  Stores action in internal map
+  If action with such id is registered already, then it will be unregistered
+  \param a - action to be registered
+  \param userId - proposed id (if it is less than 0, then id will be generated automatically)
+*/
 int QtxActionMgr::registerAction( QAction* a, const int userId )
 {
   if ( !a )
@@ -174,12 +200,20 @@ int QtxActionMgr::registerAction( QAction* a, const int userId )
   return theId;
 }
 
+/*!
+  Removes action from internal map
+  \param id - action id
+*/
 void QtxActionMgr::unRegisterAction( const int id )
 {
   if( contains( id ) )
     myActions.remove( id );
 }
 
+/*!
+  \return action by id
+  \param id - action id
+*/
 QAction* QtxActionMgr::action( const int id ) const
 {
   if ( contains( id ) )
@@ -188,6 +222,10 @@ QAction* QtxActionMgr::action( const int id ) const
     return 0;
 }
 
+/*!
+  \return id by action
+  \param a - action
+*/
 int QtxActionMgr::actionId( const QAction* a ) const
 {
   if ( !a )
@@ -203,61 +241,101 @@ int QtxActionMgr::actionId( const QAction* a ) const
   return theId;
 }
 
+/*!
+  \return true if internal map contains such id
+  \param id - action id
+*/
 bool QtxActionMgr::contains( const int id ) const
 {
   return myActions.contains( id );
 }
 
+/*!
+  \return count of actions in internal map
+*/
 int QtxActionMgr::count() const
 {
   return myActions.count();
 }
 
+/*!
+  \return true if internal map is empty
+*/
 bool QtxActionMgr::isEmpty() const
 {
   return myActions.isEmpty();
 }
 
+/*!
+  Fills list with ids of registered actions
+*/
 void QtxActionMgr::idList( QIntList& lst ) const
 {
   lst = myActions.keys();
 }
 
+/*!
+  \return true if updates are enabled
+*/
 bool QtxActionMgr::isUpdatesEnabled() const
 {
   return myUpdate;
 }
 
+/*!
+  Enables/disables updates
+  \param upd - new state
+*/
 void QtxActionMgr::setUpdatesEnabled( const bool upd )
 {
   myUpdate = upd;
 }
 
+/*!
+  \return true if action is visible (by default \return always true)
+*/
 bool QtxActionMgr::isVisible( const int, const int ) const
 {
   return true;
 }
 
+/*!
+  Sets visibility of action (by default, empty implementation)
+*/
 void QtxActionMgr::setVisible( const int, const int, const bool )
 {
 }
 
+/*!
+  Updates actions, check isUpdatesEnabled() and call internalUpdate()
+  \sa isUpdatesEnabled(), internalUpdate()
+*/
 void QtxActionMgr::update()
 {
   if ( isUpdatesEnabled() )
     internalUpdate();
 }
 
+/*!
+  Real update (to be redefined in successors)
+*/
 void QtxActionMgr::internalUpdate()
 {
 }
 
+/*!
+  \return global free id
+*/
 int QtxActionMgr::generateId() const
 {
   static int id = -1;
   return --id;
 }
 
+/*!
+  \return true if action is enabled
+  \param id - action id
+*/
 bool QtxActionMgr::isEnabled( const int id ) const
 {
   QAction* a = action( id );
@@ -267,6 +345,11 @@ bool QtxActionMgr::isEnabled( const int id ) const
     return false;
 }
 
+/*!
+  Enables/disables action
+  \param id - action id
+  \param en - new state
+*/
 void QtxActionMgr::setEnabled( const int id, const bool en )
 {
   QAction* a = action( id );
@@ -274,6 +357,11 @@ void QtxActionMgr::setEnabled( const int id, const bool en )
     a->setEnabled( en );
 }
 
+/*!
+  \return action for separator
+  If this action doesn't exist, then it will be created
+  \param individual - if it is false, then action will be shared, otherwise it will be created on every call
+*/
 QAction* QtxActionMgr::separator( const bool individual )
 {
   if ( individual )
@@ -292,19 +380,33 @@ QAction* QtxActionMgr::separator( const bool individual )
 	Level: Public
 */
 
+/*!
+  Constructor
+*/
 QtxActionMgr::Reader::Reader()
 {
 }
 
+/*!
+  Destructor
+*/
 QtxActionMgr::Reader::~Reader()
 {
 }
 
+/*!
+  \return list of options
+*/
 QStringList QtxActionMgr::Reader::options() const
 {
   return myOptions.keys();
 }
 
+/*!
+  \return value of option
+  \param name - option name
+  \param def - default option value (is returned, if there is no such option)
+*/
 QString QtxActionMgr::Reader::option( const QString& name, const QString& def ) const
 {
   if( myOptions.contains( name ) )
@@ -313,6 +415,11 @@ QString QtxActionMgr::Reader::option( const QString& name, const QString& def ) 
     return def;
 }
 
+/*!
+  Sets value of option
+  \param name - option name
+  \param value - option value
+*/
 void QtxActionMgr::Reader::setOption( const QString& name, const QString& value )
 {
   myOptions[ name ] = value;
@@ -320,8 +427,7 @@ void QtxActionMgr::Reader::setOption( const QString& name, const QString& value 
 
 
 /*!
-	Class: QtxActionMgr::XMLReader
-	Level: Public
+  Constructor
 */
 QtxActionMgr::XMLReader::XMLReader( const QString& root,
                                     const QString& item,
@@ -342,10 +448,18 @@ QtxActionMgr::XMLReader::XMLReader( const QString& root,
   setOption( QString( "toggle" ),    QString( "toggle-id" ) );
 }
 
+/*!
+  Destructor
+*/
 QtxActionMgr::XMLReader::~XMLReader()
 {
 }
 
+/*!
+  Reads file and fills action manager with help of creator
+  \param fname - file name
+  \param cr - creator
+*/
 bool QtxActionMgr::XMLReader::read( const QString& fname, Creator& cr ) const
 {
   bool res = false;  
@@ -386,6 +500,12 @@ bool QtxActionMgr::XMLReader::read( const QString& fname, Creator& cr ) const
   return res;
 }
 
+/*!
+  Create item by xml node
+  \param parent_node - parent node
+  \param parent_id - parent id
+  \param cr - creator
+*/
 void QtxActionMgr::XMLReader::read( const QDomNode& parent_node,
                                     const int parent_id,
                                     Creator& cr ) const
@@ -420,6 +540,9 @@ void QtxActionMgr::XMLReader::read( const QDomNode& parent_node,
   }
 }
 
+/*!
+  \return true if node satisfies pattern
+*/
 bool QtxActionMgr::XMLReader::isNodeSimilar( const QDomNode& node,
                                              const QString& pattern ) const
 {
@@ -445,8 +568,10 @@ bool QtxActionMgr::XMLReader::isNodeSimilar( const QDomNode& node,
 
 
 /*!
-	Class: QtxActionMgr::Creator
-	Level: Public
+  \return integer value by attributes
+  \param attrs - attributes
+  \param name - name of attribute
+  \param def - default value (is returned on fail)
 */
 int QtxActionMgr::Creator::intValue( const ItemAttributes& attrs,
                                      const QString& name, int def )
@@ -461,6 +586,12 @@ int QtxActionMgr::Creator::intValue( const ItemAttributes& attrs,
   return def;
 }
 
+/*!
+  \return string value by attributes
+  \param attrs - attributes
+  \param name - name of attribute
+  \param def - default value (is returned on fail)
+*/
 QString QtxActionMgr::Creator::strValue( const ItemAttributes& attrs,
                                          const QString& name,
                                          const QString& def  )
@@ -471,24 +602,41 @@ QString QtxActionMgr::Creator::strValue( const ItemAttributes& attrs,
     return def;
 }
 
+/*!
+   Constructor
+*/
 QtxActionMgr::Creator::Creator( QtxActionMgr::Reader* r )
 : myReader( r )
 {
 }
 
+/*!
+   Destructor
+*/
 QtxActionMgr::Creator::~Creator()
 {
 }
 
+/*!
+  \return corresponding reader
+*/
 QtxActionMgr::Reader* QtxActionMgr::Creator::reader() const
 {
   return myReader;
 }
 
+/*!
+  Connects action to some slots (default implementation is empty)
+*/
 void QtxActionMgr::Creator::connect( QAction* ) const
 {
 }
 
+/*!
+  Loads pixmap 
+  \param fname - file name
+  \param pix - to return loaded pixmap
+*/
 bool QtxActionMgr::Creator::loadPixmap( const QString& fname, QPixmap& pix ) const
 {
   if( !reader() )

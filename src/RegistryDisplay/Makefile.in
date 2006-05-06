@@ -52,8 +52,8 @@ LIB_MOC = RegWidget.h
 
 LIB_CLIENT_IDL = SALOME_Registry.idl SALOME_Exception.idl
 
-CPPFLAGS+=$(QT_INCLUDES) -I${KERNEL_ROOT_DIR}/include/salome
-LDFLAGS+=$(QT_MT_LIBS) -L$(KERNEL_ROOT_DIR)/lib/salome -lSalomeNS -lOpUtil
+CPPFLAGS+=$(QT_INCLUDES) $(KERNEL_CXXFLAGS)
+LDFLAGS+=$(QT_MT_LIBS) $(KERNEL_LDFLAGS) -lSalomeNS -lOpUtil
 
 
 @CONCLUDE@

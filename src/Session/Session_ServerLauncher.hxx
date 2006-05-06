@@ -70,6 +70,7 @@ public:
 			 PortableServer::POA_ptr poa,
 			 QMutex *GUIMutex,
 			 QWaitCondition *ServerLaunch,
+			 QMutex *SessionMutex,
 			 QWaitCondition *SessionStarted);
   virtual ~Session_ServerLauncher();
   void run();
@@ -82,13 +83,14 @@ protected:
 private:
   int _argc;
   char ** _argv;
-  CORBA::ORB_var _orb;
-  PortableServer::POA_var _root_poa;
-  QMutex* _GUIMutex;
-  QWaitCondition *_ServerLaunch;
-  QWaitCondition *_SessionStarted;
-  list<ServArg> _argServToLaunch;
-  vector<string> _argCopy;
+  CORBA::ORB_var              _orb;
+  PortableServer::POA_var     _root_poa;
+  QMutex*                     _GUIMutex;
+  QWaitCondition*             _ServerLaunch;
+  QMutex*                     _SessionMutex;
+  QWaitCondition*             _SessionStarted;
+  list<ServArg>               _argServToLaunch;
+  vector<string>              _argCopy;
   list<Session_ServerThread*> _serverThreads;
 };
 

@@ -47,7 +47,8 @@ signals:
 
 protected:
   LightApp_Study*                     getStudy() const;
-
+  virtual void                        build();
+  virtual void                        updateWidgets();
 };
 
 #endif 

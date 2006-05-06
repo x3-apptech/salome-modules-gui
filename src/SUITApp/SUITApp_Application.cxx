@@ -31,6 +31,9 @@
 #include <unistd.h>
 #endif
 
+/*!
+  Constructor
+*/
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, SUIT_ExceptionHandler* hand )
 : QApplication( argc, argv ),
 myExceptHandler( hand )
@@ -45,6 +48,9 @@ myExceptHandler( hand )
     delete strTbl;
 }
 
+/*!
+  Constructor
+*/
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, Type type, SUIT_ExceptionHandler* hand )
 : QApplication( argc, argv, type ),
 myExceptHandler( hand )
@@ -54,17 +60,30 @@ myExceptHandler( hand )
     installTranslator( strTbl );
 }
 
+/*!
+  Sends event to receiver
+  \return the value that is returned from the receiver's event handler
+  \param e - event
+  \param receiver - receiver
+*/
 bool SUITApp_Application::notify( QObject* receiver, QEvent* e )
 {
   return myExceptHandler ? myExceptHandler->handle( receiver, e ) :
                            QApplication::notify( receiver, e );
 }
 
+/*!
+  Changes exception handler
+  \param hand - new handler
+*/
 void SUITApp_Application::setHandler( SUIT_ExceptionHandler* hand )
 {
 	myExceptHandler = hand;
 }
 
+/*!
+  \return exception handler
+*/
 SUIT_ExceptionHandler* SUITApp_Application::handler() const
 {
   return myExceptHandler;

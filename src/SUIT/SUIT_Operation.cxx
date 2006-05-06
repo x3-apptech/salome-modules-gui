@@ -16,16 +16,15 @@
 //
 // See http://www.salome-platform.org/
 //
-/**
-*  SALOME SalomeApp
-*
-*  Copyright (C) 2005  CEA/DEN, EDF R&D
-*
-*
-*
-*  File   : SUIT_Operation.h
-*  Author : Unknown
-*  Module : SALOME
+
+/*!
+  SALOME SalomeApp
+
+  Copyright (C) 2005  CEA/DEN, EDF R&D
+
+  File   : SUIT_Operation.h
+  Author : Unknown
+  Module : SALOME
 */
 
 #include "SUIT_Operation.h"
@@ -36,13 +35,13 @@
 #include "SUIT_Application.h"
 
 /*!
- * \brief Constructor
-  * \param SUIT_Application - application for this operation
-*
-* Constructs an empty operation. Constructor should work very fast because many
-* operators may be created after starting application but only several from them
-* may be used. As result this constructor stores given application in myApp field
-* and set Waiting status.
+ \brief Constructor
+ \param SUIT_Application - application for this operation
+
+  Constructs an empty operation. Constructor should work very fast because many
+  operators may be created after starting application but only several from them
+  may be used. As result this constructor stores given application in myApp field
+  and set Waiting status.
 */
 SUIT_Operation::SUIT_Operation( SUIT_Application* app )
 : QObject(),

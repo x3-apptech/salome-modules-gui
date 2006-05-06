@@ -29,6 +29,9 @@
 #include <Precision.hxx>
 #include <qglobal.h>
 
+/*!
+  Default constructor
+*/
 GLViewer_Grid::GLViewer_Grid() :
        myGridList( 0 ), myGridHeight( (GLfloat)0.0 ), myGridWidth( (GLfloat)0.0 ),
        myWinW( (GLfloat)0.0 ), myWinH( (GLfloat)0.0 ), myXSize( (GLfloat)0.0 ), myYSize( (GLfloat)0.0 ),
@@ -44,6 +47,14 @@ GLViewer_Grid::GLViewer_Grid() :
   myAxisColor[2] = 0.75;
 }
 
+/*!
+  Constructor
+  \param  width and \param height - width and height of grid 
+  \param winW and \param winH     - width and height of window 
+  \param xSize and \param ySize   - steps along x and y direction
+  \param xPan and \param yPan     - offsets along x and y direction
+  \param xScale and \param yScal  - scale factors along x and y direction
+*/
 GLViewer_Grid::GLViewer_Grid( GLfloat width, GLfloat height,
                               GLfloat winW, GLfloat winH,
                               GLfloat xSize, GLfloat ySize,
@@ -63,10 +74,16 @@ GLViewer_Grid::GLViewer_Grid( GLfloat width, GLfloat height,
   myAxisColor[2] = 0.75;
 }
 
+/*!
+  Destructor
+*/
 GLViewer_Grid::~GLViewer_Grid()
 {
 }
 
+/*!
+  Performs OpenGL drawing
+*/
 void GLViewer_Grid::draw()
 {
   if ( myGridList == 0 || myIsUpdate )
@@ -75,6 +92,10 @@ void GLViewer_Grid::draw()
   glCallList( myGridList );
 }
 
+/*!
+  Changes color of grid
+  \param r, g, b - components of color
+*/
 void GLViewer_Grid::setGridColor( GLfloat r, GLfloat g, GLfloat b )
 {
   if( myGridColor[0] == r && myGridColor[1] == g && myGridColor[2] == b )
@@ -86,6 +107,10 @@ void GLViewer_Grid::setGridColor( GLfloat r, GLfloat g, GLfloat b )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  Changes color of axis
+  \param r, g, b - components of color
+*/
 void GLViewer_Grid::setAxisColor( GLfloat r, GLfloat g, GLfloat b )
 {
   if( myAxisColor[0] == r && myAxisColor[1] == g && myAxisColor[2] == b )
@@ -97,6 +122,10 @@ void GLViewer_Grid::setAxisColor( GLfloat r, GLfloat g, GLfloat b )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  Changes grid width
+  \param w - new grid width
+*/
 void GLViewer_Grid::setGridWidth( float w )
 {
   if( myGridWidth == w )
@@ -106,6 +135,10 @@ void GLViewer_Grid::setGridWidth( float w )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  Sets Radius of center point( begin coords )
+  \param r - new radius
+*/
 void GLViewer_Grid::setCenterRadius( int r )
 {
   if( myCenterRadius == r )
@@ -115,6 +148,11 @@ void GLViewer_Grid::setCenterRadius( int r )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  Sets grid size along X and Y axis
+  \param xSize - size along X axis
+  \param ySize - size along Y axis
+*/
 void GLViewer_Grid::setSize( float xSize, float ySize )
 {
   if( myXSize == xSize && myYSize == ySize )
@@ -125,6 +163,11 @@ void GLViewer_Grid::setSize( float xSize, float ySize )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  Sets panning of grid
+  \param xPan - panning along X axis
+  \param yPan - panning along Y axis
+*/
 void GLViewer_Grid::setPan( float xPan, float yPan )
 {
   if( myXPan == xPan && myYPan == yPan )
@@ -135,6 +178,10 @@ void GLViewer_Grid::setPan( float xPan, float yPan )
   myIsUpdate = GL_TRUE; 
 }
 
+/*!
+  Sets zoom 
+  \param zoom - new coefficient of zooming
+*/
 bool GLViewer_Grid::setZoom( float zoom )
 {
   if( zoom == 1.0 )
@@ -160,6 +207,12 @@ bool GLViewer_Grid::setZoom( float zoom )
   return true;
 }
 
+/*!
+  Sets parameters of grid by zoom coefficient and window size
+  \param WinW - window width
+  \param WinH - window height
+  \param zoom - zoom coefficient
+*/
 void GLViewer_Grid::setResize( float WinW, float WinH, float zoom )
 {
   if( myWinW == WinW && myWinH == WinH && zoom == 1.0 )
@@ -173,24 +226,42 @@ void GLViewer_Grid::setResize( float WinW, float WinH, float zoom )
   myIsUpdate = GL_TRUE;
 }
 
+/*!
+  \return grid size along x and y axis
+  \param xSize - for size along x axis
+  \param ySize - for size along y axis
+*/
 void GLViewer_Grid::getSize( float& xSize, float& ySize ) const
 {
   xSize = myXSize;
   ySize = myYSize;
 }
 
+/*!
+  \return panning along x and y axis
+  \param xPan - for panning along x axis
+  \param yPan - for panning along y axis
+*/
 void GLViewer_Grid::getPan( float& xPan, float& yPan ) const
 {
   xPan = myXPan;
   yPan = myYPan;
 }
 
+/*!
+  \return scaling along x and y axis
+  \param xScale - for scaling along x axis
+  \param yScale - for scaling along y axis
+*/
 void GLViewer_Grid::getScale( float& xScale, float& yScale ) const
 {
   xScale = myXScale;
   yScale = myYScale;
 }
 
+/*!
+  Initialize grid display list
+*/
 bool GLViewer_Grid::initList()
 {
   myIsUpdate = GL_FALSE;

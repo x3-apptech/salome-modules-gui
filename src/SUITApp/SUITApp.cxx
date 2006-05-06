@@ -29,6 +29,7 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ResourceMgr.h>
 
+#include <QtxSplash.h>
 
 #ifdef SUIT_ENABLE_PYTHON
 #include <Python.h>
@@ -38,6 +39,7 @@
 #include <qfile.h>
 #include <qstring.h>
 #include <qstringlist.h>
+#include <qregexp.h>
 
 #include <stdlib.h>
 
@@ -101,7 +103,6 @@ public:
   SUITApp_Session( bool theIniFormat ) : SUIT_Session(), myIniFormat ( theIniFormat ) {}
   virtual ~SUITApp_Session() {}
 
-protected:
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
   {
     SUIT_ResourceMgr* resMgr = 0;
@@ -139,13 +140,16 @@ int main( int args, char* argv[] )
 
   QStringList argList;
   bool noExceptHandling = false;
-  bool iniFormat = false;
+  bool iniFormat        = false;
+  bool noSplash         = false;
   for ( int i = 1; i < args /*&& !noExceptHandling*/; i++ )
   {
-    if ( !strcmp( argv[i], "/noexcepthandling" ) )
+    if ( !strcmp( argv[i], "--noexcepthandling" ) )
       noExceptHandling = true;
     else if ( !strcmp( argv[i], "--format=ini") )
       iniFormat = true;
+    else if ( !strcmp( argv[i], "--nosplash") )
+      noSplash = true;
     else
       argList.append( QString( argv[i] ) );
   }
@@ -156,6 +160,55 @@ int main( int args, char* argv[] )
   if ( !argList.isEmpty() )
   {
     SUITApp_Session* aSession = new SUITApp_Session( iniFormat );
+    QtxSplash* splash = 0;
+    if ( !noSplash ) {
+      SUIT_ResourceMgr* resMgr = aSession->createResourceMgr( argList.first() );
+      if ( resMgr ) {
+	resMgr->loadLanguage();
+	QString splashIcon, splashInfo, splashTextColors;
+	resMgr->value( "splash", "image",       splashIcon );
+	resMgr->value( "splash", "info",        splashInfo, false );
+	resMgr->value( "splash", "text_colors", splashTextColors );
+	QString appName    = QObject::tr( "APP_NAME" ).stripWhiteSpace();
+	QString appVersion = QObject::tr( "APP_VERSION" ).stripWhiteSpace();
+	if ( appVersion == "APP_VERSION" ) {
+	  if ( appName == "APP_NAME" || appName.lower() == "salome" )
+	    appVersion = salomeVersion();
+	  else
+	    appVersion = "";
+	}
+	QPixmap px( splashIcon );
+	if ( !px.isNull() ) {
+	  splash = QtxSplash::splash( px );
+	  if ( !splashTextColors.isEmpty() ) {
+	    QStringList colors = QStringList::split( "|", splashTextColors );
+	    QColor c1, c2;
+	    if ( colors.count() > 0 ) c1 = QColor( colors[0] );
+	    if ( colors.count() > 1 ) c2 = QColor( colors[1] );
+	    splash->setTextColors( c1, c2 );
+	  }
+	  else {
+	    splash->setTextColors( Qt::white, Qt::black );
+	  }
+#ifdef _DEBUG_
+	  splash->setHideOnClick( true );
+#endif
+	  QFont f = splash->font();
+	  f.setBold( true );
+	  splash->setFont( f );
+	  if ( !splashInfo.isEmpty() ) {
+	    splashInfo.replace( QRegExp( "%A" ),  appName );
+	    splashInfo.replace( QRegExp( "%V" ),  QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
+	    splashInfo.replace( QRegExp( "%L" ),  QObject::tr( "ABOUT_LICENSE" ) );
+	    splashInfo.replace( QRegExp( "%C" ),  QObject::tr( "ABOUT_COPYRIGHT" ) );
+	    splashInfo.replace( QRegExp( "\\\\n" ), "\n" );
+	    splash->message( splashInfo );
+	  }
+	  splash->show();
+	  qApp->processEvents();
+	}
+      }
+    }
     SUIT_Application* theApp = aSession->startApplication( argList.first() );
     if ( theApp )
     {
@@ -164,8 +217,12 @@ int main( int args, char* argv[] )
 
 //      if ( !app.mainWidget() )
 //        app.setMainWidget( theApp->desktop() );
+      if ( splash )
+	splash->finish( theApp->desktop() );
 
       result = app.exec();
+      if ( splash )
+	delete splash;
     }
     delete aSession;
   }

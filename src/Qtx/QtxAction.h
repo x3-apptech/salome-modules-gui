@@ -25,6 +25,7 @@
 #include "Qtx.h"
 
 #include <qaction.h>
+#include <qmap.h>
 
 class QTX_EXPORT QtxAction : public QAction
 {
@@ -38,9 +39,13 @@ public:
 
     virtual bool addTo( QWidget* );
     virtual bool addTo( QWidget*, int );
+    virtual bool removeFrom( QWidget* );
 
 protected:
-    void         setPopup( QPopupMenu*, const int, QPopupMenu* ) const;
+    void         setPopup( QWidget*, const int, QPopupMenu* ) const;
+
+private:
+    QMap<QWidget*,int> myMenuIds;
 };
 
 #endif

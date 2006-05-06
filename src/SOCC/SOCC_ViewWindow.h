@@ -35,7 +35,7 @@ public:
   virtual ~SOCC_ViewWindow();
   
 protected:
-  virtual void      action( const int );
+  virtual bool      action( const int );
 
 };
 

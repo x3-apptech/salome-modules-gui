@@ -17,8 +17,6 @@
 // See http://www.salome-platform.org/
 //
 // Plot2d_ViewModel.cxx: implementation of the Plot2d_ViewModel class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "Plot2d_ViewModel.h"
 #include "Plot2d_ViewWindow.h"
@@ -28,6 +26,9 @@
 
 #include <qpopupmenu.h>
 
+/*!
+  Constructor
+*/
 Plot2d_Viewer::Plot2d_Viewer(bool theAutoDel)
 :SUIT_ViewModel() 
 {
@@ -35,13 +36,19 @@ Plot2d_Viewer::Plot2d_Viewer(bool theAutoDel)
   myAutoDel = theAutoDel;
 }
 
+/*!
+  Destructor
+*/
 Plot2d_Viewer::~Plot2d_Viewer()
 {
   if (myPrs)
     clearPrs();
 }
 
-//*********************************************************************
+/*!
+  Create new instance of view window on desktop \a theDesktop.
+  \retval SUIT_ViewWindow* - created view window pointer.
+*/
 SUIT_ViewWindow* Plot2d_Viewer::createView(SUIT_Desktop* theDesktop)
 {
   Plot2d_ViewWindow* aPlot2dView = new Plot2d_ViewWindow(theDesktop, this);
@@ -50,7 +57,10 @@ SUIT_ViewWindow* Plot2d_Viewer::createView(SUIT_Desktop* theDesktop)
   return aPlot2dView;
 }
 
-//*********************************************************************
+/*!
+  Adds custom items to popup menu
+  \param thePopup - popup menu
+*/
 void Plot2d_Viewer::contextMenuPopup(QPopupMenu* thePopup)
 {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
@@ -69,8 +79,10 @@ void Plot2d_Viewer::contextMenuPopup(QPopupMenu* thePopup)
   }
 }
 
-
-//*********************************************************************
+/*!
+  Sets presentation of viewer
+  \param thePrs - new presentation
+*/
 void Plot2d_Viewer::setPrs(Plot2d_Prs* thePrs) 
 {
   if (myPrs)
@@ -79,7 +91,9 @@ void Plot2d_Viewer::setPrs(Plot2d_Prs* thePrs)
   myPrs->setAutoDel(myAutoDel);
 }
 
-//*********************************************************************
+/*!
+  Updates current viewer
+*/
 void Plot2d_Viewer::update()
 {
   SUIT_ViewManager* aMgr = getViewManager();
@@ -92,7 +106,9 @@ void Plot2d_Viewer::update()
   }
 }
 
-//*********************************************************************
+/*!
+  Clear viewer presentation
+*/
 void Plot2d_Viewer::clearPrs()
 {
   SUIT_ViewManager* aMgr = getViewManager();
@@ -109,7 +125,10 @@ void Plot2d_Viewer::clearPrs()
   myPrs = 0;
 }
 
-//*********************************************************************
+/*!
+  Sets "auto delete" state of of presentation
+  \param theDel - new state
+*/
 void Plot2d_Viewer::setAutoDel(bool theDel)
 {
   myAutoDel = theDel;
@@ -117,7 +136,9 @@ void Plot2d_Viewer::setAutoDel(bool theDel)
     myPrs->setAutoDel(theDel);
 }
 
-//*********************************************************************
+/*!
+  SLOT: called when action "Change background" is activated
+*/
 void Plot2d_Viewer::onChangeBgColor()
 {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
@@ -127,14 +148,18 @@ void Plot2d_Viewer::onChangeBgColor()
   aViewFrame->onChangeBackground();
 }
 
-//*********************************************************************
+/*!
+  SLOT: called when action "Show toolbar" is activated
+*/
 void Plot2d_Viewer::onShowToolbar() {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )
     aView->getToolBar()->show();    
 }
 
-//*********************************************************************
+/*!
+  SLOT: called when action "Dump view" is activated
+*/
 void Plot2d_Viewer::onDumpView()
 {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
@@ -142,11 +167,17 @@ void Plot2d_Viewer::onDumpView()
     aView->onDumpView();    
 }
 
-//*********************************************************************
+/*!
+  SLOT: called when action "Clone view" is activated
+*/
 void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* )
 {
 }
-//*********************************************************************
+
+/*!
+  Sets view manager
+  \param mgr - new view manager
+*/
 void Plot2d_Viewer::setViewManager( SUIT_ViewManager* mgr )
 {
   SUIT_ViewModel::setViewManager( mgr );

@@ -15,6 +15,10 @@
 #include <qwidget.h>
 #include "SUIT.h"
 
+/*!
+  \class SUIT_FileValidator
+  Provides functionality to check file
+*/
 class SUIT_EXPORT SUIT_FileValidator
 {
 public:

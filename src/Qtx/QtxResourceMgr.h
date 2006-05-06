@@ -133,6 +133,7 @@ public:
   QString         path( const QString&, const QString&, const QString& ) const;
 
   bool            load();
+  bool            import( const QString& );
   bool            save();
 
   QStringList     sections() const;
@@ -144,7 +145,7 @@ protected:
   virtual void    setDirList( const QStringList& );
   virtual void    setResource( const QString&, const QString&, const QString& );
 
-  virtual QString userFileName( const QString& ) const;
+  virtual QString userFileName( const QString&, const bool = true ) const;
   virtual QString globalFileName( const QString& ) const;
 
 private:

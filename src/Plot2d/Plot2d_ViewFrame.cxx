@@ -130,10 +130,6 @@ const char* imageCrossCursor[] = {
   "................................"};
   
 
-//=================================================================================
-// Plot2d_ViewFrame implementation
-//=================================================================================
-
 /*!
   Constructor
 */
@@ -1082,6 +1078,11 @@ void Plot2d_ViewFrame::setCurveType( int curveType, bool update )
   emit vpCurveChanged();
 }
 
+/*!
+  Sets curve title
+  \param curveKey - curve id
+  \param title - new title
+*/
 void Plot2d_ViewFrame::setCurveTitle( int curveKey, const QString& title ) 
 { 
   if(myPlot) myPlot->setCurveTitle(curveKey, title); 
@@ -1609,9 +1610,6 @@ bool Plot2d_ViewFrame::isYLogEnabled() const
   return allPositive;
 }
 
-//=================================================================================
-// Plot2d_Plot2d implementation
-//=================================================================================
 /*!
   Constructor
 */
@@ -1745,11 +1743,17 @@ void Plot2d_Plot2d::getNextMarker( QwtSymbol::Style& typeMarker, QColor& color, 
 */
 }
 
+/*!
+  \return the default layout behavior of the widget
+*/
 QSizePolicy Plot2d_Plot2d::sizePolicy() const
 {
   return QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize Plot2d_Plot2d::sizeHint() const
 {
   return QwtPlot::minimumSizeHint();
@@ -1790,12 +1794,19 @@ bool Plot2d_Plot2d::existMarker( const QwtSymbol::Style typeMarker, const QColor
   return false;
 }
 
-// TEMPORARY SOLUTION!!!  TO BE IMPLEMENTED!!!
+/*!
+  Creates presentation of object
+  Default implementation is empty
+*/
 Plot2d_Prs* Plot2d_ViewFrame::CreatePrs( const char* /*entry*/ )
 {
   return 0;
 }
 
+/*!
+  Copies preferences from other viewframe
+  \param vf - other view frame
+*/
 void Plot2d_ViewFrame::copyPreferences( Plot2d_ViewFrame* vf )
 {
   if( !vf )
@@ -1888,6 +1899,11 @@ void Plot2d_ViewFrame::updateTitles()
   setTitle( true, aTables.join("; "), MainTitle, true );
 }
 
+/*!
+  Outputs content of viewframe to file
+  \param file - file name
+  \param format - file format
+*/
 bool Plot2d_ViewFrame::print( const QString& file, const QString& format ) const
 {
 #ifdef WIN32
@@ -1919,6 +1935,9 @@ bool Plot2d_ViewFrame::print( const QString& file, const QString& format ) const
 #endif
 }
 
+/*!
+  \return string with all visual parameters
+*/
 QString Plot2d_ViewFrame::getVisualParameters()
 {
   double xmin, xmax, ymin, ymax, y2min, y2max;
@@ -1929,6 +1948,9 @@ QString Plot2d_ViewFrame::getVisualParameters()
   return retStr; 
 }
 
+/*!
+  Restores all visual parameters from string
+*/
 void Plot2d_ViewFrame::setVisualParameters( const QString& parameters )
 {
   QStringList paramsLst = QStringList::split( '*', parameters, true );

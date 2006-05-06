@@ -30,9 +30,17 @@
 #include "SALOME_InteractiveObject.hxx"
 using namespace std;
 
+/*!
+  Constructor
+  \param TheKind - type of filter
+*/
 SALOME_TypeFilter::SALOME_TypeFilter(const Standard_CString TheKind):
 myKind(TheKind){}
 
+/*!
+  \return true if object passes filter
+  \param anObj - object to be checked
+*/
 Standard_Boolean SALOME_TypeFilter::IsOk(const Handle(SALOME_InteractiveObject)& anObj) const 
 {
   return anObj->isComponentType( myKind );

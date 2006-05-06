@@ -34,17 +34,9 @@
 #include <qapplication.h>
 #include <qtooltip.h>
 
-/***************************************************************************
-**  Class:   GLViewer_ToolTip
-**  Descr:   ToolTip of GLViewer_Objects
-**  Module:  GLViewer
-**  Created: UI team, 25.03.05
-****************************************************************************/
-
-//--------------------------------------------------------------------------
-//Function: GLViewer_ToolTip()
-//Description: constructor
-//--------------------------------------------------------------------------
+/*!
+  constructor
+*/
 GLViewer_ObjectTip::GLViewer_ObjectTip( GLViewer_ViewPort2d* theParent )
 :QObject(),
  myText(),
@@ -69,10 +61,9 @@ GLViewer_ObjectTip::GLViewer_ObjectTip( GLViewer_ViewPort2d* theParent )
   connect( mypTimer, SIGNAL( timeout() ), this, SLOT( showTip() ) );
 }
 
-//--------------------------------------------------------------------------
-//Function: GLViewer_ToolTip()
-//Description: destructor
-//--------------------------------------------------------------------------
+/*!
+  destructor
+*/
 GLViewer_ObjectTip::~GLViewer_ObjectTip()
 { 
 //  delete mypRect;
@@ -87,10 +78,10 @@ GLViewer_ObjectTip::~GLViewer_ObjectTip()
 }
 
 
-//--------------------------------------------------------------------------
-//Function: GLViewer_ToolTip()
-//Description: destructor
-//--------------------------------------------------------------------------
+/*!
+  It is called when there is a possibility that a tool tip should be shown
+  \param p - position of tooltip
+*/
 bool GLViewer_ObjectTip::maybeTip( const QPoint &p )
 {
 
@@ -138,6 +129,9 @@ bool GLViewer_ObjectTip::maybeTip( const QPoint &p )
   */
 }
 
+/*!
+  Custom event filter
+*/
 bool GLViewer_ObjectTip::eventFilter( QObject* theObj, QEvent* e )
 {
   hideTipAndSleep();
@@ -175,7 +169,9 @@ bool GLViewer_ObjectTip::eventFilter( QObject* theObj, QEvent* e )
   return false;
 }
 
-
+/*!
+  Hides tooltip and stops timer
+*/
 void GLViewer_ObjectTip::hideTipAndSleep()
 {
   //if( mypPoint )
@@ -191,6 +187,9 @@ void GLViewer_ObjectTip::hideTipAndSleep()
   mypTimer->stop();
 }
 
+/*!
+  Shows tooltip
+*/
 void GLViewer_ObjectTip::showTip()
 {
   if( maybeTip( myPoint ) )
@@ -218,6 +217,9 @@ void GLViewer_ObjectTip::showTip()
   }
 }
 
+/*!
+  Restarts timer
+*/
 void GLViewer_ObjectTip::wakeup( int theTime )
 {
   if( mypTimer->isActive() )

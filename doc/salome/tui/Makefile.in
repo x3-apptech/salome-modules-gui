@@ -20,7 +20,24 @@ docs:
 	cp -fr $(srcdir)/SUIT ./INPUT; \
 	cd INPUT; \
 	sed 's|../../../share/salome|$(root_srcdir)|' ./doxyfile > ./doxyfile1; \
+	sed 's|../../build/salome|$(top_builddir)|' ./doxyfile1 > ./doxyfile2; \
+	sed "s|version|`cut -d: -f2 $(root_srcdir)/bin/VERSION`|" ./doxyfile2 > ./doxyfile3; \
+	mv -f doxyfile3 doxyfile1; \
+	echo "DOXYGEN SUPPORT PYTHON - @DOXYGEN_WITH_PYTHON@"; \
+	if( test "x@DOXYGEN_WITH_PYTHON@" = "xyes"); then \
+	  sed 's|python_extension_must_be_here|*.py|' ./doxyfile1 > ./doxyfile2; \
+	  mv -f doxyfile2 doxyfile1; \
+	  $(doxygen) -u ./doxyfile1; \
+	else \
+	  sed 's|python_extension_must_be_here||' ./doxyfile1 > ./doxyfile2; \
+	  mv -f doxyfile2 doxyfile1; \
+	fi; \
+	if( test "x@DOXYGEN_WITH_STL@" = "xyes"); then \
+	  sed -e 's|BUILTIN_STL_SUPPORT    = NO|BUILTIN_STL_SUPPORT    = YES|' ./doxyfile1 > ./doxyfile2; \
+	  mv -f doxyfile2 doxyfile1; \
+	fi; \
 	mv -f doxyfile1 doxyfile; \
+	echo "Running doxygen in directory:"`pwd`; \
 	$(doxygen) ./doxyfile; \
 	cd ../; \
 	cp -fr $(srcdir)/SUIT/sources/ SUIT ; \

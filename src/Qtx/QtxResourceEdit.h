@@ -35,6 +35,10 @@ class QtxResourceMgr;
 #include <qvariant.h>
 #include <qfont.h>
 
+/*!
+  \class QtxResourceEdit
+  Class for managing preferences items
+*/
 class QTX_EXPORT QtxResourceEdit
 {
 public:
@@ -104,9 +108,9 @@ private:
   friend class QtxResourceEdit::Item;
 };
 
-/*
-  Class: QtxResourceEditor::Item
-  Descr: Class for incapsulation of one preference item
+/*!
+  \class QtxResourceEditor::Item
+  Class for incapsulation of one preference item
 */
 
 class QTX_EXPORT QtxResourceEdit::Item

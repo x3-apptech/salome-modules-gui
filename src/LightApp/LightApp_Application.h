@@ -108,6 +108,7 @@ public:
   void                                updateActions();
 
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
+  virtual void                        addViewManager( SUIT_ViewManager* );
   virtual void                        removeViewManager( SUIT_ViewManager* );
   QWidget*                            getWindow( const int, const int = -1 );
   QWidget*                            window( const int, const int = -1 ) const;
@@ -129,6 +130,8 @@ public:
 
   static int                          studyId();
 
+  virtual bool                        event( QEvent* );
+
 signals:
   void                                studyOpened();
   void                                studySaved();
@@ -136,6 +139,7 @@ signals:
 
 public slots:
   virtual void                        onHelpContentsModule();
+  virtual void                        onHelpContextModule( const QString&, const QString& );
   virtual void                        onNewDoc();
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
@@ -189,6 +193,7 @@ private slots:
   void                                onMRUActivated( QString );
   void                                onPreferenceChanged( QString&, QString&, QString& );
   void                                onRenameWindow();
+  void                                onVisibilityChanged( bool );
 
 protected:
   void                                updateWindows();
@@ -212,12 +217,14 @@ protected:
 protected:
   typedef QMap<QString, QAction*>              ActionMap;
   typedef QMap<int, LightApp_WidgetContainer*> WindowMap;
+  typedef QMap<int, bool>                      WindowVisibilityMap;
 
 protected:
   LightApp_Preferences*               myPrefs;
   LightApp_SelectionMgr*              mySelMgr;
   ActionMap                           myActions;
   WindowMap                           myWindows;
+  WindowVisibilityMap                 myWindowsVisible;
 
   SUIT_Accel*                         myAccel;
 

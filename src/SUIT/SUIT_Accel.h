@@ -17,8 +17,6 @@
 // See http://www.salome-platform.org/
 //
 // SUIT_Accel.h: interface for the SUIT_Accel class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #ifndef SUIT_Accel_h 
 #define SUIT_Accel_h
@@ -29,6 +27,10 @@
 #include <qstring.h>
 #include <qmap.h>
 
+/*!
+  \class SUIT_Accel
+  Manager of keyboard accelerator bindings
+*/
 class SUIT_EXPORT SUIT_Accel: public QObject
 {
   Q_OBJECT

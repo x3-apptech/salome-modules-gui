@@ -26,15 +26,9 @@
 #include <qlineedit.h>
 #include <qlabel.h>
 
-/*
-  Class       : LightApp_Dialog
-  Description : Base class for all dialogs
+/*!
+  Constructor
 */
-
-//=======================================================================
-// name    : LightApp_Dialog
-// Purpose : Constructor
-//=======================================================================
 LightApp_Dialog::LightApp_Dialog( QWidget* parent, const char* name, bool modal,
                                   bool allowResize, const int f, WFlags wf )
 : QtxDialog( parent, name, modal, allowResize, f, wf ),
@@ -44,36 +38,33 @@ LightApp_Dialog::LightApp_Dialog( QWidget* parent, const char* name, bool modal,
   setObjectPixmap( "LightApp", tr( "ICON_SELECT" ) );
 }
 
-//=======================================================================
-// name    : ~LightApp_Dialog
-// Purpose : Destructor
-//=======================================================================
+/*!
+  Destructor
+*/
 LightApp_Dialog::~LightApp_Dialog()
 {
 }
 
-//=======================================================================
-// name    : show
-// Purpose : 
-//=======================================================================
+/*!
+  Show dialog
+*/
 void LightApp_Dialog::show()
 {
   QtxDialog::show();
 }
 
-//=======================================================================
-// name    : isExclusive
-// Purpose :
-//=======================================================================
+/*!
+  \return isExclusive status of selection buttons
+*/
 bool LightApp_Dialog::isExclusive() const
 {
   return myIsExclusive;
 }
 
-//=======================================================================
-// name    : updateButtons
-// Purpose :
-//=======================================================================
+/*!
+  Updates "on" state of buttons according to special button
+  \param _id - id of special button (if it is -1, then first selected button will be treated as special)
+*/
 void LightApp_Dialog::updateButtons( const int _id )
 {
   if( !myIsExclusive )
@@ -97,38 +88,39 @@ void LightApp_Dialog::updateButtons( const int _id )
   }
 }
 
-//=======================================================================
-// name    : setExclusive
-// Purpose :
-//=======================================================================
+/*!
+  Sets isExclusive status of selection buttons
+  \param ex - new value of isExclusive status
+*/
 void LightApp_Dialog::setExclusive( const bool ex )
 {
   myIsExclusive = ex;
   updateButtons();
 }
 
-//=======================================================================
-// name    : showObject
-// Purpose :
-//=======================================================================
+/*!
+  Shows object selection widget
+  \param id - identificator of object selection widget
+*/
 void LightApp_Dialog::showObject( const int id )
 {
   setObjectShown( id, true );
 }
 
-//=======================================================================
-// name    : hideObject
-// Purpose :
-//=======================================================================
+/*!
+  Hides object selection widget
+  \param id - identificator of object selection widget
+*/
 void LightApp_Dialog::hideObject( const int id )
 {
   setObjectShown( id, false );
 }
 
-//=======================================================================
-// name    : setObjectShown
-// Purpose :
-//=======================================================================
+/*!
+  Shows/hides object selection widget
+  \param id - identificator of object selection widget
+  \param shown - if it is true, widget will be shown
+*/
 void LightApp_Dialog::setObjectShown( const int id, const bool shown )
 {
   if( myObjects.contains( id ) && isObjectShown( id )!=shown )
@@ -142,19 +134,20 @@ void LightApp_Dialog::setObjectShown( const int id, const bool shown )
   }
 }
 
-//=======================================================================
-// name    : isObjectShown
-// Purpose :
-//=======================================================================
+/*!
+  \return isShown state of object selection widget
+  \param id - identificator of object selection widget
+*/
 bool LightApp_Dialog::isObjectShown( const int id ) const
 {
   return myObjects.contains( id ) && myObjects[ id ].myEdit->isShown();
 }
 
-//=======================================================================
-// name    : setObjectEnabled
-// Purpose :
-//=======================================================================
+/*!
+  Change enable state of object selection widget
+  \param id - identificator of object selection widget
+  \param en - new value of enable state
+*/
 void LightApp_Dialog::setObjectEnabled( const int id, const bool en )
 {
   if( myObjects.contains( id ) && isObjectEnabled( id )!=en )
@@ -168,19 +161,22 @@ void LightApp_Dialog::setObjectEnabled( const int id, const bool en )
   } 
 }
 
-//=======================================================================
-// name    : isObjectEnabled
-// Purpose :
-//=======================================================================
+/*!
+  \return enable state of object selection widget
+  \param id - identificator of object selection widget
+*/
 bool LightApp_Dialog::isObjectEnabled( const int id ) const
 {
   return myObjects.contains( id ) && myObjects[ id ].myEdit->isEnabled();
 }
 
-//=======================================================================
-// name    : selectObject
-// Purpose :
-//=======================================================================
+/*!
+  Passes to all active widgets name, type and id of selected object          
+  \param name - name of selected object
+  \param type - type of selected object
+  \param id - id of selected object
+  \param update - is need to update selection description string
+*/
 void LightApp_Dialog::selectObject( const QString& name, const int type, const QString& id, const bool update )
 {
   QStringList names;   names.append( name );
@@ -189,10 +185,13 @@ void LightApp_Dialog::selectObject( const QString& name, const int type, const Q
   selectObject( names, types, ids, update );
 }
 
-//=======================================================================
-// name    : selectObject
-// Purpose :
-//=======================================================================
+/*!
+  Passes to all active widgets names, types and ids of selected objects
+  \param _names - names of selected objects
+  \param _types - types of selected objects
+  \param _ids - ids of selected objects
+  \param update - is need to update selection description string
+*/
 void LightApp_Dialog::selectObject( const QStringList& _names,
                                      const TypesList& _types,
                                      const QStringList& _ids,
@@ -205,19 +204,19 @@ void LightApp_Dialog::selectObject( const QStringList& _names,
       selectObject( anIt.key(), _names, _types, _ids, update );
 }
 
-//=======================================================================
-// name    : hasSelection
-// Purpose :
-//=======================================================================
+/*!
+  \return true if widget has selection
+  \param id - identificator of object selection widget
+*/
 bool LightApp_Dialog::hasSelection( const int id ) const
 {
   return myObjects.contains( id ) && !myObjects[ id ].myIds.isEmpty();
 }
 
-//=======================================================================
-// name    : clearSelection
-// Purpose :
-//=======================================================================
+/*!
+  Clears selection of widget
+  \param id - identificator of object selection widget
+*/
 void LightApp_Dialog::clearSelection( const int id )
 {
   if( id==-1 )
@@ -239,10 +238,11 @@ void LightApp_Dialog::clearSelection( const int id )
   }
 }
 
-//=======================================================================
-// name    : objectWg
-// Purpose :
-//=======================================================================
+/*!
+  \return object selection widget 
+  \param theId - identificator of object selection widget
+  \param theWgId may be "Label", "Btn" or "Control"
+*/
 QWidget* LightApp_Dialog::objectWg( const int theId, const int theWgId ) const
 {
   QWidget* aResWg = 0;
@@ -258,39 +258,41 @@ QWidget* LightApp_Dialog::objectWg( const int theId, const int theWgId ) const
   return aResWg;
 }
 
-//=======================================================================
-// name    : objectText
-// Purpose :
-//=======================================================================
+/*!
+  \return object selection widget text
+  \param theId - identificator of object selection widget
+*/
 QString LightApp_Dialog::objectText( const int theId ) const
 {
   return myObjects.contains( theId ) ? myObjects[ theId ].myEdit->text() : "";
 }
 
-//=======================================================================
-// name    : setObjectText
-// Purpose :
-//=======================================================================
+/*!
+  Sets object selection widget text
+  \param theId - identificator of object selection widget
+  \param theText - new text
+*/
 void LightApp_Dialog::setObjectText( const int theId, const QString& theText )
 {
   if ( myObjects.contains( theId ) )
     myObjects[ theId ].myEdit->setText( theText );
 }
 
-//=======================================================================
-// name    : selectedObject
-// Purpose :
-//=======================================================================
+/*!
+  \return objects selected by widget
+  \param id - identificator of object selection widget
+  \param list - list to be filled by selected objects
+*/
 void LightApp_Dialog::selectedObject( const int id, QStringList& list ) const
 {
   if( myObjects.contains( id ) )
     list = myObjects[ id ].myIds;
 }
 
-//=======================================================================
-// name    : selectedObject
-// Purpose :
-//=======================================================================
+/*!
+  \return selected object id
+  \param id - identificator of object selection widget
+*/
 QString LightApp_Dialog::selectedObject( const int id ) const
 {
   if ( myObjects.contains( id ) && myObjects[ id ].myIds.count() > 0 )
@@ -299,10 +301,10 @@ QString LightApp_Dialog::selectedObject( const int id ) const
     return "";
 }
 
-//=======================================================================
-// name    : objectSelection
-// Purpose :
-//=======================================================================
+/*!
+  \return all selected objects
+  \param objs - map: widget id -> string id to be filled with selected objects
+*/
 void LightApp_Dialog::objectSelection( SelectedObjects& objs ) const
 {
   //objs.clear();
@@ -317,10 +319,13 @@ void LightApp_Dialog::objectSelection( SelectedObjects& objs ) const
   }
 }
 
-//=======================================================================
-// name    : createObject
-// Purpose :
-//=======================================================================
+/*!
+  Creates object selection widget
+  \return id
+  \label - label text
+  \parent - parent object
+  \id - proposed id for widget (if it is less than 0, the free id will be used)
+*/
 int LightApp_Dialog::createObject( const QString& label, QWidget* parent, const int id )
 {  
   int nid = id;
@@ -351,20 +356,22 @@ int LightApp_Dialog::createObject( const QString& label, QWidget* parent, const 
   return nid;
 }
 
-//=======================================================================
-// name    : renameObject
-// Purpose :
-//=======================================================================
+/*!
+  Changes label of object selection widget
+  \param id - identificator of object selection widget
+  \param label - new text of label
+*/
 void LightApp_Dialog::renameObject( const int id, const QString& label )
 {
   if( myObjects.contains( id ) )
     myObjects[ id ].myLabel->setText( label );
 }
 
-//=======================================================================
-// name    : setObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Sets possible types for widget
+  \param id - identificator of object selection widget
+  \param type1,... - type
+*/
 void LightApp_Dialog::setObjectType( const int id, const int type1, ... )
 {
   TypesList types;
@@ -379,10 +386,11 @@ void LightApp_Dialog::setObjectType( const int id, const int type1, ... )
   setObjectType( id, types );
 }
 
-//=======================================================================
-// name    : setObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Sets possible types for widget
+  \param id - identificator of object selection widget
+  \param list - list of possible types
+*/
 void LightApp_Dialog::setObjectType( const int id, const TypesList& list )
 {
   if( !myObjects.contains( id ) )
@@ -406,10 +414,11 @@ void LightApp_Dialog::setObjectType( const int id, const TypesList& list )
   updateObject( id );
 }
 
-//=======================================================================
-// name    : addObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Adds new possible types to object selection widget
+  \param id - identificator of object selection widget
+  \param type1, ... - new types
+*/
 void LightApp_Dialog::addObjectType( const int id, const int type1, const int, ... )
 {
   TypesList types; objectTypes( id, types );
@@ -424,20 +433,22 @@ void LightApp_Dialog::addObjectType( const int id, const int type1, const int, .
   setObjectType( id, types );  
 }
 
-//=======================================================================
-// name    : addObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Adds new possible types to object selection widget
+  \param id - identificator of object selection widget
+  \param list - new types
+*/
 void LightApp_Dialog::addObjectType( const int id, const TypesList& list )
 {
   TypesList types = list; objectTypes( id, types );
   setObjectType( id, types );
 }
 
-//=======================================================================
-// name    : addObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Adds new possible type to object selection widget
+  \param id - identificator of object selection widget
+  \param type - new type
+*/
 void LightApp_Dialog::addObjectType( const int id, const int type )
 {
   TypesList types; objectTypes( id, types );
@@ -445,20 +456,21 @@ void LightApp_Dialog::addObjectType( const int id, const int type )
   setObjectType( id, types );
 }
 
-//=======================================================================
-// name    : removeObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Clears list of possibles types for object selection widget
+  \param id - identificator of object selection widget
+*/
 void LightApp_Dialog::removeObjectType( const int id )
 {
   TypesList types;
   setObjectType( id, types );
 }
 
-//=======================================================================
-// name    : removeObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Removes types from list of possibles for object selection widget
+  \param id - identificator of object selection widget
+  \param list - list of types to be removed
+*/
 void LightApp_Dialog::removeObjectType( const int id, const TypesList& list )
 {
   if( !myObjects.contains( id ) )
@@ -485,20 +497,22 @@ void LightApp_Dialog::removeObjectType( const int id, const TypesList& list )
   updateObject( id );
 }
 
-//=======================================================================
-// name    : removeObjectType
-// Purpose :
-//=======================================================================
+/*!
+  Removes type from list of possibles for object selection widget
+  \param id - identificator of object selection widget
+  \param type - type to be removed
+*/
 void LightApp_Dialog::removeObjectType( const int id, const int type )
 {
   TypesList list; list.append( type );
   removeObjectType( id, list );
 }
 
-//=======================================================================
-// name    : hasObjectType
-// Purpose :
-//=======================================================================
+/*!
+  \return true if widget has such type
+  \param id - identificator of object selection widget
+  \param type - type to be checked
+*/
 bool LightApp_Dialog::hasObjectType( const int id, const int type ) const
 {
   if( myObjects.contains( id ) )
@@ -507,10 +521,11 @@ bool LightApp_Dialog::hasObjectType( const int id, const int type ) const
     return false;
 }
 
-//=======================================================================
-// name    : objectTypes
-// Purpose :
-//=======================================================================
+/*!
+  Returns list of possible types for widget
+  \param id - identificator of object selection widget
+  \param list - list to be filled with possible types
+*/
 void LightApp_Dialog::objectTypes( const int id, TypesList& list ) const
 {
   if( myObjects.contains( id ) )
@@ -522,10 +537,9 @@ void LightApp_Dialog::objectTypes( const int id, TypesList& list ) const
   }  
 }
 
-//=======================================================================
-// name    : onToggled
-// Purpose :
-//=======================================================================
+/*!
+  SLOT: called if selection button is clicked
+*/
 void LightApp_Dialog::onToggled( bool on )
 {
   QButton* but = ( QButton* )sender();
@@ -550,10 +564,11 @@ void LightApp_Dialog::onToggled( bool on )
       emit objectDeactivated( id );
 }
 
-//=======================================================================
-// name    : updateObject
-// Purpose :
-//=======================================================================
+/*!
+  Updates selection description of widget
+  \param id - identificator of object selection widget
+  \param emit_signal - if it is true, the signal "selection changed" is emitted
+*/
 void LightApp_Dialog::updateObject( const int id, bool emit_signal )
 {
   if( hasSelection( id ) )
@@ -566,10 +581,13 @@ void LightApp_Dialog::updateObject( const int id, bool emit_signal )
   }
 }
 
-//=======================================================================
-// name    : filterTypes
-// Purpose :
-//=======================================================================
+/*!
+  Finds in list possible types
+  \param id - identificator of object selection widget
+  \param names - list of selected objects names
+  \param types - list of selected objects types
+  \param ids - list of selected objects ids
+*/
 void LightApp_Dialog::filterTypes( const int id, QStringList& names, TypesList& types, QStringList& ids ) const
 {
   if( !myObjects.contains( id ) )
@@ -601,19 +619,18 @@ void LightApp_Dialog::filterTypes( const int id, QStringList& names, TypesList& 
   ids = new_ids;
 }
 
-//=======================================================================
-// name    : resMgr
-// Purpose :
-//=======================================================================
+/*!
+  \return global resource manager
+*/
 SUIT_ResourceMgr* LightApp_Dialog::resMgr() const
 {
   return SUIT_Session::session()->resourceMgr();
 }
 
-//=======================================================================
-// name    : setObjectPixmap
-// Purpose :
-//=======================================================================
+/*!
+  Sets pixmap for all object selection button
+  \param p - image
+*/
 void LightApp_Dialog::setObjectPixmap( const QPixmap& p )
 {
   myPixmap = p;
@@ -623,10 +640,11 @@ void LightApp_Dialog::setObjectPixmap( const QPixmap& p )
     ( ( QToolButton* )anIt.data().myBtn )->setIconSet( p );
 }                        
 
-//=======================================================================
-// name    : setObjectPixmap
-// Purpose :
-//=======================================================================
+/*!
+  Sets pixmap all for object selection button
+  \param section - name of section of resource manager
+  \param file - name of file
+*/
 void LightApp_Dialog::setObjectPixmap( const QString& section, const QString& file )
 {
   SUIT_ResourceMgr* mgr = resMgr();
@@ -634,19 +652,19 @@ void LightApp_Dialog::setObjectPixmap( const QString& section, const QString& fi
     setObjectPixmap( mgr->loadPixmap( section, file ) );
 }
 
-//=======================================================================
-// name    : multipleSelection
-// Purpose :
-//=======================================================================
+/*!
+  \return true, if it is enable multiple selection
+  \param id - identificator of object selection widget
+*/
 bool LightApp_Dialog::multipleSelection( const int id ) const
 {
   return nameIndication( id )!=OneName;  
 }
 
-//=======================================================================
-// name    : nameIndication
-// Purpose :
-//=======================================================================
+/*!
+  \return type of name indication
+  \param id - identificator of object selection widget
+*/
 LightApp_Dialog::NameIndication LightApp_Dialog::nameIndication( const int id ) const
 {
   if( myObjects.contains( id ) )
@@ -655,10 +673,11 @@ LightApp_Dialog::NameIndication LightApp_Dialog::nameIndication( const int id ) 
     return OneNameOrCount;
 }
 
-//=======================================================================
-// name    : setNameIndication
-// Purpose :
-//=======================================================================
+/*!
+  Sets type of name indication
+  \param id - identificator of object selection widget
+  \param ni - new type of name indication
+*/
 void LightApp_Dialog::setNameIndication( const int id, const NameIndication ni )
 {
   if( id==-1 )
@@ -682,10 +701,12 @@ void LightApp_Dialog::setNameIndication( const int id, const NameIndication ni )
   }
 }
 
-//=======================================================================
-// name    : selectionDescription
-// Purpose :
-//=======================================================================
+/*!
+  \return string representation of selection by selection data
+  \param names - list of selected objects names
+  \param types - list of selected objects types
+  \param ni - type of name indication
+*/
 QString LightApp_Dialog::selectionDescription( const QStringList& names, const TypesList& types, const NameIndication ni ) const
 {
   if( names.count()!=types.count() )
@@ -718,10 +739,10 @@ QString LightApp_Dialog::selectionDescription( const QStringList& names, const T
   return QString::null;
 }
 
-//=======================================================================
-// name    : countOfTypes
-// Purpose :
-//=======================================================================
+/*!
+  \return string representation of count of types
+  \param types - list of types
+*/
 QString LightApp_Dialog::countOfTypes( const TypesList& types ) const
 {
   QMap<int, int> typesCount;
@@ -743,39 +764,38 @@ QString LightApp_Dialog::countOfTypes( const TypesList& types ) const
   return typeCount.join( ", " );
 }
 
-//=======================================================================
-// name    : typeName
-// Purpose :
-//=======================================================================
+/*!
+  \return reference to type name
+  \param type - integer id of type
+*/
 QString& LightApp_Dialog::typeName( const int type )
 {
   return myTypeNames[ type ];
 }
 
-//=======================================================================
-// name    : typeName
-// Purpose :
-//=======================================================================
+/*!
+  \return const reference to type name
+  \param type - integer id of type
+*/
 const QString& LightApp_Dialog::typeName( const int type ) const
 {
   return myTypeNames[ type ];
 }
 
 
-//=======================================================================
-// name    : activateObject
-// Purpose :
-//=======================================================================
+/*!
+  Activates object selection widget
+  \param id - identificator of object selection widget
+*/
 void LightApp_Dialog::activateObject( const int theId )
 {
   if ( myObjects.contains( theId ) && !myObjects[ theId ].myBtn->isOn() )
     myObjects[ theId ].myBtn->toggle();
 }
 
-//=======================================================================
-// name    : deactivateAll
-// Purpose :
-//=======================================================================
+/*!
+  Deactivates all object selection widgets
+*/
 void LightApp_Dialog::deactivateAll()
 {
   ObjectMap::iterator anIt = myObjects.begin(),
@@ -787,10 +807,14 @@ void LightApp_Dialog::deactivateAll()
   }
 }
 
-//=======================================================================
-// name    : selectObject
-// Purpose :
-//=======================================================================
+/*!
+  Passes to widget name, type and id of selected object
+  \param id - identificator of object selection widget
+  \param name - name of selected object
+  \param type - type of selected object
+  \param selid - id of selected object
+  \param update - is need to update selection description string
+*/
 void LightApp_Dialog::selectObject( const int id, const QString& name, const int type, const QString& selid, const bool update )
 {
   QStringList names;   names.append( name );
@@ -799,10 +823,14 @@ void LightApp_Dialog::selectObject( const int id, const QString& name, const int
   selectObject( id, names, types, ids, update );
 }
 
-//=======================================================================
-// name    : selectObject
-// Purpose :
-//=======================================================================
+/*!
+  Passes to widget names, types and ids of selected objects
+  \param id - identificator of object selection widget
+  \param _names - names of selected object
+  \param _types - types of selected object
+  \param _ids - ids of selected object
+  \param update - is need to update selection description string
+*/
 void LightApp_Dialog::selectObject( const int id, const QStringList& _names, const TypesList& _types,
                                      const QStringList& _ids, const bool update )
 {
@@ -824,20 +852,21 @@ void LightApp_Dialog::selectObject( const int id, const QStringList& _names, con
   emit selectionChanged( id );
 }
 
-//=======================================================================
-// name    : setReadOnly
-// Purpose :
-//=======================================================================
+/*!
+  Sets read only state of object selection line edit
+  \param id - identificator of object selection widget
+  \param ro - new read only state
+*/
 void LightApp_Dialog::setReadOnly( const int id, const bool ro )
 {
   if( myObjects.contains( id ) )
     myObjects[ id ].myEdit->setReadOnly( nameIndication( id )==ListOfNames || nameIndication( id )==OneName ? ro : true );
 }
 
-//=======================================================================
-// name    : isReadOnly
-// Purpose :
-//=======================================================================
+/*!
+  \return read only state of object selection line edit
+  \param id - identificator of object selection widget
+*/
 bool LightApp_Dialog::isReadOnly( const int id ) const
 {
   if( myObjects.contains( id ) )
@@ -845,11 +874,10 @@ bool LightApp_Dialog::isReadOnly( const int id ) const
   else
     return true;
 }
-  
-//=======================================================================
-// name    : onTextChanged
-// Purpose :
-//=======================================================================
+
+/*!
+  SLOT: called if text of object selection line edit is changed
+*/
 void LightApp_Dialog::onTextChanged( const QString& text )
 {
   if( myIsBusy )

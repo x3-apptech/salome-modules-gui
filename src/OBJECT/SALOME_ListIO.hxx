@@ -55,6 +55,10 @@ class SALOME_ListNodeOfListIO;
 #include <Standard_Macro.hxx>
 #endif
 
+/*!
+  \class SALOME_ListIO
+  List of SALOME interactive objects
+*/
 class SALOME_ListIO  {
 
 public:

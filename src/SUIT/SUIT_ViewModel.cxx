@@ -18,7 +18,6 @@
 //
 // SUIT_ViewModel.cxx: implementation of the SUIT_ViewModel class.
 //
-//////////////////////////////////////////////////////////////////////
 
 #include "SUIT_ViewModel.h"
 

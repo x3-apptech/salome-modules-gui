@@ -36,7 +36,9 @@
 
 #define DEFAULT_SEPARATOR "***"
 
-//****************************************************************
+/*!
+  Converts rich text to plain text
+*/
 static QString plainText( const QString& richText )
 {
   QString aText = richText;
@@ -53,8 +55,9 @@ static QString plainText( const QString& richText )
   return aText;
 }
 
-//****************************************************************
-
+/*!
+  Default constructor
+*/
 LogWindow::LogWindow( QWidget* parent )
 : QFrame( parent ),
 SUIT_PopupClient()
@@ -83,10 +86,16 @@ SUIT_PopupClient()
   createActions();
 }
 
+/*!
+  Destructor
+*/
 LogWindow::~LogWindow()
 {
 }
 
+/*!
+  Custom event handler
+*/
 bool LogWindow::eventFilter( QObject* o, QEvent* e )
 {
   if ( o == myView->viewport() && e->type() == QEvent::ContextMenu )
@@ -97,6 +106,10 @@ bool LogWindow::eventFilter( QObject* o, QEvent* e )
   return QFrame::eventFilter( o, e );
 }
 
+/*!
+  Sets banner (title of message log)
+  \param banner - new title
+*/
 void LogWindow::setBanner( const QString& banner )
 {
   myBanner = banner;
@@ -104,6 +117,10 @@ void LogWindow::setBanner( const QString& banner )
   clear( false );
 }
 
+/*!
+  Set separator (line printing between messages)
+  \param separator - new separator
+*/
 void LogWindow::setSeparator( const QString& separator )
 {
   mySeparator = separator;
@@ -111,6 +128,11 @@ void LogWindow::setSeparator( const QString& separator )
   clear( false );
 }
 
+/*!
+  Puts message to log window
+  \param message - text of message
+  \addSeparator - if it is true, then separator is added to tail of message log
+*/
 void LogWindow::putMessage( const QString& message, bool addSeparator )
 {
   myView->append( message );
@@ -124,6 +146,10 @@ void LogWindow::putMessage( const QString& message, bool addSeparator )
   myView->scrollToBottom();
 }
 
+/*!
+  Clears message log
+  \param clearHistory - if it is true, then also history is cleared
+*/
 void LogWindow::clear( bool clearHistory )
 {
   myView->clear();
@@ -139,6 +165,10 @@ void LogWindow::clear( bool clearHistory )
     myBannerSize = 0;
 }
 
+/*!
+  Saves log to file
+  \param fileName - name of file
+*/
 bool LogWindow::saveLog( const QString& fileName )
 {
   QFile file( fileName );
@@ -160,6 +190,9 @@ bool LogWindow::saveLog( const QString& fileName )
   return true;
 }
 
+/*!
+  Creates actions
+*/
 void LogWindow::createActions()
 {
   QAction* a = new QAction( "", tr( "&Copy" ), 0, this );
@@ -183,6 +216,9 @@ void LogWindow::createActions()
   myActions.insert( SaveToFileId, a );
 }
 
+/*!
+  Redefined virtual method for popup filling
+*/
 void LogWindow::contextMenuPopup( QPopupMenu* popup )
 {
   myActions[ CopyId ]->addTo( popup );
@@ -199,6 +235,9 @@ void LogWindow::contextMenuPopup( QPopupMenu* popup )
   updateActions();
 }
 
+/*!
+  Updates enable status of actions
+*/
 void LogWindow::updateActions()
 {
   int paraFrom, paraTo, indexFrom, indexTo;
@@ -212,6 +251,9 @@ void LogWindow::updateActions()
   myActions[ SaveToFileId ]->setEnabled( myHistory.count() > 0 );
 }
 
+/*!
+  SLOT: called if user click "Save" in popup
+*/
 void LogWindow::onSaveToFile()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
@@ -233,17 +275,26 @@ void LogWindow::onSaveToFile()
     SUIT_MessageBox::error1( this, tr( "Error" ), tr( "Can't save file" ), tr( "OK" ) );
 }
 
+/*!
+  SLOT: called if user click "Select all" in popup
+*/
 void LogWindow::onSelectAll()
 {
   if ( myView )
     myView->selectAll();
 }
 
+/*!
+  SLOT: called if user click "Clear" in popup
+*/
 void LogWindow::onClear()
 {
   clear( false );
 }
 
+/*!
+  SLOT: called if user click "Copy" in popup
+*/
 void LogWindow::onCopy()
 {
   if ( myView )

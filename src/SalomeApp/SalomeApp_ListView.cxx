@@ -27,14 +27,9 @@
 
 using namespace std;
 
-//////////////////////////////////////////////////////////////////////
-// SalomeApp_ListView class implementation
-//////////////////////////////////////////////////////////////////////
-
-//================================================================
-// Function : computeEditGeometry
-/*! Purpose  : static function - used for resizing editing widget*/
-//================================================================
+/*!
+  Used for resizing editing widget
+*/
 void computeEditGeometry(SalomeApp_ListViewItem* theItem,
                          SalomeApp_EntityEdit*   theWidget)
 {
@@ -61,10 +56,9 @@ void computeEditGeometry(SalomeApp_ListViewItem* theItem,
   theWidget->setGeometry(aX, aY, aW, aH);
 }
 
-//================================================================
-// Function : SalomeApp_ListView::SalomeApp_ListView
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListView::SalomeApp_ListView( QWidget* parent )
 : QtxListView( parent )
 {
@@ -88,10 +82,9 @@ SalomeApp_ListView::SalomeApp_ListView( QWidget* parent )
 	  this,     SLOT(onHeaderSizeChange(int, int, int)));
 }
 
-//================================================================
-// Function : SalomeApp_ListView::~SalomeApp_ListView
-/*! Purpose  : destructor*/
-//================================================================
+/*!
+  Destructor
+*/
 SalomeApp_ListView::~SalomeApp_ListView()
 {
   if (myEdit) {
@@ -101,10 +94,9 @@ SalomeApp_ListView::~SalomeApp_ListView()
   myEditedItem = 0;
 }
 
-//================================================================
-// Function : SalomeApp_ListView::updateViewer
-/*! Purpose  : updates all data viewer*/
-//================================================================
+/*!
+  Updates all data viewer
+*/
 void SalomeApp_ListView::updateViewer()
 {
   // temporary disconnecting selection changed SIGNAL
@@ -118,10 +110,9 @@ void SalomeApp_ListView::updateViewer()
   emit selectionChanged();
 }
 
-//================================================================
-// Function : SalomeApp_ListView::updateSelected
-/*! Purpose  : updates currently selected item(s)*/
-//================================================================
+/*!
+  Updates currently selected item(s)
+*/
 void SalomeApp_ListView::updateSelected()
 {
   // temporary disconnecting selection changed SIGNAL
@@ -135,19 +126,17 @@ void SalomeApp_ListView::updateSelected()
   emit selectionChanged();
 }
 
-//================================================================
-// Function : SalomeApp_ListView::popupClientType
-/*! Purpose  : returns popup client type*/
-//================================================================
+/*!
+  Returns popup client type
+*/
 QString SalomeApp_ListView::popupClientType() const
 {
   return "SalomeApp_ListView";
 }
 
-//================================================================
-// Function : SalomeApp_ListView::contextMenuPopup
-/*! Purpose  : fills popup menu with items*/
-//================================================================
+/*!
+  Fills popup menu with items
+*/
 void SalomeApp_ListView::contextMenuPopup( QPopupMenu* aPopup )
 {
   if (aPopup) {
@@ -155,10 +144,9 @@ void SalomeApp_ListView::contextMenuPopup( QPopupMenu* aPopup )
   }
 }
 
-//================================================================
-// Function : SalomeApp_ListView::clear
-/*! Purpose  : clears view*/
-//================================================================
+/*!
+  Clears view
+*/
 void SalomeApp_ListView::clear()
 {
   if (myEdit) {
@@ -169,28 +157,25 @@ void SalomeApp_ListView::clear()
   QListView::clear();
 }
 
-//================================================================
-// Function : SalomeApp_ListView::isMouseEnabled
-/*! Purpose  : returms true if mouse events are enabled*/
-//================================================================
+/*!
+  \return true if mouse events are enabled
+*/
 bool SalomeApp_ListView::isMouseEnabled()
 {
   return myMouseEnabled;
 }
 
-//================================================================
-// Function : SalomeApp_ListView::enableMouse
-// Purpose  : enabled/disables mouse events (excluding MouseMove)
-//================================================================
+/*!
+  Enables/disables mouse events (excluding MouseMove)
+*/
 void SalomeApp_ListView::enableMouse(bool enable)
 {
   myMouseEnabled = enable;
 }
 
-//================================================================
-// Function : SalomeApp_ListView::eventFilter
-/*! Purpose  : event filter*/
-//================================================================
+/*!
+  Event filter
+*/
 bool SalomeApp_ListView::eventFilter(QObject* object, QEvent* event)
 {
   if (object == viewport() &&
@@ -203,10 +188,9 @@ bool SalomeApp_ListView::eventFilter(QObject* object, QEvent* event)
     return QListView::eventFilter(object, event);
 }
 
-//================================================================
-// Function : SalomeApp_ListView::enableEditing
-/*! Purpose  : setting editing of items availbale/not available*/
-//================================================================
+/*!
+  Setting editing of items availbale/not available
+*/
 void SalomeApp_ListView::enableEditing(bool theFlag)
 {
   myEditingEnabled = theFlag;
@@ -219,28 +203,25 @@ void SalomeApp_ListView::enableEditing(bool theFlag)
   }
 }
 
-//================================================================
-// Function : SalomeApp_ListView::isEnableEditing
-/*! Purpose  : says if editing is enabled*/
-//================================================================
+/*!
+  Says if editing is enabled
+*/
 bool SalomeApp_ListView::isEnableEditing()
 {
   return myEditingEnabled;
 }
 
-//================================================================
-// Function : SalomeApp_ListView::accept
-/*! Purpose  : calls finishEditing(true)...*/
-//================================================================
+/*!
+  Calls finishEditing(true)...
+*/
 void SalomeApp_ListView::accept()
 {
   finishEditing(true);
 }
 
-//================================================================
-// Function : QAD_ListView::onSelectionChanged
-/*! Purpose  : slot, called when selection changed in List Viewer*/
-//================================================================
+/*!
+  Slot, called when selection changed in List Viewer
+*/
 void SalomeApp_ListView::onSelectionChanged()
 {
   if (myEdit) {
@@ -271,10 +252,9 @@ void SalomeApp_ListView::onSelectionChanged()
   }
 }
 
-//================================================================
-// Function : SalomeApp_ListView::resizeEvent
-/*! Purpose  : called when Data Viewer is resized*/
-//================================================================
+/*!
+  Called when Data Viewer is resized
+*/
 void SalomeApp_ListView::resizeEvent( QResizeEvent * e)
 {
   QListView::resizeEvent(e);
@@ -285,10 +265,9 @@ void SalomeApp_ListView::resizeEvent( QResizeEvent * e)
   updateContents();
 }
 
-//================================================================
-// Function : SalomeApp_ListView::onHeaderSizeChange
-/*! Purpose  : slot, called when columns sizes are changed*/
-//================================================================
+/*!
+  Slot, called when columns sizes are changed
+*/
 void SalomeApp_ListView::onHeaderSizeChange(int, int, int)
 {
   int aW = columnWidth(columns()-1);
@@ -297,10 +276,9 @@ void SalomeApp_ListView::onHeaderSizeChange(int, int, int)
     setColumnWidth(columns()-1, width() - frameWidth() * 2 - aX - 1);
 }
 
-//================================================================
-// Function : SalomeApp_ListView::viewportPaintEvent
-/*! Purpose  : handler for paint event*/
-//================================================================
+/*!
+  Handler for paint event
+*/
 void SalomeApp_ListView::viewportPaintEvent(QPaintEvent* e)
 {
   QListView::viewportPaintEvent(e);
@@ -309,28 +287,25 @@ void SalomeApp_ListView::viewportPaintEvent(QPaintEvent* e)
   }
 }
 
-//================================================================
-// Function : SalomeApp_ListView::onEditOk
-/*! Purpose  : called when user finishes in editing of item*/
-//================================================================
+/*!
+  Called when user finishes in editing of item
+*/
 void SalomeApp_ListView::onEditOk()
 {
   finishEditing(true);
 }
 
-//================================================================
-// Function : SalomeApp_ListView::onEditCancel
-/*! Purpose  : called when user cancels item editing*/
-//================================================================
+/*!
+  Called when user cancels item editing
+*/
 void SalomeApp_ListView::onEditCancel()
 {
   finishEditing(false);
 }
 
-//================================================================
-// Function : SalomeApp_ListView::finishEditing
-/*! Purpose  : finishes editing of entity*/
-//================================================================
+/*!
+  Finishes editing of entity
+*/
 UpdateType SalomeApp_ListView::finishEditing(bool ok)
 {
   UpdateType aNeedsUpdate = utCancel;
@@ -392,12 +367,10 @@ UpdateType SalomeApp_ListView::finishEditing(bool ok)
   return aNeedsUpdate;
 }
 
-//================================================================
-// Function : SalomeApp_ListView::tip
-/*! Purpose  : gets current tooltip for list view
- * \retval valid rect in success
- */
-//================================================================
+/*!
+  \return current tooltip for list view
+  \retval valid rect in success
+*/
 QRect SalomeApp_ListView::tip(QPoint aPos,
 			QString& aText,
 			QRect& dspRect,
@@ -429,24 +402,18 @@ QRect SalomeApp_ListView::tip(QPoint aPos,
   return result;
 }
 
-//////////////////////////////////////////////////////////////////////
-// SalomeApp_ListViewItem Class Implementation
-//////////////////////////////////////////////////////////////////////
-
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView* parent) :
 QListViewItem( parent )
 {
   init();
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
 				   SalomeApp_ListViewItem* after) :
 QListViewItem( parent, after )
@@ -454,10 +421,9 @@ QListViewItem( parent, after )
   init();
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
 				   const QString&    theName,
 				   const bool        theEditable) :
@@ -467,10 +433,9 @@ QListViewItem(parent, theName)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
 				   const QString&    theName,
 				   const QString&    theValue,
@@ -481,10 +446,9 @@ QListViewItem(parent, theName, theValue)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
 				   const QString&    theName,
 				   const bool        theEditable) :
@@ -494,10 +458,9 @@ QListViewItem(parent, theName)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
 				   SalomeApp_ListViewItem* after,
 				   const QString&    theName,
@@ -508,10 +471,9 @@ QListViewItem(parent, after, theName)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
 				   SalomeApp_ListViewItem* after,
 				   const QString&    theName,
@@ -523,10 +485,9 @@ QListViewItem(parent, after, theName)
 }
 
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
 				   const QString&    theName,
 				   const QString&    theValue,
@@ -538,10 +499,9 @@ QListViewItem(parent, theName, theValue)
 }
 
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
 				   SalomeApp_ListViewItem* after,
 				   const QString&    theName,
@@ -553,10 +513,9 @@ QListViewItem(parent, after, theName, theValue)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::SalomeApp_ListViewItem
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
 				   SalomeApp_ListViewItem* after,
 				   const QString&    theName,
@@ -568,18 +527,16 @@ QListViewItem(parent, after, theName, theValue)
   setEditable(theEditable);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::~SalomeApp_ListViewItem
-/*! Purpose  : destructor*/
-//================================================================
+/*!
+  Destructor
+*/
 SalomeApp_ListViewItem::~SalomeApp_ListViewItem()
 {
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::init
-/*! Purpose  : initialization*/
-//================================================================
+/*!
+  Initialization
+*/
 void SalomeApp_ListViewItem::init()
 {
   myEditable    = false;
@@ -590,19 +547,17 @@ void SalomeApp_ListViewItem::init()
   myUserType    = -1;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getName
-/*! Purpose  : as default returns text in the first column*/
-//================================================================
+/*!
+  \return text in the first column
+*/
 QString SalomeApp_ListViewItem::getName() const
 {
   return ( listView()->columns() > 0 ) ? text(0) : QString("");
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setName
-/*! Purpose  : as default sets text in the first column*/
-//================================================================
+/*!
+  Sets text in the first column
+*/
 UpdateType SalomeApp_ListViewItem::setName(const QString& theName)
 {
   UpdateType aNeedsUpdate = utCancel;
@@ -613,19 +568,17 @@ UpdateType SalomeApp_ListViewItem::setName(const QString& theName)
   return aNeedsUpdate;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getValue
-/*! Purpose  : as default returns text in the second column*/
-//================================================================
+/*!
+  \return text in the second column
+*/
 QString SalomeApp_ListViewItem::getValue() const
 {
   return ( listView()->columns() > 1 ) ? text(1) : QString("");
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setValue
-/*! Purpose  : as default sets text in the second column*/
-//================================================================
+/*!
+  Sets text in the second column
+*/
 UpdateType SalomeApp_ListViewItem::setValue(const QString& theValue)
 {
   UpdateType aNeedsUpdate = utCancel;
@@ -636,10 +589,9 @@ UpdateType SalomeApp_ListViewItem::setValue(const QString& theValue)
   return aNeedsUpdate;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::fullName
-/*! Purpose  : returns full path to the entity from the root*/
-//================================================================
+/*!
+  \return full path to the entity from the root
+*/
 QString SalomeApp_ListViewItem::fullName()
 {
   QString aFullName = getName();
@@ -651,10 +603,9 @@ QString SalomeApp_ListViewItem::fullName()
   return aFullName;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::openAllLevels
-/*! Purpose  : expands all entities beginning from this level*/
-//================================================================
+/*!
+  expands all entities beginning from this level
+*/
 void SalomeApp_ListViewItem::openAllLevels()
 {
   setOpen(true);
@@ -665,10 +616,9 @@ void SalomeApp_ListViewItem::openAllLevels()
   }
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::updateAllLevels
-/*! Purpose  : update all entites beginning from this level*/
-//================================================================
+/*!
+  update all entites beginning from this level
+*/
 void SalomeApp_ListViewItem::updateAllLevels()
 {
   SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)firstChild();
@@ -678,145 +628,121 @@ void SalomeApp_ListViewItem::updateAllLevels()
   }
 }
 
-//================================================================
-// Function : SalomeApp_EditBox::isEditable
-/*! Purpose  : return true if entity is editable*/
-//================================================================
+/*!
+  \return true if entity is editable
+*/
 bool SalomeApp_ListViewItem::isEditable() const
 {
   return myEditable;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setEditable
-/*! Purpose  : sets editable flag fo the entity*/
-//================================================================
+/*!
+  Sets editable flag fo the entity
+*/
 void SalomeApp_ListViewItem::setEditable(bool theEditable)
 {
   myEditable = theEditable;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::isAccepted
-/*! Purpose  : returns true if entitiy is accepted after editing*/
-//================================================================
+/*!
+  \return true if entitiy is accepted after editing
+*/
 bool SalomeApp_ListViewItem::isAccepted() const
 {
   return myAccepted;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setAccepted
-/*! Purpose  : set entitiy accepted or not after editing*/
-//================================================================
+/*!
+  Sets entitiy accepted or not after editing
+*/
 void SalomeApp_ListViewItem::setAccepted(bool theAccepted)
 {
   myAccepted = theAccepted;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getEditingType
-/*! Purpose  : 
- * \retval type of edit control (default is edit box)
- *     \li 0 - edit box
- *     \li 1 - combo box
- *     \li 2 - editable combo box
- */
-//================================================================
+/*!
+ \retval type of edit control (default is edit box)
+      \li 0 - edit box
+      \li 1 - combo box
+      \li 2 - editable combo box
+*/
 int SalomeApp_ListViewItem::getEditingType()
 {
   return myEditingType;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setEditingType
-/*! Purpose  : 
- * \retval type of edit control (negative value means none)
- *     \li 0 - edit box
- *     \li 1 - combo box
- *     \li 2 - editable combo box
- */
-//================================================================
+/*!
+ \retval type of edit control (negative value means none)
+     \li 0 - edit box
+     \li 1 - combo box
+     \li 2 - editable combo box
+*/
 void SalomeApp_ListViewItem::setEditingType(const int type)
 {
   myEditingType = type;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getEditedColumn
-// Purpose  : 
 /*! \retval edited column, default is last column
- *   negative value means there are no editable columns
- */
-//================================================================
+    negative value means there are no editable columns
+*/
 int SalomeApp_ListViewItem::getEditedColumn()
 {
   return listView()->columns()-1;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getValueType
-// Purpose  : 
-/*!\retval type of edited value (string, int, double)
- * default is string
- */
-//================================================================
+/*!
+  \retval type of edited value (string, int, double)
+   default is string
+*/
 int SalomeApp_ListViewItem::getValueType()
 {
   return myValueType;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setValueType
-/*! Purpose  : sets type of edited value*/
-//================================================================
+/*!
+  Sets type of edited value
+*/
 void SalomeApp_ListViewItem::setValueType(const int valueType)
 {
   myValueType = valueType;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getUserType
-/*! Purpose  : sets type of edited value*/
-//================================================================
+/*!
+  Sets type of edited value
+*/
 int SalomeApp_ListViewItem::getUserType()
 {
   return myUserType;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::setUserType
-/*! Purpose  : sets type of edited value*/
-//================================================================
+/*!
+  Sets type of edited value
+*/
 void SalomeApp_ListViewItem::setUserType(const int userType)
 {
   myUserType = userType;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getButtons
-/*! Purpose  : returns buttons for editing widget (Apply (V), Cancel (X))
- * default is both buttons
- */
-//================================================================
+/*!
+  \return buttons for editing widget (Apply (V), Cancel (X))
+   default is both buttons
+*/
 int SalomeApp_ListViewItem::getButtons()
 {
   return myButtons;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::getButtons
-/*! Purpose  : sets buttons for editing widget (Apply (V), Cancel (X))*/
-//================================================================
+/*!
+  Sets buttons for editing widget (Apply (V), Cancel (X))
+*/
 void SalomeApp_ListViewItem::setButtons(const int buttons)
 {
   myButtons = buttons;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::startEditing
-/*! Purpose  : creates control for editing and fills it with values*/
-//================================================================
+/*!
+  Creates control for editing and fills it with values
+*/
 SalomeApp_EntityEdit* SalomeApp_ListViewItem::startEditing()
 {
   SalomeApp_EntityEdit* aWidget = 0;
@@ -842,10 +768,9 @@ SalomeApp_EntityEdit* SalomeApp_ListViewItem::startEditing()
   return aWidget;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::fillWidgetWithValues
-/*! Purpose  : fills widget with initial values (list or single value)*/
-//================================================================
+/*!
+  Fills widget with initial values (list or single value)
+*/
 void SalomeApp_ListViewItem::fillWidgetWithValues(SalomeApp_EntityEdit* theWidget)
 {
   int anEditColumn = getEditedColumn();
@@ -853,10 +778,9 @@ void SalomeApp_ListViewItem::fillWidgetWithValues(SalomeApp_EntityEdit* theWidge
     theWidget->insertItem(text(anEditColumn), true);
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::finishEditing
-/*! Purpose  : finishes editing of entity*/
-//================================================================
+/*!
+  Finishes editing of entity
+*/
 UpdateType SalomeApp_ListViewItem::finishEditing(SalomeApp_EntityEdit* theWidget)
 {
   UpdateType aNeedsUpdate = utCancel;
@@ -881,10 +805,9 @@ UpdateType SalomeApp_ListViewItem::finishEditing(SalomeApp_EntityEdit* theWidget
   return aNeedsUpdate;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::tipRect
-/*! Purpose  : calculates rectangle which should contain item's tip*/
-//================================================================
+/*!
+  Calculates rectangle which should contain item's tip
+*/
 QRect SalomeApp_ListViewItem::tipRect()
 {
   QRect aRect = QRect(-1, -1, -1, -1);
@@ -906,10 +829,9 @@ QRect SalomeApp_ListViewItem::tipRect()
   return aRect;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::tipText
-/*! Purpose  : returns text for tooltip*/
-//================================================================
+/*!
+  \return text for tooltip
+*/
 QString SalomeApp_ListViewItem::tipText()
 {
   QString aText = getName();
@@ -918,10 +840,9 @@ QString SalomeApp_ListViewItem::tipText()
   return aText;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::textRect
-/*! Purpose  : calculates rect of item text in viewport coordinates*/
-//================================================================
+/*!
+  Calculates rect of item text in viewport coordinates
+*/
 QRect SalomeApp_ListViewItem::textRect(const int column) const
 {
   QRect aItemRect = listView()->itemRect( this );
@@ -956,10 +877,9 @@ QRect SalomeApp_ListViewItem::textRect(const int column) const
   return theResult;
 }
 
-//================================================================
-// Function : SalomeApp_ListViewItem::itemRect
-/*! Purpose  : calculates rect of item data in viewport coordinates*/
-//================================================================
+/*!
+  Calculates rect of item data in viewport coordinates
+*/
 QRect SalomeApp_ListViewItem::itemRect(const int column) const
 {
   QRect aItemRect = listView()->itemRect( this );
@@ -991,23 +911,17 @@ QRect SalomeApp_ListViewItem::itemRect(const int column) const
   return theResult;
 }
 
-//////////////////////////////////////////////////////////////////////
-// SalomeApp_EditBox class implementation
-//////////////////////////////////////////////////////////////////////
-
-//================================================================
-// Function : SalomeApp_EditBox::SalomeApp_EditBox
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_EditBox::SalomeApp_EditBox(QWidget* parent) :
 QLineEdit(parent)
 {
 }
 
-//================================================================
-// Function : SalomeApp_EditBox::keyPressEvent
-/*! Purpose  : event filter for key pressing*/
-//================================================================
+/*!
+  Event filter for key pressing
+*/
 void SalomeApp_EditBox::keyPressEvent( QKeyEvent *e )
 {
   if ( e->key() == Key_Escape )
@@ -1017,23 +931,18 @@ void SalomeApp_EditBox::keyPressEvent( QKeyEvent *e )
   e->accept();
 }
 
-//////////////////////////////////////////////////////////////////////
-// SalomeApp_ComboBox class implementation
-//////////////////////////////////////////////////////////////////////
 
-//================================================================
-// Function : SalomeApp_ComboBox::SalomeApp_ComboBox
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_ComboBox::SalomeApp_ComboBox(bool rw, QWidget* parent, const char* name) :
 QComboBox(rw, parent, name)
 {
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::findItem
-/*! Purpose  : searches item in list and returns its index*/
-//================================================================
+/*!
+  Searches item in list and returns its index
+*/
 int SalomeApp_ComboBox::findItem(const QString& theText)
 {
   for (int i = 0; i < count(); i++)
@@ -1042,10 +951,9 @@ int SalomeApp_ComboBox::findItem(const QString& theText)
   return -1;
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertItem
-/*! Purpose  : adds item in combo box*/
-//================================================================
+/*!
+  Adds item in combo box
+*/
 void SalomeApp_ComboBox::insertItem(const QString& theValue,
 			      int            theIndex)
 {
@@ -1053,20 +961,18 @@ void SalomeApp_ComboBox::insertItem(const QString& theValue,
     QComboBox::insertItem(theValue, theIndex);
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertList
-/*! Purpose  : adds list of items in combo box*/
-//================================================================
+/*!
+  Adds list of items in combo box
+*/
 void SalomeApp_ComboBox::insertList(const QStringList& theList)
 {
   for (unsigned i = 0; i < theList.count(); i++)
     insertItem(theList[i]);
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertItem
-/*! Purpose  : adds item in combo box*/
-//================================================================
+/*!
+  Adds item in combo box
+*/
 void SalomeApp_ComboBox::insertItem(const int theValue)
 {
   int aNum;
@@ -1083,20 +989,18 @@ void SalomeApp_ComboBox::insertItem(const int theValue)
   insertItem(QString::number(theValue));
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertList
-/*! Purpose  : adds list of items in combo box*/
-//================================================================
+/*!
+  Adds list of items in combo box
+*/
 void SalomeApp_ComboBox::insertList(const TColStd_ListOfInteger& theList)
 {
   for (TColStd_ListIteratorOfListOfInteger aIter(theList); aIter.More(); aIter.Next())
     insertItem(aIter.Value());
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertItem
-/*! Purpose  : adds item in combo box*/
-//================================================================
+/*!
+  Adds item in combo box
+*/
 void SalomeApp_ComboBox::insertItem(const double theValue)
 {
   double aNum;
@@ -1113,29 +1017,23 @@ void SalomeApp_ComboBox::insertItem(const double theValue)
   insertItem(QString::number(theValue));
 }
 
-//================================================================
-// Function : SalomeApp_ComboBox::insertList
-/*! Purpose  : adds list of items in combo box*/
-//================================================================
+/*!
+  Adds list of items in combo box
+*/
 void SalomeApp_ComboBox::insertList(const TColStd_ListOfReal& theList)
 {
   for (TColStd_ListIteratorOfListOfReal aIter(theList); aIter.More(); aIter.Next())
     insertItem(aIter.Value());
 }
 
-//////////////////////////////////////////////////////////////////////
-// SalomeApp_EntityEdit class implementation
-//////////////////////////////////////////////////////////////////////
-
 #include <qlayout.h>
 
 #define MIN_COMBO_WIDTH     1
 #define MIN_EDIT_WIDTH      1
 
-//================================================================
-// Function : SalomeApp_EntityEdit::SalomeApp_EntityEdit
-/*! Purpose  : constructor*/
-//================================================================
+/*!
+  Constructor
+*/
 SalomeApp_EntityEdit::SalomeApp_EntityEdit(QWidget* parent,
 			       int      controlType,
 			       int      valueType,
@@ -1224,18 +1122,16 @@ myCancelBtn(0)
   }
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::~SalomeApp_EntityEdit
-/*! Purpose  : destructor*/
-//================================================================
+/*!
+  Destructor
+*/
 SalomeApp_EntityEdit::~SalomeApp_EntityEdit()
 {
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::clear
-/*! Purpose  : clears edit/combo box*/
-//================================================================
+/*!
+  Clears edit/combo box
+*/
 void SalomeApp_EntityEdit::clear()
 {
   if (myEdit)
@@ -1244,10 +1140,9 @@ void SalomeApp_EntityEdit::clear()
     myCombo->clear();
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::getText
-/*! Purpose  : returns current text in edit box or combo box*/
-//================================================================
+/*!
+  \return current text in edit box or combo box
+*/
 QString SalomeApp_EntityEdit::getText()
 {
   if (myEdit)
@@ -1258,10 +1153,9 @@ QString SalomeApp_EntityEdit::getText()
     return "";
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::setText
-/*! Purpose  : sets text*/
-//================================================================
+/*!
+  Sets text
+*/
 void SalomeApp_EntityEdit::setText(const QString& theText)
 {
   myString = theText;
@@ -1276,12 +1170,9 @@ void SalomeApp_EntityEdit::setText(const QString& theText)
   }
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertItem
-/*! Purpose  : adds item in combo box,
- *            sets it current if theSetCurrent is true
- */
-//================================================================
+/*!
+  Adds item in combo box, sets it current if theSetCurrent is true
+*/
 void SalomeApp_EntityEdit::insertItem(const QString& theValue,
 				bool           theSetCurrent,
 				int            theOrder)
@@ -1302,12 +1193,9 @@ void SalomeApp_EntityEdit::insertItem(const QString& theValue,
     setText(theValue);
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertList
-/*! Purpose  : adds items in combo box,
- *            sets item theCurrent as current
- */
-//================================================================
+/*!
+  Adds items in combo box, sets item theCurrent as current
+*/
 void SalomeApp_EntityEdit::insertList(const QStringList& theList,
 				const int          theCurrent)
 {
@@ -1317,12 +1205,9 @@ void SalomeApp_EntityEdit::insertList(const QStringList& theList,
     setText(theList[theCurrent]);
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertItem
-/*! Purpose  : adds item in combo box,
- *            sets it current if theSetCurrent is true
- */
-//================================================================
+/*!
+  Adds item in combo box, sets it current if theSetCurrent is true
+*/
 void SalomeApp_EntityEdit::insertItem(const int theValue,
 				bool      theSetCurrent)
 {
@@ -1333,12 +1218,9 @@ void SalomeApp_EntityEdit::insertItem(const int theValue,
     setText(QString::number(theValue));
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertList
-/*! Purpose  : adds items in combo box,
- *            sets item theCurrent as current
- */
-//================================================================
+/*!
+  Adds items in combo box, sets item theCurrent as current
+*/
 void SalomeApp_EntityEdit::insertList(const TColStd_ListOfInteger& theList,
 				const int                    theCurrent)
 {
@@ -1354,11 +1236,9 @@ void SalomeApp_EntityEdit::insertList(const TColStd_ListOfInteger& theList,
   }
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertItem
-// Purpose  : adds item in combo box,
-//            sets it current if theSetCurrent is true
-//================================================================
+/*!
+  Adds item in combo box, sets it current if theSetCurrent is true
+*/
 void SalomeApp_EntityEdit::insertItem(const double theValue,
 				bool         theSetCurrent)
 {
@@ -1369,12 +1249,9 @@ void SalomeApp_EntityEdit::insertItem(const double theValue,
     setText(QString::number(theValue));
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::insertList
-/*! Purpose  : adds items in combo box,
- *            sets item theCurrent as current
- */
-//================================================================
+/*!
+  Adds items in combo box, sets item theCurrent as current
+*/
 void SalomeApp_EntityEdit::insertList(const TColStd_ListOfReal& theList,
 				const int                 theCurrent)
 {
@@ -1390,10 +1267,9 @@ void SalomeApp_EntityEdit::insertList(const TColStd_ListOfReal& theList,
   }
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::getControl
-/*! Purpose  : gets actual widget*/
-//================================================================
+/*! 
+  \return actual widget
+*/
 QWidget* SalomeApp_EntityEdit::getControl()
 {
   if (myEdit)
@@ -1404,10 +1280,9 @@ QWidget* SalomeApp_EntityEdit::getControl()
     return 0;
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::setFocus
-/*! Purpose  : redirect focus to corresponding widget*/
-//================================================================
+/*!
+  redirect focus to corresponding widget
+*/
 void SalomeApp_EntityEdit::setFocus()
 {
   if (myEdit) {
@@ -1420,10 +1295,9 @@ void SalomeApp_EntityEdit::setFocus()
   }
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::setValidator
-/*! Purpose  : sets validator for the control*/
-//================================================================
+/*!
+  Sets validator for the control
+*/
 void SalomeApp_EntityEdit::setValidator(const QValidator* theValidator)
 {
   if (myEdit)
@@ -1432,10 +1306,9 @@ void SalomeApp_EntityEdit::setValidator(const QValidator* theValidator)
     myCombo->setValidator(theValidator);
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::keyPressEvent
-/*! Purpose  : event filter for KeyPress event*/
-//================================================================
+/*!
+  Event filter for KeyPress event
+*/
 void SalomeApp_EntityEdit::keyPressEvent( QKeyEvent * e)
 {
   if ( (e->key() == Key_Enter ||
@@ -1445,19 +1318,17 @@ void SalomeApp_EntityEdit::keyPressEvent( QKeyEvent * e)
     onCancel();
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::onComboActivated
-/*! Purpose  : called when item activated in combo box*/
-//================================================================
+/*!
+  Called when item activated in combo box
+*/
 void SalomeApp_EntityEdit::onComboActivated(const QString& theText)
 {
   onTextChanged(theText);
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::onTextChanged
-/*! Purpose  : slot, called when text changed in line edit*/
-//================================================================
+/*!
+  Slot, called when text changed in line edit
+*/
 void SalomeApp_EntityEdit::onTextChanged(const QString& theText)
 {
   if (myApplyBtn)
@@ -1466,10 +1337,9 @@ void SalomeApp_EntityEdit::onTextChanged(const QString& theText)
     myCancelBtn->setEnabled(!(theText == myString));
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::onCancel
-/*! Purpose  : slot, called when user presses Cancel button*/
-//================================================================
+/*!
+  Slot, called when user presses Cancel button
+*/
 void SalomeApp_EntityEdit::onCancel()
 {
   setText(myString);
@@ -1480,10 +1350,9 @@ void SalomeApp_EntityEdit::onCancel()
   emit escapePressed();
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::onApply
-/*! Purpose  : slot, called when user presses Apply button*/
-//================================================================
+/*!
+  Slot, called when user presses Apply button
+*/
 void SalomeApp_EntityEdit::onApply()
 {
   myString = getText();
@@ -1494,10 +1363,9 @@ void SalomeApp_EntityEdit::onApply()
   emit returnPressed();
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::showButtons
-/*! Purpose  : shows/hides buttons*/
-//================================================================
+/*!
+  Shows/hides buttons
+*/
 void SalomeApp_EntityEdit::showButtons(bool show)
 {
   if (myApplyBtn)
@@ -1506,10 +1374,9 @@ void SalomeApp_EntityEdit::showButtons(bool show)
     show ? myCancelBtn->show() : myCancelBtn->hide();
 }
 
-//================================================================
-// Function : SalomeApp_EntityEdit::setDuplicatesEnabled
-/*! Purpose  : enables/disables data duplication (for combo box)*/
-//================================================================
+/*!
+  Enables/disables data duplication (for combo box)
+*/
 void SalomeApp_EntityEdit::setDuplicatesEnabled(bool enabled)
 {
   if (myCombo)

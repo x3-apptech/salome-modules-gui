@@ -31,8 +31,6 @@
 #include "SALOME_NamingService.hxx"
 #include "SALOMETraceCollector.hxx"
 
-#include "InquireServersQThread.h" // splash
-
 #include <iostream>
 #ifndef WNT
 #include <unistd.h>
@@ -42,6 +40,7 @@
 #include <qfile.h>
 #include <qapplication.h>
 #include <qwaitcondition.h>
+#include <qregexp.h>
 
 #include "Utils_SALOME_Exception.hxx"
 #include "Utils_CorbaException.hxx"
@@ -54,13 +53,15 @@
 #include <utilities.h>
 #include "Session_Session_i.hxx"
 #include "Session_ServerLauncher.hxx"
+#include "Session_ServerCheck.hxx"
 
+#include <QtxSplash.h>
 #include "SUIT_Tools.h"
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
+#include "SUIT_Desktop.h"
 #include "SUIT_MessageBox.h"
 #include "SUIT_ResourceMgr.h"
-
 #include "SUIT_ExceptionHandler.h"
 
 /*! - read arguments, define list of server to launch with their arguments.
@@ -180,10 +181,39 @@ public:
   QString version() const { return myExtAppVersion; }
 
 protected:
-  QString userFileName( const QString& appName ) const
+  QString userFileName( const QString& appName, const bool for_load ) const
   { 
     if ( version().isNull()  ) return ""; 
-    return SUIT_ResourceMgr::userFileName( myExtAppName );
+    return SUIT_ResourceMgr::userFileName( myExtAppName, for_load );
+  }
+
+  virtual int userFileId( const QString& _fname ) const
+  {
+    QRegExp exp( "\\.SalomeApprc\\.([a-zA-Z0-9.]+)$" );
+    QRegExp vers_exp( "^([0-9]+)([A-Za-z]?)([0-9]*)$" );
+
+    QString fname = QFileInfo( _fname ).fileName();
+    if( exp.exactMatch( fname ) )
+    {
+      QStringList vers = QStringList::split( ".", exp.cap( 1 ) );
+      int major=0, minor=0;
+      major = vers[0].toInt();
+      minor = vers[1].toInt();
+      if( vers_exp.search( vers[2] )==-1 )
+	return -1;
+      int release = 0, dev1 = 0, dev2 = 0;
+      release = vers_exp.cap( 1 ).toInt();
+      dev1 = vers_exp.cap( 2 )[ 0 ].latin1();
+      dev2 = vers_exp.cap( 3 ).toInt();
+
+      int dev = dev1*100+dev2, id = major;
+      id*=100; id+=minor;
+      id*=100; id+=release;
+      id*=10000; id+=dev;
+      return id;
+    }
+
+    return -1;
   }
 
 public:
@@ -231,7 +261,10 @@ private:
 class GetInterfaceThread : public QThread
 {
 public:
-  GetInterfaceThread( SALOME::Session_var s ) : session ( s ) {}
+  GetInterfaceThread( SALOME::Session_var s ) : session ( s )
+  {
+    start();
+  }
 protected:
   virtual void run()
   {
@@ -256,19 +289,87 @@ bool isFound( const char* str, int argc, char** argv )
 // ---------------------------- MAIN -----------------------
 int main( int argc, char **argv )
 {
+  // Install Qt debug messages handler
   qInstallMsgHandler( MessageOutput );
-
-  // QApplication should be create before all other operations
-  // When uses QApplication::libraryPaths() ( example, QFile::encodeName() )
-  // qApp used for detection of the executable dir path.
+  
+  // Create Qt application instance;
+  // this should be done the very first!
   SALOME_QApplication _qappl( argc, argv );
   ASSERT( QObject::connect( &_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) ) );
 
+  // Add application library path (to search style plugin etc...)
   QString path = QDir::convertSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
   _qappl.addLibraryPath( path );
   
+  // Set SALOME style to the application
   _qappl.setStyle( "salome" );
 
+  bool isGUI    = isFound( "GUI",    argc, argv );
+  bool isSplash = isFound( "SPLASH", argc, argv );
+  // Show splash screen (only if both the "GUI" and "SPLASH" parameters are set)
+  QtxSplash* splash = 0;
+  if ( isGUI && isSplash ) {
+    // ...create resource manager
+    SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
+    resMgr.setCurrentFormat( "xml" );
+    resMgr.loadLanguage( "LightApp", "en" );
+    // ...get splash preferences
+    QString splashIcon, splashInfo, splashTextColors, splashProgressColors;
+    resMgr.value( "splash", "image",           splashIcon );
+    resMgr.value( "splash", "info",            splashInfo, false );
+    resMgr.value( "splash", "text_colors",     splashTextColors );
+    resMgr.value( "splash", "progress_colors", splashProgressColors );
+    QPixmap px( splashIcon );
+    if ( px.isNull() ) // try to get splash pixmap from resources
+      px = resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) );
+    if ( !px.isNull() ) {
+      // ...set splash pixmap
+      splash = QtxSplash::splash( px );
+      // ...set splash text colors
+      if ( !splashTextColors.isEmpty() ) {
+	QStringList colors = QStringList::split( "|", splashTextColors );
+	QColor c1, c2;
+	if ( colors.count() > 0 ) c1 = QColor( colors[0] );
+	if ( colors.count() > 1 ) c2 = QColor( colors[1] );
+	splash->setTextColors( c1, c2 );
+      }
+      else {
+	splash->setTextColors( Qt::white, Qt::black );
+      }
+      // ...set splash progress colors
+      if ( !splashProgressColors.isEmpty() ) {
+	QStringList colors = QStringList::split( "|", splashProgressColors );
+	QColor c1, c2;
+	int gradType = QtxSplash::Vertical;
+	if ( colors.count() > 0 ) c1 = QColor( colors[0] );
+	if ( colors.count() > 1 ) c2 = QColor( colors[1] );
+	if ( colors.count() > 2 ) gradType = colors[2].toInt();
+	splash->setProgressColors( c1, c2, gradType );
+      }
+      // ...set splash text font
+      QFont f = splash->font();
+      f.setBold( true );
+      splash->setFont( f );
+      // ...show splash initial status
+      if ( !splashInfo.isEmpty() ) {
+	splashInfo.replace( QRegExp( "%A" ),  QObject::tr( "APP_NAME" ) );
+	splashInfo.replace( QRegExp( "%V" ),  QObject::tr( "ABOUT_VERSION" ).arg( salomeVersion() ) );
+	splashInfo.replace( QRegExp( "%L" ),  QObject::tr( "ABOUT_LICENSE" ) );
+	splashInfo.replace( QRegExp( "%C" ),  QObject::tr( "ABOUT_COPYRIGHT" ) );
+	splashInfo.replace( QRegExp( "\\\\n" ), "\n" );
+	splash->message( splashInfo );
+      }
+      // ...set 'hide on click' flag
+#ifdef _DEBUG_
+      splash->setHideOnClick( true );
+#endif
+      // ...show splash
+      splash->show();
+      qApp->processEvents();
+    }
+  }
+
+  // Initialization
   int result = -1;
 
   CORBA::ORB_var orb;
@@ -280,29 +381,26 @@ int main( int argc, char **argv )
   Session_ServerLauncher* myServerLauncher = 0;
 
   try {
-    
-    // Python initialisation : only once
-
-    int _argc = 1;
+    // ...initialize Python (only once)
+    int   _argc   = 1;
     char* _argv[] = {""};
     KERNEL_PYTHON::init_python( _argc,_argv );
     PyEval_RestoreThread( KERNEL_PYTHON::_gtstate );
     if ( !KERNEL_PYTHON::salome_shared_modules_module ) // import only once
       KERNEL_PYTHON::salome_shared_modules_module = PyImport_ImportModule( "salome_shared_modules" );
-    if ( !KERNEL_PYTHON::salome_shared_modules_module )
-    {
+    if ( !KERNEL_PYTHON::salome_shared_modules_module ) {
       INFOS( "salome_shared_modules_module == NULL" );
       PyErr_Print();
     }
     PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate );
 
-    // Create ORB, get RootPOA object, NamingService, etc.
+    // ...create ORB, get RootPOA object, NamingService, etc.
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
     ASSERT( SINGLETON_<ORB_INIT>::IsAlreadyExisting() );
     int orbArgc = 1;
     orb = init( orbArgc, argv );
 
-    // Install SALOME thread event handler
+    // ...install SALOME thread event handler
     SALOME_Event::GetSessionThread();
 
     CORBA::Object_var obj = orb->resolve_initial_references( "RootPOA" );
@@ -337,70 +435,67 @@ int main( int argc, char **argv )
     INFOS( "Caught unknown exception." );
   }
 
-  // CORBA Servant Launcher
-  QMutex _GUIMutex;
-  QWaitCondition _ServerLaunch, _SessionStarted;
+  QMutex _GUIMutex, _SessionMutex, _SplashMutex;
+  QWaitCondition _ServerLaunch, _SessionStarted, _SplashStarted;
 
-  if ( !result )
-  {
-    _GUIMutex.lock();  // to block Launch server thread until wait( mutex )
+  // lock session mutex to ensure that GetInterface is not called
+  // until all initialization is done
+  _SessionMutex.lock();
 
-    // Activate embedded CORBA servers: Registry, SALOMEDS, etc.
-    myServerLauncher = new Session_ServerLauncher( argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionStarted );
-    myServerLauncher->start();
-
-    _ServerLaunch.wait( &_GUIMutex ); // to be reseased by Launch server thread when ready:
+  if ( !result ) {
+    // Start embedded servers launcher (Registry, SALOMEDS, etc.)
+    // ...lock mutex to block embedded servers launching thread until wait( mutex )
+    _GUIMutex.lock();  
+    // ...create launcher
+    myServerLauncher = new Session_ServerLauncher( argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted );
+    // ...block this thread until launcher is ready
+    _ServerLaunch.wait( &_GUIMutex );
     
-    // show splash screen if "SPLASH" parameter was passed ( default )
-    if ( isFound( "SPLASH", argc, argv ) )
-    {
-      // create temporary resource manager just to load splash icon
-      SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
-      resMgr.setCurrentFormat( "xml" );
-      resMgr.loadLanguage( "LightApp", "en" );
-
-      // create splash object: widget ( splash with progress bar ) and "pinging" thread
-      InquireServersGUI splash;
-      splash.setPixmap( resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) ) );
-      SUIT_Tools::centerWidget( &splash, _qappl.desktop() );
-      
-      _qappl.setMainWidget( &splash );
-      QObject::connect( &_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) );
-      splash.show(); // display splash with running progress bar
-      _qappl.exec(); // wait untill splash closes ( progress runs till end or Cancel is pressed )
-      
-      result = splash.getExitStatus(); // 1 is error
+    // Start servers check thread (splash)
+    if ( splash ) {
+      // ...lock mutex to block splash thread until wait( mutex )
+      _SplashMutex.lock();
+      // ...create servers checking thread
+      Session_ServerCheck sc( &_SplashMutex, &_SplashStarted );
+      // ...block this thread until servers checking is finished
+      _SplashStarted.wait( &_SplashMutex );
+      // ...unlock mutex 'cause it is no more needed
+      _SplashMutex.unlock();
+      // get servers checking thread status
+      result = splash->error();
+      QString info = splash->message().isEmpty() ? "%1" : QString( "%1\n%2" ).arg( splash->message() );
+      splash->setStatus( info.arg( "Activating desktop..." ) );
     }
-    else
-      _SessionStarted.wait();
+
+    // Finalize embedded servers launcher 
+    // ...block this thread until launcher is finished
+    _ServerLaunch.wait( &_GUIMutex );
+    // ...unlock mutex 'cause it is no more needed
+    _GUIMutex.unlock();
   }
 
-  // call Session::GetInterface() if "GUI" parameter was passed ( default )
-  if ( !result && isFound( "GUI", argc, argv ) )
-  {
-    CORBA::Object_var obj = _NS->Resolve( "/Kernel/Session" );
-    SALOME::Session_var session = SALOME::Session::_narrow( obj ) ;
-    ASSERT ( ! CORBA::is_nil( session ) );
-
-    INFOS( "Session activated, Launch IAPP..." );
-    guiThread = new GetInterfaceThread( session );
-    guiThread->start();
-  }
-
-  if ( !result )
-  {
+  if ( !result ) {
+    // Launch GUI activator
+    if ( isGUI ) {
+      // ...retrieve Session interface reference
+      CORBA::Object_var obj = _NS->Resolve( "/Kernel/Session" );
+      SALOME::Session_var session = SALOME::Session::_narrow( obj ) ;
+      ASSERT ( ! CORBA::is_nil( session ) );
+      // ...create GUI launcher
+      INFOS( "Session activated, Launch IAPP..." );
+      guiThread = new GetInterfaceThread( session );
+    }
 
     // GUI activation
     // Allow multiple activation/deactivation of GUI
-    while ( true )
-    {
+    while ( true ) {
       MESSAGE( "waiting wakeAll()" );
-      _ServerLaunch.wait( &_GUIMutex ); // to be reseased by Launch server thread when ready:
+      _SessionStarted.wait( &_SessionMutex ); // to be reseased by Launch server thread when ready:
       // atomic operation lock - unlock on mutex
       // unlock mutex: serverThread runs, calls _ServerLaunch->wakeAll()
       // this thread wakes up, and lock mutex
 
-      _GUIMutex.unlock();
+      _SessionMutex.unlock();
 
       // SUIT_Session creation
       aGUISession = new SALOME_Session();
@@ -415,7 +510,15 @@ int main( int argc, char **argv )
 	                                               // aGUISession contains SalomeApp_ExceptionHandler
 	// Run GUI loop
 	MESSAGE( "run(): starting the main event loop" );
+
+	if ( splash )
+	  splash->finish( aGUIApp->desktop() );
+	  
 	result = _qappl.exec();
+	
+	if ( splash )
+	  delete splash;
+	splash = 0;
 
 	if ( result == SUIT_Session::FROM_GUI ) // desktop is closed by user from GUI
 	  break;
@@ -425,10 +528,13 @@ int main( int argc, char **argv )
       aGUISession = 0;
 
       // Prepare _GUIMutex for a new GUI activation
-      _GUIMutex.lock();
+      _SessionMutex.lock();
     }
   }
 
+  // unlock Session mutex
+  _SessionMutex.unlock();
+  
   if ( myServerLauncher )
     myServerLauncher->KillAll(); // kill embedded servers
 

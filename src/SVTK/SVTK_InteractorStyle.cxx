@@ -98,9 +98,11 @@ namespace
 }
 
 
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(SVTK_InteractorStyle);
-//----------------------------------------------------------------------------
+
+/*!
+  Constructor
+*/
 SVTK_InteractorStyle
 ::SVTK_InteractorStyle():
   mySelectionEvent(new SVTK_SelectionEvent()),
@@ -131,13 +133,17 @@ SVTK_InteractorStyle
   myControllerOnKeyDown->Delete();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Destructor
+*/
 SVTK_InteractorStyle
 ::~SVTK_InteractorStyle() 
 {
 }
 
-//----------------------------------------------------------------------------
+/*!
+  \return widget for rendering
+*/
 QWidget*
 SVTK_InteractorStyle
 ::GetRenderWidget()
@@ -145,6 +151,9 @@ SVTK_InteractorStyle
   return myInteractor->GetRenderWidget();
 }
 
+/*!
+  \return selector
+*/
 SVTK_Selector*
 SVTK_InteractorStyle
 ::GetSelector() 
@@ -152,7 +161,9 @@ SVTK_InteractorStyle
   return myInteractor->GetSelector();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Generate special SVTK_SelectionEvent
+*/
 SVTK_SelectionEvent*
 SVTK_InteractorStyle
 ::GetSelectionEvent()
@@ -170,7 +181,9 @@ SVTK_InteractorStyle
   return mySelectionEvent.get();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Generate special SVTK_SelectionEvent with flipped Y coordinate
+*/
 SVTK_SelectionEvent*
 SVTK_InteractorStyle
 ::GetSelectionEventFlipY()
@@ -188,7 +201,6 @@ SVTK_InteractorStyle
   return mySelectionEvent.get();
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::RotateXY(int dx, int dy)
@@ -213,7 +225,6 @@ SVTK_InteractorStyle
   this->Render();
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::PanXY(int x, int y, int oldX, int oldY)
@@ -223,7 +234,6 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
 void 
 SVTK_InteractorStyle
 ::DollyXY(int dx, int dy)
@@ -247,7 +257,6 @@ SVTK_InteractorStyle
   this->Render();
 }
 
-//----------------------------------------------------------------------------
 void 
 SVTK_InteractorStyle
 ::SpinXY(int x, int y, int oldX, int oldY)
@@ -273,7 +282,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
+/*!
+  To reset reset view
+*/
 void
 SVTK_InteractorStyle
 ::OnConfigure() 
@@ -282,8 +293,9 @@ SVTK_InteractorStyle
   this->GetCurrentRenderer()->InvokeEvent(vtkCommand::ConfigureEvent,NULL);
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle mouse move event
+*/
 void
 SVTK_InteractorStyle
 ::OnMouseMove() 
@@ -295,8 +307,9 @@ SVTK_InteractorStyle
 		     x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle left mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnLeftButtonDown()
@@ -308,8 +321,9 @@ SVTK_InteractorStyle
 			  x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle left mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnLeftButtonUp()
@@ -321,8 +335,9 @@ SVTK_InteractorStyle
 			x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle middle mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnMiddleButtonDown() 
@@ -334,8 +349,9 @@ SVTK_InteractorStyle
 			    x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle middle mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnMiddleButtonUp()
@@ -347,8 +363,9 @@ SVTK_InteractorStyle
 			  x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle right mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnRightButtonDown() 
@@ -360,7 +377,9 @@ SVTK_InteractorStyle
 			   x, y );
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To handle right mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnRightButtonUp()
@@ -372,8 +391,9 @@ SVTK_InteractorStyle
 			 x, y );
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle mouse move event
+*/
 void
 SVTK_InteractorStyle
 ::OnMouseMove(int vtkNotUsed(ctrl), 
@@ -387,8 +407,9 @@ SVTK_InteractorStyle
     onCursorMove(QPoint(x, y));
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle left mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnLeftButtonDown(int ctrl, int shift, 
@@ -416,8 +437,9 @@ SVTK_InteractorStyle
   return;
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle left mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnLeftButtonUp(int vtkNotUsed(ctrl),
@@ -433,8 +455,9 @@ SVTK_InteractorStyle
   }
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To handle middle mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnMiddleButtonDown(int ctrl,
@@ -462,7 +485,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
+/*!
+  To handle middle mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnMiddleButtonUp(int vtkNotUsed(ctrl),
@@ -479,7 +504,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
+/*!
+  To handle right mouse button down event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnRightButtonDown(int ctrl,
@@ -506,7 +533,9 @@ SVTK_InteractorStyle
   }
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To handle right mouse button up event (reimplemented from vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::OnRightButtonUp(int vtkNotUsed(ctrl),
@@ -522,7 +551,6 @@ SVTK_InteractorStyle
   }
 }
 
-//----------------------------------------------------------------------------
 /* XPM */
 const char* imageZoomCursor[] = { 
 "32 32 3 1",
@@ -601,8 +629,9 @@ const char* imageRotateCursor[] = {
 "................................"};
 
 
-//----------------------------------------------------------------------------
-// loads cursors for viewer operations - zoom, pan, etc...
+/*!
+  loads cursors for viewer operations - zoom, pan, etc...
+*/
 void
 SVTK_InteractorStyle
 ::loadCursors()
@@ -618,8 +647,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// starts Zoom operation (e.g. through menu command)
+/*!
+  Starts Zoom operation (e.g. through menu command)
+*/
 void
 SVTK_InteractorStyle
 ::startZoom()
@@ -634,8 +664,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// starts Pan operation (e.g. through menu command)
+/*!
+  Starts Pan operation (e.g. through menu command)
+*/
 void
 SVTK_InteractorStyle
 ::startPan()
@@ -649,8 +680,9 @@ SVTK_InteractorStyle
   ForcedState = VTK_INTERACTOR_STYLE_CAMERA_PAN;
 }
 
-//----------------------------------------------------------------------------
-// starts Rotate operation (e.g. through menu command)
+/*!
+  Starts Rotate operation (e.g. through menu command)
+*/
 void 
 SVTK_InteractorStyle
 ::startRotate()
@@ -665,8 +697,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// starts Spin operation (e.g. through menu command)
+/*! 
+  Starts Spin operation (e.g. through menu command)
+*/
 void
 SVTK_InteractorStyle
 ::startSpin()
@@ -682,8 +715,9 @@ SVTK_InteractorStyle
 
 
 
-//----------------------------------------------------------------------------
-// starts Fit Area operation (e.g. through menu command)
+/*!
+  Starts Fit Area operation (e.g. through menu command)
+*/
 void
 SVTK_InteractorStyle
 ::startFitArea()
@@ -698,8 +732,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// starts Global Panning operation (e.g. through menu command)
+/*!
+  Starts Global Panning operation (e.g. through menu command)
+*/
 void
 SVTK_InteractorStyle
 ::startGlobalPan()
@@ -721,8 +756,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// fits viewer contents to rect
+/*!
+  Fits viewer contents to rect
+*/
 void
 SVTK_InteractorStyle
 ::fitRect(const int left, 
@@ -758,8 +794,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// starts viewer operation (!internal usage!)
+/*!
+  Starts viewer operation (!internal usage!)
+*/
 void
 SVTK_InteractorStyle
 ::startOperation(int operation)
@@ -789,8 +826,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// sets proper cursor for window when viewer operation is activated
+/*!
+  Sets proper cursor for window when viewer operation is activated
+*/
 void
 SVTK_InteractorStyle
 ::setCursor(const int operation)
@@ -832,15 +870,20 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// called when viewer operation started (!put necessary initialization here!)
+/*!
+  Called when viewer operation started (!put necessary initialization here!)
+*/
 void
 SVTK_InteractorStyle
 ::onStartOperation()
 {
-  if (!GetRenderWidget()) return;
-  // VSV: LOD actor activisation
-  //  this->Interactor->GetRenderWindow()->SetDesiredUpdateRate(this->Interactor->GetDesiredUpdateRate());
+  if (!GetRenderWidget()) 
+    return;
+
+  vtkRenderWindowInteractor *aRWI = this->Interactor;
+  vtkRenderWindow *aRenWin = aRWI->GetRenderWindow();
+  aRenWin->SetDesiredUpdateRate(aRWI->GetDesiredUpdateRate());
+
   switch (State) {
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
@@ -861,8 +904,9 @@ SVTK_InteractorStyle
 }
 
 
-//----------------------------------------------------------------------------
-// called when viewer operation finished (!put necessary post-processing here!)
+/*!
+  Called when viewer operation finished (!put necessary post-processing here!)
+*/
 void
 SVTK_InteractorStyle
 ::onFinishOperation() 
@@ -870,8 +914,9 @@ SVTK_InteractorStyle
   if (!GetRenderWidget()) 
     return;
 
-  // VSV: LOD actor activisation
-  //  rwi->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
+  vtkRenderWindowInteractor *aRWI = this->Interactor;
+  vtkRenderWindow *aRenWin = aRWI->GetRenderWindow();
+  aRenWin->SetDesiredUpdateRate(aRWI->GetStillUpdateRate());
 
   SVTK_SelectionEvent* aSelectionEvent = GetSelectionEventFlipY();
 
@@ -909,13 +954,15 @@ SVTK_InteractorStyle
 	  //
 	  SALOME_Actor* anActor = GetFirstSALOMEActor(myPicker.GetPointer());
 	  aSelectionEvent->myIsRectangle = false;
+
+	  if(!myShiftState)
+	    GetSelector()->ClearIObjects();
+
 	  if(anActor){
 	    anActor->Highlight( this, aSelectionEvent, true );
 	  }else{
 	    if(myLastHighlitedActor.GetPointer() && myLastHighlitedActor.GetPointer() != anActor)
 	      myLastHighlitedActor->Highlight( this, aSelectionEvent, false );
-	    if(!myShiftState)
-	      GetSelector()->ClearIObjects();
 	  }
 	  myLastHighlitedActor = anActor;
 	} 
@@ -965,8 +1012,9 @@ SVTK_InteractorStyle
 }
 
 
-// called during viewer operation when user moves mouse (!put necessary processing here!)
-//----------------------------------------------------------------------------
+/*!
+  Called during viewer operation when user moves mouse (!put necessary processing here!)
+*/
 void
 SVTK_InteractorStyle
 ::onOperation(QPoint mousePos) 
@@ -1021,9 +1069,10 @@ SVTK_InteractorStyle
   }
 }
 
-// called when user moves mouse inside viewer window and there is no active viewer operation 
-// (!put necessary processing here!)
-//----------------------------------------------------------------------------
+/*!
+  Called when user moves mouse inside viewer window and there is no active viewer operation 
+  (!put necessary processing here!)
+*/
 void
 SVTK_InteractorStyle
 ::onCursorMove(QPoint mousePos) 
@@ -1053,8 +1102,9 @@ SVTK_InteractorStyle
     this->Render();
 }
 
-// called on finsh GlobalPan operation 
-//----------------------------------------------------------------------------
+/*!
+  Called on finsh GlobalPan operation 
+*/
 void
 SVTK_InteractorStyle
 ::Place(const int theX, const int theY) 
@@ -1079,15 +1129,16 @@ SVTK_InteractorStyle
 
 
 
-// Translates view from Point to Point
-//----------------------------------------------------------------------------
+/*!
+  Translates view from Point to Point
+*/
 void
 SVTK_InteractorStyle
 ::TranslateView(int toX, int toY, int fromX, int fromY)
 {
   vtkCamera *cam = GetCurrentRenderer()->GetActiveCamera();
   double viewFocus[4], focalDepth, viewPoint[3];
-  float newPickPoint[4], oldPickPoint[4], motionVector[3];
+  vtkFloatingPointType newPickPoint[4], oldPickPoint[4], motionVector[3];
   cam->GetFocalPoint(viewFocus);
 
   this->ComputeWorldToDisplay(viewFocus[0], viewFocus[1],
@@ -1114,7 +1165,6 @@ SVTK_InteractorStyle
 		   motionVector[2] + viewPoint[2]);
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalPan( const int incrX, const int incrY )
@@ -1122,7 +1172,6 @@ SVTK_InteractorStyle
   this->PanXY( incrX, incrY, 0, 0 );
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalZoom( const int incr )
@@ -1130,7 +1179,6 @@ SVTK_InteractorStyle
   this->DollyXY( incr, incr );
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::IncrementalRotate( const int incrX, const int incrY )
@@ -1138,7 +1186,9 @@ SVTK_InteractorStyle
   this->RotateXY( incrX, -incrY );
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Redefined in order to add an observer (callback) for custorm event (space mouse event)
+*/
 void
 SVTK_InteractorStyle
 ::SetInteractor( vtkRenderWindowInteractor* theInteractor )
@@ -1178,8 +1228,9 @@ SVTK_InteractorStyle
   }
 }
 
-
-//----------------------------------------------------------------------------
+/*!
+  To implement cached rendering
+*/
 void
 SVTK_InteractorStyle
 ::OnTimer() 
@@ -1188,7 +1239,9 @@ SVTK_InteractorStyle
   this->Interactor->Render();
 }
 
-//----------------------------------------------------------------------------
+/*!
+  To invoke #vtkRenderWindowInteractor::CreateTimer
+*/
 void
 SVTK_InteractorStyle
 ::Render() 
@@ -1196,7 +1249,6 @@ SVTK_InteractorStyle
   this->Interactor->CreateTimer(VTKI_TIMER_FIRST);
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::onSpaceMouseMove( double* data )
@@ -1212,7 +1264,6 @@ SVTK_InteractorStyle
   IncrementalRotate( (int)data[3], 0  );   // 5. tilt the control forward/backward = rotate around X axis (Z axis of local coordinate system of space mouse)
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::onSpaceMouseButton( int button )
@@ -1227,7 +1278,6 @@ SVTK_InteractorStyle
     DominantCombinedSwitch();
 }
 
-//----------------------------------------------------------------------------
 void
 SVTK_InteractorStyle
 ::DominantCombinedSwitch()
@@ -1235,7 +1285,9 @@ SVTK_InteractorStyle
   printf( "\n--DominantCombinedSwitch() NOT IMPLEMENTED--\n" );
 }
 
-//----------------------------------------------------------------------------
+/*!
+  Main process event method (reimplemented from #vtkInteractorStyle)
+*/
 void
 SVTK_InteractorStyle
 ::ProcessEvents( vtkObject* object,
@@ -1326,11 +1378,17 @@ SVTK_InteractorStyle
 
   Superclass::ProcessEvents( object, event, clientData, callData );
 }
-//----------------------------------------------------------------------------
+
+/*!
+  To handle keyboard event (reimplemented from #vtkInteractorStyle)
+*/
 void SVTK_InteractorStyle::OnChar()
 {
 }
-//----------------------------------------------------------------------------
+
+/*!
+  Redefined vtkInteractorStyle::OnKeyDown
+*/
 void SVTK_InteractorStyle::OnKeyDown()
 {
   bool bInvokeSuperclass=myControllerOnKeyDown->OnKeyDown(this);
@@ -1338,7 +1396,10 @@ void SVTK_InteractorStyle::OnKeyDown()
     Superclass::OnKeyDown();
   }
 }
-//----------------------------------------------------------------------------
+
+/*!
+  Provide instructions for Picking
+*/
 void SVTK_InteractorStyle::ActionPicking()
 {
   int x, y;
@@ -1351,54 +1412,60 @@ void SVTK_InteractorStyle::ActionPicking()
   onFinishOperation();
   startOperation(VTK_INTERACTOR_STYLE_CAMERA_NONE);
 }
-//----------------------------------------------------------------------------
+
+/*!
+  To set current increment controller 
+*/
 void SVTK_InteractorStyle::SetControllerOnKeyDown(SVTK_ControllerOnKeyDown* theController)
 {
   myControllerOnKeyDown=theController;
 }
-//----------------------------------------------------------------------------
+
+/*!
+  To get current OnKeyDown controller 
+*/
 SVTK_ControllerOnKeyDown* SVTK_InteractorStyle::ControllerOnKeyDown()
 {
   return myControllerOnKeyDown.GetPointer();
 }
-//----------------------------------------------------------------------------
+
+/*!
+  To get current increment controller
+*/
 void SVTK_InteractorStyle::SetControllerIncrement(SVTK_ControllerIncrement* theController)
 {
   myControllerIncrement=theController;
 }
-//----------------------------------------------------------------------------
+
+/*!
+  To get current increment controller 
+*/
 SVTK_ControllerIncrement* SVTK_InteractorStyle::ControllerIncrement()
 {
   return myControllerIncrement.GetPointer();
 }
 
 vtkStandardNewMacro(SVTK_ControllerIncrement);
-//----------------------------------------------------------------------------
 SVTK_ControllerIncrement::SVTK_ControllerIncrement()
 {
   myIncrement=10;
 }
-//----------------------------------------------------------------------------
 SVTK_ControllerIncrement::~SVTK_ControllerIncrement()
 {
 }
-//----------------------------------------------------------------------------
 void SVTK_ControllerIncrement::SetStartValue(const int theValue)
 {
   myIncrement=theValue;
 }
-//----------------------------------------------------------------------------
 int SVTK_ControllerIncrement::Current()const
 {
   return myIncrement;
 }
-//----------------------------------------------------------------------------
 int SVTK_ControllerIncrement::Increase()
 {
   ++myIncrement;
   return myIncrement;
 }
-//----------------------------------------------------------------------------
 int SVTK_ControllerIncrement::Decrease()
 {
   if (myIncrement>1){
@@ -1408,15 +1475,21 @@ int SVTK_ControllerIncrement::Decrease()
 }
 
 vtkStandardNewMacro(SVTK_ControllerOnKeyDown);
-//----------------------------------------------------------------------------
+
+/*!
+  Constructor
+*/
 SVTK_ControllerOnKeyDown::SVTK_ControllerOnKeyDown()
 {
 }
-//----------------------------------------------------------------------------
+
+/*!
+  Destructor
+*/
 SVTK_ControllerOnKeyDown::~SVTK_ControllerOnKeyDown()
 {
 }
-//----------------------------------------------------------------------------
+
 bool SVTK_ControllerOnKeyDown::OnKeyDown(vtkInteractorStyle* theIS)
 {
   return true;

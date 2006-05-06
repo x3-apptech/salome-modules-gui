@@ -16,28 +16,6 @@
 //
 // See http://www.salome-platform.org/
 //
-/***********************************************************************
-
-     FONCTION :
-     ----------
-        Classe OCCViewer_VService :
-
-     HISTORIQUE DES MODIFICATIONS   :
-     --------------------------------
-      00-09-92 : GG  ; Creation.
-      25-02-98 : FMN ; PERF.27: Optimisation de la création d'une vue à partir d'une vue existante
-
-     REMARQUES :
-     -----------
-
-************************************************************************/
-
-/*----------------------------------------------------------------------*/
-/*
- * Includes
- */
-//just to load the OpenGl shared library
-//#include <OpenGl_GraphicDriver.hxx>
 
 #include "OCCViewer_VService.h"
 #include <V3d_Viewer.hxx>

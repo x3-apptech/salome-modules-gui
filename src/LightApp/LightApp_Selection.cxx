@@ -86,13 +86,13 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
       LightApp_DataOwner* sowner = dynamic_cast<LightApp_DataOwner*>( (*anIt ).get() );
       if( sowner )
       {
-	if( entries.contains( sowner->entry() ) )
+        entry = myStudy->referencedToEntry( sowner->entry() );
+	if( entries.contains( entry ) )
 	  continue;
 
-        entry = myStudy->referencedToEntry( sowner->entry() );
 	entries.insert( entry, 0 );
         myEntries.insert( num, entry );
-	myIsReferences.insert( num, sowner->entry() == entry );
+	myIsReferences.insert( num, sowner->entry() != entry );
         processOwner( sowner );
 	num++;
       }

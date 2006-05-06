@@ -127,7 +127,7 @@ public:
   GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	    TColStd_IndexedMapOfInteger& theIndex ) = 0;
 	
-  //! Change indexes of subslection for given #SALOME_InteractiveObject
+  //! Change indices of subselection for given #SALOME_InteractiveObject
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
@@ -154,7 +154,7 @@ public:
   RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
 	       int theIndex) = 0;
 
-  //! Check, if the given index is present in subslection 
+  //! Check, if the given index is present in subselection 
   virtual
   bool 
   IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 

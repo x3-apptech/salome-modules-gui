@@ -26,10 +26,10 @@
 
 class SUIT_DataObject;
 
-/* 
-  base template class for ListViewItems and CheckListItems
+/*!
+  \class ListItemF
+  Base template class for ListViewItems and CheckListItems
 */
-
 template<class T> class ListItemF
 {
 public:
@@ -57,10 +57,10 @@ protected:
   T*  myT;
 };
 
-/* 
-   ListViewItem class
+/*!
+  \class OB_ListItem
+  Provides custom list item for Object Browser tree
 */
-
 class OB_EXPORT OB_ListItem : public ListItemF<QListViewItem>, public QListViewItem
 {
 public:
@@ -82,10 +82,10 @@ public:
   static int       RTTI();
 };
 
-/* 
-   CheckListItem class
+/*!
+  \class OB_CheckListItem
+  Provides custom list item with check box
 */
-
 class OB_EXPORT OB_CheckListItem : public ListItemF<QCheckListItem>, public QCheckListItem
 {
 public:

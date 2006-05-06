@@ -40,10 +40,18 @@
 
 class Standard_Transient;
 class Handle_Standard_Type;
+/*!
+  \class Handle(MMgt_TShared)
+  Smart pointer (handle) to MMgt_TShared
+*/
 class Handle(MMgt_TShared);
 class SALOME_Filter;
 Standard_EXPORT Handle_Standard_Type& STANDARD_TYPE(SALOME_Filter);
 
+/*!
+  \class Handle(SALOME_Filter)
+  Smart pointer (handle) to SALOME_Filter
+*/
 class Handle(SALOME_Filter) : public Handle(MMgt_TShared) {
   public:
     inline void* operator new(size_t,void* anAddress) 

@@ -27,12 +27,18 @@
 #include <qapplication.h>
 #include <qobjectlist.h>
 
+/*!
+  Constructor
+*/
 QtxGroupBox::QtxGroupBox( QWidget* parent, const char* name )
 : QGroupBox( parent, name ),
 myContainer( 0 )
 {
 }
 
+/*!
+  Constructor
+*/
 QtxGroupBox::QtxGroupBox( const QString& title, QWidget* parent, const char* name )
 : QGroupBox( title, parent, name ),
 myContainer( 0 )
@@ -40,6 +46,9 @@ myContainer( 0 )
   initialize();
 }
 
+/*!
+  Constructor
+*/
 QtxGroupBox::QtxGroupBox( int strips, Orientation o, QWidget* parent, const char* name )
 : QGroupBox( strips, o, parent, name ),
 myContainer( 0 )
@@ -47,6 +56,9 @@ myContainer( 0 )
   initialize();
 }
 
+/*!
+  Constructor
+*/
 QtxGroupBox::QtxGroupBox( int strips, Orientation o, const QString& title,
                                           QWidget* parent, const char* name )
 : QGroupBox( strips, o, title, parent, name ),
@@ -55,11 +67,17 @@ myContainer( 0 )
   initialize();
 }
 
+/*!
+  Destructor
+*/
 QtxGroupBox::~QtxGroupBox()
 {
   delete myContainer;
 }
 
+/*!
+  Creates horizontal box as container
+*/
 void QtxGroupBox::initialize()
 {
   myContainer = new QHBox( this, 0, WStyle_Customize | WStyle_NoBorderEx | WStyle_Tool );
@@ -69,6 +87,9 @@ void QtxGroupBox::initialize()
 
 #if QT_VER < 3
 
+/*!
+  \return the width of the empty space between the items in the group and the frame of the group
+*/
 int QtxGroupBox::insideMargin() const
 {
   int m = 0;
@@ -77,6 +98,9 @@ int QtxGroupBox::insideMargin() const
   return m;
 }
 
+/*!
+  \return the width of the empty space between each of the items in the group
+*/
 int QtxGroupBox::insideSpacing() const
 {
   int s = 0;
@@ -85,12 +109,18 @@ int QtxGroupBox::insideSpacing() const
   return s;
 }
 
+/*!
+  Sets the width of the empty space between the items in the group and the frame of the group
+*/
 void QtxGroupBox::setInsideMargin( int m )
 {
   if ( layout() )
     layout()->setMargin( m );
 }
 
+/*!
+  Sets the width of the empty space between each of the items in the group
+*/
 void QtxGroupBox::setInsideSpacing( int s )
 {
   if ( layout() )
@@ -99,6 +129,10 @@ void QtxGroupBox::setInsideSpacing( int s )
 
 #endif
 
+/*!
+  Inserts title widget
+  \param wid - new title widget
+*/
 void QtxGroupBox::insertTitleWidget( QWidget* wid )
 {
   if ( !myContainer )
@@ -110,6 +144,10 @@ void QtxGroupBox::insertTitleWidget( QWidget* wid )
   updateTitle();
 }
 
+/*!
+  Removes title widget
+  \param wid - title widget
+*/
 void QtxGroupBox::removeTitleWidget( QWidget* wid )
 {
   if ( !myContainer || wid->parentWidget() != myContainer )
@@ -121,6 +159,9 @@ void QtxGroupBox::removeTitleWidget( QWidget* wid )
   updateTitle();
 }
 
+/*!
+  Calculates margin
+*/
 void QtxGroupBox::adjustInsideMargin()
 {
   QApplication::sendPostedEvents( myContainer, QEvent::ChildInserted );
@@ -130,6 +171,9 @@ void QtxGroupBox::adjustInsideMargin()
   setInsideMargin( myContainer->height() );
 }
 
+/*!
+  Sets the alignment of the group box title
+*/
 void QtxGroupBox::setAlignment( int align )
 {
   QGroupBox::setAlignment( align );
@@ -137,6 +181,9 @@ void QtxGroupBox::setAlignment( int align )
   updateTitle();
 }
 
+/*!
+  Sets title of groop box
+*/
 void QtxGroupBox::setTitle( const QString& title )
 {
   QGroupBox::setTitle( title );
@@ -144,6 +191,11 @@ void QtxGroupBox::setTitle( const QString& title )
   updateTitle();
 }
 
+/*!
+  Changes the layout of the group box
+  \param strips - number of column/rows
+  \param o - orientation
+*/
 void QtxGroupBox::setColumnLayout( int strips, Orientation o )
 {
   if ( myContainer )
@@ -157,6 +209,9 @@ void QtxGroupBox::setColumnLayout( int strips, Orientation o )
   updateTitle();
 }
 
+/*!
+  Shows group box
+*/
 void QtxGroupBox::show()
 {
   QGroupBox::show();
@@ -164,6 +219,9 @@ void QtxGroupBox::show()
   updateTitle();
 }
 
+/*!
+  Updates group box
+*/
 void QtxGroupBox::update()
 {
   QGroupBox::update();
@@ -171,6 +229,9 @@ void QtxGroupBox::update()
   updateTitle();
 }
 
+/*!
+  \return the recommended size for the widget
+*/
 QSize QtxGroupBox::sizeHint() const
 {
   QSize sz = QGroupBox::sizeHint();
@@ -190,6 +251,9 @@ QSize QtxGroupBox::sizeHint() const
   return QSize( QMAX( sz.width(), sw ), sz.height() );
 }
 
+/*!
+  \return the recommended minimum size for the widget
+*/
 QSize QtxGroupBox::minimumSizeHint() const
 {
   QSize sz = QGroupBox::minimumSizeHint();
@@ -209,6 +273,9 @@ QSize QtxGroupBox::minimumSizeHint() const
   return QSize( QMAX( sz.width(), sw ), sz.height() );
 }
 
+/*!
+  Custom event filter
+*/
 bool QtxGroupBox::eventFilter( QObject* obj, QEvent* e )
 {
   QEvent::Type type = e->type();
@@ -220,6 +287,9 @@ bool QtxGroupBox::eventFilter( QObject* obj, QEvent* e )
   return QGroupBox::eventFilter( obj, e );
 }
 
+/*!
+  Custom resize event filter
+*/
 void QtxGroupBox::resizeEvent( QResizeEvent* e )
 {
   QGroupBox::resizeEvent( e );
@@ -227,6 +297,9 @@ void QtxGroupBox::resizeEvent( QResizeEvent* e )
   updateTitle();
 }
 
+/*!
+  Custom child event filter
+*/
 void QtxGroupBox::childEvent( QChildEvent* e )
 {
   if ( e->type() == QEvent::ChildInserted && e->child() == myContainer )
@@ -235,16 +308,25 @@ void QtxGroupBox::childEvent( QChildEvent* e )
   QGroupBox::childEvent( e );
 }
 
+/*!
+  Event filter of custom items
+*/
 void QtxGroupBox::customEvent( QCustomEvent* )
 {
   updateTitle();
 }
 
+/*!
+  On frame changed
+*/
 void QtxGroupBox::frameChanged()
 {
   updateTitle();
 }
 
+/*!
+  \return size of title
+*/
 QSize QtxGroupBox::titleSize() const
 {
   QSize sz( 0, 0 );
@@ -264,6 +346,9 @@ QSize QtxGroupBox::titleSize() const
   return QSize( w, h );
 }
 
+/*!
+  Updates title
+*/
 void QtxGroupBox::updateTitle()
 {
   if ( !myContainer )

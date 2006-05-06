@@ -40,10 +40,16 @@
 #include "SALOME_ListIteratorOfListIO.hxx"
 #endif
 using namespace std;
+
+/*!
+  Destructor
+*/
 SALOME_ListNodeOfListIO::~SALOME_ListNodeOfListIO() {}
  
 
-
+/*!
+  \return OCC Handle Type
+*/
 Standard_EXPORT Handle_Standard_Type& SALOME_ListNodeOfListIO_Type_()
 {
 
@@ -66,9 +72,9 @@ Standard_EXPORT Handle_Standard_Type& SALOME_ListNodeOfListIO_Type_()
 }
 
 
-// DownCast method
-//   allow safe downcasting
-//
+/*!
+  DownCast method, allows safe downcasting
+*/
 const Handle(SALOME_ListNodeOfListIO) Handle(SALOME_ListNodeOfListIO)::DownCast(const Handle(Standard_Transient)& AnObject) 
 {
   Handle(SALOME_ListNodeOfListIO) _anOtherObject;
@@ -81,14 +87,26 @@ const Handle(SALOME_ListNodeOfListIO) Handle(SALOME_ListNodeOfListIO)::DownCast(
 
   return _anOtherObject ;
 }
+
+/*!
+  \return OCC Handle dynamic Type
+*/
 const Handle(Standard_Type)& SALOME_ListNodeOfListIO::DynamicType() const 
 { 
   return STANDARD_TYPE(SALOME_ListNodeOfListIO) ; 
 }
+
+/*!
+  \return true if other type is the same
+  \param AType - type to be checked
+*/
 Standard_Boolean SALOME_ListNodeOfListIO::IsKind(const Handle(Standard_Type)& AType) const 
 { 
   return (STANDARD_TYPE(SALOME_ListNodeOfListIO) == AType || TCollection_MapNode::IsKind(AType)); 
 }
+/*!
+  Destructor
+*/
 Handle_SALOME_ListNodeOfListIO::~Handle_SALOME_ListNodeOfListIO() {}
 #define Item Handle_SALOME_InteractiveObject
 #define Item_hxx "SALOME_InteractiveObject.hxx"

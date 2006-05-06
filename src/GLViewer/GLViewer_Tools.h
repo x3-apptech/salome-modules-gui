@@ -34,12 +34,10 @@
 
 class GLViewer_LineField;
 
-/****************************************************************************
-**  Class:   GLViewer_Tools 
-**  Descr:   Tools for Viewer
-**  Module:  GLViewer
-**  Created: UI team, 27.10.05
-*****************************************************************************/
+/*!
+  \class GLViewer_Tools 
+  Tools for Viewer
+*/
 class GLVIEWER_API GLViewer_Tools
 {
 public:
@@ -57,7 +55,7 @@ enum FieldDim
 };
 
 /*!
-  Class GLViewer_LineList 
+  \class GLViewer_LineList 
   Tools for distinct line
   This class implmented interface for segment operations:
   add, cut, remove and etc.
@@ -122,9 +120,10 @@ struct SearchPoint
   int       mySolveIndex;
 };
 
-/*! Class  GLViewer_LineField 
-* Tools for solving algorithm of finding shortest path on rare grid with minimum of 
-* line turns number
+/*! 
+  \class  GLViewer_LineField 
+  Tools for solving algorithm of finding shortest path on rare grid with minimum of 
+  line turns number
 */
 class GLViewer_LineField
 {
@@ -212,9 +211,9 @@ protected:
   //! Checks for complete status
   IterationStatus     checkComplete();  
 
-  //! Finds LileList by counts and returns indexes
+  //! Finds LineList by counts and returns indexes
   int*                findByCount( int& theParam );
-  //! Finds LileList by segment and dimension
+  //! Finds LineList by segment and dimension
   int                 findBySegment( FieldDim, int coord1, int coord2, bool inCurArray = true );
 
   //! Returns current solution array

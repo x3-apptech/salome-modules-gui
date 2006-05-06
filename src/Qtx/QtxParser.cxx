@@ -20,12 +20,10 @@
 #include "QtxParser.h"
 #include "QtxOperations.h"
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
-QtxParser::QtxParser( QtxOperations* operations,
-                      const QString& expr )
+/*!
+  Constructor
+*/
+QtxParser::QtxParser( QtxOperations* operations, const QString& expr )
 : myOperations( operations )
 {
     if( myOperations )
@@ -37,18 +35,22 @@ QtxParser::QtxParser( QtxOperations* operations,
         setLastError( OperationsNull );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Destructor
+*/
 QtxParser::~QtxParser()
 {
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Search elements of list as substrings starting on 'offset'
+  \returns the least position of substrings inside string
+  \param list - list of substrings
+  \param str - string where search
+  \param offset - starting index for search
+  \param matchLen - the length of appropriate substring
+  \param listind - list index of appropriate substring
+*/
 int QtxParser::search( const QStringList& list, const QString& str, int offset,
                        int& matchLen, int& listind )
 {
@@ -71,19 +73,22 @@ int QtxParser::search( const QStringList& list, const QString& str, int offset,
     return min;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return substring
+  \param str - string
+  \param pos - start position of substring
+  \param len - length of substring
+*/
 QString QtxParser::note( const QString& str, int pos, int len )
 {
     return str.mid( pos, len ).stripWhiteSpace();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  First step of parsing: finding tokens, determining its types and creating of unsorted pseudo-postfix (with brackets)
+  \param expr - string expression
+  \param post - postfix to be created
+*/
 bool QtxParser::prepare( const QString& expr, Postfix& post )
 {
     int pos = 0, len = expr.length();
@@ -225,10 +230,10 @@ bool QtxParser::prepare( const QString& expr, Postfix& post )
     return lastError()==OK;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Second step of parsing: determining types of operations
+  \param post - unsorted postfix
+*/
 bool QtxParser::setOperationTypes( Postfix& post )
 {
     Postfix::iterator aStart = post.begin(),
@@ -279,10 +284,12 @@ bool QtxParser::setOperationTypes( Postfix& post )
     return lastError()==OK;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return how many global brackets there is (for example '((2+3))' has 2 global brackets)
+  \param post - postfix to be checked
+  \param f - start index to search
+  \param l - last index to search
+*/
 int QtxParser::globalBrackets( const QtxParser::Postfix& post, int f, int l )
 {
     int i,
@@ -317,10 +324,15 @@ int QtxParser::globalBrackets( const QtxParser::Postfix& post, int f, int l )
     return br+min_br_num;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Third step of parsing: sorting of postfix in order to convert it to real postfix
+  \param post - source postfix
+  \param res - destination postfix
+  \param anOpen - list of open brackets
+  \param aClose - list of close brackets
+  \param f - start index of postfix to sorting
+  \param l - last index of postfix to sorting
+*/
 bool QtxParser::sort( const Postfix& post, Postfix& res,
                       const QStringList& anOpen,
                       const QStringList& aClose,
@@ -478,10 +490,10 @@ bool QtxParser::sort( const Postfix& post, Postfix& res,
     return lastError()==OK;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Build posfix by expression
+  \param expr - string expression
+*/
 bool QtxParser::parse( const QString& expr )
 {
     myPost.clear();
@@ -506,10 +518,12 @@ bool QtxParser::parse( const QString& expr )
            sort( p, myPost, opens, closes );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Calculate operation
+  \param op - operation name
+  \param v1 - first argument (it is not valid for unary prefix operations and it is used to store result)
+  \param v2 - second argument (it is not valid for unary postfix operations)
+*/
 bool QtxParser::calculate( const QString& op, QtxValue& v1, QtxValue& v2 )
 {
     Error err = myOperations->isValid( op, v1.type(), v2.type() );
@@ -521,10 +535,10 @@ bool QtxParser::calculate( const QString& op, QtxValue& v1, QtxValue& v2 )
     return lastError()==OK;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Calculates expression without postfix rebuilding
+  \return QtxValue as result (it is invalid if there were errors during calculation)
+*/
 QtxValue QtxParser::calculate()
 {
     setLastError( OK );
@@ -639,47 +653,47 @@ QtxValue QtxParser::calculate()
     return res;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Change expression, rebuild postfix and calculate it
+  \return QtxValue as result (it is invalid if there were errors during calculation)
+*/
 QtxValue QtxParser::calculate( const QString& expr )
 {
     setExpr( expr );
     return calculate();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Change expression and rebuild postfix
+*/
 bool QtxParser::setExpr( const QString& expr )
 {
     return parse( expr );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return true, if parser contain parameter
+  \param name - name of parameter
+*/
 bool QtxParser::has( const QString& name ) const
 {
     return myParameters.contains( name.stripWhiteSpace() );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Sets parameter value
+  \param name - name of parameter
+  \param value - value of parameter
+*/
 void QtxParser::set( const QString& name, const QtxValue& value )
 {
     myParameters[ name.stripWhiteSpace() ] = value;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Removes parameter
+  \param name - name of parameter
+*/
 bool QtxParser::remove( const QString& name )
 {
     QString sname = name.stripWhiteSpace();
@@ -689,10 +703,10 @@ bool QtxParser::remove( const QString& name )
     return res;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return value of parameter (result is invalid if there is no such parameter)
+  \param name - name of parameter
+*/
 QtxValue QtxParser::value( const QString& name ) const
 {
     QString sname = name.stripWhiteSpace();
@@ -702,10 +716,11 @@ QtxValue QtxParser::value( const QString& name ) const
         return QtxValue();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Searches first parameter with assigned invalid QtxValue
+  \return true if it is found
+  \param name - variable to return name of parameter
+*/
 bool QtxParser::firstInvalid( QString& name ) const
 {
     QMap< QString, QtxValue >::const_iterator anIt = myParameters.begin(),
@@ -719,10 +734,9 @@ bool QtxParser::firstInvalid( QString& name ) const
     return false;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Removes all parameters with assigned invalid QtxValues
+*/
 void QtxParser::removeInvalids()
 {
     QStringList toDelete;
@@ -738,37 +752,34 @@ void QtxParser::removeInvalids()
         myParameters.remove( *aLIt );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return last error occured during parsing
+*/
 QtxParser::Error QtxParser::lastError() const
 {
     return myLastError;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Sets last error occured during parsing (for internal using only)
+*/
 void QtxParser::setLastError( QtxParser::Error err )
 {
     myLastError = err;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return string dump of internal parser postfix
+*/
 QString QtxParser::dump() const
 {
     return dump( myPost );
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return string dump of postfix
+  \param post - postfix to be dumped
+*/
 QString QtxParser::dump( const Postfix& post ) const
 {
     QString res;
@@ -798,10 +809,10 @@ QString QtxParser::dump( const Postfix& post ) const
     return res;
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Fills list with names of parameters
+  \param list - list to be filled
+*/
 void QtxParser::paramsList( QStringList& list )
 {
     PostfixIterator anIt = myPost.begin(),
@@ -815,19 +826,18 @@ void QtxParser::paramsList( QStringList& list )
         }
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  Removes all parameters
+*/
 void QtxParser::clear()
 {
     myParameters.clear();
 }
 
-//================================================================
-// Function : 
-// Purpose  : 
-//================================================================
+/*!
+  \return string representation for list of QtxValues
+  \param list - list to be converted
+*/
 QString QtxParser::toString( const QValueList< QtxValue >& list )
 {
     QValueList< QtxValue >::const_iterator anIt = list.begin(),
