@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // Plot2d_ViewWindow.cxx: implementation of the Plot2d_ViewWindow class.
 
@@ -500,11 +500,11 @@ QImage Plot2d_ViewWindow::dumpView()
   \param fileName - name of file
   \param format - string contains name of format (for example, "BMP"(default) or "JPEG", "JPG")
 */
-bool Plot2d_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
+bool Plot2d_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileName, const QString& format )
 {
   bool res = myViewFrame ? myViewFrame->print( fileName, format ) : false;
   if( !res )
-    res = SUIT_ViewWindow::dumpViewToFormat( fileName, format );
+    res = SUIT_ViewWindow::dumpViewToFormat( img, fileName, format );
 
   return res;
 }

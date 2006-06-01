@@ -14,7 +14,7 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 # -* Makefile *- 
 #
@@ -99,21 +99,24 @@ runLightSalome.sh
 # copy header files in common directory
 OWN_CONFIG_H=@OWN_CONFIG_H@
 
+include_list = include/salome/SALOMEconfig.h \
+               include/salome/GUI_version.h
+
 ifeq ($(OWN_CONFIG_H),yes)
-    ifeq ($(HAVE_SSTREAM),yes)
-	include_list=include/salome/SALOMEconfig.h include/salome/config.h
-    else
-	include_list=include/salome/SALOMEconfig.h include/salome/config.h include/salome/sstream
-    endif
-else
-    ifeq ($(HAVE_SSTREAM),yes)
-	include_list=include/salome/SALOMEconfig.h
-    else
-	include_list=include/salome/SALOMEconfig.h include/salome/sstream
-    endif
+	include_list += include/salome/config.h
+endif
+
+ifneq ($(HAVE_SSTREAM),yes)
+	include_list += include/salome/sstream
 endif
 
 inc: idl $(include_list)
+
+bin: bin/salome/VERSION
+
+bin/salome/VERSION : bin/VERSION
+	-$(RM) $@
+	$(LN_S) ../../$< $@
 
 include/salome/SALOMEconfig.h: salome_adm/unix/SALOMEconfig.ref
 	-$(RM) $@
@@ -133,6 +136,10 @@ include/salome/config.h: salome_adm/unix/config.h
 	$(LN_S) ../../$< $@
 
 include/salome/sstream: salome_adm/unix/sstream
+	-$(RM) $@
+	$(LN_S) ../../$< $@
+
+include/salome/GUI_version.h: GUI_version.h
 	-$(RM) $@
 	$(LN_S) ../../$< $@
 

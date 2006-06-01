@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "CAM_Application.h"
 
@@ -179,9 +179,13 @@ void CAM_Application::loadModules()
     CAM_Module* mod = loadModule( (*it).title );
     if ( mod )
       addModule( mod );
-    else
-      SUIT_MessageBox::error1( desktop(), tr( "Loading modules" ),
-                               tr( "Can not load module %1" ).arg( (*it).title ), tr( "Ok" ) );
+    else {
+      if ( desktop() && desktop()->isShown() )
+	SUIT_MessageBox::error1( desktop(), tr( "Loading modules" ),
+				 tr( "Can not load module %1" ).arg( (*it).title ), tr( "Ok" ) );
+      else
+	qWarning( tr( "Can not load module %1" ).arg( (*it).title ).latin1() ); 
+    }
   }
 }
 
@@ -250,8 +254,12 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
     module->setName( moduleName( modName ) );
   }
 
-  if ( !err.isEmpty() )
-    SUIT_MessageBox::warn1( desktop(), tr( "Error" ), err, tr( "Ok" ) );
+  if ( !err.isEmpty() ) {
+    if ( desktop() && desktop()->isShown() )
+      SUIT_MessageBox::warn1( desktop(), tr( "Error" ), err, tr( "Ok" ) );
+    else
+      qWarning( err.latin1() ); 
+  }
 
   return module;
 }
@@ -315,7 +323,10 @@ bool CAM_Application::activateModule( CAM_Module* mod )
     {
       myModule->setMenuShown( false );
       myModule->setToolShown( false );
-      SUIT_MessageBox::error1( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ), tr( "BUT_OK" ) );
+      if ( desktop() && desktop()->isShown() )
+	SUIT_MessageBox::error1( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ), tr( "BUT_OK" ) );
+      else
+	qWarning( tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ).latin1() ); 
       myModule = 0;
       return false;
     }
@@ -484,8 +495,12 @@ void CAM_Application::readModuleList()
     myInfoList.append( inf );
   }
 
-  if ( myInfoList.isEmpty() )
-    SUIT_MessageBox::warn1( 0, tr( "Warning" ), tr( "Modules list is empty" ), tr( "&OK" ) );
+  if ( myInfoList.isEmpty() ) {
+    if ( desktop() && desktop()->isShown() )
+      SUIT_MessageBox::warn1( desktop(), tr( "Warning" ), tr( "Modules list is empty" ), tr( "&OK" ) );
+    else
+      qWarning( tr( "Modules list is empty" ).latin1() ); 
+  }
 }
 
 /*!Add common items for popup menu ( if they are exist )

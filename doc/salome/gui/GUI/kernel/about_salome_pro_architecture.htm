@@ -1,0 +1,243 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<head>
+<title>About SALOME architecture</title>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<meta name="generator" content="RoboHelp by eHelp Corporation www.ehelp.com">
+<link rel="stylesheet" href="../default_ns.css"><script type="text/javascript" language="JavaScript" title="WebHelpSplitCss">
+<!--
+if (navigator.appName !="Netscape")
+{   document.write("<link rel='stylesheet' href='../default.css'>");}
+//-->
+</script>
+<style type="text/css">
+<!--
+h1.whs1 { margin-left:40px; }
+p.whs2 { font-family:'Times New Roman' , serif; text-align:justify; text-indent:48px; }
+p.whs3 { text-indent:48px; font-weight:bold; font-family:'Times New Roman' , serif; text-align:justify; }
+img_whs4 { border:none; width:445px; height:288px; border-style:none; }
+p.whs5 { text-indent:48px; font-family:'Times New Roman' , serif; text-align:justify; font-weight:normal; }
+p.whs6 { font-family:'Times New Roman'  , serif; text-align:justify; font-weight:bold; text-indent:8px; background-image:url('../texture_horiz_ltbluebubbles.jpg'); }
+img_whs7 { border:none; width:35px; height:37px; float:none; border-style:none; }
+p.whs8 { font-family:'Times New Roman' , serif; text-align:justify; font-weight:bold; text-indent:8px; }
+p.whs9 { margin-left:40px; font-family:'Times New Roman' , serif; }
+p.whs10 { font-family:'Times New Roman' , serif; margin-left:40px; }
+ul.whs11 { list-style:disc; }
+p.whs12 { font-family:'Times New Roman' , serif; }
+-->
+</style><script type="text/javascript" language="JavaScript" title="BSSC Special Effects" src="../ehlpdhtm.js"></script><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+<!--
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//-->
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute; left:0px; top:0px; z-index:4; visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
+-->
+</style><script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
+<script type="text/javascript" language="javascript1.2">
+<!--
+if (window.gbWhTopic)
+{
+	if (window.setRelStartPage)
+	{
+	addTocInfo("About SALOME\nSALOME architecture");
+addButton("show",BTN_IMG,"Show","","","","",0,0,"../whd_show0.gif","../whd_show2.gif","../whd_show1.gif");
+addButton("hide",BTN_IMG,"Hide","","","","",0,0,"../whd_hide0.gif","../whd_hide2.gif","../whd_hide1.gif");
+
+	}
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../index.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+//-->
+</script>
+</head>
+<body><script type="text/javascript" language="javascript1.2">
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(4);
+//-->
+</script>
+<h1 class="whs1">&nbsp;SALOME 
+ architecture</h1>
+
+<p class="whs2"><span style="font-weight: bold;"><B>SALOME 
+ </B></span>architecture is based on <span style="font-weight: bold;"><B>CORBA</B></span> 
+ technology using distributed system model of applications. This architecture 
+ takes the concept of multitier client/server to its natural conclusion. 
+ The distributed system model exposes all functionality of the application 
+ as objects, each of which can use any of the services provided by other 
+ objects in the system, or even objects in other systems. The architecture 
+ can also blur the distinction between &quot;client&quot; and &quot;server&quot; 
+ because the client components can also create objects that behave in server-like 
+ roles. This architecture provides the ultimate in flexibility.</p>
+
+<p class="whs2"><span style="font-family: 'Times New Roman', serif;">The 
+ distributed system architecture achieves its flexibility by encouraging 
+ (or enforcing) the definition of specific component interfaces. The interface 
+ of a component specifies to other components what services are offered 
+ by that component and how they are used. As long as the interface of a 
+ component remains constant, that component's implementation can change 
+ dramatically without affecting other components. </span></p>
+
+<p class="whs3"><span style="font-weight: normal;">All 
+ software components (Post-Pro, Geometry, Mesh...) integrated into </span>SALOME 
+ <span style="font-weight: normal;">platform &nbsp;implement 
+ predefined interfaces. Each component provides data for the </span>SALOME<span 
+ style="font-weight: normal;"> study in a form of links (stored in the 
+ Study) to the specific data created and stored in the component. All components 
+ represent</span> CORBA <span style="font-weight: normal;">servers and 
+ it allows to run them on different host stations.</span></p>
+
+<p class="whs3">&nbsp;</p>
+
+<p class="whs2"><img src="../image67.gif" width="445px" height="288px" border="0" class="img_whs4"></p>
+
+<p class="whs2">&nbsp;</p>
+
+<p class="whs5">It is equally possible to create engine-independent 
+ modules. These modules may not use CORBA at all, and can have internal 
+ data structure which can be written in pure C++ (or python). Such modules 
+ are located inside SALOME GUI process and from the point of view of the 
+ end user have no difference with standard components. Such modules not 
+ using the standard tools of SALOME platform are defined on a special separated 
+ level named CAM. CAM component is the basis for new SALOME GUI and contains 
+ all basic functionality for working with modules (loading; saving, closing, 
+ customization of toolbar and menu).</p>
+
+<p class="whs5">Another fundamental piece of the <span 
+ style="font-weight: bold;"><B>SALOME</B></span> architecture is the use of the 
+ Interface Definition Language (IDL). IDL, which specifies interfaces between 
+ CORBA components, is instrumental in ensuring CORBA's language independence. 
+ Because interfaces described in IDL can be mapped to any programming language, 
+ CORBA applications and components are thus independent of the language(s) 
+ used to implement them. </p>
+
+<p class="whs3"><span style="font-weight: normal;">Additional 
+ information about CORBA technology is available at </span><span style="text-indent: 8px;"><a 
+ href="http://www.omg.org">www.omg.org</a></span><span style="font-weight: normal;"> 
+ &nbsp;</span></p>
+
+<p class="whs3">&nbsp;</p>
+
+<p class="whs6"><span 
+ style="font-weight: normal;">&nbsp;<img src="../note1.gif" x-maintain-ratio="TRUE" width="35px" height="37px" border="0" class="img_whs7">In </span>SALOME<span style="font-weight: normal;"> there 
+ is a possibility to run definite components in the so-called </span><a href="running_salome_pro.htm#batchmode">batch mode</a><span style="font-weight: normal;"> 
+ without GUI provided by GUI component. In this case you can work with 
+ these components with the help of Python commands and scripts. </span>&nbsp;</p>
+
+<p class="whs8">&nbsp;</p>
+
+<p class="whs9">The 
+ architecture of this all-inclusive platform for numerical components &nbsp;responds 
+ to the following objectives: </p>
+
+<p class="whs10">&nbsp;</p>
+
+<ul type="disc" class="whs11">
+	
+	<li style="margin-left: -20px;"
+		class=kadov-p><p class="whs12"><span 
+ style="font-weight: bold;"><B>Flexibility</B></span> : &nbsp;the 
+ creation and modification of computation schemes must be easy. The developer 
+ must have easy access to all modeling parameters to create domain-specific 
+ tools adapted to new situations or to test new numerical algorithms. SALOME 
+ allows integration and implementation of numerical and physical components 
+ derived from existing code. </p></li>
+</ul>
+
+<p class="whs12">&nbsp;</p>
+
+<ul type="disc" class="whs11">
+	
+	<li style="margin-left: -20px;"
+		class=kadov-p><p class="whs12"><span 
+ style="font-weight: bold;"><B>Productivity</B></span> : &nbsp;the 
+ implementation of code is simple for the user and the reuse of components 
+ (within other environments for macro-components) is noticeably facilitated.</p></li>
+</ul>
+
+<p class="whs12">&nbsp;</p>
+
+<ul type="disc" class="whs11">
+	
+	<li style="margin-left: -20px;"
+		class=kadov-p><p class="whs12"><span 
+ style="font-weight: bold;"><B>Performance</B></span> : &nbsp;<span 
+ style="font-weight: bold;"><B>SALOME</B></span> 
+ is able to more finely simulate phenomena that is more complex in scale 
+ and in physical coupling requirements. <span style="font-weight: bold;"><B>SALOME 
+ </B></span>economically exploits the performance of used machines (massively 
+ parallel processors, PC clusters, etc).</p></li>
+</ul>
+
+<p class="whs12">&nbsp;</p>
+
+<ul type="disc" class="whs11">
+	
+	<li style="margin-left: -20px;"
+		class=kadov-p><p class="whs12"><span 
+ style="font-weight: bold;"><B>Expandability</B></span>: &nbsp;on 
+ the one hand, software technologies and physical architectures evolve 
+ rapidly compared to the development time, validation and use of a scientific 
+ application while on the other hand, the development of a database model 
+ adapted to the totality of exchanges between components can be achieved 
+ incrementally. <span style="font-weight: bold;"><B>SALOME</B></span> &nbsp;is 
+ able to easily follow these developments.</p></li>
+</ul>
+
+<p class="whs12">&nbsp;</p>
+
+<p class="whs12">&nbsp;</p>
+
+<p class="whs12">&nbsp;</p>
+
+<p class="whs12">
+<a href="javascript:void(0);" onClick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) >=2 && typeof(PickupDialog_Invoke) == 'function') PickupDialog_Invoke(e,'','Introduction to SALOME ','introduction_to_salome_pro.htm');return false;" title="Related Topics"><img src="../ss_btn_related_topics.gif" border=0 height=17 width=82 alt="Related Topics"></a>
+
+
+ </p>
+
+<p class="whs12">&nbsp;</p>
+
+<p class="whs12">&nbsp;</p>
+
+<script type="text/javascript" language="JavaScript" title="WebHelpRelatedTopics"><!--
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//--></script><script type="text/javascript" language="javascript1.2">
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+//-->
+</script>
+</body>
+</html>

@@ -17,7 +17,7 @@
     <!-- Splash screen settings -->
     <parameter name="image"       value="${SUITRoot}/resources/icon_about.png" />
     <parameter name="info"        value="%A : %V" />
-    <parameter name="text_colors" value="#F0CC6D|#7F7138" />
+    <parameter name="text_colors" value="#543AA9|#FFFFFF" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->

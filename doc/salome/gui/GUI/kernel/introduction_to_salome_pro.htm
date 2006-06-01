@@ -1,0 +1,214 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<head>
+<title>Introduction to SALOME</title>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<meta name="generator" content="RoboHelp by eHelp Corporation www.ehelp.com">
+<link rel="stylesheet" href="../default_ns.css"><script type="text/javascript" language="JavaScript" title="WebHelpSplitCss">
+<!--
+if (navigator.appName !="Netscape")
+{   document.write("<link rel='stylesheet' href='../default.css'>");}
+//-->
+</script>
+<style type="text/css">
+<!--
+h1.whs1 { font-family:'Times New Roman' , serif; }
+p.whs2 { font-family:'Times New Roman' , serif; margin-left:0px; text-indent:48px; }
+p.whs3 { font-family:'Times New Roman' , serif; text-align:justify; text-indent:48px; font-weight:normal; }
+img_whs4 { border:none; width:623px; height:408px; border-style:none; }
+p.whs5 { font-family:'Times New Roman' , serif; margin-left:0px; }
+ul.whs6 { list-style:disc; }
+p.whs7 { font-family:'Times New Roman' , serif; margin-left:0px; font-weight:bold; }
+-->
+</style><script type="text/javascript" language="JavaScript">
+<!--
+if ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) == 4))
+{
+  var strNSS = "<style type='text/css'>";
+  strNSS += "p.whs2 {margin-left:1pt; }";
+  strNSS += "p.whs5 {margin-left:1pt; }";
+  strNSS += "p.whs7 {margin-left:1pt; }";
+  strNSS +="</style>";
+  document.write(strNSS);
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="BSSC Special Effects" src="../ehlpdhtm.js"></script><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+<!--
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//-->
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute; left:0px; top:0px; z-index:4; visibility:hidden; }
+p.WebHelpNavBar { text-align:right; }
+-->
+</style><script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
+<script type="text/javascript" language="javascript1.2">
+<!--
+if (window.gbWhTopic)
+{
+	if (window.setRelStartPage)
+	{
+	addTocInfo("About SALOME\nIntroduction to SALOME");
+addButton("show",BTN_IMG,"Show","","","","",0,0,"../whd_show0.gif","../whd_show2.gif","../whd_show1.gif");
+addButton("hide",BTN_IMG,"Hide","","","","",0,0,"../whd_hide0.gif","../whd_hide2.gif","../whd_hide1.gif");
+
+	}
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../index.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+//-->
+</script>
+</head>
+<body><script type="text/javascript" language="javascript1.2">
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(4);
+//-->
+</script>
+<h1 class="whs1"><span style="font-family: 'Times New Roman', serif;">Introduction 
+ to SALOME </span></h1>
+
+<p class="whs2">&nbsp;<span 
+ style="font-weight: bold;"><B>SALOME</B></span> 
+ platform represents a generic open source platform for pre- and post-processing 
+ in numeric simulations. <span style="font-weight: bold;"><B>SALOME</B></span> 
+ combines several software components, which are built in such a way that 
+ it allows to integrate solvers and existing meshing algorithms along with 
+ the specification of physical properties for a given domain. The originality 
+ of this approach is that the various components must cooperate dynamically 
+ and be configurable. </p>
+
+<p class="whs3">&nbsp;</p>
+
+<p class="whs3"><img src="../image54.jpg" width="623px" height="408px" border="0" class="img_whs4"></p>
+
+<p class="whs3">&nbsp;</p>
+
+<p class="whs3">&nbsp;</p>
+
+<p class="whs5">SALOME 
+ platform integrates a number of modules each having its own function:</p>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs7"><span lang=EN-US><B>KERNEL</B></span><span 
+ lang=EN-US
+	style="font-weight: normal;"> : &nbsp;</span><span 
+ style="font-weight: normal;">provides a common 
+ shell for all components, which can be integrated into the SALOME platform.</span></p></li>
+</ul>
+
+<p class="whs7">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs7">GUI<span style="font-weight: normal;"> 
+ :</span> <span style="font-weight: normal;">provides visual representation: 
+ </span><span lang=EN-US
+				style="font-weight: normal;">basic widgets, viewers etc. 
+ Third party modules optionally can have GUI, but in any case they always 
+ connected with KERNEL.</span></p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs5"><span 
+ style="font-weight: bold;"><B>Geometry</B></span> : &nbsp;facilitates 
+ construction and optimization of geometrical models using a wide range 
+ of &nbsp;CAD 
+ functions. </p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs5"><span 
+ style="font-weight: bold;"><B>Mesh</B></span> : &nbsp;generates 
+ meshes on geometrical models previously created or imported by the GEOM 
+ component.</p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs5"><span 
+ style="font-weight: bold;"><B>Supervisor</B></span> : &nbsp;provides 
+ tools for construction of graphs and execution of calculations. </p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs5"><span 
+ style="font-weight: bold;"><B>Post-Pro</B></span> : &nbsp;performs 
+ data visualization.</p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<ul type="disc" class="whs6">
+	
+	<li class=kadov-p><p class="whs5"><span 
+ style="font-weight: bold;"><B>MED</B></span> : &nbsp;allows 
+ to work with MED files. </p></li>
+</ul>
+
+<p class="whs5">&nbsp;</p>
+
+<p class="whs5">
+<a href="javascript:void(0);" onClick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) >=2 && typeof(PickupDialog_Invoke) == 'function') PickupDialog_Invoke(e,'','About SALOME architecture','about_salome_pro_architecture.htm','Introduction to GUI','../introduction_to_gui.htm');return false;" title="Related Topics"><img src="../ss_btn_related_topics.gif" border=0 height=17 width=82 alt="Related Topics"></a>
+
+
+ </p>
+
+<p class="whs5">&nbsp;</p>
+
+<p class="whs5">&nbsp;</p>
+
+<script type="text/javascript" language="JavaScript" title="WebHelpRelatedTopics"><!--
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//--></script><script type="text/javascript" language="javascript1.2">
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+//-->
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SalomeApp_Study.h"
 
@@ -704,7 +704,7 @@ QString SalomeApp_Study::getNameOfSavePoint(int savePoint)
 {
   _PTR(AttributeParameter) AP = studyDS()->GetCommonParameters(getVisualComponentName(), savePoint);
   _PTR(IParameters) ip = ClientFactory::getIParameters(AP);
-  return ip->getProperty("AP_SAVEPOINT_NAME");
+  return ip->getProperty("AP_SAVEPOINT_NAME").c_str();
 }
 
 /*!

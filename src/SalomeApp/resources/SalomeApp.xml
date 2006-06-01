@@ -25,8 +25,8 @@
     <!-- Splash screen settings -->
     <parameter name="image"           value="${SUITRoot}/resources/icon_about.png" />
     <parameter name="info"            value="%V" />
-    <parameter name="text_colors"     value="#F0CC6D|#7F7138" />
-    <parameter name="progress_colors" value="#FF0000|#FFFFFF|0" />
+    <parameter name="text_colors"     value="#543AA9|#FFFFFF" />
+    <parameter name="progress_colors" value="#0A4E5F|#B2EFED|1" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->

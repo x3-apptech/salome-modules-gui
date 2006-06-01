@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef CAM_MODULE_H
 #define CAM_MODULE_H
@@ -28,6 +28,7 @@
 
 class QAction;
 class SUIT_Study;
+class SUIT_Application;
 class CAM_Study;
 class CAM_DataModel;
 class CAM_Application;
@@ -85,6 +86,8 @@ public slots:
 
   virtual void           studyClosed( SUIT_Study* );
   virtual void           studyChanged( SUIT_Study*, SUIT_Study* );
+
+  virtual void           onApplicationClosed( SUIT_Application* );
 
 protected: 
   virtual CAM_DataModel* createDataModel();

@@ -14,7 +14,7 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. "Foo::Bar"
@@ -40,7 +40,7 @@ msgid "ABOUT_VERSION"
 msgstr "Version %1"
 
 msgid "ABOUT_COPYRIGHT"
-msgstr "Copyright (C) 2003-2005 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
+msgstr "Copyright (C) 2003-2006 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
 
 msgid "ABOUT_LICENSE"
 msgstr "GNU LGPL"

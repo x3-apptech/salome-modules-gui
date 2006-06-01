@@ -1,3 +1,21 @@
+// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either 
+// version 2.1 of the License.
+// 
+// This library is distributed in the hope that it will be useful 
+// but WITHOUT ANY WARRANTY; without even the implied warranty of 
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public  
+// License along with this library; if not, write to the Free Software 
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 // File:      LightApp_Application.cxx
 // Created:   6/20/2005 18:39:45 PM
 // Author:    Natalia Donis
@@ -421,12 +439,12 @@ void LightApp_Application::createActions()
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
   // help for KERNEL and GUI
   QCString dir;
-  QString aFileName;
+  QString aFileName = "index.htm";
   QString root;
   QAction* a;
   if (dir = getenv("GUI_ROOT_DIR")) {
-    aFileName = "GUI_index_v3.1.0.html";
-    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
+    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
+			  Qtx::addSlash("gui") +  Qtx::addSlash("GUI") );
     if ( QFileInfo( root + aFileName ).exists() ) {
       a = createAction( id, tr( QString("Kernel & GUI Help") ), QIconSet(),
 			tr( QString("Kernel && GUI Help") ),
@@ -445,10 +463,10 @@ void LightApp_Application::createActions()
       continue;
 
     QString modName = moduleName( *it );
-    aFileName = modName + "_index_v3.1.0.html";
     
     if (dir = getenv( modName + "_ROOT_DIR")) {
-      root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
+      root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
+			    Qtx::addSlash("gui") +  Qtx::addSlash(modName) );
       if ( QFileInfo( root + aFileName ).exists() ) {
 
 	QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
@@ -912,10 +930,11 @@ void LightApp_Application::onHelpContentsModule()
   const QAction* obj = (QAction*) sender();
 
   QString aComponentName = obj->name();
-  QString aFileName = aComponentName + "_index_v3.1.0.html";
+  QString aFileName = "index.htm";
 
   QCString dir = getenv( aComponentName + "_ROOT_DIR");
-  QString homeDir = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") );
+  QString homeDir = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
+				   Qtx::addSlash("gui") +  Qtx::addSlash(aComponentName) );
 
   QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();

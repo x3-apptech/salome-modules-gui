@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "LightApp_SelectionMgr.h"
 
@@ -92,12 +92,12 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
           QString component = study->componentDataType( refEntry );
           theList.Append( new SALOME_InteractiveObject( refEntry, component, ""/*refobj->Name().c_str()*/ ) );
         }
-        else
+        else if( !owner->IO().IsNull() )
           theList.Append( owner->IO() );
       }
     }
     else {
-      if( !entryMap.contains( entry ) )
+      if( !entryMap.contains( entry ) && !owner->IO().IsNull() )
 	theList.Append( owner->IO() );
     }
 

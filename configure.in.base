@@ -23,11 +23,13 @@ AC_CANONICAL_HOST
 PACKAGE=salome
 AC_SUBST(PACKAGE)
 
-VERSION=0.0.1
+VERSION=3.2.0
+XVERSION=0x030200
 AC_SUBST(VERSION)
+AC_SUBST(XVERSION)
 
 ########################################################################
-# Check --disable-corba option
+# Check --disable-corba-gen and other --disable-* options
 
 GUI_DISABLE_CORBA="no"
 DISABLE_PYCONSOLE="no"
@@ -41,7 +43,7 @@ DISABLE_SALOMEOBJECT="no"
 for option
 do
   case $option in
-      -disable-corba=yes | --disable-corba=yes | -disable-corba | --disable-corba)
+      -disable-corba-gen=yes | --disable-corba-gen=yes | -disable-corba-gen | --disable-corba-gen)
           GUI_DISABLE_CORBA="yes";;
       -disable-pyConsole=yes | --disable-pyConsole=yes | -disable-pyConsole | --disable-pyConsole)
           DISABLE_PYCONSOLE="yes";;
@@ -434,14 +436,12 @@ echo
 
 CHECK_HTML_GENERATORS
 
-if test "$GUI_DISABLE_CORBA" == "no"; then 
-  echo
-  echo ---------------------------------------------
-  echo Testing Kernel
-  echo ---------------------------------------------
-  echo
-  CHECK_KERNEL
-fi
+echo
+echo ---------------------------------------------
+echo Testing Kernel
+echo ---------------------------------------------
+echo
+CHECK_KERNEL
 
 echo
 echo ---------------------------------------------

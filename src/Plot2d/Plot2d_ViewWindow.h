@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef PLOT2D_VIEWWINDOW_H
 #define PLOT2D_VIEWWINDOW_H
@@ -52,7 +52,7 @@ public:
 protected:
   virtual QImage    dumpView();
   virtual QString   filter() const;
-  virtual bool      dumpViewToFormat( const QString& fileName, const QString& format );
+  virtual bool      dumpViewToFormat( const QImage&, const QString& fileName, const QString& format );
 
 private:
   bool eventFilter(QObject* watched, QEvent* e);

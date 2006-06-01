@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // SUIT_ViewWindow.cxx: implementation of the SUIT_ViewWindow class.
 //
@@ -79,13 +79,13 @@ QImage SUIT_ViewWindow::dumpView()
 }
 
 /*!
-  Saves scene rendering in window to file
+  Saves image to file according to the format
+  \param image - image
   \param fileName - name of file
   \param format - string contains name of format (for example, "BMP"(default) or "JPEG", "JPG")
 */
-bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
+bool SUIT_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileName, const QString& format )
 {
-  QImage img = dumpView();
   if( img.isNull() )
     return false; 
 
@@ -99,6 +99,16 @@ bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& 
   bool res = img.save( fileName, fmt.latin1() );
   QApplication::restoreOverrideCursor();
   return res;
+}
+
+/*!
+  Saves scene rendering in window to file
+  \param fileName - name of file
+  \param format - string contains name of format (for example, "BMP"(default) or "JPEG", "JPG")
+*/
+bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
+{
+  return dumpViewToFormat( dumpView(), fileName, format );
 }
 
 /*! Close event \a theEvent.
@@ -142,13 +152,15 @@ bool SUIT_ViewWindow::event( QEvent* e )
     bool bOk = false;
     if ( myManager && myManager->study() && myManager->study()->application() )
     {
+      QImage im = dumpView();
+
       // get file name
       SUIT_Application* app = myManager->study()->application();
       QString fileName = app->getFileName( false, QString::null, filter(), tr( "TLT_DUMP_VIEW" ), 0 );
       if( !fileName.isEmpty() )
       {
 	QString fmt = SUIT_Tools::extension( fileName ).upper();
-	bOk = dumpViewToFormat( fileName, fmt );
+	bOk = dumpViewToFormat( im, fileName, fmt );
       }
       else
       {

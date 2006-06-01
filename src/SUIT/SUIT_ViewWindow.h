@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // SUIT_ViewWindow.h: interface for the SUIT_ViewWindow class.
 //
@@ -47,7 +47,7 @@ public:
   bool              event(QEvent*);
 
   virtual QImage    dumpView();
-  virtual bool      dumpViewToFormat( const QString& fileName, const QString& format );
+  bool              dumpViewToFormat( const QString& fileName, const QString& format );
 
   bool              onAccelAction( int );
 
@@ -73,6 +73,7 @@ protected:
   virtual void      contextMenuEvent( QContextMenuEvent* );
   virtual QString   filter() const;
   virtual bool      action( const int );
+  virtual bool      dumpViewToFormat( const QImage&, const QString& fileName, const QString& format );
 
   SUIT_Desktop*     myDesktop;
   SUIT_ViewManager* myManager;

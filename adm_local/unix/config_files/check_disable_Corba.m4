@@ -9,7 +9,7 @@
 AC_DEFUN([CHECK_DISABLE_CORBA],[
 
 AC_ARG_WITH(corba,
-	    [  --disable-corba default=no ],
+	    [  --disable-corba-gen default=no ],
 	    disable_corba="$withval",disable_corba="${GUI_DISABLE_CORBA}")
 
 case $disable_corba in
