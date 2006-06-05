@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='windows-1252' ?>
 <tocdata>
 <item name="Welcome to SALOME" url="kernel/introduction.htm" />
-<item name="General information about KERNEL module, for developers and users" url="kernel_index.html" />
 <book name="Using this reference manual" >
   <item name="About SALOME help system" url="kernel/about_salome_pro_help_system.htm" />
   <item name="Navigating topics" url="kernel/navigating_topics.htm" />

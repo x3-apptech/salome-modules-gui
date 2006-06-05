@@ -30,10 +30,6 @@ VPATH=.:@srcdir@
 usr_docs:
 	cp -fr $(srcdir)/GUI ./
 	-find $(PWD) -name CVS -prune -exec rm -rf {} \;
-	ln -sf ${KERNEL_ROOT_DIR}/share/doc/salome/index.html ./GUI/kernel_index.html
-	ln -sf ${KERNEL_ROOT_DIR}/share/doc/salome/INSTALL.html ./GUI/INSTALL.html
-	ln -sf ${KERNEL_ROOT_DIR}/share/doc/salome/UnitTests.html ./GUI/UnitTests.html
-	ln -sf ${KERNEL_ROOT_DIR}/share/doc/salome/SALOME_Application.html ./GUI/SALOME_Application.html
 
 docs: usr_docs
 
