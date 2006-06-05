@@ -446,11 +446,25 @@ void LightApp_Application::createActions()
     root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
 			  Qtx::addSlash("gui") +  Qtx::addSlash("GUI") );
     if ( QFileInfo( root + aFileName ).exists() ) {
-      a = createAction( id, tr( QString("Kernel & GUI Help") ), QIconSet(),
-			tr( QString("Kernel && GUI Help") ),
-			tr( QString("Kernel & GUI Help") ),
+      a = createAction( id, tr( QString("GUI Help") ), QIconSet(),
+			tr( QString("GUI Help") ),
+			tr( QString("GUI Help") ),
 			0, desk, false, this, SLOT( onHelpContentsModule() ) );
       a->setName( QString("GUI") );
+      createMenu( a, helpModuleMenu, -1 );
+      id++;
+    }
+  }
+  if (dir = getenv("KERNEL_ROOT_DIR")) {
+    QString aFN = "index.html";
+    root = Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") + 
+			  Qtx::addSlash("salome") );
+    if ( QFileInfo( root + aFN ).exists() ) {
+      a = createAction( id, tr( QString("KERNEL Help") ), QIconSet(),
+			tr( QString("KERNEL Help") ),
+			tr( QString("KERNEL Help") ),
+			0, desk, false, this, SLOT( onHelpContentsModule() ) );
+      a->setName( QString("KERNEL") );
       createMenu( a, helpModuleMenu, -1 );
       id++;
     }
@@ -931,12 +945,14 @@ void LightApp_Application::onHelpContentsModule()
 
   QString aComponentName = obj->name();
   QString aFileName = "index.htm";
+  QString aFileNameKernel = "index.html";
 
   QCString dir = getenv( aComponentName + "_ROOT_DIR");
-  QString homeDir = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
-				   Qtx::addSlash("gui") +  Qtx::addSlash(aComponentName) );
-
-  QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();
+  QString homeDir = !aComponentName.compare(QString("KERNEL")) ? 
+    Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") + Qtx::addSlash("salome") ) : 
+    Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("doc") + Qtx::addSlash("salome") + Qtx::addSlash("gui") +  Qtx::addSlash(aComponentName) );
+  
+  QString helpFile = QFileInfo( homeDir + (!aComponentName.compare(QString("KERNEL")) ? aFileNameKernel : aFileName) ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();
   QString anApp = resMgr->stringValue("ExternalBrowser", "application");
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
