@@ -27,6 +27,7 @@
   #include "SALOME_InteractiveObject.hxx"
 #endif
 
+
 /*!
   This class provide data owner objects.
 */
@@ -39,8 +40,9 @@ public:
     LightApp_DataOwner( const QString& );
     virtual ~LightApp_DataOwner();
 
-    virtual bool isEqual( const SUIT_DataOwner& ) const;
-    virtual bool operator<( const SUIT_DataOwner& ) const;
+    // *** jfa: The below line has been put here 14.02.2007.
+    // *** It cancels modifications from branch BR_Dev_For_4_0
+    virtual QString keyString() const;
 
 #ifndef DISABLE_SALOMEOBJECT
     const Handle(SALOME_InteractiveObject)& IO() const;

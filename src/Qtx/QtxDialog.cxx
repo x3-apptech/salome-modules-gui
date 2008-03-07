@@ -416,12 +416,13 @@ QSize QtxDialog::Border::minimumSizeHint() const
 QtxDialog::QtxDialog( QWidget* parent, const char* name,
 					  bool modal, bool allowResize, const int f, WFlags wf )
 : QDialog( parent, name, modal,
-#ifdef WIN32
            wf | WStyle_Customize | WStyle_Title | WStyle_SysMenu |
-           ( allowResize ? WStyle_NormalBorder : WStyle_NoBorderEx ) ),
+#ifdef WIN32
+           ( allowResize ? WStyle_NormalBorder : WStyle_NoBorderEx ) |
 #else
-           wf | WStyle_NormalBorder | WStyle_Customize | WStyle_Title | WStyle_SysMenu ),
+           WStyle_NormalBorder |
 #endif
+           ( allowResize ? WStyle_Maximize : 0 ) ),
 mySender( 0 ),
 myAlignment( 0 ),
 myInited( false ),

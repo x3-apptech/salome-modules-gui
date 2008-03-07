@@ -19,17 +19,15 @@
 #include "SVTK_ViewManager.h"
 #include "SVTK_ViewModel.h"
 
-int SVTK_ViewManager::_SVTKViewMgr_Id = 0;
+#include <VTKViewer_ViewManager.h>
 
 /*!
   Constructor
 */
-SVTK_ViewManager::SVTK_ViewManager( SUIT_Study* study, 
-		    SUIT_Desktop* theDesktop ) 
-: SUIT_ViewManager( study, theDesktop )
+SVTK_ViewManager::SVTK_ViewManager( SUIT_Study* study, SUIT_Desktop* theDesktop ) 
+: SUIT_ViewManager( study, theDesktop, new SVTK_Viewer() )
 {
-  myId = ++_SVTKViewMgr_Id;
-  setViewModel( new SVTK_Viewer() );
+  setTitle( VTKViewer_ViewManager::tr( "VTK_VIEW_TITLE" ) );
 }
 
 /*!
@@ -45,13 +43,4 @@ SVTK_ViewManager::~SVTK_ViewManager()
 SUIT_Desktop* SVTK_ViewManager::getDesktop()
 {
   return myDesktop;
-}
-
-/*!
-  Sets default name of view
-*/
-void SVTK_ViewManager::setViewName(SUIT_ViewWindow* theView)
-{
-  int aPos = myViews.find(theView);
-  theView->setCaption( tr( "VTK_VIEW_TITLE" ).arg( myId ).arg( aPos + 1 ) );
 }

@@ -43,12 +43,13 @@ class SUIT_Desktop;
 class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 {
  public:
+   virtual ~LightApp_SVTKDataOwner() {};
 #ifndef DISABLE_VTKVIEWER
    #ifndef DISABLE_SALOMEOBJECT
-    LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
-			    SUIT_Desktop* theDesktop );
+    LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)&, SUIT_Desktop* );
+   #else
+    LightApp_SVTKDataOwner( const QString& );
    #endif
-    virtual ~LightApp_SVTKDataOwner();
 
     /*!Gets dataowners ids list.*/
     const TColStd_IndexedMapOfInteger& GetIds() const;
@@ -64,9 +65,6 @@ class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 
     SVTK_ViewWindow* GetActiveViewWindow() const;
     SUIT_Desktop* myDesktop;
-    
-#else
-  LightApp_SVTKDataOwner( const QString& );
 #endif
 };
 
@@ -80,9 +78,9 @@ class LIGHTAPP_EXPORT LightApp_VTKSelector : public SUIT_Selector
   Q_OBJECT;
 
 public:
+  virtual ~LightApp_VTKSelector() {};
 #ifndef DISABLE_VTKVIEWER
   LightApp_VTKSelector( SVTK_ViewModelBase*, SUIT_SelectionMgr* );
-  virtual ~LightApp_VTKSelector();
 
   SVTK_ViewModelBase* viewer() const;
 

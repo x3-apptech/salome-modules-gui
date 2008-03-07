@@ -67,9 +67,10 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
     for( SUIT_Selector* selector = aSelectors.first(); selector; selector = aSelectors.next() )
     {
       qDebug( selector->type() );
-      if( selector->type()!=client )
+      if( selector->type() != client && selector->isEnabled() )
       {
-	mgr->selected( cur_sel, selector->type() );
+	//mgr->selected( cur_sel, selector->type() );
+        selector->selected( cur_sel );
 	SUIT_DataOwnerPtrList::const_iterator aLIt = cur_sel.begin(), aLLast = cur_sel.end();
 	for( ; aLIt!=aLLast; aLIt++ )
 	  sel.append( *aLIt ); //check entry and don't append if such entry is in list already
@@ -86,7 +87,7 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
       LightApp_DataOwner* sowner = dynamic_cast<LightApp_DataOwner*>( (*anIt ).get() );
       if( sowner )
       {
-        entry = myStudy->referencedToEntry( sowner->entry() );
+        entry = referencedToEntry( sowner->entry() );
 	if( entries.contains( entry ) )
 	  continue;
 
@@ -98,6 +99,11 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
       }
     }
   }
+}
+
+QString LightApp_Selection::referencedToEntry( const QString& entry ) const
+{
+  return myStudy->referencedToEntry( entry );
 }
 
 /*!
@@ -146,6 +152,9 @@ QtxValue LightApp_Selection::param( const int ind, const QString& p ) const
 
   else if( p=="isReference" )
     return QtxValue( isReference( ind ), false );
+
+  else if( p=="displayer" )
+    return param( ind, "component" );
 
   else if( p=="canBeDisplayed" )
   {

@@ -36,7 +36,7 @@
 #include <qdict.h>
 
 #include "utilities.h"
-#include <iostream.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -204,7 +204,7 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 */
 bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 {
-  bool store = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
+  bool store = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", false );
   if ( store )
     SalomeApp_VisualState( (SalomeApp_Application*)application() ).storeState();
   
@@ -288,7 +288,9 @@ void SalomeApp_Study::closeDocument(bool permanently)
   _PTR(Study) studyPtr = studyDS();
   if ( studyPtr )
   {
-    if(permanently) SalomeApp_Application::studyMgr()->Close( studyPtr );
+    if(permanently) {
+      SalomeApp_Application::studyMgr()->Close( studyPtr );
+    }
     SALOMEDSClient_Study* aStudy = 0;
     setStudyDS( _PTR(Study)(aStudy) );
   }
@@ -304,6 +306,16 @@ bool SalomeApp_Study::isModified() const
     isAnyChanged = LightApp_Study::isModified();
 
   return isAnyChanged; 
+}
+
+/*!
+  Set study modified to \a on.
+ */
+void SalomeApp_Study::Modified()
+{
+  if(_PTR(Study) aStudy = studyDS())
+    aStudy->Modified();
+  LightApp_Study::Modified();
 }
 
 /*!
@@ -724,6 +736,15 @@ std::string SalomeApp_Study::getVisualComponentName()
 {
   return "Interface Applicative";
 }
+
+/*!
+ * \brief Restores the study state
+ */
+void SalomeApp_Study::restoreState(int savePoint)
+{
+  SalomeApp_VisualState((SalomeApp_Application*)application()).restoreState(savePoint);
+}
+
 
 /*!
   Slot: called on change of a root of a data model. Redefined from CAM_Study

@@ -22,6 +22,8 @@
 
 #include "SPlot2d_ViewModel.h"
 
+#include "SPlot2d_ViewWindow.h"
+
 #include "SPlot2d_Prs.h"
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
@@ -114,10 +116,10 @@ void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject,
 void SPlot2d_Viewer::renameAll( const Handle(SALOME_InteractiveObject)& IObj, const QString& name )
 {
   SUIT_ViewManager* vm = getViewManager();
-  if( vm )
+  if ( vm )
   {
     const QPtrVector<SUIT_ViewWindow>& wnds = vm->getViews();
-    for( int i=0; i<wnds.size(); i++ )
+    for ( uint i = 0; i < wnds.size(); i++ )
     {
       Plot2d_ViewWindow* pwnd = dynamic_cast<Plot2d_ViewWindow*>( wnds.at( i ) );
       rename( IObj, name, pwnd->getViewFrame() );
@@ -378,4 +380,15 @@ void SPlot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* 
     if( clonedVF->isVisible( *anIt ) )
       newVF->displayCurve( *anIt, false );
   newVF->Repaint();
+}
+
+/*!
+  create SPlot2d_ViewWindow
+*/
+SUIT_ViewWindow* SPlot2d_Viewer::createView( SUIT_Desktop* theDesktop )
+{
+  SPlot2d_ViewWindow* aPlot2dView = new SPlot2d_ViewWindow(theDesktop, this);
+  if (getPrs())
+    aPlot2dView->getViewFrame()->Display(getPrs());
+  return aPlot2dView;
 }

@@ -26,24 +26,47 @@
 
 #include <qstring.h>
 
+#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+  #include <Standard_ErrorHandler.hxx>
+  #include <Standard_Failure.hxx>
+#else
+  #include "CASCatch.hxx"
+#endif
+
 /*!Constructor. Initialize by \a floatSignal.*/
 SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 : SUIT_ExceptionHandler()
 {
-  OSD::SetSignal( floatSignal );
+  // JFA 2006-09-28: PAL10867: suppress signal catching,
+  // if environment variable DISABLE_SIGNALS_CATCHING is set to 1.
+  // Commonly this is used with "noexcepthandler" option.
+  char* envNoCatchSignals = getenv("NOT_INTERCEPT_SIGNALS");
+  if (!envNoCatchSignals || !atoi(envNoCatchSignals))
+  {
+    OSD::SetSignal( floatSignal );
+  }
 }
 
 /*!Try to call SUIT_ExceptionHandler::internalHandle(o, e), catch if failure.*/
 bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
-  CASCatch_TRY {   
+#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+  try {
+    OCC_CATCH_SIGNALS;
+#else
+  CASCatch_TRY {
+#endif
     SUIT_ExceptionHandler::internalHandle( o, e );
   }
+#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+  catch(Standard_Failure) {
+#else
   CASCatch_CATCH(Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();          
+#endif
+    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     throw Standard_Failure( aFail->GetMessageString() );
   }
-  
+
   return true;
 }
 
@@ -75,13 +98,14 @@ bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
 }
 
 /*!Create new SUIT_ExceptionHandler*/
+
 extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
 {
   // MSV 2006-04-26: work around PAL12004 "VTK window => SIGFPE Arithmetic Exception Detected"
   // We disable FPE signal as it was in earlier versions of SALOME. It is enabled
   // only in debug mode if the environment variable DISABLE_FPE is not set to 1.
   bool raiseFPE;
-#ifdef _DEBUG_
+#if defined(_DEBUG_) | defined(_DEBUG) //the Last for WNT default settings
   raiseFPE = true;
   char* envDisableFPE = getenv("DISABLE_FPE");
   if (envDisableFPE && atoi(envDisableFPE))
@@ -89,5 +113,6 @@ extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
 #else
   raiseFPE = false;
 #endif
+
   return new SalomeApp_ExceptionHandler( raiseFPE );
 }

@@ -30,8 +30,6 @@ class TCollection_AsciiString;
 
 DEFINE_STANDARD_HANDLE(DDS_Dictionary, MMgt_TShared)
 
-//  Class to provide information about used parameters,
-//  reading them from 'xml' file
 class DDS_Dictionary : public MMgt_TShared
 {
 public:
@@ -69,7 +67,6 @@ private:
 
   void                                           operator=( const DDS_Dictionary& );
 
-  // prepares formants for each unit systems
   void                                           FillDataMap( const LDOM_Element&, const LDOM_Element& );
 
 private:

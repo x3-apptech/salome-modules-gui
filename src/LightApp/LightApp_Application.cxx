@@ -38,8 +38,11 @@
 
 #include "LightApp_OBFilter.h"
 
+#include "LightApp_EventFilter.h"
+
 #include "LightApp_OBSelector.h"
 #include "LightApp_SelectionMgr.h"
+#include "LightApp_DataObject.h"
 
 #include <CAM_Module.h>
 #include <CAM_DataModel.h>
@@ -56,10 +59,12 @@
 #include <QtxMRUAction.h>
 #include <QtxDockAction.h>
 #include <QtxToolBar.h>
+#include <qprocess.h>
 
 #include <LogWindow.h>
 #include <OB_Browser.h>
 #include <OB_ListView.h>
+#include <OB_ObjSearch.h>
 
 #ifndef DISABLE_GLVIEWER
   #include <GLViewer_Viewer.h>
@@ -104,6 +109,12 @@
 //  #include <SUPERVGraph_ViewFrame.h>
 //  #include <SUPERVGraph_ViewManager.h>
 //#endif
+
+#ifndef DISABLE_QXGRAPHVIEWER
+  #include <QxGraph_ViewModel.h>
+  #include <QxGraph_ViewWindow.h>
+  #include <QxGraph_ViewManager.h>
+#endif
 
 #include <QtxWorkstack.h>
 
@@ -231,6 +242,15 @@ myPrefs( 0 )
   myAccel->setActionKey( SUIT_Accel::RotateUp,    ALT+Key_Up,        VTKViewer_Viewer::Type() );
   myAccel->setActionKey( SUIT_Accel::RotateDown,  ALT+Key_Down,      VTKViewer_Viewer::Type() );
 #endif
+#ifndef DISABLE_PLOT2DVIEWER
+  myAccel->setActionKey( SUIT_Accel::PanLeft,     CTRL+Key_Left,     Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanRight,    CTRL+Key_Right,    Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanUp,       CTRL+Key_Up,       Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::PanDown,     CTRL+Key_Down,     Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomIn,      CTRL+Key_Plus,     Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomOut,     CTRL+Key_Minus,    Plot2d_Viewer::Type() );
+  myAccel->setActionKey( SUIT_Accel::ZoomFit,     CTRL+Key_Asterisk, Plot2d_Viewer::Type() );
+#endif
 
   connect( mySelMgr, SIGNAL( selectionChanged() ), this, SLOT( onSelection() ) );
 
@@ -287,6 +307,8 @@ void LightApp_Application::start()
 
   putInfo( "" );
   desktop()->statusBar()->message( "" );
+
+  LightApp_EventFilter::Init();
 }
 
 /*!Gets application name.*/
@@ -439,12 +461,12 @@ void LightApp_Application::createActions()
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
   // help for KERNEL and GUI
   QCString dir;
-  QString aFileName = "index.htm";
+  QString aFileName = "index.html";
   QString root;
   QAction* a;
   if (dir = getenv("GUI_ROOT_DIR")) {
-    root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
-			  Qtx::addSlash("gui") +  Qtx::addSlash("GUI") );
+    root = Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") +
+                          Qtx::addSlash("salome") + Qtx::addSlash("gui") +  Qtx::addSlash("GUI") );
     if ( QFileInfo( root + aFileName ).exists() ) {
       a = createAction( id, tr( QString("GUI Help") ), QIconSet(),
 			tr( QString("GUI Help") ),
@@ -456,10 +478,9 @@ void LightApp_Application::createActions()
     }
   }
   if (dir = getenv("KERNEL_ROOT_DIR")) {
-    QString aFN = "index.html";
     root = Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") + 
 			  Qtx::addSlash("salome") );
-    if ( QFileInfo( root + aFN ).exists() ) {
+    if ( QFileInfo( root + aFileName ).exists() ) {
       a = createAction( id, tr( QString("KERNEL Help") ), QIconSet(),
 			tr( QString("KERNEL Help") ),
 			tr( QString("KERNEL Help") ),
@@ -479,8 +500,8 @@ void LightApp_Application::createActions()
     QString modName = moduleName( *it );
     
     if (dir = getenv( modName + "_ROOT_DIR")) {
-      root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("doc") +  Qtx::addSlash("salome") + 
-			    Qtx::addSlash("gui") +  Qtx::addSlash(modName) );
+      root = Qtx::addSlash( Qtx::addSlash(dir) +  Qtx::addSlash("share") + Qtx::addSlash("doc") + 
+                            Qtx::addSlash("salome") + Qtx::addSlash("gui") +  Qtx::addSlash(modName) );
       if ( QFileInfo( root + aFileName ).exists() ) {
 
 	QAction* a = createAction( id, tr( moduleTitle(modName) + QString(" Help") ), QIconSet(),
@@ -509,66 +530,72 @@ void LightApp_Application::createActions()
   if ( modIcon.isNull() )
     modIcon = QPixmap( imageEmptyIcon );
 
-  QToolBar* modTBar = new QtxToolBar( true, desk );
-  modTBar->setLabel( tr( "INF_TOOLBAR_MODULES" ) );
-
-  QActionGroup* modGroup = new QActionGroup( this );
-  modGroup->setExclusive( true );
-  modGroup->setUsesDropDown( true );
-
-  a = createAction( -1, tr( "APP_NAME" ), defIcon, tr( "APP_NAME" ),
-                    tr( "PRP_APP_MODULE" ), 0, desk, true );
-  modGroup->add( a );
-  myActions.insert( QString(), a );
-
-  QMap<QString, QString> iconMap;
-  moduleIconNames( iconMap );
-
-  const int iconSize = 20;
-
-  modGroup->addTo( modTBar );
-  QObjectList *l = modTBar->queryList( "QComboBox" );
-  QObjectListIt oit( *l );
-  while ( QObject* obj = oit.current() ) {
-    QComboBox* cb = (QComboBox*)obj;
-    if ( cb ) cb->setFocusPolicy( QWidget::NoFocus );
-    ++oit;
-  }
-  delete l;
-  
-   modTBar->addSeparator();
-
   QStringList modList;
   modules( modList, false );
 
-  for ( it = modList.begin(); it != modList.end(); ++it )
+  if( modList.count()>1 )
   {
-    if ( !isLibExists( *it ) )
+    QToolBar* modTBar = new QtxToolBar( true, desk );
+    modTBar->setLabel( tr( "INF_TOOLBAR_MODULES" ) );
+
+    QActionGroup* modGroup = new QActionGroup( this );
+    modGroup->setExclusive( true );
+    modGroup->setUsesDropDown( true );
+
+    a = createAction( -1, tr( "APP_NAME" ), defIcon, tr( "APP_NAME" ),
+                      tr( "PRP_APP_MODULE" ), 0, desk, true );
+    modGroup->add( a );
+    myActions.insert( QString(), a );
+
+    QMap<QString, QString> iconMap;
+    moduleIconNames( iconMap );
+
+    const int iconSize = 20;
+
+    modGroup->addTo( modTBar );
+    QObjectList *l = modTBar->queryList( "QComboBox" );
+    QObjectListIt oit( *l );
+    while ( QObject* obj = oit.current() ) {
+      QComboBox* cb = (QComboBox*)obj;
+      if ( cb ) cb->setFocusPolicy( QWidget::NoFocus );
+    ++oit;
+    }
+    delete l;
+  
+    modTBar->addSeparator();
+
+    for ( it = modList.begin(); it != modList.end(); ++it )
     {
-      qDebug( QString( "Library '%1' cannot be found" ).arg( *it ) );
-      continue;
+      if ( !isLibExists( *it ) )
+        continue;
+    
+      QString iconName;
+      if ( iconMap.contains( *it ) )
+        iconName = iconMap[*it];
+
+      QString modName = moduleName( *it );
+
+      QPixmap icon = resMgr->loadPixmap( modName, iconName, false );
+      if ( icon.isNull() )
+      {
+	icon = modIcon;
+	printf( "****************************************************************\n" );
+	printf( "*    Icon for %s not found. Using the default one.\n", (*it).latin1() );
+	printf( "****************************************************************\n" );
+      }
+
+      icon.convertFromImage( icon.convertToImage().smoothScale( iconSize, iconSize, QImage::ScaleMin ) );
+
+      QAction* a = createAction( -1, *it, icon, *it, tr( "PRP_MODULE" ).arg( *it ), 0, desk, true );
+      a->addTo( modTBar );
+      modGroup->add( a );
+
+      myActions.insert( *it, a );
     }
 
-    QString iconName;
-    if ( iconMap.contains( *it ) )
-      iconName = iconMap[*it];
-
-    QString modName = moduleName( *it );
-
-    QPixmap icon = resMgr->loadPixmap( modName, iconName, false );
-    if ( icon.isNull() )
-      icon = modIcon;
-
-    icon.convertFromImage( icon.convertToImage().smoothScale( iconSize, iconSize, QImage::ScaleMin ) );
-
-    QAction* a = createAction( -1, *it, icon, *it, tr( "PRP_MODULE" ).arg( *it ), 0, desk, true );
-    a->addTo( modTBar );
-    modGroup->add( a );
-
-    myActions.insert( *it, a );
+    SUIT_Tools::simplifySeparators( modTBar );
+    connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
   }
-
-  SUIT_Tools::simplifySeparators( modTBar );
 
   // New window
   int windowMenu = createMenu( tr( "MEN_DESK_WINDOW" ), -1, MenuWindowId, 100 );
@@ -588,13 +615,14 @@ void LightApp_Application::createActions()
 #ifndef DISABLE_VTKVIEWER
   createActionForViewer( NewVTKViewId, newWinMenu, QString::number( 3 ), ALT+Key_K );
 #endif
+#ifndef DISABLE_QXGRAPHVIEWER
+  createActionForViewer( NewQxGraphViewId, newWinMenu, QString::number( 4 ), ALT+Key_C );
+#endif
 
 
   createAction( RenameId, tr( "TOT_RENAME" ), QIconSet(), tr( "MEN_DESK_RENAME" ), tr( "PRP_RENAME" ),
 		SHIFT+Key_R, desk, false, this, SLOT( onRenameWindow() ) );
   createMenu( RenameId, windowMenu, -1 );
-
-  connect( modGroup, SIGNAL( selected( QAction* ) ), this, SLOT( onModuleActivation( QAction* ) ) );
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
   createMenu( PreferencesId, fileMenu, 15, -1 );
@@ -627,20 +655,16 @@ void LightApp_Application::onModuleActivation( QAction* a )
   bool cancelled = false;
   while ( !modName.isEmpty() && !activeStudy() && !cancelled ){
     LightApp_ModuleDlg aDlg( desktop(), modName, icon );
-    int res = aDlg.exec();
+    QMap<int, QString> opmap = activateModuleActions();
+    for ( QMap<int, QString>::ConstIterator it = opmap.begin(); it != opmap.end(); ++it )
+      aDlg.addButton( it.data(), it.key() );
 
-    switch ( res ){
-    case 1:
-      onNewDoc();
-      break;
-    case 2:
-      onOpenDoc();
-      break;
-    case 3:
-      //onLoadStudy();
-      //break;
-    case 0:
-    default:
+    int res = aDlg.exec();
+    if ( res != QDialog::Rejected ) {
+      // some operation is selected
+      moduleActionSelected( res );
+    }
+    else {
       putInfo( tr("INF_CANCELLED") );
       myActions[QString()]->setOn( true );
       cancelled = true;
@@ -690,6 +714,11 @@ void LightApp_Application::onNewWindow()
 #ifndef DISABLE_VTKVIEWER
   case NewVTKViewId:
     type = VTKViewer_Viewer::Type();
+    break;
+#endif
+#ifndef DISABLE_QXGRAPHVIEWER
+  case NewQxGraphViewId:
+    type = QxGraph_Viewer::Type();
     break;
 #endif
   }
@@ -889,17 +918,24 @@ void LightApp_Application::updateCommandsStatus()
   if( a )
     a->setEnabled( activeStudy() );
 #endif
+
+#ifndef DISABLE_QXGRAPHVIEWER
+  a = action( NewQxGraphViewId );
+  if( a )
+    a->setEnabled( activeStudy() );
+#endif
 }
 
 /*!
   \class RunBrowser
   Runs system command in separate thread
 */
-class RunBrowser: public QThread {
+class RunBrowser: public QThread
+{
 public:
-
-  RunBrowser( LightApp_Application* app, QString theApp, QString theParams, QString theHelpFile, QString theContext=NULL):
-    myApp(theApp), myParams(theParams), 
+  RunBrowser (LightApp_Application* app, QString theApp, QString theParams,
+              QString theHelpFile, QString theContext=NULL)
+    : myApp(theApp), myParams(theParams), 
 #ifdef WIN32
       myHelpFile("file://" + theHelpFile + theContext), 
 #else
@@ -907,25 +943,35 @@ public:
 #endif
       myStatus(0),
       myLApp( app )
-{
-};
+  {
+  };
 
   virtual void run()
   {
     QString aCommand;
 
-    if ( !myApp.isEmpty())
+    if (!myApp.isEmpty())
+    {
+      //aCommand.sprintf("%s %s %s",myApp.latin1(),myParams.latin1(),myHelpFile.latin1());
+
+      //QProcess* proc = new QProcess();
+      //proc->addArgument( aCommand );
+
+      QProcess* proc = new QProcess();
+      proc->addArgument( myApp );
+      if (!myParams.isEmpty()) proc->addArgument( myParams );
+      proc->addArgument( myHelpFile );
+      //myStatus = system(aCommand);
+
+      //if(myStatus != 0)
+      if(!proc->start())
       {
-	aCommand.sprintf("%s %s %s",myApp.latin1(),myParams.latin1(),myHelpFile.latin1());
-	myStatus = system(aCommand);
-	if(myStatus != 0)
-	  {
-	    QCustomEvent* ce2000 = new QCustomEvent( 2000 );
-	    QString* msg = new QString( QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").arg(myApp).arg(myHelpFile) );
-	    ce2000->setData( msg );
-	    postEvent( myLApp, ce2000 );
-	  }
+        QCustomEvent* ce2000 = new QCustomEvent( 2000 );
+        QString* msg = new QString( QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").arg(myApp).arg(myHelpFile) );
+        ce2000->setData( msg );
+        postEvent( myLApp, ce2000 );
       }
+    }
   }
 
 private:
@@ -944,17 +990,27 @@ void LightApp_Application::onHelpContentsModule()
   const QAction* obj = (QAction*) sender();
 
   QString aComponentName = obj->name();
-  QString aFileName = "index.htm";
-  QString aFileNameKernel = "index.html";
+  QString aFileName = "index.html";
 
   QCString dir = getenv( aComponentName + "_ROOT_DIR");
   QString homeDir = !aComponentName.compare(QString("KERNEL")) ? 
     Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") + Qtx::addSlash("salome") ) : 
-    Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("doc") + Qtx::addSlash("salome") + Qtx::addSlash("gui") +  Qtx::addSlash(aComponentName) );
+    Qtx::addSlash( Qtx::addSlash(dir) + Qtx::addSlash("share") + Qtx::addSlash("doc") + Qtx::addSlash("salome") + Qtx::addSlash("gui") +  Qtx::addSlash(aComponentName) );
   
-  QString helpFile = QFileInfo( homeDir + (!aComponentName.compare(QString("KERNEL")) ? aFileNameKernel : aFileName) ).absFilePath();
+  QString helpFile = QFileInfo( homeDir + aFileName ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-  QString anApp = resMgr->stringValue("ExternalBrowser", "application");
+	QString platform;
+#ifdef WIN32
+	platform = "winapplication";
+#else
+	platform = "application";
+#endif
+	QString anApp = resMgr->stringValue("ExternalBrowser", platform);
+#ifdef WIN32
+	QString quote("\""); 
+	anApp.prepend( quote ); 
+	anApp.append( quote ); 
+#endif
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
 
   if (!anApp.isEmpty()) {
@@ -975,11 +1031,22 @@ void LightApp_Application::onHelpContentsModule()
 void LightApp_Application::onHelpContextModule(const QString& theComponentName, const QString& theFileName)
 {
   QCString dir = getenv( theComponentName + "_ROOT_DIR");
-  QString homeDir = Qtx::addSlash(Qtx::addSlash(dir)+Qtx::addSlash("doc")+Qtx::addSlash("salome")+Qtx::addSlash("gui")+Qtx::addSlash(theComponentName));
+  QString homeDir = Qtx::addSlash(Qtx::addSlash(dir)+Qtx::addSlash("share")+Qtx::addSlash("doc")+Qtx::addSlash("salome")+Qtx::addSlash("gui")+Qtx::addSlash(theComponentName));
 
   QString helpFile = QFileInfo( homeDir + theFileName ).absFilePath();
   SUIT_ResourceMgr* resMgr = resourceMgr();
-  QString anApp = resMgr->stringValue("ExternalBrowser", "application");
+	QString platform;
+#ifdef WIN32
+	platform = "winapplication";
+#else
+	platform = "application";
+#endif
+	QString anApp = resMgr->stringValue("ExternalBrowser", platform);
+#ifdef WIN32
+	QString quote("\""); 
+	anApp.prepend( quote ); 
+	anApp.append( quote ); 
+#endif
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
 
   if (!anApp.isEmpty()) {
@@ -1109,11 +1176,13 @@ void LightApp_Application::removeWindow( const int flag, const int studyId )
       sId = activeStudy()->id();
   }
 
+  bool anIsEmpty = !myWindows[flag]->isEmpty();
   QWidget* wid = myWindows[flag]->widget( sId );
   myWindows[flag]->remove( sId );
   delete wid;
 
-  setWindowShown( flag, !myWindows[flag]->isEmpty() );
+  //setWindowShown( flag, !myWindows[flag]->isEmpty() );
+  setWindowShown( flag, anIsEmpty );
 }
 
 /*!
@@ -1314,6 +1383,12 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   //    viewMgr = new SUPERVGraph_ViewManager( activeStudy(), desktop(), new SUPERVGraph_Viewer() );
   //  }
   //#endif
+#ifndef DISABLE_QXGRAPHVIEWER
+  if( vmType == QxGraph_Viewer::Type() )
+    {
+      viewMgr = new QxGraph_ViewManager( activeStudy(), desktop(), new QxGraph_Viewer() );
+    }
+#endif
 #ifndef DISABLE_OCCVIEWER
   if( vmType == OCCViewer_Viewer::Type() )
   {
@@ -1325,7 +1400,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm = new OCCViewer_Viewer();
 #endif
     vm->setBackgroundColor( resMgr->colorValue( "OCCViewer", "background", vm->backgroundColor() ) );
-    vm->setTrihedronSize( resMgr->integerValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ) );
+    vm->setTrihedronSize( resMgr->doubleValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ) );
     int u( 1 ), v( 1 );
     vm->isos( u, v );
     u = resMgr->integerValue( "OCCViewer", "iso_number_u", u );
@@ -1348,7 +1423,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     if( vm )
     {
       vm->setBackgroundColor( resMgr->colorValue( "VTKViewer", "background", vm->backgroundColor() ) );
-      vm->setTrihedronSize( resMgr->integerValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ),
+      vm->setTrihedronSize( resMgr->doubleValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ),
 			    resMgr->booleanValue( "VTKViewer", "relative_size", vm->trihedronRelative() ) );
       new LightApp_VTKSelector( vm, mySelMgr );
     }
@@ -1399,6 +1474,9 @@ void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
 
   activateModule( defaultModule() );
 
+  if ( objectBrowser() )
+    objectBrowser()->openLevels();
+
   activateWindows();
 }
 
@@ -1415,11 +1493,13 @@ void LightApp_Application::onStudyOpened( SUIT_Study* theStudy )
     //aRoot->dump();
   }
   getWindow( WT_ObjectBrowser );
-  if ( objectBrowser() != 0 ) {
+  if ( objectBrowser() )
     objectBrowser()->setRootObject( aRoot );
-  }
 
   activateModule( defaultModule() );
+
+  if ( objectBrowser() )
+    objectBrowser()->openLevels();
 
   activateWindows();
 
@@ -1433,16 +1513,18 @@ void LightApp_Application::onStudySaved( SUIT_Study* )
 }
 
 /*!Protected SLOT. On study closed.*/
-void LightApp_Application::onStudyClosed( SUIT_Study* )
+void LightApp_Application::onStudyClosed( SUIT_Study* s )
 {
-  emit studyClosed();
-
   // Bug 10396: clear selection
   mySelMgr->clearSelected();
 
+  // Bug 12944: emit signal only after clear selection
+  emit studyClosed();
+
   activateModule( "" );
 
-  saveWindowsGeometry();
+  for ( WindowMap::ConstIterator itr = myWindows.begin(); s && itr != myWindows.end(); ++itr )
+    removeWindow( itr.key(), s->id() );
 }
 
 /*!Protected SLOT.On desktop activated.*/
@@ -1533,6 +1615,8 @@ void LightApp_Application::onPreferenceChanged( QString& modName, QString& secti
     sMod->preferencesChanged( section, param );
   else
     preferencesChanged( section, param );
+  // emit signal to allow additional preferences changing processing
+  emit preferenceChanged( modName, section, param );
 }
 
 /*!Private SLOT. On open document with name \a aName.*/
@@ -1545,9 +1629,6 @@ void LightApp_Application::onMRUActivated( QString aName )
 void LightApp_Application::beforeCloseDoc( SUIT_Study* s )
 {
   CAM_Application::beforeCloseDoc( s );
-
-  for ( WindowMap::ConstIterator itr = myWindows.begin(); s && itr != myWindows.end(); ++itr )
-    removeWindow( itr.key(), s->id() );
 }
 
 /*!Update actions.*/
@@ -1584,6 +1665,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
   if ( flag == WT_ObjectBrowser )
   {
     OB_Browser* ob = new OB_Browser( desktop() );
+    ob->setSearch( new OB_ObjSearch( ob ) );
     ob->setAutoUpdate( true );
     //ob->setAutoOpenLevel( 1 ); // commented by ASV as a fix to bug IPAL10107
     ob->setCaption( tr( "OBJECT_BROWSER" ) );
@@ -1739,7 +1821,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab );
   pref->setItemProperty( extgroup, "columns", 1 );
-  int apppref = pref->addPreference( tr( "PREF_APP" ), extgroup, LightApp_Preferences::File, "ExternalBrowser", "application" );
+	QString platform;
+#ifdef WIN32
+	platform = "winapplication";
+#else
+	platform = "application";
+#endif
+  int apppref = pref->addPreference( tr( "PREF_APP" ), extgroup, LightApp_Preferences::File, "ExternalBrowser", platform );
   pref->setItemProperty( apppref, "existing", true );
   pref->setItemProperty( apppref, "flags", QFileInfo::ExeUser );
   pref->setItemProperty( apppref, "readOnly", false );
@@ -1765,11 +1853,11 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( plot2dGroup, "columns", 1 );
 
   int occTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occGroup,
-				   LightApp_Preferences::IntSpin, "OCCViewer", "trihedron_size" );
+				   LightApp_Preferences::DblSpin, "OCCViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup,
 		       LightApp_Preferences::Color, "OCCViewer", "background" );
 
-  pref->setItemProperty( occTS, "min", 1 );
+  pref->setItemProperty( occTS, "min", 1.0E-06 );
   pref->setItemProperty( occTS, "max", 1000 );
 
   int isoU = pref->addPreference( tr( "PREF_ISOS_U" ), occGroup,
@@ -1784,12 +1872,12 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( isoV, "max", 100000 );
 
   int vtkTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkGroup,
-				   LightApp_Preferences::IntSpin, "VTKViewer", "trihedron_size" );
+				   LightApp_Preferences::DblSpin, "VTKViewer", "trihedron_size" );
   pref->addPreference( tr( "PREF_RELATIVE_SIZE" ), vtkGroup, LightApp_Preferences::Bool, "VTKViewer", "relative_size" );
   pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGroup,
 		       LightApp_Preferences::Color, "VTKViewer", "background" );
 
-  pref->setItemProperty( vtkTS, "min", 1 );
+  pref->setItemProperty( vtkTS, "min", 1.0E-06 );
   pref->setItemProperty( vtkTS, "max", 150 );
 
   pref->addPreference( tr( "PREF_SHOW_LEGEND" ), plot2dGroup,
@@ -1891,7 +1979,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #ifndef DISABLE_OCCVIEWER
   if ( sec == QString( "OCCViewer" ) && param == QString( "trihedron_size" ) )
   {
-    int sz = resMgr->integerValue( sec, param, -1 );
+    double sz = resMgr->doubleValue( sec, param, -1 );
     QPtrList<SUIT_ViewManager> lst;
     viewManagers( OCCViewer_Viewer::Type(), lst );
     for ( QPtrListIterator<SUIT_ViewManager> it( lst ); it.current() && sz >= 0; ++it )
@@ -1910,7 +1998,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #ifndef DISABLE_VTKVIEWER
   if ( sec == QString( "VTKViewer" ) && (param == QString( "trihedron_size" ) || param == QString( "relative_size" )) )
   {
-    int sz = resMgr->integerValue( "VTKViewer", "trihedron_size", -1 );
+    double sz = resMgr->doubleValue( "VTKViewer", "trihedron_size", -1 );
     bool isRelative = resMgr->booleanValue( "VTKViewer", "relative_size", true );
     QPtrList<SUIT_ViewManager> lst;
 #ifndef DISABLE_SALOMEOBJECT
@@ -2017,6 +2105,39 @@ void LightApp_Application::updateDesktopTitle() {
 }
 
 /*!
+  \brief Get module activation actions
+  \return map <action_id><action_name> where
+  - action_id is unique non-zero action identifier
+  - action_name is action title
+  \sa moduleActionSelected()
+*/
+QMap<int, QString> LightApp_Application::activateModuleActions() const
+{
+  QMap<int, QString> opmap;
+  opmap.insert( NewStudyId,  tr( "ACTIVATE_MODULE_OP_NEW" ) );
+  opmap.insert( OpenStudyId, tr( "ACTIVATE_MODULE_OP_OPEN" ) );
+  return opmap;
+}
+
+/*!
+  \brief Process module activation action.
+  \param id action identifier
+  \sa activateModuleActions()
+*/
+void LightApp_Application::moduleActionSelected( const int id )
+{
+  switch ( id ) {
+  case NewStudyId:
+    onNewDoc();
+    break;
+  case OpenStudyId:
+    onOpenDoc();
+    break;
+  default:
+    break;
+  }
+}
+/*!
   Updates windows after close document
 */
 void LightApp_Application::afterCloseDoc()
@@ -2080,8 +2201,15 @@ void LightApp_Application::updateWindows()
   currentWindows( winMap );
 
   if ( activeStudy() ) {
-    for ( QMap<int, int>::ConstIterator it = winMap.begin(); it != winMap.end(); ++it )
-      getWindow( it.key() );
+    for ( QMap<int, int>::ConstIterator it = winMap.begin(); it != winMap.end(); ++it ) {
+      getWindow( it.key() ); 
+      
+      Dock dock; int index, extraOffset; bool nl;
+      if ( desktop()->getLocation( myWindows[it.key()], dock, index, nl, extraOffset )
+	   &&
+	   dock != (Dock)it.data() )
+	desktop()->moveDockWindow( myWindows[it.key()], (Dock)it.data() );
+    }
 
     loadWindowsGeometry();
   }
@@ -2225,6 +2353,7 @@ void LightApp_Application::contextMenuPopup( const QString& type, QPopupMenu* th
 
   thePopup->insertSeparator();
   thePopup->insertItem( tr( "MEN_REFRESH" ), this, SLOT( onRefresh() ) );
+  thePopup->insertItem( tr( "MEN_FIND" ), this, SLOT( onFind() ) );
 }
 
 /*!
@@ -2323,6 +2452,10 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
     return false;
 
   QString lib = moduleLibrary( moduleTitle );
+  
+  //abd: changed libSalomePyQtGUI to SalomePyQtGUI for WIN32
+  bool isPythonModule = lib.contains("SalomePyQtGUI");
+
   QStringList paths;
 #ifdef WIN32
   paths = QStringList::split( ";", ::getenv( "PATH" ) );
@@ -2330,11 +2463,64 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
   paths = QStringList::split( ":", ::getenv( "LD_LIBRARY_PATH" ) );
 #endif
 
+  bool isLibFound = false;
   QStringList::const_iterator anIt = paths.begin(), aLast = paths.end();
   for( ; anIt!=aLast; anIt++ )
   {
     QFileInfo inf( Qtx::addSlash( *anIt ) + lib );
+    
     if( inf.exists() )
+      {
+	isLibFound = true;
+	break;
+      }
+  }
+  
+  if ( !isLibFound )
+    {
+      printf( "****************************************************************\n" );
+      printf( "*    Warning: library %s cannot be found\n", lib.latin1() );
+      printf( "*    Module %s will not be available in GUI mode\n", moduleTitle.latin1() );
+      printf( "****************************************************************\n" );
+    }
+  else if ( !isPythonModule )
+    return true;
+
+  if ( isPythonModule )
+    {
+      QString pylib = moduleName( moduleTitle ) + QString(".py");
+      QString pylibgui = moduleName( moduleTitle ) + QString("GUI.py");
+
+      // Check the python library
+#ifdef WIN32
+      paths = QStringList::split( ";", ::getenv( "PATH" ) );
+#else
+      paths = QStringList::split( ":", ::getenv( "PYTHONPATH" ) );
+#endif
+      bool isPyLib = false, isPyGuiLib = false;
+      QStringList::const_iterator anIt = paths.begin(), aLast = paths.end();
+      for( ; anIt!=aLast; anIt++ )
+	{
+	  QFileInfo inf( Qtx::addSlash( *anIt ) + pylib );
+	  QFileInfo infgui( Qtx::addSlash( *anIt ) + pylibgui );
+    
+	  if( !isPyLib && inf.exists() )
+	    isPyLib = true;
+	  
+	  if( !isPyGuiLib && infgui.exists() )
+	    isPyGuiLib = true;
+	  
+	  if ( isPyLib && isPyGuiLib && isLibFound)
+	    return true;
+	}
+      
+      printf( "****************************************************************\n" );
+      printf( "*    Warning: python library for %s cannot be found:\n", moduleTitle.latin1() );
+      if (!isPyLib)
+	printf( "*    No module named %s\n", moduleName( moduleTitle ).latin1() );
+      if (!isPyGuiLib)
+	printf( "*    No module named %s\n", (moduleName( moduleTitle ) + QString("GUI")).latin1() );
+      printf( "****************************************************************\n" );
       return true;
   }
   return false;
@@ -2388,4 +2574,23 @@ bool LightApp_Application::event( QEvent* e )
     return true;
   }
   return CAM_Application::event( e );
+}
+
+/*! Check data object */
+bool LightApp_Application::checkDataObject(LightApp_DataObject* theObj)
+{
+  if (theObj)
+    {
+      bool isSuitable =	!theObj->entry().isEmpty() && 
+	                !theObj->componentDataType().isEmpty() && 
+	                !theObj->name().isEmpty();
+      return isSuitable;
+    }
+
+  return false;
+}
+
+void LightApp_Application::onFind()
+{
+  objectBrowser()->enableSearch( true );
 }

@@ -37,6 +37,10 @@
 
 #include <qaction.h>
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 class SUPERVGRAPH_EXPORT SUPERVGraph_View: public QWidget, public SUIT_PopupClient {
   Q_OBJECT;
  public:
@@ -127,5 +131,10 @@ class SUPERVGRAPH_EXPORT SUPERVGraph_ViewFrame : public SUIT_ViewWindow {
   QToolBar*        myToolBar;
 
   SUPERVGraph_View* myView;
-}; 
+};
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
+
 #endif

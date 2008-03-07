@@ -39,7 +39,7 @@ public:
   virtual void   setFont( const QFont& );
 
   void           exec( const QString& command );
-
+  void           execAndWait( const QString& command );
 protected:
   PyInterp_base*          myInterp;
   PythonConsole_PyEditor* myEditor;

@@ -1,0 +1,46 @@
+/*!
+
+\page using_object_browser_page Using Object Browser
+
+The <b>Object Browser</b> in SALOME is destined for displaying the
+structure of the current study in a tree-like form. It contains:
+
+<ul>
+<li>components, loaded during the current session</li>
+<li>objects created with the help of different components (The objects
+created with the help of a definite component are located in the
+folder having the name of this component)
+</li>
+<li>references to different objects (they are highlighted in red)</li>
+</ul>
+
+\image html objectbrowser1.png
+
+\note The <b>Object Browser</b> is destined to getting quick access to
+different objects created during SALOME session. All pop-up menus
+associated with the objects displayed in the Object Browser are
+context-sensitive. So it depends on a definite currently loaded SALOME
+component what options you will see in the pop-up menu, if you
+right-click on a definite object in the Object Browser.
+
+The Object Browser may contain supplementary attributes of the objects
+displayed in additional columns. By default, these columns are not
+displayed -  displaying/hiding these columns is possible through
+\ref salome_preferences_page "setting study preferences" or
+right-clicking on the attributes bar and toggling the necessary
+attributes.
+
+\image html objectbrowser2.png
+
+<ul>
+<li>\b Entry  - Identification index of the object in the structure of
+the study</li>
+<li>\b IOR -  Interoperable Object Reference</li>
+<li><b>Reference entry</b>  -  Identification index of the references
+to the objects</li>
+<li>\b Value  -  Displays the value of the first object attribute</li>
+</ul>
+
+\note <b>Entry, IOR and Reference entry</b> attributes are displayed for debugging purposes only.
+ 
+*/

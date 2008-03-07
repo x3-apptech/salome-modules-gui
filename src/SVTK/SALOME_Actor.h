@@ -57,6 +57,10 @@ class SVTK_InteractorStyle;
 extern int SALOME_POINT_SIZE;
 extern int SALOME_LINE_WIDTH;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 //! The class is a basic one for all SALOME VTK presentation.
 /*!
   It provide highlight and prehighlight capabilites,
@@ -226,5 +230,9 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   vtkSmartPointer<VTKViewer_Actor> myOutlineActor;
   vtkSmartPointer<vtkOutlineSource> myOutline;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif // SALOME_ACTOR_H

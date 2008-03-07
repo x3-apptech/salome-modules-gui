@@ -38,6 +38,16 @@ class QToolTip;
 class OB_Filter;
 class OB_ListView;
 class OB_ListItem;
+class OB_ObjSearch;
+class OB_FindDlg;
+
+class OB_Updater 
+{
+public:
+  OB_Updater(){};
+  virtual ~OB_Updater(){};
+  virtual void update( SUIT_DataObject* theObj, OB_ListItem* theLI ) = 0;
+};
 
 /*!
   \class OB_Browser
@@ -77,7 +87,7 @@ public:
   bool              isAutoDeleteObjects() const;
   virtual void      setAutoDeleteObjects( const bool );
 
-  virtual void      updateTree( SUIT_DataObject* = 0, const bool autoOpen = true );
+  virtual void      updateTree( SUIT_DataObject* = 0, const bool = false );
   virtual void      replaceTree( SUIT_DataObject*, SUIT_DataObject* );
 
   bool              isShowToolTips();
@@ -95,6 +105,7 @@ public:
 
   int               autoOpenLevel() const;
   void              setAutoOpenLevel( const int );
+  void              openLevels( const int = -1 );
 
   virtual int       addColumn( const QString&, const int id = -1, const int width = -1 );
   virtual int       addColumn( const QIconSet&, const QString&, const int id = -1, const int width = -1 );
@@ -126,6 +137,13 @@ public:
 
   void              setModified();
   unsigned long     getModifiedTime() { return myModifiedTime; }
+  
+  OB_Updater*       getUpdater() const;
+  virtual void      setUpdater( OB_Updater* theUpdate = 0 );
+
+  OB_ObjSearch*     getSearch() const;
+  void              setSearch( OB_ObjSearch* );
+  void              enableSearch( const bool );
 
 signals:
   void              selectionChanged();
@@ -188,12 +206,14 @@ private:
   SUIT_DataObject*  myRoot;
   ItemMap           myItems;
   QToolTip*         myTooltip;
+  OB_Updater*       myUpdater;
   QMap<int, int>    myColumnIds;
   bool              myAutoUpdate;
   bool              myAutoDelObjs;
   bool              myShowToolTips;
   bool              myRootDecorated;
   int               myAutoOpenLevel;
+  OB_FindDlg       *myFindDlg;
 
   friend class OB_Browser::ToolTip;
 

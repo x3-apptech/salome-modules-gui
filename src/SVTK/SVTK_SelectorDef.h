@@ -43,6 +43,9 @@ class SALOME_Actor;
 class SVTK_Viewer;
 class SVTK_ViewWindow;
 
+class vtkPicker;
+class vtkCellPicker;
+
 class SVTK_SelectorDef: public SVTK_Selector
 {
 public:
@@ -165,6 +168,15 @@ public:
   void 
   EndPickCallback();
 
+  //----------------------------------------------------------------------------
+  virtual
+  SALOME_Actor*
+  Pick(const SVTK_SelectionEvent* theEvent, vtkRenderer* theRenderer) const;
+
+  virtual
+  void
+  SetTolerance(const double& theTolerance);
+
 private:
   int mySelectionMode;
 
@@ -206,6 +218,9 @@ private:
 
   typedef std::map<TFilterID,Handle(VTKViewer_Filter)> TFilters;
   TFilters myFilters;
+
+  vtkSmartPointer<vtkPicker> myPicker;
+  vtkSmartPointer<vtkCellPicker> myCellPicker;
 };
 
 #endif

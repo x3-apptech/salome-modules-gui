@@ -41,21 +41,18 @@
 /*!
   Constructor.
 */
-LightApp_SVTKDataOwner
-::LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
-			  SUIT_Desktop* theDesktop ):
-  LightApp_DataOwner( theIO ),
-  myDesktop( theDesktop )
-{}
-#endif
-
-/*!
-  Destuctor.
-*/
-LightApp_SVTKDataOwner
-::~LightApp_SVTKDataOwner()
+LightApp_SVTKDataOwner::LightApp_SVTKDataOwner( const Handle(SALOME_InteractiveObject)& theIO,
+			                                          SUIT_Desktop* theDesktop )
+: LightApp_DataOwner( theIO ),
+myDesktop( theDesktop )
 {
 }
+#else
+LightApp_SVTKDataOwner::LightApp_SVTKDataOwner( const QString& theEntry )
+: LightApp_DataOwner( theEntry )
+{
+}
+#endif
 
 /*!
   \return active SVTK view window
@@ -119,6 +116,14 @@ LightApp_SVTKDataOwner
 
 #endif
 
+/*!
+  Destuctor.
+*/
+/*
+LightApp_SVTKDataOwner::~LightApp_SVTKDataOwner()
+{
+}
+*/
 
 #ifndef DISABLE_VTKVIEWER
 /*!
@@ -132,14 +137,6 @@ LightApp_VTKSelector
 {
   if ( myViewer )
     connect( myViewer, SIGNAL( selectionChanged() ), this, SLOT( onSelectionChanged() ) );
-}
-
-/*!
-  Destructor.
-*/
-LightApp_VTKSelector
-::~LightApp_VTKSelector()
-{
 }
 
 /*!

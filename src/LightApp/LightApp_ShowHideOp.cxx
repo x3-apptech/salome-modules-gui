@@ -63,17 +63,25 @@ void LightApp_ShowHideOp::startOperation()
   }
 
   LightApp_SelectionMgr* mgr = app->selectionMgr();
-  LightApp_Selection sel; sel.init( "", mgr );
-  if( sel.count()==0 && myActionType!=ERASE_ALL )
+  LightApp_Module* mod = dynamic_cast<LightApp_Module*>( app->activeModule() );
+  if( !mod )
+    return;
+
+  LightApp_Selection* sel = mod->createSelection();
+  if( !sel )
+    return;
+
+  sel->init( "", mgr );
+  if( sel->count()==0 && myActionType!=ERASE_ALL )
   {
     abort();
     return;
   }
 
   QString mod_name;
-  if( sel.count()>0 )
+  if( sel->count()>0 )
   {
-    QString aStr =  sel.param( 0, "component" ).toString();
+    QString aStr =  sel->param( 0, "displayer" ).toString();
     mod_name = app->moduleTitle( aStr );
   }
   else if( app->activeModule() )
@@ -144,4 +152,6 @@ void LightApp_ShowHideOp::startOperation()
   }
   d->UpdateViewer();
   commit();
+
+  delete sel;
 }

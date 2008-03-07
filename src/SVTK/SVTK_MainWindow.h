@@ -46,6 +46,7 @@ class SVTK_NonIsometricDlg;
 class SVTK_UpdateRateDlg;
 class SVTK_CubeAxesActor2D;
 class SVTK_CubeAxesDlg;
+class SVTK_SetRotationPointDlg;
 
 class VTKViewer_Trihedron;
 class VTKViewer_Transform;
@@ -163,12 +164,12 @@ public:
 	      bool theIsUpdate = false);
 
   //! Redirect the request to #SVTK_Renderer::GetTrihedronSize
-  int  
+  vtkFloatingPointType  
   GetTrihedronSize();
 
   //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
   void
-  SetTrihedronSize(const int theSize, const bool theRelative = true);
+  SetTrihedronSize(const vtkFloatingPointType theSize, const bool theRelative = true);
 
   //! Redirect the request to #SVTK_Renderer::AdjustActors
   void 
@@ -207,6 +208,12 @@ public:
   void activatePanning(); 
   void activateGlobalPanning(); 
 
+  void onChangeRotationPoint(bool theIsActivate);
+
+  void activateSetRotationGravity();
+  void activateSetRotationSelected(void* theData);
+  void activateStartPointSelection();
+
   void onFrontView(); 
   void onBackView(); 
   void onTopView();
@@ -240,7 +247,8 @@ public:
   void
   SetEventDispatcher(vtkObject* theDispatcher);
 
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
+  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, 
+	 ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, 
 	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate};
   typedef QMap<int, QtxAction*> TActionsMap;
@@ -250,6 +258,7 @@ public:
   SVTK_NonIsometricDlg* myNonIsometricDlg;
   SVTK_UpdateRateDlg* myUpdateRateDlg;
   SVTK_CubeAxesDlg* myCubeAxesDlg;
+  SVTK_SetRotationPointDlg* mySetRotationPointDlg;
 
   vtkSmartPointer<vtkObject> myEventDispatcher;
   TActionsMap myActionsMap;  

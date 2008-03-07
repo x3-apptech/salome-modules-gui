@@ -52,7 +52,7 @@ public:
 
   virtual QString       applicationName() const;
 
-  virtual bool          isPossibleToClose();
+  virtual bool          isPossibleToClose( bool& );
   virtual bool          useFile( const QString& );
 
   virtual void          createEmptyStudy();
@@ -84,6 +84,9 @@ public:
 
   virtual void          contextMenuPopup( const QString&, QPopupMenu*, QString& ) {}
 
+  bool                  exitConfirmation() const;
+  void                  setExitConfirmation( const bool );
+
 signals:
   /*!emit that view manager added*/
   void                  viewManagerAdded( SUIT_ViewManager* );
@@ -101,7 +104,6 @@ public slots:
   virtual void          onOpenDoc();
   virtual bool          onOpenDoc( const QString& );
 
-  virtual void          onLoadDoc();
   virtual bool          onLoadDoc( const QString& );
 
   virtual void          onExit();
@@ -126,7 +128,7 @@ protected:
           MenuHelpId = 7
        };
 
-  enum {  FileNewId,   FileOpenId,   FileLoadId, FileCloseId,
+  enum {  FileNewId,   FileOpenId,   FileCloseId,
 	  FileSaveId,  FileSaveAsId, FileExitId, 
 	  ViewStatusBarId, ViewWindowsId, NewWindowId,
           EditCutId, EditCopyId, EditPasteId,
@@ -134,6 +136,8 @@ protected:
 	  UserID
        };
  
+  enum { CloseCancel, CloseSave, CloseDiscard };
+
 protected:
   virtual void          createActions();
   virtual void          updateDesktopTitle();
@@ -153,13 +157,16 @@ protected:
 
   virtual void          setActiveViewManager( SUIT_ViewManager* );
 
+  virtual bool          closeAction( const int, bool& );
+  virtual int           closeChoice( const QString& );
+
 private:
   ViewManagerList       myViewMgrs;
   SUIT_ViewManager*     myActiveViewMgr;
 
 private:
+  bool                  myExitConfirm;
   bool                  myEditEnabled;
-  bool                  myClosePermanently;
 };
 
 #if defined WIN32

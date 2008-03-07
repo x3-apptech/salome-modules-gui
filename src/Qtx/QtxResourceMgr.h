@@ -175,6 +175,8 @@ private:
   bool            myIsPixmapCached;
 
   bool            myIsIgnoreUserValues;
+
+  friend class QtxResourceMgr::Format;
 };
 
 /*!
@@ -185,7 +187,7 @@ class QTX_EXPORT QtxResourceMgr::Format
 {
 public:
   Format( const QString& );
-  ~Format();
+  virtual ~Format();
 
   QString                format() const;
 

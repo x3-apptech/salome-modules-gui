@@ -28,6 +28,10 @@
 #include <iostream>
 using namespace std;
 
+#ifdef WNT
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#endif
+
 /*!
   Constructor
 */
@@ -124,6 +128,8 @@ void ListItemF<T>::update()
     else
       myT->setPixmap( 0, p );
   }
+  else if ( p.isNull() )
+    myT->setPixmap( 0, p );
 
   myT->setDragEnabled( obj->isDragable() );
   myT->setDropEnabled( true );

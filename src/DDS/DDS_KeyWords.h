@@ -29,7 +29,7 @@ DEFINE_STANDARD_HANDLE(DDS_KeyWords, MMgt_TShared)
 
 class TCollection_AsciiString;
 
-class DDS_KeyWords: public MMgt_TShared
+class DDS_KeyWords : public MMgt_TShared
 {
 public:
   Standard_EXPORT static Handle(DDS_KeyWords) Get();

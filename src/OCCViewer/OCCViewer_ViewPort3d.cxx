@@ -20,6 +20,7 @@
 #include "OCCViewer_ViewPort3d.h"
 
 #include "OCCViewer_VService.h"
+#include "OCCViewer_ViewWindow.h"
 
 #include <qrect.h>
 #include <qevent.h>
@@ -34,6 +35,12 @@
 #else
 #include <Xw_Window.hxx>
 #endif
+
+static double rx = 0.;
+static double ry = 0.;
+static int sx = 0;
+static int sy = 0;
+static Standard_Boolean zRotation = Standard_False;
 
 /*!
     Constructor
@@ -289,8 +296,12 @@ void OCCViewer_ViewPort3d::fitRect( const QRect& rect )
 */
 void OCCViewer_ViewPort3d::zoom( int x0, int y0, int x, int y )
 {
-	if ( !activeView().IsNull() )
-	    activeView()->Zoom( x0, y0, x, y );
+  if ( !activeView().IsNull() ) {
+    // as OCCT respects a sign of only dx,
+    // but we want both signes to be taken into account
+    //activeView()->Zoom( x0, y0, x, y );
+    activeView()->Zoom( x0 + y0, 0, x + y, 0 );
+  }
 }
 
 /*!
@@ -314,25 +325,86 @@ void OCCViewer_ViewPort3d::pan( int dx, int dy )
 /*!
     Inits 'rotation' transformation. [ protected ]
 */
-void OCCViewer_ViewPort3d::startRotation( int x, int y )
+void OCCViewer_ViewPort3d::startRotation( int x, int y, 
+					  int theRotationPointType,
+					  const gp_Pnt& theSelectedPoint )
 {
-	if ( !activeView().IsNull() )
-  {
-		myDegenerated = activeView()->DegenerateModeIsOn();
-		activeView()->SetDegenerateModeOn();
-    if (myAnimate) activeView()->SetAnimationModeOn();
-		activeView()->StartRotation( x, y, 0.45 );
+  if ( !activeView().IsNull() )
+    {
+      myDegenerated = activeView()->DegenerateModeIsOn();
+      activeView()->SetDegenerateModeOn();
+      if (myAnimate) activeView()->SetAnimationModeOn();
+
+      //double gx, gy, gz;
+      //double gx = activeView()->gx;
+      //activeView()->Gravity(gx,gy,gz);
+
+      switch ( theRotationPointType ) {
+      case OCCViewer_ViewWindow::GRAVITY:
+	activeView()->StartRotation( x, y, 0.45 );
+	break;
+      case OCCViewer_ViewWindow::SELECTED:
+	sx = x; sy = y;
+	
+	double X,Y;
+	activeView()->Size(X,Y);
+	rx = Standard_Real(activeView()->Convert(X)); 
+	ry = Standard_Real(activeView()->Convert(Y)); 
+	
+	activeView()->Rotate( 0., 0., 0., 
+			      theSelectedPoint.X(),theSelectedPoint.Y(), theSelectedPoint.Z(), 
+			      Standard_True );
+	
+	Quantity_Ratio zRotationThreshold;
+	zRotation = Standard_False;
+	zRotationThreshold = 0.45;
+	if( zRotationThreshold > 0. ) {
+	  Standard_Real dx = Abs(sx - rx/2.);
+	  Standard_Real dy = Abs(sy - ry/2.);
+	  Standard_Real dd = zRotationThreshold * (rx + ry)/2.;
+	  if( dx > dd || dy > dd ) zRotation = Standard_True;
 	}
+	break;
+      default:
+	break;
+      }
+    }
 }
 
 /*!
     Rotates the viewport. [ protected ]
 */
-void OCCViewer_ViewPort3d::rotate( int x, int y )
+void OCCViewer_ViewPort3d::rotate( int x, int y, 
+				   int theRotationPointType,
+				   const gp_Pnt& theSelectedPoint )
 {
-	if ( !activeView().IsNull() )
-	    activeView()->Rotation( x, y );
-//  setZSize( getZSize() );
+  if ( !activeView().IsNull() ) {
+    switch ( theRotationPointType ) {
+    case OCCViewer_ViewWindow::GRAVITY:
+      activeView()->Rotation( x, y );
+      break;
+    case OCCViewer_ViewWindow::SELECTED:
+      double dx, dy, dz;
+      if( zRotation ) {
+	dz = atan2(Standard_Real(x)-rx/2., ry/2.-Standard_Real(y)) - 
+	  atan2(sx-rx/2.,ry/2.-sy);
+	dx = dy = 0.;
+      }
+      else {
+	dx = (Standard_Real(x) - sx) * Standard_PI/rx;
+	dy = (sy - Standard_Real(y)) * Standard_PI/ry;
+	dz = 0.;
+      }
+      
+      activeView()->Rotate( dx, dy, dz, 
+			    theSelectedPoint.X(),theSelectedPoint.Y(), theSelectedPoint.Z(),
+			    Standard_False );
+      break;
+    default:
+      break;
+    }
+  }
+  //  setZSize( getZSize() );
 }
 
 /*!
@@ -340,15 +412,15 @@ void OCCViewer_ViewPort3d::rotate( int x, int y )
 */
 void OCCViewer_ViewPort3d::endRotation()
 {
-	if ( !activeView().IsNull() )
-  {
-    if (myAnimate) activeView()->SetAnimationModeOff();
-		if ( !myDegenerated )
-      activeView()->SetDegenerateModeOff();
-    activeView()->ZFitAll(1.);
-    activeView()->SetZSize(0.);
-    activeView()->Update();
-	}
+  if ( !activeView().IsNull() )
+    {
+      if (myAnimate) activeView()->SetAnimationModeOff();
+      if ( !myDegenerated )
+	activeView()->SetDegenerateModeOff();
+      activeView()->ZFitAll(1.);
+      activeView()->SetZSize(0.);
+      activeView()->Update();
+    }
 }
 
 /*!

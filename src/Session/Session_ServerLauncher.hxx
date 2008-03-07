@@ -29,6 +29,8 @@
 #ifndef _SESSION_SERVERLAUNCHER_HXX_
 #define _SESSION_SERVERLAUNCHER_HXX_
 
+#include <SALOME_Session.hxx>
+
 #include "Session_ServerThread.hxx"
 
 #include <CORBA.h> 
@@ -38,16 +40,9 @@
 #include <qthread.h>
 #include <qwaitcondition.h>
 
-
-#ifdef WNT
-#include <SALOME_WNT.hxx>
-#else
-#define SALOME_WNT_EXPORT
-#endif
-
 using namespace std;
 
-class ServArg
+class SESSION_EXPORT ServArg
   {
   public:
     int _servType;
@@ -60,7 +55,7 @@ inline ServArg::ServArg(int servType, int firstArg, int lastArg):
   _servType(servType),_firstArg(firstArg),_lastArg(lastArg)
 {}
 
-class SALOME_WNT_EXPORT Session_ServerLauncher: public QThread
+class SESSION_EXPORT Session_ServerLauncher: public QThread
 {
 public:
   Session_ServerLauncher();

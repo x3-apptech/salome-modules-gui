@@ -33,6 +33,15 @@
 IMPLEMENT_STANDARD_HANDLE(DDS_DicGroup, MMgt_TShared)
 IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, MMgt_TShared)
 
+/*!
+  \class DDS_DicGroup
+  
+  This class to provide set of DDS_DicItem objects from one component.
+*/
+
+/*!
+  Constructor. Create the group with name \aname.
+*/
 DDS_DicGroup::DDS_DicGroup( const TCollection_AsciiString& name )
 : MMgt_TShared(),
 myName( name ),
@@ -40,15 +49,25 @@ myActiveSystem( UNIT_SYSTEM_SI )
 {
 }
 
+/*!
+  Copy constructor.
+*/
 DDS_DicGroup::DDS_DicGroup( const DDS_DicGroup& )
 {
 }
 
+/*!
+  Get the name of group (component).
+*/
 TCollection_AsciiString DDS_DicGroup::GetName() const
 {
   return myName;
 }
 
+/*!
+  Returns the names list of defined unit systems.
+  Parameter \atheSystems will contains the sequence of string names.
+*/
 void DDS_DicGroup::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystemSeq ) const
 {
   theSystemSeq.Clear();
@@ -61,6 +80,9 @@ void DDS_DicGroup::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystemSeq )
   }
 }
 
+/*!
+  Returns the label of unit system \aname. If unit system not found then empty string returned.
+*/
 TCollection_ExtendedString DDS_DicGroup::GetUnitSystemLabel( const TCollection_AsciiString& name ) const
 {
   TCollection_ExtendedString aLabel;
@@ -69,21 +91,33 @@ TCollection_ExtendedString DDS_DicGroup::GetUnitSystemLabel( const TCollection_A
   return aLabel;
 }
 
+/*!
+  Gets the name of active unit system.
+*/
 TCollection_AsciiString DDS_DicGroup::GetActiveUnitSystem() const
 {
   return myActiveSystem;
 }
 
+/*!
+  Sets the name of active unit system.
+*/
 void DDS_DicGroup::SetActiveUnitSystem( const TCollection_AsciiString& theSystem )
 {
   if ( myUnitSystem.IsBound( theSystem ) )
     myActiveSystem = theSystem;
 }
 
+/*!
+  Assignment operator.
+*/
 void DDS_DicGroup::operator=( const DDS_DicGroup& )
 {
 }
 
+/*!
+  Fill the internal data structures from XML parsed structures. Internal.
+*/
 void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM_Element& theDocElement )
 {
   TCollection_AsciiString aCompName = theComponentData.getAttribute( DDS_Dictionary::KeyWord( "COMPONENT_NAME" ) );
@@ -140,9 +174,9 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
 }
 
 /*!
-  Returns DicItem with all attached data
+  Gets dictionary item with specified identifier \atheID.
+  If dictionary item not found then null handle returned.
 */
-
 Handle(DDS_DicItem) DDS_DicGroup::GetDicItem( const TCollection_AsciiString& theID ) const
 {
   Handle(DDS_DicItem) aDicItem;

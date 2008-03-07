@@ -16,31 +16,22 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "LightApp_DataOwner.h"
 
 #include "LightApp_DataObject.h"
 
-#ifndef WNT
-#include <typeinfo>
-#define _typeinfo std::type_info
-#else
-#include <typeinfo.h>
-#define _typeinfo type_info
-#endif
-
 #include <iostream>
 
 /*!Constructor. Initialize by \a theEntry.*/
-LightApp_DataOwner
-::LightApp_DataOwner( const QString& theEntry ): 
-  myEntry( theEntry )
+LightApp_DataOwner::LightApp_DataOwner( const QString& theEntry )
+: myEntry( theEntry )
 {
 }
 
 #ifndef DISABLE_SALOMEOBJECT
 /*!Constructor. Initialize by \a SALOME_InteractiveObject.*/
-LightApp_DataOwner
-::LightApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO ):
+LightApp_DataOwner::LightApp_DataOwner( const Handle(SALOME_InteractiveObject)& theIO ):
   myEntry(!theIO.IsNull()? theIO->getEntry(): ""),
   myIO(theIO)
 {
@@ -48,40 +39,25 @@ LightApp_DataOwner
 #endif
 
 /*!Destructor. Do nothing.*/
-LightApp_DataOwner
-::~LightApp_DataOwner()
+LightApp_DataOwner::~LightApp_DataOwner()
 {
 }
 
-/*!Checks: Is current data owner equal \a obj.*/
-bool
-LightApp_DataOwner
-::isEqual( const SUIT_DataOwner& obj ) const
+/*!Gets key string, used for data owners comparison.*/
+QString LightApp_DataOwner::keyString() const
 {
-  const LightApp_DataOwner* other = dynamic_cast<const LightApp_DataOwner*>( &obj );
-
-  return other && entry() == other->entry();
-}
-
-bool LightApp_DataOwner::operator<( const SUIT_DataOwner& obj ) const
-{
-  const LightApp_DataOwner* other = dynamic_cast<const LightApp_DataOwner*>( &obj );
-  return entry() < other->entry();
+  return myEntry;
 }
 
 /*!Gets entry.*/
-QString
-LightApp_DataOwner
-::entry() const
+QString LightApp_DataOwner::entry() const
 {
   return myEntry;
 }
 
 #ifndef DISABLE_SALOMEOBJECT
 /*!Gets SALOME_InteractiveObject.*/
-const Handle(SALOME_InteractiveObject)&
-LightApp_DataOwner
-::IO() const
+const Handle(SALOME_InteractiveObject)& LightApp_DataOwner::IO() const
 {
   return myIO;
 }

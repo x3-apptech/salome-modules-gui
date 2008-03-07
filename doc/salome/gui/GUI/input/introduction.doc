@@ -1,0 +1,70 @@
+/*!
+
+\image html icon_about.png
+
+\page introduction_page Introduction
+
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Welcome to SALOME Platform! Modern technological products (cars,
+structures, electrical or electronic equipment) are getting more and
+more complex every year and must meet increasingly severe requirements
+in terms of quality and performance. For example, for structures and
+their environment the demands to reduce risks and optimize costs are
+extremely high. It requires particularly refined simulations
+concerning structural behavior and robustness to ensure high
+reliability.
+\n The numeric modeling of a physical problem, the development of
+solutions and their integration into the design process are often
+handled in very specific environments. SALOME represents a generic
+CAD-based application for digital simulation with "high reactivity to
+market evolutions and customer expectations".
+
+SALOME is a free software that provides a generic platform for Pre and
+Post-Processing for numerical simulation. It is based on an open and
+flexible architecture made of reusable components available as free
+software.
+
+SALOME is a CAD/CAE integration platform. It provides reusable
+components for: 
+<ul>
+<li>3D modeling (bottom-up construction, import, healing);
+<li>Visualization;
+<li>Computational schemas management;
+<li>Post-processing.
+</ul>
+
+SALOME is tailored for integration of custom components:
+<ul>
+<li>CAD interfaces;
+<li>Mesh generators;
+<li>Finite Element solvers with specific pre-processors.
+</ul>
+
+The SALOME platform is available in Open Source.
+
+<b>Salome Platform:</b>
+<ul>
+<li>Supports interoperability between CAD modeling and computation software (CAD-CAE link) 
+<li>Makes easier the integration of new components on heterogeneous systems for numerical computation 
+<li>Sets the priority to multi-physics coupling between computation software 
+<li>Provides a generic user interface, user-friendly and efficient, which helps to reduce the costs and delays of carrying out the studies 
+<li>Reduces training time to the specific time for learning the software solution which has been based on this platform 
+<li>All functionalities are accessible through the programmatic
+integrated Python console
+</ul>
+
+\image html image65.gif
+
+<b>What can you do in SALOME? (Some of SALOME main functions)</b>
+<ul>
+<li>Define geometrical models (create/modify geometrical items), import and export them using the BREP, IGES and STEP formats; 
+<li>Define meshing of these geometrical items, import and export them;
+<li>Handle physical properties and quantities attached to geometrical items, import and export them to a reusable format;
+<li>Perform computations using a solver (optionally provided): read input data, configure the solver, and write calculation results);
+<li>Visualize result fields in 3D, 2D and export images of their visualization to an appropriate format;
+<li>Manage study schemes: definition, save/restore;
+<li>Manage computation schemes: definition, execution.
+</ul>
+
+*/

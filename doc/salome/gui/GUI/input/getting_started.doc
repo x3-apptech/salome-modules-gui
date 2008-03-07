@@ -1,0 +1,20 @@
+/*!
+
+\page getting_started_page Getting started
+
+When you start the SALOME Platform, the following initial desktop window appears:
+
+\image html view2.png
+
+&nbsp;&nbsp;&nbsp;&nbsp;In general, the SALOME platform is destined
+for performance of different numerical calculations and  visualization
+of the resulting data. For that purpose, in the SALOME environment the
+following notion is used  - \b Study.
+<br>Study represents a working document in which you can realize all
+operations connected with the SALOME functionality. 
+<br>SALOME is a multi-study platform. It means that simultaneously you can
+work with several studies. 
+
+\note To proceed working in SALOME you should create or open a new study.     
+
+*/

@@ -214,3 +214,138 @@ ComputeTrihedronSize( vtkRenderer* theRenderer,
   return fabs( theNewSize - theSize) > theSize * EPS_SIZE ||
          fabs( theNewSize-theSize ) > theNewSize * EPS_SIZE;
 }
+
+bool IsBBEmpty(vtkRenderer* theRenderer)
+{
+  if(!theRenderer)
+    return false;
+
+  vtkFloatingPointType aNewBndBox[6];
+  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
+  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
+  
+  // iterate through displayed objects and set size if necessary
+  vtkActorCollection* anActors = theRenderer->GetActors();
+  anActors->InitTraversal();
+  bool isAny = false;
+  while(vtkActor* anAct = anActors->GetNextActor())
+    //if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(anAct))
+    if(VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast(anAct))
+      if(anActor->GetVisibility() && !anActor->IsInfinitive())
+      {
+	vtkFloatingPointType *aBounds = anActor->GetBounds();
+	if(aBounds[0] > -VTK_LARGE_FLOAT && aBounds[1] < VTK_LARGE_FLOAT &&
+	   aBounds[2] > -VTK_LARGE_FLOAT && aBounds[3] < VTK_LARGE_FLOAT &&
+	   aBounds[4] > -VTK_LARGE_FLOAT && aBounds[5] < VTK_LARGE_FLOAT)
+	  isAny = true;
+      }
+  
+  return !isAny;
+}
+
+bool ComputeBBCenter(vtkRenderer* theRenderer, vtkFloatingPointType theCenter[3])
+{  
+  theCenter[0] = theCenter[1] = theCenter[2] = 0.0;
+  
+  if(!theRenderer)
+    return false;
+
+  vtkFloatingPointType aNewBndBox[6];
+  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
+  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
+
+  // iterate through displayed objects and set size if necessary
+  vtkActorCollection* anActors = theRenderer->GetActors();
+  anActors->InitTraversal();
+  bool isAny = false;
+  while(vtkActor* anAct = anActors->GetNextActor())
+  {
+    //if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(anAct))
+    if(VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast(anAct))
+    {
+      if(anActor->GetVisibility() && !anActor->IsInfinitive())
+      {
+	vtkFloatingPointType *aBounds = anActor->GetBounds();
+	if(aBounds[0] > -VTK_LARGE_FLOAT && aBounds[1] < VTK_LARGE_FLOAT &&
+	   aBounds[2] > -VTK_LARGE_FLOAT && aBounds[3] < VTK_LARGE_FLOAT &&
+	   aBounds[4] > -VTK_LARGE_FLOAT && aBounds[5] < VTK_LARGE_FLOAT)
+	{
+	  for(int i = 0; i < 5; i = i + 2){
+	    if(aBounds[i] < aNewBndBox[i]) 
+	      aNewBndBox[i] = aBounds[i];
+	    if(aBounds[i+1] > aNewBndBox[i+1]) 
+	      aNewBndBox[i+1] = aBounds[i+1];
+	  }
+	  isAny = true;
+	}
+      }
+    }
+  }
+  
+  if ( !isAny )
+  {
+    // null bounding box => the center is (0,0,0)
+    return true;
+  }
+
+  if(aNewBndBox[0] > -VTK_LARGE_FLOAT && aNewBndBox[1] < VTK_LARGE_FLOAT &&
+     aNewBndBox[2] > -VTK_LARGE_FLOAT && aNewBndBox[3] < VTK_LARGE_FLOAT &&
+     aNewBndBox[4] > -VTK_LARGE_FLOAT && aNewBndBox[5] < VTK_LARGE_FLOAT)
+  {
+    static vtkFloatingPointType MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+    
+    vtkFloatingPointType aLength = aNewBndBox[1]-aNewBndBox[0];
+    aLength = max((aNewBndBox[3]-aNewBndBox[2]),aLength);
+    aLength = max((aNewBndBox[5]-aNewBndBox[4]),aLength);
+    
+    if(aLength < MIN_DISTANCE)
+      return false;
+
+    vtkFloatingPointType aWidth = 
+      sqrt((aNewBndBox[1]-aNewBndBox[0])*(aNewBndBox[1]-aNewBndBox[0]) +
+	   (aNewBndBox[3]-aNewBndBox[2])*(aNewBndBox[3]-aNewBndBox[2]) +
+	   (aNewBndBox[5]-aNewBndBox[4])*(aNewBndBox[5]-aNewBndBox[4]));
+    
+    if(aWidth < MIN_DISTANCE)
+      return false;
+
+    theCenter[0] = (aNewBndBox[0] + aNewBndBox[1])/2.0;
+    theCenter[1] = (aNewBndBox[2] + aNewBndBox[3])/2.0;
+    theCenter[2] = (aNewBndBox[4] + aNewBndBox[5])/2.0;
+    return true;
+  }
+
+  return false;
+
+  /*
+  vtkFloatingPointType aBounds[6];
+  int aCount = ComputeVisiblePropBounds(theRenderer,aBounds);
+  printf("aNewBndBox[0] = %f, aNewBndBox[1] = %f,\naNewBndBox[2] = %f, aNewBndBox[3] = %f,\naNewBndBox[4] = %f, aNewBndBox[5] = %f\n",
+	   aBounds[0],aBounds[1],aBounds[2],aBounds[3],aBounds[4],aBounds[5]);
+  printf("aCount = %d\n",aCount);
+
+  if(aCount){
+    static vtkFloatingPointType MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+
+    vtkFloatingPointType aLength = aBounds[1]-aBounds[0];
+    aLength = max((aBounds[3]-aBounds[2]),aLength);
+    aLength = max((aBounds[5]-aBounds[4]),aLength);
+    
+    if(aLength < MIN_DISTANCE)
+      return false;
+
+    vtkFloatingPointType aWidth = 
+      sqrt((aBounds[1]-aBounds[0])*(aBounds[1]-aBounds[0]) +
+	   (aBounds[3]-aBounds[2])*(aBounds[3]-aBounds[2]) +
+	   (aBounds[5]-aBounds[4])*(aBounds[5]-aBounds[4]));
+    
+    if(aWidth < MIN_DISTANCE)
+      return false;
+
+    theCenter[0] = (aBounds[0] + aBounds[1])/2.0;
+    theCenter[1] = (aBounds[2] + aBounds[3])/2.0;
+    theCenter[2] = (aBounds[4] + aBounds[5])/2.0;
+    return true;
+  }
+  return false;*/
+}

@@ -31,6 +31,17 @@
 #include <qpalette.h>
 #include <qpopupmenu.h>
 
+bool _InitializeVtkWarningsCall()
+{
+  char* isOn = getenv( "VTK_WARNINGS_IS_ON" );  
+  if ( !isOn || strcmp( isOn, "1" ) )
+    vtkObject::GlobalWarningDisplayOff();
+
+  delete isOn;
+  return vtkObject::GetGlobalWarningDisplay();
+}
+static bool _InitializeVtkWarnings = _InitializeVtkWarningsCall();
+
 /*!Constructor.Sets background color to black.*/
 VTKViewer_Viewer::VTKViewer_Viewer()
 : SUIT_ViewModel(),

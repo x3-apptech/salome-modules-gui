@@ -115,22 +115,29 @@ namespace
     // WorldToView() is called.  This is expensive, so we get the matrix once
     // and handle the transformation ourselves.
     vtkMatrix4x4 *aMatrix = vtkMatrix4x4::New();
-    aMatrix->DeepCopy(theRenderer->GetActiveCamera()->
-		      GetCompositePerspectiveTransformMatrix(1,0,1));
+    aMatrix->DeepCopy( theRenderer->GetActiveCamera()->
+		       GetCompositePerspectiveTransformMatrix( theRenderer->GetTiledAspectRatio(), 0, 1 ) );
 
     // We grab the z-buffer for the selection region all at once and probe the resulting array.
     float *aZPtr = theRenderer->GetRenderWindow()->
       GetZbufferData(theSelection[0], theSelection[1], theSelection[2], theSelection[3]);
 
     //cout<<"theSelection = {"<<theSelection[0]<<", "<<theSelection[1]<<", "<<theSelection[2]<<", "<<theSelection[3]<<"}\n";
-    /*
-    for(int iY = theSelection[1]; iY <= theSelection[3];  iY++){
-      for(int iX = theSelection[0]; iX <= theSelection[2];  iX++){
-	cout<<GetZ(aZPtr,theSelection,iX,iY)<<" ";
-      }
-      cout<<endl;
+
+    //cout<<"\t";
+    for(int iX = theSelection[0]; iX <= theSelection[2];  iX++){
+      //cout<<iX<<"\t";
     }
-    */
+    //cout<<endl;
+
+    for(int iY = theSelection[1]; iY <= theSelection[3];  iY++){
+      //cout<<iY<<"\t";
+      for(int iX = theSelection[0]; iX <= theSelection[2];  iX++){
+	//cout<<std::setprecision(4)<<GetZ(aZPtr,theSelection,iX,iY)<<"\t";
+      }
+      //cout<<endl;
+    }
+
     for(vtkIdType aPntId = 0; aPntId < aNumPts; aPntId++){
       // perform conversion
       vtkFloatingPointType aX[4] = {1.0, 1.0, 1.0, 1.0};

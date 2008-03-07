@@ -35,6 +35,9 @@
 #include <dlfcn.h>
 #endif
 
+static bool   SUIT_Session_IsPythonExecuted = false;
+static QMutex SUIT_Session_PythonMutex;
+
 SUIT_Session* SUIT_Session::mySession = 0;
 
 /*! Constructor.*/
@@ -44,7 +47,8 @@ SUIT_Session::SUIT_Session()
 myResMgr( 0 ),
 myHandler( 0 ),
 myActiveApp( 0 ),
-myExitStatus( FROM_GUI )
+myExitStatus( NORMAL ),
+myExitFlags ( 0 )
 {
   SUIT_ASSERT( !mySession )
 
@@ -58,6 +62,10 @@ SUIT_Session::~SUIT_Session()
 {
   myAppList.clear();
 
+  if (myResMgr) {
+    delete myResMgr;
+    myResMgr = 0;
+  }
   mySession = 0;
 }
 
@@ -230,12 +238,13 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
 /*!
   Destroys session by closing all applications.
 */
-void SUIT_Session::closeSession( int mode )
+void SUIT_Session::closeSession( int mode, int flags )
 {
   while ( !myAppList.isEmpty() )
   {
     SUIT_Application* app = myAppList.getFirst();
-    if ( mode == ASK && !app->isPossibleToClose() )
+    bool closePermanently;
+    if ( mode == ASK && !app->isPossibleToClose( closePermanently ) )
       return;
     else if ( mode == SAVE )
     {
@@ -245,12 +254,26 @@ void SUIT_Session::closeSession( int mode )
     }
     else if ( mode == DONT_SAVE )
     {
-      myExitStatus = FROM_CORBA_SESSION;
-      //....
+      myExitStatus = FORCED;
     }
 
     app->closeApplication();
   }
+  myExitFlags = flags;
+}
+
+/*!
+  Get session exit flags.
+
+  By default, exit flags are set to 0. You can use pass any flags to the
+  closeSession() method if you need to process them later on application
+  quiting.
+
+  \return exit flags
+*/
+int SUIT_Session::exitFlags() const
+{
+  return myExitFlags;
 }
 
 /*! \retval return myHandler*/
@@ -319,7 +342,32 @@ SUIT_ResourceMgr* SUIT_Session::createResourceMgr( const QString& appName ) cons
 /*!
   Slot, called on activation of some application's desktop
 */
-void SUIT_Session::onApplicationActivated( SUIT_Application* app ) 
+void SUIT_Session::onApplicationActivated( SUIT_Application* app )
 {
   myActiveApp = app;
+}
+
+/*!
+  \retval Return TRUE, if a command is currently executed in Python Console,
+                 FALSE otherwise.
+*/
+bool SUIT_Session::IsPythonExecuted()
+{
+  bool ret;
+  SUIT_Session_PythonMutex.lock();
+  ret = SUIT_Session_IsPythonExecuted;
+  SUIT_Session_PythonMutex.unlock();
+  return ret;
+}
+
+/*!
+  Set value of boolean flag, being returned by method \a IsPythonExecuted().
+  It is supposed to set the flag to TRUE when any python command starts
+  and reset it to FALSE when the command finishes.
+*/
+void SUIT_Session::SetPythonExecuted(bool isPythonExecuted)
+{
+  SUIT_Session_PythonMutex.lock();
+  SUIT_Session_IsPythonExecuted = isPythonExecuted;
+  SUIT_Session_PythonMutex.unlock();
 }

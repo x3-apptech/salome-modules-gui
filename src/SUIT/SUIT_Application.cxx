@@ -25,6 +25,7 @@
 #include <qlabel.h>
 #include <qtimer.h>
 #include <qstatusbar.h>
+#include <qapplication.h>
 
 #include <QtxAction.h>
 #include <QtxActionMenuMgr.h>
@@ -34,11 +35,11 @@
   Default constructor
 */
 SUIT_Application::SUIT_Application()
-: QObject( 0 ),
-myStudy( 0 ),
-myDesktop( 0 ),
-myStatusLabel( 0 )
-{ 
+  : QObject( 0 ),
+    myStudy( 0 ),
+    myDesktop( 0 ),
+    myStatusLabel( 0 )
+{
 }
 
 /*!
@@ -46,8 +47,8 @@ myStatusLabel( 0 )
 */
 SUIT_Application::~SUIT_Application() 
 {
+  setActiveStudy( 0 );
   delete myStudy;
-  myStudy = 0;
 
   setDesktop( 0 );
 }
@@ -64,7 +65,7 @@ SUIT_Desktop* SUIT_Application::desktop()
    \return FALSE if application can not be closed (because of non saved data for example). 
    This method called by SUIT_Session whin closing of application was requested.
 */
-bool SUIT_Application::isPossibleToClose()
+bool SUIT_Application::isPossibleToClose( bool& )
 {
   return true;
 }
@@ -168,7 +169,7 @@ SUIT_ResourceMgr* SUIT_Application::resourceMgr() const
   \param msg - text of message
   \param msec - time in milliseconds, after that the status label will be cleared
 */
-void SUIT_Application::putInfo ( const QString& msg, const int msec )
+void SUIT_Application::putInfo( const QString& msg, const int msec )
 {
   if ( !desktop() )
     return;
@@ -180,10 +181,35 @@ void SUIT_Application::putInfo ( const QString& msg, const int msec )
     myStatusLabel->show();
   }
 
+  QString prev = myStatusLabel->text();
+
   myStatusLabel->setText( msg );
   if ( msec != -1 )
-    QTimer::singleShot( msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec, myStatusLabel, SLOT( clear() ) );
+    QTimer::singleShot( msec <= 0 ? DEFAULT_MESSAGE_DELAY : msec, this, SLOT( onInfoClear() ) );
+
+  if ( prev != msg )
+    emit infoChanged( msg );
 }
+
+/*!
+  Clear the information label in status bar after delay.
+*/
+void SUIT_Application::onInfoClear()
+{
+  if ( !myStatusLabel )
+    return;
+
+  bool changed = !myStatusLabel->text().isEmpty();
+  myStatusLabel->clear();
+  if ( changed )
+    emit infoChanged( QString::null );
+}
+
+/*!
+  Updates status of the registerd actions
+*/
+void SUIT_Application::updateCommandsStatus()
+{}
 
 /*!
   Initialize with application arguments
@@ -221,8 +247,11 @@ void SUIT_Application::setDesktop( SUIT_Desktop* desk )
 
   delete myDesktop;
   myDesktop = desk;
-  if ( myDesktop )
+  if ( myDesktop ) {
     connect( myDesktop, SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
+    // Force desktop activation (NPAL16628)
+    QApplication::postEvent(myDesktop, new QEvent(QEvent::WindowActivate));
+  }
 }
 
 /*!
@@ -244,6 +273,12 @@ void SUIT_Application::setActiveStudy( SUIT_Study* study )
   if ( myStudy == study )
     return;
 
+  if(myStudy)
+    disconnect(myStudy, SIGNAL( studyModified( SUIT_Study* ) ), this, SLOT( updateCommandsStatus() ) );
+
+  if(study)
+    connect(study, SIGNAL( studyModified( SUIT_Study* ) ), this, SLOT( updateCommandsStatus() ) );
+	    
   myStudy = study;
 }
 
@@ -600,4 +635,13 @@ QAction* SUIT_Application::separator()
 void SUIT_Application::onDesktopActivated()
 {
   emit activated( this );
+}
+
+/*!
+  SLOT: is used for Help browsing
+*/
+
+void SUIT_Application::onHelpContextModule (const QString& /*theComponentName*/,
+                                            const QString& /*theFileName*/)
+{
 }

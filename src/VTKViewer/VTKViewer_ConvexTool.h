@@ -36,7 +36,12 @@ class vtkCellData;
 class vtkPoints;
 class vtkIdList;
 class vtkCell;
+class vtkCellArray;
+class vtkTriangle;
+class vtkOrderedTriangulator;
 
+
+//----------------------------------------------------------------------------
 class VTKVIEWER_EXPORT VTKViewer_Triangulator
 {
  public:
@@ -57,30 +62,18 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
 	  std::vector<vtkIdType>& theVTK2ObjIds,
 	  bool theIsCheckConvex);
 
- protected:
+ private:
   vtkIdList* myCellIds;
 
-  vtkUnstructuredGrid *myInput;
-  vtkIdType myCellId;
-  int myShowInside;
-  int myAllVisible;
-  const char* myCellsVisibility;
+ protected:
+  vtkIdType *myPointIds;
+  vtkIdList* myFaceIds;
+  vtkPoints* myPoints;
 
   virtual
   vtkPoints* 
-  InitPoints() = 0;
-
-  virtual
-  vtkIdType 
-  GetNbOfPoints() = 0;
-
-  virtual
-  vtkIdType 
-  GetPointId(vtkIdType thePointId) = 0;
-
-  virtual
-  vtkFloatingPointType 
-  GetCellLength() = 0;
+  InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId);
 
   virtual
   vtkIdType 
@@ -90,18 +83,27 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
   vtkCell* 
   GetFace(vtkIdType theFaceId) = 0;
 
-  virtual
-  void 
-  GetCellNeighbors(vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds) = 0;
-
-  virtual
   vtkIdType 
-  GetConnectivity(vtkIdType thePntId) = 0;
+  GetNbOfPoints();
+
+  vtkIdType 
+  GetPointId(vtkIdType thePointId);
+
+  vtkFloatingPointType 
+  GetCellLength();
+
+  void 
+  GetCellNeighbors(vtkUnstructuredGrid *theInput,
+		   vtkIdType theCellId,
+		   vtkCell* theFace,
+		   vtkIdList* theCellIds);
+
+  vtkIdType 
+  GetConnectivity(vtkIdType thePntId);
 };
 
 
+//----------------------------------------------------------------------------
 class VTKVIEWER_EXPORT VTKViewer_OrderedTriangulator : public VTKViewer_Triangulator
 {
  public:
@@ -111,22 +113,14 @@ class VTKVIEWER_EXPORT VTKViewer_OrderedTriangulator : public VTKViewer_Triangul
   ~VTKViewer_OrderedTriangulator();
 
  protected:
-  vtkGenericCell *myCell;
+  vtkOrderedTriangulator *myTriangulator;
+  vtkCellArray *myBoundaryTris;
+  vtkTriangle  *myTriangle;
 
   virtual
   vtkPoints* 
-  InitPoints();
-
-  virtual
-  vtkIdType 
-  GetNbOfPoints();
-
-  vtkIdType 
-  GetPointId(vtkIdType thePointId);
-
-  virtual
-  vtkFloatingPointType 
-  GetCellLength();
+  InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId);
 
   virtual
   vtkIdType 
@@ -135,19 +129,10 @@ class VTKVIEWER_EXPORT VTKViewer_OrderedTriangulator : public VTKViewer_Triangul
   virtual
   vtkCell* 
   GetFace(vtkIdType theFaceId);
-
-  virtual
-  void 
-  GetCellNeighbors(vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds);
-
-  virtual
-  vtkIdType 
-  GetConnectivity(vtkIdType thePntId);
 };
 
 
+//----------------------------------------------------------------------------
 class VTKVIEWER_EXPORT VTKViewer_DelaunayTriangulator : public VTKViewer_Triangulator
 {
  public:
@@ -161,24 +146,11 @@ class VTKVIEWER_EXPORT VTKViewer_DelaunayTriangulator : public VTKViewer_Triangu
   vtkGeometryFilter* myGeometryFilter;
   vtkDelaunay3D* myDelaunay3D;
   vtkPolyData* myPolyData;
-  vtkIdType *myPointIds;
-  vtkIdList* myFaceIds;
-  vtkPoints* myPoints;
 
   virtual
   vtkPoints* 
-  InitPoints();
-
-  virtual
-  vtkIdType 
-  GetNbOfPoints();
-
-  vtkIdType 
-  GetPointId(vtkIdType thePointId);
-
-  virtual
-  vtkFloatingPointType 
-  GetCellLength();
+  InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId);
 
   virtual
   vtkIdType 
@@ -187,16 +159,6 @@ class VTKVIEWER_EXPORT VTKViewer_DelaunayTriangulator : public VTKViewer_Triangu
   virtual
   vtkCell* 
   GetFace(vtkIdType theFaceId);
-
-  virtual
-  void 
-  GetCellNeighbors(vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds);
-
-  virtual
-  vtkIdType 
-  GetConnectivity(vtkIdType thePntId);
 };
 
 

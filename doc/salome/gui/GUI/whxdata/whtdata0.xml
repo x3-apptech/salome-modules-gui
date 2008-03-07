@@ -28,6 +28,10 @@
   <item name="Using Object Browser" url="kernel/using_object_browser.htm" />
   <item name="Using Registry tool" url="kernel/using_registry.htm" />
   <item name="Using Catalog Generator" url="kernel/using_catalog_generator.htm" />
+  <book name="Viewers" >
+    <item name="OCC 3D Viewer" url="occ_3d_viewer.htm" />
+    <item name="VTK 3D Viewer" url="vtk_3d_viewer.htm" />
+  </book>
   <book name="Setting Preferences" >
     <item name="Setting Preferences" url="setting_preferences.htm" />
     <item name="Select Color and Font" url="select_color_and_font.htm" />

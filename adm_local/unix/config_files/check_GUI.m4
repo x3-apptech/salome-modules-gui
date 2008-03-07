@@ -27,14 +27,14 @@ if test "x${SALOME_GUI_DIR}" = "x" ; then
     # search Salome binaries in PATH variable
     AC_PATH_PROG(TEMP, $1)
     if test "x${TEMP}" != "x" ; then
-      AC_MSG_RESULT(libLightApp.so was found at : ${TEMP})
+      AC_MSG_RESULT($1 was found at : ${TEMP})
       SALOME_BIN_DIR=`dirname ${TEMP}`
       SALOME_GUI_DIR=`cd ${SALOME_BIN_DIR}/../..; pwd`
     fi
   fi
 fi
 
-if test -f ${SALOME_GUI_DIR}/lib${LIB_LOCATION_SUFFIX}/salome/$1 ; then
+if test -f ${SALOME_GUI_DIR}/bin/salome/$1 ; then
   SalomeGUI_ok=yes
   AC_MSG_RESULT(Using SALOME GUI distribution in ${SALOME_GUI_DIR})
 
@@ -58,6 +58,6 @@ AC_MSG_RESULT(for $2: ${SalomeGUI_ok})
 ])dnl
 
 AC_DEFUN([CHECK_SALOME_GUI],[
-  CHECK_GUI([libLightApp.so],
+  CHECK_GUI([SUITApp],
             [SALOME GUI])
 ])dnl

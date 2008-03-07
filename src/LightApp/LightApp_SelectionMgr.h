@@ -62,7 +62,8 @@ public:
   void                   GetIndexes( const QString& theEntry, 
 				     TColStd_IndexedMapOfInteger& theIndex );
 
-  bool                   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& IObject, 
+  //bool                   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& IObject, 
+  void                   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& IObject, 
 					   const TColStd_MapOfInteger& theIndices, 
 					   bool modeShift );
 

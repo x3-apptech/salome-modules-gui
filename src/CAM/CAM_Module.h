@@ -64,6 +64,10 @@ public:
   virtual void           contextMenuPopup( const QString&, QPopupMenu*, QString& title ) {};
   virtual void           updateCommandsStatus() {};
 
+  virtual void           putInfo( const QString&, const int = -1 );
+
+  bool                   isActiveModule() const;
+
   /** @name Set Menu Shown*/
   //@{
   virtual void           setMenuShown( const bool );
@@ -88,6 +92,9 @@ public slots:
   virtual void           studyChanged( SUIT_Study*, SUIT_Study* );
 
   virtual void           onApplicationClosed( SUIT_Application* );
+
+private slots:
+  void                   onInfoChanged( QString );
 
 protected: 
   virtual CAM_DataModel* createDataModel();
@@ -136,6 +143,7 @@ private:
   CAM_Application*       myApp;
   QString                myName;
   QPixmap                myIcon;
+  QString                myInfo;
   CAM_DataModel*         myDataModel;
   QMap<int, QAction*>    myActionMap;
 
@@ -146,7 +154,8 @@ private:
 #pragma warning( default: 4251 )
 #endif
 
-extern "C" {
+extern "C"
+{
   typedef CAM_Module* (*GET_MODULE_FUNC)();
 }
 

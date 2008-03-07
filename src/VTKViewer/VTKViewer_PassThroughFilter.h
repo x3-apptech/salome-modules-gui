@@ -36,7 +36,8 @@ protected:
   VTKViewer_PassThroughFilter() {};//!< Null body.
   virtual ~VTKViewer_PassThroughFilter() {};//!< Null body.
 
-  void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **,
+                          vtkInformationVector *); //generate output data
 
 private:
   VTKViewer_PassThroughFilter( const VTKViewer_PassThroughFilter& );  //!< Not implemented.

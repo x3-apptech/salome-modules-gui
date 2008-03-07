@@ -26,10 +26,10 @@
 //  Module : SALOME
 //  $Header$
 
-# ifndef __REGWIDGET_H__
-# define __REGWIDGET_H__
-# include <qapplication.h>
-# include <qmainwindow.h>
+#ifndef __REGWIDGET_H__
+#define __REGWIDGET_H__
+#include <qapplication.h>
+#include <qmainwindow.h>
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOME_Registry)
@@ -50,7 +50,10 @@ class QPushButton;
 class ToolsGUI_HelpWindow;
 class ToolsGUI_IntervalWindow;
 
-class Standard_EXPORT  ToolsGUI_InfoWindow : public QMainWindow {
+class Standard_EXPORT  ToolsGUI_InfoWindow : public QMainWindow
+{
+  Q_OBJECT
+
 public:
   ToolsGUI_InfoWindow( QWidget* parent = 0, const char* name = 0);
 
@@ -64,9 +67,8 @@ private:
   QTextView* myTextView;
 };
 
-class Standard_EXPORT  ToolsGUI_RegWidget : public QMainWindow
+class Standard_EXPORT ToolsGUI_RegWidget : public QMainWindow
 {
-  
   Q_OBJECT
 
 public:
@@ -114,13 +116,4 @@ private:
   static     ToolsGUI_RegWidget* myRegWidgetPtr;
 };
 
-# endif         /* # ifndef __REGWIDGET_H__ */
-
-
-
-
-
-
-
-
-
+#endif

@@ -29,11 +29,13 @@
 #ifndef SVTK_SpaceMouse_h
 #define SVTK_SpaceMouse_h
 
+#ifndef WIN32
 extern "C"
 {
 #include <X11/X.h>
 #include <X11/Xlib.h>
 }
+#endif
 
 class SVTK_SpaceMouse 
 {
@@ -54,21 +56,25 @@ class SVTK_SpaceMouse
 
   bool isSpaceMouseOn() const { return spaceMouseOn != 0; }
 
+#ifndef WIN32
   int initialize     ( Display*, Window );
   int setWindow      ( Display*, Window );
   int translateEvent ( Display*, XEvent*, MoveEvent*, double, double );
   int close          ( Display* );
+#endif
 
  private:
   SVTK_SpaceMouse();
   static SVTK_SpaceMouse* myInstance;
 
+#ifndef WIN32
   Atom XMotionEvent;
   Atom XButtonPressEvent;
   Atom XButtonReleaseEvent;
   Atom XCommandEvent;
 
   Window win;
+#endif
   int spaceMouseOn;
 };
 

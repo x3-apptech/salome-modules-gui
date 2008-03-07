@@ -1,0 +1,375 @@
+/*!
+
+\page postpro_preferences_page Post-Pro Preferences
+
+In the Post-Pro module you can set preferences, default settings,
+which can be used in later sessions with this module.
+
+<h2>MED import Preferences</h2>
+
+\image html ppref1.png
+
+<ul>
+<li><b>MED files import</b></li>
+<ul>
+<li><b>Use Build Progress</b> - when this option is checked you can choose
+all other import MED options at the moment of loading of each file
+using <b>Build Progress</b> menu, otherwise the loading will be done
+according to the <b>Preferences</b> without addressing to the
+user.</li>
+<li><b>Full MED Loading</b> - when this option is checked, the MED file is
+fully loaded in the study, and no additional access to the MED file is
+needed during the session. Reversibly, when unchecked, the MED file is
+loaded on demand. This is the default behaviour in SALOME and
+recommended for big files to optimize memory usage.</li>
+<li><b>Build at once</b> - when this option is checked, you can't
+perform any operations until the MED file is fully loaded and
+processed.</li>
+<li><b>Build fields</b> - when this option is checked, the fields are
+built automatically at loading.</li>
+<li><b>Build min/max</b> - when this option is checked, minimum and
+maximum values of the time stamps are found at loading.</li>
+<li><b>Build groups</b> - when this option is checked, the groups and
+families are built automatically at loading.</li>
+<li><b>Close dialog at finish</b> - when this option is checked, the
+dialog box is closed after loading of the selected MED file. When
+unchecked, it allows loading other MED files.</li>
+</ul>
+</ul>
+
+<br><h2>Scalar Bar Preferences</h2>
+
+\image html pref31.png
+
+<ul>
+<li><b>Scalar Range</b></li>
+<ul>
+<li><b>Scalar Mode</b> - this feature allows refining the value to be
+inspected:</li>
+<ul>
+<li><b>Modulus:</b> value of a scalar or modulus of a vector.</li>
+<li><b>Component N:</b> Nth component of a vector, a tensor or a matrix.</li>
+</ul>
+<li><b>Logarithmic Scaling</b> - this checkbox toggles logarithmic
+scaling.</li>
+<li><b>Ranges to Use</b> - you can use either Field Range or Imposed Range.</li>
+</ul>
+<li><b>Min and Max for Imposed Range</b> - in this menu  you can set
+the limits for your Imposed Range, if you have chosen to use it.</li>
+<li><b>Font</b> - in this menu you can set type, face and color for
+the font of <b>Title</b> and <b>Labels</b>.</li>
+<li><b>Colors & Labels</b> - in this menu you can set the <b>number of
+colors</b> and the <b>number of labels</b> in the Scalar bar.</li>
+<li><b>Orientation</b> - here you can choose between vertical and horizontal
+orientation of the Scalar Bar.</li>
+<li><b>Origin & Size Vertical & Horizontal</b> - allows to define
+placement (<b>X</b> and <b>Y</b>) and lookout (<b>Width</b> and
+<b>Height</b>) of Scalar Bars.</li>
+<ul>
+<li><b>X:</b> abscissa of the point of origin (from the left
+side)</li>
+<li><b>Y:</b> ordinate of the origin of the bar (from the bottom)</li>
+</ul>
+<li><b>Scalar bars default position</b></li>
+<ul>
+<li><b>Arrange Scalar Bars</b> - this option prevents superposition of
+scalar bars during visualisation of several fields in the same
+window. If checked, a separate scalar bar is displayed for each
+presentation.</li>
+</ul>
+</ul>
+
+<br><h2>Cut Lines Preferences</h2>
+
+\image html ppref2.png
+
+<ul>
+<li><b>CutLine Preferences</b></li>
+<ul>
+<li><b>Show preview</b> check box allows to edit the parameters of the
+presentation and simultaneously observe the preview of this
+presentation in the viewer.</li>
+<li><b>Invert all curves</b> check box allows to invert the resulting
+curves.</li>
+<li><b>Use absolute length</b> check box allows to use absolute length
+for curves.</li>
+<li><b>Generate Data Table:</b> If this check box is marked, <b>Post
+Pro</b> will automatically generate a data table on the basis of your
+Cut Lines presentation. This table will be created in the structure of
+the study.</li>
+<li><b>Generate Curves:</b> If this check box is marked, <b>Post Pro</b>  will
+automatically generate curve lines on the basis of values taken from
+the generated data table. These curves will be created in the
+structure of the study and can be visualized in a XY plot.</li>
+</ul>
+</ul>
+
+<br><h2>Sweep Preferences</h2>
+
+\image html ppref3.png
+
+<ul>
+<li><b>Sweeping preferences</b></li>
+<ul>
+<li><b>Mode of the Sweeping</b> - allows to choose between Linear,
+Cosinusoidal and sinusoidal sweeping.</li>
+<li><b>Time step</b> - in this menu you can set the time of
+representation of one step.</li>
+<li><b>Number of cycles</b> - in this menu you can define the number
+of times this animation will be repeated.</li>
+<li><b>Number of steps</b> - in this menu you can define the number of
+steps, which will compose the whole animation.</li>
+<li><b>Parameter varies</b> - allows to choose the range for the
+parameter: from 0 to Pi or from Pi to -Pi.</li>  
+</ul>
+</ul>
+
+<ul>
+<li><b>Animation preferences</b></li>
+<ul>
+<li><b>Speed</b> - allows to define the speed of the animation.</li>
+<li><b>Cycled animation</b> - allows to start a cycled animation of the presentation.</li>
+<li><b>Use proportional timing</b> - allows to render the animation with proportional periods of time between every frame (not depending on the time stamps).</li>
+<li><b>Clean memory at each frame</b> - this option allows to optimize the performance of the operation.</li>
+</ul>
+</ul>
+
+<br><h2>Representation Preferences</h2>
+
+\image html pref33.png
+
+<ul>
+<li><b>Representation properties</b> - these checkboxes allow to
+choose the default representation type for each field presentation.</li>
+<ul>
+<li><b>Use Shading</b> - when this option is checked, the objects will
+be displayed with shading.</li>
+<li><b>Display only on creation</b> - when this option is checked, all
+previously created presentations will be automatically removed from
+the viewer when a new presentation is created and displayed. You can
+restore the previously created presentations using the Object
+Browser.</li>
+</ul>
+</ul>
+
+<br><h2>3D Cache</h2>
+
+\image.html pref40.png
+
+<ul>
+<li><b>3D Cache Preferences</b> - allow to define the mode of usage
+and the size of the 3D Cache, which enables to save in RAM and quickly
+restore the states of field animation.</li>
+<ul>
+<li><b>Memory Mode</b> - allows to define the mode of usage
+of the 3D Cache: <b>Minimal</b> actually disables the Cache,
+<b>Limited</b> Cache size depends on the current system
+configuration.</li>
+<li><b>Memory Limit</b> - allows to define the maximum size of the 3D
+Cache</li> 
+</ul>
+</ul>
+  
+
+<br><h2>Gauss Points Preferences</h2>
+
+\image html pref34.png
+
+<ul>
+<li><b>Primitive</b> - this menu allows user to choose the graphic
+primitive to use to present the results at Gauss points in the
+viewer.</li>
+<ul>
+<li><b>Primitive type</b> - provides choice between <b>Point
+sprites</b>, <b>Open GL points</b> and <b>Geometrical Spheres</b>.</li>
+<li><b>Maximum Size (Clamp)</b> - defines the maximum size of sprite
+points ranging from 1 to 512. By default the value is set to 256
+pixels.</li>
+<li><b>Main Texture</b> -  path to the <b>Main Texture</b> (16x16
+pixels) which defines the shape of the point sprite used for
+rendering.</li>
+<li><b>Alpha Channel Texture (16*16)</b> - path to the <b>Alpha
+Channel Texture</b> which defines the texture of the point
+sprite.</li>
+<li><b>Alpha Channel Threshold</b> - defines the level of transparency
+ranging from 0 to 1.</li>
+<li><b>Geometrical Sphere Resolution</b> - defines the number of faces
+of <b>Geometry Spheres</b>.</li>
+<li><b>Notify when number of faces exceeds</b> - limitation of the
+number of faces; the user will be warned if it exceeds the given
+value.</li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Size</b> - in this menu you can define:</li>
+<ul>
+<li><b>Range value for min and max size</b> - these two parameters
+will be respectively multiplied by a reference length (average size of
+cells of the mesh) to define the range for minimum and maximum size of
+a point during rendering (at magnification = 100%). Default values
+are:</li>
+<ul>
+<li><b>Rainbow</b> scale: <b>min</b> = <b>10%</b>, <b>max</b> =
+<b>33%</b></li>
+<ul>
+<li>Min size is associated to the smallest real value (including
+negative values).</li>
+<li>Max size is associated to the largest real value.</li>
+</ul>
+<li><b>Bicolor</b> scale: <b>min</b> = <b>0</b> (not editable),
+<b>max</b> = <b>33%</b></li>
+<ul>
+<li>Null size is associated to the 0 scalar value.</li>
+<li>Max size is associated to the largest absolute value.</li>
+</ul>
+</ul>
+Both values are dynamically updated by the system according to the
+selected scalar bar. In the case of a Bicolor scale, the minimum value
+is set to 0 in the dialog and the control is disabled.
+<li><b>Magnification (%)</b> corresponds to the change of size of
+results at Gauss point primitives in 2D space. Acceptable values range
+from 0 to N; 100% means no magnification, 50% means half of its size,
+200% mean twice its size and so forth. By default this value is set to
+100%.</li>
+<li><b>+/- Ratio</b> corresponds to the number by which the
+magnification will be respectively multiplied or divided at edition,
+ranging from 0.01 to 10. By default this value is set to 2.</li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Geometry</b></li>
+<ul>
+<li><b>Size of points (%)</b> defines a value that will be multiplied
+by a reference length (representative of the average size of cells of
+the mesh) to define the size of points during rendering (at
+magnification = 100%). Default values 10%.</li>
+<li><b>Color</b> -  allows to select the color of points used for
+presentations. Click on the colored line to access to the \ref
+select_color_and_font_page "Select Color" dialog box.</li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Gauss Points Scalar Bar</b></li>
+<ul>
+<li><b>Active Bar</b> - this option allows to choose <b>Local</b> or
+<b>Global</b> Bar as active.</li>
+<li><b>Display Global Bar</b> - this option allows to visualize or to
+hide the Global Bar.</li>
+<li><b>Scalar Bar Mode</b> - this option allows to choose between
+<b>Bicolor</b> and <b>Rainbow</b> Scalar Bar Mode.</li>
+<li><b>Spacing</b> - allows to define Spacing from 0.01 to 1.</li>
+</ul>
+</ul>
+
+<br><br><b>Inside<b> and </b>Outside Cursor Preferences</b> allow to set
+<b>Primitives</b>, <b>Size</b> and <b>Magnification</b> for the
+respective zones.
+
+<br><h2>Picking Preferences</h2>
+
+\image html pref37.png
+
+<ul>
+<li><b>Cursor</b> - allows to adjust the Size of the cursor used for
+Picking (ranging from 0.1 to 1), the Height of the pyramids (ranging
+from 0 to 10) and the Selection cursor color.</li>
+<li><b>Tolerance</b> - defines at which distance of the cursor from
+the point it becomes selected (ranges from 0.001 to 10).</li>
+<li><b>Information window</b> - allows to define the
+<b>Transparency</b> (from 0% = opaque to 100% = transparent) and
+<b>Position</b> of the window, which can be:</li>
+<ul>
+<li><b>Centred below the point</b>, or</li>
+<li>located at <b>Top-left corner of the 3D view</b></li>
+</ul>
+<li><b>Movement of the Camera</b> can also be define by the user.</li>
+<ul>
+<li><b>Zoom at first selected point</b> - This value is used to define
+the focal distance at the first selected point (at the end of the
+movement of the camera). This value is a ratio that will be multiplied
+by the current zoom value.</li>
+<li><b>Number of steps between two positions</b> - defines the
+smoothness of camera movement at selection by the number of
+iterations. If set to 1 the camera is zoomed and centered at the point
+momentarily. Greater numbers mean very slow camera movement.</li>
+</ul>
+<li><b>Display parent mesh element</b> - allows to visualize or hide
+the patent mesh element of the selected gauss point.</li>
+</ul>
+
+<br><h2>Navigation Preferences</h2>
+
+\image html pref38.png
+
+<br>
+<ul>
+<li><b>Mouse</b></li>
+<ul>
+<li><b>Mouse Behaviour</b> - this option allows to choose one of the
+modes of work with mouse in Gauss Viewer.</li>
+<ul>
+<li><b>Salome Standard Controls</b> - allows to manipulate objects in the
+viewer with the mouse and locked Ctrl button: increase or decrease the
+zoom ratio with the left mouse button, translate object in any
+direction with the central mouse button or rotate it with the right
+mouse button.</li>
+<li><b>Keyboard Free</b> - allows to manipulate objects in the viewer
+with the mouse without locking Ctrl button. In this case the
+operations are assigned to the buttons differently: rotation is made
+with the left button, translation with the right and zoom with both
+pressed in the same time.</li>
+</ul>
+</ul>
+</ul>
+
+<ul>
+<li><b>Keyboard</b></li>
+<ul>
+<li><b>[+]/[-] Speed Increment</b> - defines the number of units by
+which the speed increases or respectively decreases after pressing [+]
+or [-] keyboard buttons.</li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Spacemouse</b> - a mouse-like manipulator device specially designed
+for working with 3D presentations, objects, etc. You can reassign the
+actions listed below to any of its buttons.</li>
+<ul>
+<li><b>Decrease Speed Increment</b> - decreases by 1 the speed increment used for the keyboard (same as [-] key).</li>
+<li><b>Increase Speed Increment</b> - increase by 1 the speed increment used for the keyboard (same as [+] key).</li>
+<li><b>Decrease Gauss Points Magnification</b> - divides the current magnification by the magnification ratio.</li>
+<li><b>Increase Gauss Points Magnification</b> - multiplies the current magnification by the magnification ratio.</li>
+<li><b>Dominant / combined switch</b> - toggles button to switch to dominant or combined movements.</li>
+</ul>
+</ul>
+
+<br><h2>Recorder Preferences</h2>
+
+\image html pref38.png
+
+<ul>
+<li><b>Settings</b></li>
+<ul>
+<li><b>Mode</b> - allows to choose from two recording regimes:</li>
+<ul>
+<li><b>Recording all displayed frames</b> - records exactly at the FPS rate specified by the user.</li>
+<li><b>Recording at a given FPS</b> - records only when the contents
+of the viewer change (some activity is performed).  In the AVI file
+non-recorded images are substituted with the copies of the latest
+recorded image, which produces files with lower quality but requires
+less system resources.   </li>
+</ul>
+<li><b>FPS</b> - allows to define the FPS (frames per second) rate for
+the clip. Set greater value for better quality.</li>
+<li><b>Quality</b> - allows to set the quality of the clip in the
+interval between 0 and 100.</li>
+<li><b>Progressive</b> - allows to record a progressive API
+file.</li>
+</ul>
+</ul>
+
+*/

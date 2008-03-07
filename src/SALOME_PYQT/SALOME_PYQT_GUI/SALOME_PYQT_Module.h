@@ -74,6 +74,9 @@ private:
   QMap<int, int>                   myWindowsMap;
   /* compatible view managers list */
   QStringList                      myViewMgrList;
+
+  /* status of last trying of module activation*/
+  bool                             myLastActivateStatus;
   
   /******************************
    * Construction/destruction
@@ -108,6 +111,9 @@ public:
 
   /* context popup menu request */
   void            contextMenuPopup( const QString&, QPopupMenu*, QString& );
+
+  /* create preferences */
+  void            createPreferences();
 
   /* get module engine IOR */
   virtual QString engineIOR() const;
@@ -147,15 +153,30 @@ public:
   /* load icon from resource file */
   QIconSet               loadIcon( const QString& fileName );
 
+  /* working with preferences : open protected methods */
+  int                    addGlobalPreference( const QString& );
+  int                    addPreference( const QString& );
+  int                    addPreference( const QString&, const int, const int = -1,
+					const QString& = QString::null,
+					const QString& = QString::null );
+  QVariant               preferenceProperty( const int, const QString& ) const;
+  void                   setPreferenceProperty( const int, const QString&, const QVariant& );
+
   /* Show/hide menus/toolbars */
   void                   setMenuShown( const bool );
   void                   setToolShown( const bool );
+
+  /* Preferences changing (module) */
+  void                   preferencesChanged( const QString&, const QString& );
 
 public slots:
   /* activation */
   virtual bool    activateModule( SUIT_Study* );
   /* deactivation */
   virtual bool    deactivateModule( SUIT_Study* );
+
+  /* Preferences changing (application) */
+  void            preferenceChanged( const QString&, const QString&, const QString& );
 
   /******************************
    * Internal methods
@@ -182,6 +203,10 @@ private:
   void            init        ( CAM_Application* );
   /* internal activation */ 
   void            activate    ( SUIT_Study* );
+
+  /* getting status of last module activation */
+  bool            lastActivationStatus() const;
+
   /* internal deactivation */ 
   void            deactivate  ( SUIT_Study* );
   /* customization */ 
@@ -194,6 +219,8 @@ private:
   void            guiEvent( const int );
   /* Menu highlight processing */
   void            menuHighlight( const int, const int );
+  /* Init preferences */
+  void            initPreferences();
 
   /* initialize a Python subinterpreter */
   void            initInterp  ( int );
@@ -201,6 +228,9 @@ private:
   void            importModule();
   /* set workspace to Python GUI module */
   void            setWorkSpace();
+
+  /* preferences changing */
+  void            prefChanged( const QString&, const QString& );
 
   friend class SALOME_PYQT_XmlHandler;
 };

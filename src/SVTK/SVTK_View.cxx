@@ -259,9 +259,10 @@ SVTK_View
 void
 SVTK_View
 ::SetSelectionTolerance(const double& theTolNodes, 
-			const double& theTolCell)
+			const double& theTolCell,
+			const double& theTolObjects)
 {
-  GetRenderer()->SetSelectionTolerance(theTolNodes,theTolCell);
+  GetRenderer()->SetSelectionTolerance(theTolNodes,theTolCell, theTolObjects);
 }
 
 /*!

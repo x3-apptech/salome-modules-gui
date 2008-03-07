@@ -94,9 +94,12 @@ DIV.groupText {
    font-size: smaller 
 }
 
-BODY { 
-   background: url(sources/bg_salome.gif) 
+BODY { background: #FFFFFF
 }
+
+/* BODY { 
+   background: url(sources/bg_salome.gif) 
+} */
 
 div.tabs { 
   text-align: justify; 

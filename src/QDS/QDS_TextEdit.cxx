@@ -20,8 +20,17 @@
 
 #include <qtextedit.h>
 
+/*
+  \class QDS_TextEdit
+
+  Datum with control corresponding to text edit. User can enter parameter value in multiple line editor.
+*/
+
 /*!
-  Constructor.
+  Constructor. Create text edit datum object with datum identifier \aid under widget \aparent.
+  Parameter \aflags define behaviour of datum and set of created subwidgets. Default value of this
+  parameter is QDS::All. Parameter \acomp specify the component name which will be used during search
+  of dictionary item.
 */
 QDS_TextEdit::QDS_TextEdit( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -36,7 +45,7 @@ QDS_TextEdit::~QDS_TextEdit()
 }
 
 /*!
-  Returns string from QTextEdit widget.
+  Returns string from QTextEdit widget. Reimplemented from QDS_Datum.
 */
 QString QDS_TextEdit::getString() const
 {
@@ -47,7 +56,7 @@ QString QDS_TextEdit::getString() const
 }
 
 /*!
-  Sets the string into QTextEdit widget.
+  Sets the string into QTextEdit widget. Reimplemented from QDS_Datum.
 */
 void QDS_TextEdit::setString( const QString& txt )
 {
@@ -74,7 +83,7 @@ QWidget* QDS_TextEdit::createControl( QWidget* parent )
 }
 
 /*!
-  Notify about text changing in line edit.
+  Notify about text changing in text edit.
 */
 void QDS_TextEdit::onTextChanged()
 {

@@ -36,13 +36,6 @@ public:
   OCCViewer_Viewer* getOCCViewer() { return (OCCViewer_Viewer*) myViewModel; }
 
   virtual void      contextMenuPopup( QPopupMenu* );
-
-protected:
-  void              setViewName(SUIT_ViewWindow* theView);
-
-protected:
-  static  int       myMaxId;
-  int               myId;
 };
 
 #endif

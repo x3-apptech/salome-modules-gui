@@ -21,6 +21,7 @@
 #include "OB_Filter.h"
 #include "OB_ListItem.h"
 #include "OB_ListView.h"
+#include "OB_FindDlg.h"
 
 #include <SUIT_DataObjectIterator.h>
 #include <SUIT_TreeSync.h>
@@ -113,7 +114,7 @@ public:
   ObjPtr   nullSrc() const;
   ItemPtr  nullTrg() const;
   ItemPtr  createItem( const ObjPtr&, const ItemPtr&, const ItemPtr&, const bool ) const;
-  void     updateItem( const ItemPtr& ) const;
+  void     updateItem( const ObjPtr& , const ItemPtr& ) const;
   void     deleteItemWithChildren( const ItemPtr& ) const;
   void     children( const ObjPtr&, QValueList<ObjPtr>& ) const;
   void     children( const ItemPtr&, QValueList<ItemPtr>& ) const;
@@ -171,13 +172,17 @@ bool OB_BrowserSync::needUpdate( const ItemPtr& item ) const
   Updates item
   \param p - item
 */
-void OB_BrowserSync::updateItem( const ItemPtr& p ) const
+void OB_BrowserSync::updateItem( const ObjPtr& o, const ItemPtr& p ) const
 {
   if ( p && needUpdate( p ) ) { 
     //    printf( "--- needUpdate for %s = true ---\n", p->text( 0 ).latin1() );
     myBrowser->updateText( p );
     p->update();
   }
+  if( o && myBrowser->getUpdater() )
+    {
+      myBrowser->getUpdater()->update( o, p );
+    }
 }
 
 /*!
@@ -288,6 +293,7 @@ OB_Browser::OB_Browser( QWidget* parent, SUIT_DataObject* root )
 
 myRoot( 0 ),
 myTooltip( 0 ),
+myUpdater( 0 ),
 myAutoOpenLevel( 0 ),
 myAutoUpdate( false ),
 myAutoDelObjs( false ),
@@ -301,8 +307,12 @@ myRootDecorated( true )
   myView->installEventFilter( this );
   myView->viewport()->installEventFilter( this );
 
+  myFindDlg = new OB_FindDlg( this );
+  myFindDlg->hide();
+
   QVBoxLayout* main = new QVBoxLayout( this );
-  main->addWidget( myView );
+  main->addWidget( myView, 1 );
+  main->addWidget( myFindDlg, 0 );
 
   myShowToolTips = true;
   myTooltip = new ToolTip( this, myView->viewport() );
@@ -325,6 +335,7 @@ OB_Browser::~OB_Browser()
 {
   myItems.clear();
   delete myTooltip;
+  setUpdater( 0 );
 }
 
 /*!
@@ -366,8 +377,25 @@ void OB_Browser::setAutoOpenLevel( const int level )
     return;
 
   myAutoOpenLevel = level;
+}
 
-  autoOpenBranches();
+/*!
+  Opens branches from 1 to \alevels. If parameter value negative then autoOpenLevel() value will be used.
+  \sa autoOpenLevel()
+*/
+void OB_Browser::openLevels( const int levels )
+{
+  int level = levels < 0 ? autoOpenLevel() : levels;
+  QListView* lv = listView();
+  if ( !lv || level < 1 )
+    return;
+
+  QListViewItem* item = lv->firstChild();
+  while ( item )
+  {
+    openBranch( item, level );
+    item = item->nextSibling();
+  }
 }
 
 /*!
@@ -419,6 +447,24 @@ bool OB_Browser::isAutoDeleteObjects() const
 void OB_Browser::setAutoDeleteObjects( const bool on )
 {
   myAutoDelObjs = on;
+}
+
+/*!
+  \return updater of browser
+*/
+OB_Updater* OB_Browser::getUpdater() const
+{
+  return myUpdater;
+}
+
+/*!
+  \sets new updater of browser
+*/
+void OB_Browser::setUpdater( OB_Updater* theUpdate )
+{
+  if( myUpdater )
+    delete myUpdater;
+  myUpdater = theUpdate;
 }
 
 /*!
@@ -892,7 +938,7 @@ void OB_Browser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
 
-  if( autoOpen )
+  if ( autoOpen )
     autoOpenBranches();
 
   setModified();
@@ -938,8 +984,6 @@ void OB_Browser::replaceTree( SUIT_DataObject* src, SUIT_DataObject* trg )
   createConnections( trg );
 
   restoreState( selObjs, openObjs, curObj, selKeys, openKeys, curKey );
-
-  autoOpenBranches();
 
   setModified();
 
@@ -1574,17 +1618,7 @@ void OB_Browser::removeObject( SUIT_DataObject* obj, const bool autoUpd )
 */
 void OB_Browser::autoOpenBranches()
 {
-  int level = autoOpenLevel();
-  QListView* lv = listView();
-  if ( !lv || level < 1 )
-    return;
-
-  QListViewItem* item = lv->firstChild();
-  while ( item )
-  {
-    openBranch( item, level );
-    item = item->nextSibling();
-  }
+  openLevels();
 }
 
 /*!
@@ -1622,3 +1656,17 @@ void OB_Browser::setModified()
   myModifiedTime = clock();
 }
 
+OB_ObjSearch* OB_Browser::getSearch() const
+{
+  return myFindDlg->getSearch();
+}
+
+void OB_Browser::setSearch( OB_ObjSearch* s )
+{
+  myFindDlg->setSearch( s );
+}
+
+void OB_Browser::enableSearch( const bool on )
+{
+  myFindDlg->setShown( on );
+}

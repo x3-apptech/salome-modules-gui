@@ -14,7 +14,7 @@
 <topic name="Introduction to SALOME" url="kernel/introduction_to_salome_pro.htm" />
 <topic name="Navigating topics" url="kernel/navigating_topics.htm" />
 <topic name="Opening studies" url="kernel/opening_studies.htm" />
-<topic name="Installation Wizard" url="kernel/readme.html" />
+<topic name="SALOME Installation Wizard Help" url="kernel/readme.html" />
 <topic name="Running SALOME" url="kernel/running_salome_pro.htm" />
 <topic name="SALOME desktop" url="kernel/salome_pro_desktop.htm" />
 <topic name="Saving a study" url="kernel/saving_a_study.htm" />
@@ -24,8 +24,10 @@
 <topic name="Using Object Browser" url="kernel/using_object_browser.htm" />
 <topic name="Using Registry tool" url="kernel/using_registry.htm" />
 <topic name="MESH preferences" url="mesh_preferences.htm" />
+<topic name="OCC 3D Viewer" url="occ_3d_viewer.htm" />
 <topic name="Post-Pro Preferences" url="post-pro_preferences.htm" />
 <topic name="Select Color and Font" url="select_color_and_font.htm" />
 <topic name="Setting Preferences" url="setting_preferences.htm" />
+<topic name="VTK 3D Viewer" url="vtk_3d_viewer.htm" />
 
 </ftstdata>  

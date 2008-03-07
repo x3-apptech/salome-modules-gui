@@ -65,6 +65,7 @@ protected:
   LightApp_Study*                study() const { return myStudy; }
   QString                        activeViewType() const;
   SUIT_ViewWindow*               activeVW() const;
+  virtual QString                referencedToEntry( const QString& ) const;
 
 private:
   QString                        myPopupClient;

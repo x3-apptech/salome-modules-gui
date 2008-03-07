@@ -4,7 +4,7 @@
 #------------------------------------------------------------
 
 AC_DEFUN([CHECK_CORBA_IN_GUI],[
-  CHECK_GUI([libSalomeApp.so],
+  CHECK_GUI([SALOME_Session_Server],
             [CORBA SALOME GUI])
   CORBA_IN_GUI=${SalomeGUI_ok}
   AC_SUBST(CORBA_IN_GUI)

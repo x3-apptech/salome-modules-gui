@@ -102,8 +102,8 @@ public:
   bool                            isTrihedronVisible() const;
   virtual void                    setTrihedronShown( const bool );
 
-  int                             trihedronSize() const;
-  virtual void                    setTrihedronSize( const int );
+  double                          trihedronSize() const;
+  virtual void                    setTrihedronSize( const double );
 
 public slots:
   void                            onClearViewAspects();
@@ -139,6 +139,7 @@ public:
 
 signals:
   void selectionChanged();
+  void deselection();
 
 protected:
   void initView( OCCViewer_ViewWindow* view );

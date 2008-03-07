@@ -20,12 +20,33 @@ dnl
 dnl
 dnl
 
-AC_DEFUN([CHECK_VTK],[
+dnl
+dnl  OPTIONS_VTK
+dnl  ------------------------------------------------------------------------
+dnl  Adds the --with-vtk=path and --with-vtk-version configure options
+dnl
+AC_DEFUN([OPTIONS_VTK], [
+  AC_ARG_WITH([vtk],
+              [AC_HELP_STRING([--with-vtk], [The prefix where VTK is installed (default "" means taking from environment variable)])],
+              [with_vtk=$withval], [with_vtk=""])
+
+  AC_ARG_WITH([vtk-version],
+              [AC_HELP_STRING([--with-vtk-version], [VTK include directory name is vtk-suffix, e.g. vtk-5.0/. What is the suffix? (Default "yes" means taking from environment variable)])],
+              [vtk_suffix=$withval], [vtk_suffix="yes"])
+])
+
+dnl
+dnl  CHECK_VTK
+dnl  ------------------------------------------------------------------------
+dnl
+AC_DEFUN([CHECK_VTK], [
 AC_REQUIRE([AC_PROG_CC])dnl
 AC_REQUIRE([AC_PROG_CXX])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
 AC_REQUIRE([AC_PROG_CXXCPP])dnl
 AC_REQUIRE([AC_LINKER_OPTIONS])dnl
+
+AC_REQUIRE([OPTIONS_VTK])dnl
 
 AC_CHECKING(for VTK)
 
@@ -59,34 +80,80 @@ then
    LXLIB=""
 fi
 
-if test "x$x_libraries" = "x/usr/lib"
-then
-   LXLIB=""
-fi
-
-if test "x$x_libraries" = "x/usr/lib"
+if test "x$x_libraries" = "x/usr/lib${LIB_LOCATION_SUFFIX}"
 then
    LXLIB=""
 fi
 
 LOCAL_INCLUDES="$OGL_INCLUDES"
-LOCAL_LIBS="-lvtkCommon -lvtkGraphics -lvtkImaging -lvtkFiltering -lvtkIO -lvtkRendering -lvtkHybrid $OGL_LIBS $LXLIB -lX11 -lXt"
+LOCAL_LIBS="-lvtkCommon -lvtkGraphics -lvtkImaging -lvtkFiltering -lvtkIO -lvtkRendering -lvtkHybrid -lvtkParallel -lvtkWidgets $OGL_LIBS $LXLIB -lX11 -lXt"
 TRY_LINK_LIBS="-lvtkCommon $OGL_LIBS $LXLIB -lX11 -lXt"
 
-if test -z $VTKHOME
-then 
-   AC_MSG_WARN(undefined VTKHOME variable which specify where vtk was compiled)
-   if test -f /usr/include/vtk/vtkPlane.h ; then
-      AC_MSG_RESULT(trying /usr)
-      VTKHOME="/usr"
-   fi
+dnl VTK version suffix
+if test -z $vtk_suffix ; then
+  vtk_suffix="yes"
+fi
+if test "x$vtk_suffix" == "xno" ; then
+  dnl in case user wrote --with-vtk-version=no, use empty suffix
+  vtk_suffix=""
+fi
+if test "x$vtk_suffix" != "xyes" ; then
+  VTKSUFFIX="$vtk_suffix"
+else
+  dnl in case user wrote --with-vtk-version=yes, get the suffix from env
+  if test -z $VTKSUFFIX ; then
+    VTKSUFFIX="-5.0"
+  fi
 fi
 
-if test ! -z $VTKHOME
-then
-   LOCAL_INCLUDES="-I$VTKHOME/include/vtk $LOCAL_INCLUDES"
-   LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk/python $LOCAL_LIBS"
-   TRY_LINK_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk/python $TRY_LINK_LIBS"
+dnl VTK install dir
+if test -z $with_vtk ; then
+  with_vtk=""
+fi
+if test "x$with_vtk" = "xyes" ; then
+  dnl in case user wrote --with-vtk=yes
+  with_vtk=""
+fi
+if test "x$with_vtk" = "xno" ; then
+  dnl in case user wrote --with-vtk=no
+  with_vtk=""
+  AC_MSG_WARN(Value "no", specified for option --with-vtk, is not supported)
+fi
+
+if test "x$with_vtk" != "x" ; then
+  VTKHOME="$with_vtk"
+else
+  if test -z $VTKHOME ; then
+    AC_MSG_WARN(undefined VTKHOME variable which specify where vtk was compiled)
+    for d in /usr/local /usr ; do
+      if test -f ${d}/include/vtk${VTKSUFFIX}/vtkPlane.h ; then
+        AC_MSG_RESULT(trying ${d})
+        VTKHOME="${d}"
+        break
+      else
+        if test -f ${d}/include/vtk-5.0/vtkPlane.h ; then
+          AC_MSG_RESULT(trying ${d})
+          VTKHOME="${d}"
+          VTKSUFFIX="-5.0"
+          break
+        else
+          if test -f ${d}/include/vtk/vtkPlane.h ; then
+            AC_MSG_RESULT(trying ${d})
+            VTKHOME="${d}"
+            VTKSUFFIX=""
+            break
+          fi
+        fi
+      fi
+    done
+  fi
+fi
+
+LOCAL_INCLUDES="-I$VTKHOME/include/vtk${VTKSUFFIX} $LOCAL_INCLUDES"
+LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $LOCAL_LIBS"
+TRY_LINK_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $TRY_LINK_LIBS"
+if test "x$VTKHOME" != "x/usr" ; then
+  LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} $LOCAL_LIBS"
 fi
 
 dnl vtk headers
@@ -95,34 +162,34 @@ CPPFLAGS="$CPPFLAGS $LOCAL_INCLUDES"
 
 AC_CHECK_HEADER(vtkPlane.h,vtk_ok="yes",vtk_ok="no")
 
- CPPFLAGS="$CPPFLAGS_old"
+CPPFLAGS="$CPPFLAGS_old"
 
- if  test "x$vtk_ok" = "xyes"
- then
+if test "x$vtk_ok" = "xyes"
+then
    VTK_INCLUDES="$LOCAL_INCLUDES"
 
- dnl vtk libraries
+   dnl vtk libraries
 
    AC_MSG_CHECKING(linking VTK library)
 
-  LIBS_old="$LIBS"
-#  LIBS="$LIBS $TRY_LINK_LIBS"
-  LIBS="$LIBS $LOCAL_LIBS"
-  CPPFLAGS_old="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $VTK_INCLUDES"
+   LIBS_old="$LIBS"
+   LIBS="$LIBS $TRY_LINK_LIBS"
+   #LIBS="$LIBS $LOCAL_LIBS"
+   CPPFLAGS_old="$CPPFLAGS"
+   CPPFLAGS="$CPPFLAGS $VTK_INCLUDES"
 
- dnl  VTKPY_MODULES="$VTKHOME/python"
+   dnl VTKPY_MODULES="$VTKHOME/python"
 
    AC_CACHE_VAL(salome_cv_lib_vtk,[
-     AC_TRY_LINK([#include "vtkPlane.h"],
+     AC_TRY_LINK([#include "vtkPlane.h"
+                 ],
 		 [vtkPlane::New()],
 		 [salome_cv_lib_vtk=yes],
 		 [salome_cv_lib_vtk=no])
-  ])
-  vtk_ok="$salome_cv_lib_vtk"
-  LIBS="$LIBS_old"
-  CPPFLAGS="$CPPFLAGS_old"
-
+   ])
+   vtk_ok="$salome_cv_lib_vtk"
+   LIBS="$LIBS_old"
+   CPPFLAGS="$CPPFLAGS_old"
 fi
 
 if  test "x$vtk_ok" = "xno"

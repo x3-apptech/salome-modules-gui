@@ -118,7 +118,7 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListBoxItem* curItem )
 		int index = curItem->listBox()->index( curItem );
 		if( myKeyFlag == 2 )
 		{
-			for( int i = 0; i < myListBox->count(); i++ )
+			for( int i = 0; i < (int)myListBox->count(); i++ )
 			{
 				if( myListBox->isSelected( i ) && i != index )
 				{
@@ -172,11 +172,11 @@ void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
 	if( myListBox->count() && myListBox->isEditEnabled() )
 	{
 		int curIndex = -1;
-		for( int i = 0; i < myListBox->count(); i++ )
+		for( int i = 0; i < (int)myListBox->count(); i++ )
 			if( myListBox->isSelected( i ) )
 			{
 				myListBox->removeItem( i );
-				for( int j = i; j < myParametersMap.count(); j++ )
+				for( int j = i; j < (int)myParametersMap.count(); j++ )
 					if( j != myParametersMap.count() - 1 )
 						myParametersMap[ j ] = myParametersMap[ j + 1 ];
 					else

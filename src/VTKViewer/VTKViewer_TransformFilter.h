@@ -42,7 +42,8 @@ protected:
   VTKViewer_TransformFilter(const VTKViewer_TransformFilter&) {/*!Do nothing*/}
   /*!Operator = */
   void operator=(const VTKViewer_TransformFilter&) {/*!Do nothing*/}
-  void Execute();
+
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 };
 
 #endif

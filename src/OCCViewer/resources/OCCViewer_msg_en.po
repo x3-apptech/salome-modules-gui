@@ -107,8 +107,44 @@ msgstr "Selection of a new center of the view"
 msgid "MNU_GLOBALPAN_VIEW"
 msgstr "Global Panning"
 
+msgid "DSC_CHANGINGROTATIONPOINT_VIEW"
+msgstr "Change the point, around which the rotation is performed"
+
 msgid "DSC_ROTATE_VIEW"
 msgstr "Rotation of the point of view around the scene center"
+
+msgid "OCCViewer_SetRotationPointDlg::CAPTION"
+msgstr "Set Rotation Point"
+
+msgid "OCCViewer_SetRotationPointDlg::USE_BBCENTER"
+msgstr "Use Bounding Box Center"
+
+msgid "OCCViewer_SetRotationPointDlg::LBL_TOORIGIN"
+msgstr "Set to Origin"
+
+msgid "OCCViewer_SetRotationPointDlg::LBL_SELECTPOINT"
+msgstr "Select Point from View"
+
+msgid "OCCViewer_SetRotationPointDlg::LBL_X"
+msgstr "X :"
+
+msgid "OCCViewer_SetRotationPointDlg::LBL_Y"
+msgstr "Y :"
+
+msgid "OCCViewer_SetRotationPointDlg::LBL_Z"
+msgstr "Z :"
+
+msgid "MNU_CHANGINGROTATIONPOINT_VIEW"
+msgstr "Change Rotation Point"
+
+msgid "MNU_ROTATIONPOINTGRAVITY_VIEW"
+msgstr "Rotation Point : the gravity center"
+
+msgid "MNU_ROTATIONPOINT000_VIEW"
+msgstr "Rotation Point : (0,0,0)"
+
+msgid "MNU_ROTATIONPOINTSELECTED_VIEW"
+msgstr "Rotation Point : the point selected by the user"
 
 msgid "MNU_ROTATE_VIEW"
 msgstr "Rotation"
@@ -171,7 +207,7 @@ msgid "OCCViewer_Viewer::MEN_CHANGE_BACKGROUD"
 msgstr "Change background..."
 
 msgid "OCCViewer_ViewManager::OCC_VIEW_TITLE"
-msgstr "OCC scene:%1 - viewer:%2"
+msgstr "OCC scene:%M - viewer:%V"
 
 
 msgid "OCCViewer_CreateRestoreViewDlg::CAPTION"

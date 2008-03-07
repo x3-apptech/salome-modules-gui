@@ -144,8 +144,11 @@ myRaise( false )
 
 QtxListAction::~QtxListAction()
 {
-  if ( myFrame )
+  if ( myFrame ) {
     myFrame->myAction = 0;
+    delete myFrame;
+    myFrame = 0;
+  }
 }
 
 /*!

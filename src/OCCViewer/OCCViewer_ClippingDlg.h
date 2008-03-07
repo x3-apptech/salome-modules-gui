@@ -105,6 +105,9 @@ private slots:
   void onModeChanged( int mode );
   void onValueChanged();
   void onPreview( bool on );
+
+  void onViewShow();
+  void onViewHide();
 };
 
 #endif // OCCVIEWER_CLIPPINGDLG_H

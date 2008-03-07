@@ -43,14 +43,18 @@ class vtkDataSet;
 class vtkCamera;
 class vtkProperty;
 class vtkRenderer;
+class vtkPassThroughFilter;
 
 class VTKViewer_Transform;
 class VTKViewer_GeometryFilter;
 class VTKViewer_TransformFilter;
-class VTKViewer_PassThroughFilter;
 
 extern int VTKViewer_POINT_SIZE;
 extern int VTKViewer_LINE_WIDTH;
+
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
 
 /*! \class vtkLODActor
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation</a>
@@ -313,7 +317,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   bool myStoreMapping;
   VTKViewer_GeometryFilter *myGeomFilter;
   VTKViewer_TransformFilter *myTransformFilter;
-  std::vector<VTKViewer_PassThroughFilter*> myPassFilter;
+  std::vector<vtkPassThroughFilter*> myPassFilter;
 
   int myRepresentation;
   vtkProperty *myProperty;
@@ -329,5 +333,9 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   bool myIsPreselected;
   bool myIsHighlighted;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif // VTKVIEVER_ACTOR_H

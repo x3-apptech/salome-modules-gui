@@ -52,6 +52,10 @@ class vtkObject;
 class SVTK_Selector;
 class SVTK_Renderer;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*!
   \class QVTK_RenderWindowInteractor
   Implements Qt based vtkRenderWindowInteractor.
@@ -116,8 +120,12 @@ class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
   virtual void focusInEvent( QFocusEvent* );
   virtual void focusOutEvent( QFocusEvent* );
 
-  //! To handle native X11 events (from such devices as SpaceMouse)
+  //! To handle native events (from such devices as SpaceMouse)
+#ifdef WIN32
+  virtual bool winEvent( MSG* );
+#else
   virtual bool x11Event( XEvent *e );
+#endif
 
   vtkSmartPointer<vtkRenderWindow> myRenderWindow;
   vtkSmartPointer<vtkGenericRenderWindowInteractor> myDevice;
@@ -249,5 +257,8 @@ class SVTK_EXPORT SVTK_RenderWindowInteractor: public QVTK_RenderWindowInteracto
   TInteractorStyles myInteractorStyles;
 };
 
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

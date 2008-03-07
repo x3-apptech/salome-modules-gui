@@ -1,0 +1,36 @@
+/*!
+
+\page setting_study_properties_page Setting study properties
+
+<em>To view the properties of the current study:</em>
+\par
+From the main menu select \b File > \b Properties option. The following
+dialog box will appear:
+
+\image html studyproperties.png
+
+This dialog box gives complete information about your study.
+
+<em>To change the name of the study author:</em>
+\par
+In this dialog box click on the \b Author field and enter a new name.
+
+<em>To view the list of changes made with your study:</em>
+\par
+In this dialog box click on the \b Modifications field and scroll it
+down. Each record contains the following information: date and time of
+modification of the study, name of the user, who has made these
+changes.
+
+<em>To lock your study for modifications:</em>
+\par
+In the dialog box shown on the picture above click on the \b Locked
+field and choose \b Yes item.
+
+In this case your study will be locked for any kind of modifications
+for all users. Next time you try to edit it, you will see the
+following warning message:
+
+\image html lockedstudy.png
+
+*/

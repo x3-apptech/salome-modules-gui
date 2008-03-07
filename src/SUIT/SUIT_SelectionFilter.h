@@ -28,7 +28,7 @@ class SUIT_EXPORT SUIT_SelectionFilter
 {
 public:
   SUIT_SelectionFilter();
-  ~SUIT_SelectionFilter();
+  virtual ~SUIT_SelectionFilter();
 
   virtual bool isOk( const SUIT_DataOwner* ) const = 0;
 };

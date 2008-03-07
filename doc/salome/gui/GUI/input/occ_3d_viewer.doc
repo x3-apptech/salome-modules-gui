@@ -1,0 +1,125 @@
+/*!
+
+\page occ_3d_viewer_page OCC 3D Viewer
+
+<b>OCC (Open CasCade) 3D viewer</b> has been developed on the basis of Open
+CASCADE Technology. This is the default viewer for Geometry Module,
+providing good representation of construction and transformation of
+geometrical objects. Only this viewer allows to work with groups and
+sub-shapes. This viewer can also work in Mesh module, however, it
+doesn't allow to visualize meshes.
+
+The functionalities of OCC viewer are available via its Viewer
+Toolbar. Buttons marked with small downward triangles have extended
+functionality which can be accessed by locking on them with left mouse
+button.
+
+\image html image95.gif "Viewer Toolbar"
+
+<hr>
+\image html image77.gif
+\n <center><b>Dump View</b> - exports an object from the viewer in bmp, png, jpg
+or jpeg image format.</center>
+<hr>
+
+\image html image88.gif
+\n <center><b>Show/Hide Trihedron</b> - shows or hides coordinate axes.</center>
+<hr>
+
+\image html image96.gif
+\n <center><b>Fit all</b> - allows to select a point to be the center of a
+scene representing all displayed objects in the visible area.</center>
+<hr>
+
+\image html image97.gif
+\n <center><b>Fit area</b> - resizes the view to place in the visible area
+only the contents of a frame drawn with pressed left mouse button.</center>
+<hr>
+
+\image html image98.gif
+\n <center><b>Zoom</b> - allows to zoom in and out.</center>
+<hr>
+
+\image html image99.gif
+\n <center><b>Panning</b> - if the represented objects are greater that the
+visible area and you don't wish to use <b>Fit all</b> functionality, click on
+this button and you'll be able to drag the scene to see its remote
+parts.</center>
+<hr>
+
+\image html image100.gif
+\n <center><b>Global panning</b> - represents all displayed objects in
+the visible area.</center>
+<hr>
+
+\image html view_rotation_point.png
+\n <center><b>Change rotation point</b> - allows to to choose the point around
+which the rotation is performed.</center>
+
+\image html set_rotation_point_dialog1.png
+
+<center>By default the rotation point is located in the Center of the bounding
+box of an object.</center>
+
+\image html set_rotation_point_dialog2.png
+
+<center>Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+define the coordinates of the rotation point manually.</center>
+
+<b>Set to Origin</b> button restores the default rotation point
+coordinates.\n
+<b>Select Point from View</b> button allows to select the rotation
+point in the 3D Viewer.
+<hr>
+
+\image html image89.gif
+\n <center><b>Rotation</b> - allows to rotate the selected object using the
+mouse.</center>
+
+\image html image102.gif
+
+<center>These buttons orientate the scene strictly about coordinate axes.</center>
+<hr>
+
+\image html image91.gif
+\n <center><b>Reset</b> - restores the default position (isometric) of
+objects in the scene.</center>
+<hr>
+
+\image html image103.gif
+\n <center><b>Memorise view</b> - saves the current position of
+objects in the scene.</center>
+<hr>
+
+\image html image105.gif
+\n <center><b>Restore view</b> - restores the saved position of
+objects in the scene.</center>
+<hr>
+
+\image html image86.gif
+\n <center><b>Clone view</b> - opens a new duplicate scene.</center>
+<hr>
+
+\image html image106.gif
+\n <center><b>Clipping</b> - allows to create cross-section views
+(clipping planes) of geometrical objects.</center>
+
+\image html clipping.png
+
+<ul>
+<li><b>Base point</b> - allows to define the coordinates of the base
+point for the clipping plane.</li>
+<ul>
+<li><b>Reset</b> - returns the base point to coordinate origin.</li>
+</ul>
+<li><b>Direction</b> - allows to define the orientation of the
+clipping plane.</li>
+<ul>
+<li><b>Invert</b> - allows to select which part of the object will be removed
+and which will remain after clipping.</li>
+</ul>
+<li><b>Preview</b> - allows to see the results of clipping in the
+viewer.</li>
+</ul>
+
+*/

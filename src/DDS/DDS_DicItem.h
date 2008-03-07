@@ -47,8 +47,23 @@ class TColStd_SequenceOfExtendedString;
 class DDS_DicItem : public MMgt_TShared
 {
 public:
-  enum Type { String, Float, Integer, List, Unknown };
-  enum Data { MinValue = 0x01, MaxValue = 0x02, DefaultValue = 0x04 };
+  /*! Enum describes type of datum value */
+  enum Type
+  {
+    String,  //!< String type of value
+    Float,   //!< Real (double) numeric type of value
+    Integer, //!< Integer (int) numeric type of value
+    List,    //!< List type of enumerable value
+    Unknown  //!< Unknown or undefined type of value
+  };
+
+  /*! Enum describes the flags for existance of domain data */
+  enum Data
+  {
+    MinValue = 0x01,    //!< Flag of minimum value definition existence
+    MaxValue = 0x02,    //!< Flag of maximum value definition existence
+    DefaultValue = 0x04 //!< Flag of default value definition existence
+  };
 
   // This struct is intended for map of Format, Units, Precision and Scale
   struct UnitData
@@ -66,114 +81,64 @@ public:
   DDS_DicItem();
 
   Standard_EXPORT TCollection_AsciiString    GetId() const;
-  // to access Type of the parameter
-
   Standard_EXPORT DDS_DicItem::Type          GetType() const;
-  // to access Type of the parameter
-
   Standard_EXPORT TCollection_ExtendedString GetLabel() const;
-  // to access Label (name) of the parameter
-
   Standard_EXPORT TCollection_ExtendedString GetFilter() const;
-  // to access filter (regexp) for the parameter values
-
   Standard_EXPORT TCollection_ExtendedString GetRequired() const;
-  // to access Required of the parameter
-
   Standard_EXPORT DDS_MsgType                GetWarningLevel() const;
-  // to access wrong value warning level of the parameter
-
   Standard_EXPORT TCollection_ExtendedString GetLongDescription() const;
-  // to access Long Description of the parameter
-
   Standard_EXPORT TCollection_ExtendedString GetShortDescription() const;
-  // to access Short Description of the parameter
-
   Standard_EXPORT TCollection_AsciiString    GetComponent() const;
 
   Standard_EXPORT TCollection_AsciiString    GetUnits() const;
   Standard_EXPORT TCollection_AsciiString    GetUnits( const UnitSystem& ) const;
-  // returns units for indicated unit systems
 
   Standard_EXPORT TCollection_ExtendedString GetDefaultValue() const;
   Standard_EXPORT TCollection_ExtendedString GetDefaultValue( const UnitSystem& ) const;
-  // to access Default Value of the parameter
 
   Standard_EXPORT Standard_Real              GetMinValue() const;
   Standard_EXPORT Standard_Real              GetMinValue( const UnitSystem& ) const;
-  // get Min Value of the parameter, either in specified unit system or in internal units (basic SI)
 
   Standard_EXPORT Standard_Real              GetMaxValue() const;
   Standard_EXPORT Standard_Real              GetMaxValue( const UnitSystem& ) const;
-  // get Max Value of the parameter, either in specified unit system or in internal units (basic SI)
 
   Standard_EXPORT Standard_Integer           GetPrecision() const;
   Standard_EXPORT Standard_Integer           GetPrecision( const UnitSystem& ) const;
-  // returns precision for indicated unit systems
 
   Standard_EXPORT TCollection_AsciiString    GetFormat( const Standard_Boolean = Standard_True ) const;
   Standard_EXPORT TCollection_AsciiString    GetFormat( const UnitSystem&,
                                                         const Standard_Boolean = Standard_True ) const;
-  // returns format for indicated unit systems
-
   Standard_EXPORT TCollection_ExtendedString GetNameOfValues() const;
-  // to access valueList:name of the parameter.
-  // This string is void if the list is not defined - then use other properties:
-  //    Type, DefaultValue, MaxValue, MinValue
-
   Standard_EXPORT Standard_Boolean           GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
                                                               Handle(TColStd_HArray1OfInteger)& ) const;
-  // to access valueList of the parameter
-  // This sequence is empty if the list not defined - then use other properties:
-  //    Type, DefaultValue, MaxValue, MinValue
-
   Standard_EXPORT Standard_Boolean           GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
                                                               Handle(TColStd_HArray1OfInteger)&,
                                                               Handle(TColStd_HArray1OfExtendedString)& ) const;
-  // to access valueList of the parameter
-  // This sequence is empty if the list not defined - then use other properties:
-  //    Type, DefaultValue, MaxValue, MinValue
-
   Standard_EXPORT Standard_Boolean           GetSpecialValues( TColStd_MapOfReal& ) const;
-  // get values from specVal
 
   Standard_EXPORT Standard_Real              GetMinZoom() const;
-  // get Min Value of lateral zooming
-
   Standard_EXPORT Standard_Real              GetMaxZoom() const;
-  // get Max Value of lateral zooming
-
   Standard_EXPORT Standard_Real              GetZoomOrder() const;
-  // get Order of lateral zooming
 
-  Standard_EXPORT Standard_Real ToSI( const Standard_Real ) const;
-  Standard_EXPORT Standard_Real FromSI( const Standard_Real ) const;
+  Standard_EXPORT Standard_Real              ToSI( const Standard_Real ) const;
+  Standard_EXPORT Standard_Real              FromSI( const Standard_Real ) const;
 
-  Standard_EXPORT Standard_Real ToSI( const Standard_Real, const UnitSystem& ) const;
-  Standard_EXPORT Standard_Real FromSI( const Standard_Real, const UnitSystem& ) const;
-  // convert value to and from default SI units according to current units
+  Standard_EXPORT Standard_Real              ToSI( const Standard_Real, const UnitSystem& ) const;
+  Standard_EXPORT Standard_Real              FromSI( const Standard_Real, const UnitSystem& ) const;
 
   Standard_EXPORT Standard_Boolean           HasData( const Standard_Integer ) const;
 
+  Standard_EXPORT TCollection_ExtendedString GetOption( const TCollection_AsciiString& ) const;
+  Standard_EXPORT Standard_Boolean           GetOptionNames( TColStd_SequenceOfAsciiString& ) const;
+
 private:
   DDS_DicItem( const DDS_DicItem& );
-  // Copy constructor
-
   void                                       operator=( const DDS_DicItem& );
-  // Assignment operator
-
   void                                       FillDataMap( TCollection_AsciiString, const LDOM_Element&,
                                                           const LDOM_Element&, const LDOM_Element&,
                                                           const TColStd_SequenceOfAsciiString& );
-  // prepares formants for each unit systems
-
-
   void                                       PrepareFormats( const TCollection_AsciiString& );
-  // prepares three formats for each unit systems
-
   void                                       GetDefaultFormat();
-  // returns three default formants for each unit systems
-
   UnitSystem                                 GetActiveUnitSystem() const;
 
   void                                       GetStringFormat( const TCollection_AsciiString&,
@@ -181,28 +146,25 @@ private:
                                                               const TCollection_AsciiString&,
                                                               const TCollection_AsciiString&,
                                                               TCollection_AsciiString& );
-  // returns format for the string
-
   void                                       GetIntegerFormat( const TCollection_AsciiString&,
                                                                const TCollection_AsciiString&,
                                                                const TCollection_AsciiString&,
                                                                const TCollection_AsciiString&,
                                                                const Standard_Character,
                                                                TCollection_AsciiString& );
-  // returns format for the integer
-
   void                                       GetFloatFormat( const TCollection_AsciiString&,
                                                              const TCollection_AsciiString&,
                                                              const TCollection_AsciiString&,
                                                              const TCollection_AsciiString&,
                                                              const Standard_Character,
                                                              TCollection_AsciiString& );
-  // returns format for the float
-
   void                                       Split( const TCollection_AsciiString&,
                                                     Handle(TColStd_HArray1OfExtendedString)& );
 
   UnitData*                                  GetUnitData( const UnitSystem& ) const;
+
+private:
+  typedef NCollection_DataMap<TCollection_AsciiString, TCollection_ExtendedString> OptionsMap;
 
 private:
   TCollection_AsciiString                    myId;
@@ -237,6 +199,7 @@ private:
 
   Handle(Standard_Transient)                 myComponent;
 
+  OptionsMap                                 myOptions;
   // unitData
   NCollection_DataMap<UnitSystem, UnitData>  myUnitData;
 
@@ -247,10 +210,8 @@ public:
   DEFINE_STANDARD_RTTI(DDS_DicItem)
 };
 
-// Definition of HANDLE object using Standard_DefineHandle.hxx
 DEFINE_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)
 
-// Container class XMLTools_IndexedDataMapOfDicItems (map of handles)
 DEFINE_BASECOLLECTION(DDS_BaseCollectionOfDicItems, Handle(DDS_DicItem))
 DEFINE_INDEXEDDATAMAP(DDS_IndexedDataMapOfDicItems, DDS_BaseCollectionOfDicItems,
                       TCollection_AsciiString, Handle(DDS_DicItem))

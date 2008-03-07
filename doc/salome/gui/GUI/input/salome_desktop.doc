@@ -1,0 +1,74 @@
+/*!
+
+\page salome_desktop_page SALOME desktop
+
+The main SALOME Desktop consists of the following sections and
+toolbars:
+
+\image html geomview-alt.png
+
+<b>Basic parts of the SALOME Desktop:</b>
+<ul>
+<li><b>Main menu</b> - This is a set of context-sensitive menus, which will
+be updated according the functionality of the loaded component. In
+general,  these menus contain all functional options of SALOME
+platform.</li>
+<li><b>Standard Toolbar</b> - This toolbar contains icons allowing
+creating/saving studies, correcting mistakes, copying/pasting
+objects.</li>
+<li><b>Components Toolbar</b> - This toolbar is destined for uploading
+components in SALOME platform.</li>
+<li><b>Module Toolbar</b> - This toolbar contains icons specific to the
+loaded module.</li>
+<li><b>Viewer Toolbar</b> - This is a set of tools destined for visualization
+of the presentations in the viewer.</li>
+</ul>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All toolbars in the
+\b SALOME Platform are context-sensitive. Loading of a definite component
+(Geometry, Post-Pro, Mesh etc.) will automatically add some additional
+toolbars specific to this component. To display/hide a definite
+toolbar, in the main menu choose <b>View > Toolbars</b>, and from this
+submenu check or uncheck the toolbar, you would like to display/hide.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By default all
+toolbars are located on the top of the SALOME desktop. But you can
+relocate toolbars by dragging with the mouse and dropping it in any
+place of the window.
+
+<b>Parts of  the study window:</b>
+<ul>
+<li><b>Object Browser</b> - Management of objects created or imported into
+SALOME application.</li>
+<li>\b Viewer - This window is destined for visualization of
+presentations.</li>
+<li><b>Python console</b> - Window for Python interpreter. This window
+functions like a standard document: the pop-up menu invoked by
+right-click in this window gives access to
+<b>Copy/Paste/SelectAll/ClearAll</b> options.</li>
+</ul>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object Browser, Python
+Console, MenuBar, etc are, in fact, separate dockable windows.
+Dockable windows can be placed in special areas, on the borders of
+desktop like toolbars. You can change the size and the position of
+dockable windows, hide them or even place outside desktop. SALOME
+saves in the same file all positions and sizes of dockable windows. It
+means that the difference in settings of the same windows (for example
+Python console) is possible between different modules (the same window
+can have different size and position when other module is
+activated). Also each module can indicate which common windows are
+necessary for working, and only they will be displayed when this
+module is active.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Starting from the
+version 3.0.0 Salome uses a <b>Multi-Desktop Approach</b>. Multi-desktop
+Approach means that now there is separate Desktop for each document
+(Study)  and all windows connected to a Study (viewers, dockable
+windows etc) are placed in one container. It is very comfortable,
+because you can't mix up windows from different studies. This approach
+positively differs from the classic multi document interface in case
+if many windows are used, i.e. when one document contains a lot of
+viewers, dialogs, etc. Each desktop also has its own menu and toolbar.
+
+*/

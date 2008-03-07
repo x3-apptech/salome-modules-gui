@@ -1,0 +1,51 @@
+/*!
+
+\mainpage GUI Module Reference Documentation
+
+<ul>
+<li>\subpage introduction_page</li>
+<li>\subpage about_salome_page</li>
+<ul>
+<li>\ref intro_to_salome_page</li>
+<li>\ref salome_architecture_page</li>
+<li>\ref installing_salome_page</li>
+<li>\ref running_salome_page</li>
+</ul>
+<li>\subpage gui_module_page "GUI module"</li>
+<ul>
+<li>\ref introduction_to_gui_page</li>
+<li>\ref getting_started_page</li>
+<li>\ref salome_desktop_page</li>
+<li>\ref study_management_page</li>
+<ul>
+<li>\ref creating_new_study_page</li>
+<li>\ref opening_studies_page</li>
+<li>\ref saving_and_closing_studies_page</li>
+<li>\ref editing_studies_page</li>
+<li>\ref displaying_studies_page</li>
+<li>\ref working_with_python_scripts_page</li>
+<li>\ref setting_study_properties_page</li>
+</ul>
+</ul>
+<li>\ref using_object_browser_page</li>
+<li>\ref using_registry_tool_page</li>
+<li>\ref using_catalog_generator_page "Using Catalog Generator"</li>
+<li>\ref viewers_page</li>
+<ul>
+<li>\ref occ_3d_viewer_page</li>
+<li>\ref vtk_3d_viewer_page</li>
+<li>\ref plot2d_viewer_page</li>
+</ul>
+<li>\ref setting_preferences_page</li>
+<ul>
+<li>\ref setting_preferences_subpage</li>
+<li>\ref select_color_and_font_page</li>
+<li>\ref salome_preferences_page</li>
+<li>\ref geometry_preferences_page</li>
+<li>\ref mesh_preferences_page</li>
+<li>\ref postpro_preferences_page</li>
+</ul>
+</ul>
+
+
+*/

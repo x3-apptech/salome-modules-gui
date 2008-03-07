@@ -40,7 +40,7 @@ msgid "ABOUT_VERSION"
 msgstr "Version %1"
 
 msgid "ABOUT_COPYRIGHT"
-msgstr "Copyright (C) 2003-2006 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
+msgstr "Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
 
 msgid "ABOUT_LICENSE"
 msgstr "GNU LGPL"
@@ -94,6 +94,9 @@ msgstr "&OCC view"
 
 msgid "LightApp_Application::NEW_WINDOW_3"
 msgstr "VT&K view"
+
+msgid "LightApp_Application::NEW_WINDOW_4"
+msgstr "&QxGraph view"
 
 msgid "LightApp_Application::INF_CANCELLED"
 msgstr "Module activation cancelled"
@@ -251,6 +254,9 @@ msgstr "Quick directory list"
 msgid "LightApp_Application::MEN_REFRESH"
 msgstr "Refresh"
 
+msgid "LightApp_Application::MEN_FIND"
+msgstr "Find"
+
 msgid "LightApp_Application::PREF_GROUP_SUPERV"
 msgstr "Graph Supervisor"
 
@@ -288,65 +294,59 @@ msgstr "Import"
 
 //=======================================================================================
 
-msgid "LightApp_Module::TOP_DISPLAY"
-msgstr "Display"
+msgid "LightApp_Module::TOP_SHOW"
+msgstr "Show"
 
-msgid "LightApp_Module::MEN_DISPLAY"
-msgstr "Display"
+msgid "LightApp_Module::MEN_SHOW"
+msgstr "Show"
 
-msgid "LightApp_Module::STB_DISPLAY"
-msgstr "Display"
+msgid "LightApp_Module::STB_SHOW"
+msgstr "Show"
 
-msgid "LightApp_Module::TOP_ERASE"
-msgstr "Erase"
+msgid "LightApp_Module::TOP_HIDE"
+msgstr "Hide"
 
-msgid "LightApp_Module::MEN_ERASE"
-msgstr "Erase"
+msgid "LightApp_Module::MEN_HIDE"
+msgstr "Hide"
 
-msgid "LightApp_Module::STB_ERASE"
-msgstr "Erase"
+msgid "LightApp_Module::STB_HIDE"
+msgstr "Hide"
 
 msgid "LightApp_Module::TOP_DISPLAY_ONLY"
-msgstr "Display only"
+msgstr "Show only"
 
 msgid "LightApp_Module::MEN_DISPLAY_ONLY"
-msgstr "Display only"
+msgstr "Show only"
 
 msgid "LightApp_Module::STB_DISPLAY_ONLY"
-msgstr "Display only"
+msgstr "Show only"
 
 msgid "LightApp_Module::TOP_ERASE_ALL"
-msgstr "Erase all"
+msgstr "Hide all"
 
 msgid "LightApp_Module::MEN_ERASE_ALL"
-msgstr "Erase all"
+msgstr "Hide all"
 
 msgid "LightApp_Module::STB_ERASE_ALL"
-msgstr "Erase all"
+msgstr "Hide all"
 //=======================================================================================
 
 
 msgid "LightApp_ModuleDlg::CAPTION"
 msgstr "Activate module"
 
-msgid "LightApp_ModuleDlg::NEW"
-msgstr "&New"
-
-msgid "LightApp_ModuleDlg::OPEN"
-msgstr "&Open"
-
-msgid "LightApp_ModuleDlg::LOAD"
-msgstr "&Load"
-
-msgid "LightApp_ModuleDlg::CANCEL"
-msgstr "&Cancel"
-
-msgid "LightApp_ModuleDlg::ActivateComponent_DESCRIPTION"
-msgstr "Create, open or load study."
+msgid "LightApp_ModuleDlg::DESCRIPTION"
+msgstr "You're activating module <b>%1</b>.<br>Please, select required action by pressing the corresponding button below."
 
 msgid "LightApp_NameDlg::TLT_RENAME"
 msgstr "Rename"
 
 msgid "LightApp_NameDlg::NAME_LBL"
 msgstr "Name: "
+
+msgid "LightApp_Application::ACTIVATE_MODULE_OP_OPEN"
+msgstr "&Open..."
+
+msgid "LightApp_Application::ACTIVATE_MODULE_OP_NEW"
+msgstr "&New"
 

@@ -22,9 +22,11 @@
 #include "Qtx.h"
 
 #include <qdir.h>
+#include <qbitmap.h>
 #include <qstring.h>
 #include <qwidget.h>
 #include <qlayout.h>
+#include <qpainter.h>
 #include <qtoolbar.h>
 #include <qgroupbox.h>
 #include <qfileinfo.h>
@@ -555,4 +557,145 @@ void Qtx::scaleColors( const int num, QValueList<QColor>& lst )
   lst.clear();
   for ( int i = 0; i < num; i++ )
     lst.append( scaleColor( i, 0, num - 1 ) );
+}
+
+/*!
+	Name: grayscale [static public]
+	Desc: Convert color image to grayscale image.
+*/
+QImage Qtx::grayscale( const QImage& img )
+{
+  QImage res = img;
+
+  int colNum = res.numColors();
+  if ( colNum )
+  {
+    for ( int i = 0; i < colNum; i++ )
+      res.setColor( i, qGray( res.color( i ) ) );
+  }
+  else
+  {
+    for ( int y = 0; y < res.height(); y++ )
+    {
+      for ( int x = 0; x < res.width(); x++ )
+      {
+        QRgb pix = res.pixel( x, y );
+        res.setPixel( x, y, qRgba( qGray( pix ), qGray( pix ), qGray( pix ), qAlpha( pix ) ) );
+      }
+    }
+  }
+
+  return res;
+}
+
+/*!
+	Name: grayscale [static public]
+	Desc: Convert color pixmap to grayscale pixmap.
+*/
+QPixmap Qtx::grayscale( const QPixmap& pix )
+{
+  QPixmap res;
+  res.convertFromImage( grayscale( pix.convertToImage() ) );
+  return res;
+}
+
+/*!
+	Name: transparentImage [static public]
+	Desc: Create transparent image with specified width \aw, height \ah and color depth \ad.
+*/
+QImage Qtx::transparentImage( const int w, const int h, const int d )
+{
+  QImage img;
+  if ( img.create( w, h, d < 0 ? QPixmap::defaultDepth() : d ) )
+  {
+    img.setAlphaBuffer( true );
+    for ( int i = 0; i < img.height(); i++ )
+      for ( int j = 0; j < img.width(); j++ )
+        img.setPixel( j, i, qRgba( 0, 0, 0, 0 ) );
+  }
+  return img;
+}
+
+/*!
+	Name: transparentPixmap [static public]
+	Desc: Create transparent pixmap with specified width \aw, height \ah and color depth \ad.
+*/
+QPixmap Qtx::transparentPixmap( const int w, const int h, const int d )
+{
+  QPixmap pix;
+  QImage img = transparentImage( w, h, d );
+  if ( !img.isNull() )
+    pix.convertFromImage( img );
+  return pix;
+}
+
+/*!
+	Name: composite [static public]
+	Desc: Create composite pixmap. Pixmap 'pix' draws over pixmap 'dest' with coordinates
+        specified relative upper left corner of 'dest'. If 'dest' not given then new empty
+        pixmap with appropriate size created.
+*/
+QPixmap Qtx::composite( const QPixmap& pix, const int x, const int y, const QPixmap& dest )
+{
+  if ( pix.isNull() )
+    return dest;
+
+  int width = QMAX( pix.width() + x, dest.width() );
+  int height = QMAX( pix.height() + y, dest.height() );
+
+  QPixmap res( width, height );
+  QImage img = transparentImage( width, height, 32 );
+
+  QPainter p;
+  p.begin( &res );
+  p.fillRect( 0, 0, width, height, QBrush( white ) );
+
+  if ( !dest.isNull() )
+  {
+    p.drawPixmap( 0, 0, dest );
+    QImage temp = dest.convertToImage();
+    for ( int i = 0; i < temp.width() && i < img.width(); i++ )
+    {
+      for ( int j = 0; j < temp.height() && j < img.height(); j++ )
+      {
+        if ( temp.hasAlphaBuffer() )
+          img.setPixel( i, j, temp.pixel( i, j ) );
+        else
+        {
+          QRgb p = temp.pixel( i, j );
+          img.setPixel( i, j, qRgba( qRed( p ), qGreen( p ), qBlue( p ), 255 ) );
+        }
+      }
+    }
+  }
+
+  p.drawPixmap( x, y, pix );
+  QImage temp = pix.convertToImage();
+  for ( int c = x; c < temp.width() + x && c < img.width(); c++ )
+  {
+    for ( int r = y; r < temp.height() + y && r < img.height(); r++ )
+    {
+      if ( qAlpha( temp.pixel( c - x, r - y ) ) > 0 )
+        img.setPixel( c, r, temp.pixel( c - x, r - y ) );
+    }
+  }
+
+  p.end();
+
+  for ( int ai = 0; ai < img.width(); ai++ )
+  {
+    for ( int aj = 0; aj < img.height(); aj++ )
+    {
+      if ( qAlpha( img.pixel( ai, aj ) ) < 1 )
+        img.setPixel( ai, aj, qRgba( 255, 255, 255, 255 ) );
+      else
+        img.setPixel( ai, aj, qRgba( 0, 0, 0, 0 ) );
+    }
+  }
+
+  QBitmap bmp( width, height );
+  bmp.convertFromImage( img, Qt::ColorMode_Mask | Qt::ThresholdDither );
+  res.setMask( bmp );
+
+  return res;
 }

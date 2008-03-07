@@ -29,6 +29,8 @@
 #ifndef _SESSION_SERVERTHREAD_HXX_
 #define _SESSION_SERVERTHREAD_HXX_
 
+#include <SALOME_Session.hxx>
+
 #include <CORBA.h> 
 #include <string>
 
@@ -40,7 +42,7 @@ using namespace std;
 void WaitForServerReadiness(string serverName);
 
 
-class Session_ServerThread
+class SESSION_EXPORT Session_ServerThread
 {
 public:
   static const int NB_SRV_TYP;
@@ -71,7 +73,7 @@ protected:
 };
 
 
-class Session_SessionThread : public Session_ServerThread
+class SESSION_EXPORT Session_SessionThread : public Session_ServerThread
 {
 public:
   Session_SessionThread() {}

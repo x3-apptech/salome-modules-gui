@@ -1,0 +1,94 @@
+/*!
+
+\page plot2d_viewer_page Plot 2D viewer
+
+\n <b>Plot 2d viewer</b> is destined to the representation of  2d
+plots and graphs in Post-Pro module.
+\n Its viewer toolbar gives you fast access to the following
+operations:
+
+\image html image77.gif
+<center><b>Dump View</b> - exports an object from the viewer in bmp,
+png, jpg or jpeg image format.</center>
+
+\image html image96.gif
+<center><b>Fit all</b> - scales the display to show the entire
+scene. Use this to resize the scene so that it could fit within the
+Viewer boundary.</center>
+
+\image html image97.gif
+<center><b>Fit area</b> - resizes the view to place in the visible
+area only the contents of a frame drawn with pressed left mouse
+button.</center>
+
+\image html image98.gif
+<center><b>Zoom</b> - allows to zoom in and out.</center>
+
+\image html image99.gif
+<center>\b Panning - if the represented objects are greater that the
+visible area and you don't wish to use Fit all functionality, click on
+this button and you'll be able to drag the scene to see its remote
+parts.</center>
+
+\image html image100.gif
+<center><b>Global panning</b> - allows to define the center of the
+scene presenting all displayed objects in the visible area.</center>
+
+\image html plot2d_points.gif
+<center><b>Draw Points</b> - represents points on the graph.</center>
+
+\image html plot2d_lines.gif
+<center><b>Draw Lines</b> - represents lines on the graph.</center>
+
+\image html plot2d_splines.gif
+<center><b>Draw Splines</b> - represents splines on the graph.</center>
+
+\image html plot2d_logarithmic_horizontal.gif
+<center><b>Horizontal axis logarithmic</b> - changes the scaling on
+horizontal axis to logarithmic.</center>
+
+\image html plot2d_logarithmic_vertical.gif
+<center><b>Vertical axis logarithmic</b> - changes the scaling on vertical
+axis to logarithmic.</center>
+
+\image html plot2d_legend.gif
+<center><b>Show Legend</b> - reveals all verbal and numerical
+information on the graphs.</center>
+
+\image html plot2d_settings.gif
+<center>\b Settings - calls a menu, in which you can specify advanced
+settings for your Plot 2d Viewer.</center>
+
+\image html plot2d_clone.gif
+<center><b>Clone view</b> - opens a new duplicate scene.</center>
+
+\anchor settings
+\n \image html plot2d_view_settings.png
+
+The options are as follows:
+<ul>
+<li><b>Main title:</b> the title of the XY plot. By default, it will
+consist of the names of the tables, on the basis of which the curve
+lines have been constructed.</li>
+<li><b>Curve type:</b> you can select from \b Points, \b Lines and \b Spline.</li>
+<li><b>Show legend:</b> here you can define the position of the
+description table on the XY plot (to the \b Left, to the \b Right, on
+\b Top or on \b Bottom).</li>
+<li><b>Marker size</b> - size of the points (markers) forming curve lines.</li>
+<li><b>Background color</b> of the XY plot.</li>
+<li><b>Scale mode:</b> here you can select the type of scaling (\b
+Linear or \b Logarithmic) along <b>X (Horizontal)</b> or <b>Y (Vertical)</b> axes.</li>
+</ul>
+
+You can define settings for each axis separately:
+<ul>
+<li>\b Horizontal or \b Vertical axis title.</li>
+<li><b>Grid/Axes marks:</b>  here you can define the maximum number of major
+and minor scale divisions for a specified axis. The real number of
+intervals fits to {1,2,5}*10^N, where N is a natural number, and
+doesn't exceed the maximum.</li>
+<li><b>Save settings as default:</b> If this check box is marked, all
+XY plots will be displayed with these defined properties.</li>
+</ul>
+
+*/

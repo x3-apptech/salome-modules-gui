@@ -39,7 +39,7 @@ class QDS_EXPORT QDS_RadioBox : public QDS_Datum
   Q_OBJECT
 
 public:
-  QDS_RadioBox( const QString&, QWidget* = 0, const int = All, const QString& = QString::null );
+  QDS_RadioBox( const QString&, QWidget* = 0, const int = Control, const QString& = QString::null );
   virtual ~QDS_RadioBox();
 
   int                        count( bool = false ) const;

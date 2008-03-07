@@ -25,14 +25,19 @@
 #include <qobject.h>
 #include <qwidget.h>
 
+class QLabel;
+class QString;
 class QAction;
+class QIconSet;
 class SUIT_Desktop;
 class SUIT_Convertor;
 class SUIT_ViewModel;
 class SUIT_ResourceMgr;
-class QString;
-class QIconSet;
-class QLabel;
+
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*! \class QObject
  * \brief For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
  */
@@ -58,7 +63,7 @@ public:
 
   /*! Returns FALSE if application can not be closed (because of non saved data for example). 
       This method called by SUIT_Session whin closing of application was requested. */
-  virtual bool          isPossibleToClose();
+  virtual bool          isPossibleToClose( bool& );
 
   /*! Performs some finalization of life cycle of this application.
       For instance, the application can force its documents(s) to close. */
@@ -107,6 +112,14 @@ public:
 signals:
   void                  applicationClosed( SUIT_Application* );
   void                  activated( SUIT_Application* );
+  void                  infoChanged( QString );
+
+public slots:
+  virtual void          updateCommandsStatus();
+  virtual void          onHelpContextModule( const QString&, const QString& );
+
+private slots:
+  void                  onInfoClear();
 
 protected:
   SUIT_Application*     startApplication( int, char** ) const;
@@ -170,5 +183,9 @@ extern "C"
 }
 
 #define APP_CREATE_NAME "createApplication"
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

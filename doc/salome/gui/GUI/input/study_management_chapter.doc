@@ -1,0 +1,15 @@
+/*!
+
+\page study_management_page Study management
+
+<ul>
+<li>\subpage creating_new_study_page</li>
+<li>\subpage opening_studies_page</li>
+<li>\subpage saving_and_closing_studies_page</li>
+<li>\subpage editing_studies_page</li>
+<li>\subpage displaying_studies_page</li>
+<li>\subpage working_with_python_scripts_page</li>
+<li>\subpage setting_study_properties_page</li>
+</ul>
+
+*/

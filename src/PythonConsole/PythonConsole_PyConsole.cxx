@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
+#include <Python.h>
 #include "PythonConsole_PyConsole.h"
 #include "PythonConsole_PyEditor.h"
 #include "PyInterp_base.h"
@@ -61,6 +63,16 @@ void PythonConsole::exec( const QString& command )
 {
   if ( myEditor )
     myEditor->exec( command );
+}
+
+/*!
+  Blocks execution of main application until command is executed
+  \param command - string with command and arguments
+*/
+void PythonConsole::execAndWait( const QString& command )
+{
+  if ( myEditor )
+    myEditor->execAndWait( command );
 }
 
 /*!

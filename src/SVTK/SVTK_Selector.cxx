@@ -35,6 +35,27 @@
 #include <TColStd_IndexedMapOfInteger.hxx>
 
 #include <vtkCallbackCommand.h>
+#include <vtkActorCollection.h>
+#include <vtkCellPicker.h>
+
+
+/*!
+  Find first SALOME_Actor from the end of actors collection
+*/
+inline
+SALOME_Actor* 
+GetLastSALOMEActor(vtkActorCollection* theCollection)
+{
+  if (theCollection) {
+    for (int i = theCollection->GetNumberOfItems() - 1; i >= 0; i--) {
+      if (SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(theCollection->GetItemAsObject(i)))
+	if (anActor->hasIO())
+	  return anActor;
+    }
+  }
+  return NULL;
+}
+
 
 /*!
   \return new SVTK_Selector
@@ -50,9 +71,14 @@ SVTK_Selector
   Default constructor
 */
 SVTK_SelectorDef
-::SVTK_SelectorDef()
+::SVTK_SelectorDef():
+  myPicker(vtkPicker::New()),
+  myCellPicker(vtkCellPicker::New())
 {
   mySelectionMode = ActorSelection;
+
+  myPicker->Delete();
+  myCellPicker->Delete();
 }
 
 /*!
@@ -280,16 +306,13 @@ SVTK_SelectorDef
   TMapIOSubIndex::const_iterator anIter = myMapIOSubIndex.find(theIO);
   if(anIter != myMapIOSubIndex.end()){
     const TColStd_IndexedMapOfInteger& aMapIndex = anIter->second.myMap;
-    return aMapIndex.Contains(theIndex);
+    return aMapIndex.Contains( theIndex ) == Standard_True;
   }
 
   return false;
 }
 
-static 
-bool
-removeIndex(TColStd_IndexedMapOfInteger& theMapIndex,
-	    const int theIndex)
+static bool removeIndex(TColStd_IndexedMapOfInteger& theMapIndex, const int theIndex)
 {
   int anId = theMapIndex.FindIndex(theIndex); // i==0 if Index is not in the MapIndex
   if(anId){
@@ -308,7 +331,7 @@ removeIndex(TColStd_IndexedMapOfInteger& theMapIndex,
       theMapIndex = aNewMap;
     }
   }
-  return anId;
+  return anId != 0;
 }
 
 /*!
@@ -402,18 +425,18 @@ SVTK_SelectorDef
   }
   TColStd_IndexedMapOfInteger& aMapIndex = anIter->second.myMap;
 
-  bool anIsConatains = aMapIndex.Contains(theIndex);
-  if(anIsConatains)
-    removeIndex(aMapIndex,theIndex);
+  bool anIsConatains = aMapIndex.Contains( theIndex ) == Standard_True;
+  if ( anIsConatains )
+    removeIndex( aMapIndex, theIndex );
   
-  if(!theIsModeShift)
+  if ( !theIsModeShift )
     aMapIndex.Clear();
   
-  if(!anIsConatains)
+  if ( !anIsConatains )
     aMapIndex.Add( theIndex );
 
-  if( aMapIndex.IsEmpty())
-    myMapIOSubIndex.erase(theIO);
+  if ( aMapIndex.IsEmpty() )
+    myMapIOSubIndex.erase( theIO );
 
   return false;
 }
@@ -518,3 +541,34 @@ SVTK_SelectorDef
   return Handle(VTKViewer_Filter)();
 }
 
+SALOME_Actor*
+SVTK_SelectorDef
+::Pick(const SVTK_SelectionEvent* theEvent, vtkRenderer* theRenderer) const
+{
+  myCellPicker->Pick(theEvent->myX,
+		     theEvent->myY, 
+		     0.0,
+		     theRenderer);
+  
+  vtkActorCollection* aListActors = myCellPicker->GetActors();
+  SALOME_Actor* anActor = GetLastSALOMEActor(aListActors);
+  
+  if (! anActor) {
+    myPicker->Pick(theEvent->myX,
+		   theEvent->myY, 
+		   0.0,
+		   theRenderer);
+    aListActors = myPicker->GetActors();
+    anActor = GetLastSALOMEActor(aListActors);
+  }
+  
+  return anActor;
+}
+
+void
+SVTK_SelectorDef
+::SetTolerance(const double& theTolerance) 
+{
+  myPicker->SetTolerance(theTolerance); 	
+  myCellPicker->SetTolerance(theTolerance);
+}

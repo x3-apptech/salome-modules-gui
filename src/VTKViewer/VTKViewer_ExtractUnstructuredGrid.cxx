@@ -34,6 +34,8 @@
 #include <vtkCellArray.h>
 #include <vtkIdList.h>
 #include <vtkCell.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
 
 using namespace std;
 
@@ -79,9 +81,13 @@ void VTKViewer_ExtractUnstructuredGrid::SetStoreMapping(int theStoreMapping){
   this->Modified();
 }
 
-vtkIdType VTKViewer_ExtractUnstructuredGrid::GetInputId(int theOutId) const{
-  if(myCellIds.empty() && myCellTypes.empty()) return theOutId;
-  if(myOut2InId.empty() || theOutId > myOut2InId.size()) return -1;
+vtkIdType VTKViewer_ExtractUnstructuredGrid::GetInputId(int theOutId) const
+{
+  if ( myCellIds.empty() && myCellTypes.empty() )
+    return theOutId;
+
+  if ( myOut2InId.empty() || theOutId > (int)myOut2InId.size() )
+    return -1;
 #if defined __GNUC_2__
   return myOut2InId[theOutId];
 #else
@@ -142,9 +148,29 @@ inline void InsertPointCell(vtkCellArray *theConnectivity,
   }
 }
 
-void VTKViewer_ExtractUnstructuredGrid::Execute(){
+
+// int VTKViewer_ExtractUnstructuredGrid::RequestData(
+//   vtkInformation *vtkNotUsed(request),
+//   vtkInformationVector **inputVector,
+//   vtkInformationVector *outputVector)
+void VTKViewer_ExtractUnstructuredGrid::Execute()
+{
+  /*
+  not ported yet to the new executive-based pipeline architecture.
+
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkUnstructuredGrid *anInput = vtkUnstructuredGrid::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid *anOutput = vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  */
   vtkUnstructuredGrid *anInput = this->GetInput();
   vtkUnstructuredGrid *anOutput = this->GetOutput();
+  
   myOut2InId.clear();  myIn2OutId.clear();
 
 /*  if(MYDEBUG){
@@ -344,4 +370,5 @@ void VTKViewer_ExtractUnstructuredGrid::Execute(){
       MESSAGE("Execute - myIn2OutId.size() = "<<myIn2OutId.size());
     }
   }*/
+//  return 1;
 }

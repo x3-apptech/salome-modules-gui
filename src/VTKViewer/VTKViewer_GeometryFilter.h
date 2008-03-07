@@ -24,6 +24,11 @@
 #include <vtkGeometryFilter.h>
 
 #include <vector>
+
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*! \brief This class used same as vtkGeometryFilter. See documentation on VTK for more information.
  */
 class VTKVIEWER_EXPORT VTKViewer_GeometryFilter : public vtkGeometryFilter 
@@ -87,14 +92,15 @@ protected:
    * \brief Destructor.
    */
   ~VTKViewer_GeometryFilter();
-  /*! \fn void Execute();
-   * \brief Filter culculation method.
-   */
-  void Execute();
+
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  //special cases for performance
+  
   /*! \fn void UnstructuredGridExecute();
    * \brief Filter culculation method for data object type is VTK_UNSTRUCTURED_GRID.
    */
-  void UnstructuredGridExecute();
+  int UnstructuredGridExecute (vtkDataSet *, vtkPolyData *, vtkInformation *);
     
 private:
   typedef std::vector<vtkIdType> TVectorId;
@@ -105,5 +111,9 @@ private:
   int       myStoreMapping;
   int       myIsWireframeMode;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

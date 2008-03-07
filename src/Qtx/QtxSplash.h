@@ -66,6 +66,9 @@ public:
     void              setTextAlignment( const int );
     int               textAlignment() const;
 
+    void              setMargin( const int );
+    int               margin() const;
+
     void              setTextColor( const QColor& );
     QColor            textColor() const;
     void              setTextColors( const QColor&, const QColor& = QColor() );
@@ -109,6 +112,7 @@ private:
     QColor            myEndColor;
     int               myGradientType;
     int               myError;
+    int               myMargin;
 };
 
 #endif

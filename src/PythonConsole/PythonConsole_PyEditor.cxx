@@ -30,12 +30,15 @@
 #include <PyInterp_Dispatcher.h>
 
 #include <SUIT_Tools.h>
+#include <SUIT_Session.h>
 
 #include <qmap.h>
 #include <qclipboard.h>
 #include <qdragobject.h>
 #include <qapplication.h>
 #include <qpopupmenu.h>
+#include <qfontmetrics.h>
+#include <iostream>
 
 using namespace std;
 
@@ -51,12 +54,13 @@ enum { IdCopy, IdPaste, IdClear, IdSelectAll };
 
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
-#define PROMPT_SIZE _currentPrompt.length()
+
+#define PROMPT_SIZE (int)_currentPrompt.length()
 
 class ExecCommand : public PyInterp_LockRequest
 {
 public:
-  ExecCommand(PyInterp_base* theInterp, const char* theCommand,
+  ExecCommand(PyInterp_base* theInterp, const QString& theCommand,
               PythonConsole_PyEditor* theListener, bool sync = false)
     : PyInterp_LockRequest( theInterp, theListener, sync ),
       myCommand( theCommand ), myState( PyInterp_Event::OK )
@@ -64,20 +68,17 @@ public:
 
 protected:
   virtual void execute(){
-    if(myCommand != ""){
+    if( !myCommand.stripWhiteSpace().isEmpty() ) {
 //      if(MYDEBUG) MESSAGE("*** ExecCommand::execute() started");
+      SUIT_Session::SetPythonExecuted(true); // disable GUI user actions
       int ret = getInterp()->run( myCommand.latin1() );
+      SUIT_Session::SetPythonExecuted(false); // enable GUI user actions
 //      if(MYDEBUG) MESSAGE("ExecCommand::execute() - myInterp = "<<getInterp()<<"; myCommand = '"<<myCommand.latin1()<<"' - "<<ret);
-      if(ret < 0)
+      if( ret < 0 )
 	myState = PyInterp_Event::ERROR;
-      else if(ret > 0)
+      else if( ret > 0 )
 	myState = PyInterp_Event::INCOMPLETE;
-      myError  = getInterp()->getverr().c_str();
-      myOutput = getInterp()->getvout().c_str();
 //      if(MYDEBUG) MESSAGE("*** ExecCommand::execute() finished");
-    }else{
-      myError = "";
-      myOutput = "";
     }
   }
 
@@ -86,22 +87,34 @@ protected:
     return new PyInterp_Event( myState, (PyInterp_Request*)this );    
   }
 
-public:
-  QString myError;
-  QString myOutput;
-
 private:
   QString myCommand;
   int myState;
 };
 
+#define PRINT_EVENT 65432
+
+class PrintEvent : public QCustomEvent
+{
+public:
+  PrintEvent( const char* c ) : QCustomEvent( PRINT_EVENT ), myText( c ) {}
+  QString text() const { return myText; }
+private:
+  QString myText;
+};
+
+void staticCallback( void* data, char* c )
+{
+  QApplication::postEvent( (PythonConsole_PyEditor*)data, new PrintEvent( c ) ); 
+}
 
 /*!
     Constructor
 */
 PythonConsole_PyEditor::PythonConsole_PyEditor(PyInterp_base* theInterp, QWidget *theParent, const char* theName): 
   QTextEdit(theParent,theName),
-  myInterp( 0 )
+  myInterp( 0 ),
+  myIsInLoop( false )
 {
   QString fntSet( "" );
   QFont aFont = SUIT_Tools::stringToFont( fntSet );
@@ -110,7 +123,11 @@ PythonConsole_PyEditor::PythonConsole_PyEditor(PyInterp_base* theInterp, QWidget
   setUndoRedoEnabled( false );
 
   _currentPrompt = READY_PROMPT;
-  setWordWrap(NoWrap);
+  setWordWrap( WidgetWidth );
+  setWrapPolicy( Anywhere );
+
+  theInterp->setvoutcb( staticCallback, this );
+  theInterp->setverrcb( staticCallback, this );
 
   connect(this,SIGNAL(returnPressed()),this,SLOT(handleReturn()) );
 
@@ -133,7 +150,43 @@ void PythonConsole_PyEditor::setText(QString s)
 {
   int para=paragraphs()-1;
   int col=paragraphLength(para);
-  insertAt(s,para,col);
+
+  // Limit length of the string because exception may occur if string too long (NPAL16033)
+  // Exception occurs if  one of paragraphs of the input string "s" is too long.  Now long 
+  // paragraph is limited with threshold numbers of characters and finished by " ..." string. 
+  // Note that first paragraph of the string is checked only because it is enough for bug fixing. 
+  // If it will be insufficient for other cases then more complicated check should be implemented.
+  // At present it is not done because of possible performance problem.
+
+  static int threshold = 50000;
+  long strLength = s.length();
+  if ( col + strLength <= threshold || s.find( '\n' ) < threshold )
+    insertAt(s,para,col);
+  else
+  {
+    if ( col >= threshold )
+    {
+      if ( text( para ).right( 5 )  != QString( " ...\n" ) )
+        insertAt(" ...\n",para,col);
+    }
+    else
+    {
+      long n = threshold - col; 
+      s.truncate( n );
+      if ( n >= 5 )
+      {
+        s.at( n - 5 ) = QChar( ' ' );
+        s.at( n - 4 ) = QChar( '.' );
+        s.at( n - 3 ) = QChar( '.' );
+        s.at( n - 2 ) = QChar( '.' );
+        s.at( n - 1 ) = QChar( '\n' );
+      }
+      else 
+        s = " ...\n";
+      insertAt(s,para,col);
+    }
+  }
+
   int n = paragraphs()-1;  
   setCursorPosition( n, paragraphLength(n)); 
 }
@@ -145,16 +198,32 @@ void PythonConsole_PyEditor::setText(QString s)
 void PythonConsole_PyEditor::exec( const QString& command )
 {
   // Some interactive command is being executed in this editor -> do nothing
-  if ( isReadOnly() )
+  if ( isReadOnly() ) {
+    myQueue.push_back( command );
     return;
+  }
   int para=paragraphs()-1;
   removeParagraph( para );
   _currentPrompt = READY_PROMPT;
   _buf.truncate(0);
   _isInHistory = false;
-  setText( "\n" + _currentPrompt); 
-  setText( command + "\n" ); 
-  handleReturn();
+  setText( "\n" + _currentPrompt);
+  // PAL15963 (Problem with option -u (--execute) of runSalome).
+  // Let events creating a study end before script execution starts
+  setText( command /*+ "\n"*/ );
+  //handleReturn();
+  qApp->postEvent( this, new QKeyEvent(QEvent::KeyPress,Key_Return,13,Qt::NoButton ));
+}
+
+void PythonConsole_PyEditor::execAndWait( const QString& command )
+{
+  if( myIsInLoop )
+    return;
+
+  myIsInLoop = true;
+  exec( command );
+  qApp->enter_loop();
+  myIsInLoop = false;
 }
 
 /*!
@@ -170,7 +239,7 @@ void PythonConsole_PyEditor::handleReturn()
   
   // Post a request to execute Python command
   // Editor will be informed via a custom event that execution has been completed
-  PyInterp_Dispatcher::Get()->Exec( new ExecCommand( myInterp, _buf.latin1(), this ) );
+  PyInterp_Dispatcher::Get()->Exec( new ExecCommand( myInterp, _buf, this ) );
 }
 
 /*!
@@ -212,13 +281,15 @@ void PythonConsole_PyEditor::contentsMouseReleaseEvent( QMouseEvent* event )
       int endLine = paragraphs() -1;
       col = charAt( event->pos(), &par );
       if ( col >= 0 && par >= 0 ) {
-	if ( par != endLine || col < PROMPT_SIZE )
-	  setCursorPosition( endLine, paragraphLength( endLine ) );
+	// PAL12896 -->
+	if ( par != endLine || col < PROMPT_SIZE ) {
+	  QPoint aPos = paragraphRect(endLine).bottomRight();
+	  QMouseEvent* e = new QMouseEvent(event->type(),aPos,event->button(),event->state());
+	  QTextEdit::contentsMouseReleaseEvent(e);
+	}
 	else
-	  setCursorPosition( par, col );
-	QApplication::clipboard()->setSelectionMode(TRUE);
-	paste();
-	QApplication::clipboard()->setSelectionMode(FALSE);
+	  QTextEdit::contentsMouseReleaseEvent(event);
+	// PAL12896 <--
       }
     }
   }
@@ -357,21 +428,22 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
       else if ( ctrlPressed ) {
 	moveCursor( QTextEdit::MoveUp, false );
       }
-      else { 
-	QString histLine = _currentPrompt;
-	if ( ! _isInHistory ) {
-	  _isInHistory = true;
-	  _currentCommand = text( endLine ).remove( 0, PROMPT_SIZE );
-	  _currentCommand.truncate( _currentCommand.length() - 1 );
-	}
-	QString previousCommand = myInterp->getPrevious();
-	if ( previousCommand.compare( BEGIN_HISTORY_PY ) != 0 )
-  {
-    removeParagraph( endLine );
-	  histLine.append( previousCommand );
-    append( histLine );
-	}
-	moveCursor( QTextEdit::MoveEnd, false );
+      else {
+        QString histLine = _currentPrompt;
+        if ( ! _isInHistory ) {
+          _isInHistory = true;
+          _currentCommand = text( endLine ).remove( 0, PROMPT_SIZE );
+          _currentCommand.truncate( _currentCommand.length() - 1 );
+        }
+        QString previousCommand = myInterp->getPrevious();
+        if ( previousCommand.compare( BEGIN_HISTORY_PY ) != 0 )
+        {
+          removeParagraph( endLine );
+          histLine.append( previousCommand );
+          append( histLine );
+        }
+        moveCursor( QTextEdit::MoveEnd, false );
+        scrollViewAfterHistoryUsing( previousCommand ); // NPAL16035
       }
       break;
     }
@@ -409,6 +481,7 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
 	  }
 	}
 	moveCursor( QTextEdit::MoveEnd, false );
+        scrollViewAfterHistoryUsing( nextCommand ); // NPAL16035
       }
       break;
     }
@@ -598,9 +671,9 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
 	if ( ctrlPressed && !hasSelectedText() ) {
 	  QString txt = text( curLine );
 	  int ind = curCol;
-	  while ( ind < txt.length()-1 && txt[ ind ] == ' ' ) ind++;
+	  while ( ind < (int)( txt.length() - 1 ) && txt[ind] == ' ' ) ind++;
 	  ind = txt.find( ' ', ind );
-	  while ( ind < txt.length()-1 && txt[ ind ] == ' ' ) ind++;
+	  while ( ind < (int)( txt.length() - 1 ) && txt[ ind ] == ' ' ) ind++;
 	  if ( ind > PROMPT_SIZE-1 ) {
 	    setSelection( curLine, curCol, curLine, ind );
 	    removeSelectedText();
@@ -641,32 +714,39 @@ void PythonConsole_PyEditor::keyPressEvent( QKeyEvent* e )
 void PythonConsole_PyEditor::customEvent(QCustomEvent* e)
 {
   switch( e->type() ) {
+  case PRINT_EVENT:
+    {
+      PrintEvent* pe=(PrintEvent*)e;
+      setText( pe->text() );
+      return;
+    }
   case PyInterp_Event::OK:
   case PyInterp_Event::ERROR:
     {
-      PyInterp_Event* pe = dynamic_cast<PyInterp_Event*>( e );
-      if ( pe ){
-	ExecCommand* ec = dynamic_cast<ExecCommand*>( pe->GetRequest() );
-	if ( ec ){
-	  // The next line has appeared dangerous in case if
-	  // Python command execution has produced very large output.
-	  // A more clever approach is needed...
-	  setText(ec->myOutput);
-	  setText(ec->myError);
-	}
-      }
       _buf.truncate(0);
       _currentPrompt = READY_PROMPT;
+      QString txt = text( paragraphs()-1 );
+      txt.truncate( txt.length()-1 );
+      if ( !txt.isEmpty() )
+	setText("\n");
       setText(_currentPrompt);
       viewport()->unsetCursor();
+      if( myIsInLoop )
+	qApp->exit_loop();
       break;
     }
   case PyInterp_Event::INCOMPLETE:
     {
       _buf.append("\n");
       _currentPrompt = DOTS_PROMPT;
+      QString txt = text( paragraphs()-1 );
+      txt.truncate( txt.length()-1 );
+      if ( !txt.isEmpty() )
+	setText("\n");
       setText(_currentPrompt);
       viewport()->unsetCursor();
+      if( myIsInLoop )
+	qApp->exit_loop();
       break;
     }
   default:
@@ -675,6 +755,12 @@ void PythonConsole_PyEditor::customEvent(QCustomEvent* e)
 
   setReadOnly( false );
   _isInHistory = false;
+
+  if ( e->type() == PyInterp_Event::OK && myQueue.count() > 0 ) {
+    QString nextcmd = myQueue[0];
+    myQueue.pop_front();
+    exec( nextcmd );
+  }
 }
 
 /*!
@@ -694,6 +780,8 @@ void PythonConsole_PyEditor::onPyInterpChanged( PyInterp_base* interp )
       _isInHistory = false;
       setText(_currentPrompt);
       viewport()->unsetCursor();
+      if( myIsInLoop )
+	qApp->exit_loop();
     }
     else {
       clear();
@@ -711,7 +799,7 @@ QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
   QPopupMenu* popup = QTextEdit::createPopupMenu( pos );
 
   QValueList<int> ids;
-  for ( int i = 0; popup && i < popup->count(); i++ )
+  for ( int i = 0; popup && i < (int)popup->count(); i++ )
   {
     if ( !popup->isItemEnabled( popup->idAt( i ) ) )
       ids.append( popup->idAt( i ) );
@@ -729,4 +817,37 @@ QPopupMenu* PythonConsole_PyEditor::createPopupMenu( const QPoint& pos )
   }
 
   return popup;
+}
+
+/*!
+  Scrolls view after use of history (Up/Down keys)to the left position if length
+  of command less than visible width of the view
+*/
+void PythonConsole_PyEditor::scrollViewAfterHistoryUsing( const QString& command )
+{
+  if ( !command.isEmpty() )
+  {
+    if ( command == QString( BEGIN_HISTORY_PY ) )
+    {
+      ensureCursorVisible();
+      return;
+    }
+
+    QFontMetrics aFM( currentFont() );
+    int aCommandLength = aFM.width( command ) + aFM.width( READY_PROMPT ) + 5;
+    int aVisibleWidth = visibleWidth();
+    QScrollBar* aBar = horizontalScrollBar();
+    if ( aBar )
+    {
+      if ( aCommandLength <= aVisibleWidth )
+        aBar->setValue( aBar->minValue() );
+      else  if ( aVisibleWidth > 0 )
+      {
+        double aRatio = aCommandLength / contentsWidth();
+        double aPos = ( aBar->maxValue() - aBar->minValue() ) * aRatio;
+        aBar->setValue( (int)aPos );
+        ensureCursorVisible();
+      }
+    }
+  }
 }

@@ -521,12 +521,8 @@ void SOCC_Viewer::EraseAll( const bool forced )
     //  }
     //}
   }
-
-  // display trihedron if necessary
-  if ( isTrihedronDisplayed )
-    getAISContext()->Display( getTrihedron() );
-  else
-    Repaint();
+  
+  Repaint();
 }
 
 /*!

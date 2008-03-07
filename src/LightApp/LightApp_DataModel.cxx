@@ -110,16 +110,29 @@ void LightApp_DataModel::update( LightApp_DataObject*, LightApp_Study* )
 {
   LightApp_ModuleObject* modelRoot = dynamic_cast<LightApp_ModuleObject*>( root() );
   DataObjectList ch;
+  QMap<SUIT_DataObject*,int> aMap;
   if( modelRoot )
   {
     ch = modelRoot->children();
     for ( DataObjectListIterator it( ch ); it.current(); ++it )
       it.current()->setParent( 0 );
   }
+
   build();
+
+  modelRoot = dynamic_cast<LightApp_ModuleObject*>( root() );
+  if( modelRoot )
+  {
+    DataObjectList new_ch = modelRoot->children();
+    for ( DataObjectListIterator it1( new_ch ); it1.current(); ++it1 )
+      aMap.insert( it1.current(), 0 );
+  }
+
   updateWidgets();
+
   for( DataObjectListIterator it( ch ); it.current(); ++it )
-    delete it.current();
+    if( !aMap.contains( it.current() ) )
+      delete it.current();
 }
 
 /*!

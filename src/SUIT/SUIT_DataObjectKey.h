@@ -29,7 +29,7 @@ class SUIT_EXPORT SUIT_DataObjectKey
 {
 public:
   SUIT_DataObjectKey();
-  ~SUIT_DataObjectKey();
+  virtual ~SUIT_DataObjectKey();
 
   virtual bool isLess( const SUIT_DataObjectKey* ) const = 0;
   virtual bool isEqual( const SUIT_DataObjectKey* ) const = 0;

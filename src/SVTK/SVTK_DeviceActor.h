@@ -39,13 +39,13 @@
 
 class VTKViewer_Transform;
 class VTKViewer_TransformFilter;
-class VTKViewer_PassThroughFilter;
 class VTKViewer_GeometryFilter;
 
 class vtkCell;
 class vtkDataSet;
 class vtkShrinkFilter;
 class vtkDataSetMapper;
+class vtkPassThroughFilter;
 
 namespace SVTK
 {
@@ -59,6 +59,9 @@ namespace SVTK
   }
 }
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
 
 class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 {
@@ -172,6 +175,8 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   void
   Render(vtkRenderer *, vtkMapper *);
 
+  vtkDataSetMapper* GetDataSetMapper();
+
  protected:
   SVTK::Representation::Type myRepresentation;
   vtkProperty *myProperty;
@@ -183,7 +188,7 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 
   VTKViewer_GeometryFilter *myGeomFilter;
   VTKViewer_TransformFilter *myTransformFilter;
-  std::vector<VTKViewer_PassThroughFilter*> myPassFilter;
+  std::vector<vtkPassThroughFilter*> myPassFilter;
   vtkShrinkFilter* myShrinkFilter;
   vtkDataSetMapper* myMapper;
 
@@ -208,5 +213,8 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 
 };
 
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif //SVTK_DEVICE_ACTOR_H

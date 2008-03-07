@@ -76,15 +76,18 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupPointLayout->setMargin( 11 );
   
   // Controls
-  const double min = -1e+06;
-  const double max =  1e+06;
+  const double min = -1e+16;
+  const double max =  1e+16;
   const double step = 5;
+  const int precision = -6; // PAL12789. Minus is for using 'g' double->string conversion specifier,
+  //                          see QtxDblSpinBox::mapValueToText( double v )
 
   TextLabelX = new QLabel( GroupPoint, "TextLabelX" );
   TextLabelX->setText( tr("X:") );
   GroupPointLayout->addWidget( TextLabelX, 0, 0 );
   
   SpinBox_X = new QtxDblSpinBox( min, max, step, GroupPoint, "SpinBox_X" );
+  SpinBox_X->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_X, 0, 1 );
 
   TextLabelY = new QLabel( GroupPoint, "TextLabelY" );
@@ -92,6 +95,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupPointLayout->addWidget( TextLabelY, 0, 2 );
 
   SpinBox_Y = new QtxDblSpinBox( min, max, step, GroupPoint, "SpinBox_Y" );
+  SpinBox_Y->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Y, 0, 3 );
 
   TextLabelZ = new QLabel( GroupPoint, "TextLabelZ" );
@@ -99,6 +103,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupPointLayout->addWidget( TextLabelZ, 0, 4 );
 
   SpinBox_Z = new QtxDblSpinBox( min, max, step, GroupPoint, "SpinBox_Z" );
+  SpinBox_Z->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Z, 0, 5 );
 
   resetButton  = new QPushButton( GroupPoint, "resetButton" );
@@ -122,6 +127,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupDirectionLayout->addWidget( TextLabelDx, 0, 0 );
   
   SpinBox_Dx = new QtxDblSpinBox( min, max, step, GroupDirection, "SpinBox_Dx" );
+  SpinBox_Dx->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dx, 0, 1 );
 
   TextLabelDy = new QLabel( GroupDirection, "TextLabelDy" );
@@ -129,6 +135,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupDirectionLayout->addWidget( TextLabelDy, 0, 2 );
   
   SpinBox_Dy = new QtxDblSpinBox( min, max, step, GroupDirection, "SpinBox_Dy" );
+  SpinBox_Dy->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dy, 0, 3 );
 
   TextLabelDz = new QLabel( GroupDirection, "TextLabelDz" );
@@ -136,6 +143,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   GroupDirectionLayout->addWidget( TextLabelDz, 0, 4 );
   
   SpinBox_Dz = new QtxDblSpinBox( min, max, step, GroupDirection, "SpinBox_Dz" );
+  SpinBox_Dz->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dz, 0, 5 );
 
   invertButton  = new QPushButton( GroupDirection, "invertButton" );
@@ -212,6 +220,9 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   connect( buttonApply, SIGNAL( clicked() ), this, SLOT( ClickOnApply() ) );
   
   myBusy = false;
+
+  connect(view, SIGNAL(Show( QShowEvent * )), this, SLOT(onViewShow()));
+  connect(view, SIGNAL(Hide( QHideEvent * )), this, SLOT(onViewHide()));
 }
 
 /*!
@@ -551,3 +562,17 @@ void OCCViewer_ClippingDlg::ReserveClippingPlane()
 	myClippingPlane = aView3d->ActivePlane();
     }
 }
+
+void OCCViewer_ClippingDlg::onViewShow()
+{
+  if(myAction->isOn())
+    show();
+  else
+    hide();
+}
+
+void OCCViewer_ClippingDlg::onViewHide()
+{
+  hide();
+}
+

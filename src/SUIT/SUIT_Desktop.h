@@ -59,11 +59,15 @@ public:
   void                     logoRemove( const QString& );
   void                     logoInsert( const QString&, const QPixmap&, const int = -1 );
 
+  void                     emitActivated();
+  void                     emitMessage( const QString& );
+
 signals:
   void                     activated();
   void                     deactivated();
   void                     windowActivated( SUIT_ViewWindow* );
   void                     closing( SUIT_Desktop*, QCloseEvent* );
+  void                     message( const QString& );
 
 protected:
   virtual bool             event( QEvent* );

@@ -60,6 +60,17 @@ public:
   void             DisplayAll();
   void             EraseAll();
   bool             IsInCurrentView( const char *Entry );
+  void             UpdateView();
+
+  /* view operations */
+  void             FitAll();
+  void             ResetView();
+  void             ViewTop();
+  void             ViewBottom();
+  void             ViewLeft();
+  void             ViewRight();
+  void             ViewFront();
+  void             ViewBack();
 
   /* get component name/username */
   const char*      getComponentName( const char* ComponentUserName );

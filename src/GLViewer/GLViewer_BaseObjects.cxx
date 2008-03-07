@@ -746,7 +746,7 @@ QByteArray GLViewer_MarkerSet::getByteCopy()
         aResult[i] = *aPointer;
         
     
-    for( ; i < aResult.size(); i++ )
+    for ( ; i < (int)aResult.size(); i++ )
         aResult[i] = aObject[i - anISize - 2*aFSize*myNumber - aFSize];
 
     return aResult;
@@ -1284,7 +1284,7 @@ QByteArray GLViewer_Polyline::getByteCopy()
     for( ; i < anISize + 2*aFSize*myNumber + 2*aBSize; i++, aPointer++ )
         aResult[i] = *aPointer;
 
-    for( ; i < aResult.size(); i++ )
+    for ( ; i < (int)aResult.size(); i++ )
         aResult[i] = aObject[i - anISize - 2*aFSize*myNumber - 2*aBSize];
 
     return aResult;

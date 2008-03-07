@@ -25,6 +25,10 @@
 
 #include <vector>
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*!Shrink cells composing an arbitrary data set.
  *\warning It is possible to turn cells inside out or cause self intersection in special cases.
  */
@@ -47,7 +51,7 @@ protected:
   VTKViewer_ShrinkFilter();
   ~VTKViewer_ShrinkFilter();
   
-  void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   /*!Not implemented.*/
   void UnstructuredGridExecute();
     
@@ -56,5 +60,9 @@ private:
   typedef std::vector<vtkIdType> TVectorId;
   TVectorId myVTK2ObjIds;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

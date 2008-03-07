@@ -79,23 +79,23 @@ SOCC_ViewWindow
     myViewPort->fitAll();
     break;
   case SUIT_Accel::RotateLeft  : 
-    myViewPort->startRotation( cx, cy );
-    myViewPort->rotate( cx - inc, cy );
+    myViewPort->startRotation( cx, cy, myCurrPointType, mySelectedPoint );
+    myViewPort->rotate( cx - inc, cy, myCurrPointType, mySelectedPoint );
     myViewPort->endRotation();
     break;
   case SUIT_Accel::RotateRight :  
-    myViewPort->startRotation( cx, cy );
-    myViewPort->rotate( cx + inc, cy );
+    myViewPort->startRotation( cx, cy, myCurrPointType, mySelectedPoint );
+    myViewPort->rotate( cx + inc, cy, myCurrPointType, mySelectedPoint );
     myViewPort->endRotation();
     break;
   case SUIT_Accel::RotateUp    :  
-    myViewPort->startRotation( cx, cy );
-    myViewPort->rotate( cx, cy - inc );
+    myViewPort->startRotation( cx, cy, myCurrPointType, mySelectedPoint );
+    myViewPort->rotate( cx, cy - inc, myCurrPointType, mySelectedPoint );
     myViewPort->endRotation();
     break;
   case SUIT_Accel::RotateDown  :  
-    myViewPort->startRotation( cx, cy );
-    myViewPort->rotate( cx, cy + inc );
+    myViewPort->startRotation( cx, cy, myCurrPointType, mySelectedPoint );
+    myViewPort->rotate( cx, cy + inc, myCurrPointType, mySelectedPoint );
     myViewPort->endRotation();
     break;
   }

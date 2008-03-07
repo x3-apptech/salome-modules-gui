@@ -16,6 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_DataOwner.h"
 
 #ifndef WNT
@@ -36,18 +37,35 @@ SUIT_DataOwner::~SUIT_DataOwner()
 {
 }
 
-/*! operator== : compares two owners*/
+/*! Operator == compares two owners*/
 bool operator==( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
 {
   if ( !p1.isNull() && !p2.isNull() )
-    return (p1->isEqual( *p2 ) && p2->isEqual( *p1 ));
+    return (p1->keyString() == p2->keyString());
   return p1.isNull() && p2.isNull();
 }
+
+// *** jfa: The below function has been put here 14.02.2007 from branch BR_Dev_For_4_0
+// *** and also improved for better comparison of DataOwners with DataSubOwners.
+// *** This comment is to be removed after merging with BR_Dev_For_4_0.
+/*! Operator < allows to order suit data owners for map */
+bool operator<( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
+{
+  if ( p1.isNull() && p2.isNull() )
+    return false;
+  else if ( p1.isNull() )
+    return true;
+  else if ( p2.isNull() )
+    return false;
+
+  return (p1->keyString() < p2->keyString());
+}
+// *** end
 
 /*!
   \class SUIT_DataOwnerPtrList 
   implements value list with unique items (uniqueness is 
-  provided by operator==())
+  provided by operator==() and operator<())
 */
 
 /*!
@@ -126,12 +144,12 @@ SUIT_DataOwnerPtrList::SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>
 */
 SUIT_DataOwnerPtrList::iterator SUIT_DataOwnerPtrList::append( const SUIT_DataOwnerPtr& x )
 {
-  if( mySkipEqual && myMap.contains( x ) ) //contains uses SUIT_DataOwnerPtr::operator==
+  if ( mySkipEqual && myMap.contains( x ) ) //contains uses SUIT_DataOwnerPtr::operator==
     return myMap[ x ];
 
   iterator it = QValueList<SUIT_DataOwnerPtr>::append( x );
 
-  if( mySkipEqual )
+   if ( mySkipEqual )
     myMap.insert( x, it );
 
   return it;
@@ -155,12 +173,4 @@ uint SUIT_DataOwnerPtrList::remove(const SUIT_DataOwnerPtr& x )
   if( mySkipEqual && myMap.contains(x) )
     myMap.remove(x);
   return QValueList<SUIT_DataOwnerPtr>::remove( x );
-}
-
-/*!
-  Operator < allows to order suit data owners for map
-*/
-bool operator<( const SUIT_DataOwnerPtr& p1, const SUIT_DataOwnerPtr& p2 )
-{
-  return p1.get()<p2.get();
 }

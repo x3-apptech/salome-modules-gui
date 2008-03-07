@@ -33,13 +33,6 @@ class VTKVIEWER_EXPORT VTKViewer_ViewManager : public SUIT_ViewManager
 public:
   VTKViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* );
   virtual ~VTKViewer_ViewManager();
-
-protected:
-  void setViewName( SUIT_ViewWindow* theView );
-
-private:
-  int               myId;
-  static  int       _VTKViewMgr_Id;
 };
 
 #endif

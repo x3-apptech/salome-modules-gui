@@ -27,7 +27,11 @@
 #include <vector>
 #include <map>
 
-class vtkPoints;
+class vtkPointSet;
+
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
 
 /*! \brief This class used same as vtkAppendFilter. See documentation on VTK for more information.
  */
@@ -48,10 +52,10 @@ public:
   bool DoMappingFlag() const;
 
   void
-  SetPoints(vtkPoints* thePoints);
+  SetSharedPointsDataSet(vtkPointSet* thePointsDataSet);
 
-  vtkPoints*
-  GetPoints();
+  vtkPointSet*
+  GetSharedPointsDataSet();
 
   vtkIdType
   GetPointOutputID(vtkIdType theInputID,
@@ -84,21 +88,26 @@ protected:
    * \brief Destructor.
    */
   ~VTKViewer_AppendFilter();
-  /*! \fn void Execute();
-   * \brief Filter culculation method.
-   */
-  virtual void Execute();
-  //
+
+  // Usual data generation method
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  
   void DoMapping();
 
   void Reset();
 
-  void MakeOutput();
+  int MakeOutput(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   bool myDoMappingFlag;
   TVectorIds myNodeRanges;
   TVectorIds myCellRanges;
-  vtkSmartPointer<vtkPoints> myPoints;
+  vtkSmartPointer<vtkPointSet> mySharedPointsDataSet;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

@@ -36,7 +36,6 @@
 
 #include "VTKViewer_Transform.h"
 #include "VTKViewer_TransformFilter.h"
-#include "VTKViewer_PassThroughFilter.h"
 #include "VTKViewer_GeometryFilter.h"
 #include "SVTK_RectPicker.h"
 
@@ -58,6 +57,7 @@
 
 #include <vtkInteractorStyle.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkPassThroughFilter.h>
 
 #include <TColStd_MapOfInteger.hxx>
 #include <TColStd_IndexedMapOfInteger.hxx>

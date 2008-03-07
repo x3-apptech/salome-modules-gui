@@ -84,6 +84,7 @@ protected slots:
   void   onXGridMinorChecked();
   void   onYGridMinorChecked();
   void   onY2GridMinorChecked();
+  void   onHelp();
 
 private:
   QCheckBox*     myTitleCheck;
@@ -118,6 +119,7 @@ private:
 
   QPushButton*   myOkBtn;
   QPushButton*   myCancelBtn;
+  QPushButton*   myHelpBtn;
   bool           mySecondAxisY;
 };
 

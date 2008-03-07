@@ -285,7 +285,16 @@ QtxDockWindow::~QtxDockWindow()
 void QtxDockWindow::setWidget( QWidget* wid )
 {
   if ( wid )
-    wid->reparent( this, QPoint( 0, 0 ), wid->isVisibleTo( wid->parentWidget() ) );
+  {
+    if ( wid->parentWidget() != this )
+      wid->reparent( this, QPoint( 0, 0 ), wid->isVisibleTo( wid->parentWidget() ) );
+    if ( myWatcher )
+    {
+      setCaption( wid->caption() );
+      if ( wid->icon() )
+        setIcon( *wid->icon() );
+    }
+  }
 
   QDockWindow::setWidget( wid );
 }

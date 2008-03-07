@@ -50,6 +50,16 @@ if test "x$pyqt_uic_ok" == "xno"; then
   fi	
 fi
 if test "x$pyqt_uic_ok" == "xno"; then
+  dnl try in $PATH
+  AC_PATH_PROG(PYUIC, pyuic)
+  if test "x$PYUIC" != x; then
+    PYQTDIR=$PYUIC
+    PYQTDIR=`dirname $PYQTDIR`
+    PYQTDIR=`dirname $PYQTDIR`
+    pyqt_uic_ok=yes
+  fi
+fi
+if test "x$pyqt_uic_ok" == "xno"; then
   dnl try ${SIPDIR}
   if test "x${SIPDIR}" != "x"; then
     if test -d ${SIPDIR} ; then
@@ -106,8 +116,8 @@ if test "x${PYQTDIR}" != "x"; then
     fi
   fi
   if test "x$pyqt_lib_ok" == "xno"; then
-    dnl try {PYQTDIR}/lib
-    if test -d {PYQTDIR}/lib; then
+    dnl try ${PYQTDIR}/lib
+    if test -d ${PYQTDIR}/lib; then
       AC_CHECK_FILE(${PYQTDIR}/lib/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
       if test "x$pyqt_lib_ok" == "xyes"; then
         PYQT_LIBS="-L${PYQTDIR}/lib -lqtcmodule"
@@ -120,8 +130,8 @@ if test "x${PYQTDIR}" != "x"; then
     fi
   fi
   if test "x$pyqt_lib_ok" == "xno"; then
-    dnl try {PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
-    if test -d {PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages; then
+    dnl try ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
+    if test -d ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages; then
       AC_CHECK_FILE(${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
       if test "x$pyqt_lib_ok" == "xyes"; then
         PYQT_LIBS="-L${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
@@ -221,6 +231,17 @@ if test "x$pyqt_sips_ok" == "xno"; then
   fi
 fi
 if test "x$pyqt_sips_ok" == "xno"; then
+  dnl try ${PYQTDIR}/share/sip/qt
+  if test "x${PYQTDIR}" != "x"; then
+    if test -d ${PYQTDIR}/share/sip/qt ; then
+      AC_CHECK_FILE(${PYQTDIR}/share/sip/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
+      if test "x$pyqt_sips_ok" == "xyes"; then
+        PYQT_SIPS="${PYQTDIR}/share/sip/qt"
+      fi
+    fi
+  fi
+fi
+if test "x$pyqt_sips_ok" == "xno"; then
   dnl try ${SIPDIR}/sip
   if test "x${SIPDIR}" != "x"; then
     if test -d ${SIPDIR}/sip ; then
@@ -291,12 +312,16 @@ else
   CXXFLAGS=$CXXFLAGS_old
   LIBS=$LIBS_old
 fi
+# get latest Qt version supported
+QT_VERS=`grep -e "[[[:space:]]]*Qt_[[[:digit:]_]]\+}" ${PYQT_SIPS}/versions.sip | sed -e "s/\(.*\)[[[:space:]]]*\(Qt_[[[:digit:]_]]\+\)}/\2/g"`
+AC_MSG_RESULT(Latest Qt version supported by PyQt is $QT_VERS)
 
 AC_SUBST(PYQT_INCLUDES)
 AC_SUBST(PYQT_LIBS)
 AC_SUBST(PYQT_SIPS)
 AC_SUBST(PYUIC)
 AC_SUBST(PYQT_SIPFLAGS)
+AC_SUBST(QT_VERS)
 
 AC_LANG_RESTORE
 

@@ -1,0 +1,45 @@
+/*!
+
+\page introduction_to_gui_page Introduction to GUI
+
+\b GUI (Graphical User Interface) provides a common shell for all components, which can be integrated into the SALOME platform.
+
+\b GUI component in SALOME platform provides:
+<ul>
+<li>Common desktop environment (\ref salome_desktop_page "SALOME desktop") for all
+components</li>
+<li>Component integration and management: uploading, switching,
+component menus/toolbars handling</li> 
+<li>Study management (creation, saving, loading, editing studies)</li>
+<li>Multi-window management in the framework of one study</li>
+<li>Management of objects created or imported into the SALOME
+application (\ref using_object_browser_page "Object Browser")</li>
+<li>Integrated Python interpreter</li> 
+<li>Output messages window</li>
+<li>Additional tools : \ref using_catalog_generator_page "Catalogue Generator", 
+\ref using_registry_tool_page "Registry tool"</li>
+<li>Standard viewers for data visualization:</li>
+<ul>
+<li>VTK 3d viewer
+<li>OCC 3d viewer
+<li>Gauss Points viewer
+<li>Plot 2d viewer
+<li>Supervision viewer
+</ul>
+</ul>
+
+ 
+
+Since version 3.0.0 SALOME GUI is based on SUIT (Salome User Interface
+Toolkit) that proposes very flexible, powerful and safe mechanisms of
+interaction with SALOME tool components (both CORBA and standalone),
+resources management, viewers and selection handling,
+exception/signals processing, bringing to top multi-desktop
+dockable-windowed user interface which improves the usability of
+SALOME GUI.
+\n All Graphical User Interfaces of standard modules have plug-in
+structure, i.e. each module is placed in a dynamic library which is
+loaded on demand. All modules can create their own menu items, buttons
+in toolbar, windows etc
+
+*/

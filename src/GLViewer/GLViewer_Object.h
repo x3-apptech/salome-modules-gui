@@ -50,7 +50,7 @@ class GLViewer_AspectLine;
 class GLViewer_Group;
 class GLViewer_CoordSystem;
 class GLViewer_Text;
-class GLViewer_Owner;
+//class GLViewer_Owner;
 
 /*! 
  * Class GLViewer_Object
@@ -233,9 +233,9 @@ public:
   virtual bool              translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerCS, GLViewer_CoordSystem* aEMFCS ) = 0;
 #endif
   //!\warning It is for ouv
-  GLViewer_Owner*           owner() const { return myOwner; }
+  SUIT_DataOwner*           owner() const { return myOwner; }
   //!\warning It is for ouv
-  void                      setOwner( GLViewer_Owner* owner ) { myOwner = owner; }
+  void                      setOwner( SUIT_DataOwner* owner ) { myOwner = owner; }
   
   //! Adds object to group theGroup
   void                      setGroup( GLViewer_Group* theGroup );
@@ -297,24 +297,10 @@ protected:
   bool                      myIsVisible;
 
   //!\warning It is for ouv
-  GLViewer_Owner*           myOwner;
+  SUIT_DataOwner*           myOwner;
 
   //! Object Group
   GLViewer_Group*           myGroup;
-};
-
-
-//!\warning It is for ouv
-class GLVIEWER_API GLViewer_Owner : public SUIT_DataOwner
-{
-public:
-  //!\warning It is for ouv
-  GLViewer_Owner() : SUIT_DataOwner() {}
-  //!\warning It is for ouv
-  ~GLViewer_Owner() {}
-
-protected:
-
 };
 
 #ifdef WNT

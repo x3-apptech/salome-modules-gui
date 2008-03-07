@@ -134,7 +134,9 @@ QString SalomeApp_DataObject::text( const int id ) const
 #else
     if ( componentObject() != (SUIT_DataObject*)this )
 #endif
-      txt = value( referencedObject() );
+      txt = value( object() );
+      if ( txt.isEmpty() )
+	txt = value( referencedObject() );
     break;
   case CT_Entry:
     txt = entry( object() );
@@ -186,6 +188,17 @@ QColor SalomeApp_DataObject::color( const ColorRole cr ) const
 	else
 	  clr = QColor( 200, 200, 200 );
       }
+    else if ( myObject )
+    {
+      _PTR(GenericAttribute) anAttr;
+      if( myObject->FindAttribute ( anAttr, "AttributeTextHighlightColor") )
+      {
+        _PTR(AttributeTextHighlightColor) aHighColAttr = anAttr;
+	clr = QColor( (int)(aHighColAttr->TextHighlightColor().R), 
+		      (int)(aHighColAttr->TextHighlightColor().G), 
+		      (int)(aHighColAttr->TextHighlightColor().B));
+      }
+    }
     break;
   case HighlightedText:
     if ( isReference() )

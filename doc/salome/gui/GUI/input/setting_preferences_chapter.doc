@@ -1,0 +1,14 @@
+/*!
+
+\page setting_preferences_page Setting Preferences
+
+<ul>
+<li>\subpage setting_preferences_subpage</li>
+<li>\subpage select_color_and_font_page</li>
+<li>\subpage salome_preferences_page</li>
+<li>\subpage geometry_preferences_page</li>
+<li>\subpage mesh_preferences_page</li>
+<li>\subpage postpro_preferences_page</li>
+</ul>
+
+*/

@@ -95,7 +95,7 @@ private:
   \class TMemFunEvent
   \brief Template class for member function
 */
-template<class TObject, typename TRes> class EVENT_EXPORT TMemFunEvent: public SALOME_Event{
+template<class TObject, typename TRes> class /*EVENT_EXPORT */TMemFunEvent: public SALOME_Event{
 public:
   typedef TRes TResult;
   TResult myResult;
@@ -119,7 +119,7 @@ private:
   \class TVoidMemFunEvent
   \brief Template class for member function
 */
-template<class TObject> class EVENT_EXPORT TVoidMemFunEvent: public SALOME_Event{
+template<class TObject> class /*EVENT_EXPORT */TVoidMemFunEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)();
   TVoidMemFunEvent(TObject* theObject, TAction theAction):
@@ -139,7 +139,7 @@ private:
   \class TMemFun1ArgEvent
   \brief Template for member function with one argument
 */
-template<class TObject, typename TRes, typename TArg, typename TStoreArg = TArg> class EVENT_EXPORT TMemFun1ArgEvent:
+template<class TObject, typename TRes, typename TArg, typename TStoreArg = TArg> class/* EVENT_EXPORT */TMemFun1ArgEvent:
 public SALOME_Event{
 public:
   typedef TRes TResult;
@@ -166,7 +166,7 @@ private:
   \class TVoidMemFun1ArgEvent
   \brief Template for member function with one argument
 */
-template<class TObject, typename TArg, typename TStoreArg = TArg> class EVENT_EXPORT TVoidMemFun1ArgEvent: public SALOME_Event{
+template<class TObject, typename TArg, typename TStoreArg = TArg> class /*EVENT_EXPORT */TVoidMemFun1ArgEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)(TArg);
   TVoidMemFun1ArgEvent(TObject* theObject, TAction theAction, TArg theArg):
@@ -189,7 +189,7 @@ private:
   \brief Template for member function with two arguments
 */
 template<class TObject, typename TRes, typename TArg, typename TArg1, typename TStoreArg = TArg, typename TStoreArg1 = TArg1> class
-EVENT_EXPORT TMemFun2ArgEvent: public SALOME_Event{
+/*EVENT_EXPORT */TMemFun2ArgEvent: public SALOME_Event{
 public:
   typedef TRes TResult;
   TResult myResult;
@@ -219,7 +219,7 @@ private:
   \brief Template for member function with two arguments
 */
 template<class TObject, typename TArg, typename TArg1, typename TStoreArg = TArg, typename TStoreArg1 = TArg1> class
-EVENT_EXPORT TVoidMemFun2ArgEvent: public SALOME_Event{
+/*EVENT_EXPORT*/ TVoidMemFun2ArgEvent: public SALOME_Event{
 public:
   typedef void (TObject::* TAction)(TArg,TArg1);
   TVoidMemFun2ArgEvent(TObject* theObject, TAction theAction, TArg theArg, TArg1 theArg1):

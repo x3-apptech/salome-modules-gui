@@ -45,6 +45,8 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkVoxel.h>
 #include <vtkWedge.h>
+#include <vtkInformationVector.h>
+#include <vtkInformation.h>
 
 #include <algorithm>
 #include <iterator>
@@ -76,37 +78,54 @@ VTKViewer_GeometryFilter
 {}
 
 
-void
+int
 VTKViewer_GeometryFilter
-::Execute()
+::RequestData(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
-  vtkDataSet *input= this->GetInput();
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkIdType numCells=input->GetNumberOfCells();
 
   if (numCells == 0)
     {
-      return;
+      return 0;
     }
   
   if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID){
-    this->UnstructuredGridExecute();
-    return;
+    return this->UnstructuredGridExecute(input, output, outInfo);
   }else
-    vtkGeometryFilter::Execute();
+    return Superclass::RequestData(request,inputVector,outputVector);
+
+  return 1;
 }
 
 
-void
+int
 VTKViewer_GeometryFilter
-::UnstructuredGridExecute()
+::UnstructuredGridExecute(
+			  vtkDataSet *dataSetInput,
+			  vtkPolyData *output,
+			  vtkInformation *outInfo)
 {
-  vtkUnstructuredGrid *input= (vtkUnstructuredGrid *)this->GetInput();
+  
+  vtkUnstructuredGrid *input= (vtkUnstructuredGrid *)dataSetInput;
   vtkCellArray *Connectivity = input->GetCells();
   // Check input
   if ( Connectivity == NULL )
     {
     vtkDebugMacro(<<"Nothing to extract");
-    return;
+    return 0;
     }
 
   vtkIdType cellId;
@@ -118,7 +137,6 @@ VTKViewer_GeometryFilter
   vtkIdType numCells=input->GetNumberOfCells();
   vtkPointData *pd = input->GetPointData();
   vtkCellData *cd = input->GetCellData();
-  vtkPolyData *output = this->GetOutput();
   vtkPointData *outputPD = output->GetPointData();
   
   VTKViewer_OrderedTriangulator anOrderedTriangulator;
@@ -753,6 +771,8 @@ VTKViewer_GeometryFilter
     {
     delete [] cellVis;
     }
+
+  return 0;
 }
 
 
@@ -813,8 +833,10 @@ VTKViewer_GeometryFilter
 }
 
 
-vtkIdType VTKViewer_GeometryFilter::GetElemObjId(int theVtkID){
-  if(myVTK2ObjIds.empty() || theVtkID > myVTK2ObjIds.size()) return -1;
+vtkIdType VTKViewer_GeometryFilter::GetElemObjId( int theVtkID )
+{
+  if( myVTK2ObjIds.empty() || theVtkID > (int)myVTK2ObjIds.size() )
+    return -1;
 #if defined __GNUC_2__
   return myVTK2ObjIds[theVtkID];
 #else

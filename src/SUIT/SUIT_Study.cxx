@@ -201,6 +201,15 @@ void SUIT_Study::setIsModified( const bool on )
 }
 
 /*!
+  Set study modified to \a on.
+ */
+void SUIT_Study::Modified()
+{
+  setIsModified( TRUE );
+  sendChangesNotification();
+}
+
+/*!
   Set root object.
  */
 void SUIT_Study::setRoot( SUIT_DataObject* obj )
@@ -511,18 +520,12 @@ bool SUIT_Study::hasTransaction() const
 {
   return false;
 }
-
-/*!
- * \brief Stores the study state
-*/
-int SUIT_Study::storeState()
-{
-  return -1;
-}
  
 /*!
- * \brief Restores the study state
-*/
+ * \brief Restores the study state.
+ */
 void SUIT_Study::restoreState(int savePoint)
 {
+  // Redefined in SalomeApp_Study.
+  // Called from SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)
 }

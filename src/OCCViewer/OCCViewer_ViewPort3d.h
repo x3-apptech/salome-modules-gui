@@ -28,6 +28,10 @@
 
 class QRect;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 class OCCVIEWER_EXPORT OCCViewer_ViewPort3d: public OCCViewer_ViewPort
 {
 	Q_OBJECT
@@ -64,8 +68,8 @@ public:
 	virtual void	        zoom( int, int, int, int );
   virtual void	        fitAll( bool keepScale = false, bool withZ = true, bool upd = true );
 
-	void	                startRotation( int, int );
-	void	                rotate( int, int );
+	void	                startRotation( int, int, int, const gp_Pnt& );
+	void	                rotate( int, int, int, const gp_Pnt& );
 	void	                endRotation();
 
 protected:
@@ -88,5 +92,9 @@ private:
   bool    myAnimate;
 	double	myScale;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

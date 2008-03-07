@@ -56,6 +56,10 @@ class VTKViewer_RenderWindowInteractor;
 #define VTK_INTERACTOR_STYLE_CAMERA_SELECT     6
 #define VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN 7
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*! Description:\n
  * This class must be supplied with a vtkRenderWindowInteractor wrapper or\n
  * parent. This class should not normally be instantiated by application\n
@@ -184,5 +188,9 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   int                       LastPos[2];
   //@}
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

@@ -764,6 +764,8 @@ QString findFile( QString filename )
       dir = addSlash(dir) ;
       dir = dir + "resources" ;
       dir = addSlash(dir) ;
+      dir = dir + "kernel" ;
+      dir = addSlash(dir) ;
       QFileInfo fileInfo( dir + filename );
       if ( fileInfo.isFile() && fileInfo.exists() )
 	return fileInfo.filePath();

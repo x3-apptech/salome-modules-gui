@@ -467,7 +467,13 @@ void CAM_Application::readModuleList()
 
     QString modTitle = resMgr->stringValue( *it, QString( "name" ), QString::null );
     if ( modTitle.isEmpty() )
-      continue;
+      {
+	printf( "****************************************************************\n" );
+	printf( "*    Warning: %s not found in resources.\n", (*it).latin1() );
+	printf( "*    Module will not be available\n" );
+	printf( "****************************************************************\n" );
+	continue;
+      }
 
     QString modLibrary = resMgr->stringValue( *it, QString( "library" ), QString::null ).stripWhiteSpace();
     if ( !modLibrary.isEmpty() )
@@ -499,7 +505,11 @@ void CAM_Application::readModuleList()
     if ( desktop() && desktop()->isShown() )
       SUIT_MessageBox::warn1( desktop(), tr( "Warning" ), tr( "Modules list is empty" ), tr( "&OK" ) );
     else
-      qWarning( tr( "Modules list is empty" ).latin1() ); 
+      {
+	printf( "****************************************************************\n" );
+	printf( "*    Warning: modules list is empty.\n" );
+	printf( "****************************************************************\n" );
+      }
   }
 }
 

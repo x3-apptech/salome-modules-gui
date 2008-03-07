@@ -35,6 +35,10 @@ class QLabel;
 
 class SUIT_ResourceMgr;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*!
   \class LightApp_Dialog
   Base class for all LightApp dialogs.
@@ -50,7 +54,7 @@ class LIGHTAPP_EXPORT LightApp_Dialog : public QtxDialog
 public:
   typedef QValueList<int>        TypesList;
   typedef QMap<int,QStringList>  SelectedObjects;
-  
+
   enum ObjectWg
   {
     Label   = 0x00000001,
@@ -149,7 +153,7 @@ public:
 
   //! Set all object selection buttons to inactive state
   void deactivateAll();
-  
+
 signals:
   //! selection in certain widget is changed
   void selectionChanged ( int );
@@ -281,9 +285,14 @@ private:
   
 private:
   ObjectMap           myObjects;
+  
   QMap<int,QString>   myTypeNames;
   bool                myIsExclusive, myIsBusy;
   QPixmap             myPixmap;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

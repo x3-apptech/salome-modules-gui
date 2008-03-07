@@ -54,6 +54,8 @@ public:
   virtual QString   getVisualParameters();
   virtual void      setVisualParameters( const QString& parameters );
 
+  void              setDestructiveClose( const bool );
+
 public slots:
   virtual void      onDumpView();
 

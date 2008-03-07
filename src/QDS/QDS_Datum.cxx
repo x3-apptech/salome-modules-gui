@@ -31,9 +31,11 @@
 #include <qvalidator.h>
 #include <qmessagebox.h>
 
+#include <TColStd_SequenceOfAsciiString.hxx>
+
 /*!
-  Class: QDS_Datum::Wrapper
-  Descr: Wrapper widget for sub widgets. [internal]
+  class: QDS_Datum::Wrapper
+  descr: Wrapper widget for sub widgets. [internal]
 */
 
 class QDS_Datum::Wrapper : public QWidget
@@ -45,15 +47,12 @@ public:
   QWidget*      widget() const;
   void          setWidget( QWidget* );
 
-  virtual bool  eventFilter( QObject*, QEvent* );
-
-protected:
-  virtual void  resizeEvent( QResizeEvent* );
+  virtual void  setGeometry( int x, int y, int w, int h );
+  virtual void  setSizePolicy( QSizePolicy );
 
 private:
   QWidget*      myWid;
 };
-
 
 QDS_Datum::Wrapper::Wrapper( QWidget* parent )
 : QWidget( parent ),
@@ -78,9 +77,6 @@ void QDS_Datum::Wrapper::setWidget( QWidget* wid )
   if ( myWid == wid )
     return;
 
-  if ( myWid )
-    myWid->removeEventFilter( this );
-
   myWid = wid;
 
   if ( !myWid )
@@ -94,34 +90,67 @@ void QDS_Datum::Wrapper::setWidget( QWidget* wid )
 
   myWid->updateGeometry();
   updateGeometry();
-
-  myWid->installEventFilter( this );
 }
 
-bool QDS_Datum::Wrapper::eventFilter( QObject* o, QEvent* e )
+void QDS_Datum::Wrapper::setSizePolicy( QSizePolicy sp )
 {
-  if ( e->type() == QEvent::Resize && o == widget() )
-  {
-    QResizeEvent* re = (QResizeEvent*)e;
-    if ( re->size() != size() )
-      resize( re->size() );
-  }
-  return QWidget::eventFilter( o, e );
+  QWidget::setSizePolicy( sp );
+
+  if ( widget() )
+    widget()->setSizePolicy( sp );
 }
 
-void QDS_Datum::Wrapper::resizeEvent( QResizeEvent* e )
+void QDS_Datum::Wrapper::setGeometry( int x, int y, int w, int h )
 {
-  QWidget::resizeEvent( e );
+  QWidget::setGeometry( x, y, w, h );
 
   if ( widget() && widget()->size() != size() )
-    widget()->resize( size() );
+    widget()->setGeometry( 0, 0, width(), height() );
 }
 
 /*!
-  Class: QDS_Datum
-  Descr: Base class for control used data dictionary. [public]
+  \class QDS_Datum
+
+  This is a base class for control using the data dictionary. Datum is successor of QObject (not QWidget).
+  This object can have three sub widgets named as Label, Control and Units. User can skip creation of
+  some of them manipulate by parameter \aflags. Label widget display label of datum, Control widget allow
+  to input value, Units widget display units of measure in the active system.
+  
+  These widgets constructs under parent of datum. If this parent has layout which can automaticaly add child
+  widgets (see QLayout::setAutoAdd()) then these subwidgets will be placed in following order: first widget
+  is Label, second - Control, third - Unints. User can add these widgets to layout manually using methods
+  QDS_Datum::addTo() or QDS_Datum::widget(). In last case User can retrieve desired widget and place it into
+  layout.
+
+  If use QGroupBox as parent widget for datum object then all subwidgets will be arranged automatically by
+  group box according to column and orientation properties of QGroupBox.
+
+  For example:
+    QGroupBox* box = new QGroupBox( 3, Qt::Horizontal, "datum box" );
+    QDS_Datum* d1  = new QDS_Datum( "datum_1", box, All );
+    QDS_Datum* d2  = new QDS_Datum( "datum_2", box, All );
+    QDS_Datum* d3  = new QDS_Datum( "datum_3", box, All );
+
+  In this example we create the QGroupBox with 3 horizontal columns. All created datum widgets will be
+  placed automatically three widgets in a row. Each datum will be placed from up to bottom one by one.
+
+  Datum value is stored as string. User can get/set this value in different kinds:
+    \liAs string  - methods stringValue()/setStringValue().
+    \liAs integer - methods integerValue()/setIntegerValue(). Given value converted to/from SI.
+    \liAs double  - methods doubleValue()/setDoubleValue(). Given value converted to/from SI.
+    \liAs variant - methods value()/setValue().
+
+  User can perform some actions on datum subwidgets using following methods: isEnabled(),
+  setEnabled(), show(), hide(), setShown(), setFocus(), setAlignment().
 */
 
+/*!
+  Constructor. Create datum object with datum identifier \aid under widget \aparent. Parameter \aflags
+  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
+  Parameter \acomp specify the component name which will be used during search of dictionary item.
+
+  Datum register self in the static list by QDS::insertDatum().
+*/
 QDS_Datum::QDS_Datum( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QObject( parent ),
 myId( id ),
@@ -161,6 +190,10 @@ myInitialised( false )
   insertDatum( this );
 }
 
+/*!
+  Destructor. Destroy all subwidget.
+  Datum unregister self from the static list by QDS::removeDatum().
+*/
 QDS_Datum::~QDS_Datum()
 {
   removeDatum( this );
@@ -174,11 +207,17 @@ QDS_Datum::~QDS_Datum()
 */
 }
 
+/*!
+  Overloaded operator allow to retrieve main subwidget named Control.
+*/
 QDS_Datum::operator QWidget*() const
 {
   return widget( Control );
 }
 
+/*!
+  Returns the datum id.
+*/
 QString QDS_Datum::id() const
 {
   initDatum();
@@ -186,6 +225,9 @@ QString QDS_Datum::id() const
   return myId;
 }
 
+/*!
+  Returns the datum type of value.
+*/
 int QDS_Datum::type() const
 {
   initDatum();
@@ -196,6 +238,9 @@ int QDS_Datum::type() const
   return res;
 }
 
+/*!
+  Returns the datum label string.
+*/
 QString QDS_Datum::label() const
 {
   initDatum();
@@ -210,6 +255,9 @@ QString QDS_Datum::label() const
   return labStr;
 }
 
+/*!
+  Returns the datum units string.
+*/
 QString QDS_Datum::units() const
 {
   initDatum();
@@ -220,6 +268,9 @@ QString QDS_Datum::units() const
   return unitStr;
 }
 
+/*!
+  Returns the datum value filter string.
+*/
 QString QDS_Datum::filter() const
 {
   initDatum();
@@ -230,6 +281,9 @@ QString QDS_Datum::filter() const
   return fltr;
 }
 
+/*!
+  Returns the datum value format string.
+*/
 QString QDS_Datum::format() const
 {
   initDatum();
@@ -240,6 +294,9 @@ QString QDS_Datum::format() const
   return fmtStr;
 }
 
+/*!
+  Returns the datum default value string.
+*/
 QString QDS_Datum::defaultValue() const
 {
   initDatum();
@@ -261,6 +318,9 @@ QString QDS_Datum::defaultValue() const
   return aDef;
 }
 
+/*!
+  Returns the datum minimum value string.
+*/
 QString QDS_Datum::minimumValue() const
 {
   initDatum();
@@ -271,6 +331,9 @@ QString QDS_Datum::minimumValue() const
   return min;
 }
 
+/*!
+  Returns the datum maximum value string.
+*/
 QString QDS_Datum::maximumValue() const
 {
   initDatum();
@@ -281,6 +344,9 @@ QString QDS_Datum::maximumValue() const
   return max;
 }
 
+/*!
+  Returns the datum long description.
+*/
 QString QDS_Datum::longDescription() const
 {
   initDatum();
@@ -291,6 +357,9 @@ QString QDS_Datum::longDescription() const
   return ldStr;
 }
 
+/*!
+  Returns the datum short description.
+*/
 QString QDS_Datum::shortDescription() const
 {
   initDatum();
@@ -301,6 +370,75 @@ QString QDS_Datum::shortDescription() const
   return sdStr;
 }
 
+/*!
+  Returns the list of option names.
+*/
+QStringList QDS_Datum::options() const
+{
+  QStringList res;
+  if ( !dicItem().IsNull() )
+  {
+    TColStd_SequenceOfAsciiString lst;
+    dicItem()->GetOptionNames( lst );
+    for ( int i = 1; i <= lst.Length(); i++ )
+      res.append( toQString( lst.Value( i ) ) );
+  }
+  return res;
+}
+
+/*!
+  Returns the option specified by \aname as QVariant.
+  If option not exist then not valid QVariant returned.
+*/
+QVariant QDS_Datum::option( const QString& name ) const
+{
+  QVariant res;
+  if ( !dicItem().IsNull() )
+    res = QVariant( toQString( dicItem()->GetOption( toAsciiString( name ) ) ) );
+  return res;
+}
+
+/*!
+  Returns the option specified by \aname as QString.
+  If option not exist then empty string returned.
+*/
+QString QDS_Datum::optionString( const QString& name ) const
+{
+  QString res;
+  if ( !dicItem().IsNull() )
+    res = toQString( dicItem()->GetOption( toAsciiString( name ) ) );
+  return res;
+}
+
+/*!
+  Returns the option specified by \aname as double.
+  If option not exist then 0 returned.
+*/
+double QDS_Datum::optionDouble( const QString& name ) const
+{
+  double res = 0;
+  QVariant opt = option( name );
+  if ( opt.isValid() && opt.canCast( QVariant::Double ) )
+    res = opt.toDouble();
+  return res;
+}
+
+/*!
+  Returns the option specified by \aname as integer.
+  If option not exist then 0 returned.
+*/
+int QDS_Datum::optionInteger( const QString& name ) const
+{
+  int res = 0;
+  QVariant opt = option( name );
+  if ( opt.isValid() && opt.canCast( QVariant::Int ) )
+    res = opt.toInt();
+  return res;
+}
+
+/*!
+  Returns the datum value as variant (QVariant object).
+*/
 QVariant QDS_Datum::value() const
 {
   QVariant val;
@@ -309,6 +447,9 @@ QVariant QDS_Datum::value() const
   return val;
 }
 
+/*!
+  Returns the datum value as string (QString object).
+*/
 QString QDS_Datum::stringValue() const
 {
   initDatum();
@@ -319,6 +460,10 @@ QString QDS_Datum::stringValue() const
     return getString();
 }
 
+/*!
+  Returns the datum value as double. This value converted from units of measure in active unit system
+  to units of measure in unit system "SI".
+*/
 double QDS_Datum::doubleValue() const
 {
   initDatum();
@@ -336,6 +481,10 @@ double QDS_Datum::doubleValue() const
   return res;
 }
 
+/*!
+  Returns the datum value as integer. This value converted from units of measure in active unit system
+  to units of measure in unit system "SI".
+*/
 int QDS_Datum::integerValue() const
 {
   initDatum();
@@ -353,6 +502,9 @@ int QDS_Datum::integerValue() const
   return res;
 }
 
+/*!
+  Returns the text from datum. Text consist of label, string value and units.
+*/
 QString QDS_Datum::text() const
 {
   initDatum();
@@ -372,11 +524,17 @@ QString QDS_Datum::text() const
   return res;
 }
 
+/*!
+  Returns false if datum control has inputted value.
+*/
 bool QDS_Datum::isEmpty() const
 {
   return stringValue().isEmpty();
 }
 
+/*!
+  Reset datum state and set default value as current.
+*/
 void QDS_Datum::reset()
 {
   initDatum();
@@ -391,6 +549,9 @@ void QDS_Datum::reset()
   emit paramChanged( str );
 }
 
+/*!
+  Clear the control.
+*/
 void QDS_Datum::clear()
 {
   initDatum();
@@ -408,6 +569,9 @@ void QDS_Datum::clear()
   }
 }
 
+/*!
+  Set varian value (QVariant object) into datum.
+*/
 void QDS_Datum::setValue( const QVariant& val )
 {
   if ( val.isValid() && val.canCast( QVariant::String ) )
@@ -416,6 +580,9 @@ void QDS_Datum::setValue( const QVariant& val )
     clear();
 }
 
+/*!
+  Set string value (QString object) into datum.
+*/
 void QDS_Datum::setStringValue( const QString& txt )
 {
   initDatum();
@@ -431,6 +598,10 @@ void QDS_Datum::setStringValue( const QString& txt )
   emit paramChanged( str );
 }
 
+/*!
+  Set double value into datum. This value converted from units of measure in unit system "SI"
+  to units of measure in active unit system. Format the value using datum format if it required.
+*/
 void QDS_Datum::setDoubleValue( const double num )
 {
   initDatum();
@@ -450,6 +621,10 @@ void QDS_Datum::setDoubleValue( const double num )
   emit paramChanged( str );
 }
 
+/*!
+  Set integer value into datum. This value converted from units of measure in unit system "SI"
+  to units of measure in active unit system. Format the value using datum format if it required.
+*/
 void QDS_Datum::setIntegerValue( const int num )
 {
   initDatum();
@@ -470,7 +645,7 @@ void QDS_Datum::setIntegerValue( const int num )
 }
 
 /*!
-  Returns true if all subwidgets specified by 'element' enabled.
+  Returns true if all subwidgets specified by \aelement enabled.
 */
 bool QDS_Datum::isEnabled( const int element ) const
 {
@@ -487,8 +662,8 @@ bool QDS_Datum::isEnabled( const int element ) const
 }
 
 /*!
-  Enable/Disable subwidgets specified by 'element'.
-  Values: Label, Control, Units or their combinations.
+  Enable/Disable subwidgets specified by \aelement.
+  Possible values of \aelement: Label, Control, Units or their combinations.
 */
 void QDS_Datum::setEnabled( const bool on, const int element )
 {
@@ -510,49 +685,44 @@ void QDS_Datum::setEnabled( bool on )
   setEnabled( on, Control );
 }
 
+/*!
+  Show/hide subwidgets specified by \aelement.
+  Possible values of \aelement: Label, Control, Units or their combinations.
+*/
 void QDS_Datum::setShown( const bool visible, const int flags )
 {
-  if ( visible )
-    show( flags );
-  else
-    hide( flags );
+  initDatum();
+
+  uint flag = Units;
+  while ( flag )
+  {
+    if ( flags & flag && widget( flag ) )
+      widget( flag )->setShown( visible );
+    flag = flag >> 1;
+  }
 }
 
 /*!
-  Show subwidgets specified by 'element'.
-  Values: Label, Control, Units or their combinations.
+  Show subwidgets specified by \aelement.
+  Possible values of \aelement: Label, Control, Units or their combinations.
 */
 void QDS_Datum::show( const int element )
 {
-  initDatum();
-
-  if ( ( element & Label ) && labelWidget() )
-    labelWidget()->show();
-  if ( ( element & Units ) && unitsWidget() )
-    unitsWidget()->show();
-  if ( ( element & Control ) && controlWidget() )
-    controlWidget()->show();
+  setShown( true, element );
 }
 
 /*!
-  Hide subwidgets specified by 'element'.
-  Values: Label, Control, Units or their combinations.
+  Hide subwidgets specified by \aelement.
+  Possible values of \aelement: Label, Control, Units or their combinations.
 */
 void QDS_Datum::hide( const int element )
 {
-  initDatum();
-
-  if ( ( element & Label ) && labelWidget() )
-    labelWidget()->hide();
-  if ( ( element & Units ) && unitsWidget() )
-    unitsWidget()->hide();
-  if ( ( element & Control ) && controlWidget() )
-    controlWidget()->hide();
+  setShown( false, element );
 }
 
 /*!
-  Returns subwidget specified by 'element'.
-  Possible values: Label, Control, Units.
+  Returns subwidget specified by \aelement.
+  Possible values of \aelement: Label, Control, Units.
 */
 QWidget* QDS_Datum::widget( const int element ) const
 {
@@ -573,7 +743,7 @@ void QDS_Datum::setFocus()
 
 /*!
   Returns true if control contains valid value otherwise returns false
-  and display warning message box if parameter msgBox is set.
+  and display warning message box if parameter \amsgBox is set.
 */
 bool QDS_Datum::isValid( const bool msgBox, const QString& extMsg, const QString& extLabel ) const
 {
@@ -658,7 +828,7 @@ bool QDS_Datum::isValid( const bool msgBox, const QString& extMsg, const QString
 }
 
 /*!
-  Add widgets to the vertical layout.
+  Add widgets to the vertical box layout.
 */
 void QDS_Datum::addTo( QVBoxLayout* l )
 {
@@ -676,7 +846,7 @@ void QDS_Datum::addTo( QVBoxLayout* l )
 }
 
 /*!
-  Add widgets to the horizaontal layout.
+  Add widgets to the horizaontal box layout.
 */
 void QDS_Datum::addTo( QHBoxLayout* l )
 {
@@ -732,6 +902,9 @@ void QDS_Datum::setAlignment( const int align, const int type )
     unitsWidget()->setAlignment( align );
 }
 
+/*!
+  Perform delayed initialisation. Reimplemented for internal reasons.
+*/
 bool QDS_Datum::eventFilter( QObject* o, QEvent* e )
 {
   if ( o == parent() )
@@ -744,14 +917,14 @@ bool QDS_Datum::eventFilter( QObject* o, QEvent* e )
 }
 
 /*!
-  Notify about parameter changing.
+  Notify about parameter value changing.
 */
 void QDS_Datum::onParamChanged()
 {
 }
 
 /*!
-  Delayed initialization.
+  Perform delayed initialization.
 */
 void QDS_Datum::onInitDatum()
 {
@@ -767,7 +940,7 @@ void QDS_Datum::onDestroyed( QObject* obj )
 }
 
 /*!
-  Returns QLabel instance which contains data dictionary label.
+  Returns QLabel widget which contains dictionary item label.
 */
 QLabel* QDS_Datum::labelWidget() const
 {
@@ -776,7 +949,7 @@ QLabel* QDS_Datum::labelWidget() const
 }
 
 /*!
-  Returns QLabel instance which contains data dictionary units.
+  Returns QLabel widget which contains dictionary item units.
 */
 QLabel* QDS_Datum::unitsWidget() const
 {
@@ -810,7 +983,7 @@ void QDS_Datum::setDicItem( const Handle(DDS_DicItem)& item )
 }
 
 /*!
-  Creates QLabel widget for data label.
+  Creates QLabel widget for dictionary item label.
 */
 QLabel* QDS_Datum::createLabel( QWidget* parent )
 {
@@ -818,7 +991,7 @@ QLabel* QDS_Datum::createLabel( QWidget* parent )
 }
 
 /*!
-  Creates QLabel widget for data units.
+  Creates QLabel widget for dictionary item units.
 */
 QLabel* QDS_Datum::createUnits( QWidget* parent )
 {
@@ -826,7 +999,7 @@ QLabel* QDS_Datum::createUnits( QWidget* parent )
 }
 
 /*!
-  Returns validator accordance to data type.
+  Creates and returns validator accordance to datum type of value.
 */
 QValidator* QDS_Datum::validator( const bool limits ) const
 {
@@ -913,7 +1086,7 @@ bool QDS_Datum::validate( const QString& txt ) const
 }
 
 /*!
-  Retrieves information from data dictionary and create subwidgets using virtual mechanism.
+  Retrieves information from dictionary and create subwidgets using virtual mechanism.
   Virtual mechanism doesn't work in constructor and destructor, therefore this method should
   be called outside the constructor.
 */
@@ -954,6 +1127,9 @@ void QDS_Datum::initialize()
     labelWidget()->setBuddy( ctrl );
 }
 
+/*!
+  Notification about active unit system changing. Update label and units texts.
+*/
 void QDS_Datum::unitSystemChanged( const QString& unitSystem )
 {
   QString labText = label();
@@ -1011,7 +1187,7 @@ QString QDS_Datum::textToUnits( const QString& txt )
 }
 
 /*!
-  Format the specified integer as data dictionary value.
+  Format the specified integer as dictionary item value.
 */
 QString QDS_Datum::format( const int num, const QString& id, const bool convert )
 {
@@ -1038,7 +1214,7 @@ QString QDS_Datum::format( const int num, const QString& id, const bool convert 
 }
 
 /*!
-  Format the specified double as data dictionary value.
+  Format the specified double as dictionary item value.
 */
 QString QDS_Datum::format( const double num, const QString& id, const bool convert )
 {
@@ -1065,7 +1241,7 @@ QString QDS_Datum::format( const double num, const QString& id, const bool conve
 }
 
 /*!
-  Format the specified string as data dictionary value.
+  Format the specified string as dictionary item value.
 */
 QString QDS_Datum::format( const QString& str, const QString& id, const bool convert )
 {
@@ -1092,7 +1268,7 @@ QString QDS_Datum::format( const QString& str, const QString& id, const bool con
 }
 
 /*!
-  Format the given string accordance to data format.
+  Format the given string accordance to dictionary item format.
 */
 QString QDS_Datum::format( const QString& aFormat, const int aType, const int aValue )
 {
@@ -1123,7 +1299,7 @@ QString QDS_Datum::format( const QString& aFormat, const int aType, const int aV
 }
 
 /*!
-  Format the given string accordance to data format.
+  Format the given string accordance to dictionary item format.
 */
 QString QDS_Datum::format( const QString& aFormat, const int aType, const double aValue )
 {
@@ -1154,7 +1330,7 @@ QString QDS_Datum::format( const QString& aFormat, const int aType, const double
 }
 
 /*!
-  Format the given string accordance to data format.
+  Format the given string accordance to dictionary item format.
 */
 QString QDS_Datum::format( const QString& aFormat, const int aType, const QString& aValue )
 {
@@ -1271,7 +1447,7 @@ QString QDS_Datum::canonicalFormat( const QString& fmt, QString& flags )
 }
 
 /*!
-  Returns displayable units string for given DD ID
+  Returns displayable units string for given dictionary item id
 */
 QString QDS_Datum::units( const QString& id )
 {
@@ -1350,6 +1526,9 @@ void QDS_Datum::invalidateCache()
   myTargetValue = QString::null;
 }
 
+/*!
+  Remove the acceleartor tags '&' from specified label string \asrc.
+*/
 QString QDS_Datum::removeAccel( const QString& src )
 {
   QString trg = src;
@@ -1366,6 +1545,9 @@ QString QDS_Datum::removeAccel( const QString& src )
   return trg;
 }
 
+/*!
+  Returns true if given format string \atheFormat has specificator for double values.
+*/
 bool QDS_Datum::isDoubleFormat( const QString& theFormat )
 {
   if ( theFormat.length() > 0 )
@@ -1377,11 +1559,17 @@ bool QDS_Datum::isDoubleFormat( const QString& theFormat )
     return false;
 }
 
+/*!
+  Returns datum flags.
+*/
 int QDS_Datum::flags() const
 {
   return myFlags;
 }
 
+/*!
+  Perform intialization if it needed. [internal]
+*/
 void QDS_Datum::initDatum() const
 {
   if ( myInitialised )
@@ -1395,6 +1583,9 @@ void QDS_Datum::initDatum() const
     parent()->removeEventFilter( this );
 }
 
+/*!
+  Return wrapper for specified subwidget. [internal]
+*/
 QDS_Datum::Wrapper* QDS_Datum::wrapper( QWidget* wid ) const
 {
   if ( !wid )
@@ -1409,6 +1600,9 @@ QDS_Datum::Wrapper* QDS_Datum::wrapper( QWidget* wid ) const
   return wrap;
 }
 
+/*!
+  Return wrapper for specified subwidget name. [internal]
+*/
 QDS_Datum::Wrapper* QDS_Datum::wrapper( const int id ) const
 {
   Wrapper* wrap = 0;
@@ -1417,6 +1611,9 @@ QDS_Datum::Wrapper* QDS_Datum::wrapper( const int id ) const
   return wrap;
 }
 
+/*!
+  Return subwidget name for specified wrapper. [internal]
+*/
 int QDS_Datum::wrapperType( QDS_Datum::Wrapper* wrap ) const
 {
   int id = -1;

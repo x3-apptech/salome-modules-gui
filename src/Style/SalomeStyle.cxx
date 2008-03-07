@@ -483,22 +483,25 @@ void SalomeStyle::drawPrimitive( PrimitiveElement pe, QPainter* p, const QRect& 
         int textW = flags & Style_Horizontal ? rt.height() : rt.width();
         int textH = flags & Style_Horizontal ? rt.width() : rt.height();
 
-        QString title = titleText( wnd->caption(), textW, p->fontMetrics() );
-
-		    if ( wnd )
+	QFont old_font = p->font(), f = old_font;
+	
+        QString title = titleText( wnd->caption(), textW, textH, f );
+	p->setFont( f );
+	if ( wnd )
         {
-		      QColorGroup cgroup = wnd->isActiveWindow() ? wnd->palette().active() : wnd->palette().inactive();
-		      p->setPen( cgroup.highlightedText() );
+	  QColorGroup cgroup = wnd->isActiveWindow() ? wnd->palette().active() : wnd->palette().inactive();
+	  p->setPen( cgroup.highlightedText() );
 
-		      if ( flags & Style_Horizontal )
+	  if ( flags & Style_Horizontal )
           {
-		        p->rotate( 270.0 );
-		        p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
-		        p->drawText( 0, 0, title );
-		      }
+	    p->rotate( 270.0 );
+	    p->translate( -(rt.height()+rt.y()), (rt.width()-rt.x()) );
+	    p->drawText( 0, 0, title );
+	  }
           else
-		        p->drawText( 2, 2, textW, textH, AlignLeft, title );
-	      }
+	    p->drawText( 2, 2, textW, textH, AlignLeft, title );
+	}
+	p->setFont( old_font );
       }
       break;
     }
@@ -1279,9 +1282,16 @@ int SalomeStyle::pixelMetric( PixelMetric pm, const QWidget* widget ) const
   \param w - possible width
   \param fm - font metrics
 */
-QString SalomeStyle::titleText( const QString& txt, const int W, const QFontMetrics& fm ) const
+QString SalomeStyle::titleText( const QString& txt, const int W, const int H, QFont& f ) const
 {
   QString res = txt.stripWhiteSpace();
+
+  QFontMetrics fm( f );
+  while( fm.height() > H && f.pointSize()>1 )
+  {
+    f.setPointSize( f.pointSize()-1 );
+    fm = QFontMetrics( f );
+  }
 
   if ( fm.width( res ) > W )
   {

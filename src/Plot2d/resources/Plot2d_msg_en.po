@@ -406,3 +406,6 @@ msgstr "Diagonal cross"
 
 msgid "POSTSCRIPT_FILES"
 msgstr "PostScript files (*.ps)"
+
+msgid "Plot2d_ViewManager::PLOT2D_VIEW_TITLE"
+msgstr "Plot2d scene:%M - viewer:%V"

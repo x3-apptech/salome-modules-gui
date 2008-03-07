@@ -37,7 +37,6 @@ public:
   Plot2d_Viewer*     getPlot2dModel() const;
 
 protected:
-  void         setViewName(SUIT_ViewWindow* theView);
   bool         insertView(SUIT_ViewWindow* theView);
 
 public slots:
@@ -48,10 +47,6 @@ protected slots:
 
 signals:
   void cloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* );
-
-protected:
-  static  int  myMaxId;
-  int          myId;
 };
 
 #endif

@@ -31,9 +31,9 @@ class vtkProperty;
 class vtkPolyDataMapper;
 class vtkLineSource;
 class vtkConeSource;
+class vtkVectorText;
 
 class VTKViewer_Axis;
-class VTKViewer_VectorText;
 
 /*! \class vtkFollower
  * See <a href="http://www.vtk.org/">vtk documentation</a>
@@ -112,7 +112,7 @@ protected:
 };
 
 /*!This class provide support trihedron object in vtk viewer.*/
-class VTKVIEWER_EXPORT VTKVIEWER_EXPORT VTKViewer_Trihedron : public vtkObject
+class VTKVIEWER_EXPORT VTKViewer_Trihedron : public vtkObject
 {
 protected:
   /*!Initialize fields by default values.*/
@@ -170,6 +170,12 @@ public:
    */
   virtual int         GetVisibleActorCount(vtkRenderer* theRenderer);
   
+  /*! Check if actor belongs to the trihedron object
+   * \param theActor - vtkActor pointer
+   * \retval Return true if the actor belongs to the trihedron object
+   */
+  virtual bool        OwnActor(const vtkActor* theActor);
+
 protected:
   /*! Actor collection*/
   vtkActorCollection* myPresent;
@@ -234,6 +240,12 @@ public:
    * \retval Return myArrowActor
    */
   virtual VTKViewer_UnScaledActor* GetArrow() { return myArrowActor; }
+
+  /*! Check if actor belongs to the axis object
+   * \param theActor - vtkActor pointer
+   * \retval Return true if the actor belongs to the axis object
+   */
+  virtual bool OwnActor(const vtkActor* theActor);
   
 protected:
   /*! Visibility flag.
@@ -276,7 +288,7 @@ protected:
 
   /*! VTKViewer_VectorText pointer (Label)
    */
-  VTKViewer_VectorText* myVectorText;
+  vtkVectorText* myVectorText;
 };
 
 #endif

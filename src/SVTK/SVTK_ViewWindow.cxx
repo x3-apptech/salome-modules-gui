@@ -29,6 +29,7 @@
 #include <vtkPointPicker.h>
 #include <vtkCellPicker.h>
 #include <vtkAxisActor2D.h>
+#include <vtkGL2PSExporter.h>
 
 #include "QtxAction.h"
 
@@ -61,6 +62,31 @@
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"
 
+
+namespace SVTK
+{
+  int convertAction( const int accelAction )
+  {
+    switch ( accelAction ) {
+    case SUIT_Accel::PanLeft     : return SVTK::PanLeftEvent;
+    case SUIT_Accel::PanRight    : return SVTK::PanRightEvent;
+    case SUIT_Accel::PanUp       : return SVTK::PanUpEvent;
+    case SUIT_Accel::PanDown     : return SVTK::PanDownEvent;
+    case SUIT_Accel::ZoomIn      : return SVTK::ZoomInEvent;
+    case SUIT_Accel::ZoomOut     : return SVTK::ZoomOutEvent;
+    case SUIT_Accel::RotateLeft  : return SVTK::RotateLeftEvent;
+    case SUIT_Accel::RotateRight : return SVTK::RotateRightEvent;
+    case SUIT_Accel::RotateUp    : return SVTK::RotateUpEvent;
+    case SUIT_Accel::RotateDown  : return SVTK::RotateDownEvent;  
+    }
+    return accelAction;
+  }
+}
+
+
+
+
+
 /*!
   Constructor
 */
@@ -68,7 +94,8 @@ SVTK_ViewWindow
 ::SVTK_ViewWindow(SUIT_Desktop* theDesktop):
   SUIT_ViewWindow(theDesktop),
   myMainWindow(NULL),
-  myView(NULL)
+  myView(NULL),
+  myDumpImage(QImage())
 {}
 
 /*!
@@ -442,6 +469,7 @@ SVTK_ViewWindow
 ::setBackgroundColor( const QColor& color )
 {
   myMainWindow->SetBackgroundColor( color );
+  SUIT_ViewWindow::setBackgroundColor( color );
 }
 
 /*!
@@ -547,7 +575,7 @@ SVTK_ViewWindow
 /*!
   \return trihedron size
 */
-int
+vtkFloatingPointType
 SVTK_ViewWindow
 ::GetTrihedronSize() const
 {
@@ -561,7 +589,7 @@ SVTK_ViewWindow
 */
 void
 SVTK_ViewWindow
-::SetTrihedronSize(const int theSize, const bool theRelative)
+::SetTrihedronSize(const vtkFloatingPointType theSize, const bool theRelative)
 {
   myMainWindow->SetTrihedronSize(theSize, theRelative);
 }
@@ -684,8 +712,59 @@ SVTK_ViewWindow
 QImage
 SVTK_ViewWindow
 ::dumpView()
+{    
+  if ( myMainWindow->getToolBar()->hasMouse() || myDumpImage.isNull() )
+    return myMainWindow->dumpView();
+  
+  return myDumpImage;
+}
+
+QString SVTK_ViewWindow::filter() const
 {
-  return myMainWindow->dumpView();
+  return tr( "SVTK_IMAGE_FILES" );
+}
+
+bool SVTK_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileName, const QString& format )
+{
+  if ( format != "PS" && format != "EPS" && format != "PDF" )
+    return SUIT_ViewWindow::dumpViewToFormat( img, fileName, format );
+
+  QApplication::setOverrideCursor( Qt::waitCursor );
+
+  vtkGL2PSExporter *anExporter = vtkGL2PSExporter::New();
+  anExporter->SetRenderWindow(getRenderWindow());
+
+  if ( format == "PS" ) {
+    anExporter->SetFileFormatToPS();
+    anExporter->CompressOff();
+  }
+
+  if ( format == "EPS" ) {
+    anExporter->SetFileFormatToEPS();
+    anExporter->CompressOff();
+  }
+
+  if ( format == "PDF" ) {
+    anExporter->SetFileFormatToPDF();
+  }
+
+  QString aFilePrefix(fileName);
+  QString anExtension(SUIT_Tools::extension(fileName));
+  aFilePrefix.truncate(aFilePrefix.length() - 1 - anExtension.length());
+  anExporter->SetFilePrefix(aFilePrefix.latin1());
+  anExporter->Write();
+  anExporter->Delete();
+
+  QApplication::restoreOverrideCursor();
+  return true;
+}
+
+/*!
+  \refresh QImage, containing all scene rendering in window
+*/
+void SVTK_ViewWindow::RefreshDumpImage()
+{
+  myDumpImage = myMainWindow->dumpView();
 }
 
 /*!
@@ -720,26 +799,10 @@ SVTK_ViewWindow
 void
 SVTK_ViewWindow
 ::SetSelectionTolerance(const double& theTolNodes, 
-			const double& theTolItems)
+			const double& theTolItems,
+			const double& theTolObjects)
 {
-  myView->SetSelectionTolerance(theTolNodes,theTolItems);
-}
-
-int convertAction( const int accelAction )
-{
-  switch ( accelAction ) {
-  case SUIT_Accel::PanLeft     : return SVTK::PanLeftEvent;
-  case SUIT_Accel::PanRight    : return SVTK::PanRightEvent;
-  case SUIT_Accel::PanUp       : return SVTK::PanUpEvent;
-  case SUIT_Accel::PanDown     : return SVTK::PanDownEvent;
-  case SUIT_Accel::ZoomIn      : return SVTK::ZoomInEvent;
-  case SUIT_Accel::ZoomOut     : return SVTK::ZoomOutEvent;
-  case SUIT_Accel::RotateLeft  : return SVTK::RotateLeftEvent;
-  case SUIT_Accel::RotateRight : return SVTK::RotateRightEvent;
-  case SUIT_Accel::RotateUp    : return SVTK::RotateUpEvent;
-  case SUIT_Accel::RotateDown  : return SVTK::RotateDownEvent;  
-  }
-  return accelAction;
+  myView->SetSelectionTolerance(theTolNodes,theTolItems, theTolObjects);
 }
 
 /*!
@@ -755,7 +818,7 @@ SVTK_ViewWindow
   if ( accelAction == SUIT_Accel::ZoomFit )
     onFitAll();
   else {
-    int anEvent = convertAction( accelAction );
+    int anEvent = SVTK::convertAction( accelAction );
     myMainWindow->InvokeEvent( anEvent, 0 );
   }
   return true;

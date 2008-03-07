@@ -62,6 +62,9 @@ msgstr "view_reset.png"
 msgid "ICON_OCCVIEWER_VIEW_RIGHT"
 msgstr "view_right.png"
 
+msgid "ICON_OCCVIEWER_VIEW_ROTATION_POINT"
+msgstr "view_rotation_point.png"
+
 msgid "ICON_OCCVIEWER_VIEW_ROTATE"
 msgstr "view_rotate.png"
 

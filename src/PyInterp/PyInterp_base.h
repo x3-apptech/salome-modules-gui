@@ -63,6 +63,8 @@ class PYINTERP_EXPORT PyLockWrapper
   ~PyLockWrapper();
 };
 
+typedef void PyOutChanged(void* data,char * c);
+
 class PYINTERP_EXPORT PyInterp_base{
  public:
   static int _argc;
@@ -85,8 +87,8 @@ class PYINTERP_EXPORT PyInterp_base{
   PyLockWrapper GetLockWrapper();
 
   std::string getbanner(); 
-  std::string getverr();
-  std::string getvout();  
+  void setverrcb(PyOutChanged*,void*);
+  void setvoutcb(PyOutChanged*,void*);
 
   const char * getPrevious();
   const char * getNext();    
@@ -141,5 +143,14 @@ public:
     Py_XDECREF(myObject);
   }
 };
+
+
+typedef struct {
+  PyObject_HEAD
+  int softspace;
+  PyOutChanged* _cb;
+  void* _data;
+  bool _iscerr;
+} PyStdOut;
 
 #endif

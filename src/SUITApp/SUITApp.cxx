@@ -165,10 +165,6 @@ int main( int args, char* argv[] )
       SUIT_ResourceMgr* resMgr = aSession->createResourceMgr( argList.first() );
       if ( resMgr ) {
 	resMgr->loadLanguage();
-	QString splashIcon, splashInfo, splashTextColors;
-	resMgr->value( "splash", "image",       splashIcon );
-	resMgr->value( "splash", "info",        splashInfo, false );
-	resMgr->value( "splash", "text_colors", splashTextColors );
 	QString appName    = QObject::tr( "APP_NAME" ).stripWhiteSpace();
 	QString appVersion = QObject::tr( "APP_VERSION" ).stripWhiteSpace();
 	if ( appVersion == "APP_VERSION" ) {
@@ -177,10 +173,17 @@ int main( int args, char* argv[] )
 	  else
 	    appVersion = "";
 	}
+	QString splashIcon;
+	resMgr->value( "splash", "image", splashIcon );
 	QPixmap px( splashIcon );
 	if ( !px.isNull() ) {
 	  splash = QtxSplash::splash( px );
-	  if ( !splashTextColors.isEmpty() ) {
+	  int splashMargin;
+	  if ( resMgr->value( "splash", "margin", splashMargin ) && splashMargin > 0 ) {
+	    splash->setMargin( splashMargin );
+	  }
+	  QString splashTextColors;
+	  if ( resMgr->value( "splash", "text_colors", splashTextColors ) && !splashTextColors.isEmpty() ) {
 	    QStringList colors = QStringList::split( "|", splashTextColors );
 	    QColor c1, c2;
 	    if ( colors.count() > 0 ) c1 = QColor( colors[0] );
@@ -196,7 +199,8 @@ int main( int args, char* argv[] )
 	  QFont f = splash->font();
 	  f.setBold( true );
 	  splash->setFont( f );
-	  if ( !splashInfo.isEmpty() ) {
+	  QString splashInfo;
+	  if ( resMgr->value( "splash", "info", splashInfo, false ) && !splashInfo.isEmpty() ) {
 	    splashInfo.replace( QRegExp( "%A" ),  appName );
 	    splashInfo.replace( QRegExp( "%V" ),  QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
 	    splashInfo.replace( QRegExp( "%L" ),  QObject::tr( "ABOUT_LICENSE" ) );

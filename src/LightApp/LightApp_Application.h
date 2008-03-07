@@ -40,6 +40,7 @@ class STD_Application;
 class LightApp_WidgetContainer;
 class LightApp_Preferences;
 class LightApp_SelectionMgr;
+class LightApp_DataObject;
 class SUIT_Study;
 class SUIT_Accel;
 class CAM_Module;
@@ -90,7 +91,15 @@ public:
          NewVTKViewId,
 #endif
 
+#ifndef DISABLE_QXGRAPHVIEWER
+         NewQxGraphViewId,
+#endif
+
          PreferencesId, MRUId, UserID };
+
+protected:
+  enum { NewStudyId = 1, OpenStudyId };
+
 public:
   LightApp_Application();
   virtual ~LightApp_Application();
@@ -128,6 +137,8 @@ public:
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
   virtual void                        addViewManager( SUIT_ViewManager* );
   virtual void                        removeViewManager( SUIT_ViewManager* );
+  virtual SUIT_ViewManager*           createViewManager( const QString& vmType );
+
   QWidget*                            getWindow( const int, const int = -1 );
   QWidget*                            window( const int, const int = -1 ) const;
   void                                addWindow( QWidget*, const int, const int = -1 );
@@ -149,11 +160,14 @@ public:
   static int                          studyId();
 
   virtual bool                        event( QEvent* );
+  
+  virtual bool                        checkDataObject( LightApp_DataObject* theObj );
 
 signals:
   void                                studyOpened();
   void                                studySaved();
   void                                studyClosed();
+  void                                preferenceChanged( const QString&, const QString&, const QString& );
 
 public slots:
   virtual void                        onHelpContentsModule();
@@ -189,6 +203,9 @@ protected:
   virtual void                        preferencesChanged( const QString&, const QString& );
   virtual void                        savePreferences();
   virtual void                        updateDesktopTitle();
+  
+  virtual QMap<int, QString>          activateModuleActions() const;
+  virtual void                        moduleActionSelected( const int );
 
 protected slots:
   virtual void                        onDesktopActivated();
@@ -207,6 +224,7 @@ protected slots:
 private slots:
   void                                onSelection();
   void                                onRefresh();
+  void                                onFind();
   void                                onPreferences();
   void                                onMRUActivated( QString );
   void                                onPreferenceChanged( QString&, QString&, QString& );
@@ -226,7 +244,6 @@ protected:
   QString                             defaultModule() const;
   void                                currentWindows( QMap<int, int>& ) const;
   void                                currentViewManagers( QStringList& ) const;
-  virtual SUIT_ViewManager*           createViewManager( const QString& vmType );
   void                                moduleIconNames( QMap<QString, QString>& ) const;
 
   void                                activateWindows();

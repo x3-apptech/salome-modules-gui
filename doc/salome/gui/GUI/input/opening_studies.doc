@@ -1,0 +1,31 @@
+/*!
+
+\page opening_studies_page Opening studies
+
+In \b SALOME all studies are stored in a special format *.hdf.
+
+<em>To open an existing study:</em>
+\par
+In the main toolbar click "Open document" button or from the main menu select <b>File > Open</b>
+option. From a standard Search File dialog box choose the required
+*.hdf file and click \b Open button.
+
+\image html open.jpg "&quot;Open document&quot; button"
+
+<em>To load an unloaded study (\ref saving_and_closing_studies_page
+"see also"):</em>
+\par
+From the main menu select <b>File > Connect</b> option. In the following
+dialog box select one of the studies, which has been previously
+created and unloaded and click \b Ok button:
+
+\image html loadstudy2.png
+
+\n\b Tip:  After opening an existing study, you will see its structure
+in the \ref using_object_browser_page "Object Browser". It will contain the objects created with the
+help of different components during the previous study session. If you
+right-click on one of the objects and from the associated pop-up menu
+choose <b>Open With</b> option, which will automatically launch the component
+corresponding to this object.
+
+*/

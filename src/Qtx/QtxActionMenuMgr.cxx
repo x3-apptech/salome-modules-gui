@@ -48,12 +48,12 @@ namespace {
     QValueList<int> l;
     const QMenuData* md = 0;
     if ( w->inherits( "QMenuBar" ) )
-      md = dynamic_cast<const QMenuData*>( w );
+      md = ::qt_cast<QMenuBar*>( w );
     else if ( w->inherits( "QPopupMenu" ) )
-      md = dynamic_cast<const QMenuData*>( w );
+      md = ::qt_cast<QPopupMenu*>( w );
     if ( md ) {
-      for ( int i=0; i < md->count(); i++ )
-	l.append( md->idAt( i ) );
+      for ( uint i = 0; i < md->count(); i++ )
+	      l.append( md->idAt( i ) );
     }
     return l;
   }
@@ -62,25 +62,38 @@ namespace {
   {
     const QMenuData* md = 0;
     if ( w->inherits( "QMenuBar" ) )
-      md = dynamic_cast<const QMenuData*>( w );
+      md = ::qt_cast<QMenuBar*>( w );
     else if ( w->inherits( "QPopupMenu" ) )
-      md = dynamic_cast<const QMenuData*>( w );
-    if ( md ) {
-      for ( int i=0, j=0; i < md->count() && j < l.count(); i++, j++ )
-	if ( md->idAt( i ) != l[ j ] ) return retId ? md->idAt( i ) : i;
-      if ( md->count() > l.count() ) return retId ? md->idAt( md->count()-1 ) : md->count()-1;
+      md = ::qt_cast<QPopupMenu*>( w );
+    if ( md )
+    {
+      for ( uint i = 0, j = 0; i < md->count() && j < l.count(); i++, j++ )
+	      if ( md->idAt( i ) != l[ j ] )
+          return retId ? md->idAt( i ) : i;
+      if ( md->count() > l.count() )
+        return retId ? md->idAt( md->count()-1 ) : md->count() - 1;
     }
     return -1;
   }
 
   void dumpMenu( QWidget* w, bool before )
   {
-    QMenuData* md = dynamic_cast<QMenuData*>( w );
-    if ( !w ) return;
-    printf(">>> start dump menu (%s) >>>\n", before ? "before" : "after" );
-    for( int i = 0; i < md->count(); i++ )
-      printf("%d: %d: %s\n",i,md->idAt(i),md->text(md->idAt(i)).latin1() );
-    printf("<<< end dump menu (%s) <<<\n", before ? "before" : "after" );
+    if ( !w )
+      return;
+
+    QMenuData* md = 0;
+    if ( w->inherits( "QMenuBar" ) )
+      md = ::qt_cast<QMenuBar*>( w );
+    else if ( w->inherits( "QPopupMenu" ) )
+      md = ::qt_cast<QPopupMenu*>( w );
+
+    if ( !md )
+      return;
+
+    printf( ">>> start dump menu (%s) >>>\n", before ? "before" : "after" );
+    for ( uint i = 0; i < md->count(); i++ )
+      printf( "%d: %d: %s\n", i, md->idAt( i ), md->text( md->idAt( i ) ).latin1() );
+    printf( "<<< end dump menu (%s) <<<\n", before ? "before" : "after" );
   }
 };
 
@@ -914,7 +927,7 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
   {
     NodeList& lst = idMap[it2.current()->group];
     int idx = it2.current()->idx;
-    if ( idx < 0 || idx >= lst.count() )
+    if ( idx < 0 || idx >= (int)lst.count() )
       lst.append( it2.current() );
     else
       lst.insert( idx, it2.current() );

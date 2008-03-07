@@ -24,8 +24,18 @@
 
 #include <QtxDblSpinBox.h>
 
+/*
+  \class QDS_SpinBoxDbl
+  
+  Datum with control corresponding to spin box. This control used for double numbers.
+  User can input data directly in spin box or can modify current value with given
+  increment.
+*/
+
 /*!
-  Constructor.
+  Constructor. Create spin box datum object with datum identifier \aid under widget \aparent. Parameter \aflags
+  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
+  Parameter \acomp specify the component name which will be used during search of dictionary item.
 */
 QDS_SpinBoxDbl::QDS_SpinBoxDbl( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -40,7 +50,7 @@ QDS_SpinBoxDbl::~QDS_SpinBoxDbl()
 }
 
 /*!
-  Returns string from QSpinBox widget.
+  Returns string from QSpinBox widget. Reimplemented.
 */
 QString QDS_SpinBoxDbl::getString() const
 {
@@ -66,7 +76,7 @@ QString QDS_SpinBoxDbl::getString() const
 }
 
 /*!
-  Sets the string into QSpinBox widget.
+  Sets the string into QSpinBox widget. Reimplemented.
 */
 void QDS_SpinBoxDbl::setString( const QString& txt )
 {
@@ -87,7 +97,7 @@ QtxDblSpinBox* QDS_SpinBoxDbl::spinBox() const
 }
 
 /*!
-  Create QSpinBox widget as control subwidget.
+  Create QSpinBox widget as control subwidget. Reimplemented.
 */
 QWidget* QDS_SpinBoxDbl::createControl( QWidget* parent )
 {
@@ -98,7 +108,7 @@ QWidget* QDS_SpinBoxDbl::createControl( QWidget* parent )
 }
 
 /*!
-  Notify about text changing in spin box.
+  Notify about value changing in spin box.
 */
 void QDS_SpinBoxDbl::onValueChanged( double )
 {
@@ -129,6 +139,10 @@ void QDS_SpinBoxDbl::setStep( const double step )
     spinBox()->setLineStep( step );
 }
 
+/*!
+  Notification about active unit system changing. Reimplemented from QDS_Datum.
+  Update validator and spin box parameters: suffix, prefix, minimum, maximum.
+*/
 void QDS_SpinBoxDbl::unitSystemChanged( const QString& system )
 {
   QDS_Datum::unitSystemChanged( system );

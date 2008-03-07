@@ -36,7 +36,6 @@
 
 #include "VTKViewer_Transform.h"
 #include "VTKViewer_TransformFilter.h"
-#include "VTKViewer_PassThroughFilter.h"
 #include "VTKViewer_GeometryFilter.h"
 
 // VTK Includes
@@ -47,6 +46,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkPassThroughFilter.h>
 
 using namespace std;
 
@@ -83,7 +83,7 @@ VTKViewer_Actor
 								 myPolygonOffsetUnits);
 
   for(int i = 0; i < 6; i++)
-    myPassFilter.push_back(VTKViewer_PassThroughFilter::New());
+    myPassFilter.push_back(vtkPassThroughFilter::New());
 }
 
 /*!
@@ -347,7 +347,7 @@ VTKViewer_Actor
   unsigned long mTime = this->Superclass::GetMTime();
   unsigned long time = myTransformFilter->GetMTime();
   mTime = ( time > mTime ? time : mTime );
-  if(vtkDataSet *aDataSet = myPassFilter[0]->GetInput()){
+  if(vtkDataSet *aDataSet = dynamic_cast<vtkDataSet*>(myPassFilter[0]->GetInput())){ // bad usage of GetInput
     time = aDataSet->GetMTime();
     mTime = ( time > mTime ? time : mTime );
   }

@@ -59,12 +59,16 @@ public:
   int              getViewsCount() { return myViews.count(); }
   QPtrVector<SUIT_ViewWindow> getViews() { return myViews; }  
 
-  QString          getTitle() const { return myTitle;}
-  void             setTitle(QString theTitle) { myTitle = theTitle; }
+  QString          getTitle() const { return myTitle; }
+  virtual void     setTitle( const QString& );
 
   SUIT_ViewWindow* createViewWindow();
 
+  bool             isVisible() const;
   virtual void     setShown( const bool );
+  virtual void     setDestructiveClose( const bool );
+
+  int              getId() const { return myId; }
 
 public slots:
   void             createView();
@@ -85,8 +89,8 @@ signals:
   
 protected slots:
   void             onWindowActivated(SUIT_ViewWindow*);
-  void             onDeleteView(SUIT_ViewWindow* theView);
-  void             onMousePressed(SUIT_ViewWindow* theView, QMouseEvent* theEvent);
+  void             onClosingView( SUIT_ViewWindow* );
+  void             onMousePressed(SUIT_ViewWindow*, QMouseEvent* );
   void             onDeleteStudy();
 
 private slots:
@@ -101,8 +105,14 @@ protected:
   /*! Removes the View from internal Views Vector.*/
   virtual void     removeView(SUIT_ViewWindow* theView);
   
+  /*! Close the specified View.*/
+  virtual void     closeView(SUIT_ViewWindow* theView);
+  
   /*! Used to set unique name for the view.*/
   virtual void     setViewName(SUIT_ViewWindow* theView);
+  QString          prepareTitle( const QString&, const int, const int );
+
+  static int       useNewId( const QString& );
 
 protected:
   SUIT_Desktop*               myDesktop;
@@ -110,8 +120,11 @@ protected:
   QPtrVector<SUIT_ViewWindow> myViews;
   SUIT_ViewWindow*            myActiveView;
 
+  int                         myId;
   QString                     myTitle;
   SUIT_Study*                 myStudy;
+
+  static QMap<QString, int>   _ViewMgrId;
 };
 
 #ifdef WIN32

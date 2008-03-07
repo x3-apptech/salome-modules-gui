@@ -44,6 +44,10 @@ class VTKViewer_Transform;
 #include "SVTK.h"
 #include "VTKViewer.h"
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 #ifndef WNT
 class VTK_HYBRID_EXPORT SVTK_CubeAxesActor2D : public vtkCubeAxesActor2D
 #else
@@ -105,5 +109,9 @@ private:
   SVTK_CubeAxesActor2D(const SVTK_CubeAxesActor2D&);  // Not implemented.
   void operator=(const SVTK_CubeAxesActor2D&);  // Not implemented.
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

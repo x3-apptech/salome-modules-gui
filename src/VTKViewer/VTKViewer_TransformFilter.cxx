@@ -34,17 +34,30 @@
 #include <vtkPointData.h>
 #include <vtkCellData.h>
 #include <vtkPoints.h>
-
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
 
 vtkStandardNewMacro(VTKViewer_TransformFilter);
 
 /*!Execution method. Calculate output.*/
-void VTKViewer_TransformFilter::Execute(){
+int VTKViewer_TransformFilter::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
+{
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkPointSet *input = vtkPointSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPointSet *output = vtkPointSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkPoints *inPts;
   vtkPoints *newPts;
   int numPts, numCells;
-  vtkPointSet *input = this->GetInput();
-  vtkPointSet *output = this->GetOutput();
   vtkPointData *pd=input->GetPointData(), *outPD=output->GetPointData();
   vtkCellData *cd=input->GetCellData(), *outCD=output->GetCellData();
   output->CopyStructure( input );
@@ -67,4 +80,6 @@ void VTKViewer_TransformFilter::Execute(){
   }
   outPD->PassData(pd);
   outCD->PassData(cd);
+  
+  return 1;
 }

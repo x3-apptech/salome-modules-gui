@@ -20,9 +20,27 @@
 
 #include <qcheckbox.h>
 
+/*
+  \class QDS_CheckBox
+  
+  Datum with control corresponding to check box. This control can have only two states:
+  1 (on/true) or 0 (off/false). QDS_CheckBox don't take into account standard parameter
+  properties (minimum, maximum, filter, etc).
+
+  QDS_CheckBox can set and get following values for access methods (setStringValue(),
+  setIntegerValue(), setDoubleValue(), stringValue(), integerValue(), doubleValue()):
+    \li "1"  - check box state is setted as on.
+    \li "0"  - check box state is setted as off.
+    \li "-1" - check box state is setted as "NoChage" (undefined).
+
+  User can set and check a state "NoChange" using methods clear() and isEmpty() accordingly.
+*/
+
 /*!
-  Constructor. This method is protected. Object can't be directly constructed.
-  Use static method QDS_CheckBox::Create instead.
+  Constructor. Create check box datum object with datum identifier \aid under widget \aparent.
+  Parameter \aflags define behaviour of datum and set of created subwidgets. Default value of
+  this parameter is QDS::All. Parameter \acomp specify the component name which will be used
+  during search of dictionary item.
 */
 QDS_CheckBox::QDS_CheckBox( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -45,7 +63,7 @@ void QDS_CheckBox::clear()
 }
 
 /*!
-  Returns string from QCheckBox widget.
+  Returns string from QCheckBox widget. If the check box state is on then 1 returned otherwise 0.
 */
 QString QDS_CheckBox::getString() const
 {
@@ -56,7 +74,9 @@ QString QDS_CheckBox::getString() const
 }
 
 /*!
-  Sets the string into QCheckBox widget.
+  Sets the string into QCheckBox widget. If argument \atxt is string with number "1" then check box
+  state is setted as on. If argument \atxt is string with number "0" then state is setted as off.
+  If argument \atxt is string with number "-1" then state is setted as "NoChage" (undefined).
 */
 void QDS_CheckBox::setString( const QString& txt )
 {
@@ -95,25 +115,35 @@ QWidget* QDS_CheckBox::createControl( QWidget* parent )
 }
 
 /*!
-  Notify about shanging of control state
+  Notify about ñhanging of control state
 */
 void QDS_CheckBox::onParamChanged()
 {
   emit paramChanged();
 }
 
+/*!
+  Notify about ñhanging of control state. Switch off check box property "tristate" when
+  state changed by user.
+*/
 void QDS_CheckBox::onStateChanged( int state )
 {
   if ( state != QButton::NoChange && checkBox() )
     checkBox()->setTristate( false );
 }
 
+/*!
+  Sets the check box state \atheState.
+*/
 void QDS_CheckBox::setChecked( const bool theState )
 {
   if ( checkBox() )
     checkBox()->setChecked( theState );
 }
 
+/*!
+  Returns current check box state.
+*/
 bool QDS_CheckBox::isChecked() const
 {
   return checkBox() ? checkBox()->isChecked() : false;

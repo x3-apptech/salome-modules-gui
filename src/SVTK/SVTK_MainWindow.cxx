@@ -42,11 +42,13 @@
 #include "SVTK_NonIsometricDlg.h"
 #include "SVTK_UpdateRateDlg.h"
 #include "SVTK_CubeAxesDlg.h"
+#include "SVTK_SetRotationPointDlg.h"
 
 #include "SVTK_MainWindow.h"
 #include "SVTK_Event.h"
 #include "SVTK_Renderer.h"
 #include "SVTK_RenderWindowInteractor.h"
+#include "SVTK_InteractorStyle.h"
 
 #include "SVTK_Selector.h"
 
@@ -91,6 +93,7 @@ SVTK_MainWindow
   myUpdateRateDlg = new SVTK_UpdateRateDlg(myActionsMap[UpdateRate],this,"SVTK_UpdateRateDlg");
   myNonIsometricDlg = new SVTK_NonIsometricDlg(myActionsMap[NonIsometric],this,"SVTK_NonIsometricDlg");
   myCubeAxesDlg = new SVTK_CubeAxesDlg(myActionsMap[GraduatedAxes],this,"SVTK_CubeAxesDlg");
+  mySetRotationPointDlg = new SVTK_SetRotationPointDlg(myActionsMap[ChangeRotationPointId],this,"SVTK_SetRotationPointDlg");
 }
 
 /*!
@@ -143,6 +146,9 @@ SVTK_MainWindow
     GetRenderer()->OnAdjustTrihedron();
 
   GetInteractor()->update();
+
+  if ( (SVTK_InteractorStyle*)GetInteractorStyle() )
+    ((SVTK_InteractorStyle*)GetInteractorStyle())->OnTimer();
 }
 
 /*!
@@ -312,7 +318,7 @@ SVTK_MainWindow
 /*!
   Redirect the request to SVTK_Renderer::GetTrihedronSize
 */
-int
+vtkFloatingPointType
 SVTK_MainWindow
 ::GetTrihedronSize()
 {
@@ -324,7 +330,7 @@ SVTK_MainWindow
 */
 void 
 SVTK_MainWindow
-::SetTrihedronSize( const int theSize, const bool theRelative )
+::SetTrihedronSize( const vtkFloatingPointType theSize, const bool theRelative )
 {
   GetRenderer()->SetTrihedronSize(theSize, theRelative);
   Repaint();
@@ -463,6 +469,15 @@ SVTK_MainWindow
   connect(anAction, SIGNAL(activated()), this, SLOT(activateGlobalPanning()));
   myActionsMap[ GlobalPanId ] = anAction;
 
+  // Change rotation point
+  anAction = new QtxAction(tr("MNU_CHANGINGROTATIONPOINT_VIEW"), 
+			   theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ROTATION_POINT" ) ),
+			   tr( "MNU_CHANGINGROTATIONPOINT_VIEW" ), 0, this);
+  anAction->setStatusTip(tr("DSC_CHANGINGROTATIONPOINT_VIEW"));
+  anAction->setToggleAction(true);
+  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onChangeRotationPoint(bool)));
+  myActionsMap[ ChangeRotationPointId ] = anAction;
+
   // Rotation
   anAction = new QtxAction(tr("MNU_ROTATE_VIEW"), 
 			   theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ROTATE" ) ),
@@ -581,6 +596,8 @@ SVTK_MainWindow
   aPanningBtn->AddAction(myActionsMap[PanId]);
   aPanningBtn->AddAction(myActionsMap[GlobalPanId]);
 
+  myActionsMap[ChangeRotationPointId]->addTo(myToolBar);
+
   myActionsMap[RotationId]->addTo(myToolBar);
 
   SUIT_ToolButton* aViewsBtn = new SUIT_ToolButton(myToolBar);
@@ -646,6 +663,52 @@ SVTK_MainWindow
 ::activateRotation()
 {
   myEventDispatcher->InvokeEvent(SVTK::StartRotate,0);
+}
+
+/*!
+  Change rotation point
+*/
+void
+SVTK_MainWindow
+::onChangeRotationPoint(bool theIsActivate)
+{
+  if(theIsActivate){
+    mySetRotationPointDlg->addObserver();
+    if ( mySetRotationPointDlg->IsFirstShown() )
+      activateSetRotationGravity();
+    mySetRotationPointDlg->show();
+  }else
+    mySetRotationPointDlg->hide();
+}
+
+/*!
+  Set the gravity center as a rotation point
+*/
+void
+SVTK_MainWindow
+::activateSetRotationGravity()
+{
+  myEventDispatcher->InvokeEvent(SVTK::SetRotateGravity,0);
+}
+
+/*!
+  Set the selected point as a rotation point
+*/
+void
+SVTK_MainWindow
+::activateSetRotationSelected(void* theData)
+{
+  myEventDispatcher->InvokeEvent(SVTK::ChangeRotationPoint,theData);
+}
+
+/*!
+  Set the point selected by user as a rotation point
+*/
+void
+SVTK_MainWindow
+::activateStartPointSelection()
+{
+  myEventDispatcher->InvokeEvent(SVTK::StartPointSelection,0);
 }
 
 /*!

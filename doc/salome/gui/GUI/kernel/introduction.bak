@@ -1,0 +1,2088 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<!--(==============================================================)-->
+<!--(Document created with RoboEditor. )============================-->
+<!--(==============================================================)-->
+
+<head>
+
+<title>SALOME Installation Wizard Help</title>
+
+<!--(Meta)==========================================================-->
+
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Author content="Vadim SANDLER, Open CASCADE SAS (vadim.sandler@opencascade.com)">
+<meta name=Copyright content="2002-2006 CEA">
+<meta name=generator content="RoboHELP by eHelp Corporation - www.ehelp.com">
+<meta name=generator-major-version content=0.1>
+<meta name=generator-minor-version content=1>
+<meta name=filetype content=kadov>
+<meta name=filetype-version content=1>
+<meta name=page-count content=1>
+<meta name=layout-height content=18589>
+<meta name=layout-width content=901>
+
+
+
+<!--(Style Sheet)===================================================-->
+
+<style>
+<!--
+
+A:visited {
+	color: #551a8b;
+}
+
+A:active {
+	color: #ff0000;
+}
+
+A:link {
+	color: #0000ee;
+}
+
+-->
+</style>
+
+
+<!--(Body)==========================================================-->
+
+
+</head>
+
+<body style="color: #000000;">
+
+<p style="text-align: center;"
+	align=center>&nbsp; </p>
+
+<!--(Table)=========================================================-->
+<table nosave
+		x-use-null-cells
+		style="width: 100%;"
+		width=100%>
+
+<tr nosave>
+<td nosave>
+<h1><a href="http://www.opencascade.com"><img src="logocorp.png"
+												style="width: 139px;
+														height: 47px;
+														border-style: none;
+														border-style: none;"
+												width=139
+												height=47
+												border=0> </a></h1>
+</td>
+<td>
+<h3 style="text-align: center;"
+	align=center><font style="font-size: xx-large;"
+						size=7><font style="color: #000099;"
+									color=#000099>SALOME Installation Wizard 
+ Help</font></font></h3>
+</td>
+<td>
+<div style="text-align: right;"
+	align=right>
+<!--kadov_tag{{<implicit_p>}}--><a href="http://www.opencascade.org/SALOME/"><img 
+ src="application.png"
+	style="width: 109px;
+			height: 47px;
+			border-style: none;
+			border-style: none;"
+	width=109
+	height=47
+	border=0> </a>
+</div></td></tr>
+</table>
+
+<div style="text-align: right;"
+	align=right>
+&nbsp; 
+</div>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#install_from_wizard">Installing products 
+ with the Installation Wizard</a></li>
+	
+	<ul>
+		
+		<li class=kadov-p
+			class=kadov-p><a href="#gui_mode">GUI mode</a></li>
+		
+		<li class=kadov-p
+			class=kadov-p><a href="#batch_mode">Batch mode</a></li>
+		
+		<li class=kadov-p
+			class=kadov-p><a href="#env_files">Environment files</a></li>
+	</ul>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#check_version_proc">Notes on check products 
+ version procedure</a></li>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#pick_up_env">Pick up the environment</a></li>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#xml_files">Modifying XML configuration 
+ file</a></li>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#new_products">Implementing installation 
+ scripts for the new products</a></li>
+	
+	<li class=kadov-p
+		class=kadov-p><a href="#finish_buttons">Customizing Readme page 
+ buttons</a></li>
+</ul>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<h3><a name=install_from_wizard></a>Installing products with the <font 
+ style="color: #ff0000;"
+	color=#FF0000>Installation Wizard</font></h3>
+
+<span>The Installation Wizard can be launched in two modes: </span><span 
+ style="font-weight: bold;">GUI </span><span>and </span><span 
+ style="font-weight: bold;">batch</span><span>. 
+ <br>
+The root directory of the Installation Wizard contains Python script </span><span 
+ style="font-weight: bold;">runInstall</span><span>. To run the Installation 
+ Wizard just type <b>runInstall</b> in the terminal window: 
+
+</span><p>[ python ] <b>runInstall </b>[options]</p>
+
+<p>Without options this script will launch the SALOME Installation Wizard 
+ in the default mode (GUI).<br>
+The default installation settings can be overridden by using command line 
+ options. Each option has a short and a long notation:</p>
+
+<p><b style="font-weight: bold;">-g / --gui</b></p>
+
+<div style="margin-left: 40px;">
+<span>Runs the Installation Wizard in the GUI mode (this is the default 
+ mode). 
+</span></div>
+
+<p><b style="font-weight: bold;">-b / --batch</b></p>
+
+<div style="margin-left: 40px;">
+<span>Runs the Installation Wizard in the terminal mode. 
+</span></div>
+
+<p><b style="font-weight: bold;">-f FILE / --file=</b><span 
+ style="font-weight: bold;">FILE</span></p>
+
+<div style="margin-left: 40px;">
+<span>The XML configuration file to be used by the Installation Wizard.&nbsp; 
+ If this option is not used then the installation script tries to define 
+ the <i>Linux </i>version and use the corresponding XML file if it exists. 
+ For examle, for </span><span style="color: rgb(0, 0, 153);">Linux Mandrake 
+ 10.1</span><span>&nbsp; the <b>config_Mandrake_10.1.xml</b>&nbsp; file 
+ will be used by default. If no appropriate file is found, the file <b>config.xml</b> 
+ will be used. This file refers to the basic target platform which is </span><span style="color: rgb(0, 0, 153);">Linux Mandrake 10.1</span><span> for SALOME 
+ 3.0 and newer. If </span><span 
+ style="font-weight: bold;">config.xml</span><span> 
+ file is not found either, a warning message box is shown (in GUI mode) 
+ or printed to the console (in batch mode) and the Installation Wizard 
+ quits. 
+</span></div>
+
+<p><b style="font-weight: bold;">-d DIR / --target=DIR</b></p>
+
+<div style="margin-left: 40px;">
+<span>The target directory SALOME platform is to be installed to. If used, 
+ this option overrides the default target directory, given in the configuration 
+ XML file (usually</span><span 
+ style="font-weight: bold;"> ${HOME}/salome_&lt;version&gt;</span><span>, 
+ see <a href="#xml_files"
+		style="font-size: 12pt;">here</a> for more details). 
+</span></div>
+
+<p><b style="font-weight: bold;">-t DIR / --tmp=DIR </b></p>
+
+<div style="margin-left: 40px;">
+<span>The directory, which should be used for temporary files. If given, 
+ this option overrides the default temporary directory, given in the configuration 
+ xml file (usually </span><span 
+ style="font-weight: bold;">/tmp</span><span>, 
+ see <a href="#xml_files"
+		style="font-size: 12pt;">here</a> for more information). 
+</span></div>
+
+<p><b style="font-weight: bold;">-a / --all-from-sources</b></p>
+
+<div style="margin-left: 40px;">
+<span>Forces all the products to be installed from sources (including all 
+ SALOME modules). If this option is used, all default installation modes 
+ for all products are ignored.<br>
+This option is helpful when the user wants to install SALOME on the platform 
+ which is not officially supported. In this case, the user can try to run 
+ the SALOME Installation Wizard with the </span><span 
+ style="font-weight: bold;">-a</span><span> 
+ option in order to build all the products from sources.</span><span style="font-weight: bold; color: #ff0000;"><br>
+Note, that this is a time-consuming operation which can take more than 
+ 24 hours depending on the computer.</span><span> 
+</span></div>
+
+<p><b style="font-weight: bold;">-h / --help</b></p>
+
+<div style="margin-left: 40px;">
+<span>Prints help information on the Installation Wizard's use. 
+</span></div>
+
+<p><b style="font-weight: bold;">-v / --version</b></p>
+
+<div style="margin-left: 40px;">
+<span>Prints version information (</span><span 
+ style="font-weight: bold;">Note: 
+ </span><span>this is the Installation Wizard's version number, not the 
+ number of SALOME platform version). 
+</span></div>
+
+<p>The installation procedure supports different <span style="color: rgb(0, 0, 153);">Linux 
+ </span>platforms and installs various installation 3d-party prerequisite 
+ products which are required by SALOME platform. As it was mentioned above, 
+ the basic target platform for SALOME 3.0 and newer is <span style="color: rgb(0, 0, 153);">Linux 
+ Mandrake 10.1</span>.<br>
+Use of configuration XML files gives a flexible way to modify the list 
+ of products to be installed by the Installation Wizard without changing 
+ the program source code. Just create your own XML configuration file and 
+ implement installation scripts for the prerequisite products you need 
+ and then use this XML file with the Installation Wizard. This can be done, 
+ for example, for some <span style="color: rgb(0, 0, 153);">Linux </span>platform 
+ which is not supported directly by the Installation Wizard. See <a href="#xml_files"
+	style="font-size: 12pt;">Modifying XML configuration file</a> and <a 
+ href="#new_products"
+	style="font-size: 12pt;">Implementing installation scripts for the 
+ new products</a> sections for more information. </p>
+
+<h3 style="margin-left: 40px;"><a name=gui_mode></a>GUI mode</h3>
+
+<p>The <font 
+ style="color: #ff0000;"
+	color=#FF0000>Installation Wizard</font> GUI has been developed 
+ using <span style="color: rgb(0, 0, 153);">Trolltech's </span><span 
+ style="font-weight: bold;">Qt 
+ 3.0.5 </span>toolkit. After launching the Installation Wizard in the GUI 
+ mode the wizard window is shown to the user. This wizard guides the user 
+ through several subsequent pages. To navigate between the pages use <i>&quot;Next&quot;</i> 
+ and <i>&quot;Back&quot;</i> buttons in the lower part of the wizard window. 
+ The <i>&quot;Cancel&quot;</i> button closes the wizard window&nbsp;and 
+ quits the installation procedure after the user's confirmation. The <i>&quot;Help&quot;</i> 
+ button opens an additional window to show help information. </p>
+
+<p>The first &quot;<span style="font-style: italic;">Introduction&quot;</span> 
+ page is shown in <a href="#IntroPage">Figure 1</a>. Skip this page by 
+ clicking <i>&quot;Next&quot;</i>: </p>
+
+<a name=IntroPage></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img alt="Intro page"
+						src="intropage.png"
+						style="width: 586px;
+								height: 364px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=364
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 1:</b> &quot;Introduction&quot; 
+ page</p>
+
+<p>In the second page you are proposed to enter the target directory where 
+ the SALOME platform should be installed to. You can also click <i>&quot;Browse...&quot;</i> 
+ and choose the destination folder using the standard browse directory 
+ dialog box. <br>
+If the directory you want to install products to does not exist you are 
+ prompted to confirm directory creation. If you type a wrong directory 
+ path, or if you do not have write permissions for the directory you use, 
+ the corresponding message box is shown.</p>
+
+<p>You can also change the temporary directory (which is used to store 
+ temporary files required for the installation).<br>
+In the bottom part of the window the total disk space required for the 
+ installation and for the temporary files is displayed (see below for more 
+ details).</p>
+
+<p>In the GUI mode the Installation Wizard provides two different options 
+ to install the SALOME platform: <span 
+ style="font-weight: bold;">basic</span> 
+ (default option) and <span 
+ style="font-weight: bold;">advanced.</span> 
+ In the <span 
+ style="font-weight: bold;">basic</span> mode the user should 
+ enter the target installation directory and temporary folder. All other 
+ installation options are taken from the XML configuration file (see <a 
+ href="#Product_page1">Fig.2</a>):</p>
+
+<a name=Product_page1></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img alt="Intro page"
+						src="productpage1.png"
+						style="width: 586px;
+								height: 364px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=364
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 2:</b> &quot;Installation 
+ settings&quot; </p>
+
+<p>In addition, you have a choice to use &quot;Install all products from 
+ sources&quot; check box. If this option is turned on, all the products 
+ will be installed from the sources (using their own build procedures). 
+ This check box corresponds to the <span 
+ style="font-weight: bold;">--all-from-sources</span> 
+ (<span 
+ style="font-weight: bold;">-a</span>) option of the <span 
+ style="font-weight: bold;">runInstall</span> 
+ script (see <a href="#install_from_wizard">here</a>). </p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><img 
+ src="../note1.gif"
+	x-maintain-ratio=TRUE
+	style="border: none;
+			width: 35px;
+			height: 37px;
+			float: none;
+			border-style: none;
+			border-style: none;"
+	width=35
+	height=37
+	border=0><span 
+ style="font-weight: bold;"> Installation of all products 
+ from sources is a long-time operation.</span></p>
+
+<p>To switch to the <span 
+ style="font-weight: bold;">advanced</span> option, 
+ click <i>&quot;More...&quot;</i> (see <a href="#ProductPage2">Fig.3</a> 
+ ).</p>
+
+<p>In the advanced mode you have a possibility to select products to be 
+ installed. Each product can have several options of installation: you 
+ have a possibility to use the native product (provided with Linux distribution 
+ and installed in the system folders), install already precompiled binaries, 
+ build the product from sources or not install it at all. Available options 
+ and default option are taken from the XML configuration file. You can 
+ mark the products you want to install by clicking the corresponding radio-buttons 
+ in the list view in the left part of the page. <br>
+Note, that some products may require some other pre-requisite products 
+ to be installed (or these prerequisite products should be already available 
+ on your computer). The installation procedure has a special feature to 
+ automatically mark these products in the list view. For example, in order 
+ to install <b><i>PyQt</i></b> it is necessary to have <b><i>gcc, Python</i></b>,<b><i> 
+ Qt</i></b> and <b><i>Sip</i></b> installed. Therefore all these products 
+ will also be <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->turned 
+ on when you check on <b><i>PyQt</i></b>. This feature can be switched 
+ off by clicking the <i>&quot;Automatic dependencies&quot;</i> checkbox. 
+ Turn on this checkbox if you want all prerequisite products to be automatically 
+ checked when you select some product to be installed. Turn off this checkbox 
+ if you want to disable this feature.</p>
+
+<a name=ProductPage2></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img src="productpage.png"
+						alt="Products page"
+						style="float: none;
+								width: 586px;
+								height: 525px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=525
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 3:</b> &quot;Installation 
+ settings&quot; page in the 'advanced' mode</p>
+
+<p>If you want to use native products (like <span 
+ style="font-weight: bold;">gcc</span>, 
+ <span 
+ style="font-weight: bold;">tcl</span>, etc.), select <i>&quot;use 
+ native&quot; </i>option. <br>
+Special button in the right part of the page - <i>&quot;Unselect All&quot; 
+ </i>- allows to reset quickly all products to the <i>&quot;not install&quot;</i> 
+ state. </p>
+
+<p>There are also two checkboxes on this page: <i>&quot;SALOME sources&quot;</i> 
+ and <i>&quot;SALOME binaries&quot;</i>. These three-state checkboxes allow 
+ quick selecting/unselecting sources/binaries packages of SALOME modules 
+ for installation.</p>
+
+<p>In addition, when some SALOME sources are selected, one more check box 
+ becomes available: <span style="font-style: italic;">&quot;Build SALOME 
+ sources&quot;</span>. If this option is turned on, the selected SALOME 
+ modules will be built and installed from sources.<span 
+ style="font-weight: bold;"><br>
+&nbsp;</span></p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0> If this check box is turned on, 
+ the corresponding SALOME module binaries package installation is disabled, 
+ because of <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->SALOME 
+ module sources and binaries packages conflict </span>(see <a href="#ProductPage3">Fig. 
+ 4</a> below). </p>
+
+<a name=ProductPage3></a>
+
+<p style="text-align: center;"
+	align=center><img src="productpage2.png"
+						alt="Products page"
+						style="width: 586px;
+								height: 525px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=525
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 4:</b> &quot;Build 
+ SALOME sources&quot; check box usage</p>
+
+<p>The box at the right side of the page displays the information about 
+ currently highlighted product: name, version and short description, required 
+ disk space, disk space required for temporary files, list of prerequisites 
+ (this information is provided in the XML file) and current user choice. 
+ </p>
+
+The <i>&quot;Disk space required:&quot;</i> field displays how much disk 
+ space on the hard drive is required for installation of selected products. 
+ 
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></b><span 
+ style="font-weight: bold;">Please, 
+ take into account that the displayed amount of required disk space is 
+ approximate and may differ when you install products on your hard drive.</span> 
+ </p>
+
+<p>The installation procedure uses a special directory to store temporary 
+ files. The <i>&quot;Space for temporary files:&quot;</i> field shows the 
+ information about required disk space on the hard drive for extracting 
+ and compiling the selected products. You can change the temporary directory 
+ - just type a path to the folder you want to use or click on the corresponding 
+ <i>&quot;Browse...&quot;</i> button. <span 
+ style="font-weight: bold;"><br>
+&nbsp;</span></p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span><b 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></b></span><b 
+ style="font-weight: bold;"><span style="font-weight: normal;">A</span></b>ctually, 
+ temporary files are not stored directly in the directory entered by the 
+ user. The Installation Wizard creates an additional folder in this directory 
+ named something like INSTALLWORK<span 
+ style="font-weight: bold;">XXXXX</span> 
+ where XXXXX is a unique number. This allows to launch several Installation 
+ Wizards simultaneously. This temporary directory is removed automatically 
+ when the installation finishes.</p>
+
+<p>The installation procedure also checks the available disk space. If 
+ there is not enough disk space on your hard drive you will see a corresponding 
+ error message box. </p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0>You are strongly recommended not 
+ to use directory names containing spaces. </b>Otherwise you can experience 
+ some troubles with the installation.<b> </b></p>
+
+<p>To proceed further click <i>&quot;Next&quot;</i>. At this moment the 
+ program will make some tests to check installation settings: if there 
+ is enough disk space on the hard drive, check for native products installation, 
+ dependencies (prerequisites) for each product you have selected to be 
+ installed. If any test fails you will see the corresponding warning message 
+ box. Otherwise the wizard will proceed to the next page: </p>
+
+<a name=ChoicePage></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img src="choicepage.png"
+						alt="Choice page"
+						style="width: 586px;
+								height: 485px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=485
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 5:</b> &quot;Check 
+ your choice&quot; page</p>
+
+<p>This page summarizes the installation options you've made on the previous 
+ pages. You can check again your choice and change it if necessary by getting 
+ back to the previous page. <br>
+When you are sure that everything is OK, click <i>&quot;Next&quot;</i> 
+ to follow to the <a href="#ProgressPage">next page</a>. </p>
+
+<a name=ProgressPage></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img alt="Progress page"
+						src="progresspage1.png"
+						style="width: 586px;
+								height: 364px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=364
+						border=0></p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 6:</b> &quot;Installation 
+ progress&quot; page</p>
+
+<p style="text-align: justify;">To start installation of the selected products 
+ click &quot;Start&quot;. It launches the shell installation script and 
+ you will be able to see the output of the script in the <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->dialog 
+ topmost frame. If any errors occur during the installation progress the 
+ corresponding messages will be printed to the log window in bold red font.</p>
+
+<p style="text-align: justify;">It is possible to break the installation 
+ at any time by clicking &quot;Stop&quot;. Then you can get back to the 
+ previous pages if you wish to change installation settings or restart 
+ installation by pressing again &quot;Start&quot; button.</p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b><span 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0> I</span></b><span 
+ style="font-weight: bold;">n the current implementation 
+ it is not possible to resume the stopped installation process; it will 
+ be re-started from the very beginning.</span> </p>
+
+<a name=ProgressPage1></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img alt="Progress page"
+						src="progresspage.png"
+						style="width: 586px;
+								height: 364px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=364
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 7:</b> &quot;Installation 
+ progress&quot; page: installation in progress</p>
+
+<p>The <i>&quot;Installation Status&quot;</i> frame window shows you the 
+ progress of installation. &quot;<font 
+ style="color: #ff0000;"
+	color=#FF0000>Waiting</font>&quot; 
+ status means that installation of this product has not been started yet. 
+ The product currently being installed is marked as &quot;<font style="color: #ff9900;"
+	color=#FF9900>Processing</font>&quot;. All installed products have 
+ &quot;<font style="color: #33ff33;"
+			color=#33FF33>Completed</font>&quot; status. </p>
+
+<p>You can abort installation and close the installation procedure using 
+ <i>&quot;Cancel&quot;</i> button. </p>
+
+&nbsp; 
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span 
+ style="font-weight: bold;"><b style="font-weight: bold;"><img src="../note1.gif"
+	x-maintain-ratio=TRUE
+	style="border: none;
+			width: 36px;
+			height: 38px;
+			float: none;
+			border-style: none;
+			border-style: none;"
+	width=36
+	height=38
+	border=0>T</b>his button sends the signal &quot;SIGTERM&quot; to the 
+ shell script. The script tries to clear all temporary files. The process 
+ of removing temporary files can take some time, so the installation wizard 
+ will wait 3 seconds before closing.</span> </p>
+
+<p>At the end of installation (all selected products have been installed 
+ successfully) you can go back to the previous pages to start a new installation 
+ or click <i>&quot;Next&quot; </i>to go the Readme page: </p>
+
+<a name=readmepage></a>
+
+<p style="text-align: center;"
+	align=center>&nbsp;</p>
+
+<p style="text-align: center;"
+	align=center><img alt="Read page"
+						src="readmepage.png"
+						style="width: 586px;
+								height: 484px;
+								border-style: none;
+								border-style: none;"
+						width=586
+						height=484
+						border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 8:</b> &quot;Finish 
+ installation&quot; page</p>
+
+<p>In this page you can read important information about the Instalation 
+ Wizard itself and some tips: how to run and test SALOME or how to build 
+ SALOME from the sources. This is the contents of the README file which 
+ you can find in the root directory of the Installation Wizard. <br>
+You can also launch SALOME Desktop from this page or read the Release Notes 
+ file by clicking on the corresponding buttons in the lower part of the 
+ page (see <a href="#xml_files">here</a> and <a href="#finish_buttons">here</a> 
+ for more information about customizing these buttons).</p>
+
+<h3 style="margin-left: 40px;"><a name=batch_mode></a>Batch mode</h3>
+
+<p>To launch the Installation Wizard in the batch mode use <span 
+ style="font-weight: bold;">-b</span> 
+ (<span 
+ style="font-weight: bold;">--batch</span>) parameter.<br>
+In this mode the GUI wizard is not shown but all the installation status 
+ is displayed directly in the console. In the batch mode the user does 
+ not have a possibility to change installation settings which are given 
+ in the configuration file, except target and temporary directories which 
+ can be overridden by the corresponding command line options.<br>
+The only exception is <span 
+ style="font-weight: bold;">--all-from-sources</span> 
+ (<span 
+ style="font-weight: bold;">-a</span>) option which enables special 
+ installation mode in which all the products (including SALOME modules) 
+ are installed from sources, ignoring the default mode defined in the XML 
+ configuration file (see <a href="#install_from_wizard">here</a> for details).</p>
+
+<p style="text-align: center;"
+	align=center><!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}--><a 
+ name=BatchMode></a><br>
+<br>
+<img alt="Batch mode"
+	src="batchmode.png"
+	style="width: 660px;
+			height: 410px;
+			border-style: none;
+			border-style: none;"
+	width=660
+	height=410
+	border=0> </p>
+
+<p style="text-align: center;"
+	align=center><b style="font-weight: bold;">Figure 9:</b> Batch mode</p>
+
+<h3 style="margin-left: 40px;"><a name=env_files></a>Environment files</h3>
+
+<p>During the process of installation the script creates some environment 
+ files to simplify the procedure of launching SALOME. These shell scripts 
+ set all necessary environment variables for all products you have installed. 
+ To learn how installation scripts collects the environment, see <a href="#pick_up_env">here</a>. 
+ These files are: <b>salome.csh</b> + <b>salome.sh</b> in the <span style="font-style: italic; font-weight: bold;">KERNEL 
+ module</span><b><i> sources</i></b> and <span style="font-style: italic; font-weight: bold;">KERNEL 
+ module</span><b><i> binaries</i></b> root directories and <b>env_products.csh</b> 
+ + <b>env_products.sh </b>and <span 
+ style="font-weight: bold;">env_build.csh 
+ </span>+ <span 
+ style="font-weight: bold;">env_build.sh</span> in the target 
+ installation directory.</p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b><span 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></span></b><span 
+ style="font-weight: bold;">Note:</span> there is some 
+ difference between these files: <span 
+ style="font-weight: bold;">env_build.*</span> 
+ files are optimized to be used for building SALOME modules from sources 
+ (see <span 
+ style="font-weight: bold;">README </span>file provided with 
+ the installation procedure on the CD). The <span 
+ style="font-weight: bold;">env_products.*</span> 
+ (and<span 
+ style="font-weight: bold;"> salome.*</span>) files are optimized 
+ for SALOME launching. The behavior is defined by the environment variable<span 
+ style="font-weight: bold;"> </span><b>ENV_FOR_LAUNCH</b> which is set 
+ to <span 
+ style="font-weight: bold;">0</span> in env_build.* files and 
+ to <span 
+ style="font-weight: bold;">1</span> in env_products.* (salome.*) 
+ files. </p>
+
+<!--kadov_tag{{<implicit_empty_p>}}-->&nbsp;<br><!--kadov_tag{{</implicit_empty_p>}}-->
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<h3><a name=check_version_proc></a>Notes on<font 
+ style="color: #ff0000;"
+	color=#FF0000> check products 
+ version</font> procedure</h3>
+
+Unfortunately there is no exact algorithm to identify the product version 
+ under Linux platform. The information in this section gives an idea how 
+ the version is checked for the native/preinstalled products (this information 
+ refers to the base platform <span style="color: rgb(0, 0, 153);">Linux 
+ Mandrake 10.1</span>; and the same algorithms are used for other platforms). 
+ <br>
+The general rule for all products is that the path to the binaries should 
+ be set via the <span 
+ style="font-weight: bold;">PATH</span> environment 
+ variable, path to the libraries should be set via the <span 
+ style="font-weight: bold;">LD_LIBRARY_PATH</span> 
+ variable and the python modules should be available via the <span 
+ style="font-weight: bold;">PYTHONPATH</span> 
+ variable. 
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b><span 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></span></b><span 
+ style="font-weight: bold;">Note:</span> the information 
+ given in this section refers to the prerequisite products for SALOME version 
+ 3.2.4. </p>
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>gcc 3.4.1</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">gcc -dumpversion</span> 
+ command. The <span 
+ style="font-weight: bold;">gcc</span> executable should 
+ be in the <span 
+ style="font-weight: bold;">PATH</span> environment variable. 
+ Version should be equal to &quot;3.4.1&quot;. It is recommended to use 
+ native gcc on Mandrake 10.1. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>tcl/tk 8.4.5</li>
+</ul>
+
+Version number for <span 
+ style="font-weight: bold;">tcl/tk</span> can be 
+ found in tclConfig.sh and tkConfig.sh files (<span 
+ style="font-weight: bold;">TCL_VERSION</span> 
+ and <span 
+ style="font-weight: bold;">TK_VERSION</span> variables correspondingly). 
+ Version number should be equal to &quot;8.4&quot; (release number is not 
+ checked). <br>
+Set the <span 
+ style="font-weight: bold;">TCLHOME</span> environment variable 
+ to the root directory of tcl/tk installation.<br>
+It is recommended to use native tcl/tk on Mandrake 10.1. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>boost 1.31.0</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">version.hpp</span> 
+ file which is part of the boost distribution. This file defines the <span 
+ style="font-weight: bold;">BOOST_VERSION</span> macro which should be 
+ equal to &quot;103100&quot;. In addition the existence of boost libraries 
+ is checked. <br>
+Set the <span 
+ style="font-weight: bold;">BOOSTDIR</span> environment variable 
+ if you have a preinstalled version of boost. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Python 2.3.4</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">python -V</span> 
+ command. The <span 
+ style="font-weight: bold;">python</span> executable 
+ should be in the <span 
+ style="font-weight: bold;">PATH</span> environment 
+ variable. Version number should be equal to &quot;2.3.4&quot;. It is recommended 
+ to use native Python on Mandrake 10.1.<br>
+Set the <span 
+ style="font-weight: bold;">PYTHONHOME</span> environment 
+ variable if you have a preinstalled version of Python. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Swig 1.3.24</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">swig -version</span> 
+ command. The <span 
+ style="font-weight: bold;">swig</span> executable should 
+ be in the <span 
+ style="font-weight: bold;">PATH</span> environment variable. 
+ Version number should be equal to &quot;1.3.24&quot;. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Qt 3.3.3</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">qglobal.h</span> 
+ file which is part of the Qt distribution. This file defines <span 
+ style="font-weight: bold;">QT_VERSION_STR</span> 
+ macro which should be equal to &quot;3.3.3&quot;. It is recommended to 
+ use native Qt on Mandrake 10.1.<br>
+Set the <span 
+ style="font-weight: bold;">QTDIR</span> environment variable 
+ if you have a preinstalled version of qt. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>msg2qm</li>
+</ul>
+
+<span 
+ style="font-weight: bold;">msg2qm</span> is a Qt tool which is used 
+ to convert text *.po files to *.qm resource files. Unfortunately this 
+ tool is not included to the Linux distribution and provided only in Qt 
+ sources package. This is the reason why this tool is supplied with the 
+ SALOME Installation Wizard.<br>
+There is no way to check the version number of msg2qm tool. Just set <span 
+ style="font-weight: bold;">MSG2QM_ROOT</span> environment variable if 
+ you have a preinstalled version of msg2qm tool. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Open CASCADE 6.1.2a2</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">Standard_Version.hxx</span> 
+ file which is part of the Open CASCADE distribution. This file defines 
+ <span 
+ style="font-weight: bold;">OCC_VERSION_MAJOR,</span> <span 
+ style="font-weight: bold;">OCC_VERSION_MINOR</span> 
+ and <span 
+ style="font-weight: bold;">OCC_VERSION_MAINTENANCE</span> macros 
+ which should refer to version 6.1.2.<br>
+Set the <span 
+ style="font-weight: bold;">CASROOT</span> environment variable 
+ if you have a preinstalled version of Open CASCADE. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>qwt 4.2.0/0.4.2</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">qwt_global.h</span> 
+ file which is part of the qwt distribution. This file defines <span 
+ style="font-weight: bold;">QWT_VERSION_STR</span> 
+ macro which should be equal to &quot;4.2.0&quot;.<br>
+Set the <span 
+ style="font-weight: bold;">QWTHOME</span> environment variable 
+ if you have a preinstalled version of qwt. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>hdf 5-1.6.4</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">libhdf5.settings</span> 
+ file which is part of the <span 
+ style="font-weight: bold;">hdf5</span> 
+ distribution. Version should be equal to 1.6.4.<br>
+Set the <span 
+ style="font-weight: bold;">HDF5HOME</span> environment variable 
+ if you have a preinstalled version of hdf5. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>med 2.2.3</li>
+</ul>
+
+Unfortunately there is no formal way to check med version number. We check 
+ existence of libmed.so.1.0.2 library on the computer. If you have any 
+ problem with a preinstalled version of med, please, reinstall it.<br>
+Set the <span 
+ style="font-weight: bold;">MED2HOME</span> environment variable 
+ if you have a preinstalled version of med. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Vtk 4.2.6</li>
+</ul>
+
+Unfortunately there is no formal way to check VTK version number. We just 
+ check the existence of <span 
+ style="font-weight: bold;">libvtkCommon.so</span> 
+ library on the computer and hope that it is of version we need. If you 
+ have any problem with a preinstalled version of Vtk, please, reinstall 
+ it.<br>
+Set the <span 
+ style="font-weight: bold;">VTKHOME</span> environment variable 
+ if you have a preinstalled version of Vtk. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>OmniORB 4.0.5, OmniORBpy 2.5, OmniNotify 2.1</li>
+</ul>
+
+We just check existence of some omniORB libraries and executable on the 
+ computer, like <span 
+ style="font-weight: bold;">libomniORB4.so.0.5</span>, 
+ <span 
+ style="font-weight: bold;">_omnipymodule.so.2.4</span>, <span 
+ style="font-weight: bold;">libCOSNotify4.so.0.1</span> 
+ and <span 
+ style="font-weight: bold;">notifd</span>.<br>
+Set the <span 
+ style="font-weight: bold;">OMNIORBDIR</span> environment 
+ variable if you have a preinstalled version of omniORB products. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>sip 4.1</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">sip -V</span> 
+ command. The <span 
+ style="font-weight: bold;">sip</span> executable should 
+ be in the <span 
+ style="font-weight: bold;">PATH</span> environment variable. 
+ Version number should be equal to &quot;4.1&quot;.<br>
+Set the <span 
+ style="font-weight: bold;">SIPDIR</span> environment variable 
+ to the directory where you have sip executable preinstalled. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>PyQt 3.13</li>
+</ul>
+
+Version number is defined by <span 
+ style="font-weight: bold;">pyqtconfig.py</span> 
+ Python module file which is part of the <span 
+ style="font-weight: bold;">PyQt</span> 
+ distribution. Version should be equal to &quot;3.13&quot;.<br>
+Set the <span 
+ style="font-weight: bold;">PYQTDIR </span>environment variable 
+ if you have a preinstalled version of PyQt. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>netgen 4.5</li>
+</ul>
+
+Unfortunarely we can't find anything about netgen version. We just check 
+ if <span 
+ style="font-weight: bold;">NETGENROOT</span> environment variable 
+ is set.<br>
+Set the <span 
+ style="font-weight: bold;">NETGENROOT</span> environment 
+ variable if you have a preinstalled version of netgen mesher. 
+
+<!--begin!kadov{{--><br><!--}}end!kadov--><!--kadov_tag{{<implicit_p>}}-->&nbsp; 
+ 
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span 
+ style="font-weight: bold;"><b style="font-weight: bold;"><img src="../note1.gif"
+	x-maintain-ratio=TRUE
+	style="border: none;
+			width: 36px;
+			height: 38px;
+			float: none;
+			border-style: none;
+			border-style: none;"
+	width=36
+	height=38
+	border=0></b>Note: </span>netgen 4.5 provided with the SALOME installation 
+ Wizard has been patched to improve its performance. </p>
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>Numeric 23.7</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">python -c 
+ 'import Numeric; print Numeric.__version__'</span> command. The <span 
+ style="font-weight: bold;">python</span> executable should be in the <span 
+ style="font-weight: bold;">PATH</span> environment variable and <span 
+ style="font-weight: bold;">Numeric</span> module should be available for 
+ the Python (for example it should be in the <span 
+ style="font-weight: bold;">PYTHONPATH</span> 
+ environment variable). Version number should be equal to &quot;23.7&quot;. 
+ If you have any problem with a preinstalled version of Numeric 23.7, please, 
+ reinstall it.<br>
+Add the directory where&nbsp;you have a preinstalled version of Numeric 
+ package to the the <span 
+ style="font-weight: bold;">PYTHONHOME </span>environment 
+ variable. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>graphviz 2.2.1</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">dot -V</span> 
+ command. The <span 
+ style="font-weight: bold;">dot</span> executable should 
+ be in the <span 
+ style="font-weight: bold;">PATH</span> environment variable. 
+ Version number should be equal to &quot;2.2.1&quot;.<br>
+Add <span 
+ style="font-weight: bold;">graphviz</span> bin directory to the 
+ the <span 
+ style="font-weight: bold;">PATH</span> environment variable. 
+ 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p>doxygen 1.4.6</li>
+</ul>
+
+Version number is checked by <span 
+ style="font-weight: bold;">doxygen --version</span> 
+ command. The <span 
+ style="font-weight: bold;">doxygen</span> executable 
+ should be in the <span 
+ style="font-weight: bold;">PATH</span> environment 
+ variable. Version number should be equal to &quot;1.4.6&quot;. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><span style="font-weight: bold; color: rgb(0, 0, 153);">SALOME 
+ </span>module <span style="font-weight: bold; color: rgb(0, 0, 153);">sources</span> 
+ (3.2.4).</li>
+</ul>
+
+For each SALOME module sources package (KERNEL, GUI, GEOM, etc...) the 
+ root directory contains file configure.in (configure.ac) which defines 
+ version information.<br>
+Set the <span 
+ style="font-weight: bold;">&lt;MODULE&gt;_SRC_DIR</span> 
+ environment variable for each SALOME <span 
+ style="font-weight: bold;">MODULE</span> 
+ sources package installed (where <span 
+ style="font-weight: bold;">MODULE</span> 
+ is KERNEL, GUI, GEOM, ...). 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><span style="font-weight: bold; color: rgb(0, 0, 153);">SALOME 
+ </span>module <span style="font-weight: bold; color: rgb(0, 0, 153);">binaries 
+ </span>(3.2.4)</li>
+</ul>
+
+For each SALOME module binaries package (KERNEL, GUI, GEOM, etc...) the 
+ <span 
+ style="font-weight: bold;">bin/salome</span> directory contains 
+ file <span 
+ style="font-weight: bold;">VERSION</span> which defines version 
+ information.<br>
+Set <span 
+ style="font-weight: bold;">&lt;MODULE&gt;_ROOT_DIR</span> environment 
+ variable for each SALOME <span 
+ style="font-weight: bold;">MODULE</span> 
+ binaries package installed (where <span 
+ style="font-weight: bold;">MODULE</span> 
+ is KERNEL, GUI, GEOM, ...). 
+
+<p>If you have native products installed to directories different from 
+ default ones (not <b>/usr/bin</b>, <b>/usr/lib</b>...), it is recommended 
+ to follow the above mentioned instructions. Or you should properly set 
+ <span 
+ style="font-weight: bold;">PATH</span> and <span 
+ style="font-weight: bold;">LD_LIBRARY_PATH</span> 
+ variables <b><font style="color: #ff0000;"
+					color=#FF0000>before</font></b> starting the Installation 
+ Wizard. Otherwise the installation script will fail to find preinstalled/native 
+ products. </p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span><b 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></b></span><b style="font-weight: bold;">Note:</b> for some native 
+ products (e.g. gcc, Python) the rules of version checking are not so strict 
+ as described above. Only major and minor version numbers should coincide 
+ with the prerequisite. Newer version of the product can also be used. 
+ If some native product has version number larger than that required by 
+ the installation procedure, the user will be prompted by the warning message 
+ like this: <i>&quot;You have newer version of gcc installed on your computer 
+ than that is required (3.4.1). Continue?&quot;</i>. You can click <i>&quot;Yes&quot;</i> 
+ to proceed with the installation but in this case you should be aware 
+ of what you are doing. SALOME binaries (including other products) are 
+ compiled with the predefined prerequisites and most likely can not be 
+ run successfully if these products are not found. This can be helpful 
+ only if you plan to build all products from sources. </p>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<h3><a name=pick_up_env></a>Pick up the <font 
+ style="color: #ff0000;"
+	color=#FF0000>environment</font></h3>
+
+Please, read the following information carefully . This section describes 
+ how the installation procedure generates the environment scripts for the 
+ SALOME platform being installed. 
+
+<p>After installing each product shell the script creates a special environment 
+ file for the product in its installation folder. The name of the file 
+ is generated from the name of product by the following scheme: <b>env_&lt;product_name&gt;.sh</b> 
+ (for example <b>env_Vtk.sh </b>for the Vtk). This file includes all necessary 
+ environment settings. At the final step of the installation the script 
+ picks up all the settings files and generates two common environment files 
+ from them: <b>salome.sh</b> and <b>salome.csh </b>for <span 
+ style="font-weight: bold;">bash</span> 
+ and <span 
+ style="font-weight: bold;">csh</span> shells correspondingly. 
+ Such approach helps to save time when reinstalling products and you may 
+ not bother about setting all environment variables manually to build/launch 
+ SALOME. What you simply need is to source one of these environment files. 
+ </p>
+
+<p>This also concerns those products which are not being installed. For 
+ example, you install some SALOME binaries to the directory where you have 
+ previously installed other products.&nbsp; The Installation procedure 
+ tries to collect environment files from the target directory if it finds 
+ necessary products installed there. If some product is not found in the 
+ target directory the corresponding section of <b>salome.sh/salome.csh</b> 
+ files will be skipped. <br>
+For native products (like <i><b>gcc, tcl, etc...)</b></i> the installation 
+ procedure tries to find them first using <b>PATH</b> / <b>LD_LIBRARY_PATH</b> 
+ variables and then in the system default directories (<b>/usr/bin, /usr/lib</b> 
+ etc., depending on the product). </p>
+
+<p>In any case you may edit <b>salome.*</b> files after the installation 
+ procedure finishes, if you want.</p>
+
+&nbsp; 
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><span><b 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></b></span><span 
+ style="font-weight: bold;">Note:</span> 
+ as it was mentioned <a href="#env_files">above</a> there are other environment 
+ files which are generated by the installation procedure: <span 
+ style="font-weight: bold;">env_products.csh</span> 
+ + <span 
+ style="font-weight: bold;">env_products.sh</span> and <span 
+ style="font-weight: bold;">env_build.csh</span> 
+ + <span 
+ style="font-weight: bold;">env_build.sh</span>. These files can 
+ be found in the target installation root directory.</p>
+
+<!--kadov_tag{{<implicit_empty_p>}}-->&nbsp;<br><!--kadov_tag{{</implicit_empty_p>}}-->
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<h3><a name=xml_files></a>Modifying <font 
+ style="color: #ff0000;"
+	color=#FF0000>XML</font> configuration 
+ <font 
+ style="color: #ff0000;"
+	color=#FF0000>file</font></h3>
+
+You can create your own XML configuration file. The Installation Wizard 
+ can then take it as a command line argument to provide a list of products 
+ you want to install with it. The list of products and some other settings 
+ for the Installation Wizard are provided in the XML file. The default 
+ file which Installation Wizard looks for if no command line arguments 
+ are given, is <b>config.xml</b>.<br>
+This section describes the structure of the configuration file. <br>
+XML tags are in bold blue, optional sections/tags are in brackets. 
+
+<p><font style="font-family: Courier;"
+		face=Courier><b style="font-weight: bold;"><font style="color: #000099;"
+														color=#000099>&lt;document&gt;</font></b> 
+ <font style="color: #000000;"
+		color=#000000><b><br>
+&nbsp;&nbsp;&nbsp; </b>[</font><b><font style="color: #000099;"
+										color=#000099> &lt;config</font></b><font style="color: #000000;"
+		color=#000000> [ version=&lt;install_wizard_version&gt; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ caption=&lt;install_wizard_caption&gt; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ copyright=&lt;install_wizard_copyright&gt;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ license=&lt;install_wizard_license_info&gt; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ os=&lt;target_platform&gt; ]</font><b><font style="color: #000099;"
+										color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /&gt;</font></b><font style="color: #000000;"
+		color=#000000> <br>
+&nbsp;&nbsp;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&nbsp;&nbsp;&nbsp; </b>[ </font><b><font style="color: #000099;"
+										color=#000099>&lt;path</font></b><font style="color: #000000;"
+		color=#000000>&nbsp;&nbsp; [ targetdir=&lt;target_directory&gt; ]</font> 
+ <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ tempdir=&lt;temp_directory&gt;&nbsp;&nbsp;&nbsp;&nbsp; ]</font><b><font style="color: #000099;"
+										color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /&gt; </font></b><font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&nbsp;&nbsp;&nbsp; </b>[ </font><b><font style="color: #000099;"
+										color=#000099>&lt;button</font></b><font style="color: #000000;"
+		color=#000000> &nbsp; label=&lt;button_label&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font> 
+ <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 
+ [ tooltip=&lt;button_tooltip&gt; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 
+ &nbsp; script=&lt;button_script&gt;&nbsp;&nbsp;&nbsp;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ [ disable=&lt;disable_flag&gt;&nbsp;&nbsp;&nbsp;]</font><b><font style="color: #000099;"
+										color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /&gt; </font></b><font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; [</font><b><font style="color: #000099;"
+										color=#000099> &lt;button</font></b><font style="color: #000000;"
+		color=#000000> ... </font><font style="color: #000099;"
+									color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /<b>&gt;</b></font><font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; [</font><b><font style="color: #000099;"
+										color=#000099> &lt;product</font></b><font style="color: #000000;"
+		color=#000000>&nbsp; name=&lt;product_name&gt;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ version=&lt;product_version&gt;</font> <br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; [ context=&lt;product_context&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ ]<br>
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; [ description=&lt;product_description&gt; 
+ ]<font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ install=&lt;installation_mode&gt;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ supported=&lt;supported_installation_modes&gt;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ 
+ disable=&lt;disable_flag&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>
+&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; [ pickupenv=&lt;pickup_env_flag&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ ]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ dependancies=&lt;list_of_prerequisites&gt;</font>&nbsp;<font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 
+ installdiskspace=&lt;install_disk_space&gt;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; 
+ temporarydiskspace=&lt;tmp_disk_space&gt;</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; 
+ script=&lt;installation_script_name&gt;</font><font style="color: #000099;"
+									color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /<b>&gt;</b></font><font style="color: #000000;"
+		color=#000000> 
+ <br>
+&nbsp;&nbsp;&nbsp; ]</font> <font style="color: #000000;"
+		color=#000000><br>
+&nbsp;&nbsp;&nbsp; [</font><b><font style="color: #000099;"
+										color=#000099> &lt;product</font></b><font style="color: #000000;"
+		color=#000000> ... </font><font style="color: #000099;"
+									color=#000099><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /<b>&gt;</b></font><font style="color: #000000;"
+		color=#000000> 
+ <br>
+&nbsp;&nbsp;&nbsp; ]<br>
+&nbsp;&nbsp;&nbsp; ...</font><b><font style="color: #000099;"
+										color=#000099><br>
+&lt;/document&gt;</font></b> </font></p>
+
+<h4><font style="color: #000000;"
+			color=#000000>&lt;config&gt; section</font></h4>
+
+<font style="color: #000000;"
+			color=#000000>This is an optional section; it provides general 
+ information about the Installation Wizard itself.<br>
+<br>
+Attributes:</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">version</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The application version number to be shown in the 
+ caption.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">caption</b></font></li>
+</ul>
+
+The application main window caption - if this string contains '%1' text 
+ the title will contain the version number in this place (see above). 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">copyright</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The application copyright information (shown in the 
+ first page).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">license</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The application license information (shown in the 
+ first page).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">os</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>This parameter defines the directory (relative from 
+ ./Products/BINARIES) where the Installation Wizard will search precompiled 
+ binaries packages. If this tag is not provided, binaries packages are 
+ looked for in the ./Products/BINARIES directory.</font> 
+
+<h4><b style="font-weight: bold;"><font style="color: #000000;"
+										color=#000000>&lt;path&gt; section</font></b></h4>
+
+This is an optional section; it defines default installation directories.<font style="color: #000000;"
+			color=#000000><br>
+<br>
+Attributes:</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">targetdir</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The target directory - the path to the directory 
+ where products should be installed.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">tempdir</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The temporary directory - the path to the directory 
+ for the temporary files.</font> 
+
+<h4><b style="font-weight: bold;">&lt;product&gt; section</b></h4>
+
+This section describes product to be installed with the Installation Wizard. 
+ The XML file should include a &lt;product&gt; section for each product 
+ to be installed. The products appear in the tree view and are installed 
+ in the order they are described in the configuration file. It is recommended 
+ (but not obligatory) to define native products at the top of the list 
+ before all other products.<font style="color: #000000;"
+			color=#000000><br>
+<br>
+Attributes:</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">name</b></font></li>
+</ul>
+
+Product name. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">version</b></font></li>
+</ul>
+
+<span>Product</span> version. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">description</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Product description (optional).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">context</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Context (optional). The possible values are <b>'salome 
+ sources'</b>, <b>'salome binaries'</b> and <b>'prerequisite'</b> (several 
+ contexts can be given separated by &quot;:&quot; symbol).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">supported</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Supported modes of installation. Several modes can 
+ be separated by comma. Possible value are: <i>install sources</i>, <i>install 
+ binaries</i>, <i>use native</i>. The Installation script should contain 
+ the corresponding functions for each of the supported installation modes 
+ (see <a href="#new_products">here</a>).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">install</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Default (starting) installation mode.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">disable</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>If this optional flag has 'true' value, the corresponding 
+ product will not appear in the list of products and will not be installed.</font> 
+ 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">pickupenv</b></li>
+</ul>
+
+This flag points that pickup environment procedure should be performed 
+ for this product. If this flag equal to 'true', &nbsp;salome.sh and salome.csh 
+ files will&nbsp; be created in the product installation directory. Usually 
+ this option is set to true for SALOME KERNEL module sources and binaries 
+ package. This is an optional key, default value is 'false'<b>.</b> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">dependancies</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>List of prerequisite products, which are necessary 
+ to build this product, separated by comma.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">installdiskspace</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Total amount of space (integer, in Kbytes), which 
+ the product occupies on the hard drive after the installation.</font> 
+ 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">temporarydiskspace</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>Disk space (integer, in Kbytes) for temporary files, 
+ which is necessary to build the product from the sources.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">script</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The installation script name. This script is in charge 
+ of the installation of the product. It is called automatically by the 
+ Installation Wizard when necessary from the main program. See the <a href="#new_products">next 
+ section</a> for more information.</font> 
+
+<h4><b style="font-weight: bold;">&lt;button&gt; section</b></h4>
+
+This is an optional section. It allows customization of the last <i>&quot;Finish 
+ installation&quot;</i> page of the Installation Wizard by adding one or 
+ more buttons in the lower part of the wizard's window. The script which 
+ is attached to each such button, can perform some specific action, for 
+ example, launch the application or show the Release Notes file by using 
+ an external program. See <a href="#finish_buttons">here</a> for more details 
+ about writing scripts.<font style="color: #000000;"
+			color=#000000><br>
+<br>
+Attributes:</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">label</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>This is the button text.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">tooltip</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The button tooltip (optional).</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">script</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>The script attached to the button.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">disable</b></font></li>
+</ul>
+
+<p style="background-color: #ffffff;">If this optional flag has 'true' 
+ value, the corresponding button will not appear in the <i>&quot;Finish 
+ installation&quot;</i> page - the section of XML file is silently ignored.<b>&nbsp;</b></p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b 
+ style="font-weight: bold;"><span style="font-weight: bold;"><img src="../note1.gif"
+	x-maintain-ratio=TRUE
+	style="border: none;
+			width: 36px;
+			height: 38px;
+			float: none;
+			border-style: none;
+			border-style: none;"
+	width=36
+	height=38
+	border=0></span><span style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');">Note:</span></b><span style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"> 
+ If you add new products to be installed with Installation Wizard, you 
+ should also provide installation script for this product. See the next 
+ section for more details. </span></p>
+
+<!--kadov_tag{{<implicit_empty_p>}}-->&nbsp;<br><!--kadov_tag{{</implicit_empty_p>}}-->
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<h3><a name=new_products></a>Implementing <font 
+ style="color: #ff0000;"
+	color=#FF0000>installation 
+ scripts</font> for the new products</h3>
+
+When you want some product to be installed with the Installation Wizard, 
+ you should add its description <a href="#xml_files">to the configuration 
+ file</a> and create the installation script, following the rules described 
+ in this section. <br>
+<br>
+There are some obligatory functions which should be implemented in this 
+ installation script. These functions are automatically called by the master 
+ installation script or/and its GUI shell when it is necessary.<font style="color: #000000;"
+			color=#000000><br>
+File <b>common.sh</b> contains some service functions which can be used 
+ in your installation script, like <b>make_env()</b>,<b> make_dir()</b>, 
+ <b>try_existing()</b>, <b>sort_path()</b>,<b> find_in_path()</b>, etc.</font> 
+ 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">check_version()</b></li>
+</ul>
+
+This function allows to check the version of the product already installed 
+ on the computer. It should try to find the product (native or preinstalled 
+ in the target directory) and check its version. This helps to avoid unnecessary 
+ reinstallation. This is an internal function and is not called from the 
+ master installation script. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><b style="font-weight: bold;"><font style="color: #000000;"
+										color=#000000>try_native()</font></b></li>
+</ul>
+
+This function is called when the <i>'use native' </i>installation mode 
+ is selected by the user. The function should try to find a native version 
+ of the product and define possibility of its use. It should create the 
+ environment file for the product in the temporary directory (see also 
+ the description of <b>print_env(</b><span 
+ style="font-weight: bold;">)</span> 
+ function). It is not necessary to implement this function if you do not 
+ provide native mode installation. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">install_source()</b></font></li>
+</ul>
+
+This function is called when the <i>'install sources</i>' installation 
+ mode is selected by the user. The function is responsible for building 
+ the product from the sources package. It should create the environment 
+ file for the product in the temporary directory (see also description 
+ of <b>print_env(</b><span 
+ style="font-weight: bold;">)</span> function). 
+ It is not necessary to implement this function if you do not provide sources 
+ mode installation. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">install_source_and_build()</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>This function is called when SALOME module is installed 
+ and the <span style="font-weight: bold;">--all-from-sources</span> (<span style="font-weight: bold;">-a</span>) option is used (<span style="font-style: italic;">&quot;Build 
+ SALOME sources&quot;</span> check box in GUI mode). This function should 
+ be used to unpack SALOME sources package and then call the build/install 
+ procedure for it.<br>
+For more details please refer to the <a href="#install_from_wizard">this</a> 
+ and <a href="#gui_mode">this</a> sections for more details.</font> 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">install_binary()</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>This function is called when the <i>'install binaries'</i> 
+ installation mode is selected by the user. The function is responsible 
+ for the extracting of the product from the binaries package. It should 
+ create environment for the product in the temporary directory (see also 
+ description of <b>print_env(</b>) function). It is not necessary to implement 
+ this function if you do not provide binaries mode installation. 
+
+</font><ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">try_preinstalled()</b></li>
+</ul>
+
+This function is called when<i><span style="font-style: normal;"> the</span> 
+ 'not install'</i> installation mode is selected by the user. In this case 
+ the script should inspect the target directory to try to find an already 
+ preinstalled product, pick up and check the environment from there. See 
+ <a href="#pick_up_env">here</a> for more details. 
+
+<ul>
+	
+	<li class=kadov-p
+		style="/*begin!kadov{{*/ color: #000000; /*}}end!kadov*/ "
+		class=kadov-p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">print_env()</b></font></li>
+</ul>
+
+<font style="color: #000000;"
+			color=#000000>This function is in charge of creating the environment 
+ script. It should create a file with name </font><b>env_&lt;product_name&gt;.sh</b> 
+ in the temporary directory and then copy it into the product installation 
+ directory. The file should contain all necessary environment variables 
+ settings for the product. It will be collected during the 'pick-up-environment' 
+ procedure. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">pickup_env()</b></li>
+</ul>
+
+This procedure corresponds to the <b>pickupenv</b> tag of the configuration 
+ xml file (see previous section). It should call the <b>make_env</b> procedure 
+ to perform the pick-up environment procedure for the product.<font style="color: #000000;"
+			color=#000000><br>
+<br>
+The calling signature of the product installation script is the following:</font> 
+ <b><font style="color: #000000;"
+			color=#000000><br>
+&lt;product_script_name&gt; &lt;function_name&gt; &lt;temp_folder&gt; &lt;products_directory&gt; 
+ &lt;target_directory&gt; &lt;dependancies&gt; &lt;product_name&gt;</font></b> 
+ 
+
+<p><font style="color: #000000;"
+			color=#000000>where</font> </p>
+
+<p><font style="color: #000000;"
+							color=#000000><b style="font-weight: bold;">&lt;product_script_name&gt;</b> 
+ - installation script name (described in the configuration xml file);</font> 
+ <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;function_name&gt;</b> - the name of function, corresponding to the 
+ selected installation mode: <i>try_native, install_source, install_binary</i> 
+ or <i>try_preinstalled</i>;</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;temp_folder&gt;</b> - temporary files directory;</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;products_directory&gt;</b> - directory where the sources/binaries package 
+ can be found. You should provide the sources package in the <i>&lt;Install_Wizard_root_directory&gt;/Products/SOURCES</i> 
+ directory and binaries package in the <i>&lt;InstallWizard_root_directory&gt;/Products/BINARIES/&lt;os_version&gt;</i>, 
+ where &lt;os_version&gt; is the target platform description, which appears 
+ in the corresponding section of the <a href="#xml_files">configuration 
+ xml file</a>.</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;target_directory&gt;</b> - root target directory where the product 
+ should be installed to;</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;dependancies&gt;</b> - single-quoted list of prerequisite products, 
+ separated by space;</font> <font style="color: #000000;"
+		color=#000000><b><br>
+&lt;product_name&gt; </b>- product name itself.</font> </p>
+
+<p><font style="font-weight: bold;">Example:</font> <i><br>
+med-2.2.3.sh install_binary /tmp/work ./Products/BINARIES/Mandrake10.1 
+ /usr/salome 'gcc Hdf' med</i> </p>
+
+<p><font style="color: #000000;"
+			color=#000000>Copy the created script into the <i>&lt;Install_Wizard_root_directory&gt;/config_files</i> 
+ sub-directory where all installation scripts are stored. Installation 
+ Wizard will automatically search and call your script during the installation 
+ procedure.</font> </p>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+&nbsp; 
+
+<h3><a name=finish_buttons></a>Customizing <font 
+ style="color: #ff0000;"
+	color=#FF0000>Readme page</font> 
+ buttons</h3>
+
+The Installation Wizard allows customizing the look-n-feel of the last 
+ <i>&quot;Finish installation&quot;</i> page. If you want to add one or 
+ more buttons to this page in order to perform some specific actions at 
+ the end of the installation (for example, to show the Release Notes file 
+ by using Open Office) you can put an additional section to the XML configuration 
+ file. This is the <b>&lt;button&gt;</b> section (see <a href="#xml_files">here</a> 
+ for more details). 
+
+<!--begin!kadov{{--><br><!--}}end!kadov--><!--kadov_tag{{<implicit_p>}}-->&nbsp; 
+ 
+
+<!--begin!kadov{{--><br><!--}}end!kadov--><!--kadov_tag{{<implicit_p>}}-->To 
+ implement the action which will be performed when the user clicks the 
+ button, you need to create a script and put it to the <i>&lt;Install_Wizard_root_directory&gt;/config_files</i> 
+ directory.<br>
+There are some obligatory functions which should be implemented in this 
+ script. These functions are automatically called by the Installation Wizard 
+ GUI. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">check_enabled()</b></li>
+</ul>
+
+This procedure is called by the Installation Wizard when the <i>&quot;Finish 
+ installation&quot;</i> page is displayed and the status of the buttons 
+ should be modified according to the installation options. This procedure 
+ should return <b>0</b> if the corresponding action can be performed and, 
+ thus, the button should become enabled. Otherwise, it should return <b>1</b> 
+ - in this case the corresponding button will be disabled. 
+
+<ul>
+	
+	<li class=kadov-p
+		class=kadov-p><b style="font-weight: bold;">execute()</b></li>
+</ul>
+
+This procedure is invoked when the user clicks the button. This procedure 
+ should return <b>0</b> if the corresponding action is done successfully 
+ and <b>1</b> if any error occurs.<br>
+<br>
+The calling signature of the script is the following:<b><font style="color: #000000;"
+			color=#000000><br>
+&lt;product_script_name&gt; &lt;function_name&gt; &lt;target_directory&gt; 
+ &lt;temp_folder&gt;</font></b> 
+
+<p><font style="color: #000000;"
+			color=#000000>where</font> </p>
+
+<p><b style="font-weight: bold;">&lt;product_script_name&gt;</b> - the 
+ script name itself (retrieved from the XML configuration xml file); <b><br>
+&lt;function_name&gt;</b> - the name of function; <b><br>
+&lt;target_directory&gt;</b> - root target directory where the product 
+ is installed to; <b><br>
+&lt;temp_folder&gt; </b>- temporary files directory; <b><br>
+&nbsp;</b></p>
+
+<p style="background-image: url('../Texture_horiz_ltbluebubbles.jpg');"><b><span 
+ style="font-weight: bold;"><img src="../note1.gif"
+								x-maintain-ratio=TRUE
+								style="border: none;
+										width: 36px;
+										height: 38px;
+										float: none;
+										border-style: none;
+										border-style: none;"
+								width=36
+								height=38
+								border=0></span>Note:</b> The standard 
+ Installation Wizard buttons &quot;Launch SALOME&quot; and &quot;Release 
+ Notes&quot; are implemented with this feature. Refer to scripts <b>start_salome.sh</b> 
+ and <b>release_notes.sh</b> for sample implementation.<b><span 
+ style="font-weight: bold;"><br>
+<br>
+<img src="../note1.gif"
+	x-maintain-ratio=TRUE
+	style="border: none;
+			width: 36px;
+			height: 38px;
+			float: none;
+			border-style: none;
+			border-style: none;"
+	width=36
+	height=38
+	border=0></span>Note:</b> Any button (even standard) can be 
+ ignored by the Installation Wizard if the attribute <b>&lt;disable&gt;</b> 
+ in the XML configuration file is set to the &quot;true&quot; value. </p>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+&nbsp; 
+
+</body>
+
+</html>

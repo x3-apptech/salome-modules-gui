@@ -22,12 +22,11 @@
 // File:      GLViewer_Tools.cxx
 // Created:   April, 2005
 
-//#include "GLViewerAfx.h"
 #include "GLViewer_Tools.h"
 
 #include <GL/gl.h>
 
-#include <iostream.h>
+#include <iostream>
 
 /*!
   Constructor
@@ -43,7 +42,7 @@ GLViewer_LineList::GLViewer_LineList( int size )
 
   if( !myArray )
   {
-    cout << "Can't allocate memory: " << size << endl;
+    std::cout << "Can't allocate memory: " << size << std::endl;
     myRealSize = 0;
   }
   else
@@ -386,11 +385,11 @@ void GLViewer_LineList::clear()
 */
 void GLViewer_LineList::print()
 {
-  cout << "MainCoord: " << myMainCoord <<" SIZE: " << myRealSize << " ENum: " << mySegmentNumber << " :::";
+  std::cout << "MainCoord: " << myMainCoord <<" SIZE: " << myRealSize << " ENum: " << mySegmentNumber << " :::";
   for( int i = 0; i < mySegmentNumber; i++ )
-    cout << "  " << myArray[2*i] << " " << myArray[2*i+1] << " | ";
+    std::cout << "  " << myArray[2*i] << " " << myArray[2*i+1] << " | ";
 
-  cout << endl;
+  std::cout << std::endl;
 }
 
 /*!
@@ -694,11 +693,11 @@ void GLViewer_LineField::addRectangle( double top, double right, double bottom, 
 */
 void GLViewer_LineField::print()
 {
-  cout << "My X matrix Number: " << myXSize << endl;
+  std::cout << "My X matrix Number: " << myXSize << std::endl;
   for( int i = 0; i < myXSize; i++ )
     myXLineArray[i]->print();
 
-  cout << "My Y matrix Number: " << myYSize << endl;
+  std::cout << "My Y matrix Number: " << myYSize << std::endl;
   for( int j = 0; j < myYSize; j++ )
     myYLineArray[j]->print();
 }
@@ -724,7 +723,7 @@ void GLViewer_LineField::show()
   }
   glEnd();
   delete[] anArray;
-  cout << "Show function" << endl;
+  std::cout << "Show function" << std::endl;
 }
 
 /*!
@@ -1005,7 +1004,7 @@ GLViewer_LineField::IterationStatus GLViewer_LineField::checkComplete()
           aCurArray[i].myLineIndex == myEndPoint.myXLineIndex && 
           aCurArray[i].mySegmentindex == myEndPoint.myXSegmentIndex )
       {
-        cout << "Algorithm complete X!!!!!!!" << endl;
+        std::cout << "Algorithm complete X!!!!!!!" << std::endl;
         myEndPoint.mySolveIndex = i;
         return IS_SOLVED;
       }
@@ -1013,7 +1012,7 @@ GLViewer_LineField::IterationStatus GLViewer_LineField::checkComplete()
                aCurArray[i].myLineIndex == myEndPoint.myYLineIndex && 
                aCurArray[i].mySegmentindex == myEndPoint.myYSegmentIndex )
       {
-        cout << "Algorithm complete Y!!!!!!!" << endl;
+        std::cout << "Algorithm complete Y!!!!!!!" << std::endl;
         myEndPoint.mySolveIndex = i;  
         return IS_SOLVED;
       }
@@ -1031,7 +1030,7 @@ GLViewer_LineField::IterationStatus GLViewer_LineField::checkComplete()
   else
     myCurArrayIndex = 0;
 
-  cout << "Number of ways: " << count << endl;
+  std::cout << "Number of ways: " << count << std::endl;
   if( count == 0 )
     return IS_LOOP;
 
@@ -1099,7 +1098,7 @@ GLViewer_LineField::EndStatus GLViewer_LineField::startAlgorithm()
 
   while( true )
   {
-    cout << "-----------Iteration #" << myCurCount << "-------------" << endl;
+    std::cout << "-----------Iteration #" << myCurCount << "-------------" << std::endl;
     iteration();
 
     IterationStatus is = checkComplete();

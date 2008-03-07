@@ -63,13 +63,13 @@ public:
   void setBackgroundColor( const QColor& );
 
   //! Get size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
-  int trihedronSize() const;
+  vtkFloatingPointType trihedronSize() const;
 
   //! Shows if the size of trihedron relative (see #SVTK_Renderer::SetTrihedronSize)
   bool trihedronRelative() const;
 
   //! Set size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
-  void setTrihedronSize( const int, const bool = true );
+  void setTrihedronSize( const vtkFloatingPointType, const bool = true );
 
 public:
   void enableSelection(bool isEnabled);
@@ -117,7 +117,7 @@ protected slots:
 
 private:
   QColor myBgColor;
-  int    myTrihedronSize;
+  vtkFloatingPointType myTrihedronSize;
   bool   myTrihedronRelative;
   bool   mySelectionEnabled;
   bool   myMultiSelectionEnabled;

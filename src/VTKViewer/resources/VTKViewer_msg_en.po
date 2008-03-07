@@ -141,7 +141,7 @@ msgid "VTKViewer_Viewer::MEN_CHANGE_BACKGROUD"
 msgstr "Change background..."
 
 msgid "VTKViewer_ViewManager::VTK_VIEW_TITLE"
-msgstr "VTK scene:%1 - viewer:%2"
+msgstr "VTK scene:%M - viewer:%V"
 
 msgid "MNU_SHOW_TRIHEDRON"
 msgstr "Show/Hide trihedron"

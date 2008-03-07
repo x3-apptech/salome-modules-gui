@@ -36,6 +36,8 @@ class QTextView;
 
 class ToolsGUI_HelpWindow : public QMainWindow
 {
+  Q_OBJECT
+
 public:
   ToolsGUI_HelpWindow( QWidget* parent = 0, const char* name = 0);
   ~ToolsGUI_HelpWindow();

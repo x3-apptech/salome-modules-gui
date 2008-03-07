@@ -16,10 +16,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File:      CATHAREGUI_msg_en.po
+// File:      SalomeApp_msg_en.po
 // Created:   10/25/2004 12:46:36 PM
 // Author:    Sergey LITONIN
-// Copyright (C) CEA 2004
 
 msgid ""
 msgstr ""
@@ -118,7 +117,7 @@ msgid "SalomeApp_Application::PREF_TAB_OBJBROWSER"
 msgstr "Object browser"
 
 msgid "SalomeApp_Application::MEN_OPENWITH"
-msgstr "Activate Module"
+msgstr "Activate %1 Module"
 
 msgid "SalomeApp_Application::MEN_DELETE_INVALID_REFERENCE"
 msgstr "Delete Invalid Reference"
@@ -222,6 +221,9 @@ msgstr "Publish in study"
 msgid "SalomeApp_Application::WRN_DUMP_STUDY_FAILED"
 msgstr "Dump study failed"
 
+msgid "SalomeApp_Application::WRN_FILE_NAME_BAD"
+msgstr "Please enter correct file name"
+
 msgid "SAVE_POINT_OBJECT_TOOLTIP"
 msgstr "Saved GUI state: %1"
 
@@ -234,6 +236,9 @@ msgstr "Persistent GUI states"
 msgid "SAVE_POINT_ROOT_NAME"
 msgstr "GUI states"
 
+msgid "CLOSE_LOCKED_STUDY"
+msgstr "Close locked study?"
+
 //=======================================================================================
 
 msgid "SalomeApp_Application::MEN_RESTORE_VS"
@@ -244,3 +249,24 @@ msgstr "Rename"
 
 msgid "SalomeApp_Application::MEN_DELETE_VS"
 msgstr "Delete"
+
+msgid "SalomeApp_Application::APPCLOSE_CAPTION"
+msgstr "Close study"
+
+msgid "SalomeApp_Application::APPCLOSE_DESCRIPTION"
+msgstr "Do you want to save or unload study before closing?"
+
+msgid "SalomeApp_Application::APPCLOSE_CLOSE"
+msgstr "&Close w/o saving"
+
+msgid "SalomeApp_Application::APPCLOSE_SAVE"
+msgstr "&Save && Close"
+
+msgid "SalomeApp_Application::APPCLOSE_UNLOAD"
+msgstr "&Unload"
+
+msgid "SalomeApp_ExitDlg::SHUTDOWN_SERVERS"
+msgstr "Shutdown standalone servers"
+
+msgid "SalomeApp_Application::ACTIVATE_MODULE_OP_LOAD"
+msgstr "&Load..."

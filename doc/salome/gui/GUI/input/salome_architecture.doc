@@ -1,0 +1,95 @@
+/*!
+
+\page salome_architecture_page SALOME architecture
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\b SALOME architecture is based on \b CORBA technology using
+distributed system model of applications. This architecture takes the
+concept of multitier client/server to its natural conclusion. The
+distributed system model exposes all functionality of the application
+as objects, each of which can use any of the services provided by
+other objects in the system, or even objects in other systems. The
+architecture can also blur the distinction between "client" and
+"server" because the client components can also create objects that
+behave in server-like roles. This architecture provides the ultimate
+in flexibility.
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The distributed system architecture achieves its flexibility by
+encouraging (or enforcing) the definition of specific component
+interfaces. The interface of a component specifies to other components
+what services are offered by that component and how they are used. As
+long as the interface of a component remains constant, that
+component's implementation can change dramatically without affecting
+other components.
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+All software components (Post-Pro, Geometry, Mesh...) integrated into
+\b SALOME platform  implement predefined interfaces. Each component
+provides data for the \b SALOME study in a form of links (stored in
+the Study) to the specific data created and stored in the
+component. All components represent \b CORBA servers and it allows to
+run them on different host stations.
+
+\image html image67.gif
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+It is equally possible to create engine-independent modules. These
+modules may not use CORBA at all, and can have internal data structure
+which can be written in pure C++ (or python). Such modules are located
+inside SALOME GUI process and from the point of view of the end user
+have no difference with standard components. Such modules not using
+the standard tools of SALOME platform are defined on a special
+separated level named CAM. CAM component is the basis for new SALOME
+GUI and contains all basic functionality for working with modules
+(loading; saving, closing, customization of toolbar and menu).
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Another fundamental piece of the \b SALOME architecture is the use of
+the Interface Definition Language (IDL). IDL, which specifies
+interfaces between CORBA components, is instrumental in ensuring
+CORBA's language independence. Because interfaces described in IDL can
+be mapped to any programming language, CORBA applications and
+components are thus independent of the language(s) used to implement
+them.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Additional information about CORBA technology
+is available at http://www.omg.org
+
+\note In \b SALOME there is a possibility to run
+definite components in the so-called \ref batch_mode_run "batch mode" without GUI provided
+by GUI component. In this case you can work with these components with
+the help of Python commands and scripts.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The architecture of this all-inclusive
+platform for numerical components  responds to the following
+objectives:
+<ol>
+<li>\b Flexibility :  the creation and modification of computation
+schemes must be easy. The developer must have easy access to all
+modeling parameters to create domain-specific tools adapted to new
+situations or to test new numerical algorithms. SALOME allows
+integration and implementation of numerical and physical components
+derived from existing code.</li>
+<li>\b Productivity :  the implementation of code is simple for the
+user and the reuse of components (within other environments for
+macro-components) is noticeably facilitated.</li>
+<li> \b Performance :\b  SALOME is able to more finely simulate
+phenomena that is more complex in scale and in physical coupling
+requirements. \b SALOME economically exploits the performance of used
+machines (massively parallel processors, PC clusters, etc).</li>
+<li> \b Expandability:  on the one hand, software technologies and
+physical architectures evolve rapidly compared to the development
+time, validation and use of a scientific application while on the
+other hand, the development of a database model adapted to the
+totality of exchanges between components can be achieved
+incrementally. \b SALOME  is able to easily follow these
+developments.</li>
+</ol>
+
+*/

@@ -17,14 +17,16 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "PyInterp_Dispatcher.h"
 #include "SALOME_PYQT_Module.h"
 
-#include "PyInterp_Dispatcher.h"
+
 #include "SUIT_ResourceMgr.h"
 #include "STD_MDIDesktop.h"
 #include "STD_TabDesktop.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
+#include "LightApp_Preferences.h"
 
 #include "QtxWorkstack.h"
 #include "QtxActionMenuMgr.h"
@@ -38,15 +40,16 @@
 #include <qmenubar.h>
 #include <qpopupmenu.h>
 
+#ifndef WIN32
 #include "SALOME_PYQT_SipDefs.h"
-#if defined(SIP_VERS_v4_old) || defined(SIP_VERS_v4_new)
-#include "sipAPISalomePyQtGUI.h"
-#else
-#include "sipSalomePyQtGUIDeclSalomePyQtGUI.h"
 #endif
+#include "sipAPISalomePyQtGUI.h"
 
-#include <sipqtQWidget.h>
-#include <sipqtQPopupMenu.h>
+#include <sip.h>
+#if SIP_VERSION < 0x040700
+#include "sipqtQWidget.h"
+#include "sipqtQPopupMenu.h"
+#endif
 
 #include <CORBA.h>
 
@@ -167,7 +170,8 @@ SALOME_PYQT_Module* SALOME_PYQT_Module::getInitModule()
 SALOME_PYQT_Module::SALOME_PYQT_Module()
   : SalomeApp_Module( __DEFAULT_NAME__ ),
     myModule( 0 ), 
-    myXmlHandler ( 0 )
+    myXmlHandler ( 0 ),
+    myLastActivateStatus( true )
 {
 }
 
@@ -250,6 +254,9 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
   if ( !res )
     return res;
 
+  // reset the activation status to the default value
+  myLastActivateStatus = true;
+
   // ActivateReq: request class for internal activate() operation
   class ActivateReq : public PyInterp_Request
   {
@@ -274,6 +281,9 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
   // Posting the request
   PyInterp_Dispatcher::Get()->Exec( new ActivateReq( theStudy, this ) );
 
+  if ( !lastActivationStatus() )
+    return false;
+
   // activate menus, toolbars, etc
   setMenuShown( true );
   setToolShown( true );
@@ -281,6 +291,8 @@ bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
   if ( menuMgr() )
     connect( menuMgr(), SIGNAL( menuHighlighted( int, int ) ),
 	     this,      SLOT( onMenuHighlighted( int, int ) ) );
+  connect( getApp(), SIGNAL( preferenceChanged( const QString&, const QString&, const QString& ) ),
+	   this,     SLOT(   preferenceChanged( const QString&, const QString&, const QString& ) ) );
 
   // create menus & toolbars from XML file if required
   if ( myXmlHandler )
@@ -324,6 +336,8 @@ bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
   if ( menuMgr() )
     disconnect( menuMgr(), SIGNAL( menuHighlighted( int, int ) ),
 		this,      SLOT( onMenuHighlighted( int, int ) ) );
+  disconnect( getApp(), SIGNAL( preferenceChanged( const QString&, const QString&, const QString& ) ),
+	      this,     SLOT(   preferenceChanged( const QString&, const QString&, const QString& ) ) );
 
   // remove menus & toolbars created from XML file if required
   if ( myXmlHandler )
@@ -359,6 +373,58 @@ bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* theStudy )
   PyInterp_Dispatcher::Get()->Exec( new DeactivateReq( myInterp, theStudy, this ) );
 
   return SalomeApp_Module::deactivateModule( theStudy );
+}
+
+/*!
+ * Returns the status of last trying of module activation.
+ * Before fisrt activation - status is false
+*/
+bool SALOME_PYQT_Module::lastActivationStatus() const
+{
+  return myLastActivateStatus;
+}
+
+/*!
+  Preferences changing (application) - called when preference is changed
+*/
+void SALOME_PYQT_Module::preferenceChanged( const QString& module, 
+					    const QString& section, 
+					    const QString& setting )
+{
+  MESSAGE( "SALOME_PYQT_Module::preferenceChanged");
+
+  // perform synchronous request to Python event dispatcher
+  class Event : public PyInterp_LockRequest
+  {
+  public:
+    Event( PyInterp_base*      _py_interp,
+	   SALOME_PYQT_Module* _obj,
+	   const QString&      _section,
+	   const QString&      _setting )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myObj    ( _obj ),
+        mySection( _section ),
+        mySetting( _setting ) {}
+
+  protected:
+    virtual void execute()
+    {
+      myObj->prefChanged( mySection, mySetting );
+    }
+
+  private:
+    SALOME_PYQT_Module* myObj;
+    QString mySection, mySetting;
+  };
+
+  if ( module != moduleName() ) {
+    // Module's preferences are processed by preferencesChanged() method
+    // ...
+    // Posting the request only if dispatcher is not busy!
+    // Executing the request synchronously
+    if ( !PyInterp_Dispatcher::Get()->IsBusy() )
+      PyInterp_Dispatcher::Get()->Exec( new Event( myInterp, this, section, setting ) );
+  }
 }
 
 /*!
@@ -539,6 +605,38 @@ void SALOME_PYQT_Module::contextMenuPopup( const QString& theContext, QPopupMenu
 }
 
 /*!
+ * Export preferences for the Python module.
+ * Called only once when the first instance of the module is created.
+ */
+void SALOME_PYQT_Module::createPreferences()
+{
+  MESSAGE( "SALOME_PYQT_Module::createPreferences");
+  // perform synchronous request to Python event dispatcher
+  class Event : public PyInterp_LockRequest
+  {
+  public:
+    Event( PyInterp_base*      _py_interp,
+	   SALOME_PYQT_Module* _obj )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myObj    ( _obj )   {}
+
+  protected:
+    virtual void execute()
+    {
+      myObj->initPreferences();
+    }
+
+  private:
+    SALOME_PYQT_Module* myObj;
+  };
+
+  // Posting the request only if dispatcher is not busy!
+  // Executing the request synchronously
+  if ( !PyInterp_Dispatcher::Get()->IsBusy() )
+    PyInterp_Dispatcher::Get()->Exec( new Event( myInterp, this ) );
+}
+
+/*!
  * Defines the dockable window associated with the module.
  * To fill the list of windows the correspondind Python module's windows()
  * method is called from SALOME_PYQT_Module::init() method.
@@ -565,6 +663,44 @@ void SALOME_PYQT_Module::viewManagers( QStringList& listik ) const
     listik.append( *it );
   }
 }
+
+/*!
+  Preferences changing (module) - called when the module's preferences are changed
+*/
+void SALOME_PYQT_Module::preferencesChanged( const QString& section, const QString& setting )
+{
+  MESSAGE( "SALOME_PYQT_Module::preferencesChanged");
+
+  // perform synchronous request to Python event dispatcher
+  class Event : public PyInterp_LockRequest
+  {
+  public:
+    Event( PyInterp_base*      _py_interp,
+	   SALOME_PYQT_Module* _obj,
+	   const QString&      _section,
+	   const QString&      _setting )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myObj    ( _obj ),
+        mySection( _section ),
+        mySetting( _setting ) {}
+
+  protected:
+    virtual void execute()
+    {
+      myObj->prefChanged( mySection, mySetting );
+    }
+
+  private:
+    SALOME_PYQT_Module* myObj;
+    QString mySection, mySetting;
+  };
+
+  // Posting the request only if dispatcher is not busy!
+  // Executing the request synchronously
+  if ( !PyInterp_Dispatcher::Get()->IsBusy() )
+    PyInterp_Dispatcher::Get()->Exec( new Event( myInterp, this, section, setting ) );
+}
+
 
 /*!
  * Performs internal initialization
@@ -618,8 +754,7 @@ void SALOME_PYQT_Module::init( CAM_Application* app )
   // ... first put default values
   myWindowsMap.insert( SalomeApp_Application::WT_ObjectBrowser, Qt::DockLeft );
   myWindowsMap.insert( SalomeApp_Application::WT_PyConsole,     Qt::DockBottom );
-  // VSR: LogWindow is not yet implemented
-  // myWindowsMap.insert( SalomeApp_Application::WT_LogWindow,     Qt::DockBottom );
+  myWindowsMap.insert( SalomeApp_Application::WT_LogWindow,     Qt::DockBottom );
 
   if(PyObject_HasAttrString(myModule , "windows")){
     PyObjWrapper res1( PyObject_CallMethod( myModule, "windows", "" ) );
@@ -699,9 +834,15 @@ void SALOME_PYQT_Module::activate( SUIT_Study* theStudy )
 
   // call Python module's activate() method (for the new modules)
   if(PyObject_HasAttrString(myModule , "activate")){
-    PyObjWrapper res1( PyObject_CallMethod( myModule, "activate", "" ) );
-    if( !res1 ) {
+    PyObject* res1 = PyObject_CallMethod( myModule, "activate", "" );
+    if ( !res1 || !PyBool_Check( res1 ) ) {
       PyErr_Print();
+      //= true: for support of old modules
+      myLastActivateStatus = true;
+    }
+    else {
+      //detect return status
+      myLastActivateStatus = PyObject_IsTrue( res1 );
     }
   }
 }
@@ -826,6 +967,7 @@ Engines::Component_var SALOME_PYQT_Module::getEngine() const
  */
 QString SALOME_PYQT_Module::engineIOR() const
 {
+  QString anIOR = QString::null;
   if ( !CORBA::is_nil( getEngine() ) )
     return QString( getApp()->orb()->object_to_string( getEngine() ) );
   return QString( "" );
@@ -947,6 +1089,31 @@ void SALOME_PYQT_Module::menuHighlight( const int menu, const int submenu )
 }
 
 /*!
+ *  Initialises preferences for the module
+ *  - calls Python module's createPreferences() method
+ */
+void SALOME_PYQT_Module::initPreferences()
+{
+  // Python interpreter should be initialized and Python module should be
+  // import first
+  if ( !myInterp || !myModule )
+    return;
+
+  // temporary set myInitModule because createPreferences() method
+  // might be called during the module intialization process
+  myInitModule = this;
+
+  if ( PyObject_HasAttrString(myModule , "createPreferences") ) {
+    PyObjWrapper res( PyObject_CallMethod( myModule, "createPreferences", "" ) );
+    if( !res ) {
+      PyErr_Print();
+    }
+  }
+
+  myInitModule = 0;
+}
+
+/*!
  *  Initialises python subinterpreter (one per study)
  */
 void SALOME_PYQT_Module::initInterp( int theStudyId )
@@ -1065,6 +1232,29 @@ void SALOME_PYQT_Module::setWorkSpace()
       }
     }
   }                         //__CALL_OLD_METHODS__
+}
+
+/*!
+ *  Preference changing callback function
+ * - calls Python module's preferenceChanged(string,string,string) method
+ */
+void SALOME_PYQT_Module::prefChanged( const QString& section, const QString& setting )
+{
+  // Python interpreter should be initialized and Python module should be
+  // import first
+  if ( !myInterp || !myModule )
+    return;
+
+  if ( PyObject_HasAttrString(myModule , "preferenceChanged") ) {
+    PyObjWrapper res( PyObject_CallMethod( myModule,
+					   "preferenceChanged", 
+					   "ss", 
+					   section.latin1(), 
+					   setting.latin1() ) );
+    if( !res ) {
+      PyErr_Print();
+    }
+  }
 }
 
 /*!
@@ -1241,6 +1431,7 @@ QAction* SALOME_PYQT_Module::createAction( const int id, const QString& text, co
   }
   return a;
 }
+
 /*! 
  * Load icon from resource file
  */
@@ -1432,6 +1623,47 @@ bool SALOME_PYQT_Module::clearMenu( const int id, const int menu, const bool rem
     }
   }
   return false;
+}
+
+/*!
+ * The next methods call the parent implementation.
+ * This is done to open protected methods from LightApp_Module class.
+ */
+
+int SALOME_PYQT_Module::addGlobalPreference( const QString& label )
+{
+  LightApp_Preferences* pref = preferences();
+  if ( !pref )
+    return -1;
+
+  return pref->addPreference( label, -1 );
+}
+
+int SALOME_PYQT_Module::addPreference( const QString& label )
+{
+  return SalomeApp_Module::addPreference( label );
+}
+				       
+int SALOME_PYQT_Module::addPreference( const QString& label, 
+				       const int pId, const int type,
+				       const QString& section,
+				       const QString& param )
+{
+  return SalomeApp_Module::addPreference( label, pId, type, section, param );
+}
+
+QVariant SALOME_PYQT_Module::preferenceProperty( const int id, 
+						 const QString& prop ) const
+{
+  QVariant v = SalomeApp_Module::preferenceProperty( id, prop );
+  return v;
+}
+
+void SALOME_PYQT_Module::setPreferenceProperty( const int id, 
+						const QString& prop, 
+						const QVariant& var )
+{
+  SalomeApp_Module::setPreferenceProperty( id, prop, var );
 }
 
 // SALOME_PYQT_XmlHandler class implementation

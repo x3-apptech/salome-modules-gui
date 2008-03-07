@@ -51,11 +51,10 @@ class InfoWindow;
 
 class RegWidget : public QMainWindow
 {
-  
   Q_OBJECT
 
 public:
-   RegWidget( CORBA::ORB_var &orb , QWidget *parent = 0, const char *name = 0 );
+  RegWidget( CORBA::ORB_var &orb , QWidget *parent = 0, const char *name = 0 );
   ~RegWidget();
   void       SetListe();
   void       SetListeHistory();
@@ -114,13 +113,4 @@ private:
 
 };
 
-# endif         /* # ifndef __REGWIDGET_H__ */
-
-
-
-
-
-
-
-
-
+#endif

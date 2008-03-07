@@ -38,6 +38,10 @@
 
 class vtkRenderer;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*! \class vtkAbstractPropPicker
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
  */
@@ -116,6 +120,10 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
        vtkFloatingPointType, 
        vtkRenderer*);
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif
 

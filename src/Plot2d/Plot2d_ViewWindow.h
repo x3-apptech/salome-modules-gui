@@ -22,6 +22,8 @@
 #include "Plot2d.h"
 #include <SUIT_ViewWindow.h>
 
+#include <qimage.h>
+
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
@@ -48,6 +50,8 @@ public:
 
   virtual QString   getVisualParameters();
   virtual void      setVisualParameters( const QString& parameters );
+  
+  virtual void      RefreshDumpImage();
 
 protected:
   virtual QImage    dumpView();
@@ -94,6 +98,8 @@ private:
   QToolBar*         myToolBar;
 
   SUIT_ToolButton*  myCurveBtn;
+
+  QImage myDumpImage;
 };
 
 #ifdef WIN32

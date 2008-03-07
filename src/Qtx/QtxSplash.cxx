@@ -66,6 +66,7 @@ QtxSplash::QtxSplash( const QPixmap& pixmap )
   myGradientType = Vertical;
   myError        = 0;
   myStartColor   = red;
+  myMargin       = 5;
 
   setPixmap( pixmap );
 }
@@ -257,6 +258,30 @@ int QtxSplash::textAlignment() const
 }
 
 /*!
+  \brief Set margin.
+
+  Margin is used when drawing progress bar and status messages.
+  
+  \param m new margin
+  \sa margin()
+*/
+void QtxSplash::setMargin( const int m )
+{
+  myMargin = m;
+  repaint();
+}
+
+/*!
+  \brief Get margin.
+  \return current margin.
+  \sa setMargin()
+*/
+int QtxSplash::margin() const
+{
+  return myMargin;
+}
+
+/*!
   Sets message text color to \a color.
   Default is white.
   \sa setTextColors()
@@ -382,29 +407,11 @@ void QtxSplash::clear()
 void QtxSplash::drawContents( QPainter* painter )
 {
   QRect r = rect();
+  int m = margin();
   if ( myTotal > 0 ) {
-    // draw progress bar outline rectangle
-    painter->setPen( palette().active().dark() );
-    painter->drawLine( r.x()+5, 
-		       r.height()-5-_PROGRESS_WIDTH,
-		       r.width()-5,
-		       r.height()-5-_PROGRESS_WIDTH );
-    painter->drawLine( r.x()+5,
-		       r.height()-5-_PROGRESS_WIDTH,
-		       r.x()+5,
-		       r.height()-5 );
-    painter->setPen( palette().active().light() );
-    painter->drawLine( r.x()+5,
-		       r.height()-5,
-		       r.width()-5,
-		       r.height()-5 );
-    painter->drawLine( r.width()-5,
-		       r.height()-5-_PROGRESS_WIDTH,
-		       r.width()-5,
-		       r.height()-5 );
     // draw progress bar
     if ( myGradientType == Horizontal ) {
-      int tng = r.width() - r.x() - 11;
+      int tng = r.width() - r.x() - m*2;
       int ng = (int) ( 1.0 * tng * ( myProgress > 0 ? myProgress : 0 ) / myTotal ); 
       int h1, h2, s1, s2, v1, v2;
       myStartColor.hsv( &h1, &s1, &v1 );
@@ -415,29 +422,48 @@ void QtxSplash::drawContents( QPainter* painter )
 				 s1 + ((s2-s1)*i)/(tng-1),
 				 v1 + ((v2-v1)*i)/(tng-1), 
 				 QColor::Hsv ) );
-	painter->drawLine( r.x()+6+i,
-			   r.height()-5-_PROGRESS_WIDTH+1,
-			   r.x()+6+i,
-			   r.height()-6 );
+	painter->drawLine( r.x()+m+i,
+			   r.height()-m-_PROGRESS_WIDTH,
+			   r.x()+m+i,
+			   r.height()-m );
       }
     }
     else {
-      int ng = (int) ( 1.0 * (r.width() - r.x() - 11) * ( myProgress > 0 ? myProgress : 0 ) / myTotal ); 
+      int ng = (int) ( 1.0 * (r.width() - r.x() - m*2 - 1) * ( myProgress > 0 ? myProgress : 0 ) / myTotal ); 
       int h1, h2, s1, s2, v1, v2;
       myStartColor.hsv( &h1, &s1, &v1 );
       myEndColor.isValid() ? myEndColor.hsv( &h2, &s2, &v2 ) :
 	                     myStartColor.hsv( &h2, &s2, &v2 );
-      for ( int i = 0; i < _PROGRESS_WIDTH-1; i++ ) {
-	painter->setPen( QColor( h1 + ((h2-h1)*i)/(_PROGRESS_WIDTH-2),
-				 s1 + ((s2-s1)*i)/(_PROGRESS_WIDTH-2),
-				 v1 + ((v2-v1)*i)/(_PROGRESS_WIDTH-2), 
+      for ( int i = 0; i < _PROGRESS_WIDTH; i++ ) {
+	painter->setPen( QColor( h1 + ((h2-h1)*i)/(_PROGRESS_WIDTH-1),
+				 s1 + ((s2-s1)*i)/(_PROGRESS_WIDTH-1),
+				 v1 + ((v2-v1)*i)/(_PROGRESS_WIDTH-1), 
 				 QColor::Hsv ) );
-	painter->drawLine( r.x()+6,
-			   r.height()-5-_PROGRESS_WIDTH+1+i,
-			   r.x()+6+ng-1,
-			   r.height()-5-_PROGRESS_WIDTH+1+i );
+	painter->drawLine( r.x()+m,
+			   r.height()-m-_PROGRESS_WIDTH+i,
+			   r.x()+m+ng,
+			   r.height()-m-_PROGRESS_WIDTH+i );
       }
     }
+    // draw progress bar outline rectangle
+    painter->setPen( palette().active().dark() );
+    painter->drawLine( r.x()+m, 
+		       r.height()-m-_PROGRESS_WIDTH,
+		       r.width()-m,
+		       r.height()-m-_PROGRESS_WIDTH );
+    painter->drawLine( r.x()+m,
+		       r.height()-m-_PROGRESS_WIDTH,
+		       r.x()+m,
+		       r.height()-m );
+    painter->setPen( palette().active().light() );
+    painter->drawLine( r.x()+m,
+		       r.height()-m,
+		       r.width()-m,
+		       r.height()-m );
+    painter->drawLine( r.width()-m,
+		       r.height()-m-_PROGRESS_WIDTH,
+		       r.width()-m,
+		       r.height()-m );
   }
   // draw status
   if ( !myMessage.isEmpty() ) {
@@ -447,7 +473,7 @@ void QtxSplash::drawContents( QPainter* painter )
     int i = myMessage.length() - 1;
     while( i >= 0 && myMessage[ i-- ] == '\n' )
       shift += spacing;
-    QRect r1( r.x() + 5, r.y() + 5, r.width() - 10, r.height() - 10 - shift );
+    QRect r1( r.x() + m, r.y() + m, r.width() - m*2, r.height() - m*2 - shift );
     QRect r2 = r1;
     if ( myAlignment & Qt::AlignLeft   ) r2.setLeft  ( r2.left()   + 1 );
     if ( myAlignment & Qt::AlignTop    ) r2.setTop   ( r2.top()    + 1 );

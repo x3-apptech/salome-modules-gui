@@ -150,23 +150,23 @@ Registry::Components_var MakeRegistry( CORBA::ORB_var &orb )
   // Recuperation de la reference de l'objet
   CORBA::Object_var object = 0 ;
   try
-    {
-      SCRUTE(registryName) ;
-      object = naming.Resolve( registryName ) ;
-      if(CORBA::is_nil(object)) throw CommException( "unable to find the RegistryService" ) ;
-    }
-  catch( const ServiceUnreachable &ex )
-    {
-      MESSAGE( ex.what() )
-      exit( EXIT_FAILURE ) ;
-    }
-  catch( const CORBA::Exception &exx )
-    {
-      exit( EXIT_FAILURE ) ;
-    }
-  
+  {
+    SCRUTE(registryName) ;
+    object = naming.Resolve( registryName ) ;
+    if(CORBA::is_nil(object)) throw CommException( "unable to find the RegistryService" ) ;
+  }
+  catch( const ServiceUnreachable& ex )
+  {
+    MESSAGE( ex.what() )
+    exit( EXIT_FAILURE ) ;
+  }
+  catch( const CORBA::Exception& )
+  {
+    exit( EXIT_FAILURE ) ;
+  }
+
   // Specialisation de l'objet generique
-  
+
   return Registry::Components::_narrow( object ) ;
 }
 
@@ -342,6 +342,8 @@ QString ToolsGUI_RegWidget::setlongText( const Registry::Infos &c_info)
   QString a = QString( "<hr><h2>" ) + tr( "Code" ) + QString( " : " );
   a.append( QString( c_info.name ) );
   a.append( "</h1><hr><br>" );
+  a.append( "<code>" ); // ASV: 28.07.06 : added <code> tags to make the text font be 
+                        // fixed width (looks much better on Windows)
   a.append( tr( "Process Id" ) + QString( " : " ) );
   a.append( BOLD( QString::number( int( c_info.pid ) ) ) );
   a.append( QString( " " ) + tr( "on machine" ) + QString( " " ) );
@@ -400,6 +402,8 @@ QString ToolsGUI_RegWidget::setlongText( const Registry::Infos &c_info)
       a.append( BOLD( QString::number( int( c_info.difftime ) ) ) );
       a.append( QString( " " ) + tr( "seconds" ) + QString( ")<br>" ) );
     }
+  a.append( "</code>" ); // ASV: 28.07.06 : added <code> tags to make the text font be 
+                         // fixed width (looks much better on Windows)
   END_OF("setlongText");  
   return a;
   
@@ -768,6 +772,8 @@ QString findFile( QString filename )
       dir = addSlash(dir) ;
       dir = dir + "resources" ;
       dir = addSlash(dir) ;
+      dir = dir + "kernel" ;
+      dir = addSlash(dir) ;
       QFileInfo fileInfo( dir + filename );
       if ( fileInfo.isFile() && fileInfo.exists() )
 	return fileInfo.filePath();
@@ -795,29 +801,22 @@ QString findFile( QString filename )
   // Try CSF_SaloameResources env.var directory ( or directory list )
   cenv = getenv( "CSF_SalomeResources" );
   if ( cenv ) {
-    dir.sprintf( "%s", cenv );
-    if ( !dir.isEmpty() ) {
-      QStringList dirList = QStringList::split( SEPARATOR, dir, false ); // skip empty entries
-      for ( int i = 0; i < dirList.count(); i++ ) {
-	QFileInfo fileInfo( addSlash( dirList[ i ] ) + filename );
-	if ( fileInfo.isFile() && fileInfo.exists() )
-	  return fileInfo.filePath();
+  dir.sprintf( "%s", cenv );
+  if ( !dir.isEmpty() )
+  {
+    QStringList dirList = QStringList::split( SEPARATOR, dir, false ); // skip empty entries
+    for ( int i = 0; i < (int)dirList.count(); i++ )
+    {
+	    QFileInfo fileInfo( addSlash( dirList[ i ] ) + filename );
+	    if ( fileInfo.isFile() && fileInfo.exists() )
+	      return fileInfo.filePath();
       }
     }
   }
   return filename;
 }
+
 QString addSlash( const QString& path )
 {
   return Qtx::addSlash( path );
-//  if (!path.isNull()) {
-//#ifdef WNT
-//    QChar slash ('\\');
-//#else
-//    QChar slash ('/');
-//#endif
-//    if ( path.at(path.length()-1) != slash )
-//      return path + slash;
-//  }
-//  return path;
 }

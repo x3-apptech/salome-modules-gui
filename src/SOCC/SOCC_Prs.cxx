@@ -74,7 +74,7 @@ void SOCC_Prs::AddObject( const Handle(AIS_InteractiveObject)& obj )
 */
 bool SOCC_Prs::IsNull() const 
 { 
-  return myObjects.IsEmpty(); 
+  return myObjects.IsEmpty() == Standard_True;
 }
 
 /*!

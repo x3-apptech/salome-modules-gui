@@ -34,6 +34,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
 
 vtkCxxRevisionMacro(VTKViewer_ShrinkFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_ShrinkFilter);
@@ -49,8 +51,21 @@ VTKViewer_ShrinkFilter::~VTKViewer_ShrinkFilter()
 
 
 /*!Execute method. Calculate output.*/
-void VTKViewer_ShrinkFilter::Execute()
+int VTKViewer_ShrinkFilter::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkPoints *newPts;
   int i, j, numIds, abort=0;
   vtkIdType cellId, numCells, numPts;
@@ -58,8 +73,6 @@ void VTKViewer_ShrinkFilter::Execute()
   vtkFloatingPointType center[3], *p, pt[3];
   vtkPointData *pd, *outPD;;
   vtkIdList *ptIds, *newPtIds;
-  vtkDataSet *input= this->GetInput();
-  vtkUnstructuredGrid *output = this->GetOutput();
   vtkIdType tenth;
   vtkFloatingPointType decimal;
 
@@ -70,7 +83,7 @@ void VTKViewer_ShrinkFilter::Execute()
   if (numCells < 1 || numPts < 1)
     {
     vtkErrorMacro(<<"No data to shrink!");
-    return;
+    return 0;
     }
 
   ptIds = vtkIdList::New();
@@ -154,6 +167,8 @@ void VTKViewer_ShrinkFilter::Execute()
   ptIds->Delete();
   newPtIds->Delete();
   newPts->Delete();
+  
+  return 1;
 }
 
 /*!Sets store mapping.*/
@@ -166,7 +181,9 @@ void VTKViewer_ShrinkFilter::SetStoreMapping(int theStoreMapping){
 /*!Return node object id by vtk node id.
  *\retval -1 - if no object, else return id.
  */
-vtkIdType VTKViewer_ShrinkFilter::GetNodeObjId(int theVtkID){
-  if(myVTK2ObjIds.empty() || theVtkID > myVTK2ObjIds.size()) return -1;
+vtkIdType VTKViewer_ShrinkFilter::GetNodeObjId(int theVtkID)
+{
+  if ( myVTK2ObjIds.empty() || theVtkID > (int)myVTK2ObjIds.size() )
+    return -1;
   return myVTK2ObjIds.at(theVtkID);
 }

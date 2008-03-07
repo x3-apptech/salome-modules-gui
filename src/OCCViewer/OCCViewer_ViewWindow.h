@@ -20,6 +20,7 @@
 #define OCCVIEWER_VIEWWINDOW_H
 
 #include "OCCViewer_ViewModel.h"
+#include "OCCViewer_ViewSketcher.h"
 
 #include "SUIT_ViewWindow.h"
 
@@ -32,6 +33,7 @@ class SUIT_Desktop;
 class OCCViewer_ViewPort3d;
 
 class OCCViewer_ClippingDlg;
+class OCCViewer_SetRotationPointDlg;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -42,8 +44,13 @@ class OCCVIEWER_EXPORT OCCViewer_ViewWindow : public SUIT_ViewWindow
   Q_OBJECT
 
 public:
-  enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, PANGLOBAL, WINDOWFIT, FITALLVIEW, RESETVIEW,
+  enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
+		      PANGLOBAL, WINDOWFIT, FITALLVIEW, RESETVIEW,
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW };
+
+  enum RotationPointType{ GRAVITY, SELECTED };
+
+  enum SketchingType { NoSketching, Rect, Polygon };
 
   OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel);
 	virtual ~OCCViewer_ViewWindow() {};
@@ -67,6 +74,11 @@ public:
 
   virtual QString   getVisualParameters();
   virtual void      setVisualParameters( const QString& parameters );
+
+  virtual void            initSketchers();
+  OCCViewer_ViewSketcher* getSketcher( const int );
+
+  void                    activateSketching( int );
  
 public slots:
   void onFrontView();
@@ -83,20 +95,33 @@ public slots:
   void activateRotation();
   void activatePanning();
   void activateGlobalPanning();
+  void onSetRotationPoint( bool on );
   void onCloneView();
   void onClipping( bool on );
   void onMemorizeView();
   void onRestoreView();
   void onTrihedronShow();
   void setRestoreFlag();
-  
+
+  void activateSetRotationGravity();
+  void activateSetRotationSelected( double theX, double theY, double theZ );
+  void activateStartPointSelection();
+  void updateGravityCoords();
+   
+  virtual void showEvent( QShowEvent * );
+  virtual void hideEvent( QHideEvent * );
+
 signals:
   void vpTransformationStarted(OCCViewer_ViewWindow::OperationType type);
   void vpTransformationFinished(OCCViewer_ViewWindow::OperationType type);
   void cloneView();
 
+  void Show( QShowEvent * );
+  void Hide( QHideEvent * );
+
 protected:
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
+  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId,
+	 ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, CloneId, ClippingId, MemId, RestoreId,
          TrihedronShowId };
 
@@ -126,9 +151,26 @@ protected:
 
   viewAspect getViewParams() const;
 
+  bool computeGravityCenter( double& theX, double& theY, double& theZ );
+
+  virtual void                          onSketchingStarted();
+  virtual void                          onSketchingFinished();
+
+  virtual OCCViewer_ViewSketcher*       createSketcher( int );
+
+  OCCViewer_ViewSketcher*               mypSketcher;
+  QList<OCCViewer_ViewSketcher>         mySketchers;
+
+  int                                   myCurSketch;
+
   OperationType         myOperation;
   OCCViewer_Viewer*     myModel;
   OCCViewer_ViewPort3d* myViewPort;
+
+  RotationPointType     myCurrPointType;
+  RotationPointType     myPrevPointType;
+  gp_Pnt                mySelectedPoint;
+  bool                  myRotationPointSelection;
 
   int					myRestoreFlag;
 
@@ -154,6 +196,9 @@ protected:
 private:
   OCCViewer_ClippingDlg* myClippingDlg;
   QtxAction* myClippingAction;
+
+  OCCViewer_SetRotationPointDlg* mySetRotationPointDlg;
+  QtxAction* mySetRotationPointAction;
   
 };
 

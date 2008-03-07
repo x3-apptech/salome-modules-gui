@@ -28,6 +28,8 @@
 #include <string>
 #include <GLViewer_Object.h>
 
+class LightApp_DataObject;
+
 /*!
   \class LightApp_GLSelector
   Custom selector to get/set selection from GL viewer
@@ -55,21 +57,5 @@ private:
   GLViewer_Viewer2d*  myViewer;
 };
 
-
-/*!
-  This class provide data owner objects for GLViewer.
-*/
-class LIGHTAPP_EXPORT LightApp_GLOwner : public GLViewer_Owner
-{
-public:
-  LightApp_GLOwner( const char* );
-  ~LightApp_GLOwner();
-
-  const char*       entry() const;
-  void              setEntry( const char* );
-
-private:
-  std::string       myEntry;
-};
 
 #endif

@@ -36,7 +36,7 @@ public:
   class Signal;
 
   SUIT_PopupClient();
-  ~SUIT_PopupClient();
+  virtual ~SUIT_PopupClient();
 
   bool            connectPopupRequest( QObject* reciever, const char* slot );
   bool            disconnectPopupRequest( QObject* reciever, const char* slot );

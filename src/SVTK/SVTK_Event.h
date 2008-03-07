@@ -61,6 +61,14 @@ namespace SVTK
     StartGlobalPan,
     StartFitArea,
 
+    SetRotateGravity,
+    StartPointSelection,
+    SetRotateSelected,
+    
+    BBCenterChanged,
+    RotationPointChanged,
+    ChangeRotationPoint,
+        
     LastEvent
   };
 }

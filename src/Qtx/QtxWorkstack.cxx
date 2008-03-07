@@ -919,7 +919,7 @@ void QtxWorkstack::onDeactivated( QtxWorkstackArea* area )
 */
 void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
 {
-  QtxWorkstackArea* anArea = dynamic_cast<QtxWorkstackArea*>( (QObject*)sender()  );
+  QtxWorkstackArea* anArea = ::qt_cast<QtxWorkstackArea*>( (QObject*)sender() );
   if ( !anArea )
     anArea = activeArea();
 
@@ -947,6 +947,8 @@ void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
     myActionsMap[Close]->addTo( pm );
     myActionsMap[Rename]->addTo( pm );
   }
+
+  Qtx::simplifySeparators( pm );
 
   if ( pm->count() )
     pm->exec( p );
@@ -1294,7 +1296,9 @@ void QtxWorkstack::splitterInfo( QSplitter* split, QString& info ) const
 //Cuts starting '(' symbol and ending '(' symbol
 void cutBrackets( QString& parameters )
 {
-  if ( !parameters.isEmpty() && parameters[0] == '(' && parameters[parameters.length()-1] == ')' )
+  QChar c1 = parameters[0];
+  QChar c2 = parameters[int(parameters.length()-1)];
+  if ( !parameters.isEmpty() && c1 == '(' && c2 == ')' )
     parameters = parameters.mid( 1, parameters.length()-2 );
 }
 
@@ -1324,7 +1328,9 @@ bool checkFormat( const QString& parameters )
 {
   QString params( parameters );
   // 1. begins and ends with brackets
-  bool ok = ( params[0] == '(' && params[params.length()-1] == ')' );
+  QChar c1 = params[0];
+  QChar c2 = params[int(params.length()-1)];
+  bool ok = ( c1 == '(' && c2 == ')' );
   if ( !ok ) return ok;
   ::cutBrackets( params );
   // 2. has splitter word
@@ -1358,13 +1364,16 @@ QStringList getChildren( const QString& str )
   int i = 1,
   nOpen = 1, // count brackets: '(' increments nOpen, ')' decrements
   start = 0;
-  while ( i < str.length() ) {
-    if ( str[i] == '(' ) {
+  while ( i < (int)str.length() )
+  {
+    if ( str[i] == '(' )
+    {
       nOpen++;
       if ( nOpen == 1 )
 	start = i;
     }
-    else if ( str[i] == ')' ) {
+    else if ( str[i] == ')' )
+    {
       nOpen--;
       if ( nOpen == 0 ) 
 	lst.append( str.mid( start, i-start+1 ) );
@@ -1399,7 +1408,7 @@ QWidget* getView( const QWidget* parent, const QString& aName )
   QWidget* view = 0;
   QObjectList *l = parent->topLevelWidget()->queryList( "QWidget", aName, false, true );
   if ( !l->isEmpty() )
-    view = dynamic_cast<QWidget*>( l->first() );
+    view = ::qt_cast<QWidget*>( l->first() );
   delete l;
   return view;
 }
@@ -1420,7 +1429,8 @@ void QtxWorkstack::setSplitter( QSplitter* splitter, const QString& parameters, 
   // get splitter sizes and store it in the map for future setting
   QValueList<int> sizes;
   QStringList sizesLst = QStringList::split( ':', ::getValue( params, "sizes" ) );
-  for ( QStringList::Iterator it = sizesLst.begin(); it != sizesLst.end(); ++it )
+  QStringList::Iterator it;
+  for ( it = sizesLst.begin(); it != sizesLst.end(); ++it )
     sizes.append( (*it).toInt() );
   sMap[ splitter ] = sizes;
 
@@ -1495,8 +1505,8 @@ QtxWorkstack& QtxWorkstack::operator<<( const QString& parameters )
   qApp->processEvents();
 
   // restore splitters' sizes (map of sizes is filled in setSplitters)
-  for ( QMap< QSplitter*, QValueList<int> >::Iterator it = sMap.begin(); it != sMap.end(); ++it )
-    it.key()->setSizes( it.data() );
+  for ( QMap< QSplitter*, QValueList<int> >::Iterator itm = sMap.begin(); itm != sMap.end(); ++itm )
+    itm.key()->setSizes( itm.data() );
 
   return (*this);
 }
@@ -2337,16 +2347,16 @@ void QtxWorkstackTabBar::setActive( const bool on )
 {
   QFont aFont = font();
   aFont.setUnderline( on );
-  QColorGroup* aColGrp = new QColorGroup();
+  QColorGroup aColGrp;
   QPalette aPal = palette();
   if ( !on ) {
-    aPal.setColor( QColorGroup::HighlightedText, aColGrp->foreground() );
+    aPal.setColor( QColorGroup::HighlightedText, aColGrp.foreground() );
     aPal.setColor( QColorGroup::Highlight, colorGroup().dark().light( DARK_COLOR_LIGHT ) );
     setPalette( aPal );
   }
   else {
-    aPal.setColor( QColorGroup::HighlightedText, aColGrp->highlightedText() );
-    aPal.setColor( QColorGroup::Highlight, aColGrp->highlight() );
+    aPal.setColor( QColorGroup::HighlightedText, aColGrp.highlightedText() );
+    aPal.setColor( QColorGroup::Highlight, aColGrp.highlight() );
     unsetPalette();
   }
   setFont( aFont );

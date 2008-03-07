@@ -47,4 +47,11 @@ ComputeTrihedronSize(vtkRenderer* theRenderer,
 		     const vtkFloatingPointType theSize, 
 		     const vtkFloatingPointType theSizeInPercents);
 
+VTKVIEWER_EXPORT
+extern
+bool IsBBEmpty(vtkRenderer* theRenderer);
+VTKVIEWER_EXPORT
+extern
+bool ComputeBBCenter(vtkRenderer* theRenderer, 
+		     vtkFloatingPointType theCenter[3]);
 #endif

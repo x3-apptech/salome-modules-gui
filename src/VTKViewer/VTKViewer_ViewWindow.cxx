@@ -131,7 +131,7 @@ VTKViewer_ViewWindow::~VTKViewer_ViewWindow()
   myRWInteractor->Delete();
   
   //m_RW->Delete() ;
-  myRenderer->RemoveAllProps();
+  myRenderer->RemoveAllViewProps();
   //m_Renderer->Delete() ;
   myTrihedron->Delete();
 }
@@ -455,8 +455,8 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
                      (bnd[5]-bnd[4])*(bnd[5]-bnd[4]));
     }else{
       aLength = bnd[1]-bnd[0];
-      aLength = max((bnd[3]-bnd[2]),aLength);
-      aLength = max((bnd[5]-bnd[4]),aLength);
+      aLength = std::max((bnd[3]-bnd[2]),aLength);
+      aLength = std::max((bnd[5]-bnd[4]),aLength);
     }
    
     static vtkFloatingPointType aSizeInPercents = 105;

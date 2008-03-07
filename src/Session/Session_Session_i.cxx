@@ -35,6 +35,7 @@
 
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
+#include "SUIT_Desktop.h"
 
 #include <qapplication.h>
 
@@ -63,6 +64,7 @@ SALOME_Session_i::SALOME_Session_i(int argc,
   _poa = PortableServer::POA::_duplicate(poa) ;
   _GUIMutex = GUIMutex;
   _GUILauncher = GUILauncher;
+  _NS = new SALOME_NamingService(_orb);
   //MESSAGE("constructor end");
 }
 
@@ -86,6 +88,7 @@ Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName
 */
 SALOME_Session_i::~SALOME_Session_i()
 {
+  delete _NS;
   //MESSAGE("destructor end");
 }
 
@@ -95,10 +98,10 @@ SALOME_Session_i::~SALOME_Session_i()
 */
 void SALOME_Session_i::NSregister()
 {
-  SALOME::Session_ptr pSession = SALOME::Session::_narrow(_this());
+  CORBA::Object_var obref=_this();
+  SALOME::Session_var pSession = SALOME::Session::_narrow(obref);
   try
     {
-      _NS = new SALOME_NamingService(_orb);
       _NS->Register(pSession, "/Kernel/Session");
     }
   catch (ServiceUnreachable&)
@@ -220,4 +223,31 @@ bool SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)
   }
  
   return false;
+}
+
+void SALOME_Session_i::emitMessage(const char* theMessage)
+{
+  class TEvent: public SALOME_Event {
+  public:
+    TEvent(const char * msg) {
+      _msg = msg;
+    }
+    virtual void Execute() {
+      SUIT_Session::session()->activeApplication()->desktop()->emitMessage(_msg);
+    }
+  private:
+    const char* _msg;
+  };
+  if ( SUIT_Session::session() ) {
+    if ( SUIT_Session::session()->activeApplication() ) {
+      if ( SUIT_Session::session()->activeApplication()->desktop() ) {
+	ProcessVoidEvent( new TEvent(theMessage) );
+      }
+    }
+  }
+}
+
+void SALOME_Session_i::emitMessageOneWay(const char* theMessage)
+{
+  emitMessage(theMessage);
 }

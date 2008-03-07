@@ -29,6 +29,8 @@
 #ifndef _SALOMEAPP_ENGINE_I_HXX_
 #define _SALOMEAPP_ENGINE_I_HXX_
 
+#include <SALOME_Session.hxx>
+
 #include "SALOME_Component_i.hxx"
 
 #include <vector> 
@@ -37,13 +39,7 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SalomeApp_Engine)
 
-#ifdef WNT
-#include <SALOME_WNT.hxx>
-#else
-#define SALOME_WNT_EXPORT
-#endif
-
-class SALOME_WNT_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
+class SESSION_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
                           public Engines_Component_i
 {
 public:

@@ -30,6 +30,9 @@
 
 QValueList<QDS_Datum*> QDS::_datumList;
 
+/*!
+  Convert the OpenCascade ascii string to Qt string.
+*/
 QString QDS::toQString( const TCollection_AsciiString& src )
 {
   QTextCodec* codec = QTextCodec::codecForLocale();
@@ -40,6 +43,9 @@ QString QDS::toQString( const TCollection_AsciiString& src )
   return res;
 }
 
+/*!
+  Convert the OpenCascade unicode string to Qt string.
+*/
 QString QDS::toQString( const TCollection_ExtendedString& src )
 {
   if ( src.IsAscii() )
@@ -48,6 +54,9 @@ QString QDS::toQString( const TCollection_ExtendedString& src )
     return QString( (QChar*)src.ToExtString(), src.Length() );
 }
 
+/*!
+  Convert the OpenCascade ascii string to Qt string.
+*/
 QString QDS::toQString( const Handle(TCollection_HAsciiString)& src )
 {
   if ( src.IsNull() )
@@ -56,6 +65,9 @@ QString QDS::toQString( const Handle(TCollection_HAsciiString)& src )
     return toQString( src->String() );
 }
 
+/*!
+  Convert the OpenCascade unicode string to Qt string.
+*/
 QString QDS::toQString( const Handle(TCollection_HExtendedString)& src )
 {
   if ( src.IsNull() )
@@ -64,6 +76,9 @@ QString QDS::toQString( const Handle(TCollection_HExtendedString)& src )
     return toQString( src->String() );
 }
 
+/*!
+  Convert the Qt string to OpenCascade ascii string.
+*/
 TCollection_AsciiString QDS::toAsciiString( const QString& src )
 {
   TCollection_AsciiString res;
@@ -82,11 +97,17 @@ TCollection_AsciiString QDS::toAsciiString( const QString& src )
   return res;
 }
 
+/*!
+  Convert the OpenCascade unicode string to OpenCascade ascii string.
+*/
 TCollection_AsciiString QDS::toAsciiString( const TCollection_ExtendedString& src )
 {
   return TCollection_AsciiString( src );
 }
 
+/*!
+  Convert the OpenCascade unicode string to OpenCascade ascii string.
+*/
 TCollection_AsciiString QDS::toAsciiString( const Handle(TCollection_HExtendedString)& src )
 {
   TCollection_AsciiString res;
@@ -95,6 +116,9 @@ TCollection_AsciiString QDS::toAsciiString( const Handle(TCollection_HExtendedSt
   return res;
 }
 
+/*!
+  Convert the Qt string to OpenCascade unicode string.
+*/
 TCollection_ExtendedString QDS::toExtString( const QString& src )
 {
   if ( src.isEmpty() )
@@ -112,11 +136,18 @@ TCollection_ExtendedString QDS::toExtString( const QString& src )
   return trg;
 }
 
+/*!
+  Convert the OpenCascade ascii string to OpenCascade unicode string.
+*/
 TCollection_ExtendedString QDS::toExtString( const TCollection_AsciiString& src )
 {
   return TCollection_ExtendedString( src );
 }
 
+/*!
+  Load datum definitions in the dictionary from XML file \adictPath.
+  Returns true if load successed or false otherwise.
+*/
 bool QDS::load( const QString& dictPath )
 {
   if ( dictPath.isEmpty() )
@@ -125,6 +156,11 @@ bool QDS::load( const QString& dictPath )
   return DDS_Dictionary::Load( toAsciiString( dictPath ) );
 }
 
+/*!
+  Returns the label of unit system \asys. If component \acomp specified and not empty then
+  function find the given unit system in the given component otherwise all components will be searched.
+  If unit system not found then empty string returned.
+*/
 QString QDS::unitSystemLabel( const QString& sys, const QString& comp )
 {
   QString lab;
@@ -136,6 +172,11 @@ QString QDS::unitSystemLabel( const QString& sys, const QString& comp )
   return lab;
 }
 
+/*!
+  Gets the name of active unit system from the specified component \acomp.
+  If component not specified or component is empty string then first got component will be used.
+  If component exist then active unit system name returned or empty string otherwise.
+*/
 QString QDS::activeUnitSystem( const QString& comp )
 {
   QString sys;
@@ -146,6 +187,13 @@ QString QDS::activeUnitSystem( const QString& comp )
   return sys;
 }
 
+/*!
+  Sets the active unit system named \asys. If not empty component name \acomp specified then
+  unit system will be activated in the given component otherwise all components will be processed.
+
+  After the changing of active unit system function notify about it to all registered datums
+  from processed components using method QDS_Datum::unitSystemChanged();
+*/
 void QDS::setActiveUnitSystem( const QString& sys, const QString& comp )
 {
   Handle(DDS_Dictionary) dic = DDS_Dictionary::Get();
@@ -179,6 +227,10 @@ void QDS::setActiveUnitSystem( const QString& sys, const QString& comp )
   }
 }
 
+/*!
+  Register given datum \adatum in the static list.
+  This function invoked by QDS_Datum constructor.
+*/
 void QDS::insertDatum( QDS_Datum* datum )
 {
   if ( !datum )
@@ -187,6 +239,10 @@ void QDS::insertDatum( QDS_Datum* datum )
   _datumList.append( datum );
 }
 
+/*!
+  Remove given datum \adatum from the static list.
+  This function invoked by QDS_Datum destructor.
+*/
 void QDS::removeDatum( QDS_Datum* datum )
 {
   if ( !datum )

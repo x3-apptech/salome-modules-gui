@@ -20,11 +20,16 @@
 
 #include "LightApp_DataOwner.h"
 #include "LightApp_DataObject.h"
+#include "LightApp_Application.h"
 
 #include <OB_Browser.h>
 
+#include <SUIT_Session.h>
 #include <SUIT_DataObjectIterator.h>
+
 #include <qdatetime.h>
+
+#include <time.h>
 
 /*!
   Constructor
@@ -61,6 +66,12 @@ OB_Browser* LightApp_OBSelector::browser() const
 void LightApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
 {
   if (mySelectedList.count() == 0 ) {
+    SUIT_Session* session = SUIT_Session::session();
+    SUIT_Application* sapp = session ? session->activeApplication() : 0;
+    LightApp_Application* app = dynamic_cast<LightApp_Application*>( sapp );
+    if( !app )
+      return;
+
     if ( !myBrowser )
       return;
     DataObjectList objlist;
@@ -69,7 +80,7 @@ void LightApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
     for ( DataObjectListIterator it( objlist ); it.current(); ++it )
     {
       LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( it.current() );
-      if ( obj )
+      if ( obj && app->checkDataObject(obj) )
       {
 #ifndef DISABLE_SALOMEOBJECT
         Handle(SALOME_InteractiveObject) aSObj = new SALOME_InteractiveObject

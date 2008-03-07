@@ -1,0 +1,30 @@
+/*!
+
+\page displaying_studies_page Displaying studies
+
+Starting from SALOME version 3.0.0. you are able to work in a
+multi-desktop environment, which means that you can open as many
+studies as you need, place them wherever you wish on the desktop, in
+brief, work with Salome Platform like with a normal Windows
+application.
+\n Such windows as Object Browser and Python Console are dockable and
+also can be placed at any part of the desktop.
+\n Only one study window in representation area can be active. You can
+change their size and move any windows between representation
+areas. When an area becomes empty, it is not displayed.
+\n All windows are placed inside tabs where you can switch between
+them. If there are several windows (viewers) in your current study and
+you want to display more then one at the same time, you can split
+representation area into two parts, in horizontal or vertical
+direction, to create two representation areas with windows be placed
+in them. To do this, right-click on the tab and select <b>Split
+Vertically</b> or <b>Split Horizontally</b>.
+
+For example, on this screen-shot the active zone has been split
+horizontally to be able to work with OCC and VTK viewers
+simultaneously, the one of the windows was split again, at this time
+vertically to see Plot 2d graphs.
+
+\image html neo-view2.png
+
+*/

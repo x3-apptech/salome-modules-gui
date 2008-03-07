@@ -1,0 +1,140 @@
+/*!
+
+\page salome_preferences_page SALOME preferences
+
+To begin setting preferences for your study, select \b Preferences in the
+main menu, the following dialog box will appear:
+
+\image html pref11.png
+If you've just started your study and haven't yet loaded other
+modules, you'll be able to change only those settings, which refer to
+the whole GUI SALOME session. These settings will be valid for the
+whole study session.
+
+<h2>General Preferences</h2>
+
+<ul>
+<li><b>Study Properties</b></li>
+<ul>
+<li><b>MultiFile Save</b> - if checked in, your study will be saved in
+several HDF files (one file for the data created by each component
+used during the study session).</li>
+<li><b>ASCII Save</b> - if checked in, your study will be saved in
+ASCII format file (or files).</li>
+<li><b>Store positions of windows</b> -  if checked in, positions of windows
+will be saved in a special file at the end of the current session and
+then restored for a new session.</li>
+<li><b>Store/restore last GUI state</b> - if checked in, all GUI settings are
+saved with the rest of the data whenever you save the study. When the
+study is reopened, the GUI state is restored.</li>
+</ul>
+<li><b>External browser</b></li>
+<ul>
+<li>\b Application - this option allows you to set an external browser (IE,
+Netscape) which will be used for viewing SALOME reference manuals. By
+default, Mozilla is used. Press the &quot;<b>...</b>&quot; button(see
+the picture below) to browse for the application you need in the data
+tree of your computer.</li>
+<li>\b Parameters</li>
+</ul>
+<li><b>Python console properties</b> - here you can quickly set the
+parameters (style, size, face) of the font used in your Python
+console.</li>
+</ul>
+\par
+For detailed settings in \ref select_color_and_font_page "Select Font"
+dialog box press the &quot;<b>...</b>&quot; button(see the picture below).
+
+\image html image69.gif "&quot;...&quot; button"
+
+<br><h2>Viewers Preferences</h2>
+
+\image html pref12.png
+
+<ul>
+<li><b>OCC and VTK 3D Viewers</b></li>
+<ul>
+<li><b>Trihedron size</b> - this submenu allows to set the size of
+coordinate axes displayed in the viewer.</li>
+<li><b>Background Color</b> - this submenu allows to select background
+color. Click on the colored line to access to the 
+\ref select_color_and_font_page "Select Color" dialog box.</li>
+<li><b>Number of isolines along U</b> (or <b>V</b>) - this submenu allows to specify
+the number of isolines along the axes of coordinates.</li>
+<li><b>Relative size</b> - if checked in, trihedron axes scale to fit the
+size of the area displayed in 3D Viewer.</li>
+</ul>
+<br>
+<li><b>Plot2d Viewer</b></li>
+<ul>
+<li><b>Legend Position</b> - this submenu allows to set the default position
+of the legend, it can be located to the left, to the right, on top or
+on bottom of the graph.</li>
+<li><b>Curve Type</b> - this allows to set the representation of graphs in
+your presentations. You can see only <b>Points</b>, points connected with
+<b>Lines</b> or points connected with smooth <b>Splines</b>.</li>
+<li><b>Marker Size</b> - this submenu allows you to set the size of
+markers in your graphs</li>
+<li><b>Horizontal & Vertical Axis Scale</b> - this submenu allows you to set
+the scale for vertical and horizontal axes. It can be either <b>Linear</b> or
+<b>Logarithmic</b></li>
+<li>Background Color - this submenu allows to select the background
+color. Click on the colored line to access to the 
+\ref select_color_and_font_page "Select Color" dialog box.</li>
+</ul>
+<br>
+<li><b>Graph Supervisor</b></li>
+<ul>
+<li><b>Background Color</b> - this submenu allows to select background
+color. Click on the colored line to access to the 
+\ref select_color_and_font_page "Select Color" dialog box.</li>
+<li><b>Title Color</b> - this submenu allows to select title color. Click on
+the colored line to access to the 
+\ref select_color_and_font_page "Select Color" dialog box.</li>
+</ul>
+</ul>
+
+<br><h2>Directories Preferences</h2>
+
+\image html pref13.png
+
+<ul>
+<li>
+<b>Quick Directory List</b> - this section allows to create and manage
+a custom quick directory list. To add a directory in the list, press
+the "Add directory" button:
+\image html image70.gif
+
+then the &quot;<b>...</b>&quot; button and browse the data tree for the
+directory you need.
+The "Up" and "Down" buttons(see the picture below) help you to sort
+the directories in the list:
+\image html image73.gif
+
+\image html image75.gif
+To remove the selected directory from the list, press the "Delete"
+button:
+\image html image72.gif
+</li>
+</ul>
+
+<br><h2>Object Browser Preferences</h2>
+
+\image html pref14.png
+
+<ul>
+<li><b>Object browser settings</b></li>
+<ul>
+<li><b>Auto size for the first column</b> - this checkbox enables automatic
+resizing for the first column.</li>
+<li><b>Auto size for other columns</b> - this checkbox enables
+automatic resizing for the other columns.</li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Default columns</b> - these checkboxes allow to display or hide <b>Value</b>,
+<b>Entry</b>, <b>IOR</b> and <b>Reference entry</b> columns in the Object Browser.</li>
+</ul>
+
+*/

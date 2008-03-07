@@ -112,7 +112,7 @@ bool QtxAction::addTo( QWidget* w )
 		  successfully and false otherwise.
 */
 
-bool QtxAction::addTo( QWidget* w, int index )
+bool QtxAction::addTo( QWidget* w, const int index )
 {
   if ( !addTo( w ) )
     return false;
@@ -238,14 +238,17 @@ void QtxAction::setPopup( QWidget* w, const int id, QPopupMenu* subPopup ) const
   if ( !w )
     return;
 
-  if ( !w->inherits( "QPopupMenu" ) && !w->inherits( "QMenuBar" ) )
-    return;  // unsupported widget type
+  QMenuData* pmd = 0;
 
-  QMenuData* md = 0;
-  QMenuData* pmd = dynamic_cast<QMenuData*>( w );
+  if ( w->inherits( "QPopupMenu" ) )
+    pmd = ::qt_cast<QPopupMenu*>( w );
+  else if ( w->inherits( "QMenuBar" ) )
+    pmd = ::qt_cast<QMenuBar*>( w );
+
   if ( !pmd )
     return;  // bad widget
-  
+
+  QMenuData* md = 0;
   QMenuItem* item = pmd->findItem( id, &md );
   if ( !item || md != pmd )
     return;  // item is not found

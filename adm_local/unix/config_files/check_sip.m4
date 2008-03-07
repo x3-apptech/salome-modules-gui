@@ -44,10 +44,25 @@ else
            SIP_VERS=v4_old ;;
          4.2*)
            SIP_VERS=v4_new ;;
+         4.3*)
+           SIP_VERS=v4_new ;;
+         4.4*)
+           SIP_VERS=v4_new ;;
+         4.5*)
+           SIP_VERS=v4_new ;;
+	 4.6*)
+           SIP_VERS=v4_new ;;
+	 4.7*)
+           SIP_VERS=v4_new ;;
          *)
            AC_MSG_RESULT(sip version $version not supported)
            SIP_VERS=unsupported ;;
     esac
+
+    if test "x$SIPDIR" = "x" ; then
+        SIPDIR=`dirname $SIP`
+        SIPDIR=`dirname $SIPDIR`
+    fi
 
     sip_ok=no
     dnl Search sip.h file
@@ -162,6 +177,9 @@ AC_SUBST(SIP)
 AC_SUBST(SIP_INCLUDES)
 AC_SUBST(SIP_LIBS)
 AC_SUBST(SIP_VERS)
+
+AM_CONDITIONAL(IS_SIP_V4, [test $SIP_VERS == v4_old || test $SIP_VERS == v4_new])
+AM_CONDITIONAL(IS_SIP_NEW, [test $SIP_VERS == v3_new || test $SIP_VERS == v4_new])
 
 AC_MSG_RESULT(for sip: $sip_ok)
 

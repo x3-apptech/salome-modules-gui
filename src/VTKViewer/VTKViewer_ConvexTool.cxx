@@ -32,6 +32,10 @@
 #include <set>
 #include <map>
 
+#ifdef WNT
+#include <algorithm>
+#endif
+
 #include <vtkUnstructuredGrid.h>
 #include <vtkGeometryFilter.h>
 #include <vtkDelaunay3D.h>
@@ -43,6 +47,15 @@
 #include <vtkCell.h>
 #include <vtkPlane.h>
 #include <vtkMath.h>
+#include <vtkCellArray.h>
+#include <vtkTriangle.h>
+#include <vtkOrderedTriangulator.h>
+
+#ifdef _DEBUG_
+static int DEBUG_TRIA_EXECUTE = 0;
+#else
+static int DEBUG_TRIA_EXECUTE = 0;
+#endif
 
 namespace
 {
@@ -71,31 +84,117 @@ namespace
   typedef std::vector<TPolygon> TPolygons;
 }
 
-/*!
-  Constructor
-*/
+
+//----------------------------------------------------------------------------
 VTKViewer_Triangulator
 ::VTKViewer_Triangulator():
-  myInput(NULL),
-  myCellId(-1),
-  myShowInside(-1),
-  myAllVisible(-1),
-  myCellsVisibility(NULL),
-  myCellIds(vtkIdList::New())
+  myCellIds(vtkIdList::New()),
+  myFaceIds(vtkIdList::New()),
+  myPoints(vtkPoints::New()),
+  myPointIds(NULL)
 {}
 
 
-/*!
-  Destructor
-*/
+//----------------------------------------------------------------------------
 VTKViewer_Triangulator
 ::~VTKViewer_Triangulator()
 {
   myCellIds->Delete();
+  myFaceIds->Delete();
+  myPoints->Delete();
 }
 
 
+//----------------------------------------------------------------------------
+vtkPoints*
+VTKViewer_Triangulator
+::InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId)
+{
+  myPoints->Reset();
+  myPoints->Modified(); // the VTK bug
 
+  vtkIdType aNumPts;
+  theInput->GetCellPoints(theCellId, aNumPts, myPointIds); 
+  if ( aNumPts > 0 ) {
+    vtkFloatingPointType anAbsoluteCoord[3];
+    myPoints->SetNumberOfPoints(aNumPts);
+    vtkPoints *anInputPoints = theInput->GetPoints();
+    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
+      anInputPoints->GetPoint(myPointIds[aPntId], anAbsoluteCoord);
+      myPoints->SetPoint(aPntId, anAbsoluteCoord);
+    }
+  }
+
+  return myPoints;
+}
+
+
+//----------------------------------------------------------------------------
+vtkIdType 
+VTKViewer_Triangulator
+::GetNbOfPoints()
+{
+  return myPoints->GetNumberOfPoints();
+}
+
+
+//----------------------------------------------------------------------------
+vtkIdType 
+VTKViewer_Triangulator
+::GetPointId(vtkIdType thePointId)
+{
+  return thePointId;
+}
+
+
+//----------------------------------------------------------------------------
+vtkFloatingPointType 
+VTKViewer_Triangulator
+::GetCellLength()
+{
+  vtkFloatingPointType aBounds[6];
+  myPoints->GetBounds(aBounds);
+
+  vtkFloatingPointType aCoordDiff[3];
+  aCoordDiff[0] = (aBounds[1] - aBounds[0]);
+  aCoordDiff[1] = (aBounds[3] - aBounds[2]);
+  aCoordDiff[2] = (aBounds[5] - aBounds[4]);
+
+  return sqrt(aCoordDiff[0]*aCoordDiff[0] + 
+	      aCoordDiff[1]*aCoordDiff[1] + 
+	      aCoordDiff[2]*aCoordDiff[2]);
+}
+
+
+//----------------------------------------------------------------------------
+void 
+VTKViewer_Triangulator
+::GetCellNeighbors(vtkUnstructuredGrid *theInput,
+		   vtkIdType theCellId,
+		   vtkCell* theFace,
+		   vtkIdList* theCellIds)
+{
+  myFaceIds->Reset();
+  vtkIdList *anIdList = theFace->PointIds;  
+  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(0)]);
+  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(1)]);
+  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(2)]);
+
+  theInput->GetCellNeighbors(theCellId, myFaceIds, theCellIds);
+}
+
+
+//----------------------------------------------------------------------------
+vtkIdType 
+VTKViewer_Triangulator
+::GetConnectivity(vtkIdType thePntId)
+{
+  return myPointIds[thePntId];
+}
+
+
+//----------------------------------------------------------------------------
 bool 
 VTKViewer_Triangulator
 ::Execute(vtkUnstructuredGrid *theInput,
@@ -110,15 +209,9 @@ VTKViewer_Triangulator
 	  std::vector<vtkIdType>& theVTK2ObjIds,
 	  bool theIsCheckConvex)
 {
-  myInput = theInput;
-  myCellId = theCellId;
-  myShowInside = theShowInside;
-  myAllVisible = theAllVisible;
-  myCellsVisibility = theCellsVisibility;
-
-  vtkPoints *aPoints = InitPoints();
+  vtkPoints *aPoints = InitPoints(theInput, theCellId);
   vtkIdType aNumPts = GetNbOfPoints();
-  //cout<<"Triangulator - aNumPts = "<<aNumPts<<"\n";
+  if(DEBUG_TRIA_EXECUTE) cout<<"Triangulator - aNumPts = "<<aNumPts<<"\n";
 
   if(aNumPts == 0)
     return true;
@@ -129,7 +222,7 @@ VTKViewer_Triangulator
     vtkFloatingPointType aPntCoord[3];
     for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
       aPoints->GetPoint(GetPointId(aPntId),aPntCoord);
-      //cout<<"\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}\n";
+      if(DEBUG_TRIA_EXECUTE) cout<<"\taPntId = "<<GetPointId(aPntId)<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}\n";
       aCellCenter[0] += aPntCoord[0];
       aCellCenter[1] += aPntCoord[1];
       aCellCenter[2] += aPntCoord[2];
@@ -143,8 +236,8 @@ VTKViewer_Triangulator
   int aNumFaces = GetNumFaces();
 
   static vtkFloatingPointType EPS = 1.0E-2;
-  vtkFloatingPointType aDistEps = aCellLength * EPS;
-  //cout<<"\taCellLength = "<<aCellLength<<"; aDistEps = "<<aDistEps<<"\n";
+  vtkFloatingPointType aDistEps = aCellLength/3.0 * EPS;
+  if(DEBUG_TRIA_EXECUTE) cout<<"\taNumFaces = "<<aNumFaces<<"; aCellLength = "<<aCellLength<<"; aDistEps = "<<aDistEps<<"\n";
 
   // To initialize set of points that belong to the cell
   typedef std::set<vtkIdType> TPointIds;
@@ -162,9 +255,9 @@ VTKViewer_Triangulator
   for (int aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
     vtkCell* aFace = GetFace(aFaceId);
     
-    GetCellNeighbors(theCellId, aFace, myCellIds);
-    if((!myAllVisible && !myCellsVisibility[myCellIds->GetId(0)]) || 
-       myCellIds->GetNumberOfIds() <= 0 || myShowInside)
+    GetCellNeighbors(theInput, theCellId, aFace, myCellIds);
+    if((!theAllVisible && !theCellsVisibility[myCellIds->GetId(0)]) || 
+       myCellIds->GetNumberOfIds() <= 0 || theShowInside)
     {
       TPointIds aPointIds;
       vtkIdList *anIdList = aFace->PointIds;  
@@ -197,8 +290,10 @@ VTKViewer_Triangulator
 
     // To get know, if the points of the trinagle were already observed
     bool anIsObserved = aFace2PointIds.find(aPointIds) == aFace2PointIds.end();
-    //cout<<"\taFaceId = "<<aFaceId<<"; anIsObserved = "<<anIsObserved;
-    //cout<<"; aNewPts = {"<<aNewPts[0]<<", "<<aNewPts[1]<<", "<<aNewPts[2]<<"}\n";
+    if(DEBUG_TRIA_EXECUTE) {
+      cout<<"\taFaceId = "<<aFaceId<<"; anIsObserved = "<<anIsObserved;
+      cout<<"; aNewPts = {"<<aNewPts[0]<<", "<<aNewPts[1]<<", "<<aNewPts[2]<<"}\n";
+    }
     
     if(!anIsObserved){
       // To get coordinates of the points of the traingle face
@@ -207,7 +302,17 @@ VTKViewer_Triangulator
       aPoints->GetPoint(aNewPts[1],aCoord[1]);
       aPoints->GetPoint(aNewPts[2],aCoord[2]);
       
-      // To calculate plane normal
+      /* To calculate plane normal for face (aFace)
+
+
+	^ aNormal
+	|     
+	|   ^ aVector01
+	| /
+	/_________> aVector02
+       
+      
+      */
       vtkFloatingPointType aVector01[3] = { aCoord[1][0] - aCoord[0][0],
 					    aCoord[1][1] - aCoord[0][1],
 					    aCoord[1][2] - aCoord[0][2] };
@@ -216,6 +321,9 @@ VTKViewer_Triangulator
 					    aCoord[2][1] - aCoord[0][1],
 					    aCoord[2][2] - aCoord[0][2] };
       
+      vtkMath::Normalize(aVector01);
+      vtkMath::Normalize(aVector02);
+
       // To calculate the normal for the triangle
       vtkFloatingPointType aNormal[3];
       vtkMath::Cross(aVector02,aVector01,aNormal);
@@ -232,13 +340,72 @@ VTKViewer_Triangulator
 	  vtkFloatingPointType aPntCoord[3];
 	  vtkIdType aPntId = *anIter;
 	  aPoints->GetPoint(aPntId,aPntCoord);
+	  
+	  vtkFloatingPointType aVector0Pnt[3] = { aPntCoord[0] - aCoord[0][0],
+						  aPntCoord[1] - aCoord[0][1],
+						  aPntCoord[2] - aCoord[0][2] };
+
+	  
+	  vtkMath::Normalize(aVector0Pnt);
+	  
+	  vtkFloatingPointType aNormalPnt[3];
+	  // calculate aNormalPnt
+	  {
+ 	    vtkFloatingPointType aCosPnt01 = vtkMath::Dot(aVector0Pnt,aVector01);
+	    vtkFloatingPointType aCosPnt02 = vtkMath::Dot(aVector0Pnt,aVector02);
+	    if(aCosPnt01<-1)
+	      aCosPnt01 = -1;
+	    if(aCosPnt01>1)
+	      aCosPnt01 = 1;
+	    if(aCosPnt02<-1)
+	      aCosPnt02 = -1;
+	    if(aCosPnt02>1)
+	      aCosPnt02 = 1;
+
+	    vtkFloatingPointType aDist01,aDist02;// deflection from Pi/3 angle (equilateral triangle)
+ 	    vtkFloatingPointType aAngPnt01 = fabs(acos(aCosPnt01));
+	    vtkFloatingPointType aAngPnt02 = fabs(acos(aCosPnt02));
+
+	    /*  check that triangle similar to equilateral triangle
+		AOC or COB ?
+		aVector0Pnt = (OC)
+		aVector01   = (OB)
+		aVector02   = (OA)
+	    
+	    B
+	    ^ aVector01  C     
+	    |           ^ aVector0Pnt  
+	    |     _____/ 
+	    | ___/
+	    |/________> aVector02
+	    O          A
+	    */
+	    aDist01 = fabs(aAngPnt01-(vtkMath::Pi())/3.0); 
+	    aDist02 = fabs(aAngPnt02-(vtkMath::Pi())/3.0);
+	    
+	    // caculate a normal for best triangle
+	    if(aDist01 <= aDist02)
+	      vtkMath::Cross(aVector0Pnt,aVector01,aNormalPnt);
+ 	    else
+ 	      vtkMath::Cross(aVector0Pnt,aVector02,aNormalPnt);
+
+	  }
+	  
+	  vtkMath::Normalize(aNormalPnt);
+	  
+	  if(DEBUG_TRIA_EXECUTE)
+	    cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"};";
+	  
 	  vtkFloatingPointType aDist = vtkPlane::DistanceToPlane(aPntCoord,aNormal,aCoord[0]);
-	  //cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}; aDist = "<<aDist<<"\n";
+	  if(DEBUG_TRIA_EXECUTE) cout<<": aDist = "<<aDist;
 	  if(fabs(aDist) < aDistEps){
 	    aPointIds.insert(aPntId);
 	    aCenter[0] += aPntCoord[0];
 	    aCenter[1] += aPntCoord[1];
 	    aCenter[2] += aPntCoord[2];
+	    if(DEBUG_TRIA_EXECUTE) cout  << "; Added = TRUE" << endl;
+	  } else {
+	    if(DEBUG_TRIA_EXECUTE) cout  << "; Added = FALSE" << endl;
 	  }
 	}
 	int aNbPoints = aPointIds.size();
@@ -254,9 +421,11 @@ VTKViewer_Triangulator
       vtkMath::Normalize(aVectorC);
       
       vtkFloatingPointType aDot = vtkMath::Dot(aNormal,aVectorC);
-      //cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
-      //cout<<"; aVectorC = {"<<aVectorC[0]<<", "<<aVectorC[1]<<", "<<aVectorC[2]<<"}\n";
-      //cout<<"\t\taDot = "<<aDot<<"\n";
+      if(DEBUG_TRIA_EXECUTE) {
+	cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
+	cout<<"; aVectorC = {"<<aVectorC[0]<<", "<<aVectorC[1]<<", "<<aVectorC[2]<<"}\n";
+	cout<<"\t\taDot = "<<aDot<<"\n";
+      }
       if(aDot > 0){
 	aNormal[0] = -aNormal[0];
 	aNormal[1] = -aNormal[1];
@@ -269,8 +438,10 @@ VTKViewer_Triangulator
 					   aCoord[0][2] - aCenter[2] };
       vtkMath::Normalize(aVector0);
       
-      //cout<<"\t\taCenter = {"<<aCenter[0]<<", "<<aCenter[1]<<", "<<aCenter[2]<<"}";
-      //cout<<"; aVector0 = {"<<aVector0[0]<<", "<<aVector0[1]<<", "<<aVector0[2]<<"}\n";
+      if(DEBUG_TRIA_EXECUTE) {
+	cout<<"\t\taCenter = {"<<aCenter[0]<<", "<<aCenter[1]<<", "<<aCenter[2]<<"}";
+	cout<<"; aVector0 = {"<<aVector0[0]<<", "<<aVector0[1]<<", "<<aVector0[2]<<"}\n";
+      }
       
       // To calculate the set of points by face those that belong to the plane
       TFace2PointIds aRemoveFace2PointIds;
@@ -284,6 +455,19 @@ VTKViewer_Triangulator
 				anIds.begin(),anIds.end(),
 				std::inserter(anIntersection,anIntersection.begin()));
 	  
+
+	  if(DEBUG_TRIA_EXECUTE) {
+	    cout << "anIntersection:";
+	    TPointIds::iterator aII = anIntersection.begin();
+	    for(;aII!=anIntersection.end();aII++)
+	      cout << *aII << ",";
+	    cout << endl;
+	    cout << "anIds         :";
+	    TPointIds::const_iterator aIIds = anIds.begin();
+	    for(;aIIds!=anIds.end();aIIds++)
+	      cout << *aIIds << ",";
+	    cout << endl;
+	  }
 	  if(anIntersection == anIds){
 	    aRemoveFace2PointIds.insert(anIds);
 	  }
@@ -318,19 +502,25 @@ VTKViewer_Triangulator
 	  
 	  vtkFloatingPointType aCross[3];
 	  vtkMath::Cross(aVector,aVector0,aCross);
-	  bool aGreaterThanPi = vtkMath::Dot(aCross,aNormal) < 0;
+	  vtkFloatingPointType aCr = vtkMath::Dot(aCross,aNormal);
+	  bool aGreaterThanPi = aCr < 0;
 	  vtkFloatingPointType aCosinus = vtkMath::Dot(aVector,aVector0);
-	  if(aCosinus > 1.0)
+	  vtkFloatingPointType anAngle = 0.0;
+	  if(aCosinus >= 1.0){
 	    aCosinus = 1.0;
-	  if(aCosinus < -1.0)
+	  } else if (aCosinus <= -1.0){
 	    aCosinus = -1.0;
-	  static vtkFloatingPointType a2Pi = 2.0 * vtkMath::Pi();
-	  vtkFloatingPointType anAngle = acos(aCosinus);
-	  //cout<<"\t\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}";
-	  //cout<<"; aGreaterThanPi = "<<aGreaterThanPi<<"; aCosinus = "<<aCosinus<<"; anAngle = "<<anAngle<<"\n";
-	  if(aGreaterThanPi){
-	    anAngle = a2Pi - anAngle;
-	    //cout<<"\t\t\t\tanAngle = "<<anAngle<<"\n";
+	    anAngle = vtkMath::Pi();
+	  } else {
+	    anAngle = acos(aCosinus);
+	    if(aGreaterThanPi)
+	      anAngle = 2*vtkMath::Pi() - anAngle;
+	  }
+	  
+	  if(DEBUG_TRIA_EXECUTE) {
+	    cout << "\t\t\t vtkMath::Dot(aCross,aNormal)="<<aCr<<endl;
+	    cout<<"\t\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}";
+	    cout<<"; aGreaterThanPi = "<<aGreaterThanPi<<"; aCosinus = "<<aCosinus<<"; anAngle = "<<anAngle<<"\n";
 	  }
 	  aSortedPointIds[anAngle] = aPntId;
 	}
@@ -340,16 +530,18 @@ VTKViewer_Triangulator
 	  ::TConnectivities aConnectivities(aNumFacePts);
 	  TSortedPointIds::const_iterator anIter = aSortedPointIds.begin();
 	  TSortedPointIds::const_iterator anEndIter = aSortedPointIds.end();
+	  if(DEBUG_TRIA_EXECUTE) cout << "Polygon:";
 	  for(vtkIdType anId = 0; anIter != anEndIter; anIter++, anId++){
 	    vtkIdType aPntId = anIter->second;
 	    aConnectivities[anId] = GetConnectivity(aPntId);
+	    if(DEBUG_TRIA_EXECUTE) cout << aPntId << ",";
 	  }
+	  if(DEBUG_TRIA_EXECUTE) cout << endl;
 	  aPolygons.push_back(::TPolygon(aConnectivities,aCenter,aNormal));
 	}
       }
     }
   }
-  
   if(aPolygons.empty())
     return true;
 
@@ -360,15 +552,17 @@ VTKViewer_Triangulator
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
       vtkFloatingPointType* aNormal = aPolygon.myNormal;
       vtkFloatingPointType* anOrigin = aPolygon.myOrigin;
-      //cout<<"\taPolygonId = "<<aPolygonId<<"\n";
-      //cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
-      //cout<<"; anOrigin = {"<<anOrigin[0]<<", "<<anOrigin[1]<<", "<<anOrigin[2]<<"}\n";
+      if(DEBUG_TRIA_EXECUTE) {
+	cout<<"\taPolygonId = "<<aPolygonId<<"\n";
+	cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
+	cout<<"; anOrigin = {"<<anOrigin[0]<<", "<<anOrigin[1]<<", "<<anOrigin[2]<<"}\n";
+      }
       for(vtkIdType aPntId = 0; aPntId < aNumPts; aPntId++){
 	vtkFloatingPointType aPntCoord[3];
 	vtkIdType anId = GetPointId(aPntId);
 	aPoints->GetPoint(anId,aPntCoord);
 	vtkFloatingPointType aDist = vtkPlane::Evaluate(aNormal,anOrigin,aPntCoord);
-	//cout<<"\t\taPntId = "<<anId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}; aDist = "<<aDist<<"\n";
+	if(DEBUG_TRIA_EXECUTE) cout<<"\t\taPntId = "<<anId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}; aDist = "<<aDist<<"\n";
 	if(aDist < -aDistEps)
 	  return false;
       }
@@ -381,7 +575,13 @@ VTKViewer_Triangulator
     int aNbPolygons = aPolygons.size();
     for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
+      if(DEBUG_TRIA_EXECUTE) cout << "PoilygonId="<<aPolygonId<<" | ";
       TConnectivities& aConnectivities = aPolygon.myConnectivities;
+      if(DEBUG_TRIA_EXECUTE) {
+	for(int i=0;i<aConnectivities.size();i++)
+	  cout << aConnectivities[i] << ",";
+	cout << endl;
+      }
       int aNbPoints = aConnectivities.size();
       vtkIdType aNewCellId = theOutput->InsertNextCell(VTK_POLYGON,aNbPoints,&aConnectivities[0]);
       if(theStoreMapping)
@@ -390,167 +590,149 @@ VTKViewer_Triangulator
     }
   }
 
-  //cout<<"\tTriangulator - Ok\n";
+  if(DEBUG_TRIA_EXECUTE) cout<<"\tTriangulator - Ok\n";
+  
   return true;
 }
 
-/*!
-  Constructor
-*/
+
+//----------------------------------------------------------------------------
 VTKViewer_OrderedTriangulator
 ::VTKViewer_OrderedTriangulator():
-  myCell(vtkGenericCell::New())
-{}
+  myTriangulator(vtkOrderedTriangulator::New()),
+  myBoundaryTris(vtkCellArray::New()),
+  myTriangle(vtkTriangle::New())
+{
+  myBoundaryTris->Allocate(VTK_CELL_SIZE);
+  myTriangulator->PreSortedOff();
+}
 
-/*!
-  Destructor
-*/
+
+//----------------------------------------------------------------------------
 VTKViewer_OrderedTriangulator
 ::~VTKViewer_OrderedTriangulator()
 {
-  myCell->Delete();
+  myTriangle->Delete();
+  myBoundaryTris->Delete();
+  myTriangulator->Delete();
 }
 
+
+//----------------------------------------------------------------------------
 vtkPoints*
 VTKViewer_OrderedTriangulator
-::InitPoints()
+::InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId)
 {
-  myInput->GetCell(myCellId,myCell);
-  return myInput->GetPoints();
+  myBoundaryTris->Reset();
+
+  vtkPoints* aPoints = VTKViewer_Triangulator::InitPoints(theInput, theCellId);
+  vtkIdType aNumPts = myPoints->GetNumberOfPoints();
+  if ( aNumPts > 0 ) {
+    myTriangulator->InitTriangulation(0.0, 1.0, 0.0, 1.0, 0.0, 1.0, aNumPts);
+
+    vtkFloatingPointType aBounds[6];
+    myPoints->GetBounds(aBounds);
+
+    vtkFloatingPointType anAbsoluteCoord[3];
+    vtkFloatingPointType aParamentrucCoord[3];
+    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
+      myPoints->GetPoint(aPntId, anAbsoluteCoord);
+      aParamentrucCoord[0] = (anAbsoluteCoord[0] - aBounds[0]) / (aBounds[1] - aBounds[0]);
+      aParamentrucCoord[1] = (anAbsoluteCoord[1] - aBounds[2]) / (aBounds[3] - aBounds[2]);
+      aParamentrucCoord[2] = (anAbsoluteCoord[2] - aBounds[4]) / (aBounds[5] - aBounds[4]);
+      myTriangulator->InsertPoint(aPntId, anAbsoluteCoord, aParamentrucCoord, 0);
+    }
+
+    myTriangulator->Triangulate();
+    myTriangulator->AddTriangles(myBoundaryTris);
+  }
+
+  return aPoints;
 }
 
-vtkIdType 
-VTKViewer_OrderedTriangulator
-::GetNbOfPoints()
-{
-  return myCell->GetNumberOfPoints();
-}
 
-vtkIdType 
-VTKViewer_OrderedTriangulator
-::GetPointId(vtkIdType thePointId)
-{
-  return myCell->GetPointId(thePointId);
-}
-
-vtkFloatingPointType 
-VTKViewer_OrderedTriangulator
-::GetCellLength()
-{
-  return sqrt(myCell->GetLength2());
-}
-
+//----------------------------------------------------------------------------
 vtkIdType 
 VTKViewer_OrderedTriangulator
 ::GetNumFaces()
 {
-  return myCell->GetNumberOfFaces();
+  return myBoundaryTris->GetNumberOfCells();
 }
 
+
+//----------------------------------------------------------------------------
 vtkCell*
 VTKViewer_OrderedTriangulator
 ::GetFace(vtkIdType theFaceId)
 {
-  return myCell->GetFace(theFaceId);
+  vtkIdType aNumCells = myBoundaryTris->GetNumberOfCells();
+  if ( theFaceId < 0 || theFaceId >= aNumCells ) 
+    return NULL;
+
+  vtkIdType *aCells = myBoundaryTris->GetPointer();
+
+  // Each triangle has three points plus number of points
+  vtkIdType *aCellPtr = aCells + 4*theFaceId;
+  
+  myTriangle->PointIds->SetId(0, aCellPtr[1]);
+  myTriangle->Points->SetPoint(0, myPoints->GetPoint(aCellPtr[1]));
+
+  myTriangle->PointIds->SetId(1, aCellPtr[2]);
+  myTriangle->Points->SetPoint(1, myPoints->GetPoint(aCellPtr[2]));
+
+  myTriangle->PointIds->SetId(2, aCellPtr[3]);
+  myTriangle->Points->SetPoint(2, myPoints->GetPoint(aCellPtr[3]));
+
+  return myTriangle;
 }
 
-void 
-VTKViewer_OrderedTriangulator
-::GetCellNeighbors(vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds)
-{
-  vtkIdList *anIdList = theFace->PointIds;  
-  myInput->GetCellNeighbors(theCellId, anIdList, theCellIds);
-}
 
-vtkIdType 
-VTKViewer_OrderedTriangulator
-::GetConnectivity(vtkIdType thePntId)
-{
-  return thePntId;
-}
-
-/*!
-  Constructor
-*/
+//----------------------------------------------------------------------------
 VTKViewer_DelaunayTriangulator
 ::VTKViewer_DelaunayTriangulator():
   myUnstructuredGrid(vtkUnstructuredGrid::New()),
   myGeometryFilter(vtkGeometryFilter::New()),
   myDelaunay3D(vtkDelaunay3D::New()),
-  myFaceIds(vtkIdList::New()),
-  myPoints(vtkPoints::New()),
-  myPolyData(NULL),
-  myPointIds(NULL)
+  myPolyData(NULL)
 {
+  myUnstructuredGrid->Initialize();
+  myUnstructuredGrid->Allocate();
+  myUnstructuredGrid->SetPoints(myPoints);
+
   myDelaunay3D->SetInput(myUnstructuredGrid);
   myGeometryFilter->SetInput(myDelaunay3D->GetOutput());
+  myPolyData = myGeometryFilter->GetOutput();
 }
 
 
-
-/*!
-  Destructor
-*/
+//----------------------------------------------------------------------------
 VTKViewer_DelaunayTriangulator
 ::~VTKViewer_DelaunayTriangulator()
 {
   myUnstructuredGrid->Delete();
   myGeometryFilter->Delete();
   myDelaunay3D->Delete();
-  myFaceIds->Delete();
-  myPoints->Delete();
 }
 
 
+//----------------------------------------------------------------------------
 vtkPoints* 
 VTKViewer_DelaunayTriangulator
-::InitPoints()
+::InitPoints(vtkUnstructuredGrid *theInput,
+	     vtkIdType theCellId)
 {
-  myUnstructuredGrid->Initialize();
-  myUnstructuredGrid->Allocate();
-  myUnstructuredGrid->SetPoints(myPoints);
+  vtkPoints* aPoints = VTKViewer_Triangulator::InitPoints(theInput, theCellId);
 
-  vtkIdType aNumPts;
-  myInput->GetCellPoints(myCellId,aNumPts,myPointIds); 
-  {
-    vtkFloatingPointType aPntCoord[3];
-    myPoints->SetNumberOfPoints(aNumPts);
-    vtkPoints *anInputPoints = myInput->GetPoints();
-    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
-      anInputPoints->GetPoint(myPointIds[aPntId],aPntCoord);
-      myPoints->SetPoint(aPntId,aPntCoord);
-    }
-  }
-
+  myPoints->Modified();
+  myUnstructuredGrid->Modified();
   myGeometryFilter->Update();
-  myPolyData = myGeometryFilter->GetOutput();
-
-  return myPoints;
+  
+  return aPoints;
 }
 
-vtkIdType 
-VTKViewer_DelaunayTriangulator
-::GetNbOfPoints()
-{
-  return myPoints->GetNumberOfPoints();
-}
 
-vtkIdType 
-VTKViewer_DelaunayTriangulator
-::GetPointId(vtkIdType thePointId)
-{
-  return thePointId;
-}
-
-vtkFloatingPointType 
-VTKViewer_DelaunayTriangulator
-::GetCellLength()
-{
-  return myPolyData->GetLength();
-}
-
+//----------------------------------------------------------------------------
 vtkIdType 
 VTKViewer_DelaunayTriangulator
 ::GetNumFaces()
@@ -558,32 +740,11 @@ VTKViewer_DelaunayTriangulator
   return myPolyData->GetNumberOfCells();
 }
 
+
+//----------------------------------------------------------------------------
 vtkCell*
 VTKViewer_DelaunayTriangulator
 ::GetFace(vtkIdType theFaceId)
 {
   return myPolyData->GetCell(theFaceId);
-}
-
-void 
-VTKViewer_DelaunayTriangulator
-::GetCellNeighbors(vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds)
-{
-  myFaceIds->Reset();
-  vtkIdList *anIdList = theFace->PointIds;  
-  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(0)]);
-  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(1)]);
-  myFaceIds->InsertNextId(myPointIds[anIdList->GetId(2)]);
-
-  myInput->GetCellNeighbors(theCellId, myFaceIds, theCellIds);
-}
-
-
-vtkIdType 
-VTKViewer_DelaunayTriangulator
-::GetConnectivity(vtkIdType thePntId)
-{
-  return myPointIds[thePntId];
 }

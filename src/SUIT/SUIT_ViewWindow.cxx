@@ -111,11 +111,22 @@ bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& 
   return dumpViewToFormat( dumpView(), fileName, format );
 }
 
+/*!
+  Set or clear flag Qt::WDestructiveClose
+*/
+void SUIT_ViewWindow::setDestructiveClose( const bool on )
+{
+  if ( on )
+    setWFlags( WDestructiveClose );
+  else
+    clearWFlags( WDestructiveClose );
+}
+
 /*! Close event \a theEvent.
 */
 void SUIT_ViewWindow::closeEvent(QCloseEvent* theEvent)
 {
-  QMainWindow::closeEvent( theEvent );
+//  QMainWindow::closeEvent( theEvent );
   emit closing( this );
 }
 

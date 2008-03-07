@@ -59,10 +59,10 @@ public:
 
   virtual void                        storeVisualParameters(int savePoint);
   virtual void                        restoreVisualParameters(int savePoint);
+  virtual LightApp_Selection*         createSelection() const;
 
 protected:
   virtual CAM_DataModel*              createDataModel();
-  virtual LightApp_Selection*         createSelection() const;
   virtual void                        extractContainers( const SALOME_ListIO&, SALOME_ListIO& ) const;
 };
 

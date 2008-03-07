@@ -26,6 +26,11 @@
 #include <set>
 #include <map>
 #include <vector>
+
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*! \class vtkUnstructuredGridToUnstructuredGridFilter
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation</a>
  */
@@ -99,7 +104,10 @@ protected:
   ~VTKViewer_ExtractUnstructuredGrid();
 
   //! Main method, which calculate output
-  void Execute();
+  // not ported yet to the new executive-based pipeline architecture.
+  // see http://www.vtk.org/cgi-bin/viewcvs.cgi/Filtering/vtkUnstructuredGridToUnstructuredGridFilter.h?rev=1.19&view=log
+  // virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual void Execute();
 
   EExtraction myExtractionMode;
   
@@ -118,5 +126,9 @@ private:
   //! Not implemented.
   void operator=(const VTKViewer_ExtractUnstructuredGrid&);
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

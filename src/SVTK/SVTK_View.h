@@ -251,7 +251,8 @@ public:
   //! Redirect the request to #SVTK_Renderer::SetPreselectionProp
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
-			const double& theTolCell = 0.001);
+			const double& theTolCell = 0.001,
+			const double& theTolObjects = 0.025);
 
  protected:  
   int myDisplayMode;

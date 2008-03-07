@@ -38,8 +38,6 @@
 #include <SUIT_TreeSync.h>
 #include <SUIT_DataObjectIterator.h>
 
-#include "SALOMEDS_Tool.hxx"
-
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Exception)
 
@@ -64,7 +62,7 @@ public:
   void     children( const suitPtr&, QValueList<suitPtr>& ) const;
   suitPtr  parent( const suitPtr& ) const;
   bool     isCorrect( const kerPtr& ) const;
-  void     updateItem( const suitPtr& ) const;
+  void     updateItem( const kerPtr&, const suitPtr& ) const;
 
 private:
   _PTR( Study )     myStudy;
@@ -87,7 +85,14 @@ bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
 {
   kerPtr refObj;
   QString name = so->GetName().c_str();
-  bool res = so && ( so->GetName().size() || so->ReferencedObject( refObj ) );
+  _PTR( GenericAttribute ) anAttr;
+  bool isDraw = true;
+  if ( so->FindAttribute(anAttr, "AttributeDrawable") ) 
+  {
+    _PTR(AttributeDrawable) aAttrDraw = anAttr;
+    isDraw = aAttrDraw->IsDrawable(); 
+  }
+  bool res = so && ( so->GetName().size() || so->ReferencedObject( refObj ) ) && isDraw;  
   return res;
 }
 
@@ -221,7 +226,7 @@ suitPtr SalomeApp_DataModelSync::parent( const suitPtr& p ) const
   Updates SUIT object
   \param p - SUIT object
 */
-void SalomeApp_DataModelSync::updateItem( const suitPtr& ) const
+void SalomeApp_DataModelSync::updateItem( const kerPtr& obj, const suitPtr& ) const
 {
 }
 
@@ -333,7 +338,7 @@ SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sob
 {
   if( !study || !study->root() || !sobj )
     return 0;
-
+    
   DataObjectList ch; study->root()->children( ch );
   DataObjectList::const_iterator anIt = ch.begin(), aLast = ch.end();
   SUIT_DataObject* suitObj = 0;

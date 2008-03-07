@@ -56,6 +56,7 @@ SVTK_Actor
   myUnstructuredGrid(vtkUnstructuredGrid::New())
 {
   myIsShaded = true;
+  myIsResolveCoincidentTopology = false;
 
   Visibility = Pickable = false;
 

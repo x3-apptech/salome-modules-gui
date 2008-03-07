@@ -21,7 +21,7 @@
 
 #include "QDS.h"
 
-#include <qobject.h>
+#include <qwidget.h>
 #include <qstring.h>
 #include <qvariant.h>
 #include <qguardedptr.h>
@@ -60,6 +60,12 @@ public:
   QString                   minimumValue() const;
   QString                   maximumValue() const;
 
+  QStringList               options() const;
+  QVariant                  option( const QString& ) const;
+  QString                   optionString( const QString& ) const;
+  double                    optionDouble( const QString& ) const;
+  int                       optionInteger( const QString& ) const;
+
   virtual QVariant          value() const;
 
   virtual QString           stringValue() const;
@@ -82,9 +88,9 @@ public:
   virtual bool              isEnabled( const int = Control ) const;
   virtual void              setEnabled( const bool, const int );
 
-  void                      show( const int = -1 );
-  void                      hide( const int = -1 );
-  void                      setShown( const bool, const int = -1 );
+  void                      show( const int = All );
+  void                      hide( const int = All );
+  virtual void              setShown( const bool, const int = All );
 
   QWidget*                  widget( const int ) const;
   void                      setFocus();

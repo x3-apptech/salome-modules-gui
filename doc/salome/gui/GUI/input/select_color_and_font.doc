@@ -1,0 +1,30 @@
+/*!
+
+\page select_color_and_font_page Select Color and Font
+
+<b>Select Color</b> and <b>Select Font</b> menus are used in many
+Preferences.
+
+<br><h2>Select color</h2>
+
+\image html selectcolor.png
+
+This menu  allows to choose from either predefined <b>Basic Colors</b>
+grouped in the upper left corner of the window or <b>Custom Colors</b>, which
+you can define yourselves. To define a Custom Color, click on one of
+the Custom Color cells, select the color you need in the field of
+colors or by typing in its numeric parameters in the lower right
+corner of the window, then click <b>Add to Custom Colors</b> button. The
+chosen color will be added to <b>Custom Colors</b> table.
+
+<br><h2>Select font</h2>
+
+\image html selectfont.png
+
+This menu provides a wide choice of \b Fonts, <b>Font Styles</b> and
+\b Sizes. Characters can be underlined or struck out. It is possible to
+preview them in the \b Sample window. \b Script dialog-box gives the
+possibility to use not only Latin and Latin Extended but also
+Cyrillic, Greek, Arabic, Runic and many other subsets.
+
+*/

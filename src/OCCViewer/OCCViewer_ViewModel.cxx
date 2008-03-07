@@ -129,6 +129,7 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
 {
   if ( view ) {
     view->initLayout();
+    view->initSketchers();
     
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
@@ -201,6 +202,8 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
   bool aHasShift = (theEvent->state() & Qt::ShiftButton);
+  
+  if (!aHasShift) emit deselection();
 
   if (myStartPnt == myEndPnt)
   {
@@ -250,7 +253,7 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
     return;
 
   QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
-  for ( int i = 0; i < wins.count(); i++ )
+  for ( int i = 0; i < (int)wins.count(); i++ )
   {
     OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
@@ -270,7 +273,7 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
     return;
 
   QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
-  for ( int i = 0; i < wins.count(); i++ )
+  for ( int i = 0; i < (int)wins.count(); i++ )
   {
     OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
@@ -337,6 +340,10 @@ void OCCViewer_Viewer::update()
 {
   if (!myV3dViewer.IsNull())
     myV3dViewer->Update();
+
+  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView )
+    aView->updateGravityCoords();
 }
 
 /*!
@@ -358,7 +365,7 @@ void OCCViewer_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 {
   AIS_ListIteratorOfListOfInteractive aIt;
   for (aIt.Initialize(theList); aIt.More(); aIt.Next())
-    myAISContext->SetSelected(aIt.Value(), false);
+    myAISContext->AddOrRemoveSelected(aIt.Value(), false);
   myAISContext->UpdateCurrentViewer();
 }
 
@@ -517,7 +524,7 @@ void OCCViewer_Viewer::setColor( const Handle(AIS_InteractiveObject)& obj,
 void OCCViewer_Viewer::switchRepresentation( const Handle(AIS_InteractiveObject)& obj,
                                              int mode, bool update )
 {
-  myAISContext->SetDisplayMode( obj, (Standard_Integer)mode, true );
+  myAISContext->SetDisplayMode( obj, (Standard_Integer)mode, update );
   if( update )
     myV3dViewer->Update();
 }
@@ -572,11 +579,11 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
 /*!
   \return trihedron size
 */
-int OCCViewer_Viewer::trihedronSize() const
+double OCCViewer_Viewer::trihedronSize() const
 {
-  int sz = 0;
+  double sz = 0;
   if ( !myTrihedron.IsNull() )
-    sz = (int)myTrihedron->Size();
+    sz = myTrihedron->Size();
   return sz;
 }
 
@@ -584,7 +591,7 @@ int OCCViewer_Viewer::trihedronSize() const
   Changes trihedron size
   \param sz - new size
 */
-void OCCViewer_Viewer::setTrihedronSize( const int sz )
+void OCCViewer_Viewer::setTrihedronSize( const double sz )
 {
   if ( !myTrihedron.IsNull() )
     myTrihedron->SetSize( sz );

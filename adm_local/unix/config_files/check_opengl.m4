@@ -162,6 +162,40 @@ if test "x${OpenGL_libs_ok}" = "xyes" ; then
       break
     fi
   done
+
+  # workaround a problem with libGL library location
+  for idir in $dirs; do
+    if test -r "${idir}/libGLU.la"; then
+      GLU_LA_PATH="${idir}/libGLU.la"
+      GL_LA_PATH_TO_CHECK=`cat ${GLU_LA_PATH} | awk '{ for(i=1;i<NF;i++){ if(gsub("libGL.la","&",$i)>0) print $i } }'`
+      if test -z ${GL_LA_PATH_TO_CHECK} || test -r ${GL_LA_PATH_TO_CHECK}; then
+        # nothing to do
+        break
+      fi
+      for jdir in $dirs; do
+        if test -r "${jdir}/libGL.la"; then
+          GL_LA_PATH="${jdir}/libGL.la"
+          # copy the libGLU.la file and set correct libGL.la path in it
+          NEW_GLU_LA_PATH=${ROOT_BUILDDIR}
+          NEW_GLU_LA_FILE="${NEW_GLU_LA_PATH}/libGLU.la"
+          sed -e "s%${GL_LA_PATH_TO_CHECK}%${GL_LA_PATH}%" ${GLU_LA_PATH} > "${NEW_GLU_LA_FILE}"
+          chmod -f --reference=${GLU_LA_PATH} "${NEW_GLU_LA_FILE}"
+          # set a new libGLU.la path
+          GLU_LIB_PATH="-L${NEW_GLU_LA_PATH}"
+          # create a simbolic link to libGLU.so
+          for kdir in $dirs; do
+            if test -r "${kdir}/libGLU.so"; then
+              cp -fs "${kdir}/libGLU.so" "${NEW_GLU_LA_PATH}/libGLU.so"
+              break
+            fi
+          done
+          break
+        fi
+      done
+      break
+    fi
+  done
+
   LDFLAGS_old="${LDFLAGS}"
   LDFLAGS="${LDFLAGS} ${OGL_LIBS} ${GLU_LIB_PATH}"
   AC_CHECK_LIB([GLU],
@@ -193,3 +227,4 @@ AC_SUBST(OGL_LIBS)
 AC_LANG_RESTORE
 
 ])dnl
+

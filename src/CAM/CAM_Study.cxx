@@ -127,10 +127,8 @@ void CAM_Study::dataModelInserted( const CAM_DataModel* dModel )
     openDataModel( studyName(), dm );
   else // no, just need to update data model's connection to study tree 
        //(some application may want to show model's root in a study tree even if a model is empty)
-  {
     dm->create( this );
-    updateModelRoot( dm );
-  }
+  updateModelRoot( dm );
 }
 
 /*! \retval false*/

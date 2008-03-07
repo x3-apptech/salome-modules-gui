@@ -22,8 +22,8 @@
 #include <qvalidator.h>
 
 /*
-  Class: QDS_LineEdit::Editor
-  Descr: Internal class inherited from line edit
+  class: QDS_LineEdit::Editor
+  descr: Internal class inherited from line edit
 */
 
 class QDS_LineEdit::Editor : public QLineEdit
@@ -50,12 +50,18 @@ private:
 };
 
 /*
-  Class: QDS_LineEdit
-  Descr: Data control corresponding to line edit
+  \class QDS_LineEdit
+  
+  Datum with control corresponding to line edit. User can enter parameter value in single line editor.
+  User inputted values will be checked by validator according to type if value and parameter properties
+  (minimum, maximum, filter, precision, etc). If user input not valid value then this value will be
+  displayed in red color.
 */
 
 /*!
-  Constructor.
+  Constructor. Create line edit datum object with datum identifier \aid under widget \aparent. Parameter \aflags
+  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
+  Parameter \acomp specify the component name which will be used during search of dictionary item.
 */
 QDS_LineEdit::QDS_LineEdit( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -69,6 +75,10 @@ QDS_LineEdit::~QDS_LineEdit()
 {
 }
 
+/*!
+  Notification about active unit system changing. Reimplemented from QDS_Datum.
+  Update validator settings for line edit.
+*/
 void QDS_LineEdit::unitSystemChanged( const QString& system )
 {
   QDS_Datum::unitSystemChanged( system );
@@ -107,7 +117,44 @@ void QDS_LineEdit::unitSystemChanged( const QString& system )
 }
 
 /*!
-  Set the aligment of line edit.
+  Select all text in the editor.
+*/
+void QDS_LineEdit::selectAll()
+{
+  if ( lineEdit() )
+    lineEdit()->selectAll();
+}
+
+/*!
+  Deselect all text in the editor.
+*/
+void QDS_LineEdit::deselect()
+{
+  if ( lineEdit() )
+    lineEdit()->deselect();
+}
+
+/*!
+  Select or deselect all text in the editor.
+*/
+void QDS_LineEdit::setSelection( const bool on )
+{
+  if ( on )
+    selectAll();
+  else
+    deselect();
+}
+
+/*!
+  Returns true if the editor has selected text.
+*/
+bool QDS_LineEdit::hasSelection() const
+{
+  return lineEdit() ? lineEdit()->hasSelectedText() : false;
+}
+
+/*!
+  Set the aligment of line edit. Reimplemented from QDS_Datum.
 */
 void QDS_LineEdit::setAlignment( const int align, const int type )
 {
@@ -118,7 +165,7 @@ void QDS_LineEdit::setAlignment( const int align, const int type )
 }
 
 /*!
-  Returns string from QLineEdit widget.
+  Returns string value from QLineEdit widget. Reimplemented from QDS_Datum.
 */
 QString QDS_LineEdit::getString() const
 {
@@ -129,7 +176,7 @@ QString QDS_LineEdit::getString() const
 }
 
 /*!
-  Sets the string into QLineEdit widget.
+  Sets the string value into QLineEdit widget. Reimplemented from QDS_Datum.
 */
 void QDS_LineEdit::setString( const QString& txt )
 {
@@ -146,7 +193,7 @@ QLineEdit* QDS_LineEdit::lineEdit() const
 }
 
 /*!
-  Create QLineEdit widget as control subwidget.
+  Create QLineEdit widget as control subwidget. Reimplemented from QDS_Datum.
 */
 QWidget* QDS_LineEdit::createControl( QWidget* parent )
 {
@@ -170,7 +217,7 @@ void QDS_LineEdit::onTextChanged( const QString& )
 }
 
 /*!
-  Checks the current parameter value on validity.
+  Checks the current parameter value on validity. If value is not valid then set text color as red.
 */
 void QDS_LineEdit::onParamChanged()
 {

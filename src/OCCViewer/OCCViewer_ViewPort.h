@@ -35,6 +35,10 @@ class QPainter;
 class OCCViewer_ViewSketcher;
 class OCCViewer_ViewTransformer;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*!
   \class OCCViewer_ViewPort
   Visualisation canvas of SUIT-based application
@@ -110,5 +114,9 @@ protected:
 private:
 	static int		                 nCounter;				/* objects counter */
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

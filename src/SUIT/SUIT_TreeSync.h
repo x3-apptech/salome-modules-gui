@@ -106,7 +106,7 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
   if( td.isEqual( r1, r2 ) )
   {
     // update items themselves
-    td.updateItem( r2 );
+    td.updateItem( r1, r2 );
 
     // iterate 'siblings' (direct children) 
     QValueList< DiffItem< SrcItem, TrgItem > > d;
@@ -135,7 +135,7 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
         else
 	{
 	  //to update
-	  td.updateItem( item.myTrg );
+	  td.updateItem( item.mySrc, item.myTrg );
 	  synchronize( item.mySrc, item.myTrg, td );
 	  lastItem = item.myTrg;
 	}

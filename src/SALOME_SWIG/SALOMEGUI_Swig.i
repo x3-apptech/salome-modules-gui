@@ -30,7 +30,24 @@
 #include "SALOMEGUI_Swig.hxx"
 %}
 
-%include "pointer.i"
+%include "cpointer.i"
+
+/* Exception handler for all functions */
+%exception {
+  class PyAllowThreadsGuard {
+   public:
+    // Py_BEGIN_ALLOW_THREADS
+    PyAllowThreadsGuard() { _save = PyEval_SaveThread(); }
+    // Py_END_ALLOW_THREADS
+    ~PyAllowThreadsGuard() { PyEval_RestoreThread(_save); }
+   private:
+    PyThreadState *_save;
+  };
+
+  PyAllowThreadsGuard guard;
+
+  $action
+}
 
 class SALOMEGUI_Swig
 {
@@ -63,6 +80,17 @@ class SALOMEGUI_Swig
   void DisplayAll();
   void EraseAll();
   bool IsInCurrentView(const char *Entry);
+  void UpdateView();
+
+/* view operations */
+  void FitAll();
+  void ResetView();
+  void ViewTop();
+  void ViewBottom();
+  void ViewLeft();
+  void ViewRight();
+  void ViewFront();
+  void ViewBack();
 
 /* get component name/username */
   const char* getComponentName( const char* ComponentUserName );

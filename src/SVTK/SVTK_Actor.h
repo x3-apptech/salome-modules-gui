@@ -34,6 +34,10 @@ class vtkUnstructuredGrid;
 
 class SALOME_Actor;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 //! This class used for internal SVTK package purpose (highlight and prehighlight)
 class SVTK_EXPORT SVTK_Actor : public SVTK_DeviceActor
 {
@@ -81,5 +85,9 @@ public:
   virtual
   ~SVTK_Actor();
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

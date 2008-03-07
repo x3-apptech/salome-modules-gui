@@ -68,6 +68,9 @@
 #endif
 #endif
 
+#include <qimage.h>
+#include <qpixmap.h>
+
 class QObject;
 class QString;
 class QWidget;
@@ -131,6 +134,12 @@ public:
 
   static QColor  scaleColor( const int, const int, const int );
   static void    scaleColors( const int, QValueList<QColor>& );
+
+  static QImage  grayscale( const QImage& );
+  static QPixmap grayscale( const QPixmap& );
+  static QImage  transparentImage( const int, const int, const int = -1 );
+  static QPixmap transparentPixmap( const int, const int, const int = -1 );
+  static QPixmap composite( const QPixmap&, const int, const int, const QPixmap& = QPixmap() );
 };
 
 #endif

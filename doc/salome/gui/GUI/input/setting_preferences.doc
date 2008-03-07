@@ -1,0 +1,29 @@
+/*!
+
+\page setting_preferences_subpage Setting Preferences
+
+In \b SALOME you can set preferences for each module in the common editor
+of preferences. SALOME preferences refer to the whole GUI SALOME
+session, other preferences are module-specific and are accessible only
+after you load a respective module.
+\n When you change settings (click \b OK or \b Apply button) each module
+receives the notification about what preferences are changed. You can
+also click \b Defaults button to restore default preferences or \b Close
+button to quit the menu without any changes. 
+\n \b Import button allows to load a user file containing preferences
+from your home directory through a standard Import dialog box.
+
+\image html import.png
+
+This file has no extension and by default starts with
+.SalomeApprc. followed by Salome version number. There exists one file
+for each Salome version in use.
+\n The preferences, set during the current study session, are
+automatically saved in this file at the end of the session. Next time
+you launch SALOME application, these preferences will be restored.
+
+\note The preferences you set will be default preferences for all \b new
+objects, but they are not retroactive and do not automatically apply
+to the existing objects.
+
+*/

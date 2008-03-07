@@ -39,7 +39,7 @@
 const int __DEFAULT__ATTEMPTS__ = 300;      // number of checks attemtps
                                             // can be overrided by CSF_RepeatServerRequest
                                             // environment variable
-const int __DEFAULT__DELAY__    = 100000;   // delay between attempts (microseconds)
+const int __DEFAULT__DELAY__    = 50000;    // delay between attempts (microseconds)
                                             // can be overrided by CSF_DelayServerRequest
                                             // environment variable
 
@@ -135,7 +135,7 @@ void Session_ServerCheck::run()
   bOk = false;
   for ( i = 0; i < myAttempts ; i++ ) {
     QtxSplash::setStatus( info.arg( "Waiting for naming service..." ), current * myAttempts + i );
-    QThread::usleep( i == 0 ? 500000 : myDelay );
+    QThread::usleep( i == 0 ? 50000 : myDelay );
     try {
       CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
       CORBA::Object_var obj = orb->resolve_initial_references( "NameService" );
@@ -157,13 +157,13 @@ void Session_ServerCheck::run()
     return;
   }
   QtxSplash::setStatus( info.arg( "Waiting for naming service...OK" ), ++current * myAttempts );
-  QThread::usleep( 300000 );
+  QThread::usleep( 30000 );
   
   // 2. Check registry server
   bOk = false;
   for ( i = 0; i < myAttempts ; i++ ) {
     QtxSplash::setStatus( info.arg( "Waiting for registry server..." ), current * myAttempts + i );
-    QThread::usleep( i == 0 ? 500000 : myDelay );
+    QThread::usleep( i == 0 ? 50000 : myDelay );
     try {
       CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -205,13 +205,13 @@ void Session_ServerCheck::run()
     return;
   }
   QtxSplash::setStatus( info.arg( "Waiting for registry server...OK" ), ++current * myAttempts );
-  QThread::usleep( 300000 );
+  QThread::usleep( 30000 );
 
   // 3. Check data server
   bOk = false;
   for ( i = 0; i < myAttempts ; i++ ) {
     QtxSplash::setStatus( info.arg( "Waiting for study server..." ), current * myAttempts + i );
-    QThread::usleep( i == 0 ? 500000 : myDelay );
+    QThread::usleep( i == 0 ? 50000 : myDelay );
     try {
       CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -253,13 +253,13 @@ void Session_ServerCheck::run()
     return;
   }
   QtxSplash::setStatus( info.arg( "Waiting for study server...OK" ), ++current * myAttempts );
-  QThread::usleep( 300000 );
+  QThread::usleep( 30000 );
 
   // 4. Check module catalogue server
   bOk = false;
   for ( i = 0; i < myAttempts ; i++ ) {
     QtxSplash::setStatus( info.arg( "Waiting for module catalogue server..." ), current * myAttempts + i );
-    QThread::usleep( i == 0 ? 500000 : myDelay );
+    QThread::usleep( i == 0 ? 50000 : myDelay );
     try {
       CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -301,13 +301,13 @@ void Session_ServerCheck::run()
     return;
   }
   QtxSplash::setStatus( info.arg( "Waiting for module catalogue server...OK" ), ++current * myAttempts );
-  QThread::usleep( 300000 );
+  QThread::usleep( 30000 );
 
   // 5. Check data server
   bOk = false;
   for ( i = 0; i < myAttempts ; i++ ) {
     QtxSplash::setStatus( info.arg( "Waiting for session server..." ), current * myAttempts + i );
-    QThread::usleep( i == 0 ? 500000 : myDelay );
+    QThread::usleep( i == 0 ? 50000 : myDelay );
     try {
       CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -349,14 +349,14 @@ void Session_ServerCheck::run()
     return;
   }
   QtxSplash::setStatus( info.arg( "Waiting for session server...OK" ), ++current * myAttempts );
-  QThread::usleep( 300000 );
+  QThread::usleep( 30000 );
 
   // 6. Check C++ container
   if ( myCheckCppContainer ) {
     bOk = false;
     for ( i = 0; i < myAttempts ; i++ ) {
       QtxSplash::setStatus( info.arg( "Waiting for C++ container..." ), current * myAttempts + i );
-      QThread::usleep( i == 0 ? 500000 : myDelay );
+      QThread::usleep( i == 0 ? 50000 : myDelay );
       try {
 	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
 	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -399,7 +399,7 @@ void Session_ServerCheck::run()
       return;
     }
     QtxSplash::setStatus( info.arg( "Waiting for C++ container...OK" ), ++current * myAttempts );
-    QThread::usleep( 300000 );
+    QThread::usleep( 30000 );
   }
 
   // 7. Check Python container
@@ -407,7 +407,7 @@ void Session_ServerCheck::run()
     bOk = false;
     for ( i = 0; i < myAttempts ; i++ ) {
       QtxSplash::setStatus( info.arg( "Waiting for Python container..." ), current * myAttempts + i );
-      QThread::usleep( i == 0 ? 500000 : myDelay );
+      QThread::usleep( i == 0 ? 50000 : myDelay );
       try {
 	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
 	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -450,7 +450,7 @@ void Session_ServerCheck::run()
       return;
     }
     QtxSplash::setStatus( info.arg( "Waiting for Python container...OK" ), ++current * myAttempts );
-    QThread::usleep( 300000 );
+    QThread::usleep( 30000 );
   }
 
   // 8. Check supervision container
@@ -458,7 +458,7 @@ void Session_ServerCheck::run()
     bOk = false;
     for ( i = 0; i < myAttempts ; i++ ) {
       QtxSplash::setStatus( info.arg( "Waiting for Supervision container..." ), current * myAttempts + i );
-      QThread::usleep( i == 0 ? 500000 : myDelay );
+      QThread::usleep( i == 0 ? 50000 : myDelay );
       try {
 	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
 	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
@@ -501,7 +501,7 @@ void Session_ServerCheck::run()
       return;
     }
     QtxSplash::setStatus( info.arg( "Waiting for Supervision container...OK" ), ++current * myAttempts );
-    QThread::usleep( 300000 );
+    QThread::usleep( 30000 );
   }
   // clear splash status
   splash->setProgress( 0, 0 );

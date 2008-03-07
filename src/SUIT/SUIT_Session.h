@@ -24,6 +24,7 @@
 #include "SUIT_Application.h"
 #include "SUIT_ResourceMgr.h"
 
+#include <qmutex.h>
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qptrvector.h>
@@ -54,7 +55,7 @@ public:
   typedef LIB_HANDLE AppLib;
 
   enum { ASK = 0, SAVE, DONT_SAVE } CloseMode;
-  enum { FROM_GUI = 0, FROM_CORBA_SESSION } ExitStatus;
+  enum { NORMAL = 0, FORCED } ExitStatus;
 
 public:
   SUIT_Session();
@@ -69,9 +70,14 @@ public:
 
   SUIT_ResourceMgr*            resourceMgr() const;
 
-  void                         closeSession( int mode = ASK );
+  void                         closeSession( int mode = ASK, int flags = 0 );
+  int                          exitFlags() const;
 
   SUIT_ExceptionHandler*       handler() const;
+
+  // To lock GUI user actions during python command execution (PAL12651)
+  static bool                  IsPythonExecuted();
+  static void                  SetPythonExecuted(bool isPythonExecuted);
 
 signals:
   void                         applicationClosed( SUIT_Application* );
@@ -103,6 +109,7 @@ private:
   static SUIT_Session*         mySession;
 
   int                          myExitStatus;
+  int                          myExitFlags;
 };
 
 #endif

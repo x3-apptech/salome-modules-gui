@@ -1,0 +1,47 @@
+/*!
+
+\page geometry_preferences_page Geometry preferences
+
+In the \b Geometry module you can set preferences for visualisation of
+geometrical figures which can be used in later sessions with this
+module.
+
+\image html pref15.png
+
+\par
+For all color definitions click on the respective line to access to
+the \ref select_color_and_font_page "Select Color" dialog box.
+
+<ul>
+<li><b>General</b></li>
+<ul>
+<li><b>Default Display Mode</b> - allows to choose between wireframe
+or shading.<li>
+<li><b>Default Shading Color</b> - allows to select default shading
+color.<li>
+<li><b> Default Wireframe Color</b> - allows to select default
+wireframe color (to be applied to any lines not being free boundaries
+or isolated lines).<li>
+<li><b>Color of free boundaries</b> - allows to select default color for free boundaries.<li>
+<li><b>Color of edges, vectors and wires</b> - allows to select
+default color for edges, vectors and wires (isolated lines).<li>
+<li><b>Color of points</b> - allows to select default color for
+vertices.<li>
+<li><b>Color of isolines</b> - allows to select default color for
+isolines.<li>
+<li><b>Step Value for Spin Boxes</b> - allows to define the increment
+of values set in spin boxes.<li>
+</ul>
+</ul>
+
+<ul>
+<li><b>Marker of Points</b></li>
+<ul>
+<li><b>Type</b> - allows to select the symbol for representation of
+points (cross, asterisk, etc.).</li>
+<li><b>Size</b> - allows to define the size of the marker from 1
+(smallest) to 7 (largest).</li>
+</ul>
+</ul>
+
+*/

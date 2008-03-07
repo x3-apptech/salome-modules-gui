@@ -32,6 +32,8 @@
 #include <vtkDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
 
 vtkCxxRevisionMacro(VTKViewer_PassThroughFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_PassThroughFilter);
@@ -43,10 +45,20 @@ vtkStandardNewMacro(VTKViewer_PassThroughFilter);
  */
 
 /*!Execute method.Output calculation.*/
-void VTKViewer_PassThroughFilter::Execute()
+int VTKViewer_PassThroughFilter::RequestData(
+  vtkInformation *,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
-  vtkDataSet *input = static_cast<vtkDataSet*>(this->GetInput());
-  vtkDataSet *output = static_cast<vtkDataSet*>(this->GetOutput());
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet *output = vtkDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // This has to be here because it initialized all field datas.
   output->CopyStructure( input );
@@ -56,6 +68,7 @@ void VTKViewer_PassThroughFilter::Execute()
   output->GetPointData()->PassData( input->GetPointData() );
   output->GetCellData()->PassData( input->GetCellData() );
 
+  return 1;
 }
 
 /*!Methods invoked by print to print information about the object including superclasses.\n

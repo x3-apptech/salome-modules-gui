@@ -22,9 +22,11 @@
 #ifndef QTX_DOUBLE_VALIDATOR
 #define QTX_DOUBLE_VALIDATOR
 
+#include "Qtx.h"
+
 #include <qvalidator.h>
 
-class QtxDblValidator : public QDoubleValidator
+class QTX_EXPORT QtxDblValidator : public QDoubleValidator
 {
   Q_OBJECT
 

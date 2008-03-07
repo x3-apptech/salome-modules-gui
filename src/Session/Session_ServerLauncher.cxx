@@ -96,7 +96,7 @@ void Session_ServerLauncher::run()
   _ServerLaunch->wakeAll();
 
   // run ORB
-  _orb->run(); // this thread waits, during omniORB process events
+  //_orb->run(); // No need to call orb->run() : it waits on a lock. Qt is already waiting in the mainloop.
 }
 
 /*! 
@@ -190,20 +190,22 @@ void Session_ServerLauncher::ActivateAll()
     {
       for (int i=0; i<argc-1; i++)
 	//argv[i+1] = _argCopy[(*itServ)._firstArg + i].c_str();
-	argv[i+1] = _argv[(*itServ)._firstArg + i];
+	      argv[i+1] = _argv[(*itServ)._firstArg + i];
     }
 
-    std::cout << "*** activating [" << argc << "] : " << argv[0] << std::endl;
+    MESSAGE("*** activating [" << argc << "] : " << argv[0]);
 
     Session_ServerThread* aServerThread
       = new Session_ServerThread(argc, argv, _orb,_root_poa);
     _serverThreads.push_front(aServerThread);
     
     aServerThread->Init();
+    free( argv[0] );
+    delete[] argv;
   }
 
   // Always launch Session Server
-  std::cout << "*** activating [ SESSION ] " << std::endl;
+  MESSAGE("*** activating [ SESSION ] ");
 
   int argc=1;
   char** argv = new char*[argc];
@@ -211,8 +213,8 @@ void Session_ServerLauncher::ActivateAll()
   Session_SessionThread* aServerThread
     = new Session_SessionThread(argc, argv, _orb,_root_poa,_SessionMutex,_SessionStarted);
   _serverThreads.push_front(aServerThread);
-
   aServerThread->Init();
+  delete[] argv;
 }
 
 /*! 

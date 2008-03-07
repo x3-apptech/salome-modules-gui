@@ -28,8 +28,22 @@
 #include <qbuttongroup.h>
 #include <qradiobutton.h>
 
+/*
+  \class QDS_RadioBox
+  
+  Datum with control corresponding to button group with set of exclusive radio buttons.
+  This control used for datum with enumerable values. It can be used for datum which has
+  type of value 'List'. Each radio button of combobox defined two properties:
+  integer identifier and string name. All operations on radio buttons performed via identifier.
+
+  If datum label text is specified then it displayed in group box title.
+*/
+
 /*!
-  Constructor.
+  Constructor. Create radio button box datum object with datum identifier \aid under widget \aparent.
+  Parameter \aflags define behaviour of datum and set of created subwidgets. Default value of this
+  parameter is QDS::Control. Parameter \acomp specify the component name which will be used during
+  search of dictionary item.
 */
 QDS_RadioBox::QDS_RadioBox( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags & ~( Label | Units ), comp )
@@ -44,8 +58,8 @@ QDS_RadioBox::~QDS_RadioBox()
 }
 
 /*!
-  Returns number of items in ComboBox. If total is 'false' then only
-  visible items are taken into account otherwise all items.
+  Returns number of buttons in radio box. If total is 'false' then only
+  visible buttons are taken into account otherwise all buttons.
 */
 int QDS_RadioBox::count( bool total ) const
 {
@@ -60,8 +74,8 @@ int QDS_RadioBox::count( bool total ) const
 }
 
 /*!
-  Returns list of ids. If total is 'false' then only visible items
-  are taken into account otherwise all items.
+  Returns list of button identifiers \aids. If \atotal is 'false' then only visible
+  buttons are taken into account otherwise all buttons.
 */
 void QDS_RadioBox::values( QValueList<int>& ids, bool total ) const
 {
@@ -72,7 +86,7 @@ void QDS_RadioBox::values( QValueList<int>& ids, bool total ) const
 }
 
 /*!
-  Returns visible state of identificator.
+  Returns visible state of button specified by \aid.
 */
 bool QDS_RadioBox::state( const int id ) const
 {
@@ -83,8 +97,9 @@ bool QDS_RadioBox::state( const int id ) const
 }
 
 /*!
-  Sets the visible state of identificator. If 'id' is -1 then specified
-  state will be set to all ids.
+  Sets the visible state of button specified by \aid. If \aid is -1 then specified
+  state will be set to all buttons. If \aappend is set then keep status for other
+  buttons otherwise status of other buttons will be cleared.
 */
 void QDS_RadioBox::setState( const bool on, const int id, const bool append )
 {
@@ -101,7 +116,9 @@ void QDS_RadioBox::setState( const bool on, const int id, const bool append )
 }
 
 /*!
-  Sets the visible state of identificator from the specified list.
+  Sets the visible state of buttons specified by list of identifiers \aids.
+  If \aappend is set then keep status for other buttons otherwise status of other
+  buttons will be cleared.
 */
 void QDS_RadioBox::setState( const bool on, const QValueList<int>& ids, const bool append )
 {
@@ -135,7 +152,9 @@ void QDS_RadioBox::setState( const bool on, const QValueList<int>& ids, const bo
 }
 
 /*!
-  Sets the user items into the combo box.
+  Sets the custom user buttons into the radio box. User buttons like standard dictionary
+  button from list will be added into the radio box. This functionality allow to user override
+  buttons.
 */
 void QDS_RadioBox::setValues( const QValueList<int>& ids, const QStringList& names )
 {
@@ -160,7 +179,8 @@ void QDS_RadioBox::setValues( const QStringList& names )
 }
 
 /*!
-  Returns string from control.
+  Returns string from radio box. Reimplemented. String which contains identifier of
+  currently selected button returned.
 */
 QString QDS_RadioBox::getString() const
 {
@@ -176,7 +196,8 @@ QString QDS_RadioBox::getString() const
 }
 
 /*!
-  Sets the string into control.
+  Sets the string into radio box. Reimplemented. Button with identifier from specified
+  string \atxt became selected in radio box.
 */
 void QDS_RadioBox::setString( const QString& txt )
 {
@@ -227,7 +248,7 @@ QButtonGroup* QDS_RadioBox::buttonGroup() const
 }
 
 /*!
-  Create QComboBox widget as control subwidget.
+  Create QButtonGroup widget as control subwidget.
 */
 QWidget* QDS_RadioBox::createControl( QWidget* parent )
 {
@@ -237,6 +258,10 @@ QWidget* QDS_RadioBox::createControl( QWidget* parent )
   return bg;
 }
 
+/*!
+  Notification about active unit system changing. Reimplemented from QDS_Datum.
+  Update radio box content.
+*/
 void QDS_RadioBox::unitSystemChanged( const QString& system )
 {
   QDS_Datum::unitSystemChanged( system );
@@ -308,7 +333,7 @@ void QDS_RadioBox::unitSystemChanged( const QString& system )
 }
 
 /*!
-  Notify about state changed in line edit of RadioBox.
+  Notify about activation radio button.
 */
 void QDS_RadioBox::onToggled( bool on )
 {
@@ -322,7 +347,7 @@ void QDS_RadioBox::onToggled( bool on )
 }
 
 /*!
-  Updates RadioBox after have change of visible state or items have been inserted / removed.
+  Updates RadioBox after have change of visible state or buttons have been inserted/removed.
 */
 void QDS_RadioBox::updateRadioBox()
 {
@@ -374,6 +399,9 @@ void QDS_RadioBox::updateRadioBox()
   }
 }
 
+/*!
+  Returns the list of the radio buttons from the button group.
+*/
 void QDS_RadioBox::buttons( QPtrList<QRadioButton>& lst ) const
 {
   lst.setAutoDelete( false );

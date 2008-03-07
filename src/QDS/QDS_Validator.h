@@ -24,9 +24,8 @@
 #include <qvalidator.h>
 
 /*!
-    Class: QDS_IntegerValidator
+  class QDS_IntegerValidator
 */
-
 class QDS_EXPORT QDS_IntegerValidator : public QIntValidator
 {
 public:
@@ -41,9 +40,8 @@ private:
 };
 
 /*!
-    Class: QDS_DoubleValidator
+  class QDS_DoubleValidator
 */
-
 class QDS_DoubleValidator : public QDoubleValidator
 {
 public:
@@ -58,13 +56,11 @@ private:
 };
 
 /*!
-    Class: QDS_StringValidator
+  class QDS_StringValidator
 */
-
 class QDS_EXPORT QDS_StringValidator : public QValidator
 {
 public:
-
   QDS_StringValidator( QObject* p = 0 );
   QDS_StringValidator( const QString& f, QObject* p = 0 );
   QDS_StringValidator( const QString& ft, const QString& fg, QObject* p = 0 );

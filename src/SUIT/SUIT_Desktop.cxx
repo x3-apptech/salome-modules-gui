@@ -171,4 +171,18 @@ void SUIT_Desktop::logoClear()
     myLogoMgr->clear();
 }
 
+/*!
+  Emits activated signal
+*/
+void SUIT_Desktop::emitActivated()
+{
+  emit activated();
+}
 
+/*!
+  Emits message signal
+*/
+void SUIT_Desktop::emitMessage( const QString& theMessage )
+{
+  emit message( theMessage );
+}

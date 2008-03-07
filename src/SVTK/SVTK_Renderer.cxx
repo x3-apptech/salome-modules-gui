@@ -81,8 +81,6 @@ SVTK_Renderer
   myDevice->Delete();
   myTransform->Delete();
 
-  SetSelectionTolerance();
-
   myPointPicker->Delete();
   myCellPicker->Delete();
 
@@ -112,7 +110,7 @@ SVTK_Renderer
   myEventCallbackCommand->Delete();
 
   myTrihedron->AddToRender(GetDevice());
-  GetDevice()->AddProp(GetCubeAxes());
+  GetDevice()->AddViewProp(GetCubeAxes());
 
   myBndBox[0] = myBndBox[2] = myBndBox[4] = 0;
   myBndBox[1] = myBndBox[3] = myBndBox[5] = myTrihedron->GetSize();
@@ -225,6 +223,7 @@ SVTK_Renderer
 {
   myInteractor = theInteractor;
   mySelector = theSelector;
+  SetSelectionTolerance();
 }
 
 /*!
@@ -348,13 +347,16 @@ SVTK_Renderer
 void
 SVTK_Renderer
 ::SetSelectionTolerance(const double& theTolNodes, 
-			const double& theTolCell)
+			const double& theTolCell,
+			const double& theTolObjects)
 {
   myPointPicker->SetTolerance( theTolNodes );
   myCellPicker->SetTolerance( theTolCell );
 
   myPointRectPicker->SetTolerance( theTolNodes );
   myCellRectPicker->SetTolerance( theTolCell );
+
+  mySelector->SetTolerance( theTolObjects );
 }
 
 
@@ -466,7 +468,7 @@ SVTK_Renderer
 */
 void
 SVTK_Renderer
-::SetTrihedronSize(int theSize, const bool theRelative)
+::SetTrihedronSize(vtkFloatingPointType theSize, const bool theRelative)
 {
   if(myTrihedronSize != theSize || myIsTrihedronRelative != theRelative){
     myTrihedronSize = theSize;
@@ -478,7 +480,7 @@ SVTK_Renderer
 /*!
   \return size of the trihedron in percents from bounding box of the scene
 */
-int
+vtkFloatingPointType
 SVTK_Renderer
 ::GetTrihedronSize() const
 {

@@ -46,6 +46,10 @@ class QtxPopupMgr;
 class QString;
 class QVariant;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
+
 /*!
   \class LightApp_Module
   Base class for all light modules
@@ -84,6 +88,7 @@ public:
   virtual void                        studyActivated() {};
 
   virtual LightApp_Displayer*         displayer();
+  virtual LightApp_Selection*         createSelection() const;
 
 public slots:
   virtual bool                        activateModule( SUIT_Study* );
@@ -107,7 +112,6 @@ protected:
   LightApp_Preferences*               preferences() const;
 
   virtual CAM_DataModel*              createDataModel();
-  virtual LightApp_Selection*         createSelection() const;
 
   int                                 addPreference( const QString& label );
   int                                 addPreference( const QString& label, const int pId, const int = -1,
@@ -139,5 +143,9 @@ private:
 protected:
   int                   myDisplay, myErase, myDisplayOnly, myEraseAll;
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

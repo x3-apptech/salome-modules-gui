@@ -36,18 +36,20 @@
 #endif  // WNT
 
 // ========================================================
-// little trick - we do not have debug python libraries
+// little trick - if we do not have debug python libraries
 #ifdef _DEBUG
-
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
-
-#else  // _DEBUG
+ #ifndef HAVE_DEBUG_PYTHON
+  #undef _DEBUG
+ #endif
+#endif
 
 #include <Python.h>
 
-#endif // _DEBUG
+#ifdef _DEBUG
+ #ifndef HAVE_DEBUG_PYTHON
+  #define _DEBUG
+ #endif
+#endif
 
 // ========================================================
 // avoid warning messages

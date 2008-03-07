@@ -29,6 +29,7 @@
 
 #include "PyInterp_base.h" // this include must be first (see PyInterp_base.h)!
 #include <cStringIO.h>
+#include <structmember.h>
 
 using namespace std;
 
@@ -72,6 +73,108 @@ PyLockWrapper PyInterp_base::GetLockWrapper(){
   return _tstate;
 }
 
+static void
+PyStdOut_dealloc(PyStdOut *self)
+{
+  PyObject_Del(self);
+}
+
+static PyObject *
+PyStdOut_write(PyStdOut *self, PyObject *args)
+{
+  char *c;
+  int l;
+  if (!PyArg_ParseTuple(args, "t#:write",&c, &l))
+    return NULL;
+  if(self->_cb==NULL) {
+    if ( self->_iscerr )
+      std::cerr << c ;
+    else
+      std::cout << c ;
+  }
+  else {
+    self->_cb(self->_data,c);
+  }
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyMethodDef PyStdOut_methods[] = {
+  {"write",  (PyCFunction)PyStdOut_write,  METH_VARARGS,
+    PyDoc_STR("write(string) -> None")},
+  {NULL,    NULL}   /* sentinel */
+};
+
+static PyMemberDef PyStdOut_memberlist[] = {
+  {"softspace", T_INT,  offsetof(PyStdOut, softspace), 0,
+   "flag indicating that a space needs to be printed; used by print"},
+  {NULL} /* Sentinel */
+};
+
+
+
+static PyTypeObject PyStdOut_Type = {
+  /* The ob_type field must be initialized in the module init function
+   * to be portable to Windows without using C++. */
+  PyObject_HEAD_INIT(NULL)
+  0,      /*ob_size*/
+  "PyOut",   /*tp_name*/
+  sizeof(PyStdOut),  /*tp_basicsize*/
+  0,      /*tp_itemsize*/
+  /* methods */
+  (destructor)PyStdOut_dealloc, /*tp_dealloc*/
+  0,      /*tp_print*/
+  0, /*tp_getattr*/
+  0, /*tp_setattr*/
+  0,      /*tp_compare*/
+  0,      /*tp_repr*/
+  0,      /*tp_as_number*/
+  0,      /*tp_as_sequence*/
+  0,      /*tp_as_mapping*/
+  0,      /*tp_hash*/
+        0,                      /*tp_call*/
+        0,                      /*tp_str*/
+        PyObject_GenericGetAttr,                      /*tp_getattro*/
+        /* softspace is writable:  we must supply tp_setattro */
+        PyObject_GenericSetAttr,    /* tp_setattro */
+        0,                      /*tp_as_buffer*/
+        Py_TPFLAGS_DEFAULT,     /*tp_flags*/
+        0,                      /*tp_doc*/
+        0,                      /*tp_traverse*/
+        0,                      /*tp_clear*/
+        0,                      /*tp_richcompare*/
+        0,                      /*tp_weaklistoffset*/
+        0,                      /*tp_iter*/
+        0,                      /*tp_iternext*/
+        PyStdOut_methods,                      /*tp_methods*/
+        PyStdOut_memberlist,                      /*tp_members*/
+        0,                      /*tp_getset*/
+        0,                      /*tp_base*/
+        0,                      /*tp_dict*/
+        0,                      /*tp_descr_get*/
+        0,                      /*tp_descr_set*/
+        0,                      /*tp_dictoffset*/
+        0,                      /*tp_init*/
+        0,                      /*tp_alloc*/
+        0,                      /*tp_new*/
+        0,                      /*tp_free*/
+        0,                      /*tp_is_gc*/
+};
+
+
+#define PyStdOut_Check(v)  ((v)->ob_type == &PyStdOut_Type)
+
+static PyStdOut * newPyStdOut( bool iscerr )
+{
+  PyStdOut *self;
+  self = PyObject_New(PyStdOut, &PyStdOut_Type);
+  if (self == NULL)
+    return NULL;
+  self->softspace = 0;
+  self->_cb = NULL;
+  self->_iscerr = iscerr;
+  return self;
+}
 
 // main python interpreter (static attributes)
 
@@ -124,12 +227,9 @@ void PyInterp_base::initialize()
     return;
   }
 
-  // Create cStringIO to capture stdout and stderr
-  PycString_IMPORT;
-  if (PycStringIO) { // CTH11627 : additional check
-    _vout = PycStringIO->NewOutput(128);
-    _verr = PycStringIO->NewOutput(128);
-  }
+  // Create python objects to capture stdout and stderr
+  _vout=(PyObject*)newPyStdOut( false ); // stdout 
+  _verr=(PyObject*)newPyStdOut( true );  // stderr
 
   // All the initRun outputs are redirected to the standard output (console)
   initRun();
@@ -147,6 +247,10 @@ void PyInterp_base::init_python()
   PySys_SetArgv(_argc, _argv);
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock
   _interp = PyThreadState_Get()->interp;
+  if (PyType_Ready(&PyStdOut_Type) < 0)
+    {
+      PyErr_Print();
+    }
   _gtstate = PyEval_SaveThread(); // Release global thread state
 }
 
@@ -164,17 +268,18 @@ string PyInterp_base::getbanner()
 
 int PyInterp_base::initRun()
 {
+  // 
+  // probably all below code isn't required
+  //
+  /*
   PySys_SetObject("stderr",_verr);
   PySys_SetObject("stdout",_vout);
-
-  PyObjWrapper verr(PyObject_CallMethod(_verr,"reset",""));
-  PyObjWrapper vout(PyObject_CallMethod(_vout,"reset",""));
 
   //PyObject *m = PyImport_GetModuleDict();
   
   PySys_SetObject("stdout",PySys_GetObject("__stdout__"));
   PySys_SetObject("stderr",PySys_GetObject("__stderr__"));
-
+  */
   return 0;
 }
 
@@ -264,9 +369,6 @@ int PyInterp_base::simpleRun(const char *command)
   PySys_SetObject("stderr",_verr);
   PySys_SetObject("stdout",_vout);
 
-  PyObjWrapper verr(PyObject_CallMethod(_verr,"reset",""));
-  PyObjWrapper vout(PyObject_CallMethod(_vout,"reset",""));
-
   int ier = compile_command(command,_g);
 
   // Outputs are redirected on standards outputs (console)
@@ -300,17 +402,15 @@ const char * PyInterp_base::getNext()
 }
 
 
-string PyInterp_base::getverr(){ 
-  //PyLockWrapper aLock(_tstate);
-  PyObjWrapper v(PycStringIO->cgetvalue(_verr));
-  string aRet(PyString_AsString(v));
-  return aRet;
+void PyInterp_base::setvoutcb(PyOutChanged* cb, void* data)
+{  
+  ((PyStdOut*)_vout)->_cb=cb;
+  ((PyStdOut*)_vout)->_data=data;
 }
 
 
-string PyInterp_base::getvout(){  
-  //PyLockWrapper aLock(_tstate);
-  PyObjWrapper v(PycStringIO->cgetvalue(_vout));
-  string aRet(PyString_AsString(v));
-  return aRet;
+void PyInterp_base::setverrcb(PyOutChanged* cb, void* data)
+{  
+  ((PyStdOut*)_verr)->_cb=cb;
+  ((PyStdOut*)_verr)->_data=data;
 }

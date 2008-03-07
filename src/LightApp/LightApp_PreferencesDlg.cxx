@@ -143,7 +143,8 @@ void LightApp_PreferencesDlg::onImportPref()
   if( !mgr )
     return;
 
-  QFileDialog dlg( ".", "*", this, "", tr( "IMPORT_PREFERENCES" ) );
+  QFileDialog dlg( ".", "*", this, "" );
+  dlg.setCaption( tr("IMPORT_PREFERENCES") );
   dlg.setShowHiddenFiles( true );
   dlg.exec();
   QString fname = dlg.selectedFile();

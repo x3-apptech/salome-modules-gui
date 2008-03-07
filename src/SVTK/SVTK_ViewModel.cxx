@@ -127,7 +127,7 @@ createView( SUIT_Desktop* theDesktop )
 /*!
   \return trihedron size
 */
-int SVTK_Viewer::trihedronSize() const
+vtkFloatingPointType SVTK_Viewer::trihedronSize() const
 {
   return myTrihedronSize;
 }
@@ -145,17 +145,17 @@ bool SVTK_Viewer::trihedronRelative() const
   \param theSize - new size
   \param theRelative - new relativeness
 */
-void SVTK_Viewer::setTrihedronSize( const int theSize, const bool theRelative )
+void SVTK_Viewer::setTrihedronSize( const vtkFloatingPointType theSize, const bool theRelative )
 {
   myTrihedronSize = theSize;
   myTrihedronRelative = theRelative;
 
   if (SUIT_ViewManager* aViewManager = getViewManager()) {
     QPtrVector<SUIT_ViewWindow> aViews = aViewManager->getViews();
-    for (int i = 0; i < aViews.count(); i++) {
-      if (TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at(i))) {
-	aView->SetTrihedronSize(theSize, theRelative);
-      }
+    for ( uint i = 0; i < aViews.count(); i++ )
+    {
+      if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+	      aView->SetTrihedronSize( theSize, theRelative );
     }
   }
 }
@@ -197,6 +197,7 @@ SVTK_Viewer
     if ( !aView->getMainWindow()->getToolBar()->isVisible() ){
       thePopup->insertItem( VTKViewer_Viewer::tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
     }
+    aView->RefreshDumpImage();
   }
 }
 

@@ -1,0 +1,52 @@
+/*!
+
+\page working_with_python_scripts_page Working with Python Scripts
+
+\b SALOME Platform can be launched in the batch mode, without Graphical
+User Interface, and operated with the use of Python scripts, which can
+fulfill most of the necessary tasks, however, the process of scripting
+is quite time consuming and rather error-prone.
+\n This problem has been resolved by the possibility to automatically
+generate a set of Python scripts from data created with SALOME GUI,
+which greatly increases the productivity of using SALOME platform in
+the batch mode. This mechanism can convert a SALOME Study in one or
+several Python scripts, which can be stored and imported later to
+re-create the content of the original study. The first script is a
+SALOME document, which re-creates the SALOME Study, adds the
+stored Salome components to the SALOME and automatically calls
+Python scripts of the second type containing component specific Python
+function calls. This architecture gives great flexibility in manual
+modification of the generated scripts because you can modify only one
+of the component specific Python scripts without touching others, thus
+avoiding expert knowledge of Python API of unused components.
+
+To Dump a  SALOME Study in one or several scripts, in the main menu
+select \b File --> <b>Dump study</b>
+\n The following dialog box allowing to browse for the location and
+define the name for a Python file will appear:
+
+\image html dumpstudy.png
+
+\par
+<ul>
+<li>
+<b>Publish in study</b> - if checked in, the component objects created by
+Python commands will be published in the created Study when the script
+is played, otherwise the objects will not be published in the Study.
+</li>
+<li>
+<b>Save GUI state</b> - if checked in, the current application layout will be
+saved in the Python file.
+</li>
+</ul>
+To confirm your choice click \b Save.
+
+Reversibly it is possible to load a saved Python Script selecting in
+the main menu \b File -> <b>Load Script</b>.
+
+\image html loadscript.png
+
+\par
+To confirm your choice click \b Open.
+
+*/

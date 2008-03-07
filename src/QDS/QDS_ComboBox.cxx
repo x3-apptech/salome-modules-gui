@@ -26,8 +26,18 @@
 
 #include <qlineedit.h>
 
+/*
+  \class QDS_ComboBox
+  
+  Datum with control corresponding to combo box. This control used for datum with enumerable values.
+  It can be used for datum which has type of value 'List'. Each item of combobox defined two properties:
+  integer identifier and string name. All operations on items performed via identifier.
+*/
+
 /*!
-  Constructor.
+  Constructor. Create combobox datum object with datum identifier \aid under widget \aparent. Parameter \aflags
+  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
+  Parameter \acomp specify the component name which will be used during search of dictionary item.
 */
 QDS_ComboBox::QDS_ComboBox( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -42,7 +52,7 @@ QDS_ComboBox::~QDS_ComboBox()
 }
 
 /*!
-  Returns true if ComboBox allow to edit current Text.
+  Returns true if ComboBox allow to edit current text.
 */
 bool QDS_ComboBox::editable() const
 {
@@ -70,7 +80,7 @@ void QDS_ComboBox::setEditable( const bool on )
 }
 
 /*!
-  Returns number of items in ComboBox. If total is 'false' then only
+  Returns number of items in ComboBox. If \atotal is 'false' then only
   visible items are taken into account otherwise all items.
 */
 int QDS_ComboBox::count( bool total ) const
@@ -84,7 +94,7 @@ int QDS_ComboBox::count( bool total ) const
 }
 
 /*!
-  Returns list of ids. If total is 'false' then only visible items
+  Returns list of list item identifiers \aids. If \atotal is 'false' then only visible items
   are taken into account otherwise all items.
 */
 void QDS_ComboBox::values( QValueList<int>& ids, bool total ) const
@@ -96,7 +106,7 @@ void QDS_ComboBox::values( QValueList<int>& ids, bool total ) const
 }
 
 /*!
-  Returns the current id as integer.
+  Returns the current id as integer. Reimplemented.
 */
 int QDS_ComboBox::integerValue() const
 {
@@ -112,7 +122,7 @@ int QDS_ComboBox::integerValue() const
 }
 
 /*!
-  Returns the current id as double.
+  Returns the current id as double. Reimplemented.
 */
 double QDS_ComboBox::doubleValue() const
 {
@@ -130,7 +140,7 @@ double QDS_ComboBox::doubleValue() const
 }
 
 /*!
-  Set the current item acording to specified id.
+  Set the current item acording to specified id. Reimplemented.
 */
 void QDS_ComboBox::setIntegerValue( const int id )
 {
@@ -143,7 +153,7 @@ void QDS_ComboBox::setIntegerValue( const int id )
 }
 
 /*!
-  Get the integer part of specified value and use it as new current identifier.
+  Get the integer part of specified value and use it as new current identifier. Reimplemented.
 */
 void QDS_ComboBox::setDoubleValue( const double val )
 {
@@ -157,7 +167,7 @@ void QDS_ComboBox::setDoubleValue( const double val )
 }
 
 /*!
-  Returns visible state of identificator.
+  Returns visible state of item specified by \aid.
 */
 bool QDS_ComboBox::state( const int id ) const
 {
@@ -168,8 +178,9 @@ bool QDS_ComboBox::state( const int id ) const
 }
 
 /*!
-  Sets the visible state of identificator. If 'id' is -1 then specified
-  state will be set to all ids.
+  Sets the visible state of item specified by \aid. If \aid is -1 then specified
+  state will be set to all items. If \aappend is set then keep status for other items
+  otherwise status of other items will be cleared.
 */
 void QDS_ComboBox::setState( const bool on, const int id, const bool append )
 {
@@ -186,7 +197,9 @@ void QDS_ComboBox::setState( const bool on, const int id, const bool append )
 }
 
 /*!
-  Sets the visible state of identificator from the specified list.
+  Sets the visible state of items specified by list of identifiers \aids.
+  If \aappend is set then keep status for other items otherwise status of other
+  items will be cleared.
 */
 void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bool append )
 {
@@ -222,7 +235,9 @@ void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bo
 }
 
 /*!
-  Sets the user items into the combo box.
+  Sets the custom user items into the combo box. User items like standard dictionary
+  list items will be added into the combobox. This functionality allow to user override
+  items.
 */
 void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& names )
 {
@@ -238,7 +253,7 @@ void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& nam
 /*!
   This is an overloaded member function, provided for convenience.
   It behaves essentially like the above function. It creates
-  QValueList (0, 1, 2 ... ) and call previous method
+  QValueList (0, 1, 2 ... ) and call previous method.
 */
 void QDS_ComboBox::setValues( const QStringList& names )
 {
@@ -287,7 +302,7 @@ QString QDS_ComboBox::valueToString( const int val ) const
 }
 
 /*!
-  Returns string from QLineEdit widget.
+  Returns string from QComboBox widget. Reimplemented.
 */
 QString QDS_ComboBox::getString() const
 {
@@ -307,7 +322,7 @@ QString QDS_ComboBox::getString() const
 }
 
 /*!
-  Sets the string into QLineEdit widget.
+  Sets the string into QComboBox widget. Reimplemented.
 */
 void QDS_ComboBox::setString( const QString& txt )
 {
@@ -352,7 +367,7 @@ QtxComboBox* QDS_ComboBox::comboBox() const
 }
 
 /*!
-  Create QComboBox widget as control subwidget.
+  Create QComboBox widget as control subwidget. Reimplemented.
 */
 QWidget* QDS_ComboBox::createControl( QWidget* parent )
 {
@@ -364,6 +379,10 @@ QWidget* QDS_ComboBox::createControl( QWidget* parent )
   return cb;
 }
 
+/*!
+  Notification about active unit system changing. Reimplemented from QDS_Datum.
+  Update combobox content.
+*/
 void QDS_ComboBox::unitSystemChanged( const QString& system )
 {
   QDS_Datum::unitSystemChanged( system );
@@ -454,7 +473,7 @@ void QDS_ComboBox::onTextChanged( const QString& )
 }
 
 /*!
-  Notify about activation new item.
+  Notify about activation combobox item.
 */
 void QDS_ComboBox::onActivated( int idx )
 {
@@ -474,7 +493,7 @@ void QDS_ComboBox::onActivated( int idx )
 }
 
 /*!
-  Updates ComboBox after have change of visible state or items have been inserted / removed.
+  Updates ComboBox after have change of visible state or items have been inserted/removed.
 */
 void QDS_ComboBox::updateComboBox()
 {

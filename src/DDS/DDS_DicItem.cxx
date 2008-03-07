@@ -35,6 +35,15 @@
 IMPLEMENT_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)
 IMPLEMENT_STANDARD_RTTIEXT(DDS_DicItem, MMgt_TShared)
 
+/*!
+  \class DDS_DicItem
+
+  This class to provide information about datum (phisical characteristic parameter).
+*/
+
+/*!
+  Constructor. Creates the instance of empty dictionary item.
+*/
 DDS_DicItem::DDS_DicItem()
 : myType( 0 ),
 myDefValue( 0 ),
@@ -46,54 +55,87 @@ myZoomOrder( 2 )
 {
 }
 
+/*!
+  Copy constructor. Internal.
+*/
 DDS_DicItem::DDS_DicItem( const DDS_DicItem& )
 {
 }
 
+/*!
+  Assignment operator. Internal.
+*/
 void DDS_DicItem::operator=( const DDS_DicItem& )
 {
 }
 
+/*!
+  Gets the identifier of parameter.
+*/
 TCollection_AsciiString DDS_DicItem::GetId() const
 {
   return myId;
 }
 
+/*!
+  Gets the type of parameter.
+*/
 DDS_DicItem::Type DDS_DicItem::GetType() const
 {
   return (DDS_DicItem::Type)myType;
 }
 
+/*!
+  Gets the label of the parameter.
+*/
 TCollection_ExtendedString DDS_DicItem::GetLabel() const
 {
   return myLabel;
 }
 
+/*!
+  Gets the filter (regular expression) for the parameter values.
+*/
 TCollection_ExtendedString DDS_DicItem::GetFilter() const
 {
   return myFilter;
 }
 
+/*!
+  Gets the Required attribute of the parameter.
+*/
 TCollection_ExtendedString DDS_DicItem::GetRequired() const
 {
   return myRequired;
 }
 
+/*!
+  Gets the wrong value warning level of the parameter.
+*/
 DDS_MsgType DDS_DicItem::GetWarningLevel() const
 {
   return (DDS_MsgType)myWarnLevel;
 }
 
+/*!
+  Gets the long description of the parameter.
+*/
 TCollection_ExtendedString DDS_DicItem::GetLongDescription() const
 {
   return myLongDescr;
 }
 
+/*!
+  Gets the short description of the parameter.
+*/
 TCollection_ExtendedString DDS_DicItem::GetShortDescription() const
 {
   return myShortDescr;
 }
 
+/*!
+  Gets the name of component - owner of parameter.
+*/
 TCollection_AsciiString DDS_DicItem::GetComponent() const
 {
   TCollection_AsciiString aCompName;
@@ -103,11 +145,18 @@ TCollection_AsciiString DDS_DicItem::GetComponent() const
   return aCompName;
 }
 
+/*!
+  Gets the parameter unit of measure for active unit system.
+*/
 TCollection_AsciiString DDS_DicItem::GetUnits() const
 {
   return GetUnits( GetActiveUnitSystem() );
 }
 
+/*!
+  Gets the parameter unit of measure for specified unit system \atheSystem.
+  If specified unit system doesn't exist then empty string returned.
+*/
 TCollection_AsciiString DDS_DicItem::GetUnits( const UnitSystem& theSystem ) const
 {
   TCollection_AsciiString anUnits;
@@ -117,31 +166,54 @@ TCollection_AsciiString DDS_DicItem::GetUnits( const UnitSystem& theSystem ) con
   return anUnits;
 }
 
+/*!
+  Gets the minimum value of parameter for active unit system.
+  Returned value converted to SI.
+*/
 Standard_Real DDS_DicItem::GetMinValue() const
 {
   return GetMinValue( GetActiveUnitSystem() );
 }
 
+/*!
+  Gets the minimum value of parameter for specified unit system \atheSystem.
+  Returned value converted to SI.
+*/
 Standard_Real DDS_DicItem::GetMinValue( const UnitSystem& theUnitsSystem ) const
 {
   return FromSI( myMin, theUnitsSystem );
 }
 
+/*!
+  Gets the maximum value of parameter for active unit system.
+  Returned value converted to SI.
+*/
 Standard_Real DDS_DicItem::GetMaxValue() const
 {
   return GetMaxValue( GetActiveUnitSystem() );
 }
 
+/*!
+  Gets the maximum value of parameter for specified unit system \atheSystem.
+  Returned value converted to SI.
+*/
 Standard_Real DDS_DicItem::GetMaxValue( const UnitSystem& theUnitsSystem ) const
 {
   return FromSI( myMax, theUnitsSystem );
 }
 
+/*!
+  Gets the precision (number of digit after decimal point) of parameter for active unit system.
+*/
 Standard_Integer DDS_DicItem::GetPrecision() const
 {
   return GetPrecision( GetActiveUnitSystem() );
 }
 
+/*!
+  Gets the precision (number of digit after decimal point) of parameter for specified
+  unit system \atheSystem. If specified unit system doesn't exist then zero returned.
+*/
 Standard_Integer DDS_DicItem::GetPrecision( const UnitSystem& theSystem ) const
 {
   Standard_Integer aRes = 0;
@@ -151,11 +223,21 @@ Standard_Integer DDS_DicItem::GetPrecision( const UnitSystem& theSystem ) const
   return aRes;
 }
 
+/*!
+  Gets the default value of parameter for active unit system. Default value returned as string.
+  If type of value is numeric (Float or Integer) and default value defined then returned number
+  converted to SI.
+*/
 TCollection_ExtendedString DDS_DicItem::GetDefaultValue() const
 {
   return GetDefaultValue( GetActiveUnitSystem() );
 }
 
+/*!
+  Gets the default value of parameter for specified unit system \atheSystem. Default value returned
+  as string. If type of value is numeric (Float or Integer) and default value defined then returned
+  number converted to SI.
+*/
 TCollection_ExtendedString DDS_DicItem::GetDefaultValue( const UnitSystem& theSystem ) const
 {
   if ( !myDefString.Length() )
@@ -179,11 +261,21 @@ TCollection_ExtendedString DDS_DicItem::GetDefaultValue( const UnitSystem& theSy
   return aStr;
 }
 
+/*!
+  Gets the format string of parameter for active unit system. If argument \atheCanonical
+  is true then format string will be reduced to sprintf() specification (without extra
+  non standard qualifiers).
+*/
 TCollection_AsciiString DDS_DicItem::GetFormat( const Standard_Boolean theCanonical ) const
 {
   return GetFormat( GetActiveUnitSystem(), theCanonical );
 }
 
+/*!
+  Gets the format string of parameter for specified unit system \atheSystem. If argument
+  \atheCanonical is true then format string will be reduced to sprintf() specification
+  (without extra non standard qualifiers).
+*/
 TCollection_AsciiString DDS_DicItem::GetFormat( const UnitSystem& theSystem,
                                                 const Standard_Boolean theCanonical ) const
 {
@@ -212,8 +304,8 @@ TCollection_AsciiString DDS_DicItem::GetFormat( const UnitSystem& theSystem,
 }
 
 /*!
-  Access valueList:name of the parameter. This string is void if the list is
-  not defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
+  Gets name of a list referenced by the parameter. This string is empty if the list
+  refernce is not defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
 */
 TCollection_ExtendedString DDS_DicItem::GetNameOfValues() const
 {
@@ -221,8 +313,8 @@ TCollection_ExtendedString DDS_DicItem::GetNameOfValues() const
 }
 
 /*!
-  Access valueList of the parameter. This sequence is empty if the list is
-  not defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
+  Gets item names and item ids of a list referenced by the parameter. This sequences is empty if
+  the list reference is not defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
 */
 Standard_Boolean DDS_DicItem::GetListOfValues( Handle(TColStd_HArray1OfExtendedString)& theStrings,
                                                Handle(TColStd_HArray1OfInteger)& theIntegers ) const
@@ -233,8 +325,8 @@ Standard_Boolean DDS_DicItem::GetListOfValues( Handle(TColStd_HArray1OfExtendedS
 }
 
 /*!
-  Access valueList of the parameter. This sequence is empty if the list is not
-  defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
+  Gets item names, item ids and item icons of a list referenced by the parameter. This sequences is empty
+  if the list reference is not defined - then use other properties: Type, DefaultValue, MaxValue, MinValue
 */
 Standard_Boolean DDS_DicItem::GetListOfValues( Handle(TColStd_HArray1OfExtendedString)& theStrings,
                                                Handle(TColStd_HArray1OfInteger)& theIntegers,
@@ -246,6 +338,10 @@ Standard_Boolean DDS_DicItem::GetListOfValues( Handle(TColStd_HArray1OfExtendedS
   return !theIntegers.IsNull() && !theStrings.IsNull() && !theIcons.IsNull();
 }
 
+
+/*!
+  Gets special values of the parameter.
+*/
 Standard_Boolean DDS_DicItem::GetSpecialValues( TColStd_MapOfReal& theMap ) const
 {
   theMap.Clear();
@@ -266,7 +362,7 @@ Standard_Boolean DDS_DicItem::GetSpecialValues( TColStd_MapOfReal& theMap ) cons
 }
 
 /*!
-  Returns min value of lateral zooming
+  Gets minimum value of lateral zooming
 */
 Standard_Real DDS_DicItem::GetMinZoom() const
 {
@@ -274,7 +370,7 @@ Standard_Real DDS_DicItem::GetMinZoom() const
 }
 
 /*!
-  Returns Max Value of lateral zooming
+  Gets maximum value of lateral zooming
 */
 Standard_Real DDS_DicItem::GetMaxZoom() const
 {
@@ -282,25 +378,31 @@ Standard_Real DDS_DicItem::GetMaxZoom() const
 }
 
 /*!
-  Get Order of lateral zooming
+  Gets order of lateral zooming
 */
 Standard_Real DDS_DicItem::GetZoomOrder() const
 {
   return myZoomOrder;
 }
 
+/*!
+  Convert value \atheVal to default SI units according to active unit system.
+*/
 Standard_Real DDS_DicItem::ToSI( const Standard_Real theVal ) const
 {
   return ToSI( theVal, GetActiveUnitSystem() );
 }
 
+/*!
+  Convert value \atheVal from default SI units according to active unit system.
+*/
 Standard_Real DDS_DicItem::FromSI( const Standard_Real theVal ) const
 {
   return FromSI( theVal, GetActiveUnitSystem() );
 }
 
 /*!
-  Convert value to default SI units according to current units
+  Convert value to default SI units according to unit system \atheUnitsSystem.
 */
 Standard_Real DDS_DicItem::ToSI( const Standard_Real theVal, const UnitSystem& theUnitsSystem ) const
 {
@@ -312,7 +414,7 @@ Standard_Real DDS_DicItem::ToSI( const Standard_Real theVal, const UnitSystem& t
 }
 
 /*!
-  Convert value from default SI units according to current units
+  Convert value from default SI units according to unit system \atheUnitsSystem.
 */
 Standard_Real DDS_DicItem::FromSI( const Standard_Real theVal, const UnitSystem& theUnitsSystem ) const
 {
@@ -324,7 +426,7 @@ Standard_Real DDS_DicItem::FromSI( const Standard_Real theVal, const UnitSystem&
 }
 
 /*!
-  Returns 'true' if specified data exist.
+  Returns 'true' if data specified by \aflag exist.
 */
 Standard_Boolean DDS_DicItem::HasData( const Standard_Integer flag ) const
 {
@@ -332,7 +434,33 @@ Standard_Boolean DDS_DicItem::HasData( const Standard_Integer flag ) const
 }
 
 /*!
-  Parse record in XML file and retrieve information relevant for this data dic item
+  Returns options for specified name \aname. If option not found then empty string returned.
+*/
+TCollection_ExtendedString DDS_DicItem::GetOption( const TCollection_AsciiString& name ) const
+{
+  TCollection_ExtendedString res;
+  if ( myOptions.IsBound( name ) )
+    res = myOptions.Find( name );
+  return res;
+}
+
+/*!
+  Returns names list of existing options in the specified sequence \anames.
+  If list not empty retunrs 'true' otherwise 'false'.
+*/
+Standard_Boolean DDS_DicItem::GetOptionNames( TColStd_SequenceOfAsciiString& names ) const
+{
+  names.Clear();
+
+  for ( OptionsMap::Iterator it( myOptions ); it.More(); it.Next() )
+    names.Append( it.Key() );
+
+  return !names.IsEmpty();
+}
+
+
+/*!
+  Parse record in XML file and retrieve information relevant for this dictionary item
 */
 void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element& theDatum,
                                const LDOM_Element& theCompElement, const LDOM_Element& theDocElement,
@@ -576,6 +704,31 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
     }
   }
 
+  // Quantity::Options
+  LDOM_Element anOpt = theDatum.GetChildByTagName( DDS_Dictionary::KeyWord( "OPTIONS" ) );
+  if ( !anOpt.isNull() )
+  {
+    LDOM_NodeList anOptions = anOpt.getElementsByTagName( DDS_Dictionary::KeyWord( "OPTION" ) );
+    for ( Standard_Integer oi = 0; oi < anOptions.getLength(); oi++ )
+    {
+      LDOM_Node node = anOptions.item( oi );
+      if ( node.getNodeType() != LDOM_Node::ELEMENT_NODE )
+        continue;
+
+      LDOM_Element& elem = (LDOM_Element&)node;
+      TCollection_AsciiString name = elem.getAttribute( DDS_Dictionary::KeyWord( "OPTION_NAME" ) );
+
+      TCollection_ExtendedString value;
+      const LDOM_Node aNode = elem.getFirstChild();
+      LDOM_Text anOptTxt( (const LDOM_Text&)(aNode) );
+      if ( !anOptTxt.isNull() )
+        value = anOptTxt.getData();
+
+      if ( !name.IsEmpty() && value.Length() && !myOptions.IsBound( name ) )
+        myOptions.Bind( name, value );
+    }
+  }
+
   NCollection_DataMap<UnitSystem, Handle(Units_Dimensions)> aDimMap;
 
   for ( NCollection_DataMap<UnitSystem, UnitData>::Iterator it( myUnitData ); it.More(); it.Next() )
@@ -793,7 +946,7 @@ void DDS_DicItem::GetFloatFormat( const TCollection_AsciiString& theFlags,
 }
 
 /*!
-  Prepares three formants for each unit systems
+  Prepares formats for each unit systems
 */
 void DDS_DicItem::PrepareFormats( const TCollection_AsciiString&  theFormat )
 {
@@ -915,6 +1068,9 @@ void DDS_DicItem::PrepareFormats( const TCollection_AsciiString&  theFormat )
   }
 }
 
+/*!
+  Split the string \atheStr by spaces and returns substrings in array \aaRes.
+*/
 void DDS_DicItem::Split( const TCollection_AsciiString& theStr, Handle(TColStd_HArray1OfExtendedString)& aRes )
 {
   aRes.Nullify();
@@ -946,6 +1102,9 @@ void DDS_DicItem::Split( const TCollection_AsciiString& theStr, Handle(TColStd_H
   }
 }
 
+/*!
+  Returns unit structure for given unit system \asys.
+*/
 DDS_DicItem::UnitData* DDS_DicItem::GetUnitData( const UnitSystem& sys ) const
 {
   UnitData* unit = 0;
@@ -956,6 +1115,9 @@ DDS_DicItem::UnitData* DDS_DicItem::GetUnitData( const UnitSystem& sys ) const
   return unit;
 }
 
+/*!
+  Gets the active unit system.
+*/
 DDS_DicItem::UnitSystem DDS_DicItem::GetActiveUnitSystem() const
 {
   UnitSystem aSystem;

@@ -26,16 +26,18 @@
 //  Module : SALOME
 //  $Header$
 
-# ifndef __HELPWINDOW_H__
-# define __HELPWINDOW_H__
+#ifndef __HELPWINDOW_H__
+#define __HELPWINDOW_H__
 
-# include <qapplication.h>
-# include <qmainwindow.h>
+#include <qapplication.h>
+#include <qmainwindow.h>
 
 class QTextView;
 
 class HelpWindow : public QMainWindow
 {
+  Q_OBJECT
+
 public:
   HelpWindow( QWidget* parent = 0, const char* name = 0);
   ~HelpWindow();
@@ -46,6 +48,5 @@ public:
 private:
   QTextView* myTextView;
 };
-# endif         /* __HELPWINDOW_H__ */
 
-
+#endif

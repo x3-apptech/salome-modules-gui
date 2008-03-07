@@ -30,9 +30,8 @@
 
      This software is distributed WITHOUT ANY WARRANTY; without even 
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
+     PURPOSE.  See the above copyright notice for more information.*/
 
-=========================================================================*/
 // .NAME vtkVectorText - create polygonal text
 // .SECTION Description
 
@@ -76,7 +75,9 @@ protected:
   VTKViewer_VectorText();
   ~VTKViewer_VectorText();
 
-  void Execute();
+  //! Main method, which calculate output
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
   char *Text;
   char *Letters[127];
 

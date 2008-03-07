@@ -36,18 +36,11 @@ class GLVIEWER_API GLViewer_ViewManager : public SUIT_ViewManager
   Q_OBJECT
 public:
     GLViewer_ViewManager( SUIT_Study* theStudy, SUIT_Desktop* theDesktop );
-    ~GLViewer_ViewManager();
+    virtual ~GLViewer_ViewManager();
 
     GLViewer_Viewer* getGLViewer() { return (GLViewer_Viewer*) myViewModel; }
 
     virtual void     contextMenuPopup( QPopupMenu* );
-
-protected:
-    void         setViewName(SUIT_ViewWindow* theView);
-
-protected:
-    static  int  myMaxId;
-    int          myId;
 };
 
 #endif // GLVIEWER_VIEWMANAGER_H

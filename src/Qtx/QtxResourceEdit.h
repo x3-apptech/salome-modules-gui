@@ -135,7 +135,7 @@ public:
 
   virtual void         update();
 
-  QVariant             property( const QString& ) const;
+  virtual QVariant     property( const QString& ) const;
   virtual void         setProperty( const QString&, const QVariant& );
 
   virtual void         store() = 0;

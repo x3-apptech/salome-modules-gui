@@ -187,17 +187,17 @@ QByteArray GLViewer_Object::getByteCopy()
 
     int aCurPos = 2*anISize + sizeOf8Float + aTypeLength + aToolTipLength;
     // adds aspect byte array
-    for( i = aCurPos; i < aCurPos + aAspect.size(); i++ )
+    for ( i = aCurPos; i < (int)( aCurPos + aAspect.size() ); i++ )
         aResult[i] = aAspect[i - aCurPos];
 
     aCurPos = aCurPos + aAspect.size();
     // adds GL text byte array
-    for( i = aCurPos; i < aCurPos + aGLText.size(); i++ )
+    for ( i = aCurPos; i < (int)( aCurPos + aGLText.size() ); i++ )
         aResult[i] = aGLText[i - aCurPos];    
 
     aCurPos += aGLText.size();
     aPointer = (char*)&myOwner;
-    for( i = 0; i < sizeof( GLViewer_Owner* ); i++, aPointer++ )
+    for( i = 0; i < sizeof( SUIT_DataOwner* ); i++, aPointer++ )
         aResult[ aCurPos + i ] = *aPointer;
 
     return aResult;

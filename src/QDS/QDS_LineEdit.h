@@ -27,6 +27,8 @@ class QDS_EXPORT QDS_LineEdit : public QDS_Datum
 {
   Q_OBJECT
 
+  Q_PROPERTY( bool Selection READ hasSelection WRITE setSelection )
+
 protected:
   class Editor;
 
@@ -34,7 +36,12 @@ public:
   QDS_LineEdit( const QString&, QWidget* = 0, const int = All, const QString& = QString::null );
   virtual ~QDS_LineEdit();
 
+  virtual void         deselect();
+  virtual void         selectAll();
   virtual void         setAlignment( const int, const int = Label );
+
+  bool                 hasSelection() const;
+  void                 setSelection( const bool );
 
 signals:
   void                 returnPressed();

@@ -40,8 +40,9 @@ class SUIT_EXPORT SUIT_DataOwner : public RefCount
 public:
   SUIT_DataOwner();//!< constructor
   virtual ~SUIT_DataOwner();//!< destructor
-  //! compare function
-  virtual bool isEqual( const SUIT_DataOwner& ) const = 0;
+  // *** jfa: The below line has been put here 14.02.2007.
+  // *** It cancels modifications from branch BR_Dev_For_4_0
+  virtual QString keyString() const = 0;//!< used for comparison
 };
 
 /*! \typedef SUIT_DataOwnerPtr

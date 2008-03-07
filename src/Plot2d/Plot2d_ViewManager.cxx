@@ -20,17 +20,13 @@
 #include "Plot2d_ViewModel.h"
 #include "Plot2d_ViewWindow.h"
 
-int Plot2d_ViewManager::myMaxId = 0;
-
 /*!
   Constructor
 */
 Plot2d_ViewManager::Plot2d_ViewManager( SUIT_Study* study, SUIT_Desktop* desk ) 
-: SUIT_ViewManager( study, desk )
+: SUIT_ViewManager( study, desk, new Plot2d_Viewer() )
 {
-  myId = ++myMaxId;
-  Plot2d_Viewer* v = new Plot2d_Viewer();
-  setViewModel( v );
+  setTitle( tr( "PLOT2D_VIEW_TITLE" ) );
 }
 
 /*!
@@ -46,16 +42,6 @@ Plot2d_ViewManager::~Plot2d_ViewManager()
 Plot2d_Viewer* Plot2d_ViewManager::getPlot2dModel() const
 {
   return (Plot2d_Viewer*)myViewModel;
-}
-
-/*!
-  Sets default name of view
-  \param the View - view to be renamed
-*/
-void Plot2d_ViewManager::setViewName( SUIT_ViewWindow* theView )
-{
-  int aPos = myViews.find(theView);
-  theView->setCaption( QString( "Plot2d scene:%1 - viewer:%2" ).arg(myId).arg(aPos+1));
 }
 
 /*!

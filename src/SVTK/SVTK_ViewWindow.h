@@ -28,6 +28,8 @@
 #include "SUIT_ViewWindow.h"
 #include "SALOME_InteractiveObject.hxx"
 
+#include <qimage.h>
+
 class SUIT_Desktop;
 
 class VTKViewer_Actor;
@@ -48,6 +50,12 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 
+namespace SVTK
+{
+  SVTK_EXPORT
+    int convertAction( const int );
+}
+
 //! Define a container for SALOME VTK view window
 class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
 {
@@ -60,6 +68,8 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   virtual
   ~SVTK_ViewWindow();
   
+  virtual QImage dumpView();
+
   //! To initialize #SVTK_ViewWindow instance
   virtual
   void
@@ -213,13 +223,13 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   GetCubeAxes();
 
   //! Redirect the request to #SVTK_Renderer::GetTrihedronSize
-  int  
+  vtkFloatingPointType  
   GetTrihedronSize() const;
 
   //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
   virtual
   void 
-  SetTrihedronSize( const int, const bool = true );
+  SetTrihedronSize( const vtkFloatingPointType, const bool = true );
 
   //! Redirect the request to #SVTK_Renderer::SetSelectionProp
   virtual
@@ -241,7 +251,8 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   virtual
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
-			const double& theTolCell = 0.001);
+			const double& theTolCell = 0.001,
+			const double& theTolObjects = 0.025);
 
   //! Methods to save/restore visual parameters of a view (pan, zoom, etc.)
   virtual 
@@ -255,6 +266,9 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   virtual
   bool
   eventFilter( QObject*, QEvent* );
+
+  virtual
+  void RefreshDumpImage();
   
 public slots:
   virtual
@@ -342,14 +356,19 @@ protected:
   void
   doSetVisualParameters( const QString& );
 
-  QImage dumpView();
+  virtual QString filter() const;
+  virtual bool dumpViewToFormat( const QImage& img, const QString& fileName, const QString& format );
+  
   virtual bool action( const int );
-
+  
   SVTK_View* myView;
   SVTK_MainWindow* myMainWindow;
   SVTK_ViewModelBase* myModel;
 
   QString myVisualParams; // used for delayed setting of view parameters 
+
+private:
+  QImage myDumpImage;
 };
 
 #ifdef WIN32

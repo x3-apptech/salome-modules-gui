@@ -23,11 +23,14 @@
 #include "SUIT_Study.h"
 
 #include <qcursor.h>
+#include <qregexp.h>
 #include <qmessagebox.h>
 
 #ifdef WNT
 #include <windows.h>
 #endif
+
+QMap<QString, int> SUIT_ViewManager::_ViewMgrId;
 
 /*!\class SUIT_ViewManager.
  * Class provide manipulation with view windows.
@@ -39,17 +42,20 @@ SUIT_ViewManager::SUIT_ViewManager( SUIT_Study* theStudy,
                                     SUIT_ViewModel* theViewModel )
 : QObject( 0 ),
 myDesktop( theDesktop ),
-myTitle( "Default viewer" ),
+myTitle( "Default: %M - viewer %V" ),
 myStudy( NULL )
 {
   myViewModel = 0;
   myActiveView = 0;
-  setViewModel(theViewModel);
-  connect(theDesktop, SIGNAL(windowActivated(SUIT_ViewWindow*)), 
-          this,       SLOT(onWindowActivated(SUIT_ViewWindow*)));
+  setViewModel( theViewModel );
+
+  myId = useNewId( getType() );
+
+  connect( theDesktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ), 
+           this,       SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 
   myStudy = theStudy;
-  if( myStudy )
+  if ( myStudy )
     connect( myStudy, SIGNAL( destroyed() ), this, SLOT( onDeleteStudy() ) );
 }
 
@@ -61,6 +67,26 @@ SUIT_ViewManager::~SUIT_ViewManager()
     myViewModel->setViewManager( 0 );
     delete myViewModel;
   }
+}
+
+int SUIT_ViewManager::useNewId( const QString& type )
+{
+  if ( !_ViewMgrId.contains( type ) )
+    _ViewMgrId.insert( type, 0 );
+
+  int id = _ViewMgrId[type];
+  _ViewMgrId[type]++;
+  return id;
+}
+
+void SUIT_ViewManager::setTitle( const QString& theTitle )
+{
+  if ( myTitle == theTitle )
+    return;
+
+  myTitle = theTitle;
+  for ( uint i = 0; i < myViews.count(); i++ )
+    setViewName( myViews[i] );
 }
 
 /*!Sets view model \a theViewModel to view manager.*/
@@ -76,10 +102,31 @@ void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel)
 }
 
 /*!Sets view name for view window \a theView.*/
-void SUIT_ViewManager::setViewName(SUIT_ViewWindow* theView)
+void SUIT_ViewManager::setViewName( SUIT_ViewWindow* theView )
 {
-  int aPos = myViews.find(theView);
-  theView->setCaption(myTitle + QString(":%1").arg(aPos+1));
+  QString title = prepareTitle( getTitle(), myId + 1, myViews.find( theView ) + 1 );
+  theView->setCaption( title );
+}
+
+QString SUIT_ViewManager::prepareTitle( const QString& title, const int mId, const int vId )
+{
+  QString res = title;
+  QRegExp re( "%[%MV]" );
+  int i = 0;
+  while ( ( i = re.search( res, i ) ) != -1 )
+  {
+    QString rplc;
+    QString str = res.mid( i, re.matchedLength() );
+    if ( str == QString( "%%" ) )
+      rplc = QString( "%" );
+    else if ( str == QString( "%M" ) )
+      rplc = QString::number( mId );
+    else if ( str == QString( "%V" ) )
+      rplc = QString::number( vId );
+    res.replace( i, re.matchedLength(), rplc );
+    i += rplc.length();
+  }
+  return res;
 }
 
 /*! Creates View, adds it into list of views and returns just created view window*/
@@ -131,7 +178,7 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
   }
   
   connect(theView, SIGNAL(closing(SUIT_ViewWindow*)),
-          this,    SLOT(onDeleteView(SUIT_ViewWindow*)));
+          this,    SLOT(onClosingView(SUIT_ViewWindow*)));
 
   connect(theView, SIGNAL(mousePressed(SUIT_ViewWindow*, QMouseEvent*)),
           this,    SLOT(onMousePressed(SUIT_ViewWindow*, QMouseEvent*)));
@@ -168,10 +215,31 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
 
 /*!Emit delete view. Remove view window \a theView from view manager.
 */
-void SUIT_ViewManager::onDeleteView(SUIT_ViewWindow* theView)
+void SUIT_ViewManager::onClosingView( SUIT_ViewWindow* theView )
 {
-  emit deleteView(theView);
-  removeView(theView);
+  closeView( theView );
+}
+
+/*!
+  Remove the view window \a theView from view manager and destroy it.
+*/
+void SUIT_ViewManager::closeView( SUIT_ViewWindow* theView )
+{
+  if ( !theView )
+    return;
+
+  QGuardedPtr<SUIT_ViewWindow> view( theView );
+
+  view->hide();
+
+  if ( !view->testWFlags( WDestructiveClose ) )
+    return;
+
+  emit deleteView( view );
+  removeView( view );
+
+  if ( view )
+    delete view;
 }
 
 /*!Remove view window \a theView from view manager.
@@ -186,6 +254,26 @@ void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView)
   int aNumItems = myViews.count();
   if (aNumItems == 0)
     emit lastViewClosed(this);
+}
+
+/*!
+  Set or clear flag Qt::WDestructiveClose for all views
+*/
+void SUIT_ViewManager::setDestructiveClose( const bool on )
+{
+  for ( uint i = 0; i < myViews.count(); i++ )
+    myViews[i]->setDestructiveClose( on );
+}
+
+/*!
+  Returns 'true' if any of views (view windows) is visible.
+*/
+bool SUIT_ViewManager::isVisible() const
+{
+  bool res = false;
+  for ( uint i = 0; i < myViews.count() && !res; i++ )
+    res = myViews[i]->isVisibleTo( myViews[i]->parentWidget() );
+  return res;
 }
 
 /*!
@@ -223,17 +311,15 @@ void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 */
 void SUIT_ViewManager::closeAllViews()
 {
-  unsigned int aSize = myViews.size();
-  for (uint i = 0; i < aSize; i++) {
-    if (myViews[i])
-      myViews[i]->close();
-  }
+  for ( uint i = 0; i < myViews.size(); i++ )
+    delete myViews[i];
+  myViews.clear();
 }
 
 /*!
  *\retval QString - type of view model.
  */
-QString  SUIT_ViewManager::getType() const 
+QString SUIT_ViewManager::getType() const
 { 
   return (!myViewModel)? "": myViewModel->getType(); 
 }

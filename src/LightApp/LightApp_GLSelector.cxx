@@ -19,6 +19,7 @@
 #include "LightApp_GLSelector.h"
 
 #include "LightApp_DataOwner.h"
+#include "LightApp_DataObject.h"
 
 #include <GLViewer_Context.h>
 
@@ -64,8 +65,8 @@ void LightApp_GLSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
     GLViewer_Object* obj = cont->SelectedObject();
     if ( obj )
     {
-      LightApp_GLOwner* owner = dynamic_cast< LightApp_GLOwner* >( obj->owner() );
-      if( owner )
+      LightApp_DataOwner* owner = dynamic_cast<LightApp_DataOwner*>( obj->owner() );
+      if ( owner )
         aList.append( SUIT_DataOwnerPtr( new LightApp_DataOwner( owner->entry() ) ) );
     }
   }
@@ -81,70 +82,32 @@ void LightApp_GLSelector::setSelection( const SUIT_DataOwnerPtrList& aList )
   if ( !cont )
     return;
 
-  QMap<QString, GLViewer_Object*> aDisplayed;
+  QMap<QString, int> aSelected;
+  for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
+  {
+    const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
+
+    if ( owner )
+      aSelected.insert( owner->entry(), 0 );
+  }
+
+  bool changed = false;
   const ObjList& displayed = cont->getObjects();
   for ( ObjList::const_iterator it = displayed.begin(); it != displayed.end(); ++it )
   {
     GLViewer_Object* obj = *it;
     if ( obj && obj->getVisible() )
     {
-      LightApp_GLOwner* owner = dynamic_cast< LightApp_GLOwner* >( obj->owner() );
-      if ( owner )
-	aDisplayed.insert( owner->entry(), obj );
+      LightApp_DataOwner* owner = dynamic_cast<LightApp_DataOwner*>( obj->owner() );
+      bool sel = owner && aSelected.contains( owner->entry() );
+      changed = changed || sel != (bool)obj->isSelected();
+      if ( sel && !obj->isSelected() )
+        cont->setSelected( obj, false );
+      else if ( !sel && obj->isSelected() )
+        cont->remSelected( obj, false );
     }
   }
 
-  int Nb = 0;
-  cont->clearSelected( false );
-  for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
-  {
-    const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
-
-    if ( !owner )
-      continue;
-
-    if ( aDisplayed.contains( owner->entry() ) )
-    {
-      cont->setSelected( aDisplayed[owner->entry()], false );
-      Nb++;
-    }
-  }
-
-  if ( Nb > 0 )
+  if ( changed )
     myViewer->updateAll();
-}
-
-
-/*!
-  Constructor
-  \param entry - entry of object
-*/
-LightApp_GLOwner::LightApp_GLOwner( const char* entry )
-: GLViewer_Owner()
-{
-  setEntry( entry );
-}
-
-/*!
-  Destructor
-*/
-LightApp_GLOwner::~LightApp_GLOwner()
-{
-}
-
-/*!
-  \return entry
-*/
-const char* LightApp_GLOwner::entry() const
-{
-  return myEntry.c_str();
-}
-
-/*!
-  Sets new entry
-  \param entry - entry of object
-*/
-void LightApp_GLOwner::setEntry( const char* entry )
-{
-  myEntry = entry;
 }

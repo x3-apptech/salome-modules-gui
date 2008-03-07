@@ -92,7 +92,7 @@ protected:
   void               drawGradient( QPainter*, const QRect&, const QColor&,
 				   const QColor&, const Direction, gradient_func ) const;
 
-  QString            titleText( const QString&, const int, const QFontMetrics& ) const;
+  QString            titleText( const QString&, const int, const int, QFont& f ) const;
 
 private:
   QWidget*           myTitleParent;

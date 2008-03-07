@@ -30,6 +30,7 @@ typedef struct
 {
   double x;
   double y;
+  QString text;
 } Plot2d_Point;
 
 typedef QValueList<Plot2d_Point> pointList;
@@ -57,15 +58,18 @@ public:
   QString     getHorUnits() const;
   void        setVerUnits( const QString& units );
   QString     getVerUnits() const;
-  void        addPoint(double theX, double theY);
-  void        insertPoint(int thePos, double theX, double theY);
+  void        addPoint(double theX, double theY, const QString& = QString::null );
+  void        insertPoint(int thePos, double theX, double theY, const QString& = QString::null );
   void        deletePoint(int thePos);
   void        clearAllPoints();
   pointList   getPointList() const;
 
-  void        setData( const double* hData, const double* vData, long size );
+  void        setData( const double* hData, const double* vData, long size, const QStringList& = QStringList() );
   double*     horData() const;
   double*     verData() const;
+
+  void        setText( const int, const QString& );
+  QString     text( const int ) const;
 
   int         nbPoints() const;
   bool        isEmpty() const;

@@ -37,13 +37,6 @@ public:
   virtual ~SVTK_ViewManager();
 
   SUIT_Desktop* getDesktop();
-
-protected:
-  void setViewName( SUIT_ViewWindow* theView );
-
-private:
-  int               myId;
-  static  int       _SVTKViewMgr_Id;
 };
 
 #endif

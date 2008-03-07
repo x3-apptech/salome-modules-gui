@@ -76,25 +76,56 @@ PythonConsole_PyInterp::~PythonConsole_PyInterp()
 bool PythonConsole_PyInterp::initState()
 {
   /*
+   * The GIL is acquired on input and released on output
+   */
+    /*PyEval_AcquireLock();
+#ifdef WNT 
+  _tstate = PyGILState_GetThisThreadState();
+  // if no thread state defined
+  if ( _tstate )
+    PyThreadState_Swap(_tstate);
+  else
+#endif
+  {
+    _tstate = Py_NewInterpreter(); // create an interpreter and save current state
+    PySys_SetArgv(PyInterp_base::_argc,PyInterp_base::_argv); // initialize sys.argv
+    //if(MYDEBUG) MESSAGE("PythonConsole_PyInterp::initState - this = "<<this<<"; _tstate = "<<_tstate);
+  }*/
+
+  /*
    * The GIL is acquired and will be held on initState output
    * It is the caller responsability to release the lock if needed
    */
   PyEval_AcquireLock();
+
   _tstate = Py_NewInterpreter(); // create an interpreter and save current state
   PySys_SetArgv(PyInterp_base::_argc,PyInterp_base::_argv); // initialize sys.argv
 //  if(MYDEBUG) MESSAGE("PythonConsole_PyInterp::initState - this = "<<this<<"; _tstate = "<<_tstate);
+
 
   /*
    * If builtinmodule has been initialized all the sub interpreters
    * will have the same __builtin__ module
    */
-  if(builtinmodule){ 
+ 
+  if(!builtinmodule) // PAL18041: deepcopy function don't work in Salome
+  {
+    //builtinmodule is static member of PyInterp class
+    //If it is not NULL (initialized to the builtin module of the main interpreter
+    //all the sub interpreters will have the same builtin
+    //_interp is a static member and is the main interpreter
+    //The first time we initialized it to the builtin of main interpreter
+    builtinmodule=PyDict_GetItemString(_interp->modules, "__builtin__");
+  }
+
+  if(builtinmodule)
+    { 
     PyObject *m = PyImport_GetModuleDict();
     PyDict_SetItemString(m, "__builtin__", builtinmodule);
 //    SCRUTE(builtinmodule->ob_refcnt); // builtinmodule reference counter
     _tstate->interp->builtins = PyModule_GetDict(builtinmodule);
     Py_INCREF(_tstate->interp->builtins);
-  }
+  }    
   PyEval_ReleaseThread(_tstate);
   return true;
 }

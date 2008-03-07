@@ -30,11 +30,13 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifndef WIN32
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+#endif
 
 #include "SVTK_SpaceMouse.h"
 
@@ -55,9 +57,13 @@ SVTK_SpaceMouse* SVTK_SpaceMouse::getInstance()
 */
 SVTK_SpaceMouse::SVTK_SpaceMouse()
 {
+#ifndef WIN32
   win = InputFocus;
+#endif
   spaceMouseOn = 0;
 }
+
+#ifndef WIN32
 
 /*!
   Initialization
@@ -204,3 +210,4 @@ int SVTK_SpaceMouse::translateEvent( Display* display, XEvent* xEvent, MoveEvent
   return (!display);
 }
 
+#endif

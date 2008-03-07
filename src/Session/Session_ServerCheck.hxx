@@ -22,11 +22,7 @@
 #if !defined(SESSION_SERVERCHECK_HXX)
 #define SESSION_SERVERCHECK_HXX
 
-#ifdef WNT
-#include <SALOME_WNT.hxx>
-#else
-#define SALOME_WNT_EXPORT
-#endif
+#include <SALOME_Session.hxx>
 
 #include <qthread.h> 
 #include <qapplication.h> 
@@ -37,7 +33,7 @@ class QWaitCondition;
 /*!
   Class Session_ServerCheck : check SALOME servers
 */
-class SALOME_WNT_EXPORT Session_ServerCheck : public QThread
+class SESSION_EXPORT Session_ServerCheck : public QThread
 {
 public:
   // constructor

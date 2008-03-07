@@ -145,7 +145,7 @@ int main( int argc, char** argv )
 	  QString value = resMgr->stringValue( section, param );
 	  QStringList valsOld = QStringList::split( separ, value );
 	  QStringList valsNew = QStringList::split( separ, newValue );
-	  for ( int i = 0; i < valsNew.count(); i++ )
+	  for ( int i = 0; i < (int)valsNew.count(); i++ )
 	    if ( !valsOld.contains( valsNew[i] ) )
 	      valsOld.append( valsNew[i] );
 	  resMgr->setValue( section, param, valsOld.join( separ ) );

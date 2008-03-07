@@ -1,0 +1,144 @@
+/*!
+
+\page vtk_3d_viewer_page VTK 3D Viewer
+
+<b>VTK 3D viewer</b> is the default viewer for Mesh Module, allowing to
+visualize meshes. It is also used in Post-Pro module for all 3D
+presentations except for Gauss Points.
+
+The functionalities of VTK viewer are available via its Viewer
+Toolbar. Buttons marked with small downward triangles have extended
+functionality which can be accessed by locking on them with left mouse
+button.  
+
+\image html image157.gif "Viewer Toolbar"
+
+<hr>
+\image html image77.gif
+\n <center><b>Dump View</b> - exports an object from the viewer in bmp, png, jpg
+or jpeg image format.</center>
+<hr>
+
+\image html image88.gif
+\n <center><b>Show/Hide Trihedron</b> - shows or hides coordinate axes.</center>
+<hr>
+
+\image html image96.gif
+\n <center><b>Fit all</b> - scales the presentation so that it could
+fit within the Viewer boundaries. </center>
+<hr>
+
+\image html image97.gif
+\n <center><b>Fit area</b> - resizes the view to place in the visible area
+only the contents of a frame drawn with pressed left mouse button.</center>
+<hr>
+
+\image html image98.gif
+\n <center><b>Zoom</b> - allows to zoom in and out.</center>
+<hr>
+
+\image html image99.gif
+\n <center><b>Panning</b> - if the represented objects are greater that the
+visible area and you don't wish to use <b>Fit all</b> functionality, click on
+this button and you'll be able to drag the scene to see its remote
+parts.</center>
+<hr>
+
+\image html image100.gif
+\n <center><b>Global panning</b> - allows to select a point to be the
+center of the presentation showing all displayeed objects in the
+visible ares <center>
+<hr>
+
+\image html view_rotation_point.png
+\n <center><b>Change rotation point</b> - allows to to choose the point around
+which the rotation is performed.</center>
+
+\image html set_rotation_point_dialog1.png
+
+<center>By default the rotation point is located in the Center of the bounding
+box of an object.</center>
+
+\image html set_rotation_point_dialog2.png
+
+<center>Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+define the coordinates of the rotation point manually.</center>
+
+<b>Set to Origin</b> button restores the default rotation point
+coordinates.\n
+<b>Select Point from View</b> button allows to select the rotation
+point in the 3D Viewer.
+<hr>
+
+\image html image89.gif
+\n <center><b>Rotation</b> - allows to rotate the selected object using the
+mouse.</center>
+
+\image html image102.gif
+
+<center>These buttons orientate the scene strictly about coordinate axes.</center>
+<hr>
+
+\image html image91.gif
+\n <center><b>Reset</b> - restores the default position (isometric) of
+objects in the scene.</center>
+<hr>
+
+\image html urbutton.png
+\n <center><b>Update Rate</b> - allows to define the Update Rate for
+the presentations displayed in the viewer</center>
+
+\image html updaterate.png
+
+<ul>
+<li><b>Desired Update Rate, FPS</b> - allows to set the target Update
+Rate</li>
+<li><b>Still Update Rate, FPS</b> - allows to set the Update Rate for
+the periods when both the user and the application do not perform any
+actions in the viewer</li>
+<li><b>Current Update Rate, FPS</b> - shows the Update Rate currently
+available on your configuration</li>
+<li><b>Number of Cells</b> - shows the number of cells currently in
+display</li> 
+</ul>
+
+\image html image108.gif
+\n <center><b>Scaling</b> - represents objects deformed (stretched or
+stuffed) along the axes of coordinates.</center>
+<hr>
+
+\image html image109.gif
+\n <center><b>Graduated axes</b> - allows to define parameters of axes
+and graduate them.</center>
+
+\image html graduatedaxes1.png
+
+<ul>
+<li><b>Axis name</b></li>
+<ul>
+<li><b>Is visible</b> - if checked the axis name is displayed in the
+viewer.</li>
+<li><b>Name</b> - allows to redefine the name of the axis.</li>
+<li><b>Font</b> - allows to define color and properties of the font of
+axis name.</li>
+</ul>
+<li><b>Labels</b></li>
+<ul>
+<li><b>Is visible</b> - if checked the labels are displayed in the
+viewer.</li>
+<li><b>Number</b> - allows to define the number of labels.</li>
+<li><b>Offset</b> - allows to define the distance between labels.</li>
+<li><b>Font</b> - allows to define color and properties of the font of
+labels names.</li>
+</ul>
+<li><b>Tick marks</b></li>
+<ul>
+<li><b>Is visible</b> - if checked the tick marks are displayed in the
+viewer.</li>
+<li><b>Length</b> - allows to define the length of tick marks.</li>
+</ul>
+<li><b>Is visible</b> - if checked the axis is displayed in the
+viewer. </li>
+</ul>
+
+*/

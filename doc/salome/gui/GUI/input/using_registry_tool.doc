@@ -1,0 +1,49 @@
+/*!
+
+\page using_registry_tool_page Using Registry tool
+
+\b Registry tool is in the SALOME platform is destined for providing
+information about the processes (components), which have ever been
+launched in the current study session.
+
+<em>To view the Registry:</em>
+\par
+From the main menu choose <b>Tools > Registry display</b>, the
+following dialog box will appear:
+
+\image html registry1.png
+
+\b Running tab of this dialog box displays a list of the currently
+started processes (components) with supplementary information on each
+of them divided into columns:
+
+<ul>
+<li>\b Component: name of the started component
+<li>\b PID: process identification number
+<li>\b User \b Name: name of the user launching the component
+<li>\b Machine: name of the machine, on which the process has been started
+<li>\b begins: date and time of the starting of the component
+<li>\b hello: date and time of the last call to the component
+</ul>
+
+\b History tab displays a list of all processes, which have ever been
+launched within this study session. It contains the same supplementary
+information on each of the processes (components).
+
+\b Refresh button allows to refresh the current list of processes
+(components).
+
+\b Interval button allows to set an interval for refreshment of the
+current list of processes (components).
+
+\image html registry3.png
+
+<em>To display complete information on a definite process
+(component):</em>
+\par
+Double-click on this process (component). The following window will
+appear:
+
+\image html registry4.png
+
+*/

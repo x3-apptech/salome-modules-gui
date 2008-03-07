@@ -87,10 +87,13 @@ CAM_Module::~CAM_Module()
 void CAM_Module::initialize( CAM_Application* app )
 {
   myApp = app;
-  if (myApp) {
+  if ( myApp )
+  {
     SUIT_Session* aSession = SUIT_Session::session();
-    connect(aSession, SIGNAL( applicationClosed( SUIT_Application* ) ),
-            this, SLOT( onApplicationClosed( SUIT_Application* ) ));
+    connect( aSession, SIGNAL( applicationClosed( SUIT_Application* ) ),
+             this, SLOT( onApplicationClosed( SUIT_Application* ) ) );
+
+    connect( myApp, SIGNAL( infoChanged( QString ) ), this, SLOT( onInfoChanged( QString ) ) );
   }
 }
 
@@ -166,6 +169,38 @@ void CAM_Module::studyClosed( SUIT_Study* study )
 void CAM_Module::studyChanged( SUIT_Study* , SUIT_Study* )
 {
 }
+
+/*!Return true if module is active.*/
+bool CAM_Module::isActiveModule() const
+{
+  return application() ? application()->activeModule() == this : false;
+}
+
+/*!
+  Put the message into the status bar of the desktop. Message will be displayed
+  during specified \amscec milliseconds. If parameter \amsec is negative then
+  message will be persistently displayed when module is active.
+*/
+void CAM_Module::putInfo( const QString& msg, const int msec )
+{
+  if ( application() )
+    application()->putInfo( msg, msec );
+
+  if ( msec < 0 )
+    myInfo = msg;
+}
+
+/*!
+  Restore persistently displayed info string when previos information status string erasing
+  if module is active.
+*/
+void CAM_Module::onInfoChanged( QString txt )
+{
+  if ( txt.isEmpty() && isActiveModule() && !myInfo.isEmpty() && application() )
+    application()->putInfo( myInfo );
+}
+
+
 
 /*!Public slot, nullify application pointer if the application was closed.*/
 void CAM_Module::onApplicationClosed( SUIT_Application* theApp )
@@ -640,10 +675,10 @@ void CAM_Module::connectToStudy( CAM_Study* camStudy )
     CAM_DataModel* dm = it.current()->dataModel();
     if( it.current() == this && !camStudy->containsDataModel( dm ) )
     {
-      if( prev )
-	camStudy->insertDataModel( it.current()->dataModel(), prev );
+      if ( prev )
+	      camStudy->insertDataModel( it.current()->dataModel(), prev );
       else
-	camStudy->insertDataModel( it.current()->dataModel(), 0 );
+	      camStudy->insertDataModel( it.current()->dataModel(), 0 );
     }
     prev = dm;
   }

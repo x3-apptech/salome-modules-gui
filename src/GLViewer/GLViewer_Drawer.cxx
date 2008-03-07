@@ -306,7 +306,7 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
     float aDY = ( aRowPixelHeight - 1 ) / aYScale, aDX;
     char aLetter;
     int aLettIndex, row;
-    for( int i = 0; i < theStr.length(); i++ )
+    for ( int i = 0; i < (int)theStr.length(); i++ )
     {
         aLetter    = theStr.data()[i];
         aLettIndex = (int)aLetter - FirstSymbolNumber;
@@ -338,7 +338,7 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
 int GLViewer_TexFont::getStringWidth( QString theStr )
 {
     int aWidth = 0;
-    for( int i = 0; i < theStr.length(); i ++ )
+    for ( int i = 0; i < (int)theStr.length(); i ++ )
     {
         char aLetter = theStr.data()[i];
         int aLettIndex = (int)aLetter - FirstSymbolNumber;

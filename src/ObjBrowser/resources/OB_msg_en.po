@@ -30,3 +30,17 @@ msgstr ""
 msgid "MEN_EXPAND_ALL"
 msgstr "Expand All"
 
+msgid "OB_FindDlg::FIND"
+msgstr "Find"
+
+msgid "OB_FindDlg::CLOSE"
+msgstr "Close"
+
+msgid "OB_FindDlg::CASE_SENSITIVE"
+msgstr "Case sensitive"
+
+msgid "OB_FindDlg::IS_REG_EXP"
+msgstr "Regular expression"
+
+msgid "OB_FindDlg::NOT_FOUND"
+msgstr "There is no object is found"

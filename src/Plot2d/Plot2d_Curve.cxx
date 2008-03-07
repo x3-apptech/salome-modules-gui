@@ -147,22 +147,24 @@ QString Plot2d_Curve::getVerUnits() const
 /*!
   Adds one point for curve.
 */
-void Plot2d_Curve::addPoint(double theX, double theY)
+void Plot2d_Curve::addPoint(double theX, double theY, const QString& txt )
 {
   Plot2d_Point aPoint;
   aPoint.x = theX;
   aPoint.y = theY;
+  aPoint.text = txt;
   myPoints.append(aPoint);
 }
 
 /*!
   Insert one point for curve on some position.
 */
-void Plot2d_Curve::insertPoint(int thePos, double theX, double theY)
+void Plot2d_Curve::insertPoint(int thePos, double theX, double theY, const QString& txt)
 {
   Plot2d_Point aPoint;
   aPoint.x = theX;
   aPoint.y = theY;
+  aPoint.text = txt;
 
   QValueList<Plot2d_Point>::iterator aIt;
   int aCurrent = 0;
@@ -211,10 +213,12 @@ pointList Plot2d_Curve::getPointList() const
 /*!
   Sets curve's data. 
 */
-void Plot2d_Curve::setData( const double* hData, const double* vData, long size )
+void Plot2d_Curve::setData( const double* hData, const double* vData, long size, const QStringList& lst )
 {
   clearAllPoints();
-  for(long i = 0; i < size; i++) addPoint(hData[i], vData[i]);
+  QStringList::const_iterator anIt = lst.begin(), aLast = lst.end(); 
+  for( long i = 0; i < size; i++, anIt++ )
+    addPoint( hData[i], vData[i], anIt==aLast ? QString::null : *anIt );
 }
 
 /*!
@@ -364,7 +368,7 @@ double Plot2d_Curve::getMinX() const
 {
   QValueList<Plot2d_Point>::const_iterator aIt;
   double aMinX = 1e150;
-  int aCurrent = 0;
+  //int aCurrent = 0;
   for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
     if ( (*aIt).x < aMinX )
       aMinX = (*aIt).x;
@@ -379,10 +383,35 @@ double Plot2d_Curve::getMinY() const
 {
   QValueList<Plot2d_Point>::const_iterator aIt;
   double aMinY = 1e150;
-  int aCurrent = 0;
+  //int aCurrent = 0;
   for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
     if ( (*aIt).y < aMinY )
       aMinY = (*aIt).y;
   }
   return aMinY;
+}
+
+/*!
+  Changes text assigned to point of curve
+  \param ind -- index of point
+  \param txt -- new text
+*/
+void Plot2d_Curve::setText( const int ind, const QString& txt )
+{
+  if( ind<0 || ind>=myPoints.count() )
+    return;
+
+  myPoints[ind].text = txt;
+}
+
+/*!
+  \return text assigned to point
+  \param ind -- index of point
+*/
+QString Plot2d_Curve::text( const int ind ) const
+{
+  if( ind<0 || ind>=myPoints.count() )
+    return QString::null;
+  else
+    return myPoints[ind].text;
 }

@@ -113,6 +113,12 @@ msgstr "Rotation of the point of view around the scene center"
 msgid "MNU_ROTATE_VIEW"
 msgstr "Rotation"
 
+msgid "DSC_CHANGINGROTATIONPOINT_VIEW"
+msgstr "Change the point, around which the rotation is performed"
+
+msgid "MNU_CHANGINGROTATIONPOINT_VIEW"
+msgstr "Change Rotation Point"
+
 msgid "DSC_DUMP_VIEW"
 msgstr "Saves the active view in the image file"
 
@@ -181,6 +187,39 @@ msgstr "Scaling"
 
 msgid "SVTK_MainWindow::DSC_SVTK_SCALING"
 msgstr "Scaling"
+
+msgid "SVTK_SetRotationPointDlg::DLG_TITLE"
+msgstr "Set Rotation Point"
+
+msgid "SVTK_SetRotationPointDlg::USE_BBCENTER"
+msgstr "Use Bounding Box Center"
+
+msgid "SVTK_SetRotationPointDlg::LBL_TOORIGIN"
+msgstr "Set to Origin"
+
+msgid "SVTK_SetRotationPointDlg::LBL_SELECTPOINT"
+msgstr "Select Point from View"
+
+msgid "SVTK_SetRotationPointDlg::LBL_CENTER_OF_BOUNDING_BOX"
+msgstr "Center of bounding box"
+
+msgid "SVTK_SetRotationPointDlg::LBL_ORIGIN"
+msgstr "Origin of the coordinate system"
+
+msgid "SVTK_SetRotationPointDlg::LBL_SELECTED_POINT"
+msgstr "Selected point"
+
+msgid "SVTK_SetRotationPointDlg::LBL_X"
+msgstr "X :"
+
+msgid "SVTK_SetRotationPointDlg::LBL_Y"
+msgstr "Y :"
+
+msgid "SVTK_SetRotationPointDlg::LBL_Z"
+msgstr "Z :"
+
+msgid "SVTK_SetRotationPointDlg::RBUTTONGROUP_TITLE"
+msgstr "The rotation point type"
 
 msgid "SVTK_FontWidget::ARIAL"
 msgstr "Arial"
@@ -275,3 +314,5 @@ msgstr "Current Update Rate, FPS"
 msgid "SVTK_UpdateRateDlg::NUMBER_CELLS"
 msgstr "Number of Cells, -"
 
+msgid "SVTK_IMAGE_FILES"
+msgstr "Images Files (*.bmp *.png *.jpg *.jpeg *.pdf *.ps *.eps)""

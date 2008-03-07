@@ -33,7 +33,6 @@
 #include <qlayout.h>
 #include <qapplication.h>
 #include <qpopupmenu.h>
-#include <qimage.h>
 
 /*!
   Constructor
@@ -42,6 +41,8 @@ Plot2d_ViewWindow::Plot2d_ViewWindow(SUIT_Desktop* theDesktop, Plot2d_Viewer* th
 : SUIT_ViewWindow(theDesktop)
 {
   myModel = theModel;
+
+  myDumpImage = QImage();
 
   myViewFrame = new Plot2d_ViewFrame(this, "plotView");
   setCentralWidget(myViewFrame);
@@ -491,8 +492,13 @@ void Plot2d_ViewWindow::onDumpView()
 */
 QImage Plot2d_ViewWindow::dumpView()
 {
-  QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
-  return px.convertToImage();
+  if ( getToolBar()->hasMouse() || myDumpImage.isNull() )
+    {
+      QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
+      return px.convertToImage();
+    }
+  
+  return myDumpImage;
 }
 
 /*!
@@ -531,4 +537,13 @@ QString Plot2d_ViewWindow::getVisualParameters()
 void Plot2d_ViewWindow::setVisualParameters( const QString& parameters )
 {
   myViewFrame->setVisualParameters( parameters );
+}
+
+/*!
+  \refresh QImage, containing all scene rendering in window
+*/
+void Plot2d_ViewWindow::RefreshDumpImage()
+{
+  QPixmap px = QPixmap::grabWindow( myViewFrame->winId() );
+  myDumpImage = px.convertToImage();
 }

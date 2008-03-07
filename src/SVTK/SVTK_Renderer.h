@@ -52,6 +52,9 @@ class SVTK_CubeAxesActor2D;
 class VTKViewer_Actor;
 class SVTK_Selector;
 
+#ifdef WIN32
+#pragma warning ( disable:4251 )
+#endif
 
 /*! 
   \class SVTK_Renderer
@@ -119,7 +122,8 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //! Setup requested tolerance for the picking
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
-			const double& theTolCell = 0.001);
+			const double& theTolCell = 0.001,
+			const double& theTolObjects = 0.025);
 
   //----------------------------------------------------------------------------
   //! Adjust all intenal actors (trihedron and graduated rules) to the scene
@@ -128,10 +132,10 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
 
   //! Set size of the trihedron in percents from bounding box of the scene
   void
-  SetTrihedronSize(int theSize, const bool theRelative = true);
+  SetTrihedronSize(vtkFloatingPointType theSize, const bool theRelative = true);
  
   //! Get size of the trihedron in percents from bounding box of the scene
-  int  
+  vtkFloatingPointType  
   GetTrihedronSize() const;
 
   //! Shows if the size of the trihedron is relative
@@ -243,9 +247,13 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //----------------------------------------------------------------------------
   vtkSmartPointer<SVTK_CubeAxesActor2D> myCubeAxes;
   vtkSmartPointer<VTKViewer_Trihedron> myTrihedron;  
-  int  myTrihedronSize;
+  vtkFloatingPointType myTrihedronSize;
   bool myIsTrihedronRelative;
   vtkFloatingPointType myBndBox[6];
 };
+
+#ifdef WIN32
+#pragma warning ( default:4251 )
+#endif
 
 #endif

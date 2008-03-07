@@ -222,9 +222,10 @@ bool OB_ListView::isDropAccepted( QListViewItem* drag, QListViewItem* drop ) con
 void OB_ListView::setColumnWidth( int col, int width )
 {
   int max = columnMaxWidth( col );
-  if( max>0 && width>max )
+  if ( max>0 && width>max )
     width = max;
-  QListView::setColumnWidth( col, width );
+
+  QtxListView::setColumnWidth( col, width );
 }
 
 /*!

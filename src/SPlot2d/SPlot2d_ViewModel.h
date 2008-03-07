@@ -52,6 +52,8 @@ public:
   void rename( const Handle(SALOME_InteractiveObject)&, const QString&, Plot2d_ViewFrame* = 0 );
   void renameAll( const Handle(SALOME_InteractiveObject)&, const QString& );
   bool isInViewer( const Handle(SALOME_InteractiveObject)& IObject );
+
+  virtual   SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
   
   /* display */		
   void Display( const Handle(SALOME_InteractiveObject)& IObject, bool update = true );

@@ -40,6 +40,9 @@
 #include "SALOME_Prs.h"
 #include "SOCC_ViewModel.h"
 #include "SVTK_ViewModel.h"
+#include "SVTK_ViewWindow.h"
+#include "SOCC_ViewWindow.h"
+#include "SPlot2d_ViewWindow.h"
 
 #include "SALOME_Event.hxx"
 #include "SALOME_ListIO.hxx"
@@ -554,7 +557,7 @@ public:
 	SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
 	if ( view ) {
 	  SALOME_Prs* aPrs = view->CreatePrs( myEntry );
-	  myResult = aPrs->IsNull();
+	  myResult = !aPrs->IsNull();
 	}
       }
     }
@@ -568,4 +571,189 @@ public:
 bool SALOMEGUI_Swig::IsInCurrentView( const char* theEntry )
 {
   return ProcessEvent( new TIsInViewerEvent( theEntry ) );
+}
+
+/*!
+  Updates (repaint) current view
+*/
+void SALOMEGUI_Swig::UpdateView()
+{
+  class TEvent: public SALOME_Event {
+  public:
+    TEvent() {}
+    virtual void Execute() {
+      if ( SalomeApp_Application* anApp = getApplication() ) {
+	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+	if ( window ) {
+	  SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
+	  if ( view )
+	    view->Repaint();
+	}
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
+}
+
+/*!
+  Fit all the contents of the current view window
+ */
+void SALOMEGUI_Swig::FitAll()
+{
+  class TEvent: public SALOME_Event {
+  public:
+    TEvent() {}
+    virtual void Execute() {
+      if ( SalomeApp_Application* anApp = getApplication() ) {
+	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+	if ( window ) {
+	  if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
+	    (dynamic_cast<SVTK_ViewWindow*>( window ))->onFitAll();
+	  else if ( dynamic_cast<SOCC_ViewWindow*>( window ) )
+	    (dynamic_cast<SOCC_ViewWindow*>( window ))->onFitAll();
+	  else if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
+	    (dynamic_cast<SPlot2d_ViewWindow*>( window ))->onFitAll();
+	}
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
+}
+
+/*!
+  Reset current view window to the default state.
+ */
+void SALOMEGUI_Swig::ResetView()
+{
+  class TEvent: public SALOME_Event {
+  public:
+    TEvent() {}
+    virtual void Execute() {
+      if ( SalomeApp_Application* anApp = getApplication() ) {
+	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+	if ( window ) {
+	  if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
+	    (dynamic_cast<SVTK_ViewWindow*>( window ))->onResetView();
+	  else if ( dynamic_cast<SOCC_ViewWindow*>( window ) )
+	    (dynamic_cast<SOCC_ViewWindow*>( window ))->onResetView();
+	  else if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
+	    (dynamic_cast<SPlot2d_ViewWindow*>( window ))->onFitAll();
+	  // VSR: there is no 'ResetView' functionality for Plot2d viewer,
+	  // so we use 'FitAll' instead.
+	}
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
+}
+
+enum {
+  __ViewTop,
+  __ViewBottom,
+  __ViewLeft,
+  __ViewRight,
+  __ViewFront,
+  __ViewBack
+};
+
+void setView( int view )
+{
+  class TEvent: public SALOME_Event {
+  private:
+    int myView;
+  public:
+    TEvent( int view ) : myView( view ) {}
+    virtual void Execute() {
+      if ( SalomeApp_Application* anApp = getApplication() ) {
+	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+	if ( window ) {
+	  if ( dynamic_cast<SVTK_ViewWindow*>( window ) ) {
+	    switch( myView ) {
+	    case __ViewTop:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onTopView(); break;
+	    case __ViewBottom:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onBottomView(); break;
+	    case __ViewLeft:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onLeftView(); break;
+	    case __ViewRight:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onRightView(); break;
+	    case __ViewFront:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onFrontView(); break;
+	    case __ViewBack:
+	      (dynamic_cast<SVTK_ViewWindow*>( window ))->onBackView(); break;
+	    default:
+	      break;
+	    }
+	  }
+	  else if ( dynamic_cast<SOCC_ViewWindow*>( window ) ) {
+	    switch( myView ) {
+	    case __ViewTop:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onTopView(); break;
+	    case __ViewBottom:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onBottomView(); break;
+	    case __ViewLeft:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onLeftView(); break;
+	    case __ViewRight:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onRightView(); break;
+	    case __ViewFront:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onFrontView(); break;
+	    case __ViewBack:
+	      (dynamic_cast<SOCC_ViewWindow*>( window ))->onBackView(); break;
+	    default:
+	      break;
+	    }
+	  }
+	}
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( view ) );
+}
+
+/*!
+  Switch current view window to show top view
+ */
+void SALOMEGUI_Swig::ViewTop()
+{
+  setView( __ViewTop );
+}
+
+/*!
+  Switch current view window to show bottom view
+ */
+void SALOMEGUI_Swig::ViewBottom()
+{
+  setView( __ViewBottom );
+}
+
+/*!
+  Switch current view window to show left view
+ */
+void SALOMEGUI_Swig::ViewLeft()
+{
+  setView( __ViewLeft );
+}
+
+/*!
+  Switch current view window to show right view
+ */
+void SALOMEGUI_Swig::ViewRight()
+{
+  setView( __ViewRight );
+}
+
+/*!
+  Switch current view window to show front view
+ */
+void SALOMEGUI_Swig::ViewFront()
+{
+  setView( __ViewFront );
+}
+
+/*!
+  Switch current view window to show back view
+ */
+void SALOMEGUI_Swig::ViewBack()
+{
+  setView( __ViewBack );
 }

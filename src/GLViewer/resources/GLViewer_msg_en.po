@@ -103,3 +103,6 @@ msgstr "Error"
 
 msgid "GLViewer_ViewFrame::DUMP_VIEW_ERROR_DLG_TEXT"
 msgstr "Can't save Dump View in file"
+
+msgid "GLViewer_ViewManager::GL_VIEW_TITLE"
+msgstr "GL Scene:%M - viewer:%V"
