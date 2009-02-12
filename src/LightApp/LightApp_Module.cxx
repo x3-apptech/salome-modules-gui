@@ -1,26 +1,28 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_Module.cxx
 // Created:   6/20/2005 16:30:56 AM
 // Author:    OCC team
-// Copyright (C) CEA 2005
-
+//
 #include "LightApp_Module.h"
 
 #include "CAM_Application.h"
@@ -35,11 +37,21 @@
 #include "LightApp_SwitchOp.h"
 #include "LightApp_UpdateFlags.h"
 #include "LightApp_ShowHideOp.h"
+#include "LightApp_SelectionMgr.h"
 
-#include "SUIT_Operation.h"
 #include <SUIT_Study.h>
 #include <SUIT_DataObject.h>
+#include <SUIT_DataBrowser.h>
+#include <SUIT_Operation.h>
+#include <SUIT_ViewManager.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_TreeModel.h>
+
+#ifndef DISABLE_SALOMEOBJECT
+#include <SALOME_ListIO.hxx>
+#include <SALOME_ListIteratorOfListIO.hxx>
+#endif
 
 #ifndef DISABLE_VTKVIEWER
 #ifndef DISABLE_SALOMEOBJECT
@@ -73,13 +85,12 @@
 #endif
 #endif
 
-#include <OB_Browser.h>
-
 #include <QtxPopupMgr.h>
 
-#include <qvariant.h>
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QVariant>
+#include <QString>
+#include <QStringList>
+
 
 /*!Constructor.*/
 LightApp_Module::LightApp_Module( const QString& name )
@@ -121,12 +132,13 @@ void LightApp_Module::viewManagers( QStringList& ) const
 }
 
 /*!Context menu popup.*/
-void LightApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu, QString& /*title*/ )
+void LightApp_Module::contextMenuPopup( const QString& client, QMenu* menu, QString& /*title*/ )
 {
   LightApp_Selection* sel = createSelection();
   sel->init( client, getApp()->selectionMgr() );
-  popupMgr()->updatePopup( menu, sel );
-  delete sel;
+  popupMgr()->setSelection( sel );
+  popupMgr()->setMenu( menu );
+  popupMgr()->updateMenu();
 }
 
 /*!Update object browser.
@@ -135,7 +147,7 @@ void LightApp_Module::contextMenuPopup( const QString& client, QPopupMenu* menu,
 void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel, 
 					SUIT_DataObject* theDataObject )
 {
-  bool upd = getApp()->objectBrowser()->isAutoUpdate();
+  bool upd = getApp()->objectBrowser()->autoUpdate();
   getApp()->objectBrowser()->setAutoUpdate( false );
 
   if( theIsUpdateDataModel ){
@@ -151,6 +163,7 @@ void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel,
       }
     }
   }
+
   getApp()->objectBrowser()->setAutoUpdate( upd );
   getApp()->objectBrowser()->updateTree( 0, false );
 }
@@ -160,10 +173,40 @@ void LightApp_Module::selectionChanged()
 {
 }
 
+/*! \brief If return false, selection will be cleared at module activation
+ */
+bool LightApp_Module::isSelectionCompatible()
+{
+  // return true if selected objects belong to this module
+  bool isCompatible = true;
+#ifndef DISABLE_SALOMEOBJECT
+  SALOME_ListIO selected;
+  if ( LightApp_SelectionMgr *Sel = getApp()->selectionMgr() )
+    Sel->selectedObjects( selected );
+
+  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( getApp()->activeStudy() );
+  LightApp_DataObject* aRoot = dynamic_cast<LightApp_DataObject*>( dataModel()->root() );
+  if ( aStudy && aRoot ) {
+    // my data type
+    QString moduleDataType = aRoot->componentDataType();
+    // check data type of selection
+    SALOME_ListIteratorOfListIO It( selected );
+    for ( ; isCompatible && It.More(); It.Next()) {
+      Handle(SALOME_InteractiveObject)& io = It.Value();
+      isCompatible = ( aStudy->componentDataType( io->getEntry() ) == moduleDataType );
+    }
+  }
+#endif
+  return isCompatible;
+}
+
 /*!Activate module.*/
 bool LightApp_Module::activateModule( SUIT_Study* study )
 {
   bool res = CAM_Module::activateModule( study );
+
+  if ( !isSelectionCompatible() )// PAL19290, PAL18352
+    getApp()->selectionMgr()->clearSelected();
 
   if ( res && application() && application()->resourceMgr() )
     application()->resourceMgr()->raiseTranslators( name() );
@@ -176,6 +219,14 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
   if ( mySwitchOp == 0 )
     mySwitchOp = new LightApp_SwitchOp( this );
 
+  QString EntryCol = QObject::tr( "ENTRY_COLUMN" );
+  LightApp_DataModel* m = dynamic_cast<LightApp_DataModel*>( dataModel() );
+  if( m )
+  {
+    SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( getApp()->objectBrowser()->model() );
+    m->registerColumn( getApp()->objectBrowser(), EntryCol, LightApp_DataObject::EntryId );
+    treeModel->setAppropriate( EntryCol, Qtx::Toggled );
+  }
   return res;
 }
 
@@ -193,10 +244,19 @@ bool LightApp_Module::deactivateModule( SUIT_Study* study )
   // abort all operations
   MapOfOperation::const_iterator anIt;
   for( anIt = myOperations.begin(); anIt != myOperations.end(); anIt++ ) {
-    anIt.data()->abort();
+    anIt.value()->abort();
   }
 
-  return CAM_Module::activateModule( study );
+  QString EntryCol = QObject::tr( "ENTRY_COLUMN" );
+  LightApp_DataModel* m = dynamic_cast<LightApp_DataModel*>( dataModel() );
+  if( m )
+  {
+    SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( getApp()->objectBrowser()->model() );
+
+    treeModel->setAppropriate( EntryCol, Qtx::Shown );
+    m->unregisterColumn( getApp()->objectBrowser(), EntryCol );
+  }
+  return CAM_Module::deactivateModule( study );
 }
 
 /*!NOT IMPLEMENTED*/
@@ -236,8 +296,10 @@ void LightApp_Module::update( const int theFlags )
       if( LightApp_DataModel* aModel = dynamic_cast<LightApp_DataModel*>( aDataModel ) )
         aModel->update( 0, dynamic_cast<LightApp_Study*>( getApp()->activeStudy() ) );
   }
+
   if ( theFlags & UF_ObjBrowser )
     getApp()->objectBrowser()->updateTree( 0 );
+
   if ( theFlags & UF_Controls )
     updateControls();
   if ( theFlags & UF_Viewer )
@@ -282,7 +344,7 @@ void LightApp_Module::updateControls()
 /*!Create new instance of data model and return it.*/
 CAM_DataModel* LightApp_Module::createDataModel()
 {
-  return new LightApp_DataModel(this);
+  return new LightApp_DataModel( this );
 }
 
 /*!Create and return instance of LightApp_Selection.*/
@@ -339,9 +401,9 @@ QtxPopupMgr* LightApp_Module::popupMgr()
     QString oneAndNotActive = "( count( $component ) = 1 ) and ( not( activeModule in $component ) )";
     QString uniform = "true in $canBeDisplayed and %1 and ( activeModule = '%2' )";
     uniform = uniform.arg( oneAndNotActive ).arg( name() );
-    myPopupMgr->setRule( disp, /*QString( "( not isVisible ) and " ) + */ uniform, true );
-    myPopupMgr->setRule( erase, /*QString( "( isVisible ) and " ) + */ uniform, true );
-    myPopupMgr->setRule( dispOnly, uniform, true );
+    myPopupMgr->setRule( disp, /*QString( "( not isVisible ) and " ) + */ uniform, QtxPopupMgr::VisibleRule );
+    myPopupMgr->setRule( erase, /*QString( "( isVisible ) and " ) + */ uniform, QtxPopupMgr::VisibleRule );
+    myPopupMgr->setRule( dispOnly, uniform, QtxPopupMgr::VisibleRule );
 
     QStringList viewers;
 
@@ -374,7 +436,7 @@ QtxPopupMgr* LightApp_Module::popupMgr()
       for( ; anIt!=aLast; anIt++ )
         strViewers+=temp.arg( *anIt );
       strViewers+="}";
-      myPopupMgr->setRule( eraseAll, QString( "client in %1" ).arg( strViewers ), true );
+      myPopupMgr->setRule( eraseAll, QString( "client in %1" ).arg( strViewers ), QtxPopupMgr::VisibleRule );
     }
   }
   return myPopupMgr;
@@ -420,7 +482,7 @@ QVariant LightApp_Module::preferenceProperty( const int id, const QString& prop 
   QVariant var;
   LightApp_Preferences* pref = preferences();
   if ( pref )
-    var = pref->itemProperty( id, prop );
+    var = pref->itemProperty( prop, id );
   return var;
 }
 
@@ -429,7 +491,7 @@ void LightApp_Module::setPreferenceProperty( const int id, const QString& prop, 
 {
   LightApp_Preferences* pref = preferences();
   if ( pref )
-    pref->setItemProperty( id, prop, var );
+    pref->setItemProperty( prop, var, id );
 }
 
 /*!
@@ -519,7 +581,7 @@ void LightApp_Module::onOperationDestroyed()
     MapOfOperation::const_iterator anIt = myOperations.begin(),
                                    aLast = myOperations.end();
     for( ; anIt!=aLast; anIt++ )
-      if( anIt.data()==op )
+      if( anIt.value()==op )
       {
         myOperations.remove( anIt.key() );
         break;
@@ -562,4 +624,15 @@ void LightApp_Module::onViewManagerAdded( SUIT_ViewManager* )
 */
 void LightApp_Module::onViewManagerRemoved( SUIT_ViewManager* )
 {
+}
+
+/*!
+  \brief Returns instance of operation by its id; if there is no operation
+  corresponding to this id, null pointer is returned
+  \param id - operation id 
+  \return operation instance
+*/
+LightApp_Operation* LightApp_Module::operation( const int id ) const
+{
+  return myOperations.contains( id ) ? myOperations[id] : 0;
 }

@@ -1,32 +1,42 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : Plot2d_Curve.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 #include "Plot2d_Curve.h"
-#include <qcolor.h>
+#include <QColor>
 
 /*!
   Constructor
 */
 Plot2d_Curve::Plot2d_Curve()
 : myHorTitle( "" ), myVerTitle( "" ), 
-myHorUnits( "" ), myVerUnits( "" ), 
-myAutoAssign( true ), myColor( 0,0,0 ), myMarker( Circle ), myLine( Solid ), myLineWidth( 0 ),
-myYAxis( QwtPlot::yLeft )
+  myHorUnits( "" ), myVerUnits( "" ), 
+  myAutoAssign( true ), 
+  myColor( 0,0,0 ), 
+  myMarker( Plot2d::Circle ), 
+  myLine( Plot2d::Solid ), 
+  myLineWidth( 0 ),
+  myYAxis( QwtPlot::yLeft )
 {
 }
 
@@ -166,7 +176,7 @@ void Plot2d_Curve::insertPoint(int thePos, double theX, double theY, const QStri
   aPoint.y = theY;
   aPoint.text = txt;
 
-  QValueList<Plot2d_Point>::iterator aIt;
+  pointList::iterator aIt;
   int aCurrent = 0;
   for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
     if (thePos == aCurrent) {
@@ -183,15 +193,8 @@ void Plot2d_Curve::insertPoint(int thePos, double theX, double theY, const QStri
 */
 void Plot2d_Curve::deletePoint(int thePos)
 {
-  QValueList<Plot2d_Point>::iterator aIt;
-  int aCurrent = 0;
-  for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
-    if (thePos == aCurrent) {
-      myPoints.remove(aIt);
-      return;
-    }
-    aCurrent++;  
-  }
+  if ( thePos >= 0 && thePos < myPoints.count() )
+    myPoints.removeAt( thePos );
 }
 
 /*!
@@ -218,7 +221,7 @@ void Plot2d_Curve::setData( const double* hData, const double* vData, long size,
   clearAllPoints();
   QStringList::const_iterator anIt = lst.begin(), aLast = lst.end(); 
   for( long i = 0; i < size; i++, anIt++ )
-    addPoint( hData[i], vData[i], anIt==aLast ? QString::null : *anIt );
+    addPoint( hData[i], vData[i], anIt==aLast ? QString() : *anIt );
 }
 
 /*!
@@ -299,7 +302,7 @@ QColor Plot2d_Curve::getColor() const
 /*!
   Sets curve's marker ( and resets AutoAssign flag )
 */
-void Plot2d_Curve::setMarker( MarkerType marker )
+void Plot2d_Curve::setMarker( Plot2d::MarkerType marker )
 {
   myMarker = marker;
   myAutoAssign = false;
@@ -308,7 +311,7 @@ void Plot2d_Curve::setMarker( MarkerType marker )
 /*!
   Gets curve's marker
 */
-Plot2d_Curve::MarkerType Plot2d_Curve::getMarker() const
+Plot2d::MarkerType Plot2d_Curve::getMarker() const
 {
   return myMarker;
 }
@@ -320,7 +323,7 @@ Plot2d_Curve::MarkerType Plot2d_Curve::getMarker() const
          algorithm for diagonals. 
          For horizontal and vertical lines a line width of 0 is the same as a line width of 1.
 */
-void Plot2d_Curve::setLine( LineType line, const int lineWidth )
+void Plot2d_Curve::setLine( Plot2d::LineType line, const int lineWidth )
 {
   myLine = line;
   myLineWidth = lineWidth;
@@ -331,7 +334,7 @@ void Plot2d_Curve::setLine( LineType line, const int lineWidth )
 /*!
   Gets curve's line type
 */
-Plot2d_Curve::LineType Plot2d_Curve::getLine() const
+Plot2d::LineType Plot2d_Curve::getLine() const
 {
   return myLine;
 }
@@ -366,7 +369,7 @@ QwtPlot::Axis Plot2d_Curve::getYAxis() const
 */
 double Plot2d_Curve::getMinX() const
 {
-  QValueList<Plot2d_Point>::const_iterator aIt;
+  pointList::const_iterator aIt;
   double aMinX = 1e150;
   //int aCurrent = 0;
   for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
@@ -381,7 +384,7 @@ double Plot2d_Curve::getMinX() const
 */
 double Plot2d_Curve::getMinY() const
 {
-  QValueList<Plot2d_Point>::const_iterator aIt;
+  pointList::const_iterator aIt;
   double aMinY = 1e150;
   //int aCurrent = 0;
   for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
@@ -411,7 +414,7 @@ void Plot2d_Curve::setText( const int ind, const QString& txt )
 QString Plot2d_Curve::text( const int ind ) const
 {
   if( ind<0 || ind>=myPoints.count() )
-    return QString::null;
+    return QString();
   else
     return myPoints[ind].text;
 }

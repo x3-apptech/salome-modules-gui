@@ -1,80 +1,81 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : SalomeApp_DataObject.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 #ifndef SALOMEAPP_DATAOBJECT_H
 #define SALOMEAPP_DATAOBJECT_H
 
 #include "SalomeApp.h"
-
-#include "LightApp_DataObject.h"
-#include "CAM_RootObject.h"
-
-#include "SALOMEDSClient.hxx"
+#include <LightApp_DataObject.h>
+#include <SALOMEDSClient.hxx>
 
 class SalomeApp_Study;
 
-class SALOMEAPP_EXPORT SalomeApp_DataObject : public LightApp_DataObject
+class SALOMEAPP_EXPORT SalomeApp_DataObject : public virtual LightApp_DataObject
 {
 
 public:
-  enum { CT_Value, CT_Entry, CT_IOR, CT_RefEntry };
+  //! Column id
+  enum {
+    ValueId = EntryId + 1,    //!< value column
+    IORId,                    //!< IOR column
+    RefEntryId                //!< reference entry column
+  };
 
 public:
   SalomeApp_DataObject( SUIT_DataObject* = 0 );
   SalomeApp_DataObject( const _PTR(SObject)&, SUIT_DataObject* = 0 );
   virtual ~SalomeApp_DataObject();
-    
-  virtual QString                 name() const;
-  virtual QPixmap                 icon() const;
-  virtual QString                 toolTip() const;
 
-  virtual QString                 text( const int ) const;
-  virtual QColor                  color( const ColorRole ) const;
+  virtual QString        name() const;
+  virtual QString        entry() const;
 
-  virtual QString                 entry() const;
+  virtual QString        text( const int = NameId ) const;
+  virtual QPixmap        icon( const int = NameId ) const;
+  virtual QColor         color( const ColorRole, const int = NameId ) const;
+  virtual QString        toolTip( const int = NameId ) const;
 
-  /*! location of corresponding SALOMEDS::SObject  */
-  virtual _PTR(SObject)           object() const;
+  virtual _PTR(SObject)  object() const;
 
-  bool                            isReference() const;
-  _PTR(SObject)                   referencedObject() const;
+  bool                   isReference() const;
+  _PTR(SObject)          referencedObject() const;
 
-  /*! GEOM, SMESH, VISU, etc.*/
-  virtual QString                 componentDataType() const;
+  virtual QString        componentDataType() const;
 
-private:
-  QString                         ior( const _PTR(SObject)& ) const;
-  QString                         entry( const _PTR(SObject)& ) const;
-  QString                         value( const _PTR(SObject)& ) const;
+  virtual bool           customSorting( const int = NameId ) const;
+  virtual bool           compare( const QVariant&, const QVariant&, const int = NameId ) const;
 
 private:
-  _PTR(SObject)                   myObject;
-  QString                         myEntry;
-  QString                         myName;
+  QString                ior( const _PTR(SObject)& ) const;
+  QString                entry( const _PTR(SObject)& ) const;
+  QString                value( const _PTR(SObject)& ) const;
+
+private:
+  _PTR(SObject)          myObject;
 };
 
-/*!
- * SalomeApp_ModuleObject - class for optimized access to DataModel from
- * SalomeApp_DataObject instances - see also CAM_RootObject.h
- */
-
 class SALOMEAPP_EXPORT SalomeApp_ModuleObject : public SalomeApp_DataObject,
-                                                public CAM_RootObject
+                                                public CAM_ModuleObject
 {
 public:
   SalomeApp_ModuleObject( SUIT_DataObject* = 0 );
@@ -82,45 +83,52 @@ public:
   SalomeApp_ModuleObject( CAM_DataModel*, const _PTR(SObject)&, SUIT_DataObject* = 0 );
   virtual ~SalomeApp_ModuleObject();
 
-  virtual QString                 name() const;
+  virtual QString        name() const;
+  QPixmap                icon( const int = NameId ) const;
+  QString                toolTip( const int = NameId ) const;
 };
 
-/*!
- * SalomeApp_SavePointObject - class that represents persistent visual_state object
- * these objects are stored in data model, but NOT in SObjects structure, so we
- * must handle them separately using this special class for them
- */
+class SALOMEAPP_EXPORT SalomeApp_RootObject : public SalomeApp_DataObject,
+                                              public LightApp_RootObject
+{
+public:
+  SalomeApp_RootObject( LightApp_Study* );
+  virtual ~SalomeApp_RootObject();
+
+  QString                name() const;
+  QString                entry() const;
+  QString                text( const int = NameId ) const;
+  QPixmap                icon( const int = NameId ) const;
+  QColor                 color( const ColorRole, const int = NameId ) const;
+  QString                toolTip( const int = NameId ) const;
+};
 
 class SALOMEAPP_EXPORT SalomeApp_SavePointObject : public virtual LightApp_DataObject
 {
 public:
-  SalomeApp_SavePointObject( SUIT_DataObject* parent, const int, SalomeApp_Study* study );
+  SalomeApp_SavePointObject( SUIT_DataObject*, const int, SalomeApp_Study* );
   virtual ~SalomeApp_SavePointObject();
-  
-  virtual QString                 entry() const;
 
-  virtual QString                 name() const;
-  virtual QPixmap                 icon() const;
-  virtual QString                 toolTip() const;
+  virtual QString        name() const;
+  virtual QString        entry() const;
 
-  int                             getId() const;
+  virtual QPixmap        icon( const int = NameId ) const;
+  virtual QString        toolTip( const int = NameId ) const;
+
+  int                    getId() const;
 
 private:
-  int                             myId;
-  SalomeApp_Study*                myStudy;
+  int                    myId;
+  SalomeApp_Study*       myStudy;
 };
-
-/*!
- * SalomeApp_SavePointRootObject - class that represents parent object for visual_state objects
- */
 
 class SALOMEAPP_EXPORT SalomeApp_SavePointRootObject : public SUIT_DataObject
 {
 public:
-  SalomeApp_SavePointRootObject( SUIT_DataObject* parent ) : SUIT_DataObject( parent ) {}
-  
-  virtual QString                 name() const   { return QObject::tr( "SAVE_POINT_ROOT_NAME" ); }
-  virtual QString                 toolTip() const{ return QObject::tr( "SAVE_POINT_ROOT_TOOLTIP" ); }
+  SalomeApp_SavePointRootObject( SUIT_DataObject* );
+
+  virtual QString        name() const;
+  virtual QString        toolTip( const int = NameId ) const;
 };
 
 #endif

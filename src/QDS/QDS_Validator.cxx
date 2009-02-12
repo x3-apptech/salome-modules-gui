@@ -1,34 +1,42 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "QDS_Validator.h"
 
 /*!
   \class QDS_IntegerValidator
+  \brief A validator for integer values.
 
-  This class to provide validation of user inputted string for datum with 'Integer'
+  This class provides validation of the strings entered by the user for datum with 'Integer'
   value type according to datum properties: minimum value, maximum value, filter.
 
-  Inherits from QIntValidator.
+  Inherits QIntValidator.
 */
 
 /*!
-  Constructor. Create empty validator object.
+  \brief Constructor.
+
+  Create empty validator object.
+
+  \param p parent object
 */
 QDS_IntegerValidator::QDS_IntegerValidator( QObject* p )
 : QIntValidator( p )
@@ -36,29 +44,42 @@ QDS_IntegerValidator::QDS_IntegerValidator( QObject* p )
 }
 
 /*!
-  Constructor. Create validator object with filter string \af.
+  \brief Constructor.
+  
+  Create validator object with filter string \a f.
+
+  \param f filter string
+  \param p parent object
 */
 QDS_IntegerValidator::QDS_IntegerValidator( const QString& f, QObject* p )
 : QIntValidator( p ),
-myFilter( f )
+  myFilter( f )
 {
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_IntegerValidator::~QDS_IntegerValidator()
 {
 }
 
 /*!
-  Validate the inputed string \ainput. Reimplemented from QIntValidator. Perform
-  standard check by QIntValidator::validate(). If returned state is not Invalid and
-  filter specified then perform validation with filter by QRegExpValidator.
+  \brief Validate the entered string \a input. 
 
-  Returns Invalid if input is invalid according to this validator's rules,
-  Intermediate if it is likely that a little more editing will make the input acceptable
-  and Acceptable if the input is valid.
+  Reimplemented from QIntValidator. 
+  
+  Perform standard check by QIntValidator::validate(). If returned state 
+  is not \c QValidator::Invalid and filter is specified then perform validation
+  with filter by QRegExpValidator.
+
+  Returns \c QValidator::Invalid if input is invalid according to this validator's rules,
+  \c QValidator::Intermediate if it is likely that a little more editing will make the
+  input acceptable and \c QValidator::Acceptable if the input is valid.
+
+  \param input string being validated
+  \param pos cursor position
+  \return validation state (\c QValidator::State)
 */
 QValidator::State QDS_IntegerValidator::validate( QString& input, int& pos ) const
 {
@@ -67,22 +88,27 @@ QValidator::State QDS_IntegerValidator::validate( QString& input, int& pos ) con
   if ( ivState != Invalid && !myFilter.isEmpty() )
     rgState = QRegExpValidator( QRegExp( myFilter ), 0 ).validate( input, pos );
 
-  ivState = QMIN( ivState, rgState );
+  ivState = qMin( ivState, rgState );
 
   return ivState;
 }
 
 /*!
   \class QDS_DoubleValidator
+  \brief A validator for floating point values.
 
-  This class to provide validation of user inputted string for datum with 'Float'
+  This class provides validation of the strings entered by the user for datum with 'Float'
   value type according to datum properties: minimum value, maximum value, precision, filter.
 
-  Inherits from QDoubleValidator.
+  Inherits QDoubleValidator.
 */
 
 /*!
-  Constructor. Create empty validator object.
+  \brief Constructor.
+  
+  Create empty validator object.
+  
+  \param p parent object
 */
 QDS_DoubleValidator::QDS_DoubleValidator( QObject* p )
 : QDoubleValidator( p )
@@ -90,29 +116,42 @@ QDS_DoubleValidator::QDS_DoubleValidator( QObject* p )
 }
 
 /*!
-  Constructor. Create validator object with filter string \af.
+  \brief Constructor.
+  
+  Create validator object with filter string \a f.
+  
+  \param f filter string
+  \param p parent object
 */
 QDS_DoubleValidator::QDS_DoubleValidator( const QString& f, QObject* p )
 : QDoubleValidator( p ),
-myFilter( f )
+  myFilter( f )
 {
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_DoubleValidator::~QDS_DoubleValidator()
 {
 }
 
 /*!
-  Validate the inputed string \ainput. Reimplemented from QDoubleValidator. Perform
-  standard check by QDoubleValidator::validate(). If returned state is not Invalid and
-  filter specified then perform validation with filter by QRegExpValidator.
+  \brief Validate the entered string \a input. 
 
-  Returns Invalid if input is invalid according to this validator's rules,
-  Intermediate if it is likely that a little more editing will make the input acceptable
-  and Acceptable if the input is valid.
+  Reimplemented from QDoubleValidator. 
+  
+  Perform standard check by QDoubleValidator::validate(). If returned state 
+  is not \c QValidator::Invalid and filter is specified then perform validation
+  with filter by QRegExpValidator.
+
+  Returns \c QValidator::Invalid if input is invalid according to this validator's rules,
+  \c QValidator::Intermediate if it is likely that a little more editing will make the
+  input acceptable and \c QValidator::Acceptable if the input is valid.
+
+  \param input string being validated
+  \param pos cursor position
+  \return validation state (\c QValidator::State)
 */
 QValidator::State QDS_DoubleValidator::validate( QString& input, int& pos ) const
 {
@@ -121,59 +160,78 @@ QValidator::State QDS_DoubleValidator::validate( QString& input, int& pos ) cons
   if ( dvState != Invalid && !myFilter.isEmpty() )
     rgState = QRegExpValidator( QRegExp( myFilter ), 0 ).validate( input, pos );
 
-  dvState = QMIN( dvState, rgState );
+  dvState = qMin( dvState, rgState );
 
   return dvState;
 }
 
 /*!
   \class QDS_StringValidator
+  \brief A validator for string values.
 
-  This class to provide validation of user inputted string for datum with 'String'
+  This class provides validation of the strings entered by the user for datum with 'String'
   value type according to datum properties: format, filter.
 
-  Inherits from QDoubleValidator.
+  Inherits from QValidator.
 */
 
 /*!
-  Constructor. Create empty validator object.
+  \brief Constructor.
+
+  Create empty validator object.
+
+  \param p parent object
 */
 QDS_StringValidator::QDS_StringValidator( QObject* p ) 
 : QValidator( p ), 
-myLen( -1 ) 
+  myLen( -1 ) 
 {
 }
 
 /*!
-  Constructor. Create validator object with filter string \af.
+  \brief Constructor. 
+
+  Create validator object with filter string \a f.
+
+  \param f filter string
+  \param p parent object
 */
 QDS_StringValidator::QDS_StringValidator( const QString& f, QObject* p ) 
 : QValidator( p ), 
-myFlags( f ), 
-myLen( -1 ) 
+  myFlags( f ), 
+  myLen( -1 ) 
 {
 }
 
 /*!
-  Constructor. Create validator object with filter string \aft and format flags \afg.
+  \brief Constructor.
+
+  Create validator object with filter string \a ft and format flags \a fg.
+  \param ft filter string
+  \param fg format string
+  \param p parent object
 */
 QDS_StringValidator::QDS_StringValidator( const QString& ft, const QString& fg, QObject* p ) 
 : QValidator( p ), 
-myLen( -1 ), 
-myFilter( ft ), 
-myFlags( fg ) 
+  myLen( -1 ), 
+  myFilter( ft ), 
+  myFlags( fg ) 
 {
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_StringValidator::~QDS_StringValidator() 
 {
 }
 
 /*!
-  Returns valid string length. If length not specified -1 returned.
+  \brief Get maximum valid string length.
+
+  If maximum length is not specified, -1 is returned.
+
+  \return maximum string length
 */
 int QDS_StringValidator::length() const 
 { 
@@ -181,8 +239,12 @@ int QDS_StringValidator::length() const
 }
 
 /*!
-  Sets the valid string length \al. If value less than zero valid string
-  length not specified.
+  \brief Set maximum valid string length.
+
+  If l <= 0 is not specified, maximum valid length is reset
+  (any string length is valid).
+
+  \param l maximum strin length
 */
 void QDS_StringValidator::setLength( const int l )
 {
@@ -190,14 +252,22 @@ void QDS_StringValidator::setLength( const int l )
 }
 
 /*!
-  Validate the inputed string \ainput. Reimplemented from QValidator. Convert specified
-  string to upper/lower case if the format flags contains specificator 'u'/'l'.
-  If valid string lenght is specified then check given string length. If
-  filter specified then perform validation with filter by QRegExpValidator.
+  \brief Validate the entered string \a input. 
 
-  Returns Invalid if input is invalid according to this validator's rules,
-  Intermediate if it is likely that a little more editing will make the input acceptable
-  and Acceptable if the input is valid.
+  Reimplemented from QValidator. 
+  
+  Convert specified string to the upper/lower case if the format flags contains
+  specificator 'u'/'l' correspondingly.  If valid string length is specified,
+  then check given string length. If filter is specified, then perform also 
+  validation with filter by QRegExpValidator.
+
+  Returns \c QValidator::Invalid if input is invalid according to this validator's rules,
+  \c QValidator::Intermediate if it is likely that a little more editing will make the
+  input acceptable and \c QValidator::Acceptable if the input is valid.
+
+  \param input string being validated
+  \param pos cursor position
+  \return validation state (\c QValidator::State)
 */
 QValidator::State QDS_StringValidator::validate( QString& input, int& pos ) const
 {
@@ -205,10 +275,10 @@ QValidator::State QDS_StringValidator::validate( QString& input, int& pos ) cons
     return Acceptable;
 
   QString orig = input;
-  if ( myFlags.contains( 'u', false ) )
-    input = input.upper();
-  if ( myFlags.contains( 'l', false ) )
-    input = input.lower();
+  if ( myFlags.contains( 'u', Qt::CaseInsensitive ) )
+    input = input.toUpper();
+  if ( myFlags.contains( 'l', Qt::CaseInsensitive ) )
+    input = input.toLower();
 
   State rgState = Acceptable;
   State svState = orig == input ? Acceptable : Intermediate;
@@ -219,7 +289,7 @@ QValidator::State QDS_StringValidator::validate( QString& input, int& pos ) cons
   if ( !myFilter.isEmpty() )
     rgState = QRegExpValidator( QRegExp( myFilter ), 0 ).validate( input, pos );
 
-  svState = QMIN( svState, rgState );
+  svState = qMin( svState, rgState );
 
   return svState;
 }

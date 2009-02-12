@@ -1,38 +1,45 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : 
 //  Author : 
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SVTK_RenderWindowInteractor.h"
-#include "SVTK_GenericRenderWindowInteractor.h"
+//#include "SVTK_GenericRenderWindowInteractor.h"
 
 #include "SVTK_InteractorStyle.h"
 #include "SVTK_Renderer.h"
 #include "SVTK_Functor.h"
 #include "SALOME_Actor.h"
+
+// QT Includes
+// Put Qt includes before the X11 includes which #define the symbol None
+// (see SVTK_SpaceMouse.h) to avoid the compilation error.
+#ifndef WIN32
+# include <QX11Info>
+#endif
+#include <QMouseEvent>
 
 #include "SVTK_SpaceMouse.h" 
 #include "SVTK_Event.h" 
@@ -49,12 +56,6 @@
 #include <vtkPicker.h>
 #include <vtkCamera.h>
 
-// QT Includes
-#include <qtimer.h>
-#include <qapplication.h>
-#include <qcolordialog.h>
-#include <qpaintdevice.h>
-
 using namespace std;
 
 static bool GENERATE_SUIT_EVENTS = false;
@@ -67,16 +68,21 @@ static bool FOCUS_UNDER_MOUSE = false;
 QVTK_RenderWindowInteractor
 ::QVTK_RenderWindowInteractor(QWidget* theParent, 
 			      const char* theName):
-  QWidget(theParent,theName,Qt::WNoAutoErase),
+  QWidget(theParent),
   myRenderWindow(vtkRenderWindow::New())
 {
+  setAttribute( Qt::WA_PaintOnScreen );
+  setAttribute( Qt::WA_NoSystemBackground );
+
+  setObjectName(theName);
+
   setMouseTracking(true);
 
   myRenderWindow->Delete();
   myRenderWindow->DoubleBufferOn();
 
-#ifndef WNT
-  myRenderWindow->SetDisplayId((void*)x11Display());
+#ifndef WIN32
+  myRenderWindow->SetDisplayId((void*)QX11Info::display());
 #endif
   myRenderWindow->SetWindowId((void*)winId());
 }
@@ -106,7 +112,7 @@ QVTK_RenderWindowInteractor
 #ifndef WIN32
   SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance();
   if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
-    aSpaceMouse->close( x11Display() );
+    aSpaceMouse->close( QX11Info::display() );
 #endif
 }
 
@@ -240,8 +246,8 @@ QVTK_RenderWindowInteractor
 {
   GetDevice()->SetEventInformationFlipY(event->x(), 
 					event->y(),
-					event->state() & ControlButton,
-					event->state() & ShiftButton);
+					event->modifiers() & Qt::ControlModifier,
+					event->modifiers() & Qt::ShiftModifier);
   GetDevice()->MouseMoveEvent();
 }
 
@@ -255,13 +261,13 @@ QVTK_RenderWindowInteractor
 {
   GetDevice()->SetEventInformationFlipY(event->x(), 
 					event->y(),
-					event->state() & ControlButton,
-					event->state() & ShiftButton);
-  if( event->button() & LeftButton )
+					event->modifiers() & Qt::ControlModifier,
+					event->modifiers() & Qt::ShiftModifier);
+  if( event->button() & Qt::LeftButton )
     GetDevice()->LeftButtonPressEvent();
-  else if( event->button() & MidButton )
+  else if( event->button() & Qt::MidButton )
     GetDevice()->MiddleButtonPressEvent();
-  else if( event->button() & RightButton )
+  else if( event->button() & Qt::RightButton )
     GetDevice()->RightButtonPressEvent();
 }
 
@@ -275,14 +281,14 @@ QVTK_RenderWindowInteractor
 {
   GetDevice()->SetEventInformationFlipY(event->x(), 
 					event->y(),
-					event->state() & ControlButton,
-					event->state() & ShiftButton);
+					event->modifiers() & Qt::ControlModifier,
+					event->modifiers() & Qt::ShiftModifier);
 
-  if( event->button() & LeftButton )
+  if( event->button() & Qt::LeftButton )
     GetDevice()->LeftButtonReleaseEvent();
-  else if( event->button() & MidButton )
+  else if( event->button() & Qt::MidButton )
     GetDevice()->MiddleButtonReleaseEvent();
-  else if( event->button() & RightButton )
+  else if( event->button() & Qt::RightButton )
     GetDevice()->RightButtonReleaseEvent();
 }
 
@@ -303,7 +309,7 @@ void
 QVTK_RenderWindowInteractor
 ::wheelEvent( QWheelEvent* event )
 {
-  setActiveWindow();
+  activateWindow();
   setFocus();
 }
 
@@ -315,8 +321,8 @@ void
 QVTK_RenderWindowInteractor
 ::keyPressEvent( QKeyEvent* event ) 
 {
-  GetDevice()->SetKeyEventInformation(event->state() & ControlButton,
-				      event->state() & ShiftButton,
+  GetDevice()->SetKeyEventInformation(event->modifiers() & Qt::ControlModifier,
+				      event->modifiers() & Qt::ShiftModifier,
 				      event->key());
   GetDevice()->KeyPressEvent();
   GetDevice()->CharEvent();
@@ -329,8 +335,8 @@ void
 QVTK_RenderWindowInteractor
 ::keyReleaseEvent( QKeyEvent * event ) 
 {
-  GetDevice()->SetKeyEventInformation(event->state() & ControlButton,
-				      event->state() & ShiftButton,
+  GetDevice()->SetKeyEventInformation(event->modifiers() & Qt::ControlModifier,
+				      event->modifiers() & Qt::ShiftModifier,
 				      event->key());
   GetDevice()->KeyReleaseEvent();
 }
@@ -344,7 +350,7 @@ QVTK_RenderWindowInteractor
 ::enterEvent( QEvent* event )
 {
   if(FOCUS_UNDER_MOUSE){
-    setActiveWindow();
+    activateWindow();
     setFocus();
   }
   GetDevice()->EnterEvent();
@@ -378,9 +384,9 @@ QVTK_RenderWindowInteractor
   {
     if ( !aSpaceMouse->isSpaceMouseOn() )
       // initialize 3D space mouse driver 
-      aSpaceMouse->initialize( x11Display(), winId() );
+      aSpaceMouse->initialize( QX11Info::display(), winId() );
     else
-      aSpaceMouse->setWindow( x11Display(), winId() );
+      aSpaceMouse->setWindow( QX11Info::display(), winId() );
   }
 #endif
 }
@@ -399,7 +405,7 @@ QVTK_RenderWindowInteractor
   // unregister set space mouse events receiver
   SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance();
   if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
-    aSpaceMouse->setWindow( x11Display(), 0 );
+    aSpaceMouse->setWindow( QX11Info::display(), 0 );
 #endif
 }
 
@@ -409,10 +415,10 @@ QVTK_RenderWindowInteractor
 /*!
   To handle native Win32 events (from such devices as SpaceMouse)
 */
-bool QVTK_RenderWindowInteractor::winEvent( MSG* msg )
+bool QVTK_RenderWindowInteractor::winEvent( MSG* msg, long* result )
 {
   // TODO: Implement event handling for SpaceMouse
-  return QWidget::winEvent( msg );
+  return QWidget::winEvent( msg, result);
 }
 
 #else
@@ -430,7 +436,7 @@ QVTK_RenderWindowInteractor
     if ( aSpaceMouse->isSpaceMouseOn() && xEvent->type == ClientMessage )
     {
       SVTK_SpaceMouse::MoveEvent anEvent;
-      int type = aSpaceMouse->translateEvent( x11Display(), xEvent, &anEvent, 1.0, 1.0 );
+      int type = aSpaceMouse->translateEvent( QX11Info::display(), xEvent, &anEvent, 1.0, 1.0 );
       switch ( type )
       {
       case SVTK_SpaceMouse::SpaceMouseMove:
@@ -706,8 +712,22 @@ void
 SVTK_RenderWindowInteractor
 ::mouseReleaseEvent( QMouseEvent *event )
 {
+  bool aRightBtn = event->button() == Qt::RightButton;
+  bool isOperation = false;
+  if( aRightBtn && GetInteractorStyle()) {
+    SVTK_InteractorStyle* style = dynamic_cast<SVTK_InteractorStyle*>( GetInteractorStyle() );
+    if ( style )
+      isOperation = style->CurrentState() != VTK_INTERACTOR_STYLE_CAMERA_NONE;
+  }
+
   QVTK_RenderWindowInteractor::mouseReleaseEvent(event);
 
+  if ( aRightBtn && !isOperation && !( event->modifiers() & Qt::ControlModifier ) &&
+       !( event->modifiers() & Qt::ShiftModifier ) ) {
+    QContextMenuEvent aEvent( QContextMenuEvent::Mouse,
+                              event->pos(), event->globalPos() );
+    emit contextMenuRequested( &aEvent );
+  }
   if(GENERATE_SUIT_EVENTS)
     emit MouseButtonReleased( event );
 }
@@ -771,13 +791,3 @@ SVTK_RenderWindowInteractor
     emit KeyReleased( event );
 }
 
-/*!
-  Custom context menu event handler
-*/
-void
-SVTK_RenderWindowInteractor
-::contextMenuEvent( QContextMenuEvent* event )
-{
-  if( !( event->state() & KeyButtonMask ) )
-    emit contextMenuRequested( event );
-}

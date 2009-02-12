@@ -1,47 +1,45 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxActionMgr.h
-// Author:    Alexander SOLOVYEV, Sergey TELKOV
-
+// Author:    Alexander SOLOVYOV, Sergey TELKOV
+//
 #ifndef QTXACTIONMGR_H
 #define QTXACTIONMGR_H
 
 #include "Qtx.h"
 
-#include <qmap.h>
-#include <qobject.h>
-#include <qguardedptr.h>
+#include <QMap>
+#include <QObject>
+#include <QPointer>
 
+class QTimer;
 class QAction;
 class QDomNode;
-
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
 
-/*!
-  \class QtxActionMgr
-  Contains set of actions accessible by id.
-  Base class for menu, popup creators and other action containers.
-*/
 class QTX_EXPORT QtxActionMgr : public QObject
 {
   Q_OBJECT 
@@ -68,7 +66,7 @@ public:
 
   int              count() const;
   bool             isEmpty() const;
-  void             idList( QIntList& ) const;
+  QIntList         idList() const;
 
   bool             isUpdatesEnabled() const;
   virtual void     setUpdatesEnabled( const bool );
@@ -87,23 +85,26 @@ protected:
   virtual void     internalUpdate();
   int              generateId() const;
 
-private:
-  typedef QGuardedPtr<QAction> ActionPtr;
-  typedef QMap<int, ActionPtr> ActionMap;
+  void             triggerUpdate();
+  virtual void     updateContent();
+
+private slots:
+  void             onUpdateContent();
 
 private:
-  bool             myUpdate;
-  ActionMap        myActions;
+  typedef QPointer<QAction>    ActionPtr; //!< Action guarded pointer
+  typedef QMap<int, ActionPtr> ActionMap; //!< Actions map
+
+private:
+  bool             myUpdate;     //!< update flag
+  ActionMap        myActions;    //!< actions map
+  QTimer*          myUpdTimer;   //!< update timer
 };
 
 
-QTX_EXPORT typedef QMap<QString, QString> ItemAttributes;
+QTX_EXPORT typedef QMap<QString, QString> ItemAttributes; //!< attributes map
 
-/*!
-  \class QtxActionMgr::Creator
-  Allows to fill automatically action manager with actions created by data from file
-*/
-class QtxActionMgr::Creator
+class QTX_EXPORT QtxActionMgr::Creator
 {
 public:
   Creator( QtxActionMgr::Reader* );
@@ -111,57 +112,47 @@ public:
 
   Reader* reader() const;
 
-  virtual int append( const QString&, const bool,
-                      const ItemAttributes&, const int ) = 0;
-  virtual void connect( QAction* ) const;
+  virtual int    append( const QString&, const bool,
+			 const ItemAttributes&, const int ) = 0;
+  virtual void   connect( QAction* ) const;
 
-  virtual bool loadPixmap( const QString&, QPixmap& ) const;
+  virtual bool   loadPixmap( const QString&, QPixmap& ) const;
 
 protected:
   static int     intValue( const ItemAttributes&, const QString&, const int );
   static QString strValue( const ItemAttributes&, const QString&,
-                                      const QString& = QString::null );
+			   const QString& = QString() );
 private:
-  QtxActionMgr::Reader*  myReader;
+  QtxActionMgr::Reader*  myReader;  //!< actions reader
 };
 
-/*!
-  \class QtxActionMgr::Reader
-  This class is used to read files of some format
-  to create actions and to fill action manager automatically
-*/
-class QtxActionMgr::Reader
+class QTX_EXPORT QtxActionMgr::Reader
 {
 public:
-  QTX_EXPORT Reader();
-  QTX_EXPORT virtual ~Reader();
+  Reader();
+  virtual ~Reader();
 
-  QTX_EXPORT QStringList  options() const;
-  QTX_EXPORT QString      option( const QString&, const QString& = QString::null ) const;
-  QTX_EXPORT void         setOption( const QString&, const QString& );
+  QStringList    options() const;
+  QString        option( const QString&, const QString& = QString() ) const;
+  void           setOption( const QString&, const QString& );
 
-  QTX_EXPORT virtual bool read( const QString&, Creator& ) const = 0;
+  virtual bool   read( const QString&, Creator& ) const = 0;
 
 private:
-  QMap< QString, QString > myOptions;
+  QMap< QString, QString > myOptions;  //!< options map
 };
 
-/*!
-  \class QtxActionMgr::Reader
-  This class is used to read files of XML format
-  to create actions and to fill action manager automatically
-*/
-class QtxActionMgr::XMLReader : public Reader
+class QTX_EXPORT QtxActionMgr::XMLReader : public Reader
 {
 public:
-  QTX_EXPORT XMLReader( const QString&, const QString&, const QString& );
-  QTX_EXPORT virtual ~XMLReader();
+  XMLReader( const QString&, const QString&, const QString& );
+  virtual ~XMLReader();
 
-  QTX_EXPORT virtual bool read( const QString&, Creator& ) const;
+  virtual bool   read( const QString&, Creator& ) const;
 
 protected:
-  QTX_EXPORT virtual void read( const QDomNode&, const int, Creator& ) const;
-  QTX_EXPORT virtual bool isNodeSimilar( const QDomNode&, const QString& ) const;
+  virtual void   read( const QDomNode&, const int, Creator& ) const;
+  virtual bool   isNodeSimilar( const QDomNode&, const QString& ) const;
 };
 
 

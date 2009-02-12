@@ -1,40 +1,36 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      SalomeApp_DataModel.cxx
 // Created:   10/25/2004 10:36:06 AM
 // Author:    Sergey LITONIN
-// Copyright (C) CEA 2004
-
+//
 #include "SalomeApp_DataModel.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_DataObject.h"
 #include "SalomeApp_Module.h"
 #include "SalomeApp_Application.h"
-#include "SalomeApp_Engine_i.hxx"
-
-#include "LightApp_RootObject.h"
 
 #include <CAM_DataObject.h>
 
-#include <SUIT_Application.h>
-#include <SUIT_ResourceMgr.h>
-#include <SUIT_Session.h>
 #include <SUIT_TreeSync.h>
 #include <SUIT_DataObjectIterator.h>
 
@@ -53,16 +49,18 @@ class SalomeApp_DataModelSync
 public:
   SalomeApp_DataModelSync( _PTR( Study ), SUIT_DataObject* );
 
-  suitPtr  createItem( const kerPtr&, const suitPtr&, const suitPtr&, const bool ) const;
-  void     deleteItemWithChildren( const suitPtr& ) const;
-  bool     isEqual( const kerPtr&, const suitPtr& ) const;
-  kerPtr   nullSrc() const;
-  suitPtr  nullTrg() const;
-  void     children( const kerPtr&, QValueList<kerPtr>& ) const;
-  void     children( const suitPtr&, QValueList<suitPtr>& ) const;
-  suitPtr  parent( const suitPtr& ) const;
-  bool     isCorrect( const kerPtr& ) const;
-  void     updateItem( const kerPtr&, const suitPtr& ) const;
+  bool           isEqual( const kerPtr&, const suitPtr& ) const;
+  kerPtr         nullSrc() const;
+  suitPtr        nullTrg() const;
+  suitPtr        createItem( const kerPtr&, const suitPtr&, const suitPtr& ) const;
+  void           updateItem( const kerPtr&, const suitPtr& ) const;
+  void           deleteItemWithChildren( const suitPtr& ) const;
+  QList<kerPtr>  children( const kerPtr& ) const;
+  QList<suitPtr> children( const suitPtr& ) const;
+  suitPtr        parent( const suitPtr& ) const;
+
+private:
+  bool           isCorrect( const kerPtr& ) const;
 
 private:
   _PTR( Study )     myStudy;
@@ -105,8 +103,7 @@ bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
 */
 suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
 					     const suitPtr& parent,
-					     const suitPtr& after,
-					     const bool prepend ) const
+					     const suitPtr& after ) const
 {
   if( !isCorrect( so ) )
     return 0;
@@ -114,23 +111,13 @@ suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
   _PTR(SComponent) aSComp( so );
   suitPtr nitem = aSComp ? new SalomeApp_ModuleObject( aSComp, 0 ) :
                            new SalomeApp_DataObject( so, 0 );
-  if( parent )
-    if( after )
-    {
-      DataObjectList ch;
-      parent->children( ch );
-      int pos = ch.find( after );
-      if( pos>=0 )
-	parent->insertChild( nitem, pos+1 );
-      else
-	parent->appendChild( nitem );
-    }
-    else if( prepend )
-      parent->insertChild( nitem, 0 );
-    else // append
-      parent->appendChild( nitem );
-  else if( myRoot )
+  if( parent ) {
+    int pos = after ? parent->childPos( after ) : 0;
+    parent->insertChild( nitem, pos+1 );
+  }
+  else if( myRoot ) {
     myRoot->appendChild( nitem );
+  }
   return nitem;
 }
 
@@ -180,7 +167,7 @@ kerPtr SalomeApp_DataModelSync::nullSrc() const
 */
 suitPtr SalomeApp_DataModelSync::nullTrg() const
 {
-  return suitPtr( 0 );
+  return 0;
 }
 
 /*!
@@ -188,12 +175,14 @@ suitPtr SalomeApp_DataModelSync::nullTrg() const
   \param obj - kernel object
   \param ch - list to be filled
 */
-void SalomeApp_DataModelSync::children( const kerPtr& obj, QValueList<kerPtr>& ch ) const
+QList<kerPtr> SalomeApp_DataModelSync::children( const kerPtr& obj ) const
 {
-  ch.clear();
+  QList<kerPtr> ch;
+
   _PTR(ChildIterator) it ( myStudy->NewChildIterator( obj ) );
   for( ; it->More(); it->Next() )
     ch.append( it->Value() );
+  return ch;
 }
 
 /*!
@@ -201,16 +190,12 @@ void SalomeApp_DataModelSync::children( const kerPtr& obj, QValueList<kerPtr>& c
   \param p - SUIT object
   \param ch - list to be filled
 */
-void SalomeApp_DataModelSync::children( const suitPtr& p, QValueList<suitPtr>& ch ) const
+QList<suitPtr> SalomeApp_DataModelSync::children( const suitPtr& p ) const
 {
-  DataObjectList l;
-  if( p )
-  {
-    p->children( l );
-    ch.clear();
-    for( SUIT_DataObject* o = l.first(); o; o = l.next() )
-      ch.append( o );
-  }
+  QList<suitPtr> ch;
+  if ( p )
+    ch = p->children();
+  return ch;
 }
 
 /*!
@@ -244,7 +229,7 @@ void showTree( SUIT_DataObject* root )
   {
     QString marg; marg.fill( ' ', 3*it.depth() );
     QString nnn = "%1 '%2'";
-    qDebug( nnn.arg( marg ).arg( it.current()->name() ) );
+    qDebug( nnn.arg( marg ).arg( it.current()->name() ).toLatin1() );
   }
 }
 
@@ -277,7 +262,7 @@ bool SalomeApp_DataModel::open( const QString& name, CAM_Study* study, QStringLi
     return true; // Probably nothing to load
 
   _PTR(Study)      aStudy ( aDoc->studyDS() ); // shared_ptr cannot be used here
-  _PTR(SComponent) aSComp ( aStudy->FindComponentID( std::string( anId.latin1() ) ) );
+  _PTR(SComponent) aSComp ( aStudy->FindComponentID( std::string( anId.toLatin1() ) ) );
   if ( aSComp )
     updateTree( aSComp, aDoc );
 
@@ -312,7 +297,7 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       QString anId = getRootEntry( aSStudy );
       if ( !anId.isEmpty() ){ // if nothing is published in the study for this module -> do nothing
 	_PTR(Study) aStudy ( aSStudy->studyDS() );
-	sobj = aStudy->FindComponentID( std::string( anId.latin1() ) );
+	sobj = aStudy->FindComponentID( std::string( anId.toLatin1() ) );
       }
     }
   }
@@ -323,7 +308,7 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       if ( aSStudy ) {
         _PTR(Study) aStudy ( aSStudy->studyDS() );
         // modelRoot->object() cannot be reused here: it is about to be deleted by buildTree() soon
-        sobj = aStudy->FindComponentID( std::string( modelRoot->entry().latin1() ) );
+        sobj = aStudy->FindComponentID( std::string( modelRoot->entry().toLatin1() ) );
       }
     }
   }
@@ -408,7 +393,7 @@ QString SalomeApp_DataModel::getRootEntry( SalomeApp_Study* study ) const
       anEntry = anObj->entry();
   }
   else if ( study && study->studyDS() ) { // this works even if <myRoot> is null
-    _PTR(SComponent) aSComp( study->studyDS()->FindComponent( module()->name() ) );
+    _PTR(SComponent) aSComp( study->studyDS()->FindComponent( module()->name().toStdString() ) );
     if ( aSComp )
       anEntry = aSComp->GetID().c_str();
   }

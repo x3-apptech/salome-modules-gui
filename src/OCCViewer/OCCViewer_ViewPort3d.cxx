@@ -1,32 +1,40 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "OCCViewer_ViewPort3d.h"
 
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewWindow.h"
+#include "OCCViewer_ViewModel.h"
 
-#include <qrect.h>
-#include <qevent.h>
-#include <qapplication.h>
+#include <SUIT_ViewManager.h>
+
+#include <QColor>
+#include <QRect>
+#include <QPaintEvent>
+#include <QResizeEvent>
+#include <QApplication>
 
 #include <Visual3d_View.hxx>
+#include <V3d_Viewer.hxx>
 #include <V3d_PerspectiveView.hxx>
 #include <V3d_OrthographicView.hxx>
 
@@ -49,7 +57,8 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
 : OCCViewer_ViewPort( parent ),
 myScale( 1.0 ),
 myDegenerated( true ),
-myAnimate( false )
+myAnimate( false ),
+myBusy( true )
 {
   selectVisualId();
 
@@ -107,6 +116,16 @@ bool OCCViewer_ViewPort3d::mapView( const Handle(V3d_View)& view )
 		if ( view != activeView() )
 	    view->View()->Deactivate();
 	}
+
+  /* create static trihedron (16551: EDF PAL 501) */
+  OCCViewer_ViewWindow* aVW = dynamic_cast<OCCViewer_ViewWindow*>( parentWidget() );
+  if ( aVW ){
+    OCCViewer_Viewer* aViewModel = dynamic_cast<OCCViewer_Viewer*>( aVW->getViewManager()->getViewModel() );
+    if ( aViewModel && aViewModel->isStaticTrihedronDisplayed() ){
+      view->ZBufferTriedronSetup();
+      view->TriedronDisplay( Aspect_TOTP_LEFT_LOWER, Quantity_NOC_WHITE, 0.05, V3d_ZBUFFER );
+    }
+  }
   return true;
 }
 
@@ -253,10 +272,10 @@ void OCCViewer_ViewPort3d::setBackgroundColor( const QColor& color )
 {
 	if ( !activeView().IsNull() )
 	{
-		activeView()->SetBackgroundColor( Quantity_TOC_RGB, color.red()/255.,
-                										  color.green()/255., color.blue()/255.);
-		activeView()->Update();
-    emit vpChangeBGColor( color );
+	  activeView()->SetBackgroundColor( Quantity_TOC_RGB, color.red()/255.,
+					    color.green()/255., color.blue()/255.);
+	  activeView()->Update();
+	  emit vpChangeBGColor( color );
 	}
 }
 
@@ -441,6 +460,7 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 		    activeView()->Redraw( rc.x(), rc.y(), rc.width(), rc.height() );
 	}
 	OCCViewer_ViewPort::paintEvent( e );
+	myBusy = false;
 }
 
 /*!
@@ -463,7 +483,7 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 */
 void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
 {
-	if ( activeView().IsNull() )
+  if ( activeView().IsNull() )
     return;
 
 

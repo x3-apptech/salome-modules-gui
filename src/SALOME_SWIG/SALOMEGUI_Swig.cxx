@@ -1,71 +1,94 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
+// File   : SALOMEGUI_Swig.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
-//  File   : SALOMEGUI_Swig.cxx
-//  Author : Vadim SANDLER
-//  Module : SALOME
-//  $Header$
-
 #include "SALOMEGUI_Swig.hxx"
 
-#include "SUIT_Session.h"
-#include "SUIT_Desktop.h"
-#include "SUIT_DataObjectIterator.h"
-#include "OB_Browser.h"
-#include "SalomeApp_Application.h"
-#include "SalomeApp_Study.h"
-#include "SalomeApp_Module.h"
-#include "SalomeApp_DataObject.h"
-#include "LightApp_SelectionMgr.h"
-#include "SALOME_Prs.h"
-#include "SOCC_ViewModel.h"
-#include "SVTK_ViewModel.h"
-#include "SVTK_ViewWindow.h"
-#include "SOCC_ViewWindow.h"
-#include "SPlot2d_ViewWindow.h"
+#include <SUIT_Session.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_ViewWindow.h>
+#include <SUIT_ViewManager.h>
+#include <SUIT_DataObjectIterator.h>
+#include <CAM_DataModel.h>
+#include <SalomeApp_Application.h>
+#include <SalomeApp_Study.h>
+#include <SalomeApp_Module.h>
+#include <SalomeApp_DataObject.h>
+#include <LightApp_SelectionMgr.h>
+#include <LightApp_DataOwner.h>
+#include <SALOME_Prs.h>
+#include <SOCC_ViewModel.h>
+#include <SVTK_ViewModel.h>
+#include <SVTK_ViewWindow.h>
+#include <SOCC_ViewWindow.h>
+#include <SPlot2d_ViewWindow.h>
 
-#include "SALOME_Event.hxx"
-#include "SALOME_ListIO.hxx"
-#include "SALOME_InteractiveObject.hxx"
-#include "SALOME_ListIteratorOfListIO.hxx"
-
-//#include "utilities.h"
-
-#include <SALOMEconfig.h>
-#include CORBA_CLIENT_HEADER(SALOME_ModuleCatalog)
-
-using namespace std;
+#include <SALOME_Event.h>
+#include <SALOME_ListIO.hxx>
+#include <SALOME_InteractiveObject.hxx>
+#include <SALOME_ListIteratorOfListIO.hxx>
 
 /*!
-  asv : 3.12.04 : added checking for NULL GUI objects in almost all methods.
-  In the scope of fixing bug PAL6869.
+  \class SALOMEGUI_Swig
+  \brief Python interface module for SALOME GUI.
 
-  (PR : modify comments)
+  This module provides an access to the SALOME GUI implementing set of functions
+  which can be used from Python. This module is implemented using SWIG wrappings
+  for some GUI functionality:
+  - getActiveStudyId(), getActiveStudyName() : get active study identifier and name
+  - updateObjBrowser() : update contents of the Object Browser
+  - SelectedCount() : get number of currently selected items
+  - getSelected() : get entry of the speicified selected item
+  - ClearIObjects() : clear selection
+  - Display(), DisplayOnly(), Erase() : display/erase objects
+  - etc.
+
   Instance of this class is created every time "import salome" line is typed 
-  - in IAPP embedded Python interpretor  (SALOME_Session_Server executable),
-  - in inline Python nodes in Supervisor (in SALOME_Container executable),
-  - in stand-alone Python console outside any executable.
-  SALOME GUI(desktop and other objects) is only available in SALOME_Session_Server
+  - in IAPP embedded Python interpretor  (SALOME_Session_Server executable)
+  - in inline Python nodes in Supervisor (in SALOME_Container executable)
+  - in stand-alone Python console outside any executable
+
+  SALOME GUI (desktop and other objects) is only available in SALOME_Session_Server.
+  It means that it can not be accessed from the external Python console.
+
+  The usage in Python:
+  \code
+  import libSALOME_Swig
+  sg = libSALOME_Swig.SALOMEGUI_Swig()
+  if sg.hasDesktop():
+      selcount = sg.SelectedCount()
+      if selcount > 0:
+          sg.Erase( sg.getSelected( 0 ) )
+      pass
+  \endcode
+*/
+
+/*
+  --- INTERNAL COMMENTS SECTION ---
+
+  ASV : 03.12.04 : added checking for NULL GUI objects in almost all methods.
+  In the scope of fixing bug PAL6869.
 
   VSR : 19.04.05 : Reimplemented for new SALOME GUI (SUIT-based)
   All methods are implemeted using Event mechanism.
@@ -74,18 +97,21 @@ using namespace std;
 */
 
 /*!
-  getApplication()
-  Returns active application object [ static ]
+  \brief Get active application object
+  \internal
+  \return active application or 0 if there is no any
 */
-static SalomeApp_Application* getApplication() {
+static SalomeApp_Application* getApplication()
+{
   if ( SUIT_Session::session() )
     return dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  return NULL;
+  return 0;
 }
 
 /*!
-  getActiveStudy()
-  Gets active study or 0 if there is no study opened [ static ]
+  \brief Get active study object
+  \internal
+  \return active study or 0 if there is no study opened
 */
 static SalomeApp_Study* getActiveStudy()
 {
@@ -95,54 +121,53 @@ static SalomeApp_Study* getActiveStudy()
 }
 
 /*!
-  SALOMEGUI_Swig::SALOMEGUI_Swig
-  Constructor
+  \brief Constructor.
 */
 SALOMEGUI_Swig::SALOMEGUI_Swig()
 {
 }
 
 /*!
-  SALOMEGUI_Swig::~SALOMEGUI_Swig
-  Destructor
+  \brief Destructor
 */
 SALOMEGUI_Swig::~SALOMEGUI_Swig()
 {
 }
 
 /*!
-  SALOMEGUI_Swig::hasDesktop
-  Returns TRUE if GUI is available.
+  \fn bool SALOMEGUI_Swig::hasDesktop()
+  \brief Check GUI availability.
+  \return \c true if GUI is available
 */
-class THasDesktopEvent: public SALOME_Event {
+
+class THasDesktopEvent: public SALOME_Event
+{
 public:
   typedef bool TResult;
   TResult myResult;
   THasDesktopEvent() : myResult( false ) {}
-  virtual void Execute() {
+  virtual void Execute()
+  {
     myResult = (bool)( getApplication() && getApplication()->desktop() );
   }
 };
-
-/*!
-  \return true if GUI is available.
-*/
 bool SALOMEGUI_Swig::hasDesktop()
 {
   return ProcessEvent( new THasDesktopEvent() );
 }
 
 /*!
-  SALOMEGUI_Swig::updateObjBrowser
-  Updates active study's Object Browser.
-  VSR: updateSelection parameter is currently not used. Will be implemented or removed lately.
+  \brief Update active study's Object Browser.
+  \param updateSelection this parameter is obsolete
 */
 void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	anApp->updateObjectBrowser();
 	anApp->updateActions(); //SRN: added in order to update the toolbar
@@ -153,198 +178,168 @@ void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
 }
 
 /*!
-  SALOMEGUI_Swig::getActiveStudyId
-  Returns active study's ID or 0 if there is no active study.
+  \fn int SALOMEGUI_Swig::getActiveStudyId()
+  \brief Get active study identifier
+  \return active study's ID or 0 if there is no active study
 */
-class TGetActiveStudyIdEvent: public SALOME_Event {
+
+class TGetActiveStudyIdEvent: public SALOME_Event
+{
 public:
   typedef int TResult;
   TResult myResult;
   TGetActiveStudyIdEvent() : myResult( 0 ) {}
-  virtual void Execute() {
+  virtual void Execute()
+  {
     if ( SalomeApp_Study* aStudy = getActiveStudy() ) {
       myResult = aStudy->studyDS()->StudyId();
     }
   }
 };
-
-/*!
-  \return active study's ID or 0 if there is no active study.
-*/
 int SALOMEGUI_Swig::getActiveStudyId()
 {
   return ProcessEvent( new TGetActiveStudyIdEvent() );
 }
 
 /*!
-  SALOMEGUI_Swig::getActiveStudyName
-  Returns active study's name or NULL if there is no active study.
+  \fn const char* SALOMEGUI_Swig::getActiveStudyName()
+  \brief Get active study name
+  \return active study's name or null string if there is no active study
 */
-class TGetActiveStudyNameEvent: public SALOME_Event {
+
+class TGetActiveStudyNameEvent: public SALOME_Event
+{
 public:
-  typedef string TResult;
+  typedef std::string TResult;
   TResult myResult;
   TGetActiveStudyNameEvent() {}
-  virtual void Execute() {
+  virtual void Execute()
+  {
     if ( SalomeApp_Study* aStudy = getActiveStudy() ) {
       myResult = aStudy->studyDS()->Name();
     }
   }
 };
-
-/*!
-  \return active study's name or NULL if there is no active study.
-*/
 const char* SALOMEGUI_Swig::getActiveStudyName()
 {
-  string result = ProcessEvent( new TGetActiveStudyNameEvent() );
-  return result.empty() ? NULL : result.c_str();
+  std::string result = ProcessEvent( new TGetActiveStudyNameEvent() );
+  return result.empty() ? 0 : result.c_str();
 }
 
 /*!
-  SALOMEGUI_Swig::getComponentName
-  Returns the name of the component by its user name.
+  \fn const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
+  \brief Get name of the component by its title (user name)
+  \param componentUserName component title (user name)
+  \return component name or null string if component title is invalid
 */
-class TGetModulCatalogEvent: public SALOME_Event {
-public:
-  typedef CORBA::Object_var TResult;
-  TResult myResult;
-  TGetModulCatalogEvent() : myResult(CORBA::Object::_nil()) {}
-  virtual void Execute() {
-    if (SalomeApp_Application* anApp = getApplication())
-      myResult = anApp->namingService()->Resolve("/Kernel/ModulCatalog");
-  }
-};
 
 /*!
-  \return the name of the component by its user name.
+  \fn const char* SALOMEGUI_Swig::getComponentUserName( const char* componentName )
+  \brief Get title (user name) of the component by its name
+  \param componentName component name
+  \return component title or null string if component name is invalid
 */
-const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
+
+class TGetComponentNameEvent: public SALOME_Event
 {
-  CORBA::Object_var anObject = ProcessEvent(new TGetModulCatalogEvent());
-  if (!CORBA::is_nil(anObject)) {
-    SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
-      SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
-    SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
-    for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-      CORBA::String_var aModuleName     = aModules[ ind ].modulename;
-      CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
-      if ( strcmp(componentUserName, aModuleUserName.in()) == 0 )
-        return aModuleName._retn();
-    }
-  }
-  return 0;
-}
-
-/*!
-  SALOMEGUI_Swig::getComponentUserName
-  Returns the user name of the component by its name.
-*/
-const char* SALOMEGUI_Swig::getComponentUserName( const char* componentName )
-{
-  CORBA::Object_var anObject = ProcessEvent(new TGetModulCatalogEvent());
-  if (!CORBA::is_nil(anObject)) {
-    SALOME_ModuleCatalog::ModuleCatalog_var aCatalogue =
-      SALOME_ModuleCatalog::ModuleCatalog::_narrow( anObject );
-    SALOME_ModuleCatalog::ListOfIAPP_Affich_var aModules = aCatalogue->GetComponentIconeList();
-    for ( unsigned int ind = 0; ind < aModules->length(); ind++ ) {
-      CORBA::String_var aModuleName     = aModules[ ind ].modulename;
-      CORBA::String_var aModuleUserName = aModules[ ind ].moduleusername;
-      if ( strcmp(componentName, aModuleName.in()) == 0 )
-        return aModuleUserName._retn();
-    }
-  }
-  return 0;
-}
-
-/*!
-  SALOMEGUI_Swig::SelectedCount
-  Returns the number of selected objects.
-*/
-class TSelectedCountEvent: public SALOME_Event {
-public:
-  typedef int TResult;
-  TResult myResult;
-  TSelectedCountEvent() : myResult( 0 ) {}
-  virtual void Execute() {
-    if ( SalomeApp_Application* anApp = getApplication() ) {
-      SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
-      LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
-      if ( aStudy && aSelMgr ) {
-	SALOME_ListIO anIOList;
-	aSelMgr->selectedObjects( anIOList );
-	myResult = anIOList.Extent();
-      }
-    }
-  }
-};
-
-/*!
-  \return the number of selected objects.
-*/
-int SALOMEGUI_Swig::SelectedCount()
-{
-  return ProcessEvent( new TSelectedCountEvent() );
-}
-
-/*!
-  SALOMEGUI_Swig::getSelected
-  Returns the selected object entry by the given index.
-*/
-class TGetSelectedEvent: public SALOME_Event {
 public:
   typedef QString TResult;
   TResult myResult;
-  int     myIndex;
-  TGetSelectedEvent( int theIndex ) : myIndex( theIndex ) {}
-  virtual void Execute() {
+  QString myName;
+  bool    myIsUserName;
+  TGetComponentNameEvent( const QString& name, bool isUserName )
+    : myName( name ), myIsUserName( isUserName ) {}
+  virtual void Execute()
+  {
+    if ( SalomeApp_Application* app = getApplication() ) {
+      myResult = myIsUserName ? app->moduleTitle( myName ) : app->moduleName( myName );
+    }
+  }
+};
+const char* SALOMEGUI_Swig::getComponentName( const char* componentUserName )
+{
+  QString result = ProcessEvent( new TGetComponentNameEvent( componentUserName, false ) );
+  return result.isEmpty() ? 0 : strdup( result.toLatin1().constData() );
+}
+const char* SALOMEGUI_Swig::getComponentUserName( const char* componentName )
+{
+  QString result = ProcessEvent( new TGetComponentNameEvent( componentName, true ) );
+  return result.isEmpty() ? 0 : strdup( result.toLatin1().constData() );
+}
+
+/*!
+  \fn int SALOMEGUI_Swig::SelectedCount()
+  \brief Get number of selected items
+  \return number of selected items in the active study
+*/
+
+/*!
+  \fn const char* SALOMEGUI_Swig::getSelected( int index )
+  \brief Get entry of the specified selected item
+  \param index selected object index
+  \return selected object entry (null string if index is invalid)
+*/
+
+class TGetSelectedEvent: public SALOME_Event
+{
+public:
+  typedef QStringList TResult;
+  TResult myResult;
+  TGetSelectedEvent() {}
+  virtual void Execute()
+  {
     if ( SalomeApp_Application* anApp = getApplication() ) {
-      SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+      SalomeApp_Study* aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
       LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
       if ( aStudy && aSelMgr ) {
-	SALOME_ListIO anIOList;
-	aSelMgr->selectedObjects( anIOList );
-	if ( myIndex < anIOList.Extent() ) {
-	  int index = 0;
-	  SALOME_ListIteratorOfListIO anIter( anIOList );
-	  for( ; anIter.More(); anIter.Next(), index++ ) {
-	    Handle(SALOME_InteractiveObject) anIO = anIter.Value();
-	    if ( myIndex == index ) {
-	      myResult = anIO->getEntry();
-	      return;
-	    }
-	  }
+	SUIT_DataOwnerPtrList aList;
+	aSelMgr->selected( aList );
+
+	for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); 
+	      itr != aList.end(); ++itr ) {
+	  const LightApp_DataOwner* owner = 
+	    dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
+	  if( !owner )
+	    continue;
+	  QString entry = owner->entry();
+	  if( !myResult.contains( entry ) )
+	    myResult.append( entry );
 	}
       }
     }
   }
 };
-
-/*!
-  \return the selected object entry by the given index.
-*/
+int SALOMEGUI_Swig::SelectedCount()
+{
+  QStringList selected = ProcessEvent( new TGetSelectedEvent() );
+  return selected.count();
+}
 const char* SALOMEGUI_Swig::getSelected( int index )
 {
-  QString result = ProcessEvent( new TGetSelectedEvent( index ) );
-  return result.isEmpty() ? NULL : strdup(result.latin1());
+  QStringList selected = ProcessEvent( new TGetSelectedEvent() );
+  return index >= 0 && index < selected.count() ? 
+    strdup( selected[ index ].toLatin1().constData() ) : 0;
 }
 
 /*!
-  Adds an object with the given entry to the selection.
+  \brief Add an object to the current selection.
+  \param theEntry object entry
 */
 void SALOMEGUI_Swig::AddIObject( const char* theEntry )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     QString myEntry;
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
 	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr ) {
 	  SALOME_ListIO anIOList;
-	  anIOList.Append( new SALOME_InteractiveObject( myEntry, "", "" ) );
+	  anIOList.Append( new SALOME_InteractiveObject( myEntry.toLatin1(), "", "" ) );
 	  aSelMgr->setSelectedObjects( anIOList, true );
 	}
       }
@@ -354,17 +349,20 @@ void SALOMEGUI_Swig::AddIObject( const char* theEntry )
 }
 
 /*!
-  Removes the object with the given entry from the selection.
+  \brief Remove the object from the selection.
+  \param theEntry object entry
 */
 void SALOMEGUI_Swig::RemoveIObject( const char* theEntry )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     QString myEntry;
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+	SalomeApp_Study* aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
 	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr ) {
 	  SALOME_ListIO anIOList;
@@ -376,7 +374,7 @@ void SALOMEGUI_Swig::RemoveIObject( const char* theEntry )
 	  aSelMgr->selectedObjects( anIOList );
 	  SALOME_ListIteratorOfListIO anIter( anIOList );
 	  for( ; anIter.More(); anIter.Next() ) {
-	    if ( anIter.Value()->isSame( new SALOME_InteractiveObject( myEntry, "", "" ) ) ) { 
+	    if ( anIter.Value()->isSame( new SALOME_InteractiveObject( myEntry.toLatin1(), "", "" ) ) ) { 
 	      anIOList.Remove( anIter );
 	      aSelMgr->setSelectedObjects( anIOList, true );
 	      return;
@@ -390,16 +388,18 @@ void SALOMEGUI_Swig::RemoveIObject( const char* theEntry )
 }
 
 /*!
-  Clears selection.
+  \brief Clear selection (unselect all objects).
 */
 void SALOMEGUI_Swig::ClearIObjects()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
-	SalomeApp_Study*       aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
+	SalomeApp_Study* aStudy  = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
 	LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
 	if ( aStudy && aSelMgr )
 	  aSelMgr->clearSelected();
@@ -410,13 +410,19 @@ void SALOMEGUI_Swig::ClearIObjects()
 }
 
 /*!
-  Displays an object in the current view window
-  (the presentable object should be previously created and displayed in this viewer).
-  VSR: For the current moment implemented for OCC and VTK viewers only.
+  \brief Display an object in the current view window.
+
+  The presentable object should be previously created and
+  displayed in this viewer.
+
+  For the current moment implemented for OCC and VTK viewers only.
+
+  \param theEntry object entry
 */		
 void SALOMEGUI_Swig::Display( const char* theEntry )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
     QString myEntry;
   public:
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
@@ -426,7 +432,7 @@ void SALOMEGUI_Swig::Display( const char* theEntry )
 	if ( window ) {
 	  SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
 	  if ( view )
-	    view->Display( view->CreatePrs( myEntry ) );
+	    view->Display( view->CreatePrs( myEntry.toLatin1() ) );
 	}
       }
     }
@@ -435,24 +441,32 @@ void SALOMEGUI_Swig::Display( const char* theEntry )
 }
 
 /*!
-  Displays an object in the current view window and erases all other
-  (the presentable object should be previously created and displayed in this viewer).
-  VSR: For the current moment implemented for OCC and VTK viewers only.
+  \brief Displays an object in the current view window and 
+  erases all other ones.
+
+  The presentable object should be previously created and 
+  displayed in this viewer.
+
+  For the current moment implemented for OCC and VTK viewers only.
+  
+  \param theEntry object entry
 */
 void SALOMEGUI_Swig::DisplayOnly( const char* theEntry )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
     QString myEntry;
   public:
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
 	  SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
 	  if ( view ) {
 	    view->EraseAll( false );
-	    view->Display( view->CreatePrs( myEntry ) );
+	    view->Display( view->CreatePrs( myEntry.toLatin1() ) );
 	  }
 	}
       }
@@ -462,23 +476,30 @@ void SALOMEGUI_Swig::DisplayOnly( const char* theEntry )
 }
 
 /*!
-  Erases an object in the current view window
-  (the presentable object should be previously created and displayed in this viewer).
-  VSR: For the current moment implemented for OCC and VTK viewers only.
+  \brief Erase an object in the current view window.
+
+  The presentable object should be previously created and 
+  displayed in this viewer.
+
+  For the current moment implemented for OCC and VTK viewers only.
+
+  \param theEntry object entry
 */		
 void SALOMEGUI_Swig::Erase( const char* theEntry )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
     QString myEntry;
   public:
     TEvent( const char* theEntry ) : myEntry( theEntry ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
 	  SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
 	  if ( view )
-	    view->Erase( view->CreatePrs( myEntry ) );
+	    view->Erase( view->CreatePrs( myEntry.toLatin1() ) );
 	}
       }
     }
@@ -487,16 +508,22 @@ void SALOMEGUI_Swig::Erase( const char* theEntry )
 }
 
 /*!
-  Displays all active module's child objects in the current view window
-  (the presentable objects should be previously created and displayed in this viewer).
-  VSR: For the current moment implemented for OCC and VTK viewers only.
+  \brief Display all active module's presentable 
+  child objects in the current view window.
+  
+  The presentable objects should be previously created and
+  displayed in this viewer.
+
+  For the current moment implemented for OCC and VTK viewers only.
 */
 void SALOMEGUI_Swig::DisplayAll()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SalomeApp_Study*  study        = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() ); // for sure!
 	SUIT_ViewWindow*  window       = anApp->desktop()->activeWindow();
@@ -507,7 +534,7 @@ void SALOMEGUI_Swig::DisplayAll()
 	    for ( SUIT_DataObjectIterator it( activeModule->dataModel()->root(), SUIT_DataObjectIterator::DepthLeft ); it.current(); ++it ) {
 	      SalomeApp_DataObject* obj = dynamic_cast<SalomeApp_DataObject*>( it.current() );
 	      if ( obj && !obj->entry().isEmpty() )
-		view->Display( view->CreatePrs( obj->entry() ) );
+		view->Display( view->CreatePrs( obj->entry().toLatin1() ) );
 	    }
 	  }
 	}
@@ -518,15 +545,18 @@ void SALOMEGUI_Swig::DisplayAll()
 }
 
 /*!
-  Erases all objects from the current view window
-  VSR: For the current moment implemented for OCC and VTK viewers only.
+  \brief Erase all objects from the current view window.
+  
+  For the current moment implemented for OCC and VTK viewers only.
 */
 void SALOMEGUI_Swig::EraseAll()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
@@ -541,47 +571,53 @@ void SALOMEGUI_Swig::EraseAll()
 }
 
 /*!
-  Returns TRUE if the object with given entry is in the current viewer.
+  \fn bool SALOMEGUI_Swig::IsInCurrentView( const char* theEntry )
+  \brief Check it the object is displayed in the current view window.
+
   VSR: For the current moment implemented for OCC and VTK viewers only.
+
+  \param theEntry object entry
+  \return \c true if the object with given entry is displayed 
+          in the current viewer
 */
-class TIsInViewerEvent: public SALOME_Event {
+
+class TIsInViewerEvent: public SALOME_Event
+{
   QString myEntry;
 public:
   typedef bool TResult;
   TResult myResult;
   TIsInViewerEvent( const char* theEntry ) : myEntry( theEntry ), myResult( false ) {}
-  virtual void Execute() {
+  virtual void Execute()
+  {
     if ( SalomeApp_Application* anApp = getApplication() ) {
       SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
       if ( window ) {
 	SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
 	if ( view ) {
-	  SALOME_Prs* aPrs = view->CreatePrs( myEntry );
+	  SALOME_Prs* aPrs = view->CreatePrs( myEntry.toLatin1() );
 	  myResult = !aPrs->IsNull();
 	}
       }
     }
   }
 };
-
-/*!
-  \return TRUE if the object with given entry is in the current viewer.
-  VSR: For the current moment implemented for OCC and VTK viewers only.
-*/
 bool SALOMEGUI_Swig::IsInCurrentView( const char* theEntry )
 {
   return ProcessEvent( new TIsInViewerEvent( theEntry ) );
 }
 
 /*!
-  Updates (repaint) current view
+  \brief Update (repaint) current view window.
 */
 void SALOMEGUI_Swig::UpdateView()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
@@ -596,23 +632,25 @@ void SALOMEGUI_Swig::UpdateView()
 }
 
 /*!
-  Fit all the contents of the current view window
- */
+  \brief Fit current view window to display all its contents.
+*/
 void SALOMEGUI_Swig::FitAll()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
 	  if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
-	    (dynamic_cast<SVTK_ViewWindow*>( window ))->onFitAll();
+	    ( dynamic_cast<SVTK_ViewWindow*>( window ) )->onFitAll();
 	  else if ( dynamic_cast<SOCC_ViewWindow*>( window ) )
-	    (dynamic_cast<SOCC_ViewWindow*>( window ))->onFitAll();
+	    ( dynamic_cast<SOCC_ViewWindow*>( window ) )->onFitAll();
 	  else if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
-	    (dynamic_cast<SPlot2d_ViewWindow*>( window ))->onFitAll();
+	    ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )->onFitAll();
 	}
       }
     }
@@ -621,14 +659,16 @@ void SALOMEGUI_Swig::FitAll()
 }
 
 /*!
-  Reset current view window to the default state.
- */
+  \brief Reset current view window to the default state.
+*/
 void SALOMEGUI_Swig::ResetView()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
@@ -647,23 +687,34 @@ void SALOMEGUI_Swig::ResetView()
   ProcessVoidEvent( new TEvent() );
 }
 
+/*!
+  \brief View operation type.
+  \internal
+*/
 enum {
-  __ViewTop,
-  __ViewBottom,
-  __ViewLeft,
-  __ViewRight,
-  __ViewFront,
-  __ViewBack
+  __ViewTop,          //!< view top side
+  __ViewBottom,       //!< view bottom side
+  __ViewLeft,         //!< view left side
+  __ViewRight,        //!< view right side
+  __ViewFront,        //!< view front side
+  __ViewBack          //!< view back side
 };
 
-void setView( int view )
+/*!
+  \brief Change the view of the current view window.
+  \internal
+  \param view view operation type
+*/
+static void setView( int view )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   private:
     int myView;
   public:
     TEvent( int view ) : myView( view ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SalomeApp_Application* anApp = getApplication() ) {
 	SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
 	if ( window ) {
@@ -711,48 +762,48 @@ void setView( int view )
 }
 
 /*!
-  Switch current view window to show top view
- */
+  \brief Switch current view window to show the top view.
+*/
 void SALOMEGUI_Swig::ViewTop()
 {
   setView( __ViewTop );
 }
 
 /*!
-  Switch current view window to show bottom view
- */
+  \brief Switch current view window to show the bottom view
+*/
 void SALOMEGUI_Swig::ViewBottom()
 {
   setView( __ViewBottom );
 }
 
 /*!
-  Switch current view window to show left view
- */
+  \brief Switch current view window to show the left view
+*/
 void SALOMEGUI_Swig::ViewLeft()
 {
   setView( __ViewLeft );
 }
 
 /*!
-  Switch current view window to show right view
- */
+  \brief Switch current view window to show the right view
+*/
 void SALOMEGUI_Swig::ViewRight()
 {
   setView( __ViewRight );
 }
 
 /*!
-  Switch current view window to show front view
- */
+  \brief Switch current view window to show the front view
+*/
 void SALOMEGUI_Swig::ViewFront()
 {
   setView( __ViewFront );
 }
 
 /*!
-  Switch current view window to show back view
- */
+  \brief Switch current view window to show the back view
+*/
 void SALOMEGUI_Swig::ViewBack()
 {
   setView( __ViewBack );

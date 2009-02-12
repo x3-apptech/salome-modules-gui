@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,31 +17,41 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_ViewFrame.cxx
 // Created:   November, 2004
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_ViewFrame.h"
 #include "GLViewer_Viewer.h"
-#include "GLViewer_Viewer2d.h"
 #include "GLViewer_ViewPort2d.h"
+
+#include <QtxToolBar.h>
+#include <QtxMultiAction.h>
+#include <QtxActionToolMgr.h>
 
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
-#include <SUIT_ToolButton.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_MessageBox.h>
 
-#include <qcolor.h>
-#include <qfiledialog.h>
-#include <qimage.h>
-#include <qlayout.h>
-#include <qstring.h>
+#include <QColor>
+#include <QFileDialog>
+#include <QImage>
+#include <QHBoxLayout>
+#include <QString>
+#include <QFrame>
+#include <QMouseEvent>
+#include <QKeyEvent>
+#include <QWheelEvent>
+
+#ifdef WIN32
+#include <Standard_Integer.hxx>
+#include <iostream>
+using namespace std;
+#endif
 
 /*!
     Constructor
@@ -48,22 +61,18 @@ GLViewer_ViewFrame::GLViewer_ViewFrame( SUIT_Desktop* d, GLViewer_Viewer* vw )
 myViewer( vw ),
 myVP( 0 )
 {
-    QFrame* client = new QFrame( this );    
+    QFrame* client = new QFrame( this );
     setCentralWidget( client );
 
-    QBoxLayout* layout = new QHBoxLayout( client, 1, 1 );
-    layout->setAutoAdd( true );
+    QBoxLayout* layout = new QHBoxLayout( client );
+    layout->setMargin( 0 );
+    layout->setSpacing( 0 );
 
     GLViewer_ViewPort2d* vp = new GLViewer_ViewPort2d( client, this );
-    //vp->turnGrid( true );
-    //vp->turnCompass( true );
-    //vp->enablePopup( false );
     setViewPort( vp );
     setBackgroundColor( Qt::white );
+    layout->addWidget( vp );
 
-    myToolBar = new QToolBar(this);
-    myToolBar->setCloseMode(QDockWindow::Undocked);
-    myToolBar->setLabel(tr("LBL_TOOLBAR_LABEL"));
     createActions();
     createToolBar();
 }
@@ -80,64 +89,63 @@ GLViewer_ViewFrame::~GLViewer_ViewFrame()
 */
 void GLViewer_ViewFrame::createActions()
 {
-  if (!myActionsMap.isEmpty()) return;
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-  QAction* aAction;
+  QtxAction* aAction;
 
   // Dump view
-  aAction = new QAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
-                           tr( "MNU_DUMP_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
+			  tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewDump()));
-  myActionsMap[ DumpId ] = aAction;
+  connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
+  toolMgr()->registerAction( aAction, DumpId );
 
   // FitAll
-  aAction = new QAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITALL" ) ),
-                           tr( "MNU_FITALL" ), 0, this);
+  aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITALL" ) ),
+			  tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitAll()));
-  myActionsMap[ FitAllId ] = aAction;
+  toolMgr()->registerAction( aAction, FitAllId );
 
   // FitRect
-  aAction = new QAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITAREA" ) ),
-                           tr( "MNU_FITRECT" ), 0, this);
+  aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITAREA" ) ),
+			  tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitArea()));
-  myActionsMap[ FitRectId ] = aAction;
+  toolMgr()->registerAction( aAction, FitRectId );
 
   // FitSelect
-  aAction = new QAction(tr("MNU_FITSELECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITSELECT" ) ),
-                           tr( "MNU_FITSELECT" ), 0, this);
+  aAction = new QtxAction(tr("MNU_FITSELECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITSELECT" ) ),
+			  tr( "MNU_FITSELECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITSELECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitSelect()));
-  myActionsMap[ FitSelectId ] = aAction;
+  toolMgr()->registerAction( aAction, FitSelectId );
 
   // Zoom
-  aAction = new QAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_ZOOM" ) ),
-                           tr( "MNU_ZOOM_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_ZOOM" ) ),
+			  tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewZoom()));
-  myActionsMap[ ZoomId ] = aAction;
+  toolMgr()->registerAction( aAction, ZoomId );
 
   // Panning
-  aAction = new QAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_PAN" ) ),
-                           tr( "MNU_PAN_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_PAN" ) ),
+			  tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
-  myActionsMap[ PanId ] = aAction;
+  toolMgr()->registerAction( aAction, PanId );
 
   // Global Panning
-  aAction = new QAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_GLOBALPAN" ) ),
-                           tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_GLOBALPAN" ) ),
+			  tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewGlobalPan()));
-  myActionsMap[ GlobalPanId ] = aAction;
+  toolMgr()->registerAction( aAction, GlobalPanId );
 
-  aAction = new QAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_RESET" ) ),
-                           tr( "MNU_RESET_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_RESET" ) ),
+			  tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
-  myActionsMap[ ResetId ] = aAction;
+  toolMgr()->registerAction( aAction, ResetId );
 }
 
 /*!
@@ -145,19 +153,22 @@ void GLViewer_ViewFrame::createActions()
 */
 void GLViewer_ViewFrame::createToolBar()
 {
-  myActionsMap[DumpId]->addTo(myToolBar);
+  int tid = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL") );
+  toolMgr()->append( DumpId, tid );
 
-  SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar);
-  aScaleBtn->AddAction(myActionsMap[FitAllId]);
-  aScaleBtn->AddAction(myActionsMap[FitRectId]);
-  aScaleBtn->AddAction(myActionsMap[FitSelectId]);
-  aScaleBtn->AddAction(myActionsMap[ZoomId]);
+  QtxMultiAction* aScaleAction = new QtxMultiAction( this );
+  aScaleAction->insertAction( toolMgr()->action( FitAllId ) );
+  aScaleAction->insertAction( toolMgr()->action( FitRectId ) );
+  aScaleAction->insertAction( toolMgr()->action( FitSelectId ) );
+  aScaleAction->insertAction( toolMgr()->action( ZoomId ) );
+  toolMgr()->append( aScaleAction, tid );
 
-  SUIT_ToolButton* aPanBtn = new SUIT_ToolButton(myToolBar);
-  aPanBtn->AddAction(myActionsMap[PanId]);
-  aPanBtn->AddAction(myActionsMap[GlobalPanId]);
+  QtxMultiAction* aPanAction = new QtxMultiAction( this );
+  aPanAction->insertAction( toolMgr()->action( PanId ) );
+  aPanAction->insertAction( toolMgr()->action( GlobalPanId ) );
+  toolMgr()->append( aPanAction, tid );
 
-  myActionsMap[ResetId]->addTo(myToolBar);
+  toolMgr()->append( toolMgr()->action( ResetId ), tid );
 }
 
 /*!
@@ -213,7 +224,7 @@ QColor GLViewer_ViewFrame::backgroundColor() const
 {
     if ( myVP )
         return myVP->backgroundColor();
-    return QMainWindow::backgroundColor();
+    return palette().color( backgroundRole() );
 }
 
 /*!
@@ -257,189 +268,16 @@ void GLViewer_ViewFrame::onUpdate( int )
 /*!
   SLOT: called on dump view operation is activated, stores scene to raster file
 */
-void GLViewer_ViewFrame::onViewDump()
+
+QImage GLViewer_ViewFrame::dumpView()
 {
-    GLViewer_Widget* aWidget = ((GLViewer_ViewPort2d*)myVP)->getGLWidget();
-    int width, height;
-    width = aWidget->width();
-    height = aWidget->height();
-    
-    int imageSize = width*height*3;
-    unsigned char* imageBits = NULL;
+  QImage img;
 
-    int reserve_bytes = width % 4; //32 bits platform
-    imageSize = (width+reserve_bytes)*height*3;
-    imageBits = new unsigned char[imageSize];
+  GLViewer_Widget* aWidget = ((GLViewer_ViewPort2d*)myVP)->getGLWidget();
+  if ( aWidget )
+    img = aWidget->grabFrameBuffer();
 
-    
-#ifdef WNT
-
-    int num;
-    HBITMAP hBmp;
-    HDC hdc_old, hdc;
-    HGLRC hglrc_old, hglrc;
-
-    BITMAPINFO bi;
-
-    hglrc_old = wglGetCurrentContext();
-    hdc_old = wglGetCurrentDC();
-
-    hdc = CreateCompatibleDC( hdc_old );
-    if( !hdc )
-    {
-        cout << "Can't create compatible DC. Last Error Code: " << GetLastError() << endl;
-        return;
-    }
-
-    int sizeBmi = Standard_Integer( sizeof(BITMAPINFO) + sizeof(RGBQUAD)*3 );
-    PBITMAPINFO pBmi = (PBITMAPINFO)( new char[sizeBmi] );
-    ZeroMemory( pBmi, sizeBmi );
-
-    pBmi->bmiHeader.biSize        = sizeof( BITMAPINFOHEADER ); //sizeBmi
-    pBmi->bmiHeader.biWidth       = width;
-    pBmi->bmiHeader.biHeight      = height;
-    pBmi->bmiHeader.biPlanes      = 1;
-    pBmi->bmiHeader.biBitCount    = 24;
-    pBmi->bmiHeader.biCompression = BI_RGB;
-
-    LPVOID ppvBits;
-    hBmp = CreateDIBSection ( hdc, pBmi, DIB_RGB_COLORS, &ppvBits, NULL, 0 );
-    SelectObject ( hdc, hBmp );
-    delete[] pBmi;
-
-    PIXELFORMATDESCRIPTOR pfd;
-    ZeroMemory( &pfd, sizeof( PIXELFORMATDESCRIPTOR ) );
-    pfd.nSize      = sizeof( PIXELFORMATDESCRIPTOR );
-    pfd.nVersion   = 1;
-    pfd.dwFlags    = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_BITMAP;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 32;
-    pfd.iLayerType = PFD_MAIN_PLANE;
-
-    int iPf = ChoosePixelFormat( hdc, &pfd);    
-    if( iPf == 0 )
-    {
-        if ( !DescribePixelFormat ( hdc, iPf, sizeof(PIXELFORMATDESCRIPTOR), &pfd ) )
-        {
-            cout << "Can't describe Pixel Format. Last Error Code: " << GetLastError() << endl;
-        }
-    }
-    if ( !SetPixelFormat(hdc, iPf, &pfd) )
-    {
-        cout << "Can't set Pixel Format. Last Error Code: " << GetLastError() << endl;
-    }
-
-    hglrc = wglCreateContext( hdc );
-    if( !hglrc )
-    {
-        cout << "Can't create new GL Context. Last Error Code: " << GetLastError() << endl;
-        return;
-    }
-    if( !wglMakeCurrent( hdc, hglrc) )
-    {
-        cout << "Can't make current new context!" << endl;
-        return;
-    }
-    
-    glViewport( 0, 0, width, height );
-
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    GLfloat w_c = width / 2., h_c = height / 2.; 
-
-    gluOrtho2D( -w_c, w_c, -h_c, h_c ); 
-
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-
-    //set background
-    QColor aColor = ((GLViewer_ViewPort2d*)myVP)->backgroundColor();
-    glClearColor( ( GLfloat )aColor.red() / 255,
-                  ( GLfloat )aColor.green() / 255,
-                  ( GLfloat )aColor.blue() / 255,
-                  1.0 );
-
-    aWidget->exportRepaint();
-
-      memset(&bi, 0, sizeof(BITMAPINFOHEADER));
-    bi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-    bi.bmiHeader.biPlanes      = 1;
-    bi.bmiHeader.biBitCount    = 24;
-    bi.bmiHeader.biHeight      = -height;
-    bi.bmiHeader.biWidth       = width;
-    bi.bmiHeader.biCompression = BI_RGB;
-
-    num = GetDIBits(hdc, hBmp, 0, height, imageBits, &bi, DIB_RGB_COLORS);
-
-    wglMakeCurrent( hdc_old, hglrc_old );
-    wglDeleteContext( hglrc );
-    
-
-#else //XWindows
-#endif
-
-    unsigned int* aPix = NULL;
-    QImage  anImage( width, height, 32 );
-    for( int i = 0; i < height; i++ )
-    {
-        memset( anImage.scanLine( i ), 0, sizeof(unsigned int)*width );
-        unsigned char* pos;
-        for( int j = 0; j < width; j++ )
-        {
-            pos = imageBits + i*width*3 + j*3 + reserve_bytes*i;
-            aPix = (unsigned int*)anImage.scanLine(i)+j;
-            *aPix = qRgb( *pos, *(pos+1), *(pos+2) );
-        }
-    }
-
-    delete [] imageBits;
-
-    QString aFilter( "*.bmp\n*.png" );
-
-    QFileDialog aFileDlg( QDir::current().absPath(), aFilter, this );
-    aFileDlg.setCaption( tr( "DUMP_VIEW_SAVE_FILE_DLG_CAPTION" ) );
-    aFileDlg.setMode( QFileDialog::AnyFile );
-
-    if( !aFileDlg.exec() )
-        return;
-
-    QString aFileName = aFileDlg.selectedFile();
-    QString aFileExt = aFileDlg.selectedFilter();
-
-    if( aFileName.isEmpty() )
-    {
-        SUIT_MessageBox::error1( this,
-                                tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
-                                tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
-                                tr( "BUT_OK" ) );
-    }
-
-    QString aSaveOp = "BMP";
-    QString aTypedFileExt = QFileInfo( aFileName ).extension( false ).lower();
-
-    if( aFileExt == "*.bmp" )
-    {
-        if( aTypedFileExt.isEmpty() )
-            aFileName += ".bmp";
-        aSaveOp = "BMP";
-    }
-    else if( aFileExt == "*.png" )
-        if( aTypedFileExt.isEmpty() )
-            aFileName += ".png";
-        aSaveOp = "PNG";
-
-//#ifdef WNT
-//    if( !anImage.save( aFileName, aSaveOp ) )
-//#else
-    if( !aWidget->grabFrameBuffer().save( aFileName, aSaveOp ) )
-//#endif
-    {
-        SUIT_MessageBox::error1( this,
-                                tr( "DUMP_VIEW_ERROR_DLG_CAPTION" ),
-                                tr( "DUMP_VIEW_ERROR_DLG_TEXT" ),
-                                tr( "BUT_OK" ) );
-    }
+  return img;
 }
 
 /*!
@@ -470,7 +308,7 @@ void GLViewer_ViewFrame::onViewFitAll()
   Start fit area
 */
 void GLViewer_ViewFrame::onViewFitArea()
-{ 
+{
     myViewer->activateTransform( GLViewer_Viewer::FitRect );
 }
 
@@ -478,7 +316,7 @@ void GLViewer_ViewFrame::onViewFitArea()
   Start fit selected
 */
 void GLViewer_ViewFrame::onViewFitSelect()
-{ 
+{
     myViewer->activateTransform( GLViewer_Viewer::FitSelect );
 }
 
@@ -486,7 +324,7 @@ void GLViewer_ViewFrame::onViewFitSelect()
   Start global panning
 */
 void GLViewer_ViewFrame::onViewGlobalPan()
-{ 
+{
     myViewer->activateTransform( GLViewer_Viewer::PanGlobal );
 }
 
@@ -494,7 +332,7 @@ void GLViewer_ViewFrame::onViewGlobalPan()
   Start rotating
 */
 void GLViewer_ViewFrame::onViewRotate()
-{ 
+{
     //myViewer->activateTransform( GLViewer_Viewer::Rotate );
 }
 
@@ -502,11 +340,11 @@ void GLViewer_ViewFrame::onViewRotate()
   Start reset default view aspects
 */
 void GLViewer_ViewFrame::onViewReset()
-{ 
+{
     myViewer->activateTransform( GLViewer_Viewer::Reset );
 }
- 
-/*! 
+
+/*!
   Dispatches mouse events
 */
 void GLViewer_ViewFrame::mouseEvent( QMouseEvent* e )
@@ -584,7 +422,7 @@ QString GLViewer_ViewFrame::getVisualParameters()
 */
 void GLViewer_ViewFrame::setVisualParameters( const QString& parameters )
 {
-  QStringList paramsLst = QStringList::split( '*', parameters, true );
+  QStringList paramsLst = parameters.split( '*' );
   if ( myVP && myVP->inherits( "GLViewer_ViewPort2d" ) && paramsLst.size() == 4) {
     GLViewer_ViewPort2d* vp2d = (GLViewer_ViewPort2d*)myVP;
 

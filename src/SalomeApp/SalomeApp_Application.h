@@ -1,26 +1,28 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      SalomeApp_Application.h
 // Created:   10/22/2004 3:37:25 PM
 // Author:    Sergey LITONIN
-// Copyright (C) CEA 2004
-
+//
 #ifndef SALOMEAPP_APPLICATION_H
 #define SALOMEAPP_APPLICATION_H
 
@@ -31,27 +33,21 @@
 #include "SalomeApp.h"
 #include <LightApp_Application.h>
 
-#include <qmap.h>
-
 #include <CORBA.h>
 
-#include <SALOMEconfig.h>
+//#include <SALOMEconfig.h>
 //#include CORBA_CLIENT_HEADER(SALOMEDS)
 #include <SALOME_NamingService.hxx>
 
 #include "SALOMEDSClient.hxx"
 
-class QAction;
-class QComboBox;
-class QDockWindow;
-
 class LightApp_Preferences;
-class SalomeApp_Module;
 class SalomeApp_Study;
+class SalomeApp_NoteBookDlg;
+class SUIT_DataObject;
 
 class SALOME_LifeCycleCORBA;
 
-class QListViewItem;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -69,11 +65,12 @@ class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
 public:
   enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
-         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID };
+         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, NoteBookId, UserID };
 
 protected:
-  enum { CloseUnload = CloseDiscard + 1 };
-  enum { LoadStudyId = OpenStudyId  + 1 };
+  enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
+  enum { CloseUnload = LightApp_Application::CloseDiscard + 1 };
+  enum { LoadStudyId = LightApp_Application::OpenStudyId + 1 };
 
 public:
   SalomeApp_Application();
@@ -85,7 +82,7 @@ public:
 
   virtual void                        start();
 
-  virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
+  virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   virtual bool                        checkDataObject(LightApp_DataObject* theObj);
 
@@ -98,17 +95,26 @@ public:
   SUIT_ViewManager*                   newViewManager(const QString&);
   void                                updateSavePointDataObjects( SalomeApp_Study* );
 
+  virtual bool                        isPossibleToClose( bool& );
+
+  virtual bool                        useStudy( const QString& );
+  virtual void                        updateDesktopTitle();
+  
+  virtual void                        setNoteBook(SalomeApp_NoteBookDlg* theNoteBook);
+  virtual SalomeApp_NoteBookDlg*      getNoteBook() const;
+
 public slots:
-  virtual bool                        onOpenDoc( const QString& );
   virtual void                        onLoadDoc();
   virtual bool                        onLoadDoc( const QString& );
+  virtual void                        onCloseDoc( bool ask = true);
+
   virtual void                        onExit();
   virtual void                        onCopy();
   virtual void                        onPaste();
   void                                onSaveGUIState();// called from VISU
-  virtual void                        onCloseDoc( bool ask = true);
 
 protected slots:
+  void                                onStudyCreated( SUIT_Study* );
   void                                onStudySaved( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
   void                                onDesktopMessage( const QString& );
@@ -122,22 +128,27 @@ protected:
   virtual void                        onSelectionChanged();
 
   virtual void                        createPreferences( LightApp_Preferences* );
-  virtual void                        updateDesktopTitle();
-  
+
   virtual bool                        closeAction( const int, bool& );
   virtual int                         closeChoice( const QString& );
+
+  virtual int                         openChoice( const QString& );
+  virtual bool                        openAction( const int, const QString& );
 
   virtual QMap<int, QString>          activateModuleActions() const;
   virtual void                        moduleActionSelected( const int );
 
+  void                                objectBrowserColumnsVisibility();
+
 private slots:
   void                                onDeleteInvalidReferences();
-  void                                onDblClick( QListViewItem* );
+  void                                onDblClick( SUIT_DataObject* );
   void                                onProperties();
   void                                onDumpStudy();
-  void                                onLoadScript(); 
+  void                                onNoteBook();
+  void                                onLoadScript();
 
-  void                                onDeleteGUIState(); 
+  void                                onDeleteGUIState();
   void                                onRestoreGUIState();
   void                                onRenameGUIState();
 
@@ -145,6 +156,8 @@ private slots:
   void                                onRegDisplay();
   void                                onOpenWith();
 
+ private:
+  SalomeApp_NoteBookDlg*             myNoteBook;
 };
 
 #ifdef WIN32

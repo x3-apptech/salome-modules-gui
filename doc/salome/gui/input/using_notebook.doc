@@ -1,0 +1,26 @@
+/*!
+
+\page using_notebook Using NoteBook
+
+SALOME <b>NoteBook</b> is destined for managing numerical and boolean
+parameters (variables) which are used to create and modify objects in
+different components.
+
+To open the <b>NoteBook</b> choose <b>File > Notebook</b>, the following
+dialog box will appear:
+
+\image html notebook1.png
+
+Here you can add new variables, remove and rename existing variables and 
+change their values.
+
+If you have modified some variables, which are already used in the current
+study, you should click <b>Update Study</b> button to apply your changes
+to the study.
+
+\note The dialog will not be validated until at least one of variables in
+the table has invalid name or value (marked by red color). Names of
+variables should be unique and their values should be numerical (integer or
+double) or boolean ("True" / "False").
+
+*/

@@ -1,33 +1,33 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_Session.h"
 
+#include "SUIT_Study.h"
 #include "SUIT_Tools.h"
-#include "SUIT_Desktop.h"
 #include "SUIT_MessageBox.h"
-#include "SUIT_ViewWindow.h"
-#include "SUIT_ViewManager.h"
 #include "SUIT_ExceptionHandler.h"
+#include "SUIT_ResourceMgr.h"
 
-#include <qtextcodec.h>
-#include <qmessagebox.h>
-#include <qapplication.h>
+#include <QApplication>
 
 #ifdef WIN32
 #include <windows.h>
@@ -35,34 +35,33 @@
 #include <dlfcn.h>
 #endif
 
-static bool   SUIT_Session_IsPythonExecuted = false;
-static QMutex SUIT_Session_PythonMutex;
-
 SUIT_Session* SUIT_Session::mySession = 0;
 
 /*! Constructor.*/
 
 SUIT_Session::SUIT_Session()
 : QObject(),
-myResMgr( 0 ),
-myHandler( 0 ),
-myActiveApp( 0 ),
-myExitStatus( NORMAL ),
-myExitFlags ( 0 )
+  myResMgr( 0 ),
+  myActiveApp( 0 ),
+  myHandler( 0 ),
+  myExitStatus( NORMAL ),
+  myExitFlags ( 0 )
 {
   SUIT_ASSERT( !mySession )
 
   mySession = this;
-
-  myAppList.setAutoDelete( true );
 }
 
 /*!destructor. Clear applications list and set mySession to zero.*/
 SUIT_Session::~SUIT_Session()
 {
+  for ( AppList::iterator it = myAppList.begin(); it != myAppList.end(); ++it )
+    delete *it;
+
   myAppList.clear();
 
-  if (myResMgr) {
+  if ( myResMgr )
+  {
     delete myResMgr;
     myResMgr = 0;
   }
@@ -79,7 +78,7 @@ SUIT_Session* SUIT_Session::session()
   Starts new application using "createApplication" function of loaded DLL.
 */
 
-SUIT_Application* SUIT_Session::startApplication( const QString& name, int args, char** argv )
+SUIT_Application* SUIT_Session::startApplication( const QString& name, int /*args*/, char** /*argv*/ )
 {
   AppLib libHandle = 0;
 
@@ -93,8 +92,8 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
 
   if ( !libHandle )
   {
-    SUIT_MessageBox::warn1( 0, tr( "Error" ),
-                            tr( "Can not load application library \"%1\": %2").arg( lib ).arg( lastError() ), tr( "Ok" ) );
+    SUIT_MessageBox::warning( 0, tr( "Error" ),
+                              tr( "Can not load application library \"%1\": %2").arg( lib ).arg( lastError() ) );
     return 0;
   }
 
@@ -104,15 +103,15 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   APP_CREATE_FUNC crtInst = 0;
 
 #ifdef WIN32
-  crtInst = (APP_CREATE_FUNC)::GetProcAddress( libHandle, APP_CREATE_NAME );
+  crtInst = (APP_CREATE_FUNC)::GetProcAddress( (HINSTANCE)libHandle, APP_CREATE_NAME );
 #else
   crtInst = (APP_CREATE_FUNC)dlsym( libHandle, APP_CREATE_NAME );
 #endif
 
   if ( !crtInst )
   {
-    SUIT_MessageBox::warn1( 0, tr( "Error" ),
-                            tr( "Can not find function \"%1\": %2" ).arg( APP_CREATE_NAME ).arg( lastError() ), tr( "Ok" ) );
+    SUIT_MessageBox::warning( 0, tr( "Error" ),
+                              tr( "Can not find function \"%1\": %2" ).arg( APP_CREATE_NAME ).arg( lastError() ) );
     return 0;
   }
 
@@ -127,24 +126,19 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
   SUIT_Application* anApp = crtInst();
   if ( !anApp )
   {
-    SUIT_MessageBox::warn1( 0, tr( "Error" ), tr( "Can not create application \"%1\": %2").arg( appName ).arg( lastError() ), tr( "Ok" ) );
+    SUIT_MessageBox::warning( 0, tr( "Error" ), tr( "Can not create application \"%1\": %2").arg( appName ).arg( lastError() ) );
     return 0;
   }
 
-  anApp->setName( appName );
+  anApp->setObjectName( appName );
 
-  connect( anApp, SIGNAL( applicationClosed( SUIT_Application* ) ),
-           this, SLOT( onApplicationClosed( SUIT_Application* ) ) );
-  connect( anApp, SIGNAL( activated( SUIT_Application* ) ), 
-	         this, SLOT( onApplicationActivated( SUIT_Application* ) ) );
-
-  myAppList.append( anApp );
+  insertApplication( anApp );
 
   if ( !myHandler )
   {
     APP_GET_HANDLER_FUNC crtHndlr = 0;
 #ifdef WIN32
-    crtHndlr = (APP_GET_HANDLER_FUNC)::GetProcAddress( libHandle, APP_GET_HANDLER_NAME );
+    crtHndlr = (APP_GET_HANDLER_FUNC)::GetProcAddress( (HINSTANCE)libHandle, APP_GET_HANDLER_NAME );
 #else
     crtHndlr = (APP_GET_HANDLER_FUNC)dlsym( libHandle, APP_GET_HANDLER_NAME );
 #endif
@@ -164,15 +158,22 @@ SUIT_Application* SUIT_Session::startApplication( const QString& name, int args,
 /*!
   Gets the list of all applications
 */
-QPtrList<SUIT_Application> SUIT_Session::applications() const
+QList<SUIT_Application*> SUIT_Session::applications() const
 {
-  QPtrList<SUIT_Application> apps;
-  apps.setAutoDelete( false );
+  return myAppList;
+}
 
-  for ( AppListIterator it( myAppList ); it.current(); ++it )
-    apps.append( it.current() );
+void SUIT_Session::insertApplication( SUIT_Application* app )
+{
+  if ( !app || myAppList.contains( app ) )
+    return;
 
-  return apps;
+  myAppList.append( app );
+
+  connect( app, SIGNAL( applicationClosed( SUIT_Application* ) ),
+           this, SLOT( onApplicationClosed( SUIT_Application* ) ) );
+  connect( app, SIGNAL( activated( SUIT_Application* ) ), 
+	         this, SLOT( onApplicationActivated( SUIT_Application* ) ) );
 }
 
 /*!
@@ -224,14 +225,16 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
 {
   emit applicationClosed( theApp );
 
-  myAppList.remove( theApp );
+  myAppList.removeAll( theApp );
+  delete theApp;
+
   if ( theApp == myActiveApp )
     myActiveApp = 0;
 
   if ( myAppList.isEmpty() )
   {
-    printf( "Calling QApplication::exit() with exit code = %d\n", myExitStatus );
-    qApp->exit( myExitStatus );
+    //printf( "Calling QApplication::exit() with exit code = %d\n", myExitStatus );
+    QApplication::instance()->exit( myExitStatus );
   }
 }
 
@@ -240,9 +243,10 @@ void SUIT_Session::onApplicationClosed( SUIT_Application* theApp )
 */
 void SUIT_Session::closeSession( int mode, int flags )
 {
-  while ( !myAppList.isEmpty() )
+  AppList apps = myAppList;
+  for ( AppList::const_iterator it = apps.begin(); it != apps.end(); ++it )
   {
-    SUIT_Application* app = myAppList.getFirst();
+    SUIT_Application* app = *it;
     bool closePermanently;
     if ( mode == ASK && !app->isPossibleToClose( closePermanently ) )
       return;
@@ -250,7 +254,7 @@ void SUIT_Session::closeSession( int mode, int flags )
     {
       SUIT_Study* study = app->activeStudy();
       if ( study->isModified() && study->isSaved() )
-	study->saveDocument();
+	      study->saveDocument();
     }
     else if ( mode == DONT_SAVE )
     {
@@ -259,6 +263,7 @@ void SUIT_Session::closeSession( int mode, int flags )
 
     app->closeApplication();
   }
+
   myExitFlags = flags;
 }
 
@@ -286,11 +291,12 @@ SUIT_ExceptionHandler* SUIT_Session::handler() const
 QString SUIT_Session::lastError() const
 {
   QString str;
-#ifdef WNT
+#ifdef WIN32
   LPVOID lpMsgBuf;
   ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                    FORMAT_MESSAGE_IGNORE_INSERTS, 0, ::GetLastError(), 0, (LPTSTR)&lpMsgBuf, 0, 0 );
-  str = QString( (LPTSTR)lpMsgBuf );
+  LPTSTR msg = (LPTSTR)lpMsgBuf;
+  str = QString( SUIT_Tools::toQString( msg ) );
   LocalFree( lpMsgBuf );
 #else
   str = QString( dlerror() );
@@ -310,10 +316,16 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& li
     return 0;
 
   AppLib lib = 0;
+  QByteArray bid = libFile.toLatin1();
 #ifdef WIN32
-  lib = ::LoadLibrary( (char*)libFile.latin1() );
+#ifdef UNICODE
+  LPTSTR str = (LPTSTR)libFile.utf16();
 #else
-  lib = dlopen( (char*)libFile.latin1(), RTLD_LAZY | RTLD_GLOBAL  );
+  LPTSTR str = (LPTSTR)(const char*)bid;
+#endif
+  lib = ::LoadLibrary( str );
+#else
+  lib = dlopen( (const char*)libFile.toLatin1(), RTLD_LAZY | RTLD_GLOBAL  );
 #endif
   return lib;
 }
@@ -342,32 +354,7 @@ SUIT_ResourceMgr* SUIT_Session::createResourceMgr( const QString& appName ) cons
 /*!
   Slot, called on activation of some application's desktop
 */
-void SUIT_Session::onApplicationActivated( SUIT_Application* app )
+void SUIT_Session::onApplicationActivated( SUIT_Application* app ) 
 {
   myActiveApp = app;
-}
-
-/*!
-  \retval Return TRUE, if a command is currently executed in Python Console,
-                 FALSE otherwise.
-*/
-bool SUIT_Session::IsPythonExecuted()
-{
-  bool ret;
-  SUIT_Session_PythonMutex.lock();
-  ret = SUIT_Session_IsPythonExecuted;
-  SUIT_Session_PythonMutex.unlock();
-  return ret;
-}
-
-/*!
-  Set value of boolean flag, being returned by method \a IsPythonExecuted().
-  It is supposed to set the flag to TRUE when any python command starts
-  and reset it to FALSE when the command finishes.
-*/
-void SUIT_Session::SetPythonExecuted(bool isPythonExecuted)
-{
-  SUIT_Session_PythonMutex.lock();
-  SUIT_Session_IsPythonExecuted = isPythonExecuted;
-  SUIT_Session_PythonMutex.unlock();
 }

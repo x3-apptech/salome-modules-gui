@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,12 +17,11 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_BaseObjects.h"
 #include "GLViewer_BaseDrawers.h"
 #include "GLViewer_AspectLine.h"
@@ -28,6 +30,8 @@
 #include "GLViewer_Group.h"
 
 #include "GLViewer_Drawer.h"
+
+#include <QFile>
 
 //#include <cmath>
 //using namespace std;
@@ -214,7 +218,7 @@ bool GLViewer_MarkerSet::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVie
     }
     aBuffer+="closepath\nstroke\n";
 
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
 
     return true;
 }
@@ -252,7 +256,7 @@ bool GLViewer_MarkerSet::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aV
         }
         aBuffer+="PU;\n";
 
-        hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+        hFile.write( aBuffer.toAscii() );
     }
 
     return true;
@@ -313,10 +317,10 @@ void GLViewer_MarkerSet::compute()
 
   for ( int i = 0; i < myNumber; i++ )  
   {
-    xa = QMIN( xa, myXCoord[i] );
-    xb = QMAX( xb, myXCoord[i] );
-    ya = QMIN( ya, myYCoord[i] );
-    yb = QMAX( yb, myYCoord[i] );
+    xa = qMin( xa, myXCoord[i] );
+    xb = qMax( xb, myXCoord[i] );
+    ya = qMin( ya, myYCoord[i] );
+    yb = qMax( yb, myYCoord[i] );
   }
   
   myXGap = ( xb - xa ) / 10;
@@ -352,8 +356,8 @@ GLboolean GLViewer_MarkerSet::highlight( GLfloat x, GLfloat y, GLfloat tol, GLbo
 //  cout << "GLViewer_MarkerSet::highlight " << x <<" " << y << " " << tol << endl;
   int count = 0;
   GLfloat xdist, ydist, radius;
-  QValueList<int>::Iterator it;
-  QValueList<int> curHNumbers;
+  QList<int>::Iterator it;
+  QList<int> curHNumbers;
   bool isFound;
   GLboolean update;
   int cnt = 0;
@@ -432,10 +436,10 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
 //  cout << "GLViewer_MarkerSet::select " << x << " " << y << endl;
   int count = 0;
   GLfloat xdist, ydist, radius;
-  QValueList<int>::Iterator it;
-  QValueList<int>::Iterator it1;
-  QValueList<int>::Iterator remIt;
-  QValueList<int>::Iterator curIt;
+  QList<int>::Iterator it;
+  QList<int>::Iterator it1;
+  QList<int>::Iterator remIt;
+  QList<int>::Iterator curIt;
 
   radius = tol - myMarkerSize / 2.;
 
@@ -481,35 +485,35 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
             for ( it1 = myHNumbers.begin(); it1 != myHNumbers.end(); ++it1 )
               if( i == *it1 )
               {
-                myHNumbers.remove( it1 );
+                myHNumbers.erase( it1 );
                 break;
               }
       for ( it1 = myUHNumbers.begin(); it1 != myUHNumbers.end(); ++it1 )
         if( i == *it1 )
         {
-          myUHNumbers.remove( it1 );
+          myUHNumbers.erase( it1 );
           break;
         }
         }
     else
         {
-      mySelNumbers.remove( remIt );
+      mySelNumbers.erase( remIt );
       for ( curIt = myCurSelNumbers.begin(); curIt != myCurSelNumbers.end(); ++curIt )
         if( *curIt == *remIt)
         {
-          myCurSelNumbers.remove( curIt );
+          myCurSelNumbers.erase( curIt );
           break;
         }
       for ( it1 = myHNumbers.begin(); it1 != myHNumbers.end(); ++it1 )
         if( i == *it1 )
         {
-          myHNumbers.remove( it1 );
+          myHNumbers.erase( it1 );
           break;
         }
       for ( it1 = myUHNumbers.begin(); it1 != myUHNumbers.end(); ++it1 )
         if( i == *it1 )
         {
-          myUHNumbers.remove( it1 );
+          myUHNumbers.erase( it1 );
           break;
         }
         }
@@ -521,13 +525,13 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
     for ( it1 = myHNumbers.begin(); it1 != myHNumbers.end(); ++it1 )
       if( i == *it1 )
       {
-        myHNumbers.remove( it1 );
+        myHNumbers.erase( it1 );
         break;
       }
     for ( it1 = myUHNumbers.begin(); it1 != myUHNumbers.end(); ++it1 )
       if( i == *it1 )
           {
-        myUHNumbers.remove( it1 );
+        myUHNumbers.erase( it1 );
         break;
       }        
       }     
@@ -538,7 +542,7 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
     for( it1 = myUSelNumbers.begin(); it1 != myUSelNumbers.end(); ++it1 )
       if( *it == *it1 )
       {
-        it1 = myUSelNumbers.remove( it1 );
+        it1 = myUSelNumbers.erase( it1 );
         it1--;
       }
   
@@ -633,10 +637,10 @@ void GLViewer_MarkerSet::setNumMarkers( GLint number )
 /*!
   Export numbers of highlighted/selected lines
 */
-void GLViewer_MarkerSet::exportNumbers( QValueList<int>& highlight,
-                     QValueList<int>& unhighlight,
-                     QValueList<int>& select,
-                     QValueList<int>& unselect )
+void GLViewer_MarkerSet::exportNumbers( QList<int>& highlight,
+                     QList<int>& unhighlight,
+                     QList<int>& select,
+                     QList<int>& unselect )
 {
     highlight = myHNumbers;
     unhighlight = myUHNumbers;
@@ -655,14 +659,12 @@ bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
   if( index < 0 || index > myNumber )
     return FALSE;
 
-  int n = mySelNumbers.findIndex( index );
+  int n = mySelNumbers.indexOf( index );
   if( n == -1 )
     mySelNumbers.append( index );
   else
   {
-    QValueList<int>::Iterator it;
-    it = mySelNumbers.at( n );
-    mySelNumbers.remove( it );
+    mySelNumbers.removeAt(n);
     myUSelNumbers.append( index );
   }
   return TRUE;
@@ -675,7 +677,7 @@ bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
 void GLViewer_MarkerSet::addSelected( const TColStd_SequenceOfInteger& seq )
 {
   for ( int i = 1; i <= seq.Length(); i++ )
-    if( mySelNumbers.findIndex( seq.Value( i ) ) == -1 )
+    if( mySelNumbers.indexOf( seq.Value( i ) ) == -1 )
       mySelNumbers.append( seq.Value( i ) - 1 );
 }
 
@@ -685,7 +687,7 @@ void GLViewer_MarkerSet::addSelected( const TColStd_SequenceOfInteger& seq )
 */
 void GLViewer_MarkerSet::setSelected( const TColStd_SequenceOfInteger& seq )
 {
-//   for( QValueList<int>::Iterator it = mySelNumbers.begin(); it != mySelNumbers.end(); ++it )
+//   for( QList<int>::Iterator it = mySelNumbers.begin(); it != mySelNumbers.end(); ++it )
 //     if( myUSelNumbers.findIndex( *it ) == -1 )
 //       myUSelNumbers.append( *it );
 
@@ -728,7 +730,8 @@ QByteArray GLViewer_MarkerSet::getByteCopy()
     
     QByteArray aObject = GLViewer_Object::getByteCopy();
 
-    QByteArray aResult( anISize + 2*aFSize*myNumber + aFSize + aObject.size());
+    QByteArray aResult;
+    aResult.resize( anISize + 2*aFSize*myNumber + aFSize + aObject.size());
 
     char* aPointer = (char*)&myNumber;
     for( i = 0; i < anISize; i++, aPointer++ )
@@ -784,7 +787,8 @@ bool GLViewer_MarkerSet::initializeFromByteCopy( QByteArray theArray )
          *aPointer = theArray[i];
          
     int aCurIndex = anISize + 2*aFSize*myNumber + aFSize;
-    QByteArray aObject( aSize - aCurIndex );
+    QByteArray aObject;
+    aObject.resize( aSize - aCurIndex );
     for( ; i < aSize; i++ )
         aObject[i - aCurIndex] = theArray[i];
         
@@ -871,7 +875,7 @@ bool GLViewer_Polyline::translateToPS( QFile& hFile, GLViewer_CoordSystem* aView
 
     aBuffer+="closepath\nstroke\n";
     
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
 
     return true;
 }
@@ -897,7 +901,7 @@ bool GLViewer_Polyline::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aVi
 
     aBuffer+="PU;\n";
     
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
 
     return true;
 }
@@ -958,10 +962,10 @@ void GLViewer_Polyline::compute()
 
   for ( int i = 0; i < myNumber; i++ )  
   {
-    xa = QMIN( xa, myXCoord[i] );
-    xb = QMAX( xb, myXCoord[i] );
-    ya = QMIN( ya, myYCoord[i] );
-    yb = QMAX( yb, myYCoord[i] );
+    xa = qMin( xa, myXCoord[i] );
+    xb = qMax( xb, myXCoord[i] );
+    ya = qMin( ya, myYCoord[i] );
+    yb = qMax( yb, myYCoord[i] );
   }
 
   GLfloat xGap = ( xb - xa ) / 10;
@@ -1219,10 +1223,10 @@ void GLViewer_Polyline::setNumber( GLint number )
 /*!
   Export numbers of highlighted/selected lines
 */
-void GLViewer_Polyline::exportNumbers( QValueList<int>& highlight,
-                     QValueList<int>& unhighlight,
-                     QValueList<int>& select,
-                     QValueList<int>& unselect )
+void GLViewer_Polyline::exportNumbers( QList<int>& highlight,
+                     QList<int>& unhighlight,
+                     QList<int>& select,
+                     QList<int>& unselect )
 {
   highlight = myHNumbers;
   unhighlight = myUHNumbers;
@@ -1264,7 +1268,8 @@ QByteArray GLViewer_Polyline::getByteCopy()
 
     QByteArray aObject = GLViewer_Object::getByteCopy();
 
-    QByteArray aResult( aFSize*myNumber*2 + anISize + 2*aBSize + aObject.size());
+    QByteArray aResult;
+    aResult.resize( aFSize*myNumber*2 + anISize + 2*aBSize + aObject.size());
 
     char* aPointer = (char*)&myNumber;
     for( i = 0; i < anISize; i++, aPointer++ )
@@ -1327,7 +1332,8 @@ bool GLViewer_Polyline::initializeFromByteCopy( QByteArray theArray )
          *aPointer = theArray[i];
 
     int aCurIndex = anISize + 2*aFSize*myNumber + 2*aBSize;
-    QByteArray aObject( aSize - aCurIndex );
+    QByteArray aObject;
+    aObject.resize( aSize - aCurIndex );
     for( ; i < aSize; i++ )
         aObject[i - aCurIndex] = theArray[i];
 
@@ -1394,7 +1400,7 @@ bool GLViewer_TextObject::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVi
     AddCoordsToPS( aBuffer, "moveto", aViewerCS, aPSCS, double(xPos), double(yPos) );
     aBuffer += "(" + aText + ") show\n";
 
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
 
     return true;
 }
@@ -1416,7 +1422,7 @@ bool GLViewer_TextObject::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* a
     
     aBuffer = "LB" + aText + "#;";
     
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
 
     return true;
 }
@@ -1438,7 +1444,7 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
            y = double( yPos );
 
     aViewerCS->transform( *aEMFCS, x, y );
-    const char* str = aText.ascii();
+    const char* str = aText.toAscii();
 
     int nHeight = 35*14;       // height of font
     int nWidth = 35*12;        // average character width

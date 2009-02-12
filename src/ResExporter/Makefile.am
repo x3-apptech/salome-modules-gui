@@ -1,4 +1,7 @@
-#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -14,20 +17,14 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  File   : Makefile.in
-#  Author : Vadim SANDLER (OCN)
-#  Module : SalomeApp
-#  $Header$
-
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-bin_PROGRAMS= ResourceExporter
+bin_PROGRAMS = ResourceExporter
 
-dist_ResourceExporter_SOURCES=ResourceExporter.cxx
+dist_ResourceExporter_SOURCES = ResourceExporter.cxx
 
-ResourceExporter_CPPFLAGS= $(QT_INCLUDES) -I$(srcdir)/../Qtx -I$(srcdir)/../SUIT
-
-ResourceExporter_LDFLAGS= $(QT_MT_LIBS) 
-ResourceExporter_LDADD= ../SUIT/libsuit.la ../Qtx/libqtx.la
+ResourceExporter_CPPFLAGS = $(QT_INCLUDES) -I$(srcdir)/../Qtx -I$(srcdir)/../SUIT
+ResourceExporter_LDFLAGS  = $(QT_MT_LIBS) 
+ResourceExporter_LDADD    = ../SUIT/libsuit.la ../Qtx/libqtx.la

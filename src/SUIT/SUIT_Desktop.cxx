@@ -1,29 +1,35 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_Desktop.h"
 
-#include "SUIT_Tools.h"
 #include "SUIT_ViewWindow.h"
 
 #include <QtxLogoMgr.h>
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
+
+#include <QPointer>
+#include <QCloseEvent>
+#include <QApplication>
 
 /*!\class SUIT_Desktop
  * Provide desktop management:\n
@@ -31,6 +37,17 @@
  * \li tool manager
  * \li windows
  */
+
+class SUIT_Desktop::ReparentEvent : public QEvent
+{
+public:
+  ReparentEvent( Type t, QObject* obj ) : QEvent( t ), myObj( obj ) {};
+
+  QObject* object() const { return myObj; }
+
+private:
+  QPointer<QObject> myObj;
+};
 
 /*!
   Constructor.
@@ -66,6 +83,8 @@ bool SUIT_Desktop::event( QEvent* e )
   case QEvent::WindowDeactivate:
     emit deactivated();
     break;
+  default:
+    break;
   }
 
   return QMainWindow::event( e );
@@ -85,16 +104,27 @@ void SUIT_Desktop::closeEvent( QCloseEvent* e )
 */
 void SUIT_Desktop::childEvent( QChildEvent* e )
 {
-  if ( e->type() == QEvent::ChildInserted && parentArea() &&
-       e->child()->isWidgetType() && e->child()->inherits( "SUIT_ViewWindow" ) )
-  {
-    QWidget* wid = (QWidget*)e->child();
-    bool vis = wid->isVisibleTo( wid->parentWidget() );
-    wid->reparent( parentArea(), QPoint( 0, 0 ), vis );
-    wid->setShown( vis );
-  }
+  if ( e->type() == QEvent::ChildAdded && e->child()->isWidgetType() )
+    QApplication::postEvent( this, new ReparentEvent( QEvent::Type( Reparent ), e->child() ) );
   else
     QtxMainWindow::childEvent( e );
+}
+
+void SUIT_Desktop::customEvent( QEvent* e )
+{
+  if ( (int)e->type() != Reparent )
+    return;
+
+  ReparentEvent* re = (ReparentEvent*)e;
+  SUIT_ViewWindow* wid = ::qobject_cast<SUIT_ViewWindow*>( re->object() );
+  if ( wid )
+  {
+    bool invis = wid->testAttribute( Qt::WA_WState_ExplicitShowHide ) &&
+                 wid->testAttribute( Qt::WA_WState_Hidden );
+
+    addWindow( wid );
+    wid->setShown( !invis );
+  }
 }
 
 /*!
@@ -114,10 +144,20 @@ QtxActionToolMgr* SUIT_Desktop::toolMgr() const
 }
 
 /*!
+  Gets logo manager.
+*/
+QtxLogoMgr* SUIT_Desktop::logoMgr() const
+{
+  return myLogoMgr;
+}
+
+/*!
   Returns the count of the existed logos.
 */
 int SUIT_Desktop::logoCount() const
 {
+  return 0;
+
   if ( !myLogoMgr )
     return 0;
   else
@@ -125,23 +165,12 @@ int SUIT_Desktop::logoCount() const
 }
 
 /*!
-  Adds new logo to the menu bar area.
-  Obsolete. Not should be used.
-  Use SUIT_Desktop::logoInsert();
+  Adds new logo to the menu bar area
 */
-void SUIT_Desktop::addLogo( const QString& id, const QPixmap& pix )
+void SUIT_Desktop::logoInsert( const QString& logoID, QMovie* logo, const int idx )
 {
-  logoInsert( id, pix );
-}
-
-/*!
-  Removes a logo.
-  Obsolete. Not should be used.
-  Use SUIT_Desktop::logoRemove();
-*/
-void SUIT_Desktop::removeLogo( const QString& id )
-{
-  logoRemove( id );
+  if ( myLogoMgr )
+    myLogoMgr->insert( logoID, logo, idx );
 }
 
 /*!

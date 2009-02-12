@@ -1,45 +1,44 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  SALOME SalomeApp
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-//  File   : SalomeApp_ListView.cxx
-//  Author : Vadim SANDLER
-//  Module : SALOME
-//  $Header$
-
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : SalomeApp_ListView.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
 #include "SalomeApp_ListView.h"
 #include "SalomeApp_Application.h"
 
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 
-#include <qheader.h>
-#include <qvalidator.h>
-#include <qapplication.h>
-#include <qtoolbutton.h>
+#include <QValidator>
+#include <QToolButton>
+#include <QPixmap>
+#include <QHeaderView>
+#include <QKeyEvent>
+
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_ListOfReal.hxx>
 
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <TColStd_ListIteratorOfListOfReal.hxx>
-
-#include "utilities.h"
-
-using namespace std;
 
 /*!
   Used for resizing editing widget
@@ -49,19 +48,19 @@ void computeEditGeometry(SalomeApp_ListViewItem* theItem,
 {
   if (!theItem)
     return;
-  QListView* aListView = theItem->listView();
+  QTreeWidget* aListView = theItem->treeWidget();
   int anEditColumn = theItem->getEditedColumn();
   if (anEditColumn < 0)
     return;
 
   int aX = 0, aY = 0, aW = 0, aH = 0;
 
-  QRect aRect = aListView->itemRect(theItem);
-  aListView->contentsToViewport(aListView->header()->sectionPos(anEditColumn), 0, aX, aY);
+  QRect aRect = aListView->visualItemRect(theItem);
+  aX = aListView->header()->sectionViewportPosition(anEditColumn);
   if (aX < 0)
     aX = 0; // THIS CAN BE REMOVED
   QSize aSize = theWidget->getControl()->sizeHint();
-  aH = QMAX(aSize.height() , aRect.height() );
+  aH = qMax(aSize.height() , aRect.height() );
   aY = aRect.y() - ((aH - aRect.height()) / 2);
   //aW = aListView->columnWidth(anEditColumn); // CAN SUBSTITUTE NEXT 3 ROWS
   aW = aListView->viewport()->width() - aX;
@@ -74,23 +73,22 @@ void computeEditGeometry(SalomeApp_ListViewItem* theItem,
   Constructor
 */
 SalomeApp_ListView::SalomeApp_ListView( QWidget* parent )
-: QtxListView( parent )
+  : QTreeWidget/*QtxListView*/( parent )
 {
   myMouseEnabled = true;
   myEditingEnabled = false;
-  setSelectionMode(Single);
-  setSorting(-1);
+  setSelectionMode(QAbstractItemView::SingleSelection);
   setRootIsDecorated(false);
   setAllColumnsShowFocus(false);
 //  header()->setClickEnabled(false);
-  header()->setMovingEnabled(false);
+  header()->setMovable(false);
 
   myEditedItem = 0;
   myEdit = 0;
 
   viewport()->installEventFilter(this);
 
-  connect(this, SIGNAL(selectionChanged()),
+  connect(this, SIGNAL(itemSelectionChanged()),
 	  this, SLOT(onSelectionChanged()));
   connect(header(), SIGNAL(sizeChange(int, int, int)),
 	  this,     SLOT(onHeaderSizeChange(int, int, int)));
@@ -115,13 +113,14 @@ void SalomeApp_ListView::updateViewer()
 {
   // temporary disconnecting selection changed SIGNAL
   blockSignals(true);
-  SalomeApp_ListViewItem* aRoot = (SalomeApp_ListViewItem*)firstChild();
+  QTreeWidgetItemIterator it( this );
+  SalomeApp_ListViewItem* aRoot = (SalomeApp_ListViewItem*)(*it);
   if (aRoot)
     aRoot->updateAllLevels();
-  updateContents();
+  update( contentsRect() );//updateContents();
   // connecting again selection changed SIGNAL
   blockSignals(false);
-  emit selectionChanged();
+  emit itemSelectionChanged();
 }
 
 /*!
@@ -131,13 +130,13 @@ void SalomeApp_ListView::updateSelected()
 {
   // temporary disconnecting selection changed SIGNAL
   blockSignals(true);
-  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)selectedItem();
+  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)(selectedItems().first());
   if (aChild)
     aChild->updateAllLevels();
-  updateContents();
+  update( contentsRect() );//updateContents();
   // connecting again selection changed SIGNAL
   blockSignals(false);
-  emit selectionChanged();
+  emit itemSelectionChanged();
 }
 
 /*!
@@ -151,7 +150,7 @@ QString SalomeApp_ListView::popupClientType() const
 /*!
   Fills popup menu with items
 */
-void SalomeApp_ListView::contextMenuPopup( QPopupMenu* aPopup )
+void SalomeApp_ListView::contextMenuPopup( QMenu* aPopup )
 {
   if (aPopup) {
     // add items here...
@@ -168,7 +167,7 @@ void SalomeApp_ListView::clear()
     myEdit = 0;
     myEditedItem = 0;
   }
-  QListView::clear();
+  QTreeWidget::clear();
 }
 
 /*!
@@ -199,7 +198,7 @@ bool SalomeApp_ListView::eventFilter(QObject* object, QEvent* event)
       !isMouseEnabled())
     return true;
   else
-    return QListView::eventFilter(object, event);
+    return QTreeWidget::eventFilter(object, event);
 }
 
 /*!
@@ -244,14 +243,14 @@ void SalomeApp_ListView::onSelectionChanged()
     myEdit = 0;
     if (myEditedItem && !myEditedItem->isAccepted()) {
       delete myEditedItem;
-      updateContents();
+      update( contentsRect() );//updateContents();
     }
     myEditedItem = 0;
   }
   // editing is allowed in Single Selection Mode only
-  if (selectionMode() != Single || !isEnableEditing())
+  if (selectionMode() != QAbstractItemView::SingleSelection || !isEnableEditing())
     return;
-  SalomeApp_ListViewItem* anItem = (SalomeApp_ListViewItem*)selectedItem();
+  SalomeApp_ListViewItem* anItem = (SalomeApp_ListViewItem*)(selectedItems().first());
   if (anItem) {
     if (!anItem->isEditable())
       return;
@@ -271,12 +270,12 @@ void SalomeApp_ListView::onSelectionChanged()
 */
 void SalomeApp_ListView::resizeEvent( QResizeEvent * e)
 {
-  QListView::resizeEvent(e);
-  int aW = columnWidth(columns()-1);
-  int aX = header()->sectionPos(columns()-1);
+  QTreeWidget::resizeEvent(e);
+  int aW = columnWidth(columnCount()-1);
+  int aX = header()->sectionPosition(columnCount()-1);
   if (aW < width() - frameWidth() * 2 - aX - 1)
-    setColumnWidth(columns()-1, width() - frameWidth() * 2 - aX - 1);
-  updateContents();
+    setColumnWidth(columnCount()-1, width() - frameWidth() * 2 - aX - 1);
+  update( contentsRect() );//updateContents();
 }
 
 /*!
@@ -284,10 +283,10 @@ void SalomeApp_ListView::resizeEvent( QResizeEvent * e)
 */
 void SalomeApp_ListView::onHeaderSizeChange(int, int, int)
 {
-  int aW = columnWidth(columns()-1);
-  int aX = header()->sectionPos(columns()-1);
+  int aW = columnWidth(columnCount()-1);
+  int aX = header()->sectionPosition(columnCount()-1);
   if (aW < width() - frameWidth() * 2 - aX - 1)
-    setColumnWidth(columns()-1, width() - frameWidth() * 2 - aX - 1);
+    setColumnWidth(columnCount()-1, width() - frameWidth() * 2 - aX - 1);
 }
 
 /*!
@@ -295,7 +294,7 @@ void SalomeApp_ListView::onHeaderSizeChange(int, int, int)
 */
 void SalomeApp_ListView::viewportPaintEvent(QPaintEvent* e)
 {
-  QListView::viewportPaintEvent(e);
+  QTreeWidget::paintEvent(e);
   if (myEditedItem && myEdit) {
     computeEditGeometry(myEditedItem, myEdit);
   }
@@ -386,14 +385,14 @@ UpdateType SalomeApp_ListView::finishEditing(bool ok)
   \retval valid rect in success
 */
 QRect SalomeApp_ListView::tip(QPoint aPos,
-			QString& aText,
-			QRect& dspRect,
-			QFont& dspFnt) const
+			      QString& aText,
+			      QRect& dspRect,
+			      QFont& dspFnt) const
 {
   QRect result( -1, -1, -1, -1 );
   SalomeApp_ListViewItem* aItem = (SalomeApp_ListViewItem*)itemAt( aPos );
   if ( aItem ) {
-    for (int i = 0; i < columns(); i++) {
+    for (int i = 0; i < columnCount(); i++) {
       QRect aItemRect = aItem->itemRect(i);
       QRect aTextRect = aItem->textRect(i);
       if ( !aItem->text(i).isEmpty() &&
@@ -420,7 +419,7 @@ QRect SalomeApp_ListView::tip(QPoint aPos,
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView* parent) :
-QListViewItem( parent )
+QTreeWidgetItem( parent )
 {
   init();
 }
@@ -429,8 +428,8 @@ QListViewItem( parent )
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
-				   SalomeApp_ListViewItem* after) :
-QListViewItem( parent, after )
+					       SalomeApp_ListViewItem* after) :
+QTreeWidgetItem( parent, after )
 {
   init();
 }
@@ -439,22 +438,9 @@ QListViewItem( parent, after )
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
-				   const QString&    theName,
-				   const bool        theEditable) :
-QListViewItem(parent, theName)
-{
-  init();
-  setEditable(theEditable);
-}
-
-/*!
-  Constructor
-*/
-SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
-				   const QString&    theName,
-				   const QString&    theValue,
-				   const bool        theEditable) :
-QListViewItem(parent, theName, theValue)
+					       const QStringList&    theStrings,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, theStrings)
 {
   init();
   setEditable(theEditable);
@@ -464,9 +450,9 @@ QListViewItem(parent, theName, theValue)
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
-				   const QString&    theName,
-				   const bool        theEditable) :
-QListViewItem(parent, theName)
+					       const QStringList&    theString,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, theString)
 {
   init();
   setEditable(theEditable);
@@ -476,11 +462,12 @@ QListViewItem(parent, theName)
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
-				   SalomeApp_ListViewItem* after,
-				   const QString&    theName,
-				   const bool        theEditable) :
-QListViewItem(parent, after, theName)
+					       SalomeApp_ListViewItem* after,
+					       const QString&    theName,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, after)
 {
+  setData(0,Qt::DisplayRole,QVariant(theName));
   init();
   setEditable(theEditable);
 }
@@ -489,40 +476,28 @@ QListViewItem(parent, after, theName)
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
-				   SalomeApp_ListViewItem* after,
-				   const QString&    theName,
-				   const bool        theEditable) :
-QListViewItem(parent, after, theName)
+					       SalomeApp_ListViewItem* after,
+					       const QString&    theName,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, after)
 {
+  setData(0,Qt::DisplayRole,QVariant(theName));
   init();
   setEditable(theEditable);
 }
-
 
 /*!
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
-				   const QString&    theName,
-				   const QString&    theValue,
-				   const bool        theEditable) :
-QListViewItem(parent, theName, theValue)
+					       SalomeApp_ListViewItem* after,
+					       const QString&    theName,
+					       const QString&    theValue,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, after)
 {
-  init();
-  setEditable(theEditable);
-}
-
-
-/*!
-  Constructor
-*/
-SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListViewItem* parent,
-				   SalomeApp_ListViewItem* after,
-				   const QString&    theName,
-				   const QString&    theValue,
-				   const bool        theEditable) :
-QListViewItem(parent, after, theName, theValue)
-{
+  setData(0,Qt::DisplayRole,QVariant(theName));
+  setData(1,Qt::DisplayRole,QVariant(theValue));
   init();
   setEditable(theEditable);
 }
@@ -531,12 +506,14 @@ QListViewItem(parent, after, theName, theValue)
   Constructor
 */
 SalomeApp_ListViewItem::SalomeApp_ListViewItem(SalomeApp_ListView*     parent,
-				   SalomeApp_ListViewItem* after,
-				   const QString&    theName,
-				   const QString&    theValue,
-				   const bool        theEditable) :
-QListViewItem(parent, after, theName, theValue)
+					       SalomeApp_ListViewItem* after,
+					       const QString&    theName,
+					       const QString&    theValue,
+					       const bool        theEditable) :
+QTreeWidgetItem(parent, after)
 {
+  setData(0,Qt::DisplayRole,QVariant(theName));
+  setData(1,Qt::DisplayRole,QVariant(theValue));
   init();
   setEditable(theEditable);
 }
@@ -562,11 +539,25 @@ void SalomeApp_ListViewItem::init()
 }
 
 /*!
+  Returns the depth of this item
+*/
+int SalomeApp_ListViewItem::depth() const
+{
+  int aDepth = 0;
+  QTreeWidgetItem* aParent = parent();
+  while ( aParent ) {
+    aParent = aParent->parent();
+    aDepth++;
+  }
+  return aDepth;
+}
+
+/*!
   \return text in the first column
 */
 QString SalomeApp_ListViewItem::getName() const
 {
-  return ( listView()->columns() > 0 ) ? text(0) : QString("");
+  return ( treeWidget()->columnCount() > 0 ) ? text(0) : QString("");
 }
 
 /*!
@@ -575,7 +566,7 @@ QString SalomeApp_ListViewItem::getName() const
 UpdateType SalomeApp_ListViewItem::setName(const QString& theName)
 {
   UpdateType aNeedsUpdate = utCancel;
-  if (listView()->columns() > 0) {
+  if (treeWidget()->columnCount() > 0) {
     setText(0, theName);
     aNeedsUpdate = utNone;
   }
@@ -587,7 +578,7 @@ UpdateType SalomeApp_ListViewItem::setName(const QString& theName)
 */
 QString SalomeApp_ListViewItem::getValue() const
 {
-  return ( listView()->columns() > 1 ) ? text(1) : QString("");
+  return ( treeWidget()->columnCount() > 1 ) ? text(1) : QString("");
 }
 
 /*!
@@ -596,7 +587,7 @@ QString SalomeApp_ListViewItem::getValue() const
 UpdateType SalomeApp_ListViewItem::setValue(const QString& theValue)
 {
   UpdateType aNeedsUpdate = utCancel;
-  if (listView()->columns() > 1) {
+  if (treeWidget()->columnCount() > 1) {
     setText(1, theValue);
     aNeedsUpdate = utNone;
   }
@@ -622,11 +613,13 @@ QString SalomeApp_ListViewItem::fullName()
 */
 void SalomeApp_ListViewItem::openAllLevels()
 {
-  setOpen(true);
-  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)firstChild();
+  setExpanded(true);
+  QTreeWidgetItemIterator it( this );
+  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)(*it);
   while( aChild ) {
     aChild->openAllLevels();
-    aChild = (SalomeApp_ListViewItem*)(aChild->nextSibling());
+    ++it;
+    aChild = (SalomeApp_ListViewItem*)(*it);
   }
 }
 
@@ -635,10 +628,12 @@ void SalomeApp_ListViewItem::openAllLevels()
 */
 void SalomeApp_ListViewItem::updateAllLevels()
 {
-  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)firstChild();
+  QTreeWidgetItemIterator it( this );
+  SalomeApp_ListViewItem* aChild = (SalomeApp_ListViewItem*)(*it);
   while( aChild ) {
     aChild->updateAllLevels();
-    aChild = (SalomeApp_ListViewItem*)(aChild->nextSibling());
+    ++it;
+    aChild = (SalomeApp_ListViewItem*)(*it);
   }
 }
 
@@ -701,7 +696,7 @@ void SalomeApp_ListViewItem::setEditingType(const int type)
 */
 int SalomeApp_ListViewItem::getEditedColumn()
 {
-  return listView()->columns()-1;
+  return treeWidget()->columnCount()-1;
 }
 
 /*!
@@ -760,7 +755,7 @@ void SalomeApp_ListViewItem::setButtons(const int buttons)
 SalomeApp_EntityEdit* SalomeApp_ListViewItem::startEditing()
 {
   SalomeApp_EntityEdit* aWidget = 0;
-  QListView* aListView = listView();
+  QTreeWidget* aListView = treeWidget();
   if (aListView) {
     if (!isEditable())
       return 0;
@@ -825,14 +820,14 @@ UpdateType SalomeApp_ListViewItem::finishEditing(SalomeApp_EntityEdit* theWidget
 QRect SalomeApp_ListViewItem::tipRect()
 {
   QRect aRect = QRect(-1, -1, -1, -1);
-  QRect aItemRect = listView()->itemRect(this);
+  QRect aItemRect = treeWidget()->visualItemRect(this);
   if ( !aItemRect.isValid() )
     return aItemRect;
 
   QString aTip = tipText();
   if (!aTip.isEmpty()) {
     QRect aRect0 = textRect(0);
-    QFont aFont(listView()->font());
+    QFont aFont(treeWidget()->font());
     QFontMetrics fm(aFont);
     int iw = fm.width(aTip);
     aRect = QRect(QPoint(aRect0.x() < 0 ? 0 : aRect0.x(),
@@ -859,33 +854,33 @@ QString SalomeApp_ListViewItem::tipText()
 */
 QRect SalomeApp_ListViewItem::textRect(const int column) const
 {
-  QRect aItemRect = listView()->itemRect( this );
+  QRect aItemRect = treeWidget()->visualItemRect( this );
   if ( !aItemRect.isValid() )
     return aItemRect;
 
-  QFont aFont(listView()->font());
+  QFont aFont(treeWidget()->font());
   QFontMetrics fm(aFont);
 
-  int decorWidth  = ( listView()->rootIsDecorated() ) ?
-                    ( listView()->treeStepSize() * (depth() + 1) ) :
-                    ( listView()->treeStepSize() *  depth() );
-  int pixmapWidth = ( pixmap(column) ) ?
-                      pixmap(column)->width() +  listView()->itemMargin() * 2 :
-                      listView()->itemMargin();
+  int decorWidth  = ( treeWidget()->rootIsDecorated() ) ?
+                    ( treeWidget()->indentation() * (depth() + 1) ) :
+                    ( treeWidget()->indentation() *  depth() );
+  int pixmapWidth = ( !icon(column).isNull() ) ?
+                      treeWidget()->iconSize().width() + 2 :
+                      1;
   int prevWidth = 0;
   for (int i = 0; i < column; i++)
-    prevWidth += listView()->header()->sectionSize(i);
+    prevWidth += treeWidget()->header()->sectionSize(i);
   int ix = prevWidth   +
            pixmapWidth +
            ((column == 0) ? decorWidth : 0);
   int iy = aItemRect.y();
   int iw = fm.width(text(column));
   int ih = aItemRect.height();
-  if (pixmap(column)) {
-    iy += listView()->itemMargin();
-    ih -= listView()->itemMargin() * 2;
+  if (!icon(column).isNull()) {
+    iy += 1;
+    ih -= 2;
   }
-  ix -= listView()->contentsX();
+  ix -= treeWidget()->contentsRect().left();
 
   QRect theResult(QPoint(ix, iy), QSize(iw, ih));
   return theResult;
@@ -896,30 +891,30 @@ QRect SalomeApp_ListViewItem::textRect(const int column) const
 */
 QRect SalomeApp_ListViewItem::itemRect(const int column) const
 {
-  QRect aItemRect = listView()->itemRect( this );
+  QRect aItemRect = treeWidget()->visualItemRect( this );
   if ( !aItemRect.isValid() )
     return aItemRect;
 
-  QFont aFont(listView()->font());
+  QFont aFont(treeWidget()->font());
   QFontMetrics fm(aFont);
 
-  int decorWidth  = ( listView()->rootIsDecorated() ) ?
-                    ( listView()->treeStepSize() * (depth() + 1) ) :
-                    ( listView()->treeStepSize() *  depth() );
-  int pixmapWidth = ( pixmap(column) ) ?
-                      pixmap(column)->width() +  listView()->itemMargin() * 2 :
+  int decorWidth  = ( treeWidget()->rootIsDecorated() ) ?
+                    ( treeWidget()->indentation() * (depth() + 1) ) :
+                    ( treeWidget()->indentation() *  depth() );
+  int pixmapWidth = ( !icon(column).isNull() ) ?
+                      treeWidget()->iconSize().width() + 2 :
                       0;
   int prevWidth = 0;
   for (int i = 0; i < column; i++)
-    prevWidth += listView()->header()->sectionSize(i);
+    prevWidth += treeWidget()->header()->sectionSize(i);
   int ix = prevWidth;
   int iy = aItemRect.y();
   int iw = pixmapWidth +
-           listView()->itemMargin() * 2 +
+           2 +
            ((column == 0) ? decorWidth : 0) +
            fm.width(text(column));
   int ih = aItemRect.height();
-  ix -= listView()->contentsX();
+  ix -= treeWidget()->contentsRect().left();
 
   QRect theResult(QPoint(ix, iy), QSize(iw, ih));
   return theResult;
@@ -938,7 +933,7 @@ QLineEdit(parent)
 */
 void SalomeApp_EditBox::keyPressEvent( QKeyEvent *e )
 {
-  if ( e->key() == Key_Escape )
+  if ( e->key() == Qt::Key_Escape )
     emit escapePressed();
   else
     QLineEdit::keyPressEvent( e );
@@ -950,8 +945,10 @@ void SalomeApp_EditBox::keyPressEvent( QKeyEvent *e )
   Constructor
 */
 SalomeApp_ComboBox::SalomeApp_ComboBox(bool rw, QWidget* parent, const char* name) :
-QComboBox(rw, parent, name)
+QComboBox(parent)
 {
+  setEditable( rw );
+  setObjectName( name );
 }
 
 /*!
@@ -960,7 +957,7 @@ QComboBox(rw, parent, name)
 int SalomeApp_ComboBox::findItem(const QString& theText)
 {
   for (int i = 0; i < count(); i++)
-    if (text(i) == theText)
+    if (itemText(i) == theText)
       return i;
   return -1;
 }
@@ -969,10 +966,10 @@ int SalomeApp_ComboBox::findItem(const QString& theText)
   Adds item in combo box
 */
 void SalomeApp_ComboBox::insertItem(const QString& theValue,
-			      int            theIndex)
+				    int            theIndex)
 {
   if (duplicatesEnabled() || findItem(theValue) < 0)
-    QComboBox::insertItem(theValue, theIndex);
+    QComboBox::insertItem(theIndex, theValue);
 }
 
 /*!
@@ -992,10 +989,10 @@ void SalomeApp_ComboBox::insertItem(const int theValue)
   int aNum;
   bool bOk;
   for (int i = 0; i < count(); i++) {
-    aNum = text(i).toInt(&bOk);
+    aNum = itemText(i).toInt(&bOk);
     if (bOk) {
       if (aNum > theValue || (aNum == theValue && duplicatesEnabled())) {
-        insertItem(QString::number(theValue), i);
+        insertItem(QString::number(theValue),i);
         return;
       }
     }
@@ -1020,7 +1017,7 @@ void SalomeApp_ComboBox::insertItem(const double theValue)
   double aNum;
   bool bOk;
   for (int i = 0; i < count(); i++) {
-    aNum = text(i).toDouble(&bOk);
+    aNum = itemText(i).toDouble(&bOk);
     if (bOk) {
       if (aNum > theValue || (aNum == theValue && duplicatesEnabled())) {
         insertItem(QString::number(theValue), i);
@@ -1077,7 +1074,7 @@ myCancelBtn(0)
     myCombo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Fixed));
     // no insertions
-    myCombo->setInsertionPolicy(QComboBox::NoInsertion);
+    myCombo->setInsertPolicy(QComboBox::NoInsert);
     // no duplicates enabled by default
     myCombo->setDuplicatesEnabled(false);
     aTopLayout->addWidget(myCombo);
@@ -1110,9 +1107,9 @@ myCancelBtn(0)
 
     QPixmap anIcon;
     if( mgr )
-      anIcon = mgr->loadPixmap( "STD", tr( "ICON_APPLY" ), false );
+      anIcon = mgr->loadPixmap( "SalomeApp", tr( "ICON_APPLY" ), false );
 
-    myApplyBtn->setPixmap(anIcon);
+    myApplyBtn->setIcon(anIcon);
     myApplyBtn->setEnabled(false);
     myApplyBtn->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     myApplyBtn->setMinimumSize(16, 16);
@@ -1125,8 +1122,8 @@ myCancelBtn(0)
     myCancelBtn = new QToolButton(this);
     QPixmap anIcon;
     if( mgr )
-      anIcon = mgr->loadPixmap( "STD", tr( "ICON_CANCEL" ), false );
-    myCancelBtn->setPixmap(anIcon);
+      anIcon = mgr->loadPixmap( "SalomeApp", tr( "ICON_CANCEL" ), false );
+    myCancelBtn->setIcon(anIcon);
     myCancelBtn->setEnabled(false);
     myCancelBtn->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     myCancelBtn->setMinimumSize(16, 16);
@@ -1178,7 +1175,7 @@ void SalomeApp_EntityEdit::setText(const QString& theText)
   if (myCombo) {
     int aFound = myCombo->findItem(theText);
     if (aFound >= 0) {
-      myCombo->setCurrentItem(aFound);
+      myCombo->setCurrentIndex(aFound);
       onTextChanged(theText);
     }
   }
@@ -1196,11 +1193,11 @@ void SalomeApp_EntityEdit::insertItem(const QString& theValue,
     if (theOrder == atTop)
       aIndexAt = 0;
     else if (theOrder == atBeforeCurrent && myCombo->count() > 0)
-      aIndexAt = myCombo->currentItem();
+      aIndexAt = myCombo->currentIndex();
     else if (theOrder == atAfterCurrent &&
              myCombo->count() > 0 &&
-             myCombo->currentItem() < myCombo->count()-1)
-      aIndexAt = myCombo->currentItem() + 1;
+             myCombo->currentIndex() < myCombo->count()-1)
+      aIndexAt = myCombo->currentIndex() + 1;
     myCombo->insertItem(theValue, aIndexAt);
   }
   if (theSetCurrent)
@@ -1303,7 +1300,7 @@ void SalomeApp_EntityEdit::setFocus()
     myEdit->setFocus();
     //myEdit->selectAll();
   }
-  else if (myCombo && myCombo->editable()) {
+  else if (myCombo && myCombo->isEditable()) {
     myCombo->setFocus();
     //myCombo->lineEdit()->selectAll();
   }
@@ -1325,10 +1322,10 @@ void SalomeApp_EntityEdit::setValidator(const QValidator* theValidator)
 */
 void SalomeApp_EntityEdit::keyPressEvent( QKeyEvent * e)
 {
-  if ( (e->key() == Key_Enter ||
-        e->key() == Key_Return ) )
+  if ( (e->key() == Qt::Key_Enter ||
+        e->key() == Qt::Key_Return ) )
     onApply();
-  else if (e->key() == Key_Escape)
+  else if (e->key() == Qt::Key_Escape)
     onCancel();
 }
 

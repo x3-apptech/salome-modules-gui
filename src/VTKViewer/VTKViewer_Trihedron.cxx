@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "VTKViewer_Trihedron.h"
 #include "VTKViewer_Actor.h"
@@ -80,8 +83,12 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
     vtkFloatingPointType aLength = aDataSet->GetLength();
     vtkFloatingPointType aPrecision = 1.0E-3;
     vtkFloatingPointType anOldScale = GetScale()[0];
-    vtkFloatingPointType aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(aSize[0])/vtkFloatingPointType(aSize[1]));
-    if(fabs(aScale - anOldScale)/aScale > aPrecision){
+    vtkFloatingPointType aScale;
+    if (aSize[1] > aSize[0])
+      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(aSize[0])/vtkFloatingPointType(aSize[1]));
+    else
+      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(aSize[1])/vtkFloatingPointType(aSize[0]));
+    if(aScale != 0.0&& fabs(aScale - anOldScale)/aScale > aPrecision){
       SetScale(aScale);
     }
   }
@@ -91,7 +98,7 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
 vtkStandardNewMacro(VTKViewer_LineActor);
 
 vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,VTKViewer_UnScaledActor);
-vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,VTKViewer_UnScaledActor);
+vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,vtkFollower);
 
 /*!Adds Label and Arrow actors to \a theRenderer.*/
 void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
@@ -125,16 +132,17 @@ VTKViewer_Axis::VTKViewer_Axis()
   
   /*! \li Initialize the Arrow pipe-line representation*/
   myConeSource =  vtkConeSource::New();
-  myConeSource->SetResolution(2);
+  myConeSource->SetResolution(16);
   myConeSource->SetAngle(10);
+  myConeSource->SetCenter(-0.5,0.0,0.0);
   
   myMapper[1] = vtkPolyDataMapper::New();
   myMapper[1]->SetInput(myConeSource->GetOutput());
   
-  myArrowActor = VTKViewer_UnScaledActor::New();
+  myArrowActor = vtkFollower::New();
   myArrowActor->SetMapper(myMapper[1]);
-  static int aArrowActorSize = 24;
-  myArrowActor->SetSize(aArrowActorSize);
+  static int aArrowActorSize = 16;
+  myArrowActor->SetScale(aArrowActorSize);
   myArrowActor->PickableOff();
   
   myLineActor->SetArrowActor(myArrowActor);
@@ -248,11 +256,15 @@ void VTKViewer_Axis::SetProperty(vtkProperty* theProperty){
 void VTKViewer_Axis::SetSize(vtkFloatingPointType theSize)
 {
   vtkFloatingPointType aPosition[3] = {myDir[0]*theSize, myDir[1]*theSize, myDir[2]*theSize};
-  myLineSource->SetPoint2(aPosition);
+
+  vtkFloatingPointType aCoef = 0.99;
+  vtkFloatingPointType aLinePosition[3] = {aPosition[0]*aCoef, aPosition[1]*aCoef, aPosition[2]*aCoef};
+  myLineSource->SetPoint2(aLinePosition);
   
   myArrowActor->SetPosition(0.0,0.0,0.0);
   myArrowActor->AddPosition(aPosition);
   myArrowActor->SetOrientation(myRot);
+  myArrowActor->SetScale(theSize / 10.);
   
   myLabelActor->SetPosition(0.0,0.0,0.0);
   myLabelActor->AddPosition(aPosition);

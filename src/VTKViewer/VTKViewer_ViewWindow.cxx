@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "VTKViewer_ViewWindow.h"
 #include "VTKViewer_ViewModel.h"
@@ -25,18 +28,18 @@
 #include "VTKViewer_Transform.h"
 #include "VTKViewer_Utilities.h"
 
-#include "SUIT_Session.h"
-#include "SUIT_ToolButton.h"
-#include "SUIT_MessageBox.h"
+#include <SUIT_Session.h>
+#include <SUIT_MessageBox.h>
+#include <SUIT_Tools.h>
+#include <SUIT_ResourceMgr.h>
 
-#include "SUIT_Tools.h"
-#include "SUIT_ResourceMgr.h"
-
-#include <qapplication.h>
-#include <qimage.h>
+#include <QImage>
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+
+#include <QtxToolBar.h>
+#include <QtxMultiAction.h>
 
 /*! Construction*/
 VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop, 
@@ -55,7 +58,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
 
   myRenderWindow = new VTKViewer_RenderWindow( this, "RenderWindow" );
   setCentralWidget(myRenderWindow);
-  myRenderWindow->setFocusPolicy( StrongFocus );
+  myRenderWindow->setFocusPolicy( Qt::StrongFocus );
   myRenderWindow->setFocus();
 
   myRenderWindow->getRenderWindow()->AddRenderer( myRenderer );
@@ -88,9 +91,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
 
   setCentralWidget( myRenderWindow );
 
-  myToolBar = new QToolBar(this);
-  myToolBar->setCloseMode(QDockWindow::Undocked);
-  myToolBar->setLabel(tr("LBL_TOOLBAR_LABEL"));
+  myToolBar = new QtxToolBar( true, tr("LBL_TOOLBAR_LABEL"), this );
 
   createActions();
   createToolBar();
@@ -290,29 +291,32 @@ void VTKViewer_ViewWindow::createActions()
 /*!Create tool bar.*/
 void VTKViewer_ViewWindow::createToolBar()
 {
-  myActionsMap[DumpId]->addTo(myToolBar);
-  myActionsMap[TrihedronShowId]->addTo(myToolBar);
+  myToolBar->addAction( myActionsMap[DumpId] );
+  myToolBar->addAction( myActionsMap[TrihedronShowId] );
 
-  SUIT_ToolButton* aScaleBtn = new SUIT_ToolButton(myToolBar);
-  aScaleBtn->AddAction(myActionsMap[FitAllId]);
-  aScaleBtn->AddAction(myActionsMap[FitRectId]);
-  aScaleBtn->AddAction(myActionsMap[ZoomId]);
+  QtxMultiAction* aScaleAction = new QtxMultiAction( this );
+  aScaleAction->insertAction( myActionsMap[FitAllId] );
+  aScaleAction->insertAction( myActionsMap[FitRectId] );
+  aScaleAction->insertAction( myActionsMap[ZoomId] );
+  myToolBar->addAction( aScaleAction );
 
-  SUIT_ToolButton* aPanningBtn = new SUIT_ToolButton(myToolBar);
-  aPanningBtn->AddAction(myActionsMap[PanId]);
-  aPanningBtn->AddAction(myActionsMap[GlobalPanId]);
+  QtxMultiAction* aPanningAction = new QtxMultiAction( this );
+  aPanningAction->insertAction( myActionsMap[PanId] );
+  aPanningAction->insertAction( myActionsMap[GlobalPanId] );
+  myToolBar->addAction( aPanningAction );
 
-  myActionsMap[RotationId]->addTo(myToolBar);
+  myToolBar->addAction( myActionsMap[RotationId] );
 
-  SUIT_ToolButton* aViewsBtn = new SUIT_ToolButton(myToolBar);
-  aViewsBtn->AddAction(myActionsMap[FrontId]);
-  aViewsBtn->AddAction(myActionsMap[BackId]);
-  aViewsBtn->AddAction(myActionsMap[TopId]);
-  aViewsBtn->AddAction(myActionsMap[BottomId]);
-  aViewsBtn->AddAction(myActionsMap[LeftId]);
-  aViewsBtn->AddAction(myActionsMap[RightId]);
+  QtxMultiAction* aViewsAction = new QtxMultiAction(myToolBar);
+  aViewsAction->insertAction( myActionsMap[FrontId] );
+  aViewsAction->insertAction( myActionsMap[BackId] );
+  aViewsAction->insertAction( myActionsMap[TopId] );
+  aViewsAction->insertAction( myActionsMap[BottomId] );
+  aViewsAction->insertAction( myActionsMap[LeftId] );
+  aViewsAction->insertAction( myActionsMap[RightId] );
+  myToolBar->addAction( aViewsAction );
 
-  myActionsMap[ResetId]->addTo(myToolBar);
+  myToolBar->addAction( myActionsMap[ResetId] );
 }
 
 /*!On front view event.*/
@@ -414,7 +418,7 @@ QColor VTKViewer_ViewWindow::backgroundColor() const
     myRenderer->GetBackground( backint );
     return QColor(int(backint[0]*255), int(backint[1]*255), int(backint[2]*255));
   }
-  return SUIT_ViewWindow::backgroundColor();
+  return palette().color( backgroundRole() );
 }
 
 /*!Repaint window. If \a theUpdateTrihedron is true - recalculate trihedron.*/
@@ -455,8 +459,8 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
                      (bnd[5]-bnd[4])*(bnd[5]-bnd[4]));
     }else{
       aLength = bnd[1]-bnd[0];
-      aLength = std::max((bnd[3]-bnd[2]),aLength);
-      aLength = std::max((bnd[5]-bnd[4]),aLength);
+      aLength = qMax((bnd[3]-bnd[2]),aLength);
+      aLength = qMax((bnd[5]-bnd[4]),aLength);
     }
    
     static vtkFloatingPointType aSizeInPercents = 105;
@@ -557,7 +561,7 @@ void VTKViewer_ViewWindow::onTrihedronShow()
 QImage VTKViewer_ViewWindow::dumpView()
 {
   QPixmap px = QPixmap::grabWindow( myRenderWindow->winId() );
-  return px.convertToImage();
+  return px.toImage();
 }
 
 /*! The method returns the visual parameters of this view as a formated string
@@ -584,7 +588,7 @@ QString VTKViewer_ViewWindow::getVisualParameters()
  */
 void VTKViewer_ViewWindow::setVisualParameters( const QString& parameters )
 {
-  QStringList paramsLst = QStringList::split( '*', parameters, true );
+  QStringList paramsLst = parameters.split( '*' );
   if ( paramsLst.size() == 13 ) {
     double pos[3], focalPnt[3], viewUp[3], parScale, scale[3];
     pos[0] = paramsLst[0].toDouble();

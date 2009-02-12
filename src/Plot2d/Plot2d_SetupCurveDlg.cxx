@@ -1,217 +1,297 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  SALOME Plot2d : implementation of desktop and GUI kernel
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-//  File   : Plot2d_SetupCurveDlg.cxx
-//  Author : Vadim SANDLER
-//  Module : SALOME
-//  $Header$
-
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : Plot2d_SetupCurveDlg.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
 #include "Plot2d_SetupCurveDlg.h"
-#include "SUIT_Tools.h"
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qcombobox.h>
-#include <qspinbox.h>
-#include <qtoolbutton.h>
-#include <qgroupbox.h>
-#include <qcolordialog.h>
 
-#ifndef WNT
-using namespace std;
-#endif
+#include <QtxColorButton.h>
+#include <SUIT_Tools.h>
 
-#define MARGIN_SIZE      11
-#define SPACING_SIZE     6
-#define MIN_COMBO_WIDTH  100
-#define MIN_SPIN_WIDTH   50
-#define MAX_LINE_WIDTH   100
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QComboBox>
+#include <QSpinBox>
+#include <QPainter>
+
+const int MARGIN_SIZE     = 11;
+const int SPACING_SIZE    = 6;
+const int MIN_COMBO_WIDTH = 100;
+const int MIN_SPIN_WIDTH  = 50;
+const int MAX_LINE_WIDTH  = 10;
+const int MSIZE           = 9;
 
 /*!
-  Constructor
+  \class Plot2d_SetupCurveDlg
+  \brief Dialog box for modifying 2d curve settings.
+*/
+
+/*!
+  \brief Constructor.
+  \param parent parent widget
 */
 Plot2d_SetupCurveDlg::Plot2d_SetupCurveDlg( QWidget* parent )
-     : QDialog( parent, "Plot2d_SetupCurveDlg", true, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
+: QDialog( parent )
 {
-  setCaption( tr("TLT_SETUP_CURVE") );
-  setSizeGripEnabled( TRUE );
-  QGridLayout* topLayout = new QGridLayout( this ); 
+  setModal( true );
+  setWindowTitle( tr("TLT_SETUP_CURVE") );
+  setSizeGripEnabled( true );
+
+  // curve type
+  QLabel* aLineTypeLab = new QLabel( tr( "CURVE_LINE_TYPE_LAB" ), this );
+  myLineCombo = new QComboBox( this );
+  myLineCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myLineCombo->setMinimumWidth( MIN_COMBO_WIDTH );
+  myLineCombo->setIconSize( QSize( 40, 16 ) );
+
+  // curve width
+  QLabel* aLineWidthLab = new QLabel( tr( "CURVE_LINE_WIDTH_LAB" ), this );
+  myLineSpin = new QSpinBox( this );
+  myLineSpin->setMinimum( 0 );
+  myLineSpin->setMaximum( MAX_LINE_WIDTH );
+  myLineSpin->setSingleStep( 1 );
+  myLineSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myLineSpin->setMinimumWidth( MIN_SPIN_WIDTH );
+
+  // marker type
+  QLabel* aMarkerLab = new QLabel( tr( "CURVE_MARKER_TYPE_LAB" ), this );
+  myMarkerCombo = new QComboBox( this );
+  myMarkerCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myMarkerCombo->setMinimumWidth( MIN_COMBO_WIDTH );
+  myMarkerCombo->setIconSize( QSize( 16, 16 ) );
+
+  // curve color
+  QLabel* aColorLab = new QLabel( tr( "CURVE_COLOR_LAB" ), this );
+  myColorBtn = new QtxColorButton( this );
+
+  // preview
+  QLabel* aPreviewLab = new QLabel( tr( "CURVE_PREVIEW_LAB" ), this );
+  myPreview = new QLabel( this );
+  myPreview->setFrameStyle( QLabel::Box | QLabel::Sunken );
+  myPreview->setAlignment( Qt::AlignCenter );
+  myPreview->setScaledContents( false );
+
+  myOkBtn     = new QPushButton( tr( "BUT_OK" ),     this );
+  myCancelBtn = new QPushButton( tr( "BUT_CANCEL" ), this );
+
+  // layouting widgets
+  QGridLayout* topLayout = new QGridLayout( this );
   topLayout->setSpacing( SPACING_SIZE );
   topLayout->setMargin( MARGIN_SIZE );
 
-  QGroupBox* TopGroup = new QGroupBox( this );
-  TopGroup->setColumnLayout( 0, Qt::Vertical );
-  TopGroup->layout()->setSpacing( 0 ); TopGroup->layout()->setMargin( 0 );
-  QGridLayout* TopGroupLayout = new QGridLayout( TopGroup->layout() );
-  TopGroupLayout->setAlignment( Qt::AlignTop );
-  TopGroupLayout->setSpacing( SPACING_SIZE ); TopGroupLayout->setMargin( MARGIN_SIZE );
+  topLayout->addWidget( aLineTypeLab,  0, 0 );
+  topLayout->addWidget( myLineCombo,   0, 1, 1, 2 );
+  topLayout->addWidget( aLineWidthLab, 1, 0 );
+  topLayout->addWidget( myLineSpin,    1, 1, 1, 2 );
+  topLayout->addWidget( aMarkerLab,    2, 0 );
+  topLayout->addWidget( myMarkerCombo, 2, 1, 1, 2 );
+  topLayout->addWidget( aColorLab,     3, 0 );
+  topLayout->addWidget( myColorBtn,    3, 1 );
+  topLayout->addWidget( aPreviewLab,   4, 0 );
+  topLayout->addWidget( myPreview,     4, 1, 1, 2 );
+  topLayout->setColumnStretch( 2, 5 );
 
-  QLabel* aLineTypeLab = new QLabel( tr( "CURVE_LINE_TYPE_LAB" ), TopGroup );
-  myLineCombo = new QComboBox( false, TopGroup );
-  myLineCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  myLineCombo->setMinimumWidth( MIN_COMBO_WIDTH );
-  myLineCombo->insertItem( tr( "NONE_LINE_LBL" ) );
-  myLineCombo->insertItem( tr( "SOLID_LINE_LBL" ) );
-  myLineCombo->insertItem( tr( "DASH_LINE_LBL" ) );
-  myLineCombo->insertItem( tr( "DOT_LINE_LBL" ) );
-  myLineCombo->insertItem( tr( "DASHDOT_LINE_LBL" ) );
-  myLineCombo->insertItem( tr( "DAHSDOTDOT_LINE_LBL" ) );
-  myLineCombo->setCurrentItem( 1 ); // SOLID by default
+  QHBoxLayout* btnLayout = new QHBoxLayout;
+  btnLayout->setSpacing( SPACING_SIZE );
+  btnLayout->setMargin( 0 );
 
-  QLabel* aLineWidthLab = new QLabel( tr( "CURVE_LINE_WIDTH_LAB" ), TopGroup );
-  myLineSpin = new QSpinBox( 0, MAX_LINE_WIDTH, 1, TopGroup );
-  myLineSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  myLineSpin->setMinimumWidth( MIN_SPIN_WIDTH );
-  myLineSpin->setValue( 0 );        // default width is 0
+  btnLayout->addWidget( myOkBtn );
+  btnLayout->addSpacing( 20 );
+  btnLayout->addStretch();
+  btnLayout->addWidget( myCancelBtn );
 
-  QLabel* aMarkerLab = new QLabel( tr( "CURVE_MARKER_TYPE_LAB" ), TopGroup );
-  myMarkerCombo = new QComboBox( false, TopGroup );
-  myMarkerCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  myMarkerCombo->setMinimumWidth( MIN_COMBO_WIDTH );
-  myMarkerCombo->insertItem( tr( "NONE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "CIRCLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "RECTANGLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "DIAMOND_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "DTRIANGLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "UTRIANGLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "LTRIANGLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "RTRIANGLE_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "CROSS_MARKER_LBL" ) );
-  myMarkerCombo->insertItem( tr( "XCROSS_MARKER_LBL" ) );
-  myMarkerCombo->setCurrentItem( 1 ); // CIRCLE by default
+  topLayout->addLayout( btnLayout, 5, 0, 1, 3 );
 
-  QLabel* aColorLab = new QLabel( tr( "CURVE_COLOR_LAB" ), TopGroup );
-  myColorBtn = new QToolButton( TopGroup );
-  myColorBtn->setMinimumSize(25, 25);
+  // fill then combo boxes
+  myLineCombo->addItem( lineIcon( Plot2d::NoPen ),      tr( "NONE_LINE_LBL" ) );
+  myLineCombo->addItem( lineIcon( Plot2d::Solid ),      tr( "SOLID_LINE_LBL" ) );
+  myLineCombo->addItem( lineIcon( Plot2d::Dash ),       tr( "DASH_LINE_LBL" ) );
+  myLineCombo->addItem( lineIcon( Plot2d::Dot ),        tr( "DOT_LINE_LBL" ) );
+  myLineCombo->addItem( lineIcon( Plot2d::DashDot ),    tr( "DASHDOT_LINE_LBL" ) );
+  myLineCombo->addItem( lineIcon( Plot2d::DashDotDot ), tr( "DAHSDOTDOT_LINE_LBL" ) );
 
-  TopGroupLayout->addWidget( aLineTypeLab, 0, 0 );
-  TopGroupLayout->addMultiCellWidget( myLineCombo, 0, 0, 1, 2 );
-  TopGroupLayout->addWidget( aLineWidthLab, 1, 0 );
-  TopGroupLayout->addMultiCellWidget( myLineSpin, 1, 1, 1, 2 );
-  TopGroupLayout->addWidget( aMarkerLab, 2, 0 );
-  TopGroupLayout->addMultiCellWidget( myMarkerCombo, 2, 2, 1, 2 );
-  TopGroupLayout->addWidget( aColorLab, 3, 0 );
-  TopGroupLayout->addWidget( myColorBtn, 3, 1 );
-  TopGroupLayout->setColStretch( 2, 5 );
+  myMarkerCombo->addItem( markerIcon( Plot2d::None ),      tr( "NONE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::Circle ),    tr( "CIRCLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::Rectangle ), tr( "RECTANGLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::Diamond ),   tr( "DIAMOND_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::DTriangle ), tr( "DTRIANGLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::UTriangle ), tr( "UTRIANGLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::LTriangle ), tr( "LTRIANGLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::RTriangle ), tr( "RTRIANGLE_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::Cross ),     tr( "CROSS_MARKER_LBL" ) );
+  myMarkerCombo->addItem( markerIcon( Plot2d::XCross ),    tr( "XCROSS_MARKER_LBL" ) );
 
-  QGroupBox* GroupButtons = new QGroupBox( this );
-  GroupButtons->setColumnLayout( 0, Qt::Vertical );
-  GroupButtons->layout()->setSpacing( 0 ); GroupButtons->layout()->setMargin( 0 );
-  QHBoxLayout* GroupButtonsLayout = new QHBoxLayout( GroupButtons->layout() );
-  GroupButtonsLayout->setAlignment( Qt::AlignTop );
-  GroupButtonsLayout->setSpacing( SPACING_SIZE ); GroupButtonsLayout->setMargin( MARGIN_SIZE );
+  // default settings
+  setLine( Plot2d::Solid, 0 );   // solid line, width = 0
+  setMarker( Plot2d::Circle );   // circle
+  setColor( QColor( 0, 0, 0 ) ); // black
 
-  myOkBtn = new QPushButton( tr( "BUT_OK" ), GroupButtons );
-  myOkBtn->setAutoDefault( true ); myOkBtn->setDefault( true );
-  myCancelBtn = new QPushButton( tr( "BUT_CANCEL" ) , GroupButtons );
-  myCancelBtn->setAutoDefault( true );
-
-  GroupButtonsLayout->addWidget( myOkBtn );
-  GroupButtonsLayout->addStretch();
-  GroupButtonsLayout->addWidget( myCancelBtn );
-
-  connect( myColorBtn,  SIGNAL( clicked() ), this, SLOT( onColorChanged() ) );
-  connect( myOkBtn,     SIGNAL( clicked() ), this, SLOT( accept() ) );
-  connect( myCancelBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
-  setColor( QColor( 0, 0, 0 ) );
-
-  topLayout->addWidget( TopGroup,     0, 0 );
-  topLayout->addWidget( GroupButtons, 1, 0 );
+  // connections
+  connect( myLineCombo,   SIGNAL( activated( int ) ),    this, SLOT( updatePreview() ) );
+  connect( myLineSpin,    SIGNAL( valueChanged( int ) ), this, SLOT( updatePreview() ) );
+  connect( myMarkerCombo, SIGNAL( activated( int ) ),    this, SLOT( updatePreview() ) );
+  connect( myColorBtn,    SIGNAL( changed( QColor ) ),   this, SLOT( updatePreview() ) );
+  connect( myOkBtn,       SIGNAL( clicked() ),           this, SLOT( accept() ) );
+  connect( myCancelBtn,   SIGNAL( clicked() ),           this, SLOT( reject() ) );
 
   SUIT_Tools::centerWidget( this, parent );
+  updatePreview();
 }
+
 /*!
-  Destructor
+  \brief Destructor.
 */
 Plot2d_SetupCurveDlg::~Plot2d_SetupCurveDlg()
 {
 }
+
 /*!
-  Sets line style and width
+  \brief Set curve line type and width.
+  \param type curve line type
+  \param width curve line width
+  \sa getLine(), getLineWidth()
 */
-void Plot2d_SetupCurveDlg::setLine( const int line, const int width )
+void Plot2d_SetupCurveDlg::setLine( Plot2d::LineType type, const int width )
 {
-  myLineCombo->setCurrentItem( line );
+  myLineCombo->setCurrentIndex( (int)type );
+  if ( width > myLineSpin->maximum() )
+    myLineSpin->setMaximum( width );
   myLineSpin->setValue( width );
+  updatePreview();
 }
+
 /*!
-  Gets line style
+  \brief Get curve line type.
+  \return chosen curve line type
+  \sa setLine(), getLineWidth()
 */
-int Plot2d_SetupCurveDlg::getLine() const
+Plot2d::LineType Plot2d_SetupCurveDlg::getLine() const
 {
-  return myLineCombo->currentItem();
+  return (Plot2d::LineType)myLineCombo->currentIndex();
 }
+
 /*!
-  Gets line width
+  \brief Get curve line width.
+  \return chosen curve line width
+  \sa setLine(), getLine()
 */
 int Plot2d_SetupCurveDlg::getLineWidth() const
 {
   return myLineSpin->value();
 }
+
 /*!
-  Sets marker style
+  \brief Set curve marker type.
+  \param type curve marker type
+  \sa getMarker()
 */
-void Plot2d_SetupCurveDlg::setMarker( const int marker )
+void Plot2d_SetupCurveDlg::setMarker( Plot2d::MarkerType type )
 {
-  myMarkerCombo->setCurrentItem( marker );
+  myMarkerCombo->setCurrentIndex( (int)type );
+  updatePreview();
 }
+
 /*!
-  Gets marker style
+  \brief Get curve marker type.
+  \return chosen curve marker type
+  \sa setMarker()
 */
-int Plot2d_SetupCurveDlg::getMarker() const 
+Plot2d::MarkerType Plot2d_SetupCurveDlg::getMarker() const
 {
-  return myMarkerCombo->currentItem();
+  return (Plot2d::MarkerType)myMarkerCombo->currentIndex();
 }
+
 /*!
-  Sets color
+  \brief Set curve color.
+  \param color curve color
+  \sa getColor()
 */
 void Plot2d_SetupCurveDlg::setColor( const QColor& color )
 {
-  QPalette pal = myColorBtn->palette();
-  QColorGroup ca = pal.active();
-  ca.setColor( QColorGroup::Button, color );
-  QColorGroup ci = pal.inactive();
-  ci.setColor( QColorGroup::Button, color );
-  pal.setActive( ca );
-  pal.setInactive( ci );
-  myColorBtn->setPalette( pal );
+  myColorBtn->setColor( color );
+  updatePreview();
 }
+
 /*!
-  Gets color
+  \brief Get curve color.
+  \return curve color
+  \sa setColor()
 */
-QColor Plot2d_SetupCurveDlg::getColor() const 
+QColor Plot2d_SetupCurveDlg::getColor() const
 {
-  return myColorBtn->palette().active().button();
+  return myColorBtn->color();
 }
+
 /*!
-  <Color> button slot, invokes color selection dialog box
+  \brief Create icon pixmap according to the line type.
+  \param type line type
+  \return icon
 */
-void Plot2d_SetupCurveDlg::onColorChanged()
+QPixmap Plot2d_SetupCurveDlg::lineIcon( Plot2d::LineType type ) const
 {
-  QColor color = QColorDialog::getColor( getColor() );
-  if ( color.isValid() ) {
-    setColor( color );
-  }
+  QSize sz = myLineCombo->iconSize();
+  QPixmap px( sz );
+  px.fill( QColor( 255, 255, 255, 0 ) );
+  QPainter p( &px );
+  Plot2d::drawLine( &p, 5, sz.height()/2, sz.width()-5, sz.height()/2, type,
+		    myLineCombo->palette().color( QPalette::Text ), 1 );
+  return px;
 }
 
+/*!
+  \brief Create icon pixmap according to the marker type.
+  \param type marker type
+  \return icon
+*/
+QPixmap Plot2d_SetupCurveDlg::markerIcon( Plot2d::MarkerType type ) const
+{
+  QSize sz = myMarkerCombo->iconSize();
+  QPixmap px( sz );
+  px.fill( QColor( 255, 255, 255, 0 ) );
+  QPainter p( &px );
+  Plot2d::drawMarker( &p, sz.width()/2, sz.height()/2, MSIZE, MSIZE, type,
+		      myMarkerCombo->palette().color( QPalette::Text ) );
+  return px;
+}
 
+/*
+  \brief Update preview widget.
+*/
+void Plot2d_SetupCurveDlg::updatePreview()
+{
+  QSize sz( 150, 20 );
+  QPixmap px( sz );
+  px.fill( palette().color( QPalette::Background ) );
 
+  QPainter p( &px );
 
+  Plot2d::drawLine( &p, 5+MSIZE/2, sz.height()/2, sz.width()-5-MSIZE/2, sz.height()/2,
+		    getLine(), getColor(), getLineWidth() );
+  Plot2d::drawMarker( &p, 5+MSIZE/2, sz.height()/2, MSIZE, MSIZE,
+		      getMarker(), getColor() );
+  Plot2d::drawMarker( &p, sz.width()-5-MSIZE/2, sz.height()/2, MSIZE, MSIZE,
+		      getMarker(), getColor() );
 
+  myPreview->setPixmap( px );
+}

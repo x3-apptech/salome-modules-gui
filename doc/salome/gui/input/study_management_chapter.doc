@@ -1,0 +1,113 @@
+/*!
+
+\page study_management_page Study management
+
+Study is a document within GUI, where you can carry out all
+operations provided by the SALOME functionality. 
+This is a certain abstraction layer between actual
+document data (probably, remote data available through CORBA) and data
+presentation (in the Object Browser). The study is composed of Data
+Object instances, united in a tree-like structure.
+
+All operations with studies are available from the \b File menu.
+
+\image html studymanagement.png
+
+\b New - creates a new study. The study will be created
+with default name \b Study1. It is possible to create
+several studies, each accessible from the task bar.
+\b Open - allows to open an existing study by browsing for it in a
+standard Search File dialog box, choosing the required
+*.hdf file and clicking \b Open button.
+\b Connect - allows to open an unloaded study.
+\image html loadstudy2.png
+Select one of the studies, which has been previously
+created and unloaded and click \b Ok button.
+
+\note SALOME is a multi-study platform. It means that simultaneously you can
+work with several studies. 
+
+\b Close - closes the current study, alternatively it is
+possible to click on the cross in the upper right corner of the study window.
+
+\note If the study has not been previously saved, this option will
+call the following dialog box with several options:
+
+\image html closestudy.png
+
+Here, \b Unload option unloads the current study from the SALOME
+Desktop. It can be reloaded in the same working session, but if you quit the SALOME application, all changes
+in the unloaded study will be lost.
+
+\b Save - saves the current study. Saving a study you also save its layout, i.e. all positions and sizes
+of dockable windows. It means that the difference in settings of the
+same windows (for example Python console) is possible between
+different modules (the same window can have different size and
+position when other module is activated). Also each module can
+indicate which common windows are necessary for working, and only they
+will be displayed when this module is active.
+
+\note If the study hasn't been previously saved, \b Save will
+call the standard Search File dialog box where you can enter the name
+for your study and save it.
+
+\b Save \b as - allows to save the current study with a new name. Input  a new name for the study in the standard
+Search File dialog box and click \b Save button.
+
+<b>Dump study</b> - allows to Dump a SALOME Study in one or several
+Python scripts. The following dialog box allows to browse for the location and
+define the name for a Python file.
+
+\image html dumpstudy.png
+
+<ul>
+<li>
+<b>Publish in study</b> - if checked in, the component objects created by
+Python commands will be published in the created Study when the script
+is played, otherwise the objects will not be published in the Study.
+</li>
+<li>
+<b>Save GUI state</b> - if checked in, the current application layout will be
+saved in the Python file.
+</li>
+</ul>
+To confirm your choice click \b Save.
+
+<b>Notebook</b> - allows to manage study variables using \subpage using_notebook "NoteBook".
+
+<b>Load Script</b> - allows to load a saved Python Script.
+
+\image html loadscript.png
+
+To confirm your choice click \b Open.
+
+<b>Properties</b> - allows to edit the properties of the current study.
+
+\image html studyproperties.png
+
+<ul>
+<li>\b Author - allows to change the name of the study author</li>
+<li>\b Created - gives the date and time of Study creation</li>
+<li>\b Locked - allows to lock the  study for modifications. 
+Just click on this field and choose \b Yes item. In this case your study will be locked for any modifications
+for all users. Next time you try to edit it, you will see the
+following warning message:
+\image html lockedstudy.png </li>
+<li>\b Modified - allows to see if any modifications have been
+introduced into study since its last save. </li>
+<li>\b Modifications - allows to  view the list of changes made in the study.
+In this dialog box click on the \b Modifications field and scroll it
+down. Each record contains the date and time of the
+modification and the name of the user, who has introduced it.</li>
+</ul>
+
+\b Preferences - allows \ref setting_preferences_page "setting preferences"
+ applicable to Salome in general and its modules.
+
+<b>Most recently used</b> - contains a list of recently opened
+studies, giving the possibility to fast load the required study.
+
+\b Exit - unlike \b Close, closes not only the current, but all opened
+Salome studies.
+
+*/

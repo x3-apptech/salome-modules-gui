@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "CAM_Application.h"
 
@@ -22,16 +25,13 @@
 #include "CAM_Module.h"
 
 #include <SUIT_Tools.h>
+#include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
 #include <SUIT_MessageBox.h>
+#include <SUIT_ResourceMgr.h>
 
-#include <qfile.h> 
-#include <qfileinfo.h>
-#include <qtextstream.h>
-#include <qlabel.h>
-#include <qfont.h>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <QApplication>
+#include <QRegExp>
 
 #ifdef WIN32
 #include <windows.h>
@@ -39,31 +39,64 @@
 #include <dlfcn.h>
 #endif
 
-/*!Create new instance of CAM_Application*/
+/*!
+  \brief Create new instance of CAM_Application.
+  \return new instance of CAM_Application class
+*/
 extern "C" CAM_EXPORT SUIT_Application* createApplication()
 {
   return new CAM_Application();
 }
 
-/*!Constructor. read module list.
- * \param autoLoad - auto load flag.
- */
+/*!
+  \class CAM_Application
+  \brief Introduces an application class which provides modular architecture.
+  
+  This class defines multi-modular application configuration and behaviour.
+  Each module (CAM_Module) can have own data model, document windows and 
+  viewers, etc.
+
+  An application provides all necessary functionality for modules management,
+  like
+  - loading of modules
+  - modules activation/deactivation
+  - etc
+*/
+
+/*!
+  \brief Constructor.
+
+  Read modules list (from command line or from resource file). 
+  If \a autoLoad parameter is \c true all the modules will be loaded
+  immediately after application starting, otherwise each module will
+  be loaded by demand (with activateModule()).
+
+  \param autoLoad auto loading flag
+*/
 CAM_Application::CAM_Application( const bool autoLoad )
 : STD_Application(),
-myModule( 0 ),
-myAutoLoad( autoLoad )
+  myModule( 0 ),
+  myAutoLoad( autoLoad )
 {
   readModuleList();
 }
 
-/*!Destructor. Do nothing.*/
+/*!
+  \brief Destructor.
+
+  Does nothing currently.
+*/
 CAM_Application::~CAM_Application()
 {
 }
 
-/*! Load modules, if \a myAutoLoad flag is true.\n
- * Start application - call start() method from parent class.
- */
+/*! 
+  \brief Start an application.
+
+  Load all modules, if "auto loading" flag has been set to \c true.
+
+  \sa CAM_Application()
+*/
 void CAM_Application::start()
 {
   if ( myAutoLoad )
@@ -72,65 +105,87 @@ void CAM_Application::start()
   STD_Application::start();
 }
 
-/*!Get active module.
- * \retval CAM_Module - active module.
- */
+/*!
+  \brief Get active module.
+  \return active module or 0 if there are no any
+*/
 CAM_Module* CAM_Application::activeModule() const
 {
   return myModule;
 }
 
-/*!Get module with name \a modName from modules list.
- * \retval CAM_Module pointer - module.
- */
+/*!
+  \brief Get the module with specified name.
+  \return module or 0 if not found
+*/
 CAM_Module* CAM_Application::module(  const QString& modName ) const
 {
   CAM_Module* mod = 0;
-  for ( ModuleListIterator it( myModules ); it.current() && !mod; ++it )
-    if ( it.current()->moduleName() == modName )
-      mod = it.current();
+  for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
+	it != myModules.end() && !mod; ++it )
+    if ( (*it)->moduleName() == modName )
+      mod = *it;
   return mod;
 }
 
-/*!Gets modules iterator.*/
-CAM_Application::ModuleListIterator CAM_Application::modules() const
+/*!
+  \brief Get all loaded modules.
+  \return list of modules
+*/
+CAM_Application::ModuleList CAM_Application::modules() const
 {
-  return ModuleListIterator( myModules );
+  return myModules;
 }
 
-/*!Gets modules list.
- * \param out - output list of modules.
- */
+/*!
+  \brief Get all loaded modules.
+  \param returning list of modules
+*/
 void CAM_Application::modules( CAM_Application::ModuleList& out ) const
 {
-  out.setAutoDelete( false );
   out.clear();
 
-  for ( ModuleListIterator it( myModules ); it.current(); ++it )
-    out.append( it.current() );
+  for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
+	it != myModules.end(); ++it )
+    out.append( *it );
 }
 
-/*!Gets list of names for modules.\n
- * Get loaded modules names, if \a loaded is true, else \n
- * get names from information list.
- * \param lst - output list of names.
- * \param loaded - boolean flag.
- */
+/*!
+  \brief Get names of all modules.
+
+  Get loaded modules names if \a loaded is \c true, 
+  otherwise get all avaiable modules names.
+  
+  \param lst output list of modules names
+  \param loaded boolean flag, defines what modules names to return
+*/
 void CAM_Application::modules( QStringList& lst, const bool loaded ) const
 {
   lst.clear();
 
   if ( loaded )
-    for ( ModuleListIterator it( myModules ); it.current(); ++it )
-      lst.append( it.current()->moduleName() );
+  {
+    for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
+	  it != myModules.end(); ++it )
+      lst.append( (*it)->moduleName() );
+  }
   else
-    for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
+  {
+    for ( ModuleInfoList::const_iterator it = myInfoList.begin(); 
+	  it != myInfoList.end(); ++it )
       lst.append( (*it).title );
+  }
 }
 
-/*!Adding module \a mod to list.
- *\param mod - module.
- */
+/*!
+  \brief Add module \a mod to the modules list.
+
+  Performes module initialization. Does nothing if the module
+  is already added. 
+  
+  \param mod module being added
+  \sa CAM_Module::initialize()
+*/
 void CAM_Application::addModule( CAM_Module* mod )
 {
   if ( !mod || myModules.contains( mod ) )
@@ -141,7 +196,8 @@ void CAM_Application::addModule( CAM_Module* mod )
   QMap<CAM_Module*, int> map;
 
   ModuleList newList;
-  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
+  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); 
+	it != myInfoList.end(); ++it )
   {
     if ( (*it).title == mod->moduleName() )
       newList.append( mod );
@@ -151,17 +207,16 @@ void CAM_Application::addModule( CAM_Module* mod )
       if ( curMod )
         newList.append( curMod );
     }
-    if ( !newList.isEmpty() )
-      map.insert( newList.getLast(), 0 );
   }
 
-  for ( ModuleListIterator itr( myModules ); itr.current(); ++itr )
+  for ( QList<CAM_Module*>::const_iterator it = myModules.begin();
+	it != myModules.end(); ++it )
   {
-    if ( !map.contains( itr.current() ) )
-      newList.append( itr.current() );
+    if ( !newList.contains( *it ) )
+      newList.append( *it );
   }
 
-  if ( !map.contains( mod ) )
+  if ( !newList.contains( mod ) )
       newList.append( mod );
 
   myModules = newList;
@@ -169,9 +224,11 @@ void CAM_Application::addModule( CAM_Module* mod )
   moduleAdded( mod );
 }
 
-/*!Load modules from information list.
- * \warning If some of modules not loaded, error message appear on desktop.
- */
+/*!
+  \brief Load modules from the modules information list.
+  
+  If some module can not be loaded, an error message is shown.
+*/
 void CAM_Application::loadModules()
 {
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
@@ -180,33 +237,38 @@ void CAM_Application::loadModules()
     if ( mod )
       addModule( mod );
     else {
-      if ( desktop() && desktop()->isShown() )
-	SUIT_MessageBox::error1( desktop(), tr( "Loading modules" ),
-				 tr( "Can not load module %1" ).arg( (*it).title ), tr( "Ok" ) );
+      if ( desktop() && desktop()->isVisible() )
+	SUIT_MessageBox::critical( desktop(), tr( "Loading modules" ),
+				   tr( "Can not load module %1" ).arg( (*it).title ) );
       else
-	qWarning( tr( "Can not load module %1" ).arg( (*it).title ).latin1() ); 
+	qWarning( tr( "Can not load module %1" ).arg( (*it).title ).toLatin1().data() ); 
     }
   }
 }
 
-/*!Load module with name \a modName.
- *\param modName - module name for loading.
- *\warning If information list is empty.
- *\warning If module library (for module with \a modName) is empty.
- *\warning If module library is not loaded.
- */
-CAM_Module* CAM_Application::loadModule( const QString& modName )
+/*!
+  \brief Load module \a modName.
+
+  The function prints warning message if:
+  - modules information list is empty
+  - modules information list does not include specified module info
+  - module library can not be loaded by some reason
+
+  \param modName module name
+  \return module object pointer or 0 if module could not be loaded
+*/
+CAM_Module* CAM_Application::loadModule( const QString& modName, const bool showMsg )
 {
   if ( myInfoList.isEmpty() )
   {
-    qWarning( tr( "Modules configuration is not defined." ) );
+    qWarning( tr( "Modules configuration is not defined." ).toLatin1().data() );
     return 0;
   }
 
   QString libName = moduleLibrary( modName );
   if ( libName.isEmpty() )
   {
-    qWarning( tr( "Information about module \"%1\" doesn't exist." ).arg( modName ) );
+    qWarning( tr( "Information about module \"%1\" doesn't exist." ).arg( modName ).toLatin1().data() );
     return 0;
   }
 
@@ -214,7 +276,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
   GET_MODULE_FUNC crtInst = 0;
 
 #ifdef WIN32
-  HINSTANCE modLib = ::LoadLibrary( libName ); 
+  HINSTANCE modLib = ::LoadLibrary( libName.toLatin1() ); 
   if ( !modLib )
   {
     LPVOID lpMsgBuf;
@@ -236,7 +298,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
     }
   }
 #else
-  void* modLib = dlopen( (char*)libName.latin1(), RTLD_LAZY );
+  void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY );
   if ( !modLib )
     err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   else
@@ -254,22 +316,21 @@ CAM_Module* CAM_Application::loadModule( const QString& modName )
     module->setName( moduleName( modName ) );
   }
 
-  if ( !err.isEmpty() ) {
-    if ( desktop() && desktop()->isShown() )
-      SUIT_MessageBox::warn1( desktop(), tr( "Error" ), err, tr( "Ok" ) );
+  if ( !err.isEmpty() && showMsg ) {
+    if ( desktop() && desktop()->isVisible() )
+      SUIT_MessageBox::warning( desktop(), tr( "Error" ), err );
     else
-      qWarning( err.latin1() ); 
+      qWarning( err.toLatin1().data() ); 
   }
 
   return module;
 }
 
-/*! @name Activate module group. */
-//@{
-/*!Activate module with name \a modName.
- *\param modName - module name.
- *\ratval true, if module loaded and activated successful, else false.
- */
+/*!
+  \brief Activate module \a modName.
+  \param modName module name
+  \return \c true, if module is loaded and activated successfully and \c false otherwise
+*/
 bool CAM_Application::activateModule( const QString& modName )
 {
   if ( !modName.isEmpty() && !activeStudy() )
@@ -294,11 +355,14 @@ bool CAM_Application::activateModule( const QString& modName )
   return res;
 }
 
-/*!Activate module \a mod
- *\param mod - module for activation.
- *\retval true - if all sucessful.
- *\warning Error message if module not activated in active study.
- */
+/*!
+  \brief Activate module \a mod.
+
+  Shows error message if module could not be activated in the current study.
+
+  \param mod module object pointer
+  \return \c true, if module is loaded and activated successfully and \c false otherwise
+*/
 bool CAM_Application::activateModule( CAM_Module* mod )
 {
   if ( mod && !activeStudy() )
@@ -323,10 +387,10 @@ bool CAM_Application::activateModule( CAM_Module* mod )
     {
       myModule->setMenuShown( false );
       myModule->setToolShown( false );
-      if ( desktop() && desktop()->isShown() )
-	SUIT_MessageBox::error1( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ), tr( "BUT_OK" ) );
+      if ( desktop() && desktop()->isVisible() )
+	SUIT_MessageBox::critical( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ) );
       else
-	qWarning( tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ).latin1() ); 
+	qWarning( tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ).toLatin1().data() ); 
       myModule = 0;
       return false;
     }
@@ -336,17 +400,19 @@ bool CAM_Application::activateModule( CAM_Module* mod )
 
   return true;
 }
-//@}
 
-/*!Create new study for current application.
- *\retval study pointer.
- */
+/*!
+  \brief Create new study.
+  \return study object pointer
+*/
 SUIT_Study* CAM_Application::createNewStudy() 
 { 
   return new CAM_Study( this );
 }
 
-/*!Update commands status for parent class and for current class(if module is active)*/
+/*!
+  \brief Update menu commands status.
+*/
 void CAM_Application::updateCommandsStatus()
 {
   STD_Application::updateCommandsStatus();
@@ -355,37 +421,45 @@ void CAM_Application::updateCommandsStatus()
     activeModule()->updateCommandsStatus();
 }
 
-/*!Close all modules in study \a theDoc.
- *\param theDoc - study
- */
+/*!
+  \brief Prepare application to study closing.
+
+  Closes all modules in study \a theDoc.
+  
+  \param theDoc study
+*/
 void CAM_Application::beforeCloseDoc( SUIT_Study* theDoc )
 {
-  for ( ModuleListIterator it( myModules ); it.current(); ++it )
-    it.current()->studyClosed( theDoc );
+  for ( QList<CAM_Module*>::iterator it = myModules.begin(); it != myModules.end(); ++it )
+    (*it)->studyClosed( theDoc );
 }
 
-/*!Sets active study for parent class.
- *\param study - study.
- */
+/*!
+  \brief Set active study.
+  \param study study to be made active
+*/
 void CAM_Application::setActiveStudy( SUIT_Study* study )
 {
   STD_Application::setActiveStudy( study );
 }
 
-/*!Do nothing.*/
-void CAM_Application::moduleAdded( CAM_Module* mod )
-{
-//  CAM_Study* study = dynamic_cast<CAM_Study*>( activeStudy() );
-//  if ( !study )
-//    return;
+/*!
+  \brief Callback function, called when the module is added to the application.
+  
+  This virtual method can be re-implemented in the successors. Base implementation
+  does nothing.
 
-//  study->insertDataModel( mod->dataModel() );
+  \param mod module being added
+*/
+void CAM_Application::moduleAdded( CAM_Module* /*mod*/ )
+{
 }
 
-/*!Gets module name by title \a title
- *\param title - title name
- *\retval QString module name.
- */
+/*!
+  \brief Get module name by its title (user name).
+  \param title module title (user name)
+  \return module name or null QString if module is not found
+*/
 QString CAM_Application::moduleName( const QString& title ) const
 {
   QString res;
@@ -397,10 +471,11 @@ QString CAM_Application::moduleName( const QString& title ) const
   return res;
 }
 
-/*!Gets module title by module name \a name
- *\param name - module name
- *\retval QString module title.
- */
+/*!
+  \brief Get module title (user name) by its name.
+  \param name module name
+  \return module title (user name) or null QString if module is not found
+*/
 QString CAM_Application::moduleTitle( const QString& name ) const
 {
   QString res;
@@ -412,10 +487,27 @@ QString CAM_Application::moduleTitle( const QString& name ) const
   return res;
 }
 
-/*!Get library name for module with title \a title.
- *\param title - module title name.
- *\param full  - boolean flag (if true - return full library name, else internal name)
- *\retval QString - library name.
+/*!
+  \brief Get module icon name.
+  \param name module name
+  \return module icon or null QString if module is not found
+*/
+QString CAM_Application::moduleIcon( const QString& name ) const
+{
+  QString res;
+  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isNull(); ++it )
+  {
+    if ( (*it).name == name )
+      res = (*it).icon;
+  }
+  return res;
+}
+
+/*!
+  \brief Get module library name by its title (user name).
+  \param title module title (user name)
+  \param full if \c true, return full library name, otherwise return its internal name
+  \return module library name or null QString if module is not found
  */
 QString CAM_Application::moduleLibrary( const QString& title, const bool full ) const
 {
@@ -430,7 +522,26 @@ QString CAM_Application::moduleLibrary( const QString& title, const bool full ) 
   return res;
 }
 
-/*!Read modules list*/
+/*!
+  \brief Read modules information list
+
+  This function first tries to get the modules names list by parsing
+  the application command line arguments, looking for the
+  "--modules ( <mod_name>[:<mod_name>...] )" option.
+  List of modules is separated by colon symbol (":").
+  
+  If "--modules" command line option is not used, the list of modules
+  is retrieved from the application resource file: parameter "modules" of
+  the section "launch".
+
+  Then the information about each module (module title (user name), 
+  library name) is retrieved from the corresponding section of resource
+  file with help of resources manager.
+
+  Shows the warning message, if module information list is empty.
+
+  \sa SUIT_ResourceMgr
+*/
 void CAM_Application::readModuleList()
 {
   if ( !myInfoList.isEmpty() )
@@ -440,55 +551,83 @@ void CAM_Application::readModuleList()
 
   QStringList modList;
 
-  QStringList args;
-  for (int i = 1; i < qApp->argc(); i++)
-    args.append( qApp->argv()[i] );
+  QString args = QApplication::arguments().join( " " );
 
-  QRegExp rx("--modules\\s+\\(\\s*(.*)\\s*\\)");
-  rx.setMinimal( true );
-  if ( rx.search( args.join(" ") ) >= 0 && rx.capturedTexts().count() > 0 ) {
-    QString modules = rx.capturedTexts()[1];
-    QStringList mods = QStringList::split(":",modules,false);
-    for ( uint i = 0; i < mods.count(); i++ ) {
-      if ( !mods[i].stripWhiteSpace().isEmpty() )
-	modList.append( mods[i].stripWhiteSpace() );
+  QRegExp rx1("--modules=([\\w,]*)");
+  rx1.setMinimal( false );
+  QRegExp rx2("--modules\\s+\\(\\s*(.*)\\s*\\)");
+  rx2.setMinimal( true );
+  int pos = 0;
+  while ( 1 ) {
+    QString modules;
+    int pos1 = rx1.indexIn( args, pos );
+    int pos2 = rx2.indexIn( args, pos );
+    if ( pos1 != -1 && pos2 != -1 ) {
+      modules = pos1 < pos2 ? rx1.cap( 1 ) : rx2.cap(1);
+      pos = pos1 < pos2 ? pos1 + rx1.matchedLength() : pos2 + rx2.matchedLength();
+    }
+    else if ( pos1 != -1 ) {
+      modules = rx1.cap( 1 );
+      pos = pos1 + rx1.matchedLength();
+    }
+    else if ( pos2 != -1 ) {
+      modules = rx2.cap( 1 );
+      pos = pos2 + rx2.matchedLength();
+    }
+    else {
+      break;
+    }
+
+    modList.clear();
+    QStringList mods = modules.split( QRegExp( "[:|,\\s]" ), QString::SkipEmptyParts );
+    for ( int i = 0; i < mods.count(); i++ ) {
+      if ( !mods[i].trimmed().isEmpty() )
+	modList.append( mods[i].trimmed() );
     }
   }
+
   if ( modList.isEmpty() ) {
-    QString mods = resMgr->stringValue( "launch", "modules", QString::null );
-    modList = QStringList::split( ",", mods );
+    QString mods = resMgr->stringValue( "launch", "modules", QString() );
+    modList = mods.split( ",", QString::SkipEmptyParts );
   }
 
   for ( QStringList::const_iterator it = modList.begin(); it != modList.end(); ++it )
   {
-    QString modName = (*it).stripWhiteSpace();
+    QString modName = (*it).trimmed();
+
     if ( modName.isEmpty() )
-      continue;
+      continue;  // empty module name
 
-    QString modTitle = resMgr->stringValue( *it, QString( "name" ), QString::null );
+    if ( !moduleTitle( modName ).isEmpty() )
+      continue;  // already added
+
+    QString modTitle = resMgr->stringValue( *it, "name", QString() );
     if ( modTitle.isEmpty() )
-      {
-	printf( "****************************************************************\n" );
-	printf( "*    Warning: %s not found in resources.\n", (*it).latin1() );
-	printf( "*    Module will not be available\n" );
-	printf( "****************************************************************\n" );
-	continue;
-      }
+    {
+      printf( "****************************************************************\n" );
+      printf( "*    Warning: %s not found in resources.\n", (*it).toLatin1().data() );
+      printf( "*    Module will not be available\n" );
+      printf( "****************************************************************\n" );
+      continue;
+    }
 
-    QString modLibrary = resMgr->stringValue( *it, QString( "library" ), QString::null ).stripWhiteSpace();
+    QString modIcon = resMgr->stringValue( *it, "icon", QString() );
+
+    QString modLibrary = resMgr->stringValue( *it, "library", QString() ).trimmed();
     if ( !modLibrary.isEmpty() )
     {
-      QString libExt;
-      modLibrary = SUIT_Tools::file( modLibrary.stripWhiteSpace() );
-      libExt = QString( "so" );
-      if ( SUIT_Tools::extension( modLibrary ).lower() == libExt )
-        modLibrary = modLibrary.mid( 0, modLibrary.length() - libExt.length() - 1 );
-      libExt = QString( "dll" );
-      if ( SUIT_Tools::extension( modLibrary ).lower() == libExt )
-        modLibrary = modLibrary.mid( 0, modLibrary.length() - libExt.length() - 1 );
+      modLibrary = SUIT_Tools::file( modLibrary.trimmed() );
+#ifdef WIN32
+      QString libExt = QString( "dll" );
+#else
+      QString libExt = QString( "so" );
+#endif
+      if ( SUIT_Tools::extension( modLibrary ).toLower() == libExt )
+        modLibrary.truncate( modLibrary.length() - libExt.length() - 1 );
 #ifndef WIN32
-      if ( modLibrary.startsWith( "lib" ) )
-        modLibrary = modLibrary.mid( 3 );
+      QString prefix = QString( "lib" );
+      if ( modLibrary.startsWith( prefix ) )
+        modLibrary.remove( 0, prefix.length() );
 #endif
     }
     else
@@ -498,12 +637,13 @@ void CAM_Application::readModuleList()
     inf.name = modName;
     inf.title = modTitle;
     inf.internal = modLibrary;
+    inf.icon = modIcon;
     myInfoList.append( inf );
   }
 
   if ( myInfoList.isEmpty() ) {
-    if ( desktop() && desktop()->isShown() )
-      SUIT_MessageBox::warn1( desktop(), tr( "Warning" ), tr( "Modules list is empty" ), tr( "&OK" ) );
+    if ( desktop() && desktop()->isVisible() )
+      SUIT_MessageBox::warning( desktop(), tr( "Warning" ), tr( "Modules list is empty" ) );
     else
       {
 	printf( "****************************************************************\n" );
@@ -513,19 +653,25 @@ void CAM_Application::readModuleList()
   }
 }
 
-/*!Add common items for popup menu ( if they are exist )
- *\param type - type of popup menu
- *\param thePopup - popup menu
- *\param title - title of popup menu
- */
-void CAM_Application::contextMenuPopup( const QString& type, QPopupMenu* thePopup, QString& title )
+/*!
+  \brief Add common menu items to the popup menu.
+
+  Menu items list is defined by the active module.
+
+  \param type popup menu context
+  \param menu popup menu
+  \param title popup menu title, which can be set by the module if required
+*/
+void CAM_Application::contextMenuPopup( const QString& type, QMenu* menu, QString& title )
 {
   // to do : add common items for popup menu ( if they are exist )
   if ( activeModule() ) 
-    activeModule()->contextMenuPopup( type, thePopup, title );
+    activeModule()->contextMenuPopup( type, menu, title );
 }
 
-/*!Create empty study.*/
+/*!
+  \brief Create new empty study.
+*/
 void CAM_Application::createEmptyStudy()
 {
   /*SUIT_Study* study = */activeStudy();

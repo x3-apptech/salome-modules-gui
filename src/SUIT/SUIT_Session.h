@@ -1,34 +1,37 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef SUIT_SESSION_H
 #define SUIT_SESSION_H
 
 #include "SUIT.h"
-
 #include "SUIT_Application.h"
-#include "SUIT_ResourceMgr.h"
 
-#include <qmutex.h>
-#include <qobject.h>
-#include <qptrlist.h>
-#include <qptrvector.h>
-#include <qstringlist.h>
+#include <QList>
+#include <QObject>
+#include <QString>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #ifdef WIN32
 #define LIB_HANDLE HINSTANCE
@@ -39,7 +42,7 @@
 class SUIT_ResourceMgr;
 class SUIT_ExceptionHandler;
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 /*!
@@ -47,7 +50,7 @@ class SUIT_ExceptionHandler;
   by static function "createApplication" in external library. The Library must be loaded with \n
   loadLibrary method and after that application can be started.
 */
-class SUIT_EXPORT SUIT_Session: public QObject
+class SUIT_EXPORT SUIT_Session : public QObject
 {
   Q_OBJECT
 
@@ -65,7 +68,7 @@ public:
 
   SUIT_Application*            startApplication( const QString&, int = 0, char** = 0 );
 
-  QPtrList<SUIT_Application>   applications() const;
+  QList<SUIT_Application*>     applications() const;
   SUIT_Application*            activeApplication() const;
 
   SUIT_ResourceMgr*            resourceMgr() const;
@@ -75,9 +78,7 @@ public:
 
   SUIT_ExceptionHandler*       handler() const;
 
-  // To lock GUI user actions during python command execution (PAL12651)
-  static bool                  IsPythonExecuted();
-  static void                  SetPythonExecuted(bool isPythonExecuted);
+  void                         insertApplication( SUIT_Application* );
 
 signals:
   void                         applicationClosed( SUIT_Application* );
@@ -90,9 +91,8 @@ private slots:
   void                         onApplicationActivated( SUIT_Application* ); 
 
 private:
-  typedef QPtrList<SUIT_Application>         AppList;
-  typedef QMap<QString, AppLib>              AppLibMap;
-  typedef QPtrListIterator<SUIT_Application> AppListIterator;
+  typedef QList<SUIT_Application*> AppList;
+  typedef QMap<QString, AppLib>    AppLibMap;
 
 private:
   QString                      lastError() const;

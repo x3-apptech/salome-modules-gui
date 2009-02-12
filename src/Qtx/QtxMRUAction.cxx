@@ -1,190 +1,248 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxMRUAction.cxx
 // Author:    Sergey TELKOV
-
+//
 #include "QtxMRUAction.h"
 
 #include "QtxResourceMgr.h"
 
-#include <qpopupmenu.h>
+#include <QMenu>
+#include <QIcon>
 
 /*!
-	Name: QtxMRUAction [public]
-	Desc: Constructs an MRU action with given parent and name.
+  \class QtxMRUAction
+  \brief Menu action which provides most recent used items support.
 */
 
-QtxMRUAction::QtxMRUAction( QObject* parent, const char* name )
-: QtxAction( "Most Recently Used", "Most Recently Used", 0, parent, name ),
-myVisCount( 5 ),
-myPopupMode( SubMenu ),
-myInsertMode( MoveFirst )
+/*!
+  \brief Constructor.
+  \param parent parent object
+*/
+QtxMRUAction::QtxMRUAction( QObject* parent )
+: QtxAction( tr( "Most Recently Used" ), tr( "Most Recently Used" ), 0, parent ),
+  myVisCount( 5 ),
+  myHistoryCount( -1 ),
+  myLinkType( LinkAuto ),
+  myInsertMode( MoveFirst )
 {
+  myClear = new QAction( tr( "Clear" ), this );
+  myClear->setVisible( false );
+
+  setMenu( new QMenu( 0 ) );
+
+  connect( menu(), SIGNAL( aboutToShow() ), this, SLOT( onAboutToShow() ) );
+  connect( myClear, SIGNAL( triggered( bool ) ), this, SLOT( onCleared( bool ) ) );
 }
 
 /*!
-	Name: QtxMRUAction [public]
-	Desc: This constructor creates an action with the following properties: the
-		    description text, the menu text and.  It is a child of given parent and
-        named specified name.
+  \brief Constructor.
+  \param description (tooltip) text
+  \param menuText menu text
+  \param parent parent object
 */
-
-QtxMRUAction::QtxMRUAction( const QString& text, const QString& menuText, QObject* parent, const char* name )
-: QtxAction( text, menuText, 0, parent, name ),
-myVisCount( 5 ),
-myPopupMode( SubMenu ),
-myInsertMode( MoveFirst )
+QtxMRUAction::QtxMRUAction( const QString& text, const QString& menuText, QObject* parent )
+: QtxAction( text, menuText, 0, parent ),
+  myVisCount( 5 ),
+  myHistoryCount( -1 ),
+  myLinkType( LinkAuto ),
+  myInsertMode( MoveFirst )
 {
+  myClear = new QAction( tr( "Clear" ), this );
+  myClear->setVisible( false );
+
+  setMenu( new QMenu( 0 ) );
+  connect( menu(), SIGNAL( aboutToShow() ), this, SLOT( onAboutToShow() ) );
+  connect( myClear, SIGNAL( triggered( bool ) ), this, SLOT( onCleared( bool ) ) );
 }
 
 /*!
-	Name: QtxMRUAction [public]
-	Desc: This constructor creates an action with the following properties: the
-		    description text, the menu text, the icon or iconset icon and keyboard
-        accelerator. It is a child of given parent and named specified name.
+  \brief Constructor.
+  \param description (tooltip) text
+  \param icon action icon
+  \param menuText menu text
+  \param parent parent object
 */
-
-QtxMRUAction::QtxMRUAction( const QString& text, const QIconSet& icon, const QString& menuText, QObject* parent, const char* name )
-: QtxAction( text, icon, menuText, 0, parent, name ),
-myVisCount( 5 ),
-myPopupMode( SubMenu ),
-myInsertMode( MoveFirst )
+QtxMRUAction::QtxMRUAction( const QString& text, const QIcon& icon,
+                            const QString& menuText, QObject* parent )
+: QtxAction( text, icon, menuText, 0, parent ),
+  myVisCount( 5 ),
+  myHistoryCount( -1 ),
+  myLinkType( LinkAuto ),
+  myInsertMode( MoveFirst )
 {
+  myClear = new QAction( tr( "Clear" ), this );
+  myClear->setVisible( false );
+
+  setMenu( new QMenu( 0 ) );
+  connect( menu(), SIGNAL( aboutToShow() ), this, SLOT( onAboutToShow() ) );
+  connect( myClear, SIGNAL( triggered( bool ) ), this, SLOT( onCleared( bool ) ) );
 }
 
 /*!
-	Name: ~QtxMRUAction [public]
-	Desc: This destructor removes all added popup items.
+  \brief Destructor.
 */
-
 QtxMRUAction::~QtxMRUAction()
 {
-  for ( ItemsMap::ConstIterator iIt = myItems.begin(); iIt != myItems.end(); ++iIt )
-    removeFrom( iIt.key() );
-
-  for ( MenusMap::ConstIterator mIt = myMenus.begin(); mIt != myMenus.end(); ++mIt )
-    removeFrom( mIt.key() );
+  delete menu();
 }
 
 /*!
-	Name: insertMode [public]
-	Desc: Returns the insert mode.
+  \brief Get items insertion policy.
+  \return insertion policy (QtxMRUAction::InsertionMode)
 */
-
 int QtxMRUAction::insertMode() const
 {
   return myInsertMode;
 }
 
 /*!
-	Name: setInsertMode [public]
-	Desc: Returns the insert mode. Can be following values:
-      MoveFirst - place the specified link to the first position in any case
-      MoveLast  - place the specified link to the last position in any case
-      AddFirst  - if inserted link doesn't exist then add to the first position
-      AddLast   - if inserted link doesn't exist then add to the lase position
+  \brief Set items insertion policy.
+  \param mode insertion policy (QtxMRUAction::InsertionMode)
 */
-
 void QtxMRUAction::setInsertMode( const int mode )
 {
   myInsertMode = mode;
 }
 
 /*!
-	Name: popupMode [public]
-	Desc: Returns the popup mode.
+  \brief Get the type of link menu name.
+  \return link type (QtxMRUAction::LinkType)
 */
-
-int QtxMRUAction::popupMode() const
+int QtxMRUAction::linkType() const
 {
-  return myPopupMode;
+  return myLinkType;
 }
 
 /*!
-	Name: setPopupMode [public]
-	Desc: Set the popup mode. If this mode is 'Items' then method "addTo" creates the
-        items in the specified popup menu.  If mode is 'SubMenu' then items will be
-        create in sub popup menu which will be placed in specified popup.
+  \brief Set the type of link menu name.
+  \param link type (QtxMRUAction::LinkType)
 */
-
-void QtxMRUAction::setPopupMode( const int mode )
+void QtxMRUAction::setLinkType( const int type )
 {
-  myPopupMode = mode;
+  myLinkType = type;
 }
 
 /*!
-	Name: count [public]
-	Desc: Returns the number of links.
+  \brief Get number of MRU items.
+  \return number of MRU items
 */
-
 int QtxMRUAction::count() const
 {
   return myLinks.count();
 }
 
 /*!
-	Name: isEmpty [public]
-	Desc: Returns 'true' if there is no links.
+  \brief Check if the MRU items list is empty.
+  \return \c true if there are no MRU items
 */
-
 bool QtxMRUAction::isEmpty() const
 {
   return myLinks.isEmpty();
 }
 
 /*!
-	Name: visibleCount [public]
-	Desc: Returns the number of first links which will be added to popup menu.
-        If 'visibleCount' less than 1 then all links will be used.
+  \brief Get number of visible MRU items.
+  \return visible MRU items number
+  \sa setVisibleCount()
 */
-
 int QtxMRUAction::visibleCount() const
 {
   return myVisCount;
 }
 
 /*!
-	Name: setVisibleCount [public]
-	Desc: Sets the number of links which will be used in popup menu.
-*/
+  \brief Set number of visible MRU items.
 
+  This method sets the maximum number of MRU items
+  to be displayed in the popup menu (5 by default).
+
+  If \a num < 1, then all MRU items will be displayed.
+
+  \param num visible MRU items number
+*/
 void QtxMRUAction::setVisibleCount( int num )
 {
   if ( myVisCount == num )
     return;
 
   myVisCount = num;
-
-  updateState();
 }
 
 /*!
-	Name: insert [public]
-	Desc: Insert the link according to the insert mode.
+  \brief Return visible status of the menu item which clear all MRU items.
 */
+bool QtxMRUAction::isClearPossible() const
+{
+  return myClear->isVisible();
+}
 
+/*!
+  \brief Set visible the menu item which clear all MRU items.
+*/
+void QtxMRUAction::setClearPossible( const bool on )
+{
+  myClear->setVisible( on );
+}
+
+/*!
+  \brief Get number of totally stored MRU items.
+  \return number of MRU items stored in the preferences
+  \sa setHistoryCount(), saveLinks(), loadLinks()
+*/
+int QtxMRUAction::historyCount() const
+{
+  return myHistoryCount;
+}
+
+/*!
+  \brief Set number of totally stored MRU items.
+
+  This option allows setting number of MRU items to be stored
+  in the preferences file.
+
+  If \a num < 0, then number of stored MRU items is not limited.
+
+  \return number of MRU items stored in the preferences
+  \sa historyCount(), saveLinks(), loadLinks()
+*/
+void QtxMRUAction::setHistoryCount( const int num )
+{
+  myHistoryCount = num;
+}
+
+/*!
+  \brief Insert MRU item.
+
+  The item is inserted according to the current insertion policy.
+
+  \param link MRU item to be added
+*/
 void QtxMRUAction::insert( const QString& link )
 {
   if ( myLinks.contains( link ) && ( insertMode() == AddFirst || insertMode() == AddLast ) )
     return;
 
-  myLinks.remove( link );
+  myLinks.removeAll( link );
 
   switch ( insertMode() )
   {
@@ -197,41 +255,48 @@ void QtxMRUAction::insert( const QString& link )
     myLinks.append( link );
     break;
   }
-
-  updateState();
 }
 
 /*!
-	Name: remove [public]
-	Desc: Removes link with specified index.
-*/
+  \brief Remove MRU item.
 
+  Does nothing if \a idx is out of range.
+
+  \param idx MRU item index
+*/
 void QtxMRUAction::remove( const int idx )
 {
   if ( idx < 0 || idx >= (int)myLinks.count() )
     return;
 
-  myLinks.remove( myLinks.at( idx ) );
-
-  updateState();
+  myLinks.removeAt( idx );
 }
 
 /*!
-	Name: remove [public]
-	Desc: Removes specified link.
-*/
+  \brief Remove MRU item.
 
+  Does nothing if there is no speicified item in the list.
+
+  \param link MRU item to be removed
+*/
 void QtxMRUAction::remove( const QString& link )
 {
-  if ( myLinks.remove( link ) )
-    updateState();
+  myLinks.removeAll( link );
 }
 
 /*!
-	Name: item [public]
-	Desc: Returns the link with specified index.
+  \brief Remove all MRU items.
 */
+void QtxMRUAction::clear()
+{
+  myLinks.clear();
+}
 
+/*!
+  \brief Get MRU item
+  \param idx MRU item index
+  \return MRU item or null QString if \a idx is out of range
+*/
 QString QtxMRUAction::item( const int idx ) const
 {
   QString res;
@@ -241,127 +306,31 @@ QString QtxMRUAction::item( const int idx ) const
 }
 
 /*!
-	Name: find [public]
-	Desc: Find specified link. If link exists then returns index otherwise -1 returned.
+  \brief Get MRU item index.
+  \param link MRU item
+  \return MRU item index or -1 if item is not found
 */
-
 int QtxMRUAction::find( const QString& link ) const
 {
-  return myLinks.findIndex( link );
+  return myLinks.indexOf( link );
 }
 
 /*!
-	Name: contains [public]
-	Desc: Returns 'true' if given link exist.
+  \brief Check if MRU item is in the list.
+  \param link MRU item
+  \return \c true if specified item is already added to the list
 */
-
 bool QtxMRUAction::contains( const QString& link ) const
 {
   return myLinks.contains( link );
 }
 
 /*!
-	Name: addTo [public]
-	Desc: Add the MRU links to the end of specified popup according to the popup mode.
+  \brief Load the MRU items from specified resources section.
+  \param resMgr resources manager
+  \param section resources section
+  \param clear if \c true, previous MRU items list is cleared
 */
-
-bool QtxMRUAction::addTo( QWidget* wid )
-{
-  if ( !wid || !wid->inherits( "QPopupMenu" ) )
-    return false;
-
-  QPopupMenu* pm = (QPopupMenu*)wid;
-  checkPopup( pm );
-
-  int mode = popupMode();
-
-  if ( ( mode == Items && myItems.contains( pm ) ) ||
-       ( mode == SubMenu && myMenus.contains( pm ) ) )
-    return false;
-
-  bool exist = myItems.contains( pm ) || myMenus.contains( pm );
-
-  if ( mode == SubMenu && !QtxAction::addTo( wid ) )
-    return false;
-
-  if ( mode == Items )
-  {
-    myItems.insert( pm, Item() );
-    myItems[pm].pId = myItems[pm].nId -1;
-    connect( pm, SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
-  }
-  else if ( mode == SubMenu )
-  {
-    myMenus.insert( pm, new QPopupMenu( pm ) );
-    setPopup( pm, pm->idAt( pm->count() - 1 ), myMenus[pm] );
-    connect( myMenus[pm], SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
-  }
-
-  if ( !exist )
-  {
-    connect( pm, SIGNAL( aboutToShow() ), this, SLOT( onAboutToShow() ) );
-    connect( pm, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
-  }
-
-  return insertLinks( pm, mode );
-}
-
-/*!
-	Name: addTo [public]
-	Desc: Add the MRU links to the specified popup at given index according to the popup mode.
-*/
-
-bool QtxMRUAction::addTo( QWidget* wid, const int idx )
-{
-  if ( !QtxAction::addTo( wid, idx ) )
-    return false;
-
-  QPopupMenu* pm = (QPopupMenu*)wid;
-
-  removeLinks( pm, popupMode() );
-  insertLinks( pm, popupMode(), idx );
-
-  return true;
-}
-
-/*!
-	Name: removeFrom [public]
-	Desc: Removes all MRU links from specified popup.
-*/
-
-bool QtxMRUAction::removeFrom( QWidget* wid )
-{
-  QtxAction::removeFrom( wid );
-
-  QPopupMenu* pm = (QPopupMenu*)wid;
-  if ( !wid || !wid->inherits( "QPopupMenu" ) )
-    return false;
-
-  if ( myItems.contains( pm ) )
-  {
-    removeLinks( pm, Items );
-    myItems.remove( pm );
-    disconnect( pm, SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
-  }
-  if ( myMenus.contains( pm ) )
-  {
-    removeLinks( pm, SubMenu );
-    delete myMenus[pm];
-    myMenus.remove( pm );
-  }
-
-  disconnect( pm, SIGNAL( aboutToShow() ), this, SLOT( onAboutToShow() ) );
-  disconnect( pm, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
-
-  return true;
-}
-
-/*!
-	Name: loadLinks [public]
-	Desc: Load the MRU links from specified resource manager section.
-        If parameter 'clear' is 'true' then link list will be cleared first.
-*/
-
 void QtxMRUAction::loadLinks( QtxResourceMgr* resMgr, const QString& section, const bool clear )
 {
   if ( !resMgr || section.isEmpty() )
@@ -382,281 +351,167 @@ void QtxMRUAction::loadLinks( QtxResourceMgr* resMgr, const QString& section, co
     if ( !(*it).startsWith( itemPrefix ) )
       continue;
 
-    QString link = resMgr->stringValue( section, *it, QString::null );
+    QString link = resMgr->stringValue( section, *it, QString() );
     if ( link.isEmpty() || map.contains( link ) )
       continue;
 
     myLinks.append( link );
     map.insert( link, 0 );
   }
-
-  updateState();
 }
 
 /*!
-	Name: saveLinks [public]
-	Desc: Save the MRU links into specified resource manager section.
-        If parameter 'clear' is 'true' then section will be cleared first.
+  \brief Save the MRU items to specified resources section.
+  \param resMgr resources manager
+  \param section resources section
+  \param clear if \c true, the resources section is first cleared
 */
-
 void QtxMRUAction::saveLinks( QtxResourceMgr* resMgr, const QString& section, const bool clear ) const
 {
   if ( !resMgr || section.isEmpty() )
     return;
 
-  if ( clear )
-    resMgr->remove( section );
+  QString itemPrefix( "item_" );
+
+  if ( clear ) {
+    QStringList items = resMgr->parameters( section );
+    for ( QStringList::const_iterator it = items.begin(); it != items.end(); ++it )
+    {
+      if ( (*it).startsWith( itemPrefix ) )
+	resMgr->remove( section, *it );
+    }
+  }
 
   QStringList lst;
   QMap<QString, int> map;
   for ( QStringList::const_iterator itr = myLinks.begin(); itr != myLinks.end(); ++itr )
-    map.insert( *lst.append( *itr ), 0 );
+  {
+    lst.append( *itr );
+    map.insert( *itr, 0 );
+  }
 
-  QString itemPrefix( "item_" );
   QStringList items = resMgr->parameters( section );
   for ( QStringList::const_iterator it = items.begin(); it != items.end(); ++it )
   {
     if ( !(*it).startsWith( itemPrefix ) )
       continue;
 
-    QString link = resMgr->stringValue( section, *it, QString::null );
+    QString link = resMgr->stringValue( section, *it, QString() );
     if ( !link.isEmpty() && !map.contains( link ) )
-      map.insert( *lst.append( link ), 0 );
+    {
+      lst.append( link );
+      map.insert( link, 0 );
+    }
 
     resMgr->remove( section, *it );
   }
 
   int counter = 0;
-  for ( QStringList::const_iterator iter = lst.begin(); iter != lst.end(); ++iter, counter++ )
+  for ( QStringList::const_iterator iter = lst.begin();
+	iter != lst.end() && ( myHistoryCount < 0 || counter < myHistoryCount );
+	++iter, counter++ )
     resMgr->setValue( section, itemPrefix + QString().sprintf( "%03d", counter ), *iter );
 }
 
 /*!
-	Name: setEnabled [public slot]
-	Desc: Enable or disable all popup items with MRU links.
+  \brief Prepare MRU items popup menu.
+
+  This method is called when the parent menu is shown.
+  Enables or disables sub menu item according to the number of MRU items.
 */
-
-void QtxMRUAction::setEnabled( bool on )
-{
-  QtxAction::setEnabled( on );
-
-  for ( ItemsMap::ConstIterator iter = myItems.begin(); iter != myItems.end(); ++iter )
-    for ( QIntList::const_iterator it = iter.data().idList.begin(); it != iter.data().idList.end(); ++it )
-      iter.key()->setItemEnabled( *it, on );
-}
-
-/*!
-	Name: onAboutToShow [private slots]
-	Desc: Enable or disable sub menu item according to number of MRU links
-        in sub popup when parent popup is shown.
-*/
-
 void QtxMRUAction::onAboutToShow()
 {
-  const QObject* obj = sender();
-  if ( obj && obj->inherits( "QPopupMenu" ) )
-  {
-    QPopupMenu* pm = (QPopupMenu*)obj;
-    if ( myMenus.contains( pm ) )
-      pm->setItemEnabled( findId( pm, myMenus[pm]), isEnabled() && myMenus[pm] && myMenus[pm]->count() );
-  }
+  updateMenu();
 }
 
 /*!
-	Name: onActivated [private slot]
-	Desc: Process popup item activation and emit signal activated with selected MRU link.
-*/
+  \brief Called when any MRU item is selected by the user.
 
-void QtxMRUAction::onActivated( int id )
+  Emits signal activated(const QString&) passing selected MRU item as parameter.
+*/
+void QtxMRUAction::onActivated()
 {
-  const QObject* obj = sender();
-  if ( !obj->inherits( "QPopupMenu" ) )
+  QAction* a = ::qobject_cast<QAction*>( sender() );
+  if ( !a )
     return;
 
-  QPopupMenu* pm = (QPopupMenu*)obj;
-
-  QString link;
-  if ( ( myItems.contains( pm ) && myItems[pm].idList.contains( id ) ) ||
-       ( myMenus.contains( (QPopupMenu*)pm->parent() ) && myMenus[(QPopupMenu*)pm->parent()] == pm ) )
-    link = pm->text( id );
-
-  if ( !link.isEmpty() )
+  QString link = a->data().toString();
+  if ( !link.isEmpty() && myLinks.contains( link ) )
     emit activated( link );
 }
 
-/*!
-	Name: onDestroyed [private slot]
-	Desc: Removes deleted popup menu from internal data structures.
-*/
-
-void QtxMRUAction::onDestroyed( QObject* obj )
+void QtxMRUAction::onCleared( bool )
 {
-  if ( !obj )
-    return;
-
-  myItems.remove( (QPopupMenu*)obj );
-  myMenus.remove( (QPopupMenu*)obj );
+  clear();
 }
 
 /*!
-	Name: updateState [private]
-	Desc: Updates the state of all popup menus which contains MRU link items.
+  \brief Update MRU items popup menu.
 */
-
-void QtxMRUAction::updateState()
+void QtxMRUAction::updateMenu()
 {
-  for ( ItemsMap::ConstIterator iIt = myItems.begin(); iIt != myItems.end(); ++iIt )
-    updatePopup( iIt.key(), Items );
-
-  for ( MenusMap::ConstIterator mIt = myMenus.begin(); mIt != myMenus.end(); ++mIt )
-    updatePopup( mIt.key(), SubMenu );
-}
-
-/*!
-	Name: checkPopup [private]
-	Desc: Check consistency the popup content and internal datas.
-        Synchronize internal data structures with popup content.
-*/
-
-void QtxMRUAction::checkPopup( QPopupMenu* pm )
-{
-  if ( myItems.contains( pm ) )
-  {
-    bool found = true;
-    for ( QIntList::const_iterator it = myItems[pm].idList.begin(); it != myItems[pm].idList.end() && found; ++it )
-      found = pm->indexOf( *it ) != -1;
-    if ( !found )
-    {
-      removeLinks( pm, Items );
-      myItems.remove( pm );
-      disconnect( pm, SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
-    }
-  }
-  if ( myMenus.contains( pm ) )
-  {
-    int id = findId( pm, myMenus[pm] );
-    if ( id == -1 )
-    {
-      delete myMenus[pm];
-      myMenus.remove( pm );
-    }
-  }
-
-  if ( !myItems.contains( pm ) && !myMenus.contains( pm ) )
-    disconnect( pm, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
-}
-
-/*!
-	Name: updatePopup [private]
-	Desc: Updates the MRU link items state in the specified popup menu.
-*/
-
-void QtxMRUAction::updatePopup( QPopupMenu* pm, const int mode )
-{
+  QMenu* pm = menu();
   if ( !pm )
     return;
 
-  int idx = -1;
-  if ( mode == Items && myItems.contains( pm ) )
-  {
-    if ( !myItems[pm].idList.isEmpty() )
-      idx = pm->indexOf( myItems[pm].idList.first() );
-    else
-    {
-      int pIdx = pm->indexOf( myItems[pm].pId );
-      int nIdx = pm->indexOf( myItems[pm].nId );
-      if ( pIdx != -1 )
-        idx = pIdx + 1;
-      else if ( nIdx != -1 )
-        idx = nIdx - 1;
-    }
-  }
+  pm->clear();
 
-  removeLinks( pm, mode );
-  insertLinks( pm, mode, idx );
-}
-
-/*!
-	Name: removeLinks [private]
-	Desc: Removes MRU link items from specified popup.
-*/
-
-bool QtxMRUAction::removeLinks( QPopupMenu* pm, const int mode )
-{
-  if ( !pm )
-    return false;
-
-  if ( mode == SubMenu && myMenus.contains( pm ) )
-    myMenus[pm]->clear();
-  else if ( mode == Items && myItems.contains( pm ) )
-  {
-    for ( QIntList::const_iterator it = myItems[pm].idList.begin(); it != myItems[pm].idList.end(); ++it )
-      pm->removeItem( *it );
-    myItems[pm].idList.clear();
-  }
-
-  return true;
-}
-
-/*!
-	Name: insertLinks [private]
-	Desc: Inserts MRU link items to the specified popup.
-*/
-
-bool QtxMRUAction::insertLinks( QPopupMenu* pm, const int mode, const int idx )
-{
-  if ( !pm )
-    return false;
-
+  QStringList links;
+  QMap<QString, int> map;
   int count = visibleCount() < 0 ? myLinks.count() : visibleCount();
-  bool isOn = isEnabled();
-  if ( mode == SubMenu && myMenus.contains( pm ) )
+  int i = insertMode() == AddLast || insertMode() == MoveLast ? qMax( 0, myLinks.count()-count ) : 0;
+  for ( ; i < myLinks.count() && count > 0; ++i, count-- )
   {
-    for ( QStringList::const_iterator it = myLinks.begin(); it != myLinks.end() && count > 0; ++it, count-- )
+    links.append( myLinks[i] );
+    if ( linkType() == LinkAuto )
     {
-      int id = myMenus[pm]->insertItem( *it, -1 );
-      myMenus[pm]->setItemEnabled( id, isOn );
+      QString shortName = Qtx::file( myLinks[i] );
+      if ( map.contains( shortName ) )
+	map[shortName]++;
+      else
+	map.insert( shortName, 0 );
     }
   }
-  else if ( mode == Items )
+
+  i = 1;
+  for ( QStringList::const_iterator it = links.begin(); it != links.end(); ++it, i++ )
   {
-    QIntList ids;
-    int index = idx;
-    for ( QStringList::const_iterator it = myLinks.begin(); it != myLinks.end() && count > 0; ++it, count--  )
+    QString linkName;
+    switch( linkType() )
     {
-      ids.append( pm->insertItem( *it, -1, index ) );
-      pm->setItemEnabled( ids.last(), isOn );
-      if ( index >= 0 )
-        index++;
+    case LinkAuto:
+      linkName = Qtx::file( *it );
+      if ( map.contains( linkName ) && map[linkName] )
+	linkName = *it;
+      break;
+    case LinkShort:
+      linkName = Qtx::file( *it );
+      break;
+    case LinkFull:
+    default:
+      linkName = *it;
+      break;
     }
-    myItems[pm].idList = ids;
-    if ( !myItems[pm].idList.isEmpty() )
-    {
-      myItems[pm].pId = pm->idAt( pm->indexOf( myItems[pm].idList.first() ) - 1 );
-      myItems[pm].nId = pm->idAt( pm->indexOf( myItems[pm].idList.first() ) + 1 );
-    }
+
+    if ( links.count() < 10 )
+      linkName = QString( "&%1 %2" ).arg( i ).arg( linkName );
+
+    pm->addAction( linkName, this, SLOT( onActivated() ) )->setData( *it );
   }
-  return true;
+
+  if ( pm->isEmpty() )
+    pm->addAction( tr( "<Empty>" ) )->setEnabled( false );
+
+  if ( isClearPossible() )
+  {
+    pm->addSeparator();
+    pm->addAction( myClear );
+    myClear->setEnabled( !pm->isEmpty() );
+  }
 }
 
 /*!
-	Name: findId [private]
-	Desc: Returns identificator of popup item which contains sub popup 'pm' in the popup 'cont'.
+  \fn void QtxMRUAction::activated( const QString& link );
+  \brief Emitted when user selects any MRU item in the menu.
+  \param link selected MRU item
 */
-
-int QtxMRUAction::findId( QPopupMenu* cont, QPopupMenu* pm ) const
-{
-  if ( !cont || !pm )
-    return -1;
-
-  int id = -1;
-
-  for ( int i = 0; i < (int)cont->count() && id == -1; i++ )
-  {
-    QMenuData* md = 0;
-    QMenuItem* item = cont->findItem( cont->idAt( i ), &md );
-    if ( item && md == cont && item->popup() == pm )
-      id = item->id();
-  }
-  return id;
-}

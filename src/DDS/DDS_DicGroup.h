@@ -1,20 +1,23 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef DDS_DICGROUP_H
 #define DDS_DICGROUP_H
@@ -24,13 +27,10 @@
 #include "DDS_DicItem.h"
 
 #include <MMgt_TShared.hxx>
-
-#include <TCollection_AsciiString.hxx>
-
+#include <TColStd_SequenceOfAsciiString.hxx>
 #include <NCollection_List.hxx>
 
 class LDOM_Element;
-class TColStd_SequenceOfAsciiString;
 
 DEFINE_STANDARD_HANDLE(DDS_DicGroup, MMgt_TShared)
 
@@ -40,6 +40,7 @@ public:
   DDS_DicGroup( const TCollection_AsciiString& );
 
   TCollection_AsciiString                    GetName() const;
+  Standard_EXPORT void                       GetKeys( TColStd_SequenceOfAsciiString& ) const;
 
   Standard_EXPORT Handle(DDS_DicItem)        GetDicItem( const TCollection_AsciiString& ) const;
 
@@ -65,6 +66,7 @@ private:
   DDS_IndexedDataMapOfDicItems               myDataMap;
   UnitSystemMap                              myUnitSystem;
   TCollection_AsciiString                    myActiveSystem;
+  TColStd_SequenceOfAsciiString              myKeys;
 
   friend class DDS_Dictionary;
 

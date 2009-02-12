@@ -1,27 +1,30 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef OCCVIEWER_CLIPPINGDLG_H
 #define OCCVIEWER_CLIPPINGDLG_H
 
 #include "OCCViewer.h"
 
-#include <qdialog.h>
+#include <QDialog>
 
 #include <AIS_Plane.hxx>
 #include <V3d_Plane.hxx>
@@ -31,7 +34,7 @@ class QLabel;
 class QPushButton;
 class QComboBox;
 class QCheckBox;
-class QtxDblSpinBox;
+class QtxDoubleSpinBox;
 class QtxAction;
 
 class OCCViewer_ViewWindow;
@@ -46,7 +49,7 @@ class OCCViewer_ClippingDlg : public QDialog
     Q_OBJECT
     
     public:
-    OCCViewer_ClippingDlg(OCCViewer_ViewWindow* , QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0);
+    OCCViewer_ClippingDlg(OCCViewer_ViewWindow* , QWidget* parent = 0, const char* name = 0, bool modal = FALSE, Qt::WindowFlags fl = 0);
     ~OCCViewer_ClippingDlg();
 
     void SetAction( QtxAction* theAction ) { myAction = theAction; }
@@ -66,18 +69,18 @@ private :
     QLabel* TextLabelX;
     QLabel* TextLabelY;
     QLabel* TextLabelZ;
-    QtxDblSpinBox* SpinBox_X;
-    QtxDblSpinBox* SpinBox_Y;
-    QtxDblSpinBox* SpinBox_Z;
+    QtxDoubleSpinBox* SpinBox_X;
+    QtxDoubleSpinBox* SpinBox_Y;
+    QtxDoubleSpinBox* SpinBox_Z;
     QPushButton* resetButton;
     
     QGroupBox* GroupDirection;
     QLabel* TextLabelDx;
     QLabel* TextLabelDy;
     QLabel* TextLabelDz;
-    QtxDblSpinBox* SpinBox_Dx;
-    QtxDblSpinBox* SpinBox_Dy;
-    QtxDblSpinBox* SpinBox_Dz;
+    QtxDoubleSpinBox* SpinBox_Dx;
+    QtxDoubleSpinBox* SpinBox_Dy;
+    QtxDoubleSpinBox* SpinBox_Dz;
     QPushButton* invertButton;
     
     QComboBox* DirectionCB;

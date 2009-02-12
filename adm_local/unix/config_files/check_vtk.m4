@@ -1,25 +1,23 @@
-dnl  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-dnl 
-dnl  This library is free software; you can redistribute it and/or 
-dnl  modify it under the terms of the GNU Lesser General Public 
-dnl  License as published by the Free Software Foundation; either 
-dnl  version 2.1 of the License. 
-dnl 
-dnl  This library is distributed in the hope that it will be useful, 
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-dnl  Lesser General Public License for more details. 
-dnl 
-dnl  You should have received a copy of the GNU Lesser General Public 
-dnl  License along with this library; if not, write to the Free Software 
-dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-dnl 
-dnl  See http://www.opencascade.org/SALOME/ or email : webmaster.salome@opencascade.org 
+dnl  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
+dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 dnl
+dnl  This library is free software; you can redistribute it and/or
+dnl  modify it under the terms of the GNU Lesser General Public
+dnl  License as published by the Free Software Foundation; either
+dnl  version 2.1 of the License.
 dnl
-
+dnl  This library is distributed in the hope that it will be useful,
+dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl  Lesser General Public License for more details.
+dnl
+dnl  You should have received a copy of the GNU Lesser General Public
+dnl  License along with this library; if not, write to the Free Software
+dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+dnl
+dnl  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 dnl
 dnl  OPTIONS_VTK
 dnl  ------------------------------------------------------------------------
@@ -33,6 +31,9 @@ AC_DEFUN([OPTIONS_VTK], [
   AC_ARG_WITH([vtk-version],
               [AC_HELP_STRING([--with-vtk-version], [VTK include directory name is vtk-suffix, e.g. vtk-5.0/. What is the suffix? (Default "yes" means taking from environment variable)])],
               [vtk_suffix=$withval], [vtk_suffix="yes"])
+
+  AC_ARG_WITH([paraview],
+              [AC_HELP_STRING([--with-paraview], [ParaView from the specified location is used instead of VTK (default "" means ParaView should not be used)])])
 ])
 
 dnl
@@ -86,8 +87,8 @@ then
 fi
 
 LOCAL_INCLUDES="$OGL_INCLUDES"
-LOCAL_LIBS="-lvtkCommon -lvtkGraphics -lvtkImaging -lvtkFiltering -lvtkIO -lvtkRendering -lvtkHybrid -lvtkParallel -lvtkWidgets $OGL_LIBS $LXLIB -lX11 -lXt"
-TRY_LINK_LIBS="-lvtkCommon $OGL_LIBS $LXLIB -lX11 -lXt"
+LOCAL_LIBS="-lvtkCommon -lvtkGraphics -lvtkImaging -lvtkFiltering -lvtkIO -lvtkRendering -lvtkHybrid -lvtkParallel -lvtkWidgets $LXLIB -lX11 -lXt"
+TRY_LINK_LIBS="-lvtkCommon $LXLIB -lX11 -lXt"
 
 dnl VTK version suffix
 if test -z $vtk_suffix ; then
@@ -149,11 +150,35 @@ else
   fi
 fi
 
-LOCAL_INCLUDES="-I$VTKHOME/include/vtk${VTKSUFFIX} $LOCAL_INCLUDES"
-LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $LOCAL_LIBS"
-TRY_LINK_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $TRY_LINK_LIBS"
-if test "x$VTKHOME" != "x/usr" ; then
-  LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} $LOCAL_LIBS"
+# Using regular VTK installation
+if test "x$with_paraview" = "x" ; then
+  LOCAL_INCLUDES="-I$VTKHOME/include/vtk${VTKSUFFIX} $LOCAL_INCLUDES"
+  LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $LOCAL_LIBS"
+  TRY_LINK_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} -L$VTKHOME/lib${LIB_LOCATION_SUFFIX}/vtk${VTKSUFFIX} $TRY_LINK_LIBS"
+  if test "x$VTKHOME" != "x/usr" ; then
+    LOCAL_LIBS="-L$VTKHOME/lib${LIB_LOCATION_SUFFIX} $LOCAL_LIBS"
+  fi
+else
+# VTK from ParaView overrides other VTK versions
+  if test "${with_paraview}" = "yes" ; then
+    if test -z $PVHOME ; then
+      PVHOME="/usr"
+    fi
+  else
+    PVHOME=${with_paraview}
+  fi
+
+  if test -z $PVSRCHOME ; then
+    PVSRCHOME="$PVHOME/src"
+  fi
+
+  if test -z $PVINSTALLHOME ; then
+    PVINSTALLHOME="$PVHOME/bin"
+  fi
+
+  LOCAL_INCLUDES="-I$PVSRCHOME/VTK/Common -I$PVSRCHOME/VTK/Filtering -I$PVSRCHOME/VTK/GenericFiltering -I$PVSRCHOME/VTK/Graphics -I$PVSRCHOME/VTK/Hybrid -I$PVSRCHOME/VTK/Imaging -I$PVSRCHOME/VTK/Infovis -I$PVSRCHOME/VTK/IO -I$PVSRCHOME/VTK/Parallel -I$PVSRCHOME/VTK/Rendering -I$PVSRCHOME/VTK/Utilities -I$PVSRCHOME/VTK/Views -I$PVSRCHOME/VTK/VolumeRendering -I$PVSRCHOME/VTK/Widgets -I$PVINSTALLHOME/VTK -I$PVINSTALLHOME/VTK/Common -I$PVINSTALLHOME/VTK/Filtering -I$PVINSTALLHOME/VTK/GenericFiltering -I$PVINSTALLHOME/VTK/Graphics -I$PVINSTALLHOME/VTK/Hybrid -I$PVINSTALLHOME/VTK/Imaging -I$PVINSTALLHOME/VTK/Infovis -I$PVINSTALLHOME/VTK/IO -I$PVINSTALLHOME/VTK/Parallel -I$PVINSTALLHOME/VTK/Rendering -I$PVINSTALLHOME/VTK/Utilities -I$PVINSTALLHOME/VTK/Views -I$PVINSTALLHOME/VTK/VolumeRendering -I$PVINSTALLHOME/VTK/Widgets $LOCAL_INCLUDES"
+  LOCAL_LIBS="-L$PVINSTALLHOME/bin -lvtksys -lvtkzlib -lvtkpng -lvtkjpeg -lvtktiff -lvtkexpat -lvtksqlite -lvtkmetaio -lvtkverdict -lvtkNetCDF -lvtkDICOMParser -lvtkfreetype -lvtkftgl -lvtkexoIIc $LOCAL_LIBS"
+  TRY_LINK_LIBS="-L$PVINSTALLHOME/bin -lvtksys $TRY_LINK_LIBS"
 fi
 
 dnl vtk headers

@@ -1,28 +1,31 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxWorkstackAction.h
 // Author:    Sergey TELKOV
-
+//
 #ifndef QTXWORKSTACKACTION_H
 #define QTXWORKSTACKACTION_H
 
-#include "QtxAction.h"
+#include "QtxActionSet.h"
 
 class QtxWorkstack;
 
@@ -30,64 +33,56 @@ class QtxWorkstack;
 #pragma warning( disable:4251 )
 #endif
 
-class QTX_EXPORT QtxWorkstackAction : public QtxAction
+class QTX_EXPORT QtxWorkstackAction : public QtxActionSet
 {
   Q_OBJECT
 
 public:
-  enum { VSplit     = 0x0001,
-         HSplit     = 0x0002,
-         Windows    = 0x0010,
-         Split      = VSplit | HSplit,
-         Standard   = Split | Windows };
+  //! Actions (menu items) ID
+  enum { SplitVertical   = 0x0001,   //!< "Split window vertically" operation
+         SplitHorizontal = 0x0002,   //!< "Split window horizontally" operation
+         Windows         = 0x0010,   //!< A list of child windows menu items
+         Split           = SplitVertical | SplitHorizontal,
+         Standard        = Split | Windows };
 
-public:
-  QtxWorkstackAction( QtxWorkstack*, QObject* = 0, const char* = 0 );
+  QtxWorkstackAction( QtxWorkstack*, QObject* = 0 );
   virtual ~QtxWorkstackAction();
 
   QtxWorkstack* workstack() const;
 
-  int           items() const;
-  void          setItems( const int );
-  bool          hasItems( const int ) const;
+  int           menuActions() const;
+  void          setMenuActions( const int );
 
+  QIcon         icon( const int ) const;
+  QString       text( const int ) const;
   int           accel( const int ) const;
-  QIconSet      iconSet( const int ) const;
-  QString       menuText( const int ) const;
   QString       statusTip( const int ) const;
 
   void          setAccel( const int, const int );
-  void          setIconSet( const int, const QIconSet& );
-  void          setMenuText( const int, const QString& );
+  void          setIcon( const int, const QIcon& );
+  void          setText( const int, const QString& );
   void          setStatusTip( const int, const QString& );
-
-  virtual bool  addTo( QWidget* );
-  virtual bool  addTo( QWidget*, const int );
-  virtual bool  removeFrom( QWidget* );
 
   void          perform( const int );
 
 private slots:
   void          onAboutToShow();
-  void          onItemActivated( int );
-  void          onPopupDestroyed( QObject* );
+  void          onTriggered( int );
+
+protected:
+  virtual void  addedTo( QWidget* );
+  virtual void  removedFrom( QWidget* );
 
 private:
-  void          checkPopup( QPopupMenu* );
-  void          updatePopup( QPopupMenu* );
-
-  int           clearPopup( QPopupMenu* );
-  void          fillPopup( QPopupMenu*, const int );
-
-private:
-  typedef QMap<QPopupMenu*, QIntList> MenuMap;
-  typedef QMap<int, QtxAction*>       ItemMap;
+  void          updateContent();
+  void          updateWindows();
+  void          splitVertical();
+  void          splitHorizontal();
+  void          activateItem( const int );
 
 private:
-  MenuMap       myMenu;
-  ItemMap       myItem;
-  int           myFlags;
-  QtxWorkstack* myWorkstack;
+  QtxWorkstack* myWorkstack;       //!< parent workstack
+  bool          myWindowsFlag;     //!< "show child windows items" flag
 };
 
 #ifdef WIN32

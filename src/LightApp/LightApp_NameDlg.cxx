@@ -1,35 +1,36 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  File   : LightApp_NameDlg.cxx
-//  Author : Vadim SANDLER
-//  $Header$
-
-#include <LightApp_NameDlg.h>
-#include <SUIT_Application.h>
-#include <SUIT_Desktop.h>
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : LightApp_NameDlg.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
+#include "LightApp_NameDlg.h"
 #include <SUIT_Tools.h>
 
-#include <qgroupbox.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #ifndef WIN32
 using namespace std;
@@ -40,48 +41,51 @@ using namespace std;
 */
 LightApp_NameDlg::LightApp_NameDlg( QWidget* parent )
 : QDialog( parent ? parent : NULL,//application()->desktop(), 
-"LightApp_NameDlg",
-true,
-WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
+Qt::WindowTitleHint | Qt::WindowSystemMenuHint )
 {
-  setCaption( tr("TLT_RENAME") );
+  setObjectName( "LightApp_NameDlg" );
+  setModal( true );
+
+  setWindowTitle( tr("TLT_RENAME") );
   setSizeGripEnabled( TRUE );
 
   QVBoxLayout* topLayout = new QVBoxLayout( this );
   topLayout->setMargin( 11 ); topLayout->setSpacing( 6 );
 
   /***************************************************************/
-  QGroupBox* GroupC1 = new QGroupBox( this, "GroupC1" );
-  GroupC1->setColumnLayout(0, Qt::Vertical );
-  GroupC1->layout()->setMargin( 0 ); GroupC1->layout()->setSpacing( 0 );
-  QHBoxLayout* GroupC1Layout = new QHBoxLayout( GroupC1->layout() );
+  QGroupBox* GroupC1 = new QGroupBox( this );
+  GroupC1->setObjectName( "GroupC1" );
+  QHBoxLayout* GroupC1Layout = new QHBoxLayout( GroupC1 );
   GroupC1Layout->setAlignment( Qt::AlignTop );
   GroupC1Layout->setMargin( 11 ); GroupC1Layout->setSpacing( 6 );
   
-  QLabel* TextLabel = new QLabel( GroupC1, "TextLabel1" );
+  QLabel* TextLabel = new QLabel( GroupC1 );
+  TextLabel->setObjectName( "TextLabel1" );
   TextLabel->setText( tr( "NAME_LBL" ) );
   GroupC1Layout->addWidget( TextLabel );
   
-  myLineEdit = new QLineEdit( GroupC1, "LineEdit1" );
+  myLineEdit = new QLineEdit( GroupC1 );
+  myLineEdit->setObjectName( "LineEdit1" );
   myLineEdit->setMinimumSize( 250, 0 );
   GroupC1Layout->addWidget( myLineEdit );
   
   /***************************************************************/
-  QGroupBox* GroupButtons = new QGroupBox( this, "GroupButtons" );
-  GroupButtons->setColumnLayout(0, Qt::Vertical );
-  GroupButtons->layout()->setMargin( 0 ); GroupButtons->layout()->setSpacing( 0 ); 
-  QHBoxLayout* GroupButtonsLayout = new QHBoxLayout( GroupButtons->layout() );
+  QGroupBox* GroupButtons = new QGroupBox( this );
+  GroupButtons->setObjectName( "GroupButtons" );
+  QHBoxLayout* GroupButtonsLayout = new QHBoxLayout( GroupButtons );
   GroupButtonsLayout->setAlignment( Qt::AlignTop );
   GroupButtonsLayout->setMargin( 11 ); GroupButtonsLayout->setSpacing( 6 );
   
-  myButtonOk = new QPushButton( GroupButtons, "buttonOk" );
+  myButtonOk = new QPushButton( GroupButtons );
+  myButtonOk->setObjectName( "buttonOk" );
   myButtonOk->setText( tr( "BUT_OK"  ) );
   myButtonOk->setAutoDefault( TRUE ); myButtonOk->setDefault( TRUE );
   GroupButtonsLayout->addWidget( myButtonOk );
 
   GroupButtonsLayout->addStretch();
   
-  myButtonCancel = new QPushButton( GroupButtons, "buttonCancel" );
+  myButtonCancel = new QPushButton( GroupButtons );
+  myButtonCancel->setObjectName( "buttonCancel" );
   myButtonCancel->setText( tr( "BUT_CANCEL"  ) );
   myButtonCancel->setAutoDefault( TRUE );
   GroupButtonsLayout->addWidget( myButtonCancel );
@@ -128,7 +132,7 @@ QString LightApp_NameDlg::name()
 */
 void LightApp_NameDlg::accept()
 {
-  if ( name().stripWhiteSpace().isEmpty() )
+  if ( name().trimmed().isEmpty() )
     return;
   QDialog::accept();
 }

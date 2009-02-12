@@ -1,6 +1,6 @@
-//  LightApp_Selection
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
@@ -17,15 +17,14 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
-//
+//  LightApp_Selection
 //  File   : LightApp_Selection.h
 //  Author : Alexander SOLOVYOV
 //  Module : GUI
 //  $Header$
-
+//
 #ifndef LIGHTAPP_SELECTION_HeaderFile
 #define LIGHTAPP_SELECTION_HeaderFile
 
@@ -44,7 +43,7 @@ class SUIT_ViewWindow;
   It is able to return values of standard object properties
   (isVisible,isComponent,canBeDisplayed,isReference, etc)
 */
-class LIGHTAPP_EXPORT LightApp_Selection : public QtxPopupMgr::Selection
+class LIGHTAPP_EXPORT LightApp_Selection : public QtxPopupSelection
 {
 public:
   LightApp_Selection();
@@ -54,8 +53,8 @@ public:
   virtual void                   processOwner( const LightApp_DataOwner* );
 
   virtual int                    count() const;
-  virtual QtxValue               param( const int, const QString& ) const;
-  virtual QtxValue               globalParam( const QString& ) const;
+  virtual QVariant               parameter( const int, const QString& ) const;
+  virtual QVariant               parameter( const QString& ) const;
   void                           setModuleName( const QString );
 
 protected:

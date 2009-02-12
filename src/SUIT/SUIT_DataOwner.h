@@ -1,28 +1,32 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef SUIT_DATAOWNER_H
 #define SUIT_DATAOWNER_H
 
 #include "SUIT_SmartPtr.h"
 
-#include <qvaluelist.h>
-#include <qmap.h>
+#include <QMap>
+#include <QList>
+#include <QString>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -40,8 +44,6 @@ class SUIT_EXPORT SUIT_DataOwner : public RefCount
 public:
   SUIT_DataOwner();//!< constructor
   virtual ~SUIT_DataOwner();//!< destructor
-  // *** jfa: The below line has been put here 14.02.2007.
-  // *** It cancels modifications from branch BR_Dev_For_4_0
   virtual QString keyString() const = 0;//!< used for comparison
 };
 
@@ -60,21 +62,17 @@ bool operator==( const SUIT_DataOwnerPtr&, const SUIT_DataOwnerPtr& );
 /*! \class SUIT_DataOwnerPtrList
  * \brief Manage list of SUIT_DataOwnerPtr.
  */
-class SUIT_EXPORT SUIT_DataOwnerPtrList : public QValueList<SUIT_DataOwnerPtr> 
+class SUIT_EXPORT SUIT_DataOwnerPtrList : public QList<SUIT_DataOwnerPtr>
 {
 public:
   SUIT_DataOwnerPtrList();                         //!< constructor
   SUIT_DataOwnerPtrList( const bool skipAllEqual );//!< constructor
   SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l );                         //!< copy constructor
   SUIT_DataOwnerPtrList( const SUIT_DataOwnerPtrList& l, const bool skipAllEqual );//!< copy constructor
-#ifndef QT_NO_STL
-  SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l );                         //!< copy constructor for STL list
-  SUIT_DataOwnerPtrList( const std::list<SUIT_DataOwnerPtr>& l, const bool skipAllEqual );//!< copy constructor for STL list
-#endif
 
-  iterator append      ( const SUIT_DataOwnerPtr& x );//!< append function
+  void     append      ( const SUIT_DataOwnerPtr& x );//!< append function
   void     clear       ();
-  uint     remove      (const SUIT_DataOwnerPtr& x );
+  uint     remove      ( const SUIT_DataOwnerPtr& x );
 
 private:
   // hide this methods: only append() should be used to add items to the list
@@ -84,8 +82,8 @@ private:
   void push_back  ( const SUIT_DataOwnerPtr& x );//!< hide method
 
 private:
-  bool                              mySkipEqual;
-  QMap<SUIT_DataOwnerPtr, iterator> myMap;
+  QMap<SUIT_DataOwnerPtr, int> myMap;
+  bool                         mySkipEqual;
 };
 
 #ifdef WIN32

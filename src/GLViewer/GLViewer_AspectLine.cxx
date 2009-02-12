@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,14 +17,12 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_AspectLine.cxx
 // Created:   26/05/2005 3:17:00 PM
-
+//
 #include "GLViewer_AspectLine.h"
 
 /*!
@@ -127,7 +128,8 @@ QByteArray GLViewer_AspectLine::getByteCopy() const
     int aHR = myHColor.red(), aHG = myHColor.green(), aHB = myHColor.blue();
     int aSR = mySColor.red(), aSG = mySColor.green(), aSB = mySColor.blue();
 
-    QByteArray aResult( anISize * 10 + aFSize );
+    QByteArray aResult;
+    aResult.resize( anISize * 10 + aFSize );
 
     int i = 0;
     

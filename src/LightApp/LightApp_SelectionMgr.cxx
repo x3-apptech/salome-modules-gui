@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "LightApp_SelectionMgr.h"
 
@@ -33,6 +36,7 @@
   #include <TColStd_MapOfInteger.hxx>
   #include <TColStd_MapIteratorOfMapOfInteger.hxx>
   #include <TColStd_IndexedMapOfInteger.hxx>
+  #include <TCollection_AsciiString.hxx>
 #endif
 
 /*!
@@ -95,7 +99,7 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
       if ( !entryMap.contains( checkEntry ) ) {
         if ( refEntry != entry ) {
           QString component = study->componentDataType( refEntry );
-          theList.Append( new SALOME_InteractiveObject( refEntry, component, ""/*refobj->Name().c_str()*/ ) );
+          theList.Append( new SALOME_InteractiveObject( refEntry.toLatin1().constData(), component.toLatin1().constData(), ""/*refobj->Name().c_str()*/ ) );
         }
         else if( !owner->IO().IsNull() )
           theList.Append( owner->IO() );
@@ -218,12 +222,12 @@ void LightApp_SelectionMgr::AddOrRemoveIndex( const Handle(SALOME_InteractiveObj
                                               bool modeShift)
 {
   SUIT_DataOwnerPtrList remainsOwners;
-
+  
   SUIT_DataOwnerPtrList aList;
   selected( aList );
-
+  
   QString ioEntry (IObject->getEntry());
-
+  
   if ( !modeShift ) {
     for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr )
     {
@@ -248,7 +252,7 @@ void LightApp_SelectionMgr::AddOrRemoveIndex( const Handle(SALOME_InteractiveObj
   It.Initialize(theIndexes);
   for(;It.More();It.Next())
     remainsOwners.append( new LightApp_DataSubOwner( ioEntry, It.Key() ) );
-
+  
   bool append = false;
   setSelected( remainsOwners, append );
 
@@ -288,16 +292,16 @@ void LightApp_SelectionMgr::selectObjects( MapIOOfMapOfInteger theMapIO, bool ap
 {
   SUIT_DataOwnerPtrList aList;
 
-  MapIOOfMapOfInteger::Iterator it;
-  for ( it = theMapIO.begin(); it != theMapIO.end(); ++it ) 
+  MapIOOfMapOfInteger::Iterator it(theMapIO);
+  for ( ; it.More(); it.Next() ) 
     {
-      if ( it.data().IsEmpty() )
-	aList.append( new LightApp_DataOwner( QString(it.key()->getEntry()) ) );
+      if ( it.Value().IsEmpty() )
+	aList.append( new LightApp_DataOwner( QString(it.Key()->getEntry()) ) );
       else
 	{
 	  int i;
-	  for ( i = 1; i <= it.data().Extent(); i++ )
-	    aList.append( new LightApp_DataSubOwner( QString(it.key()->getEntry()), it.data()( i ) ) );
+	  for ( i = 1; i <= it.Value().Extent(); i++ )
+	    aList.append( new LightApp_DataSubOwner( QString(it.Key()->getEntry()), it.Value()( i ) ) );
 	}
     }
   
@@ -310,7 +314,7 @@ void LightApp_SelectionMgr::selectObjects( MapIOOfMapOfInteger theMapIO, bool ap
 */
 void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
 {
-  theMap.clear();
+  theMap.Clear();
 
   TColStd_IndexedMapOfInteger anIndexes;
 
@@ -323,7 +327,11 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
       dynamic_cast<const LightApp_DataSubOwner*>( (*itr).operator->() );
     if ( subOwner ) 
     {
-      if ( !theMap.contains( subOwner->entry() ) )
+#ifndef WNT
+      if ( !theMap.IsBound( TCollection_AsciiString(subOwner->entry().toLatin1().data()) ) )
+#else
+      if ( !theMap.IsBound( subOwner->entry().toLatin1().data() ) )
+#endif
       {
 	anIndexes.Clear();
 	//Bug 17269: GetIndexes( subOwner->entry(), anIndexes );
@@ -337,7 +345,7 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
               anIndexes.Add( subOwner2->index() );
         }
         //
-        theMap.insert( subOwner->entry(), anIndexes );
+	theMap.Bind( subOwner->entry().toLatin1().data(), anIndexes );
       }
     }
   }

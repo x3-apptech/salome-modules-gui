@@ -1,41 +1,40 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef QDS_DATUM_H
 #define QDS_DATUM_H
 
 #include "QDS.h"
+#include <QPointer>
+#include <QMap>
+#include <QLabel>
 
-#include <qwidget.h>
-#include <qstring.h>
-#include <qvariant.h>
-#include <qguardedptr.h>
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
+class QValidator;
 
 #include <DDS_DicItem.h>
 
-class QLabel;
 class QWidget;
-class QValidator;
-class QVBoxLayout;
-class QHBoxLayout;
-class QGridLayout;
-
-class Handle(DDS_Dictionary);
 
 class QDS_EXPORT QDS_Datum : public QObject, public QDS
 {
@@ -44,7 +43,7 @@ class QDS_EXPORT QDS_Datum : public QObject, public QDS
   class Wrapper;
 
 public:
-  QDS_Datum( const QString&, QWidget* = 0, const int = All, const QString& = QString::null );
+  QDS_Datum( const QString&, QWidget* = 0, const int = All, const QString& = QString() );
   virtual ~QDS_Datum();
 
   QString                   id() const;
@@ -96,8 +95,8 @@ public:
   void                      setFocus();
 
   virtual bool              isValid( const bool = true, 
-                                     const QString& = QString::null,
-                                     const QString& = QString::null ) const;
+                                     const QString& = QString(),
+                                     const QString& = QString() ) const;
   virtual QValidator*       validator( const bool = false ) const;
 
   void                      addTo( QVBoxLayout* );
@@ -117,6 +116,9 @@ public:
   virtual bool              eventFilter( QObject*, QEvent* );
 
   operator QWidget*() const;
+
+  bool isCustomTr() const;
+  void enableCustomTr( const bool );
 
 signals:
   void                      paramChanged();
@@ -183,8 +185,8 @@ private:
   static QString            canonicalFormat( const QString&, QString& );
 
 private:
-  typedef QGuardedPtr<QLabel>  GuardedLabel;
-  typedef QGuardedPtr<QWidget> GuardedWidget;
+  typedef QPointer<QLabel>  GuardedLabel;
+  typedef QPointer<QWidget> GuardedWidget;
 
 private:
   QString                   myId;
@@ -199,7 +201,7 @@ private:
   QString                   mySourceValue;
   QString                   myTargetValue;
 
-  bool                      myInitialised;
+  bool                      myInitialised, myTr;
 
   friend class QDS;
 };

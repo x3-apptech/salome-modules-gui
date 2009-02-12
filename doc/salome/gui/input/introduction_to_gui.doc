@@ -1,0 +1,67 @@
+/*!
+
+\page introduction_to_gui_page Introduction to GUI
+
+\image html view2.png
+
+\n SALOME GUI is based on SUIT (Salome User Interface
+Toolkit) that proposes very flexible, powerful and safe mechanisms of
+interaction with SALOME tool components (both CORBA and standalone),
+resource management, viewers and selection handling,
+exception and signals processing. This approach brings to the top
+Salome multi-desktop dockable-windowed user interface.
+\n All Graphical User Interfaces of standard modules have plug-in
+structure, i.e. each module is placed in a dynamic library which is
+loaded on demand. So, all modules add their own menu items, buttons
+in toolbar, windows etc.
+\b GUI (Graphical User Interface) provides a common shell for all
+components, which can be integrated into the SALOME platform and some
+basic GUI functionalities, common for all modules.
+
+\image html mainmenu.png
+
+<ul>
+<li>\b File menu corresponds to \subpage study_management_page "Study management" functionalities
+(creation, saving, loading, editing studies, etc.).</li>
+<li>\b Edit menu gives access to <b> Copy/Paste</b> allowing to paste the
+objects from one study into the other. The availability of this
+functionality depends on the module and the nature of an operation or
+an object.</li>
+<li>\b View and \b Window menus provide functionalities of 
+\subpage salome_desktop_page "Desktop management". Basically, they
+allow to show/hide toolbars, activate and manage study windows, change
+the appearance of Salome, etc. Among key parts of study window are: 
+
+<ul>
+<li>Viewer window, used for visualization of objects,</li>
+<li>\subpage using_object_browser_page "Object Browser", used for
+management of objects created or imported into the SALOME
+application, also providing search possibilities with the 
+\subpage using_find_tool_page "Find Tool", and </li>
+<li>\subpage python_interpreter_page "Python interpreter", used for
+direct input of python commands and dumping studies into Python
+scripts. </li> 
+<li> Almost all aspects of Salome look and feel can be tuned by the
+user in \subpage themes_page "Themes" dialog. </li>
+</ul>
+</li>
+
+<li>\b Tools menu gives access to: \subpage using_catalog_generator_page "Catalogue Generator", and 
+\subpage using_registry_tool_page "Registry tool"</li>
+<li>\b Help menu gives access to the help on Salome modules. The
+appropriate help page can also be called from any operation dialog via
+\b Help button.</li>
+</ul>
+
+Help for the GUI module provides information about standard
+\subpage viewers_page "Salome Viewers":
+<ul>
+<li>\ref occ_3d_viewer_page "OCC 3D viewer", </li>
+<li>\ref vtk_3d_viewer_page "VTK 3D viewer" and </li>
+<li>\ref plot2d_viewer_page "Plot 2D viewer". </li>
+</ul>
+
+\subpage setting_preferences_page "Preferences" for all Salome modules
+are also described in this section of Salome GUI Help.
+
+*/

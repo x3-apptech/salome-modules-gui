@@ -1,43 +1,61 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "QDS_ComboBox.h"
 
-#include <DDS_Dictionary.h>
+#include <QtxComboBox.h>
 
-#include <TCollection_AsciiString.hxx>
 #include <TColStd_HArray1OfInteger.hxx>
 #include <TColStd_HArray1OfExtendedString.hxx>
 
-#include <qlineedit.h>
+#include <QLineEdit>
 
 /*
   \class QDS_ComboBox
   
-  Datum with control corresponding to combo box. This control used for datum with enumerable values.
-  It can be used for datum which has type of value 'List'. Each item of combobox defined two properties:
-  integer identifier and string name. All operations on items performed via identifier.
+  \brief Datum with control corresponding to the combo box. 
+
+  This control is used for datum with enumerable values.
+  It can be used for datum which has type of value 'List'. 
+
+  Each item of the combobox is defined by two properties: integer identifier 
+  and string name. All operations on items are performed via identifier.
 */
 
 /*!
-  Constructor. Create combobox datum object with datum identifier \aid under widget \aparent. Parameter \aflags
-  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
-  Parameter \acomp specify the component name which will be used during search of dictionary item.
+  \brief Constructor. 
+
+  Create combobox datum object with datum identifier \a id 
+  and parent widget \a parent. 
+
+  Parameter \a flags defines behaviour of datum and set of created
+  subwidgets. Default value of this parameter is QDS::All.
+
+  Parameter \a comp specifies the component name which will be used
+  when searching the dictionary item.
+
+  \param id datum identifier
+  \param parent parent widget
+  \param flags datum flags
+  \param comp component
 */
 QDS_ComboBox::QDS_ComboBox( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -45,14 +63,15 @@ QDS_ComboBox::QDS_ComboBox( const QString& id, QWidget* parent, const int flags,
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_ComboBox::~QDS_ComboBox()
 {
 }
 
 /*!
-  Returns true if ComboBox allow to edit current text.
+  \brief Check if combo box allows text editing.
+  \return \c true if combo box is editable
 */
 bool QDS_ComboBox::editable() const
 {
@@ -63,7 +82,8 @@ bool QDS_ComboBox::editable() const
 }
 
 /*!
-  Sets the possibily of current text editing.
+  \brief Enable/disable text editing.
+  \param on if \c true, combo box is made editable
 */
 void QDS_ComboBox::setEditable( const bool on )
 {
@@ -73,15 +93,18 @@ void QDS_ComboBox::setEditable( const bool on )
   if ( aCombo && aCombo->lineEdit() )
   {
     aCombo->lineEdit()->setReadOnly( !on );
-    aCombo->clearValidator();
+    aCombo->setValidator(0);
     if ( on )
       aCombo->setValidator( validator() );
   }
 }
 
 /*!
-  Returns number of items in ComboBox. If \atotal is 'false' then only
-  visible items are taken into account otherwise all items.
+  \brief Get number of items in the combo box.
+
+  \param total if \c false, only visible items are taken into account, 
+        otherwise get total number of items
+  \return number of items
 */
 int QDS_ComboBox::count( bool total ) const
 {
@@ -94,10 +117,13 @@ int QDS_ComboBox::count( bool total ) const
 }
 
 /*!
-  Returns list of list item identifiers \aids. If \atotal is 'false' then only visible items
-  are taken into account otherwise all items.
+  \brief Get items identifiers.
+
+  \param ids returned list of items IDs
+  \param total if \c false, only visible items are taken into account, 
+        otherwise get total number of items
 */
-void QDS_ComboBox::values( QValueList<int>& ids, bool total ) const
+void QDS_ComboBox::values( QList<int>& ids, bool total ) const
 {
   ids.clear();
   for ( QIntList::const_iterator it = myDataIds.begin(); it != myDataIds.end(); ++it )
@@ -106,23 +132,25 @@ void QDS_ComboBox::values( QValueList<int>& ids, bool total ) const
 }
 
 /*!
-  Returns the current id as integer. Reimplemented.
+  \brief Get the current item ID as integer value.
+  \return current item ID converted to integer
 */
 int QDS_ComboBox::integerValue() const
 {
   QComboBox* cb = comboBox();
   QString cur = getString();
-  if ( cb && cb->count() > 0 && cb->currentItem() >= 0 )
-    cur = cb->text( cb->currentItem() );
+  if ( cb && cb->count() > 0 && cb->currentIndex() >= 0 )
+    cur = cb->itemText( cb->currentIndex() );
 
   if ( cb && cur == getString() )
-    return getId( cb->currentItem() );
+    return getId( cb->currentIndex() );
   else
     return getId( getString() );
 }
 
 /*!
-  Returns the current id as double. Reimplemented.
+  \brief Get the current item ID as double value.
+  \return current item ID converted to double
 */
 double QDS_ComboBox::doubleValue() const
 {
@@ -130,17 +158,18 @@ double QDS_ComboBox::doubleValue() const
 
   QComboBox* cb = comboBox();
   QString cur = getString();
-  if ( cb && cb->count() > 0 && cb->currentItem() >= 0 )
-    cur = cb->text( cb->currentItem() );
+  if ( cb && cb->count() > 0 && cb->currentIndex() >= 0 )
+    cur = cb->itemText( cb->currentIndex() );
 
   if ( cb && cur == getString() )
-    return getId( cb->currentItem() );
+    return getId( cb->currentIndex() );
   else
     return getId( getString() );
 }
 
 /*!
-  Set the current item acording to specified id. Reimplemented.
+  \brief Set the current item acording to the specified \a id.
+  \param id item ID
 */
 void QDS_ComboBox::setIntegerValue( const int id )
 {
@@ -153,7 +182,12 @@ void QDS_ComboBox::setIntegerValue( const int id )
 }
 
 /*!
-  Get the integer part of specified value and use it as new current identifier. Reimplemented.
+  \brief Set the current item acording to the specified \a id.
+  \overload
+
+  Integer part of \a val is used as new current ID.
+  
+  \param val item ID
 */
 void QDS_ComboBox::setDoubleValue( const double val )
 {
@@ -167,7 +201,9 @@ void QDS_ComboBox::setDoubleValue( const double val )
 }
 
 /*!
-  Returns visible state of item specified by \aid.
+  \brief Get visibility state of the item specified by \a id.
+  \param id item ID
+  \return item visibility state
 */
 bool QDS_ComboBox::state( const int id ) const
 {
@@ -178,13 +214,20 @@ bool QDS_ComboBox::state( const int id ) const
 }
 
 /*!
-  Sets the visible state of item specified by \aid. If \aid is -1 then specified
-  state will be set to all items. If \aappend is set then keep status for other items
-  otherwise status of other items will be cleared.
+  \brief Set the visibility state of the item specified by \a id.
+
+  If \a id is -1 then specified state will be set to all items.
+
+  If \a append is set to \c true, keep current status for other items,
+  otherwise status of other items is cleared.
+
+  \param on new visibility state
+  \param id item ID
+  \param append if \c true, keep original status for other items
 */
 void QDS_ComboBox::setState( const bool on, const int id, const bool append )
 {
-  QValueList<int> lst;
+  QList<int> lst;
   if ( id < 0 )
   {
     for ( IdStateMap::Iterator it = myState.begin(); it != myState.end(); ++it )
@@ -197,11 +240,16 @@ void QDS_ComboBox::setState( const bool on, const int id, const bool append )
 }
 
 /*!
-  Sets the visible state of items specified by list of identifiers \aids.
-  If \aappend is set then keep status for other items otherwise status of other
-  items will be cleared.
+  \brief Set the visibility state of items specified by \a ids.
+
+  If \a append is set to \c true, keep current status for other items,
+  otherwise status of other items is cleared.
+
+  \param on new visibility state
+  \param ids items IDs list
+  \param append if \c true, keep original status for other items
 */
-void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bool append )
+void QDS_ComboBox::setState( const bool on, const QList<int>& ids, const bool append )
 {
   initDatum();
 
@@ -212,21 +260,21 @@ void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bo
 
   QMap<int, int> aMap;
   for ( uint i = 0; i < ids.count(); i++ )
-    aMap.insert( *ids.at( i ), 0 );
+    aMap.insert( ids.at( i ), 0 );
 
   for ( IdStateMap::Iterator it = myState.begin(); it != myState.end(); ++it )
   {
     if ( aMap.contains( it.key() ) )
     {
-      if ( it.data() != on )
+      if ( it.value() != on )
       {
-        it.data() = on;
+        it.value() = on;
         changed = true;
       }
     }
-    else if ( !append && it.data() == on )
+    else if ( !append && it.value() == on )
     {
-      it.data() = !on;
+      it.value() = !on;
       changed = true;
     }
   }
@@ -235,11 +283,16 @@ void QDS_ComboBox::setState( const bool on, const QValueList<int>& ids, const bo
 }
 
 /*!
-  Sets the custom user items into the combo box. User items like standard dictionary
-  list items will be added into the combobox. This functionality allow to user override
+  \brief Set the custom user items into the combo box.
+
+  User items like standard dictionary list items will be added
+  into the combobox. This function allows user to override
   items.
+
+  \param ids items IDs
+  \param names items names
 */
-void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& names )
+void QDS_ComboBox::setValues( const QList<int>& ids, const QStringList& names )
 {
   initDatum();
 
@@ -248,42 +301,52 @@ void QDS_ComboBox::setValues( const QValueList<int>& ids, const QStringList& nam
 
   myUserIds = ids;
   myUserNames = names;
+
+  unitSystemChanged( "" );
 }
 
 /*!
-  This is an overloaded member function, provided for convenience.
-  It behaves essentially like the above function. It creates
-  QValueList (0, 1, 2 ... ) and call previous method.
+  \brief Set the custom user items into the combo box.
+  \overload
+
+  User items like standard dictionary list items will be added
+  into the combobox. This function allows user to override
+  items.
+
+  Uses (0, 1, 2 ... ) as items IDs.
+
+  \param names items names
 */
 void QDS_ComboBox::setValues( const QStringList& names )
 {
   initDatum();
 
-  QValueList< int > ids;
+  QList< int > ids;
   for ( int i = 0, n = names.count(); i < n; i++ )
     ids.append( i );
   setValues( ids, names );
 }
 
 /*!
-  Sets the active item as item with default id. If default
-  not defined then first item will be used.
+  \brief Reset the datum.
+
+  Set the active item as item with default ID. If default ID is not defined
+  then the first item is used.
 */
 void QDS_ComboBox::reset()
 {
   int id = -1;
   QString aDefValue = defaultValue();
   if ( !aDefValue.isEmpty() )
-    id = aDefValue.toInt();
-
-  if ( id == -1 )
-    id = getId( 0 );
-
-  setIntegerValue( id );
+    setString( aDefValue );
+  else
+    setIntegerValue( getId( 0 ) );
 }
 
 /*!
-  Returns identifier from given ComboBox string item.
+  \brief Convert string to integer value.
+  \param str item
+  \return item ID or -1 if not found
 */
 int QDS_ComboBox::stringToValue( const QString& str ) const
 {
@@ -291,7 +354,9 @@ int QDS_ComboBox::stringToValue( const QString& str ) const
 }
 
 /*!
-  Returns ComboBox string item from given identifier.
+  \brief Convert integer to string value.
+  \param val item ID 
+  \return item value or empty string if \c val is invalid
 */
 QString QDS_ComboBox::valueToString( const int val ) const
 {
@@ -302,7 +367,8 @@ QString QDS_ComboBox::valueToString( const int val ) const
 }
 
 /*!
-  Returns string from QComboBox widget. Reimplemented.
+  \brief Get string from the combo box.
+  \return string value
 */
 QString QDS_ComboBox::getString() const
 {
@@ -310,7 +376,7 @@ QString QDS_ComboBox::getString() const
   QtxComboBox* cb = comboBox();
   if ( cb )
   {
-    if ( !cb->editable() )
+    if ( !cb->isEditable() )
     {
       if ( !cb->isCleared() )
         res = cb->currentText(); 
@@ -322,7 +388,8 @@ QString QDS_ComboBox::getString() const
 }
 
 /*!
-  Sets the string into QComboBox widget. Reimplemented.
+  \brief Set the string value to the combo box widget.
+  \param txt string value
 */
 void QDS_ComboBox::setString( const QString& txt )
 {
@@ -334,20 +401,20 @@ void QDS_ComboBox::setString( const QString& txt )
   
   int idx = -1;
   for ( int i = 0; i < cb->count() && idx == -1; i++ )
-    if ( cb->text( i ) == txt )
+    if ( cb->itemText( i ) == txt )
       idx = i;
 
-  int old = cb->currentItem();
+  int old = cb->currentIndex();
   if ( idx != -1 )
-    cb->setCurrentItem( idx );
+    cb->setCurrentIndex( idx );
   else if ( txt.isEmpty() )
   {
-    if ( !cb->editable() )
-      cb->setCurrentText( txt );
+    if ( !cb->isEditable() )
+      cb->setItemText( cb->currentIndex(), txt );
     else
       cb->lineEdit()->setText( txt );
   }
-  if ( isClear != txt.isEmpty() || ( !isClear && old != cb->currentItem() ) )
+  if ( isClear != txt.isEmpty() || ( !isClear && old != cb->currentIndex() ) )
   {
     onParamChanged();
     QString str = getString();
@@ -359,15 +426,18 @@ void QDS_ComboBox::setString( const QString& txt )
 }
 
 /*!
-  Returns pointer to QtxComboBox widget.
+  \brief Get combo box widget.
+  \return internal combo box widget
 */
 QtxComboBox* QDS_ComboBox::comboBox() const
 {
-  return ::qt_cast<QtxComboBox*>( controlWidget() );
+  return ::qobject_cast<QtxComboBox*>( controlWidget() );
 }
 
 /*!
-  Create QComboBox widget as control subwidget. Reimplemented.
+  \brief Create internal combo box as control widget.
+  \param parent parent widget
+  \return created combo box widget
 */
 QWidget* QDS_ComboBox::createControl( QWidget* parent )
 {
@@ -380,8 +450,11 @@ QWidget* QDS_ComboBox::createControl( QWidget* parent )
 }
 
 /*!
-  Notification about active unit system changing. Reimplemented from QDS_Datum.
-  Update combobox content.
+  \brief Process notification about active units system changing.
+
+  Update combobox contents.
+  
+  \param system new active units system
 */
 void QDS_ComboBox::unitSystemChanged( const QString& system )
 {
@@ -462,9 +535,10 @@ void QDS_ComboBox::unitSystemChanged( const QString& system )
 }
 
 /*!
-  Notify about text changing in line edit of ComboBox.
+  \brief Called when text in the combo box (editable) is modified by the user.
+  \param txt current text in the combo box editor (not used)
 */
-void QDS_ComboBox::onTextChanged( const QString& )
+void QDS_ComboBox::onTextChanged( const QString& /*txt*/ )
 {
   onParamChanged();
   emit paramChanged();
@@ -473,12 +547,13 @@ void QDS_ComboBox::onTextChanged( const QString& )
 }
 
 /*!
-  Notify about activation combobox item.
+  \brief Called when combo box item is activated.
+  \param idx index of teh item being activated
 */
 void QDS_ComboBox::onActivated( int idx )
 {
   if ( comboBox() )
-    comboBox()->setCurrentItem( comboBox()->currentItem() );
+    comboBox()->setCurrentIndex( comboBox()->currentIndex() );
 
   int id = getId( idx );
   if ( id != -1 )
@@ -493,7 +568,7 @@ void QDS_ComboBox::onActivated( int idx )
 }
 
 /*!
-  Updates ComboBox after have change of visible state or items have been inserted/removed.
+  \brief Update combo box.
 */
 void QDS_ComboBox::updateComboBox()
 {
@@ -507,7 +582,7 @@ void QDS_ComboBox::updateComboBox()
   {
     isClear = cb->isCleared();
 
-    curId = getId( cb->currentItem() );
+    curId = getId( cb->currentIndex() );
     cb->clear();
   }
 
@@ -524,9 +599,9 @@ void QDS_ComboBox::updateComboBox()
     if ( cb )
     {
       if ( myIcons.contains( id ) )
-        cb->insertItem( myIcons[id], myValue[id] );
+        cb->addItem( QIcon(myIcons[id]), myValue[id] );
       else
-        cb->insertItem( myValue[id] );
+        cb->addItem( myValue[id] );
     }
   }
 
@@ -536,19 +611,21 @@ void QDS_ComboBox::updateComboBox()
     cb->updateGeometry();
 
     if ( isClear )
-      cb->setCurrentText( "" );
+      cb->setItemText( cb->currentIndex(), "" );
     else
     {
       if ( getIndex( curId ) != -1 )
-        cb->setCurrentItem( getIndex( curId ) );
-      if ( curId != getId( cb->currentItem() ) )
-        onActivated( cb->currentItem() );
+        cb->setCurrentIndex( getIndex( curId ) );
+      if ( curId != getId( cb->currentIndex() ) )
+        onActivated( cb->currentIndex() );
     }
   }
 }
 
 /*!
-  Returns index of ComboBox item according to id.
+  \brief Get index of the combo box item according to its identifier.
+  \param id item ID
+  \return item index or -1 if not found
 */
 int QDS_ComboBox::getIndex( const int id ) const
 {
@@ -559,7 +636,9 @@ int QDS_ComboBox::getIndex( const int id ) const
 }
 
 /*!
-  Returns index of ComboBox item according to string.
+  \brief Get index of the combo box item.
+  \param str combo box item
+  \return item index or -1 if not found
 */
 int QDS_ComboBox::getIndex( const QString& str ) const
 {
@@ -568,27 +647,31 @@ int QDS_ComboBox::getIndex( const QString& str ) const
   if ( cb )
   {
     for ( int i = 0; i < cb->count() && idx == -1; i++ )
-      if ( cb->text( i ) == str )
+      if ( cb->itemText( i ) == str )
         idx = i;
   }
   return idx;
 }
 
 /*!
-  Returns id according to ComboBox item index.
+  \brief Get item identifier according to the specified index.
+  \param idx item index
+  \return item ID or -1 if index is out of range
 */
 int QDS_ComboBox::getId( const int idx ) const
 {
   int id = -1;
   IdIndexMap::ConstIterator it = myIndex.begin();
   for (; it != myIndex.end() && id == -1; ++it )
-    if ( it.data() == idx )
+    if ( it.value() == idx )
       id = it.key();
   return id;
 }
 
 /*!
-  Returns id according to ComboBox item string.
+  \brief Get item identifier.
+  \param str combo box item
+  \return item ID or -1 if not found
 */
 int QDS_ComboBox::getId( const QString& str ) const
 {
@@ -597,7 +680,7 @@ int QDS_ComboBox::getId( const QString& str ) const
   IdValueMap::ConstIterator it = myValue.begin();
   for (; it != myValue.end() && id == -1; ++it )
   {
-    if ( it.data() == str )
+    if ( it.value() == str )
     {
       if ( state( it.key() ) )
         id = it.key();
@@ -610,3 +693,15 @@ int QDS_ComboBox::getId( const QString& str ) const
 
   return id;
 }
+
+/*!
+  \fn void QDS_ComboBox::activated( int id );
+  \brief Emitted when the current item in the combo box is changed.
+  \param id current item ID
+*/
+
+/*!
+  \fn void QDS_ComboBox::activated( const QString& txt );
+  \brief Emitted when the current item in the combo box is changed.
+  \param txt current item text
+*/

@@ -1,27 +1,29 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:	SALOME_Prs.cxx
 // Created:	Wed Apr 28 15:03:43 2004
 // Author:	Sergey ANIKIN
 //		<san@startrex.nnov.opencascade.com>
-
-
+//
 #include "SALOME_Prs.h"
 
 //#include "utilities.h"
@@ -209,7 +211,7 @@ void SALOME_View::EraseAll( const bool )
 */
 void SALOME_View::LocalSelection( const SALOME_OCCPrs*, const int )
 {
-//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_OCCPrs* ) called! \
+//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_OCCPrs* ) called!
 //   Probably, selection is being activated in uncompatible viewframe." );
 }
 
@@ -218,7 +220,7 @@ void SALOME_View::LocalSelection( const SALOME_OCCPrs*, const int )
 */
 void SALOME_View::LocalSelection( const SALOME_VTKPrs*, const int )
 {
-//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_VTKPrs* ) called! \
+//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_VTKPrs* ) called!
 //   Probably, selection is being activated in uncompatible viewframe." );
 }
 
@@ -227,7 +229,7 @@ void SALOME_View::LocalSelection( const SALOME_VTKPrs*, const int )
 */
 void SALOME_View::LocalSelection( const SALOME_Prs2d*, const int )
 {
-//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_Prs2d* ) called! \
+//  MESSAGE( "SALOME_View::LocalSelection( const SALOME_Prs2d* ) called!
 //   Probably, selection is being activated in uncompatible viewframe." );
 }
 
@@ -236,7 +238,7 @@ void SALOME_View::LocalSelection( const SALOME_Prs2d*, const int )
 */
 void SALOME_View::GlobalSelection( const bool ) const
 {
-//  MESSAGE( "SALOME_View::GlobalSelection() called! \
+//  MESSAGE( "SALOME_View::GlobalSelection() called!
 //   Probably, selection is being activated in uncompatible viewframe." );
 }
 

@@ -1,26 +1,33 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_ExceptionHandler.h"
 
 #include "SUIT_MessageBox.h"
 
-#include <qapplication.h>
+#ifdef ENABLE_TESTRECORDER
+  #include <TestApplication.h>
+#endif
+
+#include <QApplication>
 
 /*!\class SUIT_ExceptionHandler
  * Show exception message on error handler.
@@ -39,7 +46,12 @@ bool SUIT_ExceptionHandler::handle( QObject* o, QEvent* e )
 */
 bool SUIT_ExceptionHandler::internalHandle( QObject* o, QEvent* e )
 {
+#ifdef ENABLE_TESTRECORDER
+  TestApplication* aTApp = qobject_cast<TestApplication*>(qApp);
+  return aTApp ? aTApp->TestApplication::notify( o, e ) : false;
+#else
   return qApp ? qApp->QApplication::notify( o, e ) : false;
+#endif
 }
 
 /*!
@@ -53,5 +65,5 @@ void SUIT_ExceptionHandler::showMessage( const QString& title, const QString& ms
   while ( QApplication::overrideCursor() )
     QApplication::restoreOverrideCursor();
   
-  SUIT_MessageBox::error1( qApp->mainWidget(), title, msg, "OK" );
+  SUIT_MessageBox::critical( 0, title, msg );
 }

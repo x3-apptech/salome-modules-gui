@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,13 +17,15 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_Text.h"
+
+#include <QApplication>
+#include <QFontMetrics>
 
 /*!
   Constructor
@@ -31,7 +36,7 @@ GLViewer_Text::GLViewer_Text( const QString& text, float xPos, float yPos, const
   myXPos = xPos;
   myYPos = yPos;
   myColor = color;
-  myQFont = QFont::defaultFont();
+  myQFont = QApplication::font();//QFont::defaultFont();
   mySeparator = 2;
   myDTF = DTF_BITMAP;
 }
@@ -90,10 +95,11 @@ QByteArray GLViewer_Text::getByteCopy() const
     int aR = myColor.red();
     int aG = myColor.green();
     int aB = myColor.blue();
-    const char* aStr = myText.data();
+    const char* aStr = myText.toLatin1().constData();
 
     int anISize = sizeof( int );    
-    QByteArray aResult( aSize );
+    QByteArray aResult;
+    aResult.resize( aSize );
 
     char* aPointer = (char*)&myXPos;
     for( i = 0; i < anISize; i++, aPointer++ )
@@ -124,7 +130,7 @@ QByteArray GLViewer_Text::getByteCopy() const
     for( ; i < 7*anISize + aTextSize; i++, aPointer++ )
         aResult[i] = *aPointer;
 
-    const char* aFontStr = myQFont.toString().data();
+    const char* aFontStr = myQFont.toString().toLatin1().constData();
     int aFontSize = myQFont.toString().length();
 
     for( i = 0; i < aFontSize; i++ )

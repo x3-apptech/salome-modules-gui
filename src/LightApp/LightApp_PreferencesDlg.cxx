@@ -1,52 +1,55 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_PreferencesDlg.cxx
 // Author:    Sergey TELKOV
-
+//
 #include "LightApp_PreferencesDlg.h"
 #include "LightApp_Preferences.h"
 
 #include "QtxResourceMgr.h"
 
-#include <qbutton.h>
-#include <qlayout.h>
-#include <qmessagebox.h>
-#include <qvbox.h>
-#include <qfiledialog.h>
+#include <SUIT_MessageBox.h>
+
+#include <QAbstractButton>
+#include <QVBoxLayout>
+#include <QFileDialog>
 
 /*!
   Constructor.
 */
 LightApp_PreferencesDlg::LightApp_PreferencesDlg( LightApp_Preferences* prefs, QWidget* parent )
-: QtxDialog( parent, 0, true, true, OK | Close | Apply ),
+: QtxDialog( parent, true, true, OK | Close | Apply ),
 myPrefs( prefs ), mySaved ( false )
 {
-  setCaption( tr( "CAPTION" ) );
+  setWindowTitle( tr( "CAPTION" ) );
 
-  QVBoxLayout* main = new QVBoxLayout( mainFrame(), 5 );
-
-  QVBox* base = new QVBox( mainFrame() );
-  main->addWidget( base );
-
-  myPrefs->reparent( base, QPoint( 0, 0 ), true );
+  QVBoxLayout* main = new QVBoxLayout( mainFrame() );
+  main->setMargin( 0 );
+  main->setSpacing( 5 );
+  main->addWidget( myPrefs );
 
   setFocusProxy( myPrefs );
+  myPrefs->setFrameStyle( QFrame::Box | QFrame::Sunken );
+  myPrefs->show();
 
   setButtonPosition( Right, Close );
 
@@ -55,10 +58,10 @@ myPrefs( prefs ), mySaved ( false )
   connect( this, SIGNAL( dlgHelp() ),  this, SLOT( onHelp() ) );
   connect( this, SIGNAL( dlgApply() ), this, SLOT( onApply() ) );
 
-  QButton* defBtn = userButton( insertButton( tr( "DEFAULT_BTN_TEXT" ) ) );
+  QAbstractButton* defBtn = userButton( insertButton( tr( "DEFAULT_BTN_TEXT" ) ) );
   if ( defBtn )
     connect( defBtn, SIGNAL( clicked() ), this, SLOT( onDefault() ) );
-  QButton* impBtn = userButton( insertButton( tr( "IMPORT_BTN_TEXT" ) ) );
+  QAbstractButton* impBtn = userButton( insertButton( tr( "IMPORT_BTN_TEXT" ) ) );
   if( impBtn )
     connect( impBtn, SIGNAL( clicked() ), this, SLOT( onImportPref() ) );
 }
@@ -71,17 +74,21 @@ LightApp_PreferencesDlg::~LightApp_PreferencesDlg()
   if ( !myPrefs )
     return;
 
-  myPrefs->reparent( 0, QPoint( 0, 0 ), false );
+  mainFrame()->layout()->removeWidget( myPrefs );
+  myPrefs->setParent( 0 );
+  myPrefs->hide();
   myPrefs = 0;
 }
 
-/*!Show dialog.*/
-void LightApp_PreferencesDlg::show()
+/*!Show/hide dialog.*/
+void LightApp_PreferencesDlg::setVisible(bool visible)
 {
-  myPrefs->retrieve();
-  myPrefs->toBackup();
+  if ( visible ) {
+    myPrefs->retrieve();
+    myPrefs->toBackup();
+  }
 
-  QtxDialog::show();
+  QtxDialog::setVisible(visible);
 }
 
 /*!Store preferences on accept.*/
@@ -110,13 +117,13 @@ void LightApp_PreferencesDlg::onHelp()
 void LightApp_PreferencesDlg::onApply()
 {
   myPrefs->store();
-  
+
   // Fix for Bug PAL11197: Restoring the corrected values from resource manager.
   // (Correcting in VisuGUI.cxx and SMESHGUI.cxx in methods
   // ::preferencesChanged( const QString& sect, const QString& name ))
   myPrefs->retrieve();
   //
-  
+
   myPrefs->toBackup();
   mySaved = true;
 }
@@ -124,15 +131,17 @@ void LightApp_PreferencesDlg::onApply()
 /*! Restore default preferences*/
 void LightApp_PreferencesDlg::onDefault()
 {
-  if( QMessageBox::Ok == QMessageBox::information( this, tr( "WARNING" ), tr( "DEFAULT_QUESTION" ), QMessageBox::Ok, QMessageBox::Cancel ) )
+  if( SUIT_MessageBox::Ok == SUIT_MessageBox::question( this, tr( "WARNING" ), tr( "DEFAULT_QUESTION" ),
+							SUIT_MessageBox::Ok | SUIT_MessageBox::Cancel,
+							SUIT_MessageBox::Ok ) )
     {
       if ( myPrefs && myPrefs->resourceMgr() )
 	{
-          bool prev = myPrefs->resourceMgr()->ignoreUserValues();
-	  myPrefs->resourceMgr()->setIgnoreUserValues( true ); 
+          QtxResourceMgr::WorkingMode prev = myPrefs->resourceMgr()->workingMode();
+	  myPrefs->resourceMgr()->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
 	  myPrefs->retrieve();
-          myPrefs->resourceMgr()->setIgnoreUserValues( prev );
-	}      
+          myPrefs->resourceMgr()->setWorkingMode( prev );
+	}
     }
 }
 
@@ -143,14 +152,16 @@ void LightApp_PreferencesDlg::onImportPref()
   if( !mgr )
     return;
 
-  QFileDialog dlg( ".", "*", this, "" );
-  dlg.setCaption( tr("IMPORT_PREFERENCES") );
-  dlg.setShowHiddenFiles( true );
+  QFileDialog dlg( this, tr("IMPORT_PREFERENCES"), ".", "*" );
+  dlg.setObjectName( "" );
+  //dlg.setShowHiddenFiles( true );
   dlg.exec();
-  QString fname = dlg.selectedFile();
-  if( fname.isEmpty() )
+
+  QStringList files = dlg.selectedFiles();
+  if ( files.isEmpty() )
     return;
 
+  QString fname = files[0];
   if( mgr->import( fname ) )
   {
     myPrefs->retrieve();

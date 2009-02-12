@@ -1,0 +1,30 @@
+/*!
+
+\page viewers_page Viewers
+
+Salome provides a selection of viewers for data representation. Some
+of them are used in several modules, others are used only in one
+module or in some particular cases. 
+ 
+
+<ul>
+<li>\subpage occ_3d_viewer_page "OCC (Open CasCade) 3D viewer" has been developed on the basis of Open
+CASCADE Technology. This is the default viewer for Geometry Module,
+providing good representation of construction and transformation of
+geometrical objects. Only this viewer allows to work with groups and
+sub-shapes. This viewer can also work in Mesh module, however, it
+doesn't allow to visualize meshes. </li>
+<li>\subpage vtk_3d_viewer_page "VTK 3D viewer" has been developed
+basing on Visualization ToolKit library by Kitware, Inc. This is the default viewer for Mesh Module, allowing to
+visualize meshes. It is also used in Post-Pro module for all 3D presentations.</li>
+<li>\subpage plot2d_viewer_page "Plot 2D viewer" has been developed
+basing on open-source Qwt library. It is destined for the representation of 2d
+plots and graphs in Post-Pro module.</li>
+<li>GL 2D viewer - general purpose OpenGL-based viewer, which can be
+used for visualization of 2D scenes.</li>
+<li>QxScene 2D viewer - has been developed on the basis of
+QGraphicsView scene by Trolltech. This viewer is used in YACS module
+for visualization of computation schemes.</li>
+</ul>
+
+*/

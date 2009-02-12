@@ -1,6 +1,6 @@
-//  VISU VISUGUI : GUI for SMESH component
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
@@ -17,20 +17,20 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
-//
+//  VISU VISUGUI : GUI for SMESH component
 //  File   : 
 //  Author : Sergey LITONIN
 //  Module : 
-
+//
 #include "SVTK_FontWidget.h"
 
-#include <qtoolbutton.h>
-#include <qcombobox.h>
-#include <qcolordialog.h>
-#include <qcheckbox.h>
+#include <QToolButton>
+#include <QComboBox>
+#include <QColorDialog>
+#include <QCheckBox>
+#include <QHBoxLayout>
 
 #include <vtkTextProperty.h>
 
@@ -43,20 +43,28 @@
   Constructor
 */
 SVTK_FontWidget::SVTK_FontWidget( QWidget* theParent )
-: QHBox( theParent )
+: QWidget( theParent )
 {
-  setSpacing( 5 );
   myColorBtn = new QToolButton( this );
   myColorBtn->setMinimumWidth( 20 );
 
   myFamily = new QComboBox( this );
-  myFamily->insertItem( tr( "ARIAL" ) );
-  myFamily->insertItem( tr( "COURIER" ) );
-  myFamily->insertItem( tr( "TIMES" ) );
+  myFamily->insertItem( myFamily->count(), tr( "ARIAL" ) );
+  myFamily->insertItem( myFamily->count(), tr( "COURIER" ) );
+  myFamily->insertItem( myFamily->count(), tr( "TIMES" ) );
 
   myBold = new QCheckBox( tr( "BOLD" ), this );
   myItalic = new QCheckBox( tr( "ITALIC" ), this );
   myShadow = new QCheckBox( tr( "SHADOW" ), this );
+
+  QHBoxLayout* aHBLayout = new QHBoxLayout;
+  aHBLayout->setSpacing( 5 );
+  aHBLayout->addWidget(myColorBtn);
+  aHBLayout->addWidget(myFamily);
+  aHBLayout->addWidget(myBold);
+  aHBLayout->addWidget(myItalic);
+  aHBLayout->addWidget(myShadow);
+  this->setLayout(aHBLayout);
 
   connect( myColorBtn, SIGNAL( clicked() ), SLOT( onColor() ) );
 }
@@ -70,12 +78,14 @@ SVTK_FontWidget::~SVTK_FontWidget()
 
 void SVTK_FontWidget::SetColor( const QColor& theColor )
 {
-  myColorBtn->setPaletteBackgroundColor( theColor );
+  QPalette palette;
+  palette.setColor(myColorBtn->backgroundRole(), theColor);
+  myColorBtn->setPalette(palette);
 }
 
 QColor SVTK_FontWidget::GetColor() const
 {
-  return myColorBtn->paletteBackgroundColor();
+  return myColorBtn->palette().color( myColorBtn->backgroundRole() );
 }
 
 void SVTK_FontWidget::onColor()
@@ -94,11 +104,11 @@ void SVTK_FontWidget::SetData( const QColor& theColor,
   SetColor( theColor );
 
   if ( theFamily == VTK_ARIAL )
-    myFamily->setCurrentItem( 0 );
+    myFamily->setCurrentIndex( 0 );
   else if ( theFamily == VTK_COURIER )
-    myFamily->setCurrentItem( 1 );
+    myFamily->setCurrentIndex( 1 );
   else
-    myFamily->setCurrentItem( 2 );
+    myFamily->setCurrentIndex( 2 );
 
   myBold->setChecked( theBold );
   myItalic->setChecked( theItalic );
@@ -113,7 +123,7 @@ void SVTK_FontWidget::GetData( QColor& theColor,
 {
   theColor = GetColor();
 
-  int anItem =myFamily->currentItem();
+  int anItem =myFamily->currentIndex();
   if ( anItem == 0 )
     theFamily = VTK_ARIAL;
   else if ( anItem == 1 )

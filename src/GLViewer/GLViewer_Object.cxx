@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,18 +17,18 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_Object.h"
 #include "GLViewer_Drawer.h"
 #include "GLViewer_AspectLine.h"
-#include "GLViewer_Geom.h"
 #include "GLViewer_Text.h"
 #include "GLViewer_Group.h"
+
+#include <SUIT_DataOwner.h>
 
 //#include <cmath>
 //using namespace std;
@@ -141,8 +144,8 @@ QByteArray GLViewer_Object::getByteCopy()
     int i = 0;
     int anISize = sizeof( int );
 
-    const char* aTypeStr = myType.data();
-    const char* aToolTipStr = myToolTipText.data();
+    const char* aTypeStr = myType.toLatin1().constData();
+    const char* aToolTipStr = myToolTipText.toLatin1().constData();
 
     int aTypeLength = myType.length();
     int aToolTipLength = myToolTipText.length();
@@ -163,9 +166,10 @@ QByteArray GLViewer_Object::getByteCopy()
     
     int sizeOf8Float = sizeof( aRectData );
 
-    QByteArray aResult( 2*anISize + sizeOf8Float + 
-                        aTypeLength + aToolTipLength +
-                        aGLText.size() + aAspect.size() );
+    QByteArray aResult;
+    aResult.resize( 2*anISize + sizeOf8Float + 
+		    aTypeLength + aToolTipLength +
+		    aGLText.size() + aAspect.size() );
     // puts 8 float values into the byte array
     char* aPointer = (char*)&aRectData;
     for( i = 0; i < sizeOf8Float; i++, aPointer++ )
@@ -225,7 +229,9 @@ bool GLViewer_Object::initializeFromByteCopy( QByteArray theArray )
     GLViewer_AspectLine* aAspectLine = new GLViewer_AspectLine();
     int aGLAspLineSize = (aAspectLine->getByteCopy()).size();
 
-    QByteArray aGLTextArray, aAspect( aGLAspLineSize );
+    QByteArray aGLTextArray, aAspect;
+    aGLTextArray.resize( aGLAspLineSize );
+    aAspect.resize( aGLAspLineSize );
 
     if( aSize < 2*anISize + 8*aFSize + aGLTextMinSize + aGLAspLineSize )
         return false;

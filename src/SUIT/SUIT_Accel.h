@@ -1,36 +1,35 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // SUIT_Accel.h: interface for the SUIT_Accel class.
-
-#ifndef SUIT_Accel_h 
-#define SUIT_Accel_h
+//
+#ifndef SUIT_ACELL_H
+#define SUIT_ACELL_H
 
 #include "SUIT.h"
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qmap.h>
+#include <QMap>
+#include <QObject>
+#include <QString>
 
-/*!
-  \class SUIT_Accel
-  Manager of keyboard accelerator bindings
-*/
 class SUIT_EXPORT SUIT_Accel: public QObject
 {
   Q_OBJECT
@@ -63,15 +62,16 @@ protected:
 private:
   SUIT_Accel();
 
-  int getAccelKey( QEvent* ); // returns key pressed if 1) event was KeyPress 
-                              // 2) pressed key is a registered accelerator 
+  int getAccelKey( QEvent* );
 
-  typedef QMap<int, int> IdActionMap; // key - to - action_id map
-  typedef QMap<QString, IdActionMap> ViewerTypeIdActionMap; // viewer_type - to - IdActionMap
-  ViewerTypeIdActionMap myMap;
+  typedef QMap<int, int> IdActionMap; //!< maps key to action id
+  typedef QMap<QString, IdActionMap> 
+               ViewerTypeIdActionMap; //!< maps viewer type to IdActionMap
+  ViewerTypeIdActionMap myMap;        //!< viewer actions map
 
-  QMap<int, bool> myOptMap; // key - to - <not_used> map, used for optimazation.  all registered keys (accelerators)
-                            // are stored in this map.
+  //! Maps key to <not_used> flag map, used for optimization.
+  //! All registered keys (accelerators) are stored in this map.
+  QMap<int, bool> myOptMap;
 
   static SUIT_Accel* myself;
 };

@@ -1,27 +1,34 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_ResourceMgr.h"
 
-#include <qfileinfo.h>
-#include <qdir.h>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QFileInfo>
+#include <QApplication>
+#include <QRegExp>
+
+#ifndef WIN32
+#include <unistd.h>
+#endif
 
 /*!
     Constructor
@@ -66,9 +73,6 @@ QString SUIT_ResourceMgr::loadDoc( const QString& prefix, const QString& id ) co
   return path( docSection, prefix, id );
 }
 
-#ifndef WIN32
-#include <unistd.h>
-#endif
 /*!
     Returns the user file name for specified application
 */
@@ -76,13 +80,14 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
 {
   QString pathName;
 
+  QStringList arguments = QApplication::arguments();
   // Try config file, given in arguments
-  for (int i = 1; i < qApp->argc(); i++) {
+  for (int i = 1; i < arguments.count(); i++) {
     QRegExp rx ("--resources=(.+)");
-    if ( rx.search( QString(qApp->argv()[i]) ) >= 0 && rx.capturedTexts().count() > 1 ) {
-      QString file = rx.capturedTexts()[1];
+    if ( rx.indexIn( arguments[i] ) >= 0 && rx.numCaptures() > 1 ) {
+      QString file = rx.cap(1);
       QFileInfo fi (file);
-      pathName = fi.absFilePath();
+      pathName = fi.absoluteFilePath();
     }
   }
 
@@ -110,7 +115,7 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
 */
 QString SUIT_ResourceMgr::findAppropriateUserFile( const QString& fname ) const
 {
-  QDir d( QFileInfo( fname ).dir( true ) );
+  QDir d( QFileInfo( fname ).dir() );
   d.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
   QStringList l = d.entryList();
   QString appr_file;
@@ -127,7 +132,7 @@ QString SUIT_ResourceMgr::findAppropriateUserFile( const QString& fname ) const
     if( appr < 0 || abs( id-id0 ) < abs( appr-id0 ) )
     {
       appr = id;
-      appr_file = d.absFilePath( *anIt );
+      appr_file = d.absoluteFilePath( *anIt );
     }
   }
   return appr_file;

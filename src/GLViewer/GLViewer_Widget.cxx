@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,35 +17,36 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Widget.cxx
 // Created:   November, 2004
-
+//
 #include "GLViewer_Widget.h"
 #include "GLViewer_ViewPort2d.h"
 #include "GLViewer_Viewer2d.h"
-#include "GLViewer_Compass.h"
+//#include "GLViewer_Compass.h"
 #include "GLViewer_Grid.h"
-#include "GLViewer_Object.h"
+//#include "GLViewer_Object.h"
 #include "GLViewer_CoordSystem.h"
+#include "GLViewer_ViewFrame.h"
 
 #include <cmath>
 using namespace std;
 
-#include <qevent.h>
-#include <qrect.h>
+#include <QEvent>
+#include <QPaintEvent>
+#include <QRect>
 
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qapplication.h>
-#include <qintdict.h>
-#include <qpaintdevicemetrics.h>
-#include <qsize.h>
-#include <qtooltip.h>
+#include <QFile>
+//#include <qpixmap.h>
+#include <QImage>
+#include <QApplication>
+//#include <qintdict.h>
+//#include <qpaintdevicemetrics.h>
+//#include <qsize.h>
+#include <QToolTip>
 
 /*!
   A constructor
@@ -248,7 +252,8 @@ void GLViewer_Widget::setBackground( QString filename )
 void GLViewer_Widget::addToolTip( QString theString, QRect theRect )
 {
     myToolTipRect = theRect;
-    QToolTip::add( this, myToolTipRect, theString );
+    setToolTip(theString);
+    //QToolTip::add( this, myToolTipRect, theString );
 }
 
 /*!
@@ -256,7 +261,8 @@ void GLViewer_Widget::addToolTip( QString theString, QRect theRect )
 */
 void GLViewer_Widget::removeToolTip()
 {
-    QToolTip::remove( this, myToolTipRect );
+    setToolTip("");
+    //QToolTip::remove( this, myToolTipRect );
 }
 
 /*!
@@ -419,6 +425,18 @@ void GLViewer_Widget::leaveEvent( QEvent* e )
   updateGL();
 }
 
+/*!
+  Custom leave event handler
+*/
+bool GLViewer_Widget::event ( QEvent* e )
+{
+  if (e->type() == QEvent::ToolTip) {
+    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+    if ( myToolTipRect.contains(helpEvent->pos()) )
+      QToolTip::showText(helpEvent->globalPos(), toolTip());
+  }
+  return QGLWidget::event(e);
+}
 
 /*!
   \return the hex code of digit < 16
@@ -488,7 +506,7 @@ void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2,
     
     aBuffer += "> false 3 colorimage\n\n";
 
-    hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+    hFile.write( aBuffer.toAscii() );
   }
 }
 
@@ -548,7 +566,7 @@ void GLViewer_Widget::translateBackgroundToPS( QFile& hFile, GLViewer_CoordSyste
         const int max = 133000; //The maximum length of string in PS
         int dh = int( floor( double( max ) / ( 3.0*2.0*width ) ) );
         for( int k=buf.height()-1; k>=0; k-=dh )
-            AddImagePart( hFile, buf, 0, buf.width()-1, QMAX( k-dh+1, 0 ), k,
+            AddImagePart( hFile, buf, 0, buf.width()-1, qMax( k-dh+1, 0 ), k,
                           aViewerCS, aPSCS, a, b, c, d, dx, dy-(buf.height()-1-k) );
     }
 }

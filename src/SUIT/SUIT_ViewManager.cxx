@@ -1,32 +1,36 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_ViewManager.h"
 
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewModel.h"
+#include "SUIT_ViewWindow.h"
 #include "SUIT_Study.h"
 
-#include <qcursor.h>
-#include <qregexp.h>
-#include <qmessagebox.h>
+#include <QMap>
+#include <QRegExp>
+#include <QIcon>
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 
@@ -51,7 +55,7 @@ myStudy( NULL )
 
   myId = useNewId( getType() );
 
-  connect( theDesktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ), 
+  connect( theDesktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this,       SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 
   myStudy = theStudy;
@@ -85,12 +89,19 @@ void SUIT_ViewManager::setTitle( const QString& theTitle )
     return;
 
   myTitle = theTitle;
-  for ( uint i = 0; i < myViews.count(); i++ )
+  for ( int i = 0; i < myViews.count(); i++ )
     setViewName( myViews[i] );
 }
 
+void SUIT_ViewManager::setIcon( const QPixmap& theIcon )
+{
+  myIcon = theIcon;
+  for ( int i = 0; i < myViews.count(); i++ )
+    myViews[i]->setWindowIcon( QIcon( myIcon ) );
+}
+
 /*!Sets view model \a theViewModel to view manager.*/
-void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel) 
+void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel)
 {
   if (myViewModel && myViewModel != theViewModel) {
     myViewModel->setViewManager(0);
@@ -104,8 +115,8 @@ void SUIT_ViewManager::setViewModel(SUIT_ViewModel* theViewModel)
 /*!Sets view name for view window \a theView.*/
 void SUIT_ViewManager::setViewName( SUIT_ViewWindow* theView )
 {
-  QString title = prepareTitle( getTitle(), myId + 1, myViews.find( theView ) + 1 );
-  theView->setCaption( title );
+  QString title = prepareTitle( getTitle(), myId + 1, myViews.indexOf( theView ) + 1 );
+  theView->setWindowTitle( title );
 }
 
 QString SUIT_ViewManager::prepareTitle( const QString& title, const int mId, const int vId )
@@ -113,7 +124,7 @@ QString SUIT_ViewManager::prepareTitle( const QString& title, const int mId, con
   QString res = title;
   QRegExp re( "%[%MV]" );
   int i = 0;
-  while ( ( i = re.search( res, i ) ) != -1 )
+  while ( ( i = re.indexIn( res, i ) ) != -1 )
   {
     QString rplc;
     QString str = res.mid( i, re.matchedLength() );
@@ -138,14 +149,15 @@ SUIT_ViewWindow* SUIT_ViewManager::createViewWindow()
     delete aView;
     return 0;
   }
-  
+
   setViewName( aView );
+  aView->setWindowIcon( QIcon( myIcon ) );
+
   //myDesktop->addViewWindow( aView );
   //it is done automatically during creation of view
 
-  aView->setViewManager(this);
-
-  emit viewCreated(aView);
+  aView->setViewManager( this );
+  emit viewCreated( aView );
 
   // Special treatment for the case when <aView> is the first one in this view manager
   // -> call onWindowActivated() directly, because somebody may always want
@@ -156,10 +168,28 @@ SUIT_ViewWindow* SUIT_ViewManager::createViewWindow()
   return aView;
 }
 
+/*! Get identifier */
+int SUIT_ViewManager::getId() const
+{
+  return myId;
+}
+
 /*!Create view window.*/
 void SUIT_ViewManager::createView()
 {
   createViewWindow();
+}
+
+QVector<SUIT_ViewWindow*> SUIT_ViewManager::getViews() const
+{
+  QVector<SUIT_ViewWindow*> res;
+  for ( int i = 0; i < myViews.count(); i++ )
+  {
+    if ( myViews[i] )
+      res.append( myViews[i] );
+  }
+
+  return res;
 }
 
 /*!Insert view window to view manager.
@@ -168,15 +198,13 @@ void SUIT_ViewManager::createView()
 bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
 {
   unsigned int aSize = myViews.size();
-  unsigned int aNbItems = myViews.count()+1;
-  if (aNbItems > aSize) {
-    if (!myViews.resize(aNbItems)) {
-      QMessageBox::critical(myDesktop, tr("Critical error"), tr("There is no memory for the new view!!!"));
-      return false;
-    }
+  unsigned int aNbItems = myViews.count() + 1;
+  if ( aNbItems > aSize )
+  {
+    myViews.resize( aNbItems );
     aSize = myViews.size();
   }
-  
+
   connect(theView, SIGNAL(closing(SUIT_ViewWindow*)),
           this,    SLOT(onClosingView(SUIT_ViewWindow*)));
 
@@ -204,9 +232,11 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
   connect(theView, SIGNAL(contextMenuRequested( QContextMenuEvent * )),
           this,    SLOT  (onContextMenuRequested( QContextMenuEvent * )));
 
-  for (uint i = 0; i < aSize; i++) {
-    if (myViews[i]==0) {
-      myViews.insert(i, theView);
+  for ( uint i = 0; i < aSize; i++ )
+  {
+    if ( myViews[i] == 0 )
+    {
+      myViews[i] = theView;
       return true;
     }
   }
@@ -228,11 +258,11 @@ void SUIT_ViewManager::closeView( SUIT_ViewWindow* theView )
   if ( !theView )
     return;
 
-  QGuardedPtr<SUIT_ViewWindow> view( theView );
+  QPointer<SUIT_ViewWindow> view( theView );
 
   view->hide();
 
-  if ( !view->testWFlags( WDestructiveClose ) )
+  if ( !view->testAttribute( Qt::WA_DeleteOnClose ) )
     return;
 
   emit deleteView( view );
@@ -245,15 +275,14 @@ void SUIT_ViewManager::closeView( SUIT_ViewWindow* theView )
 /*!Remove view window \a theView from view manager.
  *And close the last view, if it has \a theView.
 */
-void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView) 
+void SUIT_ViewManager::removeView( SUIT_ViewWindow* theView )
 {
-  theView->disconnect(this);
-  myViews.remove(myViews.find(theView));
-  if (myActiveView == theView)
+  theView->disconnect( this );
+  myViews.remove( myViews.indexOf( theView ) );
+  if ( myActiveView == theView )
     myActiveView = 0;
-  int aNumItems = myViews.count();
-  if (aNumItems == 0)
-    emit lastViewClosed(this);
+  if ( !myViews.count() )
+    emit lastViewClosed( this );
 }
 
 /*!
@@ -261,7 +290,7 @@ void SUIT_ViewManager::removeView(SUIT_ViewWindow* theView)
 */
 void SUIT_ViewManager::setDestructiveClose( const bool on )
 {
-  for ( uint i = 0; i < myViews.count(); i++ )
+  for ( int i = 0; i < myViews.count(); i++ )
     myViews[i]->setDestructiveClose( on );
 }
 
@@ -271,7 +300,7 @@ void SUIT_ViewManager::setDestructiveClose( const bool on )
 bool SUIT_ViewManager::isVisible() const
 {
   bool res = false;
-  for ( uint i = 0; i < myViews.count() && !res; i++ )
+  for ( int i = 0; i < myViews.count() && !res; i++ )
     res = myViews[i]->isVisibleTo( myViews[i]->parentWidget() );
   return res;
 }
@@ -281,7 +310,7 @@ bool SUIT_ViewManager::isVisible() const
 */
 void SUIT_ViewManager::setShown( const bool on )
 {
-  for ( uint i = 0; i < myViews.count(); i++ )
+  for ( int i = 0; i < myViews.count(); i++ )
     myViews.at( i )->setShown( on );
 }
 
@@ -311,7 +340,7 @@ void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 */
 void SUIT_ViewManager::closeAllViews()
 {
-  for ( uint i = 0; i < myViews.size(); i++ )
+  for ( int i = 0; i < myViews.size(); i++ )
     delete myViews[i];
   myViews.clear();
 }
@@ -320,8 +349,8 @@ void SUIT_ViewManager::closeAllViews()
  *\retval QString - type of view model.
  */
 QString SUIT_ViewManager::getType() const
-{ 
-  return (!myViewModel)? "": myViewModel->getType(); 
+{
+  return (!myViewModel)? "": myViewModel->getType();
 }
 
 /*!
@@ -347,7 +376,7 @@ void SUIT_ViewManager::onContextMenuRequested( QContextMenuEvent* e )
 }
 
 /*!Context menu popup for \a popup.*/
-void SUIT_ViewManager::contextMenuPopup( QPopupMenu* popup )
+void SUIT_ViewManager::contextMenuPopup( QMenu* popup )
 {
   SUIT_ViewModel* vm = getViewModel();
   if ( vm )

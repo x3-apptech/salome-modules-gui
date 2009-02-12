@@ -1,27 +1,28 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-/*!
- File:      ResourceExporter.cxx
- Created:   27/06/05
- Author:    Vadim SANDLER
- Copyright (C) CEA 2005
-
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File    : ResourceExporter.cxx
+// Author  : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
+/*
  This tool provides command-line interface allowing to modify user preferences.
  The tool can be used by the compilation procedures in order to set default preferences for the module.
 
@@ -42,10 +43,10 @@
 */
 
 #include "SUIT_ResourceMgr.h"
-#include <qfile.h>
-#include <qdir.h>
-#include <qstringlist.h>
-#include <qapplication.h>
+#include <QFile>
+#include <QDir>
+#include <QStringList>
+#include <QApplication>
 #include <iostream>
 
 /*!
@@ -59,23 +60,22 @@ static QString salomeVersion()
   path += QString( "bin/salome/VERSION" );
 
   QFile vf( path );
-  if ( !vf.open( IO_ReadOnly ) )
-    return QString::null;
+  if ( !vf.open( QIODevice::ReadOnly ) )
+    return QString();
 
-  QString line;
-  vf.readLine( line, 1024 );
+  QString line( vf.readLine( 1024 ) );
   vf.close();
 
   if ( line.isEmpty() )
-    return QString::null;
+    return QString();
 
   while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
     line.remove( line.length() - 1, 1 );
 
   QString ver;
-  int idx = line.findRev( ":" );
+  int idx = line.lastIndexOf( ":" );
   if ( idx != -1 )
-    ver = line.mid( idx + 1 ).stripWhiteSpace();
+    ver = line.mid( idx + 1 ).trimmed();
 
   return ver;
 }
@@ -117,34 +117,34 @@ int main( int argc, char** argv )
     resMgr->setCurrentFormat( QString( "xml" ) );
     resMgr->loadLanguage();
     for ( int i = 1; i < argc; i ++ ) {
-      QString anArg = QString( argv[i] ).stripWhiteSpace();
+      QString anArg = QString( argv[i] ).trimmed();
       if ( anArg.startsWith( "-" ) ) {
 	anArg.remove( 0, 1 );
 	if ( anArg.contains( ":" ) ) {
-	  QStringList vals = QStringList::split( ":", anArg );
-	  QString section  = vals[ 0 ].stripWhiteSpace();
-	  QString param    = vals[ 1 ].stripWhiteSpace();
+	  QStringList vals = anArg.split( ":", QString::SkipEmptyParts );
+	  QString section  = vals[ 0 ].trimmed();
+	  QString param    = vals[ 1 ].trimmed();
 	  if ( section.isEmpty() || param.isEmpty() ) continue;
 	  resMgr->remove( section, param );
 	}
       }
       else if ( anArg.contains( "+=" ) ) {
-	QStringList vals = QStringList::split( "+=", anArg );
+	QStringList vals = anArg.split( "+=", QString::SkipEmptyParts );
 	if ( vals[ 0 ].contains( ":" ) ) {
-	  QStringList vals1 = QStringList::split( ":", vals[ 0 ] );
-	  QString section  = vals1[ 0 ].stripWhiteSpace();
-	  QString param    = vals1[ 1 ].stripWhiteSpace();
-	  QString newValue = vals [ 1 ].stripWhiteSpace();
+	  QStringList vals1 = vals[ 0 ].split( ":", QString::SkipEmptyParts );
+	  QString section  = vals1[ 0 ].trimmed();
+	  QString param    = vals1[ 1 ].trimmed();
+	  QString newValue = vals [ 1 ].trimmed();
 	  QString separ    = ","; // default separator
 	  if ( newValue.contains( "|" ) ) {
-	    QStringList vals2 = QStringList::split( "|", newValue );
-	    newValue = vals2[ 0 ].stripWhiteSpace();
-	    separ  = vals2[ 1 ].stripWhiteSpace();
+	    QStringList vals2 = newValue.split( "|", QString::SkipEmptyParts );
+	    newValue = vals2[ 0 ].trimmed();
+	    separ  = vals2[ 1 ].trimmed();
 	  }
 	  if ( section.isEmpty() || param.isEmpty() || newValue.isEmpty() || separ.isEmpty() ) continue;
 	  QString value = resMgr->stringValue( section, param );
-	  QStringList valsOld = QStringList::split( separ, value );
-	  QStringList valsNew = QStringList::split( separ, newValue );
+	  QStringList valsOld = value.split( separ, QString::SkipEmptyParts );
+	  QStringList valsNew = newValue.split( separ, QString::SkipEmptyParts );
 	  for ( int i = 0; i < (int)valsNew.count(); i++ )
 	    if ( !valsOld.contains( valsNew[i] ) )
 	      valsOld.append( valsNew[i] );
@@ -152,12 +152,12 @@ int main( int argc, char** argv )
 	}
       }
       else if ( anArg.contains( "=" ) ) {
-	QStringList vals = QStringList::split( "=", anArg );
+	QStringList vals = anArg.split( "=", QString::SkipEmptyParts );
 	if ( vals[ 0 ].contains( ":" ) ) {
-	  QStringList vals1 = QStringList::split( ":", vals[ 0 ] );
-	  QString section  = vals1[ 0 ].stripWhiteSpace();
-	  QString param    = vals1[ 1 ].stripWhiteSpace();
-	  QString value = vals [ 1 ].stripWhiteSpace();
+	  QStringList vals1 = vals[ 0 ].split( ":", QString::SkipEmptyParts );
+	  QString section  = vals1[ 0 ].trimmed();
+	  QString param    = vals1[ 1 ].trimmed();
+	  QString value = vals [ 1 ].trimmed();
 	  if ( section.isEmpty() || param.isEmpty() ) continue;
 	  resMgr->setValue( section, param, value );
 	}

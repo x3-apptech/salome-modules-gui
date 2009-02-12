@@ -1,31 +1,30 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME OBJECT : kernel of SALOME component
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : VTKViewer_GeometryFilter.cxx
 //  Author : Michael ZORIN
 //  Module : SALOME
-//  $Header$
-
+//  $Header$ 
+//
 #include "VTKViewer_GeometryFilter.h"
 #include "VTKViewer_ConvexTool.h"
 
@@ -152,7 +151,10 @@ VTKViewer_GeometryFilter
   vtkIdType newCellId;
   int faceId, *faceVerts, numFacePts;
   vtkFloatingPointType *x;
-  int PixelConvert[4], aNewPts[VTK_CELL_SIZE];
+  vtkIdType PixelConvert[4];
+  // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
+  // from ParaView-3.4.0 compiled on 64-bit Debian platform with VTK_USE_64BIT_IDS = ON
+  vtkIdType aNewPts[VTK_CELL_SIZE];
   // ghost cell stuff
   unsigned char  updateLevel = (unsigned char)(output->GetUpdateGhostLevel());
   unsigned char  *cellGhostLevels = 0;  
@@ -474,6 +476,8 @@ VTKViewer_GeometryFilter
         case VTK_QUADRATIC_QUAD:
         case VTK_QUADRATIC_TETRA:
         case VTK_QUADRATIC_HEXAHEDRON:
+        case VTK_QUADRATIC_WEDGE:
+        case VTK_QUADRATIC_PYRAMID:
 	  if(!myIsWireframeMode){
 	    input->GetCell(cellId,cell);
 	    vtkIdList *pts = vtkIdList::New();  
@@ -650,6 +654,82 @@ VTKViewer_GeometryFilter
 
 	      break;
 	    }
+            case VTK_QUADRATIC_WEDGE: {
+              aCellType = VTK_POLYGON;
+	      numFacePts = 6;
+              //---------------------------------------------------------------
+              //Face 1
+	      aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[6];
+	      aNewPts[2] = pts[1];
+	      aNewPts[3] = pts[7];
+	      aNewPts[4] = pts[2];
+	      aNewPts[5] = pts[8];
+              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+              outputCD->CopyData(cd,cellId,newCellId);
+              
+              //---------------------------------------------------------------
+              //Face 2
+              aNewPts[0] = pts[3];
+	      aNewPts[1] = pts[9];
+	      aNewPts[2] = pts[4];
+	      aNewPts[3] = pts[10];
+	      aNewPts[4] = pts[5];
+	      aNewPts[5] = pts[11];
+              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+              outputCD->CopyData(cd,cellId,newCellId);
+              
+              //---------------------------------------------------------------
+              //Face 3
+              numFacePts = 8;
+              aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[8];
+	      aNewPts[2] = pts[2];
+	      aNewPts[3] = pts[14];
+	      aNewPts[4] = pts[5];
+	      aNewPts[5] = pts[11];
+	      aNewPts[6] = pts[3];
+	      aNewPts[7] = pts[12];
+              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+              outputCD->CopyData(cd,cellId,newCellId);
+
+              //---------------------------------------------------------------
+              //Face 4
+              aNewPts[0] = pts[1];
+	      aNewPts[1] = pts[13];
+	      aNewPts[2] = pts[4];
+	      aNewPts[3] = pts[10];
+	      aNewPts[4] = pts[5];
+	      aNewPts[5] = pts[14];
+	      aNewPts[6] = pts[2];
+	      aNewPts[7] = pts[7];
+              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+              outputCD->CopyData(cd,cellId,newCellId);
+
+              //---------------------------------------------------------------
+              //Face 5
+              aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[12];
+	      aNewPts[2] = pts[3];
+	      aNewPts[3] = pts[9];
+	      aNewPts[4] = pts[4];
+	      aNewPts[5] = pts[13];
+              aNewPts[6] = pts[1];
+              aNewPts[7] = pts[6];
+              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+              outputCD->CopyData(cd,cellId,newCellId);
+              break;
+            }
 	    case VTK_QUADRATIC_HEXAHEDRON: {
 	      aCellType = VTK_POLYGON;
 	      numFacePts = 8;
@@ -751,6 +831,85 @@ VTKViewer_GeometryFilter
 	      outputCD->CopyData(cd,cellId,newCellId);
 	      
 	      break;
+	    }
+	    case VTK_QUADRATIC_PYRAMID: {
+	      aCellType = VTK_POLYGON;
+	      numFacePts = 6;
+	      
+	      //---------------------------------------------------------------
+	      aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[8];
+	      aNewPts[2] = pts[3];
+	      aNewPts[3] = pts[12];
+	      aNewPts[4] = pts[4];
+	      aNewPts[5] = pts[9];
+	      
+	      newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+	      
+	      outputCD->CopyData(cd,cellId,newCellId);
+
+	      //---------------------------------------------------------------
+	      aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[9];
+	      aNewPts[2] = pts[4];
+	      aNewPts[3] = pts[10];
+	      aNewPts[4] = pts[1];
+	      aNewPts[5] = pts[5];
+	      
+	      newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+	      
+	      outputCD->CopyData(cd,cellId,newCellId);
+
+	      //---------------------------------------------------------------
+	      aNewPts[0] = pts[1];
+	      aNewPts[1] = pts[10];
+	      aNewPts[2] = pts[4];
+	      aNewPts[3] = pts[11];
+	      aNewPts[4] = pts[2];
+	      aNewPts[5] = pts[6];
+	      
+	      newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+	      
+	      outputCD->CopyData(cd,cellId,newCellId);
+
+	      //---------------------------------------------------------------
+	      aNewPts[0] = pts[2];
+	      aNewPts[1] = pts[11];
+	      aNewPts[2] = pts[4];
+	      aNewPts[3] = pts[12];
+	      aNewPts[4] = pts[3];
+	      aNewPts[5] = pts[7];
+	      
+	      newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+	      
+	      outputCD->CopyData(cd,cellId,newCellId);
+
+	      //---------------------------------------------------------------
+              numFacePts = 8;
+	      aNewPts[0] = pts[0];
+	      aNewPts[1] = pts[5];
+	      aNewPts[2] = pts[1];
+	      aNewPts[3] = pts[6];
+	      aNewPts[4] = pts[2];
+	      aNewPts[5] = pts[7];
+	      aNewPts[6] = pts[3];
+	      aNewPts[7] = pts[8];
+	      
+	      newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+	      if(myStoreMapping)
+		myVTK2ObjIds.push_back(cellId);
+	      
+	      outputCD->CopyData(cd,cellId,newCellId);
+
+	      break;
 	    }}
 	  }
 	} //switch
@@ -772,7 +931,7 @@ VTKViewer_GeometryFilter
     delete [] cellVis;
     }
 
-  return 0;
+  return 1;
 }
 
 

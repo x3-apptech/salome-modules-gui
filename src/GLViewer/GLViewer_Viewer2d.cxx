@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,34 +17,33 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Viewer2d.cxx
 // Created:   November, 2004
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_Object.h"
+#include "GLViewer_ViewFrame.h"
 #include "GLViewer_BaseObjects.h"
 #include "GLViewer_CoordSystem.h"
 #include "GLViewer_Context.h"
 #include "GLViewer_Drawer.h"
 #include "GLViewer_Selector2d.h"
-//#include "GLViewer_Sketcher.h"
 #include "GLViewer_ViewPort2d.h"
 
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewWindow.h"
+#include "SUIT_ViewManager.h"
 
-#include "OSD_Timer.hxx"
-#include <TColStd_MapOfInteger.hxx>
-
-#include <qpopupmenu.h>
-#include <qpointarray.h>
-#include <qcolordialog.h>
+#include <QMenu>
+#include <QRect>
+#include <QFile>
+#include <QPolygon>
+#include <QMouseEvent>
+#include <QColorDialog>
 
 /*!
   Constructor
@@ -50,15 +52,13 @@
 GLViewer_Viewer2d::GLViewer_Viewer2d( const QString& title) :
 GLViewer_Viewer( title )
 {
-    myGLContext = new GLViewer_Context( this );
+  myGLContext = new GLViewer_Context( this );
 
-    //myGLSketcher = new GLViewer_Sketcher( this );
+  createSelector();
 
-    createSelector();
+  mySelMode = GLViewer_Viewer::Multiple;
 
-    mySelMode = GLViewer_Viewer::Multiple;
-
-    myDrawers.clear();
+  myDrawers.clear();
 }
 
 /*!
@@ -83,14 +83,14 @@ SUIT_ViewWindow* GLViewer_Viewer2d::createView( SUIT_Desktop* theDesktop )
   Adds item for change background color
   \param thePopup - menu
 */
-void GLViewer_Viewer2d::addPopupItems( QPopupMenu* thePopup )
+void GLViewer_Viewer2d::addPopupItems( QMenu* thePopup )
 {
   // CTH8434. "Change background color" menu item is available if there are no selected objects
   if ( getSelector() == 0 || getSelector()->numSelected() == 0 )
   {
-    if( thePopup->count() > 0 )
-        thePopup->insertSeparator();
-    thePopup->insertItem( tr( "CHANGE_BGCOLOR" ), this, SLOT( onChangeBgColor() ) );
+    if( thePopup->actions().count() > 0 )
+        thePopup->addSeparator();
+    thePopup->addAction( tr( "CHANGE_BGCOLOR" ), this, SLOT( onChangeBgColor() ) );
   }
 }
 
@@ -145,15 +145,15 @@ void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
 */
 void GLViewer_Viewer2d::updateBorders( GLViewer_Rect* theRect )
 {
-  QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
+  QVector<SUIT_ViewWindow*> views = getViewManager()->getViews();
   for ( int i = 0, n = views.count(); i < n; i++ )
   {
     GLViewer_Rect* border = ( ( GLViewer_ViewPort2d* )((GLViewer_ViewFrame*)views[i])->getViewPort() )->getBorder();
 
-    border->setLeft( QMIN( border->left(), theRect->left() ) );
-    border->setRight( QMAX( border->right(), theRect->right() ) );
-    border->setBottom( QMIN( border->bottom(), theRect->bottom() ) );
-    border->setTop( QMAX( border->top(), theRect->top() ) );
+    border->setLeft( qMin( border->left(), theRect->left() ) );
+    border->setRight( qMax( border->right(), theRect->right() ) );
+    border->setBottom( qMin( border->bottom(), theRect->bottom() ) );
+    border->setTop( qMax( border->top(), theRect->top() ) );
   }
 }
 
@@ -162,7 +162,7 @@ void GLViewer_Viewer2d::updateBorders( GLViewer_Rect* theRect )
 */
 void GLViewer_Viewer2d::updateBorders()
 {
-    QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
+    QVector<SUIT_ViewWindow*> views = getViewManager()->getViews();
 
     ObjList anObjects = myGLContext->getObjects();
     ObjList::Iterator beginIt = anObjects.begin();
@@ -189,10 +189,10 @@ void GLViewer_Viewer2d::updateBorders()
             }
             else
             {
-                border->setLeft( QMIN( border->left(), aRect->left() ) );
-                border->setRight( QMAX( border->right(), aRect->right() ) );
-                border->setBottom( QMIN( border->bottom(), aRect->bottom() ) );
-                border->setTop( QMAX( border->top(), aRect->top() ) );
+                border->setLeft( qMin( border->left(), aRect->left() ) );
+                border->setRight( qMax( border->right(), aRect->right() ) );
+                border->setBottom( qMin( border->bottom(), aRect->bottom() ) );
+                border->setTop( qMax( border->top(), aRect->top() ) );
             }
         }
     }
@@ -206,7 +206,7 @@ void GLViewer_Viewer2d::updateAll()
   if ( !getActiveView() )
     return;
 
-  QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
+  QVector<SUIT_ViewWindow*> views = getViewManager()->getViews();
   for ( int i = 0, n = views.count(); i < n; i++ )
     ( ( GLViewer_ViewPort2d* )( ( GLViewer_ViewFrame* )views[i] )->getViewPort() )->getGLWidget()->updateGL();
 }
@@ -226,18 +226,18 @@ void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat scX, GLfloat sc
 /*!
   Activates drawers for objects from list \param theObjects only
 */
-void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap )
+void GLViewer_Viewer2d::activateDrawers( QList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap )
 {
     //cout << "GLViewer_Viewer2d::activateDrawers " << (int)onlyUpdate << " " << (int)swap << endl;
-    QValueList<GLViewer_Drawer*>::Iterator anIt = myDrawers.begin();
-    QValueList<GLViewer_Drawer*>::Iterator endDIt = myDrawers.end();
+    QList<GLViewer_Drawer*>::Iterator anIt = myDrawers.begin();
+    QList<GLViewer_Drawer*>::Iterator endDIt = myDrawers.end();
     for( ; anIt != endDIt; anIt++ )
         (*anIt)->clear();
 
-    QValueList<GLViewer_Drawer*> anActiveDrawers;
-    QValueList<GLViewer_Object*>::Iterator endOIt = theObjects.end();
+    QList<GLViewer_Drawer*> anActiveDrawers;
+    QList<GLViewer_Object*>::Iterator endOIt = theObjects.end();
 
-    for( QValueList<GLViewer_Object*>::Iterator oit = theObjects.begin(); oit != endOIt; ++oit )
+    for( QList<GLViewer_Object*>::Iterator oit = theObjects.begin(); oit != endOIt; ++oit )
     {
         GLViewer_Drawer* aDrawer = (*oit)->getDrawer();
         if( !aDrawer )
@@ -265,11 +265,11 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
 
         int aPriority = aDrawer->getPriority();
 
-        if( anActiveDrawers.findIndex( aDrawer ) != -1 )
+        if( anActiveDrawers.indexOf( aDrawer ) != -1 )
             continue;
 
-        QValueList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
-        QValueList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
+        QList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
+        QList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
         for( ; aDIt != aDEndIt; ++aDIt )
             if( (*aDIt)->getPriority() > aPriority )
                 break;
@@ -277,10 +277,10 @@ void GLViewer_Viewer2d::activateDrawers( QValueList<GLViewer_Object*>& theObject
         anActiveDrawers.insert( aDIt, aDrawer );
     } 
 
-    QValueList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
-    QValueList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
+    QList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
+    QList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
 
-    QPtrVector<SUIT_ViewWindow> views = getViewManager()->getViews();
+    QVector<SUIT_ViewWindow*> views = getViewManager()->getViews();
     for ( int i = 0, n = views.count(); i < n; i++ )
     {
         float xScale, yScale;
@@ -523,7 +523,7 @@ QRect* GLViewer_Viewer2d::getWinObjectRect( GLViewer_Object* theObject )
 
     GLfloat anAngle = curvp->getGLWidget()->getRotationAngle() * PI / 180.;
 
-    QPointArray aPointArray(4);
+    QPolygon aPointArray(4);
     aPointArray[0] = QPoint( (int)(aLeft*cos(anAngle) - aTop*sin(anAngle)),
                              (int)(aLeft*sin(anAngle) + aTop*cos(anAngle)) );
     aPointArray[1] = QPoint( (int)(aRight*cos(anAngle) - aTop*sin(anAngle)),
@@ -539,10 +539,10 @@ QRect* GLViewer_Viewer2d::getWinObjectRect( GLViewer_Object* theObject )
     {
         int x = aPointArray[i].x();
         int y = aPointArray[i].y();
-        aMinLeft = QMIN( aMinLeft,x );
-        aMaxRight = QMAX( aMaxRight, x );
-        aMinTop = QMIN( aMinTop, y );
-        aMaxBottom = QMAX( aMaxBottom, y );
+        aMinLeft = qMin( aMinLeft,x );
+        aMaxRight = qMax( aMaxRight, x );
+        aMinTop = qMin( aMinTop, y );
+        aMaxBottom = qMax( aMaxBottom, y );
     }
 
     aLeft = (aMinLeft/* + xPan*/)*xScale + aWidth / 2;
@@ -640,7 +640,7 @@ bool GLViewer_Viewer2d::testRotation( QMouseEvent* e )
 {
     if ( ( e->button() == GLViewer_View2dTransformer::rotateButton() ) &&
          ( e->type() == QEvent::MouseButtonPress ) &&
-         ( e->state() & GLViewer_ViewTransformer::accelKey() ) )
+         ( e->modifiers() & GLViewer_ViewTransformer::accelKey() ) )
     {
         activateTransform( GLViewer_Viewer::Rotate );
         return true;
@@ -667,7 +667,7 @@ void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
         header += "%%Pages: 1\n";
         header += "%%Page: 1\n\n";
         
-        hFile.writeBlock( header.ascii(), header.length() );
+        hFile.write( header.toAscii() );
     }
     else if( aType == HPGL )
     {
@@ -681,7 +681,7 @@ void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
         header += "LT;\n";
         header += "VS36;\n";
         
-        hFile.writeBlock( header.ascii(), header.length() );
+        hFile.write( header.toAscii() );
     }
 }
 
@@ -695,12 +695,12 @@ void GLViewer_Viewer2d::insertEnding( VectorFileType aType, QFile& hFile )
     if( aType == POST_SCRIPT )
     {
         QString ending = "showpage\n\n%%EOF";
-        hFile.writeBlock( ending.ascii(), ending.length() );
+        hFile.write( ending.toAscii() );
     }
     else if( aType == HPGL )
     {
         QString ending = "PU;PA0,0;SP;EC;PG1;EC1;OE\n"; 
-        hFile.writeBlock( ending.ascii(), ending.length() );
+        hFile.write( ending.toAscii() );
     }
 }
 
@@ -730,7 +730,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
     if ( !getActiveView() )
       return false;
 
-        QFile hFile( FileName.ascii() );
+        QFile hFile( FileName.toAscii() );
 
 #ifdef WIN32
     HDC hMetaFileDC;
@@ -779,8 +779,8 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
 
     if( aType==POST_SCRIPT || aType==HPGL )
     {
-        hFile.open( IO_ReadWrite | IO_Truncate );
-        hFile.at( 0 );
+        hFile.open( QIODevice::ReadWrite | QIODevice::Truncate );
+        hFile.seek( 0 );
         insertHeader( aType, hFile );
     }
 #ifdef WIN32
@@ -792,7 +792,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
         HDC screen_dc = GetDC( 0 ); //The screen device context
         HDC bitDC = CreateCompatibleDC ( screen_dc ); //The context compatible with screen
 
-        hMetaFileDC = CreateEnhMetaFile( bitDC, FileName.ascii(), &r, "" );
+        hMetaFileDC = CreateEnhMetaFile( bitDC, FileName.toAscii(), &r, "" );
         SetMapMode( hMetaFileDC, MM_HIMETRIC );
         SetWindowOrgEx( hMetaFileDC, 0, r.bottom, NULL );
         HRGN ClipRgn = CreateRectRgn( 0, 0, AW, AH );
@@ -818,7 +818,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
                                arg( AW-mmLeft-mmRight ).arg( AH-mmBottom-mmTop );
         //It is set clipping path
 
-        hFile.writeBlock( aBuffer.ascii(), aBuffer.length() );
+        hFile.write( aBuffer.toAscii() );
 
         aCurVP->getGLWidget()->translateBackgroundToPS( hFile, &aViewerCS, &aPaperCS );
     }
@@ -874,15 +874,15 @@ void GLViewer_Viewer2d::repaintView( GLViewer_ViewFrame* theView, bool makeCurre
     float xScale;
     float yScale;
 
-    QValueList<GLViewer_Drawer*>::Iterator anIt = myDrawers.begin();
-    QValueList<GLViewer_Drawer*>::Iterator endDIt = myDrawers.end();
+    QList<GLViewer_Drawer*>::Iterator anIt = myDrawers.begin();
+    QList<GLViewer_Drawer*>::Iterator endDIt = myDrawers.end();
     for( ; anIt != endDIt; anIt++ )
             (*anIt)->clear();
 
-    QValueList<GLViewer_Drawer*> anActiveDrawers;
-    QValueList<GLViewer_Object*>::Iterator endOIt = anActiveObjs.end();
+    QList<GLViewer_Drawer*> anActiveDrawers;
+    QList<GLViewer_Object*>::Iterator endOIt = anActiveObjs.end();
 
-    for( QValueList<GLViewer_Object*>::Iterator oit = anActiveObjs.begin(); oit != endOIt; ++oit )
+    for( QList<GLViewer_Object*>::Iterator oit = anActiveObjs.begin(); oit != endOIt; ++oit )
     {
         GLViewer_Drawer* aDrawer = (*oit)->getDrawer();
         if( !aDrawer )
@@ -904,12 +904,12 @@ void GLViewer_Viewer2d::repaintView( GLViewer_ViewFrame* theView, bool makeCurre
             }
         }
         aDrawer->addObject( (*oit) );
-        if( anActiveDrawers.findIndex( aDrawer ) == -1 )
+        if( anActiveDrawers.indexOf( aDrawer ) == -1 )
             anActiveDrawers.append( aDrawer );
     } 
 
-    QValueList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
-    QValueList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
+    QList<GLViewer_Drawer*>::Iterator aDIt = anActiveDrawers.begin();
+    QList<GLViewer_Drawer*>::Iterator aDEndIt = anActiveDrawers.end();
 
     GLViewer_ViewPort2d* vp = ( GLViewer_ViewPort2d* )aCurView->getViewPort();
     vp->getScale( xScale, yScale );
@@ -991,7 +991,7 @@ void GLViewer_Viewer2d::finishOperations( QMouseEvent* e )
         vp->finishSelectByRect();
         if ( getSelector() && !aSelRect.isNull() )
         {            
-            bool append = bool ( e->state() & GLViewer_Selector::appendKey() );
+            bool append = bool ( e->modifiers() & GLViewer_Selector::appendKey() );
             getSelector()->select( aSelRect, append );
         }
     }
@@ -1017,7 +1017,7 @@ void GLViewer_Viewer2d::startOperations( QWheelEvent* e )
 }
 
 
-int GLViewer_View2dTransformer::rotateBtn = RightButton;
+int GLViewer_View2dTransformer::rotateBtn = Qt::RightButton;
 
 /*!
   Constructor

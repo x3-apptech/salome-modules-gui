@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "VTKViewer_ViewModel.h"
 #include "VTKViewer_ViewWindow.h"
@@ -25,11 +28,10 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
 
-#include <qpainter.h>
-#include <qapplication.h>
-#include <qcolordialog.h>
-#include <qpalette.h>
-#include <qpopupmenu.h>
+#include <QColorDialog>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QToolBar>
 
 bool _InitializeVtkWarningsCall()
 {
@@ -90,16 +92,16 @@ void VTKViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 }
 
 /*!Insert context into popup menu.*/
-void VTKViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
+void VTKViewer_Viewer::contextMenuPopup(QMenu* thePopup)
 {
-  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->addAction( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
 
-  thePopup->insertSeparator();
+  thePopup->addSeparator();
 
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
   if ( aView && !aView->getToolBar()->isVisible() )
-    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
+    thePopup->addAction( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
 }
 
 /*!On mouse press event.*/
@@ -111,14 +113,14 @@ void VTKViewer_Viewer::onMousePress(SUIT_ViewWindow* vw, QMouseEvent* event)
   if ( !rwi )
     return;
 
-  switch(event->button()) {
-  case LeftButton:
+  switch(event->buttons()) {
+  case Qt::LeftButton:
     rwi->LeftButtonPressed(event) ;
     break ;
-  case MidButton:
+  case Qt::MidButton:
     rwi->MiddleButtonPressed(event) ;
     break ;
-  case RightButton:
+  case Qt::RightButton:
     rwi->RightButtonPressed(event) ;
     break;
   default:
@@ -145,14 +147,14 @@ void VTKViewer_Viewer::onMouseRelease(SUIT_ViewWindow* vw, QMouseEvent* event)
   if ( !rwi )
     return;
 
-  switch(event->button()) {
-  case LeftButton:
+  switch(event->buttons()) {
+  case Qt::LeftButton:
     rwi->LeftButtonReleased(event) ;
     break ;
-  case MidButton:
+  case Qt::MidButton:
     rwi->MiddleButtonReleased(event) ;
     break ;
-  case RightButton:
+  case Qt::RightButton:
     rwi->RightButtonReleased(event) ;
     break;
   default:

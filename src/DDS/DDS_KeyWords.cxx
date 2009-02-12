@@ -1,20 +1,23 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "DDS_KeyWords.h"
 
@@ -23,60 +26,66 @@ IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, MMgt_TShared)
 
 /*!
   \class DDS_KeyWords
+  \brief This class defines the pairs of internal keys and XML tags or 
+  attributes names. 
 
-  This object contains the pairs of internal keys and XML tag or attribute names. This class allow to user
-  define set of XML keywords used in datums definition file.
+  This class allows user to define a set of XML keywords used in the datums
+  definition (XML) file.
 
   Default keywords table:
-  \li D_URI - dictionary
-  \li COMPONENT - component
-  \li COMPONENT_NAME - name
-  \li UNIT_SYSTEMS - unitSystems
-  \li UNIT_SYSTEM - system
-  \li UNIT_SYSTEM_NAME - name
-  \li UNIT_SYSTEM_LABEL - label
-  \li DATUM - datum
-  \li DATUM_ID - id
-  \li DATUM_LABEL - label
-  \li DATUM_UNITS - units
-  \li DATUM_FORMAT - format
-  \li DATUM_FILTER - filter
-  \li DATUM_REQUIRED - required
-  \li VALUE_LIST - valueList
-  \li VALUE_LIST_ID - listid
-  \li VALUE_LIST_NAME - name
-  \li VALUE_LIST_TYPE - type
-  \li VALUE_LIST_VALUE - value
-  \li VALUE_LIST_VALUEID - id
-  \li VALUE_LIST_VALUEICON - icon
-  \li DY_DOMAIN - domain
-  \li WARNING_LEVEL - warningLevel
-  \li WRONG_VALUE - wrongValue
-  \li VALUE_DESCR - valueDescr
-  \li VALUE_LIST_REF - listRef
-  \li DESCR - description
-  \li LONG_D - longDescr
-  \li SHORT_D - shortDescr
-  \li VD_TYPE - type
-  \li VD_DEFV - default
-  \li VD_MAXV - max
-  \li VD_MINV - min
-  \li VD_SPEC - specVal
-  \li VLR_LIST - list
-  \li PRS - presentation
-  \li LATERAL_ZOOM - lateralZoom
-  \li LZ_MINV - min
-  \li LZ_MAXV - max
-  \li LZ_ORDER - order
-  \li OPTIONS - options
-  \li OPTION - option
-  \li OPTION_NAME - name
+  - \c D_URI - dictionary
+  - \c COMPONENT - component
+  - \c COMPONENT_NAME - name
+  - \c UNIT_SYSTEMS - unitSystems
+  - \c UNIT_SYSTEM - system
+  - \c UNIT_SYSTEM_NAME - name
+  - \c UNIT_SYSTEM_LABEL - label
+  - \c DATUM - datum
+  - \c DATUM_ID - id
+  - \c DATUM_LABEL - label
+  - \c DATUM_UNITS - units
+  - \c DATUM_FORMAT - format
+  - \c DATUM_FILTER - filter
+  - \c DATUM_REQUIRED - required
+  - \c VALUE_LIST - valueList
+  - \c VALUE_LIST_ID - listid
+  - \c VALUE_LIST_NAME - name
+  - \c VALUE_LIST_TYPE - type
+  - \c VALUE_LIST_VALUE - value
+  - \c VALUE_LIST_VALUEID - id
+  - \c VALUE_LIST_VALUEICON - icon
+  - \c DY_DOMAIN - domain
+  - \c WARNING_LEVEL - warningLevel
+  - \c WRONG_VALUE - wrongValue
+  - \c VALUE_DESCR - valueDescr
+  - \c VALUE_LIST_REF - listRef
+  - \c DESCR - description
+  - \c LONG_D - longDescr
+  - \c SHORT_D - shortDescr
+  - \c VD_TYPE - type
+  - \c VD_DEFV - default
+  - \c VD_MAXV - max
+  - \c VD_MINV - min
+  - \c VD_SPEC - specVal
+  - \c VLR_LIST - list
+  - \c PRS - presentation
+  - \c LATERAL_ZOOM - lateralZoom
+  - \c LZ_MINV - min
+  - \c LZ_MAXV - max
+  - \c LZ_ORDER - order
+  - \c OPTIONS - options
+  - \c OPTION - option
+  - \c OPTION_NAME - name
+
+  There is the only instance of the class DDS_KeyWords in the application
+  which can be retrieved by method Get().
 */
 
 /*!
-  Constructor
+  \brief Constructor. 
+  Create an instance of the object. Can not be used directly.
+  Use Get() method instead.
 */
-
 DDS_KeyWords::DDS_KeyWords()
 : MMgt_TShared()
 {
@@ -134,10 +143,10 @@ DDS_KeyWords::DDS_KeyWords()
 }
 
 /*!
-  Returns the static instance of the class DDS_KeyWords
+  \brief Get the only instance of the class DDS_KeyWords.
+  \return the only instance of the class
 */
-
-Handle(DDS_KeyWords) DDS_KeyWords::Get()
+Handle_DDS_KeyWords DDS_KeyWords::Get()
 {
   static Handle(DDS_KeyWords) keyWords;
 
@@ -148,10 +157,12 @@ Handle(DDS_KeyWords) DDS_KeyWords::Get()
 }
 
 /*!
-  Returns the XML keyword by specified internal key \a key. If the internal key isn't registered
-  then empty string will be returned.
-*/
+  \brief Get the XML keyword by specified internal key \a key.
 
+  If the internal key is not registered, empty string is returned.
+  \param key internal key
+  \return XML keyword 
+*/
 TCollection_AsciiString DDS_KeyWords::GetKeyWord( const TCollection_AsciiString& key ) const
 {
   TCollection_AsciiString keyWord;
@@ -161,9 +172,10 @@ TCollection_AsciiString DDS_KeyWords::GetKeyWord( const TCollection_AsciiString&
 }
 
 /*!
-  Register the pair of the internal key \a key and XML keyword \a keyWord.
+  \brief Register the pair of the internal key \a key and XML keyword \a keyWord.
+  \param key internal key
+  \param keyWord XML keyword
 */
-
 void DDS_KeyWords::SetKeyWord( const TCollection_AsciiString& key,
                                const TCollection_AsciiString& keyWord )
 {

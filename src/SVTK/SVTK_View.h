@@ -1,20 +1,23 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef SVTK_VIEW_H
 #define SVTK_VIEW_H
@@ -26,22 +29,29 @@
 #include "SVTK.h"
 #include "SALOME_InteractiveObject.hxx"
 
-#include <qobject.h>
+#include <QObject>
 
 class vtkActorCollection;
 class vtkRenderer;
 
-class SVTK_MainWindow;
+class SVTK_ViewWindow;
 class SVTK_Renderer;
 
 class SALOME_Actor;
 
-//! Main purpose of the class is to provide a way to customize #SVTK_MainWindow.
+class QMouseEvent;
+class QWheelEvent;
+class QKeyEvent;
+class QContextMenuEvent;
+class QColor;
+
+
+//! Main purpose of the class is to provide a way to customize #SVTK_ViewWindow.
 /*!
-  This class is initialized by #SVTK_MainWindow and just pass Qt signals from 
-  corresponding #SVTK_RenderWindowInteractor of the #SVTK_MainWindow.
-  Its main purpose is to provide a simple and flexible way to customize the #SVTK_MainWindow.
-  So, in your own viewer it is possible to derive new #SVTK_MainWindow and 
+  This class is initialized by #SVTK_ViewWindow and just pass Qt signals from 
+  corresponding #SVTK_RenderWindowInteractor of the #SVTK_ViewWindow.
+  Its main purpose is to provide a simple and flexible way to customize the #SVTK_ViewWindow.
+  So, in your own viewer it is possible to derive new #SVTK_ViewWindow and 
   use existing functionality without any modifications.
  */
 class SVTK_EXPORT SVTK_SignalHandler : public QObject
@@ -49,26 +59,26 @@ class SVTK_EXPORT SVTK_SignalHandler : public QObject
   Q_OBJECT;
 
 public:
-  SVTK_SignalHandler(SVTK_MainWindow* theMainWindow);
+  SVTK_SignalHandler(SVTK_ViewWindow* theMainWindow);
 
   virtual
   ~SVTK_SignalHandler();
 
-  //! Get reference to its #SVTK_MainWindow
-  SVTK_MainWindow*
+  //! Get reference to its #SVTK_ViewWindow
+  SVTK_ViewWindow*
   GetMainWindow();
 
   //----------------------------------------------------------------------------
-  //! Redirect the request to #SVTK_MainWindow::Repaint (just for flexibility)
+  //! Redirect the request to #SVTK_ViewWindow::Repaint (just for flexibility)
   void
   Repaint(bool theUpdateTrihedron = true);
 
   //----------------------------------------------------------------------------
-  //! Redirect the request to #SVTK_MainWindow::GetRenderer (just for flexibility)
+  //! Redirect the request to #SVTK_ViewWindow::GetRenderer (just for flexibility)
   SVTK_Renderer* 
   GetRenderer();
 
-  //! Redirect the request to #SVTK_MainWindow::getRenderer (just for flexibility)
+  //! Redirect the request to #SVTK_ViewWindow::getRenderer (just for flexibility)
   vtkRenderer* 
   getRenderer();
 
@@ -91,7 +101,7 @@ public:
   void selectionChanged();
 
  protected:
-  SVTK_MainWindow* myMainWindow;
+  SVTK_ViewWindow* myMainWindow;
 };
 
 
@@ -106,7 +116,7 @@ class SVTK_EXPORT SVTK_View : public SVTK_SignalHandler
   Q_OBJECT;
 
 public:
-  SVTK_View(SVTK_MainWindow* theMainWindow);
+  SVTK_View(SVTK_ViewWindow* theMainWindow);
 
   virtual
   ~SVTK_View();

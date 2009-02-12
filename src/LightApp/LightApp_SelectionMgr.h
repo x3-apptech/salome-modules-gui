@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef LIGHTAPP_SELECTIONMGR_H
 #define LIGHTAPP_SELECTIONMGR_H
@@ -25,13 +28,15 @@
 
 #ifndef DISABLE_SALOMEOBJECT
   #include <SALOME_InteractiveObject.hxx>
-  #include <qmap.h>
+  #include <QMap>
+  #include <NCollection_DataMap.hxx>
 
   class SALOME_ListIO;
   class TColStd_IndexedMapOfInteger;
   class TColStd_MapOfInteger;
+  class TCollection_AsciiString;
 #else
-#include <qstringlist.h>
+#include <QStringList>
 #endif
 
 class LightApp_Application;
@@ -51,10 +56,10 @@ public:
   LightApp_Application* application() const;
 
 #ifndef DISABLE_SALOMEOBJECT
-  typedef QMap< Handle(SALOME_InteractiveObject), TColStd_IndexedMapOfInteger > MapIOOfMapOfInteger;
-  typedef QMap< QString, TColStd_IndexedMapOfInteger > MapEntryOfMapOfInteger;
+  typedef NCollection_DataMap< Handle(SALOME_InteractiveObject), TColStd_IndexedMapOfInteger > MapIOOfMapOfInteger;
+  typedef NCollection_DataMap< TCollection_AsciiString, TColStd_IndexedMapOfInteger > MapEntryOfMapOfInteger;
 
-  void                   selectedObjects( SALOME_ListIO&, const QString& = QString::null, const bool = true ) const;
+  void                   selectedObjects( SALOME_ListIO&, const QString& = QString(), const bool = true ) const;
   void                   setSelectedObjects( const SALOME_ListIO&, const bool = false );
 
   void                   GetIndexes( const Handle(SALOME_InteractiveObject)& IObject, 
@@ -73,7 +78,7 @@ public:
 
   void                   selectedSubOwners( MapEntryOfMapOfInteger& theMap );
 #else
-  void                   selectedObjects( QStringList&, const QString& = QString::null, const bool = true ) const;
+  void                   selectedObjects( QStringList&, const QString& = QString(), const bool = true ) const;
 #endif
 
 signals:

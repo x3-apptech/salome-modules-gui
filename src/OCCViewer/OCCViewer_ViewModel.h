@@ -1,26 +1,29 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef OCCVIEWER_VIEWMODEL_H
 #define OCCVIEWER_VIEWMODEL_H
 
-#include <qcolor.h>
-#include <qcursor.h>
+#include <QColor>
+#include <QPoint>
 
 #include "OCCViewer.h"
 
@@ -28,12 +31,15 @@
 
 #include <V3d_View.hxx>
 #include <AIS_Trihedron.hxx>
-#include <AIS_ListOfInteractive.hxx>
 #include <AIS_InteractiveContext.hxx>
+
+class QMouseEvent;
 
 class SUIT_ViewWindow;
 class SUIT_Desktop;
 class OCCViewer_ViewWindow;
+
+class AIS_ListOfInteractive;
 
 struct viewAspect
 {
@@ -51,10 +57,15 @@ public:
 	double     eyeX;
 	double     eyeY;
 	double     eyeZ;
+        double   scaleX;
+        double   scaleY;
+        double   scaleZ;
 	QString    name;
+	bool     isVisible;
+	double   size;
 };
 
-typedef QValueList<viewAspect> viewAspectList;
+typedef QList<viewAspect> viewAspectList;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -67,22 +78,21 @@ class OCCVIEWER_EXPORT OCCViewer_Viewer: public SUIT_ViewModel
 public:
   static QString Type() { return "OCCViewer"; }
 
-  OCCViewer_Viewer( bool DisplayTrihedron = true );
+  OCCViewer_Viewer( bool DisplayTrihedron = true, bool DisplayStaticTrihedron = true );
   virtual ~OCCViewer_Viewer();
 
   void update();
 
-	virtual SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
-
-	virtual void                    setViewManager(SUIT_ViewManager* theViewManager);
+  virtual SUIT_ViewWindow*        createView(SUIT_Desktop* theDesktop);
+  
+  virtual void                    setViewManager(SUIT_ViewManager* theViewManager);
   virtual QString                 getType() const { return Type(); }
 
-  virtual void                    contextMenuPopup(QPopupMenu*);
+  virtual void                    contextMenuPopup(QMenu*);
   
   void                            getSelectedObjects(AIS_ListOfInteractive& theList);
   void                            setObjectsSelected(const AIS_ListOfInteractive& theList);
-  void                            setSelected(const Handle(AIS_InteractiveObject)& theIO)
-  { myAISContext->SetSelected(theIO);}
+  void                            setSelected(const Handle(AIS_InteractiveObject)& theIO) { myAISContext->SetSelected(theIO);}
 
   void                            performSelectionChanged();
   // emit signal selectionChanged
@@ -115,19 +125,17 @@ public:
   Handle(AIS_Trihedron)           getTrihedron()   const { return myTrihedron; }
 
   void                            enableSelection(bool isEnabled);
-  bool                            isSelectionEnabled() const 
-  { return mySelectionEnabled; }
+  bool                            isSelectionEnabled() const { return mySelectionEnabled; }
 
   void                            enableMultiselection(bool isEnable);
-  bool                            isMultiSelectionEnabled() const 
-  { return myMultiSelectionEnabled; }
+  bool                            isMultiSelectionEnabled() const { return myMultiSelectionEnabled; }
 
-  int                             getSelectionCount() const 
-  { return (!myAISContext.IsNull())? myAISContext->NbSelected():0; }
+  int                             getSelectionCount() const { return (!myAISContext.IsNull())? myAISContext->NbSelected():0; }
+  bool                            isStaticTrihedronDisplayed() { return myShowStaticTrihedron; }
 
   /* Selection management */
-  bool		highlight( const Handle(AIS_InteractiveObject)&, bool, bool=true );
-  bool		unHighlightAll( bool=true ); 
+  bool    highlight( const Handle(AIS_InteractiveObject)&, bool, bool=true );
+  bool	  unHighlightAll( bool=true ); 
   bool    isInViewer( const Handle(AIS_InteractiveObject)&, bool=false );
   bool    isVisible( const Handle(AIS_InteractiveObject)& );
 
@@ -150,7 +158,6 @@ protected slots:
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
 
   void onDumpView();
-  void onShowToolbar();
   void onChangeBgColor();
 
 private:
@@ -167,6 +174,8 @@ private:
 
   QColor                          myBgColor;
   QPoint                          myStartPnt, myEndPnt;
+
+  bool                            myShowStaticTrihedron;
 };
 
 #ifdef WIN32

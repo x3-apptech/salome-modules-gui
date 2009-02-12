@@ -1,25 +1,29 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
-#ifndef _CASCatch_ErrorHandler_HeaderFile
-#define _CASCatch_ErrorHandler_HeaderFile
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : CASCatch_ErrorHandler.hxx
+// Author : Sergey RUIN, Open CASCADE S.A.S (sergey.ruin@opencascade.com)
+//
+#ifndef CASCATCH_ERRORHANDLER_HXX
+#define CASCATCH_ERRORHANDLER_HXX
 
 #include "CASCatch_Failure.hxx"
 
@@ -78,15 +82,15 @@ class CASCatch_ErrorHandler
                                 K_SETJMP_CASCatch = 1 ; \
                                 if(DoesNotAbort_CASCatch(_Function))
 
-# else  //If DO_ABORT is not defined
+# else  // ! DO_ABORT
 #  define DoesNotAbort_CASCatch(aHandler) !setjmp(aHandler.Label)
 
 #  define CASCatch_TRY      CASCatch_ErrorHandler _Function; \
                               if(DoesNotAbort_CASCatch(_Function))
-# endif //DO_ABORT
+# endif // DO_ABORT
 
 
 # define CASCatch_CATCH(Error)   else if(_Function.Catches(STANDARD_TYPE(Error)))
-#endif //NO_CXX_EXCEPTION
+#endif  // NO_CXX_EXCEPTION
 
-#endif //_CASCatch_ErrorHandler_HeaderFile
+#endif  // CASCATCH_ERRORHANDLER_HXX

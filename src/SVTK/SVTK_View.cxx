@@ -1,36 +1,35 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : 
 //  Author : 
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SALOME_Actor.h"
 
 #include "SVTK_View.h"
 #include "SVTK_Renderer.h"
-#include "SVTK_MainWindow.h"
+#include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
 #include "SALOME_ListIteratorOfListIO.hxx"
 
@@ -44,7 +43,7 @@
   Constructor
 */
 SVTK_SignalHandler
-::SVTK_SignalHandler(SVTK_MainWindow* theMainWindow):
+::SVTK_SignalHandler(SVTK_ViewWindow* theMainWindow):
   QObject(theMainWindow),
   myMainWindow(theMainWindow)
 {
@@ -79,7 +78,7 @@ SVTK_SignalHandler
 /*!
   \return corresponding svtk main window
 */
-SVTK_MainWindow*
+SVTK_ViewWindow*
 SVTK_SignalHandler
 ::GetMainWindow()
 {
@@ -88,7 +87,7 @@ SVTK_SignalHandler
 
 
 /*!
-  Redirect the request to #SVTK_MainWindow::Repaint (just for flexibility)
+  Redirect the request to #SVTK_ViewWindow::Repaint (just for flexibility)
 */
 void
 SVTK_SignalHandler
@@ -98,7 +97,7 @@ SVTK_SignalHandler
 }
 
 /*!
-  Redirect the request to #SVTK_MainWindow::GetRenderer (just for flexibility)
+  Redirect the request to #SVTK_ViewWindow::GetRenderer (just for flexibility)
 */
 SVTK_Renderer* 
 SVTK_SignalHandler
@@ -108,7 +107,7 @@ SVTK_SignalHandler
 }
 
 /*!
-  Redirect the request to #SVTK_MainWindow::getRenderer (just for flexibility)
+  Redirect the request to #SVTK_ViewWindow::getRenderer (just for flexibility)
 */
 vtkRenderer* 
 SVTK_SignalHandler
@@ -164,7 +163,7 @@ SVTK_SignalHandler
   Constructor
 */
 SVTK_View
-::SVTK_View(SVTK_MainWindow* theMainWindow) :
+::SVTK_View(SVTK_ViewWindow* theMainWindow) :
   SVTK_SignalHandler(theMainWindow)
 {
 }
@@ -262,7 +261,7 @@ SVTK_View
 			const double& theTolCell,
 			const double& theTolObjects)
 {
-  GetRenderer()->SetSelectionTolerance(theTolNodes,theTolCell, theTolObjects);
+  GetRenderer()->SetSelectionTolerance(theTolNodes, theTolCell, theTolObjects);
 }
 
 /*!
@@ -308,8 +307,8 @@ SVTK_View
   using namespace SVTK;
   ForEachIf<SALOME_Actor>(getRenderer()->GetActors(),
 			  TIsSameIObject<SALOME_Actor>(theIObject),
-			  TSetFunction<SALOME_Actor,const char*,QString>
-			  (&SALOME_Actor::setName,theName.latin1()));
+			  TSetFunction<SALOME_Actor,const char*,const char*>
+			  (&SALOME_Actor::setName,theName.toLatin1().data()));
 }
 
 /*!

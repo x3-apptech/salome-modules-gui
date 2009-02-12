@@ -1,22 +1,28 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_SelectionMgr.h"
+
+#include "SUIT_Selector.h"
+#include "SUIT_SelectionFilter.h"
 
 /*!\class SUIT_SelectionMgr
  * Provide selection manager. Manipulate by selection filters, modes, data owners.
@@ -26,6 +32,7 @@
 SUIT_SelectionMgr::SUIT_SelectionMgr( const bool Feedback, QObject* p )
 : QObject( p ),
 myIterations( Feedback ? 1 : 0 ),
+myAutoDelFilter( false ),
 myIsSelChangeEnabled( true )
 {
 }
@@ -33,7 +40,8 @@ myIsSelChangeEnabled( true )
 /*!destructor. mySelectors auto delete.*/
 SUIT_SelectionMgr::~SUIT_SelectionMgr()
 {
-  mySelectors.setAutoDelete( true );
+  for ( SelectorList::iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
+    delete *it;
 }
 
 /*!Add selector \a sel to selectors list,if it's not exists in list.*/
@@ -46,25 +54,25 @@ void SUIT_SelectionMgr::installSelector( SUIT_Selector* sel )
 /*!Remove selector \a sel from list.*/
 void SUIT_SelectionMgr::removeSelector( SUIT_Selector* sel )
 {
-  mySelectors.remove( sel );
+  mySelectors.removeAll( sel );
 }
 
 /*!Gets selectors list to \a lst.*/
-void SUIT_SelectionMgr::selectors( QPtrList<SUIT_Selector>& lst ) const
+void SUIT_SelectionMgr::selectors( QList<SUIT_Selector*>& lst ) const
 {
   lst.clear();
-  for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
-    lst.append( it.current() );
+  for ( SelectorList::const_iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
+    lst.append( *it );
 }
 
 /*!Gets selectors list to \a lst with type \a typ.*/
-void SUIT_SelectionMgr::selectors( const QString& typ, QPtrList<SUIT_Selector>& lst ) const
+void SUIT_SelectionMgr::selectors( const QString& typ, QList<SUIT_Selector*>& lst ) const
 {
   lst.clear();
-  for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
+  for ( SelectorList::const_iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
   {
-    if ( it.current()->type() == typ )
-      lst.append( it.current() );
+    if ( (*it)->type() == typ )
+      lst.append( *it );
   }
 }
 
@@ -72,10 +80,10 @@ void SUIT_SelectionMgr::selectors( const QString& typ, QPtrList<SUIT_Selector>& 
 */
 void SUIT_SelectionMgr::setEnabled( const bool on, const QString& typ )
 {
-  for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
+  for ( SelectorList::const_iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
   {
-    if ( typ.isEmpty() || it.current()->type() == typ )
-      it.current()->setEnabled( on );
+    if ( typ.isEmpty() || (*it)->type() == typ )
+      (*it)->setEnabled( on );
   }
 }
 
@@ -85,12 +93,13 @@ void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& typ
 {
   lst.clear();
 
-  for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
+  for ( SelectorList::const_iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
   {
-    if ( !type.isEmpty() && it.current()->type() != type )
+    if ( !type.isEmpty() && (*it)->type() != type )
       continue;
+
     SUIT_DataOwnerPtrList curList;
-    it.current()->selected( curList );
+    (*it)->selected( curList );
     for ( SUIT_DataOwnerPtrList::const_iterator itr = curList.begin(); itr != curList.end(); ++itr )
       lst.append( *itr );
   }
@@ -103,16 +112,16 @@ void SUIT_SelectionMgr::setSelected( const SUIT_DataOwnerPtrList& lst, const boo
   SUIT_DataOwnerPtrList owners;
   filterOwners( lst, owners );
 
-  for ( SelectorListIterator it( mySelectors ); it.current(); ++it )
+  for ( SelectorList::const_iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
   {
     if ( append )
     {
       SUIT_DataOwnerPtrList current;
-      it.current()->selected( current );
+      (*it)->selected( current );
       for ( SUIT_DataOwnerPtrList::const_iterator it = current.begin(); it != current.end(); ++it )
         owners.append( *it );
     }
-    it.current()->setSelected( owners );
+    (*it)->setSelected( owners );
   }
 }
 
@@ -140,11 +149,11 @@ void SUIT_SelectionMgr::selectionChanged( SUIT_Selector* sel )
 
   for ( int i = 0; i < myIterations; i++ )
   {
-    for ( SUIT_Selector* aSel = mySelectors.first(); aSel; aSel = mySelectors.next() )
+    for ( SelectorList::iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
     {
       // Temporary action(to avoid selection of the objects which don't pass the filters):
-      //if ( aSel != sel )
-	    aSel->setSelected( newOwners );
+      //if ( *it != sel )
+	(*it)->setSelected( newOwners );
     }
   }
   myIsSelChangeEnabled = true;
@@ -170,7 +179,7 @@ bool SUIT_SelectionMgr::hasSelectionMode( const int mode ) const
 
 /*! Gets selection modes to list \a vals.
 */
-void SUIT_SelectionMgr::selectionModes( QValueList<int>& vals ) const
+void SUIT_SelectionMgr::selectionModes( QList<int>& vals ) const
 {
   vals = mySelModes;
 }
@@ -179,14 +188,14 @@ void SUIT_SelectionMgr::selectionModes( QValueList<int>& vals ) const
 */
 void SUIT_SelectionMgr::setSelectionModes( const int mode )
 {
-  QValueList<int> lst;
+  QList<int> lst;
   lst.append( mode );
   setSelectionModes( lst );
 }
 
 /*! Sets selection modes list from \a lst.
 */
-void SUIT_SelectionMgr::setSelectionModes( const QValueList<int>& lst )
+void SUIT_SelectionMgr::setSelectionModes( const QList<int>& lst )
 {
   mySelModes = lst;
 }
@@ -195,20 +204,20 @@ void SUIT_SelectionMgr::setSelectionModes( const QValueList<int>& lst )
 */
 void SUIT_SelectionMgr::appendSelectionModes( const int mode )
 {
-  QValueList<int> lst;
+  QList<int> lst;
   lst.append( mode );
   appendSelectionModes( lst );
 }
 
 /*! Append selection modes \a lst list.
 */
-void SUIT_SelectionMgr::appendSelectionModes( const QValueList<int>& lst )
+void SUIT_SelectionMgr::appendSelectionModes( const QList<int>& lst )
 {
   QMap<int, int> map;
-  for ( QValueList<int>::const_iterator it = mySelModes.begin(); it != mySelModes.end(); ++it )
+  for ( QList<int>::const_iterator it = mySelModes.begin(); it != mySelModes.end(); ++it )
     map.insert( *it, 0 );
 
-  for ( QValueList<int>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
+  for ( QList<int>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
   {
     if ( !map.contains( *itr ) )
       mySelModes.append( *itr );
@@ -219,20 +228,20 @@ void SUIT_SelectionMgr::appendSelectionModes( const QValueList<int>& lst )
 */
 void SUIT_SelectionMgr::removeSelectionModes( const int mode )
 {
-  QValueList<int> lst;
+  QList<int> lst;
   lst.append( mode );
   removeSelectionModes( lst );
 }
 
 /*! Remove selection modea \a lst from list.
 */
-void SUIT_SelectionMgr::removeSelectionModes( const QValueList<int>& lst )
+void SUIT_SelectionMgr::removeSelectionModes( const QList<int>& lst )
 {
   QMap<int, int> map;
-  for ( QValueList<int>::const_iterator it = mySelModes.begin(); it != mySelModes.end(); ++it )
+  for ( QList<int>::const_iterator it = mySelModes.begin(); it != mySelModes.end(); ++it )
     map.insert( *it, 0 );
 
-  for ( QValueList<int>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
+  for ( QList<int>::const_iterator itr = lst.begin(); itr != lst.end(); ++itr )
     map.remove( *itr );
 
   mySelModes.clear();
@@ -248,8 +257,8 @@ bool SUIT_SelectionMgr::isOk( const SUIT_DataOwner* owner ) const
     return false;
 
   bool ok = true;
-  for ( SelFilterListIterator it( myFilters ); it.current() && ok; ++it )
-    ok = it.current()->isOk( owner );
+  for ( SelFilterList::const_iterator it = myFilters.begin(); it != myFilters.end() && ok; ++it )
+    ok = (*it)->isOk( owner );
 
   return ok;
 }
@@ -292,13 +301,25 @@ void SUIT_SelectionMgr::installFilter( SUIT_SelectionFilter* f, const bool updat
 */
 void SUIT_SelectionMgr::removeFilter( SUIT_SelectionFilter* f )
 {
-  myFilters.remove( f );
+  if ( !myFilters.contains( f ) )
+    return;
+
+  myFilters.removeAll( f );
+
+  if ( autoDeleteFilter() )
+    delete f;
 }
 
 /*! Clear filters list.
 */
 void SUIT_SelectionMgr::clearFilters()
 {
+  if ( autoDeleteFilter() )
+  {
+    for ( SelFilterList::const_iterator it = myFilters.begin(); it != myFilters.end(); ++it )
+      delete *it;
+  }
+
   myFilters.clear();
 }
 
@@ -306,14 +327,14 @@ void SUIT_SelectionMgr::clearFilters()
 */
 bool SUIT_SelectionMgr::autoDeleteFilter() const
 {
-  return myFilters.autoDelete();
+  return myAutoDelFilter;
 }
 
 /*! Sets auto delete filter to \a on.
 */
 void SUIT_SelectionMgr::setAutoDeleteFilter( const bool on )
 {
-  myFilters.setAutoDelete( on );
+  myAutoDelFilter = on;
 }
 
 /*! Gets good data owners list to \a out from \a in.

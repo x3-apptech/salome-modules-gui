@@ -1,4 +1,6 @@
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
@@ -15,10 +17,12 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "SVTK_Actor.h"
 #include "SALOME_Actor.h"
+
+#include "SALOME_InteractiveObject.hxx"
 
 // VTK Includes
 #include <vtkObjectFactory.h>
@@ -143,11 +147,13 @@ SVTK_Actor
   if(int aNbOfParts = theMapIndex.Extent()){
     vtkPoints *aPoints = vtkPoints::New();
     aPoints->SetNumberOfPoints(aNbOfParts);
-    for(int i = 0; i < aNbOfParts; i++){
+    for(vtkIdType i = 0; i < aNbOfParts; i++){
       int aPartId = theMapIndex( i+1 );
       if(vtkFloatingPointType* aCoord = theMapActor->GetNodeCoord(aPartId)){
 	aPoints->SetPoint(i,aCoord);
-	myUnstructuredGrid->InsertNextCell(VTK_VERTEX,1,&i);
+	// Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
+	// from ParaView-3.4.0 compiled on 64-bit Debian platform with VTK_USE_64BIT_IDS = ON
+	myUnstructuredGrid->InsertNextCell(VTK_VERTEX,(vtkIdType) 1,&i);
       }
     }
     myUnstructuredGrid->SetPoints(aPoints);

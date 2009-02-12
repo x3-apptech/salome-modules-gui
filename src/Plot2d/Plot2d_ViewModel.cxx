@@ -1,30 +1,35 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // Plot2d_ViewModel.cxx: implementation of the Plot2d_ViewModel class.
-
+//
 #include "Plot2d_ViewModel.h"
 #include "Plot2d_ViewWindow.h"
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewFrame.h"
 #include "Plot2d_Prs.h"
 
-#include <qpopupmenu.h>
+#include <QMenu>
+#include <QToolBar>
+#include <QVector>
 
 /*!
   Constructor
@@ -61,20 +66,22 @@ SUIT_ViewWindow* Plot2d_Viewer::createView(SUIT_Desktop* theDesktop)
   Adds custom items to popup menu
   \param thePopup - popup menu
 */
-void Plot2d_Viewer::contextMenuPopup(QPopupMenu* thePopup)
+void Plot2d_Viewer::contextMenuPopup(QMenu* thePopup)
 {
   Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)(myViewManager->getActiveView());
   if ( aView )
     aView->contextMenuPopup(thePopup);
 
-  if (thePopup->count() > 0) thePopup->insertSeparator();
-  thePopup->insertItem( tr( "MNU_DUMP_VIEW" ),                this, SLOT(onDumpView()));
-  thePopup->insertItem( tr( "MEN_PLOT2D_CHANGE_BACKGROUND" ), this, SLOT(onChangeBgColor()));
+  if (!thePopup->isEmpty())
+    thePopup->addSeparator();
+  thePopup->addAction( tr( "MNU_DUMP_VIEW" ),                this, SLOT(onDumpView()));
+  thePopup->addAction( tr( "MEN_PLOT2D_CHANGE_BACKGROUND" ), this, SLOT(onChangeBgColor()));
 
   if ( aView ) {
     if ( !aView->getToolBar()->isVisible() ) {
-      if (thePopup->count() > 0) thePopup->insertSeparator();
-        thePopup->insertItem("Show toolbar", this, SLOT(onShowToolbar()));
+      if (!thePopup->isEmpty())
+        thePopup->addSeparator();
+      thePopup->addAction("Show toolbar", this, SLOT(onShowToolbar()));
     }
     aView->RefreshDumpImage();
   }
@@ -98,7 +105,7 @@ void Plot2d_Viewer::setPrs(Plot2d_Prs* thePrs)
 void Plot2d_Viewer::update()
 {
   SUIT_ViewManager* aMgr = getViewManager();
-  QPtrVector<SUIT_ViewWindow> aViews = aMgr->getViews();
+  QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
   unsigned int aSize = aViews.size();
   for (uint i = 0; i < aSize; i++) {
     Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)aViews[i];
@@ -113,7 +120,7 @@ void Plot2d_Viewer::update()
 void Plot2d_Viewer::clearPrs()
 {
   SUIT_ViewManager* aMgr = getViewManager();
-  QPtrVector<SUIT_ViewWindow> aViews = aMgr->getViews();
+  QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
   unsigned int aSize = aViews.size();
   for (uint i = 0; i < aSize; i++) {
     Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)aViews[i];
@@ -171,7 +178,43 @@ void Plot2d_Viewer::onDumpView()
 /*!
   SLOT: called when action "Clone view" is activated
 */
-void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* )
+void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* newVF )
+{
+  if( !clonedVF || !newVF )
+    return;
+
+  // 1) Copy all properties of view
+
+  newVF->copyPreferences( clonedVF );
+
+  // 2) Display all curves displayed in cloned view
+
+  curveList aCurves;
+  clonedVF->getCurves( aCurves );
+  curveList::const_iterator anIt = aCurves.begin(), aLast = aCurves.end();
+
+  for( ; anIt!=aLast; anIt++ )
+    if( clonedVF->isVisible( *anIt ) )
+      newVF->displayCurve( *anIt, false );
+  newVF->Repaint();
+  
+  if ( newVF )
+  {
+    // find view window corresponding to the frame 
+    QWidget* p = newVF->parentWidget();
+    while( p && !p->inherits( "SUIT_ViewWindow" ) )
+      p = p->parentWidget();
+    
+    // emits signal
+    if ( p && p->inherits( "SUIT_ViewWindow" ) )
+      emit viewCloned( (SUIT_ViewWindow*)p );
+  }
+}
+
+/*
+  SLOT: called when clicked item in the legend from Plot2d_ViewManager
+ */
+void Plot2d_Viewer::onLegendClicked( QwtPlotItem* plotItem )
 {
 }
 

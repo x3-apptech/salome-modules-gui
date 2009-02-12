@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,14 +17,12 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Context.cxx
 // Created:   November, 2004
-
+//
 /*!
   \class GLViewer_AspectLine
   \brief Class for manage of presentations in GLViewer
@@ -33,6 +34,10 @@
 #include "GLViewer_Object.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_ViewPort2d.h"
+#include "GLViewer_ViewFrame.h"
+
+//QT includes
+#include <QRect>
 
 #include <TColStd_SequenceOfInteger.hxx>
 
@@ -222,7 +227,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
         } 
         else if( myLastPicked->isSelected() && status != SS_LocalChanged )
         {
-            mySelectedObjects.remove( myLastPicked );
+            mySelectedObjects.removeAll( myLastPicked );
             myLastPicked->unselect();
             myGLViewer2d->updateAll();
 
@@ -233,7 +238,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
         }
 
         if ( myLastPicked->select( myXhigh, myYhigh, myTolerance, GLViewer_Rect(), false, byCircle, Append )
-             && mySelectedObjects.findIndex( myLastPicked ) == -1 )
+             && mySelectedObjects.indexOf( myLastPicked ) == -1 )
         {
             mySelectedObjects.append( myLastPicked );
             myGLViewer2d->activateDrawer( myLastPicked, TRUE, TRUE );
@@ -370,7 +375,7 @@ int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
             isSel = (*it)->isSelected();
         }
 
-        if( isSel && mySelectedObjects.findIndex( *it ) == -1 )
+        if( isSel && mySelectedObjects.indexOf( *it ) == -1 )
         {
             aList.append( *it );
             mySelectedObjects.append( *it );
@@ -527,14 +532,14 @@ bool GLViewer_Context::replaceObject( GLViewer_Object* oldObject, GLViewer_Objec
 
   if( myActiveObjects.contains( oldObject ) )
   {
-    myActiveObjects.remove( oldObject );
+    myActiveObjects.removeAll( oldObject );
     myActiveObjects.append( newObject );
     return true;
   }
 
   if( myInactiveObjects.contains( oldObject ) )
   {
-    myInactiveObjects.remove( oldObject );
+    myInactiveObjects.removeAll( oldObject );
     myInactiveObjects.append( newObject );
     return true;
   }
@@ -626,7 +631,7 @@ void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
   if( !object || !mySelectedObjects.contains( object ) )
     return;
   
-  mySelectedObjects.remove( object );
+  mySelectedObjects.removeAll( object );
   object->unselect();
   
   if( updateViewer )
@@ -661,14 +666,14 @@ void GLViewer_Context::deleteObject( GLViewer_Object* theObject, bool updateView
         return;
 
     if( myActiveObjects.contains( theObject ) )      
-        myActiveObjects.remove( theObject );
+        myActiveObjects.removeAll( theObject );
     else if( myInactiveObjects.contains( theObject ) )
-        myInactiveObjects.remove( theObject );
+        myInactiveObjects.removeAll( theObject );
     else 
         return;
      
     if( mySelectedObjects.contains( theObject ) )
-        mySelectedObjects.remove( theObject );
+        mySelectedObjects.removeAll( theObject );
 
     GLViewer_Group* aGroup = theObject->getGroup();
     if( aGroup )
@@ -690,7 +695,7 @@ bool GLViewer_Context::setActive( GLViewer_Object* theObject )
   if( !theObject || !myInactiveObjects.contains( theObject ) )
     return false;
 
-  myInactiveObjects.remove( theObject );
+  myInactiveObjects.removeAll( theObject );
   myActiveObjects.append( theObject );
   return true;
 }
@@ -704,7 +709,7 @@ bool GLViewer_Context::setInactive( GLViewer_Object* theObject )
   if( !theObject || !myActiveObjects.contains( theObject ) )
     return false;
 
-  myActiveObjects.remove( theObject );
+  myActiveObjects.removeAll( theObject );
   myInactiveObjects.append( theObject );
   return true;
 }

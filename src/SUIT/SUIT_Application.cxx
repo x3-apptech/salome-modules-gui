@@ -1,54 +1,74 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_Application.h"
 
+#include "SUIT_Study.h"
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_ResourceMgr.h"
 
-#include <qlabel.h>
-#include <qtimer.h>
-#include <qstatusbar.h>
-#include <qapplication.h>
+#include <QTimer>
+#include <QLabel>
+#include <QStatusBar>
+#include <QApplication>
+#include <QSize>
 
 #include <QtxAction.h>
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
 
 /*!
+  \class StatusLabel
+  \brief Status bar customization label. Used to workaroubd desktop resizing bug.
+  \internal
+*/
+class StatusLabel : public QLabel
+{
+public:
+  StatusLabel( QWidget* parent ) : QLabel( parent ) {}
+  QSize minimumSizeHint () const { return QSize( 0, QLabel::minimumSizeHint().height() ); }
+};
+
+/*!
   Default constructor
 */
 SUIT_Application::SUIT_Application()
-  : QObject( 0 ),
-    myStudy( 0 ),
-    myDesktop( 0 ),
-    myStatusLabel( 0 )
+: QObject( 0 ),
+  myStudy( 0 ),
+  myDesktop( 0 ),
+  myStatusLabel( 0 )
 {
+  if ( SUIT_Session::session() )
+    SUIT_Session::session()->insertApplication( this );
 }
 
 /*!
   Destructor
 */
-SUIT_Application::~SUIT_Application() 
+SUIT_Application::~SUIT_Application()
 {
+  SUIT_Study* s = myStudy;
   setActiveStudy( 0 );
-  delete myStudy;
+  delete s;
 
   setDesktop( 0 );
 }
@@ -62,7 +82,7 @@ SUIT_Desktop* SUIT_Application::desktop()
 }
 
 /*!
-   \return FALSE if application can not be closed (because of non saved data for example). 
+   \return FALSE if application can not be closed (because of non saved data for example).
    This method called by SUIT_Session whin closing of application was requested.
 */
 bool SUIT_Application::isPossibleToClose( bool& )
@@ -92,7 +112,7 @@ SUIT_Study* SUIT_Application::activeStudy() const
 */
 QString SUIT_Application::applicationVersion() const
 {
-  return QString::null;
+  return QString();
 }
 
 /*!
@@ -125,15 +145,6 @@ bool SUIT_Application::useFile( const QString& theFileName )
 }
 
 /*!
-  Opens other study into active Study. If Study is empty - creates it.
-  \param theName - name of study
-*/
-bool SUIT_Application::useStudy( const QString& theName )
-{
-  return false;
-}
-
-/*!
   Creates new empty Study if active Study = 0
 */
 void SUIT_Application::createEmptyStudy()
@@ -143,7 +154,7 @@ void SUIT_Application::createEmptyStudy()
 }
 
 /*!
-  \return number of Studies. 
+  \return number of Studies.
   Must be redefined in Applications which support several studies for one Application instance.
 */
 int SUIT_Application::getNbStudies() const
@@ -165,7 +176,7 @@ SUIT_ResourceMgr* SUIT_Application::resourceMgr() const
 #define DEFAULT_MESSAGE_DELAY 3000
 
 /*!
-  Puts the message to the status bar  
+  Puts the message to the status bar
   \param msg - text of message
   \param msec - time in milliseconds, after that the status label will be cleared
 */
@@ -176,7 +187,7 @@ void SUIT_Application::putInfo( const QString& msg, const int msec )
 
   if ( !myStatusLabel )
   {
-    myStatusLabel = new QLabel( desktop()->statusBar() );
+    myStatusLabel = new StatusLabel( desktop()->statusBar() );
     desktop()->statusBar()->addWidget( myStatusLabel, 1 );
     myStatusLabel->show();
   }
@@ -202,14 +213,15 @@ void SUIT_Application::onInfoClear()
   bool changed = !myStatusLabel->text().isEmpty();
   myStatusLabel->clear();
   if ( changed )
-    emit infoChanged( QString::null );
+    emit infoChanged( QString() );
 }
 
 /*!
-  Updates status of the registerd actions
+  Update status of the registerd actions
 */
 void SUIT_Application::updateCommandsStatus()
-{}
+{
+}
 
 /*!
   Initialize with application arguments
@@ -218,7 +230,7 @@ void SUIT_Application::updateCommandsStatus()
 */
 SUIT_Application* SUIT_Application::startApplication( int argc, char** argv ) const
 {
-  return startApplication( name(), argc, argv );
+  return startApplication( objectName(), argc, argv );
 }
 
 /*!
@@ -273,12 +285,13 @@ void SUIT_Application::setActiveStudy( SUIT_Study* study )
   if ( myStudy == study )
     return;
 
-  if(myStudy)
-    disconnect(myStudy, SIGNAL( studyModified( SUIT_Study* ) ), this, SLOT( updateCommandsStatus() ) );
+  if ( myStudy )
+    disconnect( myStudy, SIGNAL( studyModified( SUIT_Study* ) ),
+		this, SLOT( updateCommandsStatus() ) );
+  if ( study )
+    connect( study, SIGNAL( studyModified( SUIT_Study* ) ),
+	     this, SLOT( updateCommandsStatus() ) );
 
-  if(study)
-    connect(study, SIGNAL( studyModified( SUIT_Study* ) ), this, SLOT( updateCommandsStatus() ) );
-	    
   myStudy = study;
 }
 
@@ -478,7 +491,12 @@ int SUIT_Application::createMenu( const int id, const QString& menu, const int g
 */
 void SUIT_Application::setMenuShown( QAction* a, const bool on )
 {
-  setMenuShown( actionId( a ), on );
+  if ( !a || !desktop() )
+    return;
+
+  QtxActionMenuMgr* mMgr = desktop()->menuMgr();
+  if ( mMgr )
+    mMgr->setShown( mMgr->actionId( a ), on );
 }
 
 /*!
@@ -488,8 +506,7 @@ void SUIT_Application::setMenuShown( QAction* a, const bool on )
 */
 void SUIT_Application::setMenuShown( const int id, const bool on )
 {
-  if ( desktop() && desktop()->menuMgr() )
-    desktop()->menuMgr()->setShown( id, on );
+  setMenuShown( action( id ), on );
 }
 
 /*!
@@ -499,7 +516,12 @@ void SUIT_Application::setMenuShown( const int id, const bool on )
 */
 void SUIT_Application::setToolShown( QAction* a, const bool on )
 {
-  setToolShown( actionId( a ), on );
+  if ( !a || !desktop() )
+    return;
+
+  QtxActionToolMgr* tMgr = desktop()->toolMgr();
+  if ( tMgr )
+    tMgr->setShown( tMgr->actionId( a ), on );
 }
 
 /*!
@@ -509,8 +531,7 @@ void SUIT_Application::setToolShown( QAction* a, const bool on )
 */
 void SUIT_Application::setToolShown( const int id, const bool on )
 {
-  if ( desktop() && desktop()->toolMgr() )
-    desktop()->toolMgr()->setShown( id, on );
+  setToolShown( action( id ), on );
 }
 
 /*!
@@ -554,13 +575,22 @@ QAction* SUIT_Application::action( const int id ) const
 int SUIT_Application::actionId( const QAction* a ) const
 {
   int id = -1;
-  for ( QMap<int, QAction*>::ConstIterator it = myActionMap.begin(); 
-	it != myActionMap.end() && id == -1;
-	++it ) {
-    if ( it.data() == a )
+  for ( QMap<int, QAction*>::ConstIterator it = myActionMap.begin(); it != myActionMap.end() && id == -1; ++it )
+  {
+    if ( it.value() == a )
       id = it.key();
   }
   return id;
+}
+
+QList<QAction*> SUIT_Application::actions() const
+{
+  return myActionMap.values();
+}
+
+QList<int> SUIT_Application::actionIds() const
+{
+  return myActionMap.keys();
 }
 
 /*!
@@ -577,15 +607,15 @@ int SUIT_Application::actionId( const QAction* a ) const
   \param reciever - object that contains slot
   \param member - slot to be called when action is activated
 */
-QAction* SUIT_Application::createAction( const int id, const QString& text, const QIconSet& icon,
+QAction* SUIT_Application::createAction( const int id, const QString& text, const QIcon& icon,
                                          const QString& menu, const QString& tip, const int key,
                                          QObject* parent, const bool toggle, QObject* reciever, const char* member )
 {
-  QtxAction* a = new QtxAction( text, icon, menu, key, parent, 0, toggle );
+  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle );
   a->setStatusTip( tip );
 
   if ( reciever && member )
-    connect( a, SIGNAL( activated() ), reciever, member );
+    connect( a, SIGNAL( triggered( bool ) ), reciever, member );
 
   registerAction( id, a );
 
@@ -606,7 +636,7 @@ int SUIT_Application::registerAction( const int id, QAction* a )
   static int generatedId = -1;
   ident = id == -1 ? --generatedId : id;
 
-  if ( action( ident ) ) 
+  if ( action( ident ) )
     qWarning( "Action registration id is already in use: %d", ident );
 
   myActionMap.insert( ident, a );
@@ -616,6 +646,9 @@ int SUIT_Application::registerAction( const int id, QAction* a )
 
   if ( desktop() && desktop()->toolMgr() )
     desktop()->toolMgr()->registerAction( a );
+
+  if ( desktop() )
+    desktop()->addAction( a );
 
   return ident;
 }
@@ -640,8 +673,8 @@ void SUIT_Application::onDesktopActivated()
 /*!
   SLOT: is used for Help browsing
 */
-
-void SUIT_Application::onHelpContextModule (const QString& /*theComponentName*/,
-                                            const QString& /*theFileName*/)
+void SUIT_Application::onHelpContextModule( const QString& /*theComponentName*/,
+                                            const QString& /*theFileName*/,
+					    const QString& /*theContext*/ )
 {
 }

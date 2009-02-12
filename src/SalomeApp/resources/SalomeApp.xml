@@ -1,3 +1,26 @@
+<!--
+  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+
+  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+
+-->
 <document>
   <section name="launch">
     <!-- SALOME launching parameters -->
@@ -12,7 +35,7 @@
     <parameter name="killall"    value="no"/>
     <parameter name="pinter"     value="no"/>
     <parameter name="noexcepthandler"  value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,VISU,SUPERV,MED,COMPONENT,PYCALCULATOR"/>
+    <parameter name="modules"    value="GEOM,SMESH,VISU,MED,YACS"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
     <parameter name="standalone" value="pyContainer,supervContainer"/>
@@ -24,11 +47,20 @@
   </section>
   <section name="splash" >
     <!-- Splash screen settings -->
-    <parameter name="image"           value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
-    <parameter name="info"            value="%V" />
-    <parameter name="text_colors"     value="#FFFFFF" />
-    <parameter name="progress_colors" value="#c33232|#d1d1d1|0" />
-    <parameter name="margin"          value="26" />
+    <parameter name="image"             value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
+    <parameter name="constant_info"     value="%A [ %V ]" />
+    <parameter name="text_colors"       value="#eeeeff|#555555" />
+    <parameter name="hide_on_click"     value="no" />
+    <parameter name="show_progress"     value="yes" />
+    <parameter name="show_message"      value="yes" />
+    <parameter name="show_percents"     value="yes" />
+    <parameter name="margin"            value="40" />
+    <parameter name="progress_width"    value="20" />
+    <parameter name="progress_flags"    value="bottom,left_to_right" />
+    <parameter name="opacity"           value="0.70" />
+    <parameter name="font"              value="Tahoma,12,normal" />
+    <parameter name="alignment"         value="top,left" />
+    <parameter name="progress_colors"   value="#3b3e5d|#d14949|v" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->
@@ -39,7 +71,9 @@
     <parameter name="GLViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OCCViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="VTKViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="QxSceneViewer" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SVTK"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PyConsole"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LightApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SalomeApp"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OB"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
@@ -51,31 +85,34 @@
     <!-- Here the environment variables are used in upper case, -->
     <!-- In SMESH/resources/SalomeApp.xml case-sensitive notation is used. -->
     <!-- As a result, both variants are acceptable. -->
-    <parameter name="NETGENPlugin" value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources/netgenplugin"/>
-    <parameter name="GHS3DPlugin"  value="${GHS3DPLUGIN_ROOT_DIR}/share/salome/resources/ghs3dplugin"/>
-    <parameter name="BLSURFPlugin" value="${BLSURFPLUGIN_ROOT_DIR}/share/salome/resources"/>
-    <parameter name="HexoticPLUGIN" value="${HexoticPLUGIN_ROOT_DIR}/share/salome/resources"/>
+    <parameter name="NETGENPlugin"   value="${NETGENPLUGIN_ROOT_DIR}/share/salome/resources/netgenplugin"/>
+    <parameter name="GHS3DPlugin"    value="${GHS3DPLUGIN_ROOT_DIR}/share/salome/resources/ghs3dplugin"/>
+    <parameter name="BLSURFPlugin"   value="${BLSURFPLUGIN_ROOT_DIR}/share/salome/resources/blsurfplugin"/>
+    <parameter name="HexoticPLUGIN"  value="${HexoticPLUGIN_ROOT_DIR}/share/salome/resources/hexoticplugin"/>
+    <parameter name="GHS3DPRLPlugin" value="${GHS3DPRLPLUGIN_ROOT_DIR}/share/salome/resources/ghs3dprlplugin"/>
   </section>
   <section name="SMESH">
     <!-- Default SMESH module plugins -->
-    <parameter name="plugins" value="NETGENPlugin,GHS3DPlugin,BLSURFPlugin,HexoticPLUGIN"/>
+    <parameter name="plugins" value="NETGENPlugin,GHS3DPlugin,GHS3DPRLPlugin,HexoticPLUGIN,BLSURFPlugin"/>
   </section>
   <section name="desktop" >
     <!-- Default GUI desktop state, position, size -->
-    <parameter name="state"  value="normal"/>
-    <parameter name="pos_x"  value="center"/>
-    <parameter name="pos_y"  value="center"/>
-    <parameter name="width"  value="800"/>
-    <parameter name="height" value="600"/>
+    <parameter name="geometry"  value="80%%x80%%+10%%+10%%"/>
+  </section>
+  <section name="Style">
+    <!-- Style and theme preferences -->
+    <parameter name="use_salome_style" value="true" />
   </section>
   <section name="ObjectBrowser" >
     <!-- Object Browser preferences -->
-    <parameter name="auto_size"           value="false" />
-    <parameter name="auto_size_first"     value="true"  />
-    <parameter name="visibility_column_0" value="true"  />
-    <parameter name="visibility_column_1" value="false" />
-    <parameter name="visibility_column_2" value="false" />
-    <parameter name="visibility_column_3" value="false" />
+    <parameter name="auto_hide_search_tool" value="true" />
+    <parameter name="auto_size"             value="false" />
+    <parameter name="auto_size_first"       value="true"  />
+    <parameter name="resize_on_expand_item" value="false"  />
+    <parameter name="visibility_column_id_1" value="true"  />
+    <parameter name="visibility_column_id_2" value="true" />
+    <parameter name="visibility_column_id_3" value="true" />
+    <parameter name="visibility_column_id_4" value="true" />
   </section>
   <section name="PyConsole">
     <!-- Python console preferences -->
@@ -94,6 +131,11 @@
     <parameter name="background"     value="0, 0, 0" />
     <parameter name="trihedron_size" value="105" />
     <parameter name="relative_size"  value="true" />
+    <parameter name="use_advanced_selection_algorithm" value="true" />
+    <parameter name="recorder_mode"        value="1"    />
+    <parameter name="recorder_fps"         value="17.3" />
+    <parameter name="recorder_quality"     value="100"  />
+    <parameter name="recorder_progressive" value="true" />
  </section>
  <section name="Plot2d" >
     <!-- Plot2d viewer preferences -->
@@ -111,7 +153,27 @@
     <parameter name="Title"      value="63, 213, 255"  />
     <parameter name="NodeBody"   value="255, 249, 147" />
   </section>
+  <section name="MRU" >
+    <!-- Show "Most recently used" studies-->
+    <parameter name="show_mru" value="true"/>
+    <!-- Max number of stored "Most recently used" studies-->
+    <parameter name="max_count" value="50"/>
+    <!-- Max visible number of "Most recently used" studies-->
+    <parameter name="visible_count" value="7"/>
+    <!-- Insert mode-->
+    <parameter name="insert_mode" value="0"/>
+    <!-- Link type-->
+    <parameter name="link_type" value="0"/>
+    <!-- Show "Clear" item-->
+    <parameter name="show_clear" value="true"/>
+  </section> 
   <section name="QxGraph" >
+    <!-- QxGraph viewer preferences -->
+    <parameter name="Background" value="144, 208, 211" />
+    <parameter name="Title"      value="63, 213, 255"  />
+    <parameter name="NodeBody"   value="255, 249, 147" />
+  </section>
+  <section name="QxSceneViewer" >
     <!-- QxGraph viewer preferences -->
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />

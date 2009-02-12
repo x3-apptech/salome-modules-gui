@@ -1,48 +1,44 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  SALOME SalomeApp
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-//  File   : SalomeApp_ListView.h
-//  Author : Vadim SANDLER
-//  Module : SALOME
-
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : SalomeApp_ListView.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
 #ifndef SALOMEAPP_LISTVIEW_H
 #define SALOMEAPP_LISTVIEW_H
 
-#include <QtxListView.h>
-
-#include <qlist.h>
-#include <qstring.h>
-#include <qpixmap.h>
-#include <qlineedit.h>
-#include <qcombobox.h>
-
-//VRV: porting on Qt 3.0.5
-#if QT_VERSION >= 0x030005
-#include <qtoolbutton.h> 
-#endif
-//VRV: porting on Qt 3.0.5
-
-#include <TColStd_ListOfInteger.hxx>
-#include <TColStd_ListOfReal.hxx>
+//#include <QtxListView.h>
 
 #include <SUIT_PopupClient.h>
+
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QString>
+#include <QLineEdit>
+#include <QComboBox>
+
+class QToolButton; 
+
+class TColStd_ListOfInteger;
+class TColStd_ListOfReal;
 
 // enumeration for ListView updating mode
 enum UpdateType {
@@ -61,7 +57,7 @@ class SalomeApp_EntityEdit;
   \class SalomeApp_ListView
   parent class for Data Viewer and Properties Viewer
 */
-class SalomeApp_ListView : public QtxListView , public SUIT_PopupClient  {
+class SalomeApp_ListView : public QTreeWidget/*QtxListView*/ , public SUIT_PopupClient  {
   
   Q_OBJECT
     
@@ -78,7 +74,7 @@ public:
 
 // fills popup with items
   virtual QString popupClientType() const;
-  virtual void    contextMenuPopup( QPopupMenu* );
+  virtual void    contextMenuPopup( QMenu* );
 
 // setting editing of items availbale/not available
   void enableEditing(bool theFlag);
@@ -240,21 +236,17 @@ private:
   QString              myString;
 };
 
-class SalomeApp_ListViewItem : public QListViewItem
+class SalomeApp_ListViewItem : public QTreeWidgetItem
 {
 public:
   SalomeApp_ListViewItem( SalomeApp_ListView* );
   SalomeApp_ListViewItem( SalomeApp_ListView*, 
 			  SalomeApp_ListViewItem* );
   SalomeApp_ListViewItem( SalomeApp_ListView*,
-			  const QString&,
+			  const QStringList&,
 			  const bool = false );
-  SalomeApp_ListViewItem( SalomeApp_ListView*,
-			  const QString& theName,
-			  const QString& theValue, 
-			  const bool = false );
-  SalomeApp_ListViewItem( SalomeApp_ListViewItem* theParent,
-			  const QString&,
+  SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
+			  const QStringList&,
 			  const bool = false );
   SalomeApp_ListViewItem( SalomeApp_ListView*,
 			  SalomeApp_ListViewItem*,
@@ -263,10 +255,6 @@ public:
   SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
 			  SalomeApp_ListViewItem*,
 			  const QString&,
-			  const bool = false);
-  SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
-			  const QString& theName,
-			  const QString& theValue, 
 			  const bool = false);
   SalomeApp_ListViewItem( SalomeApp_ListView*,
 			  SalomeApp_ListViewItem*,
@@ -340,6 +328,7 @@ public:
 protected:
   // initialization
   void               init();
+  int                depth() const;
 
 private:
   bool myEditable;

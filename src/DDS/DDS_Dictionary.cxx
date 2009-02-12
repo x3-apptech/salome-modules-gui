@@ -1,20 +1,23 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "DDS_Dictionary.h"
 
@@ -39,14 +42,16 @@ IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
 
 /*!
   \class DDS_Dictionary
-  
-  This class to provide information about used datums, reading them from 'xml' file
+  \brief This class provides an information about used datums, 
+         reading them from XML file.
 
-  Datum is the set of parameters described a phisical characteristic. These parameters loaded from
-  special XML which has following format:
+  There is the only instance of the class DDS_Dictionary in the application
+  which can be retrieved by method Get().
 
-  \hr
+  Datum is a set of parameters describing a phisical characteristic.
+  These parameters are loaded from the XML file which has the following format:
 
+  \verbatim
   <D_URI>
   <COMPONENT COMPONENT_NAME="component_name">
     <UNIT_SYSTEMS>
@@ -89,70 +94,87 @@ IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
     </COMPONENT>
   </D_URI>
 
-  \hr
+  \endverbatim
 
-  In description of datum file format used internal keys as XML tag and attributes names.
-  Concrete XML keywords defined by DDS_KeyWords class.
+  In above description of the datum XML file format internal keys are used as XML tags
+  and attributes names. Real XML keywords are defined by DDS_KeyWords class.
 
-  Describe datum file format more detailed. XML file should have one main tag named as "dictionary" (key "D_URI").
-  This tag should contains one or several components. Component is a independent set of datums and unit systems.
-  Components defined as XML tag named "component" (key "COMPONENT") with attribute "name" (key COMPONENT_NAME).
-  Component name used as component identifier and should be unique. Component tag can contains:
+  XML file should have one main tag named "dictionary" (key "D_URI"). This tag
+  should contain one or several components. 
+  Component is an independent set of datums and units systems.
+  Components are defined by XML tag named "component" (key "COMPONENT") with 
+  attribute "name" (key COMPONENT_NAME).
+  Component name is used as component identifier and should be unique. 
+  
+  Component tag can contain:
 
-  \li Tag "unit_systems" (key UNIT_SYSTEMS) defines set of used unit systems. Should exist at least one unit
-  system named SI ("System International"). If this system not exist then it will be defined automatically.
-  Each unit system defined by XML tag "unit system" (key UNIT_SYSTEM) under tag "unit_systems" with attributes
-  "name" (key UNIT_SYSTEM_NAME) and "label" (key UNIT_SYSTEM_LABEL). Name is identifier of unit system. Label is
-  human readable description.
+  - Tag "unit_systems" (key UNIT_SYSTEMS) defines a set of used units systems.
+  At least one unit system named SI ("System International") should exist.
+  If this system does not exist, it will be created automatically.
+  Each units system is defined by XML tag "unit system" (key UNIT_SYSTEM) under 
+  the tag "unit_systems" with attributes "name" (key UNIT_SYSTEM_NAME) 
+  and "label" (key UNIT_SYSTEM_LABEL). Name is an identifier of the units system and
+  label is its human readable description.
 
-  \li One or several tag "datum" (key DATUM). For this tag can be defined following attributes:
+  - One or several tags "datum" (key DATUM). For this tag the following attributes 
+  can be defined:
+    -# Identifier (key DATUM_ID) specifies the unique id string for the datum.
+    -# Label (key DATUM_LABEL) specifies human readable name of the datum.
+    -# Measure units (key DATUM_UNITS) for the given units system. Attribute name 
+    defines a name of units system and a keyword got from DDS_KeyWords by key DATUM_UNITS.
+    For example, for "SI" units system and default keyword the attribute name is "SIunits".
+    This attribute should be specified for each declared units system. 
+    Value of this attribute should be a string describing measure units.
+    For possible designations for measure units and their multiple prefixes
+    please refer to the UnitsAPI package of the OpenCascade library
+    (files Units.dat and Lexi_Expr.dat). Measure units are used for numerical
+    values conversion from one units system to another one.
+    -# Format (key DATUM_FORMAT) specifies the format string which will be used
+    during initial formatting of the value. This string should be specified 
+    in sprintf() format.
+    -# Filter (key DATUM_FILTER) specifies the regualr expression. The value (string)
+    entered by the user will be checked up to match to this regular expression
+    (if it defined). Non matched strings will be rejected.
+    -# Required value (key DATUM_REQUIRED). If this attributed si defined and its value
+    is \c true then user can't leave an input non-filled - parameter must be explicitly
+    entered by the user).
 
-      \lo Identifier (key DATUM_ID) specify the unique id string for the datum.
-      \lo Label (key DATUM_LABEL) specify human readable name of the datum.
-      \lo Units of measure (key DATUM_UNITS) for given unit system. Attribute name consist of a name
-          of unit system and a keyword got from DDS_KeyWords by key DATUM_UNITS. For example for unit system
-          named SI and default keyword attribute name will be "SIunits". This attribute should be specified
-          for each deaclared unit system. Value of this attribute should be string describs units of measure.
-          Possible designations for units of measure and their multiple prefixes see in package UnitsAPI of
-          library OpenCascade (files Units.dat and Lexi_Expr.dat). Units of measure will be used for numeric
-          value conversion from one unit system to another one.
-      \lo Format (key DATUM_FORMAT) specify the format string which will be used during initial formatting
-          of value. This string should be specified in sprintf() format.
-      \lo Filter (key DATUM_FILTER) specify the regualr expression. Each user entered string will be checked up
-          on matching to this expression (if it defined). Non matched strings will be rejected.
-      \lo Required value (key DATUM_REQUIRED). If this attributed defined and value is true then user can't
-          leave a input filed blank (parameter must be always entered).
+  - One or several tags "list definition" (key VALUE_LIST). Each such tag defines
+  the list of items for enumerable data. Attribute "list id" (key VALUE_LIST_ID) 
+  specifies the identifier string for the list and attribute "list name"
+  (key VALUE_LIST_NAME) defines a list name string. Each list item is described
+  by tag "list value" (key VALUE_LIST_VALUE) under the tag "list definition". 
+  Each this tag contains item string text and have the following attributes:
+    -# "list item id" (key VALUE_LIST_VALUEID) - integer numerical identifier for 
+    the item
+    -# "list item icon" (key VALUE_LIST_VALUEICON) - icon file name for the item
 
-      Tag "description" (key DESCR) can be defined under the tag "datum". This tag contains two sub tags:
-         \lo "short description" (key SHORT_D) specify a brief datum description text
-         \lo "long description" (key LONG_D) specify a detailed description text
+  Tag "datum" can have child subtags "description" and "options".
 
-      Tag "options" (key OPTIONS) can be defined under the tag "datum". This tag contains one or more sub
-      tags "option" (key OPTION). Each of these XML elements should contain text option value and attribute
-      "name" (key OPTION_NAME) which specified option name.
+  - Tag "description" (key DESCR) contains two sub tags:
+    -# "short description" (key SHORT_D) specifies a brief datum description text
+    -# "long description" (key LONG_D) specifies a detailed description text
 
-      Each tag "datum" define most common parameters of phisical characteristic.
-      This parameters placed in two groups:
-      \lo Domain parameters under tag "domain" (key DY_DOMAIN). This tag can contains value description tag
-          (key VALUE_DESCR) for discrete data or list reference tag (key VALUE_LIST_REF) for enumerable data.
-          Discrete data described following parameters:
-            default value (key VD_DEFV)
-            maximum value (key VD_MAXV)
-            minimum value (key VD_MINV)
-            type of value (key VD_TYPE) - possible values: String, Integer, Float, List
-          Enumerable data described by "list reference" attribute (key VLR_LIST) which reference on
-          list (see "list definition" tag) by list id.
+  - Tag "options" (key OPTIONS) contains one or more sub tags "option" (key OPTION).
+  Each of these XML elements should contain text option value and attribute
+  "name" (key OPTION_NAME) which specifies option name.
 
-  \li One or several tag "list definition" (key VALUE_LIST). This tag define the list of items for enumerable
-      data. Attribute "list id" (key VALUE_LIST_ID) specify the identifier string for the list and attribute
-      "list name" (key VALUE_LIST_NAME) define a list name string. Each list item described by tag "list value"
-      (key VALUE_LIST_VALUE) under tag "list definition". Each this tag contains item string text and have
-      following attributes:
-        \lo "list item id" (key VALUE_LIST_VALUEID) - integer numerical identifier for item
-        \lo "list item icon" (key VALUE_LIST_VALUEICON) - icon file name for item
+  Each tag "datum" defines most common parameters of phisical characteristic.
+  These parameters are placed in two groups:
+  -# Domain parameters under the tag "domain" (key DY_DOMAIN). This tag can 
+  contain value description tag (key VALUE_DESCR) for descrete data which is
+  described by following parameters:
+    - default value (key VD_DEFV)
+    - maximum value (key VD_MAXV)
+    - minimum value (key VD_MINV)
+    - type of value (key VD_TYPE), possible values are String, Integer, Float, List
+  -# list reference tag (key VALUE_LIST_REF) for enumerable data described by
+  "list reference" attribute (key VLR_LIST) which references to the list
+  (see "list definition" tag) by list id.
 
-  Below the example of a XML file with use default keywords.
+  Below is an example of the XML file using default keywords.
 
+  \verbatim
   <datadictionary version="1.0">
     <component name="My Component">
 
@@ -225,12 +247,14 @@ IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
 
     </component>
   </datadictionary>
-
-
+  \endverbatim
 */
 
 /*!
-  Constructor. Creates the instance of dictionary. Private method. Use DDS_Dictionary::Get() instead.
+  \brief Constructor.
+
+  Create an instance of the dictionary. Can not be used directly.
+  Use Get() method instead.
 */
 DDS_Dictionary::DDS_Dictionary()
 : MMgt_TShared()
@@ -238,22 +262,22 @@ DDS_Dictionary::DDS_Dictionary()
 }
 
 /*!
-  Copy constructor. Internal.
+  \brief Copy constructor (put in private section to prevent object copying).
 */
 DDS_Dictionary::DDS_Dictionary( const DDS_Dictionary& )
 {
 }
 
 /*!
-  Assigment operator. Internal.
+  \brief Assignment operator (put in private section to prevent object copying).
 */
 void DDS_Dictionary::operator=( const DDS_Dictionary& )
 {
 }
 
 /*!
-  Returns the names list of defined unit systems from all components.
-  Parameter \atheSystems will contains the sequence of string names.
+  \brief Get the names of defined units systems from all components.
+  \param theSystems returning sequence of units systems names.
 */
 void DDS_Dictionary::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystems ) const
 {
@@ -277,9 +301,13 @@ void DDS_Dictionary::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystems )
 }
 
 /*!
-  Returns the names list of defined unit systems from the specified component \atheComponent.
-  Parameter \atheSystems will contains the sequence of string names. If component not found then
-  empty list returned.
+  \brief Get the names of defined units systems from the specified component
+         \a theComponent.
+
+  If component is not found, empty list is returned.
+
+  \param theSystems returning sequence of units systems names.
+  \param theComponent component name
 */
 void DDS_Dictionary::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystems,
                                      const TCollection_AsciiString& theComponent ) const
@@ -290,8 +318,13 @@ void DDS_Dictionary::GetUnitSystems( TColStd_SequenceOfAsciiString& theSystems,
 }
 
 /*!
-  Returns the label of unit system \atheSystem. Function find the given unit system in
-  all components. If unit system not found in any component then empty string returned.
+  \brief Get the label of the units system \a theSystem.
+
+  Searches the given units system in all components. If units system is not found
+  in any component, empty string is returned.
+
+  \param theSystem units system
+  \return units system label
 */
 TCollection_ExtendedString DDS_Dictionary::GetUnitSystemLabel( const TCollection_AsciiString& theSystem ) const
 {
@@ -302,9 +335,15 @@ TCollection_ExtendedString DDS_Dictionary::GetUnitSystemLabel( const TCollection
 }
 
 /*!
-  Returns the label of unit system \atheSystem from component \atheComponent. Function find
-  the given unit system in the specified component only. If unit system not found in the
-  component then empty string returned.
+  \brief Get the label of the units system \a theSystem from the
+         component \a theComponent.
+
+  Searches the specified units system in the specified component only.
+  If units system is not found, empty string is returned.
+
+  \param theSystem units system
+  \param theComponent component name
+  \return units system label
 */
 TCollection_ExtendedString DDS_Dictionary::GetUnitSystemLabel( const TCollection_AsciiString& theSystem,
                                                                const TCollection_AsciiString& theComponent ) const
@@ -316,8 +355,12 @@ TCollection_ExtendedString DDS_Dictionary::GetUnitSystemLabel( const TCollection
 }
 
 /*!
-  Gets the name of active unit system from first got component. If any component exist then
-  active unit system name returned or empty string otherwise.
+  \brief Get the name of active units system from the first found component. 
+  
+  If at least one component exists, then its active units system name 
+  is returned. Otherwise, empty string is returned.
+
+  \return active units system name
 */
 TCollection_AsciiString DDS_Dictionary::GetActiveUnitSystem() const
 {
@@ -328,8 +371,13 @@ TCollection_AsciiString DDS_Dictionary::GetActiveUnitSystem() const
 }
 
 /*!
-  Gets the name of active unit system from component \atheComponent. If this component exist
-  active unit system name returned or empty string otherwise.
+  \brief Get the name of active units system from the component \a theComponent.
+
+  If this component exists, its active units system name is returned.
+  Otherwise, empty string is returned.
+
+  \param theComponent component name
+  \return active units system name
 */
 TCollection_AsciiString DDS_Dictionary::GetActiveUnitSystem( const TCollection_AsciiString& theComponent ) const
 {
@@ -340,8 +388,12 @@ TCollection_AsciiString DDS_Dictionary::GetActiveUnitSystem( const TCollection_A
 }
 
 /*!
-  Sets the active unit system named \atheSystem. This unit system will be activated in all
-  existing components if component have it.
+  \brief Set the active units system. 
+
+  This units system will be activated in each existing component, 
+  if it component has this units system.
+
+  \param theSystem units system to be made active
 */
 void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSystem )
 {
@@ -350,8 +402,12 @@ void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSyst
 }
 
 /*!
-  Sets the active unit system named \atheSystem for component \atheComponent. If specified unit
-  system doesn't exist in the component then function do nothing.
+  \brief Set the active units system for the component \a theComponent. 
+
+  If specified units system doesn't exist in the component, nothing happens.
+
+  \param theSystem units system to be made active
+  \param theComponent component name
 */
 void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSystem,
                                           const TCollection_AsciiString& theComponent )
@@ -361,9 +417,10 @@ void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSyst
 }
 
 /*!
-  Returns the instance of dictionary. Create instance if it is NULL.
+  \brief Get the only instance of the data dictionary.
+  \return the only instance of the data dictionary
 */
-Handle(DDS_Dictionary) DDS_Dictionary::Get()
+Handle_DDS_Dictionary DDS_Dictionary::Get()
 {
   static Handle(DDS_Dictionary) sDictionary;
 
@@ -374,8 +431,10 @@ Handle(DDS_Dictionary) DDS_Dictionary::Get()
 }
 
 /*!
-  Load datum definitions in the dictionary from XML file \atheFileName. Returns true if load
-  successed or false otherwise.
+  \brief Load datum definitions in the dictionary from the XML file
+  \a theFileName.
+  \param theFileName XML file name
+  \return \c true if loading is succeded or \c false otherwise.
 */
 Standard_Boolean DDS_Dictionary::Load( const TCollection_AsciiString theFileName )
 {
@@ -404,8 +463,13 @@ Standard_Boolean DDS_Dictionary::Load( const TCollection_AsciiString theFileName
 }
 
 /*!
-  Gets XML keyword as LDOMString by specified \akey. If key doesn't exist then empty string
-  returned. This function provided for convenience.
+  \brief Get XML keyword as LDOMString by specified \a key.
+
+  If key doesn't exist, empty string is returned. 
+  This function is provided for convenience.
+  
+  \param key keyword name
+  \return keyword value
 */
 LDOMString DDS_Dictionary::KeyWord( const TCollection_AsciiString& key )
 {
@@ -421,10 +485,15 @@ LDOMString DDS_Dictionary::KeyWord( const TCollection_AsciiString& key )
 }
 
 /*!
-  Gets dictionary item with specified identifier \atheID from specified component \atheComponent.
-  If component or item not found then null handle returned.
+  \brief Get the data dictionary item by specified identifier \a theID
+  from the component \a theComponent.
+  
+  If the component or item is not found, null handle is returned.
+  \param theID data dictionary item ID
+  \param theComponent component name
+  \return handle to the data dictionary item
 */
-Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID,
+Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID,
                                                 const TCollection_AsciiString& theComponent ) const
 {
   Handle(DDS_DicItem) aDicItem;
@@ -437,10 +506,15 @@ Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& t
 }
 
 /*!
-  Gets dictionary item with specified identifier \atheID. Function find the item in all components.
-  If item not found in any component then null handle returned.
+  \brief Get the data dictionary item by specified identifier \a theID.
+
+  Function searches the item in all components. If item is not found
+  in all components, null handle is returned.
+
+  \param theID data dictionary item ID
+  \return handle to the data dictionary item
 */
-Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID ) const
+Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID ) const
 {
   Handle(DDS_DicItem) aDicItem;
   for ( Standard_Integer i = 1; i <= myGroupMap.Extent() && aDicItem.IsNull(); i++ )
@@ -449,7 +523,9 @@ Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& t
 }
 
 /*!
-  Fill the internal data structures from XML parsed structures. Internal.
+  \brief Fill the internal data structures from the XML node.
+  \param theComponentData component XML node
+  \param theDocElement document XML node
 */
 void DDS_Dictionary::FillDataMap( const LDOM_Element& theComponentData, const LDOM_Element& theDocElement )
 {
@@ -462,8 +538,11 @@ void DDS_Dictionary::FillDataMap( const LDOM_Element& theComponentData, const LD
 }
 
 /*!
-  Convert numeric value \atheValue from specified unit of measure \atheUnits to SI unit of measure
-  (mm for Length, radians for Angles, etc). Converted value returned.
+  \brief Convert numeric value \a theValue from specified measure units
+  \a theUnits to "SI" measure units (mm for Length, radians for Angles, etc).
+  \param theValue value being converted
+  \param theUnits measure units
+  \return converted value
 */
 Standard_Real DDS_Dictionary::ToSI( const Standard_Real theValue, const Standard_CString theUnits )
 {
@@ -486,8 +565,11 @@ Standard_Real DDS_Dictionary::ToSI( const Standard_Real theValue, const Standard
 }
 
 /*!
-  Convert numeric value \atheValue to specified unit of measure \atheUnits from SI unit of measure
-  (mm for Length, radians for Angles, etc). Converted value returned.
+  \brief Convert numeric value \a theValue to specified measure units
+  \a theUnits from "SI" measure units (mm for Length, radians for Angles, etc).
+  \param theValue value being converted
+  \param theUnits measure units
+  \return converted value
 */
 Standard_Real DDS_Dictionary::FromSI( const Standard_Real theValue, const Standard_CString theUnits )
 {
@@ -507,4 +589,19 @@ Standard_Real DDS_Dictionary::FromSI( const Standard_Real theValue, const Standa
     aRetValue = theValue * 100.0;
 
   return aRetValue;
+}
+
+/*!
+  \brief Fill given string container \a seq with keys belonging to group with name \a theComponent
+  \param theComponent name of group whose keys should be stored in the container
+  \param seq returned string container with keys belonging to group; it is not cleared before filling
+*/
+void DDS_Dictionary::GetKeys( const TCollection_AsciiString& theComponent, TColStd_SequenceOfAsciiString& seq ) const
+{
+  Handle( DDS_DicGroup ) aDicGroup;
+  if( myGroupMap.Contains( theComponent ) )
+    aDicGroup = myGroupMap.FindFromKey( theComponent );
+
+  if( !aDicGroup.IsNull() )
+    aDicGroup->GetKeys( seq );
 }

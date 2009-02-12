@@ -1,29 +1,34 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      Plot2d_ToolTip.cxx
 // Author:    Alexandre SOLOVYOV
+//
+#include "Plot2d_ToolTip.h"
+#include "Plot2d_ViewFrame.h"
+#include "Plot2d_Curve.h"
 
-#include <Plot2d_ToolTip.h>
-#include <Plot2d_ViewFrame.h>
-#include <Plot2d_Curve.h>
-
-#include <qfontmetrics.h>
+#include <QFontMetrics>
+#include <QEvent>
+#include <QMouseEvent>
 
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
@@ -46,23 +51,19 @@ Plot2d_ToolTip::~Plot2d_ToolTip()
 
 void Plot2d_ToolTip::onToolTip( QPoint p, QString& str, QFont& f, QRect& txtRect, QRect& rect )
 {
-  int curInd, pInd, dist;
-  double x, y;
-  curInd = myPlot->closestCurve( p.x(), p.y(), dist, x, y, pInd );
+  int pInd;
+  double dist;
 
-  if( dist>maxDist )
-    return;
-  
-  Plot2d_Curve* c = myFrame->getCurves().find( curInd );
-  if( !c )
+  Plot2d_Curve* c = myPlot->getClosestCurve( p, dist, pInd );
+  if( !c || dist>maxDist )
     return;
 
   str = c->text( pInd );
-  if( !str )
+  if( str.isEmpty() )
     return;
 
   QFontMetrics m( f );
-  QStringList lst = QStringList::split( "\n", str );
+  QStringList lst = str.split( "\n", QString::SkipEmptyParts );
   QStringList::const_iterator anIt = lst.begin(), aLast = lst.end();
   int w = 0, h = 0;
   for( ; anIt!=aLast; anIt++ )
@@ -86,7 +87,7 @@ bool Plot2d_ToolTip::eventFilter( QObject* o, QEvent* e )
   if( e && e->type() == QEvent::MouseMove )
   {
     QMouseEvent* me = ( QMouseEvent* )e;
-    if( me->state()==0 )
+    if( me->modifiers()==0 )
       return true;
   }
   return res;

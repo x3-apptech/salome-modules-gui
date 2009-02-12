@@ -1,22 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #if !defined WNT
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
@@ -25,17 +27,20 @@
 
 #include "SUIT_Session.h"
 
-#include <qrect.h>
-#include <qcursor.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <qintdict.h>
-#include <qpopupmenu.h>
-#include <qcolordialog.h>
+#include <QColor>
+#include <QRect>
+#include <QPixmap>
+#include <QPainter>
+#include <QMultiHash>
+#include <QMenu>
+#include <QColorDialog>
+#include <QColormap>
+#include <QCoreApplication>
 
 #include <stdlib.h>
 
 #if !defined WNT
+#include <QX11Info>
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -70,104 +75,106 @@ CMapEntry::CMapEntry()
 CMapEntry::~CMapEntry()
 {
 	if ( alloc )
-        XFreeColormap( QPaintDevice::x11AppDisplay(), cmap );
+	  XFreeColormap( QX11Info::display(), cmap );
 }
 
-static QIntDict<CMapEntry> *cmap_dict = 0;
+static QMultiHash<int,CMapEntry> *cmap_dict = 0;
 static bool mesa_gl = false;
 
 static void cleanup_cmaps()
 {
 	if ( !cmap_dict )
 		return;
-	cmap_dict->setAutoDelete( true );
+	//while (!cmap_dict->isEmpty())
+	//  cmap_dict->erase(cmap_dict->begin());
+	cmap_dict->clear();
 	delete cmap_dict;
 	cmap_dict = 0;
 }
 
 static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
 {
-	if ( !cmap_dict )
-	{
-		cmap_dict = new QIntDict<CMapEntry>;
-		const char *v = glXQueryServerString( dpy, vi->screen, GLX_VERSION );
-		mesa_gl = strstr( v,"Mesa" ) != 0;
-		qAddPostRoutine( cleanup_cmaps );
-	}
+  if ( !cmap_dict )
+  {
+    cmap_dict = new QMultiHash<int,CMapEntry>;
+    const char *v = glXQueryServerString( dpy, vi->screen, GLX_VERSION );
+    mesa_gl = strstr( v,"Mesa" ) != 0;
+    qAddPostRoutine( cleanup_cmaps );
+  }
 
-	CMapEntry *x = cmap_dict->find( (long)vi->visualid );
-    if ( x )					// found colormap for visual
-        return x->cmap;
+  QHash<int,CMapEntry>::iterator itH = cmap_dict->find( (long)vi->visualid );
+  if ( itH != cmap_dict->end() )  // found colormap for visual
+    return itH.value().cmap;
+  
+  CMapEntry x;
+  
+  XStandardColormap *c;
+  int n, i;
 
-    x = new CMapEntry();
+  //#ifdef DEBUG
+  //cout << "Choosing cmap for vID = " << vi->visualid << endl;
+  //#endif
 
-    XStandardColormap *c;
-    int n, i;
-
-    //#ifdef DEBUG
-    //cout << "Choosing cmap for vID = " << vi->visualid << endl;
-    //#endif
-
-    if ( vi->visualid == XVisualIDFromVisual( (Visual*)QPaintDevice::x11AppVisual() ) )
-	{
+  if ( vi->visualid == XVisualIDFromVisual( (Visual*)QX11Info::appVisual() ) )
+  {
 #ifdef DEBUG
-		cout << "Using x11AppColormap" << endl;
+    cout << "Using x11AppColormap" << endl;
 #endif
-		return QPaintDevice::x11AppColormap();
-    }
+    return QX11Info::appColormap();
+  }
 
-    if ( mesa_gl )
-	{
-		Atom hp_cmaps = XInternAtom( dpy, "_HP_RGB_SMOOTH_MAP_LIST", true );
-		if ( hp_cmaps && vi->visual->c_class == TrueColor && vi->depth == 8 )
-		{
-	        if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, hp_cmaps ) )
-            {
-		        i = 0;
-			    while ( i < n && x->cmap == 0 )
-                {
-			        if ( c[i].visualid == vi->visual->visualid )
-				    {
-				        x->cmap = c[i].colormap;
-					    x->scmap = c[i];
-			        }
-				    i++;
-                }
-			    XFree( (char*)c );
-	        }
-        }
-	}
-#if !defined( _OS_SOLARIS_ )
-    if ( !x->cmap )
+  if ( mesa_gl )
+  {
+    Atom hp_cmaps = XInternAtom( dpy, "_HP_RGB_SMOOTH_MAP_LIST", true );
+    if ( hp_cmaps && vi->visual->c_class == TrueColor && vi->depth == 8 )
     {
-	    if ( XmuLookupStandardColormap( dpy, vi->screen, vi->visualid, vi->depth, XA_RGB_DEFAULT_MAP, false, true ) )
-        {
-		    if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, XA_RGB_DEFAULT_MAP ) )
-            {
-			    i = 0;
-				while ( i < n && x->cmap == 0 )
-				{
-				    if ( c[i].visualid == vi->visualid )
-                    {
-					    x->cmap = c[i].colormap;
-						x->scmap = c[i];
-				    }
-					i++;
-                }
-				XFree( (char *)c );
-            }
-        }
-    }
-#endif
-	if ( !x->cmap )
+      if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, hp_cmaps ) )
+      {
+	i = 0;
+	while ( i < n && x.cmap == 0 )
 	{
-		// no shared cmap found
-		x->cmap = XCreateColormap( dpy, RootWindow( dpy, vi->screen ), vi->visual, AllocNone );
-		x->alloc = true;
+	  if ( c[i].visualid == vi->visual->visualid )
+	  {
+	    x.cmap = c[i].colormap;
+	    x.scmap = c[i];
+	  }
+	  i++;
 	}
+	XFree( (char*)c );
+      }
+    }
+  }
+#if !defined( _OS_SOLARIS_ )
+  if ( !x.cmap )
+  {
+    if ( XmuLookupStandardColormap( dpy, vi->screen, vi->visualid, vi->depth, XA_RGB_DEFAULT_MAP, false, true ) )
+    {
+      if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, XA_RGB_DEFAULT_MAP ) )
+      {
+	i = 0;
+	while ( i < n && x.cmap == 0 )
+	{
+	  if ( c[i].visualid == vi->visualid )
+	  {
+	    x.cmap = c[i].colormap;
+	    x.scmap = c[i];
+	  }
+	  i++;
+	}
+	XFree( (char *)c );
+      }
+    }
+  }
+#endif
+  if ( !x.cmap )
+  {
+    // no shared cmap found
+    x.cmap = XCreateColormap( dpy, RootWindow( dpy, vi->screen ), vi->visual, AllocNone );
+    x.alloc = true;
+  }
 
-	cmap_dict->insert( (long)vi->visualid, x ); // associate cmap with visualid
-	return x->cmap;
+  cmap_dict->insert( (long)vi->visualid, x ); // associate cmap with visualid
+  return x.cmap;
 }
 #endif
 
@@ -176,7 +183,7 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
     Constructor
 */
 OCCViewer_ViewPort::OCCViewer_ViewPort( QWidget* parent )
-: QWidget( parent, 0, WRepaintNoErase | WResizeNoErase )
+: QWidget( parent )
 {
 	initialize();
 }
@@ -194,15 +201,16 @@ OCCViewer_ViewPort::~OCCViewer_ViewPort()
 */
 void OCCViewer_ViewPort::initialize()
 {
-  myPopupActions.setAutoDelete( true );
   myPaintersRedrawing = false;
   myEnableSketching = true;
   myEnableTransform = true;
   
   setMouseTracking( true );
-  setBackgroundMode( NoBackground );
+  setBackgroundRole( QPalette::NoRole );//NoBackground );
   // set focus policy to threat QContextMenuEvent from keyboard  
-  setFocusPolicy( StrongFocus );
+  setFocusPolicy( Qt::StrongFocus );
+  setAttribute( Qt::WA_PaintOnScreen );
+  setAttribute( Qt::WA_NoSystemBackground );
 }
 
 /*!
@@ -219,57 +227,57 @@ void OCCViewer_ViewPort::selectVisualId()
 {
 #if !defined WNT
 	XVisualInfo* pVisualInfo;
-	if ( x11Display() )
+	if ( QX11Info::display() )
 	{
 		/* Initialization with the default VisualID */
-		Visual *v = DefaultVisual( x11Display(), DefaultScreen( x11Display() ) );
+		Visual *v = DefaultVisual( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
 		int visualID = XVisualIDFromVisual( v );
 
 		/*  Here we use the settings from Optimizer_ViewInfo::TxglCreateWindow() */
 		int visualAttr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
 							 GLX_BLUE_SIZE, 1, GLX_DOUBLEBUFFER, None };
 
-		pVisualInfo = ::glXChooseVisual( x11Display(), DefaultScreen( x11Display() ), visualAttr );
+		pVisualInfo = ::glXChooseVisual( QX11Info::display(), DefaultScreen( QX11Info::display() ), visualAttr );
 
 		if ( isVisible() )
-            hide();
+		  hide();
 
 		XSetWindowAttributes a;
 
-		a.colormap = choose_cmap( x11Display(), pVisualInfo );	    /* find best colormap */
-		a.background_pixel = backgroundColor().pixel();
-		a.border_pixel = black.pixel();
-		Window p = RootWindow( x11Display(), DefaultScreen( x11Display() ) );
+		a.colormap = choose_cmap( QX11Info::display(), pVisualInfo );	    /* find best colormap */
+		a.background_pixel = QColormap::instance().pixel( backgroundColor() );
+		a.border_pixel = QColormap::instance().pixel( Qt::black );
+		Window p = RootWindow( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
 		if ( parentWidget() )
-            p = parentWidget()->winId();
+		  p = parentWidget()->winId();
 
-        Window w;
+		Window w;
 	/*        if ( type == Type2D )  // creating simple X window for 2d
         {
             unsigned long xbackground =
-                BlackPixel( x11Display(), DefaultScreen( x11Display() ) );
+                BlackPixel( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
             unsigned long xforeground =
-                WhitePixel( x11Display(), DefaultScreen( x11Display() ) );
+                WhitePixel( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
 
-            w = XCreateSimpleWindow ( x11Display(), p, x(), y(), width(),
+            w = XCreateSimpleWindow ( QX11Info::display(), p, x(), y(), width(),
                                       height(), 0, xforeground, xbackground );
         }
         else if ( type == Type3D )
         {
-		    w = XCreateWindow( x11Display(), p,  x(), y(), width(), height(),
+		    w = XCreateWindow( QX11Info::display(), p,  x(), y(), width(), height(),
                                0, pVisualInfo->depth, InputOutput, pVisualInfo->visual,
                                CWBackPixel | CWBorderPixel | CWColormap, &a );
 		}
 		else
 		return;*/
-	w = XCreateWindow( x11Display(), p,  x(), y(), width(), height(),
+	w = XCreateWindow( QX11Info::display(), p,  x(), y(), width(), height(),
 			   0, pVisualInfo->depth, InputOutput, pVisualInfo->visual,
 			   CWBackPixel | CWBorderPixel | CWColormap, &a );
 	
 		Window *cmw;
 		Window *cmwret;
 		int count;
-		if ( XGetWMColormapWindows( x11Display(), topLevelWidget()->winId(), &cmwret, &count ) )
+		if ( XGetWMColormapWindows( QX11Info::display(), topLevelWidget()->winId(), &cmwret, &count ) )
 		{
 			cmw = new Window[count+1];
 			memcpy( (char*)cmw, (char*)cmwret, sizeof(Window) * count );
@@ -297,7 +305,7 @@ void OCCViewer_ViewPort::selectVisualId()
 
 		/* Creating new window (with good VisualID) for this widget */
 		create(w);
-		XSetWMColormapWindows( x11Display(), topLevelWidget()->winId(), cmw, count );
+		XSetWMColormapWindows( QX11Info::display(), topLevelWidget()->winId(), cmw, count );
 		delete[] cmw;
 
 		if ( isVisible() )
@@ -307,7 +315,7 @@ void OCCViewer_ViewPort::selectVisualId()
         {
 			XFree( (char *)pVisualInfo );
 		}
-  		XFlush( x11Display() );
+  		XFlush( QX11Info::display() );
 	}
 #endif
 }
@@ -318,7 +326,7 @@ void OCCViewer_ViewPort::selectVisualId()
 void OCCViewer_ViewPort::setBackgroundColor( const QColor& color )
 {
     QPalette pal = palette();
-    pal.setColor( QColorGroup::Background, color );
+    pal.setColor( QPalette::Background, color );
     setPalette( pal );
     repaint();
     emit vpChangeBGColor( color );
@@ -329,7 +337,7 @@ void OCCViewer_ViewPort::setBackgroundColor( const QColor& color )
 */
 QColor OCCViewer_ViewPort::backgroundColor() const
 {
-    return palette().active().background();
+    return palette().color( QPalette::Active, QPalette::Background );
 }
 
 /*!
@@ -466,6 +474,8 @@ void OCCViewer_ViewPort::onUpdate()
 	{
 		for ( QtxAction* a = myPopupActions.first(); a; a = myPopupActions.next() )
 			a->removeFrom( popup );
+		//while (!myPopupActions.isEmpty())
+		//  delete myPopupActions.takeFirst();
 		myPopupActions.clear();
 	}
 }*/

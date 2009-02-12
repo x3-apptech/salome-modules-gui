@@ -1,26 +1,28 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_DataModel.h
 // Created:   10/25/2004 10:32:33 AM
 // Author:    Sergey LITONIN
-// Copyright (C) CEA 2004
-
+//
 #ifndef LIGHTAPP_DATAMODEL_H
 #define LIGHTAPP_DATAMODEL_H
 
@@ -34,6 +36,7 @@
 class LightApp_Module;
 class LightApp_Study;
 class LightApp_DataObject;
+class SUIT_DataBrowser;
 
 /*!
   Description : Base class of data model
@@ -58,6 +61,10 @@ public:
 
   LightApp_Module*                    getModule() const;
 
+  int  groupId() const;
+  void registerColumn( SUIT_DataBrowser*, const QString&, const int );
+  void unregisterColumn( SUIT_DataBrowser*, const QString& );
+
 signals:
   void                                opened();
   void                                saved();
@@ -67,6 +74,9 @@ protected:
   LightApp_Study*                     getStudy() const;
   virtual void                        build();
   virtual void                        updateWidgets();
+
+private:
+  int myGroupId;
 };
 
 #endif 

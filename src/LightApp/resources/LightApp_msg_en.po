@@ -1,4 +1,7 @@
-#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -14,11 +17,12 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 # This is a Qt message file in .po format.  Each msgid starts with
 # a scope.  This scope should *NOT* be translated - eg. "Foo::Bar"
 # would be translated to "Pub", not "Foo::Pub".
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: example-Qt-message-extraction\n"
@@ -40,7 +44,7 @@ msgid "ABOUT_VERSION"
 msgstr "Version %1"
 
 msgid "ABOUT_COPYRIGHT"
-msgstr "Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
+msgstr "Copyright (C) 2003-2006 OPEN CASCADE, EADS/CCR, LIP6,\nCEA/DEN, CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS"
 
 msgid "ABOUT_LICENSE"
 msgstr "GNU LGPL"
@@ -84,19 +88,22 @@ msgid "LightApp_Application::PRP_MODULE"
 msgstr "Switch to the module \"%1\""
 
 msgid "LightApp_Application::NEW_WINDOW_0"
-msgstr "&GL view"
+msgstr "&GL View"
 
 msgid "LightApp_Application::NEW_WINDOW_1"
-msgstr "&Plot2d view"
+msgstr "&Plot2d View"
 
 msgid "LightApp_Application::NEW_WINDOW_2"
-msgstr "&OCC view"
+msgstr "&OCC View"
 
 msgid "LightApp_Application::NEW_WINDOW_3"
-msgstr "VT&K view"
+msgstr "VT&K View"
 
 msgid "LightApp_Application::NEW_WINDOW_4"
-msgstr "&QxGraph view"
+msgstr "&QxGraph View"
+
+msgid "LightApp_Application::NEW_WINDOW_5"
+msgstr "Qx&Scene View"
 
 msgid "LightApp_Application::INF_CANCELLED"
 msgstr "Module activation cancelled"
@@ -122,7 +129,7 @@ msgstr "Message Window"
 //=======================================================================================
 
 msgid "LightApp_Application::MEN_DESK_MODULE_HELP"
-msgstr "Module help"
+msgstr "Module Help"
 
 //=======================================================================================
 
@@ -161,6 +168,12 @@ msgstr "Python console properties"
 
 msgid "LightApp_Application::PREF_FONT"
 msgstr "Font"
+
+msgid "LightApp_Application::PREF_GROUP_STYLE"
+msgstr "Salome style"
+
+msgid "LightApp_Application::PREF_USE_SALOME_STYLE"
+msgstr "Use Salome style"
 
 msgid "LightApp_Application::PREF_TAB_OBJBROWSER"
 msgstr "Object browser"
@@ -254,9 +267,6 @@ msgstr "Quick directory list"
 msgid "LightApp_Application::MEN_REFRESH"
 msgstr "Refresh"
 
-msgid "LightApp_Application::MEN_FIND"
-msgstr "Find"
-
 msgid "LightApp_Application::PREF_GROUP_SUPERV"
 msgstr "Graph Supervisor"
 
@@ -294,59 +304,65 @@ msgstr "Import"
 
 //=======================================================================================
 
-msgid "LightApp_Module::TOP_SHOW"
-msgstr "Show"
+msgid "LightApp_Module::TOP_DISPLAY"
+msgstr "Display"
 
-msgid "LightApp_Module::MEN_SHOW"
-msgstr "Show"
+msgid "LightApp_Module::MEN_DISPLAY"
+msgstr "Display"
 
-msgid "LightApp_Module::STB_SHOW"
-msgstr "Show"
+msgid "LightApp_Module::STB_DISPLAY"
+msgstr "Display"
 
-msgid "LightApp_Module::TOP_HIDE"
-msgstr "Hide"
+msgid "LightApp_Module::TOP_ERASE"
+msgstr "Erase"
 
-msgid "LightApp_Module::MEN_HIDE"
-msgstr "Hide"
+msgid "LightApp_Module::MEN_ERASE"
+msgstr "Erase"
 
-msgid "LightApp_Module::STB_HIDE"
-msgstr "Hide"
+msgid "LightApp_Module::STB_ERASE"
+msgstr "Erase"
 
 msgid "LightApp_Module::TOP_DISPLAY_ONLY"
-msgstr "Show only"
+msgstr "Display only"
 
 msgid "LightApp_Module::MEN_DISPLAY_ONLY"
-msgstr "Show only"
+msgstr "Display only"
 
 msgid "LightApp_Module::STB_DISPLAY_ONLY"
-msgstr "Show only"
+msgstr "Display only"
 
 msgid "LightApp_Module::TOP_ERASE_ALL"
-msgstr "Hide all"
+msgstr "Erase all"
 
 msgid "LightApp_Module::MEN_ERASE_ALL"
-msgstr "Hide all"
+msgstr "Erase all"
 
 msgid "LightApp_Module::STB_ERASE_ALL"
-msgstr "Hide all"
+msgstr "Erase all"
 //=======================================================================================
 
 
 msgid "LightApp_ModuleDlg::CAPTION"
 msgstr "Activate module"
 
-msgid "LightApp_ModuleDlg::DESCRIPTION"
-msgstr "You're activating module <b>%1</b>.<br>Please, select required action by pressing the corresponding button below."
+msgid "LightApp_ModuleDlg::NEW"
+msgstr "&New"
+
+msgid "LightApp_ModuleDlg::OPEN"
+msgstr "&Open"
+
+msgid "LightApp_ModuleDlg::LOAD"
+msgstr "&Load"
+
+msgid "LightApp_ModuleDlg::CANCEL"
+msgstr "&Cancel"
+
+msgid "LightApp_ModuleDlg::ActivateComponent_DESCRIPTION"
+msgstr "Create, open or load study."
 
 msgid "LightApp_NameDlg::TLT_RENAME"
 msgstr "Rename"
 
 msgid "LightApp_NameDlg::NAME_LBL"
 msgstr "Name: "
-
-msgid "LightApp_Application::ACTIVATE_MODULE_OP_OPEN"
-msgstr "&Open..."
-
-msgid "LightApp_Application::ACTIVATE_MODULE_OP_NEW"
-msgstr "&New"
 

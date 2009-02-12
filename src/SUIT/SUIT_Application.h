@@ -1,38 +1,42 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef SUIT_APPLICATION_H
 #define SUIT_APPLICATION_H
 
 #include "SUIT.h"
-#include "SUIT_Study.h"
 
-#include <qobject.h>
-#include <qwidget.h>
+#include <QObject>
+#include <QMap>
 
+class QIcon;
 class QLabel;
 class QString;
 class QAction;
-class QIconSet;
+class QWidget;
+
 class SUIT_Desktop;
-class SUIT_Convertor;
 class SUIT_ViewModel;
 class SUIT_ResourceMgr;
+class SUIT_Study;
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )
@@ -83,9 +87,6 @@ public:
   //! Opens document <theFileName> into active Study. If Study is empty - creates it.
   virtual bool          useFile( const QString& theFileName);
 
-  //! Loads document <theName> into active Study. If Study is empty - creates it.
-  virtual bool          useStudy( const QString& theName);
-
   //! Creates new empty Study if active Study = 0
   virtual void          createEmptyStudy();
 
@@ -94,10 +95,6 @@ public:
   virtual int           getNbStudies() const;
 
   SUIT_ResourceMgr*     resourceMgr() const;
-
-  /*! Returns instance of data object Convertor class according to given Viewer. 
-      If convertation is not supported returns 0. */
-  virtual SUIT_Convertor* getConvertor(const SUIT_ViewModel* theViewer) { return 0; }
 
   //! Puts the message to the status bar  
   void putInfo ( const QString&, const int = 0 );
@@ -116,7 +113,7 @@ signals:
 
 public slots:
   virtual void          updateCommandsStatus();
-  virtual void          onHelpContextModule( const QString&, const QString& );
+  virtual void          onHelpContextModule( const QString&, const QString&, const QString& = QString() );
 
 private slots:
   void                  onInfoClear();
@@ -159,8 +156,12 @@ protected:
   static QAction*       separator();
   QAction*              action( const int ) const;
   int                   actionId( const QAction* ) const;
+
+  QList<QAction*>       actions() const;
+  QList<int>            actionIds() const;
+
   int                   registerAction( const int, QAction* );
-  QAction*              createAction( const int, const QString&, const QIconSet&, const QString&,
+  QAction*              createAction( const int, const QString&, const QIcon&, const QString&,
                                       const QString&, const int, QObject* = 0,
                                       const bool = false, QObject* = 0, const char* = 0 );
 

@@ -1,33 +1,32 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : 
 //  Author : 
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SVTK_SetRotationPointDlg.h"
-#include "SVTK_MainWindow.h"
+#include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
 #include "SVTK_Event.h"
 #include "SVTK_InteractorStyle.h"
@@ -36,16 +35,13 @@
 
 #include "QtxAction.h"
 
-#include <qlineedit.h>
-#include <qgroupbox.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qvalidator.h>
-#include <qbuttongroup.h>
-#include <qobjectlist.h>
-#include <qcheckbox.h>
-#include <qhbox.h>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QDoubleValidator>
+#include <QCheckBox>
 
 #include <vtkCallbackCommand.h>
 
@@ -56,7 +52,7 @@ using namespace std;
 */
 SVTK_SetRotationPointDlg
 ::SVTK_SetRotationPointDlg(QtxAction* theAction,
-			   SVTK_MainWindow* theParent,
+			   SVTK_ViewWindow* theParent,
 			   const char* theName):
   SVTK_DialogBase(theAction,
 		  theParent, 
@@ -66,7 +62,7 @@ SVTK_SetRotationPointDlg
   myEventCallbackCommand(vtkCallbackCommand::New()),
   myRWInteractor(theParent->GetInteractor())
 {
-  setCaption(tr("DLG_TITLE"));
+  setWindowTitle(tr("DLG_TITLE"));
   setSizeGripEnabled(TRUE);
 
   // Create layout for this dialog
@@ -75,35 +71,42 @@ SVTK_SetRotationPointDlg
   layoutDlg->setMargin(11);
 
   // Create check box "Use Bounding Box Center"
-  QHBox* aCheckBox = new QHBox(this);
+  QHBoxLayout* aCheckBox = new QHBoxLayout;
 
-  myIsBBCenter = new QCheckBox(tr("USE_BBCENTER"), aCheckBox);
+  myIsBBCenter = new QCheckBox(tr("USE_BBCENTER"));
   myIsBBCenter->setChecked(true);
+  aCheckBox->addWidget(myIsBBCenter);
   connect(myIsBBCenter, SIGNAL(stateChanged(int)), SLOT(onBBCenterChecked()));
 
   // Create croup button with radio buttons
-  myGroupSelButton = new QButtonGroup(2,Qt::Vertical,"",this);
-  myGroupSelButton->setMargin(11);
+  myGroupBoxSel = new QGroupBox( "", this );
+  QVBoxLayout *vbox = new QVBoxLayout( myGroupBoxSel );
+  vbox->setMargin(11);
+  vbox->addStretch(1);
   
   // Create "Set to Origin" button
-  myToOrigin = new QPushButton(myGroupSelButton);
+  myToOrigin = new QPushButton(myGroupBoxSel);
   myToOrigin->setText(tr("LBL_TOORIGIN"));
+  vbox->addWidget(myToOrigin);
   connect(myToOrigin, SIGNAL(clicked()), this, SLOT(onToOrigin()));
 
   // Create "Select Point from View" button
-  mySelectPoint = new QPushButton(myGroupSelButton);
+  mySelectPoint = new QPushButton(myGroupBoxSel);
   mySelectPoint->setText(tr("LBL_SELECTPOINT"));
-  mySelectPoint->setToggleButton(true);
+  mySelectPoint->setCheckable(true);
+  vbox->addWidget(mySelectPoint);
   connect(mySelectPoint, SIGNAL(clicked()), this, SLOT(onSelectPoint()));
 
   // Create croup box with grid layout
-  myGroupBoxCoord = new QGroupBox(this, "GroupBox");
+  myGroupBoxCoord = new QGroupBox(this);
+  myGroupBoxCoord->setObjectName("GroupBox");
   QHBoxLayout* aHBoxLayout = new QHBoxLayout(myGroupBoxCoord);
   aHBoxLayout->setMargin(11);
   aHBoxLayout->setSpacing(6);
 
   // "X" coordinate
-  QLabel* TextLabelX = new QLabel (tr("LBL_X"), myGroupBoxCoord, "TextLabelX");
+  QLabel* TextLabelX = new QLabel (tr("LBL_X"), myGroupBoxCoord );
+  TextLabelX->setObjectName("TextLabelX");
   TextLabelX->setFixedWidth(15);
   myX = new QLineEdit(myGroupBoxCoord);
   myX->setValidator(new QDoubleValidator(myX));
@@ -111,7 +114,8 @@ SVTK_SetRotationPointDlg
   connect(myX, SIGNAL(textChanged(const QString&)), this, SLOT(onCoordChanged()));
 
   // "Y" coordinate
-  QLabel* TextLabelY = new QLabel (tr("LBL_Y"), myGroupBoxCoord, "TextLabelY");
+  QLabel* TextLabelY = new QLabel (tr("LBL_Y"), myGroupBoxCoord );
+  TextLabelY->setObjectName("TextLabelY");
   TextLabelY->setFixedWidth(15);
   myY = new QLineEdit(myGroupBoxCoord);
   myY->setValidator(new QDoubleValidator(myY));
@@ -119,7 +123,8 @@ SVTK_SetRotationPointDlg
   connect(myY, SIGNAL(textChanged(const QString&)), this, SLOT(onCoordChanged()));
 
   // "Z" coordinate
-  QLabel* TextLabelZ = new QLabel (tr("LBL_Z"), myGroupBoxCoord, "TextLabelZ");
+  QLabel* TextLabelZ = new QLabel (tr("LBL_Z"), myGroupBoxCoord );
+  TextLabelZ->setObjectName("TextLabelZ");
   TextLabelZ->setFixedWidth(15);
   myZ = new QLineEdit(myGroupBoxCoord);
   myZ->setValidator(new QDoubleValidator(myZ));
@@ -140,7 +145,8 @@ SVTK_SetRotationPointDlg
   aHBoxLayout2->setMargin(11);
   aHBoxLayout2->setSpacing(6);
 
-  QPushButton* m_bClose = new QPushButton(tr("&Close"), aGroupBox, "m_bClose");
+  QPushButton* m_bClose = new QPushButton(tr("&Close"), aGroupBox );
+  m_bClose->setObjectName("m_bClose");
   m_bClose->setAutoDefault(TRUE);
   m_bClose->setFixedSize(m_bClose->sizeHint());
   connect(m_bClose, SIGNAL(clicked()), this, SLOT(onClickClose()));
@@ -149,12 +155,12 @@ SVTK_SetRotationPointDlg
   aHBoxLayout2->addWidget(m_bClose);
 
   // Layout top level widgets
-  layoutDlg->addWidget(aCheckBox,0,0);
-  layoutDlg->addWidget(myGroupSelButton,1,0);
+  layoutDlg->addLayout(aCheckBox,0,0);
+  layoutDlg->addWidget(myGroupBoxSel,1,0);
   layoutDlg->addWidget(myGroupBoxCoord,2,0);
   layoutDlg->addWidget(aGroupBox,3,0);
   
-  setEnabled(myGroupSelButton,!myIsBBCenter->isChecked());
+  setEnabled(myGroupBoxSel,!myIsBBCenter->isChecked());
   setEnabled(myGroupBoxCoord,!myIsBBCenter->isChecked());
 
   this->resize(400, this->sizeHint().height());
@@ -240,10 +246,11 @@ void
 SVTK_SetRotationPointDlg
 ::setEnabled(QGroupBox* theGrp, const bool theState)
 {
-  QObjectList aChildren(*theGrp->children());
+  QObjectList aChildren(theGrp->children());
   QObject* anObj;
-  for(anObj = aChildren.first(); anObj !=0; anObj = aChildren.next())
+  for(int i = 0; i < aChildren.size(); i++)
   {
+    anObj = aChildren.at(i);
     if (anObj !=0 && anObj->inherits("QLineEdit"))
       ((QLineEdit*)anObj)->setReadOnly(!theState);
     if (anObj !=0 && anObj->inherits("QPushButton"))
@@ -256,12 +263,12 @@ void
 SVTK_SetRotationPointDlg
 ::onBBCenterChecked()
 {
-  setEnabled(myGroupSelButton,!myIsBBCenter->isChecked());
+  setEnabled(myGroupBoxSel,!myIsBBCenter->isChecked());
   setEnabled(myGroupBoxCoord,!myIsBBCenter->isChecked());
   
   if ( myIsBBCenter->isChecked() )
   { 
-    if ( mySelectPoint->state() == QButton::On )
+    if ( mySelectPoint->isChecked() )
       mySelectPoint->toggle();
     // activate mode : the rotation point is the center of the bounding box
     // send the data to the SVTK_InteractorStyle: set the type of the rotation point
@@ -280,7 +287,7 @@ void
 SVTK_SetRotationPointDlg
 ::onToOrigin()
 {
-  if ( mySelectPoint->state() == QButton::On )
+  if ( mySelectPoint->isChecked() )
     mySelectPoint->toggle();
   myX->setText(QString::number(0.0));
   myY->setText(QString::number(0.0));
@@ -291,7 +298,7 @@ void
 SVTK_SetRotationPointDlg
 ::onSelectPoint()
 {
-  if ( mySelectPoint->state() == QButton::On )
+  if ( mySelectPoint->isChecked() )
     myMainWindow->activateStartPointSelection();
   else
     mySelectPoint->toggle();
@@ -302,7 +309,7 @@ SVTK_SetRotationPointDlg
 ::onCoordChanged()
 {
   if ( !myIsBBCenter->isChecked() ) {
-    if ( mySelectPoint->state() == QButton::On
+    if ( mySelectPoint->isChecked()
 	 &&
 	 ( myX->hasFocus() || myY->hasFocus() || myZ->hasFocus() ) )
       mySelectPoint->toggle();

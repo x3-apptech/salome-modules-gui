@@ -1,22 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "LightApp_Displayer.h"
 #include "LightApp_Application.h"
 #include "LightApp_Module.h"
@@ -29,7 +31,7 @@
 #include <SUIT_ViewModel.h>
 #include <SUIT_ViewWindow.h>
 
-#include <qstring.h>
+#include <QString>
 #ifndef DISABLE_SALOMEOBJECT
   #include "SALOME_InteractiveObject.hxx"
 #endif
@@ -56,12 +58,11 @@ LightApp_Displayer::~LightApp_Displayer()
 */
 void LightApp_Displayer::Display( const QString& entry, const bool updateViewer, SALOME_View* theViewFrame )
 {
-  SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
-  if ( vf )
+  SALOME_Prs* prs = buildPresentation( entry, theViewFrame );
+  if ( prs )
   {
-    SALOME_Prs* prs = buildPresentation( entry, vf );
-
-    if ( prs )
+    SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
+    if ( vf )
     {
       vf->BeforeDisplay( this );
       vf->Display( prs );
@@ -88,11 +89,10 @@ void LightApp_Displayer::Redisplay( const QString& entry, const bool updateViewe
   if ( app )
   {
     SUIT_Desktop* desk = app->desktop();
-    QPtrList<SUIT_ViewWindow> wnds = desk->windows();
-    SUIT_ViewWindow* wnd;
-    for ( wnd = wnds.first(); wnd; wnd = wnds.next() )
+    QListIterator<SUIT_ViewWindow*> itWnds( desk->windows() );
+    while ( itWnds.hasNext() )
     {
-      SUIT_ViewManager* vman = wnd->getViewManager();
+      SUIT_ViewManager* vman = itWnds.next()->getViewManager();
       if( !vman )
         continue;
 
@@ -123,7 +123,7 @@ void LightApp_Displayer::Erase( const QString& entry, const bool forced,
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
 
   if ( vf ) {
-    SALOME_Prs* prs = vf->CreatePrs( entry.latin1() );
+    SALOME_Prs* prs = vf->CreatePrs( entry.toLatin1() );
     if ( prs ) {
       vf->Erase( prs, forced );
       if ( updateViewer )
@@ -163,7 +163,7 @@ bool LightApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theView
   {
 #ifndef DISABLE_SALOMEOBJECT
     Handle( SALOME_InteractiveObject ) temp = new SALOME_InteractiveObject();
-    temp->setEntry( entry.latin1() );
+    temp->setEntry( entry.toLatin1() );
     res = vf->isVisible( temp );
 #endif
   }
@@ -193,7 +193,7 @@ SALOME_Prs* LightApp_Displayer::buildPresentation( const QString& entry, SALOME_
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
 
   if ( vf )
-    prs = vf->CreatePrs( entry.latin1() );
+    prs = vf->CreatePrs( entry.toLatin1() );
 
   return prs;
 }
@@ -238,7 +238,7 @@ bool LightApp_Displayer::canBeDisplayed( const QString& entry ) const
       if( SUIT_ViewManager* vman = sApp->activeViewManager() )
 	if( SUIT_ViewModel* vmod = vman->getViewModel() )
 	  viewerType = vmod->getType();
-  return !viewerType.isNull() && canBeDisplayed( entry, viewerType );
+  return canBeDisplayed( entry, viewerType );
 }
 
 /*!
@@ -257,7 +257,7 @@ LightApp_Displayer* LightApp_Displayer::FindDisplayer( const QString& mod_name, 
   LightApp_Module* m = dynamic_cast<LightApp_Module*>( app ? app->module( mod_name ) : 0 );
   if( !m && load )
   {
-    m = dynamic_cast<LightApp_Module*>( app->loadModule( mod_name ) );
+    m = dynamic_cast<LightApp_Module*>( app->loadModule( mod_name, false ) );
     if( m )
       app->addModule( m );
   }

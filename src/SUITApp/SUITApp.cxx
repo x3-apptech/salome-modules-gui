@@ -1,49 +1,66 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-#if defined WNT
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+#if defined WIN32
 
+#ifdef SUIT_ENABLE_PYTHON
 #undef SUIT_ENABLE_PYTHON
-//#else
-//#include "SUITconfig.h"
 #endif
+
+#else //#if defined WIN32
+
+#ifndef SUIT_ENABLE_PYTHON
+// NOTE: DO NOT DELETE THIS DEFINITION ON LINUX
+// or make sure Python is initialized in main() in any case
+// Otherwise, application based on light SALOME and using Python 
+// are unlikely to work properly.
+#define SUIT_ENABLE_PYTHON
+#include <Python.h>
+#endif
+
+#endif //#if defined WIN32
 
 #include "SUITApp_Application.h"
 
 #include <SUIT_Session.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ResourceMgr.h>
-
+#include <Style_Salome.h>
 #include <QtxSplash.h>
 
-#ifdef SUIT_ENABLE_PYTHON
-#include <Python.h>
-#endif
+#include <SUIT_LicenseDlg.h>
 
-#include <qdir.h>
-#include <qfile.h>
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QFile>
+#include <QRegExp>
+#include <QString>
+#include <QStringList>
 
 #include <stdlib.h>
 
-QString salomeVersion()
+#ifdef WIN32
+#include <UserEnv.h>
+#endif
+
+static QString salomeVersion()
 {
   QString path( ::getenv( "GUI_ROOT_DIR" ) );
   if ( !path.isEmpty() )
@@ -52,27 +69,49 @@ QString salomeVersion()
   path += QString( "bin/salome/VERSION" );
 
   QFile vf( path );
-  if ( !vf.open( IO_ReadOnly ) )
-    return QString::null;
+  if ( !vf.open( QFile::ReadOnly ) )
+    return QString();
 
-  QString line;
-  vf.readLine( line, 1024 );
+  QString line = vf.readLine( 1024 );
   vf.close();
 
   if ( line.isEmpty() )
-    return QString::null;
+    return QString();
 
   while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
     line.remove( line.length() - 1, 1 );
 
   QString ver;
-  int idx = line.findRev( ":" );
+  int idx = line.lastIndexOf( ":" );
   if ( idx != -1 )
-    ver = line.mid( idx + 1 ).stripWhiteSpace();
+    ver = line.mid( idx + 1 ).trimmed();
 
   return ver;
 }
 
+static void MessageOutput( QtMsgType type, const char* msg )
+{
+  switch ( type )
+  {
+  case QtDebugMsg:
+#ifdef _DEBUG_
+    printf( "Debug: %s\n", msg );
+#endif
+    break;
+  case QtWarningMsg:
+#ifdef _DEBUG_
+    printf( "Warning: %s\n", msg );
+#endif
+    break;
+  case QtFatalMsg:
+#ifdef _DEBUG_
+    printf( "Fatal: %s\n", msg );
+#endif
+    break;
+  default:
+    break;
+  }
+}
 
 /* XPM */
 static const char* pixmap_not_found_xpm[] = {
@@ -108,7 +147,7 @@ public:
     SUIT_ResourceMgr* resMgr = 0;
     if ( myIniFormat )
     {
-      resMgr = new SUIT_ResourceMgr( appName );
+      resMgr = new SUIT_ResourceMgr( appName, QString( "%1Config" ) );
       resMgr->setCurrentFormat( "ini" );
     }
     else
@@ -131,18 +170,26 @@ private:
   bool  myIniFormat;
 };
 
-int main( int args, char* argv[] )
+int main( int argc, char* argv[] )
 {
 #ifdef SUIT_ENABLE_PYTHON
-  Py_Initialize();
-  PySys_SetArgv( args, argv );
+  // First of all initialize Python, as in complex multi-component applications
+  // someone else might initialize it some way unsuitable for light SALOME!
+  Py_SetProgramName( argv[0] );
+  Py_Initialize(); // Initialize the interpreter
+  PySys_SetArgv( argc,  argv );
+  PyEval_InitThreads(); // Create (and acquire) the interpreter lock
+  PyEval_ReleaseLock(); // Let the others use Python API until we need it again
 #endif
+
+  //qInstallMsgHandler( MessageOutput );
 
   QStringList argList;
   bool noExceptHandling = false;
   bool iniFormat        = false;
   bool noSplash         = false;
-  for ( int i = 1; i < args /*&& !noExceptHandling*/; i++ )
+  bool useLicense       = false;
+  for ( int i = 1; i < argc /*&& !noExceptHandling*/; i++ )
   {
     if ( !strcmp( argv[i], "--noexcepthandling" ) )
       noExceptHandling = true;
@@ -150,83 +197,92 @@ int main( int args, char* argv[] )
       iniFormat = true;
     else if ( !strcmp( argv[i], "--nosplash") )
       noSplash = true;
-    else
+	else if ( !strcmp( argv[i], "--uselicense" ) )
+      useLicense = true;
+	else
       argList.append( QString( argv[i] ) );
   }
 
-  SUITApp_Application app( args, argv );
+  SUITApp_Application app( argc, argv );
 
   int result = -1;
+
+  if ( useLicense ) {
+    QString env;
+
+#ifdef WIN32
+    DWORD aLen=1024;
+    char aStr[1024];
+    HANDLE aToken=0;
+    HANDLE hProcess = GetCurrentProcess();
+    OpenProcessToken(hProcess,TOKEN_QUERY,&aToken);
+    if( GetUserProfileDirectory( aToken, aStr, &aLen ) )
+      env = aStr;
+
+#else
+    if ( ::getenv( "HOME" ) )
+      env = ::getenv( "HOME" );
+#endif
+ 
+    QFile file( env + "/ReadLicense.log" ); // Read the text from a file    
+    if( !file.exists() ) {
+      SUIT_LicenseDlg aLicense;
+      if ( aLicense.exec() != QDialog::Accepted ) 
+        return result;
+    }
+  }
+
   if ( !argList.isEmpty() )
   {
     SUITApp_Session* aSession = new SUITApp_Session( iniFormat );
     QtxSplash* splash = 0;
-    if ( !noSplash ) {
-      SUIT_ResourceMgr* resMgr = aSession->createResourceMgr( argList.first() );
-      if ( resMgr ) {
-	resMgr->loadLanguage();
-	QString appName    = QObject::tr( "APP_NAME" ).stripWhiteSpace();
-	QString appVersion = QObject::tr( "APP_VERSION" ).stripWhiteSpace();
-	if ( appVersion == "APP_VERSION" ) {
-	  if ( appName == "APP_NAME" || appName.lower() == "salome" )
-	    appVersion = salomeVersion();
-	  else
-	    appVersion = "";
+    SUIT_ResourceMgr* resMgr = aSession->createResourceMgr( argList.first() );
+    if ( !noSplash ) 
+    {
+      if ( resMgr )
+      {
+	resMgr->loadLanguage( false );
+
+	splash = QtxSplash::splash( QPixmap() );
+	splash->readSettings( resMgr );
+	if ( splash->pixmap().isNull() ) {
+	  delete splash;
+	  splash = 0;
 	}
-	QString splashIcon;
-	resMgr->value( "splash", "image", splashIcon );
-	QPixmap px( splashIcon );
-	if ( !px.isNull() ) {
-	  splash = QtxSplash::splash( px );
-	  int splashMargin;
-	  if ( resMgr->value( "splash", "margin", splashMargin ) && splashMargin > 0 ) {
-	    splash->setMargin( splashMargin );
+	else {
+	  QString appName    = QObject::tr( "APP_NAME" ).trimmed();
+	  QString appVersion = QObject::tr( "APP_VERSION" ).trimmed();
+	  if ( appVersion == "APP_VERSION" )
+	  {
+	    if ( appName == "APP_NAME" || appName.toLower() == "salome" )
+	      appVersion = salomeVersion();
+	    else
+	      appVersion = "";
 	  }
-	  QString splashTextColors;
-	  if ( resMgr->value( "splash", "text_colors", splashTextColors ) && !splashTextColors.isEmpty() ) {
-	    QStringList colors = QStringList::split( "|", splashTextColors );
-	    QColor c1, c2;
-	    if ( colors.count() > 0 ) c1 = QColor( colors[0] );
-	    if ( colors.count() > 1 ) c2 = QColor( colors[1] );
-	    splash->setTextColors( c1, c2 );
-	  }
-	  else {
-	    splash->setTextColors( Qt::white, Qt::black );
-	  }
-#ifdef _DEBUG_
-	  splash->setHideOnClick( true );
-#endif
-	  QFont f = splash->font();
-	  f.setBold( true );
-	  splash->setFont( f );
-	  QString splashInfo;
-	  if ( resMgr->value( "splash", "info", splashInfo, false ) && !splashInfo.isEmpty() ) {
-	    splashInfo.replace( QRegExp( "%A" ),  appName );
-	    splashInfo.replace( QRegExp( "%V" ),  QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
-	    splashInfo.replace( QRegExp( "%L" ),  QObject::tr( "ABOUT_LICENSE" ) );
-	    splashInfo.replace( QRegExp( "%C" ),  QObject::tr( "ABOUT_COPYRIGHT" ) );
-	    splashInfo.replace( QRegExp( "\\\\n" ), "\n" );
-	    splash->message( splashInfo );
-	  }
+	  splash->setOption( "%A", appName );
+	  splash->setOption( "%V", QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
+	  splash->setOption( "%L", QObject::tr( "ABOUT_LICENSE" ) );
+	  splash->setOption( "%C", QObject::tr( "ABOUT_COPYRIGHT" ) );
 	  splash->show();
-	  qApp->processEvents();
+	  QApplication::instance()->processEvents();
 	}
       }
     }
+
     SUIT_Application* theApp = aSession->startApplication( argList.first() );
     if ( theApp )
     {
+      Style_Salome::initialize( theApp->resourceMgr() );
+      if ( theApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
+	Style_Salome::apply();
+
       if ( !noExceptHandling )
         app.setHandler( aSession->handler() );
 
-//      if ( !app.mainWidget() )
-//        app.setMainWidget( theApp->desktop() );
       if ( splash )
 	splash->finish( theApp->desktop() );
 
       result = app.exec();
-      if ( splash )
-	delete splash;
     }
     delete aSession;
   }

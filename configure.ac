@@ -1,3 +1,23 @@
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 # Author : Marc Tajchman (CEA)
 # Date : 28/06/2001
@@ -5,9 +25,7 @@
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN) - autotools usage
 #
-# Created from configure.in.base
-#
-AC_INIT([Salome2 Project GUI module], [4.1.1], [webmaster.salome@opencascade.com], [salome])
+AC_INIT([Salome2 Project GUI module], [5.1.0], [webmaster.salome@opencascade.com], [SalomeGUI])
 AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -82,7 +100,9 @@ if test "x${enable_qxGraphViewer}" != "xno" ; then
 else 
     DISABLE_QXGRAPHVIEWER="yes"
 fi
-
+dnl THIS IS A TEMPORARY SOLUTION BECAUSE QXGRAPH NOT YET PORTING TO QT4
+dnl AFTER PORTING QXGARPH TO QT4 THE STRING BELOW HAVE TO BE REMOVED
+DISABLE_QXGRAPHVIEWER="yes"
 
 dnl
 dnl Initialize source and build root directories
@@ -299,14 +319,6 @@ CHECK_QT
 
 echo
 echo ---------------------------------------------
-echo testing msg2qm
-echo ---------------------------------------------
-echo
-
-CHECK_MSG2QM
-
-echo
-echo ---------------------------------------------
 echo testing VTK
 echo ---------------------------------------------
 echo
@@ -360,6 +372,8 @@ echo ---------------------------------------------
 echo
 
 CHECK_QWT
+
+CHECK_TESTRECORDER
 
 echo
 echo ---------------------------------------------
@@ -462,10 +476,12 @@ if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
     echo "failed : for full configuration of GUI module necessary enable SalomeObject !"
     exit
   fi
-  if test "x${DISABLE_QXGRAPHVIEWER}" == "xyes" ; then
-    echo "failed : for full configuration of GUI module necessary enable QxGraphViewer !"
-    exit
-  fi
+  dnl THIS IS A TEMPORARY SOLUTION BECAUSE QXGRAPH NOT YET PORTING TO QT4
+  dnl AFTER PORTING QXGARPH TO QT4 THE FOLLOWING CHECK HAVE TO BE UNCOMMENTED
+  dnl if test "x${DISABLE_QXGRAPHVIEWER}" == "xyes" ; then
+  dnl   echo "failed : for full configuration of GUI module necessary enable QxGraphViewer !"
+  dnl   exit
+  dnl fi
 fi
 
 echo
@@ -513,10 +529,10 @@ fi
 
 
 if test "$GUI_DISABLE_CORBA" != "yes"; then
-variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok msg2qm_ok vtk_ok hdf5_ok
-omniORB_ok boost_ok occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok"
+variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok
+omniORB_ok boost_ok occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok libxml_ok Kernel_ok"
 else
-variables="cc_ok lex_yacc_ok python_ok threads_ok OpenGL_ok qt_ok msg2qm_ok vtk_ok hdf5_ok boost_ok
+variables="cc_ok lex_yacc_ok python_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok boost_ok
 occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok"
 fi
 
@@ -527,7 +543,7 @@ do
 done
 
 echo "---Optional:"
-variables="cppunit_ok"
+variables="cppunit_ok TestRecorder_ok"
 
 for var in $variables
 do
@@ -561,32 +577,7 @@ AM_CONDITIONAL(ENABLE_OCCVIEWER, [test "$DISABLE_OCCVIEWER" = no])
 AM_CONDITIONAL(ENABLE_VTKVIEWER, [test "$DISABLE_VTKVIEWER" = no])
 AM_CONDITIONAL(ENABLE_SALOMEOBJECT, [test "$DISABLE_SALOMEOBJECT" = no])
 AM_CONDITIONAL(ENABLE_QXGRAPHVIEWER, [test "$DISABLE_QXGRAPHVIEWER" = no])
-
-echo
-echo ---------------------------------------------
-echo copying resource files, shell scripts, and
-echo xml files
-echo ---------------------------------------------
-echo
-
-
-dnl copy shells and utilities contained in the bin directory
-dnl excluding .in files (treated in AC-OUTPUT below) and CVS
-dnl directory
-
-mkdir -p bin/salome
-cd bin/salome
-
-for i in $ROOT_SRCDIR/bin/*
-do
-  local_bin=`echo $i | sed -e "s,$ROOT_SRCDIR,.,"`
-  case "$local_bin" in
-        *.in | *~)                    ;;
-        ./bin/CVS | ./bin/salome)                    ;;
-        *) $INSTALL $i . ; echo $local_bin ;;
-  esac
-done
-cd $ROOT_BUILDDIR
+AM_CONDITIONAL(ENABLE_TESTRECORDER, [test "$ENABLE_TESTRECORDER" = yes])
 
 echo
 echo ---------------------------------------------
@@ -594,10 +585,10 @@ echo generating Makefiles and configure files
 echo ---------------------------------------------
 echo
 
-AC_OUTPUT_COMMANDS([ \
-  chmod +x ./bin/*; \
-  chmod +x ./bin/salome/*; \
-])
+#AC_OUTPUT_COMMANDS([ \
+#  chmod +x ./bin/*; \
+#  chmod +x ./bin/salome/*; \
+#])
 
 # This list is initiated using autoscan and must be updated manually
 # when adding a new file <filename>.in to manage. When you execute
@@ -606,6 +597,7 @@ AC_OUTPUT_COMMANDS([ \
 AC_OUTPUT([ \
   ./salome_adm/unix/SALOMEconfig.h \
   ./adm_local/Makefile \
+  ./adm_local/cmake_files/Makefile \
   ./adm_local/unix/Makefile \
   ./adm_local/unix/config_files/Makefile \
   ./bin/VERSION \
@@ -614,9 +606,9 @@ AC_OUTPUT([ \
   ./doc/Makefile \
   ./doc/salome/Makefile \
   ./doc/salome/gui/Makefile \
-  ./doc/salome/gui/GUI/doxyfile \
+  ./doc/salome/gui/doxyfile \
   ./doc/salome/tui/Makefile \
-  ./doc/salome/tui/GUI/doxyfile \
+  ./doc/salome/tui/doxyfile \
   ./src/Makefile \
   ./src/CASCatch/Makefile \
   ./src/Qtx/Makefile \
@@ -638,14 +630,14 @@ AC_OUTPUT([ \
   ./src/OCCViewer/Makefile \
   ./src/SOCC/Makefile \
   ./src/PyInterp/Makefile \
-  ./src/PythonConsole/Makefile \
+  ./src/PyConsole/Makefile \
   ./src/Plot2d/Makefile \
   ./src/SPlot2d/Makefile \
   ./src/SUPERVGraph/Makefile \
   ./src/QxGraph/Makefile \
+  ./src/QxScene/Makefile \
   ./src/LightApp/Makefile \
   ./src/ResExporter/Makefile \
-  ./src/RegistryDisplay/Makefile \
   ./src/TOOLSGUI/Makefile \
   ./src/Event/Makefile \
   ./src/Session/Makefile \
@@ -657,7 +649,6 @@ AC_OUTPUT([ \
   ./src/SALOME_PY/Makefile \
   ./src/SALOME_PYQT/Makefile \
   ./src/SALOME_PYQT/SALOME_PYQT_GUI/Makefile \
-  ./src/SALOME_PYQT/SALOME_PYQT_GUI/SALOME_PYQT_SipDefs.h \
   ./src/SALOME_PYQT/SalomePyQt/Makefile \
   ./resources/Makefile \
   ./idl/Makefile \

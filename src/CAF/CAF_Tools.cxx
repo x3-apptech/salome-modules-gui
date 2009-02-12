@@ -1,31 +1,38 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : CAF_Tools.cxx
 //  Author : UI team
-
+//
 #include "CAF_Tools.h"
 
-#include <string.h>
-#include <TCollection_ExtendedString.hxx>
+/*!
+  \class CAF_Tools
+  \brief Prodives a set of helpful static methods.
+*/
 
 /*!
-    Converts TCollection_ExtendedString 'src' to Qt string. [ static ]
+  \brief Convert TCollection_ExtendedString \a src to QString.
+  \param src string to be converted
+  \return resulting QString object
 */
 QString CAF_Tools::toQString ( const TCollection_ExtendedString& src )
 {
@@ -33,7 +40,9 @@ QString CAF_Tools::toQString ( const TCollection_ExtendedString& src )
 }
 
 /*!
-    Converts TCollection_AsciiString'src' to Qt string. [ static ]
+  \brief Convert TCollection_AsciiString \a src to QString.
+  \param src string to be converted
+  \return resulting QString object
 */
 QString CAF_Tools::toQString( const TCollection_AsciiString& src )
 {
@@ -41,18 +50,22 @@ QString CAF_Tools::toQString( const TCollection_AsciiString& src )
 }
 
 /*!
-    Converts Qt string to TCollection_AsciiString. [ static ]
+  \brief Convert QString \a src to TCollection_AsciiString.
+  \param src string to be converted
+  \return resulting TCollection_AsciiString object
 */
 TCollection_AsciiString CAF_Tools::toAsciiString( const QString& src )
 {
   TCollection_AsciiString res;
   if ( !src.isEmpty() )
-    res = TCollection_AsciiString( (char*)src.latin1() );
+    res = TCollection_AsciiString( src.toLatin1().data() );
   return res;
 }
 
 /*!
-    Converts Qt string to TCollection_ExtendedString. [ static ]
+  \brief Convert QString \a src to TCollection_ExtendedString.
+  \param src string to be converted
+  \return resulting TCollection_ExtendedString object
 */
 TCollection_ExtendedString CAF_Tools::toExtString ( const QString& src )
 {
@@ -63,7 +76,9 @@ TCollection_ExtendedString CAF_Tools::toExtString ( const QString& src )
 }
 
 /*!
-    Converts Qt color to OCC color
+  \brief Convert QColor object to Quantity_Color object.
+  \param c color object in Qt format
+  \return color object in OCC format
 */
 Quantity_Color CAF_Tools::color( const QColor& c )
 {
@@ -75,7 +90,9 @@ Quantity_Color CAF_Tools::color( const QColor& c )
 }
 
 /*!
-    Converts OCC color to Qt color
+  \brief Convert Quantity_Color object to QColor object.
+  \param c color object in OCC format
+  \return color object in Qt format
 */
 QColor CAF_Tools::color( const Quantity_Color& c )
 {

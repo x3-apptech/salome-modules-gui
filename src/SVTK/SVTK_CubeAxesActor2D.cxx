@@ -1,31 +1,30 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME OBJECT : kernel of SALOME component
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : SVTK_CubeAxesActor2D.cxx
 //  Author : Eugeny Nikolaev
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SVTK_CubeAxesActor2D.h"
 #include "VTKViewer_Transform.h"
 
@@ -205,11 +204,7 @@ static void ChangeValues(vtkFloatingPointType* aArray1,
     for (int i=0; i<4; i++){
       tmp = aArray1[i]; aArray1[i] = aArray2[i]; aArray2[i] = tmp;
     }
-#ifndef WNT
     for(int i=0;i<2; i++){
-#else
-    for(i=0;i<2; i++){
-#endif
       tmp = aRange1[i]; aRange1[i] = aRange2[i]; aRange2[i] = tmp;
     }
   }
@@ -450,31 +445,19 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 
   // XCoords coordinates for X grid
   vtkFloatArray *XCoords = vtkFloatArray::New();
-#ifndef WNT
   for(int i=0;i<numOfLabelsX;i++){
-#else
-  for(i=0;i<numOfLabelsX;i++){
-#endif
     vtkFloatingPointType val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
     XCoords->InsertNextValue(val);
   }
   // YCoords coordinates for Y grid
   vtkFloatArray *YCoords = vtkFloatArray::New();
-#ifndef WNT
   for(int i=0;i<numOfLabelsX;i++){
-#else
-  for(i=0;i<numOfLabelsX;i++){
-#endif
     vtkFloatingPointType val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
     YCoords->InsertNextValue(val);
   }
   // ZCoords coordinates for Z grid
   vtkFloatArray *ZCoords = vtkFloatArray::New();
-#ifndef WNT
   for(int i=0;i<numOfLabelsZ;i++){
-#else
-  for(i=0;i<numOfLabelsZ;i++){
-#endif
     vtkFloatingPointType val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
     ZCoords->InsertNextValue(val);
   }
@@ -534,11 +517,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   p[5][1] = YCoords->GetValue(numOfLabelsY-1);
   p[5][2] = aMiddleZ;
 
-#ifndef WNT
   for(int i=0;i<3;i++) 
-#else
-  for(i=0;i<3;i++) 
-#endif
     for(int j=0;j<6;j++) vecs[j][i] = p[j][i] - aCPosition[i];
 
   if ( vtkMath::Dot(vecs[0],aCDirection) < vtkMath::Dot(vecs[1],aCDirection))

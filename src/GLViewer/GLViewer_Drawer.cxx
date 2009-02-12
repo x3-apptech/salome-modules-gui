@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,29 +17,29 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Drawer.cxx
 // Created:   November, 2004
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_Drawer.h"
 #include "GLViewer_Object.h"
 #include "GLViewer_Text.h"
 #include "GLViewer_ViewFrame.h"
 #include "GLViewer_ViewPort2d.h"
 
+#include <QApplication>
+#include <QImage>
+#include <QPainter>
+#include <QFile>
+
 #ifndef WIN32
 #include <GL/glx.h>
 #endif
 
 #include <gp_Pnt2d.hxx>
-
-#include <qimage.h>
-#include <qpainter.h>
 
 #define TEXT_GAP    5
 // Two texture components for texmapped fonts: luminance and alpha
@@ -73,7 +76,7 @@ void GLViewer_TexFont::clearTextBases()
 GLViewer_TexFont::GLViewer_TexFont()
 : myMaxRowWidth( 0 ), myFontHeight( 0 )
 {
-    myQFont = QFont::defaultFont();
+    myQFont = QApplication::font();//QFont::defaultFont();
     mySeparator = 2;
     myIsResizeable = false;
     myMinMagFilter = GL_LINEAR;
@@ -204,7 +207,7 @@ bool GLViewer_TexFont::generateTexture()
             aPainter.drawText( myPositions[l], ( row + 1 ) * aRowPixelHeight - aDescent, aLetter );
         }
     
-        QImage aImage = aPixmap.convertToImage();
+        QImage aImage = aPixmap.toImage();
 
         //int qqq = 0;
         //if (qqq)
@@ -308,7 +311,7 @@ void GLViewer_TexFont::drawString( QString theStr, GLdouble theX , GLdouble theY
     int aLettIndex, row;
     for ( int i = 0; i < (int)theStr.length(); i++ )
     {
-        aLetter    = theStr.data()[i];
+        aLetter    = theStr.data()[i].toLatin1();
         aLettIndex = (int)aLetter - FirstSymbolNumber;
         row        = aLettIndex / TEX_ROW_LEN;
 
@@ -340,7 +343,7 @@ int GLViewer_TexFont::getStringWidth( QString theStr )
     int aWidth = 0;
     for ( int i = 0; i < (int)theStr.length(); i ++ )
     {
-        char aLetter = theStr.data()[i];
+        char aLetter = theStr.data()[i].toLatin1();
         int aLettIndex = (int)aLetter - FirstSymbolNumber;
         aWidth += myWidths[aLettIndex] + mySeparator;
     }
@@ -388,8 +391,8 @@ static GLuint displayListBase( QFont* theFont )
     QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
     for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
-      if ( it.key().myViewPortId == (int)ctx && it.data() > listBase )
-        listBase = it.data();
+      if ( it.key().myViewPortId == (int)ctx && it.value() > listBase )
+        listBase = it.value();
     }
     listBase += 256;
 
@@ -429,19 +432,19 @@ static GLuint displayListBase( QFont* theFont )
     QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
     for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
-      if ( it.key().myViewPortId == size_t(aCont) && it.data() > listBase )
-        listBase = it.data();
+      if ( it.key().myViewPortId == size_t(aCont) && it.value() > listBase )
+        listBase = it.value();
     }
     listBase += 256;
     
     //glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
     int aFontCont = 0;
     QString aFontDef = theFont->toString();
-    char** xFontList = XListFonts( aDisp, aFontDef.latin1()/*aFindFont.myFontString.data()*/, 1, &aFontCont  );
+    char** xFontList = XListFonts( aDisp, aFontDef.toLatin1()/*aFindFont.myFontString.data()*/, 1, &aFontCont  );
     if( !theFont->handle() )
     {       
 #ifdef _DEBUG_
-      printf( "Can't load font %s. loading default font....\n", aFontDef.latin1()/*aFindFont.myFontString.data()*/ );
+      printf( "Can't load font %s. loading default font....\n", aFontDef.toLatin1().data()/*aFindFont.myFontString.data()*/ );
 #endif
       QString aFontMask ("-*-*-*-r-*-*-");
       aFontMask += aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 );
@@ -449,7 +452,7 @@ static GLuint displayListBase( QFont* theFont )
       printf( "Height of Default font: %s\n", aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 ).data() );
 #endif
       aFontMask += "-*-*-*-m-*-*-*";
-      xFontList = XListFonts( aDisp, aFontMask.data()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
+      xFontList = XListFonts( aDisp, aFontMask.toLatin1().constData()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
       if( aFontCont == 0 )
       {      
 #ifdef _DEBUG_
@@ -504,7 +507,7 @@ void GLViewer_Drawer::destroyAllTextures()
     QMap<GLViewer_TexFindId,GLViewer_TexIdStored>::Iterator anEndIt= GLViewer_TexFont::TexFontBase.end();
 
     for( ; anIt != anEndIt; anIt++ )
-        glDeleteTextures( 1, &(anIt.data().myTexFontId) );
+        glDeleteTextures( 1, &(anIt.value().myTexFontId) );
 }
 
 /*!
@@ -785,7 +788,7 @@ void GLViewer_Drawer::drawText( const QString& text, GLfloat xPos, GLfloat yPos,
   {
     glRasterPos2f( xPos, yPos );
     glListBase( displayListBase( theFont ) );
-    glCallLists( text.length(), GL_UNSIGNED_BYTE, text.local8Bit().data() );
+    glCallLists( text.length(), GL_UNSIGNED_BYTE, text.toLocal8Bit().data() );
   }
 }
 
@@ -996,7 +999,7 @@ void GLViewer_Drawer::drawContour( const GLViewer_PntList& pntList, QColor color
   glLineWidth( lineWidth );
   
   glBegin( GL_LINES );
-  QValueList<GLViewer_Pnt>::const_iterator it = pntList.begin();
+  QList<GLViewer_Pnt>::const_iterator it = pntList.begin();
   for( ; it != pntList.end(); ++it )
     glVertex2f( (*it).x(), (*it).y() );
   glEnd();
@@ -1051,7 +1054,7 @@ void GLViewer_Drawer::drawPolygon( const GLViewer_PntList& pntList, QColor color
     ( GLfloat )color.green() / 255,
     ( GLfloat )color.blue() / 255 );
   glBegin( GL_POLYGON );
-  QValueList<GLViewer_Pnt>::const_iterator it = pntList.begin();
+  QList<GLViewer_Pnt>::const_iterator it = pntList.begin();
   for( ; it != pntList.end(); ++it )
     glVertex2f( (*it).x(), (*it).y() );
   glEnd();

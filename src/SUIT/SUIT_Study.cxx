@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_Study.h"
 
@@ -23,7 +26,6 @@
 #include "SUIT_DataObject.h"
 #include "SUIT_MessageBox.h"
 #include "SUIT_Application.h"
-#include <qvaluevector.h>
 
 /*!\class SUIT_Study
  * Support study management. Object management. Operation management.
@@ -33,9 +35,9 @@
 SUIT_Study::SUIT_Study( SUIT_Application* app )
 : QObject(),
 myApp( app ),
+myName( "" ),
 myIsSaved( false ),
 myIsModified( false ),
-myName( "" ),
 myBlockChangeState( false )
 {
   static int _id = 0;
@@ -43,8 +45,6 @@ myBlockChangeState( false )
   myId = ++_id;
 
   myRoot = new SUIT_DataObject();
-  myOperations.setAutoDelete( false );
-  myOperations.setAutoDelete( false );
 }
 
 /*!Destructor.*/
@@ -91,7 +91,7 @@ QString SUIT_Study::studyName() const
  */
 SUIT_Operation* SUIT_Study::activeOperation() const
 {
-  return myOperations.count() > 0 ? myOperations.getLast() : 0;
+  return myOperations.count() > 0 ? myOperations.last() : 0;
 }
 
 /*!
@@ -113,7 +113,7 @@ bool SUIT_Study::isModified() const
 /*!
  *Close document. NOT IMPLEMENTED.
  */
-void SUIT_Study::closeDocument(bool permanently)
+void SUIT_Study::closeDocument(bool /*permanently*/)
 {
 }
 
@@ -121,8 +121,9 @@ void SUIT_Study::closeDocument(bool permanently)
   Custom document initialization to be performed \n
    within onNewDoc() handler can be put here
 */
-void SUIT_Study::createDocument()
+bool SUIT_Study::createDocument( const QString& )
 {
+  return true;
 }
 
 /*!
@@ -163,8 +164,8 @@ bool SUIT_Study::saveDocument()
 void SUIT_Study::abortAllOperations()
 {
   myBlockChangeState = true;
-  for( SUIT_Operation* op = myOperations.first(); op; op = myOperations.next() )
-    op->abort();
+  for ( Operations::iterator it = myOperations.begin(); it != myOperations.end(); ++it )
+    (*it)->abort();
   myBlockChangeState = false;
   myOperations.clear();
 }
@@ -205,7 +206,7 @@ void SUIT_Study::setIsModified( const bool on )
  */
 void SUIT_Study::Modified()
 {
-  setIsModified( TRUE );
+  setIsModified( true );
   sendChangesNotification();
 }
 
@@ -248,9 +249,10 @@ SUIT_Operation* SUIT_Study::blockingOperation( SUIT_Operation* theOp ) const
     return 0;
 
   Operations tmpOps( myOperations );
-  SUIT_Operation* anOp = 0;
-  for ( anOp = tmpOps.last(); anOp; anOp = tmpOps.prev() )
+  for ( Operations::const_iterator it = tmpOps.end(); it != tmpOps.begin(); )
   {
+    it--;
+    SUIT_Operation* anOp = *it;
     if ( anOp != 0 && anOp!= theOp && !anOp->isValid( theOp ) )
       return anOp;
   }
@@ -271,7 +273,7 @@ SUIT_Operation* SUIT_Study::blockingOperation( SUIT_Operation* theOp ) const
 */
 bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 {
-  if ( !theOp || myOperations.find( theOp ) >= 0 )
+  if ( !theOp || myOperations.contains( theOp ) )
     return false;
 
   theOp->setExecStatus( SUIT_Operation::Rejected );
@@ -282,11 +284,11 @@ bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 
   if ( toCheck )
   {
-    while( SUIT_Operation* anOp = blockingOperation( theOp ) )
+    while ( SUIT_Operation* anOp = blockingOperation( theOp ) )
     {
-      int anAnsw = SUIT_MessageBox::warn2( application()->desktop(),
-                                           tr( "OPERATION_LAUNCH" ), tr( "PREVIOUS_NOT_FINISHED" ),
-                                           tr( "CONTINUE" ), tr( "CANCEL" ), 0, 1, 1 );
+      int anAnsw = SUIT_MessageBox::question( application()->desktop(),
+                                              tr( "OPERATION_LAUNCH" ), tr( "PREVIOUS_NOT_FINISHED" ),
+					      tr( "CONTINUE" ), tr( "CANCEL" ) );
 
       if ( anAnsw == 1 )
         return false;
@@ -322,7 +324,7 @@ bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 */
 bool SUIT_Study::abort( SUIT_Operation* theOp )
 {
-  if ( !theOp || myOperations.find( theOp ) == -1 )
+  if ( !theOp || !myOperations.contains( theOp ) )
     return false;
 
   theOp->setExecStatus( SUIT_Operation::Rejected );
@@ -346,7 +348,7 @@ bool SUIT_Study::abort( SUIT_Operation* theOp )
 */
 bool SUIT_Study::commit( SUIT_Operation* theOp )
 {
-  if ( !theOp || myOperations.find( theOp ) == -1 )
+  if ( !theOp || !myOperations.contains( theOp ) )
     return false;
 
   theOp->setExecStatus( SUIT_Operation::Accepted );
@@ -372,7 +374,7 @@ bool SUIT_Study::commit( SUIT_Operation* theOp )
 */
 bool SUIT_Study::suspend( SUIT_Operation* theOp )
 {
-  if ( !theOp || myOperations.find( theOp ) == -1 || theOp->state() == SUIT_Operation::Suspended )
+  if ( !theOp || !myOperations.contains( theOp ) || theOp->state() == SUIT_Operation::Suspended )
     return false;
 
   theOp->setState( SUIT_Operation::Suspended );
@@ -391,7 +393,7 @@ bool SUIT_Study::suspend( SUIT_Operation* theOp )
 */
 bool SUIT_Study::resume( SUIT_Operation* theOp )
 {
-  if ( !theOp || myOperations.find( theOp ) == -1 ||
+  if ( !theOp || !myOperations.contains( theOp ) ||
        theOp->state() == SUIT_Operation::Running ||
        blockingOperation( theOp ) != 0 )
     return false;
@@ -405,7 +407,7 @@ bool SUIT_Study::resume( SUIT_Operation* theOp )
   // Move operation at the end of list in order to sort it in the order of activation.
   // As result active operation is a last operation of list, operation which was active
   // before currently active operation is located before it and so on
-  myOperations.remove( theOp );
+  myOperations.removeAll( theOp );
   myOperations.append( theOp );
 
   emit theOp->resumed( theOp );
@@ -422,12 +424,16 @@ bool SUIT_Study::resume( SUIT_Operation* theOp )
 void SUIT_Study::stop( SUIT_Operation* theOp )
 {
   theOp->setState( SUIT_Operation::Waiting );
-  myOperations.remove( theOp );
+  myOperations.removeAll( theOp );
 
   // get last operation which can be resumed
-  SUIT_Operation* anOp, *aResultOp = 0;
-  for ( anOp = myOperations.last(); anOp; anOp = myOperations.prev() )
+  SUIT_Operation* aResultOp = 0;
+
+  QListIterator<SUIT_Operation*> it (myOperations);
+  it.toBack();
+  while( it.hasPrevious() )
   {
+    SUIT_Operation* anOp = it.previous();
     if ( anOp && anOp != theOp && blockingOperation( anOp ) == 0 )
     {
       aResultOp = anOp;
@@ -447,7 +453,7 @@ void SUIT_Study::stop( SUIT_Operation* theOp )
  * \brief Get all started operations
   * \return List of all started operations
 */
-const QPtrList<SUIT_Operation>& SUIT_Study::operations() const
+const QList<SUIT_Operation*>& SUIT_Study::operations() const
 {
   return myOperations;
 }
@@ -520,12 +526,10 @@ bool SUIT_Study::hasTransaction() const
 {
   return false;
 }
- 
+
 /*!
  * \brief Restores the study state.
  */
-void SUIT_Study::restoreState(int savePoint)
+void SUIT_Study::restoreState(int /*savePoint*/)
 {
-  // Redefined in SalomeApp_Study.
-  // Called from SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)
 }

@@ -1,39 +1,51 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "QDS_SpinBox.h"
 
 #include <QtxIntSpinBox.h>
 
-#include <qvalidator.h>
-
 /*
   \class QDS_SpinBox
-  
-  Datum with control corresponding to spin box. This control used for integer numbers.
-  User can input data directly in spin box or can modify current value with given
-  increment.
+  \brief Datum with control corresponding to spin box.
+
+  This control used for integer numbers. User can input data directly in the spin box
+  or can modify current value by clicking arrow (+/-) buttons.
 */
 
 /*!
-  Constructor. Create spin box datum object with datum identifier \aid under widget \aparent. Parameter \aflags
-  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
-  Parameter \acomp specify the component name which will be used during search of dictionary item.
+  \brief Constructor. 
+
+  Create spin box datum object with datum identifier \a id and parent widget \a parent.
+
+  Parameter \a flags defines behaviour of datum and set of created
+  subwidgets. Default value of this parameter is QDS::All.
+
+  Parameter \a comp specifies the component name which will be used
+  when searching the dictionary item.
+
+  \param id datum identifier
+  \param parent parent widget
+  \param flags datum flags
+  \param comp component
 */
 QDS_SpinBox::QDS_SpinBox( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -41,14 +53,15 @@ QDS_SpinBox::QDS_SpinBox( const QString& id, QWidget* parent, const int flags, c
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_SpinBox::~QDS_SpinBox()
 {
 }
 
 /*!
-  Returns string from QSpinBox widget. Reimplemented.
+  \brief Get string from the spin box.
+  \return string value
 */
 QString QDS_SpinBox::getString() const
 {
@@ -58,15 +71,16 @@ QString QDS_SpinBox::getString() const
   {
     res = aSpinBox->text();
     if ( !aSpinBox->suffix().isEmpty() )
-      res.remove( res.find( aSpinBox->suffix() ), aSpinBox->suffix().length() );
+      res.remove( res.indexOf( aSpinBox->suffix() ), aSpinBox->suffix().length() );
     if ( !aSpinBox->prefix().isEmpty() )
-      res.remove( res.find( aSpinBox->prefix() ), aSpinBox->prefix().length() );
+      res.remove( res.indexOf( aSpinBox->prefix() ), aSpinBox->prefix().length() );
   }
   return res;
 }
 
 /*!
-  Sets the string into QSpinBox widget. Reimplemented.
+  \brief Set the string value to the spin box widget.
+  \param txt string value
 */
 void QDS_SpinBox::setString( const QString& txt )
 {
@@ -79,15 +93,18 @@ void QDS_SpinBox::setString( const QString& txt )
 }
 
 /*!
-  Returns pointer to QSpinBox widget.
+  \brief Get spin box widget.
+  \return internal spin box widget.
 */
 QtxIntSpinBox* QDS_SpinBox::spinBox() const
 {
-  return ::qt_cast<QtxIntSpinBox*>( controlWidget() );
+  return ::qobject_cast<QtxIntSpinBox*>( controlWidget() );
 }
 
 /*!
-  Create QSpinBox widget as control subwidget. Reimplemented.
+  \brief Create internal spin box as control widget.
+  \param parent parent widget
+  \return created spin box widget
 */
 QWidget* QDS_SpinBox::createControl( QWidget* parent )
 {
@@ -98,7 +115,11 @@ QWidget* QDS_SpinBox::createControl( QWidget* parent )
 }
 
 /*!
-  Notify about value changing in spin box.
+  \brief Called when value in the spin box is changed.
+
+  Emit signals to notify  about value changing in the spin box.
+
+  \param val current spin box value
 */
 void QDS_SpinBox::onValueChanged( int val )
 {
@@ -109,28 +130,33 @@ void QDS_SpinBox::onValueChanged( int val )
 }
 
 /*!
-  Sets the increment step.
+  \brief Set the spin box increment value.
+  \param step new increment value
 */
 void QDS_SpinBox::setStep( const int step )
 {
   if ( spinBox() )
-    spinBox()->setLineStep( step );
+    spinBox()->setSingleStep( step );
 }
 
 /*!
-  Returns the increment step.
+  \brief Get the spin box increment value.
+  \return current increment value
 */
 int QDS_SpinBox::step() const
 {
   int s = 0;
   if ( spinBox() )
-    s = spinBox()->lineStep();
+    s = spinBox()->singleStep();
   return s;
 }
 
 /*!
-  Notification about active unit system changing. Reimplemented from QDS_Datum.
-  Update validator and spin box parameters: suffix, prefix, minimum, maximum.
+  \brief Process notification about active units system changing.
+
+  Update spin box contents according to the data dictionary item properties: suffix, prefix, minimum, maximum
+  
+  \param system new active units system
 */
 void QDS_SpinBox::unitSystemChanged( const QString& system )
 {
@@ -139,13 +165,16 @@ void QDS_SpinBox::unitSystemChanged( const QString& system )
   QSpinBox* sb = spinBox();
   if ( sb )
   {
-    delete sb->validator();
-    QValidator* valid = validator();
-    sb->setValidator( valid );
+    // not porting this code to qt4, only commented, since from the task context
+    // the new setted validator accepts all integers
+    //delete sb->validator();
+    //QValidator* valid = validator();
+    //sb->setValidator( valid );
 
     sb->setSuffix( suffix() );
     sb->setPrefix( prefix() );
-    sb->setMinValue( minValue().toInt() );
-    sb->setMaxValue( maxValue().toInt() );
+    sb->setMinimum( minValue().isEmpty() ? -INT_MAX : minValue().toInt() );
+    sb->setMaximum( maxValue().isEmpty() ? INT_MAX : maxValue().toInt() );
+
   }
 }

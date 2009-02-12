@@ -1,4 +1,7 @@
-#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -19,35 +22,23 @@
 #  File   : Makefile.in
 #  Author : Vasily Rusyaev (Open Cascade NN)
 #  Module : doc
-
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-EXTRA_DIST+=GUI
+EXTRA_DIST += images input static
 
-doxygen=@DOXYGEN@
-
-usr_docs:
-	cd ./GUI; \
+usr_docs: doxyfile
 	echo "Running doxygen in directory: "`pwd`; \
-	$(doxygen) ./doxyfile;
+	$(DOXYGEN) $<
 
 docs: usr_docs
 
 clean-local:
-	cd ./GUI; \
-	rm -fr `ls | grep -v "doxyfile"`
-	rm -fr `ls | grep -vE "Makefile|GUI"`
+	-rm -fr GUI doxygen.bak
 
 install-data-local: usr_docs
-	mkdir -p $(docdir)/gui
-	cp -rf GUI $(docdir)/gui
-	-find $(PWD) -name CVS -prune -exec rm -rf {} \;
+	$(INSTALL) -d $(DESTDIR)$(docdir)/gui
+	cp -rp GUI $(DESTDIR)$(docdir)/gui
 
 uninstall-local:
-	rm -rf $(docdir)/gui/GUI
-
-docguidir=$(docdir)/gui/GUI
-
-nodist_docgui_DATA= GUI/doxyfile
-GUI/doxyfile: GUI/doxyfile.in
-EXTRA_DIST+= GUI/doxyfile.in
+	rm -rf $(DESTDIR)$(docdir)/gui/GUI

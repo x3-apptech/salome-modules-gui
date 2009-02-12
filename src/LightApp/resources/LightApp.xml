@@ -1,3 +1,26 @@
+<!--
+  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+
+  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+
+-->
 <document>
   <section name="launch">
     <!-- SALOME launching parameters -->
@@ -15,10 +38,20 @@
   </section>
   <section name="splash" >
     <!-- Splash screen settings -->
-    <parameter name="image"       value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
-    <parameter name="info"        value="%A : %V" />
-    <parameter name="text_colors" value="#FFFFFF" />
-    <parameter name="margin"      value="10" />
+    <parameter name="image"             value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
+    <parameter name="constant_info"     value="%A [ %V ]" />
+    <parameter name="text_colors"       value="#eeeeff|#555555" />
+    <parameter name="hide_on_click"     value="no" />
+    <parameter name="show_progress"     value="yes" />
+    <parameter name="show_message"      value="yes" />
+    <parameter name="show_percents"     value="yes" />
+    <parameter name="margin"            value="40" />
+    <parameter name="progress_width"    value="20" />
+    <parameter name="progress_flags"    value="bottom,left_to_right" />
+    <parameter name="opacity"           value="0.70" />
+    <parameter name="font"              value="Tahoma,12,normal" />
+    <parameter name="alignment"         value="top,left" />
+    <parameter name="progress_colors"   value="#3b3e5d|#d14949|v" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->
@@ -29,35 +62,49 @@
     <parameter name="GLViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OCCViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="VTKViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="QxSceneViewer" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PyConsole"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SalomeApp"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OB"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="CAM"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LightApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SVTK"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="ToolsGUI"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="LIGHT"        value="${LIGHT_ROOT_DIR}/share/salome/resources/light"/>
   </section>
   <section name="desktop" >
     <!-- Default GUI desktop state, position, size -->
-    <parameter name="state"  value="normal"/>
-    <parameter name="pos_x"  value="center"/>
-    <parameter name="pos_y"  value="center"/>
-    <parameter name="width"  value="800"/>
-    <parameter name="height" value="600"/>
-  </section>
-  <section name="LIGHT">
-    <!-- LIGHT module settings -->
-    <parameter name="name"       value="Light"/>
-    <parameter name="icon"       value="LIGHT.png"/>
+    <parameter name="geometry"  value="80%x80%+10%+10%"/>
   </section>
   <section name="PyConsole">
     <!-- Python console preferences -->
     <parameter name="font"                value="Helvetic,12" />
     <parameter name="additional_families" value="Helvetic;Helvetica;Helvetica[Adobe];Times;Times[Adobe];Sans Serif;Serif;Monospace;Lucida"/>
   </section>
+  <section name="Style">
+    <!-- Style and theme preferences -->
+    <parameter name="use_salome_style" value="true" />
+  </section>
+  <section name="ObjectBrowser" >
+    <!-- Object Browser preferences -->
+    <parameter name="auto_hide_search_tool" value="true" />
+  </section>
   <section name="FileDlg">
     <!-- "Open/Save File" dialog box preferences-->
     <parameter name="QuickDirList" value=""/>
+  </section>
+  <section name="MRU" >
+    <!-- Show "Most recently used" studies-->
+    <parameter name="show_mru" value="true"/>
+    <!-- Max number of stored "Most recently used" studies-->
+    <parameter name="max_count" value="50"/>
+    <!-- Max visible number of "Most recently used" studies-->
+    <parameter name="visible_count" value="7"/>
+    <!-- Insert mode-->
+    <parameter name="insert_mode" value="0"/>
+    <!-- Link type-->
+    <parameter name="link_type" value="0"/>
+    <!-- Show "Clear" item-->
+    <parameter name="show_clear" value="true"/>
   </section>
   <section name="Study">
     <!-- General study settings -->
@@ -71,9 +118,18 @@
     <parameter name="trihedron_size" value="100" />
  </section>
  <section name="VTKViewer" >
-    <!-- OCC viewer preferences -->
+    <!-- VTK viewer preferences -->
     <parameter name="background"     value="0, 0, 0"/>
+    <parameter name="projection_mode" value="0" />
     <parameter name="trihedron_size" value="100" />
+    <parameter name="relative_size"  value="true" />
+    <parameter name="use_advanced_selection_algorithm" value="true" />
+    <parameter name="navigation_mode" value="0" />
+    <parameter name="speed_value" value="10" />
+    <parameter name="speed_mode" value="0" />
+    <parameter name="spacemouse_func1_btn" value="1" />
+    <parameter name="spacemouse_func2_btn" value="2" />
+    <parameter name="spacemouse_func5_btn" value="9" />
  </section>
  <section name="Plot2d" >
     <!-- Plot2d viewer preferences -->
@@ -89,5 +145,11 @@
     <!-- Supervision viewer preferences -->
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />
+  </section>
+  <section name="QxSceneViewer" >
+    <!-- QxGraph viewer preferences -->
+    <parameter name="Background" value="144, 208, 211" />
+    <parameter name="Title"      value="63, 213, 255"  />
+    <parameter name="NodeBody"   value="255, 249, 147" />
   </section>
 </document>

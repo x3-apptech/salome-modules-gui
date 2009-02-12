@@ -1,39 +1,41 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_Module.h
 // Created:   6/20/2005 16:25:06 AM
 // Author:    OCC team
-// Copyright (C) CEA 2005
-
+//
 #ifndef LIGHTAPP_MODULE_H
 #define LIGHTAPP_MODULE_H
 
 #include "LightApp.h"
+#include "LightApp_Preferences.h"
 #include <CAM_Module.h>
 
 class LightApp_Application;
-class LightApp_Preferences;
 class LightApp_Selection;
 class LightApp_Operation;
 class LightApp_SwitchOp;
-class LightApp_ShowHideOp;
 class LightApp_Displayer;
+class LightApp_SelectionMgr;
 
 class SUIT_Study;
 class SUIT_DataObject;
@@ -67,7 +69,7 @@ public:
   virtual void                        windows( QMap<int, int>& ) const;
   virtual void                        viewManagers( QStringList& ) const;
 
-  virtual void                        contextMenuPopup( const QString&, QPopupMenu*, QString& );
+  virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   virtual void                        createPreferences();
 
@@ -114,9 +116,9 @@ protected:
   virtual CAM_DataModel*              createDataModel();
 
   int                                 addPreference( const QString& label );
-  int                                 addPreference( const QString& label, const int pId, const int = -1,
-				                     const QString& section = QString::null,
-				                     const QString& param = QString::null );
+  int                                 addPreference( const QString& label, const int pId, const int = LightApp_Preferences::Auto,
+				                     const QString& section = QString(),
+				                     const QString& param = QString() );
   QVariant                            preferenceProperty( const int, const QString& ) const;
   void                                setPreferenceProperty( const int, const QString&, const QVariant& );
 
@@ -131,6 +133,10 @@ protected:
   virtual LightApp_Operation*         createOperation( const int ) const;
 
   virtual void                        updateControls();
+
+  virtual bool                        isSelectionCompatible();
+
+  LightApp_Operation*                 operation( const int ) const;
 
 private:
   typedef QMap<int,LightApp_Operation*> MapOfOperation;

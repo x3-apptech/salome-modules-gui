@@ -1,20 +1,23 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef QDS_H
 #define QDS_H
@@ -34,10 +37,8 @@
 #pragma warning ( disable:4786 )
 #endif
 
-#include <qstring.h>
-#include <qvaluelist.h>
-
-#include <TCollection_AsciiString.hxx>
+#include <QString>
+#include <QList>
 
 #include <TCollection_ExtendedString.hxx>
 
@@ -48,7 +49,7 @@ class Handle(TCollection_HExtendedString);
 class QDS_EXPORT QDS
 {
 public:
-   /*! Enum describes bit flags of the Qt datum view and behaviour */
+  //! Enum describes bit flags of the Qt datum view and behaviour
   typedef enum
   {
     None = 0x00,                   //!< Non specified any flags (Default behaviour)
@@ -65,10 +66,10 @@ public:
   static bool                       load( const QString& );
 
   static QString                    unitSystemLabel( const QString&,
-                                                     const QString& = QString::null );
-  static QString                    activeUnitSystem( const QString& = QString::null );
+                                                     const QString& = QString() );
+  static QString                    activeUnitSystem( const QString& = QString() );
   static void                       setActiveUnitSystem( const QString&,
-                                                         const QString& = QString::null );
+                                                         const QString& = QString() );
 
   static QString                    toQString( const TCollection_AsciiString& );
   static QString                    toQString( const TCollection_ExtendedString& );
@@ -87,7 +88,7 @@ protected:
   static void                       removeDatum( QDS_Datum* );
 
 private:
-  static QValueList<QDS_Datum*>     _datumList;
+  static QList<QDS_Datum*>          _datumList;
 };
 
 #endif

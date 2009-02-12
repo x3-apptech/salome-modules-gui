@@ -1,24 +1,24 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-// File:      SalomeApp_msg_en.po
-// Created:   10/25/2004 12:46:36 PM
-// Author:    Sergey LITONIN
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
 
 msgid ""
 msgstr ""
@@ -48,7 +48,7 @@ msgid "SalomeApp_Application::TOT_DESK_FILE_DUMP_STUDY"
 msgstr "Dump study"
 
 msgid "SalomeApp_Application::MEN_DESK_FILE_DUMP_STUDY"
-msgstr "&Dump study..."
+msgstr "&Dump Study..."
 
 msgid "SalomeApp_Application::PRP_DESK_FILE_DUMP_STUDY"
 msgstr "Dumps study to the python script"
@@ -66,7 +66,7 @@ msgid "SalomeApp_Application::TOT_DESK_FILE_LOAD_SCRIPT"
 msgstr "Load python script"
 
 msgid "SalomeApp_Application::MEN_DESK_FILE_LOAD_SCRIPT"
-msgstr "Load scrip&t..."
+msgstr "Load Scrip&t..."
 
 msgid "SalomeApp_Application::PRP_DESK_FILE_LOAD_SCRIPT"
 msgstr "Loads python script from file"
@@ -81,7 +81,7 @@ msgid "SalomeApp_Application::TOT_DESK_CATALOG_GENERATOR"
 msgstr "Catalog generator"
 
 msgid "SalomeApp_Application::MEN_DESK_CATALOG_GENERATOR"
-msgstr "Catalog &generator"
+msgstr "Catalog &Generator"
 
 msgid "SalomeApp_Application::PRP_DESK_CATALOG_GENERATOR"
 msgstr "Generates XML catalog of a component's interface"
@@ -90,7 +90,7 @@ msgid "SalomeApp_Application::TOT_DESK_REGISTRY_DISPLAY"
 msgstr "Registry display"
 
 msgid "SalomeApp_Application::MEN_DESK_REGISTRY_DISPLAY"
-msgstr "Registry &display"
+msgstr "Registry &Display"
 
 msgid "SalomeApp_Application::PRP_DESK_REGISTRY_DISPLAY"
 msgstr "Displays content of the Registry CORBA server"
@@ -99,7 +99,7 @@ msgid "SalomeApp_Application::TOT_DESK_MRU"
 msgstr "Most recently used"
 
 msgid "SalomeApp_Application::MEN_DESK_MRU"
-msgstr "Most recently used"
+msgstr "Most Recently Used"
 
 msgid "SalomeApp_Application::TOT_DESK_PROPERTIES"
 msgstr "Study properties"
@@ -136,7 +136,7 @@ msgstr "Save GUI state"
 //=======================================================================================
 
 msgid "SalomeApp_Application::MEN_WINDOWS_NEW"
-msgstr "New window"
+msgstr "New Window"
 
 msgid "SalomeApp_Application::MEN_VIEW_WNDS"
 msgstr "Windows"
@@ -155,10 +155,10 @@ msgid "SalomeApp_Application::OBJ_BROWSER_NAME"
 msgstr "Object"
 
 msgid "SalomeApp_Application::OBJ_BROWSER_COLUMN_0"
-msgstr "Value"
+msgstr "Entry"
 
 msgid "SalomeApp_Application::OBJ_BROWSER_COLUMN_1"
-msgstr "Entry"
+msgstr "Value"
 
 msgid "SalomeApp_Application::OBJ_BROWSER_COLUMN_2"
 msgstr "IOR"
@@ -221,9 +221,6 @@ msgstr "Publish in study"
 msgid "SalomeApp_Application::WRN_DUMP_STUDY_FAILED"
 msgstr "Dump study failed"
 
-msgid "SalomeApp_Application::WRN_FILE_NAME_BAD"
-msgstr "Please enter correct file name"
-
 msgid "SAVE_POINT_OBJECT_TOOLTIP"
 msgstr "Saved GUI state: %1"
 
@@ -250,23 +247,23 @@ msgstr "Rename"
 msgid "SalomeApp_Application::MEN_DELETE_VS"
 msgstr "Delete"
 
-msgid "SalomeApp_Application::APPCLOSE_CAPTION"
-msgstr "Close study"
+//=======================================================================================
 
-msgid "SalomeApp_Application::APPCLOSE_DESCRIPTION"
-msgstr "Do you want to save or unload study before closing?"
+msgid "SalomeApp_Application::APPCLOSE_SAVE"
+msgstr "&Save&&Close"
 
 msgid "SalomeApp_Application::APPCLOSE_CLOSE"
 msgstr "&Close w/o saving"
 
-msgid "SalomeApp_Application::APPCLOSE_SAVE"
-msgstr "&Save && Close"
-
 msgid "SalomeApp_Application::APPCLOSE_UNLOAD"
 msgstr "&Unload"
 
-msgid "SalomeApp_ExitDlg::SHUTDOWN_SERVERS"
-msgstr "Shutdown standalone servers"
+msgid "SalomeApp_Application::APPCLOSE_CANCEL"
+msgstr "&Cancel"
 
-msgid "SalomeApp_Application::ACTIVATE_MODULE_OP_LOAD"
-msgstr "&Load..."
+msgid "SalomeApp_Application::APPCLOSE_CAPTION"
+msgstr "Close active study"
+
+msgid "SalomeApp_Application::APPCLOSE_DESCRIPTION"
+msgstr "Do you want to close or only unload the study"
+

@@ -1,28 +1,32 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef SUIT_SELECTOR_H
 #define SUIT_SELECTOR_H
 
 #include "SUIT.h"
 
-#include <qvaluelist.h>
-#include <qobject.h>
+#include <QList>
+
+class QObject;
 
 class SUIT_SelectionMgr;
 class SUIT_DataOwnerPtrList;
@@ -34,9 +38,11 @@ class SUIT_DataOwnerPtrList;
   (ObjectBrowser, viewers, etc)
   Used by selection manager for selection synhronizing
 */
-class SUIT_EXPORT SUIT_Selector : public QObject
+
+class SUIT_EXPORT SUIT_Selector
 {
-  Q_OBJECT
+  class Destroyer;
+
 public:
   SUIT_Selector( SUIT_SelectionMgr*, QObject* = 0 );
   virtual ~SUIT_Selector();
@@ -55,7 +61,7 @@ public:
   void               setSelected( const SUIT_DataOwnerPtrList& );
 
   bool               hasSelectionMode( const int ) const;
-  void               selectionModes( QValueList<int>& ) const;
+  void               selectionModes( QList<int>& ) const;
 
 protected:
   void               selectionChanged();
@@ -63,10 +69,11 @@ protected:
   virtual void       setSelection( const SUIT_DataOwnerPtrList& ) = 0;
 
 private:
-  bool               myBlock;
   SUIT_SelectionMgr* mySelMgr;
+  bool               myBlock;
   bool               myEnabled;
   bool               myAutoBlock;
+  Destroyer*         myDestroyer;
 };
 
 #endif

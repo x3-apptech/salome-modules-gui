@@ -1,24 +1,70 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUIT_Selector.h"
 
 #include "SUIT_SelectionMgr.h"
+
+#include <QObject>
+
+/*!\class SUIT_Selector::Destroyer
+  Class provide the watching for qobject parent class of the selector.
+*/
+
+class SUIT_Selector::Destroyer : public QObject
+{
+public:
+  Destroyer( SUIT_Selector*, QObject* = 0 );
+  virtual ~Destroyer();
+
+  SUIT_Selector* selector() const;
+  void           setSelector( SUIT_Selector* );
+
+private:
+  SUIT_Selector* mySelector;
+};
+
+SUIT_Selector::Destroyer::Destroyer( SUIT_Selector* s, QObject* p )
+: QObject( p ),
+  mySelector( s )
+{
+}
+
+SUIT_Selector::Destroyer::~Destroyer()
+{
+  SUIT_Selector* s = mySelector;
+  mySelector = 0;
+  if ( s )
+    delete s;
+}
+
+SUIT_Selector* SUIT_Selector::Destroyer::selector() const
+{
+  return mySelector;
+}
+
+void SUIT_Selector::Destroyer::setSelector( SUIT_Selector* s )
+{
+  mySelector = s;
+}
 
 /*!\class SUIT_Selector
  * Class provide selector for data owners.
@@ -27,15 +73,18 @@
 /*!
   Constructor.
 */
-SUIT_Selector::SUIT_Selector( SUIT_SelectionMgr* selMgr, QObject* parent ) :
-QObject( parent ), 
-mySelMgr( selMgr ),
+SUIT_Selector::SUIT_Selector( SUIT_SelectionMgr* selMgr, QObject* parent )
+: mySelMgr( selMgr ),
 myBlock( false ),
 myEnabled( true ),
-myAutoBlock( true )
+myAutoBlock( true ),
+myDestroyer( 0 )
 {
   if ( selMgr )
     selMgr->installSelector( this );
+
+  if ( parent )
+    myDestroyer = new Destroyer( this, parent );
 }
 
 /*!
@@ -45,6 +94,12 @@ SUIT_Selector::~SUIT_Selector()
 {
   if ( selectionMgr() )
     selectionMgr()->removeSelector( this );
+
+  if ( myDestroyer && myDestroyer->selector() == this )
+  {
+    myDestroyer->setSelector( 0 );
+    delete myDestroyer;
+  }
 }
 
 /*!
@@ -135,7 +190,7 @@ bool SUIT_Selector::hasSelectionMode( const int mode ) const
 /*!
   Puts to list \a lst selection modes from selection manager.
 */
-void SUIT_Selector::selectionModes( QValueList<int>& lst ) const
+void SUIT_Selector::selectionModes( QList<int>& lst ) const
 {
   if ( selectionMgr() )
     selectionMgr()->selectionModes( lst );

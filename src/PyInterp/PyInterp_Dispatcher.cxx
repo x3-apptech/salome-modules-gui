@@ -1,37 +1,48 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : PyInterp_Dispatcher.cxx
 //  Author : Sergey ANIKIN, OCC
 //  Module : GUI
-//  $Header$
+//
+#include "PyInterp_Dispatcher.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
+#include "PyInterp_Interp.h"
+#include "PyInterp_Watcher.h"
+#include <SALOME_Event.h>
 
+#include <QObject>
+#include <QCoreApplication>
 
-#include <PyInterp_base.h>
-#include <PyInterp_Dispatcher.h>
-#include <PyInterp_Watcher.h>
+class PyInterp_ExecuteEvent: public SALOME_Event
+{
+public:
+  PyInterp_Request* myRequest;
+  PyInterp_ExecuteEvent( PyInterp_Request* r )
+    : myRequest( r ) {}
+  virtual void Execute()
+  {
+    myRequest->execute();
+  }
+};
 
-#include <qapplication.h>
-#include <qobject.h>
-
-//#include <utilities.h>
 using namespace std;
 
 PyInterp_Dispatcher* PyInterp_Dispatcher::myInstance = 0;
@@ -40,15 +51,21 @@ void PyInterp_Request::process()
 {
   safeExecute();
 
-  myMutex.lock();
-  //if ( !IsSync() && getListener() && getEvent() )
-  if ( getListener() && getEvent() )
-    postEvent();
-  myMutex.unlock();
+  bool isSync = IsSync();
+
+  if ( !isSync )
+    myMutex.lock();
+
+  if ( listener() )
+    processEvent( listener() );
+
+  if ( !isSync )
+    myMutex.unlock();
 }
 
 void PyInterp_Request::safeExecute()
 {
+  //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
   execute();
 }
 
@@ -62,26 +79,25 @@ void PyInterp_Request::Destroy( PyInterp_Request* request )
 
 QEvent* PyInterp_Request::createEvent() const
 {
-  return new PyInterp_Event( PyInterp_Event::NOTIFY, (PyInterp_Request*)this );
+  return new PyInterp_Event( PyInterp_Event::ES_NOTIFY, (PyInterp_Request*)this );
 }
 
-QEvent* PyInterp_Request::getEvent()
+void PyInterp_Request::processEvent( QObject* o )
 {
-  //if ( !myEvent && !IsSync() )
-  if ( !myEvent )
-    myEvent = createEvent();
-  return myEvent;
-}
+  if ( !o )
+    return;
 
-void PyInterp_Request::postEvent()
-{
-#if QT_VERSION >= 0x030303
-//  MESSAGE("*** PyInterp_Request::postEvent(): for Qt 3.3.3")
-  QApplication::postEvent( getListener(), getEvent() );
-#else
-//  MESSAGE("*** PyInterp_Request::postEvent(): for Qt 3.0.5")
-  QThread::postEvent( getListener(), getEvent() );
-#endif
+  QEvent* e = createEvent();
+  if ( !e )
+    return;
+
+  if ( !IsSync() )
+    QCoreApplication::postEvent( o, e );
+  else
+  {
+    QCoreApplication::sendEvent( o, e );
+    delete e;
+  }
 }
 
 void PyInterp_Request::setListener( QObject* o )
@@ -95,6 +111,7 @@ void PyInterp_LockRequest::safeExecute()
 {
   if ( getInterp() ){
     PyLockWrapper aLock = getInterp()->GetLockWrapper();
+    //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
     execute();
   }
 }
@@ -123,8 +140,9 @@ PyInterp_Dispatcher::~PyInterp_Dispatcher()
   // Clear the request queue
   myQueueMutex.lock();
 
-  for ( std::list<PyInterp_Request*>::iterator it = myQueue.begin(); it != myQueue.end(); ++it )
-    PyInterp_Request::Destroy( *it );
+  QListIterator<RequestPtr> it( myQueue );
+  while ( it.hasNext() )
+    PyInterp_Request::Destroy( it.next() );
   myQueue.clear();
 
   myQueueMutex.unlock();
@@ -138,7 +156,7 @@ PyInterp_Dispatcher::~PyInterp_Dispatcher()
 
 bool PyInterp_Dispatcher::IsBusy() const
 {
-  return running();
+  return isRunning();
 }
 
 void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
@@ -149,11 +167,12 @@ void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
   //if ( theRequest->IsSync() && !IsBusy() ) // synchronous processing - nothing is done if dispatcher is busy!
   if ( theRequest->IsSync() ) // synchronous processing - nothing is done if dispatcher is busy!
     processRequest( theRequest );
-  else { // asynchronous processing
+  else // asynchronous processing
+  {
     myQueueMutex.lock();
-    myQueue.push_back( theRequest );
-    if ( theRequest->getListener() )
-      QObject::connect( theRequest->getListener(), SIGNAL( destroyed( QObject* ) ), myWatcher, SLOT( onDestroyed( QObject* ) ) );
+    myQueue.enqueue( theRequest );
+    if ( theRequest->listener() )
+      QObject::connect( theRequest->listener(), SIGNAL( destroyed( QObject* ) ), myWatcher, SLOT( onDestroyed( QObject* ) ) );
     myQueueMutex.unlock();  
 
     if ( !IsBusy() )
@@ -171,7 +190,7 @@ void PyInterp_Dispatcher::run()
 
   while( myQueue.size() ) {
 //    MESSAGE("*** PyInterp_Dispatcher::run(): next request taken from the queue")
-    aRequest = myQueue.front();
+    aRequest = myQueue.head();
 
     // let other threads append their requests to the end of the queue
     myQueueMutex.unlock();
@@ -183,8 +202,8 @@ void PyInterp_Dispatcher::run()
     // prepare for removal of the first request in the queue
     myQueueMutex.lock();
     // IMPORTANT: the first item could have been removed by objectDestroyed() --> we have to check it
-    if ( myQueue.front() == aRequest ) // It's still here --> remove it
-      myQueue.pop_front();
+    if ( myQueue.head() == aRequest ) // It's still here --> remove it
+      myQueue.dequeue();
 
 //    MESSAGE("*** PyInterp_Dispatcher::run(): request processed")
   }
@@ -203,13 +222,16 @@ void PyInterp_Dispatcher::objectDestroyed( const QObject* o )
   // prepare for modification of the queue
   myQueueMutex.lock();
 
-  for ( std::list<RequestPtr>::iterator it = myQueue.begin(); it != myQueue.end(); ++it ){
-    if ( o == (*it)->getListener() ){
-      (*it)->setListener( 0 ); // to prevent event posting
-      it = myQueue.erase( it );
+  QMutableListIterator<RequestPtr> it( myQueue );
+  while ( it.hasNext() )
+  {
+    RequestPtr r = it.next();
+    if ( o == r->listener() )
+    {
+      r->setListener( 0 ); // to prevent event posting
+      it.remove();
     }
   }
 
   myQueueMutex.unlock();
 }
-

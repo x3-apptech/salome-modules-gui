@@ -1,32 +1,36 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      SalomeApp_ExitDlg.cxx
 // Author:    Margarita KARPUNINA, Open CASCADE S.A.S.
 //
-
 #include "SalomeApp_ExitDlg.h"
 
-#include <qlabel.h> 
-#include <qlayout.h> 
-#include <qpushbutton.h>
-#include <qmessagebox.h>
-#include <qcheckbox.h>
+#include <QLabel> 
+#include <QVBoxLayout> 
+#include <QHBoxLayout> 
+#include <QGridLayout> 
+#include <QPushButton>
+#include <QMessageBox>
+#include <QCheckBox>
 
 /*!
  * \brief creates a Exit dialog box
@@ -35,27 +39,27 @@
  * \param f style flags
  */
 SalomeApp_ExitDlg::SalomeApp_ExitDlg( QWidget* parent )
-  : QDialog( parent, "SalomeApp_ExitDlg", true )
+  : QDialog( parent )
 {
-  setSizeGripEnabled( true );
-  setCaption( tr( "INF_DESK_EXIT" ) );
+  setModal( true );
+  setWindowTitle( tr( "INF_DESK_EXIT" ) );
 
   QVBoxLayout* m_vbL = new QVBoxLayout( this );
   m_vbL->setMargin( 11 );
   m_vbL->setSpacing( 6 );
 
-  QLabel* m_lIcon = new QLabel( this, "m_lDescr" );
+  QLabel* m_lIcon = new QLabel( this );
   QPixmap pm = QMessageBox::standardIcon( QMessageBox::Question );
   m_lIcon->setPixmap( pm );
   m_lIcon->setScaledContents( false );
   m_lIcon->setAlignment( Qt::AlignCenter );
 
-  QLabel* m_lDescr = new QLabel (this, "m_lDescr");
-  m_lDescr->setText ( tr ("QUE_DESK_EXIT") );
+  QLabel* m_lDescr = new QLabel( this );
+  m_lDescr->setText( tr( "QUE_DESK_EXIT" ) );
   m_lDescr->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
-  myServersShutdown = new QCheckBox( tr("SHUTDOWN_SERVERS"), this );
-  myServersShutdown->setChecked(true);
+  myServersShutdown = new QCheckBox( tr( "SHUTDOWN_SERVERS" ), this );
+  myServersShutdown->setChecked( true );
   
   QVBoxLayout* m_vl1 = new QVBoxLayout();
   m_vl1->setMargin( 10 ); m_vl1->setSpacing( 16 );
@@ -75,7 +79,7 @@ SalomeApp_ExitDlg::SalomeApp_ExitDlg( QWidget* parent )
   QGridLayout* m_hl2 = new QGridLayout();
   m_hl2->setMargin( 0 ); m_hl2->setSpacing( 6 );
   m_hl2->addWidget( m_pbOk, 0, 0 );
-  m_hl2->setColStretch( 1, 5 );
+  m_hl2->setColumnStretch( 1, 5 );
   m_hl2->addWidget( m_pbCancel, 0, 2 );
   
   m_vbL->addStretch();

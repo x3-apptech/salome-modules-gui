@@ -1,4 +1,7 @@
-#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -14,28 +17,50 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : SalomeApp
-
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
+EXTRA_DIST += images
 
 # Libraries targets
 lib_LTLIBRARIES = libSalomeStyle.la
 
-libSalomeStyle_la_SOURCES = SalomeStyle.cxx
+salomeinclude_HEADERS =		\
+	Style.h			\
+	Style_PrefDlg.h		\
+	Style_Salome.h
 
-libSalomeStyle_la_CPPFLAGS=$(QT_INCLUDES)
+dist_libSalomeStyle_la_SOURCES =\
+	Style.h			\
+	Style_Model.h		\
+	Style_PrefDlg.h		\
+	Style_Salome.h		\
+	Style_Tools.h		\
+	Style_ResourceMgr.h	\
+	Style_Model.cxx		\
+	Style_PrefDlg.cxx	\
+	Style_ResourceMgr.cxx	\
+	Style_Salome.cxx	\
+	Style_Tools.cxx
 
-libSalomeStyle_la_LDFLAGS=$(QT_MT_LIBS)
+MOC_FILES = \
+	Style_PrefDlg_moc.cxx	\
+	Style_Salome_moc.cxx
 
-EXTRA_DIST+=SalomeStyle.h
+QRC_FILES = \
+	qrc_Style.cxx
 
-install-exec-hook:
-	mkdir -p $(bindir)/styles
-	(cd $(bindir)/styles; ln -sf ../../../lib@LIB_LOCATION_SUFFIX@/salome/libSalomeStyle.so libSalomeStyle.so;)
+nodist_libSalomeStyle_la_SOURCES = $(MOC_FILES) $(QRC_FILES)
 
-uninstall-hook:
-	rm -f $(bindir)/styles/libSalomeStyle.so
+libSalomeStyle_la_CPPFLAGS = $(QT_INCLUDES)	\
+	-I$(srcdir)/../Qtx
+
+libSalomeStyle_la_LDFLAGS  = $(QT_MT_LIBS)	\
+	../Qtx/libqtx.la
+
+dist_salomeres_DATA = resources/SalomeStyle.xml

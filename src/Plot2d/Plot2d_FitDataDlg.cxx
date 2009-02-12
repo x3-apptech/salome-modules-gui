@@ -1,34 +1,35 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-//  File   : Plot2d_FitDataDlg.cxx
-//  Author : Vadim SANDLER
-//  Module : SALOME
-//  $Header$
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : Plot2d_FitDataDlg.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
 #include "Plot2d_FitDataDlg.h"
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qvalidator.h>
-#include <qpushbutton.h>
-#include <qradiobutton.h>
-#include <qbuttongroup.h>
-#include <qlineedit.h>
+#include <QLabel>
+#include <QLayout>
+#include <QValidator>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QGroupBox>
+#include <QLineEdit>
 
 #define SPACING_SIZE      6
 #define MARGIN_SIZE       11
@@ -39,24 +40,22 @@
 */
 Plot2d_FitDataDlg::Plot2d_FitDataDlg( QWidget* parent, bool secondAxisY )
      : QDialog( parent ? parent : 0,
-         "Plot2d_FitDataDlg", 
-         true, 
-         WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu ),
-         myY2MinEdit( 0 ), myY2MaxEdit( 0 ), mySecondAxisY( secondAxisY )
+         Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
+       myY2MinEdit( 0 ), myY2MaxEdit( 0 ), mySecondAxisY( secondAxisY )
 
 {
-  setCaption( tr( "FIT_DATA_TLT" ) );
+  setObjectName( "Plot2d_FitDataDlg" );
+  setModal( true );
+  setWindowTitle( tr( "FIT_DATA_TLT" ) );
   setSizeGripEnabled( TRUE );
   QGridLayout* topLayout = new QGridLayout( this ); 
   topLayout->setSpacing( SPACING_SIZE );
   topLayout->setMargin( MARGIN_SIZE );
 
   // 'Range' group
-  myRangeGrp = new QButtonGroup( this );
-  myRangeGrp->setColumnLayout( 0, Qt::Vertical );
-  myRangeGrp->layout()->setSpacing( 0 );
-  myRangeGrp->layout()->setMargin( 0 );
-  QGridLayout* aGridLayout = new QGridLayout( myRangeGrp->layout() );
+  myRangeGrp = new QGroupBox( this );
+  QGridLayout* aGridLayout = new QGridLayout( myRangeGrp );
+  myRangeGrp->setLayout( aGridLayout );
   aGridLayout->setAlignment( Qt::AlignTop );
   aGridLayout->setMargin( MARGIN_SIZE );
   aGridLayout->setSpacing( SPACING_SIZE );
@@ -122,45 +121,47 @@ Plot2d_FitDataDlg::Plot2d_FitDataDlg( QWidget* parent, bool secondAxisY )
   QFont font = horLab->font(); font.setBold( true );
   horLab->setFont( font ); verLab->setFont( font );
 
-  aGridLayout->addMultiCellLayout( aModeLayout,    0, 0, 0, 4 );
-  aGridLayout->addMultiCellWidget( aHLine,         1, 1, 0, 4 );
-  aGridLayout->addWidget         ( horLab,         2,    0 );
-  aGridLayout->addWidget         ( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
-                                                   2,    1 );
-  aGridLayout->addWidget         ( myXMinEdit,     2,    2 );
-  aGridLayout->addWidget         ( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
-                                                   2,    3 );
-  aGridLayout->addWidget         ( myXMaxEdit,     2,    4 );
-  aGridLayout->addWidget         ( verLab,         3,    0 );
-  aGridLayout->addWidget         ( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
-                                                   3,    1 );
-  aGridLayout->addWidget         ( myYMinEdit,     3,    2 );
-  aGridLayout->addWidget         ( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
-                                                   3,    3 );
-  aGridLayout->addWidget         ( myYMaxEdit,     3,    4 );
+  aGridLayout->addLayout( aModeLayout,    0, 0, 1, 5 );
+  aGridLayout->addWidget( aHLine,         1, 0, 1, 5 );
+  aGridLayout->addWidget( horLab,         2,    0 );
+  aGridLayout->addWidget( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
+                                          2,    1 );
+  aGridLayout->addWidget( myXMinEdit,     2,    2 );
+  aGridLayout->addWidget( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
+                                          2,    3 );
+  aGridLayout->addWidget( myXMaxEdit,     2,    4 );
+  aGridLayout->addWidget( verLab,         3,    0 );
+  aGridLayout->addWidget( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
+                                          3,    1 );
+  aGridLayout->addWidget( myYMinEdit,     3,    2 );
+  aGridLayout->addWidget( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
+                                          3,    3 );
+  aGridLayout->addWidget( myYMaxEdit,     3,    4 );
 
   if (mySecondAxisY) {
     QLabel* ver2Lab = new QLabel(tr( "VERTICAL_RIGHT_AXIS" ), myRangeGrp );
     ver2Lab->setFont( font );
-    aGridLayout->addWidget       ( ver2Lab,        4,    0 );
-    aGridLayout->addWidget       ( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
-                                                   4,    1 );
-    aGridLayout->addWidget       ( myY2MinEdit,    4,    2 );
-    aGridLayout->addWidget       ( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
-                                                   4,    3 );
-    aGridLayout->addWidget       ( myY2MaxEdit,    4,    4 );
+    aGridLayout->addWidget( ver2Lab,        4,    0 );
+    aGridLayout->addWidget( new QLabel( tr( "MIN_VALUE_LAB" ), myRangeGrp ), 
+                                            4,    1 );
+    aGridLayout->addWidget( myY2MinEdit,    4,    2 );
+    aGridLayout->addWidget( new QLabel( tr( "MAX_VALUE_LAB" ), myRangeGrp ), 
+                                            4,    3 );
+    aGridLayout->addWidget( myY2MaxEdit,    4,    4 );
   }
 
   // OK/Cancel buttons
-  myOkBtn = new QPushButton( tr( "BUT_OK" ), this, "buttonOk" );
+  myOkBtn = new QPushButton( tr( "BUT_OK" ), this );
+  myOkBtn->setObjectName( "buttonOk" );
   myOkBtn->setAutoDefault( TRUE );
   myOkBtn->setDefault( TRUE );
-  myCancelBtn = new QPushButton(  tr( "BUT_CANCEL" ), this, "buttonCancel" );
+  myCancelBtn = new QPushButton(  tr( "BUT_CANCEL" ), this );
+  myCancelBtn->setObjectName( "buttonCancel" );
   myCancelBtn->setAutoDefault( TRUE );
 
-  topLayout->addMultiCellWidget( myRangeGrp, 0, 0, 0, 2 );
+  topLayout->addWidget( myRangeGrp, 0, 0, 1, 3 );
   topLayout->addWidget( myOkBtn, 1, 0 );
-  topLayout->setColStretch( 1, 5 );
+  topLayout->setColumnStretch( 1, 5 );
   topLayout->addWidget( myCancelBtn, 1, 2 );
 
   // connect signals

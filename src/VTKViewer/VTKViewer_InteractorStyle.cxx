@@ -1,30 +1,29 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : VTKViewer_InteractorStyle.cxx
 //  Author : Christophe ATTANASIO
 //  Module : SALOME
-
+//
 #include "VTKViewer_InteractorStyle.h"
 
 #include "VTKViewer_Actor.h"
@@ -50,12 +49,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkProperty.h>
 
-#include <qapplication.h>
-//VRV: porting on Qt 3.0.5
-#if QT_VERSION >= 0x030005
-#include <qpainter.h>
-#endif
-//VRV: porting on Qt 3.0.5
+#include <QApplication>
+#include <QRubberBand>
+
 #include <algorithm>
 
 //#include "utilities.h"
@@ -103,6 +99,8 @@ VTKViewer_InteractorStyle::VTKViewer_InteractorStyle()
   myPreSelectionActor->GetProperty()->SetLineWidth(5);
   myPreSelectionActor->GetProperty()->SetPointSize(5);
 
+  myRectBand = 0;
+
   OnSelectionModeChanged();
 }
 
@@ -111,6 +109,7 @@ VTKViewer_InteractorStyle::VTKViewer_InteractorStyle()
 VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle() 
 {
   m_ViewWnd->RemoveActor(myPreSelectionActor);
+  endDrawRect();
 }
 
 
@@ -522,13 +521,13 @@ const char* imageRotateCursor[] = {
 /*! Loads cursors for viewer operations - zoom, pan, etc...*/
 void VTKViewer_InteractorStyle::loadCursors()
 {
-  myDefCursor       = QCursor(ArrowCursor);
-  myHandCursor      = QCursor(PointingHandCursor);
-  myPanCursor       = QCursor(SizeAllCursor);
+  myDefCursor       = QCursor(Qt::ArrowCursor);
+  myHandCursor      = QCursor(Qt::PointingHandCursor);
+  myPanCursor       = QCursor(Qt::SizeAllCursor);
   myZoomCursor      = QCursor(QPixmap(imageZoomCursor));
   myRotateCursor    = QCursor(QPixmap(imageRotateCursor));
   mySpinCursor      = QCursor(QPixmap(imageRotateCursor)); // temporarly !!!!!!
-  myGlobalPanCursor = QCursor(CrossCursor);
+  myGlobalPanCursor = QCursor(Qt::CrossCursor);
   myCursorState     = false;
 }
 
@@ -776,6 +775,32 @@ void VTKViewer_InteractorStyle::setCursor(const int operation)
   }
 }
 
+/*!
+  Draws rectangle by starting and current points
+*/
+void VTKViewer_InteractorStyle::drawRect()
+{
+  if ( !myRectBand ) {
+    myRectBand = new QRubberBand( QRubberBand::Rectangle, myGUIWindow );
+    QPalette palette;
+    palette.setColor(myRectBand->foregroundRole(), Qt::white);
+    myRectBand->setPalette(palette);
+  }
+  myRectBand->hide();
+
+  QRect aRect(myPoint, myOtherPoint);
+  myRectBand->setGeometry( aRect );
+  myRectBand->setVisible( aRect.isValid() );
+}
+
+/*!
+  \brief Delete rubber band on the end on the dragging operation.
+*/
+void VTKViewer_InteractorStyle::endDrawRect()
+{
+  delete myRectBand;
+  myRectBand = 0;
+}
 
 /*! called when viewer operation started (!put necessary initialization here!)*/
 void VTKViewer_InteractorStyle::onStartOperation()
@@ -787,10 +812,7 @@ void VTKViewer_InteractorStyle::onStartOperation()
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      QPainter p(myGUIWindow);
-      p.setPen(Qt::lightGray);
-      p.setRasterOp(Qt::XorROP);
-      p.drawRect(QRect(myPoint, myOtherPoint));
+      drawRect();
       break;
     }
     case VTK_INTERACTOR_STYLE_CAMERA_ZOOM:
@@ -1163,12 +1185,8 @@ void VTKViewer_InteractorStyle::onOperation(QPoint mousePos)
     }
   case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      QPainter p(myGUIWindow);
-      p.setPen(Qt::lightGray);
-      p.setRasterOp(Qt::XorROP);
-      p.drawRect(QRect(myPoint, myOtherPoint));
       myOtherPoint = mousePos;
-      p.drawRect(QRect(myPoint, myOtherPoint));
+      drawRect();
       break;
     }
   }

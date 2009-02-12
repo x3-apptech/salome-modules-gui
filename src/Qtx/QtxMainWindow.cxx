@@ -1,37 +1,43 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxMainWindow.cxx
 // Author:    Sergey TELKOV
-
+//
 #include "QtxMainWindow.h"
 
 #include "QtxToolBar.h"
 #include "QtxResourceMgr.h"
 
-#include <qlayout.h>
-#include <qmenubar.h>
-#include <qstatusbar.h>
-#include <qapplication.h>
+#include <QEvent>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QApplication>
+#include <QDesktopWidget>
 
 /*!
-    Class: QtxMainWindow::Filter [Internal]
-    Descr: Internal object with event filter for QtxMainWindow.
+  \class QtxMainWindow::Filter
+  \internal
+  \brief Internal object used to filter child removal events for 
+         specified widget from parent widget.
 */
 
 class QtxMainWindow::Filter : public QObject
@@ -43,30 +49,39 @@ public:
   virtual bool eventFilter( QObject*, QEvent* );
 
 private:
-  QMainWindow* myMain;
-  QWidget*     myWidget;
+  QMainWindow* myMain;      //!< parent main window
+  QWidget*     myWidget;    //!< widget being watched
 };
 
 /*!
-  Constructor
+  \brief Constructor.
+  \param wid widget to be watched
+  \param mw parent main window
+  \param parent parent object (in terms of QObject)
 */
 QtxMainWindow::Filter::Filter( QWidget* wid, QtxMainWindow* mw, QObject* parent )
 : QObject( parent ),
-myMain( mw ),
-myWidget( wid )
+  myMain( mw ),
+  myWidget( wid )
 {
-  myMain->installEventFilter( this );
+  QApplication::instance()->installEventFilter( this );
 };
 
 /*!
-  Destructor
+  \brief Destructor.
 */
 QtxMainWindow::Filter::~Filter()
 {
 }
 
 /*!
-  Custom event filter
+  \brief Event filter.
+
+  Watches for the specified widget and prevents its removal from the
+  parent main window.
+
+  \param o recevier object
+  \param e event
 */
 bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
 {
@@ -77,21 +92,27 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
   return QObject::eventFilter( o, e );
 }
 
+
 /*!
-    Class: QtxMainWindow [Public]
-    Descr: Main window with support of dockable menubar/status bar
-           and geometry store/retrieve.
+  \class QtxMainWindow
+  \brief Enhanced main window which supports dockable menubar and status bar
+         plus geometry saving/restoring.
 */
-QtxMainWindow::QtxMainWindow( QWidget* parent, const char* name, WFlags f )
-: QMainWindow( parent, name, f ),
-myMode( -1 ),
-myMenuBar( NULL ),
-myStatusBar( NULL )
+
+/*!
+  \brief Constructor.
+  \param parent parent widget
+  \param f widget flags (Qt::WindowFlags)
+*/
+QtxMainWindow::QtxMainWindow( QWidget* parent, Qt::WindowFlags f )
+: QMainWindow( parent, f ),
+  myMenuBar( 0 ),
+  myStatusBar( 0 )
 {
 }
 
 /*!
-  Destructor
+  \brief Destructor.
 */
 QtxMainWindow::~QtxMainWindow()
 {
@@ -100,16 +121,18 @@ QtxMainWindow::~QtxMainWindow()
 }
 
 /*!
-  \return true if menu bar exists
+  \brief Check if the menu bar is dockable.
+  \return \c true if dockable menu bar exists
 */
 bool QtxMainWindow::isDockableMenuBar() const
 {
-  return myMenuBar;
+  return myMenuBar != 0;
 }
 
 /*!
-  Creates or deletes menu bar
-  \param on - if it is true, then to create, otherwise - to delete
+  \brief Set menu bar dockable/undockable.
+  \param on if \c true, make menu bar dockable, otherwise 
+            make menu bar undockable
 */
 void QtxMainWindow::setDockableMenuBar( const bool on )
 {
@@ -122,38 +145,31 @@ void QtxMainWindow::setDockableMenuBar( const bool on )
 
   if ( on && !myMenuBar )
   {
-    mb->setCaption( tr( "Menu bar" ) );
-    QtxToolBar* dockMb = new QtxToolBar( true, this, "menu bar container" );
-    myMenuBar = dockMb;
+    myMenuBar = new QtxToolBar( true, this );
     new Filter( mb, this, myMenuBar );
-    dockMb->setWidget( mb );
-    dockMb->setNewLine( true );
-    dockMb->setStretchable( true );
-    dockMb->setResizeEnabled( false );
+    myMenuBar->setObjectName( "menu_bar_container" );
+    myMenuBar->setWindowTitle( tr( "Menu bar" ) );
+    myMenuBar->addWidget( mb );
+    myMenuBar->setAllowedAreas( Qt::TopToolBarArea | Qt::BottomToolBarArea );
 
-    moveDockWindow( dockMb, DockTop );
-    setDockEnabled( dockMb, Left, false );
-    setDockEnabled( dockMb, Right, false );
+    addToolBarBreak( Qt::TopToolBarArea );
+    addToolBar( Qt::TopToolBarArea, myMenuBar );
+    addToolBarBreak( Qt::TopToolBarArea );
 
-    setAppropriate( dockMb, false );
-
-    connect( dockMb, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
+    connect( myMenuBar, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
   }
   else if ( !on && myMenuBar )
   {
-    mb->reparent( this, QPoint( 0, 0 ), mb->isVisibleTo( mb->parentWidget() ) );
+    setMenuBar( mb );
     disconnect( myMenuBar, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
     delete myMenuBar;
     myMenuBar = 0;
-    QChildEvent ce( QEvent::ChildRemoved, mb );
-    QApplication::sendEvent( this, &ce );
   }
-
-  setUpLayout();
 }
 
 /*!
-  \return true if status bar exists
+  \brief Check if the status bar is dockable.
+  \return \c true if dockable status bar exists
 */
 bool QtxMainWindow::isDockableStatusBar() const
 {
@@ -161,8 +177,9 @@ bool QtxMainWindow::isDockableStatusBar() const
 }
 
 /*!
-  Creates or deletes status bar
-  \param on - if it is true, then to create, otherwise - to delete
+  \brief Set status bar dockable/undockable.
+  \param on if \c true, make status bar dockable, otherwise 
+            make status bar undockable
 */
 void QtxMainWindow::setDockableStatusBar( const bool on )
 {
@@ -175,209 +192,205 @@ void QtxMainWindow::setDockableStatusBar( const bool on )
 
   if ( on && !myStatusBar )
   {
-    sb->setCaption( tr( "Status bar" ) );
-    QtxToolBar* dockSb = new QtxToolBar( true, this, "status bar container" );
-    myStatusBar = dockSb;
-    new Filter( sb, this, myStatusBar );
-    dockSb->setWidget( sb );
-    dockSb->setNewLine( true );
-    dockSb->setStretchable( true );
-    dockSb->setResizeEnabled( false );
     sb->setMinimumWidth( 250 );
-
     sb->setSizeGripEnabled( false );
+    myStatusBar = new QtxToolBar( true, this );
+    new Filter( sb, this, myStatusBar );
+    myStatusBar->setObjectName( "status_bar_container" );
+    myStatusBar->setWindowTitle( tr( "Status bar" ) );
+    myStatusBar->addWidget( sb );
+    myStatusBar->setAllowedAreas( Qt::TopToolBarArea | Qt::BottomToolBarArea );
 
-    moveDockWindow( dockSb, DockBottom );
-    setDockEnabled( dockSb, Left, false );
-    setDockEnabled( dockSb, Right, false );
+    addToolBar( Qt::BottomToolBarArea, myStatusBar );
 
-    setAppropriate( dockSb, false );
-
-    connect( dockSb, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
+    connect( myStatusBar, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
   }
   else if ( !on && myStatusBar )
   {
-    sb->reparent( this, QPoint( 0, 0 ), sb->isVisibleTo( sb->parentWidget() ) );
+    setStatusBar( sb );
     disconnect( myStatusBar, SIGNAL( destroyed( QObject* ) ), this, SLOT( onDestroyed( QObject* ) ) );
     delete myStatusBar;
     myStatusBar = 0;
-    QChildEvent ce( QEvent::ChildRemoved, sb );
-    QApplication::sendEvent( this, &ce );
 
     sb->setSizeGripEnabled( true );
   }
-
-  setUpLayout();
 }
 
 /*!
-  Retrieve the geometry information from the specified resource manager section.
-  \param resMgr - instance of ersource manager
-  \param section - section name
+  \brief Dump main window geometry to the string.
+  \return string represenation of the window geometry
 */
-void QtxMainWindow::loadGeometry( QtxResourceMgr* resMgr, const QString& section )
+QString QtxMainWindow::storeGeometry() const
 {
-  QString sec = section.stripWhiteSpace();
-  if ( !resMgr || sec.isEmpty() )
-    return;
+  QRect frame = frameGeometry();
+  QRect screen = QApplication::desktop()->availableGeometry( this );
 
-  int winState = -1;
-  if ( !resMgr->value( sec, "state", winState ) )
-  {
-    QString stateStr;
-    if ( resMgr->value( sec, "state", stateStr ) )
-      winState = windowState( stateStr );
-  }
-
-  int win_w = resMgr->integerValue( sec, "width", width() );
-  int win_h = resMgr->integerValue( sec, "height", height() );
-
-  int winPosX = windowPosition( resMgr->stringValue( sec, QString( "pos_x" ), QString::null ) );
-  int winPosY = windowPosition( resMgr->stringValue( sec, QString( "pos_y" ), QString::null ) );
-
-  QWidget* desk = QApplication::desktop();
-
-  int win_x = 0;
-  if ( winPosX == WP_Absolute )
-    win_x = resMgr->integerValue( sec, "pos_x", x() );
-  else if ( desk )
-    win_x = relativeCoordinate( winPosX, desk->width(), win_w );
-
-  int win_y = 0;
-  if ( winPosX == WP_Absolute )
-    win_y = resMgr->integerValue( sec, "pos_y", y() );
-  else if ( desk )
-    win_y = relativeCoordinate( winPosY, desk->height(), win_h );
-
-  bool vis = isVisibleTo( parentWidget() );
-
-  resize( win_w, win_h );
-  move( win_x, win_y );
-
-  myMode = -1;
-
-  if ( vis )
-    QApplication::postEvent( this, new QCustomEvent( QEvent::User, (void*)winState ) );
+  QString x;
+  if ( frame.left() == screen.left() )
+    x = QString( "+0" );
+  else if ( frame.right() == screen.right() )
+    x = QString( "-0" );
   else
-    myMode = winState;
-}
+    x = QString( "+%1" ).arg( frame.left() );
 
-/*!
-  Shows main window
-*/
-void QtxMainWindow::show()
-{
-  if ( myMode != -1 )
-    QApplication::postEvent( this, new QCustomEvent( QEvent::User, (void*)myMode ) );
+  QString y;
+  if ( frame.top() == screen.top() )
+    y = QString( "+0" );
+  else if ( frame.bottom() == screen.bottom() )
+    y = QString( "-0" );
+  else
+    y = QString( "+%1" ).arg( frame.top() );
 
-  myMode = -1;
+  QString geom = QString( "%1x%2%3%4" ).arg( width() ).arg( height() ).arg( x ).arg( y );
 
-  QMainWindow::show();
-}
-
-/*!
-  Handler of custom events
-*/
-void QtxMainWindow::customEvent( QCustomEvent* e )
-{
-  QMainWindow::customEvent( e );
-
-  size_t mode = size_t(e->data());
-  switch ( mode )
+  QString state;
+  switch ( windowState() )
   {
-  case WS_Normal:
-    showNormal();
+  case Qt::WindowMaximized:
+    state = QString( "max" );
     break;
-  case WS_Minimized:
-    showMinimized();
+  case Qt::WindowMinimized:
+    state = QString( "min" );
     break;
-  case WS_Maximized:
-    showMaximized();
+  case Qt::WindowFullScreen:
+    state = QString( "full" );
     break;
   }
+
+  if ( !state.isEmpty() )
+    geom += QString( ":" ) + state;
+
+  return geom;
 }
 
 /*!
-  \return relative co-ordinate by two points
-  \param type - type of result: WP_Center (center), WP_Left (left), WP_Right (right)
-  \param wh - left point
-  \param WH - right point
+  \brief Restore main window geometry from the string.
+  \param str string represenation of the window geometry
 */
-int QtxMainWindow::relativeCoordinate( const int type, const int WH, const int wh ) const
+void QtxMainWindow::retrieveGeometry( const QString& str )
 {
-  int res = 0;
-  switch ( type )
+  QString geom = str;
+  geom.remove( '\t' );
+  geom.remove( ' ' );
+
+  QRect rect = geometry();
+  QRect screen = QApplication::desktop()->availableGeometry( this );
+
+  QRegExp szRx( "(\\d+%?)\\s*x\\s*(\\d+%?)" );
+  if ( szRx.indexIn( geom ) != -1 )
   {
-  case WP_Center:
-    res = ( WH - wh ) / 2;
-    break;
-  case WP_Left:
+    int w = -1;
+    bool wp = false;
+    int ws = geometryValue( szRx.cap( 1 ).trimmed(), w, wp );
+    bool wOk = ws != 0;
+    if ( wOk && wp )
+      w = screen.width() * qMax( qMin( w, 100 ), 0 ) / 100;
+    wOk = wOk && w;
+
+    int h = -1;
+    bool hp = false;
+    int hs = geometryValue( szRx.cap( 2 ).trimmed(), h, hp );
+    bool hOk = hs != 0;
+    if ( hOk && hp )
+      h = screen.height() * qMax( qMin( h, 100 ), 0 ) / 100;
+    hOk = hOk && h;
+
+    if ( wOk && hOk )
+      rect.setSize( QSize( w, h ) );
+  }
+
+  QRegExp posRx( "([+|-]\\d+%?)\\s*([+|-]\\d+%?)" );
+  if ( posRx.indexIn( geom ) != -1 )
+  {
+    int x = -1;
+    bool xp = false;
+    int xs = geometryValue( posRx.cap( 1 ).trimmed(), x, xp );
+    bool xOk = xs != 0;
+    if ( xOk )
+    {
+      if ( xp )
+	x = screen.width() * qMax( qMin( x, 100 ), 0 ) / 100;
+      x = ( xs > 0 ? x : screen.right() - x - rect.width() ) + frameGeometry().x() - geometry().x();
+    }
+
+    int y = -1;
+    bool yp = false;
+    int ys = geometryValue( posRx.cap( 2 ).trimmed(), y, yp );
+    bool yOk = ys != 0;
+    if ( yOk )
+    {
+      if ( yp )
+	y = screen.height() * qMax( qMin( y, 100 ), 0 ) / 100;
+      y = ( ys > 0 ? y : screen.bottom() - y - rect.height() ) + frameGeometry().y() - geometry().y();
+    }
+
+    if ( xOk && yOk )
+      rect.moveTo( x, y );
+  }
+
+  Qt::WindowState state = Qt::WindowNoState;
+
+  QRegExp stRx( ":(\\w+)" );
+  if ( stRx.indexIn( geom ) != -1 )
+  {
+    QString stStr = stRx.cap( 1 ).trimmed().toLower();
+    if ( stStr.startsWith( QString( "max" ) ) )
+      state = Qt::WindowMaximized;
+    else if ( stStr.startsWith( QString( "min" ) ) )
+      state = Qt::WindowMinimized;
+    else if ( stStr.startsWith( QString( "full" ) ) )
+      state = Qt::WindowFullScreen;
+  }
+
+  resize( rect.size() );
+  move( rect.topLeft() );
+
+  if ( state != Qt::WindowNoState )
+    setWindowState( state );
+}
+
+/*!
+  \brief Retrieve numerical value from the string.
+  
+  Numerical value in the string have the structure [+|-]\d*[%],
+  that is one or more digits which can start from "+" or "-" and
+  can end with "%" symbol.
+
+  \param str string being converted
+  \param num returning value (> 0)
+  \param percent if string ends with "%" this parameter is equal to \c true after
+         returning from the function
+  \return -1 if value < 0, 1 if value > 0 and 0 in case of error
+*/
+int QtxMainWindow::geometryValue( const QString& str, int& num, bool& percent ) const
+{
+  num = -1;
+  int res = 1;
+  QString numStr = str;
+  if ( numStr.startsWith( "+" ) || numStr.startsWith( "-" ) )
+  {
+    res = numStr.startsWith( "+" ) ? 1 : -1;
+    numStr = numStr.mid( 1 );
+  }
+
+  percent = numStr.endsWith( "%" );
+  if ( percent )
+    numStr = numStr.mid( 0, numStr.length() - 1 );
+
+  bool ok = false;
+  num = numStr.toInt( &ok );
+  if ( !ok )
     res = 0;
-    break;
-  case WP_Right:
-    res = WH - wh;
-    break;
-  }
+
   return res;
 }
 
 /*!
-  Store the geometry information into the specified resource manager section.
-  \param resMgr - instance of ersource manager
-  \param section - section name
-*/
-void QtxMainWindow::saveGeometry( QtxResourceMgr* resMgr, const QString& section ) const
-{
-  QString sec = section.stripWhiteSpace();
-  if ( !resMgr || sec.isEmpty() )
-    return;
+  \brief Called when child object (menu bar, status bar) is destroyed.
+  
+  Clears internal pointer to prevent crashes.
 
-  resMgr->setValue( sec, "pos_x", pos().x() );
-  resMgr->setValue( sec, "pos_y", pos().y() );
-  resMgr->setValue( sec, "width", width() );
-  resMgr->setValue( sec, "height", height() );
-
-  int winState = WS_Normal;
-  if ( isMinimized() )
-    winState = WS_Minimized;
-  else if ( isMaximized() )
-    winState = WS_Maximized;
-
-  resMgr->setValue( sec, "state", winState );
-}
-
-/*!
-  Custom event filter
-*/
-bool QtxMainWindow::eventFilter( QObject* o, QEvent* e )
-{
-  return QMainWindow::eventFilter( o, e );
-}
-
-/*!
-  Controls whether or not the dw dock window's caption should appear
-  as a menu item on the dock window menu that lists the dock windows.
-  \param dw - window
-  \param a - if it is true, then it appears in menu
-*/
-void QtxMainWindow::setAppropriate( QDockWindow* dw, bool a )
-{
-  QMainWindow::setAppropriate( dw, myStatusBar != dw && myMenuBar != dw && a );
-}
-
-/*!
-  Sets up layout
-*/
-void QtxMainWindow::setUpLayout()
-{
-  QMainWindow::setUpLayout();
-
-  if ( myMenuBar && layout() )
-    layout()->setMenuBar( 0 );
-}
-
-/*!
-  SLOT: called on object destroyed, clears internal fields in case of deletion of menu bar or status bar
+  \param obj signal sender (object being destroyed)
 */
 void QtxMainWindow::onDestroyed( QObject* obj )
 {
@@ -400,54 +413,3 @@ void QtxMainWindow::onDestroyed( QObject* obj )
   }
 }
 
-/*!
-  \return flag of window state by it's name
-  \param str - name of flag
-*/
-int QtxMainWindow::windowState( const QString& str ) const
-{
-  static QMap<QString, int> winStateMap;
-  if ( winStateMap.isEmpty() )
-  {
-    winStateMap["normal"]    = WS_Normal;
-    winStateMap["min"]       = WS_Minimized;
-    winStateMap["mini"]      = WS_Minimized;
-    winStateMap["minimized"] = WS_Minimized;
-    winStateMap["max"]       = WS_Maximized;
-    winStateMap["maxi"]      = WS_Maximized;
-    winStateMap["maximized"] = WS_Maximized;
-    winStateMap["hidden"]    = WS_Hidden;
-    winStateMap["hided"]     = WS_Hidden;
-    winStateMap["hide"]      = WS_Hidden;
-    winStateMap["invisible"] = WS_Hidden;
-  }
-
-  int res = -1;
-  QString stateStr = str.stripWhiteSpace().lower();
-  if ( winStateMap.contains( stateStr ) )
-    res = winStateMap[stateStr];
-  return res;
-}
-
-/*!
-  \return flag of position by it's name
-  \param str - name of position
-*/
-int QtxMainWindow::windowPosition( const QString& str ) const
-{
-  static QMap<QString, int> winPosMap;
-  if ( winPosMap.isEmpty() )
-  {
-    winPosMap["center"] = WP_Center;
-    winPosMap["left"]   = WP_Left;
-    winPosMap["right"]  = WP_Right;
-    winPosMap["top"]    = WP_Top;
-    winPosMap["bottom"] = WP_Bottom;
-  }
-
-  int res = WP_Absolute;
-  QString posStr = str.stripWhiteSpace().lower();
-  if ( winPosMap.contains( posStr ) )
-    res = winPosMap[posStr];
-  return res;
-}

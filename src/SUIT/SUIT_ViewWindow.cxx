@@ -1,35 +1,40 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // SUIT_ViewWindow.cxx: implementation of the SUIT_ViewWindow class.
 //
-
 #include "SUIT_ViewWindow.h"
-#include "SUIT_Desktop.h"
-#include "SUIT_Application.h"
-#include "SUIT_Study.h"
-#include "SUIT_ViewManager.h"
+
 #include "SUIT_Tools.h"
+#include "SUIT_Study.h"
+#include "SUIT_Desktop.h"
 #include "SUIT_MessageBox.h"
-#include <qhbox.h>
-#include <qpopupmenu.h>
-#include <qapplication.h>
-#include <qimage.h>
+#include "SUIT_Application.h"
+#include "SUIT_ViewManager.h"
+#include "QtxActionToolMgr.h"
+
+#include <QEvent>
+#include <QIcon>
+#include <QApplication>
+#include <QContextMenuEvent>
 
 /*!\class SUIT_ViewWindow
  * Class provide view window.
@@ -39,13 +44,16 @@
 const int DUMP_EVENT = QEvent::User + 123;
 
 /*! Constructor.*/
-SUIT_ViewWindow::SUIT_ViewWindow(SUIT_Desktop* theDesktop)
-: QMainWindow( theDesktop, "SUIT_ViewWindow", Qt::WDestructiveClose )
+SUIT_ViewWindow::SUIT_ViewWindow( SUIT_Desktop* theDesktop )
+: QMainWindow( theDesktop )
 {
   myDesktop = theDesktop;
 
-  if ( myDesktop->icon() )
-    setIcon( *myDesktop->icon() );
+  setWindowIcon( myDesktop->windowIcon() );
+
+  setAttribute( Qt::WA_DeleteOnClose );
+
+  myToolMgr = new QtxActionToolMgr( this );
 }
 
 /*! Destructor.*/
@@ -87,7 +95,7 @@ QImage SUIT_ViewWindow::dumpView()
 bool SUIT_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileName, const QString& format )
 {
   if( img.isNull() )
-    return false; 
+    return false;
 
   QString fmt = format;
   if( fmt.isEmpty() )
@@ -95,8 +103,8 @@ bool SUIT_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileNa
   else if( fmt == "JPG" )
     fmt = "JPEG";
 
-  QApplication::setOverrideCursor( Qt::waitCursor );
-  bool res = img.save( fileName, fmt.latin1() );
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+  bool res = img.save( fileName, fmt.toLatin1() );
   QApplication::restoreOverrideCursor();
   return res;
 }
@@ -116,24 +124,28 @@ bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& 
 */
 void SUIT_ViewWindow::setDestructiveClose( const bool on )
 {
-  if ( on )
-    setWFlags( WDestructiveClose );
-  else
-    clearWFlags( WDestructiveClose );
+  setAttribute( Qt::WA_DeleteOnClose, on );
 }
 
 /*! Close event \a theEvent.
 */
-void SUIT_ViewWindow::closeEvent(QCloseEvent* theEvent)
+void SUIT_ViewWindow::closeEvent( QCloseEvent* e )
 {
-//  QMainWindow::closeEvent( theEvent );
+  e->ignore();
   emit closing( this );
 }
 
 /*! Context menu requested for event \a e.
 */
-void SUIT_ViewWindow::contextMenuEvent ( QContextMenuEvent * e )
+void SUIT_ViewWindow::contextMenuEvent( QContextMenuEvent* e )
 {
+  e->ignore();
+
+  QMainWindow::contextMenuEvent( e );
+
+  if ( e->isAccepted() )
+    return;
+
   if ( e->reason() != QContextMenuEvent::Mouse )
     emit contextMenuRequested( e );
 }
@@ -142,8 +154,8 @@ void SUIT_ViewWindow::contextMenuEvent ( QContextMenuEvent * e )
 */
 void SUIT_ViewWindow::onDumpView()
 {
-  qApp->postEvent( this, new QPaintEvent( QRect( 0, 0, width(), height() ), TRUE ) );
-  qApp->postEvent( this, new QCustomEvent( DUMP_EVENT ) );
+  QApplication::postEvent( this, new QPaintEvent( QRect( 0, 0, width(), height() ) ) );
+  QApplication::postEvent( this, new QEvent( (QEvent::Type)DUMP_EVENT ) );
 }
 
 /*!
@@ -167,21 +179,19 @@ bool SUIT_ViewWindow::event( QEvent* e )
 
       // get file name
       SUIT_Application* app = myManager->study()->application();
-      QString fileName = app->getFileName( false, QString::null, filter(), tr( "TLT_DUMP_VIEW" ), 0 );
-      if( !fileName.isEmpty() )
+      QString fileName = app->getFileName( false, QString(), filter(), tr( "TLT_DUMP_VIEW" ), 0 );
+      if ( !fileName.isEmpty() )
       {
-	QString fmt = SUIT_Tools::extension( fileName ).upper();
-	bOk = dumpViewToFormat( im, fileName, fmt );
+	      QString fmt = SUIT_Tools::extension( fileName ).toUpper();
+	      bOk = dumpViewToFormat( im, fileName, fmt );
       }
       else
-      {
-	bOk = true; // cancelled
-      }
+	      bOk = true; // cancelled
     }
-    if ( !bOk ) {
-      SUIT_MessageBox::error1( this, tr( "ERROR" ), tr( "ERR_CANT_DUMP_VIEW" ), tr( "BUT_OK" ) );
-    }
-    return TRUE;
+    if ( !bOk )
+      SUIT_MessageBox::critical( this, tr( "ERROR" ), tr( "ERR_CANT_DUMP_VIEW" ) );
+
+    return true;
   }
   return QMainWindow::event( e );
 }
@@ -211,7 +221,23 @@ QString   SUIT_ViewWindow::getVisualParameters()
 /*!
   Sets visual parameters of window by its string representation
   \param parameters - string with visual parameters
-*/ 
-void SUIT_ViewWindow::setVisualParameters( const QString& parameters )
+*/
+void SUIT_ViewWindow::setVisualParameters( const QString& /*parameters*/ )
 {
+}
+
+/*!
+  \return associated tool bar manager
+*/
+QtxActionToolMgr* SUIT_ViewWindow::toolMgr() const
+{
+  return myToolMgr;
+}
+
+/*!
+  \return window unique identifier  
+*/
+int SUIT_ViewWindow::getId() const
+{
+  return int(long(this));
 }

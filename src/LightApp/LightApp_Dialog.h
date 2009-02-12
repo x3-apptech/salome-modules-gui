@@ -1,36 +1,39 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_Dialog.h
 // Author:    Alexander SOLOVYOV
-
+//
 #ifndef LIGHTAPP_DIALOG_H
 #define LIGHTAPP_DIALOG_H
 
 #include "LightApp.h"
 #include <QtxDialog.h>
 
-#include <qvaluelist.h>
-#include <qmap.h>
-#include <qpixmap.h>
+#include <QList>
+#include <QMap>
+#include <QPixmap>
 
 class QLineEdit;
-class QButton;
+class QAbstractButton;
 class QLabel;
 
 class SUIT_ResourceMgr;
@@ -52,7 +55,7 @@ class LIGHTAPP_EXPORT LightApp_Dialog : public QtxDialog
   Q_OBJECT
   
 public:
-  typedef QValueList<int>        TypesList;
+  typedef QList<int>             TypesList;
   typedef QMap<int,QStringList>  SelectedObjects;
 
   enum ObjectWg
@@ -76,7 +79,7 @@ public:
 
 public:
   LightApp_Dialog( QWidget* = 0, const char* = 0, bool = false,
-                    bool = false, const int = Standard, WFlags = 0 );
+                    bool = false, const int = Standard, Qt::WindowFlags = 0 );
   virtual ~LightApp_Dialog();
   
   virtual void    show();
@@ -224,7 +227,7 @@ protected:
   
   //!Change and get type name for indicating in selection widget
   QString& typeName( const int );
-  const QString& typeName( const int ) const;
+  const QString typeName( const int ) const;
   
   //! Create string contains selection list by list of names, list of types and current name indication state
   virtual QString selectionDescription( const QStringList&, const TypesList&, const NameIndication ) const;
@@ -272,12 +275,12 @@ private:
 private:
   typedef struct
   {
-    QLineEdit*      myEdit;
-    QButton*        myBtn;
-    QLabel*         myLabel;
-    QStringList     myNames, myIds;
-    TypesList       myTypes, myPossibleTypes;
-    NameIndication  myNI;
+    QLineEdit*       myEdit;
+    QAbstractButton* myBtn;
+    QLabel*          myLabel;
+    QStringList      myNames, myIds;
+    TypesList        myTypes, myPossibleTypes;
+    NameIndication   myNI;
     
   } Object;
   

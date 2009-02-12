@@ -1,31 +1,34 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxComboBox.h
 // Author:    Sergey TELKOV
-
+//
 #ifndef QTXCOMBOBOX_H
 #define QTXCOMBOBOX_H
 
 #include "Qtx.h"
 
-#include <qmap.h>
-#include <qcombobox.h>
+#include <QMap>
+#include <QComboBox>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -33,45 +36,47 @@
 
 class QTX_EXPORT QtxComboBox : public QComboBox
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    typedef QMap<int, int> IndexIdMap;
+  class Model;
+  class ClearEvent;
 
 public:
-    QtxComboBox( QWidget* = 0, const char* = 0 );
-    QtxComboBox( bool, QWidget* = 0, const char* = 0 );
-    virtual ~QtxComboBox();
+  QtxComboBox( QWidget* = 0 );
+  virtual ~QtxComboBox();
 
-    bool         isCleared() const;
-    void         setCleared( const bool );
+  bool         isCleared() const;
+  void         setCleared( const bool );
 
-    virtual void setCurrentItem( int );
-    virtual void setCurrentText( const QString& );
+  int          currentId() const;
+  void         setCurrentId( int );
 
-    int          currentId() const;
-    void         setCurrentId( int );
+  int          id( const int ) const;
+  int          index( const int ) const;
+
+  bool         hasId( const int ) const;
+  void         setId( const int, const int );
 
 signals:
-    void         activatedId( int );
-    void         highlightedId( int );
+  void         activatedId( int );
 
 private slots:
-    void         onActivated( int );
-    void         onActivated( const QString& );
+  void         onActivated( int );
+  void         onCurrentChanged( int );
 
 protected:
-    virtual void paintEvent( QPaintEvent* );
+  virtual void paintEvent( QPaintEvent* );
+  virtual void childEvent( QChildEvent* );
+  virtual void customEvent( QEvent* );
 
 private:
-    int          id( const int ) const;
-    int          index( const int ) const;
-
-    void         resetClear();
-    void         paintClear( QPaintEvent* );
+  void         resetClear();
 
 private:
-    bool         myCleared;
-    IndexIdMap   myIndexId;
+  enum { IdRole = Qt::UserRole + 10 };
+
+private:
+  bool         myCleared;     //!< "cleared" state
 };
 
 #ifdef WIN32

@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,37 +17,38 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_ViewPort2d.cxx
 // Created:   November, 2004
-
+//
 /* GLViewer_ViewPort2d Source File */
 
 //#include <GLViewerAfx.h>
 #include "GLViewer_ViewPort2d.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_ViewFrame.h"
-#include "GLViewer_MimeSource.h"
+#include "GLViewer_MimeData.h"
 #include "GLViewer_Context.h"
 #include "GLViewer_Compass.h"
 #include "GLViewer_Grid.h"
+#include "GLViewer_Drawer.h"
 
-#include <QtxToolTip.h>
+// TODO: Porting to Qt4
+//#include <QtxToolTip.h>
 
-#include <qlayout.h>
-#include <qevent.h>
-#include <qrect.h>
-#include <qpopupmenu.h>
-#include <qtooltip.h>
-#include <qapplication.h>
-#include <qclipboard.h>
-#include <qpainter.h>
-#include <qbitmap.h>
-#include <qlabel.h>
+#include <QHBoxLayout>
+#include <QMouseEvent>
+#include <QRect>
+//#include <QMenu>
+//#include <QToolTip>
+#include <QApplication>
+#include <QClipboard>
+#include <QBitmap>
+#include <QLabel>
+#include <QWidget>
+#include <QRubberBand>
 
 #define WIDTH       640
 #define HEIGHT      480
@@ -66,45 +70,50 @@ void rotate_point( float& theX, float& theY, float theAngle )
 /*!
   Constructor
 */
-GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame ) :
-       GLViewer_ViewPort( parent ),
-       myMargin( MARGIN ), myWidth( WIDTH ), myHeight( HEIGHT ),
-       myXScale( 1.0 ), myYScale( 1.0 ), myXOldScale( 1.0 ), myYOldScale( 1.0 ),
-       myXPan( 0.0 ), myYPan( 0.0 ),
-       myIsMouseReleaseBlock( false )
+GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame )
+: GLViewer_ViewPort( parent ),
+  myMargin( MARGIN ), myWidth( WIDTH ), myHeight( HEIGHT ),
+  myXScale( 1.0 ), myYScale( 1.0 ), myXOldScale( 1.0 ), myYOldScale( 1.0 ),
+  myXPan( 0.0 ), myYPan( 0.0 ),
+  myIsMouseReleaseBlock( false ),
+  myRectBand( 0 )
 {
-    if( theViewFrame == NULL )
-        myViewFrame = ( GLViewer_ViewFrame* )parent;
-    else
-        myViewFrame = theViewFrame;
+  if ( !theViewFrame )
+    myViewFrame = (GLViewer_ViewFrame*)parent;
+  else
+    myViewFrame = theViewFrame;
 
-    myGrid = 0;
-    myCompass = 0;
-    myBorder = new GLViewer_Rect();
+  myGrid = 0;
+  myCompass = 0;
+  myBorder = new GLViewer_Rect();
 
-    QBoxLayout* qbl = new QHBoxLayout( this );
-    myGLWidget = new GLViewer_Widget( this, 0 ) ;
-    qbl->addWidget( myGLWidget );
-    myGLWidget->setFocusProxy( this );
-    setMouseTracking( TRUE );
+  QBoxLayout* qbl = new QHBoxLayout( this );
+  qbl->setSpacing( 0 );
+  qbl->setMargin( 0 );
 
-    myIsDragProcess = noDrag;
-    //myCurDragMousePos = QPoint();
-    myCurDragPosX = NULL;
-    myCurDragPosY = NULL;
+  myGLWidget = new GLViewer_Widget( this, 0 ) ;
+  qbl->addWidget( myGLWidget );
+  myGLWidget->setFocusProxy( this );
+  setMouseTracking( TRUE );
 
-    myIsPulling = false;
+  myIsDragProcess = noDrag;
+  //myCurDragMousePos = QPoint();
+  myCurDragPosX = NULL;
+  myCurDragPosY = NULL;
 
-    myViewPortId = aLastViewPostId;
-    aLastViewPostId++;
+  myIsPulling = false;
 
-    mypFirstPoint = NULL;
-    mypLastPoint = NULL;
+  myViewPortId = aLastViewPostId;
+  aLastViewPostId++;
 
-    myObjectTip = new QtxToolTip( myGLWidget );///GLViewer_ObjectTip( this );
+  mypFirstPoint = NULL;
+  mypLastPoint = NULL;
+
+    // TODO: Porting to Qt4
+    /*myObjectTip = new QtxToolTip( myGLWidget );///GLViewer_ObjectTip( this );
     myObjectTip->setShowDelayTime( 60000 );
     connect( myObjectTip, SIGNAL( maybeTip( QPoint, QString&, QFont&, QRect&, QRect& ) ),
-             this, SLOT( onMaybeTip( QPoint, QString&, QFont&, QRect&, QRect& ) ) );
+             this, SLOT( onMaybeTip( QPoint, QString&, QFont&, QRect&, QRect& ) ) );*/
 //    myGLWidget->installEventFilter( myObjectTip );
 }
 
@@ -121,6 +130,9 @@ GLViewer_ViewPort2d::~GLViewer_ViewPort2d()
 
     delete myBorder;
     delete myGLWidget;
+
+    if ( myRectBand ) myRectBand->hide();
+    delete myRectBand;
 }
 
 /*!
@@ -138,20 +150,20 @@ void GLViewer_ViewPort2d::onStartDragObject( )
         myCurDragPosX = NULL;
         myCurDragPosY = NULL;
         return;
-    } 
+    }
 }
 
 /*!
   SLOT: cuts object to clipboard
 */
 void GLViewer_ViewPort2d::onCutObject()
-{ 
+{
     /*GLViewer_Object* aMovingObject = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext()->getCurrentObject();
-    if( aMovingObject )    
-    {        
+    if( aMovingObject )
+    {
         GLViewer_MimeSource* aMimeSource = new GLViewer_MimeSource();
         aMimeSource->setObject( aMovingObject );
-        
+
         QClipboard *aClipboard = QApplication::clipboard();
         aClipboard->clear();
         aClipboard->setData( aMimeSource );
@@ -162,17 +174,17 @@ void GLViewer_ViewPort2d::onCutObject()
     int aObjNum = aContext->NbSelected();
     if( aObjNum > 0 )
     {
-        QValueList<GLViewer_Object*> aObjects;
-        GLViewer_MimeSource* aMimeSource = new GLViewer_MimeSource();
+        QList<GLViewer_Object*> aObjects;
+        GLViewer_MimeData* aMimeData = new GLViewer_MimeData();
         aContext->InitSelected();
         for( ; aContext->MoreSelected(); aContext->NextSelected() )
             aObjects.append( aContext->SelectedObject() );
 
-        //aMimeSource->setObjects( aObjects ); ouv 6.05.04
+        //aMimeData->setObjects( aObjects ); ouv 6.05.04
 
         QClipboard *aClipboard = QApplication::clipboard();
         aClipboard->clear();
-        aClipboard->setData( aMimeSource );
+        aClipboard->setMimeData( aMimeData );
 
         for( int i = 0; i < aObjNum; i++ )
             aContext->deleteObject( aObjects[i] );
@@ -185,11 +197,11 @@ void GLViewer_ViewPort2d::onCutObject()
 void GLViewer_ViewPort2d::onCopyObject()
 {
     /*GLViewer_Object* aMovingObject = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext()->getCurrentObject();
-    if( aMovingObject )    
-    {        
+    if( aMovingObject )
+    {
         GLViewer_MimeSource* aMimeSource = new GLViewer_MimeSource();
         aMimeSource->setObject( aMovingObject );
-        
+
         QClipboard *aClipboard = QApplication::clipboard();
         aClipboard->clear();
         aClipboard->setData( aMimeSource );
@@ -199,17 +211,17 @@ void GLViewer_ViewPort2d::onCopyObject()
     int aObjNum = aContext->NbSelected();
     if( aObjNum > 0 )
     {
-        QValueList<GLViewer_Object*> aObjects;
-        GLViewer_MimeSource* aMimeSource = new GLViewer_MimeSource();
+        QList<GLViewer_Object*> aObjects;
+        GLViewer_MimeData* aMimeData = new GLViewer_MimeData();
         aContext->InitSelected();
         for( ; aContext->MoreSelected(); aContext->NextSelected() )
             aObjects.append( aContext->SelectedObject() );
 
-        //aMimeSource->setObjects( aObjects ); ouv 6.05.04
+        //aMimeData->setObjects( aObjects ); ouv 6.05.04
 
         QClipboard *aClipboard = QApplication::clipboard();
         aClipboard->clear();
-        aClipboard->setData( aMimeSource );
+        aClipboard->setMimeData( aMimeData );
     }
 }
 
@@ -240,7 +252,7 @@ void GLViewer_ViewPort2d::onPasteObject()
         GLViewer_Object* aObject = GLViewer_MimeSource::getObject( anArray, aType );
         if( !aObject )
             return;
-        
+
         ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext()->insertObject( aObject, true );
     }
     */
@@ -251,7 +263,7 @@ void GLViewer_ViewPort2d::onPasteObject()
     if( aMimeSource->provides( "GLViewer_Objects" ) )
     {
         QByteArray anArray = aMimeSource->encodedData( "GLViewer_Objects" );
-        QValueList<GLViewer_Object*> aObjects = GLViewer_MimeSource::getObjects( anArray, "GLViewer_Objects" );
+        QList<GLViewer_Object*> aObjects = GLViewer_MimeSource::getObjects( anArray, "GLViewer_Objects" );
         if( aObjects.empty() )
             return;
         GLViewer_Context* aContext = ((GLViewer_Viewer2d*)getViewFrame()->getViewer())->getGLContext();
@@ -270,14 +282,14 @@ void GLViewer_ViewPort2d::onDragObject( QMouseEvent* e )
   GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
   GLViewer_Context* aContext = aViewer->getGLContext();
   GLViewer_Object* anObject = aContext->getCurrentObject();
-  
+
   if( !aContext )
     return;
 
   float aX = e->pos().x();
   float anY = e->pos().y();
   aViewer->transPoint( aX, anY );
-    
+
   if( myCurDragPosX == NULL && myCurDragPosY == NULL )
   {
     myCurDragPosX = new float(aX);
@@ -287,8 +299,8 @@ void GLViewer_ViewPort2d::onDragObject( QMouseEvent* e )
 
   //QPoint aNewPos = e->pos();
   //GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
-  
-  if( anObject && (e->state() & LeftButton ) )
+
+  if( anObject && (e->buttons() & Qt::LeftButton ) )
   {
     if( aContext->isSelected( anObject ) )
     {
@@ -302,14 +314,14 @@ void GLViewer_ViewPort2d::onDragObject( QMouseEvent* e )
     else
       anObject->moveObject( aX - *myCurDragPosX, anY - *myCurDragPosY);
   }
-  else if( aContext->NbSelected() && (e->state() & MidButton ) )
+  else if( aContext->NbSelected() && (e->buttons() & Qt::MidButton ) )
     for( aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected() )
         (aContext->SelectedObject())->moveObject( aX - *myCurDragPosX, anY - *myCurDragPosY);
-  
+
   delete myCurDragPosX;
   delete myCurDragPosY;
   myCurDragPosX = new float(aX);
-  myCurDragPosY = new float(anY);    
+  myCurDragPosY = new float(anY);
 
   myGLWidget->updateGL();
 }
@@ -318,20 +330,20 @@ void GLViewer_ViewPort2d::onDragObject( QMouseEvent* e )
     Emits 'mouseEvent' signal. [ virtual protected ]
 */
 void GLViewer_ViewPort2d::mousePressEvent( QMouseEvent* e )
-{    
+{
     emit vpMouseEvent( e );
-    
-    GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();   
+
+    GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
     GLViewer_Context* aContext = aViewer->getGLContext();
 
     GLViewer_Object* anObject = NULL;
     if( aContext )
         anObject = aContext->getCurrentObject();
-    
-    bool accel = e->state() & GLViewer_ViewTransformer::accelKey();
+
+    bool accel = e->modifiers() & GLViewer_ViewTransformer::accelKey();
     if( ( anObject && !( accel || e->button() == Qt::RightButton ) ) ||
         ( aContext->NbSelected() && !accel && e->button() == Qt::MidButton )  )
-    {       
+    {
         myIsDragProcess = inDrag;
     }
 }
@@ -342,11 +354,11 @@ void GLViewer_ViewPort2d::mousePressEvent( QMouseEvent* e )
 void GLViewer_ViewPort2d::mouseMoveEvent( QMouseEvent* e )
 {
     emit vpMouseEvent( e );
-    
+
     if( myIsDragProcess == inDrag )
         onDragObject( e );
 
-    /*GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();   
+    /*GLViewer_Viewer2d* aViewer = (GLViewer_Viewer2d*)getViewFrame()->getViewer();
     GLViewer_Context* aContext = aViewer->getGLContext();
 
     GLViewer_Object* anObj = aContext->getCurrentObject();
@@ -371,7 +383,7 @@ void GLViewer_ViewPort2d::mouseMoveEvent( QMouseEvent* e )
     Emits 'mouseEvent' signal. [ virtual protected ]
 */
 void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
-{    
+{
     if ( myIsMouseReleaseBlock )
     {
       // skip mouse release after double click
@@ -388,7 +400,7 @@ void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
         //destroyPopup( /*popup*/ );
     }
     emit vpMouseEvent( e );
-    
+
     if( myIsDragProcess == inDrag )
     {
       bool isAnyMoved = false;
@@ -401,11 +413,11 @@ void GLViewer_ViewPort2d::mouseReleaseEvent( QMouseEvent* e )
         if( aMovingObject )
           isAnyMoved = aMovingObject->finishMove() || isAnyMoved;
       }
-      
+
       aMovingObject = aContext->getCurrentObject();
       if( aMovingObject )
         isAnyMoved = aMovingObject->finishMove() || isAnyMoved;
-      
+
       myIsDragProcess = noDrag;
       //myCurDragMousePos.setX( 0 );
       //myCurDragMousePos.setY( 0 );
@@ -454,7 +466,7 @@ void GLViewer_ViewPort2d::turnGrid( GLboolean on )
     if( on )
     {
         myGrid = new GLViewer_Grid( 2*WIDTH, 2*HEIGHT,
-                                    2*WIDTH, 2*HEIGHT, 
+                                    2*WIDTH, 2*HEIGHT,
                                     GRID_XSIZE, GRID_YSIZE,
                                     myXPan, myYPan,
                                     myXScale, myYScale );
@@ -519,36 +531,36 @@ void GLViewer_ViewPort2d::initResize( int x, int y )
     GLfloat h = y;
     bool max = FALSE;
 
-    xzoom = (GLfloat)x / myWidth; 
-    yzoom = (GLfloat)y / myHeight; 
+    xzoom = (GLfloat)x / myWidth;
+    yzoom = (GLfloat)y / myHeight;
 
-    if ( ( xzoom < yzoom ) && ( xzoom < 1 ) ) 
-        zoom = xzoom; 
-    else if ( ( yzoom < xzoom ) && ( yzoom < 1 ) ) 
-        zoom = yzoom; 
-    else 
-    { 
-        max = TRUE; 
-        zoom = xzoom > yzoom ? xzoom : yzoom; 
-    } 
+    if ( ( xzoom < yzoom ) && ( xzoom < 1 ) )
+        zoom = xzoom;
+    else if ( ( yzoom < xzoom ) && ( yzoom < 1 ) )
+        zoom = yzoom;
+    else
+    {
+        max = TRUE;
+        zoom = xzoom > yzoom ? xzoom : yzoom;
+    }
 
     if ( !max && ( ! ( ( ( myXPan + w/2 ) < xb * myXScale * zoom ) ||
-             ( ( myXPan - w/2 ) > xa * myXScale * zoom ) || 
+             ( ( myXPan - w/2 ) > xa * myXScale * zoom ) ||
              ( ( myYPan + h/2 ) < yb * myYScale * zoom ) ||
-             ( ( myYPan - h/2 ) > ya * myYScale * zoom ) ) ) ) 
-        zoom = 1; 
+             ( ( myYPan - h/2 ) > ya * myYScale * zoom ) ) ) )
+        zoom = 1;
 
     if ( max && ( ( ( myXPan + w/2 ) < xb * myXScale * zoom ) ||
-            ( ( myXPan - w/2 ) > xa * myXScale * zoom ) || 
-            ( ( myYPan + h/2 ) < yb * myYScale * zoom ) || 
-            ( ( myYPan - h/2 ) > ya * myYScale * zoom ) ) ) 
-        zoom = 1; 
- 
-    myWidth = x;
-    myHeight = y; 
+            ( ( myXPan - w/2 ) > xa * myXScale * zoom ) ||
+            ( ( myYPan + h/2 ) < yb * myYScale * zoom ) ||
+            ( ( myYPan - h/2 ) > ya * myYScale * zoom ) ) )
+        zoom = 1;
 
-    myXScale *= zoom; 
-    myYScale = myXScale; 
+    myWidth = x;
+    myHeight = y;
+
+    myXScale *= zoom;
+    myYScale = myXScale;
 
     if ( myGrid )
         myGrid->setResize( 2*x, 2*y, zoom );
@@ -582,18 +594,18 @@ void GLViewer_ViewPort2d::reset()
 {
     //cout << "GLViewer_ViewPort2d::reset" << endl;
 
-    GLint val[4]; 
-    GLint vpWidth, vpHeight; 
+    GLint val[4];
+    GLint vpWidth, vpHeight;
 
     myGLWidget->makeCurrent();
     glGetIntegerv( GL_VIEWPORT, val );
-    vpWidth = val[2]; 
-    vpHeight = val[3]; 
+    vpWidth = val[2];
+    vpHeight = val[3];
 
     GLint w = myGLWidget->getWidth();
     GLint h = myGLWidget->getHeight();
-    GLfloat zoom = vpWidth / ( GLfloat )w < vpHeight / ( GLfloat )h ? 
-                 vpWidth / ( GLfloat )w : vpHeight / ( GLfloat )h; 
+    GLfloat zoom = vpWidth / ( GLfloat )w < vpHeight / ( GLfloat )h ?
+                 vpWidth / ( GLfloat )w : vpHeight / ( GLfloat )h;
 
     if( myGrid )
     {
@@ -657,13 +669,13 @@ void GLViewer_ViewPort2d::setCenter( int x, int y )
 {
     //cout << "GLViewer_ViewPort2d::setCenter" << endl;
 
-    GLint val[4]; 
-    GLint vpWidth, vpHeight; 
+    GLint val[4];
+    GLint vpWidth, vpHeight;
 
     myGLWidget->makeCurrent();
     glGetIntegerv( GL_VIEWPORT, val );
-    vpWidth = val[2]; 
-    vpHeight = val[3]; 
+    vpWidth = val[2];
+    vpHeight = val[3];
 
     myXPan -= ( x - vpWidth/2 ) / myXScale;
     myYPan += ( y - vpHeight/2 ) / myYScale;
@@ -688,7 +700,7 @@ void GLViewer_ViewPort2d::setCenter( int x, int y )
 void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
 {
     //cout << "GLViewer_ViewPort2d::zoom" << endl;
-  
+
     float dx, dy, zm;
     dx = x - x0;
     dy = y - y0;
@@ -696,14 +708,14 @@ void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
     if ( dx == 0. && dy == 0. )
         return;
 
-    zm = sqrt(dx * dx + dy * dy) / 100. + 1; 
-    zm = (dx > 0.) ?  zm : 1. / zm; 
+    zm = sqrt(dx * dx + dy * dy) / 100. + 1;
+    zm = (dx > 0.) ?  zm : 1. / zm;
 
     //backup values
     float bX = myXScale;
     float bY = myYScale;
-    myXScale *= zm; 
-    myYScale *= zm; 
+    myXScale *= zm;
+    myYScale *= zm;
 
     if( myGrid )
     {
@@ -717,7 +729,7 @@ void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
         {// undo
             myXScale = bX;
             myYScale = bY;
-        } 
+        }
     }
     else
     {
@@ -734,30 +746,30 @@ void GLViewer_ViewPort2d::zoom( int x0, int y0, int x, int y )
 void GLViewer_ViewPort2d::fitRect( const QRect& rect )
 {
     float x0, x1, y0, y1;
-    float dx, dy, zm, centerX, centerY; 
+    float dx, dy, zm, centerX, centerY;
 
-    GLint val[4]; 
-    GLint vpWidth, vpHeight; 
+    GLint val[4];
+    GLint vpWidth, vpHeight;
 
     myGLWidget->makeCurrent();
     glGetIntegerv( GL_VIEWPORT, val );
-    vpWidth = val[2]; 
-    vpHeight = val[3]; 
+    vpWidth = val[2];
+    vpHeight = val[3];
 
     x0 = rect.left();
     x1 = rect.right();
     y0 = rect.top();
     y1 = rect.bottom();
 
-    dx = fabs( x1 - x0 ); 
-    dy = fabs( y1 - y0 ); 
-    centerX = ( x0 + x1 ) / 2.; 
-    centerY = ( y0 + y1 ) / 2.; 
+    dx = fabs( x1 - x0 );
+    dy = fabs( y1 - y0 );
+    centerX = ( x0 + x1 ) / 2.;
+    centerY = ( y0 + y1 ) / 2.;
 
     if ( dx == 0. || dy == 0. )
         return;
 
-    zm = vpWidth / dx < vpHeight / dy ? vpWidth / dx : vpHeight / dy; 
+    zm = vpWidth / dx < vpHeight / dy ? vpWidth / dx : vpHeight / dy;
 
     float aDX = ( vpWidth / 2. - centerX ) / myXScale;
     float aDY = ( vpHeight / 2. - centerY ) / myYScale;
@@ -792,7 +804,7 @@ void GLViewer_ViewPort2d::fitSelect()
   GLViewer_Context* aContext = aViewer->getGLContext();
   if( !aContext )
     return;
-  
+
   QRect aSelRect;
   for( aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected() )
     aSelRect |= *(aViewer->getWinObjectRect( aContext->SelectedObject() ));
@@ -819,7 +831,7 @@ void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
     float dx, dy, zm;
     float xScale, yScale;
 
-    myMargin = QMAX( myBorder->width(), myBorder->height() ) / 5;
+    myMargin = qMax( myBorder->width(), myBorder->height() ) / 5;
 
     xa = myBorder->left() - myMargin;
     xb = myBorder->right() + myMargin;
@@ -862,9 +874,9 @@ void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
     dx = fabs( aBorders[1] - aBorders[0] );
     dy = fabs( aBorders[3] - aBorders[2] );
 
-    myXPan = -( aBorders[0] + aBorders[1] ) / 2; 
+    myXPan = -( aBorders[0] + aBorders[1] ) / 2;
     myYPan = -( aBorders[2] + aBorders[3] ) / 2;
-    
+
 
     if( keepScale )
     {
@@ -875,19 +887,19 @@ void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
     xScale = myXScale;
     yScale = myYScale;
     if( dx && dy )
-        zm = vpWidth / dx < vpHeight / dy ? vpWidth / dx : vpHeight / dy; 
+        zm = vpWidth / dx < vpHeight / dy ? vpWidth / dx : vpHeight / dy;
     else
         zm = 1.0;
-    myXScale = zm; 
-    myYScale = zm;    
-    
+    myXScale = zm;
+    myYScale = zm;
+
 
     if( myGrid )
     {
         myGrid->setPan( myXPan, myYPan );
         if( dx > dy )
             myGrid->setZoom(  zm / xScale );
-        else  
+        else
             myGrid->setZoom( zm / yScale );
     }
 
@@ -1001,7 +1013,7 @@ void GLViewer_ViewPort2d::drawCompass()
 
     float centerX = (xPos/2 - delX - cSize)/xScale;
     float centerY = (yPos/2 - delY - cSize)/yScale;
-    
+
     switch ( cPos )
     {
     case GLViewer_Compass::TopLeft:
@@ -1016,7 +1028,7 @@ void GLViewer_ViewPort2d::drawCompass()
             break;
         default: break;
     }
-    
+
     float ra, rx, ry, rz;
     myGLWidget->getRotation( ra, rx, ry, rz );
     GLfloat angle = ra * PI / 180.;
@@ -1028,14 +1040,14 @@ void GLViewer_ViewPort2d::drawCompass()
     centerY -= yPan;
 
     glColor3f( colorR, colorG, colorB );
-    glBegin( GL_POLYGON );     
+    glBegin( GL_POLYGON );
     //arrow
-        x = centerX;                      y = centerY + cSize / yScale;    
+        x = centerX;                      y = centerY + cSize / yScale;
         glVertex2f( x, y );
         //point #2
         x = centerX + cWidthTop / xScale; y = centerY + ( cSize - cHeightTop ) / yScale ;
         glVertex2f( x, y );
-        //point #3    
+        //point #3
         x = centerX + cWidthBot / xScale; y = centerY + ( cSize - cHeightTop ) / yScale ;
         glVertex2f( x, y );
         //point #4
@@ -1043,7 +1055,7 @@ void GLViewer_ViewPort2d::drawCompass()
         glVertex2f( x, y );
         //point #5
         x = centerX;                      y = centerY - (cSize - cHeightBot) / yScale ;
-        glVertex2f( x, y ); 
+        glVertex2f( x, y );
         //point #6
         x = centerX - cWidthBot / xScale; y = centerY - cSize/yScale;
         glVertex2f( x, y );
@@ -1063,18 +1075,18 @@ void GLViewer_ViewPort2d::drawCompass()
         {
             x = centerX + cos(aCircAngle) * cSize / xScale;
             y = centerY + sin(aCircAngle) * cSize / yScale;
-            glVertex2f( x, y );    
+            glVertex2f( x, y );
             aCircAngle += float( STEP ) / 2;
-        }        
-    glEnd(); 
-    
+        }
+    glEnd();
+
     GLdouble        modelMatrix[16], projMatrix[16];
     GLint           viewport[4];
     GLdouble        winxN, winyN, winz;
     GLdouble        winxE, winyE;
     GLdouble        winxS, winyS;
     GLdouble        winxW, winyW;
-    GLuint          aTextList;    
+    GLuint          aTextList;
 
     GLViewer_TexFont* aFont = myCompass->getFont();
     float widN = (float)aFont->getStringWidth( "N" );
@@ -1096,13 +1108,13 @@ void GLViewer_ViewPort2d::drawCompass()
     glGetIntegerv (GL_VIEWPORT, viewport);
     glGetDoublev (GL_MODELVIEW_MATRIX, modelMatrix);
     glGetDoublev (GL_PROJECTION_MATRIX, projMatrix);
-    
+
     gluProject (centerX, centerY + cSize / yScale, 0, modelMatrix, projMatrix, viewport, &winxN, &winyN, &winz);
     gluProject (centerX + cSize / xScale, centerY, 0, modelMatrix, projMatrix, viewport, &winxE, &winyE, &winz);
     gluProject (centerX, centerY - cSize / yScale, 0, modelMatrix, projMatrix, viewport, &winxS, &winyS, &winz);
     gluProject (centerX - cSize / xScale, centerY, 0, modelMatrix, projMatrix, viewport, &winxW, &winyW, &winz);
 
-    glColor3f( 1.0, 1.0, 1.0 );    
+    glColor3f( 1.0, 1.0, 1.0 );
 
     aTextList = glGenLists( 1 );
     glNewList( aTextList, GL_COMPILE );
@@ -1113,7 +1125,7 @@ void GLViewer_ViewPort2d::drawCompass()
     glOrtho(0,viewport[2],0,viewport[3],-100,100);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glLoadIdentity();    
+    glLoadIdentity();
 
     aFont->drawString( "N", winxN + xGapN, winyN + yGapN );
     aFont->drawString( "E", winxE + xGapE, winyE + yGapE );
@@ -1127,7 +1139,7 @@ void GLViewer_ViewPort2d::drawCompass()
 
     glEndList();
 
-    if ( aTextList != -1 ) 
+    if ( aTextList != -1 )
         glCallList( aTextList );
 }
 
@@ -1138,10 +1150,10 @@ BlockStatus GLViewer_ViewPort2d::currentBlock()
 {
     if( myIsDragProcess == inDrag && myCurDragPosX != NULL && myCurDragPosY != NULL)
         return BlockStatus(BS_Highlighting | BS_Selection);
-    
+
     if( mypFirstPoint && mypLastPoint )
         return BlockStatus(BS_Highlighting | BS_Selection);
-    
+
     return BS_NoBlock;
 }
 
@@ -1156,6 +1168,14 @@ void GLViewer_ViewPort2d::startSelectByRect( int x, int y )
         mypFirstPoint = new QPoint( x, y );
         mypLastPoint = new QPoint( x, y );
     }
+
+    if ( !myRectBand ) {
+      myRectBand = new QRubberBand( QRubberBand::Rectangle, this );
+      QPalette palette;
+      palette.setColor(myRectBand->foregroundRole(), Qt::white);
+      myRectBand->setPalette(palette);
+    }
+    myRectBand->hide();
 }
 
 /*!
@@ -1166,17 +1186,14 @@ void GLViewer_ViewPort2d::drawSelectByRect( int x, int y )
 {
     if( mypFirstPoint && mypLastPoint )
     {
+        myRectBand->hide();    /* erase */
 
-        QPainter p( getPaintDevice() );
-        p.setPen( Qt::white );
-        p.setRasterOp( Qt::XorROP );
-
-        p.drawRect( selectionRect() );    /* erase */
-
-        mypLastPoint->setX( x );
+	mypLastPoint->setX( x );
         mypLastPoint->setY( y );
-        
-        p.drawRect( selectionRect() );    /* draw */
+
+	QRect aRect = selectionRect();
+	myRectBand->setGeometry( aRect );    /* draw */
+	myRectBand->setVisible( aRect.isValid() );
     }
 
 }
@@ -1189,17 +1206,17 @@ void GLViewer_ViewPort2d::finishSelectByRect()
     if( mypFirstPoint && mypLastPoint )
     {
 
-        QPainter p( getPaintDevice() );
-        p.setPen( Qt::white );
-        p.setRasterOp( Qt::XorROP );
 
-        p.drawRect( selectionRect() );    /* erase */
+        if ( myRectBand ) myRectBand->hide();    /* erase */
 
         delete mypFirstPoint;
         delete mypLastPoint;
 
         mypFirstPoint = NULL;
         mypLastPoint = NULL;
+
+	delete myRectBand;
+	myRectBand = 0;
     }
 }
 
@@ -1211,10 +1228,10 @@ QRect GLViewer_ViewPort2d::selectionRect()
     QRect aRect;
     if( mypFirstPoint && mypLastPoint )
     {
-        aRect.setLeft( QMIN( mypFirstPoint->x(), mypLastPoint->x() ) );
-        aRect.setTop( QMIN( mypFirstPoint->y(), mypLastPoint->y() ) );
-        aRect.setRight( QMAX( mypFirstPoint->x(), mypLastPoint->x() ) );
-        aRect.setBottom( QMAX( mypFirstPoint->y(), mypLastPoint->y() ) );
+        aRect.setLeft( qMin( mypFirstPoint->x(), mypLastPoint->x() ) );
+        aRect.setTop( qMin( mypFirstPoint->y(), mypLastPoint->y() ) );
+        aRect.setRight( qMax( mypFirstPoint->x(), mypLastPoint->x() ) );
+        aRect.setBottom( qMax( mypFirstPoint->y(), mypLastPoint->y() ) );
     }
 
     return aRect;
@@ -1302,7 +1319,7 @@ GLViewer_Rect GLViewer_ViewPort2d::win2GLV( const QRect& theRect ) const
 
   gluUnProject( theRect.left(), viewport[3] - theRect.top(), 0, modelMatrix, projMatrix, viewport, &objx1, &objy1, &objz );
   gluUnProject( theRect.right(), viewport[3] - theRect.bottom(), 0, modelMatrix, projMatrix, viewport, &objx2, &objy2, &objz );
-  
+
   aRect.setLeft( objx1 );
   aRect.setTop( objy1 );
   aRect.setRight( objx2 );
@@ -1332,7 +1349,7 @@ QRect GLViewer_ViewPort2d::GLV2win( const GLViewer_Rect& theRect ) const
 
   gluProject( theRect.left(), theRect.top(), 0, modelMatrix, projMatrix, viewport, &winx1, &winy1, &winz );
   gluProject( theRect.right(), theRect.bottom(), 0, modelMatrix, projMatrix, viewport, &winx2, &winy2, &winz );
-  
+
   aRect.setLeft( (int)winx1 );
   aRect.setTop( viewport[3] - (int)winy1 );
   aRect.setRight( (int)winx2 );
@@ -1357,9 +1374,9 @@ void GLViewer_ViewPort2d::onMaybeTip( QPoint thePoint, QString& theText, QFont& 
 
     QStringList aList;
     if( anObj->isTooTipHTML() )
-      aList = QStringList::split( "<br>", theText );
+      aList = theText.split( "<br>", QString::SkipEmptyParts );
     else
-      aList = QStringList::split( "\n", theText );
+      aList = theText.split( "\n", QString::SkipEmptyParts );
 
     if( !aList.isEmpty() )
     {

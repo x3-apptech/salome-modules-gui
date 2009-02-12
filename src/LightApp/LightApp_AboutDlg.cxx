@@ -1,56 +1,68 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      LightApp_AboutDlg.cxx
 // Created:   03.06.2005 13:52:45
 // Author:    Sergey TELKOV
-// Copyright (C) CEA 2005
-
+//
 #include "LightApp_AboutDlg.h"
 
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpixmap.h>
-#include <qgroupbox.h>
+#include <QtxGridBox.h>
+
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QPixmap>
+#include <QIcon>
+#include <QGroupBox>
 
 /*!Constructor.*/
 LightApp_AboutDlg::LightApp_AboutDlg( const QString& defName, const QString& defVer, QWidget* parent )
-: QtxDialog( parent, "salome_about_dialog", true, false, None )
+: QtxDialog( parent, true, false, None )
 {
+  setObjectName( "salome_about_dialog" );
+
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
 
   QPixmap ico = resMgr->loadPixmap( "LightApp", tr( "ICO_ABOUT" ), false );
   if ( !ico.isNull() )
-    setIcon( ico );
+    setWindowIcon( ico );
 
   QPalette pal = palette();
-  QColorGroup cg = pal.active();
-  cg.setColor( QColorGroup::Foreground, Qt::darkBlue ); 
-  cg.setColor( QColorGroup::Background, Qt::white );
-  pal.setActive( cg ); pal.setInactive( cg ); pal.setDisabled( cg );
+
+  pal.setBrush( QPalette::Active, QPalette::WindowText, QBrush( Qt::darkBlue ) );
+  pal.setBrush( QPalette::Active, QPalette::Window,     QBrush( Qt::white ) );
+
+  pal.setBrush( QPalette::Inactive, QPalette::WindowText, QBrush( Qt::darkBlue ) );
+  pal.setBrush( QPalette::Inactive, QPalette::Window,     QBrush( Qt::white ) );
+
+  pal.setBrush( QPalette::Disabled, QPalette::WindowText, QBrush( Qt::darkBlue ) );
+  pal.setBrush( QPalette::Disabled, QPalette::Window,     QBrush( Qt::white ) );
+
   setPalette(pal);
 
   QVBoxLayout* main = new QVBoxLayout( mainFrame() );
-  QGroupBox* base = new QGroupBox( 1, Qt::Horizontal, "", mainFrame() );
-  base->setFrameStyle( QFrame::NoFrame );
+  QtxGridBox* base = new QtxGridBox( 1, Qt::Horizontal, mainFrame(), 0, 0 );
   base->setInsideMargin( 0 );
   main->addWidget( base );
 
@@ -99,7 +111,7 @@ LightApp_AboutDlg::LightApp_AboutDlg( const QString& defName, const QString& def
   QString capText = tr( "ABOUT_CAPTION" );
   if ( capText.contains( "%1" ) )
     capText = capText.arg( defName );
-  setCaption( capText );
+  setWindowTitle( capText );
 
   setSizeGripEnabled( false );
 }
@@ -142,7 +154,7 @@ void LightApp_AboutDlg::checkLabel( QLabel* lab ) const
   if ( !lab )
     return;
 
-  bool vis = !lab->text().stripWhiteSpace().isEmpty() ||
+  bool vis = !lab->text().trimmed().isEmpty() ||
              ( lab->pixmap() && !lab->pixmap()->isNull() );
   vis ? lab->show() : lab->hide();
 }

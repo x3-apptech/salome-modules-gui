@@ -1,75 +1,73 @@
-// SALOME Session : implementation of Session.idl
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// Copyright (C) 2003 OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+//  SALOME Session : implementation of Session.idl
+//  File : SALOME_Session_Server.cxx
+//  Author : Paul RASCLE, EDF
+//  Module : SALOME
 //
-//
-// File : SALOME_Session_Server.cxx
-// Author : Paul RASCLE, EDF
-// Module : SALOME
-
 #include <Container_init_python.hxx>
-#include "Utils_ORB_INIT.hxx"
-#include "Utils_SINGLETON.hxx"
-#include "SALOME_NamingService.hxx"
-#include "SALOMETraceCollector.hxx"
+#include <Utils_ORB_INIT.hxx>
+#include <Utils_SINGLETON.hxx>
+#include <SALOME_NamingService.hxx>
+#include <SALOME_ModuleCatalog_impl.hxx>
+#include <OpUtil.hxx>
+#include <RegistryService.hxx>
+#include <ConnectionManager_i.hxx>
+#include <SALOME_LifeCycleCORBA.hxx>
 
-#include "SALOME_ModuleCatalog_impl.hxx"
-#include "OpUtil.hxx"
-#include "RegistryService.hxx"
-#include "ConnectionManager_i.hxx"
-
-#include <iostream>
-#ifndef WNT
-#include <unistd.h>
-#include <iostream.h>
-#include <string.h>
+#ifdef ENABLE_TESTRECORDER
+  #include <TestApplication.h>
 #endif
 
-#include <qdir.h>
-#include <qfile.h>
-#include <qapplication.h>
-#include <qwaitcondition.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QFile>
+#include <QApplication>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QRegExp>
+#include <QTextStream>
 
-#include "Utils_SALOME_Exception.hxx"
-#include "Utils_CorbaException.hxx"
-#include "SALOME_Event.hxx"
+#include <Utils_SALOME_Exception.hxx>
+#include <Utils_CorbaException.hxx>
+#include <SALOME_Event.h>
 
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Session)
 #include CORBA_SERVER_HEADER(SALOMEDS)
 
 #include <utilities.h>
-#include "Session_Session_i.hxx"
 #include "Session_ServerLauncher.hxx"
 #include "Session_ServerCheck.hxx"
 
 #include <QtxSplash.h>
-#include "SUIT_Tools.h"
-#include "SUIT_Session.h"
-#include "SUIT_Application.h"
-#include "SUIT_Desktop.h"
-#include "SUIT_MessageBox.h"
-#include "SUIT_ResourceMgr.h"
-#include "SUIT_ExceptionHandler.h"
+#include <Style_Salome.h>
+#include <SUIT_Tools.h>
+#include <SUIT_Session.h>
+#include <SUIT_Application.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_ResourceMgr.h>
+#include <SUIT_ExceptionHandler.h>
+
+#include <Standard_Version.hxx>
 
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
@@ -138,23 +136,23 @@ QString salomeVersion()
   path += QString( "bin/salome/VERSION" );
 
   QFile vf( path );
-  if ( !vf.open( IO_ReadOnly ) )
-    return QString::null;
+  if ( !vf.open( QIODevice::ReadOnly ) )
+    return QString();
 
-  QString line;
-  vf.readLine( line, 1024 );
+  QString line( vf.readLine( 1024 ) );
+
   vf.close();
 
   if ( line.isEmpty() )
-    return QString::null;
+    return QString();
 
   while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
     line.remove( line.length() - 1, 1 );
 
   QString ver;
-  int idx = line.findRev( ":" );
+  int idx = line.lastIndexOf( ":" );
   if ( idx != -1 )
-    ver = line.mid( idx + 1 ).stripWhiteSpace();
+    ver = line.mid( idx + 1 ).trimmed();
 
   return ver;
 }
@@ -175,8 +173,8 @@ public:
       resMgr.loadLanguage( "LightApp",  "en" );
       resMgr.loadLanguage( "SalomeApp", "en" );
 
-      myExtAppName = QObject::tr( "APP_NAME" ).stripWhiteSpace();
-      if ( myExtAppName == "APP_NAME" || myExtAppName.lower() == "salome" ) 
+      myExtAppName = QObject::tr( "APP_NAME" ).trimmed();
+      if ( myExtAppName == "APP_NAME" || myExtAppName.toLower() == "salome" ) 
         myExtAppName = "SalomeApp";
       myExtAppVersion = QObject::tr( "APP_VERSION" );
       if ( myExtAppVersion == "APP_VERSION" ) {
@@ -191,7 +189,7 @@ public:
 protected:
   QString userFileName( const QString& appName, const bool for_load ) const
   { 
-    if ( version().isNull()  ) return ""; 
+    if ( version().isEmpty()  ) return ""; 
     return SUIT_ResourceMgr::userFileName( myExtAppName, for_load );
   }
 
@@ -203,15 +201,15 @@ protected:
       
       QString fname = QFileInfo( _fname ).fileName();
       if( exp.exactMatch( fname ) ) {
-	QStringList vers = QStringList::split( ".", exp.cap( 1 ) );
+	QStringList vers = exp.cap( 1 ).split( ".", QString::SkipEmptyParts );
 	int major=0, minor=0;
 	major = vers[0].toInt();
 	minor = vers[1].toInt();
-	if( vers_exp.search( vers[2] )==-1 )
+	if( vers_exp.indexIn( vers[2] )==-1 )
 	  return -1;
 	int release = 0, dev1 = 0, dev2 = 0;
 	release = vers_exp.cap( 1 ).toInt();
-	dev1 = vers_exp.cap( 2 )[ 0 ].latin1();
+	dev1 = vers_exp.cap( 2 )[ 0 ].toLatin1();
 	dev2 = vers_exp.cap( 3 ).toInt();
 	
 	int dev = dev1*100+dev2, id = major;
@@ -231,8 +229,8 @@ public:
   static QString myExtAppVersion;
 };
 
-QString SALOME_ResourceMgr::myExtAppName    = QString::null;
-QString SALOME_ResourceMgr::myExtAppVersion = QString::null;
+QString SALOME_ResourceMgr::myExtAppName    = QString();
+QString SALOME_ResourceMgr::myExtAppVersion = QString();
 
 class SALOME_Session : public SUIT_Session
 {
@@ -249,10 +247,18 @@ protected:
   }
 };
 
-class SALOME_QApplication : public QApplication
+#ifdef ENABLE_TESTRECORDER
+  class SALOME_QApplication : public TestApplication
+#else
+  class SALOME_QApplication : public QApplication
+#endif
 {
 public:
+#ifdef ENABLE_TESTRECORDER
+  SALOME_QApplication( int& argc, char** argv ) : TestApplication( argc, argv ), myHandler ( 0 ) {}
+#else
   SALOME_QApplication( int& argc, char** argv ) : QApplication( argc, argv ), myHandler ( 0 ) {}
+#endif
 
   virtual bool notify( QObject* receiver, QEvent* e )
   {
@@ -270,8 +276,13 @@ public:
     }
 #endif
 
+#ifdef ENABLE_TESTRECORDER
+    return myHandler ? myHandler->handle( receiver, e ) :
+      TestApplication::notify( receiver, e );
+#else
     return myHandler ? myHandler->handle( receiver, e ) :
       QApplication::notify( receiver, e );
+#endif
   }
   SUIT_ExceptionHandler* handler() const { return myHandler; }
   void setHandler( SUIT_ExceptionHandler* h ) { myHandler = h; }
@@ -312,123 +323,14 @@ bool isFound( const char* str, int argc, char** argv )
 
 void killOmniNames()
 {
-    QString fileName( ::getenv ("OMNIORB_CONFIG") );
-    QString portNumber;
-    if ( !fileName.isEmpty() ) 
-    {
-      QFile aFile( fileName );
-      if ( aFile.open(IO_ReadOnly) ) {
-        QRegExp re("InitRef = .*:([0-9]+)$");
-        QTextStream stream ( &aFile );
-        while ( !stream.atEnd() ) {
-          QString textLine = stream.readLine();
-          if ( re.search( textLine ) > -1 )
-            portNumber = re.cap(1);
-        }
-        aFile.close();
-      }
-    }
-
-    if ( !portNumber.isEmpty() ) 
-    {
-      QString cmd ;
-      cmd = QString( "ps -eo pid,command | grep -v grep | grep -E \"omniNames.*%1\" | awk '{cmd=sprintf(\"kill -9 %s\",$1); system(cmd)}'" ).arg( portNumber );
-      system ( cmd.latin1() );
-    }
-
-    /////////////////// NPAL 18309  (Kill Notifd) ////////////////////////////
-    if ( !portNumber.isEmpty() ) 
-    {
-      QString cmd = QString("import pickle, os; ");
-      cmd += QString("from killSalomeWithPort import getPiDict; ");
-      cmd += QString("filedict=getPiDict(%1); ").arg(portNumber);
-      cmd += QString("f=open(filedict, 'r'); ");
-      cmd += QString("pids=pickle.load(f); ");
-      cmd += QString("m={}; ");
-      cmd += QString("[ m.update(i) for i in pids ]; ");
-      cmd += QString("pids=filter(lambda a: 'notifd' in m[a], m.keys()); ");
-      cmd += QString("[ os.kill(pid, 9) for pid in pids ]; ");
-      cmd += QString("os.remove(filedict); ");
-      cmd  = QString("python -c \"%1\" > /dev/null").arg(cmd);
-      system( cmd.latin1() );
-    }
-
+  SALOME_LifeCycleCORBA::killOmniNames();
 }
 
 // shutdown standalone servers
 void shutdownServers( SALOME_NamingService* theNS )
 {
-  // get each Container from NamingService => shutdown it
-  // (the order is inverse to the order of servers initialization)
-  
-  CORBA::Object_var objS = theNS->Resolve("/Kernel/Session");
-  SALOME::Session_var session = SALOME::Session::_narrow(objS);
-  if (!CORBA::is_nil(session)) {
-    session->ping();
-    
-    string hostname = GetHostname();
-    //string containerName = "/Containers/" + hostname;
-    
-    // 1) SuperVisionContainer
-    //string containerNameSV = containerName + "/SuperVisionContainer";
-    //CORBA::Object_var objSV = theNS->Resolve(containerNameSV.c_str());
-    //Engines::Container_var SVcontainer = Engines::Container::_narrow(objSV) ;
-    //if ( !CORBA::is_nil(SVcontainer) && ( session->getPID() != SVcontainer->getPID() ) )
-    //  SVcontainer->Shutdown();
-    
-    // 2) FactoryServerPy
-    //string containerNameFSP = containerName + "/FactoryServerPy";
-    //CORBA::Object_var objFSP = theNS->Resolve(containerNameFSP.c_str());
-    //Engines::Container_var FSPcontainer = Engines::Container::_narrow(objFSP) ;
-    //if ( !CORBA::is_nil(FSPcontainer) && ( session->getPID() != FSPcontainer->getPID() ) )
-    //  FSPcontainer->Shutdown();
-    
-    // 3) FactoryServer
-    //string containerNameFS = containerName + "/FactoryServer";
-    //CORBA::Object_var objFS = theNS->Resolve(containerNameFS.c_str());
-    //Engines::Container_var FScontainer = Engines::Container::_narrow(objFS) ;
-    //if ( !CORBA::is_nil(FScontainer) && ( session->getPID() != FScontainer->getPID() ) )
-    //  FScontainer->Shutdown();
-    
-    // 4) ContainerManager
-    //CORBA::Object_var objCM=theNS->Resolve("/ContainerManager");
-    //Engines::ContainerManager_var contMan=Engines::ContainerManager::_narrow(objCM);
-    //if ( !CORBA::is_nil(contMan) && ( session->getPID() != contMan->getPID() ) )
-    //  contMan->ShutdownWithExit();
-
-    // 4) SalomeLauncher
-    CORBA::Object_var objSL = theNS->Resolve("/SalomeLauncher");
-    Engines::SalomeLauncher_var launcher = Engines::SalomeLauncher::_narrow(objSL);
-    if (!CORBA::is_nil(launcher) && (session->getPID() != launcher->getPID()))
-      launcher->Shutdown();
-
-    // 5) ConnectionManager
-    CORBA::Object_var objCnM=theNS->Resolve("/ConnectionManager");
-    Engines::ConnectionManager_var connMan=Engines::ConnectionManager::_narrow(objCnM);
-    if ( !CORBA::is_nil(connMan) && ( session->getPID() != connMan->getPID() ) )
-      connMan->ShutdownWithExit();
-    
-    // 6) SALOMEDS
-    CORBA::Object_var objSDS = theNS->Resolve("/myStudyManager");
-    SALOMEDS::StudyManager_var studyManager = SALOMEDS::StudyManager::_narrow(objSDS) ;
-    if ( !CORBA::is_nil(studyManager) && ( session->getPID() != studyManager->getPID() ) )
-      studyManager->Shutdown();
-    
-    // 7) ModuleCatalog
-    CORBA::Object_var objMC=theNS->Resolve("/Kernel/ModulCatalog");
-    SALOME_ModuleCatalog::ModuleCatalog_var catalog = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objMC);
-    if ( !CORBA::is_nil(catalog) && ( session->getPID() != catalog->getPID() ) )
-      catalog->shutdown();
-    
-    // 8) Registry
-    CORBA::Object_var objR = theNS->Resolve("/Registry");
-    Registry::Components_var registry = Registry::Components::_narrow(objR);
-    if ( !CORBA::is_nil(registry) && ( session->getPID() != registry->getPID() ) )
-      registry->Shutdown();
-    
-    // 9) Kill OmniNames
-    //killOmniNames();
-  }
+  SALOME_LifeCycleCORBA lcc(theNS);
+  lcc.shutdownServers();
 }
 
 // ---------------------------- MAIN -----------------------
@@ -440,85 +342,43 @@ int main( int argc, char **argv )
   // Create Qt application instance;
   // this should be done the very first!
   SALOME_QApplication _qappl( argc, argv );
-  ASSERT( QObject::connect( &_qappl, SIGNAL( lastWindowClosed() ), &_qappl, SLOT( quit() ) ) );
 
   // Add application library path (to search style plugin etc...)
   QString path = QDir::convertSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
   _qappl.addLibraryPath( path );
-  
-  // Set SALOME style to the application
-  _qappl.setStyle( "salome" );
 
   bool isGUI    = isFound( "GUI",    argc, argv );
   bool isSplash = isFound( "SPLASH", argc, argv );
   // Show splash screen (only if both the "GUI" and "SPLASH" parameters are set)
+  // Note, that user preferences are not taken into account for splash settings -
+  // it is a property of the application!
   QtxSplash* splash = 0;
   if ( isGUI && isSplash ) {
     // ...create resource manager
     SUIT_ResourceMgr resMgr( "SalomeApp", QString( "%1Config" ) );
     resMgr.setCurrentFormat( "xml" );
+    resMgr.setWorkingMode( QtxResourceMgr::IgnoreUserValues );
     resMgr.loadLanguage( "LightApp", "en" );
-    // ...get splash preferences
-    QString splashIcon;
-    resMgr.value( "splash", "image", splashIcon );
-    QPixmap px( splashIcon );
-    if ( px.isNull() ) // try to get splash pixmap from resources
-      px = resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) );
-    if ( !px.isNull() ) {
-      // ...set splash pixmap
-      splash = QtxSplash::splash( px );
-      // ... set margin
-      int splashMargin;
-      if ( resMgr.value( "splash", "margin", splashMargin ) && splashMargin > 0 ) {
-	splash->setMargin( splashMargin );
-      }
-      // ...set splash text colors
-      QString splashTextColors;
-      if ( resMgr.value( "splash", "text_colors", splashTextColors ) && !splashTextColors.isEmpty() ) {
-	QStringList colors = QStringList::split( "|", splashTextColors );
-	QColor c1, c2;
-	if ( colors.count() > 0 ) c1 = QColor( colors[0] );
-	if ( colors.count() > 1 ) c2 = QColor( colors[1] );
-	splash->setTextColors( c1, c2 );
-      }
-      else {
-	splash->setTextColors( Qt::white, Qt::black );
-      }
-      // ...set splash progress colors
-      QString splashProgressColors;
-      if ( resMgr.value( "splash", "progress_colors", splashProgressColors ) && !splashProgressColors.isEmpty() ) {
-	QStringList colors = QStringList::split( "|", splashProgressColors );
-	QColor c1, c2;
-	int gradType = QtxSplash::Vertical;
-	if ( colors.count() > 0 ) c1 = QColor( colors[0] );
-	if ( colors.count() > 1 ) c2 = QColor( colors[1] );
-	if ( colors.count() > 2 ) gradType = colors[2].toInt();
-	splash->setProgressColors( c1, c2, gradType );
-      }
-      // ...set splash text font
-      QFont f = splash->font();
-      f.setBold( true );
-      splash->setFont( f );
-      // ...show splash initial status
-      QString splashInfo;
-      if ( resMgr.value( "splash", "info", splashInfo, false ) && !splashInfo.isEmpty() ) {
-	splashInfo.replace( QRegExp( "%A" ),  QObject::tr( "APP_NAME" ) );
-	splashInfo.replace( QRegExp( "%V" ),  QObject::tr( "ABOUT_VERSION" ).arg( salomeVersion() ) );
-	splashInfo.replace( QRegExp( "%L" ),  QObject::tr( "ABOUT_LICENSE" ) );
-	splashInfo.replace( QRegExp( "%C" ),  QObject::tr( "ABOUT_COPYRIGHT" ) );
-	splashInfo.replace( QRegExp( "\\\\n" ), "\n" );
-	splash->message( splashInfo );
-      }
-      // ...set 'hide on click' flag
-#ifdef _DEBUG_
-      splash->setHideOnClick( true );
-#endif
-      // ...show splash
+    //
+    splash = QtxSplash::splash( QPixmap() );
+    splash->readSettings( &resMgr );
+    if ( splash->pixmap().isNull() )
+      splash->setPixmap( resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) ) );
+    if ( splash->pixmap().isNull() ) {
+      delete splash;
+      splash = 0;
+    }
+    else {
+      splash->setOption( "%A", QObject::tr( "APP_NAME" ) );
+      splash->setOption( "%V", QObject::tr( "ABOUT_VERSION" ).arg( salomeVersion() ) );
+      splash->setOption( "%L", QObject::tr( "ABOUT_LICENSE" ) );
+      splash->setOption( "%C", QObject::tr( "ABOUT_COPYRIGHT" ) );
       splash->show();
-      qApp->processEvents();
+      QApplication::instance()->processEvents();
     }
   }
 
+  
   // Initialization
   int result = -1;
 
@@ -549,9 +409,6 @@ int main( int argc, char **argv )
     ASSERT( SINGLETON_<ORB_INIT>::IsAlreadyExisting() );
     int orbArgc = 1;
     orb = init( orbArgc, argv );
-
-    // ...install SALOME thread event handler
-    SALOME_Event::GetSessionThread();
 
     CORBA::Object_var obj = orb->resolve_initial_references( "RootPOA" );
     poa = PortableServer::POA::_narrow( obj );
@@ -607,14 +464,29 @@ int main( int argc, char **argv )
       _SplashMutex.lock();
       // ...create servers checking thread
       Session_ServerCheck sc( &_SplashMutex, &_SplashStarted );
-      // ...block this thread until servers checking is finished
-      _SplashStarted.wait( &_SplashMutex );
+      // ... set initial progress
+      splash->setProgress( 0, sc.totalSteps() );
+      // start check loop 
+      while ( true ) {
+	int step    = sc.currentStep();
+	int total   = sc.totalSteps();
+	QString msg = sc.currentMessage();
+	QString err = sc.error();
+	if ( !err.isEmpty() ) {
+	  QtxSplash::setError( err );
+	  QApplication::instance()->processEvents();
+	  result = -1;
+	  break;
+	}
+	QtxSplash::setStatus( msg, step );
+	QApplication::instance()->processEvents();
+	if ( step >= total )
+	  break;
+	// ...block this thread until servers checking is finished
+	_SplashStarted.wait( &_SplashMutex );
+      }
       // ...unlock mutex 'cause it is no more needed
       _SplashMutex.unlock();
-      // get servers checking thread status
-      result = splash->error();
-      QString info = splash->message().isEmpty() ? "%1" : QString( "%1\n%2" ).arg( splash->message() );
-      splash->setStatus( info.arg( "Activating desktop..." ) );
     }
 
     // Finalize embedded servers launcher 
@@ -628,6 +500,8 @@ int main( int argc, char **argv )
   if ( !result ) {
     // Launch GUI activator
     if ( isGUI ) {
+      if ( splash )
+	splash->setStatus( QApplication::translate( "", "Activating desktop..." ) );
       // ...retrieve Session interface reference
       CORBA::Object_var obj = _NS->Resolve( "/Kernel/Session" );
       SALOME::Session_var session = SALOME::Session::_narrow( obj ) ;
@@ -656,6 +530,10 @@ int main( int argc, char **argv )
       SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
       if ( aGUIApp )
       {
+	Style_Salome::initialize( aGUIApp->resourceMgr() );
+	if ( aGUIApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
+	  Style_Salome::apply();
+
 	if ( !isFound( "noexcepthandler", argc, argv ) )
 	  _qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application
 	                                               // aGUISession contains SalomeApp_ExceptionHandler
@@ -667,8 +545,6 @@ int main( int argc, char **argv )
 	  
 	result = _qappl.exec();
 	
-	if ( splash )
-	  delete splash;
 	splash = 0;
 
 	if ( result == SUIT_Session::NORMAL ) { // desktop is closed by user from GUI
@@ -702,20 +578,18 @@ int main( int argc, char **argv )
   PyGILState_STATE gstate = PyGILState_Ensure();
   Py_Finalize();
 
-  try 
-    {
-      orb->destroy();
-    }
-  catch(...) 
-    {
-      //////////////////////////////////////////////////////////////
-      // VSR: silently skip exception:
-      // CORBA.BAD_INV_ORDER.BAD_INV_ORDER_ORBHasShutdown 
-      // exception is raised when orb->destroy() is called and
-      // cpp continer is launched in the embedded mode
-      //////////////////////////////////////////////////////////////
-      // std::cerr << "Caught unexpected exception on destroy : ignored !!" << std::endl;
-    }
+  try  {
+    orb->shutdown(0);
+  }
+  catch (...) {
+    //////////////////////////////////////////////////////////////
+    // VSR: silently skip exception:
+    // CORBA.BAD_INV_ORDER.BAD_INV_ORDER_ORBHasShutdown 
+    // exception is raised when orb->destroy() is called and
+    // cpp continer is launched in the embedded mode
+    //////////////////////////////////////////////////////////////
+    // std::cerr << "Caught unexpected exception on destroy : ignored !!" << std::endl;
+  }
 
   if ( shutdown )
     killOmniNames();

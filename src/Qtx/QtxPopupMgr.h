@@ -1,132 +1,135 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File:      QtxPopupMgr.h
+// Author:    Alexander SOLOVYOV, Sergey TELKOV
+//
+#ifndef QTXPOPUPMGR_H
+#define QTXPOPUPMGR_H
 
-#ifndef __QTX_POPUP_MGR_HEADER__
-#define __QTX_POPUP_MGR_HEADER__
-
-#include "Qtx.h"
 #include "QtxActionMenuMgr.h"
-#include "QtxParser.h"
-#include "QtxStdOperations.h"
 
-#include <qmap.h>
+#include <QMap>
+#include <QVariant>
 
-class QtxListOfOperations;
+class QtxEvalExpr;
+class QtxEvalParser;
+class QtxPopupSelection;
 
 class QTX_EXPORT QtxPopupMgr : public QtxActionMenuMgr
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    class QTX_EXPORT Selection
-    {
-    public:
-        virtual int      count() const = 0;
-        virtual QtxValue param( const int, const QString& ) const = 0;
-	virtual QtxValue globalParam( const QString& ) const;
+  //! Menu item rule type
+  typedef enum { 
+    VisibleRule,   //!< menu item visibility state
+    EnableRule,    //!< menu item enable state
+    ToggleRule     //!< menu item toggle state
+  } RuleType;
 
-	virtual QChar    equality() const;
-	virtual QString  selCountParam() const;
-
-	static QChar    defEquality();
-	static QString  defSelCountParam();
-    };
-
-protected:
-    class Operations : public QtxStrings
-    {
-    public:
-        Operations( QtxPopupMgr* );
-        virtual ~Operations();
-
-        virtual int   prior( const QString&, bool isBin ) const;
-        virtual QtxParser::Error calculate( const QString&, QtxValue&, QtxValue& ) const;
-
-        void clear();
-
-    private:
-        QtxPopupMgr*               myPopupMgr;
-        QtxParser*                 myParser;
-        QMap< QString, QtxValue >  myValues;
-    };
-
-    friend class Operations;
-
-protected:
+private:
   class PopupCreator;
 
 public:
-    QtxPopupMgr( QPopupMenu*, QObject* = 0 );
-    virtual ~QtxPopupMgr();
+  QtxPopupMgr( QObject* = 0 );
+  QtxPopupMgr( QMenu*, QObject* = 0 );
+  virtual ~QtxPopupMgr();
 
-    virtual int  registerAction( QAction*,
-                                 const QString& visible,
-                                 const QString& toggle = QString::null,
-                                 const int = -1 );
-    virtual void unRegisterAction( const int );
+  int                insertAction( const int, const int, const QString&, const RuleType = VisibleRule );
+  int                insertAction( QAction*, const int, const QString&, const RuleType = VisibleRule );
 
-    virtual bool isVisible( const int actId, const int place ) const;
+  virtual int        registerAction( QAction*, const int, const QString& rule,
+                                     const RuleType = VisibleRule );
+  virtual void       unRegisterAction( const int );
 
-    bool    hasRule( QAction*, bool visibility ) const;
-    bool    hasRule( const int, bool visibility ) const;
-    void    setRule( QAction*, const QString&, bool visibility );
-    void    setRule( const int, const QString&, bool visibility );
-    void    updatePopup( QPopupMenu*, Selection* );
+  virtual bool       isVisible( const int actId, const int place ) const;
 
-    //return name of parameter corresponding to selected objects count
-    //it will be set automatically
+  QString            rule( QAction*, const RuleType = VisibleRule ) const;
+  QString            rule( const int, const RuleType = VisibleRule ) const;
 
-    virtual bool load( const QString&, QtxActionMgr::Reader& );
+  void               setRule( QAction*, const QString&, const RuleType = VisibleRule );
+  void               setRule( const int, const QString&, const RuleType = VisibleRule );
+
+  bool               hasRule( QAction*, const RuleType = VisibleRule ) const;
+  bool               hasRule( const int, const RuleType = VisibleRule ) const;
+
+  QtxPopupSelection* selection() const;
+  void               setSelection( QtxPopupSelection* );
+
+  QMenu*             menu() const;
+  void               setMenu( QMenu* );
+
+  void               updateMenu();
+
+  virtual bool       load( const QString&, QtxActionMgr::Reader& );
 
 protected:
-    typedef QMap< QAction*, QtxParser* > RulesMap;
-
-protected:
-    virtual bool      isSatisfied( QAction*, bool visibility ) const;
-            void      setParams( QtxParser*, QStringList& ) const;
-            RulesMap& map( bool visibility ) const;
-
-    void createOperations();
+  virtual void       internalUpdate();
+  void               setParameters( QtxEvalParser*, QStringList& ) const;
+  virtual bool       isSatisfied( QAction*, const RuleType = VisibleRule ) const;
+  QtxEvalExpr*       expression( QAction*, const RuleType = VisibleRule, const bool = false ) const;
 
 private:
-    RulesMap                 myVisibility, myToggle;
-    Selection*               myCurrentSelection;
-    QtxListOfOperations*     myOperations;
+  bool               result( QtxEvalParser* p ) const;
+  QVariant           parameter( const QString&, const int = -1 ) const;
+
+private slots:
+  void               onSelectionDestroyed( QObject* );
+
+private:
+  typedef QMap<RuleType, QtxEvalExpr*> ExprMap;
+  typedef QMap<QAction*, ExprMap>      RuleMap;
+  typedef QMap<QString, QVariant>      CacheMap;
+
+private:
+  RuleMap            myRules;
+  CacheMap           myCache;
+  QtxPopupSelection* mySelection;
 };
 
-
-
-class QtxPopupMgr::PopupCreator : public QtxActionMgr::Creator
+class QTX_EXPORT QtxPopupSelection : public QObject
 {
+  Q_OBJECT
+
 public:
-  PopupCreator( QtxActionMgr::Reader*, QtxPopupMgr* );
-  virtual ~PopupCreator();
+  QtxPopupSelection();
+  virtual ~QtxPopupSelection();
 
-  virtual int append( const QString&, const bool,
-                      const ItemAttributes&, const int );
+  virtual int        count() const = 0;
+  virtual QVariant   parameter( const QString& ) const;
+  virtual QVariant   parameter( const int, const QString& ) const = 0;
 
-  virtual QString visibleRule( const ItemAttributes& ) const;
-  virtual QString toggleRule( const ItemAttributes& ) const;
+  QString            option( const QString& ) const;
+  void               setOption( const QString&, const QString& );
 
 private:
-  QtxPopupMgr* myMgr;
+  QString            equalityParam() const;
+  QString            selCountParam() const;
+
+private:
+  typedef QMap<QString, QString> OptionsMap;
+
+private:
+  OptionsMap         myOptions;
 };
 
-
-#endif
+#endif // QTXPOPUPMGR_H

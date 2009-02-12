@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,25 +17,25 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_ToolTip.xx
 // Created:   March, 2005
-
 //#include "GLViewerAfx.h"
+//
 #include "GLViewer_Context.h"
 #include "GLViewer_ToolTip.h"
 #include "GLViewer_Viewer2d.h"
 #include "GLViewer_ViewPort2d.h"
+#include "GLViewer_ViewFrame.h"
 
-#include <qlabel.h>
-#include <qtimer.h>
-#include <qbitmap.h>
-#include <qapplication.h>
-#include <qtooltip.h>
+#include <QLabel>
+#include <QTimer>
+#include <QBitmap>
+#include <QApplication>
+#include <QToolTip>
+#include <QMouseEvent>
 
 /*!
   constructor
@@ -44,15 +47,16 @@ GLViewer_ObjectTip::GLViewer_ObjectTip( GLViewer_ViewPort2d* theParent )
 {
   mypViewPort = theParent;
   //mypLabel = NULL;
-  mypLabel = new QLabel( "Test", NULL, "ObjectTipText",
-	     WStyle_StaysOnTop | WStyle_Customize | WStyle_NoBorder | WStyle_Tool | WX11BypassWM );
-	mypLabel->setMargin( 1 );
-	mypLabel->setAutoMask( FALSE );
+  mypLabel = new QLabel( "Test", NULL, 
+			 Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::Tool | Qt::X11BypassWindowManagerHint );
+  mypLabel->setObjectName("ObjectTipText");
+  mypLabel->setMargin( 1 );
+  //mypLabel->setAutoMask( FALSE );
   mypLabel->setFrameStyle( QFrame::Plain | QFrame::Box );
   mypLabel->setLineWidth( 1 );
-  mypLabel->setAlignment( AlignAuto | AlignTop );
+  mypLabel->setAlignment( Qt::AlignAbsolute | Qt::AlignTop );
   mypLabel->setIndent( 0 );
-  mypLabel->polish();
+  mypLabel->ensurePolished();
   
   //mypLabel->setPalette( QToolTip::palette() );
 

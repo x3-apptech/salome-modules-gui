@@ -1,31 +1,30 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : SVTK_InteractorStyle.h
 //  Author : Christophe ATTANASIO
 //  Module : SALOME
 //  $Header$
-
+//
 #ifndef __SVTK_InteractorStyle_h
 #define __SVTK_InteractorStyle_h
 
@@ -38,8 +37,7 @@
 #include <vtkInteractorStyle.h>
 #include <vtkSmartPointer.h>
 
-#include <qcursor.h>
-#include <qevent.h>
+#include <QCursor>
 
 #include <map>
 
@@ -50,10 +48,10 @@
 #endif
 
 //
-//! Control the value of increment  in SALOME way.
+//! Control the value of increment  in arithmetic progression mode.
 /*!
   This class controls of value of increment,
-  for pan/rotate/zoom operations in SALOME way
+  for pan/rotate/zoom operations in arithmetic progression mode
 */
 class SVTK_EXPORT SVTK_ControllerIncrement : public vtkObject{
  public:
@@ -80,6 +78,30 @@ class SVTK_EXPORT SVTK_ControllerIncrement : public vtkObject{
   SVTK_ControllerIncrement(const SVTK_ControllerIncrement&);//Not implemented
   void operator=(const SVTK_ControllerIncrement&);          //Not implemented
 };
+
+//
+//! Control the value of increment  in geometric progression mode.
+/*!
+  This class controls of value of increment,
+  for pan/rotate/zoom operations in geometric progression mode.
+*/
+class SVTK_EXPORT SVTK_GeomControllerIncrement : public SVTK_ControllerIncrement{
+ public:
+  vtkTypeMacro(SVTK_GeomControllerIncrement, SVTK_ControllerIncrement);
+  static SVTK_GeomControllerIncrement* New();
+
+  //! Increace the increment value by add 1
+  virtual int Increase();
+
+  //! Decreace the increment value by subtract 1
+  virtual int Decrease();
+ protected:
+  SVTK_GeomControllerIncrement();
+  virtual ~SVTK_GeomControllerIncrement();
+ private:
+  SVTK_GeomControllerIncrement(const SVTK_GeomControllerIncrement&);//Not implemented
+  void operator=(const SVTK_GeomControllerIncrement&);              //Not implemented
+};
 //
 //! Control the behaviour of KeyDown event in SALOME way.
 /*!
@@ -103,7 +125,6 @@ class SVTK_EXPORT SVTK_ControllerOnKeyDown : public vtkObject{
   void operator=(const SVTK_ControllerOnKeyDown&);          //Not implemented
 };
 
-class vtkCell;
 class vtkPointPicker;
 
 class SALOME_Actor;
@@ -111,6 +132,8 @@ class SALOME_Actor;
 class SVTK_Selector;
 class SVTK_GenericRenderWindowInteractor;
 class SVTK_Actor;
+
+class QRubberBand;
 
 #define VTK_INTERACTOR_STYLE_CAMERA_NONE    0
 #define VTK_INTERACTOR_STYLE_CAMERA_ROTATE  1
@@ -138,77 +161,52 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   
 
   //! Generate special #SVTK_SelectionEvent
-  virtual
-  SVTK_SelectionEvent*
-  GetSelectionEvent();
+  virtual SVTK_SelectionEvent* GetSelectionEvent();
 
   //! Generate special #SVTK_SelectionEvent with flipped Y coordinate
-  virtual
-  SVTK_SelectionEvent*
-  GetSelectionEventFlipY();
+  virtual SVTK_SelectionEvent* GetSelectionEventFlipY();
 
   //! Redefined in order to add an observer (callback) for custom event (space mouse event)
-  virtual
-  void
-  SetInteractor( vtkRenderWindowInteractor* );
+  virtual void SetInteractor( vtkRenderWindowInteractor* );
 
   //! To invoke #vtkRenderWindowInteractor::CreateTimer
-  virtual 
-  void
-  Render();
+  virtual void Render();
 
   //! To implement cached rendering
-  virtual
-  void
-  OnTimer();
+  virtual void OnTimer();
 
   //! To reset reset view
-  virtual
-  void
-  OnConfigure();
+  virtual void OnConfigure();
 
   //! To handle mouse move event
-  virtual 
-  void
-  OnMouseMove();
+  virtual void OnMouseMove();
 
   //! To handle left mouse button down event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnLeftButtonDown();
+  virtual void OnLeftButtonDown();
 
   //! To handle left mouse button up event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnLeftButtonUp();
+  virtual void OnLeftButtonUp();
 
   //! To handle middle mouse button down event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnMiddleButtonDown();
+  virtual void OnMiddleButtonDown();
 
   //! To handle middle mouse button up event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnMiddleButtonUp();
+  virtual void OnMiddleButtonUp();
 
   //! To handle right mouse button down event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnRightButtonDown();
+  virtual void OnRightButtonDown();
 
   //! To handle right mouse button up event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnRightButtonUp();
+  virtual void OnRightButtonUp();
 
   //! To handle keyboard event (reimplemented from #vtkInteractorStyle)
-  virtual
-  void
-  OnChar();
+  virtual void OnChar();
 
   //! To set current increment controller 
   void SetControllerIncrement(SVTK_ControllerIncrement*);
+
+  //! To modify current increment controller 
+  void SetIncrementSpeed(const int, const int = 0);
 
   //! To get current increment controller 
   SVTK_ControllerIncrement* ControllerIncrement();
@@ -226,6 +224,8 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   SVTK_ControllerOnKeyDown* ControllerOnKeyDown();
   
   SVTK_Selector* GetSelector();
+
+  int   CurrentState() const { return State; }
 
   protected:
   SVTK_InteractorStyle();
@@ -281,6 +281,7 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   void startSpin();
 
   void startPointSelection();
+  void startFocalPointSelection();
 
  protected:
   void loadCursors();
@@ -296,6 +297,9 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
 
   void DominantCombinedSwitch();
   
+  void drawRect();
+  void endDrawRect();
+
  protected:
   QCursor                   myDefCursor;
   QCursor                   myPanCursor;
@@ -331,15 +335,20 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   unsigned long                   myCurrRotationPointType;
   unsigned long                   myPrevRotationPointType;
 
+  unsigned long                   myCurrFocalPointType;
+  unsigned long                   myPrevFocalPointType;
+
   double                          myRotationPointX;
   double                          myRotationPointY;
   double                          myRotationPointZ;
 
-  vtkSmartPointer<SVTK_Actor>     myHighlightRotationPointActor;
+  vtkSmartPointer<SVTK_Actor>     myHighlightSelectionPointActor;
   vtkSmartPointer<vtkPointPicker> myPointPicker;
   
   vtkFloatingPointType            myBBCenter[3];
   bool                            myBBFirstCheck;
+
+  QRubberBand*                    myRectBand; //!< selection rectangle rubber band
 };
 
 #ifdef WIN32

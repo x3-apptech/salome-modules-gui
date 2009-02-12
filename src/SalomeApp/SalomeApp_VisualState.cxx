@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SalomeApp_VisualState.h"
 
@@ -22,26 +25,29 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Application.h"
 
-#include <SUIT_ResourceMgr.h>
+//#include <SUIT_ResourceMgr.h>
+#include <SUIT_ViewManager.h>
+#include <SUIT_ViewWindow.h>
 #include <QtxWorkstack.h>
 
 #include <STD_TabDesktop.h>
 
-#include <qptrlist.h>
-#include <qapplication.h>
-#include <qdict.h>
+#include <QList>
+#include <QApplication>
+#include <QMultiHash>
 
-#include <SALOMEDSClient_ClientFactory.hxx>
-#include <SALOMEDSClient_IParameters.hxx>
+#include <SALOMEDSClient_ClientFactory.hxx>//?
+#include <SALOMEDSClient_IParameters.hxx>//?
 
-#include <vector>
-#include <string>
+#include <vector>//?
+#include <string>//?
 
 /*!
   Constructor.
 */
 SalomeApp_VisualState::SalomeApp_VisualState( SalomeApp_Application* app )
-  : myApp( app )
+  : QObject(),
+    myApp( app )
 {
 }  
 
@@ -64,28 +70,33 @@ SalomeApp_VisualState::~SalomeApp_VisualState()
 */
 void nameViewWindows( const ViewManagerList& lst )
 {
-  QDict<int> viewersCounter; // map viewerType - to - index_of_this_viewer_type
-  viewersCounter.setAutoDelete( true );
-  for ( QPtrListIterator<SUIT_ViewManager> it(lst); it.current(); ++it) {
-    int view_count = it.current()->getViewsCount();
-    QString vType = it.current()->getType();
+  QMultiHash<QString,int> viewersCounter; // map viewerType - to - index_of_this_viewer_type
+  QListIterator<SUIT_ViewManager*> it(lst);
+  SUIT_ViewManager* aVM = 0;
+  while ( it.hasNext() ) {
+    aVM = it.next();
+    if ( !aVM ) continue;
+
+    int view_count = aVM->getViewsCount();
+    QString vType = aVM->getType();
     if ( !view_count )
       continue; //No views is opened in the viewer
     
-    int* viewerID = viewersCounter[ vType ];
+    int viewerID = viewersCounter.value( vType );
     if ( !viewerID ) {
-      viewerID = new int( 0 );
+      viewerID = 0;
       viewersCounter.insert( vType, viewerID );
     }
     else
-      ++(*viewerID);
+      ++viewerID;
 
-    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
+    QVector<SUIT_ViewWindow*> views = aVM->getViews();
     for ( int i = 0; i < view_count; i++ )  {
-      QString vName = QString( "%1_%2_%3" ).arg( vType ).arg( *viewerID ).arg( i );
-      views[i]->setName( vName );
+      QString vName = QString( "%1_%2_%3" ).arg( vType ).arg( viewerID ).arg( i );
+      views[i]->setObjectName( vName );
     }
   }
+  viewersCounter.clear();
 }
 
 /*!
@@ -117,23 +128,26 @@ int SalomeApp_VisualState::storeState()
   // store active window's name
   SUIT_ViewWindow* win = myApp->desktop()->activeWindow();  
   if ( win )
-    ip->setProperty("AP_ACTIVE_VIEW", win->name() );
+    ip->setProperty("AP_ACTIVE_VIEW", win->objectName().toStdString() );
 
   int viewerID = 0;
   SUIT_ViewManager* vm = 0;
-  for (QPtrListIterator<SUIT_ViewManager> it( lst ); it.current(); ++it ) {
-    vm = it.current();
+  QListIterator<SUIT_ViewManager*> it( lst );
+  while ( it.hasNext() ) {
+    vm = it.next();
+    if ( !vm ) continue;
+
     int view_count = vm->getViewsCount();
     if ( !view_count ) 
       continue; //No views is opened in the viewer
       
-    std::string viewerEntry = QString( "%1_%2" ).arg( vm->getType() ).arg( ++viewerID ).latin1();
+    std::string viewerEntry = QString( "%1_%2" ).arg( vm->getType() ).arg( ++viewerID ).toStdString();
     ip->append("AP_VIEWERS_LIST", viewerEntry);
     
-    QPtrVector<SUIT_ViewWindow> views = vm->getViews();
+    QVector<SUIT_ViewWindow*> views = vm->getViews();
     for(int i = 0; i<view_count; i++) {
-      ip->append( viewerEntry, views[i]->caption().latin1() );
-      ip->append( viewerEntry, views[i]->getVisualParameters().latin1() );
+      ip->append( viewerEntry, views[i]->windowTitle().toStdString() );
+      ip->append( viewerEntry, views[i]->getVisualParameters().toStdString() );
     }
   }
 
@@ -142,20 +156,24 @@ int SalomeApp_VisualState::storeState()
     QtxWorkstack* workstack = ((STD_TabDesktop*)myApp->desktop())->workstack();
     QString workstackInfo;
     (*workstack) >> workstackInfo;
-    ip->setProperty( "AP_WORKSTACK_INFO", workstackInfo.latin1() );
+    ip->setProperty( "AP_WORKSTACK_INFO", workstackInfo.toStdString() );
   }
   
   //Save a name of the active module
   if ( CAM_Module* activeModule = myApp->activeModule() ) 
-    ip->setProperty( "AP_ACTIVE_MODULE", activeModule->moduleName().latin1() );
+    ip->setProperty( "AP_ACTIVE_MODULE", activeModule->moduleName().toStdString() );
 
   //Store visual parameters of the modules
-  QPtrList<CAM_Module> mlist; 
+  QList<CAM_Module*> mlist; 
   myApp->modules( mlist );
+  QListIterator<CAM_Module*> itM( mlist );
   CAM_Module* module = 0;
-  for ( module = mlist.first(); module; module = mlist.next() ) {
+  while ( itM.hasNext() ) {
+    module = itM.next();
+    if ( !module ) continue;
+
     if ( SalomeApp_Module* sModule = dynamic_cast<SalomeApp_Module*>( module ) ) {
-      ip->append( "AP_MODULES_LIST", sModule->moduleName().latin1() );
+      ip->append( "AP_MODULES_LIST", sModule->moduleName().toStdString() );
       sModule->storeVisualParameters( savePoint );
     }
   }
@@ -178,11 +196,14 @@ void SalomeApp_VisualState::restoreState(int savePoint)
   _PTR(AttributeParameter) ap = study->studyDS()->GetCommonParameters( study->getVisualComponentName(), savePoint );
   _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
 
+  qApp->installEventFilter( this );
+
   //Remove all already existent veiwers and their views
   ViewManagerList lst;
   myApp->viewManagers( lst );
-  for ( QPtrListIterator<SUIT_ViewManager> it(lst); it.current(); ++it ) {
-    myApp->removeViewManager( it.current() );
+  QListIterator<SUIT_ViewManager*> it(lst);
+  while ( it.hasNext() ) {
+    myApp->removeViewManager( it.next() );
     qApp->processEvents();
   }
   //Restore the viewers and view windows
@@ -191,7 +212,7 @@ void SalomeApp_VisualState::restoreState(int savePoint)
 
   // parameters of view windows are stored in a map for restoring after restoring of the workstack
   QMap<SUIT_ViewWindow*, QString> viewersParameters;
-
+  
   for ( int i = 0; i < nbViewers; i++ ) {
     std::string viewerEntry = ip->getValue( "AP_VIEWERS_LIST", i );
     std::vector<std::string> veiewerParams = ip->parseValue(viewerEntry,'_');
@@ -216,7 +237,7 @@ void SalomeApp_VisualState::restoreState(int savePoint)
     }
 
     //Resize the views, set their captions and apply visual parameters.
-    QPtrVector<SUIT_ViewWindow> views = vm->getViews();  
+    QVector<SUIT_ViewWindow*> views = vm->getViews();  
     for (int i = 0, j = 0; i<viewCount; i++, j+=2) {
       viewWin = views[i];
       if ( !viewWin ) 
@@ -226,7 +247,7 @@ void SalomeApp_VisualState::restoreState(int savePoint)
       while ( !vm->isVisible() )
 	qApp->processEvents();
       
-      viewWin->setCaption(ip->getValue(viewerEntry, j).c_str());
+      viewWin->setWindowTitle(ip->getValue(viewerEntry, j).c_str());
       
       //      printf ( "VP for viewWin \"%s\": %s\n", viewerEntry.c_str(), ip->getValue(viewerEntry, j+1).c_str() );
       viewersParameters[ viewWin ] = ip->getValue(viewerEntry, j+1).c_str();
@@ -246,14 +267,18 @@ void SalomeApp_VisualState::restoreState(int savePoint)
   // so here we store their visual parameters for later restoring..
   lst.clear();
   myApp->viewManagers(lst);
-  QPtrListIterator<SUIT_ViewManager> it( lst );
-  for ( ; it.current(); ++it ) {
-    int view_count = it.current()->getViewsCount();
-    QPtrVector<SUIT_ViewWindow> views = it.current()->getViews();
+  QListIterator<SUIT_ViewManager*> itVM( lst );
+  SUIT_ViewManager* aVM = 0;
+  while ( itVM.hasNext() ) {
+    aVM = itVM.next();
+    if ( !aVM ) continue;
+
+    int view_count = aVM->getViewsCount();
+    QVector<SUIT_ViewWindow*> views = aVM->getViews();
     for ( int i = 0; i < view_count; i++ ) {
       if ( !viewersParameters.contains( views[i] ) ) {
 	viewersParameters[ views[i] ] = views[i]->getVisualParameters();
-	//	printf ( "store VP for viewWin \"%s\": %s\n", views[i]->name(), views[i]->getVisualParameters().latin1() );
+	//	printf ( "store VP for viewWin \"%s\": %s\n", views[i]->name(), views[i]->getVisualParameters().toLatin1().constData() );
       }
     }
   }  
@@ -280,10 +305,12 @@ void SalomeApp_VisualState::restoreState(int savePoint)
   std::string activeViewName = ip->getProperty("AP_ACTIVE_VIEW");
   QMap<SUIT_ViewWindow*, QString>::Iterator mapIt;
   for ( mapIt = viewersParameters.begin(); mapIt != viewersParameters.end(); ++mapIt ) {
-    mapIt.key()->setVisualParameters( mapIt.data() );
-    if ( activeViewName == mapIt.key()->name() )
+    mapIt.key()->setVisualParameters( mapIt.value() );
+    if ( activeViewName == mapIt.key()->objectName().toStdString() )
       mapIt.key()->setFocus();
   }
+
+  qApp->removeEventFilter( this );
   
   //  for ( it.toFirst(); it.current(); ++it ) {
   //    int view_count = it.current()->getViewsCount();
@@ -302,4 +329,22 @@ void SalomeApp_VisualState::restoreState(int savePoint)
   //	views[i]->setFocus();
   //    }
   //  }
+}
+
+/*!
+  Custom event filter
+*/
+bool SalomeApp_VisualState::eventFilter( QObject* o, QEvent* e )
+{
+  // eat keyboard and mouse events
+  QEvent::Type aType = e->type();
+  if ( aType == QEvent::MouseButtonDblClick ||
+       aType == QEvent::MouseButtonPress ||
+       aType == QEvent::MouseButtonRelease ||
+       aType == QEvent::MouseMove ||
+       aType == QEvent::KeyPress ||
+       aType == QEvent::KeyRelease )
+    return true;
+  
+  return QObject::eventFilter( o, e );
 }

@@ -1,20 +1,23 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "CAM_Module.h"
 
@@ -26,64 +29,66 @@
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
 
+#include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
-#include <SUIT_Application.h>
+#include <SUIT_ResourceMgr.h>
 
-/*!Icon.*/
-static const char* ModuleIcon[] = {
-"20 20 2 1",
-" 	c None",
-".	c #000000",
-"                    ",
-"                    ",
-"                    ",
-" .................. ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .                . ",
-" .................. ",
-"    .     .     .   ",
-"    .     .     .   ",
-"   ...   ...   ...  ",
-"  .. .. .. .. .. .. ",
-"  .   . .   . .   . ",
-"  .. .. .. .. .. .. ",
-"   ...   ...   ...  "};
+/*!
+  \class CAM_Module
+  \brief Base implementation of the module in the CAM application architecture.
 
-QPixmap MYPixmap( ModuleIcon );
+  Provides support of menu/toolbars management.
+*/
 
-/*!Constructor.*/
+/*!
+  \brief Default constructor.
+
+  Creates unnamed module.
+*/
 CAM_Module::CAM_Module()
 : QObject(),
-myApp( 0 ),
-myIcon( MYPixmap ),
-myDataModel( 0 )
+  myApp( 0 ),
+  myDataModel( 0 )
 {
 }
 
-/*!Constructor. initialize \a name.*/
+/*!
+  \brief Constructor.
+
+  Creates module with the specified \a name.
+
+  \param name module name
+*/
 CAM_Module::CAM_Module( const QString& name )
 : QObject(),
-myApp( 0 ),
-myName( name ),
-myIcon( MYPixmap ),
-myDataModel( 0 )
+  myApp( 0 ),
+  myName( name ),
+  myDataModel( 0 )
 {
 }
 
-/*!Destructor. Remove data model.*/
+/*!
+  \brief Destructor.
+
+  Destroy data model.
+*/
 CAM_Module::~CAM_Module()
 {
   delete myDataModel;
   myDataModel = 0;
 }
 
-/*!Initialize application.*/
+/*!
+  \brief Initialize module.
+
+  This method is usually called when the module is created (for example,
+  on the module library loading).
+  Successor classes can use this method to create menu/toolbar actions
+  and perform other module initialization.
+
+  \param app parent application object
+  \sa activateModule(), deactivateModule()
+*/
 void CAM_Module::initialize( CAM_Application* app )
 {
   myApp = app;
@@ -97,27 +102,65 @@ void CAM_Module::initialize( CAM_Application* app )
   }
 }
 
-/*!\retval Module icon.*/
+/*!
+  \brief Get module icon.
+  \return module icon pixmap
+  \sa iconName()
+*/
 QPixmap CAM_Module::moduleIcon() const
 {
+  if ( myIcon.isNull() ) {
+    QString iname = iconName();
+    if ( !iname.isEmpty() ) {
+      CAM_Module* that = (CAM_Module*)this;
+      that->myIcon = application()->resourceMgr()->loadPixmap( name(), iname, false );
+    }
+  }
   return myIcon;
 }
 
-/*!\retval Module icon name.*/
+/*!
+  \brief Get module icon's name.
+
+  This function is used to get module icon's file name.
+  Default implementation returns empty string.
+
+  \return module icon's name.
+  \sa moduleIcon()
+*/
 QString CAM_Module::iconName() const
 {
-  return "";
+  return application()->moduleIcon( name() );
 }
 
-/*!\retval Module name.*/
+/*!
+  \brief Get module (internal) name
+  \return module name
+  \sa setName(), moduleName(), setModuleName()
+*/
+QString CAM_Module::name() const
+{
+  return objectName();
+}
+
+/*!
+  \brief Get module title (user name)
+  \return module title
+  \sa setModuleName(), name(), setName()
+*/
 QString CAM_Module::moduleName() const
 {
   return myName;
 }
 
-/*! \brief Return data model.
- * Create data model, if it was't created before.
- */
+/*!
+  \brief Get data model.
+
+  Creates data model, if it is not yet created.
+
+  \return data model pointer
+  \sa createDataModel()
+*/
 CAM_DataModel* CAM_Module::dataModel() const
 {
   if ( !myDataModel )
@@ -129,33 +172,68 @@ CAM_DataModel* CAM_Module::dataModel() const
   return myDataModel;
 }
 
-/*!\retval CAM_Application pointer - application.*/
+/*!
+  \brief Get application.
+  \return application pointer
+*/
 CAM_Application* CAM_Module::application() const
 {
   return myApp;
 }
 
-/*!Public slot
- * \retval true.
+/*!
+  \brief If return false, selection will be cleared at module activation
+*/
+bool CAM_Module::isSelectionCompatible()
+{
+  return false;
+}
+
+/*!
+  \brief Activate module.
+
+  This method is called when the user activates module.
+  Successor classes can use this method to customize module activation process,
+  for example, to show own menus, toolbars, etc.
+
+  Default implementation always returns \c true.
+
+  \return \c true if module is activated successfully.
+  \sa initialize(), deactivateModule()
  */
-bool CAM_Module::activateModule( SUIT_Study* study )
+bool CAM_Module::activateModule( SUIT_Study* /*study*/ )
 {
   return true;
 }
 
-/*!Public slot
- * \retval true.
+/*!
+  \brief Deactivate module.
+
+  This method is called when the user deactivates module.
+  Successor classes can use this method to customize module deactivation process,
+  for example, to hide own menus, toolbars, etc.
+
+  Default implementation always returns \c true.
+
+  \return \c true if module is deactivated successfully.
+  \sa initialize(), activateModule()
  */
 bool CAM_Module::deactivateModule( SUIT_Study* )
 {
   return true;
 }
 
-/*!Public slot, remove data model from \a study.*/
+/*!
+  \brief Called when study is closed.
+
+  Removes data model from the \a study.
+
+  \param study study being closed
+*/
 void CAM_Module::studyClosed( SUIT_Study* study )
 {
   CAM_Study* camDoc = dynamic_cast<CAM_Study*>( study );
-  if ( !camDoc ) 
+  if ( !camDoc )
     return;
 
   CAM_DataModel* dm = dataModel();
@@ -165,21 +243,35 @@ void CAM_Module::studyClosed( SUIT_Study* study )
   }
 }
 
-/*!Public slot, do nothing.*/
-void CAM_Module::studyChanged( SUIT_Study* , SUIT_Study* )
+/*!
+  \brief Called when study is changed (obsolete).
+
+  Default implementation does nothing.
+
+  \param oldStudy old study
+  \param newStudy new study
+*/
+void CAM_Module::studyChanged( SUIT_Study* /*oldStudy*/, SUIT_Study* /*newStudy*/ )
 {
 }
 
-/*!Return true if module is active.*/
+/*!
+  \brief Check if the module is active.
+  \return \c true if module is active.
+*/
 bool CAM_Module::isActiveModule() const
 {
   return application() ? application()->activeModule() == this : false;
 }
 
 /*!
-  Put the message into the status bar of the desktop. Message will be displayed
-  during specified \amscec milliseconds. If parameter \amsec is negative then
-  message will be persistently displayed when module is active.
+  \brief Put the text message into the status bar of the application main window.
+
+  If \a msec > 0, the message will be shown \a msec milliseconds.
+  If \a msec < 0, the message will be constantly displayed until module is active.
+
+  \param msg text message
+  \param msec message displaying duration in milliseconds
 */
 void CAM_Module::putInfo( const QString& msg, const int msec )
 {
@@ -191,8 +283,12 @@ void CAM_Module::putInfo( const QString& msg, const int msec )
 }
 
 /*!
-  Restore persistently displayed info string when previos information status string erasing
-  if module is active.
+  \brief Restore message info.
+
+  Restores constant text message when previous information status message is removed.
+
+  \param txt previous message (being removed)
+  \sa putInfo()
 */
 void CAM_Module::onInfoChanged( QString txt )
 {
@@ -200,40 +296,52 @@ void CAM_Module::onInfoChanged( QString txt )
     application()->putInfo( myInfo );
 }
 
+/*!
+  \brief Called when application is closed.
 
+  Nullify application pointer if the application is being closed.
 
-/*!Public slot, nullify application pointer if the application was closed.*/
+  \param theApp application
+*/
 void CAM_Module::onApplicationClosed( SUIT_Application* theApp )
 {
   if (myApp == theApp)
     myApp = NULL;
 }
 
-/*!Create and return new instance of CAM_DataModel.*/
+/*!
+  \brief Create data model.
+  \return created data model object or 0 if it could not be created
+*/
 CAM_DataModel* CAM_Module::createDataModel()
-{ 
+{
   return new CAM_DataModel( this );
 }
 
-/*!Sets module name to \a name.
- * \param name - new name for module.
+/*!
+  \brief Set module (internal) name
+  \param name new module name
+  \sa name(), moduleName(), setModuleName()
+ */
+void CAM_Module::setName( const QString& name )
+{
+  setObjectName( name );
+}
+
+/*!
+  \brief Set module title (user name)
+  \param name new module title
+  \sa moduleName(), name(), setName()
  */
 void CAM_Module::setModuleName( const QString& name )
 {
   myName = name;
 }
 
-/*!Sets module icon to \a icon.
- * \param icon - new icon for module.
- */
-void CAM_Module::setModuleIcon( const QPixmap& icon )
-{
-  myIcon = icon;
-}
-
-/*! Return menu manager pointer.
- * \retval QtxActionMenuMgr pointer - menu manager.
- */
+/*!
+  \brief Get menu manager.
+  \return menu manager pointer
+*/
 QtxActionMenuMgr* CAM_Module::menuMgr() const
 {
   QtxActionMenuMgr* mgr = 0;
@@ -242,9 +350,10 @@ QtxActionMenuMgr* CAM_Module::menuMgr() const
   return mgr;
 }
 
-/*! Return tool manager pointer.
- * \retval QtxActionToolMgr pointer - tool manager.
- */
+/*!
+  \brief Get toolbar manager.
+  \return toolbar manager pointer
+*/
 QtxActionToolMgr* CAM_Module::toolMgr() const
 {
   QtxActionToolMgr* mgr = 0;
@@ -253,9 +362,14 @@ QtxActionToolMgr* CAM_Module::toolMgr() const
   return mgr;
 }
 
-/*! Create tool bar with name \a name, if it was't created before.
- * \retval -1 - if tool manager was't be created.
- */
+/*!
+  \brief Create toolbar with speicifed \a name.
+
+  If the toolbar has been already created, its ID is just returned.
+
+  \param name toolbar name
+  \return toolbar ID or -1 if toolbar could not be created
+*/
 int CAM_Module::createTool( const QString& name )
 {
   if ( !toolMgr() )
@@ -264,15 +378,25 @@ int CAM_Module::createTool( const QString& name )
   return toolMgr()->createToolBar( name );
 }
 
-/*! Create tool. Register action \a a with id \a id.
- * Insert QAction to tool manager.
- *\param a - QAction
- *\param tBar - integer
- *\param id   - integer
- *\param idx  - integer
- *\retval integer id of new action in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Add toolbar item.
+
+  Insert action \a to the toolbar manager and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  If \a idx < 0, the action is added to the end of the toolbar.
+
+  \param a action
+  \param tBar toolbar ID
+  \param id requested action ID
+  \param idx action index (desired position in the toolbar)
+  \return action ID or -1 if toolbar item could not be added
+*/
 int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int idx )
 {
   if ( !toolMgr() )
@@ -283,15 +407,25 @@ int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int 
   return intId != -1 ? regId : -1;
 }
 
-/*! Create tool. Register action \a a with id \a id.
- * Insert QAction to tool manager.
- *\param a - QAction
- *\param tBar - QString&
- *\param id   - integer
- *\param idx  - integer
- *\retval integer id of new action in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Add toolbar item.
+
+  Insert action \a to the toolbar manager and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  If \a idx < 0, the action is added to the end of the toolbar.
+
+  \param a action
+  \param tBar toolbar name
+  \param id requested action ID
+  \param idx action index (desired position in the toolbar)
+  \return action ID or -1 if toolbar item could not be added
+*/
 int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const int idx )
 {
   if ( !toolMgr() )
@@ -302,14 +436,24 @@ int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const
   return intId != -1 ? regId : -1;
 }
 
-/*! Create tool.
- * Insert QAction with id \a id from action map(myActionMap) to tool manager.
- *\param id   - integer
- *\param tBar - integer
- *\param idx  - integer
- *\retval integer id of new action in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Add toolbar item.
+
+  Insert action with \a id identifier to the toolbar manager.
+  It is assumed that action has been already registered.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  If \a idx < 0, the action is added to the end of the toolbar.
+
+  \param id action ID
+  \param tBar toolbar ID
+  \param idx action index (desired position in the toolbar)
+  \return action ID or -1 if toolbar item could not be added
+*/
 int CAM_Module::createTool( const int id, const int tBar, const int idx )
 {
   if ( !toolMgr() )
@@ -319,14 +463,24 @@ int CAM_Module::createTool( const int id, const int tBar, const int idx )
   return intId != -1 ? id : -1;
 }
 
-/*! Create tool.
- * Insert QAction with id \a id from action map(myActionMap) to tool manager.
- *\param id   - integer
- *\param tBar - QString&
- *\param idx  - integer
- *\retval integer id of new action in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Add toolbar item.
+
+  Insert action with \a id identifier to the toolbar manager.
+  It is assumed that action has been already registered.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  If \a idx < 0, the action is added to the end of the toolbar.
+
+  \param id action ID
+  \param tBar toolbar name
+  \param idx action index (desired position in the toolbar)
+  \return action ID or -1 if toolbar item could not be added
+*/
 int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
 {
   if ( !toolMgr() )
@@ -336,126 +490,211 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   return intId != -1 ? id : -1;
 }
 
-/*! Create menu.
- * Insert submenu \a subMenu to menu manager.
- *\param subMenu - QString&
- *\param menu    - integer
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Create menu or submenu.
+
+  Create main menu or popup submenu and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the menu ID is generated automatically.
+  If menu has been already created previously, its ID is just returned.
+
+  The \a menu parameter represents the menu name - it could be a sequence
+  of strings, separated by '|' symbol. For example, "File|Edit" means
+  File->Edit submenu. If menu doesn't exist, it is created automatically.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the menu/submenu is added to the
+  end of the menu group.
+
+  \param subMenu subMenu name
+  \param menu parent menu ID
+  \param id requested menu ID
+  \param group menu group ID
+  \param idx menu item index (desired position in the menu group)
+  \return menu item ID or -1 if menu item could not be added
+*/
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
-                            const int id, const int group, const int index,
-			    const bool enableEmpty )
+                            const int id, const int group, const int idx )
 {
   if ( !menuMgr() )
     return -1;
 
-  return menuMgr()->insert( subMenu, menu, group, id, index, enableEmpty );
+  return menuMgr()->insert( subMenu, menu, group, id, idx );
 }
 
-/*! Create menu.
- * Insert submenu \a subMenu to menu manager.
- *\param subMenu - QString&
- *\param menu    - QString&
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
+/*!
+  \brief Create menu or submenu.
+
+  Create main menu or popup submenu and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the menu ID is generated automatically.
+  If menu has been already created previously, its ID is just returned.
+
+  The \a menu parameter represents the menu name - it could be a sequence
+  of strings, separated by '|' symbol. For example, "File|Edit" means
+  File->Edit submenu. If menu doesn't exist, it is created automatically.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the menu/submenu is added to the
+  end of the menu group.
+
+  \param subMenu subMenu name
+  \param menu parent menu name(s)
+  \param id requested menu ID
+  \param group menu group ID
+  \param idx menu item index (desired position in the menu group)
+  \return menu item ID or -1 if menu item could not be added
+*/
 int CAM_Module::createMenu( const QString& subMenu, const QString& menu,
-                            const int id, const int group, const int index,
-			    const bool enableEmpty )
+                            const int id, const int group, const int idx )
 {
   if ( !menuMgr() )
     return -1;
 
-  return menuMgr()->insert( subMenu, menu, group, id, index, enableEmpty );
+  return menuMgr()->insert( subMenu, menu, group, id, idx );
 }
 
+/*!
+  \brief Add menu item.
 
-/*! Create menu. Register action \a a with id \a id.
- * Insert QAction to menu manager.
- *\param a       - Qaction
- *\param menu    - integer
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
-int CAM_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int index )
+  Insert action \a to the menu manager and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  If action has been already added previously, its ID is just returned.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the action is added to the
+  end of the menu group.
+
+  \param a action
+  \param menu menu ID
+  \param id requested action ID
+  \param group menu group ID
+  \param idx action index (desired position in the menu group)
+  \return action ID or -1 if menu item could not be added
+*/
+int CAM_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
 {
   if ( !a || !menuMgr() )
     return -1;
 
   int regId = registerAction( id, a );
-  int intId = menuMgr()->insert( a, menu, group, index );
+  int intId = menuMgr()->insert( a, menu, group, idx );
   return intId != -1 ? regId : -1;
 }
 
-/*! Create menu. Register action \a a with id \a id.
- * Insert QAction to menu manager.
- *\param a       - Qaction
- *\param menu    - QString&
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
-int CAM_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int index )
+/*!
+  \brief Add menu item.
+
+  Insert action \a to the menu manager and register it with specified \a id.
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  If action has been already added previously, its ID is just returned.
+
+  The \a menu parameter represents the menu name - it could be a sequence
+  of strings, separated by '|' symbol. For example, "File|Edit" means
+  File->Edit submenu. If menu doesn't exist, it is created automatically.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the action is added to the
+  end of the menu group.
+
+  \param a action
+  \param menu menu name(s)
+  \param id requested action ID
+  \param group menu group ID
+  \param idx action index (desired position in the menu group)
+  \return action ID or -1 if menu item could not be added
+*/
+int CAM_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
 {
   if ( !a || !menuMgr() )
     return -1;
 
   int regId = registerAction( id, a );
-  int intId = menuMgr()->insert( a, menu, group, index );
+  int intId = menuMgr()->insert( a, menu, group, idx );
   return intId != -1 ? regId : -1;
 }
 
-/*! Create menu.
- * Insert QAction with id \a id from action map(myActionMap) to menu manager.
- *\param menu    - integer
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
-int CAM_Module::createMenu( const int id, const int menu, const int group, const int index )
+/*!
+  \brief Add menu item.
+
+  Insert action with \a id identifier to the menu manager.
+  It is assumed that action has been already registered.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the action is added to the
+  end of the menu group.
+
+  \param id action ID
+  \param menu menu ID
+  \param group menu group ID
+  \param idx action index (desired position in the menu group)
+  \return action ID or -1 if menu item could not be added
+*/
+int CAM_Module::createMenu( const int id, const int menu, const int group, const int idx )
 {
   if ( !menuMgr() )
     return -1;
 
-  int intId = menuMgr()->insert( action( id ), menu, group, index );
+  int intId = menuMgr()->insert( action( id ), menu, group, idx );
   return intId != -1 ? id : -1;
 }
 
-/*! Create menu.
- * Insert QAction with id \a id from action map(myActionMap) to menu manager.
- *\param menu    - QString&
- *\param id      - integer
- *\param group   - integer
- *\param index   - integer
- *\retval integer id of new menu in tool manager.
- *\retval Return -1 if something wrong.
- */
-int CAM_Module::createMenu( const int id, const QString& menu, const int group, const int index )
+/*!
+  \brief Add menu item.
+
+  Insert action with \a id identifier to the menu manager.
+  It is assumed that action has been already registered.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If action has been already added previously, its ID is just returned.
+
+  The \a menu parameter represents the menu name - it could be a sequence
+  of strings, separated by '|' symbol. For example, "File|Edit" means
+  File->Edit submenu. If menu doesn't exist, it is created automatically.
+
+  Parameter \a idx defines the index of the menu item in the menu group which
+  is defined by the \a group. If \a idx < 0, the action is added to the
+  end of the menu group.
+
+  \param id action ID
+  \param menu menu name(s)
+  \param group menu group ID
+  \param idx action index (desired position in the menu group)
+  \return action ID or -1 if menu item could not be added
+*/
+int CAM_Module::createMenu( const int id, const QString& menu, const int group, const int idx )
 {
   if ( !menuMgr() )
     return -1;
 
-  int intId = menuMgr()->insert( action( id ), menu, group, index );
+  int intId = menuMgr()->insert( action( id ), menu, group, idx );
   return intId != -1 ? id : -1;
 }
 
-/*!Sets menus shown to \a on floag.
- *\param on - flag.
- */
+/*!
+  \brief Show/hide all module's menus.
+  \param on if \c true, show menus, otherwise, hide all menus
+  \sa setToolShown()
+*/
 void CAM_Module::setMenuShown( const bool on )
 {
   QtxActionMenuMgr* mMgr = menuMgr();
@@ -468,8 +707,8 @@ void CAM_Module::setMenuShown( const bool on )
   QAction* sep = separator();
   for ( QMap<int, QAction*>::Iterator it = myActionMap.begin(); it != myActionMap.end(); ++it )
   {
-    if ( it.data() != sep )
-      mMgr->setShown( mMgr->actionId( it.data() ), on );
+    if ( it.value() != sep )
+      mMgr->setShown( mMgr->actionId( it.value() ), on );
   }
 
   mMgr->setUpdatesEnabled( upd );
@@ -477,28 +716,32 @@ void CAM_Module::setMenuShown( const bool on )
     mMgr->update();
 }
 
-/*!Sets menu shown for QAction \a a to \a on flag.
- * \param a - QAction
- * \param on - flag
- */
+/*!
+  \brief Show/hide specified menu item.
+  \param a action
+  \param on if \c true, show menu item, otherwise, hide it
+*/
 void CAM_Module::setMenuShown( QAction* a, const bool on )
 {
   if ( menuMgr() )
     menuMgr()->setShown( menuMgr()->actionId( a ), on );
 }
 
-/*!Sets menu shown for action with id=\a id to \a on flag.
- * \param id - id of action
- * \param on - flag
- */
+/*!
+  \brief Show/hide specified menu item.
+  \param id menu item ID
+  \param on if \c true, show menu item, otherwise, hide it
+*/
 void CAM_Module::setMenuShown( const int id, const bool on )
 {
   setMenuShown( action( id ), on );
 }
 
-/*!Set tools shown to \a on flag.
- *\param on - boolean flag.
- */
+/*!
+  \brief Show/hide all module's toolbars.
+  \param on if \c true, show toolbars, otherwise, hide all toolbars
+  \sa setMenuShown()
+*/
 void CAM_Module::setToolShown( const bool on )
 {
   QtxActionToolMgr* tMgr = toolMgr();
@@ -511,8 +754,8 @@ void CAM_Module::setToolShown( const bool on )
   QAction* sep = separator();
   for ( QMap<int, QAction*>::Iterator it = myActionMap.begin(); it != myActionMap.end(); ++it )
   {
-    if ( it.data() != sep )
-      tMgr->setShown( tMgr->actionId( it.data() ), on );
+    if ( it.value() != sep )
+      tMgr->setShown( tMgr->actionId( it.value() ), on );
   }
 
   tMgr->setUpdatesEnabled( upd );
@@ -520,29 +763,32 @@ void CAM_Module::setToolShown( const bool on )
     tMgr->update();
 }
 
-/*!Set tools shown for QAction \a a to \a on flag.
- * \param a - QAction
- * \param on - boolean flag
- */
+/*!
+  \brief Show/hide specified toolbar item.
+  \param a action
+  \param on if \c true, show toolbar item, otherwise, hide it
+*/
 void CAM_Module::setToolShown( QAction* a, const bool on )
 {
   if ( toolMgr() )
     toolMgr()->setShown( toolMgr()->actionId( a ), on );
 }
 
-/*!Set tools shown for action with id=\a id to \a on flag.
- * \param id - integer action id
- * \param on - boolean flag
- */
+/*!
+  \brief Show/hide specified toolbar item.
+  \param id toolbar item ID
+  \param on if \c true, show toolbar item, otherwise, hide it
+*/
 void CAM_Module::setToolShown( const int id, const bool on )
 {
   setToolShown( action( id ), on );
 }
 
-/*! Return action by id. 
- * \param id - id of action.
- * \retval QAction.
- */
+/*!
+  \brief Get action by specified \a id.
+  \param id action ID
+  \return action or 0 if not found
+*/
 QAction* CAM_Module::action( const int id ) const
 {
   QAction* a = 0;
@@ -551,58 +797,71 @@ QAction* CAM_Module::action( const int id ) const
   return a;
 }
 
-/*! Return id by action. 
- * \param a - QAction.
- * \retval id of action.
- */
+/*!
+  \brief Get action ID.
+  \param a action
+  \return action ID or -1 if not found
+*/
 int CAM_Module::actionId( const QAction* a ) const
 {
   int id = -1;
   for ( QMap<int, QAction*>::ConstIterator it = myActionMap.begin(); it != myActionMap.end() && id == -1; ++it )
   {
-    if ( it.data() == a )
+    if ( it.value() == a )
       id = it.key();
   }
   return id;
 }
 
-/*! Create new instance of QtxAction and register action with \a id.
- * \param id - id for new action.
- * \param text - parameter for creation QtxAction
- * \param icon - parameter for creation QtxAction
- * \param menu - parameter for creation QtxAction
- * \param tip  - tip status for QtxAction action.
- * \param key  - parameter for creation QtxAction
- * \param parent - parent for action
- * \param toggle - parameter for creation QtxAction
- * \param reciever - 
- * \param member   - 
- */
-QAction* CAM_Module::createAction( const int id, const QString& text, const QIconSet& icon,
+/*!
+  \brief Create new instance of QtxAction and register action with specified \a id.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  \param id required action ID
+  \param text tooltip text
+  \param icon action icon
+  \param menu menu text
+  \param tip status bar tip
+  \param key keyboard accelerator
+  \param parent parent object
+  \param toggle if \c true, the action will be toggled
+  \param reciever action activation signal receiver object
+  \param member action activation signal receiver slot
+*/
+QAction* CAM_Module::createAction( const int id, const QString& text, const QIcon& icon,
                                    const QString& menu, const QString& tip, const int key,
                                    QObject* parent, const bool toggle, QObject* reciever, const char* member )
 {
-  QtxAction* a = new QtxAction( text, icon, menu, key, parent, 0, toggle );
+  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle );
   a->setStatusTip( tip );
 
   if ( reciever && member )
-    connect( a, SIGNAL( activated() ), reciever, member );
+    connect( a, SIGNAL( triggered( bool ) ), reciever, member );
 
   registerAction( id, a );
 
   return a;
 }
 
-/*! Register action in action map.
- * \param id - id for action.
- * \param a  - action
- * \retval new id for action.
- */
+/*!
+  \brief Register action in the internal action map.
+
+  If action has been already added previously, its ID is just returned.
+  If \a id < 0, the action ID is generated automatically.
+
+  \param id action required ID
+  \param a action
+  \return action ID
+*/
 int CAM_Module::registerAction( const int id, QAction* a )
 {
   int ident = -1;
   for ( QMap<int, QAction*>::ConstIterator it = myActionMap.begin(); it != myActionMap.end() && ident == -1; ++it )
-    if ( it.data() == a )
+    if ( it.value() == a )
       ident = it.key();
 
   if ( ident != -1 )
@@ -619,22 +878,29 @@ int CAM_Module::registerAction( const int id, QAction* a )
   if ( toolMgr() )
     toolMgr()->registerAction( a );
 
+  if ( application() && application()->desktop() )
+    application()->desktop()->addAction( a );
+
   return ident;
 }
 
-/*! Unregister an action.
- * \param id - id for action.
- * \retval true if succeded, false if action is used
- */
+/*!
+  \brief Unregister action from the internal action map.
+
+  \param id action ID
+  \return \c true on success or \c false if action is in use
+*/
 bool CAM_Module::unregisterAction( const int id )
 {
   return unregisterAction( action( id ) );
 }
 
-/*! Unregister an action.
- * \param a  - action
- * \retval true if succeded, false if action is used
- */
+/*!
+  \brief Unregister action from the internal action map.
+
+  \param a action
+  \return \c true on success or \c false if action is in use
+*/
 bool CAM_Module::unregisterAction( QAction* a )
 {
   if ( !a )
@@ -656,13 +922,22 @@ bool CAM_Module::unregisterAction( QAction* a )
   return true;
 }
 
-/*! Return qt action manager separator.*/
+/*!
+  \brief Create separator action.
+
+  Separator action can be used in menus or toolbars.
+
+  \return new separator action
+*/
 QAction* CAM_Module::separator()
 {
   return QtxActionMgr::separator();
 }
 
-/*! Connect data model of module with active study */
+/*!
+  \brief Connect data model of the module to the active study
+  \param camStudy CAM study object
+*/
 void CAM_Module::connectToStudy( CAM_Study* camStudy )
 {
   CAM_Application* app = camStudy ? dynamic_cast<CAM_Application*>( camStudy->application() ) : 0;
@@ -670,16 +945,30 @@ void CAM_Module::connectToStudy( CAM_Study* camStudy )
     return;
 
   CAM_DataModel* prev = 0;
-  for( CAM_Application::ModuleListIterator it = app->modules(); it.current(); ++it )
+  CAM_Application::ModuleList mods = app->modules();
+  for( QList<CAM_Module*>::const_iterator it = mods.begin(); it != mods.end(); ++it )
   {
-    CAM_DataModel* dm = it.current()->dataModel();
-    if( it.current() == this && !camStudy->containsDataModel( dm ) )
+    CAM_DataModel* dm = (*it)->dataModel();
+    if( (*it) == this && !camStudy->containsDataModel( dm ) )
     {
       if ( prev )
-	      camStudy->insertDataModel( it.current()->dataModel(), prev );
+	camStudy->insertDataModel( (*it)->dataModel(), prev );
       else
-	      camStudy->insertDataModel( it.current()->dataModel(), 0 );
+	camStudy->insertDataModel( (*it)->dataModel(), 0 );
     }
     prev = dm;
   }
 }
+
+/*!
+  \fn void CAM_Module::contextMenuPopup( const QString& type, QMenu* menu, QString& title );
+  \brief Create context popup menu.
+  \param type popup menu context
+  \param menu popup menu
+  \param title popup menu title, which can be set by the module if required
+*/
+
+/*!
+  \fn void CAM_Module::updateCommandsStatus();
+  \brief Update menu/toolbar actions.
+*/

@@ -1,66 +1,59 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File:      QtxActionToolMgr.h
-// Author:    Alexander SOLOVYEV, Sergey TELKOV
-
+// Author:    Alexander SOLOVYOV, Sergey TELKOV
+//
 #ifndef QTXACTIONTOOLMGR_H
 #define QTXACTIONTOOLMGR_H
 
 #include "Qtx.h"
-
-#include <qaction.h>
-
 #include "QtxActionMgr.h"
+
+#include <QMap>
+#include <QList>
 
 class QToolBar;
 class QMainWindow;
+class QAction;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
-/*!
-  \class QtxActionToolMgr
-  Allows to use set of action to automatically build set of toolbars.
-  With help of methods insert/append/remove it is possible to 
-  describe toolbars and its internal structure.
-  This manager is able to attune toolbar by removing excess separators
-*/
 class QTX_EXPORT QtxActionToolMgr : public QtxActionMgr
 {
   Q_OBJECT
 
-  /*!
-    \class ToolNode
-    Represents a toolbutton inside toolbar
-    For internal purposes only
-  */
   class ToolNode
   {
   public:
     ToolNode() : id( -1 ), visible( true ) {};
+    ToolNode( const int _id ) : id( _id ), visible( true ) {};
 
-    int       id;
-    bool      visible;
+    int       id;          //!< tool node ID
+    bool      visible;     //!< visibility status
   };
 
-  typedef QValueList<ToolNode> NodeList;
+  typedef QList<ToolNode> NodeList;    //!< toolbar nodes list
 
 protected:
   class ToolCreator;
@@ -71,7 +64,7 @@ public:
 
   QMainWindow*    mainWindow() const;
 
-  int             createToolBar( const QString&, int = -1 );
+  int             createToolBar( const QString&, int = -1, QMainWindow* = 0 );
   void            removeToolBar( const QString& );
   void            removeToolBar( const int );
 
@@ -111,33 +104,34 @@ public:
 
   virtual bool    load( const QString&, QtxActionMgr::Reader& );
 
+  int             find( QToolBar* ) const;
+
 protected slots:
   void            onToolBarDestroyed();
 
 protected:
-  int             find( QToolBar* ) const;  
   int             find( const QString& ) const;
   QToolBar*       find( const QString&, QMainWindow* ) const;
 
   virtual void    internalUpdate();
   void            updateToolBar( const int );
 
+  virtual void    updateContent();
+
 private:
   void            simplifySeparators( QToolBar* );
+  void            triggerUpdate( const int );
 
 private:
-  typedef struct { NodeList nodes; QToolBar* toolBar; } ToolBarInfo;
-  typedef QMap<int, ToolBarInfo>                        ToolBarMap;
+  typedef struct { NodeList nodes; QToolBar* toolBar; } ToolBarInfo;   //!< toolbar info
+  typedef QMap<int, ToolBarInfo>                        ToolBarMap;    //!< toolbars map
 
 private:
-  ToolBarMap      myToolBars;
-  QMainWindow*    myMainWindow;
+  ToolBarMap      myToolBars;      //!< toobars map
+  QMainWindow*    myMainWindow;    //!< parent main window
+  QMap<int,int>   myUpdateIds;     //!< list of actions ID being updated
 };
 
-/*!
-  \class QtxActionToolMgr::ToolCreator
-  Allows to create automatically toolbar by data read from file
-*/
 class QtxActionToolMgr::ToolCreator : public QtxActionMgr::Creator
 {
 public:
@@ -148,7 +142,7 @@ public:
                       const ItemAttributes&, const int );
 
 private:
-  QtxActionToolMgr* myMgr;
+  QtxActionToolMgr* myMgr;         //!< toolbar manager
 };
 
 #endif

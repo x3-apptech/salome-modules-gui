@@ -1,52 +1,66 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
 
 #include "SUIT_ViewWindow.h"
+#include "SUIT_ViewManager.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
 
-#include <qpainter.h>
-#include <qapplication.h>
-#include <qcolordialog.h>
-#include <qpalette.h>
-#include <qpopupmenu.h>
+#include "QtxActionToolMgr.h"
+
+#include <QPainter>
+#include <QApplication>
+#include <QColorDialog>
+#include <QPalette>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QToolBar>
+#include <QDesktopWidget>
 
 #include <AIS_Axis.hxx>
 #include <AIS_Drawer.hxx>
+#include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
 #include <Geom_Axis2Placement.hxx>
+#include <Prs3d_Drawer.hxx>
 #include <Prs3d_DatumAspect.hxx>
 #include <Prs3d_LineAspect.hxx>
+#include <Prs3d_LengthAspect.hxx>
+#include <Prs3d_AngleAspect.hxx>
+#include <Prs3d_TextAspect.hxx>
 
 /*!
   Constructor
   \param DisplayTrihedron - is trihedron displayed
 */
-OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron )
+OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron, bool DisplayStaticTrihedron )
 : SUIT_ViewModel(),
-myBgColor( Qt::black )
+  myBgColor( Qt::black ),
+  myShowStaticTrihedron( DisplayStaticTrihedron )
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::Viewer3d( "", (short*) "Viewer3d", "", 1000.,
@@ -66,6 +80,15 @@ myBgColor( Qt::black )
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
 
+  double h = QApplication::desktop()->screenGeometry( QApplication::desktop()->primaryScreen() ).height() / 300. ;
+  Handle(Prs3d_Drawer) drawer = myAISContext->DefaultDrawer();
+  Handle(Prs3d_TextAspect) ta = drawer->TextAspect();
+  ta->SetHeight(100); // VSR: workaround for CAS.CADE bug (is it really needed ???)
+  ta->SetHeight(h);
+  drawer->SetTextAspect(ta);
+  drawer->AngleAspect()->SetTextAspect(ta);
+  drawer->LengthAspect()->SetTextAspect(ta);
+  
   clearViewAspects();
 
   /* create trihedron */
@@ -157,7 +180,7 @@ void OCCViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
   SUIT_ViewModel::setViewManager(theViewManager);
   if (theViewManager) {
     connect(theViewManager, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), 
-            this, SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
+	    this, SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
 
     connect(theViewManager, SIGNAL(mouseMove(SUIT_ViewWindow*, QMouseEvent*)), 
             this, SLOT(onMouseMove(SUIT_ViewWindow*, QMouseEvent*)));
@@ -184,8 +207,15 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
   if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
-  if ( isSelectionEnabled() )
-    myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView->getViewPort()->getView());
+
+  if ( isSelectionEnabled() ) {
+    if (aView->getViewPort()->isBusy()) return; // Check that the ViewPort initialization completed
+                                                // To Prevent call move event if the View port is not initialized
+                                                // IPAL 20883
+    Handle(V3d_View) aView3d = aView->getViewPort()->getView();
+    if ( !aView3d.IsNull() )
+      myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+  }
 }
 
 
@@ -201,7 +231,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
 
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
-  bool aHasShift = (theEvent->state() & Qt::ShiftButton);
+  bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
   if (!aHasShift) emit deselection();
 
@@ -252,10 +282,10 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
   if ( !myViewManager )
     return;
 
-  QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
   for ( int i = 0; i < (int)wins.count(); i++ )
   {
-    OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
       win->updateEnabledDrawMode();
   }
@@ -272,10 +302,10 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
   if ( !myViewManager )
     return;
 
-  QPtrVector<SUIT_ViewWindow> wins = myViewManager->getViews();
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
   for ( int i = 0; i < (int)wins.count(); i++ )
   {
-    OCCViewer_ViewWindow* win = ::qt_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
       win->updateEnabledDrawMode();
   }
@@ -284,16 +314,20 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
 /*!
   Builds popup for occ viewer
 */
-void OCCViewer_Viewer::contextMenuPopup(QPopupMenu* thePopup)
+void OCCViewer_Viewer::contextMenuPopup(QMenu* thePopup)
 {
-  thePopup->insertItem( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->insertItem( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->addAction( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
+  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
 
-  thePopup->insertSeparator();
+  thePopup->addSeparator();
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
-  if ( aView && !aView->getToolBar()->isVisible() )
-    thePopup->insertItem( tr( "MEN_SHOW_TOOLBAR" ), this, SLOT( onShowToolbar() ) );
+
+  //Support of several toolbars in the popup menu
+  QList<QToolBar*> lst = qFindChildren<QToolBar*>( aView );
+  QList<QToolBar*>::const_iterator it = lst.begin(), last = lst.end();
+  for( ; it!=last; it++ )
+    thePopup->addAction( (*it)->toggleViewAction() );
 }
 
 /*!
@@ -322,15 +356,6 @@ void OCCViewer_Viewer::onChangeBgColor()
   QColor selColor = QColorDialog::getColor( aColorActive, aView);
   if ( selColor.isValid() )
     aViewPort3d->setBackgroundColor(selColor);
-}
-
-/*!
-  SLOT: called when popup item "Show toolbar" is activated, shows toolbar of active view window
-*/
-void OCCViewer_Viewer::onShowToolbar() {
-  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
-  if ( aView )
-    aView->getToolBar()->show();    
 }
 
 /*!

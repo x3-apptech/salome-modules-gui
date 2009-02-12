@@ -1,4 +1,7 @@
-#  Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -14,26 +17,29 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : LogWindow
 #  $Header$
-
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libLogWindow.la
 
-salomeinclude_HEADERS= LogWindow.h
+salomeinclude_HEADERS = LogWindow.h
 
-dist_libLogWindow_la_SOURCES= LogWindow.cxx		
+dist_libLogWindow_la_SOURCES = LogWindow.cxx		
 
-MOC_FILES= LogWindow_moc.cxx
+MOC_FILES = LogWindow_moc.cxx
 nodist_libLogWindow_la_SOURCES = $(MOC_FILES)
 
-libLogWindow_la_CPPFLAGS=$(QT_INCLUDES) -I$(srcdir)/../SUIT -I$(srcdir)/../Qtx
+nodist_salomeres_DATA = \
+	LogWindow_msg_en.qm
 
-libLogWindow_la_LDFLAGS=$(QT_MT_LIBS) ../SUIT/libsuit.la ../Qtx/libqtx.la 
+libLogWindow_la_CPPFLAGS = $(QT_INCLUDES) -I$(srcdir)/../SUIT -I$(srcdir)/../Qtx
+libLogWindow_la_LDFLAGS  = $(QT_MT_LIBS)
+libLogWindow_la_LIBADD   = ../Qtx/libqtx.la ../SUIT/libsuit.la
 
 

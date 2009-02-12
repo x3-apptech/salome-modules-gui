@@ -1,29 +1,33 @@
-// Copyright (C) 2005  CEA/DEN, EDF R&D, OPEN CASCADE, PRINCIPIA R&D
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License.
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// This library is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "QDS_LineEdit.h"
 
-#include <qlineedit.h>
-#include <qvalidator.h>
+#include <QLineEdit>
+#include <QValidator>
 
-/*
-  class: QDS_LineEdit::Editor
-  descr: Internal class inherited from line edit
+/*!
+  \class QDS_LineEdit::Editor
+  \internal
+  \brief Improved version of QLineEdit.
 */
 
 class QDS_LineEdit::Editor : public QLineEdit
@@ -52,16 +56,30 @@ private:
 /*
   \class QDS_LineEdit
   
-  Datum with control corresponding to line edit. User can enter parameter value in single line editor.
-  User inputted values will be checked by validator according to type if value and parameter properties
-  (minimum, maximum, filter, precision, etc). If user input not valid value then this value will be
-  displayed in red color.
+  \brief Datum with control corresponding to the line edit. 
+
+  User can enter parameter value in single line editor.
+  The value entered by the user is checked by the validator according to item type
+  according to the item properties (minimum, maximum, filter, precision, etc).
+
+  If user input is not valid, the value is displayed in red color.
 */
 
 /*!
-  Constructor. Create line edit datum object with datum identifier \aid under widget \aparent. Parameter \aflags
-  define behaviour of datum and set of created subwidgets. Default value of this parameter is QDS::All.
-  Parameter \acomp specify the component name which will be used during search of dictionary item.
+  \brief Constructor. 
+
+  Create line edit datum object with datum identifier \a id and parent widget \a parent. 
+
+  Parameter \a flags defines behaviour of datum and set of created
+  subwidgets. Default value of this parameter is QDS::All.
+
+  Parameter \a comp specifies the component name which will be used
+  when searching the dictionary item.
+
+  \param id datum identifier
+  \param parent parent widget
+  \param flags datum flags
+  \param comp component
 */
 QDS_LineEdit::QDS_LineEdit( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QDS_Datum( id, parent, flags, comp )
@@ -69,15 +87,18 @@ QDS_LineEdit::QDS_LineEdit( const QString& id, QWidget* parent, const int flags,
 }
 
 /*!
-  Destructor.
+  \brief Destructor.
 */
 QDS_LineEdit::~QDS_LineEdit()
 {
 }
 
 /*!
-  Notification about active unit system changing. Reimplemented from QDS_Datum.
+  \brief Process notification about active units system changing.
+
   Update validator settings for line edit.
+
+  \param system new active units system
 */
 void QDS_LineEdit::unitSystemChanged( const QString& system )
 {
@@ -88,14 +109,14 @@ void QDS_LineEdit::unitSystemChanged( const QString& system )
     return;
   
   delete le->validator();
-  le->clearValidator();
+  le->setValidator(0);
   QValidator* valid = validator();
   if ( valid )
     le->setValidator( valid );
 
   QString aFormat = format();
   int num = 0;
-  int pos = aFormat.find( '%' );
+  int pos = aFormat.indexOf( '%' );
   if ( pos != -1 )
   {
     pos++;
@@ -112,12 +133,12 @@ void QDS_LineEdit::unitSystemChanged( const QString& system )
   int minLen  = format( format(), type(), minValue() ).length();
   int maxLen  = format( format(), type(), maxValue() ).length();
 
-  num = QMAX( QMAX( num, zeroLen ), QMAX( minLen, maxLen ) );
+  num = qMax( qMax( num, zeroLen ), qMax( minLen, maxLen ) );
   ((Editor*)le)->setNumber( num );
 }
 
 /*!
-  Select all text in the editor.
+  \brief Select all text in the editor.
 */
 void QDS_LineEdit::selectAll()
 {
@@ -126,7 +147,7 @@ void QDS_LineEdit::selectAll()
 }
 
 /*!
-  Deselect all text in the editor.
+  \brief Deselect all text in the editor.
 */
 void QDS_LineEdit::deselect()
 {
@@ -135,7 +156,8 @@ void QDS_LineEdit::deselect()
 }
 
 /*!
-  Select or deselect all text in the editor.
+  \brief Select/deselect all text in the editor.
+  \param on select text if \c true and deselect if \c false
 */
 void QDS_LineEdit::setSelection( const bool on )
 {
@@ -146,7 +168,8 @@ void QDS_LineEdit::setSelection( const bool on )
 }
 
 /*!
-  Returns true if the editor has selected text.
+  \brief Check if there is selection in the editor.
+  \return \c true if the editor has selected text
 */
 bool QDS_LineEdit::hasSelection() const
 {
@@ -154,18 +177,21 @@ bool QDS_LineEdit::hasSelection() const
 }
 
 /*!
-  Set the aligment of line edit. Reimplemented from QDS_Datum.
+  \brief Set the aligment for the line edit.
+  \param align alignment type (Qt::Alignment)
+  \param type ORed subwidget flags
 */
 void QDS_LineEdit::setAlignment( const int align, const int type )
 {
   if ( ( type & Control ) && lineEdit() )
-    lineEdit()->setAlignment( align );
+    lineEdit()->setAlignment( Qt::Alignment(align) );
 
   QDS_Datum::setAlignment( align, type );
 }
 
 /*!
-  Returns string value from QLineEdit widget. Reimplemented from QDS_Datum.
+  \brief Get string value from datum.
+  \return datum string value
 */
 QString QDS_LineEdit::getString() const
 {
@@ -176,7 +202,8 @@ QString QDS_LineEdit::getString() const
 }
 
 /*!
-  Sets the string value into QLineEdit widget. Reimplemented from QDS_Datum.
+  \brief Set string value to datum.
+  \param txt new datum string value
 */
 void QDS_LineEdit::setString( const QString& txt )
 {
@@ -185,15 +212,18 @@ void QDS_LineEdit::setString( const QString& txt )
 }
 
 /*!
-  Returns pointer to QLineEdit widget.
+  \brief Get line edit widget.
+  \return pointer to the QLineEdit widget
 */
 QLineEdit* QDS_LineEdit::lineEdit() const
 {
-  return ::qt_cast<QLineEdit*>( controlWidget() );
+  return ::qobject_cast<QLineEdit*>( controlWidget() );
 }
 
 /*!
-  Create QLineEdit widget as control subwidget. Reimplemented from QDS_Datum.
+  \brief Create line edit widget as control subwidget.
+  \param parent parent widget
+  \return created line edit widget
 */
 QWidget* QDS_LineEdit::createControl( QWidget* parent )
 {
@@ -204,9 +234,13 @@ QWidget* QDS_LineEdit::createControl( QWidget* parent )
 }
 
 /*!
-  Notify about text changing in line edit.
+  \brief Called when text in the edit box is modified by the user.
+
+  Notify about text changing in the line edit.
+
+  \param txt current text in the line edit widget (not used)
 */
-void QDS_LineEdit::onTextChanged( const QString& )
+void QDS_LineEdit::onTextChanged( const QString& /*txt*/ )
 {
   invalidateCache();
 
@@ -217,7 +251,11 @@ void QDS_LineEdit::onTextChanged( const QString& )
 }
 
 /*!
-  Checks the current parameter value on validity. If value is not valid then set text color as red.
+  \brief Called when text is changed.
+
+  Validate the current parameter value. If value is not valid then set text color as red.
+
+  Emits signal paramChanged() to notify about changing of the control state.
 */
 void QDS_LineEdit::onParamChanged()
 {
@@ -229,9 +267,14 @@ void QDS_LineEdit::onParamChanged()
 
   QPalette aPal = anEdit->palette();
   if ( !aValid )
-    aPal.setColor( QPalette::Active, QColorGroup::Text, QColor( 255, 0, 0 ) );
+    aPal.setColor( QPalette::Active, QPalette::Text, QColor( 255, 0, 0 ) );
   else
-    aPal.setColor( QPalette::Active, QColorGroup::Text, QColor( 0, 0, 0 ) );
+    aPal.setColor( QPalette::Active, QPalette::Text, QColor( 0, 0, 0 ) );
 
   anEdit->setPalette( aPal );
 }
+
+/*!
+  \brief void QDS_LineEdit::returnPressed();
+  \brief The signal is emitted when user presses \c Enter key in the line edit.
+*/

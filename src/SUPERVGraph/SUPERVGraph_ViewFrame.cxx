@@ -1,39 +1,38 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME SUPERVGraph : build Supervisor viewer into desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : SUPERVGraph_ViewFrame.cxx
 //  Author : Nicolas REJNERI
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SUPERVGraph_ViewFrame.h"
 
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 
 //QT Include
-#include <qlayout.h>
-#include <qcolordialog.h>
+#include <QVBoxLayout>
+#include <QToolBar>
 
 using namespace std;
 
@@ -57,7 +56,7 @@ SUPERVGraph_View::SUPERVGraph_View( SUPERVGraph_View* theParent ): QWidget( theP
 /*!
   Builds popup for SUPERVGraph viewer
 */
-void SUPERVGraph_View::contextMenuPopup( QPopupMenu* )
+void SUPERVGraph_View::contextMenuPopup( QMenu* )
 {
   // to be implemented
 }
@@ -94,8 +93,8 @@ SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame( SUIT_Desktop* theDesktop )
   setBackgroundColor(QColor(R,G,B));*/
 
   myToolBar = new QToolBar(this);
-  myToolBar->setCloseMode(QDockWindow::Undocked);
-  myToolBar->setLabel(tr("LBL_TOOLBAR_LABEL"));
+  //myToolBar->setCloseMode(QDockWindow::Undocked);
+  myToolBar->setWindowTitle(tr("LBL_TOOLBAR_LABEL"));
   createActions();
   createToolBar();
 }
@@ -107,18 +106,18 @@ void SUPERVGraph_ViewFrame::createActions()
 {
   if (!myActionsMap.isEmpty()) return;
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-  QAction* aAction;
+  QtxAction* aAction;
 
   // Panning
-  aAction = new QAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_PAN" ) ),
-			tr( "MNU_PAN_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_PAN" ) ),
+			  tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
   myActionsMap[ PanId ] = aAction;
 
   // Reset
-  aAction = new QAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_RESET" ) ),
-			tr( "MNU_RESET_VIEW" ), 0, this);
+  aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_RESET" ) ),
+			  tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
   myActionsMap[ ResetId ] = aAction;
@@ -129,8 +128,8 @@ void SUPERVGraph_ViewFrame::createActions()
 */
 void SUPERVGraph_ViewFrame::createToolBar()
 {
-  myActionsMap[PanId]->addTo(myToolBar);
-  myActionsMap[ResetId]->addTo(myToolBar);
+  myToolBar->addAction( myActionsMap[PanId] );
+  myToolBar->addAction( myActionsMap[ResetId] );
 }
 
 /*!
@@ -278,8 +277,11 @@ void SUPERVGraph_ViewFrame::onViewFitAll()
 */
 void SUPERVGraph_ViewFrame::setBackgroundColor( const QColor& color )
 {
-    if (myView)
-      myView->setPaletteBackgroundColor(color);
+  if (myView) {
+    QPalette palette;
+    palette.setColor(myView->backgroundRole(), color);
+    myView->setPalette(palette);
+  }
 }
 
 /*!
@@ -288,8 +290,8 @@ void SUPERVGraph_ViewFrame::setBackgroundColor( const QColor& color )
 QColor SUPERVGraph_ViewFrame::backgroundColor() const
 {
   if (myView)
-    return myView->paletteBackgroundColor();
-  return QMainWindow::backgroundColor();
+    return myView->palette().color( myView->backgroundRole() );
+  return palette().color( backgroundRole() );
 }
 
 /*!

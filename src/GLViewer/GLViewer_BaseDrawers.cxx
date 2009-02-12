@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,20 +17,22 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_BaseDrawers.cxx
 // Created:   November, 2004
-
 //#include <GLViewerAfx.h>
+//
 #include "GLViewer_BaseDrawers.h"
 #include "GLViewer_Object.h"
 #include "GLViewer_Text.h"
 #include "GLViewer_AspectLine.h"
 #include "GLViewer_BaseObjects.h"
+
+// Qt includes
+#include <QColor>
+
 
 #ifndef WIN32
 #include <GL/glx.h>
@@ -66,10 +71,10 @@ GLViewer_MarkerDrawer::~GLViewer_MarkerDrawer()
 */
 void GLViewer_MarkerDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
-    QValueList<int>::Iterator it;
-    QValueList<int>::Iterator EndIt;
-    QValueList<GLViewer_Object*>::Iterator anObjectIt = myObjects.begin();
-    QValueList<GLViewer_Object*>::Iterator anEndObjectIt = myObjects.end();
+    QList<int>::Iterator it;
+    QList<int>::Iterator EndIt;
+    QList<GLViewer_Object*>::Iterator anObjectIt = myObjects.begin();
+    QList<GLViewer_Object*>::Iterator anEndObjectIt = myObjects.end();
 
     myXScale = xScale;
     myYScale = yScale;
@@ -89,7 +94,7 @@ void GLViewer_MarkerDrawer::create( float xScale, float yScale, bool onlyUpdate 
         float* anYCoord = aMarkerSet->getYCoord();
         float aRadius = aMarkerSet->getMarkerSize();
 
-        QValueList<int> aHNumbers, anUHNumbers, aSelNumbers, anUSelNumbers;
+        QList<int> aHNumbers, anUHNumbers, aSelNumbers, anUSelNumbers;
         aMarkerSet->exportNumbers( aHNumbers, anUHNumbers, aSelNumbers, anUSelNumbers );
 
         if( onlyUpdate )
@@ -189,8 +194,8 @@ GLViewer_PolylineDrawer::~GLViewer_PolylineDrawer()
 */
 void GLViewer_PolylineDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
-    QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
-    QValueList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
+    QList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
+    QList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
     
     myXScale = xScale;
     myYScale = yScale;
@@ -278,8 +283,8 @@ GLViewer_TextDrawer::~GLViewer_TextDrawer()
 */
 void GLViewer_TextDrawer::create( float xScale, float yScale, bool onlyUpdate )
 {
-    QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
-    QValueList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
+    QList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
+    QList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
     
     myXScale = xScale;
     myYScale = yScale;
@@ -322,8 +327,8 @@ void GLViewer_TextDrawer::create( float xScale, float yScale, bool onlyUpdate )
 */
 void GLViewer_TextDrawer::updateObjects()
 {
-    QValueList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
-    QValueList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
+    QList<GLViewer_Object*>::Iterator aObjectIt = myObjects.begin();
+    QList<GLViewer_Object*>::Iterator aObjectEndIt = myObjects.end();
     for( ; aObjectIt != aObjectEndIt; aObjectIt++ )
         (*aObjectIt)->compute();
 }

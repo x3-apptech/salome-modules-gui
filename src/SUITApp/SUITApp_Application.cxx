@@ -1,29 +1,31 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "SUITApp_Application.h"
 
-#include "SUIT_Session.h"
-#include "SUIT_MessageBox.h"
-#include "SUIT_ExceptionHandler.h"
+#include <SUIT_Tools.h>
+#include <SUIT_ExceptionHandler.h>
 
-#include <qdir.h>
-#include <qfileinfo.h>
+#include <QDir>
+#include <QTranslator>
 
 #ifdef WIN32
 #include <windows.h>
@@ -36,10 +38,14 @@
   Constructor
 */
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, SUIT_ExceptionHandler* hand )
-: QApplication( argc, argv ),
+#ifdef ENABLE_TESTRECORDER
+  : TestApplication( argc, argv ),
+#else
+  : QApplication( argc, argv ),
+#endif
 myExceptHandler( hand )
 {
-  QString path = QFileInfo( argv[0] ).dirPath() + QDir::separator() + "../../resources";
+  QString path = SUIT_Tools::dir( argv[0] ) + QDir::separator() + "../../resources";
   path = QDir::convertSeparators( QDir( path ).canonicalPath() );
 
   QTranslator* strTbl = new QTranslator( 0 );
@@ -53,7 +59,11 @@ myExceptHandler( hand )
   Constructor
 */
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, Type type, SUIT_ExceptionHandler* hand )
-: QApplication( argc, argv, type ),
+#ifdef ENABLE_TESTRECORDER
+  : TestApplication( argc, argv ),
+#else
+  : QApplication( argc, argv, type ),
+#endif
 myExceptHandler( hand )
 {
     QTranslator* strTbl = new QTranslator( 0 );
@@ -69,22 +79,12 @@ myExceptHandler( hand )
 */
 bool SUITApp_Application::notify( QObject* receiver, QEvent* e )
 {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) < 0x060101
-  // Disable GUI user actions while python command is executed
-  if (SUIT_Session::IsPythonExecuted()) {
-    // Disable mouse and keyboard events
-    QEvent::Type aType = e->type();
-    if (aType == QEvent::MouseButtonPress || aType == QEvent::MouseButtonRelease ||
-        aType == QEvent::MouseButtonDblClick || aType == QEvent::MouseMove ||
-        aType == QEvent::Wheel || aType == QEvent::ContextMenu ||
-        aType == QEvent::KeyPress || aType == QEvent::KeyRelease ||
-        aType == QEvent::Accel || aType == QEvent::AccelOverride)
-      return false;
-  }
-#endif
-
   return myExceptHandler ? myExceptHandler->handle( receiver, e ) :
+#ifdef ENABLE_TESTRECORDER
+                           TestApplication::notify( receiver, e );
+#else
                            QApplication::notify( receiver, e );
+#endif
 }
 
 /*!

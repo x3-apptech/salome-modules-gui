@@ -1,0 +1,708 @@
+/*!
+
+\page installing_salome_page SALOME Installation Wizard Help
+
+<hr>
+<ul>
+<li>\ref installing_products "Installing products with the Installation Wizard"
+<ul>
+<li>\ref gui_mode_install "GUI mode"
+<li>\ref batch_mode_install "Batch mode"
+<li>\ref environment_files "Environment files"
+</ul>
+<li>\ref pick_up_env "Pick up the environment"
+<li>\ref modifying_xml "Modifying XML configuration file"
+<li>\ref installation_scripts "Implementing installation scripts for the new products"
+<li>\ref finish_buttons "Customizing Readme page buttons"
+</ul>
+<hr>
+\anchor installing_products 
+<h1>Installing products with the <em>Installation Wizard</em></h1>
+
+The Installation Wizard can be launched in two modes: \b GUI and \b
+batch.
+<br>The root directory of the Installation Wizard contains Python
+script \b runInstall. To run the Installation Wizard just type \b runInstall.
+in the terminal window:
+<br><br>[ python ] \b runInstall [options]
+
+Without options this script will launch the SALOME Installation
+Wizard in the default mode (GUI). \n The default installation settings
+can be overridden by using command line options. Each option has a
+short and a long notation:
+
+<b>-g / --gui</b>
+\par
+Runs the Installation Wizard in the GUI mode (this is the default
+mode).
+
+<b>-b / --batch</b>
+\par
+Runs the Installation Wizard in the terminal mode.
+
+<b>-f FILE / --file=FILE</b>
+\par
+The XML configuration file to be used by the Installation Wizard.  If
+this option is not used then the installation script tries to define
+the \e Linux version and use the corresponding XML file if it exists. For
+examle, for <em>Linux Mandrake 10.1</em>  the <b>config_Mandrake_10.1.xml</b>  file
+will be used by default. If no appropriate file is found, the file
+<b>config.xml</b> will be used. This file refers to the basic target platform 
+which is <em>Linux Mandrake 10.1</em> for SALOME 3.0 and newer. If <b>config.xml</b>
+file is not found either, a warning message box is shown (in GUI mode)
+or printed to the console (in batch mode) and the Installation Wizard 
+quits.
+
+<b>-d DIR / --target=DIR</b>
+\par
+The target directory SALOME platform is to be installed to. 
+If used, this option overrides the default target directory, given in
+the configuration XML file (usually <b>${HOME}/salome_\<version\></b>, 
+see \ref modifying_xml "here" for more details).
+
+<b>-t DIR / --tmp=DIR</b>
+\par
+The directory, which should be used for temporary files. If given,
+this option overrides the default temporary directory, given in the
+configuration xml file (usually \b /tmp, see \ref modifying_xml "here"
+for more information).
+
+<b>-a / --all-from-sources</b>
+\par
+Forces all the products to be installed from sources (including all
+SALOME modules). If this option is used, all default installation
+modes for all products are ignored.
+\n This option is helpful when the user wants to install SALOME on the
+platform which is not officially supported. In this case, the user can
+try to run the SALOME Installation Wizard with the \b -a option in order
+to build all the products from sources.
+\n<b>Note, that this is a time-consuming operation which can take
+more than 24 hours depending on the computer.</b>
+
+<b>-s / --single-directory</b>
+\par
+Install all SALOME binaries packages to one directory. <br><b>
+This option is ignored when --all-from-sources (-a) option is used.</b>
+
+<b>-h / --help</b>
+\par
+Prints help information on the Installation Wizard's use.
+
+<b>-v / --version</b>
+\par
+Prints version information (\b Note: this is the Installation Wizard's
+version number, not the number of SALOME platform version).
+
+The installation procedure supports different \em Linux platforms and
+installs various installation 3d-party prerequisite products which are
+required by SALOME platform. As it was mentioned above, the basic
+target platform for SALOME 3.0 and newer is <em>Linux Mandrake 10.1</em>.
+Use of configuration XML files gives a flexible way to modify the list
+of products to be installed by the Installation Wizard without
+changing the program source code. Just create your own XML
+configuration file and implement installation scripts for the
+prerequisite products you need and then use this XML file with the
+Installation Wizard. This can be done, for example, for some Linux
+platform which is not supported directly by the Installation
+Wizard. See \ref modifying_xml "Modifying XML configuration file" and
+\ref installation_scripts "Implementing installation scripts for the new products"
+sections for more information.
+
+<br>
+<hr>
+\anchor gui_mode_install
+<h2>GUI mode</h2>
+
+The <b>Installation Wizard</b> GUI has been developed using
+Trolltech's <b>Qt 3.0.5</b> toolkit. After launching the Installation
+Wizard in the GUI mode the wizard window is shown to the user. This
+wizard guides the user through several subsequent pages. To navigate
+between the pages use \em "Next" and \em "Back" buttons in the lower
+part of the wizard window. The \em "Cancel" button closes the wizard
+window and quits the installation procedure after the user's
+confirmation. The \em "Help" button opens an additional window to show
+help information.
+
+The first \em "Introduction" page is shown in \ref figure_1 "Figure 1". 
+Skip this page by clicking \em "Next":
+
+\anchor figure_1
+\image html intropage.png 
+\n <center><b>Figure 1:</b> "Introduction" page</center>
+
+In the second page you are proposed to select the type of the SALOME installation.<br><br>
+At this step three possible types of installation are available:
+
+1. <b><em>"Install binaries"</em></b> type:
+\par
+    - all binaries and sources of the chosen modules are installed;
+    - all binaries of the chosen prerequisites are installed.
+
+2. <b><em>"Install sources"</em></b> type:
+\par
+    - all sources of the chosen modules and prerequisites are installed without compilation.
+
+3. <b><em>"Install sources and make compilation"</em></b> type:
+\par
+    - all sources of the chosen modules and prerequisites are installed;<br>
+    - all sources are compiled.
+
+In case you select "Install sources and make compilation" installation type, then you can also check "Remove sources and temporary files after compilation" option.
+
+\anchor figure_2
+\image html installtypepage.png
+\n <center><b>Figure 1:</b> "Type Of Installation" page</center>
+
+After the installation type has been selected you click "Next" button and the Installation Wizard tries to determine the Linux platform to load the corresponding configuration file. If the user system is not defined or the current SALOME package does not support this one, the warning will appear (<em>"Install binaries"</em> and <em>"Install sources"</em> installation types only):
+
+\anchor figure_3
+\image html platformpage.png
+\n <center><b>Figure 3:</b> "Installation platform" page</center>
+
+If <em>"Install sources and make compilation"</em> installation type has been selected, the warning message will be slightly different: <em>"Your Linux platform is not supported by this SALOME package and compilation is not tested on this one".</em><br>
+There is a list of all platforms supported by SALOME, but only those supported by the current package are available for selection. in this page you need to to select the reference platform, if you wish to proceed with the present installation procedure.
+
+\b Note: this page is not displayed if the installation platform has been defined automatically.
+
+In the next page you are proposed to enter the target directory
+where the SALOME platform should be installed to. You can also click
+<em>"Browse..."</em> and choose the destination folder using the standard
+browse directory dialog box.
+\n If the necessary directory does not exist you
+are prompted to confirm directory creation. If you type a wrong
+directory path, or if you do not have write permissions 
+for the directory you use, the corresponding message box is shown.
+
+\b Note: you are strongly recommended to avoid using directory names containing spaces.</b> Otherwise you can experience some troubles with the installation.
+\n
+\anchor figure_4
+\image html directorypage.png
+\n <center><b>Figure 4:</b> "Installation directory" page</center>
+
+You can select the products to be installed in the "Choice of the products to be installed" page.
+\n In the default mode it gives you the possibility to view and select SALOME modules only. There is a hidden list of 3d-party prerequisite products. To show it, just click <em>"Show prerequisites..."</em> button.
+
+\anchor figure_5
+\image html productpage1.png
+\n <center><b>Figure 5:</b> Choice of the SALOME modules</center>
+
+In the full mode you also have the possibility to select prerequisites.
+\n The checkbox before each product indicates if this one will be installed or not (checked or unchecked). The second column shows the disk space occupied by the corresponding module. This value depends on the selected type of installation.
+\n To hide the prerequisites list - click <em>"Hide prerequisites"</em> button.
+
+\anchor figure_6
+\image html productpage2.png
+\n <center><b>Figure 6:</b> Choice of the prerequisites</center>
+
+Some products may require some other prerequisite products to be installed. So the installation procedure has a special feature to automatically mark these products in the list view. For example, to install PyQt it is necessary to have gcc, Python, Qt and Sip installed, and these products will be also turned on when you check on PyQt. GEOM module requires KERNEL, GUI modules and such prerequisites as: OpenCascade, Python, Swig, Qt, etc.
+\n
+\n The dependencies between SALOME modules are managed in the following way:
+\par
+- If one module is unchecked, all modules which depend on this one are also unchecked automatically;\n
+- If one module is checked, all modules required for this one are also checked automatically.
+
+Dependency between modules and prerequisites is realized in the following way:
+\par
+-  The choices made by the user in the list of modules have a direct impact on the list of prerequisites;
+- Whenever a module is checked, all the necessary prerequisites are checked automatically with no possibility for the user to uncheck them (see \ref figure_7 "Fig. 7" below);
+- Whenever a module is unchecked, according to the remaining checked modules, the unnecessary prerequisites are unchecked automatically (see \ref figure_7 "Fig. 7" below).
+
+It is possible to check again the prerequisites, which have been automatically unchecked. In other words, it is possible to add more prerequisites than necessary.
+
+\anchor figure_7
+\image html productpage3.png
+\n <center><b>Figure 7:</b> Dependencies between modules and prerequisites</center>
+
+The <em>"Installation with GUI"</em> checkbox allows managing the installation of the graphical interface. Only modules for that 'woguimode' attribute is set to "true" value in the XML file (see \ref modifying_xml "here" for more information about customizing this installation mode) support without GUI mode and will be checked and installed with their necessary prerequisites in case of installation without GUI. And other modules are unchecked with no possibility to check them in this mode (see \ref figure_8 "Figure below").
+\n By default 'Installation with GUI' checkbox is switched on.
+
+\anchor figure_8
+\image html productpage4.png
+\n <center><b>Figure 8:</b> Installation without GUI mode</center>
+
+The box at the right side of the page displays the information about
+currently selected product: name, version and short description,
+required disk space, disk space required for temporary files and the list of
+prerequisites (this information is provided in the XML file).
+
+The <em>"Disk space required:"</em> field displays how much disk space
+on the hard drive is required for installation of selected products.
+\n\b Note: Please, take into account that the displayed amount of
+required disk space is approximate and may differ when you actually install
+products on your hard drive.
+
+The installation procedure uses a special directory to store temporary
+files. The <em>"Space for temporary files:"</em> field shows the information
+about required disk space on the hard drive for extracting and
+compiling the selected products. You can change the temporary directory (this information is provided in the XML file) to the folder you want.
+\n\b Note: Actually, temporary files are not stored directly in the
+directory entered by the user. The Installation Wizard creates in this directory an additional folder named like INSTALLWORK<b>XXXXX</b> where XXXXX is a unique number. This allows launching several Installation Wizards simultaneously. This temporary directory is removed automatically when the installation finishes.
+
+The installation procedure also checks the available disk space. If there is not enough disk space on your hard drive you will see the corresponding error message box.
+
+Also in the current version of Installation Wizard is possible to install all binaries of the selected SALOME modules into a \b single directory. It is "SALOME" directory. For this purpose there is a checkbox "Install modules to a single directory" checkbox exists (see \ref figure_8 "Fig. 8").
+\n This feature helps to get shorter PYTHONPATH and LD_LIBRARY_PATH environment variables.
+\n\b Note: the installation into a single directory is available with the binaries installation type only.
+
+To proceed further click <em>"Next"</em>. At this moment the program will make some tests to check the installation settings: if there is enough disk space on the hard drive, check for the dependencies for each product you have selected to be installed. If any test fails you will see the corresponding warning message box. Otherwise the wizard will proceed to the next page:
+
+\anchor figure_9
+\image html choicepage.png
+\n <center><b>Figure 9:</b> "Check your choice" page</center>
+
+This page summarizes the installation options you've selected in the previous pages. You can review again your choices and change them if necessary returning to the previous pages.
+\n When you are sure that everything is OK, click <em>"Next"</em> to
+follow to the \ref figure_10 "progress page".
+
+\anchor figure_10
+\image html progresspage1.png
+\n <center><b>Figure 10:</b> "Installation progress" page</center>
+
+To start the installation of the selected products click <em>"Start"</em> button. It launches the shell installation script and you will be able to see the output of the script in the topmost frame of the dialog box. If any errors occur during the installation progress, the corresponding messages will be printed to the log window in the bold red font.
+\n It is possible to break the installation at any time by pressing <em>"Stop"</em> button. Then you can get back to the previous pages if you wish to change the installation settings or restart the installation by pressing <em>"Start"</em> button again.
+
+\b Note: in the current implementation it is not possible to resume the stopped installation process; the installation will restart from the very beginning.
+
+\anchor figure_11
+\image html progresspage2.png
+\n <center><b>Figure 11:</b> "Installation progress" page: installation in progress</center>
+
+The <em>"Installation Status"</em> frame window shows you the progress of
+installation. \c "Waiting" status means that installation of this product
+has not been started yet. The product currently being installed is
+marked as \c "Processing" and is displayed in the status bar under "Installation Status" view. All installed products have \c "Completed"
+status.
+
+You can abort installation and close the installation procedure using
+\em "Cancel" button.
+
+\b Note: This button sends the signal "SIGTERM" to the shell
+script. The script tries to clear all temporary files. The process of
+removing temporary files can take some time, so the installation
+wizard will wait 3 seconds before closing.
+
+At the end of the installation <b>"Installation completed"</b> message will appear in the status bar. You can return to the previous pages to start a new installation or click \em"Next" button to go to the readme page:
+
+\anchor figure_12
+\image html readmepage.png
+\n <center><b>Figure 12:</b> "Finish installation" page</center>
+
+In this page you can read important information about the Instalation
+Wizard itself and some tips: how to run and test SALOME or how to
+build SALOME from the sources. This is the contents of the README file
+which you can find in the root directory of the Installation Wizard.
+
+You can also launch SALOME Desktop from this page or read the Release
+Notes file by clicking on the corresponding buttons in the lower part
+of the page (see \ref modifying_xml "here" and \ref finish_buttons
+"here" for more information about customizing these buttons).
+
+<br>
+<hr>
+\anchor batch_mode_install
+<h2>Batch mode</h2>
+
+To launch the Installation Wizard in the batch mode use -\b b (--\b batch)
+parameter.
+\n In this mode the GUI wizard is not shown but all the installation
+status is displayed directly in the console. In the batch mode the
+user does not have a possibility to change installation settings which
+are given in the configuration file, except target and temporary
+directories which can be overridden by the corresponding command line
+options.
+\n The only exception is --\b all-from-sources (-\b a) option which enables
+special installation mode in which all the products (including SALOME
+modules) are installed from sources, ignoring the default mode defined
+in the XML configuration file (see \ref installing_products "here" for details) and <b>--single-directory (-s)</b> option which defines that all SALOME modules have to be installed into the one directory (SALOME_<version>, by default, where <version> is SALOME version).
+
+\anchor figure_13
+\image html batchmode.png
+\n <center><b>Figure 13:</b> Batch mode</center>
+
+<br>
+<hr>
+\anchor environment_files
+<h2>Environment files</h2>
+
+During the process of installation the script creates some environment
+files to simplify the procedure of launching SALOME. These shell
+scripts set all necessary environment variables for all products you
+have installed. To learn how installation scripts collects the
+environment, see \ref pick_up_env "here". These files are: \b
+salome.csh + \b salome.sh in the <b><em>KERNEL module sources</em></b>
+and <b><em>KERNEL module binaries</em></b> root directories and
+\b env_products.csh + \b env_products.sh and \b env_build.csh + 
+\b env_build.sh in the target installation directory.
+
+\b Note: there is some difference between these files: \b env_build.*
+files are optimized to be used for building SALOME modules from
+sources (see \b README file provided with the installation procedure
+on the CD). The \b env_products.* (and \b salome.*) files are
+optimized for SALOME launching. The behavior is defined by the
+environment variable \b ENV_FOR_LAUNCH which is set to \b 0 in
+env_build.* files and to \b 1 in env_products.* (salome.*) files.
+
+<br>
+<hr>
+\anchor pick_up_env
+<h2>Pick up the <em>environment</em></h2>
+
+Please, read carefully the following information. This section
+describes how the installation procedure generates the environment
+scripts for the SALOME platform being installed.
+
+After installing each product shell the script creates a special
+environment file for the product in its installation folder. The name
+of the file is generated from the name of product by the following
+scheme: \b env_<product_name>.sh (for example \b env_Vtk.sh for the
+Vtk). This file includes all necessary environment settings. At the
+final step of the installation the script picks up all the settings
+files and generates two common environment files from them: \b salome.sh
+and \b salome.csh for \b bash and \b csh shells correspondingly.
+Such approach helps to save time when reinstalling products and you may not bother about setting all environment variables manually to build/launch
+SALOME. What you simply need is to source one of these environment
+files.
+
+This also concerns those products which are not being installed. For
+example, you install some SALOME binaries to the directory where you
+have previously installed other products.  The Installation procedure
+tries to collect environment files from the target directory if it
+finds necessary products installed there. If some product is not found
+in the target directory the corresponding section of
+\b salome.sh/salome.csh files will be skipped.
+\n For native products (like \b gcc, \b tcl, etc...) the installation
+procedure tries to find them first using \b PATH / \b LD_LIBRARY_PATH
+variables and then in the system default directories (\b /usr/bin,
+\b /usr/lib etc., depending on the product).
+<br><br>
+In any case you may edit \b salome.* files after the installation
+procedure finishes, if you want.
+
+\n\b Note: As it was mentioned \ref environment_files "above" there are
+other environment files which are generated by the installation
+procedure: \b env_products.csh + \b env_products.sh and \b env_build.csh +
+\b env_build.sh. These files can be found in the target installation root
+directory.
+
+<br>
+<hr>
+\anchor modifying_xml
+<h2>Modifying <em>XML</em> configuration <em>file</em></h2>
+
+You can create your own XML configuration file. The Installation
+Wizard can then take it as a command line argument to provide a list
+of products you want to install with it. The list of products and some
+other settings for the Installation Wizard are provided in the XML
+file.
+\n This section describes the structure of the configuration file, optional sections/tags are in brackets.
+
+\code
+<document>
+      <config [ version=<application_version>      ]
+              [ caption=<application_caption>      ]
+              [ copyright=<application_copyright>  ]
+              [ license=<application_license_info> ]
+                platforms=<target_platform>
+              [ targetdir=<target_directory>       ]
+              [ tempdir=<temp_directory>           ]
+      />
+    [ <buttons>
+      [ <button   label=<button_label>     
+                [ tooltip=<button_tooltip> ]
+                  script=<button_script>   
+                [ disable=<disable_flag>   ]
+        />
+      ]
+      [ <button ...
+        />
+      ]
+        ...
+      </buttons>
+    ]
+    [ <products>
+      [ <product  name=<product_name>
+                  type=<product_type>
+                [ description=<product_description> ]
+          <installation  os=<installation_platform>
+                         version=<product_version>
+                       [ disable=<disable_flag>            ]
+                       [ woguimode=<without_gui_mode_flag> ]
+                         installdiskspace=<install_disk_space>
+                       [ pickupenv=<pickup_env_flag>       ] 
+                         script=<installation_script_name>
+          />
+          ...
+        />
+      ]
+      [ <product ...
+        />
+      ]
+        ...
+      </products>
+    ]
+    [ <dependencies>
+      [ <product  name=<product_name> >
+        [ <dep> <prerequisite_name> </dep> ]
+          ...
+        </product>
+      ]
+        ...
+      </dependencies>
+    ]
+</document> 
+\endcode
+
+<b>\<config\> section</b>
+\n\n This is an optional section; it provides general information about the Installation Wizard itself.<br><br>
+Attributes:
+<ul>
+<li><b>version</b>
+\n\n The application version number to be shown in the caption.<br><br>
+</li>
+<li><b>caption</b>
+\n\n The application main window caption - if this string contains '\%1' text the title will contain the version number in this place (see
+above).<br><br>
+</li>
+<li><b>copyright</b>
+\n\n The application copyright information (shown in the first page).<br><br>
+</li>
+<li><b>license</b>
+\n\n The application license information (shown in the first page).<br><br>
+</li>
+<li><b>platforms</b>
+\n\n This parameter defines the directory (relative from ./Products/BINARIES) where the Installation Wizard will search
+precompiled binaries packages. If this tag is not provided, binaries
+packages are looked for in the ./Products/BINARIES directory.<br><br>
+</li>
+<li><b>targetdir</b>
+\n\n The target directory - the path to the directory where products
+should be installed.<br><br>
+</li>
+<li><b>tempdir</b>
+\n\n The temporary directory - the path to the directory for the
+temporary files.<br><br>
+</li>
+</ul>
+
+<b>\<button\> section</b>
+\n\n This is an optional section. It allows customization of the last
+"Finish installation" page of the Installation Wizard by adding one or
+more buttons in the lower part of the wizard's window. The script
+which is attached to each such button, can perform some specific
+action, for example, launch the application or show the Release Notes
+file by using an external program. See \ref finish_buttons "here" for
+more details about writing scripts.<br><br>
+Attributes:
+<ul>
+<li><b>label</b>
+\n\n This is the button text.<br><br>
+</li>
+<li><b>tooltip</b>
+\n\n The button tooltip (optional).<br><br>
+</li>
+<li><b>script</b>
+\n\n The script attached to the button.<br><br>
+</li>
+<li><b>disable</b>
+\n\n If this optional flag has 'true' value, the corresponding button
+will not appear in the "<em>Finish installation</em>" page - the section of XML
+file is silently ignored.<br><br>
+</li>
+</ul>
+
+<b>\<product\> section</b>
+\n\n This section describes product to be installed with the
+Installation Wizard. The XML file should include a \<product\> section
+for each product to be installed. The products appear in the tree view
+and are installed in the order they are described in the configuration
+file. It is recommended (but not obligatory) to define native products
+at the top of the list before all other products.
+<br><br>
+Attributes:
+<ul>
+<li><b>name</b>
+\n\n Product name.<br><br>
+</li>
+<li><b>type</b>
+\n\n The type of the product: 'component' - SALOME module or 'prerequisite' - prerequisite product.<br><br>
+</li>
+<li><b>description</b>
+\n\n Product description (optional).<br><br>
+</li>
+</ul>
+
+<b>\<installation\> section</b>
+
+It is a part of the <product> section, that provides installation information by platforms. The <product> section may contains a several <installation> ones for the different platforms. 
+<br><br>
+Attributes:
+<ul>
+<li><b>os</b>
+\n\n A possible installation platform.<br><br>
+</li>
+<li><b>version</b>
+\n\n The version of the product.<br><br>
+</li>
+<li><b>disable</b>
+\n\n If this optional flag has 'true' value, the corresponding product will not appear in the list of products and will not be installed.<br><br>
+</li>
+<li><b>woguimode</b>
+\n\n This optional flag defines that it's possible to install this module without GUI.<br><br>
+</li>
+<li><b>installdiskspace</b>
+\n\n List of three total amount spaces (integer, in Kbytes, derived by comma), which product occupies on the hard drive after the installation in case 'binary', 'sources' and 'sources and compile' installation type.<br><br>
+</li>
+<li><b>pickenv</b>
+\n\n This flag shows that the pickup environment procedure should be performed for this product. If this flag equal to 'true',  salome.sh and salome.csh files will  be created in the product's installation directory. Usually this option is set to true for SALOME KERNEL module. This is optional key, default value is 'false'.<br><br>
+</li>
+<li><b>script</b>
+\n\n The installation script name. This script is in charge of the installation of the product. It is called automatically by the Installation Wizard when necessary from the main program. See the see 
+\ref installation_scripts "next section" for more information.<br><br>
+</li>
+</ul>
+
+\n\b Note: If you add new products to be installed with Installation
+Wizard, you should also provide installation script for this
+product. See the next section for more details.
+
+<br>
+<hr>
+\anchor installation_scripts
+<h2>Implementing <em>installation scripts</em> for the new products</h2>
+
+When you want some product to be installed with the Installation
+Wizard, you should add its description \ref modifying_xml "to the configuration file"
+and create the installation script, following the rules described in this section.
+
+There are some obligatory functions which should be implemented in
+this installation script. These functions are automatically called by
+the master installation script or/and its GUI shell when it is
+necessary. \n File \b common.sh contains some service functions which can
+be used in your installation script, like \b make_env(), \b make_dir(),
+\b try_existing(), \b sort_path(), \b find_in_path(), etc.
+
+<ul>
+<li><b>check_version()</b>
+\n\n This function allows to check the version of the product already
+installed on the computer. It should try to find the product (native
+or preinstalled in the target directory) and check its version. This
+helps to avoid unnecessary reinstallation. This is an internal
+function and is not called from the master installation
+script.<br><br>
+</li>
+<li><b>install_binary()</b>
+\n\n This function is called when <em>'Install binaries'</em> installation mode is selected by the user. The function is responsible for the extracting of the product from the binaries package. It should create environment for the product in the temporary directory (see also the description of \b print_env() function). It is not necessary to implement this function if you do not provide binaries mode installation for the current product.<br><br>
+</li>
+<li><b>install_source()</b>
+This function is called to install SALOME modules sources, if <em>'Install binaries'</em> installation mode is selected by the user, and to install prerequisite products sources, in <em>'Install sources'</em> case (\ref Figure_2 "Fig. 2" above). The function is responsible for the building of the product from the sources package. It should create the environment file for the product in the temporary directory (see also the description of print_env() function). It is not necessary to implement this function if you do not provide a sources mode installation for the current product. <br><br>
+</li>
+<li><b>install_source_and_build()</b>
+This function is called when <em>'Install sources and make a compilation'</em> installation mode is selected. This function should be used to unpack SALOME or prerequisite sources package and then call build/install procedure for it.
+For more details please refer to the \ref installing_products "this"
+and \ref gui_mode_install "this" sections for more details.<br><br>
+</li>
+<li><b>try_preinstalled()</b>
+\n\n This function is called when the 'not install' installation mode
+is selected by the user. In this case the script should inspect the
+target directory to try to find an already preinstalled product, pick
+up and check the environment from there. See \ref pick_up_env "here" for more
+details.<br><br>
+</li>
+<li><b>print_env_bin() & print_env_src()</b>
+\n\n These functions are in charge of the creation of the environment scripts. They should create in the temporary directory two files with \b env_<product_name>.sh and \b env_<product_name>_src.sh names and then copy them into the binary and sources product installation directories correspondingly. The file should contain all necessary environment variable settings for the product. It will be collected during the 'pick-up-environment' procedure.<br><br>
+</li>
+<li><b>pickup_env()</b>
+\n\n This procedure corresponds to the \b pickupenv tag of the
+configuration xml file (see previous section). It should call the
+\b make_env procedure to perform the pick-up environment procedure for
+the product.<br><br>
+</li>
+</ul>
+
+The calling signature of the product installation script is the following: 
+<b>\<product_script_name\> \<function_name\> \<temp_folder\>
+\<products_directory\> \<target_directory\> \<dependancies\>
+\<product_name\></b>
+\n\n where \n\n
+<b>\<product_script_name\></b> - installation script name (described in the
+configuration xml file);\n
+<b>\<function_name\></b> - the name of function, corresponding to the selected
+installation mode: \em try_native, \em install_source, \em install_binary or
+\em try_preinstalled;\n
+<b>\<temp_folder\></b> - temporary files directory;\n
+<b>\<products_directory\></b> - directory where the sources/binaries package
+can be found. You should provide the sources package in the
+<em>\<Install_Wizard_root_directory\>/Products/SOURCES</em> directory and
+binaries package in the
+<em>\<InstallWizard_root_directory\>/Products/BINARIES/\<os_version\></em>, where
+\<os_version\> is the target platform description, which appears in the
+corresponding section of the \ref modifying_xml "configuration xml file";
+<em>\<target_directory\></em> - root target directory where the product should be installed to; 
+<em>\<dependancies\></em> - single-quoted list of prerequisite products, separated by space; 
+<em>\<product_name\></em> - product name itself.
+
+\b Example:
+\n <em>med-2.2.3.sh install_binary /tmp/work
+./Products/BINARIES/Mandrake10.1 /usr/salome 'gcc Hdf' med</em>
+
+Copy the created script into the
+<em>\<Install_Wizard_root_directory\>/config_files</em> sub-directory where all
+installation scripts are stored. Installation Wizard will
+automatically search and call your script during the installation
+procedure.
+
+<br>
+<hr>
+\anchor finish_buttons
+<h2>Customizing <em>Readme page</em> buttons</h2>
+
+The Installation Wizard allows customizing the look-n-feel of the last
+<em>"Finish installation"</em> page. If you want to add one or more buttons to
+this page in order to perform some specific actions at the end of the
+installation (for example, to show the Release Notes file by using
+Open Office) you can put an additional section to the XML
+configuration file. This is the \b \<button\> section (see 
+\ref modifying_xml "here" for more details).
+
+To implement the action which will be performed when the user clicks
+the button, you need to create a script and put it to the
+<em>\<Install_Wizard_root_directory\>/config_files</em> directory.
+\n There are some obligatory functions which should be implemented in
+this script. These functions are automatically called by the
+Installation Wizard GUI.
+
+<ul>
+<li><b>check_enabled()</b>
+\n\n This procedure is called by the Installation Wizard when the
+<em>"Finish installation"</em> page is displayed and the status of the buttons
+should be modified according to the installation options. This
+procedure should return \b 0 if the corresponding action can be performed
+and, thus, the button should become enabled. Otherwise, it should
+return \b 1 - in this case the corresponding button will be
+disabled.<br><br>
+</li>
+<li><b>execute()</b>
+\n\n This procedure is invoked when the user clicks the button. This
+procedure should return \b 0 if the corresponding action is done
+successfully and \b 1 if any error occurs.<br><br>
+</li>
+</ul>
+
+The calling signature of the script is the following:
+\n <b>\<product_script_name\> \<function_name\> \<target_directory\>
+\<temp_folder\></b>
+\n\n where \n\n
+\b \<product_script_name\> - the script name itself (retrieved from the XML configuration xml file); 
+\n \b \<function_name\> - the name of function; 
+\n \b \<target_directory\> - root target directory where the product is installed to; 
+\n \b \<temp_folder\> - temporary files directory;
+
+\n\b Note: The standard Installation Wizard buttons "Launch SALOME" and
+"Release Notes" are implemented with this feature. Refer to scripts
+\b start_salome.sh and \b release_notes.sh for sample implementation.
+
+\n\b Note: Any button (even standard) can be ignored by the Installation
+Wizard if the attribute \b \<disable\> in the XML configuration file is set
+to the "true" value.
+
+*/

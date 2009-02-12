@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,36 +17,33 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Viewer2d.h
 // Created:   November, 2004
-
+//
 #ifndef GLVIEWER_VIEWER2D_H
 #define GLVIEWER_VIEWER2D_H
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 
-#include <qmap.h>
-#include <qrect.h>
+class QRect;
+class QFile;
 
 #include "GLViewer_Viewer.h"
-#include "GLViewer_Object.h"
-#include "GLViewer_ViewFrame.h"
-#include "GLViewer_Drawer.h"
 
 #include <TColStd_SequenceOfInteger.hxx>
 
 #include <GL/gl.h>
 
 class GLViewer_Object;
+class GLViewer_ViewFrame;
+class GLViewer_Drawer;
 class GLViewer_Context;
-class GLViewer_Selector2d;
+class GLViewer_Rect;
 //class GLViewer_Sketcher;
 
 class SUIT_Desktop;
@@ -58,7 +58,7 @@ const double Sizes[2*5] = {
     /* A5 */ 148.5, 210.0
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
@@ -115,12 +115,12 @@ public:
   virtual SUIT_ViewWindow*  createView( SUIT_Desktop* );
   
   //! Adds item for change background color
-  void                 addPopupItems( QPopupMenu* );
+  void                 addPopupItems( QMenu* );
 
   //void                activateGLSketching( int );
 
   //! Returns all drawers
-  const QValueList<GLViewer_Drawer*>& getDrawers() const { return myDrawers; }
+  const QList<GLViewer_Drawer*>& getDrawers() const { return myDrawers; }
   
   //! Returns context
   GLViewer_Context*    getGLContext() const { return myGLContext; }
@@ -138,7 +138,7 @@ public:
   /* \param onlyUpdate is passed to method activateAllDrawersdrawers*/
   void                 updateDrawers( GLboolean onlyUpdate, GLfloat scX = 0.0, GLfloat scY = 0.0 );
   //! Activates drawers for objects from list \param theObjects only
-  void                 activateDrawers( QValueList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap = GL_FALSE );
+  void                 activateDrawers( QList<GLViewer_Object*>& theObjects, bool onlyUpdate, GLboolean swap = GL_FALSE );
   //! Activates drawer for \param theObject
   void                 activateDrawer( GLViewer_Object* theObject, bool onlyUpdate, GLboolean swap = GL_FALSE );
   //! Updates all drawers with new scale factor
@@ -224,7 +224,7 @@ protected:
   //! Current context 
   GLViewer_Context*             myGLContext;
   //! Map of active drawers
-  QValueList<GLViewer_Drawer*>  myDrawers;
+  QList<GLViewer_Drawer*>  myDrawers;
   
   //GLViewer_Sketcher*   myGLSketcher;
 };
@@ -247,7 +247,7 @@ protected:
   static  int          rotateBtn;
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( default:4251 )
 #endif
 

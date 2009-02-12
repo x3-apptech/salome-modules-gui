@@ -1,31 +1,28 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME SALOME_PY : binding of VTK graphics and Python
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : SalomePy.cxx
 //  Author : Paul RASCLE, EDF
-//  Module : SALOME
-//  $Header$
-
+//
 #include <Python.h>
 #include <vtkPythonUtil.h>
 
@@ -34,16 +31,39 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include "SALOME_Event.hxx"
+#include <SALOME_Event.h>
 
-#include "SUIT_Session.h"
-#include "SalomeApp_Application.h"
-#include "SalomeApp_Study.h"
+#include <SUIT_Session.h>
+#include <SalomeApp_Application.h>
+#include <SalomeApp_Study.h>
 
-#include "SVTK_ViewManager.h"
-#include "SVTK_ViewWindow.h"
+#include <SVTK_ViewManager.h>
+#include <SVTK_ViewWindow.h>
 
-using namespace std;
+/*!
+  \brief Python wrappings for VTK viewer of the SALOME desktop.
+
+  All methods are implemented using Event mechanism. The module
+  provides the following functions:
+  - getRenderer()
+  - getRenderWindow()
+  - getRenderWindowInteractor()
+  - showTrihedron()
+  - fitAll()
+  - setView()
+  - resetView()
+
+  Usage in Python:
+  \code
+  import SalomePy
+  renderer = SalomePy.getRenderer()     # get VTK renderer
+  window   = SalomePy.getRenderWindow() # get render window
+  \endcode
+
+  The methods getRenderer(), getRenderWindow() and getRenderWindowInteractor()
+  open new VTK viewer if there is no one opened.
+  In case of any error these methods return None object to the Python.
+*/
 
 #define PUBLISH_ENUM(i)                              \
 {                                                    \
@@ -55,55 +75,59 @@ using namespace std;
   if ( rc < 0 ) return;                              \
 }
 
-// enumeration : view type
+//! View operation type
 enum {
-  ViewFront,     // fron view
-  ViewBack,      // back view
-  ViewTop,       // top view
-  ViewBottom,    // bottom view
-  ViewRight,     // right view
-  ViewLeft       // left view
+  ViewFront,     //!< front view
+  ViewBack,      //!< back view
+  ViewTop,       //!< top view
+  ViewBottom,    //!< bottom view
+  ViewRight,     //!< right view
+  ViewLeft       //!< left view
 };
 
-
 /*!
-  VSR : 19.04.05 : Reimplemented for new SALOME GUI (SUIT-based)
-  All methods are implemented using Event mechanism:
-  - getRenderer()
-  - getRenderWindow()
-  - getRenderWindowInteractor()
-  - showTrihedron()
-  These methods (except showTrihedron() ) open new VTK viewer
-  if there is no one opened.
-  In case of error all methods return None object in Python.
+  \brief Get Python class object by name
+  \internal
+  \param theClassName Python class name
+  \return Python class object or None object if class is not found
 */
-
-static PyObject* GetPyClass(const char* theClassName){
-  static PyObject *aVTKModule = NULL;
-  if(!aVTKModule){
-    if (VTK_MAJOR_VERSION > 3)
-      aVTKModule = PyImport_ImportModule("libvtkRenderingPython"); 
+static PyObject* GetPyClass( const char* theClassName ) 
+{
+  static PyObject* aVTKModule = 0;
+  PyObject* aPyClass = 0;
+  if( !aVTKModule ) {
+    if ( VTK_MAJOR_VERSION > 3 )
+      aVTKModule = PyImport_ImportModule( "libvtkRenderingPython" ); 
     else
-      aVTKModule = PyImport_ImportModule("libVTKGraphicsPython"); 
-    if(PyErr_Occurred()){
+      aVTKModule = PyImport_ImportModule( "libVTKGraphicsPython" ); 
+    if( PyErr_Occurred() ) {
       PyErr_Print();
-      return NULL;
     }
   }
-  PyObject* aVTKDict = PyModule_GetDict(aVTKModule);
-  char* aClassName = const_cast<char*>(theClassName);
-  PyObject* aPyClass = PyDict_GetItemString(aVTKDict,aClassName);
-  //Py_DECREF(aVTKModule);
+  if ( aVTKModule ) {
+    PyObject* aVTKDict = PyModule_GetDict( aVTKModule );
+    aPyClass = PyDict_GetItemString(aVTKDict, const_cast<char*>( theClassName ) );
+  }
   return aPyClass;
 }
 
-// internal enum: find or create VTK window
-enum { __Find,          // try to find only 
-       __FindOrCreate,  // try to find: if not found - create new 
-       __Create };      // try to find: if not found - create new 
+/*!
+  \brief VTK window find/create mode
+  \internal
+*/
+enum { 
+  __Find,          // try to find VTK window; if not found, do nothing
+  __FindOrCreate,  // try to find VTK window; if not found, create new one
+  __Create };      // create new VTK window
 
+/*!
+  \brief Find or create VTK window.
+  \internal
+  \param toCreate window find/create mode
+  \return VTK window pointer or 0 if it could not be found/created
+*/
 static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
-  SVTK_ViewWindow* aVW = NULL;
+  SVTK_ViewWindow* aVW = 0;
   if ( SUIT_Session::session() ) {
     // get application
     SalomeApp_Application* anApp = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
@@ -121,7 +145,7 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
 	    // VSR : When new view window is created it can be not active yet at this moment,
 	    // so the following is a some workaround
 	    if ( !aVW && !aVM->getViews().isEmpty() )
-	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[ 0 ] );
+	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
 	  }
 	}
 	else {
@@ -131,7 +155,7 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
 	    // VSR : When new view window is created it can be not active yet at this moment,
 	    // so the following is a some workaround
 	    if ( !aVW && !aVM->getViews().isEmpty() )
-	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[ 0 ] );
+	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
 	  }
 	}
       }
@@ -141,30 +165,48 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
 }
 
 /*!
-  Get VTK renderer.
-  Always opens new VTK window if <toCreate> parameter is non zero.
-  Otherwise opens new VTK window only if there is no one opened.
+  \fn PyObject* getRenderer( int toCreate = 0 );
+  \brief Get VTK renderer (vtkRenderer).
+  
+  If \a toCreate parameter is 0 (by default) the function tries to find
+  and reuse existing VTK window; if it is not found, the new VTK window
+  is opened.
+
+  If \a toCreate parameter is non-zero, the function always creates
+  new VTK window.
+
+  If VTK window could not be found and or created, the None Python object
+  is returned.
+
+  \param toCreate window creation mode
+  \return VTK window renderer object
 */
-class TGetRendererEvent: public SALOME_Event {
+
+class TGetRendererEvent: public SALOME_Event
+{
 public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
   TGetRendererEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate )  {}
-  virtual void Execute() {
-    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( myCreate ? __Create : __FindOrCreate ) ) {
-      PyObject* aPyClass = GetPyClass("vtkRenderer");
+    : myResult( Py_None ), myCreate( toCreate ) {}
+  virtual void Execute()
+  {
+    PyObject* aPyClass = ::GetPyClass( "vtkRenderer" );
+    SVTK_ViewWindow* aVTKViewWindow = 
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+    if( aVTKViewWindow && aPyClass ) {
       vtkRenderer* aVTKObject = aVTKViewWindow->getRenderer();
-      myResult = PyVTKObject_New(aPyClass,aVTKObject);
+      myResult = PyVTKObject_New( aPyClass, aVTKObject );
     }
   }
 };
-extern "C" PyObject *libSalomePy_getRenderer(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_getRenderer( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple(args, "|i:getRenderer", &toCreate) )
+  if ( !PyArg_ParseTuple( args, "|i:getRenderer", &toCreate ) )
     PyErr_Print();
   else
     aResult = ProcessEvent( new TGetRendererEvent( toCreate ) );
@@ -172,30 +214,48 @@ extern "C" PyObject *libSalomePy_getRenderer(PyObject *self, PyObject *args)
 }
 
 /*!
-  Get VTK render window.
-  Always opens new VTK window if <toCreate> parameter is non zero.
-  Otherwise opens new VTK window only if there is no one opened.
+  \fn PyObject* getRenderWindow( int toCreate = 0 );
+  \brief Get VTK render window (vtkRenderWindow).
+  
+  If \a toCreate parameter is 0 (by default) the function tries to find 
+  and reuse existing VTK window; if it is not found, the new VTK window
+  is opened.
+
+  If \a toCreate parameter is non-zero, the function always creates
+  new VTK window.
+
+  If VTK window could not be found and or created, the None Python object
+  is returned.
+
+  \param toCreate window creation mode
+  \return VTK window render window object
 */
-class TGetRenderWindowEvent: public SALOME_Event {
+
+class TGetRenderWindowEvent: public SALOME_Event
+{
 public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
   TGetRenderWindowEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate )  {}
-  virtual void Execute() {
-    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( myCreate ? __Create : __FindOrCreate ) ) {
-      PyObject* aPyClass = GetPyClass("vtkRenderWindow");
+    : myResult( Py_None ), myCreate( toCreate ) {}
+  virtual void Execute()
+  {
+    PyObject* aPyClass = ::GetPyClass( "vtkRenderWindow" );
+    SVTK_ViewWindow* aVTKViewWindow = 
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+    if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindow* aVTKObject = aVTKViewWindow->getRenderWindow();
-      myResult = PyVTKObject_New(aPyClass,aVTKObject);
+      myResult = PyVTKObject_New( aPyClass, aVTKObject );
     }
   }
 };
-extern "C" PyObject *libSalomePy_getRenderWindow(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_getRenderWindow( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple(args, "|i:getRenderWindow", &toCreate) )
+  if ( !PyArg_ParseTuple( args, "|i:getRenderWindow", &toCreate ) )
     PyErr_Print();
   else
     aResult = ProcessEvent( new TGetRenderWindowEvent( toCreate ) );
@@ -203,30 +263,48 @@ extern "C" PyObject *libSalomePy_getRenderWindow(PyObject *self, PyObject *args)
 }
 
 /*!
-  Get VTK render window interactor.
-  Always opens new VTK window if <toCreate> parameter is non zero.
-  Otherwise opens new VTK window only if there is no one opened.
+  \fn PyObject* getRenderWindowInteractor( int toCreate = 0 );
+  \brief Get VTK render window interactor (getRenderWindowInteractor).
+  
+  If \a toCreate parameter is 0 (by default) the function tries to find 
+  and reuse existing VTK window; if it is not found, the new VTK window
+  is opened.
+
+  If \a toCreate parameter is non-zero, the function always creates
+  new VTK window.
+
+  If VTK window could not be found and or created, the None Python object
+  is returned.
+
+  \param toCreate window creation mode
+  \return VTK window render window interactor object
 */
-class TGetRenderWindowInteractorEvent: public SALOME_Event {
+
+class TGetRenderWindowInteractorEvent: public SALOME_Event
+{
 public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
   TGetRenderWindowInteractorEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate )  {}
-  virtual void Execute() {
-    if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( myCreate ? __Create : __FindOrCreate ) ) {
-      PyObject* aPyClass = GetPyClass("vtkRenderWindowInteractor");
+    : myResult( Py_None ), myCreate( toCreate ) {}
+  virtual void Execute()
+  {
+    PyObject* aPyClass = ::GetPyClass( "vtkRenderWindowInteractor" );
+    SVTK_ViewWindow* aVTKViewWindow = 
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+    if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindowInteractor* aVTKObject = aVTKViewWindow->getInteractor();
-      myResult = PyVTKObject_New(aPyClass,aVTKObject);
+      myResult = PyVTKObject_New( aPyClass, aVTKObject );
     }
   }
 };
-extern "C" PyObject *libSalomePy_getRenderWindowInteractor(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_getRenderWindowInteractor( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple(args, "|i:getRenderWindowInteractor", &toCreate) )
+  if ( !PyArg_ParseTuple( args, "|i:getRenderWindowInteractor", &toCreate ) )
     PyErr_Print();
   else
     aResult = ProcessEvent( new TGetRenderWindowInteractorEvent( toCreate ) );
@@ -234,16 +312,25 @@ extern "C" PyObject *libSalomePy_getRenderWindowInteractor(PyObject *self, PyObj
 }
 
 /*!
-  Show/hide trihedron in the current VTK viewer (if there is one)
+  \fn PyObject* showTrihedron( int show );
+  \brief Show/hide trihedron in the current VTK viewer.
+
+  If there is no active VTK viewer, nothing happens.
+  
+  \param show new trihedron visibility state
+  \return nothing (Py_None)
 */
-extern "C" PyObject *libSalomePy_showTrihedron(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     int myShow;
     TEvent( int bShow )
-      : myShow( bShow )  {}
-    virtual void Execute() {
+      : myShow( bShow ) {}
+    virtual void Execute()
+    {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
 	if ( aVTKViewWindow->isTrihedronDisplayed() != myShow )
 	  aVTKViewWindow->onViewTrihedron();
@@ -253,7 +340,7 @@ extern "C" PyObject *libSalomePy_showTrihedron(PyObject *self, PyObject *args)
   
   PyObject* aResult = Py_None;
   int bShow = 0;
-  if ( !PyArg_ParseTuple(args, "i:showTrihedron", &bShow) )
+  if ( !PyArg_ParseTuple( args, "i:showTrihedron", &bShow ) )
     PyErr_Print();
   else
     ProcessVoidEvent( new TEvent( bShow ) );
@@ -261,14 +348,22 @@ extern "C" PyObject *libSalomePy_showTrihedron(PyObject *self, PyObject *args)
 }
 
 /*!
-  Fit all the contents in the current VTK viewer (if there is one)
+  \fn PyObject* fitAll();
+  \brief Fit all the contents in the current VTK viewer.
+
+  If there is no active VTK viewer, nothing happens.
+
+  \return nothing (Py_None)
 */
-extern "C" PyObject *libSalomePy_fitAll(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
 	aVTKViewWindow->onFitAll();
       }
@@ -280,15 +375,24 @@ extern "C" PyObject *libSalomePy_fitAll(PyObject *self, PyObject *args)
 }
 
 /*!
-  Set view type fot the current VTK viewer (if there is one)
+  \fn PyObject* setView( int type );
+  \brief Set view type for the current VTK viewer.
+
+  If there is no active VTK viewer, nothing happens.
+  
+  \param type view type
+  \return nothing (Py_None)
 */
-extern "C" PyObject *libSalomePy_setView(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     long myType;
     TEvent( long type ) : myType( type) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
 	switch( myType ) {
 	case ViewFront:
@@ -312,7 +416,7 @@ extern "C" PyObject *libSalomePy_setView(PyObject *self, PyObject *args)
   };
   
   long type = -1;
-  if ( !PyArg_ParseTuple(args, "l:setView", &type) )
+  if ( !PyArg_ParseTuple( args, "l:setView", &type ) )
     PyErr_Print();
   else {
     ProcessVoidEvent( new TEvent( type ) );
@@ -323,15 +427,22 @@ extern "C" PyObject *libSalomePy_setView(PyObject *self, PyObject *args)
 }
 
 /*!
-  Reset contents of the current VTK viewer (if there is one)
-  to the default state
+  \fn PyObject* resetView();
+  \brief Reset contents of the current VTK viewer.
+
+  If there is no active VTK viewer, nothing happens.
+  
+  \return nothing (Py_None)
 */
-extern "C" PyObject *libSalomePy_resetView(PyObject *self, PyObject *args)
+
+extern "C" PyObject* libSalomePy_resetView( PyObject* self, PyObject* args )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
   public:
     TEvent() {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
 	aVTKViewWindow->onResetView();
       }
@@ -342,9 +453,6 @@ extern "C" PyObject *libSalomePy_resetView(PyObject *self, PyObject *args)
   return Py_None;
 }
 
-/*!
-  Library initialization
-*/
 static PyMethodDef Module_Methods[] = 
 {
   { "getRenderer",               libSalomePy_getRenderer,               METH_VARARGS },
@@ -357,20 +465,27 @@ static PyMethodDef Module_Methods[] =
   { NULL, NULL }
 };
 
+/*!
+  \brief Python module initialization.
+  \internal
+*/
 extern "C" void initlibSalomePy()
 {
-  static char modulename[] = "libSalomePy";
+  static char* modulename = "libSalomePy";
+
   // init module
-  PyObject* aModule = Py_InitModule(modulename, Module_Methods);
+  PyObject* aModule = Py_InitModule( modulename, Module_Methods );
   if( PyErr_Occurred() ) {
     PyErr_Print();
     return;
   }
+
   // get module's dictionary
   PyObject *aModuleDict = PyModule_GetDict( aModule );
   if ( aModuleDict == NULL )
     return;
-  // add View type enumeration
+
+  // export View type enumeration
   PUBLISH_ENUM( ViewFront );
   PUBLISH_ENUM( ViewBack );
   PUBLISH_ENUM( ViewTop );

@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,26 +17,23 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_BaseObjects.h
 // Created:   November, 2004
-
+//
 #ifndef GLVIEWER_BASEOBJECTS_H
 #define GLVIEWER_BASEOBJECTS_H
 
 #include "GLViewer.h"
 #include "GLViewer_Object.h"
 
-#include <qcolor.h>
-#include <qvaluelist.h>
+#include <QColor>
 
 #include <TColStd_SequenceOfInteger.hxx>
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
@@ -92,11 +92,11 @@ public:
   float                    getMarkerSize() const { return myMarkerSize; }
   
   //! Export numbers of heghlighted/selected markers
-  void                     exportNumbers( QValueList<int>& high, QValueList<int>& unhigh,
-                                          QValueList<int>& sel, QValueList<int>& unsel );
+  void                     exportNumbers( QList<int>& high, QList<int>& unhigh,
+                                          QList<int>& sel, QList<int>& unsel );
   
   //! Returns selected numbers
-  QValueList<int>          getSelectedElements() { return mySelNumbers; }
+  QList<int>               getSelectedElements() { return mySelNumbers; }
   //! Adds or remove selected number
   bool                     addOrRemoveSelected( int index );
   //! Adds selected numbers
@@ -109,12 +109,12 @@ protected:
   GLfloat*                myXCoord;
   GLfloat*                myYCoord;    
   GLfloat                 myMarkerSize;
-  QValueList<int>         myHNumbers;
-  QValueList<int>         myUHNumbers;
-  QValueList<int>         mySelNumbers;
-  QValueList<int>         myCurSelNumbers;
-  QValueList<int>         myUSelNumbers;
-  QValueList<int>         myPrevHNumbers;
+  QList<int>              myHNumbers;
+  QList<int>              myUHNumbers;
+  QList<int>              mySelNumbers;
+  QList<int>              myCurSelNumbers;
+  QList<int>              myUSelNumbers;
+  QList<int>              myPrevHNumbers;
   TColStd_SequenceOfInteger mySelectedIndexes;
 };
 
@@ -177,11 +177,11 @@ public:
   GLboolean               isHighSelAll() const { return myHighSelAll; }
   
   //! Export numbers of highlighted/selected lines
-  void                     exportNumbers( QValueList<int>& high, QValueList<int>& unhigh,
-                                          QValueList<int>& sel, QValueList<int>& unsel );
+  void                    exportNumbers( QList<int>& high, QList<int>& unhigh,
+					 QList<int>& sel, QList<int>& unsel );
 
   //! Returns numbers of selected lines
-  QValueList<int>         getSelectedElements() { return mySelNumbers; }
+  QList<int>              getSelectedElements() { return mySelNumbers; }
 
 protected:
   GLfloat*                myXCoord;
@@ -190,12 +190,12 @@ protected:
   GLboolean               myIsClosed;
   GLboolean               myHighSelAll;
   
-  QValueList<int>         myHNumbers;
-  QValueList<int>         myUHNumbers;
-  QValueList<int>         mySelNumbers;
-  QValueList<int>         myUSelNumbers;
-  QValueList<int>         myCurSelNumbers;
-  QValueList<int>         myPrevHNumbers;
+  QList<int>              myHNumbers;
+  QList<int>              myUHNumbers;
+  QList<int>              mySelNumbers;
+  QList<int>              myUSelNumbers;
+  QList<int>              myCurSelNumbers;
+  QList<int>              myPrevHNumbers;
   TColStd_SequenceOfInteger mySelectedIndexes;
   
   GLboolean               myHighFlag;
@@ -248,7 +248,7 @@ protected:
   int                       myHeight;
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( default:4251 )
 #endif
 

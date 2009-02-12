@@ -1,29 +1,35 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 #include "OCCViewer_ViewSketcher.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
 
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qpointarray.h>
+#include "QtxRubberBand.h"
+
+#include <QApplication>
+#include <QPainter>
+#include <QPolygon>
+#include <QMouseEvent>
+#include <QKeyEvent>
 
 /****************************************************************
 **  Class: OCCViewer_ViewSketcher
@@ -125,7 +131,7 @@ bool OCCViewer_ViewSketcher::eventFilter( QObject* o, QEvent* e )
       {
         QMouseEvent* me = (QMouseEvent*)e;
 
-        myButtonState = me->state();
+        myButtonState = me->buttons();
         if ( e->type() == QEvent::MouseButtonPress )
           myButtonState |= me->button();
 
@@ -199,13 +205,18 @@ void OCCViewer_ViewSketcher::setSketchButton( int b )
 *****************************************************************/
 
 OCCViewer_RectSketcher::OCCViewer_RectSketcher( OCCViewer_ViewWindow* vw, int typ )
-: OCCViewer_ViewSketcher( vw, typ )
+  : OCCViewer_ViewSketcher( vw, typ )
 {
+  if ( vw )
+    {
+      OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+      mypRectRB = new QtxRectRubberBand( avp );
+    }
 }
 
 OCCViewer_RectSketcher::~OCCViewer_RectSketcher()
 {
-  delete mypData;
+  delete (QRect*)mypData;
 }
 
 void OCCViewer_RectSketcher::onActivate()
@@ -215,8 +226,9 @@ void OCCViewer_RectSketcher::onActivate()
 
 void OCCViewer_RectSketcher::onDeactivate()
 {
-  delete mypData;
+  delete (QRect*)mypData;
   mypData = 0;
+  mypRectRB->clearGeometry();
 }
 
 bool OCCViewer_RectSketcher::onKey( QKeyEvent* e )
@@ -242,28 +254,42 @@ void OCCViewer_RectSketcher::onMouse( QMouseEvent* e )
   {
     myResult = Accept;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
-                                                   e->globalPos(), e->state(), e->button() ) );
+                                                   e->globalPos(), e->button(), 
+						   e->buttons(), e->modifiers() ) );
   }
 }
 
 void OCCViewer_RectSketcher::onSketch( SketchState state )
 {
-  OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+  //OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
 
-  QRect* sketchRect = (QRect*)data();
-  if ( myButtonState & sketchButton() )
-  {
-    QRect rect( QMIN( myStart.x(), myCurr.x() ), QMIN( myStart.y(), myCurr.y() ),
-                QABS( myStart.x() - myCurr.x() ), QABS( myStart.y() - myCurr.y() ) );
-    QPainter p( avp );
-    p.setPen( Qt::white );
-    p.setRasterOp( Qt::XorROP );
-    if ( state != Debut && !sketchRect->isEmpty() )
-      p.drawRect( *sketchRect );
-    *sketchRect = rect;
-    if ( !rect.isEmpty() && state != Fin )
-      p.drawRect( *sketchRect );
-  }
+  if ( mypRectRB )
+    {      
+      QRect* sketchRect = (QRect*)data();
+      if ( myButtonState & sketchButton() )
+        {   
+          QRect rect = QRect( myStart, myCurr ).normalized();
+          /*QRect rect( qMin( myStart.x(), myCurr.x() ), qMin( myStart.y(), myCurr.y() ),
+                      qAbs( myStart.x() - myCurr.x() ), qAbs( myStart.y() - myCurr.y() ) );
+          QPainter p( avp );
+          p.setPen( Qt::white );
+          p.setCompositionMode( QPainter::CompositionMode_Xor );
+          */
+          
+          //if ( state != Debut && !sketchRect->isEmpty() )
+          //  p.drawRect( *sketchRect );
+
+          *sketchRect = rect;
+          if ( !rect.isEmpty() && state != Fin )
+            {
+              //p.drawRect( *sketchRect );            
+              mypRectRB->initGeometry( rect );
+              mypRectRB->show();
+            }          
+          else
+            mypRectRB->hide();
+        }
+    }
 
   if ( state == Fin )
   {
@@ -281,24 +307,29 @@ OCCViewer_PolygonSketcher::OCCViewer_PolygonSketcher( OCCViewer_ViewWindow* vw, 
 : OCCViewer_ViewSketcher( vw, typ ),
   myDbl           ( false ),
   myToler         ( 5, 5 ),
-  mypPoints        ( 0L ),
+  //mypPoints        ( 0L ),
   myAddButton     ( 0 ),
   myDelButton     ( 0 )
 {
   mySketchButton = Qt::RightButton;
+  if ( vw )
+    {
+      OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+      mypPolyRB = new QtxPolyRubberBand( avp );
+    }
 }
 
 OCCViewer_PolygonSketcher::~OCCViewer_PolygonSketcher()
 {
-  delete mypPoints;
-  delete mypData;
+  //delete mypPoints;
+  delete (QPolygon*)mypData;
 }
 
 void OCCViewer_PolygonSketcher::onActivate()
 {
   myDbl = false;
-  mypData = new QPointArray( 0 );
-  mypPoints = new QPointArray( 0 );
+  mypData = new QPolygon( 0 );
+  //mypPoints = new QPolygon( 0 );
 
   switch ( sketchButton() )
   {
@@ -320,10 +351,13 @@ void OCCViewer_PolygonSketcher::onActivate()
 
 void OCCViewer_PolygonSketcher::onDeactivate()
 {
-  delete mypPoints;
-  mypPoints = 0;
-  delete mypData;
+  //delete mypPoints;
+  //mypPoints = 0;
+  delete (QPolygon*)mypData;
   mypData = 0;
+
+  if ( mypPolyRB )
+    mypPolyRB->clearGeometry();  
 }
 
 bool OCCViewer_PolygonSketcher::onKey( QKeyEvent* e )
@@ -335,7 +369,7 @@ bool OCCViewer_PolygonSketcher::onKey( QKeyEvent* e )
   }
   else if ( e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return )
   {
-    QPointArray* points = (QPointArray*)data();
+    QPolygon* points = (QPolygon*)data();
     if ( points->count() )
     {
       QPoint last = points->point( points->count() - 1 );
@@ -350,7 +384,7 @@ bool OCCViewer_PolygonSketcher::onKey( QKeyEvent* e )
   }
   else if ( e->key() == Qt::Key_Backspace && e->type() == QEvent::KeyRelease )
   {
-    QPointArray* points = (QPointArray*)data();
+    QPolygon* points = (QPolygon*)data();
     if ( points->count() > 1 )
       points->resize( points->count() - 1 );
     onMouse( 0 );
@@ -364,7 +398,7 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
 {
   OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
 
-  QPointArray* points = (QPointArray*)data();
+  QPolygon* points = (QPolygon*)data();
   if ( !points->count() && !myStart.isNull() )
   {
     points->resize( points->count() + 1 );
@@ -397,7 +431,8 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
   {
     myResult = Reject;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
-                                                   e->globalPos(), e->state(), e->button() ) );
+                                                   e->globalPos(), e->button(), 
+						   e->buttons(), e->modifiers() ) );
   }
   else if ( e->type() == QEvent::MouseButtonRelease && ( e->button() & myAddButton ) )
   {
@@ -432,12 +467,12 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
 
 void OCCViewer_PolygonSketcher::onSketch( SketchState state )
 {
-  OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+  //OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
 
-  QPointArray* points = (QPointArray*)data();
-  QPainter p( avp );
+  QPolygon* points = (QPolygon*)data();
+  /*QPainter p( avp );
   p.setPen( Qt::white );
-  p.setRasterOp( Qt::XorROP );
+  p.setCompositionMode( QPainter::CompositionMode_Xor );
   if ( state != Debut )
     p.drawPolyline( *mypPoints );
 
@@ -449,16 +484,38 @@ void OCCViewer_PolygonSketcher::onSketch( SketchState state )
     mypPoints->setPoint( points->count(), myCurr );
     if ( state != Fin )
       p.drawPolyline( *mypPoints );
-  }
+      }*/
+  if ( mypPolyRB )
+    {
+      mypPolyRB->setUpdatesEnabled ( false );
+      if ( !mypPolyRB->isVisible() )
+        mypPolyRB->show();
+      //if ( state != Debut )
+      //  mypPolyRB->repaint();
 
+      if ( state != Fin && points->count() )
+        mypPolyRB->initGeometry( QPolygon(*points) << myCurr );
+      //mypPolyRB->addNode( myCurr );
+
+      //if ( state != Fin )
+      //  mypPolyRB->repaint();
+      mypPolyRB->setUpdatesEnabled ( true );
+      //mypPolyRB->repaint();
+    }
+      
   if ( state == Fin )
   {
+    if ( mypPolyRB )
+      {
+        mypPolyRB->clearGeometry();
+        mypPolyRB->hide();
+      }
     QApplication::syncX();
     mypViewWindow->activateSketching( OCCViewer_ViewWindow::NoSketching );
   }
 }
 
-bool OCCViewer_PolygonSketcher::isValid( const QPointArray* aPoints, const QPoint& aCur ) const
+bool OCCViewer_PolygonSketcher::isValid( const QPolygon* aPoints, const QPoint& aCur ) const
 {
   if ( !aPoints->count() )
     return true;
@@ -514,20 +571,20 @@ bool OCCViewer_PolygonSketcher::isIntersect( const QPoint& aStart1, const QPoint
     if ( b1 != b2 )
       return false;
     else
-      return !( ( QMAX( x11, x12 ) <= QMIN( x21, x22 ) ||
-                  QMIN( x11, x12 ) >= QMAX( x21, x22 ) ) &&
-                ( QMAX( y11, y12 ) <= QMIN( y21, y22 ) ||
-                  QMIN( y11, y12 ) >= QMAX( y21, y22 ) ) );
+      return !( ( qMax( x11, x12 ) <= qMin( x21, x22 ) ||
+                  qMin( x11, x12 ) >= qMax( x21, x22 ) ) &&
+                ( qMax( y11, y12 ) <= qMin( y21, y22 ) ||
+                  qMin( y11, y12 ) >= qMax( y21, y22 ) ) );
   }
   else
   {
     double x0 = ( b2 - b1 ) / ( k1 - k2 );
     double y0 = ( k1 * b2 - k2 * b1 ) / ( k1 - k2 );
 
-    if ( QMIN( x11, x12 ) < x0 && x0 < QMAX( x11, x12 ) &&
-         QMIN( y11, y12 ) < y0 && y0 < QMAX( y11, y12 ) &&
-         QMIN( x21, x22 ) < x0 && x0 < QMAX( x21, x22 ) &&
-         QMIN( y21, y22 ) < y0 && y0 < QMAX( y21, y22 ) )
+    if ( qMin( x11, x12 ) < x0 && x0 < qMax( x11, x12 ) &&
+         qMin( y11, y12 ) < y0 && y0 < qMax( y11, y12 ) &&
+         qMin( x21, x22 ) < x0 && x0 < qMax( x21, x22 ) &&
+         qMin( y21, y22 ) < y0 && y0 < qMax( y21, y22 ) )
       return true;
   }
   return false;

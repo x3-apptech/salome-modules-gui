@@ -1,32 +1,30 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SVTK OBJECT : interactive object for SVTK visualization
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : SVTK_DeviceActor.cxx
 //  Author : 
 //  Module : 
 //  $Header$
-
-
+//
 #include "SVTK_DeviceActor.h"
 
 #include "VTKViewer_Transform.h"
@@ -36,6 +34,7 @@
 // VTK Includes
 #include <vtkObjectFactory.h>
 #include <vtkShrinkFilter.h>
+#include <vtkFeatureEdges.h>
 
 #include <vtkPolyData.h>
 #include <vtkUnstructuredGrid.h>
@@ -58,6 +57,9 @@ SVTK_DeviceActor
   myIsShrunk = false;
   myIsShrinkable = true;
 
+  myIsFeatureEdgesAllowed = false;
+  myIsFeatureEdgesEnabled = false;
+
   myIsShaded = true;
   myProperty = vtkProperty::New();
   myRepresentation = SVTK::Representation::Surface;
@@ -69,6 +71,8 @@ SVTK_DeviceActor
   myMapper = vtkDataSetMapper::New();
 
   myShrinkFilter = vtkShrinkFilter::New();
+
+  myFeatureEdges = vtkFeatureEdges::New();
 
   myGeomFilter = VTKViewer_GeometryFilter::New();
 
@@ -93,6 +97,8 @@ SVTK_DeviceActor
   myTransformFilter->Delete();
 
   myShrinkFilter->Delete();
+
+  myFeatureEdges->Delete();
 
   for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
     myPassFilter[i]->Delete();
@@ -191,6 +197,9 @@ SVTK_DeviceActor
 
   if(myIsShrunk)
     mTime = max(mTime,myShrinkFilter->GetMTime());
+
+  if(myIsFeatureEdgesEnabled)
+    mTime = max(mTime,myFeatureEdges->GetMTime());
 
   for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
     max(mTime,myPassFilter[i]->GetMTime());
@@ -298,6 +307,148 @@ SVTK_DeviceActor
 ::SetShrinkFactor(vtkFloatingPointType theValue)
 {
   myShrinkFilter->SetShrinkFactor(theValue);
+}
+
+/*!
+  \return true if feature edges are allowed for this actor
+*/
+bool
+SVTK_DeviceActor
+::IsFeatureEdgesAllowed() 
+{ 
+  return myIsFeatureEdgesAllowed;
+}
+
+/*!
+  Allows feature edges for this actor on or off
+  \param theIsFeatureEdgesAllowed - flag which allows feature edges for this actor on or off
+*/
+void
+SVTK_DeviceActor
+::SetFeatureEdgesAllowed(bool theIsFeatureEdgesAllowed)
+{
+  myIsFeatureEdgesAllowed = theIsFeatureEdgesAllowed;
+}
+
+/*!
+  \return true if feature edges are enabled
+*/
+bool
+SVTK_DeviceActor
+::IsFeatureEdgesEnabled()
+{
+  return myIsFeatureEdgesEnabled;
+}
+
+/*!
+  Enables feature edges on or off
+  \param theIsFeatureEdgesEnabled - flag which enables feature edges on or off
+*/
+void
+SVTK_DeviceActor
+::SetFeatureEdgesEnabled(bool theIsFeatureEdgesEnabled)
+{
+  if ( !myIsFeatureEdgesAllowed || myIsFeatureEdgesEnabled == theIsFeatureEdgesEnabled ) 
+    return;
+
+  if ( vtkPolyData* aPolyData = myPassFilter[ 2 ]->GetPolyDataOutput() )
+  {
+    if( theIsFeatureEdgesEnabled )
+    {
+      aPolyData->Update();
+      myFeatureEdges->SetInput( aPolyData );
+      myPassFilter[ 3 ]->SetInput( myFeatureEdges->GetOutput() );
+      myIsFeatureEdgesEnabled = true;
+    }
+    else
+    {
+      myPassFilter[3]->SetInput( aPolyData );
+      myIsFeatureEdgesEnabled = false;
+    }
+    myIsFeatureEdgesEnabled = theIsFeatureEdgesEnabled;
+  }
+}
+
+/*!
+  \return angle of feature edges' filter
+*/
+vtkFloatingPointType
+SVTK_DeviceActor
+::GetFeatureEdgesAngle()
+{
+  return myFeatureEdges->GetFeatureAngle();
+}
+
+/*!
+  Sets angle of feature edges' filter
+  \param theAngle angle of feature edges' filter
+*/
+void
+SVTK_DeviceActor
+::SetFeatureEdgesAngle(vtkFloatingPointType theAngle)
+{
+  myFeatureEdges->SetFeatureAngle(theAngle);
+}
+
+/*!
+  Gets information about kinds of edges which are displayed by feature edges' filter
+  \param theIsFeatureEdges flag which shows whether feature edges are displayed
+  \param theIsBoundaryEdges flag which shows whether boundary edges are displayed
+  \param theIsManifoldEdges flag which shows whether manifold edges are displayed
+  \param theIsNonManifoldEdges flag which shows whether non-manifold edges are displayed
+*/
+void
+SVTK_DeviceActor
+::GetFeatureEdgesFlags(bool& theIsFeatureEdges,
+		       bool& theIsBoundaryEdges,
+		       bool& theIsManifoldEdges,
+		       bool& theIsNonManifoldEdges)
+{
+  theIsFeatureEdges = myFeatureEdges->GetFeatureEdges();
+  theIsBoundaryEdges = myFeatureEdges->GetBoundaryEdges();
+  theIsManifoldEdges = myFeatureEdges->GetManifoldEdges();
+  theIsNonManifoldEdges = myFeatureEdges->GetNonManifoldEdges();
+}
+
+/*!
+  Sets different kinds of edges to be displayed by feature edges' filter
+  \param theIsFeatureEdges flag which displays feature edges
+  \param theIsBoundaryEdges flag which displays boundary edges
+  \param theIsManifoldEdges flag which displays manifold edges
+  \param theIsNonManifoldEdges flag which displays non-manifold edges
+*/
+void
+SVTK_DeviceActor
+::SetFeatureEdgesFlags(bool theIsFeatureEdges,
+		       bool theIsBoundaryEdges,
+		       bool theIsManifoldEdges,
+		       bool theIsNonManifoldEdges)
+{
+  myFeatureEdges->SetFeatureEdges(theIsFeatureEdges);
+  myFeatureEdges->SetBoundaryEdges(theIsBoundaryEdges);
+  myFeatureEdges->SetManifoldEdges(theIsManifoldEdges);
+  myFeatureEdges->SetNonManifoldEdges(theIsNonManifoldEdges);
+}
+
+/*!
+  \return feature edges' coloring flag
+*/
+bool
+SVTK_DeviceActor
+::GetFeatureEdgesColoring()
+{
+  return myFeatureEdges->GetColoring();
+}
+
+/*!
+  Sets feature edges' coloring flag
+  \param theIsColoring feature edges' coloring flag
+*/
+void
+SVTK_DeviceActor
+::SetFeatureEdgesColoring(bool theIsColoring)
+{
+  myFeatureEdges->SetColoring(theIsColoring);
 }
 
 /*!

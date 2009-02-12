@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,36 +17,32 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_ViewPort.cxx
 // Created:   November, 2004
-
 //#include <GLViewerAfx.h>
-
-#if !(defined WNT) && !(defined QT_CLEAN_NAMESPACE)
-#define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
-#endif
-
+//
 #include "GLViewer_ViewPort.h"
 
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 
-#include <qrect.h>
-#include <qcursor.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <qintdict.h>
-#include <qpopupmenu.h>
-#include <qcolordialog.h>
+#include <QRect>
+#include <QCursor>
+#include <QPainter>
+#include <QMultiHash>
+//#include <QMenu>
+#include <QColorDialog>
+#include <QColormap>
+#include <QMouseEvent>
+#include <QCoreApplication>
 
 #include <stdlib.h>
 
-#if !defined WNT
+#if !defined WIN32
+#include <QX11Info>
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -83,17 +82,19 @@ CMapEntry::CMapEntry()
 CMapEntry::~CMapEntry()
 {
     if ( alloc )
-        XFreeColormap( QPaintDevice::x11AppDisplay(), cmap );
+        XFreeColormap( QX11Info::display(), cmap );
 }
 
-static QIntDict<CMapEntry> *cmap_dict = 0;
+static QMultiHash<int,CMapEntry> *cmap_dict = 0;
 static bool mesa_gl = false;
 
 static void cleanup_cmaps()
 {
     if ( !cmap_dict )
         return;
-    cmap_dict->setAutoDelete( true );
+    //while (!cmap_dict->isEmpty())
+    //  cmap_dict->erase(cmap_dict->begin());
+    cmap_dict->clear();
     delete cmap_dict;
     cmap_dict = 0;
 }
@@ -102,17 +103,17 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
 {
     if ( !cmap_dict )
     {
-        cmap_dict = new QIntDict<CMapEntry>;
+        cmap_dict = new QMultiHash<int,CMapEntry>;
         const char *v = glXQueryServerString( dpy, vi->screen, GLX_VERSION );
         mesa_gl = strstr( v,"Mesa" ) != 0;
         qAddPostRoutine( cleanup_cmaps );
     }
 
-    CMapEntry *x = cmap_dict->find( (long)vi->visualid );
-    if ( x )                    // found colormap for visual
-        return x->cmap;
+    QHash<int,CMapEntry>::iterator itH = cmap_dict->find( (long)vi->visualid );
+    if ( itH != cmap_dict->end() )  // found colormap for visual
+        return itH.value().cmap;
 
-    x = new CMapEntry();
+    CMapEntry x;
 
     XStandardColormap *c;
     int n, i;
@@ -121,12 +122,12 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
     cout << "Choosing cmap for vID = " << vi->visualid << endl;
 #endif
 
-    if ( vi->visualid == XVisualIDFromVisual( (Visual*)QPaintDevice::x11AppVisual() ) )
+    if ( vi->visualid == XVisualIDFromVisual( (Visual*)QX11Info::appVisual() ) )
     {
 #ifdef DEBUG
         cout << "Using x11AppColormap" << endl;
 #endif
-        return QPaintDevice::x11AppColormap();
+        return QX11Info::appColormap();
     }
 
     if ( mesa_gl )
@@ -137,12 +138,12 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
             if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, hp_cmaps ) )
             {
                 i = 0;
-                while ( i < n && x->cmap == 0 )
+                while ( i < n && x.cmap == 0 )
                 {
                     if ( c[i].visualid == vi->visual->visualid )
                     {
-                        x->cmap = c[i].colormap;
-                        x->scmap = c[i];
+                        x.cmap = c[i].colormap;
+                        x.scmap = c[i];
                     }
                     i++;
                 }
@@ -151,19 +152,19 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
         }
     }
 #if !defined( _OS_SOLARIS_ )
-    if ( !x->cmap )
+    if ( !x.cmap )
     {
         if ( XmuLookupStandardColormap( dpy, vi->screen, vi->visualid, vi->depth, XA_RGB_DEFAULT_MAP, false, true ) )
         {
             if ( XGetRGBColormaps( dpy, RootWindow( dpy, vi->screen ), &c, &n, XA_RGB_DEFAULT_MAP ) )
             {
                 i = 0;
-                while ( i < n && x->cmap == 0 )
+                while ( i < n && x.cmap == 0 )
                 {
                     if ( c[i].visualid == vi->visualid )
                     {
-                        x->cmap = c[i].colormap;
-                        x->scmap = c[i];
+                        x.cmap = c[i].colormap;
+                        x.scmap = c[i];
                     }
                     i++;
                 }
@@ -172,15 +173,15 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
         }
     }
 #endif
-    if ( !x->cmap )
+    if ( !x.cmap )
     {
         // no shared cmap found
-        x->cmap = XCreateColormap( dpy, RootWindow( dpy, vi->screen ), vi->visual, AllocNone );
-        x->alloc = true;
+        x.cmap = XCreateColormap( dpy, RootWindow( dpy, vi->screen ), vi->visual, AllocNone );
+        x.alloc = true;
     }
 
     cmap_dict->insert( (long)vi->visualid, x ); // associate cmap with visualid
-    return x->cmap;
+    return x.cmap;
 }
 #endif
 
@@ -198,10 +199,10 @@ QCursor* GLViewer_ViewPort::sketchCursor = 0;
 */
 void GLViewer_ViewPort::createCursors ()
 {
-    defCursor   = new QCursor( ArrowCursor );
-    panglCursor = new QCursor( CrossCursor );
-    handCursor  = new QCursor( PointingHandCursor );
-    panCursor   = new QCursor( SizeAllCursor );
+    defCursor   = new QCursor( Qt::ArrowCursor );
+    panglCursor = new QCursor( Qt::CrossCursor );
+    handCursor  = new QCursor( Qt::PointingHandCursor );
+    panCursor   = new QCursor( Qt::SizeAllCursor );
 
     SUIT_ResourceMgr* rmgr = SUIT_Session::session()->resourceMgr();
     zoomCursor   = new QCursor( rmgr->loadPixmap( "GLViewer", tr( "ICON_GL_CURSOR_ZOOM" ) ) );
@@ -297,7 +298,7 @@ void GLViewer_ViewPort::setSketchCursor( const QCursor& newCursor )
     Constructor
 */
 GLViewer_ViewPort::GLViewer_ViewPort( QWidget* parent )
-: QWidget( parent, 0, WRepaintNoErase | WResizeNoErase )
+: QWidget( parent, 0 )
 {
     initialize();
 }
@@ -324,9 +325,9 @@ void GLViewer_ViewPort::initialize()
     myEnableTransform = true;
 
     setMouseTracking( true );
-    setBackgroundMode( NoBackground );
+    setBackgroundRole( QPalette::NoRole );//NoBackground );
 
-    setFocusPolicy( StrongFocus );
+    setFocusPolicy( Qt::StrongFocus );
 }
 
 /*!
@@ -343,9 +344,9 @@ void GLViewer_ViewPort::cleanup()
 */
 void GLViewer_ViewPort::selectVisualId( ViewType type )
 {
-#if !defined WNT
+#if !defined WIN32
     XVisualInfo* pVisualInfo;
-    if ( x11Display() )
+    if ( QX11Info::display() )
     {
         /* Initialization with the default VisualID */
         //Visual *v = DefaultVisual( x11Display(), DefaultScreen( x11Display() ) );
@@ -355,17 +356,17 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
         int visualAttr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
                              GLX_BLUE_SIZE, 1, GLX_DOUBLEBUFFER, None };
 
-        pVisualInfo = ::glXChooseVisual( x11Display(), DefaultScreen( x11Display() ), visualAttr );
+        pVisualInfo = ::glXChooseVisual( QX11Info::display(), DefaultScreen( QX11Info::display() ), visualAttr );
 
         if ( isVisible() )
             hide();
 
         XSetWindowAttributes a;
 
-        a.colormap = choose_cmap( x11Display(), pVisualInfo );      /* find best colormap */
-        a.background_pixel = backgroundColor().pixel();
-        a.border_pixel = black.pixel();
-        Window p = RootWindow( x11Display(), DefaultScreen( x11Display() ) );
+        a.colormap = choose_cmap( QX11Info::display(), pVisualInfo );      /* find best colormap */
+        a.background_pixel = QColormap::instance().pixel( backgroundColor() );
+        a.border_pixel = QColormap::instance().pixel( Qt::black );
+        Window p = RootWindow( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
         if ( parentWidget() )
             p = parentWidget()->winId();
 
@@ -373,16 +374,16 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
         if ( type == Type2D )  // creating simple X window for 2d
         {
             unsigned long xbackground =
-                BlackPixel( x11Display(), DefaultScreen( x11Display() ) );
+                BlackPixel( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
             unsigned long xforeground =
-                WhitePixel( x11Display(), DefaultScreen( x11Display() ) );
+                WhitePixel( QX11Info::display(), DefaultScreen( QX11Info::display() ) );
 
-            w = XCreateSimpleWindow ( x11Display(), p, x(), y(), width(),
+            w = XCreateSimpleWindow ( QX11Info::display(), p, x(), y(), width(),
                                       height(), 0, xforeground, xbackground );
         }
         else if ( type == Type3D )
         {
-            w = XCreateWindow( x11Display(), p,  x(), y(), width(), height(),
+            w = XCreateWindow( QX11Info::display(), p,  x(), y(), width(), height(),
                                0, pVisualInfo->depth, InputOutput, pVisualInfo->visual,
                                CWBackPixel | CWBorderPixel | CWColormap, &a );
         }
@@ -392,7 +393,7 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
         Window *cmw;
         Window *cmwret;
         int count;
-        if ( XGetWMColormapWindows( x11Display(), topLevelWidget()->winId(), &cmwret, &count ) )
+        if ( XGetWMColormapWindows( QX11Info::display(), topLevelWidget()->winId(), &cmwret, &count ) )
         {
             cmw = new Window[count+1];
             memcpy( (char*)cmw, (char*)cmwret, sizeof(Window) * count );
@@ -420,7 +421,7 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
 
         /* Creating new window (with good VisualID) for this widget */
         create(w);
-        XSetWMColormapWindows( x11Display(), topLevelWidget()->winId(), cmw, count );
+        XSetWMColormapWindows( QX11Info::display(), topLevelWidget()->winId(), cmw, count );
         delete[] cmw;
 
         if ( isVisible() )
@@ -430,7 +431,7 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
         {
             XFree( (char *)pVisualInfo );
         }
-        XFlush( x11Display() );
+        XFlush( QX11Info::display() );
     }
 #endif
 }
@@ -441,7 +442,7 @@ void GLViewer_ViewPort::selectVisualId( ViewType type )
 void GLViewer_ViewPort::setBackgroundColor( const QColor& color )
 {
     QPalette pal = palette();
-    pal.setColor( QColorGroup::Background, color );
+    pal.setColor( QPalette::Background, color );
     setPalette( pal );
     repaint();
 }
@@ -451,7 +452,7 @@ void GLViewer_ViewPort::setBackgroundColor( const QColor& color )
 */
 QColor GLViewer_ViewPort::backgroundColor() const
 {
-    return palette().active().background();
+    return palette().color( QPalette::Active, QPalette::Background );
 }
 
 /*!

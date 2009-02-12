@@ -1,0 +1,125 @@
+<!--
+  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+
+  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+
+-->
+<document>
+  <section name="Steel-Blue">
+    <parameter name="button-color"            value="silver" />
+    <parameter name="base-color"              value="white" />
+    <parameter name="window-color"            value="lightsteelblue" />
+    <parameter name="lines-color"             value="blue" />
+    <parameter name="checked-color"           value="cornflowerblue" />
+    <parameter name="header-color"            value="silver" />
+    <parameter name="slider-color"            value="cornflowerblue" />
+    <parameter name="pointer-color"           value="midnightblue" />
+    <parameter name="field-light-color"       value="whitesmoke" />
+    <parameter name="field-dark-color"        value="#bababa" />
+    <parameter name="progress-bar-color"      value="cornflowerblue" />
+    <parameter name="highlight-widget-color"  value="skyblue" />
+    <parameter name="highlight-border-color"  value="cornflowerblue" />
+    <parameter name="lines-type"              value="0" />
+    <parameter name="slider-rad"              value="3" />
+    <parameter name="edit-rad"                value="6" />
+    <parameter name="button-rad"              value="10" />
+    <parameter name="frame-rad"               value="10" />
+    <parameter name="all-antialized"          value="false" />
+    <parameter name="widget-effect"           value="1" />
+    <parameter name="slider-size"             value="5" />
+  </section>
+  <section name="Dark-Green">
+    <parameter name="button-color"            value="#003300" />
+    <parameter name="window-color"            value="black" />
+    <parameter name="text-color"              value="white" />
+    <parameter name="bright-text-color"       value="gold" />
+    <parameter name="window-text-color"       value="gold" />
+    <parameter name="base-color"              value="black" />
+    <parameter name="highlight-color"         value="gold" />
+    <parameter name="highlight-text-color"    value="goldenrod" />
+    <parameter name="light-color"             value="goldenrod" />
+    <parameter name="dark-color"              value="saddlebrown" />
+    <parameter name="lines-type"              value="0" />
+    <parameter name="checked-color"           value="black" />
+    <parameter name="header-color"            value="#003300" />
+    <parameter name="slider-color"            value="goldenrod" />
+    <parameter name="border-top-color"        value="goldenrod" />
+    <parameter name="border-bottom-color"     value="saddlebrown" />
+    <parameter name="tab-border-top-color"    value="goldenrod" />
+    <parameter name="tab-border-bottom-color" value="saddlebrown" />
+    <parameter name="pointer-color"           value="gold" />
+    <parameter name="field-light-color"       value="green" />
+    <parameter name="field-dark-color"        value="#003300" />
+    <parameter name="progress-bar-color"      value="goldenrod" />
+    <parameter name="grid-line-color"         value="saddlebrown" />
+    <parameter name="highlight-widget-color"  value="green" />
+    <parameter name="highlight-border-color"  value="#003300" />
+    <parameter name="tooltip-base-color"      value="green" />
+    <parameter name="slider-rad"              value="3" />
+    <parameter name="edit-rad"                value="6" />
+    <parameter name="frame-rad"               value="10" />
+    <parameter name="button-rad"              value="10" />
+    <parameter name="all-antialized"          value="false" />
+    <parameter name="slider-size"             value="6" />
+    <parameter name="widget-effect"           value="1" />
+  </section>
+  <section name="Green Sunset" >
+    <parameter name="button-color"            value="#e6e7e6" />
+    <parameter name="text-color"              value="#000000" />
+    <parameter name="base-color"              value="#ffff7f" />
+    <parameter name="window-color"            value="#aaff7f" />
+    <parameter name="light-color"             value="#ffaaff" />
+    <parameter name="dark-color"              value="#55aa00" />
+    <parameter name="button-text-color"       value="#000000" />
+    <parameter name="window-text-color"       value="#000000" />
+    <parameter name="tooltip-base-color"      value="#e6e7e6" />
+    <parameter name="tooltip-text-color"      value="#000000" />
+    <parameter name="highlight-color"         value="#21449c" />
+    <parameter name="highlight-text-color"    value="#ffffff"  />
+    <parameter name="header-color"            value="#e6e7e6" />
+    <parameter name="slider-color"            value="#e6e7e6" />
+    <parameter name="progress-bar-color"      value="#21449c" />
+    <parameter name="checked-color"           value="#ffffff" />
+    <parameter name="pointer-color"           value="#000000" />
+    <parameter name="grid-line-color"         value="#c0c1c0" />
+    <parameter name="highlight-widget-color"  value="#e6e7e6" />
+    <parameter name="highlight-border-color"  value="#e6e7e6" />
+    <parameter name="lines-color"             value="#c0c1c0" />
+    <parameter name="field-light-color"       value="#ffaa7f" />
+    <parameter name="field-dark-color"        value="#aa557f" />
+    <parameter name="lines-type"              value="0" />
+    <parameter name="lines-transparency"      value="0" />
+    <parameter name="hor-hadle-delta"         value="3" />
+    <parameter name="ver-handle-delta"        value="3" />
+    <parameter name="split-handle-len"        value="20" />
+    <parameter name="all-antialized"          value="false" />
+    <parameter name="slider-rad"              value="3" />
+    <parameter name="edit-rad"                value="0" />
+    <parameter name="button-rad"              value="0" />
+    <parameter name="frame-rad"               value="0" />
+    <parameter name="slider-size"             value="5" />
+    <parameter name="widget-effect"           value="2" />
+    <parameter name="application-font"        value="DejaVu Sans,9" />
+    <parameter name="border-top-color"        value="#00ff7f" />
+    <parameter name="border-bottom-color"     value="#55557f" />
+    <parameter name="tab-border-top-color"    value="#ff007f" />
+    <parameter name="tab-border-bottom-color" value="#55aaff" />
+  </section>
+</document>

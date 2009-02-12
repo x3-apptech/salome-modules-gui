@@ -1,67 +1,82 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "CAF_Study.h"
 
 #include "CAF_Tools.h"
-#include "CAF_Operation.h"
 #include "CAF_Application.h"
 
 #include <SUIT_Desktop.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_Application.h>
 
-#include <qdir.h>
+#include <QDir>
 
 #include <TDF_Delta.hxx>
 #include <TDF_ListIteratorOfDeltaList.hxx>
+#include <TDocStd_Application.hxx>
 
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
 /*!
-  Constructor
+  \class CAF_Study
+  \brief Represents study for using in CAF module.
+
+  A study contains reference to OCAF std document and allows using OCAF services.
+  Provides necessary functionality for OCC transactions management.
+*/
+
+/*!
+  \brief Constructor.
+  \param theApp application
 */
 CAF_Study::CAF_Study(SUIT_Application* theApp)
 : SUIT_Study( theApp ),
-myModifiedCnt( 0 )
+  myModifiedCnt( 0 )
 {
 }
 
 /*!
-  Constructor
+  \brief Constructor.
+  \param theApp application
+  \param aStdDoc OCAF document
 */
 CAF_Study::CAF_Study(SUIT_Application* theApp, Handle (TDocStd_Document)& aStdDoc)
 : SUIT_Study( theApp ),
-myStdDoc( aStdDoc ),
-myModifiedCnt( 0 )
+  myStdDoc( aStdDoc ),
+  myModifiedCnt( 0 )
 {
 }
 
 /*!
-  Destructor
+  \brief Destructor.
 */
 CAF_Study::~CAF_Study()
 {
 }
 
 /*!
-  \return OCAF document
+  \brief Get OCAF document.
+  \return handle to the OCAF document object
 */
 Handle(TDocStd_Document) CAF_Study::stdDoc() const
 {
@@ -69,8 +84,8 @@ Handle(TDocStd_Document) CAF_Study::stdDoc() const
 }
 
 /*!
-  Sets new OCAF document
-  \param aStdDoc - new OCAF document
+  \brief Set OCAF document.
+  \param aStdDoc new OCAF document
 */
 void CAF_Study::setStdDoc( Handle(TDocStd_Document)& aStdDoc )
 {
@@ -78,14 +93,16 @@ void CAF_Study::setStdDoc( Handle(TDocStd_Document)& aStdDoc )
 }
 
 /*!
-  Custom document initialization
+  \brief Customize document initialization.
+  \param doc study name
+  \return \c true on success and \c false on error
 */
-void CAF_Study::createDocument()
+bool CAF_Study::createDocument( const QString& doc )
 {
-  SUIT_Study::createDocument();
+  bool res = SUIT_Study::createDocument( doc );
 
   CAF_Application* app = cafApplication();
-  if ( app && !app->stdApp().IsNull() )
+  if ( res && app && !app->stdApp().IsNull() )
   {
     try {
 #if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
@@ -97,25 +114,29 @@ void CAF_Study::createDocument()
         app->stdApp()->NewDocument( formats.First(), myStdDoc );
     }
     catch ( Standard_Failure ) {
+      res = false;
     }
   }
+  return res;
 }
 
 /*!
-  Close document
+  \brief Close document.
+  \param permanently if \c true, a document is closed permanently
 */
-void CAF_Study::closeDocument( bool permanent )
+void CAF_Study::closeDocument( bool permanently )
 {
   Handle(TDocStd_Application) app = stdApp();
   if ( !app.IsNull() && !stdDoc().IsNull() )
     app->Close( stdDoc() );
 
-  SUIT_Study::closeDocument( permanent );
+  SUIT_Study::closeDocument( permanently );
 }
 
 /*!
-  Open document
-  \param fname - name of file
+  \brief Open document.
+  \param fname study file name
+  \return \c true on success and \c false if document cannot be opened
 */
 bool CAF_Study::openDocument( const QString& fname )
 {
@@ -138,8 +159,8 @@ bool CAF_Study::openDocument( const QString& fname )
 }
 
 /*!
-  Save document with other name
-  \param fname - name of file
+  \brief Save document with other name.
+  \param fname study file name
 */
 bool CAF_Study::saveDocumentAs( const QString& fname )
 {
@@ -186,7 +207,8 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
 }
 
 /*!
-  Open OCAF transaction
+  \brief Open OCAF transaction.
+  \return \c true if transaction is opened successfully
 */
 bool CAF_Study::openTransaction()
 {
@@ -211,7 +233,8 @@ bool CAF_Study::openTransaction()
 }
 
 /*!
-  Abort OCAF transaction
+  \brief Abort OCAF transaction.
+  \return \c true if transaction is aborted successfully
 */
 bool CAF_Study::abortTransaction()
 {
@@ -233,7 +256,8 @@ bool CAF_Study::abortTransaction()
 }
 
 /*!
-  Commit OCAF transaction
+  \brief Commit OCAF transaction
+  \return \c true if transaction is committed successfully
 */
 bool CAF_Study::commitTransaction( const QString& name )
 {
@@ -261,7 +285,8 @@ bool CAF_Study::commitTransaction( const QString& name )
 }
 
 /*!
-  \return true, if there is opened OCAF transaction
+  \brief Check if there is any transaction opened.
+  \return \c true if there is opened OCAF transaction
 */
 bool CAF_Study::hasTransaction() const
 {
@@ -272,7 +297,8 @@ bool CAF_Study::hasTransaction() const
 }
 
 /*!
-  \return whether the document was saved in file. [ public ]
+  \brief Check if the study is saved.
+  \return \c true if the document has been saved to file
 */
 bool CAF_Study::isSaved() const
 {
@@ -283,7 +309,8 @@ bool CAF_Study::isSaved() const
 }
 
 /*!
-  \return whether the document is modified. [ public ]
+  \brief Check if the study is modified.
+  \return \c true if the document has been modified
 */
 bool CAF_Study::isModified() const
 {
@@ -295,24 +322,30 @@ bool CAF_Study::isModified() const
 }
 
 /*!
-    Increments modification count. If 'undoable' is 'true', this modification
-    can be rolled back by 'undoModified' otherwise the document will be marked
-    as 'modiifed' until saved. [ protected ]
+  \brief Increment modifications count.
+
+  If \a undoable is \c true, this modification can be rolled back by
+  undoModified(), otherwise the document will be marked as \c modified
+  until it is saved.
+
+  \param undoable if \c true the operation is undoable
+  \sa undoModified(), clearModified()
 */
 void CAF_Study::doModified( bool undoable )
 {
-	if ( myStdDoc.IsNull() )
+  if ( myStdDoc.IsNull() )
     return;
 
-	myModifiedCnt++;
+  myModifiedCnt++;
 
-    /*  Assumed that number of available undos / redos is NOT changed dynamically */
-	if ( !undoable )
+  /*  Assumed that number of available undos / redos is NOT changed dynamically */
+  if ( !undoable )
     myModifiedCnt += myStdDoc->GetAvailableUndos();
 }
 
 /*!
-    Decrements modification count. [ protected ]
+  \brief Decrement modifications count.
+  \sa doModified(), clearModified()
 */
 void CAF_Study::undoModified()
 {
@@ -320,7 +353,8 @@ void CAF_Study::undoModified()
 }
 
 /*!
-    Clears modification count. [ public ]
+  \brief Clear modifications count.
+  \sa doModified(), undoModified()
 */
 void CAF_Study::clearModified()
 {
@@ -328,7 +362,8 @@ void CAF_Study::clearModified()
 }
 
 /*!
-    Undoes the last command. [ public ]
+  \brief Undo the last command.
+  \return \c true on success and \c false on error
 */
 bool CAF_Study::undo()
 {
@@ -343,15 +378,16 @@ bool CAF_Study::undo()
     undoModified();     /* decrement modification counter */
   }
   catch ( Standard_Failure ) {
-    SUIT_MessageBox::error1(application()->desktop(), tr( "ERR_ERROR" ),
-                            tr( "ERR_DOC_UNDO" ), tr ( "BUT_OK" ));
+    SUIT_MessageBox::critical(application()->desktop(), tr( "ERR_ERROR" ),
+			      tr( "ERR_DOC_UNDO" ));
     return false;
   }
   return true;
 }
 
 /*!
-    Redoes the last undo. [ public ]
+  \brief Redo the last undo.
+  \return \c true on success and \c false on error
 */
 bool CAF_Study::redo()
 {
@@ -366,15 +402,16 @@ bool CAF_Study::redo()
     doModified();      /* increment modification counter */
   }
   catch ( Standard_Failure ) {
-    SUIT_MessageBox::error1( application()->desktop(), tr( "ERR_ERROR" ),
-                             tr( "ERR_DOC_REDO" ), tr ( "BUT_OK" ) );
+    SUIT_MessageBox::critical( application()->desktop(), tr( "ERR_ERROR" ),
+			       tr( "ERR_DOC_REDO" ) );
     return false;
   }
   return true;
 }
 
 /*!
-  \return true if possible to perform 'undo' command. [ public ]
+  \brief Check if it is possible to undo last command.
+  \return \c true if undo is avaiable
 */
 bool CAF_Study::canUndo() const
 {
@@ -385,7 +422,8 @@ bool CAF_Study::canUndo() const
 }
 
 /*!
-  \return true if possible to perform 'redo' command. [ public ]
+  \brief Check if it is possible to redo last undo.
+  \return \c true if redo is avaiable
 */
 bool CAF_Study::canRedo() const
 {
@@ -396,7 +434,8 @@ bool CAF_Study::canRedo() const
 }
 
 /*!
-  \return the list of names of 'undo' actions available. [ public ]
+  \brief Get names of available undo commands.
+  \return list of commands names
 */
 QStringList CAF_Study::undoNames() const
 {
@@ -410,7 +449,8 @@ QStringList CAF_Study::undoNames() const
 }
 
 /*!
-  \return the list of names of 'redo' actions available. [ public ]
+  \brief Get names of available redo commands.
+  \return list of commands names
 */
 QStringList CAF_Study::redoNames() const
 {
@@ -424,7 +464,8 @@ QStringList CAF_Study::redoNames() const
 }
 
 /*!
-  \return the standard OCAF application from owner application. [ protected ]
+  \brief Get OCAF application.
+  \return handle to the OCAF application object
 */
 Handle(TDocStd_Application) CAF_Study::stdApp() const
 {
@@ -436,9 +477,10 @@ Handle(TDocStd_Application) CAF_Study::stdApp() const
 }
 
 /*!
-  \return the application casted to type CAF_Application. [ protected ]
+  \brief Get application.
+  \return application object (CAF_Application)
 */
 CAF_Application* CAF_Study::cafApplication() const
 {
-  return ::qt_cast<CAF_Application*>( application() );
+  return qobject_cast<CAF_Application*>( application() );
 }

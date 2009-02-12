@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,21 +17,20 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Widget.h
 // Created:   November, 2004
-
+//
 #ifndef GLVIEWER_WIDGET_H
 #define GLVIEWER_WIDGET_H
 
 #include "GLViewer.h"
 
-#include <qgl.h>
-#include <qfile.h>
+#include <QtOpenGL>
+
+class QFile;
 
 class GLViewer_ViewPort2d;
 class GLViewer_CoordSystem;
@@ -153,6 +155,8 @@ protected:
   virtual void           enterEvent( QEvent* );
   /* Needs to redefine because Window must be updated highlight presentation when mouse leave window */
   virtual void           leaveEvent( QEvent* );
+
+  virtual bool           event ( QEvent* );
   
 private:
   //! width of window

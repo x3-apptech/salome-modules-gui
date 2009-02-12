@@ -1,96 +1,125 @@
-// Copyright (C) 2005  OPEN CASCADE, CEA/DEN, EDF R&D, PRINCIPIA R&D
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
 //
-#ifndef SUIT_FILEDIALOG_H
-#define SUIT_FILEDIALOG_H
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
+// File   : SUIT_FileDlg.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
+#ifndef SUIT_FILEDLG_H
+#define SUIT_FILEDLG_H
 
 #include "SUIT.h"
 
-#include <qfiledialog.h>
+#include <QFileDialog>
 
 class QLabel;
+class QLineEdit;
 class QComboBox;
 class QPushButton;
 class SUIT_FileValidator;
 
-/*! \class QFileDialog
- *  For more information see <a href="http://doc.trolltech.com">QT documentation</a>.
-*/
 class SUIT_EXPORT SUIT_FileDlg : public QFileDialog
 {
   Q_OBJECT
 
 public:
-  SUIT_FileDlg( QWidget*, bool open, bool showQuickDir = true, bool modal = true );
+  SUIT_FileDlg( QWidget*, bool, bool = true, bool = true );
   virtual ~SUIT_FileDlg();
 
-public:    
   bool                isOpenDlg()    const;    
-  QString             selectedFile() const;
+  
+  bool                checkPermissions() const;
+  void                setCheckPermissions( const bool );
 
+  SUIT_FileValidator* validator() const;
   void                setValidator( SUIT_FileValidator* );
 
-  QString             dirPath() const; // QFileDialog::dirPath() has a bug on Linux Debian (1 level up from correct 
-                                       // directory is returned).  This redefinition fixes the bug.  
+  bool                addWidgets( QWidget*, QWidget*, QWidget* );
 
-  static QString      getFileName( QWidget* parent, const QString& initial, const QStringList& filters, 
-				   const QString& caption, const bool open, const bool showQuickDir = true,
-                                   SUIT_FileValidator* validator = 0 );
-  static QStringList  getOpenFileNames( QWidget* parent, const QString& initial, const QStringList& filters, 
-				        const QString& caption, bool showQuickDir = true, 
-				        SUIT_FileValidator* validator = 0 );
-  static QString      getExistingDirectory( QWidget* parent, const QString& initial,
-                                            const QString& caption, const bool showQuickDir = true );
+  QStringList         selectedFiles() const;
+  QString             selectedFile() const;
 
-public slots:
-  void                polish();
+  void selectFile( const QString& );
 
-private:
-  bool                acceptData();
-  void                addExtension();
-  bool                processPath( const QString& path );
+  static QString      getLastVisitedDirectory();
+
+  static QString      getFileName( QWidget*, 
+				   const QString&, 
+				   const QStringList&, 
+				   const QString& = QString(), 
+				   const bool = true, 
+				   const bool = true,
+                                   SUIT_FileValidator* = 0 );
+  static QString      getFileName( QWidget*, 
+				   const QString&, 
+				   const QString&,
+				   const QString& = QString(), 
+				   const bool = true,
+				   const bool = true,
+                                   SUIT_FileValidator* = 0 );
+
+  static QStringList  getOpenFileNames( QWidget*, 
+					const QString&,
+					const QStringList&, 
+				        const QString& = QString(),
+					const bool = true, 
+				        SUIT_FileValidator* = 0 );
+  static QStringList  getOpenFileNames( QWidget*, 
+					const QString&,
+					const QString&, 
+				        const QString& = QString(),
+					const bool = true, 
+				        SUIT_FileValidator* = 0 );
+
+  static QString      getExistingDirectory( QWidget*, 
+					    const QString&,
+                                            const QString& = QString(), 
+					    const bool = true,
+					    SUIT_FileValidator* = 0 );
+
+  static QString      getLastVisitedPath();
+
+protected:
+  virtual bool        event( QEvent* );
+  QLineEdit*          lineEdit() const;
+  virtual bool        acceptData();
+  QString             addExtension( const QString& ) const;
+  bool                processPath( const QString& );
+  void                addFilter( const QString& );
+  static bool         hasWildCards( const QString& );
 
 protected slots:
   void                accept();        
-  void                reject(); 
   void                quickDir( const QString& );
   void                addQuickDir();
 
-protected:
-  bool                myOpen;             //!< open/save selector
-  QString             mySelectedFile;     //!< selected filename
+private:
+  void                polish();
+
+private:
   SUIT_FileValidator* myValidator;        //!< file validator
   QLabel*             myQuickLab;         //!< quick dir combo box
   QComboBox*          myQuickCombo;       //!< quick dir combo box
   QPushButton*        myQuickButton;      //!< quick dir add button
-  
-  /*! \var myAccepted
-   * \brief flag is used to warkaround the Qt 2.2.2
-   * \bug accept() method is called twice if user presses 'Enter' key 
-   * in file name editor while file name is not acceptable by acceptData()
-   * (e.g. permission denied)
-   */
-//  bool                myAccepted;
-  /*! ASL: this bug can be fixed with help of call setDefault( false ) 
-   *       and setAutoDefault( false ) methods for all QPushButtons of this dialog
-   */
-
+  bool                myCheckPermissions; //!< check permissions option
   static QString      myLastVisitedPath;  //!< last visited path
 };
 
-#endif
+#endif  // SUIT_FILEDLG_H

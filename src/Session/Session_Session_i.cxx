@@ -1,6 +1,6 @@
-//  SALOME Session : implementation of Session.idl
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
@@ -17,32 +17,36 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//
-//
+//  SALOME Session : implementation of Session.idl
 //  File   : SALOME_Session_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : SALOME
 //  $Header$
-
+//
 #include "utilities.h"
 
 #include "Session_Session_i.hxx"
 
 #include "SALOME_NamingService.hxx"
-#include "SALOME_Event.hxx"
+#include "SALOME_Event.h"
 
 #include "SUIT_Session.h"
-#include "SUIT_Application.h"
 #include "SUIT_Desktop.h"
+#include "SUIT_Study.h"
 
-#include <qapplication.h>
+#include <QMutex>
+#include <QWaitCondition>
 
 // Open CASCADE Includes
 #include <OSD_SharedLibrary.hxx>
-#include <OSD_LoadMode.hxx>
 #include <OSD_Function.hxx>
+
+#ifdef WNT
+# include <process.h>
+#endif
+
 
 using namespace std;
 
@@ -157,12 +161,12 @@ void SALOME_Session_i::StopSession()
   Send a SALOME::StatSession structure (see idl) to the client
   (number of running studies and presence of GUI)
 */
-class QtLock
+/*class QtLock
 {
 public:
   QtLock() { if ( qApp ) qApp->lock(); }
   ~QtLock() { if ( qApp ) qApp->unlock(); }
-};
+};*/
 
 
 SALOME::StatSession SALOME_Session_i::GetStatSession()
@@ -172,7 +176,7 @@ SALOME::StatSession SALOME_Session_i::GetStatSession()
 
   _runningStudies = 0;
   {
-    QtLock lock;
+    //QtLock lock;
     _isGUI = SUIT_Session::session();
     if ( _isGUI && SUIT_Session::session()->activeApplication() )
       _runningStudies = SUIT_Session::session()->activeApplication()->getNbStudies();
@@ -199,6 +203,15 @@ CORBA::Long SALOME_Session_i::GetActiveStudyId()
       aStudyId = SUIT_Session::session()->activeApplication()->activeStudy()->id();
   }
   return aStudyId;
+}
+
+CORBA::Long SALOME_Session_i::getPID() {
+  return (CORBA::Long)
+#ifndef WNT
+    getpid();
+#else
+    _getpid();
+#endif
 }
 
 bool SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)

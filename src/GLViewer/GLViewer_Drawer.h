@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,26 +17,23 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_Drawer.h
 // Created:   November, 2004
-
+//
 #ifndef GLVIEWER_DRAWER_H
 #define GLVIEWER_DRAWER_H
 
-#ifdef WNT
+#ifdef WIN32
 #include "windows.h"
 #endif
 
-#include <qcolor.h>
-#include <qobject.h>
-#include <qfile.h>
-#include <qfont.h>
-#include <qgl.h>
+#include <QColor>
+#include <QFont>
+
+class QFile;
 
 #include <GL/gl.h>
 
@@ -45,7 +45,7 @@ class GLViewer_Object;
 class GLViewer_Rect;
 class GLViewer_CoordSystem;
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 /*! 
@@ -424,7 +424,7 @@ protected:
   float                           myYScale;
   
   //! List of objects
-  QValueList<GLViewer_Object*>    myObjects;
+  QList<GLViewer_Object*>    myObjects;
   //! List generated textures
   GLuint                          myTextList;
   
@@ -443,7 +443,7 @@ protected:
   GLfloat                         myTextScale;
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( default:4251 )
 #endif
 

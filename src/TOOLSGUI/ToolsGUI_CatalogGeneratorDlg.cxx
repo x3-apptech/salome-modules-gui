@@ -1,50 +1,46 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME TOOLSGUI : implementation of desktop "Tools" optioins
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : ToolsGUI_CatalogGeneratorDlg.cxx
 //  Author : Nicolas REJNERI
-//  Modified : Marc TAJCHMAN
-//  Module : SALOME
-//  $Header$
-
+//
 #include "ToolsGUI_CatalogGeneratorDlg.h"
 
 #include "SUIT_Application.h"
-#include "SUIT_Desktop.h"
 #include "SUIT_MessageBox.h"
-#include "SUIT_Tools.h"
+//#include "SUIT_Tools.h"
 #include "SUIT_Session.h"
 
 #include <stdlib.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qgroupbox.h>
-#include <qstringlist.h>
-#include <qregexp.h>
-#include <qvalidator.h>
-#include <qfile.h>
+
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QStringList>
+#include <QRegExp>
+#include <QIntValidator>
+#include <QFile>
 
 #include <OSD_Process.hxx>
 #include <OSD_Path.hxx>
@@ -60,39 +56,47 @@ using namespace std;
 #define MIN_EDIT_SIZE          250
 
 /*!
-  Constructor
+  \class ToolsGUI_CatalogGeneratorDlg
+  \brief A dialog box which allows converting the IDL files 
+         to the XML description.
 */
-ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, const char* name )
-    : QDialog( parent, name, TRUE, WStyle_Customize | WStyle_NormalBorder | WStyle_Title | WStyle_SysMenu )
+
+/*!
+  \brief Constructor.
+  \param parent parent widget
+*/
+ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent )
+: QDialog( parent )
 {
-  if ( !name )
-    setName( "ToolsGUI_CatalogGeneratorDlg" );
-  resize( 322, 120 ); 
-  setCaption( tr( "TOOLS_CATALOG_GENERATOR" ) );
-  setSizeGripEnabled( TRUE );
+  setModal( true );
+
+  setWindowTitle( tr( "TOOLS_CATALOG_GENERATOR" ) );
+  setSizeGripEnabled( true );
 
   QGridLayout* aTopLayout = new QGridLayout(this);
-  aTopLayout->setMargin(MARGIN_SIZE);
-  aTopLayout->setSpacing(SPACING_SIZE);
+  aTopLayout->setMargin( MARGIN_SIZE );
+  aTopLayout->setSpacing( SPACING_SIZE );
 
-  QGroupBox* filesGrp = new QGroupBox( tr( "TOOLS_FILES") , this, "filesGrp" );
-  filesGrp->setColumnLayout( 0, Qt::Vertical );
-  filesGrp->layout()->setSpacing( 0 );
-  filesGrp->layout()->setMargin( 0 );
-  QGridLayout* filesGrpLayout = new QGridLayout( filesGrp->layout() );
+  QGroupBox* filesGrp = new QGroupBox( tr( "TOOLS_FILES") , this );
+  filesGrp->setObjectName( "filesGrp" );
+  QGridLayout* filesGrpLayout = new QGridLayout( filesGrp );
   filesGrpLayout->setAlignment( Qt::AlignTop );
   filesGrpLayout->setSpacing( SPACING_SIZE );
   filesGrpLayout->setMargin( MARGIN_SIZE  );
 
-  myIdlEdit = new QLineEdit( filesGrp, "myIdlEdit" );
+  myIdlEdit = new QLineEdit( filesGrp );
+  myIdlEdit->setObjectName( "myIdlEdit" );
   myIdlEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myIdlEdit->setMinimumSize( MIN_EDIT_SIZE, 0 );
-  myXmlEdit = new QLineEdit( filesGrp, "myXmlEdit" );
+  myXmlEdit = new QLineEdit( filesGrp );
+  myXmlEdit->setObjectName( "myXmlEdit" );
   myXmlEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myXmlEdit->setMinimumSize( MIN_EDIT_SIZE, 0 );
 
-  myBrowseIdlBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), filesGrp, "myBrowseIdlBtn" );
-  myBrowseXmlBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), filesGrp, "myBrowseXmlBtn" );
+  myBrowseIdlBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), filesGrp );
+  myBrowseIdlBtn->setObjectName( "myBrowseIdlBtn" );
+  myBrowseXmlBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), filesGrp );
+  myBrowseXmlBtn->setObjectName( "myBrowseXmlBtn" );
 //  QFontMetrics fm(myBrowseIdlBtn->font());
 //  myBrowseIdlBtn->setFixedWidth(fm.width(myBrowseIdlBtn->text()) + 10);
 //  myBrowseXmlBtn->setFixedWidth(fm.width(myBrowseXmlBtn->text()) + 10);
@@ -104,50 +108,56 @@ ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, con
   filesGrpLayout->addWidget( myXmlEdit, 1, 1 );
   filesGrpLayout->addWidget( myBrowseXmlBtn, 1, 2 );
 
-  QGroupBox* supplGrp = new QGroupBox(tr( "TOOLS_SUPPLEMENT" )  , this, "SupplGrp" );
-  supplGrp->setColumnLayout( 0, Qt::Vertical );
-  supplGrp->layout()->setSpacing( 0 );
-  supplGrp->layout()->setMargin( 0 );
-  QGridLayout* supplGrpLayout = new QGridLayout( supplGrp->layout() );
+  QGroupBox* supplGrp = new QGroupBox(tr( "TOOLS_SUPPLEMENT" )  , this );
+  supplGrp->setObjectName( "SupplGrp" );
+  QGridLayout* supplGrpLayout = new QGridLayout( supplGrp );
   supplGrpLayout->setAlignment( Qt::AlignTop );
   supplGrpLayout->setSpacing( SPACING_SIZE );
   supplGrpLayout->setMargin( MARGIN_SIZE  );
 
   QSize myMinimumSize(int(MIN_EDIT_SIZE*0.3), 0);
 
-  myAuthorEdit = new QLineEdit( supplGrp , "myAuthorEdit" );
+  myAuthorEdit = new QLineEdit( supplGrp );
+  myAuthorEdit->setObjectName( "myAuthorEdit" );
   myAuthorEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myAuthorEdit->setMinimumSize( myMinimumSize );
 
   OSD_Process aProcess;
   myAuthorEdit->setText(aProcess.UserName().ToCString());
 
-  myVersionEdit = new QLineEdit(supplGrp , "myVersion" );
+  myVersionEdit = new QLineEdit( supplGrp );
+  myVersionEdit->setObjectName( "myVersion" );
   myVersionEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myVersionEdit->setMinimumSize( myMinimumSize );
-  QStringList aList = QStringList::split(QRegExp("\\s+"),tr( "INF_VERSION" ));
+  QStringList aList = tr( "INF_VERSION" ).split(QRegExp("\\s+"), QString::SkipEmptyParts);
   myVersionEdit->setText(aList.last());
 
-  myPngEdit = new QLineEdit(supplGrp , "myCompIcon" );
+  myPngEdit = new QLineEdit( supplGrp );
+  myPngEdit->setObjectName( "myCompIcon" );
   myPngEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myPngEdit->setMinimumSize( MIN_EDIT_SIZE, 0 );
 
-  myBrowsePngBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), supplGrp, "myBrowsePngBtn" );
+  myBrowsePngBtn = new QPushButton( tr( "TOOLS_BUT_BROWSE" ), supplGrp );
+  myBrowsePngBtn->setObjectName( "myBrowsePngBtn" );
 
-  myCompName = new QLineEdit(supplGrp , "myCompName");
+  myCompName = new QLineEdit( supplGrp );
+  myCompName->setObjectName( "myCompName" );
   myCompName->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myCompName->setMinimumSize( myMinimumSize );
 
-  myCompUserName = new QLineEdit(supplGrp , "myCompUserName");
+  myCompUserName = new QLineEdit( supplGrp );
+  myCompUserName->setObjectName( "myCompUserName" );
   myCompUserName->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myCompUserName->setMinimumSize( (int)(MIN_EDIT_SIZE*0.3), 0 );
 
-  myCompType = new QLineEdit(supplGrp , "myCompType");
+  myCompType = new QLineEdit( supplGrp );
+  myCompType->setObjectName( "myCompType" );
   myCompType->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myCompType->setMinimumSize( myMinimumSize );
   myCompType->setText("OTHER");
 
-  myCompMultiStd = new QLineEdit(supplGrp , "myCompMultiStd");
+  myCompMultiStd = new QLineEdit( supplGrp );
+  myCompMultiStd->setObjectName( "myCompMultiStd" );
   myCompMultiStd->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myCompMultiStd->setMinimumSize( myMinimumSize );
   myCompMultiStd->setText("1");
@@ -167,18 +177,19 @@ ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, con
   supplGrpLayout->addWidget( new QLabel( tr( "TOOLS_COMP_TYPE" ), supplGrp ), 1, 4);
   supplGrpLayout->addWidget(myCompType,1,5);
   supplGrpLayout->addWidget( new QLabel( tr( "TOOLS_PNG_FILE" ), supplGrp ), 2, 0);
-  supplGrpLayout->addMultiCellWidget( myPngEdit, 2,2,1,4 );
+  supplGrpLayout->addWidget( myPngEdit, 2,1,1,4 );
   supplGrpLayout->addWidget( myBrowsePngBtn, 2, 5 );
-  
 
   QHBoxLayout* aBtnLayout = new QHBoxLayout;
   aBtnLayout->setSpacing( SPACING_SIZE );
   aBtnLayout->setMargin( 0 );
 
-  myApplyBtn = new QPushButton( tr( "TOOLS_BUT_APPLY"  ), this, "myApplyBtn" );
+  myApplyBtn = new QPushButton( tr( "TOOLS_BUT_APPLY"  ), this );
+  myApplyBtn->setObjectName( "myApplyBtn" );
   myApplyBtn->setAutoDefault( true );
   myApplyBtn->setDefault( true );
-  myCloseBtn = new QPushButton( tr( "TOOLS_BUT_CLOSE" ), this, "myCloseBtn" );
+  myCloseBtn = new QPushButton( tr( "TOOLS_BUT_CLOSE" ), this );
+  myCloseBtn->setObjectName( "myCloseBtn" );
   myCloseBtn->setAutoDefault( true );
   
   aBtnLayout->addWidget( myApplyBtn );
@@ -202,85 +213,95 @@ ToolsGUI_CatalogGeneratorDlg::ToolsGUI_CatalogGeneratorDlg( QWidget* parent, con
 }
 
 /*!
-  destructor
+  \brief Destructor
 */
 ToolsGUI_CatalogGeneratorDlg::~ToolsGUI_CatalogGeneratorDlg()
 {  
 }
 
 /*!
-  \return IDL file name entered
+  \brief Get IDL file name
+  \return IDL file name entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getIdlFile()
 {
-  return myIdlEdit->text().stripWhiteSpace();
+  return myIdlEdit->text().trimmed();
 }
 
 /*!
-  \return  XML file name entered
+  \brief Get XML file name
+  \return XML file name entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getXmlFile()
 {
-  return myXmlEdit->text().stripWhiteSpace();
+  return myXmlEdit->text().trimmed();
 }
 
 /*!
-  \return PNG file name entered
+  \brief Get module icon file name
+  \return icon file name entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getPngFile()
 {
-  return myPngEdit->text().stripWhiteSpace();
+  return myPngEdit->text().trimmed();
 }
 
 /*!
-  \return author 
+  \brief Get author name
+  \return author name entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getAuthor()
 {
-  return myAuthorEdit->text().stripWhiteSpace();
+  return myAuthorEdit->text().trimmed();
 }
 
 /*!
-  \return version number 
+  \brief Get version number 
+  \return version number entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getVersion()
 {
-  return myVersionEdit->text().stripWhiteSpace();
+  return myVersionEdit->text().trimmed();
 }
 
 /*!
-  \return name of the component
+  \brief Get component name
+  \return name of the component entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getCompName()
 {
-  return myCompName->text().stripWhiteSpace();
+  return myCompName->text().trimmed();
 }
 
 /*!
-  \return username of the component
+  \brief Get component title (user name)
+  \return title of the component entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getCompUserName()
 {
-  return myCompUserName->text().stripWhiteSpace();
+  return myCompUserName->text().trimmed();
 }
 
 /*!
-  \return type of the component
+  \brief Get multistudy flag
+  \return multistudy flag for the component entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getCompMultiStd()
 {
-  return myCompMultiStd->text().stripWhiteSpace();
+  return myCompMultiStd->text().trimmed();
 }
 
 /*!
-  \return type of the component
+  \brief Get component type
+  \return type of the component entered by the user
 */
 QString ToolsGUI_CatalogGeneratorDlg::getCompType()
 {
-  return myCompType->text().stripWhiteSpace();
+  return myCompType->text().trimmed();
 }
 
 /*!
+  \brief Get IDL path of the modules
   \return IDL path of modules
 */
 QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
@@ -315,7 +336,7 @@ QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
 }
 
 /*!
-  SLOT: called on Browse button click
+  \brief Called when user presses "Browse" button
 */
 void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
 {
@@ -324,18 +345,18 @@ void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
 
   if ( send == myBrowseIdlBtn ) {
-    QString file = app->getFileName( true, myIdlEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_IMPORT_IDL"), tr("TOOLS_MEN_IMPORT"), 0 );
+    QString file = app->getFileName( true, myIdlEdit->text().trimmed(), tr("TOOLS_MEN_IMPORT_IDL"), tr("TOOLS_MEN_IMPORT"), 0 );
     if ( !file.isEmpty() ) {
       myIdlEdit->setText(file);
     }
   } 
   else if ( send == myBrowseXmlBtn ) {
-    QString file = app->getFileName( false, myXmlEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_EXPORT_XML"), tr("TOOLS_MEN_EXPORT"), 0 );
+    QString file = app->getFileName( false, myXmlEdit->text().trimmed(), tr("TOOLS_MEN_EXPORT_XML"), tr("TOOLS_MEN_EXPORT"), 0 );
     if ( !file.isEmpty() ) {
       myXmlEdit->setText(file);
     }
   } else if ( send == myBrowsePngBtn ) {
-    QString file = app->getFileName( true, myPngEdit->text().stripWhiteSpace(), tr("TOOLS_MEN_IMPORT_PNG"), tr("TOOLS_MEN_IMPORT"), 0 );
+    QString file = app->getFileName( true, myPngEdit->text().trimmed(), tr("TOOLS_MEN_IMPORT_PNG"), tr("TOOLS_MEN_IMPORT"), 0 );
     if ( !file.isEmpty() ) {
       myPngEdit->setText(file);
     
@@ -345,16 +366,18 @@ void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
 }
 
 /*!
-  Updates <OK> button's state
+  \brief Update <OK> button's state.
 */
 void ToolsGUI_CatalogGeneratorDlg::updateButtonState()
 {
-  myApplyBtn->setEnabled( !myIdlEdit->text().stripWhiteSpace().isEmpty() && 
-			  !myXmlEdit->text().stripWhiteSpace().isEmpty() );
+  myApplyBtn->setEnabled( !myIdlEdit->text().trimmed().isEmpty() && 
+			  !myXmlEdit->text().trimmed().isEmpty() );
 }
 
 /*!
-  <Apply> button slot, performs IDL->XML conversion
+  \brief Called when user presses <Apply> button
+
+  Performs IDL to XML file conversion using \c runIDLparser SALOME utility.
 */
 void ToolsGUI_CatalogGeneratorDlg::onApply()
 {
@@ -371,26 +394,24 @@ void ToolsGUI_CatalogGeneratorDlg::onApply()
 
   if ( !XmlFile.isEmpty() && !IdlFile.isEmpty() ) {
     if ( !QFile::exists( IdlFile ) ) {
-      SUIT_MessageBox::error1( this, 
-			      tr("TOOLS_ERR_ERROR"), 
-			      tr("TOOLS_ERR_FILE_NOT_EXIST").arg(IdlFile), 
-			      tr ("TOOLS_BUT_OK") );
+      SUIT_MessageBox::critical( this, 
+				 tr("TOOLS_ERR_ERROR"), 
+				 tr("TOOLS_ERR_FILE_NOT_EXIST").arg(IdlFile) );
     }
     else {
       QString command = "";
       if ( getenv("KERNEL_ROOT_DIR")  )
 	command = QString( getenv( "KERNEL_ROOT_DIR" ) ) + "/bin/salome/runIDLparser -K " + IDLpath + " -Wbcatalog=" + XmlFile;
       else {
-	SUIT_MessageBox::error1( this, 
-				tr("TOOLS_ERR_ERROR"), 
-				tr("KERNEL_ROOT_DIR variable is not defined"), 
-				tr("TOOLS_BUT_OK") );
+	SUIT_MessageBox::critical( this, 
+				   tr("TOOLS_ERR_ERROR"), 
+				   tr("KERNEL_ROOT_DIR variable is not defined") );
       }
 
       if (!Author.isEmpty()) command += ",author=" + Author; 
       if (!Version.isEmpty()) command += ",version=" + Version;
       if (!PngFile.isEmpty()) {
-	OSD_Path aPath((Standard_CString)PngFile.latin1()); 
+	OSD_Path aPath((Standard_CString)PngFile.toLatin1().constData()); 
 	TCollection_AsciiString aFile = aPath.Name() + aPath.Extension();
 	command += QString(",icon=") + QString(aFile.ToCString());
       }
@@ -399,9 +420,9 @@ void ToolsGUI_CatalogGeneratorDlg::onApply()
       if (!CompType.isEmpty()) command += ",type=" + CompType;
       if (!CompMultiStd.isEmpty()) command += ",multistudy=" + CompMultiStd;
       command += " " + IdlFile;
-      MESSAGE( "shell command is : " << command );
+      MESSAGE( "shell command is : " << command.toLatin1().constData() );
       int res;
-      res = system( ( char* )( command.latin1() ) );
+      res = system( ( char* )( command.toLatin1().constData() ) );
       if ( res == -1 ) {
 	MESSAGE( "work failed (system command result = " << res );
       } else if (res == 217) {

@@ -1,4 +1,7 @@
-//  Copyright (C) 2005 OPEN CASCADE
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -14,18 +17,16 @@
 //  License along with this library; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  Author : OPEN CASCADE
-//
-
 // File:      GLViewer_ViewPort2d.h
 // Created:   November, 2004
-
+//
 #ifndef GLVIEWER_VIEWPORT2D_H
 #define GLVIEWER_VIEWPORT2D_H
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 
@@ -36,12 +37,11 @@
 #include "GLViewer_Widget.h"
 #include "GLViewer_Geom.h"
 
-#include <qgl.h>
-#include <qcolor.h>
-#include <qwidget.h>
-#include <qpaintdevice.h>
+#include <QtOpenGL>
+#include <QColor>
+#include <QPaintDevice>
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
@@ -51,6 +51,10 @@ class GLViewer_Object;
 class GLViewer_ViewFrame;
 
 class QtxToolTip;
+
+class QWidget;
+class QRubberBand;
+
 /*! 
  * Class GLViewer_ViewPort
  * 2D visualisation canvas of GLViewer
@@ -237,9 +241,11 @@ protected:
   QtxToolTip*            myObjectTip;
   //! flag to block mouse release event just after mouse double-click
   bool                   myIsMouseReleaseBlock;
+
+  QRubberBand*           myRectBand; //!< selection rectangle rubber band
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( default:4251 )
 #endif
 

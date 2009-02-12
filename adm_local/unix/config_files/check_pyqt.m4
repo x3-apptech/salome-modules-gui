@@ -1,329 +1,213 @@
-dnl Copyright (C) 2003  CEA/DEN, EDF R&D
-
+dnl  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+dnl
+dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+dnl
+dnl  This library is free software; you can redistribute it and/or
+dnl  modify it under the terms of the GNU Lesser General Public
+dnl  License as published by the Free Software Foundation; either
+dnl  version 2.1 of the License.
+dnl
+dnl  This library is distributed in the hope that it will be useful,
+dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl  Lesser General Public License for more details.
+dnl
+dnl  You should have received a copy of the GNU Lesser General Public
+dnl  License along with this library; if not, write to the Free Software
+dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+dnl
+dnl  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+dnl
 AC_DEFUN([CHECK_PYQT],[
 AC_REQUIRE([CHECK_PYTHON])dnl
 AC_REQUIRE([CHECK_QT])dnl
 AC_REQUIRE([CHECK_SIP])dnl
 AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
+dnl AC_LANG_SAVE
+dnl AC_LANG_CPLUSPLUS
 
 AC_ARG_WITH(pyqt,
     [  --with-pyqt=DIR      root directory path to PyQt installation ],
     [PYQTDIR="$withval"
-      AC_MSG_RESULT("select $withval as path to PyQt")
+      AC_MSG_RESULT([Try $withval as path to the PyQt])
     ])
 
 AC_ARG_WITH(pyqt_sips,
     [  --with-pyqt_sips=DIR      a directory path to PyQt sips installation ],
     [PYQT_SIPS="$withval"
-      AC_MSG_RESULT("select $withval as path to PyQt sips")
+      AC_MSG_RESULT([Try $withval as path to the PyQt sip files])
     ])
 
-
-AC_ARG_WITH(pyuic,
-    [  --with-pyuic=EXEC pyuic executable ],
+AC_ARG_WITH(pyuic4,
+    [  --with-pyuic4=EXEC pyuic4 executable ],
     [PYUIC="$withval"
-      AC_MSG_RESULT("select $withval as pyqt executable")
+      AC_MSG_RESULT([Try $withval as pyuic4 executable])
     ])
 
 AC_CHECKING(for pyqt)
 
-pyqt_ok=yes
+pyqt_ok=no
 
-dnl look for pyuic
-pyqt_uic_ok=no
-if test "x$PYUIC" != x; then
-  dnl try withval value
-  AC_CHECK_FILE($PYUIC,pyqt_uic_ok=yes,pyqt_uic_ok=no)
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  dnl try ${PYQTDIR}
-  if test "x${PYQTDIR}" != "x"; then
-    if test -d ${PYQTDIR} ; then
-      AC_CHECK_FILE(${PYQTDIR}/pyuic,pyqt_uic_ok=yes,pyqt_uic_ok=no)
-      if test "x$pyqt_uic_ok" == "xyes"; then
-        PYUIC="${PYQTDIR}/pyuic"
-      fi
-    fi
-  fi	
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  dnl try in $PATH
-  AC_PATH_PROG(PYUIC, pyuic)
-  if test "x$PYUIC" != x; then
-    PYQTDIR=$PYUIC
-    PYQTDIR=`dirname $PYQTDIR`
-    PYQTDIR=`dirname $PYQTDIR`
-    pyqt_uic_ok=yes
-  fi
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  dnl try ${SIPDIR}
-  if test "x${SIPDIR}" != "x"; then
-    if test -d ${SIPDIR} ; then
-      AC_CHECK_FILE(${SIPDIR}/pyuic,pyqt_uic_ok=yes,pyqt_uic_ok=no)
-      if test "x$pyqt_uic_ok" == "xyes"; then
-        PYUIC="${SIPDIR}/pyuic"
-      fi
-    fi
-  fi	
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  dnl try ${PYTHONHOME}/bin
-  if test "x${PYTHONHOME}" != "x"; then
-    if test -d ${PYTHONHOME}/bin ; then
-      AC_CHECK_FILE(${PYTHONHOME}/bin/pyuic,pyqt_uic_ok=yes,pyqt_uic_ok=no)
-      if test "x$pyqt_uic_ok" == "xyes"; then
-        PYUIC="${PYTHONHOME}/bin/pyuic"
-      fi
-    fi
-  fi	
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  dnl try /usr/bin
-  AC_CHECK_FILE(/usr/bin/pyuic,pyqt_uic_ok=yes,pyqt_uic_ok=no)
-  if test "x$pyqt_uic_ok" == "xyes"; then
-    PYUIC="/usr/bin/pyuic"
-  fi
-fi
-if test "x$pyqt_uic_ok" == "xno"; then
-  pyqt_ok=no
-fi
-
-dnl look for PyQt libs
-pyqt_lib_ok=no
-if test "x${PYQTDIR}" != "x"; then
-  dnl try {PYQTDIR}
-  AC_CHECK_FILE(${PYQTDIR}/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-  if test "x$pyqt_lib_ok" == "xyes"; then
-    if test "x${PYQTDIR}" = "x/usr/lib"
-    then
-      PYQT_LIBS="-lqtcmodule"
-    else
-      PYQT_LIBS="-L${PYQTDIR} -lqtcmodule"
-    fi
-  else 
-    AC_CHECK_FILE(${PYQTDIR}/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-    if test "x$pyqt_lib_ok" == "xyes"; then
-      if test "x${PYQTDIR}" = "x/usr/lib"
-      then
-        PYQT_LIBS=""
-      else
-        PYQT_LIBS="-L${PYQTDIR}"
-      fi
-    fi
-  fi
-  if test "x$pyqt_lib_ok" == "xno"; then
-    dnl try ${PYQTDIR}/lib
-    if test -d ${PYQTDIR}/lib; then
-      AC_CHECK_FILE(${PYQTDIR}/lib/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-      if test "x$pyqt_lib_ok" == "xyes"; then
-        PYQT_LIBS="-L${PYQTDIR}/lib -lqtcmodule"
-      else 
-        AC_CHECK_FILE(${PYQTDIR}/lib/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-        if test "x$pyqt_lib_ok" == "xyes"; then
-          PYQT_LIBS="-L${PYQTDIR}/lib"
-        fi
-      fi
-    fi
-  fi
-  if test "x$pyqt_lib_ok" == "xno"; then
-    dnl try ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
-    if test -d ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages; then
-      AC_CHECK_FILE(${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-      if test "x$pyqt_lib_ok" == "xyes"; then
-        PYQT_LIBS="-L${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
-      else 
-        AC_CHECK_FILE(${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-        if test "x$pyqt_lib_ok" == "xyes"; then
-          PYQT_LIBS="-L${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
-        fi
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_lib_ok" == "xno"; then
-  dnl try ${SIPDIR}
-  if test "x${SIPDIR}" != "x"; then
-    if test -d ${SIPDIR} ; then
-      AC_CHECK_FILE(${SIPDIR}/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-      if test "x$pyqt_lib_ok" == "xyes"; then
-        if test "x${SIPDIR}" = "x/usr/lib"
-        then
-          PYQT_LIBS="-lqtcmodule"
-        else
-          PYQT_LIBS="-L${SIPDIR} -lqtcmodule"
-        fi
-      else 
-        AC_CHECK_FILE(${SIPDIR}/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-        if test "x$pyqt_lib_ok" == "xyes"; then
-          if test "x${SIPDIR}" = "x/usr/lib"
-          then
-            PYQT_LIBS=""
-          else
-            PYQT_LIBS="-L${SIPDIR}"
-          fi
-        fi
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_lib_ok" == "xno"; then
-  dnl try ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
-  if test "x${PYTHONHOME}" != "x"; then
-    if test -d ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages ; then
-      AC_CHECK_FILE(${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-      if test "x$pyqt_lib_ok" == "xyes"; then
-        PYQT_LIBS="-L${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
-      else 
-        AC_CHECK_FILE(${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-        if test "x$pyqt_lib_ok" == "xyes"; then
-          PYQT_LIBS="-L${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
-        fi
-      fi
-    fi
-  fi	
-fi
-if test "x$pyqt_lib_ok" == "xno"; then
-  dnl try /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages
-  AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/libqtcmodule.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-  if test "x$pyqt_lib_ok" == "xyes"; then
-    PYQT_LIBS="-L/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages -lqtcmodule"
-  else 
-    AC_CHECK_FILE(/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/qt.so,pyqt_lib_ok=yes,pyqt_lib_ok=no)
-    if test "x$pyqt_lib_ok" == "xyes"; then
-      PYQT_LIBS="-L/usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
-    fi
-  fi
-fi
-if test "x$pyqt_lib_ok" == "xno"; then
-  pyqt_ok=no
-fi
-
-dnl look for PyQt sips
-pyqt_sips_ok=no
-dnl try ${PYQT_SIPS} or ${PYQT_SIPS}/qt
-if test "x${PYQT_SIPS}" != "x"; then
-  AC_CHECK_FILE(${PYQT_SIPS}/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-  if test "x$pyqt_sips_ok" == "xno"; then
-    AC_CHECK_FILE(${PYQT_SIPS}/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-    if test "x$pyqt_sips_ok" == "xyes"; then
-      PYQT_SIPS="${PYQT_SIPS}/qt"
-    fi
-  fi
-fi
-if test "x$pyqt_sips_ok" == "xno"; then
-  dnl try ${PYQTDIR}/sip
-  if test "x${PYQTDIR}" != "x"; then
-    if test -d ${PYQTDIR}/sip ; then
-      AC_CHECK_FILE(${PYQTDIR}/sip/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-      if test "x$pyqt_sips_ok" == "xyes"; then
-        PYQT_SIPS="${PYQTDIR}/sip"
-      else
-        AC_CHECK_FILE(${PYQTDIR}/sip/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-        if test "x$pyqt_sips_ok" == "xyes"; then
-          PYQT_SIPS="${PYQTDIR}/sip/qt"
-        fi
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_sips_ok" == "xno"; then
-  dnl try ${PYQTDIR}/share/sip/qt
-  if test "x${PYQTDIR}" != "x"; then
-    if test -d ${PYQTDIR}/share/sip/qt ; then
-      AC_CHECK_FILE(${PYQTDIR}/share/sip/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-      if test "x$pyqt_sips_ok" == "xyes"; then
-        PYQT_SIPS="${PYQTDIR}/share/sip/qt"
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_sips_ok" == "xno"; then
-  dnl try ${SIPDIR}/sip
-  if test "x${SIPDIR}" != "x"; then
-    if test -d ${SIPDIR}/sip ; then
-      AC_CHECK_FILE(${SIPDIR}/sip/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-      if test "x$pyqt_sips_ok" == "xyes"; then
-        PYQT_SIPS="${SIPDIR}/sip"
-      else
-        AC_CHECK_FILE(${SIPDIR}/sip/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-        if test "x$pyqt_sips_ok" == "xyes"; then
-          PYQT_SIPS="${SIPDIR}/sip/qt"
-        fi
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_sips_ok" == "xno"; then
-  dnl try /usr/share/sip
-  if test -d /usr/share/sip ; then
-    AC_CHECK_FILE(/usr/share/sip/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-    if test "x$pyqt_sips_ok" == "xyes"; then
-      PYQT_SIPS="/usr/share/sip"
-    else
-      AC_CHECK_FILE(/usr/share/sip/qt/qglobal.sip,pyqt_sips_ok=yes,pyqt_sips_ok=no)
-      if test "x$pyqt_sips_ok" == "xyes"; then
-        PYQT_SIPS="/usr/share/sip/qt"
-      fi
-    fi
-  fi
-fi
-if test "x$pyqt_sips_ok" == "xno"; then
-  pyqt_ok=no
+dnl check pyuic4
+if test "x$PYUIC" != "x" ; then
+    dnl try $withval value
+    AC_CHECK_FILE($PYUIC,pyqt_ok=yes,pyqt_ok=no)
 else
-  PYQT_INCLUDES="-I$PYQT_SIPS"
-  
-  dnl Additional sip flags required for correct wrappers compilation
-  AC_MSG_CHECKING(which qt classes should be excluded)
+    TEST_BIN_DIRS=""
+    if test "x${PYQTDIR}" != "x" ; then
+        TEST_BIN_DIRS="${TEST_BIN_DIRS} ${PYQTDIR} ${PYQTDIR}/bin"
+    fi
+    TEST_BIN_DIRS="${TEST_BIN_DIRS} __CHECK__PATH__"
+    if test "x${SIPDIR}" != "x" ; then
+        TEST_BIN_DIRS="${TEST_BIN_DIRS} ${SIPDIR} ${SIPDIR}/bin"
+    fi
+    if test "x${PYTHONHOME}" != "x" ; then
+        TEST_BIN_DIRS="${TEST_BIN_DIRS} ${PYTHONHOME}/bin"
+    fi
+    TEST_BIN_DIRS="${TEST_BIN_DIRS} /usr/bin"
 
-  PYQT_SIPFLAGS=""
-
-  CXXFLAGS_old=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS $QT_INCLUDES"
-  LIBS_old=$LIBS
-  LIBS="$LIBS $QT_LIBS"
-
-  AC_TRY_COMPILE([#include <qcdestyle.h>],
-                 [new QCDEStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_CDE")
-  AC_TRY_COMPILE([#include <qinterlacestyle.h>],
-                 [new QInterlaceStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_INTERLACE")
-  AC_TRY_COMPILE([#include <qmotifstyle.h>],
-                 [new QMotifStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_MOTIF")
-  AC_TRY_COMPILE([#include <qmotifplusstyle.h>],
-                 [new QMotifPlusStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_MOTIFPLUS")
-  AC_TRY_COMPILE([#include <qplatinumstyle.h>],
-                 [new QPlatinumStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_PLATINUM")
-  AC_TRY_COMPILE([#include <qsgistyle.h>],
-                 [new QSGIStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_SGI")
-  AC_TRY_COMPILE([#include <qwindowsstyle.h>],
-                 [new QWindowsStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_WINDOWS")
-  AC_TRY_COMPILE([#include <qwindowsxpstyle.h>],
-                 [new QWindowsXPStyle();],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_STYLE_WINDOWSXP")
-
-  LIBS="$LIBS -lqassistantclient"
-  AC_TRY_LINK([#include <qassistantclient.h>],
-              [new QAssistantClient("foo");],,PYQT_SIPFLAGS="$PYQT_SIPFLAGS -x Qt_ASSISTANTCLIENT")
-
-  AC_MSG_RESULT(done)
-
-  CXXFLAGS=$CXXFLAGS_old
-  LIBS=$LIBS_old
+    dnl search pyuic4
+    pyqt_ok=no
+    for d in ${TEST_BIN_DIRS} ; do
+        if test "x${d}" = "x__CHECK__PATH__" ; then
+            AC_PATH_PROG(TEMP, pyuic4)
+            if test "x${TEMP}" != "x" ; then
+                PYUIC=${TEMP}
+                if test "x$PYQTDIR" = "x" ; then
+                    PYQTDIR=`dirname ${PYUIC}`
+                    PYQTDIR=`dirname ${PYQTDIR}`
+                fi
+                pyqt_ok=yes
+                break
+            fi
+        else
+            if test -d $d ; then
+                AC_CHECK_FILE(${d}/pyuic4,pyqt_ok=yes,pyqt_ok=no)
+      	        if test "x$pyqt_ok" == "xyes" ; then
+                    PYUIC=${d}/pyuic4
+                    break
+                fi
+            fi
+        fi
+    done
 fi
-# get latest Qt version supported
-QT_VERS=`grep -e "[[[:space:]]]*Qt_[[[:digit:]_]]\+}" ${PYQT_SIPS}/versions.sip | sed -e "s/\(.*\)[[[:space:]]]*\(Qt_[[[:digit:]_]]\+\)}/\2/g"`
-AC_MSG_RESULT(Latest Qt version supported by PyQt is $QT_VERS)
+
+dnl check PyQt version
+if test "x$pyqt_ok" == "xyes" ; then
+    AC_MSG_CHECKING(whether PyQt version >= 4.2)
+    PYQT_VERSION=`${PYUIC} --version 2>&1 | grep "Python User Interface Compiler"`
+    if test "$?" != "0" ; then
+        PYQT_VERSION=`${PYUIC} -version 2>&1 | grep "Python User Interface Compiler"`
+    fi
+    if test "x${PYQT_VERSION}" != "x" ; then
+        PYQT_VERSION=`echo $PYQT_VERSION | sed -e 's%[[[:alpha:][:space:]]]*\([[[:digit:].]]*\).*%\1%g'`
+        PYQT_VERSION_ID=`echo $PYQT_VERSION | awk -F. '{v=$[1]*10000+$[2]*100+$[3];print v}'`
+    else
+        PYQT_VERSION="<unknown>"
+        PYQT_VERSION_ID=0
+    fi
+    if test $PYQT_VERSION_ID -ge 40200 ; then 
+        AC_MSG_RESULT(yes)
+        AC_MSG_RESULT(PyQt version is $PYQT_VERSION)
+    else
+        AC_MSG_RESULT(no)
+        AC_MSG_RESULT(WARNING! PyQt version $PYQT_VERSION is not supported (at least 4.2 is required)!)
+        pyqt_ok=no
+    fi
+else
+    AC_MSG_RESULT(Warning! pyuic4 is not found!)
+fi
+
+if test "x$pyqt_ok" == "xyes" ; then
+    TESTLIBFILE=QtCore.so
+    TESTSIPFILE=QtCore/QtCoremod.sip
+    TEST_LIB_DIRS=""
+    TEST_SIPS_DIRS=""
+    if test "x${PYQT_SIPS}" != "x" ; then
+        TEST_SIPS_DIRS="${TEST_SIPS_DIRS} ${PYQT_SIPS}"
+    fi
+    if test "x${PYQTDIR}" != "x" ; then
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${PYQTDIR} ${PYQTDIR}/lib ${PYQTDIR}/PyQt4"
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${PYQTDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/PyQt4"
+        TEST_SIPS_DIRS="${TEST_SIPS_DIRS} ${PYQTDIR} ${PYQTDIR}/sip"
+	TEST_SIPS_DIRS="${TEST_SIPS_DIRS} ${PYQTDIR}/share ${PYQTDIR}/share/sip"
+    fi
+    if test "x${SIPDIR}" != "x" ; then
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${SIPDIR} ${SIPDIR}/lib ${SIPDIR}/PyQt4"
+	TEST_LIB_DIRS="${TEST_LIB_DIRS} ${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
+	TEST_LIB_DIRS="${TEST_LIB_DIRS} ${SIPDIR}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/PyQt4"
+        TEST_SIPS_DIRS="${TEST_SIPS_DIRS} ${SIPDIR} ${SIPDIR}/sip"
+        TEST_SIPS_DIRS="${TEST_SIPS_DIRS} ${SIPDIR}/share ${SIPDIR}/share/sip ${SIPDIR}/share/sip/PyQt4"
+    fi
+    if test "x${PYTHONHOME}" != "x" ; then
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
+        TEST_LIB_DIRS="${TEST_LIB_DIRS} ${PYTHONHOME}/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/PyQt4"
+    fi
+    TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib${LIB_LOCATION_SUFFIX} /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
+    TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages/PyQt4"
+    TEST_SIPS_DIRS="${TEST_SIPS_DIRS} /usr/share/sip"
+    TEST_SIPS_DIRS="${TEST_SIPS_DIRS} /usr/share/sip/PyQt4"
+
+    dnl check PyQt libs
+    pyqt_ok=no
+    for d in ${TEST_LIB_DIRS} ; do
+        if test -d $d ; then
+            AC_CHECK_FILE(${d}/${TESTLIBFILE},pyqt_ok=yes,pyqt_ok=no)
+            if test "x$pyqt_ok" == "xyes" ; then
+                if test "x${d}" = "x/usr/lib${LIB_LOCATION_SUFFIX}" ; then
+                    PYQT_LIBS=""
+                else
+                    PYQT_LIBS="-L${d}"
+                fi
+                break
+            fi
+        fi
+    done
+
+    dnl check PyQt sips
+    if test "x$pyqt_ok" == "xyes" ; then
+        pyqt_ok=no
+        for d in ${TEST_SIPS_DIRS} ; do
+            if test -d $d ; then
+                AC_CHECK_FILE(${d}/${TESTSIPFILE},pyqt_ok=yes,pyqt_ok=no)
+                if test "x$pyqt_ok" == "xyes" ; then
+                    PYQT_SIPS=${d}
+                    PYQT_INCLUDES="-I ${d}"
+                    PYQT_INCLUDES="${PYQT_INCLUDES} -I ${d}/QtCore -I ${d}/QtGui"
+                    PYQT_INCLUDES="${PYQT_INCLUDES} -I ${d}/QtXml -I ${d}/QtOpenGL"
+                    PYQT_INCLUDES="${PYQT_INCLUDES} -I ${d}/QtAssistant -I ${d}/QtDesigner"
+                    PYQT_INCLUDES="${PYQT_INCLUDES} -I ${d}/QtNetwork -I ${d}/QtSql"
+                    PYQT_INCLUDES="${PYQT_INCLUDES} -I ${d}/QtSvg -I ${d}/QtTest"
+
+                    # check compatibility with Qt
+                    SUPPORTED=`grep -e "[[[:space:]]]*Qt_[[[:digit:]_]]\+}" ${PYQT_SIPS}/QtCore/QtCoremod.sip | sed -e "s/\(.*\)[[[:space:]]]*\(Qt_[[[:digit:]_]]\+\)}/\2/g"`
+                    SUPPORTED=`echo $SUPPORTED | sed -e "s/Qt_//g" -e "s/_/./g"`
+                    SUPPORTED_ID=`echo $SUPPORTED | awk -F. '{v=$[1]*10000+$[2]*100+$[3];print v}'`
+                    if test $SUPPORTED_ID -lt $QT_VERSION_ID ; then 
+                        AC_MSG_RESULT(Warning! Used Qt version ($QT_VERSION) is not supported by PyQt)
+                        AC_MSG_RESULT(Latest supported Qt version is ${SUPPORTED})
+                    else
+                        SUPPORTED=${QT_VERSION}
+                    fi
+                    SUPPORTED="Qt_`echo ${SUPPORTED} | sed -e 's/\./_/g'`"
+                    PYQT_SIPFLAGS="-x VendorID -x PyQt_NoPrintRangeBug -t WS_X11 -t ${SUPPORTED} -g -s ".cc" -c . ${PYQT_INCLUDES}"
+                    break
+                fi
+            fi
+        done
+    fi
+fi
 
 AC_SUBST(PYQT_INCLUDES)
 AC_SUBST(PYQT_LIBS)
 AC_SUBST(PYQT_SIPS)
 AC_SUBST(PYUIC)
 AC_SUBST(PYQT_SIPFLAGS)
-AC_SUBST(QT_VERS)
 
-AC_LANG_RESTORE
+dnl AC_LANG_RESTORE
 
 AC_MSG_RESULT(for pyqt: $pyqt_ok)
 

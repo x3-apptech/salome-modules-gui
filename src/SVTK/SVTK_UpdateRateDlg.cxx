@@ -1,48 +1,47 @@
+//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//
-//  Copyright (C) 2003  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS 
-// 
-//  This library is free software; you can redistribute it and/or 
-//  modify it under the terms of the GNU Lesser General Public 
-//  License as published by the Free Software Foundation; either 
-//  version 2.1 of the License. 
-// 
-//  This library is distributed in the hope that it will be useful, 
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-//  Lesser General Public License for more details. 
-// 
-//  You should have received a copy of the GNU Lesser General Public 
-//  License along with this library; if not, write to the Free Software 
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA 
-// 
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-//
-//
 //  File   : 
 //  Author : 
 //  Module : SALOME
 //  $Header$
-
+//
 #include "SVTK_UpdateRateDlg.h"
 
-#include "SVTK_MainWindow.h"
+#include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
 #include "VTKViewer_Algorithm.h"
 #include "SALOME_Actor.h"
 
-#include "QtxDblSpinBox.h"
+#include "QtxDoubleSpinBox.h"
 #include "QtxAction.h"
 
 #include <sstream>
 
-#include <qgroupbox.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qlineedit.h>
+#include <QGroupBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QLineEdit>
 
 #include <vtkGenericRenderWindowInteractor.h>
 #include <vtkCallbackCommand.h>
@@ -165,7 +164,7 @@ namespace
 */
 SVTK_UpdateRateDlg
 ::SVTK_UpdateRateDlg(QtxAction* theAction,
-		     SVTK_MainWindow* theParent,
+		     SVTK_ViewWindow* theParent,
 		     const char* theName):
   SVTK_DialogBase(theAction,
 		  theParent, 
@@ -178,25 +177,26 @@ SVTK_UpdateRateDlg
   vtkRenderWindowInteractor* aRWI = myRWInteractor->GetDevice();
   bool anIsEnabledUpdateRate = false;
 
-  setCaption(tr("DLG_TITLE"));
-  QVBoxLayout* aVBoxLayout = new QVBoxLayout(this, 5, 5);
+  setWindowTitle(tr("DLG_TITLE"));
+  QVBoxLayout* aVBoxLayout = new QVBoxLayout(this);
+  aVBoxLayout->setMargin(5);
+  aVBoxLayout->setSpacing(5);
   {
     QGroupBox* aGroupBox = new QGroupBox(tr("INPUT_FRAME_TITLE"), this);
-    aGroupBox->setColumnLayout(0, Qt::Vertical );
-    aGroupBox->layout()->setSpacing( 6 );
-    aGroupBox->layout()->setMargin( 11 );
 
     aGroupBox->setCheckable(true);
     aGroupBox->setChecked(anIsEnabledUpdateRate);
     myIsEnableUpdateRateGroupBox = aGroupBox;
 
-    QGridLayout* aGridLayout = new QGridLayout(aGroupBox->layout());
+    QGridLayout* aGridLayout = new QGridLayout(aGroupBox);
+    aGridLayout->setSpacing( 6 );
+    aGridLayout->setMargin( 11 );
     {
       QLabel* aLabel = new QLabel(tr("DESIRED"), aGroupBox);
       aLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       aGridLayout->addWidget(aLabel, 0, 0);
 
-      QtxDblSpinBox* aDblSpinBox = new QtxDblSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
+      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
       aDblSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       aGridLayout->addWidget(aDblSpinBox, 0, 1);
 
@@ -210,7 +210,7 @@ SVTK_UpdateRateDlg
       aLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       aGridLayout->addWidget(aLabel, 1, 0);
 
-      QtxDblSpinBox* aDblSpinBox = new QtxDblSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
+      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
       aDblSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       aGridLayout->addWidget(aDblSpinBox, 1, 1);
 
@@ -223,11 +223,10 @@ SVTK_UpdateRateDlg
   }
   {
     QGroupBox* aGroupBox = new QGroupBox(tr("INFORMATION_FRAME_TITLE"), this);
-    aGroupBox->setColumnLayout(0, Qt::Vertical );
-    aGroupBox->layout()->setSpacing( 6 );
-    aGroupBox->layout()->setMargin( 11 );
-
-    QGridLayout* aGridLayout = new QGridLayout(aGroupBox->layout());
+    
+    QGridLayout* aGridLayout = new QGridLayout(aGroupBox);
+    aGridLayout->layout()->setSpacing( 6 );
+    aGridLayout->layout()->setMargin( 11 );
     {
       QLabel* aLabel = new QLabel(tr("CURRENT_FPS"), aGroupBox);
       aLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
