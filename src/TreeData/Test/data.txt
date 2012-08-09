@@ -1,0 +1,15 @@
+Tuyauterie;RF1;T1
+Tuyauterie;RF1;T2
+Tuyauterie;RF1;T3
+Tuyauterie;RF2;T1
+Tuyauterie;RF3;T1
+Tuyauterie;RF3;T2
+Composansts;RF1;T1
+Composansts;RF1;T2
+Composansts;RF3;T2
+Genie Civil;RF1;T1
+Genie Civil;RF1;T2
+Genie Civil;RF1;T3
+Genie Civil;RF2;T1
+Genie Civil;RF3;T1
+Genie Civil;RF3;T2
