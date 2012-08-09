@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxToolTip.cxx
 // Author:    Sergey TELKOV
 //
@@ -48,21 +49,21 @@ QtxToolTip::QtxToolTip( QWidget* parent )
   palette.setColor( backgroundRole(), QColor( 255, 255, 231 ) );
   setPalette( palette );
 
-	myWidgetRegion = QRect( -1, -1, -1, -1 );
+        myWidgetRegion = QRect( -1, -1, -1, -1 );
 
-	setFrameShape( QFrame::Panel );
-	setFrameShadow( QFrame::Plain );
+        setFrameShape( QFrame::Panel );
+        setFrameShadow( QFrame::Plain );
 
   parent->setMouseTracking( true );
-	parent->installEventFilter( this );
-	installEventFilter( this );
+        parent->installEventFilter( this );
+        installEventFilter( this );
 
-	mySleepTimer = new QTimer( this );
+        mySleepTimer = new QTimer( this );
         mySleepTimer->setSingleShot( true );
-	myWakeUpTimer = new QTimer( this );
+        myWakeUpTimer = new QTimer( this );
         myWakeUpTimer->setSingleShot( true );
-	connect( mySleepTimer,  SIGNAL( timeout() ), this, SLOT( onSleepTimeOut()  ) );
-	connect( myWakeUpTimer, SIGNAL( timeout() ), this, SLOT( onWakeUpTimeOut() ) );
+        connect( mySleepTimer,  SIGNAL( timeout() ), this, SLOT( onSleepTimeOut()  ) );
+        connect( myWakeUpTimer, SIGNAL( timeout() ), this, SLOT( onWakeUpTimeOut() ) );
 
   myWakeUpDelayTime = 700;
   myShowDelayTime = 5000;
@@ -80,49 +81,49 @@ QtxToolTip::~QtxToolTip()
 */
 bool QtxToolTip::eventFilter( QObject* o, QEvent* e )
 {
-	if ( ( e->type() == QEvent::Destroy ) || ( e->type() == QEvent::Close ) || ( e->type() == QEvent::Hide ) )
-	{
-		hideTip();
-	}
-	if ( e->type() == QEvent::Leave )
-	{
-		if ( isVisible() && ( o == this ) )
-			hideTip();
-		myWakeUpTimer->stop();
-	}
-	if ( e->type() == QEvent::MouseMove )
-	{
-		QMouseEvent* me = (QMouseEvent*)e;
-		QPoint thePos = parentWidget()->mapFromGlobal( me->globalPos() );
-		if ( myWakeUpTimer->isActive() )
-		{
-			myWakeUpTimer->stop();
-			myWakeUpTimer->start( myWakeUpDelayTime );
-		}
-		if ( isVisible() )
-		{
-			if ( !myWidgetRegion.contains( thePos ) )
+        if ( ( e->type() == QEvent::Destroy ) || ( e->type() == QEvent::Close ) || ( e->type() == QEvent::Hide ) )
+        {
+                hideTip();
+        }
+        if ( e->type() == QEvent::Leave )
+        {
+                if ( isVisible() && ( o == this ) )
+                        hideTip();
+                myWakeUpTimer->stop();
+        }
+        if ( e->type() == QEvent::MouseMove )
+        {
+                QMouseEvent* me = (QMouseEvent*)e;
+                QPoint thePos = parentWidget()->mapFromGlobal( me->globalPos() );
+                if ( myWakeUpTimer->isActive() )
+                {
+                        myWakeUpTimer->stop();
+                        myWakeUpTimer->start( myWakeUpDelayTime );
+                }
+                if ( isVisible() )
+                {
+                        if ( !myWidgetRegion.contains( thePos ) )
       {
-				hideTip();
+                                hideTip();
         myWidgetRegion = QRect( -1, -1, -1, -1 );
       }
-		}
-		else
-		{
-			if ( !myWidgetRegion.isValid() || myWidgetRegion.contains( thePos ) )
-				myWakeUpTimer->start( myWakeUpDelayTime );
-		}
-	}
-	if ( e->type() == QEvent::KeyPress )
-	{
-		hideTip();
-	}
-	if ( o == parent() && ( e->type() == QEvent::MouseButtonPress ||
+                }
+                else
+                {
+                        if ( !myWidgetRegion.isValid() || myWidgetRegion.contains( thePos ) )
+                                myWakeUpTimer->start( myWakeUpDelayTime );
+                }
+        }
+        if ( e->type() == QEvent::KeyPress )
+        {
+                hideTip();
+        }
+        if ( o == parent() && ( e->type() == QEvent::MouseButtonPress ||
                           e->type() == QEvent::MouseButtonRelease ) )
-	{
-		hideTip();
-	}
-	return false;
+        {
+                hideTip();
+        }
+        return false;
 }
 
 /*!
@@ -133,10 +134,10 @@ bool QtxToolTip::eventFilter( QObject* o, QEvent* e )
 */
 void QtxToolTip::showTip( const QPoint& aPos, const QString& text, const QRect& aWidgetRegion )
 {
-	QFontMetrics theFM = fontMetrics();
-	int theHeight = theFM.height();
-	int theWidth = theFM.width( text ) + 2;
-	showTip( QRect( QPoint( aPos.x(), aPos.y() + 10 ), QSize( theWidth, theHeight ) ), text, aWidgetRegion );
+        QFontMetrics theFM = fontMetrics();
+        int theHeight = theFM.height();
+        int theWidth = theFM.width( text ) + 2;
+        showTip( QRect( QPoint( aPos.x(), aPos.y() + 10 ), QSize( theWidth, theHeight ) ), text, aWidgetRegion );
 }
 
 /*!
@@ -147,12 +148,12 @@ void QtxToolTip::showTip( const QPoint& aPos, const QString& text, const QRect& 
 */
 void QtxToolTip::showTip( const QRect& aRegion, const QString& text, const QRect& aWidgetRegion )
 {
-	setText( text );
-	myWidgetRegion = aWidgetRegion;
-	setGeometry( aRegion );
-	if ( myShowDelayTime != 0 )
-		mySleepTimer->start( myShowDelayTime );
-	show();
+        setText( text );
+        myWidgetRegion = aWidgetRegion;
+        setGeometry( aRegion );
+        if ( myShowDelayTime != 0 )
+                mySleepTimer->start( myShowDelayTime );
+        show();
 }
 
 /*!
@@ -160,9 +161,9 @@ void QtxToolTip::showTip( const QRect& aRegion, const QString& text, const QRect
 */
 void QtxToolTip::hideTip()
 {
-	hide();
+        hide();
   myWidgetRegion = QRect( -1, -1, -1, -1 );
-	mySleepTimer->stop();
+        mySleepTimer->stop();
 }
 
 /*!
@@ -172,23 +173,23 @@ void QtxToolTip::hideTip()
 */
 void QtxToolTip::maybeTip( const QPoint& pos )
 {
-	QString text;
-	QRect textRegion, theRegion( -1, -1, -1, -1 );
-	QFont theFnt = font();
+        QString text;
+        QRect textRegion, theRegion( -1, -1, -1, -1 );
+        QFont theFnt = font();
 
     emit maybeTip( pos, text, theFnt, textRegion, theRegion );
 
     if ( theRegion.isValid() )
-	{
-		setFont( theFnt );
-		int margin = lineWidth() + indent();
-		QRect dspRegion( QPoint( textRegion.x() - margin, textRegion.y() ),
-				         QSize( textRegion.width() + 2 * margin, textRegion.height() ) );
-		QRect tipRegion( parentWidget()->mapToGlobal( dspRegion.topLeft() ), dspRegion.size() );
-		if ( tipRegion.left() < 0 )
-			tipRegion.translate( -1 * tipRegion.left(), 0 );
-		showTip( tipRegion, text, theRegion );
-	}
+        {
+                setFont( theFnt );
+                int margin = lineWidth() + indent();
+                QRect dspRegion( QPoint( textRegion.x() - margin, textRegion.y() ),
+                                         QSize( textRegion.width() + 2 * margin, textRegion.height() ) );
+                QRect tipRegion( parentWidget()->mapToGlobal( dspRegion.topLeft() ), dspRegion.size() );
+                if ( tipRegion.left() < 0 )
+                        tipRegion.translate( -1 * tipRegion.left(), 0 );
+                showTip( tipRegion, text, theRegion );
+        }
 }
 
 /*!
@@ -196,8 +197,8 @@ void QtxToolTip::maybeTip( const QPoint& pos )
 */
 void QtxToolTip::onSleepTimeOut()
 {
-	mySleepTimer->stop();
-	hideTip();
+        mySleepTimer->stop();
+        hideTip();
 }
 
 /*!
@@ -205,7 +206,7 @@ void QtxToolTip::onSleepTimeOut()
 */
 void QtxToolTip::onWakeUpTimeOut()
 {
-	myWakeUpTimer->stop();
+        myWakeUpTimer->stop();
   QPoint pos = QCursor::pos();
   if ( parentWidget() )
     pos = parentWidget()->mapFromGlobal( pos );
@@ -217,12 +218,12 @@ void QtxToolTip::onWakeUpTimeOut()
 */
 void QtxToolTip::mousePressEvent( QMouseEvent* e )
 {
-	hideTip();
-	QWidget* reciever = parentWidget();
-	QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonPress,
-									   reciever->mapFromGlobal( e->globalPos() ),
-									   e->button(), e->buttons(), Qt::KeypadModifier );
-	QApplication::sendEvent( reciever, me );
+        hideTip();
+        QWidget* reciever = parentWidget();
+        QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonPress,
+                                                                           reciever->mapFromGlobal( e->globalPos() ),
+                                                                           e->button(), e->buttons(), Qt::KeypadModifier );
+        QApplication::sendEvent( reciever, me );
 }
 
 /*!
@@ -230,12 +231,12 @@ void QtxToolTip::mousePressEvent( QMouseEvent* e )
 */
 void QtxToolTip::mouseDoubleClickEvent( QMouseEvent* e )
 {
-	hideTip();
-	QWidget* reciever = parentWidget();
-	QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonDblClick,
-									   reciever->mapFromGlobal( e->globalPos() ),
-									   e->button(), e->buttons(), Qt::KeypadModifier );
-	QApplication::sendEvent( reciever, me );
+        hideTip();
+        QWidget* reciever = parentWidget();
+        QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonDblClick,
+                                                                           reciever->mapFromGlobal( e->globalPos() ),
+                                                                           e->button(), e->buttons(), Qt::KeypadModifier );
+        QApplication::sendEvent( reciever, me );
 }
 
 /*!

@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:      QtxPathListEdit.cxx
 // Author:    Sergey TELKOV
 //
@@ -505,24 +503,24 @@ bool QtxPathListEdit::validate( const bool quietMode )
       if (found) {
         if (found != myLastSelected) {
           // it is forbidden to add directory more then once
-	  if ( !quietMode )
-	    QMessageBox::critical(this, 
-				  tr("Error"),
-				  tr("Directory already specified."), 
-				  tr("Ok"));
-	  myEdit->setFocus();
+          if ( !quietMode )
+            QMessageBox::critical(this, 
+                                  tr("Error"),
+                                  tr("Directory already specified."), 
+                                  tr("Ok"));
+          myEdit->setFocus();
           return false;
         }
       }
       else {
         if (!dir.exists()) {
-	  if ( !quietMode && QMessageBox::information(this, 
-						      tr("Warning"),
-						      tr("%1\n\nThe directory doesn't exist.\nAdd directory anyway?").arg(dir.absPath()),
-						      tr("Yes"), tr("No"), QString(), 1, 1) == 1) {
-	    myEdit->setFocus();
+          if ( !quietMode && QMessageBox::information(this, 
+                                                      tr("Warning"),
+                                                      tr("%1\n\nThe directory doesn't exist.\nAdd directory anyway?").arg(dir.absPath()),
+                                                      tr("Yes"), tr("No"), QString(), 1, 1) == 1) {
+            myEdit->setFocus();
             return false;
-	  }
+          }
         }
         // append
         appendDir(myLastSelected, dir.absPath());
@@ -764,22 +762,23 @@ bool QtxPathListEdit::checkExistance( const QString& str, const bool msg )
   if ( pathType() == Qtx::PT_SaveFile )
     return true;
 
-  bool ok = QFileInfo( str ).exists();
+  QFileInfo aFI = QFileInfo( Qtx::makeEnvVarSubst( str ) );
+  bool ok = aFI.exists();
   if ( !ok && msg )
     ok = QMessageBox::question( this, tr( "Warning" ), tr( "Path \"%1\" doesn't exist. Add it to list anyway?" ).arg( str ),
                                 QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes;
 
-  if ( ok && QFileInfo( str ).exists() )
+  if ( ok && aFI.exists() )
   {
     switch ( pathType() )
     {
     case Qtx::PT_OpenFile:
-      ok = QFileInfo( str ).isFile();
+      ok = aFI.isFile();
       if ( !ok && msg )
         QMessageBox::warning( this, tr( "Error" ), tr( "Location \"%1\" doesn't point to file" ).arg( str ) );
       break;
     case Qtx::PT_Directory:
-      ok = QFileInfo( str ).isDir();
+      ok = aFI.isDir();
       if ( !ok && msg )
         QMessageBox::warning( this, tr( "Error" ), tr( "Location \"%1\" doesn't point to directory" ).arg( str ) );
       break;

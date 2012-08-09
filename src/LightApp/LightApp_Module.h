@@ -1,34 +1,37 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      LightApp_Module.h
 // Created:   6/20/2005 16:25:06 AM
 // Author:    OCC team
-//
+
 #ifndef LIGHTAPP_MODULE_H
 #define LIGHTAPP_MODULE_H
 
 #include "LightApp.h"
 #include "LightApp_Preferences.h"
 #include <CAM_Module.h>
+
+#include <SUIT_DataObject.h>
 
 class LightApp_Application;
 class LightApp_Selection;
@@ -38,7 +41,7 @@ class LightApp_Displayer;
 class LightApp_SelectionMgr;
 
 class SUIT_Study;
-class SUIT_DataObject;
+//class SUIT_DataObject;
 class SUIT_Operation;
 class SUIT_ViewManager;
 class CAM_Application;
@@ -77,20 +80,38 @@ public:
 
   virtual void                        update( const int );
   // Update viewer or/and object browser etc. in accordance with update flags
-  // ( see SalomeApp_UpdateFlags enumeration ). Derived modules can redefine this method
+  // (see SalomeApp_UpdateFlags enumeration). Derived modules can redefine this method
   // for their own purposes
 
   virtual void                        updateObjBrowser( bool = true, SUIT_DataObject* = 0 );
-  // Update object bropwser ( for updating model or whole object browser use update() method
-  // can be used )
+  // Update object browser (for updating model or whole object browser use update() method)
 
   virtual void                        selectionChanged();
   virtual void                        preferencesChanged( const QString&, const QString& );
+  virtual void                        message( const QString& );
 
   virtual void                        studyActivated() {};
 
   virtual LightApp_Displayer*         displayer();
   virtual LightApp_Selection*         createSelection() const;
+
+  virtual bool                        canCopy() const;
+  virtual bool                        canPaste() const;
+  virtual bool                        isDraggable( const SUIT_DataObject* ) const;
+  virtual bool                        isDropAccepted( const SUIT_DataObject* ) const;
+  virtual void                        dropObjects( const DataObjectList&, SUIT_DataObject*,
+						   const int, Qt::DropAction );
+  virtual void                        copy();
+  virtual void                        paste();
+  virtual bool                        renameAllowed( const QString& ) const;
+  virtual bool                        renameObject( const QString&, const QString& );
+
+  int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const int, const int, const int = -1, const int = -1 );
+  int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
 
 public slots:
   virtual bool                        activateModule( SUIT_Study* );
@@ -115,10 +136,13 @@ protected:
 
   virtual CAM_DataModel*              createDataModel();
 
+  virtual bool                        reusableOperation( const int id );
+
   int                                 addPreference( const QString& label );
-  int                                 addPreference( const QString& label, const int pId, const int = LightApp_Preferences::Auto,
-				                     const QString& section = QString(),
-				                     const QString& param = QString() );
+  int                                 addPreference( const QString& label, const int pId,
+                                                     const int type = LightApp_Preferences::Auto,
+                                                     const QString& section = QString(),
+                                                     const QString& param = QString() );
   QVariant                            preferenceProperty( const int, const QString& ) const;
   void                                setPreferenceProperty( const int, const QString&, const QVariant& );
 

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : PyConsole_Console.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -39,6 +40,8 @@
 #include <QEvent>
 #include <QMenu>
 #include <QVBoxLayout>
+
+#include <utilities.h>
 
 /*!
   \brief Constructor.
@@ -63,6 +66,12 @@ PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp 
   QVBoxLayout* lay = new QVBoxLayout( this );
   lay->setMargin( 0 );
   myEditor = new PyConsole_Editor( myInterp, this );
+  char* synchronous = getenv("PYTHON_CONSOLE_SYNC");
+  if (synchronous && atoi(synchronous))
+  {
+      MESSAGE("Python console is synchronous");
+      myEditor->setIsSync(true);
+  }
   myEditor->viewport()->installEventFilter( this );
   lay->addWidget( myEditor );
 
@@ -128,6 +137,54 @@ void PyConsole_Console::setIsSync( const bool on )
 }
 
 /*!
+  \brief Get suppress output flag value.
+  
+  \sa setIsSuppressOutput()
+  \return True if python console output is suppressed.
+*/
+bool PyConsole_Console::isSuppressOutput() const
+{
+  return myEditor->isSuppressOutput();
+}
+
+/*!
+  \brief Set suppress output flag value.
+
+  In case if suppress output flag is true, the python 
+  console output suppressed.
+
+  \param on suppress output flag
+*/
+void PyConsole_Console::setIsSuppressOutput( const bool on )
+{
+  myEditor->setIsSuppressOutput(on);
+}
+
+/*!
+  \brief Get 'show banner' flag value.
+  
+  \sa setIsShowBanner()
+  \return \c true if python console shows banner
+*/
+bool PyConsole_Console::isShowBanner() const
+{
+  return myEditor->isShowBanner();
+}
+
+/*!
+  \brief Set 'show banner' flag value.
+
+  The banner is shown in the top of the python console window.
+
+  \sa isShowBanner()
+  \param on 'show banner' flag
+*/
+void PyConsole_Console::setIsShowBanner( const bool on )
+{
+  myEditor->setIsShowBanner( on );
+}
+
+/*!
   \brief Change the python console's font.
   \param f new font
 */
@@ -185,6 +242,8 @@ void PyConsole_Console::contextMenuPopup( QMenu* menu )
   menu->addAction( myActions[ClearId] );
   menu->addSeparator();
   menu->addAction( myActions[SelectAllId] );
+  menu->addSeparator();
+  menu->addAction( myActions[DumpCommandsId] );
 
   Qtx::simplifySeparators( menu );
 
@@ -205,6 +264,7 @@ void PyConsole_Console::setMenuActions( const int flags )
   myActions[PasteId]->setVisible( flags & PasteId );
   myActions[ClearId]->setVisible( flags & ClearId );
   myActions[SelectAllId]->setVisible( flags & SelectAllId );
+  myActions[DumpCommandsId]->setVisible( flags & DumpCommandsId );
 }
 
 /*!
@@ -219,6 +279,7 @@ int PyConsole_Console::menuActions() const
   ret = ret | ( myActions[PasteId]->isVisible() ? PasteId : 0 );
   ret = ret | ( myActions[ClearId]->isVisible() ? ClearId : 0 );
   ret = ret | ( myActions[SelectAllId]->isVisible() ? SelectAllId : 0 );
+  ret = ret | ( myActions[DumpCommandsId]->isVisible() ? DumpCommandsId : 0 );
   return ret;
 }
 
@@ -248,6 +309,11 @@ void PyConsole_Console::createActions()
   a->setStatusTip( tr( "EDIT_SELECTALL_CMD" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( selectAll() ) );
   myActions.insert( SelectAllId, a );
+  
+  a = new QAction( tr( "EDIT_DUMPCOMMANDS_CMD" ), this );
+  a->setStatusTip( tr( "EDIT_DUMPCOMMANDS_CMD" ) );
+  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( dump() ) );
+  myActions.insert( DumpCommandsId, a );
 }
 
 /*!

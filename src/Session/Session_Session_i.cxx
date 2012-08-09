@@ -1,30 +1,28 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  SALOME Session : implementation of Session.idl
 //  File   : SALOME_Session_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : SALOME
-//  $Header$
-//
+
 #include "utilities.h"
 
 #include "Session_Session_i.hxx"
@@ -36,6 +34,8 @@
 #include "SUIT_Desktop.h"
 #include "SUIT_Study.h"
 
+#include "Basics_Utils.hxx"
+
 #include <QMutex>
 #include <QWaitCondition>
 
@@ -45,20 +45,19 @@
 
 #ifdef WNT
 # include <process.h>
+#else
+#include <unistd.h>
 #endif
-
-
-using namespace std;
 
 /*!
   constructor
 */
 SALOME_Session_i::SALOME_Session_i(int argc,
-				   char ** argv,
-				   CORBA::ORB_ptr orb,
-				   PortableServer::POA_ptr poa,
-				   QMutex* GUIMutex,
-				   QWaitCondition* GUILauncher)
+                                   char ** argv,
+                                   CORBA::ORB_ptr orb,
+                                   PortableServer::POA_ptr poa,
+                                   QMutex* GUIMutex,
+                                   QWaitCondition* GUILauncher)
 {
   _argc = argc ;
   _argv = argv ;
@@ -69,22 +68,23 @@ SALOME_Session_i::SALOME_Session_i(int argc,
   _GUIMutex = GUIMutex;
   _GUILauncher = GUILauncher;
   _NS = new SALOME_NamingService(_orb);
+  _isShuttingDown = false;
   //MESSAGE("constructor end");
 }
 
 /*!
   returns Visu component
 */
-Engines::Component_ptr SALOME_Session_i::GetComponent(const char* theLibraryName)
+Engines::EngineComponent_ptr SALOME_Session_i::GetComponent(const char* theLibraryName)
 {
-  typedef Engines::Component_ptr TGetImpl(CORBA::ORB_ptr,
-					  PortableServer::POA_ptr,
-					  SALOME_NamingService*,QMutex*);
+  typedef Engines::EngineComponent_ptr TGetImpl(CORBA::ORB_ptr,
+                                                PortableServer::POA_ptr,
+                                                SALOME_NamingService*,QMutex*);
   OSD_SharedLibrary  aSharedLibrary(const_cast<char*>(theLibraryName));
   if(aSharedLibrary.DlOpen(OSD_RTLD_LAZY))
     if(OSD_Function anOSDFun = aSharedLibrary.DlSymb("GetImpl"))
       return ((TGetImpl (*)) anOSDFun)(_orb,_poa,_NS,_GUIMutex);
-  return Engines::Component::_nil();
+  return Engines::EngineComponent::_nil();
 }
 
 /*!
@@ -121,6 +121,25 @@ void SALOME_Session_i::NSregister()
 }
 
 /*!
+  Unregister session server from CORBA Naming Service
+*/
+void SALOME_Session_i::NSunregister()
+{
+  try
+    {
+      _NS->Destroy_Name("/Kernel/Session");
+    }
+  catch (ServiceUnreachable&)
+    {
+      INFOS("Caught exception: Naming Service Unreachable");
+    }
+  catch (...)
+    {
+      INFOS("Caught unknown exception from Naming Service");
+    }
+}
+
+/*!
   Launches the GUI if there is none.
   The Corba method is oneway (corba client does'nt wait for GUI completion)
 */
@@ -131,8 +150,8 @@ void SALOME_Session_i::GetInterface()
   if ( !SUIT_Session::session() )
   {
     _GUILauncher->wakeAll();
-    MESSAGE("SALOME_Session_i::GetInterface() called, starting GUI...")
-      }
+    MESSAGE("SALOME_Session_i::GetInterface() called, starting GUI...");
+  }
 }
 
 /*!
@@ -142,19 +161,38 @@ class CloseEvent : public SALOME_Event
 {
 public:
   virtual void Execute() {
-    SUIT_Session* session = SUIT_Session::session();
-    session->closeSession( SUIT_Session::DONT_SAVE );
-    //if ( SUIT_Application::getDesktop() )
-    //  QAD_Application::getDesktop()->closeDesktop( true );
+    if ( SUIT_Session::session() )
+      SUIT_Session::session()->closeSession( SUIT_Session::DONT_SAVE );
   }
 };
 
 /*!
-  Processes event to close session
+  Stop session (close all GUI windows)
 */
 void SALOME_Session_i::StopSession()
 {
-  ProcessVoidEvent( new CloseEvent() );
+  _GUIMutex->lock();
+  _GUIMutex->unlock();
+  if ( SUIT_Session::session() ) {
+    ProcessVoidEvent( new CloseEvent() );
+  }
+}
+
+//! Shutdown session
+void SALOME_Session_i::Shutdown()
+{
+  _GUIMutex->lock();
+  bool isBeingShuttingDown = _isShuttingDown;
+  _isShuttingDown = true;
+  _GUIMutex->unlock();
+  if ( !isBeingShuttingDown ) {
+    if ( SUIT_Session::session() ) {
+      ProcessVoidEvent( new CloseEvent() );
+    }
+    else {
+      _GUILauncher->wakeAll();
+    }
+  }
 }
 
 /*!
@@ -182,16 +220,19 @@ SALOME::StatSession SALOME_Session_i::GetStatSession()
       _runningStudies = SUIT_Session::session()->activeApplication()->getNbStudies();
   }
 
-  _GUIMutex->unlock();
-
   // getting stat info
   SALOME::StatSession_var myStats = new SALOME::StatSession ;
   if (_runningStudies)
     myStats->state = SALOME::running ;
+  else if (_isShuttingDown)
+    myStats->state = SALOME::shutdown ;
   else
     myStats->state = SALOME::asleep ;
   myStats->runningStudies = _runningStudies ;
   myStats->activeGUI = _isGUI ;
+
+  _GUIMutex->unlock();
+
   return myStats._retn() ;
 }
 
@@ -214,6 +255,12 @@ CORBA::Long SALOME_Session_i::getPID() {
 #endif
 }
 
+char* SALOME_Session_i::getHostname()
+{
+  std::string aHostName = Kernel_Utils::GetHostname();
+  return CORBA::string_dup( aHostName.data() );
+}
+
 bool SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)
 {
   class TEvent: public SALOME_Event {
@@ -223,7 +270,7 @@ bool SALOME_Session_i::restoreVisualState(CORBA::Long theSavePoint)
     virtual void Execute() {
       SUIT_Study* study = SUIT_Session::session()->activeApplication()->activeStudy();
       if ( study ) {
-	study->restoreState(_savePoint);
+        study->restoreState(_savePoint);
       }
     }
   };
@@ -254,7 +301,7 @@ void SALOME_Session_i::emitMessage(const char* theMessage)
   if ( SUIT_Session::session() ) {
     if ( SUIT_Session::session()->activeApplication() ) {
       if ( SUIT_Session::session()->activeApplication()->desktop() ) {
-	ProcessVoidEvent( new TEvent(theMessage) );
+        ProcessVoidEvent( new TEvent(theMessage) );
       }
     }
   }

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef VTKVIEWER_TRIHEDRON_H
 #define VTKVIEWER_TRIHEDRON_H
 
@@ -35,8 +36,21 @@ class vtkPolyDataMapper;
 class vtkLineSource;
 class vtkConeSource;
 class vtkVectorText;
+class vtkTextActor;
+class vtkTextMapper;
 
 class VTKViewer_Axis;
+
+#if !defined(VTK_XVERSION)
+#define VTK_XVERSION (VTK_MAJOR_VERSION<<16)+(VTK_MINOR_VERSION<<8)+(VTK_BUILD_VERSION)
+#endif
+
+// VTKViewer_UnScaledActor is temporarily replaced with simple vtkTextActor
+// This workaround caused by the bug with disappeared labels of the trihedron
+// reproduced after migration from qt-4.4.3 to qt-4.5.2
+#if (VTK_XVERSION < 0x050200)
+#define IPAL21440
+#endif
 
 /*! \class vtkFollower
  * See <a href="http://www.vtk.org/">vtk documentation</a>
@@ -81,10 +95,17 @@ public:
   /*!Create new instance of VTKViewer_LineActor.*/
   static VTKViewer_LineActor *New();
   
-  /*! Sets Lable actor.
+#ifdef IPAL21440
+  /*! Sets Label actor.
+   * \param theLabelActor - vtkTextActor
+   */
+  void SetLabelActor(vtkTextActor* theLabelActor);
+#else
+  /*! Sets Label actor.
    * \param theLabelActor - VTKViewer_UnScaledActor
    */
   void SetLabelActor(VTKViewer_UnScaledActor* theLabelActor);
+#endif
   
   /*! Sets Arrow actor.
    * \param theLabelActor - VTKViewer_UnScaledActor
@@ -108,7 +129,11 @@ protected:
   }
 
   /*!Label actor pointer*/
+#ifdef IPAL21440
+  vtkTextActor* LabelActor;
+#else
   VTKViewer_UnScaledActor* LabelActor;
+#endif
 
   /*!Arrow actor pointer*/
   vtkFollower* ArrowActor;
@@ -226,9 +251,12 @@ public:
    */
   virtual void SetCamera(vtkCamera* theCamera);
 
-  /*! Sets \a theProperty for actors: myLineActor,myLabelActor,myArrowActor
+  /*! Sets color for actors: myLineActor,myLabelActor,myArrowActor
+   * \param theRed - red component of the color
+   * \param theGreen - green component of the color
+   * \param theBlue - blue component of the color
    */
-  virtual void SetProperty(vtkProperty* theProperty);
+  virtual void SetColor(double theRed, double theGreen, double theBlue);
   
   /*! Set size of VTKViewer_Axis
    */
@@ -237,7 +265,11 @@ public:
   /*! Get label actor.
    * \retval Return myLabelActor.
    */
+#ifdef IPAL21440
+  virtual vtkTextActor* GetLabel() { return myLabelActor; }
+#else
   virtual VTKViewer_UnScaledActor* GetLabel() { return myLabelActor; }
+#endif
   
   /*! Get arrow actor.
    * \retval Return myArrowActor
@@ -273,7 +305,11 @@ protected:
 
   /*! VTKViewer_UnScaledActor actor pointer
    */
+#ifdef IPAL21440
+  vtkTextActor *myLabelActor;
+#else
   VTKViewer_UnScaledActor *myLabelActor;
+#endif
   
   /*! \li myMapper[0] - for the Line pipe-line representation
    *  \li myMapper[1] - for the Arrow pipe-line representation
@@ -289,9 +325,15 @@ protected:
    */
   vtkConeSource *myConeSource;
 
+#ifdef IPAL21440
+  /*! vtkTextMapper pointer (Label)
+   */
+  vtkTextMapper *myTextMapper;
+#else
   /*! VTKViewer_VectorText pointer (Label)
    */
   vtkVectorText* myVectorText;
+#endif
 };
 
 #endif

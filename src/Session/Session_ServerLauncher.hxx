@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME Session : implementation of Session_ServerLauncher.hxx
 //  File   : Session_ServerLauncher.hxx
 //  Author : Paul RASCLE, EDF
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef _SESSION_SERVERLAUNCHER_HXX_
 #define _SESSION_SERVERLAUNCHER_HXX_
 
@@ -35,8 +34,6 @@
 #include <vector>
 #include <string>
 #include <QThread>
-
-using namespace std;
 
 class SESSION_EXPORT ServArg
   {
@@ -61,13 +58,13 @@ class SESSION_EXPORT Session_ServerLauncher: public QThread
 public:
   Session_ServerLauncher();
   Session_ServerLauncher(int argc,
-			 char ** argv, 
-			 CORBA::ORB_ptr orb, 
-			 PortableServer::POA_ptr poa,
-			 QMutex *GUIMutex,
-			 QWaitCondition *ServerLaunch,
-			 QMutex *SessionMutex,
-			 QWaitCondition *SessionStarted);
+                         char ** argv, 
+                         CORBA::ORB_ptr orb, 
+                         PortableServer::POA_ptr poa,
+                         QMutex *GUIMutex,
+                         QWaitCondition *ServerLaunch,
+                         QMutex *SessionMutex,
+                         QWaitCondition *SessionStarted);
   virtual ~Session_ServerLauncher();
   void run();
   void KillAll();
@@ -77,17 +74,17 @@ protected:
   void ActivateAll();
 
 private:
-  int _argc;
-  char ** _argv;
-  CORBA::ORB_var              _orb;
-  PortableServer::POA_var     _root_poa;
-  QMutex*                     _GUIMutex;
-  QWaitCondition*             _ServerLaunch;
-  QMutex*                     _SessionMutex;
-  QWaitCondition*             _SessionStarted;
-  list<ServArg>               _argServToLaunch;
-  vector<string>              _argCopy;
-  list<Session_ServerThread*> _serverThreads;
+  int                              _argc;
+  char**                           _argv;
+  CORBA::ORB_var                    _orb;
+  PortableServer::POA_var          _root_poa;
+  QMutex*                          _GUIMutex;
+  QWaitCondition*                  _ServerLaunch;
+  QMutex*                          _SessionMutex;
+  QWaitCondition*                  _SessionStarted;
+  std::list<ServArg>               _argServToLaunch;
+  std::vector<std::string>         _argCopy;
+  std::list<Session_ServerThread*> _serverThreads;
 };
 
 #endif

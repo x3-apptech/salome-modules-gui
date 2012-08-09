@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -97,10 +76,6 @@
         <translation>Rotation</translation>
     </message>
     <message>
-        <source>OCC_IMAGE_FILES</source>
-        <translation>Images Files (*.bmp *.png *.jpg *.jpeg)</translation>
-    </message>
-    <message>
         <source>DSC_FRONT_VIEW</source>
         <translation>Front View</translation>
     </message>
@@ -161,6 +136,14 @@
         <translation>Right View</translation>
     </message>
     <message>
+        <source>DSC_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate view counterclockwise</translation>
+    </message>
+    <message>
+        <source>DSC_CLOCKWISE_VIEW</source>
+        <translation>Rotate View Clockwise</translation>
+    </message>
+    <message>
         <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
         <translation>Change Rotation Point</translation>
     </message>
@@ -209,6 +192,14 @@
         <translation>Restore View</translation>
     </message>
     <message>
+        <source>MNU_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate counterclockwise</translation>
+    </message>
+    <message>
+        <source>MNU_CLOCKWISE_VIEW</source>
+        <translation>Rotate clockwise</translation>
+    </message>
+    <message>
         <source>MNU_RIGHT_VIEW</source>
         <translation>Right</translation>
     </message>
@@ -217,8 +208,20 @@
         <translation>Restore view</translation>
     </message>
     <message>
-        <source>LBL_TOOLBAR_LABEL</source>
-        <translation>View Operations</translation>
+        <source>LBL_XYTOOLBAR_LABEL</source>
+        <translation>XY View Operations</translation>
+    </message>
+    <message>
+        <source>LBL_XZTOOLBAR_LABEL</source>
+        <translation>XZ View Operations</translation>
+    </message>
+    <message>
+        <source>LBL_YZTOOLBAR_LABEL</source>
+        <translation>YZ View Operations</translation>
+    </message>
+    <message>
+        <source>LBL_3DTOOLBAR_LABEL</source>
+        <translation>3D View Operations</translation>
     </message>
     <message>
         <source>DSC_BACK_VIEW</source>
@@ -233,8 +236,72 @@
         <translation>Scaling</translation>
     </message>
     <message>
+        <source>DSC_GRADUATED_AXES</source>
+        <translation>Graduated axes</translation>
+    </message>
+    <message>
+        <source>MNU_GRADUATED_AXES</source>
+        <translation>Graduated axes</translation>
+    </message>
+    <message>
+        <source>DSC_AMBIENT</source>
+        <translation>Toogle keep only ambient light</translation>
+    </message>
+    <message>
+        <source>MNU_AMBIENT</source>
+        <translation>Toogle keep only ambient light</translation>
+    </message>
+    <message>
+        <source>DSC_STYLE_SWITCH</source>
+        <translation>Interaction style switch</translation>
+    </message>
+    <message>
+        <source>MNU_STYLE_SWITCH</source>
+        <translation>Interaction style switch</translation>
+    </message>
+    <message>
+        <source>DSC_ZOOMING_STYLE_SWITCH</source>
+        <translation>Zooming style switch</translation>
+    </message>
+    <message>
+        <source>MNU_ZOOMING_STYLE_SWITCH</source>
+        <translation>Zooming style switch</translation>
+    </message>
+    <message>
         <source>OCC_IMAGE_FILES</source>
         <translation>Images Files (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
+    </message>
+    <message>
+        <source>OCC_TEXTURE_FILES</source>
+        <translation>Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+    </message>
+    <message>
+        <source>DSC_MAXIMIZE_VIEW</source>
+        <translation>Maximize view</translation>
+    </message>
+    <message>
+        <source>DSC_MINIMIZE_VIEW</source>
+        <translation>Minimize view</translation>
+    </message>
+    <message>
+        <source>DSC_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize view</translation>
+    </message>
+    <message>
+        <source>MNU_MAXIMIZE_VIEW</source>
+        <translation>Maximize</translation>
+    </message>
+    <message>
+        <source>MNU_MINIMIZE_VIEW</source>
+        <translation>Minimize</translation>
+    </message>
+    <message>
+        <source>MNU_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize</translation>
+    </message>
+    <message>
+        <source>MNU_SYNC_NO_VIEW</source>
+        <translation>[ No appropriate view ]</translation>
     </message>
 </context>
 <context>
@@ -293,8 +360,64 @@
         <translation>Show Toolbar</translation>
     </message>
     <message>
-        <source>MEN_CHANGE_BACKGROUD</source>
+        <source>MEN_CHANGE_BACKGROUND</source>
         <translation>Change Background...</translation>
+    </message>
+    <message>
+        <source>MEN_CHANGE_IMAGE</source>
+        <translation>Set/Change Background Image...</translation>
+    </message>
+    <message>
+        <source>SELECT_IMAGE</source>
+        <translation>Select image...</translation>
+    </message>
+    <message>
+        <source>CENTERED</source>
+        <translation>in centered mode</translation>
+    </message>
+    <message>
+        <source>TILED</source>
+        <translation>in tiled mode</translation>
+    </message>
+    <message>
+        <source>STRETCHED</source>
+        <translation>in stretched mode</translation>
+    </message>
+    <message>
+        <source>GT_HORIZONTALGRADIENT</source>
+        <translation>Horizontal gradient</translation>
+    </message>
+    <message>
+        <source>GT_VERTICALGRADIENT</source>
+        <translation>Vertical gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTDIAGONALGRADIENT</source>
+        <translation>First diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDDIAGONALGRADIENT</source>
+        <translation>Second diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTCORNERGRADIENT</source>
+        <translation>First corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDCORNERGRADIENT</source>
+        <translation>Second corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_THIRDCORNERGRADIENT</source>
+        <translation>Third corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_FORTHCORNERGRADIENT</source>
+        <translation>Fourth corner gradient</translation>
+    </message>
+    <message>
+        <source>BG_IMAGE_FILES</source>
+        <translation>Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
     </message>
 </context>
 <context>

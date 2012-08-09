@@ -1,29 +1,33 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SUIT_DataObject.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
+#include <QVariant>
+
 #include "SUIT_DataObject.h"
 #include "SUIT_DataObjectKey.h"
+#include <cstdio>
 
 SUIT_DataObject::Signal* SUIT_DataObject::mySignal = 0;
 
@@ -47,7 +51,8 @@ SUIT_DataObject::SUIT_DataObject( SUIT_DataObject* p )
 : myParent( 0 ),
   myOpen( false ),
   myCheck( false ),
-  myAutoDel( true )
+  myAutoDel( true ),
+  _modified( false )
 {
   setParent( p );
   signal()->emitCreated( this );
@@ -281,6 +286,19 @@ void SUIT_DataObject::insertChild( SUIT_DataObject* obj, int position )
 }
 
 /*!
+  \brief Insert new child object into the list of the children (faster version of insertChild without signal).
+  \param obj child object being added
+  \param position child position
+*/
+void SUIT_DataObject::insertChildAtPos( SUIT_DataObject* obj, int position )
+{
+  if ( !obj )return;
+  int pos = position < 0 ? myChildren.count() : position;
+  myChildren.insert( qMin( pos, (int)myChildren.count() ), obj );
+  obj->assignParent( this );
+}
+
+/*!
   \brief Remove the specified child object reference.
   \param obj child object being removed
   \param del if \c true, the child object is destroyed
@@ -371,6 +389,14 @@ void SUIT_DataObject::setParent( SUIT_DataObject* p )
 
   if ( parent() )
     parent()->appendChild( this );
+}
+
+void SUIT_DataObject::assignParent( SUIT_DataObject* p )
+{
+  if ( p == myParent )
+    return;
+
+  myParent = p;
 }
 
 /*!
@@ -520,6 +546,24 @@ int SUIT_DataObject::alignment( const int /*id*/ ) const
   return Qt::AlignLeft;
 }
 
+bool SUIT_DataObject::expandable() const
+{
+  return true;
+}
+
+/*!
+  \brief Check if the object is visible.
+
+  This method can be re-implemented in the subclasses.
+  Default implementation returns \c true (all objects are visible by default).
+
+  \return \c true if this object is displayable or \c false otherwise
+*/
+bool SUIT_DataObject::isVisible() const
+{
+  return true;
+}
+
 /*!
   \brief Check if the object is draggable.
 
@@ -528,23 +572,20 @@ int SUIT_DataObject::alignment( const int /*id*/ ) const
 
   \return \c true if it is possible to drag this object
 */
-bool SUIT_DataObject::isDragable() const
+bool SUIT_DataObject::isDraggable() const
 {
   return false;
 }
 
 /*!
-  \brief Check if the drop operation fo this object is possible.
+  \brief Check if the drop operation for this object is possible.
 
   This method can be re-implemented in the subclasses.
   Default implementation returns \c false (drop operation is not allowed).
 
-  \param obj object being dropped
-  \return \c true if it is possible to drop an object \c obj
-          to this object
+  \return \c true if it is possible to drop one or more objects (currently selected) to this object
 */
-
-bool SUIT_DataObject::isDropAccepted( SUIT_DataObject* /*obj*/ )
+bool SUIT_DataObject::isDropAccepted() const
 {
   return false;
 }
@@ -587,6 +628,32 @@ bool SUIT_DataObject::isSelectable() const
 */
 bool SUIT_DataObject::isCheckable( const int /*id*/ ) const
 {
+  return false;
+}
+
+/*!
+  \brief Check if this object is can't be renamed in place
+
+  This method can be re-implemented in the subclasses.
+  Default implementation returns \c false (all objects can not be renamed).
+
+  \param id column id
+  \return \c true if the item can be renamed by the user in place (e.g. in the Object browser)
+*/
+bool SUIT_DataObject::renameAllowed( const int /*id*/ ) const
+{
+  return false;
+}
+
+/*!
+  \brief Set name of the this object.
+
+  This method can be re-implemented in the subclasses.
+  Default implementation returns \c false.
+
+  \return \c true if rename operation finished successfully, \c false otherwise.
+*/
+bool SUIT_DataObject::setName(const QString& /*name*/) {
   return false;
 }
 
@@ -676,7 +743,7 @@ bool SUIT_DataObject::customSorting( const int /*id*/ ) const
   \sa customSorting()
 */
 bool SUIT_DataObject::compare( const QVariant& /*left*/, const QVariant& /*right*/,
-			       const int /*id*/ ) const
+                               const int /*id*/ ) const
 {
   return false;
 }
@@ -806,7 +873,7 @@ SUIT_DataObject::Signal::Signal()
 SUIT_DataObject::Signal::~Signal()
 {
   for ( DataObjectList::Iterator it = myDelLaterObjects.begin();
-	it != myDelLaterObjects.end(); ++it ) {
+        it != myDelLaterObjects.end(); ++it ) {
     delete *it;
   }
   myDelLaterObjects.clear();
@@ -894,7 +961,12 @@ int SUIT_DataObject::groupId() const
 {
   return 0;
 }
-
+/*!
+  \brief return custom data for data object.
+ */
+QVariant SUIT_DataObject::customData(Qtx::CustomDataType /*type*/) {
+  return QVariant();
+}
 /*!
   \fn void SUIT_DataObject::Signal::created( SUIT_DataObject* object );
   \brief Emitted when data object is created.

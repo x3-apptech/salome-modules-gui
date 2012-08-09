@@ -2,6 +2,7 @@
 
 \page select_color_and_font_page Select Color and Font
 
+\anchor select_color_dlg
 <b>Select Color</b> and <b>Select Font</b> menus are used in many
 Preferences.
 
@@ -17,6 +18,7 @@ colors or by typing in its numeric parameters in the lower right
 corner of the window, then click <b>Add to Custom Colors</b> button. The
 chosen color will be added to <b>Custom Colors</b> table.
 
+\anchor font_color_dlg
 <br><h2>Select font</h2>
 
 \image html selectfont.png

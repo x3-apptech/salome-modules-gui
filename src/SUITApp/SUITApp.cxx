@@ -1,52 +1,53 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#if defined WIN32
 
-#ifdef SUIT_ENABLE_PYTHON
-#undef SUIT_ENABLE_PYTHON
-#endif
-
-#else //#if defined WIN32
-
-#ifndef SUIT_ENABLE_PYTHON
+//#if defined WIN32
+//#ifdef SUIT_ENABLE_PYTHON
+//#undef SUIT_ENABLE_PYTHON
+//#endif
+//#else //#if defined WIN32
+//#ifndef SUIT_ENABLE_PYTHON
 // NOTE: DO NOT DELETE THIS DEFINITION ON LINUX
 // or make sure Python is initialized in main() in any case
 // Otherwise, application based on light SALOME and using Python 
 // are unlikely to work properly.
-#define SUIT_ENABLE_PYTHON
-#include <Python.h>
+//#define SUIT_ENABLE_PYTHON
+//#include <Python.h>
+//#endif
+//
+#ifdef SUIT_ENABLE_PYTHON
+#include "SUITApp_init_python.hxx"
 #endif
 
-#endif //#if defined WIN32
+//#endif //#if defined WIN32
 
+#include "GUI_version.h"
 #include "SUITApp_Application.h"
-
-#include <SUIT_Session.h>
-#include <SUIT_Desktop.h>
-#include <SUIT_ResourceMgr.h>
-#include <Style_Salome.h>
-#include <QtxSplash.h>
-
-#include <SUIT_LicenseDlg.h>
+#include "SUIT_Desktop.h"
+#include "SUIT_LicenseDlg.h"
+#include "SUIT_ResourceMgr.h"
+#include "SUIT_Session.h"
+#include "Style_Salome.h"
+#include "QtxSplash.h"
 
 #include <QDir>
 #include <QFile>
@@ -62,56 +63,39 @@
 
 static QString salomeVersion()
 {
-  QString path( ::getenv( "GUI_ROOT_DIR" ) );
-  if ( !path.isEmpty() )
-    path += QDir::separator();
-
-  path += QString( "bin/salome/VERSION" );
-
-  QFile vf( path );
-  if ( !vf.open( QFile::ReadOnly ) )
-    return QString();
-
-  QString line = vf.readLine( 1024 );
-  vf.close();
-
-  if ( line.isEmpty() )
-    return QString();
-
-  while ( !line.isEmpty() && line.at( line.length() - 1 ) == QChar( '\n' ) )
-    line.remove( line.length() - 1, 1 );
-
-  QString ver;
-  int idx = line.lastIndexOf( ":" );
-  if ( idx != -1 )
-    ver = line.mid( idx + 1 ).trimmed();
-
-  return ver;
+  return GUI_VERSION_STR;
 }
 
-static void MessageOutput( QtMsgType type, const char* msg )
+static QString getAppName( const QString& libName )
 {
-  switch ( type )
-  {
-  case QtDebugMsg:
-#ifdef _DEBUG_
-    printf( "Debug: %s\n", msg );
-#endif
-    break;
-  case QtWarningMsg:
-#ifdef _DEBUG_
-    printf( "Warning: %s\n", msg );
-#endif
-    break;
-  case QtFatalMsg:
-#ifdef _DEBUG_
-    printf( "Fatal: %s\n", msg );
-#endif
-    break;
-  default:
-    break;
-  }
+  QString appName = QFileInfo( libName ).baseName();
+  if ( appName.startsWith( "lib" ) ) appName = appName.mid( 3 );
+  return appName;
 }
+
+// static void MessageOutput( QtMsgType type, const char* msg )
+// {
+//   switch ( type )
+//   {
+//   case QtDebugMsg:
+// #ifdef _DEBUG_
+//     printf( "Debug: %s\n", msg );
+// #endif
+//     break;
+//   case QtWarningMsg:
+// #ifdef _DEBUG_
+//     printf( "Warning: %s\n", msg );
+// #endif
+//     break;
+//   case QtFatalMsg:
+// #ifdef _DEBUG_
+//     printf( "Fatal: %s\n", msg );
+// #endif
+//     break;
+//   default:
+//     break;
+//   }
+// }
 
 /* XPM */
 static const char* pixmap_not_found_xpm[] = {
@@ -172,15 +156,15 @@ private:
 
 int main( int argc, char* argv[] )
 {
-#ifdef SUIT_ENABLE_PYTHON
-  // First of all initialize Python, as in complex multi-component applications
-  // someone else might initialize it some way unsuitable for light SALOME!
-  Py_SetProgramName( argv[0] );
-  Py_Initialize(); // Initialize the interpreter
-  PySys_SetArgv( argc,  argv );
-  PyEval_InitThreads(); // Create (and acquire) the interpreter lock
-  PyEval_ReleaseLock(); // Let the others use Python API until we need it again
-#endif
+  //#ifdef SUIT_ENABLE_PYTHON
+  //  // First of all initialize Python, as in complex multi-component applications
+  //  // someone else might initialize it some way unsuitable for light SALOME!
+  //  Py_SetProgramName( argv[0] );
+  //  Py_Initialize(); // Initialize the interpreter
+  //  PySys_SetArgv( argc,  argv );
+  //  PyEval_InitThreads(); // Create (and acquire) the interpreter lock
+  //  PyEval_ReleaseLock(); // Let the others use Python API until we need it again
+  //#endif
 
   //qInstallMsgHandler( MessageOutput );
 
@@ -189,7 +173,7 @@ int main( int argc, char* argv[] )
   bool iniFormat        = false;
   bool noSplash         = false;
   bool useLicense       = false;
-  for ( int i = 1; i < argc /*&& !noExceptHandling*/; i++ )
+  for ( int i = 1; i < argc; i++ )
   {
     if ( !strcmp( argv[i], "--noexcepthandling" ) )
       noExceptHandling = true;
@@ -197,13 +181,25 @@ int main( int argc, char* argv[] )
       iniFormat = true;
     else if ( !strcmp( argv[i], "--nosplash") )
       noSplash = true;
-	else if ( !strcmp( argv[i], "--uselicense" ) )
+    else if ( !strcmp( argv[i], "--uselicense" ) )
       useLicense = true;
-	else
+    else
       argList.append( QString( argv[i] ) );
   }
 
+  // add $QTDIR/plugins to the pluins search path for image plugins
+  QString qtdir( ::getenv( "QTDIR" ) );
+  if ( !qtdir.isEmpty() )
+    QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
+  
   SUITApp_Application app( argc, argv );
+  QString cfgAppName = getAppName( argList.isEmpty() ? QString() : argList.first() );
+  // hard-coding for LightApp :( no other way to this for the moment
+  if ( cfgAppName == "LightApp" ) {
+    app.setOrganizationName( "salome" );
+    app.setApplicationName( "salome" );
+    app.setApplicationVersion( salomeVersion() );
+  }
 
   int result = -1;
 
@@ -241,46 +237,63 @@ int main( int argc, char* argv[] )
     {
       if ( resMgr )
       {
-	resMgr->loadLanguage( false );
+        resMgr->loadLanguage();
 
-	splash = QtxSplash::splash( QPixmap() );
-	splash->readSettings( resMgr );
-	if ( splash->pixmap().isNull() ) {
-	  delete splash;
-	  splash = 0;
-	}
-	else {
-	  QString appName    = QObject::tr( "APP_NAME" ).trimmed();
-	  QString appVersion = QObject::tr( "APP_VERSION" ).trimmed();
-	  if ( appVersion == "APP_VERSION" )
-	  {
-	    if ( appName == "APP_NAME" || appName.toLower() == "salome" )
-	      appVersion = salomeVersion();
-	    else
-	      appVersion = "";
-	  }
-	  splash->setOption( "%A", appName );
-	  splash->setOption( "%V", QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
-	  splash->setOption( "%L", QObject::tr( "ABOUT_LICENSE" ) );
-	  splash->setOption( "%C", QObject::tr( "ABOUT_COPYRIGHT" ) );
-	  splash->show();
-	  QApplication::instance()->processEvents();
-	}
+        splash = QtxSplash::splash( QPixmap() );
+        splash->readSettings( resMgr );
+        if ( splash->pixmap().isNull() ) {
+          delete splash;
+          splash = 0;
+        }
+        else {
+          QString appName    = QObject::tr( "APP_NAME" ).trimmed();
+          QString appVersion = QObject::tr( "APP_VERSION" ).trimmed();
+          if ( appVersion == "APP_VERSION" )
+          {
+            if ( appName == "APP_NAME" || appName.toLower() == "salome" )
+              appVersion = salomeVersion();
+            else
+              appVersion = "";
+          }
+          splash->setOption( "%A", appName );
+          splash->setOption( "%V", QObject::tr( "ABOUT_VERSION" ).arg( appVersion ) );
+          splash->setOption( "%L", QObject::tr( "ABOUT_LICENSE" ) );
+          splash->setOption( "%C", QObject::tr( "ABOUT_COPYRIGHT" ) );
+          splash->show();
+          QApplication::instance()->processEvents();
+        }
       }
     }
+
+#ifdef SUIT_ENABLE_PYTHON
+    //...Initialize python 
+    int   _argc   = 1;
+    char* _argv[] = {(char*)""};
+    SUIT_PYTHON::init_python(_argc,_argv);
+    
+    PyEval_RestoreThread( SUIT_PYTHON::_gtstate );
+    
+    if ( !SUIT_PYTHON::salome_shared_modules_module ) // import only once
+      SUIT_PYTHON::salome_shared_modules_module = PyImport_ImportModule( (char*)"salome_shared_modules" );
+    if ( !SUIT_PYTHON::salome_shared_modules_module ) 
+      PyErr_Print();
+    
+    PyEval_ReleaseThread( SUIT_PYTHON::_gtstate );
+
+#endif
 
     SUIT_Application* theApp = aSession->startApplication( argList.first() );
     if ( theApp )
     {
       Style_Salome::initialize( theApp->resourceMgr() );
       if ( theApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
-	Style_Salome::apply();
+        Style_Salome::apply();
 
       if ( !noExceptHandling )
         app.setHandler( aSession->handler() );
 
       if ( splash )
-	splash->finish( theApp->desktop() );
+        splash->finish( theApp->desktop() );
 
       result = app.exec();
     }

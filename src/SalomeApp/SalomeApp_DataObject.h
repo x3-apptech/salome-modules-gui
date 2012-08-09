@@ -1,27 +1,28 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SalomeApp_DataObject.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #ifndef SALOMEAPP_DATAOBJECT_H
 #define SALOMEAPP_DATAOBJECT_H
 
@@ -37,9 +38,9 @@ class SALOMEAPP_EXPORT SalomeApp_DataObject : public virtual LightApp_DataObject
 public:
   //! Column id
   enum {
-    ValueId = EntryId + 1,    //!< value column
-    IORId,                    //!< IOR column
-    RefEntryId                //!< reference entry column
+    ValueId = RefEntryId + 1,    //!< value column
+    IORId,                       //!< IOR column
+    LastId                       //!< indicates last Id value
   };
 
 public:
@@ -54,16 +55,26 @@ public:
   virtual QPixmap        icon( const int = NameId ) const;
   virtual QColor         color( const ColorRole, const int = NameId ) const;
   virtual QString        toolTip( const int = NameId ) const;
+  virtual QFont          font( const int = NameId ) const;
 
   virtual _PTR(SObject)  object() const;
 
-  bool                   isReference() const;
+  virtual QString        refEntry() const;
+  virtual bool           isReference() const;
   _PTR(SObject)          referencedObject() const;
+
+  bool                   hasChildren() const;
+  bool                   expandable() const;
+
+  virtual bool           isVisible() const;
 
   virtual QString        componentDataType() const;
 
   virtual bool           customSorting( const int = NameId ) const;
   virtual bool           compare( const QVariant&, const QVariant&, const int = NameId ) const;
+
+  virtual void           insertChildAtTag( SalomeApp_DataObject*, int );
+  virtual void           updateItem();
 
 private:
   QString                ior( const _PTR(SObject)& ) const;
@@ -101,6 +112,10 @@ public:
   QPixmap                icon( const int = NameId ) const;
   QColor                 color( const ColorRole, const int = NameId ) const;
   QString                toolTip( const int = NameId ) const;
+  void                   setToSynchronize(bool value){_toSynchronize=value;};
+  bool                   toSynchronize() const {return _toSynchronize;};
+protected:
+  bool _toSynchronize;
 };
 
 class SALOMEAPP_EXPORT SalomeApp_SavePointObject : public virtual LightApp_DataObject

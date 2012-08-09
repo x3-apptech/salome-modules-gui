@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_ResourceMgr.h"
 
 #include <QDir>
@@ -115,33 +116,59 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
 */
 QString SUIT_ResourceMgr::findAppropriateUserFile( const QString& fname ) const
 {
-  QDir d( QFileInfo( fname ).dir() );
-  d.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
-  QStringList l = d.entryList();
   QString appr_file;
-  int id0 = userFileId( fname ), id, appr=-1;
-  if( id0<0 )
+
+  // calculate default file id from user file name
+  long id0 = userFileId( fname );
+  if ( id0 < 0 ) // can't calculate file id from user file name, no further processing
     return appr_file;
 
-  for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
-  {
-    id = userFileId( *anIt );
-    if( id<0 )
-      continue;
+  long id, appr = -1;
 
-    if( appr < 0 || abs( id-id0 ) < abs( appr-id0 ) )
+  // get all files from the same dir where use file is (should be) situated
+  QDir d( QFileInfo( fname ).dir() );
+  if ( d.exists() ) {
+    d.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
+    QStringList l = d.entryList();
+    for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
     {
-      appr = id;
-      appr_file = d.absoluteFilePath( *anIt );
+      id = userFileId( *anIt );
+      if ( id < 0 )
+	continue;
+      if( appr < 0 || qAbs( id-id0 ) < qAbs( appr-id0 ) )
+      {
+	appr = id;
+	appr_file = d.absoluteFilePath( *anIt );
+      }
     }
   }
+
+  // backward compatibility: check also user's home directory (if it differs from above one)
+  QDir home = QDir::home();
+  if ( home.exists() && d.canonicalPath() != home.canonicalPath() ) {
+    home.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
+    QStringList l = home.entryList();
+
+    for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
+    {
+      id = userFileId( *anIt );
+      if ( id < 0 )
+	continue;
+      if( appr < 0 || qAbs( id-id0 ) < qAbs( appr-id0 ) )
+      {
+	appr = id;
+	appr_file = home.absoluteFilePath( *anIt );
+      }
+    }
+  }
+  
   return appr_file;
 }
 
 /*!
     Calculates integer extended version number by user file name for comparing
 */
-int SUIT_ResourceMgr::userFileId( const QString& ) const
+long SUIT_ResourceMgr::userFileId( const QString& ) const
 {
   return -1;
 }

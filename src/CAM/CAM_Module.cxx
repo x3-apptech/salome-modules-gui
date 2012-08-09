@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "CAM_Module.h"
 
 #include "CAM_DataModel.h"
@@ -39,6 +40,29 @@
 
   Provides support of menu/toolbars management.
 */
+
+class ActionMgrLocker
+{
+public:
+  ActionMgrLocker( QtxActionMgr* m, bool use ) : myMgr( m ), myUseLock( use )
+  {
+    if ( myUseLock ) {
+      myUpdEnabled = myMgr->isUpdatesEnabled();
+      myMgr->setUpdatesEnabled( false );
+    }
+  }
+  ~ActionMgrLocker()
+  {
+    if ( myUseLock ) {
+      myMgr->setUpdatesEnabled( myUpdEnabled );
+      //myMgr->update();
+    }
+  }
+
+  QtxActionMgr* myMgr;
+  bool          myUseLock;
+  bool          myUpdEnabled;
+};
 
 /*!
   \brief Default constructor.
@@ -63,7 +87,9 @@ CAM_Module::CAM_Module( const QString& name )
 : QObject(),
   myApp( 0 ),
   myName( name ),
-  myDataModel( 0 )
+  myDataModel( 0 ),
+  myMenuShown( false ),
+  myToolShown( false )
 {
 }
 
@@ -375,7 +401,9 @@ int CAM_Module::createTool( const QString& name )
   if ( !toolMgr() )
     return -1;
 
-  return toolMgr()->createToolBar( name );
+  ActionMgrLocker lock( toolMgr(), !myToolShown );
+
+  return toolMgr()->createToolBar( name, myToolShown );
 }
 
 /*!
@@ -402,8 +430,14 @@ int CAM_Module::createTool( QAction* a, const int tBar, const int id, const int 
   if ( !toolMgr() )
     return -1;
 
+  ActionMgrLocker lock( toolMgr(), !myToolShown );
+
   int regId = registerAction( id, a );
   int intId = toolMgr()->insert( a, tBar, idx );
+
+  if ( !myToolShown )
+    setToolShown( a, false );
+
   return intId != -1 ? regId : -1;
 }
 
@@ -431,8 +465,14 @@ int CAM_Module::createTool( QAction* a, const QString& tBar, const int id, const
   if ( !toolMgr() )
     return -1;
 
+  ActionMgrLocker lock( toolMgr(), !myToolShown );
+
   int regId = registerAction( id, a );
   int intId = toolMgr()->insert( a, tBar, idx );
+
+  if ( !myToolShown )
+    setToolShown( a, false );
+
   return intId != -1 ? regId : -1;
 }
 
@@ -459,7 +499,13 @@ int CAM_Module::createTool( const int id, const int tBar, const int idx )
   if ( !toolMgr() )
     return -1;
 
+  ActionMgrLocker lock( toolMgr(), !myToolShown );
+
   int intId = toolMgr()->insert( action( id ), tBar, idx );
+
+  if ( !myToolShown )
+    setToolShown( action( id ), false );
+
   return intId != -1 ? id : -1;
 }
 
@@ -486,7 +532,13 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   if ( !toolMgr() )
     return -1;
 
+  ActionMgrLocker lock( toolMgr(), !myToolShown );
+
   int intId = toolMgr()->insert( action( id ), tBar, idx );
+
+  if ( !myToolShown )
+    setToolShown( action( id ), false );
+
   return intId != -1 ? id : -1;
 }
 
@@ -520,7 +572,7 @@ int CAM_Module::createMenu( const QString& subMenu, const int menu,
 {
   if ( !menuMgr() )
     return -1;
-
+  
   return menuMgr()->insert( subMenu, menu, group, id, idx );
 }
 
@@ -584,9 +636,15 @@ int CAM_Module::createMenu( QAction* a, const int menu, const int id, const int 
 {
   if ( !a || !menuMgr() )
     return -1;
+  
+  ActionMgrLocker lock( menuMgr(), !myMenuShown );
 
   int regId = registerAction( id, a );
   int intId = menuMgr()->insert( a, menu, group, idx );
+
+  if ( !myMenuShown )
+    setMenuShown( a, false );
+
   return intId != -1 ? regId : -1;
 }
 
@@ -621,8 +679,14 @@ int CAM_Module::createMenu( QAction* a, const QString& menu, const int id, const
   if ( !a || !menuMgr() )
     return -1;
 
+  ActionMgrLocker lock( menuMgr(), !myMenuShown );
+
   int regId = registerAction( id, a );
   int intId = menuMgr()->insert( a, menu, group, idx );
+
+  if ( !myMenuShown )
+    setMenuShown( a, false );
+  
   return intId != -1 ? regId : -1;
 }
 
@@ -652,7 +716,13 @@ int CAM_Module::createMenu( const int id, const int menu, const int group, const
   if ( !menuMgr() )
     return -1;
 
+  ActionMgrLocker lock( menuMgr(), !myMenuShown );
+
   int intId = menuMgr()->insert( action( id ), menu, group, idx );
+
+  if ( !myMenuShown )
+    setMenuShown( action( id ), false );
+
   return intId != -1 ? id : -1;
 }
 
@@ -686,7 +756,13 @@ int CAM_Module::createMenu( const int id, const QString& menu, const int group, 
   if ( !menuMgr() )
     return -1;
 
+  ActionMgrLocker lock( menuMgr(), !myMenuShown );
+
   int intId = menuMgr()->insert( action( id ), menu, group, idx );
+
+  if ( !myMenuShown )
+    setMenuShown( action( id ), false );
+
   return intId != -1 ? id : -1;
 }
 
@@ -697,6 +773,8 @@ int CAM_Module::createMenu( const int id, const QString& menu, const int group, 
 */
 void CAM_Module::setMenuShown( const bool on )
 {
+  myMenuShown = on;
+
   QtxActionMenuMgr* mMgr = menuMgr();
   if ( !mMgr )
     return;
@@ -744,6 +822,8 @@ void CAM_Module::setMenuShown( const int id, const bool on )
 */
 void CAM_Module::setToolShown( const bool on )
 {
+  myToolShown = on;
+
   QtxActionToolMgr* tMgr = toolMgr();
   if ( !tMgr )
     return;
@@ -834,9 +914,10 @@ int CAM_Module::actionId( const QAction* a ) const
 */
 QAction* CAM_Module::createAction( const int id, const QString& text, const QIcon& icon,
                                    const QString& menu, const QString& tip, const int key,
-                                   QObject* parent, const bool toggle, QObject* reciever, const char* member )
+                                   QObject* parent, const bool toggle, QObject* reciever,
+				   const char* member, const QString& shortcutAction )
 {
-  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle );
+  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle, shortcutAction );
   a->setStatusTip( tip );
 
   if ( reciever && member )
@@ -935,6 +1016,14 @@ QAction* CAM_Module::separator()
 }
 
 /*!
+  \brief Update visibility state of the module objects.
+*/
+void CAM_Module::updateModuleVisibilityState() {
+
+}
+
+
+/*!
   \brief Connect data model of the module to the active study
   \param camStudy CAM study object
 */
@@ -952,9 +1041,9 @@ void CAM_Module::connectToStudy( CAM_Study* camStudy )
     if( (*it) == this && !camStudy->containsDataModel( dm ) )
     {
       if ( prev )
-	camStudy->insertDataModel( (*it)->dataModel(), prev );
+        camStudy->insertDataModel( (*it)->dataModel(), prev );
       else
-	camStudy->insertDataModel( (*it)->dataModel(), 0 );
+        camStudy->insertDataModel( (*it)->dataModel(), 0 );
     }
     prev = dm;
   }

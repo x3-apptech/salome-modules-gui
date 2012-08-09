@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include <QMenu>
 #include <QColorDialog>
 #include <QToolBar>
@@ -35,6 +36,7 @@
 //#include "SVTK_MainWindow.h"
 #include "SVTK_Prs.h"
 
+#include "VTKViewer_Algorithm.h"
 #include "VTKViewer_ViewModel.h"
 
 #include "SUIT_ViewModel.h"
@@ -42,7 +44,12 @@
 
 #include "SALOME_Actor.h"
 
-#include <QtxActionToolMgr.h>
+#include "QtxActionToolMgr.h"
+#include "QtxBackgroundTool.h"
+
+// VSR: Uncomment below line to allow texture background support in VTK viewer
+#define VTK_ENABLE_TEXTURED_BACKGROUND
+
 
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
@@ -73,13 +80,17 @@ SVTK_Viewer::SVTK_Viewer()
 {
   myTrihedronSize = 105;
   myTrihedronRelative = true;
+  myIsStaticTrihedronVisible = true;
   myIncrementSpeed = 10;
   myIncrementMode = 0;
   myProjMode = 0;
   myStyle = 0;
+  myZoomingStyle = 0;
+  myDynamicPreSelection = false;
   mySpaceBtn[0] = 1;
   mySpaceBtn[1] = 2;
   mySpaceBtn[2] = 9;
+  myDefaultBackground = Qtx::BackgroundData( Qt::black );
 }
 
 /*!
@@ -89,33 +100,68 @@ SVTK_Viewer::~SVTK_Viewer()
 {
 }
 
-/*!
-  \return background color
-*/
+/*! Get data for supported background modes: gradient types, identifiers and supported image formats */
+QString SVTK_Viewer::backgroundData( QStringList& gradList, QIntList& idList, QIntList& txtList )
+{
+  gradList << tr( "GT_HORIZONTALGRADIENT" )
+           << tr( "GT_VERTICALGRADIENT" )
+           << tr( "GT_FIRSTDIAGONALGRADIENT" )
+           << tr( "GT_SECONDDIAGONALGRADIENT" )
+           << tr( "GT_FIRSTCORNERGRADIENT" )
+           << tr( "GT_SECONDCORNERGRADIENT" )
+           << tr( "GT_THIRDCORNERGRADIENT" )
+           << tr( "GT_FOURTHCORNERGRADIENT" );
+  idList   << HorizontalGradient
+           << VerticalGradient
+           << FirstDiagonalGradient
+           << SecondDiagonalGradient
+           << FirstCornerGradient
+           << SecondCornerGradient
+           << ThirdCornerGradient
+           << FourthCornerGradient;
+#ifdef VTK_ENABLE_TEXTURED_BACKGROUND
+  txtList  << Qtx::CenterTexture << Qtx::TileTexture << Qtx::StretchTexture;
+#endif
+  return tr("BG_IMAGE_FILES");
+}
+
+//! Get background color of the viewer [obsolete]
 QColor SVTK_Viewer::backgroundColor() const
 {
-  return myBgColor;
+  return background().color();
+}
+
+//! Set background color to the viewer [obsolete]
+void SVTK_Viewer::setBackgroundColor( const QColor& c )
+{
+  Qtx::BackgroundData bg = background();
+  bg.setColor( c );
+  setBackground( bg );
 }
 
 /*!
-  Changes background color
-  \param theColor - new background color
+  \return background data
 */
-void SVTK_Viewer::setBackgroundColor( const QColor& theColor )
+Qtx::BackgroundData SVTK_Viewer::background() const
 {
-  if ( !theColor.isValid() )
-    return;
+  return myDefaultBackground;
+}
 
+/*!
+  Changes background
+  \param theBackground - new background data
+*/
+void SVTK_Viewer::setBackground( const Qtx::BackgroundData& theBackground )
+{
+  myDefaultBackground = theBackground.isValid() ? theBackground : Qtx::BackgroundData( Qt::black );
   QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(SUIT_ViewWindow* aViewWindow = aViews.at(i)){
       if(TViewWindow* aView = dynamic_cast<TViewWindow*>(aViewWindow)){
-	aView->setBackgroundColor(theColor);
+        aView->setBackground(myDefaultBackground);
       }
     }
-  }
-
-  myBgColor = theColor;
+  }  
 }
 
 /*!Create new instance of view window on desktop \a theDesktop.
@@ -126,17 +172,20 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
   TViewWindow* aViewWindow = new TViewWindow(theDesktop);
   aViewWindow->Initialize(this);
 
-  aViewWindow->setBackgroundColor( backgroundColor() );
+  aViewWindow->setBackground( background() );
   aViewWindow->SetTrihedronSize( trihedronSize(), trihedronRelative() );
+  aViewWindow->SetStaticTrihedronVisible( isStaticTrihedronVisible() );
   aViewWindow->SetProjectionMode( projectionMode() );
   aViewWindow->SetInteractionStyle( interactionStyle() );
+  aViewWindow->SetZoomingStyle( zoomingStyle() );
+  aViewWindow->SetDynamicPreSelection( dynamicPreSelection() );
   aViewWindow->SetIncrementalSpeed( incrementalSpeed(), incrementalSpeedMode() );
   aViewWindow->SetSpacemouseButtons( spacemouseBtn(1), spacemouseBtn(2), spacemouseBtn(3) );
 
   connect(aViewWindow, SIGNAL( actorAdded(VTKViewer_Actor*) ), 
-	  this,  SLOT(onActorAdded(VTKViewer_Actor*)));
+          this,  SLOT(onActorAdded(VTKViewer_Actor*)));
   connect(aViewWindow, SIGNAL( actorRemoved(VTKViewer_Actor*) ), 
-	  this,  SLOT(onActorRemoved(VTKViewer_Actor*)));
+          this,  SLOT(onActorRemoved(VTKViewer_Actor*)));
 
   return aViewWindow;
 }
@@ -172,11 +221,36 @@ void SVTK_Viewer::setTrihedronSize( const vtkFloatingPointType theSize, const bo
     for ( uint i = 0; i < aViews.count(); i++ )
     {
       if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-	      aView->SetTrihedronSize( theSize, theRelative );
+              aView->SetTrihedronSize( theSize, theRelative );
     }
   }
 }
 
+/*!
+  \return visibility status of the static trihedron
+*/
+bool SVTK_Viewer::isStaticTrihedronVisible() const
+{
+  return myIsStaticTrihedronVisible;
+}
+
+/*!
+  Sets visibility status of the static trihedron
+  \param theIsVisible - new visibility status
+*/
+void SVTK_Viewer::setStaticTrihedronVisible( const bool theIsVisible )
+{
+  myIsStaticTrihedronVisible = theIsVisible;
+
+  if (SUIT_ViewManager* aViewManager = getViewManager()) {
+    QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
+    for ( uint i = 0; i < aViews.count(); i++ )
+    {
+      if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+        aView->SetStaticTrihedronVisible( theIsVisible );
+    }
+  }
+}
 
 /*!
   \return projection mode
@@ -200,8 +274,8 @@ void SVTK_Viewer::setProjectionMode( const int theMode )
       QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
       for ( uint i = 0; i < aViews.count(); i++ )
       {
-	if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-	  aView->SetProjectionMode( theMode );
+        if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+          aView->SetProjectionMode( theMode );
       }
     }
   }
@@ -228,7 +302,59 @@ void SVTK_Viewer::setInteractionStyle( const int theStyle )
     for ( uint i = 0; i < aViews.count(); i++ )
     {
       if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-	aView->SetInteractionStyle( theStyle );
+        aView->SetInteractionStyle( theStyle );
+    }
+  }
+}
+
+/*!
+  \return zooming style
+*/
+int SVTK_Viewer::zoomingStyle() const
+{
+  return myZoomingStyle;
+}
+
+/*!
+  Sets zooming style: 0 - standard, 1 - advanced (at cursor)
+  \param theStyle - new zooming style
+*/
+void SVTK_Viewer::setZoomingStyle( const int theStyle )
+{
+  myZoomingStyle = theStyle;
+  
+  if (SUIT_ViewManager* aViewManager = getViewManager()) {
+    QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
+    for ( uint i = 0; i < aViews.count(); i++ )
+    {
+      if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+        aView->SetZoomingStyle( theStyle );
+    }
+  }
+}
+
+/*!
+  \return dynamic preselection
+*/
+bool SVTK_Viewer::dynamicPreSelection() const
+{
+  return myDynamicPreSelection;
+}
+
+/*!
+  Sets dynamic preselection
+  \param theMode - new dynamic preselection mode
+*/
+void SVTK_Viewer::setDynamicPreSelection( const bool theMode )
+{
+  myDynamicPreSelection = theMode;
+  
+  if (SUIT_ViewManager* aViewManager = getViewManager()) {
+    QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
+    for ( uint i = 0; i < aViews.count(); i++ )
+    {
+      if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+        aView->SetDynamicPreSelection( theMode );
     }
   }
 }
@@ -264,7 +390,7 @@ void SVTK_Viewer::setIncrementalSpeed( const int theValue, const int theMode )
     for ( uint i = 0; i < aViews.count(); i++ )
     {
       if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-	aView->SetIncrementalSpeed( theValue, theMode );
+        aView->SetIncrementalSpeed( theValue, theMode );
     }
   }
 }
@@ -295,7 +421,7 @@ void SVTK_Viewer::setSpacemouseButtons( const int theBtn1, const int theBtn2, co
     for ( uint i = 0; i < aViews.count(); i++ )
     {
       if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-	aView->SetSpacemouseButtons( theBtn1, theBtn2, theBtn3 );
+        aView->SetSpacemouseButtons( theBtn1, theBtn2, theBtn3 );
     }
   }
 }
@@ -327,7 +453,7 @@ void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 void SVTK_Viewer::contextMenuPopup( QMenu* thePopup )
 {
   thePopup->addAction( VTKViewer_Viewer::tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->addAction( VTKViewer_Viewer::tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->addAction( VTKViewer_Viewer::tr( "MEN_CHANGE_BACKGROUND" ), this, SLOT( onChangeBackground() ) );
 
   thePopup->addSeparator();
 
@@ -391,12 +517,32 @@ void SVTK_Viewer::onDumpView()
 /*!
   SLOT: called if background color is to be changed changed, passes new color to view port
 */
-void SVTK_Viewer::onChangeBgColor()
+void SVTK_Viewer::onChangeBackground()
 {
-  if(SUIT_ViewWindow* aView = myViewManager->getActiveView()){
-    QColor aColor = QColorDialog::getColor( backgroundColor(), aView);
-    setBackgroundColor(aColor);
-  }
+  SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(myViewManager->getActiveView());
+  if ( !aView )
+    return;
+
+  // get supported gradient types
+  QStringList gradList;
+  QIntList    idList, txtList;
+  QString     formats = backgroundData( gradList, idList, txtList );
+
+  // invoke dialog box
+  Qtx::BackgroundData bgData = QtxBackgroundDialog::getBackground( aView->background(),  // initial background
+								   aView,                // parent for dialog box
+								   txtList,              // allowed texture modes
+								   true,                 // enable solid color mode
+								   true,                 // enable gradient mode
+								   false,                // disable custom gradient mode
+								   !txtList.isEmpty(),   // enable texture mode
+								   gradList,             // gradient names
+								   idList,               // gradient identifiers
+								   formats );            // image formats
+
+  // set chosen background data to the viewer
+  if ( bgData.isValid() )
+    aView->setBackground( bgData );
 }
 
 /*!
@@ -417,29 +563,31 @@ void SVTK_Viewer::Display( const SALOME_VTKPrs* prs )
       // _PTR(Study) aStudy(getStudyDS());
       anActorCollection->InitTraversal();
       while(vtkActor* anActor = anActorCollection->GetNextActor()){
-	if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
-	  // Set visibility flag
+        if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
+          if(!anAct->ShouldBeDisplayed())
+            continue;
+          // Set visibility flag
           // Temporarily commented to avoid awful dependecy on SALOMEDS
           // TODO: better mechanism of storing display/erse status in a study
           // should be provided...
-	  //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	  //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
-	  //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),true,this);
-	  //}
-	  // just display the object
-	  QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
-	  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
-	    if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i))){
-	      if(SVTK_View* aView = aViewWindow->getView()){
-		aView->Display(anAct,false);
-		if(anAct->IsSetCamera()){
-		  vtkRenderer* aRenderer = aView->getRenderer();
-		  anAct->SetCamera( aRenderer->GetActiveCamera() );
-		}
-	      }
-	    }
-	  }
-	}
+          //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+          //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
+          //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),true,this);
+          //}
+          // just display the object
+          QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
+          for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
+            if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i))){
+              if(SVTK_View* aView = aViewWindow->getView()){
+                aView->Display(anAct,false);
+                if(anAct->IsSetCamera()){
+                  vtkRenderer* aRenderer = aView->getRenderer();
+                  anAct->SetCamera( aRenderer->GetActiveCamera() );
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -459,31 +607,33 @@ void SVTK_Viewer::Erase( const SALOME_VTKPrs* prs, const bool forced )
     if(vtkActorCollection* anActorCollection = aPrs->GetObjects()){
       // get SALOMEDS Study
       // Temporarily commented to avoid awful dependecy on SALOMEDS
-      // TODO: better mechanism of storing display/erse status in a study
+      // TODO: better mechanism of storing display/erase status in a study
       // should be provided...
       //_PTR(Study) aStudy(getStudyDS());
       anActorCollection->InitTraversal();
       while(vtkActor* anActor = anActorCollection->GetNextActor())
-	if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
-	  // Set visibility flag
+        if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
+          // Set visibility flag
           // Temporarily commented to avoid awful dependecy on SALOMEDS
-          // TODO: better mechanism of storing display/erse status in a study
+          // TODO: better mechanism of storing display/erase status in a study
           // should be provided...
-	  //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	  //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
-	  //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
-	  //}
-	  // just display the object
-	  QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
-	  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
-	    if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i)))
-	      if(SVTK_View* aView = aViewWindow->getView())
-		if ( forced )
-		  aView->Remove(anAct,false);
-		else
-		  aView->Erase(anAct,forced);
-	  }
-	}
+          //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+          //if(!anObj.IsNull() && anObj->hasEntry() && aStudy){
+          //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
+          //}
+          // just display the object
+          QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
+          for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
+            if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i)))
+              if(SVTK_View* aView = aViewWindow->getView())
+              {
+                if ( forced )
+                  aView->Remove(anAct,false);
+                else
+                  aView->Erase(anAct,forced);
+              }
+          }
+        }
     }
   }
 }
@@ -502,33 +652,34 @@ void SVTK_Viewer::EraseAll( const bool forced )
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++){
     if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(aViews.at(i)))
       if(SVTK_View* aView = aViewWindow->getView()){
-	vtkRenderer* aRenderer =  aView->getRenderer();
-	vtkActorCollection* anActorCollection = aRenderer->GetActors();
-	anActorCollection->InitTraversal();
-	while(vtkActor* anActor = anActorCollection->GetNextActor()){
-	  if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
-	    // Set visibility flag
+        vtkRenderer* aRenderer =  aView->getRenderer();
+        VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
+        vtkActorCollection* anActorCollection = aCopy.GetActors();
+        anActorCollection->InitTraversal();
+        while(vtkActor* anActor = anActorCollection->GetNextActor()){
+          if(SALOME_Actor* anAct = SALOME_Actor::SafeDownCast(anActor)){
+            // Set visibility flag
             // Temporarily commented to avoid awful dependecy on SALOMEDS
             // TODO: better mechanism of storing display/erse status in a study
             // should be provided...
-	    //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
-	    //if(!anObj.IsNull() && anObj->hasEntry() && aStudy)
-	    //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
-	    if(forced)
-	      aRenderer->RemoveActor(anAct);
-	    else{
-	      // just erase actor
-	      anAct->SetVisibility( false );
-	      // erase dependent actors
-	      vtkActorCollection* aCollection = vtkActorCollection::New();
-	      anAct->GetChildActors( aCollection );
-	      aCollection->InitTraversal();
-	      while(vtkActor* aSubAct = aCollection->GetNextActor())
-		aSubAct->SetVisibility( false );
-	      aCollection->Delete();
-	    }
-	  }
-	}
+            //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
+            //if(!anObj.IsNull() && anObj->hasEntry() && aStudy)
+            //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
+            if(forced)
+              aRenderer->RemoveActor(anAct);
+            else{
+              // just erase actor
+              anAct->SetVisibility( false );
+              // erase dependent actors
+              vtkActorCollection* aCollection = vtkActorCollection::New();
+              anAct->GetChildActors( aCollection );
+              aCollection->InitTraversal();
+              while(vtkActor* aSubAct = aCollection->GetNextActor())
+                aSubAct->SetVisibility( false );
+              aCollection->Delete();
+            }
+          }
+        }
       }
   }
   Repaint();
@@ -544,35 +695,20 @@ SALOME_Prs* SVTK_Viewer::CreatePrs( const char* entry )
   if ( entry ) {
     if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(getViewManager()->getActiveView()))
       if(SVTK_View* aView = aViewWindow->getView()){
-	vtkRenderer* aRenderer =  aView->getRenderer();
-	vtkActorCollection* theActors = aRenderer->GetActors();
-	theActors->InitTraversal();
-	vtkActor* ac;
-	while( ( ac = theActors->GetNextActor() ) ) {
-	  SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac );
-	  if ( anActor && anActor->hasIO() && !strcmp( anActor->getIO()->getEntry(), entry ) ) {
-	    prs->AddObject( ac );
-	  }
-	}
+        vtkRenderer* aRenderer =  aView->getRenderer();
+        VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
+        vtkActorCollection* theActors = aCopy.GetActors();
+        theActors->InitTraversal();
+        vtkActor* ac;
+        while( ( ac = theActors->GetNextActor() ) ) {
+          SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac );
+          if ( anActor && anActor->hasIO() && !strcmp( anActor->getIO()->getEntry(), entry ) ) {
+            prs->AddObject( ac );
+          }
+        }
       }
   }
   return prs;
-}
-
-/*!
-  Auxiliary method called before displaying of objects
-*/
-void SVTK_Viewer::BeforeDisplay( SALOME_Displayer* d )
-{
-  d->BeforeDisplay( this, SALOME_VTKViewType() );
-}
-
-/*!
-  Auxiliary method called after displaying of objects
-*/
-void SVTK_Viewer::AfterDisplay( SALOME_Displayer* d )
-{
-  d->AfterDisplay( this, SALOME_VTKViewType() );
 }
 
 /*!
@@ -593,6 +729,21 @@ bool SVTK_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& io )
 }
 
 /*!
+  \Collect objects visible in viewer
+  \param theList - visible objects collection
+*/
+void SVTK_Viewer::GetVisible( SALOME_ListIO& theList )
+{
+  // here we collect object if it is disaplaed even one view
+  QVector<SUIT_ViewWindow*> aViews = myViewManager->getViews();
+  for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)
+    if(SUIT_ViewWindow* aViewWindow = aViews.at(i))
+      if(TViewWindow* aViewWnd = dynamic_cast<TViewWindow*>(aViewWindow))
+        if(SVTK_View* aView = aViewWnd->getView())
+          aView->GetVisible( theList );
+}
+
+/*!
   Updates current viewer
 */
 void SVTK_Viewer::Repaint()
@@ -602,7 +753,7 @@ void SVTK_Viewer::Repaint()
   for(int i = 0, iEnd = aViews.size(); i < iEnd; i++)
     if(TViewWindow* aViewWindow = dynamic_cast<TViewWindow*>(aViews.at(i)))
       if(SVTK_View* aView = aViewWindow->getView())
-	aView->Repaint();
+        aView->Repaint();
 }
  
 

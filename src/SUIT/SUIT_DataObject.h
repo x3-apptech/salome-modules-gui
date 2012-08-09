@@ -1,31 +1,34 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SUIT_DataObject.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #ifndef SUIT_DATAOBJECT_H
 #define SUIT_DATAOBJECT_H
 
 #include "SUIT.h"
+
+#include <Qtx.h>
 
 #include <QList>
 #include <QObject>
@@ -42,13 +45,13 @@ typedef QList<SUIT_DataObject*> DataObjectList;
 #pragma warning( disable:4251 )
 #endif
 
-class SUIT_EXPORT SUIT_DataObject  
+class SUIT_EXPORT SUIT_DataObject
 {
 public:
   class Signal;
 
   //! Color role
-  typedef enum { 
+  typedef enum {
     Text,              //!< editor foreground (text) color
     Base,              //!< editor background color
     Foreground,        //!< foreground (text) color
@@ -59,8 +62,9 @@ public:
 
   //! Column id
   enum
-  { 
-    NameId            //!< name column
+  {
+    NameId,          //!< name column
+    VisibilityId     //!< visibility state column
   };
 
   SUIT_DataObject( SUIT_DataObject* = 0 );
@@ -84,7 +88,7 @@ public:
 
   virtual void                children( DataObjectList&, const bool = false ) const;
   virtual DataObjectList      children( const bool = false );
-  
+
   void                        appendChild( SUIT_DataObject* );
   virtual void                insertChild( SUIT_DataObject*, int );
   virtual void                removeChild( SUIT_DataObject*, const bool = false );
@@ -94,6 +98,10 @@ public:
 
   virtual SUIT_DataObject*    parent() const;
   virtual void                setParent( SUIT_DataObject* );
+  virtual void                assignParent( SUIT_DataObject* );
+  void                        insertChildAtPos( SUIT_DataObject* obj, int position );
+  bool                        modified(){return _modified;};
+  void                        setModified(bool modified){_modified = modified;};
 
   virtual QString             name() const;
   virtual QString             text( const int = NameId ) const;
@@ -105,12 +113,16 @@ public:
   virtual QFont               font( const int = NameId ) const;
   virtual int                 alignment( const int = NameId ) const;
 
-  virtual bool                isDragable() const;
-  virtual bool                isDropAccepted( SUIT_DataObject* obj );
+  virtual bool                expandable() const;
+  virtual bool                isVisible() const;
+  virtual bool                isDraggable() const;
+  virtual bool                isDropAccepted() const;
 
   virtual bool                isEnabled() const;
   virtual bool                isSelectable() const;
   virtual bool                isCheckable( const int = NameId ) const;
+  virtual bool                renameAllowed( const int = NameId ) const;
+  virtual bool                setName(const QString& name);
 
   virtual bool                isOn( const int = NameId ) const;
   virtual void                setOn( const bool, const int = NameId );
@@ -123,7 +135,8 @@ public:
   virtual bool                compare( const QVariant&, const QVariant&, const int = NameId ) const;
 
   virtual SUIT_DataObjectKey* key() const;
-  virtual int groupId() const;
+  virtual int                 groupId() const;
+  virtual QVariant            customData(Qtx::CustomDataType /*type*/);
 
   static Signal*              signal();
   static bool                 connect( const char*, QObject*, const char* );
@@ -139,6 +152,7 @@ private:
   bool                        myCheck;
   bool                        myAutoDel;
   DataObjectList              myChildren;
+  bool                        _modified;
 
   static Signal*              mySignal;
 

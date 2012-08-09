@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
 //  File   : SALOME_AISShape.ixx
 //  Module : SALOME
@@ -36,8 +37,8 @@ SALOME_AISShape::~SALOME_AISShape() {}
 Standard_EXPORT Handle_Standard_Type& SALOME_AISShape_Type_()
 {
 
-    static Handle_Standard_Type aType1 = STANDARD_TYPE(AIS_Shape);
-  if ( aType1.IsNull()) aType1 = STANDARD_TYPE(AIS_Shape);
+  static Handle_Standard_Type aType1 = STANDARD_TYPE(AIS_TexturedShape);
+  if ( aType1.IsNull()) aType1 = STANDARD_TYPE(AIS_TexturedShape);
   static Handle_Standard_Type aType2 = STANDARD_TYPE(AIS_InteractiveObject);
   if ( aType2.IsNull()) aType2 = STANDARD_TYPE(AIS_InteractiveObject);
   static Handle_Standard_Type aType3 = STANDARD_TYPE(SelectMgr_SelectableObject);
@@ -52,10 +53,10 @@ Standard_EXPORT Handle_Standard_Type& SALOME_AISShape_Type_()
 
   static Handle_Standard_Transient _Ancestors[]= {aType1,aType2,aType3,aType4,aType5,aType6,NULL};
   static Handle_Standard_Type _aType = new Standard_Type("SALOME_AISShape",
-			                                 sizeof(SALOME_AISShape),
-			                                 1,
-			                                 (Standard_Address)_Ancestors,
-			                                 (Standard_Address)NULL);
+                                                         sizeof(SALOME_AISShape),
+                                                         1,
+                                                         (Standard_Address)_Ancestors,
+                                                         (Standard_Address)NULL);
 
   return _aType;
 }

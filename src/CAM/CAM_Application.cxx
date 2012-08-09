@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "CAM_Application.h"
 
 #include "CAM_Study.h"
@@ -30,6 +31,9 @@
 #include <SUIT_MessageBox.h>
 #include <SUIT_ResourceMgr.h>
 
+#include <KERNEL_version.h>
+#include <GUI_version.h>
+
 #include <QApplication>
 #include <QRegExp>
 
@@ -38,6 +42,21 @@
 #else
 #include <dlfcn.h>
 #endif
+
+#include <cstdio>
+
+namespace
+{
+class BusyLocker
+{
+public:
+  BusyLocker( bool& busy ) : myPrev( busy ), myBusy( busy ) { myBusy = true; }
+  ~BusyLocker() { myBusy = myPrev; }
+private:
+  bool  myPrev;
+  bool& myBusy;
+};
+}
 
 /*!
   \brief Create new instance of CAM_Application.
@@ -76,7 +95,8 @@ extern "C" CAM_EXPORT SUIT_Application* createApplication()
 CAM_Application::CAM_Application( const bool autoLoad )
 : STD_Application(),
   myModule( 0 ),
-  myAutoLoad( autoLoad )
+  myAutoLoad( autoLoad ),
+  myBlocked( false )
 {
   readModuleList();
 }
@@ -88,6 +108,9 @@ CAM_Application::CAM_Application( const bool autoLoad )
 */
 CAM_Application::~CAM_Application()
 {
+  for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); it != myModules.end(); ++it )
+    delete *it;
+  myModules.clear();
 }
 
 /*! 
@@ -122,7 +145,7 @@ CAM_Module* CAM_Application::module(  const QString& modName ) const
 {
   CAM_Module* mod = 0;
   for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
-	it != myModules.end() && !mod; ++it )
+        it != myModules.end() && !mod; ++it )
     if ( (*it)->moduleName() == modName )
       mod = *it;
   return mod;
@@ -146,7 +169,7 @@ void CAM_Application::modules( CAM_Application::ModuleList& out ) const
   out.clear();
 
   for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
-	it != myModules.end(); ++it )
+        it != myModules.end(); ++it )
     out.append( *it );
 }
 
@@ -166,13 +189,13 @@ void CAM_Application::modules( QStringList& lst, const bool loaded ) const
   if ( loaded )
   {
     for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); 
-	  it != myModules.end(); ++it )
+          it != myModules.end(); ++it )
       lst.append( (*it)->moduleName() );
   }
   else
   {
     for ( ModuleInfoList::const_iterator it = myInfoList.begin(); 
-	  it != myInfoList.end(); ++it )
+          it != myInfoList.end(); ++it )
       lst.append( (*it).title );
   }
 }
@@ -197,7 +220,7 @@ void CAM_Application::addModule( CAM_Module* mod )
 
   ModuleList newList;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); 
-	it != myInfoList.end(); ++it )
+        it != myInfoList.end(); ++it )
   {
     if ( (*it).title == mod->moduleName() )
       newList.append( mod );
@@ -210,7 +233,7 @@ void CAM_Application::addModule( CAM_Module* mod )
   }
 
   for ( QList<CAM_Module*>::const_iterator it = myModules.begin();
-	it != myModules.end(); ++it )
+        it != myModules.end(); ++it )
   {
     if ( !newList.contains( *it ) )
       newList.append( *it );
@@ -233,15 +256,18 @@ void CAM_Application::loadModules()
 {
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
   {
+    if ( !isModuleAccessible( (*it).title ) ) {
+      continue;
+    }
     CAM_Module* mod = loadModule( (*it).title );
     if ( mod )
       addModule( mod );
     else {
+      QString wrn = tr( "Can not load module %1" ).arg( (*it).title );
       if ( desktop() && desktop()->isVisible() )
-	SUIT_MessageBox::critical( desktop(), tr( "Loading modules" ),
-				   tr( "Can not load module %1" ).arg( (*it).title ) );
+        SUIT_MessageBox::critical( desktop(), tr( "Loading modules" ), wrn );
       else
-	qWarning( tr( "Can not load module %1" ).arg( (*it).title ).toLatin1().data() ); 
+        qWarning( qPrintable( wrn ) ); 
     }
   }
 }
@@ -261,19 +287,25 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
 {
   if ( myInfoList.isEmpty() )
   {
-    qWarning( tr( "Modules configuration is not defined." ).toLatin1().data() );
+    qWarning( qPrintable( tr( "Modules configuration is not defined." ) ) );
+    return 0;
+  }
+
+  if ( !isModuleAccessible( modName ) ) {
+    qWarning( qPrintable( tr( "Module \"%1\" cannot be loaded in this application." ).arg( modName ) ) );
     return 0;
   }
 
   QString libName = moduleLibrary( modName );
   if ( libName.isEmpty() )
   {
-    qWarning( tr( "Information about module \"%1\" doesn't exist." ).arg( modName ).toLatin1().data() );
+    qWarning( qPrintable( tr( "Information about module \"%1\" doesn't exist." ).arg( modName ) ) );
     return 0;
   }
 
   QString err;
   GET_MODULE_FUNC crtInst = 0;
+  GET_VERSION_FUNC getVersion = 0;
 
 #ifdef WIN32
   HINSTANCE modLib = ::LoadLibrary( libName.toLatin1() ); 
@@ -296,6 +328,8 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
     err = QString( "Failed to find  %1 function. %2" ).arg( GET_MODULE_NAME ).arg( (LPTSTR)lpMsgBuf );
     ::LocalFree( lpMsgBuf );
     }
+
+    getVersion = (GET_VERSION_FUNC)::GetProcAddress( modLib, GET_VERSION_NAME );
   }
 #else
   void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY );
@@ -306,6 +340,8 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
     crtInst = (GET_MODULE_FUNC)dlsym( modLib, GET_MODULE_NAME );
     if ( !crtInst )
       err = QString( "Failed to find function %1. %2" ).arg( GET_MODULE_NAME ).arg( dlerror() );
+
+    getVersion = (GET_VERSION_FUNC)dlsym( modLib, GET_VERSION_NAME );
   }
 #endif
 
@@ -320,9 +356,22 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
     if ( desktop() && desktop()->isVisible() )
       SUIT_MessageBox::warning( desktop(), tr( "Error" ), err );
     else
-      qWarning( err.toLatin1().data() ); 
+      qWarning( qPrintable( err ) ); 
   }
 
+  char* version = getVersion ? getVersion() : 0;
+
+  if(version) {    
+    for ( ModuleInfoList::iterator it = myInfoList.begin(); it != myInfoList.end(); ++it ) {
+      if ( (*it).title == modName ) {
+        if( (*it).version.isEmpty() ) {
+          (*it).version = QString(version);
+        }
+        break;
+      }
+    }
+  }
+  
   return module;
 }
 
@@ -333,8 +382,12 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
 */
 bool CAM_Application::activateModule( const QString& modName )
 {
-  if ( !modName.isEmpty() && !activeStudy() )
+  if ( !modName.isEmpty() && !activeStudy() || myBlocked )
     return false;
+
+  // VSR 25/10/2011: prevent nested activation/deactivation
+  // See issues 0021307, 0021373
+  BusyLocker lock( myBlocked );
 
   bool res = false;
   if ( !modName.isEmpty() )
@@ -377,7 +430,7 @@ bool CAM_Application::activateModule( CAM_Module* mod )
     {
       // ....      
     }    
-  }	
+  }     
   myModule = mod;
 
   if ( myModule ){
@@ -387,10 +440,11 @@ bool CAM_Application::activateModule( CAM_Module* mod )
     {
       myModule->setMenuShown( false );
       myModule->setToolShown( false );
+      QString wrn = tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() );
       if ( desktop() && desktop()->isVisible() )
-	SUIT_MessageBox::critical( desktop(), tr( "ERROR_TLT" ), tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ) );
+        SUIT_MessageBox::critical( desktop(), tr( "ERROR_TLT" ), wrn );
       else
-	qWarning( tr( "ERROR_ACTIVATE_MODULE_MSG" ).arg( myModule->moduleName() ).toLatin1().data() ); 
+        qWarning( qPrintable( wrn ) ); 
       myModule = 0;
       return false;
     }
@@ -432,6 +486,10 @@ void CAM_Application::beforeCloseDoc( SUIT_Study* theDoc )
 {
   for ( QList<CAM_Module*>::iterator it = myModules.begin(); it != myModules.end(); ++it )
     (*it)->studyClosed( theDoc );
+}
+
+void CAM_Application::afterCloseDoc()
+{
 }
 
 /*!
@@ -501,6 +559,38 @@ QString CAM_Application::moduleIcon( const QString& name ) const
       res = (*it).icon;
   }
   return res;
+}
+
+/*!
+  \brief Returns \c true if module is accessible for the current application.
+  Singleton module can be loaded only in one application object. In other application
+  objects this module will be unavailable.
+  \param title module title (user name)
+  \return \c true if module is accessible (can be loaded) or \c false otherwise
+ */
+bool CAM_Application::isModuleAccessible( const QString& title ) const
+{
+  bool found   = false;
+  bool blocked = false;
+  
+  QStringList somewhereLoaded;
+  QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
+  foreach( SUIT_Application* app, apps ) {
+    CAM_Application* camApp = dynamic_cast<CAM_Application*>( app );
+    if ( !camApp ) continue;
+    QStringList loaded;
+    camApp->modules( loaded, true );
+    foreach( QString lm, loaded ) {
+      if ( !somewhereLoaded.contains( lm ) ) somewhereLoaded << lm;
+    }
+  }
+
+  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && !found; ++it )
+  {
+    found = (*it).title == title;
+    blocked = (*it).isSingleton && somewhereLoaded.contains((*it).title);
+  }
+  return found && !blocked;
 }
 
 /*!
@@ -582,7 +672,7 @@ void CAM_Application::readModuleList()
     QStringList mods = modules.split( QRegExp( "[:|,\\s]" ), QString::SkipEmptyParts );
     for ( int i = 0; i < mods.count(); i++ ) {
       if ( !mods[i].trimmed().isEmpty() )
-	modList.append( mods[i].trimmed() );
+        modList.append( mods[i].trimmed() );
     }
   }
 
@@ -605,8 +695,8 @@ void CAM_Application::readModuleList()
     if ( modTitle.isEmpty() )
     {
       printf( "****************************************************************\n" );
-      printf( "*    Warning: %s not found in resources.\n", (*it).toLatin1().data() );
-      printf( "*    Module will not be available\n" );
+      printf( "*    Warning: %s GUI resources are not found.\n", qPrintable(*it) );
+      printf( "*    %s GUI will not be available.\n", qPrintable(*it) );
       printf( "****************************************************************\n" );
       continue;
     }
@@ -633,11 +723,17 @@ void CAM_Application::readModuleList()
     else
       modLibrary = modName;
 
+    bool aIsSingleton = resMgr->booleanValue(*it, "singleton", false);
+
+    QString ver = resMgr->stringValue(*it, "version", QString());
+
     ModuleInfo inf;
     inf.name = modName;
     inf.title = modTitle;
     inf.internal = modLibrary;
     inf.icon = modIcon;
+    inf.isSingleton = aIsSingleton;
+    inf.version = ver;
     myInfoList.append( inf );
   }
 
@@ -646,9 +742,9 @@ void CAM_Application::readModuleList()
       SUIT_MessageBox::warning( desktop(), tr( "Warning" ), tr( "Modules list is empty" ) );
     else
       {
-	printf( "****************************************************************\n" );
-	printf( "*    Warning: modules list is empty.\n" );
-	printf( "****************************************************************\n" );
+        printf( "****************************************************************\n" );
+        printf( "*    Warning: modules list is empty.\n" );
+        printf( "****************************************************************\n" );
       }
   }
 }
@@ -676,4 +772,30 @@ void CAM_Application::createEmptyStudy()
 {
   /*SUIT_Study* study = */activeStudy();
   STD_Application::createEmptyStudy();
+}
+
+/*!
+  \brief Return information about version of the each module.
+*/
+CAM_Application::ModuleShortInfoList CAM_Application::getVersionInfo() const {
+
+  ModuleShortInfoList info;
+
+  ModuleShortInfo kernel;
+  kernel.name = "KERNEL";
+  kernel.version = KERNEL_VERSION_STR;
+  info.append(kernel);
+
+  ModuleShortInfo gui;
+  gui.name = "GUI";
+  gui.version = GUI_VERSION_STR;
+  info.append(gui);
+
+  for(int i = 0; i < myInfoList.size(); i++) {
+    ModuleShortInfo infoItem;
+    infoItem.name = myInfoList.at(i).title;
+    infoItem.version = myInfoList.at(i).version;
+    info.append(infoItem);
+  }  
+  return info;
 }

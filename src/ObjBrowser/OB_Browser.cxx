@@ -1,27 +1,28 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : OB_Browser.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #include "OB_Browser.h"
 
 //#include "OB_Filter.h"
@@ -91,7 +92,7 @@ OB_Browser::ToolTip::~ToolTip()
 void OB_Browser::ToolTip::maybeTip( const QPoint& pos )
 {
   if ( !parentWidget() || !myBrowser || !myBrowser->isShowToolTips() )
-	  return;
+          return;
 
   QListView* lv = myBrowser->listView();
 
@@ -136,16 +137,23 @@ OB_Browser::OB_Browser( QWidget* parent, QAbstractItemModel* model )
 : QWidget( parent ),
   myAutoOpenLevel( 0 )
 {
-  myView = new QtxTreeView( this );
-  myView->setRootIsDecorated( true );
-  myView->setSelectionMode( QAbstractItemView::ExtendedSelection );
-  myView->setAllColumnsShowFocus( true );
+  // set-up tree view
+  myView = new QtxTreeView( this );                                  // create tree view
+  myView->setRootIsDecorated( true );                                // show root item
+  myView->setSelectionMode( QAbstractItemView::ExtendedSelection );  // enable extended selection mode
+  myView->setAllColumnsShowFocus( true );                            // focus is shown in all columns
 
-  mySearchTool = new QtxSearchTool( this, myView );
-  mySearchTool->setFrameStyle( QFrame::NoFrame | QFrame::Plain );
-  mySearchTool->setActivators( QtxSearchTool::StandardKey | QtxSearchTool::SlashKey );
-  mySearchTool->setSearcher( new QtxTreeViewSearcher( myView ) );
+  // enable drag-n-drop support
+  myView->setDragDropMode( QAbstractItemView::DragDrop );            // enable both drag and drop operations
+  myView->setDropIndicatorShown( true );                             // show drag indicator on dragging
+
+  // set-up search tool
+  mySearchTool = new QtxSearchTool( this, myView );                  // create search tool
+  mySearchTool->setFrameStyle( QFrame::NoFrame | QFrame::Plain );    // do not show frame
+  mySearchTool->setActivators( QtxSearchTool::StandardKey | QtxSearchTool::SlashKey ); // set activation mode
+  mySearchTool->setSearcher( new QtxTreeViewSearcher( myView ) );    // assign searcher (for tree view)
   
+  // layout widgets
   QVBoxLayout* main = new QVBoxLayout( this );
   main->addWidget( myView );
   main->addWidget( mySearchTool );
@@ -163,8 +171,7 @@ OB_Browser::OB_Browser( QWidget* parent, QAbstractItemModel* model )
   setModel( model );
 
   connect( myView, SIGNAL( selectionChanged() ),
-	   this,   SIGNAL( selectionChanged() ) );
-
+           this,   SIGNAL( selectionChanged() ) );
 }
 
 /*!
@@ -357,7 +364,8 @@ void OB_Browser::setShowToolTips( const bool theDisplay )
 */
 int OB_Browser::numberOfSelected() const
 {
-  return myView->selectionModel() ? myView->selectionModel()->selectedIndexes().count() : 0;
+  // we take selection by rows
+  return myView->selectionModel() ? myView->selectionModel()->selectedRows().count() : 0;
 }
 
 /*!
@@ -366,7 +374,8 @@ int OB_Browser::numberOfSelected() const
 */
 QModelIndexList OB_Browser::selectedIndexes() const
 {
-  return myView->selectionModel() ? myView->selectionModel()->selectedIndexes() : QModelIndexList();
+  // we take selection by rows
+  return myView->selectionModel() ? myView->selectionModel()->selectedRows() : QModelIndexList();
 }
 
 /*!
@@ -414,15 +423,42 @@ void OB_Browser::select( const QModelIndexList& indexes, const bool on, const bo
   myView->blockSignals( true );
 
   QModelIndex idx;
-  bool first = true;
 
   if ( !indexes.isEmpty() ) {
-    foreach( idx, indexes ) {
-      select( idx, on, first ? keepSelection : true );
-      first = false;
+    QItemSelection mysel;
+    // select by range if indexes are contiguous
+    QModelIndex first=indexes.at(0);
+    QModelIndex last=first;
+    if (indexes.size() > 1) {
+      for (int i = 1; i < indexes.size(); ++i) 
+      {
+        idx=indexes.at(i);
+        if(idx.parent().internalId()==last.parent().internalId() && idx.row()==last.row()+1 && idx.column()==last.column())
+        {
+          // index is contiguous to last: extend the range
+          last=idx;
+        }
+        else
+        {
+          // index idx is not contiguous: create a new range
+          mysel.select(first,last);
+          first=idx;
+          last=idx;
+        }
+      }
+    }
+    mysel.select(first,last);
+
+    if ( myView->selectionModel() ) {
+      QItemSelectionModel::SelectionFlags f = on ? QItemSelectionModel::Select : QItemSelectionModel::Deselect;
+      f = f | QItemSelectionModel::Rows;
+      if ( !keepSelection )
+        f = f | QItemSelectionModel::Clear;
+      myView->selectionModel()->select( mysel, f );
     }
   }
-  else if ( !keepSelection ) {
+  else if ( !keepSelection )
+  {
     myView->clearSelection();
   }
 
@@ -758,7 +794,7 @@ void OB_Browser::restoreState( const DataObjectMap& selObjs, const DataObjectMap
     {
       bool parentOpen = true;
       if( item && item->parent() )
-	parentOpen = item->parent()->isOpen();
+        parentOpen = item->parent()->isOpen();
 
       if ( openObjs[obj] && parentOpen )
         lv->setOpen( item, true );
@@ -767,10 +803,10 @@ void OB_Browser::restoreState( const DataObjectMap& selObjs, const DataObjectMap
     {
       bool parentOpen = true;
       if( item && item->parent() )
-	parentOpen = item->parent()->isOpen();
+        parentOpen = item->parent()->isOpen();
 
       if( parentOpen )
-	lv->setOpen( item, true );
+        lv->setOpen( item, true );
     }
 
     if ( !curItem && ( curObj == obj || ( !curKey.isNull() && curKey == key )) )
@@ -984,12 +1020,12 @@ void OB_Browser::createPopupMenu( QMenu* menu )
   bool closed = false, opened = false;
   
   for ( QModelIndexList::Iterator it = indexes.begin(); 
-	it != indexes.end() && !closed; ++it ) {
+        it != indexes.end() && !closed; ++it ) {
     closed = hasCollased( *it );
   }
 
   for ( QModelIndexList::Iterator it = indexes.begin(); 
-	it != indexes.end() && !opened; ++it ) {
+        it != indexes.end() && !opened; ++it ) {
     opened = hasExpanded( *it );
   }
 
@@ -1033,8 +1069,8 @@ bool OB_Browser::hasCollased( const QModelIndex& index ) const
     if ( !result && hasChildren ) {
       int rows = model()->rowCount( index );
       for ( int i = 0; i < rows && !result; i ++ ) {
-	QModelIndex child = model()->index( i, 0, index );
-	result = hasCollased( child );
+        QModelIndex child = model()->index( i, 0, index );
+        result = hasCollased( child );
       }
     }
   }
@@ -1055,8 +1091,8 @@ bool OB_Browser::hasExpanded( const QModelIndex& index ) const
     if ( !result && hasChildren ) {
       int rows = model()->rowCount( index );
       for ( int i = 0; i < rows && !result; i ++ ) {
-	QModelIndex child = model()->index( i, 0, index );
-	result = hasExpanded( child );
+        QModelIndex child = model()->index( i, 0, index );
+        result = hasExpanded( child );
       }
     }
   }

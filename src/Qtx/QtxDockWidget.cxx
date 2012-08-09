@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxDockWidget.cxx
 // Author:    Sergey TELKOV
 //
@@ -218,13 +219,13 @@ void QtxDockWidget::Watcher::hideContainer()
 */
 void QtxDockWidget::Watcher::customEvent( QEvent* e )
 {
-  if ( e->type() == Update )
+  if ( e->type() == (QEvent::Type)Update )
   {
     updateIcon();
     updateCaption();
     updateVisibility();
   }
-  else if ( myCont && e->type() == Remove && !myCont->widget() )
+  else if ( myCont && e->type() == (QEvent::Type)Remove && !myCont->widget() )
   {
     myCont->deleteLater();
     myCont = 0;
@@ -269,7 +270,7 @@ void QtxDockWidget::Watcher::updateVisibility()
     if ( l )
     {
       for ( int i = 0; i < (int)l->count() && !vis; i++ )
-	vis = l->itemAt( i ) && l->itemAt( i )->widget() && l->itemAt( i )->widget()->isVisibleTo( myCont );
+        vis = l->itemAt( i ) && l->itemAt( i )->widget() && l->itemAt( i )->widget()->isVisibleTo( myCont );
     }
   }
 
@@ -377,7 +378,7 @@ QSize QtxDockWidget::sizeHint() const
 {
   QSize sz = QDockWidget::sizeHint();
 
-  printf( "----------------> QtxDockWidget::sizeHint()\n" );
+  // printf( "----------------> QtxDockWidget::sizeHint()\n" );
 
   return QSize( 500, 100 );
 

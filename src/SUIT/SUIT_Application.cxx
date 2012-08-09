@@ -1,30 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_Application.h"
 
 #include "SUIT_Study.h"
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_ResourceMgr.h"
+#include "SUIT_ShortcutMgr.h"
 
 #include <QTimer>
 #include <QLabel>
@@ -35,6 +37,7 @@
 #include <QtxAction.h>
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
+
 
 /*!
   \class StatusLabel
@@ -122,6 +125,9 @@ void SUIT_Application::start()
 {
   if ( desktop() )
     desktop()->show();
+
+  // Initialize shortcut manager
+  SUIT_ShortcutMgr::Init();
 }
 
 /*!
@@ -171,6 +177,15 @@ SUIT_ResourceMgr* SUIT_Application::resourceMgr() const
     return 0;
 
   return SUIT_Session::session()->resourceMgr();
+}
+
+/*!
+  \brief Get access to shortcut manager.
+  \return global shortcut manager
+*/
+SUIT_ShortcutMgr* SUIT_Application::shortcutMgr() const
+{
+  return SUIT_ShortcutMgr::getShortcutMgr();
 }
 
 #define DEFAULT_MESSAGE_DELAY 3000
@@ -257,7 +272,9 @@ void SUIT_Application::setDesktop( SUIT_Desktop* desk )
   if ( myDesktop == desk )
     return;
 
-  delete myDesktop;
+  // >> VSR 09/06/2009: workaround about the Qt 4.5.0 bug: SIGSEGV on desktop delete
+  myDesktop->deleteLater(); // delete myDesktop;
+  // << VSR 09/06/2009
   myDesktop = desk;
   if ( myDesktop ) {
     connect( myDesktop, SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
@@ -287,10 +304,10 @@ void SUIT_Application::setActiveStudy( SUIT_Study* study )
 
   if ( myStudy )
     disconnect( myStudy, SIGNAL( studyModified( SUIT_Study* ) ),
-		this, SLOT( updateCommandsStatus() ) );
+                this, SLOT( updateCommandsStatus() ) );
   if ( study )
     connect( study, SIGNAL( studyModified( SUIT_Study* ) ),
-	     this, SLOT( updateCommandsStatus() ) );
+             this, SLOT( updateCommandsStatus() ) );
 
   myStudy = study;
 }
@@ -609,9 +626,10 @@ QList<int> SUIT_Application::actionIds() const
 */
 QAction* SUIT_Application::createAction( const int id, const QString& text, const QIcon& icon,
                                          const QString& menu, const QString& tip, const int key,
-                                         QObject* parent, const bool toggle, QObject* reciever, const char* member )
+                                         QObject* parent, const bool toggle, QObject* reciever, 
+					 const char* member, const QString& shortcutAction )
 {
-  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle );
+  QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle, shortcutAction );
   a->setStatusTip( tip );
 
   if ( reciever && member )
@@ -675,6 +693,6 @@ void SUIT_Application::onDesktopActivated()
 */
 void SUIT_Application::onHelpContextModule( const QString& /*theComponentName*/,
                                             const QString& /*theFileName*/,
-					    const QString& /*theContext*/ )
+                                            const QString& /*theContext*/ )
 {
 }

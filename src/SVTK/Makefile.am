@@ -1,28 +1,29 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Alexander Solovyov(OCN)
 #  Module : SVTK
-# $Header: 
+# $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
@@ -35,7 +36,6 @@ salomeinclude_HEADERS= \
 	SALOME_Actor.h \
 	SVTK_RectPicker.h \
 	SVTK_DeviceActor.h \
-	SVTK_DialogBase.h \
 	SVTK_FontWidget.h \
 	SVTK_CubeAxesActor2D.h \
 	SVTK_Functor.h \
@@ -57,7 +57,6 @@ salomeinclude_HEADERS= \
 	SVTK_SetRotationPointDlg.h \
 	SVTK_ViewParameterDlg.h \
 	SVTK_ComboAction.h \
-	SVTK_Extension.h \
 	SVTK_Recorder.h \
 	SVTK_RecorderDlg.h \
 	SVTK_ImageWriter.h \
@@ -73,7 +72,6 @@ dist_libSVTK_la_SOURCES= \
 	SVTK_NonIsometricDlg.cxx \
 	SVTK_UpdateRateDlg.cxx \
 	SVTK_CubeAxesDlg.cxx \
-	SVTK_DialogBase.cxx \
 	SVTK_FontWidget.cxx \
 	SVTK_Trihedron.cxx \
 	SVTK_View.cxx \
@@ -90,11 +88,14 @@ dist_libSVTK_la_SOURCES= \
 	SVTK_SetRotationPointDlg.cxx \
 	SVTK_ViewParameterDlg.cxx \
 	SVTK_ComboAction.cxx \
-	SVTK_Extension.cxx \
 	SVTK_Recorder.cxx \
 	SVTK_RecorderDlg.cxx \
 	SVTK_ImageWriter.cxx \
-	SVTK_ImageWriterMgr.cxx
+	SVTK_ImageWriterMgr.cxx \
+	vtkPVAxesActor.h \
+	vtkPVAxesActor.cxx \
+	vtkPVAxesWidget.h \
+	vtkPVAxesWidget.cxx
 
 
 # internal headers
@@ -107,7 +108,6 @@ MOC_FILES= \
 	SVTK_UpdateRateDlg_moc.cxx \
 	SVTK_CubeAxesDlg_moc.cxx \
 	SVTK_FontWidget_moc.cxx \
-	SVTK_DialogBase_moc.cxx \
 	SVTK_ViewModelBase_moc.cxx \
 	SVTK_ViewManager_moc.cxx \
 	SVTK_ViewWindow_moc.cxx \
@@ -128,13 +128,17 @@ dist_salomeres_DATA=\
 	resources/vtk_view_perspective.png \
 	resources/vtk_view_parameters.png \
 	resources/vtk_view_style_switch.png \
+	resources/vtk_view_zooming_style_switch.png \
 	resources/vtk_view_recording_start.png \
 	resources/vtk_view_recording_play.png \
 	resources/vtk_view_recording_pause.png \
-	resources/vtk_view_recording_stop.png
+	resources/vtk_view_recording_stop.png \
+	resources/vtk_view_sync.png \
+	resources/vtk_view_highlight.png
 
 nodist_salomeres_DATA =	\
 	SVTK_msg_en.qm	\
+	SVTK_msg_fr.qm	\
 	SVTK_images.qm
 
 libSVTK_la_CPPFLAGS =		\
@@ -144,17 +148,23 @@ libSVTK_la_CPPFLAGS =		\
 	$(BOOST_CPPFLAGS)	\
 	-I$(srcdir)/../Qtx	\
 	-I$(srcdir)/../SUIT	\
+	-I$(srcdir)/../ViewerTools \
 	-I$(srcdir)/../OBJECT	\
 	-I$(srcdir)/../Prs 	\
-	-I$(srcdir)/../VTKViewer
+	-I$(srcdir)/../VTKViewer \
+	-I$(srcdir)/../OpenGLUtils
 
 libSVTK_la_LDFLAGS =			\
+	$(VTK_LIBS) $(OGL_LIBS)		\
 	$(QT_MT_LIBS)			\
-	$(CAS_KERNEL) $(CAS_VIEWER)	\
-	$(VTK_LIBS) $(OGL_LIBS)
+	$(CAS_KERNEL) $(CAS_VIEWER)     \
+	$(KERNEL_LDFLAGS)
 
-libSVTK_la_LIBADD = ../Qtx/libqtx.la ../SUIT/libsuit.la ../OBJECT/libSalomeObject.la \
-		    ../Prs/libSalomePrs.la ../VTKViewer/libVTKViewer.la
+
+libSVTK_la_LIBADD = ../Qtx/libqtx.la ../SUIT/libsuit.la ../ViewerTools/libViewerTools.la \
+		    ../OBJECT/libSalomeObject.la ../Prs/libSalomePrs.la \
+		    ../VTKViewer/libVTKViewer.la ../OpenGLUtils/libOpenGLUtils.la \
+		    -lSALOMELocalTrace -lOpUtil
 
 # Executable
 bin_PROGRAMS = SVTK

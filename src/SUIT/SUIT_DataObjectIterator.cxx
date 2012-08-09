@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_DataObjectIterator.h"
 
 /*!
@@ -26,8 +27,7 @@
 */
 SUIT_DataObjectIterator::SUIT_DataObjectIterator( SUIT_DataObject* root, const int det, const bool fromTrueRoot )
 : myRoot( root ),
-myDetourType( det ),
-myCurrentLevel( 0 )
+myDetourType( det )
 {
   if ( myRoot && fromTrueRoot )
     myRoot = myRoot->root();
@@ -64,7 +64,7 @@ void SUIT_DataObjectIterator::operator++()
       if ( myCurrent->myChildren.count() > 0 )
       {
         myCurrent = extreme( myCurrent->myChildren, myDetourType == DepthLeft );
-        myCurrentLevel++;
+        myChildrenIndexes.append(myDetourType == DepthLeft ? 0 : myCurrent->myChildren.size() - 1);
       }
       else do
       {
@@ -77,18 +77,22 @@ void SUIT_DataObjectIterator::operator++()
         }
         else
         {
-          int idx = aParent->myChildren.indexOf( myCurrent );
-          if ( myDetourType == DepthLeft )
-            myCurrent = idx < aParent->myChildren.count() - 1 ? aParent->myChildren[idx + 1] : 0;
-          else
-            myCurrent = idx > 0 ? aParent->myChildren[idx - 1] : 0;
-          if ( !myCurrent )
+          int idx = myChildrenIndexes.last();
+          if (myDetourType == DepthLeft && idx < aParent->myChildren.count() - 1) 
           {
-            myCurrent = aParent;
-            myCurrentLevel--;
-          }
-          else
+            myChildrenIndexes.last()++;
+            myCurrent = aParent->myChildren[idx + 1];
             exit = true;
+          }
+          else if (myDetourType == DepthRight && idx > 0) 
+          {
+            myChildrenIndexes.last()--;
+            myCurrent = aParent->myChildren[idx - 1];
+            exit = true;
+          } else {
+            myCurrent = aParent;
+            myChildrenIndexes.removeLast();
+          }
         }
       }
       while ( !exit );
@@ -106,7 +110,7 @@ void SUIT_DataObjectIterator::operator++()
           {
             myExtremeChild = extreme( cur->myChildren, myDetourType == BreadthLeft );
             myCurrent = myExtremeChild;
-            myCurrentLevel++;
+            myChildrenIndexes.append(myDetourType == BreadthLeft ? 0 : myCurrent->myChildren.size() - 1);
           }
         }
       }
@@ -129,7 +133,7 @@ SUIT_DataObject* SUIT_DataObjectIterator::current() const
 */
 int SUIT_DataObjectIterator::depth() const
 {
-  return myCurrentLevel;
+  return myChildrenIndexes.size();
 }
 
 /*!

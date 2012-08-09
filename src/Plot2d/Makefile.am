@@ -1,24 +1,25 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : Plot2d
@@ -29,22 +30,39 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 lib_LTLIBRARIES = libPlot2d.la
 
 # header files 
-salomeinclude_HEADERS =		\
-	Plot2d.h		\
-	Plot2d_Curve.h		\
-	Plot2d_FitDataDlg.h	\
-	Plot2d_Prs.h		\
-	Plot2d_SetupViewDlg.h	\
-	Plot2d_ViewFrame.h	\
-	Plot2d_ViewManager.h	\
-	Plot2d_ViewModel.h	\
-	Plot2d_ViewWindow.h	\
-	Plot2d_SetupCurveDlg.h	\
-	Plot2d_ToolTip.h
+salomeinclude_HEADERS =		        \
+	Plot2d.h		        \
+	Plot2d_PlotItems.h	        \
+	Plot2d_Object.h		        \
+	Plot2d_Curve.h		        \
+	Plot2d_Histogram.h	        \
+	Plot2d_FitDataDlg.h	        \
+	Plot2d_Prs.h		        \
+	Plot2d_SetupViewDlg.h     	\
+	Plot2d_ViewFrame.h	        \
+	Plot2d_ViewManager.h	        \
+	Plot2d_ViewModel.h	        \
+	Plot2d_ViewWindow.h	        \
+	Plot2d_Algorithm.h		\
+	Plot2d_NormalizeAlgorithm.h	\
+	Plot2d_SetupCurveDlg.h	        \
+	Plot2d_ToolTip.h                \
+	Plot2d_SetupCurveScaleDlg.h	
+
+if ENABLE_PYCONSOLE
+salomeinclude_HEADERS +=                \
+	Plot2d_AnalyticalCurve.h   	\
+	Plot2d_AnalyticalCurveDlg.h       \
+        Plot2d_AnalyticalParser.h
+endif
+
 
 dist_libPlot2d_la_SOURCES =		\
 	Plot2d.cxx			\
+	Plot2d_PlotItems.cxx		\
+	Plot2d_Object.cxx		\
 	Plot2d_Curve.cxx		\
+	Plot2d_Histogram.cxx		\
 	Plot2d_FitDataDlg.cxx		\
 	Plot2d_Prs.cxx			\
 	Plot2d_SetupViewDlg.cxx		\
@@ -52,8 +70,18 @@ dist_libPlot2d_la_SOURCES =		\
 	Plot2d_ViewManager.cxx		\
 	Plot2d_ViewModel.cxx		\
 	Plot2d_ViewWindow.cxx		\
+	Plot2d_Algorithm.cxx		\
+	Plot2d_NormalizeAlgorithm.cxx	\
 	Plot2d_SetupCurveDlg.cxx	\
-	Plot2d_ToolTip.cxx
+	Plot2d_SetupCurveScaleDlg.cxx	\
+	Plot2d_ToolTip.cxx              
+
+if ENABLE_PYCONSOLE
+dist_libPlot2d_la_SOURCES +=            \
+	Plot2d_AnalyticalCurve.cxx	\
+	Plot2d_AnalyticalCurveDlg.cxx     \
+        Plot2d_AnalyticalParser.cxx
+endif
 
 MOC_FILES =				\
 	Plot2d_FitDataDlg_moc.cxx	\
@@ -63,7 +91,15 @@ MOC_FILES =				\
 	Plot2d_ViewModel_moc.cxx	\
 	Plot2d_ViewWindow_moc.cxx	\
 	Plot2d_SetupCurveDlg_moc.cxx	\
+	Plot2d_Algorithm_moc.cxx		\
+	Plot2d_NormalizeAlgorithm_moc.cxx	\
+	Plot2d_SetupCurveScaleDlg_moc.cxx	\
 	Plot2d_ToolTip_moc.cxx
+
+if ENABLE_PYCONSOLE
+MOC_FILES +=         Plot2d_AnalyticalCurveDlg_moc.cxx
+endif
+
 nodist_libPlot2d_la_SOURCES = $(MOC_FILES)
 
 dist_salomeres_DATA =				\
@@ -80,17 +116,24 @@ dist_salomeres_DATA =				\
 	resources/plot2d_log_y.png		\
 	resources/plot2d_pan.png		\
 	resources/plot2d_points.png		\
+	resources/plot2d_print.png		\
 	resources/plot2d_settings.png		\
 	resources/plot2d_splines.png		\
+	resources/plot2d_analytical_curve.png	\
+	resources/plot2d_lmax_normalization.png	\
+	resources/plot2d_lmin_normalization.png	\
+	resources/plot2d_rmax_normalization.png	\
+	resources/plot2d_rmin_normalization.png	\
 	resources/plot2d_zoom.png
 
 nodist_salomeres_DATA =		\
 	Plot2d_images.qm	\
-	Plot2d_msg_en.qm 
+	Plot2d_msg_en.qm 	\
+	Plot2d_msg_fr.qm 
 
 libPlot2d_la_CPPFLAGS = $(QT_INCLUDES) $(PYTHON_INCLUDES) $(QWT_INCLUDES) \
 	-I$(srcdir)/../Qtx -I$(srcdir)/../SUIT
 
-libPlot2d_la_LDFLAGS  = $(QWT_LIBS) $(QT_MT_LIBS) ../SUIT/libsuit.la
+libPlot2d_la_LDFLAGS  = $(QWT_LIBS) $(QT_MT_LIBS) $(PYTHON_LIBS) ../SUIT/libsuit.la
 
 

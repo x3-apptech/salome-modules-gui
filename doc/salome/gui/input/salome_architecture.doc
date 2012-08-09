@@ -12,7 +12,7 @@ specification of physical properties for a given domain. The
 originality of this approach is that the various components must
 cooperate dynamically and be configurable.
 
-\image html image54.jpg
+\image html image54.png
 
 <br>SALOME platform integrates a number of modules each having its own function:
 <ul>
@@ -53,7 +53,7 @@ the Study) to the specific data created and stored in the
 component. All components represent \b CORBA servers and it allows to
 run them on different host stations.
 
-\image html image67.gif
+\image html image67.png
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 It is equally possible to create engine-independent modules. These

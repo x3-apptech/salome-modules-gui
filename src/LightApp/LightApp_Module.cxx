@@ -1,28 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      LightApp_Module.cxx
 // Created:   6/20/2005 16:30:56 AM
 // Author:    OCC team
-//
+
 #include "LightApp_Module.h"
 
 #include "CAM_Application.h"
@@ -45,6 +46,7 @@
 #include <SUIT_Operation.h>
 #include <SUIT_ViewManager.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_ShortcutMgr.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_TreeModel.h>
 
@@ -91,6 +93,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <iostream>
 
 /*!Constructor.*/
 LightApp_Module::LightApp_Module( const QString& name )
@@ -136,6 +139,7 @@ void LightApp_Module::contextMenuPopup( const QString& client, QMenu* menu, QStr
 {
   LightApp_Selection* sel = createSelection();
   sel->init( client, getApp()->selectionMgr() );
+
   popupMgr()->setSelection( sel );
   popupMgr()->setMenu( menu );
   popupMgr()->updateMenu();
@@ -145,7 +149,7 @@ void LightApp_Module::contextMenuPopup( const QString& client, QMenu* menu, QStr
  * For updating model or whole object browser use update() method can be used.
 */
 void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel, 
-					SUIT_DataObject* theDataObject )
+                                        SUIT_DataObject* theDataObject )
 {
   bool upd = getApp()->objectBrowser()->autoUpdate();
   getApp()->objectBrowser()->setAutoUpdate( false );
@@ -153,12 +157,12 @@ void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel,
   if( theIsUpdateDataModel ){
     if( CAM_DataModel* aDataModel = dataModel() ){
       if ( LightApp_DataModel* aModel = dynamic_cast<LightApp_DataModel*>( aDataModel ) ) {
-	SUIT_DataObject* aParent = NULL;
-	if(theDataObject && theDataObject != aDataModel->root())
-	  aParent = theDataObject->parent();
+        //SUIT_DataObject* aParent = NULL;
+        //if(theDataObject && theDataObject != aDataModel->root())
+        //  aParent = theDataObject->parent();
 
-	LightApp_DataObject* anObject = dynamic_cast<LightApp_DataObject*>(theDataObject);
-	LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(getApp()->activeStudy());
+        LightApp_DataObject* anObject = dynamic_cast<LightApp_DataObject*>(theDataObject);
+        LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(getApp()->activeStudy());
         aModel->update( anObject, aStudy );
       }
     }
@@ -219,6 +223,17 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
   if ( mySwitchOp == 0 )
     mySwitchOp = new LightApp_SwitchOp( this );
 
+  // Enable Display and Erase actions
+  if ( action(myDisplay) )
+    action(myDisplay)->setEnabled(true);
+  if ( action(myErase) )
+    action(myErase)->setEnabled(true);
+
+  application()->shortcutMgr()->setSectionEnabled( moduleName() );
+
+  /*  BUG 0020498 : The Entry column is always shown at module activation
+      The registration of column is moved into LightApp_Application
+
   QString EntryCol = QObject::tr( "ENTRY_COLUMN" );
   LightApp_DataModel* m = dynamic_cast<LightApp_DataModel*>( dataModel() );
   if( m )
@@ -226,7 +241,7 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
     SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( getApp()->objectBrowser()->model() );
     m->registerColumn( getApp()->objectBrowser(), EntryCol, LightApp_DataObject::EntryId );
     treeModel->setAppropriate( EntryCol, Qtx::Toggled );
-  }
+  }*/
   return res;
 }
 
@@ -237,9 +252,9 @@ bool LightApp_Module::deactivateModule( SUIT_Study* study )
   mySwitchOp = 0;
 
   disconnect( application(), SIGNAL( viewManagerAdded( SUIT_ViewManager* ) ),
-	      this, SLOT( onViewManagerAdded( SUIT_ViewManager* ) ) );
+              this, SLOT( onViewManagerAdded( SUIT_ViewManager* ) ) );
   disconnect( application(), SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
-	      this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
+              this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
 
   // abort all operations
   MapOfOperation::const_iterator anIt;
@@ -247,6 +262,15 @@ bool LightApp_Module::deactivateModule( SUIT_Study* study )
     anIt.value()->abort();
   }
 
+  // Disable Display and Erase action
+  if ( action(myDisplay) )
+    action(myDisplay)->setEnabled(false);
+  if ( action(myErase) )
+    action(myErase)->setEnabled(false);
+
+  application()->shortcutMgr()->setSectionEnabled( moduleName(), false );
+  
+  /*  BUG 0020498 : The Entry column is always shown at module activation
   QString EntryCol = QObject::tr( "ENTRY_COLUMN" );
   LightApp_DataModel* m = dynamic_cast<LightApp_DataModel*>( dataModel() );
   if( m )
@@ -256,6 +280,7 @@ bool LightApp_Module::deactivateModule( SUIT_Study* study )
     treeModel->setAppropriate( EntryCol, Qtx::Shown );
     m->unregisterColumn( getApp()->objectBrowser(), EntryCol );
   }
+  */
   return CAM_Module::deactivateModule( study );
 }
 
@@ -271,6 +296,11 @@ void LightApp_Module::createPreferences()
 
 /*!NOT IMPLEMENTED*/
 void LightApp_Module::preferencesChanged( const QString&, const QString& )
+{
+}
+
+/*!NOT IMPLEMENTED*/
+void LightApp_Module::message( const QString& )
 {
 }
 
@@ -380,13 +410,13 @@ QtxPopupMgr* LightApp_Module::popupMgr()
     
     QAction 
       *disp = createAction( -1, tr( "TOP_SHOW" ), p, tr( "MEN_SHOW" ), tr( "STB_SHOW" ),
-			    0, d, false, this, SLOT( onShowHide() ) ),
+                            0, d, false, this, SLOT( onShowHide() ), QString("General:Show object(s)") ),
       *erase = createAction( -1, tr( "TOP_HIDE" ), p, tr( "MEN_HIDE" ), tr( "STB_HIDE" ),
-			     0, d, false, this, SLOT( onShowHide() ) ),
+                             0, d, false, this, SLOT( onShowHide() ) , QString("General:Hide object(s)") ),
       *dispOnly = createAction( -1, tr( "TOP_DISPLAY_ONLY" ), p, tr( "MEN_DISPLAY_ONLY" ), tr( "STB_DISPLAY_ONLY" ),
-			        0, d, false, this, SLOT( onShowHide() ) ),
+                                0, d, false, this, SLOT( onShowHide() ) ),
       *eraseAll = createAction( -1, tr( "TOP_ERASE_ALL" ), p, tr( "MEN_ERASE_ALL" ), tr( "STB_ERASE_ALL" ),
-			        0, d, false, this, SLOT( onShowHide() ) );
+                                0, d, false, this, SLOT( onShowHide() ) );
     myDisplay     = actionId( disp );
     myErase       = actionId( erase );
     myDisplayOnly = actionId( dispOnly );
@@ -505,7 +535,7 @@ void LightApp_Module::setPreferenceProperty( const int id, const QString& prop, 
 void LightApp_Module::startOperation( const int id )
 {
   LightApp_Operation* op = 0;
-  if( myOperations.contains( id ) )
+  if( myOperations.contains( id ) && reusableOperation( id ) )
     op = myOperations[ id ];
   else
   {
@@ -635,4 +665,120 @@ void LightApp_Module::onViewManagerRemoved( SUIT_ViewManager* )
 LightApp_Operation* LightApp_Module::operation( const int id ) const
 {
   return myOperations.contains( id ) ? myOperations[id] : 0;
+}
+
+/*!
+  virtual method called to manage the same operations
+*/
+bool LightApp_Module::reusableOperation( const int id )
+{
+ return true;
+} 
+
+/*!
+  virtual method
+  \return true if module can copy the current selection
+*/
+bool LightApp_Module::canCopy() const
+{
+  return false;
+}
+
+/*!
+  virtual method
+  \return true if module can paste previously copied data
+*/
+bool LightApp_Module::canPaste() const
+{
+  return false;
+}
+
+/*!
+  virtual method
+  \brief Copies the current selection into clipboard
+*/
+void LightApp_Module::copy()
+{
+}
+
+/*!
+  virtual method
+  \brief Pastes the current data in the clipboard
+*/
+void LightApp_Module::paste()
+{
+}
+
+/*!
+  virtual method
+  \return true if module allows dragging the given object
+*/
+bool LightApp_Module::isDraggable( const SUIT_DataObject* /*what*/ ) const
+{
+  return false;
+}
+
+/*!
+  virtual method
+  \return true if module allows dropping one or more objects (currently selected) on the object \c where
+*/
+bool LightApp_Module::isDropAccepted( const SUIT_DataObject* /*where*/ ) const
+{
+  return false;
+}
+
+/*!
+  virtual method
+  Complete drag-n-drop operation by processing objects \a what being dragged, dropped to the line \a row
+  within the object \a where. The drop action being performed is specified by \a action.
+*/
+void LightApp_Module::dropObjects( const DataObjectList& /*what*/, SUIT_DataObject* /*where*/,
+                                   const int /*row*/, Qt::DropAction /*action*/ )
+{
+}
+
+/*!
+  \brief Return \c true if object can be renamed
+*/
+bool LightApp_Module::renameAllowed( const QString& /*entry*/ ) const
+{
+  return false;
+}
+
+/*!
+  Rename object by entry.
+  \param entry entry of the object
+  \param name new name of the object
+  \brief Return \c true if rename operation finished successfully, \c false otherwise.
+*/
+bool LightApp_Module::renameObject( const QString& /*entry*/, const QString& /*name*/ )
+{
+  return false;
+}
+
+
+
+int LightApp_Module::createMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx )
+{
+  return CAM_Module::createMenu( subMenu, menu, id, group, idx );
+}
+int LightApp_Module::createMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx )
+{
+  return CAM_Module::createMenu( subMenu, menu, id, group, idx );
+}
+int LightApp_Module::createMenu( const int id, const int menu, const int group, const int idx )
+{
+  return CAM_Module::createMenu( id, menu, group, idx );
+}
+int LightApp_Module::createMenu( const int id, const QString& menu, const int group, const int idx )
+{
+  return CAM_Module::createMenu( id, menu, group, idx );
+}
+int LightApp_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
+{
+  return CAM_Module::createMenu( a, menu, id, group, idx );
+}
+int LightApp_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
+{
+  return CAM_Module::createMenu( a, menu, id, group, idx );
 }

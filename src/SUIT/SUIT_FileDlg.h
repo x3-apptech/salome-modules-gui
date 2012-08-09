@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SUIT_FileDlg.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -33,6 +34,7 @@ class QLabel;
 class QLineEdit;
 class QComboBox;
 class QPushButton;
+class QUrl;
 class SUIT_FileValidator;
 
 class SUIT_EXPORT SUIT_FileDlg : public QFileDialog
@@ -61,38 +63,38 @@ public:
   static QString      getLastVisitedDirectory();
 
   static QString      getFileName( QWidget*, 
-				   const QString&, 
-				   const QStringList&, 
-				   const QString& = QString(), 
-				   const bool = true, 
-				   const bool = true,
+                                   const QString&, 
+                                   const QStringList&, 
+                                   const QString& = QString(), 
+                                   const bool = true, 
+                                   const bool = true,
                                    SUIT_FileValidator* = 0 );
   static QString      getFileName( QWidget*, 
-				   const QString&, 
-				   const QString&,
-				   const QString& = QString(), 
-				   const bool = true,
-				   const bool = true,
+                                   const QString&, 
+                                   const QString&,
+                                   const QString& = QString(), 
+                                   const bool = true,
+                                   const bool = true,
                                    SUIT_FileValidator* = 0 );
 
   static QStringList  getOpenFileNames( QWidget*, 
-					const QString&,
-					const QStringList&, 
-				        const QString& = QString(),
-					const bool = true, 
-				        SUIT_FileValidator* = 0 );
+                                        const QString&,
+                                        const QStringList&, 
+                                        const QString& = QString(),
+                                        const bool = true, 
+                                        SUIT_FileValidator* = 0 );
   static QStringList  getOpenFileNames( QWidget*, 
-					const QString&,
-					const QString&, 
-				        const QString& = QString(),
-					const bool = true, 
-				        SUIT_FileValidator* = 0 );
+                                        const QString&,
+                                        const QString&, 
+                                        const QString& = QString(),
+                                        const bool = true, 
+                                        SUIT_FileValidator* = 0 );
 
   static QString      getExistingDirectory( QWidget*, 
-					    const QString&,
+                                            const QString&,
                                             const QString& = QString(), 
-					    const bool = true,
-					    SUIT_FileValidator* = 0 );
+                                            const bool = true,
+                                            SUIT_FileValidator* = 0 );
 
   static QString      getLastVisitedPath();
 
@@ -117,6 +119,7 @@ private:
   SUIT_FileValidator* myValidator;        //!< file validator
   QLabel*             myQuickLab;         //!< quick dir combo box
   QComboBox*          myQuickCombo;       //!< quick dir combo box
+  QList<QUrl>         myUrls;             //!< quick dir Sidebar Urls
   QPushButton*        myQuickButton;      //!< quick dir add button
   bool                myCheckPermissions; //!< check permissions option
   static QString      myLastVisitedPath;  //!< last visited path

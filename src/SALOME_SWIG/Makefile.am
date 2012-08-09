@@ -1,24 +1,25 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Paul RASCLE, EDF
 #  Module : SALOME
@@ -53,8 +54,9 @@ SWIG_SOURCES  = libSALOME_Swig.i
 
 libSALOME_Swig.py: swig_wrap.cpp
 
-# library
-lib_LTLIBRARIES = _libSALOME_Swig.la
+salomepython_PYTHON = libSALOME_Swig.py
+salomepyexec_LTLIBRARIES = _libSALOME_Swig.la
+
 _libSALOME_Swig_la_SOURCES = $(SWIG_SOURCES) SALOMEGUI_Swig.cxx
 nodist__libSALOME_Swig_la_SOURCES = swig_wrap.cpp
 salomeinclude_HEADERS = $(SWIG_SOURCES) SALOMEGUI_Swig.hxx SALOMEGUI_Swig.i
@@ -62,18 +64,17 @@ salomeinclude_HEADERS = $(SWIG_SOURCES) SALOMEGUI_Swig.hxx SALOMEGUI_Swig.i
 _libSALOME_Swig_la_CPPFLAGS = \
 	$(QT_INCLUDES) $(QWT_INCLUDES) $(PYTHON_INCLUDES) $(CAS_CPPFLAGS) $(VTK_INCLUDES)	\
 	$(OGL_INCLUDES) $(BOOST_CPPFLAGS) -DHAVE_CONFIG_H @KERNEL_CXXFLAGS@			\
-	-I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl -I$(srcdir) 			\
-	-I$(srcdir)/../SalomeApp -I$(srcdir)/../Qtx -I$(srcdir)/../SUIT				\
+	-I$(top_builddir)/idl -I$(srcdir) 							\
+	-I$(srcdir)/../LightApp -I$(srcdir)/../Qtx -I$(srcdir)/../SUIT				\
 	-I$(srcdir)/../ObjBrowser -I$(srcdir)/../LightApp -I$(srcdir)/../SOCC			\
 	-I$(srcdir)/../SVTK -I$(srcdir)/../Event -I$(srcdir)/../OBJECT				\
 	-I$(srcdir)/../CAM -I$(srcdir)/../STD -I$(srcdir)/../OCCViewer				\
 	-I$(srcdir)/../Prs -I$(srcdir)/../VTKViewer -I$(srcdir)/../SPlot2d			\
-	-I$(srcdir)/../Plot2d									\
-	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@
+	-I$(srcdir)/../Plot2d
 
 _libSALOME_Swig_la_LDFLAGS  = -module
 _libSALOME_Swig_la_LIBADD   =		\
-	../SalomeApp/libSalomeApp.la	\
+	../LightApp/libLightApp.la	\
 	@PYTHON_LIBS@
 
 swig_wrap.cpp : $(SWIG_SOURCES)

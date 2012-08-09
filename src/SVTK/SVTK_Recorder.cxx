@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "SVTK_Recorder.h"
 
 #include "SVTK_ImageWriter.h"
@@ -60,11 +58,10 @@ namespace
   inline
   void
   GetNameJPEG(const std::string& thePreffix,  
-	      const int theIndex,
-	      std::string& theName)
+              const int theIndex,
+              std::string& theName)
   {
-    using namespace std;
-    ostringstream aStream;
+    std::ostringstream aStream;
     aStream<<thePreffix<<"_"<<setw(6)<<setfill('0')<<theIndex<<".jpeg";
     theName = aStream.str();
   }
@@ -116,9 +113,12 @@ SVTK_Recorder
 ::CheckExistAVIMaker()
 {
   myErrorStatus = 0;
-  using namespace std;
-  ostringstream aStream;
-  aStream<<"which "<<myNameAVIMaker<<" >& /dev/null";
+  std::ostringstream aStream;
+#ifndef WIN32
+  aStream<<"which "<<myNameAVIMaker<<" 2> /dev/null";
+#else
+  aStream<<"setlocal & set P2=.;%PATH% & (for %e in (%PATHEXT%) do @for %i in ("<<myNameAVIMaker<<"%e) do @if NOT \"%~$P2:i\"==\"\" exit /b 0) & exit /b 1";
+#endif
   std::string anAVIMakeCheck = aStream.str();
   int iErr = system(anAVIMakeCheck.c_str());
   if(iErr != 0)
@@ -241,16 +241,16 @@ SVTK_Recorder
 void
 SVTK_Recorder
 ::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
-		unsigned long theEvent,
-		void* theClientData, 
-		void* vtkNotUsed(theCallData))
+                unsigned long theEvent,
+                void* theClientData, 
+                void* vtkNotUsed(theCallData))
 {
   if(vtkObject* anObj = reinterpret_cast<vtkObject*>(theClientData)){ 
     if(SVTK_Recorder* aSelf = dynamic_cast<SVTK_Recorder*>(anObj)){
       if(theEvent==vtkCommand::EndEvent){
-	if(aSelf->State() == SVTK_Recorder::SVTK_Recorder_Record){
-	  aSelf->DoRecord();
-	}
+        if(aSelf->State() == SVTK_Recorder::SVTK_Recorder_Record){
+          aSelf->DoRecord();
+        }
       }
     }
   }
@@ -322,9 +322,9 @@ SVTK_Recorder
 inline 
 int
 GetFrameIndex(double theStartTime,
-	      double theFPS)
+              double theFPS)
 {
-  double aTimeNow = vtkTimerLog::GetCurrentTime();
+  double aTimeNow = vtkTimerLog::GetUniversalTime();
   double aDelta = aTimeNow - theStartTime;
   return int(aDelta*theFPS);
 }
@@ -338,7 +338,7 @@ SVTK_Recorder
 
   if(myFrameIndex < 0){
     myFrameIndex = 0;
-    myTimeStart = vtkTimerLog::GetCurrentTime();
+    myTimeStart = vtkTimerLog::GetUniversalTime();
   }else{
     int aFrameIndex = GetFrameIndex(myTimeStart,myNbFPS);
     if(aFrameIndex <= myFrameIndex)
@@ -350,8 +350,8 @@ SVTK_Recorder
       myFrameIndexes.back() = abs(myFrameIndexes.back());
       double aPauseTime = fabs((double)(aFrameIndex - myFrameIndex - 1)) / myNbFPS;
       if(MYDEBUG) 
-	cout<<"SVTK_Recorder::DoRecord - aFrameIndex = "<<aFrameIndex<<
-	  "; aPauseTime = "<<aPauseTime<<endl;
+        cout<<"SVTK_Recorder::DoRecord - aFrameIndex = "<<aFrameIndex<<
+          "; aPauseTime = "<<aPauseTime<<endl;
       myTimeStart += aPauseTime;
     }
 
@@ -399,8 +399,8 @@ SVTK_Recorder
   anImageData->UpdateInformation();
   int *anExtent = anImageData->GetWholeExtent();
   anImageData->SetUpdateExtent(anExtent[0], anExtent[1],
-			       anExtent[2], anExtent[3],
-			       0,0);
+                               anExtent[2], anExtent[3],
+                               0,0);
   anImageData->UpdateData();
 }
 
@@ -432,10 +432,19 @@ SVTK_Recorder
       myNbWrittenFrames++;
       std::string anCurrentName;
       GetNameJPEG(myName,anIndex,anCurrentName);
+  #ifndef WIN32
       aStream<<"ln -s "<< anInitialName<<" "<<anCurrentName<<";";
+  #else
+      aStream<<"COPY /Y "<<QString::fromStdString(anInitialName).replace("/","\\\\").toStdString()<<
+		  " "<<QString::fromStdString(anCurrentName).replace("/","\\\\").toStdString()<<" > NUL";
+  #endif
       if(anIndex + 1 < aFinishIndex)
-	aStream<<" \\";
-      aStream<<endl;
+  #ifndef WIN32
+        aStream<<" \\";
+        aStream<<endl;
+  #else
+        aStream<<" & ";
+  #endif
     }
     std::string aString(aStream.str());
     system(aString.c_str());
@@ -457,10 +466,11 @@ SVTK_Recorder
     //" -f "<<int(myNbFPS)<<" "<<
     " -f "<<myNbFPS<<" "<<
     " -n "<<myNbWrittenFrames<<" "<<
-    " -j "<<myName<<"_\%06d.jpeg "<<
-    "| yuv2lav"<<
-    " -o "<<myName;
-   
+    " -j \""<<myName<<"_\%06d.jpeg\" "<<
+    "| yuv2lav"<<" -o \""<<myName<<"\"";
+#ifdef WIN32
+  aStream<<" -f aA";   
+#endif
   std::string aString(aStream.str());
   myErrorStatus = system(aString.c_str());
 
@@ -469,12 +479,20 @@ SVTK_Recorder
   QFileInfo aFileInfo(myName.c_str());
   QString aDirPath = aFileInfo.absoluteDir().path();
   QString aBaseName = aFileInfo.fileName();
-  QString aCommand = 
-    QString("(cd ") + aDirPath + 
+  QString aCommand;
+#ifndef WIN32
+  aCommand = QString("(cd ") + aDirPath + 
     "; ls " +
     " | egrep '" + aBaseName + "_[0-9]*.jpeg'" +
     " | xargs rm " +
     ")";
+#else
+  QString tmpFile = QString("_") + aBaseName + "_tempfile";
+  QString diskName = aDirPath.split("/")[0];
+  aCommand = diskName + " && (cd " + aDirPath.replace("/","\\\\") + 
+	" && ((dir /b | findstr " + aBaseName + "_[0-9]*.jpeg > " + tmpFile + 
+	") & (for /f %i in (" + tmpFile + ") do (del \"%i\")) & (del " + tmpFile + "))) > NUL";
+#endif
 
   if(MYDEBUG) cout<<"SVTK_Recorder::MakeFileAVI - "<<(const char*)aCommand.toLatin1()<<endl;
   system((const char*)aCommand.toLatin1());

@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : SVTK_InteractorStyle.h
 //  Author : Christophe ATTANASIO
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef __SVTK_InteractorStyle_h
 #define __SVTK_InteractorStyle_h
 
@@ -126,6 +125,7 @@ class SVTK_EXPORT SVTK_ControllerOnKeyDown : public vtkObject{
 };
 
 class vtkPointPicker;
+class vtkTDxInteractorStyle;
 
 class SALOME_Actor;
 
@@ -158,7 +158,7 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
 
   typedef boost::shared_ptr<SVTK_SelectionEvent> PSelectionEvent;
 
-  
+  void SetTDxStyle(vtkTDxInteractorStyle*){} 
 
   //! Generate special #SVTK_SelectionEvent
   virtual SVTK_SelectionEvent* GetSelectionEvent();
@@ -199,6 +199,12 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   //! To handle right mouse button up event (reimplemented from #vtkInteractorStyle)
   virtual void OnRightButtonUp();
 
+  //! To handle mouse wheel forward event (reimplemented from #vtkInteractorStyle)
+  virtual void OnMouseWheelForward();
+
+  //! To handle mouse wheel backward event (reimplemented from #vtkInteractorStyle)
+  virtual void OnMouseWheelBackward();
+
   //! To handle keyboard event (reimplemented from #vtkInteractorStyle)
   virtual void OnChar();
 
@@ -226,6 +232,9 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   SVTK_Selector* GetSelector();
 
   int   CurrentState() const { return State; }
+
+  void SetAdvancedZoomingEnabled( const bool theState ) { myIsAdvancedZoomingEnabled = theState; }
+  bool IsAdvancedZoomingEnabled() const { return myIsAdvancedZoomingEnabled; }
 
   protected:
   SVTK_InteractorStyle();
@@ -264,9 +273,9 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   static 
   void
   ProcessEvents(vtkObject* object, 
-		unsigned long event,
-		void* clientData, 
-		void* callData );
+                unsigned long event,
+                void* clientData, 
+                void* callData );
 
   float MotionFactor;
   float RadianToDegree;                 // constant: for conv from deg to rad
@@ -349,6 +358,8 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   bool                            myBBFirstCheck;
 
   QRubberBand*                    myRectBand; //!< selection rectangle rubber band
+
+  bool                            myIsAdvancedZoomingEnabled;
 };
 
 #ifdef WIN32

@@ -1,29 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "LightApp_EventFilter.h"
 
 #include <SUIT_Desktop.h>
 
 #include <QApplication>
+
+#include <SALOME_Event.h>
 
 LightApp_EventFilter* LightApp_EventFilter::myFilter = NULL;
 
@@ -52,18 +55,35 @@ bool LightApp_EventFilter::eventFilter( QObject* o, QEvent* e )
       SUIT_Desktop* aDesktop = 0;
       
       while( parent )
-	{
-	  if ( aDesktop = dynamic_cast<SUIT_Desktop*>(parent) )
-	    break;
-	  parent = parent->parentWidget();
-	}
+        {
+          aDesktop = dynamic_cast<SUIT_Desktop*>(parent);
+          if ( aDesktop )
+            break;
+          parent = parent->parentWidget();
+        }
       
       if ( aDesktop )
-	aDesktop->emitActivated();
+        aDesktop->emitActivated();
+    }
+
+  else if(e->type() == SALOME_EVENT)
+    {
+      SALOME_Event* aSE = (SALOME_Event*)((SALOME_CustomEvent*)e)->data();
+      processEvent(aSE);
+      ((SALOME_CustomEvent*)e)->setData( 0 );
+      return true;
     }
   
   return QObject::eventFilter( o, e );
 }
+
+/*!Process event.*/
+void LightApp_EventFilter::processEvent( SALOME_Event* theEvent )
+{
+  if(theEvent)
+    theEvent->ExecutePostedEvent();
+}
+
 
 /*!Create new instance of LightApp_EventFilter*/
 void LightApp_EventFilter::Init()

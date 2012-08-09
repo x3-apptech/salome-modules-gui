@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SOCC_ViewModel.h"
 
 #include "SOCC_Prs.h"
@@ -44,6 +45,7 @@
 #include <SALOME_AISShape.hxx>
 #include <SALOME_AISObject.hxx>
 #include <SALOME_InteractiveObject.hxx>
+#include <SALOME_ListIO.hxx>
 
 // Temporarily commented to avoid awful dependecy on SALOMEDS
 // TODO: better mechanism of storing display/erse status in a study
@@ -55,8 +57,10 @@
 
 //#include "SALOMEDSClient.hxx"
 //#include "SALOMEDS_StudyManager.hxx"
+#include <Basics_OCCTVersion.hxx>
 
 #include <AIS_TypeOfIso.hxx>
+#include <Precision.hxx>
 
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
@@ -123,7 +127,7 @@ bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
     {
       if ( !isInLocal )
           OCCViewer_Viewer::highlight( ite.Value(), hilight, false );
-      // highlight subshapes only when local selection is active
+      // highlight sub-shapes only when local selection is active
       else
       {
         /*if ( ite.Value()->IsKind( STANDARD_TYPE( SALOME_AISShape ) ) )
@@ -179,17 +183,19 @@ bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
 */
 bool SOCC_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& obj )
 {
-  AIS_ListOfInteractive List;
-  getAISContext()->DisplayedObjects( List );
 
-  AIS_ListIteratorOfListOfInteractive ite( List );
-  for ( ; ite.More(); ite.Next() )
-  {
-    Handle(SALOME_InteractiveObject) anObj =
-      Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
-
-    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
-      return getAISContext()->IsDisplayed( ite.Value() );
+  std::map< std::string , std::vector<Handle(AIS_InteractiveObject)> >::iterator it=entry2aisobjects.find(obj->getEntry());
+  if(it != entry2aisobjects.end())
+    {
+      // get context
+      Handle (AIS_InteractiveContext) ic = getAISContext();
+      std::vector<Handle(AIS_InteractiveObject)>& List = it->second;
+      for( unsigned int ind = 0; ind < List.size(); ind++ )
+        {
+          Handle(AIS_InteractiveObject) anAIS=List[ind];
+          if(ic->IsDisplayed(anAIS))
+            return true;
+        }
   }
   
   return false;
@@ -204,21 +210,21 @@ bool SOCC_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& obj )
 void SOCC_Viewer::setColor( const Handle(SALOME_InteractiveObject)& obj,
                             const QColor& color, bool update )
 {
-  AIS_ListOfInteractive List;
-  getAISContext()->DisplayedObjects(List);
-  
-  AIS_ListIteratorOfListOfInteractive ite(List);
-  for ( ; ite.More(); ite.Next() )
-  {
-    Handle(SALOME_InteractiveObject) anObj =
-        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+  if(obj.IsNull() || !obj->hasEntry() )
+    return;
 
-    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+  if(entry2aisobjects.count(obj->getEntry())>0)
     {
-      OCCViewer_Viewer::setColor( ite.Value(), color, update );
-      return;
+      // get context
+      Handle (AIS_InteractiveContext) ic = getAISContext();
+      std::vector<Handle(AIS_InteractiveObject)>& List = entry2aisobjects[obj->getEntry()];
+      for( unsigned int ind = 0; ind < List.size(); ind++ )
+        {
+          Handle(AIS_InteractiveObject) anAIS=List[ind];
+          if( !anAIS.IsNull() && ic->IsDisplayed(anAIS))
+            OCCViewer_Viewer::setColor( anAIS, color, update );
+        }
     }
-  }
 }
 
 /*!
@@ -230,21 +236,21 @@ void SOCC_Viewer::setColor( const Handle(SALOME_InteractiveObject)& obj,
 void SOCC_Viewer::switchRepresentation( const Handle(SALOME_InteractiveObject)& obj,
                                         int mode, bool update )
 {
-  AIS_ListOfInteractive List;
-  getAISContext()->DisplayedObjects(List);
-  
-  AIS_ListIteratorOfListOfInteractive ite(List);
-  for ( ; ite.More(); ite.Next() )
-  {
-    Handle(SALOME_InteractiveObject) anObj =
-        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+  if(obj.IsNull() || !obj->hasEntry() )
+    return;
 
-    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+  if(entry2aisobjects.count(obj->getEntry())>0)
     {
-      OCCViewer_Viewer::switchRepresentation( ite.Value(), mode, update );
-      return;
+      // get context
+      Handle (AIS_InteractiveContext) ic = getAISContext();
+      std::vector<Handle(AIS_InteractiveObject)>& List = entry2aisobjects[obj->getEntry()];
+      for( unsigned int ind = 0; ind < List.size(); ind++ )
+        {
+          Handle(AIS_InteractiveObject) anAIS=List[ind];
+          if( !anAIS.IsNull() && ic->IsDisplayed(anAIS))
+            OCCViewer_Viewer::switchRepresentation( anAIS, mode, update );
+        }
     }
-  }
 }
 
 /*!
@@ -256,21 +262,21 @@ void SOCC_Viewer::switchRepresentation( const Handle(SALOME_InteractiveObject)& 
 void SOCC_Viewer::setTransparency( const Handle(SALOME_InteractiveObject)& obj,
                                    float trans, bool update )
 {
-  AIS_ListOfInteractive List;
-  getAISContext()->DisplayedObjects( List );
-  
-  AIS_ListIteratorOfListOfInteractive ite( List );
-  for ( ; ite.More(); ite.Next() )
-  {
-    Handle(SALOME_InteractiveObject) anObj =
-        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+  if(obj.IsNull() || !obj->hasEntry() )
+    return;
 
-    if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
+  if(entry2aisobjects.count(obj->getEntry())>0)
     {
-      OCCViewer_Viewer::setTransparency( ite.Value(), trans, update );
-      return;
+      // get context
+      Handle (AIS_InteractiveContext) ic = getAISContext();
+      std::vector<Handle(AIS_InteractiveObject)>& List = entry2aisobjects[obj->getEntry()];
+      for( unsigned int ind = 0; ind < List.size(); ind++ )
+        {
+          Handle(AIS_InteractiveObject) anAIS=List[ind];
+          if( !anAIS.IsNull() && ic->IsDisplayed(anAIS))
+            OCCViewer_Viewer::setTransparency( anAIS, trans, update );
+        }
     }
-  }
 }
 
 /*!
@@ -332,13 +338,6 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
   // get context
   Handle (AIS_InteractiveContext) ic = getAISContext();
 
-  // get all displayed objects
-  AIS_ListOfInteractive List;
-  ic->DisplayedObjects( List );
-  // get objects in the collector
-  AIS_ListOfInteractive ListCollector;
-  ic->ObjectsInCollector( ListCollector );
-
   // get objects to be displayed
   AIS_ListOfInteractive anAISObjects;
   anOCCPrs->GetObjects( anAISObjects );
@@ -350,68 +349,78 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
     if ( !anAIS.IsNull() )
     {
       // try to find presentation in the viewer
-      bool bDisplayed = false;
-      AIS_ListIteratorOfListOfInteractive ite( List );
-      for ( ; ite.More(); ite.Next() )
-      {
-        // compare presentations by handles
-        // if the object is already displayed - nothing to do more
-        if ( ite.Value() == anAIS )
+
+      // if the object is already displayed - nothing to do more
+      if(ic->IsDisplayed(anAIS))
         {
           // Deactivate object if necessary
           if ( !anOCCPrs->ToActivate() )
             ic->Deactivate( anAIS );
-          bDisplayed = true;
-          break;
+          continue;
         }
-      }
-
-      if ( bDisplayed )
-        continue;
 
       // then try to find presentation in the collector
-      bDisplayed = false;
-      ite.Initialize( ListCollector );
-      for ( ; ite.More(); ite.Next() )
-      {
-        // compare presentations by handles
-        // if the object is in collector - display it
-        if ( ite.Value() == anAIS )
+      if(ic->IsInCollector(anAIS))
         {
           ic->DisplayFromCollector( anAIS, false );
-
           // Deactivate object if necessary
           if ( !anOCCPrs->ToActivate() )
             ic->Deactivate( anAIS );
-          bDisplayed = true;
 
           // Set visibility flag
-	  // Temporarily commented to avoid awful dependecy on SALOMEDS
-	  // TODO: better mechanism of storing display/erse status in a study
-	  // should be provided...
-	  //Handle(SALOME_InteractiveObject) anObj =
+          // Temporarily commented to avoid awful dependecy on SALOMEDS
+          // TODO: better mechanism of storing display/erse status in a study
+          // should be provided...
+          //Handle(SALOME_InteractiveObject) anObj =
           //  Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
           //if ( !anObj.IsNull() && anObj->hasEntry() )
           //{
-	  //  if ( study )
-	  //    ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
-	  //}
-          break;
+          //  if ( study )
+          //    ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+          //}
+          continue;
         }
-      }
-      if ( bDisplayed )
-        continue;
 
       // if object is not displayed and not found in the collector - display it
       if ( anAIS->IsKind( STANDARD_TYPE(AIS_Trihedron) ) )
       {
         Handle(AIS_Trihedron) aTrh = Handle(AIS_Trihedron)::DownCast( anAIS );
         double aNewSize = 100, aSize = 100;
-        getTrihedronSize( aNewSize, aSize );
+        computeTrihedronSize( aNewSize, aSize );
         aTrh->SetSize( aTrh == getTrihedron() ? aNewSize : 0.5 * aNewSize );
       }
 
       ic->Display( anAIS, false );
+      
+#if OCC_VERSION_LARGE > 0x06050200 
+      Handle(SALOME_AISShape) aSh = Handle(SALOME_AISShape)::DownCast(anAIS);
+      if ( !aSh.IsNull() ) {
+          bool top = (aSh->isTopLevel() && aSh->switchTopLevel());
+	      ic->SetZLayer( aSh, top ? getTopLayerId() : 0 );
+		  if(!aSh->toActivate()) {
+			ic->Deactivate( aSh );
+		  }
+      }
+#endif
+      //Register anAIS (if it has an entry) in entry2aisobjects map
+      Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
+      if ( !anObj.IsNull() && anObj->hasEntry())
+        {
+          std::vector<Handle(AIS_InteractiveObject)>& List = entry2aisobjects[anObj->getEntry()];
+          int found=0;
+          for ( unsigned int ind = 0; ind < List.size(); ind++ )
+          {
+            if(List[ind] == anAIS)
+              {
+                found=1;
+                break;
+              }
+          }
+          if(!found)
+            {
+              List.push_back(anAIS);
+            }
+        }
 
       // Set visibility flag
       // Temporarily commented to avoid awful dependecy on SALOMEDS
@@ -430,6 +439,7 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
         ic->Deactivate( anAIS );
     }
   }
+  updateTrihedron();
 }
 
 
@@ -481,6 +491,7 @@ void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
       //}
     }
   }
+  updateTrihedron();
 }
 
 
@@ -507,8 +518,8 @@ void SOCC_Viewer::EraseAll( const bool forced )
   ic->DisplayedObjects( aList );
   AIS_ListIteratorOfListOfInteractive anIter( aList );
   for ( ; anIter.More(); anIter.Next() ) {
-    if ( isTrihedronDisplayed && anIter.Value()->DynamicType() == STANDARD_TYPE( AIS_Trihedron ) ||
-	 anIter.Value()->DynamicType() == STANDARD_TYPE( OCCViewer_Trihedron ))
+    if ( (isTrihedronDisplayed && anIter.Value()->DynamicType() == STANDARD_TYPE( AIS_Trihedron )) ||
+         anIter.Value()->DynamicType() == STANDARD_TYPE( OCCViewer_Trihedron ))
       continue;
 
     // erase an object
@@ -521,16 +532,17 @@ void SOCC_Viewer::EraseAll( const bool forced )
     // should be provided...
     //if ( !forced ) {
     //  Handle(SALOME_InteractiveObject) anObj =
-    //	Handle(SALOME_InteractiveObject)::DownCast( anIO->GetOwner() );
+    //  Handle(SALOME_InteractiveObject)::DownCast( anIO->GetOwner() );
 
     //  if ( !anObj.IsNull() && anObj->hasEntry() ) {
-    //	if ( study )
-    //	  ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
+    //  if ( study )
+    //    ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
     //  }
     //}
   }
-  
+
   Repaint();
+  updateTrihedron();
 }
 
 /*!
@@ -542,32 +554,28 @@ SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
   SOCC_Prs* prs = new SOCC_Prs();
   if ( entry )
   {
-    // get context
-    Handle(AIS_InteractiveContext) ic = getAISContext();
-
-    // get displayed objects
-    AIS_ListOfInteractive List;
-    ic->DisplayedObjects( List );
-    // get objects in the collector
-    AIS_ListOfInteractive ListCollector;
-    ic->ObjectsInCollector( ListCollector );
-    List.Append( ListCollector );
-
-    AIS_ListIteratorOfListOfInteractive ite( List );
-    for ( ; ite.More(); ite.Next() )
-    {
-      Handle(SALOME_InteractiveObject) anObj =
-        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
-
-      if ( !anObj.IsNull() && anObj->hasEntry() && strcmp( anObj->getEntry(), entry ) == 0 )
-        prs->AddObject( ite.Value() );
-    }
+    if(entry2aisobjects.count(entry)>0)
+      {
+        //ais object exists
+        std::vector<Handle(AIS_InteractiveObject)> List = entry2aisobjects[entry];
+        // get context
+        Handle(AIS_InteractiveContext) ic = getAISContext();
+        //add all ais
+        for ( unsigned int ind = 0; ind < List.size(); ind++ )
+          {
+            Handle(AIS_InteractiveObject) anAIS=List[ind];
+            if(ic->IsDisplayed(anAIS)||ic->IsInCollector(anAIS))
+              {
+                prs->AddObject( anAIS );
+              }
+          }
+      }
   }
   return prs;
 }
 
 /*!
-  Activates selection of sub shapes
+  Activates selection of sub-shapes
 */
 void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
 {
@@ -612,7 +620,7 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode
 }
 
 /*!
-  Deactivates selection of sub shapes
+  Deactivates selection of sub-shapes
 */
 void SOCC_Viewer::GlobalSelection( const bool update ) const
 {
@@ -625,64 +633,26 @@ void SOCC_Viewer::GlobalSelection( const bool update ) const
   }
 }
 
-/*!
-  Auxiliary method called before displaying of objects
-*/
-void  SOCC_Viewer::BeforeDisplay( SALOME_Displayer* d )
-{
-  d->BeforeDisplay( this, SALOME_OCCViewType() );
-}
 
 /*!
-  Auxiliary method called after displaying of objects
+  \Collect objects visible in viewer
+  \param theList - visible objects collection
 */
-void SOCC_Viewer::AfterDisplay( SALOME_Displayer* d )
+void SOCC_Viewer::GetVisible( SALOME_ListIO& theList )
 {
-  d->AfterDisplay( this, SALOME_OCCViewType() );
+  AIS_ListOfInteractive List;
+  getAISContext()->DisplayedObjects(List);
+  
+  AIS_ListIteratorOfListOfInteractive ite(List);
+  for ( ; ite.More(); ite.Next() )
+  {
+    Handle(SALOME_InteractiveObject) anObj =
+        Handle(SALOME_InteractiveObject)::DownCast( ite.Value()->GetOwner() );
+
+    if ( !anObj.IsNull() && anObj->hasEntry() )
+      theList.Append( anObj );
+  }
 }
-
-/*!
-  Get new and current trihedron size corresponding to the current model size
-*/
-bool SOCC_Viewer::getTrihedronSize( double& theNewSize, double& theSize )
-{
-  theNewSize = 100;
-  theSize = 100;
-
-  //SRN: BUG IPAL8996, a usage of method ActiveView without an initialization
-  Handle(V3d_Viewer) viewer = getViewer3d();
-  viewer->InitActiveViews();
-  if(!viewer->MoreActiveViews()) return false;
-
-  Handle(V3d_View) view3d = viewer->ActiveView();
-  //SRN: END of fix
-
-  if ( view3d.IsNull() )
-    return false;
-
-  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
-  double aMaxSide;
-
-  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
-
-  if ( Xmin == RealFirst() || Ymin == RealFirst() || Zmin == RealFirst() ||
-       Xmax == RealLast()  || Ymax == RealLast()  || Zmax == RealLast() )
-    return false;
-
-  aMaxSide = Xmax - Xmin;
-  if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
-  if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
-
-  float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("Viewer","TrihedronSize", 105.);
-
-  static float EPS = 5.0E-3;
-  theSize = getTrihedron()->Size();
-  theNewSize = aMaxSide*aSizeInPercents / 100.0;
-
-  return fabs( theNewSize - theSize ) > theSize * EPS ||
-         fabs( theNewSize - theSize) > theNewSize * EPS;
-}
-
 
 /*!
   Updates current viewer
@@ -697,9 +667,18 @@ void SOCC_Viewer::Repaint()
 /*!
   create SOCC_ViewWindow
 */
-SUIT_ViewWindow* SOCC_Viewer::createView( SUIT_Desktop* theDesktop )
+/*SUIT_ViewWindow* SOCC_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   SOCC_ViewWindow* view = new SOCC_ViewWindow(theDesktop, this);
-  initView( view );
+  //initView( view );
+  initView( view->getView(OCCViewer_ViewFrame::MAIN_VIEW) );
   return view;
+  }*/
+
+/* 
+ * Returns a new OCCViewer_ViewWindow instance which will be placed as a sub window in ViewFrame
+ */
+OCCViewer_ViewWindow* SOCC_Viewer::createSubWindow()
+{
+  return new SOCC_ViewWindow( 0,  this);
 }

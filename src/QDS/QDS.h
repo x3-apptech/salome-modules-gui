@@ -1,29 +1,30 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef QDS_H
 #define QDS_H
 
 #ifdef WIN32
-#ifdef QDS_EXPORTS
+#if defined QDS_EXPORTS
 #define QDS_EXPORT __declspec(dllexport)
 #else
 #define QDS_EXPORT __declspec(dllimport)
@@ -52,13 +53,14 @@ public:
   //! Enum describes bit flags of the Qt datum view and behaviour
   typedef enum
   {
-    None = 0x00,                   //!< Non specified any flags (Default behaviour)
-    Label = 0x01,                  //!< Create subwidget for datum label
-    Control = 0x02,                //!< Create subwidget for datum input control
-    Units = 0x04,                  //!< Create subwidget for datum units of measure
-    NotFormat = 0x08,              //!< Don't format initial value
-    NotAccel = 0x10,               //!< Not support accelerators in datum label
-    UnitsWithLabel = 0x20,         //!< Display units of measure in label like "<label_text> (<units_text>) instead separate text"
+    None           = 0x00,         //!< Non specified any flags (Default behaviour)
+    Label          = 0x01,         //!< Create subwidget for datum label
+    Control        = 0x02,         //!< Create subwidget for datum input control
+    Units          = 0x04,         //!< Create subwidget for datum units of measure
+    NotFormat      = 0x08,         //!< Don't format initial value
+    NotAccel       = 0x10,         //!< Not support accelerators in datum label
+    NotConvert     = 0x20,         //!< Don't convert numeric value
+    UnitsWithLabel = 0x40,         //!< Display units of measure in label like "<label_text> (<units_text>) instead separate text"
     All = Label | Control | Units  //!< Create all subwidgets
   } DatumFlags;
 

@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
 //  File   : SALOME_Actor.h
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef SALOME_ACTOR_H
 #define SALOME_ACTOR_H
 
@@ -39,15 +38,19 @@ class Handle(SALOME_InteractiveObject);
 #undef min
 #undef max
 
-#include "VTKViewer_Actor.h"
+#include <VTKViewer_Actor.h>
+#include <VTKViewer_MarkerDef.h>
 
 #include <vtkSmartPointer.h>
 
+class vtkAbstractPicker;
 class vtkPointPicker;
 class vtkCellPicker;
 class vtkOutlineSource;
 class vtkInteractorStyle;
 class vtkRenderWindowInteractor;
+
+class VTKViewer_FramedTextActor;
 
 class SVTK_Actor;
 class SVTK_RectPicker;
@@ -104,8 +107,8 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   virtual
   void
   SetPosition(vtkFloatingPointType _arg1, 
-	      vtkFloatingPointType _arg2, 
-	      vtkFloatingPointType _arg3);
+              vtkFloatingPointType _arg2, 
+              vtkFloatingPointType _arg3);
 
   //! Apply additional position
   virtual
@@ -117,6 +120,11 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   virtual
   void
   SetVisibility( int );
+
+  //! Gets know whether the actor should be displayed or not
+  virtual
+  bool
+  ShouldBeDisplayed();
 
   //----------------------------------------------------------------------------
   //! To publish the actor an all its internal devices
@@ -165,15 +173,72 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   virtual
   bool
   PreHighlight(vtkInteractorStyle* theInteractorStyle, 
-	       SVTK_SelectionEvent* theSelectionEvent,
-	       bool theIsHighlight);
+               SVTK_SelectionEvent* theSelectionEvent,
+               bool theIsHighlight);
 
   //! To process highlight (called from #SVTK_InteractorStyle)
   virtual 
   bool
   Highlight(vtkInteractorStyle* theInteractorStyle, 
-	    SVTK_SelectionEvent* theSelectionEvent,
-	    bool theIsHighlight);
+            SVTK_SelectionEvent* theSelectionEvent,
+            bool theIsHighlight);
+
+  //----------------------------------------------------------------------------
+  //! To get flag of displaying of name actor
+  virtual
+  bool
+  IsDisplayNameActor() const;
+
+  //! To set flag of displaying of name actor
+  virtual
+  void
+  SetIsDisplayNameActor(bool theIsDisplayNameActor);
+
+  //! To set text of name actor
+  virtual
+  void
+  SetNameActorText(const char* theText);
+
+  //! To set offset of name actor
+  virtual
+  void
+  SetNameActorOffset(int theOffset[2]);
+
+  //! To get size of name actor
+  virtual
+  void
+  GetNameActorSize(vtkRenderer* theRenderer, int theSize[2]) const;
+
+  //! To update visibility of name actors
+  virtual
+  void
+  UpdateNameActors();
+
+  //----------------------------------------------------------------------------
+  //! Set standard point marker
+  virtual
+  void
+  SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
+
+  //! Set custom point marker
+  virtual
+  void
+  SetMarkerTexture( int, VTK::MarkerTexture );
+
+  //! Get type of the point marker
+  virtual
+  VTK::MarkerType
+  GetMarkerType();
+
+  //! Get scale of the point marker
+  virtual
+  VTK::MarkerScale
+  GetMarkerScale();
+
+  //! Get texture identifier of the point marker
+  virtual
+  int
+  GetMarkerTexture();
 
   //----------------------------------------------------------------------------
   //! To set up a picker for nodal selection (initialized by #SVTK_Renderer::AddActor)
@@ -228,7 +293,21 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
 
   vtkSmartPointer<VTKViewer_Actor> myOutlineActor;
   vtkSmartPointer<vtkOutlineSource> myOutline;
+
+  bool myIsDisplayNameActor;
+  vtkSmartPointer<VTKViewer_FramedTextActor> myNameActor;
 };
+
+namespace SVTK
+{
+  class SVTK_EXPORT TPickLimiter
+  {
+    vtkAbstractPicker* myPicker;
+  public:
+    TPickLimiter(vtkAbstractPicker*, SALOME_Actor*);
+    ~TPickLimiter();
+  };
+}
 
 #ifdef WIN32
 #pragma warning ( default:4251 )

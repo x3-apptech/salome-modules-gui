@@ -1,26 +1,26 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "OCCViewer_CreateRestoreViewDlg.h"
-#include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewPort3d.h"
 
 #include <QPushButton>
@@ -33,17 +33,17 @@
 /*!
   Constructor
 */
-OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, OCCViewer_Viewer* curModel )
+OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, OCCViewer_ViewWindow* theViewWindow )
 : QDialog( aWin )
 {
   setWindowTitle( tr( "CAPTION" ) );
 
-  myParametersMap = curModel->getViewAspects();
+  myParametersMap = theViewWindow->getViewAspects();
 
   myKeyFlag = 0;
 
   int aQuantityOfItems = myParametersMap.count();
-	
+        
   setFixedSize( 400, 300 );
 
   QGridLayout* aGrid = new QGridLayout( this );
@@ -52,17 +52,17 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
 
   QWidget* aWidget1 = new QWidget( this );
   QWidget* aWidget2 = new QWidget( this );
-	
+        
   QHBoxLayout* aLayout = new QHBoxLayout( aWidget1 );
-	
+        
   myListBox = new QListWidget( aWidget1 );
   myListBox->installEventFilter( this );
 
-  myCurViewPort = new OCCViewer_ViewPort3d( aWidget1, curModel->getViewer3d(), V3d_ORTHOGRAPHIC );
+  myCurViewPort = new OCCViewer_ViewPort3d( aWidget1, theViewWindow->getViewPort()->getViewer(), V3d_ORTHOGRAPHIC );
   myCurViewPort->getView()->SetBackgroundColor( Quantity_NOC_BLACK );
 
   myListBox->setEditTriggers( QAbstractItemView::DoubleClicked );
-	
+        
   if ( aQuantityOfItems )
   {
     myListBox->clear();
@@ -81,7 +81,7 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
 
   connect( myListBox, SIGNAL( itemClicked( QListWidgetItem* ) ), this, SLOT( changeImage( QListWidgetItem* ) ) );
   connect( myListBox, SIGNAL( itemChanged( QListWidgetItem* ) ), this, SLOT( editItemText( QListWidgetItem* ) ) );
-	
+        
   aLayout->addWidget( myListBox );
   aLayout->addWidget( myCurViewPort, 30 );
 
@@ -90,8 +90,8 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
   aButtonLayout->setSpacing( 5 );
 
   QPushButton* theOk     = new QPushButton( tr( "Ok" ), aWidget2 );            theOk->setAutoDefault( false );
-  QPushButton* theCancel = new QPushButton( tr( "Cancel" ), aWidget2 );		 theCancel->setAutoDefault( false );
-  QPushButton* theDelete = new QPushButton( tr( "Delete" ), aWidget2 );		 theDelete->setAutoDefault( false );
+  QPushButton* theCancel = new QPushButton( tr( "Cancel" ), aWidget2 );          theCancel->setAutoDefault( false );
+  QPushButton* theDelete = new QPushButton( tr( "Delete" ), aWidget2 );          theDelete->setAutoDefault( false );
   QPushButton* theClearAll = new QPushButton( tr( "Clear List" ), aWidget2 );  theClearAll->setAutoDefault( false );
 
   aButtonLayout->addWidget( theOk );
@@ -101,7 +101,7 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
 
   aGrid->addWidget( aWidget1, 0, 0 );
   aGrid->addWidget( aWidget2, 1, 0 );
-	
+        
   connect( theOk, SIGNAL( clicked() ), this, SLOT( OKpressed() ) );
   connect( theCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
   connect( theDelete, SIGNAL( clicked() ), this, SLOT( deleteSelectedItems() ) );
@@ -130,25 +130,25 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListWidgetItem* curItem )
     {
       for( int i = 0; i < (int)myListBox->count(); i++ )
       {
-	if( myListBox->item( i )->isSelected() && i != index )
-	{
-	  myListBox->clearSelection();
-	  if( i > index )
-	  {
-	    lowLevel  = index;
-	    highLevel = i;
-	  }
-	  else
-	  {
-	    lowLevel  = i;
-	    highLevel = index;
-	  }
-	  for( int j = lowLevel; j <= highLevel; j++ )
-	    myListBox->item( j )->setSelected( TRUE );
-	  break;
-	}
-	if( myListBox->item( i )->isSelected() && i == index )
-	  myListBox->item( i )->setSelected( TRUE );
+        if( myListBox->item( i )->isSelected() && i != index )
+        {
+          myListBox->clearSelection();
+          if( i > index )
+          {
+            lowLevel  = index;
+            highLevel = i;
+          }
+          else
+          {
+            lowLevel  = i;
+            highLevel = index;
+          }
+          for( int j = lowLevel; j <= highLevel; j++ )
+            myListBox->item( j )->setSelected( TRUE );
+          break;
+        }
+        if( myListBox->item( i )->isSelected() && i == index )
+          myListBox->item( i )->setSelected( TRUE );
       }
     }
     
@@ -180,25 +180,38 @@ viewAspect OCCViewer_CreateRestoreViewDlg::currentItem() const
 */
 void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
 {
-  if( myListBox->count() )
+  QList<QListWidgetItem*> selectedItems = myListBox->selectedItems();
+  if( myListBox->count() && selectedItems.count())
   {
     int curIndex = -1;
-    for( int i = 0; i < (int)myListBox->count(); i++ )
-      if( myListBox->item( i )->isSelected() && ( myListBox->item( i )->flags() & Qt::ItemIsEditable ) )
+    // Iterate by all selected items
+    for(int i = 0; i < selectedItems.count(); i++) 
+    {
+      QListWidgetItem* item =  selectedItems.at(i);
+      // get position of the selected item in the list
+      int position = myListBox->row(item);
+
+      //Calculate current index in case if "item" is last selected item.
+      if(i == selectedItems.count() - 1)
       {
-	QListWidgetItem* anItemToDelete = myListBox->takeItem( i );
-	delete anItemToDelete;
-	for( int j = i; j < (int)myParametersMap.count(); j++ )
-	  if( j != myParametersMap.count() - 1 )
-	    myParametersMap[ j ] = myParametersMap[ j + 1 ];
-	  else
-	    myParametersMap.removeAt( j );
-	if( i != myListBox->count() )
-	  curIndex = i;
-	else
-	  curIndex = i - 1;
-	i--;
+	if(position != myListBox->count() - 1)
+	  curIndex = position;
+	else 
+	  curIndex = position - 1;
       }
+
+      //Delete item
+      delete item;
+
+      //Shift parameters in the map
+      for( int j = position; j < (int)myParametersMap.count(); j++ )
+      {
+	if( j != myParametersMap.count() - 1 )
+	  myParametersMap[ j ] = myParametersMap[ j + 1 ];
+	else
+	  myParametersMap.removeAt( j );
+      }
+    }
     if( curIndex >= 0 )
     {
       myListBox->setCurrentItem( myListBox->item( curIndex ) );
@@ -207,8 +220,7 @@ void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
   }
   if( !myListBox->count() )
   {
-    myListBox->clear();
-    myListBox->insertItem( 0, "No Items" );
+    clearList();
   }
 }
 
@@ -219,8 +231,10 @@ void OCCViewer_CreateRestoreViewDlg::clearList()
 {
   myListBox->clear();
   myListBox->insertItem( 0, "No Items" );
-  
   myParametersMap.clear();
+	
+  //Clear view
+  myCurViewPort->reset();
 }
 
 /*!
@@ -252,12 +266,12 @@ bool OCCViewer_CreateRestoreViewDlg::eventFilter( QObject* anObj, QEvent* anEv )
     if( aKeyEv->key() == Qt::Key_Control )
     {
       myKeyFlag = 1;
-      myListBox->setSelectionMode( QAbstractItemView::MultiSelection );	
+      myListBox->setSelectionMode( QAbstractItemView::MultiSelection ); 
     }
     else if( aKeyEv->key() == Qt::Key_Shift )
     {
       myKeyFlag = 2;
-      myListBox->setSelectionMode( QAbstractItemView::MultiSelection );	
+      myListBox->setSelectionMode( QAbstractItemView::MultiSelection ); 
     }
     else
       myListBox->setSelectionMode( QAbstractItemView::SingleSelection );

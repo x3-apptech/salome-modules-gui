@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -388,6 +367,10 @@ Do you want to overwrite it?</translation>
         <translation>Open document</translation>
     </message>
     <message>
+        <source>TOT_DESK_FILE_REOPEN</source>
+        <translation>Reopen document</translation>
+    </message>
+    <message>
         <source>PRP_DESK_FILE_EXIT</source>
         <translation>Exits the application</translation>
     </message>
@@ -396,12 +379,16 @@ Do you want to overwrite it?</translation>
         <translation>Opens an existing document</translation>
     </message>
     <message>
+        <source>PRP_DESK_FILE_REOPEN</source>
+        <translation>Reload the current document from the file</translation>
+    </message>
+    <message>
         <source>PRP_DESK_FILE_SAVE</source>
         <translation>Saves the active document</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_LOAD</source>
-        <translation>Load a document</translation>
+        <translation>Loads a document</translation>
     </message>
     <message>
         <source>PRP_DESK_WINDOW_HTILE</source>
@@ -422,6 +409,10 @@ Do you want to overwrite it?</translation>
     <message>
         <source>MEN_DESK_FILE_OPEN</source>
         <translation>&amp;Open...</translation>
+    </message>
+    <message>
+        <source>MEN_DESK_FILE_REOPEN</source>
+        <translation>Reopen</translation>
     </message>
     <message>
         <source>MEN_DESK_FILE_LOAD</source>
@@ -470,7 +461,10 @@ Do you want to save changes?</translation>
     <message>
         <source>INF_DOC_SAVING_FAILS</source>
         <translation>Can&apos;t save file &quot;%1&quot;.
-Possible reason is permission denied or disc full.
+Possible reasons:
+- permission denied;
+- unsufficient disk space;
+- application error.
 Try to use another file name.</translation>
     </message>
     <message>
@@ -485,6 +479,15 @@ Do you want to save changes?</translation>
     <message>
         <source>CLOSE_QUESTION</source>
         <translation>Do you want to save study before closing?</translation>
+    </message>
+    <message>
+        <source>REOPEN_STUDY</source>
+        <translation>Reopen study</translation>
+    </message>
+    <message>
+        <source>REOPEN_QUESTION</source>
+        <translation>Do you really want to re-open study?
+All the changes made since last saving will be lost.</translation>
     </message>
 </context>
 </TS>

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxPopupMgr.cxx
 // Author:    Alexander SOLOVYOV, Sergey TELKOV
 //
@@ -51,11 +52,11 @@ bool operator<( const QVariant& v1, const QVariant& v2 )
     {
       const QList<QVariant>& aList1 = v1.toList(), aList2 = v2.toList();
       QList<QVariant>::const_iterator anIt1 = aList1.begin(), aLast1 = aList1.end(),
-	anIt2 = aList2.begin(), aLast2 = aList2.end();
+        anIt2 = aList2.begin(), aLast2 = aList2.end();
       for ( ; anIt1 != aLast1 && anIt2 != aLast2;  anIt1++, anIt2++ )
       {
-	if ( (*anIt1) != (*anIt2) )
-	  return (*anIt1)<(*anIt2);
+        if ( (*anIt1) != (*anIt2) )
+          return (*anIt1)<(*anIt2);
       }
       return anIt1 == aLast1 && anIt2 != aLast2;
     }
@@ -85,7 +86,7 @@ public:
                           const ItemAttributes&, const int );
 
   virtual QString rule( const ItemAttributes&, 
-			const QtxPopupMgr::RuleType = VisibleRule ) const;
+                        const QtxPopupMgr::RuleType = VisibleRule ) const;
 
 private:
   QtxPopupMgr*    myMgr;
@@ -189,7 +190,7 @@ int QtxPopupMgr::PopupCreator::append( const QString& tag, const bool subMenu,
   \return rule for the menu item corresponding to the rule type
 */
 QString QtxPopupMgr::PopupCreator::rule( const ItemAttributes& /*attr*/, 
-					 const QtxPopupMgr::RuleType /*ruleType*/ ) const
+                                         const QtxPopupMgr::RuleType /*ruleType*/ ) const
 {
   return QString();
 }
@@ -285,10 +286,13 @@ void QtxPopupMgr::setSelection( QtxPopupSelection* sel )
 
   mySelection = sel;
 
-  if ( mySelection )
+  if ( mySelection ) {
     mySelection->setParent( this );
+    mySelection->setPopupMgr( this );
+  }
+
   connect( mySelection, SIGNAL( destroyed( QObject* ) ), 
-	   this,        SLOT( onSelectionDestroyed( QObject* ) ) );
+           this,        SLOT( onSelectionDestroyed( QObject* ) ) );
 
   QtxActionMgr::triggerUpdate();
 }
@@ -514,18 +518,18 @@ bool QtxPopupMgr::isSatisfied( QAction* act, const RuleType ruleType ) const
       for ( int i = 0; i < mySelection->count() && !res; i++ )
       {
         QList<QVariant> c;
-	for ( QStringList::const_iterator anIt1 = specific.begin(); anIt1 != specific.end(); ++anIt1 )
+        for ( QStringList::const_iterator anIt1 = specific.begin(); anIt1 != specific.end(); ++anIt1 )
           c.append( parameter( *anIt1, i ) );
         aCorteges.insert( c, 0 );
       }
       for ( QMap<QList<QVariant>, int>::const_iterator anIt = aCorteges.begin(); anIt  != aCorteges.end(); ++anIt )
       {
-	const QList<QVariant>& aCortege = anIt.key();
-	QStringList::const_iterator anIt1 = specific.begin(), aLast1 = specific.end();
-	QList<QVariant>::const_iterator anIt2 = aCortege.begin();
-	for ( ; anIt1 != aLast1; anIt1++, anIt2++ )
-	  p->setParameter( *anIt1, *anIt2 );
-	res = res || result( p );
+        const QList<QVariant>& aCortege = anIt.key();
+        QStringList::const_iterator anIt1 = specific.begin(), aLast1 = specific.end();
+        QList<QVariant>::const_iterator anIt2 = aCortege.begin();
+        for ( ; anIt1 != aLast1; anIt1++, anIt2++ )
+          p->setParameter( *anIt1, *anIt2 );
+        res = res || result( p );
       }
     }
     else
@@ -675,7 +679,8 @@ void QtxPopupMgr::onSelectionDestroyed( QObject* o )
   \brief Constructor.
 */
 QtxPopupSelection::QtxPopupSelection()
-: QObject( 0 )
+  : QObject( 0 ),
+    myPopupMgr( 0 )
 {
 }
 
@@ -709,6 +714,16 @@ void QtxPopupSelection::setOption( const QString& optName, const QString& opt )
   myOptions.insert( optName, opt );
 }
 
+QtxPopupMgr* QtxPopupSelection::popupMgr() const
+{
+  return myPopupMgr;
+}
+
+void QtxPopupSelection::setPopupMgr( QtxPopupMgr* pm )
+{
+  myPopupMgr = pm;
+}
+
 /*!
   \brief Get the parameter value.
   \param str parameter name
@@ -722,13 +737,15 @@ QVariant QtxPopupSelection::parameter( const QString& str ) const
   {
     QtxEvalSetSets::ValueSet set;
     QString par = str.mid( equalityParam().length() );
+
+    QtxPopupMgr* pMgr = popupMgr();
     for ( int i = 0; i < (int)count(); i++ )
     {
-      QVariant v = parameter( i, par );
+      QVariant v = pMgr ? pMgr->parameter( par, i ) : parameter( i, par );
       if ( v.isValid() )
-	QtxEvalSetSets::add( set, v );
+        QtxEvalSetSets::add( set, v );
       else
-	return QVariant();
+        return QVariant();
     }
     return set;
   }

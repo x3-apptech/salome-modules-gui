@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef VTKVIEWER_VIEWWINDOW_H
 #define VTKVIEWER_VIEWWINDOW_H
 
@@ -49,19 +50,21 @@ class VTKVIEWER_EXPORT VTKViewer_ViewWindow : public SUIT_ViewWindow
 public:
   VTKViewer_ViewWindow( SUIT_Desktop*, VTKViewer_Viewer*,
                         VTKViewer_InteractorStyle* = 0,
-			VTKViewer_RenderWindowInteractor* = 0 );
+                        VTKViewer_RenderWindowInteractor* = 0 );
   virtual ~VTKViewer_ViewWindow();
   
   /*!Gets tool bar.*/
-  QToolBar*    getToolBar() { return myToolBar; }
+  QToolBar*                         getToolBar() { return myToolBar; }
   
-  void         setBackgroundColor( const QColor& );
-  QColor       backgroundColor() const;
+  void                              setBackgroundColor( const QColor& ); // obsolete
+  QColor                            backgroundColor() const;             // obsolete
+  void                              setBackground( const Qtx::BackgroundData& );
+  Qtx::BackgroundData               background() const;
 
   /*!Gets renderer.*/
   vtkRenderer*                      getRenderer()     { return myRenderer;     }
   /*!Gets render window.*/
-  VTKViewer_RenderWindow*	    getRenderWindow() { return myRenderWindow; }
+  VTKViewer_RenderWindow*           getRenderWindow() { return myRenderWindow; }
   /*!Gets render window interactor.*/
   VTKViewer_RenderWindowInteractor* getRWInteractor() { return myRWInteractor; }
   bool                              isTrihedronDisplayed();
@@ -83,6 +86,8 @@ public slots:
   void onBottomView();
   void onLeftView();
   void onRightView();
+  void onClockWiseView();
+  void onAntiClockWiseView();
   void onResetView();
   void onFitAll();
   void activateZoom();
@@ -110,7 +115,8 @@ private:
 
 private:
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, TrihedronShowId };
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
+	 ResetId, TrihedronShowId };
   typedef QMap<int, QtxAction*> ActionsMap;
   
   void    createActions();
@@ -129,6 +135,7 @@ private:
   ActionsMap                        myActionsMap;  
   
   double                            myCurScale;
+  Qtx::BackgroundData               myBackground;
 
   friend class VTKViewer_RenderWindowInteractor;
 };

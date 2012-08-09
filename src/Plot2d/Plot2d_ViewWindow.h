@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : Plot2d_ViewWindow.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -48,14 +49,17 @@ class PLOT2D_EXPORT Plot2d_ViewWindow : public SUIT_ViewWindow
 
 public:
   enum { DumpId, 
-	 ScaleOpId, FitAllId, FitRectId, ZoomId,
-	 MoveOpId, PanId, GlobalPanId,
-	 PModeXLinearId, PModeXLogarithmicId, 
+         ScaleOpId, FitAllId, FitRectId, ZoomId,
+         MoveOpId, PanId, GlobalPanId,
+         PModeXLinearId, PModeXLogarithmicId, 
          PModeYLinearId, PModeYLogarithmicId,
+         PModeNormLMaxId, PModeNormLMinId,
+         PModeNormRMaxId, PModeNormRMinId,
 	 CurvPointsId, CurvLinesId, CurvSplinesId, 
 	 LegendId,
 	 CurvSettingsId,
-	 CloneId };
+	 CloneId, PrintId,
+	 AnalyticalCurveId };
 
 public:
   Plot2d_ViewWindow( SUIT_Desktop*, Plot2d_Viewer* );
@@ -65,6 +69,7 @@ public:
   void              putInfo( const QString&);
   Plot2d_ViewFrame* getViewFrame();
   QToolBar*         getToolBar();
+  virtual void      initLayout();
   void              contextMenuPopup( QMenu* );
 
   virtual bool      eventFilter( QObject*, QEvent* );
@@ -82,6 +87,9 @@ public slots:
   void              onChangeVerMode();
   void              onChangeCurveMode();
   void              onChangeLegendMode();
+  void              onChangeNormLMode();
+  void              onChangeNormRMode();
+
   
   void              onFitAll();
   void              onFitRect();
@@ -90,16 +98,19 @@ public slots:
   void              onGlobalPanning();
   void              onViewHorMode();
   void              onViewVerMode();
+  void              onViewNormLMode();
+  void              onViewNormRMode();
   void              onLegend();
   void              onCurves();
 
   void              onDumpView();
+  void              onPrintView();
 
 protected:
   virtual QImage    dumpView();
   virtual bool      dumpViewToFormat( const QImage&, 
-				      const QString&, 
-				      const QString& );
+                                      const QString&, 
+                                      const QString& );
   virtual QString   filter() const;
 
 signals:

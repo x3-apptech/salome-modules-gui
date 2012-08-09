@@ -1,29 +1,31 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef _VTKViewer_ConvexTool_H
 #define _VTKViewer_ConvexTool_H
 
 #include "VTKViewer.h"
 
+#include <map>
 #include <vector>
 
 #include <vtkSystemIncludes.h>
@@ -52,16 +54,18 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
 
   bool 
   Execute(vtkUnstructuredGrid *theInput,
-	  vtkCellData* thInputCD,
-	  vtkIdType theCellId,
-	  int theShowInside,
-	  int theAllVisible,
-	  const char* theCellsVisibility,
-	  vtkPolyData *theOutput,
-	  vtkCellData* theOutputCD,
-	  int theStoreMapping,
-	  std::vector<vtkIdType>& theVTK2ObjIds,
-	  bool theIsCheckConvex);
+          vtkCellData* thInputCD,
+          vtkIdType theCellId,
+          int theShowInside,
+          int theAllVisible,
+          int theAppendCoincident3D,
+          const char* theCellsVisibility,
+          vtkPolyData *theOutput,
+          vtkCellData* theOutputCD,
+          int theStoreMapping,
+          std::vector<vtkIdType>& theVTK2ObjIds,
+          std::map< vtkIdType, std::vector<vtkIdType> >& theDimension2VTK2ObjIds,
+          bool theIsCheckConvex);
 
  private:
   vtkIdList* myCellIds;
@@ -74,7 +78,7 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
   virtual
   vtkPoints* 
   InitPoints(vtkUnstructuredGrid *theInput,
-	     vtkIdType theCellId);
+             vtkIdType theCellId);
 
   virtual
   vtkIdType 
@@ -95,9 +99,9 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
 
   void 
   GetCellNeighbors(vtkUnstructuredGrid *theInput,
-		   vtkIdType theCellId,
-		   vtkCell* theFace,
-		   vtkIdList* theCellIds);
+                   vtkIdType theCellId,
+                   vtkCell* theFace,
+                   vtkIdList* theCellIds);
 
   vtkIdType 
   GetConnectivity(vtkIdType thePntId);
@@ -121,7 +125,7 @@ class VTKVIEWER_EXPORT VTKViewer_OrderedTriangulator : public VTKViewer_Triangul
   virtual
   vtkPoints* 
   InitPoints(vtkUnstructuredGrid *theInput,
-	     vtkIdType theCellId);
+             vtkIdType theCellId);
 
   virtual
   vtkIdType 
@@ -151,7 +155,7 @@ class VTKVIEWER_EXPORT VTKViewer_DelaunayTriangulator : public VTKViewer_Triangu
   virtual
   vtkPoints* 
   InitPoints(vtkUnstructuredGrid *theInput,
-	     vtkIdType theCellId);
+             vtkIdType theCellId);
 
   virtual
   vtkIdType 

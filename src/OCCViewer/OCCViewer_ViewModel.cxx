@@ -1,26 +1,28 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewWindow.h"
+#include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
 
@@ -28,13 +30,17 @@
 #include "SUIT_ViewManager.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
+#include "SUIT_ResourceMgr.h"
 
 #include "QtxActionToolMgr.h"
+#include "QtxBackgroundTool.h"
 
 #include <QPainter>
 #include <QApplication>
 #include <QColorDialog>
+#include <QFileDialog>
 #include <QPalette>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QToolBar>
@@ -53,14 +59,44 @@
 #include <Prs3d_AngleAspect.hxx>
 #include <Prs3d_TextAspect.hxx>
 
+#include <Visual3d_View.hxx>
+
+#include <Basics_OCCTVersion.hxx>
+
+// VSR: Uncomment below line to allow texture background support in OCC viewer
+#define OCC_ENABLE_TEXTURED_BACKGROUND
+
+/*!
+  Get data for supported background modes: gradient types, identifiers and supported image formats
+*/
+QString OCCViewer_Viewer::backgroundData( QStringList& gradList, QIntList& idList, QIntList& txtList )
+{
+  gradList << tr("GT_HORIZONTALGRADIENT")    << tr("GT_VERTICALGRADIENT")       <<
+              tr("GT_FIRSTDIAGONALGRADIENT") << tr("GT_SECONDDIAGONALGRADIENT") <<
+              tr("GT_FIRSTCORNERGRADIENT")   << tr("GT_SECONDCORNERGRADIENT")   <<
+              tr("GT_THIRDCORNERGRADIENT")   << tr("GT_FORTHCORNERGRADIENT");
+  idList   << HorizontalGradient             << VerticalGradient  <<
+              Diagonal1Gradient              << Diagonal2Gradient <<
+              Corner1Gradient                << Corner2Gradient   <<
+              Corner3Gradient                << Corner4Gradient;
+#if OCC_VERSION_LARGE > 0x06050200 // enabled since OCCT 6.5.3, since in previous version this functionality is buggy
+#ifdef OCC_ENABLE_TEXTURED_BACKGROUND
+  txtList  << Qtx::CenterTexture << Qtx::TileTexture << Qtx::StretchTexture;
+#endif
+#endif
+  return tr("BG_IMAGE_FILES");
+}
+
 /*!
   Constructor
   \param DisplayTrihedron - is trihedron displayed
 */
-OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron, bool DisplayStaticTrihedron )
+OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 : SUIT_ViewModel(),
-  myBgColor( Qt::black ),
-  myShowStaticTrihedron( DisplayStaticTrihedron )
+  myBackgrounds(4, Qtx::BackgroundData( Qt::black )),
+  myIsRelative(true),
+  myTopLayerId( 0 ),
+  myTrihedronSize(100)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::Viewer3d( "", (short*) "Viewer3d", "", 1000.,
@@ -89,8 +125,6 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron, bool DisplayStaticTri
   drawer->AngleAspect()->SetTextAspect(ta);
   drawer->LengthAspect()->SetTextAspect(ta);
   
-  clearViewAspects();
-
   /* create trihedron */
   if( DisplayTrihedron )
   {
@@ -112,11 +146,22 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron, bool DisplayStaticTri
 
     myAISContext->Display(myTrihedron);
     myAISContext->Deactivate(myTrihedron);
-  }
+    }
+
+  // set interaction style to standard
+  myInteractionStyle = 0;
+
+  // set zooming style to standard
+  myZoomingStyle = 0;
 
   // selection
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
+  
+  
+  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+  if(resMgr)
+    myShowStaticTrihedron = resMgr->booleanValue( "OCCViewer", "show_static_trihedron", true );
 }
 
 /*!
@@ -127,21 +172,38 @@ OCCViewer_Viewer::~OCCViewer_Viewer()
 }
 
 /*!
+  [obsolete]
   \return background color of viewer
 */
 QColor OCCViewer_Viewer::backgroundColor() const
 {
-  return myBgColor;
+  return backgroundColor(0);
 }
 
 /*!
-  Sets background color
+  \return background data of viewer
+*/
+Qtx::BackgroundData OCCViewer_Viewer::background() const
+{
+  return background(0);
+}
+
+/*!
+  Sets background color [obsolete]
   \param c - new background color
 */
 void OCCViewer_Viewer::setBackgroundColor( const QColor& c )
 {
-  if ( c.isValid() )
-    myBgColor = c;
+  setBackgroundColor( 0, c );
+}
+
+/*!
+  Sets background data
+  \param d - new background data
+*/
+void OCCViewer_Viewer::setBackground( const Qtx::BackgroundData& theBackground )
+{
+  setBackground( 0, theBackground );
 }
 
 /*!
@@ -153,10 +215,14 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
   if ( view ) {
     view->initLayout();
     view->initSketchers();
+    view->setInteractionStyle( interactionStyle() );
+    view->setZoomingStyle( zoomingStyle() );
     
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
-      vp3d->setBackgroundColor( myBgColor );
+    {
+      vp3d->getView()->SetSurfaceDetail(V3d_TEX_ALL);
+    }
   }
 }
 
@@ -166,8 +232,14 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
 */
 SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
-  OCCViewer_ViewWindow* view = new OCCViewer_ViewWindow(theDesktop, this);
-  initView( view );
+  // create view frame
+  OCCViewer_ViewFrame* view = new OCCViewer_ViewFrame(theDesktop, this);
+  // get main view window (created by view frame)
+  OCCViewer_ViewWindow* vw = view->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+  // initialize main view window
+  initView( vw );
+  // set default background for view window
+  vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
   return view;
 }
 
@@ -180,13 +252,16 @@ void OCCViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
   SUIT_ViewModel::setViewManager(theViewManager);
   if (theViewManager) {
     connect(theViewManager, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), 
-	    this, SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
+            this, SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
 
     connect(theViewManager, SIGNAL(mouseMove(SUIT_ViewWindow*, QMouseEvent*)), 
             this, SLOT(onMouseMove(SUIT_ViewWindow*, QMouseEvent*)));
 
     connect(theViewManager, SIGNAL(mouseRelease(SUIT_ViewWindow*, QMouseEvent*)), 
             this, SLOT(onMouseRelease(SUIT_ViewWindow*, QMouseEvent*)));
+
+    connect(theViewManager, SIGNAL(keyPress(SUIT_ViewWindow*, QKeyEvent*)), 
+            this, SLOT(onKeyPress(SUIT_ViewWindow*, QKeyEvent*)));
   }
 }
 
@@ -209,12 +284,16 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
 
   if ( isSelectionEnabled() ) {
-    if (aView->getViewPort()->isBusy()) return; // Check that the ViewPort initialization completed
+    if (aView->getViewPort()->isBusy()) {
+      QCoreApplication::processEvents();
+      return; // Check that the ViewPort initialization completed
                                                 // To Prevent call move event if the View port is not initialized
                                                 // IPAL 20883
+    }
     Handle(V3d_View) aView3d = aView->getViewPort()->getView();
-    if ( !aView3d.IsNull() )
+    if ( !aView3d.IsNull() ) {
       myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+    }
   }
 }
 
@@ -228,9 +307,11 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   if (theEvent->button() != Qt::LeftButton) return;
   if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
 
+  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
+  if (!aView || aView->interactionStyle() != SUIT_ViewModel::STANDARD)
+    return;
 
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
-  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
   if (!aHasShift) emit deselection();
@@ -270,6 +351,90 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   emit selectionChanged();
 }
 
+/*!
+  SLOT: called on key press, processes selection in "key free" interaction style
+*/
+void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEvent)
+{
+  if (!mySelectionEnabled) return;
+  if (theEvent->key() != Qt::Key_S) return;
+  if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
+
+  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
+  if (!aView || aView->interactionStyle() != SUIT_ViewModel::KEY_FREE)
+    return;
+
+  emit deselection();
+  myAISContext->Select();
+
+  emit selectionChanged();
+}
+
+int OCCViewer_Viewer::getTopLayerId()
+{
+#if OCC_VERSION_LARGE > 0x06050200
+  if ( myTopLayerId == 0 && !myAISContext->CurrentViewer().IsNull() )    
+    myAISContext->CurrentViewer()->AddZLayer( myTopLayerId );
+#endif
+
+  return myTopLayerId;
+}
+
+/*!
+  \return interaction style
+*/
+int OCCViewer_Viewer::interactionStyle() const
+{
+  return myInteractionStyle;
+}
+
+/*!
+  Sets interaction style: 0 - standard, 1 - keyboard free interaction
+  \param theStyle - new interaction style
+*/
+void OCCViewer_Viewer::setInteractionStyle( const int theStyle )
+{
+  myInteractionStyle = theStyle;
+  //!! To be done for view windows
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setInteractionStyle( theStyle );
+  }
+}
+
+/*!
+  \return zooming style
+*/
+int OCCViewer_Viewer::zoomingStyle() const
+{
+  return myZoomingStyle;
+}
+
+/*!
+  Sets zooming style: 0 - standard, 1 - advanced (at cursor)
+  \param theStyle - new zooming style
+*/
+void OCCViewer_Viewer::setZoomingStyle( const int theStyle )
+{
+  myZoomingStyle = theStyle;
+  //!! To be done for view windows
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setZoomingStyle( theStyle );
+  }
+}
 
 /*!
   Sets selection enabled status
@@ -317,7 +482,7 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
 void OCCViewer_Viewer::contextMenuPopup(QMenu* thePopup)
 {
   thePopup->addAction( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUND" ), this, SLOT( onChangeBackground() ) );
 
   thePopup->addSeparator();
 
@@ -326,8 +491,10 @@ void OCCViewer_Viewer::contextMenuPopup(QMenu* thePopup)
   //Support of several toolbars in the popup menu
   QList<QToolBar*> lst = qFindChildren<QToolBar*>( aView );
   QList<QToolBar*>::const_iterator it = lst.begin(), last = lst.end();
-  for( ; it!=last; it++ )
-    thePopup->addAction( (*it)->toggleViewAction() );
+  for ( ; it!=last; it++ ) {
+    if ( (*it)->parentWidget()->isVisible() )
+      thePopup->addAction( (*it)->toggleViewAction() );
+  }
 }
 
 /*!
@@ -343,19 +510,32 @@ void OCCViewer_Viewer::onDumpView()
 /*!
   SLOT: called if background color is to be changed changed, passes new color to view port
 */
-void OCCViewer_Viewer::onChangeBgColor()
+void OCCViewer_Viewer::onChangeBackground()
 {
-  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
-  if( !aView )
+  OCCViewer_ViewWindow* aView = dynamic_cast<OCCViewer_ViewWindow*>(myViewManager->getActiveView());
+  if ( !aView )
     return;
-  OCCViewer_ViewPort3d* aViewPort3d = aView->getViewPort();
-  if( !aViewPort3d )
-    return;
-  QColor aColorActive = aViewPort3d->backgroundColor();
 
-  QColor selColor = QColorDialog::getColor( aColorActive, aView);
-  if ( selColor.isValid() )
-    aViewPort3d->setBackgroundColor(selColor);
+  // get supported gradient types
+  QStringList gradList;
+  QIntList    idList, txtList;
+  QString     formats = backgroundData( gradList, idList, txtList );
+
+  // invoke dialog box
+  Qtx::BackgroundData bgData = QtxBackgroundDialog::getBackground( aView->background(),  // initial background
+								   aView,                // parent for dialog box
+								   txtList,              // allowed texture modes
+								   true,                 // enable solid color mode
+								   true,                 // enable gradient mode
+								   false,                // disable custom gradient mode
+								   !txtList.isEmpty(),   // enable/disable texture mode
+								   gradList,             // gradient names
+								   idList,               // gradient identifiers
+								   formats );            // image formats
+
+  // set chosen background data to the viewer
+  if ( bgData.isValid() )
+    aView->setBackground( bgData );
 }
 
 /*!
@@ -400,48 +580,6 @@ void OCCViewer_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 void OCCViewer_Viewer::performSelectionChanged()
 {
     emit selectionChanged();
-}
-
-/*!
-  SLOT, clears view aspects
-*/
-void OCCViewer_Viewer::onClearViewAspects()
-{
-    clearViewAspects();
-}
-
-/*!
-  Clears view aspects
-*/
-void OCCViewer_Viewer::clearViewAspects()
-{
-	myViewAspects.clear();
-}
-
-/*!
-  \return const reference to list of view aspects
-*/
-const viewAspectList& OCCViewer_Viewer::getViewAspects()
-{
-	return myViewAspects;
-}
-
-/*!
-  Appends new view aspect
-  \param aParams - new view aspects
-*/
-void OCCViewer_Viewer::appendViewAspect( const viewAspect& aParams )
-{
-	myViewAspects.append( aParams );
-}
-
-/*!
-  Replaces old view aspects by new ones
-  \param aViewList - list of new view aspects
-*/
-void OCCViewer_Viewer::updateViewAspects( const viewAspectList& aViewList )
-{
-	myViewAspects = aViewList;
 }
 
 /*!
@@ -616,10 +754,13 @@ double OCCViewer_Viewer::trihedronSize() const
   Changes trihedron size
   \param sz - new size
 */
-void OCCViewer_Viewer::setTrihedronSize( const double sz )
+void OCCViewer_Viewer::setTrihedronSize( const double sz, bool isRelative )
 {
-  if ( !myTrihedron.IsNull() )
-    myTrihedron->SetSize( sz );
+  if ( myTrihedronSize != sz || isRelative != myIsRelative) {
+    myTrihedronSize = sz; 
+    myIsRelative = isRelative;
+    updateTrihedron();
+  }
 }
 
 /*!
@@ -649,5 +790,121 @@ void OCCViewer_Viewer::isos( int& u, int& v ) const
   {
     u = ic->IsoNumber( AIS_TOI_IsoU );
     v = ic->IsoNumber( AIS_TOI_IsoV );
+  }
+}
+
+/* 
+ * Returns a new OCCViewer_ViewWindow instance which will be placed as a sub window in ViewFrame
+ */
+OCCViewer_ViewWindow* OCCViewer_Viewer::createSubWindow()
+{
+  return new OCCViewer_ViewWindow( 0,  this);
+}
+
+// obsolete  
+QColor OCCViewer_Viewer::backgroundColor( int theViewId ) const
+{
+  return background( theViewId ).color();
+}
+
+Qtx::BackgroundData OCCViewer_Viewer::background( int theViewId ) const
+{
+  return ( theViewId >= 0 && theViewId < myBackgrounds.count() ) ? myBackgrounds[theViewId] : Qtx::BackgroundData();
+}
+
+// obsolete
+void OCCViewer_Viewer::setBackgroundColor( int theViewId, const QColor& theColor )
+{
+  if ( theColor.isValid() ) {
+    Qtx::BackgroundData bg = background( theViewId );
+    bg.setColor( theColor );
+    setBackground( theViewId, bg );
+  }
+}
+
+void OCCViewer_Viewer::setBackground( int theViewId, const Qtx::BackgroundData& theBackground )
+{
+  if ( theBackground.isValid() && theViewId >= 0 && theViewId < myBackgrounds.count() )
+    myBackgrounds[theViewId] = theBackground;    
+}
+
+
+/*!
+  Set the show static trihedron flag
+*/
+void OCCViewer_Viewer::setStaticTrihedronDisplayed(const bool on) {
+  if(myShowStaticTrihedron != on) {
+    OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
+    if(!aView)
+      return;
+
+    OCCViewer_ViewPort3d* vp3d = aView->getViewPort();
+    if(vp3d) {
+      myShowStaticTrihedron = on;
+      vp3d->updateStaticTriedronVisibility();
+    }
+  }
+}
+
+/*!
+  Get new and current trihedron size corresponding to the current model size
+*/
+bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize )
+{
+  theNewSize = 100;
+  theSize = 100;
+
+  //SRN: BUG IPAL8996, a usage of method ActiveView without an initialization
+  Handle(V3d_Viewer) viewer = getViewer3d();
+  viewer->InitActiveViews();
+  if(!viewer->MoreActiveViews()) return false;
+
+  Handle(V3d_View) view3d = viewer->ActiveView();
+  //SRN: END of fix
+
+  if ( view3d.IsNull() )
+    return false;
+
+  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
+  double aMaxSide;
+
+  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
+
+  if ( Xmin == RealFirst() || Ymin == RealFirst() || Zmin == RealFirst() ||
+       Xmax == RealLast()  || Ymax == RealLast()  || Zmax == RealLast() )
+    return false;
+
+  aMaxSide = Xmax - Xmin;
+  if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
+  if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+
+  // IPAL21687
+  // The boundary box of the view may be initialized but nullified
+  // (case of infinite objects)
+  if ( aMaxSide < Precision::Confusion() )
+    return false;
+
+  float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("OCCViewer","trihedron_size", 100.);
+
+  static float EPS = 5.0E-3;
+  theSize = getTrihedron()->Size();
+  theNewSize = aMaxSide*aSizeInPercents / 100.0;
+
+  return fabs( theNewSize - theSize ) > theSize * EPS ||
+         fabs( theNewSize - theSize) > theNewSize * EPS;
+}
+
+/*! 
+ * Update the size of the trihedron
+ */
+void OCCViewer_Viewer::updateTrihedron() {
+  if(myIsRelative){
+    double newSz, oldSz;
+    
+    if(computeTrihedronSize(newSz, oldSz))
+      myTrihedron->SetSize(newSz);
+    
+  } else if(myTrihedron->Size() != myTrihedronSize) {
+    myTrihedron->SetSize(myTrihedronSize);
   }
 }

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "LightApp_Study.h"
 
 #include "CAM_DataModel.h"
@@ -30,9 +31,10 @@
 
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_DataObjectIterator.h"
+#include "SUIT_DataBrowser.h"
+#include "SUIT_TreeModel.h"
 
 #include <set>
-#include <QString>
 
 /*!
   Constructor.
@@ -447,6 +449,44 @@ void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool
 }
 
 /*!
+  Virtual method that creates the root object (module object) for the given data model.
+  The type of the created object depends on the study class, therefore data model classes
+  should not create their module objects directly and should instead use 
+  LightApp_DataModel::createModuleObject() that in its turn relies on this method.
+
+  \param theDataModel - data model instance to create a module object for
+  \param theParent - the module object's parent (normally it's the study root)
+  \return the module object instance
+  \sa LightApp_DataModel class, SalomeApp_Study class, LightApp_ModuleObject class
+*/
+CAM_ModuleObject* LightApp_Study::createModuleObject( LightApp_DataModel* theDataModel, 
+						      SUIT_DataObject* theParent ) const
+{
+  // Calling addComponent() for symmetry with SalomeApp_Study
+  // Currently it has empty implementation, but maybe in the future things will change...
+  LightApp_Study* that = const_cast<LightApp_Study*>( this );
+  that->addComponent( theDataModel );
+
+  // Avoid creating multiple module objects for the same module
+  CAM_ModuleObject* res = 0;
+
+  DataObjectList children = root()->children();
+  DataObjectList::const_iterator anIt = children.begin(), aLast = children.end();
+  for( ; !res && anIt!=aLast; anIt++ )
+  {
+    LightApp_ModuleObject* obj = dynamic_cast<LightApp_ModuleObject*>( *anIt );
+    if ( obj && obj->name() == theDataModel->module()->moduleName() )
+      res = obj;
+  }
+
+  if ( !res ){
+    res = new LightApp_ModuleObject( theDataModel, theParent );
+  }
+
+  return res;
+}
+
+/*!
   Fills list with components names
   \param comp - list to be filled
 */
@@ -457,7 +497,264 @@ void LightApp_Study::components( QStringList& comp ) const
   for( ; anIt!=aLast; anIt++ )
   {
     LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>( *anIt );
-    if( obj && obj->entry()!="Interface Applicative" )
+    if ( obj && obj->entry() != getVisualComponentName() )
       comp.append( obj->entry() );
   }
+}
+
+/*!
+  Get the entry for the given module
+  \param comp - list to be filled
+  \return module root's entry
+*/
+QString LightApp_Study::centry( const QString& comp ) const
+{
+  QString e;
+  ModelList dmlist;
+  dataModels( dmlist );
+  QListIterator<CAM_DataModel*> it( dmlist );
+  while ( it.hasNext() && e.isEmpty() ) {
+    CAM_DataModel* dm = it.next();
+    if ( dm->module() && dm->module()->name() == comp ) {
+      LightApp_DataObject* r = dynamic_cast<LightApp_DataObject*>( dm->root() );
+      if ( r ) e = r->entry();
+    }
+  }
+  return e;
+}
+
+/*!
+  \return a name of the component where visual parameters are stored
+*/
+QString LightApp_Study::getVisualComponentName() const
+{
+  return "Interface Applicative";
+}
+
+
+
+
+
+/*!
+  Set a visual property of the object
+  \param theViewId - Id of the viewer namager
+  \param theEntry - Entry of the object
+  \param thePropName - the name of the visual property
+  \param theValue - the value of the visual property
+*/
+void LightApp_Study::setObjectProperty(int theViewId, QString theEntry, QString thePropName, QVariant theValue) {
+  
+  //Try to find viewer manager in the map
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewId);
+  if(v_it == myViewMgrMap.end()) {
+
+    //1) Create property map
+    PropMap aPropMap;
+    aPropMap.insert(thePropName, theValue);
+    
+    //2) Create object map
+    ObjMap anObjMap;
+    anObjMap.insert(theEntry,aPropMap);
+
+    //3) Insert in the view manager map
+    myViewMgrMap.insert(theViewId, anObjMap);
+    
+  } else {
+    ObjMap& anObjMap = v_it.value();
+    ObjMap::Iterator o_it = anObjMap.find(theEntry);
+    if(o_it == anObjMap.end()) {
+      //1) Create property map
+      PropMap aPropMap;
+      aPropMap.insert(thePropName, theValue);
+      
+      //2) Insert in the object map
+      anObjMap.insert(theEntry, aPropMap);
+    } else {
+      PropMap& aPropMap = o_it.value();
+      aPropMap.insert(thePropName, theValue);
+    }
+  }
+}
+
+/*!
+  Get a visual property of the object identified by theViewMgrId, theEntry and thePropName.
+  \param theViewMgrId - Id of the viewer manager.
+  \param theEntry - Entry of the object.
+  \param thePropName - the name of the visual property.
+  \param theDefValue - the default value of the visual property.
+  \return value of the visual propetry. If value is't found then return theDefValue.
+*/
+QVariant LightApp_Study::getObjectProperty(int theViewMgrId, QString theEntry, QString thePropName, QVariant theDefValue) const {
+  QVariant& aResult = theDefValue;
+  ViewMgrMap::ConstIterator v_it = myViewMgrMap.find(theViewMgrId);
+  if(v_it != myViewMgrMap.end()){
+    const ObjMap& anObjectMap = v_it.value();
+    ObjMap::ConstIterator o_it = anObjectMap.find(theEntry);
+    if(o_it != anObjectMap.end()) {
+      const PropMap& aPropMap = o_it.value();
+      PropMap::ConstIterator p_it = aPropMap.find(thePropName);
+      if(p_it != aPropMap.end()) {
+	aResult = p_it.value();
+      }
+    }
+  }
+  return aResult;
+}
+
+/*!
+  Remove view manager with all objects.
+  \param theViewMgrId - Id of the viewer manager.
+*/
+void LightApp_Study::removeViewMgr( int theViewMgrId ) { 
+  myViewMgrMap.remove(theViewMgrId);
+}
+
+
+/*!
+  Get a map of the properties of the object identified by theViewMgrId and theEntry.
+  \param theViewMgrId - Id of the viewer manager.
+  \param theEntry - Entry of the object.
+  \return a map of the properties of the object.
+*/
+const PropMap& LightApp_Study::getObjectPropMap(int theViewMgrId, QString theEntry) {
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
+  if (v_it != myViewMgrMap.end()) {
+    ObjMap& anObjectMap = v_it.value();
+    ObjMap::Iterator o_it = anObjectMap.find(theEntry);
+    if(o_it != anObjectMap.end()) {
+      return o_it.value();
+    } else {
+      PropMap aPropMap;
+      anObjectMap.insert(theEntry, aPropMap);
+      return anObjectMap.find(theEntry).value();
+    }
+  } else {
+    PropMap aPropMap;
+    ObjMap anObjMap;
+    anObjMap.insert(theEntry,aPropMap);
+    myViewMgrMap.insert(theViewMgrId, anObjMap);
+
+    ObjMap& anObjectMap = myViewMgrMap.find(theViewMgrId).value();
+    return anObjectMap.find(theEntry).value();
+  }
+}
+
+/*!
+  Set a map of the properties of the object identified by theViewMgrId and theEntry.
+  \param theViewMgrId - Id of the viewer manager.
+  \param theEntry - Entry of the object.
+*/
+void LightApp_Study::setObjectPropMap(int theViewMgrId, QString theEntry, PropMap thePropMap) {
+  //Try to find viewer manager in the map
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
+  if(v_it == myViewMgrMap.end()) {
+    
+    //1) Create object map
+    ObjMap anObjMap;
+    anObjMap.insert(theEntry,thePropMap);
+
+    //3) Insert in the view manager map
+    myViewMgrMap.insert(theViewMgrId, anObjMap);
+  } else {
+    ObjMap& anObjMap = v_it.value();
+    anObjMap.insert(theEntry,thePropMap);
+  }
+}
+
+/*!
+   Remove object's properties from all view managers.
+  \param theEntry - Entry of the object.
+*/
+void LightApp_Study::removeObjectFromAll( QString theEntry ) {
+  ViewMgrMap::Iterator v_it = myViewMgrMap.begin();
+  for( ;v_it != myViewMgrMap.end(); v_it++ ) {
+    v_it.value().remove(theEntry);
+  }
+}
+
+/*!
+  Get all objects and it's properties from view manager identified by theViewMgrId.
+  \param theEntry - Entry of the object.
+*/
+const ObjMap& LightApp_Study::getObjectMap ( int theViewMgrId ) {
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
+  if( v_it == myViewMgrMap.end() ) {
+    ObjMap anObjMap;
+    myViewMgrMap.insert(theViewMgrId , anObjMap);
+    return myViewMgrMap.find(theViewMgrId).value();
+  }
+  return v_it.value();
+}
+
+/*!
+  Set 'visibility state' property of the object.
+  \param theEntry - Entry of the object.
+  \param theState - visibility status
+*/
+void LightApp_Study::setVisibilityState(const QString& theEntry, Qtx::VisibilityState theState) {
+  LightApp_Application* app = (LightApp_Application*)application();
+  if(!app)
+    return;
+  SUIT_DataBrowser* db = app->objectBrowser();
+  if(!db)
+    return;
+
+  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
+  
+  if(treeModel)
+    treeModel->setVisibilityState(theEntry,theState);
+}
+
+/*!
+  Set 'visibility state' property for all object.
+  \param theEntry - Entry of the object.
+*/
+void LightApp_Study::setVisibilityStateForAll(Qtx::VisibilityState theState) {
+  
+  LightApp_Application* app = (LightApp_Application*)application();
+  if(!app)
+    return;
+  SUIT_DataBrowser* db = app->objectBrowser();
+  if(!db)
+    return;
+
+  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
+  
+  if(treeModel)
+    treeModel->setVisibilityStateForAll(theState);
+}
+
+/*!
+  Get 'visibility state' property of the object.
+  \param theEntry - Entry of the object.
+  \return 'visibility state' property of the object.
+*/
+Qtx::VisibilityState LightApp_Study::visibilityState(const QString& theEntry) const {
+  LightApp_Application* app = (LightApp_Application*)application();
+  if(app) {
+    
+    SUIT_DataBrowser* db = app->objectBrowser();
+    if(db) {
+      SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
+      if(treeModel)
+	return treeModel->visibilityState(theEntry);
+    }
+  }
+  return Qtx::UnpresentableState;
+}
+
+/*!
+  Find a data object by the specified entry.
+  \param theEntry - Entry of the object.
+  \return data object.
+*/
+LightApp_DataObject* LightApp_Study::findObjectByEntry( const QString& theEntry )
+{
+  LightApp_DataObject* aCurObj;
+  for ( SUIT_DataObjectIterator it( root(), SUIT_DataObjectIterator::DepthLeft ); it.current(); ++it ) {
+    aCurObj = dynamic_cast<LightApp_DataObject*>( it.current() );
+    if ( aCurObj && aCurObj->entry() == theEntry )
+      return aCurObj;
+  }
+  return NULL;
 }

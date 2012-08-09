@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxPathDialog.cxx
 // Author:    Sergey TELKOV
 //
@@ -340,7 +341,7 @@ bool QtxPathDialog::isValid()
 bool QtxPathDialog::acceptData() const
 {
   bool ok = true;
-	
+        
   QWidget* parent = (QWidget*)this;
 
   FileEntryMap::ConstIterator it;
@@ -351,7 +352,7 @@ bool QtxPathDialog::acceptData() const
     if ( entry.edit->text().isEmpty() )
     {
       QMessageBox::critical( parent, windowTitle(), tr( "File name not specified" ),
-			     QMessageBox::Ok, QMessageBox::NoButton );
+                             QMessageBox::Ok, QMessageBox::NoButton );
       ok = false;
     }
     else switch ( entry.mode )
@@ -359,44 +360,44 @@ bool QtxPathDialog::acceptData() const
     case OpenFile:
       if ( !fileInfo.exists() )
       {
-	QMessageBox::critical( parent, windowTitle(), tr( "File \"%1\" does not exist" ).arg( fileInfo.filePath() ),
-			       QMessageBox::Ok, QMessageBox::NoButton );
-	ok = false;
+        QMessageBox::critical( parent, windowTitle(), tr( "File \"%1\" does not exist" ).arg( fileInfo.filePath() ),
+                               QMessageBox::Ok, QMessageBox::NoButton );
+        ok = false;
       }
       break;
     case SaveFile:
       if ( fileInfo.exists() )
-	ok = QMessageBox::warning( parent, windowTitle(), tr( "File \"%1\" already exist. Do you want to overwrite it?" ).arg( fileInfo.filePath() ),
-				   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes;
+        ok = QMessageBox::warning( parent, windowTitle(), tr( "File \"%1\" already exist. Do you want to overwrite it?" ).arg( fileInfo.filePath() ),
+                                   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes;
       break;
     case OpenDir:
       if ( !fileInfo.exists() || !fileInfo.isDir() )
       {
-	QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" does not exist" ).arg( fileInfo.filePath() ),
-			       QMessageBox::Ok, QMessageBox::NoButton );
-	ok = false;
+        QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" does not exist" ).arg( fileInfo.filePath() ),
+                               QMessageBox::Ok, QMessageBox::NoButton );
+        ok = false;
       }
       break;
     case SaveDir:
       if ( fileInfo.exists() && !fileInfo.isDir() )
       {
-	QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" can't be created because file with the same name exist" ).arg( fileInfo.filePath() ),
-			       QMessageBox::Ok, QMessageBox::NoButton );
-	ok = false;
+        QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" can't be created because file with the same name exist" ).arg( fileInfo.filePath() ),
+                               QMessageBox::Ok, QMessageBox::NoButton );
+        ok = false;
       }
       break;
     case NewDir:
       if ( fileInfo.exists() )
       {
-	if ( !fileInfo.isDir() )
-	{
-	  QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" can't be created because file with the same name exist" ).arg( fileInfo.filePath() ),
-				 QMessageBox::Ok, QMessageBox::NoButton );
-	  ok = false;
-	}
-	else if ( QDir( fileInfo.filePath() ).count() > 2 )
-	  ok = QMessageBox::warning( parent, windowTitle(), tr( "Directory \"%1\" not empty. Do you want to remove all files in this directory?" ).arg( fileInfo.filePath() ),
-				     QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes;
+        if ( !fileInfo.isDir() )
+        {
+          QMessageBox::critical( parent, windowTitle(), tr( "Directory \"%1\" can't be created because file with the same name exist" ).arg( fileInfo.filePath() ),
+                                 QMessageBox::Ok, QMessageBox::NoButton );
+          ok = false;
+        }
+        else if ( QDir( fileInfo.filePath() ).count() > 2 )
+          ok = QMessageBox::warning( parent, windowTitle(), tr( "Directory \"%1\" not empty. Do you want to remove all files in this directory?" ).arg( fileInfo.filePath() ),
+                                     QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes;
       }
       break;
     default:
@@ -461,7 +462,7 @@ void QtxPathDialog::setFileName( const int id, const QString& txt, const bool au
 {
   int mode;
   QLineEdit* le = fileEntry( id, mode );
-	
+        
   if ( le )
   {
     if ( autoExt && ( mode == OpenFile || mode == SaveFile ) )
@@ -539,7 +540,7 @@ QLineEdit* QtxPathDialog::fileEntry( const int theId, int& theMode ) const
   \return created file entry ID
 */
 int QtxPathDialog::createFileEntry( const QString& lab, const int mode, 
-				                            const QString& filter, const int id )
+                                                            const QString& filter, const int id )
 {
   int num = id;
   if ( num == -1 )
@@ -668,7 +669,7 @@ QStringList QtxPathDialog::filterWildCards( const QString& theFilter ) const
     for ( QStringList::ConstIterator it = lst.begin(); it != lst.end(); ++it )
     {
       if ( (*it).indexOf( "." ) != -1 )
-	res.append( (*it).trimmed() );
+        res.append( (*it).trimmed() );
     }
   }
   return res;
@@ -720,7 +721,7 @@ bool QtxPathDialog::hasVisibleChildren( QWidget* wid ) const
     for ( QObjectList::const_iterator it = aChildren.begin(); it != aChildren.end() && !res; ++it )
     {
       if ( (*it)->isWidgetType() )
-	res = ((QWidget*)(*it))->isVisibleTo( wid );
+        res = ((QWidget*)(*it))->isVisibleTo( wid );
     }
   }
   return res;

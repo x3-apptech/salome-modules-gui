@@ -1,24 +1,25 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : suit
@@ -37,6 +38,8 @@ salomeinclude_HEADERS =		\
 	QtxActionMgr.h		\
 	QtxActionSet.h		\
 	QtxActionToolMgr.h	\
+	QtxBackgroundTool.h	\
+	QtxBiColorTool.h	\
 	QtxColorButton.h	\
 	QtxColorScale.h		\
 	QtxComboBox.h		\
@@ -66,6 +69,7 @@ salomeinclude_HEADERS =		\
 	QtxResourceMgr.h	\
 	QtxRubberBand.h         \
 	QtxSearchTool.h		\
+	QtxShortcutEdit.h       \
 	QtxSplash.h		\
 	QtxToolBar.h		\
 	QtxToolTip.h		\
@@ -74,7 +78,8 @@ salomeinclude_HEADERS =		\
 	QtxWorkspace.h		\
 	QtxWorkspaceAction.h	\
 	QtxWorkstack.h		\
-	QtxWorkstackAction.h
+	QtxWorkstackAction.h    \
+	QtxWebBrowser.h
 
 #VSR: not yet migrated to Qt4 files
 #				\
@@ -94,6 +99,8 @@ dist_libqtx_la_SOURCES =	\
 	QtxActionMgr.cxx	\
 	QtxActionSet.cxx	\
 	QtxActionToolMgr.cxx	\
+	QtxBackgroundTool.cxx	\
+	QtxBiColorTool.cxx	\
 	QtxColorButton.cxx	\
 	QtxColorScale.cxx	\
 	QtxComboBox.cxx		\
@@ -122,6 +129,7 @@ dist_libqtx_la_SOURCES =	\
 	QtxResourceMgr.cxx	\
 	QtxRubberBand.cxx       \
 	QtxSearchTool.cxx	\
+	QtxShortcutEdit.cxx     \
 	QtxSplash.cxx		\
 	QtxToolBar.cxx		\
 	QtxToolTip.cxx		\
@@ -130,7 +138,8 @@ dist_libqtx_la_SOURCES =	\
 	QtxWorkspace.cxx	\
 	QtxWorkspaceAction.cxx	\
 	QtxWorkstack.cxx	\
-	QtxWorkstackAction.cxx
+	QtxWorkstackAction.cxx  \
+	QtxWebBrowser.cxx
 
 #VSR: not yet migrated to Qt4 files
 #				\
@@ -145,6 +154,8 @@ MOC_FILES =				\
 	QtxActionMgr_moc.cxx		\
 	QtxActionSet_moc.cxx		\
 	QtxActionToolMgr_moc.cxx	\
+	QtxBackgroundTool_moc.cxx	\
+	QtxBiColorTool_moc.cxx		\
 	QtxColorButton_moc.cxx		\
 	QtxColorScale_moc.cxx		\
 	QtxComboBox_moc.cxx		\
@@ -170,6 +181,7 @@ MOC_FILES =				\
 	QtxPopupMgr_moc.cxx		\
 	QtxRubberBand_moc.cxx           \
 	QtxSearchTool_moc.cxx		\
+	QtxShortcutEdit_moc.cxx         \
 	QtxSplash_moc.cxx		\
 	QtxToolBar_moc.cxx		\
 	QtxToolTip_moc.cxx		\
@@ -177,7 +189,8 @@ MOC_FILES =				\
 	QtxWorkspace_moc.cxx		\
 	QtxWorkspaceAction_moc.cxx	\
 	QtxWorkstack_moc.cxx		\
-	QtxWorkstackAction_moc.cxx
+	QtxWorkstackAction_moc.cxx      \
+	QtxWebBrowser_moc.cxx
 
 #VSR: not yet migrated to Qt4 files
 #					\
@@ -187,4 +200,7 @@ MOC_FILES =				\
 nodist_libqtx_la_SOURCES = $(MOC_FILES)
 
 libqtx_la_CPPFLAGS = $(QT_INCLUDES)
-libqtx_la_LDFLAGS  = $(QT_MT_LIBS)
+libqtx_la_LDFLAGS  = $(QT_MT_LIBS) $(OGL_LIBS)
+
+nodist_salomeres_DATA =		\
+	Qtx_msg_fr.qm

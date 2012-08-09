@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : QtxSearchTool.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -38,20 +36,20 @@
 
 const char* const first_xpm[] = {
 "16 16 14 1",
-" 	c None",
-".	c #111111",
-"+	c #0A0A0A",
-"@	c #161616",
-"#	c #ACACAC",
-"$	c #FC6D6E",
-"%	c #FB6364",
-"&	c #F25B5C",
-"*	c #EA5859",
-"=	c #C1494A",
-"-	c #B64545",
-";	c #AB4040",
-">	c #A03C3C",
-",	c #99393A",
+"       c None",
+".      c #111111",
+"+      c #0A0A0A",
+"@      c #161616",
+"#      c #ACACAC",
+"$      c #FC6D6E",
+"%      c #FB6364",
+"&      c #F25B5C",
+"*      c #EA5859",
+"=      c #C1494A",
+"-      c #B64545",
+";      c #AB4040",
+">      c #A03C3C",
+",      c #99393A",
 "           .    ",
 " +@+      ..#   ",
 " +$+#    .$.... ",
@@ -71,20 +69,20 @@ const char* const first_xpm[] = {
 
 const char* const last_xpm[] = {
 "16 16 14 1",
-" 	c None",
-".	c #111111",
-"+	c #0A0A0A",
-"@	c #161616",
-"#	c #FC6D6E",
-"$	c #ACACAC",
-"%	c #FB6364",
-"&	c #F25B5C",
-"*	c #EA5859",
-"=	c #C1494A",
-"-	c #B64545",
-";	c #AB4040",
-">	c #A03C3C",
-",	c #99393A",
+"       c None",
+".      c #111111",
+"+      c #0A0A0A",
+"@      c #161616",
+"#      c #FC6D6E",
+"$      c #ACACAC",
+"%      c #FB6364",
+"&      c #F25B5C",
+"*      c #EA5859",
+"=      c #C1494A",
+"-      c #B64545",
+";      c #AB4040",
+">      c #A03C3C",
+",      c #99393A",
 "    .           ",
 "    ..      +@+ ",
 " ....#.     +#+$",
@@ -104,18 +102,18 @@ const char* const last_xpm[] = {
 
 const char* const prev_xpm[] = {
 "16 16 12 1",
-" 	c None",
-".	c #111111",
-"+	c #ACACAC",
-"@	c #FC6D6E",
-"#	c #FB6364",
-"$	c #F25B5C",
-"%	c #EA5859",
-"&	c #C1494A",
-"*	c #B64545",
-"=	c #AB4040",
-"-	c #A03C3C",
-";	c #99393A",
+"       c None",
+".      c #111111",
+"+      c #ACACAC",
+"@      c #FC6D6E",
+"#      c #FB6364",
+"$      c #F25B5C",
+"%      c #EA5859",
+"&      c #C1494A",
+"*      c #B64545",
+"=      c #AB4040",
+"-      c #A03C3C",
+";      c #99393A",
 "        .       ",
 "       ..+      ",
 "      .@......  ",
@@ -135,18 +133,18 @@ const char* const prev_xpm[] = {
 
 const char* const next_xpm[] = {
 "16 16 12 1",
-" 	c None",
-".	c #111111",
-"+	c #FC6D6E",
-"@	c #FB6364",
-"#	c #F25B5C",
-"$	c #EA5859",
-"%	c #C1494A",
-"&	c #B64545",
-"*	c #ACACAC",
-"=	c #AB4040",
-"-	c #A03C3C",
-";	c #99393A",
+"       c None",
+".      c #111111",
+"+      c #FC6D6E",
+"@      c #FB6364",
+"#      c #F25B5C",
+"$      c #EA5859",
+"%      c #C1494A",
+"&      c #B64545",
+"*      c #ACACAC",
+"=      c #AB4040",
+"-      c #A03C3C",
+";      c #99393A",
 "       .        ",
 "       ..       ",
 "  ......+.      ",
@@ -166,14 +164,14 @@ const char* const next_xpm[] = {
 
 const char* const close_xpm[] = {
 "16 16 8 1",
-" 	c None",
-".	c #D73727",
-"+	c #E17765",
-"@	c #E7957F",
-"#	c #DE6F48",
-"$	c #DF7B4F",
-"%	c #FAE9E4",
-"&	c #FFFFFF",
+"       c None",
+".      c #D73727",
+"+      c #E17765",
+"@      c #E7957F",
+"#      c #DE6F48",
+"$      c #DF7B4F",
+"%      c #FAE9E4",
+"&      c #FFFFFF",
 "                ",
 "  ............  ",
 " .+@@@@@@@@@@+. ",
@@ -272,7 +270,7 @@ static QWidget* wrapWidget( QWidget* parent, QWidget* w )
   \param controls ORed controls flags (QtxSearchTool::Controls)
   \sa setWatchedWidget(), setControls()
 */
-QtxSearchTool::QtxSearchTool( QWidget* parent, QWidget* watched, int controls )
+QtxSearchTool::QtxSearchTool( QWidget* parent, QWidget* watched, int controls, Qt::Orientation orientation )
 : QFrame( parent ),
   myWatched( watched ? watched : parent ),
   mySearcher( 0 ),
@@ -281,7 +279,7 @@ QtxSearchTool::QtxSearchTool( QWidget* parent, QWidget* watched, int controls )
   myAutoHideTimer( 0 ),
   myAutoHideEnabled( true )
 {
-  init();
+  init( orientation );
 }
 
 /*!
@@ -296,7 +294,7 @@ QtxSearchTool::QtxSearchTool( QWidget* parent, QWidget* watched, int controls )
   \param controls ORed controls flags (QtxSearchTool::Controls)
   \sa setWatchedWidget(), setControls()
 */
-QtxSearchTool::QtxSearchTool( QWidget* parent, int controls )
+QtxSearchTool::QtxSearchTool( QWidget* parent, int controls, Qt::Orientation orientation )
 : QFrame( parent ),
   myWatched( parent ),
   mySearcher( 0 ),
@@ -305,7 +303,7 @@ QtxSearchTool::QtxSearchTool( QWidget* parent, int controls )
   myAutoHideTimer( 0 ),
   myAutoHideEnabled( true )
 {
-  init();
+  init( orientation );
 }
 
 /*!
@@ -498,7 +496,7 @@ int QtxSearchTool::addCustomWidget( QWidget* w, int id )
 
   wid = id < 0 ? --_wid : id;
 
-  QVBoxLayout* vbox = qobject_cast<QVBoxLayout*>( layout() );
+  QBoxLayout* vbox = qobject_cast<QBoxLayout*>( layout() );
   w->setParent( this );
   vbox->addWidget( w );
   myWidgets.insert( wid, w );
@@ -828,9 +826,9 @@ void QtxSearchTool::find( const QString& what, int where )
 
   QPalette p = myData->palette();
   p.setColor( QPalette::Active,
-	      QPalette::Base,
-	      QApplication::palette( myData ).color( QPalette::Active,
-						     QPalette::Base ) );
+              QPalette::Base,
+              QApplication::palette( myData ).color( QPalette::Active,
+                                                     QPalette::Base ) );
 
   bool found = true;
   if ( mySearcher && !what.isEmpty() )
@@ -873,25 +871,19 @@ void QtxSearchTool::modifierSwitched()
   \brief Initialize the search tool widget.
   \internal
 */
-void QtxSearchTool::init()
+void QtxSearchTool::init( Qt::Orientation orientation )
 {
   setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
-  QVBoxLayout* vbox = new QVBoxLayout();
-  vbox->setSpacing( 0 );
-  vbox->setMargin( 5 );
-  setLayout( vbox );
 
   myBtnWidget = new QWidget( this );
   QHBoxLayout* myBtnWidget_layout = new QHBoxLayout( myBtnWidget );
   myBtnWidget_layout->setSpacing( 0 );
   myBtnWidget_layout->setMargin( 0 );
-  vbox->addWidget( myBtnWidget );
 
   myModWidget = new QWidget( this );
   QHBoxLayout* myModWidget_layout = new QHBoxLayout( myModWidget );
   myModWidget_layout->setSpacing( 0 );
   myModWidget_layout->setMargin( 0 );
-  vbox->addWidget( myModWidget );
 
   myClose = new QToolButton( myBtnWidget );
   myClose->setIcon( QIcon( close_xpm ) );
@@ -953,6 +945,14 @@ void QtxSearchTool::init()
 
   setShortcuts( QKeySequence( "Ctrl+S" ) );
   setActivators( Any );
+  
+  QBoxLayout* box = orientation == Qt::Vertical ? (QBoxLayout*)( new QVBoxLayout ) : (QBoxLayout*)( new QHBoxLayout );
+  box->setSpacing( 0 );
+  box->setMargin( 5 );
+  box->addWidget( myBtnWidget );
+  box->addWidget( myModWidget );
+  setLayout( box );
+
   updateControls();
 }
 
@@ -1040,8 +1040,8 @@ void QtxSearchTool::updateShortcuts()
   ShortcutList::Iterator it;
   for ( it = myShortcuts.begin(), i = 0; it != myShortcuts.end(); ++it, i++ )
   {
-    (*it)->setEnabled( isEnabled() && ( i < 3 && myActivators & StandardKey ||
-					i > 2 && myActivators & HotKey ) );
+    (*it)->setEnabled( isEnabled() && ( ( i < 3 && myActivators & StandardKey ) ||
+                                        ( i > 2 && myActivators & HotKey ) ) );
   }
 }
 
@@ -1408,8 +1408,8 @@ QModelIndexList QtxTreeViewSearcher::findItems( const QString& text, QtxSearchTo
 
   if ( myView->model() )
     return myView->model()->match( myView->model()->index( 0, myColumn ),
-				   Qt::DisplayRole,
-				   s, -1, fl );
+                                   Qt::DisplayRole,
+                                   s, -1, fl );
   return QModelIndexList();
 }
 
@@ -1422,8 +1422,8 @@ QModelIndexList QtxTreeViewSearcher::findItems( const QString& text, QtxSearchTo
   appropriate item
 */
 QModelIndex QtxTreeViewSearcher::findNearest( const QModelIndex& index,
-					      const QModelIndexList& lst,
-					      bool direction )
+                                              const QModelIndexList& lst,
+                                              bool direction )
 {
   if ( direction )
   {
@@ -1432,7 +1432,7 @@ QModelIndex QtxTreeViewSearcher::findNearest( const QModelIndex& index,
     {
       QModelIndex found = it.next();
       if ( compareIndices( found, index ) > 0 )
-	return found;
+        return found;
     }
   }
   else
@@ -1443,7 +1443,7 @@ QModelIndex QtxTreeViewSearcher::findNearest( const QModelIndex& index,
     {
       QModelIndex found = it.previous();
       if ( compareIndices( found, index ) < 0 )
-	return found;
+        return found;
     }
   }
   return QModelIndex();
@@ -1494,7 +1494,7 @@ QString QtxTreeViewSearcher::getId( const QModelIndex& index )
   and positive value otherwise
 */
 int QtxTreeViewSearcher::compareIndices( const QModelIndex& left,
-					 const QModelIndex& right )
+                                         const QModelIndex& right )
 {
   QString leftId = getId( left );
   QString rightId = getId( right );

@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -101,6 +80,14 @@
         <translation>occ_view_right.png</translation>
     </message>
     <message>
+        <source>ICON_OCCVIEWER_VIEW_CLOCKWISE</source>
+        <translation>occ_view_clockwise.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_VIEW_ANTICLOCKWISE</source>
+        <translation>occ_view_anticlockwise.png</translation>
+    </message>
+    <message>
         <source>ICON_OCCVIEWER_CLIPPING</source>
         <translation>occ_view_clipping.png</translation>
     </message>
@@ -111,6 +98,34 @@
     <message>
         <source>ICON_OCCVIEWER_SCALING</source>
         <translation>occ_view_scaling.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_GRADUATED_AXES</source>
+        <translation>occ_view_graduated_axes.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_AMBIENT</source>
+        <translation>occ_view_ambient.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_STYLE_SWITCH</source>
+        <translation>occ_view_style_switch.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_ZOOMING_STYLE_SWITCH</source>
+        <translation>occ_view_zooming_style_switch.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_MAXIMIZE</source>
+        <translation>occ_view_maximized.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_MINIMIZE</source>
+        <translation>occ_view_minimized.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_SYNC</source>
+        <translation>occ_view_sync.png</translation>
     </message>
 </context>
 </TS>

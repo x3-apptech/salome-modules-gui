@@ -1,38 +1,35 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SalomeApp_PyInterp.cxx
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SalomeApp_PyInterp.h"
 
 #include <utilities.h>
 #include <Container_init_python.hxx>
 
 #include "PyInterp.h" // this include must be first (see PyInterp_base.h)!
-
-using namespace std;
 
 /*!
  * constructor : multi Python interpreter, one per SALOME study.
@@ -92,7 +89,7 @@ bool SalomeApp_PyInterp::initContext()
 
   // Call init_shared_modules to initialize the shared import mechanism for modules 
   //that must not be imported twice
-  PyObjWrapper m2( PyObject_CallMethod( m1, "init_shared_modules", "O", KERNEL_PYTHON::salome_shared_modules_module ) );
+  PyObjWrapper m2( PyObject_CallMethod( m1, (char*)"init_shared_modules", (char*)"O", KERNEL_PYTHON::salome_shared_modules_module ) );
   if ( !m2 )
   {
     MESSAGE( "initContext: problem with init_shared_modules call" );
@@ -110,7 +107,7 @@ bool SalomeApp_PyInterp::initContext()
  */
 void SalomeApp_PyInterp::initPython()
 {
-  MESSAGE("PyInterp_base::initPython");
+  MESSAGE("SalomeApp_PyInterp::initPython");
   ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
   SCRUTE(KERNEL_PYTHON::_gtstate);
   _gtstate=KERNEL_PYTHON::_gtstate;

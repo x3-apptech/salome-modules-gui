@@ -1,34 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File:	SALOME_Prs.cxx
-// Created:	Wed Apr 28 15:03:43 2004
-// Author:	Sergey ANIKIN
-//		<san@startrex.nnov.opencascade.com>
-//
+
+// File:        SALOME_Prs.cxx
+// Author:      Sergey ANIKIN, Open CASCADE S.A.S. (sergey.anikin@opencascade.com)
+
 #include "SALOME_Prs.h"
-
-//#include "utilities.h"
-
-//using namespace std;
 
 /*!
   Dispatches display operation to proper Display() method of SALOME_View
@@ -44,6 +39,38 @@ void SALOME_OCCPrs::DisplayIn( SALOME_View* v ) const
 void SALOME_OCCPrs::EraseIn( SALOME_View* v, const bool forced ) const
 {
   if ( v ) v->Erase( this, forced );
+}
+
+/*!
+  Dispatches display operation to proper BeforeDisplay() method of SALOME_Displayer
+*/
+void SALOME_OCCPrs::BeforeDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterDisplay() method of SALOME_Displayer
+*/
+void SALOME_OCCPrs::AfterDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper BeforeErase() method of SALOME_Displayer
+*/
+void SALOME_OCCPrs::BeforeEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeErase( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterErase() method of SALOME_Displayer
+*/
+void SALOME_OCCPrs::AfterEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterErase( v, this );
 }
 
 /*!
@@ -79,6 +106,38 @@ void SALOME_VTKPrs::EraseIn( SALOME_View* v, const bool forced ) const
 }
 
 /*!
+  Dispatches display operation to proper BeforeDisplay() method of SALOME_Displayer
+*/
+void SALOME_VTKPrs::BeforeDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterDisplay() method of SALOME_Displayer
+*/
+void SALOME_VTKPrs::AfterDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper BeforeErase() method of SALOME_Displayer
+*/
+void SALOME_VTKPrs::BeforeEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeErase( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterErase() method of SALOME_Displayer
+*/
+void SALOME_VTKPrs::AfterEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterErase( v, this );
+}
+
+/*!
   Dispatches operation to proper LocalSelectionIn() method of SALOME_View
 */
 void SALOME_VTKPrs::LocalSelectionIn( SALOME_View* v, const int mode ) const
@@ -108,6 +167,38 @@ void SALOME_Prs2d::DisplayIn( SALOME_View* v ) const
 void SALOME_Prs2d::EraseIn( SALOME_View* v, const bool forced ) const
 {
   if ( v ) v->Erase( this, forced );
+}
+
+/*!
+  Dispatches display operation to proper BeforeDisplay() method of SALOME_Displayer
+*/
+void SALOME_Prs2d::BeforeDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterDisplay() method of SALOME_Displayer
+*/
+void SALOME_Prs2d::AfterDisplayIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterDisplay( v, this );
+}
+
+/*!
+  Dispatches display operation to proper BeforeErase() method of SALOME_Displayer
+*/
+void SALOME_Prs2d::BeforeEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->BeforeErase( v, this );
+}
+
+/*!
+  Dispatches display operation to proper AfterErase() method of SALOME_Displayer
+*/
+void SALOME_Prs2d::AfterEraseIn( SALOME_Displayer* d, SALOME_View* v ) const
+{
+  d->AfterErase( v, this );
 }
 
 /*!
@@ -240,6 +331,26 @@ void SALOME_View::GlobalSelection( const bool ) const
 {
 //  MESSAGE( "SALOME_View::GlobalSelection() called!
 //   Probably, selection is being activated in uncompatible viewframe." );
+}
+
+void SALOME_View::BeforeDisplay( SALOME_Displayer* d, const SALOME_Prs* p )
+{
+  p->BeforeDisplayIn( d, this );
+}
+
+void SALOME_View::AfterDisplay( SALOME_Displayer* d, const SALOME_Prs* p )
+{
+  p->AfterDisplayIn( d, this );
+}
+
+void SALOME_View::BeforeErase( SALOME_Displayer* d, const SALOME_Prs* p )
+{
+  p->BeforeEraseIn( d, this );
+}
+
+void SALOME_View::AfterErase ( SALOME_Displayer* d, const SALOME_Prs* p )
+{
+  p->AfterEraseIn( d, this );
 }
 
 /*!

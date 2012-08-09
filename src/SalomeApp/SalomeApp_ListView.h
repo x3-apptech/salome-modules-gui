@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SalomeApp_ListView.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -186,10 +187,10 @@ public:
 
 public:
   SalomeApp_EntityEdit( QWidget* parent, 
-		        int      controlType = etLineEdit, 
-		        int      valueType   = vtString,
-		        bool     butApply    = false, 
-		        bool     butCancel   = false);
+                        int      controlType = etLineEdit, 
+                        int      valueType   = vtString,
+                        bool     butApply    = false, 
+                        bool     butCancel   = false);
   ~SalomeApp_EntityEdit();
 
   void finishEditing();
@@ -197,18 +198,18 @@ public:
   QString getText();
   void setText(const QString& theText );
   void insertItem( const QString& theValue, 
-		   bool           theSetCurrent = false,
-		   int            theOrder = atBottom );
+                   bool           theSetCurrent = false,
+                   int            theOrder = atBottom );
   void insertList( const QStringList& theList, 
-		   const int          theCurrent = -1 );
+                   const int          theCurrent = -1 );
   void insertItem( const int theValue, 
-		   bool  theSetCurrent = false );
+                   bool  theSetCurrent = false );
   void insertList( const TColStd_ListOfInteger& theList, 
-		   const int                    theCurrent = -1 );
+                   const int                    theCurrent = -1 );
   void insertItem( const double theValue, 
-		   bool         theSetCurrent = false );
+                   bool         theSetCurrent = false );
   void insertList( const TColStd_ListOfReal& theList, 
-		   const int                 theCurrent = -1 );
+                   const int                 theCurrent = -1 );
   QWidget* getControl();
   void setFocus();
   void setValidator(const QValidator*);
@@ -241,31 +242,31 @@ class SalomeApp_ListViewItem : public QTreeWidgetItem
 public:
   SalomeApp_ListViewItem( SalomeApp_ListView* );
   SalomeApp_ListViewItem( SalomeApp_ListView*, 
-			  SalomeApp_ListViewItem* );
+                          SalomeApp_ListViewItem* );
   SalomeApp_ListViewItem( SalomeApp_ListView*,
-			  const QStringList&,
-			  const bool = false );
+                          const QStringList&,
+                          const bool = false );
   SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
-			  const QStringList&,
-			  const bool = false );
+                          const QStringList&,
+                          const bool = false );
   SalomeApp_ListViewItem( SalomeApp_ListView*,
-			  SalomeApp_ListViewItem*,
-			  const QString&,
-			  const bool = false );
+                          SalomeApp_ListViewItem*,
+                          const QString&,
+                          const bool = false );
   SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
-			  SalomeApp_ListViewItem*,
-			  const QString&,
-			  const bool = false);
+                          SalomeApp_ListViewItem*,
+                          const QString&,
+                          const bool = false);
   SalomeApp_ListViewItem( SalomeApp_ListView*,
-			  SalomeApp_ListViewItem*,
-			  const QString& theName,
-			  const QString& theValue, 
-			  const bool = false);
+                          SalomeApp_ListViewItem*,
+                          const QString& theName,
+                          const QString& theValue, 
+                          const bool = false);
   SalomeApp_ListViewItem( SalomeApp_ListViewItem*,
-			  SalomeApp_ListViewItem*,
-			  const QString&,
-			  const QString&, 
-			  const bool = false);
+                          SalomeApp_ListViewItem*,
+                          const QString&,
+                          const QString&, 
+                          const bool = false);
   ~SalomeApp_ListViewItem();
 
   QString            fullName();

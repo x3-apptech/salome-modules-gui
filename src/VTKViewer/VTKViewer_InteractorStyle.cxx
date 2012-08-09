@@ -1,29 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : VTKViewer_InteractorStyle.cxx
 //  Author : Christophe ATTANASIO
-//  Module : SALOME
-//
+
 #include "VTKViewer_InteractorStyle.h"
 
 #include "VTKViewer_Actor.h"
@@ -32,8 +32,6 @@
 #include "VTKViewer_ViewWindow.h"
 #include "VTKViewer_RenderWindow.h"
 #include "VTKViewer_RenderWindowInteractor.h"
-
-//#include "SALOME_Actor.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkMath.h>
@@ -54,11 +52,6 @@
 
 #include <algorithm>
 
-//#include "utilities.h"
-
-using namespace std;
-
-
 /*
 static int GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId){
   int anEdgeId = -1;
@@ -68,12 +61,12 @@ static int GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId)
     float aMinDist = 1000000.0, aDist = 0;
     for (int i = 0, iEnd = aPickedCell->GetNumberOfEdges(); i < iEnd; i++){
       if(vtkLine* aLine = vtkLine::SafeDownCast(aPickedCell->GetEdge(i))){
-	int subId;  float pcoords[3], closestPoint[3], weights[3];
-	aLine->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
-	if (aDist < aMinDist) {
-	  aMinDist = aDist;
-	  anEdgeId = i;
-	}
+        int subId;  float pcoords[3], closestPoint[3], weights[3];
+        aLine->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
+        if (aDist < aMinDist) {
+          aMinDist = aDist;
+          anEdgeId = i;
+        }
       }
     }
   }
@@ -120,7 +113,7 @@ VTKViewer_InteractorStyle::~VTKViewer_InteractorStyle()
  *\param theWidth - width..
  */
 void VTKViewer_InteractorStyle::setPreselectionProp(const double& theRed, const double& theGreen, 
-							  const double& theBlue, const int& theWidth) 
+                                                          const double& theBlue, const int& theWidth) 
 {
   if ( myPreSelectionActor->GetProperty() == 0 )
     return;
@@ -235,9 +228,9 @@ void VTKViewer_InteractorStyle::SpinXY(int x, int y, int oldX, int oldY)
     }
 
   double newAngle = atan2((double)(y - this->CurrentRenderer->GetCenter()[1]),
-			  (double)(x - this->CurrentRenderer->GetCenter()[0]));
+                          (double)(x - this->CurrentRenderer->GetCenter()[0]));
   double oldAngle = atan2((double)(oldY -this->CurrentRenderer->GetCenter()[1]),
-			  (double)(oldX - this->CurrentRenderer->GetCenter()[0]));
+                          (double)(oldX - this->CurrentRenderer->GetCenter()[0]));
   
   newAngle *= this->RadianToDegree;
   oldAngle *= this->RadianToDegree;
@@ -258,8 +251,8 @@ void VTKViewer_InteractorStyle::SpinXY(int x, int y, int oldX, int oldY)
  *\param y - y coordinate
  */
 void VTKViewer_InteractorStyle::OnMouseMove(int vtkNotUsed(ctrl), 
-						  int shift,
-						  int x, int y) 
+                                                  int shift,
+                                                  int x, int y) 
 {
   myShiftState = shift;
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
@@ -276,7 +269,7 @@ void VTKViewer_InteractorStyle::OnMouseMove(int vtkNotUsed(ctrl),
  *\param y - y coordinate
  */
 void VTKViewer_InteractorStyle::OnLeftButtonDown(int ctrl, int shift, 
-						       int x, int y) 
+                                                       int x, int y) 
 {
   if (this->HasObserver(vtkCommand::LeftButtonPressEvent)) {
     this->InvokeEvent(vtkCommand::LeftButtonPressEvent,NULL);
@@ -312,9 +305,9 @@ void VTKViewer_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
  *\param y - y coordinate (not used)
  */
 void VTKViewer_InteractorStyle::OnLeftButtonUp(int vtkNotUsed(ctrl),
-						     int shift, 
-						     int vtkNotUsed(x),
-						     int vtkNotUsed(y))
+                                                     int shift, 
+                                                     int vtkNotUsed(x),
+                                                     int vtkNotUsed(y))
 {
   myShiftState = shift;
   // finishing current viewer operation
@@ -332,8 +325,8 @@ void VTKViewer_InteractorStyle::OnLeftButtonUp(int vtkNotUsed(ctrl),
  *\param y - y coordinate
  */
 void VTKViewer_InteractorStyle::OnMiddleButtonDown(int ctrl,
-							 int shift, 
-							 int x, int y) 
+                                                         int shift, 
+                                                         int x, int y) 
 {
   if (this->HasObserver(vtkCommand::MiddleButtonPressEvent)) 
     {
@@ -369,9 +362,9 @@ void VTKViewer_InteractorStyle::OnMiddleButtonDown(int ctrl,
  *\param y - y coordinate (not used)
  */
 void VTKViewer_InteractorStyle::OnMiddleButtonUp(int vtkNotUsed(ctrl),
-						       int shift, 
-						       int vtkNotUsed(x),
-						       int vtkNotUsed(y))
+                                                       int shift, 
+                                                       int vtkNotUsed(x),
+                                                       int vtkNotUsed(y))
 {
   myShiftState = shift;
   // finishing current viewer operation
@@ -389,8 +382,8 @@ void VTKViewer_InteractorStyle::OnMiddleButtonUp(int vtkNotUsed(ctrl),
  *\param y - y coordinate
  */
 void VTKViewer_InteractorStyle::OnRightButtonDown(int ctrl,
-							int shift, 
-							int x, int y) 
+                                                        int shift, 
+                                                        int x, int y) 
 {
   if (this->HasObserver(vtkCommand::RightButtonPressEvent)) 
     {
@@ -425,9 +418,9 @@ void VTKViewer_InteractorStyle::OnRightButtonDown(int ctrl,
  *\param y - y coordinate (not used)
  */
 void VTKViewer_InteractorStyle::OnRightButtonUp(int vtkNotUsed(ctrl),
-						      int shift, 
-						      int vtkNotUsed(x),
-						      int vtkNotUsed(y))
+                                                      int shift, 
+                                                      int vtkNotUsed(x),
+                                                      int vtkNotUsed(y))
 {
   myShiftState = shift;
   // finishing current viewer operation
@@ -863,256 +856,256 @@ void VTKViewer_InteractorStyle::onFinishOperation()
       }
       else {
         if (myPoint == myOtherPoint) {
-	  // process point selection
+          // process point selection
           int w, h, x, y;
           m_Interactor->GetSize(w, h);
           x = myPoint.x(); 
           y = h - myPoint.y() - 1;
 
           this->FindPokedRenderer(x, y);
-	  m_Interactor->StartPickCallback();
+          m_Interactor->StartPickCallback();
 
-	  vtkPicker* aPicker = vtkPicker::SafeDownCast(m_Interactor->GetPicker());
+          vtkPicker* aPicker = vtkPicker::SafeDownCast(m_Interactor->GetPicker());
           aPicker->Pick(x, y, 0.0, this->CurrentRenderer);
     
-	  SALOME_Actor* SActor = SALOME_Actor::SafeDownCast(aPicker->GetActor());
+          SALOME_Actor* SActor = SALOME_Actor::SafeDownCast(aPicker->GetActor());
 
           if (vtkCellPicker* picker = vtkCellPicker::SafeDownCast(aPicker)) {
-	    int aVtkId = picker->GetCellId();
-	    if ( aVtkId >= 0 && SActor && SActor->hasIO() && IsValid( SActor, aVtkId ) ) {
-	      int anObjId = SActor->GetElemObjId(aVtkId);
-	      if(anObjId >= 0){
-		Handle(SALOME_InteractiveObject) IO = SActor->getIO();
-		if(aSelectionMode != EdgeOfCellSelection) {
-		  if(CheckDimensionId(aSelectionMode,SActor,anObjId)){
-		    if (IsSelected(IO,aSel)) {
-		      // This IO is already in the selection
-		      aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
-		    } else {
-		      if (!myShiftState) {
-			this->HighlightProp( NULL );
-			aSel->ClearIObjects();
-		      }
-		      aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
-		      aSel->AddIObject( IO, false );
-		    }
-		  }
-		}else{
-		  if (!myShiftState) {
-		    this->HighlightProp( NULL );
-		    aSel->ClearIObjects();
-		  }
-		  int anEdgeId = GetEdgeId(picker,SActor,anObjId);
-		  if (anEdgeId >= 0) {
-		    aSel->AddOrRemoveIndex( IO, anObjId, true, false);
-		    aSel->AddOrRemoveIndex( IO, -anEdgeId-1, true, true );
-		    aSel->AddIObject( IO, false );
-		  } 
-		}
-	      }
-	    } else {
-	      this->HighlightProp( NULL );
-	      aSel->ClearIObjects();
-	    }
+            int aVtkId = picker->GetCellId();
+            if ( aVtkId >= 0 && SActor && SActor->hasIO() && IsValid( SActor, aVtkId ) ) {
+              int anObjId = SActor->GetElemObjId(aVtkId);
+              if(anObjId >= 0){
+                Handle(SALOME_InteractiveObject) IO = SActor->getIO();
+                if(aSelectionMode != EdgeOfCellSelection) {
+                  if(CheckDimensionId(aSelectionMode,SActor,anObjId)){
+                    if (IsSelected(IO,aSel)) {
+                      // This IO is already in the selection
+                      aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
+                    } else {
+                      if (!myShiftState) {
+                        this->HighlightProp( NULL );
+                        aSel->ClearIObjects();
+                      }
+                      aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
+                      aSel->AddIObject( IO, false );
+                    }
+                  }
+                }else{
+                  if (!myShiftState) {
+                    this->HighlightProp( NULL );
+                    aSel->ClearIObjects();
+                  }
+                  int anEdgeId = GetEdgeId(picker,SActor,anObjId);
+                  if (anEdgeId >= 0) {
+                    aSel->AddOrRemoveIndex( IO, anObjId, true, false);
+                    aSel->AddOrRemoveIndex( IO, -anEdgeId-1, true, true );
+                    aSel->AddIObject( IO, false );
+                  } 
+                }
+              }
+            } else {
+              this->HighlightProp( NULL );
+              aSel->ClearIObjects();
+            }
           } else if ( vtkPointPicker* picker = vtkPointPicker::SafeDownCast(aPicker) ) {
-	    int aVtkId = picker->GetPointId();
-	    if ( aVtkId >= 0 && IsValid( SActor, aVtkId, true ) ) {
-	      if ( SActor && SActor->hasIO() ) {
-		int anObjId = SActor->GetNodeObjId(aVtkId);
-		if(anObjId >= 0){
-		  Handle(SALOME_InteractiveObject) IO = SActor->getIO();
-		  if(IsSelected(IO,aSel)) {
-		    // This IO is already in the selection
-		    aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
-		  } else {
-		    if(!myShiftState) {
-		      this->HighlightProp( NULL );
-		      aSel->ClearIObjects();
-		    }
-		    aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
-		    aSel->AddIObject( IO, false );
-		  }
-		}
-	      }
-	    } else {
-	      this->HighlightProp( NULL );
-	      aSel->ClearIObjects();
-	    } 
-	  } else {
-	    if ( SActor && SActor->hasIO() ) {
-	      this->PropPicked++;
-	      Handle(SALOME_InteractiveObject) IO = SActor->getIO();
-	      if(IsSelected(IO,aSel)) {
-		// This IO is already in the selection
-		if(myShiftState) {
-		  aSel->RemoveIObject(IO);
-		}
-	      }
-	      else {
-		if(!myShiftState) {
-		  this->HighlightProp( NULL );
-		  aSel->ClearIObjects();
-		}
-		aSel->AddIObject( IO, false );
-	      }
-	    }else{
-	      // No selection clear all
-	      this->PropPicked = 0;
-	      this->HighlightProp( NULL );
-	      aSel->ClearIObjects();
-	    }
-	  }
-	  m_Interactor->EndPickCallback();
+            int aVtkId = picker->GetPointId();
+            if ( aVtkId >= 0 && IsValid( SActor, aVtkId, true ) ) {
+              if ( SActor && SActor->hasIO() ) {
+                int anObjId = SActor->GetNodeObjId(aVtkId);
+                if(anObjId >= 0){
+                  Handle(SALOME_InteractiveObject) IO = SActor->getIO();
+                  if(IsSelected(IO,aSel)) {
+                    // This IO is already in the selection
+                    aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
+                  } else {
+                    if(!myShiftState) {
+                      this->HighlightProp( NULL );
+                      aSel->ClearIObjects();
+                    }
+                    aSel->AddOrRemoveIndex( IO, anObjId, myShiftState, false );
+                    aSel->AddIObject( IO, false );
+                  }
+                }
+              }
+            } else {
+              this->HighlightProp( NULL );
+              aSel->ClearIObjects();
+            } 
+          } else {
+            if ( SActor && SActor->hasIO() ) {
+              this->PropPicked++;
+              Handle(SALOME_InteractiveObject) IO = SActor->getIO();
+              if(IsSelected(IO,aSel)) {
+                // This IO is already in the selection
+                if(myShiftState) {
+                  aSel->RemoveIObject(IO);
+                }
+              }
+              else {
+                if(!myShiftState) {
+                  this->HighlightProp( NULL );
+                  aSel->ClearIObjects();
+                }
+                aSel->AddIObject( IO, false );
+              }
+            }else{
+              // No selection clear all
+              this->PropPicked = 0;
+              this->HighlightProp( NULL );
+              aSel->ClearIObjects();
+            }
+          }
+          m_Interactor->EndPickCallback();
         } else {
           //processing rectangle selection
-	  QString aComponentDataType = SUIT_Application::getDesktop()->getComponentDataType();
-	  if(aSelActiveCompOnly && aComponentDataType.isEmpty()) return;
-	  m_Interactor->StartPickCallback();
+          QString aComponentDataType = SUIT_Application::getDesktop()->getComponentDataType();
+          if(aSelActiveCompOnly && aComponentDataType.isEmpty()) return;
+          m_Interactor->StartPickCallback();
 
-	  if (!myShiftState) {
-	    this->PropPicked = 0;
-	    this->HighlightProp( NULL );
-	    aSel->ClearIObjects();
-	  }
+          if (!myShiftState) {
+            this->PropPicked = 0;
+            this->HighlightProp( NULL );
+            aSel->ClearIObjects();
+          }
 
-	  // Compute bounds
-	  //	  vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
-	  QRect rect(myPoint, myOtherPoint);
-	  rect = rect.normalize();
-	  int w, h;
-	  m_Interactor->GetSize(w, h);
-	  int x1, y1, x2, y2;
-	  x1 = rect.left(); 
-	  y1 = h - rect.top() - 1;
-	  x2 = rect.right(); 
-	  y2 = h - rect.bottom() - 1;
+          // Compute bounds
+          //      vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
+          QRect rect(myPoint, myOtherPoint);
+          rect = rect.normalize();
+          int w, h;
+          m_Interactor->GetSize(w, h);
+          int x1, y1, x2, y2;
+          x1 = rect.left(); 
+          y1 = h - rect.top() - 1;
+          x2 = rect.right(); 
+          y2 = h - rect.bottom() - 1;
 
-	  switch (aSelectionMode) {
-	  case NodeSelection: {
-	    if ( vtkPointPicker* aPointPicker = vtkPointPicker::SafeDownCast(m_Interactor->GetPicker()) ) {
-	      vtkActorCollection* aListActors = this->CurrentRenderer->GetActors();
-	      aListActors->InitTraversal();
-	      while (vtkActor* aActor = aListActors->GetNextActor()) {
-		if (!aActor->GetVisibility()) 
-		  continue;
-		if(SALOME_Actor* SActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (SActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) IO = SActor->getIO();
-		    if (IO.IsNull()) 
-		      continue;
-		    if (aSelActiveCompOnly && aComponentDataType != IO->getComponentDataType())
-		      continue;
-		    if (vtkDataSet* aDataSet = SActor->GetInput()) {
-		      SALOME_Selection::TContainerOfId anIndices;
-		      for(int i = 0; i < aDataSet->GetNumberOfPoints(); i++) {
-			float aPoint[3];
-			aDataSet->GetPoint(i,aPoint);
-			if (IsInRect(aPoint,x1,y1,x2,y2)){
-			  float aDisp[3];
-			  ComputeWorldToDisplay(aPoint[0],aPoint[1],aPoint[2],aDisp);
-			  if(aPointPicker->Pick(aDisp[0],aDisp[1],0.0,CurrentRenderer)){
-			    if(vtkActorCollection *anActorCollection = aPointPicker->GetActors()){
-			      if(anActorCollection->IsItemPresent(SActor)){
-				float aPickedPoint[3];
-				aPointPicker->GetMapperPosition(aPickedPoint);
-				vtkIdType aVtkId = aDataSet->FindPoint(aPickedPoint);
-				if ( aVtkId >= 0 && IsValid( SActor, aVtkId, true ) ){
-				  int anObjId = SActor->GetNodeObjId(aVtkId);
-				  anIndices.insert(anObjId);
-				}
-			      }
-			    }
-			  }
-			}
-		      }
-		      if (!anIndices.empty()) {
-			aSel->AddOrRemoveIndex(IO, anIndices, true, false);
-			aSel->AddIObject(IO, false);
-			anIndices.clear();
-		      }else{
-			aSel->RemoveIObject(IO, false);
-		      }
-		    }
-		  }
-		}
-	      }
-	    }
-	    break;
-	  }
-	  case CellSelection:
-	  case EdgeOfCellSelection:
-	  case EdgeSelection:
-	  case FaceSelection:
-	  case VolumeSelection: 
-	    {
-	      vtkSmartPointer<VTKViewer_CellRectPicker> picker = VTKViewer_CellRectPicker::New();
-	      picker->SetTolerance(0.001);
-	      picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
-	      
-	      vtkActorCollection* aListActors = picker->GetActors();
-	      aListActors->InitTraversal();
-	      while(vtkActor* aActor = aListActors->GetNextActor()) {
-		if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (aSActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) aIO = aSActor->getIO();
-		    if (aSelActiveCompOnly && aComponentDataType != aIO->getComponentDataType())
-		      continue;
-		    VTKViewer_CellDataSet cellList = picker->GetCellData(aActor);
-		    if ( !cellList.empty() ) {
-		      SALOME_Selection::TContainerOfId anIndexes;
-		      VTKViewer_CellDataSet::iterator it;
-		      for ( it = cellList.begin(); it != cellList.end(); ++it ) {
-			int aCellId = (*it).cellId;
-			
-			if ( !IsValid( aSActor, aCellId ) )
-			  continue;
-			
-			int anObjId = aSActor->GetElemObjId(aCellId);
-			if (anObjId != -1){
-			  if ( CheckDimensionId(aSelectionMode,aSActor,anObjId) ) {
-			    anIndexes.insert(anObjId);
-			  }
-			}
-		      }
-		      aSel->AddOrRemoveIndex(aIO, anIndexes, true, false);
-		      aSel->AddIObject(aIO, false);
-		    }
-		  }
-		}
-	      }
-	    }
-	    break;	    
-	  case ActorSelection: // objects selection
-	    {
-	      vtkSmartPointer<VTKViewer_RectPicker> picker = VTKViewer_RectPicker::New();
-	      picker->SetTolerance(0.001);
-	      picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
+          switch (aSelectionMode) {
+          case NodeSelection: {
+            if ( vtkPointPicker* aPointPicker = vtkPointPicker::SafeDownCast(m_Interactor->GetPicker()) ) {
+              vtkActorCollection* aListActors = this->CurrentRenderer->GetActors();
+              aListActors->InitTraversal();
+              while (vtkActor* aActor = aListActors->GetNextActor()) {
+                if (!aActor->GetVisibility()) 
+                  continue;
+                if(SALOME_Actor* SActor = SALOME_Actor::SafeDownCast(aActor)) {
+                  if (SActor->hasIO()) {
+                    Handle(SALOME_InteractiveObject) IO = SActor->getIO();
+                    if (IO.IsNull()) 
+                      continue;
+                    if (aSelActiveCompOnly && aComponentDataType != IO->getComponentDataType())
+                      continue;
+                    if (vtkDataSet* aDataSet = SActor->GetInput()) {
+                      SALOME_Selection::TContainerOfId anIndices;
+                      for(int i = 0; i < aDataSet->GetNumberOfPoints(); i++) {
+                        float aPoint[3];
+                        aDataSet->GetPoint(i,aPoint);
+                        if (IsInRect(aPoint,x1,y1,x2,y2)){
+                          float aDisp[3];
+                          ComputeWorldToDisplay(aPoint[0],aPoint[1],aPoint[2],aDisp);
+                          if(aPointPicker->Pick(aDisp[0],aDisp[1],0.0,CurrentRenderer)){
+                            if(vtkActorCollection *anActorCollection = aPointPicker->GetActors()){
+                              if(anActorCollection->IsItemPresent(SActor)){
+                                float aPickedPoint[3];
+                                aPointPicker->GetMapperPosition(aPickedPoint);
+                                vtkIdType aVtkId = aDataSet->FindPoint(aPickedPoint);
+                                if ( aVtkId >= 0 && IsValid( SActor, aVtkId, true ) ){
+                                  int anObjId = SActor->GetNodeObjId(aVtkId);
+                                  anIndices.insert(anObjId);
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      if (!anIndices.empty()) {
+                        aSel->AddOrRemoveIndex(IO, anIndices, true, false);
+                        aSel->AddIObject(IO, false);
+                        anIndices.clear();
+                      }else{
+                        aSel->RemoveIObject(IO, false);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            break;
+          }
+          case CellSelection:
+          case EdgeOfCellSelection:
+          case EdgeSelection:
+          case FaceSelection:
+          case VolumeSelection: 
+            {
+              vtkSmartPointer<VTKViewer_CellRectPicker> picker = VTKViewer_CellRectPicker::New();
+              picker->SetTolerance(0.001);
+              picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
+              
+              vtkActorCollection* aListActors = picker->GetActors();
+              aListActors->InitTraversal();
+              while(vtkActor* aActor = aListActors->GetNextActor()) {
+                if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
+                  if (aSActor->hasIO()) {
+                    Handle(SALOME_InteractiveObject) aIO = aSActor->getIO();
+                    if (aSelActiveCompOnly && aComponentDataType != aIO->getComponentDataType())
+                      continue;
+                    VTKViewer_CellDataSet cellList = picker->GetCellData(aActor);
+                    if ( !cellList.empty() ) {
+                      SALOME_Selection::TContainerOfId anIndexes;
+                      VTKViewer_CellDataSet::iterator it;
+                      for ( it = cellList.begin(); it != cellList.end(); ++it ) {
+                        int aCellId = (*it).cellId;
+                        
+                        if ( !IsValid( aSActor, aCellId ) )
+                          continue;
+                        
+                        int anObjId = aSActor->GetElemObjId(aCellId);
+                        if (anObjId != -1){
+                          if ( CheckDimensionId(aSelectionMode,aSActor,anObjId) ) {
+                            anIndexes.insert(anObjId);
+                          }
+                        }
+                      }
+                      aSel->AddOrRemoveIndex(aIO, anIndexes, true, false);
+                      aSel->AddIObject(aIO, false);
+                    }
+                  }
+                }
+              }
+            }
+            break;          
+          case ActorSelection: // objects selection
+            {
+              vtkSmartPointer<VTKViewer_RectPicker> picker = VTKViewer_RectPicker::New();
+              picker->SetTolerance(0.001);
+              picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
 
-	      vtkActorCollection* aListActors = picker->GetActors();
-	      SALOME_ListIO aListIO;
-	      aListActors->InitTraversal();
-	      while(vtkActor* aActor = aListActors->GetNextActor()) {
-		if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
-		  if (aSActor->hasIO()) {
-		    Handle(SALOME_InteractiveObject) aIO = aSActor->getIO();
-		    if (!IsStored(aIO,aListIO))
-		      aListIO.Append(aIO);
-		  }
-		}
-	      }
-	      if (!aListIO.IsEmpty()) {
-		SALOME_ListIteratorOfListIO It(aListIO);
-		for(;It.More();It.Next()) {
-		  Handle(SALOME_InteractiveObject) IOS = It.Value();
-		  this->PropPicked++;
-		  aSel->AddIObject( IOS, false );
-		}
-	      }
-	    } // end case 4
-	  } //end switch
-	  m_Interactor->EndPickCallback();
-	}
-	aActiveStudy->update3dViewers();
+              vtkActorCollection* aListActors = picker->GetActors();
+              SALOME_ListIO aListIO;
+              aListActors->InitTraversal();
+              while(vtkActor* aActor = aListActors->GetNextActor()) {
+                if (SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor)) {
+                  if (aSActor->hasIO()) {
+                    Handle(SALOME_InteractiveObject) aIO = aSActor->getIO();
+                    if (!IsStored(aIO,aListIO))
+                      aListIO.Append(aIO);
+                  }
+                }
+              }
+              if (!aListIO.IsEmpty()) {
+                SALOME_ListIteratorOfListIO It(aListIO);
+                for(;It.More();It.Next()) {
+                  Handle(SALOME_InteractiveObject) IOS = It.Value();
+                  this->PropPicked++;
+                  aSel->AddIObject( IOS, false );
+                }
+              }
+            } // end case 4
+          } //end switch
+          m_Interactor->EndPickCallback();
+        }
+        aActiveStudy->update3dViewers();
       } 
     } 
     break;
@@ -1230,36 +1223,36 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
     if ( aVtkId >= 0 ) {
       int anObjId = SActor->GetElemObjId(aVtkId);
       if ( SActor && SActor->hasIO() && IsValid( SActor, aVtkId ) ) {
-	bool anIsSameObjId = (mySelectedActor == SActor && myElemId == anObjId);
-	bool aResult = anIsSameObjId;
-	if(!anIsSameObjId) {
-	  if(aSelectionMode != EdgeOfCellSelection) {
-	    aResult = CheckDimensionId(aSelectionMode,SActor,anObjId);
-	    if(aResult){
-	      mySelectedActor = SActor;
-	      myElemId = anObjId;
-	      m_Interactor->setCellData(anObjId,SActor,myPreSelectionActor);
-	    }
-	  }
-	}
-	if(aSelectionMode == EdgeOfCellSelection){
-	  int anEdgeId = GetEdgeId(picker,SActor,anObjId);
-	  bool anIsSameEdgeId = (myEdgeId != anEdgeId) && anIsSameObjId;
-	  aResult = anIsSameEdgeId;
-	  if(!anIsSameEdgeId) {
-	    aResult = (anEdgeId >= 0);
-	    if (aResult) {
-	      mySelectedActor = SActor;
-	      myEdgeId = anEdgeId;
-	      myElemId = anObjId;
-	      m_Interactor->setEdgeData(anObjId,SActor,-anEdgeId-1,myPreSelectionActor);
-	    } 
-	  }
-	}
-	if(aResult) {
-	  myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
-	  myPreSelectionActor->SetVisibility(true);
-	}
+        bool anIsSameObjId = (mySelectedActor == SActor && myElemId == anObjId);
+        bool aResult = anIsSameObjId;
+        if(!anIsSameObjId) {
+          if(aSelectionMode != EdgeOfCellSelection) {
+            aResult = CheckDimensionId(aSelectionMode,SActor,anObjId);
+            if(aResult){
+              mySelectedActor = SActor;
+              myElemId = anObjId;
+              m_Interactor->setCellData(anObjId,SActor,myPreSelectionActor);
+            }
+          }
+        }
+        if(aSelectionMode == EdgeOfCellSelection){
+          int anEdgeId = GetEdgeId(picker,SActor,anObjId);
+          bool anIsSameEdgeId = (myEdgeId != anEdgeId) && anIsSameObjId;
+          aResult = anIsSameEdgeId;
+          if(!anIsSameEdgeId) {
+            aResult = (anEdgeId >= 0);
+            if (aResult) {
+              mySelectedActor = SActor;
+              myEdgeId = anEdgeId;
+              myElemId = anObjId;
+              m_Interactor->setEdgeData(anObjId,SActor,-anEdgeId-1,myPreSelectionActor);
+            } 
+          }
+        }
+        if(aResult) {
+          myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
+          myPreSelectionActor->SetVisibility(true);
+        }
       }
     }
   }
@@ -1267,44 +1260,44 @@ void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
     int aVtkId = picker->GetPointId();
     if ( aVtkId >= 0 && IsValid( SActor, aVtkId, true ) ) {
       if ( SActor && SActor->hasIO() ) {
-	int anObjId = SActor->GetNodeObjId(aVtkId);
-	bool anIsSameObjId = (mySelectedActor == SActor && myNodeId == anObjId);
-	if(!anIsSameObjId) {
-	  mySelectedActor = SActor;
-	  myNodeId = anObjId;
-	  m_Interactor->setPointData(anObjId,SActor,myPreSelectionActor);
-	}
-	myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
-	myPreSelectionActor->SetVisibility(true);
+        int anObjId = SActor->GetNodeObjId(aVtkId);
+        bool anIsSameObjId = (mySelectedActor == SActor && myNodeId == anObjId);
+        if(!anIsSameObjId) {
+          mySelectedActor = SActor;
+          myNodeId = anObjId;
+          m_Interactor->setPointData(anObjId,SActor,myPreSelectionActor);
+        }
+        myPreSelectionActor->GetProperty()->SetRepresentationToSurface();
+        myPreSelectionActor->SetVisibility(true);
       }
     }
   }
   else if ( vtkPicker::SafeDownCast(aPicker) ) {
     if ( SActor ) {
       if ( myPreViewActor != SActor ) {
-	if ( myPreViewActor != NULL ) {
-	  myPreViewActor->SetPreSelected( false );
-	}
-	myPreViewActor = SActor;
-	      
-	if ( SActor->hasIO() ) {
-	  Handle( SALOME_InteractiveObject) IO = SActor->getIO();
-	  if ( !IsSelected(IO,Sel) ) {
+        if ( myPreViewActor != NULL ) {
+          myPreViewActor->SetPreSelected( false );
+        }
+        myPreViewActor = SActor;
+              
+        if ( SActor->hasIO() ) {
+          Handle( SALOME_InteractiveObject) IO = SActor->getIO();
+          if ( !IsSelected(IO,Sel) ) {
             // Find All actors with same IO
-	    vtkActorCollection* theActors = this->CurrentRenderer->GetActors();
-	    theActors->InitTraversal();
-	    while( vtkActor *ac = theActors->GetNextActor() ) {
-	      if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) ) {
-		if ( anActor->hasIO() ) {
-		  Handle(SALOME_InteractiveObject) IOS = anActor->getIO();
-		  if(IO->isSame(IOS)) {
-		    anActor->SetPreSelected( true );
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+            vtkActorCollection* theActors = this->CurrentRenderer->GetActors();
+            theActors->InitTraversal();
+            while( vtkActor *ac = theActors->GetNextActor() ) {
+              if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) ) {
+                if ( anActor->hasIO() ) {
+                  Handle(SALOME_InteractiveObject) IOS = anActor->getIO();
+                  if(IO->isSame(IOS)) {
+                    anActor->SetPreSelected( true );
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     } else {
       myPreViewActor = NULL;
@@ -1359,13 +1352,13 @@ void VTKViewer_InteractorStyle::TranslateView(int toX, int toY, int fromX, int f
   cam->GetFocalPoint(viewFocus);
 
   this->ComputeWorldToDisplay(viewFocus[0], viewFocus[1],
-			      viewFocus[2], viewFocus);
+                              viewFocus[2], viewFocus);
   focalDepth = viewFocus[2];
 
   this->ComputeDisplayToWorld(vtkFloatingPointType(toX), vtkFloatingPointType(toY),
-			      focalDepth, newPickPoint);
+                              focalDepth, newPickPoint);
   this->ComputeDisplayToWorld(vtkFloatingPointType(fromX),vtkFloatingPointType(fromY),
-			      focalDepth, oldPickPoint);
+                              focalDepth, oldPickPoint);
   
   // camera motion is reversed
   motionVector[0] = oldPickPoint[0] - newPickPoint[0];
@@ -1375,18 +1368,18 @@ void VTKViewer_InteractorStyle::TranslateView(int toX, int toY, int fromX, int f
   cam->GetFocalPoint(viewFocus);
   cam->GetPosition(viewPoint);
   cam->SetFocalPoint(motionVector[0] + viewFocus[0],
-		     motionVector[1] + viewFocus[1],
-		     motionVector[2] + viewFocus[2]);
+                     motionVector[1] + viewFocus[1],
+                     motionVector[2] + viewFocus[2]);
   cam->SetPosition(motionVector[0] + viewPoint[0],
-		   motionVector[1] + viewPoint[1],
-		   motionVector[2] + viewPoint[2]);
+                   motionVector[1] + viewPoint[1],
+                   motionVector[2] + viewPoint[2]);
 }
 
 
 /*! Checks: is the given Actor within display coordinates?*/
 bool VTKViewer_InteractorStyle::IsInRect(vtkActor* theActor, 
-					       const int left, const int top, 
-					       const int right, const int bottom)
+                                               const int left, const int top, 
+                                               const int right, const int bottom)
 {
   vtkFloatingPointType* aBounds = theActor->GetBounds();
   vtkFloatingPointType aMin[3], aMax[3];
@@ -1409,8 +1402,8 @@ bool VTKViewer_InteractorStyle::IsInRect(vtkActor* theActor,
 
 /*! Checks: is the given Cell within display coordinates?*/
 bool VTKViewer_InteractorStyle::IsInRect(vtkCell* theCell, 
-					       const int left, const int top, 
-					       const int right, const int bottom)
+                                               const int left, const int top, 
+                                               const int right, const int bottom)
 {
   vtkFloatingPointType* aBounds = theCell->GetBounds();
   vtkFloatingPointType aMin[3], aMax[3];
@@ -1432,8 +1425,8 @@ bool VTKViewer_InteractorStyle::IsInRect(vtkCell* theCell,
 
 /*!Checks: is given point \a thePoint in rectangle*/
 bool VTKViewer_InteractorStyle::IsInRect(vtkFloatingPointType* thePoint, 
-					 const int left, const int top, 
-					 const int right, const int bottom)
+                                         const int left, const int top, 
+                                         const int right, const int bottom)
 {
   vtkFloatingPointType aPnt[3];
   ComputeWorldToDisplay(thePoint[0], thePoint[1], thePoint[2], aPnt);

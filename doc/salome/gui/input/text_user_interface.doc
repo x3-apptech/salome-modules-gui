@@ -318,7 +318,9 @@ studyName = salome.sg.getActiveStudyName()
 selCount = salome.sg.SelectedCount() # total number of selected items
 for i in range(selCount):
     print salome.sg.getSelected(i) # print entry ID of i-th selected item
+\endcode
 
+\code
 # get list of all selected objects' IDs
 selected = salome.sg.getAllSelected()
 

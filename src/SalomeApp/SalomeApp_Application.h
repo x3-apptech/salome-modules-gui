@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      SalomeApp_Application.h
 // Created:   10/22/2004 3:37:25 PM
 // Author:    Sergey LITONIN
@@ -33,6 +34,8 @@
 #include "SalomeApp.h"
 #include <LightApp_Application.h>
 
+#include <SUIT_DataObject.h>
+
 #include <CORBA.h>
 
 //#include <SALOMEconfig.h>
@@ -44,8 +47,9 @@
 class LightApp_Preferences;
 class SalomeApp_Study;
 class SalomeApp_NoteBookDlg;
-class SUIT_DataObject;
+class SUIT_Desktop;
 
+class SUIT_ViewModel;
 class SALOME_LifeCycleCORBA;
 
 
@@ -70,7 +74,7 @@ public:
 protected:
   enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
   enum { CloseUnload = LightApp_Application::CloseDiscard + 1 };
-  enum { LoadStudyId = LightApp_Application::OpenStudyId + 1 };
+  enum { LoadStudyId = LightApp_Application::OpenStudyId + 1, NewAndScriptId };
 
 public:
   SalomeApp_Application();
@@ -86,11 +90,12 @@ public:
 
   virtual bool                        checkDataObject(LightApp_DataObject* theObj);
 
+  virtual void                        setDesktop( SUIT_Desktop* );
+
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
   static SALOME_NamingService*        namingService();
   static SALOME_LifeCycleCORBA*       lcc();
-  static QString                      defaultEngineIOR();
 
   SUIT_ViewManager*                   newViewManager(const QString&);
   void                                updateSavePointDataObjects( SalomeApp_Study* );
@@ -103,8 +108,16 @@ public:
   virtual void                        setNoteBook(SalomeApp_NoteBookDlg* theNoteBook);
   virtual SalomeApp_NoteBookDlg*      getNoteBook() const;
 
+ //! update visibility state of objects
+  void                                updateVisibilityState( DataObjectList& theList,
+                                                             SUIT_ViewModel* theViewModel );  
+
+  virtual bool                        renameAllowed( const QString& ) const;
+  virtual bool                        renameObject( const QString&, const QString& );
+  
 public slots:
   virtual void                        onLoadDoc();
+  virtual void                        onNewWithScript();
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCloseDoc( bool ask = true);
 
@@ -117,7 +130,9 @@ protected slots:
   void                                onStudyCreated( SUIT_Study* );
   void                                onStudySaved( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
-  void                                onDesktopMessage( const QString& );
+  void                                onStudyClosed( SUIT_Study* );
+  
+  void                                onViewManagerRemoved( SUIT_ViewManager* );
 
 protected:
   virtual void                        createActions();
@@ -150,14 +165,20 @@ private slots:
 
   void                                onDeleteGUIState();
   void                                onRestoreGUIState();
-  void                                onRenameGUIState();
 
   void                                onCatalogGen();
   void                                onRegDisplay();
   void                                onOpenWith();
+  void                                onExtAction();
 
- private:
-  SalomeApp_NoteBookDlg*             myNoteBook;
+  void                                onWindowActivated( SUIT_ViewWindow* theViewWindow );
+
+private:
+  void                                createExtraActions();
+
+private:
+  SalomeApp_NoteBookDlg*              myNoteBook;
+  QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
 };
 
 #ifdef WIN32

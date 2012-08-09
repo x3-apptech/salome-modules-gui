@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "STD_TabDesktop.h"
 
 #include <SUIT_Session.h>
@@ -51,22 +52,22 @@ myWorkstackAction( 0 )
   myWorkstack = new QtxWorkstack( base );
   main->addWidget( myWorkstack );
   // setting Expanding size policy for central workstack.  If there are several widgets
-  // in central area of Desktop, other widgets will be added below the workstack (CATHARE, TRIPOLI modules).  
+  // in central area of Desktop, other widgets will be added below the workstack (CATHARE, TRIPOLI modules).
   // But the workstack must occupy as much space as possible -- set Expanding for it.
   myWorkstack->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
-  myWorkstack->setAccel( QtxWorkstack::SplitVertical,   Qt::SHIFT + Qt::Key_V );
-  myWorkstack->setAccel( QtxWorkstack::SplitHorizontal, Qt::SHIFT + Qt::Key_H );
-  myWorkstack->setAccel( QtxWorkstack::Close,           Qt::SHIFT + Qt::Key_C );
+  myWorkstack->setAccel( QtxWorkstack::SplitVertical,   Qt::ALT + Qt::SHIFT + Qt::Key_V );
+  myWorkstack->setAccel( QtxWorkstack::SplitHorizontal, Qt::ALT + Qt::SHIFT + Qt::Key_H );
+  //myWorkstack->setAccel( QtxWorkstack::Close,           Qt::CTRL + Qt::Key_F4 );
 
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
   if ( resMgr ) {
-    myWorkstack->setIcon( QtxWorkstack::SplitVertical,   
-			  resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_VSPLIT" ) ) );
+    myWorkstack->setIcon( QtxWorkstack::SplitVertical,
+                          resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_VSPLIT" ) ) );
     myWorkstack->setIcon( QtxWorkstack::SplitHorizontal,
-			  resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_HSPLIT" ) ) );
+                          resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_HSPLIT" ) ) );
     myWorkstack->setIcon( QtxWorkstack::Close,
-			  resMgr->loadPixmap( "STD", tr( "ICON_FILE_CLOSE" ) ));
+                          resMgr->loadPixmap( "STD", tr( "ICON_FILE_CLOSE" ) ));
   }
 
   connect( myWorkstack, SIGNAL( windowActivated( QWidget* ) ),
@@ -138,18 +139,18 @@ void STD_TabDesktop::windowOperation( const int type )
 void STD_TabDesktop::setWindowOperations( const int first, ... )
 {
   va_list ints;
-	va_start( ints, first );
+        va_start( ints, first );
 
-	QList<int> typeList;
+        QList<int> typeList;
 
-	int cur = first;
-	while ( cur )
-	{
-	  typeList.append( cur );
-		cur = va_arg( ints, int );
+        int cur = first;
+        while ( cur )
+        {
+          typeList.append( cur );
+                cur = va_arg( ints, int );
   }
 
-	setWindowOperations( typeList );
+        setWindowOperations( typeList );
 }
 
 /*!
@@ -203,14 +204,14 @@ void STD_TabDesktop::createActions()
                               resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_HSPLIT" ) ) );
   myWorkstackAction->setText( QtxWorkstackAction::SplitHorizontal, tr( "MEN_DESK_WINDOW_HSPLIT" ) );
   myWorkstackAction->setStatusTip( QtxWorkstackAction::SplitHorizontal, tr( "PRP_DESK_WINDOW_HSPLIT" ) );
-  myWorkstackAction->setAccel( QtxWorkstackAction::SplitHorizontal, Qt::SHIFT + Qt::Key_H );
+  myWorkstackAction->setAccel( QtxWorkstackAction::SplitHorizontal, Qt::ALT + Qt::SHIFT + Qt::Key_H );
 
   // Split Vertical
   myWorkstackAction->setIcon( QtxWorkstackAction::SplitVertical,
                               resMgr->loadPixmap( "STD", tr( "ICON_DESK_WINDOW_VSPLIT" ) ) );
   myWorkstackAction->setText( QtxWorkstackAction::SplitVertical, tr( "MEN_DESK_WINDOW_VSPLIT" ) );
   myWorkstackAction->setStatusTip( QtxWorkstackAction::SplitVertical, tr( "PRP_DESK_WINDOW_VSPLIT" ) );
-  myWorkstackAction->setAccel( QtxWorkstackAction::SplitVertical,   Qt::SHIFT + Qt::Key_V );
+  myWorkstackAction->setAccel( QtxWorkstackAction::SplitVertical,   Qt::ALT + Qt::SHIFT + Qt::Key_V );
 
   QtxActionMenuMgr* mMgr = menuMgr();
   if ( !mMgr )

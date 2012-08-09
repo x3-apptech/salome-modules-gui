@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      LightApp_DataModel.cxx
 // Created:   10/25/2004 10:36:06 AM
 // Author:    Sergey LITONIN
@@ -41,7 +42,7 @@ LightApp_DataModel::LightApp_DataModel( CAM_Module* theModule )
 {
   myGroupId = 0;
   if( module() )
-	myGroupId = qHash( module()->name() );
+        myGroupId = qHash( module()->name() );
 }
 
 /*!
@@ -79,6 +80,15 @@ bool LightApp_DataModel::saveAs( const QString&, CAM_Study*, QStringList& )
 }
 
 /*!
+  Does nothing by default. Should be redefined in light modules
+  that want to participate in "Dump study" operation.
+*/
+bool LightApp_DataModel::dumpPython( const QString&, CAM_Study*, bool, QStringList& )
+{
+  return true;
+}
+
+/*!
   Emit closed()
 */
 bool LightApp_DataModel::close()
@@ -109,7 +119,10 @@ void LightApp_DataModel::updateWidgets()
 */
 void LightApp_DataModel::update( LightApp_DataObject*, LightApp_Study* )
 {
-  LightApp_ModuleObject* modelRoot = dynamic_cast<LightApp_ModuleObject*>( root() );
+  // san: Previously modelRoot was casted to LightApp_ModuleObject*,
+  // BUT this is incorrect: in full SALOME the model root has different type.
+  // Hopefully LightApp_DataObject* is sufficient here.
+  LightApp_DataObject* modelRoot = dynamic_cast<LightApp_DataObject*>( root() );
   DataObjectList ch;
   QMap<SUIT_DataObject*,int> aMap;
   if( modelRoot )
@@ -122,7 +135,7 @@ void LightApp_DataModel::update( LightApp_DataObject*, LightApp_Study* )
 
   build();
 
-  modelRoot = dynamic_cast<LightApp_ModuleObject*>( root() );
+  modelRoot = dynamic_cast<LightApp_DataObject*>( root() );
   if( modelRoot )
   {
     DataObjectList new_ch = modelRoot->children();
@@ -206,5 +219,27 @@ void LightApp_DataModel::unregisterColumn( SUIT_DataBrowser* browser, const QStr
 {
   SUIT_AbstractModel* m = dynamic_cast<SUIT_AbstractModel*>( browser ? browser->model() : 0 );
   if( m )
-	m->unregisterColumn( groupId(), name );
+    m->unregisterColumn( groupId(), name );
+}
+
+/*!
+  Creates the data model's root (module object) using the study services.
+  This is important because different study classes use different moduel object classes.
+  Therefore creation of the module object cannot be done at the data model level
+  where the type of the current study instance should not be known.
+  The module object returned by this method should be then passed to the model's setRoot().
+  \return the module object instance corresponding to the study type
+  \sa CAM_DataModel class
+*/
+CAM_ModuleObject* LightApp_DataModel::createModuleObject( SUIT_DataObject* theRoot ) const
+{
+  LightApp_RootObject* aStudyRoot = dynamic_cast<LightApp_RootObject*>( theRoot );
+  if ( !aStudyRoot )
+    return 0;
+
+  LightApp_Study* aStudy = aStudyRoot->study();
+  if ( aStudy )
+    return aStudy->createModuleObject( const_cast<LightApp_DataModel*>( this ), 
+				       theRoot );
+  return 0;
 }

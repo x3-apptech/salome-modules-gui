@@ -2,125 +2,291 @@
 
 \page occ_3d_viewer_page OCC 3D Viewer
 
+<h2>Operations</h2>
+
 The functionalities of OCC viewer are available via its Viewer
 Toolbar. Buttons marked with small downward triangles have extended
 functionality which can be accessed by locking on them with left mouse
 button.
 
-\image html occviewer_toolbar.png "Viewer Toolbar"
-
-<hr>
-\image html image77.png
-\n <center><b>Dump View</b> - exports an object from the viewer in bmp, png, jpg
-or jpeg image format.</center>
+\image html occviewer_toolbar.png
 <hr>
 
-\image html image88.gif
-\n <center><b>Show/Hide Trihedron</b> - shows or hides coordinate axes.</center>
+\image html occ_view_camera_dump.png
+
+<b>Dump View</b> - exports an object from the viewer in bmp, png or
+jpeg image format.
 <hr>
 
-\image html image96.png
-\n <center><b>Fit all</b> - allows to select a point to be the center of a
-scene representing all displayed objects in the visible area.</center>
+\image html occ_view_style_switch.png
+
+<b>Interaction style switch</b> - allows to switch between standard
+and "keyboard free" interaction styles. "Keyboard free" style allows
+to process all view transformations without using keyboard (only by
+mouse) and perform selection in view by pressing "S" key. By default,
+rotation in this mode is performed by left mouse button, panning - by
+middle mouse button, zooming - by left and middle mouse buttons
+pressed simultaneously.
 <hr>
 
-\image html image97.png
-\n <center><b>Fit area</b> - resizes the view to place in the visible area
-only the contents of a frame drawn with pressed left mouse button.</center>
+\image html occ_view_zooming_style_switch.png
+
+<b>Zooming style switch</b> - allows to switch between standard
+(zooming at the center of the view) and advanced (zooming at the
+current cursor position) zooming styles.
 <hr>
 
-\image html image98.png
-\n <center><b>Zoom</b> - allows to zoom in and out.</center>
+\image html occ_view_triedre.png
+
+<b>Show/Hide Trihedron</b> - shows or hides coordinate axes.
 <hr>
 
-\image html image99.gif
-\n <center><b>Panning</b> - if the represented objects are greater that the
-visible area and you don't wish to use <b>Fit all</b> functionality, click on
-this button and you'll be able to drag the scene to see its remote
-parts.</center>
+\image html occ_view_fitall.png
+
+<b>Fit all</b> - allows to select a point to be the center of a scene
+representing all displayed objects in the visible area.
 <hr>
 
-\image html image100.png
-\n <center><b>Global panning</b> - represents all displayed objects in
-the visible area.</center>
+\image html occ_view_fitarea.png
+
+<b>Fit area</b> - resizes the view to place in the visible area only
+the contents of a frame drawn with pressed left mouse button.
 <hr>
 
-\image html view_rotation_point.png
-\n <center><b>Change rotation point</b> - allows to to choose the point around
-which the rotation is performed.</center>
+\image html occ_view_zoom.png
+
+<b>Zoom</b> - allows to zoom in and out.
+<hr>
+
+\image html occ_view_pan.png
+
+<b>Panning</b> - if the represented objects are greater that the
+visible area and you don't wish to use <b>Fit all</b> functionality,
+click on this button and you'll be able to drag the scene to see its
+remote parts.
+<hr>
+
+\image html occ_view_glpan.png
+
+<b>Global panning</b> - represents all displayed objects in the
+visible area.
+<hr>
+
+\image html occ_view_rotation_point.png
+
+<b>Change rotation point</b> - allows to to choose the point around
+which the rotation is performed.
 
 \image html set_rotation_point_dialog1.png
 
-<center>By default the rotation point is located in the Center of the bounding
-box of an object.</center>
+By default the rotation point is located in the Center of the bounding
+box of an object.
 
 \image html set_rotation_point_dialog2.png
 
-<center>Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
-define the coordinates of the rotation point manually.</center>
+Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+define the coordinates of the rotation point manually.
 
-<b>Set to Origin</b> button restores the default rotation point
-coordinates.\n
-<b>Select Point from View</b> button allows to select the rotation
-point in the 3D Viewer.
+- <b>Set to Origin</b> button restores the default rotation point
+  coordinates.
+
+- <b>Select Point from View</b> button allows to select the rotation
+  point in the 3D Viewer.
+
 <hr>
 
-\image html image89.png
-\n <center><b>Rotation</b> - allows to rotate the selected object using the
-mouse.</center>
+\image html occ_view_rotate.png
 
-\image html image102.gif
-
-<center>These buttons orientate the scene strictly about coordinate axes.</center>
+<b>Rotation</b> - allows to rotate the selected object using the
+mouse.
 <hr>
 
-\image html image91.png
-\n <center><b>Reset</b> - restores the default position (isometric) of
-objects in the scene.</center>
+\image html occ_view_front.png
+\image html occ_view_back.png
+\image html occ_view_top.png
+\image html occ_view_bottom.png
+\image html occ_view_left.png
+\image html occ_view_right.png
+
+These buttons orientate the scene strictly about coordinate axes:
+\b Front, \b Back, \b Top, \b Bottom, \b Left or \b Right side.
 <hr>
 
-\image html image103.png
-\n <center><b>Memorise view</b> - saves the current position of
-objects in the scene.</center>
+\image html occ_view_anticlockwise.png
+
+<b>Rotate counterclockwise</b> - rotates view 90 @htmlonly &deg; @endhtmlonly counterclockwise.
 <hr>
 
-\image html image105.gif
-\n <center><b>Restore view</b> - restores the saved position of
-objects in the scene.</center>
+\image html occ_view_clockwise.png
+
+<b>Rotate clockwise</b> - rotates view 90 @htmlonly &deg; @endhtmlonly clockwise.
 <hr>
 
-\image html image86.png
-\n <center><b>Clone view</b> - opens a new duplicate scene.</center>
+\image html occ_view_reset.png
+
+<b>Reset</b> - restores the default position (isometric) of objects in
+the scene.
 <hr>
 
-\image html image106.png
-\n <center><b>Clipping</b> - allows to create cross-section views
-(clipping planes) of geometrical objects.</center>
+\image html occ_view_shoot.png
+
+<b>Memorise view</b> - saves the current position of objects in the
+scene.
+<hr>
+
+\image html occ_view_presets.png
+
+<b>Restore view</b> - restores the saved position of objects in the
+scene.
+<hr>
+
+\image html occ_view_clone.png
+
+<b>Clone view</b> - opens a new duplicate scene.
+<hr>
+
+\image html occ_view_clipping.png
+
+<b>Clipping</b> - allows to create cross-section views (clipping
+planes) of geometrical objects.
 
 \image html clipping.png
-<ul>
-<li><b>Base point</b> - allows to define the coordinates of the base
-point for the clipping plane.</li>
-<ul>
-<li><b>Reset</b> - returns the base point to coordinate origin.</li>
-</ul>
-<li><b>Direction</b> - allows to define the orientation of the
-clipping plane.</li>
-<ul>
-<li><b>Invert</b> - allows to select which part of the object will be removed
-and which will remain after clipping.</li>
-</ul>
-<li><b>Preview</b> - allows to see the results of clipping in the
-viewer.</li>
-</ul>
+
+- <b>Base point</b> - allows to define the coordinates of the base
+  point for the clipping plane.
+
+  - <b>Reset</b> - returns the base point to coordinate origin.
+
+- <b>Direction</b> - allows to define the orientation of the
+  clipping plane.
+
+  - <b>Invert</b> - allows to select which part of the object will be
+    removed and which will remain after clipping.
+
+- <b>Preview</b> - allows to see the results of clipping in the
+  viewer.
+
 <hr>
-\image html occviewer_axialscale.png
-\n <center><b>Scaling</b> - represents objects deformed (stretched or
-stuffed) along the axes of coordinates.</center>
 
-<b>Note!</b> OCC Viewer features a special <b>Polyline Selection</b> mechanism, which allows selecting an arbitraty part of the graphic area using a polygon frame, instead of the usual selection with a rectangular frame.
+\image html occ_view_scaling.png
 
-To produce a Polyline Selection, lock the right mouse button and draw the first side of the polygon, then change the direction by clicking  the left mouse button add draw another side, etc. The whole selection frame is drawn with the locked right mouse button. 
+<b>Scaling</b> - represents objects deformed (stretched or stuffed)
+along the axes of coordinates.
+<hr>
+
+\image html occ_view_graduated_axes.png
+
+<b>Graduated axes</b> - allows to define axes parameters and graduate
+them.
+
+\image html graduatedaxes2.png
+
+- <b>Axis name</b> - if checked the axis name is displayed in the viewer.
+
+  - <b>Name</b> - allows to redefine the axis name.
+
+  - <b>Font</b> - allows to define the font color of the axis name.
+
+- <b>Labels</b> - if checked the labels are displayed in the viewer.
+
+  - <b>Number</b> - allows to define the number of labels.
+
+  - <b>Offset</b> - allows to define the distance between labels.
+
+  - <b>Font</b> - allows to define the font color of labels names.
+
+- <b>Tick marks</b> - if checked the tick marks are displayed in the viewer.
+
+  - <b>Length</b> - allows to define the length of tick marks.
+
+- <b>Is visible</b> - if checked the axis is displayed in the viewer.
+
+<hr>
+
+\image html occ_view_ambient.png
+
+<b>Toggle ambient light</b> - toggle "keep only ambient light" flag
+on/off.
+<hr>
+
+\image html occ_view_minimized.png
+\image html occ_view_maximized.png
+
+<b>Minimize/Maximize</b> - these buttons allow switching the current
+view area to the minimized / maximized state.
+<hr>
+
+\image html occ_view_sync.png
+
+<b>Synchronize view</b> - allows to synchronize 3d view
+parameters. This button has two states - checked and
+unchecked. Clicking on this button opens a drop-down menu listing the
+compatible 3d views. As soon as the user selects any view from the
+list, the parameters (view point, position, zoom coefficient, etc.) of
+the current view are synchronized with the selected view (static
+synchronization).
+
+In addition, when this button is in the "checked" state, the dynamic
+synchronization of the views is performed, i.e. any zoom, pan, rotate
+or other view operation done in one view is automatically applied to
+the other view.
+<hr>
+
+\anchor occ_background
+<h2>Background</h2>
+
+OCC Viewer background can be customized using the "Change background"
+popup menu command that opens the following dialog box:
+
+\image html change_background_dlg.png
+
+The following types of the background are supported:
+
+- Single color: the background is colored with the solid color
+  specified by the user in the dialog box.
+
+- Gradient background: the background is gradiently colored according
+  to two colors and the gradient type specified in the dialog box. The
+  following types of background are supported:
+
+  - Horizontal
+
+  - Vertical
+
+  - First diagonal
+
+  - Second diagonal
+
+  - First corner
+
+  - Second corner
+
+  - Third corner
+
+  - Fourth corner
+
+- Image: allows to set image as viewer background and define filling type:
+
+  - Center: the image is located at the center of the viewer backgound
+
+  - Tile: the image fills the entire viewer backgound one by one
+
+  - Stretch: the image is stretched to the entire viewer backgound.
+
+Default background for the viewer is specified via the
+\ref occ_preferences "application preferences".
+
+<h2>Polyline selection</h2>
+
+OCC Viewer features a special <b>Polyline Selection</b> mechanism,
+which allows selecting an arbitraty part of the graphic area using a
+polygon frame (rubber band), instead of the usual selection with a
+rectangular frame.
+
+To produce a Polyline Selection, lock the right mouse button and draw
+the first side of the polygon, then change the direction by clicking
+the left mouse button add draw another side, etc. The whole selection
+frame is drawn with the locked right mouse button.
    
 \image html polyselection1.png
 

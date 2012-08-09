@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "OCCViewer_AxialScaleDlg.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
@@ -41,8 +39,8 @@
   \param view - view window
   \param parent - parent widget
 */
-OCCViewer_AxialScaleDlg::OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* view, QWidget* parent )
-  : QDialog( parent ),
+OCCViewer_AxialScaleDlg::OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* view )
+  : QDialog( view ),
     myView( view )
 {
   setWindowTitle( tr( "DLG_SCALING" ) );
@@ -143,7 +141,7 @@ void OCCViewer_AxialScaleDlg::Update()
 {
   // Get values from the OCC view
   double aScaleFactor[3];
-  myView->getViewPort()->getView()->AxialScale( aScaleFactor[0], aScaleFactor[1], aScaleFactor[2] );
+  myView->getViewPort()->getAxialScale( aScaleFactor[0], aScaleFactor[1], aScaleFactor[2] );
   m_sbXcoeff->setValue( aScaleFactor[0] );
   m_sbYcoeff->setValue( aScaleFactor[1] );
   m_sbZcoeff->setValue( aScaleFactor[2] );
@@ -164,7 +162,7 @@ void OCCViewer_AxialScaleDlg::accept()
 bool OCCViewer_AxialScaleDlg::apply()
 {
   double aScaleFactor[3] = { m_sbXcoeff->value(), m_sbYcoeff->value(), m_sbZcoeff->value() };
-  myView->getViewPort()->getView()->SetAxialScale( aScaleFactor[0], aScaleFactor[1], aScaleFactor[2] );
+  myView->getViewPort()->setAxialScale( aScaleFactor[0], aScaleFactor[1], aScaleFactor[2] );
   return true;
 }
 

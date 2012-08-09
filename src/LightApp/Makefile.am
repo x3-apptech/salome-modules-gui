@@ -1,30 +1,35 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : OCC team (OCN)
 #  Module : LightApp
 #  $Header$
-#
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
+EXTRA_DIST += images
+
+QRC_FILES = qrc_LightApp.cxx
 
 lib_LTLIBRARIES = libLightApp.la
 
@@ -54,7 +59,13 @@ salomeinclude_HEADERS =			\
 	LightApp_SwitchOp.h		\
 	LightApp_Preferences.h		\
 	LightApp_PreferencesDlg.h	\
-	LightApp_UpdateFlags.h
+	LightApp_UpdateFlags.h		\
+	LightApp_WgViewModel.h          \
+	LightApp_FullScreenHelper.h
+
+if ENABLE_PYCONSOLE
+  salomeinclude_HEADERS += LightApp_PyInterp.h
+endif
 
 #	LightApp_OBFilter.h
 
@@ -97,7 +108,13 @@ dist_libLightApp_la_SOURCES =		\
 	LightApp_Study.cxx		\
 	LightApp_SwitchOp.cxx		\
 	LightApp_Preferences.cxx	\
-	LightApp_PreferencesDlg.cxx
+	LightApp_PreferencesDlg.cxx	\
+	LightApp_WgViewModel.cxx        \
+	LightApp_FullScreenHelper.cxx
+
+if ENABLE_PYCONSOLE
+  dist_libLightApp_la_SOURCES += LightApp_PyInterp.cxx
+endif
 
 #	LightApp_OBFilter.cxx
 
@@ -132,7 +149,8 @@ MOC_FILES =				\
 	LightApp_Study_moc.cxx		\
 	LightApp_SwitchOp_moc.cxx	\
 	LightApp_Preferences_moc.cxx	\
-	LightApp_PreferencesDlg_moc.cxx
+	LightApp_PreferencesDlg_moc.cxx	\
+	LightApp_WgViewModel_moc.cxx
 
 if ENABLE_VTKVIEWER
 if ENABLE_SALOMEOBJECT
@@ -148,8 +166,7 @@ endif
 if ENABLE_PLOT2DVIEWER
   MOC_FILES += LightApp_Plot2dSelector_moc.cxx
 endif
-nodist_libLightApp_la_SOURCES = $(MOC_FILES)
-
+nodist_libLightApp_la_SOURCES = $(MOC_FILES) $(QRC_FILES)
 dist_salomeres_DATA =			\
 	resources/icon_about.png	\
 	resources/icon_applogo.png	\
@@ -162,12 +179,15 @@ dist_salomeres_DATA =			\
 
 nodist_salomeres_DATA =		\
 	LightApp_images.qm	\
-	LightApp_msg_en.qm
+	LightApp_msg_en.qm	\
+	LightApp_msg_fr.qm
 
 libLightApp_la_CPPFLAGS = $(PYTHON_INCLUDES) $(QT_INCLUDES) $(CAS_CPPFLAGS)		\
 	$(HDF5_INCLUDES) @KERNEL_CXXFLAGS@ -I$(srcdir)/../SUIT -I$(srcdir)/../STD	\
 	-I$(srcdir)/../CAM -I$(srcdir)/../ObjBrowser -I$(srcdir)/../LogWindow		\
-	-I$(srcdir)/../Prs -I$(srcdir)/../Qtx -I$(srcdir)/../Event -I$(srcdir)/../Style
+	-I$(srcdir)/../Prs -I$(srcdir)/../Qtx -I$(srcdir)/../Event -I$(srcdir)/../Style	\
+	-I$(srcdir)/../CASCatch
+
 libLightApp_la_LDFLAGS = $(QT_MT_LIBS)
 
 if ENABLE_VTKVIEWER
@@ -180,15 +200,14 @@ if ENABLE_PLOT2DVIEWER
 else
   libLightApp_la_CPPFLAGS += -DDISABLE_PLOT2DVIEWER
 endif
-libLightApp_la_CPPFLAGS+= -I$(srcdir)/../QxScene
-
 if ENABLE_OCCVIEWER
   libLightApp_la_CPPFLAGS += -I$(srcdir)/../OCCViewer
 else !ENABLE_OCCVIEWER
   libLightApp_la_CPPFLAGS += -DDISABLE_OCCVIEWER
 endif
 if ENABLE_PYCONSOLE
-  libLightApp_la_CPPFLAGS += $(PYTHON_INCLUDES) -I$(srcdir)/../PyConsole -I$(srcdir)/../PyInterp
+  libLightApp_la_CPPFLAGS += $(PYTHON_INCLUDES) -I$(srcdir)/../PyConsole -I$(srcdir)/../PyInterp \
+			     -I$(srcdir)/../SUITApp
   libLightApp_la_LDFLAGS += $(PYTHON_LIBS)
 else !ENABLE_PYCONSOLE
   libLightApp_la_CPPFLAGS += -DDISABLE_PYCONSOLE
@@ -203,8 +222,10 @@ if ENABLE_SUPERVGRAPHVIEWER
 else !ENABLE_SUPERVGRAPHVIEWER
   libLightApp_la_CPPFLAGS += -DDISABLE_SUPERVGRAPHVIEWER
 endif
+###VSR: QxGraph has been replaced by QxScene
+###libLightApp_la_CPPFLAGS += -I$(srcdir)/../QxGraph
 if ENABLE_QXGRAPHVIEWER
-  libLightApp_la_CPPFLAGS += -I$(srcdir)/../QxGraph
+  libLightApp_la_CPPFLAGS += -I$(srcdir)/../QxScene
 else !ENABLE_QXGRAPHVIEWER
   libLightApp_la_CPPFLAGS += -DDISABLE_QXGRAPHVIEWER
 endif
@@ -223,7 +244,7 @@ if ENABLE_VTKVIEWER
 endif
 else !ENABLE_SALOMEOBJECT
   libLightApp_la_CPPFLAGS += -DDISABLE_SALOMEOBJECT
-  
+
 endif
 
 libLightApp_la_LIBADD = ../SUIT/libsuit.la ../STD/libstd.la ../CAM/libCAM.la			\
@@ -256,13 +277,17 @@ if ENABLE_SALOMEOBJECT
   libLightApp_la_LIBADD += ../SPlot2d/libSPlot2d.la
 endif
 endif
+
 if ENABLE_PYCONSOLE
-  libLightApp_la_LIBADD += ../PyInterp/libPyInterp.la ../PyConsole/libPyConsole.la
+  libLightApp_la_LIBADD += ../PyInterp/libPyInterp.la ../PyConsole/libPyConsole.la \
+			   ../SUITApp/libSUITApp.la
 endif
+
 if ENABLE_SUPERVGRAPHVIEWER
   libLightApp_la_LIBADD += ../SUPERVGraph/libSUPERVGraph.la
 endif
+###VSR: QxGraph has been replaced by QxScene
+###libLightApp_la_LIBADD += ../QxGraph/libQxGraph.la
 if ENABLE_QXGRAPHVIEWER
-  libLightApp_la_LIBADD += ../QxGraph/libQxGraph.la
-endif
   libLightApp_la_LIBADD+= ../QxScene/libQxScene.la
+endif

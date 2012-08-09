@@ -1,29 +1,31 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "VTKViewer_ViewModel.h"
 #include "VTKViewer_ViewWindow.h"
 #include "VTKViewer_ViewManager.h"
 #include "VTKViewer_RenderWindowInteractor.h"
 
+#include "QtxBackgroundTool.h"
 #include "SUIT_ViewWindow.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
@@ -32,6 +34,9 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QToolBar>
+
+// VSR: Uncomment below line to allow texture background support in VTK viewer
+#define VTK_ENABLE_TEXTURED_BACKGROUND
 
 bool _InitializeVtkWarningsCall()
 {
@@ -47,7 +52,7 @@ static bool _InitializeVtkWarnings = _InitializeVtkWarningsCall();
 /*!Constructor.Sets background color to black.*/
 VTKViewer_Viewer::VTKViewer_Viewer()
 : SUIT_ViewModel(),
-myBgColor( Qt::black )
+  myDefaultBackground( Qtx::BackgroundData( Qt::black ) )
 {
 }
 
@@ -56,24 +61,62 @@ VTKViewer_Viewer::~VTKViewer_Viewer()
 {
 }
 
-/*!Gets background color.*/
-QColor VTKViewer_Viewer::backgroundColor() const
+/*! Get data for supported background modes: gradient types, identifiers and supported image formats */
+QString VTKViewer_Viewer::backgroundData( QStringList& gradList, QIntList& idList, QIntList& txtList )
 {
-  return myBgColor;
+  gradList << tr( "GT_HORIZONTALGRADIENT" )
+           << tr( "GT_VERTICALGRADIENT" )
+           << tr( "GT_FIRSTDIAGONALGRADIENT" )
+           << tr( "GT_SECONDDIAGONALGRADIENT" )
+           << tr( "GT_FIRSTCORNERGRADIENT" )
+           << tr( "GT_SECONDCORNERGRADIENT" )
+           << tr( "GT_THIRDCORNERGRADIENT" )
+           << tr( "GT_FOURTHCORNERGRADIENT" );
+  idList   << HorizontalGradient
+           << VerticalGradient
+           << FirstDiagonalGradient
+           << SecondDiagonalGradient
+           << FirstCornerGradient
+           << SecondCornerGradient
+           << ThirdCornerGradient
+           << FourthCornerGradient;
+#ifdef VTK_ENABLE_TEXTURED_BACKGROUND
+  txtList  << Qtx::CenterTexture << Qtx::TileTexture << Qtx::StretchTexture;
+#endif
+  return tr("BG_IMAGE_FILES");
 }
 
-/*!Sets background color.*/
+/*!Gets background color [obsolete]*/
+QColor VTKViewer_Viewer::backgroundColor() const
+{
+  return background().color();
+}
+
+/*!Sets background color [obsolete]*/
 void VTKViewer_Viewer::setBackgroundColor( const QColor& c )
 {
-  if ( c.isValid() )
-    myBgColor = c;
+  Qtx::BackgroundData bg = background();
+  bg.setColor( c );
+  setBackground( bg );
+}
+
+/*!Gets default background data.*/
+Qtx::BackgroundData VTKViewer_Viewer::background() const
+{
+  return myDefaultBackground;
+}
+
+/*!Sets default background data.*/
+void VTKViewer_Viewer::setBackground( const Qtx::BackgroundData& theBackground )
+{
+  myDefaultBackground = theBackground.isValid() ? theBackground : Qtx::BackgroundData( Qt::black );
 }
 
 /*!Create new instance of VTKViewer_ViewWindow, sets background color and return pointer to it.*/
 SUIT_ViewWindow* VTKViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   VTKViewer_ViewWindow* vw = new VTKViewer_ViewWindow( theDesktop, this );
-  vw->setBackgroundColor( myBgColor );
+  vw->setBackground( myDefaultBackground );
   return vw;
 }
 
@@ -95,7 +138,7 @@ void VTKViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 void VTKViewer_Viewer::contextMenuPopup(QMenu* thePopup)
 {
   thePopup->addAction( tr( "MEN_DUMP_VIEW" ), this, SLOT( onDumpView() ) );
-  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUD" ), this, SLOT( onChangeBgColor() ) );
+  thePopup->addAction( tr( "MEN_CHANGE_BACKGROUND" ), this, SLOT( onChangeBackground() ) );
 
   thePopup->addSeparator();
 
@@ -185,15 +228,32 @@ void VTKViewer_Viewer::onDumpView()
 }
 
 /*!On change back ground color event.*/
-void VTKViewer_Viewer::onChangeBgColor()
+void VTKViewer_Viewer::onChangeBackground()
 {
   VTKViewer_ViewWindow* aView = (VTKViewer_ViewWindow*)(myViewManager->getActiveView());
   if ( !aView )
     return;
 
-  QColor aColor = QColorDialog::getColor( aView->backgroundColor(), aView);
-  if ( aColor.isValid() )
-    aView->setBackgroundColor(aColor);
+  // get supported gradient types
+  QStringList gradList;
+  QIntList    idList, txtList;
+  QString     formats = backgroundData( gradList, idList, txtList );
+
+  // invoke dialog box
+  Qtx::BackgroundData bgData = QtxBackgroundDialog::getBackground( aView->background(),  // initial background
+								   aView,                // parent for dialog box
+								   txtList,              // allowed texture modes
+								   true,                 // enable solid color mode
+								   true,                 // enable gradient mode
+								   false,                // disable custom gradient mode
+								   !txtList.isEmpty(),   // enable texture mode
+								   gradList,             // gradient names
+								   idList,               // gradient identifiers
+								   formats );            // image formats
+
+  // set chosen background data to the viewer
+  if ( bgData.isValid() )
+    aView->setBackground( bgData );
 }
 
 /*!On show tool bar event.*/

@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File   : SalomePyQt.sip
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
@@ -208,16 +208,45 @@ public:
   static QMenuBar*         getMainMenuBar() /ReleaseGIL/ ;
   static QMenu*            getPopupMenu( const MenuName ) /ReleaseGIL/ ;
   static QMenu*            getPopupMenu( const QString& ) /ReleaseGIL/ ;
+  static QTreeView*        getObjectBrowser() /ReleaseGIL/ ;
   static SALOME_Selection* getSelection() /Factory,ReleaseGIL/ ;
   static int               getStudyId() /ReleaseGIL/ ;
   static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
   static const QString     getActiveComponent() /ReleaseGIL/ ;
-  static void              updateObjBrowser( const int = 0, bool = true ) /ReleaseGIL/ ;
+  static SIP_PYOBJECT      getActivePythonModule() /ReleaseGIL/ ;
+  static bool              activateModule( const QString& ) /ReleaseGIL/ ;
+  static void              updateObjBrowser( const int = 0, bool =  true ) /ReleaseGIL/ ;
+  
+  static bool              isModified() /ReleaseGIL/ ;
+  static void              setModified( bool ) /ReleaseGIL/ ;
 
   static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool ) /ReleaseGIL/ ;
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& ) /ReleaseGIL/ ;
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& ) /ReleaseGIL/ ;
+			 
+  static QString           createObject( const QString& = QString("") )  /ReleaseGIL/ ;
+  static QString           createObject( const QString&,
+			                 const QString&,
+					 const QString&,
+					 const QString& = QString("") )  /ReleaseGIL/ ;
 
+  static void              setName(const QString& ,const QString& ) /ReleaseGIL/ ;
+  static void              setIcon(const QString& ,const QString& ) /ReleaseGIL/ ;
+  static void              setToolTip(const QString& ,const QString& ) /ReleaseGIL/ ;
+  static QString           getName(const QString& ) /ReleaseGIL/ ;
+  static QString           getToolTip(const QString& ) /ReleaseGIL/ ;
+
+  static void              setColor( const QString&, const QColor& ) /ReleaseGIL/ ;
+  static QColor            getColor( const QString& ) /ReleaseGIL/ ;
+
+  static void              setReference( const QString& ,const QString& ) /ReleaseGIL/ ; 
+  static QString           getReference( const QString& ) /ReleaseGIL/ ;
+
+  static void              removeObject(const QString&  )    /ReleaseGIL/ ;
+  static void              removeChild(const QString& = QString("")  ) /ReleaseGIL/ ;
+  static QStringList       getChildren(const QString&=QString("") , const bool = false) /ReleaseGIL/ ;
+
+  static QIcon             loadIcon( const QString&, const QString& ) /ReleaseGIL/ ;
   static void              helpContext( const QString&, const QString& ) /ReleaseGIL/ ;
 
   static bool              dumpView( const QString& ) /ReleaseGIL/ ;
@@ -300,9 +329,12 @@ public:
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
   static int               createView( const QString& ) /ReleaseGIL/ ;
+  static int               createView( const QString&, QWidget* ) /ReleaseGIL/ ;
   static bool              closeView( const int ) /ReleaseGIL/ ;
   static int               cloneView( const int ) /ReleaseGIL/ ;
   static bool              isViewVisible( const int id ) /ReleaseGIL/ ;
+  static void              setViewClosable( const int id, const bool ) /ReleaseGIL/ ;
+  static bool              isViewClosable( const int id ) /ReleaseGIL/ ;
   
   static bool              groupAllViews() /ReleaseGIL/ ;
   static bool              splitView( const int, Orientation, Action ) /ReleaseGIL/ ;

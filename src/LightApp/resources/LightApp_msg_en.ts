@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -30,7 +9,7 @@
     </message>
     <message>
         <source>ABOUT_COPYRIGHT</source>
-        <translation>Copyright (C) 2007-2008 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+        <translation>Copyright (C) 2007-2012 CEA/DEN, EDF R&amp;D, OPEN CASCADE
 
 Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
 CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
@@ -39,6 +18,22 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>ABOUT_CAPTION</source>
         <translation>About %1</translation>
     </message>
+    <message>
+        <source>ABOUT_BASE</source>
+        <translation>Base information</translation>
+    </message>
+    <message>
+        <source>ABOUT_MODULE_INFOS</source>
+        <translation>Modules information</translation>
+    </message>
+    <message>
+        <source>ABOUT_UNKNOWN_VERSION</source>
+        <translation>Unknown</translation>
+    </message>
+    <message>
+        <source>ABOUT_CLOSE</source>
+        <translation>&amp;Close</translation>
+    </message>    
     <message>
         <source>APP_NAME</source>
         <translation>SALOME</translation>
@@ -55,9 +50,50 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>ENTRY_COLUMN</source>
         <translation>Entry</translation>
     </message>
+    <message>
+        <source>BROWSER_TITLE</source>
+        <translation>SALOME Help Browser</translation>
+    </message>    
+    <message>
+        <source>BROWSER_TOOLBAR_TITLE</source>
+        <translation>Navigation</translation>
+    </message>    
+    <message>
+        <source>BROWSER_FILEMENU</source>
+        <translation>&amp;File</translation>
+    </message>    
+    <message>
+        <source>BROWSER_CLOSE</source>
+        <translation>&amp;Close</translation>
+    </message>    
+    <message>
+        <source>BROWSER_BACK</source>
+        <translation>Go Back</translation>
+    </message>    
+    <message>
+        <source>BROWSER_FORWARD</source>
+        <translation>Go Forward</translation>
+    </message>    
+    <message>
+        <source>BROWSER_FIND</source>
+        <translation>&amp;Find...</translation>
+    </message>    
+    <message>
+        <source>BROWSER_FINDNEXT</source>
+        <translation>Find &amp;next</translation>
+    </message>    
+    <message>
+        <source>BROWSER_FINDPREV</source>
+        <translation>Find &amp;previous</translation>
+    </message>    
 </context>
 <context>
     <name>LightApp_Application</name>
+    <message>
+        <source>LANG_CHANGED</source>
+        <translation>Application language has been changed.
+The changes will be applied on the next application session.</translation>
+    </message>
     <message>
         <source>MEN_DESK_THEME</source>
         <translation>Theme</translation>
@@ -69,6 +105,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
         <source>PRP_THEME</source>
         <translation>Change style properties</translation>
+    </message>
+    <message>
+        <source>TOT_FULLSCREEN</source>
+        <translation>Full screen</translation>
+    </message>
+    <message>
+        <source>MEN_DESK_FULLSCREEN</source>
+        <translation>Full screen</translation>
+    </message>
+    <message>
+        <source>PRP_FULLSCREEN</source>
+        <translation>Switch to full screen mode</translation>
     </message>
     <message>
         <source>INF_TOOLBAR_MODULES</source>
@@ -95,8 +143,12 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Show trihedron</translation>
     </message>
     <message>
+        <source>PREF_TRIHEDRON</source>
+        <translation>Trihedron</translation>
+    </message>
+    <message>
         <source>PREF_TRIHEDRON_SIZE</source>
-        <translation>Trihedron size</translation>
+        <translation>Size</translation>
     </message>
     <message>
         <source>OBJECT_BROWSER</source>
@@ -112,11 +164,19 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_GROUP_VTKVIEWER</source>
-        <translation>VTK Viewer 3d</translation>
+        <translation>VTK 3D Viewer</translation>
     </message>
     <message>
         <source>PREF_STORE_POS</source>
         <translation>Store positions of windows</translation>
+    </message>
+    <message>
+        <source>PREF_AUTO_SAVE</source>
+        <translation>Auto-save interval (min)</translation>
+    </message>
+    <message>
+        <source>PREF_AUTO_SAVE_DISABLED</source>
+        <translation>Disabled</translation>
     </message>
     <message>
         <source>PREF_PROJECTION_MODE</source>
@@ -132,7 +192,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_NAVIGATION</source>
-        <translation>Navigation:</translation>
+        <translation>Navigation style</translation>
     </message>
     <message>
         <source>PREF_STANDARD_STYLE</source>
@@ -141,6 +201,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
         <source>PREF_KEYFREE_STYLE</source>
         <translation>Keyboard free style</translation>
+    </message>
+    <message>
+        <source>PREF_ZOOMING</source>
+        <translation>Zooming style</translation>
+    </message>
+    <message>
+        <source>PREF_ZOOMING_AT_CENTER</source>
+        <translation>Relative to the view&apos;s center</translation>
+    </message>
+    <message>
+        <source>PREF_ZOOMING_AT_CURSOR</source>
+        <translation>Relative to the cursor</translation>
     </message>
     <message>
         <source>PREF_INCREMENTAL_SPEED</source>
@@ -161,6 +233,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
         <source>PREF_FRAME_SPACEMOUSE</source>
         <translation>Spacemouse</translation>
+    </message>
+    <message>
+        <source>PREF_SHOW_STATIC_TRIHEDRON</source>
+        <translation>Show static trihedron</translation>
     </message>
     <message>
         <source>PREF_SPACEMOUSE_FUNC_1</source>
@@ -251,6 +327,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Recording at a given FPS</translation>
     </message>
     <message>
+        <source>PREF_FRAME_GROUP_NAMES</source>
+        <translation>Names of groups</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_NAMES_TEXT_COLOR</source>
+        <translation>Text color</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_NAMES_TRANSPARENCY</source>
+        <translation>Transparency</translation>
+    </message>
+    <message>
         <source>PREF_BOTTOM</source>
         <translation>Bottom</translation>
     </message>
@@ -259,12 +347,16 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Curve type:</translation>
     </message>
     <message>
+        <source>PREF_ISOS</source>
+        <translation>Number of isolines</translation>
+    </message>
+    <message>
         <source>PREF_ISOS_U</source>
-        <translation>Number of isolines along U</translation>
+        <translation>Along U</translation>
     </message>
     <message>
         <source>PREF_ISOS_V</source>
-        <translation>Number of isolines along V</translation>
+        <translation>Along V</translation>
     </message>
     <message>
         <source>PREF_POINTS</source>
@@ -299,6 +391,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Rename</translation>
     </message>
     <message>
+        <source>MEN_RENAME_OBJ</source>
+        <translation>Rename</translation>
+    </message>        	
+    <message>
         <source>LOG_WINDOW</source>
         <translation>Message Window</translation>
     </message>
@@ -324,7 +420,11 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_GROUP_PY_CONSOLE</source>
-        <translation>Python console properties</translation>
+        <translation>Python console</translation>
+    </message>
+    <message>
+        <source>PREF_SHOW_BANNER</source>
+        <translation>Show banner</translation>
     </message>
     <message>
         <source>PREF_GROUP_STYLE</source>
@@ -356,11 +456,27 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_AUTO_SIZE_FIRST</source>
-        <translation>Auto size for first column</translation>
+        <translation>Auto size for "Name" column</translation>
     </message>
     <message>
         <source>PREF_RESIZE_ON_EXPAND_ITEM</source>
         <translation>Resize columns on expand item</translation>
+    </message>
+    <message>
+        <source>PREF_BROWSE_TO_THE_PUBLISHED_OBJECT</source>
+        <translation>Browse to the published object</translation>
+    </message>
+    <message>
+        <source>PREF_BROWSE_NEVER</source>
+        <translation>Never</translation>
+    </message>
+    <message>
+        <source>PREF_BROWSE_AFTER_APPLY_AND_CLOSE_ONLY</source>
+        <translation>After Apply &amp; Close only</translation>
+    </message>
+    <message>
+        <source>PREF_BROWSE_ALWAYS</source>
+        <translation>Always</translation>
     </message>
     <message>
         <source>PREF_GROUP_SUPERV</source>
@@ -376,27 +492,31 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>NEW_WINDOW_0</source>
-        <translation>&amp;GL view</translation>
+        <translation>&amp;GL 2D view</translation>
     </message>
     <message>
         <source>NEW_WINDOW_1</source>
-        <translation>&amp;Plot2d view</translation>
+        <translation>&amp;Plot 2D view</translation>
     </message>
     <message>
         <source>NEW_WINDOW_2</source>
-        <translation>&amp;OCC view</translation>
+        <translation>&amp;OCC 3D view</translation>
     </message>
     <message>
         <source>NEW_WINDOW_3</source>
-        <translation>VT&amp;K view</translation>
+        <translation>VT&amp;K 3D view</translation>
     </message>
     <message>
         <source>NEW_WINDOW_4</source>
-        <translation>&amp;QxGraph view</translation>
+        <translation>&amp;QxGraph 2D view</translation>
     </message>
     <message>
         <source>NEW_WINDOW_5</source>
-        <translation>Qx&amp;Scene view</translation>
+        <translation>Qx&amp;Scene 2D view</translation>
+    </message>
+    <message>
+        <source>CREATING_NEW_WINDOW</source>
+        <translation>Create new %1</translation>
     </message>
     <message>
         <source>OBJ_BROWSER_NAME</source>
@@ -408,16 +528,52 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_RELATIVE_SIZE</source>
-        <translation>Relative size</translation>
+        <translation>Relative</translation>
     </message>
     <message>
         <source>PREF_VIEWER_BACKGROUND</source>
+        <translation>Background</translation>
+    </message>
+    <message>
+        <source>PREF_VIEWER_BACKGROUND_COLOR</source>
         <translation>Background color</translation>
+    </message>
+    <message>
+        <source>PREF_VIEWER_SELECTION</source>
+        <translation>Selection color</translation>
+    </message>    
+    <message>
+        <source>PREF_XYVIEWER_BACKGROUND</source>
+        <translation>XY View</translation>
+    </message>
+    <message>
+        <source>PREF_XZVIEWER_BACKGROUND</source>
+        <translation>XZ View</translation>
+    </message>
+    <message>
+        <source>PREF_YZVIEWER_BACKGROUND</source>
+        <translation>YZ View</translation>
+    </message>
+    <message>
+        <source>PREF_3DVIEWER_BACKGROUND</source>
+        <translation>3D View</translation>
     </message>
     <message>
         <source>PREF_FONT</source>
         <translation>Font</translation>
     </message>
+    <message>
+        <source>PREF_LEGEND_FONT</source>
+        <translation>Legend font</translation>
+    </message>
+    <message>
+        <source>PREF_FONT_COLOR</source>
+        <translation>Legend font color</translation>
+    </message>
+    <message>
+        <source>PREF_SELECTED_FONT_COLOR</source>
+        <translation>Highlighted legend font color</translation>
+    </message>			        
     <message>
         <source>PREF_LEFT</source>
         <translation>Left</translation>
@@ -439,6 +595,22 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Horizontal axis scale:</translation>
     </message>
     <message>
+        <source>PREF_GROUP_LANGUAGE</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <source>PREF_CURRENT_LANGUAGE</source>
+        <translation>Current language</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_LOOK_AND_FEEL</source>
+        <translation>Look and feel</translation>
+    </message>
+    <message>
+        <source>PREF_OPAQUE_RESIZE</source>
+        <translation>Opaque resize</translation>
+    </message>
+    <message>
         <source>PREF_GROUP_STUDY</source>
         <translation>Study properties</translation>
     </message>
@@ -447,8 +619,16 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>SALOME</translation>
     </message>
     <message>
+        <source>PREF_DROP_DOWN_BUTTONS</source>
+        <translation>Drop-down buttons in toolbars for action groups</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_COMMON</source>
+        <translation>Common</translation>
+    </message>
+    <message>
         <source>PREF_GROUP_OCCVIEWER</source>
-        <translation>OCC Viewer 3d</translation>
+        <translation>OCC 3D Viewer</translation>
     </message>
     <message>
         <source>PREF_LOGARITHMIC</source>
@@ -492,7 +672,19 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PREF_GROUP_PLOT2DVIEWER</source>
-        <translation>Plot2d Viewer</translation>
+        <translation>Plot 2D Viewer</translation>
+    </message>
+    <message>
+        <source>PREF_DEVIATION_COLOR</source>
+        <translation>Deviation marker color</translation>
+    </message>
+    <message>
+        <source>PREF_DEVIATION_MARKER_LW</source>
+        <translation>Deviation marker line width</translation>
+    </message>
+    <message>
+        <source>PREF_DEVIATION_MARKER_TS</source>
+        <translation>Deviation marker tick size</translation>
     </message>
     <message>
         <source>MEN_DESK_MRU</source>
@@ -527,8 +719,8 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Python Console</translation>
     </message>
     <message>
-        <source>PREF_USE_ADVANCED_SELECTION_ALGORITHM</source>
-        <translation>Use Advanced Selection Algorithm</translation>
+        <source>PREF_DYNAMIC_PRESELECTION</source>
+        <translation>Dynamic pre-selection</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
@@ -617,7 +809,15 @@ File does not exist</translation>
     </message>
     <message>
         <source>PREFERENCES_NOT_SUPPORTED</source>
-        <translation>Preferences for module "%1" not supported</translation>
+        <translation>Preferences for module &quot;%1&quot; not supported</translation>
+    </message>
+    <message>
+        <source>PREF_TAB_SHORTCUTS</source>
+        <translation>Shortcuts</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_SHORTCUTS</source>
+        <translation>Shortcuts settings</translation>
     </message>
 </context>
 <context>
@@ -675,7 +875,7 @@ File does not exist</translation>
     <name>LightApp_ModuleDlg</name>
     <message>
         <source>DESCRIPTION</source>
-        <translation>You're activating module
+        <translation>You&apos;re activating module
 	&lt;b&gt;%1&lt;/b&gt;.&lt;br&gt;Please, select required action by pressing the corresponding button below.</translation>
     </message>
     <message>
@@ -723,6 +923,13 @@ File does not exist</translation>
     <message>
         <source>DEFAULT_BTN_TEXT</source>
         <translation>Defaults</translation>
+    </message>
+</context>
+<context>
+    <name>LightApp_ModuleAction</name>
+    <message>
+        <source>ACTIVATE_MODULE_TOP</source>
+        <translation>Activate/deactivate %1 module</translation>
     </message>
 </context>
 </TS>

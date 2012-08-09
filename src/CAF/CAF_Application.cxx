@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "CAF_Application.h"
 
 #include "CAF_Tools.h"
@@ -165,15 +166,15 @@ void CAF_Application::createActions()
 
   QtxListAction* editUndo = 
     new QtxListAction( tr( "TOT_APP_EDIT_UNDO" ), 
-		       resMgr->loadPixmap( "STD", tr( "ICON_EDIT_UNDO" ) ),
-		       tr( "MEN_APP_EDIT_UNDO" ), Qt::CTRL+Qt::Key_Z, desk );
+                       resMgr->loadPixmap( "STD", tr( "ICON_EDIT_UNDO" ) ),
+                       tr( "MEN_APP_EDIT_UNDO" ), Qt::CTRL+Qt::Key_Z, desk );
   editUndo->setStatusTip( tr( "PRP_APP_EDIT_UNDO" ) );
   registerAction( EditUndoId, editUndo );
 
   QtxListAction* editRedo =
     new QtxListAction( tr( "TOT_APP_EDIT_REDO" ), 
-		       resMgr->loadPixmap( "STD", tr( "ICON_EDIT_REDO" ) ),
-		       tr( "MEN_APP_EDIT_REDO" ), Qt::CTRL+Qt::Key_Y, desk );
+                       resMgr->loadPixmap( "STD", tr( "ICON_EDIT_REDO" ) ),
+                       tr( "MEN_APP_EDIT_REDO" ), Qt::CTRL+Qt::Key_Y, desk );
   editRedo->setStatusTip( tr( "PRP_APP_EDIT_REDO" ) );
   registerAction( EditRedoId, editRedo );
 
@@ -207,7 +208,8 @@ bool CAF_Application::undo( CAF_Study* doc )
   bool success = false;
   if ( doc )
   {
-    if ( success = doc->undo() )
+    success = doc->undo();
+    if ( success )
       doc->update();
   }
   return success;
@@ -223,7 +225,8 @@ bool CAF_Application::redo(CAF_Study* doc)
   bool success = false;
   if ( doc )
   {
-    if ( success = doc->redo() )
+    success = doc->redo();
+    if ( success )
       doc->update();
   }
   return success;
@@ -247,8 +250,8 @@ bool CAF_Application::onUndo( int numActions )
     {
       if ( !undo( cafStudy ) )
       {
-	ok = false;
-	break;
+        ok = false;
+        break;
       }
       numActions--;
     }
@@ -275,8 +278,8 @@ bool CAF_Application::onRedo( int numActions )
     {
       if ( !redo( cafStudy ) )
       {
-	ok = false;
-	break;
+        ok = false;
+        break;
       }
       numActions--;
     }

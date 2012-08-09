@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
 //  File   : SALOME_Actor.h
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef VTKVIEVER_ACTOR_H
 #define VTKVIEVER_ACTOR_H
 
@@ -34,6 +33,7 @@
 #include <vector>
 
 #include <vtkLODActor.h>
+#include <vtkProperty.h>
 
 class vtkCell;
 class vtkPointPicker;
@@ -50,6 +50,19 @@ class VTKViewer_TransformFilter;
 
 extern int VTKViewer_POINT_SIZE;
 extern int VTKViewer_LINE_WIDTH;
+
+namespace VTKViewer
+{
+  namespace Representation
+  {
+    typedef int Type;
+    const Type Points = VTK_POINTS;
+    const Type Wireframe = VTK_WIREFRAME;
+    const Type Surface = VTK_SURFACE;
+    const Type Insideframe = Surface + 1;
+    const Type SurfaceWithEdges = Insideframe + 1;
+  }
+}
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )
@@ -91,20 +104,30 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   virtual
   void
   SetColor(vtkFloatingPointType r,
-	   vtkFloatingPointType g,
-	   vtkFloatingPointType b);
+           vtkFloatingPointType g,
+           vtkFloatingPointType b);
 
   //! Get current color
   virtual
   void
   GetColor(vtkFloatingPointType& r,
-	   vtkFloatingPointType& g,
-	   vtkFloatingPointType& b);
+           vtkFloatingPointType& g,
+           vtkFloatingPointType& b);
 
   //! Change color
   virtual
   void
   SetColor(const vtkFloatingPointType theRGB[3]);
+
+  //! Change material
+  virtual
+  void
+  SetMaterial(std::vector<vtkProperty*> theProps);
+
+  //! Get current material
+  virtual
+  vtkProperty* 
+  GetMaterial();
 
   //----------------------------------------------------------------------------
   // For selection mapping purpose
@@ -223,12 +246,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //! Set ResolveCoincidentTopology parameters
   void
   SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-			     vtkFloatingPointType units);
+                             vtkFloatingPointType units);
 
   //! Get current ResolveCoincidentTopology parameters
   void
   GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-			     vtkFloatingPointType& units);
+                             vtkFloatingPointType& units);
 
   virtual
   void
@@ -287,6 +310,11 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   bool
   isHighlighted();
 
+  //! Ask, if the VTKViewer_Actor is already preselected
+  virtual
+  bool
+  isPreselected();
+
   //! Set preselection mode
   virtual
   void
@@ -300,6 +328,18 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   void
   SetPreviewProperty(vtkProperty* theProperty);
+
+  //----------------------------------------------------------------------------
+  //! Setting for displaying quadratic elements
+  virtual void SetQuadraticArcMode(bool theFlag);
+  virtual bool GetQuadraticArcMode() const;
+
+  virtual void   SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
+  virtual vtkFloatingPointType GetQuadraticArcAngle() const;
+
+  //----------------------------------------------------------------------------
+  //! Return pointer to the dataset, which used to calculation of the bounding box of the actor
+  virtual vtkDataSet* GetHighlightedDataSet();
 
  protected:
   //----------------------------------------------------------------------------

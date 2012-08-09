@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : LightApp_ModuleDlg.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -148,8 +149,8 @@ static const char* const default_icon[] = {
   \param icon module icon
 */
 LightApp_ModuleDlg::LightApp_ModuleDlg( QWidget*       parent, 
-					const QString& component, 
-					const QPixmap& icon )
+                                        const QString& component, 
+                                        const QPixmap& icon )
 : QDialog ( parent )
 {
   setModal( true );
@@ -178,6 +179,8 @@ LightApp_ModuleDlg::LightApp_ModuleDlg( QWidget*       parent,
 
   // <Cancel>
   QPushButton* cancelBtn = new QPushButton( tr( "CANCEL" ), this );
+  cancelBtn->setAutoDefault( true );
+
   myButtonLayout->addSpacing( 70 );
   myButtonLayout->addStretch();
   myButtonLayout->addWidget( cancelBtn );
@@ -223,8 +226,12 @@ int LightApp_ModuleDlg::addButton( const QString& button, const int id )
   }
 
   QPushButton* newButton = new QPushButton( button, this );
+  newButton->setAutoDefault( true );
 
-  if ( myButtons.empty() ) newButton->setDefault( true );
+  if ( myButtons.empty() ) {
+	newButton->setDefault( true );
+	newButton->setFocus();
+  }
 
   myButtons.insert( newButton, bid );
   myButtonLayout->insertWidget( myButtonLayout->count()-3, newButton );
@@ -242,7 +249,7 @@ QPushButton* LightApp_ModuleDlg::findButton( const int id ) const
 {
   QPushButton* btn = 0;
   for ( ButtonMap::ConstIterator it = myButtons.begin(); 
-	it != myButtons.end() && !btn; ++it ) {
+        it != myButtons.end() && !btn; ++it ) {
     if ( it.value() == id )
       btn = it.key();
   }

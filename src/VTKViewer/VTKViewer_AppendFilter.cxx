@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : kernel of SALOME component
 //  File   : VTKViewer_GeometryFilter.cxx
 //  Author : 
-//  Module : SALOME
-//  $Header$
-//
+
 #include "VTKViewer_AppendFilter.h"
 
 #include <vtkCell.h>
@@ -99,9 +98,9 @@ VTKViewer_AppendFilter
 int
 VTKViewer_AppendFilter
 ::RequestData(
-	      vtkInformation *request,
-	      vtkInformationVector **inputVector,
-	      vtkInformationVector *outputVector)
+              vtkInformation *request,
+              vtkInformationVector **inputVector,
+              vtkInformationVector *outputVector)
 {
   int aRet = 0;
   if(GetSharedPointsDataSet())
@@ -146,8 +145,8 @@ namespace
   inline
   vtkIdType
   GetOutputID(vtkIdType theInputID,
-	      vtkIdType theInputDataSetID,
-	      const VTKViewer_AppendFilter::TVectorIds& theRanges)
+              vtkIdType theInputDataSetID,
+              const VTKViewer_AppendFilter::TVectorIds& theRanges)
   {
     theInputID = theInputDataSetID = -1;
 
@@ -163,7 +162,7 @@ namespace
 vtkIdType
 VTKViewer_AppendFilter
 ::GetPointOutputID(vtkIdType theInputID,
-		   vtkIdType theInputDataSetID)
+                   vtkIdType theInputDataSetID)
 {
   if(GetSharedPointsDataSet())
     return theInputID;
@@ -175,7 +174,7 @@ VTKViewer_AppendFilter
 vtkIdType 
 VTKViewer_AppendFilter
 ::GetCellOutputID(vtkIdType theInputID,
-		   vtkIdType theInputDataSetID)
+                   vtkIdType theInputDataSetID)
 {
   if(GetSharedPointsDataSet())
     return theInputID;
@@ -188,10 +187,10 @@ namespace
 {
   void
   GetInputID(vtkIdType theOutputID,
-	     vtkIdType& theInputID,
-	     vtkIdType& theStartID,
-	     vtkIdType& theInputDataSetID,
-	     const VTKViewer_AppendFilter::TVectorIds& theRanges)
+             vtkIdType& theInputID,
+             vtkIdType& theStartID,
+             vtkIdType& theInputDataSetID,
+             const VTKViewer_AppendFilter::TVectorIds& theRanges)
   {
     theInputID = theStartID = theInputDataSetID = -1;
 
@@ -207,10 +206,10 @@ namespace
     for(vtkIdType aDataSetId = 0; aDataSetId < aNbInputs; ++aDataSetId){
       vtkIdType aRange = theRanges[aDataSetId];
       if(aRange > theOutputID){
-	theInputID = theOutputID - aStartId;
-	theInputDataSetID = aDataSetId;
-	theStartID = aStartId;
-	break;
+        theInputID = theOutputID - aStartId;
+        theInputDataSetID = aDataSetId;
+        theStartID = aStartId;
+        break;
       }
       aStartId = aRange;
     }
@@ -220,9 +219,9 @@ namespace
 void 
 VTKViewer_AppendFilter
 ::GetPointInputID(vtkIdType theOutputID,
-		  vtkIdType& theInputID,
-		  vtkIdType& theStartID,
-		  vtkIdType& theInputDataSetID)
+                  vtkIdType& theInputID,
+                  vtkIdType& theStartID,
+                  vtkIdType& theInputDataSetID)
 {
   if(GetSharedPointsDataSet()) {
     theStartID = theInputDataSetID = 0;
@@ -231,25 +230,25 @@ VTKViewer_AppendFilter
   }
 
   ::GetInputID(theOutputID,
-	       theInputID,
-	       theStartID,
-	       theInputDataSetID,
-	       myNodeRanges);
+               theInputID,
+               theStartID,
+               theInputDataSetID,
+               myNodeRanges);
 }
 
 
 void
 VTKViewer_AppendFilter
 ::GetCellInputID(vtkIdType theOutputID,
-		 vtkIdType& theInputID,
-		 vtkIdType& theStartID,
-		 vtkIdType& theInputDataSetID)
+                 vtkIdType& theInputID,
+                 vtkIdType& theStartID,
+                 vtkIdType& theInputDataSetID)
 {
   ::GetInputID(theOutputID,
-	       theInputID,
-	       theStartID,
-	       theInputDataSetID,
-	       myCellRanges);
+               theInputID,
+               theStartID,
+               theInputDataSetID,
+               myCellRanges);
 }
 
 
@@ -261,8 +260,8 @@ VTKViewer_AppendFilter
   vtkInformationVector *outputVector)
 {
   int idx;
-  vtkIdType numPts, numCells, newCellId, cellId;
-  vtkCellData *cd;
+  vtkIdType numPts, numCells, cellId;
+  // vtkCellData *cd;
   vtkIdList *ptIds;
   vtkDataSet *ds;
   int numInputs = this->GetNumberOfInputConnections(0);
@@ -320,11 +319,11 @@ VTKViewer_AppendFilter
     if (ds != NULL) {
       
       numCells = ds->GetNumberOfCells(); 
-      cd = ds->GetCellData();
+      // cd = ds->GetCellData();
       // copy cell and cell data
       for (cellId=0; cellId<numCells; cellId++)  {
         ds->GetCellPoints(cellId, ptIds);
-        newCellId = output->InsertNextCell(ds->GetCellType(cellId), ptIds);
+        output->InsertNextCell(ds->GetCellType(cellId), ptIds);
       }
     }
   }

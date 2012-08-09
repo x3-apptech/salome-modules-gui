@@ -1,42 +1,44 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : Plot2d_Curve.cxx
-// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+//  File   : Plot2d_Curve.cxx
+//  Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+
 #include "Plot2d_Curve.h"
-#include <QColor>
+#include "Plot2d_PlotItems.h"
+#include <qwt_plot_curve.h>
+
+const int DEFAULT_LINE_WIDTH  =  0;     // (default) line width
+const int DEFAULT_MARKER_SIZE =  9;     // default marker size
 
 /*!
   Constructor
 */
 Plot2d_Curve::Plot2d_Curve()
-: myHorTitle( "" ), myVerTitle( "" ), 
-  myHorUnits( "" ), myVerUnits( "" ), 
-  myAutoAssign( true ), 
-  myColor( 0,0,0 ), 
+: Plot2d_Object(),
+  myColor( 0, 0, 0 ), 
   myMarker( Plot2d::Circle ), 
+  myMarkerSize( 0 ), 
   myLine( Plot2d::Solid ), 
-  myLineWidth( 0 ),
-  myYAxis( QwtPlot::yLeft )
+  myLineWidth( 0 )
 {
 }
 
@@ -48,238 +50,116 @@ Plot2d_Curve::~Plot2d_Curve()
 }
 
 /*!
-  Copy constructor. Makes deep copy of data.
+  Copy constructor. Makes deep copy of data
 */
 Plot2d_Curve::Plot2d_Curve( const Plot2d_Curve& curve )
+: Plot2d_Object( curve )
 {
-  myAutoAssign = curve.isAutoAssign();
-  myHorTitle   = curve.getHorTitle();
-  myVerTitle   = curve.getVerTitle();
-  myHorUnits   = curve.getHorUnits();
-  myVerUnits   = curve.getVerUnits();
   myColor      = curve.getColor();
   myMarker     = curve.getMarker();
+  myMarkerSize = curve.getMarkerSize();
   myLine       = curve.getLine();
   myLineWidth  = curve.getLineWidth();
-  myPoints     = curve.getPointList();
 }
 
 /*!
-  operator=. Makes deep copy of data.
+  operator=. Makes deep copy of data
 */
 Plot2d_Curve& Plot2d_Curve::operator=( const Plot2d_Curve& curve )
 {
-  myAutoAssign = curve.isAutoAssign();
-  myHorTitle   = curve.getHorTitle();
-  myVerTitle   = curve.getVerTitle();
-  myHorUnits   = curve.getHorUnits();
-  myVerUnits   = curve.getVerUnits();
+  Plot2d_Object::operator=(curve);
   myColor      = curve.getColor();
   myMarker     = curve.getMarker();
+  myMarkerSize = curve.getMarkerSize();
   myLine       = curve.getLine();
   myLineWidth  = curve.getLineWidth();
-  myPoints     = curve.getPointList();
   return *this;
 }
 
 /*!
-  \return title of table
+  Get typeid for the plot2d curve class
 */
-QString Plot2d_Curve::getTableTitle() const
+int Plot2d_Curve::rtti()
 {
-  return QString();
+  return QwtPlotItem::Rtti_PlotCurve;
 }
 
 /*!
-  Sets curve's horizontal title
+  Create plot object for the curve
 */
-void Plot2d_Curve::setHorTitle( const QString& title )
+QwtPlotItem* Plot2d_Curve::createPlotItem()
 {
-  myHorTitle = title;
+  QwtPlotCurve* aCurve = new Plot2d_QwtPlotCurve( getVerTitle(), getYAxis() );
+  updatePlotItem( aCurve );
+  return aCurve;
 }
 
 /*!
-  Gets curve's horizontal title
+  Auto fill parameters of object by plot view
 */
-QString Plot2d_Curve::getHorTitle() const
+void Plot2d_Curve::autoFill( const QwtPlot* thePlot )
 {
-  return myHorTitle;
+  QwtSymbol::Style typeMarker;
+  QColor           color;
+  Qt::PenStyle     typeLine;
+  Plot2d::getNextMarker( rtti(), thePlot, typeMarker, color, typeLine );
+
+  setColor( color );
+  setLine( Plot2d::qwt2plotLine( typeLine ), DEFAULT_LINE_WIDTH );
+  setMarker( Plot2d::qwt2plotMarker( typeMarker ) );
 }
 
 /*!
-  Sets curve's vertical title
+  Updates curve fields
 */
-void Plot2d_Curve::setVerTitle( const QString& title )
+void Plot2d_Curve::updatePlotItem( QwtPlotItem* theItem )
 {
-  myVerTitle = title;
-}
+  if ( theItem->rtti() != rtti() )
+    return;
 
-/*!
-  Gets curve's vertical title
-*/
-QString Plot2d_Curve::getVerTitle() const
-{
-  return myVerTitle;
-}
+  Plot2d_QwtPlotCurve* aCurve = dynamic_cast<Plot2d_QwtPlotCurve*>( theItem );
+  if ( !aCurve )
+    return;
 
-/*!
-  Sets curve's horizontal units
-*/
-void Plot2d_Curve::setHorUnits( const QString& units )
-{
-  myHorUnits = units;
-}
+  Plot2d_Object::updatePlotItem( theItem );
 
-/*!
-  Gets curve's horizontal units
-*/
-QString Plot2d_Curve::getHorUnits() const
-{
-  return myHorUnits;
-}
+  Qt::PenStyle     ps = Plot2d::plot2qwtLine( getLine() );
+  QwtSymbol::Style ms = Plot2d::plot2qwtMarker( getMarker() );
+  
+  QColor aColor = isSelected() ?  Plot2d_Object::selectionColor() : getColor();
+  int lineW = getLineWidth(); 
+  if ( isSelected() ) lineW += (lineW == 0 ? 3 : 2);
 
-/*!
-  Sets curve's vertical units
-*/
-void Plot2d_Curve::setVerUnits( const QString& units )
-{
-  myVerUnits = units;
-}
+  int markerS = isSelected() ? getMarkerSize() + 2 : getMarkerSize();
 
-/*!
-  Gets curve's vertical units
-*/
-QString Plot2d_Curve::getVerUnits() const
-{
-  return myVerUnits;
-}
+  aCurve->setSelected(isSelected());
 
-/*!
-  Adds one point for curve.
-*/
-void Plot2d_Curve::addPoint(double theX, double theY, const QString& txt )
-{
-  Plot2d_Point aPoint;
-  aPoint.x = theX;
-  aPoint.y = theY;
-  aPoint.text = txt;
-  myPoints.append(aPoint);
-}
+  aCurve->setPen( QPen(aColor , lineW, ps ) );
+  aCurve->setSymbol( QwtSymbol( ms, QBrush( aColor ), 
+				QPen( aColor ), 
+				QSize( markerS , markerS ) ) );
 
-/*!
-  Insert one point for curve on some position.
-*/
-void Plot2d_Curve::insertPoint(int thePos, double theX, double theY, const QString& txt)
-{
-  Plot2d_Point aPoint;
-  aPoint.x = theX;
-  aPoint.y = theY;
-  aPoint.text = txt;
-
-  pointList::iterator aIt;
-  int aCurrent = 0;
-  for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
-    if (thePos == aCurrent) {
-      myPoints.insert(aIt, aPoint);
-      return;
+  aCurve->setLegendPen(QPen(getColor(), getLineWidth(), ps ));
+  aCurve->setLegendSymbol( QwtSymbol( ms, QBrush( getColor() ), 
+				      QPen( getColor() ), 
+				      QSize( getMarkerSize() , getMarkerSize() )));
+  
+  double *x, *y, *min, *max;
+  long nb = getData( &x, &y );
+  if(nb > 0 && x && y) {
+    aCurve->setData( x, y, nb );
+    delete [] x;
+    delete [] y;
+    QList<int> idx;
+    getDeviationData(min, max, idx);
+    if(idx.size() > 0 && min && max) {
+      aCurve->setDeviationData(min,max,idx);
+      delete min;
+      delete max;
+    } else {
+      aCurve->clearDeviationData();
     }
-    aCurrent++;  
   }
-  myPoints.append(aPoint);
-}
-
-/*!
-  Delete one point for curve on some position.
-*/
-void Plot2d_Curve::deletePoint(int thePos)
-{
-  if ( thePos >= 0 && thePos < myPoints.count() )
-    myPoints.removeAt( thePos );
-}
-
-/*!
-  Remove all points for curve.
-*/
-void Plot2d_Curve::clearAllPoints()
-{
-  myPoints.clear();
-}
-
-/*!
-  Gets curve's data : abscissas of points
-*/
-pointList Plot2d_Curve::getPointList() const
-{
-  return myPoints;
-}
-
-/*!
-  Sets curve's data. 
-*/
-void Plot2d_Curve::setData( const double* hData, const double* vData, long size, const QStringList& lst )
-{
-  clearAllPoints();
-  QStringList::const_iterator anIt = lst.begin(), aLast = lst.end(); 
-  for( long i = 0; i < size; i++, anIt++ )
-    addPoint( hData[i], vData[i], anIt==aLast ? QString() : *anIt );
-}
-
-/*!
-  Gets curve's data : abscissas of points
-*/
-double* Plot2d_Curve::horData() const
-{
-  int aNPoints = nbPoints();
-  double* aX = new double[aNPoints];
-  for (int i = 0; i < aNPoints; i++) {
-    aX[i] = myPoints[i].x;
-  }
-  return aX;
-}
-
-/*!
-  Gets curve's data : ordinates of points
-*/
-double* Plot2d_Curve::verData() const
-{
-  int aNPoints = nbPoints();
-  double* aY = new double[aNPoints];
-  for (int i = 0; i < aNPoints; i++) {
-    aY[i] = myPoints[i].y;
-  }
-  return aY;
-}
-
-/*!
-  Gets curve's data : number of points
-*/
-int Plot2d_Curve::nbPoints() const
-{
-  return myPoints.count();
-}
-
-/*!
-  Returns true if curve has no data
-*/
-bool Plot2d_Curve::isEmpty() const
-{
-  return myPoints.isEmpty();
-}
-
-/*!
-  Sets curve's AutoAssign flag - in this case attributes will be set automatically
-*/
-void Plot2d_Curve::setAutoAssign( bool on )
-{
-  myAutoAssign = on;
-}
-
-/*!
-  Gets curve's AutoAssign flag state
-*/
-bool Plot2d_Curve::isAutoAssign() const
-{
-  return myAutoAssign;
 }
 
 /*!
@@ -288,7 +168,7 @@ bool Plot2d_Curve::isAutoAssign() const
 void Plot2d_Curve::setColor( const QColor& color )
 {
   myColor = color;
-  myAutoAssign = false;
+  setAutoAssign( false );
 }
 
 /*!
@@ -300,24 +180,68 @@ QColor Plot2d_Curve::getColor() const
 }
 
 /*!
-  Sets curve's marker ( and resets AutoAssign flag )
+  Sets marker type and size ( and resets AutoAssign flag )
+*/
+void Plot2d_Curve::setMarker( Plot2d::MarkerType marker, const int markerSize )
+{
+  setMarker( marker );
+  setMarkerSize( markerSize );
+  setAutoAssign( false );
+}
+
+/*!
+  Sets marker type ( and resets AutoAssign flag )
 */
 void Plot2d_Curve::setMarker( Plot2d::MarkerType marker )
 {
   myMarker = marker;
-  myAutoAssign = false;
+  setAutoAssign( false );
+}
+
+/* Sets Qwt marker type
+ */
+void Plot2d_Curve::setMarkerStyle( QwtSymbol::Style style)
+{
+  myMarkerStyle = style;
 }
 
 /*!
-  Gets curve's marker
+  Gets marker type
 */
 Plot2d::MarkerType Plot2d_Curve::getMarker() const
 {
   return myMarker;
 }
 
+
+/* Gets Qwt marker type
+ */
+QwtSymbol::Style Plot2d_Curve::getMarkerStyle() const
+{
+  return myMarkerStyle;
+}
+
+
+
 /*!
-  Sets curve's line type and width ( and resets AutoAssign flag )
+  Sets new marker size ( and resets AutoAssign flag )
+*/
+void Plot2d_Curve::setMarkerSize( const int theSize )
+{
+  myMarkerSize = theSize < 0 ? 0 : theSize;
+  setAutoAssign( false );
+}
+
+/*!
+  Gets marker size
+*/
+int Plot2d_Curve::getMarkerSize() const
+{
+  return myMarkerSize;
+}
+
+/*!
+  Sets line type and width ( and resets AutoAssign flag )
   NOTE : A line width of 0 will produce a 1 pixel wide line using a fast algorithm for diagonals. 
          A line width of 1 will also produce a 1 pixel wide line, but uses a slower more accurate 
          algorithm for diagonals. 
@@ -325,14 +249,22 @@ Plot2d::MarkerType Plot2d_Curve::getMarker() const
 */
 void Plot2d_Curve::setLine( Plot2d::LineType line, const int lineWidth )
 {
-  myLine = line;
-  myLineWidth = lineWidth;
-  if ( myLineWidth < 0 ) myLineWidth = 0;
-  myAutoAssign = false;
+  setLine( line );
+  setLineWidth( lineWidth );
+  setAutoAssign( false );
 }
 
 /*!
-  Gets curve's line type
+  Sets line type ( and resets AutoAssign flag )
+*/
+void Plot2d_Curve::setLine( Plot2d::LineType line )
+{
+  myLine = line;
+  setAutoAssign( false );
+}
+
+/*!
+  Gets line type
 */
 Plot2d::LineType Plot2d_Curve::getLine() const
 {
@@ -340,81 +272,92 @@ Plot2d::LineType Plot2d_Curve::getLine() const
 }
 
 /*!
-  Gets curve's line width
+  Sets line width ( and resets AutoAssign flag )
+*/
+void Plot2d_Curve::setLineWidth( const int lineWidth )
+{
+  myLineWidth = lineWidth < 0 ? 0 : lineWidth;
+  setAutoAssign( false );
+}
+
+/*!
+  Gets line width
 */
 int Plot2d_Curve::getLineWidth() const
 {
   return myLineWidth;
 }
-
 /*!
-  Sets curve's y axis
+  Sets deviation data on the curve.
 */
-void Plot2d_Curve::setYAxis(QwtPlot::Axis theYAxis)
-{
-  if(theYAxis == QwtPlot::yLeft || theYAxis == QwtPlot::yRight)
-    myYAxis = theYAxis;
-}
-
-/*!
-  Gets curve's y axis
-*/
-QwtPlot::Axis Plot2d_Curve::getYAxis() const
-{
-  return myYAxis;
-}
-
-/*!
-  Gets curve's minimal abscissa
-*/
-double Plot2d_Curve::getMinX() const
-{
-  pointList::const_iterator aIt;
-  double aMinX = 1e150;
-  //int aCurrent = 0;
-  for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
-    if ( (*aIt).x < aMinX )
-      aMinX = (*aIt).x;
+void Plot2d_Curve::setDeviationData( const double* min, const double* max,const QList<int>& idx) {
+  for( int i = 0; i < idx.size(); i++ ) {
+    if(idx[i] < myPoints.size()) {
+      myPoints[idx[i]].setDeviation(min[i], max[i]);
+    }
   }
-  return aMinX;
 }
 
 /*!
-  Gets curve's minimal ordinate
+  Gets object's data
+*/
+void Plot2d_Curve::getDeviationData( double*& theMin, double*& theMax, QList<int>& idx) const
+{
+  int aNb = 0;
+  idx.clear();
+  for (int i = 0; i < nbPoints(); i++)
+    if(myPoints[i].hasDeviation())
+      aNb++;
+  if(aNb) {
+    double min, max;
+    theMin = new double[aNb];
+    theMax = new double[aNb];
+    for (int i = 0; i < nbPoints(); i++)
+      if(myPoints[i].hasDeviation()) {
+        myPoints[i].deviation(min,max);
+        theMin[i] = min;
+        theMax[i] = max;
+        idx.push_back(i);
+      }
+  }
+}
+
+/*!
+  Clear deviation data on the curve.
+*/
+void Plot2d_Curve::clearDeviationData() {
+  for( int i=0; i < myPoints.size(); i++ )
+    myPoints[i].clearDeviation();
+}
+
+/*!
+  Gets object's minimal ordinate
 */
 double Plot2d_Curve::getMinY() const
 {
-  pointList::const_iterator aIt;
   double aMinY = 1e150;
-  //int aCurrent = 0;
-  for(aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
-    if ( (*aIt).y < aMinY )
-      aMinY = (*aIt).y;
+  pointList::const_iterator aIt;
+  double coeff = 0.0;
+  for (aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {    
+    aMinY = qMin( aMinY, myScale * (*aIt).y );
+    if((*aIt).minDeviation(coeff))
+      aMinY = qMin( aMinY, coeff );
   }
   return aMinY;
 }
 
 /*!
-  Changes text assigned to point of curve
-  \param ind -- index of point
-  \param txt -- new text
+  Gets object's maximal ordinate
 */
-void Plot2d_Curve::setText( const int ind, const QString& txt )
+double Plot2d_Curve::getMaxY() const
 {
-  if( ind<0 || ind>=myPoints.count() )
-    return;
-
-  myPoints[ind].text = txt;
-}
-
-/*!
-  \return text assigned to point
-  \param ind -- index of point
-*/
-QString Plot2d_Curve::text( const int ind ) const
-{
-  if( ind<0 || ind>=myPoints.count() )
-    return QString();
-  else
-    return myPoints[ind].text;
+  double aMaxY = -1e150;
+  pointList::const_iterator aIt;
+  double coeff = 0.0;
+  for (aIt = myPoints.begin(); aIt != myPoints.end(); ++aIt) {
+    aMaxY = qMax( aMaxY, myScale * (*aIt).y);
+    if((*aIt).maxDeviation(coeff))
+      aMaxY = qMax( aMaxY, coeff);
+  }
+  return aMaxY;
 }

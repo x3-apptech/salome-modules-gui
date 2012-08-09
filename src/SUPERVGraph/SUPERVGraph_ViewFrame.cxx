@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SUPERVGraph : build Supervisor viewer into desktop
 //  File   : SUPERVGraph_ViewFrame.cxx
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SUPERVGraph_ViewFrame.h"
 
 #include <SUIT_ResourceMgr.h>
@@ -33,9 +32,6 @@
 //QT Include
 #include <QVBoxLayout>
 #include <QToolBar>
-
-using namespace std;
-
 
 /*!
   Constructor
@@ -93,6 +89,7 @@ SUPERVGraph_ViewFrame::SUPERVGraph_ViewFrame( SUIT_Desktop* theDesktop )
   setBackgroundColor(QColor(R,G,B));*/
 
   myToolBar = new QToolBar(this);
+  myToolBar->setFloatable(false);
   //myToolBar->setCloseMode(QDockWindow::Undocked);
   myToolBar->setWindowTitle(tr("LBL_TOOLBAR_LABEL"));
   createActions();
@@ -110,14 +107,14 @@ void SUPERVGraph_ViewFrame::createActions()
 
   // Panning
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_PAN" ) ),
-			  tr( "MNU_PAN_VIEW" ), 0, this);
+                          tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
   myActionsMap[ PanId ] = aAction;
 
   // Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "SUPERVGraph", tr( "ICON_SUPERVGraph_RESET" ) ),
-			  tr( "MNU_RESET_VIEW" ), 0, this);
+                          tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
   myActionsMap[ ResetId ] = aAction;
@@ -307,7 +304,7 @@ void SUPERVGraph_ViewFrame::onAdjustTrihedron()
   \param name - new name
 */
 void SUPERVGraph_ViewFrame::rename( const Handle(SALOME_InteractiveObject)& IObject, 
-				    QString newName )
+                                    QString newName )
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::rename" )
 }
@@ -328,7 +325,7 @@ void SUPERVGraph_ViewFrame::unHighlightAll()
   \param update - update current viewer
 */
 void SUPERVGraph_ViewFrame::highlight( const Handle(SALOME_InteractiveObject)& IObject, 
-				       bool highlight, bool immediatly ) 
+                                       bool highlight, bool immediatly ) 
 {
 //  MESSAGE ( "SUPERVGraph_ViewFrame::highlight" )
 }

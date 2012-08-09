@@ -1,29 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : SalomePyQt.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 #ifndef SALOME_PYQT_H
 #define SALOME_PYQT_H
+
+#include <Python.h>
 
 #include <QObject>
 #include <QString>
@@ -33,11 +36,12 @@
 #include <LightApp_Preferences.h>
 
 class LightApp_SelectionMgr;
-class SalomeApp_Application;
+class LightApp_Application;
 class QMenuBar;
 class QMenu;
 class QWidget;
 class QAction;
+class QTreeView;
 class QtxActionGroup;
 
 class SALOME_Selection : public QObject
@@ -46,7 +50,7 @@ class SALOME_Selection : public QObject
 
 public:
   ~SALOME_Selection();
-  static SALOME_Selection* GetSelection( SalomeApp_Application* );
+  static SALOME_Selection* GetSelection( LightApp_Application* );
 
   void Clear();
   void ClearIObjects();
@@ -120,15 +124,45 @@ public:
   static QMenuBar*         getMainMenuBar();
   static QMenu*            getPopupMenu( const MenuName );
   static QMenu*            getPopupMenu( const QString& );
+  static QTreeView*        getObjectBrowser();
   static SALOME_Selection* getSelection();
   static int               getStudyId();
   static void              putInfo( const QString&, const int = 0 );
   static const QString     getActiveComponent();
+  static PyObject*         getActivePythonModule();
+  static bool              activateModule( const QString& );
   static void              updateObjBrowser( const int = 0, bool = true );
+
+  static bool              isModified();
+  static void              setModified( bool );
 
   static QString           getFileName         ( QWidget*, const QString&, const QStringList&, const QString&, bool );
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& );
+
+  static QString           createObject(const QString& parent = QString(""));
+  static QString           createObject(const QString& name,
+                                        const QString& iconname,
+                                        const QString& tooltip,
+                                        const QString& parent = QString(""));
+
+  static void              removeObject( const QString& obj);
+  static void              removeChild( const QString& obj = QString(""));
+  static QStringList       getChildren(const QString& obj = QString(""), const bool rec = false);
+  static void              setName(const QString& obj,const QString& name);
+  static void              setIcon(const QString& obj,const QString& iconname);
+  static void              setToolTip(const QString& obj,const QString& tooltip);
+  static QString           getName(const QString& obj);
+  static QString           getToolTip(const QString& obj);
+
+  static void              setColor(const QString& obj,const QColor& color);
+  static QColor            getColor(const QString& obj);
+
+  static void              setReference( const QString& obj, 
+					 const QString& refEntry ); 
+  static QString           getReference( const QString& obj );
+
+  static QIcon             loadIcon( const QString&, const QString& );
 
   static void              helpContext( const QString&, const QString& );
 
@@ -143,23 +177,23 @@ public:
   static int               createTool( QAction*, const QString&, const int = -1, const int = -1 );
 
   static int               createMenu( const QString&, const int = -1,
-				       const int = -1, const int = -1, const int = -1 );
+                                       const int = -1, const int = -1, const int = -1 );
   static int               createMenu( const QString&, const QString& = QString(), 
-				       const int = -1, const int = -1, const int = -1 );
+                                       const int = -1, const int = -1, const int = -1 );
   static int               createMenu( const int,      const int = -1,
-				       const int = -1, const int = -1 );
+                                       const int = -1, const int = -1 );
   static int               createMenu( const int,      const QString& = QString(), 
-				       const int = -1, const int = -1 );
+                                       const int = -1, const int = -1 );
   static int               createMenu( QAction*,     const int,      const int = -1, 
-	                               const int = -1, const int = -1 );
+                                       const int = -1, const int = -1 );
   static int               createMenu( QAction*,     const QString&, const int = -1, 
-	                               const int = -1, const int = -1 );
+                                       const int = -1, const int = -1 );
 
   static QAction*          createSeparator();
 
   static QAction*          createAction( const int, const QString&,
-					 const QString& = QString(), const QString& = QString(), 
-					 const QString& = QString(), const int = 0, const bool = false );
+                                         const QString& = QString(), const QString& = QString(), 
+                                         const QString& = QString(), const int = 0, const bool = false );
   
   static QtxActionGroup*   createActionGroup( const int, const bool = true );
 
@@ -191,15 +225,15 @@ public:
   static int               addPreference( const QString&,
                                           const int, const int = PT_Auto,
                                           const QString& = QString(),
-				          const QString& = QString() );
+                                          const QString& = QString() );
   static QVariant          preferenceProperty( const int, const QString& );
   static void              setPreferenceProperty( const int, 
                                                   const QString&,
                                                   const QVariant& );
   static void              addPreferenceProperty( const int,
-						  const QString&,
-						  const int,
-						  const QVariant& );
+                                                  const QString&,
+                                                  const int,
+                                                  const QVariant& );
 
   static void              message( const QString&, bool = true );
   static void              clearMessages();
@@ -212,10 +246,13 @@ public:
   static QList<int>        findViews( const QString& );
   static bool              activateView( const int );
   static int               createView( const QString& );
+  static int               createView( const QString&, QWidget* );
   static bool              closeView( const int );
   static int               cloneView( const int );
-  static bool              isViewVisible( const int id );
-  
+  static bool              isViewVisible( const int );
+  static void              setViewClosable( const int, const bool );
+  static bool              isViewClosable( const int );
+
   static bool              groupAllViews();
   static bool              splitView( const int, const Orientation, const Action );
   static bool              moveView( const int, const int, const bool );

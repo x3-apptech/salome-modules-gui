@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : PyConsole_Interp.cxx
 //  Author : Nicolas REJNERI
@@ -84,12 +85,14 @@ PyConsole_Interp::~PyConsole_Interp()
  
 /*!
   \brief Initialize internal Python interpreter state.
+
+  When calling initState the GIL is not held
+  It must not be held on exit
+
   \return \c true on success
 */
 bool PyConsole_Interp::initState()
 {
-  // The GIL is acquired and will be held on initState output
-  // It is the caller responsability to release the lock if needed
   PyEval_AcquireLock();
   _tstate = Py_NewInterpreter(); // create an interpreter and save current state
   PySys_SetArgv(PyInterp_Interp::_argc,PyInterp_Interp::_argv); // initialize sys.argv
@@ -120,8 +123,8 @@ bool PyConsole_Interp::initState()
   \brief Initialize python interpeter context.
 
   The GIL is assumed to be held.
-  It is the caller responsability caller to acquire the GIL.
-  It will still be held on initContext() exit.
+  It is the caller responsability to acquire the GIL.
+  It must still be held on initContext() exit.
 
   \return \c true on success
 */

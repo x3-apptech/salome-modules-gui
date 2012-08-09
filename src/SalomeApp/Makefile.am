@@ -1,34 +1,37 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : SalomeApp
 #  $Header$
-#
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
+SUBDIRS=pluginsdemo
 
 if CPPUNIT_IS_OK
 if GUI_ENABLE_CORBA
-  SUBDIRS = Test
+  SUBDIRS += Test
 endif
 endif
 
@@ -94,13 +97,19 @@ MOC_FILES =					\
 
 nodist_libSalomeApp_la_SOURCES = $(MOC_FILES)
 
+# python modules
+salomepython_PYTHON = salome_pluginsmanager.py
+
+dist_salomescript_DATA = addvars2notebook.py
+
 dist_salomeres_DATA =		\
 	resources/SalomeApp.ini	\
 	resources/SalomeApp.xml
 
 nodist_salomeres_DATA =		\
 	SalomeApp_images.qm	\
-	SalomeApp_msg_en.qm
+	SalomeApp_msg_en.qm	\
+	SalomeApp_msg_fr.qm
 
 libSalomeApp_la_CPPFLAGS = $(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES)	\
 	$(CAS_CPPFLAGS) $(VTK_INCLUDES) $(BOOST_CPPFLAGS) @KERNEL_CXXFLAGS@	\
@@ -109,8 +118,8 @@ libSalomeApp_la_CPPFLAGS = $(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES)	\
 	-I$(srcdir)/../STD -I$(srcdir)/../VTKViewer -I$(srcdir)/../ObjBrowser	\
 	-I$(srcdir)/../PyConsole -I$(srcdir)/../TOOLSGUI			\
 	-I$(srcdir)/../PyInterp -I$(srcdir)/../Session -I$(top_builddir)/idl	\
-	-I$(srcdir)/../Event -I$(srcdir)/../CASCatch				\
-	-I$(top_builddir)/salome_adm/unix @CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @LIBXML_INCLUDES@
+	-I$(srcdir)/../Event -I$(srcdir)/../CASCatch  -I$(srcdir)/../Prs        \
+	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @LIBXML_INCLUDES@
 libSalomeApp_la_LDFLAGS = $(PYTHON_LIBS) $(QT_MT_LIBS) 
 libSalomeApp_la_LIBADD  = $(KERNEL_LDFLAGS) -lOpUtil -lSALOMELocalTrace -lSalomeDSClient		\
 	../SUIT/libsuit.la ../STD/libstd.la ../CAM/libCAM.la ../ObjBrowser/libObjBrowser.la	\
@@ -119,4 +128,4 @@ libSalomeApp_la_LIBADD  = $(KERNEL_LDFLAGS) -lOpUtil -lSALOMELocalTrace -lSalome
 	../SVTK/libSVTK.la ../SOCC/libSOCC.la ../PyInterp/libPyInterp.la			\
 	../PyConsole/libPyConsole.la ../LogWindow/libLogWindow.la				\
 	../LightApp/libLightApp.la ../TOOLSGUI/libToolsGUI.la ../Session/libSalomeSession.la	\
-	../Event/libEvent.la ../CASCatch/libCASCatch.la $(CAS_KERNEL)
+	../Event/libEvent.la ../CASCatch/libCASCatch.la ../Prs/libSalomePrs.la $(CAS_KERNEL)

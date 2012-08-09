@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "LightApp_ShowHideOp.h"
 #include "LightApp_Application.h"
 #include "LightApp_Module.h"
@@ -104,7 +105,7 @@ void LightApp_ShowHideOp::startOperation()
     {
       LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( app->moduleTitle( *anIt ), true );
       if( disp )
-	disp->EraseAll( false, false, 0 );
+        disp->EraseAll( false, false, 0 );
     }
     if( myActionType==ERASE_ALL )
     {
@@ -142,14 +143,20 @@ void LightApp_ShowHideOp::startOperation()
         entries.append( entry );
     }
 
-  for( QStringList::const_iterator it = entries.begin(), last = entries.end(); it!=last; it++ )
-  {
-    QString e = study->referencedToEntry( *it );
-    if( myActionType==DISPLAY || myActionType==DISPLAY_ONLY )
-      d->Display( e, false, 0 );
-    else if( myActionType==ERASE )
-      d->Erase( e, false, false, 0 );
+  // be sure to use real obejct entries
+  QStringList objEntries;
+  QStringList::const_iterator it = entries.begin(), last = entries.end();
+  for ( ; it!=last; ++it )
+    objEntries.append( study->referencedToEntry( *it ) ); 
+  
+  if( myActionType==DISPLAY || myActionType==DISPLAY_ONLY ) {
+    d->Display( objEntries, false, 0 );
+    mgr->setSelectedObjects(selObjs);
   }
+  else if( myActionType==ERASE ) {
+    d->Erase( objEntries, false, false, 0 );
+  }
+  
   d->UpdateViewer();
   commit();
 }

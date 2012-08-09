@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : 
 //  Author : 
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef SVTK_Renderer_h
 #define SVTK_Renderer_h
 
@@ -77,18 +76,18 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   virtual
   void 
   Initialize(vtkRenderWindowInteractor* theInteractor,
-	     SVTK_Selector* theSelector);
+             SVTK_Selector* theSelector);
 
   //----------------------------------------------------------------------------
   //! Publishes pointed actor into the renderer
   virtual
   void 
-  AddActor(VTKViewer_Actor* theActor);
+  AddActor(VTKViewer_Actor* theActor, bool theIsAdjustActors = true);
 
   //! Removes pointed actor from the renderer
   virtual
   void 
-  RemoveActor(VTKViewer_Actor* theActor);
+  RemoveActor(VTKViewer_Actor* theActor, bool theIsAdjustActors = true);
 
   //! Get special container that keeps scaling of the scene 
   VTKViewer_Transform* 
@@ -107,22 +106,22 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //! Applies color and size (PointSize and LineWidth) of primitives in selection mode
   void
   SetSelectionProp(const double& theRed = 1, 
-		   const double& theGreen = 1,
-		   const double& theBlue = 0, 
-		   const int& theWidth = 5);
+                   const double& theGreen = 1,
+                   const double& theBlue = 0, 
+                   const int& theWidth = 5);
 
   //! Applies color and size (PointSize and LineWidth) of primitives in preselection mode
   void
   SetPreselectionProp(const double& theRed = 0, 
-		      const double& theGreen = 1,
-		      const double& theBlue = 1, 
-		      const int& theWidth = 5);
+                      const double& theGreen = 1,
+                      const double& theBlue = 1, 
+                      const int& theWidth = 5);
 
   //! Setup requested tolerance for the picking
   void
   SetSelectionTolerance(const double& theTolNodes = 0.025, 
-			const double& theTolCell = 0.001,
-			const double& theTolObjects = 0.025);
+                        const double& theTolCell = 0.001,
+                        const double& theTolObjects = 0.025);
 
   //----------------------------------------------------------------------------
   //! Adjust all intenal actors (trihedron and graduated rules) to the scene
@@ -203,7 +202,13 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //! To reset direction of the camera to left view
   void OnLeftView();     
 
- protected:
+  //! To rotate view 90 degrees clockwise
+  void onClockWiseView();
+
+  //! To rotate view 90 degrees counterclockwise
+  void onAntiClockWiseView();
+
+protected:
   SVTK_Renderer();
   ~SVTK_Renderer();
 

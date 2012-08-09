@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      Qtx.h
 // Author:    Sergey TELKOV
 //
@@ -26,7 +27,7 @@
 #define QTX_H
 
 #if defined WIN32
-#  if defined QTX_EXPORTS
+#  if defined QTX_EXPORTS || defined qtx_EXPORTS
 #    define QTX_EXPORT _declspec( dllexport )
 #  else
 #    define QTX_EXPORT _declspec( dllimport )
@@ -46,13 +47,11 @@
 #include <QColor>
 #include <QImage>
 #include <QPixmap>
+#include <QGradient>
 
 class QObject;
 class QWidget;
 class QCompleter;
-class QLinearGradient;
-class QRadialGradient;
-class QConicalGradient;
 
 typedef QList<int>    QIntList;       //!< list of int values
 typedef QList<short>  QShortList;     //!< list of short int values
@@ -100,10 +99,102 @@ public:
   };
 
   typedef enum {
-	Shown,   //!< column should be always visible
-	Hidden,  //!< column should be always hidden
-	Toggled  //!< it should be possible to show/hide the column with help of popup menu
+        Shown,   //!< column should be always visible
+        Hidden,  //!< column should be always hidden
+        Toggled  //!< it should be possible to show/hide the column with help of popup menu
   } Appropriate;  //!< appropriate status
+
+  //! Environment variables substitution mode
+  typedef enum {
+        Always, //!< substitute environment variable by it's value if variable exists, and "" otherwise
+        Never,  //!< keep environment variable as is without any substitution
+        Auto    //!< substitute environment variable by it's value if variable exists, and keep it as is otherwise
+  } SubstMode;
+
+  //! object visibility state
+  typedef enum {
+    ShownState,             //!< Object is shown in viewer
+    HiddenState,            //!< Object is hidden in viewer
+    UnpresentableState,     //!< Unpresentable object
+  } VisibilityState;
+
+  //! Header view flags
+  typedef enum {
+    ShowText = 0x001,                //!< Show only text in the header
+    ShowIcon = 0x010,                //!< Show only icon in the header
+    ShowAll  = ShowText | ShowIcon   //!< Show icon and text in the header
+  } HeaderViewFlags;
+
+  //! Type of the custom data (for custom tree model)
+  typedef enum {
+    IdType
+  } CustomDataType;
+  
+  //! Background mode
+  typedef enum { 
+    NoBackground,              // no (invalid) background data
+    ColorBackground,           // single color
+    SimpleGradientBackground,  // simple two-color gradient
+    CustomGradientBackground   // custom (complex) gradient
+  } BackgroundMode;
+
+  //! Texture mode
+  typedef enum { 
+    CenterTexture,             // center texture
+    TileTexture,               // tile texture
+    StretchTexture,            // stretch texture
+  } TextureMode;
+
+  class QTX_EXPORT Localizer
+  {
+  public:
+    Localizer();
+    ~Localizer();
+  private:
+    QString myCurLocale;
+  };
+
+  class QTX_EXPORT BackgroundData
+  {
+  public:
+    BackgroundData();
+    BackgroundData( const QColor& );
+    BackgroundData( int, const QColor&, const QColor& );
+    BackgroundData( const QGradient& );
+    virtual ~BackgroundData();
+
+    bool operator==( const BackgroundData&) const;
+    inline bool operator!=( const BackgroundData& other ) const
+    { return !operator==( other ); }
+
+    bool             isValid() const;
+    
+    BackgroundMode   mode() const;
+    void             setMode( const BackgroundMode );
+    
+    TextureMode      texture( QString& ) const;
+    void             setTexture( const QString&, TextureMode = Qtx::CenterTexture );
+    bool             isTextureShown() const;
+    void             setTextureShown( bool );
+
+    QColor           color() const;
+    void             setColor( const QColor& );
+
+    int              gradient( QColor&, QColor& ) const;
+    void             setGradient( int, const QColor&, const QColor& );
+
+    const QGradient* gradient() const;
+    void             setGradient( const QGradient& );
+  
+  private:
+    BackgroundMode   myMode;
+    TextureMode      myTextureMode;
+    QString          myFileName;
+    QColorList       myColors;
+    int              myGradientType;
+    QGradient        myGradient;
+    bool             myTextureShown;
+  };
 
   static QString     toQString( const char*, const int = -1 );
   static QString     toQString( const short*, const int = -1 );
@@ -132,6 +223,8 @@ public:
   static QString     addSlash( const QString& );
 
   static QCompleter* pathCompleter( const PathType, const QString& = QString() );
+  static QString     findEnvVar( const QString&, int&, int& );
+  static QString     makeEnvVarSubst( const QString&, const SubstMode = Auto );
 
   static int         rgbSet( const QColor& );
   static int         rgbSet( const int, const int, const int );
@@ -151,6 +244,9 @@ public:
 
   static QString     colorToString( const QColor& );
   static bool        stringToColor( const QString&, QColor& );
+  static QString     biColorToString( const QColor&, const int );
+  static bool        stringToBiColor( const QString&, QColor&, int& );
+  static QColor      mainColorToSecondary( const QColor&, int );
 
   static QString     gradientToString( const QLinearGradient& );
   static QString     gradientToString( const QRadialGradient& );
@@ -158,6 +254,14 @@ public:
   static bool        stringToLinearGradient( const QString&, QLinearGradient& );
   static bool        stringToRadialGradient( const QString&, QRadialGradient& );
   static bool        stringToConicalGradient( const QString&, QConicalGradient& );
+
+  static QString        backgroundToString( const BackgroundData& );
+  static BackgroundData stringToBackground( const QString& );
+
+#ifndef WIN32
+  static void*       getDisplay();
+  static Qt::HANDLE  getVisual();
+#endif
 };
 
 #endif

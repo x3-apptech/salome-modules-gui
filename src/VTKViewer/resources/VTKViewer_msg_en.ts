@@ -1,29 +1,24 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
+    <message>
+        <source>DSC_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate view counterclockwise</translation>
+    </message>
+    <message>
+        <source>DSC_CLOCKWISE_VIEW</source>
+        <translation>Rotate View Clockwise</translation>
+    </message>
+    <message>
+        <source>MNU_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate counterclockwise</translation>
+    </message>
+    <message>
+        <source>MNU_CLOCKWISE_VIEW</source>
+        <translation>Rotate clockwise</translation>
+    </message>
     <message>
         <source>MNU_FRONT_VIEW</source>
         <translation>Front</translation>
@@ -166,6 +161,44 @@
     </message>
 </context>
 <context>
+    <name>VTKViewer_MarkerDlg</name>
+    <message>
+        <source>SET_MARKER_TLT</source>
+        <translation>Set Point Marker</translation>
+    </message>
+</context>
+<context>
+    <name>VTKViewer_MarkerWidget</name>
+    <message>
+        <source>STANDARD_MARKER</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>CUSTOM_MARKER</source>
+        <translation>Custom</translation>
+    </message>
+    <message>
+        <source>TYPE</source>
+        <translation>Type:</translation>
+    </message>
+    <message>
+        <source>SCALE</source>
+        <translation>Scale:</translation>
+    </message>
+    <message>
+        <source>CUSTOM</source>
+        <translation>Texture:</translation>
+    </message>
+    <message>
+        <source>BROWSE</source>
+        <translation>Browse...</translation>
+    </message>
+    <message>
+        <source>LOAD_TEXTURE_TLT</source>
+        <translation>Load Texture</translation>
+    </message>
+</context>
+<context>
     <name>VTKViewer_ViewManager</name>
     <message>
         <source>VTK_VIEW_TITLE</source>
@@ -183,8 +216,44 @@
         <translation>Show Toolbar</translation>
     </message>
     <message>
-        <source>MEN_CHANGE_BACKGROUD</source>
+        <source>MEN_CHANGE_BACKGROUND</source>
         <translation>Change Background...</translation>
+    </message>
+    <message>
+        <source>GT_HORIZONTALGRADIENT</source>
+        <translation>Horizontal gradient</translation>
+    </message>
+    <message>
+        <source>GT_VERTICALGRADIENT</source>
+        <translation>Vertical gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTDIAGONALGRADIENT</source>
+        <translation>First diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDDIAGONALGRADIENT</source>
+        <translation>Second diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTCORNERGRADIENT</source>
+        <translation>First corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDCORNERGRADIENT</source>
+        <translation>Second corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_THIRDCORNERGRADIENT</source>
+        <translation>Third corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_FOURTHCORNERGRADIENT</source>
+        <translation>Fourth corner gradient</translation>
+    </message>
+    <message>
+        <source>BG_IMAGE_FILES</source>
+        <translation>Image files (*.png *.jpg *.jpeg *.bmp *.tif *.tiff *.mhd *.mha)</translation>
     </message>
 </context>
 </TS>

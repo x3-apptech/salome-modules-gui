@@ -1,33 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME Session : implementation of Session_ServerThread.cxx
 //  File   : Session_ServerThread.cxx
 //  Author : Paul RASCLE, EDF
-//  Module : SALOME
-//  $Header$
-// #include <SALOMEconfig.h>
-// #include CORBA_SERVER_HEADER(SALOME_Session)
-// #include CORBA_SERVER_HEADER(SALOMEDS)
-//
+
 #include "Session_ServerThread.hxx"
 
 #include <SALOME_NamingService.hxx>
@@ -38,7 +34,6 @@
 #include <RegistryService.hxx>
 
 #include "Session_Session_i.hxx"
-#include "SalomeApp_Engine_i.hxx"
 
 #include <Utils_ORB_INIT.hxx>
 #include <Utils_SINGLETON.hxx>
@@ -53,15 +48,12 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-using namespace std;
-
-const int Session_ServerThread::NB_SRV_TYP = 7;
+const int Session_ServerThread::NB_SRV_TYP = 6;
 const char* Session_ServerThread::_serverTypes[NB_SRV_TYP] = {"Container",
-							      "ModuleCatalog",
-							      "Registry",
-							      "SALOMEDS",
-							      "Session",
-							      "SalomeAppEngine",
+                                                              "ModuleCatalog",
+                                                              "Registry",
+                                                              "SALOMEDS",
+                                                              "Session",
                                                               "ContainerManager"};
 
 /*! 
@@ -76,9 +68,9 @@ Session_ServerThread::Session_ServerThread()
   constructor
 */
 Session_ServerThread::Session_ServerThread(int argc,
-					   char ** argv, 
-					   CORBA::ORB_ptr orb, 
-					   PortableServer::POA_ptr poa)
+                                           char ** argv, 
+                                           CORBA::ORB_ptr orb, 
+                                           PortableServer::POA_ptr poa)
 {
   //MESSAGE("Session_ServerThread Constructor " << argv[0]);
   _argc = argc;
@@ -123,64 +115,58 @@ void Session_ServerThread::Init()
       MESSAGE("Server Thread type : "<<_serverTypes[i]);
       switch (_servType) {
       case 0:  // Container
-	{
-	  NamingService_WaitForServerReadiness(_NS,"/Registry");
-	  NamingService_WaitForServerReadiness(_NS,"/ContainerManager");
-	  ActivateContainer(_argc, _argv);
-	  break;
-	}
+        {
+          NamingService_WaitForServerReadiness(_NS,"/Registry");
+          NamingService_WaitForServerReadiness(_NS,"/ContainerManager");
+          ActivateContainer(_argc, _argv);
+          break;
+        }
       case 1:  // ModuleCatalog
-	{
-	  NamingService_WaitForServerReadiness(_NS,"/Registry");
-	  ActivateModuleCatalog(_argc, _argv);
-	  break;
-	}
+        {
+          NamingService_WaitForServerReadiness(_NS,"/Registry");
+          ActivateModuleCatalog(_argc, _argv);
+          break;
+        }
       case 2:  // Registry
-	{
-	  NamingService_WaitForServerReadiness(_NS,"");
-	  ActivateRegistry(_argc, _argv);
-	  break;
-	}
+        {
+          NamingService_WaitForServerReadiness(_NS,"");
+          ActivateRegistry(_argc, _argv);
+          break;
+        }
       case 3:  // SALOMEDS
-	{
-	  NamingService_WaitForServerReadiness(_NS,"/Kernel/ModulCatalog");
-	  ActivateSALOMEDS(_argc, _argv);
-	  break;
-	}
+        {
+          NamingService_WaitForServerReadiness(_NS,"/Kernel/ModulCatalog");
+          ActivateSALOMEDS(_argc, _argv);
+          break;
+        }
       case 4:  // Session
-	{
-	  NamingService_WaitForServerReadiness(_NS,"/myStudyManager");
-	  string containerName = "/Containers/";
-	  containerName = containerName + Kernel_Utils::GetHostname();
-	  containerName = containerName + "/FactoryServer";
-	  NamingService_WaitForServerReadiness(_NS,containerName);
-	  ActivateSession(_argc, _argv);
-	  break;
-	}
-      case 5: // SalomeApp_Engine
-	{
-	  NamingService_WaitForServerReadiness(_NS,"/myStudyManager");
-	  ActivateEngine(_argc, _argv);
-	  break;
-	}
-      case 6: // Container Manager
-	{
-	  NamingService_WaitForServerReadiness(_NS,"");
-	  ActivateContainerManager(_argc, _argv);
-	  break;
-	}
+        {
+          NamingService_WaitForServerReadiness(_NS,"/myStudyManager");
+          std::string containerName = "/Containers/";
+          containerName = containerName + Kernel_Utils::GetHostname();
+          containerName = containerName + "/FactoryServer";
+          NamingService_WaitForServerReadiness(_NS,containerName);
+          ActivateSession(_argc, _argv);
+          break;
+        }
+      case 5: // Container Manager
+        {
+          NamingService_WaitForServerReadiness(_NS,"");
+          ActivateContainerManager(_argc, _argv);
+          break;
+        }
       default:
-	{
-	  ASSERT(0);
-	  break;
-	}
+        {
+          ASSERT(0);
+          break;
+        }
       }
     }
   }
 }
 
 void Session_ServerThread::ActivateModuleCatalog(int argc,
-						 char ** argv)
+                                                 char ** argv)
 {
   try {
     MESSAGE("ModuleCatalog thread started");
@@ -215,7 +201,7 @@ void Session_ServerThread::ActivateModuleCatalog(int argc,
 }
 
 void Session_ServerThread::ActivateSALOMEDS(int argc,
-					    char ** argv)
+                                            char ** argv)
 {
   try {
     MESSAGE("SALOMEDS thread started");
@@ -243,7 +229,7 @@ void Session_ServerThread::ActivateSALOMEDS(int argc,
 }
 
 void Session_ServerThread::ActivateRegistry(int argc,
-					    char ** argv)
+                                            char ** argv)
 {
   MESSAGE("Registry thread started");
   SCRUTE(argc); 
@@ -265,10 +251,11 @@ void Session_ServerThread::ActivateRegistry(int argc,
   const char *registryName = "Registry";
   Registry::Components_var varComponents;
   try {
-    RegistryService *ptrRegistry = SINGLETON_<RegistryService>::Instance();
+    RegistryService *ptrRegistry = new RegistryService;
     ptrRegistry->SessionName( ptrSessionName );
     ptrRegistry->SetOrb(_orb);
     varComponents = ptrRegistry->_this();
+    ptrRegistry->_remove_ref(); //let poa manage registry service deletion
     // The RegistryService must not already exist.
     
     try {
@@ -281,9 +268,8 @@ void Session_ServerThread::ActivateRegistry(int argc,
     }
     catch( const CORBA::Exception &/*exx*/ ) {
     }
-    string absoluteName = string("/") + registryName;
+    std::string absoluteName = std::string("/") + registryName;
     _NS->Register( varComponents , absoluteName.c_str() );
-    MESSAGE("On attend les requetes des clients");
   }
   catch( const SALOME_Exception &ex ) {
     INFOS( "Communication Error : " << ex.what() );
@@ -292,12 +278,12 @@ void Session_ServerThread::ActivateRegistry(int argc,
 }
 
 void Session_ServerThread::ActivateContainerManager(int argc,
-					     char ** argv)
+                                             char ** argv)
 {
   try {
     PortableServer::POA_var root_poa=PortableServer::POA::_the_root_poa();
-    cout << "Activate SalomeLauncher ......!!!! " << endl;
-    SALOME_Launcher * myContainer = new SALOME_Launcher(_orb,root_poa);
+    std::cout << "Activate SalomeLauncher ......!!!! " << std::endl;
+    new SALOME_Launcher(_orb,root_poa);
   }
   catch(CORBA::SystemException&) {
     INFOS("Caught CORBA::SystemException.");
@@ -317,7 +303,7 @@ void Session_ServerThread::ActivateContainerManager(int argc,
 }
 
 void Session_ServerThread::ActivateContainer(int argc,
-					     char ** argv)
+                                             char ** argv)
 {
   try {
     MESSAGE("Container thread started");
@@ -333,25 +319,25 @@ void Session_ServerThread::ActivateContainer(int argc,
       MESSAGE("factory_poa does not exists, create...");
       // define policy objects     
       PortableServer::ImplicitActivationPolicy_var implicitActivation =
-	_root_poa->create_implicit_activation_policy(PortableServer::NO_IMPLICIT_ACTIVATION);
+        _root_poa->create_implicit_activation_policy(PortableServer::NO_IMPLICIT_ACTIVATION);
       // default = NO_IMPLICIT_ACTIVATION
       PortableServer::ThreadPolicy_var threadPolicy =
-	_root_poa->create_thread_policy(PortableServer::ORB_CTRL_MODEL);
+        _root_poa->create_thread_policy(PortableServer::ORB_CTRL_MODEL);
       // default = ORB_CTRL_MODEL, other choice SINGLE_THREAD_MODEL
       
       // create policy list
       CORBA::PolicyList policyList;
       policyList.length(2);
       policyList[0] = PortableServer::ImplicitActivationPolicy::
-	_duplicate(implicitActivation);
+        _duplicate(implicitActivation);
       policyList[1] = PortableServer::ThreadPolicy::
-	_duplicate(threadPolicy);
+        _duplicate(threadPolicy);
       
       PortableServer::POAManager_var nil_mgr
-	= PortableServer::POAManager::_nil();
+        = PortableServer::POAManager::_nil();
       factory_poa = _root_poa->create_POA("factory_poa",
-					  nil_mgr,
-					  policyList);
+                                          nil_mgr,
+                                          policyList);
       //with nil_mgr instead of pman,
       //a new POA manager is created with the new POA
       
@@ -365,13 +351,12 @@ void Session_ServerThread::ActivateContainer(int argc,
       MESSAGE("pmanfac->activate()");
     }
     
-    char *containerName = "";
+    char *containerName = (char*)"";
     if (argc >1) {
       containerName = argv[1];
     }
     
-    Engines_Container_i * myContainer 
-      = new Engines_Container_i(_orb, _root_poa, containerName , argc , argv , true , false);
+    new Engines_Container_i(_orb, _root_poa, containerName , argc , argv , true , false);
   }
   catch(CORBA::SystemException&) {
     INFOS("Caught CORBA::SystemException.");
@@ -390,31 +375,8 @@ void Session_ServerThread::ActivateContainer(int argc,
   }
 }
 
-void Session_ServerThread::ActivateEngine(int /*argc*/, char ** /*argv*/)
-{
-  try {
-    MESSAGE("SalomeApp_Engine thread started");
-    SalomeApp_Engine_i* anEngine = new SalomeApp_Engine_i();
-    PortableServer::ObjectId_var id =_root_poa->activate_object( anEngine );
-    MESSAGE("poa->activate_object( SalomeApp_Engine )");
-
-    CORBA::Object_var obj = anEngine->_this();
-    anEngine->_remove_ref();
-    _NS->Register( obj ,"/SalomeAppEngine");
-  }
-  catch (CORBA::SystemException&) {
-    INFOS("Caught CORBA::SystemException.");
-  }
-  catch (CORBA::Exception&) {
-    INFOS("Caught CORBA::Exception.");
-  }
-  catch (...) {
-    INFOS("Caught unknown exception.");
-  }
-}
-
 void Session_ServerThread::ActivateSession(int argc,
-					   char ** argv)
+                                           char ** argv)
 {
   MESSAGE("Session_ServerThread::ActivateSession() not implemented!");
 }
@@ -423,11 +385,11 @@ void Session_ServerThread::ActivateSession(int argc,
   constructor 
 */
 Session_SessionThread::Session_SessionThread(int argc,
-					     char** argv, 
-					     CORBA::ORB_ptr orb, 
-					     PortableServer::POA_ptr poa,
-					     QMutex* GUIMutex,
-					     QWaitCondition* GUILauncher)
+                                             char** argv, 
+                                             CORBA::ORB_ptr orb, 
+                                             PortableServer::POA_ptr poa,
+                                             QMutex* GUIMutex,
+                                             QWaitCondition* GUILauncher)
 : Session_ServerThread(argc, argv, orb, poa),
   _GUIMutex( GUIMutex ),
   _GUILauncher( GUILauncher )
@@ -442,7 +404,7 @@ Session_SessionThread::~Session_SessionThread()
 }
 
 void Session_SessionThread::ActivateSession(int argc,
-					    char ** argv)
+                                            char ** argv)
 {
   try {
     MESSAGE("Session thread started");

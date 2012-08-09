@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "SUIT_LicenseDlg.h"
 
 #include <QApplication>
@@ -50,10 +48,10 @@ SUIT_LicenseDlg::SUIT_LicenseDlg( bool firstShow, QWidget* parent, const char* n
   setObjectName( name );
   setModal( modal );
   QString env;
-  if ( ::getenv( "TRIPOLI_ROOT_DIR" ) )
-    env = ::getenv( "TRIPOLI_ROOT_DIR" );
+  if ( ::getenv( "SALOME_LICENSE_FILE" ) )
+    env = ::getenv( "SALOME_LICENSE_FILE" );
  
-  QFile file( env + "/share/salome/resources/License.txt" ); // Read the text from a file
+  QFile file( env ); // Read the text from a file
   
   if ( !file.exists() || !file.open( QIODevice::ReadOnly ) )
     return;
@@ -108,8 +106,8 @@ SUIT_LicenseDlg::SUIT_LicenseDlg( bool firstShow, QWidget* parent, const char* n
 }
 
 /*!
-	Name: ~SUIT_LicenseDlg [public]
-	Desc: Destructor
+        Name: ~SUIT_LicenseDlg [public]
+        Desc: Destructor
 */
 
 SUIT_LicenseDlg::~SUIT_LicenseDlg()
@@ -175,20 +173,20 @@ void SUIT_LicenseDlg::onPrint()
 
     // convert text to rich text format
     QString aFormattedText = Qt::convertFromPlainText( myTextEdit->toPlainText() );
-	
+        
     QTextDocument aRichText( aFormattedText );
     aRichText.setDefaultFont( aBodyFont );
 
 
     /*QSimpleRichText aRichText( aFormattedText,
-			       aBodyFont,
-			       myTextEdit->context(),
-			       myTextEdit->styleSheet(),
-			       myTextEdit->mimeSourceFactory(),
-			       aBody.height() );
+                               aBodyFont,
+                               myTextEdit->context(),
+                               myTextEdit->styleSheet(),
+                               myTextEdit->mimeSourceFactory(),
+                               aBody.height() );
     */
     aRichText.setPageSize( QSize( aBody.width(), aRichText.pageSize().height() ) );
-	//aRichText.setWidth( &aPainter, aBody.width() );
+        //aRichText.setWidth( &aPainter, aBody.width() );
     
     QRect aView( aBody );
     
@@ -197,7 +195,7 @@ void SUIT_LicenseDlg::onPrint()
     do {
       // print page text
       aRichText.drawContents( &aPainter, aView );
-	  //aRichText.draw( &aPainter, aBody.left(), aBody.top(), aView, colorGroup() );
+          //aRichText.draw( &aPainter, aBody.left(), aBody.top(), aView, colorGroup() );
       aView.translate( 0, aBody.height() );
       aPainter.translate( 0 , -aBody.height() );
       
@@ -206,10 +204,10 @@ void SUIT_LicenseDlg::onPrint()
       aPainter.setFont(aFooterFont);
       QString aFooter = QString("Page ") + QString::number(aPageIndex);
       aPainter.drawText( aView.right() - aPainter.fontMetrics().width( aFooter ),
-			 aView.bottom() + aPainter.fontMetrics().ascent() + 5, aFooter );
+                         aView.bottom() + aPainter.fontMetrics().ascent() + 5, aFooter );
       
       if ( aView.top() >= aRichText.size().height() )
-	break;
+        break;
       aPrinter.newPage();
       aPageIndex++;
     } while (true);

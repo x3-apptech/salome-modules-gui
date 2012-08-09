@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef VTKVIEWER_GEOMETRYFILTER_H
 #define VTKVIEWER_GEOMETRYFILTER_H
 
@@ -26,11 +27,14 @@
 
 #include <vtkGeometryFilter.h>
 
+#include <map>
 #include <vector>
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )
 #endif
+
+class vtkUnstructuredGrid;
 
 /*! \brief This class used same as vtkGeometryFilter. See documentation on VTK for more information.
  */
@@ -59,6 +63,19 @@ public:
    * \brief Sets \a myIsWireframeMode flag. \a myIsWireframeMode is changed, call this->Modified().
    * \param theIsWireframeMode - used for changing value of \a myIsWireframeMode variable.
    */
+
+  int GetAppendCoincident3D() const;
+  /*! \fn void SetAppendCoincident3D()
+   *  \brief Sets \a myAppendCoincident3D flag. If this flag is true, filter append to the 
+      result data set coincident 3D elements.
+   */
+
+  void SetAppendCoincident3D(int theFlag);
+  /*! \fn int SetAppendCoincident3D()
+   * \brief Return value of \a myAppendCoincident3D
+   * \retval myAppendCoincident3D
+   */
+
   void SetWireframeMode(int theIsWireframeMode);
   /*! \fn int GetWireframeMode()
    * \brief Return value of \a myIsWireframeMode
@@ -86,6 +103,20 @@ public:
    */
   virtual vtkIdType GetElemObjId(int theVtkID);
 
+  virtual void SetQuadraticArcMode(bool theFlag);
+  virtual bool GetQuadraticArcMode() const;
+
+  virtual void   SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
+  virtual vtkFloatingPointType GetQuadraticArcAngle() const;
+
+  typedef std::vector<vtkIdType> TVectorId;
+  typedef std::map<vtkIdType, TVectorId> TMapOfVectorId;
+
+  static void InsertId( const vtkIdType theCellId,
+                        const vtkIdType theCellType,
+                        TVectorId& theVTK2ObjIds,
+                        TMapOfVectorId& theDimension2VTK2ObjIds );
+
 protected:
   /*! \fn VTKViewer_GeometryFilter();
    * \brief Constructor which sets \a myShowInside = 0 and \a myStoreMapping = 0
@@ -104,15 +135,23 @@ protected:
    * \brief Filter culculation method for data object type is VTK_UNSTRUCTURED_GRID.
    */
   int UnstructuredGridExecute (vtkDataSet *, vtkPolyData *, vtkInformation *);
-    
-private:
-  typedef std::vector<vtkIdType> TVectorId;
 
+
+  void BuildArcedPolygon(vtkIdType cellId,
+                         vtkUnstructuredGrid* input,
+                         vtkPolyData *output,
+                         TMapOfVectorId& theDimension2VTK2ObjIds,
+                         bool triangulate = false);
+    
 private:
   TVectorId myVTK2ObjIds;
   int       myShowInside;
   int       myStoreMapping;
   int       myIsWireframeMode;
+  int       myAppendCoincident3D;
+
+  vtkFloatingPointType    myMaxArcAngle;   // define max angle for mesh 2D quadratic element in the degrees
+  bool      myIsBuildArc;     // flag for representation 2D quadratic element as arked polygon
 };
 
 #ifdef WIN32

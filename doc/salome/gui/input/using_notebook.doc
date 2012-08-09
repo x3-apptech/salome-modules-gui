@@ -2,9 +2,8 @@
 
 \page using_notebook Using NoteBook
 
-SALOME <b>NoteBook</b> is destined for managing numerical and boolean
-parameters (variables) which are used to create and modify objects in
-different components.
+SALOME <b>NoteBook</b> allows to predefine numerical and boolean
+parameters (variables).
 
 To open the <b>NoteBook</b> choose <b>File > Notebook</b>, the following
 dialog box will appear:
@@ -19,8 +18,22 @@ study, you should click <b>Update Study</b> button to apply your changes
 to the study.
 
 \note The dialog will not be validated until at least one of variables in
-the table has invalid name or value (marked by red color). Names of
+the table has an invalid name or value (marked by red color). The names of
 variables should be unique and their values should be numerical (integer or
 double) or boolean ("True" / "False").
+
+Here is an example of setting of variables in python scripts:
+\code
+import salome_notebook
+
+notebook = salome_notebook.notebook
+
+notebook.set("Length", 100)
+notebook.set("Radius", 37.5)
+notebook.set("Flag", True)
+\endcode
+
+Later these values can be used as parameters for any operations in
+various components.
 
 */

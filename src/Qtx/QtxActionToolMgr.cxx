@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxActionToolMgr.cxx
 // Author:    Alexander SOLOVYOV, Sergey TELKOV
 //
@@ -27,6 +28,8 @@
 #include "QtxAction.h"
 #include "QtxToolBar.h"
 
+#include <QApplication>
+#include <QHideEvent>
 #include <QMainWindow>
 
 /*!
@@ -96,9 +99,30 @@ QMainWindow* QtxActionToolMgr::mainWindow() const
   \param title toolbar title
   \param tid requested toolbar ID
   \param mw parent main window; if it is null, the tool manager's main window is used
+  \param vis show toolbar visible immediately after creation (true by default)
   \return id of created/found toolbar
 */
-int QtxActionToolMgr::createToolBar( const QString& title, const int tid, QMainWindow* mw )
+int QtxActionToolMgr::createToolBar( const QString& title, const int tid, QMainWindow* mw, bool vis )
+{
+  return createToolBar( title, true, Qt::AllToolBarAreas, tid, mw, vis );
+}
+
+/*!
+  \brief Create toolbar and assign \a id to it.
+
+  If \a tid is less than 0, the identifier is generated automatically.
+  If toolbar with given \a tid is already registered, the toolbar will not be created.
+
+  \param title toolbar title
+  \param floatable if \c true, new toolbar is made floatable
+  \param dockAreas dock areas of the main window where the new toolbar can be situated
+  \param tid requested toolbar ID
+  \param mw parent main window; if it is null, the tool manager's main window is used
+  \param vis show toolbar visible immediately after creation (true by default)
+  \return id of created/found toolbar
+*/
+int QtxActionToolMgr::createToolBar( const QString& title, bool floatable, Qt::ToolBarAreas dockAreas, 
+                                     int tid, QMainWindow* mw, bool vis )
 {
   static int _toolBarId = -1;
 
@@ -124,10 +148,16 @@ int QtxActionToolMgr::createToolBar( const QString& title, const int tid, QMainW
   if ( !tb )
   {
     tb = new QtxToolBar( true, tbw );
+    //tb->setVisible( false );  // VSR: create toolbar visible initially
+    tb->setFloatable( floatable );
+    tb->setAllowedAreas( dockAreas );
+    tb->setMovable( dockAreas & Qt::AllToolBarAreas );
     //mainWindow()->addToolBar( tb );
     tb->setWindowTitle( title );
     tb->setObjectName( title );
     tb->setToolTip( title );
+    if ( !vis )
+      QApplication::postEvent( tb, new QHideEvent());
    }
 
   tInfo.toolBar = tb;
@@ -387,6 +417,15 @@ QToolBar* QtxActionToolMgr::toolBar( const QString& title ) const
 }
 
 /*!
+  \bried Get all registered toolbars identifiers
+  \return list of toolbars ids
+*/
+QIntList QtxActionToolMgr::toolBarsIds() const
+{
+  return myToolBars.keys();
+}
+
+/*!
   \brief Check if toolbar with given \a id already registered.
   \param tid toolbar ID
   \return \c true if toolbar is registered in the toolbar manager
@@ -420,11 +459,32 @@ bool QtxActionToolMgr::containsAction( const int id, const int tid ) const
     {
       const NodeList& list = it.value().nodes;
       for ( NodeList::const_iterator nit = list.begin(); nit != list.end(); ++nit )
-	if ( (*nit).id == id )
-	  return true;
+        if ( (*nit).id == id )
+          return true;
     }
   }
   return false;
+}
+
+/*!
+  \brief Get index of the action \a id within the toolbar \a tid
+  \param id action ID
+  \param tid toolbar ID
+  \return index of the action in the toolbar or -1 if action is not contained in the toolbar
+*/
+int QtxActionToolMgr::index( const int id, const int tid ) const
+{
+  for ( ToolBarMap::ConstIterator it = myToolBars.begin(); it != myToolBars.end(); ++it )
+  {
+    if ( it.key() == tid )
+    {
+      const NodeList& list = it.value().nodes;
+      int idx = 0;
+      for ( NodeList::const_iterator nit = list.begin(); nit != list.end(); ++nit, ++idx )
+        if ( (*nit).id == id ) return idx;
+    }
+  }
+  return -1;
 }
 
 /*!

@@ -1,27 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:   SUIT_TreeModel.h
 // Author: Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #ifndef SUIT_TREEMODEL_H
 #define SUIT_TREEMODEL_H
 
@@ -34,6 +32,7 @@
 #include <QModelIndex>
 #include <QItemDelegate>
 #include <QVariant>
+#include <QMap>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -41,9 +40,18 @@
 
 class SUIT_DataObject;
 class SUIT_TreeModel;
+class QMimeData;
+
+class SUIT_EXPORT SUIT_DataSearcher
+{
+public:
+  virtual SUIT_DataObject* findObject( const QString& ) const = 0;
+};
 
 class SUIT_EXPORT SUIT_AbstractModel
 {
+  SUIT_DataSearcher* mySearcher;
+
 public:
   SUIT_AbstractModel();
 
@@ -51,27 +59,39 @@ public:
   operator QAbstractItemModel*();
   operator const QObject*() const;
 
-  virtual SUIT_DataObject* root() const = 0;
-  virtual void             setRoot( SUIT_DataObject* ) = 0;
-  virtual SUIT_DataObject* object( const QModelIndex& = QModelIndex() ) const = 0;
-  virtual QModelIndex      index( const SUIT_DataObject*, int = 0 ) const = 0;
-  virtual bool             autoDeleteTree() const = 0;
-  virtual void             setAutoDeleteTree( const bool ) = 0;
-  virtual bool             autoUpdate() const = 0;
-  virtual void             setAutoUpdate( const bool ) = 0;
+  virtual SUIT_DataObject*      root() const = 0;
+  virtual void                  setRoot( SUIT_DataObject* ) = 0;
+  virtual SUIT_DataObject*      object( const QModelIndex& = QModelIndex() ) const = 0;
+  virtual QModelIndex           index( const SUIT_DataObject*, int = 0 ) const = 0;
+  virtual bool                  autoDeleteTree() const = 0;
+  virtual void                  setAutoDeleteTree( const bool ) = 0;
+  virtual bool                  autoUpdate() const = 0;
+  virtual void                  setAutoUpdate( const bool ) = 0;
+  virtual bool                  updateModified() const = 0;
+  virtual void                  setUpdateModified( const bool ) = 0;
   virtual QAbstractItemDelegate* delegate() const = 0;
-  virtual bool             customSorting( const int ) const = 0;
-  virtual bool             lessThan( const QModelIndex& left, const QModelIndex& right ) const = 0;
+  virtual bool                  customSorting( const int ) const = 0;
+  virtual bool                  lessThan( const QModelIndex& left, const QModelIndex& right ) const = 0;
+  virtual void                  forgetObject( const SUIT_DataObject* ) = 0;
 
-  virtual void             updateTree( const QModelIndex& ) = 0;
-  virtual void             updateTree( SUIT_DataObject* = 0 ) = 0;
+  virtual void                  updateTree( const QModelIndex& ) = 0;
+  virtual void                  updateTree( SUIT_DataObject* = 0 ) = 0;
 
-  virtual void             registerColumn( const int group_id, const QString& name, const int custom_id ) = 0;
-  virtual void             unregisterColumn( const int group_id, const QString& name ) = 0;
-  virtual void             setColumnIcon( const QString& name, const QPixmap& icon ) = 0;
-  virtual QPixmap          columnIcon( const QString& name ) const = 0;
-  virtual void             setAppropriate( const QString& name, const Qtx::Appropriate appr ) = 0;
-  virtual Qtx::Appropriate appropriate( const QString& name ) const = 0;
+  virtual void                  registerColumn( const int group_id, const QString& name, const int custom_id ) = 0;
+  virtual void                  unregisterColumn( const int group_id, const QString& name ) = 0;
+  virtual void                  setColumnIcon( const QString& name, const QPixmap& icon ) = 0;
+  virtual QPixmap               columnIcon( const QString& name ) const = 0;
+  virtual void                  setAppropriate( const QString& name, const Qtx::Appropriate appr ) = 0;
+  virtual Qtx::Appropriate      appropriate( const QString& name ) const = 0;
+  virtual void                  setVisibilityState(const QString& id, Qtx::VisibilityState state) = 0;
+  virtual void                  setVisibilityStateForAll(Qtx::VisibilityState state) = 0;
+  virtual Qtx::VisibilityState  visibilityState(const QString& id) const = 0;
+  virtual void                  setHeaderFlags( const QString& name, const Qtx::HeaderViewFlags flags ) = 0;
+  virtual Qtx::HeaderViewFlags  headerFlags( const QString& name ) const = 0;
+  virtual void                  emitClicked( SUIT_DataObject* obj, const QModelIndex& index) = 0;
+
+  virtual SUIT_DataSearcher*    searcher() const;
+  virtual void                  setSearcher( SUIT_DataSearcher* );
 };
 
 
@@ -119,6 +139,8 @@ public:
   virtual Qt::ItemFlags  flags( const QModelIndex& ) const;
   virtual QVariant       headerData( int, Qt::Orientation, int = Qt::DisplayRole ) const;
 
+  virtual Qt::DropActions supportedDropActions() const;
+
   virtual QModelIndex    index( int, int, const QModelIndex& = QModelIndex() ) const;
   virtual QModelIndex    parent( const QModelIndex& ) const;
 
@@ -130,6 +152,13 @@ public:
   virtual QPixmap          columnIcon( const QString& name ) const;
   virtual void             setAppropriate( const QString& name, const Qtx::Appropriate appr );
   virtual Qtx::Appropriate appropriate( const QString& name ) const;
+  virtual void                  setVisibilityState(const QString& id, Qtx::VisibilityState state);
+  virtual void                  setVisibilityStateForAll(Qtx::VisibilityState state);
+  virtual Qtx::VisibilityState  visibilityState(const QString& id) const;
+  virtual void                  setHeaderFlags( const QString& name, const Qtx::HeaderViewFlags flags );
+  virtual Qtx::HeaderViewFlags  headerFlags( const QString& name ) const;
+  virtual void           emitClicked( SUIT_DataObject* obj, const QModelIndex& index);
+
 
   SUIT_DataObject*       object( const QModelIndex& = QModelIndex() ) const;
   QModelIndex            index( const SUIT_DataObject*, int = 0 ) const;
@@ -140,10 +169,22 @@ public:
   bool                   autoUpdate() const;
   void                   setAutoUpdate( const bool );
 
+  bool                   updateModified() const;
+  void                   setUpdateModified( const bool );
+
   virtual bool           customSorting( const int ) const;
   virtual bool           lessThan( const QModelIndex& left, const QModelIndex& right ) const;
+  virtual void           forgetObject( const SUIT_DataObject* );
 
   QAbstractItemDelegate* delegate() const;
+
+
+  virtual void           updateTreeModel(SUIT_DataObject*,TreeItem*);
+
+  virtual QStringList    mimeTypes() const;
+  virtual QMimeData*     mimeData (const QModelIndexList& indexes) const;
+  virtual bool           dropMimeData (const QMimeData *data, Qt::DropAction action,
+                                       int row, int column, const QModelIndex &parent);
 
 public slots:
   virtual void           updateTree( const QModelIndex& );
@@ -151,6 +192,8 @@ public slots:
 
 signals:
   void modelUpdated();
+  void clicked( SUIT_DataObject*, int );
+  void dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction );
 
 private:
   void                   initialize();
@@ -159,9 +202,11 @@ private:
   TreeItem*              treeItem( const QModelIndex& ) const;
   TreeItem*              treeItem( const SUIT_DataObject* ) const;
   SUIT_DataObject*       object( const TreeItem* ) const;
+  QString                objectId( const QModelIndex& = QModelIndex() ) const;
 
   TreeItem*              createItem( SUIT_DataObject*, TreeItem* = 0, TreeItem* = 0 );
-  void                   updateItem( TreeItem* );
+  TreeItem*              createItemAtPos( SUIT_DataObject*, TreeItem* = 0, int pos=0 );
+  void                   updateItem( TreeItem*, bool emitLayoutChanged );
   void                   removeItem( TreeItem* );
 
 private slots:
@@ -173,17 +218,22 @@ private:
   typedef struct
   {
     QString myName;
-	QMap<int,int> myIds;
-	QPixmap myIcon;
-	Qtx::Appropriate myAppropriate;
+        QMap<int,int> myIds;
+        QPixmap myIcon;
+        Qtx::HeaderViewFlags myHeaderFlags;
+        Qtx::Appropriate myAppropriate;
 
   } ColumnInfo;
+
+  typedef QMap<QString,Qtx::VisibilityState> VisibilityMap;
   
   SUIT_DataObject*    myRoot;
   TreeItem*           myRootItem;
   ItemMap             myItems;
+  VisibilityMap       myVisibilityMap;
   bool                myAutoDeleteTree;
   bool                myAutoUpdate;
+  bool                myUpdateModified;
   QVector<ColumnInfo> myColumns;
 
   friend class SUIT_TreeModel::TreeSync;
@@ -210,10 +260,14 @@ public:
 
   bool                   autoUpdate() const;
   void                   setAutoUpdate( const bool );
- 
+
+  bool                   updateModified() const;
+  void                   setUpdateModified( const bool );
+
   bool                   isSortingEnabled() const;
   bool                   customSorting( const int ) const;
 
+  virtual void             forgetObject( const SUIT_DataObject* );
   virtual bool             lessThan( const QModelIndex&, const QModelIndex& ) const;
   virtual void             registerColumn( const int group_id, const QString& name, const int custom_id );
   virtual void             unregisterColumn( const int group_id, const QString& name );
@@ -221,6 +275,15 @@ public:
   virtual QPixmap          columnIcon( const QString& name ) const;
   virtual void             setAppropriate( const QString& name, const Qtx::Appropriate appr );
   virtual Qtx::Appropriate appropriate( const QString& name ) const;
+  virtual void                  setVisibilityState(const QString& id, Qtx::VisibilityState state);
+  virtual void                  setVisibilityStateForAll(Qtx::VisibilityState state);
+  virtual Qtx::VisibilityState  visibilityState(const QString& id) const;
+  virtual void                  setHeaderFlags( const QString& name, const Qtx::HeaderViewFlags flags );
+  virtual Qtx::HeaderViewFlags  headerFlags( const QString& name ) const;
+  virtual void             emitClicked( SUIT_DataObject* obj, const QModelIndex& index);
+
+  virtual SUIT_DataSearcher*    searcher() const;
+  virtual void                  setSearcher( SUIT_DataSearcher* );
 
   QAbstractItemDelegate* delegate() const;
 
@@ -231,9 +294,12 @@ public slots:
 
 signals:
   void modelUpdated();
+  void clicked( SUIT_DataObject*, int );
+  void dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction );
 
 protected:
   SUIT_AbstractModel*    treeModel() const;
+  virtual bool           filterAcceptsRow( int, const QModelIndex& ) const;
 
 private:
   bool                   mySortingEnabled;
@@ -247,7 +313,9 @@ public:
   SUIT_ItemDelegate( QObject* = 0 );
   
   virtual void paint( QPainter*, const QStyleOptionViewItem&,
-		      const QModelIndex& ) const;
+                      const QModelIndex& ) const;
+                      
+  virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
 #ifdef WIN32

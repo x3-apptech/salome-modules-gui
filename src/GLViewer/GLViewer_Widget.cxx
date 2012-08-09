@@ -1,51 +1,40 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  Author : OPEN CASCADE
-// File:      GLViewer_Widget.cxx
-// Created:   November, 2004
-//
+
 #include "GLViewer_Widget.h"
 #include "GLViewer_ViewPort2d.h"
 #include "GLViewer_Viewer2d.h"
-//#include "GLViewer_Compass.h"
 #include "GLViewer_Grid.h"
-//#include "GLViewer_Object.h"
 #include "GLViewer_CoordSystem.h"
 #include "GLViewer_ViewFrame.h"
 
 #include <cmath>
-using namespace std;
 
 #include <QEvent>
 #include <QPaintEvent>
 #include <QRect>
-
 #include <QFile>
-//#include <qpixmap.h>
 #include <QImage>
 #include <QApplication>
-//#include <qintdict.h>
-//#include <qpaintdevicemetrics.h>
-//#include <qsize.h>
 #include <QToolTip>
 
 /*!
@@ -131,7 +120,7 @@ void GLViewer_Widget::setScale( GLfloat xScale, GLfloat yScale, GLfloat zScale )
   \return start point of curren rotation of Window in OpenGL global scene
 */
 void GLViewer_Widget::getRotationStart( GLfloat& rotationStartX,
-				        GLfloat& rotationStartY,
+                                        GLfloat& rotationStartY,
                                         GLfloat& rotationStartZ )
 {
     rotationStartX = myRotationStartX;
@@ -143,7 +132,7 @@ void GLViewer_Widget::getRotationStart( GLfloat& rotationStartX,
   A function for installing the rotation angle of Window in OpenGL global scene in degree (Only in 2D)
 */
 void GLViewer_Widget::setRotationStart( GLfloat rotationStartX,
-				        GLfloat rotationStartY,
+                                        GLfloat rotationStartY,
                                         GLfloat rotationStartZ )
 {
     myRotationStartX = rotationStartX;
@@ -159,9 +148,9 @@ void GLViewer_Widget::setRotationStart( GLfloat rotationStartX,
   \param rotationCenterZ - center z
 */
 void GLViewer_Widget::getRotation( GLfloat& rotationAngle,
-				   GLfloat& rotationCenterX,
-				   GLfloat& rotationCenterY,
-				   GLfloat& rotationCenterZ )
+                                   GLfloat& rotationCenterX,
+                                   GLfloat& rotationCenterY,
+                                   GLfloat& rotationCenterZ )
 {
     rotationAngle = myRotationAngle;
     rotationCenterX = myRotationCenterX;
@@ -177,9 +166,9 @@ void GLViewer_Widget::getRotation( GLfloat& rotationAngle,
   \param rotationCenterZ - center z
 */
 void GLViewer_Widget::setRotation( GLfloat rotationAngle,
-				   GLfloat rotationCenterX,
-				   GLfloat rotationCenterY,
-				   GLfloat rotationCenterZ )
+                                   GLfloat rotationCenterX,
+                                   GLfloat rotationCenterY,
+                                   GLfloat rotationCenterZ )
 {
     myRotationAngle = rotationAngle;
     myRotationCenterX = rotationCenterX;
@@ -488,20 +477,20 @@ void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2,
     {           
       uchar* theCurLine = image.scanLine( i ), cur;
       for( int j=w1; j<=w2; j++ )
-	for( int k=0; k<3; k++ )
-	{
-	  cur = *(theCurLine+4*j+2-k);
-	  *(line+cur_index) = hex( cur/16 ); //HI
-	  *(line+cur_index+1) = hex( cur%16 ); //LO
-	  full++;
-	  cur_index+=2;
-	  if( cur_index>=80 )
-	  {
-	    aBuffer += line;
-	    aBuffer += "\n";
-	    cur_index = 0;
-	  }
-	}           
+        for( int k=0; k<3; k++ )
+        {
+          cur = *(theCurLine+4*j+2-k);
+          *(line+cur_index) = hex( cur/16 ); //HI
+          *(line+cur_index+1) = hex( cur%16 ); //LO
+          full++;
+          cur_index+=2;
+          if( cur_index>=80 )
+          {
+            aBuffer += line;
+            aBuffer += "\n";
+            cur_index = 0;
+          }
+        }           
     }
     
     aBuffer += "> false 3 colorimage\n\n";

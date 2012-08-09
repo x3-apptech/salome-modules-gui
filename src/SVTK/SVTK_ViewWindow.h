@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef SVTK_VIEWWINDOW_H
 #define SVTK_VIEWWINDOW_H
 
@@ -28,6 +29,7 @@
 
 #include "SVTK.h"
 #include "SVTK_Selection.h"
+#include "Qtx.h"
 #include "SUIT_ViewWindow.h"
 
 #include "SALOME_InteractiveObject.hxx"
@@ -42,7 +44,6 @@ class VTKViewer_Actor;
 class VTKViewer_Trihedron;
 
 class SVTK_ViewModelBase;
-//class SVTK_MainWindow;
 class SVTK_Selector;
 class SVTK_View;
 
@@ -52,15 +53,20 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkInteractorStyle;
+class vtkCallbackCommand;
+
 class SVTK_RenderWindowInteractor;
 class SVTK_Renderer;
 class SVTK_NonIsometricDlg;
 class SVTK_UpdateRateDlg;
 class SVTK_CubeAxesDlg;
 class SVTK_SetRotationPointDlg;
+class SVTK_InteractorStyle;
 class SVTK_KeyFreeInteractorStyle;
 class SVTK_ViewParameterDlg;
 class SVTK_Recorder;
+
+class vtkPVAxesWidget;
 
 class vtkObject;
 class QtxAction;
@@ -90,57 +96,62 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Get #SVTK_View
   SVTK_View* getView();
 
-  //! Get #SVTK_MainWindow
-  //SVTK_MainWindow* getMainWindow();
-
-  //! Redirect the request to #SVTK_MainWindow::getRenderWindow
+  //! Get render window
   vtkRenderWindow* getRenderWindow();
 
-  //! Redirect the request to #SVTK_MainWindow::getInteractor
+  //! Get interactor
   vtkRenderWindowInteractor* getInteractor() const;
 
-  //! Redirect the request to #SVTK_MainWindow::getInteractor
+  //! Get SVTK interactor
   SVTK_RenderWindowInteractor*  GetInteractor() const;
 
+  //! Get current interactor style
   vtkInteractorStyle* GetInteractorStyle() const;
 
-  //! Redirect the request to #SVTK_RenderWindowInteractor::PushInteractorStyle
+  //! Add interactor style to the stack of styles
   void PushInteractorStyle(vtkInteractorStyle* theStyle);
 
-  //! Redirect the request to #SVTK_RenderWindowInteractor::PopInteractorStyle
+  //! Remove last interactor style from the stack of styles
   void PopInteractorStyle();
 
-  //! Redirect the request to #SVTK_MainWindow::getRenderer 
+  //! Get renderer
   vtkRenderer* getRenderer() const;
-
+  
+  //! Get SVTK renderer
   SVTK_Renderer* GetRenderer() const;
 
-  //! Redirect the request to #SVTK_MainWindow::GetSelector 
+  //! Get selector
   SVTK_Selector* GetSelector() const;
   
-  //! Redirect the request to #SVTK_Selector::SelectionMode
+  //! Set selection mode
   Selection_Mode SelectionMode() const;
   
   //! Change selection mode
   virtual void SetSelectionMode(Selection_Mode theMode);
 
-  //! Redirect the request to #SVTK_MainWindow::SetBackgroundColor 
+  //! Set background color [obsolete] 
   virtual void setBackgroundColor( const QColor& );
 
-  //! Redirect the request to #SVTK_MainWindow::SetBackgroundColor 
+  //! Get background color [obsolete]
   QColor backgroundColor() const;
 
-  //! Redirect the request to #SVTK_Renderer::IsTrihedronDisplayed
+  //! Set background
+  virtual void setBackground( const Qtx::BackgroundData& );
+
+  //! Get background
+  Qtx::BackgroundData background() const;
+
+  //! Return \c true if "display trihedron" flag is set
   bool isTrihedronDisplayed();
 
-  //! Redirect the request to #SVTK_Renderer::IsCubeAxesDisplayed
+  //! Return \c true if "show graduated axes" flag is set
   bool isCubeAxesDisplayed();
  
   /*  interactive object management */
   //! Redirect the request to #SVTK_View::highlight (to support old code)
   virtual void highlight(const Handle(SALOME_InteractiveObject)& theIO, 
-			 bool theIsHighlight = true, 
-			 bool theIsUpdate = true);
+                         bool theIsHighlight = true, 
+                         bool theIsUpdate = true);
 
   //! Redirect the request to #SVTK_View::unHighlightAll (to support old code)
   virtual void unHighlightAll();
@@ -155,18 +166,18 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //----------------------------------------------------------------------------
   Handle(SALOME_InteractiveObject) FindIObject(const char* theEntry);
   
-  /* display */		
+  /* display */         
   //----------------------------------------------------------------------------
   //! Redirect the request to #SVTK_View::Display (to support old code)
   virtual void Display(const Handle(SALOME_InteractiveObject)& theIObject,
-		       bool theImmediatly = true);
+                       bool theImmediatly = true);
 
   //! Redirect the request to #SVTK_View::DisplayOnly (to support old code)
   virtual void DisplayOnly(const Handle(SALOME_InteractiveObject)& theIObject);
 
   //! Redirect the request to #SVTK_View::Erase (to support old code)
   virtual void Erase(const Handle(SALOME_InteractiveObject)& theIObject,
-		     bool theImmediatly = true);
+                     bool theImmediatly = true);
 
   //! Redirect the request to #SVTK_View::DisplayAll (to support old code)
   virtual void DisplayAll();
@@ -186,11 +197,13 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
 
   //! Redirect the request to #SVTK_Renderer::AddActor
   virtual void AddActor(VTKViewer_Actor* theActor,
-			bool theIsUpdate = false);
+                        bool theIsUpdate = false,
+                        bool theIsAdjustActors = true);
 
   //! Redirect the request to #SVTK_Renderer::RemoveActor
   virtual void RemoveActor(VTKViewer_Actor* theActor,
-			   bool theIsUpdate = false);
+                           bool theIsUpdate = false,
+                           bool theIsAdjustActors = true);
 
   //----------------------------------------------------------------------------
   //! Redirect the request to #SVTK_Renderer::AdjustActors
@@ -208,34 +221,46 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
   virtual void SetTrihedronSize( const vtkFloatingPointType, const bool = true );
 
-  //! Redirect the request to #SVTK_MainWindow::SetIncrementalSpeed
+  //! Set incremental speed
   virtual void SetIncrementalSpeed( const int, const int = 0 );
 
-  //! Redirect the request to #SVTK_MainWindow::SetProjectionMode
+  //! Set current projection mode
   virtual void SetProjectionMode( const int );
 
-  //! Redirect the request to #SVTK_MainWindow::SetInteractionStyle
+  //! Set interactive style
   virtual void SetInteractionStyle( const int );
 
-  //! Redirect the request to #SVTK_MainWindow::SetSpacemouseButtons
+  //! Set zooming style
+  virtual void SetZoomingStyle( const int );
+
+  //! Set dynamic preselection on/off
+  virtual void SetDynamicPreSelection( bool );
+
+  //! Customize space mouse buttons
   virtual void SetSpacemouseButtons( const int, const int, const int );
 
-  //! Redirect the request to #SVTK_Renderer::SetSelectionProp
+  //! Set selection properties
   virtual void SetSelectionProp(const double& theRed = 1, 
-				const double& theGreen = 1,
-				const double& theBlue = 0, 
-				const int& theWidth = 5);
+                                const double& theGreen = 1,
+                                const double& theBlue = 0, 
+                                const int& theWidth = 5);
 
   //! Redirect the request to #SVTK_Renderer::SetPreselectionProp
   virtual void SetPreselectionProp(const double& theRed = 0, 
-				   const double& theGreen = 1,
-				   const double& theBlue = 1, 
-				   const int& theWidth = 5);
+                                   const double& theGreen = 1,
+                                   const double& theBlue = 1, 
+                                   const int& theWidth = 5);
 
   //! Redirect the request to #SVTK_Renderer::SetSelectionTolerance
   virtual void SetSelectionTolerance(const double& theTolNodes = 0.025, 
-				     const double& theTolCell = 0.001,
-				     const double& theTolObjects = 0.025);
+                                     const double& theTolCell = 0.001,
+                                     const double& theTolObjects = 0.025);
+
+  //! Get visibility status of the static trihedron
+  bool IsStaticTrihedronVisible() const;
+
+  //! Set visibility status of the static trihedron
+  virtual void SetStaticTrihedronVisible( const bool );
 
   //! Methods to save/restore visual parameters of a view (pan, zoom, etc.)
   virtual QString getVisualParameters();
@@ -245,6 +270,8 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   virtual bool eventFilter( QObject*, QEvent* );
 
   virtual void RefreshDumpImage();
+
+  void emitTransformed();
 
   //! To invoke a VTK event on #SVTK_RenderWindowInteractor instance
   void InvokeEvent(unsigned long theEvent, void* theCallData);
@@ -285,6 +312,8 @@ public slots:
   void onViewParameters(bool theIsActivate);
 
   void onSwitchInteractionStyle(bool theOn);
+  void onSwitchZoomingStyle(bool theOn);
+  void onSwitchDynamicPreSelection(bool theOn);
 
   void onStartRecording();
   void onPlayRecording();
@@ -295,6 +324,7 @@ signals:
  void selectionChanged();
  void actorAdded(VTKViewer_Actor*);
  void actorRemoved(VTKViewer_Actor*);
+ void transformed(SVTK_ViewWindow*);
 
 public slots:
   //! Redirect the request to #SVTK_Renderer::OnFrontView
@@ -315,6 +345,12 @@ public slots:
   //! Redirect the request to #SVTK_Renderer::OnLeftView
   virtual void onLeftView();     
 
+  //! Redirect the request to #SVTK_Renderer::onClockWiseView
+  virtual void onClockWiseView();
+
+  //! Redirect the request to #SVTK_Renderer::onAntiClockWiseView
+  virtual void onAntiClockWiseView();
+
   //! Redirect the request to #SVTK_Renderer::OnResetView
   virtual void onResetView();     
 
@@ -332,7 +368,9 @@ public slots:
 
   //! Redirect the request to #SVTK_Renderer::OnAdjustCubeAxes
   virtual void onAdjustCubeAxes();
-
+  
+  virtual void synchronize(SVTK_ViewWindow*);
+    
 protected slots:
   void onKeyPressed(QKeyEvent* event);
   void onKeyReleased(QKeyEvent* event);
@@ -343,9 +381,15 @@ protected slots:
 
 protected:
   virtual void Initialize(SVTK_View* theView,
-			  SVTK_ViewModelBase* theModel);
+                          SVTK_ViewModelBase* theModel);
 
-  void doSetVisualParameters( const QString& );
+  // Main process event method
+  static void ProcessEvents(vtkObject* object,
+                            unsigned long event,
+                            void* clientdata,
+                            void* calldata);
+
+  void doSetVisualParameters( const QString&, bool = false );
   void SetEventDispatcher(vtkObject* theDispatcher);
 
   QImage dumpViewContent();
@@ -360,23 +404,26 @@ protected:
   void createActions(SUIT_ResourceMgr* theResourceMgr);
 
   enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, 
-	 ChangeRotationPointId, RotationId,
-         FrontId, BackId, TopId, BottomId, LeftId, RightId, ResetId, 
+         ChangeRotationPointId, RotationId,
+         FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId, ResetId,
 	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate,
-	 ParallelModeId, ProjectionModeId, ViewParametersId, SwitchInteractionStyleId,
-	 StartRecordingId, PlayRecordingId, PauseRecordingId, StopRecordingId };
-
+         ParallelModeId, ProjectionModeId, ViewParametersId, SynchronizeId, SwitchInteractionStyleId,
+         SwitchZoomingStyleId,SwitchDynamicPreselectionId,
+         StartRecordingId, PlayRecordingId, PauseRecordingId, StopRecordingId };
 
   SVTK_View* myView;
-  //SVTK_MainWindow* myMainWindow;
   SVTK_ViewModelBase* myModel;
 
   SVTK_RenderWindowInteractor* myInteractor;
+  vtkSmartPointer<SVTK_InteractorStyle> myDefaultInteractorStyle;
   vtkSmartPointer<SVTK_KeyFreeInteractorStyle> myKeyFreeInteractorStyle;
 
   QString myVisualParams; // used for delayed setting of view parameters 
 
   vtkSmartPointer<vtkObject> myEventDispatcher;
+
+  // Used to process events
+  vtkSmartPointer<vtkCallbackCommand> myEventCallbackCommand;
 
   SVTK_NonIsometricDlg* myNonIsometricDlg;
   SVTK_UpdateRateDlg* myUpdateRateDlg;
@@ -395,6 +442,16 @@ protected:
 
   int myToolBar;
   int myRecordingToolBar;
+
+  vtkPVAxesWidget* myAxesWidget;
+  Qtx::BackgroundData myBackground;
+
+private slots:
+  void onSynchronizeView(bool);
+  void updateSyncViews();
+
+private:
+  static void synchronizeView( SVTK_ViewWindow*, int );
 
 private:
   QImage myDumpImage;

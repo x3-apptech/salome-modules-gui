@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "VTKViewer_ViewWindow.h"
 #include "VTKViewer_ViewModel.h"
 #include "VTKViewer_RenderWindow.h"
@@ -27,16 +28,25 @@
 #include "VTKViewer_Trihedron.h"
 #include "VTKViewer_Transform.h"
 #include "VTKViewer_Utilities.h"
+#include "VTKViewer_Texture.h"
+#include "VTKViewer_OpenGLRenderer.h"
 
 #include <SUIT_Session.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_Tools.h>
 #include <SUIT_ResourceMgr.h>
 
+#include <QFileInfo>
 #include <QImage>
 
-#include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include <vtkJPEGReader.h>
+#include <vtkBMPReader.h>
+#include <vtkTIFFReader.h>
+#include <vtkPNGReader.h>
+#include <vtkMetaImageReader.h>
+#include <vtkImageMapToColors.h>
+#include <vtkTexture.h>
 
 #include <QtxToolBar.h>
 #include <QtxMultiAction.h>
@@ -44,15 +54,15 @@
 /*! Construction*/
 VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop, 
                                             VTKViewer_Viewer* theModel,
-					    VTKViewer_InteractorStyle* iStyle,
-					    VTKViewer_RenderWindowInteractor* rw )
+                                            VTKViewer_InteractorStyle* iStyle,
+                                            VTKViewer_RenderWindowInteractor* rw )
 : SUIT_ViewWindow( theDesktop )
 {
   myModel = theModel;
 
   myTrihedron = VTKViewer_Trihedron::New();
   myTransform = VTKViewer_Transform::New();
-  myRenderer  = vtkRenderer::New() ;
+  myRenderer  = VTKViewer_OpenGLRenderer::New() ;
 
   myTrihedron->AddToRender( myRenderer );
 
@@ -67,16 +77,6 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
   myRenderer->LightFollowCameraOn();
   myRenderer->TwoSidedLightingOn();
 
-  // Set BackgroundColor
-  QString BgrColorRed   = "0";//SUIT_CONFIG->getSetting("VTKViewer:BackgroundColorRed");
-  QString BgrColorGreen = "0";//SUIT_CONFIG->getSetting("VTKViewer:BackgroundColorGreen");
-  QString BgrColorBlue  = "0";//SUIT_CONFIG->getSetting("VTKViewer:BackgroundColorBlue");
-
-  if( !BgrColorRed.isEmpty() && !BgrColorGreen.isEmpty() && !BgrColorBlue.isEmpty() ) 
-    myRenderer->SetBackground( BgrColorRed.toInt()/255., BgrColorGreen.toInt()/255., BgrColorBlue.toInt()/255. );
-  else
-    myRenderer->SetBackground( 0, 0, 0 );
-  
   // Create an interactor.
   myRWInteractor = rw ? rw : VTKViewer_RenderWindowInteractor::New();
   myRWInteractor->SetRenderWindow( myRenderWindow->getRenderWindow() );
@@ -92,6 +92,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
   setCentralWidget( myRenderWindow );
 
   myToolBar = new QtxToolBar( true, tr("LBL_TOOLBAR_LABEL"), this );
+  myToolBar->setFloatable( false );
 
   createActions();
   createToolBar();
@@ -118,6 +119,9 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
            this,           SIGNAL(contextMenuRequested( QContextMenuEvent * )) );
 
 
+  // set default background
+  setBackground( Qtx::BackgroundData( Qt::black ) );
+  // reset view
   onResetView();
 }
 
@@ -273,6 +277,20 @@ void VTKViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(activated()), this, SLOT(onRightView()));
   myActionsMap[ RightId ] = aAction;
 
+  // \li Rotate anticlockwise
+  aAction = new QtxAction(tr("MNU_ANTICLOCKWISE_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ANTICLOCKWISE" ) ),
+			  tr( "MNU_ANTICLOCKWISE_VIEW" ), 0, this);
+  aAction->setStatusTip(tr("DSC_ANTICLOCKWISE_VIEW"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onAntiClockWiseView()));
+  myActionsMap[ AntiClockWiseId ] = aAction;
+
+  // \li Rotate clockwise
+  aAction = new QtxAction(tr("MNU_CLOCKWISE_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_CLOCKWISE" ) ),
+			  tr( "MNU_CLOCKWISE_VIEW" ), 0, this);
+  aAction->setStatusTip(tr("DSC_CLOCKWISE_VIEW"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onClockWiseView()));
+  myActionsMap[ ClockWiseId ] = aAction;
+
   //! \li Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RESET" ) ),
                            tr( "MNU_RESET_VIEW" ), 0, this);
@@ -315,6 +333,9 @@ void VTKViewer_ViewWindow::createToolBar()
   aViewsAction->insertAction( myActionsMap[LeftId] );
   aViewsAction->insertAction( myActionsMap[RightId] );
   myToolBar->addAction( aViewsAction );
+
+  myToolBar->addAction( myActionsMap[AntiClockWiseId] );
+  myToolBar->addAction( myActionsMap[ClockWiseId] );
 
   myToolBar->addAction( myActionsMap[ResetId] );
 }
@@ -379,6 +400,28 @@ void VTKViewer_ViewWindow::onRightView()
   onFitAll();
 }
 
+/*!
+  \brief Rotate view 90 degrees clockwise
+*/
+void VTKViewer_ViewWindow::onClockWiseView()
+{
+  vtkCamera* aCamera = myRenderer->GetActiveCamera(); 
+  aCamera->Roll(-90);
+  aCamera->OrthogonalizeViewUp();
+  Repaint();
+}
+
+/*!
+  \brief Rotate view 90 degrees conterclockwise
+*/
+void VTKViewer_ViewWindow::onAntiClockWiseView()
+{
+  vtkCamera* aCamera = myRenderer->GetActiveCamera(); 
+  aCamera->Roll(90);
+  aCamera->OrthogonalizeViewUp();
+  Repaint();
+}
+
 /*!On reset view slot.*/
 void VTKViewer_ViewWindow::onResetView()
 {
@@ -403,22 +446,166 @@ void VTKViewer_ViewWindow::onFitAll()
   Repaint();
 }
 
-/*!Set background of the viewport*/
-void VTKViewer_ViewWindow::setBackgroundColor( const QColor& color )
+/*!Set background color of the viewport [obsolete]*/
+void VTKViewer_ViewWindow::setBackgroundColor( const QColor& c )
 {
-  if ( myRenderer )
-    myRenderer->SetBackground( color.red()/255., color.green()/255., color.blue()/255. );
+  Qtx::BackgroundData bg = background();
+  bg.setColor( c );
+  setBackground( bg );
+}
+
+/*!Returns background color of the viewport [obsolete]*/
+QColor VTKViewer_ViewWindow::backgroundColor() const
+{
+  return background().color();
+}
+
+/*!Set background of the viewport*/
+void VTKViewer_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
+{
+  bool ok = false;
+ 
+  if ( bgData.isValid() ) {
+    switch ( bgData.mode() ) {
+    case Qtx::ColorBackground:
+      {
+	QColor c = bgData.color();
+	if ( c.isValid() ) {
+	  // show solid-colored background
+	  getRenderer()->SetTexturedBackground( false );  // cancel texture mode
+	  getRenderer()->SetGradientBackground( false );  // cancel gradient mode
+	  getRenderer()->SetBackground( c.red()/255.0,
+					c.green()/255.0,
+					c.blue()/255.0 ); // set background color
+	  ok = true;
+	}
+	break;
+      }
+    case Qtx::SimpleGradientBackground:
+      {
+	QColor c1, c2;
+	int type = bgData.gradient( c1, c2 );
+        if ( c1.isValid() )
+        {
+          if ( !c2.isValid() )
+            c2 = c1;
+
+          // show two-color gradient background
+          getRenderer()->SetTexturedBackground( false );    // cancel texture mode
+          getRenderer()->SetGradientBackground( true );     // switch to gradient mode
+
+          VTKViewer_OpenGLRenderer* aRenderer =
+            VTKViewer_OpenGLRenderer::SafeDownCast( getRenderer() );
+          if( aRenderer )
+          {
+            aRenderer->SetGradientType( type );
+            aRenderer->SetBackground( c1.redF(), c1.greenF(), c1.blueF() );
+            aRenderer->SetBackground2( c2.redF(), c2.greenF(), c2.blueF() );
+            ok = true;
+          }
+        }
+	break;
+      }
+    case Qtx::CustomGradientBackground:
+      {
+	// NOT IMPLEMENTED YET
+	getRenderer()->SetTexturedBackground( false );  // cancel texture mode
+	getRenderer()->SetGradientBackground( false );  // cancel gradient mode
+	// .........
+	break;
+      }
+    default:
+      break;
+    }
+    if ( bgData.isTextureShown() ) {
+      QString fileName;
+      int textureMode = bgData.texture( fileName );
+      QFileInfo fi( fileName );
+      if ( !fileName.isEmpty() && fi.exists() ) {
+	// read texture from file
+	QString extension = fi.suffix().toLower();
+	vtkImageReader2* aReader = 0;
+	if ( extension == "jpg" || extension == "jpeg" )
+	  aReader = vtkJPEGReader::New();
+	else if ( extension == "bmp" )
+	  aReader = vtkBMPReader::New();
+	else if ( extension == "tif" || extension == "tiff" )
+	  aReader = vtkTIFFReader::New();
+	else if ( extension == "png" )
+	  aReader = vtkPNGReader::New();
+	else if ( extension == "mhd" || extension == "mha" )
+	  aReader = vtkMetaImageReader::New();           
+	if ( aReader ) {
+	  // create texture
+	  aReader->SetFileName( fi.absoluteFilePath().toLatin1().constData() );
+	  aReader->Update();
+	  
+	  VTKViewer_Texture* aTexture = VTKViewer_Texture::New();
+	  vtkImageMapToColors* aMap = 0;
+	  vtkAlgorithmOutput* anOutput;
+	  /*
+	  // special processing for BMP reader
+	  vtkBMPReader* aBMPReader = (vtkBMPReader*)aReader;
+	  if ( aBMPReader ) {
+	    // Special processing for BMP file
+	    aBMPReader->SetAllow8BitBMP(1);
+	    
+	    aMap = vtkImageMapToColors::New();
+	    aMap->SetInputConnection( aBMPReader->GetOutputPort() );
+	    aMap->SetLookupTable( (vtkScalarsToColors*)aBMPReader->GetLookupTable() );
+	    aMap->SetOutputFormatToRGB();
+	    
+	    anOutput = aMap->GetOutputPort();
+	  }
+	  else {
+          }
+	  */
+	  anOutput = aReader->GetOutputPort( 0 );
+	  aTexture->SetInputConnection( anOutput );
+	  // set texture mode
+	  // VSR: Currently, VTK only supports Stretch mode, so below code will give
+	  // the same results for all modes
+	  switch ( textureMode ) {
+	  case Qtx::TileTexture:
+	    aTexture->RepeatOn();
+	    aTexture->EdgeClampOff();
+	    aTexture->InterpolateOff();
+	    break;
+	  case Qtx::StretchTexture:
+	    aTexture->RepeatOff();
+	    aTexture->EdgeClampOff();
+	    aTexture->InterpolateOn();
+	    break;
+	  case Qtx::CenterTexture:
+	  default:
+	    aTexture->RepeatOff();
+	    aTexture->EdgeClampOn();
+	    aTexture->InterpolateOff();
+	    break;
+	  }
+	  // show textured background
+	  getRenderer()->SetTexturedBackground( true );     // switch to texture mode
+	  getRenderer()->SetBackgroundTexture( aTexture );  // set texture image
+	  
+	  // clean-up resources
+	  if ( aMap )
+	    aMap->Delete();
+	  aReader->Delete();
+	  aTexture->Delete();
+	  ok = true;
+	}
+      }
+    }
+  }
+
+  if ( ok )
+    myBackground = bgData;
 }
 
 /*!Returns background of the viewport*/
-QColor VTKViewer_ViewWindow::backgroundColor() const
+Qtx::BackgroundData VTKViewer_ViewWindow::background() const
 {
-  vtkFloatingPointType backint[3];
-  if ( myRenderer ) {
-    myRenderer->GetBackground( backint );
-    return QColor(int(backint[0]*255), int(backint[1]*255), int(backint[2]*255));
-  }
-  return palette().color( backgroundRole() );
+  return myBackground;
 }
 
 /*!Repaint window. If \a theUpdateTrihedron is true - recalculate trihedron.*/
@@ -579,8 +766,8 @@ QString VTKViewer_ViewWindow::getVisualParameters()
 
   QString retStr;
   retStr.sprintf( "%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e", 
-		  pos[0], pos[1], pos[2], focalPnt[0], focalPnt[1], focalPnt[2], viewUp[0], viewUp[1], 
-		  viewUp[2], parScale, scale[0], scale[1], scale[2] );
+                  pos[0], pos[1], pos[2], focalPnt[0], focalPnt[1], focalPnt[2], viewUp[0], viewUp[1], 
+                  viewUp[2], parScale, scale[0], scale[1], scale[2] );
   return retStr;
 }
 

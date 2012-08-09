@@ -16,9 +16,14 @@ All operations with studies are available from the \b File menu.
 \b New - creates a new study. The study will be created
 with default name \b Study1. It is possible to create
 several studies, each accessible from the task bar.
+
 \b Open - allows to open an existing study by browsing for it in a
 standard Search File dialog box, choosing the required
 *.hdf file and clicking \b Open button.
+
+\b Reopen - reloads the current study from the *.hdf file. This menu command
+can be used to reverse the study to the latest saved state.
+
 \b Connect - allows to open an unloaded study.
 \image html loadstudy2.png
 Select one of the studies, which has been previously
@@ -73,7 +78,7 @@ saved in the Python file.
 </ul>
 To confirm your choice click \b Save.
 
-<b>Notebook</b> - allows to manage study variables using \subpage using_notebook "NoteBook".
+\subpage using_notebook "Notebook" - allows to predefine study variables.
 
 <b>Load Script</b> - allows to load a saved Python Script.
 
@@ -86,18 +91,19 @@ To confirm your choice click \b Open.
 \image html studyproperties.png
 
 <ul>
-<li>\b Author - allows to change the name of the study author</li>
-<li>\b Created - gives the date and time of Study creation</li>
+<li>\b Author - allows to change the name of the study author.</li>
+<li><b> Creation date</b> - gives the date and time of Study creation.</li>
 <li>\b Locked - allows to lock the  study for modifications. 
-Just click on this field and choose \b Yes item. In this case your study will be locked for any modifications
+In case if \b Locked checkbox is checked your study will be locked for any modifications
 for all users. Next time you try to edit it, you will see the
 following warning message:
 \image html lockedstudy.png </li>
-<li>\b Modified - allows to see if any modifications have been
+<li><b>Modified/Not Modified</b>  - allows to see if any modifications have been
 introduced into study since its last save. </li>
+<li><b>Length units</b> - allows to change the units of the study.</li>
+<li>\b Comment - allows to change the comment of the study.</li>
 <li>\b Modifications - allows to  view the list of changes made in the study.
-In this dialog box click on the \b Modifications field and scroll it
-down. Each record contains the date and time of the
+Each record contains the date and time of the
 modification and the name of the user, who has introduced it.</li>
 </ul>
 

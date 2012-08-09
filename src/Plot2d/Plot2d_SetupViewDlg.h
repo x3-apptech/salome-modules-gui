@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : Plot2d_SetupViewDlg.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -35,6 +36,7 @@ class QLineEdit;
 class QComboBox;
 class QPushButton;
 class QtxColorButton;
+class QtxFontEdit;
 
 class PLOT2D_EXPORT Plot2d_SetupViewDlg : public QDialog
 { 
@@ -62,9 +64,20 @@ public:
   void            setCurveType( const int );
   int             getCurveType();
 
-  void            setLegend( bool, int );
+  bool            getLMaxNormMode();
+  void            setLMaxNormMode(const bool);
+  bool            getLMinNormMode();
+  void            setLMinNormMode(const bool);
+  bool            getRMaxNormMode();
+  void            setRMaxNormMode(const bool);
+  bool            getRMinNormMode();
+  void            setRMinNormMode(const bool);
+
+  void            setLegend( bool, int, const QFont&, const QColor& );
   bool            isLegendEnabled();
   int             getLegendPos();
+  QFont           getLegendFont();
+  QColor          getLegendColor();
   
   void            setMarkerSize( const int );
   int             getMarkerSize();
@@ -81,6 +94,15 @@ public:
   int             getXScaleMode();
   int             getYScaleMode();
 
+  void            setDeviationMarkerLw( const int);
+  int             getDeviationMarkerLw() const;
+
+  void            setDeviationMarkerTs( const int);
+  int             getDeviationMarkerTs() const;
+
+  void            setDeviationMarkerCl( const QColor&);
+  QColor          getDeviationMarkerCl() const;
+
   bool            isSetAsDefault();
 
 protected slots:
@@ -95,6 +117,10 @@ protected slots:
   void            onXGridMinorChecked();
   void            onYGridMinorChecked();
   void            onY2GridMinorChecked();
+  void            onNormLMaxChecked();
+  void            onNormLMinChecked();
+  void            onNormRMaxChecked();
+  void            onNormRMinChecked();
   void            onHelp();
 
 private:
@@ -107,6 +133,8 @@ private:
   QLineEdit*      myTitleYEdit;
   QLineEdit*      myTitleY2Edit;
   QtxColorButton* myBackgroundBtn;
+  QtxColorButton* myLegendColor;
+  QtxFontEdit*    myLegendFont;
   QCheckBox*      myXGridCheck;
   QSpinBox*       myXGridSpin;
   QCheckBox*      myYGridCheck;
@@ -125,11 +153,18 @@ private:
   QSpinBox*       myMarkerSpin;
   QComboBox*      myXModeCombo;
   QComboBox*      myYModeCombo;
+  QCheckBox*      myNormLMaxCheck;
+  QCheckBox*      myNormLMinCheck;
+  QCheckBox*      myNormRMaxCheck;
+  QCheckBox*      myNormRMinCheck;
   QComboBox*      myY2ModeCombo;
   QCheckBox*      myDefCheck;
   QPushButton*    myOkBtn;
   QPushButton*    myCancelBtn;
   QPushButton*    myHelpBtn;
+  QSpinBox*       myDeviationLw;
+  QSpinBox*       myDeviationTs;
+  QtxColorButton* myDeviationCl;
   bool            mySecondAxisY;
 };
 

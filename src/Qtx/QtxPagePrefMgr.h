@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:      QtxPagePrefMgr.h
 // Author:    Sergey TELKOV
 //
@@ -33,12 +31,17 @@
 #include <QFrame>
 #include <QLabel>
 #include <QPointer>
+#include <QIcon>
 
 class QtxGridBox;
 class QtxFontEdit;
 class QtxGroupBox;
 class QtxComboBox;
 class QtxColorButton;
+class QtxBiColorTool;
+class QtxShortcutEdit;
+class QtxShortcutTree;
+class QtxBackgroundTool;
 
 class QToolBox;
 class QLineEdit;
@@ -50,6 +53,8 @@ class QListWidget;
 class QFileDialog;
 class QDateTimeEdit;
 class QStackedWidget;
+class QSlider;
+class QTreeWidget;
 
 class QTX_EXPORT QtxPagePrefMgr : public QFrame, public QtxPreferenceMgr
 {
@@ -402,6 +407,12 @@ public:
   int              inputType() const;
   void             setInputType( const int );
 
+  int              decimals() const;
+  void             setDecimals( const int );
+  
+  int              echoMode() const;
+  void             setEchoMode( const int );
+
   virtual void     store();
   virtual void     retrieve();
 
@@ -414,7 +425,50 @@ private:
 
 private:
   int              myType;
+  int              myDecimals;
+  int              myEchoMode;
   QLineEdit*       myEditor;
+};
+
+class QTX_EXPORT QtxPagePrefSliderItem : public QObject,public QtxPageNamedPrefItem
+{
+  Q_OBJECT
+
+public:
+  QtxPagePrefSliderItem( const QString&, QtxPreferenceItem* = 0,
+                         const QString& = QString(), const QString& = QString() );
+  virtual ~QtxPagePrefSliderItem();
+
+  int              singleStep() const;
+  int              pageStep() const;
+  int              minimum() const;
+  int              maximum() const;
+  QList<QIcon>     icons() const; 
+
+  void             setSingleStep( const int& );
+  void             setPageStep( const int& );
+  void             setMinimum( const int& );
+  void             setMaximum( const int& );
+  void             setIcons( const QList<QIcon>& );
+
+  virtual void     store();
+  virtual void     retrieve();
+
+protected:
+  virtual QVariant optionValue( const QString& ) const;
+  virtual void     setOptionValue( const QString&, const QVariant& );
+
+private slots:
+  void             setIcon( int );
+
+private:
+  void             updateSlider();
+  void             setIcons( const QVariant& );
+
+private:
+  QSlider*         mySlider;
+  QLabel*          myLabel;
+  QList<QIcon>     myIcons;
 };
 
 class QTX_EXPORT QtxPagePrefSelectItem : public QtxPageNamedPrefItem
@@ -434,9 +488,11 @@ public:
 
   QStringList      strings() const;
   QList<int>       numbers() const;
+  QList<QIcon>     icons() const;
 
   void             setStrings( const QStringList& );
   void             setNumbers( const QList<int>& );
+  void             setIcons( const QList<QIcon>& );
 
   virtual void     store();
   virtual void     retrieve();
@@ -449,6 +505,7 @@ private:
   void             updateSelector();
   void             setStrings( const QVariant& );
   void             setNumbers( const QVariant& );
+  void             setIcons( const QVariant& );
 
 private:
   int              myType;
@@ -468,6 +525,7 @@ public:
   virtual ~QtxPagePrefSpinItem();
 
   QVariant         step() const;
+  QVariant         precision() const;
   QVariant         minimum() const;
   QVariant         maximum() const;
 
@@ -476,6 +534,7 @@ public:
   QString          specialValueText() const;
 
   void             setStep( const QVariant& );
+  void             setPrecision( const QVariant& );
   void             setMinimum( const QVariant& );
   void             setMaximum( const QVariant& );
 
@@ -528,6 +587,27 @@ public:
 
 private:
   QtxColorButton*  myColor;
+};
+
+class QTX_EXPORT QtxPagePrefBiColorItem : public QtxPageNamedPrefItem
+{
+public:
+  QtxPagePrefBiColorItem( const QString&, QtxPreferenceItem* = 0,
+			   const QString& = QString(), const QString& = QString() );
+  virtual ~QtxPagePrefBiColorItem();
+
+  virtual QString  text() const;
+  virtual void     setText( const QString& );
+
+  virtual void     store();
+  virtual void     retrieve();
+
+protected:
+  virtual QVariant optionValue( const QString& ) const;
+  virtual void     setOptionValue( const QString&, const QVariant& );
+
+private:
+  QtxBiColorTool*  myColors;
 };
 
 class QTX_EXPORT QtxPagePrefFontItem : public QObject, public QtxPageNamedPrefItem
@@ -656,6 +736,98 @@ private:
 private:
   int              myType;
   QDateTimeEdit*   myDateTime;
+};
+
+class QTX_EXPORT QtxPagePrefShortcutBtnsItem : public QtxPageNamedPrefItem
+{
+public:
+  QtxPagePrefShortcutBtnsItem( const QString&, QtxPreferenceItem* = 0,
+                               const QString& = QString(), const QString& = QString() );
+  virtual ~QtxPagePrefShortcutBtnsItem();
+  virtual void     store();
+  virtual void     retrieve();
+
+private:
+  QtxShortcutEdit* myShortcut;
+};
+
+class QTX_EXPORT QtxPagePrefShortcutTreeItem : public QtxPageNamedPrefItem
+{
+public:
+  QtxPagePrefShortcutTreeItem( const QString&, QtxPreferenceItem* = 0, 
+                               const QString& = QString(), const QString& = QString() );
+  virtual ~QtxPagePrefShortcutTreeItem();
+  virtual void     store();
+  virtual void     retrieve();
+								   
+private:
+  QtxShortcutTree* myShortcutTree;
+  QString          mySection;
+};
+
+class QTX_EXPORT QtxPagePrefBackgroundItem : public QObject, public QtxPageNamedPrefItem
+{
+  Q_OBJECT
+
+public:
+  QtxPagePrefBackgroundItem( const QString&, QtxPreferenceItem* = 0,
+			     const QString& = QString(), const QString& = QString() );
+  virtual ~QtxPagePrefBackgroundItem();
+
+  void               gradients( QStringList&, QIntList& ) const;
+  void               setGradients( const QStringList&, const QIntList& = QIntList() );
+
+  bool               isModeAllowed( Qtx::BackgroundMode ) const;
+  void               setModeAllowed( Qtx::BackgroundMode, bool );
+
+  bool               isTextureModeAllowed( Qtx::TextureMode ) const;
+  void               setTextureModeAllowed( Qtx::TextureMode, bool );
+
+  bool               isTextureAllowed() const;
+  void               setTextureAllowed( bool );
+
+  QString            imageFormats() const;
+  void               setImageFormats( const QString& );
+
+  Qt::Orientation    orientation() const;
+  void               setOrientation( Qt::Orientation );
+
+  virtual void       store();
+  virtual void       retrieve();
+
+protected:
+  virtual QVariant   optionValue( const QString& ) const;
+  virtual void       setOptionValue( const QString&, const QVariant& );
+
+private:
+  QtxBackgroundTool* myBgTool;
+};
+
+class QtxUserDefinedContent: public QWidget
+{
+ public:
+  QtxUserDefinedContent(QWidget* parent = 0, Qt::WindowFlags f = 0 ):QWidget(parent, f) {};
+  virtual void store(QtxResourceMgr* theRes, QtxPreferenceMgr* thePref) = 0;
+  virtual void retrieve(QtxResourceMgr* theRes, QtxPreferenceMgr* thePref) = 0;
+};
+
+
+class QTX_EXPORT QtxUserDefinedItem : public QtxPageNamedPrefItem
+{
+public:
+  QtxUserDefinedItem( QtxPreferenceItem* parent );
+
+  void setContent( QtxUserDefinedContent* theContent );
+
+  virtual void store();
+  virtual void retrieve();
+
+protected:
+  virtual QVariant optionValue( const QString& theName ) const;
+  virtual void     setOptionValue( const QString& theName, const QVariant& theVal );
+
+private:
+  QtxUserDefinedContent* myContent;
 };
 
 #endif

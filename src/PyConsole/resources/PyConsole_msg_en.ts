@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>PyConsole_Console</name>
     <message>
@@ -44,6 +22,21 @@
         <location filename="../PyConsole_Console.cxx" line="231"/>
         <source>EDIT_SELECTALL_CMD</source>
         <translation>Select &amp;All</translation>
+    </message>
+    <message>
+        <source>EDIT_DUMPCOMMANDS_CMD</source>
+        <translation>D&amp;ump commands</translation>
+    </message>
+</context>
+<context>
+    <name>PyConsole_Editor</name>
+    <message>
+        <source>TOT_DUMP_PYCOMMANDS</source>
+        <translation>Dump commands</translation>
+    </message>
+    <message>
+        <source>PYTHON_FILES_FILTER</source>
+        <translation>PYTHON Files (*.py)</translation>
     </message>
 </context>
 </TS>

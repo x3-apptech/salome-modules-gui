@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+  Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 
   Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
   CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -29,10 +29,11 @@
     <parameter name="file"       value="no"/>
     <parameter name="key"        value="no"/>
     <parameter name="interp"     value="no"/>
-    <parameter name="modules"    value="LIGHT"/>
+    <parameter name="modules"    value="LIGHT,PYLIGHT"/>
   </section>
   <section name="language">
     <!-- Language settings (resource manager)-->
+    <parameter name="languages"   value="en,fr"/>
     <parameter name="language"    value="en"/>
     <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>
@@ -40,23 +41,26 @@
     <!-- Splash screen settings -->
     <parameter name="image"             value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
     <parameter name="constant_info"     value="%A [ %V ]" />
-    <parameter name="text_colors"       value="#eeeeff|#555555" />
+    <parameter name="text_colors"       value="#ffffff|#777777" />
     <parameter name="hide_on_click"     value="no" />
     <parameter name="show_progress"     value="yes" />
     <parameter name="show_message"      value="yes" />
     <parameter name="show_percents"     value="yes" />
-    <parameter name="margin"            value="40" />
+    <parameter name="margin"            value="50" />
     <parameter name="progress_width"    value="20" />
     <parameter name="progress_flags"    value="bottom,left_to_right" />
-    <parameter name="opacity"           value="0.70" />
+    <parameter name="opacity"           value="0.85" />
     <parameter name="font"              value="Tahoma,12,normal" />
     <parameter name="alignment"         value="top,left" />
-    <parameter name="progress_colors"   value="#3b3e5d|#d14949|v" />
+    <parameter name="progress_colors"   value="#929ca7|#aebac7|v" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->
+    <parameter name="Qtx"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="Style"        value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SUIT"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="STD"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="ViewerTools"  value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="Plot2d"       value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SPlot2d"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="GLViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
@@ -69,14 +73,19 @@
     <parameter name="CAM"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LightApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SVTK"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SUPERVGraph"  value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="QxGraph"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="ToolsGUI"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="LogWindow"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
   </section>
   <section name="desktop" >
     <!-- Default GUI desktop state, position, size -->
-    <parameter name="geometry"  value="80%x80%+10%+10%"/>
+    <parameter name="geometry"      value="80%%x80%%+10%%+10%%"/>
+    <parameter name="opaque_resize" value="false"/>
   </section>
   <section name="PyConsole">
     <!-- Python console preferences -->
+    <parameter name="show_banner"         value="true" />
     <parameter name="font"                value="Helvetic,12" />
     <parameter name="additional_families" value="Helvetic;Helvetica;Helvetica[Adobe];Times;Times[Adobe];Sans Serif;Serif;Monospace;Lucida"/>
   </section>
@@ -87,10 +96,15 @@
   <section name="ObjectBrowser" >
     <!-- Object Browser preferences -->
     <parameter name="auto_hide_search_tool" value="true" />
+    <parameter name="auto_size"             value="false" />
+    <parameter name="auto_size_first"       value="true"  />
+    <parameter name="resize_on_expand_item" value="false"  />
+    <parameter name="browse_published_object" value="1"  />
   </section>
   <section name="FileDlg">
     <!-- "Open/Save File" dialog box preferences-->
     <parameter name="QuickDirList" value=""/>
+    <parameter name="ShowCurDirInitial" value="true" />
   </section>
   <section name="MRU" >
     <!-- Show "Most recently used" studies-->
@@ -108,48 +122,126 @@
   </section>
   <section name="Study">
     <!-- General study settings -->
-    <parameter name="store_positions" value="true" />
+    <parameter name="store_positions"    value="true" />
+    <parameter name="auto_save_interval" value="0" />
+  </section>
+  <section name="viewers" >
+    <!-- common viewers preferences -->
+    <parameter name="drop_down_buttons"     value="true" />
   </section>
   <section name="OCCViewer" >
     <!-- OCC viewer preferences -->
-    <parameter name="background"     value="35, 136, 145" />
+    <parameter name="xz_background"     value="35, 136, 145" />
+    <parameter name="yz_background"     value="35, 136, 145" />
+    <parameter name="xy_background"     value="35, 136, 145" />
+    <parameter name="background"        value="35, 136, 145" />
     <parameter name="iso_number_u"   value="1" />
     <parameter name="iso_number_v"   value="1" />
     <parameter name="trihedron_size" value="100" />
+    <parameter name="navigation_mode" value="0" />
+    <parameter name="zooming_mode"   value="0" />
+    <parameter name="show_static_trihedron" value="true"/>
+    <parameter name="relative_size"                    value="true"/>    
  </section>
  <section name="VTKViewer" >
     <!-- VTK viewer preferences -->
-    <parameter name="background"     value="0, 0, 0"/>
-    <parameter name="projection_mode" value="0" />
-    <parameter name="trihedron_size" value="100" />
-    <parameter name="relative_size"  value="true" />
-    <parameter name="use_advanced_selection_algorithm" value="true" />
-    <parameter name="navigation_mode" value="0" />
-    <parameter name="speed_value" value="10" />
-    <parameter name="speed_mode" value="0" />
-    <parameter name="spacemouse_func1_btn" value="1" />
-    <parameter name="spacemouse_func2_btn" value="2" />
-    <parameter name="spacemouse_func5_btn" value="9" />
+    <parameter name="background"                       value="0, 0, 0"/>
+    <parameter name="projection_mode"                  value="0"/>
+    <parameter name="trihedron_size"                   value="105"/>
+    <parameter name="relative_size"                    value="true"/>
+    <parameter name="dynamic_preselection"             value="true"/>
+    <parameter name="navigation_mode"                  value="0"/>
+    <parameter name="zooming_mode"                     value="0"/>
+    <parameter name="speed_value"                      value="10"/>
+    <parameter name="speed_mode"                       value="0"/>
+    <parameter name="show_static_trihedron"            value="true"/>
+    <parameter name="spacemouse_func1_btn"             value="1"/>
+    <parameter name="spacemouse_func2_btn"             value="2"/>
+    <parameter name="spacemouse_func5_btn"             value="5"/>
+    <parameter name="show_group_names"                 value="true"/>
+    <parameter name="group_names_text_color"           value="255, 255, 255"/>
+    <parameter name="group_names_transparency"         value="0.5"/>
+    <parameter name="recorder_mode"                    value="1"/>
+    <parameter name="recorder_fps"                     value="17.3"/>
+    <parameter name="recorder_quality"                 value="100" />
+    <parameter name="recorder_progressive"             value="true"/>
  </section>
  <section name="Plot2d" >
     <!-- Plot2d viewer preferences -->
     <parameter name="Background"   value="255, 255, 255" />
+    <parameter name="SelectionColor"   value="80, 80, 80" />
+    <parameter name="DeviationMarkerColor"   value="255, 0, 0" />
+    <parameter name="DeviationMarkerLineWidth" value="1" />
+    <parameter name="DeviationMarkerTickSize" value="2" />
     <parameter name="CurveType"    value="1" />
     <parameter name="HorScaleMode" value="0" />
     <parameter name="LegendPos"    value="1" />
+    <parameter name="LegendFont"   value="Helvetic,12" />
+    <parameter name="LegendFontColor"  value="0, 0, 0" />
+    <parameter name="SelectedLegendFontColor"  value="255, 255, 255" />
     <parameter name="MarkerSize"   value="9" />
     <parameter name="ShowLegend"   value="true" />
     <parameter name="VerScaleMode" value="0" />
+    <parameter name="VerNormLMinMode" value="false"/>
+    <parameter name="VerNormLMaxMode" value="false"/>
+    <parameter name="VerNormRMinMode" value="false"/>
+    <parameter name="VerNormRMaxMode" value="false"/>
   </section>
-  <section name="SUPERVGraph" >
-    <!-- Supervision viewer preferences -->
+  <section name="QxGraph" >
+    <!-- QxGraph viewer preferences -->
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />
+    <parameter name="NodeBody"   value="255, 249, 147" />
   </section>
   <section name="QxSceneViewer" >
     <!-- QxGraph viewer preferences -->
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />
     <parameter name="NodeBody"   value="255, 249, 147" />
+  </section>
+  <section name="GUI" >
+    <parameter name="documentation"     value="gui_help"/>
+  </section>
+  <section name="KERNEL" >
+    <parameter name="documentation"     value="kernel_help"/>
+  </section>
+  <section name="gui_help" >
+    <parameter name="sub_menu"          value="%1 module"/>
+    <parameter name="User's Guide"      value="${GUI_ROOT_DIR}/share/doc/salome/gui/GUI/index.html"/>
+    <parameter name="Developer's Guide" value="${GUI_ROOT_DIR}/share/doc/salome/tui/GUI/index.html"/>
+  </section>
+  <section name="kernel_help" >
+    <parameter name="sub_menu"          value="%1 module"/>
+    <parameter name="User's Guide"      value="${KERNEL_ROOT_DIR}/share/doc/salome/gui/KERNEL/index.html"/>
+    <parameter name="Developer's Guide" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html"/>
+  </section>
+  <!--Salome shortcut settings-->
+  <section name="shortcuts_settings">
+    <parameter name="general_sections" value="General;Viewers"/>
+  </section>
+  <section name="shortcuts:General">
+    <parameter name="Show object(s)" value="Ctrl+Alt+S"/>
+    <parameter name="Hide object(s)" value="Ctrl+Alt+H"/>
+  </section>
+  <section name="shortcuts:Viewers">
+    <parameter name="Front view" value="Ctrl+Alt+F"/>
+    <parameter name="Back view" value="Ctrl+Alt+B"/>
+    <parameter name="Top view" value="Ctrl+Alt+T"/>
+    <parameter name="Bottom view" value="Ctrl+Alt+O"/>
+    <parameter name="Left view" value="Ctrl+Alt+K"/>
+    <parameter name="Right view" value="Ctrl+Alt+R"/>
+    <parameter name="Reset view" value="Ctrl+Alt+E"/>
+  </section>
+  <section name="shortcuts:Geometry">
+    <parameter name="Increase number of isolines" value="Meta+I"/>
+    <parameter name="Decrease number of isolines" value="Meta+D"/>
+    <parameter name="Increase transparency" value="Meta+Y"/>
+    <parameter name="Decrease transparency" value="Meta+T"/>
+  </section>
+  <section name="ExternalBrowser" >
+    <!-- External HELP browser settings -->
+    <parameter value="C:\Program Files\Internet Explorer\iexplore.exe" name="winapplication" />
+    <parameter value="false" name="use_external_browser" />
+    <parameter value="/usr/bin/mozilla" name="application" />
   </section>
 </document>

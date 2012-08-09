@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef STD_APPLICATION_H
 #define STD_APPLICATION_H
 
@@ -52,7 +53,7 @@ class STD_EXPORT STD_Application : public SUIT_Application
   Q_OBJECT
 
 public:
-  enum { MenuFileId, FileNewId, FileOpenId, FileCloseId, FileSaveId, FileSaveAsId, FileExitId,
+  enum { MenuFileId, FileNewId, FileOpenId, FileReopenId, FileCloseId, FileSaveId, FileSaveAsId, FileExitId,
          MenuViewId, ViewWindowsId, ViewToolBarsId, ViewStatusBarId, NewWindowId,
          MenuEditId, EditCutId, EditCopyId, EditPasteId,
          MenuHelpId, HelpAboutId,
@@ -85,10 +86,11 @@ public:
   ViewManagerList       viewManagers() const;
   void                  viewManagers( ViewManagerList& ) const;
   void                  viewManagers( const QString&, ViewManagerList& ) const;
+  virtual int           viewManagerId (const SUIT_ViewManager* ) const;
 
   virtual QString       getFileFilter() const { return QString(); }
   virtual QString       getFileName( bool open, const QString& initial, const QString& filters,
-				                             const QString& caption, QWidget* parent );
+                                                             const QString& caption, QWidget* parent );
   QString               getDirectory( const QString& initial, const QString& caption, QWidget* parent );
 
   virtual void          start();
@@ -120,6 +122,8 @@ public slots:
 
   virtual void          onOpenDoc();
   virtual bool          onOpenDoc( const QString& );
+
+  virtual bool          onReopenDoc();
 
   virtual void          onExit();
 

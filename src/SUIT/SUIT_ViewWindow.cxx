@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // SUIT_ViewWindow.cxx: implementation of the SUIT_ViewWindow class.
 //
 #include "SUIT_ViewWindow.h"
@@ -30,6 +31,7 @@
 #include "SUIT_Application.h"
 #include "SUIT_ViewManager.h"
 #include "QtxActionToolMgr.h"
+#include "QtxMultiAction.h"
 
 #include <QEvent>
 #include <QIcon>
@@ -45,15 +47,17 @@ const int DUMP_EVENT = QEvent::User + 123;
 
 /*! Constructor.*/
 SUIT_ViewWindow::SUIT_ViewWindow( SUIT_Desktop* theDesktop )
-: QMainWindow( theDesktop )
+  : QMainWindow( theDesktop ), myManager( 0 ), myIsDropDown( true )
 {
   myDesktop = theDesktop;
 
-  setWindowIcon( myDesktop->windowIcon() );
+  setWindowIcon( myDesktop ? myDesktop->windowIcon() : QApplication::windowIcon() );
 
   setAttribute( Qt::WA_DeleteOnClose );
 
   myToolMgr = new QtxActionToolMgr( this );
+
+  setProperty( "VectorsMode", false );
 }
 
 /*! Destructor.*/
@@ -116,6 +120,7 @@ bool SUIT_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileNa
 */
 bool SUIT_ViewWindow::dumpViewToFormat( const QString& fileName, const QString& format )
 {
+  Qtx::Localizer loc;
   return dumpViewToFormat( dumpView(), fileName, format );
 }
 
@@ -132,7 +137,8 @@ void SUIT_ViewWindow::setDestructiveClose( const bool on )
 void SUIT_ViewWindow::closeEvent( QCloseEvent* e )
 {
   e->ignore();
-  emit closing( this );
+  emit tryClosing( this );
+  if ( closable() ) emit closing( this );
 }
 
 /*! Context menu requested for event \a e.
@@ -154,7 +160,8 @@ void SUIT_ViewWindow::contextMenuEvent( QContextMenuEvent* e )
 */
 void SUIT_ViewWindow::onDumpView()
 {
-  QApplication::postEvent( this, new QPaintEvent( QRect( 0, 0, width(), height() ) ) );
+  // VSV (TRIPOLI dev): next line commented: causes error messages
+  //QApplication::postEvent( this, new QPaintEvent( QRect( 0, 0, width(), height() ) ) );
   QApplication::postEvent( this, new QEvent( (QEvent::Type)DUMP_EVENT ) );
 }
 
@@ -175,18 +182,18 @@ bool SUIT_ViewWindow::event( QEvent* e )
     bool bOk = false;
     if ( myManager && myManager->study() && myManager->study()->application() )
     {
-      QImage im = dumpView();
-
       // get file name
       SUIT_Application* app = myManager->study()->application();
       QString fileName = app->getFileName( false, QString(), filter(), tr( "TLT_DUMP_VIEW" ), 0 );
       if ( !fileName.isEmpty() )
       {
-	      QString fmt = SUIT_Tools::extension( fileName ).toUpper();
-	      bOk = dumpViewToFormat( im, fileName, fmt );
+        QImage im = dumpView();
+	QString fmt = SUIT_Tools::extension( fileName ).toUpper();
+	Qtx::Localizer loc;
+	bOk = dumpViewToFormat( im, fileName, fmt );
       }
       else
-	      bOk = true; // cancelled
+	bOk = true; // cancelled
     }
     if ( !bOk )
       SUIT_MessageBox::critical( this, tr( "ERROR" ), tr( "ERR_CANT_DUMP_VIEW" ) );
@@ -210,10 +217,27 @@ bool SUIT_ViewWindow::action( const int  )
   return true;
 }
 
+/*! Returns \c true if view window can be closed by the user
+*/
+bool SUIT_ViewWindow::closable() const
+{
+  QVariant val = property( "closable" );
+  return !val.isValid() || val.toBool();
+}
+
+/*! Set / reset "closable" option of the view window
+*/
+bool SUIT_ViewWindow::setClosable( const bool on )
+{
+  bool prev = closable();
+  setProperty( "closable", on );
+  return prev;
+}
+
 /*!
   \return string containing visual parameters of window
 */
-QString   SUIT_ViewWindow::getVisualParameters()
+QString SUIT_ViewWindow::getVisualParameters()
 {
   return "empty";
 }
@@ -232,6 +256,67 @@ void SUIT_ViewWindow::setVisualParameters( const QString& /*parameters*/ )
 QtxActionToolMgr* SUIT_ViewWindow::toolMgr() const
 {
   return myToolMgr;
+}
+
+/*!
+  \brief Set buttons mode to drop-down (\a on = \c true) or ligned (\a on = \c false) 
+  \param on new buttons mode
+  \sa dropDownButtons()
+*/
+void SUIT_ViewWindow::setDropDownButtons( bool on )
+{
+  if ( myIsDropDown != on ) {
+    myIsDropDown = on;
+    if ( myIsDropDown ) {
+      ActionsMap::const_iterator it;
+      for( it = myMultiActions.constBegin(); it != myMultiActions.constEnd(); ++it )
+      {
+	int tid = it.key();
+	const QList<QtxMultiAction*>& mlist = it.value();
+	QList<QtxMultiAction*>::const_iterator mit;
+	for ( mit = mlist.constBegin(); mit != mlist.constEnd(); ++mit )
+	{
+	  QtxMultiAction* ma = *mit;
+	  const QList<QAction*> alist = ma->actions();
+	  if ( alist.isEmpty() ) continue;
+	  int idx = toolMgr()->index( toolMgr()->actionId( alist[0] ), tid );
+	  if ( idx == -1 ) continue;
+	  foreach ( QAction* a, alist ) toolMgr()->remove( toolMgr()->actionId( a ), tid );
+	  toolMgr()->insert( ma, tid, idx );
+	}
+      }
+      myMultiActions.clear();
+    }
+    else {
+      QIntList tblist = toolMgr()->toolBarsIds();
+      QIntList alist  = toolMgr()->idList();
+      foreach( int aid, alist )
+      {
+	QtxMultiAction* ma = qobject_cast<QtxMultiAction*>( toolMgr()->action( aid ) );
+	if ( !ma ) continue;
+	foreach( int tid, tblist )
+	{
+	  int idx = toolMgr()->index( aid, tid );
+	  if ( idx >= 0 )
+	  {
+	    myMultiActions[ tid ].append( ma );
+	    toolMgr()->remove( aid, tid );
+	    foreach( QAction* a, ma->actions() ) toolMgr()->insert( a, tid, idx++ );
+	  }
+	}
+      }
+    }
+  }
+}
+
+/*!
+  \brief Get current buttons mode
+  \return current buttons mode
+  \sa setDropDownButtons()
+*/
+bool SUIT_ViewWindow::dropDownButtons() const
+{
+  return myIsDropDown;
 }
 
 /*!

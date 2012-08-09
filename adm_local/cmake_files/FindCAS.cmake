@@ -1,43 +1,70 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-#
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 SET(CASROOT $ENV{CASROOT})
 
-SET(OCC_VERSION_MAJOR 6)
-SET(OCC_VERSION_MINOR 3)
-SET(OCC_VERSION_MAINTENANCE 0)
+# SET(OCC_VERSION_MAJOR 6)
+# SET(OCC_VERSION_MINOR 3)
+# SET(OCC_VERSION_MAINTENANCE 10)
+SET(OCC_VERSION_DEVELOPMENT 0)
+
+FIND_FILE(ff Standard_Version.hxx ${CASROOT}/include/opencascade ${CASROOT}/inc)    
+IF(ff)
+  FILE(STRINGS ${ff} OCC_VERSION_DEVELOPMENT_STR
+      REGEX "^ *#define OCC_VERSION_DEVELOPMENT.*$")
+  IF(OCC_VERSION_DEVELOPMENT_STR)
+    SET(OCC_VERSION_DEVELOPMENT 1)
+  ENDIF(OCC_VERSION_DEVELOPMENT_STR)
+ENDIF(ff)
 
 SET(CAS_CPPFLAGS)
-SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MAJOR=${OCC_VERSION_MAJOR})
-SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MINOR=${OCC_VERSION_MINOR})
-SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MAINTENANCE=${OCC_VERSION_MAINTENANCE})
+# SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MAJOR=${OCC_VERSION_MAJOR})
+# SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MINOR=${OCC_VERSION_MINOR})
+# SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DOCC_VERSION_MAINTENANCE=${OCC_VERSION_MAINTENANCE})
 SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DLIN -DLINTEL -DCSFDB)
+SET(CAS_DEFINITIONS "-DLIN -DLINTEL -DCSFDB")
 SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DNo_exception)
+SET(CAS_DEFINITIONS "${CAS_DEFINITIONS} -DNo_exception")
 SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DHAVE_CONFIG_H)
+SET(CAS_DEFINITIONS "${CAS_DEFINITIONS} -DHAVE_CONFIG_H")
 SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -DHAVE_LIMITS_H)
-SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -I${CASROOT}/inc)
+SET(CAS_DEFINITIONS "${CAS_DEFINITIONS} -DHAVE_LIMITS_H")
+SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -I${CASROOT}/inc) # to be removed
+SET(CAS_INCLUDE_DIRS ${CASROOT}/inc)
+
+IF(CMAKE_SIZEOF_VOID_P STREQUAL 8)
+  SET(CAS_CPPFLAGS ${CAS_CPPFLAGS} -D_OCC64)
+ENDIF(CMAKE_SIZEOF_VOID_P STREQUAL 8)
+
+IF(NOT WINDOWS)
+  FIND_LIBRARY(Xmu Xmu)
+  IF(Xmu)
+    SET(CAS_LDPATH ${Xmu})
+  ENDIF(Xmu)
+ENDIF(NOT WINDOWS)
 
 IF(WINDOWS)
-  SET(CASROOT_LIBDIR ${CASROOT}/win32/libd)
+  IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+    SET(CASROOT_LIBDIR ${CASROOT}/win32/libd)
+  ELSE(CMAKE_BUILD_TYPE STREQUAL Debug)
+    SET(CASROOT_LIBDIR ${CASROOT}/win32/lib)
+  ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE(WINDOWS)
   SET(CASROOT_LIBDIR ${CASROOT}/lib)
 ENDIF(WINDOWS)

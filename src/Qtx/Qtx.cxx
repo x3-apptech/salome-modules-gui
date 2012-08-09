@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      Qtx.cxx
 // Author:    Sergey TELKOV
 //
@@ -36,13 +37,33 @@
 #include <QCompleter>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QLinearGradient>
-#include <QRadialGradient>
-#include <QConicalGradient>
+#include <QtDebug>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <clocale>
+
+#define BICOLOR_CHANGE_HUE
+
+/*!
+  \brief Auxiliary function converting string \a str to the integer value.
+  Parameter \a defVal specifies default value that is returned if conversion can't be done.
+  Parameters \a minVal and \a maxVal limit the resulting value.
+  \param str string being converted
+  \param defVal default value
+  \param minVal minimum allowed value
+  \param maxVal maximum allowed value
+  \return integer value obtained from the string
+  \internal
+*/
+static int stringToInt( const QString& str, int defVal, int minVal, int maxVal )
+{
+  bool ok;
+  int v = str.toInt( &ok );
+  if ( !ok ) v = defVal;
+  return qMin( qMax( v, minVal ), maxVal );
+}
 
 /*!
   \class Qtx
@@ -434,7 +455,7 @@ QString Qtx::library( const QString& str )
 */
 QString Qtx::tmpDir()
 {
-  char* tmpdir = ::getenv( "TEMP" );
+  const char* tmpdir = ::getenv( "TEMP" );
   if ( !tmpdir )
     tmpdir = ::getenv ( "TMP" );
   if ( !tmpdir )
@@ -478,7 +499,7 @@ bool Qtx::rmDir( const QString& thePath )
     {
       QFileInfo inf = *it;
       if ( inf.fileName() == "." || inf.fileName() == ".." )
-	continue;
+        continue;
       stat = stat && rmDir( inf.absoluteFilePath() );
     }
     stat = stat && aDir.rmdir( thePath );
@@ -559,7 +580,7 @@ bool Qtx::dos2unix( const QString& absName )
     if ( nbwri != outcnt )
     {
       ::fclose( src );
-			::fclose( tgt );
+                        ::fclose( tgt );
       QFile::remove( QString( temp ) );
       return false;
     }
@@ -625,6 +646,99 @@ QCompleter* Qtx::pathCompleter( const PathType type, const QString& filter )
   dm->setParent( cmp );
 
   return cmp;
+}
+
+/*!
+  \brief Parse given string to retrieve environment variable.
+
+  Looks through the string for the patterns: ${name} or $(name) or %name%.
+  If string contains variable satisfying any pattern, the variable name
+  is returned, start index of the variable is returned in the \a start parameter,
+  and length of the variable is returned in the \a len parameter.
+
+  \param str string being processed
+  \param start if variable is found, this parameter contains its starting 
+         position in the \a str
+  \param len if variable is found, this parameter contains its length 
+  \return first found variable or null QString if there is no ones
+*/
+QString Qtx::findEnvVar( const QString& str, int& start, int& len )
+{
+  QString varName;
+  len = 0;
+
+  QRegExp rx( "(^\\$\\{|[^\\$]\\$\\{)([a-zA-Z]+[a-zA-Z0-9_]*)(\\})|(^\\$\\(|[^\\$]\\$\\()([a-zA-Z]+[a-zA-Z0-9_]*)(\\))|(^\\$|[^\\$]\\$)([a-zA-Z]+[a-zA-Z0-9_]*)|(^%|[^%]%)([a-zA-Z]+[a-zA-Z0-9_]*)(%[^%]|%$)" );
+
+  int pos = rx.indexIn( str, start );
+  if ( pos != -1 )
+  {
+    int i = 1;
+    while ( i <= rx.numCaptures() && varName.isEmpty() )
+    {
+      QString capStr = rx.cap( i );
+      if ( !capStr.contains( "%" ) && !capStr.contains( "$" ) )
+        varName = capStr;
+      i++;
+    }
+
+    if ( !varName.isEmpty() )
+    {
+      int capIdx = i - 1;
+      start = rx.pos( capIdx );
+      int end = start + varName.length();
+      if ( capIdx > 1 && rx.cap( capIdx - 1 ).contains( QRegExp( "\\$|%" ) ) )
+        start = rx.pos( capIdx - 1 ) + rx.cap( capIdx - 1 ).indexOf( QRegExp( "\\$|%" ) );
+      if ( capIdx < rx.numCaptures() && !rx.cap( capIdx - 1 ).isEmpty() )
+        end++;
+      len = end - start;
+    }
+  }
+  return varName;
+}
+
+/*!
+  \brief Substitute environment variables by their values.
+
+  Environment variable is substituted by its value.
+
+  \param str string to be processed
+  \return processed string (with all substitutions made)
+*/
+QString Qtx::makeEnvVarSubst( const QString& str, const SubstMode mode )
+{
+  QString res = str;
+  if ( mode != Never )
+  {
+    QMap<QString, int> ignoreMap;
+
+    int start( 0 ), len( 0 );
+    while ( true )
+    {
+      QString envName = findEnvVar( res, start, len );
+      if ( envName.isNull() )
+        break;
+
+      QString newStr;
+      if ( ::getenv( envName.toLatin1() ) || mode == Always )
+        newStr = QString( ::getenv( envName.toLatin1() ) );
+
+      if ( newStr.isNull() )
+      {
+        if ( ignoreMap.contains( envName ) )
+        {
+          start += len;
+          continue;
+        }
+        ignoreMap.insert( envName, 0 );
+      }
+      res.replace( start, len, newStr );
+    }
+
+    res.replace( "$$", "$" );
+    res.replace( "%%", "%" );
+  }
+
+  return res;
 }
 
 /*!
@@ -721,7 +835,7 @@ void Qtx::scaleColors( const int num, QColorList& lst )
 /*!
   \brief Scale the pixmap to the required size.
 
-  If \h is 0 (default) the value of \a w is used instead (to create
+  If \a h is 0 (default) the value of \a w is used instead (to create
   square pixmap).
 
   \param icon pixmap to be resized
@@ -733,7 +847,7 @@ QPixmap Qtx::scaleIcon( const QPixmap& icon, const unsigned w, const unsigned h 
 {
   QPixmap p;
   int aw = w, ah = h <= 0 ? w : h;
-  if ( icon.isNull() || aw <= 0 || ah <= 0 || aw == icon.width() && ah == icon.height() )
+  if ( icon.isNull() || aw <= 0 || ah <= 0 || ( aw == icon.width() && ah == icon.height() ) )
     p = icon;
   else
     p = icon.fromImage( icon.toImage().scaled( aw, ah, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
@@ -965,7 +1079,7 @@ QString Qtx::colorToString( const QColor& color )
   - "RR,GG,BB[,AA]" or "RR GG BB[ AA]" (\c RR, \c GG, \c BB
   and optional \c AA values represent red, green, blue and alpha
   components of the color in decimal form)
-  - #RRGGBB" - (\c RR, \c GG and \c BB values represent red, green and blue
+  - "#RRGGBB" - (\c RR, \c GG and \c BB values represent red, green and blue
   components of the color in hexadecimal form)
   - an integer value representing packed color components (see rgbSet())
   - a name from the list of colors defined in the list of SVG color keyword names
@@ -1014,6 +1128,106 @@ bool Qtx::stringToColor( const QString& str, QColor& color )
   }
 
   return res;
+}
+
+/*!
+  \brief Convert bi-color value to the string representation.
+  
+  Bi-color value is specified as main color and integer delta
+  value that is used to calculate secondary color by changing
+  paremeters of the main color ("saturation" and "value"
+  components in HSV notation).
+
+  The resulting string consists of two sub-strings separated by
+  '|' symbol. The first part represents main color
+  (see colorToString() for more details), the second part is a
+  delta value.
+
+  Backward conversion can be done with stringToBiColor() method.
+
+  \param color color to be converted
+  \param delta delta value
+  \return string representation of the bi-color value
+
+  \sa stringToBiColor(), stringToColor()
+*/
+QString Qtx::biColorToString( const QColor& color, const int delta )
+{
+  return QString("%1|%2").arg( Qtx::colorToString( color ) ).arg( delta );
+}
+
+/*!
+  \brief Restore bi-color value from the string representation.
+
+  Bi-color value is specified as main color and integer delta
+  value that is used to calculate secondary color by changing
+  paremeters of the main color ("saturation" and "value"
+  components in HSV notation).
+
+  The parameter \a str should consist of two sub-strings separated
+  by '|' symbol. The first part represents main color
+  (see stringToColor() for more details), the second part is a
+  delta value.
+
+  Backward conversion can be done with biColorToString() method.
+
+  \param str string representation of the bi-color value
+  \param color resulting color value
+  \param delta resulting delta value
+  \return \c true if the conversion is successful and \c false otherwise
+
+  \sa biColorToString(), stringToColor(), rgbSet()
+*/
+bool Qtx::stringToBiColor( const QString& str, QColor& color, int& delta )
+{
+  QStringList data = str.split( "|", QString::KeepEmptyParts );
+  QColor c;
+  int d = 0;
+  bool ok = data.count() > 0 && Qtx::stringToColor( data[0], c );
+  bool dok = false;
+  if ( data.count() > 1 ) d = data[1].toInt( &dok );
+  ok = ok && dok;
+  color = ok ? c : QColor();
+  delta = ok ? d : 0;
+  return ok;
+}
+
+/*!
+  \brief Compute secondary color value from specified main color
+  and delta.
+
+  Secondary color is calculated by changing paremeters of the main
+  color ("saturation" and "value" components in HSV notation) using
+  specified delta.
+
+  If main color is invalid, result of the function is also invalid color.
+
+  \param color source main color
+  \param delta delta value
+  \return resulting secondary color
+  
+  \sa biColorToString(), stringToBiColor()
+*/
+QColor Qtx::mainColorToSecondary( const QColor& color, int delta )
+{
+  QColor cs = color;
+  if ( cs.isValid() ) {
+    int val = qMin( 255, qMax( cs.value() + delta, 0 ) );
+    int sat = qMin( 255, qMax( cs.saturation() + delta-(val-cs.value()), 0 ) );
+#ifdef BICOLOR_CHANGE_HUE
+    const int BICOLOR_HUE_MAXDELTA = 40;
+    int dh = delta-(val-cs.value())-(sat-cs.saturation());
+    dh = qMin( BICOLOR_HUE_MAXDELTA, qAbs( dh ) ) * ( dh > 0 ? 1 : -1 );
+    //int hue = qMin( 359, qMax( cs.hue() + delta-(val-cs.value())-(sat-cs.saturation()), 0 ) );
+    //int hue = qMin( 359, qMax( cs.hue() + delta-(val-cs.value())-ds, 0 ) );
+    int hue = cs.hue() + dh;
+    if ( hue < 0 ) hue = 360 - hue;
+#else
+    int hue = cs.hue();
+#endif
+    cs.setHsv( hue, sat, val );
+  }
+  return cs;
 }
 
 /*!
@@ -1156,25 +1370,25 @@ bool Qtx::stringToLinearGradient( const QString& str, QLinearGradient& gradient 
       // spread type
       if ( vals.count() > 5 )
       {
-	QString spread = vals[ 5 ].trimmed().toLower();
-	if ( spread == "pad" || spread == "0" )
-	  gradient.setSpread( QGradient::PadSpread );
-	else if ( spread == "repeat" || spread == "2" )
-	  gradient.setSpread( QGradient::RepeatSpread );
-	else if ( spread == "reflect" || spread == "1" )
-	  gradient.setSpread( QGradient::ReflectSpread );
+        QString spread = vals[ 5 ].trimmed().toLower();
+        if ( spread == "pad" || spread == "0" )
+          gradient.setSpread( QGradient::PadSpread );
+        else if ( spread == "repeat" || spread == "2" )
+          gradient.setSpread( QGradient::RepeatSpread );
+        else if ( spread == "reflect" || spread == "1" )
+          gradient.setSpread( QGradient::ReflectSpread );
       }
       // stop points
       QGradientStops stops;
       for ( int i = 6; i < vals.count(); i+=2 )
       {
-	bool bOk5, bOk6 = false;
-	QColor c;
-	double stop = vals[i].toDouble( &bOk5 );
-	if ( i+1 < vals.count() )
-	  bOk6 = stringToColor( vals[ i+1 ], c );
-	if ( bOk5 && stop >= 0.0 && stop <= 1.0 && bOk6 && c.isValid() )
-	  stops.append( QGradientStop( stop, c ) );
+        bool bOk5, bOk6 = false;
+        QColor c;
+        double stop = vals[i].toDouble( &bOk5 );
+        if ( i+1 < vals.count() )
+          bOk6 = stringToColor( vals[ i+1 ], c );
+        if ( bOk5 && stop >= 0.0 && stop <= 1.0 && bOk6 && c.isValid() )
+          stops.append( QGradientStop( stop, c ) );
       }
       gradient.setStops( stops );
       success = true;
@@ -1194,7 +1408,7 @@ bool Qtx::stringToRadialGradient( const QString& str, QRadialGradient& gradient 
 {
   bool success = false;
   QStringList vals = str.split( "|", QString::SkipEmptyParts );
-  if ( vals.count() > 5 && vals[0] == "radial" || vals[0] == "rg" ) 
+  if ( vals.count() > 5 && ( vals[0] == "radial" || vals[0] == "rg" ) )
   {
     // center, radius and focal point
     double cx, cy, r, fx, fy;
@@ -1210,25 +1424,25 @@ bool Qtx::stringToRadialGradient( const QString& str, QRadialGradient& gradient 
       // spread type
       if ( vals.count() > 6 )
       {
-	QString spread = vals[ 6 ].trimmed().toLower();
-	if ( spread == "pad" || spread == "0" )
-	  gradient.setSpread( QGradient::PadSpread );
-	else if ( spread == "repeat" || spread == "2" )
-	  gradient.setSpread( QGradient::RepeatSpread );
-	else if ( spread == "reflect" || spread == "1" )
-	  gradient.setSpread( QGradient::ReflectSpread );
+        QString spread = vals[ 6 ].trimmed().toLower();
+        if ( spread == "pad" || spread == "0" )
+          gradient.setSpread( QGradient::PadSpread );
+        else if ( spread == "repeat" || spread == "2" )
+          gradient.setSpread( QGradient::RepeatSpread );
+        else if ( spread == "reflect" || spread == "1" )
+          gradient.setSpread( QGradient::ReflectSpread );
       }
       // stop points
       QGradientStops stops;
       for ( int i = 7; i < vals.count(); i+=2 )
       {
-	bool bOk7, bOk8 = false;
-	QColor c;
-	double stop = vals[i].toDouble( &bOk7 );
-	if ( i+1 < vals.count() )
-	  bOk8 = stringToColor( vals[ i+1 ], c );
-	if ( bOk7 && stop >= 0.0 && stop <= 1.0 && bOk8 && c.isValid() )
-	  stops.append( QGradientStop( stop, c ) );
+        bool bOk7, bOk8 = false;
+        QColor c;
+        double stop = vals[i].toDouble( &bOk7 );
+        if ( i+1 < vals.count() )
+          bOk8 = stringToColor( vals[ i+1 ], c );
+        if ( bOk7 && stop >= 0.0 && stop <= 1.0 && bOk8 && c.isValid() )
+          stops.append( QGradientStop( stop, c ) );
       }
       gradient.setStops( stops );
       success = true;
@@ -1248,7 +1462,7 @@ bool Qtx::stringToConicalGradient( const QString& str, QConicalGradient& gradien
 {
   bool success = false;
   QStringList vals = str.split( "|", QString::SkipEmptyParts );
-  if ( vals.count() > 3 && vals[0] == "conical" || vals[0] == "cg" ) 
+  if ( vals.count() > 3 && ( vals[0] == "conical" || vals[0] == "cg" ) )
   {
     // center and angle
     double cx, cy, a;
@@ -1262,25 +1476,25 @@ bool Qtx::stringToConicalGradient( const QString& str, QConicalGradient& gradien
       // spread type
       if ( vals.count() > 4 )
       {
-	QString spread = vals[ 4 ].trimmed().toLower();
-	if ( spread == "pad" || spread == "0" )
-	  gradient.setSpread( QGradient::PadSpread );
-	else if ( spread == "repeat" || spread == "2" )
-	  gradient.setSpread( QGradient::RepeatSpread );
-	else if ( spread == "reflect" || spread == "1" )
-	  gradient.setSpread( QGradient::ReflectSpread );
+        QString spread = vals[ 4 ].trimmed().toLower();
+        if ( spread == "pad" || spread == "0" )
+          gradient.setSpread( QGradient::PadSpread );
+        else if ( spread == "repeat" || spread == "2" )
+          gradient.setSpread( QGradient::RepeatSpread );
+        else if ( spread == "reflect" || spread == "1" )
+          gradient.setSpread( QGradient::ReflectSpread );
       }
       // stop points
       QGradientStops stops;
       for ( int i = 5; i < vals.count(); i+=2 )
       {
-	bool bOk4, bOk5 = false;
-	QColor c;
-	double stop = vals[i].toDouble( &bOk4 );
-	if ( i+1 < vals.count() )
-	  bOk5 = stringToColor( vals[ i+1 ], c );
-	if ( bOk4 && stop >= 0.0 && stop <= 1.0 && bOk5 && c.isValid() )
-	  stops.append( QGradientStop( stop, c ) );
+        bool bOk4, bOk5 = false;
+        QColor c;
+        double stop = vals[i].toDouble( &bOk4 );
+        if ( i+1 < vals.count() )
+          bOk5 = stringToColor( vals[ i+1 ], c );
+        if ( bOk4 && stop >= 0.0 && stop <= 1.0 && bOk5 && c.isValid() )
+          stops.append( QGradientStop( stop, c ) );
       }
       gradient.setStops( stops );
       success = true;
@@ -1288,3 +1502,560 @@ bool Qtx::stringToConicalGradient( const QString& str, QConicalGradient& gradien
   }
   return success;
 }
+
+/*!
+  \brief Convert background data to the string representation.
+  The resulting string consists of several sub-strings separated by ';' symbol. 
+  These sub-strings represent:
+  1. background type (enumerator, see Qtx::BackgroundMode)
+  2. texture image file name (string)
+  3. texture mode (enumerator, see Qtx::TextureMode)
+  4. "show texture" flag (boolean)
+  5. first color (for simple gradient data) or solid color (for single-colored mode)
+  6. second color (for simple gradient data)
+  7. type of simple gradient (some integer identifier)
+  8. complex gradient data (for custom gradient mode)
+  Each sub-string consists of keyword/value couple, in form of "<keyword>=<value>".
+
+  Backward conversion can be done with stringToBackground() method.
+
+  \param bgData background data
+  \return string representation of the background data
+
+  \sa stringToBackground()
+*/
+QString Qtx::backgroundToString( const Qtx::BackgroundData& bgData )
+{
+  const QString dtSep         = ";";
+  const QString kwSep         = "=";
+  const QString kwBgType      = "bt";
+  const QString kwFileName    = "fn";
+  const QString kwTextureMode = "tm";
+  const QString kwShowTexture = "ts";
+  const QString kwFirstColor  = "c1";
+  const QString kwSecondColor = "c2";
+  const QString kwGrType      = "gt";
+  const QString kwGrData      = "gr";
+
+  Qtx::BackgroundMode bgMode       = bgData.mode();
+  QString             fileName;
+  Qtx::TextureMode    textureMode  = bgData.texture( fileName );
+  bool                showTexture  = bgData.isTextureShown();
+  QColor              c1, c2;
+  int                 gradientType = bgData.gradient( c1, c2 );
+  const QGradient*    gradient     = bgData.gradient();
+  QString             grString;
+  if ( gradient ) {
+    switch ( gradient->type() ) {
+    case QGradient::LinearGradient:
+      grString = gradientToString( *(static_cast<const QLinearGradient*>( gradient )) );
+      break;
+    case QGradient::RadialGradient:
+      grString = gradientToString( *(static_cast<const QRadialGradient*>( gradient )) );
+      break;
+    case QGradient::ConicalGradient:
+      grString = gradientToString( *(static_cast<const QConicalGradient*>( gradient )) );
+      break;
+    default:
+      break;
+    }
+  }
+  QStringList data;
+  data << QString( "%1%2%3" ).arg( kwBgType ).arg( kwSep ).arg( (int)bgMode );
+  data << QString( "%1%2%3" ).arg( kwFileName ).arg( kwSep ).arg( fileName );
+  data << QString( "%1%2%3" ).arg( kwTextureMode ).arg( kwSep ).arg( (int)textureMode );
+  data << QString( "%1%2%3" ).arg( kwShowTexture ).arg( kwSep ).arg( showTexture ? "true" : "false" );
+  data << QString( "%1%2%3" ).arg( kwFirstColor ).arg( kwSep ).arg( Qtx::colorToString( c1 ) );
+  data << QString( "%1%2%3" ).arg( kwSecondColor ).arg( kwSep ).arg( Qtx::colorToString( c2 ) );
+  data << QString( "%1%2%3" ).arg( kwGrType ).arg( kwSep ).arg( gradientType );
+  data << QString( "%1%2%3" ).arg( kwGrData ).arg( kwSep ).arg( grString );
+
+  return data.join( dtSep );
+}
+
+/*!
+  \brief Restore background data from the string representation.
+
+  The string should consist of several sub-strings separated by ';' symbol. 
+  Each sub-string consists of keyword/value couple, in form of "<keyword>=<value>".
+  The sub-strings can follow in arbitrary order, some keywords can be missing.
+  The background data is described by the following values:
+  - background type (enumerator, see Qtx::BackgroundMode), keyword "bt"
+  - texture image file name (string), keyword "fn"
+  - texture mode (enumerator, see Qtx::TextureMode), keyword "tm"
+  - "show texture" flag (boolean), keyword "ts"
+  - first color (for simple gradient data) or solid color (for single-colored mode), keyword "c1"
+  - second color (for simple gradient data), keyword "c2"
+  - name of gradient type (string), keyword "gt"
+  - complex gradient data (for custom gradient mode), keyword "gr"
+
+  Also, for backward compatibility, background data can be represented by
+  single color value, see stringToColor().
+
+  Backward conversion can be done with backgroundToString() method.
+  Returns invalid background if conversion could not be done.
+
+  \code
+  Qtx::BackgroundData bgData = Qtx::stringToBackground( str );
+  if ( bgData.isValid() ) ) doSomething( bgData );
+  \endcode
+
+  \param theString string representation of the background data
+  \return resulting background data (invalid if conversion has failed)
+
+  \sa backgroundToString()
+*/
+
+Qtx::BackgroundData Qtx::stringToBackground( const QString& str )
+{
+  const QString dtSep         = ";";
+  const QString kwSep         = "=";
+  const QString kwBgType      = "bt";
+  const QString kwFileName    = "fn";
+  const QString kwTextureMode = "tm";
+  const QString kwShowTexture = "ts";
+  const QString kwFirstColor  = "c1";
+  const QString kwSecondColor = "c2";
+  const QString kwGrType      = "gt";
+  const QString kwGrData      = "gr";
+
+  Qtx::BackgroundData bgData = BackgroundData();
+
+  QStringList data = str.split( dtSep, QString::KeepEmptyParts );
+  
+  QColor c;
+  if ( data.count() == 1 && !data.contains( kwSep ) && stringToColor( data[0], c ) ) {
+    // solid color mode, for backward compatibility
+    bgData.setColor( c );
+  }
+  else {
+    QMap<QString, QString> dmap;
+    // background data
+    foreach( QString d, data ) {
+      QStringList items = d.split( kwSep, QString::KeepEmptyParts );
+      if ( items.count() > 0 ) {
+	QString kw  = items.takeFirst().trimmed().toLower(); // keyword
+	QString val = items.join( kwSep ).trimmed(); // if value contains "=" symbol, we have to restore it
+	dmap[ kw ] = val;
+      }
+    }
+    QString bgMode       = dmap.value( kwBgType,      QString() );
+    QString fileName     = dmap.value( kwFileName,    QString() );
+    QString textureMode  = dmap.value( kwTextureMode, QString() );
+    QString showTexture  = dmap.value( kwShowTexture, QString() );
+    QString color1       = dmap.value( kwFirstColor,  QString() );
+    QString color2       = dmap.value( kwSecondColor, QString() );
+    QString gradientType = dmap.value( kwGrType,      QString() );
+    QString gradient     = dmap.value( kwGrData,      QString() );
+    
+    // texture data
+    if ( !fileName.isEmpty() || !textureMode.isEmpty() || !showTexture.isEmpty() ) {
+      Qtx::TextureMode m = (Qtx::TextureMode)( stringToInt( textureMode,        Qtx::CenterTexture, 
+							    Qtx::CenterTexture, Qtx::StretchTexture ) );
+      bgData.setTexture( fileName, m );
+      QStringList boolvars; boolvars << "true" << "yes" << "ok" << "1";
+      if ( boolvars.contains( showTexture.trimmed().toLower() ) )
+	bgData.setTextureShown( true );
+    }
+    QColor c1, c2;
+    // try color mode
+    bool ok = Qtx::stringToColor( color1, c1 );
+    if ( ok ) {
+      bgData.setColor( c1 );
+    }
+    // try simple gradient mode
+    ok = Qtx::stringToColor( color2, c2 );
+    if ( ok || !gradientType.isEmpty() ) {
+      int gt = gradientType.toInt( &ok );
+      bgData.setGradient( ok ? gt : -1, c1, c2 );
+    }
+    // try custom gradient mode
+    QLinearGradient  lg;
+    QConicalGradient cg;
+    QRadialGradient  rg;
+    ok = Qtx::stringToLinearGradient( gradient, lg );
+    if ( ok ) {
+      bgData.setGradient( lg );
+    }
+    ok = Qtx::stringToRadialGradient( gradient, rg );
+    if ( ok ) {
+      bgData.setGradient( rg );
+    }
+    ok = Qtx::stringToConicalGradient( gradient, cg );
+    if ( ok ) {
+      bgData.setGradient( cg );
+    }
+    
+    // finally set background mode
+    Qtx::BackgroundMode m = (Qtx::BackgroundMode)( stringToInt( bgMode,            Qtx::ColorBackground, 
+								Qtx::NoBackground, Qtx::CustomGradientBackground ) );
+    bgData.setMode( m );
+  }
+
+  return bgData;
+}
+
+/*!
+  \class Qtx::Localizer
+  \brief Localization helper
+
+  This helper class can be used to solve the localization problems,
+  usually related to the textual files reading/writing, namely when
+  floating point values are read / written with API functions.
+  The problem relates to such locale specific settings as decimal point
+  separator, thousands separator, etc.
+  
+  To use the Localizer class, just create a local variable in the beginning
+  of the code where you need to read / write data from textual file(s).
+  The constructor of the class forces setting "C" locale temporariy.
+  The destructor switches back to the initial locale.
+
+  \code
+  Qtx::Localizer loc;
+  readSomething();
+  writeSomething();
+  \endcode
+*/
+
+/*!
+  \brief Constructor. Forces "C" locale to be set.
+*/
+Qtx::Localizer::Localizer()
+{
+  myCurLocale = setlocale( LC_NUMERIC, 0 );
+  setlocale( LC_NUMERIC, "C" );
+}
+
+/*!
+  \brief Destructor. Reverts back to the initial locale.
+*/
+Qtx::Localizer::~Localizer()
+{
+  setlocale( LC_NUMERIC, myCurLocale.toLatin1().constData() );
+}
+
+/*!
+  \class Qtx::BackgroundData
+  \brief Stores background data
+
+  This class is used to store background data. Depending on the mode,
+  the background can be specified by:
+  - image (by assigning the file name to be used as background texture), see setTexture(), setTextureShown()
+  - single color (by assigning any color), see setColor()
+  - simple two-color gradient (with the gradient type id and two colors), see setGradient( int, const QColor&, const QColor& )
+  - complex gradient (by assigning arbitrary gradient data), see setGradient( const QGradient& )
+
+  The class stores all the data passed to it, so switching between different modes can be done
+  just by calling setMode() function.
+
+  \note Texture is used with combination of the background mode.
+
+  \note Two-color gradient is specified by two colors and integer identifier. The interpretation of 
+  this identifier should be done in the calling code.
+
+  \code
+  Qtx::BackgroundData bg;
+  bg.setColor( QColor(100, 100, 100) );                  // bg is switched to Qtx::ColorBackground mode
+  bg.setGradient( Qt::Horizontal, Qt::gray, Qt::white ); // bg is switched to Qtx::ColorBackground mode
+  QLinearGradient grad( 0,0,1,1 ); 
+  grad.setColorAt( 0.0, Qt::gray ); 
+  grad.setColorAt( 0.5, Qt::white );
+  grad.setColorAt( 1.0, Qt::green );
+  grad.setSpread( QGradient::PadSpread );
+  bg.setGradient( grad );                                // bg is switched to Qtx::CustomGradientBackground mode
+  bg.setMode( Qtx::ColorBackground );                    // bg is switched back to Qtx::ColorBackground mode
+  bg.setTexture( "/data/images/background.png" );        // specify texture (in the centered mode by default)
+  bg.setTextureShown( true );                            // draw texture on the solid color background
+  \endcode
+*/
+
+/*!
+  \brief Default constructor.
+  Creates invalid background data.
+*/
+Qtx::BackgroundData::BackgroundData()
+  : myTextureMode( Qtx::CenterTexture ), myGradientType( -1 ), myTextureShown( false )
+{
+  setMode( Qtx::NoBackground );
+}
+
+/*!
+  \brief Constructor.
+  Creates background data initialized with the specified color
+  \param c color
+*/
+Qtx::BackgroundData::BackgroundData( const QColor& c )
+  : myTextureMode( Qtx::CenterTexture ), myGradientType( -1 ), myTextureShown( false )
+{
+  setColor( c );
+}
+
+/*!
+  \brief Constructor.
+  Creates background data initialized with the specified two-color gradient
+  \param type gradient type identifier
+  \param c1 first gradient color
+  \param c2 second gradient color
+  \note the interpretation of the gradient identifier should be done in the calling code
+*/
+Qtx::BackgroundData::BackgroundData( int type, const QColor& c1, const QColor& c2 )
+  : myTextureMode( Qtx::CenterTexture ), myGradientType( -1 ), myTextureShown( false )
+{
+  setGradient( type, c1, c2 );
+}
+
+/*!
+  \brief Constructor.
+  Creates background data initialized with the arbirtary gradient data
+  \param grad gradient data
+*/
+Qtx::BackgroundData::BackgroundData( const QGradient& grad )
+  : myTextureMode( Qtx::CenterTexture ), myGradientType( -1 ), myTextureShown( false )
+{
+  setGradient( grad );
+}
+
+/*!
+  \brief Destructor.
+*/
+Qtx::BackgroundData::~BackgroundData()
+{
+}
+
+/*!
+  \brief Compares two background data objects
+*/
+bool Qtx::BackgroundData::operator==( const Qtx::BackgroundData& other ) const
+{
+  return 
+    ( myMode         == other.myMode )         && 
+    ( myTextureMode  == other.myTextureMode )  &&
+    ( myFileName     == other.myFileName )     &&
+    ( myColors       == other.myColors )       &&
+    ( myGradientType == other.myGradientType ) &&
+    ( myGradient     == other.myGradient )     &&
+    ( myTextureShown == other.myTextureShown );
+}
+
+/*!
+  \brief Returns \c false if background data is not set (invalid)
+  \return \c true if background data is valid or \c false otherwise
+  \sa mode()
+*/
+bool Qtx::BackgroundData::isValid() const
+{
+  return myMode != Qtx::NoBackground;
+}
+
+/*!
+  \brief Get background mode
+  \return current background mode
+  \sa setMode()
+*/
+Qtx::BackgroundMode Qtx::BackgroundData::mode() const
+{
+  return myMode;
+}
+
+/*!
+  \brief Set background mode
+  \param m background mode being set
+  \sa mode()
+*/
+void Qtx::BackgroundData::setMode( const Qtx::BackgroundMode m )
+{
+  myMode = m;
+}
+
+/*!
+  \brief Get file name used as a texture image
+  \return path to the texture image file
+  \sa setTexture(), setTextureShown()
+*/
+Qtx::TextureMode Qtx::BackgroundData::texture( QString& fileName ) const
+{
+  fileName = myFileName;
+  return myTextureMode;
+}
+
+/*!
+  \brief Set file name to be used as a texture image.
+
+  \note To show texture image on the background it is necessary to call additionally
+  setTextureShown() method.
+
+  \param fileName path to the texture image file name
+  \param m texture mode (Qtx::CenterTexture by default)
+  \sa texture(), setTextureShown()
+*/
+void Qtx::BackgroundData::setTexture( const QString& fileName, const Qtx::TextureMode m )
+{
+  myFileName = fileName;
+  myTextureMode = m;
+}
+
+/*!
+  \brief Check if "show texture" flag is switched on
+  \return \c true if "show texture" flag is set or \c false otherwise
+  \sa setTextureShown(), texture()
+*/
+bool Qtx::BackgroundData::isTextureShown() const
+{
+  return myTextureShown;
+}
+
+/*!
+  \brief Specify if texture should be shown on the background or no.
+  \param on \c true if texture should be shown or \c false otherwise
+  \sa isTextureShown(), texture()
+*/
+void Qtx::BackgroundData::setTextureShown( bool on )
+{
+  myTextureShown = on;
+}
+
+/*!
+  \brief Get background color. Returns null QColor if color is not set
+  \return solid background color
+  \sa setColor(), mode()
+*/
+QColor Qtx::BackgroundData::color() const
+{
+  return myColors.count() > 0 ? myColors[0] : QColor();
+}
+
+/*!
+  \brief Set background color and switch to the Qtx::ColorBackground mode
+  \param c color
+  \sa color(), mode()
+*/
+void Qtx::BackgroundData::setColor( const QColor& c )
+{
+  myColors.clear();
+  myColors << c;
+  setMode( Qtx::ColorBackground );
+}
+
+/*!
+  \brief Get simple gradient data.
+  Returns -1 and null QColor for \a c1 and \a c2 if gradient data is not set
+  \param c1 first gradient color is returned via this parameter
+  \param c2 second gradient color is returned via this parameter
+  \return current two-colored gradient mode type identifier
+  \note the interpretation of the gradient identifier should be done in the calling code
+  \sa setGradient(int, const QColor&, const QColor&), mode()
+*/
+int Qtx::BackgroundData::gradient( QColor& c1, QColor& c2 ) const
+{
+  c1 = myColors.count() > 0 ? myColors[0] : QColor();
+  c2 = myColors.count() > 1 ? myColors[1] : ( myColors.count() > 0 ? myColors[0] : QColor() );
+  return myGradientType;
+}
+
+/*!
+  \brief Set simple background gradient data and switch to the Qtx::SimpleGradientBackground mode
+  \param type two-colored gradient mode type identifier
+  \param c1 first gradient color is returned via this parameter
+  \param c2 second gradient color is returned via this parameter
+  \note the interpretation of the gradient identifier should be done in the calling code
+  \sa gradient(QColor&, QColor&), mode()
+*/
+void Qtx::BackgroundData::setGradient( int type, const QColor& c1, const QColor& c2 )
+{
+  myColors.clear();
+  myColors << c1 << c2;
+  myGradientType = type;
+  setMode( Qtx::SimpleGradientBackground );
+}
+
+/*!
+  \brief Get complex gradient data.
+  Returns QGradient of QGradient::NoGradient if gradient data is not set
+  \note This function does not transform simple gradient data set with 
+  setGradient( const QString&, const QColor&, const QColor& ) to QGradient class
+  \return gradient data
+  \sa setGradient(const QGradient&), mode()
+*/
+const QGradient* Qtx::BackgroundData::gradient() const
+{
+  return &myGradient;
+}
+
+/*!
+  \brief Set complex background gradient data and switch to the Qtx::CustomGradientBackground mode
+  \param grad gradient data (QLinearGradient, QRadialGradient or QConicalGradient)
+  \sa gradient(), mode()
+*/
+void Qtx::BackgroundData::setGradient( const QGradient& grad )
+{
+  myGradient = grad;
+  setMode( Qtx::CustomGradientBackground );
+}
+  
+
+#ifndef WIN32
+
+#include <X11/Xlib.h>
+#include <GL/glx.h>
+
+/*!
+  \brief Open the default X display and returns pointer to it.
+         This method is available on Linux only.
+  \return Pointer to X display.
+  \sa getVisual()
+*/
+void* Qtx::getDisplay()
+{
+  static Display* pDisplay = NULL;
+  if ( !pDisplay )
+    pDisplay = XOpenDisplay( NULL );
+  return pDisplay;
+}
+
+/*!
+  \brief Returns pointer to X visual suitable for 3D rendering.
+         This method is available on Linux only.
+  \return Pointer to X visual.
+  \sa getDisplay()
+*/
+Qt::HANDLE Qtx::getVisual()
+{
+  Qt::HANDLE res = (Qt::HANDLE)NULL;
+
+  Display* pDisplay = (Display*)getDisplay();
+  if ( !pDisplay )
+    return res;
+
+  int errorBase;
+  int eventBase;
+
+  // Make sure OpenGL's GLX extension supported
+  if( !glXQueryExtension( pDisplay, &errorBase, &eventBase ) ){
+    qCritical( "Could not find glx extension" );
+    return res;
+  }
+
+  // Find an appropriate visual
+
+  int doubleBufferVisual[]  = {
+    GLX_RGBA,           // Needs to support OpenGL
+    GLX_DEPTH_SIZE, 16, // Needs to support a 16 bit depth buffer
+    GLX_DOUBLEBUFFER,   // Needs to support double-buffering
+    None                // end of list
+  };
+
+  // Try for the double-bufferd visual first
+  XVisualInfo *visualInfo = NULL;
+  visualInfo = glXChooseVisual( pDisplay, DefaultScreen(pDisplay), doubleBufferVisual );
+
+  if( visualInfo == NULL ){
+    qCritical( "Could not find matching glx visual" );
+    return res;
+  }
+
+  qDebug() << "Picked visual 0x" << hex << XVisualIDFromVisual( visualInfo->visual );
+  res = (Qt::HANDLE)( visualInfo->visual );
+ 
+  return res;
+}
+#endif // WIN32

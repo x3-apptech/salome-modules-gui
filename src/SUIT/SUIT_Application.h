@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef SUIT_APPLICATION_H
 #define SUIT_APPLICATION_H
 
@@ -34,8 +35,9 @@ class QAction;
 class QWidget;
 
 class SUIT_Desktop;
-class SUIT_ViewModel;
+class SUIT_ViewManager;
 class SUIT_ResourceMgr;
+class SUIT_ShortcutMgr;
 class SUIT_Study;
 
 #ifdef WIN32
@@ -96,15 +98,22 @@ public:
 
   SUIT_ResourceMgr*     resourceMgr() const;
 
+  SUIT_ShortcutMgr*     shortcutMgr() const;
+
   //! Puts the message to the status bar  
-  void putInfo ( const QString&, const int = 0 );
+  void                  putInfo ( const QString&, const int = 0 );
 
   //! Invokes application-specific "Open/Save File" dialog and returns the selected file name.
-  virtual QString getFileName( bool open, const QString& initial, const QString& filters, 
-			       const QString& caption, QWidget* parent ) = 0;
+  virtual QString       getFileName( bool open, const QString& initial, const QString& filters, 
+                                     const QString& caption, QWidget* parent ) = 0;
 
   //! Invokes application-specific "Select Directory" dialog and returns the selected directory name.
-  virtual QString getDirectory( const QString& initial, const QString& caption, QWidget* parent ) = 0;
+  virtual QString       getDirectory( const QString& initial, const QString& caption, QWidget* parent ) = 0;
+
+
+  virtual int           viewManagerId ( const SUIT_ViewManager* ) const = 0;
+  virtual void          viewManagers( const QString&, QList<SUIT_ViewManager*>& ) const = 0;
+  QAction*              action( const int ) const;
 
 signals:
   void                  applicationClosed( SUIT_Application* );
@@ -154,7 +163,6 @@ protected:
   void                  setActionShown( const int, const bool );
 
   static QAction*       separator();
-  QAction*              action( const int ) const;
   int                   actionId( const QAction* ) const;
 
   QList<QAction*>       actions() const;
@@ -163,7 +171,8 @@ protected:
   int                   registerAction( const int, QAction* );
   QAction*              createAction( const int, const QString&, const QIcon&, const QString&,
                                       const QString&, const int, QObject* = 0,
-                                      const bool = false, QObject* = 0, const char* = 0 );
+                                      const bool = false, QObject* = 0, const char* = 0,
+				      const QString& = QString() );
 
 protected slots:
   virtual void          onDesktopActivated();
@@ -172,6 +181,7 @@ private:
   SUIT_Study*           myStudy;
   SUIT_Desktop*         myDesktop;
   QMap<int, QAction*>   myActionMap;
+  SUIT_ShortcutMgr*     myShortcutMgr;
 
   QLabel*               myStatusLabel;
 };

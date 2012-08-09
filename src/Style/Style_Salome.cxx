@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : Style_Salome.cxx
 // Author : Natalia Ermolaeva, Open CASCADE S.A.S.
 //
@@ -259,6 +257,7 @@ void Style_Salome::apply()
     // set SALOME style
     QApplication::style()->setParent( 0 );           // avoid deleting original application style
     QApplication::setStyle( new Style_Salome() );    // set style
+    QApplication::setDesktopSettingsAware(false);    // prevent the style changing from another tools
   }
   update();                                          // update style
 }
@@ -275,6 +274,9 @@ void Style_Salome::restore()
   // check if SALOME style is set to the application
   if ( !isActive() )
     return;
+
+  QApplication::setDesktopSettingsAware(true);
+
   // restore previous style
   model()->restore();
 }
@@ -398,7 +400,7 @@ void Style_Salome::unpolish( QWidget* w )
   \param w widget
 */
 void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComplex* opt,
-				       QPainter* p, const QWidget* w ) const
+                                       QPainter* p, const QWidget* w ) const
 {
   if ( checkDebugLevel(4) ) {
     QWindowsStyle::drawComplexControl( cc, opt, p, w );
@@ -411,18 +413,19 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
       if (const QStyleOptionSpinBox *spin = qstyleoption_cast<const QStyleOptionSpinBox *>(opt)) {
         bool hover = hasHover() && (opt->state & State_Enabled) && (opt->state & State_MouseOver);
         QRect optr = opt->rect, arUp =   subControlRect( cc, spin, SC_SpinBoxUp, w );
-        optr.setWidth( arUp.x()-optr.x()+1 );
+        if (spin->buttonSymbols != QAbstractSpinBox::NoButtons)
+          optr.setWidth( arUp.x()-optr.x()+1 );
         double aRad = model()->widgetRounding( Style_Model::EditRadius );
         bool antialized = model()->antialiasing();
         QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         if ( hover )
           drawHoverRect(p, optr, opt->palette.color( QPalette::Window ), aRad, Style_Tools::Left, true);
         else
           Style_Tools::shadowRect( p, optr, aRad, LINE_GR_MARGIN, SHADOW, Style_Tools::Left,
                                    model()->color( Style_Model::FieldLight ), // Style_Model::fld_light_clr,
                                    model()->color( Style_Model::FieldDark ),  // Style_Model::fld_dark_clr,
-				   aBrdTopCol, aBrdBotCol, antialized, false );
+                                   aBrdTopCol, aBrdBotCol, antialized, false );
         QRect aBtnRect = QRect( QPoint( arUp.x(), optr.y() ), QPoint( arUp.right(), optr.bottom() ) );
         QColor aBtnCol = opt->palette.color( QPalette::Button );
         bool aStateOn = opt->state & ( State_Sunken | State_On );
@@ -432,7 +435,6 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
           Style_Tools::shadowRect( p, aBtnRect, aRad, 0.0, SHADOW, Style_Tools::Right,
                                   aBtnCol.light( BUT_PERCENT_COL ), aBtnCol.dark( BUT_PERCENT_COL ),
                                   aBrdTopCol, aBrdBotCol, antialized, true, aStateOn );
-        State flags = State_None;
         QStyleOptionSpinBox copy;
         PrimitiveElement pe;
         if (spin->subControls & SC_SpinBoxUp) {
@@ -482,7 +484,7 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
           copy.rect = aBtnRect;
           drawPrimitive(pe, &copy, p, w);
         }
-	break;
+        break;
      }
      case CC_ComboBox: {
       if (const QStyleOptionComboBox *cmb = qstyleoption_cast<const QStyleOptionComboBox *>(opt)) {
@@ -495,14 +497,14 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
         bool antialized = model()->antialiasing();
         double aRad = model()->widgetRounding( Style_Model::EditRadius );
         QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         if ( hover )
           drawHoverRect(p, optr, opt->palette.color( QPalette::Window ), aRad, Style_Tools::Left, true);
         else
           Style_Tools::shadowRect( p, optr, aRad, LINE_GR_MARGIN, SHADOW, Style_Tools::Left,
                                    model()->color( Style_Model::FieldLight ), // Style_Model::fld_light_clr,
                                    model()->color( Style_Model::FieldDark ),  // Style_Model::fld_dark_clr,
-				   aBrdTopCol, aBrdBotCol, antialized, false );
+                                   aBrdTopCol, aBrdBotCol, antialized, false );
         if (cmb->subControls & SC_ComboBoxArrow) {
           State flags = State_None;
           QColor aBtnCol = opt->palette.color( QPalette::Button );
@@ -533,7 +535,7 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
             p->setPen(cmb->palette.highlightedText().color());
           }
           else
-	    p->setPen(cmb->palette.text().color());
+            p->setPen(cmb->palette.text().color());
         }
         break;
       }
@@ -545,7 +547,7 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
 
             if( hasHover() && (slider->state & State_Enabled) &&
                          (slider->state & State_MouseOver) ) {
-	      QRect moderated = w->rect();
+              QRect moderated = w->rect();
                 drawHoverRect(p, moderated, opt->palette.color( QPalette::Window ),
                               model()->widgetRounding( Style_Model::ButtonRadius ), Style_Tools::All, false);
             }
@@ -572,8 +574,8 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
               bool tickAbove = slider->tickPosition == QSlider::TicksAbove;
               bool tickBelow = slider->tickPosition == QSlider::TicksBelow;
               QColor aBtnCol = model()->color( Style_Model::Slider );          // Style_Model::slider_clr
-	      QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	      QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+              QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
+              QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
               // rect was changed on +/-DELTA_SLIDER value for correct painting Antialised border of slider
               int aDelta = DELTA_SLIDER-1;
               QRect slRect = QRect(x+aDelta, y+aDelta, wi-aDelta, he-aDelta);
@@ -622,8 +624,8 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
         menuArea = subControlRect(cc, toolbutton, SC_ToolButtonMenu, w);
 
         if (w && ( qobject_cast<QToolBar *>(w->parentWidget() ) || 
-		   toolbutton->state & State_AutoRaise && !( toolbutton->state & State_MouseOver ) )
-	    ) {
+                   ( toolbutton->state & State_AutoRaise && !( toolbutton->state & State_MouseOver ) ) )
+            ) {
           QWindowsStyle::drawComplexControl( cc, opt, p, w );
           return;
         }
@@ -639,8 +641,8 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
         bool isAutoRaising = model()->widgetEffect() == Style_Model::AutoRaiseEffect;
         bool isHighWdg     = model()->widgetEffect() == Style_Model::HighlightEffect;
         bool hover = hasHover() && (opt->state & State_Enabled) && ( opt->state & State_MouseOver );
-	QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         QRect aRect = button;
         int aType = isMenuBtn ? Style_Tools::Left : Style_Tools::All;
         if ( toolbutton->subControls & SC_ToolButton ) {
@@ -652,7 +654,7 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
           else
             Style_Tools::shadowRect( p, aRect, aMinDelta, -1, SHADOW, aType, top, bottom,
                                      aBrdTopCol, aBrdBotCol, antialized, true, aStateOn );
-	}
+        }
         if (toolbutton->subControls & SC_ToolButtonMenu) {
           p->save();
           if ( aMinDelta > menuArea.height()/2 )
@@ -694,7 +696,7 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
           fr.rect.adjust(3, 3, -3, -3);
           if (toolbutton->features & QStyleOptionToolButton::Menu)
             fr.rect.adjust(0, 0, -pixelMetric(QStyle::PM_MenuButtonIndicator, toolbutton, w), 0);
-	  Style_Tools::drawFocus( p, fr.rect, aMinDelta-1,  isMenuBtn ? Style_Tools::Left :
+          Style_Tools::drawFocus( p, fr.rect, aMinDelta-1,  isMenuBtn ? Style_Tools::Left :
                                   Style_Tools::All, aBrdBotCol );
         }
         QStyleOptionToolButton label = *toolbutton;
@@ -717,13 +719,13 @@ void Style_Salome::drawComplexControl( ComplexControl cc, const QStyleOptionComp
         QRect checkBoxRect = subControlRect( cc, opt, SC_GroupBoxCheckBox, w);
         if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
           QRect aRect = subControlRect( cc, opt, SC_GroupBoxFrame, w);
-	  QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	  QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
+          QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
+          QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
           Style_Tools::shadowRect( p, aRect, model()->widgetRounding( Style_Model::FrameRadius ), 0.,
                                    SHADOW, Style_Tools::All,
                                    model()->color( Style_Model::FieldLight ), // Style_Model::fld_light_clr
                                    model()->color( Style_Model::FieldDark ),  // Style_Model::fld_dark_clr
-				   aBrdTopCol, aBrdBotCol, false, false, false, false);
+                                   aBrdTopCol, aBrdBotCol, false, false, false, false);
         }
         // Draw title
         if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) && !groupBox->text.isEmpty()) {
@@ -788,13 +790,13 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
         drawControl(CE_PushButtonLabel, &subopt, p, w);
         if (btn->state & State_HasFocus) {
           QRect aRect = subElementRect( SE_PushButtonFocusRect, btn, w );
-	  Style_Tools::drawFocus( p, aRect, model()->widgetRounding( Style_Model::ButtonRadius ),
+          Style_Tools::drawFocus( p, aRect, model()->widgetRounding( Style_Model::ButtonRadius ),
                                   Style_Tools::All, model()->color( Style_Model::BorderBottom ) );
         }
-	break;
+        break;
       }
     case CE_PushButtonBevel:
-      if ( qstyleoption_cast<const QStyleOptionButton *>(opt) ) {
+      if ( const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(opt) ) {
         double aRad = model()->widgetRounding( Style_Model::ButtonRadius );
         bool aStateOn = opt->state & ( State_Sunken | State_On );
         bool isAutoRaising = model()->widgetEffect() == Style_Model::AutoRaiseEffect;
@@ -804,9 +806,9 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
 
         QColor aBtnCol = opt->palette.color( QPalette::Button );
         QColor top = aBtnCol.light( BUT_PERCENT_COL ),
-	       bottom = aBtnCol.dark( BUT_PERCENT_COL );
+               bottom = aBtnCol.dark( BUT_PERCENT_COL );
         QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         QRect r = opt->rect;
         bool antialized = model()->antialiasing();
         if ( isAutoRaising && hover && !aStateOn )
@@ -814,10 +816,16 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
                                    aBrdTopCol, aBrdBotCol, antialized, true, aStateOn );
         else if ( isHighWdg && hover && !aStateOn )
           drawHoverRect( p, r, opt->palette.color( QPalette::Window ), aRad, Style_Tools::All, true );
-	else
+        else
           Style_Tools::shadowRect( p, r, aRad, -1, SHADOW, Style_Tools::All, top, bottom,
                                    aBrdTopCol, aBrdBotCol, antialized, true, aStateOn );
-	break;
+	if (btn->features & QStyleOptionButton::HasMenu) {
+	  int mbi = pixelMetric(PM_MenuButtonIndicator, btn, w);
+	  QStyleOptionButton newBtn = *btn;
+	  newBtn.rect = QRect(r.right() - mbi-2, r.height()/2 - mbi/2, mbi, mbi);
+	  drawPrimitive(PE_IndicatorArrowDown, &newBtn, p, w);
+	}
+        break;
       }
       case CE_DockWidgetTitle:
         if (const QStyleOptionDockWidget *dwOpt = qstyleoption_cast<const QStyleOptionDockWidget *>(opt)) {
@@ -894,8 +902,8 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
                          dwOpt->state & State_Enabled, aTitle,
                          floating ? (active ? QPalette::BrightText : QPalette::Window) : QPalette::WindowText);
             p->setFont(oldFont);
-	  }
-	  break;
+          }
+          break;
         }
     case CE_Splitter: {
       QWindowsStyle::drawControl( ce, opt, p, w );
@@ -919,10 +927,10 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
           bool isSelected = opt->state & State_Selected;
           bool isLast = tab->position == QStyleOptionTab::End ||
                         tab->position == QStyleOptionTab::OnlyOneTab;
-	  QColor aColor = opt->palette.color( QPalette::Window ),
+          QColor aColor = opt->palette.color( QPalette::Window ),
                  aDarkColor = aColor.dark( BUT_PERCENT_ON );
-	  QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );     // Style_Model::border_tab_top_clr
-	  QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom );  // Style_Model::border_tab_bot_clr
+          QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );     // Style_Model::border_tab_top_clr
+          QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom );  // Style_Model::border_tab_bot_clr
 
           bool isHover = hasHover() && (opt->state & State_Enabled) &&
                                        (opt->state & State_MouseOver);
@@ -935,13 +943,13 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
                                 DELTA_H_TAB, aColor, aDarkColor,
                                 aBrdTopCol, aBrdBotCol, isSelected, isLast, isHover );
           p->restore();
-	} else
+        } else
            QCommonStyle::drawControl(ce, opt, p, w);
         break;
       }
     case CE_TabBarTabLabel:
       if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(opt)) {
-      	if ( tab->position == QStyleOptionTab::End ||
+        if ( tab->position == QStyleOptionTab::End ||
              tab->position == QStyleOptionTab::OnlyOneTab ) {
           QRect oldRect = opt->rect;
           int aDelta = 0;
@@ -949,14 +957,14 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
             aDelta = (int)(opt->rect.height()*DELTA_H_TAB/2);
             oldRect = QRect( oldRect.topLeft(), QPoint( oldRect.right()-aDelta, oldRect.bottom() ) );
           }
-	  else {
+          else {
             aDelta = (int)(opt->rect.width()*DELTA_H_TAB/2);
             oldRect = QRect( oldRect.topLeft(), QPoint( oldRect.right(), oldRect.bottom()-aDelta ) );
-	  }
+          }
           QStyleOptionTab* copyTab = (QStyleOptionTab*)tab;
           copyTab->rect = oldRect;
           QWindowsStyle::drawControl( ce, copyTab, p, w );
-	}
+        }
         else
           QWindowsStyle::drawControl( ce, opt, p, w );
         break;
@@ -978,8 +986,8 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
             QColor aBtnCol = opt->palette.color( QPalette::Window ),
                    top =    aBtnCol.light( BUT_PERCENT_ON ),
                    bottom = aBtnCol.dark( BUT_PERCENT_ON );
-	    QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	    QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+            QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
+            QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
             bool aHighWdg = model()->widgetEffect() == Style_Model::HighlightEffect;
             if ( !aStateOn && aHighWdg && (opt->state & State_Enabled) &&
                  (opt->state & State_Selected) )
@@ -1004,7 +1012,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
       break;
     case CE_ProgressBarGroove: {
       QColor aBgColor = opt->palette.color( QPalette::Window ),
-	top =    aBgColor.light( BUT_PERCENT_ON ),
+        top =    aBgColor.light( BUT_PERCENT_ON ),
         bottom = aBgColor.dark( BUT_PERCENT_ON );
       QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
       QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
@@ -1150,9 +1158,9 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
           int myHeight = pbBits.rect.height();
           pbBits.state = State_None;
           QRect aRect;
-	  QColor aColor = model()->color( Style_Model::ProgressBar );    // Style_Model::prbar_clr
-	  QColor top    = aColor.light( BUT_PERCENT_COL );
-	  QColor bottom = aColor.dark( BUT_PERCENT_COL );
+          QColor aColor = model()->color( Style_Model::ProgressBar );    // Style_Model::prbar_clr
+          QColor top    = aColor.light( BUT_PERCENT_COL );
+          QColor bottom = aColor.dark( BUT_PERCENT_COL );
           int aType;
           for (int i = 0; i <= nu; ++i) {
             aType = Style_Tools::None;
@@ -1194,7 +1202,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
             if ( unit_width > 1 ) {
               aTopClr = aColor.light();
               aBotClr = aColor.dark();
-	    }
+            }
             Style_Tools::shadowRect( p, aRect, model()->widgetRounding( Style_Model::EditRadius ), -1, 0,
                                      aType, top, bottom, aTopClr, aBotClr, false, true );
             x += reverse ? -unit_width : unit_width;
@@ -1224,7 +1232,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
         double aMargin = LINE_GR_MARGIN;
         QLinearGradient gr(x,y,menuitem->rect.right(),y);
         gr.setColorAt( 0.0, aBgColor );
-	gr.setColorAt( aMargin/width, model()->color( Style_Model::FieldLight ) ); // Style_Model::fld_light_clr
+        gr.setColorAt( aMargin/width, model()->color( Style_Model::FieldLight ) ); // Style_Model::fld_light_clr
         gr.setColorAt( 1.0, model()->color( Style_Model::FieldLight ) );
         QBrush fill;
         if ( act )
@@ -1234,8 +1242,8 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
         p->fillRect(menuitem->rect, fill);
         if (menuitem->menuItemType == QStyleOptionMenuItem::Separator){
           int yoff = y-1 + h / 2;
-	  QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	  QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
+          QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
+          QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
           p->setPen( aBrdBotCol );
           p->drawLine(x + 2, yoff, x + width - 4, yoff);
           p->setPen( aBrdTopCol );
@@ -1388,7 +1396,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
                                  Qt::AlignLeft | Qt::AlignVCenter,
                                  iconRect.size(), alignRect);
  
-	  // Here's absent filling of pixmap on basic color for editable comboBox
+          // Here's absent filling of pixmap on basic color for editable comboBox
           drawItemPixmap(p, iconRect, Qt::AlignCenter, pixmap);
 
           if (cb->direction == Qt::RightToLeft)
@@ -1410,7 +1418,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
         QColor top =    aBtnCol.light( BUT_PERCENT_COL ),
                bottom = aBtnCol.dark( BUT_PERCENT_COL );
         QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         Style_Tools::shadowRect( p, opt->rect, 0, -1, 0, Style_Tools::All, top, bottom, aBrdTopCol,
                                  aBrdBotCol, false, true, aStateOn, true );
       PrimitiveElement arrow;
@@ -1438,13 +1446,12 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
         if ( hasHover() && enabled && (opt->state & State_MouseOver) )
          drawHoverRect(p, opt->rect, opt->palette.color( QPalette::Window ), aRad, Style_Tools::All, false);
         else {
-	QColor aColor = model()->color( Style_Model::Slider );      // Style_Model::slider_clr
+        QColor aColor = model()->color( Style_Model::Slider );      // Style_Model::slider_clr
           if ( !enabled )
             aColor = opt->palette.button().color();
-	  QColor top =    aColor.light( BUT_PERCENT_ON ),
+          QColor top =    aColor.light( BUT_PERCENT_ON ),
                  bottom = aColor.dark( BUT_PERCENT_ON );
-	  QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	  QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+          QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
           QRect r = opt->rect;
           QPainterPath path = Style_Tools::roundRect( r, aRad,
                                                       Style_Tools::All );
@@ -1501,7 +1508,7 @@ void Style_Salome::drawControl( ControlElement ce, const QStyleOption* opt,
   \param w widget (optional)
 */
 void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
-				  QPainter* p, const QWidget* w ) const
+                                  QPainter* p, const QWidget* w ) const
 {
   if ( checkDebugLevel(6) ) {
     QWindowsStyle::drawPrimitive( pe, opt, p, w );
@@ -1516,8 +1523,8 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         QColor aBtnCol = opt->palette.color( QPalette::Window ),
                top =    aBtnCol.light( BUT_PERCENT_ON ),
                bottom = aBtnCol.dark( BUT_PERCENT_ON );
-	QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         Style_Tools::shadowRect( p, opt->rect, 0, 0., SHADOW, Style_Tools::All, top,
                                  bottom, aBrdTopCol, aBrdBotCol, false, false, false, false );
         break;
@@ -1525,7 +1532,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
     case PE_PanelButtonTool : {
       if ( w && ( opt->state & State_Enabled ) && 
            ( ( qobject_cast<QToolBar*>( w->parentWidget() ) ) ||
-	     ( w->inherits("QDockWidgetTitleButton") ) ||
+             ( w->inherits("QDockWidgetTitleButton") ) ||
              ( w->inherits("QtxWorkstackAreaTitleButton") ) ) ) {
         bool aStateOn = opt->state & (State_Sunken | State_On);
         bool aHighWdg = model()->widgetEffect() == Style_Model::HighlightEffect;
@@ -1534,14 +1541,14 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
           drawHoverRect(p, opt->rect, opt->palette.color( QPalette::Window ), 0, Style_Tools::All, true);
         else {
           QColor aBtnCol = opt->palette.color( QPalette::Window );
-	  QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	  QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
+          QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
+          QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
           QColor top =    aBtnCol.light( BUT_PERCENT_COL ),
                  bottom = aBtnCol.dark( BUT_PERCENT_COL );
           Style_Tools::shadowRect( p, opt->rect, 0.0, 0, SHADOW, Style_Tools::All, top, bottom,
            aBrdTopCol, aBrdBotCol, model()->antialiasing(), true, aStateOn );
-	}
-	break;
+        }
+        break;
       }
       else
         QWindowsStyle::drawPrimitive( pe, opt, p, w );
@@ -1550,8 +1557,8 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
     case PE_FrameFocusRect: {
       if (w && qobject_cast<QTabBar*>((QWidget*)w)) {
         QTabBar* tabBar = qobject_cast<QTabBar*>((QWidget*)w);
-	QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
+        QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
+        QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
         bool isHover = hasHover() && (opt->state & State_Enabled) && (opt->state & State_MouseOver);
         Style_Tools::tabRect( p, opt->rect, (int)tabBar->shape(),
                               model()->widgetRounding( Style_Model::FrameRadius ), DELTA_H_TAB,
@@ -1560,7 +1567,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
                               aBrdTopCol, aBrdBotCol, false, false, isHover, true );
       }
       else {
-	QWindowsStyle::drawPrimitive( pe, opt, p, w );
+        QWindowsStyle::drawPrimitive( pe, opt, p, w );
       }
       break;
     }
@@ -1575,24 +1582,24 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       QRect rect = opt->rect;
       QColor pen, brush;
       if ( opt->state & State_Enabled ) {
-	pen = model()->color( Style_Model::Pointer );    // Style_Model::pointer_clr
-	brush = opt->palette.color( QPalette::Button );
+        pen = model()->color( Style_Model::Pointer );    // Style_Model::pointer_clr
+        brush = opt->palette.color( QPalette::Button );
         if ( ( opt->state & State_Sunken ) && (opt->state & State_Enabled ) )
           rect.moveTo( rect.x()+1, rect.y()+1 );
       } else {
         pen = opt->palette.mid().color();
-	brush = pen;
+        brush = pen;
       }
       if ( pe == PE_IndicatorSpinPlus || pe == PE_IndicatorSpinMinus )
-	Style_Tools::drawSign( pe, p, rect, pen, brush );
+        Style_Tools::drawSign( pe, p, rect, pen, brush );
       else
-	Style_Tools::drawArrow( pe, p, rect, pen, brush );
+        Style_Tools::drawArrow( pe, p, rect, pen, brush );
       break;
     }
     case PE_IndicatorCheckBox: {
       if ( hasHover() && (opt->state & State_Enabled) && (opt->state & State_MouseOver) )
         drawHoverRect(p, w->rect(), opt->palette.color( QPalette::Window ),
-		      model()->widgetRounding( Style_Model::EditRadius ),
+                      model()->widgetRounding( Style_Model::EditRadius ),
                       Style_Tools::All, false);
       QBrush fill;
       if (opt->state & State_NoChange)
@@ -1642,10 +1649,10 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       }
       const QStyleOptionViewItem *itemViewOpt = qstyleoption_cast<const QStyleOptionViewItem *>(opt);
       p->setPen(itemViewOpt && itemViewOpt->showDecorationSelected
-		&& opt->state & State_Selected ? opt->palette.highlightedText().color()
-		: opt->palette.text().color());
+                && opt->state & State_Selected ? opt->palette.highlightedText().color()
+                : opt->palette.text().color());
       if (opt->state & State_NoChange)
-	p->setBrush( opt->palette.color( QPalette::Button ) );
+        p->setBrush( opt->palette.color( QPalette::Button ) );
       p->drawRect(opt->rect.x() + 1, opt->rect.y() + 1, 11, 11);
       if (!(opt->state & State_Off)) {
         QLineF lines[11];
@@ -1666,7 +1673,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         QColor aColor = model()->color( Style_Model::Pointer ); // Style_Model::pointer_clr
         if ( !(opt->state & State_Enabled ) )
           aColor = opt->palette.mid().color();
-	if ( opt->state & State_Selected && itemViewOpt && itemViewOpt->showDecorationSelected )
+        if ( opt->state & State_Selected && itemViewOpt && itemViewOpt->showDecorationSelected )
           aColor = opt->palette.highlightedText().color();
 
         p->setPen( QPen( aColor ) );
@@ -1680,7 +1687,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
     case PE_IndicatorRadioButton: {
       if ( hasHover() && (opt->state & State_Enabled) && (opt->state & State_MouseOver) )
         drawHoverRect(p, w->rect(), opt->palette.color( QPalette::Window ), 
-		      model()->widgetRounding( Style_Model::ButtonRadius ),
+                      model()->widgetRounding( Style_Model::ButtonRadius ),
                       Style_Tools::All, false);
 #define PTSARRLEN(x) sizeof(x)/(sizeof(QPoint))
       static const QPoint pts_border[] = {              // border line
@@ -1713,7 +1720,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       else {
         QColor fillColor =  opt->palette.color( QPalette::Base );
         if ( enabled && on )
-	  fillColor = model()->color( Style_Model::Checked ); // Style_Model::checked_clr
+          fillColor = model()->color( Style_Model::Checked ); // Style_Model::checked_clr
         QLinearGradient gr( 3, 3, 8, 8 );
         gr.setColorAt( 0.0, fillColor.dark( BUT_PERCENT_ON ) );
         gr.setColorAt( 1.0, fillColor );
@@ -1762,14 +1769,14 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       }
       if ( pe == PE_FrameLineEdit ) {
         QColor aBrdTopCol = model()->color( Style_Model::BorderTop );    // Style_Model::border_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::BorderBottom ); // Style_Model::border_bot_clr
         bool hover = hasHover() && (opt->state & State_Enabled) && (opt->state & State_MouseOver);
         double aRad = model()->widgetRounding( Style_Model::EditRadius );
         if ( hover )
           drawHoverRect(p, opt->rect, opt->palette.color( QPalette::Window ), aRad, Style_Tools::All, true);
         else {
           Style_Tools::shadowRect( p, opt->rect, aRad, LINE_GR_MARGIN, SHADOW,
-				   Style_Tools::All, opt->palette.color( QPalette::Base ), // getColor( Style_Model::fld_light_clr ),
+                                   Style_Tools::All, opt->palette.color( QPalette::Base ), // getColor( Style_Model::fld_light_clr ),
                                    model()->color( Style_Model::FieldDark ), aBrdTopCol, aBrdBotCol,
                                    model()->antialiasing(), false );
         }
@@ -1778,14 +1785,14 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         if (const QStyleOptionFrame *panel = qstyleoption_cast<const QStyleOptionFrame *>(opt)) {
           QRect rect = panel->rect.adjusted( panel->lineWidth,  panel->lineWidth,
                                              -panel->lineWidth, -panel->lineWidth);
-	  if ( w->inherits("QLineEdit") && panel->lineWidth > 0 ) {
+          if ( w->inherits("QLineEdit") && panel->lineWidth > 0 ) {
             drawPrimitive( PE_FrameLineEdit, panel, p, w );
-	  }
+          }
           else {
-	    QColor c = panel->palette.color(QPalette::Base); c.setAlpha(255);
+            QColor c = panel->palette.color(QPalette::Base); c.setAlpha(255);
             p->fillRect( rect, c ); // panel->palette.brush(QPalette::Base)
-	  }
-	}
+          }
+        }
       }
       break;
     }
@@ -1801,7 +1808,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         if ( aTabPos != QTabWidget::East )
           aRoundType = aRoundType | Style_Tools::TopRight;
         QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
+        QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
         Style_Tools::shadowRect( p, opt->rect, model()->widgetRounding( Style_Model::FrameRadius ),
                                  0., SHADOW, aRoundType,
                                  model()->color( Style_Model::FieldLight ),
@@ -1819,7 +1826,6 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       gr.setColorAt( 0.0, aBgCol.light( BUT_PERCENT_ON ) );
       gr.setColorAt( 1.0, aBgCol );
       p->fillRect( r, gr );
-      QRect aRect = QRect( r.x(), r.y(), r.width(), r.height() );
       drawHandle( p, r, horiz, false );
       p->restore();
       break;
@@ -1838,7 +1844,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
       if (const QStyleOptionTabBarBase *tbb
           = qstyleoption_cast<const QStyleOptionTabBarBase *>(opt)) {
         if (tbb->shape != QTabBar::RoundedNorth && tbb->shape != QTabBar::RoundedEast &&
-	    tbb->shape != QTabBar::RoundedSouth && tbb->shape != QTabBar::RoundedWest) {
+            tbb->shape != QTabBar::RoundedSouth && tbb->shape != QTabBar::RoundedWest) {
           QWindowsStyle::drawPrimitive( pe, opt, p, w );
           break;
         }
@@ -1850,19 +1856,17 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         if ( tabBar )
           isLast = tabBar->currentIndex() == tabBar->count() -1;
         QColor aColor = opt->palette.color( QPalette::Window );
-        QColor aBrdTopCol = model()->color( Style_Model::TabBorderTop );    // Style_Model::border_tab_top_clr
-	QColor aBrdBotCol = model()->color( Style_Model::TabBorderBottom ); // Style_Model::border_tab_bot_clr
         bool isHover = hasHover() && (opt->state & State_Enabled) &&
                                      (opt->state & State_MouseOver);
         QPainterPath aSelPath = Style_Tools::tabRect( p, aSelRect, (int)tbb->shape,
-						      model()->widgetRounding( Style_Model::FrameRadius ),
-						      DELTA_H_TAB, aColor, aColor,
+                                                      model()->widgetRounding( Style_Model::FrameRadius ),
+                                                      DELTA_H_TAB, aColor, aColor,
                             aColor, aColor, isSelected, isLast, isHover, false, false );
         if ( !aSelPath.isEmpty() )
           aSelRect = aSelPath.controlPointRect().toRect();
         QStyleOptionTabBarBase* copyOpt = (QStyleOptionTabBarBase*)tbb;
         copyOpt->selectedTabRect = aSelRect;
-	QCommonStyle::drawPrimitive( pe, copyOpt, p, w );
+        QCommonStyle::drawPrimitive( pe, copyOpt, p, w );
         break;
       }
     case PE_IndicatorBranch: {
@@ -1932,9 +1936,9 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         QPalette aPal = aWdg->palette();
         double aMarg = LINE_GR_MARGIN;
         QColor base = model()->color( Style_Model::Base ), // Style_Model::pal_base_clr
-	  light = base,
-	  light_alt = base.dark(110),//AlternateBase color
-	  dark  = model()->color( Style_Model::FieldDark ); // Style_Model::fld_dark_clr
+          light = base,
+          light_alt = base.dark(110),//AlternateBase color
+          dark  = model()->color( Style_Model::FieldDark ); // Style_Model::fld_dark_clr
         //light.setAlpha( 0 ); // VSR commented: IPAL19262
         QLinearGradient gr_h(r.x(), r.y(), r.right(), r.y());
         gr_h.setColorAt( 0.0, dark );
@@ -1947,7 +1951,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         // draw frame
         p->fillRect( r, base );
         p->fillRect( r, gr_h );
-	p->fillRect( r, gr_v );
+        p->fillRect( r, gr_v );
         aPal.setBrush( QPalette::Base, QBrush( light ) );
 
         QLinearGradient gr_alt(r.x(), r.y(), r.right(), r.y());
@@ -1973,7 +1977,7 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
   \return metric value
 */
 int Style_Salome::pixelMetric( PixelMetric metric, const QStyleOption* opt,
-			       const QWidget* w ) const
+                               const QWidget* w ) const
 {
   if ( checkDebugLevel(7) ) {
     return QWindowsStyle::pixelMetric( metric, opt, w );
@@ -2028,11 +2032,11 @@ QSize Style_Salome::sizeFromContents( ContentsType ct, const QStyleOption* opt,
           if ( tab->shape == QTabBar::RoundedNorth || tab->shape == QTabBar::RoundedSouth ) {
             int aDelta = (int)(opt->rect.height()*DELTA_H_TAB/2);
             sz.setWidth( sz.width() + aDelta );
-	  }
+          }
           if ( tab->shape == QTabBar::RoundedEast || tab->shape == QTabBar::RoundedWest ) {
             int aDelta = (int)(opt->rect.width()*DELTA_H_TAB/2);
             sz.setHeight( sz.height() + aDelta );
-	  }
+          }
         }
         break;
       }
@@ -2055,7 +2059,7 @@ QSize Style_Salome::sizeFromContents( ContentsType ct, const QStyleOption* opt,
             aDelta += aHalfRect; // for right of line edit internal
           sz.setWidth( res.width() + aDelta + aHalfRect );
         }
-	break;
+        break;
       default:
       break;
   }
@@ -2100,8 +2104,8 @@ QPixmap Style_Salome::standardPixmap(StandardPixmap stPixmap, const QStyleOption
   \return standard icon
 */
 QIcon Style_Salome::standardIconImplementation( StandardPixmap standardIcon, 
-						const QStyleOption* opt,
-						const QWidget* w ) const
+                                                const QStyleOption* opt,
+                                                const QWidget* w ) const
 {
   if ( checkDebugLevel(10) ) {
     return QWindowsStyle::standardIconImplementation( standardIcon, opt, w );
@@ -2165,7 +2169,7 @@ int Style_Salome::styleHint( StyleHint hint, const QStyleOption* opt, const QWid
   \return subcontrol rectangle
 */
 QRect Style_Salome::subControlRect( ComplexControl cc, const QStyleOptionComplex* opt,
-				    SubControl sc, const QWidget* wid ) const
+                                    SubControl sc, const QWidget* wid ) const
 {
   if ( checkDebugLevel(12) ) {
     return QWindowsStyle::subControlRect( cc, opt, sc, wid );
@@ -2227,8 +2231,8 @@ QRect Style_Salome::subControlRect( ComplexControl cc, const QStyleOptionComplex
             else
               res.setTop( res.top() - aRect - 1);
           break;
-	  default:
-	    break;
+          default:
+            break;
         }
         break;
       }
@@ -2310,7 +2314,7 @@ void Style_Salome::updatePaletteColors()
     for ( int j = (int)Style_Model::WindowText; j < (int)Style_Model::NColorRoles; j++ ) {
       if ( j == QPalette::NoRole ) continue;
       pal.setColor( (QPalette::ColorGroup)i, (QPalette::ColorRole)j,
-		    model()->color( (Style_Model::ColorRole)j, (QPalette::ColorGroup)i ) );
+                    model()->color( (Style_Model::ColorRole)j, (QPalette::ColorGroup)i ) );
     }
   }
   QPixmapCache::clear();
@@ -2331,7 +2335,7 @@ void Style_Salome::updateAllWidgets( QApplication* app )
   for (QWidgetList::ConstIterator it2 = all.constBegin(); it2 != all.constEnd(); ++it2) {
     w = *it2;
     if (w->windowType() != Qt::Desktop && w->testAttribute(Qt::WA_WState_Polished)
-	&& !w->testAttribute(Qt::WA_SetStyle)) {
+        && !w->testAttribute(Qt::WA_SetStyle)) {
       QEvent e(QEvent::StyleChange);
       QApplication::sendEvent(w, &e);
       polish( w );
@@ -2467,7 +2471,7 @@ void Style_Salome::drawBackground( QPainter* p, const QRect& r, const QColor& bg
     {
       const int d = 3;
       for ( int i = 0; i <= h; i += d )
-	lines.append( QLine( x, y+i, w, r.y()+i ) );
+        lines.append( QLine( x, y+i, w, r.y()+i ) );
     }
     break;
   case Style_Model::Inclined:
@@ -2476,9 +2480,9 @@ void Style_Salome::drawBackground( QPainter* p, const QRect& r, const QColor& bg
       w = w/d*d;
       h = h/d*d;
       for ( int i = 0; i <= w; i += d )
-	lines.append( QLine( x+i, y, x, y+i ) );
+        lines.append( QLine( x+i, y, x, y+i ) );
       for ( int i = 0; i < h; i += d )
-	lines.append( QLine( left+w-i, top+h, left+w, top+h-i ) );
+        lines.append( QLine( left+w-i, top+h, left+w, top+h-i ) );
     }
     break;
   default:

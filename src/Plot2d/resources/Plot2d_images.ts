@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -73,9 +52,29 @@
         <translation>plot2d_log_y.png</translation>
     </message>
     <message>
+        <source>ICON_PLOT2D_NORMALIZE_MODE_LMIN</source>
+        <translation>plot2d_lmin_normalization.png</translation>
+    </message>
+    <message>
+        <source>ICON_PLOT2D_NORMALIZE_MODE_LMAX</source>
+        <translation>plot2d_lmax_normalization.png</translation>
+    </message>
+    <message>
+        <source>ICON_PLOT2D_NORMALIZE_MODE_RMIN</source>
+        <translation>plot2d_rmin_normalization.png</translation>
+    </message>
+    <message>
+        <source>ICON_PLOT2D_NORMALIZE_MODE_RMAX</source>
+        <translation>plot2d_rmax_normalization.png</translation>
+    </message>
+    <message>
         <source>ICON_PLOT2D_SETTINGS</source>
         <translation>plot2d_settings.png</translation>
     </message>
+    <message>
+        <source>ICON_PLOT2D_ANALYTICAL_CURVES</source>
+        <translation>plot2d_analytical_curve.png</translation>
+    </message>    
     <message>
         <source>ICON_PLOT2D_CURVES_LINES</source>
         <translation>plot2d_lines.png</translation>
@@ -87,6 +86,10 @@
     <message>
         <source>ICON_PLOT2D_SHOW_LEGEND</source>
         <translation>plot2d_legend.png</translation>
+    </message>
+    <message>
+        <source>ICON_PLOT2D_PRINT</source>
+        <translation>plot2d_print.png</translation>
     </message>
 </context>
 </TS>

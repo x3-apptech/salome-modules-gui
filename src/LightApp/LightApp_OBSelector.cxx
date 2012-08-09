@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : LightApp_OBSelector.cxx
 // Author :
 //
@@ -130,8 +131,8 @@ void LightApp_OBSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
 #ifndef DISABLE_SALOMEOBJECT
         Handle(SALOME_InteractiveObject) aSObj = new SALOME_InteractiveObject
           ( obj->entry().toLatin1().constData(),
-	    obj->componentDataType().toLatin1().constData(),
-	    obj->name().toLatin1().constData() );
+            obj->componentDataType().toLatin1().constData(),
+            obj->name().toLatin1().constData() );
         LightApp_DataOwner* owner = new LightApp_DataOwner( aSObj  );
 #else
         LightApp_DataOwner* owner = new LightApp_DataOwner( obj->entry() );
@@ -152,12 +153,12 @@ void LightApp_OBSelector::setSelection( const SUIT_DataOwnerPtrList& theList )
   if ( !myBrowser )
     return;
 
-  if( myEntries.count() == 0 ||	myModifiedTime < myBrowser->getModifiedTime() )
+  if( myEntries.count() == 0 || myModifiedTime < myBrowser->getModifiedTime() )
     fillEntries( myEntries );
 
   DataObjectList objList;
   for ( SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); 
-	it != theList.end(); ++it ) {
+        it != theList.end(); ++it ) {
     const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*it).operator->() );
     if ( owner && myEntries.contains( owner->entry() ) )
       objList.append( myEntries[owner->entry()] );

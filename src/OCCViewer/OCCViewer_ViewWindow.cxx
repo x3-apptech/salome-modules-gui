@@ -1,27 +1,28 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : OCCViewer_ViewWindow.cxx
 // Author :
-//
+
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewPort3d.h"
@@ -31,6 +32,9 @@
 #include "OCCViewer_ClippingDlg.h"
 #include "OCCViewer_SetRotationPointDlg.h"
 #include "OCCViewer_AxialScaleDlg.h"
+#include "OCCViewer_CubeAxesDlg.h"
+
+#include <Basics_OCCTVersion.hxx>
 
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
@@ -38,41 +42,58 @@
 #include <SUIT_Tools.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_MessageBox.h>
+#include <SUIT_Application.h>
 
 #include <QtxActionToolMgr.h>
 #include <QtxMultiAction.h>
 #include <QtxRubberBand.h>
 
+#include <OpenGLUtils_FrameBuffer.h>
+
 #include <QPainter>
 #include <QTime>
 #include <QImage>
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QApplication>
-
-#include <V3d_Plane.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Pln.hxx>
-#include <TColgp_Array1OfPnt2d.hxx>
+#include <QMenu>
 
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_Shape.hxx>
 
 #include <BRep_Tool.hxx>
+#include <BRepBndLib.hxx>
 #include <TopoDS.hxx>
 
-#include <BRepBndLib.hxx>
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
-#include <Visual3d_View.hxx>
 #include <Graphic3d_MapOfStructure.hxx>
 #include <Graphic3d_Structure.hxx>
 #include <Graphic3d_ExportFormat.hxx>
+
+#include <Visual3d_View.hxx>
+#include <V3d_Plane.hxx>
+#include <V3d_Light.hxx>
+
+#include <gp_Dir.hxx>
+#include <gp_Pln.hxx>
+#include <TColgp_Array1OfPnt2d.hxx>
+
+#include <Standard_Version.hxx>
+
+#include "utilities.h"
+
+// // OpenCV includes
+// #include <cv.h>
+// #include <highgui.h>
 
 static QEvent* l_mbPressEvent = 0;
 
 #ifdef WIN32
 # include <QWindowsStyle>
 #endif
+
+#include <GL/gl.h>
 
 const char* imageZoomCursor[] = {
 "32 32 3 1",
@@ -195,20 +216,29 @@ const char* imageCrossCursor[] = {
   \param theModel OCC 3D viewer
 */
 OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
-					    OCCViewer_Viewer* theModel )
+                                            OCCViewer_Viewer* theModel )
 : SUIT_ViewWindow( theDesktop )
 {
   myModel = theModel;
   myRestoreFlag = 0;
   myEnableDrawMode = false;
+  myDrawRect=false;
   updateEnabledDrawMode();
   myClippingDlg = 0;
   myScalingDlg = 0;
   mySetRotationPointDlg = 0;
   myRectBand = 0;
+  
+  IsSketcherStyle = false;
 
   mypSketcher = 0;
   myCurSketch = -1;
+  my2dMode = No2dMode;
+
+  myInteractionStyle = SUIT_ViewModel::STANDARD;
+
+  clearViewAspects();
+  
 }
 
 /*!
@@ -226,7 +256,6 @@ OCCViewer_ViewWindow::~OCCViewer_ViewWindow()
 void OCCViewer_ViewWindow::initLayout()
 {
   myViewPort = new OCCViewer_ViewPort3d( this, myModel->getViewer3d(), V3d_ORTHOGRAPHIC );
-  myViewPort->setBackgroundColor(Qt::black);
   myViewPort->installEventFilter(this);
   setCentralWidget(myViewPort);
   myOperation = NOTHING;
@@ -241,6 +270,28 @@ void OCCViewer_ViewWindow::initLayout()
 
   createActions();
   createToolBar();
+
+  switch (my2dMode) {
+  case XYPlane:
+    onTopView();
+    break;
+  case XZPlane:
+    onLeftView();
+    break;
+  case YZPlane:
+    onFrontView();
+    break;
+  }
+
+  // Graduated axes dialog
+  QtxAction* anAction = dynamic_cast<QtxAction*>( toolMgr()->action( GraduatedAxesId ) );
+  myCubeAxesDlg = new OCCViewer_CubeAxesDlg( anAction, this, "OCCViewer_CubeAxesDlg" );
+  myCubeAxesDlg->initialize();
+}
+
+OCCViewer_ViewWindow* OCCViewer_ViewWindow::getView( const int mode ) const
+{
+  return mode == get2dMode() ? const_cast<OCCViewer_ViewWindow*>( this ) : 0;
 }
 
 /*!
@@ -250,17 +301,19 @@ void OCCViewer_ViewWindow::initLayout()
   \return type of the operation
 */
 OCCViewer_ViewWindow::OperationType
-OCCViewer_ViewWindow::getButtonState( QMouseEvent* theEvent )
+OCCViewer_ViewWindow::getButtonState( QMouseEvent* theEvent, int theInteractionStyle )
 {
   OperationType aOp = NOTHING;
-  if( (theEvent->modifiers() == SUIT_ViewModel::myStateMap[SUIT_ViewModel::ZOOM]) &&
-      (theEvent->button() == SUIT_ViewModel::myButtonMap[SUIT_ViewModel::ZOOM]) )
+  SUIT_ViewModel::InteractionStyle aStyle = (SUIT_ViewModel::InteractionStyle)theInteractionStyle;
+  if( (theEvent->modifiers() == SUIT_ViewModel::myStateMap[aStyle][SUIT_ViewModel::ZOOM]) &&
+      (theEvent->buttons() == SUIT_ViewModel::myButtonMap[aStyle][SUIT_ViewModel::ZOOM]) )
     aOp = ZOOMVIEW;
-  else if( (theEvent->modifiers() == SUIT_ViewModel::myStateMap[SUIT_ViewModel::PAN]) &&
-           (theEvent->button() == SUIT_ViewModel::myButtonMap[SUIT_ViewModel::PAN]) )
+  else if( (theEvent->modifiers() == SUIT_ViewModel::myStateMap[aStyle][SUIT_ViewModel::PAN]) &&
+           (theEvent->buttons() == SUIT_ViewModel::myButtonMap[aStyle][SUIT_ViewModel::PAN]) )
     aOp = PANVIEW;
-  else if( (theEvent->modifiers()  == SUIT_ViewModel::myStateMap[SUIT_ViewModel::ROTATE]) &&
-           (theEvent->button() == SUIT_ViewModel::myButtonMap[SUIT_ViewModel::ROTATE]) )
+  else if( (theEvent->modifiers()  == SUIT_ViewModel::myStateMap[aStyle][SUIT_ViewModel::ROTATE]) &&
+           (theEvent->buttons() == SUIT_ViewModel::myButtonMap[aStyle][SUIT_ViewModel::ROTATE]) &&
+           (my2dMode == No2dMode))
     aOp = ROTATE;
 
   return aOp;
@@ -296,9 +349,13 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
     case QEvent::Wheel:
       {
         QWheelEvent* aEvent = (QWheelEvent*) e;
-        double aDelta = aEvent->delta();
-        double aScale = (aDelta < 0) ? 100./(-aDelta) : aDelta/100.;
-        myViewPort->getView()->SetZoom(aScale);
+	myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
+	double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
+	int x  = aEvent->x();
+	int y  = aEvent->y();
+	int x1 = (int)( aEvent->x() + width()*delta/100 );
+	int y1 = (int)( aEvent->y() + height()*delta/100 );
+	myViewPort->zoom( x, y, x1, y1 );
       }
       return true;
 
@@ -308,6 +365,10 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
         if ( aEvent->reason() != QContextMenuEvent::Mouse )
           emit contextMenuRequested( aEvent );
       }
+      return true;
+
+    case QEvent::KeyPress:
+      emit keyPressed(this, (QKeyEvent*) e);
       return true;
 
     default:
@@ -334,6 +395,17 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
 {
   myStartX = theEvent->x();
   myStartY = theEvent->y();
+  int anInteractionStyle = interactionStyle();
+
+  // in "key free" interaction style zoom operation is activated by two buttons (simultaneously pressed),
+  // which are assigned for pan and rotate - these operations are activated immediately after pressing 
+  // of the first button, so it is necessary to switch to zoom when the second button is pressed
+  bool aSwitchToZoom = false;
+  if ( anInteractionStyle == SUIT_ViewModel::KEY_FREE && 
+       ( myOperation == PANVIEW || myOperation == ROTATE ) ) {
+    aSwitchToZoom = getButtonState( theEvent, anInteractionStyle ) == ZOOMVIEW;
+  }
+
   switch ( myOperation ) {
   case WINDOWFIT:
     if ( theEvent->button() == Qt::LeftButton )
@@ -346,76 +418,87 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
     break;
 
   case ZOOMVIEW:
-    if ( theEvent->button() == Qt::LeftButton )
+    if ( theEvent->button() == Qt::LeftButton ) {
+      myViewPort->startZoomAtPoint( myStartX, myStartY );
       emit vpTransformationStarted ( ZOOMVIEW );
+    }
     break;
 
   case PANVIEW:
-    if ( theEvent->button() == Qt::LeftButton )
+    if ( aSwitchToZoom ) {
+      myViewPort->startZoomAtPoint( myStartX, myStartY );
+      activateZoom();
+    }
+    else if ( theEvent->button() == Qt::LeftButton )
       emit vpTransformationStarted ( PANVIEW );
     break;
 
   case ROTATE:
-    if ( theEvent->button() == Qt::LeftButton ) {
-	    myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
-	    emit vpTransformationStarted ( ROTATE );
-	  }
+    if ( aSwitchToZoom ) {
+      myViewPort->startZoomAtPoint( myStartX, myStartY );
+      activateZoom();
+    }
+    else if ( theEvent->button() == Qt::LeftButton ) {
+      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+      emit vpTransformationStarted ( ROTATE );
+    }
     break;
 
   default:
   /*  Try to activate a transformation */
-    switch ( getButtonState(theEvent) ) {
+    switch ( getButtonState(theEvent, anInteractionStyle) ) {
     case ZOOMVIEW:
-	    activateZoom();
+      myViewPort->startZoomAtPoint( myStartX, myStartY );
+      activateZoom();
       break;
     case PANVIEW:
-	    activatePanning();
+            activatePanning();
       break;
     case ROTATE:
-	    activateRotation();
-	    myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+            activateRotation();
+            myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
       break;
     default:
       if ( myRotationPointSelection )
       {
-	if ( theEvent->button() == Qt::LeftButton )
-	{
-	  Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-	  ic->Select();
-	  for ( ic->InitSelected(); ic->MoreSelected(); ic->NextSelected() )
-	  {
-	    TopoDS_Shape aShape = ic->SelectedShape();
-	    if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX )
-	    {
-	      gp_Pnt aPnt = BRep_Tool::Pnt( TopoDS::Vertex( ic->SelectedShape() ) );
-	      if ( mySetRotationPointDlg )
-	      {
-		myRotationPointSelection = false;
-		mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
-	      }
-	    }
-	    else
-	    {
-	      myCurrPointType = myPrevPointType;
-	      break;
-	    }
-	  }
-	  if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
-	  if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-	  ic->CloseAllContexts();
-	  myOperation = NOTHING;
-	  myViewPort->setCursor( myCursor );
-	  myCursorIsHand = false;
-	  myRotationPointSelection = false;
-	}
+        if ( theEvent->button() == Qt::LeftButton )
+        {
+          Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+          ic->Select();
+          for ( ic->InitSelected(); ic->MoreSelected(); ic->NextSelected() )
+          {
+            TopoDS_Shape aShape = ic->SelectedShape();
+            if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX )
+            {
+              gp_Pnt aPnt = BRep_Tool::Pnt( TopoDS::Vertex( ic->SelectedShape() ) );
+              if ( mySetRotationPointDlg )
+              {
+                myRotationPointSelection = false;
+                mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
+              }
+            }
+            else
+            {
+              myCurrPointType = myPrevPointType;
+              break;
+            }
+          }
+          if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
+          if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
+          ic->CloseAllContexts();
+          myOperation = NOTHING;
+          myViewPort->setCursor( myCursor );
+          myCursorIsHand = false;
+          myRotationPointSelection = false;
+        }
       }
       else
-	emit mousePressed(this, theEvent);
+        emit mousePressed(this, theEvent);
       break;
     }
     /* notify that we start a transformation */
     if ( transformRequested() )
-	    emit vpTransformationStarted ( myOperation );
+            emit vpTransformationStarted ( myOperation );
   }
   if ( transformRequested() )
     setTransformInProcess( true );
@@ -435,13 +518,13 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
 void OCCViewer_ViewWindow::activateZoom()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();	        /* save old cursor */
+    myCursor = cursor();                /* save old cursor */
 
   if ( myOperation != ZOOMVIEW ) {
     QPixmap zoomPixmap (imageZoomCursor);
     QCursor zoomCursor (zoomPixmap);
-    setTransformRequested ( ZOOMVIEW );
-    myViewPort->setCursor( zoomCursor );
+    if( setTransformRequested ( ZOOMVIEW ) )
+      myViewPort->setCursor( zoomCursor );
   }
 }
 
@@ -454,12 +537,12 @@ void OCCViewer_ViewWindow::activateZoom()
 void OCCViewer_ViewWindow::activatePanning()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();	        // save old cursor
+    myCursor = cursor();                // save old cursor
 
   if ( myOperation != PANVIEW ) {
     QCursor panCursor (Qt::SizeAllCursor);
-    setTransformRequested ( PANVIEW );
-    myViewPort->setCursor( panCursor );
+    if( setTransformRequested ( PANVIEW ) )
+      myViewPort->setCursor( panCursor );
   }
 }
 
@@ -471,13 +554,13 @@ void OCCViewer_ViewWindow::activatePanning()
 void OCCViewer_ViewWindow::activateRotation()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();	        // save old cursor
+    myCursor = cursor();                // save old cursor
 
   if ( myOperation != ROTATE ) {
     QPixmap rotatePixmap (imageRotateCursor);
     QCursor rotCursor (rotatePixmap);
-    setTransformRequested ( ROTATE );
-    myViewPort->setCursor( rotCursor );
+    if( setTransformRequested ( ROTATE ) )
+      myViewPort->setCursor( rotCursor );
   }
 }
 
@@ -663,10 +746,10 @@ void OCCViewer_ViewWindow::activateGlobalPanning()
     QCursor glPanCursor (globalPanPixmap);
     myCurScale = aView3d->Scale();
     aView3d->FitAll(0.01, false);
-    myCursor = cursor();	        // save old cursor
+    myCursor = cursor();                // save old cursor
     myViewPort->fitAll(); // fits view before selecting a new scene center
-    setTransformRequested( PANGLOBAL );
-    myViewPort->setCursor( glPanCursor );
+    if( setTransformRequested( PANGLOBAL ) )
+      myViewPort->setCursor( glPanCursor );
   }
 }
 
@@ -678,25 +761,28 @@ void OCCViewer_ViewWindow::activateGlobalPanning()
 void OCCViewer_ViewWindow::activateWindowFit()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();	        /* save old cursor */
+    myCursor = cursor();                /* save old cursor */
 
   if ( myOperation != WINDOWFIT ) {
     QCursor handCursor (Qt::PointingHandCursor);
-    setTransformRequested ( WINDOWFIT );
-    myViewPort->setCursor ( handCursor );
-    myCursorIsHand = true;
+    if( setTransformRequested ( WINDOWFIT ) )
+    {
+      myViewPort->setCursor ( handCursor );
+      myCursorIsHand = true;
+    }
   }
 }
 
 /*!
   \brief Start delayed viewer operation.
 */
-void OCCViewer_ViewWindow::setTransformRequested( OperationType op )
+bool OCCViewer_ViewWindow::setTransformRequested( OperationType op )
 {
-  myOperation = op;
-  myViewPort->setMouseTracking( myOperation == NOTHING );
+  bool ok = transformEnabled( op );
+  myOperation = ok ? op : NOTHING;
+  myViewPort->setMouseTracking( myOperation == NOTHING );  
+  return ok;
 }
-
 
 /*!
   \brief Handle mouse move event.
@@ -732,52 +818,58 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
     break;
 
   default:
-    if ( myRotationPointSelection )
+    if ( myRotationPointSelection || isSketcherStyle() )
+    {
       emit mouseMoving( this, theEvent );
+    }
     else
     {
       int aState = theEvent->modifiers();
       int aButton = theEvent->buttons();
-      if ( aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
-	myDrawRect = myEnableDrawMode;
-	if ( myDrawRect ) {
-	  drawRect();
-	  if ( !myCursorIsHand )	{   // we are going to sketch a rectangle
-	    QCursor handCursor (Qt::PointingHandCursor);
-	    myCursorIsHand = true;
-	    myCursor = cursor();
-	    myViewPort->setCursor( handCursor );
-	  }
-	}
+      int anInteractionStyle = interactionStyle();
+      if ( anInteractionStyle == SUIT_ViewModel::STANDARD && 
+           aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
+        myDrawRect = myEnableDrawMode;
+        if ( myDrawRect ) {
+          drawRect();
+          if ( !myCursorIsHand )        {   // we are going to sketch a rectangle
+            QCursor handCursor (Qt::PointingHandCursor);
+            myCursorIsHand = true;
+            myCursor = cursor();
+            myViewPort->setCursor( handCursor );
+          }
+        }
+        emit mouseMoving( this, theEvent );
       }
-      else if ( aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
-	OCCViewer_ViewSketcher* sketcher = 0;
-	QList<OCCViewer_ViewSketcher*>::Iterator it;
-	for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it )
-	{
-	  OCCViewer_ViewSketcher* sk = (*it);
-	  if( sk->isDefault() && sk->sketchButton() == aButton )
-	    sketcher = sk;
-	}
-	if ( sketcher && myCurSketch == -1 )
-	{
-	  activateSketching( sketcher->type() );
-	  if ( mypSketcher )
-	  {
-	    myCurSketch = mypSketcher->sketchButton();
+      else if ( anInteractionStyle == SUIT_ViewModel::STANDARD && 
+                aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
+        OCCViewer_ViewSketcher* sketcher = 0;
+        QList<OCCViewer_ViewSketcher*>::Iterator it;
+        for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it )
+        {
+          OCCViewer_ViewSketcher* sk = (*it);
+          if( sk->isDefault() && sk->sketchButton() == aButton )
+            sketcher = sk;
+        }
+        if ( sketcher && myCurSketch == -1 )
+        {
+          activateSketching( sketcher->type() );
+          if ( mypSketcher )
+          {
+            myCurSketch = mypSketcher->sketchButton();
 
-	    if ( l_mbPressEvent )
-	    {
-	      QApplication::sendEvent( getViewPort(), l_mbPressEvent );
-	      delete l_mbPressEvent;
-	      l_mbPressEvent = 0;
-	    }
-	    QApplication::sendEvent( getViewPort(), theEvent );
-	  }
-	}
+            if ( l_mbPressEvent )
+            {
+              QApplication::sendEvent( getViewPort(), l_mbPressEvent );
+              delete l_mbPressEvent;
+              l_mbPressEvent = 0;
+            }
+            QApplication::sendEvent( getViewPort(), theEvent );
+          }
+        }
       }
       else
-	emit mouseMoving( this, theEvent );
+        emit mouseMoving( this, theEvent );
     }
   }
 }
@@ -794,13 +886,13 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
       int prevState = myCurSketch;
       if(theEvent->button() == Qt::RightButton)
       {
-	QList<OCCViewer_ViewSketcher*>::Iterator it;
-	for ( it = mySketchers.begin(); it != mySketchers.end() && myCurSketch != -1; ++it )
-	{
-	  OCCViewer_ViewSketcher* sk = (*it);
-	  if( ( sk->sketchButton() & theEvent->button() ) && sk->sketchButton() == myCurSketch )
-	    myCurSketch = -1;
-	}
+        QList<OCCViewer_ViewSketcher*>::Iterator it;
+        for ( it = mySketchers.begin(); it != mySketchers.end() && myCurSketch != -1; ++it )
+        {
+          OCCViewer_ViewSketcher* sk = (*it);
+          if( ( sk->sketchButton() & theEvent->button() ) && sk->sketchButton() == myCurSketch )
+            myCurSketch = -1;
+        }
       }
 
       emit mouseReleased(this, theEvent);
@@ -1004,51 +1096,75 @@ void OCCViewer_ViewWindow::createActions()
 
   // Projections
   aAction = new QtxAction(tr("MNU_FRONT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_FRONT" ) ),
-                           tr( "MNU_FRONT_VIEW" ), 0, this);
+                           tr( "MNU_FRONT_VIEW" ), 0, this, false, "Viewers:Front view");
   aAction->setStatusTip(tr("DSC_FRONT_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onFrontView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, FrontId );
 
   aAction = new QtxAction(tr("MNU_BACK_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_BACK" ) ),
-                           tr( "MNU_BACK_VIEW" ), 0, this);
+                           tr( "MNU_BACK_VIEW" ), 0, this, false, "Viewers:Back view");
   aAction->setStatusTip(tr("DSC_BACK_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onBackView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, BackId );
 
   aAction = new QtxAction(tr("MNU_TOP_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_TOP" ) ),
-                           tr( "MNU_TOP_VIEW" ), 0, this);
+                           tr( "MNU_TOP_VIEW" ), 0, this, false, "Viewers:Top view");
   aAction->setStatusTip(tr("DSC_TOP_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onTopView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, TopId );
 
   aAction = new QtxAction(tr("MNU_BOTTOM_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_BOTTOM" ) ),
-                           tr( "MNU_BOTTOM_VIEW" ), 0, this);
+                           tr( "MNU_BOTTOM_VIEW" ), 0, this, false, "Viewers:Bottom view");
   aAction->setStatusTip(tr("DSC_BOTTOM_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onBottomView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, BottomId );
-
+  
   aAction = new QtxAction(tr("MNU_LEFT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_LEFT" ) ),
-                           tr( "MNU_LEFT_VIEW" ), 0, this);
+                           tr( "MNU_LEFT_VIEW" ), 0, this, false, "Viewers:Left view");
   aAction->setStatusTip(tr("DSC_LEFT_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onLeftView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, LeftId );
 
   aAction = new QtxAction(tr("MNU_RIGHT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_RIGHT" ) ),
-                           tr( "MNU_RIGHT_VIEW" ), 0, this);
+                           tr( "MNU_RIGHT_VIEW" ), 0, this, false, "Viewers:Right view");
   aAction->setStatusTip(tr("DSC_RIGHT_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onRightView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, RightId );
+
+  // rotate anticlockwise
+  aAction = new QtxAction(tr("MNU_ANTICLOCKWISE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_ANTICLOCKWISE" ) ),
+                           tr( "MNU_ANTICLOCKWISE_VIEW" ), 0, this, false, "Viewers:Rotate anticlockwise");
+  aAction->setStatusTip(tr("DSC_ANTICLOCKWISE_VIEW"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onAntiClockWiseView()));
+  this->addAction(aAction);
+  toolMgr()->registerAction( aAction, AntiClockWiseId );
+
+  // rotate clockwise
+  aAction = new QtxAction(tr("MNU_CLOCKWISE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_CLOCKWISE" ) ),
+                           tr( "MNU_CLOCKWISE_VIEW" ), 0, this, false, "Viewers:Rotate clockwise");
+  aAction->setStatusTip(tr("DSC_CLOCKWISE_VIEW"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onClockWiseView()));
+  this->addAction(aAction);
+  toolMgr()->registerAction( aAction, ClockWiseId );
 
   // Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_RESET" ) ),
-                           tr( "MNU_RESET_VIEW" ), 0, this);
+                           tr( "MNU_RESET_VIEW" ), 0, this, false, "Viewers:Reset view");
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onResetView()));
+  this->addAction(aAction);
   toolMgr()->registerAction( aAction, ResetId );
 
-  // Reset
-  aAction = new QtxAction(tr("MNU_CLONE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLONE_VIEW" ) ),
-                           tr( "MNU_CLONE_VIEW" ), 0, this);
+  // Clone
+  aAction = new QtxAction(tr("MNU_CLONE_VIEW"),
+                          aResMgr->loadPixmap("OCCViewer", tr("ICON_OCCVIEWER_CLONE_VIEW")),
+                          tr("MNU_CLONE_VIEW"), 0, this);
   aAction->setStatusTip(tr("DSC_CLONE_VIEW"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onCloneView()));
   toolMgr()->registerAction( aAction, CloneId );
@@ -1086,6 +1202,53 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_SCALING"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(onAxialScale()));
   toolMgr()->registerAction( aAction, AxialScaleId );
+
+  // Graduated axes 
+  aAction = new QtxAction(tr("MNU_GRADUATED_AXES"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_GRADUATED_AXES" ) ),
+                           tr( "MNU_GRADUATED_AXES" ), 0, this);
+  aAction->setStatusTip(tr("DSC_GRADUATED_AXES"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onGraduatedAxes()));
+  toolMgr()->registerAction( aAction, GraduatedAxesId );
+
+  // Active only ambient light or not
+  aAction = new QtxAction(tr("MNU_AMBIENT"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_AMBIENT" ) ),
+                           tr( "MNU_AMBIENT" ), 0, this);
+  aAction->setStatusTip(tr("DSC_AMBIENT"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onAmbientToogle()));
+  toolMgr()->registerAction( aAction, AmbientId );
+
+  // Switch between interaction styles
+  aAction = new QtxAction(tr("MNU_STYLE_SWITCH"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_STYLE_SWITCH" ) ),
+                          tr( "MNU_STYLE_SWITCH" ), 0, this);
+  aAction->setStatusTip(tr("DSC_STYLE_SWITCH"));
+  aAction->setCheckable(true);
+  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchInteractionStyle(bool)));
+  toolMgr()->registerAction( aAction, SwitchInteractionStyleId );
+
+  // Switch between zooming styles
+  aAction = new QtxAction(tr("MNU_ZOOMING_STYLE_SWITCH"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_ZOOMING_STYLE_SWITCH" ) ),
+                          tr( "MNU_ZOOMING_STYLE_SWITCH" ), 0, this);
+  aAction->setStatusTip(tr("DSC_ZOOMING_STYLE_SWITCH"));
+  aAction->setCheckable(true);
+  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchZoomingStyle(bool)));
+  toolMgr()->registerAction( aAction, SwitchZoomingStyleId );
+
+  // Maximized view
+  aAction = new QtxAction(tr("MNU_MINIMIZE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MINIMIZE" ) ),
+                          tr( "MNU_MINIMIZE_VIEW" ), 0, this );
+  aAction->setStatusTip(tr("DSC_MINIMIZE_VIEW"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onMaximizedView()));
+  toolMgr()->registerAction( aAction, MaximizedId );
+
+  // Synchronize view
+  aAction = new QtxAction(tr("MNU_SYNCHRONIZE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SYNC" ) ),
+                          tr( "MNU_SYNCHRONIZE_VIEW" ), 0, this );
+  aAction->setStatusTip(tr("DSC_SYNCHRONIZE_VIEW"));
+  aAction->setMenu( new QMenu( this ) );
+  aAction->setCheckable(true);
+  connect(aAction->menu(), SIGNAL(aboutToShow()), this, SLOT(updateSyncViews()));
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSynchronizeView(bool)));
+  toolMgr()->registerAction( aAction, SynchronizeId );
 }
 
 /*!
@@ -1093,10 +1256,29 @@ void OCCViewer_ViewWindow::createActions()
 */
 void OCCViewer_ViewWindow::createToolBar()
 {
-  int tid = toolMgr()->createToolBar( tr( "LBL_TOOLBAR_LABEL" ) );
+  QString aToolbarName;
+  switch (my2dMode) {
+  case XYPlane:
+    aToolbarName = tr( "LBL_XYTOOLBAR_LABEL" );
+    break;
+  case XZPlane:
+    aToolbarName = tr( "LBL_XZTOOLBAR_LABEL" );
+    break;
+  case YZPlane:
+    aToolbarName = tr( "LBL_YZTOOLBAR_LABEL" );
+    break;
+  default:
+    aToolbarName = tr( "LBL_3DTOOLBAR_LABEL" );
+  }
+  
+  int tid = toolMgr()->createToolBar( aToolbarName, false );
 
   toolMgr()->append( DumpId, tid );
-  if( myModel->trihedronActivated() ) 
+  toolMgr()->append( SwitchInteractionStyleId, tid );
+#if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
+  toolMgr()->append( SwitchZoomingStyleId, tid );
+#endif
+  if( myModel->trihedronActivated() )
     toolMgr()->append( TrihedronShowId, tid );
 
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
@@ -1110,19 +1292,24 @@ void OCCViewer_ViewWindow::createToolBar()
   aPanningAction->insertAction( toolMgr()->action( GlobalPanId ) );
   toolMgr()->append( aPanningAction, tid );
 
-  toolMgr()->append( ChangeRotationPointId, tid );
-  toolMgr()->append( RotationId, tid );
+  if (my2dMode == No2dMode) {
+    toolMgr()->append( ChangeRotationPointId, tid );
+    toolMgr()->append( RotationId, tid );
 
-  QtxMultiAction* aViewsAction = new QtxMultiAction( this );
-  aViewsAction->insertAction( toolMgr()->action( FrontId ) );
-  aViewsAction->insertAction( toolMgr()->action( BackId ) );
-  aViewsAction->insertAction( toolMgr()->action( TopId ) );
-  aViewsAction->insertAction( toolMgr()->action( BottomId ) );
-  aViewsAction->insertAction( toolMgr()->action( LeftId ) );
-  aViewsAction->insertAction( toolMgr()->action( RightId ) );
-  toolMgr()->append( aViewsAction, tid );
+    QtxMultiAction* aViewsAction = new QtxMultiAction( this );
+    aViewsAction->insertAction( toolMgr()->action( FrontId ) );
+    aViewsAction->insertAction( toolMgr()->action( BackId ) );
+    aViewsAction->insertAction( toolMgr()->action( TopId ) );
+    aViewsAction->insertAction( toolMgr()->action( BottomId ) );
+    aViewsAction->insertAction( toolMgr()->action( LeftId ) );
+    aViewsAction->insertAction( toolMgr()->action( RightId ) );
+    toolMgr()->append( aViewsAction, tid );
 
-  toolMgr()->append( ResetId, tid );
+    toolMgr()->append( AntiClockWiseId, tid );
+    toolMgr()->append( ClockWiseId, tid );
+
+    toolMgr()->append( ResetId, tid );
+  }
 
   QtxMultiAction* aMemAction = new QtxMultiAction( this );
   aMemAction->insertAction( toolMgr()->action( MemId ) );
@@ -1135,6 +1322,13 @@ void OCCViewer_ViewWindow::createToolBar()
   toolMgr()->append( toolMgr()->separator(), tid );
   toolMgr()->append( ClippingId, tid );
   toolMgr()->append( AxialScaleId, tid );
+#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
+  toolMgr()->append( GraduatedAxesId, tid );
+#endif
+  toolMgr()->append( AmbientId, tid );
+
+  toolMgr()->append( MaximizedId, tid );
+  toolMgr()->append( SynchronizeId, tid );
 }
 
 /*!
@@ -1154,6 +1348,7 @@ void OCCViewer_ViewWindow::onFrontView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xpos);
   onViewFitAll();
+  emit vpTransformationFinished ( FRONTVIEW );
 }
 
 /*!
@@ -1165,6 +1360,7 @@ void OCCViewer_ViewWindow::onBackView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xneg);
   onViewFitAll();
+  emit vpTransformationFinished ( BACKVIEW );
 }
 
 /*!
@@ -1176,6 +1372,7 @@ void OCCViewer_ViewWindow::onTopView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zpos);
   onViewFitAll();
+  emit vpTransformationFinished ( TOPVIEW );
 }
 
 /*!
@@ -1187,6 +1384,7 @@ void OCCViewer_ViewWindow::onBottomView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zneg);
   onViewFitAll();
+  emit vpTransformationFinished ( BOTTOMVIEW );
 }
 
 /*!
@@ -1198,6 +1396,7 @@ void OCCViewer_ViewWindow::onLeftView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Yneg);
   onViewFitAll();
+  emit vpTransformationFinished ( LEFTVIEW );
 }
 
 /*!
@@ -1209,6 +1408,27 @@ void OCCViewer_ViewWindow::onRightView()
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Ypos);
   onViewFitAll();
+  emit vpTransformationFinished ( RIGHTVIEW );
+}
+
+/*!
+  \brief Rotate view 90 degrees clockwise
+*/
+void OCCViewer_ViewWindow::onClockWiseView()
+{
+  emit vpTransformationStarted ( CLOCKWISEVIEW );
+  myViewPort->rotateXY( 90. );
+  emit vpTransformationFinished ( CLOCKWISEVIEW );
+}
+
+/*!
+  \brief Rotate view 90 degrees conterclockwise
+*/
+void OCCViewer_ViewWindow::onAntiClockWiseView()
+{
+  emit vpTransformationStarted ( ANTICLOCKWISEVIEW );
+  myViewPort->rotateXY( -90. );
+  emit vpTransformationFinished ( ANTICLOCKWISEVIEW );
 }
 
 /*!
@@ -1224,6 +1444,7 @@ void OCCViewer_ViewWindow::onResetView()
   myViewPort->fitAll( false, true, false );
   myViewPort->getView()->SetImmediateUpdate( upd );
   myViewPort->getView()->Update();
+  emit vpTransformationFinished( RESETVIEW );
 }
 
 /*!
@@ -1233,6 +1454,7 @@ void OCCViewer_ViewWindow::onFitAll()
 {
   emit vpTransformationStarted( FITALLVIEW );
   myViewPort->fitAll();
+  emit vpTransformationFinished( FITALLVIEW );
 }
 
 /*!
@@ -1241,30 +1463,31 @@ void OCCViewer_ViewWindow::onFitAll()
 */
 void OCCViewer_ViewWindow::onSetRotationPoint( bool on )
 {
-  if ( on )
+  if (on)
+  {
+    if (!mySetRotationPointDlg)
     {
-      if ( !mySetRotationPointDlg )
-	{
-	  mySetRotationPointDlg = new OCCViewer_SetRotationPointDlg( this, myDesktop );
-	  mySetRotationPointDlg->SetAction( mySetRotationPointAction );
-	}
+      mySetRotationPointDlg = new OCCViewer_SetRotationPointDlg (this);
+      mySetRotationPointDlg->SetAction(mySetRotationPointAction);
+    }
 
-      if ( !mySetRotationPointDlg->isVisible() )
-      {
-	if ( mySetRotationPointDlg->IsFirstShown() )
-	{
-	  Standard_Real Xcenter, Ycenter, Zcenter;
-	  if ( computeGravityCenter( Xcenter, Ycenter, Zcenter ) )
-	    mySetRotationPointDlg->setCoords( Xcenter, Ycenter, Zcenter );
-	}
-	mySetRotationPointDlg->show();
-      }
-    }
-  else
+    if (!mySetRotationPointDlg->isVisible())
     {
-      if ( mySetRotationPointDlg->isVisible() )
-	mySetRotationPointDlg->hide();
+      //if (mySetRotationPointDlg->IsFirstShown())
+      if (myCurrPointType == GRAVITY)
+      {
+        Standard_Real Xcenter, Ycenter, Zcenter;
+        if (computeGravityCenter(Xcenter, Ycenter, Zcenter))
+          mySetRotationPointDlg->setCoords(Xcenter, Ycenter, Zcenter);
+      }
+      mySetRotationPointDlg->show();
     }
+  }
+  else
+  {
+    if (mySetRotationPointDlg->isVisible())
+      mySetRotationPointDlg->hide();
+  }
 }
 
 /*!
@@ -1293,23 +1516,26 @@ void OCCViewer_ViewWindow::onClipping( bool on )
   else
     myActionsMap[ ClippingId ]->setIcon(aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" )));
   */
+  OCCViewer_ViewWindow* aParent = dynamic_cast<OCCViewer_ViewWindow*>(parent()->parent());
+  if (!aParent)
+    aParent = this;
   if ( on )
-  {
-    if ( !myClippingDlg )
     {
-      myClippingDlg = new OCCViewer_ClippingDlg( this, myDesktop );
-      myClippingDlg->SetAction( myClippingAction );
-    }
+      if ( !myClippingDlg )
+        {
+          myClippingDlg = new OCCViewer_ClippingDlg( aParent );
+          myClippingDlg->SetAction( myClippingAction );
+        }
     
-    if ( !myClippingDlg->isVisible() )
-      myClippingDlg->show();
-  }
+      if ( !myClippingDlg->isVisible() )
+        myClippingDlg->show();
+    }
   else
-  {
-    if ( myClippingDlg->isVisible() )
-      myClippingDlg->hide();
-    setCuttingPlane(false);
-  }
+    {
+      if ( myClippingDlg->isVisible() )
+        myClippingDlg->hide();
+      aParent->setCuttingPlane(false);
+    }
 }
 
 /*!
@@ -1318,10 +1544,37 @@ void OCCViewer_ViewWindow::onClipping( bool on )
 void OCCViewer_ViewWindow::onAxialScale()
 {
   if ( !myScalingDlg )
-    myScalingDlg = new OCCViewer_AxialScaleDlg( this, myDesktop );
+    myScalingDlg = new OCCViewer_AxialScaleDlg( this );
   
   if ( !myScalingDlg->isVisible() )
     myScalingDlg->show();
+}
+
+/*!
+  Shows Graduated Axes dialog
+*/
+void OCCViewer_ViewWindow::onGraduatedAxes()
+{
+  myCubeAxesDlg->Update();
+  myCubeAxesDlg->show();
+}
+
+void OCCViewer_ViewWindow::onAmbientToogle()
+{
+  Handle(V3d_Viewer) viewer = myViewPort->getViewer();
+  viewer->InitDefinedLights();
+  while(viewer->MoreDefinedLights())
+    {
+      Handle(V3d_Light) light = viewer->DefinedLight();
+      if(light->Type() != V3d_AMBIENT)
+        {
+          Handle(V3d_View) aView3d = myViewPort->getView();
+          if( aView3d->IsActiveLight(light) ) viewer->SetLightOff(light);
+          else viewer->SetLightOn(light);
+        }
+      viewer->NextDefinedLights();
+    }
+  viewer->Update();
 }
 
 /*!
@@ -1329,7 +1582,7 @@ void OCCViewer_ViewWindow::onAxialScale()
 */
 void OCCViewer_ViewWindow::onMemorizeView()
 {
-  myModel->appendViewAspect( getViewParams() );
+  appendViewAspect( getViewParams() );
 }
 
 /*!
@@ -1337,10 +1590,10 @@ void OCCViewer_ViewWindow::onMemorizeView()
 */
 void OCCViewer_ViewWindow::onRestoreView()
 {
-  OCCViewer_CreateRestoreViewDlg* aDlg = new OCCViewer_CreateRestoreViewDlg( centralWidget(), myModel );
+  OCCViewer_CreateRestoreViewDlg* aDlg = new OCCViewer_CreateRestoreViewDlg( centralWidget(), this );
   connect( aDlg, SIGNAL( dlgOk() ), this, SLOT( setRestoreFlag() ) );
   aDlg->exec();
-  myModel->updateViewAspects( aDlg->parameters() );
+  updateViewAspects( aDlg->parameters() );
   if( myRestoreFlag && aDlg->parameters().count() )
     performRestoring( aDlg->currentItem() );
 }
@@ -1349,7 +1602,7 @@ void OCCViewer_ViewWindow::onRestoreView()
   \brief Restore view parameters.
   \param anItem view parameters
 */
-void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem )
+void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool baseParamsOnly )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
 
@@ -1362,9 +1615,62 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem )
   aView3d->SetEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
-  myModel->setTrihedronShown( anItem.isVisible );
-  myModel->setTrihedronSize( anItem.size );
-	
+
+  if ( !baseParamsOnly ) {
+
+    myModel->setTrihedronShown( anItem.isVisible );
+    myModel->setTrihedronSize( anItem.size );
+        
+#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
+    // graduated trihedron
+    bool anIsVisible = anItem.gtIsVisible;
+    OCCViewer_AxisWidget::AxisData anAxisData[3];
+    anAxisData[0].DrawName = anItem.gtDrawNameX;
+    anAxisData[1].DrawName = anItem.gtDrawNameZ;
+    anAxisData[2].DrawName = anItem.gtDrawNameZ;
+    anAxisData[0].Name = anItem.gtNameX;
+    anAxisData[1].Name = anItem.gtNameZ;
+    anAxisData[2].Name = anItem.gtNameZ;
+    anAxisData[0].NameColor = QColor( anItem.gtNameColorRX,
+				      anItem.gtNameColorGX,
+				      anItem.gtNameColorBX );
+    anAxisData[1].NameColor = QColor( anItem.gtNameColorRY,
+				      anItem.gtNameColorGY,
+				      anItem.gtNameColorBY );
+    anAxisData[2].NameColor = QColor( anItem.gtNameColorRZ,
+				      anItem.gtNameColorGZ,
+				      anItem.gtNameColorBZ );
+    anAxisData[0].DrawValues = anItem.gtDrawValuesX;
+    anAxisData[1].DrawValues = anItem.gtDrawValuesY;
+    anAxisData[2].DrawValues = anItem.gtDrawValuesZ;
+    anAxisData[0].NbValues = anItem.gtNbValuesX;
+    anAxisData[1].NbValues = anItem.gtNbValuesY;
+    anAxisData[2].NbValues = anItem.gtNbValuesZ;
+    anAxisData[0].Offset = anItem.gtOffsetX;
+    anAxisData[1].Offset = anItem.gtOffsetY;
+    anAxisData[2].Offset = anItem.gtOffsetZ;
+    anAxisData[0].Color = QColor( anItem.gtColorRX,
+				  anItem.gtColorGX,
+				  anItem.gtColorBX );
+    anAxisData[1].Color = QColor( anItem.gtColorRY,
+				  anItem.gtColorGY,
+				  anItem.gtColorBY );
+    anAxisData[2].Color = QColor( anItem.gtColorRZ,
+				  anItem.gtColorGZ,
+				  anItem.gtColorBZ );
+    anAxisData[0].DrawTickmarks = anItem.gtDrawTickmarksX;
+    anAxisData[1].DrawTickmarks = anItem.gtDrawTickmarksY;
+    anAxisData[2].DrawTickmarks = anItem.gtDrawTickmarksZ;
+    anAxisData[0].TickmarkLength = anItem.gtTickmarkLengthX;
+    anAxisData[1].TickmarkLength = anItem.gtTickmarkLengthY;
+    anAxisData[2].TickmarkLength = anItem.gtTickmarkLengthZ;
+
+    myCubeAxesDlg->SetData( anIsVisible, anAxisData );
+    myCubeAxesDlg->ApplyData( aView3d );
+#endif
+
+  } // if ( !baseParamsOnly )
+
   myRestoreFlag = 0;
 }
 
@@ -1385,18 +1691,125 @@ void OCCViewer_ViewWindow::onTrihedronShow()
 }
 
 /*!
+  \brief Switches "keyboard free" interaction style on/off
+*/
+void OCCViewer_ViewWindow::onSwitchInteractionStyle( bool on )
+{
+  myInteractionStyle = on ? (int)SUIT_ViewModel::KEY_FREE : (int)SUIT_ViewModel::STANDARD;
+
+  // update action state if method is called outside
+  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchInteractionStyleId ) );
+  if ( a->isChecked() != on )
+    a->setChecked( on );
+}
+
+/*!
+  \brief Toogles advanced zooming style (relatively to the cursor position) on/off
+*/
+void OCCViewer_ViewWindow::onSwitchZoomingStyle( bool on )
+{
+  myViewPort->setAdvancedZoomingEnabled( on );
+
+  // update action state if method is called outside
+  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchZoomingStyleId ) );
+  if ( a->isChecked() != on )
+    a->setChecked( on );
+}
+
+/*!
+  \brief Get current interaction style
+  \return interaction style
+*/
+int OCCViewer_ViewWindow::interactionStyle() const
+{
+  return myInteractionStyle;
+}
+
+/*!
+  \brief Set current interaction style
+  \param theStyle interaction style
+*/
+void OCCViewer_ViewWindow::setInteractionStyle( const int theStyle )
+{
+  onSwitchInteractionStyle( theStyle == (int)SUIT_ViewModel::KEY_FREE );
+}
+
+/*!
+  \brief Get current zooming style
+  \return zooming style
+*/
+int OCCViewer_ViewWindow::zoomingStyle() const
+{
+  return myViewPort->isAdvancedZoomingEnabled() ? 1 : 0;
+}
+
+/*!
+  \brief Set current zooming style
+  \param theStyle zooming style
+*/
+void OCCViewer_ViewWindow::setZoomingStyle( const int theStyle )
+{
+  onSwitchZoomingStyle( theStyle == 1 );
+}
+
+/*!
   \brief Dump view window contents to the pixmap.
   \return pixmap containing all scene rendered in the window
 */
 QImage OCCViewer_ViewWindow::dumpView()
 {
-  QPixmap px = QPixmap::grabWindow( myViewPort->winId() );
-  return px.toImage();
+  Handle(V3d_View) view = myViewPort->getView();
+  if ( view.IsNull() )
+    return QImage();
+  
+  int aWidth = myViewPort->width();
+  int aHeight = myViewPort->height();
+  QApplication::syncX();
+  view->Redraw(); // In order to reactivate GL context
+  //view->Update();
+
+  OpenGLUtils_FrameBuffer aFrameBuffer;
+  if( aFrameBuffer.init( aWidth, aHeight ) )
+  {
+    QImage anImage( aWidth, aHeight, QImage::Format_RGB32 );
+   
+    glPushAttrib( GL_VIEWPORT_BIT );
+    glViewport( 0, 0, aWidth, aHeight );
+    aFrameBuffer.bind();
+
+    // draw scene
+    view->Redraw();
+
+    aFrameBuffer.unbind();
+    glPopAttrib();
+
+    aFrameBuffer.bind();
+    glReadPixels( 0, 0, aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
+    aFrameBuffer.unbind();
+
+    anImage = anImage.rgbSwapped();
+    anImage = anImage.mirrored();
+    return anImage;
+  }
+  // if frame buffers are unsupported, use old functionality
+  //view->Redraw();
+
+  unsigned char* data = new unsigned char[ aWidth*aHeight*4 ];
+
+  QPoint p = myViewPort->mapFromParent(myViewPort->geometry().topLeft());
+
+  glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
+                data);
+
+  QImage anImage( data, aWidth, aHeight, QImage::Format_ARGB32 );
+  anImage = anImage.mirrored();
+  anImage = anImage.rgbSwapped();
+  return anImage;
 }
 
 bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img, 
-					     const QString& fileName, 
-					     const QString& format )
+                                             const QString& fileName, 
+                                             const QString& format )
 {
   if ( format != "PS" && format != "EPS")
     return SUIT_ViewWindow::dumpViewToFormat( img, fileName, format );
@@ -1404,9 +1817,9 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
   Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
 
   if (format == "PS")
-    a3dView->Export(qPrintable(fileName), Graphic3d_EF_PostScript);
+    a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
   else if (format == "EPS")
-    a3dView->Export(qPrintable(fileName), Graphic3d_EF_EnhPostScript);
+    a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
 
   return true;
 }
@@ -1429,7 +1842,7 @@ QString OCCViewer_ViewWindow::filter() const
   \param dz Z coordinate of plane normal
 */
 void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const double y,  const double z,
-					    const double dx, const double dy, const double dz )
+                                            const double dx, const double dy, const double dz )
 {
   Handle(V3d_View) view = myViewPort->getView();
   if ( view.IsNull() )
@@ -1441,18 +1854,29 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     // try to use already existing plane or create a new one
     Handle(V3d_Plane) clipPlane;
     view->InitActivePlanes();
-    if ( view->MoreActivePlanes() )
+
+    // calculate new a,b,c,d values for the plane
+    gp_Pln pln (gp_Pnt(x, y, z), gp_Dir(dx, dy, dz));
+    double a, b, c, d;
+    pln.Coefficients(a, b, c, d);
+
+#if OCC_VERSION_LARGE > 0x06040000 // Porting to OCCT6.5.1
+    if (view->MoreActivePlanes()) {
+      clipPlane = view->ActivePlane();
+      clipPlane->SetPlane(a, b, c, d);
+    }
+    else
+      clipPlane = new V3d_Plane (a, b, c, d);
+#else
+    if (view->MoreActivePlanes())
       clipPlane = view->ActivePlane();
     else
-      clipPlane = new V3d_Plane( viewer );
+      clipPlane = new V3d_Plane (viewer);
 
-    // set new a,b,c,d values for the plane
-    gp_Pln pln( gp_Pnt( x, y, z ), gp_Dir( dx, dy, dz ) );
-    double a, b, c, d;
-    pln.Coefficients( a, b, c, d );
-    clipPlane->SetPlane( a, b, c, d );
+    clipPlane->SetPlane(a, b, c, d);
+#endif
 
-    view->SetPlaneOn( clipPlane );
+    view->SetPlaneOn(clipPlane);
   }
   else
     view->SetPlaneOff();
@@ -1460,6 +1884,14 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
   view->Update();
   view->Redraw();
 }
+
+void OCCViewer_ViewWindow::setCuttingPlane( bool on, const gp_Pln pln )
+{
+  gp_Dir aDir = pln.Axis().Direction();
+  gp_Pnt aPnt = pln.Location();
+  setCuttingPlane(on, aPnt.X(), aPnt.Y(), aPnt.Z(), aDir.X(), aDir.Y(), aDir.Z());
+}
+
 
 /*!
   \brief Check if any cutting plane is enabled
@@ -1514,9 +1946,57 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   params.scaleX   = aScaleX;
   params.scaleY   = aScaleY;
   params.scaleZ   = aScaleZ;
-  params.name	  = aName;
+  params.name     = aName;
   params.isVisible= isShown;
   params.size     = size;
+
+#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
+  // graduated trihedron
+  bool anIsVisible = false;
+  OCCViewer_AxisWidget::AxisData anAxisData[3];
+  myCubeAxesDlg->GetData( anIsVisible, anAxisData );
+
+  params.gtIsVisible = anIsVisible;
+  params.gtDrawNameX = anAxisData[0].DrawName;
+  params.gtDrawNameY = anAxisData[1].DrawName;
+  params.gtDrawNameZ = anAxisData[2].DrawName;
+  params.gtNameX = anAxisData[0].Name;
+  params.gtNameY = anAxisData[1].Name;
+  params.gtNameZ = anAxisData[2].Name;
+  params.gtNameColorRX = anAxisData[0].NameColor.red();
+  params.gtNameColorGX = anAxisData[0].NameColor.green();
+  params.gtNameColorBX = anAxisData[0].NameColor.blue();
+  params.gtNameColorRY = anAxisData[1].NameColor.red();
+  params.gtNameColorGY = anAxisData[1].NameColor.green();
+  params.gtNameColorBY = anAxisData[1].NameColor.blue();
+  params.gtNameColorRZ = anAxisData[2].NameColor.red();
+  params.gtNameColorGZ = anAxisData[2].NameColor.green();
+  params.gtNameColorBZ = anAxisData[2].NameColor.blue();
+  params.gtDrawValuesX = anAxisData[0].DrawValues;
+  params.gtDrawValuesY = anAxisData[1].DrawValues;
+  params.gtDrawValuesZ = anAxisData[2].DrawValues;
+  params.gtNbValuesX = anAxisData[0].NbValues;
+  params.gtNbValuesY = anAxisData[1].NbValues;
+  params.gtNbValuesZ = anAxisData[2].NbValues;
+  params.gtOffsetX = anAxisData[0].Offset;
+  params.gtOffsetY = anAxisData[1].Offset;
+  params.gtOffsetZ = anAxisData[2].Offset;
+  params.gtColorRX = anAxisData[0].Color.red();
+  params.gtColorGX = anAxisData[0].Color.green();
+  params.gtColorBX = anAxisData[0].Color.blue();
+  params.gtColorRY = anAxisData[1].Color.red();
+  params.gtColorGY = anAxisData[1].Color.green();
+  params.gtColorBY = anAxisData[1].Color.blue();
+  params.gtColorRZ = anAxisData[2].Color.red();
+  params.gtColorGZ = anAxisData[2].Color.green();
+  params.gtColorBZ = anAxisData[2].Color.blue();
+  params.gtDrawTickmarksX = anAxisData[0].DrawTickmarks;
+  params.gtDrawTickmarksY = anAxisData[1].DrawTickmarks;
+  params.gtDrawTickmarksZ = anAxisData[2].DrawTickmarks;
+  params.gtTickmarkLengthX = anAxisData[0].TickmarkLength;
+  params.gtTickmarkLengthY = anAxisData[1].TickmarkLength;
+  params.gtTickmarkLengthZ = anAxisData[2].TickmarkLength;
+#endif
 
   return params;
 }
@@ -1529,13 +2009,75 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
 QString OCCViewer_ViewWindow::getVisualParameters()
 {
   viewAspect params = getViewParams();
-  QString retStr;
-  retStr.sprintf( "%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e*%.12e", params.scale,
-		  params.centerX, params.centerY, params.projX, params.projY, params.projZ, params.twist,
-		  params.atX, params.atY, params.atZ, params.eyeX, params.eyeY, params.eyeZ,
-		  params.scaleX, params.scaleY, params.scaleZ );
-  retStr += QString().sprintf("*%u*%.2f", params.isVisible, params.size );
-  return retStr;
+
+  QStringList data;
+
+  data << QString( "scale=%1" )    .arg( params.scale,   0, 'e', 12 );
+  data << QString( "centerX=%1" )  .arg( params.centerX, 0, 'e', 12 );
+  data << QString( "centerY=%1" )  .arg( params.centerY, 0, 'e', 12 );
+  data << QString( "projX=%1" )    .arg( params.projX,   0, 'e', 12 );
+  data << QString( "projY=%1" )    .arg( params.projY,   0, 'e', 12 );
+  data << QString( "projZ=%1" )    .arg( params.projZ,   0, 'e', 12 );
+  data << QString( "twist=%1" )    .arg( params.twist,   0, 'e', 12 );
+  data << QString( "atX=%1" )      .arg( params.atX,     0, 'e', 12 );
+  data << QString( "atY=%1" )      .arg( params.atY,     0, 'e', 12 );
+  data << QString( "atZ=%1" )      .arg( params.atZ,     0, 'e', 12 );
+  data << QString( "eyeX=%1" )     .arg( params.eyeX,    0, 'e', 12 );
+  data << QString( "eyeY=%1" )     .arg( params.eyeY,    0, 'e', 12 );
+  data << QString( "eyeZ=%1" )     .arg( params.eyeZ,    0, 'e', 12 );
+  data << QString( "scaleX=%1" )   .arg( params.scaleX,  0, 'e', 12 );
+  data << QString( "scaleY=%1" )   .arg( params.scaleY,  0, 'e', 12 );
+  data << QString( "scaleZ=%1" )   .arg( params.scaleZ,  0, 'e', 12 );
+  data << QString( "isVisible=%1" ).arg( params.isVisible );
+  data << QString( "size=%1" )     .arg( params.size,    0, 'f',  2 );
+
+#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 or newer version
+  // graduated trihedron
+  data << QString( "gtIsVisible=%1" )      .arg( params.gtIsVisible );
+  data << QString( "gtDrawNameX=%1" )      .arg( params.gtDrawNameX );
+  data << QString( "gtDrawNameY=%1" )      .arg( params.gtDrawNameY );
+  data << QString( "gtDrawNameZ=%1" )      .arg( params.gtDrawNameZ );
+  data << QString( "gtNameX=%1" )          .arg( params.gtNameX );
+  data << QString( "gtNameY=%1" )          .arg( params.gtNameY );
+  data << QString( "gtNameZ=%1" )          .arg( params.gtNameZ );
+  data << QString( "gtNameColorRX=%1" )    .arg( params.gtNameColorRX );
+  data << QString( "gtNameColorGX=%1" )    .arg( params.gtNameColorGX );
+  data << QString( "gtNameColorBX=%1" )    .arg( params.gtNameColorBX );
+  data << QString( "gtNameColorRY=%1" )    .arg( params.gtNameColorRY );
+  data << QString( "gtNameColorGY=%1" )    .arg( params.gtNameColorGY );
+  data << QString( "gtNameColorBY=%1" )    .arg( params.gtNameColorBY );
+  data << QString( "gtNameColorRZ=%1" )    .arg( params.gtNameColorRZ );
+  data << QString( "gtNameColorGZ=%1" )    .arg( params.gtNameColorGZ );
+  data << QString( "gtNameColorBZ=%1" )    .arg( params.gtNameColorBZ );
+  data << QString( "gtDrawValuesX=%1" )    .arg( params.gtDrawValuesX );
+  data << QString( "gtDrawValuesY=%1" )    .arg( params.gtDrawValuesY );
+  data << QString( "gtDrawValuesZ=%1" )    .arg( params.gtDrawValuesZ );
+  data << QString( "gtNbValuesX=%1" )      .arg( params.gtNbValuesX );
+  data << QString( "gtNbValuesY=%1" )      .arg( params.gtNbValuesY );
+  data << QString( "gtNbValuesZ=%1" )      .arg( params.gtNbValuesZ );
+  data << QString( "gtOffsetX=%1" )        .arg( params.gtOffsetX );
+  data << QString( "gtOffsetY=%1" )        .arg( params.gtOffsetY );
+  data << QString( "gtOffsetZ=%1" )        .arg( params.gtOffsetZ );
+  data << QString( "gtColorRX=%1" )        .arg( params.gtColorRX );
+  data << QString( "gtColorGX=%1" )        .arg( params.gtColorGX );
+  data << QString( "gtColorBX=%1" )        .arg( params.gtColorBX );
+  data << QString( "gtColorRY=%1" )        .arg( params.gtColorRY );
+  data << QString( "gtColorGY=%1" )        .arg( params.gtColorGY );
+  data << QString( "gtColorBY=%1" )        .arg( params.gtColorBY );
+  data << QString( "gtColorRZ=%1" )        .arg( params.gtColorRZ );
+  data << QString( "gtColorGZ=%1" )        .arg( params.gtColorGZ );
+  data << QString( "gtColorBZ=%1" )        .arg( params.gtColorBZ );
+  data << QString( "gtDrawTickmarksX=%1" ) .arg( params.gtDrawTickmarksX );
+  data << QString( "gtDrawTickmarksY=%1" ) .arg( params.gtDrawTickmarksY );
+  data << QString( "gtDrawTickmarksZ=%1" ) .arg( params.gtDrawTickmarksZ );
+  data << QString( "gtTickmarkLengthX=%1" ).arg( params.gtTickmarkLengthX );
+  data << QString( "gtTickmarkLengthY=%1" ).arg( params.gtTickmarkLengthY );
+  data << QString( "gtTickmarkLengthZ=%1" ).arg( params.gtTickmarkLengthZ );
+#endif
+  QString bg = Qtx::backgroundToString( background() ).replace( "=", "$" );
+  data << QString( "background=%1" ).arg( bg );
+
+  return data.join("*");
 }
 
 /*!
@@ -1544,36 +2086,104 @@ QString OCCViewer_ViewWindow::getVisualParameters()
 */
 void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
 {
-  QStringList paramsLst = parameters.split( '*' );
-  if ( paramsLst.size() >= 15 ) {
-    viewAspect params;
-    params.scale    = paramsLst[0].toDouble();
-    params.centerX  = paramsLst[1].toDouble();
-    params.centerY  = paramsLst[2].toDouble();
-    params.projX    = paramsLst[3].toDouble();
-    params.projY    = paramsLst[4].toDouble();
-    params.projZ    = paramsLst[5].toDouble();
-    params.twist    = paramsLst[6].toDouble();
-    params.atX      = paramsLst[7].toDouble();
-    params.atY      = paramsLst[8].toDouble();
-    params.atZ      = paramsLst[9].toDouble();
-    params.eyeX     = paramsLst[10].toDouble();
-    params.eyeY     = paramsLst[11].toDouble();
-    params.eyeZ     = paramsLst[12].toDouble();
-    if ( paramsLst.size() == 18 ) {
-      params.scaleX    = paramsLst[13].toDouble();
-      params.scaleY    = paramsLst[14].toDouble();
-      params.scaleZ    = paramsLst[15].toDouble();
-      params.isVisible = paramsLst[16].toDouble();
-      params.size      = paramsLst[17].toDouble();
-    } 
-    else {
-      params.scaleX    = 1.;
-      params.scaleY    = 1.;
-      params.scaleZ    = 1.;
+  viewAspect params;
+
+  QStringList data = parameters.split( '*' );
+  Qtx::BackgroundData bgData;
+  if ( parameters.contains( '=' )  ) // new format - "scale=1.000e+00*centerX=0.000e+00..."
+  {
+    foreach( QString param, data ) {
+      QString paramName  = param.section( '=', 0, 0 ).trimmed();
+      QString paramValue = param.section( '=', 1, 1 ).trimmed();
+      if      ( paramName == "scale" )             params.scale             = paramValue.toDouble();
+      else if ( paramName == "centerX" )           params.centerX           = paramValue.toDouble();
+      else if ( paramName == "centerY" )           params.centerY           = paramValue.toDouble();
+      else if ( paramName == "projX" )             params.projX             = paramValue.toDouble();
+      else if ( paramName == "projY" )             params.projY             = paramValue.toDouble();
+      else if ( paramName == "projZ" )             params.projZ             = paramValue.toDouble();
+      else if ( paramName == "twist" )             params.twist             = paramValue.toDouble();
+      else if ( paramName == "atX" )               params.atX               = paramValue.toDouble();
+      else if ( paramName == "atY" )               params.atY               = paramValue.toDouble();
+      else if ( paramName == "atZ" )               params.atZ               = paramValue.toDouble();
+      else if ( paramName == "eyeX" )              params.eyeX              = paramValue.toDouble();
+      else if ( paramName == "eyeY" )              params.eyeY              = paramValue.toDouble();
+      else if ( paramName == "eyeZ" )              params.eyeZ              = paramValue.toDouble();
+      else if ( paramName == "scaleX" )            params.scaleX            = paramValue.toDouble();
+      else if ( paramName == "scaleY" )            params.scaleY            = paramValue.toDouble();
+      else if ( paramName == "scaleZ" )            params.scaleZ            = paramValue.toDouble();
+      else if ( paramName == "isVisible" )         params.isVisible         = paramValue.toInt();
+      else if ( paramName == "size" )              params.size              = paramValue.toDouble();
+      // graduated trihedron
+      else if ( paramName == "gtIsVisible" )       params.gtIsVisible       = paramValue.toInt();
+      else if ( paramName == "gtDrawNameX" )       params.gtDrawNameX       = paramValue.toInt();
+      else if ( paramName == "gtDrawNameY" )       params.gtDrawNameY       = paramValue.toInt();
+      else if ( paramName == "gtDrawNameZ" )       params.gtDrawNameZ       = paramValue.toInt();
+      else if ( paramName == "gtNameX" )           params.gtNameX           = paramValue;
+      else if ( paramName == "gtNameY" )           params.gtNameY           = paramValue;
+      else if ( paramName == "gtNameZ" )           params.gtNameZ           = paramValue;
+      else if ( paramName == "gtNameColorRX" )     params.gtNameColorRX     = paramValue.toInt();
+      else if ( paramName == "gtNameColorGX" )     params.gtNameColorGX     = paramValue.toInt();
+      else if ( paramName == "gtNameColorBX" )     params.gtNameColorBX     = paramValue.toInt();
+      else if ( paramName == "gtNameColorRY" )     params.gtNameColorRY     = paramValue.toInt();
+      else if ( paramName == "gtNameColorGY" )     params.gtNameColorGY     = paramValue.toInt();
+      else if ( paramName == "gtNameColorBY" )     params.gtNameColorBY     = paramValue.toInt();
+      else if ( paramName == "gtNameColorRZ" )     params.gtNameColorRZ     = paramValue.toInt();
+      else if ( paramName == "gtNameColorGZ" )     params.gtNameColorGZ     = paramValue.toInt();
+      else if ( paramName == "gtNameColorBZ" )     params.gtNameColorBZ     = paramValue.toInt();
+      else if ( paramName == "gtDrawValuesX" )     params.gtDrawValuesX     = paramValue.toInt();
+      else if ( paramName == "gtDrawValuesY" )     params.gtDrawValuesY     = paramValue.toInt();
+      else if ( paramName == "gtDrawValuesZ" )     params.gtDrawValuesZ     = paramValue.toInt();
+      else if ( paramName == "gtNbValuesX" )       params.gtNbValuesX       = paramValue.toInt();
+      else if ( paramName == "gtNbValuesY" )       params.gtNbValuesY       = paramValue.toInt();
+      else if ( paramName == "gtNbValuesZ" )       params.gtNbValuesZ       = paramValue.toInt();
+      else if ( paramName == "gtOffsetX" )         params.gtOffsetX         = paramValue.toInt();
+      else if ( paramName == "gtOffsetY" )         params.gtOffsetY         = paramValue.toInt();
+      else if ( paramName == "gtOffsetZ" )         params.gtOffsetZ         = paramValue.toInt();
+      else if ( paramName == "gtColorRX" )         params.gtColorRX         = paramValue.toInt();
+      else if ( paramName == "gtColorGX" )         params.gtColorGX         = paramValue.toInt();
+      else if ( paramName == "gtColorBX" )         params.gtColorBX         = paramValue.toInt();
+      else if ( paramName == "gtColorRY" )         params.gtColorRY         = paramValue.toInt();
+      else if ( paramName == "gtColorGY" )         params.gtColorGY         = paramValue.toInt();
+      else if ( paramName == "gtColorBY" )         params.gtColorBY         = paramValue.toInt();
+      else if ( paramName == "gtColorRZ" )         params.gtColorRZ         = paramValue.toInt();
+      else if ( paramName == "gtColorGZ" )         params.gtColorGZ         = paramValue.toInt();
+      else if ( paramName == "gtColorBZ" )         params.gtColorBZ         = paramValue.toInt();
+      else if ( paramName == "gtDrawTickmarksX" )  params.gtDrawTickmarksX  = paramValue.toInt();
+      else if ( paramName == "gtDrawTickmarksY" )  params.gtDrawTickmarksY  = paramValue.toInt();
+      else if ( paramName == "gtDrawTickmarksZ" )  params.gtDrawTickmarksZ  = paramValue.toInt();
+      else if ( paramName == "gtTickmarkLengthX" ) params.gtTickmarkLengthX = paramValue.toInt();
+      else if ( paramName == "gtTickmarkLengthY" ) params.gtTickmarkLengthY = paramValue.toInt();
+      else if ( paramName == "gtTickmarkLengthZ" ) params.gtTickmarkLengthZ = paramValue.toInt();
+      else if ( paramName == "background" )        {
+	QString bg = paramValue.replace( "$", "=" );
+	bgData = Qtx::stringToBackground( bg );
+      }
     }
-    performRestoring( params );
   }
+  else // old format - "1.000e+00*0.000e+00..."
+  {
+    int idx = 0;
+    params.scale     = data.count() > idx ? data[idx++].toDouble() : 1.0;
+    params.centerX   = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.centerY   = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.projX     = data.count() > idx ? data[idx++].toDouble() : sqrt(1./3);
+    params.projY     = data.count() > idx ? data[idx++].toDouble() : -sqrt(1./3);
+    params.projZ     = data.count() > idx ? data[idx++].toDouble() : sqrt(1./3);
+    params.twist     = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.atX       = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.atY       = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.atZ       = data.count() > idx ? data[idx++].toDouble() : 0.0;
+    params.eyeX      = data.count() > idx ? data[idx++].toDouble() : sqrt(250000./3);
+    params.eyeY      = data.count() > idx ? data[idx++].toDouble() : -sqrt(250000./3);
+    params.eyeZ      = data.count() > idx ? data[idx++].toDouble() : sqrt(250000./3);
+    params.scaleX    = data.count() > idx ? data[idx++].toDouble() : 1.0;
+    params.scaleY    = data.count() > idx ? data[idx++].toDouble() : 1.0;
+    params.scaleZ    = data.count() > idx ? data[idx++].toDouble() : 1.0;
+    params.isVisible = data.count() > idx ? data[idx++].toInt()    : 1;
+    params.size      = data.count() > idx ? data[idx++].toDouble() : 100.0;
+  }
+  performRestoring( params );
+  setBackground( bgData );
 }
 
 /*!
@@ -1682,6 +2292,7 @@ void OCCViewer_ViewWindow::onSketchingStarted()
 */
 void OCCViewer_ViewWindow::onSketchingFinished()
 {
+  MESSAGE("OCCViewer_ViewWindow::onSketchingFinished()")
   if ( mypSketcher && mypSketcher->result() == OCCViewer_ViewSketcher::Accept )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
@@ -1690,19 +2301,20 @@ void OCCViewer_ViewWindow::onSketchingFinished()
     {
     case Rect:
       {
-	QRect* aRect = (QRect*)mypSketcher->data();
-	if( aRect )
-	{
-	  int aLeft = aRect->left();
-	  int aRight = aRect->right();
-	  int aTop = aRect->top();
-	  int aBottom = aRect->bottom();
+        QRect* aRect = (QRect*)mypSketcher->data();
+        if( aRect )
+        {
+          int aLeft = aRect->left();
+          int aRight = aRect->right();
+          int aTop = aRect->top();
+          int aBottom = aRect->bottom();
+//           myRect = aRect;
 
-	  if( append )
-	    ic->ShiftSelect( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
-	  else
-	    ic->Select( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
-	}
+          if( append )
+            ic->ShiftSelect( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
+          else
+            ic->Select( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
+        }
       }
       break;
     case Polygon:
@@ -1710,21 +2322,21 @@ void OCCViewer_ViewWindow::onSketchingFinished()
         QPolygon* aPolygon = (QPolygon*)mypSketcher->data();
         if( aPolygon )
         {
-	  int size = aPolygon->size();
-	  TColgp_Array1OfPnt2d anArray( 1, size );
+          int size = aPolygon->size();
+          TColgp_Array1OfPnt2d anArray( 1, size );
 
-	  QPolygon::Iterator it = aPolygon->begin();
-	  QPolygon::Iterator itEnd = aPolygon->end();
-	  for( int index = 1; it != itEnd; ++it, index++ )
-	  {
-	    QPoint aPoint = *it;
-	    anArray.SetValue( index, gp_Pnt2d( aPoint.x(), aPoint.y() ) );
-	  }
+          QPolygon::Iterator it = aPolygon->begin();
+          QPolygon::Iterator itEnd = aPolygon->end();
+          for( int index = 1; it != itEnd; ++it, index++ )
+          {
+            QPoint aPoint = *it;
+            anArray.SetValue( index, gp_Pnt2d( aPoint.x(), aPoint.y() ) );
+          }
 
-	  if( append )
-	    ic->ShiftSelect( anArray, getViewPort()->getView(), Standard_False );
-	  else
-	    ic->Select( anArray, getViewPort()->getView(), Standard_False );
+          if( append )
+            ic->ShiftSelect( anArray, getViewPort()->getView(), Standard_False );
+          else
+            ic->Select( anArray, getViewPort()->getView(), Standard_False );
         }
       }
       break;
@@ -1755,4 +2367,270 @@ bool OCCViewer_ViewWindow::transformInProcess() const
 void OCCViewer_ViewWindow::setTransformInProcess( bool bOn )
 {
   myEventStarted = bOn;
+}
+
+/*!
+  Set enabled state of transformation (rotate, zoom, etc)
+*/
+void OCCViewer_ViewWindow::setTransformEnabled( const OperationType id, const bool on )
+{
+  if ( id != NOTHING ) myStatus.insert( id, on );
+}
+
+/*!
+  \return enabled state of transformation (rotate, zoom, etc)
+*/
+bool OCCViewer_ViewWindow::transformEnabled( const OperationType id ) const
+{
+  return myStatus.contains( id ) ? myStatus[ id ] : true;
+}
+
+void OCCViewer_ViewWindow::onMaximizedView()
+{
+  setMaximized(!isMaximized());
+}
+
+
+void OCCViewer_ViewWindow::setMaximized(bool toMaximize, bool toSendSignal)
+{
+  QAction* anAction =  toolMgr()->action( MaximizedId );
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  if ( toMaximize ) {
+    anAction->setText( tr( "MNU_MINIMIZE_VIEW" ) );  
+    anAction->setToolTip( tr( "MNU_MINIMIZE_VIEW" ) );  
+    anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MINIMIZE" ) ) );
+    anAction->setStatusTip( tr( "DSC_MINIMIZE_VIEW" ) );
+    if (toSendSignal) {
+      emit maximized( this, true );
+    }
+  }
+  else {
+    anAction->setText( tr( "MNU_MAXIMIZE_VIEW" ) );  
+    anAction->setToolTip( tr( "MNU_MAXIMIZE_VIEW" ) );  
+    anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MAXIMIZE" ) ) );
+    anAction->setStatusTip( tr( "DSC_MAXIMIZE_VIEW" ) );
+    if (toSendSignal) {
+      emit maximized( this, false );
+    }
+  }
+}
+
+
+bool OCCViewer_ViewWindow::isMaximized() const
+{
+  return !(toolMgr()->action( MaximizedId )->text() == tr( "MNU_MAXIMIZE_VIEW" ));
+}
+
+void OCCViewer_ViewWindow::setSketcherStyle( bool enable )
+{ 
+  IsSketcherStyle = enable; 
+}
+
+bool OCCViewer_ViewWindow::isSketcherStyle() const 
+{ 
+  return IsSketcherStyle; 
+}
+
+
+void OCCViewer_ViewWindow::set2dMode(Mode2dType theType)
+{
+  my2dMode = theType;
+}
+
+// obsolete   
+QColor OCCViewer_ViewWindow::backgroundColor() const
+{
+  return myViewPort ? myViewPort->backgroundColor() : Qt::black;
+}
+   
+// obsolete
+void OCCViewer_ViewWindow::setBackgroundColor( const QColor& theColor )
+{
+  if ( myViewPort ) myViewPort->setBackgroundColor( theColor );
+}
+
+Qtx::BackgroundData OCCViewer_ViewWindow::background() const
+{
+  return myViewPort ? myViewPort->background() : Qtx::BackgroundData();
+}
+   
+void OCCViewer_ViewWindow::setBackground( const Qtx::BackgroundData& theBackground )
+{
+  if ( myViewPort ) myViewPort->setBackground( theBackground );
+}
+
+/*!
+  Clears view aspects
+*/
+void OCCViewer_ViewWindow::clearViewAspects()
+{
+  myViewAspects.clear();
+}
+
+/*!
+  \return const reference to list of view aspects
+*/
+const viewAspectList& OCCViewer_ViewWindow::getViewAspects()
+{
+  return myViewAspects;
+}
+
+/*!
+  Appends new view aspect
+  \param aParams - new view aspects
+*/
+void OCCViewer_ViewWindow::appendViewAspect( const viewAspect& aParams )
+{
+  myViewAspects.append( aParams );
+}
+
+/*!
+  Replaces old view aspects by new ones
+  \param aViewList - list of new view aspects
+*/
+void OCCViewer_ViewWindow::updateViewAspects( const viewAspectList& aViewList )
+{
+  myViewAspects = aViewList;
+}
+
+void OCCViewer_ViewWindow::synchronizeView( OCCViewer_ViewWindow* viewWindow, int id )
+{
+  OCCViewer_ViewWindow* otherViewWindow = 0;
+  QList<OCCViewer_ViewWindow*> compatibleViews;
+
+  bool isSync = viewWindow->toolMgr()->action( SynchronizeId )->isChecked();
+
+  int vwid = viewWindow->getId();
+  
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( !app ) return;
+
+  QList<SUIT_ViewManager*> wmlist;
+  app->viewManagers( viewWindow->getViewManager()->getType(), wmlist );
+
+  foreach( SUIT_ViewManager* wm, wmlist ) {
+    QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
+
+    foreach( SUIT_ViewWindow* vw, vwlist ) {
+      OCCViewer_ViewWindow* occVW = dynamic_cast<OCCViewer_ViewWindow*>( vw );
+      if ( !occVW ) continue;
+
+      // check only compatible types
+      occVW = occVW->getView( viewWindow->get2dMode() );
+      if ( occVW ) {
+	if ( occVW->getId() == id ) 
+	  otherViewWindow = occVW;
+	else if ( occVW != viewWindow )
+	  compatibleViews.append( occVW );
+      }
+    }
+  }
+
+  if ( isSync && id ) {
+    // remove all possible disconnections
+    foreach( OCCViewer_ViewWindow* vw, compatibleViews ) {
+      // disconnect target view
+      vw->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), vw->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      if ( otherViewWindow ) {
+	// disconnect source view
+	vw->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+	otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), vw->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      }
+      QAction* a = vw->toolMgr()->action( SynchronizeId );
+      if ( a ) {
+	int anid = a->data().toInt();
+	if ( a->isChecked() && ( anid == id || anid == vwid ) ) {
+	  bool blocked = a->blockSignals( true );
+	  a->setChecked( false );
+	  a->blockSignals( blocked );
+	}
+      }
+    }
+    if ( otherViewWindow ) {
+      // reconnect source and target view
+      otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      otherViewWindow->getViewPort()->connect( viewWindow->getViewPort(), SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      viewWindow->getViewPort()->connect( otherViewWindow->getViewPort(), SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+      // synchronize target view with source view
+      viewWindow->getViewPort()->synchronize( otherViewWindow->getViewPort() );
+      viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
+      QAction* anOtherAcion = otherViewWindow->toolMgr()->action( SynchronizeId );
+      if (anOtherAcion) {
+        anOtherAcion->setData( viewWindow->getId() );
+        if ( !anOtherAcion->isChecked() ) {
+	        bool blocked = anOtherAcion->blockSignals( true );
+	        anOtherAcion->setChecked( true );
+	        anOtherAcion->blockSignals( blocked );
+        }
+      }
+    }
+  }
+  else if ( otherViewWindow ) {
+    // reconnect source and target view
+    otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+    viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
+    viewWindow->getViewPort()->synchronize( otherViewWindow->getViewPort() );
+    viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
+    QAction* anOtherAcion = otherViewWindow->toolMgr()->action( SynchronizeId );
+    if (anOtherAcion) {
+      if ( anOtherAcion->data().toInt() == viewWindow->getId() && anOtherAcion->isChecked() ) {
+        bool blocked = anOtherAcion->blockSignals( true );
+        anOtherAcion->setChecked( false );
+        anOtherAcion->blockSignals( blocked );
+      }
+    }
+  }
+}
+
+/*!
+  "Synchronize View" action slot.
+*/
+void OCCViewer_ViewWindow::onSynchronizeView(bool checked)
+{
+  QAction* a = qobject_cast<QAction*>( sender() );
+  if ( a ) {
+    synchronizeView( this, a->data().toInt() );
+  }
+}
+
+/*!
+  Update list of available view for the "Synchronize View" action
+*/
+void OCCViewer_ViewWindow::updateSyncViews()
+{
+  QAction* anAction = toolMgr()->action( SynchronizeId );
+  if ( anAction && anAction->menu() ) {
+    int currentId = anAction->data().toInt();
+    anAction->menu()->clear();
+    SUIT_Application* app = SUIT_Session::session()->activeApplication();
+    if ( app ) { 
+      QList<SUIT_ViewManager*> wmlist;
+      app->viewManagers( getViewManager()->getType(), wmlist );
+      foreach( SUIT_ViewManager* wm, wmlist ) {
+	QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
+	foreach ( SUIT_ViewWindow* vw, vwlist ) {
+	  OCCViewer_ViewWindow* occVW = dynamic_cast<OCCViewer_ViewWindow*>( vw );
+	  if ( !occVW || occVW == this ) continue;
+	  // list only compatible types
+	  OCCViewer_ViewWindow* subWindow = occVW->getView( get2dMode() );
+	  if ( subWindow && subWindow != this ) {
+	    QAction* a = anAction->menu()->addAction( occVW->windowTitle() );
+	    if ( subWindow->getId() == currentId ) {
+	      QFont f = a->font();
+	      f.setBold( true );
+	      a->setFont( f );
+	    }
+	    a->setData( subWindow->getId() );
+	    connect( a, SIGNAL( triggered(bool) ), this, SLOT( onSynchronizeView(bool) ) );
+	  }
+	}
+      }
+    }
+    if ( anAction->menu()->actions().isEmpty() ) {
+      anAction->setData( 0 );
+      anAction->menu()->addAction( tr( "MNU_SYNC_NO_VIEW" ) );
+    }
+  }
 }

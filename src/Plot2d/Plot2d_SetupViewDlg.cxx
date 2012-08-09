@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : Plot2d_SetupViewDlg.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -27,6 +28,7 @@
 #include <SUIT_Session.h>
 #include <SUIT_Application.h>
 #include <QtxColorButton.h>
+#include <QtxFontEdit.h>
 
 #include <QCheckBox>
 #include <QLineEdit>
@@ -57,8 +59,8 @@ const int MIN_SPIN_WIDTH  = 70;
   \param secondAxisY if \c true, show widgets for the second (right) vertical axis
 */
 Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent, 
-					  bool showDefCheck, 
-					  bool secondAxisY )
+                                          bool showDefCheck, 
+                                          bool secondAxisY )
 : QDialog( parent ), 
   mySecondAxisY( secondAxisY )
 {
@@ -88,6 +90,9 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   // legend
   myLegendCheck = new QCheckBox( tr( "PLOT2D_ENABLE_LEGEND" ), this );
   myLegendCombo = new QComboBox( this );
+  myLegendFont = new QtxFontEdit( this );
+  myLegendColor = new QtxColorButton( this );
+  QLabel* aLegendFontLab = new QLabel( tr( "PLOT2D_LEGEND_FONT" ), this );
   myLegendCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myLegendCombo->setMinimumWidth( MIN_COMBO_WIDTH );
   myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_LEFT" ) );
@@ -107,6 +112,56 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   // background color
   QLabel* aBGLab  = new QLabel( tr( "PLOT2D_BACKGROUND_COLOR_LBL" ), this );
   myBackgroundBtn = new QtxColorButton( this );
+
+  //Deviation marker parameters
+  QGroupBox* aDeviationGrp = new QGroupBox( tr( "PLOT2D_DEVIATION_MARKER_TLT" ), this );
+  QHBoxLayout* aDeviationLayout = new QHBoxLayout(aDeviationGrp);
+
+  //Deviation marker parameters : Line width
+  QLabel* aDeviationLwLbl  = new QLabel( tr( "PLOT2D_DEVIATION_LW_LBL" ), aDeviationGrp );
+  myDeviationLw  = new QSpinBox( aDeviationGrp );
+  myDeviationLw->setMinimum( 1 );
+  myDeviationLw->setMaximum( 5 );
+  myDeviationLw->setSingleStep( 1 );
+  myDeviationLw->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+
+  //Deviation marker parameters : Line width
+  QLabel* aDeviationTsLbl  = new QLabel( tr( "PLOT2D_DEVIATION_TS_LBL" ), aDeviationGrp );
+  myDeviationTs  =  new QSpinBox( aDeviationGrp );
+  myDeviationTs->setMinimum( 1 );
+  myDeviationTs->setMaximum( 5 );
+  myDeviationTs->setSingleStep( 1 );
+  myDeviationTs->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+
+  //Deviation marker parameters : Color
+  QLabel* aDeviationClLbl  = new QLabel( tr( "PLOT2D_DEVIATION_CL_LBL" ), aDeviationGrp );
+  myDeviationCl = new QtxColorButton( aDeviationGrp );
+
+  aDeviationLayout->addWidget( aDeviationLwLbl );
+  aDeviationLayout->addWidget( myDeviationLw );
+  aDeviationLayout->addWidget( aDeviationTsLbl );
+  aDeviationLayout->addWidget( myDeviationTs );
+  aDeviationLayout->addWidget( aDeviationClLbl );
+  aDeviationLayout->addWidget( myDeviationCl );
+
+  // normalize mode
+  QGroupBox* aNormalizeGrp = new QGroupBox( tr( "PLOT2D_NORMALIZE_TLT" ), this );
+  QGridLayout* aNormalizeLayout = new QGridLayout( aNormalizeGrp );
+  aNormalizeLayout->setMargin( MARGIN_SIZE ); aNormalizeLayout->setSpacing( SPACING_SIZE );
+  aNormalizeGrp->setLayout( aNormalizeLayout );
+  QLabel* aYLeftLab  = new QLabel( tr( "PLOT2D_NORMALIZE_LEFT_AXIS" ), aNormalizeGrp );
+  myNormLMinCheck = new QCheckBox( tr( "PLOT2D_NORMALIZE_MODE_MIN" ), aNormalizeGrp );
+  myNormLMaxCheck = new QCheckBox( tr( "PLOT2D_NORMALIZE_MODE_MAX" ), aNormalizeGrp );
+  QLabel* aYRightLab  = new QLabel( tr( "PLOT2D_NORMALIZE_RIGHT_AXIS" ), aNormalizeGrp );
+  myNormRMinCheck = new QCheckBox( tr( "PLOT2D_NORMALIZE_MODE_MIN" ), aNormalizeGrp );
+  myNormRMaxCheck = new QCheckBox( tr( "PLOT2D_NORMALIZE_MODE_MAX" ), aNormalizeGrp );
+
+  aNormalizeLayout->addWidget( aYLeftLab,    0, 0 );
+  aNormalizeLayout->addWidget( myNormLMaxCheck,    0, 1 );
+  aNormalizeLayout->addWidget( myNormLMinCheck, 0, 2 );
+  aNormalizeLayout->addWidget( aYRightLab,    1, 0 );
+  aNormalizeLayout->addWidget( myNormRMaxCheck,    1, 1 );
+  aNormalizeLayout->addWidget( myNormRMinCheck, 1, 2 );
 
   // scale mode
   QGroupBox* aScaleGrp = new QGroupBox( tr( "PLOT2D_SCALE_TLT" ), this );
@@ -227,7 +282,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   myYMinGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
 
   aGridLayoutY->addWidget( myYGridCheck,    0, 0 );
-  aGridLayoutY->addWidget( aYMajLbl,        0, 1 );
+  aGridLayoutY->addWidget( aYMajLbl,       0, 1 );
   aGridLayoutY->addWidget( myYGridSpin,     0, 2 );
   aGridLayoutY->addWidget( myYMinGridCheck, 1, 0 );
   aGridLayoutY->addWidget( aYMinLbl,        1, 1 );
@@ -320,22 +375,28 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   // layout widgets
   topLayout->addWidget( myTitleCheck,  0,    0    );
   topLayout->addWidget( myTitleEdit,   0, 1, 1, 3 );
-  topLayout->addWidget( aCurveLab,     1,    0    );
-  topLayout->addWidget( myCurveCombo,  1,    1    );
-  topLayout->addWidget( myLegendCheck, 1,    2    );
-  topLayout->addWidget( myLegendCombo, 1,    3    );
-  topLayout->addWidget( aMarkerLab,    2,    0    );
-  topLayout->addWidget( myMarkerSpin,  2,    1    );
+  topLayout->addWidget( myLegendCheck, 1,    0    );
+  topLayout->addWidget( myLegendCombo, 1,    1    );
+  topLayout->addWidget( aCurveLab,  1,    2    );
+  topLayout->addWidget( myCurveCombo,  1,     3    );
+  topLayout->addWidget( aLegendFontLab,2,    0    );
+  topLayout->addWidget( myLegendFont,     2,    1    );
+  topLayout->addWidget( myLegendColor,  2,    2    );
+
+  topLayout->addWidget( aMarkerLab,    3,    0    );
+  topLayout->addWidget( myMarkerSpin,  3,    1    );
   QHBoxLayout* bgLayout = new QHBoxLayout;
   bgLayout->addWidget( myBackgroundBtn ); bgLayout->addStretch();
-  topLayout->addWidget( aBGLab,        2,    2    );
-  topLayout->addLayout( bgLayout,      2,    3    );
-  topLayout->addWidget( aScaleGrp,     3, 0, 1, 4 );
-  topLayout->addWidget( aTabWidget,    4, 0, 1, 4 );
-  topLayout->addWidget( myDefCheck,    5, 0, 1, 4 );
-  topLayout->setRowStretch( 5, 5 );
+  topLayout->addWidget( aBGLab,        3,    2    );
+  topLayout->addLayout( bgLayout,      3,    3    );
+  topLayout->addWidget( aDeviationGrp,   4, 0, 1, 4 );
+  topLayout->addWidget( aNormalizeGrp,      5, 0, 1, 4 );
+  topLayout->addWidget( aScaleGrp,     6, 0, 1, 4 );
+  topLayout->addWidget( aTabWidget,    7, 0, 1, 4 );
+  topLayout->addWidget( myDefCheck,    8, 0, 1, 4 );
+  topLayout->setRowStretch( 9, 5 );
 
-  topLayout->addLayout( btnLayout,     6, 0, 1, 4 );
+  topLayout->addLayout( btnLayout,     10, 0, 1, 4 );
   
   if ( !showDefCheck )
     myDefCheck->hide();
@@ -348,6 +409,11 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   connect( myYGridCheck,    SIGNAL( clicked() ), this, SLOT( onYGridMajorChecked() ) );
   connect( myXMinGridCheck, SIGNAL( clicked() ), this, SLOT( onXGridMinorChecked() ) );
   connect( myYMinGridCheck, SIGNAL( clicked() ), this, SLOT( onYGridMinorChecked() ) );
+  connect( myNormLMaxCheck, SIGNAL( clicked() ), this, SLOT( onNormLMaxChecked() ) );
+  connect( myNormLMinCheck, SIGNAL( clicked() ), this, SLOT( onNormLMinChecked() ) );
+  connect( myNormRMaxCheck, SIGNAL( clicked() ), this, SLOT( onNormRMaxChecked() ) );
+  connect( myNormRMinCheck, SIGNAL( clicked() ), this, SLOT( onNormRMinChecked() ) );
+
 
   connect( myOkBtn,         SIGNAL( clicked() ), this, SLOT( accept() ) );
   connect( myCancelBtn,     SIGNAL( clicked() ), this, SLOT( reject() ) );
@@ -368,6 +434,10 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   onXGridMajorChecked();
   onYGridMajorChecked();
   onXGridMinorChecked();
+  onNormLMaxChecked();
+  onNormLMinChecked();
+  onNormRMaxChecked();
+  onNormRMinChecked();
   if ( mySecondAxisY ) {
     onY2TitleChecked();
     onY2GridMajorChecked();
@@ -539,15 +609,99 @@ int Plot2d_SetupViewDlg::getCurveType()
 }
 
 /*!
+  \brief Set normalization to maximum by left Y axis.
+  \param type normalizatoin type: true,false
+  \sa getMaxNormMode()
+*/
+void Plot2d_SetupViewDlg::setLMaxNormMode( const bool type )
+{
+  myNormLMaxCheck->setChecked( type );
+}
+
+/*!
+  \brief Check if normalization to maximum by left Y axis sets.
+  \return curve normalizatoin type: true,false
+  \sa setMaxNormMode()
+*/
+bool Plot2d_SetupViewDlg::getLMaxNormMode()
+{
+  return myNormLMaxCheck->isChecked();
+}
+
+/*!
+  \brief Set normalization to minimum by left Y axis.
+  \param type normalizatoin type: true,false
+  \sa getMinNormMode()
+*/
+void Plot2d_SetupViewDlg::setLMinNormMode( const bool type )
+{
+  myNormLMinCheck->setChecked( type );
+}
+
+/*!
+  \brief Check if normalization to minimum by left Y axis sets.
+  \return curve normalizatoin type: true,false
+  \sa setMinNormMode()
+*/
+bool Plot2d_SetupViewDlg::getLMinNormMode()
+{
+  return myNormLMinCheck->isChecked();
+}
+
+/*!
+  \brief Set normalization to maximum by right Y axis.
+  \param type normalizatoin type: true,false
+  \sa getMaxNormMode()
+*/
+void Plot2d_SetupViewDlg::setRMaxNormMode( const bool type )
+{
+  myNormRMaxCheck->setChecked( type );
+}
+
+/*!
+  \brief Check if normalization to maximum by right Y axis sets.
+  \return curve normalizatoin type: true,false
+  \sa setMaxNormMode()
+*/
+bool Plot2d_SetupViewDlg::getRMaxNormMode()
+{
+  return myNormRMaxCheck->isChecked();
+}
+
+/*!
+  \brief Set normalization to minimum by right Y axis.
+  \param type normalizatoin type: true,false
+  \sa getMinNormMode()
+*/
+void Plot2d_SetupViewDlg::setRMinNormMode( const bool type )
+{
+  myNormRMinCheck->setChecked( type );
+}
+
+/*!
+  \brief Check if normalization to minimum by right Y axis sets.
+  \return curve normalizatoin type: true,false
+  \sa setMinNormMode()
+*/
+bool Plot2d_SetupViewDlg::getRMinNormMode()
+{
+  return myNormRMinCheck->isChecked();
+}
+
+/*!
   \brief Set legend attribute.
   \param if \c true legend is shown
   \param pos legend position: 0 (left), 1 (right), 2 (top), 3 (bottom)
-  \sa isLegendEnabled(), getLegendPos()
+  \param fnt legend font
+  \param col legend font color
+  \sa isLegendEnabled(), getLegendPos(), getLegendFont()
 */
-void Plot2d_SetupViewDlg::setLegend( bool enable, int pos )
+void Plot2d_SetupViewDlg::setLegend( bool enable, int pos, const QFont& fnt, const QColor& col )
 {
   myLegendCheck->setChecked( enable );
   myLegendCombo->setCurrentIndex( pos );
+  myLegendFont->setCurrentFont( fnt );
+  myLegendColor->setColor( col );
   onLegendChecked();
 }
 
@@ -572,6 +726,26 @@ int Plot2d_SetupViewDlg::getLegendPos()
 }
 
 /*!
+  \brief Get legend font.
+  \return legend font
+  \sa setLegend()
+*/
+QFont Plot2d_SetupViewDlg::getLegendFont()
+{
+  return myLegendFont->currentFont();
+}
+
+/*!
+  \brief Get legend font color.
+  \return legend font color
+  \sa setLegend()
+*/
+QColor Plot2d_SetupViewDlg::getLegendColor()
+{
+  return myLegendColor->color();
+}
+
+/*!
   \brief Set marker size.
   \param size marker size
   \sa getMarkerSize()
@@ -589,6 +763,59 @@ void Plot2d_SetupViewDlg::setMarkerSize( const int size )
 int Plot2d_SetupViewDlg::getMarkerSize()
 {
   return myMarkerSpin->value();
+}
+/*!
+  \brief Set deviation marker line width.
+  \param width marker line width
+  \sa getDeviationMarkerLw()
+*/
+void Plot2d_SetupViewDlg::setDeviationMarkerLw( const int width ){
+  myDeviationLw->setValue(width);
+}
+
+/*!
+  \brief Get deviation marker line width.
+  \return marker line width
+  \sa setMarkerSize()
+*/
+int Plot2d_SetupViewDlg::getDeviationMarkerLw() const {
+  return myDeviationLw->value();
+}
+
+/*!
+  \brief Set deviation marker tick size.
+  \param size marker tick size
+  \sa getDeviationMarkerTs()
+*/
+void Plot2d_SetupViewDlg::setDeviationMarkerTs( const int size) {
+  myDeviationTs->setValue(size);
+}
+
+/*!
+  \brief Get deviation marker tick size.
+  \return marker tick size
+  \sa setDeviationMarkerTs()
+*/
+int Plot2d_SetupViewDlg::getDeviationMarkerTs() const {
+  return myDeviationTs->value();
+}
+
+/*!
+  \brief Set color of the deviation marker.
+  \param color marker color
+  \sa getDeviationMarkerCl()
+*/
+void Plot2d_SetupViewDlg::setDeviationMarkerCl( const QColor& col) {
+  myDeviationCl->setColor( col );
+}
+
+/*!
+  \brief Get color of the deviation marker.
+  \return marker color
+  \sa setDeviationMarkerCl()
+*/
+QColor Plot2d_SetupViewDlg::getDeviationMarkerCl() const {
+ return myDeviationCl->color();
 }
 
 /*!
@@ -835,6 +1062,34 @@ void Plot2d_SetupViewDlg::onYGridMinorChecked()
   \brief Called when user clicks "Enable right vertical minor grid" check box.
 */
 void Plot2d_SetupViewDlg::onY2GridMinorChecked()
+{
+}
+
+/*!
+  \brief Called when user clicks "Left Y Axis: Normalize to maximum" check box.
+*/
+void Plot2d_SetupViewDlg::onNormLMaxChecked()
+{
+}
+
+/*!
+  \brief Called when user clicks "Left Y Axis: Normalize to minimum" check box.
+*/
+void Plot2d_SetupViewDlg::onNormLMinChecked()
+{
+}
+
+/*!
+  \brief Called when user clicks "Right Y Axis: Normalize to maximum" check box.
+*/
+void Plot2d_SetupViewDlg::onNormRMaxChecked()
+{
+}
+
+/*!
+  \brief Called when user clicks "Right Y Axis: Normalize to minimum" check box.
+*/
+void Plot2d_SetupViewDlg::onNormRMinChecked()
 {
 }
 

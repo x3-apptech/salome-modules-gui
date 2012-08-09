@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxDialog.cxx
 // Author:    Sergey TELKOV
 //
@@ -260,7 +261,7 @@ void QtxDialog::Area::layoutButtons()
     {
       buttonId[mit.value()] = mit.key();
       if ( mit.key() >= 0 )
-	src.append( mit.value() );
+        src.append( mit.value() );
     }
   }
 
@@ -321,7 +322,7 @@ void QtxDialog::Area::layoutButtons()
     {
       buttonLayout->addWidget( other[i] );
       if ( aPolicy == QtxDialog::Uniform && i < (int)other.count() - 1  )
-	buttonLayout->addStretch( 1 );
+        buttonLayout->addStretch( 1 );
     }
   }
 
@@ -440,16 +441,16 @@ QSize QtxDialog::Border::minimumSizeHint() const
   \param wf dialog box flags (Qt::WindowFlags)
 */
 QtxDialog::QtxDialog( QWidget* parent, bool modal, bool allowResize, const int f, Qt::WindowFlags wf )
-: QDialog( parent, (Qt::WindowFlags)( wf | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::Dialog |
+: QDialog( parent, (Qt::WindowFlags)( wf | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::Dialog |
 #ifdef WIN32
            ( allowResize ? 0 : Qt::FramelessWindowHint ) |
 #endif
            ( ( allowResize 
 #ifdef WIN32 
-	       // in qwidget_win.cpp flag WStyle_ContextHelp will be unset in WStyle_MinMax in switched ON
-	       && !( wf & Qt::WindowContextHelpButtonHint )
+               // in qwidget_win.cpp flag WStyle_ContextHelp will be unset in WStyle_MinMax in switched ON
+               && !( wf & Qt::WindowContextHelpButtonHint )
 #endif
-	       ) ? Qt::WindowMaximizeButtonHint : 0 ) ) ),
+               ) ? Qt::WindowMaximizeButtonHint : 0 ) ) ),
   myInited( false ),
   mySender( 0 ),
   myAlignment( 0 ),
@@ -1051,7 +1052,7 @@ void QtxDialog::removeButton( const int id )
     for ( ButtonMap::Iterator it = myButton.begin(); it != myButton.end(); ++it )
     {
       if ( it.key() < 0 )
-	map.insert( it.key(), it.value() );
+        map.insert( it.key(), it.value() );
     }
   }
   else if ( myButton.contains( id ) )
@@ -1212,7 +1213,7 @@ QtxDialog::ButtonMap QtxDialog::buttons( const int f ) const
   {
     for ( ButtonMap::ConstIterator it = myButton.begin(); it != myButton.end(); ++it )
       if ( f == -1 || ( it.key() >= 0 && f & it.key() ) )
-	retmap.insert( it.key(), it.value() );
+        retmap.insert( it.key(), it.value() );
   }
   return retmap;
 }
@@ -1327,8 +1328,11 @@ void QtxDialog::keyPressEvent( QKeyEvent* e )
   if ( e->key() == Qt::Key_Tab && e->modifiers() & Qt::ControlModifier )
   {
     QObject* tab = qFindChild<QTabWidget*>( this );
-    if ( tab )
+    if ( tab && !property( "in_tab_event" ).toBool() ) {
+      setProperty( "in_tab_event", true );
       QApplication::sendEvent( tab, e );
+      setProperty( "in_tab_event", false );
+    }
   }
 }
 
@@ -1541,7 +1545,7 @@ void QtxDialog::adjustButtons()
     const QList<QAbstractButton*>& lst = aIt.value()->buttons();
     for ( QList<QAbstractButton*>::const_iterator bIt = lst.begin(); bIt != lst.end(); ++bIt )
       if ( (*bIt)->isVisibleTo( this ) )
-	minWidth = qMax( minWidth, (*bIt)->sizeHint().width() );
+        minWidth = qMax( minWidth, (*bIt)->sizeHint().width() );
   }
 
   for ( AreaMap::Iterator aItr = myArea.begin(); aItr != myArea.end(); ++aItr )
@@ -1549,7 +1553,7 @@ void QtxDialog::adjustButtons()
     const QList<QAbstractButton*>& lst = aItr.value()->buttons();
     for ( QList<QAbstractButton*>::const_iterator bItr = lst.begin(); bItr != lst.end(); ++bItr )
       if ( (*bItr)->isVisibleTo( this ) )
-	(*bItr)->setMinimumWidth( minWidth );
+        (*bItr)->setMinimumWidth( minWidth );
   }
 }
 

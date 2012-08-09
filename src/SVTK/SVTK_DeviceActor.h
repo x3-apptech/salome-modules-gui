@@ -1,35 +1,36 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SVTK OBJECT : interactive object for SVTK visualization
 //  File   : SVTK_DeviceActor.h
 //  Author : 
-//  Module : 
-//  $Header$
-//
+
 #ifndef SVTK_DEVICE_ACTOR_H
 #define SVTK_DEVICE_ACTOR_H
 
 #include "SVTK.h"
 #include "VTKViewer.h"
+#include "VTKViewer_Actor.h"
+#include "VTKViewer_MarkerDef.h"
 
 #include <vector>
 
@@ -44,20 +45,8 @@ class vtkCell;
 class vtkDataSet;
 class vtkShrinkFilter;
 class vtkFeatureEdges;
-class vtkDataSetMapper;
+class VTKViewer_DataSetMapper;
 class vtkPassThroughFilter;
-
-namespace SVTK
-{
-  namespace Representation
-  {
-    typedef int Type;
-    const Type Points = VTK_POINTS;
-    const Type Wireframe = VTK_WIREFRAME;
-    const Type Surface = VTK_SURFACE;
-    const Type Insideframe = Surface + 1;
-  }
-}
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )
@@ -177,15 +166,15 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   virtual
   void
   GetFeatureEdgesFlags(bool& theIsFeatureEdges,
-		       bool& theIsBoundaryEdges,
-		       bool& theIsManifoldEdges,
-		       bool& theIsNonManifoldEdges);
+                       bool& theIsBoundaryEdges,
+                       bool& theIsManifoldEdges,
+                       bool& theIsNonManifoldEdges);
   virtual
   void
   SetFeatureEdgesFlags(bool theIsFeatureEdges,
-		       bool theIsBoundaryEdges,
-		       bool theIsManifoldEdges,
-		       bool theIsNonManifoldEdges);
+                       bool theIsBoundaryEdges,
+                       bool theIsManifoldEdges,
+                       bool theIsNonManifoldEdges);
 
   virtual
   bool
@@ -199,9 +188,9 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   /** @name For representation mamnagement purpose */
   virtual
   void 
-  SetRepresentation(SVTK::Representation::Type theMode);
+    SetRepresentation(VTKViewer::Representation::Type theMode);
 
-  SVTK::Representation::Type 
+  VTKViewer::Representation::Type 
   GetRepresentation();
 
   virtual
@@ -219,14 +208,51 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   SetShaded(bool theShaded);
   //@}
 
+  /** @name For marker management purpose */
+  void
+  SetMarkerEnabled( bool );
+
+  void
+  SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
+
+  void
+  SetMarkerTexture( int, VTK::MarkerTexture );
+
+  VTK::MarkerType
+  GetMarkerType();
+
+  VTK::MarkerScale
+  GetMarkerScale();
+
+  int
+  GetMarkerTexture();
+  //@}
+
   virtual
   void
   Render(vtkRenderer *, vtkMapper *);
 
-  vtkDataSetMapper* GetDataSetMapper();
+  VTKViewer_DataSetMapper* GetDataSetMapper();
+
+  //----------------------------------------------------------------------------
+  //! Setting for displaying quadratic elements
+  virtual void SetQuadraticArcMode(bool theFlag);
+  virtual bool GetQuadraticArcMode();
+
+  virtual void SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
+  virtual vtkFloatingPointType GetQuadraticArcAngle();
+
+  virtual
+  void
+  SetCoincident3DAllowed(bool theIsFeatureEdgesAllowed);
+
+  virtual
+  bool 
+  IsCoincident3DAllowed() const;
+
 
  protected:
-  SVTK::Representation::Type myRepresentation;
+  VTKViewer::Representation::Type myRepresentation;
   vtkProperty *myProperty;
   bool myIsShaded;
 
@@ -239,7 +265,7 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   std::vector<vtkPassThroughFilter*> myPassFilter;
   vtkShrinkFilter* myShrinkFilter;
   vtkFeatureEdges* myFeatureEdges;
-  vtkDataSetMapper* myMapper;
+  VTKViewer_DataSetMapper* myMapper;
 
   bool myIsShrinkable;
   bool myIsShrunk;
@@ -252,9 +278,9 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   vtkFloatingPointType myPolygonOffsetUnits;
 
   void SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-				  vtkFloatingPointType units);
+                                  vtkFloatingPointType units);
   void GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-				  vtkFloatingPointType& units);
+                                  vtkFloatingPointType& units);
 
   SVTK_DeviceActor();
   ~SVTK_DeviceActor();

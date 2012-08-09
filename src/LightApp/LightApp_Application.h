@@ -1,28 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      LightApp_Application.h
 // Created:   6/20/2005 18:39:25 PM
 // Author:    OCC team
-//
+
 #ifndef LIGHTAPP_APPLICATION_H
 #define LIGHTAPP_APPLICATION_H
 
@@ -31,9 +32,11 @@
 #endif // _MSC_VER > 1000
 
 #include "LightApp.h"
+#include <SUIT_TreeModel.h>
 #include <CAM_Application.h>
 
 #include <QPointer>
+#include <QStringList>
 
 class LogWindow;
 #ifndef DISABLE_PYCONSOLE
@@ -42,6 +45,7 @@ class PyConsole_Console;
 class LightApp_WidgetContainer;
 class LightApp_Preferences;
 class LightApp_SelectionMgr;
+class LightApp_FullScreenHelper;
 class LightApp_DataObject;
 class SUIT_DataBrowser;
 class SUIT_Study;
@@ -52,6 +56,7 @@ class QString;
 class QWidget;
 class QStringList;
 class QDockWidget;
+class QTimer;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -61,7 +66,7 @@ class QDockWidget;
   Description : Application containing only LightApp module
 */
 
-class LIGHTAPP_EXPORT LightApp_Application : public CAM_Application
+class LIGHTAPP_EXPORT LightApp_Application : public CAM_Application, public SUIT_DataSearcher
 {
   Q_OBJECT
 
@@ -77,14 +82,16 @@ public:
   enum { MenuWindowId = 6 };
 
   enum { RenameId = CAM_Application::UserID,
-	 CloseId, CloseAllId, GroupAllId,
-	 PreferencesId, MRUId, ModulesListId,
+         CloseId, CloseAllId, GroupAllId,
+         PreferencesId, MRUId, ModulesListId,
          NewGLViewId, NewPlot2dId, NewOCCViewId, NewVTKViewId, NewQxGraphViewId,
-	 NewQxSceneViewId, StyleId,
-	 UserID };
+         NewQxSceneViewId = NewQxGraphViewId, StyleId, FullScreenId,
+         UserID };
 
 protected:
   enum { NewStudyId = 1, OpenStudyId };
+
+  enum BrowsePolicy { BP_Never = 0, BP_ApplyAndClose, BP_Always };
 
 public:
   LightApp_Application();
@@ -111,10 +118,10 @@ public:
   virtual QString                     getFileFilter() const;
 
   virtual QString                     getFileName( bool open, const QString& initial, const QString& filters,
-						   const QString& caption, QWidget* parent );
+                                                   const QString& caption, QWidget* parent );
   virtual QString                     getDirectory( const QString& initial, const QString& caption, QWidget* parent );
   virtual QStringList                 getOpenFileNames( const QString& initial, const QString& filters,
-							const QString& caption, QWidget* parent );
+                                                        const QString& caption, QWidget* parent );
 
   void                                updateActions();
 
@@ -122,6 +129,7 @@ public:
   virtual void                        addViewManager( SUIT_ViewManager* );
   virtual void                        removeViewManager( SUIT_ViewManager* );
   virtual SUIT_ViewManager*           createViewManager( const QString& vmType );
+  virtual SUIT_ViewManager*           createViewManager( const QString& vmType, QWidget* w );
 
   QWidget*                            getWindow( const int, const int = -1 );
   QWidget*                            dockWindow( const int ) const;
@@ -135,6 +143,8 @@ public:
 
   virtual void                        createEmptyStudy();
 
+  virtual void                        setDesktop( SUIT_Desktop* );
+
   SUIT_Accel*                         accel() const;
 
   void                                setDefaultStudyName( const QString& theName );
@@ -146,6 +156,21 @@ public:
   virtual bool                        checkDataObject( LightApp_DataObject* theObj );
 
   virtual void                        updateDesktopTitle();
+
+  //! Returns list of view manager types which are supported by this application
+  QStringList                          viewManagersTypes() const;
+
+  //! Removes ViewManagers only of known type
+  virtual void                        clearKnownViewManagers();
+
+  virtual QString                     browseObjects( const QStringList& theEntryList,
+                                                     const bool theIsApplyAndClose = true,
+                                                     const bool theIsOptimizedBrowsing = false );
+
+  virtual SUIT_DataObject*            findObject( const QString& ) const;
+
+  virtual bool                        renameAllowed( const QString& ) const;
+  virtual bool                        renameObject( const QString&, const QString& );
 
 signals:
   void                                studyOpened();
@@ -160,6 +185,9 @@ public slots:
   virtual void                        onOpenDoc();
   virtual void                        onHelpAbout();
   virtual bool                        onOpenDoc( const QString& );
+  virtual void                        onCopy();
+  virtual void                        onPaste();
+  virtual void                        onSelectionChanged();
 
 protected:
   virtual void                        createActions();
@@ -174,7 +202,6 @@ protected:
 
   virtual void                        setActiveStudy( SUIT_Study* );
   virtual void                        updateCommandsStatus();
-  virtual void                        onSelectionChanged();
 
   virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
@@ -208,10 +235,14 @@ protected slots:
   void                                onMRUActivated( const QString& );
 
   void                                onStylePreferences();
+  void                                onFullScreen();
+
+  virtual void                        onDesktopMessage( const QString& );
 
 private slots:
   void                                onSelection();
   void                                onRefresh();
+  void                                onDropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction );
   void                                onPreferences();
   void                                onPreferenceChanged( QString&, QString&, QString& );
   void                                onRenameWindow();
@@ -223,12 +254,14 @@ protected:
   void                                updateWindows();
   void                                updateViewManagers();
   void                                updateModuleActions();
+  void                                removeModuleAction( const QString& );
 
   void                                loadDockWindowsState();
   void                                saveDockWindowsState();
 
   virtual void                        studyOpened( SUIT_Study* );
   virtual void                        studyCreated( SUIT_Study* );
+  virtual void                        studySaved( SUIT_Study* );
 
   void                                updatePreference( const QString&, const QString&, const QString& );
 
@@ -263,15 +296,19 @@ protected:
   LightApp_Preferences*               myPrefs;
   LightApp_SelectionMgr*              mySelMgr;
 
+  LightApp_FullScreenHelper*          myScreenHelper;
+
   WinMap                              myWin;
   WinVis                              myWinVis;
   WinGeom                             myWinGeom;
 
   SUIT_Accel*                         myAccel;
+  QTimer*                             myAutoSaveTimer;
 
   static LightApp_Preferences*        _prefs_;
 
   static int                          lastStudyId;
+  QStringList                         myUserWmTypes;
 };
 
 #ifdef WIN32

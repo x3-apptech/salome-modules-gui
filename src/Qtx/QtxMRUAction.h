@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxMRUAction.h
 // Author:    Sergey TELKOV
 //
@@ -42,14 +43,14 @@ class QTX_EXPORT QtxMRUAction : public QtxAction
 public:
   //! Items insertion policy
   typedef enum { MoveFirst,   //!< put the specified item to the beginning
-		 MoveLast,    //!< put the specified item to the end
-		 AddFirst,    //!< if specified item doesn't exist, add it to the beginning
-		 AddLast      //!< if specified item doesn't exist, add it to the end
+                 MoveLast,    //!< put the specified item to the end
+                 AddFirst,    //!< if specified item doesn't exist, add it to the beginning
+                 AddLast      //!< if specified item doesn't exist, add it to the end
   } InsertionMode;
 
   typedef enum { LinkAuto,    //!< put the full path of link into the menu if link file names of severals link are same
-		 LinkShort,   //!< put the only file name of link into the menu
-		 LinkFull     //!< put the full path of link into the menu
+                 LinkShort,   //!< put the only file name of link into the menu
+                 LinkFull     //!< put the full path of link into the menu
   } LinkType;
 
 public:

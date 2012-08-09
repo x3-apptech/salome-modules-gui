@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxAction.cxx
 // Author:    Sergey TELKOV
 //
@@ -66,14 +67,19 @@ private:
 
   Creates an action owned by \a parent. 
   Parameter \a toggle can be used to make the action checkable.
+  Parameter \a shortcutAction can be used to assign the shortcut from
+  preferences. This parameter value corresponds to shortcut action identifier
+  in shortcut preferences.
 
   \param parent parent object
   \param toggle if \c true the action will be a toggle action
+  \param shortcutAction shortcut action identifier
 */
-QtxAction::QtxAction( QObject* parent, bool toggle )
+QtxAction::QtxAction( QObject* parent, bool toggle, const QString& shortcutAction )
 : QWidgetAction( parent )
 {
   setCheckable( toggle );
+  setShortcutActionName(shortcutAction);
 
   QApplication::instance()->installEventFilter( this );
 }
@@ -84,6 +90,9 @@ QtxAction::QtxAction( QObject* parent, bool toggle )
   Creates an action owned by \a parent. Parameters \a text,
   \a icon, \a menuText and \a accel specify the action's attributes.
   Parameter \a toggle can be used to make the action checkable.
+  Parameter \a shortcutAction can be used to assign the shortcut from
+  preferences. This parameter value corresponds to shortcut action identifier
+  in shortcut preferences.
 
   \param text tooltip text
   \param icon iconset
@@ -91,9 +100,10 @@ QtxAction::QtxAction( QObject* parent, bool toggle )
   \param accel shortcut key sequence
   \param parent parent object
   \param toggle if \c true the action will be a toggle action
+  \param shortcutAction shortcut action identifier
 */
-QtxAction::QtxAction( const QString& text, const QIcon& icon,
-                      const QString& menuText, int accel, QObject* parent, bool toggle )
+QtxAction::QtxAction( const QString& text, const QIcon& icon, const QString& menuText, 
+		      int accel, QObject* parent, bool toggle, const QString& shortcutAction )
 : QWidgetAction( parent )
 {
   setIcon( icon );
@@ -101,6 +111,7 @@ QtxAction::QtxAction( const QString& text, const QIcon& icon,
   setToolTip( text );
   setShortcut( accel );
   setCheckable( toggle );
+  setShortcutActionName(shortcutAction);
 
   QApplication::instance()->installEventFilter( this );
 }
@@ -111,22 +122,27 @@ QtxAction::QtxAction( const QString& text, const QIcon& icon,
   Creates an action owned by \a parent. Parameters \a text,
   \a menuText and \a accel specify the action's attributes.
   Parameter \a toggle can be used to make the action checkable.
+  Parameter \a shortcutAction can be used to assign the shortcut from
+  preferences. This parameter value corresponds to shortcut action identifier
+  in shortcut preferences.
 
   \param text tooltip text
   \param menuText menu text
   \param accel shortcut key sequence
   \param parent parent object
   \param toggle if \c true the action is a toggle action
+  \param shortcutAction shortcut action identifier
 */
 QtxAction::QtxAction( const QString& text, const QString& menuText,
-                      int accel, QObject* parent, bool toggle )
+                      int accel, QObject* parent, bool toggle, const QString& shortcutAction )
 : QWidgetAction( parent )
 {
   setText( menuText );
   setToolTip( text );
   setShortcut( accel );
   setCheckable( toggle );
-
+  setShortcutActionName(shortcutAction);
+  
   QApplication::instance()->installEventFilter( this );
 }
 
@@ -206,4 +222,28 @@ void QtxAction::customEvent( QEvent* e )
     addedTo( ae->widget() );
   else
     removedFrom( ae->widget() );
+}
+
+/*!
+  \brief Return shortcut action name for the action.
+  
+  \return shortcut action name
+  \sa setShortcutActionName()
+*/
+QString QtxAction::shortcutActionName() const
+{
+  return myShortcutActionName;
+}
+
+/*!
+  \brief Set shortcut action name to the action.
+
+  Shortcut action name is used for shortcuts customization.
+
+  \param shortcutAction shortcut action name
+  \sa shortcutActionName()
+*/
+void QtxAction::setShortcutActionName( const QString& shortcutAction )
+{
+  myShortcutActionName = shortcutAction;
 }

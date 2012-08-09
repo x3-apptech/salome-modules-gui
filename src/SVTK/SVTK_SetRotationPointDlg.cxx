@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : 
 //  Author : 
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SVTK_SetRotationPointDlg.h"
 #include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
@@ -45,18 +44,16 @@
 
 #include <vtkCallbackCommand.h>
 
-using namespace std;
-
 /*!
   Constructor
 */
 SVTK_SetRotationPointDlg
 ::SVTK_SetRotationPointDlg(QtxAction* theAction,
-			   SVTK_ViewWindow* theParent,
-			   const char* theName):
-  SVTK_DialogBase(theAction,
-		  theParent, 
-		  theName),
+                           SVTK_ViewWindow* theParent,
+                           const char* theName):
+  ViewerTools_DialogBase(theAction,
+                         theParent, 
+                         theName),
   myMainWindow(theParent),
   myPriority(0.0),
   myEventCallbackCommand(vtkCallbackCommand::New()),
@@ -209,9 +206,9 @@ SVTK_SetRotationPointDlg
 void 
 SVTK_SetRotationPointDlg
 ::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
-		unsigned long theEvent,
-		void* theClientData, 
-		void* theCallData)
+                unsigned long theEvent,
+                void* theClientData, 
+                void* theCallData)
 {
   SVTK_SetRotationPointDlg* self = reinterpret_cast<SVTK_SetRotationPointDlg*>(theClientData);
   vtkFloatingPointType* aCoord = (vtkFloatingPointType*)theCallData;
@@ -219,14 +216,14 @@ SVTK_SetRotationPointDlg
   switch ( theEvent ) {
   case SVTK::BBCenterChanged:
     if ( self->myIsBBCenter->isChecked()
-	 ||
-	 IsBBEmpty(self->myMainWindow->getRenderer()) )
+         ||
+         IsBBEmpty(self->myMainWindow->getRenderer()) )
     {
       if ( aCoord )
       {
-	self->myX->setText( QString::number(aCoord[0]) );
-	self->myY->setText( QString::number(aCoord[1]) );
-	self->myZ->setText( QString::number(aCoord[2]) );
+        self->myX->setText( QString::number(aCoord[0]) );
+        self->myY->setText( QString::number(aCoord[1]) );
+        self->myZ->setText( QString::number(aCoord[2]) );
       }
     }
     break;
@@ -310,12 +307,12 @@ SVTK_SetRotationPointDlg
 {
   if ( !myIsBBCenter->isChecked() ) {
     if ( mySelectPoint->isChecked()
-	 &&
-	 ( myX->hasFocus() || myY->hasFocus() || myZ->hasFocus() ) )
+         &&
+         ( myX->hasFocus() || myY->hasFocus() || myZ->hasFocus() ) )
       mySelectPoint->toggle();
     vtkFloatingPointType aCenter[3] = {myX->text().toDouble(), 
-				       myY->text().toDouble(), 
-				       myZ->text().toDouble()};
+                                       myY->text().toDouble(), 
+                                       myZ->text().toDouble()};
     myMainWindow->activateSetRotationSelected((void*)aCenter);
   }
   else

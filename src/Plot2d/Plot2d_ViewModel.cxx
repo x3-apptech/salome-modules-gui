@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // Plot2d_ViewModel.cxx: implementation of the Plot2d_ViewModel class.
 //
 #include "Plot2d_ViewModel.h"
@@ -39,6 +40,7 @@ Plot2d_Viewer::Plot2d_Viewer(bool theAutoDel)
 {
   myPrs = 0;
   myAutoDel = theAutoDel;
+  Plot2d_Object::initColors();
 }
 
 /*!
@@ -56,10 +58,11 @@ Plot2d_Viewer::~Plot2d_Viewer()
 */
 SUIT_ViewWindow* Plot2d_Viewer::createView(SUIT_Desktop* theDesktop)
 {
-  Plot2d_ViewWindow* aPlot2dView = new Plot2d_ViewWindow(theDesktop, this);
+  Plot2d_ViewWindow* aView = new Plot2d_ViewWindow(theDesktop, this);
+  aView->initLayout();
   if (myPrs)
-    aPlot2dView->getViewFrame()->Display(myPrs);
-  return aPlot2dView;
+    aView->getViewFrame()->Display(myPrs);
+  return aView;
 }
 
 /*!
@@ -120,7 +123,9 @@ void Plot2d_Viewer::update()
 void Plot2d_Viewer::clearPrs()
 {
   SUIT_ViewManager* aMgr = getViewManager();
-  QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
+  QVector<SUIT_ViewWindow*> aViews;
+  if ( aMgr )
+    aViews = aMgr->getViews();
   unsigned int aSize = aViews.size();
   for (uint i = 0; i < aSize; i++) {
     Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)aViews[i];
@@ -229,6 +234,6 @@ void Plot2d_Viewer::setViewManager( SUIT_ViewManager* mgr )
   {
     Plot2d_ViewManager* pmgr = ( Plot2d_ViewManager* )mgr;
     connect( pmgr, SIGNAL( cloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* ) ),
-	     this, SLOT( onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* ) ) );
+             this, SLOT( onCloneView( Plot2d_ViewFrame*, Plot2d_ViewFrame* ) ) );
   }
 }

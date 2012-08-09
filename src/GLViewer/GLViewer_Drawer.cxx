@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  Author : OPEN CASCADE
 // File:      GLViewer_Drawer.cxx
 // Created:   November, 2004
@@ -516,25 +517,25 @@ void GLViewer_Drawer::destroyAllTextures()
 */
 void GLViewer_Drawer::setAntialiasing(const bool on)
 {
-	if (on)
-	{
+        if (on)
+        {
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POLYGON_SMOOTH);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-		glEnable (GL_BLEND);
-	}
-	else
-	{
-		glDisable(GL_POINT_SMOOTH);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POLYGON_SMOOTH);
-		glBlendFunc (GL_ONE, GL_ZERO);
-		glDisable (GL_BLEND);
-	}
+                glEnable(GL_POINT_SMOOTH);
+                glEnable(GL_LINE_SMOOTH);
+                glEnable(GL_POLYGON_SMOOTH);
+                glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+                glEnable (GL_BLEND);
+        }
+        else
+        {
+                glDisable(GL_POINT_SMOOTH);
+                glDisable(GL_LINE_SMOOTH);
+                glDisable(GL_POLYGON_SMOOTH);
+                glBlendFunc (GL_ONE, GL_ZERO);
+                glDisable (GL_BLEND);
+        }
 }
 
 /*! Loads texture from file
@@ -949,7 +950,7 @@ bool GLViewer_Drawer::translateToEMF( HDC hDC, GLViewer_CoordSystem* aViewerCS, 
   \param fillingColor - color of filling
 */
 void GLViewer_Drawer::drawRectangle( GLViewer_Rect* rect, GLfloat lineWidth, GLfloat gap,
-				     QColor color, bool filled, QColor fillingColor )
+                                     QColor color, bool filled, QColor fillingColor )
 {
   if( !rect )
     return;
@@ -1014,7 +1015,7 @@ void GLViewer_Drawer::drawContour( const GLViewer_PntList& pntList, QColor color
   \param isStripe - enables line stipple
 */
 void GLViewer_Drawer::drawContour( GLViewer_Rect* rect, QColor color, GLfloat lineWidth,
-				   GLushort pattern, bool isStripe )
+                                   GLushort pattern, bool isStripe )
 {
   float x1 = rect->left();
   float x2 = rect->right();
@@ -1137,9 +1138,9 @@ void GLViewer_Drawer::drawCross( GLfloat x, GLfloat y, QColor color )
   \param filled - drawn as filled
 */
 void GLViewer_Drawer::drawArrow( const GLfloat red, const GLfloat green, const GLfloat blue,
-				 GLfloat lineWidth,
-				 GLfloat staff, GLfloat length, GLfloat width,
-				 GLfloat x, GLfloat y, GLfloat angle, GLboolean filled )
+                                 GLfloat lineWidth,
+                                 GLfloat staff, GLfloat length, GLfloat width,
+                                 GLfloat x, GLfloat y, GLfloat angle, GLboolean filled )
 {
   GLfloat vx1 = x;
   GLfloat vy1 = y + staff + length;

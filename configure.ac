@@ -1,38 +1,41 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 # Author : Marc Tajchman (CEA)
 # Date : 28/06/2001
 # Modified by : Patrick GOLDBRONN (CEA)
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN) - autotools usage
 #
-AC_INIT([Salome2 Project GUI module], [5.1.0], [webmaster.salome@opencascade.com], [SalomeGUI])
-AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
+AC_INIT([Salome2 Project GUI module], [6.5.0], [webmaster.salome@opencascade.com], [SalomeGUI])
+AC_CONFIG_AUX_DIR(adm_local/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wno-portability])
 
 XVERSION=`echo $VERSION | awk -F. '{printf("0x%02x%02x%02x",$1,$2,$3)}'`
 AC_SUBST(XVERSION)
+VERSION_DEV=1
+AC_SUBST(VERSION_DEV)
 
 # set up MODULE_NAME variable for dynamic construction of directories (resources, etc.)
 MODULE_NAME=gui
@@ -100,9 +103,6 @@ if test "x${enable_qxGraphViewer}" != "xno" ; then
 else 
     DISABLE_QXGRAPHVIEWER="yes"
 fi
-dnl THIS IS A TEMPORARY SOLUTION BECAUSE QXGRAPH NOT YET PORTING TO QT4
-dnl AFTER PORTING QXGARPH TO QT4 THE STRING BELOW HAVE TO BE REMOVED
-DISABLE_QXGRAPHVIEWER="yes"
 
 dnl
 dnl Initialize source and build root directories
@@ -140,6 +140,7 @@ echo
 
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_LOCAL_INSTALL
 dnl
 dnl libtool macro check for CC, LD, NM, LN_S, RANLIB, STRIP + pour les librairies dynamiques !
 
@@ -166,7 +167,7 @@ dnl Fix up the INSTALL macro if it s a relative path. We want the
 dnl full-path to the binary instead.
 case "$INSTALL" in
    *install-sh*)
-      INSTALL='\${ROOT_BUILDDIR}'/salome_adm/unix/config_files/install-sh
+      INSTALL='\${ROOT_BUILDDIR}'/adm_local/unix/config_files/install-sh
       ;;
 esac
 
@@ -199,13 +200,14 @@ dnl
 
 AC_CXX_HAVE_SSTREAM
 
-dnl
-dnl ---------------------------------------------
-dnl testing MPICH
-dnl ---------------------------------------------
-dnl
+echo
+echo ---------------------------------------------
+echo testing MPI
+echo ---------------------------------------------
+echo
 
-CHECK_MPICH
+CHECK_MPI
+
 
 echo
 echo ---------------------------------------------
@@ -226,6 +228,16 @@ echo
 
 CHECK_PYTHON
 
+echo
+echo ---------------------------------------------
+echo testing swig
+echo ---------------------------------------------
+echo
+
+AM_PATH_PYTHON(2.3)
+CHECK_SWIG
+
+
 dnl echo
 dnl echo ---------------------------------------------
 dnl echo testing java
@@ -242,18 +254,6 @@ echo
 
 CHECK_DISABLE_CORBA
 echo "GUI_DISABLE_CORBA = "$GUI_DISABLE_CORBA
-
-if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
-
-echo
-echo ---------------------------------------------
-echo testing swig
-echo ---------------------------------------------
-echo
-
-AM_PATH_PYTHON(2.3)
-CHECK_SWIG
-fi
 
 echo
 echo ---------------------------------------------
@@ -476,12 +476,10 @@ if test "x${GUI_DISABLE_CORBA}" != "xyes" ; then
     echo "failed : for full configuration of GUI module necessary enable SalomeObject !"
     exit
   fi
-  dnl THIS IS A TEMPORARY SOLUTION BECAUSE QXGRAPH NOT YET PORTING TO QT4
-  dnl AFTER PORTING QXGARPH TO QT4 THE FOLLOWING CHECK HAVE TO BE UNCOMMENTED
-  dnl if test "x${DISABLE_QXGRAPHVIEWER}" == "xyes" ; then
-  dnl   echo "failed : for full configuration of GUI module necessary enable QxGraphViewer !"
-  dnl   exit
-  dnl fi
+  if test "x${DISABLE_QXGRAPHVIEWER}" == "xyes" ; then
+    echo "failed : for full configuration of GUI module necessary enable QxGraphViewer !"
+    exit
+  fi
 fi
 
 echo
@@ -533,7 +531,7 @@ variables="cc_ok lex_yacc_ok python_ok swig_ok threads_ok OpenGL_ok qt_ok vtk_ok
 omniORB_ok boost_ok occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok libxml_ok Kernel_ok"
 else
 variables="cc_ok lex_yacc_ok python_ok threads_ok OpenGL_ok qt_ok vtk_ok hdf5_ok boost_ok
-occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok"
+occ_ok sip_ok pyqt_ok qwt_ok doxygen_ok graphviz_ok Kernel_ok "
 fi
 
 for var in $variables
@@ -579,6 +577,13 @@ AM_CONDITIONAL(ENABLE_SALOMEOBJECT, [test "$DISABLE_SALOMEOBJECT" = no])
 AM_CONDITIONAL(ENABLE_QXGRAPHVIEWER, [test "$DISABLE_QXGRAPHVIEWER" = no])
 AM_CONDITIONAL(ENABLE_TESTRECORDER, [test "$ENABLE_TESTRECORDER" = yes])
 
+if test "$DISABLE_PYCONSOLE" = "no" ; then
+  AC_DEFINE(SUIT_ENABLE_PYTHON)
+fi
+
+dnl Build with GUI observers feature
+AC_DEFINE(WITH_SALOMEDS_OBSERVER)
+
 echo
 echo ---------------------------------------------
 echo generating Makefiles and configure files
@@ -590,67 +595,90 @@ echo
 #  chmod +x ./bin/salome/*; \
 #])
 
+AC_HACK_LIBTOOL
+AC_CONFIG_COMMANDS([hack_libtool],[
+sed -i "s%^CC=\"\(.*\)\"%hack_libtool (){ \n\
+  $(pwd)/hack_libtool \1 \"\$[@]\" \n\
+}\n\
+CC=\"hack_libtool\"%g" libtool
+sed -i "s%\(\s*\)for searchdir in \$newlib_search_path \$lib_search_path \$sys_lib_search_path \$shlib_search_path; do%\1searchdirs=\"\$newlib_search_path \$lib_search_path \$sys_lib_search_path \$shlib_search_path\"\n\1for searchdir in \$searchdirs; do%g" libtool
+sed -i "s%\(\s*\)searchdirs=\"\$newlib_search_path \$lib_search_path \(.*\)\"%\1searchdirs=\"\$newlib_search_path \$lib_search_path\"\n\1sss_beg=\"\"\n\1sss_end=\"\2\"%g" libtool
+sed -i "s%\(\s*\)\(for searchdir in \$searchdirs; do\)%\1for sss in \$searchdirs; do\n\1  if ! test -d \$sss; then continue; fi\n\1  ssss=\$(cd \$sss; pwd)\n\1  if test \"\$ssss\" != \"\" \&\& test -d \$ssss; then\n\1    case \$ssss in\n\1      /usr/lib | /usr/lib64 ) ;;\n\1      * ) sss_beg=\"\$sss_beg \$ssss\" ;;\n\1    esac\n\1  fi\n\1done\n\1searchdirs=\"\$sss_beg \$sss_end\"\n\1\2%g" libtool
+],[])
+
 # This list is initiated using autoscan and must be updated manually
 # when adding a new file <filename>.in to manage. When you execute
 # autoscan, the Makefile list is generated in the output file configure.scan.
 # This could be helpfull to update de configuration.
 AC_OUTPUT([ \
-  ./salome_adm/unix/SALOMEconfig.h \
-  ./adm_local/Makefile \
-  ./adm_local/cmake_files/Makefile \
-  ./adm_local/unix/Makefile \
-  ./adm_local/unix/config_files/Makefile \
-  ./bin/VERSION \
-  ./bin/Makefile \
-  ./GUI_version.h \
-  ./doc/Makefile \
-  ./doc/salome/Makefile \
-  ./doc/salome/gui/Makefile \
-  ./doc/salome/gui/doxyfile \
-  ./doc/salome/tui/Makefile \
-  ./doc/salome/tui/doxyfile \
-  ./src/Makefile \
-  ./src/CASCatch/Makefile \
-  ./src/Qtx/Makefile \
-  ./src/Style/Makefile \
-  ./src/DDS/Makefile \
-  ./src/QDS/Makefile \
-  ./src/SUIT/Makefile \
-  ./src/STD/Makefile \
-  ./src/CAF/Makefile \
-  ./src/CAM/Makefile \
-  ./src/SUITApp/Makefile \
-  ./src/LogWindow/Makefile \
-  ./src/ObjBrowser/Makefile \
-  ./src/Prs/Makefile \
-  ./src/OBJECT/Makefile \
-  ./src/GLViewer/Makefile \
-  ./src/VTKViewer/Makefile \
-  ./src/SVTK/Makefile \
-  ./src/OCCViewer/Makefile \
-  ./src/SOCC/Makefile \
-  ./src/PyInterp/Makefile \
-  ./src/PyConsole/Makefile \
-  ./src/Plot2d/Makefile \
-  ./src/SPlot2d/Makefile \
-  ./src/SUPERVGraph/Makefile \
-  ./src/QxGraph/Makefile \
-  ./src/QxScene/Makefile \
-  ./src/LightApp/Makefile \
-  ./src/ResExporter/Makefile \
-  ./src/TOOLSGUI/Makefile \
-  ./src/Event/Makefile \
-  ./src/Session/Makefile \
-  ./src/SalomeApp/Makefile \
-  ./src/SalomeApp/Test/Makefile \
-  ./src/SALOME_SWIG/Makefile \
-  ./src/SALOME_SWIG/supervisionexample.py \
-  ./src/SALOME_SWIG/supervisiongeomexample.py \
-  ./src/SALOME_PY/Makefile \
-  ./src/SALOME_PYQT/Makefile \
-  ./src/SALOME_PYQT/SALOME_PYQT_GUI/Makefile \
-  ./src/SALOME_PYQT/SalomePyQt/Makefile \
-  ./resources/Makefile \
-  ./idl/Makefile \
+  adm_local/Makefile \
+  adm_local/cmake_files/Makefile \
+  adm_local/unix/Makefile \
+  adm_local/unix/config_files/Makefile \
+  bin/VERSION \
+  bin/Makefile \
+  GUI_version.h \
+  doc/Makefile \
+  doc/salome/Makefile \
+  doc/salome/gui/Makefile \
+  doc/salome/gui/doxyfile \
+  doc/salome/gui/static/header.html \
+  doc/salome/tui/Makefile \
+  doc/salome/tui/doxyfile \
+  doc/salome/tui/static/header.html \
+  src/Makefile \
+  src/CASCatch/Makefile \
+  src/Qtx/Makefile \
+  src/Style/Makefile \
+  src/DDS/Makefile \
+  src/QDS/Makefile \
+  src/SUIT/Makefile \
+  src/STD/Makefile \
+  src/CAF/Makefile \
+  src/CAM/Makefile \
+  src/SUITApp/Makefile \
+  src/LogWindow/Makefile \
+  src/ObjBrowser/Makefile \
+  src/Prs/Makefile \
+  src/OBJECT/Makefile \
+  src/ViewerTools/Makefile \
+  src/GLViewer/Makefile \
+  src/VTKViewer/Makefile \
+  src/SVTK/Makefile \
+  src/OCCViewer/Makefile \
+  src/SOCC/Makefile \
+  src/PyInterp/Makefile \
+  src/PyConsole/Makefile \
+  src/Plot2d/Makefile \
+  src/SPlot2d/Makefile \
+  src/SUPERVGraph/Makefile \
+  src/QxGraph/Makefile \
+  src/QxScene/Makefile \
+  src/LightApp/Makefile \
+  src/ResExporter/Makefile \
+  src/TOOLSGUI/Makefile \
+  src/Event/Makefile \
+  src/OpenGLUtils/Makefile \
+  src/Session/Makefile \
+  src/SalomeApp/Makefile \
+  src/SalomeApp/Test/Makefile \
+  src/SalomeApp/pluginsdemo/Makefile \
+  src/GuiHelpers/Makefile \
+  src/TreeData/Makefile \
+  src/TreeData/Test/Makefile \
+  src/SALOME_SWIG/Makefile \
+  src/SALOME_SWIG/supervisionexample.py \
+  src/SALOME_SWIG/supervisiongeomexample.py \
+  src/SALOME_PY/Makefile \
+  src/SALOME_PYQT/Makefile \
+  src/SALOME_PYQT/SALOME_PYQT_GUI/Makefile \
+  src/SALOME_PYQT/SALOME_PYQT_GUILight/Makefile \
+  src/SALOME_PYQT/SalomePyQt/Makefile \
+  src/GUI_PY/Makefile \
+  resources/Makefile \
+  idl/Makefile \
+  tools/Makefile \
+  tools/dlgfactory/Makefile \
+  tools/vtkEDFOverloads/Makefile \
   Makefile
 ])

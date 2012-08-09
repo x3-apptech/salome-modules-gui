@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : Style_Tools.cxx
 // Author : Natalia Ermolaeva, Open CASCADE S.A.S.
 //
@@ -436,7 +434,7 @@ void Style_Tools::drawArrow( QStyle::PrimitiveElement type, QPainter* p, const Q
   \param brush background painter brush
 */
 void Style_Tools::drawSign( QStyle::PrimitiveElement type, QPainter* p, const QRect& r,
-			    const QColor& pen, const QColor& brush )
+                            const QColor& pen, const QColor& brush )
 {
   p->save();
   QPainterPath sign;
@@ -458,31 +456,31 @@ void Style_Tools::drawSign( QStyle::PrimitiveElement type, QPainter* p, const QR
         deltaY = -deltaY;
       }
       if ( correct ) 
-	sign.moveTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
+        sign.moveTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
       else {
-	sign.moveTo(  aDelta/3,   -aDelta/2 );
-	sign.lineTo(  aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3) );
-	sign.lineTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
+        sign.moveTo(  aDelta/3,   -aDelta/2 );
+        sign.lineTo(  aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3) );
+        sign.lineTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
       }
       
       sign.lineTo(    deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
       
       if ( !correct ) {
-	sign.lineTo(  aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
-	sign.lineTo(  aDelta/3,   -aDelta/2-deltaY );
-	sign.lineTo( -aDelta/3,   -aDelta/2-deltaY );
-	sign.lineTo( -aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
+        sign.lineTo(  aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
+        sign.lineTo(  aDelta/3,   -aDelta/2-deltaY );
+        sign.lineTo( -aDelta/3,   -aDelta/2-deltaY );
+        sign.lineTo( -aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
       }
       
       sign.lineTo(   -deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3)-2*aDelta/3 );
       sign.lineTo(   -deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
 
       if ( correct ) 
-	sign.lineTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
+        sign.lineTo(  deltaY/2,   -aDelta/2-(deltaY/2-aDelta/3) );
       else {
-	sign.lineTo( -aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3) );
-	sign.lineTo( -aDelta/3,   -aDelta/2 );
-	sign.lineTo(  aDelta/3,   -aDelta/2);
+        sign.lineTo( -aDelta/3,   -aDelta/2-(deltaY/2-aDelta/3) );
+        sign.lineTo( -aDelta/3,   -aDelta/2 );
+        sign.lineTo(  aDelta/3,   -aDelta/2);
       }
 
       if ( correct )

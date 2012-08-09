@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SALOME_Selection.cxx
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SVTK_SelectorDef.h"
 
 #include <VTKViewer_Filter.h>
@@ -40,24 +39,6 @@
 #include <vtkCallbackCommand.h>
 #include <vtkActorCollection.h>
 #include <vtkCellPicker.h>
-
-
-/*!
-  Find first SALOME_Actor from the end of actors collection
-*/
-inline
-SALOME_Actor* 
-GetLastSALOMEActor(vtkActorCollection* theCollection)
-{
-  if (theCollection) {
-    for (int i = theCollection->GetNumberOfItems() - 1; i >= 0; i--) {
-      if (SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(theCollection->GetItemAsObject(i)))
-	if (anActor->hasIO())
-	  return anActor;
-    }
-  }
-  return NULL;
-}
 
 
 /*!
@@ -79,6 +60,7 @@ SVTK_SelectorDef
   myCellPicker(vtkCellPicker::New())
 {
   mySelectionMode = ActorSelection;
+  myDynamicPreselection = true;
 
   myPicker->Delete();
   myCellPicker->Delete();
@@ -287,7 +269,7 @@ SVTK_SelectorDef
 void 
 SVTK_SelectorDef
 ::GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	    TColStd_IndexedMapOfInteger& theIndex)
+            TColStd_IndexedMapOfInteger& theIndex)
 {
   TMapIOSubIndex::const_iterator anIter = myMapIOSubIndex.find(theIO);
   if(anIter != myMapIOSubIndex.end())
@@ -304,7 +286,7 @@ SVTK_SelectorDef
 bool
 SVTK_SelectorDef
 ::IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
-		  int theIndex) const
+                  int theIndex) const
 {
   TMapIOSubIndex::const_iterator anIter = myMapIOSubIndex.find(theIO);
   if(anIter != myMapIOSubIndex.end()){
@@ -346,8 +328,8 @@ static bool removeIndex(TColStd_IndexedMapOfInteger& theMapIndex, const int theI
 bool
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_IndexedMapOfInteger& theIndices, 
-		    bool theIsModeShift)
+                    const TColStd_IndexedMapOfInteger& theIndices, 
+                    bool theIsModeShift)
 {
   TMapIOSubIndex::iterator aMapIter = myMapIOSubIndex.find(theIO);
   if(aMapIter == myMapIOSubIndex.end()){
@@ -381,8 +363,8 @@ SVTK_SelectorDef
 bool
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_MapOfInteger& theIndices, 
-		    bool theIsModeShift)
+                    const TColStd_MapOfInteger& theIndices, 
+                    bool theIsModeShift)
 {
   TMapIOSubIndex::iterator aMapIter = myMapIOSubIndex.find(theIO);
   if(aMapIter == myMapIOSubIndex.end()){
@@ -417,8 +399,8 @@ SVTK_SelectorDef
 bool 
 SVTK_SelectorDef
 ::AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    int theIndex, 
-		    bool theIsModeShift)
+                    int theIndex, 
+                    bool theIsModeShift)
 {
   TMapIOSubIndex::iterator anIter = myMapIOSubIndex.find(theIO);
   if(anIter == myMapIOSubIndex.end()){
@@ -453,7 +435,7 @@ SVTK_SelectorDef
 void
 SVTK_SelectorDef
 ::RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	       int theIndex)
+               int theIndex)
 {
   if(IsIndexSelected(theIO,theIndex)){
     TMapIOSubIndex::iterator anIter = myMapIOSubIndex.find(theIO);
@@ -515,8 +497,8 @@ SVTK_SelectorDef
 bool
 SVTK_SelectorDef
 ::IsValid(SALOME_Actor* theActor,
-	  const TFilterID theId,
-	  const bool theIsNode) const
+          const TFilterID theId,
+          const bool theIsNode) const
 {
   TFilters::const_iterator anIter = myFilters.begin();
   for(; anIter != myFilters.end(); ++anIter){
@@ -544,43 +526,50 @@ SVTK_SelectorDef
   return Handle(VTKViewer_Filter)();
 }
 
-SALOME_Actor*
+vtkActorCollection*
 SVTK_SelectorDef
 ::Pick(const SVTK_SelectionEvent* theEvent, vtkRenderer* theRenderer) const
 {
-  bool anAdvancedSelectionAlgorithm = true;
-  SUIT_ResourceMgr* aResourceMgr = SUIT_Session::session()->resourceMgr();
-  if ( aResourceMgr )
-    anAdvancedSelectionAlgorithm = aResourceMgr->booleanValue( "VTKViewer", "use_advanced_selection_algorithm", true );
-
-  SALOME_Actor* anActor = NULL;
   vtkActorCollection* aListActors = NULL;
-  if ( anAdvancedSelectionAlgorithm ) {
+
+  if ( GetDynamicPreSelection() ) {
     myCellPicker->Pick(theEvent->myX,
-		       theEvent->myY, 
-		       0.0,
-		       theRenderer);
+                       theEvent->myY, 
+                       0.0,
+                       theRenderer);
   
     aListActors = myCellPicker->GetActors();
-    anActor = GetLastSALOMEActor(aListActors);
   }
 
-  if ( !anActor ) {
+  if ( !aListActors || !aListActors->GetNumberOfItems() ) {
     myPicker->Pick(theEvent->myX,
-		   theEvent->myY, 
-		   0.0,
-		   theRenderer);
+                   theEvent->myY, 
+                   0.0,
+                   theRenderer);
     aListActors = myPicker->GetActors();
-    anActor = GetLastSALOMEActor(aListActors);
   }
   
-  return anActor;
+  return aListActors;
 }
 
 void
 SVTK_SelectorDef
 ::SetTolerance(const double& theTolerance) 
 {
-  myPicker->SetTolerance(theTolerance); 	
+  myPicker->SetTolerance(theTolerance);         
   myCellPicker->SetTolerance(theTolerance);
+}
+
+void
+SVTK_SelectorDef
+::SetDynamicPreSelection( bool theIsDynPreselect )
+{
+  myDynamicPreselection = theIsDynPreselect;
+}
+
+bool
+SVTK_SelectorDef
+::GetDynamicPreSelection() const
+{
+  return myDynamicPreselection;
 }

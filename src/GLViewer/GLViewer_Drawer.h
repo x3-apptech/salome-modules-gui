@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  Author : OPEN CASCADE
 // File:      GLViewer_Drawer.h
 // Created:   November, 2004
@@ -236,8 +237,8 @@ public:
   //! Returns object priority
   int                             getPriority() const { return myPriority; }
 
-	//! The function enables and disables antialiasing in Open GL (for points, lines and polygons).
-	void                            setAntialiasing(const bool on);
+        //! The function enables and disables antialiasing in Open GL (for points, lines and polygons).
+        void                            setAntialiasing(const bool on);
   
   //! Clears all generated textures
   static void                     destroyAllTextures();
@@ -342,7 +343,7 @@ public:
   */
   void                            drawText( const QString& text,
                                             GLfloat xPos,
-					                                  GLfloat yPos,
+                                                                          GLfloat yPos,
                                             const QColor& color,
                                             QFont* aFont,
                                             int theSeparator,
@@ -359,8 +360,8 @@ public:
    *\param smallFont - font format
   */
   void                            drawGLText( QString text,
-					                                    float x,
-					                                    float y,
+                                                                            float x,
+                                                                            float y,
                                               int hPosition = GLText_Center,
                                               int vPosition = GLText_Center,
                                               QColor color = Qt::black,
@@ -404,7 +405,7 @@ protected:
   //! Draw basic primitives: rectangle, contour, polygon, vertex, cross, arrow
   //* with predefined color
   static void                     drawRectangle( GLViewer_Rect*, GLfloat, GLfloat = 0, QColor = Qt::black, 
-						 bool = false, QColor = Qt::white );
+                                                 bool = false, QColor = Qt::white );
   static void                     drawContour( GLViewer_Rect*, QColor, GLfloat, GLushort, bool );
   static void                     drawContour( const GLViewer_PntList&, QColor, GLfloat );
   static void                     drawPolygon( GLViewer_Rect*, QColor, GLushort, bool );
@@ -412,8 +413,8 @@ protected:
   static void                     drawVertex( GLfloat, GLfloat, QColor );
   static void                     drawCross( GLfloat, GLfloat, QColor );
   static void                     drawArrow( const GLfloat red, const GLfloat green, const GLfloat blue,
-					     GLfloat, GLfloat, GLfloat, GLfloat,
-					     GLfloat, GLfloat, GLfloat, GLboolean = GL_FALSE );
+                                             GLfloat, GLfloat, GLfloat, GLfloat,
+                                             GLfloat, GLfloat, GLfloat, GLboolean = GL_FALSE );
 
   //! Draw object text
   virtual void                    drawText( GLViewer_Object* theObject );

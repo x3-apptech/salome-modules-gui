@@ -1,30 +1,127 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : Plot2d.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 #include "Plot2d.h"
 
 #include <QPainter>
+
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+
+const int MSIZE  = 9;
+const int MAX_ATTEMPTS        = 10;     // max attempts
+
+// color tolerance (used to compare color values)
+const long COLOR_DISTANCE = 100;
+
+
+
+/*!
+  Constructor
+*/
+Plot2d_Point::Plot2d_Point()
+  : x( 0. ), y( 0. ), deviationPtr(0)
+{
+}
+
+/*!
+  Constructor
+*/
+Plot2d_Point::Plot2d_Point( double theX, double theY, const QString& theText )
+  : x( theX ), y( theY ), text( theText ), deviationPtr(0)
+{
+}
+
+/*!
+  Destructor.
+*/
+Plot2d_Point::~Plot2d_Point() {
+  clearDeviation();
+}
+
+/*!
+  Free memory allocated for the deviation data.
+*/
+void Plot2d_Point::clearDeviation() {
+  if(deviationPtr)
+    delete deviationPtr;
+  deviationPtr = 0;
+}
+
+/*!
+  Return true in case if deviation data is assigned to the point.
+*/
+bool Plot2d_Point::hasDeviation() const {
+  return !(deviationPtr == 0);
+}
+
+/*!
+  Assign deviation data to the point.
+*/
+void Plot2d_Point::setDeviation(double min, double max) {
+ clearDeviation();
+ deviationPtr = new double[2];
+ deviationPtr[0] = min;deviationPtr[1] = max;
+}
+
+/*!
+  Return true in case if deviation data is assigned to the point
+  and store deviation data in the input parameters.
+*/
+bool Plot2d_Point::deviation(double& min, double& max) const {
+  if(hasDeviation()) {
+    min = deviationPtr[0];
+    max = deviationPtr[1];
+  }
+  return false;
+}
+
+/*!
+  Return minimal deviation value.
+*/
+bool Plot2d_Point::minDeviation(double& min) const {
+  if(hasDeviation()) {
+    min = deviationPtr[0];
+    return true;
+  } else {
+    min = 0;
+  }
+  return false;
+}
+
+/*!
+  Return minimal deviation value.
+*/
+bool Plot2d_Point::maxDeviation(double& max) const {
+  if(hasDeviation()) {
+    max = deviationPtr[1];
+    return true;
+  } else {
+    max = 0;
+  }
+  return false;
+}
+
+
 
 /*!
   \brief Convert Plot2d marker type to Qwt marker type.
@@ -156,7 +253,7 @@ Plot2d::LineType Plot2d::qwt2plotLine( Qt::PenStyle p )
   \param width line width
 */
 void Plot2d::drawLine( QPainter* painter, const QPoint& p1, const QPoint& p2, 
-		       Qt::PenStyle type, const QColor& color, int width )
+                       Qt::PenStyle type, const QColor& color, int width )
 {
   painter->save();
   QPen pen( type );
@@ -177,7 +274,7 @@ void Plot2d::drawLine( QPainter* painter, const QPoint& p1, const QPoint& p2,
   \param width line width
 */
 void Plot2d::drawLine( QPainter* painter, const QPoint& p1, const QPoint& p2, 
-		       Plot2d::LineType type, const QColor& color, int width )
+                       Plot2d::LineType type, const QColor& color, int width )
 {
   drawLine( painter, p1, p2, plot2qwtLine( type ), color, width );
 }
@@ -194,7 +291,7 @@ void Plot2d::drawLine( QPainter* painter, const QPoint& p1, const QPoint& p2,
   \param width line width
 */
 void Plot2d::drawLine( QPainter* painter, int x1, int y1, int x2, int y2,
-		       Qt::PenStyle type, const QColor& color, int width )
+                       Qt::PenStyle type, const QColor& color, int width )
 {
   drawLine( painter, QPoint( x1, y1 ), QPoint( x2, y2 ), type, color, width );
 }
@@ -211,10 +308,10 @@ void Plot2d::drawLine( QPainter* painter, int x1, int y1, int x2, int y2,
   \param width line width
 */
 void Plot2d::drawLine( QPainter* painter, int x1, int y1, int x2, int y2,
-		       Plot2d::LineType type, const QColor& color, int width )
+                       Plot2d::LineType type, const QColor& color, int width )
 {
   drawLine( painter, QPoint( x1, y1 ), QPoint( x2, y2 ), 
-	    plot2qwtLine( type), color, width );
+            plot2qwtLine( type), color, width );
 }
 
 /*!
@@ -226,7 +323,7 @@ void Plot2d::drawLine( QPainter* painter, int x1, int y1, int x2, int y2,
   \param color marker color
 */
 void Plot2d::drawMarker( QPainter* painter, const QPoint& p, const QRect& r,
-			 QwtSymbol::Style type, const QColor& color )
+                         QwtSymbol::Style type, const QColor& color )
 {
   painter->save();
   painter->setPen( color );
@@ -314,7 +411,7 @@ void Plot2d::drawMarker( QPainter* painter, const QPoint& p, const QRect& r,
   \param color marker color
 */
 void Plot2d::drawMarker( QPainter* painter, const QPoint& p, const QRect& r,
-			 Plot2d::MarkerType type, const QColor& color )
+                         Plot2d::MarkerType type, const QColor& color )
 {
   drawMarker( painter, p, r, plot2qwtMarker( type ), color ); 
 }
@@ -330,7 +427,7 @@ void Plot2d::drawMarker( QPainter* painter, const QPoint& p, const QRect& r,
   \param color marker color
 */
 void Plot2d::drawMarker( QPainter* painter, int x, int y, int w, int h,
-			 QwtSymbol::Style type, const QColor& color )
+                         QwtSymbol::Style type, const QColor& color )
 {
   drawMarker( painter, QPoint( x, y ), QRect( 0, 0, w, h ), type, color ); 
 }
@@ -346,7 +443,117 @@ void Plot2d::drawMarker( QPainter* painter, int x, int y, int w, int h,
   \param color marker color
 */
 void Plot2d::drawMarker( QPainter* painter, int x, int y, int w, int h,
-			 Plot2d::MarkerType type, const QColor& color )
+                         Plot2d::MarkerType type, const QColor& color )
 {
   drawMarker( painter, QPoint( x, y ), QRect( 0, 0, w, h ), plot2qwtMarker( type ), color ); 
+}
+
+
+/*!
+  \brief Create icon pixmap according to the marker type.
+  \param size icon size
+  \param type marker type
+  \param color icon color
+  \return icon
+*/
+QPixmap Plot2d::markerIcon(const QSize &size, const QColor& color, Plot2d::MarkerType type )
+{
+
+  QPixmap px( size );
+  px.fill( QColor( 255, 255, 255, 0 ) );
+  QPainter p( &px );
+  Plot2d::drawMarker( &p, size.width()/2, size.height()/2, MSIZE, MSIZE, type, color );
+  return px;
+}
+
+
+/*!
+  \brief Create icon pixmap according to the line type.
+  \param size icon size
+  \param type line type
+  \param color icon color
+  \return icon
+*/
+QPixmap Plot2d::lineIcon( const QSize& size,  const QColor& color, Plot2d::LineType type )
+{
+
+  QPixmap px( size );
+  px.fill( QColor( 255, 255, 255, 0 ) );
+  QPainter p( &px );
+  drawLine( &p, 5, size.height()/2, size.width()-5, size.height()/2, type,
+	    color, 1 );
+  return px;
+}
+
+/*!
+  Gets new unique marker for item if possible
+*/
+void Plot2d::getNextMarker( const int rtti, const QwtPlot* thePlot, QwtSymbol::Style& typeMarker,
+			    QColor& color, Qt::PenStyle& typeLine ) 
+{
+  bool bOk = false;
+  int cnt = 0;
+  while ( !bOk ) {
+    int aRed    = (int)( 256.0 * rand() / RAND_MAX );  // generate random color
+    int aGreen  = (int)( 256.0 * rand() / RAND_MAX );  // ...
+    int aBlue   = (int)( 256.0 * rand() / RAND_MAX );  // ...
+    int aMarker = (int)( 9.0 * rand() / RAND_MAX ) + 1;// 9 markers types( not including empty )
+    int aLine   = (int)( 5.0 * rand() / RAND_MAX ) + 1;// 5 line types ( not including empty )
+    
+    typeMarker = ( QwtSymbol::Style )aMarker;
+    color      = QColor( aRed, aGreen, aBlue );
+    typeLine   = ( Qt::PenStyle )aLine;
+    
+    bOk = ( ++cnt == MAX_ATTEMPTS ) || !existMarker( rtti, thePlot, typeMarker, color, typeLine );
+  }
+}
+
+/*!
+  Checks if marker belongs to any enitity
+*/
+bool Plot2d::existMarker( const int rtti, const QwtPlot* thePlot, const QwtSymbol::Style typeMarker,
+			  const QColor& color, const Qt::PenStyle typeLine ) 
+{
+  bool ok = false;
+  
+  QColor bgColor = thePlot->palette().color( QPalette::Background );
+  if ( closeColors( color, bgColor ) ) {
+    ok = true;
+  }
+  else {
+    QwtPlotItemList anItems = thePlot->itemList();
+    QwtPlotItemIterator anIt = anItems.begin(), aLast = anItems.end();
+    QwtPlotItem* anItem;
+    for ( ; anIt != aLast && !ok; anIt++ ) {
+      anItem = *anIt;
+      if ( anItem && anItem->rtti() == rtti ) {
+	QwtPlotCurve* crv = dynamic_cast<QwtPlotCurve*>( anItem );
+	if ( crv ) {
+	  QwtSymbol::Style aStyle = crv->symbol().style();
+	  QColor           aColor = crv->pen().color();
+	  Qt::PenStyle     aLine  = crv->pen().style();
+	  ok = closeColors( aColor, color ) && aStyle == typeMarker && aLine == typeLine;
+	}
+      }
+    }
+  }
+  return ok;
+}
+
+/*!
+  Checks if two colors are close to each other
+  uses COLOR_DISTANCE variable as max tolerance for comparing of colors
+*/
+
+bool Plot2d::closeColors( const QColor& color1,
+			  const QColor& color2,
+			  int distance )
+{
+  long tol = 
+    qAbs( color2.red()   - color1.red()   ) + 
+    qAbs( color2.green() - color1.green() ) +
+    qAbs( color2.blue()  - color1.blue()  ) -
+    ( distance < 0 ? COLOR_DISTANCE : distance );
+
+  return tol <= 0;
 }

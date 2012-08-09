@@ -2,91 +2,237 @@
 
 \page plot2d_viewer_page Plot 2D viewer
 
-\n <b>Plot 2d viewer</b> toolbar gives fast access to the following
-operations:
+The functionalities of Plot2d viewer are available via its Viewer
+Toolbar. Buttons marked with small downward triangles have extended
+functionality which can be accessed by locking on them with left mouse
+button.
 
-\image html image77.png
-<center><b>Dump View</b> - exports an object from the viewer in bmp,
-png, jpg or jpeg image format.</center>
+\image html plot2dviewer_toolbar.png
+<hr>
 
-\image html image96.png
-<center><b>Fit all</b> - scales the display to show the entire
-scene. Use this to resize the scene so that it could fit within the
-Viewer boundary.</center>
+\image html plot2d_camera_dump.png
 
-\image html image97.png
-<center><b>Fit area</b> - resizes the view to place in the visible
-area only the contents of a frame drawn with pressed left mouse
-button.</center>
+<b>Dump View</b> - exports an object from the viewer in
+bmp, png or jpeg image format.
+<hr>
 
-\image html image98.png
-<center><b>Zoom</b> - allows to zoom in and out.</center>
+\image html plot2d_fitall.png
+<b>Fit all</b> - scales the display to show the entire scene. Use this
+to resize the scene so that it could fit within the Viewer boundary.
+<hr>
 
-\image html image99.png
-<center>\b Panning - if the represented objects are greater that the
-visible area and you don't wish to use Fit all functionality, click on
-this button and you'll be able to drag the scene to see its remote
-parts.</center>
+\image html plot2d_fitarea.png
 
-\image html image100.png
-<center><b>Global panning</b> - allows to define the center of the
-scene presenting all displayed objects in the visible area.</center>
+<b>Fit area</b> - resizes the view to place in the visible area only
+the contents of a frame drawn with pressed left mouse button.
+<hr>
+
+\image html plot2d_zoom.png
+
+<b>Zoom</b> - allows to zoom in and out.
+<hr>
+
+\image html plot2d_pan.png
+
+\b Panning - if the represented objects are greater that the visible
+area and you don't wish to use Fit all functionality, click on this
+button and you'll be able to drag the scene to see its remote parts.
+<hr>
+
+\image html plot2d_glpan.png
+
+<b>Global panning</b> - allows to define the center of the scene
+presenting all displayed objects in the visible area.
+<hr>
 
 \image html plot2d_points.png
-<center><b>Draw Points</b> - represents points on the graph.</center>
+
+<b>Draw Points</b> - switches display mode to \em Points. In
+this mode, each curve is displayed as a set of points.
+<hr>
 
 \image html plot2d_lines.png
-<center><b>Draw Lines</b> - represents lines on the graph.</center>
+
+<b>Draw Lines</b> - switches display mode to \em Lines. In this
+mode, each curve is represented as a set of plain line segments.
+<hr>
 
 \image html plot2d_splines.png
-<center><b>Draw Splines</b> - represents splines on the graph.</center>
 
-\image html plot2d_logarithmic_horizontal.png
-<center><b>Horizontal axis logarithmic</b> - changes the scaling on
-horizontal axis to logarithmic.</center>
+<b>Draw Splines</b> - switches display mode to \em Splines. In
+this mode, each curve is represented as a spline.
+<hr>
 
-\image html plot2d_logarithmic_vertical.png
-<center><b>Vertical axis logarithmic</b> - changes the scaling on vertical
-axis to logarithmic.</center>
+\image html plot2d_lmin_normalization.png
+
+<b>Normalization to global minimum by left Y axis</b> - switches
+normalization mode to <b>Left Y Axis: Minimum normalization</b>.
+In this mode, all curves are normalized to the global minimum by the left Y axis.
+
+\image html plot2d_lmax_normalization.png
+
+<b>Normalization to global maximum by left Y axis</b> - switches
+normalization mode to <b>Left Y Axis: Maximum normalization</b>. 
+In this mode, all curves are normalized to the global maximum by the left Y axis.
+<hr>
+
+\image html plot2d_rmin_normalization.png
+
+<b>Normalization to global minimum by right Y axis</b> - switches
+normalization mode to <b>Right Y Axis: Minimum normalization</b>.
+In this mode, all curves are normalized to the global minimum by
+the right Y axis.
+
+\image html plot2d_rmax_normalization.png
+
+<b>Normalization to global maximum by right Y axis</b> - switch
+normalization mode to <b>Right Y Axis: Maximum normalization</b>.
+In this mode, all curves are normalized to the global maximum by
+the right Y axis.
+<hr>
+
+\image html plot2d_linear.png
+\image html plot2d_log.png
+
+These buttons allow to switch horizontal axis scale to the linear or
+logarithmic mode.
+
+\note The logarithmic mode of the horizontal
+axis scale is allowed only if the minimum value of abscissa component
+of displayed points is greater than zero.
+
+<hr>
+
+\image html plot2d_linear_y.png
+\image html plot2d_log_y.png
+
+These buttons allow to switch vertical axis scale to the linear or
+logarithmic mode.
+
+\note The logarithmic mode of the vertical
+axis scale is allowed only if the minimum value of ordinate component
+of displayed points is greater than zero.
+
+<hr>
 
 \image html plot2d_legend.png
-<center><b>Show Legend</b> - reveals all verbal and numerical
-information on the graphs.</center>
+
+<b>Show Legend</b> - Shows / hides information about the displayed
+objects in a legend.
+<hr>
 
 \image html plot2d_settings.png
-<center>\b Settings - calls a menu, in which you can specify advanced
-settings for your Plot 2d Viewer.</center>
 
-\image html plot2d_clone.png
-<center><b>Clone view</b> - opens a new duplicate scene.</center>
+\b Settings - provides an access to the settings dialog box, that
+allows to specify advanced parameters for the Plot 2d Viewer.
 
 \anchor settings
-\n \image html plot2d_view_settings.png
+\image html plot2d_view_settings.png
 
 The options are as follows:
-<ul>
-<li><b>Main title:</b> the title of the XY plot. By default, it will
-consist of the names of the tables, on the basis of which the curve
-lines have been constructed.</li>
-<li><b>Curve type:</b> you can select from \b Points, \b Lines and \b Spline.</li>
-<li><b>Show legend:</b> here you can define the position of the
-description table on the XY plot (to the \b Left, to the \b Right, on
-\b Top or on \b Bottom).</li>
-<li><b>Marker size</b> - size of the points (markers) forming curve lines.</li>
-<li><b>Background color</b> of the XY plot.</li>
-<li><b>Scale mode:</b> here you can select the type of scaling (\b
-Linear or \b Logarithmic) along <b>X (Horizontal)</b> or <b>Y (Vertical)</b> axes.</li>
-</ul>
 
-You can define settings for each axis separately:
-<ul>
-<li>\b Horizontal or \b Vertical axis title.</li>
-<li><b>Grid/Axes marks:</b>  here you can define the maximum number of major
-and minor scale divisions for a specified axis. The real number of
-intervals fits to {1,2,5}*10^N, where N is a natural number, and
-doesn't exceed the maximum.</li>
-<li><b>Save settings as default:</b> If this check box is marked, all
-XY plots will be displayed with these defined properties.</li>
-</ul>
+- <b>Main title</b> the title of the XY plot. By default, it will
+  consist of the names of the tables, on the basis of which the curve
+  lines have been constructed.
+
+- <b>Curve type</b> you can select from \em Points, \em Lines or
+  \em Spline.
+
+- <b>Show legend</b> here you can define the position of the
+  description table on the XY plot (to the \em Left, to the \em Right,
+  on \em Top or on \em Bottom).
+
+- <b>Legend font</b> here you can set type, face and color for the
+  font of Legend item.
+
+- <b>Marker size</b> - size of the points (markers) forming curve lines.
+
+- <b>Background color</b> of the XY plot.
+
+- <b>Deviation marker</b> allows specifying the properties of the
+  marker, which is used for drawing deviations data.
+
+  - <b>Line width</b> line width of the marker.
+
+  - <b>Tick size</b> size of the upper and lower horizontal lines of
+    the marker.
+
+  - <b>Color</b> color of the marker.
+
+- <b>Normalization</b> allows selecting the type of
+  normalization (\em minimum or/and \em maximum) for the displayed
+  presentations of 2d curves in the view.
+
+- <b>Scale mode</b> allows selecting the type of scaling (\em Linear
+  or \em Logarithmic) for <b>X (Horizontal)</b> or <b>Y (Vertical)</b>
+  axes separately. Note that the \em Logarithmic scale can be used
+  only if the minimum value of corresponding component (abscissa or
+  ordinate) of all points displayed in the viewer is greater than
+  zero.
+
+- <b>Axis ...</b> options group allows specifying additional settings
+  for each axis separately:
+
+  - <b>Axis title</b> - an axis title.
+
+  - <b>Grid / Axes marks</b> allows defining the maximum number
+    of major and minor scale divisions for a given axis. The real
+    number of intervals fits to {1,2,5}*10^N, where N is a natural
+    number, and does not exceed the maximum.
+
+- <b>Save settings as default</b> If this check box is marked, all XY
+  plots will be displayed with these defined properties. 
+
+<hr>
+
+\anchor analytical_curve
+\image html plot2d_analytical_curve.png
+
+<b>Analytical curves</b> - provides an access to the analytical curves
+dialog box that allows to add, remove and modify analytical curves
+for the Plot 2d Viewer.
+
+\image html analytical_curves_dlg.png
+
+The options are as follows:
+
+- Curve parameters:
+
+  - <b>y(x)=</b> allows specifying a python expression, which is used to
+    calculate the coordinates of the curve points, where <b>x</b>
+    corresponds to the horizontal range, shown in plot 2D viewer.
+
+  - <b>Nb. itervals</b> allows specifying the number of the curve points.
+
+- Curve properties:
+
+  - <b>Auto assign</b> if checked, the properties 
+    (<em>Line type</em>, <em>Line width</em>, <em>Marker type</em> and
+    <em>Color</em>) are assigned to curves automatically. To define
+    the curve properties manually, uncheck this control.
+
+  - <b>Line type</b> allows to choose curve line type from \em None,
+    \em Solid, \em Dash, \em Dot, <em>Dash - Dot</em> and
+    <em>Dash - Dot - Dot</em>.
+
+  - <b>Line width</b> allows to specify line width of the curve.
+
+  - <b>Marker type</b> allows to choose curve marker type from
+    \em Circle, \em Rectangle, \em Diamond, <em>Rightward Triangle</em>,
+    <em>Leftward Triangle</em>, <em>Downward Triangle</em>,
+    <em>Upward Triangle</em>, \em Cross and <em>Diagonal Cross</em>).
+
+  - <b>Color</b> allows specifying the curve color.
+
+<hr>
+
+\image html plot2d_clone.png
+
+<b>Clone view</b> - opens a new duplicate scene.
+<hr>
+
+\image html plot2d_print.png
+
+<b>Print view</b> - prints the current view scene.
 
 */

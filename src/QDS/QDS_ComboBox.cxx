@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "QDS_ComboBox.h"
 
 #include <QtxComboBox.h>
@@ -302,7 +303,7 @@ void QDS_ComboBox::setValues( const QList<int>& ids, const QStringList& names )
   myUserIds = ids;
   myUserNames = names;
 
-  unitSystemChanged( "" );
+  //unitSystemChanged( "" );
 }
 
 /*!
@@ -335,7 +336,6 @@ void QDS_ComboBox::setValues( const QStringList& names )
 */
 void QDS_ComboBox::reset()
 {
-  int id = -1;
   QString aDefValue = defaultValue();
   if ( !aDefValue.isEmpty() )
     setString( aDefValue );
@@ -410,11 +410,11 @@ void QDS_ComboBox::setString( const QString& txt )
   else if ( txt.isEmpty() )
   {
     if ( !cb->isEditable() )
-      cb->setItemText( cb->currentIndex(), txt );
+      cb->setCleared( true );
     else
       cb->lineEdit()->setText( txt );
   }
-  if ( isClear != txt.isEmpty() || ( !isClear && old != cb->currentIndex() ) )
+  if ( isClear != txt.isEmpty() || ( !isClear && old != cb->currentIndex() ) || isClear != cb->isCleared() )
   {
     onParamChanged();
     QString str = getString();
@@ -553,7 +553,11 @@ void QDS_ComboBox::onTextChanged( const QString& /*txt*/ )
 void QDS_ComboBox::onActivated( int idx )
 {
   if ( comboBox() )
-    comboBox()->setCurrentIndex( comboBox()->currentIndex() );
+  {
+    int ind = comboBox()->currentIndex();
+    comboBox()->setCurrentIndex( -1 );
+    comboBox()->setCurrentIndex( ind );
+  }
 
   int id = getId( idx );
   if ( id != -1 )

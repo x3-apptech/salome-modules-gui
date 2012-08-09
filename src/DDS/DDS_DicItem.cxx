@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "DDS_DicItem.h"
 #include "DDS_Dictionary.h"
 
@@ -199,7 +200,7 @@ Standard_Real DDS_DicItem::GetMinValue() const
 /*!
   \brief Get the minimum value of the parameter for the specified 
          units system \a theSystem.
-	 
+         
   Returned value is converted to SI.
 
   \param theUnitsSystem units system
@@ -774,9 +775,9 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
             {
               //  Read the text in the element "value"
               //LDOM_Text aListItemTxt = (const LDOM_Text&)aListItemValue.getFirstChild();
-	      LDOM_Node aNode = aListItemValue.getFirstChild();
-	      const LDOM_Text& aText = (const LDOM_Text&) aNode;
-	      LDOM_Text aListItemTxt(aText);
+              LDOM_Node aNode = aListItemValue.getFirstChild();
+              const LDOM_Text& aText = (const LDOM_Text&) aNode;
+              LDOM_Text aListItemTxt(aText);
               if ( !aListItemTxt.isNull() )
               {
                 // adding ID and text value to sequence
@@ -855,12 +856,12 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
         LDOMString v = attr.getValue();
         if( v.Type()==LDOMBasicString::LDOM_Integer )
         {
-	        Standard_Integer ival;
-	        v.GetInteger( ival );
-	        value = TCollection_ExtendedString( ival );
+                Standard_Integer ival;
+                v.GetInteger( ival );
+                value = TCollection_ExtendedString( ival );
         }
         else
-	        value = ( Standard_CString )v.GetString();
+                value = ( Standard_CString )v.GetString();
       }
       else
         continue;
@@ -894,7 +895,7 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
       else if ( anUnitData.myUnits.ToCString()[0] ) // treat '%' as unit with scale 100
         anUnitData.myScale = 0.01;
     }
-	  catch( Standard_Failure ) {
+          catch( Standard_Failure ) {
       anUnitData.myUnits.Clear();
     }
 

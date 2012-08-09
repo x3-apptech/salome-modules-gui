@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -79,12 +58,27 @@ Do you want to overwrite it ?</translation>
 Permission denied.</translation>
     </message>
     <message>
+        <source>ERR_OPEN_PERMISSION_DENIED</source>
+        <translation>Can&apos;t open file &quot;%1&quot;.
+Permission denied.</translation>
+    </message>
+    <message>
+        <source>ERR_DIR_READ_PERMISSION_DENIED</source>
+        <translation>Can&apos;t read directory &quot;%1&quot;.
+Permission denied.</translation>
+    </message>
+    <message>
+        <source>ERR_DIR_WRITE_PERMISSION_DENIED</source>
+        <translation>Can&apos;t write directory &quot;%1&quot;.
+Permission denied.</translation>
+    </message>
+    <message>
         <source>ERR_ERROR</source>
         <translation>Error</translation>
     </message>
     <message>
         <source>QUE_FILE_EXISTS</source>
-        <translation>The file &quot;%1&quot; already exists.
+        <translation>The file %1 already exists.
 Do you want to overwrite it?</translation>
     </message>
     <message>

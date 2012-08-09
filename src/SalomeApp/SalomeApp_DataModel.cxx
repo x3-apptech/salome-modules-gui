@@ -1,28 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      SalomeApp_DataModel.cxx
 // Created:   10/25/2004 10:36:06 AM
 // Author:    Sergey LITONIN
-//
+
 #include "SalomeApp_DataModel.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_DataObject.h"
@@ -81,6 +82,10 @@ SalomeApp_DataModelSync::SalomeApp_DataModelSync( _PTR( Study ) aStudy, SUIT_Dat
 */
 bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
 {
+#ifdef WITH_SALOMEDS_OBSERVER
+  // with GUI observers this function is not needed anymore
+  return true;
+#endif
   kerPtr refObj;
   QString name = so->GetName().c_str();
   _PTR( GenericAttribute ) anAttr;
@@ -102,8 +107,8 @@ bool SalomeApp_DataModelSync::isCorrect( const kerPtr& so ) const
   \param prepend - SUIT object must be added to start of children list
 */
 suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
-					     const suitPtr& parent,
-					     const suitPtr& after ) const
+                                             const suitPtr& parent,
+                                             const suitPtr& after ) const
 {
   if( !isCorrect( so ) )
     return 0;
@@ -111,6 +116,7 @@ suitPtr SalomeApp_DataModelSync::createItem( const kerPtr& so,
   _PTR(SComponent) aSComp( so );
   suitPtr nitem = aSComp ? new SalomeApp_ModuleObject( aSComp, 0 ) :
                            new SalomeApp_DataObject( so, 0 );
+
   if( parent ) {
     int pos = after ? parent->childPos( after ) : 0;
     parent->insertChild( nitem, pos+1 );
@@ -150,7 +156,7 @@ bool SalomeApp_DataModelSync::isEqual( const kerPtr& p, const suitPtr& q ) const
   _PTR( SComponent ) aComp( p );
   bool res = ( !p && !q ) ||
              ( lobj && !sobj && aComp ) ||
-	     ( sobj && isCorrect( p ) && p->GetID().c_str()==sobj->entry() );
+             ( sobj && isCorrect( p ) && p->GetID().c_str()==sobj->entry() );
   return res;
 }
 
@@ -179,9 +185,28 @@ QList<kerPtr> SalomeApp_DataModelSync::children( const kerPtr& obj ) const
 {
   QList<kerPtr> ch;
 
-  _PTR(ChildIterator) it ( myStudy->NewChildIterator( obj ) );
-  for( ; it->More(); it->Next() )
-    ch.append( it->Value() );
+  _PTR( GenericAttribute ) anAttr;
+  bool expandable = true;
+  if ( obj && obj->FindAttribute( anAttr, "AttributeExpandable" ) ) {
+    _PTR(AttributeExpandable) aAttrExp = anAttr;
+    expandable = aAttrExp->IsExpandable();
+  }
+
+  if ( expandable ) {
+    // tmp??
+    _PTR(UseCaseBuilder) aUseCaseBuilder = myStudy->GetUseCaseBuilder();
+    if (aUseCaseBuilder->HasChildren(obj)) {
+      _PTR(UseCaseIterator) it ( aUseCaseBuilder->GetUseCaseIterator( obj ) );
+      for ( ; it->More(); it->Next() )
+        ch.append( it->Value() );
+    }
+    else {
+      _PTR(ChildIterator) it ( myStudy->NewChildIterator( obj ) );
+      for ( ; it->More(); it->Next() )
+        ch.append( it->Value() );
+    }
+  }
+
   return ch;
 }
 
@@ -296,8 +321,8 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       studyRoot = dynamic_cast<LightApp_RootObject*>( aSStudy->root() );
       QString anId = getRootEntry( aSStudy );
       if ( !anId.isEmpty() ){ // if nothing is published in the study for this module -> do nothing
-	_PTR(Study) aStudy ( aSStudy->studyDS() );
-	sobj = aStudy->FindComponentID( std::string( anId.toLatin1() ) );
+        _PTR(Study) aStudy ( aSStudy->studyDS() );
+        sobj = aStudy->FindComponentID( std::string( anId.toLatin1() ) );
       }
     }
   }
@@ -337,12 +362,20 @@ SUIT_DataObject* SalomeApp_DataModel::synchronize( const _PTR( SComponent )& sob
     }
   }
 
+#ifdef WITH_SALOMEDS_OBSERVER
+  SalomeApp_RootObject* root=dynamic_cast<SalomeApp_RootObject*>(study->root());
+  if(!(root->toSynchronize()))
+    return suitObj;
+#endif
+
   SalomeApp_DataModelSync sync( study->studyDS(), study->root() );
 
   if( !suitObj || dynamic_cast<SalomeApp_DataObject*>( suitObj ) )
-    return ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
+    suitObj= ::synchronize<kerPtr,suitPtr,SalomeApp_DataModelSync>( sobj, suitObj, sync );
   else
-    return 0;
+    suitObj= 0;
+
+  return suitObj;
 }
 
 /*!

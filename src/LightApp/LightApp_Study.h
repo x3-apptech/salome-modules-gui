@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef LIGHTAPP_STUDY_H
 #define LIGHTAPP_STUDY_H
 
@@ -29,10 +30,33 @@
 
 #include "string"
 #include "vector"
+#include <Qtx.h>
+
+#include <QMap>
+#include <QVariant>
 
 class SUIT_Study;
 class SUIT_Application;
 class CAM_DataModel;
+class CAM_ModuleObject;
+class LightApp_DataObject;
+class LightApp_DataModel;
+
+//Map to store visual property of the object.
+//Key:   Name of the visual property of the object.
+//Value: value of the visual property.
+typedef QMap<QString, QVariant> PropMap;
+
+//Map to store objects with it's visual properties.
+//Key:   Entry of the object.
+//Value: Map of the visual properties of the object.
+typedef QMap<QString, PropMap> ObjMap;
+
+//Map to store view managers and all objects which displayed in views of the view managers.
+//Key:   Id of the viewer.
+//Value: Map of the objects with it's visual properties.
+typedef QMap<int, ObjMap> ViewMgrMap;
+
 
 /*!
   Custom study, using for open/close of documents HDF format.
@@ -68,6 +92,24 @@ public:
   virtual bool        isComponent( const QString& ) const;
   virtual void        children( const QString&, QStringList& ) const;
   virtual void        components( QStringList& ) const;
+  virtual QString     centry( const QString& ) const;
+
+  virtual QString     getVisualComponentName() const;
+
+  virtual void              setObjectProperty  ( int theViewMgrId, QString theEntry, QString thePropName, QVariant theValue );
+  virtual QVariant          getObjectProperty  ( int theViewMgrId, QString theEntry, QString thePropName, QVariant theDefValue ) const;
+  virtual void              removeViewMgr      ( int theViewMgrId );
+  virtual void              setObjectPropMap   ( int theViewMgrId, QString theEntry, PropMap thePropMap );
+  virtual const PropMap&    getObjectPropMap   ( int theViewMgrId, QString theEntry ) ;
+  virtual void              removeObjectFromAll( QString theEntry );
+  virtual const ObjMap&     getObjectMap       ( int theViewMgrId );
+  virtual const ViewMgrMap& getViewMgrMap      ( int theViewMgrId ) { return myViewMgrMap; };
+
+  virtual void                  setVisibilityState(const QString& theEntry, Qtx::VisibilityState theState);
+  virtual Qtx::VisibilityState  visibilityState(const QString& theEntry) const;
+  virtual void                  setVisibilityStateForAll(Qtx::VisibilityState theState);
+
+  virtual LightApp_DataObject* findObjectByEntry( const QString& theEntry );
 
 protected:
   virtual void        saveModuleData ( QString theModuleName, QStringList theListOfFiles );
@@ -83,6 +125,8 @@ protected:
 
 protected:
   virtual bool        openDataModel  ( const QString&, CAM_DataModel* );
+  virtual CAM_ModuleObject* createModuleObject( LightApp_DataModel* theDataModel, 
+						SUIT_DataObject* theParent ) const;
 
 signals:
   void                saved  ( SUIT_Study* );
@@ -93,8 +137,10 @@ signals:
 
 private:
   LightApp_Driver*    myDriver;
+  ViewMgrMap          myViewMgrMap;
 
   friend class LightApp_Application;
+  friend class LightApp_DataModel;
 };
 
 #endif 

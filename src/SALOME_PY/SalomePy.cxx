@@ -1,28 +1,37 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOME_PY : binding of VTK graphics and Python
 //  File   : SalomePy.cxx
 //  Author : Paul RASCLE, EDF
 //
+#ifdef WNT
+// E.A. : On windows with python 2.6, there is a conflict
+// E.A. : between pymath.h and Standard_math.h which define
+// E.A. : some same symbols : acosh, asinh, ...
+#include <Standard_math.hxx>
+#include <pymath.h>
+#endif
+
 #include <Python.h>
 #include <vtkPythonUtil.h>
 
@@ -34,11 +43,13 @@
 #include <SALOME_Event.h>
 
 #include <SUIT_Session.h>
-#include <SalomeApp_Application.h>
-#include <SalomeApp_Study.h>
+#include <LightApp_Application.h>
+#include <LightApp_Study.h>
 
 #include <SVTK_ViewManager.h>
 #include <SVTK_ViewWindow.h>
+
+#define VTK_XVERSION (VTK_MAJOR_VERSION*10000+VTK_MINOR_VERSION*100+VTK_BUILD_VERSION)
 
 /*!
   \brief Python wrappings for VTK viewer of the SALOME desktop.
@@ -96,10 +107,13 @@ static PyObject* GetPyClass( const char* theClassName )
   static PyObject* aVTKModule = 0;
   PyObject* aPyClass = 0;
   if( !aVTKModule ) {
-    if ( VTK_MAJOR_VERSION > 3 )
-      aVTKModule = PyImport_ImportModule( "libvtkRenderingPython" ); 
-    else
-      aVTKModule = PyImport_ImportModule( "libVTKGraphicsPython" ); 
+#if VTK_XVERSION < 30000
+    aVTKModule = PyImport_ImportModule( "libVTKGraphicsPython" ); 
+#elif VTK_XVERSION < 50700
+    aVTKModule = PyImport_ImportModule( "vtk.libvtkRenderingPython" ); 
+#else
+    aVTKModule = PyImport_ImportModule( "vtkRenderingPython" ); 
+#endif
     if( PyErr_Occurred() ) {
       PyErr_Print();
     }
@@ -130,34 +144,34 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
   SVTK_ViewWindow* aVW = 0;
   if ( SUIT_Session::session() ) {
     // get application
-    SalomeApp_Application* anApp = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
+    LightApp_Application* anApp = dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
     if ( anApp ) {
       // get active study
-      SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>( anApp->activeStudy() );
+      LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( anApp->activeStudy() );
       if ( aStudy ) {
-	// find or create VTK view manager
-	if ( toCreate == __Create ) {
-	  SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->createViewManager( "VTKViewer" ) );
-	  if ( aVM ) {
-	    aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
-	    if ( !aVW )
-	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->createViewWindow() );
-	    // VSR : When new view window is created it can be not active yet at this moment,
-	    // so the following is a some workaround
-	    if ( !aVW && !aVM->getViews().isEmpty() )
-	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
-	  }
-	}
-	else {
-	  SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->getViewManager( "VTKViewer", toCreate == __FindOrCreate ) );
-	  if ( aVM ) {
-	    aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
-	    // VSR : When new view window is created it can be not active yet at this moment,
-	    // so the following is a some workaround
-	    if ( !aVW && !aVM->getViews().isEmpty() )
-	      aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
-	  }
-	}
+        // find or create VTK view manager
+        if ( toCreate == __Create ) {
+          SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->createViewManager( "VTKViewer" ) );
+          if ( aVM ) {
+            aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
+            if ( !aVW )
+              aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->createViewWindow() );
+            // VSR : When new view window is created it can be not active yet at this moment,
+            // so the following is a some workaround
+            if ( !aVW && !aVM->getViews().isEmpty() )
+              aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
+          }
+        }
+        else {
+          SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->getViewManager( "VTKViewer", toCreate == __FindOrCreate ) );
+          if ( aVM ) {
+            aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
+            // VSR : When new view window is created it can be not active yet at this moment,
+            // so the following is a some workaround
+            if ( !aVW && !aVM->getViews().isEmpty() )
+              aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getViews()[0] );
+          }
+        }
       }
     }
   }
@@ -197,7 +211,11 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderer* aVTKObject = aVTKViewWindow->getRenderer();
+#if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
+#else
+      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+#endif
     }
   }
 };
@@ -246,7 +264,11 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindow* aVTKObject = aVTKViewWindow->getRenderWindow();
+#if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
+#else
+      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+#endif
     }
   }
 };
@@ -295,7 +317,11 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindowInteractor* aVTKObject = aVTKViewWindow->getInteractor();
+#if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
+#else
+      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+#endif
     }
   }
 };
@@ -332,8 +358,8 @@ extern "C" PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
     virtual void Execute()
     {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
-	if ( aVTKViewWindow->isTrihedronDisplayed() != myShow )
-	  aVTKViewWindow->onViewTrihedron();
+        if ( aVTKViewWindow->isTrihedronDisplayed() != myShow )
+          aVTKViewWindow->onViewTrihedron();
       }
     }
   };
@@ -365,7 +391,7 @@ extern "C" PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
     virtual void Execute()
     {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
-	aVTKViewWindow->onFitAll();
+        aVTKViewWindow->onFitAll();
       }
     }
   };
@@ -394,23 +420,23 @@ extern "C" PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
     virtual void Execute()
     {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
-	switch( myType ) {
-	case ViewFront:
-	  aVTKViewWindow->onFrontView();  break;
-	case ViewBack:
-	  aVTKViewWindow->onBackView();   break;
-	case ViewTop:
-	  aVTKViewWindow->onTopView();    break;
-	case ViewBottom:
-	  aVTKViewWindow->onBottomView(); break;
-	case ViewRight:
-	  aVTKViewWindow->onRightView();  break;
-	case ViewLeft:
-	  aVTKViewWindow->onLeftView();   break;
-	default:
-	  PyErr_Format(PyExc_ValueError,"setView%: wrong parameter value; must be between %d and %d", ViewFront, ViewLeft );
-	  break;
-	}
+        switch( myType ) {
+        case ViewFront:
+          aVTKViewWindow->onFrontView();  break;
+        case ViewBack:
+          aVTKViewWindow->onBackView();   break;
+        case ViewTop:
+          aVTKViewWindow->onTopView();    break;
+        case ViewBottom:
+          aVTKViewWindow->onBottomView(); break;
+        case ViewRight:
+          aVTKViewWindow->onRightView();  break;
+        case ViewLeft:
+          aVTKViewWindow->onLeftView();   break;
+        default:
+          PyErr_Format(PyExc_ValueError,"setView%: wrong parameter value; must be between %d and %d", ViewFront, ViewLeft );
+          break;
+        }
       }
     }
   };
@@ -444,7 +470,7 @@ extern "C" PyObject* libSalomePy_resetView( PyObject* self, PyObject* args )
     virtual void Execute()
     {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
-	aVTKViewWindow->onResetView();
+        aVTKViewWindow->onResetView();
       }
     }
   };
@@ -471,7 +497,7 @@ static PyMethodDef Module_Methods[] =
 */
 extern "C" void initlibSalomePy()
 {
-  static char* modulename = "libSalomePy";
+  static char* modulename = (char*)"libSalomePy";
 
   // init module
   PyObject* aModule = Py_InitModule( modulename, Module_Methods );

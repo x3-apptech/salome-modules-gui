@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File   : SalomeApp_DataObject.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #include "SalomeApp_DataObject.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Application.h"
@@ -60,7 +60,7 @@ SalomeApp_DataObject::SalomeApp_DataObject( SUIT_DataObject* parent )
   \param parent parent data object
 */
 SalomeApp_DataObject::SalomeApp_DataObject( const _PTR(SObject)& sobj, 
-					    SUIT_DataObject* parent )
+                                            SUIT_DataObject* parent )
 : CAM_DataObject( parent ),
   LightApp_DataObject( parent )
 {
@@ -125,7 +125,7 @@ QString SalomeApp_DataObject::text( const int id ) const
 {
   QString txt;
 
-  // add "Value", "IOR", and "Reference Entry" columns
+  // Text for "Value" and "IOR" columns
   switch ( id )
   {
   case ValueId:
@@ -136,16 +136,14 @@ QString SalomeApp_DataObject::text( const int id ) const
 #endif
       txt = value( object() );
       if ( txt.isEmpty() )
-	txt = value( referencedObject() );
+        txt = value( referencedObject() );
     break;
   case IORId:
     txt = ior( referencedObject() );
     break;
-  case RefEntryId :
-    if ( isReference() )
-      txt = entry( referencedObject() );
-    break;
   default:
+    // Issue 21379: LightApp_DataObject::text() treats "Entry"
+    // and "Reference Entry" columns
     txt = LightApp_DataObject::text( id );
     break;
   }
@@ -165,20 +163,20 @@ QPixmap SalomeApp_DataObject::icon( const int id ) const
     if ( myObject && myObject->FindAttribute( anAttr, "AttributePixMap" ) ){
       _PTR(AttributePixMap) aPixAttr ( anAttr );
       if ( aPixAttr->HasPixMap() ) {
-	QString componentType = componentDataType();
-	QString pixmapID      = aPixAttr->GetPixMap().c_str();
-	// select a plugin within a component
-	QStringList plugin_pixmap = pixmapID.split( "::", QString::KeepEmptyParts );
-	if ( plugin_pixmap.size() == 2 ) {
-	  componentType = plugin_pixmap.front();
-	  pixmapID      = plugin_pixmap.back();
-	}
-	QString pixmapName = QObject::tr( pixmapID.toLatin1().constData() );
-	LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
-	if ( aRoot && aRoot->study() ) {
-	  SUIT_ResourceMgr* mgr = aRoot->study()->application()->resourceMgr();
-	  return mgr->loadPixmap( componentType, pixmapName, false ); 
-	}
+        QString componentType = componentDataType();
+        QString pixmapID      = aPixAttr->GetPixMap().c_str();
+        // select a plugin within a component
+        QStringList plugin_pixmap = pixmapID.split( "::", QString::KeepEmptyParts );
+        if ( plugin_pixmap.size() == 2 ) {
+          componentType = plugin_pixmap.front();
+          pixmapID      = plugin_pixmap.back();
+        }
+        QString pixmapName = QObject::tr( pixmapID.toLatin1().constData() );
+        LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
+        if ( aRoot && aRoot->study() ) {
+          SUIT_ResourceMgr* mgr = aRoot->study()->application()->resourceMgr();
+          return mgr->loadPixmap( componentType, pixmapName, false ); 
+        }
       }
     }
   }
@@ -202,47 +200,44 @@ QColor SalomeApp_DataObject::color( const ColorRole role, const int id ) const
   case Foreground:
     // text color (not selected item)
     if ( isReference() ) {
-      if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
-	c = QColor( 255, 0, 0 );      // valid reference (red)
-      else
-	c = QColor( 200, 200, 200 );  // invalid reference (grayed)
+      if ( QString(referencedObject()->GetName().c_str()).isEmpty() )
+        c = QColor( 200, 200, 200 );  // invalid reference (grayed)
     }
     else if ( myObject ) {
       // get color atrtribute value
       _PTR(GenericAttribute) anAttr;
       if ( myObject->FindAttribute( anAttr, "AttributeTextColor" ) ) {
-	_PTR(AttributeTextColor) aColAttr = anAttr;
-	c = QColor( (int)aColAttr->TextColor().R, (int)aColAttr->TextColor().G, (int)aColAttr->TextColor().B );
+        _PTR(AttributeTextColor) aColAttr = anAttr;
+        c = QColor( (int)aColAttr->TextColor().R, (int)aColAttr->TextColor().G, (int)aColAttr->TextColor().B );
       }
     }
     break;
+
   case Highlight:
     // background color for the highlighted item
     if ( isReference() ) {
-      if ( !(QString(referencedObject()->GetName().c_str()).isEmpty()) )
-	c = QColor( 255, 0, 0 );      // valid reference (red)
-      else
-	c = QColor( 200, 200, 200 );  // invalid reference (grayed)
+      if ( QString(referencedObject()->GetName().c_str()).isEmpty() )
+        c = QColor( 200, 200, 200 );  // invalid reference (grayed)
     }
     else if ( myObject ) {
       // get color atrtribute value
       _PTR(GenericAttribute) anAttr;
       if( myObject->FindAttribute ( anAttr, "AttributeTextHighlightColor") ) {
         _PTR(AttributeTextHighlightColor) aHighColAttr = anAttr;
-	c = QColor( (int)(aHighColAttr->TextHighlightColor().R), 
-		    (int)(aHighColAttr->TextHighlightColor().G), 
-		    (int)(aHighColAttr->TextHighlightColor().B));
+        c = QColor( (int)(aHighColAttr->TextHighlightColor().R), 
+                    (int)(aHighColAttr->TextHighlightColor().G), 
+                    (int)(aHighColAttr->TextHighlightColor().B));
       }
     }
     break;
-  case HighlightedText:
-    // text color for the highlighted item
-    if ( isReference() )
-      c = QColor( 255, 255, 255 );   // white
+  default:
     break;
   }
+
+  // Issue 21379: LightApp_DataObject::color() defines colors for valid references
   if ( !c.isValid() )
     c = LightApp_DataObject::color( role, id );
+
   return c;
 }
 
@@ -269,18 +264,35 @@ QString SalomeApp_DataObject::toolTip( const int /*id*/ ) const
       //     with any container name, on every machine available
       Engines::MachineParameters params;
       app->lcc()->preSet(params); // --- any container name, anywhere
-      Engines::Component_var aComponent =
+      Engines::EngineComponent_var aComponent =
         app->lcc()->FindComponent(params, componentDataType().toLatin1().constData() );
       
       if ( !CORBA::is_nil(aComponent) && aComponent->hasObjectInfo() ) {
-	LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
-	if ( aRoot && aRoot->study() )
-	  return QString( aComponent->getObjectInfo( aRoot->study()->id(), entry().toLatin1().constData()) );
+        LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
+        if ( aRoot && aRoot->study() )
+          return QString( (CORBA::String_var)aComponent->getObjectInfo( aRoot->study()->id(), entry().toLatin1().constData()) );
       }
     }
   }
   
   return QString( "Object \'%1\', module \'%2\', ID=%3" ).arg( name() ).arg( componentDataType() ).arg( entry() );
+}
+
+/*!
+  \brief Get font to be used for data object rendering in the item views
+  \param id column id
+  \return font to be used for the item rendering
+*/
+QFont SalomeApp_DataObject::font( const int id ) const
+{
+  QFont f = LightApp_DataObject::font( id );
+  if ( id == NameId ) {
+    if ( !expandable() && hasChildren() ) {
+      // set bold font to highlight the item which is non-expandable but has children
+      f.setBold( true );
+    }
+  }
+  return f;
 }
 
 /*!
@@ -313,7 +325,22 @@ _PTR(SObject) SalomeApp_DataObject::object() const
 }
 
 /*!
+  \brief Returns the string identifier of the data objects referenced by this one.
+
+  Re-implemented from LightApp_DataObject using SALOMEDS API.
+
+  \return ID string of the referenced SObject
+*/
+QString SalomeApp_DataObject::refEntry() const
+{
+  return entry( referencedObject() );
+}
+
+/*!
   \brief Check if the data object is a reference.
+
+  Re-implemented from LightApp_DataObject using SALOMEDS API.
+
   \return \c true if this data object actually refers to another one
 */
 bool SalomeApp_DataObject::isReference() const
@@ -339,6 +366,65 @@ _PTR(SObject) SalomeApp_DataObject::referencedObject() const
     obj = refObj;
 
   return obj;
+}
+
+/*!
+  \brief Check if object has children
+  \return \c true if object has at least one child sub-object and \c false otherwise
+*/
+bool SalomeApp_DataObject::hasChildren() const
+{
+  bool ok = false;
+
+  // tmp??
+  _PTR(UseCaseBuilder) aUseCaseBuilder = myObject->GetStudy()->GetUseCaseBuilder();
+  if (aUseCaseBuilder->IsUseCaseNode(myObject)) {
+    ok = aUseCaseBuilder->HasChildren(myObject);
+    // TODO: check name as below?
+  }
+  else {
+    _PTR(ChildIterator) it ( myObject->GetStudy()->NewChildIterator( myObject ) );
+    for ( ; it->More() && !ok; it->Next() ) {
+      _PTR(SObject) obj = it->Value();
+      if ( obj ) {
+        _PTR(SObject) refObj;
+        //if ( obj->ReferencedObject( refObj ) ) continue; // omit references
+        if ( obj->GetName() != "" ) ok = true;
+      }
+    }
+  }
+  return ok;
+}
+
+/*!
+  \brief Check if the object is expandable (e.g. in the data tree view)
+  \return \c true if object is expandable and \c false otherwise
+*/
+bool SalomeApp_DataObject::expandable() const
+{
+  bool exp = true;
+  _PTR(GenericAttribute) anAttr;
+  if ( myObject && myObject->FindAttribute( anAttr, "AttributeExpandable" ) ) {
+    _PTR(AttributeExpandable) aAttrExp = anAttr;
+    exp = aAttrExp->IsExpandable();
+  }
+  return exp;
+}
+
+/*!
+  \brief Check if the object is visible.
+  \return \c true if this object is displayable or \c false otherwise
+*/
+bool SalomeApp_DataObject::isVisible() const
+{
+  bool isDraw = true;
+  _PTR(GenericAttribute) anAttr;
+  if ( myObject && myObject->FindAttribute(anAttr, "AttributeDrawable") ) 
+  {
+    _PTR(AttributeDrawable) aAttrDraw = anAttr;
+    isDraw = aAttrDraw->IsDrawable(); 
+  }
+  return isDraw && LightApp_DataObject::isVisible() && ( !name().isEmpty() || isReference() );
 }
 
 /*!
@@ -389,8 +475,8 @@ QString SalomeApp_DataObject::ior( const _PTR(SObject)& obj ) const
       _PTR(AttributeIOR) iorAttr = attr;
       if ( iorAttr )
       {
-	std::string str = iorAttr->Value();
-	txt = QString( str.c_str() );
+        std::string str = iorAttr->Value();
+        txt = QString( str.c_str() );
       }
     }
   }
@@ -440,28 +526,28 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
       {
         _PTR(Study) studyDS( aStudy->studyDS() );
 
-	bool ok = false;
-	QStringList aSectionList = aStrings.split( "|" );
-	if ( !aSectionList.isEmpty() )
-	{
-	  QString aLastSection = aSectionList.last();
-	  QStringList aStringList = aLastSection.split( ":" );
-	  if ( !aStringList.isEmpty() )
-	  {
-	    ok = true;
-	    for ( int i = 0, n = aStringList.size(); i < n; i++ )
-	    {
-	      QString aStr = aStringList[i];
-	      if ( studyDS->IsVariable( aStr.toStdString() ) )
-		val.append( aStr + ", " );
-	    }
+        bool ok = false;
+        QStringList aSectionList = aStrings.split( "|" );
+        if ( !aSectionList.isEmpty() )
+        {
+          QString aLastSection = aSectionList.last();
+          QStringList aStringList = aLastSection.split( ":" );
+          if ( !aStringList.isEmpty() )
+          {
+            ok = true;
+            for ( int i = 0, n = aStringList.size(); i < n; i++ )
+            {
+              QString aStr = aStringList[i];
+              if ( studyDS->IsVariable( aStr.toStdString() ) )
+                val.append( aStr + ", " );
+            }
 
-	    if ( !val.isEmpty() )
-	      val.remove( val.length() - 2, 2 );
-	  }
-	}
-	if( !ok )
-	  val = aStrings;
+            if ( !val.isEmpty() )
+              val.remove( val.length() - 2, 2 );
+          }
+        }
+        if( !ok )
+          val = aStrings;
       }
     }
   }
@@ -505,6 +591,27 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   return val;
 }
 
+void SalomeApp_DataObject::insertChildAtTag( SalomeApp_DataObject* obj, int tag )
+{
+  int pos = 0;
+  int npos = qMin( tag-1,childCount() );
+  for ( int i = npos; i > 0; i-- )
+  {
+    if ( (dynamic_cast<SalomeApp_DataObject*>( childObject( i-1 ) ) )->object()->Tag() < tag )
+    {
+      pos = i;
+      break;
+    }
+  }
+  insertChildAtPos( obj, pos );
+}
+
+void SalomeApp_DataObject::updateItem()
+{
+  if ( modified() ) return;
+  setModified( true );
+}
+
 /*!
   \class SalomeApp_ModuleObject
   \brief This class is used for optimized access to the SALOMEDS-based 
@@ -530,7 +637,7 @@ SalomeApp_ModuleObject::SalomeApp_ModuleObject( SUIT_DataObject* parent )
   \param parent parent data object
 */
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( const _PTR(SObject)& sobj, 
-						SUIT_DataObject* parent )
+                                                SUIT_DataObject* parent )
 : CAM_DataObject( parent ),
   LightApp_DataObject( parent ),
   SalomeApp_DataObject( sobj, parent ),
@@ -545,8 +652,8 @@ SalomeApp_ModuleObject::SalomeApp_ModuleObject( const _PTR(SObject)& sobj,
   \param parent parent data object
 */
 SalomeApp_ModuleObject::SalomeApp_ModuleObject( CAM_DataModel* dm, 
-						const _PTR(SObject)& sobj, 
-						SUIT_DataObject* parent )
+                                                const _PTR(SObject)& sobj, 
+                                                SUIT_DataObject* parent )
 : CAM_DataObject( parent ),
   LightApp_DataObject( parent ),
   SalomeApp_DataObject( sobj, parent ),
@@ -574,10 +681,17 @@ QString SalomeApp_ModuleObject::name() const
   \brief Get data object icon for the specified column.
   \param id column id
   \return object icon for the specified column
+  \sa CAM_ModuleObject class
 */
 QPixmap SalomeApp_ModuleObject::icon( const int id ) const
 {
-  return SalomeApp_DataObject::icon( id );
+  QPixmap p = SalomeApp_DataObject::icon( id );
+  // The module might not provide a separate small icon
+  // for Obj. Browser representation -> always try to scale it
+  // See CAM_ModuleObject::icon()
+  if ( !p.isNull() )
+    p = Qtx::scaleIcon( p, 16 );
+  return p;
 }
 
 /*!
@@ -608,7 +722,8 @@ SalomeApp_RootObject::SalomeApp_RootObject( LightApp_Study* study )
 : CAM_DataObject( 0 ),
   LightApp_DataObject( 0 ),
   SalomeApp_DataObject( 0 ),
-  LightApp_RootObject( study )
+  LightApp_RootObject( study ),
+  _toSynchronize(true)
 {
 }
 
@@ -693,8 +808,8 @@ QString SalomeApp_RootObject::toolTip( const int id ) const
   \param study study
 */
 SalomeApp_SavePointObject::SalomeApp_SavePointObject( SUIT_DataObject* parent, 
-						      const int id, 
-						      SalomeApp_Study* study )
+                                                      const int id, 
+                                                      SalomeApp_Study* study )
 : LightApp_DataObject( parent ), 
   CAM_DataObject( parent ),
   myId( id ),

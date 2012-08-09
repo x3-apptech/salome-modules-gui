@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:      QtxPagePrefMgr.cxx
 // Author:    Sergey TELKOV
 //
@@ -30,7 +28,11 @@
 #include "QtxComboBox.h"
 #include "QtxIntSpinBox.h"
 #include "QtxColorButton.h"
+#include "QtxBiColorTool.h"
 #include "QtxDoubleSpinBox.h"
+#include "QtxShortcutEdit.h"
+#include "QtxBackgroundTool.h"
+#include "QtxResourceMgr.h"
 
 #include <QEvent>
 #include <QLayout>
@@ -44,6 +46,9 @@
 #include <QApplication>
 #include <QDateTimeEdit>
 #include <QStackedWidget>
+#include <QSlider>
+
+#include <stdio.h>
 
 /*!
   \class QtxPagePrefMgr
@@ -2050,6 +2055,36 @@ void QtxPagePrefCheckItem::retrieve()
   for string, integer and double values.
 */
 
+static void fixupAndSet( QLineEdit* le, const QString& txt )
+{
+  if ( le ) {
+    QString val = txt;
+    if ( le->validator() ) {
+      const QDoubleValidator* de = dynamic_cast<const QDoubleValidator*>( le->validator() );
+      if ( de ) {
+	int dec = de->decimals();
+	int idx = val.lastIndexOf( QRegExp( QString("[.|%1]").arg( le->locale().decimalPoint () ) ) );
+	if ( idx >= 0 ) {
+	  QString tmp = val.mid( idx+1 );
+	  QString exp;
+	  val = val.left( idx+1 );
+	  idx = tmp.indexOf( QRegExp( QString("[e|E]") ) );
+	  if ( idx >= 0 ) {
+	    exp = tmp.mid( idx );
+	    tmp = tmp.left( idx );
+	  }
+	  tmp.truncate( dec );
+	  val = val + tmp + exp;
+	}
+      }
+      int pos = 0;
+      if ( le->validator()->validate( val, pos ) == QValidator::Invalid )
+	val.clear();
+    }
+    le->setText( val );
+  }
+}
+
 /*!
   \brief Constructor.
 
@@ -2063,7 +2098,9 @@ void QtxPagePrefCheckItem::retrieve()
 QtxPagePrefEditItem::QtxPagePrefEditItem( const QString& title, QtxPreferenceItem* parent,
                                           const QString& sect, const QString& param )
 : QtxPageNamedPrefItem( title, parent, sect, param ),
-  myType( String )
+  myType( String ),
+  myDecimals( 1000 ),
+  myEchoMode( 0 )
 {
   setControl( myEditor = new QLineEdit() );
   updateEditor();
@@ -2083,9 +2120,11 @@ QtxPagePrefEditItem::QtxPagePrefEditItem( const QString& title, QtxPreferenceIte
 */
 QtxPagePrefEditItem::QtxPagePrefEditItem( const int type, const QString& title,
                                           QtxPreferenceItem* parent, const QString& sect,
-					  const QString& param )
+                                          const QString& param )
 : QtxPageNamedPrefItem( title, parent, sect, param ),
-  myType( type )
+  myType( type ),
+  myDecimals( 1000 ),
+  myEchoMode( 0 )
 {
   setControl( myEditor = new QLineEdit() );
   updateEditor();
@@ -2123,6 +2162,54 @@ void QtxPagePrefEditItem::setInputType( const int type )
 }
 
 /*!
+  \brief Get number of digits after decimal point (for Double input type)
+  \return preference item decimals value
+  \sa setDecimals()
+*/
+int QtxPagePrefEditItem::decimals() const
+{
+  return myDecimals;
+}
+
+/*!
+  \brief Set number of digits after decimal point (for Double input type)
+  \param dec new preference item decimals value
+  \sa decimals()
+*/
+void QtxPagePrefEditItem::setDecimals( const int dec )
+{
+  if ( myDecimals == dec )
+    return;
+  
+  myDecimals = dec;
+  updateEditor();
+}
+
+/*!
+  \brief Get the line edit's echo mode
+  \return preference item echo mode value
+  \sa setEchoMode()
+*/
+int QtxPagePrefEditItem::echoMode() const
+{
+  return myEchoMode;
+}
+
+/*!
+  \brief Set the line edit's echo mode
+  \param echo new preference item echo mode value
+  \sa echoMode()
+*/
+void QtxPagePrefEditItem::setEchoMode( const int echo )
+{   
+  if ( myEchoMode == echo )
+    return;
+  
+  myEchoMode = echo;
+  updateEditor();
+}
+
+/*!
   \brief Store preference item to the resource manager.
   \sa retrieve()
 */
@@ -2138,13 +2225,7 @@ void QtxPagePrefEditItem::store()
 void QtxPagePrefEditItem::retrieve()
 {
   QString txt = getString();
-  if ( myEditor->validator() )
-  {
-    int pos = 0;
-    if ( myEditor->validator()->validate( txt, pos ) == QValidator::Invalid )
-      txt.clear();
-  }
-  myEditor->setText( txt );
+  fixupAndSet( myEditor, txt );
 }
 
 /*!
@@ -2157,6 +2238,10 @@ QVariant QtxPagePrefEditItem::optionValue( const QString& name ) const
 {
   if ( name == "input_type" || name == "type" )
     return inputType();
+  else if ( name == "precision" || name == "prec" || name == "decimals" )
+    return decimals();
+  else if ( name == "echo" || name == "echo_mode" || name == "echomode")
+    return echoMode();
   else
     return QtxPageNamedPrefItem::optionValue( name );
 }
@@ -2174,6 +2259,14 @@ void QtxPagePrefEditItem::setOptionValue( const QString& name, const QVariant& v
     if ( val.canConvert( QVariant::Int ) )
       setInputType( val.toInt() );
   }
+  else if ( name == "precision" || name == "prec" || name == "decimals" ) {
+    if ( val.canConvert( QVariant::Int ) )
+      setDecimals( val.toInt() );
+  }
+  else if ( name == "echo" || name == "echo_mode" || name == "echomode") {
+    if ( val.canConvert( QVariant::Int ) )
+      setEchoMode( val.toInt() );
+  }
   else
     QtxPageNamedPrefItem::setOptionValue( name, val );
 }
@@ -2183,6 +2276,24 @@ void QtxPagePrefEditItem::setOptionValue( const QString& name, const QVariant& v
 */
 void QtxPagePrefEditItem::updateEditor()
 {
+  switch (myEchoMode)
+  {
+    case 0:
+      myEditor->setEchoMode(QLineEdit::Normal);
+      break;
+    case 1:
+      myEditor->setEchoMode(QLineEdit::NoEcho);
+      break;
+    case 2:
+      myEditor->setEchoMode(QLineEdit::Password);
+      break;
+    case 3:
+      myEditor->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+      break;
+    default:
+      myEditor->setEchoMode(QLineEdit::Normal);
+  }
+  
   QValidator* val = 0;
   switch ( inputType() )
   {
@@ -2191,21 +2302,298 @@ void QtxPagePrefEditItem::updateEditor()
     break;
   case Double:
     val = new QDoubleValidator( myEditor );
+    dynamic_cast<QDoubleValidator*>( val )->setDecimals( myDecimals < 0 ? 1000 : myDecimals );
     break;
   default:
     break;
   }
 
-  if ( !myEditor->text().isEmpty() && val )
-  {
-    int pos = 0;
-    QString str = myEditor->text();
-    if ( val->validate( str, pos ) == QValidator::Invalid )
-      myEditor->clear();
-  }
-
+  QString txt = myEditor->text();
   delete myEditor->validator();
   myEditor->setValidator( val );
+  fixupAndSet( myEditor, txt );
+}
+
+/*!
+  \class QtxPagePrefSliderItem
+*/
+
+/*!
+  \brief Constructor.
+
+  Creates preference item with slider widget
+
+  \param title preference item title
+  \param parent parent preference item
+  \param sect resource file section associated with the preference item
+  \param param resource file parameter associated with the preference item
+*/
+QtxPagePrefSliderItem::QtxPagePrefSliderItem( const QString& title, QtxPreferenceItem* parent,
+                                              const QString& sect, const QString& param )
+: QtxPageNamedPrefItem( title, parent, sect, param )
+{
+  setControl( mySlider = new QSlider( Qt::Horizontal ) );
+  widget()->layout()->addWidget( myLabel = new QLabel( ) );
+    
+  setMinimum( 0 );
+  setMaximum( 0 );
+  setSingleStep( 1 );
+  setPageStep( 1 );
+  
+  mySlider->setTickPosition( QSlider::TicksBothSides );
+  
+  connect (mySlider, SIGNAL(valueChanged(int)), this, SLOT(setIcon(int)));
+  updateSlider();
+}
+
+/*!
+  \brief Destructor.
+*/
+QtxPagePrefSliderItem::~QtxPagePrefSliderItem()
+{
+}
+
+/*!
+  \brief Get slider preference item step value.
+  \return slider single step value
+  \sa setSingleStep()
+*/
+int QtxPagePrefSliderItem::singleStep() const
+{
+  return mySlider->singleStep();
+}
+
+/*!
+  \brief Get slider preference item step value.
+  \return slider page step value
+  \sa setPageStep()
+*/
+int QtxPagePrefSliderItem::pageStep() const
+{
+  return mySlider->pageStep();
+}
+
+/*!
+  \brief Get slider preference item minimum value.
+  \return slider minimum value
+  \sa setMinimum()
+*/
+int QtxPagePrefSliderItem::minimum() const
+{
+    return mySlider->minimum();
+}
+
+/*!
+  \brief Get slider preference item maximum value.
+  \return slider maximum value
+  \sa setMaximum()
+*/
+int QtxPagePrefSliderItem::maximum() const
+{
+    return mySlider->maximum();
+}
+
+/*!
+  \brief Get the list of the icons associated with the selection widget items
+  \return list of icons
+  \sa setIcons()
+*/
+QList<QIcon> QtxPagePrefSliderItem::icons() const
+{
+  return myIcons;
+}
+
+/*!
+  \brief Set slider preference item step value.
+  \param step new slider single step value
+  \sa step()
+*/
+void QtxPagePrefSliderItem::setSingleStep( const int& step )
+{
+  mySlider->setSingleStep( step );
+}
+
+/*!
+  \brief Set slider preference item step value.
+  \param step new slider single step value
+  \sa step()
+*/
+void QtxPagePrefSliderItem::setPageStep( const int& step )
+{
+  mySlider->setPageStep( step );
+}
+
+/*!
+  \brief Set slider preference item minimum value.
+  \param min new slider minimum value
+  \sa minimum()
+*/
+void QtxPagePrefSliderItem::setMinimum( const int& min )
+{
+  mySlider->setMinimum( min );
+  setIcon( mySlider->value() );
+}
+
+/*!
+  \brief Set slider preference item maximum value.
+  \param max new slider maximum value
+  \sa maximum()
+*/
+void QtxPagePrefSliderItem::setMaximum( const int& max )
+{
+  mySlider->setMaximum( max );
+  setIcon( mySlider->value() );
+}
+
+/*!
+  \brief Set the list of the icons to the selection widget items
+  \param icns new list of icons
+  \sa icons()
+*/
+void QtxPagePrefSliderItem::setIcons( const QList<QIcon>& icns )
+{
+  if ( icns.isEmpty() ) 
+    return;
+  myIcons = icns;
+  
+  QSize maxsize(0, 0); 
+  for ( QList<QIcon>::const_iterator it = myIcons.begin(); it != myIcons.end(); ++it ) {
+    if ( (*it).isNull() ) continue;
+    maxsize = maxsize.expandedTo( (*it).availableSizes().first() );
+  }
+  myLabel->setFixedSize( maxsize );
+  
+  updateSlider();
+}
+
+/*!
+  \brief Store preference item to the resource manager.
+  \sa retrieve()
+*/
+void QtxPagePrefSliderItem::store()
+{
+  setInteger( mySlider->value() );
+}
+
+/*!
+  \brief Retrieve preference item from the resource manager.
+  \sa store()
+*/
+void QtxPagePrefSliderItem::retrieve()
+{
+  mySlider->setValue( getInteger( mySlider->value() ) );
+}
+
+/*!
+  \brief Get preference item option value.
+  \param name option name
+  \return property value or null integer if option is not set
+  \sa setOptionValue()
+*/
+QVariant QtxPagePrefSliderItem::optionValue( const QString& name ) const
+{
+  if ( name == "minimum" || name == "min" )
+    return minimum();
+  else if ( name == "maximum" || name == "max" )
+    return maximum();
+  else if ( name == "single_step" )
+    return singleStep();
+  else if ( name == "page_step" )
+    return pageStep();
+  else if ( name == "icons" || name == "pixmaps" )
+  {
+    QList<QVariant> lst;
+    QList<QIcon> ics = icons();
+    for ( QList<QIcon>::const_iterator it = ics.begin(); it != ics.end(); ++it )
+      lst.append( *it );
+    return lst;
+  }
+  else
+    return QtxPageNamedPrefItem::optionValue( name );
+}
+
+/*!
+  \brief Set preference item option value.
+  \param name option name
+  \param val new property value
+  \sa optionValue()
+*/
+void QtxPagePrefSliderItem::setOptionValue( const QString& name, const QVariant& val )
+{
+  if ( val.canConvert( QVariant::Int ) )
+  {
+    if ( name == "minimum" || name == "min" )
+      setMinimum( val.toInt() );
+    else if ( name == "maximum" || name == "max" )
+      setMaximum( val.toInt() );
+    else if ( name == "single_step" )
+      setSingleStep( val.toInt() );
+    else if ( name == "page_step" )
+      setPageStep( val.toInt() );
+    else
+      QtxPageNamedPrefItem::setOptionValue( name, val );
+  }
+  else if ( name == "icons" || name == "pixmaps" )
+    setIcons( val );
+  else
+    QtxPageNamedPrefItem::setOptionValue( name, val );
+}
+
+void QtxPagePrefSliderItem::setIcon( int pos )
+{
+  int index = pos - mySlider->minimum();
+  if ( !myIcons.isEmpty() && index >= 0 && index < myIcons.size() && !myIcons[index].isNull() )
+    myLabel->setPixmap( myIcons[index].pixmap( myIcons[index].availableSizes().first() ) );
+  else
+    myLabel->clear();
+}
+
+/*!
+  \brief Update slider widget.
+*/
+void QtxPagePrefSliderItem::updateSlider()
+{
+  int val = mySlider->value();
+  int stp = singleStep();
+  int ptp = pageStep();
+  int min = minimum();
+  int max = maximum();
+
+  control()->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  mySlider->setFocusPolicy(Qt::StrongFocus);
+  
+  mySlider->setValue( val );
+  setSingleStep( stp );
+  setPageStep( ptp );
+  setMinimum( min );
+  setMaximum( max );
+  
+  myLabel->setVisible( !myIcons.empty() );
+  widget()->layout()->setSpacing( !myIcons.empty() ? 6 : 0 );
+}
+
+/*!
+  \brief Set the list of the icons from the resource manager.
+  \param var new icons list
+  \internal
+*/
+void  QtxPagePrefSliderItem::setIcons( const QVariant& var )
+{
+  if ( var.type() != QVariant::List )
+    return;
+
+  QList<QIcon> lst;
+  QList<QVariant> varList = var.toList();
+  for ( QList<QVariant>::const_iterator it = varList.begin(); it != varList.end(); ++it )
+  {
+    if ( (*it).canConvert<QIcon>() )
+      lst.append( (*it).value<QIcon>() );
+    else if ( (*it).canConvert<QPixmap>() )
+      lst.append( (*it).value<QPixmap>() );
+    else
+      lst.append( QIcon() );
+  }
+  setIcons( lst );
 }
 
 /*!
@@ -2296,7 +2684,7 @@ void QtxPagePrefSelectItem::setInputType( const int type )
 /*!
   \brief Get the list of the values from the selection widget.
   \return list of values
-  \sa numbers(), setStrings()
+  \sa numbers(), icons(), setStrings()
 */
 QStringList QtxPagePrefSelectItem::strings() const
 {
@@ -2309,7 +2697,7 @@ QStringList QtxPagePrefSelectItem::strings() const
 /*!
   \brief Get the list of the values identifiers from the selection widget.
   \return list of values IDs
-  \sa strings(), setNumbers()
+  \sa strings(), icons(), setNumbers()
 */
 QList<int> QtxPagePrefSelectItem::numbers() const
 {
@@ -2323,9 +2711,22 @@ QList<int> QtxPagePrefSelectItem::numbers() const
 }
 
 /*!
+  \brief Get the list of the icons associated with the selection widget.items
+  \return list of icons
+  \sa strings(), numbers(), setIcons()
+*/
+QList<QIcon> QtxPagePrefSelectItem::icons() const
+{
+  QList<QIcon> res;
+  for ( uint i = 0; i < mySelector->count(); i++ )
+    res.append( mySelector->itemIcon( i ) );
+  return res;
+}
+
+/*!
   \brief Set the list of the values to the selection widget.
   \param lst new list of values
-  \sa strings(), setNumbers()
+  \sa strings(), setNumbers(), setIcons()
 */
 void QtxPagePrefSelectItem::setStrings( const QStringList& lst )
 {
@@ -2334,15 +2735,34 @@ void QtxPagePrefSelectItem::setStrings( const QStringList& lst )
 }
 
 /*!
-  \brief Set the list of the values identifiers to the selection widget.
+  \brief Set the list of the values identifiers to the selection widget
   \param ids new list of values IDs
-  \sa numbers(), setStrings()
+  \sa numbers(), setStrings(), setIcons()
 */
 void QtxPagePrefSelectItem::setNumbers( const QList<int>& ids )
 {
   uint i = 0;
-  for ( QList<int>::const_iterator it = ids.begin(); it != ids.end() && i < mySelector->count(); ++it, i++ )
+  for ( QList<int>::const_iterator it = ids.begin(); it != ids.end(); ++it, i++ ) {
+    if ( i >= mySelector->count() )
+      mySelector->addItem(QString("") );
+    
     mySelector->setId( i, *it );
+  }
+}
+
+/*!
+  \brief Set the list of the icons to the selection widget items
+
+  Important: call this method after setStrings() or setNumbers()
+
+  \param icns new list of icons
+  \sa icons(), setStrings(), setNumbers()
+*/
+void QtxPagePrefSelectItem::setIcons( const QList<QIcon>& icns )
+{
+  uint i = 0;
+  for ( QList<QIcon>::const_iterator it = icns.begin(); it != icns.end() && i < mySelector->count(); ++it, i++ )
+    mySelector->setItemIcon( i, *it );
 }
 
 /*!
@@ -2422,6 +2842,14 @@ QVariant QtxPagePrefSelectItem::optionValue( const QString& name ) const
       lst.append( *it );
     return lst;
   }
+  else if ( name == "icons" || name == "pixmaps" )
+  {
+    QList<QVariant> lst;
+    QList<QIcon> ics = icons();
+    for ( QList<QIcon>::const_iterator it = ics.begin(); it != ics.end(); ++it )
+      lst.append( *it );
+    return lst;
+  }
   else
     return QtxPageNamedPrefItem::optionValue( name );
 }
@@ -2443,6 +2871,8 @@ void QtxPagePrefSelectItem::setOptionValue( const QString& name, const QVariant&
     setStrings( val );
   else if ( name == "numbers" || name == "ids" || name == "indexes" )
     setNumbers( val );
+  else if ( name == "icons" || name == "pixmaps" )
+    setIcons( val );
   else
     QtxPageNamedPrefItem::setOptionValue( name, val );
 }
@@ -2478,6 +2908,30 @@ void QtxPagePrefSelectItem::setNumbers( const QVariant& var )
       lst.append( (*it).toInt() );
   }
   setNumbers( lst );
+}
+
+/*!
+  \brief Set the list of the icons from the resource manager.
+  \param var new icons list
+  \internal
+*/
+void QtxPagePrefSelectItem::setIcons( const QVariant& var )
+{
+  if ( var.type() != QVariant::List )
+    return;
+
+  QList<QIcon> lst;
+  QList<QVariant> varList = var.toList();
+  for ( QList<QVariant>::const_iterator it = varList.begin(); it != varList.end(); ++it )
+  {
+    if ( (*it).canConvert<QIcon>() )
+      lst.append( (*it).value<QIcon>() );
+    else if ( (*it).canConvert<QPixmap>() )
+      lst.append( (*it).value<QPixmap>() );
+    else
+      lst.append( QIcon() );
+  }
+  setIcons( lst );
 }
 
 /*!
@@ -2550,7 +3004,7 @@ QtxPagePrefSpinItem::QtxPagePrefSpinItem( const QString& title, QtxPreferenceIte
 */
 QtxPagePrefSpinItem::QtxPagePrefSpinItem( const int type, const QString& title,
                                           QtxPreferenceItem* parent, const QString& sect,
-					  const QString& param )
+                                          const QString& param )
 : QtxPageNamedPrefItem( title, parent, sect, param ),
   myType( type )
 {
@@ -2599,6 +3053,19 @@ QVariant QtxPagePrefSpinItem::step() const
     return isb->singleStep();
   else if ( QtxDoubleSpinBox* dsb = ::qobject_cast<QtxDoubleSpinBox*>( control() ) )
     return dsb->singleStep();
+  else
+    return QVariant();
+}
+
+/*!
+  \brief Get double spin box preference item precision value.
+  \return double spin box precision
+  \sa setPrecision()
+*/
+QVariant QtxPagePrefSpinItem::precision() const
+{
+  if ( QtxDoubleSpinBox* dsb = ::qobject_cast<QtxDoubleSpinBox*>( control() ) )
+    return dsb->decimals();
   else
     return QVariant();
 }
@@ -2694,6 +3161,22 @@ void QtxPagePrefSpinItem::setStep( const QVariant& step )
   {
     if ( step.canConvert( QVariant::Double ) )
       dsb->setSingleStep( step.toDouble() );
+  }
+}
+
+/*!
+  \brief Set double spin box preference item precision value.
+  \param step new double spin box precision value
+  \sa precision()
+*/
+void QtxPagePrefSpinItem::setPrecision( const QVariant& prec )
+{
+  if ( QtxDoubleSpinBox* dsb = ::qobject_cast<QtxDoubleSpinBox*>( control() ) )
+  {
+    if ( prec.canConvert( QVariant::Int ) ) {
+      dsb->setDecimals( qAbs( prec.toInt() ) );
+      dsb->setPrecision( prec.toInt() );
+    }
   }
 }
 
@@ -2814,6 +3297,8 @@ QVariant QtxPagePrefSpinItem::optionValue( const QString& name ) const
     return maximum();
   else if ( name == "step" )
     return step();
+  else if ( name == "precision" )
+    return precision();
   else if ( name == "prefix" )
     return prefix();
   else if ( name == "suffix" )
@@ -2843,6 +3328,8 @@ void QtxPagePrefSpinItem::setOptionValue( const QString& name, const QVariant& v
     setMaximum( val );
   else if ( name == "step" )
     setStep( val );
+  else if ( name == "precision" )
+    setPrecision( val );
   else if ( name == "prefix" )
   {
     if ( val.canConvert( QVariant::String ) )
@@ -2869,6 +3356,7 @@ void QtxPagePrefSpinItem::updateSpinBox()
 {
   QVariant val;
   QVariant stp = step();
+  QVariant prec = precision();
   QVariant min = minimum();
   QVariant max = maximum();
 
@@ -2892,6 +3380,7 @@ void QtxPagePrefSpinItem::updateSpinBox()
   control()->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
   setStep( stp );
+  setPrecision( prec );
   setMinimum( min );
   setMaximum( max );
 
@@ -2920,7 +3409,7 @@ void QtxPagePrefSpinItem::updateSpinBox()
   \param param resource file parameter associated with the preference item
 */
 QtxPagePrefTextItem::QtxPagePrefTextItem( QtxPreferenceItem* parent, const QString& sect,
-					  const QString& param )
+                                          const QString& param )
 : QtxPageNamedPrefItem( QString(), parent, sect, param )
 {
   myEditor = new QTextEdit();
@@ -3020,6 +3509,109 @@ void QtxPagePrefColorItem::retrieve()
 }
 
 /*!
+  \class QtxPagePrefBiColorItem
+  \brief GUI implementation of the resources item to store a bi-color value.
+
+  The main color is specified explicitly. The secondary color is calculated
+  by changing "value" and "saturation" parameters of the main color in the 
+  HSV notation using specified delta.
+*/
+
+/*!
+  \brief Constructor.
+  \param title preference item title
+  \param parent parent preference item
+  \param sect resource file section associated with the preference item
+  \param param resource file parameter associated with the preference item
+*/
+QtxPagePrefBiColorItem::QtxPagePrefBiColorItem( const QString& title, QtxPreferenceItem* parent,
+						const QString& sect, const QString& param )
+: QtxPageNamedPrefItem( title, parent, sect, param )
+{
+  setControl( myColors = new QtxBiColorTool( 0 ) );
+}
+
+/*!
+  \brief Destructor.
+*/
+QtxPagePrefBiColorItem::~QtxPagePrefBiColorItem()
+{
+}
+
+/*!
+  \bried Get auxiliary text
+  \return text assigned to the item
+  \sa setText()
+*/
+QString QtxPagePrefBiColorItem::text() const
+{
+  return myColors->text();
+}
+
+/*!
+  \bried Set auxiliary text
+  \param t text being assigned to the item
+  \sa text()
+*/
+void QtxPagePrefBiColorItem::setText( const QString& t )
+{
+  myColors->setText( t );
+}
+
+/*!
+  \brief Store preference item to the resource manager.
+  \sa retrieve()
+*/
+void QtxPagePrefBiColorItem::store()
+{
+  setString( Qtx::biColorToString( myColors->mainColor(), myColors->delta() ) );
+}
+
+/*!
+  \brief Retrieve preference item from the resource manager.
+  \sa store()
+*/
+void QtxPagePrefBiColorItem::retrieve()
+{
+  QColor c;
+  int d;
+  Qtx::stringToBiColor( getString(), c, d );
+  myColors->setMainColor( c );
+  myColors->setDelta( d );
+}
+
+/*!
+  \brief Get preference item option value.
+  \param name option name
+  \return property value or null QVariant if option is not set
+  \sa setOptionValue()
+*/
+QVariant QtxPagePrefBiColorItem::optionValue( const QString& name ) const
+{
+  if ( name == "text" )
+    return text();
+  else
+    return QtxPageNamedPrefItem::optionValue( name );
+}
+
+/*!
+  \brief Set preference item option value.
+  \param name option name
+  \param val new property value
+  \sa optionValue()
+*/
+void QtxPagePrefBiColorItem::setOptionValue( const QString& name, const QVariant& val )
+{
+  if ( name == "text" )
+  {
+    if ( val.canConvert( QVariant::String ) )
+      setText( val.toString() );
+  }
+  else
+    QtxPageNamedPrefItem::setOptionValue( name, val );
+}
+
+/*!
   \class QtxPagePrefFontItem
   \brief GUI implementation of the resources font item.
 */
@@ -3034,7 +3626,7 @@ void QtxPagePrefColorItem::retrieve()
 */
 QtxPagePrefFontItem::QtxPagePrefFontItem( const int feat, const QString& title,
                                           QtxPreferenceItem* parent, const QString& sect,
-					  const QString& param )
+                                          const QString& param )
 : QtxPageNamedPrefItem( title, parent, sect, param )
 {
   setControl( myFont = new QtxFontEdit( feat ) );
@@ -3805,4 +4397,485 @@ void QtxPagePrefDateTimeItem::updateDateTime()
   }
 
   myDateTime->setDisplayFormat( dispFmt );
+}
+
+/*!
+  \brief Constructor.
+  \param title preference item title
+  \param parent parent preference item
+  \param sect resource file section associated with the preference item
+  \param param resource file parameter associated with the preference item
+*/
+QtxPagePrefShortcutBtnsItem::QtxPagePrefShortcutBtnsItem( const QString& title, QtxPreferenceItem* parent, const QString& sect,
+                                                          const QString& param ): QtxPageNamedPrefItem( title, parent, sect, param )
+{
+  setControl( myShortcut = new QtxShortcutEdit() );
+}
+
+/*!
+  \brief Destructor.
+*/  
+QtxPagePrefShortcutBtnsItem::~QtxPagePrefShortcutBtnsItem()
+{
+}
+
+/*!
+  \brief Store preference item to the resource manager.
+  \sa retrieve()
+*/
+void QtxPagePrefShortcutBtnsItem::store()
+{
+  setString( myShortcut->shortcut().toString() );
+}
+
+/*!
+  \brief Retrieve preference item from the resource manager.
+  \sa store()
+*/
+void QtxPagePrefShortcutBtnsItem::retrieve()
+{
+  myShortcut->setShortcut( QKeySequence::fromString( getString() ) );
+}
+
+/*!
+  \brief Constructor.
+
+  Creates preference item for editing of key bindings
+
+  \param title preference item title
+  \param parent parent preference item
+  \param sect resource file section associated with the preference item
+  \param param resource file parameter associated with the preference item
+*/
+QtxPagePrefShortcutTreeItem::QtxPagePrefShortcutTreeItem( const QString& title, QtxPreferenceItem* parent, const QString& sect, 
+                                                          const QString& param ): QtxPageNamedPrefItem( title, parent, sect, "" )
+{
+  mySection = sect;
+
+  myShortcutTree = new QtxShortcutTree();
+
+  // Retrieve shortcuts common sections from resources
+  QtxResourceMgr* resMgr = resourceMgr();
+  if ( resMgr ){
+    QString generalSections = resourceMgr()->stringValue( "shortcuts_settings", "general_sections", QString() );
+    QStringList sectionsList = generalSections.split( ";", QString::SkipEmptyParts );
+    myShortcutTree->setGeneralSections( sectionsList );
+  }
+ 
+  setControl( myShortcutTree );
+}
+
+/*!
+  \brief Destructor.
+*/
+QtxPagePrefShortcutTreeItem::~QtxPagePrefShortcutTreeItem()
+{
+}
+						    
+/*!
+  \brief Retrieve preference item from the resource manager.
+  \sa store()
+*/
+void QtxPagePrefShortcutTreeItem::retrieve()
+{
+  QtxResourceMgr* resMgr = resourceMgr();
+  if ( resMgr ){
+    QStringList secLst = resMgr->subSections( mySection, false );
+    ShortcutMap aMap; QStringList paramLst;
+    for( int i = 0; i < secLst.size(); i++ ) {
+      paramLst = resMgr->parameters( QStringList() << mySection << secLst.at( i ) );
+      for( int j = 0; j < paramLst.size(); j++ )
+        resMgr->value( mySection + resMgr->sectionsToken() + secLst.at( i ), paramLst.at( j ),aMap[ paramLst.at( j ) ], false );
+      myShortcutTree->setBindings( secLst.at( i ), aMap );
+      aMap.clear();
+    }
+  }
+}
+	      
+/*!
+  \brief Store preference item to the resource manager.
+  \sa retrieve()
+*/
+void QtxPagePrefShortcutTreeItem::store()
+{
+  QStringList lst = myShortcutTree->sections();
+  QString aSection;
+  QtxResourceMgr* resMgr = resourceMgr();
+  
+  if ( resMgr ) {
+    for( int i = 0; i < lst.size(); i++ ) {
+      ShortcutMap* aMap( myShortcutTree->bindings( lst.at( i ) ) );
+      aSection = mySection + resMgr->sectionsToken() + lst.at( i );
+      for( ShortcutMap::const_iterator it = aMap->constBegin(); it != aMap->constEnd(); ++it )
+	resMgr->setValue( aSection, it.key(), it.value() );
+    }
+  }
+}
+
+/*!
+  \class QtxPagePrefBackgroundItem
+  \brief GUI implementation of the resources item to store background data.
+
+  Preference item allows specifying background data in different ways:
+  - solid color
+  - texture image file
+  - simple two-color gradient
+  - complex custom gradient (NOT IMPLEMENTED YET)
+  
+  Allowed background modes can be specified using setModeAllowed() method.
+  Texture modes can be enabled/disabled using setTextureModeAllowed() method.
+  Also, showing texture controls can be enabled/disabled by means of
+  setTextureAllowed() method.
+  Verical or horizontal orientation of the widget can be chosen via setOrientation()
+  method (default orientation is horizontal).
+
+  Simple gradient types can be specified using setGradients() method.
+
+  \sa Qtx::BackgroundData, QtxBackgroundTool
+*/
+
+/*!
+  \brief Constructor.
+  \param title preference item title
+  \param parent parent preference item
+  \param sect resource file section associated with the preference item
+  \param param resource file parameter associated with the preference item
+*/
+QtxPagePrefBackgroundItem::QtxPagePrefBackgroundItem( const QString& title, QtxPreferenceItem* parent,
+						      const QString& sect, const QString& param )
+: QtxPageNamedPrefItem( title, parent, sect, param )
+{
+  setControl( myBgTool = new QtxBackgroundTool( 0 ) );
+}
+
+/*!
+  \brief Destructor.
+*/
+QtxPagePrefBackgroundItem::~QtxPagePrefBackgroundItem()
+{
+}
+
+/*!
+  \brief Get allowed two-color gradients to the widget
+  \param gradients gradients names are returned via this parameter
+  \param ids gradients identifiers are returned via this parameter (empty list can be returned)
+*/
+void QtxPagePrefBackgroundItem::gradients( QStringList& gradList, QIntList& idList ) const
+{
+  myBgTool->gradients( gradList, idList );
+}
+
+/*!
+  \brief Set allowed two-color gradients to the widget
+  \param gradients gradients names
+  \param ids optional gradients identifiers; if not specified, gradients are automatically numbered starting from 0
+*/
+void QtxPagePrefBackgroundItem::setGradients( const QStringList& gradients, const QIntList& ids )
+{
+  myBgTool->setGradients( gradients, ids );
+}
+
+/*!
+  \brief Check if specific background mode is allowed
+  \param mode background mode
+  \return \c true if specified background mode is enabled or \c false otherwise
+  \sa setModeAllowed()
+*/
+bool QtxPagePrefBackgroundItem::isModeAllowed( Qtx::BackgroundMode mode ) const
+{
+  return myBgTool->isModeAllowed( mode );
+}
+
+/*!
+  \brief Enable / disable specific background mode
+  \param mode background mode
+  \param on enable / disable flag
+  \sa isModeAllowed()
+*/
+void QtxPagePrefBackgroundItem::setModeAllowed( Qtx::BackgroundMode mode, bool on )
+{
+  myBgTool->setModeAllowed( mode, on );
+}
+
+/*!
+  \brief Check if specific texture mode is allowed
+  \param mode texture mode
+  \return \c true if specified texture mode is enabled or \c false otherwise
+  \sa setTextureModeAllowed(), setTextureAllowed()
+*/
+bool QtxPagePrefBackgroundItem::isTextureModeAllowed( Qtx::TextureMode mode ) const
+{
+  return myBgTool->isTextureModeAllowed( mode );
+}
+
+/*!
+  \brief Enable / disable specific texture mode
+  \param mode texture mode
+  \param on enable / disable flag (\c true by default)
+  \sa isTextureModeAllowed(), setTextureAllowed()
+*/
+void QtxPagePrefBackgroundItem::setTextureModeAllowed( Qtx::TextureMode mode, bool on )
+{
+  myBgTool->setTextureModeAllowed( mode, on );
+}
+
+/*!
+  \brief Check if texture controls are allowed (shown)
+  \return \c true if texture controls are enabled or \c false otherwise
+  \sa setTextureAllowed(), setTextureModeAllowed()
+*/
+bool QtxPagePrefBackgroundItem::isTextureAllowed() const
+{
+  return myBgTool->isTextureAllowed();
+}
+
+/*!
+  \brief Enable / disable texture controls
+  \param on enable / disable flag (\c true by default)
+  \sa isTextureAllowed(), setTextureModeAllowed()
+*/
+void QtxPagePrefBackgroundItem::setTextureAllowed( bool on )
+{
+  myBgTool->setTextureAllowed( on );
+}
+
+/*!
+  \brief Get allowed image formats
+  \return image formats
+*/
+QString QtxPagePrefBackgroundItem::imageFormats() const
+{
+  return myBgTool->imageFormats();
+}
+
+/*!
+  \brief Set allowed image formats
+  \param formats image formats
+*/
+void QtxPagePrefBackgroundItem::setImageFormats( const QString& formats )
+{
+  myBgTool->setImageFormats( formats );
+}
+
+/*!
+  \brief Get widget editor orientation
+  \return orientation
+*/
+Qt::Orientation QtxPagePrefBackgroundItem::orientation() const
+{
+  return myBgTool->orientation();
+}
+
+/*!
+  \brief Set widget editor orientation
+  \param o orientation
+*/
+void QtxPagePrefBackgroundItem::setOrientation( Qt::Orientation o )
+{
+  myBgTool->setOrientation( o );
+}
+
+/*!
+  \brief Store preference item to the resource manager.
+  \sa retrieve()
+*/
+void QtxPagePrefBackgroundItem::store()
+{
+  setString( Qtx::backgroundToString( myBgTool->data() ) );
+}
+
+/*!
+  \brief Retrieve preference item from the resource manager.
+  \sa store()
+*/
+void QtxPagePrefBackgroundItem::retrieve()
+{
+  myBgTool->setData( Qtx::stringToBackground( getString() ) );
+}
+
+/*!
+  \brief Get preference item option value.
+  \param name option name
+  \return property value or null QVariant if option is not set
+  \sa setOptionValue()
+*/
+QVariant QtxPagePrefBackgroundItem::optionValue( const QString& name ) const
+{
+  if ( name == "texture_enabled" )
+    return isTextureAllowed();
+  else if ( name == "color_enabled" )
+    return isModeAllowed( Qtx::ColorBackground );
+  else if ( name == "gradient_enabled" )
+    return isModeAllowed( Qtx::SimpleGradientBackground );
+  else if ( name == "custom_enabled" )
+    return isModeAllowed( Qtx::CustomGradientBackground );
+  else if ( name == "texture_center_enabled" )
+    return isTextureModeAllowed( Qtx::CenterTexture );
+  else if ( name == "texture_tile_enabled" )
+    return isTextureModeAllowed( Qtx::TileTexture );
+  else if ( name == "texture_stretch_enabled" )
+    return isTextureModeAllowed( Qtx::StretchTexture );
+  else if ( name == "orientation" )
+    return orientation();
+  else if ( name == "image_formats" )
+    return imageFormats();
+  else if ( name == "gradient_names" ) {
+    QStringList grList;
+    QIntList    idList;
+    gradients( grList, idList );
+    return grList;
+  }
+  else if ( name == "gradient_ids" ) {
+    QStringList grList;
+    QIntList    idList;
+    gradients( grList, idList );
+    QList<QVariant> lst;
+    for ( QIntList::const_iterator it = idList.begin(); it != idList.end(); ++it )
+      lst.append( *it );
+    return lst;
+  }
+  else
+    return QtxPageNamedPrefItem::optionValue( name );
+}
+
+/*!
+  \brief Set preference item option value.
+  \param name option name
+  \param val new property value
+  \sa optionValue()
+*/
+void QtxPagePrefBackgroundItem::setOptionValue( const QString& name, const QVariant& val )
+{
+  if ( name == "texture_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setTextureAllowed( val.toBool() );
+  }
+  else if ( name == "color_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setModeAllowed( Qtx::ColorBackground, val.toBool() );
+  }
+  else if ( name == "gradient_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setModeAllowed( Qtx::SimpleGradientBackground, val.toBool() );
+  }
+  else if ( name == "custom_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setModeAllowed( Qtx::CustomGradientBackground, val.toBool() );
+  }
+  else if ( name == "texture_center_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setTextureModeAllowed( Qtx::CenterTexture, val.toBool() );
+  }
+  else if ( name == "texture_tile_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setTextureModeAllowed( Qtx::TileTexture, val.toBool() );
+  }
+  else if ( name == "texture_stretch_enabled" ) {
+    if ( val.canConvert( QVariant::Bool ) )
+      setTextureModeAllowed( Qtx::StretchTexture, val.toBool() );
+  }
+  else if ( name == "orientation" ) {
+    if ( val.canConvert( QVariant::Int ) )
+      setOrientation( (Qt::Orientation)val.toInt() );
+  }
+  else if ( name == "image_formats" ) {
+    if ( val.canConvert( QVariant::String ) )
+      setImageFormats( val.toString() );
+  }
+  else if ( name == "gradient_names" ) {
+    if ( val.canConvert( QVariant::StringList ) )
+      setGradients( val.toStringList() );
+  }
+  else if ( name == "gradient_ids" ) {
+    if ( val.canConvert( QVariant::List ) ) {
+      QStringList grList;
+      QIntList    idList;
+      gradients( grList, idList );
+      idList.clear();
+      QList<QVariant> varList = val.toList();
+      for ( QList<QVariant>::const_iterator it = varList.begin(); it != varList.end(); ++it ) {
+	if ( (*it).canConvert( QVariant::Int ) )
+	  idList.append( (*it).toInt() );
+      }
+      setGradients( grList, idList );
+    }
+  }
+  else
+    QtxPageNamedPrefItem::setOptionValue( name, val );
+}
+
+/*!
+  \brief Constructor.
+
+  Creates preference item of user defined widget. The item widget has to be inherited from 
+  QtxUserDefinedContent class. An instance of this class has to be installed into the item
+  with help of setContent method. Methods optionValue and setOptionValue use pointer on the 
+  content widget an qint64 value.
+
+  \param parent parent preference item
+*/
+QtxUserDefinedItem::QtxUserDefinedItem( QtxPreferenceItem* parent )
+  : QtxPageNamedPrefItem(QString(), parent), myContent(0)
+{
+}
+  
+/*!
+  \brief Lets to Store preferences for content instance
+  \sa retrieve()
+*/
+void QtxUserDefinedItem::store()
+{
+  if (myContent) {
+    myContent->store( resourceMgr(), preferenceMgr());
+  }
+}
+
+/*!
+  \brief Lets to Retrieve preferences for content instance
+  \sa store()
+*/
+void QtxUserDefinedItem::retrieve()
+{
+  if (myContent) {
+    myContent->retrieve( resourceMgr(), preferenceMgr());
+  }
+}
+
+/*!
+ * \brief Returns option value
+ * \param theName is a string "content"
+ * \return pointer on QtxUserDefinedContent class instance as a qint64 value
+ */
+QVariant QtxUserDefinedItem::optionValue( const QString& theName ) const
+{
+  if ( theName == "content" )
+    return (qint64) myContent;
+  else
+    return QtxPreferenceItem::optionValue( theName );
+}
+
+/*!
+ * \brief Sets option value
+ * \param theName is a string "content" 
+ * \param theVal is a pointer on QtxUserDefinedContent class instance represented as qint64 value
+ */
+void QtxUserDefinedItem::setOptionValue( const QString& theName, const QVariant& theVal)
+{
+  if ( theName == "content" ) {
+    if ( theVal.canConvert( QVariant::ULongLong ) ) {
+      setContent( (QtxUserDefinedContent*)theVal.toULongLong() );
+    }
+  } else
+    QtxPreferenceItem::setOptionValue( theName, theVal );
+}
+  
+/*!
+ * \brief Defines content of the property item as a Widget which has to be inherited from 
+ * QtxUserDefinedContent class.
+ * \param theContent is an QtxUserDefinedContent class instance.
+ */
+void QtxUserDefinedItem::setContent( QtxUserDefinedContent* theContent ) 
+{ 
+  myContent = theContent; 
+  setControl(myContent);
 }

@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "OCCViewer_ViewSketcher.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
@@ -255,7 +253,7 @@ void OCCViewer_RectSketcher::onMouse( QMouseEvent* e )
     myResult = Accept;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
                                                    e->globalPos(), e->button(), 
-						   e->buttons(), e->modifiers() ) );
+                                                   e->buttons(), e->modifiers() ) );
   }
 }
 
@@ -432,7 +430,7 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
     myResult = Reject;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
                                                    e->globalPos(), e->button(), 
-						   e->buttons(), e->modifiers() ) );
+                                                   e->buttons(), e->modifiers() ) );
   }
   else if ( e->type() == QEvent::MouseButtonRelease && ( e->button() & myAddButton ) )
   {
@@ -540,7 +538,7 @@ bool OCCViewer_PolygonSketcher::isValid( const QPolygon* aPoints, const QPoint& 
 }
 
 bool OCCViewer_PolygonSketcher::isIntersect( const QPoint& aStart1, const QPoint& anEnd1,
-					     const QPoint& aStart2, const QPoint& anEnd2 ) const
+                                             const QPoint& aStart2, const QPoint& anEnd2 ) const
 {
   if ( ( aStart1 == aStart2 && anEnd1 == anEnd2 ) ||
        ( aStart1 == anEnd2 && anEnd1 == aStart2 ) )

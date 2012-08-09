@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:      QtxTreeView.cxx
 // Author:    Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -110,13 +108,13 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
     QIcon icon;
     if ( iconData.isValid() ) {
       if ( qVariantCanConvert<QIcon>( iconData ) )
-	icon = qVariantValue<QIcon>( iconData );
+        icon = qVariantValue<QIcon>( iconData );
       else if ( qVariantCanConvert<QPixmap>( iconData ) )
-	icon = qVariantValue<QPixmap>( iconData );
+        icon = qVariantValue<QPixmap>( iconData );
     }
     if( ( !lab.isEmpty() || !icon.isNull() ) && 
-	    appropriate.isValid() ? appropriate.toInt()==Qtx::Toggled : true )
-	{
+            appropriate.isValid() ? appropriate.toInt()==Qtx::Toggled : true )
+        {
       QAction* a = menu.addAction( icon, lab );
       a->setCheckable( true );
       a->setChecked( !isSectionHidden( i ) );
@@ -126,7 +124,7 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
   QAction* sortAction = 0;
   if ( count() > 0 && myEnableSortMenu ) {
     menu.addSeparator();
-    sortAction = menu.addAction( tr( "Enable sorting" ) );
+    sortAction = menu.addAction( QtxTreeView::tr( "Enable sorting" ) );
     sortAction->setCheckable( true );
     sortAction->setChecked( isSortIndicatorShown() );
   }
@@ -141,15 +139,15 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
       setClickable( a->isChecked() );
       QtxTreeView* view = qobject_cast<QtxTreeView*>( parent() );
       if ( view ) {
-	view->emitSortingEnabled( a->isChecked() );
-	if ( a->isChecked() ) {
-	  connect( this, SIGNAL( sectionClicked( int ) ), view, SLOT( onHeaderClicked( int ) ) );
-	  view->sortByColumn( sortIndicatorSection(), sortIndicatorOrder() );
-	}
-	else {
-	  disconnect( this, SIGNAL( sectionClicked( int ) ), view, SLOT( onHeaderClicked( int ) ) );
-	  view->sortByColumn( 0, Qt::AscendingOrder );
-	}
+        view->emitSortingEnabled( a->isChecked() );
+        if ( a->isChecked() ) {
+          connect( this, SIGNAL( sectionClicked( int ) ), view, SLOT( onHeaderClicked( int ) ) );
+          view->sortByColumn( sortIndicatorSection(), sortIndicatorOrder() );
+        }
+        else {
+          disconnect( this, SIGNAL( sectionClicked( int ) ), view, SLOT( onHeaderClicked( int ) ) );
+          view->sortByColumn( 0, Qt::AscendingOrder );
+        }
       }
     }
   }
@@ -315,7 +313,7 @@ void QtxTreeView::onHeaderClicked( int column )
   \param deselected previous selection
 */
 void QtxTreeView::selectionChanged( const QItemSelection& selected, 
-				    const QItemSelection& deselected )
+                                    const QItemSelection& deselected )
 {
   QTreeView::selectionChanged( selected, deselected );
   emit( selectionChanged() );
@@ -329,7 +327,11 @@ void QtxTreeView::selectionChanged( const QItemSelection& selected,
 */
 void QtxTreeView::rowsAboutToBeRemoved( const QModelIndex& parent, int start, int end )
 {
-  setCurrentIndex( QModelIndex() );
+  QModelIndex curIndex = currentIndex();
+  while ( curIndex.isValid() && curIndex.parent() != parent )
+    curIndex = curIndex.parent();
+  if ( curIndex.isValid() && curIndex.row() >= start && curIndex.row() <= end )
+    setCurrentIndex( QModelIndex() );
   QTreeView::rowsAboutToBeRemoved( parent, start, end );
 }
 
@@ -384,15 +386,15 @@ void QtxTreeView::setModel( QAbstractItemModel* m )
   QTreeView::setModel( m );
   if ( model() )
     connect( model(), SIGNAL( headerDataChanged( Qt::Orientation, int, int ) ),
-	     this, SLOT( onAppropriate( Qt::Orientation, int, int ) ) );
+             this, SLOT( onAppropriate( Qt::Orientation, int, int ) ) );
 }
 
 void QtxTreeView::onAppropriate( Qt::Orientation orient, int first, int last )
 {
   if( orient==Qt::Horizontal )
     for( int i=first; i<=last; i++ )
-	{
-	  int appr = model()->headerData( i, orient, Qtx::AppropriateRole ).toInt();
-	  header()->setSectionHidden( i, appr==Qtx::Hidden );
-	}
+        {
+          int appr = model()->headerData( i, orient, Qtx::AppropriateRole ).toInt();
+          header()->setSectionHidden( i, appr==Qtx::Hidden );
+        }
 }

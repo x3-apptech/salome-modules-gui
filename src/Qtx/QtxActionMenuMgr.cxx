@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxActionMenuMgr.cxx
 // Author:    Alexander SOLOVYOV, Sergey TELKOV
 //
@@ -71,9 +72,9 @@ QtxActionMenuMgr::MenuNode::MenuNode()
   \param _group menu node group ID
 */
 QtxActionMenuMgr::MenuNode::MenuNode( MenuNode* p,
-				      const int _id,
-				      const int _idx,
-				      const int _group )
+                                      const int _id,
+                                      const int _idx,
+                                      const int _group )
 : parent( p ), id( _id ), idx( _idx ), group( _group ), visible( true ), emptyEnabled( 0 )
 {
   if ( p )
@@ -491,8 +492,19 @@ void QtxActionMenuMgr::remove( const int id, const int pId, const int group )
       delNodes.append( *it );
   }
 
+  QWidget* mW = menuWidget( pNode );
   for ( NodeList::iterator itr = delNodes.begin(); itr != delNodes.end(); ++itr )
+  {
+    int id = (*itr)->id;
+    if( mW && menuAction( id ) )
+    {
+      mW->removeAction( menuAction( id ) );
+      myMenus.remove( id );
+    }
+    else if( mW && itemAction( id ) )
+      mW->removeAction( itemAction( id ) );
     pNode->children.removeAll( *itr );
+  }
 
   triggerUpdate( pNode->id, false );
 }
@@ -886,7 +898,7 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
     {
       a = foralit.next();
       if ( !mw->actions().contains( a ) )
-	foralit.remove();
+        foralit.remove();
     }
   }
   QList<QAction*> alist = mw->actions();
@@ -984,8 +996,10 @@ bool QtxActionMenuMgr::ownAction( QAction* a, MenuNode* node ) const
   for ( NodeList::const_iterator iter = node->children.begin(); iter != node->children.end(); ++iter )
   {
     QAction* mya = itemAction( (*iter)->id );
-    if ( !mya ) mya = menuAction( (*iter)->id );
-    if ( mya && mya == a ) return true;
+    if ( !mya )
+      mya = menuAction( (*iter)->id );
+    if ( mya && mya == a )
+      return true;
   }
   return false;
 }
@@ -1161,7 +1175,7 @@ void QtxActionMenuMgr::setEmptyEnabled( const int id, const bool enable )
   if ( node && menuAction( id ) ) {
     int old = node->emptyEnabled;
     node->emptyEnabled += enable ? 1 : -1;
-    if ( old <= 0 && enable || old > 0 && !enable ) // update menu only if enabled state has been changed
+    if ( ( old <= 0 && enable ) || ( old > 0 && !enable ) ) // update menu only if enabled state has been changed
       updateMenu( node, true, true );
   }
 }

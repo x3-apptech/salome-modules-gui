@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "QDS_Datum.h"
 
 #include <QLayout>
@@ -342,7 +343,7 @@ QString QDS_Datum::label() const
     if( labStr.isNull() )
       labStr = toQString( myDicItem->GetId() );
   }
-  if( myTr )
+  if( myTr && labStr.length()>0 )
   {
     QString dest = QApplication::translate( "QDS", labStr.toLatin1().constData() );
     if( labStr != dest )
@@ -587,7 +588,7 @@ double QDS_Datum::doubleValue() const
   else
   {
     res = getString().toDouble();
-    if ( !myDicItem.IsNull() )
+    if ( !myDicItem.IsNull() && !( flags() & NotConvert ) )
       res = myDicItem->ToSI( res );
   }
 
@@ -612,7 +613,7 @@ int QDS_Datum::integerValue() const
   else
   {
     double val = getString().toDouble();
-    if ( !myDicItem.IsNull() )
+    if ( !myDicItem.IsNull() && !( flags() & NotConvert ) )
       res = (int)myDicItem->ToSI( val );
   }
 
@@ -737,7 +738,7 @@ void QDS_Datum::setDoubleValue( const double num )
 
   mySourceValue = QString().setNum( num, 'g', 16 );
   double val = num;
-  if ( !myDicItem.IsNull() )
+  if ( !myDicItem.IsNull() && !( flags() & NotConvert ) )
     val = myDicItem->FromSI( val );
 
   QString aStr = format( ( flags() & NotFormat ) ? (QString) "" : format(), type(), val );
@@ -765,7 +766,7 @@ void QDS_Datum::setIntegerValue( const int num )
 
   mySourceValue = QString().setNum( num );
   double val = num;
-  if ( !myDicItem.IsNull() )
+  if ( !myDicItem.IsNull() && !( flags() & NotConvert ) )
     val = myDicItem->FromSI( val );
 
   QString aStr = format( ( flags() & NotFormat ) ? (QString) "" : format(), type(), val );
@@ -1297,7 +1298,7 @@ QValidator* QDS_Datum::validator( const bool limits ) const
 bool QDS_Datum::validate( const QString& txt ) const
 {
   if ( type() == DDS_DicItem::Unknown ||
-       type() == DDS_DicItem::String && isDoubleFormat( format() ) )
+       ( type() == DDS_DicItem::String && isDoubleFormat( format() ) ) )
     return true;
 
   QValidator* aValidator = validator( true );

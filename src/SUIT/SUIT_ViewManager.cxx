@@ -1,30 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_ViewManager.h"
 
 #include "SUIT_Desktop.h"
 #include "SUIT_ViewModel.h"
 #include "SUIT_ViewWindow.h"
 #include "SUIT_Study.h"
+#include "SUIT_Session.h"
 
 #include <QMap>
 #include <QRegExp>
@@ -45,9 +47,9 @@ SUIT_ViewManager::SUIT_ViewManager( SUIT_Study* theStudy,
                                     SUIT_Desktop* theDesktop,
                                     SUIT_ViewModel* theViewModel )
 : QObject( 0 ),
-myDesktop( theDesktop ),
-myTitle( "Default: %M - viewer %V" ),
-myStudy( NULL )
+  myDesktop( theDesktop ),
+  myTitle( "Default: %M - viewer %V" ),
+  myStudy( NULL )
 {
   myViewModel = 0;
   myActiveView = 0;
@@ -80,6 +82,16 @@ int SUIT_ViewManager::useNewId( const QString& type )
 
   int id = _ViewMgrId[type];
   _ViewMgrId[type]++;
+  return id;
+}
+
+
+int SUIT_ViewManager::getGlobalId() const {
+  int id = -1;
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if(app) {
+    id = app->viewManagerId(this);
+  }
   return id;
 }
 
@@ -208,6 +220,9 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
   connect(theView, SIGNAL(closing(SUIT_ViewWindow*)),
           this,    SLOT(onClosingView(SUIT_ViewWindow*)));
 
+  connect(theView, SIGNAL(tryClosing(SUIT_ViewWindow*)),
+          this,    SIGNAL(tryCloseView(SUIT_ViewWindow*)));
+
   connect(theView, SIGNAL(mousePressed(SUIT_ViewWindow*, QMouseEvent*)),
           this,    SLOT(onMousePressed(SUIT_ViewWindow*, QMouseEvent*)));
 
@@ -260,6 +275,7 @@ void SUIT_ViewManager::closeView( SUIT_ViewWindow* theView )
 
   QPointer<SUIT_ViewWindow> view( theView );
 
+  view->setClosable( false );
   view->hide();
 
   if ( !view->testAttribute( Qt::WA_DeleteOnClose ) )

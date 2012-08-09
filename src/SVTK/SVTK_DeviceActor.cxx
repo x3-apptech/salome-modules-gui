@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SVTK OBJECT : interactive object for SVTK visualization
 //  File   : SVTK_DeviceActor.cxx
 //  Author : 
-//  Module : 
-//  $Header$
-//
+
 #include "SVTK_DeviceActor.h"
 
 #include "VTKViewer_Transform.h"
@@ -39,12 +38,10 @@
 #include <vtkPolyData.h>
 #include <vtkUnstructuredGrid.h>
 
-#include <vtkPolyDataMapper.h>
-#include <vtkDataSetMapper.h>
+#include <VTKViewer_PolyDataMapper.h>
+#include <VTKViewer_DataSetMapper.h>
 
 #include <vtkPassThroughFilter.h>
-
-using namespace std;
 
 vtkStandardNewMacro(SVTK_DeviceActor);
 
@@ -62,13 +59,13 @@ SVTK_DeviceActor
 
   myIsShaded = true;
   myProperty = vtkProperty::New();
-  myRepresentation = SVTK::Representation::Surface;
+  myRepresentation = VTKViewer::Representation::Surface;
 
   myIsResolveCoincidentTopology = true;
   vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-								 myPolygonOffsetUnits);
+                                                                 myPolygonOffsetUnits);
 
-  myMapper = vtkDataSetMapper::New();
+  myMapper = VTKViewer_DataSetMapper::New();
 
   myShrinkFilter = vtkShrinkFilter::New();
 
@@ -141,9 +138,9 @@ SVTK_DeviceActor
     myPassFilter[ anId + 1 ]->SetInput( myPassFilter[ anId ]->GetOutput() );
 
     anId++; // 5
-    if(vtkDataSetMapper* aMapper = dynamic_cast<vtkDataSetMapper*>(theMapper)){
+    if(VTKViewer_DataSetMapper* aMapper = dynamic_cast<VTKViewer_DataSetMapper*>(theMapper)){
       aMapper->SetInput(myPassFilter[anId]->GetOutput());
-    }else if(vtkPolyDataMapper* aMapper = dynamic_cast<vtkPolyDataMapper*>(theMapper)){
+    }else if(VTKViewer_PolyDataMapper* aMapper = dynamic_cast<VTKViewer_PolyDataMapper*>(theMapper)){
       aMapper->SetInput(myPassFilter[anId]->GetPolyDataOutput());
     }
   }
@@ -191,18 +188,18 @@ SVTK_DeviceActor
 {
   unsigned long mTime = this->Superclass::GetMTime();
 
-  mTime = max(mTime,myGeomFilter->GetMTime());
+  mTime = std::max(mTime,myGeomFilter->GetMTime());
 
-  mTime = max(mTime,myTransformFilter->GetMTime());
+  mTime = std::max(mTime,myTransformFilter->GetMTime());
 
   if(myIsShrunk)
-    mTime = max(mTime,myShrinkFilter->GetMTime());
+    mTime = std::max(mTime,myShrinkFilter->GetMTime());
 
   if(myIsFeatureEdgesEnabled)
-    mTime = max(mTime,myFeatureEdges->GetMTime());
+    mTime = std::max(mTime,myFeatureEdges->GetMTime());
 
   for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
-    max(mTime,myPassFilter[i]->GetMTime());
+    std::max(mTime,myPassFilter[i]->GetMTime());
 
   return mTime;
 }
@@ -266,7 +263,7 @@ SVTK_DeviceActor
     int numPts = aDataSet->GetNumberOfPoints();
     //It's impossible to use to apply "shrink" for "empty" dataset
     if (numCells < 1 || numPts < 1)
- 	    return;
+            return;
     myShrinkFilter->SetInput( aDataSet );
     myPassFilter[ 1 ]->SetInput( myShrinkFilter->GetOutput() );
     myIsShrunk = true;
@@ -400,9 +397,9 @@ SVTK_DeviceActor
 void
 SVTK_DeviceActor
 ::GetFeatureEdgesFlags(bool& theIsFeatureEdges,
-		       bool& theIsBoundaryEdges,
-		       bool& theIsManifoldEdges,
-		       bool& theIsNonManifoldEdges)
+                       bool& theIsBoundaryEdges,
+                       bool& theIsManifoldEdges,
+                       bool& theIsNonManifoldEdges)
 {
   theIsFeatureEdges = myFeatureEdges->GetFeatureEdges();
   theIsBoundaryEdges = myFeatureEdges->GetBoundaryEdges();
@@ -420,9 +417,9 @@ SVTK_DeviceActor
 void
 SVTK_DeviceActor
 ::SetFeatureEdgesFlags(bool theIsFeatureEdges,
-		       bool theIsBoundaryEdges,
-		       bool theIsManifoldEdges,
-		       bool theIsNonManifoldEdges)
+                       bool theIsBoundaryEdges,
+                       bool theIsManifoldEdges,
+                       bool theIsNonManifoldEdges)
 {
   myFeatureEdges->SetFeatureEdges(theIsFeatureEdges);
   myFeatureEdges->SetBoundaryEdges(theIsBoundaryEdges);
@@ -457,13 +454,14 @@ SVTK_DeviceActor
 */
 void
 SVTK_DeviceActor
-::SetRepresentation(SVTK::Representation::Type theMode)
+::SetRepresentation(VTKViewer::Representation::Type theMode)
 { 
-  using namespace SVTK::Representation;
+  using namespace VTKViewer::Representation;
   if(IsShaded()){
     switch(myRepresentation){
     case Points : 
     case Surface : 
+    case SurfaceWithEdges :
       myProperty->SetAmbient(GetProperty()->GetAmbient());
       myProperty->SetDiffuse(GetProperty()->GetDiffuse());
       myProperty->SetSpecular(GetProperty()->GetSpecular());
@@ -472,6 +470,7 @@ SVTK_DeviceActor
     switch(theMode){
     case Points : 
     case Surface : 
+    case SurfaceWithEdges :
       GetProperty()->SetAmbient(myProperty->GetAmbient());
       GetProperty()->SetDiffuse(myProperty->GetDiffuse());
       GetProperty()->SetSpecular(myProperty->GetSpecular());
@@ -501,11 +500,14 @@ SVTK_DeviceActor
     myGeomFilter->SetInside(false);
     break;
   case Surface : 
+  case SurfaceWithEdges :
     GetProperty()->SetRepresentation(VTK_SURFACE);
     myGeomFilter->SetWireframeMode(false);
     myGeomFilter->SetInside(false);
     break;
   }
+
+  SetMarkerEnabled( theMode == Points );
 
   myRepresentation = theMode;
 }
@@ -513,7 +515,7 @@ SVTK_DeviceActor
 /*!
   \return current representation mode
 */
-SVTK::Representation::Type 
+VTKViewer::Representation::Type 
 SVTK_DeviceActor
 ::GetRepresentation()
 {
@@ -616,7 +618,7 @@ SVTK_DeviceActor
     
     vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
     vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-								   myPolygonOffsetUnits);
+                                                                   myPolygonOffsetUnits);
     Superclass::Render(ren,m);
     
     vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
@@ -633,7 +635,7 @@ SVTK_DeviceActor
 void
 SVTK_DeviceActor
 ::SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-			     vtkFloatingPointType units)
+                             vtkFloatingPointType units)
 {
   myPolygonOffsetFactor = factor;
   myPolygonOffsetUnits = units;
@@ -646,13 +648,104 @@ SVTK_DeviceActor
 void
 SVTK_DeviceActor
 ::GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-			     vtkFloatingPointType& units)
+                             vtkFloatingPointType& units)
 {
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;
 }
 
-vtkDataSetMapper* SVTK_DeviceActor::GetDataSetMapper()
+VTKViewer_DataSetMapper* SVTK_DeviceActor::GetDataSetMapper()
 {
   return myMapper;
+}
+
+/*!
+ * On/Off representation 2D quadratic element as arked polygon
+ */
+void SVTK_DeviceActor::SetQuadraticArcMode(bool theFlag){
+  myGeomFilter->SetQuadraticArcMode(theFlag);
+}
+
+/*!
+ * Return true if 2D quadratic element displayed as arked polygon
+ */
+bool SVTK_DeviceActor::GetQuadraticArcMode(){
+  return myGeomFilter->GetQuadraticArcMode();
+}
+/*!
+ * Set Max angle for representation 2D quadratic element as arked polygon
+ */
+void SVTK_DeviceActor::SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle){
+  myGeomFilter->SetQuadraticArcAngle(theMaxAngle);
+}
+
+/*!
+ * Return Max angle of the representation 2D quadratic element as arked polygon
+ */
+vtkFloatingPointType SVTK_DeviceActor::GetQuadraticArcAngle(){
+  return myGeomFilter->GetQuadraticArcAngle();
+}
+
+/*!
+ * Set point marker enabled
+ * \param theMarkerEnabled flag to enable/disable point marker
+ */
+void SVTK_DeviceActor::SetMarkerEnabled( bool theMarkerEnabled )
+{
+  myMapper->SetMarkerEnabled( theMarkerEnabled );
+}
+
+/*!
+ * Set standard point marker
+ * \param theMarkerType type of the marker
+ * \param theMarkerScale scale of the marker
+ */
+void SVTK_DeviceActor::SetMarkerStd( VTK::MarkerType theMarkerType, VTK::MarkerScale theMarkerScale )
+{
+  myMapper->SetMarkerStd( theMarkerType, theMarkerScale );
+}
+
+/*!
+ * Set custom point marker
+ * \param theMarkerId id of the marker texture
+ * \param theMarkerTexture marker texture
+ */
+void SVTK_DeviceActor::SetMarkerTexture( int theMarkerId, VTK::MarkerTexture theMarkerTexture )
+{
+  myMapper->SetMarkerTexture( theMarkerId, theMarkerTexture );
+}
+
+/*!
+ * Get type of the point marker
+ * \return type of the point marker
+ */
+VTK::MarkerType SVTK_DeviceActor::GetMarkerType()
+{
+  return myMapper->GetMarkerType();
+}
+
+/*!
+  Get scale of the point marker
+  \return scale of the point marker
+*/
+VTK::MarkerScale SVTK_DeviceActor::GetMarkerScale()
+{
+  return myMapper->GetMarkerScale();
+}
+
+/*!
+ * Get texture identifier of the point marker
+ * \return texture identifier of the point marker
+ */
+int SVTK_DeviceActor::GetMarkerTexture()
+{
+  return myMapper->GetMarkerTexture();
+}
+
+void SVTK_DeviceActor::SetCoincident3DAllowed(bool theFlag) {
+  myGeomFilter->SetAppendCoincident3D(theFlag);
+}
+
+bool SVTK_DeviceActor::IsCoincident3DAllowed() const {
+  return myGeomFilter->GetAppendCoincident3D();
 }

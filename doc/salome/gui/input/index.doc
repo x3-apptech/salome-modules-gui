@@ -54,7 +54,7 @@ The SALOME platform is available in Open Source.
 integrated Python console
 </ul>
 
-\image html image65.gif
+\image html image65.png
 
 <b>What can you do in SALOME? (Some of SALOME main functions)</b>
 <ul>
@@ -68,10 +68,8 @@ integrated Python console
 </ul>
 
 From the point of view of the \subpage salome_architecture_page "Architecture", 
-Salome is composed of several modules, which provides a
-great flexibility in its structure during 
-\subpage installing_salome_page "Installation" and
-\subpage running_salome_page "Running".
+Salome is composed of several modules. 
+To run salome (with different options) refer to \subpage running_salome_page page.
 
 This part of documentation on Salome also covers 
 \subpage introduction_to_gui_page "general Salome functionalities",

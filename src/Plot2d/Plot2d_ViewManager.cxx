@@ -1,28 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewModel.h"
 #include "Plot2d_ViewWindow.h"
 #include "Plot2d_ViewFrame.h"
+
+#include "SUIT_PreferenceMgr.h"
+#include "SUIT_ResourceMgr.h"
 
 /*!
   Constructor
@@ -63,7 +67,7 @@ bool Plot2d_ViewManager::insertView( SUIT_ViewWindow* theView )
     Plot2d_ViewFrame* aViewFrame = view->getViewFrame();
     Plot2d_Viewer* aViewer = getPlot2dModel();
     connect( aViewFrame, SIGNAL( legendClicked( QwtPlotItem* ) ), 
-	     aViewer, SLOT( onLegendClicked( QwtPlotItem* ) ) );
+             aViewer, SLOT( onLegendClicked( QwtPlotItem* ) ) );
   }
   return res;
 }
@@ -106,4 +110,79 @@ Plot2d_ViewWindow* Plot2d_ViewManager::cloneView( Plot2d_ViewWindow* srcWnd )
     emit cloneView( srcWnd->getViewFrame(), newWnd->getViewFrame() );
 
   return newWnd;
+}
+
+/*!
+  Fills preference manager for viewer
+*/
+int Plot2d_ViewManager::fillPreferences( SUIT_PreferenceMgr* thePrefMgr, const int theId )
+{
+  int aGrpId = thePrefMgr->addItem( tr( "PREF_GROUP_PLOT2DVIEWER" ), theId,
+				    SUIT_PreferenceMgr::GroupBox );
+
+  thePrefMgr->addItem( tr( "PREF_SHOW_LEGEND" ), aGrpId,
+		       SUIT_PreferenceMgr::Bool, "Plot2d", "ShowLegend" );
+  
+  int legendPosition = thePrefMgr->addItem( tr( "PREF_LEGEND_POSITION" ), aGrpId,
+					    SUIT_PreferenceMgr::Selector, "Plot2d", "LegendPos" );
+  QStringList aLegendPosList;
+  aLegendPosList.append( tr("PREF_LEFT") );
+  aLegendPosList.append( tr("PREF_RIGHT") );
+  aLegendPosList.append( tr("PREF_TOP") );
+  aLegendPosList.append( tr("PREF_BOTTOM") );
+
+  QList<QVariant> anIndexesList;
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+  anIndexesList.append(2);
+  anIndexesList.append(3);
+
+  thePrefMgr->setItemProperty( "strings", aLegendPosList, legendPosition );
+  thePrefMgr->setItemProperty( "indexes", anIndexesList, legendPosition );
+
+  int curveType = thePrefMgr->addItem( tr( "PREF_CURVE_TYPE" ), aGrpId,
+				       SUIT_PreferenceMgr::Selector, "Plot2d", "CurveType" );
+  QStringList aCurveTypesList;
+  aCurveTypesList.append( tr("PREF_POINTS") );
+  aCurveTypesList.append( tr("PREF_LINES") );
+  aCurveTypesList.append( tr("PREF_SPLINE") );
+
+  anIndexesList.clear();
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+  anIndexesList.append(2);
+
+  thePrefMgr->setItemProperty( "strings", aCurveTypesList, curveType );
+  thePrefMgr->setItemProperty( "indexes", anIndexesList, curveType );
+
+  int markerSize = thePrefMgr->addItem( tr( "PREF_MARKER_SIZE" ), aGrpId,
+					SUIT_PreferenceMgr::IntSpin, "Plot2d", "MarkerSize" );
+
+  thePrefMgr->setItemProperty( "min", 0, markerSize );
+  thePrefMgr->setItemProperty( "max", 100, markerSize );
+
+  QStringList aScaleModesList;
+  aScaleModesList.append( tr("PREF_LINEAR") );
+  aScaleModesList.append( tr("PREF_LOGARITHMIC") );
+
+  anIndexesList.clear();
+  anIndexesList.append(0);
+  anIndexesList.append(1);
+
+  int horScale = thePrefMgr->addItem( tr( "PREF_HOR_AXIS_SCALE" ), aGrpId,
+				      SUIT_PreferenceMgr::Selector, "Plot2d", "HorScaleMode" );
+
+  thePrefMgr->setItemProperty( "strings", aScaleModesList, horScale );
+  thePrefMgr->setItemProperty( "indexes", anIndexesList, horScale );
+
+  int verScale = thePrefMgr->addItem( tr( "PREF_VERT_AXIS_SCALE" ), aGrpId,
+				      SUIT_PreferenceMgr::Selector, "Plot2d", "VerScaleMode" );
+
+  thePrefMgr->setItemProperty( "strings", aScaleModesList, verScale );
+  thePrefMgr->setItemProperty( "indexes", anIndexesList, verScale );
+
+  thePrefMgr->addItem( tr( "PREF_VIEWER_BACKGROUND" ), aGrpId,
+		       SUIT_PreferenceMgr::Color, "Plot2d", "Background" );
+
+  return aGrpId;
 }

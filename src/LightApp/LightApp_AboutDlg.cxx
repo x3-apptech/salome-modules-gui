@@ -1,29 +1,31 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      LightApp_AboutDlg.cxx
 // Created:   03.06.2005 13:52:45
 // Author:    Sergey TELKOV
 //
 #include "LightApp_AboutDlg.h"
+#include "LightApp_Application.h"
 
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
@@ -35,6 +37,8 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QGroupBox>
+#include <QTabWidget>
+#include <QPushButton>
 
 /*!Constructor.*/
 LightApp_AboutDlg::LightApp_AboutDlg( const QString& defName, const QString& defVer, QWidget* parent )
@@ -56,15 +60,36 @@ LightApp_AboutDlg::LightApp_AboutDlg( const QString& defName, const QString& def
   pal.setBrush( QPalette::Inactive, QPalette::WindowText, QBrush( Qt::darkBlue ) );
   pal.setBrush( QPalette::Inactive, QPalette::Window,     QBrush( Qt::white ) );
 
+
   pal.setBrush( QPalette::Disabled, QPalette::WindowText, QBrush( Qt::darkBlue ) );
   pal.setBrush( QPalette::Disabled, QPalette::Window,     QBrush( Qt::white ) );
 
+
+
   setPalette(pal);
 
-  QVBoxLayout* main = new QVBoxLayout( mainFrame() );
-  QtxGridBox* base = new QtxGridBox( 1, Qt::Horizontal, mainFrame(), 0, 0 );
+  QTabWidget* tw = new QTabWidget( mainFrame() );
+  
+  QGridLayout* main = new QGridLayout( mainFrame() );
+  main->addWidget( tw, 0, 0, 1, 3 );
+  
+  QtxGridBox* base = new QtxGridBox( 1, Qt::Horizontal, tw, 0, 0 );
   base->setInsideMargin( 0 );
-  main->addWidget( base );
+
+  tw->addTab(base, tr("ABOUT_BASE") );
+
+  tw->addTab(getModulesInfoWidget(tw), tr("ABOUT_MODULE_INFOS") );
+
+  QPushButton * btn = new QPushButton( tr("ABOUT_CLOSE"), mainFrame() );
+
+  main->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 1, 0, 1, 1);
+
+  main->addWidget( btn, 1, 1, 1, 1);
+
+  main->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), 1, 2, 1, 1);
+
+  connect(btn, SIGNAL( clicked() ), this, SLOT( accept()) );
+
 
   QLabel* screen = new QLabel( base );
   screen->setScaledContents( true );
@@ -122,12 +147,6 @@ LightApp_AboutDlg::~LightApp_AboutDlg()
   //! Do nothing.
 }
 
-/*!On mouse press event.*/
-void LightApp_AboutDlg::mousePressEvent( QMouseEvent* )
-{
-  accept();
-}
-
 /*!Change font of widget \a wid.
  *\param wid - QWidget
  *\param bold - boolean value
@@ -157,4 +176,36 @@ void LightApp_AboutDlg::checkLabel( QLabel* lab ) const
   bool vis = !lab->text().trimmed().isEmpty() ||
              ( lab->pixmap() && !lab->pixmap()->isNull() );
   vis ? lab->show() : lab->hide();
+}
+
+/*! Return widget with info about versions of modules */
+QWidget* LightApp_AboutDlg::getModulesInfoWidget(QWidget* parent) const {
+
+  QWidget* modulesInfo = new QWidget(parent);
+  QGridLayout* gridLayout = new QGridLayout(modulesInfo);
+
+  LightApp_Application* app = dynamic_cast<LightApp_Application*>(SUIT_Session::session()->activeApplication());
+  if(app) {
+
+    CAM_Application::ModuleShortInfoList info = app->getVersionInfo();
+    
+    CAM_Application::ModuleShortInfoList::const_iterator it = info.constBegin();
+    int i = 0;
+    
+    QString unknownVersion = tr("ABOUT_UNKNOWN_VERSION");
+
+    while (it != info.constEnd()) {
+      QLabel * name = new QLabel( "<h4>" + (*it).name + ":</h4>", modulesInfo);
+      QString v = (*it).version.isEmpty() ?  unknownVersion : (*it).version;
+      QLabel * version = new QLabel("<h4>" + v + "</h4>",modulesInfo);
+      gridLayout->addWidget(name , i, 0);
+      gridLayout->addWidget(version , i, 1);
+      gridLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), i, 2);
+      it++;
+      i++;
+    }
+    gridLayout->addItem(new QSpacerItem(0, 0,  QSizePolicy::Minimum, QSizePolicy::Expanding), i, 0);
+    gridLayout->addItem(new QSpacerItem(0, 0,  QSizePolicy::Minimum, QSizePolicy::Expanding), i, 1);
+  }  
+  return modulesInfo;
 }

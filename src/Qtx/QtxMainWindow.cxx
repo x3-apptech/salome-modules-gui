@@ -1,38 +1,42 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File:      QtxMainWindow.cxx
-// Author:    Sergey TELKOV
-//
+//  File:      QtxMainWindow.cxx
+//  Author:    Sergey TELKOV
+
 #include "QtxMainWindow.h"
 
 #include "QtxToolBar.h"
-#include "QtxResourceMgr.h"
 
 #include <QEvent>
+#include <QPoint>
+#include <QTimer>
+#include <QLayout>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QRubberBand>
+#include <QMouseEvent>
 #include <QApplication>
 #include <QDesktopWidget>
-
+#include <cstdio>
 /*!
   \class QtxMainWindow::Filter
   \internal
@@ -92,6 +96,133 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
   return QObject::eventFilter( o, e );
 }
 
+/*!
+  \class QtxMainWindow::Resizer
+  \internal
+  \brief Internal object used to resize dock widgets.
+*/
+
+class QtxMainWindow::Resizer : public QObject
+{
+public:
+  Resizer( const QPoint&, const Qt::Orientation, QtxMainWindow* );
+  virtual ~Resizer();
+
+  QMouseEvent*    finalEvent() const;
+  void            setFinalEvent( QMouseEvent* );
+
+  void            setPosition( const QPoint& );
+  virtual bool    eventFilter( QObject*, QEvent* );
+
+private:
+  void            setFilters( bool );
+
+private:
+  QPoint          myPos;
+  QMainWindow*    myMain;
+  QRubberBand*    myRubber;
+  Qt::Orientation myOrient;
+  QMouseEvent*    myFinEvent;
+};
+
+/*!
+  \brief Constructor.
+  \param mw parent main window
+*/
+QtxMainWindow::Resizer::Resizer( const QPoint& p, const Qt::Orientation o, QtxMainWindow* mw )
+: QObject( mw ),
+  myMain( mw ),
+  myOrient( o ),
+  myFinEvent( 0 )
+{
+  setFilters( true );
+
+  myRubber = new QRubberBand( QRubberBand::Line, 0 );
+
+  setPosition( p );
+
+  myRubber->hide();
+};
+
+/*!
+  \brief Destructor.
+*/
+QtxMainWindow::Resizer::~Resizer()
+{
+  delete myRubber;
+
+  setFilters( false );
+}
+
+void QtxMainWindow::Resizer::setPosition( const QPoint& pos )
+{
+  myPos = pos;
+  if ( myRubber ) {
+    QRect r;
+    QPoint min = myMain->mapToGlobal( myMain->rect().topLeft() );
+    QPoint max = myMain->mapToGlobal( myMain->rect().bottomRight() );
+    if ( myOrient == Qt::Horizontal ) {
+      int p = qMax( qMin( myPos.y(), max.y() ), min.y() );
+      r = QRect( myMain->mapToGlobal( QPoint( 0, 0 ) ).x(), p - 1, myMain->width(), 3 );
+    }
+    else {
+      int p = qMax( qMin( myPos.x(), max.x() ), min.x() );
+      r = QRect( p - 1, myMain->mapToGlobal( QPoint( 0, 0 ) ).y(), 3, myMain->height() );
+    }
+    myRubber->setGeometry( r );
+    if ( !myRubber->isVisible() )
+      myRubber->show();
+  }
+}
+
+QMouseEvent* QtxMainWindow::Resizer::finalEvent() const
+{
+  return myFinEvent;
+}
+
+void QtxMainWindow::Resizer::setFinalEvent( QMouseEvent* e )
+{
+  myFinEvent = e;
+}
+
+/*!
+  \brief Event filter.
+
+  \param o recevier object
+  \param e event
+*/
+bool QtxMainWindow::Resizer::eventFilter( QObject* o, QEvent* e )
+{
+  if ( e->type() == QEvent::Timer ) {
+    if ( !finalEvent() )
+      return true;
+
+    setFilters( false );
+    QApplication::postEvent( myMain, finalEvent() );
+    myFinEvent = 0;
+    deleteLater();
+  }
+
+  return QObject::eventFilter( o, e );
+}
+
+void QtxMainWindow::Resizer::setFilters( bool on )
+{
+  if ( myMain ) {
+    if ( on )
+      myMain->layout()->installEventFilter( this );
+    else
+      myMain->layout()->removeEventFilter( this );
+  }
+
+  QTimer* t = qFindChild<QTimer*>( myMain->layout() );
+  if ( t ) {
+    if ( on )
+      t->installEventFilter( this );
+    else
+      t->removeEventFilter( this );
+  }
+}
 
 /*!
   \class QtxMainWindow
@@ -107,8 +238,15 @@ bool QtxMainWindow::Filter::eventFilter( QObject* o, QEvent* e )
 QtxMainWindow::QtxMainWindow( QWidget* parent, Qt::WindowFlags f )
 : QMainWindow( parent, f ),
   myMenuBar( 0 ),
-  myStatusBar( 0 )
+  myStatusBar( 0 ),
+  myOpaque( true ),
+  myResizer( 0 ),
+  myMouseMove( 0 ),
+  myFullScreenAllowed(true)
 {
+  //rnv: Enables tooltips for inactive windows.
+  //rnv: For details see http://bugtracker.opencascade.com/show_bug.cgi?id=20893
+  setAttribute(Qt::WA_AlwaysShowToolTips);
 }
 
 /*!
@@ -216,6 +354,16 @@ void QtxMainWindow::setDockableStatusBar( const bool on )
   }
 }
 
+bool QtxMainWindow::isOpaqueResize() const
+{
+  return myOpaque;
+}
+
+void QtxMainWindow::setOpaqueResize( bool on )
+{
+  myOpaque = on;
+}
+
 /*!
   \brief Dump main window geometry to the string.
   \return string represenation of the window geometry
@@ -253,7 +401,7 @@ QString QtxMainWindow::storeGeometry() const
     state = QString( "min" );
     break;
   case Qt::WindowFullScreen:
-    state = QString( "full" );
+    state = isFullScreenAllowed() ? QString( "full" ) : QString( "max" );
     break;
   }
 
@@ -413,3 +561,86 @@ void QtxMainWindow::onDestroyed( QObject* obj )
   }
 }
 
+bool QtxMainWindow::event( QEvent* e )
+{
+//   if ( e->type() == QEvent::WindowDeactivate ) {
+//     printf( "----------------> Deactivated\n" );
+//   }
+
+  if ( myResizer ) {
+    QMouseEvent* me = static_cast<QMouseEvent*>( e );
+    if ( ( e->type() == QEvent::MouseButtonRelease && me->button() == Qt::LeftButton ) || 
+	 ( e->type() == QEvent::MouseButtonPress && me->button() != Qt::LeftButton ) ) {
+      if ( me->button() == Qt::LeftButton ) {
+	if ( myMouseMove ) {
+	  QMainWindow::event( myMouseMove );
+	  delete myMouseMove;
+	  myMouseMove = 0;
+	}
+
+	QMouseEvent* me = static_cast<QMouseEvent*>( e );
+	myResizer->setFinalEvent( new QMouseEvent( QEvent::MouseButtonRelease, me->pos(), me->globalPos(),
+						   Qt::LeftButton, me->buttons(), me->modifiers() ) );
+	myResizer = 0;
+	return true;
+      }
+    }
+  }
+
+  if ( myResizer && e->type() == QEvent::MouseMove ) {
+    QMouseEvent* me = static_cast<QMouseEvent*>( e );
+    if ( myMouseMove )
+      delete myMouseMove;
+    myMouseMove = new QMouseEvent( me->type(), me->pos(), me->globalPos(),
+                                   me->button(), me->buttons(), me->modifiers() );
+    myResizer->setPosition( me->globalPos() );
+  }
+
+  bool ok = QMainWindow::event( e );
+
+  if ( !myResizer && e->type() == QEvent::MouseButtonPress ) {
+    QMouseEvent* me = static_cast<QMouseEvent*>( e );
+    if ( !isOpaqueResize() && ok && testAttribute( Qt::WA_SetCursor ) && me->button() == Qt::LeftButton ) {
+      bool status = true;
+      Qt::Orientation o;
+      switch ( cursor().shape() )
+	{
+	case Qt::SplitHCursor:
+	  o = Qt::Vertical;
+	  break;
+	case Qt::SplitVCursor:
+	  o = Qt::Horizontal;
+	  break;
+	default:
+	  status = false;
+	  break;
+	}
+      if ( status ) {
+	myResizer = new Resizer( me->globalPos(), o, this );
+	myMouseMove = new QMouseEvent( me->type(), me->pos(), me->globalPos(),
+				       me->button(), me->buttons(), me->modifiers() );
+      }
+    }
+  }
+
+  return ok;
+}
+
+/*!
+  \brief FullScreenAllowed flag allowed dump in the main window geometry 
+         Qt::WindowFullScreen parameter.
+  \return \c fullScreenAllowed flag.
+*/
+bool QtxMainWindow::isFullScreenAllowed() const {
+  return myFullScreenAllowed;
+}
+
+
+/*!
+  \brief Set FullScreenAllowed flag.
+         The default value is true.
+  \param f value of the fullScreenAllowed flag.
+*/
+void QtxMainWindow::setFullScreenAllowed( const bool f ) {
+    myFullScreenAllowed = f;
+}

@@ -1,42 +1,34 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "VTKViewer_RenderWindowInteractor.h"
 #include "VTKViewer_RenderWindow.h"
 #include "VTKViewer_InteractorStyle.h"
 #include "SUIT_ViewModel.h"
 #include "VTKViewer_ViewWindow.h"
 
-//#include "SUIT_Application.h"
-//#include "SUIT_Desktop.h"
-
-//#include "SALOME_Selection.h"
 #include "VTKViewer_Actor.h"
 #include "VTKViewer_Algorithm.h"
 #include "VTKViewer_Functor.h"
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <math.h>
 
 // VTK Includes
 #include <vtkAssemblyNode.h>
@@ -391,8 +383,8 @@ void VTKViewer_RenderWindowInteractor::LeftButtonPressed(const QMouseEvent *even
     return ;
   }
   myInteractorStyle->OnLeftButtonDown((event->modifiers() & Qt::ControlModifier), 
-				      (event->modifiers() & Qt::ShiftModifier), 
-				      event->x(), event->y());
+                                      (event->modifiers() & Qt::ShiftModifier), 
+                                      event->x(), event->y());
 }
 
 /*!Reaction on left button releases.\n
@@ -404,8 +396,8 @@ void VTKViewer_RenderWindowInteractor::LeftButtonReleased(const QMouseEvent *eve
     return ;
   }
   myInteractorStyle->OnLeftButtonUp( (event->modifiers() & Qt::ControlModifier), 
-				     (event->modifiers() & Qt::ShiftModifier), 
-				     event->x(), event->y() ) ;
+                                     (event->modifiers() & Qt::ShiftModifier), 
+                                     event->x(), event->y() ) ;
 }
 
 /*!Reaction on middle button pressed.\n
@@ -417,8 +409,8 @@ void VTKViewer_RenderWindowInteractor::MiddleButtonPressed(const QMouseEvent *ev
     return ;
   }
   myInteractorStyle->OnMiddleButtonDown((event->modifiers() & Qt::ControlModifier), 
-					(event->modifiers() & Qt::ShiftModifier), 
-					event->x(), event->y() ) ;
+                                        (event->modifiers() & Qt::ShiftModifier), 
+                                        event->x(), event->y() ) ;
 }
 
 /*!Reaction on middle button released.\n
@@ -430,8 +422,8 @@ void VTKViewer_RenderWindowInteractor::MiddleButtonReleased(const QMouseEvent *e
     return ;
   }
   myInteractorStyle->OnMiddleButtonUp( (event->modifiers() & Qt::ControlModifier), 
-				       (event->modifiers() & Qt::ShiftModifier), 
-				       event->x(), event->y() ) ;
+                                       (event->modifiers() & Qt::ShiftModifier), 
+                                       event->x(), event->y() ) ;
 }
 
 /*!Reaction on right button pressed.\n
@@ -443,8 +435,8 @@ void VTKViewer_RenderWindowInteractor::RightButtonPressed(const QMouseEvent *eve
     return ;
   }
   myInteractorStyle->OnRightButtonDown( (event->modifiers() & Qt::ControlModifier), 
-					(event->modifiers() & Qt::ShiftModifier), 
-					event->x(), event->y() ) ;
+                                        (event->modifiers() & Qt::ShiftModifier), 
+                                        event->x(), event->y() ) ;
 }
 
 /*!Reaction on right button released.\n
@@ -457,8 +449,8 @@ void VTKViewer_RenderWindowInteractor::RightButtonReleased(const QMouseEvent *ev
   }
   bool isOperation = myInteractorStyle->CurrentState() != VTK_INTERACTOR_STYLE_CAMERA_NONE;
   myInteractorStyle->OnRightButtonUp( (event->modifiers() & Qt::ControlModifier),
-				      (event->modifiers() & Qt::ShiftModifier),
-				      event->x(), event->y() );
+                                      (event->modifiers() & Qt::ShiftModifier),
+                                      event->x(), event->y() );
   if ( !isOperation )
   {
     QContextMenuEvent aEvent( QContextMenuEvent::Mouse,
@@ -490,21 +482,37 @@ int VTKViewer_RenderWindowInteractor::GetDisplayMode() {
 void VTKViewer_RenderWindowInteractor::SetDisplayMode(int theMode) {
   if(theMode == 0)
     ChangeRepresentationToWireframe();
-  else
+  else if (theMode == 1)
     ChangeRepresentationToSurface();
+  else if (theMode == 2) {
+    ChangeRepresentationToSurfaceWithEdges();
+    theMode++;
+  }
   myDisplayMode = theMode;
 }
 
 /*!Change all actors to wireframe*/
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToWireframe()
 {
-  ChangeRepresentationToWireframe(GetRenderer()->GetActors());
+  using namespace VTK;
+  ActorCollectionCopy aCopy(GetRenderer()->GetActors());
+  ChangeRepresentationToWireframe(aCopy.GetActors());
 }
 
 /*!Change all actors to surface*/
 void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurface()
 {
-  ChangeRepresentationToSurface(GetRenderer()->GetActors());
+  using namespace VTK;
+  ActorCollectionCopy aCopy(GetRenderer()->GetActors());
+  ChangeRepresentationToSurface(aCopy.GetActors());
+}
+
+/*!Change all actors to surface with edges*/
+void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurfaceWithEdges()
+{
+  using namespace VTK;
+  ActorCollectionCopy aCopy(GetRenderer()->GetActors());
+  ChangeRepresentationToSurfaceWithEdges(aCopy.GetActors());
 }
 
 /*!Change all actors from \a theCollection to wireframe and
@@ -514,8 +522,8 @@ void VTKViewer_RenderWindowInteractor::ChangeRepresentationToWireframe(vtkActorC
 {
   using namespace VTK;
   ForEach<VTKViewer_Actor>(theCollection,
-			TSetFunction<VTKViewer_Actor,int>
-			(&VTKViewer_Actor::setDisplayMode,0));
+                        TSetFunction<VTKViewer_Actor,int>
+                        (&VTKViewer_Actor::setDisplayMode,0));
   emit RenderWindowModified();
 }
 
@@ -526,8 +534,20 @@ void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurface(vtkActorCol
 {
   using namespace VTK;
   ForEach<VTKViewer_Actor>(theCollection,
-			TSetFunction<VTKViewer_Actor,int>
-			(&VTKViewer_Actor::setDisplayMode,1));
+                        TSetFunction<VTKViewer_Actor,int>
+                        (&VTKViewer_Actor::setDisplayMode,1));
+  emit RenderWindowModified();
+}
+
+/*!Change all actors from \a theCollection to surface with edges and
+ * emit render window modified.
+ */
+void VTKViewer_RenderWindowInteractor::ChangeRepresentationToSurfaceWithEdges(vtkActorCollection* theCollection)
+{
+  using namespace VTK;
+  ForEach<VTKViewer_Actor>(theCollection,
+                        TSetFunction<VTKViewer_Actor,int>
+                        (&VTKViewer_Actor::setDisplayMode,3));
   emit RenderWindowModified();
 }
 
@@ -550,8 +570,8 @@ void VTKViewer_RenderWindowInteractor::EraseAll()
 void VTKViewer_RenderWindowInteractor::DisplayAll()
 {
   using namespace VTK;
-  vtkActorCollection* aCollection = GetRenderer()->GetActors();
-  ForEach<VTKViewer_Actor>(aCollection,TSetVisibility<VTKViewer_Actor>(true));
+  ActorCollectionCopy aCopy(GetRenderer()->GetActors());
+  ForEach<VTKViewer_Actor>(aCopy.GetActors(),TSetVisibility<VTKViewer_Actor>(true));
 
   emit RenderWindowModified() ;
 }
@@ -566,7 +586,7 @@ void VTKViewer_RenderWindowInteractor::Remove( VTKViewer_Actor* SActor, bool upd
 {
   if ( SActor != 0 )
   {
-    GetRenderer()->RemoveProp( SActor );
+    GetRenderer()->RemoveViewProp( SActor );
     if ( updateViewer )
       emit RenderWindowModified();
   }
@@ -577,8 +597,10 @@ void VTKViewer_RenderWindowInteractor::Remove( VTKViewer_Actor* SActor, bool upd
  */
 void VTKViewer_RenderWindowInteractor::RemoveAll( const bool updateViewer )
 {
+  using namespace VTK;
   vtkRenderer* aRenderer = GetRenderer();
-  vtkActorCollection* anActors = aRenderer->GetActors();
+  ActorCollectionCopy aCopy(aRenderer->GetActors());
+  vtkActorCollection* anActors = aCopy.GetActors();
   if ( anActors )
   {
     anActors->InitTraversal();
@@ -627,7 +649,8 @@ struct TUpdateAction{
 void VTKViewer_RenderWindowInteractor::Update() {
   using namespace VTK;
   vtkRenderer* aRen = GetRenderer();
-  ForEach<vtkActor>(aRen->GetActors(),TUpdateAction());
+  ActorCollectionCopy aCopy(aRen->GetActors());
+  ForEach<vtkActor>(aCopy.GetActors(),TUpdateAction());
 
   aRen->ResetCamera();
 
@@ -657,8 +680,8 @@ bool VTKViewer_RenderWindowInteractor::unHighlightAll(){
  * \li Emit render window modified, if flag \a update - true.
  */
 bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteger& theMapIndex,
-						 VTKViewer_Actor* theMapActor, VTKViewer_Actor* theActor,
-						 TUpdateActor theFun, bool hilight, bool update)
+                                                 VTKViewer_Actor* theMapActor, VTKViewer_Actor* theActor,
+                                                 TUpdateActor theFun, bool hilight, bool update)
 {
   if(theMapIndex.Extent() == 0) return false;
 
@@ -680,9 +703,9 @@ bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteg
 
 /*!Sets actors data.*/
 void VTKViewer_RenderWindowInteractor::setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
-						    VTKViewer_Actor * theMapActor,
-						    VTKViewer_Actor * theActor,
-						    TUpdateActor theFun)
+                                                    VTKViewer_Actor * theMapActor,
+                                                    VTKViewer_Actor * theActor,
+                                                    TUpdateActor theFun)
 {
   (*theFun)(theMapIndex,theMapActor,theActor);
   vtkFloatingPointType aPos[3];

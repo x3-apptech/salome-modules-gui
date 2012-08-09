@@ -1,30 +1,26 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : 
 //  Author : 
-//  Module : SALOME
-//  $Header: 
-//
+
 #include "SVTK_ViewParameterDlg.h"
 #include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
@@ -50,15 +46,13 @@
 #include <vtkCamera.h>
 #include <vtkGenericRenderWindowInteractor.h>
 
-using namespace std;
-
 /*!
   Constructor
 */
 SVTK_ViewParameterDlg::SVTK_ViewParameterDlg(QtxAction* theAction,
-					     SVTK_ViewWindow* theParent,
-					     const char* theName):
-  SVTK_DialogBase(theAction, theParent, theName),
+                                             SVTK_ViewWindow* theParent,
+                                             const char* theName):
+  ViewerTools_DialogBase(theAction, theParent, theName),
   myMainWindow(theParent),
   myPriority(0.0),
   myEventCallbackCommand(vtkCallbackCommand::New()),
@@ -415,9 +409,9 @@ void SVTK_ViewParameterDlg::addObserver()
   Processes events
 */
 void SVTK_ViewParameterDlg::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
-					  unsigned long theEvent,
-					  void* theClientData, 
-					  void* theCallData)
+                                          unsigned long theEvent,
+                                          void* theClientData, 
+                                          void* theCallData)
 {
   SVTK_ViewParameterDlg* self = reinterpret_cast<SVTK_ViewParameterDlg*>(theClientData);
   vtkFloatingPointType* aCoord;
@@ -566,8 +560,8 @@ void SVTK_ViewParameterDlg::onFocalCoordChanged()
 
   vtkCamera* aCamera = myRWInteractor->getRenderer()->GetActiveCamera();
   aCamera->SetFocalPoint(myFocalX->text().toDouble(),
-			 myFocalY->text().toDouble(),
-			 myFocalZ->text().toDouble());
+                         myFocalY->text().toDouble(),
+                         myFocalZ->text().toDouble());
 
   aCamera->OrthogonalizeViewUp();
   myRWInteractor->getRenderer()->ResetCameraClippingRange();
@@ -586,8 +580,8 @@ void SVTK_ViewParameterDlg::onCameraCoordChanged()
 
   vtkCamera* aCamera = myRWInteractor->getRenderer()->GetActiveCamera();
   aCamera->SetPosition(myCameraX->text().toDouble(),
-		       myCameraY->text().toDouble(),
-		       myCameraZ->text().toDouble());
+                       myCameraY->text().toDouble(),
+                       myCameraZ->text().toDouble());
 
   aCamera->OrthogonalizeViewUp();
   myRWInteractor->getRenderer()->ResetCameraClippingRange();
@@ -618,8 +612,8 @@ void SVTK_ViewParameterDlg::onViewDirectionChanged()
 
   vtkCamera* aCamera = myRWInteractor->getRenderer()->GetActiveCamera();
   aCamera->SetViewUp(myViewDirX->text().toDouble(),
-		     myViewDirY->text().toDouble(),
-		     myViewDirZ->text().toDouble());
+                     myViewDirY->text().toDouble(),
+                     myViewDirZ->text().toDouble());
 
   // update view
   myRWInteractor->GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
@@ -716,7 +710,7 @@ void SVTK_ViewParameterDlg::updateCoordinates()
     // recompute focal point
     if (computePoint(pos, dir, dist, pnt)) {
       if (mySelectPoint->isChecked())
-	mySelectPoint->toggle();
+        mySelectPoint->toggle();
       myBusy = true;
       myFocalX->setText(QString::number(pnt[0]));
       myFocalY->setText(QString::number(pnt[1]));
@@ -728,9 +722,9 @@ void SVTK_ViewParameterDlg::updateCoordinates()
 }
 
 bool SVTK_ViewParameterDlg::computePoint(const double start[3], 
-					 const double dir[3], 
-					 const double dist, 
-					 double result[3])
+                                         const double dir[3], 
+                                         const double dist, 
+                                         double result[3])
 {
   double d = sqrt(dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]);
   if ( d < 0.0002 ) return false;

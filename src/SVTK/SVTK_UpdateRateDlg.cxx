@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : 
 //  Author : 
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SVTK_UpdateRateDlg.h"
 
 #include "SVTK_ViewWindow.h"
@@ -53,8 +52,6 @@
 static vtkFloatingPointType OFF_UPDATE_RATE = 0.00001;
 static vtkFloatingPointType FLOAT_TOLERANCE = 1.0 / VTK_LARGE_FLOAT;
 
-using namespace std;
-
 namespace
 {
   //----------------------------------------------------------------------------
@@ -65,10 +62,10 @@ namespace
     if(vtkRenderer *aRenderer = theRWInteractor->getRenderer()){
       vtkFloatingPointType aLastRenderTimeInSeconds = aRenderer->GetLastRenderTimeInSeconds();
       if(aLastRenderTimeInSeconds > FLOAT_TOLERANCE){
-	std::ostringstream aStr;
-	vtkFloatingPointType aFPS = 1.0 / aLastRenderTimeInSeconds;
-	aStr<<aFPS;
-	return QString(aStr.str().c_str());
+        std::ostringstream aStr;
+        vtkFloatingPointType aFPS = 1.0 / aLastRenderTimeInSeconds;
+        aStr<<aFPS;
+        return QString(aStr.str().c_str());
       }
     }
     return "Inf";
@@ -90,9 +87,9 @@ namespace
     operator()(vtkActor* theActor)
     {
       if(theActor->GetVisibility()){
-	myVTKMultiplier += theActor->GetAllocatedRenderTime();
-	if(dynamic_cast<SALOME_Actor*>(theActor))
-	  mySALOMEMultiplier += theActor->GetAllocatedRenderTime();
+        myVTKMultiplier += theActor->GetAllocatedRenderTime();
+        if(dynamic_cast<SALOME_Actor*>(theActor))
+          mySALOMEMultiplier += theActor->GetAllocatedRenderTime();
       }
     }
   };
@@ -102,16 +99,17 @@ namespace
   inline
   vtkFloatingPointType 
   AdjustUpdateRate(SVTK_RenderWindowInteractor* theRWInteractor,
-		   vtkFloatingPointType theUpdateRate)
+                   vtkFloatingPointType theUpdateRate)
   {
     if(vtkRenderer *aRenderer = theRWInteractor->getRenderer()){
-      if(vtkActorCollection *anActorCollection = aRenderer->GetActors()){
-	TRenderTimeMultiplier aMultiplier;
-	using namespace VTK;
-	aMultiplier = ForEach<vtkActor>(anActorCollection,
-					aMultiplier);
-	if(aMultiplier.mySALOMEMultiplier > FLOAT_TOLERANCE)
-	  theUpdateRate *= aMultiplier.mySALOMEMultiplier / aMultiplier.myVTKMultiplier;
+      VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
+      if(vtkActorCollection *anActorCollection = aCopy.GetActors()){
+        TRenderTimeMultiplier aMultiplier;
+        using namespace VTK;
+        aMultiplier = ForEach<vtkActor>(anActorCollection,
+                                        aMultiplier);
+        if(aMultiplier.mySALOMEMultiplier > FLOAT_TOLERANCE)
+          theUpdateRate *= aMultiplier.mySALOMEMultiplier / aMultiplier.myVTKMultiplier;
       }
     }
     return theUpdateRate;
@@ -130,11 +128,11 @@ namespace
     operator()(SALOME_Actor* theActor)
     {
       if(theActor->GetVisibility()){
-	if(vtkMapper *aMapper = theActor->GetMapper()){
-	  if(vtkDataSet *aDataSet = aMapper->GetInput()){
-	    myCounter += aDataSet->GetNumberOfCells();
-	  }
-	}
+        if(vtkMapper *aMapper = theActor->GetMapper()){
+          if(vtkDataSet *aDataSet = aMapper->GetInput()){
+            myCounter += aDataSet->GetNumberOfCells();
+          }
+        }
       }
     }
   };
@@ -146,12 +144,13 @@ namespace
   GetNumberOfCells(SVTK_RenderWindowInteractor* theRWInteractor)
   {
     if(vtkRenderer *aRenderer = theRWInteractor->getRenderer()){
-      if(vtkActorCollection *anActorCollection = aRenderer->GetActors()){
-	TCellsCounter aCounter;
-	using namespace VTK;
-	aCounter = ForEach<SALOME_Actor>(anActorCollection,
-					 aCounter);
-	return QString::number(aCounter.myCounter);
+      VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
+      if(vtkActorCollection *anActorCollection = aCopy.GetActors()){
+        TCellsCounter aCounter;
+        using namespace VTK;
+        aCounter = ForEach<SALOME_Actor>(anActorCollection,
+                                         aCounter);
+        return QString::number(aCounter.myCounter);
       }
     }
     
@@ -164,11 +163,11 @@ namespace
 */
 SVTK_UpdateRateDlg
 ::SVTK_UpdateRateDlg(QtxAction* theAction,
-		     SVTK_ViewWindow* theParent,
-		     const char* theName):
-  SVTK_DialogBase(theAction,
-		  theParent, 
-		  theName),
+                     SVTK_ViewWindow* theParent,
+                     const char* theName):
+  ViewerTools_DialogBase(theAction,
+                         theParent, 
+                         theName),
   myPriority(0.0),
   myEventCallbackCommand(vtkCallbackCommand::New()),
   myRWInteractor(theParent->GetInteractor()),
@@ -293,8 +292,8 @@ SVTK_UpdateRateDlg
   myEventCallbackCommand->SetCallback(SVTK_UpdateRateDlg::ProcessEvents);
   vtkRenderer *aRenderer = myRWInteractor->getRenderer();
   aRenderer->AddObserver(vtkCommand::EndEvent,
-			 myEventCallbackCommand.GetPointer(), 
-			 myPriority);
+                         myEventCallbackCommand.GetPointer(), 
+                         myPriority);
 }
 
 /*!
@@ -312,9 +311,9 @@ SVTK_UpdateRateDlg
 void 
 SVTK_UpdateRateDlg
 ::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
-		unsigned long theEvent,
-		void* theClientData, 
-		void* vtkNotUsed(theCallData))
+                unsigned long theEvent,
+                void* theClientData, 
+                void* vtkNotUsed(theCallData))
 {
   SVTK_UpdateRateDlg* self = reinterpret_cast<SVTK_UpdateRateDlg*>(theClientData);
 

@@ -1,28 +1,31 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "CAF_Study.h"
 
 #include "CAF_Tools.h"
 #include "CAF_Application.h"
+
+#include <Basics_OCCTVersion.hxx>
 
 #include <SUIT_Desktop.h>
 #include <SUIT_MessageBox.h>
@@ -105,7 +108,7 @@ bool CAF_Study::createDocument( const QString& doc )
   if ( res && app && !app->stdApp().IsNull() )
   {
     try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
       OCC_CATCH_SIGNALS;
 #endif
       TColStd_SequenceOfExtendedString formats;
@@ -146,10 +149,15 @@ bool CAF_Study::openDocument( const QString& fname )
 
   bool status = false;
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
+
+#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
+    status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == PCDM_RS_OK;
+#else
     status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == CDF_RS_OK;
+#endif
   }
   catch ( Standard_Failure ) {
     status = false;
@@ -177,11 +185,15 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
 
   bool status = false;
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     if ( save )
+#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
+      status = app->Save( stdDoc() ) == PCDM_SS_OK;
+#else
       status = app->Save( stdDoc() ) == CDF_SS_OK;
+#endif
     else
     {
       TCollection_ExtendedString format, path( CAF_Tools::toExtString( fname ) );
@@ -190,7 +202,11 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
       if ( format.Length() )
         stdDoc()->ChangeStorageFormat( format );
 
+#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
+      status = app->SaveAs( stdDoc(), path ) == PCDM_SS_OK;
+#else
       status = app->SaveAs( stdDoc(), path ) == CDF_SS_OK;
+#endif
     }
   }
   catch ( Standard_Failure ) {
@@ -217,7 +233,7 @@ bool CAF_Study::openTransaction()
 
   bool res = true;
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     if ( myStdDoc->HasOpenCommand() )
@@ -243,7 +259,7 @@ bool CAF_Study::abortTransaction()
 
   bool res = true;
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     myStdDoc->AbortCommand();
@@ -266,7 +282,7 @@ bool CAF_Study::commitTransaction( const QString& name )
 
   bool res = true;
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     myStdDoc->CommitCommand();
@@ -371,7 +387,7 @@ bool CAF_Study::undo()
     return false;
 
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     myStdDoc->Undo();
@@ -379,7 +395,7 @@ bool CAF_Study::undo()
   }
   catch ( Standard_Failure ) {
     SUIT_MessageBox::critical(application()->desktop(), tr( "ERR_ERROR" ),
-			      tr( "ERR_DOC_UNDO" ));
+                              tr( "ERR_DOC_UNDO" ));
     return false;
   }
   return true;
@@ -395,7 +411,7 @@ bool CAF_Study::redo()
     return false;
 
   try {
-#if (OCC_VERSION_MAJOR << 16 | OCC_VERSION_MINOR << 8 | OCC_VERSION_MAINTENANCE) > 0x060100
+#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
 #endif
     myStdDoc->Redo();
@@ -403,7 +419,7 @@ bool CAF_Study::redo()
   }
   catch ( Standard_Failure ) {
     SUIT_MessageBox::critical( application()->desktop(), tr( "ERR_ERROR" ),
-			       tr( "ERR_DOC_REDO" ) );
+                               tr( "ERR_DOC_REDO" ) );
     return false;
   }
   return true;

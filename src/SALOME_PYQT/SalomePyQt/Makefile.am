@@ -1,24 +1,25 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  File   : Makefile.in
 #  Author : Nicolas REJNERI
 #  Module : SALOME
@@ -47,27 +48,26 @@ CLEANFILES = $(SIP_SRC)
 MOC_FILES = SalomePyQt_moc.cxx
 
 # compilation flags
-COMMON_CPP_FLAGS = $(QT_INCLUDES) $(QWT_INCLUDES) $(SIP_INCLUDES) $(PYTHON_INCLUDES)	\
-	$(CAS_CPPFLAGS) $(VTK_INCLUDES) $(OGL_INCLUDES) $(BOOST_CPPFLAGS)		\
-	-DHAVE_CONFIG_H @KERNEL_CXXFLAGS@ -I$(top_builddir)/salomeadn/unix		\
-	-I$(srcdir) -I$(top_builddir)/idl						\
-	-I$(srcdir)/../../SUIT -I$(srcdir)/../../CAM -I$(srcdir)/../../STD		\
-	-I$(srcdir)/../../Qtx -I$(srcdir)/../../SalomeApp -I$(srcdir)/../../Event	\
-	-I$(srcdir)/../../SalomeSession -I$(srcdir)/../../LogWindow			\
-	-I$(srcdir)/../../VTKViewer -I$(srcdir)/../../TOOLSGUI				\
-	-I$(srcdir)/../../OCCViewer -I$(srcdir)/../../Plot2d				\
-	-I$(srcdir)/../SALOME_PYQT_GUI -I$(srcdir)/../../PyInterp			\
-	-I$(srcdir)/../../LightApp -I$(srcdir)/../../ObjBrowser				\
-	-I$(srcdir)/../../OBJECT							\
-	-I$(top_builddir)/salome_adm/unix @CORBA_CXXFLAGS@ @CORBA_INCLUDES@
+COMMON_CPP_FLAGS = $(QT_INCLUDES) $(QWT_INCLUDES) $(SIP_INCLUDES) $(PYTHON_INCLUDES)	 \
+	$(CAS_CPPFLAGS) $(VTK_INCLUDES) $(OGL_INCLUDES) $(BOOST_CPPFLAGS)		 \
+	-DHAVE_CONFIG_H @KERNEL_CXXFLAGS@ -I$(top_builddir)/salomeadn/unix		 \
+	-I$(srcdir) -I$(top_builddir)/idl						 \
+	-I$(srcdir)/../../SUIT -I$(srcdir)/../../CAM -I$(srcdir)/../../STD		 \
+	-I$(srcdir)/../../Qtx -I$(srcdir)/../../Event	                                 \
+	-I$(srcdir)/../../LogWindow			                                 \
+	-I$(srcdir)/../../VTKViewer                     				 \
+	-I$(srcdir)/../../OCCViewer -I$(srcdir)/../../Plot2d				 \
+	-I$(srcdir)/../SALOME_PYQT_GUILight -I$(srcdir)/../../PyInterp			 \
+	-I$(srcdir)/../../LightApp -I$(srcdir)/../../ObjBrowser				 \
+	-I$(srcdir)/../../OBJECT							
 
 # linkage flags
-COMMON_LIBS = $(PYTHON_LIBS) $(SIP_LIBS) $(PYQT_LIBS) $(VTK_LIBS) $(QWT_LIBS)		\
-	$(OGL_LIBS) ../../SUIT/libsuit.la ../../CAM/libCAM.la ../../STD/libstd.la	\
-	../../Qtx/libqtx.la ../../SalomeApp/libSalomeApp.la ../../Event/libEvent.la	\
-	../../Session/libSalomeSession.la ../../LogWindow/libLogWindow.la		\
-	../../VTKViewer/libVTKViewer.la ../../TOOLSGUI/libToolsGUI.la			\
-	../SALOME_PYQT_GUI/libSalomePyQtGUI.la ../../OCCViewer/libOCCViewer.la		\
+COMMON_LIBS = $(PYTHON_LIBS) $(SIP_LIBS) $(PYQT_LIBS) $(VTK_LIBS) $(QWT_LIBS)		 \
+	$(OGL_LIBS) ../../SUIT/libsuit.la ../../CAM/libCAM.la ../../STD/libstd.la	 \
+	../../Qtx/libqtx.la ../../Event/libEvent.la	                                 \
+	../../LogWindow/libLogWindow.la		                                         \
+	../../VTKViewer/libVTKViewer.la                         			 \
+	../SALOME_PYQT_GUILight/libSalomePyQtGUILight.la ../../OCCViewer/libOCCViewer.la \
 	../../Plot2d/libPlot2d.la
 
 # libraries targets

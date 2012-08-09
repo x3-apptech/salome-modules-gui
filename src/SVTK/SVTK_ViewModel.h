@@ -1,32 +1,36 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef SVTK_VIEWMODEL_H
 #define SVTK_VIEWMODEL_H
 
 #include "SVTK.h"
 #include "SVTK_ViewModelBase.h"
 
-#include "SALOME_Prs.h"
-#include "SALOME_InteractiveObject.hxx"
+#include "Qtx.h"
+
+#include <SALOME_Prs.h>
+#include <SALOME_InteractiveObject.hxx>
+#include <SALOME_ListIO.hxx>
 
 #include <QColor>
 #include <QMap>
@@ -42,10 +46,24 @@ class SVTK_EXPORT SVTK_Viewer : public SVTK_ViewModelBase, public SALOME_View
   Q_OBJECT;
 
 public:
+  /*! supported gradient types */
+  enum { 
+    HorizontalGradient,
+    VerticalGradient,
+    FirstDiagonalGradient,
+    SecondDiagonalGradient,
+    FirstCornerGradient,
+    SecondCornerGradient,
+    ThirdCornerGradient,
+    FourthCornerGradient,
+    LastGradient = FourthCornerGradient,
+  };
+
   typedef SVTK_ViewWindow TViewWindow;
   
   //! Define string representation of the viewer type
-  static QString Type() { return "VTKViewer"; }
+  static QString           Type() { return "VTKViewer"; }
+  static QString           backgroundData( QStringList&, QIntList&, QIntList& );
 
   SVTK_Viewer();
   virtual ~SVTK_Viewer();
@@ -62,11 +80,17 @@ public:
   //! See #SUIT_ViewModel::getType
   virtual QString getType() const { return Type(); }
 
-  //! Get background color of the viewer
+  //! Get background color of the viewer [obsolete]
   QColor backgroundColor() const;
 
-  //! Set background color to the viewer
+  //! Set background color to the viewer [obsolete]
   void setBackgroundColor( const QColor& );
+
+  //! Get background color of the viewer
+  Qtx::BackgroundData background() const;
+
+  //! Set background color to the viewer
+  void setBackground( const Qtx::BackgroundData& );
 
   //! Get size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
   vtkFloatingPointType trihedronSize() const;
@@ -76,6 +100,12 @@ public:
 
   //! Set size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
   void setTrihedronSize( const vtkFloatingPointType, const bool = true );
+
+  //! Get visibility status of the static trihedron
+  bool isStaticTrihedronVisible() const;
+
+  //! Set visibility status of the static trihedron
+  void setStaticTrihedronVisible( const bool );
 
   //! Gets projection mode
   int projectionMode() const;
@@ -88,6 +118,18 @@ public:
 
   //! Sets interaction style
   void setInteractionStyle( const int );
+
+  //! Gets zooming style
+  int zoomingStyle() const;
+
+  //! Sets zooming style
+  void setZoomingStyle( const int );
+
+  //! Gets dynamic preselection
+  bool dynamicPreSelection() const;
+
+  //! Sets dynamic preselection
+  void setDynamicPreSelection( const bool );
 
   //! Get incremental speed (see #SVTK_InteractorStyle::ControllerIncrement)
   int incrementalSpeed() const;
@@ -124,14 +166,11 @@ public:
   //! See #SALOME_View::EraseAll( const bool = false )
   void EraseAll( const bool = false );
 
+  //! See #SALOME_View::getVisible( SALOME_ListIO& )
+  virtual void GetVisible( SALOME_ListIO& );
+
   //! See #SALOME_View::CreatePrs( const char* entry = 0 )
   SALOME_Prs* CreatePrs( const char* entry = 0 );
-
-  //! See #SALOME_View::BeforeDisplay( SALOME_Displayer* d )
-  virtual void BeforeDisplay( SALOME_Displayer* d );
-
-  //! See #SALOME_View::AfterDisplay( SALOME_Displayer* d )
-  virtual void AfterDisplay( SALOME_Displayer* d );
 
   //! See #SALOME_View::isVisible( const Handle(SALOME_InteractiveObject)& )
   virtual bool isVisible( const Handle(SALOME_InteractiveObject)& );
@@ -149,7 +188,7 @@ protected slots:
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
 
   void onDumpView();
-  void onChangeBgColor();
+  void onChangeBackground();
 
   void onActorAdded(VTKViewer_Actor*);
   void onActorRemoved(VTKViewer_Actor*);
@@ -157,17 +196,19 @@ protected slots:
 private:
   void updateToolBars();
 
-
-  QColor myBgColor;
+  Qtx::BackgroundData  myDefaultBackground;
   vtkFloatingPointType myTrihedronSize;
-  bool   myTrihedronRelative;
-  bool   mySelectionEnabled;
-  bool   myMultiSelectionEnabled;
-  int    myIncrementSpeed;
-  int    myIncrementMode;
-  int    myProjMode;
-  int    myStyle;
-  int    mySpaceBtn[3];
+  bool                 myTrihedronRelative;
+  bool                 myIsStaticTrihedronVisible;
+  bool                 mySelectionEnabled;
+  bool                 myMultiSelectionEnabled;
+  int                  myIncrementSpeed;
+  int                  myIncrementMode;
+  int                  myProjMode;
+  int                  myStyle;
+  int                  myZoomingStyle;
+  bool                 myDynamicPreSelection;
+  int                  mySpaceBtn[3];
 };
 
 #endif

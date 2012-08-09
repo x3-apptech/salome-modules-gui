@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
 //  File   : SALOME_AISShape.hxx
 //  Module : SALOME
@@ -39,18 +40,22 @@
 #ifndef _Handle_SALOME_InteractiveObject_HeaderFile
 #include <Handle_SALOME_InteractiveObject.hxx>
 #endif
-#ifndef _AIS_Shape_HeaderFile
-#include <AIS_Shape.hxx>
+// #ifndef _AIS_Shape_HeaderFile
+// #include <AIS_Shape.hxx>
+// #endif
+#ifndef _AIS_TexturedShape_HeaderFile
+#include <AIS_TexturedShape.hxx>
 #endif
 #ifndef _Standard_Boolean_HeaderFile
 #include <Standard_Boolean.hxx>
 #endif
+
 class SALOME_InteractiveObject;
 class TopoDS_Shape;
 class TColStd_IndexedMapOfInteger;
 
 
-class SALOME_AISShape : public AIS_Shape {
+class SALOME_AISShape : public AIS_TexturedShape {
 
 public:
 
@@ -75,6 +80,10 @@ public:
 Standard_EXPORT SALOME_AISShape(const TopoDS_Shape& shape);
 Standard_EXPORT virtual  Handle_SALOME_InteractiveObject getIO() = 0;
 Standard_EXPORT virtual  Standard_Boolean hasIO() = 0;
+Standard_EXPORT virtual  Standard_Boolean isTopLevel() = 0;
+Standard_EXPORT virtual  Standard_Boolean switchTopLevel() = 0;
+Standard_EXPORT virtual  Standard_Boolean toActivate() = 0;
+Standard_EXPORT virtual  void setTopLevel(Standard_Boolean) = 0;
 Standard_EXPORT virtual  Standard_CString getName() = 0;
 Standard_EXPORT virtual  void setName(const Standard_CString aName) = 0;
 Standard_EXPORT virtual  void highlightSubShapes(const TColStd_IndexedMapOfInteger& aIndexMap, const Standard_Boolean aHighlight ) = 0;
@@ -87,7 +96,7 @@ Standard_EXPORT ~SALOME_AISShape();
  //
  Standard_EXPORT friend Handle_Standard_Type& SALOME_AISShape_Type_();
  Standard_EXPORT const Handle(Standard_Type)& DynamicType() const;
- Standard_EXPORT Standard_Boolean	       IsKind(const Handle(Standard_Type)&) const;
+ Standard_EXPORT Standard_Boolean              IsKind(const Handle(Standard_Type)&) const;
 
 protected:
 
@@ -106,7 +115,7 @@ private:
 
  // Fields PRIVATE
  //
-
+  
 
 };
 

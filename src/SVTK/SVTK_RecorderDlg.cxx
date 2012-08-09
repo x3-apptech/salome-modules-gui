@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "SVTK_RecorderDlg.h"
 #include "SVTK_Recorder.h"
 
@@ -156,15 +154,15 @@ void SVTK_RecorderDlg::onHelp()
   if (app)
     app->onHelpContextModule(app->activeModule() ? app->moduleName(app->activeModule()->moduleName()) : QString(""), aHelpFileName);
   else {
-		QString platform;
+                QString platform;
 #ifdef WIN32
-		platform = "winapplication";
+                platform = "winapplication";
 #else
-		platform = "application";
+                platform = "application";
 #endif
     SUIT_MessageBox::warning(0, QObject::tr("WRN_WARNING"),
-			     QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").
-			     arg(app->resourceMgr()->stringValue("ExternalBrowser", platform)).arg(aHelpFileName) );
+                             QObject::tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").
+                             arg(app->resourceMgr()->stringValue("ExternalBrowser", platform)).arg(aHelpFileName) );
   }
   */
 }
@@ -176,7 +174,7 @@ bool SVTK_RecorderDlg::onBrowseFile()
   aFilter.append( tr( "FLT_ALL_FILES" ) );
 
   QString aFileName = SUIT_FileDlg::getFileName( this, getenv( "HOME" ), aFilter,
-						 tr( "FILE_NAME" ), false );
+                                                 tr( "FILE_NAME" ), false );
 
   if( aFileName.isNull() )
     return false;

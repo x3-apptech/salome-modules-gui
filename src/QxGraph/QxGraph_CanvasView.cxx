@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME QxGraph : build Supervisor viewer into desktop
 //
 #include "QxGraph_CanvasView.h"
@@ -194,15 +195,15 @@ void QxGraph_CanvasView::contentsMousePressEvent(QMouseEvent* theEvent)
       int aCursorType;
       if ( anActItem && anActItem->isResizable(myPoint,aCursorType) )
       { // resize itself only active items if it is resizable
-	anActItem->beforeResizing(aCursorType);
-	myCurrentItem = *it;
-	return;
+        anActItem->beforeResizing(aCursorType);
+        myCurrentItem = *it;
+        return;
       }
       else if ( anActItem && anActItem->isMoveable() )
       { // move itself only active items if it is moveable
-	anActItem->beforeMoving();
-	myCurrentItem = *it;
-	return;
+        anActItem->beforeMoving();
+        myCurrentItem = *it;
+        return;
       }
     }
   }
@@ -218,7 +219,7 @@ void QxGraph_CanvasView::contentsMouseMoveEvent(QMouseEvent* theEvent)
   if ( myOperation == PANVIEW )
   { // Panning
     scrollBy(myGlobalPoint.x() - aGlobalPoint.x(),
-	     myGlobalPoint.y() - aGlobalPoint.y());
+             myGlobalPoint.y() - aGlobalPoint.y());
     myGlobalPoint = aGlobalPoint;
     myMovingDone = true;
     return;
@@ -282,7 +283,7 @@ void QxGraph_CanvasView::contentsMouseMoveEvent(QMouseEvent* theEvent)
       if ( anActItem ) anActItem->setTMatrix(m);
       (*it)->show();
     }
-    	
+        
     myGlobalPoint = aGlobalPoint;
     myMovingDone = true;
 
@@ -303,12 +304,12 @@ void QxGraph_CanvasView::contentsMouseMoveEvent(QMouseEvent* theEvent)
     if ( myCurrentItem->x() && myCurrentItem->y() ) {
       double cx = myCurrentItem->x() - myPoint.x();
       double cy = myCurrentItem->y() - myPoint.y();
-	
+        
       if (aPoint.x()+cx < 0) aPoint.setX(-(int)cx);
       if (aPoint.y()+cy < 0) aPoint.setY(-(int)cy);
     }
     myCurrentItem->moveBy(aPoint.x() - myPoint.x(), 
-			  aPoint.y() - myPoint.y());
+                          aPoint.y() - myPoint.y());
     myMovingDone = true;
     myPoint = aPoint;
     canvas()->update();
@@ -339,53 +340,53 @@ void QxGraph_CanvasView::contentsMouseMoveEvent(QMouseEvent* theEvent)
       QxGraph_ActiveItem* anActItem = dynamic_cast<QxGraph_ActiveItem*>( *it );
     
       if (!isHilightPerformed && anActItem) {
-	// hilight
-	anActItem->hilight(aPoint);
-	if (anActItem != myHilightedItem) {
-	  if (myHilightedItem)
-	    myHilightedItem->hilight(aPoint, false);
-	  myHilightedItem = anActItem;
-	}
-	isHilightPerformed = true;
-	
-	// show tooltip
-	QxGraph_ToolTip* aToolTip = new QxGraph_ToolTip(this);
-	aToolTip->maybeTip(aPoint);
+        // hilight
+        anActItem->hilight(aPoint);
+        if (anActItem != myHilightedItem) {
+          if (myHilightedItem)
+            myHilightedItem->hilight(aPoint, false);
+          myHilightedItem = anActItem;
+        }
+        isHilightPerformed = true;
+        
+        // show tooltip
+        QxGraph_ToolTip* aToolTip = new QxGraph_ToolTip(this);
+        aToolTip->maybeTip(aPoint);
       }
       
       int aCursorType;
       if ( anActItem && anActItem->isResizable(aPoint,aCursorType) ) {
-	// set resize cursor
-	QCursor resizeCursor;
-	switch (aCursorType)
-	  {
-	  case 1: //left
-	  case 3: //right
-	    resizeCursor = QCursor(Qt::SizeHorCursor);
-	    break;
-	  case 2: //top
-	  case 4: //bottom
-	    resizeCursor = QCursor(Qt::SizeVerCursor); 
-	    break;
-	  case 5: //left-top
-	  case 7: //right-bottom
-	    resizeCursor = QCursor(Qt::SizeFDiagCursor);
-	    break;
-	  case 6: //right-top
-	  case 8: //left-bottom
-	    resizeCursor = QCursor(Qt::SizeBDiagCursor); 
-	    break;
-	  default : 
-	    resizeCursor = QCursor(Qt::ArrowCursor);
-	    break;
-	  }
-	setCursor(resizeCursor);
-	return;
+        // set resize cursor
+        QCursor resizeCursor;
+        switch (aCursorType)
+          {
+          case 1: //left
+          case 3: //right
+            resizeCursor = QCursor(Qt::SizeHorCursor);
+            break;
+          case 2: //top
+          case 4: //bottom
+            resizeCursor = QCursor(Qt::SizeVerCursor); 
+            break;
+          case 5: //left-top
+          case 7: //right-bottom
+            resizeCursor = QCursor(Qt::SizeFDiagCursor);
+            break;
+          case 6: //right-top
+          case 8: //left-bottom
+            resizeCursor = QCursor(Qt::SizeBDiagCursor); 
+            break;
+          default : 
+            resizeCursor = QCursor(Qt::ArrowCursor);
+            break;
+          }
+        setCursor(resizeCursor);
+        return;
       }
       else {
-	// reset old cursor
-	setCursor(QCursor(Qt::ArrowCursor));
-	return;
+        // reset old cursor
+        setCursor(QCursor(Qt::ArrowCursor));
+        return;
       }
     }
     
@@ -396,7 +397,7 @@ void QxGraph_CanvasView::contentsMouseMoveEvent(QMouseEvent* theEvent)
     }
 
     if ( cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor
-	 || cursor().shape() == Qt::SizeBDiagCursor || cursor().shape() == Qt::SizeFDiagCursor)
+         || cursor().shape() == Qt::SizeBDiagCursor || cursor().shape() == Qt::SizeFDiagCursor)
       setCursor(QCursor(Qt::ArrowCursor));
   }
 }
@@ -530,20 +531,20 @@ void QxGraph_CanvasView::contentsMouseReleaseEvent(QMouseEvent* theEvent)
       QxGraph_ActiveItem* anActItem = dynamic_cast<QxGraph_ActiveItem*>( *it );
       if (!isSelectionPerformed && anActItem) 
       {
-	anActItem->select(aPoint);
-	if (anActItem != mySelectedItem) 
-	{
-	  if (mySelectedItem && isSelectedItemInCanvas() &&
-	      !mySelectedItem->arePartsOfOtherItem(anActItem)) mySelectedItem->select(aPoint, false);
-	  mySelectedItem = anActItem;
+        anActItem->select(aPoint);
+        if (anActItem != mySelectedItem) 
+        {
+          if (mySelectedItem && isSelectedItemInCanvas() &&
+              !mySelectedItem->arePartsOfOtherItem(anActItem)) mySelectedItem->select(aPoint, false);
+          mySelectedItem = anActItem;
 
-	  // unhilight hilighted item if selection was performed
-	  if (myHilightedItem) {
-	    myHilightedItem->hilight(aPoint, false);
-	    myHilightedItem = 0;
-	  }
-	}
-	isSelectionPerformed = true;
+          // unhilight hilighted item if selection was performed
+          if (myHilightedItem) {
+            myHilightedItem->hilight(aPoint, false);
+            myHilightedItem = 0;
+          }
+        }
+        isSelectionPerformed = true;
       }
     }
 
@@ -551,17 +552,17 @@ void QxGraph_CanvasView::contentsMouseReleaseEvent(QMouseEvent* theEvent)
     { 
       if ( mySelectedItem )
       {
-	if ( isSelectedItemInCanvas() ) mySelectedItem->select(aPoint, false);
-	mySelectedItem = 0;
+        if ( isSelectedItemInCanvas() ) mySelectedItem->select(aPoint, false);
+        mySelectedItem = 0;
       }
       
       // Background popup
       printf("Background popup\n");
       QContextMenuEvent aEvent( QContextMenuEvent::Mouse,
-				theEvent->pos(), theEvent->globalPos(),
-				theEvent->state() );
+                                theEvent->pos(), theEvent->globalPos(),
+                                theEvent->state() );
       if ( getViewWindow() )
-	getViewWindow()->contextPopupEvent(&aEvent); // => emit contextMenuRequested( &aEvent );
+        getViewWindow()->contextPopupEvent(&aEvent); // => emit contextMenuRequested( &aEvent );
     }
     else
     { // show context popup for the selected item
@@ -582,18 +583,18 @@ void QxGraph_CanvasView::contentsMouseReleaseEvent(QMouseEvent* theEvent)
     else
     {
       for (QCanvasItemList::Iterator it = aList.begin(); it != aList.end(); ++it) {
-	QxGraph_ActiveItem* anActItem = dynamic_cast<QxGraph_ActiveItem*>( *it );
-	if (anActItem) 
-	{
-	  anActItem->select(aPoint);
-	  if (anActItem != mySelectedItem) 
-	  {
-	    if (mySelectedItem && isSelectedItemInCanvas() &&
-		!mySelectedItem->arePartsOfOtherItem(anActItem)) mySelectedItem->select(aPoint, false);
-	    mySelectedItem = anActItem;
-	  }
-	  break;
-	}
+        QxGraph_ActiveItem* anActItem = dynamic_cast<QxGraph_ActiveItem*>( *it );
+        if (anActItem) 
+        {
+          anActItem->select(aPoint);
+          if (anActItem != mySelectedItem) 
+          {
+            if (mySelectedItem && isSelectedItemInCanvas() &&
+                !mySelectedItem->arePartsOfOtherItem(anActItem)) mySelectedItem->select(aPoint, false);
+            mySelectedItem = anActItem;
+          }
+          break;
+        }
       }
     }
   }
@@ -743,17 +744,17 @@ void QxGraph_ToolTip::maybeTip(const QPoint& theMousePos) {
     QxGraph_ActiveItem* anActItem = dynamic_cast<QxGraph_ActiveItem*>( *it );
     if (anActItem)
       {
-	QRect aRect;
-	QString aText = anActItem->getToolTipText(theMousePos, aRect);
-	int avX, avY;
-	QWMatrix aWM = ((QCanvasView*)parentWidget())->worldMatrix();
-	((QCanvasView*)parentWidget())->contentsToViewport((int)(aRect.left()*aWM.m11()), 
-							   (int)(aRect.top()*aWM.m22()), 
-							   avX, avY);
-	QRect aTipRect(avX, avY, (int)(aRect.width()*aWM.m11()), (int)(aRect.height()*aWM.m22()));
-	if (!aText.isEmpty())
-	  tip(aTipRect, aText);
-	return;
+        QRect aRect;
+        QString aText = anActItem->getToolTipText(theMousePos, aRect);
+        int avX, avY;
+        QWMatrix aWM = ((QCanvasView*)parentWidget())->worldMatrix();
+        ((QCanvasView*)parentWidget())->contentsToViewport((int)(aRect.left()*aWM.m11()), 
+                                                           (int)(aRect.top()*aWM.m22()), 
+                                                           avX, avY);
+        QRect aTipRect(avX, avY, (int)(aRect.width()*aWM.m11()), (int)(aRect.height()*aWM.m22()));
+        if (!aText.isEmpty())
+          tip(aTipRect, aText);
+        return;
       }
   }
 }

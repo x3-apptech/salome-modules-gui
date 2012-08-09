@@ -1,27 +1,6 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
     <message>
@@ -49,6 +28,26 @@
         <translation>Horizontal axis:</translation>
     </message>
     <message>
+        <source>PLOT2D_NORMALIZE_TLT</source>
+        <translation>Normalization</translation>
+    </message>
+    <message>
+        <source>PLOT2D_NORMALIZE_MODE_MIN</source>
+        <translation>Normalize to minimum</translation>
+    </message>
+    <message>
+        <source>PLOT2D_NORMALIZE_MODE_MAX</source>
+        <translation>Normalize to maximum</translation>
+    </message>
+    <message>
+        <source>PLOT2D_NORMALIZE_LEFT_AXIS</source>
+        <translation>Left Y Axis: </translation>
+    </message>
+    <message>
+        <source>PLOT2D_NORMALIZE_RIGHT_AXIS</source>
+        <translation>Right Y Axis: </translation>
+    </message>
+    <message>
         <source>PLOT2D_SCALE_MODE_VER</source>
         <translation>Vertical axis:</translation>
     </message>
@@ -59,6 +58,10 @@
     <message>
         <source>MNU_CLONE_VIEW</source>
         <translation>Clone View</translation>
+    </message>
+    <message>
+        <source>MNU_PRINT_VIEW</source>
+        <translation>Print View</translation>
     </message>
     <message>
         <source>POSTSCRIPT_FILES</source>
@@ -87,6 +90,10 @@
     <message>
         <source>CURVE_TYPE_POPUP</source>
         <translation>Curve type</translation>
+    </message>
+    <message>
+        <source>NORMALIZATION_TYPE_POPUP</source>
+        <translation>Normalization</translation>
     </message>
     <message>
         <source>TOT_PLOT2D_MODE_LINEAR_VER</source>
@@ -165,6 +172,10 @@
         <translation>Create new OCC viewer for the active scene</translation>
     </message>
     <message>
+        <source>DSC_PRINT_VIEW</source>
+        <translation>Print active view</translation>
+    </message>
+    <message>
         <source>DASH_LINE_LBL</source>
         <translation>Dash</translation>
     </message>
@@ -216,6 +227,26 @@
         <source>TOT_PLOT2D_SETTINGS</source>
         <translation>Settings</translation>
     </message>
+    <message>
+        <source>TOT_PLOT2D_ANALYTICAL_CURVES</source>
+        <translation>Analytical curves</translation>
+    </message>    
+    <message>
+        <source>TOT_PLOT2D_NORMALIZE_MODE_LMAX</source>
+        <translation>Left Y Axis: Normalize to global maximum</translation>
+    </message>    
+    <message>
+        <source>TOT_PLOT2D_NORMALIZE_MODE_LMIN</source>
+        <translation>Left Y Axis: Normalize to global minimum</translation>
+    </message>    
+    <message>
+        <source>TOT_PLOT2D_NORMALIZE_MODE_RMAX</source>
+        <translation>Right Y Axis: Normalize to global maximum</translation>
+    </message>    
+    <message>
+        <source>TOT_PLOT2D_NORMALIZE_MODE_RMIN</source>
+        <translation>Right Y Axis: Normalize to global minimum</translation>
+    </message>    
     <message>
         <source>PLOT2D_CURVE_TYPE_LINES</source>
         <translation>Lines</translation>
@@ -301,6 +332,22 @@
         <translation>Background color:</translation>
     </message>
     <message>
+        <source>PLOT2D_DEVIATION_MARKER_TLT</source>
+        <translation>Deviation marker</translation>
+    </message>
+    <message>
+        <source>PLOT2D_DEVIATION_LW_LBL</source>
+        <translation>Line width</translation>
+    </message>
+    <message>
+        <source>PLOT2D_DEVIATION_TS_LBL</source>
+        <translation>Tick size</translation>
+    </message>
+    <message>
+        <source>PLOT2D_DEVIATION_CL_LBL</source>
+        <translation>Color</translation>
+    </message>
+    <message>
         <source>WRN_XLOG_NOT_ALLOWED</source>
         <translation>Some points with non-positive abscissa values have been detected.
 Logarithmic scale for abscissa axis is not allowed.</translation>
@@ -355,13 +402,37 @@ Logarithmic scale for ordinate axis is not allowed.</translation>
         <translation>Show legend</translation>
     </message>
     <message>
+        <source>PLOT2D_LEGEND_FONT</source>
+        <translation>Legend font</translation>
+    </message>
+    <message>
         <source>DSC_ZOOM_VIEW</source>
         <translation>Zoom the view</translation>
     </message>
     <message>
+        <source>PRP_PLOT2D_ANALYTICAL_CURVES</source>
+        <translation>Setups analytical curves properties</translation>
+    </message>
+    <message>
+        <source>PRP_PLOT2D_NORMALIZE_MODE_LMAX</source>
+        <translation>Switches view to maximum normalization mode by left Y axis</translation>
+    </message>
+    <message>
+        <source>PRP_PLOT2D_NORMALIZE_MODE_LMIN</source>
+        <translation>Switches view to minimum normalization mode by left Y axis</translation>
+    </message>
+    <message>
+        <source>PRP_PLOT2D_NORMALIZE_MODE_RMAX</source>
+        <translation>Switches view to maximum normalization mode by right Y axis</translation>
+    </message>
+    <message>
+        <source>PRP_PLOT2D_NORMALIZE_MODE_RMIN</source>
+        <translation>Switches view to minimum normalization mode by right Y axis</translation>
+    </message>
+    <message>
         <source>PRP_PLOT2D_SETTINGS</source>
         <translation>Setups view properties</translation>
-    </message>
+    </message>    
     <message>
         <source>INF_COORDINATES_SOME_Y</source>
         <translation>Coordinates: X : %1, Y : %2 ( %3 )</translation>
@@ -397,6 +468,22 @@ Logarithmic scale for ordinate axis is not allowed.</translation>
     <message>
         <source>MEN_PLOT2D_MODE_LOGARITHMIC_VER</source>
         <translation>Vertical Axis: Logarithmic</translation>
+    </message>
+    <message>
+        <source>MEN_PLOT2D_NORMALIZE_MODE_LMIN</source>
+        <translation>Left Y Axis: Minimum</translation>
+    </message>
+    <message>
+        <source>MEN_PLOT2D_NORMALIZE_MODE_LMAX</source>
+        <translation>Left Y Axis: Maximum</translation>
+    </message>
+    <message>
+        <source>MEN_PLOT2D_NORMALIZE_MODE_RMIN</source>
+        <translation>Right Y Axis: Minimum</translation>
+    </message>
+    <message>
+        <source>MEN_PLOT2D_NORMALIZE_MODE_RMAX</source>
+        <translation>Right Y Axis: Maximum</translation>
     </message>
     <message>
         <source>PRP_PLOT2D_FITDATA</source>
@@ -449,6 +536,10 @@ Logarithmic scale for ordinate axis is not allowed.</translation>
     <message>
         <source>MEN_PLOT2D_SETTINGS</source>
         <translation>&amp;Settings</translation>
+    </message>
+    <message>
+        <source>MEN_PLOT2D_ANALYTICAL_CURVES</source>
+        <translation>Analytical curves</translation>
     </message>
     <message>
         <source>CIRCLE_MARKER_LBL</source>
@@ -527,6 +618,157 @@ Logarithmic scale for ordinate axis is not allowed.</translation>
     <message>
         <source>PLOT2D_VIEW_TITLE</source>
         <translation>Plot2d scene:%M - viewer:%V</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_PLOT2DVIEWER</source>
+        <translation>Plot2d Viewer</translation>
+    </message>
+    <message>
+        <source>PREF_SHOW_LEGEND</source>
+        <translation>Show legend</translation>
+    </message>
+    <message>
+        <source>PREF_LEGEND_POSITION</source>
+        <translation>Legend position:</translation>
+    </message>
+    <message>
+        <source>PREF_LEFT</source>
+        <translation>Left</translation>
+    </message>
+    <message>
+        <source>PREF_RIGHT</source>
+        <translation>Right</translation>
+    </message>
+    <message>
+        <source>PREF_TOP</source>
+        <translation>Top</translation>
+    </message>
+    <message>
+        <source>PREF_BOTTOM</source>
+        <translation>Bottom</translation>
+    </message>
+    <message>
+        <source>PREF_CURVE_TYPE</source>
+        <translation>Curve type:</translation>
+    </message>
+    <message>
+        <source>PREF_POINTS</source>
+        <translation>Points</translation>
+    </message>
+    <message>
+        <source>PREF_LINES</source>
+        <translation>Lines</translation>
+    </message>
+    <message>
+        <source>PREF_SPLINE</source>
+        <translation>Spline</translation>
+    </message>
+    <message>
+        <source>PREF_MARKER_SIZE</source>
+        <translation>Marker size:</translation>
+    </message>
+    <message>
+        <source>PREF_LINEAR</source>
+        <translation>Linear</translation>
+    </message>
+    <message>
+        <source>PREF_LOGARITHMIC</source>
+        <translation>Logarithmic</translation>
+    </message>
+    <message>
+        <source>PREF_HOR_AXIS_SCALE</source>
+        <translation>Horizontal axis scale:</translation>
+    </message>
+    <message>
+        <source>PREF_VERT_AXIS_SCALE</source>
+        <translation>Vertical axis scale:</translation>
+    </message>
+    <message>
+        <source>PREF_VIEWER_BACKGROUND</source>
+        <translation>Background color</translation>
+    </message>
+</context>
+<context>
+    <name>Plot2d_AnalyticalCurveDlg</name>
+    <message>
+        <source>ANALYTICAL_CURVE_TLT</source>
+        <translation>Analytical curves properties</translation>
+    </message>
+    <message>
+        <source>AC_CURVE_PARAMS</source>
+        <translation>Curve parameters</translation>
+    </message>    
+    <message>
+        <source>AC_CURVE_PROPS</source>
+        <translation>Curve properties</translation>
+    </message>        
+    <message>
+        <source>AC_FORMULA</source>
+        <translation>y(x) = </translation>
+    </message>            
+    <message>
+        <source>AC_NB_INTERVALS</source>
+        <translation>Nb. intervals</translation>
+    </message>
+    <message>
+        <source>AC_AUTO_ASSIGN</source>
+        <translation>Auto assign</translation>
+    </message>
+    <message>
+        <source>AC_MARKER_TYPE</source>
+        <translation>Marker type</translation>
+    </message>
+    <message>
+        <source>AC_LINE_TYPE</source>
+        <translation>Line type</translation>
+    </message>
+    <message>
+        <source>AC_LINE_WIDTH</source>
+        <translation>Line Width</translation>
+    </message>
+    <message>
+        <source>AC_CURVE_COLOR</source>
+        <translation>Curve color</translation>
+    </message>
+    <message>
+        <source>AC_ADD_BTN</source>
+        <translation>Add curve</translation>
+    </message>                
+    <message>
+        <source>AC_REM_BTN</source>
+        <translation>Remove curve</translation>
+    </message>                    
+    <message>
+        <source>AC_OK_BTN</source>
+        <translation>Ok</translation>
+    </message>                    
+    <message>
+        <source>AC_APPLY_BTN</source>
+        <translation>Apply</translation>
+    </message>                                        
+    <message>
+        <source>AC_CANT_CALCULATE</source>
+        <translation>Can't calculate curve. 
+Please, check input parameters!!!</translation>
+    </message>
+    <message>
+        <source>AC_CLOSE_BTN</source>
+        <translation>&amp;Close</translation>
+    </message>
+    <message>
+        <source>AC_HELP_BTN</source>
+        <translation>Help</translation>
+    </message>
+</context>
+<context>
+    <name>Plot2d_SetupCurveScaleDlg</name>
+    <message>
+        <source>TLT_SETUP_CURVE_SCALE</source>
+        <translation>Curve(s) scale</translation>
+    </message>
+    <message>
+        <source>CURVE_SCALE_FACTOR</source>
+        <translation>Scale factor</translation>
     </message>
 </context>
 </TS>

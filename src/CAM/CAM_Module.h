@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef CAM_MODULE_H
 #define CAM_MODULE_H
 
@@ -79,6 +80,8 @@ public:
   void                   setToolShown( QAction*, const bool );
   void                   setToolShown( const int, const bool );
 
+  virtual void           updateModuleVisibilityState();
+
 public slots:
   virtual bool           activateModule( SUIT_Study* );
   virtual bool           deactivateModule( SUIT_Study* );
@@ -127,7 +130,7 @@ protected:
   bool                   unregisterAction( QAction* );
   QAction*               createAction( const int, const QString&, const QIcon&, const QString&,
                                        const QString&, const int, QObject* = 0,
-                                       const bool = false, QObject* = 0, const char* = 0 );
+                                       const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
 
 private:
   CAM_Application*       myApp;             //!< parent application object
@@ -136,6 +139,8 @@ private:
   QString                myInfo;            //!< latest info message
   CAM_DataModel*         myDataModel;       //!< data model
   QMap<int, QAction*>    myActionMap;       //!< menu actions
+  bool                   myMenuShown;       //!< menu shown flag
+  bool                   myToolShown;       //!< tool shown flag
 
   friend class CAM_Application;
 };
@@ -147,8 +152,9 @@ private:
 extern "C"
 {
   typedef CAM_Module* (*GET_MODULE_FUNC)();
+  typedef char* (*GET_VERSION_FUNC)();
 }
 
 #define GET_MODULE_NAME "createModule"
-
+#define GET_VERSION_NAME "getModuleVersion"
 #endif

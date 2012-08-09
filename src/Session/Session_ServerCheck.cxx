@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : Session_ServerCheck.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -265,8 +266,8 @@ void Session_ServerCheck::run()
       CORBA::Object_var obj = orb->resolve_initial_references( "NameService" );
       CosNaming::NamingContext_var _root_context = CosNaming::NamingContext::_narrow( obj );
       if ( !CORBA::is_nil( _root_context ) ) {
-	setStep( ++current * myAttempts );
-	break;
+        setStep( ++current * myAttempts );
+        break;
       }
     }
     catch( CORBA::COMM_FAILURE& ) {
@@ -296,11 +297,11 @@ void Session_ServerCheck::run()
       CORBA::Object_var obj = NS.Resolve( "/Registry" );
       Registry::Components_var registry = Registry::Components::_narrow( obj );
       if ( !CORBA::is_nil( registry ) ) {
-	MESSAGE( "/Registry is found" );
-	registry->ping();
-	MESSAGE( "Registry was activated" );
-	setStep( ++current * myAttempts );
-	break;
+        MESSAGE( "/Registry is found" );
+        registry->ping();
+        MESSAGE( "Registry was activated" );
+        setStep( ++current * myAttempts );
+        break;
       }
     }
     catch ( ServiceUnreachable& ) {
@@ -344,11 +345,11 @@ void Session_ServerCheck::run()
       CORBA::Object_var obj = NS.Resolve( "/myStudyManager" );
       SALOMEDS::StudyManager_var studyManager = SALOMEDS::StudyManager::_narrow( obj );
       if ( !CORBA::is_nil( studyManager ) ) {
-	MESSAGE( "/myStudyManager is found" );
-	studyManager->ping();
-	MESSAGE( "StudyManager was activated" );
-	setStep( ++current * myAttempts );
-	break;
+        MESSAGE( "/myStudyManager is found" );
+        studyManager->ping();
+        MESSAGE( "StudyManager was activated" );
+        setStep( ++current * myAttempts );
+        break;
       }
     }
     catch ( ServiceUnreachable& ) {
@@ -392,11 +393,11 @@ void Session_ServerCheck::run()
       CORBA::Object_var obj = NS.Resolve( "/Kernel/ModulCatalog" );
       SALOME_ModuleCatalog::ModuleCatalog_var catalog = SALOME_ModuleCatalog::ModuleCatalog::_narrow( obj );
       if ( !CORBA::is_nil( catalog ) ){
-	MESSAGE( "/Kernel/ModulCatalog is found" );
-	catalog->ping();
-	MESSAGE( "ModuleCatalog was activated" );
-	setStep( ++current * myAttempts );
-	break;
+        MESSAGE( "/Kernel/ModulCatalog is found" );
+        catalog->ping();
+        MESSAGE( "ModuleCatalog was activated" );
+        setStep( ++current * myAttempts );
+        break;
       }
     }
     catch ( ServiceUnreachable& ) {
@@ -440,11 +441,11 @@ void Session_ServerCheck::run()
       CORBA::Object_var obj = NS.Resolve( "/Kernel/Session" );
       SALOME::Session_var session = SALOME::Session::_narrow( obj );
       if ( !CORBA::is_nil( session ) ) {
-	MESSAGE( "/Kernel/Session is found" );
-	session->ping();
-	MESSAGE( "SALOME_Session was activated" );
-	setStep( ++current * myAttempts );
-	break;
+        MESSAGE( "/Kernel/Session is found" );
+        session->ping();
+        MESSAGE( "SALOME_Session was activated" );
+        setStep( ++current * myAttempts );
+        break;
       }
     }
     catch ( ServiceUnreachable& ) {
@@ -482,45 +483,45 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
-	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-	ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-	NS.init_orb( orb );
-	QString containerName = QString( "/Containers/%1/FactoryServer" ).arg( Kernel_Utils::GetHostname().c_str() );
-	CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
-	Engines::Container_var FScontainer = Engines::Container::_narrow( obj );
-	if ( !CORBA::is_nil( FScontainer ) ) {
-	  MESSAGE( containerName.toLatin1().constData() << " is found" );
-	  FScontainer->ping();
-	  MESSAGE( "FactoryServer container was activated" );
-	  setStep( ++current * myAttempts );
-	  break;
-	}
+        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
+        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
+        NS.init_orb( orb );
+        QString containerName = QString( "/Containers/%1/FactoryServer" ).arg( Kernel_Utils::GetHostname().c_str() );
+        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        Engines::Container_var FScontainer = Engines::Container::_narrow( obj );
+        if ( !CORBA::is_nil( FScontainer ) ) {
+          MESSAGE( containerName.toLatin1().constData() << " is found" );
+          FScontainer->ping();
+          MESSAGE( "FactoryServer container was activated" );
+          setStep( ++current * myAttempts );
+          break;
+        }
       }
       catch ( ServiceUnreachable& ) {
-	MESSAGE( "Caught exception: Naming Service unreachable." );
-	error = "Naming service unreachable";
+        MESSAGE( "Caught exception: Naming Service unreachable." );
+        error = "Naming service unreachable";
       }
       catch ( CORBA::COMM_FAILURE& ) {
-	MESSAGE( "Caught CORBA::SystemException CommFailure." );
-	error = "Caught CORBA::SystemException CommFailure.";
+        MESSAGE( "Caught CORBA::SystemException CommFailure." );
+        error = "Caught CORBA::SystemException CommFailure.";
       }
       catch ( CORBA::SystemException& ) {
-	MESSAGE( "Caught CORBA::SystemException." );
-	error = "Caught CORBA::SystemException.";
+        MESSAGE( "Caught CORBA::SystemException." );
+        error = "Caught CORBA::SystemException.";
       }
       catch ( CORBA::Exception& ) {
-	MESSAGE( "Caught CORBA::Exception." );
-	error = "Caught CORBA::Exception.";
+        MESSAGE( "Caught CORBA::Exception." );
+        error = "Caught CORBA::Exception.";
       }
       catch (...) {
-	MESSAGE( "Caught unknown exception." );
-	error = "Caught unknown exception.";
+        MESSAGE( "Caught unknown exception." );
+        error = "Caught unknown exception.";
       }
       
       if ( i == myAttempts-1 ) {
-	setError( tr( "C++ container is not found.\n%1" ).arg ( error ) );
-	return;
+        setError( tr( "C++ container is not found.\n%1" ).arg ( error ) );
+        return;
       }
     }
   }
@@ -533,45 +534,45 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
-	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-	ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-	NS.init_orb( orb );
-	QString containerName = QString( "/Containers/%1/FactoryServerPy" ).arg( Kernel_Utils::GetHostname().c_str() );
-	CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
-	Engines::Container_var FSPcontainer = Engines::Container::_narrow( obj );
-	if ( !CORBA::is_nil( FSPcontainer ) ) {
-	  MESSAGE( containerName.toLatin1().constData() << " is found" );
-	  FSPcontainer->ping();
-	  MESSAGE("FactoryServerPy container was activated");
-	  setStep( ++current * myAttempts );
-	  break;
-	}
+        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
+        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
+        NS.init_orb( orb );
+        QString containerName = QString( "/Containers/%1/FactoryServerPy" ).arg( Kernel_Utils::GetHostname().c_str() );
+        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        Engines::Container_var FSPcontainer = Engines::Container::_narrow( obj );
+        if ( !CORBA::is_nil( FSPcontainer ) ) {
+          MESSAGE( containerName.toLatin1().constData() << " is found" );
+          FSPcontainer->ping();
+          MESSAGE("FactoryServerPy container was activated");
+          setStep( ++current * myAttempts );
+          break;
+        }
       }
       catch ( ServiceUnreachable& ) {
-	MESSAGE( "Caught exception: Naming Service unreachable." );
-	error = "Naming service unreachable";
+        MESSAGE( "Caught exception: Naming Service unreachable." );
+        error = "Naming service unreachable";
       }
       catch ( CORBA::COMM_FAILURE& ) {
-	MESSAGE( "Caught CORBA::SystemException CommFailure." );
-	error = "Caught CORBA::SystemException CommFailure.";
+        MESSAGE( "Caught CORBA::SystemException CommFailure." );
+        error = "Caught CORBA::SystemException CommFailure.";
       }
       catch ( CORBA::SystemException& ) {
-	MESSAGE( "Caught CORBA::SystemException." );
-	error = "Caught CORBA::SystemException.";
+        MESSAGE( "Caught CORBA::SystemException." );
+        error = "Caught CORBA::SystemException.";
       }
       catch ( CORBA::Exception& ) {
-	MESSAGE( "Caught CORBA::Exception." );
-	error = "Caught CORBA::Exception.";
+        MESSAGE( "Caught CORBA::Exception." );
+        error = "Caught CORBA::Exception.";
       }
       catch (...) {
-	MESSAGE( "Caught unknown exception." );
-	error = "Caught unknown exception.";
+        MESSAGE( "Caught unknown exception." );
+        error = "Caught unknown exception.";
       }
 
       if ( i == myAttempts-1 ) {
-	setError( tr( "Python container is not found.\n%1" ).arg ( error ) );
-	return;
+        setError( tr( "Python container is not found.\n%1" ).arg ( error ) );
+        return;
       }
     }
   }
@@ -584,45 +585,45 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-	CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
-	SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-	ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-	NS.init_orb( orb );
-	QString containerName = QString( "/Containers/%1/SuperVisionContainer" ).arg( Kernel_Utils::GetHostname().c_str() );
-	CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
-	Engines::Container_var SVcontainer = Engines::Container::_narrow( obj );
-	if ( !CORBA::is_nil( SVcontainer ) ) {
-	  MESSAGE( containerName.toLatin1().constData() << " is found" );
-	  SVcontainer->ping();
-	  MESSAGE("SuperVisionContainer container was activated");
-	  setStep( ++current * myAttempts );
-	  break;
-	}
+        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
+        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
+        NS.init_orb( orb );
+        QString containerName = QString( "/Containers/%1/SuperVisionContainer" ).arg( Kernel_Utils::GetHostname().c_str() );
+        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        Engines::Container_var SVcontainer = Engines::Container::_narrow( obj );
+        if ( !CORBA::is_nil( SVcontainer ) ) {
+          MESSAGE( containerName.toLatin1().constData() << " is found" );
+          SVcontainer->ping();
+          MESSAGE("SuperVisionContainer container was activated");
+          setStep( ++current * myAttempts );
+          break;
+        }
       }
       catch ( ServiceUnreachable& ) {
-	MESSAGE( "Caught exception: Naming Service unreachable." );
-	error = "Naming service unreachable";
+        MESSAGE( "Caught exception: Naming Service unreachable." );
+        error = "Naming service unreachable";
       }
       catch ( CORBA::COMM_FAILURE& ) {
-	MESSAGE( "Caught CORBA::SystemException CommFailure." );
-	error = "Caught CORBA::SystemException CommFailure.";
+        MESSAGE( "Caught CORBA::SystemException CommFailure." );
+        error = "Caught CORBA::SystemException CommFailure.";
       }
       catch ( CORBA::SystemException& ) {
-	MESSAGE( "Caught CORBA::SystemException." );
-	error = "Caught CORBA::SystemException.";
+        MESSAGE( "Caught CORBA::SystemException." );
+        error = "Caught CORBA::SystemException.";
       }
       catch ( CORBA::Exception& ) {
-	MESSAGE( "Caught CORBA::Exception." );
-	error = "Caught CORBA::Exception.";
+        MESSAGE( "Caught CORBA::Exception." );
+        error = "Caught CORBA::Exception.";
       }
       catch (...) {
-	MESSAGE( "Caught unknown exception." );
-	error = "Caught unknown exception.";
+        MESSAGE( "Caught unknown exception." );
+        error = "Caught unknown exception.";
       }
     
       if ( i == myAttempts-1 ) {
-	setError( tr( "Supervision container is not found.\n%1" ).arg ( error ) );
-	return;
+        setError( tr( "Supervision container is not found.\n%1" ).arg ( error ) );
+        return;
       }
     }
   }

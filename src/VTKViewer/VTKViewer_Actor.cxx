@@ -1,35 +1,33 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
 //  File   : SALOME_Actor.cxx
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 /*!
   \class SALOME_Actor SALOME_Actor.h
   \brief Abstract class of SALOME Objects in VTK.
 */
-
 
 #include "VTKViewer_Actor.h"
 
@@ -43,11 +41,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkPassThroughFilter.h>
-
-using namespace std;
 
 #if defined __GNUC__
   #if __GNUC__ == 2
@@ -66,9 +61,10 @@ vtkStandardNewMacro(VTKViewer_Actor);
 */
 VTKViewer_Actor
 ::VTKViewer_Actor():
+  myOpacity(1.0),
   myIsHighlighted(false),
   myIsPreselected(false),
-  myRepresentation(VTK_SURFACE),
+  myRepresentation(VTKViewer::Representation::Surface),
   myDisplayMode(1),
   myProperty(vtkProperty::New()),
   PreviewProperty(NULL),
@@ -79,7 +75,7 @@ VTKViewer_Actor
   myTransformFilter(VTKViewer_TransformFilter::New())
 {
   vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-								 myPolygonOffsetUnits);
+                                                                 myPolygonOffsetUnits);
 
   for(int i = 0; i < 6; i++)
     myPassFilter.push_back(vtkPassThroughFilter::New());
@@ -233,7 +229,7 @@ VTKViewer_Actor
     
     vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
     vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-								   myPolygonOffsetUnits);
+                                                                   myPolygonOffsetUnits);
     Superclass::Render(ren,m);
     
     vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
@@ -261,7 +257,7 @@ VTKViewer_Actor
 void
 VTKViewer_Actor
 ::SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-			     vtkFloatingPointType units)
+                             vtkFloatingPointType units)
 {
   myPolygonOffsetFactor = factor;
   myPolygonOffsetUnits = units;
@@ -274,7 +270,7 @@ VTKViewer_Actor
 void
 VTKViewer_Actor
 ::GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-			     vtkFloatingPointType& units)
+                             vtkFloatingPointType& units)
 {
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;
@@ -361,9 +357,11 @@ void
 VTKViewer_Actor
 ::SetRepresentation(int theMode) 
 { 
+  using namespace VTKViewer::Representation;
   switch(myRepresentation){
-  case VTK_POINTS : 
-  case VTK_SURFACE : 
+  case Points : 
+  case Surface : 
+  case SurfaceWithEdges :
     myProperty->SetAmbient(GetProperty()->GetAmbient());
     myProperty->SetDiffuse(GetProperty()->GetDiffuse());
     myProperty->SetSpecular(GetProperty()->GetSpecular());
@@ -371,8 +369,9 @@ VTKViewer_Actor
   }    
 
   switch(theMode){
-  case VTK_POINTS : 
-  case VTK_SURFACE : 
+  case Points : 
+  case Surface : 
+  case SurfaceWithEdges :
     GetProperty()->SetAmbient(myProperty->GetAmbient());
     GetProperty()->SetDiffuse(myProperty->GetDiffuse());
     GetProperty()->SetSpecular(myProperty->GetSpecular());
@@ -384,23 +383,24 @@ VTKViewer_Actor
   }
 
   switch(theMode){
-  case 3 : 
+  case Insideframe : 
     myGeomFilter->SetInside(true);
     myGeomFilter->SetWireframeMode(true);
     GetProperty()->SetRepresentation(VTK_WIREFRAME);
     break;
-  case VTK_POINTS : 
+  case Points : 
     GetProperty()->SetPointSize(VTKViewer_POINT_SIZE);  
     GetProperty()->SetRepresentation(theMode);
     myGeomFilter->SetWireframeMode(false);
     myGeomFilter->SetInside(false);
     break;
-  case VTK_WIREFRAME : 
+  case Wireframe : 
     GetProperty()->SetRepresentation(theMode);
     myGeomFilter->SetWireframeMode(true);
     myGeomFilter->SetInside(false);
     break;
-  case VTK_SURFACE : 
+  case Surface : 
+  case SurfaceWithEdges :
     GetProperty()->SetRepresentation(theMode);
     myGeomFilter->SetWireframeMode(false);
     myGeomFilter->SetInside(false);
@@ -578,8 +578,8 @@ VTKViewer_Actor
 void
 VTKViewer_Actor
 ::SetColor(vtkFloatingPointType r,
-	   vtkFloatingPointType g,
-	   vtkFloatingPointType b)
+           vtkFloatingPointType g,
+           vtkFloatingPointType b)
 {
   GetProperty()->SetColor(r,g,b);
 }
@@ -600,8 +600,8 @@ VTKViewer_Actor
 void
 VTKViewer_Actor
 ::GetColor(vtkFloatingPointType& r,
-	   vtkFloatingPointType& g,
-	   vtkFloatingPointType& b)
+           vtkFloatingPointType& g,
+           vtkFloatingPointType& b)
 {
   vtkFloatingPointType aColor[3];
   GetProperty()->GetColor(aColor);
@@ -610,6 +610,25 @@ VTKViewer_Actor
   b = aColor[2];
 }
 
+
+/*!
+  Change material
+*/
+void
+VTKViewer_Actor
+::SetMaterial(std::vector<vtkProperty*> theProps)
+{
+}
+
+/*!
+  Get current material
+*/
+vtkProperty* 
+VTKViewer_Actor
+::GetMaterial()
+{
+  return NULL;
+}
 
 /*!
   \return display mode
@@ -654,6 +673,16 @@ VTKViewer_Actor
 }
 
 /*!
+  \return true if the VTKViewer_Actor is already preselected
+*/
+bool
+VTKViewer_Actor
+::isPreselected() 
+{ 
+  return myIsPreselected; 
+}
+
+/*!
   Set preselection mode
 */
 void
@@ -672,5 +701,42 @@ VTKViewer_Actor
 {
   myIsHighlighted = theIsHighlight; 
 }
+
+/*!
+ * On/Off representation 2D quadratic element as arked polygon
+ */
+void VTKViewer_Actor::SetQuadraticArcMode(bool theFlag){
+  myGeomFilter->SetQuadraticArcMode(theFlag);
+}
+
+/*!
+ * Return true if 2D quadratic element displayed as arked polygon
+ */
+bool VTKViewer_Actor::GetQuadraticArcMode() const{
+  return myGeomFilter->GetQuadraticArcMode();
+}
+/*!
+ * Set Max angle for representation 2D quadratic element as arked polygon
+ */
+void VTKViewer_Actor::SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle){
+  myGeomFilter->SetQuadraticArcAngle(theMaxAngle);
+}
+
+/*!
+ * Return Max angle of the representation 2D quadratic element as arked polygon
+ */
+vtkFloatingPointType VTKViewer_Actor::GetQuadraticArcAngle() const{
+  return myGeomFilter->GetQuadraticArcAngle();
+}
+
+/*!
+ * Return pointer to the dataset, which used to calculation of the bounding box of the actor.
+ * By default it is the input dataset.
+ */
+vtkDataSet* VTKViewer_Actor::GetHighlightedDataSet() {
+  return GetInput();
+}
+
+
 
 vtkCxxSetObjectMacro(VTKViewer_Actor,PreviewProperty,vtkProperty);

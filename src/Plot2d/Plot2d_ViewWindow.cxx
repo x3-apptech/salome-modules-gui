@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File   : Plot2d_ViewWindow.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -29,7 +30,9 @@
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 #include <SUIT_Desktop.h>
+#include <SUIT_MessageBox.h>
 
+#include <Qtx.h>
 #include <QtxAction.h>
 #include <QtxMultiAction.h>
 #include <QtxActionToolMgr.h>
@@ -42,6 +45,11 @@
 #include <QToolBar>
 #include <QPaintEvent>
 #include <QActionGroup>
+#include <QPainter>
+#include <QPrinter>
+#include <QPrintDialog>
+
+#include <qwt_plot_curve.h>
 
 /*!
   \class Plot2d_ViewWindow
@@ -57,8 +65,21 @@ Plot2d_ViewWindow::Plot2d_ViewWindow( SUIT_Desktop* theDesktop, Plot2d_Viewer* t
 : SUIT_ViewWindow( theDesktop )
 {
   myModel = theModel;
-  myDumpImage = QImage();
+}
 
+/*!
+  \brief Destructor.
+*/
+Plot2d_ViewWindow::~Plot2d_ViewWindow()
+{
+}
+
+/*!
+  \brief Internal initialization.
+*/
+void Plot2d_ViewWindow::initLayout()
+{
+  myDumpImage = QImage();
   myViewFrame = new Plot2d_ViewFrame( this, "plotView" );
   setCentralWidget( myViewFrame );
 
@@ -67,18 +88,13 @@ Plot2d_ViewWindow::Plot2d_ViewWindow( SUIT_Desktop* theDesktop, Plot2d_Viewer* t
 
   connect( myViewFrame, SIGNAL( vpModeHorChanged() ), this, SLOT( onChangeHorMode() ) );
   connect( myViewFrame, SIGNAL( vpModeVerChanged() ), this, SLOT( onChangeVerMode() ) );
+  connect( myViewFrame, SIGNAL( vpNormLModeChanged() ), this, SLOT( onChangeNormLMode() ) );
+  connect( myViewFrame, SIGNAL( vpNormRModeChanged() ), this, SLOT( onChangeNormRMode() ) );
   connect( myViewFrame, SIGNAL( vpCurveChanged() ),   this, SLOT( onChangeCurveMode() ) );
   connect( myViewFrame, SIGNAL( contextMenuRequested( QContextMenuEvent* ) ),
-	   this,        SIGNAL( contextMenuRequested( QContextMenuEvent* ) ) );
+           this,        SIGNAL( contextMenuRequested( QContextMenuEvent* ) ) );
 
   myViewFrame->installEventFilter( this );
-}
-
-/*!
-  \brief Destructor.
-*/
-Plot2d_ViewWindow::~Plot2d_ViewWindow()
-{
 }
 
 /*!
@@ -142,6 +158,15 @@ void Plot2d_ViewWindow::contextMenuPopup( QMenu* thePopup )
   curTypePopup->addAction( mgr->action( CurvLinesId ) );
   curTypePopup->addAction( mgr->action( CurvSplinesId ) );
 
+  //Normalization type
+  QMenu* normTypePopup = thePopup->addMenu( tr( "NORMALIZATION_TYPE_POPUP" ) );
+  normTypePopup->addAction( mgr->action( PModeNormLMinId ) );
+  normTypePopup->addAction( mgr->action( PModeNormLMaxId ) );
+  normTypePopup->addSeparator();
+  normTypePopup->addAction( mgr->action( PModeNormRMinId ) );
+  normTypePopup->addAction( mgr->action( PModeNormRMaxId ) );
+
+
   // legend
   thePopup->addAction( mgr->action( LegendId ) );
 
@@ -186,9 +211,9 @@ void Plot2d_ViewWindow::createActions()
 
   // 1. Dump View
   aAction = new QtxAction( tr( "MNU_DUMP_VIEW" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_DUMP" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_DUMP" ) ),
                            tr( "MNU_DUMP_VIEW" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_DUMP_VIEW" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onDumpView() ) );
   mgr->registerAction( aAction, DumpId );
@@ -197,27 +222,27 @@ void Plot2d_ViewWindow::createActions()
 
   // 2.1. Fit All
   aAction = new QtxAction( tr( "MNU_FITALL" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_FIT_ALL" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_FIT_ALL" ) ),
                            tr( "MNU_FITALL" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_FITALL" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onFitAll() ) );
   mgr->registerAction( aAction, FitAllId );
 
   // 2.2. Fit Rect
   aAction = new QtxAction( tr( "MNU_FITRECT" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_FIT_AREA" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_FIT_AREA" ) ),
                            tr( "MNU_FITRECT" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_FITRECT" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onFitRect() ) );
   mgr->registerAction( aAction, FitRectId );
 
   // 2.3. Zoom
   aAction = new QtxAction( tr( "MNU_ZOOM_VIEW" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_ZOOM" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_ZOOM_VIEW" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onZoom() ) );
   mgr->registerAction( aAction, ZoomId );
@@ -233,18 +258,18 @@ void Plot2d_ViewWindow::createActions()
 
   // 3.1. Panning
   aAction = new QtxAction( tr( "MNU_PAN_VIEW" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_PAN" ) ),
-			   tr( "MNU_PAN_VIEW" ), 
-			   0, this);
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_PAN" ) ),
+                           tr( "MNU_PAN_VIEW" ), 
+                           0, this);
   aAction->setStatusTip( tr( "DSC_PAN_VIEW" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onPanning() ) );
   mgr->registerAction( aAction, PanId );
 
   // 3.2. Global Panning
   aAction = new QtxAction( tr( "MNU_GLOBALPAN_VIEW" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_GLOBALPAN" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_GLOBALPAN" ) ),
                            tr( "MNU_GLOBALPAN_VIEW" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_GLOBALPAN_VIEW" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onGlobalPanning() ) );
   mgr->registerAction( aAction, GlobalPanId );
@@ -259,27 +284,27 @@ void Plot2d_ViewWindow::createActions()
   
   // 4.1. Points
   aAction = new QtxAction( tr( "TOT_PLOT2D_CURVES_POINTS" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_POINTS" ) ),
-			   tr( "MEN_PLOT2D_CURVES_POINTS" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_POINTS" ) ),
+                           tr( "MEN_PLOT2D_CURVES_POINTS" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_CURVES_POINTS" ) );
   aAction->setCheckable( true );
   mgr->registerAction( aAction, CurvPointsId );
 
   // 4.2. Lines
   aAction = new QtxAction( tr( "TOT_PLOT2D_CURVES_LINES" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_LINES" ) ),
-			   tr( "MEN_PLOT2D_CURVES_LINES" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_LINES" ) ),
+                           tr( "MEN_PLOT2D_CURVES_LINES" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_CURVES_LINES" ) );
   aAction->setCheckable( true );
   mgr->registerAction( aAction, CurvLinesId );
 
   // 4.3. Splines
   aAction = new QtxAction( tr( "TOT_PLOT2D_CURVES_SPLINES" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_SPLINES" ) ),
-			   tr( "MEN_PLOT2D_CURVES_SPLINES" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CURVES_SPLINES" ) ),
+                           tr( "MEN_PLOT2D_CURVES_SPLINES" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_CURVES_SPLINES" ) );
   aAction->setCheckable( true );
   mgr->registerAction( aAction, CurvSplinesId );
@@ -295,9 +320,9 @@ void Plot2d_ViewWindow::createActions()
 
   // 5.1. Linear
   aAction = new QtxAction( tr( "TOT_PLOT2D_MODE_LINEAR_HOR" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LINEAR_HOR" ) ),
-			   tr( "MEN_PLOT2D_MODE_LINEAR_HOR" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LINEAR_HOR" ) ),
+                           tr( "MEN_PLOT2D_MODE_LINEAR_HOR" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_MODE_LINEAR_HOR" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewHorMode() ) );
   aAction->setCheckable( true );
@@ -305,9 +330,9 @@ void Plot2d_ViewWindow::createActions()
   
   // 5.2. Logarithmic
   aAction = new QtxAction( tr( "TOT_PLOT2D_MODE_LOGARITHMIC_HOR" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LOGARITHMIC_HOR" ) ),
-			   tr( "MEN_PLOT2D_MODE_LOGARITHMIC_HOR" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LOGARITHMIC_HOR" ) ),
+                           tr( "MEN_PLOT2D_MODE_LOGARITHMIC_HOR" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_MODE_LOGARITHMIC_HOR" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewHorMode() ) );
   aAction->setCheckable( true );
@@ -322,9 +347,9 @@ void Plot2d_ViewWindow::createActions()
 
   // 6.1. Linear
   aAction = new QtxAction( tr( "TOT_PLOT2D_MODE_LINEAR_VER" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LINEAR_VER" ) ),
-			   tr( "MEN_PLOT2D_MODE_LINEAR_VER" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LINEAR_VER" ) ),
+                           tr( "MEN_PLOT2D_MODE_LINEAR_VER" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_MODE_LINEAR_VER" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewVerMode() ) );
   aAction->setCheckable( true );
@@ -332,9 +357,9 @@ void Plot2d_ViewWindow::createActions()
 
   // 6.2. Logarithmic
   aAction = new QtxAction( tr( "TOT_PLOT2D_MODE_LOGARITHMIC_VER" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LOGARITHMIC_VER" ) ),
-			   tr( "MEN_PLOT2D_MODE_LOGARITHMIC_VER" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_MODE_LOGARITHMIC_VER" ) ),
+                           tr( "MEN_PLOT2D_MODE_LOGARITHMIC_VER" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_MODE_LOGARITHMIC_VER" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewVerMode() ) );
   aAction->setCheckable( true );
@@ -345,38 +370,104 @@ void Plot2d_ViewWindow::createActions()
   aVerGroup->addAction( mgr->action( PModeYLinearId ) );
   aVerGroup->addAction( mgr->action( PModeYLogarithmicId ) );
 
-  // 7. Legend
+  // 7. Normalization mode operations
+
+  // 7.1. Normalize to the global minimum by left Y axis
+  aAction = new QtxAction( tr( "TOT_PLOT2D_NORMALIZE_MODE_LMIN" ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_NORMALIZE_MODE_LMIN" ) ),
+                           tr( "MEN_PLOT2D_NORMALIZE_MODE_LMIN" ),
+                           0, this );
+  aAction->setStatusTip( tr( "PRP_PLOT2D_NORMALIZE_MODE_LMIN" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewNormLMode() ) );
+  aAction->setCheckable( true );
+  mgr->registerAction( aAction, PModeNormLMinId );
+
+  // 7.2. Normalize to the global maximum by right Y axis
+  aAction = new QtxAction( tr( "TOT_PLOT2D_NORMALIZE_MODE_LMAX" ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_NORMALIZE_MODE_LMAX" ) ),
+                           tr( "MEN_PLOT2D_NORMALIZE_MODE_LMAX" ),
+                           0, this );
+  aAction->setStatusTip( tr( "PRP_PLOT2D_NORMALIZE_MODE_LMAX" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewNormLMode() ) );
+  aAction->setCheckable( true );
+  mgr->registerAction( aAction, PModeNormLMaxId );
+
+    // 7.3. Normalize to the global minimum by right Y axis
+  aAction = new QtxAction( tr( "TOT_PLOT2D_NORMALIZE_MODE_RMIN" ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_NORMALIZE_MODE_RMIN" ) ),
+                           tr( "MEN_PLOT2D_NORMALIZE_MODE_RMIN" ),
+                           0, this );
+  aAction->setStatusTip( tr( "PRP_PLOT2D_NORMALIZE_MODE_RMIN" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewNormRMode() ) );
+  aAction->setCheckable( true );
+  mgr->registerAction( aAction, PModeNormRMinId );
+
+  // 7.4. Normalize to the global maximum by left Y axis
+  aAction = new QtxAction( tr( "TOT_PLOT2D_NORMALIZE_MODE_RMAX" ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_NORMALIZE_MODE_RMAX" ) ),
+                           tr( "MEN_PLOT2D_NORMALIZE_MODE_RMAX" ),
+                           0, this );
+  aAction->setStatusTip( tr( "PRP_PLOT2D_NORMALIZE_MODE_RMAX" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onViewNormRMode() ) );
+  aAction->setCheckable( true );
+  mgr->registerAction( aAction, PModeNormRMaxId );
+
+  // 8. Legend
   aAction = new QtxAction( tr( "TOT_PLOT2D_SHOW_LEGEND" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_SHOW_LEGEND" ) ),
-			   tr( "MEN_PLOT2D_SHOW_LEGEND" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_SHOW_LEGEND" ) ),
+                           tr( "MEN_PLOT2D_SHOW_LEGEND" ),
+                           0, this );
   aAction->setStatusTip( tr( "PRP_PLOT2D_SHOW_LEGEND" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onLegend() ) );
   aAction->setCheckable( true );
   mgr->registerAction( aAction, LegendId );
 
-  // 8. Settings
+  // 9. Settings
   aAction = new QtxAction( tr( "TOT_PLOT2D_SETTINGS" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_SETTINGS" ) ),
-			   tr( "MEN_PLOT2D_SETTINGS" ),
-			   0, this );
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_SETTINGS" ) ),
+                           tr( "MEN_PLOT2D_SETTINGS" ),
+                           0, this );
+
   aAction->setStatusTip( tr( "PRP_PLOT2D_SETTINGS" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), myViewFrame, SLOT( onSettings() ) );
   mgr->registerAction( aAction, CurvSettingsId );
 
-  // 9. Clone
+  // 9. Analytical curves
+#ifndef DISABLE_PYCONSOLE
+  aAction = new QtxAction( tr( "TOT_PLOT2D_ANALYTICAL_CURVES" ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_ANALYTICAL_CURVES" ) ),
+                           tr( "MEN_PLOT2D_ANALYTICAL_CURVES" ),
+                           0, this );
+
+  aAction->setStatusTip( tr( "PRP_PLOT2D_ANALYTICAL_CURVES" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), myViewFrame, SLOT( onAnalyticalCurve() ) );
+  mgr->registerAction( aAction, AnalyticalCurveId );
+#endif
+
+  // 10. Clone
   aAction = new QtxAction( tr( "MNU_CLONE_VIEW" ),
-			   aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CLONE_VIEW" ) ),
+                           aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_CLONE_VIEW" ) ),
                            tr( "MNU_CLONE_VIEW" ),
-			   0, this);
+                           0, this);
   aAction->setStatusTip( tr( "DSC_CLONE_VIEW" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), this, SIGNAL( cloneView() ) );
   mgr->registerAction( aAction, CloneId );
+
+  // 11. Print 
+  aAction = new QtxAction( tr( "MNU_PRINT_VIEW" ),
+			   aResMgr->loadPixmap( "STD", tr( "ICON_PLOT2D_PRINT" ) ),
+                           tr( "MNU_PRINT_VIEW" ),
+			   0, this);
+  aAction->setStatusTip( tr( "DSC_PRINT_VIEW" ) );
+  connect( aAction, SIGNAL( triggered( bool ) ), this, SLOT( onPrintView() ) );
+  mgr->registerAction( aAction, PrintId );
 
   // Set initial values
   onChangeCurveMode();
   onChangeHorMode();
   onChangeVerMode();
+  onChangeNormLMode();
+  onChangeNormRMode();
   onChangeLegendMode();
 }
 
@@ -386,7 +477,7 @@ void Plot2d_ViewWindow::createActions()
 void Plot2d_ViewWindow::createToolBar()
 {
   QtxActionToolMgr* mgr = toolMgr();
-  myToolBar = mgr->createToolBar( tr( "LBL_TOOLBAR_LABEL" ) );
+  myToolBar = mgr->createToolBar( tr( "LBL_TOOLBAR_LABEL" ), false );
   mgr->append( DumpId, myToolBar );
   mgr->append( ScaleOpId, myToolBar );
   mgr->append( MoveOpId, myToolBar );
@@ -394,6 +485,12 @@ void Plot2d_ViewWindow::createToolBar()
   mgr->append( CurvPointsId, myToolBar );
   mgr->append( CurvLinesId, myToolBar );
   mgr->append( CurvSplinesId, myToolBar );
+  mgr->append( toolMgr()->separator(), myToolBar );
+  mgr->append( PModeNormLMaxId, myToolBar );
+  mgr->append( PModeNormLMinId, myToolBar );
+  mgr->append( toolMgr()->separator(), myToolBar );
+  mgr->append( PModeNormRMaxId, myToolBar );
+  mgr->append( PModeNormRMinId, myToolBar );
   mgr->append( toolMgr()->separator(), myToolBar );
   mgr->append( PModeXLinearId, myToolBar );
   mgr->append( PModeXLogarithmicId, myToolBar );
@@ -403,7 +500,9 @@ void Plot2d_ViewWindow::createToolBar()
   mgr->append( toolMgr()->separator(), myToolBar );
   mgr->append( LegendId, myToolBar );
   mgr->append( CurvSettingsId, myToolBar );
+  mgr->append( AnalyticalCurveId, myToolBar );
   mgr->append( CloneId, myToolBar );
+  mgr->append( PrintId, myToolBar );
 }
 
 /*!
@@ -463,6 +562,42 @@ void Plot2d_ViewWindow::onChangeVerMode()
     toolMgr()->action( PModeYLogarithmicId )->setChecked( true );
 
   toolMgr()->action( GlobalPanId )->setEnabled( aHorLinear && aVerLinear );
+}
+
+/*!
+  \brief Called when the normalization mode (by left Y axis) for curves is changed.
+*/
+void Plot2d_ViewWindow::onChangeNormLMode()
+{
+  bool aNormMax = myViewFrame->isNormLMaxMode();
+  bool aNormMin = myViewFrame->isNormLMinMode();
+
+  if ( aNormMax )
+    toolMgr()->action( PModeNormLMaxId )->setChecked( true );
+  else
+    toolMgr()->action( PModeNormLMaxId )->setChecked( false );
+  if ( aNormMin )
+    toolMgr()->action( PModeNormLMinId )->setChecked( true );
+  else
+    toolMgr()->action( PModeNormLMinId )->setChecked( false );
+}
+
+/*!
+  \brief Called when the normalization mode (by left Y axis) for curves is changed.
+*/
+void Plot2d_ViewWindow::onChangeNormRMode()
+{
+  bool aNormMax = myViewFrame->isNormRMaxMode();
+  bool aNormMin = myViewFrame->isNormRMinMode();
+
+  if ( aNormMax )
+    toolMgr()->action( PModeNormRMaxId )->setChecked( true );
+  else
+    toolMgr()->action( PModeNormRMaxId )->setChecked( false );
+  if ( aNormMin )
+    toolMgr()->action( PModeNormRMinId )->setChecked( true );
+  else
+    toolMgr()->action( PModeNormRMinId )->setChecked( false );
 }
 
 /*!
@@ -550,6 +685,26 @@ void Plot2d_ViewWindow::onViewVerMode()
 }
 
 /*!
+  \brief Called when normalization mode action (by left Y axis) is activated.
+*/
+
+void Plot2d_ViewWindow::onViewNormLMode()
+{
+  myViewFrame->setNormLMaxMode( toolMgr()->action( PModeNormLMaxId )->isChecked() ? true : false );
+  myViewFrame->setNormLMinMode( toolMgr()->action( PModeNormLMinId )->isChecked() ? true : false );
+}
+
+/*!
+  \brief Called when normalization mode action (by right Y axis) is activated.
+*/
+
+void Plot2d_ViewWindow::onViewNormRMode()
+{
+  myViewFrame->setNormRMaxMode( toolMgr()->action( PModeNormRMaxId )->isChecked() ? true : false );
+  myViewFrame->setNormRMinMode( toolMgr()->action( PModeNormRMinId )->isChecked() ? true : false );
+}
+
+/*!
   \brief Called when the "Show legend" action is activated.
 */
 void Plot2d_ViewWindow::onLegend()
@@ -601,8 +756,8 @@ QImage Plot2d_ViewWindow::dumpView()
   \param format image format ("BMP" [default], "JPEG", "JPG", "PNG")
 */
 bool Plot2d_ViewWindow::dumpViewToFormat( const QImage&  img,
-					  const QString& fileName, 
-					  const QString& format )
+                                          const QString& fileName, 
+                                          const QString& format )
 {
   bool res = myViewFrame ? myViewFrame->print( fileName, format ) : false;
   if( !res )
@@ -621,6 +776,151 @@ QString Plot2d_ViewWindow::filter() const
   filters << tr( "POSTSCRIPT_FILES" );
   filters << tr( "ENCAPSULATED_POSTSCRIPT_FILES" );
   return filters.join( ";;" );
+}
+
+/*!
+  \brief Called when the "Print view" action is activated.
+*/
+void Plot2d_ViewWindow::onPrintView()
+{
+  if ( !myViewFrame )
+    return;
+
+#if !defined(WIN32) && !defined(QT_NO_CUPS)
+#if QT_VERSION < 0x040303
+  if ( !Qtx::hasAnyPrinters() ) {
+    SUIT_MessageBox::warning( this, tr( "WRN_WARNING" ),
+                              tr( "WRN_NO_PRINTERS" ) );
+    return;
+  }
+#endif
+#endif
+
+  // stored settings for further starts
+  static QString aPrinterName;
+  static int aColorMode = -1;
+  static int anOrientation = -1;
+
+  QPrinter aPrinter;
+
+  // restore settinds from previous launching
+
+  // printer name
+  if ( !aPrinterName.isEmpty() )
+    aPrinter.setPrinterName( aPrinterName );
+  else 
+  {
+    // Nothing to do for the first printing. aPrinter contains default printer name by default
+  }
+
+  // color mode
+  if ( aColorMode >= 0 )
+    aPrinter.setColorMode( (QPrinter::ColorMode)aColorMode );
+  else 
+  {
+    // Black-and-wight printers are often used
+    aPrinter.setColorMode( QPrinter::GrayScale );
+  }
+
+  if ( anOrientation >= 0 )
+    aPrinter.setOrientation( (QPrinter::Orientation)anOrientation );
+  else
+    aPrinter.setOrientation( QPrinter::Landscape );
+
+  QPrintDialog printDlg( &aPrinter, this );
+  printDlg.setPrintRange( QAbstractPrintDialog::AllPages );
+  if ( printDlg.exec() != QDialog::Accepted ) 
+    return;
+
+  // store printer settings for further starts
+  aPrinterName = aPrinter.printerName();
+  aColorMode = aPrinter.colorMode();
+  anOrientation = aPrinter.orientation();
+  
+  int W, H;
+  QPainter aPainter;
+
+  bool needColorCorrection = aPrinter.colorMode() == QPrinter::GrayScale;
+
+  // work arround for printing on real printer
+  if ( aPrinter.outputFileName().isEmpty() && aPrinter.orientation() == QPrinter::Landscape )
+  {
+    aPrinter.setFullPage( false );
+    // set paper orientation and rotate painter
+    aPrinter.setOrientation( QPrinter::Portrait );
+
+    W = aPrinter.height();
+    H = aPrinter.width();
+
+    aPainter.begin( &aPrinter );
+    aPainter.translate( QPoint( H, 0 ) );
+    aPainter.rotate( 90 );
+  }
+  else 
+  {
+    aPrinter.setFullPage( false );
+    aPainter.begin( &aPrinter );
+    W = aPrinter.width();
+    H = aPrinter.height();
+  }
+
+  QMap< QwtPlotCurve*, QPen > aCurvToPen;
+  QMap< QwtPlotCurve*, QwtSymbol > aCurvToSymbol;
+
+  if ( needColorCorrection )
+  {
+    // Iterate through, store temporary their parameters and assign 
+    // parameters proper for printing
+
+    CurveDict aCurveDict = myViewFrame->getCurves();
+    CurveDict::iterator it;
+    for ( it = aCurveDict.begin(); it != aCurveDict.end(); it++ ) 
+    {
+      QwtPlotCurve* aCurve = it.key();
+      if ( !aCurve )
+        continue;
+
+      // pen
+      QPen aPen = aCurve->pen();
+      aCurvToPen[ aCurve ] = aPen;
+
+      aPen.setColor( QColor( 0, 0, 0 ) );
+      aPen.setWidthF( 1.5 );
+
+      aCurve->setPen( aPen );
+
+      // symbol
+      QwtSymbol aSymbol = aCurve->symbol();
+      aCurvToSymbol[ aCurve ] = aSymbol;
+      aPen = aSymbol.pen();
+      aPen.setColor( QColor( 0, 0, 0 ) );
+      aPen.setWidthF( 1.5 );
+      aSymbol.setPen( aPen );
+
+      aCurve->setSymbol( aSymbol );
+    }
+  }
+
+  myViewFrame->printPlot( &aPainter, QRect( 0, 0, W, H ) );
+  aPainter.end();
+
+  // restore old pens and symbols
+  if ( needColorCorrection && !aCurvToPen.isEmpty() )
+  {
+    CurveDict aCurveDict = myViewFrame->getCurves();
+    CurveDict::iterator it;
+    for ( it = aCurveDict.begin(); it != aCurveDict.end(); it++ ) 
+    {
+      QwtPlotCurve* aCurve = it.key();
+      if ( !aCurve || 
+           !aCurvToPen.contains( aCurve ) ||
+           !aCurvToSymbol.contains( aCurve ) )
+        continue;
+
+      aCurve->setPen( aCurvToPen[ aCurve ] );
+      aCurve->setSymbol( aCurvToSymbol[ aCurve ] );
+    }
+  }
 }
 
 /*!

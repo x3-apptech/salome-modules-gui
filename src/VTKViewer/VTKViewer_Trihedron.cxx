@@ -1,28 +1,31 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "VTKViewer_Trihedron.h"
 #include "VTKViewer_Actor.h"
+#include "VTKViewer_Algorithm.h"
 
 // VTK Includes
+#include <vtkConfigure.h>
 #include <vtkMath.h>
 #include <vtkMapper.h>
 #include <vtkDataSet.h>
@@ -35,7 +38,14 @@
 #include <vtkLineSource.h>
 #include <vtkConeSource.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataMapper2D.h>
 #include <vtkVectorText.h>
+#include <vtkTextActor.h>
+#include <vtkTextMapper.h>
+#include <vtkTextProperty.h>
+
+// QT includes
+#include <QtGlobal>
 
 vtkStandardNewMacro(VTKViewer_UnScaledActor);
 
@@ -74,21 +84,21 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
     theRenderer->ViewToWorld(P[0][0],P[0][1],P[0][2]);
     theRenderer->ViewToWorld(P[1][0],P[1][1],P[1][2]);
     vtkFloatingPointType aWorldDiag = sqrt((P[1][0]-P[0][0])*(P[1][0]-P[0][0])+
-					   (P[1][1]-P[0][1])*(P[1][1]-P[0][1])+
-					   (P[1][2]-P[0][2])*(P[1][2]-P[0][2]));
+                                           (P[1][1]-P[0][1])*(P[1][1]-P[0][1])+
+                                           (P[1][2]-P[0][2])*(P[1][2]-P[0][2]));
     int* aSize = theRenderer->GetRenderWindow()->GetSize();
     vtkFloatingPointType aWinDiag = sqrt(vtkFloatingPointType(aSize[0]*aSize[0]+aSize[1]*aSize[1]));
     vtkDataSet* aDataSet = GetMapper()->GetInput();
     aDataSet->Update();
     vtkFloatingPointType aLength = aDataSet->GetLength();
     vtkFloatingPointType aPrecision = 1.0E-3;
+    vtkFloatingPointType aZeroTol   = 1.0E-12;
     vtkFloatingPointType anOldScale = GetScale()[0];
-    vtkFloatingPointType aScale;
-    if (aSize[1] > aSize[0])
-      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(aSize[0])/vtkFloatingPointType(aSize[1]));
-    else
-      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(aSize[1])/vtkFloatingPointType(aSize[0]));
-    if(aScale != 0.0&& fabs(aScale - anOldScale)/aScale > aPrecision){
+    vtkFloatingPointType aScale = anOldScale;
+    vtkFloatingPointType aMaxSize = (vtkFloatingPointType)qMax(aSize[1],aSize[0]);
+    if (qAbs(aWinDiag) > aZeroTol && qAbs(aLength) > aZeroTol && qAbs(aMaxSize) > aZeroTol)
+      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(qMin(aSize[1],aSize[0]))/aMaxSize);
+    if(qAbs(aScale) > aZeroTol && qAbs(aScale - anOldScale)/aScale > aPrecision){
       SetScale(aScale);
     }
   }
@@ -97,16 +107,22 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
 
 vtkStandardNewMacro(VTKViewer_LineActor);
 
+#ifdef IPAL21440
+vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,vtkTextActor);
+#else
 vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,VTKViewer_UnScaledActor);
+#endif
 vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,vtkFollower);
 
 /*!Adds Label and Arrow actors to \a theRenderer.*/
 void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
 {
+#ifndef IPAL21440
   if(LabelActor && LabelActor->GetVisibility()){
     LabelActor->Modified();
     LabelActor->Render(theRenderer);
   }
+#endif
   if(ArrowActor && ArrowActor->GetVisibility()){
     ArrowActor->Modified();
     ArrowActor->Render(theRenderer);
@@ -148,6 +164,18 @@ VTKViewer_Axis::VTKViewer_Axis()
   myLineActor->SetArrowActor(myArrowActor);
   
   /*! \li Initialize the Label pipe-line representation */
+#ifdef IPAL21440
+  myTextMapper = vtkTextMapper::New();
+  
+  myLabelActor = vtkTextActor::New();
+  myLabelActor->SetMapper(myTextMapper);
+  myLabelActor->ScaledTextOff();
+  myLabelActor->PickableOff();
+  
+  vtkCoordinate* aCoord = vtkCoordinate::New();
+  myLabelActor->GetPositionCoordinate()->SetReferenceCoordinate( aCoord );
+  aCoord->Delete();
+#else
   myVectorText = vtkVectorText::New();
   
   myMapper[2] = vtkPolyDataMapper::New();
@@ -159,6 +187,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   myLabelActor->SetSize(aLabelActorSize);
   myLabelActor->PickableOff();
   //myLabelActor->DebugOn();
+#endif
   
   myLineActor->SetLabelActor(myLabelActor);
   
@@ -177,8 +206,6 @@ VTKViewer_Axis::~VTKViewer_Axis()
   myMapper[0]->RemoveAllInputs();
   myMapper[0]->Delete();
   
-  myVectorText->Delete();
-  
   /*! \li Destroy of the Arrow pipe-line representation */
   myArrowActor->Delete();
   
@@ -190,8 +217,15 @@ VTKViewer_Axis::~VTKViewer_Axis()
   /*! \li Destroy of the Line pipe-line representation */
   myLineActor->Delete();
   
+#ifdef IPAL21440
+  myTextMapper->RemoveAllInputs();
+  myTextMapper->Delete();
+#else
+  myVectorText->Delete();
+  
   myMapper[2]->RemoveAllInputs();
   myMapper[2]->Delete();
+#endif
   
   myLineSource->Delete();
 }
@@ -240,15 +274,36 @@ void VTKViewer_Axis::SetVisibility(VTKViewer_Trihedron::TVisibility theVis)
 /*! Set camera for myLabelActor
  */
 void VTKViewer_Axis::SetCamera(vtkCamera* theCamera){
+#ifndef IPAL21440
   myLabelActor->SetCamera(theCamera);
+#endif
 }
 
-/*! Sets \a theProperty for actors: myLineActor,myLabelActor,myArrowActor
+/*! Sets color for actors: myLineActor,myLabelActor,myArrowActor
  */
-void VTKViewer_Axis::SetProperty(vtkProperty* theProperty){
-  myLabelActor->SetProperty(theProperty);
-  myArrowActor->SetProperty(theProperty);
-  myLineActor->SetProperty(theProperty);
+void VTKViewer_Axis::SetColor(double theRed, double theGreen, double theBlue)
+{
+  // Set color property for arrow and line actors
+  vtkProperty* aProperty = vtkProperty::New();
+  aProperty->SetColor(theRed, theGreen, theBlue);
+
+  myArrowActor->SetProperty(aProperty);
+  myLineActor->SetProperty(aProperty);
+#ifndef IPAL21440
+  myLabelActor->SetProperty(aProperty);
+#endif
+
+  aProperty->Delete();
+  
+  // Set color property for label actor
+#ifdef IPAL21440
+  vtkTextProperty* aTextProperty = vtkTextProperty::New();
+  aTextProperty->SetColor(theRed, theGreen, theBlue);
+
+  myLabelActor->SetTextProperty(aTextProperty);
+
+  aTextProperty->Delete();
+#endif
 }
 
 /*! Set size of VTKViewer_Axis
@@ -266,8 +321,13 @@ void VTKViewer_Axis::SetSize(vtkFloatingPointType theSize)
   myArrowActor->SetOrientation(myRot);
   myArrowActor->SetScale(theSize / 10.);
   
+#ifdef IPAL21440
+  if( vtkCoordinate* aCoord = myLabelActor->GetPositionCoordinate()->GetReferenceCoordinate() )
+    aCoord->SetValue( aPosition );
+#else
   myLabelActor->SetPosition(0.0,0.0,0.0);
   myLabelActor->AddPosition(aPosition);
+#endif
 }
 
 /*! Check if actor belongs to the axis object
@@ -278,7 +338,11 @@ bool VTKViewer_Axis::OwnActor(const vtkActor* theActor)
 {
   return theActor == myLineActor  || 
          theActor == myArrowActor ||
+#ifdef IPAL21440
+         false;
+#else
          theActor == myLabelActor;
+#endif
 }
 
 /*! \class VTKViewer_XAxis
@@ -300,11 +364,12 @@ vtkStandardNewMacro(VTKViewer_XAxis);
 VTKViewer_XAxis::VTKViewer_XAxis(){ 
   myDir[0] = 1.0; myDir[1] = 0.0; myDir[2] = 0.0;
   myRot[0] = 0.0; myRot[1] = 0.0; myRot[2] = 0.0;
+#ifdef IPAL21440
+  myTextMapper->SetInput("X");
+#else
   myVectorText->SetText("X");
-  vtkProperty* aProperty = vtkProperty::New();
-  aProperty->SetColor(1.0,0.0,0.0);
-  SetProperty(aProperty);
-  aProperty->Delete();
+#endif
+  SetColor(1.0,0.0,0.0);
 }
 
 /*! \class VTKViewer_YAxis
@@ -326,11 +391,12 @@ VTKViewer_YAxis::VTKViewer_YAxis()
 { 
   myDir[0] = 0.0; myDir[1] = 1.0; myDir[2] = 0.0;
   myRot[0] = 0.0; myRot[1] = 0.0; myRot[2] = 90.;
+#ifdef IPAL21440
+  myTextMapper->SetInput("Y");
+#else
   myVectorText->SetText("Y");
-  vtkProperty* aProperty = vtkProperty::New();
-  aProperty->SetColor(0.0,1.0,0.0);
-  SetProperty(aProperty);
-  aProperty->Delete();
+#endif
+  SetColor(0.0,1.0,0.0);
 }
 
 /*! \class VTKViewer_ZAxis
@@ -353,11 +419,12 @@ VTKViewer_ZAxis::VTKViewer_ZAxis()
 {
   myDir[0] = 0.0; myDir[1] = 0.0; myDir[2] = 1.0;
   myRot[0] = 0.0; myRot[1] = -90; myRot[2] = 0.0;
+#ifdef IPAL21440
+  myTextMapper->SetInput("Z");
+#else
   myVectorText->SetText("Z");
-  vtkProperty* aProperty = vtkProperty::New();
-  aProperty->SetColor(0.0,0.0,1.0);
-  SetProperty(aProperty);
-  aProperty->Delete();
+#endif
+  SetColor(0.0,0.0,1.0);
 }
 
 vtkStandardNewMacro(VTKViewer_Trihedron);
@@ -442,20 +509,22 @@ int VTKViewer_Trihedron::GetVisibleActorCount(vtkRenderer* theRenderer)
 {
   //TVisibility aVis = GetVisibility();
   //SetVisibility(eOff);
-  vtkActorCollection* aCollection = theRenderer->GetActors();
+  VTK::ActorCollectionCopy aCopy(theRenderer->GetActors());
+  vtkActorCollection* aCollection = aCopy.GetActors();
   aCollection->InitTraversal();
   int aCount = 0;
   while(vtkActor* prop = aCollection->GetNextActor()) {
-    if( prop->GetVisibility())
+    if( prop->GetVisibility()) {
       if(VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast(prop)) {
         if(!anActor->IsInfinitive()) 
-	  aCount++;
+          aCount++;
       }
       else if ( !OwnActor( anActor ) ) {
-	aCount++;
+        aCount++;
       }
         //int aCount = theRenderer->VisibleActorCount();
         //SetVisibility(aVis);
+    }
   }
   return aCount;
 }

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : VTKViewer_InteractorStyle.h
 //  Author : Christophe ATTANASIO
@@ -31,6 +32,7 @@
 
 class vtkCell;
 class vtkRenderWindowInteractor;
+class vtkTDxInteractorStyle;
 
 #include <QObject>
 #include <QCursor>
@@ -78,7 +80,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
 
   void setTriedron(VTKViewer_Trihedron* theTrihedron);
   void setPreselectionProp(const double& theRed = 0, const double& theGreen = 1,
-			   const double& theBlue = 1, const int& theWidth = 5);
+                           const double& theBlue = 1, const int& theWidth = 5);
 
   // Generic event bindings must be overridden in subclasses
   void OnMouseMove  (int ctrl, int shift, int x, int y);
@@ -121,14 +123,14 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   void Place(const int theX, const int theY);
   void TranslateView(int toX, int toY, int fromX, int fromY);
   bool IsInRect(vtkActor* theActor, 
-		const int left, const int top, 
-		const int right, const int bottom);
+                const int left, const int top, 
+                const int right, const int bottom);
   bool IsInRect(vtkCell* theCell, 
-		const int left, const int top, 
-		const int right, const int bottom);
+                const int left, const int top, 
+                const int right, const int bottom);
   bool IsInRect(vtkFloatingPointType* thePoint, 
-		const int left, const int top, 
-		const int right, const int bottom);
+                const int left, const int top, 
+                const int right, const int bottom);
 
   int State;
   vtkFloatingPointType MotionFactor;
@@ -149,6 +151,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   void startRotate();
   void startFitArea();
   void startSpin();
+  void SetTDxStyle(vtkTDxInteractorStyle *tdxStyle) {}
   bool needsRedrawing();
 
  protected:

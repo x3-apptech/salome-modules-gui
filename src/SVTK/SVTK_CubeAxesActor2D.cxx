@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME OBJECT : kernel of SALOME component
 //  File   : SVTK_CubeAxesActor2D.cxx
 //  Author : Eugeny Nikolaev
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SVTK_CubeAxesActor2D.h"
 #include "VTKViewer_Transform.h"
 
@@ -194,10 +193,10 @@ int SVTK_CubeAxesActor2D::RenderOverlay(vtkViewport *viewport)
 }
 
 static void ChangeValues(vtkFloatingPointType* aArray1,
-			 vtkFloatingPointType* aArray2,
-			 vtkFloatingPointType *aRange1,
-			 vtkFloatingPointType* aRange2,
-			 bool theY)
+                         vtkFloatingPointType* aArray2,
+                         vtkFloatingPointType *aRange1,
+                         vtkFloatingPointType* aRange2,
+                         bool theY)
 {
   vtkFloatingPointType tmp=-1000;
   if (!theY){
@@ -220,14 +219,14 @@ static void ChangeValues(vtkFloatingPointType* aArray1,
 }
 
 static void ChangeArrays(vtkFloatingPointType* xCoords,
-			 vtkFloatingPointType* yCoords,
-			 vtkFloatingPointType* zCoords,
-			 vtkFloatingPointType* xRange,
-			 vtkFloatingPointType* yRange,
-			 vtkFloatingPointType* zRange,
-			 const int xAxes,
-			 const int yAxes, 
-			 const int zAxes)
+                         vtkFloatingPointType* yCoords,
+                         vtkFloatingPointType* zCoords,
+                         vtkFloatingPointType* xRange,
+                         vtkFloatingPointType* yRange,
+                         vtkFloatingPointType* zRange,
+                         const int xAxes,
+                         const int yAxes, 
+                         const int zAxes)
 {
   if ( xAxes == 0 && yAxes == 2 && zAxes == 1)
     ChangeValues(yCoords,zCoords,yRange,zRange,true);
@@ -417,8 +416,8 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   // if xAxes=0 yAxes=1 zAxes=2 - good situation
   if (!(xAxes == 0 && yAxes == 1 && zAxes == 2))
     ChangeArrays(xCoords,yCoords,zCoords,
-		 xRange,yRange,zRange,
-		 xAxes,yAxes,zAxes);
+                 xRange,yRange,zRange,
+                 xAxes,yAxes,zAxes);
 
   double aTScale[3];
   if(m_Transform.GetPointer() != NULL)

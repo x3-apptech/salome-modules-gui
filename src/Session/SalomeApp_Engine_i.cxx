@@ -1,46 +1,52 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SalomeApp_Engine_i : implementation of SalomeApp_Engine.idl
 //  File   : SalomeApp_Engine_i.cxx
 //  Author : Alexander SLADKOV
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SalomeApp_Engine_i.hxx"
 
-#include "SALOMEDS_Tool.hxx"
+#include <SALOME_NamingService.hxx>
+#include <SALOMEDS_Tool.hxx>
+#include <Utils_ORB_INIT.hxx>
+#include <Utils_SINGLETON.hxx>
+#include <Utils_SALOME_Exception.hxx>
+#include <utilities.h>
+
+#include <QApplication>
+#include <QDir>
+#include <QFile>
 
 #include <iostream>
-
-using namespace std;
-
-SalomeApp_Engine_i* SalomeApp_Engine_i::myInstance = NULL;
 
 /*!
   Constructor
 */
-SalomeApp_Engine_i::SalomeApp_Engine_i()
+SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
 {
-  myInstance = this;
+  myComponentName = theComponentName;
+  MESSAGE("SalomeApp_Engine_i::SalomeApp_Engine_i(): myComponentName = " <<
+	  myComponentName << ", this = " << this);
 }
 
 /*!
@@ -48,6 +54,8 @@ SalomeApp_Engine_i::SalomeApp_Engine_i()
 */
 SalomeApp_Engine_i::~SalomeApp_Engine_i()
 {
+  MESSAGE("SalomeApp_Engine_i::~SalomeApp_Engine_i(): myComponentName = " << 
+	  myComponentName << ", this = " << this);
 }
 
 SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theComponent,
@@ -56,22 +64,23 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 {
   SALOMEDS::TMPFile_var aStreamFile = new SALOMEDS::TMPFile;
 
-  cout << "SalomeApp_Engine_i::Save() isMultiFile = " << isMultiFile << endl;
   if (CORBA::is_nil(theComponent) || CORBA::is_nil(theComponent->GetStudy()))
     return aStreamFile._retn();
 
   const int studyId = theComponent->GetStudy()->StudyId();
-  cout << "SalomeApp_Engine_i::Save() - studyId = " << studyId << endl;
 
   // Get a temporary directory to store a file
   //std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
 
   if (myMap.count(studyId)) {
-    cout << "SalomeApp_Engine_i::Save() - myMap.count(studyId)" << endl;
-    MapOfListOfFiles mapOfListOfFiles = myMap[studyId];
     std::string componentName (theComponent->ComponentDataType());
-    cout << "SalomeApp_Engine_i::Save() - componentName = " << componentName << endl;
-    ListOfFiles listOfFiles = mapOfListOfFiles[componentName];
+
+    // Error somewhere outside - Save() called with
+    // wrong SComponent instance
+    if ( myComponentName != componentName )
+      return aStreamFile._retn();
+
+    const ListOfFiles& listOfFiles = myMap[studyId];
 
     // listOfFiles must contain temporary directory name in its first item
     // and names of files (relatively the temporary directory) in the others
@@ -79,7 +88,6 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 
     if (n > 0) { // there are some files, containing persistent data of the component
       std::string aTmpDir = listOfFiles[0];
-      cout << "SalomeApp_Engine_i::Save() - aTmpDir = " << aTmpDir << endl;
 
       // Create a list to store names of created files
       SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
@@ -103,8 +111,14 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
                                          const char* theURL,
                                          bool isMultiFile)
 {
-  cout << "SalomeApp_Engine_i::Load() isMultiFile = " << isMultiFile << endl;
+  std::cout << "SalomeApp_Engine_i::Load() isMultiFile = " << isMultiFile << std::endl;
   if (CORBA::is_nil(theComponent) || CORBA::is_nil(theComponent->GetStudy()))
+    return false;
+
+  // Error somewhere outside - Load() called with
+  // wrong SComponent instance
+  std::string componentName (theComponent->ComponentDataType());
+  if ( myComponentName != componentName )
     return false;
 
   const int studyId = theComponent->GetStudy()->StudyId();
@@ -124,52 +138,259 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
   for (int i = 1; i < n; i++)
     listOfFiles[i] = std::string(aSeq[i - 1]);
 
-  //MapOfListOfFiles mapOfListOfFiles;
-  //if (myMap.count(studyId))
-  //  mapOfListOfFiles = myMap[studyId];
-  //std::string componentName (theComponent->ComponentDataType());
-  //mapOfListOfFiles[componentName] = listOfFiles;
-  //myMap[studyId] = mapOfListOfFiles;
-
-  SetListOfFiles(listOfFiles, studyId, theComponent->ComponentDataType());
+  SetListOfFiles(listOfFiles, studyId);
 
   return true;
 }
 
-SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles (const int theStudyId,
-                                                                    const char* theComponentName)
+SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles (const int theStudyId)
 {
   ListOfFiles aListOfFiles;
 
-  if (myMap.count(theStudyId))
+  if (myMap.find(theStudyId) != myMap.end())
   {
-    MapOfListOfFiles mapOfListOfFiles = myMap[theStudyId];
-    std::string componentName (theComponentName);
-    if (mapOfListOfFiles.count(componentName))
-      aListOfFiles = mapOfListOfFiles[componentName];
+    aListOfFiles = myMap[theStudyId];
   }
 
   return aListOfFiles;
 }
 
-void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles theListOfFiles,
-                                         const int   theStudyId,
-                                         const char* theComponentName)
+void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles& theListOfFiles,
+                                         const int          theStudyId)
 {
-  //if (!myMap.count(theStudyId)) {
-  //  MapOfListOfFiles mapOfListOfFiles;
-  //  myMap[theStudyId] = mapOfListOfFiles;
-  //}
+  myMap[theStudyId] = theListOfFiles;
+}
 
-  MapOfListOfFiles& mapOfListOfFiles = myMap[theStudyId];
-  std::string componentName (theComponentName);
-  mapOfListOfFiles[componentName] = theListOfFiles;
+/*! 
+ *  DumpPython implementation for light modules
+ */
+Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy, 
+						 CORBA::Boolean isPublished, 
+						 CORBA::Boolean isMultiFile, 
+						 CORBA::Boolean& isValidScript)
+{
+  MESSAGE("SalomeApp_Engine_i::DumpPython(): myComponentName = "<<
+	  myComponentName << ", this = " << this);
+  
+  // Temporary solution: returning a non-empty sequence
+  // even if there's nothing to dump, to avoid crashes in SALOMEDS
+  // TODO: Improve SALOMEDSImpl_Study::DumpStudy() by skipping the components 
+  // with isValidScript == false, and initialize isValidScript by false below.
+  Engines::TMPFile_var aStreamFile = new Engines::TMPFile(1);
+  aStreamFile->length( 1 );
+  aStreamFile[0] = '\0';
+  isValidScript = true;
+
+  if (CORBA::is_nil(theStudy))
+    return aStreamFile._retn();
+
+  SALOMEDS::Study_var studyDS = SALOMEDS::Study::_narrow( theStudy );
+  const int studyId = studyDS->StudyId();
+
+  if (!myMap.count(studyId))
+    return aStreamFile._retn();
+
+  ListOfFiles listOfFiles = myMap[studyId];
+
+  // listOfFiles must contain temporary directory name in its first item
+  // and names of files (relatively the temporary directory) in the others
+  if ( listOfFiles.size() < 2 ) 
+    return aStreamFile._retn();
+
+  // there are some files, containing persistent data of the component
+  QString aTmpPath( listOfFiles.front().c_str() );
+  QDir aTmpDir( aTmpPath );
+  if ( !aTmpDir.exists() )
+    return aStreamFile._retn();    
+
+  // Calculate file sizes
+  QStringList aFilePaths;
+  QList<qint64> aFileSizes;
+  qint64 aBuffSize = 0;
+  ListOfFiles::const_iterator aFIt  = listOfFiles.begin();
+  ListOfFiles::const_iterator aFEnd = listOfFiles.end();
+  aFIt++;
+  for (; aFIt != aFEnd; aFIt++){
+    QString aFileName( (*aFIt).c_str() );
+    if ( !aTmpDir.exists( aFileName ) ){
+      continue;
+    }
+
+    QFile aFile( aTmpDir.filePath( aFileName ) );
+    if ( !aFile.open( QIODevice::ReadOnly ) ){
+      continue;
+    }
+
+    aFilePaths.push_back( aTmpDir.filePath( aFileName ) );
+    aFileSizes.push_back( aFile.size() );
+    aBuffSize += aFileSizes.back();
+
+    aFile.close();
+  }
+
+  if ( !aFilePaths.size() || !aBuffSize )
+    return aStreamFile._retn(); 
+    
+  char* aBuffer = new char[aBuffSize + 1];
+  if ( !aBuffer )
+    return aStreamFile._retn();
+
+  // Convert the file(s) to the byte stream, multiple files are simply
+  // concatenated
+  // TODO: imporve multi-script support if necessary...
+  qint64 aCurrPos = 0;
+  QStringList::const_iterator aFileIt  = aFilePaths.begin();
+  QStringList::const_iterator aFileEnd = aFilePaths.end();
+  QList<qint64>::const_iterator   aSIt = aFileSizes.begin();
+  for ( ; aFileIt != aFileEnd; aFileIt++, aSIt++ ){
+    QFile aFile( aTmpDir.filePath( *aFileIt ) );
+    if ( !aFile.open( QIODevice::ReadOnly ) ){
+      continue;
+    }
+
+    // Incorrect size of file
+    // Do not remove the bad file to have some diagnostic means
+    if ( aFile.read( aBuffer + aCurrPos, *aSIt ) != *aSIt ){
+      aFile.close();      
+      return aStreamFile._retn();
+    }
+
+    aCurrPos += (*aSIt); 
+    aFile.remove();   
+  }
+
+  // Here we should end up with empty aTmpDir
+  // TODO: Handle QDir::rmdir() error status somehow...
+  aTmpDir.rmdir( aTmpPath );
+
+  aBuffer[aBuffSize] = '\0';
+  CORBA::Octet* anOctetBuf =  (CORBA::Octet*)aBuffer;
+  aStreamFile = new Engines::TMPFile(aBuffSize + 1, aBuffSize + 1, anOctetBuf, 1); 
+
+  return aStreamFile._retn();
 }
 
 /*!
-  \return shared instance of engine
+  \return Component data type string for this instance of the engine
 */
-SalomeApp_Engine_i* SalomeApp_Engine_i::GetInstance()
+char* SalomeApp_Engine_i::ComponentDataType()
 {
-  return myInstance;
+  return const_cast<char*>( myComponentName.c_str() );
 }
+
+/*!
+  \return 
+*/
+CORBA::ORB_var SalomeApp_Engine_i::orb()
+{
+  ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+  // TODO: using QApplication here looks ugly, think how to
+  // obtain the ORB reference in a nicer way...
+  static CORBA::ORB_var _orb = init( qApp->argc(), qApp->argv() );
+  return _orb;
+}
+
+/*!
+  \return 
+*/
+PortableServer::POA_var SalomeApp_Engine_i::poa()
+{
+  static PortableServer::POA_var _poa;
+  if ( CORBA::is_nil( _poa ) ){
+    CORBA::Object_var obj = orb()->resolve_initial_references( "RootPOA" );
+    _poa = PortableServer::POA::_narrow( obj );
+  }
+  return _poa;
+}
+
+/*!
+  \return 
+*/
+SALOME_NamingService* SalomeApp_Engine_i::namingService()
+{
+  static SALOME_NamingService _ns(orb());
+  return &_ns;
+}
+
+/*!
+  Internal method, creates a CORBA engine for a light SALOME module
+  with the given "component data type" string,
+  activates it and registers in SALOME naming service with
+  /SalomeAppEngine/comp_data_type path. If the engine is already in the 
+  naming service, simply returns and object reference to it.
+  \param theComponentName - synthetic "component data type" used to identify a given light module
+  \return Object reference to the CORBA engine
+*/
+CORBA::Object_ptr SalomeApp_Engine_i::engineForComponent( const char* theComponentName,
+							  bool toCreate )
+{
+  CORBA::Object_var anEngine;
+  if ( !theComponentName || !strlen( theComponentName ) )
+    return anEngine._retn();
+
+  std::string aPath( "/SalomeAppEngine/" );
+  aPath += theComponentName;
+  anEngine = namingService()->Resolve( aPath.c_str() );
+
+  // Activating a new instance of the servant
+  if ( toCreate && CORBA::is_nil( anEngine ) ){
+    try {
+      SalomeApp_Engine_i* aServant    = new SalomeApp_Engine_i( theComponentName );
+      PortableServer::ObjectId_var id = poa()->activate_object( aServant );
+      anEngine = aServant->_this();
+      aServant->_remove_ref();
+      namingService()->Register( anEngine.in(), aPath.c_str() );
+    }
+    catch (CORBA::SystemException&) {
+      INFOS("Caught CORBA::SystemException.");
+    }
+    catch (CORBA::Exception&) {
+      INFOS("Caught CORBA::Exception.");
+    }
+    catch (...) {
+      INFOS("Caught unknown exception.");
+    }
+  }
+
+  return anEngine._retn();
+}
+
+/*!
+  \param theComponentName - synthetic "component data type" used to identify a given light module
+  \return IOR string for the CORBA engine for a light SALOME module
+  with the given "component data type" string
+  \sa GetInstance( const char* theComponentName )
+*/
+std::string SalomeApp_Engine_i::EngineIORForComponent( const char* theComponentName,
+						       bool toCreate )
+{
+  std::string anIOR( "" );
+  CORBA::Object_var anEngine = engineForComponent( theComponentName, toCreate );
+  if ( !CORBA::is_nil( anEngine ) )
+  {
+    CORBA::String_var objStr = orb()->object_to_string( anEngine.in() );
+    anIOR = std::string( objStr.in() );
+  }
+  return anIOR;
+}
+
+/*!
+  \param theComponentName - synthetic "component data type" used to identify a given light module
+  \return A pointer to corresponding C++ engine instance, null means some internal problems.
+  \sa EngineIORForComponent( const char* theComponentName )
+*/
+SalomeApp_Engine_i* SalomeApp_Engine_i::GetInstance( const char* theComponentName,
+						     bool toCreate )
+{
+  SalomeApp_Engine_i* aServant = 0;
+  CORBA::Object_var anEngine = engineForComponent( theComponentName, toCreate );
+  if ( !CORBA::is_nil( anEngine ) )
+  {
+    PortableServer::Servant aServantBase = poa()->reference_to_servant( anEngine.in() );
+    aServant = dynamic_cast<SalomeApp_Engine_i*>( aServantBase );
+  } 
+  MESSAGE("SalomeApp_Engine_i::GetInstance(): theComponentName = " <<
+	  theComponentName << ", aServant = " << aServant);
+  return aServant;
+}
+

@@ -46,22 +46,22 @@ user in \subpage themes_page "Themes" dialog. </li>
 </ul>
 </li>
 
-<li>\b Tools menu gives access to: \subpage using_catalog_generator_page "Catalogue Generator", and 
-\subpage using_registry_tool_page "Registry tool"</li>
+<li>\b Tools menu gives access to: \subpage using_catalog_generator_page "Catalogue Generator", 
+\subpage using_registry_tool_page "Registry tool" and \ref using_pluginsmanager "Python plugins"</li>
 <li>\b Help menu gives access to the help on Salome modules. The
 appropriate help page can also be called from any operation dialog via
 \b Help button.</li>
 </ul>
 
 Help for the GUI module provides information about standard
-\subpage viewers_page "Salome Viewers":
-<ul>
-<li>\ref occ_3d_viewer_page "OCC 3D viewer", </li>
-<li>\ref vtk_3d_viewer_page "VTK 3D viewer" and </li>
-<li>\ref plot2d_viewer_page "Plot 2D viewer". </li>
-</ul>
+\subpage viewers_page "Salome Viewers".
 
-\subpage setting_preferences_page "Preferences" for all Salome modules
-are also described in this section of Salome GUI Help.
+General application preferences are described in the \subpage setting_preferences_page "Preferences" 
+section of SALOME GUI Help.
+
+
+\subpage using_input_widgets_page "Using input widgets" sub-section
+covers specific aspects of behavior of certain kinds of SALOME GUI
+input fields.
 
 */

@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File:      Plot2d_ToolTip.cxx
-// Author:    Alexandre SOLOVYOV
-//
+//  File   : Plot2d_ToolTip.cxx
+//  Author : Alexandre SOLOVYOV, Open CASCADE S.A.S. (alexander.solovyov@opencascade.com)
+
 #include "Plot2d_ToolTip.h"
 #include "Plot2d_ViewFrame.h"
 #include "Plot2d_Curve.h"
@@ -36,13 +36,12 @@
 const int maxDist = 3, tip_margin = 10;
 
 
-Plot2d_ToolTip::Plot2d_ToolTip( Plot2d_ViewFrame* frame, Plot2d_Plot2d* plot )
-: QtxToolTip( plot->canvas() ),
-  myFrame( frame ),
-  myPlot( plot )
+Plot2d_ToolTip::Plot2d_ToolTip( Plot2d_ViewFrame* frame )
+: QtxToolTip( frame->getPlotCanvas() ),
+  myFrame( frame )
 {
   connect( this, SIGNAL( maybeTip( QPoint, QString&, QFont&, QRect&, QRect& ) ),
-	   this, SLOT( onToolTip( QPoint, QString&, QFont&, QRect&, QRect& ) ) );
+           this, SLOT( onToolTip( QPoint, QString&, QFont&, QRect&, QRect& ) ) );
 }
 
 Plot2d_ToolTip::~Plot2d_ToolTip()
@@ -54,7 +53,7 @@ void Plot2d_ToolTip::onToolTip( QPoint p, QString& str, QFont& f, QRect& txtRect
   int pInd;
   double dist;
 
-  Plot2d_Curve* c = myPlot->getClosestCurve( p, dist, pInd );
+  Plot2d_Curve* c = myFrame->getClosestCurve( p, dist, pInd );
   if( !c || dist>maxDist )
     return;
 

@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   :
 //  Author :
-//  Module :
-//  $Header$
-//
+
 #include "SVTK_Renderer.h"
 
 #include "SVTK_Trihedron.h"
@@ -33,11 +32,12 @@
 
 #include "SALOME_Actor.h"
 #include "VTKViewer_Actor.h"
+#include "VTKViewer_Algorithm.h"
 #include "VTKViewer_Transform.h"
 #include "VTKViewer_Utilities.h"
+#include "VTKViewer_OpenGLRenderer.h"
 
 #include <vtkCamera.h>
-#include <vtkRenderer.h>
 #include <vtkTextProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkCallbackCommand.h>
@@ -61,7 +61,7 @@ vtkStandardNewMacro(SVTK_Renderer);
 */
 SVTK_Renderer
 ::SVTK_Renderer():
-  myDevice(vtkRenderer::New()),
+  myDevice(VTKViewer_OpenGLRenderer::New()),
   myInteractor(NULL),
   myPriority(0.0),
   myEventCallbackCommand(vtkCallbackCommand::New()),
@@ -104,6 +104,9 @@ SVTK_Renderer
   myHighlightProperty->SetLineWidth(SALOME_LINE_WIDTH+2);
   myHighlightProperty->SetRepresentationToPoints();
 
+  // Bug 0020123, note 0005217 - Problem with zoom
+  GetDevice()->SetNearClippingPlaneTolerance( 0.00001 );
+
   myTrihedron->Delete();
   myCubeAxes->Delete();
   myEventCallbackCommand->Delete();
@@ -140,14 +143,14 @@ SVTK_Renderer
   myEventCallbackCommand->SetClientData(this);
   myEventCallbackCommand->SetCallback(SVTK_Renderer::ProcessEvents);
   GetDevice()->AddObserver(vtkCommand::ConfigureEvent,
-			   myEventCallbackCommand.GetPointer(), 
-			   myPriority);
+                           myEventCallbackCommand.GetPointer(), 
+                           myPriority);
   GetDevice()->AddObserver(vtkCommand::ResetCameraEvent,
-			   myEventCallbackCommand.GetPointer(), 
-			   myPriority);
+                           myEventCallbackCommand.GetPointer(), 
+                           myPriority);
   GetDevice()->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,
-			   myEventCallbackCommand.GetPointer(), 
-			   myPriority);
+                           myEventCallbackCommand.GetPointer(), 
+                           myPriority);
 }
 
 /*!
@@ -156,7 +159,8 @@ SVTK_Renderer
 SVTK_Renderer
 ::~SVTK_Renderer()
 {
-  vtkActorCollection* anActors = GetDevice()->GetActors();
+  VTK::ActorCollectionCopy aCopy(GetDevice()->GetActors());
+  vtkActorCollection* anActors = aCopy.GetActors();
   vtkActorCollection* anActors2 = vtkActorCollection::New();
 
   anActors->InitTraversal();
@@ -183,9 +187,9 @@ SVTK_Renderer
 void 
 SVTK_Renderer
 ::ProcessEvents(vtkObject* vtkNotUsed(theObject), 
-		unsigned long theEvent,
-		void* theClientData, 
-		void* vtkNotUsed(theCallData))
+                unsigned long theEvent,
+                void* theClientData, 
+                void* vtkNotUsed(theCallData))
 {
   SVTK_Renderer* self = reinterpret_cast<SVTK_Renderer*>(theClientData);
 
@@ -218,7 +222,7 @@ SVTK_Renderer
 void 
 SVTK_Renderer
 ::Initialize(vtkRenderWindowInteractor* theInteractor,
-	     SVTK_Selector* theSelector)
+             SVTK_Selector* theSelector)
 {
   myInteractor = theInteractor;
   mySelector = theSelector;
@@ -230,7 +234,7 @@ SVTK_Renderer
 */
 void
 SVTK_Renderer
-::AddActor(VTKViewer_Actor* theActor)
+::AddActor(VTKViewer_Actor* theActor, bool theIsAdjustActors)
 {
   if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(theActor)){
     anActor->SetInteractor(myInteractor);
@@ -247,7 +251,10 @@ SVTK_Renderer
     anActor->SetHighlightProperty(myHighlightProperty.GetPointer());
 
     anActor->AddToRender(GetDevice());
-    AdjustActors();
+    anActor->UpdateNameActors();
+
+    if(theIsAdjustActors)
+      AdjustActors();
   }
 }
 
@@ -256,7 +263,7 @@ SVTK_Renderer
 */
 void
 SVTK_Renderer
-::RemoveActor(VTKViewer_Actor* theActor)
+::RemoveActor(VTKViewer_Actor* theActor, bool theIsAdjustActors)
 {
   if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(theActor)){
     // Order of the calls are important because VTKViewer_Actor::RemoveFromRender
@@ -275,7 +282,9 @@ SVTK_Renderer
     anActor->SetHighlightProperty(NULL);
 
     anActor->RemoveFromRender(GetDevice());
-    AdjustActors();
+
+    if(theIsAdjustActors)
+      AdjustActors();
   }
 }
 
@@ -309,12 +318,13 @@ SVTK_Renderer
   myTransform->SetMatrixScale( theScale[0], theScale[1], theScale[2] );
   AdjustActors();
 
-  vtkActorCollection* anActors = GetDevice()->GetActors();
+  VTK::ActorCollectionCopy aCopy(GetDevice()->GetActors());
+  vtkActorCollection* anActors = aCopy.GetActors();
   anActors->InitTraversal();
   while(vtkActor* anAct = anActors->GetNextActor())
     if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(anAct))
       if(anActor->isHighlighted() && !anActor->IsInfinitive())
-	anActor->highlight(true);
+        anActor->highlight(true);
 }
 
 /*!
@@ -323,9 +333,9 @@ SVTK_Renderer
 void
 SVTK_Renderer
 ::SetSelectionProp(const double& theRed, 
-		   const double& theGreen, 
-		   const double& theBlue, 
-		   const int& theWidth) 
+                   const double& theGreen, 
+                   const double& theBlue, 
+                   const int& theWidth) 
 {
   myHighlightProperty->SetColor( theRed, theGreen, theBlue );
   myHighlightProperty->SetLineWidth( theWidth );
@@ -338,9 +348,9 @@ SVTK_Renderer
 void
 SVTK_Renderer
 ::SetPreselectionProp(const double& theRed, 
-		      const double& theGreen, 
-		      const double& theBlue, 
-		      const int& theWidth) 
+                      const double& theGreen, 
+                      const double& theBlue, 
+                      const int& theWidth) 
 {
   myPreHighlightProperty->SetColor( theRed, theGreen, theBlue );
   myPreHighlightProperty->SetLineWidth( theWidth );
@@ -353,8 +363,8 @@ SVTK_Renderer
 void
 SVTK_Renderer
 ::SetSelectionTolerance(const double& theTolNodes, 
-			const double& theTolCell,
-			const double& theTolObjects)
+                        const double& theTolCell,
+                        const double& theTolObjects)
 {
   myPointPicker->SetTolerance( theTolNodes );
   myCellPicker->SetTolerance( theTolCell );
@@ -407,28 +417,29 @@ SVTK_Renderer
     vtkFloatingPointType aSize = myTrihedron->GetSize();
     if ( IsTrihedronRelative() )
       {
-	ComputeTrihedronSize(GetDevice(),aSize,aSize,myTrihedronSize);
-	myTrihedron->SetSize(aSize);
+        ComputeTrihedronSize(GetDevice(),aSize,aSize,myTrihedronSize);
+        myTrihedron->SetSize(aSize);
       }
     else
       myTrihedron->SetSize( myTrihedronSize );
 
     // iterate through displayed objects and set size if necessary
-    vtkActorCollection* anActors = GetDevice()->GetActors();
+    VTK::ActorCollectionCopy aCopy(GetDevice()->GetActors());
+    vtkActorCollection* anActors = aCopy.GetActors();
     anActors->InitTraversal();
     while(vtkActor* anAct = anActors->GetNextActor()){
       if(SALOME_Actor* anActor = dynamic_cast<SALOME_Actor*>(anAct)){
-	if(anActor->IsResizable())
-	  anActor->SetSize(0.5*aSize);
+        if(anActor->IsResizable())
+          anActor->SetSize(0.5*aSize);
         if(anActor->GetVisibility() && !anActor->IsInfinitive()){
-	  vtkFloatingPointType *aBounds = anActor->GetBounds();
+          vtkFloatingPointType *aBounds = anActor->GetBounds();
           if(CheckBndBox(aBounds))
-	    for(int i = 0; i < 5; i = i + 2){
-	      if(aBounds[i] < aNewBndBox[i]) 
-		aNewBndBox[i] = aBounds[i];
-	      if(aBounds[i+1] > aNewBndBox[i+1]) 
-		aNewBndBox[i+1] = aBounds[i+1];
-	    }
+            for(int i = 0; i < 5; i = i + 2){
+              if(aBounds[i] < aNewBndBox[i]) 
+                aNewBndBox[i] = aBounds[i];
+              if(aBounds[i+1] > aNewBndBox[i+1]) 
+                aNewBndBox[i+1] = aBounds[i+1];
+            }
         }
       }
     }
@@ -742,6 +753,31 @@ SVTK_Renderer
   aCamera->SetViewUp(0,0,1);
   aCamera->SetFocalPoint(0,0,0);
   this->OnFitAll();
+}
+
+
+/*!
+  To rotate view 90 degrees clockwise
+*/
+void
+SVTK_Renderer
+::onClockWiseView()
+{
+  vtkCamera* aCamera = GetDevice()->GetActiveCamera(); 
+  aCamera->Roll(-90);
+  aCamera->OrthogonalizeViewUp();
+}
+
+/*!
+  To rotate view 90 degrees counterclockwise
+*/
+void
+SVTK_Renderer
+::onAntiClockWiseView()
+{
+  vtkCamera* aCamera = GetDevice()->GetActiveCamera(); 
+  aCamera->Roll(90);
+  aCamera->OrthogonalizeViewUp();
 }
 
 /*!

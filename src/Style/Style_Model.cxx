@@ -1,28 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : Style_Model.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S (vadim.sandler@opencascade.com)
 //
 #include "Style_Model.h"
+#include "Style_Salome.h"
 
 #include <QtxResourceMgr.h>
 
@@ -41,9 +40,9 @@
 static QColor mixColors( const QColor& c1, const QColor& c2 )
 {
   return QColor( (c1.red()   + c2.red() )   / 2,
-		 (c1.green() + c2.green() ) / 2,
-		 (c1.blue()  + c2.blue() )  / 2,
-		 (c1.alpha() + c2.alpha() ) / 2 );
+                 (c1.green() + c2.green() ) / 2,
+                 (c1.blue()  + c2.blue() )  / 2,
+                 (c1.alpha() + c2.alpha() ) / 2 );
 }
 
 /*!
@@ -106,10 +105,11 @@ void Style_Model::fromApplication( bool reset )
   if ( !QApplication::instance() )  // application object is not created yet
     return;
 
-  if ( !myAppData )  {
-    // if not yes initialized from the application,
-    // store current application's style, palette, etc
+  if ( !myAppData ) // if not yes initialized from the application init myAppData
     myAppData = new AppData;
+
+  // store original application's style, palette, etc
+  if ( !Style_Salome::isActive() ) {
     myAppData->myStyle   = QApplication::style();
     myAppData->myPalette = QApplication::palette();
     myAppData->myFont    = QApplication::font();
@@ -125,7 +125,7 @@ void Style_Model::fromApplication( bool reset )
   for ( int i = (int)QPalette::Active; i <= (int)QPalette::Inactive; i++ ) {
     for ( int j = (int)Style_Model::WindowText; j < (int)Style_Model::NColorRoles; j++ ) {
       myColors[ (QPalette::ColorGroup)i ][ (Style_Model::ColorRole)j ] =
-	myAppData->myPalette.color( (QPalette::ColorGroup)i, (QPalette::ColorRole)j );
+        myAppData->myPalette.color( (QPalette::ColorGroup)i, (QPalette::ColorRole)j );
     }
   }
 
@@ -281,7 +281,7 @@ void Style_Model::fromResources( QtxResourceMgr* resMgr, const QString& resSecti
       setWidgetEffect( (WidgetEffect)effect );
   }
   else if ( resourceMgr()->hasValue( section, "is-highlight-widget" ) ||
-	    resourceMgr()->hasValue( section, "is-raising-widget" ) ) {
+            resourceMgr()->hasValue( section, "is-raising-widget" ) ) {
     bool highlight = resourceMgr()->booleanValue( section, "is-highlight-widget", false );
     bool autoraise = resourceMgr()->booleanValue( section, "is-highlight-widget", false );
     if ( highlight )
@@ -504,7 +504,7 @@ QColor Style_Model::color( ColorRole role, QPalette::ColorGroup cg ) const
   \sa color()
 */
 void Style_Model::setColor( Style_Model::ColorRole role, const QColor& active,
-			    const QColor& inactive, const QColor& disabled )
+                            const QColor& inactive, const QColor& disabled )
 {
   QColor ac = active, ic = inactive, dc = disabled;
 
@@ -515,6 +515,7 @@ void Style_Model::setColor( Style_Model::ColorRole role, const QColor& active,
     switch ( role ) {
     case WindowText:
     case Text:
+    case ButtonText:
       dc = color( Button ).darker();
       break;
     case Base:
@@ -854,7 +855,7 @@ void Style_Model::readColorValue( ColorRole role, const QString& prefix )
   \sa readColorValue()
 */
 void Style_Model::writeColorValue( ColorRole role, const QString& prefix,
-				   QtxResourceMgr* resMgr, const QString& resSection ) const
+                                   QtxResourceMgr* resMgr, const QString& resSection ) const
 {
   QString active   = QString( "%1-color" ).arg( prefix );
   QString inactive = QString( "%1-color-inactive" ).arg( prefix );

@@ -1,24 +1,25 @@
-dnl  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+dnl Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
-dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+dnl Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 dnl
-dnl  This library is free software; you can redistribute it and/or
-dnl  modify it under the terms of the GNU Lesser General Public
-dnl  License as published by the Free Software Foundation; either
-dnl  version 2.1 of the License.
+dnl This library is free software; you can redistribute it and/or
+dnl modify it under the terms of the GNU Lesser General Public
+dnl License as published by the Free Software Foundation; either
+dnl version 2.1 of the License.
 dnl
-dnl  This library is distributed in the hope that it will be useful,
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl  Lesser General Public License for more details.
+dnl This library is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl Lesser General Public License for more details.
 dnl
-dnl  You should have received a copy of the GNU Lesser General Public
-dnl  License along with this library; if not, write to the Free Software
-dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with this library; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 dnl
-dnl  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+dnl See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 dnl
+
 AC_DEFUN([CHECK_SIP],[
 AC_REQUIRE([CHECK_PYTHON])dnl
 AC_REQUIRE([CHECK_QT])dnl
@@ -71,7 +72,11 @@ if test "x$sip_ok" = "xyes" ; then
     fi
     TEST_INC_DIRS="${TEST_INC_DIRS} /usr/include /usr/include/python${PYTHON_VERSION}"
     TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib${LIB_LOCATION_SUFFIX} /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/site-packages"
-
+    TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib${LIB_LOCATION_SUFFIX}/python${PYTHON_VERSION}/dist-packages/PyQt4"
+    TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib${LIB_LOCATION_SUFFIX}/pymodules/python${PYTHON_VERSION}"
+    if test "${build_cpu::6}" = "x86_64" ; then
+      TEST_LIB_DIRS="${TEST_LIB_DIRS} /usr/lib64/python${PYTHON_VERSION}/site-packages"
+    fi
     dnl Search sip.h file
     sip_ok=no
     for d in ${TEST_INC_DIRS} ; do

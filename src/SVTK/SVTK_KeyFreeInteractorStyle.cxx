@@ -1,30 +1,26 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
 //  File   : SVTK_KeyFreeInteractorStyle.cxx
 //  Author : Christophe ATTANASIO
-//  Module : SALOME
-//  $Header$
-//
+
 #include "SVTK_KeyFreeInteractorStyle.h"
 #include "SVTK_Selector.h"
 
@@ -53,7 +49,7 @@ SVTK_KeyFreeInteractorStyle::~SVTK_KeyFreeInteractorStyle()
 
 //----------------------------------------------------------------------------
 void SVTK_KeyFreeInteractorStyle::OnLeftButtonDown(int ctrl, int shift, 
-						   int x, int y) 
+                                                   int x, int y) 
 {
   myIsLeftButtonDown = true;
 
@@ -78,10 +74,10 @@ void SVTK_KeyFreeInteractorStyle::OnLeftButtonDown(int ctrl, int shift,
   else {
     if (!(ctrl||shift)){
       if (myIsMidButtonDown){
-	startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
+        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
       }
       else{
-	startOperation(VTK_INTERACTOR_STYLE_CAMERA_ROTATE);
+        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ROTATE);
       }
     }
   }
@@ -90,8 +86,8 @@ void SVTK_KeyFreeInteractorStyle::OnLeftButtonDown(int ctrl, int shift,
 
 //----------------------------------------------------------------------------
 void SVTK_KeyFreeInteractorStyle::OnMiddleButtonDown(int ctrl,
-						     int shift, 
-						     int x, int y) 
+                                                     int shift, 
+                                                     int x, int y) 
 {
   myIsMidButtonDown = true;
 
@@ -116,10 +112,10 @@ void SVTK_KeyFreeInteractorStyle::OnMiddleButtonDown(int ctrl,
   else {
     if (!(ctrl||shift)){
       if ( myIsLeftButtonDown ){
-	startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
+        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
       }
       else{
-	startOperation(VTK_INTERACTOR_STYLE_CAMERA_PAN);
+        startOperation(VTK_INTERACTOR_STYLE_CAMERA_PAN);
       }
     }
   }

@@ -1,35 +1,40 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxResourceMgr.cxx
 // Author:    Alexander SOLOVYOV, Sergey TELKOV
 //
 #include "QtxResourceMgr.h"
 #include "QtxTranslator.h"
 
+#include <QSet>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QRegExp>
 #include <QTextStream>
 #include <QApplication>
+#include <QLibraryInfo>
+#include <QtDebug>
 #ifndef QT_NO_DOM
 #include <QDomDocument>
 #include <QDomElement>
@@ -65,7 +70,6 @@ public:
   QPixmap                loadPixmap( const QString&, const QString&, const QString& ) const;
   QTranslator*           loadTranslator( const QString&, const QString&, const QString& ) const;
 
-  QString                environmentVariable( const QString&, int&, int& ) const;
   QString                makeSubstitution( const QString&, const QString&, const QString& ) const;
 
   void                   clear();
@@ -389,61 +393,13 @@ QPixmap QtxResourceMgr::Resources::loadPixmap( const QString& sect, const QStrin
 QTranslator* QtxResourceMgr::Resources::loadTranslator( const QString& sect, const QString& prefix, const QString& name ) const
 {
   QTranslator* trans = new QtxTranslator( 0 );
-  QString fname = fileName( sect, prefix, name );
+  QString fname = QDir::convertSeparators( fileName( sect, prefix, name ) );
   if ( !trans->load( Qtx::file( fname, false ), Qtx::dir( fname ) ) )
   {
     delete trans;
     trans = 0;
   }
   return trans;
-}
-
-/*!
-  \brief Parse given string to retrieve environment variable.
-
-  Looks through the string for the patterns: ${name} or $(name) or %name%.
-  If string contains variable satisfying any pattern, the variable name
-  is returned, start index of the variable is returned in the \a start parameter,
-  and length of the variable is returned in the \a len parameter.
-
-  \param str string being processed
-  \param start if variable is found, this parameter contains its starting 
-         position in the \a str
-  \param len if variable is found, this parameter contains its length 
-  \return first found variable or null QString if there is no ones
-*/
-QString QtxResourceMgr::Resources::environmentVariable( const QString& str, int& start, int& len ) const
-{
-  QString varName;
-  len = 0;
-
-  QRegExp rx( "(^\\$\\{|[^\\$]\\$\\{)([a-zA-Z]+[a-zA-Z0-9_]*)(\\})|(^\\$\\(|[^\\$]\\$\\()([a-zA-Z]+[a-zA-Z0-9_]*)(\\))|(^\\$|[^\\$]\\$)([a-zA-Z]+[a-zA-Z0-9_]*)|(^%|[^%]%)([a-zA-Z]+[a-zA-Z0-9_]*)(%[^%]|%$)" );
-
-  int pos = rx.indexIn( str, start );
-  if ( pos != -1 )
-  {
-    int i = 1;
-    while ( i <= rx.numCaptures() && varName.isEmpty() )
-    {
-      QString capStr = rx.cap( i );
-      if ( !capStr.contains( "%" ) && !capStr.contains( "$" ) )
-        varName = capStr;
-      i++;
-    }
-
-    if ( !varName.isEmpty() )
-    {
-      int capIdx = i - 1;
-      start = rx.pos( capIdx );
-      int end = start + varName.length();
-      if ( capIdx > 1 && rx.cap( capIdx - 1 ).contains( QRegExp( "\\$|%" ) ) )
-        start = rx.pos( capIdx - 1 ) + rx.cap( capIdx - 1 ).indexOf( QRegExp( "\\$|%" ) );
-      if ( capIdx < rx.numCaptures() && !rx.cap( capIdx - 1 ).isEmpty() )
-        end++;
-      len = end - start;
-    }
-  }
-  return varName;
 }
 
 /*!
@@ -467,7 +423,7 @@ QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const Q
   int start( 0 ), len( 0 );
   while ( true )
   {
-    QString envName = environmentVariable( res, start, len );
+    QString envName = Qtx::findEnvVar( res, start, len );
     if ( envName.isNull() )
       break;
 
@@ -511,6 +467,9 @@ public:
 protected:
   virtual bool load( const QString&, QMap<QString, Section>& );
   virtual bool save( const QString&, const QMap<QString, Section>& );
+
+private:
+  bool         load( const QString&, QMap<QString, Section>&, QSet<QString>& );
 };
 
 /*!
@@ -536,9 +495,41 @@ QtxResourceMgr::IniFormat::~IniFormat()
 */
 bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Section>& secMap )
 {
-  QFile file( fname );
+  QSet<QString> importHistory;
+  return load( fname, secMap, importHistory );
+}
+
+
+/*!
+  \brief Load resources from xml-file.
+  \param fname resources file name
+  \param secMap resources map to be filled in
+  \param importHistory list of already imported resources files (to prevent import loops)
+  \return \c true on success or \c false on error
+*/
+bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Section>& secMap, QSet<QString>& importHistory )
+{
+  QString aFName = fname.trimmed();
+  if ( !QFileInfo( aFName ).exists() )
+  {
+    if ( QFileInfo( aFName + ".ini" ).exists() )
+      aFName += ".ini";
+    else if ( QFileInfo( aFName + ".INI" ).exists() )
+      aFName += ".INI";
+    else
+      return false; // file does not exist
+  }
+  QFileInfo aFinfo( aFName );
+  aFName = aFinfo.canonicalFilePath();
+
+  if ( !importHistory.contains( aFName ) )
+    importHistory.insert( aFName );
+  else
+    return true;   // already imported (prevent import loops)
+
+  QFile file( aFName );
   if ( !file.open( QFile::ReadOnly ) )
-    return false;
+    return false;  // file is not accessible
 
   QTextStream ts( &file );
 
@@ -577,26 +568,64 @@ bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Sectio
       if ( section.isEmpty() )
       {
         res = false;
-        qWarning( "Empty section in line %d", line );
+        qWarning() << "QtxResourceMgr: Empty section in line:" << line;
       }
     }
-    else if ( data.contains( "=" ) && !section.isEmpty() )
+    else if ( data.contains( separator ) && !section.isEmpty() )
     {
       int pos = data.indexOf( separator );
       QString key = data.left( pos ).trimmed();
       QString val = data.mid( pos + 1 ).trimmed();
       secMap[section].insert( key, val );
     }
+    else if ( section == "import" )
+    {
+      QString impFile = QDir::convertSeparators( Qtx::makeEnvVarSubst( data, Qtx::Always ) );
+      QFileInfo impFInfo( impFile );
+      if ( impFInfo.isRelative() )
+	      impFInfo.setFile( aFinfo.absoluteDir(), impFile );
+    
+      QMap<QString, Section> impMap;
+      if ( !load( impFInfo.absoluteFilePath(), impMap, importHistory ) )
+      {
+        qDebug() << "QtxResourceMgr: Error with importing file:" << data;
+      }
+      else 
+      {
+	      QMap<QString, Section>::const_iterator it = impMap.constBegin();
+	      for ( ; it != impMap.constEnd() ; ++it )
+	      { 
+	         if ( !secMap.contains( it.key() ) )
+	         {
+	            // insert full section
+	            secMap.insert( it.key(), it.value() );
+	         }
+	         else
+	         {
+	            // insert all parameters from the section
+	            Section::ConstIterator paramIt = it.value().begin();
+	            for ( ; paramIt != it.value().end() ; ++paramIt )
+	            {
+	               if ( !secMap[it.key()].contains( paramIt.key() ) )
+		               secMap[it.key()].insert( paramIt.key(), paramIt.value() );
+	            }
+	         }
+	      }
+      }
+    }
     else
     {
       res = false;
-      section.isEmpty() ? qWarning( "Current section is empty" ) : qWarning( "Error in line: %d", line );
+      if ( section.isEmpty() )
+	      qWarning() << "QtxResourceMgr: Current section is empty";
+      else
+	      qWarning() << "QtxResourceMgr: Error in line:" << line;
     }
   }
 
   file.close();
 
-  return res;
+  return res; 
 }
 
 /*!
@@ -607,11 +636,18 @@ bool QtxResourceMgr::IniFormat::load( const QString& fname, QMap<QString, Sectio
 */
 bool QtxResourceMgr::IniFormat::save( const QString& fname, const QMap<QString, Section>& secMap )
 {
+  if ( !Qtx::mkDir( QFileInfo( fname ).absolutePath() ) )
+    return false;
+
   QFile file( fname );
   if ( !file.open( QFile::WriteOnly ) )
     return false;
 
   QTextStream ts( &file );
+
+  ts << "# This file is automatically created by SALOME application." << endl;
+  ts << "# Changes made in this file can be lost!" << endl;
+  ts << endl;
 
   bool res = true;
   for ( QMap<QString, Section>::ConstIterator it = secMap.begin(); it != secMap.end() && res; ++it )
@@ -650,8 +686,11 @@ private:
   QString      docTag() const;
   QString      sectionTag() const;
   QString      parameterTag() const;
+  QString      importTag() const;
   QString      nameAttribute() const;
   QString      valueAttribute() const;
+
+  bool         load( const QString&, QMap<QString, Section>&, QSet<QString>& );
 };
 
 /*!
@@ -677,14 +716,45 @@ QtxResourceMgr::XmlFormat::~XmlFormat()
 */
 bool QtxResourceMgr::XmlFormat::load( const QString& fname, QMap<QString, Section>& secMap )
 {
+  QSet<QString> importHistory;
+  return load( fname, secMap, importHistory );
+}
+
+/*!
+  \brief Load resources from xml-file.
+  \param fname resources file name
+  \param secMap resources map to be filled in
+  \param importHistory list of already imported resources files (to prevent import loops)
+  \return \c true on success and \c false on error
+*/
+bool QtxResourceMgr::XmlFormat::load( const QString& fname, QMap<QString, Section>& secMap, QSet<QString>& importHistory )
+{
+  QString aFName = fname.trimmed();
+  if ( !QFileInfo( aFName ).exists() )
+  {
+    if ( QFileInfo( aFName + ".xml" ).exists() )
+      aFName += ".xml";
+    else if ( QFileInfo( aFName + ".XML" ).exists() )
+      aFName += ".XML";
+    else
+      return false; // file does not exist
+  }
+  QFileInfo aFinfo( aFName );
+  aFName = aFinfo.canonicalFilePath();
+
+  if ( !importHistory.contains(  aFName ) )
+    importHistory.insert( aFName );
+  else
+    return true;   // already imported (prevent import loops)
+
   bool res = false;
 
 #ifndef QT_NO_DOM
 
-  QFile file( fname );
+  QFile file( aFName );
   if ( !file.open( QFile::ReadOnly ) )
   {
-    qDebug( "File cannot be opened" );
+    qDebug() << "QtxResourceMgr: File is not accessible:" << aFName;
     return false;
   }
 
@@ -695,14 +765,14 @@ bool QtxResourceMgr::XmlFormat::load( const QString& fname, QMap<QString, Sectio
 
   if ( !res )
   {
-    qDebug( "File is empty" );
+    qDebug() << "QtxResourceMgr: File is empty:" << aFName;
     return false;
   }
 
   QDomElement root = doc.documentElement();
   if ( root.isNull() || root.tagName() != docTag() )
   {
-    qDebug( "Invalid root" );
+    qDebug() << "QtxResourceMgr: Invalid root in file:" << aFName;
     return false;
   }
 
@@ -728,45 +798,79 @@ bool QtxResourceMgr::XmlFormat::load( const QString& fname, QMap<QString, Sectio
             {
               QString paramName = paramElem.attribute( nameAttribute() );
               QString paramValue = paramElem.attribute( valueAttribute() );
-
               secMap[section].insert( paramName, paramValue );
             }
             else
-	    {
-	      qDebug( "Invalid parameter element" );
+            {
+              qDebug() << "QtxResourceMgr: Invalid parameter element in file:" << aFName;
               res = false;
-	    }
+            }
           }
-	  else
-	  {
-	    res = paramNode.isComment();
-	    if( !res )
-	      qDebug( "Node isn't element nor comment" );
-	  }
+          else
+          {
+            res = paramNode.isComment();
+            if ( !res )
+              qDebug() << "QtxResourceMgr: Node is neither element nor comment in file:" << aFName;
+          }
 
           paramNode = paramNode.nextSibling();
         }
       }
+      else if ( sectElem.tagName() == importTag() && sectElem.hasAttribute( nameAttribute() ) )
+      {
+         QString impFile = QDir::convertSeparators( Qtx::makeEnvVarSubst( sectElem.attribute( nameAttribute() ), Qtx::Always ) );
+	      QFileInfo impFInfo( impFile );
+	      if ( impFInfo.isRelative() )
+	         impFInfo.setFile( aFinfo.absoluteDir(), impFile );
+
+        QMap<QString, Section> impMap;
+        if ( !load( impFInfo.absoluteFilePath(), impMap, importHistory ) )
+	     {
+            qDebug() << "QtxResourceMgr: Error with importing file:" << sectElem.attribute( nameAttribute() );
+	     }
+	     else
+	     {
+	         QMap<QString, Section>::const_iterator it = impMap.constBegin();
+	         for ( ; it != impMap.constEnd() ; ++it )
+	         {
+	            if ( !secMap.contains( it.key() ) )
+	            {
+	               // insert full section
+	               secMap.insert( it.key(), it.value() );
+	            }
+	            else
+	            {
+	               // insert all parameters from the section
+	               Section::ConstIterator paramIt = it.value().begin();
+	               for ( ; paramIt != it.value().end() ; ++paramIt )
+	               {
+		               if ( !secMap[it.key()].contains( paramIt.key() ) )
+		                  secMap[it.key()].insert( paramIt.key(), paramIt.value() );
+	               }
+	            }
+	         }
+         }
+      }
       else
       {
-	qDebug( "Invalid section" );
-        res = false;
+         qDebug() << "QtxResourceMgr: Invalid section in file:" << aFName;
+         res = false;
       }
     }
     else
     {
       res = sectNode.isComment(); // if it's a comment -- let it be, pass it..
-      if( !res )
-	qDebug( "Node isn't element nor comment" );
+      if ( !res )
+        qDebug() << "QtxResourceMgr: Node is neither element nor comment in file:" << aFName;
     }
 
     sectNode = sectNode.nextSibling();
   }
 
 #endif
-
+  
   if ( res )
-    qDebug( "File '%s' is loaded successfully", (const char*)fname.toLatin1() );
+    qDebug() << "QtxResourceMgr: File" << fname << "is loaded successfully";
   return res;
 }
 
@@ -782,11 +886,16 @@ bool QtxResourceMgr::XmlFormat::save( const QString& fname, const QMap<QString, 
 
 #ifndef QT_NO_DOM
 
+  if ( !Qtx::mkDir( QFileInfo( fname ).absolutePath() ) )
+    return false;
+
   QFile file( fname );
   if ( !file.open( QFile::WriteOnly ) )
     return false;
 
   QDomDocument doc( docTag() );
+  QDomComment comment = doc.createComment( "\nThis file is automatically created by SALOME application.\nChanges made in this file can be lost!\n" );
+  doc.appendChild( comment );
   QDomElement root = doc.createElement( docTag() );
   doc.appendChild( root );
 
@@ -849,6 +958,18 @@ QString QtxResourceMgr::XmlFormat::parameterTag() const
   QString tag = option( "parameter_tag" );
   if ( tag.isEmpty() )
     tag = QString( "parameter" );
+  return tag;
+}
+
+/*!
+  \brief Get import tag name
+  \return XML import tag name
+*/
+QString QtxResourceMgr::XmlFormat::importTag() const
+{
+  QString tag = option( "import_tag" );
+  if ( tag.isEmpty() )
+   tag = QString( "import" );
   return tag;
 }
 
@@ -919,7 +1040,7 @@ QStringList QtxResourceMgr::Format::options() const
   \brief Get the value of the option with specified name.
 
   If option doesn't exist then null QString is returned.
-	 
+         
   \param opt option name
   \return option value
 */
@@ -956,7 +1077,7 @@ bool QtxResourceMgr::Format::load( Resources* res )
   if ( status )
     res->mySections = sections;
   else
-    qDebug( "QtxResourceMgr: Could not load resource file \"%s\"", (const char*)res->myFileName.toLatin1() );
+    qDebug() << "QtxResourceMgr: Can't load resource file:" << res->myFileName;
 
   return status;
 }
@@ -1444,7 +1565,7 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QByteArray
   \brief Get linear gradient parameter value.
   \param sect section name
   \param name parameter name
-  \param gVal parameter to return resulting linear gradient value value
+  \param gVal parameter to return resulting linear gradient value
   \return \c true if parameter is found and \c false if parameter is not found
           (in this case \a gVal value is undefined)
 */
@@ -1461,7 +1582,7 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QLinearGra
   \brief Get radial gradient parameter value.
   \param sect section name
   \param name parameter name
-  \param gVal parameter to return resulting radial gradient value value
+  \param gVal parameter to return resulting radial gradient value
   \return \c true if parameter is found and \c false if parameter is not found
           (in this case \a gVal value is undefined)
 */
@@ -1478,7 +1599,7 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QRadialGra
   \brief Get conical gradient parameter value.
   \param sect section name
   \param name parameter name
-  \param gVal parameter to return resulting conical gradient value value
+  \param gVal parameter to return resulting conical gradient value
   \return \c true if parameter is found and \c false if parameter is not found
           (in this case \a gVal value is undefined)
 */
@@ -1489,6 +1610,24 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QConicalGr
     return false;
 
   return Qtx::stringToConicalGradient( val, gVal );
+}
+
+/*!
+  \brief Get background parameter value.
+  \param sect section name
+  \param name parameter name
+  \param bgVal parameter to return resulting background value
+  \return \c true if parameter is found and \c false if parameter is not found
+          (in this case \a bgVal value is undefined)
+*/
+bool QtxResourceMgr::value( const QString& sect, const QString& name, Qtx::BackgroundData& bgVal ) const
+{
+  QString val;
+  if ( !value( sect, name, val, true ) )
+    return false;
+
+  bgVal = Qtx::stringToBackground( val );
+  return bgVal.isValid();
 }
 
 /*!
@@ -1706,6 +1845,24 @@ QConicalGradient QtxResourceMgr::conicalGradientValue( const QString& sect, cons
 }
 
 /*!
+  \brief Get background parameter value.
+
+  If the specified parameter is not found, the specified default value is returned instead.
+
+  \param sect section name
+  \param name parameter name
+  \param def default value
+  \return parameter value (or default value if parameter is not found)
+*/
+Qtx::BackgroundData QtxResourceMgr::backgroundValue( const QString& sect, const QString& name, const Qtx::BackgroundData& def ) const
+{
+  Qtx::BackgroundData val;
+  if ( !value( sect, name, val ) )
+    val = def;
+  return val;
+}
+
+/*!
   \brief Check parameter existence.
   \param sect section name
   \param name parameter name
@@ -1915,6 +2072,21 @@ void QtxResourceMgr::setValue( const QString& sect, const QString& name, const Q
     return;
 
   setResource( sect, name, Qtx::gradientToString( val ) );
+}
+
+/*!
+  \brief Set background parameter value.
+  \param sect section name
+  \param name parameter name
+  \param val parameter value
+*/
+void QtxResourceMgr::setValue( const QString& sect, const QString& name, const Qtx::BackgroundData& val )
+{
+  Qtx::BackgroundData res;
+  if ( checkExisting() && value( sect, name, res ) && res == val )
+    return;
+
+  setResource( sect, name, Qtx::backgroundToString( val ) );
 }
 
 /*!
@@ -2145,6 +2317,63 @@ QStringList QtxResourceMgr::sections() const
 }
 
 /*!
+  \brief Get all sections names matching specified regular expression.
+  \param re searched regular expression
+  \return list of sections names
+*/
+QStringList QtxResourceMgr::sections(const QRegExp& re) const
+{
+  return sections().filter( re );
+}
+
+/*!
+  \brief Get all sections names with the prefix specified by passed
+  list of parent sections names. 
+
+  Sub-sections are separated inside the section name by the sections 
+  separator token, for example "splash:color:label".
+
+  \param names parent sub-sections names 
+  \return list of sections names
+*/
+QStringList QtxResourceMgr::sections(const QStringList& names) const
+{
+  QStringList nm = names;
+  nm << ".+";
+  QRegExp re( QString( "^%1$" ).arg( nm.join( sectionsToken() ) ) );
+  return sections( re );
+}
+
+/*!
+  \brief Get list of sub-sections names for the specified parent section name.
+
+  Sub-sections are separated inside the section name by the sections 
+  separator token, for example "splash:color:label".
+
+  \param section parent sub-section name
+  \param full if \c true return full names of child sub-sections, if \c false,
+         return only top-level sub-sections names
+  \return list of sub-sections names
+*/
+QStringList QtxResourceMgr::subSections(const QString& section, const bool full) const
+{
+  QStringList names = sections( QStringList() << section );
+  QMutableListIterator<QString> it( names );
+  while ( it.hasNext() ) {
+    QString name = it.next().mid( section.size() + 1 ).trimmed();
+    if ( name.isEmpty() ) {
+      it.remove();
+      continue;
+    }
+    if ( !full ) name = name.split( sectionsToken() ).first();
+    it.setValue( name );
+  }
+  names.removeDuplicates();
+  names.sort();
+  return names;
+}
+
+/*!
   \brief Get all parameters name in specified section.
   \param sec section name
   \return list of settings names
@@ -2181,6 +2410,21 @@ QStringList QtxResourceMgr::parameters( const QString& sec ) const
 }
 
 /*!
+  \brief Get all parameters name in specified
+  list of sub-sections names. 
+
+  Sub-sections are separated inside the section name by the sections 
+  separator token, for example "splash:color:label".
+
+  \param names parent sub-sections names 
+  \return list of settings names
+*/
+QStringList QtxResourceMgr::parameters( const QStringList& names ) const
+{
+  return parameters( names.join( sectionsToken() ) );
+}
+
+/*!
   \brief Get absolute path to the file which name is defined by the parameter.
 
   The file name is defined by \a name argument, while directory name is retrieved
@@ -2211,7 +2455,7 @@ QString QtxResourceMgr::path( const QString& sect, const QString& prefix, const 
   \brief Get application resources section name.
 
   By default, application resources section name is "resources" but
-  it can be changed by setting the corresponding resources manager option.
+  it can be changed by setting the "res_section_name" resources manager option.
   
   \return section corresponding to the resources directories
   \sa option(), setOption()
@@ -2228,7 +2472,7 @@ QString QtxResourceMgr::resSection() const
   \brief Get application language section name.
 
   By default, application language section name is "language" but
-  it can be changed by setting the corresponding resources manager option.
+  it can be changed by setting the "lang_section_name" resources manager option.
   
   \return section corresponding to the application language settings
   \sa option(), setOption()
@@ -2238,6 +2482,23 @@ QString QtxResourceMgr::langSection() const
   QString res = option( "lang_section_name" );
   if ( res.isEmpty() )
     res = QString( "language" );
+  return res;
+}
+
+/*!
+  \brief Get sections separator token.
+
+  By default, sections separator token is colon symbol ":" but
+  it can be changed by setting the "section_token" resources manager option.
+  
+  \return string corresponding to the current section separator token
+  \sa option(), setOption()
+*/
+QString QtxResourceMgr::sectionsToken() const
+{
+  QString res = option( "section_token" );
+  if ( res.isEmpty() )
+    res = QString( ":" );
   return res;
 }
 
@@ -2364,7 +2625,7 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
   if ( lang.isEmpty() )
   {
     lang = QString( "en" );
-    qWarning( "Language not specified. Assumed: %s", (const char*)lang.toLatin1() );
+    qWarning() << "QtxResourceMgr: Language not specified. Assumed:" << lang;
   }
 
   substMap.insert( 'L', lang );
@@ -2386,7 +2647,7 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
   if ( trList.isEmpty() )
   {
     trList.append( "%P_msg_%L.qm" );
-    qWarning( "Translators not defined. Assumed: %s", (const char*)trList[0].toLatin1() );
+    qWarning() << "QtxResourceMgr: Translators not defined. Assumed:" << trList[0];
   }
 
   QStringList prefixList;
@@ -2394,6 +2655,20 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
     prefixList.append( pref );
   else
     prefixList = parameters( resSection() );
+
+  if ( pref.isEmpty() && lang != "en" ) {
+    // load Qt resources
+    QString qt_translations = QLibraryInfo::location( QLibraryInfo::TranslationsPath );
+    QString qt_dir_trpath;
+    if ( ::getenv( "QTDIR" ) )
+      qt_dir_trpath = QString( ::getenv( "QTDIR" ) );
+    if ( !qt_dir_trpath.isEmpty() )
+      qt_dir_trpath = QDir( qt_dir_trpath ).absoluteFilePath( "translations" );
+
+    QTranslator* trans = new QtxTranslator( 0 );
+    if ( trans->load( QString("qt_%1").arg( lang ), qt_translations ) || trans->load( QString("qt_%1").arg( lang ), qt_dir_trpath ) )
+      QApplication::instance()->installTranslator( trans );
+  }
 
   for ( QStringList::ConstIterator iter = prefixList.begin(); iter != prefixList.end(); ++iter )
   {
@@ -2569,7 +2844,7 @@ void QtxResourceMgr::setResource( const QString& sect, const QString& name, cons
   the configuration file from the previous versions of the application).
   
   \param appName application name
-  \param for_load boolean flag indicating that file is opened for loading or saving (not used) 
+  \param for_load boolean flag indicating that file is opened for loading or saving (not used in default implementation) 
   \return user configuration file name
   \sa globalFileName()
 */
@@ -2577,6 +2852,10 @@ QString QtxResourceMgr::userFileName( const QString& appName, const bool /*for_l
 {
   QString fileName;
   QString pathName = QDir::homePath();
+
+  QString cfgAppName = QApplication::applicationName();
+  if ( !cfgAppName.isEmpty() )
+    pathName = Qtx::addSlash( Qtx::addSlash( pathName ) + QString( ".config" ) ) + cfgAppName;
 
 #ifdef WIN32
   fileName = QString( "%1.%2" ).arg( appName ).arg( currentFormat() );

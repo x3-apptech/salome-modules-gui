@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "STD_Application.h"
 
 #include "STD_MDIDesktop.h"
@@ -161,6 +162,10 @@ void STD_Application::createActions()
                 tr( "MEN_DESK_FILE_OPEN" ), tr( "PRP_DESK_FILE_OPEN" ),
                 Qt::CTRL+Qt::Key_O, desk, false, this, SLOT( onOpenDoc() ) );
 
+  createAction( FileReopenId, tr( "TOT_DESK_FILE_REOPEN" ), QIcon(),
+                tr( "MEN_DESK_FILE_REOPEN" ), tr( "PRP_DESK_FILE_REOPEN" ),
+                0, desk, false, this, SLOT( onReopenDoc() ) );
+
   createAction( FileCloseId, tr( "TOT_DESK_FILE_CLOSE" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_CLOSE" ) ),
                 tr( "MEN_DESK_FILE_CLOSE" ), tr( "PRP_DESK_FILE_CLOSE" ),
@@ -177,7 +182,7 @@ void STD_Application::createActions()
 
   createAction( FileSaveAsId, tr( "TOT_DESK_FILE_SAVEAS" ), QIcon(),
                 tr( "MEN_DESK_FILE_SAVEAS" ), tr( "PRP_DESK_FILE_SAVEAS" ),
-                Qt::CTRL+Qt::Key_A, desk, false, this, SLOT( onSaveAsDoc() ) );
+                Qt::CTRL+Qt::SHIFT+Qt::Key_S, desk, false, this, SLOT( onSaveAsDoc() ) );
 
   createAction( EditCopyId, tr( "TOT_DESK_EDIT_COPY" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_EDIT_COPY" ) ),
@@ -191,7 +196,7 @@ void STD_Application::createActions()
 
   QAction* a = createAction( ViewStatusBarId, tr( "TOT_DESK_VIEW_STATUSBAR" ),
                              QIcon(), tr( "MEN_DESK_VIEW_STATUSBAR" ),
-                             tr( "PRP_DESK_VIEW_STATUSBAR" ), Qt::SHIFT+Qt::Key_S, desk, true );
+                             tr( "PRP_DESK_VIEW_STATUSBAR" ), Qt::ALT+Qt::SHIFT+Qt::Key_S, desk, true );
   a->setChecked( desk->statusBar()->isVisibleTo( desk ) );
   connect( a, SIGNAL( toggled( bool ) ), this, SLOT( onViewStatusBar( bool ) ) );
 
@@ -200,7 +205,7 @@ void STD_Application::createActions()
 
   createAction( HelpAboutId, tr( "TOT_DESK_HELP_ABOUT" ), QIcon(),
                 tr( "MEN_DESK_HELP_ABOUT" ), tr( "PRP_DESK_HELP_ABOUT" ),
-                Qt::SHIFT+Qt::Key_A, desk, false, this, SLOT( onHelpAbout() ) );
+                Qt::ALT+Qt::SHIFT+Qt::Key_A, desk, false, this, SLOT( onHelpAbout() ) );
 
 
   QtxDockAction* dwa = new QtxDockAction( tr( "TOT_DOCKWINDOWS" ), tr( "MEN_DESK_VIEW_DOCKWINDOWS" ), desk );
@@ -222,6 +227,7 @@ void STD_Application::createActions()
 
   createMenu( FileNewId,    fileMenu, 0 );
   createMenu( FileOpenId,   fileMenu, 0 );
+  createMenu( FileReopenId, fileMenu, 0 ); 
   createMenu( FileCloseId,  fileMenu, 5 );
   createMenu( separator(),  fileMenu, -1, 5 );
   createMenu( FileSaveId,   fileMenu, 5 );
@@ -323,6 +329,51 @@ bool STD_Application::onOpenDoc( const QString& aName )
   
   QApplication::restoreOverrideCursor();
 
+  return res;
+}
+
+/*! Reload document from the file.*/
+bool STD_Application::onReopenDoc()
+{
+  bool res = false;
+
+  SUIT_Study* study = activeStudy();
+  if ( study && study->isSaved() ) {
+    // ask user for the confirmation
+    if ( SUIT_MessageBox::question( desktop(), tr( "REOPEN_STUDY" ), tr( "REOPEN_QUESTION" ),
+                                    SUIT_MessageBox::Yes | SUIT_MessageBox::No, SUIT_MessageBox::No
+                                    ) == SUIT_MessageBox::No )
+      return false;
+
+    // remember study name
+    QString studyName = study->studyName();
+
+    // close study
+    beforeCloseDoc( study );
+    study->closeDocument( true );
+
+    // update views / windows / status bar / title
+    clearViewManagers();
+    setActiveStudy( 0 );
+    updateDesktopTitle();
+    updateCommandsStatus();
+
+    // delete study
+    delete study;
+    study = 0;
+    
+    // post closing actions
+    afterCloseDoc();
+
+    // reload study from the file
+    res = useFile( studyName ) && activeStudy();
+
+    // if reloading is failed, close the desktop
+    if ( !res ) {
+      setDesktop( 0 );
+      closeApplication();
+    }
+  }
   return res;
 }
 
@@ -456,13 +507,13 @@ bool STD_Application::openAction( const int choice, const QString& aName )
       QList<SUIT_Application*> aAppList = aSession->applications();
       for ( QList<SUIT_Application*>::iterator it = aAppList.begin(); it != aAppList.end() && !aApp; ++it )
       {
-	if ( (*it)->activeStudy() && (*it)->activeStudy()->studyName() == aName )
-	  aApp = *it;
+        if ( (*it)->activeStudy() && (*it)->activeStudy()->studyName() == aName )
+          aApp = *it;
       }
       if ( aApp )
-	aApp->desktop()->activateWindow();
+        aApp->desktop()->activateWindow();
       else
-	res = false;
+        res = false;
     }
     break;
   case OpenNew:
@@ -472,9 +523,9 @@ bool STD_Application::openAction( const int choice, const QString& aName )
     {
       SUIT_Application* aApp = startApplication( 0, 0 );
       if ( aApp )
-	res = aApp->useFile( aName );
+        res = aApp->useFile( aName );
       if ( !res )
-	aApp->closeApplication();
+        aApp->closeApplication();
     }
     break;
   case OpenCancel:
@@ -507,7 +558,7 @@ void STD_Application::onSaveDoc()
       putInfo( "" );
       // displaying a message box as SUIT_Validator in case file can't be written (the most frequent case)
       SUIT_MessageBox::critical( desktop(), tr( "ERR_ERROR" ),
-                                 tr( "ERR_PERMISSION_DENIED" ).arg( activeStudy()->studyName() ) );
+                                 tr( "INF_DOC_SAVING_FAILS" ).arg( activeStudy()->studyName() ) );
     }
     else
       putInfo( tr( "INF_DOC_SAVED" ).arg( "" ) );
@@ -621,12 +672,14 @@ void STD_Application::updateCommandsStatus()
 {
   SUIT_Application::updateCommandsStatus();
 
-  bool aHasStudy = activeStudy() != 0;
-  bool aIsNeedToSave = false;
-  if ( aHasStudy )
-    aIsNeedToSave = !activeStudy()->isSaved() || activeStudy()->isModified();
+  bool aHasStudy     = activeStudy() != 0;
+  bool aSaved        = aHasStudy && activeStudy()->isSaved();
+  bool aModified     = aHasStudy && activeStudy()->isModified();
+  bool aIsNeedToSave = aHasStudy && ( !aSaved || aModified );
 
-  if ( action( FileSaveId ) )
+ if ( action( FileReopenId ) )
+    action( FileReopenId )->setEnabled( aSaved );
+ if ( action( FileSaveId ) )
     action( FileSaveId )->setEnabled( aIsNeedToSave );
   if ( action( FileSaveAsId ) )
     action( FileSaveAsId )->setEnabled( aHasStudy );
@@ -802,7 +855,7 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
 
 /*!\retval QString - return file name from dialog.*/
 QString STD_Application::getFileName( bool open, const QString& initial, const QString& filters,
-				      const QString& caption, QWidget* parent )
+                                      const QString& caption, QWidget* parent )
 {
   if ( !parent )
     parent = desktop();
@@ -824,9 +877,9 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
         isOk = true;
       else
       {
-	int aEnd = aUsedFilter.lastIndexOf( ')' );
-	int aStart = aUsedFilter.lastIndexOf( '(', aEnd );
-	QString wcStr = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
+        int aEnd = aUsedFilter.lastIndexOf( ')' );
+        int aStart = aUsedFilter.lastIndexOf( '(', aEnd );
+        QString wcStr = aUsedFilter.mid( aStart + 1, aEnd - aStart - 1 );
 
         int idx = 0;
         QStringList extList;
@@ -840,23 +893,23 @@ QString STD_Application::getFileName( bool open, const QString& initial, const Q
         if ( !extList.isEmpty() && !extList.contains( SUIT_Tools::extension( aName ) ) )
           aName += QString( ".%1" ).arg( extList.first() );
 
-	if ( QFileInfo( aName ).exists() )
+        if ( QFileInfo( aName ).exists() )
         {
-	  int aAnswer = SUIT_MessageBox::question( desktop(), tr( "TIT_FILE_SAVEAS" ),
-						   tr( "MSG_FILE_EXISTS" ).arg( aName ),
-						   SUIT_MessageBox::Yes | SUIT_MessageBox::No | SUIT_MessageBox::Cancel, SUIT_MessageBox::Yes );
-	  if ( aAnswer == SUIT_MessageBox::Cancel )
+          int aAnswer = SUIT_MessageBox::question( desktop(), tr( "TIT_FILE_SAVEAS" ),
+                                                   tr( "MSG_FILE_EXISTS" ).arg( aName ),
+                                                   SUIT_MessageBox::Yes | SUIT_MessageBox::No | SUIT_MessageBox::Cancel, SUIT_MessageBox::Yes );
+          if ( aAnswer == SUIT_MessageBox::Cancel )
           {     // cancelled
             aName = QString();
-	    isOk = true;
+            isOk = true;
           }
-	  else if ( aAnswer == SUIT_MessageBox::No ) // not save to this file
-	    anOldPath = aName;             // not to return to the same initial dir at each "while" step
-	  else                     // overwrite the existing file
-	    isOk = true;
+          else if ( aAnswer == SUIT_MessageBox::No ) // not save to this file
+            anOldPath = aName;             // not to return to the same initial dir at each "while" step
+          else                     // overwrite the existing file
+            isOk = true;
         }
-	else
-	  isOk = true;
+        else
+          isOk = true;
       }
     }
     return aName;
@@ -878,13 +931,12 @@ QString STD_Application::getDirectory( const QString& initial, const QString& ca
 */
 void STD_Application::setDesktop( SUIT_Desktop* desk )
 {
-  SUIT_Desktop* prev = desktop();
-
   SUIT_Application::setDesktop( desk );
 
-  if ( prev != desk && desk )
+  if ( desk ) {
     connect( desk, SIGNAL( closing( SUIT_Desktop*, QCloseEvent* ) ),
-             this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ) );
+             this, SLOT( onDesktopClosing( SUIT_Desktop*, QCloseEvent* ) ), Qt::UniqueConnection );
+  }
 }
 
 /*!
@@ -930,3 +982,12 @@ void STD_Application::studySaved( SUIT_Study* )
   updateDesktopTitle();
   updateCommandsStatus();
 }
+
+/*!
+  Return index of the view ma
+*/
+int STD_Application::viewManagerId( const SUIT_ViewManager* theManager) const
+{
+  return myViewMgrs.indexOf(const_cast<SUIT_ViewManager*>(theManager));
+}
+

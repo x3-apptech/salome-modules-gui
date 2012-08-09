@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SALOME_Selection.h
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef SVTK_SELECTOR_H
 #define SVTK_SELECTOR_H
 
@@ -41,6 +40,7 @@ class Handle(VTKViewer_Filter);
 
 class SALOME_Actor;
 class SVTK_SelectionEvent;
+class vtkActorCollection;
 class vtkRenderer;
 class Handle(SALOME_InteractiveObject);
 
@@ -128,40 +128,40 @@ public:
   virtual
   void 
   GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	    TColStd_IndexedMapOfInteger& theIndex ) = 0;
-	
+            TColStd_IndexedMapOfInteger& theIndex ) = 0;
+        
   //! Change indices of subselection for given #SALOME_InteractiveObject
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_IndexedMapOfInteger& theIndices, 
-		    bool theIsModeShift) = 0;
+                    const TColStd_IndexedMapOfInteger& theIndices, 
+                    bool theIsModeShift) = 0;
 
   //! Change indexes of subslection for given #SALOME_InteractiveObject
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_MapOfInteger& theIndices, 
-		    bool theIsModeShift) = 0;
+                    const TColStd_MapOfInteger& theIndices, 
+                    bool theIsModeShift) = 0;
 
   //! Change index of subslection for given #SALOME_InteractiveObject
   virtual
   bool
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    int theIndex, 
-		    bool theIsModeShift) = 0;
+                    int theIndex, 
+                    bool theIsModeShift) = 0;
 
   //! Change index of subslection for given #SALOME_InteractiveObject
   virtual
   void 
   RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	       int theIndex) = 0;
+               int theIndex) = 0;
 
   //! Check, if the given index is present in subselection 
   virtual
   bool 
   IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
-		  int theIndex) const = 0;
+                  int theIndex) const = 0;
 
   //! Clear subselection
   virtual
@@ -195,8 +195,8 @@ public:
   virtual
   bool
   IsValid(SALOME_Actor* theActor,
-	  const int theId,
-	  const bool theIsNode = false) const = 0;
+          const int theId,
+          const bool theIsNode = false) const = 0;
   
   //----------------------------------------------------------------------------
   virtual
@@ -210,12 +210,20 @@ public:
 
   //----------------------------------------------------------------------------
   virtual
-  SALOME_Actor*
+  vtkActorCollection*
   Pick(const SVTK_SelectionEvent* theEvent, vtkRenderer* theRenderer) const = 0;
 
   virtual
   void
   SetTolerance(const double& theTolerance) = 0;
+
+  virtual
+  void
+  SetDynamicPreSelection( bool theIsDynPreselect ) = 0;
+
+  virtual
+  bool
+  GetDynamicPreSelection() const = 0;
 };
 
 

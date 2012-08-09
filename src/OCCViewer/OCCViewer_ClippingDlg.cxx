@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "OCCViewer_ClippingDlg.h"
 
 #include <QtxDoubleSpinBox.h>
@@ -61,8 +62,8 @@
   \param modal - is this dialog modal
   \param fl - flags
 */
-OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl )
-: QDialog( parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
+OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const char* name, bool modal, Qt::WindowFlags fl )
+: QDialog( view, Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
   myView( view )
 {
   setObjectName( "OCCViewer_ClippingDlg" );
@@ -86,7 +87,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   const double min = -1e+7;
   const double max =  1e+7;
   const double step = 5;
-  const int precision = 3;
+  const int precision = -7;
 
   TextLabelX = new QLabel( GroupPoint );
   TextLabelX->setObjectName( "TextLabelX" );
@@ -95,7 +96,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   
   SpinBox_X = new QtxDoubleSpinBox( min, max, step, GroupPoint );
   SpinBox_X->setObjectName("SpinBox_X" );
-  SpinBox_X->setDecimals( precision );
+  SpinBox_X->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_X, 0, 1 );
 
   TextLabelY = new QLabel( GroupPoint );
@@ -105,7 +106,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
 
   SpinBox_Y = new QtxDoubleSpinBox( min, max, step, GroupPoint );
   SpinBox_Y->setObjectName("SpinBox_Y" );
-  SpinBox_Y->setDecimals( precision );
+  SpinBox_Y->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Y, 0, 3 );
 
   TextLabelZ = new QLabel( GroupPoint );
@@ -115,7 +116,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
 
   SpinBox_Z = new QtxDoubleSpinBox( min, max, step, GroupPoint );
   SpinBox_Z->setObjectName("SpinBox_Z" );
-  SpinBox_Z->setDecimals( precision );
+  SpinBox_Z->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Z, 0, 5 );
 
   resetButton  = new QPushButton( GroupPoint );
@@ -140,7 +141,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   
   SpinBox_Dx = new QtxDoubleSpinBox( min, max, step, GroupDirection );
   SpinBox_Dx->setObjectName("SpinBox_Dx" );
-  SpinBox_Dx->setDecimals( precision );
+  SpinBox_Dx->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dx, 0, 1 );
 
   TextLabelDy = new QLabel( GroupDirection );
@@ -150,7 +151,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   
   SpinBox_Dy = new QtxDoubleSpinBox( min, max, step, GroupDirection );
   SpinBox_Dy->setObjectName("SpinBox_Dy" );
-  SpinBox_Dy->setDecimals( precision );
+  SpinBox_Dy->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dy, 0, 3 );
 
   TextLabelDz = new QLabel( GroupDirection );
@@ -160,7 +161,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, QWidge
   
   SpinBox_Dz = new QtxDoubleSpinBox( min, max, step, GroupDirection );
   SpinBox_Dz->setObjectName("SpinBox_Dz" );
-  SpinBox_Dz->setDecimals( precision );
+  SpinBox_Dz->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dz, 0, 5 );
 
   invertButton  = new QPushButton( GroupDirection );
@@ -265,9 +266,9 @@ void OCCViewer_ClippingDlg::closeEvent( QCloseEvent* e )
   erasePreview();
   
   // Set the clipping plane back
-  Handle(V3d_View) aView3d = myView->getViewPort()->getView();
+  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
   if ( !aView3d.IsNull() && !myClippingPlane.IsNull() )
-    aView3d->SetPlaneOn( myClippingPlane );
+  aView3d->SetPlaneOn( myClippingPlane );*/
   
   myAction->setChecked( false );
   
@@ -280,7 +281,7 @@ void OCCViewer_ClippingDlg::closeEvent( QCloseEvent* e )
 */
 void OCCViewer_ClippingDlg::showEvent( QShowEvent* e )
 {
-  ReserveClippingPlane();
+  //ReserveClippingPlane();
   
   QDialog::showEvent( e );
   onPreview( PreviewChB->isChecked() );
@@ -305,10 +306,10 @@ void OCCViewer_ClippingDlg::ClickOnClose()
   erasePreview();
 
   // Set the clipping plane back
-  Handle(V3d_View) aView3d = myView->getViewPort()->getView();
+  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
   if ( !aView3d.IsNull() && !myClippingPlane.IsNull() )
     aView3d->SetPlaneOn( myClippingPlane );
-
+  */
   myAction->setChecked( false );
   
   reject();
@@ -325,13 +326,13 @@ void OCCViewer_ClippingDlg::ClickOnApply()
   qApp->processEvents();
   
   myView->setCuttingPlane( true, SpinBox_X->value() , SpinBox_Y->value() , SpinBox_Z->value(),
-	                         SpinBox_Dx->value(), SpinBox_Dy->value(), SpinBox_Dz->value() );
+                                 SpinBox_Dx->value(), SpinBox_Dy->value(), SpinBox_Dz->value() );
   
   QApplication::restoreOverrideCursor(); 
   
   erasePreview();
   
-  ReserveClippingPlane();
+  //ReserveClippingPlane();
 }
 
 /*!
@@ -496,14 +497,15 @@ void OCCViewer_ClippingDlg::displayPreview()
       
       intersector.Perform( gp_Lin( aCenter, aNormal), gp_Pln( aBasePnt, aNormal), Precision::Confusion() );
       if ( intersector.IsDone() && intersector.NbPoints() == 1 )
-	aBasePnt = intersector.Point( 1 );
+        aBasePnt = intersector.Point( 1 );
     }
   
   myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ) );
   myPreviewPlane->SetSize( aSize, aSize );
   
   // Deactivate clipping planes
-  myView->getViewPort()->getView()->SetPlaneOff();
+  //myView->getViewPort()->getView()->SetPlaneOff();
+  //myView->setPlaneOff();
 
   ic->Display( myPreviewPlane, 1, -1, false );
   ic->SetWidth( myPreviewPlane, 10, false );
@@ -574,13 +576,13 @@ bool OCCViewer_ClippingDlg::isValid()
 */
 void OCCViewer_ClippingDlg::ReserveClippingPlane()
 {
-  Handle(V3d_View) aView3d = myView->getViewPort()->getView();
+  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
   if ( !aView3d.IsNull() )
     {
       aView3d->InitActivePlanes();
       if ( aView3d->MoreActivePlanes() )
-	myClippingPlane = aView3d->ActivePlane();
-    }
+        myClippingPlane = aView3d->ActivePlane();
+        }*/
 }
 
 void OCCViewer_ClippingDlg::onViewShow()

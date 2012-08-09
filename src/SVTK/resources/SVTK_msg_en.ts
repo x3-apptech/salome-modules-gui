@@ -1,29 +1,24 @@
-<!DOCTYPE TS><TS>
-<!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-
-  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>@default</name>
+    <message>
+        <source>DSC_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate view counterclockwise</translation>
+    </message>
+    <message>
+        <source>DSC_CLOCKWISE_VIEW</source>
+        <translation>Rotate View Clockwise</translation>
+    </message>
+    <message>
+        <source>MNU_ANTICLOCKWISE_VIEW</source>
+        <translation>Rotate counterclockwise</translation>
+    </message>
+    <message>
+        <source>MNU_CLOCKWISE_VIEW</source>
+        <translation>Rotate clockwise</translation>
+    </message>
     <message>
         <source>MNU_FRONT_VIEW</source>
         <translation>Front</translation>
@@ -185,6 +180,18 @@
         <translation>Change the parameters of the view</translation>
     </message>
     <message>
+        <source>MNU_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize</translation>
+    </message>
+    <message>
+        <source>DSC_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize view</translation>
+    </message>
+    <message>
+        <source>MNU_SYNC_NO_VIEW</source>
+        <translation>[ No appropriate view ]</translation>
+    </message>
+    <message>
         <source>MNU_SVTK_PARALLEL_MODE</source>
         <translation>Orthogonal Mode</translation>
     </message>
@@ -202,74 +209,31 @@
     </message>
     <message>
         <source>DSC_SVTK_STYLE_SWITCH</source>
-        <translation>Interactiion style switch</translation>
+        <translation>Interaction style switch</translation>
     </message>
     <message>
         <source>MNU_SVTK_STYLE_SWITCH</source>
         <translation>Interaction Style Switch</translation>
     </message>
-</context>
-<context>
-    <name>SVTK_CubeAxesDlg</name>
     <message>
-        <source>X_AXIS</source>
-        <translation>X axis</translation>
+        <source>DSC_SVTK_ZOOMING_STYLE_SWITCH</source>
+        <translation>Zooming style switch</translation>
     </message>
     <message>
-        <source>Y_AXIS</source>
-        <translation>Y axis</translation>
+        <source>MNU_SVTK_ZOOMING_STYLE_SWITCH</source>
+        <translation>Zomming style switch</translation>
     </message>
     <message>
-        <source>Z_AXIS</source>
-        <translation>Z axis</translation>
+        <source>DSC_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
+        <translation>Dynamic preselection switch</translation>
     </message>
     <message>
-        <source>CAPTION</source>
-        <translation>Graduated axes</translation>
-    </message>
-    <message>
-        <source>IS_VISIBLE</source>
-        <translation>Is visible</translation>
-    </message>
-    <message>
-        <source>FONT</source>
-        <translation>Font</translation>
-    </message>
-    <message>
-        <source>NAME</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>TICK_MARKS</source>
-        <translation>Tick marks</translation>
-    </message>
-    <message>
-        <source>LABELS</source>
-        <translation>Labels</translation>
-    </message>
-    <message>
-        <source>LENGTH</source>
-        <translation>Length</translation>
-    </message>
-    <message>
-        <source>NUMBER</source>
-        <translation>Number</translation>
-    </message>
-    <message>
-        <source>OFFSET</source>
-        <translation>Offset</translation>
-    </message>
-    <message>
-        <source>AXIS_NAME</source>
-        <translation>Axis name</translation>
+        <source>MNU_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
+        <translation>Dynamic preselection switch</translation>
     </message>
 </context>
 <context>
     <name>SVTK_FontWidget</name>
-    <message>
-        <source>BOLD</source>
-        <translation>Bold</translation>
-    </message>
     <message>
         <source>ARIAL</source>
         <translation>Arial</translation>
@@ -277,14 +241,6 @@
     <message>
         <source>TIMES</source>
         <translation>Times</translation>
-    </message>
-    <message>
-        <source>ITALIC</source>
-        <translation>Italic</translation>
-    </message>
-    <message>
-        <source>SHADOW</source>
-        <translation>Shadow</translation>
     </message>
     <message>
         <source>COURIER</source>
@@ -327,11 +283,11 @@
     </message>
     <message>
         <source>DSC_SVTK_RECORDING_PLAY</source>
-        <translation>Play recording</translation>
+        <translation>Continue recording</translation>
     </message>
     <message>
         <source>MNU_SVTK_RECORDING_PLAY</source>
-        <translation>Play recording</translation>
+        <translation>Continue recording</translation>
     </message>
     <message>
         <source>DSC_SVTK_RECORDING_PAUSE</source>
@@ -534,11 +490,11 @@ Please, refer to the documentation.</translation>
         <source>LBL_TOBBCENTER</source>
         <translation>Set to Bounding Box Center</translation>
     </message>
-      <message>
+    <message>
         <source>LBL_TOORIGIN</source>
         <translation>Set to Origin</translation>
     </message>
-  <message>
+    <message>
         <source>LBL_SELECTPOINT</source>
         <translation>Select Point from View</translation>
     </message>
@@ -552,7 +508,7 @@ Please, refer to the documentation.</translation>
     </message>
     <message>
         <source>WORLD_COORDINATES</source>
-        <translation>World Coordinates</translation>
+        <translation>Absolute Coordinates</translation>
     </message>
     <message>
         <source>FOCAL_RELATIVE</source>
@@ -636,8 +592,44 @@ Please, refer to the documentation.</translation>
         <translation>Show toolbar</translation>
     </message>
     <message>
-        <source>MEN_CHANGE_BACKGROUD</source>
+        <source>MEN_CHANGE_BACKGROUND</source>
         <translation>Change background...</translation>
+    </message>
+    <message>
+        <source>GT_HORIZONTALGRADIENT</source>
+        <translation>Horizontal gradient</translation>
+    </message>
+    <message>
+        <source>GT_VERTICALGRADIENT</source>
+        <translation>Vertical gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTDIAGONALGRADIENT</source>
+        <translation>First diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDDIAGONALGRADIENT</source>
+        <translation>Second diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTCORNERGRADIENT</source>
+        <translation>First corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDCORNERGRADIENT</source>
+        <translation>Second corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_THIRDCORNERGRADIENT</source>
+        <translation>Third corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_FOURTHCORNERGRADIENT</source>
+        <translation>Fourth corner gradient</translation>
+    </message>
+    <message>
+        <source>BG_IMAGE_FILES</source>
+        <translation>Image files (*.png *.jpg *.jpeg *.bmp *.tif *.tiff *.mhd *.mha)</translation>
     </message>
 </context>
 </TS>

@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File:      QtxColorButton.cxx
 // Author:    Sergey TELKOV
 //
@@ -56,7 +54,7 @@ QtxColorButton::QtxColorButton( QWidget* parent )
 : QToolButton( parent )
 {
   setCheckable( false );
-  setPopupMode( MenuButtonPopup );
+  setPopupMode( MenuButtonPopup ); // VSR 11/10/2010 temporarily roolback from InstantPopup (regressions)
 
   QMenu* pm = new QMenu( this );
   QGridLayout* grid = new QGridLayout( pm );
@@ -307,11 +305,13 @@ void QtxColorButton::paintEvent( QPaintEvent* e )
   pix.fill( palette().color( backgroundRole() ) );
 
   if ( color().isValid() )
-    drawColor( &pix, color() );
+    drawColor( &pix, isEnabled() ? color() : palette().mid().color(), isEnabled() ? Qt::black : palette().mid().color() );
   else {
     QPainter pixp( &pix );
+    pixp.setPen( palette().color( isEnabled() ? QPalette::WindowText : QPalette::Mid ) );
     pixp.drawRect( 2, 2, pix.width() - 4, pix.height() - 4 );
-    pixp.fillRect( 3, 3, pix.width() - 6, pix.height() - 6, QBrush( Qt::BDiagPattern ) );
+    pixp.fillRect( 3, 3, pix.width() - 6, pix.height() - 6, 
+		   QBrush( palette().color( isEnabled() ? QPalette::WindowText : QPalette::Mid ), Qt::BDiagPattern ) );
     pixp.end();
   }
 
@@ -382,13 +382,13 @@ QPixmap QtxColorButton::buttonIcon( const QColor& c ) const
   \param c color
   \param m margin
 */
-void QtxColorButton::drawColor( QPaintDevice* pd, const QColor& c, const int m ) const
+void QtxColorButton::drawColor( QPaintDevice* pd, const QColor& c, const QColor& bc, const int m ) const
 {
   if ( !pd )
     return;
 
   QPainter p( pd );
-  p.setPen( Qt::black );
+  p.setPen( bc );
   p.fillRect( m, m, pd->width() - 2 * m - 1, pd->height() - 2 * m - 1, QBrush( c ) );
   p.drawRect( m, m, pd->width() - 2 * m - 1, pd->height() - 2 * m - 1 );
   p.end();

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "SUIT_MessageBox.h"
 
 #include "SUIT_OverrideCursor.h"
@@ -63,8 +64,8 @@
   // show question message box with two standard buttons
   int result = SUIT_MessageBox::question(desktop(), "Error",
                                          "File already exists? Overwrite?",
-					 SUIT_MessageBox::Yes | SUIT_MessageBox::No,
-					 SUIT_MessageBox::No );
+                                         SUIT_MessageBox::Yes | SUIT_MessageBox::No,
+                                         SUIT_MessageBox::No );
   if ( result == SUIT_MessageBox::Yes )
     overwriteFileFunction();
 
@@ -72,7 +73,7 @@
   // default is second button and escape is third button
   int result = SUIT_MessageBox::critical(desktop(), "Hazard!",
                                          "The situation is critical! What to do?",
-					 "Hide", "Run Away", "Stand still", 1, 2);
+                                         "Hide", "Run Away", "Stand still", 1, 2);
   switch ( result )
   {
   case 0:
@@ -89,8 +90,8 @@
   // both default and escape buttons are set to first button ("Zero")
   int result = SUIT_MessageBox::information(desktop(), "Question",
                                             "Select your favourite number",
-					    0, 0,
-					    "Zero", "One", "Two", "Three", "Four", "Five");
+                                            0, 0,
+                                            "Zero", "One", "Two", "Three", "Four", "Five");
   useMyFavouriteNumberSomewhere( result );
   \endcode
 */
@@ -230,7 +231,7 @@ SUIT_MessageBox::StandardButton SUIT_MessageBox::question( QWidget* parent, cons
   \return button id clicked by the user (QMessageBox::StandardButton)
 */
 int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button )
+                               const QString& button )
 {
   ButtonInfos lst;
   lst.append( ButtonInfo( 0, button ) );
@@ -251,7 +252,7 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   \return button id clicked by the user (QMessageBox::StandardButton)
 */
 int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text,
-			      const QString& button )
+                              const QString& button )
 {
   ButtonInfos lst;
   lst.append( ButtonInfo( 0, button ) );
@@ -272,7 +273,7 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   \return button id clicked by the user (QMessageBox::StandardButton)
 */
 int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text,
-				  const QString& button )
+                                  const QString& button )
 {
   ButtonInfos lst;
   lst.append( ButtonInfo( 0, button ) );
@@ -298,7 +299,7 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   \return button id clicked by the user (QMessageBox::StandardButton)
 */
 int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button )
+                               const QString& button )
 {
   ButtonInfos lst;
   lst.append( ButtonInfo( 0, button ) );
@@ -329,15 +330,15 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
   lst.append( ButtonInfo( id++, button1 ) );
   lst.append( ButtonInfo( id++, button2 ) );
   return messageBox( SUIT_MessageBox::Critical, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -364,15 +365,15 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text,
-			      const QString& button1, const QString& button2,
-			      const int defaultButton, const int escapeButton )
+                              const QString& button1, const QString& button2,
+                              const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
   lst.append( ButtonInfo( id++, button1 ) );
   lst.append( ButtonInfo( id++, button2 ) );
   return messageBox( SUIT_MessageBox::Warning, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -399,15 +400,15 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   \return button used button id
 */
 int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text,
-				  const QString& button1, const QString& button2,
-				  const int defaultButton, const int escapeButton )
+                                  const QString& button1, const QString& button2,
+                                  const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
   lst.append( ButtonInfo( id++, button1 ) );
   lst.append( ButtonInfo( id++, button2 ) );
   return messageBox( SUIT_MessageBox::Information, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -434,15 +435,15 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   \return button used button id
 */
 int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
   lst.append( ButtonInfo( id++, button1 ) );
   lst.append( ButtonInfo( id++, button2 ) );
   return messageBox( SUIT_MessageBox::Question, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -470,9 +471,9 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2, 
-			       const QString& button3,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2, 
+                               const QString& button3,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -480,7 +481,7 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   lst.append( ButtonInfo( id++, button2 ) );
   lst.append( ButtonInfo( id++, button3 ) );
   return messageBox( SUIT_MessageBox::Critical, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -508,9 +509,9 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text,
-			      const QString& button1, const QString& button2,
-			      const QString& button3,
-			      const int defaultButton, const int escapeButton )
+                              const QString& button1, const QString& button2,
+                              const QString& button3,
+                              const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -518,7 +519,7 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   lst.append( ButtonInfo( id++, button2 ) );
   lst.append( ButtonInfo( id++, button3 ) );
   return messageBox( SUIT_MessageBox::Warning, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -546,9 +547,9 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   \return button used button id
 */
 int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text,
-				  const QString& button1, const QString& button2,
-				  const QString& button3,
-				  const int defaultButton, const int escapeButton )
+                                  const QString& button1, const QString& button2,
+                                  const QString& button3,
+                                  const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -556,7 +557,7 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   lst.append( ButtonInfo( id++, button2 ) );
   lst.append( ButtonInfo( id++, button3 ) );
   return messageBox( SUIT_MessageBox::Information, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -584,9 +585,9 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   \return button used button id
 */
 int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2,
-			       const QString& button3,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2,
+                               const QString& button3,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -594,7 +595,7 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   lst.append( ButtonInfo( id++, button2 ) );
   lst.append( ButtonInfo( id++, button3 ) );
   return messageBox( SUIT_MessageBox::Question, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -624,9 +625,9 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2, 
-			       const QString& button3, const QString& button4,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2, 
+                               const QString& button3, const QString& button4,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -635,7 +636,7 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   lst.append( ButtonInfo( id++, button3 ) );
   lst.append( ButtonInfo( id++, button4 ) );
   return messageBox( SUIT_MessageBox::Critical, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -665,9 +666,9 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text,
-			      const QString& button1, const QString& button2, 
-			      const QString& button3, const QString& button4,
-			      const int defaultButton, const int escapeButton )
+                              const QString& button1, const QString& button2, 
+                              const QString& button3, const QString& button4,
+                              const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -676,7 +677,7 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   lst.append( ButtonInfo( id++, button3 ) );
   lst.append( ButtonInfo( id++, button4 ) );
   return messageBox( SUIT_MessageBox::Warning, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -706,9 +707,9 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   \return button used button id
 */
 int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text,
-				  const QString& button1, const QString& button2, 
-				  const QString& button3, const QString& button4,
-				  const int defaultButton, const int escapeButton )
+                                  const QString& button1, const QString& button2, 
+                                  const QString& button3, const QString& button4,
+                                  const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -717,7 +718,7 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   lst.append( ButtonInfo( id++, button3 ) );
   lst.append( ButtonInfo( id++, button4 ) );
   return messageBox( SUIT_MessageBox::Information, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -747,9 +748,9 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   \return button used button id
 */
 int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text,
-			       const QString& button1, const QString& button2, 
-			       const QString& button3, const QString& button4,
-			       const int defaultButton, const int escapeButton )
+                               const QString& button1, const QString& button2, 
+                               const QString& button3, const QString& button4,
+                               const int defaultButton, const int escapeButton )
 {
   ButtonInfos lst;
   int id = 0;
@@ -758,7 +759,7 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   lst.append( ButtonInfo( id++, button3 ) );
   lst.append( ButtonInfo( id++, button4 ) );
   return messageBox( SUIT_MessageBox::Question, parent, title, text, lst, 
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -789,14 +790,14 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text, 
-			       const int defaultButton, const int escapeButton, 
-			       char* btn, ... )
+                               const int defaultButton, const int escapeButton, 
+                               char* btn, ... )
 {
   va_list args;
   va_start( args, btn );
   return messageBox( SUIT_MessageBox::Critical, parent, title, text,
                      messageList( btn, args ),
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -827,14 +828,14 @@ int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QStr
   \return button used button id
 */
 int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text, 
-			      const int defaultButton, const int escapeButton, 
-			      char* btn, ... )
+                              const int defaultButton, const int escapeButton, 
+                              char* btn, ... )
 {
   va_list args;
   va_start( args, btn );
   return messageBox( SUIT_MessageBox::Warning, parent, title, text,
                      messageList( btn, args ),
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -865,14 +866,14 @@ int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QStri
   \return button used button id
 */
 int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text, 
-				  const int defaultButton, const int escapeButton, 
-				  char* btn, ... )
+                                  const int defaultButton, const int escapeButton, 
+                                  char* btn, ... )
 {
   va_list args;
   va_start( args, btn );
   return messageBox( SUIT_MessageBox::Information, parent, title, text,
                      messageList( btn, args ),
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -903,14 +904,14 @@ int SUIT_MessageBox::information( QWidget* parent, const QString& title, const Q
   \return button used button id
 */
 int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text, 
-			       const int defaultButton, const int escapeButton, 
-			       char* btn, ... )
+                               const int defaultButton, const int escapeButton, 
+                               char* btn, ... )
 {
   va_list args;
   va_start( args, btn );
   return messageBox( SUIT_MessageBox::Question, parent, title, text,
                      messageList( btn, args ),
-		     defaultButton, escapeButton );
+                     defaultButton, escapeButton );
 }
 
 /*!
@@ -950,10 +951,10 @@ SUIT_MessageBox::ButtonInfos SUIT_MessageBox::messageList( char* txt, va_list& a
   \return button used button id
 */
 int SUIT_MessageBox::messageBox( Icon icon, QWidget* parent, 
-				 const QString& title, const QString& text, 
-				 const ButtonInfos& lst, 
-				 const int defaultButton, 
-				 const int escapeButton )
+                                 const QString& title, const QString& text, 
+                                 const ButtonInfos& lst, 
+                                 const int defaultButton, 
+                                 const int escapeButton )
 {
   SUIT_MessageBox msgBox( icon, title, text, NoButton, parent );
 
@@ -967,9 +968,9 @@ int SUIT_MessageBox::messageBox( Icon icon, QWidget* parent,
     QPushButton* pb = msgBox.addButton( txt, role );
     bm.insert( pb, btn );
 
-    if ( defaultButton == -1 && i == 0 || btn == defaultButton )
+    if ( ( defaultButton == -1 && i == 0 ) || btn == defaultButton )
       msgBox.setDefaultButton( pb );
-    if ( escapeButton == -1 && i == lst.count() - 1 || btn == escapeButton )
+    if ( ( escapeButton == -1 && i == lst.count() - 1 ) || btn == escapeButton )
       msgBox.setEscapeButton( pb );
   }
     

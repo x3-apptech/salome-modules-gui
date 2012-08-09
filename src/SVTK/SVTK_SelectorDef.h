@@ -1,30 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SALOME_Selection.h
 //  Author : Nicolas REJNERI
-//  Module : SALOME
-//  $Header$
-//
+
 #ifndef SVTK_SELECTORDEF_H
 #define SVTK_SELECTORDEF_H
 
@@ -107,31 +106,31 @@ public:
   virtual
   void 
   GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	    TColStd_IndexedMapOfInteger& theIndex );
-	
+            TColStd_IndexedMapOfInteger& theIndex );
+        
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_IndexedMapOfInteger& theIndices, 
-		    bool theIsModeShift);
+                    const TColStd_IndexedMapOfInteger& theIndices, 
+                    bool theIsModeShift);
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    const TColStd_MapOfInteger& theIndices, 
-		    bool theIsModeShift);
+                    const TColStd_MapOfInteger& theIndices, 
+                    bool theIsModeShift);
   virtual
   bool
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		    int theIndex, 
-		    bool theIsModeShift);
+                    int theIndex, 
+                    bool theIsModeShift);
   virtual
   void 
   RemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-	       int theIndex);
+               int theIndex);
   virtual
   bool 
   IsIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
-		  int theIndex) const;
+                  int theIndex) const;
   virtual
   void 
   ClearIndex();
@@ -156,8 +155,8 @@ public:
   virtual
   bool
   IsValid(SALOME_Actor* theActor,
-	  const TFilterID theId,
-	  const bool theIsNode = false) const;
+          const TFilterID theId,
+          const bool theIsNode = false) const;
   
   //----------------------------------------------------------------------------
   virtual
@@ -170,21 +169,31 @@ public:
 
   //----------------------------------------------------------------------------
   virtual
-  SALOME_Actor*
+  vtkActorCollection*
   Pick(const SVTK_SelectionEvent* theEvent, vtkRenderer* theRenderer) const;
 
   virtual
   void
   SetTolerance(const double& theTolerance);
 
+  virtual
+  void
+  SetDynamicPreSelection( bool theIsDynPreselect );
+
+  virtual
+  bool
+  GetDynamicPreSelection() const;
+
 private:
   int mySelectionMode;
+
+  bool myDynamicPreselection;
 
   struct TIOLessThan
   {
     bool 
     operator()(const Handle(SALOME_InteractiveObject)& theRightIO,
-	       const Handle(SALOME_InteractiveObject)& theLeftIO) const
+               const Handle(SALOME_InteractiveObject)& theLeftIO) const
     {
       return strcmp(theRightIO->getEntry(),theLeftIO->getEntry()) < 0;
     }

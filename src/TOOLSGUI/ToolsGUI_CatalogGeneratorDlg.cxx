@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME TOOLSGUI : implementation of desktop "Tools" optioins
 //  File   : ToolsGUI_CatalogGeneratorDlg.cxx
 //  Author : Nicolas REJNERI
@@ -48,8 +49,6 @@
 #include <Standard_CString.hxx>
 
 #include "utilities.h"
-
-using namespace std;
 
 #define SPACING_SIZE             6
 #define MARGIN_SIZE             11
@@ -324,8 +323,8 @@ QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
     QCString dir;
     if (dir = getenv( modulename + "_ROOT_DIR")) {
       IDLpath = IDLpath + "-I" + SUIT_Tools::addSlash( SUIT_Tools::addSlash(dir) + 
-						      SUIT_Tools::addSlash("idl") + 
-						      SUIT_Tools::addSlash("salome")) + " ";
+                                                      SUIT_Tools::addSlash("idl") + 
+                                                      SUIT_Tools::addSlash("salome")) + " ";
     }
   }
 
@@ -371,7 +370,7 @@ void ToolsGUI_CatalogGeneratorDlg::onBrowseBtnClicked()
 void ToolsGUI_CatalogGeneratorDlg::updateButtonState()
 {
   myApplyBtn->setEnabled( !myIdlEdit->text().trimmed().isEmpty() && 
-			  !myXmlEdit->text().trimmed().isEmpty() );
+                          !myXmlEdit->text().trimmed().isEmpty() );
 }
 
 /*!
@@ -395,25 +394,25 @@ void ToolsGUI_CatalogGeneratorDlg::onApply()
   if ( !XmlFile.isEmpty() && !IdlFile.isEmpty() ) {
     if ( !QFile::exists( IdlFile ) ) {
       SUIT_MessageBox::critical( this, 
-				 tr("TOOLS_ERR_ERROR"), 
-				 tr("TOOLS_ERR_FILE_NOT_EXIST").arg(IdlFile) );
+                                 tr("TOOLS_ERR_ERROR"), 
+                                 tr("TOOLS_ERR_FILE_NOT_EXIST").arg(IdlFile) );
     }
     else {
       QString command = "";
       if ( getenv("KERNEL_ROOT_DIR")  )
-	command = QString( getenv( "KERNEL_ROOT_DIR" ) ) + "/bin/salome/runIDLparser -K " + IDLpath + " -Wbcatalog=" + XmlFile;
+        command = QString( getenv( "KERNEL_ROOT_DIR" ) ) + "/bin/salome/runIDLparser -K " + IDLpath + " -Wbcatalog=" + XmlFile;
       else {
-	SUIT_MessageBox::critical( this, 
-				   tr("TOOLS_ERR_ERROR"), 
-				   tr("KERNEL_ROOT_DIR variable is not defined") );
+        SUIT_MessageBox::critical( this, 
+                                   tr("TOOLS_ERR_ERROR"), 
+                                   tr("KERNEL_ROOT_DIR variable is not defined") );
       }
 
       if (!Author.isEmpty()) command += ",author=" + Author; 
       if (!Version.isEmpty()) command += ",version=" + Version;
       if (!PngFile.isEmpty()) {
-	OSD_Path aPath((Standard_CString)PngFile.toLatin1().constData()); 
-	TCollection_AsciiString aFile = aPath.Name() + aPath.Extension();
-	command += QString(",icon=") + QString(aFile.ToCString());
+        OSD_Path aPath((Standard_CString)PngFile.toLatin1().constData()); 
+        TCollection_AsciiString aFile = aPath.Name() + aPath.Extension();
+        command += QString(",icon=") + QString(aFile.ToCString());
       }
       if (!CompName.isEmpty()) command += ",name=" + CompName;
       if (!CompUserName.isEmpty()) command += ",username=" + CompUserName;
@@ -424,9 +423,9 @@ void ToolsGUI_CatalogGeneratorDlg::onApply()
       int res;
       res = system( ( char* )( command.toLatin1().constData() ) );
       if ( res == -1 ) {
-	MESSAGE( "work failed (system command result = " << res );
+        MESSAGE( "work failed (system command result = " << res );
       } else if (res == 217) {
-	MESSAGE( "shell exec failed (system command result = " << res );
+        MESSAGE( "shell exec failed (system command result = " << res );
       }
     }
   }

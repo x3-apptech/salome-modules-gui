@@ -26,7 +26,7 @@ right-click on a definite object in the Object Browser.
 The Object Browser may contain supplementary attributes of the objects
 displayed in additional columns. By default, these columns are not
 displayed -  displaying/hiding these columns is possible through
-\ref salome_preferences_page "setting study preferences" or
+\ref setting_preferences_page "setting study preferences" or
 right-clicking on the attributes bar and toggling the necessary
 attributes.
 
@@ -42,5 +42,17 @@ to the objects</li>
 </ul>
 
 \note <b>Entry, IOR and Reference entry</b> attributes are displayed for debugging purposes only.
- 
+
+<h2> Enable sorting </h2>
+
+By default the objects in the object browser are sorted in the creation order. 
+\n
+However, it is possible to enable sorting 
+in the alphabetical order (or the reverse alphabetical order) by right
+clicking in the header of the tree (near the "Name" field) and
+checking "enable sorting" in the popup menu.
+\n
+It is possible to use the arrow near "Name" to reverse the order.
+If "enable sorting" is unchecked, the objects are sorted in the default order again.
+
 */

@@ -2,139 +2,332 @@
 
 \page vtk_3d_viewer_page VTK 3D Viewer
 
+<h2>Operations</h2>
+
 The functionalities of VTK viewer are available via its Viewer
 Toolbar. Buttons marked with small downward triangles have extended
 functionality which can be accessed by locking on them with left mouse
 button.  
 
-\image html image157.gif "Viewer Toolbar"
-
-<hr>
-\image html image77.png
-\n <center><b>Dump View</b> - exports an object from the viewer in bmp, png, jpg
-or jpeg image format.</center>
+\image html vtkviewer_toolbar.png
 <hr>
 
-\image html image88.gif
-\n <center><b>Show/Hide Trihedron</b> - shows or hides coordinate axes.</center>
+\image html vtk_view_camera_dump.png
+
+<b>Dump View</b> - exports an object from the viewer in bmp, png or
+jpeg image format.
 <hr>
 
-\image html image96.png
-\n <center><b>Fit all</b> - scales the presentation so that it could
-fit within the Viewer boundaries. </center>
+\image html vtk_view_style_switch.png
+
+<b>Interaction style switch</b> - allows to switch between standard
+and "keyboard free" interaction styles. "Keyboard free" style allows
+to process all view transformations without using keyboard (only by
+mouse) and perform selection in view by pressing "S" key. By default,
+rotation in this mode is performed by left mouse button, panning - by
+middle mouse button, zooming - by left and middle mouse buttons
+pressed simultaneously.
 <hr>
 
-\image html image97.png
-\n <center><b>Fit area</b> - resizes the view to place in the visible area
-only the contents of a frame drawn with pressed left mouse button.</center>
+\image html vtk_view_zooming_style_switch.png
+
+<b>Zooming style switch</b> - allows to switch between standard
+(zooming at the center of the view) and advanced (zooming at the
+current cursor position) zooming styles. The second mode is available
+only for parallel (non-perspective) view's mode.
 <hr>
 
-\image html image98.png
-\n <center><b>Zoom</b> - allows to zoom in and out.</center>
+\image html vtk_view_highlight.png
+
+<b>Dynamic pre-selection switch</b> - allows to switch on/off dynamic
+pre-selection of objects. When the dynamic pre-selection is switched
+on, an objects can be selected by clicking the point/cell belonging to
+this object, with some performance loss. Switch dynamic pre-selection
+off to have a good performance on big objects (for example, huge
+meshes).
 <hr>
 
-\image html image99.png
-\n <center><b>Panning</b> - if the represented objects are greater that the
-visible area and you don't wish to use <b>Fit all</b> functionality, click on
-this button and you'll be able to drag the scene to see its remote
-parts.</center>
+\image html vtk_view_triedre.png
+
+<b>Show/Hide Trihedron</b> - shows or hides coordinate axes.
 <hr>
 
-\image html image100.png
-\n <center><b>Global panning</b> - allows to select a point to be the
-center of the presentation showing all displayeed objects in the
-visible ares <center>
+\image html vtk_view_fitall.png
+
+<b>Fit all</b> - scales the presentation so that it could fit within
+the Viewer boundaries.
 <hr>
 
-\image html view_rotation_point.png
-\n <center><b>Change rotation point</b> - allows to to choose the point around
-which the rotation is performed.</center>
+\image html vtk_view_fitarea.png
+
+<b>Fit area</b> - resizes the view to place in the visible area only
+the contents of a frame drawn with pressed left mouse button.
+<hr>
+
+\image html vtk_view_zoom.png
+
+<b>Zoom</b> - allows to zoom in and out.
+<hr>
+
+\image html vtk_view_pan.png
+
+<b>Panning</b> - if the represented objects are greater that the
+visible area and you don't wish to use <b>Fit all</b> functionality,
+click on this button and you'll be able to drag the scene to see its
+remote parts.
+<hr>
+
+\image html vtk_view_glpan.png
+
+<b>Global panning</b> - allows to select a point to be the center of
+the presentation showing all displayed objects in the visible ares.
+<hr>
+
+\image html vtk_view_rotation_point.png
+
+<b>Change rotation point</b> - allows to to choose the point around
+which the rotation is performed.
 
 \image html set_rotation_point_dialog1.png
 
-<center>By default the rotation point is located in the Center of the bounding
-box of an object.</center>
+By default the rotation point is located in the Center of the bounding
+box of an object.
 
 \image html set_rotation_point_dialog2.png
 
-<center>Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
-define the coordinates of the rotation point manually.</center>
+Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+define the coordinates of the rotation point manually.
 
-<b>Set to Origin</b> button restores the default rotation point
-coordinates.\n
-<b>Select Point from View</b> button allows to select the rotation
-point in the 3D Viewer.
+- <b>Set to Origin</b> button restores the default rotation point
+  coordinates.
+
+- <b>Select Point from View</b> button allows to select the rotation
+  point in the 3D Viewer.
+
 <hr>
 
-\image html image89.png
-\n <center><b>Rotation</b> - allows to rotate the selected object using the
-mouse.</center>
+\image html vtk_view_rotate.png
 
-\image html image102.gif
-
-<center>These buttons orientate the scene strictly about coordinate axes.</center>
+<b>Rotation</b> - allows to rotate the selected object using the
+mouse.
 <hr>
 
-\image html image91.png
-\n <center><b>Reset</b> - restores the default position (isometric) of
-objects in the scene.</center>
+\image html vtk_view_front.png
+\image html vtk_view_back.png
+\image html vtk_view_top.png
+\image html vtk_view_bottom.png
+\image html vtk_view_left.png
+\image html vtk_view_right.png
+
+These buttons orientate the scene strictly about coordinate axes:
+\b Front, \b Back, \b Top, \b Bottom, \b Left or \b Right side.
 <hr>
 
-\image html urbutton.png
-\n <center><b>Update Rate</b> - allows to define the Update Rate for
-the presentations displayed in the viewer</center>
+\image html vtk_view_anticlockwise.png
+
+<b>Rotate counterclockwise</b> - rotates view 90° counterclockwise.
+<hr>
+
+\image html vtk_view_clockwise.png
+
+<b>Rotate clockwise</b> - rotates view 90° clockwise.
+<hr>
+
+\image html vtk_view_reset.png
+
+<b>Reset</b> - restores the default position (isometric) of objects in
+the scene.
+<hr>
+
+\image html vtk_view_update_rate.png
+
+<b>Update Rate</b> - allows to define the Update Rate for the
+presentations displayed in the viewer.
 
 \image html updaterate.png
 
-<ul>
-<li><b>Desired Update Rate, FPS</b> - allows to set the target Update
-Rate</li>
-<li><b>Still Update Rate, FPS</b> - allows to set the Update Rate for
-the periods when both the user and the application do not perform any
-actions in the viewer</li>
-<li><b>Current Update Rate, FPS</b> - shows the Update Rate currently
-available on your configuration</li>
-<li><b>Number of Cells</b> - shows the number of cells currently in
-display</li> 
-</ul>
+- <b>Desired Update Rate, FPS</b> - allows to set the target Update
+  Rate  
 
-\image html image108.png
-\n <center><b>Scaling</b> - represents objects deformed (stretched or
-stuffed) along the axes of coordinates.</center>
+- <b>Still Update Rate, FPS</b> - allows to set the Update Rate for
+  the periods when both the user and the application do not perform
+  any actions in the viewer
+
+- <b>Current Update Rate, FPS</b> - shows the Update Rate currently
+  available on your configuration 
+
+- <b>Number of Cells</b> - shows the number of cells currently in
+  display 
+
 <hr>
 
-\image html image109.gif
-\n <center><b>Graduated axes</b> - allows to define parameters of axes
-and graduate them.</center>
+\image html vtk_view_scaling.png
+
+<b>Scaling</b> - represents objects deformed (stretched or stuffed)
+along the axes of coordinates.
+<hr>
+
+\image html vtk_view_graduated_axes.png
+
+<b>Graduated axes</b> - allows to define parameters of axes and
+graduate them.
 
 \image html graduatedaxes1.png
 
-<ul>
-<li><b>Axis name</b></li>
-<ul>
-<li><b>Is visible</b> - if checked the axis name is displayed in the
-viewer.</li>
-<li><b>Name</b> - allows to redefine the name of the axis.</li>
-<li><b>Font</b> - allows to define color and properties of the font of
-axis name.</li>
-</ul>
-<li><b>Labels</b></li>
-<ul>
-<li><b>Is visible</b> - if checked the labels are displayed in the
-viewer.</li>
-<li><b>Number</b> - allows to define the number of labels.</li>
-<li><b>Offset</b> - allows to define the distance between labels.</li>
-<li><b>Font</b> - allows to define color and properties of the font of
-labels names.</li>
-</ul>
-<li><b>Tick marks</b></li>
-<ul>
-<li><b>Is visible</b> - if checked the tick marks are displayed in the
-viewer.</li>
-<li><b>Length</b> - allows to define the length of tick marks.</li>
-</ul>
-<li><b>Is visible</b> - if checked the axis is displayed in the
-viewer. </li>
-</ul>
+- <b>Axis name</b> - if checked the axis name is displayed in the viewer.
+
+  - <b>Name</b> - allows to redefine the name of the axis.
+
+  - <b>Font</b> - allows to define color and properties of the font of axis name.
+
+- <b>Labels</b> - if checked the labels are displayed in the viewer.<
+
+  - <b>Number</b> - allows to define the number of labels.
+
+  - <b>Offset</b> - allows to define the distance between labels.
+
+  - <b>Font</b> - allows to define color and properties of the font of labels names.
+
+- <b>Tick marks</b> - if checked the tick marks are displayed in the viewer.
+
+  - <b>Length</b> - allows to define the length of tick marks.
+
+- <b>Is visible</b> - if checked the axis is displayed in the viewer.
+
+<hr>
+
+\image html vtk_view_parameters.png
+
+<b>Change View Parameters</b> - this button provides access to the
+dialog box allowing customization different parameters of the view.
+
+\image html vtk_view_parameters_dlg.png
+
+- <b>Projection Mode</b> - switchs to the Orthogonal / Perspective
+  projection mode
+
+- <b>Focal Point</b> - allows to specify the focal point of the view
+
+  - <b>Set to Bounding Box Center</b> - chooses the center of the
+    bounding box of the current scene as the focal point.
+
+  - <b>Set to Origin</b> - chooses the global coordinates system origin as
+    the focal point
+
+  - <b>Select Point from View</b> - allows to specify the focal point by the
+    direct selection of a point in the view window
+
+  - <b>X</b>, <b>Y</b>, <b>Z</b> - allows to input the coordinates of the focal
+    point directly
+
+- <b>Camera Position</b> - allows to specify the position of the view camera:
+
+  - <b>Absolute Coordinates</b> - either in absolute coordinates,
+
+  - <b>Relative to Focal Point</b> - or as a offset to the focal point;
+
+  - <b>Projection Direction</b> - allows specify the direction of the
+    projection vector;
+
+  - <b>Focal Distance</b> - the focal distance value;
+
+  - <b>View Up Direction</b> - direction of the "view up" vector.
+
+- <b>Zooming</b> - the current zoom factor (available in the <b>Orthogonal
+  mode</b> only)
+
+- <b>View Angle</b> - the current view angle (available in the <b>Perspective
+  mode</b> only)
+
+<hr>
+
+\image html vtk_view_sync.png
+
+<b>Synchronize view</b> - allows to synchronize 3d view
+parameters. This button has two states - checked and
+unchecked. Clicking on this button opens a drop-down menu listing the
+compatible 3d views. As soon as the user selects any view from the
+list, the parameters (view point, position, zoom coefficient, etc.) of
+the current view are synchronized with the selected view (static
+synchronization).
+
+In addition, when this button is in the "checked" state, the dynamic
+synchronization of the views is performed, i.e. any zoom, pan, rotate
+or other view operation done in one view is automatically applied to
+the other view.
+<hr>
+
+\image html vtk_view_parallel.png
+
+<b>Orthogonal mode</b> - Switches the view to the orthogonal mode.
+<hr>
+
+\image html vtk_view_perspective.png
+
+<b>Perspective mode</b> - Switches the view to the perspective mode.
+<hr>
+
+\image html vtk_view_recording_start.png
+\image html vtk_view_recording_play.png
+\image html vtk_view_recording_pause.png
+\image html vtk_view_recording_stop.png
+
+These buttons allow recording viewing operations as a video file in
+the AVI format using external software (jpeg2yuv):
+
+- <b>Start recording</b> - specify parameters and start recording;
+
+- <b>Pause recording</b> - suspend recording;
+
+- <b>Continue recording</b> - resume recording;
+
+- <b>Stop recording</b> - stop recording.
+
+<hr>
+
+\anchor vtk_background
+<h2>Background</h2>
+
+VTK Viewer background can be customized using the "Change background"
+popup menu command that opens the following dialog box:
+
+\image html change_background_dlg.png
+
+The following types of the background are supported:
+
+- Single color: the background is colored with the solid color
+  specified by the user in the dialog box.
+
+- Gradient background: the background is gradiently colored according
+  to two colors and the gradient type specified in the dialog
+  box. The following types of background are supported:
+
+  - Horizontal
+
+  - Vertical
+
+  - First diagonal
+
+  - Second diagonal
+
+  - First corner
+
+  - Second corner
+
+  - Third corner
+
+  - Fourth corner
+
+- Image: allows to set image as viewer background and define filling type:
+
+  - Center: the image is located at the center of the viewer backgound
+
+  - Tile: the image fills the entire viewer backgound one by one
+
+  - Stretch: the image is stretched to the entire viewer backgound.
+
+
+Default background for the viewer is specified via the
+\ref vtk_preferences "application preferences".
 
 */

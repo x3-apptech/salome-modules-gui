@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  SALOME QxGraph : build Supervisor viewer into desktop
 //
 #include "QxGraph_ViewWindow.h"
@@ -33,9 +34,6 @@
 //QT Include
 #include <qlayout.h>
 #include <qcolor.h>
-//#include <qcolordialog.h>
-
-using namespace std;
 
 /*!
     Constructor
@@ -126,42 +124,42 @@ void QxGraph_ViewWindow::createActions()
 
   // FitAll
   aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_FITALL" ) ),
-			  tr( "MNU_FITALL" ), 0, this);
+                          tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitAll()));
   myActionsMap[ FitAllId ] = aAction;
 
   // FitRect
   aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_FITAREA" ) ),
-			  tr( "MNU_FITRECT" ), 0, this);
+                          tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitArea()));
   myActionsMap[ FitRectId ] = aAction;
 
   // Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_ZOOM" ) ),
-			  tr( "MNU_ZOOM_VIEW" ), 0, this);
+                          tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewZoom()));
   myActionsMap[ ZoomId ] = aAction;
 
   // Panning
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_PAN" ) ),
-			  tr( "MNU_PAN_VIEW" ), 0, this);
+                          tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
   myActionsMap[ PanId ] = aAction;
 
   // Global Panning
   aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_GLOBALPAN" ) ),
-			  tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
+                          tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewGlobalPan()));
   myActionsMap[ GlobalPanId ] = aAction;
 
   // Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "QxGraph", tr( "ICON_QXGRAPH_RESET" ) ),
-			  tr( "MNU_RESET_VIEW" ), 0, this);
+                          tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
   connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
   myActionsMap[ ResetId ] = aAction;

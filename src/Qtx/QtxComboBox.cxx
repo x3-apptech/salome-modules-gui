@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File:      QtxComboBox.cxx
 // Author:    Sergey TELKOV
 //
@@ -133,7 +134,6 @@ QtxComboBox::QtxComboBox( QWidget* parent )
 : QComboBox( parent ),
   myCleared( false )
 {
-  connect( this, SIGNAL( activated( int ) ),            this, SLOT( onActivated( int ) ) );
   connect( this, SIGNAL( currentIndexChanged( int ) ),  this, SLOT( onCurrentChanged( int ) ) );
   setModel( new Model( this ) );
 }
@@ -236,23 +236,16 @@ void QtxComboBox::customEvent( QEvent* e )
 }
 
 /*!
-  \brief Called when any item is activated by the user.
-  \param idx activated item index
-*/
-void QtxComboBox::onActivated( int idx )
-{
-  resetClear();
-  emit activatedId( id( idx ) );
-}
-
-/*!
   \brief Called when current item is chaned (by the user or programmatically).
   \param idx item being set current
 */
 void QtxComboBox::onCurrentChanged( int idx )
 {
   if ( idx != -1 )
+  {
     resetClear();
+    emit activatedId( id( idx ) );
+  }
 }
 
 /*!

@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 // File   : SUIT_DataBrowser.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
@@ -119,6 +117,27 @@ void SUIT_DataBrowser::setAutoUpdate( const bool on )
 }
 
 /*!
+  \brief Get 'updateModified' flag value.
+  \return 'updateModified' flag value
+*/
+bool SUIT_DataBrowser::updateModified() const
+{
+  SUIT_ProxyModel* m = qobject_cast<SUIT_ProxyModel*>( model() );
+  return m ? m->updateModified() : false;
+}
+
+/*!
+  \brief Set 'updateModified' flag value.
+  \param on 'updateModified' flag value
+*/
+void SUIT_DataBrowser::setUpdateModified( const bool on )
+{
+  SUIT_ProxyModel* m = qobject_cast<SUIT_ProxyModel*>( model() );
+  if ( m ) 
+    m->setUpdateModified( on );
+}
+
+/*!
   \brief Update object browser starting from the object \obj;
   open all branches automatically if \a autoOpen is \c true.
   \param obj starting object for updating
@@ -139,29 +158,27 @@ void SUIT_DataBrowser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
 }
 
 /*!
-  \brief Get current key accelerator used for the 
-  object browser update operation.
+  \brief Get current key accelerator by id.
   \return current key accelerator
-  \sa setUpdateKey(), requestUpdate()
+  \sa setShortcutKey(), requestUpdate(), requestRename()
 */
-int SUIT_DataBrowser::updateKey() const
+int SUIT_DataBrowser::shortcutKey(const int id) const
 {
-  return myShortcut->key();
+  return myShortcutMap.value(id)->key();
 }
 
 /*!
-  \brief Assign the key accelerator to be used for the 
-  object browser update operation.
-
-  By default, \c [F5] key is assigned for the update operation.
-  To disable the accelerator, pass 0 to this method.
-
+  \brief Assign the key accelerator for the shortcut.
+  
+  \param id id of the shortcut
   \param key new key accelerator
-  \sa updateKey(), requestUpdate()
+  \sa shortcutKey(), requestUpdate(), requestRename()
 */
-void SUIT_DataBrowser::setUpdateKey( const int key )
-{
-  myShortcut->setKey( key );
+void SUIT_DataBrowser::setShortcutKey( const int id, const int key )
+{ 
+  ShortcutMap::iterator it = myShortcutMap.find( key );
+  if( it != myShortcutMap.end() )
+    (*it)->setKey(key);
 }
 
 /*!
@@ -193,7 +210,7 @@ void SUIT_DataBrowser::getSelected( DataObjectList& lst ) const
     foreach( idx, sel ) {
       SUIT_DataObject* obj = m->object( idx );
       if ( obj )
-	lst.append( obj );
+        lst.append( obj );
     }
   }
 }
@@ -216,6 +233,18 @@ void SUIT_DataBrowser::setSelected( const SUIT_DataObject* obj, const bool appen
 }
 
 /*!
+  \brief function to sort QModelIndexList with qSort
+*/
+bool modelIndexLessThan(const QModelIndex& lhs, const QModelIndex& rhs)
+{
+  QModelIndex lhs_parent=lhs.parent();
+  QModelIndex rhs_parent=rhs.parent();
+  if(lhs_parent < rhs_parent)return true;
+  if(lhs_parent == rhs_parent) return lhs < rhs;
+  return false;
+}
+
+/*!
   \brief Set list of selected data objects.
   \param lst list of the data object to set selected
   \param append if \c true, the objects are added to the current selection;
@@ -232,9 +261,44 @@ void SUIT_DataBrowser::setSelected( const DataObjectList& lst, const bool append
     foreach( obj, lst ) {
       QModelIndex index = m->index( obj );
       if ( index.isValid() )
-	indexes.append( index );
+        indexes.append( index );
     }
+    qSort(indexes.begin(), indexes.end(), modelIndexLessThan);
+
     select( indexes, true, append ); // if !indexes.isEmpty() ???
+  }
+}
+
+/*!
+  \brief Make the view item for specified data object is visible.
+  \param obj data object
+*/
+void SUIT_DataBrowser::ensureVisible( SUIT_DataObject* obj )
+{
+  if ( !obj )
+    return;
+
+  DataObjectList lst;
+  lst.append( obj );
+  ensureVisible( lst );
+}
+
+/*!
+  \brief Make the view items for specified data objects is visible.
+  \param lst data object list
+*/
+void SUIT_DataBrowser::ensureVisible( const DataObjectList& lst )
+{
+  QtxTreeView* tv = treeView();
+  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( model() );
+  if ( !tv || !treeModel )
+    return;
+
+  for ( DataObjectList::const_iterator it = lst.begin(); it != lst.end(); ++it )
+  {
+    QModelIndex idx = treeModel->index( *it );
+    if ( idx.isValid() )
+      tv->scrollTo( idx );
   }
 }
 
@@ -309,14 +373,18 @@ void SUIT_DataBrowser::init( SUIT_DataObject* root )
   setModel( m );
   setItemDelegate( qobject_cast<SUIT_ProxyModel*>( model() )->delegate() );
   connect( treeView(), SIGNAL( sortingEnabled( bool ) ), 
-	   model(),    SLOT( setSortingEnabled( bool ) ) );
+           model(),    SLOT( setSortingEnabled( bool ) ) );
   connect( treeView(), SIGNAL( clicked( const QModelIndex& ) ), 
-	   this,       SLOT( onClicked( const QModelIndex& ) ) );
+           this,       SLOT( onClicked( const QModelIndex& ) ) );
   connect( treeView(), SIGNAL( doubleClicked( const QModelIndex& ) ), 
-	   this,       SLOT( onDblClicked( const QModelIndex& ) ) );
+           this,       SLOT( onDblClicked( const QModelIndex& ) ) );
   connect( treeView(), SIGNAL( expanded( const QModelIndex& ) ), 
-	   this,       SLOT( onExpanded( const QModelIndex& ) ) );
-  myShortcut = new QShortcut( Qt::Key_F5, this, SIGNAL( requestUpdate() ), SIGNAL( requestUpdate() ) );
+           this,       SLOT( onExpanded( const QModelIndex& ) ) );
+  connect( this      , SIGNAL( requestRename() ),
+	   this      , SLOT ( onStartEditing() ));
+
+  myShortcutMap.insert(UpdateShortcut , new QShortcut( Qt::Key_F5, this, SIGNAL( requestUpdate() ), SIGNAL( requestUpdate() ) ) );
+  myShortcutMap.insert(RenameShortcut , new QShortcut( Qt::Key_F2, this, SIGNAL( requestRename() ), SIGNAL( requestRename() ) ) );
 
   myAutoSizeFirstColumn = true;
   myAutoSizeColumns = false;
@@ -329,9 +397,9 @@ void SUIT_DataBrowser::init( SUIT_DataObject* root )
   assigned for the update operation is pressed by the user.
 
   By default, \c [F5] key is assigned for the update operation.
-  The key accelerator can be changed with the setUpdateKey() method.
+  The key accelerator can be changed with the setShortcutKey() method.
 
-  \sa updateKey(), setUpdateKey()
+  \sa shortcutKey(), setShortcutKey()
 */
 
 /*!
@@ -374,7 +442,10 @@ void SUIT_DataBrowser::onClicked( const QModelIndex& index )
 
   if ( m ) {
     SUIT_DataObject* obj = m->object( index );
-    if ( obj ) emit( clicked( obj ) );
+    if ( obj ) { 
+      emit( clicked( obj ) );
+      m->emitClicked(obj, index);
+    }
   }
 }
 
@@ -403,6 +474,18 @@ void SUIT_DataBrowser::onExpanded( const QModelIndex& index )
   if (myResizeOnExpandItem) {
     adjustFirstColumnWidth();
     adjustColumnsWidth();
+  }
+}
+
+/*!
+  \brief Make editable selected item in place.
+  \internal
+*/
+void SUIT_DataBrowser::onStartEditing() {
+  DataObjectList sel = getSelected();
+  SUIT_ProxyModel* m = qobject_cast<SUIT_ProxyModel*>( model() );
+  if(treeView() && m && sel.count() == 1){
+    treeView()->edit(m->index( sel.first(), SUIT_DataObject::NameId ));
   }
 }
 

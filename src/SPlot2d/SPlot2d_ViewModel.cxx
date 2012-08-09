@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  File   : SPlot2d_Viewer.cxx
 //  Author : Sergey RUIN
 //  Module : SUIT
@@ -28,11 +29,13 @@
 #include "SPlot2d_ViewWindow.h"
 
 #include "SPlot2d_Prs.h"
+#include "SPlot2d_Histogram.h"
 #include "SUIT_Session.h"
 #include "SUIT_Application.h"
 #include "SUIT_ViewManager.h"
 
 #include "SALOME_ListIO.hxx"
+#include "SALOME_ListIteratorOfListIO.hxx"
 
 #include <QApplication>
 #include <QToolBar>
@@ -44,8 +47,6 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_curve.h>
 #include <stdlib.h>
-
-using namespace std;
 
 //ASL: Temporary commented in order to avoir dependency on SALOMEDS
 
@@ -76,7 +77,8 @@ using namespace std;
   Constructor
 */
 SPlot2d_Viewer::SPlot2d_Viewer(  bool theAutoDel )
-: Plot2d_Viewer( theAutoDel )    
+: Plot2d_Viewer( theAutoDel ),
+  myDeselectAnalytical(true)
 {
 }
 
@@ -91,7 +93,7 @@ SPlot2d_Viewer::~SPlot2d_Viewer()
   Renames curve if it is found
 */
 void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject,
-			     const QString& newName, Plot2d_ViewFrame* fr ) 
+                             const QString& newName, Plot2d_ViewFrame* fr ) 
 {
   Plot2d_ViewFrame* aViewFrame = fr ? fr : getActiveViewFrame();
   if( !aViewFrame )
@@ -150,8 +152,8 @@ bool SPlot2d_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& IObject
       CurveDict::Iterator it = aCurves.begin();
       for( ; it != aCurves.end(); ++it ) {
         SPlot2d_Curve* aCurve = dynamic_cast<SPlot2d_Curve*>( it.value() );
-	if(aCurve && aCurve->hasIO() && aCurve->getTableIO()->isSame(IObject))
-	  return 1;
+        if(aCurve && aCurve->hasIO() && aCurve->getTableIO()->isSame(IObject))
+          return 1;
       }
     }
   }
@@ -216,10 +218,10 @@ void SPlot2d_Viewer::Erase( const Handle(SALOME_InteractiveObject)& IObject, boo
       _PTR(SObject) aChildSO = aIter->Value();
       _PTR(SObject) refSO;
       if ( aChildSO->ReferencedObject( refSO ) && refSO )
-	aChildSO = refSO;
+        aChildSO = refSO;
       curve = getCurveByIO( new SALOME_InteractiveObject( aChildSO->GetID().c_str(), "") );
       if ( curve )
-	aViewFrame->eraseCurve( curve, update );
+        aViewFrame->eraseCurve( curve, update );
     }
   }
 */
@@ -270,30 +272,26 @@ void SPlot2d_Viewer::Erase( const SALOME_Prs2d* prs, const bool )
 SALOME_Prs* SPlot2d_Viewer::CreatePrs( const char* entry )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
+  SPlot2d_Prs *prs = new SPlot2d_Prs();
   if(aViewFrame)
   {
-    Plot2d_Prs* prs = aViewFrame->CreatePrs(entry);
-    if( prs )
-      return new SPlot2d_Prs( prs );
+    CurveDict aCurves = aViewFrame->getCurves();
+    CurveDict::Iterator it = aCurves.begin();
+    for( ; it != aCurves.end(); ++it ) {
+      SPlot2d_Curve* aCurve = dynamic_cast<SPlot2d_Curve*>(it.value());
+      OwnerSet owners = aCurve->getOwners();
+      if(aCurve) {
+	if ( 
+	    (aCurve->hasIO() && !strcmp( aCurve->getIO()->getEntry(), entry )) ||
+	    (aCurve->hasTableIO() && !strcmp( aCurve->getTableIO()->getEntry(), entry )) ||
+	    owners.contains(entry)
+	    ) {
+	  prs->AddObject(aCurve);
+	}
+      }      
+    }
   }
-
-  return NULL;
-}
-
-/*!
-  Axiluary method called before displaying of objects
-*/
-void  SPlot2d_Viewer::BeforeDisplay( SALOME_Displayer* d )
-{
-  d->BeforeDisplay( this, SALOME_Plot2dViewType() );
-}
-
-/*!
-  Axiluary method called after displaying of objects
-*/
-void  SPlot2d_Viewer::AfterDisplay( SALOME_Displayer* d )
-{
-  d->AfterDisplay( this, SALOME_Plot2dViewType() );
+  return prs;
 }
 
 /*!
@@ -306,6 +304,23 @@ bool SPlot2d_Viewer::isVisible( const Handle(SALOME_InteractiveObject)& IObject 
 
   SPlot2d_Curve* curve = getCurveByIO( IObject );
   return aViewFrame->isVisible( curve );
+}
+
+/*!
+  \Collect objects visible in viewer
+  \param theList - visible objects collection
+*/
+void SPlot2d_Viewer::GetVisible( SALOME_ListIO& theList )
+{
+  Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
+  if(aViewFrame == NULL) return;
+  CurveDict aCurves = aViewFrame->getCurves();
+  CurveDict::Iterator it = aCurves.begin();
+  for( ; it != aCurves.end(); ++it ) {
+    SPlot2d_Curve* aCurve = dynamic_cast<SPlot2d_Curve*>(it.value()); 
+    if ( aCurve && aCurve->hasIO() && aViewFrame->isVisible( aCurve ) )
+      theList.Append( aCurve->getIO() );
+  }
 }
 
 /*!
@@ -350,7 +365,7 @@ Plot2d_ViewFrame* SPlot2d_Viewer::getActiveViewFrame()
   \param fr - viewframe
 */
 SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObject)& theIObject,
-					     Plot2d_ViewFrame* fr )
+                                             Plot2d_ViewFrame* fr )
 {
   if ( !theIObject.IsNull() ) {
     Plot2d_ViewFrame* aViewFrame = fr ? fr : getActiveViewFrame();
@@ -359,10 +374,10 @@ SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObje
       CurveDict::Iterator it = aCurves.begin();
       for( ; it != aCurves.end(); ++it ) {
         SPlot2d_Curve* aCurve = dynamic_cast<SPlot2d_Curve*>( it.value() );
-	if(aCurve) {
-	  if ( aCurve->hasIO() && aCurve->getIO()->isSame( theIObject ) )
-	    return aCurve;
-	}
+        if(aCurve) {
+          if ( aCurve->hasIO() && aCurve->getIO()->isSame( theIObject ) )
+            return aCurve;
+        }
       }
     }
   }
@@ -375,6 +390,7 @@ SPlot2d_Curve* SPlot2d_Viewer::getCurveByIO( const Handle(SALOME_InteractiveObje
 SUIT_ViewWindow* SPlot2d_Viewer::createView( SUIT_Desktop* theDesktop )
 {
   SPlot2d_ViewWindow* aPlot2dView = new SPlot2d_ViewWindow(theDesktop, this);
+  aPlot2dView->initLayout();
   if (getPrs())
     aPlot2dView->getViewFrame()->Display(getPrs());
   return aPlot2dView;
@@ -389,19 +405,95 @@ void SPlot2d_Viewer::onLegendClicked( QwtPlotItem* plotItem )
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
   if(aViewFrame == NULL) return;
 
-  CurveDict aCurves = aViewFrame->getCurves();
-  SPlot2d_Curve* aSCurve;
-  CurveDict::Iterator it = aCurves.begin();
-  for( ; it != aCurves.end(); ++it )
-  {
-    if ( it.key() == plotItem ) {
-      aSCurve = dynamic_cast<SPlot2d_Curve*>( it.value() );
-      break;
-    }
+  bool isAnalytical = false;
+  AnalyticalCurveList curves = aViewFrame->getAnalyticalCurves();
+   foreach ( Plot2d_AnalyticalCurve* curve, curves ) {
+	   if(plotItem == curve->plotItem()) {
+		  isAnalytical = true;
+		  curve->setSelected(true);
+	   } else {
+		  curve->setSelected(false);
+	   }
+   }
+  if(isAnalytical) {
+	myDeselectAnalytical = false;
+	emit clearSelected();
+	aViewFrame->updateAnalyticalCurves();
+	myDeselectAnalytical = true;
+	return;
   }
-  // Highlight curve in Object Browser
-  if(aSCurve && aSCurve->hasIO()) {
-    QString anEntry = aSCurve->getIO()->getEntry();
-    emit legendSelected( anEntry );
+
+  Plot2d_Object* anObject = aViewFrame->getPlotObject(plotItem);
+  
+  if(anObject) {
+    
+    // Highlight object in Object Browser
+    QString anEntry;
+    if(SPlot2d_Curve* aSCurve = dynamic_cast<SPlot2d_Curve*>(anObject)) {
+      if(aSCurve->hasIO())
+	anEntry = aSCurve->getIO()->getEntry();
+    } else if( SPlot2d_Histogram* aSHisto = dynamic_cast<SPlot2d_Histogram*>(anObject)) {
+      if(aSHisto->hasIO())
+	anEntry = aSHisto->getIO()->getEntry();
+    }
+    
+    if(!anEntry.isEmpty())
+      emit legendSelected( anEntry );
+  }	
+}
+
+/*!
+  
+*/
+void SPlot2d_Viewer::setObjectsSelected( SALOME_ListIO& theList ) {
+  Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
+  if(aViewFrame) {
+
+    objectList allObjects;
+    aViewFrame->getObjects( allObjects );
+    
+    bool isSelected = false;
+    SPlot2d_Histogram* h = 0;
+    SPlot2d_Curve* c =0;
+    
+    foreach ( Plot2d_Object* o, allObjects ) {
+      isSelected = false;
+      
+      Handle(SALOME_InteractiveObject) io;
+      if( (h = dynamic_cast<SPlot2d_Histogram*>(o)) && h->hasIO() ) {
+	io = h->getIO();
+      } else if((c = dynamic_cast<SPlot2d_Curve*>(o)) && c->hasIO()) {
+	io = c->getIO();
+      } else {
+	continue;
+      }
+
+      SALOME_ListIteratorOfListIO anIter( theList ); 
+      
+      for( ; anIter.More(); anIter.Next() ) {
+	if ( anIter.Value()->hasEntry() ) {
+	  if( io->isSame(anIter.Value()) ) {
+	    isSelected = o->isSelected();
+	    if( !isSelected ) {
+	      o->setSelected(true);
+	      aViewFrame->updateObject(o);
+	      theList.Remove(anIter);
+	      isSelected = true;
+	      break;
+	    } else 
+	      break;
+	  }
+	}
+      }
+      if( !isSelected && o->isSelected() != false ) {	
+	o->setSelected(false);
+	aViewFrame->updateObject(o);
+      }
+    }
+	if( myDeselectAnalytical ) {
+		aViewFrame->deselectAnalyticalCurves();
+		aViewFrame->updateAnalyticalCurves(); 
+	}
+    aViewFrame->Repaint();
   }
 }
