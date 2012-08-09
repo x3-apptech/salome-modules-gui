@@ -1,0 +1,71 @@
+/*!
+
+\page gl_2d_viewer_page GL 2D Viewer
+
+<h2>Operations</h2>
+
+The functionalities of GL viewer are available via its Viewer
+Toolbar. Buttons marked with small downward triangles have extended
+functionality which can be accessed by locking on them with left mouse
+button.  
+
+\image html glviewer_toolbar.png
+<hr>
+
+\image html gl_view_dump.png
+
+<b>Dump View</b> - exports an object from the viewer in bmp, png or
+jpeg image format.
+<hr>
+
+\image html gl_view_fitall.png
+
+<b>Fit all</b> - scales the presentation so that it could fit within
+the Viewer boundaries.
+<hr>
+
+\image html gl_view_fitarea.png
+
+<b>Fit area</b> - resizes the view to place in the visible area only
+the contents of a frame drawn with pressed left mouse button.
+<hr>
+
+\image html gl_view_fitselect.png
+
+<b>Fit selection</b> - resizes the view to fit in the visible area
+only currently selected objects.
+<hr>
+
+\image html gl_view_zoom.png
+
+<b>Zoom</b> - allows to zoom in and out.
+<hr>
+
+\image html gl_view_pan.png
+
+<b>Panning</b> - if the represented objects are greater that the
+visible area and you don't wish to use <b>Fit all</b> functionality,
+click on this button and you'll be able to drag the scene to see its
+remote parts.
+<hr>
+
+\image html gl_view_glpan.png
+
+<b>Global panning</b> - allows to select a point to be the center of
+the presentation showing all displayed objects in the visible ares.
+<hr>
+
+\image html gl_view_reset.png
+
+<b>Reset</b> - restores the default position the scene.
+<hr>
+
+\anchor gl_background
+<h2>Background</h2>
+
+GL Viewer background can be customized using the "Change background"
+popup menu command that opens standard "Select Color" dialog box:
+
+\image html selectcolor.png
+
+*/

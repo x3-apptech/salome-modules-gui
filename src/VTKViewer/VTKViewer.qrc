@@ -1,0 +1,14 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>textures/texture1.dat</file>
+     <file>textures/texture2.dat</file>
+     <file>textures/texture3.dat</file>
+     <file>textures/texture4.dat</file>
+     <file>textures/texture5.dat</file>
+     <file>textures/texture6.dat</file>
+     <file>textures/texture7.dat</file>
+     <file>textures/texture8.dat</file>
+     <file>textures/texture9.dat</file>
+ </qresource>
+ </RCC>
+ 

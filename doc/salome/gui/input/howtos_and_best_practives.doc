@@ -1,0 +1,463 @@
+/*!
+
+\page howtos How-To's and Best Practices
+
+These documents provide guidelines and best practices explaining different aspects
+and usage examples of SALOME platform.
+
+- \subpage use_case_builder
+- \subpage drag_and_drop
+- \subpage using_pluginsmanager
+
+\page use_case_builder Customize data tree representation in the Object browser by means of use case builder
+
+\tableofcontents
+
+In SALOME, the representation of the data tree in the Object browser for the \a full
+(CORBA-based) module is done basing on the study contents as it is supplied by SALOME
+data server (SALOMEDS). In contrast to the \a light module which data tree is completely
+defined and can be easily attuned by the module specific implementation, \a full module
+must publish its data in the CORBA study by means of the corresponding API of SALOME
+data server, namely \c SALOMEDS::StudyBuilder. As soon as data entities are published
+in the study, they are shown in the Object browser, in the same order as they appear
+in the study tree. Re-arrangement of the data entities with such approach is not a 
+trivial task: for example, when copying/moving any data entity at the new position
+within the tree, it is necessary to copy all its attributes as well
+and to clear (in case of move operation) the data entity at the original position. Also, it is not possible to
+make some data items in the tree "invisible" for the user (though it might be useful).
+
+Use case builder provides an alternative and more flexible way for customizing the
+data tree representation. It implements another approach to the data tree hierarchy,
+based on the tree node attributes. With use case builder it is possible to arrange
+and easily re-arrange the data items in the data tree in any appropriate way.
+
+For example, with use case builder it is easy to implement such operations as
+\ref drag_and_drop "Drag and Drop" and Copy/Cut/Paste. With use case builder approach
+it is not important how data entities are arranged in the study tree, they even may 
+lie on the same level - use case builder allows providing custom data tree
+representation, completely indepedent on the study data tree itself. It is even possible
+to hide some data entities in the tree representation while still keeping them in the
+study (to store specific module data).
+
+Object browser automatically checks it the module root data object
+contains a tree node attribute and switches to the browsing of the
+data tree for such module using the use case
+builder. Otherwise, it browses data using an ordinary study tree iterator. Thus, it is
+possible to have in the same study some modules based on use case builder approach and
+others not using it.
+
+\section use_case_builder_usage Use case builder usage
+
+To obtain a reference to the use case builder, the function \c GetUseCaseBuilder() of the
+\c SALOMEDS::Study interface can be used:
+
+\code
+interface Study
+{
+  // Get reference to the use case builder
+  UseCaseBuilder GetUseCaseBuilder(); 
+};
+\endcode
+
+\c SALOMEDS::UseCaseBuilder interface of the \c SALOMEDS CORBA module provides several
+methods that can be used to build a custom data tree. Its API is
+similar to the API of
+\c SALOMEDS::StudyBuilder interface - it operates with terms \a "father object" and
+\a "child object". In addition, use case builder uses term \a "current object" that is
+used as a parent of the children objects added if the parent is not explicitly 
+specified.
+
+\code
+interface UseCaseBuilder
+{
+  // Set top-level root object of the use case tree as the current one.
+  // This method is usually used to add SComponent items to the top level of the tree
+  boolean SetRootCurrent();
+  
+  // Set the object theObject as the current object of the use case builder
+  boolean SetCurrentObject(in SObject theObject);
+  
+  // Append object SObject to the end of children list of the current object
+  boolean Append(in SObject theObject);
+  
+  // Append object SObject to the end of children list of the parent object theFather
+  boolean AppendTo(in SObject theFather, in SObject theObject);
+  
+  // Insert object theFirst before the object theNext (under the same parent object)
+  boolean InsertBefore(in SObject theFirst, in SObject theNext);
+  
+  // Remove object from the use case tree (without removing it from the study)
+  boolean Remove(in SObject theObject);
+  
+  // Check if the object theObject has children (in the use case tree)
+  boolean HasChildren(in SObject theObject);
+  
+  // Get father object of the given object theObject in the use cases tree
+  SObject GetFather(in SObject theObject);
+  
+  // Check if given object theObject is added to the use case tree
+  boolean IsUseCaseNode(in SObject theObject);
+  
+  // Get the current object of the use case builder
+  SObject GetCurrentObject();
+};
+\endcode
+
+\section browse_use_case_tree Browsing use case data tree
+
+Browsing the use case tree can be done by means of the use case iterator, that is
+provided by the \c SALOMEDS::UseCaseIterator interface of the \c SALOMEDS CORBA
+module. Access to the use case iterator can be done via \c SALOMEDS::UseCaseBuilder
+interface:
+
+\code
+interface UseCaseBuilder
+{
+  // Get a reference to the use case iterator and initialize it
+  // by the given object theObject
+  UseCaseIterator GetUseCaseIterator(in SObject theObject);
+};
+\endcode
+
+The API of the \c SALOMEDS::UseCaseIterator interface is similar to the 
+\c SALOMEDS::ChildIterator:
+
+\code
+interface UseCaseIterator
+{
+  // Activate or reset use case iterator; boolean parameter allLevels
+  // specifies if the iterator should browse recursively on all sub-levels or
+  // on the first sub-level only.
+  void Init(in boolean allLevels);
+  // Check if the iterator can browse to the next item
+  boolean More();
+  // Browse the iterator to the next object
+  void Next();
+  // Get the object currently pointed by the iterator
+  SObject Value();
+};
+\endcode
+
+Typical usage of the \c UseCaseIterator is as follows:
+
+\code
+// get use case builder
+SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+
+// get the use case iterator
+SALOMEDS::UseCaseIterator_var iter = useCaseIter->GetUseCaseIterator( sobject.in() );
+// iterate through the sub-items recursively
+for ( useCaseIter->Init( true ); useCaseIter->More(); useCaseIter->Next() ) {
+  SALOMEDS::SObject_var child = useCaseIter->Value();
+  // do something with the child
+  // ...
+  // clean-up
+  child->UnRegister();
+}
+// clean-up
+useCaseIter->UnRegister();
+useCaseBuilder->UnRegister();
+\endcode
+
+\section use_case_compatibility Remark about compatibility with existing studies
+
+If you decide to switch your module to the use case builder approach to provide
+customization for the data tree representation, you must take care of compatibility
+with existing SALOME studies. Basically it means that you have to add
+a simple code to  \c Load() (and \c LoadASCII() if necessary) method
+of your module, which adds tree node attributes to all data entities
+in the data tree of your module. The simplest way to do
+this is to iterate through all data items and recursively add them to
+the use case builder:
+
+\code
+// find component
+SALOMEDS::SComponent_var comp = study->FindComponent( "MYMODULE" );
+// add tree node attributes only if component data is present in the study
+if ( !CORBA::is_nil( comp ) ) {
+  // get the use case builder
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  // check if tree nodes are already set
+  if ( !useCaseBuilder->IsUseCaseNode( comp.in() ) ) {
+    // set the current node of the use case builder to the root
+    useCaseBuilder->SetRootCurrent();
+    // add component item to the top level of the use case tree
+    useCaseBuilder->Append( comp.in() );
+    // iterate through all child items recursively
+    SALOMEDS::ChildIterator_var iter = study->NewChildIterator( comp.in() );
+    for ( iter->InitEx( true ); iter->More(); iter->Next() ) {
+      SALOMEDS::SObject_var sobj   = iter->Value();
+      SALOMEDS::SObject_var father = sobj->GetFather();
+      // add an object to the corresponding level in the use case tree
+      useCaseBuilder->AppendTo( father.in(), sobj.in() );
+      // clean up (avoid memory leaks)
+      sobj->UnRegister();
+      father->UnRegister();
+    }
+  }
+  useCaseBuilder->UnRegister(); // clean up
+}
+\endcode
+
+\page drag_and_drop Implementing Drag and Drop functionality in SALOME module
+
+\tableofcontents
+
+<b>Drag and Drop</b> provides a simple visual mechanism to transfer
+information between and within applications. 
+
+In some aspects Drag and drop operates similarly to the clipboard copy/cut/paste
+mechanism.
+
+Since SALOME GUI is implemented on Qt, the drag and drop functionality support
+is provided by means of the corresponding Qt mechanisms.
+
+Currently dragging and dropping of the items can be done within Object browser only,
+however this functionality can be extended to other GUI elements as well.
+
+\section enable_drag_and_drop Enabling drag and drop in SALOME module
+
+The Drag and drop functionality is enabled by default in the Object browser. However,
+to allow dragging of a data object or dropping data on it, it is necessary to redefine
+\c isDraggable() and \c isDropAccepted() methods of the corresponding class, a successor
+of the \c SUIT_DataObject. These methods are defined in the base class \c SUIT_DataObject
+and default implementation of both functions returns \c false, which prevents dragging and
+dropping:
+
+\code
+bool SUIT_DataObject::isDraggable() const
+{
+  return false;
+}
+
+bool SUIT_DataObject::isDropAccepted() const
+{
+  return false;
+}
+\endcode
+
+If your data model is based on the \c SUIT_DataObject and \c SUIT_TreeModel, just
+re-implement these functions in your successor data object class and return \c true
+when it is needed (for example, depending on the data object type, state, etc).
+
+Another alternative is available if your module is directly inherited from
+\c LightApp_Module or \c SalomeApp_Module class (as the majority of existing SALOME modules).
+The class \c LightApp_Module (and thus \c SalomeApp_Module also) already provides
+high-level API that can be used for enabling drag and drop functionality.
+
+To enable dragging, redefine \c isDraggable() method of your module class. In this method
+you can analyze the data object subject to the drag operation and decide if
+it is necessary to enable or prevent its dragging:
+
+\code
+bool MyModuleGUI::isDraggable( const SUIT_DataObject* what ) const
+{
+  bool result = false;
+  const MyDataObject* obj = dynamic_cast<const MyDataObject*>( what );
+  if ( obj ) {
+    // check if object can be dragged
+    result = <some condition>;
+  }
+  return result;
+}
+\endcode
+
+Note, that you should not invoke here method \c isDragEnabled() of your data object class
+(in case if it inherits \c LightApp_DataObject or \c SalomeApp_DataObject), unless you
+redefine methods \c isDraggable() and \c isDropAccepted() in your data object class. 
+The reason is that the implementation of these methods in \c LightApp_DataObject class
+redirects calls to the \c LightApp_Module - be careful to avoid entering endless
+recursion loop.
+
+To allow data dropping to an object (the object under the mouse cursor in the
+Object browser during the drag operation) redefine \c isDropAccepted() method of your
+module class:
+
+\code
+bool MyModuleGUI::isDropAccepted( const SUIT_DataObject* where ) const
+{
+  bool result = false;
+  const MyDataObject* obj = dynamic_cast<const MyDataObject*>( where );
+  if ( obj ) {
+    // check if object supports dropping
+    result = <some condition>;
+  }
+  return result;
+}
+\endcode
+
+The caution about avoiding recursive loop mentioned above is also valid for
+\c isDropAccepted() method.
+
+\section handle_data_dropping Handling data dropping
+
+When dragging operation is completed (the data is dropped to an object) the module owning
+the item on which the data is dropped is notified by invoking its \c dropObjects() method:
+
+\code
+void LightApp_Module::dropObjects( const DataObjectList& what,
+                                   SUIT_DataObject* where,
+                                   const int row,
+                                   Qt::DropAction action )
+{
+}
+\endcode
+
+The default implementation does nothing. However, this method can be redifined in the
+successor class and handle the operation properly. The list of dropped
+data objects is passed via \c what parameter. The data object on which
+the data is dropped is passed via \c where parameter. The parameter \c row specifies in the children list
+the position of object where data is dropped; if this parameter is equal to -1, the
+data is dropped to the end of the children list. Performed drop action is passed
+via \c action parameter; possible values are \c Qt::CopyAction and \c Qt::MoveAction
+(other actions are currently unsupported).
+
+The method \c dropObjects() should analyze the parameters and apply
+the corresponding actions for rearrangement of the data tree, copying or moving the data items depending on the
+operation performed. For example:
+
+\code
+void MyModuleGUI::dropObjects( const DataObjectList& what, SUIT_DataObject* where,
+                               const int row, Qt::DropAction action )
+{
+  if ( action != Qt::CopyAction && action != Qt::MoveAction )
+    return; // unsupported action
+
+  // get parent object
+  MyDataObject* whereObj = dynamic_cast<MyDataObject*>( where );
+  if ( !dataObj ) return; // wrong parent
+
+  // iterate through all objects being dropped
+  for ( int i = 0; i < what.count(); i++ ) {
+    MyDataObject* whatObj = dynamic_cast<MyDataObject*>( what[i] );
+    if ( !whatObj ) continue;                // skip wrong objects
+    // perform copying or moving
+    copyOrMove( whatObj,                     // data object being copied/moved
+                whereObj,                    // target data object
+                row,                         // index in the target data object
+                action == Qt::CopyAction );  // true if copying is done
+  }
+  // update Object browser
+  getApp()->updateObjectBrowser( false );
+}
+\endcode
+
+In the above code the function \c copyOrMove() performs actual data tree rearrangement.
+
+\section drag_drop_light_modules Drag and Drop in "light" modules
+
+The data model of the \a light (not having CORBA engine) SALOME module is usually
+based on the custom tree of data objects. The general approach is to
+inherit a custom data
+object class from the \c LightApp_DataObject and a custom data model from the
+\c LightApp_DataModel class. The data model class is responsible for building the
+appropriate presentation of the data tree in the Object browser.
+
+Thus, the implementation of the drag and drop functionality in a \a light module (more
+precisely, the method \a dropObjects() as described above), consists in copying data
+entities (by creating new instances of the corresponding data object class) or moving
+existing data objects to the new position in a tree. The Object browser will update the
+tree representation automatically, as soon as \c updateObjectBrowser() function is called.
+
+\section drag_drop_full_modules Using UseCaseBuilder for Drag and Drop handling in "full" modules
+
+Drag and drop operation requires underlying data model to allow flexible re-arrangement of
+the data entities inside the data tree. In a \a full (CORBA engine based) SALOME
+module, which data model is usually based on the hierarchy of \c SALOMEDS::SObject entities
+provided by the data server functionality, re-arrangement of the data
+tree is not a trivial task.
+
+However, SALOME data server (\c SALOMEDS) CORBA module proposes a mechanism that can be used
+to customize data tree representation in a simple and flexible way -
+\ref use_case_builder "use case builder".
+
+With use case builder, the \c dropObjects() function can be easily implemented. For example:
+
+\code
+// GUI part: process objects dropping
+void MyModuleGUI::dropObjects( const DataObjectList& what, SUIT_DataObject* where,
+                               const int row, Qt::DropAction action )
+{
+  if ( action != Qt::CopyAction && action != Qt::MoveAction )
+    return; // unsupported action
+
+  // get parent object
+  SalomeApp_DataObject* dataObj = dynamic_cast<SalomeApp_DataObject*>( where );
+  if ( !dataObj ) return; // wrong parent
+  _PTR(SObject) parentObj = dataObj->object();
+
+  // collect objects being dropped
+  MYMODULE_ORB::object_list_var objects = new MYMODULE_ORB::object_list();
+  objects->length( what.count() );
+  int count = 0;
+  for ( int i = 0; i < what.count(); i++ ) {
+    dataObj = dynamic_cast<SalomeApp_DataObject*>( what[i] );
+    if ( !dataObj ) continue;  // skip wrong objects
+    _PTR(SObject) sobj = dataObj->object();
+    objects[i] = _CAST(SObject, sobj)->GetSObject();
+    count++;
+  }
+  objects->length( count );
+
+  // call engine function
+  engine()->copyOrMove( objects.in(),                              // what
+                        _CAST(SObject, parentObj)->GetSObject(),   // where
+                        row,                                       // row
+                        action == Qt::CopyAction );                // isCopy
+
+  // update Object browser
+  getApp()->updateObjectBrowser( false );
+}
+
+// Engine part: perform actual data copying / moving
+void MyModule::copyOrMove( const MYMODULE_ORB::object_list& what,
+                           SALOMEDS::SObject_ptr where,
+                           CORBA::Long row, CORBA::Boolean isCopy )
+{
+  if ( CORBA::is_nil( where ) ) return; // bad parent
+
+  SALOMEDS::Study_var study = where->GetStudy();                               // study
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();               // study builder
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();    // use case builder
+  SALOMEDS::SComponent_var father = where->GetFatherComponent();               // father component
+  std::string dataType = father->ComponentDataType();
+  if ( dataType != "MYMODULE" ) return; // not a MYMODULE component
+  
+  SALOMEDS::SObject_var objAfter;
+  if ( row >= 0 && useCaseBuilder->HasChildren( where ) ) {
+    // insert at a given row -> find insertion position
+    SALOMEDS::UseCaseIterator_var useCaseIt = useCaseBuilder->GetUseCaseIterator( where );
+    int i;
+    for ( i = 0; i < row && useCaseIt->More(); i++, useCaseIt->Next() );
+    if ( i == row && useCaseIt->More() ) {
+      objAfter = useCaseIt->Value();
+    }
+  }
+  // process all objects in a given list
+  for ( int i = 0; i < what.length(); i++ ) {
+    SALOMEDS::SObject_var sobj = what[i];
+    if ( CORBA::is_nil( sobj ) ) continue; // skip bad object
+    if ( isCopy ) {
+      // copying is performed
+      // get the name of the object
+      CORBA::String_var name = sobj->GetName();
+      // create a new object, as a child of the component object
+      SALOMEDS::SObject_var new_sobj = studyBuilder->NewObject( father );
+      new_sobj->SetAttrString( "AttributeName", name.in() );
+      sobj = new_sobj;
+      // ... perform other necessary data copying like
+      // adding the corresponding attributes or creation
+      // of servant data entities...
+    }
+    // insert the object or its copy to the use case tree
+    if ( !CORBA::is_nil( objAfter ) )
+      useCaseBuilder->InsertBefore( sobj, objAfter ); // insert at a given row
+    else
+      useCaseBuilder->AppendTo( where, sobj );        // append to the
+  end of the list
+  }
+}
+
+\endcode
+
+*/
