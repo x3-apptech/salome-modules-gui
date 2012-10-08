@@ -1326,10 +1326,7 @@ void SUIT_TreeModel::updateTreeModel(SUIT_DataObject* obj,TreeItem* item)
       if(sitem==0)
         {
           //end of item list
-          if(kitem==0)
-            sitem=createItemAtPos(sobj,item,0);
-          else
-            sitem=createItemAtPos(sobj,item,kitem);
+	  sitem=createItemAtPos(sobj,item,kitem);
           updateTreeModel(sobj,sitem);
           kobj++;
           kitem++;
@@ -1347,7 +1344,8 @@ void SUIT_TreeModel::updateTreeModel(SUIT_DataObject* obj,TreeItem* item)
           else
             {
               // obj : new object
-              createItemAtPos(sobj,item,kitem);
+              sitem=createItemAtPos(sobj,item,kitem);
+	      updateTreeModel(sobj,sitem);
               kobj++;
               kitem++;
               sobj=obj->childObject(kobj);
@@ -1359,7 +1357,7 @@ void SUIT_TreeModel::updateTreeModel(SUIT_DataObject* obj,TreeItem* item)
           //obj and item are synchronised : go to next ones
           updateTreeModel(sobj,sitem);
           if(sobj->modified()) updateItem(sitem, true);
-          if( sobj ) sobj->update();
+          sobj->update();
           kobj++;
           kitem++;
           sobj=obj->childObject(kobj);
@@ -1569,8 +1567,8 @@ SUIT_TreeModel::TreeItem* SUIT_TreeModel::createItemAtPos( SUIT_DataObject* obj,
   SUIT_TreeModel::TreeItem* item = new TreeItem( obj, parent, after );
   myItems[ obj ] = item;
 
-  for(int pos=row;pos < parent->childCount();pos++)
-    parent->child(pos)->setPosition(pos);
+  for(int ppos=row;ppos < parent->childCount();ppos++)
+    parent->child(ppos)->setPosition(ppos);
 
   endInsertRows();
 

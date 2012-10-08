@@ -38,6 +38,8 @@ const Selection_Mode EdgeSelection = 3;
 const Selection_Mode FaceSelection = 4;
 const Selection_Mode VolumeSelection = 5;
 const Selection_Mode ActorSelection = 6;
+const Selection_Mode Elem0DSelection = 7;
+const Selection_Mode BallSelection = 8;
 
 
 #endif

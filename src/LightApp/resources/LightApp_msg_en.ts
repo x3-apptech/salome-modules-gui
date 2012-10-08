@@ -607,6 +607,10 @@ The changes will be applied on the next application session.</translation>
         <translation>Look and feel</translation>
     </message>
     <message>
+        <source>PREF_SHOW_SPLASH</source>
+        <translation>Show splash screen at start-up</translation>
+    </message>
+    <message>
         <source>PREF_OPAQUE_RESIZE</source>
         <translation>Opaque resize</translation>
     </message>

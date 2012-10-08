@@ -142,6 +142,7 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
         view->emitSortingEnabled( a->isChecked() );
         if ( a->isChecked() ) {
           connect( this, SIGNAL( sectionClicked( int ) ), view, SLOT( onHeaderClicked( int ) ) );
+	  setSortIndicator( 0, Qt::AscendingOrder );
           view->sortByColumn( sortIndicatorSection(), sortIndicatorOrder() );
         }
         else {

@@ -124,14 +124,30 @@ ComputeVisiblePropBounds(vtkRenderer* theRenderer,
       if(VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast(aProp))
         if(anActor->IsInfinitive())
           continue;
-        
       vtkFloatingPointType *aBounds = aProp->GetBounds();
+      static vtkFloatingPointType MIN_DISTANCE = 1./VTK_LARGE_FLOAT;
       static vtkFloatingPointType MAX_DISTANCE = 0.9*VTK_LARGE_FLOAT;
+
+      if(abs(aBounds[1] - aBounds[0]) < MIN_DISTANCE) {
+        aBounds[0]-=0.001;
+        aBounds[1]+=0.001;
+      }
+
+      if(abs(aBounds[3] - aBounds[2]) < MIN_DISTANCE) {
+        aBounds[2]-=0.001;
+        aBounds[3]+=0.001;
+      }
+
+      if(abs(aBounds[5] - aBounds[4]) < MIN_DISTANCE) {
+        aBounds[4]-=0.001;
+        aBounds[5]+=0.001;
+      }
+      
       // make sure we haven't got bogus bounds
       if ( aBounds != NULL &&
            aBounds[0] > -MAX_DISTANCE && aBounds[1] < MAX_DISTANCE &&
            aBounds[2] > -MAX_DISTANCE && aBounds[3] < MAX_DISTANCE &&
-           aBounds[4] > -MAX_DISTANCE && aBounds[5] < MAX_DISTANCE )
+           aBounds[4] > -MAX_DISTANCE && aBounds[5] < MAX_DISTANCE)           
       {
         aCount++;
 

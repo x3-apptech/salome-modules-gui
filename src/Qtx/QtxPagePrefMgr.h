@@ -253,7 +253,7 @@ class QTX_EXPORT QtxPagePrefFrameItem : public QtxPagePrefItem
 {
 public:
   QtxPagePrefFrameItem( const QString&, QtxPreferenceItem* = 0,
-                        const QString& = QString(), const QString& = QString() );
+                        const QString& = QString(), const QString& = QString(), const bool = false );
   virtual ~QtxPagePrefFrameItem();
 
   virtual void     updateContents();

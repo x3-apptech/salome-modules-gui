@@ -391,7 +391,7 @@ QString Qtx::file( const QString& path, bool withExt )
   if ( withExt )
     return QFileInfo( fPath ).fileName();
   else
-    return QFileInfo( fPath ).baseName();
+    return QFileInfo( fPath ).completeBaseName();
 }
 
 /*!

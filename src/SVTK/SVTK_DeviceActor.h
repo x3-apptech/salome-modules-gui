@@ -249,6 +249,10 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   virtual
   bool 
   IsCoincident3DAllowed() const;
+  
+  void
+  SetResolveCoincidentTopology(bool theIsResolve);
+    
 
 
  protected:

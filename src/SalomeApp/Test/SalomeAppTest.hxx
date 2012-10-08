@@ -25,7 +25,17 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-class SalomeAppTest : public CppUnit::TestFixture
+#ifdef WIN32
+# if defined SALOMEAPPTEST_EXPORTS || defined SalomeAppTest_EXPORTS
+#  define SALOMEAPPTEST_EXPORT __declspec( dllexport )
+# else
+#  define SALOMEAPPTEST_EXPORT __declspec( dllimport )
+# endif
+#else
+# define SALOMEAPPTEST_EXPORT
+#endif
+
+class SALOMEAPPTEST_EXPORT SalomeAppTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( SalomeAppTest );
   CPPUNIT_TEST( testSalomeApp );

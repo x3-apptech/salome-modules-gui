@@ -121,7 +121,7 @@ libSalomeApp_la_CPPFLAGS = $(PYTHON_INCLUDES) $(QT_INCLUDES) $(QWT_INCLUDES)	\
 	-I$(srcdir)/../Event -I$(srcdir)/../CASCatch  -I$(srcdir)/../Prs        \
 	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @LIBXML_INCLUDES@
 libSalomeApp_la_LDFLAGS = $(PYTHON_LIBS) $(QT_MT_LIBS) 
-libSalomeApp_la_LIBADD  = $(KERNEL_LDFLAGS) -lOpUtil -lSALOMELocalTrace -lSalomeDSClient		\
+libSalomeApp_la_LIBADD  = $(KERNEL_LDFLAGS) -lOpUtil -lSALOMELocalTrace -lSalomeLifeCycleCORBA -lSalomeDSClient		\
 	../SUIT/libsuit.la ../STD/libstd.la ../CAM/libCAM.la ../ObjBrowser/libObjBrowser.la	\
 	../Prs/libSalomePrs.la ../SPlot2d/libSPlot2d.la ../GLViewer/libGLViewer.la		\
 	../OCCViewer/libOCCViewer.la ../VTKViewer/libVTKViewer.la ../OBJECT/libSalomeObject.la	\

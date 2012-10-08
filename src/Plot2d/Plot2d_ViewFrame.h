@@ -88,18 +88,14 @@ public:
   void           setTitle( const QString& );
   QString        getTitle() const;
 
-  /* addition MultiX */
-  void createCurveTooltips( Plot2d_Curve *curve,
-                            Plot2d_QwtPlotPicker *picker);
-
-  void displayPlot2dCurveList( QList< QList<Plot2d_Curve*> > sysCoCurveList,
-                               Plot2d_QwtPlotPicker*         picker,
-                               bool                          displayLegend);
+  QVector< QVector<QwtPlotCurve *> > displayPlot2dCurveList( const QList< QList<Plot2d_Curve*> >& sysCoCurveList,
+                                                             bool                                 displayLegend,
+                                                             const QList< QList<bool> >&          sides);
   
-  void displayPlot2dCurveList( QList<Plot2d_Curve*>  curveList,
-                                                int  groupsize,
-                               Plot2d_QwtPlotPicker* picker,
-                                               bool  displayLegend);
+  QVector< QVector<QwtPlotCurve *> > displayPlot2dCurveList( const QList<Plot2d_Curve*>&  curveList,
+                                                             int  groupsize,
+                                                             bool  displayLegend,
+                                                             const QList< bool >& sides);
   
   Plot2d_Curve* createPlot2dCurve( QString & title,
                                    QString & unit,
@@ -116,11 +112,12 @@ public:
 
   QColor getPlot2dCurveColor( Plot2d_Curve* plot2dCurve);
 
-  void createSegment( double *X, double *Y, int nbPoint,
-                      Qt::PenStyle lineKind,
-                      int lineWidth,
-                      QColor & lineColor,
-                      QwtSymbol::Style markerKind);
+  QwtPlotCurve *createSegment( double *X, double *Y, int nbPoint,
+                               Qt::PenStyle lineKind,
+                               int lineWidth,
+                               QColor & lineColor,
+                               QwtSymbol::Style markerKind,
+                               bool side=false);
 
   /* curves operations [ obsolete ] */
   void           displayCurve( Plot2d_Curve*, bool = false );
@@ -137,6 +134,8 @@ public:
   void           displayObjects( const objectList&, bool = false );
   void           eraseObject( Plot2d_Object*, bool = false );
   void           eraseObjects( const objectList&, bool = false );
+  void           eraseBasicObject( QwtPlotItem*, bool = false );
+  void           eraseBasicObjects( const QList<QwtPlotItem*> &, bool = false );
   int            getObjects( objectList& ) const;
   bool           isVisible( Plot2d_Object* ) const;
   void           updateObject( Plot2d_Object*, bool = false );

@@ -53,6 +53,8 @@ public:
   QString          text() const;
   void             setText( const QString& );
 
+  QLabel*          label();
+
 private slots:
   void             updateState();
 

@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+//  File   : VTKViewer_MarkerDlg.h
+//  Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
 #ifndef VTKVIEWER_MARKERDLG_H
 #define VTKVIEWER_MARKERDLG_H
@@ -27,10 +29,6 @@
 
 class VTKViewer_MarkerWidget;
 
-/*!
- * Class       : VTKViewer_MarkerDlg
- * Description : Dialog for specifying point marker parameters
- */
 class VTKVIEWER_EXPORT VTKViewer_MarkerDlg : public QtxDialog
 {
   Q_OBJECT
@@ -42,16 +40,15 @@ public:
   void                    setHelpData( const QString& theModuleName,
                                        const QString& theHelpFileName );
 
-  void                    setCustomMarkerMap( VTK::MarkerMap );
-  VTK::MarkerMap          getCustomMarkerMap();
+  void                    setCustomMarkers( const VTK::MarkerMap& );
+  VTK::MarkerMap          customMarkers() const;
+  void                    addMarker( VTK::MarkerType, const QPixmap& );
 
-  void                    setStandardMarker( VTK::MarkerType, VTK::MarkerScale );
+  void                    setMarker( VTK::MarkerType, VTK::MarkerScale );
   void                    setCustomMarker( int );
-  VTK::MarkerType         getMarkerType() const;
-  VTK::MarkerScale        getStandardMarkerScale() const;
-  int                     getCustomMarkerID() const;
-
-  void                    addExtraStdMarker( VTK::MarkerType, const QPixmap& );
+  VTK::MarkerType         markerType() const;
+  VTK::MarkerScale        markerScale() const;
+  int                     markerId() const;
 
 protected:
   void                    keyPressEvent( QKeyEvent* );
@@ -61,9 +58,8 @@ private slots:
 
 private:
   VTKViewer_MarkerWidget* myMarkerWidget;
-
-  QString                 myModuleName;
-  QString                 myHelpFileName;
+  QString                 myModule;
+  QString                 myHelpFile;
 };
 
 #endif

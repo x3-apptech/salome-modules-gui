@@ -163,6 +163,7 @@ protected slots:
   virtual void onMouseMove(SUIT_ViewWindow*, QMouseEvent*);
   virtual void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
   virtual void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
+  virtual void onViewClosed();
 
   void onDumpView();
   void onChangeBackground();

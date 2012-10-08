@@ -56,7 +56,7 @@
 #include <QDebug>
 #define QDEBUG qWarning()
 //#define QDEBUG qDebug()
-#define QLOG(data) QDEBUG << "[XSALOME] " << data
+#define QLOG(data) QDEBUG << __FILE__<<" ["<<__LINE__<<"] : " << data
 #ifdef LOG
 #undef LOG
 #endif

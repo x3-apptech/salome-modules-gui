@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+//  File   : VTKViewer_MarkerWidget.h
+//  Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
 #ifndef VTKVIEWER_MARKERWIDGET_H
 #define VTKVIEWER_MARKERWIDGET_H
@@ -25,10 +27,9 @@
 
 #include <QWidget>
 
-class QButtonGroup;
-class QStackedWidget;
-
-class QtxComboBox;
+class QComboBox;
+class QLabel;
+class QSpinBox;
 
 /*!
  * Class       : VTKViewer_MarkerWidget
@@ -42,36 +43,37 @@ public:
   VTKViewer_MarkerWidget( QWidget* );
   virtual ~VTKViewer_MarkerWidget();
 
-  void             setCustomMarkerMap( VTK::MarkerMap );
-  VTK::MarkerMap   getCustomMarkerMap();
+  void             setCustomMarkers( const VTK::MarkerMap& );
+  VTK::MarkerMap   customMarkers() const;
+  void             addMarker( VTK::MarkerType, const QPixmap& );
 
-  void             setStandardMarker( VTK::MarkerType, VTK::MarkerScale );
+  void             setMarker( VTK::MarkerType, VTK::MarkerScale = VTK::MS_NONE );
   void             setCustomMarker( int );
-  VTK::MarkerType  getMarkerType() const;
-  VTK::MarkerScale getStandardMarkerScale() const;
-  int              getCustomMarkerID() const;
 
-  void             addExtraStdMarker( VTK::MarkerType, const QPixmap& );
+  VTK::MarkerType  markerType() const;
+  VTK::MarkerScale markerScale() const;
+  int              markerId() const;
+
+  QLabel*          typeLabel();
+  QLabel*          scaleLabel();
 
 private:
   void             init();
-  void             addTexture( int, bool = false );
   QPixmap          markerFromData( const VTK::MarkerData& );
 
 private slots:
-  void             onStdMarkerChanged( int );
-  void             onBrowse();
+  void             onTypeChanged( int );
 
 private:
-  QButtonGroup*    myTypeGroup;
-  QStackedWidget*  myWGStack;
-  QtxComboBox*     myStdTypeCombo;
-  QtxComboBox*     myStdScaleCombo;
-  QtxComboBox*     myCustomTypeCombo;
-
-  VTK::MarkerMap   myCustomMarkerMap;
-
-  QList<VTK::MarkerType> myExtraMarkerList;
+  // widgets
+  QLabel*          myTypeLab;
+  QComboBox*       myType;
+  QLabel*          myScaleLab;
+  QSpinBox*        myScale;
+  // custom markers data
+  VTK::MarkerMap   myCustomMarkers;
+  // current item
+  int              myCurrentIdx;
 };
 
 #endif

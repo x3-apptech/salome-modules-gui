@@ -92,6 +92,7 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
 */
 OCCViewer_ViewPort3d::~OCCViewer_ViewPort3d()
 {
+  emit vpClosed();
   Handle(V3d_View) aView = activeView();
   if (!aView.IsNull())
     aView->Remove();

@@ -22,6 +22,7 @@
 
 #include "SVTK_Actor.h"
 #include "SALOME_Actor.h"
+#include "SVTK_Utils.h"
 
 #include "SALOME_InteractiveObject.hxx"
 
@@ -41,19 +42,6 @@
 #include "Utils_SALOME_Exception.hxx"
 #include "utilities.h"
 
-static 
-void
-CopyPoints(vtkUnstructuredGrid* theGrid, vtkDataSet *theSourceDataSet)
-{
-  vtkPoints *aPoints = vtkPoints::New();
-  vtkIdType iEnd = theSourceDataSet->GetNumberOfPoints();
-  aPoints->SetNumberOfPoints(iEnd);
-  for(vtkIdType i = 0; i < iEnd; i++){
-    aPoints->SetPoint(i,theSourceDataSet->GetPoint(i));
-  }
-  theGrid->SetPoints(aPoints);
-  aPoints->Delete();
-}
 
 vtkStandardNewMacro(SVTK_Actor);
 
@@ -123,7 +111,7 @@ SVTK_Actor
   myUnstructuredGrid->Allocate();
 
   vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  CopyPoints(GetSource(),aSourceDataSet);
+  SVTK::CopyPoints(GetSource(),aSourceDataSet);
 
   int aNbOfParts = theMapIndex.Extent();
   for(int ind = 1; ind <= aNbOfParts; ind++){
@@ -194,7 +182,7 @@ SVTK_Actor
   myUnstructuredGrid->Allocate();
 
   vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  CopyPoints(GetSource(),aSourceDataSet);
+  SVTK::CopyPoints(GetSource(),aSourceDataSet);
 
 
   if(theMapIndex.Extent() == 2){
@@ -222,4 +210,21 @@ SVTK_Actor
   }
 
   myMapIndex = theMapIndex;
+}
+
+/*!
+  To publish the actor an all its internal devices
+*/
+void
+SVTK_Actor
+::AddToRender(vtkRenderer* theRenderer)
+{
+  theRenderer->AddActor(this);
+}
+
+void
+SVTK_Actor
+::RemoveFromRender(vtkRenderer* theRenderer) 
+{
+  theRenderer->RemoveActor(this);
 }

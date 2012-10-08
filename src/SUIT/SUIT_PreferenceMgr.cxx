@@ -96,7 +96,7 @@ int SUIT_PreferenceMgr::addItem( const QString& title, const int pId,
       item = new QtxPagePrefTabsItem( title, parent, sect, param );
       break;
     case 2:
-      item = new QtxPagePrefFrameItem( title, parent, sect, param );
+      item = new QtxPagePrefFrameItem( title, parent, sect, param, true );
       break;
     case 3:
       item = new QtxPagePrefGroupItem( title, parent, sect, param );

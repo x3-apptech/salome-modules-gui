@@ -65,6 +65,8 @@ myPrefs( prefs ), mySaved ( false )
   QAbstractButton* impBtn = userButton( insertButton( tr( "IMPORT_BTN_TEXT" ) ) );
   if( impBtn )
     connect( impBtn, SIGNAL( clicked() ), this, SLOT( onImportPref() ) );
+
+  setMinimumSize( 800, 600 );
 }
 
 /*!

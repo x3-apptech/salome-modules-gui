@@ -80,11 +80,6 @@ them.
 Additional information about CORBA technology
 is available at http://www.omg.org
 
-\note In \b SALOME there is a possibility to run
-definite components in the so-called \ref batch_mode_run "batch mode" without GUI provided
-by GUI component. In this case you can work with these components with
-the help of Python commands and scripts.
-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 The architecture of this all-inclusive
 platform for numerical components  responds to the following

@@ -60,7 +60,8 @@ salomeinclude_HEADERS= \
 	SVTK_Recorder.h \
 	SVTK_RecorderDlg.h \
 	SVTK_ImageWriter.h \
-	SVTK_ImageWriterMgr.h
+	SVTK_ImageWriterMgr.h \
+	SVTK_Utils.h
 
 dist_libSVTK_la_SOURCES= \
 	SVTK_Prs.cxx \
@@ -92,6 +93,7 @@ dist_libSVTK_la_SOURCES= \
 	SVTK_RecorderDlg.cxx \
 	SVTK_ImageWriter.cxx \
 	SVTK_ImageWriterMgr.cxx \
+	SVTK_Utils.cxx \
 	vtkPVAxesActor.h \
 	vtkPVAxesActor.cxx \
 	vtkPVAxesWidget.h \

@@ -42,7 +42,7 @@
     <parameter name="image"             value="${GUI_ROOT_DIR}/share/salome/resources/gui/icon_about.png" />
     <parameter name="constant_info"     value="%A [ %V ]" />
     <parameter name="text_colors"       value="#ffffff|#777777" />
-    <parameter name="hide_on_click"     value="no" />
+    <parameter name="hide_on_click"     value="yes" />
     <parameter name="show_progress"     value="yes" />
     <parameter name="show_message"      value="yes" />
     <parameter name="show_percents"     value="yes" />

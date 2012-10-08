@@ -178,14 +178,59 @@ protected:
 
   virtual long userFileId( const QString& _fname ) const
   {
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // In SALOME and SALOME-based applications the user preferences file is named as
+    // - <AppName>.xml.<AppVersion> on Windows
+    // - <AppName>rc.<AppVersion> on Linux
+    // where
+    //   * AppName is application name, default SalomeApp (can be customized in SALOME-based
+    //     applications
+    //   * AppVersion is application version
+    //
+    // Since version 6.5.0 of SALOME, user file is situated in the ~/.config/salome
+    // directory. For backward compatibility, when user preferences from nearest
+    // version of application is searched, user home directory is also looked through,
+    // with lower priority.
+    // 
+    // Since version 6.6.0 of SALOME, user file name on Linux is no more prefixed by dot
+    // symbol since it is situated in hidden ~/.config/salome directory. Files with dot
+    // prefix also though taken into account (with lower priority) for backward compatibility.
+    //
+    // Notes:
+    // - Currently the following format of version number is supported:
+    //   <major>[.<minor>[.<release>[<type><dev>]]]
+    //   Parts in square brackets are considered optional. Here:
+    //   * major   - major version id
+    //   * minor   - minor version id
+    //   * release - maintenance version id
+    //   * type    - dev or patch marker; it can be either one alphabetical symbol (from 'a' to 'z')
+    //               or 'rc' to point release candidate (case-insensitive)
+    //   * dev     - dev version or patch number
+    //   All numerical values must be of range [1-99].
+    //   Examples: 1.0, 6.5.0, 1.2.0a1, 3.3.3rc3 (release candidate 3), 11.0.0p1 (patch 1)
+    //
+    // - Versioning approach can be customized by implementing and using own resource manager class,
+    //   see QtxResurceMgr, SUIT_ResourceMgr classes.
+    //////////////////////////////////////////////////////////////////////////////////////////////
     long id = -1;
     if ( !myExtAppName.isEmpty() ) {
 #ifdef WIN32
-      QRegExp exp( QString( "%1\\.%2\\.([a-zA-Z0-9.]+)$" ).arg( myExtAppName ).arg( currentFormat() ) );
+      // On Windows, user file name is something like SalomeApp.xml.6.5.0 where
+      // - SalomeApp is an application name (can be customized)
+      // - xml is a file format (xml or ini)
+      // - 6.5.0 is an application version, can include alfa/beta/rc marks, e.g. 6.5.0a3, 6.5.0rc1
+      QRegExp exp( QString( "%1\\.%2\\.([a-zA-Z0-9.]+)" ).arg( myExtAppName ).arg( currentFormat() ) );
 #else
-      QRegExp exp( QString( "\\.%1rc\\.([a-zA-Z0-9.]+)$" ).arg( myExtAppName ) );
+      // On Linux, user file name is something like SalomeApprc.6.5.0 where
+      // - SalomeApp is an application name (can be customized)
+      // - 6.5.0 is an application version, can include alfa/beta/rc marks, e.g. 6.5.0a3, 6.5.0rc1
+
+      // VSR 24/09/2012: issue 0021781: since version 6.6.0 user filename is not prepended with "."
+      // when it is stored in the ~/.config/<appname> directory;
+      // for backward compatibility we also check files prepended with "." with lower priority
+      QRegExp exp( QString( "\\.?%1rc\\.([a-zA-Z0-9.]+)" ).arg( myExtAppName ) );
 #endif
-      QRegExp vers_exp( "^([0-9]+)([A-Za-z]?)([0-9]*)$" );
+      QRegExp vers_exp( "^([0-9]+)([A-Z]|RC)?([0-9]*)", Qt::CaseInsensitive );
       
       QString fname = QFileInfo( _fname ).fileName();
       if( exp.exactMatch( fname ) ) {
@@ -195,10 +240,17 @@ protected:
 	if ( vers.count() > 0 ) major = vers[0].toInt();
 	if ( vers.count() > 1 ) minor = vers[1].toInt();
 	if ( vers.count() > 2 ) {
-	  if( vers_exp.indexIn( vers[2] ) != -1 ) {
+	  if ( vers_exp.indexIn( vers[2] ) != -1 ) {
 	    release = vers_exp.cap( 1 ).toInt();
-	    dev1 = vers_exp.cap( 2 )[ 0 ].toLatin1();
-	    dev2 = vers_exp.cap( 3 ).toInt();
+	    QString tag = vers_exp.cap( 2 ).toLower();
+	    if ( !tag.isEmpty() ) {
+	      if ( tag == "rc" ) // release candidate
+		dev1 = 49;       // 'rc'=49
+	      else               // a, b, c, ... 
+		dev1 = (int)( tag[ 0 ].toLatin1() ) - (int)( QChar('a').toLatin1() ) + 1; // 'a'=1, 'b'=2, ..., 'z'=26
+	    }
+	    if ( !vers_exp.cap( 3 ).isEmpty() )
+	      dev2 = vers_exp.cap( 3 ).toInt();
 	  }
 	}
         
@@ -207,7 +259,7 @@ protected:
         id*=100; id+=minor;
         id*=100; id+=release;
         id*=10000;
-        if ( dev > 0 ) id+=dev-10000;
+        if ( dev > 0 ) id-=dev;
       }
     }
     return id;

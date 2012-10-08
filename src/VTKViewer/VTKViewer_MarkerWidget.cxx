@@ -20,254 +20,292 @@
 #include "VTKViewer_MarkerWidget.h"
 #include "VTKViewer_MarkerUtils.h"
 
-#include <QtxComboBox.h>
-
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 
 #include <vtkImageData.h>
 
-#include <QButtonGroup>
-#include <QGridLayout>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QStackedWidget>
+#include <QSpinBox>
 
-#define MARGIN  9
-#define SPACING 6
+const int SPACING = 6;
+enum { TypeRole = Qt::UserRole, IdRole };
 
 /*!
- * Class       : VTKViewer_MarkerWidget
- * Description : Widget for specifying point marker parameters
- */
-
-/*!
-  Constructor
+  \class VTKViewer_MarkerWidget
+  \brief Widget for specifying point marker parameters
 */
-VTKViewer_MarkerWidget::VTKViewer_MarkerWidget( QWidget* theParent )
-: QWidget( theParent )
+
+/*!
+  \brief Constructor
+  \param parent parent widget
+*/
+VTKViewer_MarkerWidget::VTKViewer_MarkerWidget( QWidget* parent )
+  : QWidget( parent ), myCurrentIdx( -1 )
 {
-  QRadioButton* aStandardTypeRB = new QRadioButton( tr( "STANDARD_MARKER" ), this );
-  QRadioButton* aCustomTypeRB   = new QRadioButton( tr( "CUSTOM_MARKER" ), this );
-  myTypeGroup = new QButtonGroup( this );
-  myTypeGroup->addButton( aStandardTypeRB, 0 );
-  myTypeGroup->addButton( aCustomTypeRB,   1 );
-
-  QHBoxLayout* aRadioLayout = new QHBoxLayout;
-  aRadioLayout->setMargin( 0 );
-  aRadioLayout->setSpacing( SPACING );
-  aRadioLayout->addWidget( aStandardTypeRB );
-  aRadioLayout->addWidget( aCustomTypeRB );
-
-  // ---
-
-  myWGStack = new QStackedWidget( this );
-  myWGStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
-
-  // ---
-
-  QWidget* aStdWidget = new QWidget( myWGStack );
-
-  QLabel* aTypeLab  = new QLabel( tr( "TYPE" ),  aStdWidget );
-  QLabel* aScaleLab = new QLabel( tr( "SCALE" ), aStdWidget );
-
-  myStdTypeCombo  = new QtxComboBox( aStdWidget );
-  myStdScaleCombo = new QtxComboBox( aStdWidget );
-
-  QGridLayout* aStdLayout = new QGridLayout;
-  aStdLayout->setMargin( MARGIN );
-  aStdLayout->setSpacing( SPACING );
-  aStdLayout->addWidget( aTypeLab,        0, 0 );
-  aStdLayout->addWidget( myStdTypeCombo,  0, 1 );
-  aStdLayout->addWidget( aScaleLab,       1, 0 );
-  aStdLayout->addWidget( myStdScaleCombo, 1, 1 );
-  aStdWidget->setLayout( aStdLayout );
-
-  // ---
-
-  QWidget* aCustomWidget = new QWidget( myWGStack );
-
-  QLabel* aCustomLab = new QLabel( tr( "CUSTOM" ), aCustomWidget );
-  myCustomTypeCombo = new QtxComboBox( aCustomWidget );
-  QPushButton* aBrowseBtn = new QPushButton( tr( "BROWSE" ), aCustomWidget );
-
-  QGridLayout* aCustomLayout = new QGridLayout;
-  aCustomLayout->setMargin( MARGIN );
-  aCustomLayout->setSpacing( SPACING );
-  aCustomLayout->addWidget( aCustomLab,        0, 0 );
-  aCustomLayout->addWidget( myCustomTypeCombo, 0, 1 );
-  aCustomLayout->addWidget( aBrowseBtn,        0, 2 );
-  aCustomLayout->setRowStretch( 1, 5 );
-  aCustomWidget->setLayout( aCustomLayout );
-
-  // ---
-  
-  myWGStack->insertWidget( 0, aStdWidget );
-  myWGStack->insertWidget( 1, aCustomWidget );
-
-  // ---
-
-  QVBoxLayout* aTopLayout = new QVBoxLayout;
-  aTopLayout->setMargin( MARGIN );
-  aTopLayout->setSpacing( SPACING );
-  aTopLayout->addLayout( aRadioLayout );
-  aTopLayout->addWidget( myWGStack );
-  setLayout( aTopLayout );
-
-  // ---
-
-  connect( myTypeGroup, SIGNAL( buttonClicked( int ) ), myWGStack, SLOT( setCurrentIndex( int ) ) );
-  connect( myStdTypeCombo, SIGNAL( currentIndexChanged( int ) ), this, SLOT( onStdMarkerChanged( int ) ) );
-  connect( aBrowseBtn,  SIGNAL( clicked() ), this, SLOT( onBrowse() ) );
-
-  // ---
-
-  aStandardTypeRB->setChecked( true );
+  // create widgets
+  myTypeLab  = new QLabel( tr( "TYPE" ),  this );
+  myScaleLab = new QLabel( tr( "SCALE" ), this );
+  myType     = new QComboBox( this );
+  myScale    = new QSpinBox( this );
+  // layouting
+  QHBoxLayout* ml = new QHBoxLayout( this );
+  ml->setMargin( 0 );
+  ml->setSpacing( SPACING );
+  ml->addWidget( myTypeLab );
+  ml->addWidget( myType );
+  ml->addWidget( myScaleLab );
+  ml->addWidget( myScale );
+  myType->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  myScale->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  // connect signals/slots
+  connect( myType, SIGNAL( currentIndexChanged( int ) ), this, SLOT( onTypeChanged( int ) ) );
+  // initialize
   init();
 }
 
 /*!
-  Destructor
+  \brief Destructor
 */
 VTKViewer_MarkerWidget::~VTKViewer_MarkerWidget()
 {
 }
 
-void VTKViewer_MarkerWidget::setCustomMarkerMap( VTK::MarkerMap theMarkerMap )
+/*!
+  \brief Set custom markers data
+  \param markerMap custom marker data (a map {index:texture})
+*/
+void VTKViewer_MarkerWidget::setCustomMarkers( const VTK::MarkerMap& markerMap )
 {
-  myCustomMarkerMap = theMarkerMap;
-
-  VTK::MarkerMap::const_iterator it = theMarkerMap.begin(), itEnd = theMarkerMap.end();
-  for( ; it != itEnd; it++ )
+  // store custom markers data
+  myCustomMarkers = markerMap;
+  // clear current custom markers
+  for ( int i = myType->count()-1; i >= 0; i-- ) {
+    int type = myType->itemData( i, TypeRole ).toInt();
+    if ( type == VTK::MT_USER )
+      myType->removeItem( i );
+  }
+  // add custom markers
+  VTK::MarkerMap::const_iterator it;
+  for ( it = myCustomMarkers.begin(); it != myCustomMarkers.end(); ++it )
   {
-    int anId = it->first;
-    VTK::MarkerData aMarkerData = it->second;
-    QPixmap aPixmap = markerFromData( aMarkerData );
-    if( !aPixmap.isNull() )
+    int id = it->first;
+    VTK::MarkerData markerData = it->second;
+    QPixmap icon = markerFromData( markerData );
+    if( !icon.isNull() )
     {
-      myCustomTypeCombo->addItem( aPixmap, QString::number( anId ) );
-      myCustomTypeCombo->setId( myCustomTypeCombo->count()-1, anId );
+      int idx = myType->count()-1;
+      myType->insertItem( idx, icon, QString() );
+      myType->setItemData( idx, VTK::MT_USER, TypeRole );
+      myType->setItemData( idx, id, IdRole );
     }
   }
 }
 
-VTK::MarkerMap VTKViewer_MarkerWidget::getCustomMarkerMap()
+/*!
+  \brief Get custom markers data
+  \return custom marker data
+*/
+VTK::MarkerMap VTKViewer_MarkerWidget::customMarkers() const
 {
-  return myCustomMarkerMap;
+  return myCustomMarkers;
 }
 
-void VTKViewer_MarkerWidget::setStandardMarker( VTK::MarkerType theMarkerType, VTK::MarkerScale theMarkerScale )
+/*!
+  \brief Add standard marker
+  The marker type specified with \a type must be > VTK::MT_USER
+  \param type marker type
+  \param icon marker icon
+*/
+void VTKViewer_MarkerWidget::addMarker( VTK::MarkerType type, const QPixmap& icon )
 {
-  if ( ( theMarkerType > VTK::MT_NONE && theMarkerType < VTK::MT_USER ) ||
-       myExtraMarkerList.contains( theMarkerType ) ) {
-    myTypeGroup->button( 0 )->setChecked( true );
-    myWGStack->setCurrentIndex( 0 );
-    myStdTypeCombo->setCurrentId( theMarkerType );
-    int aMarkerScale = std::max( (int)VTK::MS_10, std::min( (int)VTK::MS_70, (int)theMarkerScale ) );
-    myStdScaleCombo->setCurrentId( aMarkerScale );
+  if ( type > VTK::MT_USER ) {
+    int idx = (int)VTK::MT_USER - 1;
+    // find insertion index
+    while ( idx < myType->count()-1 ) {
+      if ( myType->itemData( idx, TypeRole ) == VTK::MT_USER )
+	break;
+      ++idx;
+    }
+    myType->insertItem( idx, icon, QString() );
+    myType->setItemData( idx, type, TypeRole );
   }
 }
 
-void VTKViewer_MarkerWidget::setCustomMarker( int theId )
+/*!
+  \brief Select specified standard marker as current one
+  \param type marker type
+  \param scale marker scale (optional parameter; can be omitted for extended markers)
+*/
+void VTKViewer_MarkerWidget::setMarker( VTK::MarkerType type, VTK::MarkerScale scale )
 {
-  if ( theId > 0 ) {
-    myTypeGroup->button( 1 )->setChecked( true );
-    myWGStack->setCurrentIndex( 1 );
-    addTexture( theId );
-    myCustomTypeCombo->setCurrentId( theId );
+  if ( type != VTK::MT_USER ) {
+    for ( int i = 0; i < myType->count()-1; i++ ) {
+      if ( type == myType->itemData( i, TypeRole ).toInt() ) {
+	myType->setCurrentIndex( i );
+	break;
+      }
+    }
+  }
+  if ( scale != VTK::MS_NONE )
+    myScale->setValue( qMax( (int)VTK::MS_10, qMin( (int)VTK::MS_70, (int)scale ) ) );
+}
+
+/*!
+  \brief Select specified custom marker as current one
+  \param id custom marker identifier
+*/
+void VTKViewer_MarkerWidget::setCustomMarker( int id )
+{
+  for ( int i = 0; i < myType->count()-1; i++ ) {
+    int type = myType->itemData( i, TypeRole ).toInt();
+    if ( type == VTK::MT_USER && id == myType->itemData( i, IdRole ).toInt() ) {
+      myType->setCurrentIndex( i );
+      break;
+    }
   }
 }
 
-VTK::MarkerType VTKViewer_MarkerWidget::getMarkerType() const
+/*!
+  \brief Get current marker's type.
+  For custom marker, VTK::MT_USER is returned and markerId() function 
+  then returns its identifier.
+  \return currently selected marker type
+*/
+VTK::MarkerType VTKViewer_MarkerWidget::markerType() const
 {
-  return myWGStack->currentIndex() == 0 ? (VTK::MarkerType)myStdTypeCombo->currentId() : VTK::MT_USER;
+  return myType->itemData( myType->currentIndex(), TypeRole ).toInt();
 }
 
-VTK::MarkerScale VTKViewer_MarkerWidget::getStandardMarkerScale() const
+/*!
+  \brief Get current marker's scale size.
+  For custom marker return value is undefined.
+  \return currently selected marker scale size
+*/
+VTK::MarkerScale VTKViewer_MarkerWidget::markerScale() const
 {
-  return myWGStack->currentIndex() == 0 ? (VTK::MarkerScale)myStdScaleCombo->currentId() : VTK::MS_NONE;
+  return myScale->value();
 }
 
-int VTKViewer_MarkerWidget::getCustomMarkerID() const
+/*!
+  \bried Get currently selected custom marker's identifier.
+  For standard markers return value is VTK::MT_NONE.
+*/
+int VTKViewer_MarkerWidget::markerId() const
 {
-  return myWGStack->currentIndex() == 1 ? myCustomTypeCombo->currentId() : 0;
+  int type = myType->itemData( myType->currentIndex(), TypeRole ).toInt();
+  return type == VTK::MT_USER ? myType->itemData( myType->currentIndex(), IdRole ).toInt() : VTK::MT_NONE;
 }
 
-void VTKViewer_MarkerWidget::addExtraStdMarker( VTK::MarkerType theMarkerType, const QPixmap& thePixmap )
+/*!
+  \brief Get access to the internal marker type label
+  \return marker type label widget
+*/
+QLabel* VTKViewer_MarkerWidget::typeLabel()
 {
-  if( myExtraMarkerList.isEmpty() )
-    myStdTypeCombo->insertSeparator( myStdTypeCombo->count() );
-  myStdTypeCombo->addItem( thePixmap, QString() );
-  myStdTypeCombo->setId( myStdTypeCombo->count()-1, theMarkerType );
-
-  myExtraMarkerList.append( theMarkerType );
+  return myTypeLab;
 }
 
+/*!
+  \brief Get access to the internal marker scale label
+  \return marker scale label widget
+*/
+QLabel* VTKViewer_MarkerWidget::scaleLabel()
+{
+  return myScaleLab;
+}
+
+/*!
+  \brief Internal initialization
+*/
 void VTKViewer_MarkerWidget::init()
 {
+  myType->blockSignals( true );
+
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-
-  for ( int i = VTK::MT_POINT; i < VTK::MT_USER; i++ ) {
-    QString icoFile = QString( "ICON_VERTEX_MARKER_%1" ).arg( i );
+  // standard marker types
+  for ( int type = VTK::MT_POINT; type < VTK::MT_USER; type++ ) {
+    QString icoFile = QString( "ICON_VERTEX_MARKER_%1" ).arg( type );
     QPixmap pixmap = resMgr->loadPixmap( "VTKViewer", tr( qPrintable( icoFile ) ) );
-    myStdTypeCombo->addItem( pixmap, QString() );
-    myStdTypeCombo->setId( myStdTypeCombo->count()-1, i );
+    myType->addItem( pixmap, QString() );
+    myType->setItemData( myType->count()-1, type, TypeRole );
   }
+  // standard marker sizes
+  myScale->setMinimum( (int)VTK::MS_10 );
+  myScale->setMaximum( (int)VTK::MS_70 );
+  // add item for loading custom textures
+  myType->addItem( "..." );
+  myType->setItemData( myType->count()-1, VTK::MT_NONE, TypeRole );
 
-  for ( int i = VTK::MS_10; i <= VTK::MS_70; i++ ) {
-    myStdScaleCombo->addItem( QString::number( (i-1)*0.5 + 1.0 ) );
-    myStdScaleCombo->setId( myStdScaleCombo->count()-1, i );
-  }
+  myType->blockSignals( false );
+
+  // set current item to first type in the list
+  myType->setCurrentIndex( 0 );
 }
 
-void VTKViewer_MarkerWidget::addTexture( int id, bool select )
+/*!
+  \brief Create icon from the custom marker data (texture)
+  \param markerData custom marker data
+  \return icon generated from texture specified with marker data
+*/
+QPixmap VTKViewer_MarkerWidget::markerFromData( const VTK::MarkerData& markerData )
 {
-  if ( id > 0 && myCustomTypeCombo->index( id ) == -1 &&
-       myCustomMarkerMap.find( id ) != myCustomMarkerMap.end() ) {
-    VTK::MarkerData aMarkerData = myCustomMarkerMap[ id ];
-    QPixmap pixmap = markerFromData( aMarkerData );
-    if( !pixmap.isNull() ) {
-      myCustomTypeCombo->addItem( pixmap, QString::number( id ) );
-      myCustomTypeCombo->setId( myCustomTypeCombo->count()-1, id );
-      if ( select ) myCustomTypeCombo->setCurrentId( id );
+  // get texture data
+  const VTK::MarkerTexture& texture = markerData.second;
+  // generate VTK image
+  vtkSmartPointer<vtkImageData> image = VTK::MakeVTKImage( texture, false );
+  // convert VTK image to icon
+  QImage qimage = VTK::ConvertToQImage( image.GetPointer() );
+  return qimage.isNull() ? QPixmap() : QPixmap::fromImage( qimage );
+}
+
+/*!
+  \brief Called when marker type is changed (by the user or programmatically)
+  \param index index of item being selected
+*/
+void VTKViewer_MarkerWidget::onTypeChanged( int index )
+{
+  if ( index == myType->count()-1 ) {
+    // browse new custom texture file item is selected
+    QStringList filters;
+    filters << tr( "Texture files (*.dat)" ) << tr( "All files (*)" );
+    QString fileName = SUIT_Session::session()->activeApplication()->getFileName( true, 
+										  QString(), 
+										  filters.join( ";;" ), 
+										  tr( "LOAD_TEXTURE_TLT" ), 
+										  parentWidget() );
+    if ( !fileName.isEmpty() ) {
+      // load texture and add new marker
+      VTK::MarkerTexture texture;
+      if ( VTK::LoadTextureData( fileName, VTK::MS_NONE, texture ) ) {
+	int id = VTK::GetUniqueId( myCustomMarkers );
+	VTK::MarkerData& markerData = myCustomMarkers[ id ];
+	markerData.first  = fileName.toStdString();
+	markerData.second = texture;
+	QPixmap icon = markerFromData( markerData );
+	if( !icon.isNull() ) {
+	  int idx = myType->count()-1;
+	  myType->blockSignals( true );
+	  myType->insertItem( idx, icon, QString() );
+	  myType->blockSignals( false );
+	  myType->setItemData( idx, VTK::MT_USER, TypeRole );
+	  myType->setItemData( idx, id, IdRole );
+	  myType->setCurrentIndex( idx );
+	  return;
+	}
+      }
     }
+    // if user cancelled texture loading or there was an error when loading texture
+    // reset to the previous item
+    myType->setCurrentIndex( myCurrentIdx );
+    return;
   }
-}
-
-QPixmap VTKViewer_MarkerWidget::markerFromData( const VTK::MarkerData& theMarkerData )
-{
-  const VTK::MarkerTexture& aMarkerTexture = theMarkerData.second;
-  vtkSmartPointer<vtkImageData> anImageData = VTK::MakeVTKImage( aMarkerTexture, false );
-
-  QImage anImage = VTK::ConvertToQImage( anImageData.GetPointer() );
-  if( anImage.isNull() )
-    return QPixmap();
-
-  return QPixmap::fromImage( anImage );
-}
-
-void VTKViewer_MarkerWidget::onStdMarkerChanged( int index )
-{
-  VTK::MarkerType aMarkerType = (VTK::MarkerType)myStdTypeCombo->id( index );
-  bool anIsExtraMarker = myExtraMarkerList.contains( aMarkerType );
-  myStdScaleCombo->setEnabled( !anIsExtraMarker );
-}
-
-void VTKViewer_MarkerWidget::onBrowse()
-{
-  QStringList filters;
-  filters << tr( "Texture files (*.dat)" ) << tr( "All files (*)" );
-  QString aFileName = SUIT_Session::session()->activeApplication()->getFileName( true, QString(), filters.join( ";;" ), tr( "LOAD_TEXTURE_TLT" ), this );
-  if ( !aFileName.isEmpty() ) {
-    VTK::MarkerTexture aMarkerTexture;
-    if ( VTK::LoadTextureData( aFileName, VTK::MS_NONE, aMarkerTexture ) ) {
-      int anId = VTK::GetUniqueId( myCustomMarkerMap );
-      VTK::MarkerData& aMarkerData = myCustomMarkerMap[ anId ];
-      aMarkerData.first = aFileName.toStdString();
-      aMarkerData.second = aMarkerTexture;
-      addTexture( anId, true );
-    }
+  else {
+    myCurrentIdx = index;
   }
+  int type = myType->itemData( index, TypeRole ).toInt();
+  myScale->setEnabled( type < VTK::MT_USER );
+  myScaleLab->setEnabled( type < VTK::MT_USER );
 }

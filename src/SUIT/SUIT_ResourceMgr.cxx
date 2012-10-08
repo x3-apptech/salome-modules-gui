@@ -125,40 +125,45 @@ QString SUIT_ResourceMgr::findAppropriateUserFile( const QString& fname ) const
 
   long id, appr = -1;
 
+  QStringList all_files;
+
   // get all files from the same dir where use file is (should be) situated
   QDir d( QFileInfo( fname ).dir() );
   if ( d.exists() ) {
     d.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
     QStringList l = d.entryList();
-    for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
-    {
-      id = userFileId( *anIt );
-      if ( id < 0 )
-	continue;
-      if( appr < 0 || qAbs( id-id0 ) < qAbs( appr-id0 ) )
-      {
-	appr = id;
-	appr_file = d.absoluteFilePath( *anIt );
-      }
-    }
+    foreach( QString ll, l )
+      all_files << d.absoluteFilePath( ll );
   }
-
   // backward compatibility: check also user's home directory (if it differs from above one)
   QDir home = QDir::home();
   if ( home.exists() && d.canonicalPath() != home.canonicalPath() ) {
     home.setFilter( QDir::Files | QDir::Hidden | QDir::NoSymLinks );
     QStringList l = home.entryList();
+    foreach( QString ll, l )
+      all_files << home.absoluteFilePath( ll );
+  }
 
-    for( QStringList::const_iterator anIt = l.begin(), aLast = l.end(); anIt!=aLast; anIt++ )
+  for( QStringList::const_iterator anIt = all_files.begin(), aLast = all_files.end(); anIt!=aLast; anIt++ )
+  {
+    id = userFileId( *anIt );
+    if ( id < 0 )
+      continue;
+
+    if( appr < 0 || qAbs( id-id0 ) < qAbs( appr-id0 ) )
     {
-      id = userFileId( *anIt );
-      if ( id < 0 )
-	continue;
-      if( appr < 0 || qAbs( id-id0 ) < qAbs( appr-id0 ) )
-      {
-	appr = id;
+      appr = id;
+      appr_file = d.absoluteFilePath( *anIt );
+    }
+    else if ( qAbs( id-id0 ) == qAbs( appr-id0 ) ) {
+      // appr == id that means that another file with equal version id is detected
+      // this can happen, e.g. if one file begins with "." and other one - not
+      // ...
+      // VSR 24/09/2012: issue 0021781: since version 6.6.0 user filename is not prepended with "."
+      // when it is stored in the ~/.config/<appname> directory;
+      // for backward compatibility we also check files prepended with "." with lower priority
+      if ( !QFileInfo( *anIt ).fileName().startsWith(".") )
 	appr_file = home.absoluteFilePath( *anIt );
-      }
     }
   }
   

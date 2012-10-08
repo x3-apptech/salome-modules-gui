@@ -96,6 +96,7 @@ public:
 
 signals:
   void                  vpChangeBackground( const Qtx::BackgroundData& );
+  void                  vpClosed();
 
 public slots:
   virtual bool          synchronize( OCCViewer_ViewPort* );

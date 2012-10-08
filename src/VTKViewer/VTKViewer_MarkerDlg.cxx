@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+//  File   : VTKViewer_MarkerDlg.cxx
+//  Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
 #include "VTKViewer_MarkerDlg.h"
 #include "VTKViewer_MarkerWidget.h"
@@ -26,117 +28,164 @@
 #include <SUIT_Session.h>
 
 #include <QFrame>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QKeyEvent>
 
 /*!
- * Class       : VTKViewer_MarkerDlg
- * Description : Dialog for specifying point marker parameters
- */
+  \class VTKViewer_MarkerDlg
+  \brief Dialog for specifying of point marker parameters
+*/
 
 /*!
-  Constructor
+  \brief Constructor
+  \param parent parent widget
 */
-VTKViewer_MarkerDlg::VTKViewer_MarkerDlg( QWidget* theParent )
-: QtxDialog( theParent, true, true )
+VTKViewer_MarkerDlg::VTKViewer_MarkerDlg( QWidget* parent )
+: QtxDialog( parent, true, true )
 {
+  // set title
   setWindowTitle( tr( "SET_MARKER_TLT" ) );
 
-  myMarkerWidget = new VTKViewer_MarkerWidget( mainFrame() );
+  // create widgets
+  QFrame* frame = new QFrame( mainFrame() );
+  frame->setFrameStyle( QFrame::Sunken | QFrame::Box );
+  myMarkerWidget = new VTKViewer_MarkerWidget( frame );
 
-  QBoxLayout* aTopLayout = new QHBoxLayout( mainFrame() );
-  aTopLayout->setSpacing( 0 );
-  aTopLayout->setMargin( 0 );
-  aTopLayout->addWidget( myMarkerWidget );
+  // layoting
+  QBoxLayout* vl = new QVBoxLayout( frame );
+  vl->setSpacing( 6 ) ;
+  vl->setMargin( 11 );
+  vl->addWidget( myMarkerWidget );
 
+  QBoxLayout* topLayout = new QVBoxLayout( mainFrame() );
+  topLayout->setSpacing( 0 ) ;
+  topLayout->setMargin( 0 );
+  topLayout->addWidget( frame );
+
+  // connect signals / slots
   connect( this, SIGNAL( dlgHelp() ), this, SLOT( onHelp() ) );
 }
 
 /*!
-  Destructor
+  \brief Destructor
 */
 VTKViewer_MarkerDlg::~VTKViewer_MarkerDlg()
 {
 }
 
-void VTKViewer_MarkerDlg::setHelpData( const QString& theModuleName,
-                                       const QString& theHelpFileName )
+/*!
+  \brief Associate documentation page with the dialog box
+  \param module module name
+  \param helpFile reference help file
+*/
+void VTKViewer_MarkerDlg::setHelpData( const QString& module,
+                                       const QString& helpFile )
 {
-  myModuleName = theModuleName;
-  myHelpFileName = theHelpFileName;
+  myModule   = module;
+  myHelpFile = helpFile;
 }
 
+/*!
+  \brief Process key press event
+  \param e key press event
+*/
 void VTKViewer_MarkerDlg::keyPressEvent( QKeyEvent* e )
 {
   QtxDialog::keyPressEvent( e );
   if ( e->isAccepted() )
     return;
 
+  // invoke Help on <F1> key presss
   if ( e->key() == Qt::Key_F1 ) {
     e->accept();
     onHelp();
   }
 }
 
+/*!
+  \brief Activate help for the dialog box
+*/
 void VTKViewer_MarkerDlg::onHelp()
 {
-  if( myModuleName.isNull() || myHelpFileName.isNull() )
-    return;
-
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if (app) 
-    app->onHelpContextModule(myModuleName, myHelpFileName);
-  else {
-    QString platform;
-#ifdef WIN32
-    platform = "winapplication";
-#else
-    platform = "application";
-#endif
-    SUIT_MessageBox::warning(this, tr("WRN_WARNING"),
-                             tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").
-                             arg(app->resourceMgr()->stringValue("ExternalBrowser", 
-                                                                 platform)).
-                             arg(myHelpFileName));
+  if ( !myModule.isEmpty() && !myHelpFile.isEmpty() ) {
+    SUIT_Session::session()->activeApplication()->onHelpContextModule( myModule, myHelpFile );
   }
 }
 
-void VTKViewer_MarkerDlg::setCustomMarkerMap( VTK::MarkerMap theMarkerMap )
+/*!
+  \brief Set custom markers data
+  \param markerMap custom marker data (a map {index:texture})
+*/
+void VTKViewer_MarkerDlg::setCustomMarkers( const VTK::MarkerMap& markerMap )
 {
-  myMarkerWidget->setCustomMarkerMap( theMarkerMap );
+  myMarkerWidget->setCustomMarkers( markerMap );
 }
 
-VTK::MarkerMap VTKViewer_MarkerDlg::getCustomMarkerMap()
+/*!
+  \brief Get custom markers data
+  \return custom marker data
+*/
+VTK::MarkerMap VTKViewer_MarkerDlg::customMarkers() const
 {
-  return myMarkerWidget->getCustomMarkerMap();
+  return myMarkerWidget->customMarkers();
 }
 
-void VTKViewer_MarkerDlg::setStandardMarker( VTK::MarkerType theMarkerType, VTK::MarkerScale theMarkerScale )
+/*!
+  \brief Add standard marker
+  The marker type specified with \a type must be > VTK::MT_USER
+  \param type marker type
+  \param icon marker icon
+*/
+void VTKViewer_MarkerDlg::addMarker( VTK::MarkerType type, const QPixmap& icon )
 {
-  myMarkerWidget->setStandardMarker( theMarkerType, theMarkerScale );
+  myMarkerWidget->addMarker( type, icon );
 }
 
-void VTKViewer_MarkerDlg::setCustomMarker( int theId )
+/*!
+  \brief Select specified standard marker as current one
+  \param type marker type
+  \param scale marker scale (optional parameter; can be omitted for extended markers)
+*/
+void VTKViewer_MarkerDlg::setMarker( VTK::MarkerType type, VTK::MarkerScale scale )
 {
-  myMarkerWidget->setCustomMarker( theId );
+  myMarkerWidget->setMarker( type, scale );
 }
 
-VTK::MarkerType VTKViewer_MarkerDlg::getMarkerType() const
+/*!
+  \brief Select specified custom marker as current one
+  \param id custom marker identifier
+*/
+void VTKViewer_MarkerDlg::setCustomMarker( int id )
 {
-  return myMarkerWidget->getMarkerType();
+  myMarkerWidget->setCustomMarker( id );
 }
 
-VTK::MarkerScale VTKViewer_MarkerDlg::getStandardMarkerScale() const
+/*!
+  \brief Get current marker's type.
+  For custom marker, VTK::MT_USER is returned and markerId() function 
+  then returns its identifier.
+  \return currently selected marker type
+*/
+VTK::MarkerType VTKViewer_MarkerDlg::markerType() const
 {
-  return myMarkerWidget->getStandardMarkerScale();
+  return myMarkerWidget->markerType();
 }
 
-int VTKViewer_MarkerDlg::getCustomMarkerID() const
+/*!
+  \brief Get current marker's scale size.
+  For custom marker return value is undefined.
+  \return currently selected marker scale size
+*/
+VTK::MarkerScale VTKViewer_MarkerDlg::markerScale() const
 {
-  return myMarkerWidget->getCustomMarkerID();
+  return myMarkerWidget->markerScale();
 }
 
-void VTKViewer_MarkerDlg::addExtraStdMarker( VTK::MarkerType theMarkerType, const QPixmap& thePixmap )
+/*!
+  \bried Get currently selected custom marker's identifier.
+  For standard markers return value is VTK::MT_NONE.
+*/
+int VTKViewer_MarkerDlg::markerId() const
 {
-  myMarkerWidget->addExtraStdMarker( theMarkerType, thePixmap );
+  return myMarkerWidget->markerId();
 }

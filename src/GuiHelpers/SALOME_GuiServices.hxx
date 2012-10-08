@@ -31,13 +31,13 @@
 #include CORBA_SERVER_HEADER(SALOMEDS)
 #include <SALOME_InteractiveObject.hxx>
 #include <SALOME_KernelServices.hxx>
-
+#include "SalomeGuiHelpers.hxx"
 namespace GUI {
 
   // SALOME GUI main services
-  SalomeApp_Application * getSalomeApplication();
-  LightApp_SelectionMgr * getSelectionManager();
-  SUIT_ResourceMgr      * getResourcesManager();
+  SALOMEGUIHELPERS_EXPORT SalomeApp_Application * getSalomeApplication();
+  SALOMEGUIHELPERS_EXPORT LightApp_SelectionMgr * getSelectionManager();
+  SALOMEGUIHELPERS_EXPORT SUIT_ResourceMgr      * getResourcesManager();
 
   // Helper functions to deal with the study in a GUI context.
   //
@@ -58,14 +58,14 @@ namespace GUI {
   // depends of the SALOME module technical choices). In general, on
   // of the attribute of a SObject is a CORBA servant that handles the
   // data to work with
-  SALOMEDS::Study_ptr getActiveStudy();
-  int                 getActiveStudyId();
+  SALOMEGUIHELPERS_EXPORT SALOMEDS::Study_ptr getActiveStudy();
+  SALOMEGUIHELPERS_EXPORT int                 getActiveStudyId();
 
   // Another way to get the active study (to be converted in
   // SALOMEDS::Study):
-  SalomeApp_Study   * getSalomeAppActiveStudy();
+  SALOMEGUIHELPERS_EXPORT SalomeApp_Study   * getSalomeAppActiveStudy();
 
-  SALOMEDS::SObject_ptr IObjectToSObject(const Handle(SALOME_InteractiveObject)& iobject);
+  SALOMEGUIHELPERS_EXPORT SALOMEDS::SObject_ptr IObjectToSObject(const Handle(SALOME_InteractiveObject)& iobject);
 
   template<class TInterface> typename TInterface::_var_type
   IObjectToInterface(const Handle(SALOME_InteractiveObject)& iobject) {

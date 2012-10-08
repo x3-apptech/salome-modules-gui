@@ -169,6 +169,9 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 */
 OCCViewer_Viewer::~OCCViewer_Viewer() 
 {
+  myAISContext.Nullify();
+  myV3dViewer.Nullify();
+  myV3dCollector.Nullify();
 }
 
 /*!
@@ -240,6 +243,8 @@ SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
   initView( vw );
   // set default background for view window
   vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
+  // connect signal from viewport
+  connect(view->getViewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
   return view;
 }
 
@@ -368,6 +373,17 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
   myAISContext->Select();
 
   emit selectionChanged();
+}
+
+void OCCViewer_Viewer::onViewClosed()
+{
+  Standard_Integer aViewsNb = 0;
+  for ( myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews(); myV3dViewer->NextActiveViews())
+    ++aViewsNb;
+  if ( aViewsNb < 2 ) {
+    //clean up presentations before last view is closed
+    myAISContext->RemoveAll(Standard_False);
+  }
 }
 
 int OCCViewer_Viewer::getTopLayerId()

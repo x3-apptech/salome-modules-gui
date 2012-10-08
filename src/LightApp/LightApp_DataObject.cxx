@@ -450,7 +450,7 @@ bool LightApp_DataObject::compare( const QVariant& left, const QVariant& right, 
           rid = idsRight[i].toInt( &okRight );
         if ( okLeft && okRight ) {
           // both seem to be correct integer ID
-          return lid < rid;
+	  if ( lid < rid ) return true;
         }
         else if ( okLeft || okRight ) {
           // objects with correct (int) ID have higher priority

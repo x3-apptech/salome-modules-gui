@@ -29,6 +29,8 @@
 
 #include <QString>
 
+#include "SalomeGuiHelpers.hxx"
+
 /*!
  * This class is provided as the base class for the standard gui part
  * of a SALOME module. To define a gui part, you just have to
@@ -56,7 +58,7 @@
  * test package (tst/module/gui/Xsalome.hxx and
  * tst/module/gui/factory.cxx in the XSALOME library).
  */
-class StandardApp_Module: public SalomeApp_Module
+class SALOMEGUIHELPERS_EXPORT StandardApp_Module: public SalomeApp_Module
 {
   Q_OBJECT
 

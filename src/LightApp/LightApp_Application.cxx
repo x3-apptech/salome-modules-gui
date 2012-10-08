@@ -469,14 +469,14 @@ void LightApp_Application::createActionForViewer( const int id,
   QString vtlt = tr( QString( "NEW_WINDOW_%1" ).arg( suffix ).toLatin1().constData() );
   QString tip = tr( "CREATING_NEW_WINDOW" ).arg( vtlt.remove( "&" ) );
   QAction* a = createAction( id,                      // menu action id
-			     tip,                     // status tip
-			     QIcon(),                 // icon
-			     vtlt,                    // menu text
+                             tip,                     // status tip
+                             QIcon(),                 // icon
+                             vtlt,                    // menu text
                              tip,                     // tooltip
                              accel,                   // shortcut
-			     desktop(),               // parent
+                             desktop(),               // parent
                              false,                   // toggle flag
-			     this,                    // receiver
+                             this,                    // receiver
                              SLOT( onNewWindow() ) ); // slot
   createMenu( a, parentId, -1 );
 }
@@ -549,7 +549,7 @@ void LightApp_Application::createActions()
       QString helpFileName = fileIt.key();
       // remove all '//' occurances 
       while ( helpFileName.contains( "//" ) )
-	helpFileName.replace( "//", "" );
+        helpFileName.replace( "//", "" );
       // obtain submenus hierarchy if given
       QStringList smenus = helpFileName.split( "/" );
       helpFileName = smenus.last();
@@ -560,7 +560,7 @@ void LightApp_Application::createActions()
                                  0, desk, false, this, SLOT( onHelpContentsModule() ) );
       a->setData( fileIt.value() );
       if ( !helpSubMenu.isEmpty() ) {
-	smenus.prepend( helpSubMenu );
+        smenus.prepend( helpSubMenu );
       }
       // create sub-menus hierarchy
       int menuId = helpMenu;
@@ -1006,7 +1006,7 @@ void LightApp_Application::onHelpContentsModule()
     // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
     QtxWebBrowser::loadUrl(helpFile);
 #else
-	QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile));
+        QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile));
 #endif
   }
 }
@@ -1077,9 +1077,9 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
 #ifdef WIN32
     // On Win32 platform QWebKit of the Qt 4.6.3 hang up in case 'file://' protocol 
     // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
-	QtxWebBrowser::loadUrl(helpFile, context);
+        QtxWebBrowser::loadUrl(helpFile, context);
 #else
-	QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile),context);
+        QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile),context);
 #endif
     
   }
@@ -1424,13 +1424,13 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm = new OCCViewer_Viewer( true );
 #endif
     vm->setBackground( OCCViewer_ViewFrame::TOP_LEFT,
-		       resMgr->backgroundValue( "OCCViewer", "xz_background", vm->background(OCCViewer_ViewFrame::TOP_LEFT) ) );
+                       resMgr->backgroundValue( "OCCViewer", "xz_background", vm->background(OCCViewer_ViewFrame::TOP_LEFT) ) );
     vm->setBackground( OCCViewer_ViewFrame::TOP_RIGHT,
-		       resMgr->backgroundValue( "OCCViewer", "yz_background", vm->background(OCCViewer_ViewFrame::TOP_RIGHT) ) );
+                       resMgr->backgroundValue( "OCCViewer", "yz_background", vm->background(OCCViewer_ViewFrame::TOP_RIGHT) ) );
     vm->setBackground( OCCViewer_ViewFrame::BOTTOM_LEFT,
-		       resMgr->backgroundValue( "OCCViewer", "xy_background", vm->background(OCCViewer_ViewFrame::BOTTOM_LEFT) ) );
+                       resMgr->backgroundValue( "OCCViewer", "xy_background", vm->background(OCCViewer_ViewFrame::BOTTOM_LEFT) ) );
     vm->setBackground( OCCViewer_ViewFrame::BOTTOM_RIGHT,
-		       resMgr->backgroundValue( "OCCViewer", "background", vm->background(OCCViewer_ViewFrame::MAIN_VIEW) ) );
+                       resMgr->backgroundValue( "OCCViewer", "background", vm->background(OCCViewer_ViewFrame::MAIN_VIEW) ) );
 
     vm->setTrihedronSize(  resMgr->doubleValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ),
                            resMgr->booleanValue( "OCCViewer", "relative_size", vm->trihedronRelative() ));
@@ -1808,7 +1808,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
     SUIT_ProxyModel* proxyModel = dynamic_cast<SUIT_ProxyModel*>(treeModel);
     if ( proxyModel ) {
       connect( proxyModel, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
-	       this,       SLOT( onDropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
+               this,       SLOT( onDropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
     }
 
     // temporary commented
@@ -2020,6 +2020,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   // ... "Look and feel" group <<start>>
   int lookGroup = pref->addPreference( tr( "PREF_GROUP_LOOK_AND_FEEL" ), genTab );
+  pref->setItemProperty( "columns", 2, lookGroup );
+  // .... -> show splash-screen
+  pref->addPreference( tr( "PREF_SHOW_SPLASH" ), lookGroup, LightApp_Preferences::Bool, "launch", "splash" );
   // .... -> opaque resize
   pref->addPreference( tr( "PREF_OPAQUE_RESIZE" ), lookGroup, LightApp_Preferences::Bool, "desktop", "opaque_resize" );
   // .... -> drop-down buttons 
@@ -2127,7 +2130,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   foreach( int gid, idList ) anIndicesList << gid;
   // .... -> 3D viewer background
   int bgId = pref->addPreference( tr( "PREF_3DVIEWER_BACKGROUND" ), bgGroup,
-				  LightApp_Preferences::Background, "OCCViewer", "background" );
+                                  LightApp_Preferences::Background, "OCCViewer", "background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
   pref->setItemProperty( "texture_enabled", !txtList.isEmpty(), bgId );
@@ -2138,7 +2141,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "image_formats", formats, bgId );
   // .... -> XZ viewer background
   bgId = pref->addPreference( tr( "PREF_XZVIEWER_BACKGROUND" ), bgGroup,
-			      LightApp_Preferences::Background, "OCCViewer", "xz_background" );
+                              LightApp_Preferences::Background, "OCCViewer", "xz_background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
   pref->setItemProperty( "texture_enabled", !txtList.isEmpty(), bgId );
@@ -2149,7 +2152,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "image_formats", formats, bgId );
   // .... -> YZ viewer background
   bgId = pref->addPreference( tr( "PREF_YZVIEWER_BACKGROUND" ), bgGroup,
-			      LightApp_Preferences::Background, "OCCViewer", "yz_background" );
+                              LightApp_Preferences::Background, "OCCViewer", "yz_background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
   pref->setItemProperty( "texture_enabled", !txtList.isEmpty(), bgId );
@@ -2160,7 +2163,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "image_formats", formats, bgId );
   // .... -> XY viewer background
   bgId = pref->addPreference( tr( "PREF_XYVIEWER_BACKGROUND" ), bgGroup,
-			      LightApp_Preferences::Background, "OCCViewer", "xy_background" );
+                              LightApp_Preferences::Background, "OCCViewer", "xy_background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
   pref->setItemProperty( "texture_enabled", !txtList.isEmpty(), bgId );
@@ -2220,7 +2223,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   formats = SVTK_Viewer::backgroundData( aValuesList, idList, txtList );
   foreach( int gid, idList ) anIndicesList << gid;
   bgId = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGen,
-			      LightApp_Preferences::Background, "VTKViewer", "background" );
+                              LightApp_Preferences::Background, "VTKViewer", "background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
   pref->setItemProperty( "texture_enabled", !txtList.isEmpty(), bgId );
@@ -3876,7 +3879,7 @@ QString LightApp_Application::browseObjects( const QStringList& theEntryList,
   // scroll to each entry in the list
   // (in optimized mode - to the last entry only)
   QString anEntry;
-  LightApp_DataObject* anObject;
+  LightApp_DataObject* anObject = 0;
   while( anIter.hasNext() )
   {
     anEntry = anIter.next();
@@ -3971,24 +3974,24 @@ void LightApp_Application::onDesktopMessage( const QString& message )
       LightApp_Module* sMod = 0;
       CAM_Module* mod = module( msgType );
       if ( !mod )
-	mod = module( moduleTitle( msgType ) );
+        mod = module( moduleTitle( msgType ) );
       if ( mod && mod->inherits( "LightApp_Module" ) )
-	sMod = (LightApp_Module*)mod;
+        sMod = (LightApp_Module*)mod;
 
       if ( msgType.toLower() == "preferences" ) {
-	// requested preferences change: should be given as "preferences/<section>/<name>/<value>"
-	// for example "preferences/Study/multi_file_dump/true"
-	if ( data.count() > 3 ) {
-	  QString section = data[1].trimmed();
-	  QString param   = data[2].trimmed();
-	  QString value   = QStringList( data.mid(3) ).join( sectionSeparator );
-	  resourceMgr()->setValue( section, param, value );
-	}
+        // requested preferences change: should be given as "preferences/<section>/<name>/<value>"
+        // for example "preferences/Study/multi_file_dump/true"
+        if ( data.count() > 3 ) {
+          QString section = data[1].trimmed();
+          QString param   = data[2].trimmed();
+          QString value   = QStringList( data.mid(3) ).join( sectionSeparator );
+          resourceMgr()->setValue( section, param, value );
+        }
       }
       else if ( sMod ) {
-	// received message for the module
-	QString msg = QStringList( data.mid(1) ).join( sectionSeparator );
-	sMod->message( msg );
+        // received message for the module
+        QString msg = QStringList( data.mid(1) ).join( sectionSeparator );
+        sMod->message( msg );
       }
     }
   }

@@ -50,7 +50,7 @@ public:
   vtkTypeMacro(SVTK_Actor,SVTK_DeviceActor);
 
   //! Initialiaze the instance completely
-  void
+  virtual void
   Initialize();
 
   //! Allows to set an external source 
@@ -61,18 +61,25 @@ public:
   vtkUnstructuredGrid*
   GetSource();
 
+  virtual void
+  AddToRender(vtkRenderer* theRenderer);
+
+  virtual void
+  RemoveFromRender(vtkRenderer* theRenderer);
+
+
   //! Allow to recostruct selected cells from source SALOME_Actor and map of subindexes
-  void
+  virtual void
   MapCells(SALOME_Actor* theMapActor, 
            const TColStd_IndexedMapOfInteger& theMapIndex);
 
   //! Allow to recostruct selected points from source SALOME_Actor and map of subindexes
-  void 
+  virtual void 
   MapPoints(SALOME_Actor* theMapActor, 
             const TColStd_IndexedMapOfInteger& theMapIndex);
 
   //! Allow to recostruct selected edges from source SALOME_Actor and map of subindexes
-  void 
+  virtual void 
   MapEdge(SALOME_Actor* theMapActor, 
           const TColStd_IndexedMapOfInteger& theMapIndex);
 

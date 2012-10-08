@@ -2860,7 +2860,11 @@ QString QtxResourceMgr::userFileName( const QString& appName, const bool /*for_l
 #ifdef WIN32
   fileName = QString( "%1.%2" ).arg( appName ).arg( currentFormat() );
 #else
-  fileName = QString( ".%1rc" ).arg( appName );
+  fileName = QString( "%1rc" ).arg( appName );
+  // VSR 24/09/2012: issue 0021781: do not prepend filename with "."
+  // when user file is stored in ~/.config/<appname> directory
+  if ( cfgAppName.isEmpty() )
+    fileName.prepend( "." );
 #endif
 
   if ( !fileName.isEmpty() )

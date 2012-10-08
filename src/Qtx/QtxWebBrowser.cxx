@@ -154,6 +154,12 @@ QtxWebBrowser::QtxWebBrowser() : QMainWindow( 0 )
   QWidget* frame = new QWidget( this );
 
   myWebView = new QWebView( frame );
+
+  QAction *copyAction = myWebView->pageAction(QWebPage::Copy);
+  copyAction->setShortcut(QKeySequence::Copy);
+  myWebView->addAction(copyAction);
+
+
   myWebView->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
   myFindPanel = new QtxSearchTool( frame, myWebView,
 				   QtxSearchTool::Basic | QtxSearchTool::Case | QtxSearchTool::Wrap, 

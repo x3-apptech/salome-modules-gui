@@ -28,6 +28,8 @@
 #include <QPainter>
 #include <QSlider>
 #include <QStyle>
+#include <QStylePainter>
+#include <QStyleOptionButton>
 
 const int BICOLOR_MAX_DELTA = 100;
 
@@ -41,8 +43,8 @@ class QtxBiColorTool::ColorLabel: public QFrame
 public:
   ColorLabel( QWidget* parent) : QFrame( parent )
   {
-    setFrameStyle( QFrame::Box | QFrame::Plain );
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    setFrameStyle( QFrame::Panel | QFrame::Raised );
+    //setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
   }
   ~ColorLabel() {}
   QSize sizeHint() const
@@ -51,21 +53,48 @@ public:
   }
   QSize minimumSizeHint() const
   {
-    int pm = style()->pixelMetric(QStyle::PM_ButtonMargin);
-    QFontMetrics fm ( font() );
-    return QSize( fm.height() + pm, fm.height() + pm );
+    if ( !mySizeHint.isValid() ) {
+      int is = style()->pixelMetric( QStyle::PM_ButtonIconSize, 0, this );
+      int pm = style()->pixelMetric( QStyle::PM_ButtonMargin );
+      ColorLabel* that = const_cast<ColorLabel*>( this );
+      that->mySizeHint = QSize( is + pm, is + pm );
+    }
+    return mySizeHint; 
   }
   void paintEvent( QPaintEvent* e )
   {
-    QPainter p( this );
-    drawFrame( &p );
-    QRect r = contentsRect();
+    QStylePainter sp(this);
+    QStyleOptionButton option;
+    option.initFrom(this);
+    option.features = QStyleOptionButton::None;
+    option.state |= QStyle::State_Raised;
+    sp.drawControl( QStyle::CE_PushButton, option );
+
+    QRect r = rect();
+    r.setTopLeft( r.topLeft() + QPoint( 2, 2 ) );
+    r.setBottomRight( r.bottomRight() - QPoint( 2, 2 ) );
+
+    QPixmap pix( r.size() );
+    pix.fill( palette().color( backgroundRole() ) );
+
     if ( myColor.isValid() ) {
-      p.fillRect( r, QBrush( myColor ) );
+      QPainter pixp( &pix );
+      pixp.setPen( isEnabled() ? Qt::black : palette().mid().color() );
+      pixp.fillRect( 1, 1, pix.width()-3, pix.height()- 3, QBrush( isEnabled() ? myColor : palette().mid().color() ) );
+      pixp.drawRect( 1, 1, pix.width()-3, pix.height()- 3 );
+      pixp.end();
     }
     else {
-      p.fillRect( r, QBrush( palette().color( foregroundRole() ), Qt::BDiagPattern ) );
+      QPainter pixp( &pix );
+      pixp.setPen( palette().color( isEnabled() ? QPalette::WindowText : QPalette::Mid ) );
+      pixp.drawRect( 2, 2, pix.width() - 4, pix.height() - 4 );
+      pixp.fillRect( 3, 3, pix.width() - 6, pix.height() - 6,
+		     QBrush( palette().color( isEnabled() ? QPalette::WindowText : QPalette::Mid ), Qt::BDiagPattern ) );
+      pixp.end();
     }
+
+    QPainter p( this );
+    p.drawPixmap( r, pix );
     p.end();
   }
   void setColor( const QColor& c )
@@ -75,6 +104,7 @@ public:
   }
   
 private:
+  QSize  mySizeHint;
   QColor myColor;
 };
 
@@ -98,7 +128,7 @@ QtxBiColorTool::QtxBiColorTool( QWidget* parent )
   l->setSpacing( 5 );
 
   myMainColor = new QtxColorButton( this );
-  myMainColor->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  //myMainColor->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
   myExtraText = new QLabel( this );
   myRuler = new QSlider( Qt::Horizontal, this );
   myRuler->setMinimum( -BICOLOR_MAX_DELTA );
@@ -113,6 +143,7 @@ QtxBiColorTool::QtxBiColorTool( QWidget* parent )
   l->addWidget( myExtraText );
   l->addWidget( myRuler );
   l->addWidget( myDelta );
+  myRuler->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
   connect( myMainColor, SIGNAL( changed( QColor ) ),   this, SLOT( updateState() ) );
   connect( myRuler,     SIGNAL( valueChanged( int ) ), this, SLOT( updateState() ) );
@@ -205,6 +236,15 @@ QString QtxBiColorTool::text() const
 void QtxBiColorTool::setText( const QString& txt )
 {
   myExtraText->setText( txt );
+}
+
+/*!
+  \brief Get access to the internal label use for drawing 
+  auxiliary test assigned to the widget
+*/
+QLabel* QtxBiColorTool::label()
+{
+  return myExtraText;
 }
 
 /*!

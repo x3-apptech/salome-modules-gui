@@ -607,6 +607,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Aspect</translation>
     </message>
     <message>
+        <source>PREF_SHOW_SPLASH</source>
+        <translation>Afficher l'écran de démarrage</translation>
+    </message>
+    <message>
         <source>PREF_OPAQUE_RESIZE</source>
         <translation>Redimensionnement opaque</translation>
     </message>

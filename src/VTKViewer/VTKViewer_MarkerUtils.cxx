@@ -123,17 +123,24 @@ namespace VTK
     theImageData->GetExtent( extent );
     int width = extent[1] - extent[0] + 1;
     int height = extent[3] - extent[2] + 1;
+
+    const int wmin = 20;
+    const int hmin = 20;
+
+    int xshift = width  < wmin ? (wmin-width)/2  : 0;
+    int yshift = height < hmin ? (hmin-height)/2 : 0;
   
-    QImage anImage(width, height, QImage::Format_ARGB32);
+    QImage anImage(width < wmin ? wmin : width, height < hmin ? hmin : height, QImage::Format_ARGB32);
+    anImage.fill(qRgba(255,255,255,0));
     for( int i = 0; i < height; i++ )
     {
-      QRgb* bits = reinterpret_cast<QRgb*>( anImage.scanLine(i) );
+      QRgb* bits = reinterpret_cast<QRgb*>( anImage.scanLine(i+yshift) );
       unsigned char* row = static_cast<unsigned char*>(
         theImageData->GetScalarPointer( extent[0], extent[2] + height - i - 1, extent[4] ) );
       for( int j = 0; j < width; j++ )
       {
         unsigned char* data = &row[ j*4 ];
-        bits[j] = qRgba( data[0], data[1], data[2], data[3] );
+        bits[j+xshift] = qRgba( data[0], data[1], data[2], data[3] );
       }
     }
     return anImage;

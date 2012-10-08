@@ -47,6 +47,7 @@
 #include <QDateTimeEdit>
 #include <QStackedWidget>
 #include <QSlider>
+#include <QScrollArea>
 
 #include <stdio.h>
 
@@ -1198,7 +1199,7 @@ void QtxPagePrefTabsItem::updateTabs()
   \param param resource file parameter associated with the preference item
 */
 QtxPagePrefFrameItem::QtxPagePrefFrameItem( const QString& title, QtxPreferenceItem* parent,
-                                            const QString& sect, const QString& param )
+                                            const QString& sect, const QString& param, const bool scrollable )
 : QtxPagePrefItem( title, parent, sect, param )
 {
   QWidget* main = new QWidget();
@@ -1207,7 +1208,15 @@ QtxPagePrefFrameItem::QtxPagePrefFrameItem( const QString& title, QtxPreferenceI
   base->setSpacing( 0 );
 
   base->addWidget( myBox = new QtxGridBox( 1, Qt::Horizontal, main, 5, 5 ) );
-  base->addItem( new QSpacerItem( 0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding ) );
+  base->addStretch();
+
+  if ( scrollable ) {
+    QScrollArea* scroll = new QScrollArea();
+    scroll->setWidget( main );
+    scroll->setWidgetResizable( true );
+    base->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
+    main = scroll;
+  }
 
   setWidget( main );
 }

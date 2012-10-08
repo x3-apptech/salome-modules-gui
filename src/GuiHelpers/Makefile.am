@@ -26,7 +26,8 @@ salomeinclude_HEADERS =        \
 	QtHelper.hxx           \
 	SALOME_GuiServices.hxx       \
 	SALOME_AppStudyEditor.hxx     \
-	StandardApp_Module.hxx
+	StandardApp_Module.hxx     \
+	SalomeGuiHelpers.hxx
 
 # Libraries targets
 lib_LTLIBRARIES = libSalomeGuiHelpers.la
