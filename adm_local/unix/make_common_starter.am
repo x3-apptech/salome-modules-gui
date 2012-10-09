@@ -29,6 +29,11 @@ AM_CXXFLAGS = @KERNEL_CXXFLAGS@ -include SALOMEconfig.h -I$(top_builddir)
 AM_CPPFLAGS = @KERNEL_CXXFLAGS@ -include SALOMEconfig.h -I$(top_builddir)
 
 # ============================================================
+# Cmake files wildcard (to add then to the distribution)
+# ============================================================
+CMAKEFILES         = $(notdir $(wildcard $(srcdir)/CMakeLists.txt))
+
+# ============================================================
 # This file defines the common definitions used in several
 # Makefile. This file must be included, if needed, by the file
 # Makefile.am.
@@ -37,7 +42,7 @@ AM_CPPFLAGS = @KERNEL_CXXFLAGS@ -include SALOMEconfig.h -I$(top_builddir)
 #
 salomeincludedir   = $(includedir)/salome
 libdir             = $(prefix)/lib@LIB_LOCATION_SUFFIX@/salome
-libparaviewdir          = $(prefix)/lib@LIB_LOCATION_SUFFIX@/paraview
+libparaviewdir     = $(prefix)/lib@LIB_LOCATION_SUFFIX@/paraview
 bindir             = $(prefix)/bin/salome
 salomescriptdir    = $(bindir)
 salomepythondir    = $(pythondir)/salome
@@ -58,7 +63,7 @@ admlocalunixdir    = $(admlocaldir)/unix
 admlocalm4dir      = $(admlocaldir)/unix/config_files
 
 # Directory for install cmake files
-admlocal_cmakedir = $(admlocaldir)/cmake_files
+admlocal_cmakedir  = $(admlocaldir)/cmake_files
 
 # Shared modules installation directory
 sharedpkgpythondir = $(salomepythondir)/shared_modules
@@ -86,7 +91,8 @@ ui_%.h: %.ui
 
 # extra distributed files
 EXTRA_DIST = $(MOC_FILES:%_moc.cxx=%.h) $(QRC_FILES:qrc_%.cxx=%.qrc) \
-             $(UIC_FILES:ui_%.h=%.ui) $(nodist_salomeres_DATA:%.qm=resources/%.ts)
+             $(UIC_FILES:ui_%.h=%.ui) $(nodist_salomeres_DATA:%.qm=resources/%.ts) \
+             $(CMAKEFILES)
 
 # customize clean operation
 mostlyclean-local:

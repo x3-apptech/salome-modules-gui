@@ -39,3 +39,5 @@ plugins_PYTHON = \
 	xalome.py         \
 	minmax_dialog.py  \
 	minmax_plugin.py
+
+EXTRA_DIST += minmax.ui

@@ -23,9 +23,12 @@
 #  File   : Makefile.am
 #  Author : Patrick GOLDBRONN (CEA)
 
+include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
 ##
 # Common packages
 ##
+
 SUBDIRS_COMMON = CASCatch Qtx Style DDS QDS ObjBrowser SUIT SUITApp STD CAF CAM LogWindow Prs Event OpenGLUtils GUI_PY
 
 ##
