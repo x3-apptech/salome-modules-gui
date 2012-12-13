@@ -56,10 +56,6 @@
         <translation>vtk_view_recording_stop.png</translation>
     </message>
     <message>
-        <source>ICON_SVTK_SYNCHRONIZE</source>
-        <translation>vtk_view_sync.png</translation>
-    </message>
-    <message>
         <source>ICON_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
         <translation>vtk_view_highlight.png</translation>
     </message>

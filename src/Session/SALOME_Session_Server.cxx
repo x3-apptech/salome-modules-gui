@@ -659,11 +659,14 @@ int main( int argc, char **argv )
   // unlock Session mutex
   _SessionMutex.unlock();
   
-  if ( shutdownAll )
+  if ( myServerLauncher )
+    myServerLauncher->ShutdownAll(); // shutdown embedded servers
+
+  if ( shutdownAll )                 // shutdown standalone servers
     shutdownServers( _NS );
 
   if ( myServerLauncher )
-    myServerLauncher->KillAll(); // kill embedded servers
+    myServerLauncher->KillAll();     // kill embedded servers
 
   // Unregister session server
   SALOME_Session_i* sessionServant = dynamic_cast<SALOME_Session_i*>( poa->reference_to_servant( session.in() ) );

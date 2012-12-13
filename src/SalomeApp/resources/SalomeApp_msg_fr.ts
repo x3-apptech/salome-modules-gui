@@ -364,6 +364,18 @@ Voulez-vous le recharger ?</translation>
         <translation>Modifications</translation>
     </message>
     <message>
+        <source>PRP_COMPONENT</source>
+        <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+        <source>PRP_VERSION</source>
+        <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+        <source>PRP_VERSIONS</source>
+        <translation type="unfinished">Stored data</translation>
+    </message>
+    <message>
         <source>PRP_DATE_MODIF</source>
         <translation>Date</translation>
     </message>

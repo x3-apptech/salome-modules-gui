@@ -65,6 +65,28 @@ void SUIT_ExceptionHandler::showMessage( const QString& title, const QString& ms
   
   while ( QApplication::overrideCursor() )
     QApplication::restoreOverrideCursor();
-  
+
+  cleanUp();
+
   SUIT_MessageBox::critical( 0, title, msg );
+}
+
+CleanUpFuncList SUIT_ExceptionHandler::myCleanUpFunctions;
+
+void SUIT_ExceptionHandler::addCleanUpRoutine(CleanUpFunction p)
+{
+  myCleanUpFunctions.append(p);
+}
+
+void SUIT_ExceptionHandler::removeCleanUpRoutine(CleanUpFunction p)
+{
+  myCleanUpFunctions.removeAll(p);
+}
+
+void SUIT_ExceptionHandler::cleanUp()
+{
+  foreach( QtCleanUpFunction f, myCleanUpFunctions )
+  {
+    f();
+  }
 }

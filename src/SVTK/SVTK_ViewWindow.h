@@ -276,6 +276,8 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! To invoke a VTK event on #SVTK_RenderWindowInteractor instance
   void InvokeEvent(unsigned long theEvent, void* theCallData);
   
+  virtual SUIT_CameraProperties cameraProperties();
+  
  signals:
   void Show( QShowEvent * );
   void Hide( QHideEvent * );
@@ -372,6 +374,7 @@ public slots:
   virtual void synchronize(SVTK_ViewWindow*);
     
 protected slots:
+  void synchronize( SUIT_ViewWindow* );
   void onKeyPressed(QKeyEvent* event);
   void onKeyReleased(QKeyEvent* event);
   void onMousePressed(QMouseEvent* event);
@@ -445,13 +448,6 @@ protected:
 
   vtkPVAxesWidget* myAxesWidget;
   Qtx::BackgroundData myBackground;
-
-private slots:
-  void onSynchronizeView(bool);
-  void updateSyncViews();
-
-private:
-  static void synchronizeView( SVTK_ViewWindow*, int );
 
 private:
   QImage myDumpImage;

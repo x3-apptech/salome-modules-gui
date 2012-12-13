@@ -25,16 +25,19 @@
 #include "SUIT_ViewWindow.h"
 
 #include "SUIT_Tools.h"
+#include "SUIT_Session.h"
 #include "SUIT_Study.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_MessageBox.h"
 #include "SUIT_Application.h"
 #include "SUIT_ViewManager.h"
+#include "SUIT_ResourceMgr.h"
 #include "QtxActionToolMgr.h"
 #include "QtxMultiAction.h"
 
 #include <QEvent>
 #include <QIcon>
+#include <QMenu>
 #include <QApplication>
 #include <QContextMenuEvent>
 
@@ -47,7 +50,7 @@ const int DUMP_EVENT = QEvent::User + 123;
 
 /*! Constructor.*/
 SUIT_ViewWindow::SUIT_ViewWindow( SUIT_Desktop* theDesktop )
-  : QMainWindow( theDesktop ), myManager( 0 ), myIsDropDown( true )
+  : QMainWindow( theDesktop ), myManager( 0 ), myIsDropDown( true ), mySyncAction( 0 )
 {
   myDesktop = theDesktop;
 
@@ -259,7 +262,7 @@ QtxActionToolMgr* SUIT_ViewWindow::toolMgr() const
 }
 
 /*!
-  \brief Set buttons mode to drop-down (\a on = \c true) or ligned (\a on = \c false) 
+  \brief Set buttons mode to drop-down (\a on = \c true) or ligned (\a on = \c false)
   \param on new buttons mode
   \sa dropDownButtons()
 */
@@ -320,9 +323,222 @@ bool SUIT_ViewWindow::dropDownButtons() const
 }
 
 /*!
-  \return window unique identifier  
+  \return window unique identifier
 */
 int SUIT_ViewWindow::getId() const
 {
   return int(long(this));
+}
+
+/*!
+  Get camera properties for the view window.
+  \return shared pointer on camera properties. Base implementation
+          returns null properties.
+*/
+SUIT_CameraProperties SUIT_ViewWindow::cameraProperties()
+{
+  return SUIT_CameraProperties();
+}
+
+/*!
+  Synchronize this view window's camera properties with specified
+  view window.
+
+  This method is a part of general views synchronization mechanism.
+  It should be redefined in successors. Base imlementation does nothing.
+
+  \param otherWindow other view window
+*/
+void SUIT_ViewWindow::synchronize( SUIT_ViewWindow* /*otherWindow*/ )
+{
+  // base implementation does nothing
+}
+
+/*!
+  Get action for views syncronization.
+
+  This method is a part of general views synchronization mechanism.
+  It creates an action that can be inserted, for instance, to the toolbar.
+
+  \return action for views synchronization
+*/
+QAction* SUIT_ViewWindow::synchronizeAction()
+{
+  if ( !mySyncAction ) {
+    SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+    mySyncAction = new QtxAction( tr( "MNU_SYNCHRONIZE_VIEW" ),
+				  resMgr->loadPixmap( "SUIT", tr( "ICON_VIEW_SYNC" ) ),
+				  tr( "MNU_SYNCHRONIZE_VIEW" ), 0, this );
+    mySyncAction->setStatusTip( tr( "DSC_SYNCHRONIZE_VIEW" ) );
+    mySyncAction->setMenu( new QMenu( this ) );
+    mySyncAction->setCheckable( true );
+    connect( mySyncAction->menu(), SIGNAL( aboutToShow() ),     this, SLOT( updateSyncViews() ) );
+    connect( mySyncAction,         SIGNAL( triggered( bool ) ), this, SLOT( onSynchronizeView( bool ) ) );
+  }
+  return mySyncAction;
+}
+
+/*!
+  Emit notification signal that the view is transformed.
+  Other views can use the signal for synchronization.
+*/
+void SUIT_ViewWindow::emitViewModified()
+{
+  emit viewModified( this );
+}
+
+/*!
+  Update list of available view for the "Synchronize View" action
+*/
+void SUIT_ViewWindow::updateSyncViews()
+{
+  SUIT_CameraProperties props = cameraProperties();
+  if ( !props.isValid() )
+    return;
+
+  QAction* anAction = synchronizeAction();
+  if ( anAction && anAction->menu() ) {
+    int currentId = anAction->data().toInt();
+    anAction->menu()->clear();
+    SUIT_Application* app = SUIT_Session::session()->activeApplication();
+    if ( app ) {
+      SUIT_Desktop* d = app->desktop();
+      QList<SUIT_ViewWindow*> allViews = qFindChildren<SUIT_ViewWindow*>( d );
+      foreach( SUIT_ViewWindow* vw, allViews ) {
+	if ( !vw || vw == this ) continue; // skip invalid views and this one
+	SUIT_CameraProperties otherProps = vw->cameraProperties();
+	if ( otherProps.isCompatible( props ) ) {
+	  QAction* a = anAction->menu()->addAction( vw->windowTitle() );
+	  if ( vw->getId() == currentId ) {
+	    QFont f = a->font();
+	    f.setBold( true );
+	    a->setFont( f );
+	  }
+	  a->setData( vw->getId() );
+	  connect( a, SIGNAL( triggered( bool ) ), this, SLOT( onSynchronizeView( bool ) ) );
+	}
+	else if ( vw->getId() == currentId ) {
+	  // other view, this one is being currently synchronized to, seems has become incompatible
+	  // we have to break synchronization
+	  vw->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), this, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+	  this->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), vw, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+	  // 
+	  bool blocked = anAction->blockSignals( true );
+	  anAction->setChecked( false );
+	  anAction->blockSignals( blocked );
+	  anAction->setData( 0 );
+	  //
+	  QAction* a = vw->synchronizeAction();
+	  if ( a ) {
+	    blocked = a->blockSignals( true );
+	    a->setChecked( false );
+	    a->blockSignals( blocked );
+	  }
+	}
+      }
+    }
+    if ( anAction->menu()->actions().isEmpty() ) {
+      anAction->setData( 0 );
+      anAction->menu()->addAction( tr( "MNU_SYNC_NO_VIEW" ) );
+    }
+  }
+}
+
+/*!
+  "Synchronize View" action slot.
+*/
+void SUIT_ViewWindow::onSynchronizeView( bool checked )
+{
+  QAction* a = qobject_cast<QAction*>( sender() );
+  if ( a ) {
+    synchronizeView( this, a->data().toInt() );
+  }
+}
+
+/*!
+  Synchronize camera properties of view \a viewWindow with
+  camera properties of view specified via \a id
+*/
+void SUIT_ViewWindow::synchronizeView( SUIT_ViewWindow* viewWindow, int id )
+{
+  SUIT_ViewWindow* sourceView = 0;
+  QList<SUIT_ViewWindow*> otherViews;
+
+  bool isSync = viewWindow->synchronizeAction() && viewWindow->synchronizeAction()->isChecked();
+
+  int vwid = viewWindow->getId();
+
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( !app ) return;
+  SUIT_Desktop* d = app->desktop();
+  if ( !d ) return;
+
+  QList<SUIT_ViewWindow*> allViews = qFindChildren<SUIT_ViewWindow*>( d );
+  foreach( SUIT_ViewWindow* vw, allViews ) {
+    if ( !vw->cameraProperties().isValid() )
+      continue;                    // omit views not supporting camera properties
+    if ( vw->getId() == id )
+      sourceView = vw;             // remember source view
+    else if ( vw != viewWindow )
+      otherViews.append( vw );     // collect all remaining views
+  }
+
+  if ( isSync && id ) {
+    // remove all possible disconnections
+    foreach( SUIT_ViewWindow* vw, otherViews ) {
+      // disconnect target view
+      vw->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), viewWindow, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      viewWindow->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), vw, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      if ( sourceView ) {
+	// disconnect source view
+	vw->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), sourceView, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+	sourceView->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), vw, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      }
+      QAction* a = vw->synchronizeAction();
+      if ( a ) {
+	int anid = a->data().toInt();
+	if ( a->isChecked() && ( anid == id || anid == vwid ) ) {
+	  bool blocked = a->blockSignals( true );
+	  a->setChecked( false );
+	  a->blockSignals( blocked );
+	}
+      }
+    }
+    if ( sourceView ) {
+      // reconnect source and target views
+      sourceView->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), viewWindow, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      viewWindow->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), sourceView, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      sourceView->connect( viewWindow, SIGNAL( viewModified( SUIT_ViewWindow* ) ), SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      viewWindow->connect( sourceView, SIGNAL( viewModified( SUIT_ViewWindow* ) ), SLOT( synchronize( SUIT_ViewWindow* ) ) );
+      // synchronize target view with source view
+      viewWindow->synchronize( sourceView );
+      if ( viewWindow->synchronizeAction() )
+	viewWindow->synchronizeAction()->setData( sourceView->getId() );
+      QAction* sourceAction = sourceView->synchronizeAction();
+      if ( sourceAction ) {
+        sourceAction->setData( viewWindow->getId() );
+        if ( !sourceAction->isChecked() ) {
+	  bool blocked = sourceAction->blockSignals( true );
+	  sourceAction->setChecked( true );
+	  sourceAction->blockSignals( blocked );
+        }
+      }
+    }
+  }
+  else if ( sourceView ) {
+    // reconnect source and target view
+    sourceView->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), viewWindow, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+    viewWindow->disconnect( SIGNAL( viewModified( SUIT_ViewWindow* ) ), sourceView, SLOT( synchronize( SUIT_ViewWindow* ) ) );
+    viewWindow->synchronize( sourceView );
+    if ( viewWindow->synchronizeAction() )
+      viewWindow->synchronizeAction() ->setData( sourceView->getId() );
+    QAction* sourceAction = sourceView->synchronizeAction();
+    if ( sourceAction ) {
+      if ( sourceAction->data().toInt() == viewWindow->getId() && sourceAction->isChecked() ) {
+        bool blocked = sourceAction->blockSignals( true );
+        sourceAction->setChecked( false );
+        sourceAction->blockSignals( blocked );
+      }
+    }
+  }
 }

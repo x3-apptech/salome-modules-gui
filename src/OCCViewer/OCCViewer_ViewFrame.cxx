@@ -37,6 +37,7 @@ OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Vie
   setCentralWidget( centralFrame );
 
   OCCViewer_ViewWindow* view0 = theModel->createSubWindow();
+  updateWindowTitle( view0 );
   view0->setParent( centralFrame );
   myViews.append( view0 ); // MAIN_VIEW
 
@@ -50,6 +51,17 @@ OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Vie
 
 OCCViewer_ViewFrame::~OCCViewer_ViewFrame()
 {
+}
+
+bool OCCViewer_ViewFrame::event( QEvent* e )
+{
+  if ( e->type() == QEvent::WindowTitleChange ) {
+    updateWindowTitle( getView( MAIN_VIEW ) );
+    updateWindowTitle( getView( BOTTOM_LEFT ) );
+    updateWindowTitle( getView( TOP_LEFT ) );
+    updateWindowTitle( getView( TOP_RIGHT ) );
+  }
+  return OCCViewer_ViewWindow::event( e );
 }
 
 //**************************************************************************************
@@ -101,6 +113,7 @@ void OCCViewer_ViewFrame::onMaximizedView( OCCViewer_ViewWindow* theView, bool i
         view->set2dMode( (Mode2dType) i );
         view->setParent( centralWidget() );
         view->setViewManager(myManager); 
+	updateWindowTitle( view );
         myViews.append( view ); 
         aModel->initView(view);
         view->setMaximized(false, false);
@@ -336,4 +349,31 @@ void OCCViewer_ViewFrame::setVisualParameters( const QString& parameters )
     // handle obsolete versions - no parameters for xy, yz, xz views
     getView(MAIN_VIEW)->setVisualParameters( parameters );
   }
+}
+
+SUIT_CameraProperties OCCViewer_ViewFrame::cameraProperties()
+{
+  // view frame does not have camera properties
+  return SUIT_CameraProperties();
+}
+
+void OCCViewer_ViewFrame::updateWindowTitle(OCCViewer_ViewWindow* theView)
+{
+  if ( !theView )
+    return;
+  QString title;
+  switch ( theView->get2dMode() ) {
+  case No2dMode:
+    title = "3D"; break;
+  case XYPlane:
+    title = "YX"; break;
+  case XZPlane:
+    title = "XZ"; break;
+  case YZPlane:
+    title = "YZ"; break;
+  default:
+    break;
+  }
+  if ( !title.isEmpty() )
+    theView->setWindowTitle( windowTitle() + " - " + title );
 }

@@ -109,9 +109,20 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   QStringList columnNames;
   columnNames.append(tr("PRP_AUTHOR"));
   columnNames.append(tr("PRP_DATE_MODIF"));
+  myModifications->setHeaderLabels( columnNames );
 
-  QTreeWidgetItem * headerItem = new QTreeWidgetItem(columnNames);
-  myModifications->setHeaderItem ( headerItem );
+  //Component versions
+  QLabel* versionsLabel = new QLabel(tr("PRP_VERSIONS"),this);  
+  myVersions = new QTreeWidget(this);
+  myVersions->setRootIsDecorated(false);
+  myVersions->setUniformRowHeights(true);
+  myVersions->setAllColumnsShowFocus(true);
+  myVersions->setColumnCount(2);
+  myVersions->setMaximumHeight(80);
+  columnNames.clear();
+  columnNames.append(tr("PRP_COMPONENT"));
+  columnNames.append(tr("PRP_VERSION"));
+  myVersions->setHeaderLabels( columnNames );
 
   QFrame* buttonFrame = new QFrame(this);
 
@@ -140,7 +151,9 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   gridLayout->addWidget(myComment, 4, 1, 1, 2);
   gridLayout->addWidget(modificationsLabel, 5, 0, 1, 1);
   gridLayout->addWidget(myModifications, 5, 1, 1, 2);
-  gridLayout->addWidget(buttonFrame, 6, 0, 1, 3);
+  gridLayout->addWidget(versionsLabel, 6, 0, 1, 1);
+  gridLayout->addWidget(myVersions, 6, 1, 1, 2);
+  gridLayout->addWidget(buttonFrame, 7, 0, 1, 3);
 
   connect(myOkButton,     SIGNAL(clicked()), this, SLOT(clickOnOk()));
   connect(myCancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -183,15 +196,11 @@ void SalomeApp_StudyPropertiesDlg::initData()
     bool isModified = false;
     SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>
       (SUIT_Session::session()->activeApplication()->activeStudy());
-    if (study) {
-      isModified = study->isModified();
-      if (hasData) {
-        if (propAttr->IsModified() != isModified) {
-          propAttr->SetModified((int)isModified);
-        }
-      }
+    isModified = study->isModified();
+    if (propAttr->IsModified() != isModified) {
+      propAttr->SetModified((int)isModified);
     }
-
+    
     QString modif = propAttr->IsModified() ? tr( "PRP_MODIFIED" ) : tr( "PRP_NOT_MODIFIED" );
     myModification->setText(modif);
     
@@ -236,6 +245,20 @@ void SalomeApp_StudyPropertiesDlg::initData()
       QTreeWidgetItem* item = new  QTreeWidgetItem(aList);
       myModifications->addTopLevelItem(item);
     }        
+  
+    //Component versions
+    std::vector<std::string> aComponents = propAttr->GetStoredComponents();
+    for ( int i = 0; i < aComponents.size(); i++ ) {
+      std::vector<int>  aMins, aHours, aDays, aMonths, aYears;
+      std::vector<std::string> aVersions = propAttr->GetComponentVersions(aComponents[i]);
+      QStringList aData;
+      aData.append( aComponents[i].c_str() );
+      aData.append( aVersions.empty() || aVersions[0] == "" ? "unknown" : aVersions[0].c_str() );
+      QTreeWidgetItem* item = new QTreeWidgetItem( aData );
+      if ( aVersions.size() > 1 )
+	item->setForeground( 1, Qt::red );
+      myVersions->addTopLevelItem(item);
+    }
   }
   adjustSize();
 }

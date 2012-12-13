@@ -127,7 +127,7 @@
   </section>
   <section name="viewers" >
     <!-- common viewers preferences -->
-    <parameter name="drop_down_buttons"     value="true" />
+    <parameter name="drop_down_buttons"     value="false" />
   </section>
   <section name="OCCViewer" >
     <!-- OCC viewer preferences -->

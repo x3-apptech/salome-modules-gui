@@ -24,19 +24,31 @@
 #define SUIT_EXCEPTIONHANDLER_H
 
 #include "SUIT.h"
+#include <QList>
 
 class QEvent;
 class QObject;
 class QString;
 
+typedef void (*CleanUpFunction)();
+typedef QList<CleanUpFunction> CleanUpFuncList;
+
 class SUIT_EXPORT SUIT_ExceptionHandler
 {
 public:
+  static void  addCleanUpRoutine(CleanUpFunction p);
+  static void  removeCleanUpRoutine(CleanUpFunction p);
+
   virtual bool handle( QObject*, QEvent* );
 
 protected:
   bool         internalHandle( QObject*, QEvent* );
   void         showMessage( const QString&, const QString& );
+
+private:
+  void         cleanUp();
+
+  static CleanUpFuncList myCleanUpFunctions;
 };
 
 extern "C"

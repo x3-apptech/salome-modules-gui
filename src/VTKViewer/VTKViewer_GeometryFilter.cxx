@@ -68,6 +68,28 @@
 //#define __MYDEBUG__
 //#define USE_ROBUST_TRIANGULATION
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+// VSR 26/10/2012: fix of regression (issue 21924) - increased memory consumption
+// for displaying of 3d elements, introduced by fix for issue 20314.
+// ...
+// The macro SHOW_COINCIDING_3D_PAL20314, when defined, allows correct visualization of
+// coincident 3d elements but causes substantial increasing of memory consumption, as all 3d 
+// elements are always shown, even if they are totally covered by surrounding faces.
+// If this macro is not defined (commented), the behaviour is defined by another macro -
+// SHOW_COINCIDING_3D_PAL21924, as follows:
+// - If SHOW_COINCIDING_3D_PAL21924 is defined, an alternative solution for computing 
+//   visibility of 3d elements is used; this solution allows to fix problem with visibility
+//   of coinciding 3d elements in most cases (though some cases might not work), while not
+//   causing significant increasing of memory consumption.
+// - If SHOW_COINCIDING_3D_PAL21924 is not defined (commented), coinciding 3d elements are 
+//   not shown at all (this corresponds to the state before issue 20314 fixing).
+///////////////////////////////////////////////////////////////////////////////////////////////
+//#define SHOW_COINCIDING_3D_PAL20314
+#ifndef SHOW_COINCIDING_3D_PAL20314
+#define SHOW_COINCIDING_3D_PAL21924
+#endif
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 vtkCxxRevisionMacro(VTKViewer_GeometryFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_GeometryFilter);
 
@@ -156,6 +178,8 @@ VTKViewer_GeometryFilter
 
   vtkIdList *cellIds = vtkIdList::New();
   vtkIdList *faceIds = vtkIdList::New();
+  vtkIdList *cellIdsTmp = vtkIdList::New();
+  vtkIdList *faceIdsTmp = vtkIdList::New();
 
   char *cellVis;
   vtkIdType newCellId;
@@ -331,7 +355,7 @@ VTKViewer_GeometryFilter
                                                       cellId,
                                                       myShowInside,
                                                       allVisible,
-                                                      myAppendCoincident3D,
+                                                      GetAppendCoincident3D(),
                                                       cellVis,
                                                       output,
                                                       outputCD,
@@ -345,7 +369,7 @@ VTKViewer_GeometryFilter
                                           cellId,
                                           myShowInside,
                                           allVisible,
-                                          myAppendCoincident3D,
+                                          GetAppendCoincident3D(),
                                           cellVis,
                                           output,
                                           outputCD,
@@ -357,6 +381,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_TETRA: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 4; faceId++)
             {
             faceIds->Reset();
@@ -367,7 +397,15 @@ VTKViewer_GeometryFilter
             aCellType = VTK_TRIANGLE;
             numFacePts = 3;
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
               {
@@ -382,6 +420,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_VOXEL: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 6; faceId++)
             {
             faceIds->Reset();
@@ -393,7 +437,15 @@ VTKViewer_GeometryFilter
             aCellType = VTK_QUAD;
             numFacePts = 4;
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
               {
@@ -408,6 +460,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_HEXAHEDRON: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 6; faceId++)
             {
             faceIds->Reset();
@@ -419,7 +477,15 @@ VTKViewer_GeometryFilter
             aCellType = VTK_QUAD;
             numFacePts = 4;
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
               {
@@ -434,6 +500,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_WEDGE: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 5; faceId++)
             {
             faceIds->Reset();
@@ -451,7 +523,15 @@ VTKViewer_GeometryFilter
               }
 
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
               {
@@ -466,6 +546,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_HEXAGONAL_PRISM: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 8; faceId++)
           {
             faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
@@ -484,7 +570,15 @@ VTKViewer_GeometryFilter
               numFacePts = 6;
             }
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
             {
@@ -499,6 +593,12 @@ VTKViewer_GeometryFilter
           break;
         }
         case VTK_PYRAMID: {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	  faceIdsTmp->Reset();
+	  for (int ai=0; ai<npts; ai++)
+	    faceIdsTmp->InsertNextId(pts[ai]);
+	  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
           for (faceId = 0; faceId < 5; faceId++)
             {
             faceIds->Reset();
@@ -515,7 +615,15 @@ VTKViewer_GeometryFilter
               numFacePts = 4;
               }
             input->GetCellNeighbors(cellId, faceIds, cellIds);
-            bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    int nbNeighbors = 0;
+	    for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+	      if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+	    }
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
             if ( process || myShowInside ||
                  (!allVisible && !cellVis[cellIds->GetId(0)]) )
               {
@@ -538,6 +646,12 @@ VTKViewer_GeometryFilter
             vtkIdType* ptIds = 0;
             int idp = 0;
             input->GetFaceStream(cellId, nFaces, ptIds);
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	    faceIdsTmp->Reset();
+	    for (int ai=0; ai<npts; ai++)
+	      faceIdsTmp->InsertNextId(pts[ai]);
+	    input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
             for (faceId = 0; faceId < nFaces; faceId++)
               {
                 faceIds->Reset();
@@ -564,7 +678,15 @@ VTKViewer_GeometryFilter
                   }
                 // TODO understand and fix display of several polyhedrons                
                 input->GetCellNeighbors(cellId, faceIds, cellIds);
-                bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+		int nbNeighbors = 0;
+		for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+		  if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+		}
+		bool process = nbNeighbors <= 0;
+#else
+		bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
                 if (process || myShowInside
                     || (!allVisible && !cellVis[cellIds->GetId(0)]))
                   {
@@ -643,12 +765,36 @@ VTKViewer_GeometryFilter
             }
             else //3D nonlinear cell
             {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+	      faceIdsTmp->Reset();
+	      int npts1 = 0;
+	      switch (aCellType ){
+	      case VTK_QUADRATIC_TETRA:         npts1 = 4; break;
+	      case VTK_QUADRATIC_HEXAHEDRON:    npts1 = 8; break;
+	      case VTK_TRIQUADRATIC_HEXAHEDRON: npts1 = 8; break;
+	      case VTK_QUADRATIC_WEDGE:         npts1 = 6; break;
+	      case VTK_QUADRATIC_PYRAMID:       npts1 = 5; break;
+	      }
+	      if ( npts1 > 0 ) {
+		for (int ai=0; ai<npts; ai++)
+		  faceIdsTmp->InsertNextId(pts[ai]);
+		input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+	      }
+#endif
               aCellType = VTK_TRIANGLE;
               numFacePts = 3;
               for (int j=0; j < cell->GetNumberOfFaces(); j++){
                 vtkCell *face = cell->GetFace(j);
                 input->GetCellNeighbors(cellId, face->PointIds, cellIds);
-                bool process = cellIds->GetNumberOfIds() <= 0 ? true : myAppendCoincident3D;
+#ifdef SHOW_COINCIDING_3D_PAL21924
+		int nbNeighbors = 0;
+		for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
+		  if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
+		}
+		bool process = nbNeighbors <= 0;
+#else
+		bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
                 if ( process || myShowInside ) {
                   face->Triangulate(0,lpts,coords);
                   for (i=0; i < lpts->GetNumberOfIds(); i+=3) {
@@ -1075,6 +1221,8 @@ VTKViewer_GeometryFilter
 
   cellIds->Delete();
   faceIds->Delete();
+  cellIdsTmp->Delete();
+  faceIdsTmp->Delete();
 
   if ( cellVis )
   {
@@ -1390,9 +1538,14 @@ vtkFloatingPointType VTKViewer_GeometryFilter:: GetQuadraticArcAngle() const
   return myMaxArcAngle;
 }
 
-
 int VTKViewer_GeometryFilter::GetAppendCoincident3D() const {
+// VSR 26/10/2012: see description of SHOW_COINCIDING_3D_PAL20314
+// in the top of this file
+#ifdef SHOW_COINCIDING_3D_PAL20314
   return myAppendCoincident3D;
+#else
+  return false;
+#endif
 }
 
 void VTKViewer_GeometryFilter::SetAppendCoincident3D(int theFlag) {

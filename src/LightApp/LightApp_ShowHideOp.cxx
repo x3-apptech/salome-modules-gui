@@ -103,7 +103,7 @@ void LightApp_ShowHideOp::startOperation()
     QStringList::const_iterator anIt = comps.begin(), aLast = comps.end();
     for( ; anIt!=aLast; anIt++ )
     {
-      LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( app->moduleTitle( *anIt ), true );
+      LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( app->moduleTitle( *anIt ), false );
       if( disp )
         disp->EraseAll( false, false, 0 );
     }

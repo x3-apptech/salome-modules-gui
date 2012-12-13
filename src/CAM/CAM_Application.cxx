@@ -82,6 +82,8 @@ extern "C" CAM_EXPORT SUIT_Application* createApplication()
   - etc
 */
 
+CAM_Application::ModuleInfoList CAM_Application::myInfoList;
+
 /*!
   \brief Constructor.
 
@@ -361,7 +363,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
 
   char* version = getVersion ? getVersion() : 0;
 
-  if(version) {    
+  if ( version ) {    
     for ( ModuleInfoList::iterator it = myInfoList.begin(); it != myInfoList.end(); ++it ) {
       if ( (*it).title == modName ) {
         if( (*it).version.isEmpty() ) {
@@ -518,7 +520,7 @@ void CAM_Application::moduleAdded( CAM_Module* /*mod*/ )
   \param title module title (user name)
   \return module name or null QString if module is not found
 */
-QString CAM_Application::moduleName( const QString& title ) const
+QString CAM_Application::moduleName( const QString& title )
 {
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isEmpty(); ++it )
@@ -534,7 +536,7 @@ QString CAM_Application::moduleName( const QString& title ) const
   \param name module name
   \return module title (user name) or null QString if module is not found
 */
-QString CAM_Application::moduleTitle( const QString& name ) const
+QString CAM_Application::moduleTitle( const QString& name )
 {
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isEmpty(); ++it )
@@ -550,7 +552,7 @@ QString CAM_Application::moduleTitle( const QString& name ) const
   \param name module name
   \return module icon or null QString if module is not found
 */
-QString CAM_Application::moduleIcon( const QString& name ) const
+QString CAM_Application::moduleIcon( const QString& name )
 {
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isNull(); ++it )
@@ -568,7 +570,7 @@ QString CAM_Application::moduleIcon( const QString& name ) const
   \param title module title (user name)
   \return \c true if module is accessible (can be loaded) or \c false otherwise
  */
-bool CAM_Application::isModuleAccessible( const QString& title ) const
+bool CAM_Application::isModuleAccessible( const QString& title )
 {
   bool found   = false;
   bool blocked = false;
@@ -599,7 +601,7 @@ bool CAM_Application::isModuleAccessible( const QString& title ) const
   \param full if \c true, return full library name, otherwise return its internal name
   \return module library name or null QString if module is not found
  */
-QString CAM_Application::moduleLibrary( const QString& title, const bool full ) const
+QString CAM_Application::moduleLibrary( const QString& title, const bool full )
 {
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isEmpty(); ++it )
@@ -777,8 +779,8 @@ void CAM_Application::createEmptyStudy()
 /*!
   \brief Return information about version of the each module.
 */
-CAM_Application::ModuleShortInfoList CAM_Application::getVersionInfo() const {
-
+CAM_Application::ModuleShortInfoList CAM_Application::getVersionInfo()
+{
   ModuleShortInfoList info;
 
   ModuleShortInfo kernel;

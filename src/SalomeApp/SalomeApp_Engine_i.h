@@ -27,7 +27,7 @@
 #ifndef _SALOMEAPP_ENGINE_I_HXX_
 #define _SALOMEAPP_ENGINE_I_HXX_
 
-#include "SALOME_Session.hxx"
+#include "SalomeApp.h"
 
 #include "SALOME_Component_i.hxx"
 
@@ -39,8 +39,8 @@
 
 class SALOME_NamingService;
 
-class SESSION_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
-					 public Engines_Component_i
+class SALOMEAPP_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
+					   public Engines_Component_i
 {
 public:
   SalomeApp_Engine_i( const char* theComponentName );
@@ -87,6 +87,8 @@ public:
   SALOMEDS::TMPFile* CopyFrom( SALOMEDS::SObject_ptr, CORBA::Long& )                                                                                 {return 0;}
   CORBA::Boolean CanPaste( const char*, CORBA::Long )                                                                                                {return 0;}
   SALOMEDS::SObject_ptr PasteInto( const SALOMEDS::TMPFile&, CORBA::Long, SALOMEDS::SObject_ptr )                                                    {return 0;}
+
+  char* getVersion();
 
 private:
   static CORBA::ORB_var              orb();

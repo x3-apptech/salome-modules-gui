@@ -39,7 +39,7 @@ CORBA_CXXFLAGS=@OMNIORB_CXXFLAGS@ @OMNIORB_INCLUDES@
 CORBA_LIBS=@OMNIORB_LIBS@
 QT_CXXFLAGS=@QT_INCLUDES@ @QT_MT_INCLUDES@
 
-TEST_CPPFLAGS = \
+COMMON_CPP_FLAGS = \
 	$(QT_CXXFLAGS) \
 	$(CORBA_CXXFLAGS) \
 	$(KERNEL_CXXFLAGS) \
@@ -47,11 +47,16 @@ TEST_CPPFLAGS = \
 	-I$(top_srcdir)/src/TreeData \
 	-I.
 
-TEST_LDFLAGS  = \
+COMMON_LIBS  = \
 	$(CORBA_LIBS) $(QT_LIBS) \
 	$(top_builddir)/src/TreeData/libSalomeTreeData.la \
 	$(top_builddir)/src/GuiHelpers/libSalomeGuiHelpers.la \
-	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lSalomeKernelHelpers
+	$(top_builddir)/src/SUIT/libsuit.la \
+	$(top_builddir)/src/CAM/libCAM.la \
+	$(top_builddir)/src/Plot2d/libPlot2d.la \
+	$(top_builddir)/src/LightApp/libLightApp.la \
+	$(top_builddir)/src/SalomeApp/libSalomeApp.la \
+	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lSalomeKernelHelpers @LIBXML_LIBS@
 
 # Program targets
 bin_PROGRAMS = TreeData_guitester TreeData_tester
@@ -76,20 +81,20 @@ TreeData_guitester_SOURCES = \
 	MyDataModel.cxx
 
 TreeData_guitester_CPPFLAGS = \
-	$(TEST_CPPFLAGS)
+	$(COMMON_CPP_FLAGS)
 
 TreeData_guitester_LDFLAGS = \
-	$(TEST_LDFLAGS)
+	$(COMMON_LIBS)
 
 TreeData_tester_SOURCES = \
 	tester.cxx \
 	MyDataModel.cxx
 
 TreeData_tester_CPPFLAGS = \
-	$(TEST_CPPFLAGS)
+	$(COMMON_CPP_FLAGS)
 
 TreeData_tester_LDFLAGS = \
-	$(TEST_LDFLAGS)
+	$(COMMON_LIBS)
 
 # test data files
 testdir = $(salomeresdir)/testdata

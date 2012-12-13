@@ -195,6 +195,8 @@ public:
   virtual void                    updateViewAspects( const viewAspectList& );
   virtual void                    clearViewAspects();
 
+  virtual SUIT_CameraProperties   cameraProperties();
+
 public slots:
   virtual void onFrontView();
   virtual void onViewFitAll();
@@ -243,6 +245,9 @@ signals:
   void Show( QShowEvent * );
   void Hide( QHideEvent * );
   void maximized( OCCViewer_ViewWindow*, bool );
+
+protected slots:
+  void synchronize( SUIT_ViewWindow* );
 
 public:
   virtual QImage dumpView();
@@ -314,13 +319,6 @@ protected:
   QCursor               myCursor;
 
   double myCurScale;
-
-private slots:
-  void                  onSynchronizeView(bool);
-  void                  updateSyncViews();
-
-private:
-  static void           synchronizeView( OCCViewer_ViewWindow*, int );
 
 private:
   OCCViewer_ClippingDlg* myClippingDlg;

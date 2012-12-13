@@ -69,7 +69,6 @@ SET(SalomeSession_SOURCES
   Session_ServerThread.cxx
   Session_ServerLauncher.cxx
   Session_ServerCheck.cxx
-  SalomeApp_Engine_i.cxx
 )
 ADD_LIBRARY(SalomeSession SHARED ${SalomeSession_SOURCES})
 SET_TARGET_PROPERTIES(SalomeSession PROPERTIES COMPILE_FLAGS "${COMMON_FLAGS}")
@@ -106,6 +105,5 @@ SET(COMMON_HEADERS_H
   Session_ServerLauncher.hxx
   Session_ServerThread.hxx
   Session_ServerCheck.hxx
-  SalomeApp_Engine_i.hxx
 )
 INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${GUI_salomeinclude_HEADERS})

@@ -35,6 +35,7 @@
 void WaitForServerReadiness(std::string serverName);
 
 class SALOME_NamingService;
+class Engines_Container_i;
 
 class SESSION_EXPORT Session_ServerThread
 {
@@ -49,6 +50,7 @@ public:
                        PortableServer::POA_ptr poa);
   virtual ~Session_ServerThread();
   void         Init();
+  void         Shutdown();
 protected:
   void         ActivateModuleCatalog   ( int argc, char ** argv );
   void         ActivateSALOMEDS        ( int argc, char ** argv );
@@ -64,6 +66,7 @@ protected:
   CORBA::ORB_var          _orb;
   PortableServer::POA_var _root_poa;
   SALOME_NamingService *  _NS;
+  Engines_Container_i*    _container;
 };
 
 class QMutex;

@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>MNU_FRONT_VIEW</source>
-        <translation>Front</translation>
+        <translation>-OX</translation>
     </message>
     <message>
         <source>ERROR</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>DSC_TOP_VIEW</source>
-        <translation>Top View</translation>
+        <translation>-OZ View</translation>
     </message>
     <message>
         <source>MNU_PAN_VIEW</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>MNU_TOP_VIEW</source>
-        <translation>Top</translation>
+        <translation>-OZ</translation>
     </message>
     <message>
         <source>DSC_GLOBALPAN_VIEW</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>DSC_LEFT_VIEW</source>
-        <translation>Left View</translation>
+        <translation>+OY View</translation>
     </message>
     <message>
         <source>DSC_FITALL</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>DSC_FRONT_VIEW</source>
-        <translation>Front View</translation>
+        <translation>-OX View</translation>
     </message>
     <message>
         <source>MNU_GLOBALPAN_VIEW</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>MNU_BACK_VIEW</source>
-        <translation>Back</translation>
+        <translation>+OX</translation>
     </message>
     <message>
         <source>MNU_SHOW_TRIHEDRON</source>
@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>MNU_BOTTOM_VIEW</source>
-        <translation>Bottom</translation>
+        <translation>+OZ</translation>
     </message>
     <message>
         <source>MNU_RESET_VIEW</source>
@@ -113,11 +113,11 @@
     </message>
     <message>
         <source>MNU_LEFT_VIEW</source>
-        <translation>Left</translation>
+        <translation>+OY</translation>
     </message>
     <message>
         <source>DSC_RIGHT_VIEW</source>
-        <translation>Right View</translation>
+        <translation>-OY View</translation>
     </message>
     <message>
         <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
@@ -133,7 +133,7 @@
     </message>
     <message>
         <source>DSC_BOTTOM_VIEW</source>
-        <translation>Bottom View</translation>
+        <translation>+OZ View</translation>
     </message>
     <message>
         <source>DSC_DUMP_VIEW</source>
@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>MNU_RIGHT_VIEW</source>
-        <translation>Right</translation>
+        <translation>-OY</translation>
     </message>
     <message>
         <source>LBL_TOOLBAR_LABEL</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
         <source>DSC_BACK_VIEW</source>
-        <translation>Back View</translation>
+        <translation>+OX View</translation>
     </message>
     <message>
         <source>SVTK_IMAGE_FILES</source>
@@ -178,18 +178,6 @@
     <message>
         <source>DSC_VIEWPARAMETERS_VIEW</source>
         <translation>Change the parameters of the view</translation>
-    </message>
-    <message>
-        <source>MNU_SYNCHRONIZE_VIEW</source>
-        <translation>Synchronize</translation>
-    </message>
-    <message>
-        <source>DSC_SYNCHRONIZE_VIEW</source>
-        <translation>Synchronize view</translation>
-    </message>
-    <message>
-        <source>MNU_SYNC_NO_VIEW</source>
-        <translation>[ No appropriate view ]</translation>
     </message>
     <message>
         <source>MNU_SVTK_PARALLEL_MODE</source>

@@ -123,9 +123,5 @@
         <source>ICON_OCCVIEWER_MINIMIZE</source>
         <translation>occ_view_minimized.png</translation>
     </message>
-    <message>
-        <source>ICON_OCCVIEWER_SYNC</source>
-        <translation>occ_view_sync.png</translation>
-    </message>
 </context>
 </TS>

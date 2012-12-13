@@ -35,8 +35,7 @@ salomeinclude_HEADERS =			\
 	SALOME_Session.hxx		\
 	Session_ServerLauncher.hxx	\
 	Session_ServerThread.hxx	\
-	Session_ServerCheck.hxx		\
-	SalomeApp_Engine_i.hxx
+	Session_ServerCheck.hxx
 
 # Libraries targets
 
@@ -44,8 +43,7 @@ dist_libSalomeSession_la_SOURCES =	\
 	Session_Session_i.cxx		\
 	Session_ServerThread.cxx	\
 	Session_ServerLauncher.cxx	\
-	Session_ServerCheck.cxx		\
-	SalomeApp_Engine_i.cxx
+	Session_ServerCheck.cxx
 
 libSalomeSession_la_CPPFLAGS = $(QT_MT_INCLUDES) $(PYTHON_INCLUDES)		\
 	$(HDF5_INCLUDES) $(BOOST_CPPFLAGS) @KERNEL_CXXFLAGS@ $(CAS_CPPFLAGS)	\

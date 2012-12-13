@@ -108,7 +108,7 @@ public:
   LogWindow*                          logWindow();
   SUIT_DataBrowser*                   objectBrowser();
 #ifndef DISABLE_PYCONSOLE
-  PyConsole_Console*                  pythonConsole();
+  PyConsole_Console*                  pythonConsole(const bool force = false);
 #endif
 
   virtual void                        updateObjectBrowser( const bool = true );

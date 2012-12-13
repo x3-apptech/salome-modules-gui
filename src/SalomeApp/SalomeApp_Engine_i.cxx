@@ -24,7 +24,8 @@
 //  File   : SalomeApp_Engine_i.cxx
 //  Author : Alexander SLADKOV
 
-#include "SalomeApp_Engine_i.hxx"
+#include "SalomeApp_Engine_i.h"
+#include "SalomeApp_Application.h"
 
 #include <SALOME_NamingService.hxx>
 #include <SALOMEDS_Tool.hxx>
@@ -279,6 +280,24 @@ char* SalomeApp_Engine_i::ComponentDataType()
 }
 
 /*!
+  \return Component version
+*/
+char* SalomeApp_Engine_i::getVersion()
+{
+  SalomeApp_Application::ModuleShortInfoList versions = SalomeApp_Application::getVersionInfo();
+  QString version;
+  SalomeApp_Application::ModuleShortInfo version_info;
+  foreach ( version_info, versions ) {
+    if ( SalomeApp_Application::moduleName( version_info.name ) == myComponentName.c_str() ) {
+      version = version_info.version;
+      break;
+    }
+  }
+  
+  return CORBA::string_dup( version.toLatin1().constData() );
+}
+
+/*!
   \return 
 */
 CORBA::ORB_var SalomeApp_Engine_i::orb()
@@ -393,4 +412,3 @@ SalomeApp_Engine_i* SalomeApp_Engine_i::GetInstance( const char* theComponentNam
 	  theComponentName << ", aServant = " << aServant);
   return aServant;
 }
-

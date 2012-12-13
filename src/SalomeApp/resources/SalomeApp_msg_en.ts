@@ -364,6 +364,18 @@ Do you want to reload it ?</translation>
         <translation>Modifications</translation>
     </message>
     <message>
+        <source>PRP_COMPONENT</source>
+        <translation>Component</translation>
+    </message>
+    <message>
+        <source>PRP_VERSION</source>
+        <translation>Version</translation>
+    </message>
+    <message>
+        <source>PRP_VERSIONS</source>
+        <translation>Stored data</translation>
+    </message>
+    <message>
         <source>PRP_DATE_MODIF</source>
         <translation>Date</translation>
     </message>        

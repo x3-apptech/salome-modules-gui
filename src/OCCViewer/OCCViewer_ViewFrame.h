@@ -41,6 +41,8 @@ public:
   OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel);
   virtual ~OCCViewer_ViewFrame();
 
+  bool event( QEvent* e );
+
   OCCViewer_ViewWindow*   getView( const int ) const;
 
   virtual OCCViewer_ViewPort3d* getViewPort() { return getView(MAIN_VIEW)->getViewPort(); }
@@ -81,6 +83,8 @@ public:
   virtual void                setBackground( const Qtx::BackgroundData& );
 
   virtual void   setDropDownButtons( bool );
+
+  virtual SUIT_CameraProperties cameraProperties();
 
 public slots:
   virtual void onFrontView() { getView(MAIN_VIEW)->onFrontView(); }
@@ -123,8 +127,8 @@ private slots:
   void onContextMenuRequested(QContextMenuEvent*);
 
 private:
-  void connectViewSignals(OCCViewer_ViewWindow* theView);
-
+  void connectViewSignals( OCCViewer_ViewWindow* theView );
+  void updateWindowTitle( OCCViewer_ViewWindow* theView );
 
   QList<OCCViewer_ViewWindow*> myViews;
   QGridLayout* myLayout;

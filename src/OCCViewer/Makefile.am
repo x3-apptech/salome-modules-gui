@@ -20,12 +20,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-#  File   : Makefile.in
-#  Author : Vladimir Klyachin (OCN)
-#  Module : OCCViewer
-#  $Header$
-#
-
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libOCCViewer.la
@@ -118,8 +112,7 @@ dist_salomeres_DATA =				\
 	resources/occ_view_style_switch.png	\
 	resources/occ_view_zooming_style_switch.png \
 	resources/occ_view_maximized.png	\
-	resources/occ_view_minimized.png	\
-	resources/occ_view_sync.png
+	resources/occ_view_minimized.png
 
 nodist_salomeres_DATA =		\
 	OCCViewer_images.qm	\

@@ -113,6 +113,18 @@ Do you want to overwrite it?</translation>
         <source>NAME_COLUMN</source>
         <translation>Name</translation>
     </message>
+    <message>
+        <source>MNU_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize</translation>
+    </message>
+    <message>
+        <source>DSC_SYNCHRONIZE_VIEW</source>
+        <translation>Synchronize view</translation>
+    </message>
+    <message>
+        <source>MNU_SYNC_NO_VIEW</source>
+        <translation>[ No appropriate view ]</translation>
+    </message>
 </context>
 <context>
     <name>SUIT_Study</name>

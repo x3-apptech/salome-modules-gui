@@ -59,6 +59,7 @@ SET(GUI_HEADERS
   SUIT_ViewModel.h 
   SUIT_ViewWindow.h 
   SUIT_ShortcutMgr.h
+  SUIT_CameraProperties.h
 )
 QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
@@ -93,6 +94,7 @@ SET(suit_SOURCES
   SUIT_ViewModel.cxx
   SUIT_ViewWindow.cxx
   SUIT_ShortcutMgr.cxx
+  SUIT_CameraProperties.cxx
 )
 SET(GUITS_SOURCES
   resources/SUIT_msg_en.ts

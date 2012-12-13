@@ -57,6 +57,9 @@ public:
   bool              isFullScreenAllowed() const;
   void              setFullScreenAllowed( const bool );
 
+  bool              isMinimizeAllowed() const;
+  void              setMinimizeAllowed( const bool );
+
 protected:
   virtual bool      event( QEvent* );
 
@@ -71,6 +74,7 @@ private:
   QToolBar*         myStatusBar;     //!< dockable status bar
 
   bool              myFullScreenAllowed;
+  bool              myMinimizeAllowed;
 
   bool              myOpaque;
   Resizer*          myResizer;

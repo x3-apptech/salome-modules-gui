@@ -84,6 +84,7 @@ Session_ServerThread::Session_ServerThread(int argc,
   _servType =-1;
   _NS = new SALOME_NamingService(_orb); // one instance per server to limit
                                         // multi thread coherence problems
+  _container = 0;                       // embedded container
 }
 
 /*! 
@@ -163,6 +164,11 @@ void Session_ServerThread::Init()
       }
     }
   }
+}
+
+void Session_ServerThread::Shutdown()
+{
+  if ( _container ) _container->Shutdown();
 }
 
 void Session_ServerThread::ActivateModuleCatalog(int argc,
@@ -356,7 +362,7 @@ void Session_ServerThread::ActivateContainer(int argc,
       containerName = argv[1];
     }
     
-    new Engines_Container_i(_orb, _root_poa, containerName , argc , argv , true , false);
+    _container = new Engines_Container_i(_orb, _root_poa, containerName , argc , argv , true , false);
   }
   catch(CORBA::SystemException&) {
     INFOS("Caught CORBA::SystemException.");

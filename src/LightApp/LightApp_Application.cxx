@@ -254,6 +254,7 @@ LightApp_Application::LightApp_Application()
 
   STD_TabDesktop* desk = new STD_TabDesktop();
   desk->setFullScreenAllowed(false);
+  desk->setMinimizeAllowed(false);
 
   setDesktop( desk );
 
@@ -1279,11 +1280,21 @@ LogWindow* LightApp_Application::logWindow()
 
 #ifndef DISABLE_PYCONSOLE
 /*!
+  This returns the python console integrated to the GUI. Depending
+  when you request the python console, this function could return
+  null. Then the optional parameter force (default to false) can be
+  set to force the creation of the python console if it is not done
+  already. 
+  \param force - if true, the pythonConsole is created if it does not exist yet
   \return Python Console
 */
-PyConsole_Console* LightApp_Application::pythonConsole()
+PyConsole_Console* LightApp_Application::pythonConsole(const bool force)
 {
-  return qobject_cast<PyConsole_Console*>( dockWindow( WT_PyConsole ) );
+  QWidget* wid = dockWindow( WT_PyConsole );
+  if ( !wid && force==true) {
+    wid = getWindow(WT_PyConsole);
+  }
+  return qobject_cast<PyConsole_Console*>( wid );
 }
 #endif
 

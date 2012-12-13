@@ -32,7 +32,7 @@
     <parameter name="killall"    value="no"/>
     <parameter name="pinter"     value="no"/>
     <parameter name="noexcepthandler"  value="no"/>
-    <parameter name="modules"    value="GEOM,SMESH,VISU,MED,YACS,PARAVIS"/>
+    <parameter name="modules"    value="GEOM,SMESH,HEXABLOCK,VISU,MED,YACS,PARAVIS"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
     <parameter name="standalone" value="pyContainer,supervContainer"/>

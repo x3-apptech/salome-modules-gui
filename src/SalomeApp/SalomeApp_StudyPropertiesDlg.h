@@ -69,6 +69,7 @@ private:
  QComboBox*           myUnits;
  QTextEdit*           myComment;
  QTreeWidget*         myModifications;
+ QTreeWidget*         myVersions;
  QPushButton*         myOkButton;
  QPushButton*         myCancelButton;
 };

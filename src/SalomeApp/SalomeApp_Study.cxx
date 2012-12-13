@@ -26,7 +26,7 @@
 #include "SalomeApp_DataObject.h"
 #include "SalomeApp_DataModel.h"
 #include "SalomeApp_Application.h"
-#include "SalomeApp_Engine_i.hxx"
+#include "SalomeApp_Engine_i.h"
 #include "SalomeApp_VisualState.h"
 
 // temporary commented

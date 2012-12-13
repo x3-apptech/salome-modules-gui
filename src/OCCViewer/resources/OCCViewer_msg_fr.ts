@@ -284,24 +284,12 @@
         <translation>Minimiser la vue</translation>
     </message>
     <message>
-        <source>DSC_SYNCHRONIZE_VIEW</source>
-        <translation>Synchroniser la vue</translation>
-    </message>
-    <message>
         <source>MNU_MAXIMIZE_VIEW</source>
         <translation>Maximiser</translation>
     </message>
     <message>
         <source>MNU_MINIMIZE_VIEW</source>
         <translation>Minimiser</translation>
-    </message>
-    <message>
-        <source>MNU_SYNCHRONIZE_VIEW</source>
-        <translation>Synchroniser</translation>
-    </message>
-    <message>
-        <source>MNU_SYNC_NO_VIEW</source>
-        <translation>[ Pas de vue appropriée ]</translation>
     </message>
 </context>
 <context>

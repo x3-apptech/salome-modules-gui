@@ -287,6 +287,8 @@ void OCCViewer_ViewWindow::initLayout()
   QtxAction* anAction = dynamic_cast<QtxAction*>( toolMgr()->action( GraduatedAxesId ) );
   myCubeAxesDlg = new OCCViewer_CubeAxesDlg( anAction, this, "OCCViewer_CubeAxesDlg" );
   myCubeAxesDlg->initialize();
+  
+  connect( myViewPort, SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), this, SLOT( emitViewModified() ) );
 }
 
 OCCViewer_ViewWindow* OCCViewer_ViewWindow::getView( const int mode ) const
@@ -1240,15 +1242,8 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onMaximizedView()));
   toolMgr()->registerAction( aAction, MaximizedId );
 
-  // Synchronize view
-  aAction = new QtxAction(tr("MNU_SYNCHRONIZE_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SYNC" ) ),
-                          tr( "MNU_SYNCHRONIZE_VIEW" ), 0, this );
-  aAction->setStatusTip(tr("DSC_SYNCHRONIZE_VIEW"));
-  aAction->setMenu( new QMenu( this ) );
-  aAction->setCheckable(true);
-  connect(aAction->menu(), SIGNAL(aboutToShow()), this, SLOT(updateSyncViews()));
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSynchronizeView(bool)));
-  toolMgr()->registerAction( aAction, SynchronizeId );
+  // Synchronize View 
+  toolMgr()->registerAction( synchronizeAction(), SynchronizeId );
 }
 
 /*!
@@ -1547,7 +1542,10 @@ void OCCViewer_ViewWindow::onAxialScale()
     myScalingDlg = new OCCViewer_AxialScaleDlg( this );
   
   if ( !myScalingDlg->isVisible() )
+  {
+    myScalingDlg->Update();
     myScalingDlg->show();
+  }
 }
 
 /*!
@@ -2493,144 +2491,174 @@ void OCCViewer_ViewWindow::updateViewAspects( const viewAspectList& aViewList )
   myViewAspects = aViewList;
 }
 
-void OCCViewer_ViewWindow::synchronizeView( OCCViewer_ViewWindow* viewWindow, int id )
+/*!
+  Get camera properties for the OCC view window.
+  \return shared pointer on camera properties.
+*/
+SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
 {
-  OCCViewer_ViewWindow* otherViewWindow = 0;
-  QList<OCCViewer_ViewWindow*> compatibleViews;
+  SUIT_CameraProperties aProps;
 
-  bool isSync = viewWindow->toolMgr()->action( SynchronizeId )->isChecked();
+  Handle(V3d_View) aSourceView = getViewPort()->getView();
+  if ( aSourceView.IsNull() )
+    return aProps;
 
-  int vwid = viewWindow->getId();
+  if ( get2dMode() == No2dMode ) {
+    aProps.setDimension( SUIT_CameraProperties::Dim3D );
+  }
+  else {
+    aProps.setDimension( SUIT_CameraProperties::Dim2D );
+    aProps.setViewSide( (SUIT_CameraProperties::ViewSide)(int)get2dMode() );
+  }
   
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if ( !app ) return;
+  // read common properites of the view
+  Standard_Real anUpDir[3];
+  Standard_Real aPrjDir[3];
+  Standard_Real aMapScale[2];
+  Standard_Real aTranslation[3];
+  Standard_Real anAxialScale[3];
+  
+  aSourceView->Up(anUpDir[0], anUpDir[1], anUpDir[2]);
+  aSourceView->Proj(aPrjDir[0], aPrjDir[1], aPrjDir[2]);
+  aSourceView->At(aTranslation[0], aTranslation[1], aTranslation[2]);
+  aSourceView->Size(aMapScale[0], aMapScale[1]);
 
-  QList<SUIT_ViewManager*> wmlist;
-  app->viewManagers( viewWindow->getViewManager()->getType(), wmlist );
+  getViewPort()->getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
 
-  foreach( SUIT_ViewManager* wm, wmlist ) {
-    QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
+  // we use similar depth to the one used in perspective projection 
+  // to proivde a convinience synchronization with other camera views that
+  // can switch between orthogonal & perspective projection. otherwise,
+  // the camera will get to close when switching from orthogonal to perspective.
+  Standard_Real aCameraDepth = aSourceView->Depth() + aSourceView->ZSize() * 0.5;
 
-    foreach( SUIT_ViewWindow* vw, vwlist ) {
-      OCCViewer_ViewWindow* occVW = dynamic_cast<OCCViewer_ViewWindow*>( vw );
-      if ( !occVW ) continue;
+  // store common props
+  aProps.setViewUp(anUpDir[0], anUpDir[1], anUpDir[2]);
+  aProps.setMappingScale(aMapScale[1] / 2.0);
+  aProps.setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  
+  // generate view orientation matrix for transforming OCC projection reference point
+  // into a camera (eye) position.
+  gp_Dir aLeftDir = gp_Dir(anUpDir[0], anUpDir[1], anUpDir[2]).Crossed(
+    gp_Dir(aPrjDir[0], aPrjDir[1], aPrjDir[2]));
 
-      // check only compatible types
-      occVW = occVW->getView( viewWindow->get2dMode() );
-      if ( occVW ) {
-	if ( occVW->getId() == id ) 
-	  otherViewWindow = occVW;
-	else if ( occVW != viewWindow )
-	  compatibleViews.append( occVW );
-      }
-    }
-  }
+  gp_Trsf aTrsf;
+  aTrsf.SetValues( aLeftDir.X(), anUpDir[0], aPrjDir[0], aTranslation[0],
+                   aLeftDir.Y(), anUpDir[1], aPrjDir[1], aTranslation[1],
+                   aLeftDir.Z(), anUpDir[2], aPrjDir[2], aTranslation[2],
+                   Precision::Confusion(),
+                   Precision::Confusion() );
 
-  if ( isSync && id ) {
-    // remove all possible disconnections
-    foreach( OCCViewer_ViewWindow* vw, compatibleViews ) {
-      // disconnect target view
-      vw->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), vw->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      if ( otherViewWindow ) {
-	// disconnect source view
-	vw->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-	otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), vw->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      }
-      QAction* a = vw->toolMgr()->action( SynchronizeId );
-      if ( a ) {
-	int anid = a->data().toInt();
-	if ( a->isChecked() && ( anid == id || anid == vwid ) ) {
-	  bool blocked = a->blockSignals( true );
-	  a->setChecked( false );
-	  a->blockSignals( blocked );
-	}
-      }
-    }
-    if ( otherViewWindow ) {
-      // reconnect source and target view
-      otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      otherViewWindow->getViewPort()->connect( viewWindow->getViewPort(), SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      viewWindow->getViewPort()->connect( otherViewWindow->getViewPort(), SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-      // synchronize target view with source view
-      viewWindow->getViewPort()->synchronize( otherViewWindow->getViewPort() );
-      viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
-      QAction* anOtherAcion = otherViewWindow->toolMgr()->action( SynchronizeId );
-      if (anOtherAcion) {
-        anOtherAcion->setData( viewWindow->getId() );
-        if ( !anOtherAcion->isChecked() ) {
-	        bool blocked = anOtherAcion->blockSignals( true );
-	        anOtherAcion->setChecked( true );
-	        anOtherAcion->blockSignals( blocked );
-        }
-      }
-    }
-  }
-  else if ( otherViewWindow ) {
-    // reconnect source and target view
-    otherViewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), viewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-    viewWindow->getViewPort()->disconnect( SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), otherViewWindow->getViewPort(), SLOT( synchronize( OCCViewer_ViewPort* ) ) );
-    viewWindow->getViewPort()->synchronize( otherViewWindow->getViewPort() );
-    viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
-    QAction* anOtherAcion = otherViewWindow->toolMgr()->action( SynchronizeId );
-    if (anOtherAcion) {
-      if ( anOtherAcion->data().toInt() == viewWindow->getId() && anOtherAcion->isChecked() ) {
-        bool blocked = anOtherAcion->blockSignals( true );
-        anOtherAcion->setChecked( false );
-        anOtherAcion->blockSignals( blocked );
-      }
-    }
-  }
+  // get projection reference point in view coordinates
+  Graphic3d_Vertex aProjRef = aSourceView->ViewMapping().ProjectionReferencePoint();
+  
+  // transform to world-space coordinate system
+  gp_Pnt aPosition = gp_Pnt(aProjRef.X(), aProjRef.Y(), aCameraDepth).Transformed(aTrsf);
+  
+  // compute focal point
+  double aFocalPoint[3];
+
+  aFocalPoint[0] = aPosition.X() - aPrjDir[0] * aCameraDepth;
+  aFocalPoint[1] = aPosition.Y() - aPrjDir[1] * aCameraDepth;
+  aFocalPoint[2] = aPosition.Z() - aPrjDir[2] * aCameraDepth;
+
+  aProps.setFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
+  aProps.setPosition(aPosition.X(), aPosition.Y(), aPosition.Z());
+
+  return aProps;
 }
 
 /*!
-  "Synchronize View" action slot.
+  Synchronize views.
+  This implementation synchronizes OCC view's camera propreties.
 */
-void OCCViewer_ViewWindow::onSynchronizeView(bool checked)
+void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
 {
-  QAction* a = qobject_cast<QAction*>( sender() );
-  if ( a ) {
-    synchronizeView( this, a->data().toInt() );
-  }
-}
+  bool blocked = blockSignals( true );
 
-/*!
-  Update list of available view for the "Synchronize View" action
-*/
-void OCCViewer_ViewWindow::updateSyncViews()
-{
-  QAction* anAction = toolMgr()->action( SynchronizeId );
-  if ( anAction && anAction->menu() ) {
-    int currentId = anAction->data().toInt();
-    anAction->menu()->clear();
-    SUIT_Application* app = SUIT_Session::session()->activeApplication();
-    if ( app ) { 
-      QList<SUIT_ViewManager*> wmlist;
-      app->viewManagers( getViewManager()->getType(), wmlist );
-      foreach( SUIT_ViewManager* wm, wmlist ) {
-	QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
-	foreach ( SUIT_ViewWindow* vw, vwlist ) {
-	  OCCViewer_ViewWindow* occVW = dynamic_cast<OCCViewer_ViewWindow*>( vw );
-	  if ( !occVW || occVW == this ) continue;
-	  // list only compatible types
-	  OCCViewer_ViewWindow* subWindow = occVW->getView( get2dMode() );
-	  if ( subWindow && subWindow != this ) {
-	    QAction* a = anAction->menu()->addAction( occVW->windowTitle() );
-	    if ( subWindow->getId() == currentId ) {
-	      QFont f = a->font();
-	      f.setBold( true );
-	      a->setFont( f );
-	    }
-	    a->setData( subWindow->getId() );
-	    connect( a, SIGNAL( triggered(bool) ), this, SLOT( onSynchronizeView(bool) ) );
-	  }
-	}
-      }
-    }
-    if ( anAction->menu()->actions().isEmpty() ) {
-      anAction->setData( 0 );
-      anAction->menu()->addAction( tr( "MNU_SYNC_NO_VIEW" ) );
-    }
+  SUIT_CameraProperties aProps = theView->cameraProperties();
+  if ( !cameraProperties().isCompatible( aProps ) ) {
+    // other view, this one is being currently synchronized to, seems has become incompatible
+    // we have to break synchronization
+    updateSyncViews();
+    return;
   }
+
+  Handle(V3d_View) aDestView = getViewPort()->getView();
+
+  aDestView->SetImmediateUpdate( Standard_False );
+
+  double anUpDir[3];
+  double aPosition[3];
+  double aFocalPoint[3];
+  double aMapScaling;
+  double anAxialScale[3];
+
+  // get common properties
+  aProps.getFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
+  aProps.getPosition(aPosition[0], aPosition[1], aPosition[2]);
+  aProps.getViewUp(anUpDir[0], anUpDir[1], anUpDir[2]);
+  aProps.getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  aMapScaling = aProps.getMappingScale() * 2.0;
+
+  gp_Dir aProjDir(aPosition[0] - aFocalPoint[0],
+                  aPosition[1] - aFocalPoint[1],
+                  aPosition[2] - aFocalPoint[2]);
+  
+  // get custom view translation
+  Standard_Real aTranslation[3];
+  aDestView->At(aTranslation[0], aTranslation[1], aTranslation[2]);
+
+  gp_Dir aLeftDir = gp_Dir(anUpDir[0], anUpDir[1], anUpDir[2]).Crossed(
+    gp_Dir(aProjDir.X(), aProjDir.Y(), aProjDir.Z()));
+
+  // convert camera position into a view reference point
+  gp_Trsf aTrsf;
+  aTrsf.SetValues( aLeftDir.X(), anUpDir[0], aProjDir.X(), aTranslation[0],
+                   aLeftDir.Y(), anUpDir[1], aProjDir.Y(), aTranslation[1],
+                   aLeftDir.Z(), anUpDir[2], aProjDir.Z(), aTranslation[2], 
+                   Precision::Confusion(),
+                   Precision::Confusion() );
+  aTrsf.Invert();
+
+  // transform to view-space coordinate system
+  gp_Pnt aProjRef(aPosition[0], aPosition[1], aPosition[2]);
+  aProjRef.Transform(aTrsf);
+
+  // set view camera properties using low-level approach. this is done
+  // in order to avoid interference with static variables in v3d view used
+  // when rotation is in process in another view.
+  Visual3d_ViewMapping aMapping = aDestView->View()->ViewMapping();
+  Visual3d_ViewOrientation anOrientation = aDestView->View()->ViewOrientation();
+
+  Graphic3d_Vector aMappingProj(aProjDir.X(), aProjDir.Y(), aProjDir.Z());
+  Graphic3d_Vector aMappingUp(anUpDir[0], anUpDir[1], anUpDir[2]);
+
+  aMappingProj.Normalize();
+  aMappingUp.Normalize();
+
+  anOrientation.SetViewReferencePlane(aMappingProj);
+  anOrientation.SetViewReferenceUp(aMappingUp);
+
+  aDestView->SetViewMapping(aMapping);
+  aDestView->SetViewOrientation(anOrientation);
+
+  // set panning
+  aDestView->SetCenter(aProjRef.X(), aProjRef.Y());
+
+  // set mapping scale
+  Standard_Real aWidth, aHeight;
+  aDestView->Size(aWidth, aHeight);
+  
+  if ( aWidth > aHeight )
+    aDestView->SetSize (aMapScaling * (aWidth / aHeight));
+  else
+    aDestView->SetSize (aMapScaling);
+
+  getViewPort()->setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+
+  aDestView->ZFitAll();
+  aDestView->SetImmediateUpdate( Standard_True );
+  aDestView->Redraw();
+
+  blockSignals( blocked );
 }

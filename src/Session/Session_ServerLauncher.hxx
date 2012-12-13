@@ -67,6 +67,7 @@ public:
                          QWaitCondition *SessionStarted);
   virtual ~Session_ServerLauncher();
   void run();
+  void ShutdownAll();
   void KillAll();
 
 protected:

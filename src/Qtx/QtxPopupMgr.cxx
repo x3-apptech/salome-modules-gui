@@ -374,7 +374,7 @@ int QtxPopupMgr::insertAction( QAction* a, const int pId, const QString& rule, c
 */
 bool QtxPopupMgr::hasRule( QAction* a, const RuleType t ) const
 {
-  return a ? expression( a, t, false ) : false;
+  return a ? expression( a, t, false )!=0 : false;
 }
 
 /*!

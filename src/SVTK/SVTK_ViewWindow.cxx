@@ -76,7 +76,6 @@
 #include "VTKViewer_Trihedron.h"
 
 #include "SVTK_View.h"
-//#include "SVTK_MainWindow.h"
 #include "SVTK_Selector.h"
 
 #include "SVTK_Event.h"
@@ -229,6 +228,8 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
 
   GetInteractor()->GetInteractorStyle()->AddObserver(SVTK::OperationFinished, 
 						     myEventCallbackCommand.GetPointer(), 0.0);
+  myKeyFreeInteractorStyle->AddObserver(SVTK::OperationFinished, 
+					myEventCallbackCommand.GetPointer(), 0.0);
 
 
   
@@ -259,6 +260,8 @@ void SVTK_ViewWindow::Initialize(SVTK_View* theView,
           this,SIGNAL(contextMenuRequested(QContextMenuEvent *)));
   connect(theView,SIGNAL(selectionChanged()),
           theModel,SLOT(onSelectionChanged()));
+
+  connect( this, SIGNAL( transformed( SVTK_ViewWindow* ) ), SLOT( emitViewModified() ) );
 }
 
 /*!
@@ -1843,6 +1846,8 @@ void SVTK_ViewWindow::onPerspectiveMode()
   vtkCamera* aCamera = getRenderer()->GetActiveCamera();
   aCamera->SetParallelProjection(anIsParallelMode);
   GetInteractor()->GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
+
+  emit transformed( this );
 }
 
 void SVTK_ViewWindow::SetEventDispatcher(vtkObject* theDispatcher)
@@ -2065,15 +2070,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   mgr->registerAction( anAction, ViewParametersId );
 
   // Synchronize View 
-  anAction = new QtxAction(tr("MNU_SYNCHRONIZE_VIEW"), 
-                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_SYNCHRONIZE" ) ),
-                           tr( "MNU_SYNCHRONIZE_VIEW" ), 0, this);
-  anAction->setStatusTip(tr("DSC_SYNCHRONIZE_VIEW"));
-  anAction->setMenu( new QMenu( this ) );
-  anAction->setCheckable(true);
-  connect(anAction->menu(), SIGNAL(aboutToShow()), this, SLOT(updateSyncViews()));
-  connect(anAction, SIGNAL(triggered(bool)), this, SLOT(onSynchronizeView(bool)));
-  mgr->registerAction( anAction, SynchronizeId );
+  mgr->registerAction( synchronizeAction(), SynchronizeId );
 
   // Switch between interaction styles
   anAction = new QtxAction(tr("MNU_SVTK_STYLE_SWITCH"), 
@@ -2361,134 +2358,6 @@ void SVTK_ViewWindow::hideEvent( QHideEvent * theEvent )
   emit Hide( theEvent );
 }
 
-void SVTK_ViewWindow::synchronizeView( SVTK_ViewWindow* viewWindow, int id )
-{
-  SVTK_ViewWindow* otherViewWindow = 0;
-  QList<SVTK_ViewWindow*> compatibleViews;
-
-  bool isSync = viewWindow->toolMgr()->action( SynchronizeId )->isChecked();
-
-  int vwid = viewWindow->getId();
-  
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if ( !app ) return;
-
-  QList<SUIT_ViewManager*> wmlist;
-  app->viewManagers( viewWindow->getViewManager()->getType(), wmlist );
-
-  foreach( SUIT_ViewManager* wm, wmlist ) {
-    QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
-
-    foreach( SUIT_ViewWindow* vw, vwlist ) {
-      SVTK_ViewWindow* vtkVW = dynamic_cast<SVTK_ViewWindow*>( vw );
-      if ( !vtkVW ) continue;
-      if ( vtkVW->getId() == id ) 
-	otherViewWindow = vtkVW;
-      else if ( vtkVW != viewWindow )
-	compatibleViews.append( vtkVW );
-    }
-  }
-
-  if ( isSync && id ) {
-    // remove all possible disconnections
-    foreach( SVTK_ViewWindow* vw, compatibleViews ) {
-      // disconnect target view
-      vw->disconnect( SIGNAL( transformed( SVTK_ViewPort* ) ), viewWindow, SLOT( synchronize( SVTK_ViewPort* ) ) );
-      viewWindow->disconnect( SIGNAL( transformed( SVTK_ViewPort* ) ), vw, SLOT( synchronize( SVTK_ViewPort* ) ) );
-      if ( otherViewWindow ) {
-	// disconnect source view
-	vw->disconnect( SIGNAL( transformed( SVTK_ViewPort* ) ), otherViewWindow, SLOT( synchronize( SVTK_ViewPort* ) ) );
-	otherViewWindow->disconnect( SIGNAL( transformed( SVTK_ViewPort* ) ), vw, SLOT( synchronize( SVTK_ViewPort* ) ) );
-      }
-      QAction* a = vw->toolMgr()->action( SynchronizeId );
-      if ( a ) {
-	int anid = a->data().toInt();
-	if ( a->isChecked() && ( anid == id || anid == vwid ) ) {
-	  bool blocked = a->blockSignals( true );
-	  a->setChecked( false );
-	  a->blockSignals( blocked );
-	}
-      }
-    }
-    if ( otherViewWindow ) {
-      // reconnect source and target view
-      otherViewWindow->disconnect( SIGNAL( transformed( SVTK_ViewWindow* ) ), viewWindow, SLOT( synchronize( SVTK_ViewWindow* ) ) );
-      viewWindow->disconnect( SIGNAL( transformed( SVTK_ViewWindow* ) ), otherViewWindow, SLOT( synchronize( SVTK_ViewWindow* ) ) );
-      otherViewWindow->connect( viewWindow, SIGNAL( transformed( SVTK_ViewWindow* ) ), SLOT( synchronize( SVTK_ViewWindow* ) ) );
-      viewWindow->connect( otherViewWindow, SIGNAL( transformed( SVTK_ViewWindow* ) ), SLOT( synchronize( SVTK_ViewWindow* ) ) );
-      // synchronize target view with source view
-      viewWindow->doSetVisualParameters( otherViewWindow->getVisualParameters(), true );
-      viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
-      otherViewWindow->toolMgr()->action( SynchronizeId )->setData( viewWindow->getId() );
-      if ( !otherViewWindow->toolMgr()->action( SynchronizeId )->isChecked() ) {
-	bool blocked = otherViewWindow->toolMgr()->action( SynchronizeId )->blockSignals( true );
-	otherViewWindow->toolMgr()->action( SynchronizeId )->setChecked( true );
-	otherViewWindow->toolMgr()->action( SynchronizeId )->blockSignals( blocked );
-      }
-    }
-  }
-  else if ( otherViewWindow ) {
-    // reconnect source and target view
-    otherViewWindow->disconnect( SIGNAL( transformed( SVTK_ViewWindow* ) ), viewWindow, SLOT( synchronize( SVTK_ViewWindow* ) ) );
-    viewWindow->disconnect( SIGNAL( transformed( SVTK_ViewWindow* ) ), otherViewWindow, SLOT( synchronize( SVTK_ViewWindow* ) ) );
-    viewWindow->doSetVisualParameters( otherViewWindow->getVisualParameters(), true );
-    viewWindow->toolMgr()->action( SynchronizeId )->setData( otherViewWindow->getId() );
-    if ( otherViewWindow->toolMgr()->action( SynchronizeId )->data().toInt() == viewWindow->getId() && otherViewWindow->toolMgr()->action( SynchronizeId )->isChecked() ) {
-      bool blocked = otherViewWindow->toolMgr()->action( SynchronizeId )->blockSignals( true );
-      otherViewWindow->toolMgr()->action( SynchronizeId )->setChecked( false );
-      otherViewWindow->toolMgr()->action( SynchronizeId )->blockSignals( blocked );
-    }
-  }
-}
-
-/*!
-  "Synchronize View" action slot.
-*/
-void SVTK_ViewWindow::onSynchronizeView(bool checked)
-{
-  QAction* a = qobject_cast<QAction*>( sender() );
-  if ( a ) {
-    synchronizeView( this, a->data().toInt() );
-  }
-}
-
-/*!
-  Update list of available view for the "Synchronize View" action
-*/
-void SVTK_ViewWindow::updateSyncViews()
-{
-  QAction* anAction = toolMgr()->action( SynchronizeId );
-  if ( anAction && anAction->menu() ) {
-    int currentId = anAction->data().toInt();
-    anAction->menu()->clear();
-    SUIT_Application* app = SUIT_Session::session()->activeApplication();
-    if ( app ) { 
-      QList<SUIT_ViewManager*> wmlist;
-      app->viewManagers( getViewManager()->getType(), wmlist );
-      foreach( SUIT_ViewManager* wm, wmlist ) {
-	QVector<SUIT_ViewWindow*> vwlist = wm->getViews();
-	foreach ( SUIT_ViewWindow* vw, vwlist ) {
-	  SVTK_ViewWindow* vtkVW = dynamic_cast<SVTK_ViewWindow*>( vw );
-	  if ( !vtkVW || vtkVW == this ) continue;
-	  QAction* a = anAction->menu()->addAction( vtkVW->windowTitle() );
-          if ( vtkVW->getId() == currentId ) {
-            QFont f = a->font();
-	    f.setBold( true );
-	    a->setFont( f );
-	  }
-	  a->setData( vtkVW->getId() );
-	  connect( a, SIGNAL( triggered(bool) ), this, SLOT( onSynchronizeView(bool) ) );
-	}
-      }
-    }
-    if ( anAction->menu()->actions().isEmpty() ) {
-      anAction->setData( 0 );
-      anAction->menu()->addAction( tr( "MNU_SYNC_NO_VIEW" ) );
-    }
-  }
-}
-
-
 /*!
   Emit transformed signal.
 */
@@ -2507,4 +2376,100 @@ void SVTK_ViewWindow::ProcessEvents(vtkObject* vtkNotUsed(theObject),
   SVTK_ViewWindow* self = reinterpret_cast<SVTK_ViewWindow*>(theClientData);
   if(self)
     self->emitTransformed();
+}
+
+/*!
+  Get camera properties for the SVTK view window.
+  \return shared pointer on camera properties.
+*/
+SUIT_CameraProperties SVTK_ViewWindow::cameraProperties()
+{
+  SUIT_CameraProperties aProps;
+
+  // get vtk camera
+  vtkCamera* aCamera = getRenderer()->GetActiveCamera();
+  if ( !aCamera )
+    return aProps;
+  
+  aProps.setDimension( SUIT_CameraProperties::Dim3D );
+  if ( toolMgr()->action( ParallelModeId ) ) {
+    if ( toolMgr()->action( ParallelModeId )->isChecked() )
+      aProps.setProjection( SUIT_CameraProperties::PrjOrthogonal );
+    else
+      aProps.setProjection( SUIT_CameraProperties::PrjPerspective );
+  }
+
+  double aFocalPoint[3];
+  double aPosition[3];
+  double aViewUp[3];
+  double anAxialScale[3];
+
+  aCamera->OrthogonalizeViewUp();
+  aCamera->GetFocalPoint(aFocalPoint);
+  aCamera->GetPosition(aPosition);
+  aCamera->GetViewUp(aViewUp);
+  
+  aProps.setFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
+  aProps.setPosition(aPosition[0], aPosition[1], aPosition[2]);
+  aProps.setViewUp(aViewUp[0], aViewUp[1], aViewUp[2]);
+  aProps.setMappingScale(aCamera->GetParallelScale());
+
+  if (aProps.getProjection() == SUIT_CameraProperties::PrjPerspective)
+  {
+    aProps.setViewAngle(aCamera->GetViewAngle());
+  }
+
+  GetRenderer()->GetScale(anAxialScale);
+  aProps.setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  
+  return aProps;
+}
+
+/*!
+  Synchronize views.
+  This implementation synchronizes camera propreties.
+*/
+void SVTK_ViewWindow::synchronize( SUIT_ViewWindow* theView )
+{
+  bool blocked = blockSignals( true );
+
+  SUIT_CameraProperties aProps = theView->cameraProperties();
+  if ( !cameraProperties().isCompatible( aProps ) ) {
+    // other view, this one is being currently synchronized to, seems has become incompatible
+    // we have to break synchronization
+    updateSyncViews();
+    return;
+  }
+
+  // get camera
+  vtkCamera* aCamera = getRenderer()->GetActiveCamera();
+  
+  double aFocalPoint[3];
+  double aPosition[3];
+  double aViewUp[3];
+  double anAxialScale[3];
+
+  // get common properties
+  aProps.getViewUp(aViewUp[0], aViewUp[1], aViewUp[2]);
+  aProps.getPosition(aPosition[0], aPosition[1], aPosition[2]);
+  aProps.getFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
+  aProps.getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  
+  // restore properties to the camera
+  aCamera->SetViewUp(aViewUp);
+  aCamera->SetPosition(aPosition);
+  aCamera->SetFocalPoint(aFocalPoint);
+  aCamera->SetParallelScale(aProps.getMappingScale());
+
+  if (aProps.getProjection() == SUIT_CameraProperties::PrjPerspective)
+  {
+    aCamera->SetViewAngle(aProps.getViewAngle());
+  }
+
+  GetRenderer()->SetScale(anAxialScale);
+
+  getRenderer()->ResetCameraClippingRange();
+  Repaint(false);
+
+  blockSignals( blocked );
 }

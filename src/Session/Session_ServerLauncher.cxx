@@ -230,6 +230,16 @@ void Session_ServerLauncher::ActivateAll()
   delete[] argv;
 }
 
+void Session_ServerLauncher::ShutdownAll()
+{
+  MESSAGE("Session_ServerLauncher::ShutdownAll()");
+  std::list<Session_ServerThread*>::reverse_iterator itServ;
+  for (itServ = _serverThreads.rbegin(); itServ !=_serverThreads.rend(); itServ++)
+  {
+    (*itServ)->Shutdown();
+  }
+}
+
 /*! 
   Destruction des classes serveur dans l'ordre inverse de creation
 */

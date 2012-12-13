@@ -12,23 +12,23 @@ viewers, dialogs, etc. Each desktop also has its own menu and toolbar.
 The main SALOME Desktop consists of the following sections and
 toolbars:
 
-\image html geomview-alt.png
+\image html desktop.png
 
 
 <b>Basic parts of the SALOME Desktop:</b>
 <ul>
 <li><b>Main menu</b> - This is a set of context-sensitive menus, which will
-be updated according the functionality of the loaded component. In
-general,  these menus contain all functional options of SALOME
+be updated according to the functionality of the currently active component. In
+general, these menus contain all functional options of SALOME
 platform.</li>
-<li><b>Standard Toolbar</b> - This toolbar contains icons allowing
-creating/saving studies, correcting mistakes, copying/pasting
-objects.</li>
-<li><b>Components Toolbar</b> - This toolbar is destined for uploading
+<li><b>Standard toolbar</b> - This toolbar contains standard actions
+that allow creating new or opening existing study, saving study, deleting
+objects etc.</li>
+<li><b>Components toolbar</b> - This toolbar allows activating
 components in SALOME platform.</li>
-<li><b>Module Toolbar</b> - This toolbar contains icons specific to the
-loaded module.</li>
-<li><b>Viewer Toolbar</b> - This is a set of tools destined for visualization
+<li><b>Module toolbars</b> - These toolbars contain actions specific to the
+currently active module.</li>
+<li><b>Viewer toolbar</b> - This is a set of tools destined for visualization
 of the presentations in the viewer.</li>
 </ul>
 
@@ -47,7 +47,7 @@ place of the window.
 
 <b>Parts of  the study window:</b>
 <ul>
-<li><b>Object Browser</b> - Management of objects created or imported into
+<li><b>Object browser</b> - Management of objects created or imported into
 SALOME application.</li>
 <li>\b Viewer - This window is destined for visualization of
 presentations.</li>

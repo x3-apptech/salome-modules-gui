@@ -183,7 +183,7 @@ if DEMO_IS_ACTIVATED:
       global tubebuilder, xalome
       global dialogWithApply, activeStudy
       global previewShapeEntry, deletePreviewShape
-      global DEFAULT_FOLDER_NAME,DEFAULT_SHAPE_NAME 
+      global DEFAULT_FOLDER_NAME,DEFAULT_SHAPE_NAME
 
       dialogWithApply.accept()
 
@@ -194,7 +194,7 @@ if DEMO_IS_ACTIVATED:
       shape = tubebuilder.createGeometry(activeStudy, radius, length, width)
       entry = xalome.addToStudy(activeStudy, shape, DEFAULT_SHAPE_NAME, DEFAULT_FOLDER_NAME)
       xalome.displayShape(entry)
-      
+
   def rejectCallback():
       """Action to be done when click on Cancel"""
       global dialogWithApply, previewShapeEntry, deletePreviewShape
@@ -262,13 +262,15 @@ def runSalomeShellSession(context):
     version = salome_version.getVersion(full=True)
     kernel_appli_dir = os.environ['KERNEL_ROOT_DIR']
     command = ""
-    if os.path.exists("/usr/bin/xterm"):
-      command = 'xterm -T "SALOME %s - Shell session" -e %s/runSession &'%(version,kernel_appli_dir)
-    elif os.path.exists("/usr/bin/gnome-terminal"):
+    if os.path.exists("/usr/bin/gnome-terminal"):
       command = 'gnome-terminal -t "SALOME %s - Shell session" -e %s/runSession &'%(version,kernel_appli_dir)
+    elif os.path.exists("/usr/bin/konsole"):
+      command = 'PATH="/usr/bin:/sbin:/bin" LD_LIBRARY_PATH="" konsole -e %s/runSession &'%(kernel_appli_dir)
+    elif os.path.exists("/usr/bin/xterm"):
+      command = 'xterm -T "SALOME %s - Shell session" -e %s/runSession &'%(version,kernel_appli_dir)
     else:
-      print "Neither xterm nor gnome-terminal is installed."
-    
+      print "Neither xterm nor gnome-terminal nor konsole is installed."
+
     if command is not "":
       try:
         subprocess.check_call(command, shell = True)

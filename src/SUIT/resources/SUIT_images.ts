@@ -11,5 +11,9 @@
         <source>ICON_DATAOBJ_INVISIBLE</source>
         <translation>icon_visibility_off.png</translation>
     </message>
+    <message>
+        <source>ICON_VIEW_SYNC</source>
+        <translation>view_sync.png</translation>
+    </message>
 </context>
 </TS>

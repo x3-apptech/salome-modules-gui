@@ -242,7 +242,8 @@ QtxMainWindow::QtxMainWindow( QWidget* parent, Qt::WindowFlags f )
   myOpaque( true ),
   myResizer( 0 ),
   myMouseMove( 0 ),
-  myFullScreenAllowed(true)
+  myFullScreenAllowed(true),
+  myMinimizeAllowed(true)
 {
   //rnv: Enables tooltips for inactive windows.
   //rnv: For details see http://bugtracker.opencascade.com/show_bug.cgi?id=20893
@@ -398,7 +399,7 @@ QString QtxMainWindow::storeGeometry() const
     state = QString( "max" );
     break;
   case Qt::WindowMinimized:
-    state = QString( "min" );
+    if ( isMinimizeAllowed() ) state = QString( "min" );
     break;
   case Qt::WindowFullScreen:
     state = isFullScreenAllowed() ? QString( "full" ) : QString( "max" );
@@ -482,12 +483,16 @@ void QtxMainWindow::retrieveGeometry( const QString& str )
   if ( stRx.indexIn( geom ) != -1 )
   {
     QString stStr = stRx.cap( 1 ).trimmed().toLower();
-    if ( stStr.startsWith( QString( "max" ) ) )
+    if ( stStr.startsWith( QString( "max" ) ) ) {
       state = Qt::WindowMaximized;
-    else if ( stStr.startsWith( QString( "min" ) ) )
-      state = Qt::WindowMinimized;
-    else if ( stStr.startsWith( QString( "full" ) ) )
-      state = Qt::WindowFullScreen;
+    }
+    else if ( stStr.startsWith( QString( "min" ) ) ) {
+      if ( isMinimizeAllowed() )
+	state = Qt::WindowMinimized;
+    }
+    else if ( stStr.startsWith( QString( "full" ) ) ) {
+      state = isFullScreenAllowed() ? Qt::WindowFullScreen : Qt::WindowMaximized;
+    }
   }
 
   resize( rect.size() );
@@ -629,7 +634,7 @@ bool QtxMainWindow::event( QEvent* e )
 /*!
   \brief FullScreenAllowed flag allowed dump in the main window geometry 
          Qt::WindowFullScreen parameter.
-  \return \c fullScreenAllowed flag.
+  \return \c FullScreenAllowed flag.
 */
 bool QtxMainWindow::isFullScreenAllowed() const {
   return myFullScreenAllowed;
@@ -639,8 +644,27 @@ bool QtxMainWindow::isFullScreenAllowed() const {
 /*!
   \brief Set FullScreenAllowed flag.
          The default value is true.
-  \param f value of the fullScreenAllowed flag.
+  \param f value of the FullScreenAllowed flag.
 */
 void QtxMainWindow::setFullScreenAllowed( const bool f ) {
     myFullScreenAllowed = f;
+}
+
+/*!
+  \brief MinimizeAllowed flag allowed dump in the main window geometry 
+         Qt::WindowMinimized parameter.
+  \return \c MinimizeAllowed flag.
+*/
+bool QtxMainWindow::isMinimizeAllowed() const {
+  return myMinimizeAllowed;
+}
+
+
+/*!
+  \brief Set MinimizeAllowed flag.
+         The default value is true.
+  \param f value of the MinimizeAllowed flag.
+*/
+void QtxMainWindow::setMinimizeAllowed( const bool f ) {
+    myMinimizeAllowed = f;
 }

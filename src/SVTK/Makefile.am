@@ -20,11 +20,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-#  File   : Makefile.in
-#  Author : Alexander Solovyov(OCN)
-#  Module : SVTK
-# $Header$
-#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libSVTK.la
@@ -135,7 +130,6 @@ dist_salomeres_DATA=\
 	resources/vtk_view_recording_play.png \
 	resources/vtk_view_recording_pause.png \
 	resources/vtk_view_recording_stop.png \
-	resources/vtk_view_sync.png \
 	resources/vtk_view_highlight.png
 
 nodist_salomeres_DATA =	\

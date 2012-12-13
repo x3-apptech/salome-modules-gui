@@ -66,14 +66,14 @@ public:
 
   virtual void        contextMenuPopup( const QString&, QMenu*, QString& );
 
-  QString             moduleName( const QString& ) const;
-  QString             moduleTitle( const QString& ) const;
-  QString             moduleIcon( const QString& ) const;
-  bool                isModuleAccessible( const QString& ) const;
+  static QString      moduleName( const QString& );
+  static QString      moduleTitle( const QString& );
+  static QString      moduleIcon( const QString& );
+  static bool         isModuleAccessible( const QString& );
 
   virtual void        createEmptyStudy();
 
-  ModuleShortInfoList getVersionInfo() const;
+  static ModuleShortInfoList getVersionInfo();
 
 protected:
   virtual SUIT_Study* createNewStudy();
@@ -86,7 +86,7 @@ protected:
 
   virtual void        setActiveStudy( SUIT_Study* );
 
-  QString             moduleLibrary( const QString&, const bool = true ) const;
+  static QString      moduleLibrary( const QString&, const bool = true );
 
 private:
   void                readModuleList();
@@ -96,11 +96,11 @@ private:
   typedef QList<ModuleInfo> ModuleInfoList;
 
 private:
-  CAM_Module*         myModule;        //!< active module
-  ModuleList          myModules;       //!< loaded modules list
-  ModuleInfoList      myInfoList;      //!< modules info list
-  bool                myAutoLoad;      //!< auto loading flag
-  bool                myBlocked;       //!< "blocked" flag, internal usage
+  CAM_Module*           myModule;        //!< active module
+  ModuleList            myModules;       //!< loaded modules list
+  static ModuleInfoList myInfoList;      //!< modules info list
+  bool                  myAutoLoad;      //!< auto loading flag
+  bool                  myBlocked;       //!< "blocked" flag, internal usage
 };
 
 #ifdef WIN32

@@ -126,6 +126,7 @@ SET(SalomeApp_SOURCES
   SalomeApp_NoteBookDlg.cxx
   SalomeApp_DoubleSpinBox.cxx
   SalomeApp_IntSpinBox.cxx
+  SalomeApp_Engine_i.cxx
 )
 
 SET(GUITS_SOURCES
@@ -160,6 +161,7 @@ SET(COMMON_HEADERS_H
   SalomeApp_NoteBookDlg.h
   SalomeApp_DoubleSpinBox.h
   SalomeApp_IntSpinBox.h
+  SalomeApp_Engine_i.h
 )
 
 INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${GUI_salomeinclude_HEADERS})

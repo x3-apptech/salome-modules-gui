@@ -298,31 +298,7 @@ void Plot2d_ViewFrame::EraseAll()
       }
       myIntermittentSegmentList.clear();
   }
-
-  // 2)- Erase all curves points markers
-
-  int nbMark = myMarkerList.size();
-  if (nbMark > 0)
-  {
-      for (int imar=0; imar < nbMark; imar++)
-      {
-          QwtPlotMarker *marker = myMarkerList[imar];
-
-          marker->detach();  // erase in QwtPlot window
-          delete marker;
-      }
-      myMarkerList.clear();
-  }
-
-  // The graphic view's picker
-  Plot2d_QwtPlotPicker *picker = myPlot->getPicker();
-
-  // Clear points markers list and associations (marker,tooltip)
-  if ( picker ) {
-    picker->pMarkers.clear();         // QList<QwtPlotMarker*>
-    picker->pMarkersToolTip.clear();  // QMap<QwtPlotMarker*, QwtText>
-  }
-
+  
   // 3)- Erase all QwtPlotCurve associated with the Plot2d_Curve
 
   int nbCur1 = myQwtPlotCurveList.size();
@@ -1435,6 +1411,7 @@ void Plot2d_ViewFrame::fitAll()
 
   double xmin, xmax, y1min, y1max, y2min, y2max;
   getFitRangeByCurves(xmin, xmax, y1min, y1max, y2min, y2max);
+  getFitRangeByMarkers(xmin, xmax, y1min, y1max, y2min, y2max);
 
   myPlot->setAxisScale( QwtPlot::xBottom, xmin, xmax );
   myPlot->setAxisScale( QwtPlot::yLeft, y1min, y1max );
@@ -1584,6 +1561,47 @@ void Plot2d_ViewFrame::getFitRangeByCurves(double& xMin,  double& xMax,
     y2Min = isModeVerLinear() ? 0.    : 1.;
     y2Max = isModeVerLinear() ? 1000. : 1e5;
   }
+}
+
+/*!
+  Gets current fit ranges by Markers
+  All parameters are inout.
+*/
+void Plot2d_ViewFrame::getFitRangeByMarkers(double& xMin,  double& xMax,
+                                            double& yMin,  double& yMax,
+                                            double& y2Min, double& y2Max)
+{
+  Plot2d_QwtPlotPicker *picker=myPlot->getPicker();
+  if(!picker)
+    return;
+  if(picker->pMarkers.empty())
+    return;
+  foreach(QwtPlotMarker *mrker,picker->pMarkers)
+    {
+      bool isV2 = mrker->yAxis() == QwtPlot::yRight;
+      xMin = qMin( xMin, mrker->xValue() );
+      xMax = qMax( xMax, mrker->xValue() );
+      if ( isV2 ) {
+        y2Min = qMin( y2Min, mrker->yValue() );
+        y2Max = qMax( y2Max, mrker->yValue() );
+      }
+      else {
+        yMin = qMin( yMin, mrker->yValue() );
+        yMax = qMax( yMax, mrker->yValue() );
+      }
+      if ( xMin == xMax ) {
+        xMin = xMin == 0. ? -1. : xMin - xMin/10.;
+        xMax = xMax == 0. ?  1. : xMax + xMax/10.;
+      }
+      if ( yMin == yMax ) {
+        yMin = yMin == 0. ? -1. : yMin - yMin/10.;
+        yMax = yMax == 0. ?  1  : yMax + yMax/10.;
+      }
+      if ( y2Min == y2Max ) {
+        y2Min = y2Min == 0. ? -1. : y2Min - y2Min/10.;
+        y2Max = y2Max == 0. ?  1  : y2Max + y2Max/10.;
+      }
+    }
 }
 
 /*!
@@ -2813,7 +2831,8 @@ public:
 */
 Plot2d_Plot2d::Plot2d_Plot2d( QWidget* parent )
   : QwtPlot( parent ),
-    myIsPolished( false )
+    myIsPolished( false ),
+    myPicker( 0 )
 {
   // Create alternative scales
   setAxisScaleDraw( QwtPlot::yLeft,   new Plot2d_ScaleDraw() );
@@ -4294,28 +4313,28 @@ Plot2d_QwtPlotPicker::~Plot2d_QwtPlotPicker()
  */
 QwtText Plot2d_QwtPlotPicker::trackerText( const QwtDoublePoint & pos ) const
 {
-  for (QList<QwtPlotMarker* >::const_iterator pMarkerIt = pMarkers.begin();
-                                              pMarkerIt != pMarkers.end();
-                                              ++pMarkerIt )
-  {
+  for (QList<QwtPlotMarker* >::const_iterator pMarkerIt = pMarkers.begin();pMarkerIt != pMarkers.end(); ++pMarkerIt )
+    {
       QwtPlotMarker* pMarker = *pMarkerIt;
       if ( pMarker != NULL )
-      {
-          QwtDoubleRect  bound0        = pMarker->boundingRect();
-          QwtDoublePoint center_bound0 = bound0.center();
-          double left = center_bound0.x()-(BOUND_HV_SIZE/2.);
-          double top  = center_bound0.y()-(BOUND_HV_SIZE/2.);
-	  
-          QwtDoubleRect  bound( left, top , BOUND_HV_SIZE, BOUND_HV_SIZE);
-	  
-          if( bound.contains(pos) )
-          {
-            //QString toolTip =  "X="  + QString::number( pMarker->xValue() )
-            //                 + " Y=" + QString::number( pMarker->yValue() );
-            return pMarkersToolTip[pMarker];
-          }
-      }	
+        {
+          const QwtSymbol &symb=pMarker->symbol();
+          const QSize& sz=symb.size();
+          const QwtScaleMap yMapRef=plot()->canvasMap(QwtPlot::yLeft);
+          const QwtScaleMap xMap=plot()->canvasMap(pMarker->xAxis());
+          const QwtScaleMap yMap=plot()->canvasMap(pMarker->yAxis());
+          QwtDoubleRect  bound0=pMarker->boundingRect();
+          QRect bound00=pMarker->transform(xMap,yMap,bound0);
+          QPoint toto(xMap.transform(pos.x()),yMapRef.transform(pos.y()));
+          bound00.setX(bound00.x()-sz.width());
+          bound00.setY(bound00.y()-sz.height());
+          bound00.setWidth(bound00.width()+sz.width());
+          bound00.setHeight(bound00.height()+sz.height());
+          if( bound00.contains(toto) )
+            {
+              return pMarkersToolTip[pMarker];
+            }
+        }
   }
-      
   return QwtText();      
 }
