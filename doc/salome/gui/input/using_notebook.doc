@@ -5,10 +5,11 @@
 SALOME <b>NoteBook</b> allows to predefine numerical and boolean
 parameters (variables).
 
-To open the <b>NoteBook</b> choose <b>File > Notebook</b>, the following
-dialog box will appear:
+By default, the <b>NoteBook</b> takes place in a left tabbed widget.
 
 \image html notebook1.png
+
+To hide/show this tab choose <b>View > Windows > Notebook</b>.
 
 Here you can add new variables, remove and rename existing variables and 
 change their values.
@@ -17,7 +18,7 @@ If you have modified some variables, which are already used in the current
 study, you should click <b>Update Study</b> button to apply your changes
 to the study.
 
-\note The dialog will not be validated until at least one of variables in
+\note The study can not be updated until at least one of variables in
 the table has an invalid name or value (marked by red color). The names of
 variables should be unique and their values should be numerical (integer or
 double) or boolean ("True" / "False").

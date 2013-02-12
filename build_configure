@@ -25,9 +25,8 @@
 # and regenerating configure script
 # Author : Marc Tajchman - CEA
 # Date : 10/10/2002
-# $Header$
 # 26/10/2006: Mikhail PONIKAROV - OCN
-# Reorganization for uage of autotools
+# Reorganization for usage of autotools
 #
 ORIG_DIR=`pwd`
 CONF_DIR=`echo $0 | sed -e "s,[^/]*$,,;s,/$,,;s,^$,.,"`

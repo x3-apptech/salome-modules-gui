@@ -83,7 +83,7 @@ public:
   void                setNameOfSavePoint(int savePoint, const QString& nameOfSavePoint);
 
   virtual void        restoreState(int savePoint);
-  void                markAsSavedIn(QString theFileName);
+  void                updateFromNotebook(const QString&, bool);
 
   virtual LightApp_DataObject* findObjectByEntry( const QString& theEntry );
 
@@ -106,6 +106,7 @@ protected:
 						SUIT_DataObject* theParent ) const;
 protected slots:
   virtual void        updateModelRoot( const CAM_DataModel* );
+  void                onNoteBookVarUpdate( QString theVarName );
 
 private:
   QString             newStudyName() const;
@@ -113,6 +114,9 @@ private:
 private:
   _PTR(Study)         myStudyDS;
   Observer_i*         myObserver;
+
+ signals:
+  void                notebookVarUpdated( QString theVarName );
 };
 
 #ifdef WIN32

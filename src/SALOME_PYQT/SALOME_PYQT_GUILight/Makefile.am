@@ -42,9 +42,9 @@ CLEANFILES = $(SIP_SRC)
 
 # moc files (generated my moc)
 MOC_FILES = \
+	SALOME_PYQT_PyModule_moc.cxx \
 	SALOME_PYQT_ModuleLight_moc.cxx \
-	SALOME_PYQT_DataModelLight_moc.cxx 
-
+	SALOME_PYQT_DataModelLight_moc.cxx
 
 # exported header files
 salomeinclude_HEADERS =	\
@@ -56,6 +56,8 @@ salomeinclude_HEADERS =	\
 
 # library sources
 dist_libSalomePyQtGUILight_la_SOURCES = \
+	SALOME_PYQT_PyModule.h \
+	SALOME_PYQT_PyModule.cxx \
 	SALOME_PYQT_ModuleLight.cxx \
 	SALOME_PYQT_DataObjectLight.cxx \
 	SALOME_PYQT_DataModelLight.cxx  \
@@ -78,7 +80,7 @@ if GUI_ENABLE_CORBA
 libSalomePyQtGUILight_la_CPPFLAGS += -I$(srcdir)/../../SalomeApp \
 				     @CORBA_CXXFLAGS@ @CORBA_INCLUDES@
 endif
-			
+
 
 if !GUI_ENABLE_CORBA
   libSalomePyQtGUILight_la_CPPFLAGS += -DGUI_DISABLE_CORBA
@@ -91,7 +93,7 @@ libSalomePyQtGUILight_la_LIBADD = $(PYTHON_LIBS) $(SIP_LIBS) $(PYQT_LIBS) $(VTK_
 if GUI_ENABLE_CORBA
   libSalomePyQtGUILight_la_LIBADD +=../../SalomeApp/libSalomeApp.la $(KERNEL_LDFLAGS) -lSalomeContainer
 endif
-			
+
 
 
 # Custom build step: generate C++ wrapping according to $(SIP_FILES)

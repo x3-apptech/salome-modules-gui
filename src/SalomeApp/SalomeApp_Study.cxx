@@ -75,7 +75,7 @@ class SalomeApp_Study::Observer_i : public virtual POA_SALOMEDS::Observer, QObje
 
 public:
 
-  Observer_i(_PTR(Study) aStudyDS, SalomeApp_Study* aStudy)
+  Observer_i(_PTR(Study) aStudyDS, SalomeApp_Study* aStudy):QObject(aStudy)
   {
     myStudyDS=aStudyDS;
     myStudy=aStudy;
@@ -153,10 +153,10 @@ public:
             SUIT_DataObject* oldFather = suit_obj->parent();
             if (oldFather) {
               oldFather->removeChild(suit_obj, false);
-	      SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( myStudy->application() );
-	      SUIT_AbstractModel* model = dynamic_cast<SUIT_AbstractModel*>(app->objectBrowser()->model());
-	      model->forgetObject( suit_obj );
-		
+              SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( myStudy->application() );
+              SUIT_AbstractModel* model = dynamic_cast<SUIT_AbstractModel*>(app->objectBrowser()->model());
+              model->forgetObject( suit_obj );
+                
               if (SalomeApp_DataObject* oldFatherSA = dynamic_cast<SalomeApp_DataObject*>(oldFather)) {
                 oldFatherSA->updateItem();
               }
@@ -167,7 +167,7 @@ public:
             entry2SuitObject[theID] = suit_obj;
           }
 
-	  suit_obj->updateItem();
+          suit_obj->updateItem();
           // define position in the data tree (in aFatherDO) to insert the aSObj
           int pos = -1;
           //int childDataObjCount = aFatherDO->childCount();
@@ -318,6 +318,11 @@ public:
         }
         break;
       }
+    case 6: //NoteBook variables were modified
+      {
+	myStudy->onNoteBookVarUpdate( QString( theID.c_str() ) );
+	break;
+      }
     default:MESSAGE("Unknown event: "  << event);break;
     } //switch
   } //notifyObserverID_real
@@ -375,6 +380,15 @@ SalomeApp_Study::SalomeApp_Study( SUIT_Application* app )
 */
 SalomeApp_Study::~SalomeApp_Study()
 {
+  if ( myObserver ) {
+    PortableServer::ObjectId_var oid = myObserver->_default_POA()->servant_to_id( myObserver );
+    myObserver->_default_POA()->deactivate_object( oid.in() );
+  }
+}
+
+void SalomeApp_Study::onNoteBookVarUpdate( QString theVarName)
+{
+  emit notebookVarUpdated( theVarName );
 }
 
 /*!
@@ -574,7 +588,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
     // Cast to LightApp class in order to give a chance
     // to light modules to save their data
     if ( LightApp_DataModel* aModel = 
-	 dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
+         dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
       listOfFiles.clear();
       aModel->saveAs( theFileName, this, listOfFiles );
       if ( !listOfFiles.isEmpty() )
@@ -619,7 +633,7 @@ bool SalomeApp_Study::saveDocument()
     // Cast to LightApp class in order to give a chance
     // to light modules to save their data
     if ( LightApp_DataModel* aModel = 
-	 dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
+         dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
       listOfFiles.clear();
       aModel->save(listOfFiles);
       if ( !listOfFiles.isEmpty() )
@@ -680,9 +694,9 @@ void SalomeApp_Study::closeDocument(bool permanently)
   \return - true if the operation succeeds, and false otherwise.
 */
 bool SalomeApp_Study::dump( const QString& theFileName, 
-			    bool toPublish, 
-			    bool isMultiFile,
-			    bool toSaveGUI )
+                            bool toPublish, 
+                            bool isMultiFile,
+                            bool toSaveGUI )
 {
   int savePoint;
   _PTR(AttributeParameter) ap;
@@ -709,13 +723,13 @@ bool SalomeApp_Study::dump( const QString& theFileName,
   QStringList listOfFiles;
   while ( it.hasNext() ) {
     if ( LightApp_DataModel* aModel = 
-	 dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
+         dynamic_cast<LightApp_DataModel*>( it.next() ) ) {
       listOfFiles.clear();
       if ( aModel->dumpPython( theFileName, this, isMultiFile, listOfFiles ) && 
-	   !listOfFiles.isEmpty() )
-	// This call simply passes the data model's dump output to SalomeApp_Engine servant.
-	// This code is shared with persistence mechanism.
-	// NOTE: this should be revised if behavior of saveModuleData() changes!
+           !listOfFiles.isEmpty() )
+        // This call simply passes the data model's dump output to SalomeApp_Engine servant.
+        // This code is shared with persistence mechanism.
+        // NOTE: this should be revised if behavior of saveModuleData() changes!
         saveModuleData(aModel->module()->name(), listOfFiles);
     }
   }
@@ -724,9 +738,9 @@ bool SalomeApp_Study::dump( const QString& theFileName,
   // any light module is present in the current configuration
   QFileInfo aFileInfo( theFileName );
   bool res = aStudy->DumpStudy( aFileInfo.absolutePath().toUtf8().data(),
-				aFileInfo.baseName().toUtf8().data(),
-				toPublish,
-				isMultiFile);
+                                aFileInfo.baseName().toUtf8().data(),
+                                toPublish,
+                                isMultiFile);
   if ( toSaveGUI )
     removeSavePoint( savePoint ); //SRN: remove the created temporary save point.
 
@@ -860,7 +874,7 @@ void SalomeApp_Study::setStudyDS( const _PTR(Study)& s )
   \sa LightApp_Study class, LightApp_DataModel class
 */
 CAM_ModuleObject* SalomeApp_Study::createModuleObject( LightApp_DataModel* theDataModel, 
-						       SUIT_DataObject* theParent ) const
+                                                       SUIT_DataObject* theParent ) const
 {
   SalomeApp_Study* that = const_cast<SalomeApp_Study*>( this );
   
@@ -941,7 +955,7 @@ void SalomeApp_Study::addComponent(const CAM_DataModel* dm)
       // Set default engine IOR
       // Issue 21377 - using separate engine for each type of light module
       std::string anEngineIOR = SalomeApp_Engine_i::EngineIORForComponent( aCompDataType.c_str(),
-									   true );
+                                                                           true );
       aBuilder->DefineComponentInstance(aComp, anEngineIOR);
       //SalomeApp_DataModel::BuildTree( aComp, root(), this, /*skipExisitng=*/true );
       SalomeApp_DataModel::synchronize( aComp, this );
@@ -1120,10 +1134,11 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bo
   Mark the study as saved in the file
   \param theFileName - the name of file
 */
-void SalomeApp_Study::markAsSavedIn(QString theFileName)
+void SalomeApp_Study::updateFromNotebook( const QString& theFileName, bool isSaved )
 {
   setStudyName(theFileName);
-  setIsSaved(true);
+  studyDS()->Name(theFileName.toStdString());
+  setIsSaved( isSaved );
 }
 
 LightApp_DataObject* SalomeApp_Study::findObjectByEntry( const QString& theEntry )

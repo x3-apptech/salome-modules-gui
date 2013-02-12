@@ -38,6 +38,7 @@ the appearance of Salome, etc. Among key parts of study window are:
 management of objects created or imported into the SALOME
 application, also providing search possibilities with the 
 \subpage using_find_tool_page "Find Tool", and </li>
+<li>\subpage using_notebook "Notebook" - allows to predefine study variables.</li>
 <li>\subpage python_interpreter_page "Python interpreter", used for
 direct input of python commands and dumping studies into Python
 scripts. </li> 

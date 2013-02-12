@@ -23,7 +23,6 @@
 #  File   : Makefile.in
 #  Author : Vladimir Klyachin (OCN)
 #  Module : SalomeApp
-#  $Header$
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
@@ -55,7 +54,7 @@ salomeinclude_HEADERS =			\
 	SalomeApp_CheckFileDlg.h	\
 	SalomeApp_VisualState.h		\
 	SalomeApp_ExitDlg.h             \
-	SalomeApp_NoteBookDlg.h         \
+	SalomeApp_NoteBook.h            \
 	SalomeApp_DoubleSpinBox.h       \
 	SalomeApp_IntSpinBox.h		\
 	SalomeApp_Engine_i.h
@@ -78,7 +77,7 @@ dist_libSalomeApp_la_SOURCES =			\
 	SalomeApp_CheckFileDlg.cxx		\
 	SalomeApp_VisualState.cxx		\
 	SalomeApp_ExitDlg.cxx                   \
-	SalomeApp_NoteBookDlg.cxx               \
+	SalomeApp_NoteBook.cxx                  \
 	SalomeApp_DoubleSpinBox.cxx             \
 	SalomeApp_IntSpinBox.cxx		\
 	SalomeApp_Engine_i.cxx
@@ -93,7 +92,7 @@ MOC_FILES =					\
 	SalomeApp_ListView_moc.cxx		\
 	SalomeApp_CheckFileDlg_moc.cxx		\
 	SalomeApp_ExitDlg_moc.cxx               \
-	SalomeApp_NoteBookDlg_moc.cxx           \
+	SalomeApp_NoteBook_moc.cxx              \
 	SalomeApp_DoubleSpinBox_moc.cxx         \
 	SalomeApp_IntSpinBox_moc.cxx
 

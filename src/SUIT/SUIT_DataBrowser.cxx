@@ -176,7 +176,7 @@ int SUIT_DataBrowser::shortcutKey(const int id) const
 */
 void SUIT_DataBrowser::setShortcutKey( const int id, const int key )
 { 
-  ShortcutMap::iterator it = myShortcutMap.find( key );
+  ShortcutMap::iterator it = myShortcutMap.find( id );
   if( it != myShortcutMap.end() )
     (*it)->setKey(key);
 }

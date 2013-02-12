@@ -243,6 +243,7 @@ public:
   static QString           getReference( const QString& ) /ReleaseGIL/ ;
 
   static void              removeObject(const QString&  )    /ReleaseGIL/ ;
+  static void              removeChildren(const QString& = QString("")  ) /ReleaseGIL/ ;
   static void              removeChild(const QString& = QString("")  ) /ReleaseGIL/ ;
   static QStringList       getChildren(const QString&=QString("") , const bool = false) /ReleaseGIL/ ;
 

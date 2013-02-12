@@ -24,7 +24,6 @@
 #  File   : Makefile.in
 #  Author : Paul RASCLE, EDF
 #  Module : SALOME
-#  $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 

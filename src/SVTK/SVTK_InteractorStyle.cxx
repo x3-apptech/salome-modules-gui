@@ -261,6 +261,7 @@ void SVTK_InteractorStyle::RotateXY(int dx, int dy)
   // To apply the transformation
   cam->SetPosition(aTransform->TransformPoint(viewPos));
   cam->SetFocalPoint(aTransform->TransformPoint(viewFP));
+  aTransform->Delete();
 
   cam->OrthogonalizeViewUp();
 

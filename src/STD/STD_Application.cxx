@@ -219,7 +219,8 @@ void STD_Application::createActions()
   // Create menus
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1, MenuFileId, 0 );
-  int editMenu = createMenu( tr( "MEN_DESK_EDIT" ), -1, MenuEditId, 10 );
+  // Let the application developers insert some menus between Edit and View
+  int editMenu = createMenu( tr( "MEN_DESK_EDIT" ), -1, MenuEditId, 5 );
   int viewMenu = createMenu( tr( "MEN_DESK_VIEW" ), -1, MenuViewId, 10 );
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, MenuHelpId, 1000 );
 

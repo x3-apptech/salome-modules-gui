@@ -47,6 +47,8 @@ public:
   bool                 hasSelection() const;
   void                 setSelection( const bool );
 
+  virtual QString      getString() const;
+
 signals:
   void                 returnPressed();
 
@@ -60,7 +62,6 @@ protected:
   virtual QWidget*     createControl( QWidget* );
   QLineEdit*           lineEdit() const;
 
-  virtual QString      getString() const;
   virtual void         setString( const QString& );
 
   virtual void         unitSystemChanged( const QString& );

@@ -48,7 +48,7 @@ COMMON_CPP_FLAGS = \
 	-I.
 
 COMMON_LIBS  = \
-	$(CORBA_LIBS) $(QT_LIBS) \
+	$(CORBA_LIBS) $(QT_LIBS) $(VTK_LIBS) \
 	$(top_builddir)/src/TreeData/libSalomeTreeData.la \
 	$(top_builddir)/src/GuiHelpers/libSalomeGuiHelpers.la \
 	$(top_builddir)/src/SUIT/libsuit.la \

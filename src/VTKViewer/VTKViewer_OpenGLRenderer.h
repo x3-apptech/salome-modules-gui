@@ -20,13 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME VTKViewer : build VTK viewer into Salome desktop
-//  File   :
-//  Author :
-//  Module :
-//  $Header$
-//
-
 #ifndef VTKVIEWER_OPENGLRENDERER_H
 #define VTKVIEWER_OPENGLRENDERER_H
 

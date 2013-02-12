@@ -27,12 +27,15 @@
 #include "CAM_Study.h"
 
 #include <QtxAction.h>
+#include <QtxActionGroup.h>
 #include <QtxActionMenuMgr.h>
 #include <QtxActionToolMgr.h>
 
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
+
+#include <QMenu>
 
 /*!
   \class CAM_Module
@@ -874,6 +877,10 @@ QAction* CAM_Module::action( const int id ) const
   QAction* a = 0;
   if ( myActionMap.contains( id ) )
     a = myActionMap[id];
+  else if ( menuMgr() ) {
+    QMenu* m = menuMgr()->findMenu( id );
+    if ( m ) a = m->menuAction();
+  }
   return a;
 }
 
@@ -925,6 +932,23 @@ QAction* CAM_Module::createAction( const int id, const QString& text, const QIco
 
   registerAction( id, a );
 
+  return a;
+}
+
+/*!
+  \brief Create new action group.
+  \param id action group ID
+  \param exclusive \c true for exclusive action group
+  \return created action group
+*/
+QtxActionGroup* CAM_Module::createActionGroup( const int id, const bool exclusive )
+{
+  QtxActionGroup* a = qobject_cast<QtxActionGroup*>( action( id ) );
+  if ( !a ) {
+    a = new QtxActionGroup( this );
+    registerAction( id, a );
+  }
+  a->setExclusive( exclusive );
   return a;
 }
 

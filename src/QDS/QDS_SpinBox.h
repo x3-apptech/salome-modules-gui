@@ -38,6 +38,8 @@ public:
   int              step() const;
   void             setStep( const int );
 
+  virtual QString  getString() const;
+
 private slots:
   void             onValueChanged( int );
 
@@ -46,7 +48,6 @@ protected:
 
   virtual QWidget* createControl( QWidget* );
 
-  virtual QString  getString() const;
   virtual void     setString( const QString& );
 
   virtual void     unitSystemChanged( const QString& );

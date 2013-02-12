@@ -1104,7 +1104,7 @@ void QtxWorkstackArea::onChildCaptionChanged( QtxWorkstackChild* c )
 */
 void QtxWorkstackArea::updateCurrent()
 {
-  QWidget* cur = child( widget( myBar->tabId( myBar->currentIndex() ) ) );
+  QWidget* cur = child( myBar->tabId( myBar->currentIndex() ) );
   if ( cur )
     myStack->setCurrentWidget( cur );
 }

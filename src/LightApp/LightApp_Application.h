@@ -266,7 +266,7 @@ protected:
   void                                updatePreference( const QString&, const QString&, const QString& );
 
   QString                             defaultModule() const;
-  void                                currentWindows( QMap<int, int>& ) const;
+  virtual void                        currentWindows( QMap<int, int>& ) const;
   void                                currentViewManagers( QStringList& ) const;
   void                                moduleIconNames( QMap<QString, QString>& ) const;
 

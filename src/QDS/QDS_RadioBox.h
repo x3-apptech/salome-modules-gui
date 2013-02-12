@@ -58,6 +58,8 @@ public:
   void                       setValues( const QList<int>&, const QStringList& );
   void                       setValues( const QStringList& );
 
+  virtual QString            getString() const;
+
 signals:
   void                       activated( int );
 
@@ -70,7 +72,6 @@ protected:
   virtual QWidget*           createControl( QWidget* );
   void                       buttons( QList<QRadioButton*>& ) const;
 
-  virtual QString            getString() const;
   virtual void               setString( const QString& );
 
   virtual void               unitSystemChanged( const QString& );

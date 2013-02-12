@@ -114,6 +114,8 @@ public:
   static QString            format( const double, const QString&, const bool = false );
   static QString            units( const QString& );
 
+  virtual QString           getString() const = 0;
+
   virtual bool              eventFilter( QObject*, QEvent* );
 
   operator QWidget*() const;
@@ -151,7 +153,6 @@ protected:
   virtual QLabel*           createUnits( QWidget* );
   virtual QWidget*          createControl( QWidget* ) = 0;
 
-  virtual QString           getString() const = 0;
   virtual void              setString( const QString& ) = 0;
 
   virtual bool              validate( const QString& ) const;

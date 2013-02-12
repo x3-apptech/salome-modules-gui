@@ -101,7 +101,7 @@ public:
   virtual void                assignParent( SUIT_DataObject* );
   void                        insertChildAtPos( SUIT_DataObject* obj, int position );
   bool                        modified(){return _modified;};
-  void                        setModified(bool modified){_modified = modified;};
+  virtual void                setModified(bool modified);
 
   virtual QString             name() const;
   virtual QString             text( const int = NameId ) const;
@@ -173,6 +173,7 @@ private:
   void emitDestroyed( SUIT_DataObject* );
   void emitInserted( SUIT_DataObject*, SUIT_DataObject* );
   void emitRemoved( SUIT_DataObject*, SUIT_DataObject* );
+  void emitModified( SUIT_DataObject* );
 
   void deleteLater( SUIT_DataObject* );
 
@@ -181,6 +182,7 @@ signals:
   void destroyed( SUIT_DataObject* );
   void inserted( SUIT_DataObject*, SUIT_DataObject* );
   void removed( SUIT_DataObject*, SUIT_DataObject* );
+  void modified( SUIT_DataObject* );
 
   friend class SUIT_DataObject;
 

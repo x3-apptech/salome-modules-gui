@@ -200,7 +200,7 @@ public:
   bool                restoreState( QDataStream&, QMap<QString, QtxWorkstackChild*>& );
 };
 
-class QtxWorkstackArea : public QFrame
+class QTX_EXPORT QtxWorkstackArea : public QFrame
 {
   Q_OBJECT
 

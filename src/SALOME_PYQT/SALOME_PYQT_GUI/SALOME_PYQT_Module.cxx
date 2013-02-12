@@ -22,20 +22,23 @@
 // File   : SALOME_PYQT_Module.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-#include <PyInterp_Dispatcher.h>
-
 #include "SALOME_PYQT_Module.h"
+#include "SALOME_PYQT_PyModule.h"
 #include "SalomeApp_Application.h"
-#include "SALOME_PYQT_ModuleLight.h"
 
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <Container_init_python.hxx>
-#include <CORBA.h>
-
 
 //
+// NB: Python requests.
+// General rule for Python requests created by Python-based GUI modules
+// (SALOME_PYQT_Module and other ones):
+// all requests should be executed SYNCHRONOUSLY within the main GUI thread.
+// However, it is obligatory that ANY Python call is wrapped with a request object,
+// so that ALL Python API calls are serialized with PyInterp_Dispatcher.
+//
 // NB: Library initialization
-// Since the SalomePyQtGUILight library is not imported in Python it's initialization function
+// Since the SalomePyQtGUI library is not imported in Python it's initialization function
 // should be called manually (and only once) in order to initialize global sip data
 // and to get C API from sip : sipBuildResult for example
 //
@@ -59,198 +62,225 @@ PyMODINIT_FUNC INIT_FUNCTION();
 */
 
 extern "C" {
-  SALOME_PYQT_EXPORT CAM_Module* createModule() {
-
+  SALOME_PYQT_EXPORT CAM_Module* createModule()
+  {
     static bool alreadyInitialized = false;
+
     if ( !alreadyInitialized ) {
       // call only once (see comment above) !
-
       PyEval_RestoreThread( KERNEL_PYTHON::_gtstate);
       INIT_FUNCTION();
       PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate);
       alreadyInitialized = !alreadyInitialized;
     }
+
     return new SALOME_PYQT_Module();
   }
 }
 
-
 /*!
-  \var __DEFAULT_NAME__ - Default name of the module, replaced at the moment of module creation
+  \class SALOME_PYQT_Module
+  \brief This class implements GUI module for CORBA engine-based Python SALOME modules.
 */
-const char* __DEFAULT_NAME__  = "SALOME_PYQT_Module";
 
 /*!
- * Constructor
- */
+  \brief Constructor
+*/
 SALOME_PYQT_Module::SALOME_PYQT_Module()
-  : SalomeApp_Module(__DEFAULT_NAME__),
-    LightApp_Module(__DEFAULT_NAME__),
-    SALOME_PYQT_ModuleLight()
+  : SalomeApp_Module( "noname" ) // name is set explicitly at the module initialization
 {
+  // initialize helper
+  myHelper = new PyModuleHelper( this );
 }
 
 /*!
- * Destructor
- */
+  \brief Destructor
+*/
 SALOME_PYQT_Module::~SALOME_PYQT_Module()
 {
+  // as myHelper is a QObject, it should be deleted automatically
 }
 
 /*!
- * Get module engine, returns nil var if engine is not found in LifeCycleCORBA
- */
-Engines::EngineComponent_var SALOME_PYQT_Module::getEngine() const
-{
-  Engines::EngineComponent_var comp;
-  // temporary solution
-  try {
-    comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name().toLatin1() );
-  }
-  catch (CORBA::Exception&) {
-  }
-  return comp;
-}
-
-/*!
- * Get module engine IOR, returns empty string if engine is not found in LifeCycleCORBA
- */
+  \brief Get module engine IOR
+  
+  This function tries to get engine IOR from the Python module using engineIOR() function.
+  That function can load module engine using appropriate container if required.
+  If this function is not available in Python module, the default implementation
+  is used which loads engine to the default FactoryServerPy container.
+*/
 QString SALOME_PYQT_Module::engineIOR() const
 {
-  class EngineIORReq : public PyInterp_LockRequest
-  {
-  public:
-    EngineIORReq( PyInterp_Interp*    _py_interp,
-                  SALOME_PYQT_Module* _obj )
-      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
-        myObj( _obj ) {}
+  // call helper to get IOR from Python module
+  static QString ior;
 
-  protected:
-    virtual void execute()
-    {
-      myObj->getEngineIOR();
+  if ( ior.isEmpty() ) {
+    // first call helper to get IOR from Python module
+    ior = myHelper->engineIOR();
+  }
+  if ( ior.isEmpty() ) {
+    // if IOR is still not specified, try default implementation
+    // which loads engine to the default FactoryServerPy container.
+    Engines::EngineComponent_var comp;
+    // temporary solution
+    try {
+      comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name().toLatin1() );
     }
+    catch (CORBA::Exception&) {
+    }
+    if ( !CORBA::is_nil( comp ) )
+      ior = QString( getApp()->orb()->object_to_string( comp.in() ) );
+  }
 
-  private:
-    SALOME_PYQT_Module* myObj;
-  };
-
-  // post request
-  PyInterp_Dispatcher::Get()->Exec( new EngineIORReq( myInterp, const_cast<SALOME_PYQT_Module*>( this ) ) );
-
-  return myIOR;
+  return ior;
 }
 
-
 /*!
- * Redefined to invokec correct version
- */
-bool SALOME_PYQT_Module::activateModule( SUIT_Study* theStudy )
+  \brief Initialization of the module.
+  \param app parent application object
+  \sa PyModuleHelper::initialize()
+*/
+void SALOME_PYQT_Module::initialize( CAM_Application* app )
 {
   // call base implementation
-  bool res = SalomeApp_Module::activateModule( theStudy );
+  SalomeApp_Module::initialize( app );
 
-  if ( !res )
-    return res;
-
-  // internal activation
-  return activateModuleInternal( theStudy );
+  // ... then call helper
+  myHelper->initialize( app );
 }
 
 /*!
- * Tries to get engine IOR from the Python module using engineIOR() function.
- * That function can load module engine using appropriate container if required.
- * If this function is not available in Python module, the default implementation
- * is used which loads engine to the default FactoryServerPy container.
- */
-void SALOME_PYQT_Module::getEngineIOR()
-{
-  myIOR = "";
-
-  // Python interpreter should be initialized and Python module should be
-  // import first
-  if ( !myInterp || !myModule )
-    return;
-
-  if ( PyObject_HasAttrString( myModule , "engineIOR" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myModule, (char*)"engineIOR", (char*)"" ) );
-    if ( !res ) {
-      PyErr_Print();
-    }
-    else {
-      // parse the return value, result chould be string
-      if ( PyString_Check( res ) ) {
-        myIOR = PyString_AsString( res );
-      }
-    }
-  }
-  else if ( !CORBA::is_nil( getEngine() ) )
-    myIOR = QString( getApp()->orb()->object_to_string( getEngine() ) );
-}
-
-CAM_DataModel* SALOME_PYQT_Module::createDataModel()
-{
-  MESSAGE( "SALOME_PYQT_Module::createDataModel()" );
-  CAM_DataModel * dm = SalomeApp_Module::createDataModel();
-  return dm;
-}
-
-/*!
-  \brief Process GUI action (from main menu, toolbar or 
-  context popup menu action).
+  \brief Activation of the module.
+  \param study parent study
+  \return \c true if activation is successful and \c false otherwise
+  \sa PyModuleHelper::activate()
 */
-void SALOME_PYQT_Module::onGUIEvent(){
-  SALOME_PYQT_ModuleLight::onGUIEvent();
+bool SALOME_PYQT_Module::activateModule( SUIT_Study* study )
+{
+  // call base implementation and then helper
+  return SalomeApp_Module::activateModule( study ) && myHelper->activate( study );
 }
 
 /*!
-  \brief Signal handler closing(SUIT_ViewWindow*) of a view
-  \param pview view being closed
+  \brief Deactivation of the module.
+  \param study parent study
+  \return \c true if deactivation is successful and \c false otherwise
+  \sa PyModuleHelper::deactivate()
 */
-void SALOME_PYQT_Module::onViewClosed( SUIT_ViewWindow* pview )
+bool SALOME_PYQT_Module::deactivateModule( SUIT_Study* study )
 {
-  SALOME_PYQT_ModuleLight::onViewClosed( pview );
+  // call helper
+  bool res = myHelper->deactivate( study );
+    
+  // ... then call base implementation
+  return SalomeApp_Module::deactivateModule( study ) && res;
 }
 
 /*!
-  \brief Signal handler tryClose(SUIT_ViewWindow*) of a view
-  \param pview view user tries to close
+  \brief Get the dockable windows associated with the module.
+  \param winMap output map of dockable windows in form { <window_type> : <dock_area> }
+  \sa PyModuleHelper::windows()
 */
-void SALOME_PYQT_Module::onViewTryClose( SUIT_ViewWindow* pview )
+void SALOME_PYQT_Module::windows( QMap<int, int>& winMap ) const
 {
-  SALOME_PYQT_ModuleLight::onViewTryClose( pview );
+  // get list of dockable windows from helper
+  winMap = myHelper->windows();
 }
 
 /*!
-  \breif Process application preferences changing.
-
-  Called when any application setting is changed.
-
-  \param module preference module
-  \param section preference resource file section
-  \param setting preference resource name
+  \brief Define the compatible view windows associated with the module.
+  \param viewList output list of view windows types
+  \sa PyModuleHelper::viewManagers()
 */
-void SALOME_PYQT_Module::preferenceChanged( const QString& module, 
-                                            const QString& section, 
-                                            const QString& setting )
+void SALOME_PYQT_Module::viewManagers( QStringList& viewList ) const
 {
-  SALOME_PYQT_ModuleLight::preferenceChanged(module,section,setting);
+  // get list of view types from helper
+  viewList = myHelper->viewManagers();
 }
 
 /*!
-  \brief Signal handler windowActivated(SUIT_ViewWindow*) of SUIT_Desktop
-  \param pview view being activated
+  \brief Process study activation.
+  \sa PyModuleHelper::studyActivated()
 */
-void SALOME_PYQT_Module::onActiveViewChanged( SUIT_ViewWindow* pview )
+void SALOME_PYQT_Module::studyActivated()
 {
-  SALOME_PYQT_ModuleLight::onActiveViewChanged(pview);
+  // call helper
+  myHelper->studyActivated( application()->activeStudy() );
 }
 
 /*!
-  \brief Signal handler cloneView() of OCCViewer_ViewWindow
-  \param pview view being cloned
+  \brief Process context popup menu request.
+  \param context popup menu context (e.g. "ObjectBrowser")
+  \param menu popup menu
+  \param title popup menu title (not used)
+  \sa PyModuleHelper::contextMenu()
 */
-void SALOME_PYQT_Module::onViewCloned( SUIT_ViewWindow* pview )
+void SALOME_PYQT_Module::contextMenuPopup( const QString& context, 
+					   QMenu*         menu, 
+					   QString&       /*title*/ )
 {
-  SALOME_PYQT_ModuleLight::onViewCloned(pview);
+  // call helper
+  myHelper->contextMenu( context, menu );
 }
+
+/*!
+  \brief Export preferences for the Python module.
+  \sa PyModuleHelper::createPreferences()
+*/
+void SALOME_PYQT_Module::createPreferences()
+{
+  // call helper
+  myHelper->createPreferences();
+}
+
+/*!
+  \brief Process module's preferences changing.
+  \param section preference resources section
+  \param parameter preference resources parameter name
+  \sa PyModuleHelper::preferencesChanged()
+*/
+void SALOME_PYQT_Module::preferencesChanged( const QString& section, const QString& parameter )
+{
+  // call helper
+  myHelper->preferencesChanged( section, parameter );
+}
+
+/*!
+  \brief Test if object \a what can be dragged by the user.
+  \param what data object being tested
+  \return \c true if object can be dragged or \c false otherwise
+  \sa PyModuleHelper::isDraggable()
+*/
+bool SALOME_PYQT_Module::isDraggable( const SUIT_DataObject* what ) const
+{
+  // call helper
+  return myHelper->isDraggable( what );
+}
+
+/*!
+  \brief Test if drop operation can be done on the \a where object.
+  \param where data object being tested
+  \return \c true if if drop operation is supported by object or \c false otherwise
+  \sa PyModuleHelper::isDropAccepted()
+*/
+bool SALOME_PYQT_Module::isDropAccepted( const SUIT_DataObject* where ) const
+{
+  // call helper
+  return myHelper->isDropAccepted( where );
+}
+
+/*!
+  \brief Perform drop operation
+  \param what list of data objects being dropped
+  \param where target data object for drop operation
+  \param row line (child item index) where drop operation is performed to
+  \param action current drop action (copy or move)
+  \sa PyModuleHelper::dropObjects()
+*/
+void SALOME_PYQT_Module::dropObjects( const DataObjectList& what, SUIT_DataObject* where,
+				      const int row, Qt::DropAction action )
+{
+  // call helper
+  myHelper->dropObjects( what, where, row, action );
+}
+

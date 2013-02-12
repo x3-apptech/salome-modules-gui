@@ -76,10 +76,10 @@ void SUIT_Selector::Destroyer::setSelector( SUIT_Selector* s )
 */
 SUIT_Selector::SUIT_Selector( SUIT_SelectionMgr* selMgr, QObject* parent )
 : mySelMgr( selMgr ),
-myBlock( false ),
-myEnabled( true ),
-myAutoBlock( true ),
-myDestroyer( 0 )
+  myBlock( false ),
+  myEnabled( true ),
+  myAutoBlock( true ),
+  myDestroyer( 0 )
 {
   if ( selMgr )
     selMgr->installSelector( this );
@@ -100,6 +100,7 @@ SUIT_Selector::~SUIT_Selector()
   {
     myDestroyer->setSelector( 0 );
     delete myDestroyer;
+    myDestroyer = 0;
   }
 }
 
@@ -195,4 +196,12 @@ void SUIT_Selector::selectionModes( QList<int>& lst ) const
 {
   if ( selectionMgr() )
     selectionMgr()->selectionModes( lst );
+}
+
+/*!
+  Get owner of this selector.
+ */
+QObject* SUIT_Selector::owner() const
+{
+  return myDestroyer ? myDestroyer->parent() : 0;
 }

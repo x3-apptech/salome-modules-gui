@@ -183,7 +183,8 @@ ResetCameraClippingRange(vtkRenderer* theRenderer)
   anActiveCamera->GetPosition(position);
   
   vtkFloatingPointType bounds[6];
-  theRenderer->ComputeVisiblePropBounds(bounds);
+  //theRenderer->ComputeVisiblePropBounds(bounds);
+  ComputeVisiblePropBounds(theRenderer, bounds);
   
   vtkFloatingPointType center[3];
   center[0] = (bounds[0] + bounds[1])/2.0;

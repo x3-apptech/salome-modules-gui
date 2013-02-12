@@ -213,6 +213,9 @@ void OCCViewer_ViewFrame::connectViewSignals(OCCViewer_ViewWindow* theView)
 
   connect( theView, SIGNAL( contextMenuRequested(QContextMenuEvent*) ), 
            this, SIGNAL( contextMenuRequested(QContextMenuEvent*) ) );
+
+  connect( theView, SIGNAL( viewCloned( SUIT_ViewWindow* ) ),
+	   this,    SIGNAL( viewCloned( SUIT_ViewWindow* ) ) );
 }
 
 // obsolete

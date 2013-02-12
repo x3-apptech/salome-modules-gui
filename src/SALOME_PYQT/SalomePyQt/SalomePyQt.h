@@ -36,7 +36,6 @@
 #include <LightApp_Preferences.h>
 
 class LightApp_SelectionMgr;
-class LightApp_Application;
 class QMenuBar;
 class QMenu;
 class QWidget;
@@ -140,27 +139,23 @@ public:
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& );
 
-  static QString           createObject(const QString& parent = QString(""));
-  static QString           createObject(const QString& name,
-                                        const QString& iconname,
-                                        const QString& tooltip,
-                                        const QString& parent = QString(""));
+  static QString           createObject( const QString& parent = QString() );
+  static QString           createObject( const QString&, const QString&, const QString&, const QString& = QString() );
 
-  static void              removeObject( const QString& obj);
-  static void              removeChild( const QString& obj = QString(""));
-  static QStringList       getChildren(const QString& obj = QString(""), const bool rec = false);
-  static void              setName(const QString& obj,const QString& name);
-  static void              setIcon(const QString& obj,const QString& iconname);
-  static void              setToolTip(const QString& obj,const QString& tooltip);
-  static QString           getName(const QString& obj);
-  static QString           getToolTip(const QString& obj);
+  static void              removeObject( const QString&);
+  static void              removeChildren( const QString& = QString() );
+  static QStringList       getChildren( const QString& = QString(), const bool = false );
+  static void              setName( const QString&, const QString& );
+  static void              setIcon( const QString&, const QString& );
+  static void              setToolTip( const QString&, const QString& );
+  static QString           getName( const QString& );
+  static QString           getToolTip( const QString& );
 
-  static void              setColor(const QString& obj,const QColor& color);
-  static QColor            getColor(const QString& obj);
+  static void              setColor( const QString&, const QColor& );
+  static QColor            getColor( const QString& );
 
-  static void              setReference( const QString& obj, 
-					 const QString& refEntry ); 
-  static QString           getReference( const QString& obj );
+  static void              setReference( const QString&, const QString& ); 
+  static QString           getReference( const QString& );
 
   static QIcon             loadIcon( const QString&, const QString& );
 
@@ -212,13 +207,6 @@ public:
   static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
   static void              removeSetting ( const QString&, const QString& );
   static bool              hasSetting    ( const QString&, const QString& );
-  // obsolete
-  static void              addStringSetting( const QString&, const QString&, bool = true );
-  static void              addIntSetting   ( const QString&, const int,      bool = true );
-  static void              addBoolSetting  ( const QString&, const bool,     bool = true );
-  static void              addDoubleSetting( const QString&, const double,   bool = true );
-  static void              removeSettings  ( const QString& );
-  static QString           getSetting      ( const QString& );
 
   static int               addGlobalPreference( const QString& );
   static int               addPreference( const QString& );
@@ -227,13 +215,8 @@ public:
                                           const QString& = QString(),
                                           const QString& = QString() );
   static QVariant          preferenceProperty( const int, const QString& );
-  static void              setPreferenceProperty( const int, 
-                                                  const QString&,
-                                                  const QVariant& );
-  static void              addPreferenceProperty( const int,
-                                                  const QString&,
-                                                  const int,
-                                                  const QVariant& );
+  static void              setPreferenceProperty( const int, const QString&, const QVariant& );
+  static void              addPreferenceProperty( const int, const QString&, const int, const QVariant& );
 
   static void              message( const QString&, bool = true );
   static void              clearMessages();
@@ -257,6 +240,16 @@ public:
   static bool              splitView( const int, const Orientation, const Action );
   static bool              moveView( const int, const int, const bool );
   static QList<int>        neighbourViews( const int );
+
+  // the following methods are obsolete
+  static void              addStringSetting( const QString&, const QString&, bool = true );
+  static void              addIntSetting   ( const QString&, const int,      bool = true );
+  static void              addBoolSetting  ( const QString&, const bool,     bool = true );
+  static void              addDoubleSetting( const QString&, const double,   bool = true );
+  static void              removeSettings  ( const QString& );
+  static QString           getSetting      ( const QString& );
+
+  static void              removeChild( const QString& = QString() );
 };
 
 #endif // SALOME_PYQT_H

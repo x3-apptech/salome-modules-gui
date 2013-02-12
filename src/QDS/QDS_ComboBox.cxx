@@ -443,7 +443,7 @@ QWidget* QDS_ComboBox::createControl( QWidget* parent )
 {
   QtxComboBox* cb = new QtxComboBox( parent );
   cb->setSizePolicy( QSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed ) );
-  connect( cb, SIGNAL( textChanged( const QString& ) ), this,
+  connect( cb, SIGNAL( editTextChanged( const QString& ) ), this,
            SLOT( onTextChanged( const QString& ) ) );
   connect( cb, SIGNAL( activated( int ) ), this, SLOT( onActivated( int ) ) );
   return cb;

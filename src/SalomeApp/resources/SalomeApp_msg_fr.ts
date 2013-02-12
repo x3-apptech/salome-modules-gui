@@ -461,7 +461,7 @@ Voulez-vous vraiment la renommer?</translation>
     </message>
 </context>
 <context>
-    <name>SalomeApp_NoteBookDlg</name>
+    <name>SalomeApp_NoteBook</name>
     <message>
         <source>NOTEBOOK_TITLE</source>
         <translation>Registre Salome</translation>

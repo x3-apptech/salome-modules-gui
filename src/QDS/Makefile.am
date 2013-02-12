@@ -23,7 +23,6 @@
 #  File   : Makefile.in
 #  Author : Alexander SOLOVYOV (OCN)
 #  Module : QDS
-#  $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 

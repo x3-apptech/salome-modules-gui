@@ -29,10 +29,6 @@
 #include <CAM_Module.h>
 #include "SALOME_PYQT_DataObjectLight.h"
 
-class SALOME_PYQT_RootObjectLight;
-
-
-
 class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_DataModelLight : public LightApp_DataModel
 {
   Q_OBJECT

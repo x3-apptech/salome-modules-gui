@@ -38,6 +38,8 @@ public:
   bool                 isChecked() const;
   void                 setChecked( const bool );
 
+  virtual QString      getString() const;
+
   virtual void         clear();
 
 signals:
@@ -51,7 +53,6 @@ protected:
   QCheckBox*           checkBox() const;
   virtual QWidget*     createControl( QWidget* );
 
-  virtual QString      getString() const;
   virtual void         setString( const QString& );
 };
 

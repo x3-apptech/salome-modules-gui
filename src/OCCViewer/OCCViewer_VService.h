@@ -23,59 +23,16 @@
 #ifndef OCCVIEWER_VSERVICE_H
 #define OCCVIEWER_VSERVICE_H
 
-#ifndef _Handle_V3d_View_HeaderFile
-#include <Handle_V3d_View.hxx>
-#endif
-#ifndef _Standard_Integer_HeaderFile
-#include <Standard_Integer.hxx>
-#endif
-#ifndef _Xw_WindowQuality_HeaderFile
-#include <Xw_WindowQuality.hxx>
-#endif
-#ifndef _Handle_V3d_Viewer_HeaderFile
-#include <Handle_V3d_Viewer.hxx>
-#endif
-#ifndef _Standard_CString_HeaderFile
-#include <Standard_CString.hxx>
-#endif
-#ifndef _Standard_ExtString_HeaderFile
-#include <Standard_ExtString.hxx>
-#endif
-#ifndef _Quantity_Length_HeaderFile
-#include <Quantity_Length.hxx>
-#endif
-#ifndef _Quantity_NameOfColor_HeaderFile
-#include <Quantity_NameOfColor.hxx>
-#endif
-#ifndef _V3d_TypeOfOrientation_HeaderFile
-#include <V3d_TypeOfOrientation.hxx>
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
-#ifndef _Handle_Graphic2d_View_HeaderFile
-#include <Handle_Graphic2d_View.hxx>
-#endif
-#ifndef _Handle_Aspect_WindowDriver_HeaderFile
-#include <Handle_Aspect_WindowDriver.hxx>
-#endif
-#ifndef _Handle_Aspect_Window_HeaderFile
 #include <Handle_Aspect_Window.hxx>
-#endif
-
-class V3d_View;
-class V2d_View;
-class V3d_Viewer;
-class V2d_Viewer;
-class Graphic2d_View;
-class Aspect_WindowDriver;
-
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
-#ifndef _Standard_Macro_HeaderFile
-#include <Standard_Macro.hxx>
-#endif
+#include <Handle_V3d_View.hxx>
+#include <Handle_V3d_Viewer.hxx>
+#include <Standard_Boolean.hxx>
+#include <Standard_CString.hxx>
+#include <Standard_ExtString.hxx>
+#include <Standard_Integer.hxx>
+#include <Quantity_Length.hxx>
+#include <Xw_WindowQuality.hxx>
+#include <V3d_TypeOfOrientation.hxx>
 
 class Standard_EXPORT OCCViewer_VService
 {
@@ -122,24 +79,6 @@ public:
                               const V3d_TypeOfOrientation ViewProj = V3d_XposYnegZpos,
                               const Standard_Boolean ComputedMode = Standard_True,
                               const Standard_Boolean DefaultComputedMode = Standard_True );
-
-    static Handle_Aspect_WindowDriver
-                    WindowDriver( const Standard_CString display,
-                                  const Standard_Integer hiwin,
-                                  const Standard_Integer lowin,
-                                  const Quantity_NameOfColor color = Quantity_NOC_GRAY69 );
-    /*static Handle_Aspect_WindowDriver
-                    XdpsDriver( const Standard_CString display,
-                                const Standard_Integer hiwin,
-                                const Standard_Integer lowin,
-                                const Quantity_NameOfColor color = Quantity_NOC_GRAY69 );
-    */
-    static Handle_Aspect_WindowDriver
-                    ImageDriver( const Standard_CString display,
-                                 const Standard_Integer hiwin,
-                                 const Standard_Integer lowin,
-                                 const Quantity_NameOfColor color = Quantity_NOC_GRAY69 );
-
 };
 
 #endif

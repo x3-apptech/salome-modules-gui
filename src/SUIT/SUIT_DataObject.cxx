@@ -400,6 +400,24 @@ void SUIT_DataObject::assignParent( SUIT_DataObject* p )
 }
 
 /*!
+  \brief Sets modification state of the object.
+
+  When the object has been modified (modified is set to true)
+  a signal is emitted to notify the tree model and eventually redraw the data object.
+
+  \param modified modified state 
+*/
+void SUIT_DataObject::setModified(bool modified)
+{
+  if ( _modified == modified )
+    return;
+
+  _modified = modified;
+  if ( _modified )
+    signal()->emitModified( this );
+}
+
+/*!
   \brief Get data object name.
 
   This method should be re-implemented in the subclasses.
@@ -926,6 +944,15 @@ void SUIT_DataObject::Signal::emitInserted( SUIT_DataObject* object, SUIT_DataOb
 void SUIT_DataObject::Signal::emitRemoved( SUIT_DataObject* object, SUIT_DataObject* parent )
 {
   emit( removed( object, parent ) );
+}
+
+/*!
+  \brief Emit a signal to notify that the data object has been modified.
+  \param object data object that has been modified
+*/
+void SUIT_DataObject::Signal::emitModified( SUIT_DataObject* object )
+{
+  emit( modified( object ) );
 }
 
 /*!

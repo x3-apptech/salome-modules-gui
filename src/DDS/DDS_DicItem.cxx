@@ -1291,3 +1291,188 @@ DDS_DicItem::UnitSystem DDS_DicItem::GetActiveUnitSystem() const
     aSystem = aComponent->GetActiveUnitSystem();
   return aSystem;
 }
+
+/*!
+  \brief Set item's identify string.
+  \param theId identify string.
+*/
+void DDS_DicItem::SetId( const TCollection_AsciiString& theId )
+{
+  myId = theId;
+}
+
+/*!
+  \brief Set item's component pointer.
+  \param theComponent component pointer.
+*/
+void DDS_DicItem::SetComponent( const Handle(Standard_Transient)& theComponent )
+{
+  myComponent = theComponent;
+}
+
+/*!
+  \brief Set item's label string.
+  \param theLabel label string.
+*/
+void DDS_DicItem::SetLabel( const TCollection_AsciiString& theLabel )
+{
+  myLabel = theLabel;
+}
+
+/*!
+  \brief Set item's filter string.
+  \param theFilter filter string.
+*/
+void DDS_DicItem::SetFilter( const TCollection_AsciiString& theFilter )
+{
+  myFilter = theFilter;
+}
+
+/*!
+  \brief Set item's required value.
+  \param theRequired required value string.
+*/
+void DDS_DicItem::SetRequired( const TCollection_AsciiString& theRequired )
+{
+  myRequired = theRequired;
+}
+
+/*!
+  \brief Set item's warning level value.
+  \param theWarningLevel warning level value.
+*/
+void DDS_DicItem::SetWarningLevel( const Standard_Integer& theWarningLevel )
+{
+  myWarnLevel = theWarningLevel;
+}
+
+/*!
+  \brief Set item's minimum zoom value.
+  \param theMinZoom minimum zoom value.
+*/
+void DDS_DicItem::SetMinZoom( const Standard_Real& theMinZoom )
+{
+  myMinZoom = theMinZoom;
+}
+
+/*!
+  \brief Set item's maximum zoom value.
+  \param theMaxZoom maximum zoom value.
+*/
+void DDS_DicItem::SetMaxZoom( const Standard_Real& theMaxZoom )
+{
+  myMaxZoom = theMaxZoom;
+}
+
+/*!
+  \brief Set item's zoom order value.
+  \param theZoomOrder zoom order value.
+*/
+void DDS_DicItem::SetZoomOrder( const Standard_Real& theZoomOrder )
+{
+  myZoomOrder = theZoomOrder;
+}
+
+/*!
+  \brief Set item's short description.
+  \param theShortDescr short description string.
+*/
+void DDS_DicItem::SetShortDescription( const TCollection_ExtendedString& theShortDescr )
+{
+  myShortDescr = theShortDescr;
+}
+
+/*!
+  \brief Set item's long description.
+  \param theLongDescr long description string.
+*/
+void DDS_DicItem::SetLongDescription( const TCollection_ExtendedString& theLongDescr )
+{
+  myLongDescr = theLongDescr;
+}
+
+/*!
+  \brief Add item's option.
+  \param theOptionName option name string.
+  \param theOptionValue option value string.
+*/
+bool DDS_DicItem::SetOption( const TCollection_AsciiString& theOptionName,
+                             const TCollection_AsciiString& theOptionValue )
+{
+  return myOptions.Bind( theOptionName, theOptionValue );
+}
+
+/*!
+  \brief Set item's type value.
+  \param theType item value type.
+*/
+void DDS_DicItem::SetType( const DDS_DicItem::Type& theType )
+{
+  myType = theType;
+}
+
+/*!
+  \brief Set item's minimum value.
+  \param theMinVal minimum possible value.
+*/
+void DDS_DicItem::SetMin( const Standard_Real& theMinVal )
+{
+  myData |= MinValue;
+  myMin = theMinVal;
+}
+
+/*!
+  \brief Set item's maximum value.
+  \param theMaxVal maximum possible value.
+*/
+void DDS_DicItem::SetMax( const Standard_Real& theMaxVal )
+{
+  myData |= MaxValue;
+  myMax = theMaxVal;
+}
+
+/*!
+  \brief Set item's default value as a real number.
+  \param theDefVal default value.
+*/
+void DDS_DicItem::SetDefaultValue( const Standard_Real& theDefVal )
+{
+  myData |= DefaultValue;
+  myDefValue = theDefVal;
+}
+
+/*!
+  \brief Set item's default value as a string.
+  \param theDefStr default value.
+*/
+void DDS_DicItem::SetDefaultValue( const TCollection_AsciiString& theDefStr )
+{
+  myDefString = theDefStr;
+}
+
+/*!
+  \brief Set item's value list.
+  \param theStrings list of value strings.
+  \param theIntegers list of integer values associated with string item.
+*/
+void DDS_DicItem::SetListOfValues( const Handle(TColStd_HArray1OfExtendedString)& theStrings,
+                                   const Handle(TColStd_HArray1OfInteger)& theIntegers )
+{
+  myListRef   = theStrings;
+  myListRefID = theIntegers;
+}
+
+/*!
+  \brief Set item's value list and icons.
+  \param theStrings list of value strings.
+  \param theIntegers list of integer values associated with string item.
+  \param theIcons list of icons associated with string item.
+*/
+void DDS_DicItem::SetListOfValues( const Handle(TColStd_HArray1OfExtendedString)& theStrings,
+                                   const Handle(TColStd_HArray1OfInteger)& theIntegers,
+                                   const Handle(TColStd_HArray1OfExtendedString)& theIcons )
+{
+  myListRef      = theStrings;
+  myListRefID    = theIntegers;
+  myListRefIcons = theIcons;
+}

@@ -2018,7 +2018,7 @@ QtxPagePrefCheckItem::QtxPagePrefCheckItem( const QString& title, QtxPreferenceI
 : QtxPagePrefItem( title, parent, sect, param )
 {
   myCheck = new QCheckBox( title );
-  myCheck->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  myCheck->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
   setWidget( myCheck );
 }
 

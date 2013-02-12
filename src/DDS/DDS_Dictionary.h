@@ -67,16 +67,29 @@ public:
 
   static Standard_EXPORT LDOMString              KeyWord( const TCollection_AsciiString& );
 
-private:
-  DDS_Dictionary();
-  DDS_Dictionary( const DDS_Dictionary& );
+protected:
 
-  void                                           operator=( const DDS_Dictionary& );
+  Standard_EXPORT virtual Handle(DDS_DicGroup)   CreateGroup( const TCollection_AsciiString& ) const;
 
-  void                                           FillDataMap( const LDOM_Element&, const LDOM_Element& );
+protected:
 
-private:
+  Standard_EXPORT DDS_Dictionary();
+
+  Standard_EXPORT DDS_Dictionary( const DDS_Dictionary& );
+
+  Standard_EXPORT void                           operator=( const DDS_Dictionary& );
+
+  Standard_EXPORT virtual void                   FillDataMap( const LDOM_Element& );
+
+  Standard_EXPORT static void                    SetDictionary(const Handle(DDS_Dictionary)& theDict);
+
+protected:
+
   DDS_IndexedDataMapOfDicGroups                  myGroupMap;
+
+private:
+
+  static Handle(DDS_Dictionary)                  myDictionary;
 
 public:
   DEFINE_STANDARD_RTTI(DDS_Dictionary)

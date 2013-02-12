@@ -38,6 +38,8 @@ public:
   double            step() const;
   void              setStep( const double );
 
+  virtual QString   getString() const;
+
 private slots:
   void              onValueChanged( double );
 
@@ -45,7 +47,6 @@ protected:
   QtxDoubleSpinBox* spinBox() const;
   virtual QWidget*  createControl( QWidget* );
 
-  virtual QString   getString() const;
   virtual void      setString( const QString& );
 
   virtual void      unitSystemChanged( const QString& );

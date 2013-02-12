@@ -99,7 +99,7 @@ SET(GUI_HEADERS
   SalomeApp_ListView.h
   SalomeApp_CheckFileDlg.h
   SalomeApp_ExitDlg.h
-  SalomeApp_NoteBookDlg.h
+  SalomeApp_NoteBook.h
   SalomeApp_DoubleSpinBox.h
   SalomeApp_IntSpinBox.h
 )
@@ -123,7 +123,7 @@ SET(SalomeApp_SOURCES
   SalomeApp_CheckFileDlg.cxx
   SalomeApp_VisualState.cxx
   SalomeApp_ExitDlg.cxx
-  SalomeApp_NoteBookDlg.cxx
+  SalomeApp_NoteBook.cxx
   SalomeApp_DoubleSpinBox.cxx
   SalomeApp_IntSpinBox.cxx
   SalomeApp_Engine_i.cxx
@@ -158,7 +158,7 @@ SET(COMMON_HEADERS_H
   SalomeApp_CheckFileDlg.h
   SalomeApp_VisualState.h
   SalomeApp_ExitDlg.h
-  SalomeApp_NoteBookDlg.h
+  SalomeApp_NoteBook.h
   SalomeApp_DoubleSpinBox.h
   SalomeApp_IntSpinBox.h
   SalomeApp_Engine_i.h

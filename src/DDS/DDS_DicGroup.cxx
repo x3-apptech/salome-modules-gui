@@ -182,12 +182,12 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
 
     // 1. Attributes (id,label,units?,format?,required?)
     TCollection_AsciiString anID = aQuantity.getAttribute( DDS_Dictionary::KeyWord( "DATUM_ID" ) );
-    Handle(DDS_DicItem) aDicItem = new DDS_DicItem();
+    Handle(DDS_DicItem) aDicItem = CreateItem();
 
     aDicItem->myComponent = this;
     aDicItem->FillDataMap( anID, aQuantity, theComponentData, theDocElement, unitSystems );
     myDataMap.Add( anID, aDicItem );
-
+    
     bool exist = false;
     for( int i=1, n=myKeys.Length(); i<=n && !exist; i++ )
       if( myKeys.Value( i )==anID )
@@ -225,4 +225,68 @@ Handle_DDS_DicItem DDS_DicGroup::GetDicItem( const TCollection_AsciiString& theI
 void DDS_DicGroup::GetKeys( TColStd_SequenceOfAsciiString& seq ) const
 {
   seq = myKeys;
+}
+
+/*!
+  \brief Instantiate new dictionary item, used for customization of
+         data dictionary items.
+  \return New dictionary item instance.
+*/
+Handle(DDS_DicItem) DDS_DicGroup::CreateItem() const
+{
+  return new DDS_DicItem();
+}
+
+/*!
+  \brief Bind dictionary item to ID
+  \return Standard_True if the item has been succesfully bound.
+          Standard_False if there is an item with same id.
+*/
+Standard_Boolean DDS_DicGroup::AddDicItem( const TCollection_AsciiString& theID,
+                                           const Handle(DDS_DicItem)& theDicItem )
+{
+  if ( myDataMap.Contains( theID ) )
+    return Standard_False;
+
+  myDataMap.Add( theID, theDicItem );
+  myKeys.Append( theID );
+
+  return Standard_True;
+}
+
+/*!
+  \brief Check if there is item bounded by id.
+  \return Standard_True if there is an item bound in map with given id.
+*/
+Standard_Boolean DDS_DicGroup::HasDicItem( const TCollection_AsciiString& theID ) const 
+{
+  return myDataMap.Contains( theID );
+}
+
+/*!
+  \brief Clear dictionary items map
+*/
+void DDS_DicGroup::RemoveAllDicItems() 
+{
+  myDataMap.Clear();
+  myKeys.Clear();
+}
+
+/*!
+  \brief Returns a reference to a map. Can be used to iterate through
+         dictionary items.
+*/
+const DDS_IndexedDataMapOfDicItems& DDS_DicGroup::GetItemMap() const
+{
+  return myDataMap;
+}
+
+/*!
+  \brief Add new unit system and bind its label name.
+  \return Standard_False if there is other system bound by this key.
+*/
+Standard_Boolean DDS_DicGroup::AddUnitSystem( const TCollection_AsciiString& theSystemKey,
+                                              const TCollection_ExtendedString& theSystemLabel )
+{
+  return myUnitSystem.Bind( theSystemKey, theSystemLabel );
 }

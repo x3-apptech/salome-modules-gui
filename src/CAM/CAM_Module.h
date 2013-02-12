@@ -34,6 +34,7 @@ class QAction;
 class QMenu;
 class QIcon;
 
+class QtxActionGroup;
 class QtxActionMenuMgr;
 class QtxActionToolMgr;
 class SUIT_Study;
@@ -82,6 +83,33 @@ public:
 
   virtual void           updateModuleVisibilityState();
 
+  // actions/menu/toolbars management
+
+  QtxActionMenuMgr*      menuMgr() const;
+  QtxActionToolMgr*      toolMgr() const;
+
+  virtual QAction*       action( const int ) const;
+  virtual int            actionId( const QAction* ) const;
+  virtual QAction*       createAction( const int, const QString&, const QIcon&, const QString&,
+                                       const QString&, const int, QObject* = 0,
+                                       const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
+  QtxActionGroup*        createActionGroup( const int, const bool = true );
+
+  int                    createTool( const QString& );
+  int                    createTool( const int, const int, const int = -1 );
+  int                    createTool( const int, const QString&, const int = -1 );
+  int                    createTool( QAction*, const int, const int = -1, const int = -1 );
+  int                    createTool( QAction*, const QString&, const int = -1, const int = -1 );
+
+  int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( const int, const int, const int = -1, const int = -1 );
+  int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
+  int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
+
+  static QAction*        separator();
+
 public slots:
   virtual bool           activateModule( SUIT_Study* );
   virtual bool           deactivateModule( SUIT_Study* );
@@ -104,33 +132,9 @@ protected:
   void                   setName( const QString& );
   virtual void           setModuleName( const QString& );
 
-  QtxActionMenuMgr*      menuMgr() const;
-  QtxActionToolMgr*      toolMgr() const;
-
-  int                    createTool( const QString& );
-  int                    createTool( const int, const int, const int = -1 );
-  int                    createTool( const int, const QString&, const int = -1 );
-  int                    createTool( QAction*, const int, const int = -1, const int = -1 );
-  int                    createTool( QAction*, const QString&, const int = -1, const int = -1 );
-
-  int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
-  int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
-  int                    createMenu( const int, const int, const int = -1, const int = -1 );
-  int                    createMenu( const int, const QString&, const int = -1, const int = -1 );
-  int                    createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
-  int                    createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );
-
-  static QAction*        separator();
-
-  QAction*               action( const int ) const;
-  int                    actionId( const QAction* ) const;
-
   int                    registerAction( const int, QAction* );
   bool                   unregisterAction( const int );
   bool                   unregisterAction( QAction* );
-  QAction*               createAction( const int, const QString&, const QIcon&, const QString&,
-                                       const QString&, const int, QObject* = 0,
-                                       const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
 
 private:
   CAM_Application*       myApp;             //!< parent application object

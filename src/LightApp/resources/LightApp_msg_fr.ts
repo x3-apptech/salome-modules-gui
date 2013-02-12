@@ -347,18 +347,6 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Type de courbe:</translation>
     </message>
     <message>
-        <source>PREF_ISOS</source>
-        <translation>Nombre d&apos;isolignes</translation>
-    </message>
-    <message>
-        <source>PREF_ISOS_U</source>
-        <translation>Selon U</translation>
-    </message>
-    <message>
-        <source>PREF_ISOS_V</source>
-        <translation>Selon V</translation>
-    </message>
-    <message>
         <source>PREF_POINTS</source>
         <translation>Points</translation>
     </message>

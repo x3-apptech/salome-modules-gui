@@ -755,30 +755,3 @@ bool LightApp_Module::renameObject( const QString& /*entry*/, const QString& /*n
 {
   return false;
 }
-
-
-
-int LightApp_Module::createMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx )
-{
-  return CAM_Module::createMenu( subMenu, menu, id, group, idx );
-}
-int LightApp_Module::createMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx )
-{
-  return CAM_Module::createMenu( subMenu, menu, id, group, idx );
-}
-int LightApp_Module::createMenu( const int id, const int menu, const int group, const int idx )
-{
-  return CAM_Module::createMenu( id, menu, group, idx );
-}
-int LightApp_Module::createMenu( const int id, const QString& menu, const int group, const int idx )
-{
-  return CAM_Module::createMenu( id, menu, group, idx );
-}
-int LightApp_Module::createMenu( QAction* a, const int menu, const int id, const int group, const int idx )
-{
-  return CAM_Module::createMenu( a, menu, id, group, idx );
-}
-int LightApp_Module::createMenu( QAction* a, const QString& menu, const int id, const int group, const int idx )
-{
-  return CAM_Module::createMenu( a, menu, id, group, idx );
-}

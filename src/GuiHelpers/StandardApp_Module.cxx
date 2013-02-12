@@ -38,8 +38,7 @@
 
 // Constructor
 StandardApp_Module::StandardApp_Module() :
-  SalomeApp_Module( "" ),
-  LightApp_Module( "" )
+  SalomeApp_Module( "" )
 {
   // Note that it's no use to specify here the moduleName because it's
   // automatically determined by the name of the GUI library

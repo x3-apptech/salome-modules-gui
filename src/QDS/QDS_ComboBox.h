@@ -62,6 +62,8 @@ public:
   void                       setValues( const QList<int>&, const QStringList& );
   void                       setValues( const QStringList& );
 
+  virtual QString            getString() const;
+
   virtual void               reset();
 
   int                        stringToValue( const QString& ) const;
@@ -79,7 +81,6 @@ protected:
   QtxComboBox*               comboBox() const;
   virtual QWidget*           createControl( QWidget* );
 
-  virtual QString            getString() const;
   virtual void               setString( const QString& );
 
   virtual void               unitSystemChanged( const QString& );

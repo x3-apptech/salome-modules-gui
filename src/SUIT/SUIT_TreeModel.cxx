@@ -483,6 +483,8 @@ SUIT_TreeModel::~SUIT_TreeModel()
                                  this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
     SUIT_DataObject::disconnect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                                  this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+    SUIT_DataObject::disconnect( SIGNAL( modifed( SUIT_DataObject* ) ),
+                                 this, SLOT( onModified( SUIT_DataObject* ) ) );
     delete myRoot;
   }
 
@@ -669,8 +671,10 @@ Qtx::HeaderViewFlags SUIT_TreeModel::headerFlags( const QString& name ) const
   
   \param id - column name
   \param state - visible state
+  \param emitChanged - if set to false, blocks dataChanged() signal, this can be used to
+  prevent emitting dataChanged() several times for the same data object
 */
-void SUIT_TreeModel::setVisibilityState( const QString& id, Qtx::VisibilityState state )
+void SUIT_TreeModel::setVisibilityState( const QString& id, Qtx::VisibilityState state, bool emitChanged )
 {
   VisibilityMap::const_iterator it = myVisibilityMap.find( id );
   if ( it != myVisibilityMap.end() && it.value() == state )
@@ -684,7 +688,7 @@ void SUIT_TreeModel::setVisibilityState( const QString& id, Qtx::VisibilityState
   else {
     needSignal = myVisibilityMap.remove( id ) > 0;
   }
-  if ( needSignal ) {
+  if ( emitChanged && needSignal ) {
     QModelIndexList lst;
     if ( searcher() ) {
       SUIT_DataObject* o = searcher()->findObject( id );
@@ -703,7 +707,6 @@ void SUIT_TreeModel::setVisibilityState( const QString& id, Qtx::VisibilityState
 /*!
   \brief Set visibility state for all objects.
   
-  \param id - column name
   \param state - visible state
 */
 void SUIT_TreeModel::setVisibilityStateForAll( Qtx::VisibilityState state )
@@ -775,7 +778,15 @@ void SUIT_TreeModel::setRoot( SUIT_DataObject* r )
                                  this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
     SUIT_DataObject::disconnect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                                  this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+    SUIT_DataObject::disconnect( SIGNAL( modified( SUIT_DataObject* ) ),
+                                 this, SLOT( onModified( SUIT_DataObject* ) ) );
     delete myRoot;
+    
+    if ( myRootItem ) {
+      QList<TreeItem*> items = myRootItem->children();
+      for ( QList<TreeItem*>::iterator anIt = items.begin(); anIt != items.end(); anIt++ )
+        delete *anIt;
+    }
   }
 
   myRoot = r;
@@ -1212,6 +1223,8 @@ void SUIT_TreeModel::setAutoUpdate( const bool on )
                                this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
   SUIT_DataObject::disconnect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                                this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+  SUIT_DataObject::disconnect( SIGNAL( modified( SUIT_DataObject* ) ),
+                               this, SLOT( onModified( SUIT_DataObject* ) ) );
   myAutoUpdate = on;
 
   if ( myAutoUpdate ) {
@@ -1219,6 +1232,8 @@ void SUIT_TreeModel::setAutoUpdate( const bool on )
                               this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
     SUIT_DataObject::connect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                               this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+    SUIT_DataObject::connect( SIGNAL( modified( SUIT_DataObject* ) ),
+                              this, SLOT( onModified( SUIT_DataObject* ) ) );
 
     updateTree();
   }
@@ -1412,11 +1427,15 @@ void SUIT_TreeModel::initialize()
                                this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
   SUIT_DataObject::disconnect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                                this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+  SUIT_DataObject::disconnect( SIGNAL( modified( SUIT_DataObject* ) ),
+                               this, SLOT( onModified( SUIT_DataObject* ) ) );
   if ( autoUpdate() ) {
     SUIT_DataObject::connect( SIGNAL( inserted( SUIT_DataObject*, SUIT_DataObject* ) ),
                               this, SLOT( onInserted( SUIT_DataObject*, SUIT_DataObject* ) ) );
     SUIT_DataObject::connect( SIGNAL( removed( SUIT_DataObject*, SUIT_DataObject* ) ),
                               this, SLOT( onRemoved( SUIT_DataObject*, SUIT_DataObject* ) ) );
+    SUIT_DataObject::connect( SIGNAL( modified( SUIT_DataObject* ) ),
+                              this, SLOT( onModified( SUIT_DataObject* ) ) );
   }
 
   myItems.clear(); // ????? is it really necessary
@@ -1592,12 +1611,12 @@ void SUIT_TreeModel::updateItem( SUIT_TreeModel::TreeItem* item, bool emitLayout
     return;
   
   // update all columns corresponding to the given data object
-  //emit layoutAboutToBeChanged(); // VSR 25/04/2011: fix crash on delete objects
+  emit layoutAboutToBeChanged(); // Comment by VSR 25/04/2011: fix crash on delete objects. Uncomment by PRascle 18/12/2012 : required by Qt4.8 (original issue 22424 not accessible)
   QModelIndex firstIdx = index( obj, 0 );
   QModelIndex lastIdx  = index( obj, columnCount() - 1 );
   emit dataChanged( firstIdx, lastIdx );
   obj->setModified(false);
-  if( emitLayoutChanged )
+  if ( emitLayoutChanged )
     emit layoutChanged();
 }
 
@@ -1662,6 +1681,22 @@ void SUIT_TreeModel::onRemoved( SUIT_DataObject* /*object*/, SUIT_DataObject* pa
 {
   if ( autoUpdate() )
     updateTree( parent );
+}
+
+/*!
+  \brief Called when the data object is modified. TreeSync is not used here for maximum efficiency.
+  It is assumed that it is up to the application to decide when its data objects are modified.
+  \param obj data object that has been modified
+*/
+void SUIT_TreeModel::onModified( SUIT_DataObject* obj )
+{
+  if ( autoUpdate() )
+  {
+    QModelIndex firstIdx = index( obj, 0 );
+    QModelIndex lastIdx  = index( obj, columnCount() - 1 );
+    emit dataChanged( firstIdx, lastIdx );
+    obj->setModified(false);
+  }
 }
 
 /*!
@@ -2171,11 +2206,12 @@ Qtx::HeaderViewFlags SUIT_ProxyModel::headerFlags( const QString& name ) const
   
   \param id - column name
   \param state - visible state
+  \param emitChanged - if set to false, blocks dataChanged() signal, this can be used to
+  prevent emitting dataChanged() several times for the same data object
 */
-void SUIT_ProxyModel::setVisibilityState(const QString& id, Qtx::VisibilityState state)
-{
+void SUIT_ProxyModel::setVisibilityState(const QString& id, Qtx::VisibilityState state, bool emitChanged ) {
   if(treeModel())
-    treeModel()->setVisibilityState(id,state);
+    treeModel()->setVisibilityState(id,state,emitChanged);
 }
 
 /*!

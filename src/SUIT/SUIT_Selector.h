@@ -64,6 +64,8 @@ public:
   bool               hasSelectionMode( const int ) const;
   void               selectionModes( QList<int>& ) const;
 
+  QObject*           owner() const;
+
 protected:
   void               selectionChanged();
   virtual void       getSelection( SUIT_DataOwnerPtrList& ) const = 0;

@@ -20,7 +20,6 @@
 #  File   : Makefile.am
 #  Author : Oleg UVAROV
 #  Module : SALOME
-#  $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 

@@ -23,7 +23,6 @@
 #  File   : Makefile.in
 #  Author : Alexander Solovyov(OCN)
 #  Module : SOCC
-# $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 

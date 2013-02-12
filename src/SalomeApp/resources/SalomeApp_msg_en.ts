@@ -441,11 +441,11 @@ Do you really want to rename it?</translation>
     </message>
     <message>
         <source>VARNAME_COLUMN</source>
-        <translation>Variable Name</translation>
+        <translation>Variable</translation>
     </message>
     <message>
         <source>VARVALUE_COLUMN</source>
-        <translation>Variable Value</translation>
+        <translation>Value</translation>
     </message>
     <message>
         <source>VARVALUE_INCORRECT</source>
@@ -461,10 +461,10 @@ Do you really want to rename it?</translation>
     </message>
 </context>
 <context>
-    <name>SalomeApp_NoteBookDlg</name>
+    <name>SalomeApp_NoteBook</name>
     <message>
         <source>NOTEBOOK_TITLE</source>
-        <translation>Salome NoteBook</translation>
+        <translation>NoteBook</translation>
     </message>
     <message>
         <source>BUT_UPDATE_STUDY</source>

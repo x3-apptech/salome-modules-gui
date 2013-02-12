@@ -22,7 +22,7 @@
 
 // File   : SalomePyQt.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 #ifdef WNT
 // E.A. : On windows with python 2.6, there is a conflict
 // E.A. : between pymath.h and Standard_math.h which define
@@ -31,38 +31,28 @@
 #include <pymath.h>
 #endif
 
-#include <SALOME_PYQT_ModuleLight.h> // this include must be first!!!
-#include <SALOME_PYQT_DataModelLight.h>
+#include "SALOME_PYQT_ModuleLight.h" // this include must be first!!!
+#include "SALOME_PYQT_DataModelLight.h"
+#include "SALOME_PYQT_PyModule.h"
 #include "SalomePyQt.h"
 
-#include <QApplication>
-#include <QMenuBar>
-#include <QMenu>
-#include <QImage>
-#include <QStringList>
+#include "LightApp_SelectionMgr.h"
+#include "LogWindow.h"
+#include "OCCViewer_ViewWindow.h"
+#include "Plot2d_ViewManager.h"
+#include "Plot2d_ViewWindow.h"
+#include "QtxActionMenuMgr.h"
+#include "QtxWorkstack.h"
+#include "QtxTreeView.h"
+#include "SALOME_Event.h"
+#include "STD_TabDesktop.h"
+#include "SUIT_DataBrowser.h"
+#include "SUIT_ResourceMgr.h"
+#include "SUIT_Session.h"
+#include "SUIT_Tools.h"
+
 #include <QAction>
-
-#include <SALOME_Event.h>
-
-#include <QtxActionMenuMgr.h>
-#include <QtxActionGroup.h>
-#include <QtxWorkstack.h>
-#include <QtxTreeView.h>
-#include <SUIT_Session.h>
-#include <SUIT_Desktop.h>
-#include <SUIT_ResourceMgr.h>
-#include <SUIT_Tools.h>
-#include <SUIT_ViewManager.h>
-#include <SUIT_ViewWindow.h>
-#include <SUIT_DataBrowser.h>
-#include <STD_TabDesktop.h>
-#include <LightApp_Application.h>
-#include <LightApp_Study.h>
-#include <LightApp_SelectionMgr.h>
-#include <LogWindow.h>
-#include <OCCViewer_ViewWindow.h>
-#include <Plot2d_ViewManager.h>
-#include <Plot2d_ViewWindow.h>
+#include <QApplication>
 
 /*!
   \brief Get the currently active application.
@@ -94,15 +84,45 @@ static LightApp_Study* getActiveStudy()
   This function returns correct result only if Python-based
   module is currently active. Otherwize, 0 is returned.
 */
-static SALOME_PYQT_ModuleLight* getActiveModule()
+static LightApp_Module* getActiveModule()
 {
-  SALOME_PYQT_ModuleLight* module = 0;
+  LightApp_Module* module = 0;
   if ( LightApp_Application* anApp = getApplication() ) {
-    module = SALOME_PYQT_ModuleLight::getInitModule();
+    module = PyModuleHelper::getInitModule();
     if ( !module )
-      module = dynamic_cast<SALOME_PYQT_ModuleLight*>( anApp->activeModule() );
+      module = dynamic_cast<LightApp_Module*>( anApp->activeModule() );
   }
   return module;
+}
+
+/*!
+  \brief Get the currently active Python module's helper.
+  \internal
+  This function returns correct result only if Python-based
+  module is currently active. Otherwize, 0 is returned.
+*/
+static PyModuleHelper* getPythonHelper()
+{
+  LightApp_Module* module = getActiveModule();
+  PyModuleHelper* helper = module ? qFindChild<PyModuleHelper*>( module, "python_module_helper" ) : 0;
+  return helper;
+}
+
+/*!
+  \brief Get SALOME verbose level
+  \internal
+  \return \c true if SALOME debug output is allowed or \c false otherwise
+*/
+static bool verbose()
+{
+  bool isVerbose = false;
+  if ( getenv( "SALOME_VERBOSE" ) ) {
+    QString envVar = getenv( "SALOME_VERBOSE" );
+    bool ok;
+    int value = envVar.toInt( &ok );
+    isVerbose = ok && value != 0;
+  }
+  return isVerbose;
 }
 
 /*!
@@ -175,12 +195,14 @@ void SALOME_Selection::onSelMgrDestroyed()
 */
 void SALOME_Selection::Clear()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
     LightApp_SelectionMgr* mySelMgr;
   public:
     TEvent( LightApp_SelectionMgr* selMgr ) 
       : mySelMgr( selMgr ) {}
-    virtual void Execute() {
+    virtual void Execute() 
+    {
       if ( mySelMgr )
         mySelMgr->clearSelected();
     }
@@ -201,12 +223,14 @@ void SALOME_Selection::ClearIObjects()
 */
 void SALOME_Selection::ClearFilters()
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event 
+  {
     LightApp_SelectionMgr* mySelMgr;
   public:
     TEvent( LightApp_SelectionMgr* selMgr ) 
       : mySelMgr( selMgr ) {}
-    virtual void Execute() {
+    virtual void Execute() 
+    {
       if ( mySelMgr )
         mySelMgr->clearFilters();
     }
@@ -439,7 +463,7 @@ int SalomePyQt::getStudyId()
 }
 
 /*!
-  \fn SALOME_Selection* SalomePyQt::getSelection()
+  \fn SALOME_Selection* SalomePyQt::getSelection();
   \brief Get the selection object for the current study.
 
   Creates a Selection object if it has not been created yet.
@@ -464,7 +488,7 @@ SALOME_Selection* SalomePyQt::getSelection()
 }
 
 /*!
-  \fn void SalomePyQt::putInfo( const QString& msg, const int sec )
+  \fn void SalomePyQt::putInfo( const QString& msg, const int sec );
   \brief Put an information message to the current application's 
   desktop status bar.
 
@@ -521,7 +545,7 @@ const QString SalomePyQt::getActiveComponent()
 }
 
 /*!
-  \fn PyObject* SalomePyQt::getActivePythonModule()
+  \fn PyObject* SalomePyQt::getActivePythonModule();
   \brief Access to Python module object currently loaded into SALOME_PYQT_ModuleLight container.
   \return Python module object currently loaded into SALOME_PYQT_ModuleLight container
 */
@@ -531,12 +555,12 @@ class TGetActivePyModuleEvent: public SALOME_Event
 public:
   typedef PyObject* TResult;
   TResult myResult;
-  TGetActivePyModuleEvent() : myResult( 0 ) {}
+  TGetActivePyModuleEvent() : myResult( Py_None ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (PyObject*)module->getPythonModule();
+    PyModuleHelper* helper = getPythonHelper();
+    if ( helper )
+      myResult = (PyObject*)helper->pythonModule();
   }
 };
 PyObject* SalomePyQt::getActivePythonModule()
@@ -545,7 +569,7 @@ PyObject* SalomePyQt::getActivePythonModule()
 }
 
 /*!
-  \fn bool SalomePyQt::activateModule( const QString& modName )
+  \fn bool SalomePyQt::activateModule( const QString& modName );
   \brief Activates SALOME module with the given name
   \return True if the module has been activated and False otherwise.
 */
@@ -618,6 +642,7 @@ void SalomePyQt::updateObjBrowser( const int studyId, bool updateSelection )
   SalomePyQt::isModified()
   \return The modification status of the data model
   for the currently active Python module
+  \note This function is supported for "light" Python-based SALOME modules only.
   \sa setModified()
 */
 class TIsModifiedEvent: public SALOME_Event
@@ -628,14 +653,18 @@ public:
   TIsModifiedEvent() : myResult( false ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( !module )
       return;
     
     SALOME_PYQT_DataModelLight* aModel =
       dynamic_cast<SALOME_PYQT_DataModelLight*>( module->dataModel() );
-    if ( aModel )
+    if ( aModel ) {
       myResult = aModel->isModified();
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.isModified() function is not supported for the current module.\n" );
+    }
   }
 };
 bool SalomePyQt::isModified()
@@ -651,6 +680,8 @@ bool SalomePyQt::isModified()
   by the Python code in order to enable/disable "Save" operation
   depending on the module's data state.
 
+  \note This function is supported for "light" Python-based SALOME modules only.
+
   \param New modification status of the data model
 
   \sa isModified()
@@ -665,19 +696,22 @@ void SalomePyQt::setModified( bool flag )
       : myFlag( flag ) {}
     virtual void Execute()
     {
-      SALOME_PYQT_ModuleLight* module = getActiveModule();
+      LightApp_Module* module = getActiveModule();
       if ( !module )
 	return;
 
-      SALOME_PYQT_DataModelLight* aModel =
+      SALOME_PYQT_DataModelLight* model =
 	dynamic_cast<SALOME_PYQT_DataModelLight*>( module->dataModel() );
-      LightApp_Application* aLApp = 
-	dynamic_cast<LightApp_Application*>( module->application() );
-      if ( !aModel || !aLApp )
-	return;
 
-      aModel->setModified( myFlag );
-      aLApp->updateActions();
+      LightApp_Application* app = module->getApp();
+
+      if ( model && app ) {
+	model->setModified( myFlag );
+	app->updateActions();
+      }
+      else {
+	if ( verbose() ) printf( "SalomePyQt.setModified() function is not supported for the current module.\n" );
+      }
     }
   };
   ProcessVoidEvent( new TEvent( flag ) );
@@ -713,7 +747,8 @@ void SalomePyQt::addStringSetting( const QString& name, const QString& value, bo
   public:
     TEvent( const QString& name, const QString& value, bool autoValue ) 
       : myName( name ), myValue( value ), myAutoValue( autoValue ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SUIT_Session::session() ) {
         SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
         QStringList sl = myName.split( ":", QString::SkipEmptyParts );
@@ -854,11 +889,13 @@ void SalomePyQt::addBoolSetting( const QString& name, const bool value, bool aut
 */
 void SalomePyQt::removeSettings( const QString& name )
 {
-  class TEvent: public SALOME_Event {
+  class TEvent: public SALOME_Event
+  {
     QString myName;
   public:
     TEvent( const QString& name ) : myName( name ) {}
-    virtual void Execute() {
+    virtual void Execute()
+    {
       if ( SUIT_Session::session() ) {
         SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
         QStringList sl = myName.split( ":", QString::SkipEmptyParts );
@@ -1417,9 +1454,26 @@ QString SalomePyQt::getExistingDirectory( QWidget*       parent,
 /*!
   \fn QString SalomePyQt::loadIcon( const QString& filename );
   \brief Load an icon from the module resources by the specified file name.
-  \param filename icon file name
+  \param fileName icon file name
   \return icon object
 */
+
+static QIcon loadIconInternal( const QString& module, const QString& fileName )
+{
+  QIcon icon;
+
+  LightApp_Application* app = getApplication();
+
+  if ( app && !fileName.isEmpty() ) {
+    QPixmap pixmap = app->resourceMgr()->loadPixmap( module, 
+						     QApplication::translate( module.toLatin1().data(), 
+									      fileName.toLatin1().data() ) );
+    if ( !pixmap.isNull() )
+      icon = QIcon( pixmap );
+  }
+  return icon;
+}
+
 class TLoadIconEvent: public SALOME_Event 
 {
 public:
@@ -1432,15 +1486,7 @@ public:
       myFileName ( filename ) {}
   virtual void Execute() 
   {
-    if ( LightApp_Application* anApp = getApplication() ) {
-      if ( !myFileName.isEmpty() ) {
-        QPixmap pixmap = anApp->resourceMgr()->loadPixmap( myModule, 
-                         QApplication::translate( myModule.toLatin1().data(), 
-                                                  myFileName.toLatin1().data() ) );
-        if ( !pixmap.isNull() )
-          myResult = QIcon( pixmap );
-      }
-    }
+    myResult = loadIconInternal( myModule, myFileName );
   }
 };
 QIcon SalomePyQt::loadIcon( const QString& module, const QString& filename )
@@ -1536,7 +1582,7 @@ public:
   TDefMenuGroupEvent() : myResult( -1 ) {}
   virtual void Execute() 
   {
-    myResult = SALOME_PYQT_ModuleLight::defaultMenuGroup();
+    myResult = PyModuleHelper::defaultMenuGroup();
   }
 };
 int SalomePyQt::defaultMenuGroup()
@@ -1558,7 +1604,7 @@ public:
   CrTool( QAction* action, const QString& tBar, const int id, const int idx )
     : myCase( 4 ), myAction( action ), myTbName( tBar ), myId( id ), myIndex( idx ) {}
 
-  int execute( SALOME_PYQT_ModuleLight* module ) const
+  int execute( LightApp_Module* module ) const
   {
     if ( module ) {
       switch ( myCase ) {
@@ -1595,7 +1641,7 @@ public:
     : myResult( -1 ), myCrTool( crTool ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( module )
       myResult = myCrTool.execute( module );
   }
@@ -1718,12 +1764,9 @@ public:
     : myResult( -1 ), myCrMenu( crMenu ) {}
   virtual void Execute()
   {
-    if ( LightApp_Application* anApp = getApplication() ) 
-      {
-        LightApp_Module* module = dynamic_cast<LightApp_Module*>( anApp->activeModule() );
-        if ( module )
-          myResult = myCrMenu.execute( module );
-      }
+    LightApp_Module* module = getActiveModule();
+    if ( module )
+      myResult = myCrMenu.execute( module );
   }
 };
 
@@ -1822,7 +1865,7 @@ public:
     : myResult( 0 ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( module )
       myResult = (QAction*)module->separator();
   }
@@ -1834,12 +1877,12 @@ QAction* SalomePyQt::createSeparator()
 
 /*!
   \fn QAction* SalomePyQt::createAction( const int      id,
-                                           const QString& menuText, 
-                                           const QString& tipText, 
-                                           const QString& statusText, 
-                                           const QString& icon,
-                                           const int      key, 
-                                           const bool     toggle )
+                                         const QString& menuText, 
+                                         const QString& tipText, 
+                                         const QString& statusText, 
+                                         const QString& icon,
+                                         const int      key, 
+                                         const bool     toggle );
   \brief Create an action which can be then used in the menu or toolbar.
   \param id the unique id action to be registered to
   \param menuText action text which should appear in menu
@@ -1868,46 +1911,69 @@ public:
       myStatusText( statusText ), myIcon( icon ), myKey( key ), myToggle( toggle ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QAction*)module->createAction( myId, myTipText, myIcon, myMenuText, myStatusText, myKey, myToggle );
+    LightApp_Module* module = getActiveModule();
+    if ( module ) {
+      QIcon icon = loadIconInternal( module->name(), myIcon );
+      myResult = (QAction*)module->action( myId );
+      if ( myResult ) {
+	if ( myResult->toolTip().isEmpty() && !myTipText.isEmpty() ) 
+	  myResult->setToolTip( myTipText );
+	if ( myResult->text().isEmpty() && !myMenuText.isEmpty() )
+	  myResult->setText( myMenuText );
+	if ( myResult->icon().isNull() && !icon.isNull() ) 
+	  myResult->setIcon( icon );
+	if ( myResult->statusTip().isEmpty() && !myStatusText.isEmpty() )
+	  myResult->setStatusTip( myStatusText );
+	if ( myResult->shortcut().isEmpty() && myKey )
+	  myResult->setShortcut( myKey );
+	if ( myResult->isCheckable() != myToggle )
+	  myResult->setCheckable( myToggle );
+      }
+      else {
+	myResult = (QAction*)module->createAction( myId, myTipText, icon, myMenuText, myStatusText, myKey, module, myToggle );
+      }
+      // for Python module, automatically connect action to callback slot
+      PyModuleHelper* helper = qFindChild<PyModuleHelper*>( module, "python_module_helper" );
+      if ( helper ) helper->connectAction( myResult );
+    }
   }
 };
 QAction* SalomePyQt::createAction( const int id,           const QString& menuText, 
-                                     const QString& tipText, const QString& statusText, 
-                                     const QString& icon,    const int key, const bool toggle )
+				   const QString& tipText, const QString& statusText, 
+				   const QString& icon,    const int key, const bool toggle )
 {
   return ProcessEvent( new TCreateActionEvent( id, menuText, tipText, statusText, icon, key, toggle ) );
 }
 
 /*!
-  \fn QtxActionGroup* SalomePyQt::createActionGroup( const int id, const bool exclusive )
+  \fn QtxActionGroup* SalomePyQt::createActionGroup( const int id, const bool exclusive );
   \brief Create an action group which can be then used in the menu or toolbar
   \param id         : the unique id action group to be registered to
   \param exclusive  : if \c true the action group does exclusive toggling
 */
 
-struct TcreateActionGroupEvent: public SALOME_Event {
+struct TCreateActionGroupEvent: public SALOME_Event 
+{
   typedef QtxActionGroup* TResult;
   TResult myResult;
   int     myId;
   bool    myExclusive;
-  TcreateActionGroupEvent( const int id, const bool exclusive )
+  TCreateActionGroupEvent( const int id, const bool exclusive )
     : myId( id ), myExclusive( exclusive ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( module )
       myResult = module->createActionGroup( myId, myExclusive );
   }
 };
-QtxActionGroup* SalomePyQt::createActionGroup(const int id, const bool exclusive)
+QtxActionGroup* SalomePyQt::createActionGroup( const int id, const bool exclusive )
 {
-  return ProcessEvent( new TcreateActionGroupEvent( id, exclusive ) );
+  return ProcessEvent( new TCreateActionGroupEvent( id, exclusive ) );
 }
 
 /*!
-  \fn QAction* SalomePyQt::action( const int id )
+  \fn QAction* SalomePyQt::action( const int id );
   \brief Get action by specified identifier.
   \return action or 0 if action is not registered
 */
@@ -1922,7 +1988,7 @@ public:
     : myResult( 0 ), myId( id ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( module )
       myResult = (QAction*)module->action( myId );
   }
@@ -1948,7 +2014,7 @@ public:
     : myResult( -1 ), myAction( action ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
+    LightApp_Module* module = getActiveModule();
     if ( module )
       myResult = module->actionId( myAction );
   }
@@ -1975,9 +2041,12 @@ public:
     : myResult( -1 ), myLabel( label ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->addGlobalPreference( myLabel );
+    LightApp_Module* module = getActiveModule();
+    if ( module ) {
+      LightApp_Preferences* pref = module->getApp()->preferences();
+      if ( pref )
+	myResult = pref->addPreference( myLabel, -1 );
+    }
   }
 };
 int SalomePyQt::addGlobalPreference( const QString& label )
@@ -2002,9 +2071,15 @@ public:
     : myResult( -1 ), myLabel( label ) {}
   virtual void Execute() 
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->addPreference( myLabel );
+    LightApp_Module* module = getActiveModule();
+    if ( module ) {
+      LightApp_Preferences* pref = module->getApp()->preferences();
+      if ( pref ) {
+	int cId = pref->addPreference( module->moduleName(), -1 );
+	if ( cId != -1 )
+	  myResult = pref->addPreference( myLabel, cId );
+      }
+    }
   }
 };
 int SalomePyQt::addPreference( const QString& label )
@@ -2043,9 +2118,12 @@ public:
       mySection( section ), myParam ( param ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->addPreference( myLabel, myPId, myType, mySection, myParam );
+    LightApp_Module* module = getActiveModule();
+    if ( module ) {
+      LightApp_Preferences* pref = module->getApp()->preferences();
+      if ( pref )
+	myResult = pref->addPreference( module->moduleName(), myLabel, myPId, myType, mySection, myParam );
+    }
   }
 };
 int SalomePyQt::addPreference( const QString& label, const int pId, const int type,
@@ -2073,9 +2151,12 @@ public:
     : myId( id ), myProp( prop ) {}
   virtual void Execute()
   {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->preferenceProperty( myId, myProp );
+    LightApp_Module* module = getActiveModule();
+    if ( module ) {
+      LightApp_Preferences* pref = module->getApp()->preferences();
+      if ( pref )
+	myResult = pref->itemProperty( myProp, myId );
+    }
   }
 };
 QVariant SalomePyQt::preferenceProperty( const int id, const QString& prop )
@@ -2103,9 +2184,12 @@ void SalomePyQt::setPreferenceProperty( const int id,
       : myId( id ), myProp( prop ), myVar( var ) {}
     virtual void Execute() 
     {
-      SALOME_PYQT_ModuleLight* module = getActiveModule();
-      if ( module )
-        module->setPreferenceProperty( myId, myProp, myVar );
+      LightApp_Module* module = getActiveModule();
+      if ( module ) {
+	LightApp_Preferences* pref = module->getApp()->preferences();
+	if ( pref )
+	  pref->setItemProperty( myProp, myVar, myId );
+      }
     }
   };
   ProcessVoidEvent( new TEvent( id, prop, var) );
@@ -2138,32 +2222,35 @@ void SalomePyQt::addPreferenceProperty( const int id,
       : myId( id ), myProp( prop ), myIdx( idx), myVar( var ) {}
     virtual void Execute()
     {
-      SALOME_PYQT_ModuleLight* module = getActiveModule();
+      LightApp_Module* module = getActiveModule();
       if ( module ) {
-        QVariant var =  module->preferenceProperty( myId, myProp );
-        if ( var.isValid() ) {
-          if ( var.type() == QVariant::StringList ) {
-            QStringList sl = var.toStringList();
-            if ( myIdx >= 0 && myIdx < sl.count() ) 
-              sl[myIdx] = myVar.toString();
-            else
-              sl.append( myVar.toString() );
-            module->setPreferenceProperty( myId, myProp, sl );
-          }
-          else if ( var.type() == QVariant::List ) {
-            QList<QVariant> vl = var.toList();
-            if ( myIdx >= 0 && myIdx < vl.count() ) 
-              vl[myIdx] = myVar;
-            else
-              vl.append( myVar );
-            module->setPreferenceProperty( myId, myProp, vl );
-          }
-        }
-        else {
-          QList<QVariant> vl;
-          vl.append( myVar );
-          module->setPreferenceProperty( myId, myProp, vl );
-        }
+	LightApp_Preferences* pref = module->getApp()->preferences();
+	if ( pref ) {
+	  QVariant var =  pref->itemProperty( myProp, myId );
+	  if ( var.isValid() ) {
+	    if ( var.type() == QVariant::StringList ) {
+	      QStringList sl = var.toStringList();
+	      if ( myIdx >= 0 && myIdx < sl.count() ) 
+		sl[myIdx] = myVar.toString();
+	      else
+		sl.append( myVar.toString() );
+	      pref->setItemProperty( myProp, sl, myId );
+	    }
+	    else if ( var.type() == QVariant::List ) {
+	      QList<QVariant> vl = var.toList();
+	      if ( myIdx >= 0 && myIdx < vl.count() ) 
+		vl[myIdx] = myVar;
+	      else
+		vl.append( myVar );
+	      pref->setItemProperty( myProp, vl, myId );
+	    }
+	  }
+	  else {
+	    QList<QVariant> vl;
+	    vl.append( myVar );
+	    pref->setItemProperty( myProp, vl, myId );
+	  }
+	}
       }
     }
   };
@@ -2250,7 +2337,7 @@ static SUIT_ViewWindow* getWnd( const int id )
 }
 
 /*!
-  \fn QList<int> SalomePyQt::getViews()
+  \fn QList<int> SalomePyQt::getViews();
   \brief Get list of integer identifiers of all the currently opened views
   \return list of integer identifiers of all the currently opened views
 */
@@ -2284,7 +2371,7 @@ QList<int> SalomePyQt::getViews()
 }
 
 /*!
-  \fn int SalomePyQt::getActiveView()
+  \fn int SalomePyQt::getActiveView();
   \brief Get integer identifier of the currently active view
   \return integer identifier of the currently active view
 */
@@ -2317,7 +2404,7 @@ int SalomePyQt::getActiveView()
 }
 
 /*!                      
-  \fn QString SalomePyQt::getViewType( const int id )
+  \fn QString SalomePyQt::getViewType( const int id );
   \brief Get type of the specified view, e.g. "OCCViewer"
   \param id window identifier
   \return view type
@@ -2348,7 +2435,7 @@ QString SalomePyQt::getViewType( const int id )
 }
 
 /*!
-  \fn bool SalomePyQt::setViewTitle( const int id, const QString& title )
+  \fn bool SalomePyQt::setViewTitle( const int id, const QString& title );
   \brief Change view caption  
   \param id window identifier
   \param title new window title
@@ -2383,7 +2470,7 @@ bool SalomePyQt::setViewTitle( const int id, const QString& title )
 
 
 /*!
-  \fn QString SalomePyQt::getViewTitle( const int id )
+  \fn QString SalomePyQt::getViewTitle( const int id );
   \brief Get view caption  
   \param id window identifier
   \return view caption  
@@ -2410,7 +2497,7 @@ QString SalomePyQt::getViewTitle( const int id )
 }
 
 /*!
-  \fn QList<int> SalomePyQt::findViews( const QString& type )
+  \fn QList<int> SalomePyQt::findViews( const QString& type );
   \brief Get list of integer identifiers of all the 
          currently opened views of the specified type
   \param type viewer type
@@ -2453,7 +2540,7 @@ QList<int> SalomePyQt::findViews( const QString& type )
 }
 
 /*!
-  \fn bool SalomePyQt::activateView( const int id )
+  \fn bool SalomePyQt::activateView( const int id );
   \brief Activate view
   \param id window identifier
   \return \c true if operation is completed successfully and \c false otherwise 
@@ -2484,7 +2571,7 @@ bool SalomePyQt::activateView( const int id )
 }
 
 /*!
-  \fn int SalomePyQt::createView( const QString& type )
+  \fn int SalomePyQt::createView( const QString& type );
   \brief Create new view and activate it
   \param type viewer type
   \return integer identifier of created view (or -1 if view could not be created)
@@ -2520,7 +2607,7 @@ int SalomePyQt::createView( const QString& type )
 }
 
 /*!
-  \fn int SalomePyQt::createView( const QString& type, QWidget* w )
+  \fn int SalomePyQt::createView( const QString& type, QWidget* w );
   \brief Create new view with custom widget embedded and activate it
   \param type viewer type
   \param w custom widget
@@ -2559,7 +2646,7 @@ int SalomePyQt::createView( const QString& type, QWidget* w )
 }
 
 /*!
-  \fn bool SalomePyQt::closeView( const int id )
+  \fn bool SalomePyQt::closeView( const int id );
   \brief Close view
   \param id window identifier
   \return \c true if operation is completed successfully and \c false otherwise 
@@ -2594,7 +2681,7 @@ bool SalomePyQt::closeView( const int id )
 }
 
 /*!
-  \fn int SalomePyQt::cloneView( const int id )
+  \fn int SalomePyQt::cloneView( const int id );
   \brief Clone view (if this operation is supported for specified view type)
   \param id window identifier
   \return integer identifier of the cloned view or -1 or operation could not be performed
@@ -2646,7 +2733,7 @@ int SalomePyQt::cloneView( const int id )
 }
 
 /*!
-  \fn bool SalomePyQt::isViewVisible( const int id )
+  \fn bool SalomePyQt::isViewVisible( const int id );
   \brief Check whether view is visible ( i.e. it is on the top of the views stack)
   \param id window identifier
   \return \c true if view is visible and \c false otherwise 
@@ -2677,7 +2764,7 @@ bool SalomePyQt::isViewVisible( const int id )
 }
   
 /*!
-  \fn bool SalomePyQt::setViewClosable( const int id, const bool on )
+  \fn bool SalomePyQt::setViewClosable( const int id, const bool on );
   \brief Set / clear view's "closable" option. By default any view is closable
         (i.e. can be closed by the user).
   \param id window identifier
@@ -2703,7 +2790,7 @@ void SalomePyQt::setViewClosable( const int id, const bool on )
 }
 
 /*!
-  \fn bool SalomePyQt::isViewClosable( const int id )
+  \fn bool SalomePyQt::isViewClosable( const int id );
   \brief Check whether view is closable (i.e. can be closed by the user)
   \param id window identifier
   \return \c true if view is closable or \c false otherwise 
@@ -2732,7 +2819,7 @@ bool SalomePyQt::isViewClosable( const int id )
 }
 
 /*!
-  \fn bool SalomePyQt::groupAllViews()
+  \fn bool SalomePyQt::groupAllViews();
   \brief Group all views to the single tab area
   \return \c true if operation is completed successfully and \c false otherwise 
 */
@@ -2768,7 +2855,7 @@ bool SalomePyQt::groupAllViews()
 }
 
 /*!
-  \fn bool SalomePyQt::splitView( const int id, const Orientation ori, const Action action )
+  \fn bool SalomePyQt::splitView( const int id, const Orientation ori, const Action action );
   \brief Split tab area to which view with identifier belongs to
   \param id window identifier
   \param ori orientation of split operation
@@ -2834,7 +2921,7 @@ bool SalomePyQt::splitView( const int id, const Orientation ori, const Action ac
 }
 
 /*!
-  \fn bool SalomePyQt::moveView( const int id, const int id_to, const bool before )
+  \fn bool SalomePyQt::moveView( const int id, const int id_to, const bool before );
   \brief Move view with the first identifier to the same area which 
          another view with the second identifier belongs to
   \param id source window identifier
@@ -2876,7 +2963,7 @@ bool SalomePyQt::moveView( const int id, const int id_to, const bool before )
 }
 
 /*!
-  \fn QList<int> SalomePyQt::neighbourViews( const int id )
+  \fn QList<int> SalomePyQt::neighbourViews( const int id );
   \brief Get list of views identifiers that belongs to the same area as 
          specified view (excluding it)
   \param id window identifier
@@ -2920,314 +3007,435 @@ QList<int> SalomePyQt::neighbourViews( const int id )
 
 
 /*!
-  SalomePyQt::createObject(parent)
-  Create empty data object
+  \fn QString SalomePyQt::createObject( const QString& parent );
+  \brief Create empty data object
+  \param parent entry of parent data object
+  \return entry of created data object
 */
-class TCreateEmptyObjectEvent: public SALOME_Event {
+
+class TCreateEmptyObjectEvent: public SALOME_Event
+{
 public:
   typedef QString TResult;
   TResult  myResult;
   QString  myParent;
-  TCreateEmptyObjectEvent(const QString& parent) : myParent( parent ) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QString)module->createObject(myParent);
+  TCreateEmptyObjectEvent( const QString& parent )
+    : myParent( parent ) {}
+  virtual void Execute() 
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+       myResult = module->createObject( myParent );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.createObject() function is not supported for the current module.\n" );
+    }
   }
 };
-QString SalomePyQt::createObject(const QString& parent)
+QString SalomePyQt::createObject( const QString& parent )
 {
-  return ProcessEvent( new TCreateEmptyObjectEvent(parent) );
+  return ProcessEvent( new TCreateEmptyObjectEvent( parent ) );
 }
 
 /*!
-  SalomePyQt::createObject( name, icon, tooltip, parent )
-  Create data object with name, icon and tooltip
+  \fn QString SalomePyQt::createObject( const QString& name, const QString& icon,
+                                        const QString& tooltip,const QString& parent );
+  \brief Create new data object with specified name, icon and tooltip
+  \param name data object name
+  \param icon data object icon
+  \param toolTip data object tooltip
+  \param parent entry of parent data object
+  \return entry of created data object
 */
-class TCreateObjectEvent: public SALOME_Event {
+
+class TCreateObjectEvent: public SALOME_Event 
+{
 public:
   typedef QString TResult;
   TResult myResult;
   QString myParent;
   QString myName;
-  QString myIconName;
+  QString myIcon;
   QString myToolTip;
-  TCreateObjectEvent(const QString& name,
-                     const QString& iconname,
-                     const QString& tooltip,
-                     const QString& parent) : myName(name),
-                                              myIconName(iconname),
-                                              myToolTip(tooltip),
-                                              myParent( parent ){}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QString)module->createObject(myName, myIconName,
-                                               myToolTip, myParent);
+  TCreateObjectEvent( const QString& name,
+		      const QString& icon,
+		      const QString& tooltip,
+		      const QString& parent )
+    : myName( name ),
+      myIcon( icon ),
+      myToolTip( tooltip ),
+      myParent( parent ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->createObject( myName, myIcon, myToolTip, myParent );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.createObject() function is not supported for the current module.\n" );
+    }
   }
 };
-QString SalomePyQt::createObject(const QString& name,
-                                 const QString& iconname,
-                                 const QString& tooltip,
-                                 const QString& parent)
+QString SalomePyQt::createObject( const QString& name,
+				  const QString& icon,
+				  const QString& toolTip,
+				  const QString& parent )
 {
-  return ProcessEvent( new TCreateObjectEvent(name, iconname, tooltip, parent) );
+  return ProcessEvent( new TCreateObjectEvent( name, icon, toolTip, parent ) );
 }
 
 
 /*!
-  SalomePyQt::setName(obj,name)
-  Set object name
+  \fn void SalomePyQt::setName( const QString& entry, const QString& name );
+  \brief Set data object name
+  \param entry data object entry
+  \param name data object name
 */
 class TSetNameEvent: public SALOME_Event
 {
 public:
-  QString myObj;
+  QString myEntry;
   QString myName;
-  TSetNameEvent( const QString& obj,
-                 const QString& name) : myObj(obj),
-                                         myName(name) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->setName(myObj,myName);
+  TSetNameEvent( const QString& entry,
+                 const QString& name )
+  : myEntry( entry ),
+    myName( name ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->setName( myEntry, myName );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.setName() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::setName(const QString& obj,const QString& name)
+void SalomePyQt::setName( const QString& entry, const QString& name )
 {
-  ProcessVoidEvent(new TSetNameEvent(obj,name));
+  ProcessVoidEvent( new TSetNameEvent( entry, name ) );
 }
 
-
 /*!
-  SalomePyQt::setIcon(obj,icon)
-  Set object icon
+  \fn void SalomePyQt::setIcon( const QString& entry, const QString& icon );
+  \brief Set data object icon
+  \param entry data object entry
+  \param icon data object icon file name (icon is loaded from module resources)
 */
+
 class TSetIconEvent: public SALOME_Event
 {
 public:
-  QString myObj;
-  QString myIconName;
-  TSetIconEvent( const QString& obj,
-                 const QString& iconname) : myObj(obj),
-                                            myIconName(iconname) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->setIcon(myObj,myIconName);
+  QString myEntry;
+  QString myIcon;
+  TSetIconEvent( const QString& entry,
+                 const QString& icon )
+  : myEntry( entry ),
+    myIcon( icon ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->setIcon( myEntry, myIcon );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.setIcon() function is not supported for the current module.\n" );
+    }
   }
 };
 
-void SalomePyQt::setIcon(const QString& obj,const QString& iconname)
+void SalomePyQt::setIcon( const QString& entry, const QString& icon )
 {
-  ProcessVoidEvent(new TSetIconEvent(obj,iconname));
+  ProcessVoidEvent( new TSetIconEvent( entry, icon ) );
 }
 
 /*!
-  SalomePyQt::setToolTip(obj,tooltip)
-  Set object tool tip
+  \fn void SalomePyQt::setToolTip( const QString& entry, const QString& toolTip );
+  \brief Set data object tooltip
+  \param entry data object entry
+  \param toolTip data object tooltip
 */
+
 class TSetToolTipEvent: public SALOME_Event
 {
 public:
-  QString myObj;
+  QString myEntry;
   QString myToolTip;
-  TSetToolTipEvent( const QString& obj,
-                    const QString& tooltip) : myObj(obj),
-                                              myToolTip(tooltip) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->setToolTip(myObj,myToolTip);
+  TSetToolTipEvent( const QString& entry,
+                    const QString& toolTip )
+    : myEntry( entry ),
+      myToolTip( toolTip ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->setToolTip( myEntry, myToolTip );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.setToolTip() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::setToolTip(const QString& obj,const QString& tooltip)
+void SalomePyQt::setToolTip( const QString& entry, const QString& toolTip )
 {
-  ProcessVoidEvent(new TSetToolTipEvent(obj,tooltip));
+  ProcessVoidEvent( new TSetToolTipEvent( entry, toolTip ) );
 }
 
 /*!
-  SalomePyQt::setReference(obj,refEntry)
-  Set entry to referenced object
+  \fn void SalomePyQt::setReference( const QString& entry, const QString& refEntry );
+  \brief Set reference to another data object
+  \param entry data object entry
+  \param refEntry referenced data object entry
 */
+
 class TSetRefEvent: public SALOME_Event
 {
 public:
-  QString myObj;
+  QString myEntry;
   QString myRefEntry;
-  TSetRefEvent( const QString& obj,
-		const QString& refEntry) : myObj(obj),
-					   myRefEntry(refEntry) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->setReference(myObj,myRefEntry);
+  TSetRefEvent( const QString& entry,
+		const QString& refEntry )
+    : myEntry( entry ),
+      myRefEntry( refEntry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->setReference( myEntry, myRefEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.setReference() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::setReference(const QString& obj,const QString& refEntry)
+void SalomePyQt::setReference( const QString& entry, const QString& refEntry )
 {
-  ProcessVoidEvent(new TSetRefEvent(obj,refEntry));
+  ProcessVoidEvent( new TSetRefEvent( entry, refEntry ) );
 }
 
 /*!
-  SalomePyQt::setColor(obj,color)
-  Set object color
-*/
+  \fn void SalomePyQt::setColor( const QString& entry, const QColor& color );
+  \brief Set data object color
+  \param entry data object entry
+  \param color data object color
+ */
+
 class TSetColorEvent: public SALOME_Event
 {
 public:
-  QString myObj;
+  QString myEntry;
   QColor  myColor;
-  TSetColorEvent( const QString& obj,
-		  const QColor& color) : myObj(obj),
-					 myColor(color) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->setColor(myObj,myColor);
+  TSetColorEvent( const QString& entry,
+		  const QColor& color )
+    : myEntry( entry ),
+      myColor( color ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->setColor( myEntry, myColor );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.setColor() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::setColor(const QString& obj,const QColor& color)
+void SalomePyQt::setColor( const QString& entry, const QColor& color )
 {
-  ProcessVoidEvent(new TSetColorEvent(obj,color));
+  ProcessVoidEvent( new TSetColorEvent( entry, color ) );
 }
 
 /*!
-  SalomePyQt::getName(obj)
-  Return name of object
+  \fn QString SalomePyQt::getName( const QString& entry );
+  \brief Get data object name
+  \param entry data object entry
+  \return data object name
 */
+
 class TGetNameEvent: public SALOME_Event
 {
 public:
   typedef QString TResult;
   TResult myResult;
-  QString myObj;
-  TGetNameEvent( const QString& obj ) : myObj(obj) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QString) module->getName(myObj);
+  QString myEntry;
+  TGetNameEvent( const QString& entry )
+    : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->getName( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.getName() function is not supported for the current module.\n" );
+    }
   }
 };
-
-QString SalomePyQt::getName(const QString& obj)
+QString SalomePyQt::getName( const QString& entry )
 {
-  return ProcessEvent(new TGetNameEvent(obj));
+  return ProcessEvent( new TGetNameEvent( entry ) );
 }
 
 /*!
-  SalomePyQt::getToolTip(obj)
-  Return tool tip of object
+  \fn QString SalomePyQt::getToolTip( const QString& entry );
+  \brief Get data object tooltip
+  \param entry data object entry
+  \return data object tooltip
 */
+
 class TGetToolTipEvent: public SALOME_Event
 {
 public:
   typedef QString TResult;
   TResult myResult;
-  QString myObj;
-  TGetToolTipEvent( const QString& obj ) : myObj(obj) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QString)module->getToolTip(myObj);
+  QString myEntry;
+  TGetToolTipEvent( const QString& entry )
+  : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->getToolTip( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.getToolTip() function is not supported for the current module.\n" );
+    }
   }
 };
-QString SalomePyQt::getToolTip(const QString& obj)
+QString SalomePyQt::getToolTip( const QString& entry )
 {
-  return ProcessEvent(new TGetToolTipEvent(obj));
+  return ProcessEvent( new TGetToolTipEvent( entry ) );
 }
 
-/*!
-  SalomePyQt::getReference(obj)
-  Return entry of the referenced object (if any)
+/*
+  \fn QString SalomePyQt::getReference( const QString& entry );
+  \brief Get entry of the referenced object (if there's any)
+  \param entry data object entry
+  \return referenced data object entry
 */
+
 class TGetRefEvent: public SALOME_Event
 {
 public:
   typedef QString TResult;
   TResult myResult;
-  QString myObj;
-  TGetRefEvent( const QString& obj ) : myObj(obj) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->getReference(myObj);
+  QString myEntry;
+  TGetRefEvent( const QString& entry )
+  : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->getReference( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.getReference() function is not supported for the current module.\n" );
+    }
   }
 };
-QString SalomePyQt::getReference(const QString& obj)
+QString SalomePyQt::getReference( const QString& entry )
 {
-  return ProcessEvent(new TGetRefEvent(obj));
+  return ProcessEvent( new TGetRefEvent( entry ) );
 }
 
 /*!
-  SalomePyQt::getColor(obj)
-  Return the color of the object
+  \fn QColor SalomePyQt::getColor( const QString& entry );
+  \brief Get data object color
+  \param entry data object entry
+  \return data object color
 */
+
 class TGetColorEvent: public SALOME_Event
 {
 public:
   typedef QColor TResult;
   TResult myResult;
-  QString myObj;
-  TGetColorEvent( const QString& obj ) : myObj(obj) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = module->getColor(myObj);
+  QString myEntry;
+  TGetColorEvent( const QString& entry )
+  : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->getColor( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.getColor() function is not supported for the current module.\n" );
+    }
   }
 };
-QColor SalomePyQt::getColor(const QString& obj)
+QColor SalomePyQt::getColor( const QString& entry )
 {
-  return ProcessEvent(new TGetColorEvent(obj));
+  return ProcessEvent( new TGetColorEvent( entry ) );
 }
 
 /*!
-  SalomePyQt::removeChild(obj)
-  Remove childrens from object
+  \fn void SalomePyQt::removeChildren( const QString& entry );
+  \brief Remove all child data objects from specified data object
+  \param entry data object entry
 */
+
 class TRemoveChildEvent: public SALOME_Event
 {
 public:
-  QString myObj;
-  TRemoveChildEvent(const QString& obj) : myObj(obj) {}
-  
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->removeChild(myObj);
+  QString myEntry;
+  TRemoveChildEvent( const QString& entry )
+  : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->removeChildren( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.removeChildren() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::removeChild(const QString& obj)
+void SalomePyQt::removeChildren( const QString& entry )
 {
-  ProcessVoidEvent(new TRemoveChildEvent(obj));
+  ProcessVoidEvent( new TRemoveChildEvent( entry ) );
+}
+void SalomePyQt::removeChild( const QString& entry )
+{
+  if ( verbose() ) printf( "SalomePyQt.removeChild() function is obsolete. Use SalomePyQt.removeChildren() instead." );
+  removeChildren( entry );
 }
 
-
 /*!
-  SalomePyQt::removeObject(obj)
-  Remove object
+  \fn void SalomePyQt::removeObject( const QString& entry );
+  \brief Remove object by entry
+  \param entry data object entry
 */
+
 class TRemoveObjectEvent: public SALOME_Event
 {
 public:
-  QString myObj;
+  QString myEntry;
   
-  TRemoveObjectEvent( const QString& obj) : myObj(obj) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      module->removeObject(myObj);
+  TRemoveObjectEvent( const QString& entry )
+  : myEntry( entry ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      module->removeObject( myEntry );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.removeObject() function is not supported for the current module.\n" );
+    }
   }
 };
-void SalomePyQt::removeObject(const QString& obj)
+void SalomePyQt::removeObject( const QString& entry )
 {
-  ProcessVoidEvent(new TRemoveObjectEvent(obj));
+  ProcessVoidEvent( new TRemoveObjectEvent( entry ) );
 }
 
 /*!
-  SalomePyQt::getChildren(obj)
-  Return the list of the child objects
-  if rec == true then function get all sub children.
+  \fn QStringList SalomePyQt::getChildren( const QString& entry, const bool recursive );
+  \brief Get entries of all child data objects of specified data object
+  \param entry data object entry
+  \param recursive \c true for recursive processing
 */
 
 class TGetChildrenEvent: public SALOME_Event
@@ -3235,17 +3443,23 @@ class TGetChildrenEvent: public SALOME_Event
 public:
   typedef QStringList TResult;
   TResult myResult;
-  QString myObj;
-  bool myRec; 
-  TGetChildrenEvent(const QString& obj, const bool rec) : myObj(obj),
-                                                          myRec(rec) {}
-  virtual void Execute() {
-    SALOME_PYQT_ModuleLight* module = getActiveModule();
-    if ( module )
-      myResult = (QStringList)module->getChildren(myObj,myRec);
+  QString myEntry;
+  bool    myRecursive; 
+  TGetChildrenEvent( const QString& entry, const bool recursive )
+    : myEntry( entry ),
+      myRecursive( recursive ) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module ) {
+      myResult = module->getChildren( myEntry, myRecursive );
+    }
+    else {
+      if ( verbose() ) printf( "SalomePyQt.getChildren() function is not supported for the current module.\n" );
+    }
   }
 };
-QStringList SalomePyQt::getChildren(const QString& obj, const bool rec)
+QStringList SalomePyQt::getChildren( const QString& entry, const bool recursive )
 {
-  return ProcessEvent( new TGetChildrenEvent(obj,rec) ); 
+  return ProcessEvent( new TGetChildrenEvent( entry, recursive ) ); 
 }

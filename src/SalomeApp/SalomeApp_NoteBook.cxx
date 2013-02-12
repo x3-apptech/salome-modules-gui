@@ -17,14 +17,14 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:    SalomeApp_NoteBookDlg.cxx
+// File:    SalomeApp_NoteBook.cxx
 // Author : Roman NIKOLAEV, Open CASCADE S.A.S.
 // Module : GUI
 //
 #include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
 #include <PyConsole_Console.h>
 
-#include "SalomeApp_NoteBookDlg.h"
+#include "SalomeApp_NoteBook.h"
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_VisualState.h"
@@ -38,10 +38,7 @@
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 
-#include <SALOMEDS_Tool.hxx>
-
 #include <QWidget>
-#include <QDialog>
 #include <QGridLayout>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -57,8 +54,8 @@
 
 #define DEFAULT_MARGIN  11
 #define DEFAULT_SPACING 6
-#define SPACER_SIZE     120
-#define COLUMN_SIZE     180
+#define SPACER_SIZE     100
+#define COLUMN_SIZE     100
 
 #define NAME_COLUMN  0
 #define VALUE_COLUMN 1
@@ -326,7 +323,6 @@ NoteBook_Table::NoteBook_Table(QWidget * parent)
   
   //Add Headers Columns
   QFont aFont = QFont();
-  aFont.setBold(true);
   aFont.setPointSize(10);
   
   //"Name" column
@@ -486,11 +482,11 @@ bool NoteBook_Table::IsValid() const
 }
 
 //============================================================================
-/*! Function : RenamberRowItems
+/*! Function : RenumberRowItems
  *  Purpose  : renumber row items
  */
 //============================================================================
-void NoteBook_Table::RenamberRowItems() {
+void NoteBook_Table::RenumberRowItems() {
   for(int i=0; i<myRows.size();i++){
     myRows[i]->GetHeaderItem()->setText(QString::number(i+1));
   }
@@ -552,7 +548,7 @@ bool NoteBook_Table::IsLastRow(const NoteBook_TableRow* theRow) const
 
 //============================================================================
 /*! Function : onItemChanged
- *  Purpose  : [slot] called then table item changed
+ *  Purpose  : [slot] called when table item changed
  */
 //============================================================================
 void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
@@ -585,7 +581,7 @@ void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
         }
       }
 
-      //Case then varible name changed. 
+      //Case when variable name was changed.
       if(aCurrentColumn == NAME_COLUMN) {
         if(!aRow->CheckName()) {
           IsCorrect = false;
@@ -599,7 +595,7 @@ void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
           IsVariableComplited = aRow->CheckValue();
       }
       
-      //Case then varible value changed. 
+      //Case when variable value was changed. 
       else if(aCurrentColumn == VALUE_COLUMN){
         if(!aRow->CheckValue()) {
           IsCorrect = false;
@@ -632,6 +628,9 @@ void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
 
       if(IsCorrect && IsVariableComplited && IsLastRow(aRow))
         AddEmptyRow();
+
+      if( aRow->CheckName() && aRow->CheckValue() )
+	qobject_cast<SalomeApp_NoteBook*>(parentWidget())->onApply();
     }
 
     if( !myIsModified )
@@ -704,7 +703,7 @@ void NoteBook_Table::RemoveSelected()
   }
   if(removedFromStudy)
     myIsModified = true;
-  RenamberRowItems();
+  RenumberRowItems();
   isProcessItemChangedSignal = true;
 }
 
@@ -751,23 +750,20 @@ void NoteBook_Table::ResetMaps()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//                  SalomeApp_NoteBookDlg class                          //
+//                  SalomeApp_NoteBook class                          //
 ///////////////////////////////////////////////////////////////////////////
 //============================================================================
-/*! Function : SalomeApp_NoteBookDlg
+/*! Function : SalomeApp_NoteBook
  *  Purpose  : Constructor
  */
 //============================================================================
-SalomeApp_NoteBookDlg::SalomeApp_NoteBookDlg(QWidget * parent, _PTR(Study) theStudy):
-  QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+SalomeApp_NoteBook::SalomeApp_NoteBook(QWidget * parent, _PTR(Study) theStudy):
+  QWidget(parent),
   myStudy(theStudy)
 {
-  setModal(false);
-  setObjectName("SalomeApp_NoteBookDlg");
+  setObjectName("SalomeApp_NoteBook");
   setWindowTitle(tr("NOTEBOOK_TITLE"));
   QGridLayout* aLayout = new QGridLayout(this);
-  aLayout->setMargin(DEFAULT_MARGIN);
-  aLayout->setSpacing(DEFAULT_SPACING);
 
   //Table
   myTable = new NoteBook_Table(this);
@@ -775,66 +771,36 @@ SalomeApp_NoteBookDlg::SalomeApp_NoteBookDlg(QWidget * parent, _PTR(Study) theSt
   
   //Buttons
   myRemoveButton = new QPushButton(tr("BUT_REMOVE"));
-  aLayout->addWidget(myRemoveButton, 1, 0, 1, 1);
+  aLayout->addWidget(myRemoveButton, 1, 0);
 
   QSpacerItem* spacer =
     new QSpacerItem(DEFAULT_SPACING, 5 , QSizePolicy::Expanding, QSizePolicy::Minimum);
-  aLayout->addItem(spacer, 1, 1, 2, 1);
+  aLayout->addItem(spacer, 1, 1);
 
   myUpdateStudyBtn = new QPushButton(tr("BUT_UPDATE_STUDY"));
-  aLayout->addWidget(myUpdateStudyBtn, 1, 2, 1, 1);
-  
-  QGroupBox* groupBox = new QGroupBox(this);
-
-  QGridLayout* aLayout1 = new QGridLayout(groupBox);
-
-  aLayout1->setMargin(DEFAULT_MARGIN);
-  aLayout1->setSpacing(DEFAULT_SPACING);
-
-  myOkBtn = new QPushButton(tr("BUT_APPLY_AND_CLOSE"));
-  aLayout1->addWidget(myOkBtn, 0, 0, 1, 1);
-  
-  myApplyBtn = new QPushButton(tr("BUT_APPLY"));
-  aLayout1->addWidget(myApplyBtn, 0, 1, 1, 1);  
-
-  QSpacerItem* spacer1 =
-    new QSpacerItem(DEFAULT_SPACING, 5, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  aLayout1->addItem(spacer1, 0, 2, 1, 1);
-
-  myCancelBtn = new QPushButton(tr("BUT_CLOSE"));
-  aLayout1->addWidget(myCancelBtn, 0, 3, 1, 1);
-
-  myHelpBtn = new QPushButton(tr("BUT_HELP"));
-  aLayout1->addWidget(myHelpBtn, 0, 4, 1, 1);
-  
-  aLayout->addWidget(groupBox, 2, 0, 1, 3);
+  aLayout->addWidget(myUpdateStudyBtn, 1, 2);
 
   QWidgetList aWidgetList;
   aWidgetList.append( myTable );
-  aWidgetList.append( myOkBtn );
-  aWidgetList.append( myApplyBtn );
-  aWidgetList.append( myCancelBtn );
-  aWidgetList.append( myHelpBtn );
   aWidgetList.append( myUpdateStudyBtn );
   aWidgetList.append( myRemoveButton );
   Qtx::setTabOrder( aWidgetList );
 
-  connect( myOkBtn, SIGNAL(clicked()), this, SLOT(onOK()) );
-  connect( myApplyBtn, SIGNAL(clicked()), this, SLOT(onApply()) );
-  connect( myCancelBtn, SIGNAL(clicked()), this, SLOT(onCancel()) );
   connect( myUpdateStudyBtn, SIGNAL(clicked()), this, SLOT(onUpdateStudy()) );
   connect( myRemoveButton, SIGNAL(clicked()), this, SLOT(onRemove()));
-  connect( myHelpBtn, SIGNAL(clicked()), this, SLOT(onHelp()));
   
   myTable->Init(myStudy);
+
+  myDumpedStudyScript = "";  
+  myIsDumpedStudySaved = false;
 }
 
 //============================================================================
-/*! Function : ~SalomeApp_NoteBookDlg
+/*! Function : ~SalomeApp_NoteBook
  *  Purpose  : Destructor
  */
 //============================================================================
-SalomeApp_NoteBookDlg::~SalomeApp_NoteBookDlg(){}
+SalomeApp_NoteBook::~SalomeApp_NoteBook(){}
 
 
 //============================================================================
@@ -842,7 +808,7 @@ SalomeApp_NoteBookDlg::~SalomeApp_NoteBookDlg(){}
  *  Purpose  : init variable table
  */
 //============================================================================
-void SalomeApp_NoteBookDlg::Init(_PTR(Study) theStudy){
+void SalomeApp_NoteBook::Init(_PTR(Study) theStudy){
   if(myStudy!= theStudy)
     myStudy = theStudy;
   myTable->Init(myStudy);
@@ -850,49 +816,21 @@ void SalomeApp_NoteBookDlg::Init(_PTR(Study) theStudy){
 
 
 //============================================================================
-/*! Function : onOK
+/*! Function : onVarUpdate
  *  Purpose  : [slot]
  */
 //============================================================================
-void SalomeApp_NoteBookDlg::onOK()
+void SalomeApp_NoteBook::onVarUpdate(QString theVarName)
 {
-  onApply();
-  if( myTable->IsValid() )
-    accept();
+  myTable->Init(myStudy);
 }
 
-//============================================================================
-/*! Function : onHelp
- *  Purpose  : [slot]
- */
-//============================================================================
-void SalomeApp_NoteBookDlg::onHelp()
-{
-  QString aHelpFileName("using_notebook.html");
-  LightApp_Application* app = (LightApp_Application*)(SUIT_Session::session()->activeApplication());
-  if (app)
-    app->onHelpContextModule("GUI",aHelpFileName);
-  else {
-    QString platform;
-#ifdef WIN32
-    platform = "winapplication";
-#else
-    platform = "application";
-#endif
-    SUIT_MessageBox::warning(this, tr("WRN_WARNING"),
-                             tr("EXTERNAL_BROWSER_CANNOT_SHOW_PAGE").
-                             arg(app->resourceMgr()->stringValue("ExternalBrowser",
-                                                                 platform)).
-                             arg(aHelpFileName));
-  }
-
-}
 //============================================================================
 /*! Function : onApply
  *  Purpose  : [slot]
  */
 //============================================================================
-void SalomeApp_NoteBookDlg::onApply()
+void SalomeApp_NoteBook::onApply()
 {
   if( !myTable->IsValid() )
   {
@@ -959,29 +897,8 @@ void SalomeApp_NoteBookDlg::onApply()
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
   if(app)
     app->updateActions();
-
-}
-
-//============================================================================
-/*! Function : onCancel
- *  Purpose  : [slot]
- */
-//============================================================================
-void SalomeApp_NoteBookDlg::onCancel()
-{
-  if( myTable->IsModified() )
-  {
-    int answer = QMessageBox::question( this, tr( "CLOSE_CAPTION" ), tr( "CLOSE_DESCRIPTION" ),
-                                        QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel );
-    switch( answer )
-    {
-      case QMessageBox::Yes    : onOK(); return;
-      case QMessageBox::No     : break;
-      case QMessageBox::Cancel : return;
-      default : break;
-    }
-  }
-  reject();
+  
+  myStudy->Modified();
 }
 
 //============================================================================
@@ -989,9 +906,10 @@ void SalomeApp_NoteBookDlg::onCancel()
  *  Purpose  : [slot]
  */
 //============================================================================
-void SalomeApp_NoteBookDlg::onRemove()
+void SalomeApp_NoteBook::onRemove()
 {
   myTable->RemoveSelected();
+  onApply();
 }
 
 //============================================================================
@@ -999,151 +917,14 @@ void SalomeApp_NoteBookDlg::onRemove()
  *  Purpose  : [slot]
  */
 //============================================================================
-void SalomeApp_NoteBookDlg::onUpdateStudy()
+void SalomeApp_NoteBook::onUpdateStudy()
 {
   onApply();
   if( !myTable->IsValid() )
     return;
-
-  QApplication::setOverrideCursor( Qt::WaitCursor );
-
-  if( !updateStudy() )
-    SUIT_MessageBox::warning( this, tr( "ERROR" ), tr( "ERR_UPDATE_STUDY_FAILED" ) );
-    
-  QApplication::restoreOverrideCursor();
-}
-
-//============================================================================
-/*! Function : updateStudy
- *  Purpose  : 
- */
-//============================================================================
-bool SalomeApp_NoteBookDlg::updateStudy()
-{
-  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  if( !app )
-    return false;
-
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( app->activeStudy() );
-  if( !study )
-    return false;
-
-  bool isStudySaved = study->isSaved();
-  QString aStudyName = study->studyName();
-
-  _PTR(Study) studyDS = study->studyDS();
-
-  // get unique temporary directory name
-  QString aTmpDir = QString::fromStdString( SALOMEDS_Tool::GetTmpDir() );
-  if( aTmpDir.isEmpty() )
-    return false;
-
-  if( aTmpDir.right( 1 ).compare( QDir::separator() ) == 0 )
-    aTmpDir.remove( aTmpDir.length() - 1, 1 );
-
-  // dump study to the temporary directory
-  QString aFileName( "notebook" );
-  bool toPublish = true;
-  bool isMultiFile = false;
-  bool toSaveGUI = true;
-
-  int savePoint;
-  _PTR(AttributeParameter) ap;
-  _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
-  if(ip->isDumpPython(studyDS)) ip->setDumpPython(studyDS); //Unset DumpPython flag.
-  if ( toSaveGUI ) { //SRN: Store a visual state of the study at the save point for DumpStudy method
-    ip->setDumpPython(studyDS);
-    savePoint = SalomeApp_VisualState( app ).storeState(); //SRN: create a temporary save point
-  }
-  bool ok = studyDS->DumpStudy( aTmpDir.toStdString(), aFileName.toStdString(), toPublish, isMultiFile );
-  if ( toSaveGUI )
-    study->removeSavePoint(savePoint); //SRN: remove the created temporary save point.
-
-  if( !ok )
-    return false;
-
-  // clear a study (delete all objects)
-  clearStudy();
-
-  // get active application
-  app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-
-  // load study from the temporary directory
-  QString command = QString( "execfile(r\"%1\")" ).arg( aTmpDir + QDir::separator() + aFileName + ".py" );
-
-  PyConsole_Console* pyConsole = app->pythonConsole();
-  if ( pyConsole )
-    pyConsole->execAndWait( command );
-
-  // remove temporary directory
-  QDir aDir( aTmpDir );
-  QStringList aFiles = aDir.entryList( QStringList( "*.py*" ) );
-  for( QStringList::iterator it = aFiles.begin(), itEnd = aFiles.end(); it != itEnd; ++it )
-    ok = aDir.remove( *it ) && ok;
-  if( ok )
-    ok = aDir.rmdir( aTmpDir );
-
-  if( SalomeApp_Study* newStudy = dynamic_cast<SalomeApp_Study*>( app->activeStudy() ) )
-  {
-    myStudy = newStudy->studyDS();
-    myTable->Init(myStudy);
-    if(isStudySaved) {
-      newStudy->markAsSavedIn(aStudyName);
-    }
-  }
-  else
-    ok = false;
-
-  return ok;
-}
-
-//============================================================================
-/*! Function : clearStudy
- *  Purpose  : 
- */
-//============================================================================
-void SalomeApp_NoteBookDlg::clearStudy()
-{
-  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  if( !app )
-    return;
-
-  QList<SUIT_Application*> aList = SUIT_Session::session()->applications();
-  int anIndex = aList.indexOf( app );
-
-  //Store position and size of the this dialog
-  int aW = width();
-  int aH = height();
-  int aX = x();
-  int aY = y();
-
-  // Disconnect dialog from application desktop in case if:
-  // 1) Application is not the first application in the session 
-  // 2) Application is the first application in session but not the only.
-  bool changeDesktop = ((anIndex > 0) || (anIndex == 0 && aList.count() > 1));
-
-  if( changeDesktop )
-    setParent( 0 );
-
-  app->onCloseDoc( false );
   
-  if( anIndex > 0 && anIndex < aList.count() )
-    app = dynamic_cast<SalomeApp_Application*>( aList[ anIndex - 1 ] );
-  else if(anIndex == 0 && aList.count() > 1)
-    app = dynamic_cast<SalomeApp_Application*>( aList[ 1 ] );
-
-  if( !app )
+  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
+  if(!app)
     return;
-
-  app->onNewDoc();
-
-  app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  if( changeDesktop && app ) {
-    setParent( app->desktop(), Qt::Dialog );
-    app->setNoteBook(this);
-  }
-  //Set position and size of the this dialog
-  resize( aW, aH );
-  move( aX, aY );
-  show();
+  app->onUpdateStudy();
 }

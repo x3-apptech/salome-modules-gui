@@ -1445,11 +1445,6 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
 
     vm->setTrihedronSize(  resMgr->doubleValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ),
                            resMgr->booleanValue( "OCCViewer", "relative_size", vm->trihedronRelative() ));
-    int u( 1 ), v( 1 );
-    vm->isos( u, v );
-    u = resMgr->integerValue( "OCCViewer", "iso_number_u", u );
-    v = resMgr->integerValue( "OCCViewer", "iso_number_v", v );
-    vm->setIsos( u, v );
     vm->setInteractionStyle( resMgr->integerValue( "OCCViewer", "navigation_mode", vm->interactionStyle() ) );
     vm->setZoomingStyle( resMgr->integerValue( "OCCViewer", "zooming_mode", vm->zoomingStyle() ) );
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
@@ -2115,22 +2110,6 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .... -> show static trihedron
   pref->addPreference( tr( "PREF_SHOW_STATIC_TRIHEDRON" ), occTriGroup, LightApp_Preferences::Bool, "OCCViewer", "show_static_trihedron" );
   // ... "Trihedron" group <<end>>
-
-  // ... "Iso-lines" group <<start>>
-  int isoGroup = pref->addPreference( tr( "PREF_ISOS" ), occGroup );
-  pref->setItemProperty( "columns", 2, isoGroup );
-  // .... -> nb isos U
-  int isoU = pref->addPreference( tr( "PREF_ISOS_U" ), isoGroup,
-                                  LightApp_Preferences::IntSpin, "OCCViewer", "iso_number_u" );
-  pref->setItemProperty( "min", 0, isoU );
-  pref->setItemProperty( "max", 100000, isoU );
-  // .... -> nb isos V
-  int isoV = pref->addPreference( tr( "PREF_ISOS_V" ), isoGroup,
-                                  LightApp_Preferences::IntSpin, "OCCViewer", "iso_number_v" );
-  pref->setItemProperty( "min", 0, isoV );
-  pref->setItemProperty( "max", 100000, isoV );
-  // ... "Iso-lines" group <<end>>
-
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
   //  pref->setItemProperty( "columns", 2, bgGroup );
@@ -2776,24 +2755,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #endif
   }
 #endif
-
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && ( param == QString( "iso_number_u" ) || param == QString( "iso_number_v" ) ) )
-  {
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( OCCViewer_Viewer::Type(), lst );
-    int u = resMgr->integerValue( sec, "iso_number_u" );
-    int v = resMgr->integerValue( sec, "iso_number_v" );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      OCCViewer_ViewManager* mgr = dynamic_cast<OCCViewer_ViewManager*>( it.next() );
-      if( mgr && mgr->getOCCViewer() )
-        mgr->getOCCViewer()->setIsos( u, v );
-    }
-  }
-#endif
-
   if( sec=="ObjectBrowser" )
   {
     SUIT_DataBrowser* ob = objectBrowser();
@@ -3514,6 +3475,15 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
   if (aStudy )
     aStudy->removeViewMgr(vm->getGlobalId());
+
+  LightApp_SelectionMgr* selMgr = selectionMgr();
+  QList<SUIT_Selector*> selectors;
+  selMgr->selectors( selectors );
+  foreach( SUIT_Selector* selector, selectors ) {
+    if ( selector->owner() == vm->getViewModel() ) {
+      delete selector;
+    }
+  }
 
   STD_Application::removeViewManager( vm );
 

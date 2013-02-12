@@ -26,16 +26,13 @@
 #define SALOME_PYQT_MODULE_H
 
 #include "SALOME_PYQT_GUI.h"
-#include "SALOME_PYQT_PyInterp.h" // this include must be first (see PyInterp_base.h)!*/
-#include "SALOME_PYQT_ModuleLight.h"
+
+#include "PyInterp_Interp.h" // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
 #include "SalomeApp_Module.h"
-#include <SALOMEconfig.h>
-#include CORBA_CLIENT_HEADER(SALOME_Component)
 
+class PyModuleHelper;
 
-
-class SALOME_PYQT_EXPORT SALOME_PYQT_Module: public SalomeApp_Module,
-  public SALOME_PYQT_ModuleLight
+class SALOME_PYQT_EXPORT SALOME_PYQT_Module: public SalomeApp_Module
 {
   Q_OBJECT;
 
@@ -43,31 +40,27 @@ public:
   SALOME_PYQT_Module();
   ~SALOME_PYQT_Module();
 
-  /* get module engine IOR */
-  virtual QString            engineIOR() const;
+  // engine management
+  QString         engineIOR() const;
 
-public slots:
-  virtual bool               activateModule( SUIT_Study* );
-  void                       preferenceChanged( const QString&, 
-                                                const QString&, 
-                                                const QString& );
-  void                       onGUIEvent();
-  void                       onActiveViewChanged( SUIT_ViewWindow* );
-  void                       onViewClosed( SUIT_ViewWindow* );
-  void                       onViewTryClose( SUIT_ViewWindow* );
-  void                       onViewCloned( SUIT_ViewWindow* );
+  // module activation, preferences, menus
+  void            initialize( CAM_Application* );
+  bool            activateModule( SUIT_Study* );
+  bool            deactivateModule( SUIT_Study* );
+  void            windows( QMap<int, int>& ) const;
+  void            viewManagers( QStringList& ) const;
+  void            studyActivated();
+  void            contextMenuPopup( const QString&, QMenu*, QString& );
+  void            createPreferences();
+  void            preferencesChanged( const QString&, const QString& );
 
-protected:
-  /* create data model */
-  virtual CAM_DataModel*     createDataModel();
-
-  Engines::EngineComponent_var getEngine() const;
-
+  // drag-n-drop support
+  bool            isDraggable( const SUIT_DataObject* ) const;
+  bool            isDropAccepted( const SUIT_DataObject* ) const;
+  void            dropObjects( const DataObjectList&, SUIT_DataObject*,
+			       const int, Qt::DropAction );
 private:
-  void                       getEngineIOR();
-
-private:
-  QString                    myIOR;
+  PyModuleHelper* myHelper;
 };
 
 #endif // SALOME_PYQT_MODULE_H

@@ -347,18 +347,6 @@ The changes will be applied on the next application session.</translation>
         <translation>Curve type:</translation>
     </message>
     <message>
-        <source>PREF_ISOS</source>
-        <translation>Number of isolines</translation>
-    </message>
-    <message>
-        <source>PREF_ISOS_U</source>
-        <translation>Along U</translation>
-    </message>
-    <message>
-        <source>PREF_ISOS_V</source>
-        <translation>Along V</translation>
-    </message>
-    <message>
         <source>PREF_POINTS</source>
         <translation>Points</translation>
     </message>

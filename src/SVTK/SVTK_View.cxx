@@ -746,17 +746,19 @@ SVTK_View
 /*!
   Change material
   \param theIObject - object
-  \param thePropF - property contained new properties of material
+  \param thePropF - property contained new properties of front material
+  \param thePropB - property contained new properties of back material
 */
 void
 SVTK_View
 ::SetMaterial(const Handle(SALOME_InteractiveObject)& theIObject,
-	      vtkProperty* thePropF)
+	      vtkProperty* thePropF, vtkProperty* thePropB)
 {
   using namespace SVTK;
   VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
   std::vector<vtkProperty*> aProps;
   aProps.push_back( thePropF );
+  aProps.push_back( thePropB );
   ForEachIf<SALOME_Actor>(aCopy.GetActors(),
                           TIsSameIObject<SALOME_Actor>(theIObject),
                           TSetFunction<SALOME_Actor,std::vector<vtkProperty*> >
@@ -766,11 +768,11 @@ SVTK_View
 /*!
   Get current front material
   \param theIObject - object
-  \return property contained material properties of the given object
+  \return property contained front material properties of the given object
 */
 vtkProperty* 
 SVTK_View
-::GetMaterial(const Handle(SALOME_InteractiveObject)& theIObject)
+::GetFrontMaterial(const Handle(SALOME_InteractiveObject)& theIObject)
 {
   using namespace SVTK;
   VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
@@ -778,7 +780,26 @@ SVTK_View
     Find<SALOME_Actor>(aCopy.GetActors(),
                        TIsSameIObject<SALOME_Actor>(theIObject));
   if(anActor)
-    return anActor->GetMaterial();
+    return anActor->GetFrontMaterial();
+  return NULL;
+}
+
+/*!
+  Get current back material
+  \param theIObject - object
+  \return property contained back material properties of the given object
+*/
+vtkProperty* 
+SVTK_View
+::GetBackMaterial(const Handle(SALOME_InteractiveObject)& theIObject)
+{
+  using namespace SVTK;
+  VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
+  SALOME_Actor* anActor = 
+    Find<SALOME_Actor>(aCopy.GetActors(),
+                       TIsSameIObject<SALOME_Actor>(theIObject));
+  if(anActor)
+    return anActor->GetBackMaterial();
   return NULL;
 }
 

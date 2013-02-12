@@ -40,7 +40,7 @@
 #include "SalomeApp_VisualState.h"
 #include "SalomeApp_StudyPropertiesDlg.h"
 #include "SalomeApp_LoadStudiesDlg.h"
-#include "SalomeApp_NoteBookDlg.h"
+#include "SalomeApp_NoteBook.h"
 
 #include "SalomeApp_ExitDlg.h"
 
@@ -104,6 +104,8 @@
 
 #include <vector>
 
+#include <SALOMEDS_Tool.hxx>
+
 /*!Internal class that updates object browser item properties */
 // temporary commented
 /*class SalomeApp_Updater : public OB_Updater
@@ -157,12 +159,10 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application()
+  : LightApp_Application(), myNoteBook( 0 )
 {
   connect( desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this,      SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
-
-  setNoteBook(0);
 }
 
 /*!Destructor.
@@ -278,12 +278,7 @@ void SalomeApp_Application::createActions()
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIcon(),
                 tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
                 Qt::CTRL+Qt::Key_D, desk, false, this, SLOT( onDumpStudy() ) );
-
-  //! NoteBook
-  createAction(NoteBookId, tr( "TOT_DESK_FILE_NOTEBOOK" ), QIcon(),
-               tr( "MEN_DESK_FILE_NOTEBOOK" ), tr( "PRP_DESK_FILE_NOTEBOOK" ),
-               Qt::CTRL+Qt::Key_K, desk, false, this, SLOT(onNoteBook()));
-
+  
   //! Load script
   createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIcon(),
                 tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
@@ -321,7 +316,6 @@ void SalomeApp_Application::createActions()
   createMenu( FileLoadId,   fileMenu, 0 );  //SRN: BugID IPAL9021, add a menu item "Load"
 
   createMenu( DumpStudyId, fileMenu, 10, -1 );
-  createMenu( NoteBookId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 10, -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 10, -1 );
@@ -568,9 +562,6 @@ void SalomeApp_Application::onCloseDoc( bool ask )
     }
   }
 
-  if(myNoteBook && myNoteBook->isVisible())
-    myNoteBook->hide();
-
   LightApp_Application::onCloseDoc( ask );
 }
 
@@ -666,6 +657,10 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
   connect( aStudy, SIGNAL( saved  ( SUIT_Study* ) ), this, SLOT( onStudySaved  ( SUIT_Study* ) ) );
   connect( aStudy, SIGNAL( closed ( SUIT_Study* ) ), this, SLOT( onStudyClosed ( SUIT_Study* ) ) );
 
+  //to receive signal in application that NoteBook's variable was modified
+  connect( aStudy, SIGNAL(notebookVarUpdated(QString)), 
+	   this, SIGNAL(notebookVarUpdated(QString)) );
+
   return aStudy;
 }
 
@@ -679,11 +674,6 @@ void SalomeApp_Application::updateCommandsStatus()
   // Dump study menu
   QAction* a = action( DumpStudyId );
   if ( a )
-    a->setEnabled( activeStudy() );
-
-  // Note Book
-  a = action(NoteBookId);
-  if( a )
     a->setEnabled( activeStudy() );
 
   // Load script menu
@@ -812,25 +802,6 @@ void SalomeApp_Application::onDumpStudy( )
                                   QObject::tr("WRN_WARNING"),
                                   tr("WRN_DUMP_STUDY_FAILED") );
     }
-  }
-}
-
-/*!Private SLOT. On NoteBook*/
-void SalomeApp_Application::onNoteBook()
-{
-  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-  if ( appStudy ) {
-    _PTR(Study) aStudy = appStudy->studyDS();
-    if(!myNoteBook) {
-      myNoteBook = new SalomeApp_NoteBookDlg(desktop(),aStudy);
-    }
-    else if(!myNoteBook->isVisible()){
-      myNoteBook->Init(aStudy);
-      myNoteBook->adjustSize();
-      myNoteBook->move((int)(desktop()->x() + desktop()->width()/2  - myNoteBook->frameGeometry().width()/2),
-                       (int)(desktop()->y() + desktop()->height()/2 - myNoteBook->frameGeometry().height()/2));
-    }
-    myNoteBook->show();
   }
 }
 
@@ -966,6 +937,18 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     wid = pyCons;
     //pyCons->resize( pyCons->width(), desktop()->height()/4 );
     pyCons->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
+  }
+  else if ( flag == WT_NoteBook )
+  {
+    SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+    if ( appStudy ) {
+      _PTR(Study) aStudy = appStudy->studyDS();
+      setNoteBook( new SalomeApp_NoteBook( desktop(), aStudy ) );
+      //to receive signal in NoteBook that it's variable was modified
+      connect( this, SIGNAL( notebookVarUpdated( QString ) ), 
+	       getNoteBook(), SLOT( onVarUpdate( QString ) ) );
+    }
+    wid = getNoteBook();
   }
   return wid;
 }
@@ -1458,6 +1441,11 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
 {
   LightApp_Application::onStudyCreated( study );
 
+  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
+			       windowDock( getWindow( WT_ObjectBrowser ) ) );
+
+  loadDockWindowsState();
+
   connect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
            this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ), Qt::UniqueConnection );
 
@@ -1481,6 +1469,11 @@ void SalomeApp_Application::onStudySaved( SUIT_Study* study )
 void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
 {
   LightApp_Application::onStudyOpened( study );
+
+  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
+			       windowDock( getWindow( WT_ObjectBrowser ) ) );
+
+  loadDockWindowsState();
 
   connect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
            this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ), Qt::UniqueConnection );
@@ -1612,13 +1605,16 @@ void SalomeApp_Application::objectBrowserColumnsVisibility()
     }
 }
 
-/*! Set SalomeApp_NoteBookDlg pointer */
-void SalomeApp_Application::setNoteBook(SalomeApp_NoteBookDlg* theNoteBook){
+/*! Set SalomeApp_NoteBook pointer */
+void SalomeApp_Application::setNoteBook( SalomeApp_NoteBook* theNoteBook )
+{
+  if ( myNoteBook && myNoteBook != theNoteBook )
+    delete myNoteBook;
   myNoteBook = theNoteBook;
 }
 
-/*! Return SalomeApp_NoteBookDlg pointer */
-SalomeApp_NoteBookDlg* SalomeApp_Application::getNoteBook() const
+/*! Return SalomeApp_NoteBook pointer */
+SalomeApp_NoteBook* SalomeApp_Application::getNoteBook() const
 {
   return myNoteBook;
 }
@@ -1822,4 +1818,193 @@ bool SalomeApp_Application::renameObject( const QString& entry, const QString& n
     return true;
   }
   return false;
+}
+
+/*!
+  \return default windows( Object Browser, Python Console )
+  Adds to map \a aMap.
+*/
+void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
+{
+  LightApp_Application::defaultWindows(aMap);
+  if ( !aMap.contains( WT_NoteBook ) ) { 
+    if ( !myNoteBook ) {
+      aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
+    }
+  }
+}
+
+/*!
+  Gets current windows.
+  \param winMap - output current windows map.
+*/
+void SalomeApp_Application::currentWindows(QMap<int, int>& aMap) const
+{
+  LightApp_Application::currentWindows( aMap );
+  if ( !aMap.contains( WT_NoteBook) && myNoteBook )
+    aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
+}
+
+//============================================================================
+/*! Function : onUpdateStudy
+ *  Purpose  : Slot to update the study.
+ */
+//============================================================================
+void SalomeApp_Application::onUpdateStudy()
+{
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+
+  if( !updateStudy() )
+    SUIT_MessageBox::warning( desktop(), tr( "ERROR" ), tr( "ERR_UPDATE_STUDY_FAILED" ) );
+    
+  QApplication::restoreOverrideCursor();
+}
+
+//============================================================================
+/*! Function : updateStudy
+ *  Purpose  : Update study by dumping the study to Python script and loading it.
+ *             It is used to apply variable modifications done in NoteBook to created objects.
+ */
+//============================================================================
+bool SalomeApp_Application::updateStudy()
+{
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+  if ( !study || !myNoteBook )
+    return false;
+
+  myNoteBook->setIsDumpedStudySaved( study->isSaved() );
+  myNoteBook->setDumpedStudyName( study->studyName() );
+
+  _PTR(Study) studyDS = study->studyDS();
+
+  // get unique temporary directory name
+  QString aTmpDir = QString::fromStdString( SALOMEDS_Tool::GetTmpDir() );
+  if( aTmpDir.isEmpty() )
+    return false;
+
+  if( aTmpDir.right( 1 ).compare( QDir::separator() ) == 0 )
+    aTmpDir.remove( aTmpDir.length() - 1, 1 );
+
+  // dump study to the temporary directory
+  QString aScriptName( "notebook" );
+  bool toPublish = true;
+  bool isMultiFile = false;
+  bool toSaveGUI = true;
+
+  int savePoint;
+  _PTR(AttributeParameter) ap;
+  _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
+  if(ip->isDumpPython(studyDS)) ip->setDumpPython(studyDS); //Unset DumpPython flag.
+  if ( toSaveGUI ) { //SRN: Store a visual state of the study at the save point for DumpStudy method
+    ip->setDumpPython(studyDS);
+    savePoint = SalomeApp_VisualState( this ).storeState(); //SRN: create a temporary save point
+  }
+  bool ok = studyDS->DumpStudy( aTmpDir.toStdString(), aScriptName.toStdString(), toPublish, isMultiFile );
+  if ( toSaveGUI )
+    study->removeSavePoint(savePoint); //SRN: remove the created temporary save point.
+
+  if( ok )
+    myNoteBook->setDumpedStudyScript( aTmpDir + QDir::separator() + aScriptName + ".py" );
+  else
+    return false;
+
+  QList<SUIT_Application*> aList = SUIT_Session::session()->applications();
+  int anIndex = aList.indexOf( this );
+
+  // Disconnect dialog from application desktop in case if:
+  // 1) Application is not the first application in the session 
+  // 2) Application is the first application in session but not the only.
+  bool changeDesktop = ((anIndex > 0) || (anIndex == 0 && aList.count() > 1));
+
+  SalomeApp_Application* app;
+  if( anIndex > 0 && anIndex < aList.count() )
+    app = dynamic_cast<SalomeApp_Application*>( aList[ anIndex - 1 ] );
+  else if(anIndex == 0 && aList.count() > 1)
+    app = dynamic_cast<SalomeApp_Application*>( aList[ 1 ] );
+
+  if( !app )
+    return false;
+
+  if( changeDesktop ) {
+    // creation a new study and restoring will be done in another application
+    connect( this, SIGNAL( dumpedStudyClosed( const QString&, const QString&, bool ) ),
+             app, SLOT( onRestoreStudy( const QString&, const QString&, bool ) ), Qt::UniqueConnection );
+  }
+
+  QString aDumpScript = myNoteBook->getDumpedStudyScript();
+  QString aStudyName = myNoteBook->getDumpedStudyName();
+  bool isStudySaved = myNoteBook->isDumpedStudySaved();
+  // clear a study (delete all objects)
+  onCloseDoc( false );
+
+  if( !changeDesktop ) {
+    ok = onRestoreStudy( aDumpScript, 
+			 aStudyName, 
+			 isStudySaved );
+  }
+
+  return ok;
+}
+
+//============================================================================
+/*! Function : onRestoreStudy
+ *  Purpose  : Load the dumped study from Python script
+ */
+//============================================================================
+bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript, 
+					    const QString& theStudyName, 
+					    bool theIsStudySaved )
+{
+  bool ok = true;
+
+  // create a new study
+  onNewDoc();
+
+  // get active application
+  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
+
+  // load study from the temporary directory
+  QString command = QString( "execfile(r\"%1\")" ).arg( theDumpScript );
+
+  PyConsole_Console* pyConsole = app->pythonConsole();
+  if ( pyConsole )
+    pyConsole->execAndWait( command );
+
+  // remove temporary directory
+  QFileInfo aScriptInfo = QFileInfo( theDumpScript );
+  QString aStudyName = aScriptInfo.baseName();
+  QDir aDir = aScriptInfo.absoluteDir();
+  QStringList aFiles = aDir.entryList( QStringList( "*.py*" ) );
+  for( QStringList::iterator it = aFiles.begin(), itEnd = aFiles.end(); it != itEnd; ++it )
+    ok = aDir.remove( *it ) && ok;
+  if( ok )
+    ok = aDir.rmdir( aDir.absolutePath() );
+
+  if( SalomeApp_Study* newStudy = dynamic_cast<SalomeApp_Study*>( app->activeStudy() ) )
+  {
+    _PTR(Study) aStudyDS = newStudy->studyDS();
+    app->getNoteBook()->Init( aStudyDS );
+    newStudy->updateFromNotebook(theStudyName, theIsStudySaved);
+    newStudy->Modified();
+    updateDesktopTitle();
+    updateActions();
+  }
+  else
+    ok = false;
+
+  return ok;
+}
+
+/*!
+  Close the Application
+*/
+void SalomeApp_Application::closeApplication()
+{
+  // emit signal to restore study from Python script
+  if ( myNoteBook ) {
+    emit dumpedStudyClosed( myNoteBook->getDumpedStudyScript(), 
+			    myNoteBook->getDumpedStudyName(), 
+			    myNoteBook->isDumpedStudySaved() );
+  }
+  LightApp_Application::closeApplication();
 }

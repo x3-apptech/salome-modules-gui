@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-FILE(TO_CMAKE_PATH $ENV{QWTHOME} QWTHOME)
+FILE(TO_CMAKE_PATH "$ENV{QWTHOME}" QWTHOME)
 IF(NOT QWTHOME)
   SET(QWTHOME /usr)
 ENDIF(NOT QWTHOME)

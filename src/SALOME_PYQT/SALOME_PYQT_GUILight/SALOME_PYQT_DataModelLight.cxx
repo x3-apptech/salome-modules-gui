@@ -70,7 +70,7 @@ bool SALOME_PYQT_DataModelLight::open( const QString& theURL, CAM_Study* study, 
 
   setModified( false );
   
-  return aModule->open(theListOfFiles);
+  return aModule->load(theListOfFiles);
   
 }
 

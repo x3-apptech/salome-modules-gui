@@ -17,19 +17,19 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:    SalomeApp_NoteBookDlg.h
+// File:    SalomeApp_NoteBook.h
 // Author : Roman NIKOLAEV, Open CASCADE S.A.S.
 // Module : GUI
 //
-#ifndef SALOMEAPP_NOTEBOOKDLG_H
-#define SALOMEAPP_NOTEBOOKDLG_H
+#ifndef SALOMEAPP_NOTEBOOK_H
+#define SALOMEAPP_NOTEBOOK_H
 
 #include "SalomeApp.h"
 
 #include "SALOMEDSClient_ClientFactory.hxx" 
 #include CORBA_SERVER_HEADER(SALOMEDS)
 
-#include <QDialog>
+#include <QWidget>
 #include <QTableWidget>
 #include <QList>
 
@@ -118,7 +118,7 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   const QList<int>&  GetRemovedRows() const { return myRemovedRows; }
   const VariableMap& GetVariableMap() const { return myVariableMap; }
   const VariableMap& GetVariableMapRef() const { return myVariableMapRef; }
-  void  RenamberRowItems();
+  void  RenumberRowItems();
 
   void ResetMaps();
 
@@ -141,37 +141,39 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   _PTR(Study)      myStudy;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_NoteBookDlg : public QDialog 
+class SALOMEAPP_EXPORT SalomeApp_NoteBook : public QWidget 
 {
   Q_OBJECT
  public:
-  SalomeApp_NoteBookDlg(QWidget * parent , _PTR(Study) theStudy);
-  virtual ~SalomeApp_NoteBookDlg();
+  SalomeApp_NoteBook(QWidget * parent , _PTR(Study) theStudy);
+  virtual ~SalomeApp_NoteBook();
 
   void Init(_PTR(Study) theStudy);
+
+  QString getDumpedStudyName() { return myDumpedStudyName; }
+  void setDumpedStudyName(QString theName) { myDumpedStudyName = theName; }
+  
+  QString getDumpedStudyScript() { return myDumpedStudyScript; }
+  void setDumpedStudyScript(QString theScript) { myDumpedStudyScript = theScript; }
+
+  bool isDumpedStudySaved() { return myIsDumpedStudySaved; }
+  void setIsDumpedStudySaved(bool isSaved) { myIsDumpedStudySaved = isSaved; }
   
  public slots:
-   void onOK();
    void onApply();
-   void onCancel();
    void onRemove();
    void onUpdateStudy();
-   void onHelp();
-
- protected:
-   bool updateStudy();
-   void clearStudy();
+   void onVarUpdate( QString theVarName );
 
  private:
   NoteBook_Table*  myTable;
   QPushButton*     myRemoveButton;
   QPushButton*     myUpdateStudyBtn;
-  QPushButton*     myOkBtn;
-  QPushButton*     myApplyBtn;
-  QPushButton*     myCancelBtn;
-  QPushButton*     myHelpBtn;
   
   _PTR(Study)      myStudy;
+  QString          myDumpedStudyScript; // path to script of dumped study
+  QString          myDumpedStudyName;
+  bool             myIsDumpedStudySaved;
 };
 
-#endif //SALOMEAPP_NOTEBOOKDLG_H
+#endif //SALOMEAPP_NOTEBOOK_H

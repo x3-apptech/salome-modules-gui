@@ -38,27 +38,44 @@ DEFINE_STANDARD_HANDLE(DDS_DicGroup, MMgt_TShared)
 class DDS_DicGroup : public MMgt_TShared
 {
 public:
-  DDS_DicGroup( const TCollection_AsciiString& );
+  Standard_EXPORT DDS_DicGroup( const TCollection_AsciiString& );
 
-  TCollection_AsciiString                    GetName() const;
-  Standard_EXPORT void                       GetKeys( TColStd_SequenceOfAsciiString& ) const;
+  Standard_EXPORT TCollection_AsciiString     GetName() const;
+  Standard_EXPORT void                        GetKeys( TColStd_SequenceOfAsciiString& ) const;
 
-  Standard_EXPORT Handle(DDS_DicItem)        GetDicItem( const TCollection_AsciiString& ) const;
+  Standard_EXPORT Handle(DDS_DicItem)         GetDicItem( const TCollection_AsciiString& ) const;
 
-  Standard_EXPORT void                       GetUnitSystems( TColStd_SequenceOfAsciiString& ) const;
-  Standard_EXPORT TCollection_ExtendedString GetUnitSystemLabel( const TCollection_AsciiString& ) const;
+  Standard_EXPORT void                        GetUnitSystems( TColStd_SequenceOfAsciiString& ) const;
+  Standard_EXPORT TCollection_ExtendedString  GetUnitSystemLabel( const TCollection_AsciiString& ) const;
 
-  Standard_EXPORT TCollection_AsciiString    GetActiveUnitSystem() const;
-  Standard_EXPORT void                       SetActiveUnitSystem( const TCollection_AsciiString& );
+  Standard_EXPORT TCollection_AsciiString     GetActiveUnitSystem() const;
+  Standard_EXPORT void                        SetActiveUnitSystem( const TCollection_AsciiString& );
 
-private:
-  DDS_DicGroup( const DDS_DicGroup& );
+  virtual Standard_EXPORT Handle(DDS_DicItem) CreateItem() const;
+  
+protected:
 
-  void                                       operator=( const DDS_DicGroup& );
+  Standard_EXPORT DDS_DicGroup( const DDS_DicGroup& );
 
-  void                                       FillDataMap( const LDOM_Element&, const LDOM_Element& );
+  Standard_EXPORT void                        operator=( const DDS_DicGroup& );
 
-private:
+  Standard_EXPORT virtual void                FillDataMap( const LDOM_Element&, const LDOM_Element& );
+
+  Standard_EXPORT Standard_Boolean            AddDicItem( const TCollection_AsciiString&,
+                                                          const Handle(DDS_DicItem)& );
+
+  Standard_EXPORT Standard_Boolean            HasDicItem( const TCollection_AsciiString& ) const;
+
+  Standard_EXPORT void                        RemoveAllDicItems();
+
+  Standard_EXPORT const 
+    DDS_IndexedDataMapOfDicItems&             GetItemMap() const;
+
+  Standard_EXPORT Standard_Boolean            AddUnitSystem( const TCollection_AsciiString&,
+                                                             const TCollection_ExtendedString& );
+
+protected:
+
   typedef NCollection_DataMap<TCollection_AsciiString,
                               TCollection_ExtendedString> UnitSystemMap;
 

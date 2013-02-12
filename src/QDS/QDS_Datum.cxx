@@ -551,8 +551,29 @@ int QDS_Datum::optionInteger( const QString& name ) const
 QVariant QDS_Datum::value() const
 {
   QVariant val;
-  if ( !isEmpty() )
-    val = stringValue();
+  // trying to return QVariant containing value of correct data type
+  if ( dicItem().IsNull() )
+  {
+    if ( !isEmpty() )
+      val = stringValue();
+  }
+  else
+  {
+    switch( type() )
+    {
+      case DDS_DicItem::Float:
+        val = doubleValue();
+        break;
+      case DDS_DicItem::Integer:
+      case DDS_DicItem::List:
+        val = integerValue();
+        break;
+      case DDS_DicItem::String:
+      case DDS_DicItem::Unknown:
+        val = stringValue();
+        break;
+    }
+  }
   return val;
 }
 
@@ -698,6 +719,39 @@ void QDS_Datum::clear()
 */
 void QDS_Datum::setValue( const QVariant& val )
 {
+  // trying to extract data of correct type from QVariant
+  if ( !dicItem().IsNull() )
+  {
+    bool isOk = false;
+    switch( type() )
+    {
+      case DDS_DicItem::Float:
+      {
+        double aDblVal = val.toDouble( &isOk );
+        if ( isOk )
+        {
+          setDoubleValue( aDblVal );
+          return;
+        }
+        break;
+      }
+      case DDS_DicItem::Integer:
+      case DDS_DicItem::List:
+      {
+        int anIntVal = val.toInt( &isOk );
+        if ( isOk )
+        {
+          setIntegerValue( anIntVal );
+          return;
+        }
+        break;
+      }
+      case DDS_DicItem::String:
+      case DDS_DicItem::Unknown:
+        break;
+    }
+  }
+
   if ( val.isValid() && val.canConvert( QVariant::String ) )
     setStringValue( val.toString() );
   else
@@ -1033,7 +1087,7 @@ void QDS_Datum::addTo( QHBoxLayout* l )
   if ( wrapper( Control ) )
     l->addWidget( wrapper( Control ) );
   if ( wrapper( Units ) )
-    l->addWidget( unitsWidget() );
+    l->addWidget( wrapper( Units ) );
 }
 
 /*!

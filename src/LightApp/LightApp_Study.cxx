@@ -52,6 +52,7 @@ LightApp_Study::LightApp_Study( SUIT_Application* app )
 */
 LightApp_Study::~LightApp_Study()
 {
+  delete myDriver; myDriver = 0;
 }
 
 /*!

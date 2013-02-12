@@ -82,90 +82,132 @@ public:
   typedef TCollection_AsciiString UnitSystem;
 
 public:
-  DDS_DicItem();
+  Standard_EXPORT DDS_DicItem();
 
-  Standard_EXPORT TCollection_AsciiString    GetId() const;
-  Standard_EXPORT DDS_DicItem::Type          GetType() const;
-  Standard_EXPORT TCollection_ExtendedString GetLabel() const;
-  Standard_EXPORT TCollection_ExtendedString GetFilter() const;
-  Standard_EXPORT TCollection_ExtendedString GetRequired() const;
-  Standard_EXPORT DDS_MsgType                GetWarningLevel() const;
-  Standard_EXPORT TCollection_ExtendedString GetLongDescription() const;
-  Standard_EXPORT TCollection_ExtendedString GetShortDescription() const;
-  Standard_EXPORT TCollection_AsciiString    GetComponent() const;
+  Standard_EXPORT TCollection_AsciiString            GetId() const;
+  Standard_EXPORT DDS_DicItem::Type                  GetType() const;
+  Standard_EXPORT TCollection_ExtendedString         GetLabel() const;
+  Standard_EXPORT TCollection_ExtendedString         GetFilter() const;
+  Standard_EXPORT TCollection_ExtendedString         GetRequired() const;
+  Standard_EXPORT DDS_MsgType                        GetWarningLevel() const;
+  Standard_EXPORT TCollection_ExtendedString         GetLongDescription() const;
+  Standard_EXPORT TCollection_ExtendedString         GetShortDescription() const;
+  Standard_EXPORT TCollection_AsciiString            GetComponent() const;
 
-  Standard_EXPORT TCollection_AsciiString    GetUnits() const;
-  Standard_EXPORT TCollection_AsciiString    GetUnits( const UnitSystem& ) const;
+  Standard_EXPORT virtual TCollection_AsciiString    GetUnits() const;
+  Standard_EXPORT virtual TCollection_AsciiString    GetUnits( const UnitSystem& ) const;
 
-  Standard_EXPORT TCollection_ExtendedString GetDefaultValue() const;
-  Standard_EXPORT TCollection_ExtendedString GetDefaultValue( const UnitSystem& ) const;
+  Standard_EXPORT TCollection_ExtendedString         GetDefaultValue() const;
+  Standard_EXPORT TCollection_ExtendedString         GetDefaultValue( const UnitSystem& ) const;
 
-  Standard_EXPORT Standard_Real              GetMinValue() const;
-  Standard_EXPORT Standard_Real              GetMinValue( const UnitSystem& ) const;
+  Standard_EXPORT Standard_Real                      GetMinValue() const;
+  Standard_EXPORT Standard_Real                      GetMinValue( const UnitSystem& ) const;
 
-  Standard_EXPORT Standard_Real              GetMaxValue() const;
-  Standard_EXPORT Standard_Real              GetMaxValue( const UnitSystem& ) const;
+  Standard_EXPORT Standard_Real                      GetMaxValue() const;
+  Standard_EXPORT Standard_Real                      GetMaxValue( const UnitSystem& ) const;
 
-  Standard_EXPORT Standard_Integer           GetPrecision() const;
-  Standard_EXPORT Standard_Integer           GetPrecision( const UnitSystem& ) const;
+  Standard_EXPORT virtual Standard_Integer           GetPrecision() const;
+  Standard_EXPORT virtual Standard_Integer           GetPrecision( const UnitSystem& ) const;
 
-  Standard_EXPORT TCollection_AsciiString    GetFormat( const Standard_Boolean = Standard_True ) const;
-  Standard_EXPORT TCollection_AsciiString    GetFormat( const UnitSystem&,
-                                                        const Standard_Boolean = Standard_True ) const;
-  Standard_EXPORT TCollection_ExtendedString GetNameOfValues() const;
-  Standard_EXPORT Standard_Boolean           GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
-                                                              Handle(TColStd_HArray1OfInteger)& ) const;
-  Standard_EXPORT Standard_Boolean           GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
-                                                              Handle(TColStd_HArray1OfInteger)&,
-                                                              Handle(TColStd_HArray1OfExtendedString)& ) const;
-  Standard_EXPORT Standard_Boolean           GetSpecialValues( TColStd_MapOfReal& ) const;
+  Standard_EXPORT virtual TCollection_AsciiString    GetFormat( const Standard_Boolean = Standard_True ) const;
+  Standard_EXPORT virtual TCollection_AsciiString    GetFormat( const UnitSystem&,
+                                                                const Standard_Boolean = Standard_True ) const;
+  Standard_EXPORT TCollection_ExtendedString         GetNameOfValues() const;
+  Standard_EXPORT Standard_Boolean                   GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
+                                                                      Handle(TColStd_HArray1OfInteger)& ) const;
+  Standard_EXPORT Standard_Boolean                   GetListOfValues( Handle(TColStd_HArray1OfExtendedString)&,
+                                                                      Handle(TColStd_HArray1OfInteger)&,
+                                                                      Handle(TColStd_HArray1OfExtendedString)& ) const;
+  Standard_EXPORT Standard_Boolean                   GetSpecialValues( TColStd_MapOfReal& ) const;
 
-  Standard_EXPORT Standard_Real              GetMinZoom() const;
-  Standard_EXPORT Standard_Real              GetMaxZoom() const;
-  Standard_EXPORT Standard_Real              GetZoomOrder() const;
+  Standard_EXPORT Standard_Real                      GetMinZoom() const;
+  Standard_EXPORT Standard_Real                      GetMaxZoom() const;
+  Standard_EXPORT Standard_Real                      GetZoomOrder() const;
 
-  Standard_EXPORT Standard_Real              ToSI( const Standard_Real ) const;
-  Standard_EXPORT Standard_Real              FromSI( const Standard_Real ) const;
+  Standard_EXPORT virtual Standard_Real              ToSI( const Standard_Real ) const;
+  Standard_EXPORT virtual Standard_Real              FromSI( const Standard_Real ) const;
 
-  Standard_EXPORT Standard_Real              ToSI( const Standard_Real, const UnitSystem& ) const;
-  Standard_EXPORT Standard_Real              FromSI( const Standard_Real, const UnitSystem& ) const;
+  Standard_EXPORT virtual Standard_Real              ToSI( const Standard_Real, const UnitSystem& ) const;
+  Standard_EXPORT virtual Standard_Real              FromSI( const Standard_Real, const UnitSystem& ) const;
 
-  Standard_EXPORT Standard_Boolean           HasData( const Standard_Integer ) const;
+  Standard_EXPORT Standard_Boolean                   HasData( const Standard_Integer ) const;
 
-  Standard_EXPORT TCollection_ExtendedString GetOption( const TCollection_AsciiString& ) const;
-  Standard_EXPORT Standard_Boolean           GetOptionNames( TColStd_SequenceOfAsciiString& ) const;
+  Standard_EXPORT TCollection_ExtendedString         GetOption( const TCollection_AsciiString& ) const;
+  Standard_EXPORT Standard_Boolean                   GetOptionNames( TColStd_SequenceOfAsciiString& ) const;
+
+protected:
+  
+  Standard_EXPORT void                               SetId( const TCollection_AsciiString& );
+
+  Standard_EXPORT void                               SetComponent( const Handle(Standard_Transient)& );
+
+  Standard_EXPORT void                               SetLabel( const TCollection_AsciiString& );
+
+  Standard_EXPORT void                               SetFilter( const TCollection_AsciiString& );
+
+  Standard_EXPORT void                               SetRequired( const TCollection_AsciiString& );
+
+  Standard_EXPORT void                               SetWarningLevel( const Standard_Integer& );
+
+  Standard_EXPORT void                               SetMinZoom( const Standard_Real& );
+  Standard_EXPORT void                               SetMaxZoom( const Standard_Real& );
+  Standard_EXPORT void                               SetZoomOrder( const Standard_Real& );
+
+  Standard_EXPORT void                               SetShortDescription( const TCollection_ExtendedString& );
+  Standard_EXPORT void                               SetLongDescription( const TCollection_ExtendedString& );
+
+  Standard_EXPORT bool                               SetOption( const TCollection_AsciiString&, const TCollection_AsciiString& );
+  Standard_EXPORT void                               SetType( const DDS_DicItem::Type& );
+
+  Standard_EXPORT void                               SetMin( const Standard_Real& );
+  Standard_EXPORT void                               SetMax( const Standard_Real& );
+
+  Standard_EXPORT void                               SetDefaultValue( const Standard_Real& );
+  Standard_EXPORT void                               SetDefaultValue( const TCollection_AsciiString& );
+
+  Standard_EXPORT void                               SetListOfValues( const Handle(TColStd_HArray1OfExtendedString)&,
+                                                                      const Handle(TColStd_HArray1OfInteger)& );
+  Standard_EXPORT void                               SetListOfValues( const Handle(TColStd_HArray1OfExtendedString)&,
+                                                                      const Handle(TColStd_HArray1OfInteger)&,
+                                                                      const Handle(TColStd_HArray1OfExtendedString)& );
+
+protected:
+
+  Standard_EXPORT DDS_DicItem( const DDS_DicItem& );
+
+  Standard_EXPORT void                               operator=( const DDS_DicItem& );
+
+  Standard_EXPORT virtual void                       FillDataMap( TCollection_AsciiString, const LDOM_Element&,
+                                                                  const LDOM_Element&, const LDOM_Element&,
+                                                                  const TColStd_SequenceOfAsciiString& );
 
 private:
-  DDS_DicItem( const DDS_DicItem& );
-  void                                       operator=( const DDS_DicItem& );
-  void                                       FillDataMap( TCollection_AsciiString, const LDOM_Element&,
-                                                          const LDOM_Element&, const LDOM_Element&,
-                                                          const TColStd_SequenceOfAsciiString& );
-  void                                       PrepareFormats( const TCollection_AsciiString& );
-  void                                       GetDefaultFormat();
-  UnitSystem                                 GetActiveUnitSystem() const;
 
-  void                                       GetStringFormat( const TCollection_AsciiString&,
-                                                              const TCollection_AsciiString&,
-                                                              const TCollection_AsciiString&,
-                                                              const TCollection_AsciiString&,
-                                                              TCollection_AsciiString& );
-  void                                       GetIntegerFormat( const TCollection_AsciiString&,
-                                                               const TCollection_AsciiString&,
-                                                               const TCollection_AsciiString&,
-                                                               const TCollection_AsciiString&,
-                                                               const Standard_Character,
-                                                               TCollection_AsciiString& );
-  void                                       GetFloatFormat( const TCollection_AsciiString&,
-                                                             const TCollection_AsciiString&,
-                                                             const TCollection_AsciiString&,
-                                                             const TCollection_AsciiString&,
-                                                             const Standard_Character,
-                                                             TCollection_AsciiString& );
-  void                                       Split( const TCollection_AsciiString&,
-                                                    Handle(TColStd_HArray1OfExtendedString)& );
+  Standard_EXPORT void                               PrepareFormats( const TCollection_AsciiString& );
+  Standard_EXPORT void                               GetDefaultFormat();
+  Standard_EXPORT UnitSystem                         GetActiveUnitSystem() const;
 
-  UnitData*                                  GetUnitData( const UnitSystem& ) const;
+  Standard_EXPORT void                               GetStringFormat( const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      TCollection_AsciiString& );
+  Standard_EXPORT void                               GetIntegerFormat( const TCollection_AsciiString&,
+                                                                       const TCollection_AsciiString&,
+                                                                       const TCollection_AsciiString&,
+                                                                       const TCollection_AsciiString&,
+                                                                       const Standard_Character,
+                                                                       TCollection_AsciiString& );
+  Standard_EXPORT void                               GetFloatFormat( const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      const TCollection_AsciiString&,
+                                                                      const Standard_Character,
+                                                                      TCollection_AsciiString& );
+  Standard_EXPORT void                               Split( const TCollection_AsciiString&,
+                                                            Handle(TColStd_HArray1OfExtendedString)& );
+
+  Standard_EXPORT UnitData*                          GetUnitData( const UnitSystem& ) const;
 
 private:
   typedef NCollection_DataMap<TCollection_AsciiString, TCollection_ExtendedString> OptionsMap;

@@ -35,6 +35,8 @@ public:
   QDS_TextEdit( const QString&, QWidget* = 0, const int = All, const QString& = QString() );
   virtual ~QDS_TextEdit();
 
+  virtual QString                 getString() const;
+
 signals:
   void                            returnPressed();
 
@@ -45,7 +47,6 @@ protected:
   QTextEdit*                      textEdit() const;
   virtual QWidget*                createControl( QWidget* );
 
-  virtual QString                 getString() const;
   virtual void                    setString( const QString& );
 };
 

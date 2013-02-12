@@ -36,7 +36,7 @@
 
 #include <SUIT_DataObject.h>
 
-#include <CORBA.h>
+#include <omniORB4/CORBA.h>
 
 //#include <SALOMEconfig.h>
 //#include CORBA_CLIENT_HEADER(SALOMEDS)
@@ -46,7 +46,7 @@
 
 class LightApp_Preferences;
 class SalomeApp_Study;
-class SalomeApp_NoteBookDlg;
+class SalomeApp_NoteBook;
 class SUIT_Desktop;
 
 class SUIT_ViewModel;
@@ -69,7 +69,9 @@ class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
 public:
   enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
-         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, NoteBookId, UserID };
+         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID };
+
+  typedef enum { WT_NoteBook = LightApp_Application::WT_User } WindowTypes;
 
 protected:
   enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
@@ -104,9 +106,10 @@ public:
 
   virtual bool                        useStudy( const QString& );
   virtual void                        updateDesktopTitle();
+  virtual void                        currentWindows( QMap<int, int>& ) const;
   
-  virtual void                        setNoteBook(SalomeApp_NoteBookDlg* theNoteBook);
-  virtual SalomeApp_NoteBookDlg*      getNoteBook() const;
+  virtual void                        setNoteBook(SalomeApp_NoteBook* theNoteBook);
+  virtual SalomeApp_NoteBook*         getNoteBook() const;
 
  //! update visibility state of objects
   void                                updateVisibilityState( DataObjectList& theList,
@@ -125,6 +128,10 @@ public slots:
   virtual void                        onCopy();
   virtual void                        onPaste();
   void                                onSaveGUIState();// called from VISU
+  void                                onUpdateStudy(); // called from NoteBook
+  bool                                onRestoreStudy( const QString& theDumpScript,
+  						      const QString& theStudyName,
+  						      bool theIsStudySaved );
 
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
@@ -153,14 +160,19 @@ protected:
   virtual QMap<int, QString>          activateModuleActions() const;
   virtual void                        moduleActionSelected( const int );
 
+  virtual void                        defaultWindows( QMap<int, int>& ) const;
+
   void                                objectBrowserColumnsVisibility();
+
+  bool                                updateStudy();
+
+  virtual void                        closeApplication();
 
 private slots:
   void                                onDeleteInvalidReferences();
   void                                onDblClick( SUIT_DataObject* );
   void                                onProperties();
   void                                onDumpStudy();
-  void                                onNoteBook();
   void                                onLoadScript();
 
   void                                onDeleteGUIState();
@@ -177,8 +189,15 @@ private:
   void                                createExtraActions();
 
 private:
-  SalomeApp_NoteBookDlg*              myNoteBook;
+  SalomeApp_NoteBook*                 myNoteBook;
   QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
+
+signals:
+  void                                dumpedStudyClosed( const QString& theDumpScript, 
+							 const QString& theStudyName, 
+							 bool theIsStudySaved );
+  void                                notebookVarUpdated( QString theVarName );
+
 };
 
 #ifdef WIN32

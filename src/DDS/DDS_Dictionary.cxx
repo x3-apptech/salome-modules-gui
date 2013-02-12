@@ -43,6 +43,8 @@
 IMPLEMENT_STANDARD_HANDLE(DDS_Dictionary, MMgt_TShared)
 IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
 
+Handle(DDS_Dictionary) DDS_Dictionary::myDictionary = Handle(DDS_Dictionary)();
+
 /*!
   \class DDS_Dictionary
   \brief This class provides an information about used datums, 
@@ -425,12 +427,10 @@ void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSyst
 */
 Handle_DDS_Dictionary DDS_Dictionary::Get()
 {
-  static Handle(DDS_Dictionary) sDictionary;
+  if ( myDictionary.IsNull() )
+    myDictionary = new DDS_Dictionary();
 
-  if ( sDictionary.IsNull() )
-    sDictionary = new DDS_Dictionary();
-
-  return sDictionary;
+  return myDictionary;
 }
 
 /*!
@@ -456,9 +456,8 @@ Standard_Boolean DDS_Dictionary::Load( const TCollection_AsciiString theFileName
 
   LDOM_Document aDoc = aParser.getDocument();
   LDOM_Element aDocElement = aDoc.getDocumentElement();
-  for ( LDOM_Element aComponentElem = aDocElement.GetChildByTagName( KeyWord( "COMPONENT" ) );
-        !aComponentElem.isNull(); aComponentElem = aComponentElem.GetSiblingByTagName() )
-    aDic->FillDataMap( aComponentElem, aDocElement );
+  if ( !aDocElement.isNull() )
+    aDic->FillDataMap( aDocElement );
 
   _LoadMap.Add( theFileName );
 
@@ -527,17 +526,20 @@ Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& th
 
 /*!
   \brief Fill the internal data structures from the XML node.
-  \param theComponentData component XML node
   \param theDocElement document XML node
 */
-void DDS_Dictionary::FillDataMap( const LDOM_Element& theComponentData, const LDOM_Element& theDocElement )
+void DDS_Dictionary::FillDataMap( const LDOM_Element& theDocElement )
 {
-  TCollection_AsciiString aCompName = theComponentData.getAttribute( KeyWord( "COMPONENT_NAME" ) );
-  if ( !myGroupMap.Contains( aCompName ) )
-    myGroupMap.Add( aCompName, new DDS_DicGroup( aCompName ) );
-  Handle(DDS_DicGroup) aDicGroup = myGroupMap.FindFromKey( aCompName );
-  aDicGroup->FillDataMap( theComponentData, theDocElement );
-  myGroupMap.Add( aCompName, aDicGroup );
+  for ( LDOM_Element aComponentElem = theDocElement.GetChildByTagName( KeyWord( "COMPONENT" ) );
+        !aComponentElem.isNull(); aComponentElem = aComponentElem.GetSiblingByTagName() )
+  {
+    TCollection_AsciiString aCompName = aComponentElem.getAttribute( KeyWord( "COMPONENT_NAME" ) );
+    if ( !myGroupMap.Contains( aCompName ) )
+      myGroupMap.Add( aCompName, CreateGroup( aCompName ) );
+    Handle(DDS_DicGroup) aDicGroup = myGroupMap.FindFromKey( aCompName );
+    aDicGroup->FillDataMap( aComponentElem, theDocElement );
+    myGroupMap.Add( aCompName, aDicGroup );
+  }
 }
 
 /*!
@@ -607,4 +609,26 @@ void DDS_Dictionary::GetKeys( const TCollection_AsciiString& theComponent, TColS
 
   if( !aDicGroup.IsNull() )
     aDicGroup->GetKeys( seq );
+}
+
+/*!
+  \brief  Create instance of a dictionary group. This method can
+          be used for customization data dictionary by specific
+          groups design.
+  \return New dictionary group instance.
+*/
+Handle(DDS_DicGroup) DDS_Dictionary::CreateGroup( const TCollection_AsciiString& theCompName ) const
+{
+  return new DDS_DicGroup( theCompName );
+}
+
+/*!
+  \brief Set instance of dictionary. This method might be used in descendant classes to initialize
+         custom dictionary and replace the default implementation.
+         This method overrides static handle on dictionary that is available
+         through Get() method
+*/
+void DDS_Dictionary::SetDictionary( const Handle(DDS_Dictionary)& theDict )
+{
+  myDictionary = theDict; 
 }
