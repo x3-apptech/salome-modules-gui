@@ -16,7 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #include "StandardApp_Module.hxx"
 
@@ -114,11 +114,11 @@ int StandardApp_Module::newActionId() {
  * class.
  */
 int StandardApp_Module::createStandardAction(const QString& label,
-					     QObject * slotobject,
-					     const char* slotmember,
-					     const QString& iconName,
-					     const QString& tooltip,
-					     const int identifier)
+                                             QObject * slotobject,
+                                             const char* slotmember,
+                                             const QString& iconName,
+                                             const QString& tooltip,
+                                             const int identifier)
 {
 
   // If the tooltip is not defined, we choose instead the label text.
@@ -136,7 +136,7 @@ int StandardApp_Module::createStandardAction(const QString& label,
   }
 
   // Creating the action
-  QAction * action= this->createAction( effIdentifier, label, actionIcon, 
+  QAction * action= this->createAction( effIdentifier, label, actionIcon,
                                         label, effToolTip, 0, getApp()->desktop(),
                                         false, slotobject, slotmember);
 
@@ -154,6 +154,7 @@ void StandardApp_Module::addActionInToolbar(int actionId) {
  * Integrate the action in the default menu
  */
 void StandardApp_Module::addActionInMenubar(int actionId) {
+  this->action( actionId )->setIconVisibleInMenu(true);
   this->createMenu( actionId, _defaultMenuId, 10 );
 }
 
@@ -167,6 +168,7 @@ void StandardApp_Module::addActionInPopupMenu(int actionId,const QString& rule) 
   // implement "LightApp_Selection*    createSelection() const;"
   int parentId = -1;
   QtxPopupMgr* mgr = this->popupMgr();
+  this->action( actionId )->setIconVisibleInMenu(true);
   mgr->insert ( this->action( actionId ), parentId, 0 );
   mgr->setRule( this->action( actionId ), rule, QtxPopupMgr::VisibleRule );
 }
@@ -190,7 +192,7 @@ void StandardApp_Module::createModuleWidgets() {
  */
 void StandardApp_Module::createModuleActions() {
   int actionId = this->createStandardAction("Test", this, SLOT(OnTest()),
-					    "f1.png", "Run the default test function");
+                                            "f1.png", "Run the default test function");
   this->addActionInToolbar(actionId);
 }
 
@@ -236,13 +238,13 @@ void StandardApp_Module::setDockLayout(DockLayoutType layoutType) {
   SUIT_Desktop* desk = getApp()->desktop();
   _areaAtBottomLeftCorner = desk->corner(Qt::BottomLeftCorner);
   _areaAtBottomRightCorner = desk->corner(Qt::BottomRightCorner);
-  
+
   if ( layoutType == DOCKLAYOUT_LEFT_VLARGE ) {
     desk->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
     desk->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
   } else {
     desk->setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
-    desk->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);    
+    desk->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
   }
 }
 
@@ -313,8 +315,8 @@ void StandardApp_Module::createStudyComponent(SUIT_Study* theStudy) {
       // raising (eh, you work on SALOME isn't it?)
       SALOMEDS::Driver_var driver = SALOMEDS::Driver::_narrow(this->getEngine());
       if ( ! driver->_is_nil() ) {
-	STDLOG("Associate the SComponent to the engine");
-	aStudyBuilder->DefineComponentInstance(aFather, this->getEngine());
+        STDLOG("Associate the SComponent to the engine");
+        aStudyBuilder->DefineComponentInstance(aFather, this->getEngine());
       }
     }
 
