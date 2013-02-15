@@ -262,7 +262,7 @@ QString SalomeApp_DataObject::toolTip( const int /*id*/ ) const
       // --- try to find (and not load) the component instance, like GEOM instance,
       //     registered in naming service under Containers/<hostname>/...
       //     with any container name, on every machine available
-      Engines::MachineParameters params;
+      Engines::ContainerParameters params;
       app->lcc()->preSet(params); // --- any container name, anywhere
       Engines::EngineComponent_var aComponent =
         app->lcc()->FindComponent(params, componentDataType().toLatin1().constData() );
