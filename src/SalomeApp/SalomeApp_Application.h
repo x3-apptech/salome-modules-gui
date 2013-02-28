@@ -44,6 +44,8 @@
 
 #include "SALOMEDSClient.hxx"
 
+#include <QPointer>
+
 class LightApp_Preferences;
 class SalomeApp_Study;
 class SalomeApp_NoteBook;
@@ -189,7 +191,7 @@ private:
   void                                createExtraActions();
 
 private:
-  SalomeApp_NoteBook*                 myNoteBook;
+  QPointer<SalomeApp_NoteBook>        myNoteBook;
   QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
 
 signals:

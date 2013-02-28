@@ -34,8 +34,8 @@ class QTX_EXPORT QtxPathEdit : public QFrame
   Q_OBJECT
 
 public:
-  QtxPathEdit( const Qtx::PathType, QWidget* = 0 );
-  QtxPathEdit( QWidget* = 0 );
+  QtxPathEdit( const Qtx::PathType, QWidget* = 0, bool = false );
+  QtxPathEdit( QWidget* = 0, bool = false );
   virtual ~QtxPathEdit();
 
   QString       path() const;
@@ -61,6 +61,7 @@ private:
   QLineEdit*    myPath;
   Qtx::PathType myType;
   QString       myFilter;
+  bool          myBrowse;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "GenericDialog.hxx"
+#include "GenericDialog.h"
 
 GenericDialog::GenericDialog(QDialog *parent) : QDialog(parent)
 {

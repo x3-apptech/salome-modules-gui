@@ -143,7 +143,7 @@ public:
     \brief Constructor
     \internal
   */
-  Editor( QWidget* parent = 0 ) : QtxPathEdit( parent )
+  Editor( QWidget* parent = 0 ) : QtxPathEdit( parent, true )
   {
     layout()->setSpacing( 0 );
     lineEdit()->setFrame( false );

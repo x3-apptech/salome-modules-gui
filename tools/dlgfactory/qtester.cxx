@@ -23,7 +23,7 @@
 //
 #include <QApplication>
 #include <QtGui>
-#include "QDialogTest.hxx"
+#include "QDialogTest.h"
 
 void TEST_show() {
   QDialogTest * dialog = new QDialogTest();

@@ -17,8 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_LIBRARY(SalomePrs SHARED SALOME_Prs.cxx)
-SET_TARGET_PROPERTIES(SalomePrs PROPERTIES COMPILE_FLAGS "${PLATFORM_DEFINITIONS}")
+ADD_LIBRARY(SalomePrs SALOME_Prs.cxx)
 INSTALL(TARGETS SalomePrs DESTINATION ${GUI_salomelib_LIBS})
 
 INSTALL(FILES SALOME_Prs.h DESTINATION ${GUI_salomeinclude_HEADERS})

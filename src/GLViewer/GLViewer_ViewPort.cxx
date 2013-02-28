@@ -51,7 +51,6 @@
 #include <X11/Xmu/StdCmap.h>
 #undef QT_CLEAN_NAMESPACE
 #include <Xw_Window.hxx>
-#include <Graphic3d_GraphicDevice.hxx>
 
 /*!
   \struct CMapEntry

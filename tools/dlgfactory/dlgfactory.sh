@@ -29,7 +29,7 @@
 # DESCRIPTION:
 #
 # This script generates a set of files to initiate a dialog qt window
-# (i.e. MyDialog.ui, MyDialog.hxx and MyDialog.cxx files).
+# (i.e. MyDialog.ui, MyDialog.h and MyDialog.cxx files).
 #
 # The dialog window can be a self-consistent class (i.e. depends only
 # on Qt classes) or a classe that inherits from the class
@@ -83,11 +83,11 @@ fi
 
 if [ "$classType" = "qdialog" ]; then
     sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__QDIALOG__.ui > $className.ui
-    sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__QDIALOG__.hxx > $className.hxx
+    sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__QDIALOG__.h > $className.h
     sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__QDIALOG__.cxx > $className.cxx
 else
     sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__GDIALOG__.ui > $className.ui
-    sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__GDIALOG__.hxx > $className.hxx
+    sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__GDIALOG__.h > $className.h
     sed s/__CLASSNAME__/$className/g $TOOLDIRNAME/__GDIALOG__.cxx > $className.cxx    
 fi
 
@@ -107,10 +107,10 @@ displayMessage()
 ## and form source files from ui files
 ## ---------------------------------------------------------
 ##
-#%_moc.cxx: %.hxx
+#%_moc.cxx: %.h
 #	$(MOC) $< -o $@
 #
-#ui_%.hxx: %.ui
+#ui_%.h: %.ui
 #	$(UIC) -o $@ $<
 #
 ##
@@ -120,7 +120,7 @@ displayMessage()
 ## ---------------------------------------------------------
 ##
 #UIC_FILES = \
-#	ui___CLASSNAME__.hxx
+#	ui___CLASSNAME__.h
 ##
 #MOC_FILES = \
 #	__CLASSNAME___moc.cxx
@@ -139,7 +139,7 @@ displayMessage()
 #nodist_<MyLibrary>_la_SOURCES += $(MOC_FILES) $(UIC_FILES)
 #
 #dist_<MyLibrary>_la_SOURCES += __CLASSNAME__.cxx
-#salomeinclude_HEADERS       += __CLASSNAME__.hxx
+#salomeinclude_HEADERS       += __CLASSNAME__.h
 #
 #<MyLibrary>_la_CPPFLAGS = \
 #	$(QT_CXXFLAGS)

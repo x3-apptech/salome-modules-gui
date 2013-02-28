@@ -893,10 +893,15 @@ void OB_Browser::onExpandAll()
 {
   QModelIndexList indexes = selectedIndexes();
   QModelIndex index;
-
+  disconnect( treeView(), SIGNAL( expanded( const QModelIndex& ) ), 
+           this,       SLOT( onExpanded( const QModelIndex& ) ) );
+  
   foreach ( index, indexes ) {
     myView->expandAll( index );
   }
+  connect( treeView(), SIGNAL( expanded( const QModelIndex& ) ), 
+           this,       SLOT( onExpanded( const QModelIndex& ) ) );
+  emit(onExpanded( index));
 }
 
 /*!

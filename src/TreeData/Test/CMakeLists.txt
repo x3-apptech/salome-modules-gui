@@ -19,8 +19,8 @@
 INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/UseQT4EXT.cmake)
 
 INCLUDE_DIRECTORIES(
-  ${OMNIORB_INCLUDE_DIRS}
-  ${QT_INCLUDE_DIRS}
+  ${OMNIORB_INCLUDE_DIR}
+  ${QT_INCLUDES}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${KERNEL_ROOT_DIR}/include/salome
   ${CMAKE_SOURCE_DIR}/src/GuiHelpers
@@ -29,7 +29,7 @@ INCLUDE_DIRECTORIES(
 
 SET(COMMON_LIBS
   ${CORBA_LIBS}
-  ${QT_LIBS}
+  ${QT_LIBRARIES}
   SalomeTreeData
   SalomeGuiHelpers
   ${SalomeLifeCycleCORBA}
@@ -42,17 +42,15 @@ SET(GUI_FORMS mainwindow.ui)
 QT4_WRAP_UI(GUI_FORMS_HEADERS ${GUI_FORMS})
 
 SET(TreeData_guitester_SOURCES
-  testhelper.hxx
   testhelper.cxx
   guitester.cxx
-  mainwindow.hxx
   mainwindow.cxx
-  MyDataModel.hxx
   MyDataModel.cxx
 )
 
+ADD_DEFINITIONS(${OMNIORB_DEFINITIONS} ${QT_DEFINITIONS})
+
 ADD_EXECUTABLE(TreeData_guitester ${TreeData_guitester_SOURCES} ${GUI_HEADERS} ${GUI_FORMS_HEADERS})
-SET_TARGET_PROPERTIES(TreeData_guitester PROPERTIES COMPILE_FLAGS "${OMNIORB_DEFINITIONS} ${QT_DEFINITIONS} ${PLATFORM_DEFINITIONS}")
 TARGET_LINK_LIBRARIES(TreeData_guitester ${COMMON_LIBS})
 
 SET(TreeData_tester_SOURCES
@@ -61,7 +59,6 @@ SET(TreeData_tester_SOURCES
 )
 
 ADD_EXECUTABLE(TreeData_tester ${TreeData_tester_SOURCES})
-SET_TARGET_PROPERTIES(TreeData_tester PROPERTIES COMPILE_FLAGS "${OMNIORB_DEFINITIONS} ${QT_DEFINITIONS} ${PLATFORM_DEFINITIONS}")
 TARGET_LINK_LIBRARIES(TreeData_tester ${COMMON_LIBS})
 
 INSTALL(TARGETS TreeData_guitester TreeData_tester DESTINATION ${GUI_salomebin_BINS})

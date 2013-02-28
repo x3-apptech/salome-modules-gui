@@ -613,6 +613,7 @@ sed -i "s%\(\s*\)\(for searchdir in \$searchdirs; do\)%\1for sss in \$searchdirs
 AC_OUTPUT([ \
   adm_local/Makefile \
   adm_local/cmake_files/Makefile \
+  adm_local/cmake_files/deprecated/Makefile \
   adm_local/unix/Makefile \
   adm_local/unix/config_files/Makefile \
   bin/VERSION \

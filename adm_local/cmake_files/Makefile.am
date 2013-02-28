@@ -19,13 +19,16 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
+SUBDIRS = deprecated
+
 dist_admlocal_cmake_DATA = \
 FindCAS.cmake \
-FindOPENGL.cmake \
-FindQT4.cmake \
 UseQT4EXT.cmake \
 FindQWT.cmake \
-FindSIPPYQT.cmake \
-FindVTK.cmake \
-FindGUI.cmake
-
+FindGUI.cmake \
+FindSalomeCAS.cmake \
+FindSalomePYQT4.cmake \
+FindSalomeQT4.cmake \
+FindSalomeQWT.cmake \
+FindSalomeSIP.cmake \
+FindSalomeVTK.cmake

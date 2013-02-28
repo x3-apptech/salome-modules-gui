@@ -405,11 +405,18 @@ void QtxWebBrowser::linkClicked( const QUrl& url )
       // special processing of PDF files
       QStringList readers;
       readers << "xdg-open" << "acroread" << "kpdf" << "kghostview" << "xpdf";
+      int i;
       foreach ( QString r, readers ) {
 	QString reader = QString( "/usr/bin/%1" ).arg( r );
 	if ( QFileInfo( reader ).exists() ) {
-	  ::system( QString( "unset LD_LIBRARY_PATH; %1 %2 &" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
-	  break;
+	  i = ::system( QString( "%1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
+	  // If Salome Qt version is lower than the system one, on KDE an unresolved symbol is raised
+	  // In this case, we try to launch the pdf viewer after unsetting the LD_LIBRARY_PATH environnement variable
+	  // Warning: the test on the return value of ::system does not work if the command ends with '&'
+	  if (i != 0)
+	    i  = ::system( QString( "unset LD_LIBRARY_PATH ; %1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
+	  if (i == 0)
+	    break;
 	}
       }
 #endif // WIN32

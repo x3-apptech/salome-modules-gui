@@ -29,7 +29,7 @@
 
 #include "SALOME_Session.hxx"
 
-#include <CORBA.h> 
+#include <omniORB4/CORBA.h> 
 #include <string>
 
 void WaitForServerReadiness(std::string serverName);

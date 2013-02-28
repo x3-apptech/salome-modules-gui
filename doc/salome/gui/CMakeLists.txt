@@ -20,38 +20,20 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(top_builddir
- ${CMAKE_BINARY_DIR}
-)
-SET(top_srcdir 
- ${CMAKE_SOURCE_DIR}
-)
-SET(srcdir 
- ${CMAKE_CURRENT_SOURCE_DIR}
-)
-SET(builddir 
- ${CMAKE_CURRENT_BINARY_DIR}
-)
-SET(datadir
- ${CMAKE_INSTALL_PREFIX}/share
-)
-SET(docdir 
- ${datadir}/doc/salome
-)
+SET(top_builddir ${CMAKE_BINARY_DIR})
+SET(top_srcdir ${CMAKE_SOURCE_DIR})
+SET(srcdir ${CMAKE_CURRENT_SOURCE_DIR})
+SET(builddir ${CMAKE_CURRENT_BINARY_DIR})
+SET(datadir ${CMAKE_INSTALL_PREFIX}/share)
+SET(docdir ${datadir}/doc/salome)
             
-
-SET(input ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in)
-SET(output ${CMAKE_CURRENT_BINARY_DIR}/doxyfile)
-MESSAGE(STATUS "Creation of ${output}")
-CONFIGURE_FILE(${input} ${output})
-
-SET(input ${CMAKE_CURRENT_SOURCE_DIR}/static/header.html.in)
-SET(output ${CMAKE_CURRENT_BINARY_DIR}/static/header.html)
-MESSAGE(STATUS "Creation of ${output}")
-CONFIGURE_FILE(${input} ${output})
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doxyfile)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/static/header.html.in ${CMAKE_CURRENT_BINARY_DIR}/static/header.html)
                 
-ADD_CUSTOM_TARGET(usr_docs ${DOXYGEN_EXECUTABLE} 
-  COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; shutil.rmtree(r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/GUI''', True); shutil.copytree(r'''${CMAKE_CURRENT_BINARY_DIR}/GUI''', r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/GUI'''); shutil.copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/head.png''', r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/GUI''')"
-  VERBATIM 
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
-)
+ADD_CUSTOM_TARGET(usr_docs ${DOXYGEN_EXECUTABLE})
+
+ADD_DEPENDENCIES(usr_docs html_docs)
+
+INSTALL(CODE "EXECUTE_PROCESS(COMMAND \"${CMAKE_COMMAND}\" --build ${CMAKE_BINARY_DIR} --target usr_docs)")
+INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/GUI DESTINATION share/doc/salome/gui)
+INSTALL(FILES images/head.png DESTINATION share/doc/salome/gui/GUI) 

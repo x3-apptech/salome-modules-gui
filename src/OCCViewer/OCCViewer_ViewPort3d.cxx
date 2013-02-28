@@ -746,15 +746,7 @@ bool OCCViewer_ViewPort3d::setWindow( const Handle(V3d_View)& view )
   if ( view.IsNull() )
     return false;
 
-  int hwnd = (int)winId();
-  if ( !hwnd )
-    return false;
-
-  /* set this widget as the drawing window */
-  short lo = (short)hwnd;
-  short hi = (short)( hwnd >> 16 );
-
-  attachWindow( view, OCCViewer_VService::CreateWindow( view, (int)hi, (int)lo, Xw_WQ_SAMEQUALITY ) );
+  attachWindow( view, OCCViewer_VService::CreateWindow( view, winId() ) );
 
   myWindow = view->Window();
   return !myWindow.IsNull();

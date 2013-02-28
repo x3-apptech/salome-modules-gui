@@ -3570,7 +3570,7 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
 
   //abd: changed libSalomePyQtGUI to SalomePyQtGUI for WIN32
   bool isPythonModule = lib.contains("SalomePyQtGUI");
-  bool isPythonLightModule = lib.contains("libSalomePyQtGUILight");
+  bool isPythonLightModule = lib.contains("SalomePyQtGUILight");
 
   QStringList paths;
 #ifdef WIN32
@@ -3608,11 +3608,11 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
       QString pylibgui = moduleName( moduleTitle ) + QString("GUI.py");
 
       // Check the python library
-#ifdef WIN32
-      paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
-#else
+// #ifdef WIN32
+//       paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
+// #else
       paths = QString(::getenv( "PYTHONPATH" )).split( ":", QString::SkipEmptyParts );
-#endif
+// #endif
       bool isPyLib = false, isPyGuiLib = false;
       QStringList::const_iterator anIt = paths.begin(), aLast = paths.end();
       for( ; anIt!=aLast; anIt++ )

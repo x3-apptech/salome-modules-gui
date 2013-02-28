@@ -159,7 +159,7 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application(), myNoteBook( 0 )
+  : LightApp_Application()
 {
   connect( desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this,      SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
@@ -1608,8 +1608,6 @@ void SalomeApp_Application::objectBrowserColumnsVisibility()
 /*! Set SalomeApp_NoteBook pointer */
 void SalomeApp_Application::setNoteBook( SalomeApp_NoteBook* theNoteBook )
 {
-  if ( myNoteBook && myNoteBook != theNoteBook )
-    delete myNoteBook;
   myNoteBook = theNoteBook;
 }
 

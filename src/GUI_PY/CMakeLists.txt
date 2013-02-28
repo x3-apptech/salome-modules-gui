@@ -44,7 +44,7 @@ FOREACH(output ${PYUIC_FILES})
   SET(output ${CMAKE_CURRENT_BINARY_DIR}/${output})
   ADD_CUSTOM_COMMAND(
     OUTPUT ${output}
-    COMMAND ${PYUIC_EXECUTABLE} -o ${output} ${input}
+    COMMAND ${PYQT_PYUIC_EXECUTABLE} -o ${output} ${input}
     MAIN_DEPENDENCY ${input}
   )
 ENDFOREACH(output ${PYUIC_FILES})

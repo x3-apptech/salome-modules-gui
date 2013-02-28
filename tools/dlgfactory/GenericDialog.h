@@ -2,7 +2,7 @@
 #define _GenericDialog_HXX
 
 #include <QtGui>
-#include "ui_GenericDialog.hxx"
+#include "ui_GenericDialog.h"
 
 class GenericDialog : public QDialog
 {

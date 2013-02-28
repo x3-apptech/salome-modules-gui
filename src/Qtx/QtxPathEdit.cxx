@@ -22,10 +22,12 @@
 //
 #include "QtxPathEdit.h"
 
+#include <QApplication>
 #include <QLayout>
 #include <QDirModel>
 #include <QLineEdit>
 #include <QCompleter>
+#include <QKeyEvent>
 #include <QToolButton>
 #include <QFileDialog>
 #include <QRegExpValidator>
@@ -78,11 +80,14 @@ static const char* browse_icon[] = {
   \brief Constructor
   \param type widget mode (Qtx::PathType)
   \param parent parent widget
+  \param browse if \c true, automatically finish editing of file path when
+                user presses OK in "Select File/Directory" dialog box
   \sa pathType(), setPathType()
 */
-QtxPathEdit::QtxPathEdit( const Qtx::PathType type, QWidget* parent )
+QtxPathEdit::QtxPathEdit( const Qtx::PathType type, QWidget* parent, bool browse )
 : QFrame( parent ),
-  myType( type )
+  myType( type ),
+  myBrowse ( browse )
 {
   initialize();
 }
@@ -93,11 +98,14 @@ QtxPathEdit::QtxPathEdit( const Qtx::PathType type, QWidget* parent )
   Qtx::PT_OpenFile mode is used by default.
 
   \param parent parent widget
+  \param browse if \c true, automatically finish editing of file path when
+                user presses OK in "Select File/Directory" dialog box
   \sa pathType(), setPathType()
 */
-QtxPathEdit::QtxPathEdit( QWidget* parent )
+QtxPathEdit::QtxPathEdit( QWidget* parent, bool browse )
 : QFrame( parent ),
-  myType( Qtx::PT_OpenFile )
+  myType( Qtx::PT_OpenFile ),
+  myBrowse ( browse )
 {
   initialize();
 }
@@ -206,6 +214,9 @@ void QtxPathEdit::onBrowse( bool /*on*/ )
     myPath->setText( QDir::convertSeparators( path ) ); 
 
   myPath->setFocus();
+
+  if ( !path.isEmpty() && myBrowse )
+    QApplication::postEvent( myPath, new QKeyEvent( QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier ) );
 }
 
 /*!

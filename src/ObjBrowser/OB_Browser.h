@@ -120,6 +120,7 @@ signals:
 private slots:
   void                   onExpandAll();
   void                   onCollapseAll();
+  virtual void           onExpanded( const QModelIndex& ) {}
   //void                   onDestroyed( SUIT_DataObject* );
   //void                   onDoubleClicked ( QListViewItem* );
   //void                   onDropped( QPtrList<QListViewItem>, QListViewItem*, int );

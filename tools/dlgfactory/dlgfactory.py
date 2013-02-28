@@ -22,7 +22,7 @@ import sys, os
 
 __descr_str = ""
 __descr_str += "This script generates a set of files to initiate a dialog Qt window "
-__descr_str += "(i.e. MyDialog.ui, MyDialog.hxx and MyDialog.cxx files). "
+__descr_str += "(i.e. MyDialog.ui, MyDialog.h and MyDialog.cxx files). "
 __descr_str += "The dialog window can be a self-consistent class (i.e. depends only "
 __descr_str += "on Qt classes) or a class that inherits class GenericDialog "
 __descr_str += "which implementation is provided in this package and "
@@ -38,10 +38,10 @@ __msg_str = """
 # and form source files from ui files
 # ---------------------------------------------------------
 
-%_moc.cxx: %.hxx
+%_moc.cxx: %.h
 	$(MOC) $< -o $@
 
-ui_%.hxx: %.ui
+ui_%.h: %.ui
 	$(UIC) -o $@ $<
 
 
@@ -51,7 +51,7 @@ ui_%.hxx: %.ui
 # ---------------------------------------------------------
 #
 UIC_FILES = \
-	ui___CLASSNAME__.hxx
+	ui___CLASSNAME__.h
 #
 MOC_FILES = \
 	__CLASSNAME___moc.cxx
@@ -70,7 +70,7 @@ BUILT_SOURCES = $(UIC_FILES)
 nodist_<MyLibrary>_la_SOURCES += $(MOC_FILES) $(UIC_FILES)
 
 dist_<MyLibrary>_la_SOURCES += __CLASSNAME__.cxx
-salomeinclude_HEADERS       += __CLASSNAME__.hxx
+salomeinclude_HEADERS       += __CLASSNAME__.h
 
 <MyLibrary>_la_CPPFLAGS = \\
 	$(QT_CXXFLAGS)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
   className = options.className
   classType = options.classType
 
-  for ext in [".cxx", ".hxx", ".ui"]:
+  for ext in [".cxx", ".h", ".ui"]:
     file_dest = className + ext 
     if classType == "qdialog":
       file_src = os.path.join( tool_path, "__QDIALOG__" + ext )

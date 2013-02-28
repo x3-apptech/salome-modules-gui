@@ -29,34 +29,20 @@
 #include <Standard_Boolean.hxx>
 #include <Standard_CString.hxx>
 #include <Standard_ExtString.hxx>
-#include <Standard_Integer.hxx>
+//#include <Standard_Integer.hxx>
 #include <Quantity_Length.hxx>
-#include <Xw_WindowQuality.hxx>
+//#include <Xw_WindowQuality.hxx>
 #include <V3d_TypeOfOrientation.hxx>
+
+#include <QWidget>
 
 class Standard_EXPORT OCCViewer_VService
 {
 public:
-    inline void* operator new(size_t,void* anAddress)
-    {
-        return anAddress;
-    }
-    inline void* operator new(size_t size)
-    {
-        return Standard::Allocate(size);
-    }
-    inline void  operator delete(void *anAddress)
-    {
-        if ( anAddress ) Standard::Free((Standard_Address&)anAddress);
-    }
+  // STATIC METHODS
+  static Handle(Aspect_Window) CreateWindow( const Handle(V3d_View)& view, WId id );
 
-    // STATIC METHODS
-    static Handle(Aspect_Window) 
-                    CreateWindow( const Handle(V3d_View)& view,
-                                  const Standard_Integer hiwin,
-                                  const Standard_Integer lowin,
-                                  const Xw_WindowQuality quality );
-
+  /*
     static void     SetWindow( const Handle(  V3d_View )& view,
                                const Standard_Integer hiwin,
                                const Standard_Integer lowin,
@@ -71,14 +57,15 @@ public:
                                 const Standard_Integer x2,
                                 const Standard_Integer y2,
                                 const Xw_WindowQuality quality = Xw_WQ_3DQUALITY );
-    static Handle_V3d_Viewer
-                    Viewer3d( const Standard_CString display,
-                              const Standard_ExtString name,
-                              const Standard_CString domain = "",
-                              const Quantity_Length ViewSize = 1000.0,
-                              const V3d_TypeOfOrientation ViewProj = V3d_XposYnegZpos,
-                              const Standard_Boolean ComputedMode = Standard_True,
-                              const Standard_Boolean DefaultComputedMode = Standard_True );
+    */
+
+  static Handle(V3d_Viewer) Viewer3d( const Standard_CString display,
+				      const Standard_ExtString name,
+				      const Standard_CString domain = "",
+				      const Quantity_Length ViewSize = 1000.0,
+				      const V3d_TypeOfOrientation ViewProj = V3d_XposYnegZpos,
+				      const Standard_Boolean ComputedMode = Standard_True,
+				      const Standard_Boolean DefaultComputedMode = Standard_True );
 };
 
 #endif
