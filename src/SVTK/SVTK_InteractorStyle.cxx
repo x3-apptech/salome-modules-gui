@@ -224,7 +224,7 @@ void SVTK_InteractorStyle::RotateXY(int dx, int dy)
 
   if ( myCurrRotationPointType == SVTK::SetRotateGravity )
   {
-    vtkFloatingPointType aCenter[3];
+    double aCenter[3];
     if ( ComputeBBCenter(GetCurrentRenderer(),aCenter) ) 
     {
       myRotationPointX = aCenter[0];
@@ -511,7 +511,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
             if ( aVtkId >= 0 )
             {
               int anObjId = anActor->GetNodeObjId( aVtkId );
-              vtkFloatingPointType* aCoords = anActor->GetNodeCoord(anObjId);
+              double* aCoords = anActor->GetNodeCoord(anObjId);
               
               if (myCurrRotationPointType == SVTK::StartPointSelection) {
                 myCurrRotationPointType = SVTK::SetRotateSelected;
@@ -810,7 +810,7 @@ void SVTK_InteractorStyle::startPointSelection()
 
   if(GetCurrentRenderer() != NULL) {
     GetCurrentRenderer()->AddActor( myHighlightSelectionPointActor.GetPointer() );
-    vtkFloatingPointType aColor[3];
+    double aColor[3];
     GetCurrentRenderer()->GetBackground( aColor );
     myHighlightSelectionPointActor->GetProperty()->SetColor(1. - aColor[0],
                                                             1. - aColor[1],
@@ -829,7 +829,7 @@ void SVTK_InteractorStyle::startFocalPointSelection()
 
   if(GetCurrentRenderer() != NULL) {
     GetCurrentRenderer()->AddActor( myHighlightSelectionPointActor.GetPointer() );
-    vtkFloatingPointType aColor[3];
+    double aColor[3];
     GetCurrentRenderer()->GetBackground( aColor );
     myHighlightSelectionPointActor->GetProperty()->SetColor(1. - aColor[0],
                                                             1. - aColor[1],
@@ -1313,7 +1313,7 @@ void SVTK_InteractorStyle::TranslateView(int toX, int toY, int fromX, int fromY)
 
   vtkCamera *cam = GetCurrentRenderer()->GetActiveCamera();
   double viewFocus[4], focalDepth, viewPoint[3];
-  vtkFloatingPointType newPickPoint[4], oldPickPoint[4], motionVector[3];
+  double newPickPoint[4], oldPickPoint[4], motionVector[3];
   cam->GetFocalPoint(viewFocus);
 
   this->ComputeWorldToDisplay(viewFocus[0], viewFocus[1],
@@ -1414,7 +1414,7 @@ void SVTK_InteractorStyle::OnTimer()
   // check if bounding box was changed
   if ( GetCurrentRenderer() )
   {
-    vtkFloatingPointType aCurrBBCenter[3];
+    double aCurrBBCenter[3];
     if ( ComputeBBCenter(GetCurrentRenderer(),aCurrBBCenter) )
     {
       if ( !myBBFirstCheck )
@@ -1516,8 +1516,8 @@ void SVTK_InteractorStyle::ProcessEvents( vtkObject* object,
     vtkObject* anObject = reinterpret_cast<vtkObject*>( clientData );
     SVTK_InteractorStyle* self = dynamic_cast<SVTK_InteractorStyle*>( anObject );
     int aSpeedIncrement=self->ControllerIncrement()->Current();
-    vtkFloatingPointType aCenter[3];
-    vtkFloatingPointType* aSelectedPoint;
+    double aCenter[3];
+    double* aSelectedPoint;
     if ( self ) {
       switch ( event ) {
       case SVTK::SpaceMouseMoveEvent : 
@@ -1620,7 +1620,7 @@ void SVTK_InteractorStyle::ProcessEvents( vtkObject* object,
         }
         self->myPrevRotationPointType = self->myCurrRotationPointType;
         self->myCurrRotationPointType = SVTK::SetRotateSelected;
-        aSelectedPoint = (vtkFloatingPointType*)callData;
+        aSelectedPoint = (double*)callData;
         self->myRotationPointX = aSelectedPoint[0];
         self->myRotationPointY = aSelectedPoint[1];
         self->myRotationPointZ = aSelectedPoint[2];

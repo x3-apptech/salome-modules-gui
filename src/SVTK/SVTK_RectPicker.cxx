@@ -51,7 +51,7 @@ namespace
 {
   //----------------------------------------------------------------------------
   inline
-  vtkFloatingPointType
+  double
   GetZ(float* theZPtr,
        int theSelection[4],
        int theDX,
@@ -66,13 +66,13 @@ namespace
   int
   Check(float* theZPtr,
         int theSelection[4],
-        vtkFloatingPointType theTolerance,
-        vtkFloatingPointType theDZ,
+        double theTolerance,
+        double theDZ,
         int theDX,
         int theDY)
   {
     int aRet = 0;
-    vtkFloatingPointType aZ = -1.0;
+    double aZ = -1.0;
     if(theDX >= theSelection[0] && theDX <= theSelection[2] &&
        theDY >= theSelection[1] && theDY <= theSelection[3])
     {
@@ -97,7 +97,7 @@ namespace
                       vtkDataSet *theInput,
                       SVTK_RectPicker::TVectorIds& theVisibleIds,
                       SVTK_RectPicker::TVectorIds& theInVisibleIds,
-                      vtkFloatingPointType theTolerance)
+                      double theTolerance)
   {
     theVisibleIds.clear();
     theInVisibleIds.clear();
@@ -140,10 +140,10 @@ namespace
 
     for(vtkIdType aPntId = 0; aPntId < aNumPts; aPntId++){
       // perform conversion
-      vtkFloatingPointType aX[4] = {1.0, 1.0, 1.0, 1.0};
+      double aX[4] = {1.0, 1.0, 1.0, 1.0};
       theInput->GetPoint(aPntId,aX);
 
-      vtkFloatingPointType aView[4];
+      double aView[4];
       aMatrix->MultiplyPoint(aX,aView);
       if(aView[3] == 0.0)
         continue;
@@ -152,7 +152,7 @@ namespace
                                 aView[2]/aView[3]);
       theRenderer->ViewToDisplay();
 
-      vtkFloatingPointType aDX[3];
+      double aDX[3];
       theRenderer->GetDisplayPoint(aDX);
       
       // check whether visible and in selection window 
@@ -218,8 +218,8 @@ namespace
   //----------------------------------------------------------------------------
   inline
   void
-  GetCenter(const vtkFloatingPointType theBounds[6],
-            vtkFloatingPointType theCenter[3])
+  GetCenter(const double theBounds[6],
+            double theCenter[3])
   {
     theCenter[0] = (theBounds[1] + theBounds[0]) / 2.0;
     theCenter[1] = (theBounds[3] + theBounds[2]) / 2.0;
@@ -231,7 +231,7 @@ namespace
                      vtkRenderer *theRenderer,
                      vtkDataSet *theInput,
                      SVTK_RectPicker::TVectorIds& theVectorIds,
-                     vtkFloatingPointType theTolerance)
+                     double theTolerance)
   {
     theVectorIds.clear();
 
@@ -266,14 +266,14 @@ namespace
     for(vtkIdType aCellId = 0; aCellId < aNumCells; aCellId++){
       vtkCell* aCell = theInput->GetCell(aCellId);
 
-      vtkFloatingPointType aBounds[6];
+      double aBounds[6];
       aCell->GetBounds(aBounds);
 
-      vtkFloatingPointType aCenter[3];
+      double aCenter[3];
       GetCenter(aBounds,aCenter);
 
-      vtkFloatingPointType aView[4];
-      vtkFloatingPointType aX[4] = {aCenter[0], aCenter[1], aCenter[2], 1.0};
+      double aView[4];
+      double aX[4] = {aCenter[0], aCenter[1], aCenter[2], 1.0};
       aMatrix->MultiplyPoint(aX,aView);
 
       if(aView[3] == 0.0)
@@ -284,7 +284,7 @@ namespace
                                 aView[2]/aView[3]);
       theRenderer->ViewToDisplay();
 
-      vtkFloatingPointType aDX[3];
+      double aDX[3];
       theRenderer->GetDisplayPoint(aDX);
       
       // check whether visible and in selection window 
@@ -312,16 +312,16 @@ namespace
   //----------------------------------------------------------------------------
   void
   CalculatePickPosition(vtkRenderer *theRenderer,
-                        vtkFloatingPointType theSelectionX, 
-                        vtkFloatingPointType theSelectionY, 
-                        vtkFloatingPointType theSelectionZ,
-                        vtkFloatingPointType thePickPosition[3])
+                        double theSelectionX, 
+                        double theSelectionY, 
+                        double theSelectionZ,
+                        double thePickPosition[3])
   {
     // Convert the selection point into world coordinates.
     //
     theRenderer->SetDisplayPoint(theSelectionX, theSelectionY, theSelectionZ);
     theRenderer->DisplayToWorld();
-    vtkFloatingPointType* aWorldCoords = theRenderer->GetWorldPoint();
+    double* aWorldCoords = theRenderer->GetWorldPoint();
     if ( aWorldCoords[3] != 0.0 ) {
       for (int i=0; i < 3; i++) {
         thePickPosition[i] = aWorldCoords[i] / aWorldCoords[3];
@@ -345,9 +345,9 @@ SVTK_RectPicker
 
 int
 SVTK_RectPicker
-::Pick(vtkFloatingPointType, 
-       vtkFloatingPointType, 
-       vtkFloatingPointType, 
+::Pick(double, 
+       double, 
+       double, 
        vtkRenderer*)
 {
   return 0;
@@ -355,8 +355,8 @@ SVTK_RectPicker
 
 int
 SVTK_RectPicker
-::Pick(vtkFloatingPointType theSelection[3], 
-       vtkFloatingPointType theSelection2[3], 
+::Pick(double theSelection[3], 
+       double theSelection2[3], 
        vtkRenderer *theRenderer)
 {
   return Pick(theSelection[0], theSelection[1], theSelection[2], 
@@ -366,12 +366,12 @@ SVTK_RectPicker
 
 int 
 SVTK_RectPicker
-::Pick(vtkFloatingPointType theSelectionX, 
-       vtkFloatingPointType theSelectionY, 
-       vtkFloatingPointType theSelectionZ, 
-       vtkFloatingPointType theSelectionX2, 
-       vtkFloatingPointType theSelectionY2, 
-       vtkFloatingPointType theSelectionZ2,
+::Pick(double theSelectionX, 
+       double theSelectionY, 
+       double theSelectionZ, 
+       double theSelectionX2, 
+       double theSelectionY2, 
+       double theSelectionZ2,
        vtkRenderer *theRenderer)
 {
   //  Initialize picking process
@@ -385,14 +385,14 @@ SVTK_RectPicker
   //
   vtkCamera* aCamera = theRenderer->GetActiveCamera();
 
-  vtkFloatingPointType aCameraFP[4];
+  double aCameraFP[4];
   aCamera->GetFocalPoint(aCameraFP); 
   aCameraFP[3] = 1.0;
 
   theRenderer->SetWorldPoint(aCameraFP);
   theRenderer->WorldToDisplay();
-  vtkFloatingPointType* aDisplayCoords = theRenderer->GetDisplayPoint();
-  vtkFloatingPointType aSelectionZ = aDisplayCoords[2];
+  double* aDisplayCoords = theRenderer->GetDisplayPoint();
+  double aSelectionZ = aDisplayCoords[2];
 
   this->SelectionPoint[0] = theSelectionX;
   this->SelectionPoint[1] = theSelectionY;

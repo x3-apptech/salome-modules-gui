@@ -33,7 +33,6 @@
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
 
-vtkCxxRevisionMacro(VTKViewer_CellCenters, "$Revision$");
 vtkStandardNewMacro(VTKViewer_CellCenters);
 
 /*!

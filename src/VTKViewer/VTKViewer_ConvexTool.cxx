@@ -55,11 +55,11 @@ namespace
   struct TPolygon
   {
     TConnectivities myConnectivities;
-    vtkFloatingPointType myOrigin[3];
-    vtkFloatingPointType myNormal[3];
+    double myOrigin[3];
+    double myNormal[3];
     TPolygon(const TConnectivities& theConnectivities,
-             vtkFloatingPointType theOrigin[3],
-             vtkFloatingPointType theNormal[3]):
+             double theOrigin[3],
+             double theNormal[3]):
       myConnectivities(theConnectivities)
     {
       myOrigin[0] = theOrigin[0];
@@ -108,7 +108,7 @@ VTKViewer_Triangulator
   vtkIdType aNumPts;
   theInput->GetCellPoints(theCellId, aNumPts, myPointIds); 
   if ( aNumPts > 0 ) {
-    vtkFloatingPointType anAbsoluteCoord[3];
+    double anAbsoluteCoord[3];
     myPoints->SetNumberOfPoints(aNumPts);
     vtkPoints *anInputPoints = theInput->GetPoints();
     for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
@@ -140,14 +140,14 @@ VTKViewer_Triangulator
 
 
 //----------------------------------------------------------------------------
-vtkFloatingPointType 
+double 
 VTKViewer_Triangulator
 ::GetCellLength()
 {
-  vtkFloatingPointType aBounds[6];
+  double aBounds[6];
   myPoints->GetBounds(aBounds);
 
-  vtkFloatingPointType aCoordDiff[3];
+  double aCoordDiff[3];
   aCoordDiff[0] = (aBounds[1] - aBounds[0]);
   aCoordDiff[1] = (aBounds[3] - aBounds[2]);
   aCoordDiff[2] = (aBounds[5] - aBounds[4]);
@@ -210,9 +210,9 @@ VTKViewer_Triangulator
     return true;
 
   // To calculate the bary center of the cell
-  vtkFloatingPointType aCellCenter[3] = {0.0, 0.0, 0.0};
+  double aCellCenter[3] = {0.0, 0.0, 0.0};
   {
-    vtkFloatingPointType aPntCoord[3];
+    double aPntCoord[3];
     for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
       aPoints->GetPoint(GetPointId(aPntId),aPntCoord);
       if(DEBUG_TRIA_EXECUTE) cout<<"\taPntId = "<<GetPointId(aPntId)<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}\n";
@@ -225,11 +225,11 @@ VTKViewer_Triangulator
     aCellCenter[2] /= aNumPts;
   }
 
-  vtkFloatingPointType aCellLength = GetCellLength();
+  double aCellLength = GetCellLength();
   int aNumFaces = GetNumFaces();
 
-  static vtkFloatingPointType EPS = 1.0E-2;
-  vtkFloatingPointType aDistEps = aCellLength/3.0 * EPS;
+  static double EPS = 1.0E-2;
+  double aDistEps = aCellLength/3.0 * EPS;
   if(DEBUG_TRIA_EXECUTE) cout<<"\taNumFaces = "<<aNumFaces<<"; aCellLength = "<<aCellLength<<"; aDistEps = "<<aDistEps<<"\n";
 
   // To initialize set of points that belong to the cell
@@ -291,7 +291,7 @@ VTKViewer_Triangulator
     
     if(!anIsObserved){
       // To get coordinates of the points of the traingle face
-      vtkFloatingPointType aCoord[3][3];
+      double aCoord[3][3];
       aPoints->GetPoint(aNewPts[0],aCoord[0]);
       aPoints->GetPoint(aNewPts[1],aCoord[1]);
       aPoints->GetPoint(aNewPts[2],aCoord[2]);
@@ -307,11 +307,11 @@ VTKViewer_Triangulator
        
       
       */
-      vtkFloatingPointType aVector01[3] = { aCoord[1][0] - aCoord[0][0],
+      double aVector01[3] = { aCoord[1][0] - aCoord[0][0],
                                             aCoord[1][1] - aCoord[0][1],
                                             aCoord[1][2] - aCoord[0][2] };
       
-      vtkFloatingPointType aVector02[3] = { aCoord[2][0] - aCoord[0][0],
+      double aVector02[3] = { aCoord[2][0] - aCoord[0][0],
                                             aCoord[2][1] - aCoord[0][1],
                                             aCoord[2][2] - aCoord[0][2] };
       
@@ -319,34 +319,34 @@ VTKViewer_Triangulator
       vtkMath::Normalize(aVector02);
 
       // To calculate the normal for the triangle
-      vtkFloatingPointType aNormal[3];
+      double aNormal[3];
       vtkMath::Cross(aVector02,aVector01,aNormal);
       
       vtkMath::Normalize(aNormal);
       
       // To calculate what points belong to the plane
       // To calculate bounds of the point set
-      vtkFloatingPointType aCenter[3] = {0.0, 0.0, 0.0};
+      double aCenter[3] = {0.0, 0.0, 0.0};
       {
         TPointIds::const_iterator anIter = anInitialPointIds.begin();
         TPointIds::const_iterator anEndIter = anInitialPointIds.end();
         for(; anIter != anEndIter; anIter++){
-          vtkFloatingPointType aPntCoord[3];
+          double aPntCoord[3];
           vtkIdType aPntId = *anIter;
           aPoints->GetPoint(aPntId,aPntCoord);
           
-          vtkFloatingPointType aVector0Pnt[3] = { aPntCoord[0] - aCoord[0][0],
+          double aVector0Pnt[3] = { aPntCoord[0] - aCoord[0][0],
                                                   aPntCoord[1] - aCoord[0][1],
                                                   aPntCoord[2] - aCoord[0][2] };
 
           
           vtkMath::Normalize(aVector0Pnt);
           
-          vtkFloatingPointType aNormalPnt[3];
+          double aNormalPnt[3];
           // calculate aNormalPnt
           {
-            vtkFloatingPointType aCosPnt01 = vtkMath::Dot(aVector0Pnt,aVector01);
-            vtkFloatingPointType aCosPnt02 = vtkMath::Dot(aVector0Pnt,aVector02);
+            double aCosPnt01 = vtkMath::Dot(aVector0Pnt,aVector01);
+            double aCosPnt02 = vtkMath::Dot(aVector0Pnt,aVector02);
             if(aCosPnt01<-1)
               aCosPnt01 = -1;
             if(aCosPnt01>1)
@@ -356,9 +356,9 @@ VTKViewer_Triangulator
             if(aCosPnt02>1)
               aCosPnt02 = 1;
 
-            vtkFloatingPointType aDist01,aDist02;// deflection from Pi/3 angle (equilateral triangle)
-            vtkFloatingPointType aAngPnt01 = fabs(acos(aCosPnt01));
-            vtkFloatingPointType aAngPnt02 = fabs(acos(aCosPnt02));
+            double aDist01,aDist02;// deflection from Pi/3 angle (equilateral triangle)
+            double aAngPnt01 = fabs(acos(aCosPnt01));
+            double aAngPnt02 = fabs(acos(aCosPnt02));
 
             /*  check that triangle similar to equilateral triangle
                 AOC or COB ?
@@ -390,7 +390,7 @@ VTKViewer_Triangulator
           if(DEBUG_TRIA_EXECUTE)
             cout<<"\t\taPntId = "<<aPntId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"};";
           
-          vtkFloatingPointType aDist = vtkPlane::DistanceToPlane(aPntCoord,aNormal,aCoord[0]);
+          double aDist = vtkPlane::DistanceToPlane(aPntCoord,aNormal,aCoord[0]);
           if(DEBUG_TRIA_EXECUTE) cout<<": aDist = "<<aDist;
           if(fabs(aDist) < aDistEps){
             aPointIds.insert(aPntId);
@@ -409,12 +409,12 @@ VTKViewer_Triangulator
       }
       
       //To sinchronize orientation of the cell and its face
-      vtkFloatingPointType aVectorC[3] = { aCenter[0] - aCellCenter[0],
+      double aVectorC[3] = { aCenter[0] - aCellCenter[0],
                                            aCenter[1] - aCellCenter[1],
                                            aCenter[2] - aCellCenter[2] };
       vtkMath::Normalize(aVectorC);
       
-      vtkFloatingPointType aDot = vtkMath::Dot(aNormal,aVectorC);
+      double aDot = vtkMath::Dot(aNormal,aVectorC);
       if(DEBUG_TRIA_EXECUTE) {
         cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
         cout<<"; aVectorC = {"<<aVectorC[0]<<", "<<aVectorC[1]<<", "<<aVectorC[2]<<"}\n";
@@ -427,7 +427,7 @@ VTKViewer_Triangulator
       }
       
       // To calculate the primary direction for point set
-      vtkFloatingPointType aVector0[3] = { aCoord[0][0] - aCenter[0],
+      double aVector0[3] = { aCoord[0][0] - aCenter[0],
                                            aCoord[0][1] - aCenter[1],
                                            aCoord[0][2] - aCenter[2] };
       vtkMath::Normalize(aVector0);
@@ -480,26 +480,26 @@ VTKViewer_Triangulator
       
       // To sort the planar set of the points accrding to the angle
       {
-        typedef std::map<vtkFloatingPointType,vtkIdType> TSortedPointIds;
+        typedef std::map<double,vtkIdType> TSortedPointIds;
         TSortedPointIds aSortedPointIds;
         
         TPointIds::const_iterator anIter = aPointIds.begin();
         TPointIds::const_iterator anEndIter = aPointIds.end();
         for(; anIter != anEndIter; anIter++){
-          vtkFloatingPointType aPntCoord[3];
+          double aPntCoord[3];
           vtkIdType aPntId = *anIter;
           aPoints->GetPoint(aPntId,aPntCoord);
-          vtkFloatingPointType aVector[3] = { aPntCoord[0] - aCenter[0],
+          double aVector[3] = { aPntCoord[0] - aCenter[0],
                                               aPntCoord[1] - aCenter[1],
                                               aPntCoord[2] - aCenter[2] };
           vtkMath::Normalize(aVector);
           
-          vtkFloatingPointType aCross[3];
+          double aCross[3];
           vtkMath::Cross(aVector,aVector0,aCross);
-          vtkFloatingPointType aCr = vtkMath::Dot(aCross,aNormal);
+          double aCr = vtkMath::Dot(aCross,aNormal);
           bool aGreaterThanPi = aCr < 0;
-          vtkFloatingPointType aCosinus = vtkMath::Dot(aVector,aVector0);
-          vtkFloatingPointType anAngle = 0.0;
+          double aCosinus = vtkMath::Dot(aVector,aVector0);
+          double anAngle = 0.0;
           if(aCosinus >= 1.0){
             aCosinus = 1.0;
           } else if (aCosinus <= -1.0){
@@ -544,18 +544,18 @@ VTKViewer_Triangulator
     int aNbPolygons = aPolygons.size();
     for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
-      vtkFloatingPointType* aNormal = aPolygon.myNormal;
-      vtkFloatingPointType* anOrigin = aPolygon.myOrigin;
+      double* aNormal = aPolygon.myNormal;
+      double* anOrigin = aPolygon.myOrigin;
       if(DEBUG_TRIA_EXECUTE) {
         cout<<"\taPolygonId = "<<aPolygonId<<"\n";
         cout<<"\t\taNormal = {"<<aNormal[0]<<", "<<aNormal[1]<<", "<<aNormal[2]<<"}";
         cout<<"; anOrigin = {"<<anOrigin[0]<<", "<<anOrigin[1]<<", "<<anOrigin[2]<<"}\n";
       }
       for(vtkIdType aPntId = 0; aPntId < aNumPts; aPntId++){
-        vtkFloatingPointType aPntCoord[3];
+        double aPntCoord[3];
         vtkIdType anId = GetPointId(aPntId);
         aPoints->GetPoint(anId,aPntCoord);
-        vtkFloatingPointType aDist = vtkPlane::Evaluate(aNormal,anOrigin,aPntCoord);
+        double aDist = vtkPlane::Evaluate(aNormal,anOrigin,aPntCoord);
         if(DEBUG_TRIA_EXECUTE) cout<<"\t\taPntId = "<<anId<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}; aDist = "<<aDist<<"\n";
         if(aDist < -aDistEps)
           return false;
@@ -625,14 +625,14 @@ VTKViewer_OrderedTriangulator
   if ( aNumPts > 0 ) {
     myTriangulator->InitTriangulation(0.0, 1.0, 0.0, 1.0, 0.0, 1.0, aNumPts);
 
-    vtkFloatingPointType aBounds[6];
+    double aBounds[6];
     myPoints->GetBounds(aBounds);
-    vtkFloatingPointType xSize, ySize, zSize;
+    double xSize, ySize, zSize;
     xSize = aBounds[1] - aBounds[0];
     ySize = aBounds[3] - aBounds[2];
     zSize = aBounds[5] - aBounds[4];
-    vtkFloatingPointType anAbsoluteCoord[3];
-    vtkFloatingPointType aParamentrucCoord[3];
+    double anAbsoluteCoord[3];
+    double aParamentrucCoord[3];
     for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
       myPoints->GetPoint(aPntId, anAbsoluteCoord);
       aParamentrucCoord[0] = xSize==0. ? 0. : ((anAbsoluteCoord[0] - aBounds[0]) / xSize);
@@ -697,8 +697,8 @@ VTKViewer_DelaunayTriangulator
   myUnstructuredGrid->Allocate();
   myUnstructuredGrid->SetPoints(myPoints);
 
-  myDelaunay3D->SetInput(myUnstructuredGrid);
-  myGeometryFilter->SetInput(myDelaunay3D->GetOutput());
+  myDelaunay3D->SetInputData(myUnstructuredGrid);
+  myGeometryFilter->SetInputConnection(myDelaunay3D->GetOutputPort());
   myPolyData = myGeometryFilter->GetOutput();
 }
 

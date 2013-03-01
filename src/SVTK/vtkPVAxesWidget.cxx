@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "$Revision$");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -115,7 +114,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   vtkCoordinate *tcoord = vtkCoordinate::New();
   tcoord->SetCoordinateSystemToDisplay();
   vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
-  mapper->SetInput(this->Outline);
+  mapper->SetInputData(this->Outline);
   mapper->SetTransformCoordinate(tcoord);
   this->OutlineActor = vtkActor2D::New();
   this->OutlineActor->SetMapper(mapper);

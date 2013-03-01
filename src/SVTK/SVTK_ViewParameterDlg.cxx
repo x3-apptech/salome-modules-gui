@@ -414,12 +414,12 @@ void SVTK_ViewParameterDlg::ProcessEvents(vtkObject* vtkNotUsed(theObject),
                                           void* theCallData)
 {
   SVTK_ViewParameterDlg* self = reinterpret_cast<SVTK_ViewParameterDlg*>(theClientData);
-  vtkFloatingPointType* aCoord;
+  double* aCoord;
   switch ( theEvent ) {
   case SVTK::FocalPointChanged:
     if ( theCallData )
     {
-      aCoord = (vtkFloatingPointType*)theCallData;
+      aCoord = (double*)theCallData;
       self->myBusy = true;
       self->myFocalX->setText( QString::number(aCoord[0]) );
       self->myFocalY->setText( QString::number(aCoord[1]) );

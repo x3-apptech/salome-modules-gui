@@ -128,13 +128,13 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   bool IsInRect(vtkCell* theCell, 
                 const int left, const int top, 
                 const int right, const int bottom);
-  bool IsInRect(vtkFloatingPointType* thePoint, 
+  bool IsInRect(double* thePoint, 
                 const int left, const int top, 
                 const int right, const int bottom);
 
   int State;
-  vtkFloatingPointType MotionFactor;
-  vtkFloatingPointType RadianToDegree;                 // constant: for conv from deg to rad
+  double MotionFactor;
+  double RadianToDegree;                 // constant: for conv from deg to rad
   double myScale;
 
   VTKViewer_Actor *myPreViewActor, *myPreSelectionActor, *mySelectedActor;

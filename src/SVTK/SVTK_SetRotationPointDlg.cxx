@@ -211,7 +211,7 @@ SVTK_SetRotationPointDlg
                 void* theCallData)
 {
   SVTK_SetRotationPointDlg* self = reinterpret_cast<SVTK_SetRotationPointDlg*>(theClientData);
-  vtkFloatingPointType* aCoord = (vtkFloatingPointType*)theCallData;
+  double* aCoord = (double*)theCallData;
   
   switch ( theEvent ) {
   case SVTK::BBCenterChanged:
@@ -310,7 +310,7 @@ SVTK_SetRotationPointDlg
          &&
          ( myX->hasFocus() || myY->hasFocus() || myZ->hasFocus() ) )
       mySelectPoint->toggle();
-    vtkFloatingPointType aCenter[3] = {myX->text().toDouble(), 
+    double aCenter[3] = {myX->text().toDouble(), 
                                        myY->text().toDouble(), 
                                        myZ->text().toDouble()};
     myMainWindow->activateSetRotationSelected((void*)aCenter);

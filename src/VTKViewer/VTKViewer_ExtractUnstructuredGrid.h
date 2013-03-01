@@ -25,7 +25,7 @@
 
 #include "VTKViewer.h"
 
-#include <vtkUnstructuredGridToUnstructuredGridFilter.h>
+#include <vtkUnstructuredGridAlgorithm.h>
 
 #include <set>
 #include <map>
@@ -35,17 +35,17 @@
 #pragma warning ( disable:4251 )
 #endif
 
-/*! \class vtkUnstructuredGridToUnstructuredGridFilter
+/*! \class vtkUnstructuredGridAlgorithm
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation</a>
  */
-/*! \class vtkUnstructuredGridToUnstructuredGridFilter
+/*! \class vtkUnstructuredGridAlgorithm
  * \brief For more information see VTK documentation.
  */
-class VTKVIEWER_EXPORT VTKViewer_ExtractUnstructuredGrid : public vtkUnstructuredGridToUnstructuredGridFilter
+class VTKVIEWER_EXPORT VTKViewer_ExtractUnstructuredGrid : public vtkUnstructuredGridAlgorithm
 {
 public:
   //! VTK type macros.
-  vtkTypeMacro( VTKViewer_ExtractUnstructuredGrid, vtkUnstructuredGridToUnstructuredGridFilter );
+  vtkTypeMacro( VTKViewer_ExtractUnstructuredGrid, vtkUnstructuredGridAlgorithm );
 
   //! \brief Construct with all types of clipping turned off.
   static VTKViewer_ExtractUnstructuredGrid *New();
@@ -107,11 +107,7 @@ protected:
   VTKViewer_ExtractUnstructuredGrid();
   ~VTKViewer_ExtractUnstructuredGrid();
 
-  //! Main method, which calculate output
-  // not ported yet to the new executive-based pipeline architecture.
-  // see http://www.vtk.org/cgi-bin/viewcvs.cgi/Filtering/vtkUnstructuredGridToUnstructuredGridFilter.h?rev=1.19&view=log
-  // virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   EExtraction myExtractionMode;
   

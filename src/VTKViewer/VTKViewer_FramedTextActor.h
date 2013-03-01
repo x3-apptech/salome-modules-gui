@@ -40,7 +40,7 @@ public:
   enum LayoutType { Vertical = 0, Horizontal };
 
 public:
-  vtkTypeRevisionMacro(VTKViewer_FramedTextActor,vtkActor2D);
+  vtkTypeMacro(VTKViewer_FramedTextActor,vtkActor2D);
   static VTKViewer_FramedTextActor *New();
 
   virtual int                 RenderOpaqueGeometry(vtkViewport*);
@@ -64,31 +64,31 @@ public:
   void                        SetLayoutType(const int theType);
   int                         GetLayoutType() const;
 
-  void                        SetWorldPoint(const vtkFloatingPointType theWorldPoint[4]);
-  const vtkFloatingPointType* GetWorldPoint() const;
+  void                        SetWorldPoint(const double theWorldPoint[4]);
+  const double* GetWorldPoint() const;
 
-  void                        SetDistance(const vtkFloatingPointType theDistance);
-  vtkFloatingPointType        GetDistance() const;
+  void                        SetDistance(const double theDistance);
+  double        GetDistance() const;
 
   void                        SetMoveFrameFlag(const int flag);
   int                         GetMoveFrameFlag() const;
 
-  void                        SetForegroundColor(const vtkFloatingPointType r,
-                                                 const vtkFloatingPointType g,
-                                                 const vtkFloatingPointType b);
-  void                        GetForegroundColor(vtkFloatingPointType& r,
-                                                 vtkFloatingPointType& g,
-                                                 vtkFloatingPointType& b);
+  void                        SetForegroundColor(const double r,
+                                                 const double g,
+                                                 const double b);
+  void                        GetForegroundColor(double& r,
+                                                 double& g,
+                                                 double& b);
 
-  void                        SetBackgroundColor(const vtkFloatingPointType r,
-                                                 const vtkFloatingPointType g,
-                                                 const vtkFloatingPointType b);
-  void                        GetBackgroundColor(vtkFloatingPointType& r,
-                                                 vtkFloatingPointType& g,
-                                                 vtkFloatingPointType& b);
+  void                        SetBackgroundColor(const double r,
+                                                 const double g,
+                                                 const double b);
+  void                        GetBackgroundColor(double& r,
+                                                 double& g,
+                                                 double& b);
 
-  void                        SetTransparency(const vtkFloatingPointType theTransparency);
-  vtkFloatingPointType        GetTransparency() const;
+  void                        SetTransparency(const double theTransparency);
+  double        GetTransparency() const;
 
   void                        SetTextMargin(const int theMargin);
   int                         GetTextMargin() const;
@@ -114,9 +114,9 @@ protected:
   int                         myLayoutType;
   int                         myMoveFrameFlag;
 
-  vtkFloatingPointType        myWorldPoint[4];
-  vtkFloatingPointType        myDistance;
-  vtkFloatingPointType        myTransparency;
+  double        myWorldPoint[4];
+  double        myDistance;
+  double        myTransparency;
 
   int                         myTextMargin;
 

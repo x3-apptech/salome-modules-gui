@@ -691,12 +691,12 @@ SVTK_View
 ::SetTransparency(const Handle(SALOME_InteractiveObject)& theIObject, 
                   float theTrans)
 {
-  vtkFloatingPointType anOpacity = 1.0 - theTrans;
+  double anOpacity = 1.0 - theTrans;
   using namespace SVTK;
   VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
   ForEachIf<SALOME_Actor>(aCopy.GetActors(),
                           TIsSameIObject<SALOME_Actor>(theIObject),
-                          TSetFunction<SALOME_Actor,vtkFloatingPointType>
+                          TSetFunction<SALOME_Actor,double>
                           (&SALOME_Actor::SetOpacity,anOpacity));
 }
 
@@ -710,13 +710,13 @@ SVTK_View
 ::SetColor(const Handle(SALOME_InteractiveObject)& theIObject,
            const QColor& theColor) 
 {
-  vtkFloatingPointType aColor[3] = {theColor.red()/255., theColor.green()/255., theColor.blue()/255.};
+  double aColor[3] = {theColor.red()/255., theColor.green()/255., theColor.blue()/255.};
 
   using namespace SVTK;
   VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
   ForEachIf<SALOME_Actor>(aCopy.GetActors(),
                           TIsSameIObject<SALOME_Actor>(theIObject),
-                          TSetFunction<SALOME_Actor,const vtkFloatingPointType*>
+                          TSetFunction<SALOME_Actor,const double*>
                           (&SALOME_Actor::SetColor,aColor));
 }
 
@@ -735,7 +735,7 @@ SVTK_View
     Find<SALOME_Actor>(aCopy.GetActors(),
                        TIsSameIObject<SALOME_Actor>(theIObject));
   if(anActor){
-    vtkFloatingPointType r,g,b;
+    double r,g,b;
     anActor->GetColor(r,g,b);
     return QColor(int(r*255),int(g*255),int(b*255));
   }

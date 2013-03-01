@@ -323,7 +323,7 @@ echo testing VTK
 echo ---------------------------------------------
 echo
 
-CHECK_VTK
+CHECK_PYVTK
 
 echo
 echo ---------------------------------------------

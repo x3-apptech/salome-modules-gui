@@ -39,7 +39,7 @@
 class VTKVIEWER_EXPORT VTKViewer_CellCenters : public vtkCellCenters
 {
 public:
-  vtkTypeRevisionMacro(VTKViewer_CellCenters,vtkCellCenters);
+  vtkTypeMacro(VTKViewer_CellCenters,vtkCellCenters);
 
   static VTKViewer_CellCenters *New();
 

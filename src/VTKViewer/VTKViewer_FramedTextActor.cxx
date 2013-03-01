@@ -39,7 +39,6 @@
 #define OFFSET_SPACING 2
 
 //==================================================================
-vtkCxxRevisionMacro(VTKViewer_FramedTextActor, "$Revision$");
 vtkStandardNewMacro(VTKViewer_FramedTextActor);
 
 //==================================================================
@@ -53,7 +52,7 @@ VTKViewer_FramedTextActor::VTKViewer_FramedTextActor()
   myTransparency=0.;
   myBar = vtkPolyData::New();
   myBarMapper = vtkPolyDataMapper2D::New();
-  myBarMapper->SetInput(myBar);
+  myBarMapper->SetInputData(myBar);
   myBarActor = vtkActor2D::New();
   myBarActor->SetMapper(myBarMapper);
   myBarActor->GetProperty()->SetOpacity(1.-myTransparency);  
@@ -160,9 +159,9 @@ void VTKViewer_FramedTextActor::GetSize(vtkRenderer* theRenderer, int theSize[2]
 // function : SetForegroundColor
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetForegroundColor(const vtkFloatingPointType r,
-                                                   const vtkFloatingPointType g,
-                                                   const vtkFloatingPointType b)
+void VTKViewer_FramedTextActor::SetForegroundColor(const double r,
+                                                   const double g,
+                                                   const double b)
 {
   myTextProperty->SetColor(r, g, b);
   myTextMapper->GetTextProperty()->ShallowCopy(myTextProperty);
@@ -173,11 +172,11 @@ void VTKViewer_FramedTextActor::SetForegroundColor(const vtkFloatingPointType r,
 // function : GetForegroundColor
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::GetForegroundColor(vtkFloatingPointType& r,
-                                                   vtkFloatingPointType& g,
-                                                   vtkFloatingPointType& b)
+void VTKViewer_FramedTextActor::GetForegroundColor(double& r,
+                                                   double& g,
+                                                   double& b)
 {
-  vtkFloatingPointType aColor[3];
+  double aColor[3];
   myTextProperty->GetColor(aColor);
   r = aColor[0];
   g = aColor[1];
@@ -188,9 +187,9 @@ void VTKViewer_FramedTextActor::GetForegroundColor(vtkFloatingPointType& r,
 // function : SetBackgroundColor
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetBackgroundColor(const vtkFloatingPointType r,
-                                                   const vtkFloatingPointType g,
-                                                   const vtkFloatingPointType b)
+void VTKViewer_FramedTextActor::SetBackgroundColor(const double r,
+                                                   const double g,
+                                                   const double b)
 {
   myBarActor->GetProperty()->SetColor(r, g, b);
   Modified();
@@ -200,11 +199,11 @@ void VTKViewer_FramedTextActor::SetBackgroundColor(const vtkFloatingPointType r,
 // function : GetBackgroundColor
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::GetBackgroundColor(vtkFloatingPointType& r,
-                                                   vtkFloatingPointType& g,
-                                                   vtkFloatingPointType& b)
+void VTKViewer_FramedTextActor::GetBackgroundColor(double& r,
+                                                   double& g,
+                                                   double& b)
 {
-  vtkFloatingPointType aColor[3];
+  double aColor[3];
   myBarActor->GetProperty()->GetColor(aColor);
   r = aColor[0];
   g = aColor[1];
@@ -215,7 +214,7 @@ void VTKViewer_FramedTextActor::GetBackgroundColor(vtkFloatingPointType& r,
 // function : SetTransparency
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetTransparency(const vtkFloatingPointType theTransparency)
+void VTKViewer_FramedTextActor::SetTransparency(const double theTransparency)
 {
   if (theTransparency>=0.  && theTransparency<=1.){
     myTransparency=theTransparency;
@@ -228,7 +227,7 @@ void VTKViewer_FramedTextActor::SetTransparency(const vtkFloatingPointType theTr
 // function : GetTransparency
 // purpose  :
 //==================================================================
-vtkFloatingPointType VTKViewer_FramedTextActor::GetTransparency()const
+double VTKViewer_FramedTextActor::GetTransparency()const
 {
   return myTransparency;
 }
@@ -336,7 +335,7 @@ int VTKViewer_FramedTextActor::GetLayoutType() const
 // function : SetWorldPoint
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetWorldPoint(const vtkFloatingPointType theWorldPoint[4])
+void VTKViewer_FramedTextActor::SetWorldPoint(const double theWorldPoint[4])
 {
   for(int i = 0; i<4; ++i) {
     myWorldPoint[i] = theWorldPoint[i];
@@ -348,7 +347,7 @@ void VTKViewer_FramedTextActor::SetWorldPoint(const vtkFloatingPointType theWorl
 // function : GetWorldPoint
 // purpose  :
 //==================================================================
-const vtkFloatingPointType* VTKViewer_FramedTextActor::GetWorldPoint()const 
+const double* VTKViewer_FramedTextActor::GetWorldPoint()const 
 {
   return myWorldPoint;
 }
@@ -357,7 +356,7 @@ const vtkFloatingPointType* VTKViewer_FramedTextActor::GetWorldPoint()const
 // function : SetDistance
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetDistance(const vtkFloatingPointType theDistance)
+void VTKViewer_FramedTextActor::SetDistance(const double theDistance)
 {
   myDistance=theDistance;
 }
@@ -366,7 +365,7 @@ void VTKViewer_FramedTextActor::SetDistance(const vtkFloatingPointType theDistan
 // function : GetDistance
 // purpose  :
 //==================================================================
-vtkFloatingPointType VTKViewer_FramedTextActor::GetDistance()const
+double VTKViewer_FramedTextActor::GetDistance()const
 {
   return myDistance;
 }
@@ -457,10 +456,10 @@ VTKViewer_FramedTextActor
 
   int aTextMargin = GetTextMargin();
 
-  vtkFloatingPointType xMin = 0.0;
-  vtkFloatingPointType xMax = 0.0;
-  vtkFloatingPointType yMin = -aBarHeight/2 - aTextMargin;
-  vtkFloatingPointType yMax =  aBarHeight/2 + aTextMargin;
+  double xMin = 0.0;
+  double xMax = 0.0;
+  double yMin = -aBarHeight/2 - aTextMargin;
+  double yMax =  aBarHeight/2 + aTextMargin;
 
   int aHorizontalOffset = GetLayoutType() == Horizontal ? myHorizontalOffset : 0;
   int aVerticalOffset = GetLayoutType() == Vertical ? myVerticalOffset : 0;
@@ -470,10 +469,10 @@ VTKViewer_FramedTextActor
     theViewport->SetWorldPoint(myWorldPoint);
     theViewport->WorldToDisplay();
 
-    vtkFloatingPointType aSelectionPoint[3];
+    double aSelectionPoint[3];
     theViewport->GetDisplayPoint(aSelectionPoint);
-    vtkFloatingPointType u = aSelectionPoint[0];
-    vtkFloatingPointType v = aSelectionPoint[1] - myDistance;
+    double u = aSelectionPoint[0];
+    double v = aSelectionPoint[1] - myDistance;
     if(myMoveFrameFlag)
       v -= aBarHeight/2.;
     theViewport->ViewportToNormalizedViewport(u, v);
@@ -486,8 +485,8 @@ VTKViewer_FramedTextActor
   }
   else // except BelowPoint, only TopLeft and TopRight modes are supported at this moment
   {
-    vtkFloatingPointType x = 0, xOffset = aHorizontalOffset + aTextMargin + OFFSET_SPACING;
-    vtkFloatingPointType y = 0, yOffset = aVerticalOffset + aTextMargin + OFFSET_SPACING;
+    double x = 0, xOffset = aHorizontalOffset + aTextMargin + OFFSET_SPACING;
+    double y = 0, yOffset = aVerticalOffset + aTextMargin + OFFSET_SPACING;
 
     if( myModePosition == TopLeft )
     {
@@ -508,8 +507,8 @@ VTKViewer_FramedTextActor
       xMax =              aTextMargin;
     }
 
-    PositionCoordinate->SetValue(x / (vtkFloatingPointType)aViewPortWidth,
-                                 y / (vtkFloatingPointType)aViewPortHeight);
+    PositionCoordinate->SetValue(x / (double)aViewPortWidth,
+                                 y / (double)aViewPortHeight);
   }
 
   aPoints->SetPoint(0, xMin, yMax, 0.0);

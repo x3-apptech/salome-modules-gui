@@ -23,7 +23,6 @@
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(VTKViewer_DataSetMapper, "Revision$");
 vtkStandardNewMacro(VTKViewer_DataSetMapper);
 
 //----------------------------------------------------------------------------
@@ -48,7 +47,7 @@ void VTKViewer_DataSetMapper::Render(vtkRenderer *ren, vtkActor *act)
   {
     vtkDataSetSurfaceFilter *gf = vtkDataSetSurfaceFilter::New();
     VTKViewer_PolyDataMapper *pm = VTKViewer_PolyDataMapper::New();
-    pm->SetInput(gf->GetOutput());
+    pm->SetInputConnection(gf->GetOutputPort());
 
     pm->SetMarkerEnabled( this->MarkerEnabled );
     if( this->MarkerType != VTK::MT_USER )

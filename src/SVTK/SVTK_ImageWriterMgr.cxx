@@ -20,6 +20,7 @@
 #include "SVTK_ImageWriterMgr.h"
 #include "SVTK_ImageWriter.h"
 
+#include <vtkAlgorithm.h>
 #include <vtkImageData.h>
 
 #include <QSemaphore>
@@ -58,13 +59,15 @@ SVTK_ImageWriterMgr
 //----------------------------------------------------------------------------
 void
 SVTK_ImageWriterMgr
-::StartImageWriter(vtkImageData *theImageData,
+::StartImageWriter(vtkAlgorithm *theAlgorithm,
+                   vtkImageData *theImageData,
                    const std::string& theName,
                    const int theProgressive,
                    const int theQuality)
 {
   SVTK_ImageWriter *anImageWriter = 
     new SVTK_ImageWriter(mySemaphore,
+                         theAlgorithm,
                          theImageData,
                          theName,
                          theProgressive,

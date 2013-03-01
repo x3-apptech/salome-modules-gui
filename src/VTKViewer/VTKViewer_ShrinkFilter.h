@@ -41,7 +41,7 @@ class VTKVIEWER_EXPORT VTKViewer_ShrinkFilter : public vtkShrinkFilter
 public:
   /*!Create new instance of VTKViewer_ShrinkFilter.*/
   static VTKViewer_ShrinkFilter *New();
-  vtkTypeRevisionMacro(VTKViewer_ShrinkFilter, vtkShrinkFilter);
+  vtkTypeMacro(VTKViewer_ShrinkFilter, vtkShrinkFilter);
 
   void SetStoreMapping(int theStoreMapping);
   /*!Gets store mapping flag.*/

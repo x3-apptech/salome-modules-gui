@@ -88,7 +88,7 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   GetNodeObjId(int theVtkID);
 
   virtual
-  vtkFloatingPointType* 
+  double* 
   GetNodeCoord(int theObjID);
 
   virtual
@@ -111,12 +111,12 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 
   /** @name For shrink mamnagement purpose */
   //@{
-  vtkFloatingPointType
+  double
   GetShrinkFactor();
 
   virtual 
   void  
-  SetShrinkFactor(vtkFloatingPointType value);
+  SetShrinkFactor(double value);
 
   virtual
   void
@@ -156,12 +156,12 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   SetFeatureEdgesEnabled(bool theIsFeatureEdgesEnabled);
 
   virtual
-  vtkFloatingPointType
+  double
   GetFeatureEdgesAngle();
 
   virtual
   void
-  SetFeatureEdgesAngle(vtkFloatingPointType theAngle); 
+  SetFeatureEdgesAngle(double theAngle); 
 
   virtual
   void
@@ -194,11 +194,11 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   GetRepresentation();
 
   virtual
-  vtkFloatingPointType
+  double
   GetDefaultPointSize();
 
   virtual
-  vtkFloatingPointType
+  double
   GetDefaultLineWidth();
 
   bool
@@ -239,8 +239,8 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   virtual void SetQuadraticArcMode(bool theFlag);
   virtual bool GetQuadraticArcMode();
 
-  virtual void SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
-  virtual vtkFloatingPointType GetQuadraticArcAngle();
+  virtual void SetQuadraticArcAngle(double theMaxAngle);
+  virtual double GetQuadraticArcAngle();
 
   virtual
   void
@@ -278,13 +278,13 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   bool myIsFeatureEdgesEnabled;
 
   bool myIsResolveCoincidentTopology;
-  vtkFloatingPointType myPolygonOffsetFactor;
-  vtkFloatingPointType myPolygonOffsetUnits;
+  double myPolygonOffsetFactor;
+  double myPolygonOffsetUnits;
 
-  void SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-                                  vtkFloatingPointType units);
-  void GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-                                  vtkFloatingPointType& units);
+  void SetPolygonOffsetParameters(double factor, 
+                                  double units);
+  void GetPolygonOffsetParameters(double& factor, 
+                                  double& units);
 
   SVTK_DeviceActor();
   ~SVTK_DeviceActor();

@@ -44,7 +44,6 @@
   #endif
 #endif
 
-vtkCxxRevisionMacro(VTKViewer_AppendFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_AppendFilter);
 
 VTKViewer_AppendFilter

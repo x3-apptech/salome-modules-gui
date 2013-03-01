@@ -84,13 +84,13 @@ namespace
   {
     int anEdgeId = 0;
     if (vtkCell* aPickedCell = theActor->GetElemCell(theObjId)) {
-      vtkFloatingPointType aPickPosition[3];
+      double aPickPosition[3];
       thePicker->GetPickPosition(aPickPosition);
-      vtkFloatingPointType aMinDist = 1000000.0, aDist = 0;
+      double aMinDist = 1000000.0, aDist = 0;
       for (int i = 0, iEnd = aPickedCell->GetNumberOfEdges(); i < iEnd; i++){
         if(vtkLine* aLine = vtkLine::SafeDownCast(aPickedCell->GetEdge(i))){
           int subId;  
-          vtkFloatingPointType pcoords[3], closestPoint[3], weights[3];
+          double pcoords[3], closestPoint[3], weights[3];
           aLine->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
           if (aDist < aMinDist) {
             aMinDist = aDist;
@@ -185,7 +185,7 @@ SALOME_Actor
   myOutline->Delete();
 
   vtkPolyDataMapper* anOutlineMapper = vtkPolyDataMapper::New();
-  anOutlineMapper->SetInput(myOutline->GetOutput());
+  anOutlineMapper->SetInputConnection(myOutline->GetOutputPort());
 
   myOutlineActor->Delete();
   myOutlineActor->SetMapper( anOutlineMapper );
@@ -212,7 +212,7 @@ SALOME_Actor
                                   aForegroundColor.greenF(),
                                   aForegroundColor.blueF());
 
-  vtkFloatingPointType aGroupNamesTransparency = 0.5;
+  double aGroupNamesTransparency = 0.5;
   aGroupNamesTransparency = aResourceMgr->doubleValue( "VTKViewer", "group_names_transparency", aGroupNamesTransparency );
   myNameActor->SetTransparency(aGroupNamesTransparency);
 }
@@ -357,9 +357,9 @@ SALOME_Actor
 */
 void
 SALOME_Actor
-::SetPosition(vtkFloatingPointType _arg1, 
-              vtkFloatingPointType _arg2, 
-              vtkFloatingPointType _arg3)
+::SetPosition(double _arg1, 
+              double _arg2, 
+              double _arg3)
 {
   Superclass::SetPosition(_arg1,_arg2,_arg3);
 
@@ -373,7 +373,7 @@ SALOME_Actor
 */
 void
 SALOME_Actor
-::SetPosition(vtkFloatingPointType _arg[3])
+::SetPosition(double _arg[3])
 {
   SetPosition(_arg[0],_arg[1],_arg[2]);
 }
@@ -471,10 +471,11 @@ void
 SALOME_Actor
 ::highlight(bool theIsHighlight)
 {
-  vtkFloatingPointType aBounds[6];
+  double aBounds[6];
   vtkDataSet * aDataSet = GetHighlightedDataSet();
   aDataSet->GetBounds(aBounds);
   myOutline->SetBounds(aBounds);
+  myOutline->Update();
   myOutlineActor->SetVisibility( GetVisibility() && theIsHighlight );
 
   Superclass::highlight(theIsHighlight);
@@ -504,9 +505,9 @@ SALOME_Actor
 
   myPreHighlightActor->SetMarkerEnabled( aSelectionMode == NodeSelection );
 
-  vtkFloatingPointType x = theSelectionEvent->myX;
-  vtkFloatingPointType y = theSelectionEvent->myY;
-  vtkFloatingPointType z = 0.0;
+  double x = theSelectionEvent->myX;
+  double y = theSelectionEvent->myY;
+  double z = 0.0;
 
   if( !theIsHighlight ) {
     if ( hasIO() ) {
@@ -664,9 +665,9 @@ SALOME_Actor
 
   myHighlightActor->SetMarkerEnabled( aSelectionMode == NodeSelection );
 
-  vtkFloatingPointType x = theSelectionEvent->myX;
-  vtkFloatingPointType y = theSelectionEvent->myY;
-  vtkFloatingPointType z = 0.0;
+  double x = theSelectionEvent->myX;
+  double y = theSelectionEvent->myY;
+  double z = 0.0;
 
   if( !theSelectionEvent->myIsRectangle ) {
     switch(aSelectionMode){
@@ -740,16 +741,16 @@ SALOME_Actor
       break;
     }
   }else{
-    vtkFloatingPointType xLast = theSelectionEvent->myLastX;
-    vtkFloatingPointType yLast = theSelectionEvent->myLastY;
-    vtkFloatingPointType zLast = 0.0;
+    double xLast = theSelectionEvent->myLastX;
+    double yLast = theSelectionEvent->myLastY;
+    double zLast = 0.0;
 
-    vtkFloatingPointType x1 = x < xLast ? x : xLast;
-    vtkFloatingPointType y1 = y < yLast ? y : yLast;
-    vtkFloatingPointType z1 = z < zLast ? z : zLast;
-    vtkFloatingPointType x2 = x > xLast ? x : xLast;
-    vtkFloatingPointType y2 = y > yLast ? y : yLast;
-    vtkFloatingPointType z2 = z > zLast ? z : zLast;
+    double x1 = x < xLast ? x : xLast;
+    double y1 = y < yLast ? y : yLast;
+    double z1 = z < zLast ? z : zLast;
+    double x2 = x > xLast ? x : xLast;
+    double y2 = y > yLast ? y : yLast;
+    double z2 = z > zLast ? z : zLast;
 
     switch(aSelectionMode){
     case NodeSelection: {
@@ -785,8 +786,8 @@ SALOME_Actor
     }
     case ActorSelection :
     {
-      vtkFloatingPointType aPnt[3];
-      vtkFloatingPointType* aBounds = GetBounds();
+      double aPnt[3];
+      double* aBounds = GetBounds();
 
       bool anIsPicked = true;
       for( int i = 0; i <= 1; i++ ) {

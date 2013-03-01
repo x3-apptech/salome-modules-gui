@@ -24,6 +24,7 @@
 #include <vector>
 
 class QString;
+class vtkAlgorithm;
 class vtkImageData;
 class SVTK_ImageWriter;
 class QSemaphore;
@@ -35,7 +36,8 @@ class SVTK_ImageWriterMgr
   ~SVTK_ImageWriterMgr();
   
   void
-  StartImageWriter(vtkImageData *theImageData,
+  StartImageWriter(vtkAlgorithm *theAlgorithm,
+                   vtkImageData *theImageData,
                    const std::string& theName,
                    const int theProgressive,
                    const int theQuality);

@@ -144,7 +144,7 @@ void VTKViewer_RenderWindow::wheelEvent(QWheelEvent* event)
 void VTKViewer_RenderWindow::onChangeBackgroundColor()
 {
   //float red, green, blue;
-  vtkFloatingPointType backint[3];
+  double backint[3];
 
   vtkRendererCollection * theRenderers = myRW->GetRenderers();
   theRenderers->InitTraversal();

@@ -49,8 +49,8 @@
 #include <vtkMapper.h>
 #include <vtkDataSet.h>
 
-static vtkFloatingPointType OFF_UPDATE_RATE = 0.00001;
-static vtkFloatingPointType FLOAT_TOLERANCE = 1.0 / VTK_LARGE_FLOAT;
+static double OFF_UPDATE_RATE = 0.00001;
+static double FLOAT_TOLERANCE = 1.0 / VTK_LARGE_FLOAT;
 
 namespace
 {
@@ -60,10 +60,10 @@ namespace
   GetUpdateRate(SVTK_RenderWindowInteractor* theRWInteractor)
   {
     if(vtkRenderer *aRenderer = theRWInteractor->getRenderer()){
-      vtkFloatingPointType aLastRenderTimeInSeconds = aRenderer->GetLastRenderTimeInSeconds();
+      double aLastRenderTimeInSeconds = aRenderer->GetLastRenderTimeInSeconds();
       if(aLastRenderTimeInSeconds > FLOAT_TOLERANCE){
         std::ostringstream aStr;
-        vtkFloatingPointType aFPS = 1.0 / aLastRenderTimeInSeconds;
+        double aFPS = 1.0 / aLastRenderTimeInSeconds;
         aStr<<aFPS;
         return QString(aStr.str().c_str());
       }
@@ -75,8 +75,8 @@ namespace
   //----------------------------------------------------------------------------
   struct TRenderTimeMultiplier
   {
-    vtkFloatingPointType myVTKMultiplier;
-    vtkFloatingPointType mySALOMEMultiplier;
+    double myVTKMultiplier;
+    double mySALOMEMultiplier;
 
     TRenderTimeMultiplier():
       myVTKMultiplier(0.0),
@@ -97,9 +97,9 @@ namespace
 
   //----------------------------------------------------------------------------
   inline
-  vtkFloatingPointType 
+  double 
   AdjustUpdateRate(SVTK_RenderWindowInteractor* theRWInteractor,
-                   vtkFloatingPointType theUpdateRate)
+                   double theUpdateRate)
   {
     if(vtkRenderer *aRenderer = theRWInteractor->getRenderer()){
       VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
@@ -332,7 +332,7 @@ SVTK_UpdateRateDlg
 {
   vtkRenderWindowInteractor* aRWI = myRWInteractor->GetDevice();
 
-  vtkFloatingPointType anUpdateRate;
+  double anUpdateRate;
   if(myIsEnableUpdateRateGroupBox->isChecked()){
     anUpdateRate = AdjustUpdateRate(myRWInteractor,myDesiredUpdateRateSblSpinBox->value());
     aRWI->SetDesiredUpdateRate(anUpdateRate);

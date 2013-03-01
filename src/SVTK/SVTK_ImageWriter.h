@@ -23,6 +23,7 @@
 #include <QThread>
 #include <string>
 
+class vtkAlgorithm;
 class vtkImageData;
 class QSemaphore;
 
@@ -30,6 +31,7 @@ class SVTK_ImageWriter : public QThread
 {
 public:
   SVTK_ImageWriter(QSemaphore* theSemaphore,
+                   vtkAlgorithm* theAlgorithm,
                    vtkImageData* theImageData,
                    const std::string& theName,
                    int theProgressive,
@@ -44,6 +46,7 @@ public:
   
  protected:
   QSemaphore* mySemaphore;
+  vtkAlgorithm *myAlgorithm;
   vtkImageData *myImageData;
   std::string myName;
   int   myProgressive;

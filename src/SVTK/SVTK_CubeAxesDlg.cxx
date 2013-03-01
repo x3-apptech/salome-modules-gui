@@ -89,7 +89,7 @@ bool SVTK_AxisWidget::ReadData(vtkAxisActor2D* theActor)
   vtkTextProperty* aTitleProp = theActor->GetTitleTextProperty();
   if (aTitleProp !=0)
   {
-    vtkFloatingPointType c[ 3 ];
+    double c[ 3 ];
     aTitleProp->GetColor(c);
     aTitleColor.setRgb((int)(c[ 0 ] * 255), (int)(c[ 1 ] * 255), (int)(c[ 2 ] * 255));
     aTitleFontFamily = aTitleProp->GetFontFamily();
@@ -117,7 +117,7 @@ bool SVTK_AxisWidget::ReadData(vtkAxisActor2D* theActor)
   vtkTextProperty* aLabelsProp = theActor->GetLabelTextProperty();
   if (aLabelsProp !=0)
   {
-    vtkFloatingPointType c[ 3 ];
+    double c[ 3 ];
     aLabelsProp->GetColor(c);
     aLabelsColor.setRgb((int)(c[ 0 ] * 255), (int)(c[ 1 ] * 255), (int)(c[ 2 ] * 255));
     aLabelsFontFamily = aLabelsProp->GetFontFamily();

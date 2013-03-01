@@ -216,10 +216,10 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   SVTK_CubeAxesActor2D* GetCubeAxes();
 
   //! Redirect the request to #SVTK_Renderer::GetTrihedronSize
-  vtkFloatingPointType GetTrihedronSize() const;
+  double GetTrihedronSize() const;
 
   //! Redirect the request to #SVTK_Renderer::SetTrihedronSize
-  virtual void SetTrihedronSize( const vtkFloatingPointType, const bool = true );
+  virtual void SetTrihedronSize( const double, const bool = true );
 
   //! Set incremental speed
   virtual void SetIncrementalSpeed( const int, const int = 0 );

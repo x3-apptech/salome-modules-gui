@@ -157,7 +157,7 @@ SVTK_Actor
     aPoints->SetNumberOfPoints(aNbOfParts);
     for(vtkIdType i = 0; i < aNbOfParts; i++){
       int aPartId = theMapIndex( i+1 );
-      if(vtkFloatingPointType* aCoord = theMapActor->GetNodeCoord(aPartId)){
+      if(double* aCoord = theMapActor->GetNodeCoord(aPartId)){
         aPoints->SetPoint(i,aCoord);
         // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
         // from ParaView-3.4.0 compiled on 64-bit Debian platform with VTK_USE_64BIT_IDS = ON

@@ -94,7 +94,7 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
   vtkIdType 
   GetPointId(vtkIdType thePointId);
 
-  vtkFloatingPointType 
+  double 
   GetCellLength();
 
   void 

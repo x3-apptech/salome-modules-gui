@@ -90,7 +90,6 @@
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-vtkCxxRevisionMacro(VTKViewer_GeometryFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_GeometryFilter);
 
 VTKViewer_GeometryFilter
@@ -184,13 +183,13 @@ VTKViewer_GeometryFilter
   char *cellVis;
   vtkIdType newCellId;
   int faceId, *faceVerts, numFacePts;
-  vtkFloatingPointType *x;
+  double *x;
   vtkIdType PixelConvert[4];
   // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
   // from ParaView-3.4.0 compiled on 64-bit Debian platform with VTK_USE_64BIT_IDS = ON
   vtkIdType aNewPts[VTK_CELL_SIZE];
   // ghost cell stuff
-  unsigned char  updateLevel = (unsigned char)(output->GetUpdateGhostLevel());
+  unsigned char  updateLevel = (unsigned char)(GetUpdateGhostLevel());
   unsigned char  *cellGhostLevels = 0;
 
   PixelConvert[0] = 0;
@@ -1525,7 +1524,7 @@ bool VTKViewer_GeometryFilter::GetQuadraticArcMode() const
   return myIsBuildArc;
 }
 
-void VTKViewer_GeometryFilter::SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle)
+void VTKViewer_GeometryFilter::SetQuadraticArcAngle(double theMaxAngle)
 {
   if(myMaxArcAngle != theMaxAngle) {
     myMaxArcAngle = theMaxAngle;
@@ -1533,7 +1532,7 @@ void VTKViewer_GeometryFilter::SetQuadraticArcAngle(vtkFloatingPointType theMaxA
   }
 }
 
-vtkFloatingPointType VTKViewer_GeometryFilter:: GetQuadraticArcAngle() const
+double VTKViewer_GeometryFilter:: GetQuadraticArcAngle() const
 {
   return myMaxArcAngle;
 }

@@ -93,31 +93,31 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //! Change opacity
   virtual
   void
-  SetOpacity(vtkFloatingPointType theOpacity);
+  SetOpacity(double theOpacity);
 
   //! Get current opacity
   virtual
-  vtkFloatingPointType 
+  double 
   GetOpacity();
 
   //! Change color
   virtual
   void
-  SetColor(vtkFloatingPointType r,
-           vtkFloatingPointType g,
-           vtkFloatingPointType b);
+  SetColor(double r,
+           double g,
+           double b);
 
   //! Get current color
   virtual
   void
-  GetColor(vtkFloatingPointType& r,
-           vtkFloatingPointType& g,
-           vtkFloatingPointType& b);
+  GetColor(double& r,
+           double& g,
+           double& b);
 
   //! Change color
   virtual
   void
-  SetColor(const vtkFloatingPointType theRGB[3]);
+  SetColor(const double theRGB[3]);
 
   //! Change material
   virtual
@@ -143,7 +143,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   //! Get coordinates of a node for given object index
   virtual
-  vtkFloatingPointType*
+  double*
   GetNodeCoord(int theObjID);
 
   //! Maps VTK index of a cell to corresponding object index
@@ -219,12 +219,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
     
   //! To calcualte current bounding box
   virtual
-  vtkFloatingPointType* 
+  double* 
   GetBounds();
 
   //! To calcualte current bounding box
   void
-  GetBounds(vtkFloatingPointType bounds[6]);
+  GetBounds(double bounds[6]);
 
   //----------------------------------------------------------------------------
   virtual
@@ -237,7 +237,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   virtual
   void
-  SetSize( const vtkFloatingPointType );
+  SetSize( const double );
 
   virtual
   void 
@@ -250,13 +250,13 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   //! Set ResolveCoincidentTopology parameters
   void
-  SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-                             vtkFloatingPointType units);
+  SetPolygonOffsetParameters(double factor, 
+                             double units);
 
   //! Get current ResolveCoincidentTopology parameters
   void
-  GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-                             vtkFloatingPointType& units);
+  GetPolygonOffsetParameters(double& factor, 
+                             double& units);
 
   virtual
   void
@@ -265,7 +265,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //----------------------------------------------------------------------------
   //! Get current shrink factor
   virtual
-  vtkFloatingPointType
+  double
   GetShrinkFactor();
 
   //! Is the actor is shrunkable
@@ -339,8 +339,8 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   virtual void SetQuadraticArcMode(bool theFlag);
   virtual bool GetQuadraticArcMode() const;
 
-  virtual void   SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
-  virtual vtkFloatingPointType GetQuadraticArcAngle() const;
+  virtual void   SetQuadraticArcAngle(double theMaxAngle);
+  virtual double GetQuadraticArcAngle() const;
 
   //----------------------------------------------------------------------------
   //! Return pointer to the dataset, which used to calculation of the bounding box of the actor
@@ -349,12 +349,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
  protected:
   //----------------------------------------------------------------------------
   bool myIsResolveCoincidentTopology;
-  vtkFloatingPointType myPolygonOffsetFactor;
-  vtkFloatingPointType myPolygonOffsetUnits;
+  double myPolygonOffsetFactor;
+  double myPolygonOffsetUnits;
 
   std::string myName;
 
-  vtkFloatingPointType myOpacity;
+  double myOpacity;
   int myDisplayMode;
   bool myIsInfinite;
 

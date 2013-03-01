@@ -354,7 +354,7 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   vtkSmartPointer<SVTK_Actor>     myHighlightSelectionPointActor;
   vtkSmartPointer<vtkPointPicker> myPointPicker;
   
-  vtkFloatingPointType            myBBCenter[3];
+  double            myBBCenter[3];
   bool                            myBBFirstCheck;
 
   QRubberBand*                    myRectBand; //!< selection rectangle rubber band

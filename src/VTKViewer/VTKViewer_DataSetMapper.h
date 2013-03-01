@@ -29,7 +29,7 @@ class VTKVIEWER_EXPORT VTKViewer_DataSetMapper : public vtkDataSetMapper
 {
 public:
   static VTKViewer_DataSetMapper *New();
-  vtkTypeRevisionMacro(VTKViewer_DataSetMapper,vtkDataSetMapper);
+  vtkTypeMacro(VTKViewer_DataSetMapper,vtkDataSetMapper);
 
   //! Set point marker enabled
   void SetMarkerEnabled( bool );

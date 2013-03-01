@@ -80,7 +80,7 @@ protected:
 
   //----------------------------------------------------------------------------
   // Priority at which events are processed
-  vtkFloatingPointType myPriority;
+  double myPriority;
 
   // Used to process events
   vtkSmartPointer<vtkCallbackCommand> myEventCallbackCommand;

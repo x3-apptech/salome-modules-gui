@@ -38,6 +38,5 @@ libSalomePy_la_CPPFLAGS = $(QT_INCLUDES) $(PYTHON_INCLUDES) $(VTK_INCLUDES) \
 	-I$(srcdir)/../STD -I$(srcdir)/../VTKViewer -I$(srcdir)/../OBJECT \
 	@CAS_CPPFLAGS@ 
 
-libSalomePy_la_LDFLAGS = $(PYTHON_LIBS) $(QT_MT_LIBS) $(VTK_LIBS) $(OGL_LIBS) \
-	../LightApp/libLightApp.la \
-	-lvtkCommonPythonD -lvtkGraphicsPythonD -lvtkImagingPythonD -lvtkPythonCore
+libSalomePy_la_LDFLAGS = $(PYTHON_LIBS) $(QT_MT_LIBS) $(VTK_LIBS) ${VTK_PYLIBS} $(OGL_LIBS) \
+	../LightApp/libLightApp.la

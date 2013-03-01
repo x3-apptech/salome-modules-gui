@@ -25,6 +25,8 @@
 #include <map>
 #include <vector>
 
+#include <vtkType.h>
+
 class vtkCell;
 class vtkDataArray;
 class vtkPoints;
@@ -45,7 +47,7 @@ vtkIdType Build1DArc(vtkIdType cellId,
                      vtkUnstructuredGrid* input, 
                      vtkPolyData *output,
                      vtkIdType *pts, 
-                     vtkFloatingPointType myMaxArcAngle);
+                     double myMaxArcAngle);
 
 Pnt CreatePnt(vtkCell* cell,
               vtkDataArray* scalars,

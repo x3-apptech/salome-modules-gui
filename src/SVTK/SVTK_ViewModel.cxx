@@ -193,7 +193,7 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
 /*!
   \return trihedron size
 */
-vtkFloatingPointType SVTK_Viewer::trihedronSize() const
+double SVTK_Viewer::trihedronSize() const
 {
   return myTrihedronSize;
 }
@@ -211,7 +211,7 @@ bool SVTK_Viewer::trihedronRelative() const
   \param theSize - new size
   \param theRelative - new relativeness
 */
-void SVTK_Viewer::setTrihedronSize( const vtkFloatingPointType theSize, const bool theRelative )
+void SVTK_Viewer::setTrihedronSize( const double theSize, const bool theRelative )
 {
   myTrihedronSize = theSize;
   myTrihedronRelative = theRelative;

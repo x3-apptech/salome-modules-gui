@@ -35,7 +35,6 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 
-vtkCxxRevisionMacro(VTKViewer_ShrinkFilter, "$Revision$");
 vtkStandardNewMacro(VTKViewer_ShrinkFilter);
 
 /*!Constructor. Sets store mapping to zero.*/
@@ -68,11 +67,11 @@ int VTKViewer_ShrinkFilter::RequestData(
   int i, j, numIds, abort=0;
   vtkIdType cellId, numCells, numPts;
   vtkIdType oldId, newId;
-  vtkFloatingPointType center[3], *p, pt[3];
+  double center[3], *p, pt[3];
   vtkPointData *pd, *outPD;;
   vtkIdList *ptIds, *newPtIds;
   vtkIdType tenth;
-  vtkFloatingPointType decimal;
+  double decimal;
 
   vtkDebugMacro(<<"Shrinking cells");
 

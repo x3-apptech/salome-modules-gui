@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SVTK.h"
 #include "vtkProp3D.h"
 
+#include <vtkVersion.h>
+
 class vtkRenderer;
 class vtkPropCollection;
 class vtkMapper;
@@ -60,7 +62,7 @@ class SVTK_EXPORT vtkPVAxesActor : public vtkProp3D
 {
 public:
   static vtkPVAxesActor *New();
-  vtkTypeRevisionMacro(vtkPVAxesActor,vtkProp3D);
+  vtkTypeMacro(vtkPVAxesActor,vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 
@@ -73,7 +75,7 @@ public:
   // Description:
   // Support the standard render methods.
   virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-#if (VTK_MINOR_VERSION>=2)
+#if (VTK_MAJOR_VERSION>5 || VTK_MINOR_VERSION>=2)
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport); // porting to VTK 5.0.x
   virtual int HasTranslucentPolygonalGeometry();                         // porting to VTK 5.0.x
 #else

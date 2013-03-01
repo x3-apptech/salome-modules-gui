@@ -434,7 +434,7 @@ void VTKViewer_ViewWindow::onResetView()
   ::ResetCamera(myRenderer,true);  
   if(aTriedronIsVisible) myTrihedron->VisibilityOn();
   else myTrihedron->VisibilityOff();
-  static vtkFloatingPointType aCoeff = 3.0;
+  static double aCoeff = 3.0;
   aCamera->SetParallelScale(aCoeff*aCamera->GetParallelScale());
   Repaint();
 }
@@ -634,11 +634,11 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
   int aVisibleNum = myTrihedron->GetVisibleActorCount(myRenderer);
   if(aVisibleNum){
     // calculating diagonal of visible props of the renderer
-    vtkFloatingPointType bnd[6];
+    double bnd[6];
     myTrihedron->VisibilityOff();
     ::ComputeVisiblePropBounds(myRenderer,bnd);
     myTrihedron->VisibilityOn();
-    vtkFloatingPointType aLength = 0;
+    double aLength = 0;
     static bool CalcByDiag = false;
     if(CalcByDiag){
       aLength = sqrt((bnd[1]-bnd[0])*(bnd[1]-bnd[0])+
@@ -650,13 +650,13 @@ void VTKViewer_ViewWindow::onAdjustTrihedron(){
       aLength = qMax((bnd[5]-bnd[4]),aLength);
     }
    
-    static vtkFloatingPointType aSizeInPercents = 105;
+    static double aSizeInPercents = 105;
     QString aSetting;// = SUIT_CONFIG->getSetting("Viewer:TrihedronSize");
     if(!aSetting.isEmpty()) aSizeInPercents = aSetting.toFloat();
 
-    static vtkFloatingPointType EPS_SIZE = 5.0E-3;
-    vtkFloatingPointType aSize = myTrihedron->GetSize();
-    vtkFloatingPointType aNewSize = aLength*aSizeInPercents/100.0;
+    static double EPS_SIZE = 5.0E-3;
+    double aSize = myTrihedron->GetSize();
+    double aNewSize = aLength*aSizeInPercents/100.0;
     // if the new trihedron size have sufficient difference, then apply the value
     if(fabs(aNewSize-aSize) > aSize*EPS_SIZE || fabs(aNewSize-aSize) > aNewSize*EPS_SIZE){
       myTrihedron->SetSize(aNewSize);

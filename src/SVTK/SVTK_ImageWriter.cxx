@@ -21,6 +21,7 @@
 
 #include <QSemaphore>
 
+#include <vtkAlgorithm.h>
 #include <vtkImageData.h>
 #include <vtkImageClip.h>
 #include <vtkJPEGWriter.h>
@@ -36,11 +37,13 @@ static int MYDEBUG = 0;
 //----------------------------------------------------------------------------
 SVTK_ImageWriter
 ::SVTK_ImageWriter(QSemaphore* theSemaphore,
+                   vtkAlgorithm* theAlgorithm,
                    vtkImageData* theImageData,
                    const std::string& theName,
                    int theProgressive,
                    int theQuality):
   mySemaphore(theSemaphore),
+  myAlgorithm(theAlgorithm),
   myImageData(theImageData),
   myName(theName),
   myProgressive(theProgressive),
@@ -62,13 +65,13 @@ SVTK_ImageWriter
 ::run()
 {
   vtkJPEGWriter *aWriter = vtkJPEGWriter::New();
-  vtkImageData *anImageData = myImageData;
+  vtkAlgorithmOutput *anImageData = 0;
   vtkSmartPointer<vtkImageClip> anImageClip;
   //
   if(myConstraint16Flag){ 
     int uExtent[6];
-    myImageData->UpdateInformation();
-    myImageData->GetUpdateExtent(uExtent);
+    myAlgorithm->UpdateInformation();
+    myAlgorithm->GetUpdateExtent(uExtent);
     unsigned int width = uExtent[1] - uExtent[0] + 1;
     unsigned int height = uExtent[3] - uExtent[2] + 1;
     width = (width / 16) * 16;
@@ -79,17 +82,20 @@ SVTK_ImageWriter
     anImageClip = vtkImageClip::New();
     anImageClip->Delete();
 
-    anImageClip->SetInput(myImageData);
+    anImageClip->SetInputData(myImageData);
     anImageClip->SetOutputWholeExtent(uExtent);
     anImageClip->ClipDataOn();
-    anImageData = anImageClip->GetOutput();
+    anImageData = anImageClip->GetOutputPort();
   }
   //
   aWriter->WriteToMemoryOff();
   aWriter->SetFileName(myName.c_str());
   aWriter->SetQuality(myQuality);
   aWriter->SetProgressive(myProgressive);
-  aWriter->SetInput(anImageData);
+  if(myConstraint16Flag)
+    aWriter->SetInputConnection(anImageData);
+  else
+    aWriter->SetInputData(myImageData);
   aWriter->Write();
 
   aWriter->Delete();

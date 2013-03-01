@@ -93,13 +93,13 @@ public:
   void setBackground( const Qtx::BackgroundData& );
 
   //! Get size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
-  vtkFloatingPointType trihedronSize() const;
+  double trihedronSize() const;
 
   //! Shows if the size of trihedron relative (see #SVTK_Renderer::SetTrihedronSize)
   bool trihedronRelative() const;
 
   //! Set size of trihedron of the viewer (see #SVTK_Renderer::SetTrihedronSize)
-  void setTrihedronSize( const vtkFloatingPointType, const bool = true );
+  void setTrihedronSize( const double, const bool = true );
 
   //! Get visibility status of the static trihedron
   bool isStaticTrihedronVisible() const;
@@ -197,7 +197,7 @@ private:
   void updateToolBars();
 
   Qtx::BackgroundData  myDefaultBackground;
-  vtkFloatingPointType myTrihedronSize;
+  double myTrihedronSize;
   bool                 myTrihedronRelative;
   bool                 myIsStaticTrihedronVisible;
   bool                 mySelectionEnabled;

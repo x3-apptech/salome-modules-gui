@@ -60,7 +60,7 @@ public:
 
 public:
   static VTKViewer_PolyDataMapper* New();
-  vtkTypeRevisionMacro( VTKViewer_PolyDataMapper, MAPPER_SUPERCLASS );
+  vtkTypeMacro( VTKViewer_PolyDataMapper, MAPPER_SUPERCLASS );
 
   //! Set point marker enabled
   void SetMarkerEnabled( bool );

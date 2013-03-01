@@ -59,7 +59,7 @@ VTKViewer_UnScaledActor::VTKViewer_UnScaledActor()
 /*!
   \return bounding box
 */
-vtkFloatingPointType* 
+double* 
 VTKViewer_UnScaledActor
 ::GetBounds()
 {
@@ -80,24 +80,24 @@ void VTKViewer_UnScaledActor::SetSize(int theSize)
 void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
 {
   if(theRenderer){
-    vtkFloatingPointType P[2][3] = {{-1.0, -1.0, 0.0},{+1.0, +1.0, 0.0}};
+    double P[2][3] = {{-1.0, -1.0, 0.0},{+1.0, +1.0, 0.0}};
     theRenderer->ViewToWorld(P[0][0],P[0][1],P[0][2]);
     theRenderer->ViewToWorld(P[1][0],P[1][1],P[1][2]);
-    vtkFloatingPointType aWorldDiag = sqrt((P[1][0]-P[0][0])*(P[1][0]-P[0][0])+
+    double aWorldDiag = sqrt((P[1][0]-P[0][0])*(P[1][0]-P[0][0])+
                                            (P[1][1]-P[0][1])*(P[1][1]-P[0][1])+
                                            (P[1][2]-P[0][2])*(P[1][2]-P[0][2]));
     int* aSize = theRenderer->GetRenderWindow()->GetSize();
-    vtkFloatingPointType aWinDiag = sqrt(vtkFloatingPointType(aSize[0]*aSize[0]+aSize[1]*aSize[1]));
+    double aWinDiag = sqrt(double(aSize[0]*aSize[0]+aSize[1]*aSize[1]));
     vtkDataSet* aDataSet = GetMapper()->GetInput();
-    aDataSet->Update();
-    vtkFloatingPointType aLength = aDataSet->GetLength();
-    vtkFloatingPointType aPrecision = 1.0E-3;
-    vtkFloatingPointType aZeroTol   = 1.0E-12;
-    vtkFloatingPointType anOldScale = GetScale()[0];
-    vtkFloatingPointType aScale = anOldScale;
-    vtkFloatingPointType aMaxSize = (vtkFloatingPointType)qMax(aSize[1],aSize[0]);
+    GetMapper()->Update();
+    double aLength = aDataSet->GetLength();
+    double aPrecision = 1.0E-3;
+    double aZeroTol   = 1.0E-12;
+    double anOldScale = GetScale()[0];
+    double aScale = anOldScale;
+    double aMaxSize = (double)qMax(aSize[1],aSize[0]);
     if (qAbs(aWinDiag) > aZeroTol && qAbs(aLength) > aZeroTol && qAbs(aMaxSize) > aZeroTol)
-      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(vtkFloatingPointType(qMin(aSize[1],aSize[0]))/aMaxSize);
+      aScale = mySize*aWorldDiag/aWinDiag/aLength*sqrt(double(qMin(aSize[1],aSize[0]))/aMaxSize);
     if(qAbs(aScale) > aZeroTol && qAbs(aScale - anOldScale)/aScale > aPrecision){
       SetScale(aScale);
     }
@@ -140,7 +140,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   myLineSource->SetPoint1(0.0,0.0,0.0);
   
   myMapper[0] = vtkPolyDataMapper::New();
-  myMapper[0]->SetInput(myLineSource->GetOutput());
+  myMapper[0]->SetInputConnection(myLineSource->GetOutputPort());
   
   myLineActor = VTKViewer_LineActor::New();
   myLineActor->SetMapper(myMapper[0]);
@@ -153,7 +153,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   myConeSource->SetCenter(-0.5,0.0,0.0);
   
   myMapper[1] = vtkPolyDataMapper::New();
-  myMapper[1]->SetInput(myConeSource->GetOutput());
+  myMapper[1]->SetInputConnection(myConeSource->GetOutputPort());
   
   myArrowActor = vtkFollower::New();
   myArrowActor->SetMapper(myMapper[1]);
@@ -169,7 +169,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   
   myLabelActor = vtkTextActor::New();
   myLabelActor->SetMapper(myTextMapper);
-  myLabelActor->ScaledTextOff();
+  myLabelActor->SetTextScaleModeToNone();
   myLabelActor->PickableOff();
   
   vtkCoordinate* aCoord = vtkCoordinate::New();
@@ -179,7 +179,7 @@ VTKViewer_Axis::VTKViewer_Axis()
   myVectorText = vtkVectorText::New();
   
   myMapper[2] = vtkPolyDataMapper::New();
-  myMapper[2]->SetInput(myVectorText->GetOutput());
+  myMapper[2]->SetInputConnection(myVectorText->GetOutputPort());
   
   myLabelActor = VTKViewer_UnScaledActor::New();
   myLabelActor->SetMapper(myMapper[2]);
@@ -308,12 +308,12 @@ void VTKViewer_Axis::SetColor(double theRed, double theGreen, double theBlue)
 
 /*! Set size of VTKViewer_Axis
  */
-void VTKViewer_Axis::SetSize(vtkFloatingPointType theSize)
+void VTKViewer_Axis::SetSize(double theSize)
 {
-  vtkFloatingPointType aPosition[3] = {myDir[0]*theSize, myDir[1]*theSize, myDir[2]*theSize};
+  double aPosition[3] = {myDir[0]*theSize, myDir[1]*theSize, myDir[2]*theSize};
 
-  vtkFloatingPointType aCoef = 0.99;
-  vtkFloatingPointType aLinePosition[3] = {aPosition[0]*aCoef, aPosition[1]*aCoef, aPosition[2]*aCoef};
+  double aCoef = 0.99;
+  double aLinePosition[3] = {aPosition[0]*aCoef, aPosition[1]*aCoef, aPosition[2]*aCoef};
   myLineSource->SetPoint2(aLinePosition);
   
   myArrowActor->SetPosition(0.0,0.0,0.0);
@@ -438,7 +438,7 @@ VTKViewer_Trihedron::VTKViewer_Trihedron()
   myAxis[0] = VTKViewer_XAxis::New();
   myAxis[1] = VTKViewer_YAxis::New();
   myAxis[2] = VTKViewer_ZAxis::New();
-  static vtkFloatingPointType aSize = 100;
+  static double aSize = 100;
   SetSize(aSize);
 }
 
@@ -455,7 +455,7 @@ VTKViewer_Trihedron::~VTKViewer_Trihedron()
 
 /*! Set size of axes
  */
-void VTKViewer_Trihedron::SetSize(vtkFloatingPointType theSize)
+void VTKViewer_Trihedron::SetSize(double theSize)
 {
   mySize = theSize;
   for(int i = 0; i < 3; i++)

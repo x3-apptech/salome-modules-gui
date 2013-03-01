@@ -88,7 +88,6 @@ bool operator < (const vtkEDFEdge& e0, const vtkEDFEdge& e1)
 }
 
 vtkStandardNewMacro(vtkEDFCutter);
-vtkCxxRevisionMacro(vtkEDFCutter, "0.0");
 
 vtkEDFCutter::vtkEDFCutter()
 {

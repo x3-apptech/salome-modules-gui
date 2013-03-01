@@ -47,13 +47,13 @@ class VTKViewer_Transform;
 #endif
 
 #ifndef WIN32
-class VTK_HYBRID_EXPORT SVTK_CubeAxesActor2D : public vtkCubeAxesActor2D
+class VTKRENDERINGANNOTATION_EXPORT SVTK_CubeAxesActor2D : public vtkCubeAxesActor2D
 #else
 class SVTK_EXPORT SVTK_CubeAxesActor2D : public vtkCubeAxesActor2D
 #endif
 {
 public:
-  vtkTypeRevisionMacro(SVTK_CubeAxesActor2D,vtkCubeAxesActor2D);
+  vtkTypeMacro(SVTK_CubeAxesActor2D,vtkCubeAxesActor2D);
 
   // Description:
   // Instantiate object with bold, italic, and shadow enabled; font family

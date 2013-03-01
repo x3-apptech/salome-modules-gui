@@ -46,7 +46,6 @@
 #endif
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-vtkCxxRevisionMacro(VTKViewer_PolyDataMapper, "Revision$");
 vtkStandardNewMacro(VTKViewer_PolyDataMapper);
 #endif
 
@@ -316,7 +315,7 @@ namespace VTK
   //-----------------------------------------------------------------------------
   struct TColorFunctorBase
   {
-    vtkFloatingPointType myAlpha;
+    double myAlpha;
 
     TColorFunctorBase( vtkProperty* theProperty )
     {
@@ -331,7 +330,7 @@ namespace VTK
   //-----------------------------------------------------------------------------
   struct TPropertyColor : TColorFunctorBase
   {
-    vtkFloatingPointType myColor[3];
+    double myColor[3];
 
     TPropertyColor( vtkProperty* theProperty ):
       TColorFunctorBase( theProperty )

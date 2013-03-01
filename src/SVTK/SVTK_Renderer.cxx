@@ -382,7 +382,7 @@ SVTK_Renderer
 
 inline
 bool
-CheckBndBox(const vtkFloatingPointType theBounds[6])
+CheckBndBox(const double theBounds[6])
 {
   if(theBounds[0] > -VTK_LARGE_FLOAT && theBounds[1] < VTK_LARGE_FLOAT &&
      theBounds[2] > -VTK_LARGE_FLOAT && theBounds[3] < VTK_LARGE_FLOAT &&
@@ -401,7 +401,7 @@ SVTK_Renderer
   bool aTDisplayed = IsTrihedronDisplayed();
   bool aCDisplayed = IsCubeAxesDisplayed();
 
-  vtkFloatingPointType aNewBndBox[6];
+  double aNewBndBox[6];
   aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
   aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
 
@@ -414,7 +414,7 @@ SVTK_Renderer
       myCubeAxes->VisibilityOff();
 
     // if the new trihedron size have sufficient difference, then apply the value
-    vtkFloatingPointType aSize = myTrihedron->GetSize();
+    double aSize = myTrihedron->GetSize();
     if ( IsTrihedronRelative() )
       {
         ComputeTrihedronSize(GetDevice(),aSize,aSize,myTrihedronSize);
@@ -432,7 +432,7 @@ SVTK_Renderer
         if(anActor->IsResizable())
           anActor->SetSize(0.5*aSize);
         if(anActor->GetVisibility() && !anActor->IsInfinitive()){
-          vtkFloatingPointType *aBounds = anActor->GetBounds();
+          double *aBounds = anActor->GetBounds();
           if(CheckBndBox(aBounds))
             for(int i = 0; i < 5; i = i + 2){
               if(aBounds[i] < aNewBndBox[i]) 
@@ -485,7 +485,7 @@ SVTK_Renderer
 */
 void
 SVTK_Renderer
-::SetTrihedronSize(vtkFloatingPointType theSize, const bool theRelative)
+::SetTrihedronSize(double theSize, const bool theRelative)
 {
   if(myTrihedronSize != theSize || myIsTrihedronRelative != theRelative){
     myTrihedronSize = theSize;
@@ -497,7 +497,7 @@ SVTK_Renderer
 /*!
   \return size of the trihedron in percents from bounding box of the scene
 */
-vtkFloatingPointType
+double
 SVTK_Renderer
 ::GetTrihedronSize() const
 {
@@ -629,7 +629,7 @@ SVTK_Renderer
   else
     myCubeAxes->VisibilityOff();
 
-  static vtkFloatingPointType aCoeff = 3.0;
+  static double aCoeff = 3.0;
   aCamera->SetParallelScale(aCoeff*aCamera->GetParallelScale());
 }
 

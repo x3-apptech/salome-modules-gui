@@ -27,7 +27,7 @@ class VTKTOOLS_EXPORT vtkEDFCutter : public vtkCutter
 {
 public :
   static vtkEDFCutter* New();
-  vtkTypeRevisionMacro(vtkEDFCutter, vtkCutter);
+  vtkTypeMacro(vtkEDFCutter, vtkCutter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

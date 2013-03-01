@@ -25,6 +25,8 @@
 
 #include "VTKViewer.h"
 
+#include <vtkVersion.h>
+
 #if ((VTK_MAJOR_VERSION == 4) &&  (VTK_MINOR_VERSION >= 4)) || (VTK_MAJOR_VERSION > 4)
 #  include <vtkIdTypeArray.h>
 #  define TCellLocationsArray vtkIdTypeArray

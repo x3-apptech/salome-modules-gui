@@ -120,29 +120,25 @@ SVTK_DeviceActor
 {
   if(theMapper){
     int anId = 0;
-    myPassFilter[ anId ]->SetInput( theMapper->GetInput() );
-    myPassFilter[ anId + 1]->SetInput( myPassFilter[ anId ]->GetOutput() );
+    myPassFilter[ anId ]->SetInputData( theMapper->GetInput() );
+    myPassFilter[ anId + 1]->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
     
     anId++; // 1
-    myGeomFilter->SetInput( myPassFilter[ anId ]->GetOutput() );
+    myGeomFilter->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
 
     anId++; // 2
-    myPassFilter[ anId ]->SetInput( myGeomFilter->GetOutput() ); 
-    myPassFilter[ anId + 1 ]->SetInput( myPassFilter[ anId ]->GetOutput() );
+    myPassFilter[ anId ]->SetInputConnection( myGeomFilter->GetOutputPort() ); 
+    myPassFilter[ anId + 1 ]->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
 
     anId++; // 3
-    myTransformFilter->SetInput( myPassFilter[ anId ]->GetPolyDataOutput() );
+    myTransformFilter->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
 
     anId++; // 4
-    myPassFilter[ anId ]->SetInput( myTransformFilter->GetOutput() );
-    myPassFilter[ anId + 1 ]->SetInput( myPassFilter[ anId ]->GetOutput() );
+    myPassFilter[ anId ]->SetInputConnection( myTransformFilter->GetOutputPort() );
+    myPassFilter[ anId + 1 ]->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
 
     anId++; // 5
-    if(VTKViewer_DataSetMapper* aMapper = dynamic_cast<VTKViewer_DataSetMapper*>(theMapper)){
-      aMapper->SetInput(myPassFilter[anId]->GetOutput());
-    }else if(VTKViewer_PolyDataMapper* aMapper = dynamic_cast<VTKViewer_PolyDataMapper*>(theMapper)){
-      aMapper->SetInput(myPassFilter[anId]->GetPolyDataOutput());
-    }
+    theMapper->SetInputConnection(myPassFilter[anId]->GetOutputPort());
   }
   Superclass::SetMapper(theMapper);
 }
@@ -164,7 +160,7 @@ void
 SVTK_DeviceActor
 ::SetInput(vtkDataSet* theDataSet)
 {
-  myMapper->SetInput(theDataSet);
+  myMapper->SetInputData(theDataSet);
   InitPipeLine(myMapper);
 }
 
@@ -256,16 +252,19 @@ SVTK_DeviceActor
   if ( !myIsShrinkable ) 
     return;
   
-  if ( vtkDataSet* aDataSet = myPassFilter[ 0 ]->GetOutput() )
+  if ( vtkAlgorithmOutput* anOutput = myPassFilter[ 0 ]->GetOutputPort() )
   {     
-    aDataSet->Update();
-    int numCells=aDataSet->GetNumberOfCells();
-    int numPts = aDataSet->GetNumberOfPoints();
-    //It's impossible to use to apply "shrink" for "empty" dataset
-    if (numCells < 1 || numPts < 1)
-            return;
-    myShrinkFilter->SetInput( aDataSet );
-    myPassFilter[ 1 ]->SetInput( myShrinkFilter->GetOutput() );
+    myPassFilter[ 0 ]->Update();
+    if ( vtkDataSet* aDataSet = myPassFilter[ 0 ]->GetOutput() )
+    {
+      int numCells=aDataSet->GetNumberOfCells();
+      int numPts = aDataSet->GetNumberOfPoints();
+      //It's impossible to use to apply "shrink" for "empty" dataset
+      if (numCells < 1 || numPts < 1)
+        return;
+    }
+    myShrinkFilter->SetInputConnection( anOutput );
+    myPassFilter[ 1 ]->SetInputConnection( myShrinkFilter->GetOutputPort() );
     myIsShrunk = true;
   }
 }
@@ -278,9 +277,9 @@ SVTK_DeviceActor
 ::UnShrink() 
 {
   if ( !myIsShrunk ) return;
-  if ( vtkDataSet* aDataSet = myPassFilter[ 0 ]->GetOutput() )
+  if ( vtkAlgorithmOutput* anOutput = myPassFilter[ 0 ]->GetOutputPort() )
   {    
-    myPassFilter[ 1 ]->SetInput( aDataSet );
+    myPassFilter[ 1 ]->SetInputConnection( anOutput );
     myIsShrunk = false;
   }
 }
@@ -288,7 +287,7 @@ SVTK_DeviceActor
 /*!
   \return shrink factor
 */
-vtkFloatingPointType
+double
 SVTK_DeviceActor
 ::GetShrinkFactor()
 {
@@ -301,7 +300,7 @@ SVTK_DeviceActor
 */
 void 
 SVTK_DeviceActor
-::SetShrinkFactor(vtkFloatingPointType theValue)
+::SetShrinkFactor(double theValue)
 {
   myShrinkFilter->SetShrinkFactor(theValue);
 }
@@ -348,18 +347,18 @@ SVTK_DeviceActor
   if ( !myIsFeatureEdgesAllowed || myIsFeatureEdgesEnabled == theIsFeatureEdgesEnabled ) 
     return;
 
-  if ( vtkPolyData* aPolyData = myPassFilter[ 2 ]->GetPolyDataOutput() )
+  if ( vtkAlgorithmOutput* aPolyData = myPassFilter[ 2 ]->GetOutputPort() )
   {
     if( theIsFeatureEdgesEnabled )
     {
-      aPolyData->Update();
-      myFeatureEdges->SetInput( aPolyData );
-      myPassFilter[ 3 ]->SetInput( myFeatureEdges->GetOutput() );
+      myPassFilter[ 2 ]->Update();
+      myFeatureEdges->SetInputConnection( aPolyData );
+      myPassFilter[ 3 ]->SetInputConnection( myFeatureEdges->GetOutputPort() );
       myIsFeatureEdgesEnabled = true;
     }
     else
     {
-      myPassFilter[3]->SetInput( aPolyData );
+      myPassFilter[3]->SetInputConnection( aPolyData );
       myIsFeatureEdgesEnabled = false;
     }
     myIsFeatureEdgesEnabled = theIsFeatureEdgesEnabled;
@@ -369,7 +368,7 @@ SVTK_DeviceActor
 /*!
   \return angle of feature edges' filter
 */
-vtkFloatingPointType
+double
 SVTK_DeviceActor
 ::GetFeatureEdgesAngle()
 {
@@ -382,7 +381,7 @@ SVTK_DeviceActor
 */
 void
 SVTK_DeviceActor
-::SetFeatureEdgesAngle(vtkFloatingPointType theAngle)
+::SetFeatureEdgesAngle(double theAngle)
 {
   myFeatureEdges->SetFeatureAngle(theAngle);
 }
@@ -525,7 +524,7 @@ SVTK_DeviceActor
 /*!
   \return default point size
 */
-vtkFloatingPointType
+double
 SVTK_DeviceActor
 ::GetDefaultPointSize()
 {
@@ -535,7 +534,7 @@ SVTK_DeviceActor
 /*!
   \return default line width
 */
-vtkFloatingPointType
+double
 SVTK_DeviceActor
 ::GetDefaultLineWidth()
 {
@@ -576,7 +575,7 @@ SVTK_DeviceActor
 /*!
   Get coordinates of a node for given object index
 */
-vtkFloatingPointType* 
+double* 
 SVTK_DeviceActor
 ::GetNodeCoord(int theObjID)
 {
@@ -613,7 +612,7 @@ SVTK_DeviceActor
 {
   if(myIsResolveCoincidentTopology){
     int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
-    vtkFloatingPointType aFactor, aUnit; 
+    double aFactor, aUnit; 
     vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
     
     vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
@@ -634,8 +633,8 @@ SVTK_DeviceActor
 */
 void
 SVTK_DeviceActor
-::SetPolygonOffsetParameters(vtkFloatingPointType factor, 
-                             vtkFloatingPointType units)
+::SetPolygonOffsetParameters(double factor, 
+                             double units)
 {
   myPolygonOffsetFactor = factor;
   myPolygonOffsetUnits = units;
@@ -647,8 +646,8 @@ SVTK_DeviceActor
 */
 void
 SVTK_DeviceActor
-::GetPolygonOffsetParameters(vtkFloatingPointType& factor, 
-                             vtkFloatingPointType& units)
+::GetPolygonOffsetParameters(double& factor, 
+                             double& units)
 {
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;
@@ -675,14 +674,14 @@ bool SVTK_DeviceActor::GetQuadraticArcMode(){
 /*!
  * Set Max angle for representation 2D quadratic element as arked polygon
  */
-void SVTK_DeviceActor::SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle){
+void SVTK_DeviceActor::SetQuadraticArcAngle(double theMaxAngle){
   myGeomFilter->SetQuadraticArcAngle(theMaxAngle);
 }
 
 /*!
  * Return Max angle of the representation 2D quadratic element as arked polygon
  */
-vtkFloatingPointType SVTK_DeviceActor::GetQuadraticArcAngle(){
+double SVTK_DeviceActor::GetQuadraticArcAngle(){
   return myGeomFilter->GetQuadraticArcAngle();
 }
 

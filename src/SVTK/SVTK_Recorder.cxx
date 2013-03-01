@@ -68,7 +68,6 @@ namespace
 }
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(SVTK_Recorder,"$Revision$");
 vtkStandardNewMacro(SVTK_Recorder);
 
 
@@ -376,7 +375,7 @@ SVTK_Recorder
   vtkImageData *anImageData = vtkImageData::New(); 
   anImageData->DeepCopy(myFilter->GetOutput());
 
-  myWriterMgr->StartImageWriter(anImageData,aName,myProgressiveMode,myQuality);
+  myWriterMgr->StartImageWriter(myFilter,anImageData,aName,myProgressiveMode,myQuality);
   myNbWrittenFrames++;
 
   myRenderWindow->AddObserver(vtkCommand::EndEvent,
@@ -396,12 +395,9 @@ SVTK_Recorder
     myErrorStatus = 20;
     return;
   }
-  anImageData->UpdateInformation();
-  int *anExtent = anImageData->GetWholeExtent();
-  anImageData->SetUpdateExtent(anExtent[0], anExtent[1],
-                               anExtent[2], anExtent[3],
-                               0,0);
-  anImageData->UpdateData();
+  myFilter->UpdateInformation();
+  myFilter->SetUpdateExtentToWholeExtent();
+  myFilter->Update();
 }
 
 

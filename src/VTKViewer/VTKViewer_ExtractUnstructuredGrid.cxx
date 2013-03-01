@@ -178,15 +178,10 @@ inline void InsertPointCell(vtkCellArray *theConnectivity,
 }
 
 
-// int VTKViewer_ExtractUnstructuredGrid::RequestData(
-//   vtkInformation *vtkNotUsed(request),
-//   vtkInformationVector **inputVector,
-//   vtkInformationVector *outputVector)
-void VTKViewer_ExtractUnstructuredGrid::Execute()
+int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(request),
+                                                   vtkInformationVector **inputVector,
+                                                   vtkInformationVector *outputVector)
 {
-  /*
-  not ported yet to the new executive-based pipeline architecture.
-
   // get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
@@ -196,9 +191,9 @@ void VTKViewer_ExtractUnstructuredGrid::Execute()
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid *anOutput = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  */
-  vtkUnstructuredGrid *anInput = this->GetInput();
-  vtkUnstructuredGrid *anOutput = this->GetOutput();
+
+  //vtkUnstructuredGrid *anInput = this->GetInput();
+  //vtkUnstructuredGrid *anOutput = this->GetOutput();
   
   myOut2InId.clear();  myIn2OutId.clear();
 
@@ -414,5 +409,5 @@ void VTKViewer_ExtractUnstructuredGrid::Execute()
       MESSAGE("Execute - myIn2OutId.size() = "<<myIn2OutId.size());
     }
   }*/
-//  return 1;
+  return 1;
 }

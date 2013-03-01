@@ -825,7 +825,7 @@ SVTK_CubeAxesActor2D* SVTK_ViewWindow::GetCubeAxes()
 /*!
   \return trihedron size
 */
-vtkFloatingPointType SVTK_ViewWindow::GetTrihedronSize() const
+double SVTK_ViewWindow::GetTrihedronSize() const
 {
   return GetRenderer()->GetTrihedronSize();
 }
@@ -992,7 +992,7 @@ void SVTK_ViewWindow::SetSpacemouseButtons(const int theBtn1,
   \param theSize - new trihedron size
   \param theRelative - trihedron relativeness
 */
-void SVTK_ViewWindow::SetTrihedronSize(const vtkFloatingPointType theSize, const bool theRelative)
+void SVTK_ViewWindow::SetTrihedronSize(const double theSize, const bool theRelative)
 {
   GetRenderer()->SetTrihedronSize(theSize, theRelative);
   Repaint();
@@ -1297,7 +1297,7 @@ void getGradAxisVisualParams( QXmlStreamWriter& writer, vtkAxisActor2D* actor, Q
   // Name
   bool isVisible = actor->GetTitleVisibility();
   QString title ( actor->GetTitle() );
-  vtkFloatingPointType color[ 3 ];
+  double color[ 3 ];
   int font = VTK_ARIAL;
   int bold = 0;
   int italic = 0;
@@ -1411,7 +1411,7 @@ void setGradAxisVisualParams(QXmlStreamReader& reader, vtkAxisActor2D* actor)
   // Read title color
   aAttr = reader.attributes();
 
-  vtkFloatingPointType color[3];
+  double color[3];
   color[0] = aAttr.value("R").toString().toDouble();
   color[1] = aAttr.value("G").toString().toDouble();
   color[2] = aAttr.value("B").toString().toDouble();
@@ -1493,7 +1493,7 @@ void setGradAxisVisualParams( vtkAxisActor2D* actor, const QString& params )
     // retrieve and set name parameters
     bool isVisible = paramsLst[2].toUShort();
     QString title = paramsLst[3];
-    vtkFloatingPointType color[3];
+    double color[3];
     color[0] = paramsLst[4].toDouble();
     color[1] = paramsLst[5].toDouble();
     color[2] = paramsLst[6].toDouble();

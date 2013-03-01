@@ -92,9 +92,7 @@ namespace VTK
     anImageData->Delete();
 
     anImageData->SetExtent( 0, aWidth-1, 0, aHeight-1, 0, 0 );
-    anImageData->SetScalarTypeToUnsignedChar();
-    anImageData->SetNumberOfScalarComponents( 4 );
-    anImageData->AllocateScalars();
+    anImageData->AllocateScalars( VTK_UNSIGNED_CHAR, 4 );
 
     unsigned char* aDataPtr = (unsigned char*)anImageData->GetScalarPointer();
 
@@ -109,7 +107,6 @@ namespace VTK
       aDataPtr[ anId++ ] = aValue * aCoef;
       aDataPtr[ anId++ ] = aValue;
     }
-    anImageData->Update();
 
     return anImageData;
   }

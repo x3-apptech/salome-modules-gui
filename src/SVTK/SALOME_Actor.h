@@ -106,14 +106,14 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   //! Apply additional position
   virtual
   void
-  SetPosition(vtkFloatingPointType _arg1, 
-              vtkFloatingPointType _arg2, 
-              vtkFloatingPointType _arg3);
+  SetPosition(double _arg1, 
+              double _arg2, 
+              double _arg3);
 
   //! Apply additional position
   virtual
   void
-  SetPosition(vtkFloatingPointType _arg[3]);
+  SetPosition(double _arg[3]);
 
   //----------------------------------------------------------------------------
   //! Visibility management

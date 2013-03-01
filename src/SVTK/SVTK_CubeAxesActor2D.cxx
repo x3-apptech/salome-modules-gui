@@ -43,7 +43,6 @@
 #include <vtkProperty.h>
 #include <vtkProperty2D.h>
 
-vtkCxxRevisionMacro(SVTK_CubeAxesActor2D, "$Revision$");
 vtkStandardNewMacro(SVTK_CubeAxesActor2D);
 
 // Instantiate this object.
@@ -61,9 +60,9 @@ SVTK_CubeAxesActor2D::SVTK_CubeAxesActor2D()
   this->rgridMapperYZ = vtkPolyDataMapper::New();
   this->rgridMapperXZ = vtkPolyDataMapper::New();
 
-  this->rgridMapperXY->SetInput(this->planeXY->GetOutput());
-  this->rgridMapperYZ->SetInput(this->planeYZ->GetOutput());
-  this->rgridMapperXZ->SetInput(this->planeXZ->GetOutput());
+  this->rgridMapperXY->SetInputConnection(this->planeXY->GetOutputPort());
+  this->rgridMapperYZ->SetInputConnection(this->planeYZ->GetOutputPort());
+  this->rgridMapperXZ->SetInputConnection(this->planeXZ->GetOutputPort());
 
   this->wireActorXY->SetMapper(rgridMapperXY);
   this->wireActorYZ->SetMapper(rgridMapperYZ);
@@ -192,13 +191,13 @@ int SVTK_CubeAxesActor2D::RenderOverlay(vtkViewport *viewport)
   return renderedSomething;
 }
 
-static void ChangeValues(vtkFloatingPointType* aArray1,
-                         vtkFloatingPointType* aArray2,
-                         vtkFloatingPointType *aRange1,
-                         vtkFloatingPointType* aRange2,
+static void ChangeValues(double* aArray1,
+                         double* aArray2,
+                         double *aRange1,
+                         double* aRange2,
                          bool theY)
 {
-  vtkFloatingPointType tmp=-1000;
+  double tmp=-1000;
   if (!theY){
     for (int i=0; i<4; i++){
       tmp = aArray1[i]; aArray1[i] = aArray2[i]; aArray2[i] = tmp;
@@ -218,12 +217,12 @@ static void ChangeValues(vtkFloatingPointType* aArray1,
   }
 }
 
-static void ChangeArrays(vtkFloatingPointType* xCoords,
-                         vtkFloatingPointType* yCoords,
-                         vtkFloatingPointType* zCoords,
-                         vtkFloatingPointType* xRange,
-                         vtkFloatingPointType* yRange,
-                         vtkFloatingPointType* zRange,
+static void ChangeArrays(double* xCoords,
+                         double* yCoords,
+                         double* zCoords,
+                         double* xRange,
+                         double* yRange,
+                         double* zRange,
                          const int xAxes,
                          const int yAxes, 
                          const int zAxes)
@@ -249,8 +248,8 @@ static void ChangeArrays(vtkFloatingPointType* xCoords,
 // with the boundary of the viewport (minus borders).
 int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 {
-  vtkFloatingPointType bounds[6], slope = 0.0, minSlope, num, den;
-  vtkFloatingPointType pts[8][3], d2, d2Min, min;
+  double bounds[6], slope = 0.0, minSlope, num, den;
+  double pts[8][3], d2, d2Min, min;
   int i, idx = 0;
   int xIdx, yIdx = 0, zIdx = 0, zIdx2, renderedSomething=0;
   int xAxes = 0, yAxes, zAxes;
@@ -308,7 +307,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
       }
     else
       {
-      vtkFloatingPointType e1[2], e2[2], e3[2];
+      double e1[2], e2[2], e3[2];
 
       // Find distance to origin
       d2Min = VTK_LARGE_FLOAT;
@@ -401,7 +400,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
     }
 
   // Setup the axes for plotting
-  vtkFloatingPointType xCoords[4], yCoords[4], zCoords[4], xRange[2], yRange[2], zRange[2];
+  double xCoords[4], yCoords[4], zCoords[4], xRange[2], yRange[2], zRange[2];
   this->AdjustAxes(pts, bounds, idx, xIdx, yIdx, zIdx, zIdx2, 
                    xAxes, yAxes, zAxes, 
                    xCoords, yCoords, zCoords, xRange, yRange, zRange);
@@ -445,19 +444,19 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   // XCoords coordinates for X grid
   vtkFloatArray *XCoords = vtkFloatArray::New();
   for(int i=0;i<numOfLabelsX;i++){
-    vtkFloatingPointType val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
+    double val = bounds[0]+i*(bounds[1]-bounds[0])/(numOfLabelsX-1);
     XCoords->InsertNextValue(val);
   }
   // YCoords coordinates for Y grid
   vtkFloatArray *YCoords = vtkFloatArray::New();
   for(int i=0;i<numOfLabelsX;i++){
-    vtkFloatingPointType val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
+    double val = bounds[2]+i*(bounds[3]-bounds[2])/(numOfLabelsY-1);
     YCoords->InsertNextValue(val);
   }
   // ZCoords coordinates for Z grid
   vtkFloatArray *ZCoords = vtkFloatArray::New();
   for(int i=0;i<numOfLabelsZ;i++){
-    vtkFloatingPointType val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
+    double val = bounds[4]+i*(bounds[5]-bounds[4])/(numOfLabelsZ-1);
     ZCoords->InsertNextValue(val);
   }
 
@@ -467,14 +466,14 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   rgrid->SetYCoordinates(YCoords);
   rgrid->SetZCoordinates(ZCoords);
 
-  this->planeXY->SetInput(rgrid);
-  this->planeYZ->SetInput(rgrid);
-  this->planeXZ->SetInput(rgrid);
+  this->planeXY->SetInputData(rgrid);
+  this->planeYZ->SetInputData(rgrid);
+  this->planeXZ->SetInputData(rgrid);
 
   rgrid->Delete();
 
-  vtkFloatingPointType aCPosition[3];
-  vtkFloatingPointType aCDirection[3];
+  double aCPosition[3];
+  double aCDirection[3];
   this->Camera->GetPosition(aCPosition);
   this->Camera->GetDirectionOfProjection(aCDirection);
 
@@ -482,12 +481,12 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   bool replaceXY=false;
   bool replaceYZ=false;
   bool replaceXZ=false;
-  vtkFloatingPointType p[6][3]; // centers of planes
-  vtkFloatingPointType vecs[6][3]; // 6 vectors from camera position to centers
+  double p[6][3]; // centers of planes
+  double vecs[6][3]; // 6 vectors from camera position to centers
 
-  vtkFloatingPointType aMiddleX = (XCoords->GetValue(0) + XCoords->GetValue(numOfLabelsX-1))/2;
-  vtkFloatingPointType aMiddleY = (YCoords->GetValue(0) + YCoords->GetValue(numOfLabelsY-1))/2;
-  vtkFloatingPointType aMiddleZ = (ZCoords->GetValue(0) + ZCoords->GetValue(numOfLabelsZ-1))/2;
+  double aMiddleX = (XCoords->GetValue(0) + XCoords->GetValue(numOfLabelsX-1))/2;
+  double aMiddleY = (YCoords->GetValue(0) + YCoords->GetValue(numOfLabelsY-1))/2;
+  double aMiddleZ = (ZCoords->GetValue(0) + ZCoords->GetValue(numOfLabelsZ-1))/2;
 
   // plane XY
   p[0][0] = aMiddleX; // plane X=0.5 Y=0.5 Z=0
@@ -539,7 +538,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
   YCoords->Delete();
   ZCoords->Delete();
 
-  vtkFloatingPointType color[3];
+  double color[3];
 
   this->GetProperty()->GetColor(color);
   this->wireActorXY->GetProperty()->SetColor(color);

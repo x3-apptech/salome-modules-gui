@@ -37,7 +37,7 @@ VTKVIEWER_EXPORT
 extern
 int
 ComputeVisiblePropBounds(vtkRenderer* theRenderer, 
-                         vtkFloatingPointType theBounds[6]);
+                         double theBounds[6]);
 
 VTKVIEWER_EXPORT
 extern
@@ -47,9 +47,9 @@ VTKVIEWER_EXPORT
 extern
 bool
 ComputeTrihedronSize(vtkRenderer* theRenderer, 
-                     vtkFloatingPointType& theNewSize, 
-                     const vtkFloatingPointType theSize, 
-                     const vtkFloatingPointType theSizeInPercents);
+                     double& theNewSize, 
+                     const double theSize, 
+                     const double theSizeInPercents);
 
 VTKVIEWER_EXPORT
 extern
@@ -57,5 +57,5 @@ bool IsBBEmpty(vtkRenderer* theRenderer);
 VTKVIEWER_EXPORT
 extern
 bool ComputeBBCenter(vtkRenderer* theRenderer, 
-                     vtkFloatingPointType theCenter[3]);
+                     double theCenter[3]);
 #endif

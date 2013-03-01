@@ -143,7 +143,8 @@ nodist_salomeres_DATA =		\
 	VTKViewer_msg_fr.qm
 
 libVTKViewer_la_CPPFLAGS = $(QT_INCLUDES) $(VTK_INCLUDES) $(CAS_CPPFLAGS)	\
-	-I$(srcdir)/../Qtx -I$(srcdir)/../SUIT
+	-I$(srcdir)/../Qtx -I$(srcdir)/../SUIT \
+	-DvtkRenderingCore_AUTOINIT="3(vtkInteractionStyle,vtkRenderingOpenGL,vtkRenderingFreeTypeOpenGL)"
 libVTKViewer_la_LDFLAGS = $(KERNEL_LDFLAGS) $(VTK_LIBS) $(QT_MT_LIBS)           \
 	$(CAS_KERNEL) $(OGL_LIBS) ../Qtx/libqtx.la ../SUIT/libsuit.la
 

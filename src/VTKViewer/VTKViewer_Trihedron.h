@@ -27,6 +27,7 @@
 
 #include <vtkObject.h>
 #include <vtkFollower.h>
+#include <vtkVersion.h>
 
 class vtkRenderer;
 class vtkActorCollection;
@@ -69,7 +70,7 @@ public:
   /*!Create new instance of VTKViewer_UnScaledActor.*/
   static VTKViewer_UnScaledActor *New();
   
-  virtual vtkFloatingPointType* GetBounds();
+  virtual double* GetBounds();
   virtual void SetSize(int theSize);
   virtual void Render(vtkRenderer *theRenderer);
 
@@ -160,14 +161,14 @@ public:
   static VTKViewer_Trihedron *New();
   
   /*!Sets size of trihedron.
-   * \param theSize - vtkFloatingPointType value
+   * \param theSize - double value
    */
-  virtual void        SetSize(vtkFloatingPointType theSize);
+  virtual void        SetSize(double theSize);
 
   /*! Get size of trihedron.
-   * \retval mySize - vtkFloatingPointType value
+   * \retval mySize - double value
    */
-  virtual vtkFloatingPointType  GetSize() { return mySize;}
+  virtual double  GetSize() { return mySize;}
   
   enum TVisibility{eOff, eOn, eOnlyLineOn};
   
@@ -215,7 +216,7 @@ protected:
   VTKViewer_Axis*     myAxis[3];
   
   /*! Common size for trihedron, for each axis.*/
-  vtkFloatingPointType mySize;
+  double mySize;
 };
 
 /*!The base class for concreate Axis.
@@ -260,7 +261,7 @@ public:
   
   /*! Set size of VTKViewer_Axis
    */
-  virtual void SetSize(vtkFloatingPointType theSize);
+  virtual void SetSize(double theSize);
   
   /*! Get label actor.
    * \retval Return myLabelActor.
@@ -293,7 +294,7 @@ protected:
   /*! \var myRot[3]
    * Orientation vector
    */
-  vtkFloatingPointType myDir[3], myRot[3];
+  double myDir[3], myRot[3];
   
   /*! VTKViewer_LineActor actor pointer
    */

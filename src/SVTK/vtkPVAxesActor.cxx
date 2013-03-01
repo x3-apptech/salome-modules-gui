@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "$Revision$");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
@@ -153,9 +152,9 @@ vtkPVAxesActor::vtkPVAxesActor()
   vtkPolyDataMapper *ymapper = vtkPolyDataMapper::New();
   vtkPolyDataMapper *zmapper = vtkPolyDataMapper::New();
   
-  xmapper->SetInput( this->XAxisVectorText->GetOutput() );
-  ymapper->SetInput( this->YAxisVectorText->GetOutput() );
-  zmapper->SetInput( this->ZAxisVectorText->GetOutput() );
+  xmapper->SetInputConnection( this->XAxisVectorText->GetOutputPort() );
+  ymapper->SetInputConnection( this->YAxisVectorText->GetOutputPort() );
+  zmapper->SetInputConnection( this->ZAxisVectorText->GetOutputPort() );
   
   this->XAxisLabel->SetMapper( xmapper );
   this->YAxisLabel->SetMapper( ymapper );
@@ -257,7 +256,7 @@ int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport *vp)
 }
 
 //-----------------------------------------------------------------------------
-#if (VTK_MINOR_VERSION>=2)
+#if (VTK_MAJOR_VERSION>5 || VTK_MINOR_VERSION>=2)
 // porting to VTK 5.0.x
 int vtkPVAxesActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 {
@@ -586,36 +585,34 @@ void vtkPVAxesActor::UpdateProps()
     {
     case vtkPVAxesActor::CYLINDER_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->CylinderSource->GetOutput() );
+        SetInputConnection( this->CylinderSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::LINE_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->LineSource->GetOutput() );
+        SetInputConnection( this->LineSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::USER_DEFINED_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->UserDefinedShaft );
+        SetInputData( this->UserDefinedShaft );
     }
   
   switch ( this->TipType )
     {
     case vtkPVAxesActor::CONE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->ConeSource->GetOutput() );
+        SetInputConnection( this->ConeSource->GetOutputPort() );
       break;      
     case vtkPVAxesActor::SPHERE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->SphereSource->GetOutput() );
+        SetInputConnection( this->SphereSource->GetOutputPort() );
       break;      
     case vtkPVAxesActor::USER_DEFINED_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->UserDefinedTip );
+        SetInputData( this->UserDefinedTip );
     }
   
-  (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-    GetInput()->Update();
-  (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-    GetInput()->Update();
+  (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->Update();
+  (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->Update();
       
   
   

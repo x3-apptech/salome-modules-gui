@@ -42,7 +42,7 @@ class SVTK_Recorder : public vtkObject
   
  public:
   static SVTK_Recorder *New();
-  vtkTypeRevisionMacro(SVTK_Recorder,vtkObject);
+  vtkTypeMacro(SVTK_Recorder,vtkObject);
 
   void
   SetRenderWindow(vtkRenderWindow* theRenderWindow);

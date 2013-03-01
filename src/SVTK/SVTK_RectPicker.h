@@ -61,8 +61,8 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
     as fraction of rendering window size. (Rendering window size is measured
     across diagonal.)
   */
-  vtkSetMacro(Tolerance,vtkFloatingPointType);
-  vtkGetMacro(Tolerance,vtkFloatingPointType);
+  vtkSetMacro(Tolerance,double);
+  vtkGetMacro(Tolerance,double);
 
   //! Use these methods to pick points or points and cells
   vtkSetMacro(PickPoints,int);
@@ -71,17 +71,17 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
 
   virtual 
   int
-  Pick(vtkFloatingPointType theSelectionX, 
-       vtkFloatingPointType theSelectionY, 
-       vtkFloatingPointType theSelectionZ, 
-       vtkFloatingPointType theSelectionX2, 
-       vtkFloatingPointType theSelectionY2, 
-       vtkFloatingPointType theSelectionZ2,
+  Pick(double theSelectionX, 
+       double theSelectionY, 
+       double theSelectionZ, 
+       double theSelectionX2, 
+       double theSelectionY2, 
+       double theSelectionZ2,
        vtkRenderer *theRenderer);  
 
   int
-  Pick(vtkFloatingPointType theSelection[3], 
-       vtkFloatingPointType theSelection2[3], 
+  Pick(double theSelection[3], 
+       double theSelection2[3], 
        vtkRenderer *theRenderer);
 
   typedef std::vector<vtkIdType> TVectorIds;
@@ -98,16 +98,16 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
   ~SVTK_RectPicker();
 
   //! tolerance for computation (% of window)
-  vtkFloatingPointType Tolerance;
+  double Tolerance;
 
   //! use the following to control picking mode
   int PickPoints;
 
   //! second rectangle selection point in window (pixel) coordinates
-  vtkFloatingPointType SelectionPoint2[3]; 
+  double SelectionPoint2[3]; 
 
   //! second rectangle selection point in world coordinates
-  vtkFloatingPointType PickPosition2[3]; 
+  double PickPosition2[3]; 
 
   TVectorIdsMap myPointIdsMap;
   TVectorIdsMap myCellIdsMap;
@@ -115,9 +115,9 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
  private:
   virtual 
   int
-  Pick(vtkFloatingPointType, 
-       vtkFloatingPointType, 
-       vtkFloatingPointType, 
+  Pick(double, 
+       double, 
+       double, 
        vtkRenderer*);
 };
 

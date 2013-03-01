@@ -148,7 +148,8 @@ libSVTK_la_CPPFLAGS =		\
 	-I$(srcdir)/../OBJECT	\
 	-I$(srcdir)/../Prs 	\
 	-I$(srcdir)/../VTKViewer \
-	-I$(srcdir)/../OpenGLUtils
+	-I$(srcdir)/../OpenGLUtils \
+	-DvtkRenderingCore_AUTOINIT="3(vtkInteractionStyle,vtkRenderingOpenGL,vtkRenderingFreeTypeOpenGL)"
 
 libSVTK_la_LDFLAGS =			\
 	$(VTK_LIBS) $(OGL_LIBS)		\

@@ -45,10 +45,10 @@ public:
    */
   static VTKViewer_GeometryFilter *New();
   
-  /*! \fn vtkTypeRevisionMacro(VTKViewer_GeometryFilter, vtkGeometryFilter)
+  /*! \fn vtkTypeMacro(VTKViewer_GeometryFilter, vtkGeometryFilter)
    *  \brief VTK type revision macros.
    */
-  vtkTypeRevisionMacro(VTKViewer_GeometryFilter, vtkGeometryFilter);
+  vtkTypeMacro(VTKViewer_GeometryFilter, vtkGeometryFilter);
   /*! \fn void SetInside(int theShowInside)
    * \brief Sets \a myShowInside flag. \a myShowInside is changed, call this->Modified().
    * \param theShowInside - used for changing value of \a myShowInside variable.
@@ -106,8 +106,8 @@ public:
   virtual void SetQuadraticArcMode(bool theFlag);
   virtual bool GetQuadraticArcMode() const;
 
-  virtual void   SetQuadraticArcAngle(vtkFloatingPointType theMaxAngle);
-  virtual vtkFloatingPointType GetQuadraticArcAngle() const;
+  virtual void   SetQuadraticArcAngle(double theMaxAngle);
+  virtual double GetQuadraticArcAngle() const;
 
   typedef std::vector<vtkIdType> TVectorId;
   typedef std::map<vtkIdType, TVectorId> TMapOfVectorId;
@@ -150,7 +150,7 @@ private:
   int       myIsWireframeMode;
   int       myAppendCoincident3D;
 
-  vtkFloatingPointType    myMaxArcAngle;   // define max angle for mesh 2D quadratic element in the degrees
+  double    myMaxArcAngle;   // define max angle for mesh 2D quadratic element in the degrees
   bool      myIsBuildArc;     // flag for representation 2D quadratic element as arked polygon
 };
 
