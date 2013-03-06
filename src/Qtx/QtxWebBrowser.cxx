@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QWebView>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QToolBar>
 #include <QMenu>
 #include <QStatusBar>
@@ -399,27 +400,32 @@ void QtxWebBrowser::linkClicked( const QUrl& url )
   if ( url.scheme() == "file" ) {
     QString filename = url.toLocalFile();
     if ( QFileInfo( filename ).suffix().toLower() == "pdf" ) {
+      int i = -1;
 #ifdef WIN32
-      ::system( QString( "start %2" ).arg( filename ).toLatin1().constData() );
+      i = ::system( QString( "start %2" ).arg( filename ).toLatin1().constData() );
 #else
       // special processing of PDF files
       QStringList readers;
-      readers << "xdg-open" << "acroread" << "kpdf" << "kghostview" << "xpdf";
-      int i;
+      readers << "xdg-open" << "acroread"<< "okular" << "evince" << "kpdf" << "kghostview" << "xpdf";
       foreach ( QString r, readers ) {
 	QString reader = QString( "/usr/bin/%1" ).arg( r );
 	if ( QFileInfo( reader ).exists() ) {
-	  i = ::system( QString( "%1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
-	  // If Salome Qt version is lower than the system one, on KDE an unresolved symbol is raised
-	  // In this case, we try to launch the pdf viewer after unsetting the LD_LIBRARY_PATH environnement variable
 	  // Warning: the test on the return value of ::system does not work if the command ends with '&'
-	  if (i != 0)
-	    i  = ::system( QString( "unset LD_LIBRARY_PATH ; %1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
-	  if (i == 0)
-	    break;
+	  i = ::system( QString( "%1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
+	  if (i != 0) {
+	    // If Salome Qt version is lower than the system one, on KDE an unresolved symbol is raised
+	    // In this case, we can try to launch the pdf viewer after unsetting the LD_LIBRARY_PATH environnement variable
+	    i = ::system( QString( "unset LD_LIBRARY_PATH ; %1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
+	  }
+          if (i == 0) {
+            break;
+          }
 	}
       }
 #endif // WIN32
+      if (i != 0) {
+	QMessageBox::warning(this, tr("Opening pdf file"), tr("Impossible to open the pdf file: no viewer found or compatible."));
+      }
     }
   }
   myWebView->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );

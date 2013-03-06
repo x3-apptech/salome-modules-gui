@@ -18,8 +18,13 @@
 #
 
 IF(${WINDOWS})
-  FIND_LIBRARY(OpenGL_LIB OpenGL32 "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib")
-  FIND_LIBRARY(GlU_LIB GlU32 "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib")
+  IF("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")          # if platform is Windows 64 bit 
+    FIND_LIBRARY(OpenGL_LIB OpenGL32 HINTS "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib/x64")
+    FIND_LIBRARY(GlU_LIB GlU32 HINTS "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib/x64")
+  ELSE("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+    FIND_LIBRARY(OpenGL_LIB OpenGL32 "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib")
+    FIND_LIBRARY(GlU_LIB GlU32 "C:/Program Files/Microsoft SDKs/Windows/v6.0A/lib")
+  ENDIF("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
 ELSE(${WINDOWS})
   FIND_LIBRARY(OpenGL_LIB GL)
   FIND_LIBRARY(GlU_LIB GLU)
