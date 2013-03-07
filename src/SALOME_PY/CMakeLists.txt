@@ -43,10 +43,11 @@ SET(COMMON_LIBS
   ${VTK_LIBRARIES}
   ${OPENGL_LIBRARIES}
   LightApp
-  ${vtkCommonPythonD}
-  ${vtkGraphicsPythonD}
-  ${vtkImagingPythonD}
-  ${vtkPythonCore}
+  ${VTK_PYLIBS}
+  #  ${vtkCommonPythonD}
+  #  ${vtkGraphicsPythonD}
+  #  ${vtkImagingPythonD}
+  #  ${vtkPythonCore}
 )
 
 ADD_DEFINITIONS("-DHAVE_CONFIG_H ${CAS_DEFINITIONS} ${QT_DEFINITIONS} ${BOOST_DEFINITIONS} ${VTK_DEFINITIONS} ${PYTHON_DEFINITIONS}")
