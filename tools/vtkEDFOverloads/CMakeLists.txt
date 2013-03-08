@@ -17,11 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIRS}
-)
-
-ADD_DEFINITIONS(${VTK_DEFINITIONS})
+INCLUDE(${VTK_USE_FILE})
 
 ADD_LIBRARY(vtkTools vtkEDFCutter.cxx)
 TARGET_LINK_LIBRARIES(vtkTools ${VTK_LIBRARIES})
