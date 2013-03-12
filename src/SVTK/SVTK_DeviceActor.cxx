@@ -120,7 +120,7 @@ SVTK_DeviceActor
 {
   if(theMapper){
     int anId = 0;
-    myPassFilter[ anId ]->SetInputData( theMapper->GetInput() );
+    myPassFilter[ anId ]->SetInputConnection( theMapper->GetInputConnection( 0, 0 ) );
     myPassFilter[ anId + 1]->SetInputConnection( myPassFilter[ anId ]->GetOutputPort() );
     
     anId++; // 1
@@ -158,9 +158,20 @@ SVTK_DeviceActor
 */
 void
 SVTK_DeviceActor
-::SetInput(vtkDataSet* theDataSet)
+::SetInputData(vtkDataSet* theDataSet)
 {
   myMapper->SetInputData(theDataSet);
+  InitPipeLine(myMapper);
+}
+
+/*!
+  Allows to set initial vtkDataSet
+*/
+void
+SVTK_DeviceActor
+::SetInputConnection(vtkAlgorithmOutput* theAlgorithmOutput)
+{
+  myMapper->SetInputConnection(theAlgorithmOutput);
   InitPipeLine(myMapper);
 }
 

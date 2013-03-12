@@ -47,6 +47,7 @@ class vtkShrinkFilter;
 class vtkFeatureEdges;
 class VTKViewer_DataSetMapper;
 class vtkPassThroughFilter;
+class vtkAlgorithmOutput;
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )
@@ -79,7 +80,12 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   //! Allows to set initial #vtkDataSet
   virtual
   void
-  SetInput(vtkDataSet* theDataSet); 
+  SetInputData(vtkDataSet* theDataSet); 
+
+  //! Allows to set initial #vtkAlgorithmOutput
+  virtual
+  void
+  SetInputConnection(vtkAlgorithmOutput* theAlgorithmOutput); 
 
   /** @name For selection mapping purpose */
   //@{

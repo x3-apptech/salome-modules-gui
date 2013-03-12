@@ -65,7 +65,7 @@ void
 SVTK_Actor
 ::Initialize()
 {
-  SetInput(GetSource());
+  SetInputData(GetSource());
 }
 
 void
@@ -77,7 +77,7 @@ SVTK_Actor
 
   myUnstructuredGrid = theUnstructuredGrid;
 
-  SetInput(theUnstructuredGrid);
+  SetInputData(theUnstructuredGrid);
 }
 
 vtkUnstructuredGrid*
