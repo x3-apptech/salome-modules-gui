@@ -25,8 +25,10 @@
 //
 #include "Plot2d_SetupViewDlg.h"
 
+#ifndef NO_SUIT
 #include <SUIT_Session.h>
 #include <SUIT_Application.h>
+#endif
 #include <QtxColorButton.h>
 #include <QtxFontEdit.h>
 
@@ -58,20 +60,20 @@ const int MIN_SPIN_WIDTH  = 70;
   \param showDefCheck if \c true, show "Set settings as default" check box
   \param secondAxisY if \c true, show widgets for the second (right) vertical axis
 */
-Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent, 
-                                          bool showDefCheck, 
+Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
+                                          bool showDefCheck,
                                           bool secondAxisY )
-: QDialog( parent ), 
+: QDialog( parent ),
   mySecondAxisY( secondAxisY )
 {
   setModal( true );
   setWindowTitle( tr("TLT_SETUP_PLOT2D_VIEW") );
   setSizeGripEnabled( TRUE );
 
-  QGridLayout* topLayout = new QGridLayout( this ); 
+  QGridLayout* topLayout = new QGridLayout( this );
   topLayout->setSpacing( SPACING_SIZE );
   topLayout->setMargin( MARGIN_SIZE );
-  
+
   // main title
   myTitleCheck = new QCheckBox( tr( "PLOT2D_ENABLE_MAIN_TITLE" ), this );
   myTitleEdit  = new QLineEdit( this );
@@ -188,12 +190,12 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   aScaleLayout->addWidget( yScaleLab,    0, 2 );
   aScaleLayout->addWidget( myYModeCombo, 0, 3 );
 
-  // tab widget for choose properties of axis 
+  // tab widget for choose properties of axis
   QTabWidget* aTabWidget = new QTabWidget( this );
 
   // widget for parameters on Ox
   QWidget* aXWidget = new QWidget(aTabWidget);
-  QGridLayout* aXLayout = new QGridLayout( aXWidget ); 
+  QGridLayout* aXLayout = new QGridLayout( aXWidget );
   aXLayout->setSpacing( SPACING_SIZE );
   aXLayout->setMargin( MARGIN_SIZE );
 
@@ -208,7 +210,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   // grid
   QGroupBox* aGridGrpX = new QGroupBox( tr( "PLOT2D_GRID_TLT" ), aXWidget );
   QGridLayout* aGridLayoutX = new QGridLayout( aGridGrpX );
-  aGridLayoutX->setMargin( MARGIN_SIZE ); 
+  aGridLayoutX->setMargin( MARGIN_SIZE );
   aGridLayoutX->setSpacing( SPACING_SIZE );
 
   myXGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_HOR_MAJOR" ), aGridGrpX );
@@ -220,9 +222,9 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   myXGridSpin->setSingleStep( 1 );
   myXGridSpin->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
   myXGridSpin->setMinimumWidth( MIN_SPIN_WIDTH );
-  
+
   myXMinGridCheck      = new QCheckBox( tr( "PLOT2D_GRID_ENABLE_HOR_MINOR" ), aGridGrpX );
-  
+
   QLabel* aXMinLbl     = new QLabel( tr( "PLOT2D_MAX_INTERVALS" ), aGridGrpX);
   myXMinGridSpin       = new QSpinBox( aGridGrpX );
   myXMinGridSpin->setMinimum( 1 );
@@ -243,7 +245,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
 
   // widget for parameters on Oy
   QWidget* aYWidget = new QWidget(aTabWidget);
-  QGridLayout* aYLayout = new QGridLayout( aYWidget ); 
+  QGridLayout* aYLayout = new QGridLayout( aYWidget );
   aYLayout->setSpacing( SPACING_SIZE );
   aYLayout->setMargin( MARGIN_SIZE );
 
@@ -371,7 +373,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   btnLayout->addStretch();
   btnLayout->addWidget( myCancelBtn );
   btnLayout->addWidget( myHelpBtn );
-  
+
   // layout widgets
   topLayout->addWidget( myTitleCheck,  0,    0    );
   topLayout->addWidget( myTitleEdit,   0, 1, 1, 3 );
@@ -397,7 +399,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   topLayout->setRowStretch( 9, 5 );
 
   topLayout->addLayout( btnLayout,     10, 0, 1, 4 );
-  
+
   if ( !showDefCheck )
     myDefCheck->hide();
 
@@ -418,7 +420,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   connect( myOkBtn,         SIGNAL( clicked() ), this, SLOT( accept() ) );
   connect( myCancelBtn,     SIGNAL( clicked() ), this, SLOT( reject() ) );
   connect( myHelpBtn,       SIGNAL( clicked() ), this, SLOT( onHelp() ) );
-  
+
   if ( mySecondAxisY ) {
     connect( myTitleY2Check,   SIGNAL( clicked() ), this, SLOT( onY2TitleChecked() ) );
     connect( myY2GridCheck,    SIGNAL( clicked() ), this, SLOT( onY2GridMajorChecked() ) );
@@ -1107,7 +1109,9 @@ bool Plot2d_SetupViewDlg::isSetAsDefault()
 */
 void Plot2d_SetupViewDlg::onHelp()
 {
+#ifndef NO_SUIT
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
     app->onHelpContextModule( "GUI", "plot2d_viewer_page.html", "settings" );
+#endif
 }

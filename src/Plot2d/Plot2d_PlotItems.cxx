@@ -19,7 +19,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : Plot2d_HistogramItem.cxx
+//  File   : Plot2d_PlotItems.cxx
 //  Author : Natalia ERMOLAEVA, Open CASCADE S.A.S. (natalia.donis@opencascade.com)
 
 #include "Plot2d_PlotItems.h"
@@ -128,7 +128,7 @@ void Plot2d_QwtLegendItem::updateHighlit() {
     if(highlightColor != txt.backgroundBrush().color()) {
       txt.setBackgroundBrush(highlightColor);
       setText(txt);
-    }    
+    }
   } else if( QWidget* parent = qobject_cast<QWidget*>(this->parent()->parent()) ) {
     QPalette aPal = parent->palette();
     if(aPal.color(QPalette::Background) != txt.backgroundBrush().color()) {
@@ -157,9 +157,9 @@ bool Plot2d_QwtLegendItem::isSelected() const {
   Draw text of the item.
 */
 void  Plot2d_QwtLegendItem::drawText(QPainter * painter, const QRect &rect) {
-  painter->setPen( isSelected() ? Plot2d_Object::highlightedLegendTextColor() : 
+  painter->setPen( isSelected() ? Plot2d_Object::highlightedLegendTextColor() :
 		   getColorFromPalette( QPalette::Text) );
-  
+
   QwtLegendItem::drawText( painter, rect );
 }
 
@@ -167,7 +167,7 @@ void  Plot2d_QwtLegendItem::drawText(QPainter * painter, const QRect &rect) {
   Get color from the legend pallete by 'role' flag.
 */
 QColor Plot2d_QwtLegendItem::getColorFromPalette(QPalette::ColorRole role) {
-  QWidget* pw = parentWidget(); 
+  QWidget* pw = parentWidget();
   QColor  col = palette().color( role );
   while( pw ) {
     if ( qobject_cast<QwtLegend*>( pw ) ) {
@@ -175,7 +175,7 @@ QColor Plot2d_QwtLegendItem::getColorFromPalette(QPalette::ColorRole role) {
       break;
     }
     pw = pw->parentWidget();
-  } 
+  }
   return col;
 }
 /*
@@ -184,7 +184,7 @@ QColor Plot2d_QwtLegendItem::getColorFromPalette(QPalette::ColorRole role) {
 class Plot2d_QwtPlotCurve::Plot2d_DeviationData {
 public:
   Plot2d_DeviationData(const double *min, const double *max,const QList<int>& idx)
-  { 
+  {
     foreach(int index,idx) {
       myMin[index] = min[index];
       myMax[index] = max[index];
@@ -192,9 +192,9 @@ public:
   }
   ~Plot2d_DeviationData(){}
 
-  size_t size() const 
-  { 
-    return qwtMin(myMin.size(), myMax.size()); 
+  size_t size() const
+  {
+    return qwtMin(myMin.size(), myMax.size());
   }
   bool values(size_t i, double &min, double &max) {
     if(myMin.contains(i) && myMax.contains(i)) {
@@ -215,12 +215,12 @@ private:
 */
 Plot2d_QwtPlotCurve::Plot2d_QwtPlotCurve( const QString& title,
                                           QwtPlot::Axis yAxis /*const int index*/ ) :
-  Plot2d_SelectableItem(),    					  
+  Plot2d_SelectableItem(),
   QwtPlotCurve( title ),
   myYAxis( yAxis ),
   myYAxisIdentifierEnabled( false ),
   myDeviationData(0)
-{  
+{
 }
 
 /*!
@@ -245,11 +245,11 @@ void Plot2d_QwtPlotCurve::setYAxisIdentifierEnabled( const bool on )
 void Plot2d_QwtPlotCurve::updateLegend( QwtLegend* legend ) const
 {
   if ( !legend )
-    return; 
+    return;
 
   QWidget* widget = legend->find( this );
 
-  if ( testItemAttribute(QwtPlotItem::Legend)) {   
+  if ( testItemAttribute(QwtPlotItem::Legend) ) {
 
     if ( widget == NULL ) {
       widget = legendItem();
@@ -257,7 +257,7 @@ void Plot2d_QwtPlotCurve::updateLegend( QwtLegend* legend ) const
 	if ( widget->inherits("QwtLegendItem") ) {
 	  QwtLegendItem *label = (QwtLegendItem *)widget;
 	  label->setItemMode(legend->itemMode());
-		
+
 	  if ( plot() ) {
 	    QObject::connect(label, SIGNAL(clicked()),
 			     plot(), SLOT(legendItemClicked()));
@@ -269,10 +269,10 @@ void Plot2d_QwtPlotCurve::updateLegend( QwtLegend* legend ) const
 	legend->insert(this, widget);
       }
     }
-    
+
     QwtPlotCurve::updateLegend( legend );
-    
-    
+
+
     if( Plot2d_QwtLegendItem* anItem = dynamic_cast<Plot2d_QwtLegendItem*>( widget ) ) {
       int aMode = Plot2d_QwtLegendItem::IM_None;
       if( myYAxisIdentifierEnabled )
@@ -302,7 +302,7 @@ QWidget* Plot2d_QwtPlotCurve::legendItem() const
   Redefined method, which draw a set of points of a curve.
 */
 void Plot2d_QwtPlotCurve::draw(QPainter *painter,
-                               const QwtScaleMap &xMap, const QwtScaleMap &yMap, 
+                               const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                                int from, int to) const
 {
   if (to < 0)
@@ -310,13 +310,13 @@ void Plot2d_QwtPlotCurve::draw(QPainter *painter,
   QwtPlotCurve::draw(painter, xMap, yMap, from, to);
 
   //draw deviation data
-  if(hasDeviationData()) {    
+  if(hasDeviationData()) {
     painter->save();
     int lineW = deviationMarkerLineWidth();
     int tickSz = deviationMarkerTickSize() + qRound(lineW/2);
     double min, max, xi, yi;
     int xp, ytop, ybtm, tickl, tickr;
-    QColor c = isSelected() ? Plot2d_Object::selectionColor() : deviationMarkerColor(); 
+    QColor c = isSelected() ? Plot2d_Object::selectionColor() : deviationMarkerColor();
     QPen p = QPen(c, lineW, Qt::SolidLine);
     painter->setPen(p);
     for (int i = from; i <= to; i++) {
@@ -393,7 +393,7 @@ bool Plot2d_QwtPlotCurve::hasDeviationData() const {
 /*!
  * Remove deviation data from the plot item.
  */
-void Plot2d_QwtPlotCurve::clearDeviationData() 
+void Plot2d_QwtPlotCurve::clearDeviationData()
 {
   if(myDeviationData)
     delete myDeviationData;
@@ -407,14 +407,14 @@ void Plot2d_QwtPlotCurve::clearDeviationData()
 */
 Plot2d_SelectableItem::Plot2d_SelectableItem():
   myIsSelected(false)
-{ 
+{
 }
 
 /*!
   Destructor.
 */
 Plot2d_SelectableItem::~Plot2d_SelectableItem()
-{ 
+{
 }
 
 /*!
@@ -433,28 +433,28 @@ bool Plot2d_SelectableItem::isSelected() const {
 
 /*!
   Sets legend pen property.
-*/  
+*/
 void Plot2d_SelectableItem::setLegendPen( const QPen & p) {
   myLegendPen = p;
 }
 
 /*!
   Return legend pen property.
-*/  
+*/
 QPen Plot2d_SelectableItem::legendPen() const {
   return myLegendPen;
 }
 
 /*!
   Sets legend symbol property.
-*/  
+*/
 void Plot2d_SelectableItem::setLegendSymbol(const QwtSymbol& s) {
   myLegendSymbol = s;
 }
 
 /*!
   Sets legend symbol property.
-*/  
+*/
 QwtSymbol Plot2d_SelectableItem::legendSymbol() const {
   return myLegendSymbol;
 }
@@ -560,21 +560,21 @@ QColor Plot2d_HistogramQwtItem::color() const
 QwtDoubleRect Plot2d_HistogramQwtItem::boundingRect() const
 {
   QwtDoubleRect aRect = myData.boundingRect();
-  if ( !aRect.isValid() ) 
+  if ( !aRect.isValid() )
       return aRect;
 
   if ( myAttributes & Xfy ) {
     aRect = QwtDoubleRect( aRect.y(), aRect.x(),
                            aRect.height(), aRect.width() );
-    if ( aRect.left() > myReference ) 
+    if ( aRect.left() > myReference )
       aRect.setLeft( myReference );
-    else if ( aRect.right() < myReference ) 
+    else if ( aRect.right() < myReference )
       aRect.setRight( myReference );
-  } 
+  }
   else {
-    if ( aRect.bottom() < myReference ) 
+    if ( aRect.bottom() < myReference )
       aRect.setBottom( myReference );
-    else if ( aRect.top() > myReference ) 
+    else if ( aRect.top() > myReference )
       aRect.setTop( myReference );
   }
   return aRect;
@@ -599,7 +599,7 @@ void Plot2d_HistogramQwtItem::setHistogramAttribute( HistogramAttribute theAttr,
       myAttributes |= theAttr;
     else
       myAttributes &= ~theAttr;
-    
+
     itemChanged();
   }
 }
@@ -616,7 +616,7 @@ bool Plot2d_HistogramQwtItem::testHistogramAttribute( HistogramAttribute theAttr
   Draws histogram object
 */
 void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
-				    const QwtScaleMap& theXMap, 
+				    const QwtScaleMap& theXMap,
 				    const QwtScaleMap& theYMap,
 				    const QRect& ) const
 {
@@ -724,7 +724,7 @@ void Plot2d_HistogramQwtItem::drawBar( QPainter* thePainter,
 */
 Plot2d_HistogramItem::Plot2d_HistogramItem( const QwtText& theTitle )
 : Plot2d_HistogramQwtItem( theTitle ),
-  Plot2d_SelectableItem(), 
+  Plot2d_SelectableItem(),
   myCrossed( true )
 {
 }
@@ -760,7 +760,7 @@ void Plot2d_HistogramItem::updateLegend( QwtLegend* theLegend ) const
 {
   if ( !theLegend )
     return;
- 
+
   Plot2d_HistogramQwtItem::updateLegend( theLegend );
 
   QWidget* theWidget = theLegend->find( this );
@@ -774,7 +774,7 @@ void Plot2d_HistogramItem::updateLegend( QwtLegend* theLegend ) const
                      QPen( legendPen().color() ), QSize( aSize, aSize ) );
   anItem->setSymbol( aSymbol );
   anItem->setIdentifierMode( theLegend->identifierMode()
-			     | QwtLegendItem::ShowSymbol ); 
+			     | QwtLegendItem::ShowSymbol );
   anItem->setSelected(isSelected());
   anItem->updateHighlit();
   anItem->update();
@@ -784,7 +784,7 @@ void Plot2d_HistogramItem::updateLegend( QwtLegend* theLegend ) const
   Draws histogram object
 */
 void Plot2d_HistogramItem::draw( QPainter* thePainter,
-				 const QwtScaleMap& theXMap, 
+				 const QwtScaleMap& theXMap,
 				 const QwtScaleMap& theYMap,
 				 const QRect& ) const
 {
@@ -797,7 +797,7 @@ void Plot2d_HistogramItem::draw( QPainter* thePainter,
   const int y0 = theYMap.transform( baseline() );
 
   const QwtIntervalData& iData = data();
-  
+
   for ( int i = 0; i < (int)iData.size(); i++ ) {
     if ( testHistogramAttribute( Plot2d_HistogramItem::Xfy ) ) {
       const int x2 = theXMap.transform( iData.value( i ) );
@@ -888,7 +888,7 @@ void Plot2d_HistogramItem::drawRectAndLowers( QPainter* thePainter,
 {
   QRect aRect = theRect;
   // theRect has inversed coordinates on Y axis.
-  // The top of the rect is bottom in standard QRect coordinates, 
+  // The top of the rect is bottom in standard QRect coordinates,
   // and it bottom is the top.
   if ( myCrossed )//&& theOr == Qt::Horizontal )
     aRect.setTop( getCrossedTop( theRect ) );
@@ -912,7 +912,7 @@ int Plot2d_HistogramItem::getCrossedTop( const QRect& theRect ) const
     Plot2d_HistogramItem* anItem;
     QList<QRect> aRects;
     for ( ; anIt != aLast; anIt++ ) {
-      if ( !(*anIt)->rtti() == QwtPlotItem::Rtti_PlotHistogram )
+      if ( !((*anIt)->rtti() == QwtPlotItem::Rtti_PlotHistogram) )
         continue;
       anItem = dynamic_cast<Plot2d_HistogramItem*>( *anIt );
       if( !anItem || anItem == this )

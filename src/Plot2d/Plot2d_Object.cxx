@@ -25,9 +25,10 @@
 
 #include "Plot2d_Object.h"
 
-
+#ifndef NO_SUIT
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
+#endif
 
 // Static members
 QColor Plot2d_Object::mySelectionColor;
@@ -37,6 +38,7 @@ QColor Plot2d_Object::myHighlightedLegendTextColor;
  * Read colors from the resource manager.
 */
 void Plot2d_Object::initColors() {
+#ifndef NO_SUIT
   SUIT_Session* session = SUIT_Session::session();
   if(!session)
     return;
@@ -46,6 +48,10 @@ void Plot2d_Object::initColors() {
     mySelectionColor = resMgr->colorValue( "Plot2d", "SelectionColor", QColor(80,80,80) );
     myHighlightedLegendTextColor = resMgr->colorValue( "Plot2d", "SelectedLegendFontColor", QColor(255,255,255) );
   }
+#else
+  mySelectionColor = QColor(80,80,80);
+  myHighlightedLegendTextColor = QColor(255,255,255);
+#endif
 }
 
 /*!
@@ -315,12 +321,12 @@ void Plot2d_Object::setPointList( const pointList& points )
 }
 
 /*!
-  Sets object's data. 
+  Sets object's data.
 */
 void Plot2d_Object::setData( const double* hData, const double* vData, long size, const QStringList& lst )
 {
   clearAllPoints();
-  QStringList::const_iterator anIt = lst.begin(), aLast = lst.end(); 
+  QStringList::const_iterator anIt = lst.begin(), aLast = lst.end();
   for ( long i = 0; i < size; i++, anIt++ )
     addPoint( hData[i], vData[i], anIt==aLast ? QString() : *anIt );
 }

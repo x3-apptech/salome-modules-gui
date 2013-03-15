@@ -26,7 +26,9 @@
 #include "Plot2d_SetupCurveDlg.h"
 
 #include <QtxColorButton.h>
+#ifndef NO_SUIT
 #include <SUIT_Tools.h>
+#endif
 
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -162,7 +164,9 @@ Plot2d_SetupCurveDlg::Plot2d_SetupCurveDlg( QWidget* parent )
   connect( myOkBtn,       SIGNAL( clicked() ),           this, SLOT( accept() ) );
   connect( myCancelBtn,   SIGNAL( clicked() ),           this, SLOT( reject() ) );
 
+#ifndef NO_SUIT
   SUIT_Tools::centerWidget( this, parent );
+#endif
   updatePreview();
 }
 

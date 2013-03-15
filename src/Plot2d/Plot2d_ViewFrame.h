@@ -25,7 +25,9 @@
 
 #include "Plot2d.h"
 #include "Plot2d_Curve.h"
+#ifndef NO_ANALYTICAL_CURVES
 #include "Plot2d_AnalyticalCurve.h"
+#endif
 #include "Plot2d_NormalizeAlgorithm.h"
 
 #include <QWidget>
@@ -56,17 +58,22 @@ class Plot2d_QwtPlotPicker;
 typedef QMultiHash<QwtPlotCurve*, Plot2d_Curve*>  CurveDict;
 typedef QMultiHash<QwtPlotItem*,  Plot2d_Object*> ObjectDict;
 
-class PLOT2D_EXPORT Plot2d_ViewFrame : public QWidget, public Plot2d_CurveContainer
-{ 
+class PLOT2D_EXPORT Plot2d_ViewFrame : public QWidget
+#ifndef NO_ANALYTICAL_CURVES
+  , public Plot2d_CurveContainer
+#endif
+{
   Q_OBJECT
-  
-  enum { NoOpId, FitAreaId, ZoomId, PanId, GlPanId, DumpId, 
+
+  enum { NoOpId, FitAreaId, ZoomId, PanId, GlPanId, DumpId,
 	 ModeXLinearId, ModeXLogarithmicId, ModeYLinearId, ModeYLogarithmicId,
 	 LegendId, CurvePointsId, CurveLinesId, CurveSplinesId };
 public:
   /* Construction/destruction */
   Plot2d_ViewFrame( QWidget*, const QString& = "" );
   virtual ~Plot2d_ViewFrame();
+
+  void Init();
 
   enum ObjectType { MainTitle, XTitle, YTitle, Y2Title, XAxis, YAxis, Y2Axis };
 
@@ -84,19 +91,19 @@ public:
   virtual bool   eventFilter( QObject*, QEvent* );
 
   /* operations */
-  void           updateTitles();
+  void           updateTitles( const bool = true );
   void           setTitle( const QString& );
   QString        getTitle() const;
 
   QVector< QVector<QwtPlotCurve *> > displayPlot2dCurveList( const QList< QList<Plot2d_Curve*> >& sysCoCurveList,
                                                              bool                                 displayLegend,
                                                              const QList< QList<bool> >&          sides);
-  
+
   QVector< QVector<QwtPlotCurve *> > displayPlot2dCurveList( const QList<Plot2d_Curve*>&  curveList,
                                                              int  groupsize,
                                                              bool  displayLegend,
                                                              const QList< bool >& sides);
-  
+
   Plot2d_Curve* createPlot2dCurve( QString & title,
                                    QString & unit,
                                    QList<double> & xList,
@@ -147,25 +154,28 @@ public:
   void           fitData( const int, const double, const double,
 			  const double, const double,
 			  const double = 0, const double = 0 );
-  
+
   void           getFitRanges( double&, double&, double&, double&,
 			       double&, double&);
-  
+
   void           getFitRangeByCurves( double&, double&, double&, double&,
 				      double&, double& );
 
   void           getFitRangeByMarkers(double&, double&, double&, double&,
                                       double&, double& );
 
+#ifndef NO_ANALYTICAL_CURVES
   void              addAnalyticalCurve( Plot2d_AnalyticalCurve* );
   void              removeAnalyticalCurve( Plot2d_AnalyticalCurve* );
   void              updateAnalyticalCurve( Plot2d_AnalyticalCurve*, bool = false );
   void              updateAnalyticalCurves();
-  void              deselectAnalyticalCurves();	
-  void              deselectObjects();	
+  void              deselectAnalyticalCurves();
 
   AnalyticalCurveList getAnalyticalCurves() const;
   Plot2d_AnalyticalCurve* getAnalyticalCurve(QwtPlotItem *);
+#endif
+
+  void              deselectObjects();
 
   /* view parameters */
   void           copyPreferences( Plot2d_ViewFrame* );
@@ -182,7 +192,7 @@ public:
   QColor         getLegendFontColor() const;
   void           setMarkerSize( const int, bool = true  );
   int            getMarkerSize() const;
-  void           setBackgroundColor( const QColor& );
+  virtual void   setBackgroundColor( const QColor& );
   QColor         backgroundColor() const;
   void           setXGrid( bool, const int, bool, const int, bool = true );
   void           setYGrid( bool, const int, bool, const int,
@@ -214,7 +224,7 @@ public:
 
   bool           isLegendShow() const;
 
-  // Protection against QwtCurve::drawLines() bug in Qwt 0.4.x: 
+  // Protection against QwtCurve::drawLines() bug in Qwt 0.4.x:
   // it crashes if switched to X/Y logarithmic mode, when one or more points have
   // non-positive X/Y coordinate
   bool           isXLogEnabled() const;
@@ -233,7 +243,7 @@ public:
 
   QwtPlotCanvas* getPlotCanvas() const;
   Plot2d_Curve*  getClosestCurve( QPoint, double&, int& ) const;
-  
+
   Plot2d_Object* getPlotObject( QwtPlotItem* ) const;
   QwtPlotItem*   getPlotObject( Plot2d_Object* ) const;
   QwtPlotCurve*  getPlotCurve( Plot2d_Curve* ) const;
@@ -242,8 +252,8 @@ public:
   void           updatePlotItem(Plot2d_Object*, QwtPlotItem*);
 protected:
   int            testOperation( const QMouseEvent& );
-  void           readPreferences();
-  void           writePreferences();
+  virtual void   readPreferences();
+  virtual void   writePreferences();
   QString        getInfo( const QPoint& );
   virtual void   wheelEvent( QWheelEvent* );
   bool           hasPlotCurve( Plot2d_Curve* ) const;
@@ -252,18 +262,16 @@ protected:
   QString        getXmlVisualParameters();
   bool           setXmlVisualParameters(const QString&);
 
-
-  
-  
-
 public slots:
-  void           onViewPan(); 
+  void           onViewPan();
   void           onViewZoom();
   void           onViewFitAll();
   void           onViewFitArea();
-  void           onViewGlobalPan(); 
+  void           onViewGlobalPan();
   void           onSettings();
+#ifndef NO_ANALYTICAL_CURVES
   void           onAnalyticalCurve();
+#endif
   void           onFitData();
   void           onChangeBackground();
   void           onPanLeft();
@@ -311,14 +319,16 @@ protected:
   double              myXDistance, myYDistance, myYDistance2;
   bool                mySecondY;
   ObjectDict          myObjects;
+#ifndef NO_ANALYTICAL_CURVES
   AnalyticalCurveList myAnalyticalCurves;
+#endif
   Plot2d_NormalizeAlgorithm* myLNormAlgo;
   Plot2d_NormalizeAlgorithm* myRNormAlgo;
   bool                myIsDefTitle;
  private:
   // List of QwtPlotCurve curves to draw (created by Plot2d_Curve::createPlotItem() )
   QList<QwtPlotItem*> myQwtPlotCurveList;
-  
+
   // List of intermittent segments to connect curves
   QList<QwtPlotCurve*> myIntermittentSegmentList;
 
@@ -326,7 +336,7 @@ protected:
   QList<Plot2d_Curve*> myPlot2dCurveList;
 };
 
-class Plot2d_Plot2d : public QwtPlot 
+class Plot2d_Plot2d : public QwtPlot
 {
   Q_OBJECT
 public:
@@ -357,7 +367,7 @@ public:
   QwtPlotZoomer* zoomer() const;
 
   virtual void   updateYAxisIdentifiers();
-  
+
   // Methods to deal with axes ticks
 
   void createAxisScaleDraw();
@@ -369,7 +379,7 @@ public:
          const QList< QPair< QString, QMap<double,QString> > > & devicesPosLabelTicks);
 
   void createSeparationLine( double Xpos);
-                                         
+
 
 public slots:
   virtual void   polish();
@@ -433,7 +443,7 @@ public:
   virtual QwtText label(double value) const;
 
   void setLabelTick(double value, QString label, bool isDevice = false);
-    
+
   void setTicks(const QList<double> aTicks);
 
   void setInterval(double lowerBound, double upperBound);
@@ -443,7 +453,7 @@ public:
 protected:
 
   void drawLabel( QPainter* painter, double value) const;
-    
+
   void drawTick( QPainter* painter, double value, int len) const;
 
 private:
@@ -454,10 +464,10 @@ private:
   QMap<double, QString> myLabelX;  // position, label
   //
   QList<double> myTicks;  // positions
-    
+
   // Systems names to display under X axis
   QMap<double, QString> myLabelDevice;
-    
+
   Plot2d_Plot2d* myPlot;  // Drawing zone QwtPlot
 
   double myLowerBound;
@@ -473,20 +483,20 @@ class Plot2d_QwtPlotPicker : public QwtPlotPicker
 {
 public:
   static const double BOUND_HV_SIZE;
-  
+
   Plot2d_QwtPlotPicker( int            xAxis,
                         int            yAxis,
                         int            selectionFlags,
                         RubberBand     rubberBand,
                         DisplayMode    trackerMode,
                         QwtPlotCanvas *canvas);
-    
+
   Plot2d_QwtPlotPicker( int  xAxis,
                         int  yAxis,
                         QwtPlotCanvas *canvas);
-    
+
   virtual ~Plot2d_QwtPlotPicker();
-    
+
   QList<QwtPlotMarker*>             pMarkers;         // points markers
   QMap<QwtPlotMarker*, QwtText>  pMarkersToolTip;  // associations (marker,tooltip)
 
