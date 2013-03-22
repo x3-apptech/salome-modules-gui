@@ -41,8 +41,10 @@ myIsSelChangeEnabled( true )
 /*!destructor. mySelectors auto delete.*/
 SUIT_SelectionMgr::~SUIT_SelectionMgr()
 {
-  for ( SelectorList::iterator it = mySelectors.begin(); it != mySelectors.end(); ++it )
+  while( !mySelectors.empty() ) {
+    SelectorList::iterator it = mySelectors.begin();
     delete *it;
+  }
 }
 
 /*!Add selector \a sel to selectors list,if it's not exists in list.*/
