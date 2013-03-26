@@ -165,8 +165,10 @@ bool SUIT_Study::saveDocument()
 void SUIT_Study::abortAllOperations()
 {
   myBlockChangeState = true;
-  for ( Operations::iterator it = myOperations.begin(); it != myOperations.end(); ++it )
+  while ( !myOperations.isEmpty() ) {
+    Operations::iterator it = myOperations.begin();
     (*it)->abort();
+  }
   myBlockChangeState = false;
   myOperations.clear();
 }
