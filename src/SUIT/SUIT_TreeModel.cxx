@@ -1611,13 +1611,28 @@ void SUIT_TreeModel::updateItem( SUIT_TreeModel::TreeItem* item, bool emitLayout
     return;
   
   // update all columns corresponding to the given data object
-  emit layoutAboutToBeChanged(); // Comment by VSR 25/04/2011: fix crash on delete objects. Uncomment by PRascle 18/12/2012 : required by Qt4.8 (original issue 22424 not accessible)
-  QModelIndex firstIdx = index( obj, 0 );
-  QModelIndex lastIdx  = index( obj, columnCount() - 1 );
-  emit dataChanged( firstIdx, lastIdx );
-  obj->setModified(false);
-  if ( emitLayoutChanged )
-    emit layoutChanged();
+  /*To avoid crashes we should update any persistent model indexes before emitting layoutChanged(). In other words, when the structure changes:
+      -  emit layoutAboutToBeChanged
+      - Remember the QModelIndex that will change
+      - call changePersistentIndex()
+      - emit layoutChanged
+  */
+
+    emit layoutAboutToBeChanged();
+
+    // Remember the QModelIndex that will change
+    QModelIndexList fromIndexes;
+    QModelIndexList toIndexes;
+    for (int i = 0; i < columnCount() - 1; ++i) {
+        fromIndexes.append( index( obj, i ));
+        toIndexes.append(QModelIndex());
+    }
+    changePersistentIndexList(fromIndexes, toIndexes); // Limitation: can lead to loss of selection
+
+    emit dataChanged( toIndexes.first(), toIndexes.last() );
+    obj->setModified(false);
+    if ( emitLayoutChanged )
+      emit layoutChanged();
 }
 
 /*!
