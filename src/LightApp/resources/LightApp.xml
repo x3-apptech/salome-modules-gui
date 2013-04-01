@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+  Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 
   Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
   CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -85,8 +85,8 @@
   </section>
   <section name="PyConsole">
     <!-- Python console preferences -->
-    <parameter name="show_banner"         value="true" />
-    <parameter name="font"                value="Helvetic,12" />
+    <parameter name="show_banner"         value="false" />
+    <parameter name="font"                value="Sans Serif,12" />
     <parameter name="additional_families" value="Helvetic;Helvetica;Helvetica[Adobe];Times;Times[Adobe];Sans Serif;Serif;Monospace;Lucida"/>
   </section>
   <section name="Style">
@@ -95,11 +95,11 @@
   </section>
   <section name="ObjectBrowser" >
     <!-- Object Browser preferences -->
-    <parameter name="auto_hide_search_tool" value="true" />
-    <parameter name="auto_size"             value="false" />
-    <parameter name="auto_size_first"       value="true"  />
-    <parameter name="resize_on_expand_item" value="false"  />
-    <parameter name="browse_published_object" value="1"  />
+    <parameter name="auto_hide_search_tool"   value="true" />
+    <parameter name="auto_size"               value="true" />
+    <parameter name="auto_size_first"         value="true" />
+    <parameter name="resize_on_expand_item"   value="true" />
+    <parameter name="browse_published_object" value="1" />
   </section>
   <section name="FileDlg">
     <!-- "Open/Save File" dialog box preferences-->
@@ -124,6 +124,8 @@
     <!-- General study settings -->
     <parameter name="store_positions"    value="true" />
     <parameter name="auto_save_interval" value="0" />
+    <parameter name="multi_file"         value="false" />
+    <parameter name="ascii_file"         value="false" />
   </section>
   <section name="viewers" >
     <!-- common viewers preferences -->
@@ -131,15 +133,15 @@
   </section>
   <section name="OCCViewer" >
     <!-- OCC viewer preferences -->
-    <parameter name="xz_background"     value="35, 136, 145" />
-    <parameter name="yz_background"     value="35, 136, 145" />
-    <parameter name="xy_background"     value="35, 136, 145" />
-    <parameter name="background"        value="35, 136, 145" />
-    <parameter name="trihedron_size" value="100" />
+    <parameter name="background"      value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
+    <parameter name="xz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
+    <parameter name="yz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
+    <parameter name="xy_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
+    <parameter name="trihedron_size"  value="100" />
     <parameter name="navigation_mode" value="0" />
-    <parameter name="zooming_mode"   value="0" />
+    <parameter name="zooming_mode"    value="0" />
     <parameter name="show_static_trihedron" value="true"/>
-    <parameter name="relative_size"                    value="true"/>    
+    <parameter name="relative_size"                    value="true"/>
  </section>
  <section name="VTKViewer" >
     <!-- VTK viewer preferences -->
@@ -147,7 +149,7 @@
     <parameter name="projection_mode"                  value="0"/>
     <parameter name="trihedron_size"                   value="105"/>
     <parameter name="relative_size"                    value="true"/>
-    <parameter name="dynamic_preselection"             value="true"/>
+    <parameter name="dynamic_preselection"             value="false"/>
     <parameter name="navigation_mode"                  value="0"/>
     <parameter name="zooming_mode"                     value="0"/>
     <parameter name="speed_value"                      value="10"/>
@@ -238,8 +240,9 @@
   </section>
   <section name="ExternalBrowser" >
     <!-- External HELP browser settings -->
-    <parameter value="C:\Program Files\Internet Explorer\iexplore.exe" name="winapplication" />
-    <parameter value="false" name="use_external_browser" />
-    <parameter value="/usr/bin/mozilla" name="application" />
+    <parameter name="winapplication"       value="C:\Program Files\Internet Explorer\iexplore.exe" />
+    <parameter name="use_external_browser" value="false" />
+    <parameter name="application"          value="/usr/bin/mozilla" />
+    <parameter name="parameters"           value="" />
   </section>
 </document>

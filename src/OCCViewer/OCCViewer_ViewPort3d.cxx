@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -66,8 +66,6 @@ static Standard_Boolean zRotation = Standard_False;
 OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_Viewer)& viewer, V3d_TypeOfView  type )
   : OCCViewer_ViewPort( parent ),
     myScale( 1.0 ),
-    myDegenerated( true ),
-    myAnimate( false ),
     myBusy( true ),
     myIsAdvancedZoomingEnabled( false )
 {
@@ -82,8 +80,6 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
     myPerspView = new V3d_PerspectiveView( viewer );
     myActiveView = myPerspView;
   }
-  if ( myDegenerated )
-    activeView()->SetDegenerateModeOn();
   setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
 }
 
@@ -160,11 +156,6 @@ Handle( V3d_View ) OCCViewer_ViewPort3d::setView( const Handle( V3d_View )& view
       oldView->View()->Deactivate();
     view->SetBackgroundColor( oldView->BackgroundColor() );
   }
-
-  if ( myDegenerated )
-    view->SetDegenerateModeOn();
-  else
-    view->SetDegenerateModeOff();
 
   view->View()->Activate();
   activeView() = view;
@@ -458,18 +449,6 @@ void OCCViewer_ViewPort3d::updateBackground()
 }
 
 /*!
-  Set animation mode
-  \param theDegenerated - degenerated mode
-*/
-void OCCViewer_ViewPort3d::setAnimationMode(bool theDegenerated)
-{
-  if ( !activeView().IsNull() ) {
-    myAnimate = theDegenerated;
-    activeView()->SetAnimationMode(true, theDegenerated);
-  }
-}
-
-/*!
   Updates the active viewport. [ virtual public ]
 */
 void OCCViewer_ViewPort3d::onUpdate()
@@ -549,10 +528,6 @@ void OCCViewer_ViewPort3d::startRotation( int x, int y,
                                           const gp_Pnt& theSelectedPoint )
 {
   if ( !activeView().IsNull() ) {
-    myDegenerated = activeView()->DegenerateModeIsOn();
-    activeView()->SetDegenerateModeOn();
-    if (myAnimate) activeView()->SetAnimationModeOn();
-
     //double gx, gy, gz;
     //double gx = activeView()->gx;
     //activeView()->Gravity(gx,gy,gz);
@@ -633,9 +608,6 @@ void OCCViewer_ViewPort3d::rotate( int x, int y,
 void OCCViewer_ViewPort3d::endRotation()
 {
   if ( !activeView().IsNull() ) {
-    if (myAnimate) activeView()->SetAnimationModeOff();
-    if ( !myDegenerated )
-      activeView()->SetDegenerateModeOff();
     activeView()->ZFitAll(1.);
     activeView()->SetZSize(0.);
     activeView()->Update();

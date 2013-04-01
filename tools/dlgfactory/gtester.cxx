@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2010-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // This program can be used for unit test of dialog box.
 // You just have to include the interface file (*.h) and
 // use the dialog class as illustrated in the functions TEST_*.

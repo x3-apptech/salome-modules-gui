@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -486,7 +486,7 @@ void LightApp_Application::createActionForViewer( const int id,
 
 void LightApp_Application::createActions()
 {
-  STD_Application::createActions();
+  CAM_Application::createActions();
 
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
@@ -3462,7 +3462,7 @@ void LightApp_Application::addViewManager( SUIT_ViewManager* vm )
 {
   connect( vm, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
            this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
-  STD_Application::addViewManager( vm );
+  CAM_Application::addViewManager( vm );
 }
 
 /*!
@@ -3476,6 +3476,8 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
   if (aStudy )
     aStudy->removeViewMgr(vm->getGlobalId());
 
+  CAM_Application::removeViewManager( vm );
+
   LightApp_SelectionMgr* selMgr = selectionMgr();
   QList<SUIT_Selector*> selectors;
   selMgr->selectors( selectors );
@@ -3484,8 +3486,6 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
       delete selector;
     }
   }
-
-  STD_Application::removeViewManager( vm );
 
   // IPAL22894: Crash on closing OCC view
   //delete vm;

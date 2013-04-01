@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -557,6 +557,10 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 #endif
 
   bool res = CAM_Study::openDocument( theStudyName );
+  
+  //rnv: to fix the "0051779: TC7.2.0: Save operation works incorrectly for study loaded from data server"
+  //     mark study as "not saved" after call openDocument( ... ) method.
+  setIsSaved(false);
   emit opened( this );
 
   bool restore = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );

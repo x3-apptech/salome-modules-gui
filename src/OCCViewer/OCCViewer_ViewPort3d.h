@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -52,8 +52,6 @@ public:
   Handle(V3d_View)      getView() const;
   Handle(V3d_View)      setView( const Handle(V3d_View)& );
   Handle(V3d_Viewer)    getViewer() const;
-
-  void                  setAnimationMode(bool theDegenerated);
 
   virtual void          setBackgroundColor( const QColor& color);    // obsolete
   virtual QColor        backgroundColor() const;                     // obsolete
@@ -121,8 +119,6 @@ private:
   Handle(V3d_View)      myOrthoView;
   Handle(V3d_View)      myPerspView;
   Handle(V3d_View)      myActiveView;
-  bool                  myDegenerated;
-  bool                  myAnimate;
   bool                  myBusy;
   double                myScale;
   bool                  myIsAdvancedZoomingEnabled;

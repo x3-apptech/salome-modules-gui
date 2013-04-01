@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -189,3 +189,11 @@ SET(TKIGES ${TKIGES_EA})
 SET(TKSTEP ${TKSTEP_EA})
 SET(TKSTL ${TKSTL_EA})
 SET(TKCAF ${TKCAF_EA})
+
+IF(StdPlugin)
+  SET(CAS_STDPLUGIN StdPlugin)
+ELSE(StdPlugin)
+  IF(TKStdLSchema)
+    SET(CAS_STDPLUGIN TKStdSchema)
+  ENDIF(TKStdLSchema)
+ENDIF(StdPlugin)
