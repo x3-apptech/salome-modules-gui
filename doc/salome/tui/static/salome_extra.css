@@ -8,7 +8,7 @@
         background-repeat: no-repeat;
 	padding: 0px;
 	margin: 0px;
-	width: 100%;
+	width: 99.9%;
 	border-bottom: 1px solid #5373B4;
 }
 
@@ -21,4 +21,9 @@ div.version {
 	width:100px;
 	-moz-border-radius: 8px;
 	margin: 5px;
+}
+
+.navpath li.footer {
+	line-height:15px;
+	text-align: right;
 }
