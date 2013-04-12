@@ -27,22 +27,10 @@
 #include "PyInterp_Dispatcher.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
 #include "PyInterp_Interp.h"
 #include "PyInterp_Watcher.h"
-#include <SALOME_Event.h>
+#include "PyInterp_Request.h"
 
 #include <QObject>
 #include <QCoreApplication>
-
-class PyInterp_ExecuteEvent: public SALOME_Event
-{
-public:
-  PyInterp_Request* myRequest;
-  PyInterp_ExecuteEvent( PyInterp_Request* r )
-    : myRequest( r ) {}
-  virtual void Execute()
-  {
-    myRequest->execute();
-  }
-};
 
 PyInterp_Dispatcher* PyInterp_Dispatcher::myInstance = 0;
 
@@ -76,9 +64,9 @@ void PyInterp_Request::Destroy( PyInterp_Request* request )
   delete request;
 }
 
-QEvent* PyInterp_Request::createEvent() const
+QEvent* PyInterp_Request::createEvent()
 {
-  return new PyInterp_Event( PyInterp_Event::ES_NOTIFY, (PyInterp_Request*)this );
+  return new PyInterp_Event( PyInterp_Event::ES_NOTIFY, this );
 }
 
 void PyInterp_Request::processEvent( QObject* o )

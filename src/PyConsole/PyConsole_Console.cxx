@@ -30,7 +30,8 @@
 
 #include "PyConsole_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
 #include "PyConsole_Console.h"
-#include "PyConsole_Editor.h"
+#include "PyConsole_EnhEditor.h"
+#include "PyConsole_EnhInterp.h"
 
 #include <Qtx.h>
 
@@ -49,8 +50,7 @@
   \param interp python interpreter
 */
 PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp )
-: QWidget( parent ),
-  myEditor( 0 )
+: QWidget( parent )
 {
   // create python interpreter
   myInterp = interp;
@@ -74,6 +74,13 @@ PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp 
 
   createActions();
 }
+
+/**
+ * Protected constructor.
+ */
+PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* i,  PyConsole_Editor* e)
+  : QWidget (parent), myEditor(e), myInterp(i)
+{}
 
 /*!
   \brief Destructor.
@@ -323,4 +330,36 @@ void PyConsole_Console::updateActions()
   myActions[CopyId]->setEnabled( myEditor->textCursor().hasSelection() );
   myActions[PasteId]->setEnabled( !myEditor->isReadOnly() && !QApplication::clipboard()->text().isEmpty() );
   myActions[SelectAllId]->setEnabled( !myEditor->document()->isEmpty() );
+}
+
+/**
+ * Similar to constructor of the base class but using enhanced objects.
+ * TODO: this should really be done in a factory to avoid code duplication.
+ * @param parent
+ * @param interp
+ */
+PyConsole_EnhConsole::PyConsole_EnhConsole( QWidget* parent, PyConsole_EnhInterp* interp)
+  : PyConsole_Console(parent, interp, 0)
+{
+  // create python interpreter
+  myInterp = interp;
+  if ( !myInterp )
+    myInterp = new PyConsole_EnhInterp();
+
+  // initialize Python interpretator
+  myInterp->initialize();
+
+  // create editor console
+  QVBoxLayout* lay = new QVBoxLayout( this );
+  lay->setMargin( 0 );
+  myEditor = new PyConsole_EnhEditor( static_cast<PyConsole_EnhInterp*>(myInterp), this );
+  char* synchronous = getenv("PYTHON_CONSOLE_SYNC");
+  if (synchronous && atoi(synchronous))
+  {
+      myEditor->setIsSync(true);
+  }
+  myEditor->viewport()->installEventFilter( this );
+  lay->addWidget( myEditor );
+
+  createActions();
 }

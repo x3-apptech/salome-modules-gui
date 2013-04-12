@@ -34,6 +34,8 @@ QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 SET(PyInterp_SOURCES
   PyInterp_Interp.cxx
   PyInterp_Dispatcher.cxx
+  PyInterp_Event.cxx
+  PyInterp_Request.cxx
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
@@ -46,5 +48,7 @@ SET(COMMON_HEADERS_H
   PyInterp.h
   PyInterp_Interp.h
   PyInterp_Dispatcher.h
+  PyInterp_Event.h
+  PyInterp_Request.h
 )
 INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${GUI_salomeinclude_HEADERS})

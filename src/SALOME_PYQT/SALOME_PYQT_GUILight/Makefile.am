@@ -74,7 +74,7 @@ libSalomePyQtGUILight_la_CPPFLAGS =  $(QT_INCLUDES) $(SIP_INCLUDES) $(PYTHON_INC
 	-I$(srcdir)/../../Plot2d -I$(srcdir)/../../OCCViewer				\
 	-I$(srcdir)/../../CAM -I$(srcdir)/../../STD		                        \
 	-I$(srcdir)/../../SUITApp                                                       \
-	-I$(srcdir)/../../CAM -I$(srcdir)/../../STD
+	-I$(srcdir)/../../CAM -I$(srcdir)/../../STD -I$(srcdir)/../../Event
 
 if GUI_ENABLE_CORBA
 libSalomePyQtGUILight_la_CPPFLAGS += -I$(srcdir)/../../SalomeApp \

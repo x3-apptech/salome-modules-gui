@@ -43,7 +43,7 @@ public:
   PyConsole_Editor( PyConsole_Interp* theInterp, QWidget *theParent = 0 );
   ~PyConsole_Editor();
   
-  virtual void   addText( const QString& str, const bool newBlock = false ); 
+  virtual void   addText( const QString& str, const bool newBlock = false, const bool isError = false );
   bool           isCommand( const QString& str ) const;
 
   virtual void   exec( const QString& command );
@@ -60,6 +60,14 @@ public:
 
   virtual QSize  sizeHint() const;
 
+public slots:
+    void           cut();
+    void           paste();
+    void           clear();
+    void           handleReturn();
+    void           onPyInterpChanged( PyConsole_Interp* );
+    void           dump();
+
 protected:
   virtual void   dropEvent( QDropEvent* event );
   virtual void   mouseReleaseEvent( QMouseEvent* event );
@@ -68,15 +76,9 @@ protected:
 
   virtual PyInterp_Request* createRequest( const QString& );
 
-public slots:
-  void           cut();
-  void           paste();
-  void           clear();
-  void           handleReturn();
-  void           onPyInterpChanged( PyConsole_Interp* );
-  void           dump();
-  
-private:
+  /** Convenience function */
+  inline int promptSize() const { return myPrompt.size(); }
+
   PyConsole_Interp* myInterp;           //!< python interpreter
 
   QString           myCommandBuffer;    //!< python command buffer

@@ -1839,7 +1839,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else  if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_Console( desktop(),new LightApp_PyInterp());
+    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(),new LightApp_PyInterp());
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
     pyCons->setIsShowBanner(resourceMgr()->booleanValue( "PyConsole", "show_banner", true ));

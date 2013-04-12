@@ -31,10 +31,14 @@ lib_LTLIBRARIES = libPyInterp.la
 salomeinclude_HEADERS =		\
 	PyInterp.h		\
 	PyInterp_Interp.h	\
+	PyInterp_Event.h	\
+	PyInterp_Request.h	\
 	PyInterp_Dispatcher.h
 
 dist_libPyInterp_la_SOURCES =	\
 	PyInterp_Interp.cxx	\
+	PyInterp_Event.cxx	\
+	PyInterp_Request.cxx	\
 	PyInterp_Dispatcher.cxx
 
 MOC_FILES = PyInterp_Watcher_moc.cxx

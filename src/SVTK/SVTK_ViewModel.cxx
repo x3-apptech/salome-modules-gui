@@ -666,10 +666,10 @@ void SVTK_Viewer::EraseAll( const bool forced )
             //Handle(SALOME_InteractiveObject) anObj = anAct->getIO();
             //if(!anObj.IsNull() && anObj->hasEntry() && aStudy)
             //  ToolsGUI::SetVisibility(aStudy,anObj->getEntry(),false,this);
-            if(forced) 
+            if(forced){
               if(SVTK_Renderer* aRnd = aView->GetRenderer())
                 aRnd->RemoveActor(anAct);
-            else{
+            }else{
               // just erase actor
               anAct->SetVisibility( false );
               // erase dependent actors

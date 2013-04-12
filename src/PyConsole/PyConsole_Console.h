@@ -34,6 +34,7 @@
 
 class PyConsole_Interp;
 class PyConsole_Editor;
+class PyConsole_EnhInterp;
 
 class PYCONSOLE_EXPORT PyConsole_Console : public QWidget, public SUIT_PopupClient
 {
@@ -81,14 +82,30 @@ public:
   void                setMenuActions( const int );
   int                 menuActions() const;
 
-private:
+protected:
   void                createActions();
   void                updateActions();
 
-private:
+  PyConsole_Console( QWidget* parent, PyConsole_Interp*,  PyConsole_Editor*);
+
+
   PyConsole_Interp*   myInterp;    //!< python interpreter
   PyConsole_Editor*   myEditor;    //!< python console editor widget
   QMap<int, QAction*> myActions;   //!< menu actions list
+};
+
+/**
+ * Enhance console object providing auto-completion.
+ * Similar to PyConsole_Console except that an enhanced interpreter and enhanced editor
+ * are encapsulated.
+ */
+class PYCONSOLE_EXPORT PyConsole_EnhConsole: public PyConsole_Console
+{
+  Q_OBJECT
+
+public:
+  PyConsole_EnhConsole( QWidget* parent, PyConsole_EnhInterp* interp = 0);
+  virtual ~PyConsole_EnhConsole() {}
 };
 
 #endif // PYCONSOLE_CONSOLE_H

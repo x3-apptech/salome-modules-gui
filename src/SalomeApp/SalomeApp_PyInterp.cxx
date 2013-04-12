@@ -37,7 +37,7 @@
  * initstate & initcontext redefined here.
  */
 SalomeApp_PyInterp::SalomeApp_PyInterp(): 
-  PyConsole_Interp(), myFirstRun( true )
+  PyConsole_EnhInterp(), myFirstRun( true )
 {
 }
 

@@ -32,7 +32,7 @@
  * calls initialize method defined in base class, which calls virtual methods
  * initstate & initcontext redefined here.
  */
-LightApp_PyInterp::LightApp_PyInterp(): PyConsole_Interp()
+LightApp_PyInterp::LightApp_PyInterp(): PyConsole_EnhInterp()
 {
 }
 

@@ -29,15 +29,24 @@ salomeinclude_HEADERS =		\
 	PyConsole.h		\
 	PyConsole_Console.h	\
 	PyConsole_Editor.h	\
-	PyConsole_Interp.h
+	PyConsole_EnhEditor.h	\
+	PyConsole_EnhInterp.h	\
+	PyConsole_Event.h	\
+	PyConsole_Request.h	\
+	PyConsole_Interp.h  
 
 dist_libPyConsole_la_SOURCES =	\
 	PyConsole_Console.cxx	\
 	PyConsole_Editor.cxx	\
-	PyConsole_Interp.cxx		
+	PyConsole_EnhEditor.cxx	\
+	PyConsole_Event.cxx	\
+	PyConsole_Request.cxx	\
+	PyConsole_Interp.cxx	\
+	PyConsole_EnhInterp.cxx
 
 MOC_FILES =				\
 	PyConsole_Editor_moc.cxx	\
+	PyConsole_EnhEditor_moc.cxx	\
 	PyConsole_Console_moc.cxx
 
 nodist_libPyConsole_la_SOURCES = $(MOC_FILES)
@@ -47,7 +56,7 @@ nodist_salomeres_DATA = \
 	PyConsole_msg_fr.qm
 
 libPyConsole_la_CPPFLAGS = $(PYTHON_INCLUDES) $(QT_INCLUDES) \
-	-I$(srcdir)/../PyInterp -I$(srcdir)/../SUIT -I$(srcdir)/../Qtx
+	-I$(srcdir)/../PyInterp -I$(srcdir)/../SUIT -I$(srcdir)/../Qtx -I$(srcdir)/../Event
 
 libPyConsole_la_LDFLAGS  = $(PYTHON_LIBS) $(QT_MT_LIBS) $(KERNEL_LDFLAGS) -lSALOMELocalTrace
-libPyConsole_la_LIBADD   = ../Qtx/libqtx.la ../SUIT/libsuit.la ../PyInterp/libPyInterp.la
+libPyConsole_la_LIBADD   = ../Qtx/libqtx.la ../SUIT/libsuit.la ../Event/libEvent.la ../PyInterp/libPyInterp.la 

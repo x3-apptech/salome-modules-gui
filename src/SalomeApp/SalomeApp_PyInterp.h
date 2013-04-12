@@ -27,9 +27,9 @@
 #ifndef _SalomeApp_PYINTERP_H_
 #define _SalomeApp_PYINTERP_H_
 
-#include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
+#include <PyConsole_EnhInterp.h> // this include must be first (see PyInterp_base.h)!
 
-class SalomeApp_PyInterp : public PyConsole_Interp
+class SalomeApp_PyInterp : public PyConsole_EnhInterp
 {
 public:
   SalomeApp_PyInterp();

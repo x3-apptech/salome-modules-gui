@@ -86,16 +86,14 @@
   - <Ctrl><C>            : copy
   - <Ctrl><X>            : cut
   - <Ctrl><V>            : paste
-
-  TODO:
-  - paste multiline text: process each line as separate command
-    (including mouse middle-button click pasting)
-  - the same for drag-n-drop of multiline text
 */
 
 #include "PyConsole_Interp.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
 #include "PyConsole_Editor.h"
-#include <PyInterp_Dispatcher.h>
+#include "PyConsole_Event.h"
+#include "PyInterp_Event.h"
+#include "PyInterp_Dispatcher.h"
+#include "PyConsole_Request.h"
 
 #include <SUIT_Tools.h>
 #include <SUIT_FileDlg.h>
@@ -113,13 +111,10 @@
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextStream>
+#include <QChar>
 
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
-#define PROMPT_SIZE myPrompt.length()
-
-#define PRINT_EVENT 65432
-
 
 class DumpCommandsFileValidator : public SUIT_FileValidator
 {
@@ -141,94 +136,18 @@ bool DumpCommandsFileValidator::canSave(const QString& file, bool permissions)
   return SUIT_FileValidator::canSave( file, permissions);
 }
 
-/*!
-  \class ExecCommand
-  \brief Python command execution request.
-  \internal
-*/
-
-class ExecCommand : public PyInterp_LockRequest
-{
-public:
-  /*!
-    \brief Constructor.
-    
-    Creates new python command execution request.
-    \param theInterp   python interpreter
-    \param theCommand  python command
-    \param theListener widget to get the notification messages
-    \param sync        if True the request is processed synchronously 
-  */
-  ExecCommand( PyInterp_Interp*        theInterp, 
-               const QString&          theCommand,
-               PyConsole_Editor*       theListener, 
-               bool                    sync = false )
-    : PyInterp_LockRequest( theInterp, theListener, sync ),
-      myCommand( theCommand ), myState( PyInterp_Event::ES_OK )
-  {}
-
-protected:
-  /*!
-    \brief Execute the python command in the interpreter and 
-           get its execution status.
-  */
-  virtual void execute()
-  {
-    if ( myCommand != "" )
-    {
-      int ret = getInterp()->run( myCommand.toUtf8().data() );
-      if ( ret < 0 )
-        myState = PyInterp_Event::ES_ERROR;
-      else if ( ret > 0 )
-        myState = PyInterp_Event::ES_INCOMPLETE;
-    } 
-  }
-
-  /*!
-    \brief Create and return a notification event.
-    \return new notification event
-  */
-  virtual QEvent* createEvent() const
-  {
-    if ( IsSync() )
-      QCoreApplication::sendPostedEvents( listener(), PRINT_EVENT );
-    return new PyInterp_Event( myState, (PyInterp_Request*)this );    
-  }
-
-private:
-  QString myCommand;   //!< Python command
-  int     myState;     //!< Python command execution status
-};
-
-/*!
-  \class PrintEvent
-  \brief Python command output backend event.
-  \internal
-*/
-
-class PrintEvent : public QEvent
-{
-public:
-  /*!
-    \brief Constructor
-    \param c message text (python trace)
-  */
-  PrintEvent( const char* c ) : QEvent( (QEvent::Type)PRINT_EVENT ), myText( c ) {}
-  /*!
-    \brief Get message
-    \return message text (python trace)
-  */
-  QString text() const { return myText; }
-
-private:
-  QString myText; //!< Event message (python trace)
-};
-
-void staticCallback( void* data, char* c )
+void staticCallbackStdout( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput())
-    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( c ) ); 
+    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( c, false ) );
 }
+
+void staticCallbackStderr( void* data, char* c )
+{
+  if(!((PyConsole_Editor*)data)->isSuppressOutput())
+    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( c, true ) );
+}
+
 
 /*!
   \brief Constructor. 
@@ -257,8 +176,8 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
   setWordWrapMode( QTextOption::WrapAnywhere );
   setAcceptRichText( false );
 
-  theInterp->setvoutcb( staticCallback, this );
-  theInterp->setverrcb( staticCallback, this );
+  theInterp->setvoutcb( staticCallbackStdout, this );
+  theInterp->setverrcb( staticCallbackStderr, this );
 
   // san - This is necessary for troubleless initialization
   onPyInterpChanged( theInterp );
@@ -366,14 +285,23 @@ QSize PyConsole_Editor::sizeHint() const
   \brief Put the string \a str to the python editor.
   \param str string to be put in the command line of the editor
   \param newBlock if True, then the string is printed on a new line
+  \param isError if true, the text is printed in dark red
 */
 void PyConsole_Editor::addText( const QString& str, 
-                                const bool     newBlock )
+                                const bool     newBlock,
+                                const bool    isError)
 {
+  QTextCursor theCursor(textCursor());
+  QTextCharFormat cf;
+
   moveCursor( QTextCursor::End );
   if ( newBlock )
-    textCursor().insertBlock();
-  textCursor().insertText( str );
+    theCursor.insertBlock();
+  if (isError)
+      cf.setForeground(QBrush(Qt::red));
+  else
+      cf.setForeground(QBrush(Qt::black));
+  theCursor.insertText( str, cf);
   moveCursor( QTextCursor::End );
   ensureCursorVisible();
 }
@@ -382,6 +310,8 @@ void PyConsole_Editor::addText( const QString& str,
   \brief Convenient method for executing a Python command,
   as if the user typed it manually.
   \param command python command to be executed
+
+  !!! WARNING: doesn't work properly with multi-line commands. !!!
 */
 void PyConsole_Editor::exec( const QString& command )
 {
@@ -462,12 +392,17 @@ void PyConsole_Editor::execAndWait( const QString& command )
 */
 void PyConsole_Editor::handleReturn()
 {
+  // Position cursor at the end
+  QTextCursor curs(textCursor());
+  curs.movePosition(QTextCursor::End);
+  setTextCursor(curs);
+
   // get last line
   QTextBlock par = document()->end().previous();
   if ( !par.isValid() ) return;
 
   // get command
-  QString cmd = par.text().remove( 0, PROMPT_SIZE );
+  QString cmd = par.text().remove( 0, promptSize() );
   // extend the command buffer with the current command 
   myCommandBuffer.append( cmd );
   // add command to the history
@@ -499,7 +434,7 @@ void PyConsole_Editor::dropEvent( QDropEvent* event )
   QPoint pos = event->pos();
   QTextCursor cur = cursorForPosition( event->pos() );
   // if the position is not in the last line move it to the end of the command line
-  if ( cur.position() < document()->end().previous().position() + PROMPT_SIZE ) {
+  if ( cur.position() < document()->end().previous().position() + promptSize() ) {
     moveCursor( QTextCursor::End );
     pos = cursorRect().center();
   }
@@ -529,21 +464,18 @@ void PyConsole_Editor::mouseReleaseEvent( QMouseEvent* event )
     //copy();
   }
   else if ( event->button() == Qt::MidButton ) {
-    QString text;
-    if ( QApplication::clipboard()->supportsSelection() )
-      text = QApplication::clipboard()->text( QClipboard::Selection );
-    if ( text.isEmpty() )
-      text = QApplication::clipboard()->text( QClipboard::Clipboard );
     QTextCursor cur = cursorForPosition( event->pos() );
     // if the position is not in the last line move it to the end of the command line
-    if ( cur.position() < document()->end().previous().position() + PROMPT_SIZE ) {
+    if ( cur.position() < document()->end().previous().position() + promptSize() ) {
       moveCursor( QTextCursor::End );
     }
     else {
       setTextCursor( cur );
     }
-    textCursor().clearSelection();
-    textCursor().insertText( text );
+    const QMimeData* md = QApplication::clipboard()->mimeData( QApplication::clipboard()->supportsSelection() ? 
+							       QClipboard::Selection : QClipboard::Clipboard );
+    if ( md )
+      insertFromMimeData( md );
   }
   else {
     QTextEdit::mouseReleaseEvent( event );
@@ -612,13 +544,15 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
   }
 
   // check for printed key
-  aKey = ( aKey < Qt::Key_Space || aKey > Qt::Key_ydiaeresis ) ? aKey : 0;
+  // #### aKey = ( aKey < Qt::Key_Space || aKey > Qt::Key_ydiaeresis ) ? aKey : 0;
+  // Better:
+  aKey = !(QChar(aKey).isPrint()) ? aKey : 0;
 
   switch ( aKey ) {
   case 0 :
     // any printed key: just print it
     {
-      if ( curLine < endLine || curCol < PROMPT_SIZE ) {
+      if ( curLine < endLine || curCol < promptSize() ) {
         moveCursor( QTextCursor::End );
       }
       QTextEdit::keyPressEvent( event );
@@ -654,7 +588,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
           myCmdInHistory = myHistory.count();
           // remember current command
           QTextBlock par = document()->end().previous();
-          myCurrentCommand = par.text().remove( 0, PROMPT_SIZE );
+          myCurrentCommand = par.text().remove( 0, promptSize() );
         }
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory--;
@@ -724,7 +658,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
     // - with <Ctrl>+<Shift> modifier keys pressed: move one word left with selection
     {
       QString txt = textCursor().block().text();
-      if ( !shftPressed && isCommand( txt ) && curCol <= PROMPT_SIZE ) {
+      if ( !shftPressed && isCommand( txt ) && curCol <= promptSize() ) {
         moveCursor( QTextCursor::Up );
         moveCursor( QTextCursor::EndOfBlock );
       }
@@ -743,15 +677,15 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
       QString txt = textCursor().block().text();
       if ( !shftPressed ) {
         if ( curCol < txt.length() ) {
-          if ( isCommand( txt ) && curCol < PROMPT_SIZE ) {
-            cur.setPosition( cur.block().position() + PROMPT_SIZE );
+          if ( isCommand( txt ) && curCol < promptSize() ) {
+            cur.setPosition( cur.block().position() + promptSize() );
             setTextCursor( cur );
             break;
           }
         }
         else {
           if ( curLine < endLine && isCommand( textCursor().block().next().text() ) ) {
-            cur.setPosition( cur.position() + PROMPT_SIZE+1 );
+            cur.setPosition( cur.position() + promptSize()+1 );
             setTextCursor( cur );
             horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
             break;
@@ -798,7 +732,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
           myCmdInHistory = myHistory.count();
           // remember current command
           QTextBlock par = document()->end().previous();
-          myCurrentCommand = par.text().remove( 0, PROMPT_SIZE );
+          myCurrentCommand = par.text().remove( 0, promptSize() );
         }
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory = 0;
@@ -876,14 +810,14 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         QString txt = textCursor().block().text();
         if ( isCommand( txt ) ) {
           if ( shftPressed ) {
-            if ( curCol > PROMPT_SIZE ) {
+            if ( curCol > promptSize() ) {
               cur.movePosition( QTextCursor::StartOfLine, QTextCursor::KeepAnchor );
-              cur.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor, PROMPT_SIZE );
+              cur.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor, promptSize() );
             }
           }
           else {
             cur.movePosition( QTextCursor::StartOfLine );
-            cur.movePosition( QTextCursor::Right, QTextCursor::MoveAnchor, PROMPT_SIZE );
+            cur.movePosition( QTextCursor::Right, QTextCursor::MoveAnchor, promptSize() );
           }
           setTextCursor( cur );
         }
@@ -916,13 +850,13 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
       if ( cur.hasSelection() ) {
         cut();
       }
-      else if ( cur.position() > document()->end().previous().position() + PROMPT_SIZE ) {
+      else if ( cur.position() > document()->end().previous().position() + promptSize() ) {
         if ( shftPressed ) {
           moveCursor( QTextCursor::PreviousWord, QTextCursor::KeepAnchor );
           textCursor().removeSelectedText();
         }
         else if ( ctrlPressed ) {
-          cur.setPosition( document()->end().previous().position() + PROMPT_SIZE, 
+          cur.setPosition( document()->end().previous().position() + promptSize(),
                            QTextCursor::KeepAnchor );
           setTextCursor( cur );
           textCursor().removeSelectedText();
@@ -932,7 +866,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         }
       }
       else {
-        cur.setPosition( document()->end().previous().position() + PROMPT_SIZE );
+        cur.setPosition( document()->end().previous().position() + promptSize() );
         setTextCursor( cur );
         horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
       }
@@ -948,7 +882,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
       if ( cur.hasSelection() ) {
         cut();
       }
-      else if ( cur.position() > document()->end().previous().position() + PROMPT_SIZE-1 ) {
+      else if ( cur.position() > document()->end().previous().position() + promptSize()-1 ) {
         if ( shftPressed ) {
           moveCursor( QTextCursor::NextWord, QTextCursor::KeepAnchor );
           textCursor().removeSelectedText();
@@ -962,7 +896,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         }
       }
       else {
-        cur.setPosition( document()->end().previous().position() + PROMPT_SIZE );
+        cur.setPosition( document()->end().previous().position() + promptSize() );
         setTextCursor( cur );
         horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
       }
@@ -994,10 +928,10 @@ void PyConsole_Editor::customEvent( QEvent* event )
 {
   switch( event->type() )
   {
-  case PRINT_EVENT:
+  case PrintEvent::EVENT_ID:
     {
       PrintEvent* pe=(PrintEvent*)event;
-      addText( pe->text() );
+      addText( pe->text(), false, pe->isError());
       return;
     }
   case PyInterp_Event::ES_OK:
@@ -1115,11 +1049,11 @@ void PyConsole_Editor::cut()
   if ( cur.hasSelection() ) {
     QApplication::clipboard()->setText( cur.selectedText() );
     int startSelection = cur.selectionStart();
-    if ( startSelection < document()->end().previous().position() + PROMPT_SIZE )
-      startSelection = document()->end().previous().position() + PROMPT_SIZE;
+    if ( startSelection < document()->end().previous().position() + promptSize() )
+      startSelection = document()->end().previous().position() + promptSize();
     int endSelection = cur.selectionEnd();
-    if ( endSelection < document()->end().previous().position() + PROMPT_SIZE )
-      endSelection = document()->end().previous().position() + PROMPT_SIZE;
+    if ( endSelection < document()->end().previous().position() + promptSize() )
+      endSelection = document()->end().previous().position() + promptSize();
     cur.setPosition( startSelection );
     cur.setPosition( endSelection, QTextCursor::KeepAnchor );
     horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
@@ -1139,18 +1073,18 @@ void PyConsole_Editor::paste()
   QTextCursor cur = textCursor();
   if ( cur.hasSelection() ) {
     int startSelection = cur.selectionStart();
-    if ( startSelection < document()->end().previous().position() + PROMPT_SIZE )
-      startSelection = document()->end().previous().position() + PROMPT_SIZE;
+    if ( startSelection < document()->end().previous().position() + promptSize() )
+      startSelection = document()->end().previous().position() + promptSize();
     int endSelection = cur.selectionEnd();
-    if ( endSelection < document()->end().previous().position() + PROMPT_SIZE )
-      endSelection = document()->end().previous().position() + PROMPT_SIZE;
+    if ( endSelection < document()->end().previous().position() + promptSize() )
+      endSelection = document()->end().previous().position() + promptSize();
     cur.setPosition( startSelection );
     cur.setPosition( endSelection, QTextCursor::KeepAnchor );
     horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
     setTextCursor( cur );
     textCursor().removeSelectedText();
   }
-  if ( textCursor().position() < document()->end().previous().position() + PROMPT_SIZE )
+  if ( textCursor().position() < document()->end().previous().position() + promptSize() )
     moveCursor( QTextCursor::End );
   QTextEdit::paste();
 }

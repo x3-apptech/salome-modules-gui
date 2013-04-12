@@ -1,5 +1,8 @@
 // Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 //
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -16,24 +19,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+//  Author : Vadim SANDLER (Open CASCADE S.A.S), Adrien Bruneton (CEA/DEN)
 
-//  Author : Roman NIKOLAEV, Open CASCADE S.A.S. (roman.nikolaev@opencascade.com)
-//  Date   : 22/06/2007
-//
-#ifndef _LIGHTAPP_PYINTERP_H_
-#define _LIGHTAPP_PYINTERP_H_
-
-#include <PyConsole_EnhInterp.h> // this include must be first (see PyInterp_base.h)!
-
-class LightApp_PyInterp : public PyConsole_EnhInterp
-{
-public:
-  LightApp_PyInterp();
-  virtual ~LightApp_PyInterp();
-  
-protected:
-  virtual void initPython();
-  virtual bool initContext();
-};
-
-#endif //_LIGHTAPP_PYINTERP_H_
+#include "PyConsole_Event.h"

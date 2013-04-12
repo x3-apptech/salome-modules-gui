@@ -22,106 +22,22 @@
 
 //  File   : PyInterp_Dispatcher.h
 //  Author : Sergey Anikin, OCC
-//  Module : SALOME
+//  Module : GUI
 //
 #ifndef PYINTERP_DISPATCHER_H
 #define PYINTERP_DISPATCHER_H
 
 #include "PyInterp.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
 
+#include "PyInterp_Request.h"   // full include instead of forward declaration
+                                // everyone inc'ing the Dispatcher will get the requests for free.
+
 #include <QMutex>
 #include <QThread>
-#include <QEvent>
 #include <QQueue>
 
 class QObject;
-
-class PyInterp_Interp;
 class PyInterp_Watcher;
-class PyInterp_Dispatcher;
-class PyInterp_ExecuteEvent;
-
-class PYINTERP_EXPORT PyInterp_Request
-{
-  friend class PyInterp_Dispatcher;
-  friend class PyInterp_ExecuteEvent;
-
-  PyInterp_Request();
-  PyInterp_Request( const PyInterp_Request& );
-
-protected:
-  virtual ~PyInterp_Request() {};
-  // protected destructor - to control deletion of requests
-
-public:
-  PyInterp_Request( QObject* listener, bool sync = false )
-    : myIsSync( sync ), myListener( listener ) {};
-
-  static void     Destroy( PyInterp_Request* );
-  // Deletes a request
-
-  bool            IsSync() const { return myIsSync; }
-  // Returns true if this request should be processed synchronously,
-  // without putting it to a queue
-
-protected:
-  virtual void    safeExecute();
-
-  virtual void    execute() = 0;
-  // Should be redefined in successors, contains actual request code
-
-  virtual QEvent* createEvent() const;
-  // This method can be overridden to customize notification event creation
-
-  virtual void    processEvent( QObject* );
-
-  QObject*        listener() const { return myListener; }
-  void            setListener( QObject* );
-
-private:
-  void            process();
-
-private:
-  QMutex          myMutex;
-  bool            myIsSync;
-  QObject*        myListener;
-};
-
-class PYINTERP_EXPORT PyInterp_LockRequest : public PyInterp_Request
-{
-public:
-  PyInterp_LockRequest( PyInterp_Interp* interp, QObject* listener = 0, bool sync = false )
-    : PyInterp_Request( listener, sync ), myInterp( interp ) {}
-
-protected:
-  PyInterp_Interp*  getInterp() const { return myInterp; }
-
-  virtual void      safeExecute();
-
-private:
-  PyInterp_Interp*  myInterp;
-};
-
-class PYINTERP_EXPORT PyInterp_Event : public QEvent
-{
-  PyInterp_Event();
-  PyInterp_Event( const PyInterp_Event& );
-
-public:
-  //Execution state
-  enum { ES_NOTIFY = QEvent::User + 5000, ES_OK, ES_ERROR, ES_INCOMPLETE, ES_LAST };
-
-  PyInterp_Event( int type, PyInterp_Request* request )
-    : QEvent( (QEvent::Type)type ), myRequest( request ) {}
-
-  virtual ~PyInterp_Event();
-
-  PyInterp_Request* GetRequest() const { return myRequest; }
-  operator PyInterp_Request*() const { return myRequest; }
-
-private:
-  PyInterp_Request* myRequest;
-};
 
 class PYINTERP_EXPORT PyInterp_Dispatcher : protected QThread
 {
