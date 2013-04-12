@@ -51,8 +51,8 @@ OPTION(SALOME_USE_SUPERVGRAPHVIEWER "Enable Supervision visualization (Mandatory
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
 
 ENABLE_TESTING()
-SET(VERSION "7.1.0")
-SET(VERSION_DEV "1")
+SET(VERSION "7.2.0")
+SET(VERSION_DEV "0")
 
 SET(BUILD_SHARED_LIBS true)
 
