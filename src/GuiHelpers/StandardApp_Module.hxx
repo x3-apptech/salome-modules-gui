@@ -31,6 +31,8 @@
 
 #include "SalomeGuiHelpers.hxx"
 
+#define UNSPECIFIED_INT -1
+
 /*!
  * This class is provided as the base class for the standard gui part
  * of a SALOME module. To define a gui part, you just have to
@@ -91,7 +93,7 @@ public:
                            const int identifier=ACTIONID_UNDEFINED);
 
   void addActionInToolbar(int actionId);
-  void addActionInMenubar(int actionId);
+  void addActionInMenubar(int actionId, int menuId=UNSPECIFIED_INT);
   void addActionInPopupMenu(int actionId,const QString& rule="client='ObjectBrowser'");
 
 protected:

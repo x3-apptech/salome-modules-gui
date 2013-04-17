@@ -151,12 +151,19 @@ void StandardApp_Module::addActionInToolbar(int actionId) {
 }
 
 /**
- * Integrate the action in the default menu
+ * Integrate action in the specified menu. If the menu is not
+ * specified, then it is integrated into the menu associated to the
+ * SALOME module.
  */
-void StandardApp_Module::addActionInMenubar(int actionId) {
+void StandardApp_Module::addActionInMenubar(int actionId, int menuId) {
+  if ( menuId == UNSPECIFIED_INT) {
+    menuId = _defaultMenuId;
+  }
   this->action( actionId )->setIconVisibleInMenu(true);
-  this->createMenu( actionId, _defaultMenuId, 10 );
+  this->createMenu( actionId, menuId, 10 );
 }
+
+
 
 /**
  * Add the specified action as an item in the popup menu, with the
