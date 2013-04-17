@@ -104,11 +104,11 @@ introduced into study since its last save. </li>
 Each record contains the date and time of the
 modification and the name of the user, who has introduced it.</li>
 <li><b> Stored data </b> - Shows the versions of data currently stored
-in the study. Note, that this information does not concern current
+in the study. Note, that this information does not concern the current
 versions of SALOME modules, it shows the version in which the data has been
 initially created. If the study is re-saved in the version of SALOME,
-different from initial one, the version information is
-highlighted by red-colored font; this means that version information
+different from the initial one, the version information is
+highlighted by the red-colored font, which means that the version information
 is not actually valid.</li>
 </ul>
 

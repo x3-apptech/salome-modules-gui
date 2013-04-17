@@ -5,7 +5,7 @@
 SALOME <b>NoteBook</b> allows to predefine numerical and boolean
 parameters (variables).
 
-By default, the <b>NoteBook</b> takes place in a left tabbed widget.
+By default, the <b>NoteBook</b> is located in a tabbed widget to the left (shared with the Object Browser).
 
 \image html notebook1.png
 
@@ -18,12 +18,12 @@ If you have modified some variables, which are already used in the current
 study, you should click <b>Update Study</b> button to apply your changes
 to the study.
 
-\note The study can not be updated until at least one of variables in
+\note The study can not be updated until at least one of the variables in
 the table has an invalid name or value (marked by red color). The names of
 variables should be unique and their values should be numerical (integer or
 double) or boolean ("True" / "False").
 
-Here is an example of setting of variables in python scripts:
+Here is an example of setting variables in python scripts:
 \code
 import salome_notebook
 

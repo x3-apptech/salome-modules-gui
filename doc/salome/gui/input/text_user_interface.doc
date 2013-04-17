@@ -3,10 +3,10 @@
 \page tui_page Using SALOME GUI python interface
 
 
-The extended salome.py Python module provides a \b sg variable, this variable provides an access to some GUI functions.
+The extended salome.py Python module provides \b sg variable, which gives access to some GUI functions.
 
 \b Note, that this variable is not available if you use salome.py
-Python module outside the GUI desktop, i.e. not in the embedded Python
+Python module outside of the GUI desktop, i.e. without the embedded Python
 console (since SWIG library is linked directly to the GUI library).
 
 The example of usage:
@@ -14,36 +14,36 @@ The example of usage:
 # update Object browser contents
 salome.sg.updateObjBrowser(True)
 
-# get active study ID
+# get the active study ID
 studyId = salome.sg.getActiveStudyId() 
 
-# get active study name
+# get the active study name
 studyName = salome.sg.getActiveStudyName()
 
-# get selected objects
-selCount = salome.sg.SelectedCount() # total number of selected items
+# get the selected objects
+selCount = salome.sg.SelectedCount() # the number of selected items
 for i in range(selCount):
-    print salome.sg.getSelected(i) # print entry ID of i-th selected item
+    print salome.sg.getSelected(i) # print the entry ID of i-th selected item
 \endcode
 
 \code
-# get list of all selected objects' IDs
+# get the list of IDs of all selected objects
 selected = salome.sg.getAllSelected()
 
-# add object to the selection
+# add an object to the selection
 salome.sg.AddIObject("0:1:1:1") # "0:1:1:1" is an object ID 
 
-# remove object from the selection (make it unselected)
+# remove an object from the selection (make it unselected)
 salome.sg.RemoveIObject("0:1:1:1") # "0:1:1:1" is an object ID 
 
-# clear selection (set all objects unselected)
+# clear the selection (set all objects unselected)
 salome.sg.ClearIObjects()
 
-# display object in the current view (if possible)
+# display an object in the current view (if possible)
 salome.sg.Display("0:1:1:1") # "0:1:1:1" is an object ID 
 salome.sg.UpdateView() # update view
 
-# erase object from the current view
+# erase an object from the current view
 salome.sg.Erase("0:1:1:1") # "0:1:1:1" is an object ID 
 salome.sg.UpdateView() # update view
 
@@ -63,13 +63,13 @@ salome.sg.ViewTop() #  back view
 salome.sg.ViewLeft() # left view
 salome.sg.ViewRight() # right view
 
-# reset current view
+# reset the current view
 salome.sg.ResetView()
 
-# get component symbolic name by its user name
+# get the component symbolic name by its user name
 compName = salome.sg.getComponentName("Geometry") # compoName = "GEOM"
 
-# get component user name by its symbolic name
+# get the component user name by its symbolic name
 compName = salome.sg.getComponentUserName("SMESH") # compoName = "Mesh"
 
 # ...
