@@ -2289,7 +2289,11 @@ bool QtxResourceMgr::save()
   if ( myResources.isEmpty() || !myHasUserValues )
     return true;
 
-  return fmt->save( myResources[0] );
+  bool result = fmt->save( myResources[0] );
+
+  saved();
+
+  return result;
 }
 
 /*!
@@ -2888,6 +2892,14 @@ QString QtxResourceMgr::userFileName( const QString& appName, const bool /*for_l
 QString QtxResourceMgr::globalFileName( const QString& appName ) const
 {
   return QString( "%1.%2" ).arg( appName ).arg( currentFormat() );
+}
+
+/*!
+  \brief This function is called after user configuration file is saved.
+  Can be redefined in the successor classes, default implementation does nothing.
+*/
+void QtxResourceMgr::saved()
+{
 }
 
 /*!

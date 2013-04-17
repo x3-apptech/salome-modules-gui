@@ -180,6 +180,8 @@ protected:
   virtual QString  userFileName( const QString&, const bool = true ) const;
   virtual QString  globalFileName( const QString& ) const;
 
+  virtual void     saved();
+
 private:
   void             initialize( const bool = true ) const;
   QString          substMacro( const QString&, const QMap<QChar, QString>& ) const;
