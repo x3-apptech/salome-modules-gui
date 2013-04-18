@@ -584,8 +584,36 @@ Veuillez consulter la documentation.</translation>
         <translation>Changer l&apos;arrière-plan...</translation>
     </message>
     <message>
+        <source>GT_HORIZONTALGRADIENT</source>
+        <translation>Gradient horizontal</translation>
+    </message>
+    <message>
         <source>GT_VERTICALGRADIENT</source>
         <translation>Gradient vertical</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTDIAGONALGRADIENT</source>
+        <translation>Gradient de la première diagonale</translation>
+    </message>
+    <message>
+        <source>GT_SECONDDIAGONALGRADIENT</source>
+        <translation>Gradient de la seconde diagonale</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTCORNERGRADIENT</source>
+        <translation>Gradient du premier coin</translation>
+    </message>
+    <message>
+        <source>GT_SECONDCORNERGRADIENT</source>
+        <translation>Gradient du second coin</translation>
+    </message>
+    <message>
+        <source>GT_THIRDCORNERGRADIENT</source>
+        <translation>Gradient du troisième coin</translation>
+    </message>
+    <message>
+        <source>GT_FOURTHCORNERGRADIENT</source>
+        <translation>Gradient du quatrième coin</translation>
     </message>
     <message>
         <source>BG_IMAGE_FILES</source>
