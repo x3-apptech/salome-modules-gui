@@ -365,15 +365,15 @@ Voulez-vous le recharger ?</translation>
     </message>
     <message>
         <source>PRP_COMPONENT</source>
-        <translation type="unfinished">Component</translation>
+        <translation>Composant</translation>
     </message>
     <message>
         <source>PRP_VERSION</source>
-        <translation type="unfinished">Version</translation>
+        <translation>Version</translation>
     </message>
     <message>
         <source>PRP_VERSIONS</source>
-        <translation type="unfinished">Stored data</translation>
+        <translation>Données stockées</translation>
     </message>
     <message>
         <source>PRP_DATE_MODIF</source>
