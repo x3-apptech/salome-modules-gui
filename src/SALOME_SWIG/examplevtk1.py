@@ -28,11 +28,8 @@
 import os
 import libSalomePy
 from vtk import *
-
-try:
-    from libvtkRenderingPython import *
-except:
-    from vtkRenderingPython import *
+from vtkRenderingCorePython import *
+from vtkFiltersSourcesPython import *
 
 # get the "vtkRenderer": an OpenGL rendering context
 ren = libSalomePy.getRenderer()
@@ -41,7 +38,7 @@ ren = libSalomePy.getRenderer()
 cone = vtkConeSource()
 cone.SetResolution(8)
 coneMapper = vtkPolyDataMapper()
-coneMapper.SetInput(cone.GetOutput())
+coneMapper.SetInputConnection(cone.GetOutputPort(0))
 coneActor = vtkActor()
 coneActor.SetMapper(coneMapper)
 
@@ -49,5 +46,3 @@ coneActor.SetMapper(coneMapper)
 ren.AddActor(coneActor)
 
 libSalomePy.fitAll()
-
-iren = libSalomePy.getRenderWindowInteractor()
