@@ -48,6 +48,7 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkVoxel.h>
 #include <vtkWedge.h>
+#include <vtkVersion.h>
 
 #include <algorithm>
 #include <iterator>
