@@ -704,6 +704,7 @@ VTKViewer_GeometryFilter
         //Quadratic cells
         case VTK_QUADRATIC_EDGE:
         case VTK_QUADRATIC_TRIANGLE:
+        case VTK_BIQUADRATIC_TRIANGLE:
         case VTK_QUADRATIC_QUAD:
         case VTK_BIQUADRATIC_QUAD:
         case VTK_QUADRATIC_TETRA:
@@ -838,7 +839,8 @@ VTKViewer_GeometryFilter
               outputCD->CopyData(cd,cellId,newCellId);
               break;
             }
-            case VTK_QUADRATIC_TRIANGLE: {
+            case VTK_QUADRATIC_TRIANGLE:
+            case VTK_BIQUADRATIC_TRIANGLE: {
               if(!myIsBuildArc) {
                 aCellType = VTK_POLYGON;
                 numFacePts = 6;
@@ -860,8 +862,8 @@ VTKViewer_GeometryFilter
                 BuildArcedPolygon(cellId,input,output,aDimension2VTK2ObjIds);
               break;
             }
-            case VTK_BIQUADRATIC_QUAD:
-            case VTK_QUADRATIC_QUAD: {
+            case VTK_QUADRATIC_QUAD:
+            case VTK_BIQUADRATIC_QUAD: {
               if(!myIsBuildArc) {
                 aCellType = VTK_POLYGON;
                 numFacePts = 8;
@@ -1374,6 +1376,7 @@ void VTKViewer_GeometryFilter::BuildArcedPolygon(vtkIdType cellId,
   vtkCell* aCell = input->GetCell(cellId);
   switch(aCell->GetCellType()) {
     case VTK_QUADRATIC_TRIANGLE:
+    case VTK_BIQUADRATIC_TRIANGLE:
     {
       //Get All points from input cell
       Pnt P0 = CreatePnt( aCell, inputScalars, 0 );
@@ -1407,8 +1410,8 @@ void VTKViewer_GeometryFilter::BuildArcedPolygon(vtkIdType cellId,
       aScalarCollection.push_back(aBuilder3.GetScalarValues());
       break;
     }
-    case VTK_BIQUADRATIC_QUAD:
     case VTK_QUADRATIC_QUAD:
+    case VTK_BIQUADRATIC_QUAD:
     {
       //Get All points from input cell
       Pnt P0 = CreatePnt( aCell, inputScalars, 0 );
