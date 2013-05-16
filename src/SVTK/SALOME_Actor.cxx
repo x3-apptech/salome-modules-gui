@@ -515,9 +515,9 @@ SALOME_Actor
       vtkActorCollection* theActors = aCopy.GetActors();
       theActors->InitTraversal();
       while( vtkActor *ac = theActors->GetNextActor() )
-	if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) )
-	  if( anActor->hasIO() && myIO->isSame( anActor->getIO() ) )
-	    anActor->SetPreSelected( false );
+        if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( ac ) )
+          if( anActor->hasIO() && myIO->isSame( anActor->getIO() ) )
+            anActor->SetPreSelected( false );
     }
   }else{
     switch(aSelectionMode) {
@@ -613,17 +613,17 @@ SALOME_Actor
       if( !mySelector->IsSelected( myIO ) ) {
         SetPreSelected( true );
 
-	if ( hasIO() ) {
-	  VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
-	  vtkActorCollection* theActors = aCopy.GetActors();
-	  theActors->InitTraversal();
-	  while( vtkActor *anAct = theActors->GetNextActor() ) {
-	    if( anAct != this )
-	      if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( anAct ) )
-		if( anActor->hasIO() && myIO->isSame( anActor->getIO() ) )
-		  anActor->SetPreSelected( true );
-	  }
-	}
+        if ( hasIO() ) {
+          VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
+          vtkActorCollection* theActors = aCopy.GetActors();
+          theActors->InitTraversal();
+          while( vtkActor *anAct = theActors->GetNextActor() ) {
+            if( anAct != this )
+              if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( anAct ) )
+                if( anActor->hasIO() && myIO->isSame( anActor->getIO() ) )
+                  anActor->SetPreSelected( true );
+          }
+        }
       }
     }
     default:
@@ -729,11 +729,11 @@ SALOME_Actor
     case ActorSelection : 
     {
       if ( hasIO() ) {
-	if( mySelector->IsSelected( myIO ) && anIsShift )
-	  mySelector->RemoveIObject( this );
-	else {
-	  mySelector->AddIObject( this );
-	}
+        if( mySelector->IsSelected( myIO ) && anIsShift )
+          mySelector->RemoveIObject( this );
+        else {
+          mySelector->AddIObject( this );
+        }
       }
       break;
     }
@@ -774,13 +774,13 @@ SALOME_Actor
       }
       
       if ( hasIO() ) {
-	if( !anIndexes.IsEmpty() ) {
-	  mySelector->AddOrRemoveIndex( myIO, anIndexes, anIsShift );
-	  mySelector->AddIObject( this );
-	  anIndexes.Clear();
-	}
-	else if ( !anIsShift )
-	  mySelector->RemoveIObject( this );
+        if( !anIndexes.IsEmpty() ) {
+          mySelector->AddOrRemoveIndex( myIO, anIndexes, anIsShift );
+          mySelector->AddIObject( this );
+          anIndexes.Clear();
+        }
+        else if ( !anIsShift )
+          mySelector->RemoveIObject( this );
       }
       break;
     }
@@ -840,13 +840,13 @@ SALOME_Actor
       }
       
       if ( hasIO() ) {
-	if( !anIndexes.IsEmpty() ) {
-	  mySelector->AddOrRemoveIndex( myIO, anIndexes, anIsShift );
-	  mySelector->AddIObject( this );
-	  anIndexes.Clear();
-	}
-	else if ( !anIsShift )
-	  mySelector->RemoveIObject( this );
+        if( !anIndexes.IsEmpty() ) {
+          mySelector->AddOrRemoveIndex( myIO, anIndexes, anIsShift );
+          mySelector->AddIObject( this );
+          anIndexes.Clear();
+        }
+        else if ( !anIsShift )
+          mySelector->RemoveIObject( this );
       }
     }
     default:
