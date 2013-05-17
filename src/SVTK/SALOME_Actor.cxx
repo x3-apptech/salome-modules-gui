@@ -48,6 +48,7 @@
 // VTK Includes
 #include <vtkCell.h>
 #include <vtkLine.h>
+#include <vtkQuadraticEdge.h>
 #include <vtkPicker.h>
 #include <vtkPointPicker.h>
 #include <vtkCellPicker.h>
@@ -87,11 +88,14 @@ namespace
       double aPickPosition[3];
       thePicker->GetPickPosition(aPickPosition);
       double aMinDist = 1000000.0, aDist = 0;
+      vtkCell* aSelEdge;
       for (int i = 0, iEnd = aPickedCell->GetNumberOfEdges(); i < iEnd; i++){
-        if(vtkLine* aLine = vtkLine::SafeDownCast(aPickedCell->GetEdge(i))){
+	aSelEdge = aPickedCell->GetEdge(i);
+        if(vtkLine::SafeDownCast(aPickedCell->GetEdge(i)) || 
+	   vtkQuadraticEdge::SafeDownCast(aPickedCell->GetEdge(i))){
           int subId;  
           double pcoords[3], closestPoint[3], weights[3];
-          aLine->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
+          aSelEdge->EvaluatePosition(aPickPosition,closestPoint,subId,pcoords,aDist,weights);
           if (aDist < aMinDist) {
             aMinDist = aDist;
             anEdgeId = -1 - i;
