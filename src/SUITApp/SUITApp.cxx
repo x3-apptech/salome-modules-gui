@@ -191,6 +191,13 @@ int main( int argc, char* argv[] )
   QString qtdir( ::getenv( "QTDIR" ) );
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
+
+  //Set a "native" graphic system in case if application runs on the remote host
+  QString remote(::getenv("REMOTEHOST"));
+  QString client(::getenv("SSH_CLIENT"));
+  if(remote.length() > 0 || client.length() > 0 ) {
+    QApplication::setGraphicsSystem(QLatin1String("native"));
+  }
   
   SUITApp_Application app( argc, argv );
   QString cfgAppName = getAppName( argList.isEmpty() ? QString() : argList.first() );
