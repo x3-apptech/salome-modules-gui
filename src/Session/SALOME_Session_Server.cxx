@@ -403,6 +403,13 @@ int main( int argc, char **argv )
 {
   // Install Qt debug messages handler
   qInstallMsgHandler( MessageOutput );
+
+  //Set a "native" graphic system in case if application runs on the remote host
+  QString remote(getenv("REMOTEHOST"));
+  QString client(getenv("SSH_CLIENT"));
+  if(remote.length() > 0 || client.length() > 0 ) {
+    QApplication::setGraphicsSystem(QLatin1String("native"));
+  }
   
   // add $QTDIR/plugins to the pluins search path for image plugins
   QString qtdir( ::getenv( "QTDIR" ) );
