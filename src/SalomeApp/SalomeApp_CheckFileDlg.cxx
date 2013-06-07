@@ -36,16 +36,41 @@ SUIT_FileDlg( parent, open, showQuickDir, modal )
   QGridLayout* grid = ::qobject_cast<QGridLayout*>( layout() );
   if ( grid )
   {
-    myCheckBox = new QCheckBox( theCheckBoxName, this );
-    QLabel* label = new QLabel("", this);
-    QPushButton* pb = new QPushButton(this);        
-    
+    QCheckBox* myCheckBox = new QCheckBox( theCheckBoxName, this );
+    QLabel*         label = new QLabel("", this);
+    QPushButton*       pb = new QPushButton(this);        
+    myCheckBoxes.append( myCheckBox );
+
     int row = grid->rowCount();
     grid->addWidget( label, row, 0 );
     grid->addWidget( myCheckBox, row, 1 );
     grid->addWidget( pb, row, 2 );
-      
+
     pb->hide();
+  }
+}
+
+/*!
+Constructor
+*/
+SalomeApp_CheckFileDlg::SalomeApp_CheckFileDlg( QWidget* parent, bool open, const QStringList& theCheckBoxNames, bool showQuickDir, bool modal) :
+SUIT_FileDlg( parent, open, showQuickDir, modal )
+{
+  if ( theCheckBoxNames.count() > 0 )
+  {
+    
+    QGridLayout* grid = ::qobject_cast<QGridLayout*>( layout() );
+    if ( grid )
+    {
+      for ( int i = 0; i < theCheckBoxNames.count(); ++i )
+      {
+        QCheckBox* myCheckBox = new QCheckBox( theCheckBoxNames.at(i), this );
+        myCheckBoxes.append( myCheckBox );
+    
+        int row = grid->rowCount();
+        grid->addWidget( myCheckBox, row, 1 );
+      }
+    }
   }
 }
 
@@ -58,15 +83,18 @@ SalomeApp_CheckFileDlg::~SalomeApp_CheckFileDlg()
 }
 
 /*!Sets checked.*/
-void SalomeApp_CheckFileDlg::SetChecked( bool check )
+void SalomeApp_CheckFileDlg::SetChecked( bool check, int checkBoxId/*=0*/ )
 {
-  myCheckBox->setChecked(check);
+  if ( checkBoxId >=0 && checkBoxId < myCheckBoxes.count() )
+    myCheckBoxes.at( checkBoxId )->setChecked(check);
 }
 
 /*!Is checked?
  *\retval boolean - true, check box is checked, else false.
  */
-bool SalomeApp_CheckFileDlg::IsChecked() const
+bool SalomeApp_CheckFileDlg::IsChecked( int checkBoxId ) const
 {
-  return myCheckBox->isChecked();
+  if ( checkBoxId >=0 && checkBoxId < myCheckBoxes.count() )
+    return myCheckBoxes.at( checkBoxId )->isChecked();
+  return false;
 }

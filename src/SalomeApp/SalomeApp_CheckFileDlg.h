@@ -35,14 +35,15 @@ class SALOMEAPP_EXPORT SalomeApp_CheckFileDlg : public SUIT_FileDlg
     
 public:
   SalomeApp_CheckFileDlg( QWidget*, bool open, const QString& theCheckBoxName, bool showQuickDir = true, bool modal = true );
+  SalomeApp_CheckFileDlg( QWidget*, bool open, const QStringList& theCheckBoxNames, bool showQuickDir = true, bool modal = true );
   virtual ~SalomeApp_CheckFileDlg();
 
 public:
-  void SetChecked( bool check );
-  bool IsChecked() const;
+  void SetChecked( bool check, int checkBoxId=0 );
+  bool IsChecked(int checkBoxId=0) const;
 
 protected:
-  QCheckBox* myCheckBox;
+  QList< QCheckBox* > myCheckBoxes;
 };
 
 #endif
