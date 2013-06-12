@@ -66,8 +66,7 @@ ENDIF(EXISTS ${KERNEL_ROOT_DIR})
 STRING(REPLACE "\\" "/" KERNEL_ROOT_DIR ${KERNEL_ROOT_DIR})
 
 # directories for packages detection
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${KERNEL_ROOT_DIR}/salome_adm/cmake_files ${CMAKE_SOURCE_DIR}/adm_local/cmake_files)
-
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${KERNEL_ROOT_DIR}/salome_adm/cmake_files ${CMAKE_SOURCE_DIR}/adm_local/cmake_files ${CMAKE_SOURCE_DIR}/adm_local/cmake_files/deprecated )
 find_package(PLATFORM)
 
 
