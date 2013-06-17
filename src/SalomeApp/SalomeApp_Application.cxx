@@ -336,6 +336,7 @@ void SalomeApp_Application::createActions()
   if(res==NULL)
     PyErr_Print();
   Py_XDECREF(res);
+  Py_XDECREF(pluginsmanager);
   PyGILState_Release(gstate);
   // end of SALOME plugins loading
 
