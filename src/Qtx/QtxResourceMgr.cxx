@@ -334,15 +334,22 @@ const QtxResourceMgr::Section QtxResourceMgr::Resources::section( const QString&
 QString QtxResourceMgr::Resources::fileName( const QString& sect, const QString& prefix, const QString& name ) const
 {
   QString path;
-  if ( hasValue( sect, prefix ) )
+  if ( !QFileInfo( name ).isRelative() )
   {
-    path = value( sect, prefix, true );
-    if ( !path.isEmpty() )
+    path = name;
+  }
+  else
+  {
+    if ( hasValue( sect, prefix ) )
     {
-      if ( QFileInfo( path ).isRelative() )
-        path = Qtx::addSlash( Qtx::dir( myFileName, true ) ) + path;
-
-      path = Qtx::addSlash( path ) + name;
+      path = value( sect, prefix, true );
+      if ( !path.isEmpty() )
+      {
+	if ( QFileInfo( path ).isRelative() )
+	  path = Qtx::addSlash( Qtx::dir( myFileName, true ) ) + path;
+	
+	path = Qtx::addSlash( path ) + name;
+      }
     }
   }
   if( !path.isEmpty() )
