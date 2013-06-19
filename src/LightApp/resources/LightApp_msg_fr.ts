@@ -619,6 +619,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Commun</translation>
     </message>
     <message>
+        <source>PREF_GROUP_3DVIEWER</source>
+        <translation>Scène 3D</translation>
+    </message>
+    <message>
         <source>PREF_GROUP_OCCVIEWER</source>
         <translation>Scène OCC 3D</translation>
     </message>

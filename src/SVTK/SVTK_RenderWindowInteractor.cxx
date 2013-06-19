@@ -724,17 +724,25 @@ void
 SVTK_RenderWindowInteractor
 ::mouseReleaseEvent( QMouseEvent *event )
 {
+  SVTK_InteractorStyle* style = 0;
   bool aRightBtn = event->button() == Qt::RightButton;
   bool isOperation = false;
+  bool isPolygonalSelection = false;
   if( aRightBtn && GetInteractorStyle()) {
-    SVTK_InteractorStyle* style = dynamic_cast<SVTK_InteractorStyle*>( GetInteractorStyle() );
+    style = dynamic_cast<SVTK_InteractorStyle*>( GetInteractorStyle() );
     if ( style )
       isOperation = style->CurrentState() != VTK_INTERACTOR_STYLE_CAMERA_NONE;
   }
 
   QVTK_RenderWindowInteractor::mouseReleaseEvent(event);
 
-  if ( aRightBtn && !isOperation && !( event->modifiers() & Qt::ControlModifier ) &&
+  if ( style ) {
+    isPolygonalSelection = style->GetPolygonState() == Finished;
+    style->SetPolygonState( Disable );
+  }
+
+  if ( aRightBtn && !isOperation && !isPolygonalSelection &&
+       !( event->modifiers() & Qt::ControlModifier ) &&
        !( event->modifiers() & Qt::ShiftModifier ) ) {
     QContextMenuEvent aEvent( QContextMenuEvent::Mouse,
                               event->pos(), event->globalPos() );
@@ -752,6 +760,12 @@ void
 SVTK_RenderWindowInteractor
 ::mouseDoubleClickEvent( QMouseEvent* event )
 {
+  if( GetInteractorStyle() && event->button() == Qt::LeftButton ) {
+    SVTK_InteractorStyle* style = dynamic_cast<SVTK_InteractorStyle*>( GetInteractorStyle() );
+    if ( style )
+      style->OnMouseButtonDoubleClick();
+  }
+
   QVTK_RenderWindowInteractor::mouseDoubleClickEvent(event);
 
   if(GENERATE_SUIT_EVENTS)

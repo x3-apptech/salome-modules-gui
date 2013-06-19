@@ -44,11 +44,17 @@ class SVTK_EXPORT SVTK_KeyFreeInteractorStyle : public SVTK_InteractorStyle
 
   // Generic event bindings must be overridden in subclasses
 
+  //! Redefine SVTK_InteractorStyle::OnMouseMove
+  virtual void OnMouseMove(int ctrl, int shift, int x, int y);
+
   //! Redefine SVTK_InteractorStyle::OnLeftButtonDown
   virtual void OnLeftButtonDown(int ctrl, int shift, int x, int y);
 
   //! Redefine SVTK_InteractorStyle::OnMiddleButtonDown
   virtual void OnMiddleButtonDown(int ctrl, int shift, int x, int y);
+
+  //! Redefine SVTK_InteractorStyle::OnRightButtonDown
+  virtual void OnRightButtonDown(int ctrl, int shift, int x, int y);
 
   //! Redefine SVTK_InteractorStyle::OnLeftButtonUp
   virtual void OnLeftButtonUp(int ctrl, int shift, int x, int y);
@@ -56,11 +62,14 @@ class SVTK_EXPORT SVTK_KeyFreeInteractorStyle : public SVTK_InteractorStyle
   //! Redefine SVTK_InteractorStyle::OnMiddleButtonUp
   virtual void OnMiddleButtonUp(int ctrl, int shift, int x, int y);
 
+  //! Redefine SVTK_InteractorStyle::OnRightButtonUp
+  virtual void OnRightButtonUp(int ctrl, int shift, int x, int y);
+
   //! Redefine SVTK_InteractorStyle::OnChar
   virtual void OnChar();
-  
-  bool myIsMidButtonDown;
+
   bool myIsLeftButtonDown;
+  bool myIsRightButtonDown;
 };
 
 #endif

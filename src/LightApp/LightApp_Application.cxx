@@ -1443,10 +1443,10 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm->setBackground( OCCViewer_ViewFrame::BOTTOM_RIGHT,
                        resMgr->backgroundValue( "OCCViewer", "background", vm->background(OCCViewer_ViewFrame::MAIN_VIEW) ) );
 
-    vm->setTrihedronSize(  resMgr->doubleValue( "OCCViewer", "trihedron_size", vm->trihedronSize() ),
-                           resMgr->booleanValue( "OCCViewer", "relative_size", vm->trihedronRelative() ));
-    vm->setInteractionStyle( resMgr->integerValue( "OCCViewer", "navigation_mode", vm->interactionStyle() ) );
-    vm->setZoomingStyle( resMgr->integerValue( "OCCViewer", "zooming_mode", vm->zoomingStyle() ) );
+    vm->setTrihedronSize(  resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
+                           resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
+    vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
+    vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
     new LightApp_OCCSelector( (OCCViewer_Viewer*)viewMgr->getViewModel(), mySelMgr );
   }
@@ -1465,11 +1465,11 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     {
       vm->setProjectionMode( resMgr->integerValue( "VTKViewer", "projection_mode", vm->projectionMode() ) );
       vm->setBackground( resMgr->backgroundValue( "VTKViewer", "background", vm->background() ) );
-      vm->setTrihedronSize( resMgr->doubleValue( "VTKViewer", "trihedron_size", vm->trihedronSize() ),
-                            resMgr->booleanValue( "VTKViewer", "relative_size", vm->trihedronRelative() ) );
-      vm->setStaticTrihedronVisible( resMgr->booleanValue( "VTKViewer", "show_static_trihedron", vm->isStaticTrihedronVisible() ) );
-      vm->setInteractionStyle( resMgr->integerValue( "VTKViewer", "navigation_mode", vm->interactionStyle() ) );
-      vm->setZoomingStyle( resMgr->integerValue( "VTKViewer", "zooming_mode", vm->zoomingStyle() ) );
+      vm->setTrihedronSize( resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
+                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ) );
+      vm->setStaticTrihedronVisible( resMgr->booleanValue( "3DViewer", "show_static_trihedron", vm->isStaticTrihedronVisible() ) );
+      vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
+      vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
       vm->setDynamicPreSelection( resMgr->booleanValue( "VTKViewer", "dynamic_preselection", vm->dynamicPreSelection() ) );
       vm->setIncrementalSpeed( resMgr->integerValue( "VTKViewer", "speed_value", vm->incrementalSpeed() ),
                                resMgr->integerValue( "VTKViewer", "speed_mode", vm->incrementalSpeedMode() ) );
@@ -2094,22 +2094,46 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // ... "MRU" preferences group <<end>>
   // .. "General" preferences tab <<end>>
 
-  // .. "OCC viewer" group <<start>>
-  int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), salomeCat );
-
+  // .. "3D viewer" group <<start>>
+  int Viewer3DGroup = pref->addPreference( tr( "PREF_GROUP_3DVIEWER" ), salomeCat );
+  // ... -> navigation mode
+  int vtkStyleMode = pref->addPreference( tr( "PREF_NAVIGATION" ), Viewer3DGroup,
+                                          LightApp_Preferences::Selector, "3DViewer", "navigation_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_STANDARD_STYLE") << tr("PREF_KEYFREE_STYLE");
+  anIndicesList << 0                         << 1;
+  pref->setItemProperty( "strings", aValuesList,   vtkStyleMode );
+  pref->setItemProperty( "indexes", anIndicesList, vtkStyleMode );
+  // ... -> zooming mode
+  #if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
+    int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), Viewer3DGroup,
+                                                   LightApp_Preferences::Selector, "3DViewer", "zooming_mode" );
+    aValuesList.clear();
+    anIndicesList.clear();
+    aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
+    anIndicesList << 0                            << 1;
+    pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
+    pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
+  #endif
   // ... "Trihedron" group <<start>>
-  int occTriGroup = pref->addPreference( tr( "PREF_TRIHEDRON" ), occGroup );
+  int occTriGroup = pref->addPreference( tr( "PREF_TRIHEDRON" ), Viewer3DGroup );
   pref->setItemProperty( "columns", 2, occTriGroup );
   // .... -> trihedron size
   int occTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), occTriGroup,
-                                   LightApp_Preferences::DblSpin, "OCCViewer", "trihedron_size" );
+                                   LightApp_Preferences::DblSpin, "3DViewer", "trihedron_size" );
   pref->setItemProperty( "min", 1.0E-06, occTS );
   pref->setItemProperty( "max", 1000, occTS );
   // .... -> relative size of trihedron
-  pref->addPreference( tr( "PREF_RELATIVE_SIZE" ), occTriGroup, LightApp_Preferences::Bool, "OCCViewer", "relative_size" );
+  pref->addPreference( tr( "PREF_RELATIVE_SIZE" ), occTriGroup, LightApp_Preferences::Bool, "3DViewer", "relative_size" );
   // .... -> show static trihedron
-  pref->addPreference( tr( "PREF_SHOW_STATIC_TRIHEDRON" ), occTriGroup, LightApp_Preferences::Bool, "OCCViewer", "show_static_trihedron" );
+  pref->addPreference( tr( "PREF_SHOW_STATIC_TRIHEDRON" ), occTriGroup, LightApp_Preferences::Bool, "3DViewer", "show_static_trihedron" );
   // ... "Trihedron" group <<end>>
+  // .. "3D viewer" group <<end>>
+
+  // .. "OCC viewer" group <<start>>
+  int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), salomeCat );
+
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
   //  pref->setItemProperty( "columns", 2, bgGroup );
@@ -2168,26 +2192,6 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int occGen = pref->addPreference( "", occGroup, LightApp_Preferences::Frame );
   pref->setItemProperty( "margin",  0, occGen );
   pref->setItemProperty( "columns", 2, occGen );
-  // .... -> navigation mode
-  int occStyleMode = pref->addPreference( tr( "PREF_NAVIGATION" ), occGen,
-                                          LightApp_Preferences::Selector, "OCCViewer", "navigation_mode" );
-  aValuesList.clear();
-  anIndicesList.clear();
-  aValuesList   << tr("PREF_STANDARD_STYLE") << tr("PREF_KEYFREE_STYLE");
-  anIndicesList << 0                         << 1;
-  pref->setItemProperty( "strings", aValuesList,   occStyleMode );
-  pref->setItemProperty( "indexes", anIndicesList, occStyleMode );
-  // .... -> zooming mode
-#if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
-  int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), occGen,
-                                                 LightApp_Preferences::Selector, "OCCViewer", "zooming_mode" );
-  aValuesList.clear();
-  anIndicesList.clear();
-  aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
-  anIndicesList << 0                            << 1;
-  pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
-  pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
-#endif
   // ... -> empty frame (for layout) <<end>>
   // .. "OCC viewer" group <<end>>
 
@@ -2222,24 +2226,6 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "texture_stretch_enabled", (bool)txtList.contains( Qtx::StretchTexture ), bgId );
   pref->setItemProperty( "custom_enabled", false, bgId );
   pref->setItemProperty( "image_formats", formats, bgId );
-  // .... -> navigation mode
-  int vtkStyleMode = pref->addPreference( tr( "PREF_NAVIGATION" ), vtkGen,
-                                          LightApp_Preferences::Selector, "VTKViewer", "navigation_mode" );
-  aValuesList.clear();
-  anIndicesList.clear();
-  aValuesList   << tr("PREF_STANDARD_STYLE") << tr("PREF_KEYFREE_STYLE");
-  anIndicesList << 0                         << 1;
-  pref->setItemProperty( "strings", aValuesList,   vtkStyleMode );
-  pref->setItemProperty( "indexes", anIndicesList, vtkStyleMode );
-  // .... -> zooming mode
-  int vtkZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), vtkGen,
-                                                 LightApp_Preferences::Selector, "VTKViewer", "zooming_mode" );
-  aValuesList.clear();
-  anIndicesList.clear();
-  aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
-  anIndicesList << 0                            << 1;
-  pref->setItemProperty( "strings", aValuesList,   vtkZoomingStyleMode );
-  pref->setItemProperty( "indexes", anIndicesList, vtkZoomingStyleMode );
   // .... -> speed increment
   int vtkSpeed = pref->addPreference( tr( "PREF_INCREMENTAL_SPEED" ), vtkGen,
                                       LightApp_Preferences::IntSpin, "VTKViewer", "speed_value" );
@@ -2257,20 +2243,6 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .... -> dynamic pre-selection
   pref->addPreference( tr( "PREF_DYNAMIC_PRESELECTION" ),  vtkGen, LightApp_Preferences::Bool, "VTKViewer", "dynamic_preselection" );
   // ... -> empty frame (for layout) <<end>>
-
-  // ... "Trihedron" group <<start>>
-  int vtkTriGroup = pref->addPreference( tr( "PREF_TRIHEDRON" ), vtkGroup );
-  pref->setItemProperty( "columns", 2, vtkTriGroup );
-  // .... -> trihedron size
-  int vtkTS = pref->addPreference( tr( "PREF_TRIHEDRON_SIZE" ), vtkTriGroup,
-                                   LightApp_Preferences::DblSpin, "VTKViewer", "trihedron_size" );
-  pref->setItemProperty( "min", 1.0E-06, vtkTS );
-  pref->setItemProperty( "max", 150, vtkTS );
-  // .... -> relative size of trihedron
-  pref->addPreference( tr( "PREF_RELATIVE_SIZE" ), vtkTriGroup, LightApp_Preferences::Bool, "VTKViewer", "relative_size" );
-  // .... -> static trihedron
-  pref->addPreference( tr( "PREF_SHOW_STATIC_TRIHEDRON" ), vtkTriGroup, LightApp_Preferences::Bool, "VTKViewer", "show_static_trihedron" );
-  // ... "Trihedron" group <<end>>
 
   // ... space mouse sub-group <<start>>
   int vtkSM = pref->addPreference( tr( "PREF_FRAME_SPACEMOUSE" ), vtkGroup, LightApp_Preferences::GroupBox );
@@ -2493,17 +2465,17 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && (param == QString( "trihedron_size" ) || param == QString( "relative_size" )))
+  if ( sec == QString( "3DViewer" ) && (param == QString( "trihedron_size" ) || param == QString( "relative_size" )))
   {
     double sz = resMgr->doubleValue( sec, "trihedron_size", -1 );
     bool relative = resMgr->booleanValue( sec, "relative_size", true );
     QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_OCCVIEWER
     viewManagers( OCCViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() && sz >= 0 )
+    QListIterator<SUIT_ViewManager*> itOCC( lst );
+    while ( itOCC.hasNext() && sz >= 0 )
     {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
+      SUIT_ViewModel* vm = itOCC.next()->getViewModel();
       if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
         continue;
 
@@ -2511,19 +2483,38 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
       occVM->setTrihedronSize( sz, relative );
       occVM->getAISContext()->UpdateCurrentViewer();
     }
-  }
 #endif
-
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && param == QString( "show_static_trihedron" ) )
-  {
-    bool isVisible = resMgr->booleanValue( "OCCViewer", "show_static_trihedron", true );
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( OCCViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
+#ifndef DISABLE_VTKVIEWER
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itVTK( lst );
+    while ( itVTK.hasNext() && sz >= 0 )
     {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
+      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM )
+      {
+        vtkVM->setTrihedronSize( sz, relative );
+        vtkVM->Repaint();
+      }
+    }
+#endif
+#endif
+  }
+
+  if ( sec == QString( "3DViewer" ) && param == QString( "show_static_trihedron" ) )
+  {
+    bool isVisible = resMgr->booleanValue( "3DViewer", "show_static_trihedron", true );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_OCCVIEWER
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itOCC( lst );
+    while ( itOCC.hasNext() )
+    {
+      SUIT_ViewModel* vm = itOCC.next()->getViewModel();
       if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
         continue;
 
@@ -2533,72 +2524,95 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         occVM->setStaticTrihedronDisplayed( isVisible );
       }
     }
-  }
 #endif
-
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && param == QString( "navigation_mode" ) )
-  {
-    int mode = resMgr->integerValue( "OCCViewer", "navigation_mode", 0 );
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( OCCViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
-        continue;
-
-      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
-      occVM->setInteractionStyle( mode );
-    }
-  }
-#endif
-
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && param == QString( "zooming_mode" ) )
-  {
-    int mode = resMgr->integerValue( "OCCViewer", "zooming_mode", 0 );
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( OCCViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
-        continue;
-
-      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
-      occVM->setZoomingStyle( mode );
-    }
-  }
-#endif
-
 #ifndef DISABLE_VTKVIEWER
-  if ( sec == QString( "VTKViewer" ) && (param == QString( "trihedron_size" ) || param == QString( "relative_size" )) )
-  {
-    double sz = resMgr->doubleValue( "VTKViewer", "trihedron_size", -1 );
-    bool isRelative = resMgr->booleanValue( "VTKViewer", "relative_size", true );
-    QList<SUIT_ViewManager*> lst;
 #ifndef DISABLE_SALOMEOBJECT
     viewManagers( SVTK_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() && sz >= 0 )
+    QListIterator<SUIT_ViewManager*> itVTK( lst );
+    while ( itVTK.hasNext() )
     {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
+      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
       if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
         continue;
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
       if( vtkVM )
       {
-        vtkVM->setTrihedronSize( sz, isRelative );
+        vtkVM->setStaticTrihedronVisible( isVisible );
         vtkVM->Repaint();
       }
     }
 #endif
-  }
 #endif
+  }
+
+  if ( sec == QString( "3DViewer" ) && param == QString( "navigation_mode" ) )
+  {
+    int mode = resMgr->integerValue( "3DViewer", "navigation_mode", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_OCCVIEWER
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itOCC( lst );
+    while ( itOCC.hasNext() )
+    {
+      SUIT_ViewModel* vm = itOCC.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setInteractionStyle( mode );
+    }
+#endif
+#ifndef DISABLE_VTKVIEWER
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itVTK( lst );
+    while ( itVTK.hasNext() )
+    {
+      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setInteractionStyle( mode );
+    }
+#endif
+#endif
+  }
+
+  if ( sec == QString( "3DViewer" ) && param == QString( "zooming_mode" ) )
+  {
+    int mode = resMgr->integerValue( "3DViewer", "zooming_mode", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_OCCVIEWER
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itOCC( lst );
+    while ( itOCC.hasNext() )
+    {
+      SUIT_ViewModel* vm = itOCC.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setZoomingStyle( mode );
+    }
+#endif
+#ifndef DISABLE_VTKVIEWER
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itVTK( lst );
+    while ( itVTK.hasNext() )
+    {
+      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setZoomingStyle( mode );
+    }
+#endif
+#endif
+  }
 
 #ifndef DISABLE_VTKVIEWER
   if ( sec == QString( "VTKViewer" ) && (param == QString( "speed_value" ) || param == QString( "speed_mode" )) )
@@ -2644,48 +2658,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #endif
 
 #ifndef DISABLE_VTKVIEWER
-  if ( sec == QString( "VTKViewer" ) && param == QString( "navigation_mode" ) )
-  {
-    int mode = resMgr->integerValue( "VTKViewer", "navigation_mode", 0 );
-    QList<SUIT_ViewManager*> lst;
-#ifndef DISABLE_SALOMEOBJECT
-    viewManagers( SVTK_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
-        continue;
-
-      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
-      if( vtkVM ) vtkVM->setInteractionStyle( mode );
-    }
-#endif
-  }
-#endif
-
-#ifndef DISABLE_VTKVIEWER
-  if ( sec == QString( "VTKViewer" ) && param == QString( "zooming_mode" ) )
-  {
-    int mode = resMgr->integerValue( "VTKViewer", "zooming_mode", 0 );
-    QList<SUIT_ViewManager*> lst;
-#ifndef DISABLE_SALOMEOBJECT
-    viewManagers( SVTK_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
-        continue;
-
-      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
-      if( vtkVM ) vtkVM->setZoomingStyle( mode );
-    }
-#endif
-  }
-#endif
-
-#ifndef DISABLE_VTKVIEWER
   if ( sec == QString( "VTKViewer" ) && param == QString( "dynamic_preselection" ) )
   {
     bool mode = resMgr->booleanValue( "VTKViewer", "dynamic_preselection", true );
@@ -2701,31 +2673,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
       if( vtkVM ) vtkVM->setDynamicPreSelection( mode );
-    }
-#endif
-  }
-#endif
-
-#ifndef DISABLE_VTKVIEWER
-  if ( sec == QString( "VTKViewer" ) && param == QString( "show_static_trihedron" ) )
-  {
-    bool isVisible = resMgr->booleanValue( "VTKViewer", "show_static_trihedron", true );
-    QList<SUIT_ViewManager*> lst;
-#ifndef DISABLE_SALOMEOBJECT
-    viewManagers( SVTK_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
-        continue;
-
-      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
-      if( vtkVM )
-      {
-        vtkVM->setStaticTrihedronVisible( isVisible );
-        vtkVM->Repaint();
-      }
     }
 #endif
   }

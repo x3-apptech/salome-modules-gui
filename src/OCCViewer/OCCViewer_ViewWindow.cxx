@@ -230,6 +230,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myRectBand = 0;
   
   IsSketcherStyle = false;
+  myIsKeyFree = false;
 
   mypSketcher = 0;
   myCurSketch = -1;
@@ -448,17 +449,24 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
 
   default:
   /*  Try to activate a transformation */
-    switch ( getButtonState(theEvent, anInteractionStyle) ) {
+    OperationType aState;
+    if ( interactionStyle() == SUIT_ViewModel::STANDARD )
+      aState = getButtonState(theEvent, anInteractionStyle);
+    else {
+      aState = OCCViewer_ViewWindow::NOTHING;
+      myIsKeyFree = true;
+    }
+    switch ( aState ) {
     case ZOOMVIEW:
       myViewPort->startZoomAtPoint( myStartX, myStartY );
       activateZoom();
       break;
     case PANVIEW:
-            activatePanning();
+      activatePanning();
       break;
     case ROTATE:
-            activateRotation();
-            myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+      activateRotation();
+      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
       break;
     default:
       if ( myRotationPointSelection )
@@ -792,6 +800,25 @@ bool OCCViewer_ViewWindow::setTransformRequested( OperationType op )
 */
 void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
 {
+  if ( myIsKeyFree && interactionStyle() == SUIT_ViewModel::KEY_FREE ) {
+    myIsKeyFree = false;
+    switch ( getButtonState( theEvent, interactionStyle() ) ) {
+    case ZOOMVIEW:
+      myViewPort->startZoomAtPoint( myStartX, myStartY );
+      activateZoom();
+      break;
+    case PANVIEW:
+      activatePanning();
+      break;
+    case ROTATE:
+      activateRotation();
+      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+      break;
+    default:
+      break;
+    }
+  }
+
   myCurrX = theEvent->x();
   myCurrY = theEvent->y();
   switch (myOperation) {
@@ -829,8 +856,10 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
       int aState = theEvent->modifiers();
       int aButton = theEvent->buttons();
       int anInteractionStyle = interactionStyle();
-      if ( anInteractionStyle == SUIT_ViewModel::STANDARD && 
-           aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
+      if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
+           aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
+    	   ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
+    	   aButton == Qt::LeftButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
         myDrawRect = myEnableDrawMode;
         if ( myDrawRect ) {
           drawRect();
@@ -843,8 +872,10 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
         }
         emit mouseMoving( this, theEvent );
       }
-      else if ( anInteractionStyle == SUIT_ViewModel::STANDARD && 
-                aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) {
+      else if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
+                aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
+                ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
+                aButton == Qt::RightButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
         OCCViewer_ViewSketcher* sketcher = 0;
         QList<OCCViewer_ViewSketcher*>::Iterator it;
         for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it )
@@ -2294,7 +2325,7 @@ void OCCViewer_ViewWindow::onSketchingFinished()
   if ( mypSketcher && mypSketcher->result() == OCCViewer_ViewSketcher::Accept )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    bool append = bool( mypSketcher->buttonState() & Qt::ShiftModifier );
+    bool append = bool( mypSketcher->buttonState() && mypSketcher->isHasShift() );
     switch( mypSketcher->type() )
     {
     case Rect:

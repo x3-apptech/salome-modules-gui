@@ -52,7 +52,7 @@ SUIT_ViewModel::SUIT_ViewModel()
 
     // "key free" interaction style
     SUIT_ViewModel::myStateMap[KEY_FREE][ZOOM]  = Qt::NoModifier;
-    SUIT_ViewModel::myButtonMap[KEY_FREE][ZOOM] = Qt::LeftButton | Qt::MidButton;
+    SUIT_ViewModel::myButtonMap[KEY_FREE][ZOOM] = Qt::RightButton;
 
     SUIT_ViewModel::myStateMap[KEY_FREE][PAN]   = Qt::NoModifier;
     SUIT_ViewModel::myButtonMap[KEY_FREE][PAN]  = Qt::MidButton;

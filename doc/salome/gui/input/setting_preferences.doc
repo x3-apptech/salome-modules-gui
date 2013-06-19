@@ -93,29 +93,10 @@ items in <b>Most Recently Used</b> list and the <b>Link type</b>:
   - \b Auto - shows full paths to the files only if some files from
 different locations have the same name.
 
-\anchor occ_preferences
-<h2>OCC 3D Viewer Preferences</h2>
+<h2>3D Viewer Preferences</h2>
 
-\image html pref_salome_occviewer.png
+\image html pref_salome_3dviewer.png
 
-- <b>Trihedron</b> - viewer trihedron settings:
-  - <b>Size</b> - size of the coordinate axes (global trihedron)
-    displayed in the viewer.
-  - <b>Relative size</b> - if this option is switched on, trihedron
-    axes scale to fit the size of the scene displayed in 3D viewer.
-  - <b>Show static trihedron</b> - allows to show/hide the static
-    mini-trihedron located in the bottom-left corner of the viewer.
-- <b>Number of isolines</b> - this submenu allows to specify the
-  number of isolines along the axes of coordinates:
-  - <b>Along U</b> and
-  - <b>Along V</b>
-- <b>Background</b> - specifies the default background for the viewers,
-  separately for (for more details, refer to the \ref occ_background
-  "this page"):
-  - <b>3D View</b>
-  - <b>XZ View</b>
-  - <b>YZ View</b>
-  - <b>XY View</b>
 - <b>Navigation style</b> - this option allows to choose one of the
   modes of work with mouse in OCC and VTK 3D viewers.
   - <b>Salome Standard Controls</b> - allows to manipulate objects in the
@@ -133,6 +114,26 @@ different locations have the same name.
   relatively to its center.
   - <b>Relative to the cursor</b> - allows to zoom the view
   relatively to the current cursor position.
+- <b>Trihedron</b> - viewer trihedron settings:
+  - <b>Size</b> - size of the coordinate axes (global trihedron)
+    displayed in the viewer.
+  - <b>Relative size</b> - if this option is switched on, trihedron
+    axes scale to fit the size of the scene displayed in 3D viewer.
+  - <b>Show static trihedron</b> - allows to show/hide the static
+    mini-trihedron located in the bottom-left corner of the viewer.
+
+\anchor occ_preferences
+<h2>OCC 3D Viewer Preferences</h2>
+
+\image html pref_salome_occviewer.png
+
+- <b>Background</b> - specifies the default background for the viewers,
+  separately for (for more details, refer to the \ref viewer_background
+  "this page"):
+  - <b>3D View</b>
+  - <b>XZ View</b>
+  - <b>YZ View</b>
+  - <b>XY View</b>
 
 \anchor vtk_preferences
 <h2>VTK 3D Viewer Preferences</h2>
@@ -142,24 +143,13 @@ different locations have the same name.
 - <b>Projection mode</b> - allows choosing between \b Orthogonal and
 \b Perspective projection mode.
 - <b>Background</b> - specifies the default background for the viewer;
-  for more details, refer to the \ref vtk_background "this page".
-- <b>Navigation style</b> - this option allows to choose one of the
-  modes of work with mouse in OCC and VTK 3D viewers (for more details
-  see \ref occ_preferences "preferences for OCC Viewer 3d").
-- <b>Zooming style</b> - this option allows to choose a zooming mode
-  (for more details see \ref occ_preferences "preferences for OCC Viewer 3d").
+  for more details, refer to the \ref viewer_background "this page".
 - <b>Speed Increment</b> - defines the number of units by
   which the speed increases or respectively decreases after pressing [+]
   or [-] keyboard buttons.
 - <b>Modification Mode</b> - allows choosing between \b Arithmetic
   and \b Geometrical progression used for zooming.
 - <b>Dynamic pre-selection</b> - switches dynamic pre-selection on/off.
-- <b>Trihedron</b> - viewer trihedron settings:
-  - <b>Size</b> - size of the coordinate axes displayed in the viewer.
-  - <b>Relative size</b> - if this option is switched on, trihedron
-    axes scale to fit the size of the scene displayed in 3D viewer.
-  - <b>Show static trihedron</b> - allows to show/hide the static
-    mini-trihedron located in the bottom-left corner of the viewer.
 - <b>Spacemouse</b> - a mouse-like manipulator device specially designed
   for working with 3D presentations, objects, etc. You can reassign the
   actions listed below to any of its buttons.

@@ -161,7 +161,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
   if(resMgr)
-    myShowStaticTrihedron = resMgr->booleanValue( "OCCViewer", "show_static_trihedron", true );
+    myShowStaticTrihedron = resMgr->booleanValue( "3DViewer", "show_static_trihedron", true );
 }
 
 /*!
@@ -313,7 +313,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
-  if (!aView || aView->interactionStyle() != SUIT_ViewModel::STANDARD)
+  if (!aView )
     return;
 
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
@@ -900,7 +900,7 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
   if ( aMaxSide < Precision::Confusion() )
     return false;
 
-  float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("OCCViewer","trihedron_size", 100.);
+  float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("3DViewer","trihedron_size", 100.);
 
   static float EPS = 5.0E-3;
   theSize = getTrihedron()->Size();

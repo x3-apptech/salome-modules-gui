@@ -59,6 +59,7 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QRubberBand>
+#include <QPolygon>
 
 #include <algorithm>
 #include <iostream>
@@ -90,7 +91,9 @@ SVTK_InteractorStyle::SVTK_InteractorStyle():
   myControllerOnKeyDown(SVTK_ControllerOnKeyDown::New()),
   myHighlightSelectionPointActor(SVTK_Actor::New()),
   myRectBand(0),
-  myIsAdvancedZoomingEnabled(false)
+  myPolygonBand(0),
+  myIsAdvancedZoomingEnabled(false),
+  myPoligonState( Disable )
 {
   myPointPicker->Delete();
 
@@ -138,6 +141,7 @@ SVTK_InteractorStyle::SVTK_InteractorStyle():
 SVTK_InteractorStyle::~SVTK_InteractorStyle() 
 {
   endDrawRect();
+  endDrawPolygon();
 }
 
 /*!
@@ -452,12 +456,29 @@ void SVTK_InteractorStyle::OnMouseWheelBackward()
 }
 
 /*!
+  To handle mouse double click event
+*/
+void SVTK_InteractorStyle::OnMouseButtonDoubleClick()
+{
+  if( myPoligonState == InProcess ) {
+    onFinishOperation();
+    myPoligonState = Finished;
+  }
+}
+
+/*!
   To handle mouse move event
 */
 void SVTK_InteractorStyle::OnMouseMove(int vtkNotUsed(ctrl), 
                                        int shift,
                                        int x, int y) 
 {
+  if ( myPoligonState == Start ) {
+    // if right button was pressed and mouse is moved
+    // we can to draw a polygon for polygonal selection
+    myPoligonState = InProcess;
+    startOperation( VTK_INTERACTOR_STYLE_CAMERA_SELECT );
+  }
   myShiftState = shift;
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE)
     onOperation(QPoint(x, y));
@@ -473,6 +494,9 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
 {
   this->FindPokedRenderer(x, y);
   if(GetCurrentRenderer() == NULL)
+    return;
+
+  if ( myPoligonState != Disable )
     return;
 
   myShiftState = shift;
@@ -565,10 +589,23 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
 */
 void SVTK_InteractorStyle::OnLeftButtonUp(int vtkNotUsed(ctrl),
                                           int shift, 
-                                          int vtkNotUsed(x),
-                                          int vtkNotUsed(y))
+                                          int x,
+                                          int y)
 {
   myShiftState = shift;
+  if( myPoligonState == InProcess ) { // add a new point of polygon
+    myPolygonPoints.append( QPoint( x, y ) );
+    this->Interactor->GetEventPosition( mySelectionEvent->myX, mySelectionEvent->myY );
+    mySelectionEvent->myPolygonPoints.append( QPoint( mySelectionEvent->myX, mySelectionEvent->myY ) );
+    return;
+  }
+  else if ( myPoligonState == Closed ) { // close polygon and apply a selection
+    onFinishOperation();
+    myPoligonState = Finished;
+    return;
+  }
+  else if( myPoligonState == Finished || myPoligonState == NotValid )
+    return;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
     onFinishOperation();
@@ -585,6 +622,9 @@ void SVTK_InteractorStyle::OnMiddleButtonDown(int ctrl,
 {
   this->FindPokedRenderer(x, y);
   if(GetCurrentRenderer() == NULL)
+    return;
+
+  if ( myPoligonState != Disable )
     return;
 
   myShiftState = shift;
@@ -612,6 +652,13 @@ void SVTK_InteractorStyle::OnMiddleButtonUp(int vtkNotUsed(ctrl),
                                             int vtkNotUsed(x),
                                             int vtkNotUsed(y))
 {
+  if( myPoligonState == InProcess ) { // delete a point of polygon
+    if ( myPolygonPoints.size() > 2 ) {
+      myPolygonPoints.remove( myPolygonPoints.size() - 1 );
+      mySelectionEvent->myPolygonPoints.remove( mySelectionEvent->myPolygonPoints.size() - 1 );
+    }
+    return;
+  }
   myShiftState = shift;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
@@ -633,6 +680,12 @@ void SVTK_InteractorStyle::OnRightButtonDown(int ctrl,
     return;
 
   myShiftState = shift;
+
+  if ( !ctrl ) {
+    myPoligonState = Start;
+    this->Interactor->GetEventPosition(mySelectionEvent->myX, mySelectionEvent->myY);
+    mySelectionEvent->myPolygonPoints.append( QPoint( mySelectionEvent->myX, mySelectionEvent->myY) );
+  }
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
     onFinishOperation();
@@ -656,6 +709,18 @@ void SVTK_InteractorStyle::OnRightButtonUp(int vtkNotUsed(ctrl),
                                            int vtkNotUsed(x),
                                            int vtkNotUsed(y))
 {
+  if( myPoligonState == Start ) { // if right button was pressed but mouse is not moved
+    myPoligonState = Disable;
+    mySelectionEvent->myPolygonPoints.clear();
+  }
+
+  if( myPoligonState != Disable ) {
+    endDrawPolygon();
+    myPoligonState = Finished;
+    startOperation(VTK_INTERACTOR_STYLE_CAMERA_NONE);
+    return;
+  }
+
   myShiftState = shift;
   // finishing current viewer operation
   if (State != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
@@ -1020,7 +1085,10 @@ void SVTK_InteractorStyle::onStartOperation()
     case VTK_INTERACTOR_STYLE_CAMERA_SELECT:
     case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
-      drawRect();
+      if ( myPoligonState == InProcess )
+        drawPolygon();
+      else
+        drawRect();
       break;
     }
     case VTK_INTERACTOR_STYLE_CAMERA_ZOOM:
@@ -1067,78 +1135,86 @@ void SVTK_InteractorStyle::onFinishOperation()
       }
       else {
         if (myPoint == myOtherPoint)
-          {
-            // process point selection
-            this->FindPokedRenderer(aSelectionEvent->myX, aSelectionEvent->myY);
-            Interactor->StartPickCallback();
+        {
+          // process point selection
+          this->FindPokedRenderer(aSelectionEvent->myX, aSelectionEvent->myY);
+          Interactor->StartPickCallback();
             
-            SALOME_Actor* aHighlightedActor = NULL;
-            vtkActorCollection* anActorCollection = GetSelector()->Pick(aSelectionEvent, GetCurrentRenderer());
+          SALOME_Actor* aHighlightedActor = NULL;
+          vtkActorCollection* anActorCollection = GetSelector()->Pick(aSelectionEvent, GetCurrentRenderer());
 
-            aSelectionEvent->myIsRectangle = false;
+          aSelectionEvent->myIsRectangle = false;
+          aSelectionEvent->myIsPolygon = false;
+          if(!myShiftState)
+            GetSelector()->ClearIObjects();
 
-            if(!myShiftState)
-              GetSelector()->ClearIObjects();
-
-            if( anActorCollection )
+          if( anActorCollection )
+          {
+            anActorCollection->InitTraversal();
+            while( vtkActor* aVTKActor = anActorCollection->GetNextActor() )
             {
-              anActorCollection->InitTraversal();
-              while( vtkActor* aVTKActor = anActorCollection->GetNextActor() )
+              if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aVTKActor ) )
               {
-                if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aVTKActor ) )
+                if( anActor->Highlight( this, aSelectionEvent, true ) )
                 {
-                  if( anActor->Highlight( this, aSelectionEvent, true ) )
-                  {
-                    aHighlightedActor = anActor;
-                    break;
-                  }
+                  aHighlightedActor = anActor;
+                  break;
                 }
               }
             }
+          }
 
-            if( !aHighlightedActor )
-            {
-              if(myLastHighlitedActor.GetPointer() && myLastHighlitedActor.GetPointer() != aHighlightedActor)
-                myLastHighlitedActor->Highlight( this, aSelectionEvent, false );
-            }
-            myLastHighlitedActor = aHighlightedActor;
-          } 
-        else 
+          if( !aHighlightedActor )
           {
-            //processing rectangle selection
-            Interactor->StartPickCallback();
-            GetSelector()->StartPickCallback();
+            if(myLastHighlitedActor.GetPointer() && myLastHighlitedActor.GetPointer() != aHighlightedActor)
+              myLastHighlitedActor->Highlight( this, aSelectionEvent, false );
+          }
+          myLastHighlitedActor = aHighlightedActor;
+        }
+        else
+        {
+          if ( myPoligonState == InProcess || myPoligonState == Closed )
+            aSelectionEvent->myIsPolygon = true;
+          else
             aSelectionEvent->myIsRectangle = true;
 
-            if(!myShiftState)
-              GetSelector()->ClearIObjects();
+          //processing polygonal selection
+          Interactor->StartPickCallback();
+          GetSelector()->StartPickCallback();
 
-            VTK::ActorCollectionCopy aCopy(GetCurrentRenderer()->GetActors());
-            vtkActorCollection* aListActors = aCopy.GetActors();
-            aListActors->InitTraversal();
-            while(vtkActor* aActor = aListActors->GetNextActor())
+          if(!myShiftState)
+            GetSelector()->ClearIObjects();
+
+          VTK::ActorCollectionCopy aCopy(GetCurrentRenderer()->GetActors());
+          vtkActorCollection* aListActors = aCopy.GetActors();
+          aListActors->InitTraversal();
+          while(vtkActor* aActor = aListActors->GetNextActor())
+          {
+            if(aActor->GetVisibility())
+            {
+              if(SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor))
               {
-                if(aActor->GetVisibility())
-                  {
-                    if(SALOME_Actor* aSActor = SALOME_Actor::SafeDownCast(aActor))
-                      {
-                        if(aSActor->hasIO())
-                          aSActor->Highlight( this, aSelectionEvent, true );
-                      }
-                  }
+                if(aSActor->hasIO())
+                  aSActor->Highlight( this, aSelectionEvent, true );
               }
+            }
           }
+        }
+        aSelectionEvent->myIsRectangle = false;
+        aSelectionEvent->myIsPolygon = false;
+        aSelectionEvent->myPolygonPoints.clear();
+        endDrawPolygon();
         Interactor->EndPickCallback();
         GetSelector()->EndPickCallback();
       } 
-    } 
-    break;
-  case VTK_INTERACTOR_STYLE_CAMERA_ZOOM:
-  case VTK_INTERACTOR_STYLE_CAMERA_PAN:
-  case VTK_INTERACTOR_STYLE_CAMERA_ROTATE:
-  case VTK_INTERACTOR_STYLE_CAMERA_SPIN:
-    break;
-  case VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN: 
+      break;
+    }
+    case VTK_INTERACTOR_STYLE_CAMERA_ZOOM:
+    case VTK_INTERACTOR_STYLE_CAMERA_PAN:
+    case VTK_INTERACTOR_STYLE_CAMERA_ROTATE:
+    case VTK_INTERACTOR_STYLE_CAMERA_SPIN:
+      break;
+    case VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN:
     {
       int w, h, x, y;
       Interactor->GetSize(w, h);
@@ -1198,7 +1274,10 @@ void SVTK_InteractorStyle::onOperation(QPoint mousePos)
   case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
       myOtherPoint = mousePos;
-      drawRect();
+      if ( myPoligonState == InProcess || myPoligonState == Closed || myPoligonState == NotValid )
+        drawPolygon();
+      else if ( myPoligonState != Finished )
+        drawRect();
       break;
     }
   }
@@ -1493,6 +1572,131 @@ void SVTK_InteractorStyle::drawRect()
   myRectBand->setVisible( aRect.isValid() );
 }
 
+bool isIntersect( const QPoint& theStart1, const QPoint& theEnd1,
+                  const QPoint& theStart2, const QPoint& theEnd2 )
+{
+  if ( ( theStart1 == theStart2 && theEnd1 == theEnd2 ) ||
+       ( theStart1 == theEnd2 && theEnd1 == theStart2 ) )
+    return true;
+
+  if ( theStart1 == theStart2 || theStart2 == theEnd1 ||
+      theStart1 == theEnd2 || theEnd1 == theEnd2 )
+    return false;
+
+  double x11 = theStart1.x() * 1.0;
+  double x12 = theEnd1.x() * 1.0;
+  double y11 = theStart1.y() * 1.0;
+  double y12 = theEnd1.y() * 1.0;
+
+  double x21 = theStart2.x() * 1.0;
+  double x22 = theEnd2.x() * 1.0;
+  double y21 = theStart2.y() * 1.0;
+  double y22 = theEnd2.y() * 1.0;
+
+  double k1 = x12 == x11 ? 0 : ( y12 - y11 ) / ( x12 - x11 );
+  double k2 = x22 == x21 ? 0 : ( y22 - y21 ) / ( x22 - x21 );
+
+  double b1 = y11 - k1 * x11;
+  double b2 = y21 - k2 * x21;
+
+  if ( k1 == k2 )
+  {
+    if ( b1 != b2 )
+      return false;
+    else
+      return !( ( qMax( x11, x12 ) <= qMin( x21, x22 ) ||
+                  qMin( x11, x12 ) >= qMax( x21, x22 ) ) &&
+                ( qMax( y11, y12 ) <= qMin( y21, y22 ) ||
+                  qMin( y11, y12 ) >= qMax( y21, y22 ) ) );
+  }
+  else
+  {
+    double x0 = ( b2 - b1 ) / ( k1 - k2 );
+    double y0 = ( k1 * b2 - k2 * b1 ) / ( k1 - k2 );
+
+    if ( qMin( x11, x12 ) < x0 && x0 < qMax( x11, x12 ) &&
+         qMin( y11, y12 ) < y0 && y0 < qMax( y11, y12 ) &&
+         qMin( x21, x22 ) < x0 && x0 < qMax( x21, x22 ) &&
+         qMin( y21, y22 ) < y0 && y0 < qMax( y21, y22 ) )
+      return true;
+  }
+  return false;
+}
+
+bool isValid( const QPolygon* thePoints, const QPoint& theCurrent )
+{
+  if ( !thePoints->count() )
+    return true;
+
+  if ( thePoints->count() == 1 && thePoints->point( 0 ) == theCurrent )
+    return false;
+
+  const QPoint& aLast = thePoints->point( thePoints->count() - 1 );
+
+  if ( aLast == theCurrent )
+    return true;
+
+  bool res = true;
+  for ( uint i = 0; i < thePoints->count() - 1 && res; i++ )
+  {
+    const QPoint& aStart = thePoints->point( i );
+    const QPoint& anEnd  = thePoints->point( i + 1 );
+    res = !isIntersect( aStart, anEnd, theCurrent, aLast );
+  }
+  return res;
+}
+
+/*!
+  Draws polygon
+*/
+void SVTK_InteractorStyle::drawPolygon()
+{
+  QSize aToler( 5, 5 );
+  if ( !myPolygonBand ) {
+    myPolygonBand = new QtxPolyRubberBand( GetRenderWidget() );
+    QPalette palette;
+    palette.setColor( myPolygonBand->foregroundRole(), Qt::white );
+    myPolygonBand->setPalette( palette );
+    myPolygonPoints.append( QPoint( myPoint.x(), myPoint.y() ) );
+  }
+  myPolygonBand->hide();
+
+  bool closed = false;
+  bool valid = GetRenderWidget()->rect().contains( QPoint( myOtherPoint.x(), myOtherPoint.y() ) );
+  if ( !myPolygonPoints.at(0).isNull() )
+  {
+    QRect aRect( myPolygonPoints.at(0).x() - aToler.width(), myPolygonPoints.at(0).y() - aToler.height(),
+                 2 * aToler.width(), 2 * aToler.height() );
+    closed = aRect.contains( QPoint( myOtherPoint.x(), myOtherPoint.y() ) );
+  }
+
+  QPolygon* points = new QPolygon( myPolygonPoints );
+  valid = valid && isValid( points, QPoint( myOtherPoint.x(), myOtherPoint.y() ) );
+  myPoligonState = valid ? InProcess : NotValid;
+  delete points;
+  if ( closed && !valid )
+    closed = false;
+
+  if ( closed && myPolygonPoints.size() > 2 ) {
+    GetRenderWidget()->setCursor( Qt::CrossCursor );
+    myPoligonState = Closed;
+  }
+  else if ( valid )
+    GetRenderWidget()->setCursor( Qt::PointingHandCursor );
+  else
+    GetRenderWidget()->setCursor( Qt::ForbiddenCursor );
+
+  myPolygonPoints.append( QPoint( myOtherPoint.x(), myOtherPoint.y() ) );
+
+  QPolygon aPolygon( myPolygonPoints );
+  myPolygonBand->initGeometry( aPolygon );
+  myPolygonBand->setVisible( true );
+
+  if ( myPolygonPoints.size() > 1 ) {
+    myPolygonPoints.remove( myPolygonPoints.size() - 1 );
+  }
+}
+
 /*!
   \brief Delete rubber band on the end on the dragging operation.
 */
@@ -1502,6 +1706,19 @@ void SVTK_InteractorStyle::endDrawRect()
 
   delete myRectBand;
   myRectBand = 0;
+}
+
+/*!
+  \brief Delete rubber band on the end on the dragging operation.
+*/
+void SVTK_InteractorStyle::endDrawPolygon()
+{
+  if ( myPolygonBand ) myPolygonBand->hide();
+
+  delete myPolygonBand;
+  myPolygonBand = 0;
+
+  myPolygonPoints.clear();
 }
 
 /*!

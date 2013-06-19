@@ -1038,7 +1038,7 @@ void VTKViewer_InteractorStyle::onFinishOperation()
           case FaceSelection:
           case VolumeSelection: 
             {
-              vtkSmartPointer<VTKViewer_CellRectPicker> picker = VTKViewer_CellRectPicker::New();
+              vtkSmartPointer<VTKViewer_CellAreaPicker> picker = VTKViewer_CellRectPicker::New();
               picker->SetTolerance(0.001);
               picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
               
@@ -1077,7 +1077,7 @@ void VTKViewer_InteractorStyle::onFinishOperation()
             break;          
           case ActorSelection: // objects selection
             {
-              vtkSmartPointer<VTKViewer_RectPicker> picker = VTKViewer_RectPicker::New();
+              vtkSmartPointer<VTKViewer_AreaPicker> picker = VTKViewer_AreaPicker::New();
               picker->SetTolerance(0.001);
               picker->Pick(x1, y1, 0.0, x2, y2, 0.0, this->CurrentRenderer);
 

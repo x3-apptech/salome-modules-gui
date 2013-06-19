@@ -37,6 +37,7 @@
 #include <vtkSmartPointer.h>
 
 #include <QCursor>
+#include <QtxRubberBand.h>
 
 #include <map>
 
@@ -145,6 +146,8 @@ class QRubberBand;
 #define VTK_INTERACTOR_STYLE_CAMERA_GLOBAL_PAN 7
 #define VTK_INTERACTOR_STYLE_CAMERA_SELECT_ROTATION_POINT 8
 
+enum PolygonState { Disable, Start, InProcess, Finished, Closed, NotValid };
+
 //! Introduce SALOME way of user interaction
 /*!
   This class defines SALOME way of user interaction for VTK viewer, as well, 
@@ -205,6 +208,9 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   //! To handle mouse wheel backward event (reimplemented from #vtkInteractorStyle)
   virtual void OnMouseWheelBackward();
 
+  //! To handle mouse button double click event
+  virtual void OnMouseButtonDoubleClick();
+
   //! To handle keyboard event (reimplemented from #vtkInteractorStyle)
   virtual void OnChar();
 
@@ -231,7 +237,10 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   
   SVTK_Selector* GetSelector();
 
-  int   CurrentState() const { return State; }
+  int          CurrentState() const { return State; }
+  PolygonState GetPolygonState() const { return myPoligonState; }
+  void         SetPolygonState( const PolygonState& thePolygonState )
+                              { myPoligonState = thePolygonState; }
 
   void SetAdvancedZoomingEnabled( const bool theState ) { myIsAdvancedZoomingEnabled = theState; }
   bool IsAdvancedZoomingEnabled() const { return myIsAdvancedZoomingEnabled; }
@@ -308,6 +317,8 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   
   void drawRect();
   void endDrawRect();
+  void drawPolygon();
+  void endDrawPolygon();
 
  protected:
   QCursor                   myDefCursor;
@@ -354,10 +365,13 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   vtkSmartPointer<SVTK_Actor>     myHighlightSelectionPointActor;
   vtkSmartPointer<vtkPointPicker> myPointPicker;
   
-  double            myBBCenter[3];
+  double                          myBBCenter[3];
   bool                            myBBFirstCheck;
 
   QRubberBand*                    myRectBand; //!< selection rectangle rubber band
+  QtxPolyRubberBand*              myPolygonBand; //!< polygonal selection
+  QVector<QPoint>                 myPolygonPoints;
+  PolygonState                    myPoligonState;
 
   bool                            myIsAdvancedZoomingEnabled;
 };

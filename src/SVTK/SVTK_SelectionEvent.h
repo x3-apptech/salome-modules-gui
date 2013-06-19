@@ -28,6 +28,8 @@
 #define SVTK_SELECTIONEVENT_H
 
 #include "SVTK_Selection.h"
+#include <QPoint>
+#include <QVector>
 
 //! The structure is used for passing all infromation necessary for claculation of the selection.
 /*!
@@ -44,6 +46,8 @@ struct SVTK_SelectionEvent
   int myLastX; //!< Last X position of the mouse before starting any complex operation (like rectangle selection)
   int myLastY; //!< Last Y position of the mouse before starting any complex operation
   bool myIsRectangle; //!< A flag to define is it necessary provide rectangle selection for current #Selection_Mode
+  bool myIsPolygon; //!< A flag to define is it necessary provide polygonal selection for current #Selection_Mode
+  QVector<QPoint> myPolygonPoints; //!< Vector of points for polygonal selection
   bool myIsCtrl; //!< Is Ctrl key are pressed
   bool myIsShift; //!< Is Shift key are pressed
   int myKeyCode; //!< Code of the pressed key

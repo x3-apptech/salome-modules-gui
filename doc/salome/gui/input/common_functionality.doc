@@ -1,0 +1,130 @@
+/*!
+
+\page common_functionality_page Common functionality
+
+\anchor viewer_background
+<h2>Background</h2>
+
+Viewers background can be customized using the "Change background"
+popup menu command that opens the following dialog box:
+
+\image html change_background_dlg.png
+
+The following types of the background are supported:
+
+- Single color: the background is colored with the solid color
+  specified by the user in the dialog box.
+
+- Gradient background: the background is gradiently colored according
+  to two colors and the gradient type specified in the dialog box. The
+  following types of background are supported:
+
+  - Horizontal
+
+  - Vertical
+
+  - First diagonal
+
+  - Second diagonal
+
+  - First corner
+
+  - Second corner
+
+  - Third corner
+
+  - Fourth corner
+
+- Image: allows to set image as viewer background and define filling type:
+
+  - Center: the image is located at the center of the viewer backgound
+
+  - Tile: the image fills the entire viewer backgound one by one
+
+  - Stretch: the image is stretched to the entire viewer backgound.
+
+Default background for the OCC viewer is specified via the
+\ref occ_preferences "OCC 3D Viewer Preferences" and for the
+VTK viewer via the \ref vtk_preferences "VTK 3D Viewer Preferences".
+
+<hr>
+
+<h2>Selection</h2>
+
+For selecting it is necessary to click by left mouse button on the required 
+element. Thus, this element will be selected.
+
+Also, holding down the <b>Shift</b> key while selecting objects will 
+produce multi selection. 
+
+In the viewers there are two mechanism for selecting: rectangle and 
+polyline selection.
+
+<h3>Rectangle selection</h3>
+
+The Rectangle Selection tool is designed to select rectangular regions: 
+it is the most basic of the selection tools and very commonly used.
+ 
+For selecting area by rectangle press left mouse button and draw it on 
+the viewer holding down the left mouse button.
+
+To add an area to the existing selection it is necessary to hold down 
+<b>Shift</b> key while selecting.
+
+\image html rectselectionvtk.png
+As a result, only a rectangle is selected.
+\image html rectselectionvtk2.png
+
+<h3>Polyline selection</h3>
+
+OCC and VTK Viewers features a special Polyline Selection mechanism,
+which allows selecting an arbitraty part of the graphic area using a
+polygon frame (rubber band), instead of the usual selection with a
+rectangular frame.
+
+To produce a Polyline Selection, lock the right mouse button and draw
+the first side of the polygon, then change the direction by clicking
+the left mouse button add draw another side, etc. The whole selection
+frame is drawn with the locked right mouse button.
+
+To add an area to the existing selection it is necessary to hold down 
+<b>Shift</b> key while selecting.
+
+\image html polyselectionvtk11.png
+As a result, only the faces within the frame are selected.
+\image html polyselectionvtk21.png
+
+<hr>
+
+\anchor viewer_navigation_modes
+<h2>Navigation modes</h2>
+
+OCC and VTK 3D viewers support two different navigation modes:
+
+- <b>Salome standard controls</b>
+
+  Rectangle selection in this mode is performed by left mouse button, 
+  polyline selection is done by right mouse button;
+  multiple selection is available when \b Shift button is pressed.
+
+  Also, holding \b Ctrl key pressed in conjunction with 
+  mouse buttons performs view transformations:
+  - \b Ctrl + left mouse button - zooming;
+  - \b Ctrl + middle mouse button - panning;
+  - \b Ctrl + right mouse button - rotation.
+
+- <b>Keyboard free style</b>
+
+  This mode allows to process all view transformations without using
+  keyboard (only by mouse):
+  - \b Left mouse button performs view rotation;
+  - \b Middle mouse button performs panning; 
+  - \b Right mouse button makes zooming.
+  .
+  
+  In this style selection of objects in view is performed by pressing
+  "S" key or by left mouse button click. Rectangle selection is done
+  by left mouse button when holding \b Ctrl key; polyline selection
+  is done by right mouse button with \b Ctrl key pressed.
+
+*/

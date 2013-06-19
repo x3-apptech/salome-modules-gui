@@ -38,7 +38,7 @@
 #include "VTKViewer_TransformFilter.h"
 #include "VTKViewer_GeometryFilter.h"
 #include "VTKViewer_FramedTextActor.h"
-#include "SVTK_RectPicker.h"
+#include "SVTK_AreaPicker.h"
 
 #include "SVTK_Actor.h"
 
@@ -59,6 +59,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkOutlineSource.h>
+#include <vtkPolygon.h>
 
 #include <vtkInteractorStyle.h>
 #include <vtkRenderWindowInteractor.h>
@@ -66,6 +67,10 @@
 
 #include <TColStd_MapOfInteger.hxx>
 #include <TColStd_IndexedMapOfInteger.hxx>
+
+#include <math.h>
+#include <QPoint>
+#include <QVector>
 
 #if defined __GNUC__
   #if __GNUC__ == 2
@@ -671,102 +676,30 @@ SALOME_Actor
 
   double x = theSelectionEvent->myX;
   double y = theSelectionEvent->myY;
-  double z = 0.0;
 
-  if( !theSelectionEvent->myIsRectangle ) {
-    switch(aSelectionMode){
-    case NodeSelection: {
-      SVTK::TPickLimiter aPickLimiter( myPointPicker, this );
-      myPointPicker->Pick( x, y, z, aRenderer );
-
-      int aVtkId = myPointPicker->GetPointId();
-      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId, true ) ) {
-        int anObjId = GetNodeObjId( aVtkId );
-        if( hasIO() && anObjId >= 0 ) {
-          mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
-          mySelector->AddIObject( this );
-        }
-      }
-      break;
-    }
-    case CellSelection: 
-    case EdgeSelection:
-    case FaceSelection:
-    case VolumeSelection: 
-    case Elem0DSelection:        
-    case BallSelection: 
-    {
-      SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
-      myCellPicker->Pick( x, y, z, aRenderer );
-    
-      int aVtkId = myCellPicker->GetCellId();
-      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
-        int anObjId = GetElemObjId( aVtkId );
-        if( anObjId >= 0 ) {
-          if ( hasIO() && CheckDimensionId(aSelectionMode,this,anObjId) ) {
-            mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
-            mySelector->AddIObject( this );
-          }
-        }
-      }
-      break;
-    }
-    case EdgeOfCellSelection: 
-    {
-      SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
-      myCellPicker->Pick( x, y, z, aRenderer );
-    
-      int aVtkId = myCellPicker->GetCellId();
-      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
-        int anObjId = GetElemObjId( aVtkId );
-        if( anObjId >= 0 ) {
-          int anEdgeId = GetEdgeId(this,myCellPicker.GetPointer(),anObjId);
-          if( hasIO() && anEdgeId < 0 ) {
-            mySelector->AddOrRemoveIndex( myIO, anObjId, false );
-            mySelector->AddOrRemoveIndex( myIO, anEdgeId, true );
-            mySelector->AddIObject( this );
-          } 
-        }
-      }
-      break;
-    }
-    case ActorSelection : 
-    {
-      if ( hasIO() ) {
-        if( mySelector->IsSelected( myIO ) && anIsShift )
-          mySelector->RemoveIObject( this );
-        else {
-          mySelector->AddIObject( this );
-        }
-      }
-      break;
-    }
-    default:
-      break;
-    }
-  }else{
+  if( theSelectionEvent->myIsRectangle || theSelectionEvent->myIsPolygon ) {
     double xLast = theSelectionEvent->myLastX;
     double yLast = theSelectionEvent->myLastY;
-    double zLast = 0.0;
 
     double x1 = x < xLast ? x : xLast;
     double y1 = y < yLast ? y : yLast;
-    double z1 = z < zLast ? z : zLast;
     double x2 = x > xLast ? x : xLast;
     double y2 = y > yLast ? y : yLast;
-    double z2 = z > zLast ? z : zLast;
 
     switch(aSelectionMode){
     case NodeSelection: {
 
-      SVTK::TPickLimiter aPickLimiter( myPointRectPicker, this );
-      myPointRectPicker->Pick( x1, y1, z1, x2, y2, z2, aRenderer );
+      SVTK::TPickLimiter aPickLimiter( myPointAreaPicker, this );
+      if ( theSelectionEvent->myIsRectangle )
+        myPointAreaPicker->Pick( x1, y1, x2, y2, aRenderer, SVTK_AreaPicker::RectangleMode );
+      else if( theSelectionEvent->myIsPolygon )
+        myPointAreaPicker->Pick( theSelectionEvent->myPolygonPoints, aRenderer, SVTK_AreaPicker::PolygonMode );
 
-      const SVTK_RectPicker::TVectorIdsMap& aVectorIdsMap = myPointRectPicker->GetPointIdsMap();
-      SVTK_RectPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
+      const SVTK_AreaPicker::TVectorIdsMap& aVectorIdsMap = myPointAreaPicker->GetPointIdsMap();
+      SVTK_AreaPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
       TColStd_MapOfInteger anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
-        const SVTK_RectPicker::TVectorIds& aVectorIds = aMapIter->second;
+        const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
         vtkIdType anEnd = aVectorIds.size();
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
           int aPointId = aVectorIds[anId];
@@ -800,17 +733,28 @@ SALOME_Actor
             aRenderer->SetWorldPoint( aBounds[ i ], aBounds[ j ], aBounds[ k ], 1.0 );
             aRenderer->WorldToDisplay();
             aRenderer->GetDisplayPoint( aPnt );
+            bool anIsPointInSelection;
+            if( theSelectionEvent->myIsRectangle )
+              anIsPointInSelection =  aPnt[0] > x1 && aPnt[0] < x2 && aPnt[1] > y1 && aPnt[1] < y2;
+            else if( theSelectionEvent->myIsPolygon )
+              anIsPointInSelection = myPointAreaPicker->isPointInPolygon( QPoint( aPnt[0], aPnt[1] ),
+                                                                          theSelectionEvent->myPolygonPoints );
 
-            if( aPnt[0] < x1 || aPnt[0] > x2 || aPnt[1] < y1 || aPnt[1] > y2 ) {
-              anIsPicked = false;
-              break;
+            if( !anIsPointInSelection ) {
+                anIsPicked = false;
+                break;
             }
           }
         }
       }
 
-      if( anIsPicked )
-        mySelector->AddIObject(this);
+      if ( hasIO() ) {
+        if( anIsPicked && mySelector->IsSelected( myIO ) && anIsShift )
+          mySelector->RemoveIObject( this );
+        else if ( anIsPicked ){
+          mySelector->AddIObject( this );
+        }
+      }
 
       break;
     }
@@ -821,14 +765,17 @@ SALOME_Actor
     case Elem0DSelection:        
     case BallSelection: 
     {
-      SVTK::TPickLimiter aPickLimiter( myCellRectPicker, this );
-      myCellRectPicker->Pick( x1, y1, z1, x2, y2, z2, aRenderer );
+      SVTK::TPickLimiter aPickLimiter( myCellAreaPicker, this );
+      if( theSelectionEvent->myIsRectangle )
+        myCellAreaPicker->Pick( x1, y1, x2, y2, aRenderer, SVTK_AreaPicker::RectangleMode );
+      else if( theSelectionEvent->myIsPolygon )
+        myCellAreaPicker->Pick( theSelectionEvent->myPolygonPoints, aRenderer, SVTK_AreaPicker::PolygonMode );
 
-      const SVTK_RectPicker::TVectorIdsMap& aVectorIdsMap = myCellRectPicker->GetCellIdsMap();
-      SVTK_RectPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
+      const SVTK_AreaPicker::TVectorIdsMap& aVectorIdsMap = myCellAreaPicker->GetCellIdsMap();
+      SVTK_AreaPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
       TColStd_MapOfInteger anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
-        const SVTK_RectPicker::TVectorIds& aVectorIds = aMapIter->second;
+        const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
         vtkIdType anEnd = aVectorIds.size();
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
           int aCellId = aVectorIds[anId];
@@ -852,6 +799,78 @@ SALOME_Actor
         else if ( !anIsShift )
           mySelector->RemoveIObject( this );
       }
+    }
+    default:
+      break;
+    }
+  }
+  else {
+    switch(aSelectionMode){
+    case NodeSelection: {
+      SVTK::TPickLimiter aPickLimiter( myPointPicker, this );
+      myPointPicker->Pick( x, y, 0.0, aRenderer );
+
+      int aVtkId = myPointPicker->GetPointId();
+      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId, true ) ) {
+        int anObjId = GetNodeObjId( aVtkId );
+        if( hasIO() && anObjId >= 0 ) {
+          mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
+          mySelector->AddIObject( this );
+        }
+      }
+      break;
+    }
+    case CellSelection:
+    case EdgeSelection:
+    case FaceSelection:
+    case VolumeSelection:
+    case Elem0DSelection:
+    case BallSelection:
+    {
+      SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
+      myCellPicker->Pick( x, y, 0.0, aRenderer );
+
+      int aVtkId = myCellPicker->GetCellId();
+      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
+        int anObjId = GetElemObjId( aVtkId );
+        if( anObjId >= 0 ) {
+          if ( hasIO() && CheckDimensionId(aSelectionMode,this,anObjId) ) {
+            mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
+            mySelector->AddIObject( this );
+          }
+        }
+      }
+      break;
+    }
+    case EdgeOfCellSelection:
+    {
+      SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
+      myCellPicker->Pick( x, y, 0.0, aRenderer );
+
+      int aVtkId = myCellPicker->GetCellId();
+      if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
+        int anObjId = GetElemObjId( aVtkId );
+        if( anObjId >= 0 ) {
+          int anEdgeId = GetEdgeId(this,myCellPicker.GetPointer(),anObjId);
+          if( hasIO() && anEdgeId < 0 ) {
+            mySelector->AddOrRemoveIndex( myIO, anObjId, false );
+            mySelector->AddOrRemoveIndex( myIO, anEdgeId, true );
+            mySelector->AddIObject( this );
+          }
+        }
+      }
+      break;
+    }
+    case ActorSelection :
+    {
+      if ( hasIO() ) {
+        if( mySelector->IsSelected( myIO ) && anIsShift )
+          mySelector->RemoveIObject( this );
+        else {
+          mySelector->AddIObject( this );
+        }
+      }
+      break;
     }
     default:
       break;
@@ -978,25 +997,25 @@ SALOME_Actor
 }
 
 /*!
-  To set up a picker for point rectangle selection (initialized by SVTK_Renderer::AddActor)
-  \param theRectPicker - new picker
+  To set up a picker for point rectangle or polygonal selection (initialized by SVTK_Renderer::AddActor)
+  \param theAreaPicker - new picker
 */
 void
 SALOME_Actor
-::SetPointRectPicker(SVTK_RectPicker* theRectPicker) 
+::SetPointAreaPicker(SVTK_AreaPicker* theAreaPicker)
 {
-  myPointRectPicker = theRectPicker;
+  myPointAreaPicker = theAreaPicker;
 }
 
 /*!
-  To set up a picker for cell rectangle selection (initialized by SVTK_Renderer::AddActor)
-  \param theRectPicker - new picker
+  To set up a picker for cell rectangle of polygonal selection (initialized by SVTK_Renderer::AddActor)
+  \param theAreaPicker - new picker
 */
 void
 SALOME_Actor
-::SetCellRectPicker(SVTK_RectPicker* theRectPicker) 
+::SetCellAreaPicker(SVTK_AreaPicker* theAreaPicker)
 {
-  myCellRectPicker = theRectPicker;
+  myCellAreaPicker = theAreaPicker;
 }
 
 /*!

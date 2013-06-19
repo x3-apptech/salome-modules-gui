@@ -20,13 +20,9 @@ jpeg image format.
 
 \image html vtk_view_style_switch.png
 
-<b>Interaction style switch</b> - allows to switch between standard
-and "keyboard free" interaction styles. "Keyboard free" style allows
-to process all view transformations without using keyboard (only by
-mouse) and perform selection in view by pressing "S" key. By default,
-rotation in this mode is performed by left mouse button, panning - by
-middle mouse button, zooming - by left and middle mouse buttons
-pressed simultaneously.
+<b>Interaction style switch</b> - allows to switch between "Salome 
+standard controls" and "Keyboard free" \ref viewer_navigation_modes "interaction styles". 
+
 <hr>
 
 \image html vtk_view_zooming_style_switch.png
@@ -282,52 +278,5 @@ the AVI format using external software (jpeg2yuv):
 - <b>Continue recording</b> - resume recording;
 
 - <b>Stop recording</b> - stop recording.
-
-<hr>
-
-\anchor vtk_background
-<h2>Background</h2>
-
-VTK Viewer background can be customized using the "Change background"
-popup menu command that opens the following dialog box:
-
-\image html change_background_dlg.png
-
-The following types of the background are supported:
-
-- Single color: the background is colored with the solid color
-  specified by the user in the dialog box.
-
-- Gradient background: the background is gradiently colored according
-  to two colors and the gradient type specified in the dialog
-  box. The following types of background are supported:
-
-  - Horizontal
-
-  - Vertical
-
-  - First diagonal
-
-  - Second diagonal
-
-  - First corner
-
-  - Second corner
-
-  - Third corner
-
-  - Fourth corner
-
-- Image: allows to set image as viewer background and define filling type:
-
-  - Center: the image is located at the center of the viewer backgound
-
-  - Tile: the image fills the entire viewer backgound one by one
-
-  - Stretch: the image is stretched to the entire viewer backgound.
-
-
-Default background for the viewer is specified via the
-\ref vtk_preferences "application preferences".
 
 */

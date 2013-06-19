@@ -315,6 +315,7 @@ protected:
   bool                  myEnableDrawMode;
   bool                  myPaintersRedrawing;  // set to draw with external painters  
   bool                  IsSketcherStyle;
+  bool                  myIsKeyFree;
   
   QCursor               myCursor;
 

@@ -41,7 +41,8 @@ mypViewWindow( vw ),
 myType( type ),
 mypData( 0 ),
 myResult( Neutral ),
-myButtonState( 0 )
+myButtonState( 0 ),
+myHasShift( false )
 {
 }
 
@@ -99,6 +100,11 @@ int OCCViewer_ViewSketcher::buttonState() const
   return myButtonState;
 }
 
+bool OCCViewer_ViewSketcher::isHasShift() const
+{
+  return myHasShift;
+}
+
 void OCCViewer_ViewSketcher::onActivate()
 {
 }
@@ -116,6 +122,7 @@ bool OCCViewer_ViewSketcher::eventFilter( QObject* o, QEvent* e )
 {
   OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
 
+  QMouseEvent* me = (QMouseEvent*)e;
   SketchState state = EnTrain;
   bool ignore = false;
   if ( o == avp )
@@ -127,7 +134,6 @@ bool OCCViewer_ViewSketcher::eventFilter( QObject* o, QEvent* e )
       case QEvent::MouseButtonRelease:
       case QEvent::MouseButtonDblClick:
       {
-        QMouseEvent* me = (QMouseEvent*)e;
 
         myButtonState = me->buttons();
         if ( e->type() == QEvent::MouseButtonPress )
@@ -147,6 +153,7 @@ bool OCCViewer_ViewSketcher::eventFilter( QObject* o, QEvent* e )
           state = Fin;
 
         ignore = true;
+        myHasShift = ( me->modifiers() & Qt::ShiftModifier );
         break;
       }
       case QEvent::Hide:

@@ -65,7 +65,7 @@ SET(SVTK_SOURCES
   SVTK_Prs.cxx
   SVTK_Actor.cxx
   SALOME_Actor.cxx
-  SVTK_RectPicker.cxx
+  SVTK_AreaPicker.cxx
   SVTK_DeviceActor.cxx
   SVTK_CubeAxesActor2D.cxx
   SVTK_NonIsometricDlg.cxx
@@ -118,7 +118,7 @@ SET(COMMON_HEADERS_H
   SVTK_Prs.h
   SVTK_Actor.h
   SALOME_Actor.h
-  SVTK_RectPicker.h
+  SVTK_AreaPicker.h
   SVTK_DeviceActor.h
   SVTK_FontWidget.h
   SVTK_CubeAxesActor2D.h

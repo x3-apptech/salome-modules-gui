@@ -42,7 +42,7 @@ class vtkPointPicker;
 class vtkCellPicker;
 class vtkProperty;
 
-class SVTK_RectPicker;
+class SVTK_AreaPicker;
 
 class VTKViewer_Trihedron;
 class VTKViewer_Transform;
@@ -242,8 +242,8 @@ protected:
   vtkSmartPointer<vtkPointPicker> myPointPicker;
   vtkSmartPointer<vtkCellPicker> myCellPicker;
 
-  vtkSmartPointer<SVTK_RectPicker> myPointRectPicker;
-  vtkSmartPointer<SVTK_RectPicker> myCellRectPicker;
+  vtkSmartPointer<SVTK_AreaPicker> myPointAreaPicker;
+  vtkSmartPointer<SVTK_AreaPicker> myCellAreaPicker;
 
   vtkSmartPointer<vtkProperty> myPreHighlightProperty;
   vtkSmartPointer<vtkProperty> myHighlightProperty;

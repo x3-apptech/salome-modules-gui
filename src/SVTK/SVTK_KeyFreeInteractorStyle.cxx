@@ -37,8 +37,8 @@ vtkStandardNewMacro(SVTK_KeyFreeInteractorStyle);
 //----------------------------------------------------------------------------
 
 SVTK_KeyFreeInteractorStyle::SVTK_KeyFreeInteractorStyle():
-  myIsMidButtonDown( false ),
-  myIsLeftButtonDown( false )
+  myIsLeftButtonDown( false ),
+  myIsRightButtonDown( false )
 {
 }
 
@@ -48,10 +48,36 @@ SVTK_KeyFreeInteractorStyle::~SVTK_KeyFreeInteractorStyle()
 }
 
 //----------------------------------------------------------------------------
+void SVTK_KeyFreeInteractorStyle::OnMouseMove(int ctrl,
+                                              int shift,
+                                              int x, int y)
+{
+  // OnLeftButtonDown + OnMouseMove = Rotate
+  if ( myIsLeftButtonDown ) {
+    OnLeftButtonDown( ctrl, shift, x, y );
+    myIsLeftButtonDown = false;
+  }
+  // OnRightButtonDown + OnMouseMove = Zoom
+  if ( myIsRightButtonDown ) {
+    OnRightButtonDown( ctrl, shift, x, y );
+    myIsRightButtonDown = false;
+  }
+  SVTK_InteractorStyle::OnMouseMove( ctrl, shift, x, y );
+}
+
+//----------------------------------------------------------------------------
 void SVTK_KeyFreeInteractorStyle::OnLeftButtonDown(int ctrl, int shift, 
                                                    int x, int y) 
 {
-  myIsLeftButtonDown = true;
+  if ( ctrl ) {
+    SVTK_InteractorStyle::OnLeftButtonDown( !ctrl, shift, x, y );
+    return;
+  }
+
+  if( !myIsLeftButtonDown ) {
+    myIsLeftButtonDown = true;
+    return;
+  }
 
   if (this->HasObserver(vtkCommand::LeftButtonPressEvent)) {
     this->InvokeEvent(vtkCommand::LeftButtonPressEvent,NULL);
@@ -71,16 +97,9 @@ void SVTK_KeyFreeInteractorStyle::OnLeftButtonDown(int ctrl, int shift,
   if (ForcedState != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
     startOperation(ForcedState);
   } 
-  else {
-    if (!(ctrl||shift)){
-      if (myIsMidButtonDown){
-        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
-      }
-      else{
-        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ROTATE);
-      }
-    }
-  }
+  else if ( !shift )
+    startOperation(VTK_INTERACTOR_STYLE_CAMERA_ROTATE);
+
   return;
 }
 
@@ -89,7 +108,10 @@ void SVTK_KeyFreeInteractorStyle::OnMiddleButtonDown(int ctrl,
                                                      int shift, 
                                                      int x, int y) 
 {
-  myIsMidButtonDown = true;
+  if ( ctrl ) {
+    SVTK_InteractorStyle::OnMiddleButtonDown( !ctrl, shift, x, y );
+    return;
+  }
 
   if (this->HasObserver(vtkCommand::MiddleButtonPressEvent))  {
     this->InvokeEvent(vtkCommand::MiddleButtonPressEvent,NULL);
@@ -109,36 +131,73 @@ void SVTK_KeyFreeInteractorStyle::OnMiddleButtonDown(int ctrl,
   if (ForcedState != VTK_INTERACTOR_STYLE_CAMERA_NONE) {
     startOperation(ForcedState);
   }
-  else {
-    if (!(ctrl||shift)){
-      if ( myIsLeftButtonDown ){
-        startOperation(VTK_INTERACTOR_STYLE_CAMERA_ZOOM);
-      }
-      else{
-        startOperation(VTK_INTERACTOR_STYLE_CAMERA_PAN);
-      }
-    }
+  else if ( !shift )
+    startOperation(VTK_INTERACTOR_STYLE_CAMERA_PAN);
+}
+
+//----------------------------------------------------------------------------
+void SVTK_KeyFreeInteractorStyle::OnRightButtonDown( int ctrl,
+                                                     int shift,
+                                                     int x, int y )
+{
+  if ( ctrl ) {
+    SVTK_InteractorStyle::OnRightButtonDown( !ctrl, shift, x, y );
+    return;
   }
+
+  if( !myIsRightButtonDown ) {
+    myIsRightButtonDown = true;
+    return;
+  }
+
+  if( this->HasObserver( vtkCommand::RightButtonPressEvent ) ) {
+    this->InvokeEvent( vtkCommand::RightButtonPressEvent, NULL );
+    return;
+  }
+  this->FindPokedRenderer( x, y );
+  if( this->CurrentRenderer == NULL ) {
+    return;
+  }
+  myShiftState = shift;
+  // finishing current viewer operation
+  if ( State != VTK_INTERACTOR_STYLE_CAMERA_NONE ) {
+    onFinishOperation();
+    startOperation( VTK_INTERACTOR_STYLE_CAMERA_NONE );
+  }
+  myOtherPoint = myPoint = QPoint(x, y);
+  if ( ForcedState != VTK_INTERACTOR_STYLE_CAMERA_NONE ) {
+    startOperation(ForcedState);
+  }
+  else if ( !shift )
+    startOperation( VTK_INTERACTOR_STYLE_CAMERA_ZOOM );
 }
 
 //----------------------------------------------------------------------------
 void SVTK_KeyFreeInteractorStyle::OnLeftButtonUp(int ctrl, int shift, int x, int y)
 {
-  myIsLeftButtonDown = false;
+  // OnLeftButtonDown + OnLeftButtonUp = Select
+  if ( myIsLeftButtonDown ) {
+    SVTK_InteractorStyle::OnLeftButtonDown( ctrl, shift, x, y );
+    myIsLeftButtonDown = false;
+  }
   SVTK_InteractorStyle::OnLeftButtonUp( ctrl, shift, x, y );
-
-  if ( myIsMidButtonDown )
-    OnMiddleButtonDown( ctrl, shift, x, y );
 }
 
 //----------------------------------------------------------------------------
 void SVTK_KeyFreeInteractorStyle::OnMiddleButtonUp(int ctrl, int shift, int x, int y)
 {
-  myIsMidButtonDown = false;
   SVTK_InteractorStyle::OnMiddleButtonUp( ctrl, shift, x, y );
+}
 
-  if ( myIsLeftButtonDown )
-    OnLeftButtonDown( ctrl, shift, x, y );
+//----------------------------------------------------------------------------
+void SVTK_KeyFreeInteractorStyle::OnRightButtonUp(int ctrl, int shift, int x, int y)
+{
+  // OnRightButtonDown + OnRightButtonUp = Open context menu
+  if( myIsRightButtonDown ) {
+    myIsRightButtonDown = false;
+    SVTK_InteractorStyle::OnRightButtonDown( ctrl, shift, x, y );
+  }
+  SVTK_InteractorStyle::OnRightButtonUp( ctrl, shift, x, y );
 }
 
 //----------------------------------------------------------------------------

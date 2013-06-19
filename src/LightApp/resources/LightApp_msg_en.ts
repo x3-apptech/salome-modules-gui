@@ -619,6 +619,10 @@ The changes will be applied on the next application session.</translation>
         <translation>Common</translation>
     </message>
     <message>
+        <source>PREF_GROUP_3DVIEWER</source>
+        <translation>3D Viewer</translation>
+    </message>
+    <message>
         <source>PREF_GROUP_OCCVIEWER</source>
         <translation>OCC 3D Viewer</translation>
     </message>

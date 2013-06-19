@@ -57,6 +57,7 @@ public:
   int                          type() const;
   int                          result() const;
   int                          buttonState() const;
+  bool                         isHasShift() const;
   void*                        data() const;
 
   void                         activate();
@@ -88,6 +89,7 @@ protected:
   QCursor                      mySavedCursor;
   QPoint                       myStart, myCurr;
   int                          myButtonState;
+  bool                         myHasShift;
 };
 
 /*!

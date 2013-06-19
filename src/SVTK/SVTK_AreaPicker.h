@@ -21,12 +21,12 @@
 //
 
 //  SALOME VTKViewer : build VTK viewer into Salome desktop
-//  File   : SVTK_RectPicker.h
+//  File   : SVTK_AreaPicker.h
 //  Author : 
 //  Module : SALOME
 //
-#ifndef __SVTK_RectPicker_h
-#define __SVTK_RectPicker_h
+#ifndef __SVTK_AreaPicker_h
+#define __SVTK_AreaPicker_h
 
 #include "SVTK.h"
 #include "VTKViewer.h"
@@ -35,6 +35,9 @@
 #include <vector>
 
 #include <vtkAbstractPropPicker.h>
+#include <vtkDataSet.h>
+#include <QVector>
+#include <QPoint>
 
 class vtkRenderer;
 
@@ -45,16 +48,19 @@ class vtkRenderer;
 /*! \class vtkAbstractPropPicker
  * \brief For more information see <a href="http://www.vtk.org/">VTK documentation
  */
-/*! \class SVTK_RectPicker
+/*! \class SVTK_AreaPicker
  * \brief Rectangular picker class.
  */
-class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
+class SVTK_EXPORT SVTK_AreaPicker : public vtkAbstractPropPicker
 {
  public:
-  static
-  SVTK_RectPicker *New();
 
-  vtkTypeMacro(SVTK_RectPicker,vtkAbstractPropPicker);
+  enum SelectionMode { RectangleMode, PolygonMode };
+
+  static
+  SVTK_AreaPicker *New();
+
+  vtkTypeMacro(SVTK_AreaPicker,vtkAbstractPropPicker);
   
   /*! 
     Specify tolerance for performing pick operation. Tolerance is specified
@@ -69,20 +75,21 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
   vtkGetMacro(PickPoints,int);
   vtkBooleanMacro(PickPoints,int);
 
-  virtual 
   int
-  Pick(double theSelectionX, 
-       double theSelectionY, 
-       double theSelectionZ, 
-       double theSelectionX2, 
-       double theSelectionY2, 
-       double theSelectionZ2,
-       vtkRenderer *theRenderer);  
+  Pick( QVector<QPoint>& thePoints,
+        vtkRenderer *theRenderer,
+        SelectionMode theMode );
 
   int
-  Pick(double theSelection[3], 
-       double theSelection2[3], 
-       vtkRenderer *theRenderer);
+  Pick( double theSelectionX,
+        double theSelectionY,
+        double theSelectionX2,
+        double theSelectionY2,
+        vtkRenderer *theRenderer,
+        SelectionMode theMode );
+
+  static bool
+  isPointInPolygon( const QPoint& thePoint,const QVector<QPoint>& thePolygon );
 
   typedef std::vector<vtkIdType> TVectorIds;
   typedef std::map<vtkActor*,TVectorIds> TVectorIdsMap;
@@ -94,8 +101,8 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
   GetCellIdsMap() const;
 
  protected:
-  SVTK_RectPicker();
-  ~SVTK_RectPicker();
+  SVTK_AreaPicker();
+  ~SVTK_AreaPicker();
 
   //! tolerance for computation (% of window)
   double Tolerance;
@@ -103,11 +110,8 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
   //! use the following to control picking mode
   int PickPoints;
 
-  //! second rectangle selection point in window (pixel) coordinates
-  double SelectionPoint2[3]; 
-
-  //! second rectangle selection point in world coordinates
-  double PickPosition2[3]; 
+  //! coordinates of bounding box of selection
+  int mySelection[4];
 
   TVectorIdsMap myPointIdsMap;
   TVectorIdsMap myCellIdsMap;
@@ -119,6 +123,22 @@ class SVTK_EXPORT SVTK_RectPicker : public vtkAbstractPropPicker
        double, 
        double, 
        vtkRenderer*);
+
+  void
+  SelectVisiblePoints( QVector<QPoint>& thePoints,
+                       vtkRenderer *theRenderer,
+                       vtkDataSet *theInput,
+                       SVTK_AreaPicker::TVectorIds& theVisibleIds,
+                       SVTK_AreaPicker::TVectorIds& theInVisibleIds,
+                       double theTolerance,
+                       SelectionMode theMode );
+  void
+  SelectVisibleCells( QVector<QPoint>& thePoints,
+                      vtkRenderer *theRenderer,
+                      vtkDataSet *theInput,
+                      SVTK_AreaPicker::TVectorIds& theVectorIds,
+                      double theTolerance,
+                      SelectionMode theMode );
 };
 
 #ifdef WIN32

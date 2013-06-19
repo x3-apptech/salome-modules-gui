@@ -28,7 +28,7 @@
 
 #include "SVTK_Trihedron.h"
 #include "SVTK_CubeAxesActor2D.h"
-#include "SVTK_RectPicker.h"
+#include "SVTK_AreaPicker.h"
 
 #include "SALOME_Actor.h"
 #include "VTKViewer_Actor.h"
@@ -67,8 +67,8 @@ SVTK_Renderer
   myEventCallbackCommand(vtkCallbackCommand::New()),
   myPointPicker(vtkPointPicker::New()),
   myCellPicker(vtkCellPicker::New()),
-  myPointRectPicker(SVTK_RectPicker::New()),
-  myCellRectPicker(SVTK_RectPicker::New()),
+  myPointAreaPicker(SVTK_AreaPicker::New()),
+  myCellAreaPicker(SVTK_AreaPicker::New()),
   myPreHighlightProperty(vtkProperty::New()),
   myHighlightProperty(vtkProperty::New()),
   myTransform(VTKViewer_Transform::New()),
@@ -83,12 +83,12 @@ SVTK_Renderer
   myPointPicker->Delete();
   myCellPicker->Delete();
 
-  myPointRectPicker->Delete();
-  myPointRectPicker->PickFromListOn();
+  myPointAreaPicker->Delete();
+  myPointAreaPicker->PickFromListOn();
 
-  myCellRectPicker->Delete();
-  myCellRectPicker->PickFromListOn();
-  myCellRectPicker->PickPointsOff();
+  myCellAreaPicker->Delete();
+  myCellAreaPicker->PickFromListOn();
+  myCellAreaPicker->PickPointsOff();
 
   //SetPreselectionProp();
   myPreHighlightProperty->Delete();
@@ -244,8 +244,8 @@ SVTK_Renderer
     anActor->SetPointPicker(myPointPicker.GetPointer());
     anActor->SetCellPicker(myCellPicker.GetPointer());
 
-    anActor->SetPointRectPicker(myPointRectPicker.GetPointer());
-    anActor->SetCellRectPicker(myCellRectPicker.GetPointer());
+    anActor->SetPointAreaPicker(myPointAreaPicker.GetPointer());
+    anActor->SetCellAreaPicker(myCellAreaPicker.GetPointer());
 
     anActor->SetPreHighlightProperty(myPreHighlightProperty.GetPointer());
     anActor->SetHighlightProperty(myHighlightProperty.GetPointer());
@@ -275,8 +275,8 @@ SVTK_Renderer
     anActor->SetPointPicker(NULL);
     anActor->SetCellPicker(NULL);
 
-    anActor->SetPointRectPicker(NULL);
-    anActor->SetCellRectPicker(NULL);
+    anActor->SetPointAreaPicker(NULL);
+    anActor->SetCellAreaPicker(NULL);
 
     anActor->SetPreHighlightProperty(NULL);
     anActor->SetHighlightProperty(NULL);
@@ -369,8 +369,8 @@ SVTK_Renderer
   myPointPicker->SetTolerance( theTolNodes );
   myCellPicker->SetTolerance( theTolCell );
 
-  myPointRectPicker->SetTolerance( theTolNodes );
-  myCellRectPicker->SetTolerance( theTolCell );
+  myPointAreaPicker->SetTolerance( theTolNodes );
+  myCellAreaPicker->SetTolerance( theTolCell );
 
   mySelector->SetTolerance( theTolObjects );
 }
