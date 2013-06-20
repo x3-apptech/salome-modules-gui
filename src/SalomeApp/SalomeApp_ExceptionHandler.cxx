@@ -21,6 +21,7 @@
 //
 
 #include "SalomeApp_ExceptionHandler.h"
+#include "Utils_CorbaException.hxx"
 
 #include "CASCatch.hxx"
 #include "Basics_OCCTVersion.hxx"
@@ -92,6 +93,10 @@ bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
   catch( Standard_Failure& e )
   {
     showMessage( title, QString( e.GetMessageString() ) );
+  }
+  catch( SALOME::SALOME_Exception& ex)
+  {
+    showMessage( title, QString( ex.details.text));
   }
 #ifndef WIN32
   catch(...)
