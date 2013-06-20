@@ -126,8 +126,8 @@ int SVTK_AreaPicker::Pick( double theSelectionX, double theSelectionY,
     SelectionMode theMode )
 {
   QVector< QPoint > aPoints;
-  aPoints.append( QPoint( theSelectionX, theSelectionY ) );
-  aPoints.append( QPoint( theSelectionX2, theSelectionY2 ) );
+  aPoints.append( QPoint( (int)theSelectionX, (int)theSelectionY ) );
+  aPoints.append( QPoint( (int)theSelectionX2, (int)theSelectionY2 ) );
   return Pick( aPoints, theRenderer, theMode );
 }
 
@@ -141,7 +141,10 @@ int SVTK_AreaPicker::Pick( QVector< QPoint >& thePoints,
   this->Renderer = theRenderer;
 
   if ( theMode == RectangleMode ) {
-    mySelection = {thePoints[0].x(), thePoints[0].y(), thePoints[1].x(), thePoints[1].y()};
+    mySelection[0] = thePoints[0].x();
+    mySelection[1] = thePoints[0].y();
+    mySelection[2] = thePoints[1].x();
+    mySelection[3] = thePoints[1].y();
   }
   else if( theMode == PolygonMode ) {
     int minX, minY, maxX, maxY;
@@ -157,7 +160,10 @@ int SVTK_AreaPicker::Pick( QVector< QPoint >& thePoints,
       if ( thePoints[i].y() > maxY )
       maxY = thePoints[i].y();
     }
-    mySelection = {minX, minY, maxX, maxY};
+    mySelection[0] = minX;
+    mySelection[1] = minY;
+    mySelection[2] = maxX;
+    mySelection[3] = maxY;
   }
 
   // Invoke start pick method if defined
@@ -264,8 +270,7 @@ void SVTK_AreaPicker::SelectVisiblePoints( QVector< QPoint >& thePoints,
         && aDX[1] <= mySelection[3];
     else
       if ( theMode == PolygonMode ) isInSelection =
-          SVTK_AreaPicker::isPointInPolygon( QPoint( aDX[0], aDX[1] ),
-              thePoints );
+	isPointInPolygon( QPoint( (int)aDX[0], (int)aDX[1] ), thePoints );
 
     // check whether visible and in selection window
     if ( isInSelection ) {
@@ -373,8 +378,7 @@ void SVTK_AreaPicker::SelectVisibleCells( QVector< QPoint >& thePoints,
         && aDX[1] <= mySelection[3];
     else
       if ( theMode == PolygonMode ) isInSelection =
-          SVTK_AreaPicker::isPointInPolygon( QPoint( aDX[0], aDX[1] ),
-              thePoints );
+	isPointInPolygon( QPoint( (int)aDX[0], (int)aDX[1] ), thePoints );
     // check whether visible and in selection window
     if ( isInSelection ) {
       vtkIdType aNumPts = aCell->GetNumberOfPoints();
@@ -389,8 +393,7 @@ void SVTK_AreaPicker::SelectVisibleCells( QVector< QPoint >& thePoints,
   }  //for all parts
 }
 
-bool SVTK_AreaPicker::isPointInPolygon( const QPoint& thePoint,
-    const QVector< QPoint >& thePolygon )
+bool SVTK_AreaPicker::isPointInPolygon( const QPoint& thePoint, const QVector<QPoint>& thePolygon )
 {
   double eps = 1.0;
   if ( thePolygon.size() < 3 ) return false;
