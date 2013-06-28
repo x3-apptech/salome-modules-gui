@@ -415,13 +415,10 @@ bool SVTK_AreaPicker::isPointInPolygon( const QPoint& thePoint, const QVector<QP
     double del = last_pt.x() * cur_pt.y() - cur_pt.x() * last_pt.y();
     double xy = cur_pt.x() * last_pt.x() + cur_pt.y() * last_pt.y();
 
-    sum +=
-        ( atan(
-            ( last_pt.x() * last_pt.x() + last_pt.y() * last_pt.y() - xy )
-                / del )
-            + atan(
-                ( cur_pt.x() * cur_pt.x() + cur_pt.y() * cur_pt.y() - xy )
-                    / del ) );
+    if ( del )
+      sum +=
+      ( atan( ( last_pt.x() * last_pt.x() + last_pt.y() * last_pt.y() - xy ) / del )
+      + atan( ( cur_pt.x() * cur_pt.x() + cur_pt.y() * cur_pt.y() - xy ) / del ) );
 
     last_pt = cur_pt;
   }
