@@ -16,13 +16,12 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-# QWT detection for salome
-
-set(QWT_ROOT_DIR $ENV{QWT_ROOT_DIR} CACHE PATH "Path to Qwt directory")
-if(EXISTS ${QWT_ROOT_DIR})
-  set(CMAKE_INCLUDE_PATH ${QWT_ROOT_DIR}/include)
-  set(CMAKE_LIBRARY_PATH ${QWT_ROOT_DIR}/lib)
-  set(CMAKE_PROGRAM_PATH ${QWT_ROOT_DIR}/bin)
-endif(EXISTS ${QWT_ROOT_DIR})
-find_package(QWT)
+# PyQt4 detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(PyQt4 PYQT_PYUIC_EXECUTABLE 2)
+MARK_AS_ADVANCED(PYQT_PYUIC_EXECUTABLE PYQT_SIPS_DIR)

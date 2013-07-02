@@ -39,4 +39,4 @@ SET(plugins_PYTHON
   minmax_plugin.py
 )
 
-SALOME_INSTALL_SCRIPTS("${plugins_PYTHON}" ${GUI_salomepluginsdir}/demo DEF_PERMS)
+SALOME_INSTALL_SCRIPTS("${plugins_PYTHON}" ${SALOME_GUI_INSTALL_PLUGINS}/demo DEF_PERMS)

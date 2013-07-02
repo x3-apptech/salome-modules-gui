@@ -1,3 +1,13 @@
+# - Find SIP
+# Sets the following variables:
+#   SIP_EXECUTABLE      - path to the SIP executable
+#   SIP_INCLUDE_DIR     - path to the SIP headers
+#
+#  The header sip.h is looked for.
+#  The binary 'sip' is looked for.
+#
+
+#########################################################################
 # Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
@@ -20,25 +30,14 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
-  ${CAS_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-)
+IF(NOT SIP_FIND_QUIETLY)
+  MESSAGE(STATUS "Looking for SIP ...")
+ENDIF()
 
-SET(DDS_SOURCES
-  DDS_DicGroup.cxx
-  DDS_DicItem.cxx
-  DDS_Dictionary.cxx
-  DDS_KeyWords.cxx
-)
+FIND_PROGRAM(SIP_EXECUTABLE sip)
+FIND_PATH(SIP_INCLUDE_DIR sip.h PATH_SUFFIXES python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SIP REQUIRED_VARS SIP_INCLUDE_DIR SIP_EXECUTABLE)
 
-ADD_LIBRARY(DDS ${DDS_SOURCES})
-TARGET_LINK_LIBRARIES(DDS ${CAS_KERNEL} ${CAS_OCAF})
-INSTALL(TARGETS DDS EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
-
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
 

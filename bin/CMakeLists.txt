@@ -21,11 +21,11 @@ INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/SalomeMacros.cmake)
 
 CONFIGURE_FILE(VERSION.in VERSION @ONLY)
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/VERSION DESTINATION ${GUI_salomebin_BINS})
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/VERSION DESTINATION ${SALOME_INSTALL_BINS})
 
 # ===============================================================
 # Files to be installed
 # ===============================================================
 
 SET(SCRIPTS runLightSalome.csh runLightSalome.sh gui_setenv.py)
-SALOME_INSTALL_SCRIPTS("${SCRIPTS}" ${GUI_salomescript_SCRIPTS})
+SALOME_INSTALL_SCRIPTS("${SCRIPTS}" ${SALOME_INSTALL_SCRIPT_SCRIPTS})

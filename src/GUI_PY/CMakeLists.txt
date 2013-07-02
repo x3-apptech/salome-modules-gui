@@ -30,7 +30,7 @@ SET(mypkgpython_PYTHON
   mytestdialog.py
   helper.py
 )
-SALOME_INSTALL_SCRIPTS("${mypkgpython_PYTHON}" ${GUI_salomepythondir}/salome/gui)
+SALOME_INSTALL_SCRIPTS("${mypkgpython_PYTHON}" ${SALOME_INSTALL_PYTHON}/salome/gui)
 
 SET(PYUIC_FILES
   SelectVarsDialog_ui.py
@@ -52,5 +52,5 @@ ENDFOREACH(output ${PYUIC_FILES})
 ADD_CUSTOM_TARGET(BUILD_PY_UI_FILES ALL DEPENDS ${PYUIC_FILES})
 
 FOREACH(output ${PYUIC_FILES})
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${output} DESTINATION ${GUI_salomepythondir}/salome/gui)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${output} DESTINATION ${SALOME_INSTALL_PYTHON}/salome/gui)
 ENDFOREACH(output ${PYUIC_FILES})

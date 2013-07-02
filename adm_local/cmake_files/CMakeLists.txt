@@ -26,14 +26,16 @@ ADD_SUBDIRECTORY(deprecated)
 # These files are data, module or lib files
 SET(DATA
   FindCAS.cmake
-  UseQT4EXT.cmake
-  FindQWT.cmake
+  UseQt4Ext.cmake
+  FindQwt.cmake
   FindGUI.cmake
+  FindSIP.cmake
+  FindPyQt4.cmake
   FindSalomeCAS.cmake
-  FindSalomePYQT4.cmake
-  FindSalomeQT4.cmake
-  FindSalomeQWT.cmake
+  FindSalomePyQt4.cmake
+  FindSalomeQt4.cmake
+  FindSalomeQwt.cmake
   FindSalomeSIP.cmake
   FindSalomeVTK.cmake
 )
-INSTALL(FILES ${DATA} DESTINATION ${GUI_admlocalcmake})
+INSTALL(FILES ${DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})

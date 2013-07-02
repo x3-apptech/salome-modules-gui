@@ -32,4 +32,4 @@ SET(DATA
   FindVTK.cmake
   UseQT4EXT.cmake
 )
-INSTALL(FILES ${DATA} DESTINATION ${GUI_admlocalcmake}/deprecated)
+INSTALL(FILES ${DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL}/deprecated)

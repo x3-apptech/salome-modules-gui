@@ -16,13 +16,12 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-# Sip detection for Salome
-
-set(SIP_ROOT_DIR $ENV{SIP_ROOT_DIR} CACHE PATH "Path to Sip directory")
-if(EXISTS ${SIP_ROOT_DIR})
-  set(CMAKE_INCLUDE_PATH ${SIP_ROOT_DIR}/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} ${SIP_ROOT_DIR}/include)
-  set(CMAKE_PROGRAM_PATH ${SIP_ROOT_DIR}/bin)
-endif(EXISTS ${SIP_ROOT_DIR})
-find_program(SIP_EXECUTABLE sip REQUIRED)
-find_path(SIP_INCLUDE_DIR sip.h REQUIRED HINTS /usr/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
+# SIP detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(SIP SIP_EXECUTABLE 2)
+MARK_AS_ADVANCED(SIP_EXECUTABLE SIP_INCLUDE_DIR)

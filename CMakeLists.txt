@@ -16,31 +16,60 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-PROJECT(SALOME_GUI)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+PROJECT(SalomeGUI C CXX)
 
-IF(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-ENDIF(COMMAND cmake_policy)
+# Ensure a proper linker behavior:
+CMAKE_POLICY(SET CMP0003 NEW)
 
-IF(APPLE)
-  SET(CMAKE_C_COMPILER gcc)
-  SET(CMAKE_CXX_COMPILER g++)
-  # because default is clang(llvm) with mountain lion at least
-ENDIF(APPLE)
+#set(CMAKE_PREFIX_PATH "")
+#set(_compo QtCore QtGui)
+#find_package(Qt4 REQUIRED COMPONENTS _compo)
 
-# Temporary definitions
-SET(DOXYGEN_IS_OK 0)
-IF(WINDOWS)
- SET(CPPUNIT_IS_OK 0)
-ENDIF(WINDOWS)
+# Versioning
+# ===========
+# Project name, upper case
+STRING(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
 
-#Defining all options first
-option(SALOME_USE_MPI "Use MPI containers" OFF)
-option(SALOME_USE_CORBA "Use distribute application with components" ON)
-option(SALOME_USE_DOC "Generate documentation" ON)
-option(SALOME_USE_TEST "Generate test" OFF)
+SET(${PROJECT_NAME_UC}_MAJOR_VERSION 7)
+SET(${PROJECT_NAME_UC}_MINOR_VERSION 2)
+SET(${PROJECT_NAME_UC}_PATCH_VERSION 0)
+SET(${PROJECT_NAME_UC}_VERSION
+  ${${PROJECT_NAME_UC}_MAJOR_VERSION}.${${PROJECT_NAME_UC}_MINOR_VERSION}.${${PROJECT_NAME_UC}_PATCH_VERSION})
+# Temporary backward compatibility:
+SET(VERSION ${${PROJECT_NAME_UC}_VERSION})
+SET(VERSION_DEV "0")
+
+# Find KERNEL
+# ===========
+SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
+IF(EXISTS ${KERNEL_ROOT_DIR})
+  LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
+  INCLUDE(SalomeMacros)
+  FIND_PACKAGE(SalomeKERNEL REQUIRED)
+ELSE(EXISTS ${KERNEL_ROOT_DIR})
+  MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
+ENDIF(EXISTS ${KERNEL_ROOT_DIR})
+
+
+# Platform setup
+# ==============
+INCLUDE(SalomeSetupPlatform)   # From KERNEL
+# Always build libraries as shared objects:
+SET(BUILD_SHARED_LIBS TRUE)
+# Local macros:
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
+
+# User options
+# (some options have already been defined in KERNEL) 
+# ============
+OPTION(SALOME_USE_MPI "Use MPI containers" ${SALOME_USE_MPI})
+OPTION(SALOME_BUILD_DOC "Generate SALOME GUI documentation" ${SALOME_BUILD_DOC})
+OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ${SALOME_BUILD_TESTS})
+
+# Advanced options:
+OPTION(SALOME_LIGHT_ONLY "Build SALOME Light only (no CORBA)" ${SALOME_LIGHT_ONLY})
+
 OPTION(SALOME_USE_VTKVIEWER "Enable VTK visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_SALOMEOBJECT "Enable Salome Object (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_OCCVIEWER "Enable OCC visualization (Mandatory in classic configurations)" ON)
@@ -50,127 +79,119 @@ OPTION(SALOME_USE_PYCONSOLE "Enable Python GUI interface (Mandatory in classic c
 OPTION(SALOME_USE_SUPERVGRAPHVIEWER "Enable Supervision visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
 
-ENABLE_TESTING()
-SET(VERSION "7.2.0")
-SET(VERSION_DEV "0")
+MARK_AS_ADVANCED(SALOME_LIGHT_ONLY SALOME_USE_LIBBATCH SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER)
+MARK_AS_ADVANCED(SALOME_USE_SALOMEOBJECT SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_PLOT2DVIEWER)
+MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_SUPERVGRAPHVIEWER SALOME_USE_QXGRAPHVIEWER)
 
-SET(BUILD_SHARED_LIBS true)
+# Prerequisites
+# =============
+# Find "big" prerequisites first - they reference themselves many others
+#   -> this can help finding the smaller prerequisites and detect conficts.
+# In our case KERNEL has already loaded many prereq:
 
-SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
-IF(EXISTS ${KERNEL_ROOT_DIR})
-  INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
-ELSE(EXISTS ${KERNEL_ROOT_DIR})
-  MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
-ENDIF(EXISTS ${KERNEL_ROOT_DIR})
+##
+## From KERNEL:
+##
 
-STRING(REPLACE "\\" "/" KERNEL_ROOT_DIR ${KERNEL_ROOT_DIR})
+# Various
+FIND_PACKAGE(SalomePython REQUIRED)
+FIND_PACKAGE(SalomePThread REQUIRED)
+FIND_PACKAGE(SalomeSWIG REQUIRED)
+FIND_PACKAGE(SalomeLibXml2 REQUIRED)
+FIND_PACKAGE(SalomeBoost REQUIRED)
+FIND_PACKAGE(SalomeHDF5 REQUIRED COMPONENTS C)
 
-# directories for packages detection
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${KERNEL_ROOT_DIR}/salome_adm/cmake_files ${CMAKE_SOURCE_DIR}/adm_local/cmake_files ${CMAKE_SOURCE_DIR}/adm_local/cmake_files/deprecated )
-find_package(PLATFORM)
+# Other KERNEL optionals:
+IF(SALOME_USE_MPI)
+  FIND_PACKAGE(SalomeMPI REQUIRED)
+ENDIF()
+IF(NOT SALOME_LIGHT_ONLY)
+  FIND_PACKAGE(SalomeOmniORB REQUIRED)
+ENDIF() 
+IF(SALOME_BUILD_TESTS)
+  ENABLE_TESTING()
+  FIND_PACKAGE(SalomeCppUnit REQUIRED)  
+ENDIF()
+IF(SALOME_BUILD_DOC)
+  FIND_PACKAGE(SalomeDoxygen REQUIRED)
+  FIND_PACKAGE(SalomeGraphviz)          # Remains optional even here.
+  FIND_PACKAGE(SalomeSphinx REQUIRED)
+ENDIF()
 
+##
+## GUI specifics
+##
 
-# Threads
-SET(CMAKE_THREAD_PREFER_PTHREAD)
-find_package(Threads REQUIRED)
+FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python
 
+# Qt4
+FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui QtXml QtWebKit QtOpenGL)
+INCLUDE(${QT_USE_FILE})
 
-# required prerequisites from KERNEL
+FIND_PACKAGE(SalomePyQt4 REQUIRED) 
 
-find_package(SalomePYTHON)
-find_package(SalomeSWIG)
-find_package(SalomeLIBXML2)
-find_package(SalomeHDF5)
-find_package(SalomeBOOST)
+# Optional prerequisites for GUI
+IF(SALOME_USE_OCCVIEWER)
+  FIND_PACKAGE(SalomeCAS REQUIRED)
+ENDIF()
+IF(SALOME_USE_GLVIEWER)
+  FIND_PACKAGE(SalomeOpenGL REQUIRED) 
+ENDIF()
+IF(SALOME_USE_VTKVIEWER)
+  # Required components are listed in the FindSalomeVTK.cmake file: 
+  FIND_PACKAGE(SalomeVTK 6.0 REQUIRED) 
+ENDIF()
+IF(SALOME_USE_PLOT2DVIEWER)
+  FIND_PACKAGE(SalomeQwt REQUIRED)  
+ENDIF()
 
-# required prerequisites for GUI
+# Directories
+# (default values taken from KERNEL)
+# ===========
+SET(SALOME_INSTALL_BINS "${SALOME_INSTALL_BINS}" CACHE PATH "Install path: SALOME binaries")
+SET(SALOME_INSTALL_LIBS "${SALOME_INSTALL_LIBS}" CACHE PATH "Install path: SALOME libs")
+SET(SALOME_INSTALL_IDLS "${SALOME_INSTALL_IDLS}" CACHE PATH "Install path: SALOME IDL files")
+SET(SALOME_INSTALL_HEADERS "${SALOME_INSTALL_HEADERS}" CACHE PATH "Install path: SALOME headers")
+SET(SALOME_INSTALL_SCRIPT_SCRIPTS "${SALOME_INSTALL_SCRIPT_SCRIPTS}" CACHE PATH 
+   "Install path: SALOME scripts")
+SET(SALOME_INSTALL_SCRIPT_DATA "${SALOME_INSTALL_SCRIPT_DATA}" CACHE PATH 
+   "Install path: SALOME script data")
+SET(SALOME_INSTALL_SCRIPT_PYTHON "${SALOME_INSTALL_SCRIPT_PYTHON}" CACHE PATH 
+   "Install path: SALOME Python scripts")
+SET(SALOME_INSTALL_APPLISKEL_SCRIPTS "${SALOME_INSTALL_APPLISKEL_SCRIPTS}" CACHE PATH 
+   "Install path: SALOME application skeleton - scripts")
+SET(SALOME_INSTALL_APPLISKEL_PYTHON "${SALOME_INSTALL_APPLISKEL_PYTHON}" CACHE PATH 
+   "Install path: SALOME application skeleton - Python")
+SET(SALOME_INSTALL_PYTHON "${SALOME_INSTALL_PYTHON}" CACHE PATH "Install path: SALOME Python stuff")
+SET(SALOME_INSTALL_PYTHON_SHARED "${SALOME_INSTALL_PYTHON_SHARED}" CACHE PATH 
+   "Install path: SALOME Python shared modules")
+SET(SALOME_INSTALL_CMAKE "${SALOME_INSTALL_CMAKE}" CACHE PATH "Install path: SALOME CMake files")
+SET(SALOME_INSTALL_CMAKE_LOCAL "${SALOME_INSTALL_CMAKE_LOCAL}" CACHE PATH 
+    "Install path: local SALOME CMake files") 
 
-find_package(SalomeQT4)
-find_package(SalomeSIP)
-find_package(SalomePYQT4)
+SET(SALOME_INSTALL_RES "${SALOME_INSTALL_RES}" CACHE PATH "Install path: SALOME resources")
 
-# optional prerequisites from KERNEL
+# Specific to GUI:
+SET(SALOME_GUI_INSTALL_PARAVIEW_LIBS lib/paraview CACHE PATH 
+    "Install path: SALOME GUI ParaView libraries")
+SET(SALOME_GUI_INSTALL_RES_DATA "${SALOME_INSTALL_RES}/gui" CACHE PATH 
+    "Install path: SALOME GUI specific data")
+SET(SALOME_GUI_INSTALL_RES_SCRIPTS "${SALOME_INSTALL_RES}/gui" CACHE PATH 
+    "Install path: SALOME GUI scripts")
+SET(SALOME_GUI_INSTALL_PLUGINS share/salome/plugins/gui CACHE PATH 
+    "Install path: SALOME GUI plugins")
 
-if(SALOME_USE_MPI OR HDF5_IS_PARALLEL)
-  find_package(SalomeMPI)
-endif(SALOME_USE_MPI OR HDF5_IS_PARALLEL)
+MARK_AS_ADVANCED(SALOME_INSTALL_BINS SALOME_INSTALL_LIBS SALOME_INSTALL_IDLS SALOME_INSTALL_HEADERS)
+MARK_AS_ADVANCED(SALOME_INSTALL_SCRIPT_SCRIPTS SALOME_INSTALL_SCRIPT_DATA SALOME_INSTALL_SCRIPT_PYTHON)
+MARK_AS_ADVANCED(SALOME_INSTALL_APPLISKEL_SCRIPTS  SALOME_INSTALL_APPLISKEL_PYTHON SALOME_INSTALL_CMAKE SALOME_INSTALL_CMAKE_LOCAL SALOME_INSTALL_RES)
+MARK_AS_ADVANCED(SALOME_INSTALL_PYTHON SALOME_INSTALL_PYTHON_SHARED)
+MARK_AS_ADVANCED(SALOME_GUI_INSTALL_PARAVIEW_LIBS SALOME_GUI_INSTALL_RES_DATA SALOME_GUI_INSTALL_RES_SCRIPTS SALOME_GUI_INSTALL_PLUGINS)
 
-if(SALOME_USE_CORBA)
-  find_package(OMNIORB)
-endif(SALOME_USE_CORBA)
-
-if(SALOME_USE_TEST)
-  find_package(SalomeCPPUNIT)
-endif(SALOME_USE_TEST)
-
-if(SALOME_USE_DOC)
-  find_package(SalomeDOXYGEN)
-  find_package(SalomeSPHINX)
-endif(SALOME_USE_DOC)
-
-if(SALOME_USE_LIBBATCH)
-  find_package(LIBBATCH)
-endif(SALOME_USE_LIBBATCH)
-
-
-# optional prerequisites for GUI
-
-if(SALOME_USE_OCCVIEWER)
-  find_package(SalomeCAS)
-endif(SALOME_USE_OCCVIEWER)
-
-if(SALOME_USE_GLVIEWER)
-  find_package(OpenGL REQUIRED)
-endif(SALOME_USE_GLVIEWER)
-
-if(SALOME_USE_VTKVIEWER)
-  find_package(SalomeVTK)
-endif(SALOME_USE_VTKVIEWER)
-
-if(SALOME_USE_PLOT2DVIEWER)
-  find_package(SalomeQWT)
-endif(SALOME_USE_PLOT2DVIEWER)
-
-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; t=sys.argv[-1].split(\".\") ; t[:]=(int(elt) for elt in t) ; sys.stdout.write(\"0x%02x%02x%02x\"%tuple(t))" ${VERSION}
-  OUTPUT_VARIABLE XVERSION)
-
-SET(GUI_salomebin_BINS bin/salome)
-
-SET(GUI_salomelib_LIBS lib/salome)
-SET(GUI_paraviewlib_LIBS lib/paraview)
-
-SET(GUI_salomeinclude_HEADERS include/salome)
-
-SET(GUI_salomeres_DATA share/salome/resources/gui)
-
-SET(GUI_salomeres_SCRIPTS share/salome/resources/gui)
-
-SET(GUI_salomepluginsdir share/salome/plugins/gui)
-
-SET(GUI_salomescript_SCRIPTS bin/salome)
-
-SET(GUI_salomescript_DATA bin/salome)
-
-SET(GUI_salomescript_PYTHON bin/salome)
-SET(KERNEL_salomescript_PYTHON ${GUI_salomescript_PYTHON})
-
-SET(GUI_appliskel_SCRIPTS bin/salome/appliskel)
-
-SET(GUI_appliskel_PYTHON bin/salome/appliskel)
-
-SET(GUI_pythondir lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-
-SET(GUI_salomepythondir ${GUI_pythondir}/salome)
-SET(KERNEL_salomepythondir ${GUI_salomepythondir})
-
-SET(GUI_sharedpkgpython_PYTHON ${GUI_salomepythondir}/shared_modules)
-
-SET(GUI_admlocalcmake adm_local/cmake_files)
-
-SET(IDLDIR)                        
-IF(SALOME_USE_CORBA)
+# Sources 
+# ========
+IF(NOT SALOME_LIGHT_ONLY)
   SET(IDLDIR idl)
-ENDIF(SALOME_USE_CORBA)
+ENDIF()
 
 SET(SUBDIRS
   ${IDLDIR}
@@ -179,14 +200,80 @@ SET(SUBDIRS
   src
   doc
   bin
-  tools
-)
+  tools)
+  
 FOREACH(dir ${SUBDIRS})
   ADD_SUBDIRECTORY(${dir})
 ENDFOREACH(dir ${SUBDIRS})
+
+# Header configuration
+# ====================
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; t=sys.argv[-1].split(\".\") ; t[:]=(int(elt) for elt in t) ; sys.stdout.write(\"0x%02x%02x%02x\"%tuple(t))" ${${PROJECT_NAME_UC}_VERSION}
+  OUTPUT_VARIABLE XVERSION)
 
 SET(input ${CMAKE_CURRENT_SOURCE_DIR}/GUI_version.h.in)
 SET(output ${CMAKE_CURRENT_BINARY_DIR}/GUI_version.h)
 MESSAGE(STATUS "Creation of ${output}")
 CONFIGURE_FILE(${input} ${output} @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/GUI_version.h DESTINATION ${GUI_salomeinclude_HEADERS})
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/GUI_version.h DESTINATION ${SALOME_INSTALL_HEADERS})
+
+# Configuration export
+# (here only the level 1 prerequisites are exposed)
+# ====================
+INCLUDE(CMakePackageConfigHelpers)
+
+# List of targets in this project we want to make visible to the rest of the world.
+# They all have to be INSTALL'd with the option "EXPORT ${PROJECT_NAME}TargetGroup"
+SET(_${PROJECT_NAME}_exposed_targets 
+    caf CAM CASCatch  DDS Event GLViewer  LightApp  LogWindow ObjBrowser  
+    OCCViewer OpenGLUtils Plot2d  PyConsole PyInterp  QDS qtx QxScene SalomeApp 
+    SalomeIDLGUI  SalomeObject  SalomePrs SalomePyQtGUILight  SalomePyQtGUI 
+    SalomePyQt  SalomePy  SalomeSession SalomeStyle SOCC  SPlot2d std SUITApp suit  
+    SUPERVGraph SVTK  ToolsGUI  ViewerTools VTKViewer   vtkTools  SalomeGuiHelpers  
+    SalomeTreeData
+)
+
+IF(SALOME_BUILD_TESTS)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomeAppTest) 
+ENDIF()
+
+# Add all targets to the build-tree export set
+EXPORT(TARGETS ${_${PROJECT_NAME}_exposed_targets}
+  FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
+# Create the configuration files:
+#   - in the build tree:
+
+#      Ensure the variables are always defined for the configure:
+SET(CPPUNIT_ROOT_DIR "${CPPUNIT_ROOT_DIR}")
+ 
+SET(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
+CONFIGURE_PACKAGE_CONFIG_FILE(adm_local/cmake_files/${PROJECT_NAME}Config.cmake.in 
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION "${SALOME_INSTALL_CMAKE}"
+    PATH_VARS CONF_INCLUDE_DIRS SALOME_INSTALL_CMAKE CMAKE_INSTALL_PREFIX
+       KERNEL_ROOT_DIR)
+
+#   - in the install tree:
+#       Get the relative path of the include directory so 
+#       we can register it in the generated configuration files:
+SET(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_INCLUDE_DIR}")
+CONFIGURE_PACKAGE_CONFIG_FILE(adm_local/cmake_files/${PROJECT_NAME}Config.cmake.in 
+    ${PROJECT_BINARY_DIR}/to_install/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION "${SALOME_INSTALL_CMAKE}"
+    PATH_VARS CONF_INCLUDE_DIRS SALOME_INSTALL_CMAKE CMAKE_INSTALL_PREFIX 
+       KERNEL_ROOT_DIR)
+
+WRITE_BASIC_PACKAGE_VERSION_FILE(${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${${PROJECT_NAME_UC}_VERSION}
+    COMPATIBILITY AnyNewerVersion)
+  
+# Install the CMake configuration files:
+INSTALL(FILES
+  "${PROJECT_BINARY_DIR}/to_install/${PROJECT_NAME}Config.cmake"
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION "${SALOME_INSTALL_CMAKE}")
+
+# Install the export set for use with the install-tree
+INSTALL(EXPORT ${PROJECT_NAME}TargetGroup DESTINATION "${SALOME_INSTALL_CMAKE}" 
+        FILE ${PROJECT_NAME}Targets.cmake)

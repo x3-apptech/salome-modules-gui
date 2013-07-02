@@ -16,13 +16,13 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/UseQT4EXT.cmake)
+INCLUDE(UseQt4Ext)
 
 INCLUDE_DIRECTORIES(
   ${OMNIORB_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${KERNEL_ROOT_DIR}/include/salome
+  ${KERNEL_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/src/GuiHelpers
   ${CMAKE_SOURCE_DIR}/src/TreeData
 )
@@ -61,4 +61,4 @@ SET(TreeData_tester_SOURCES
 ADD_EXECUTABLE(TreeData_tester ${TreeData_tester_SOURCES})
 TARGET_LINK_LIBRARIES(TreeData_tester ${COMMON_LIBS})
 
-INSTALL(TARGETS TreeData_guitester TreeData_tester DESTINATION ${GUI_salomebin_BINS})
+INSTALL(TARGETS TreeData_guitester TreeData_tester DESTINATION ${SALOME_INSTALL_BINS})

@@ -122,7 +122,7 @@ SET(SUBDIRS_LIGHT
 ##
 # Full (CORBA) SALOME packages
 ##
-IF(SALOME_USE_CORBA)
+IF(NOT SALOME_LIGHT_ONLY)
   SET(SUBDIRS_CORBA
     TOOLSGUI
     Session
@@ -130,7 +130,7 @@ IF(SALOME_USE_CORBA)
     GuiHelpers
     TreeData
   )
-ENDIF(SALOME_USE_CORBA)
+ENDIF(NOT SALOME_LIGHT_ONLY)
 
 ##
 # Extra Python packages

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2013  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,24 +16,12 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
-  ${CAS_INCLUDE_DIRS}
-)
-
-SET(CASCatch_SOURCES
-  CASCatch_CatchSignals.cxx
-  CASCatch_ErrorHandler.cxx
-  CASCatch_Failure.cxx
-)
-
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
-
-ADD_LIBRARY(CASCatch ${CASCatch_SOURCES})
-TARGET_LINK_LIBRARIES(CASCatch ${CAS_KERNEL})
-INSTALL(TARGETS CASCatch EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
-
-FILE(GLOB COMMON_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
-INSTALL(FILES ${COMMON_HEADERS_HXX} DESTINATION ${SALOME_INSTALL_HEADERS})
-
+# OpenGL detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(OpenGL OPENGL_INCLUDE_DIR 1)
+#MARK_AS_ADVANCED()
