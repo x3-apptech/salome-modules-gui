@@ -23,12 +23,12 @@ SUBDIRS = deprecated
 
 dist_admlocal_cmake_DATA = \
 FindCAS.cmake \
-UseQT4EXT.cmake \
-FindQWT.cmake \
+UseQt4Ext.cmake \
+FindQwt.cmake \
 FindGUI.cmake \
 FindSalomeCAS.cmake \
-FindSalomePYQT4.cmake \
-FindSalomeQT4.cmake \
-FindSalomeQWT.cmake \
+FindSalomePyQt4.cmake \
+FindSalomeQt4.cmake \
+FindSalomeQwt.cmake \
 FindSalomeSIP.cmake \
 FindSalomeVTK.cmake
