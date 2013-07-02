@@ -66,6 +66,7 @@
 #include <SUIT_ViewWindow.h>
 #include <SUIT_ViewManager.h>
 #include <SUIT_ViewModel.h>
+#include <SUIT_OverrideCursor.h>
 
 #include <QtxTreeView.h>
 
@@ -660,7 +661,7 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
 
   //to receive signal in application that NoteBook's variable was modified
   connect( aStudy, SIGNAL(notebookVarUpdated(QString)), 
-	   this, SIGNAL(notebookVarUpdated(QString)) );
+           this, SIGNAL(notebookVarUpdated(QString)) );
 
   return aStudy;
 }
@@ -796,8 +797,11 @@ void SalomeApp_Application::onDumpStudy( )
         return;
       
       // Issue 21377 - dump study implementation moved to SalomeApp_Study class
-      bool res = appStudy->dump( aFileName, toPublish, isMultiFile, toSaveGUI );
-
+      bool res;
+      {
+        SUIT_OverrideCursor wc;
+        res = appStudy->dump( aFileName, toPublish, isMultiFile, toSaveGUI );
+      }
       if ( !res )
         SUIT_MessageBox::warning( desktop(),
                                   QObject::tr("WRN_WARNING"),
@@ -947,7 +951,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
       setNoteBook( new SalomeApp_NoteBook( desktop(), aStudy ) );
       //to receive signal in NoteBook that it's variable was modified
       connect( this, SIGNAL( notebookVarUpdated( QString ) ), 
-	       getNoteBook(), SLOT( onVarUpdate( QString ) ) );
+               getNoteBook(), SLOT( onVarUpdate( QString ) ) );
     }
     wid = getNoteBook();
   }
@@ -1275,22 +1279,22 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
       // Use only first selected object
       SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
       if ( study ) {
-	_PTR(Study) stdDS = study->studyDS();
-	if ( stdDS ) {
-	  _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
-	  if ( aSO ) {
-	    _PTR( GenericAttribute ) anAttr;
-	    std::string auid = "AttributeUserID";
-	    auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
-	    if ( aSO->FindAttribute( anAttr, auid ) ) {
-	      _PTR(AttributeUserID) aAttrID = anAttr;
-	      QString aId = aAttrID->Value().c_str();
-	      if ( myExtActions.contains( aId ) ) {
-		thePopup->addAction(myExtActions[aId]);
-	      }
-	    }
-	  }
-	}
+        _PTR(Study) stdDS = study->studyDS();
+        if ( stdDS ) {
+          _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
+          if ( aSO ) {
+            _PTR( GenericAttribute ) anAttr;
+            std::string auid = "AttributeUserID";
+            auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
+            if ( aSO->FindAttribute( anAttr, auid ) ) {
+              _PTR(AttributeUserID) aAttrID = anAttr;
+              QString aId = aAttrID->Value().c_str();
+              if ( myExtActions.contains( aId ) ) {
+                thePopup->addAction(myExtActions[aId]);
+              }
+            }
+          }
+        }
       }
     }
 
@@ -1301,7 +1305,7 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
       QString aModuleTitle = moduleTitle( aModuleName );
       CAM_Module* currentModule = activeModule();
       if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
-	thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
+        thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
     }
   }
 
@@ -1443,7 +1447,7 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
   LightApp_Application::onStudyCreated( study );
 
   desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
-			       windowDock( getWindow( WT_ObjectBrowser ) ) );
+                               windowDock( getWindow( WT_ObjectBrowser ) ) );
 
   loadDockWindowsState();
 
@@ -1472,7 +1476,7 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
   LightApp_Application::onStudyOpened( study );
 
   desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
-			       windowDock( getWindow( WT_ObjectBrowser ) ) );
+                               windowDock( getWindow( WT_ObjectBrowser ) ) );
 
   loadDockWindowsState();
 
@@ -1938,8 +1942,8 @@ bool SalomeApp_Application::updateStudy()
 
   if( !changeDesktop ) {
     ok = onRestoreStudy( aDumpScript, 
-			 aStudyName, 
-			 isStudySaved );
+                         aStudyName, 
+                         isStudySaved );
   }
 
   return ok;
@@ -1951,8 +1955,8 @@ bool SalomeApp_Application::updateStudy()
  */
 //============================================================================
 bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript, 
-					    const QString& theStudyName, 
-					    bool theIsStudySaved )
+                                            const QString& theStudyName, 
+                                            bool theIsStudySaved )
 {
   bool ok = true;
 
@@ -2002,8 +2006,8 @@ void SalomeApp_Application::closeApplication()
   // emit signal to restore study from Python script
   if ( myNoteBook ) {
     emit dumpedStudyClosed( myNoteBook->getDumpedStudyScript(), 
-			    myNoteBook->getDumpedStudyName(), 
-			    myNoteBook->isDumpedStudySaved() );
+                            myNoteBook->getDumpedStudyName(), 
+                            myNoteBook->isDumpedStudySaved() );
   }
   LightApp_Application::closeApplication();
 }
