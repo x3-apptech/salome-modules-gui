@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/SalomeMacros.cmake)
-
 CONFIGURE_FILE(VERSION.in VERSION @ONLY)
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/VERSION DESTINATION ${SALOME_INSTALL_BINS})

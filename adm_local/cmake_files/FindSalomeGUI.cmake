@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2013  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,25 +16,24 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-
 #
-# Note that the plugins files should be installed in the directory
-# <salomepluginsdir> (ROOT_DIR/share/salome/plugins) or one of this
-# sub-directories (the search of plugins by the plugin manager is
-# recurcive from this folder, in each SALOME module, i.e. each
-# variable *_ROOT_DIR).  
+# Author: Adrien Bruneton
 #
 
-SET(plugins_PYTHON
-  salome_plugins.py
-  smesh_plugins.py
-  trihedron.py
-  tubedialog_ui.py
-  tubedialog.py
-  tubebuilder.py
-  xalome.py
-  minmax_dialog.py
-  minmax_plugin.py
-)
+# GUI detection for Salome - this is typically called by dependent modules
+# (PARAVIS, etc ...)
+#
+# The detection is simpler than for other prerequisites.
+# See explanation in FindSalomeKERNEL.cmake.
+#
 
-SALOME_INSTALL_SCRIPTS("${plugins_PYTHON}" ${SALOME_GUI_INSTALL_PLUGINS}/demo DEF_PERMS)
+IF(NOT SalomeGUI_FIND_QUIETLY)
+  MESSAGE(STATUS "Looking for Salome GUI ...")
+ENDIF()
+
+SET(CMAKE_PREFIX_PATH "${GUI_ROOT_DIR}")
+SALOME_FIND_PACKAGE(SalomeGUI SalomeGUI CONFIG)
+
+IF(NOT SalomeGUI_FIND_QUIETLY)
+  MESSAGE(STATUS "Found Salome GUI: ${GUI_ROOT_DIR}")
+ENDIF()

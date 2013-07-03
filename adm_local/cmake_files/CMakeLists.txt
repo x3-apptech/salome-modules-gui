@@ -37,5 +37,7 @@ SET(DATA
   FindSalomeQwt.cmake
   FindSalomeSIP.cmake
   FindSalomeVTK.cmake
+  FindSalomeGUI.cmake
+  FindSalomeOpenGL.cmake
 )
 INSTALL(FILES ${DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})

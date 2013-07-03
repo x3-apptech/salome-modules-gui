@@ -48,7 +48,7 @@ FIND_PROGRAM(PYQT_PYUIC_EXECUTABLE NAMES pyuic4 pyuic4.bat)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_EXECUTABLE}" PATH)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 
-# Typical location of qobject.sip are: 
+# Typical locations of qobject.sip are: 
 #   - /usr/share/sip/PyQt4/QtCore, for a system install
 #   - or <xyz>/sip/QtCore, for a custom install
 #   - or <xyz>/share/sip/QtCore, for a custom install

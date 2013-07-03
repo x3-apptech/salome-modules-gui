@@ -17,6 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+#
+#  TODO: this file should be removed when switching to full CMake
+#
+
 SET(GUI_CXXFLAGS -I${GUI_ROOT_DIR}/include/salome)
 
 FIND_LIBRARY(caf caf ${GUI_ROOT_DIR}/lib/salome)
