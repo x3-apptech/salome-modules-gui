@@ -51,7 +51,8 @@ GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 # Typical location of qobject.sip are: 
 #   - /usr/share/sip/PyQt4/QtCore, for a system install
 #   - or <xyz>/sip/QtCore, for a custom install
-FIND_FILE(PYQT_SIP_MAIN_FILE qobject.sip PATH_SUFFIXES sip/QtCore share/sip/PyQt4/QtCore)
+#   - or <xyz>/share/sip/QtCore, for a custom install
+FIND_FILE(PYQT_SIP_MAIN_FILE qobject.sip PATH_SUFFIXES share/sip/QtCore sip/QtCore share/sip/PyQt4/QtCore)
 
 IF(PYQT_SIP_MAIN_FILE)
   GET_FILENAME_COMPONENT(PYQT_SIPS_DIR "${PYQT_SIP_MAIN_FILE}" PATH)
