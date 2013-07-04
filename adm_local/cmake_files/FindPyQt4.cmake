@@ -1,6 +1,7 @@
 # - Find PyQt4 installation
 # Sets the following variables:
-#    PYQT_PYUIC_EXECUTABLE  - path to the pyuic4 executable
+#    PYQT_PYUIC_EXECUTABLE  - command to launch pyuic with the correct PYTHONPATH
+#    PYQT_PYUIC_PATH        - path to the pyuic executable
 #    PYQT_PYTHONPATH        - path to the PyQt Python modules
 #    PYQT_SIPS_DIR          - path to main include directory (which contains several sub folders)
 #    PYQT_INCLUDE_DIRS      - list of paths to include when compiling (all rooted on PYQT_SIP_DIRS)
@@ -42,10 +43,10 @@ IF(NOT PyQt4_FIND_QUIETLY)
   MESSAGE(STATUS "Looking for PyQt4 ...")
 ENDIF()
 
-FIND_PROGRAM(PYQT_PYUIC_EXECUTABLE NAMES pyuic4 pyuic4.bat)
+FIND_PROGRAM(PYQT_PYUIC_PATH NAMES pyuic4 pyuic4.bat)
 
 # Get root dir locally, going up two levels from the exec:
-GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_EXECUTABLE}" PATH)
+GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_PATH}" PATH)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 
 # Typical locations of qobject.sip are: 
@@ -61,9 +62,13 @@ ENDIF()
 MARK_AS_ADVANCED(PYQT_SIP_MAIN_FILE)
 
 # Get PyQt compilation flags:
-SET(PYQT_PYTHONPATH "${PYQT_PYTHONPATH}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
+SET(PYQT_PYTHONPATH "${_tmp_ROOT_DIR}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
 SET(PYQT_SIPFLAGS)
-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.path[:0] = ['${PYQT_PYTHONPATH}']; from PyQt4 import pyqtconfig; sys.stdout.write(pyqtconfig.Configuration().pyqt_sip_flags)"
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; 
+sys.path[:0] = ['${PYQT_PYTHONPATH}'] 
+sys.path[:0] = ['${SIP_PYTHONPATH}']
+from PyQt4 import pyqtconfig; 
+sys.stdout.write(pyqtconfig.Configuration().pyqt_sip_flags)"
   OUTPUT_VARIABLE PYQT_SIPFLAGS)
 SEPARATE_ARGUMENTS(PYQT_SIPFLAGS)
 
@@ -86,6 +91,14 @@ FOREACH(_dir ${PYQT_INCLUDE_DIRS})
   LIST(APPEND PYQT_SIPFLAGS -I ${_dir})
 ENDFOREACH()
 
+# Wrap the final executable so that it always uses the proper environment:
+IF(WIN32 AND NOT CYGWIN)
+  MESSAGE(WARNING "PyQt4 command was not tested under Linux")
+  SET(PYQT_PYUIC_EXECUTABLE set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH} && ${PYQT_PYUIC_PATH})
+ELSE()
+  SET(PYQT_PYUIC_EXECUTABLE /usr/bin/env PYTHONPATH=${PYQT_PYTHONPATH}:${SIP_PYTHONPATH} ${PYQT_PYUIC_PATH})
+ENDIF()
+
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_EXECUTABLE PYQT_SIPS_DIR PYQT_SIPFLAGS)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_PATH PYQT_SIPS_DIR PYQT_SIPFLAGS)
 

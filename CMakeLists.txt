@@ -123,7 +123,7 @@ ENDIF()
 ## GUI specifics
 ##
 
-FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python
+FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python and before PyQt4
 
 # Qt4
 FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui QtXml QtWebKit QtOpenGL)
