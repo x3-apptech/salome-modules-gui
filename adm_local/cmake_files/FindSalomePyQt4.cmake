@@ -29,7 +29,7 @@ IF(NOT SalomeSIP_FOUND AND NOT SalomePyQt4_FIND_QUIETLY)
 ENDIF()   
 
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(PyQt4 PYQT_PYUIC_PATH 2)
-MARK_AS_ADVANCED(PYQT_PYUIC_EXECUTABLE PYQT_SIPS_DIR)
+MARK_AS_ADVANCED(PYQT_PYUIC_EXECUTABLE PYQT_SIPS_DIR PYQT_PYUIC_PATH)
 
 # Wrap the final executable so that it always uses the proper environment:
 # TODO: should be done like Sphinx in KERNEL (i.e. generating a shell script)?
