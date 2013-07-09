@@ -21,10 +21,10 @@
 #
 
 SET(top_builddir
- ${CMAKE_BINARY_DIR}
+ ${PROJECT_BINARY_DIR}
 )
 SET(top_srcdir 
- ${CMAKE_SOURCE_DIR}
+ ${PROJECT_SOURCE_DIR}
 )
 SET(srcdir 
  ${CMAKE_CURRENT_SOURCE_DIR}
