@@ -25,8 +25,18 @@
 #
 
 IF(NOT SalomeSIP_FOUND AND NOT SalomePyQt4_FIND_QUIETLY)
-   MESSAGE(WARNING "PyQt4 needs SIP to be found correctly!")
+   MESSAGE(WARNING "PyQt4 needs SIP to be detected correctly!")
 ENDIF()   
 
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(PyQt4 PYQT_PYUIC_PATH 2)
 MARK_AS_ADVANCED(PYQT_PYUIC_EXECUTABLE PYQT_SIPS_DIR)
+
+# Wrap the final executable so that it always uses the proper environment:
+# TODO: should be done like Sphinx in KERNEL (i.e. generating a shell script)?
+IF(WIN32 AND NOT CYGWIN)
+  MESSAGE(WARNING "PyQt4 command was not tested under Win32")
+  SET(PYQT_PYUIC_EXECUTABLE set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH} && ${PYQT_PYUIC_PATH})
+ELSE()
+  SET(PYQT_PYUIC_EXECUTABLE 
+      /usr/bin/env PYTHONPATH=${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:${PYTHONPATH} ${PYQT_PYUIC_PATH})
+ENDIF()
