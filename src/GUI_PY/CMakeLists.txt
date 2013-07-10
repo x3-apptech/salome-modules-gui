@@ -44,7 +44,6 @@ FOREACH(output ${PYUIC_FILES})
     OUTPUT ${output}
     COMMAND ${PYQT_PYUIC_EXECUTABLE} -o ${output} ${input}
     MAIN_DEPENDENCY ${input}
-    VERBATIM
   )
   #${PYQT_PYUIC_EXECUTABLE}
 ENDFOREACH(output ${PYUIC_FILES})
