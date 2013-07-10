@@ -230,8 +230,8 @@ SET(_${PROJECT_NAME}_exposed_targets
     OCCViewer OpenGLUtils Plot2d  PyConsole PyInterp  QDS qtx QxScene SalomeApp 
     SalomeIDLGUI  SalomeObject  SalomePrs SalomePyQtGUILight  SalomePyQtGUI 
     SalomePyQt  SalomePy  SalomeSession SalomeStyle SOCC  SPlot2d std SUITApp suit  
-    SUPERVGraph SVTK  ToolsGUI  ViewerTools VTKViewer   vtkTools  SalomeGuiHelpers  
-    SalomeTreeData
+    SUPERVGraph SVTK  ToolsGUI  ViewerTools VTKViewer  vtkTools vtkEDFOverloads SalomeGuiHelpers  
+    SalomeTreeData 
 )
 
 IF(SALOME_BUILD_TESTS)
