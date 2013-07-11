@@ -107,7 +107,7 @@ SALOME_PYQT_Module::~SALOME_PYQT_Module()
   This function tries to get engine IOR from the Python module using engineIOR() function.
   That function can load module engine using appropriate container if required.
   If this function is not available in Python module, the default implementation
-  is used which loads engine to the default FactoryServerPy container.
+  is used which loads engine to the default FactoryServer container.
 */
 QString SALOME_PYQT_Module::engineIOR() const
 {
@@ -120,11 +120,11 @@ QString SALOME_PYQT_Module::engineIOR() const
   }
   if ( ior.isEmpty() ) {
     // if IOR is still not specified, try default implementation
-    // which loads engine to the default FactoryServerPy container.
+    // which loads engine to the default FactoryServer container.
     Engines::EngineComponent_var comp;
     // temporary solution
     try {
-      comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServerPy", name().toLatin1() );
+      comp = getApp()->lcc()->FindOrLoad_Component( "FactoryServer", name().toLatin1() );
     }
     catch (CORBA::Exception&) {
     }
