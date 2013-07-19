@@ -47,6 +47,7 @@
 #include <vtkCellPicker.h>
 
 #include <vtkProperty.h>
+#include <vtkProp3DCollection.h>
 
 // undefining min and max because CASCADE's defines them and
 // it clashes with std::min(), std::max() included in utilities.h
@@ -282,6 +283,16 @@ SVTK_Renderer
     anActor->SetHighlightProperty(NULL);
 
     anActor->RemoveFromRender(GetDevice());
+
+    while ( int i = myPointPicker->GetProp3Ds()->IsItemPresent( theActor ))
+      myPointPicker->GetProp3Ds()->RemoveItem( i-1 );
+    while ( int i = myCellPicker->GetProp3Ds()->IsItemPresent( theActor ))
+      myCellPicker->GetProp3Ds()->RemoveItem( i-1 );
+
+    while ( int i = myPointPicker->GetActors()->IsItemPresent( theActor ))
+      myPointPicker->GetActors()->RemoveItem( i-1 );
+    while ( int i = myCellPicker->GetActors()->IsItemPresent( theActor ))
+      myCellPicker->GetActors()->RemoveItem( i-1 );
 
     if(theIsAdjustActors)
       AdjustActors();
