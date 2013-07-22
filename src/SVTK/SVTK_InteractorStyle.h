@@ -245,6 +245,9 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   void SetAdvancedZoomingEnabled( const bool theState ) { myIsAdvancedZoomingEnabled = theState; }
   bool IsAdvancedZoomingEnabled() const { return myIsAdvancedZoomingEnabled; }
 
+  //! releaze myLastHighlitedActor and myLastPreHighlitedActor
+  void FreeActors();
+
   protected:
   SVTK_InteractorStyle();
   ~SVTK_InteractorStyle();

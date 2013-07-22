@@ -161,6 +161,15 @@ SVTK_Selector* SVTK_InteractorStyle::GetSelector()
 }
 
 /*!
+  Realeaze actors
+*/
+void SVTK_InteractorStyle::FreeActors()
+{
+  myLastHighlitedActor = NULL;
+  myLastPreHighlitedActor = NULL;
+}
+
+/*!
   Generate special SVTK_SelectionEvent
 */
 SVTK_SelectionEvent* SVTK_InteractorStyle::GetSelectionEvent()
