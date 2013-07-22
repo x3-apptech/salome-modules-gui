@@ -1101,6 +1101,10 @@ void SVTK_ViewWindow::RemoveActor( VTKViewer_Actor* theActor,
                                    bool theIsAdjustActors )
 {
   GetRenderer()->RemoveActor(theActor, theIsAdjustActors);
+  if ( myDefaultInteractorStyle )
+    myDefaultInteractorStyle->FreeActors();
+  if ( myKeyFreeInteractorStyle )
+    myKeyFreeInteractorStyle->FreeActors();
   if(theUpdate) 
     Repaint();
   emit actorRemoved(theActor);
