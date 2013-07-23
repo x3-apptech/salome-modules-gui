@@ -54,6 +54,7 @@ SET(GUITS_SOURCES
   resources/SUPERVGraph_images.ts
   resources/SUPERVGraph_msg_en.ts
   resources/SUPERVGraph_msg_fr.ts
+  resources/SUPERVGraph_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${PYTHON_DEFINITIONS} ${BOOST_DEFINITIONS})

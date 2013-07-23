@@ -50,6 +50,7 @@ SET(CAM_SOURCES
 SET(CAMTS_SOURCES
   resources/CAM_msg_en.ts
   resources/CAM_msg_fr.ts
+  resources/CAM_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})

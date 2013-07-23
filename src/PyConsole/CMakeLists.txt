@@ -52,6 +52,7 @@ SET(PyConsole_SOURCES
 SET(GUITS_SOURCES
   resources/PyConsole_msg_en.ts
   resources/PyConsole_msg_fr.ts
+  resources/PyConsole_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})

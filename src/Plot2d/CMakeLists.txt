@@ -71,6 +71,7 @@ SET(GUITS_SOURCES
   resources/Plot2d_images.ts
   resources/Plot2d_msg_en.ts
   resources/Plot2d_msg_fr.ts
+  resources/Plot2d_msg_ja.ts
 )
 
 # header files 

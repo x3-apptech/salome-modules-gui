@@ -50,6 +50,7 @@ SET(caf_SOURCES
 SET(GUITS_SOURCES
   resources/CAF_msg_en.ts
   resources/CAF_msg_fr.ts
+  resources/CAF_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})

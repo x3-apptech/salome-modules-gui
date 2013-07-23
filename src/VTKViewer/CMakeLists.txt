@@ -82,6 +82,7 @@ SET(GUITS_SOURCES
   resources/VTKViewer_images.ts
   resources/VTKViewer_msg_en.ts
   resources/VTKViewer_msg_fr.ts
+  resources/VTKViewer_msg_ja.ts
 )
 
 ADD_LIBRARY(VTKViewer ${VTKViewer_SOURCES} ${GUI_HEADERS_MOC} ${RCC_SRCS})

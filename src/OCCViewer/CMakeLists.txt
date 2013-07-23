@@ -91,6 +91,7 @@ SET(GUITS_SOURCES
   resources/OCCViewer_images.ts
   resources/OCCViewer_msg_en.ts
   resources/OCCViewer_msg_fr.ts
+  resources/OCCViewer_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})

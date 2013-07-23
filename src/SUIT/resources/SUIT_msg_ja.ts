@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS>
+  <context>
+    <name>@default</name>
+    <message>
+      <source>MEN_DESK_WINDOW</source>
+      <translation>&amp; ウィンドウ</translation>
+    </message>
+    <message>
+      <source>ERR_CANT_DUMP_VIEW</source>
+      <translation>ビューの内容をファイルにダンプすることはできません。</translation>
+    </message>
+    <message>
+      <source>TLT_IMAGE_FILES</source>
+      <translation>イメージ ファイル (*.bmp *.png *.jpg クリックした場合 if)</translation>
+    </message>
+    <message>
+      <source>MEN_DESK_WINDOW_CASCADE</source>
+      <translation>&amp; カスケード</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_WINDOW_CASCADE</source>
+      <translation>重ねてウィンドウを整列します。</translation>
+    </message>
+    <message>
+      <source>ERR_DIR_NOT_EXIST</source>
+      <translation>ディレクトリ「%1」は存在しません ！</translation>
+    </message>
+    <message>
+      <source>ERR_FILE_NOT_DIR</source>
+      <translation>「%1」はディレクトリではありません ！</translation>
+    </message>
+    <message>
+      <source>CONTINUE</source>
+      <translation>続行</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>ERR_FILE_NOT_EXIST</source>
+      <translation>ファイル「%1」は存在しません ！</translation>
+    </message>
+    <message>
+      <source>QUE_DOC_FILEEXISTS</source>
+      <translation>%1 ファイルは既に存在します。それを上書きしますか。</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_WINDOW_ACTIVATE</source>
+      <translation>このウィンドウをアクティブにします</translation>
+    </message>
+    <message>
+      <source>ERR_PERMISSION_DENIED</source>
+      <translation>ファイル「%1」を保存することはできません。アクセスが拒否されました。</translation>
+    </message>
+    <message>
+      <source>ERR_OPEN_PERMISSION_DENIED</source>
+      <translation>ファイル「%1」を開くことができません。アクセスが拒否されました。</translation>
+    </message>
+    <message>
+      <source>ERR_DIR_READ_PERMISSION_DENIED</source>
+      <translation>ディレクトリ「%1」を読み取ることができません。アクセスが拒否されました。</translation>
+    </message>
+    <message>
+      <source>ERR_DIR_WRITE_PERMISSION_DENIED</source>
+      <translation>ディレクトリ「%1」を書き込むことができません。アクセスが拒否されました。</translation>
+    </message>
+    <message>
+      <source>ERR_ERROR</source>
+      <translation>エラー</translation>
+    </message>
+    <message>
+      <source>QUE_FILE_EXISTS</source>
+      <translation>%1 ファイルは既に存在します。それを上書きしますか。</translation>
+    </message>
+    <message>
+      <source>WRN_WARNING</source>
+      <translation>警告</translation>
+    </message>
+    <message>
+      <source>TLT_DUMP_VIEW</source>
+      <translation>表示するファイルをダンプします</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_WINDOW_TILE</source>
+      <translation>重複しない並べて表示ウィンドウ</translation>
+    </message>
+    <message>
+      <source>MEN_DESK_WINDOW_VTILE</source>
+      <translation>タイル &amp; 垂直方向に</translation>
+    </message>
+    <message>
+      <source>INF_DIRECTORIES_FILTER</source>
+      <translation>ディレクトリ</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_WINDOW_VTILE</source>
+      <translation>ウィンドウ重複垂直並べて表示します</translation>
+    </message>
+    <message>
+      <source>MEN_DESK_WINDOW_TILE</source>
+      <translation>&amp; タイル</translation>
+    </message>
+    <message>
+      <source>NAME_COLUMN</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>MNU_SYNCHRONIZE_VIEW</source>
+      <translation>同期</translation>
+    </message>
+    <message>
+      <source>DSC_SYNCHRONIZE_VIEW</source>
+      <translation>ビューを同期します。</translation>
+    </message>
+    <message>
+      <source>MNU_SYNC_NO_VIEW</source>
+      <translation>[適切なビューがありません]</translation>
+    </message>
+  </context>
+  <context>
+    <name>SUIT_Study</name>
+    <message>
+      <source>OPERATION_LAUNCH</source>
+      <translation>稼働開始</translation>
+    </message>
+    <message>
+      <source>PREVIOUS_NOT_FINISHED</source>
+      <translation>以前の操作が未完成であり、中止か</translation>
+    </message>
+  </context>
+  <context>
+    <name>SUIT_FileDlg</name>
+    <message>
+      <source>LAB_QUICK_PATH</source>
+      <translation>迅速なパス:</translation>
+    </message>
+    <message>
+      <source>BUT_ADD_PATH</source>
+      <translation>パスを追加します。</translation>
+    </message>
+    <message>
+      <source>INF_DESK_DOC_OPEN</source>
+      <translation>ファイルを開く</translation>
+    </message>
+    <message>
+      <source>INF_DESK_DOC_SAVE</source>
+      <translation>ファイルを保存します。</translation>
+    </message>
+    <message>
+      <source>ALL_FILES_FILTER</source>
+      <translation>すべてのファイル (*)</translation>
+    </message>
+  </context>
+</TS>

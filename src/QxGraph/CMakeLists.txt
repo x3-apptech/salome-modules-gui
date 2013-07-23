@@ -53,6 +53,7 @@ SET(GUITS_SOURCES
   resources/QxGraph_images.ts
   resources/QxGraph_msg_en.ts
   resources/QxGraph_msg_fr.ts
+  resources/QxGraph_msg_ja.ts
 )
 
 ADD_DEFINITIONS("${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${PYTHON_DEFINITIONS}")

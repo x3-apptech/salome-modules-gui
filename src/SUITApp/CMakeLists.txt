@@ -73,6 +73,7 @@ ENDIF(ENABLE_TESTRECORDER)
 SET(GUITS_SOURCES
   resources/SUITApp_msg_en.ts
   resources/SUITApp_msg_fr.ts
+  resources/SUITApp_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})

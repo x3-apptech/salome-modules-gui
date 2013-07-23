@@ -130,6 +130,7 @@ SET(GUITS_SOURCES
   resources/SalomeApp_images.ts
   resources/SalomeApp_msg_en.ts
   resources/SalomeApp_msg_fr.ts
+  resources/SalomeApp_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${LIBXML2_DEFINITIONS} ${OMNIORB_DEFINITIONS} ${QWT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${PYTHON_DEFINITIONS})

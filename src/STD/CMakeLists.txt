@@ -47,6 +47,7 @@ SET(GUITS_SOURCES
   resources/STD_images.ts
   resources/STD_msg_en.ts
   resources/STD_msg_fr.ts
+  resources/STD_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})

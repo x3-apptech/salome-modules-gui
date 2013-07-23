@@ -58,6 +58,7 @@ SET(QDS_SOURCES
 SET(GUITS_SOURCES
   resources/QDS_msg_en.ts
   resources/QDS_msg_fr.ts
+  resources/QDS_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})

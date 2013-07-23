@@ -31,6 +31,7 @@ QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 SET(GUITS_SOURCES
   resources/LogWindow_msg_en.ts
   resources/LogWindow_msg_fr.ts
+  resources/LogWindow_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})

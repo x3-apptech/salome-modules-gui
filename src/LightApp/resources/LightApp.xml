@@ -33,7 +33,7 @@
   </section>
   <section name="language">
     <!-- Language settings (resource manager)-->
-    <parameter name="languages"   value="en,fr"/>
+    <parameter name="languages"   value="en,fr,ja"/>
     <parameter name="language"    value="en"/>
     <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>

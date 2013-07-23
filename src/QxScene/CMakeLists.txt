@@ -48,6 +48,7 @@ SET(GUITS_SOURCES
   resources/QxSceneViewer_images.ts
   resources/QxSceneViewer_msg_en.ts
   resources/QxSceneViewer_msg_fr.ts
+  resources/QxSceneViewer_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${PYTHON_DEFINITIONS})

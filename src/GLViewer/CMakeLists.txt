@@ -68,6 +68,7 @@ SET(GUITS_SOURCES
   resources/GLViewer_images.ts
   resources/GLViewer_msg_en.ts
   resources/GLViewer_msg_fr.ts
+  resources/GLViewer_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${CAS_DEFINITIONS})

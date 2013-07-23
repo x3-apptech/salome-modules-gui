@@ -101,6 +101,7 @@ SET(SVTK_SOURCES
 SET(GUITS_SOURCES
   resources/SVTK_msg_en.ts
   resources/SVTK_msg_fr.ts
+  resources/SVTK_msg_ja.ts
   resources/SVTK_images.ts
 )
 

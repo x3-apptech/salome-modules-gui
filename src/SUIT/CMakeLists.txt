@@ -98,6 +98,7 @@ SET(suit_SOURCES
 SET(GUITS_SOURCES
   resources/SUIT_msg_en.ts
   resources/SUIT_msg_fr.ts
+  resources/SUIT_msg_ja.ts
   resources/SUIT_images.ts
 )
 

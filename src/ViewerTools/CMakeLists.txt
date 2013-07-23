@@ -34,6 +34,7 @@ SET(ViewerTools_SOURCES
 SET(GUITS_SOURCES
   resources/ViewerTools_msg_en.ts
   resources/ViewerTools_msg_fr.ts
+  resources/ViewerTools_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})

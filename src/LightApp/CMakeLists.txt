@@ -117,6 +117,7 @@ SET(GUITS_SOURCES
   resources/LightApp_images.ts
   resources/LightApp_msg_en.ts
   resources/LightApp_msg_fr.ts
+  resources/LightApp_msg_ja.ts
 )
 
 SET(COMMON_HEADERS_H 

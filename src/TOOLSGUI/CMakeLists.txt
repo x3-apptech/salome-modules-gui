@@ -52,6 +52,7 @@ SET(ToolsGUI_SOURCES
 SET(GUITS_SOURCES
   resources/ToolsGUI_msg_en.ts
   resources/ToolsGUI_msg_fr.ts
+  resources/ToolsGUI_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS}  ${OMNIORB_DEFINITIONS})

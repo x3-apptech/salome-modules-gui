@@ -33,6 +33,7 @@ SET(ObjBrowser_SOURCES
 SET(GUITS_SOURCES
   resources/OB_msg_en.ts
   resources/OB_msg_fr.ts
+  resources/OB_msg_ja.ts
 )
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
