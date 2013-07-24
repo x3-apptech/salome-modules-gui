@@ -305,6 +305,8 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
       aCellTypesArray->Delete();
       aConnectivity->Delete();
       anIdList->Delete();
+      if ( newFaceLocations ) newFaceLocations->Delete();
+      if ( newFaces ) newFaces->Delete();
     }
   }else{
     vtkIdList *anIdList = vtkIdList::New();
