@@ -2,6 +2,7 @@
 <qresource>
   <file>images/en.png</file>
   <file>images/fr.png</file>
+  <file>images/ja.png</file>
 </qresource>
 </RCC>
  
