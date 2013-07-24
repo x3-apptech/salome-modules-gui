@@ -23,7 +23,7 @@
 //
 #include "VTKViewer_ArcBuilder.h"
 
-#include <math.h>
+#include <cmath>
 #include <float.h>
 
 //VTK includes
@@ -42,10 +42,10 @@
 #define ANGLE_PRECISION 0.5
 //#define _MY_DEBUG_
 
+#include <limits>
 #ifdef _MY_DEBUG_
 #include <iostream>
 #endif
-
 
 bool CheckAngle(const double compare, const double angle){
   if((angle <= compare - ANGLE_PRECISION) || (angle >= compare + ANGLE_PRECISION))
@@ -115,10 +115,15 @@ Vec::Vec (const double Xv,
           const double Zv)
 {
   double D = sqrt (Xv * Xv + Yv * Yv + Zv * Zv);
-  if(D != 0) {
+  if(D > std::numeric_limits<double>::min() ) {
     coord.SetX(Xv / D);
     coord.SetY(Yv / D);
     coord.SetZ(Zv / D);
+  }
+  else {
+    coord.SetX(0);
+    coord.SetY(0);
+    coord.SetZ(0);
   }
 }
 
@@ -159,8 +164,7 @@ Vec Vec::VectMultiplication(const Vec & Other) const{
   double x = GetXYZ().Y()*Other.GetXYZ().Z() - GetXYZ().Z()*Other.GetXYZ().Y();
   double y = GetXYZ().Z()*Other.GetXYZ().X() - GetXYZ().X()*Other.GetXYZ().Z();
   double z = GetXYZ().X()*Other.GetXYZ().Y() - GetXYZ().Y()*Other.GetXYZ().X();
-  Vec *aRes  = new Vec(x,y,z);
-  return *aRes;
+  return Vec(x,y,z);
 }
 
 /*---------------------Class Plane --------------------------------*/
@@ -282,44 +286,42 @@ VTKViewer_ArcBuilder::VTKViewer_ArcBuilder(const Pnt& thePnt1,
     aInputPnts.push_back(thePnt2);
     aInputPnts.push_back(thePnt3);
     
-    vtkUnstructuredGrid* aGrid = BuildGrid(aInputPnts);
+    vtkSmartPointer<vtkUnstructuredGrid> aGrid = BuildGrid(aInputPnts);
+    aGrid->Delete();
     
     bool needRotation = true;
     if(anAngle  == 0 || anAngle == 180)
       needRotation = false;
     
     if(aGrid) {
-      vtkUnstructuredGrid* aTransformedGrid;
       if(needRotation) {
-        aTransformedGrid = TransformGrid(aGrid,aAxis,anAngle);    
+        aGrid = TransformGrid(aGrid,aAxis,anAngle);    
+        aGrid->Delete();
 #ifdef _MY_DEBUG_
         cout<<"Need Rotation!!!"<<endl;
 #endif
       }
       else {
-        aTransformedGrid = aGrid;
 #ifdef _MY_DEBUG_
         cout<<"Rotation does not need!!!"<<endl;
 #endif
       }
       
       double coords[3];
-      aTransformedGrid->GetPoint(0,coords);
+      aGrid->GetPoint(0,coords);
       myPnt1 = Pnt(coords[0],coords[1],coords[2], thePnt1.GetScalarValue());
-      aTransformedGrid->GetPoint(1,coords);
+      aGrid->GetPoint(1,coords);
       myPnt2 = Pnt(coords[0],coords[1],coords[2], thePnt2.GetScalarValue());
-      aTransformedGrid->GetPoint(2,coords);
+      aGrid->GetPoint(2,coords);
       myPnt3 = Pnt(coords[0],coords[1],coords[2], thePnt3.GetScalarValue());
-      std::vector<double> aScalarValues;
-      vtkUnstructuredGrid* anArc = BuildArc(aScalarValues);
-      vtkUnstructuredGrid* anTransArc;
-      if(needRotation)
-        anTransArc = TransformGrid(anArc,aAxis,-anAngle);
-      else
-        anTransArc = anArc;
-      
-      myPoints = anTransArc->GetPoints();
-      myScalarValues = aScalarValues;
+
+      vtkSmartPointer<vtkUnstructuredGrid> anArc = BuildArc(myScalarValues);
+      anArc->Delete();
+      if(needRotation) {
+        anArc = TransformGrid(anArc,aAxis,-anAngle);
+        anArc->Delete();
+      }
+      myPoints = anArc->GetPoints();
       myStatus = Arc_Done;
     }
   }
@@ -333,6 +335,7 @@ VTKViewer_ArcBuilder::VTKViewer_ArcBuilder(const Pnt& thePnt1,
     aList.push_back(thePnt3);
     vtkUnstructuredGrid* aGrid = BuildGrid(aList);
     myPoints = aGrid->GetPoints();
+    aGrid->Delete();
 
     myScalarValues.clear();
     myScalarValues.push_back(thePnt1.GetScalarValue());
@@ -414,7 +417,8 @@ double InterpolateScalarValue(int index, int count, double firstValue, double mi
   return value;
 }
 
-vtkUnstructuredGrid* VTKViewer_ArcBuilder::BuildArc(std::vector<double>& theScalarValues){
+vtkUnstructuredGrid* VTKViewer_ArcBuilder::BuildArc(std::vector<double>& theScalarValues)
+{
   double x1 = myPnt1.GetXYZ().X(); double x2 = myPnt2.GetXYZ().X(); double x3 = myPnt3.GetXYZ().X();
   double y1 = myPnt1.GetXYZ().Y(); double y2 = myPnt2.GetXYZ().Y(); double y3 = myPnt3.GetXYZ().Y();
   double z =  myPnt1.GetXYZ().Z();  //Points on plane || XOY
@@ -608,10 +612,10 @@ vtkIdType Build1DArc(vtkIdType cellId, vtkUnstructuredGrid* input,
     vtkPoints* aPoints = aBuilder.GetPoints();
     std::vector<double> aScalarValues = aBuilder.GetScalarValues();
     vtkIdType aNbPts = aPoints->GetNumberOfPoints();
-    aNewPoints = new vtkIdType[aNbPts];
+    std::vector< vtkIdType > aNewPoints( aNbPts );
     vtkIdType curID;
     vtkIdType aCellType = VTK_POLY_LINE;
-    
+
     aNewPoints[0] = pts[0];
     for(vtkIdType idx = 1; idx < aNbPts-1;idx++) {
       curID = output->GetPoints()->InsertNextPoint(aPoints->GetPoint(idx));
@@ -620,17 +624,17 @@ vtkIdType Build1DArc(vtkIdType cellId, vtkUnstructuredGrid* input,
       aNewPoints[idx] = curID;
     }
     aNewPoints[aNbPts-1] = pts[1];
-    
-    aResult = output->InsertNextCell(aCellType,aNbPts,aNewPoints);
+
+    aResult = output->InsertNextCell(aCellType,aNbPts,&aNewPoints[0]);
     return aResult;
-  } 
+  }
 }
 
 /*!
  * Add all points from the input vector theCollection into thePoints. 
  * Array theIds - it is array with ids of added points.
  */
-vtkIdType MergevtkPoints(const std::vector<vtkPoints*>& theCollection,
+vtkIdType MergevtkPoints(const std::vector< vtkSmartPointer< vtkPoints > >& theCollection,
                          const std::vector< std::vector<double> >& theScalarCollection,
                          vtkPoints* thePoints,
                          std::map<int, double>& thePntId2ScalarValue,
@@ -638,9 +642,9 @@ vtkIdType MergevtkPoints(const std::vector<vtkPoints*>& theCollection,
   vtkIdType aNbPoints = 0;
   vtkIdType anIdCounter = 0;
   vtkIdType aNewPntId = 0;
-  
+
   //Compute number of points
-  std::vector<vtkPoints*>::const_iterator it = theCollection.begin();
+  std::vector< vtkSmartPointer< vtkPoints > >::const_iterator it = theCollection.begin();
   for(;it != theCollection.end();it++){
     vtkPoints* aPoints = *it;
     if(aPoints) { 

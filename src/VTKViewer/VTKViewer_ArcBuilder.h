@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <vtkType.h>
+#include <vtkSmartPointer.h>
 
 class vtkCell;
 class vtkDataArray;
@@ -37,7 +38,7 @@ class Pnt;
 
 typedef std::list<Pnt> PntList;
 
-vtkIdType MergevtkPoints(const std::vector<vtkPoints*>& theCollection,
+vtkIdType MergevtkPoints(const std::vector< vtkSmartPointer< vtkPoints > >& theCollection,
                          const std::vector< std::vector<double> >& theScalarCollection,
                          vtkPoints* thePoints,
                          std::map<int, double>& thePntId2ScalarValue,
@@ -184,7 +185,7 @@ class VTKViewer_ArcBuilder{
 
   double myAngle;
   ArcStatus myStatus;
-  vtkPoints* myPoints;
+  vtkSmartPointer<vtkPoints> myPoints;
   std::vector<double> myScalarValues;
 };
 
