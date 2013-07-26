@@ -132,8 +132,8 @@ public slots:
   void                                onSaveGUIState();// called from VISU
   void                                onUpdateStudy(); // called from NoteBook
   bool                                onRestoreStudy( const QString& theDumpScript,
-  						      const QString& theStudyName,
-  						      bool theIsStudySaved );
+                                                      const QString& theStudyName,
+                                                      bool theIsStudySaved );
 
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
@@ -168,7 +168,7 @@ protected:
 
   bool                                updateStudy();
 
-  virtual void                        closeApplication();
+  virtual void                        afterCloseDoc();
 
 private slots:
   void                                onDeleteInvalidReferences();
@@ -196,8 +196,8 @@ private:
 
 signals:
   void                                dumpedStudyClosed( const QString& theDumpScript, 
-							 const QString& theStudyName, 
-							 bool theIsStudySaved );
+                                                         const QString& theStudyName, 
+                                                         bool theIsStudySaved );
   void                                notebookVarUpdated( QString theVarName );
 
 };

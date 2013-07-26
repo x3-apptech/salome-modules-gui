@@ -1918,17 +1918,17 @@ bool SalomeApp_Application::updateStudy()
   // 1) Application is not the first application in the session 
   // 2) Application is the first application in session but not the only.
   bool changeDesktop = ((anIndex > 0) || (anIndex == 0 && aList.count() > 1));
-
-  SalomeApp_Application* app;
-  if( anIndex > 0 && anIndex < aList.count() )
-    app = dynamic_cast<SalomeApp_Application*>( aList[ anIndex - 1 ] );
-  else if(anIndex == 0 && aList.count() > 1)
-    app = dynamic_cast<SalomeApp_Application*>( aList[ 1 ] );
-
-  if( !app )
-    return false;
-
   if( changeDesktop ) {
+
+    SalomeApp_Application* app = this;
+    if( anIndex > 0 && anIndex < aList.count() )
+      app = dynamic_cast<SalomeApp_Application*>( aList[ anIndex - 1 ] );
+    else if(anIndex == 0 && aList.count() > 1)
+      app = dynamic_cast<SalomeApp_Application*>( aList[ 1 ] );
+
+    if( !app )
+      return false;
+
     // creation a new study and restoring will be done in another application
     connect( this, SIGNAL( dumpedStudyClosed( const QString&, const QString&, bool ) ),
              app, SLOT( onRestoreStudy( const QString&, const QString&, bool ) ), Qt::UniqueConnection );
@@ -1942,7 +1942,7 @@ bool SalomeApp_Application::updateStudy()
 
   if( !changeDesktop ) {
     ok = onRestoreStudy( aDumpScript, 
-                         aStudyName, 
+                         aStudyName,
                          isStudySaved );
   }
 
@@ -2001,7 +2001,7 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 /*!
   Close the Application
 */
-void SalomeApp_Application::closeApplication()
+void SalomeApp_Application::afterCloseDoc()
 {
   // emit signal to restore study from Python script
   if ( myNoteBook ) {
@@ -2009,5 +2009,5 @@ void SalomeApp_Application::closeApplication()
                             myNoteBook->getDumpedStudyName(), 
                             myNoteBook->isDumpedStudySaved() );
   }
-  LightApp_Application::closeApplication();
+  LightApp_Application::afterCloseDoc();
 }
