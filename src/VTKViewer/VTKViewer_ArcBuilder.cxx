@@ -396,9 +396,11 @@ VTKViewer_ArcBuilder::TransformGrid(vtkUnstructuredGrid* theGrid,
   aTransform->RotateWXYZ(angle, theAxis.GetXYZ().X(), theAxis.GetXYZ().Y(), theAxis.GetXYZ().Z());
   vtkTransformFilter* aTransformFilter  = vtkTransformFilter::New();
   aTransformFilter->SetTransform(aTransform);
-  aTransformFilter->SetInputData(theGrid);
   aTransform->Delete();
-  return aTransformFilter->GetUnstructuredGridOutput();
+  aTransformFilter->SetInputData(theGrid);
+  aTransformFilter->Update();
+  vtkUnstructuredGrid * aGrid = aTransformFilter->GetUnstructuredGridOutput();
+  return aGrid;
 }
 
 
