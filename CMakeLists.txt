@@ -128,6 +128,9 @@ ENDIF()
 
 FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python and before PyQt4
 
+# Build with GUI observers feature
+ADD_DEFINITIONS(-DWITH_SALOMEDS_OBSERVER)
+
 # Qt4
 FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui QtXml QtWebKit QtOpenGL)
 INCLUDE(${QT_USE_FILE})
