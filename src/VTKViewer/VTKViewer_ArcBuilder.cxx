@@ -400,6 +400,8 @@ VTKViewer_ArcBuilder::TransformGrid(vtkUnstructuredGrid* theGrid,
   aTransformFilter->SetInputData(theGrid);
   aTransformFilter->Update();
   vtkUnstructuredGrid * aGrid = aTransformFilter->GetUnstructuredGridOutput();
+  aGrid->Register(0);
+  aTransformFilter->Delete();
   return aGrid;
 }
 
