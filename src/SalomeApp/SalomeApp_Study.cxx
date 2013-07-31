@@ -183,6 +183,22 @@ public:
           //aFatherDO->insertChild(suit_obj, pos);
           aFatherDO->updateItem();
 
+	  /* Define visibility state */
+	  bool isComponent = dynamic_cast<SalomeApp_ModuleObject*>( suit_obj ) != 0;
+	  if ( suit_obj && !isComponent ) {
+	    QString moduleTitle = ((CAM_Application*)myStudy->application())->moduleTitle(suit_obj->componentDataType());
+	    if (!moduleTitle.isEmpty()) {
+	      LightApp_Displayer* aDisplayer = LightApp_Displayer::FindDisplayer(moduleTitle,false);
+	      if (aDisplayer) {
+		if(aDisplayer->canBeDisplayed(theID.c_str())) {
+		  myStudy->setVisibilityState( theID.c_str(), Qtx::HiddenState );
+		  //MESSAGE("Object with entry : "<< theID <<" CAN be displayed !!!");
+		}
+		else
+		  MESSAGE("Object with entry : "<< theID <<" CAN'T be displayed !!!");
+	      }
+	    }
+	  }
         } // END: work with tree nodes structure
         else { // BEGIN: work with study structure
           EntryMapIter it = entry2SuitObject.find( theID );
