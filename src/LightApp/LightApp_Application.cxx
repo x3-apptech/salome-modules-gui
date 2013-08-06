@@ -491,22 +491,23 @@ void LightApp_Application::createActions()
   SUIT_Desktop* desk = desktop();
   SUIT_ResourceMgr* resMgr = resourceMgr();
 
-  //! Preferences
+  // Preferences
   createAction( PreferencesId, tr( "TOT_DESK_PREFERENCES" ), QIcon(),
                 tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
                 Qt::CTRL+Qt::Key_R, desk, false, this, SLOT( onPreferences() ) );
 
-  //! Help for modules
+  // Help menu:
+
+  // - Help for modules
+
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
-  createMenu( separator(), helpMenu, -1, 1 );
+  createMenu( separator(), helpMenu, -1, 10 );
   QStringList aModuleList;
   modules( aModuleList, false );
   aModuleList.prepend( "GUI" );
   aModuleList.prepend( "KERNEL" );
 
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
-
-  // help for other existing modules
 
   QString aModule;
   foreach( aModule, aModuleList ) {
@@ -572,6 +573,24 @@ void LightApp_Application::createActions()
       id++;
     }
   }
+
+  // - Additional help items
+
+  QStringList addHelpItems = resMgr->parameters( "add_help" );
+  foreach ( QString addHelpItem, addHelpItems ) {
+    QString valueStr = resMgr->stringValue( "add_help", addHelpItem );
+    printf("-----%s\n", qPrintable(valueStr));
+    if ( !valueStr.isEmpty() && QFile::exists( valueStr ) ) {
+      QAction* a = createAction( id, addHelpItem,
+                                 resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false ),
+                                 addHelpItem, addHelpItem,
+                                 0, desk, false, this, SLOT( onHelpContentsModule() ) );
+      a->setData( valueStr );
+      createMenu( a, helpMenu, -1, 5 );
+      id++;
+    }
+  }
+  createMenu( separator(), helpMenu, -1, 5 );
 
   //! MRU
   static QtxMRUAction* mru = new QtxMRUAction( tr( "TOT_DESK_MRU" ), tr( "MEN_DESK_MRU" ), 0 );

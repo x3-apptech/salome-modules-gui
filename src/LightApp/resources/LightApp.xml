@@ -242,4 +242,8 @@
     <parameter name="application"          value="/usr/bin/mozilla" />
     <parameter name="parameters"           value="" />
   </section>
+  <section name="add_help">
+    <!-- Additional help resources -->
+    <parameter name="Developer resources"  value="${DOCUMENTATION_ROOT_DIR}/index.html" />
+  </section>
 </document>
