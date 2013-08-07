@@ -579,7 +579,6 @@ void LightApp_Application::createActions()
   QStringList addHelpItems = resMgr->parameters( "add_help" );
   foreach ( QString addHelpItem, addHelpItems ) {
     QString valueStr = resMgr->stringValue( "add_help", addHelpItem );
-    printf("-----%s\n", qPrintable(valueStr));
     if ( !valueStr.isEmpty() && QFile::exists( valueStr ) ) {
       QAction* a = createAction( id, addHelpItem,
                                  resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false ),
