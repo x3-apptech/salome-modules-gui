@@ -96,6 +96,30 @@ viewer.</li>
 <li><b>Close</b> - closes the currently active viewer window.</li> 
 <li><b>Close all</b> - closes all viewer windows.</li>
 <li><b>Group all</b> - arranges all created viewer windows on the same desktop</li>
+<li><b>Arrange Views</b> - choice of split scheme and list of used views.
+\image html arrange_views_dlg.png
+
+- <b>Views Layout</b>
+
+  - Three radio-buttons to specify numbers of the views to arrange (2, 3 or 4).
+  
+  - Buttons (depending on the chosen number of views) with images to specify 
+    view layout.
+    
+  - Buttons "Previous" and "Next" for possibility to change split schemas.
+
+- <b>Views List</b>
+
+  - The list of opened view windows - the user have to select corresponding 
+    views to be arranged.
+    
+  - Two radio-buttons that specify an action to be applied to the remaining views.
+  
+    - "Close the remaining views" - all remaining views will be closed.
+    
+    - "Stack the remaining views" - all remaining views will be stacker to the 
+      last tab area.
+      
 <li><b>Split Vertically</b> and <b>Split Horizontally</b> allows to split
 the representation area into two parts, in horizontal or vertical
 direction.</li>

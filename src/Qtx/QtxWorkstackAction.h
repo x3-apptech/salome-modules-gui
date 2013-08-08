@@ -27,8 +27,15 @@
 #define QTXWORKSTACKACTION_H
 
 #include "QtxActionSet.h"
+#include <QDialog>
 
 class QtxWorkstack;
+class QRadioButton;
+class QStackedLayout;
+class QListWidget;
+class QComboBox;
+class QLabel;
+class QToolButton;
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -50,6 +57,7 @@ public:
   virtual ~QtxWorkstackAction();
 
   QtxWorkstack* workstack() const;
+  QAction*      getArrangeViewsAction();
 
   int           menuActions() const;
   void          setMenuActions( const int );
@@ -84,6 +92,60 @@ private:
 private:
   QtxWorkstack* myWorkstack;       //!< parent workstack
   bool          myWindowsFlag;     //!< "show child windows items" flag
+  QAction*      myArrangeViewsAction;
+};
+
+enum QtxSplitDlgMode{ ArrangeViews, CreateSubViews };
+
+class QTX_EXPORT QtxSplitDlg : public QDialog
+{
+  Q_OBJECT
+
+  enum ViewMode{ XYZ, XY, XZ, YZ };
+
+public:
+  QtxSplitDlg( QWidget* = 0, QtxWorkstack* = NULL, QtxSplitDlgMode = ArrangeViews );
+  ~QtxSplitDlg();
+  int getSplitMode();
+  QList<int> getViewsMode();
+
+private :
+  QToolButton* createSplitButton( int, int );
+  void initialize();
+  void valid();
+
+  QStackedLayout* myStackedSplitLayout;
+  QRadioButton* myButton2Views;
+  QRadioButton* myButton3Views;
+  QRadioButton* myButton4Views;
+  QPushButton* myButtonApply;
+  QPushButton* myButtonPrevious;
+  QPushButton* myButtonNext;
+  QList<QLabel*> myLabels;
+  QList<QComboBox*> myComboBox;
+  QListWidget* myViewsList;
+
+  QtxWorkstack* myWorkstack;
+  QtxSplitDlgMode myDlgMode;
+
+  int myViewsNB;
+  int mySplitMode;
+  int myNBSelectedViews;
+  bool myIsCloseViews;
+  QMap<QComboBox*, ViewMode> myMapComboBoxMode;
+  QMap<ViewMode, bool> myMapModeIsBusy;
+
+private slots:
+
+  void onChangeIcons();
+  void onSplitChanged(int);
+  void onComboBoxChanged(int);
+  void onPreviousViews();
+  void onNextViews();
+  void onSynchronize();
+  void onCloseViews();
+  void onStackViews();
+  void onApply();
 };
 
 #ifdef WIN32

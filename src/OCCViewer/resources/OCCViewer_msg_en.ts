@@ -289,7 +289,7 @@
     </message>
     <message>
         <source>MNU_MINIMIZE_VIEW</source>
-        <translation>Minimize</translation>
+        <translation>Create sub-views</translation>
     </message>
 </context>
 <context>

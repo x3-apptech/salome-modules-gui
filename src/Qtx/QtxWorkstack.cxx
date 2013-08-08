@@ -2729,10 +2729,12 @@ void QtxWorkstack::onContextMenuRequested( QWidget* w, QPoint p )
 
   if ( lst.count() > 1 )
   {
-    if ( myActionsMap[SplitVertical]->isEnabled() )
-      pm->addAction( myActionsMap[SplitVertical] );
-    if ( myActionsMap[SplitHorizontal]->isEnabled() )
-      pm->addAction( myActionsMap[SplitHorizontal] );
+    if ( !myActionsMap[SplitVertical]->isEnabled() )
+      myActionsMap[SplitVertical]->setEnabled(true);
+    pm->addAction( myActionsMap[SplitVertical] );
+    if ( !myActionsMap[SplitHorizontal]->isEnabled() )
+      myActionsMap[SplitHorizontal]->setEnabled(true);
+    pm->addAction( myActionsMap[SplitHorizontal] );
     pm->addSeparator();
   }
 
@@ -3223,6 +3225,7 @@ bool QtxWorkstack::move( QWidget* wid, QWidget* wid_to, const bool before )
           idx++;
         area_src->removeWidget( wid, true );
         area_to->insertWidget( wid, idx );
+        wid->showMaximized();
         return true;
       }
     }

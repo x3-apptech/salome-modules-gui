@@ -208,8 +208,28 @@ on/off.
 \image html occ_view_minimized.png
 \image html occ_view_maximized.png
 
-<b>Minimize/Maximize</b> - these buttons allow switching the current
+<b>Create sub-views/Maximize</b> - these buttons allow switching the current
 view area to the minimized / maximized state.
+
+<b>Create sub-views</b> - user can select the layout and types of child sub-views:
+
+\image html create_sub-views_dlg.png
+
+- <b>Sub-views Layout</b>
+
+  - Three radio-buttons to specify numbers of the views to arrange (2, 3 or 4).
+  
+  - Buttons (depending on the chosen number of views) with images to specify 
+    view layout.
+    
+  - Buttons "Previous" and "Next" for possibility to change split schemas.
+
+- <b>Sub-views Properties</b>
+
+  - Type of each sub-view: XZ, YZ, XY or XYZ. 
+
+<b>Maximize</b> - the current view area will be converted to maximized state.
+
 <hr>
 
 \image html occ_view_sync.png

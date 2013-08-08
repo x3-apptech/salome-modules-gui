@@ -25,13 +25,18 @@
 #include "OCCViewer_ViewModel.h"
 
 #include <SUIT_ViewManager.h>
+#include <SUIT_Session.h>
+#include <SUIT_ResourceMgr.h>
+
+#include <QtxResourceMgr.h>
+#include <QtxWorkstackAction.h>
 
 #include <QFrame>
 #include <QLayout>
 #include <QApplication>
 
 OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel)
-  : OCCViewer_ViewWindow( theDesktop, theModel ), myPopupRequestedView(0)
+  : OCCViewer_ViewWindow( theDesktop, theModel ), myPopupRequestedView(0), mySplitMode(-1)
 {
   QFrame* centralFrame = new QFrame( this );
   setCentralWidget( centralFrame );
@@ -45,7 +50,8 @@ OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Vie
   myLayout->setMargin( 0 );
   myLayout->setSpacing( 1 );
 
-  myLayout->addWidget( view0, 1, 1 );
+  myLayout->addWidget( view0, 0, 0 );
+  myMaximizedView = view0;
   connectViewSignals(view0);
 }
 
@@ -79,70 +85,176 @@ void OCCViewer_ViewFrame::setViewManager( SUIT_ViewManager* theMgr )
   }
 }
 
-
 //**************************************************************************************
 void OCCViewer_ViewFrame::onMaximizedView( OCCViewer_ViewWindow* theView, bool isMaximized)
 {
+  myMaximizedView = theView;
   if (isMaximized) {
     if (myViews.count() <= 1)
       return;
-
     myLayout->setColumnStretch(0, 0);
     myLayout->setColumnStretch(1, 0);
+    myLayout->addWidget( theView, 0, 0 );
     int i = 0;
     OCCViewer_ViewWindow* view = 0;
-    for ( i = BOTTOM_RIGHT; i <= TOP_RIGHT; i++) {
+    for ( i = BOTTOM_RIGHT; i <= TOP_RIGHT; i++ ) {
       view = myViews.at(i);
       view->setVisible( view == theView );
       view->setMaximized( view == theView, false );
     }
+    mySplitMode = -1;
+    myViewsMode.clear();
   }
   else {
-    OCCViewer_Viewer* aModel = dynamic_cast<OCCViewer_Viewer*>(myManager->getViewModel());
-    if (!aModel) return;
+    createSubViews();
 
-    myLayout->setColumnStretch(0, 10);
-    myLayout->setColumnStretch(1, 10);
-
-    int i = 0;
-    if (myViews.count() == 1) {
-      //QColor aColor = myViews.at( MAIN_VIEW )->backgroundColor();
-      OCCViewer_ViewWindow* view = 0;
-      for ( i = BOTTOM_LEFT; i <= TOP_RIGHT; i++) {
-        view = aModel->createSubWindow();
-        view->set2dMode( (Mode2dType) i );
-        view->setParent( centralWidget() );
-        view->setViewManager(myManager); 
-	updateWindowTitle( view );
-        myViews.append( view ); 
-        aModel->initView(view);
-        view->setMaximized(false, false);
-	view->setDropDownButtons( dropDownButtons() );
-        connectViewSignals(view);
-	view->setBackground(aModel->background(i));
-      }
-      myLayout->addWidget( myViews.at(BOTTOM_LEFT), 1, 0 );
-      myLayout->addWidget( myViews.at(TOP_LEFT), 0, 0 );
-      myLayout->addWidget( myViews.at(TOP_RIGHT), 0, 1 );
+    QtxSplitDlg CreateSubViewsDlg( this, NULL, CreateSubViews );
+    if ( CreateSubViewsDlg.exec() ) {
+      mySplitMode = CreateSubViewsDlg.getSplitMode();
+      myViewsMode = CreateSubViewsDlg.getViewsMode();
+      splitSubViews();
     }
-    OCCViewer_ViewWindow* view = 0;
-    for ( i = BOTTOM_RIGHT; i <= TOP_RIGHT; i++) {
-      view = myViews.at(i);
-      view->show();
-      view->setMaximized( false, false );
-      ///////////////QApplication::processEvents(); // VSR: hangs up ?
-      if (view != theView)
-        view->onViewFitAll();
+    else {
+      myMaximizedView->setMaximized(true);
     }
   }
   myLayout->invalidate();
 }
 
+//**************************************************************************************
+void OCCViewer_ViewFrame::createSubViews()
+{
+  OCCViewer_Viewer* aModel = dynamic_cast<OCCViewer_Viewer*>(myManager->getViewModel());
+  if (!aModel) return;
+  int i = 0;
+  if (myViews.count() == 1) {
+    //QColor aColor = myViews.at( MAIN_VIEW )->backgroundColor();
+    OCCViewer_ViewWindow* view = 0;
+    for ( i = BOTTOM_LEFT; i <= TOP_RIGHT; i++) {
+      view = aModel->createSubWindow();
+      view->set2dMode( (Mode2dType) i );
+      view->setParent( centralWidget() );
+      view->setViewManager(myManager);
+      updateWindowTitle( view );
+      myViews.append( view );
+      aModel->initView(view);
+      view->setMaximized(false, false);
+      view->setDropDownButtons( dropDownButtons() );
+      connectViewSignals(view);
+      view->setBackground(aModel->background(i));
+    }
+  }
+}
+
+void OCCViewer_ViewFrame::splitSubViews()
+{
+	if( mySplitMode == -1 )
+		return;
+
+  int aNbViews;
+  if ( mySplitMode >= 0 && mySplitMode < 2)
+    aNbViews = 2;
+  else if( mySplitMode >= 2 && mySplitMode < 8 )
+    aNbViews = 3;
+  else if( mySplitMode >=8 && mySplitMode < 29 )
+    aNbViews = 4;
+
+  if( aNbViews != myViewsMode.count() )
+  	return;
+
+  int SubViews3Map[6][3][4] = {
+    { {0,0,1,1}, {0,1,1,1}, {0,2,1,1} },
+    { {0,0,1,1}, {1,0,1,1}, {2,0,1,1} },
+    { {0,0,1,1}, {1,0,1,1}, {0,1,2,1} },
+    { {0,0,2,1}, {0,1,1,1}, {1,1,1,1} },
+    { {0,0,1,2}, {1,0,1,1}, {1,1,1,1} },
+    { {0,0,1,1}, {0,1,1,1}, {1,0,1,2} }
+  };
+
+  int SubViews4Map[21][4][4] = {
+    { {0,0,1,1}, {0,1,1,1}, {0,2,1,1}, {0,3,1,1} },
+    { {0,0,1,1}, {1,0,1,1}, {2,0,1,1}, {3,0,1,1} },
+    { {0,0,1,1}, {0,1,1,1}, {1,0,1,1}, {1,1,1,1} },
+    { {0,0,1,1}, {1,0,1,1}, {0,1,2,1}, {0,2,2,1} },
+    { {0,0,2,1}, {0,1,1,1}, {1,1,1,1}, {0,2,2,1} },
+    { {0,0,2,1}, {0,1,2,1}, {0,2,1,1}, {1,2,1,1} },
+    { {0,0,1,1}, {0,1,1,1}, {1,0,1,2}, {2,0,1,2} },
+    { {0,0,1,2}, {1,0,1,1}, {1,1,1,1}, {2,0,1,2} },
+    { {0,0,1,2}, {1,0,1,2}, {2,0,1,1}, {2,1,1,1} },
+    { {0,0,1,1}, {1,0,1,1}, {0,1,2,1}, {2,0,1,2} },
+    { {0,0,2,1}, {0,1,1,1}, {1,1,1,1}, {2,0,1,2} },
+    { {0,0,1,2}, {1,0,1,1}, {2,0,1,1}, {1,1,2,1} },
+    { {0,0,1,2}, {1,0,2,1}, {1,1,1,1}, {2,1,1,1} },
+    { {0,0,2,1}, {0,1,1,1}, {0,2,1,1}, {1,1,1,2} },
+    { {0,0,2,1}, {0,1,1,2}, {1,1,1,1}, {1,2,1,1} },
+    { {0,0,1,1}, {0,1,1,1}, {1,0,1,2}, {0,2,2,1} },
+    { {0,0,1,2}, {1,0,1,1}, {1,1,1,1}, {0,2,2,1} },
+    { {0,0,1,3}, {1,0,1,1}, {1,1,1,1}, {1,2,1,1} },
+    { {0,0,1,1}, {0,1,1,1}, {0,2,1,1}, {1,0,1,3} },
+    { {0,0,1,1}, {1,0,1,1}, {2,0,1,1}, {0,1,3,1} },
+    { {0,0,3,1}, {0,1,1,1}, {1,1,1,1}, {2,1,1,1} },
+  };
+
+  if( aNbViews == 2 ) {
+    if( mySplitMode == 0 ) {
+      myLayout->addWidget( myViews.at(myViewsMode[0]), 0,0,2,1 );
+      myLayout->addWidget( myViews.at(myViewsMode[1]), 0,1,2,1 );
+    }
+    else if( mySplitMode == 1 ) {
+      myLayout->addWidget( myViews.at(myViewsMode[0]), 0,0,1,2 );
+      myLayout->addWidget( myViews.at(myViewsMode[1]), 1,0,1,2 );
+    }
+  }
+  else if( aNbViews == 3 ) {
+  	int aSplitMode = mySplitMode - 2;
+    for( int i = 0; i < 3; i++ ) {
+    myLayout->addWidget( myViews.at(myViewsMode[i]),
+                         SubViews3Map[aSplitMode][i][0],
+                         SubViews3Map[aSplitMode][i][1],
+                         SubViews3Map[aSplitMode][i][2],
+                         SubViews3Map[aSplitMode][i][3]);
+    }
+  }
+  else if( aNbViews == 4 ) {
+  	int aSplitMode = mySplitMode - 8;
+    for( int i = 0; i < 4; i++ ) {
+    myLayout->addWidget( myViews.at(myViewsMode[i]),
+                         SubViews4Map[aSplitMode][i][0],
+                         SubViews4Map[aSplitMode][i][1],
+                         SubViews4Map[aSplitMode][i][2],
+                         SubViews4Map[aSplitMode][i][3]);
+    }
+  }
+
+  OCCViewer_ViewWindow* view = 0;
+  for ( int i = 0; i< myViews.count(); i++ ) {
+    view = myViews.at(i);
+    bool isShowed = false;
+    for( int j = 0; j < myViewsMode.count(); j++ ) {
+      OCCViewer_ViewWindow* view2 = 0;
+      view2 = myViews.at( myViewsMode[j] );
+      if( view == view2 )
+        isShowed = true;
+    }
+    if( isShowed ) {
+      view->show();
+      view->setMaximized( false, false );
+      ///////////////QApplication::processEvents(); // VSR: hangs up ?
+      if ( view != myMaximizedView )
+        view->onViewFitAll();
+    }
+    else
+      view->setVisible( false );
+  }
+}
+
+//**************************************************************************************
 OCCViewer_ViewPort3d* OCCViewer_ViewFrame::getViewPort(int theView) 
 { 
   return getView(theView)? getView(theView)->getViewPort() : 0;
 }
   
+//**************************************************************************************
 void OCCViewer_ViewFrame::updateEnabledDrawMode() 
 { 
   foreach (OCCViewer_ViewWindow* aView, myViews) {
@@ -150,6 +262,7 @@ void OCCViewer_ViewFrame::updateEnabledDrawMode()
   }
 }
 
+//**************************************************************************************
 void OCCViewer_ViewFrame::setCuttingPlane( bool on, const double x , const double y , const double z,
                                            const double dx, const double dy, const double dz)  
 { 
@@ -325,6 +438,15 @@ void OCCViewer_ViewFrame::setDropDownButtons( bool on )
 QString OCCViewer_ViewFrame::getVisualParameters()
 {
   QStringList params;
+  QStringList splitParams;
+  if( mySplitMode != -1 && myViewsMode.count() != 0 ) {
+    splitParams << QString::number( mySplitMode );
+    foreach ( int aViewMode, myViewsMode )
+      splitParams << QString::number( aViewMode );
+    params.append( splitParams.join("*") );
+  }
+  else
+    params.append( QString::number( mySplitMode ) );
   int maximizedView = 999;
   for ( int i = BOTTOM_RIGHT; i <= TOP_RIGHT && i < myViews.count(); i++) {
     if ( getView(i)->isVisible() )
@@ -340,13 +462,24 @@ void OCCViewer_ViewFrame::setVisualParameters( const QString& parameters )
   QStringList params = parameters.split( "|" );
   if ( params.count() > 1 ) {
     int maximizedView = params[0].toInt();
-    if ( myViews.count() < params.count()-1 )
-      onMaximizedView( getView(MAIN_VIEW), false ); // secondary views are not created yet, but should be
-    for ( int i = 1; i < params.count(); i++ ) {
-      int idx = i-1;
+    if ( myViews.count() < params.count()-2 )
+      createSubViews(); // secondary views are not created yet, but should be
+
+    for ( int i = 2; i < params.count(); i++ ) {
+      int idx = i-2;
       getView( idx )->setVisualParameters( params[i] );
     }
-    onMaximizedView( getView( maximizedView ), maximizedView != -1 ); // set proper sib-window maximized 
+
+    QStringList aSplitParams = params[1].split("*");
+    if( aSplitParams.count() > 1 ) {
+      mySplitMode = aSplitParams[0].toInt();
+      for( int i = 1; i < aSplitParams.count(); i++ )
+        myViewsMode << aSplitParams[i].toInt();
+    }
+    if( mySplitMode != -1 )
+      splitSubViews();
+    else
+      onMaximizedView( getView( maximizedView ), true ); // set proper sub-window maximized
   }
   else {
     // handle obsolete versions - no parameters for xy, yz, xz views

@@ -213,13 +213,27 @@ void STD_TabDesktop::createActions()
   myWorkstackAction->setStatusTip( QtxWorkstackAction::SplitVertical, tr( "PRP_DESK_WINDOW_VSPLIT" ) );
   myWorkstackAction->setAccel( QtxWorkstackAction::SplitVertical,   Qt::ALT + Qt::SHIFT + Qt::Key_V );
 
+  QAction* anArrangeViewsAction = myWorkstackAction->getArrangeViewsAction();
+  if( anArrangeViewsAction )
+    connect( anArrangeViewsAction, SIGNAL( triggered() ), this, SLOT( onArrangeViews() ) );
+
   QtxActionMenuMgr* mMgr = menuMgr();
   if ( !mMgr )
     return;
 
   int winMenuId = mMgr->insert( tr( "MEN_DESK_WINDOW" ), -1, 100 );
+  mMgr->insert( anArrangeViewsAction, winMenuId, -1 );
   mMgr->insert( myWorkstackAction, winMenuId, -1 );
   mMgr->insert( QtxActionMenuMgr::separator(), winMenuId, -1 );
+}
+
+/*!
+  Emit Arrange Views menu activated.
+*/
+void STD_TabDesktop::onArrangeViews()
+{
+  QtxSplitDlg ArrangeViewsDlg( this, workstack(), ArrangeViews );
+  ArrangeViewsDlg.exec();
 }
 
 /*!

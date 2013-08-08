@@ -57,6 +57,7 @@ public:
 
 private slots:
   void                     onWindowActivated( QWidget* );
+  void                     onArrangeViews();
 
 protected:
   void                     createActions();

@@ -264,6 +264,10 @@
         <source>Split horizontally</source>
         <translation>Diviser horizontalement</translation>
     </message>
+    <message>
+        <source>Arrange Views</source>
+        <translation>Disposer les vues</translation>
+    </message>
 </context>
 <context>
     <name>QtxColorButton</name>
@@ -331,6 +335,53 @@
     <message>
         <source>Change background</source>
         <translation>Modifier l&apos;arrière plan</translation>
+    </message>
+</context>
+<context>
+    <name>QtxSplitDlg</name>
+    <message>
+        <source>Arrange views</source>
+        <translation>Disposer les vues</translation>
+    </message>
+    <message>
+        <source>Create sub-views</source>
+        <translation>Créer les sous-vues</translation>
+    </message>
+    <message>
+        <source>Views Layout</source>
+        <translation>Mise en page des vues</translation>
+    </message>
+    <message>
+        <source>Sub-views Layout</source>
+        <translation>Mise en page des sous-vues</translation>
+    </message>
+    <message>
+        <source>Views List</source>
+        <translation>Liste des vues</translation>
+    </message>
+    <message>
+        <source>Close remaining views</source>
+        <translation>Fermer les vues restantes</translation>
+    </message>
+    <message>
+        <source>Stack remaining views in the last area</source>
+        <translation>Empiler les vues restantes dans la dernière zone</translation>
+    </message>
+    <message>
+        <source>Sub-views Properties</source>
+        <translation>Propriétés des sous-vues</translation>
+    </message>
+    <message>
+        <source>Sub-view</source>
+        <translation>Sous-vue</translation>
+    </message>
+    <message>
+        <source>&amp;Apply</source>
+        <translation>&amp;Appliquer</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fermer</translation>
     </message>
 </context>
 </TS>

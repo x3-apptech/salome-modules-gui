@@ -129,9 +129,14 @@ private slots:
 private:
   void connectViewSignals( OCCViewer_ViewWindow* theView );
   void updateWindowTitle( OCCViewer_ViewWindow* theView );
+  void createSubViews();
+  void splitSubViews();
 
   QList<OCCViewer_ViewWindow*> myViews;
   QGridLayout* myLayout;
+  OCCViewer_ViewWindow* myMaximizedView;
+  int mySplitMode;
+  QList<int> myViewsMode;
 
   OCCViewer_ViewWindow* myPopupRequestedView;
 };
