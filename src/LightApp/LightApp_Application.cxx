@@ -1465,7 +1465,6 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
     vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
     vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
-
     vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
     vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
 
@@ -2594,6 +2593,26 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         continue;
 
       OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setInteractionStyle( mode );
+    }
+#endif
+#ifndef DISABLE_VTKVIEWER
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itVTK( lst );
+    while ( itVTK.hasNext() )
+    {
+      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setInteractionStyle( mode );
+    }
+#endif
+#endif
+  }
+
 #ifndef DISABLE_OCCVIEWER
   if ( sec == QString( "OCCViewer" ) && param == QString( "enable_preselection" ) )
   {
@@ -2631,26 +2650,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 #endif
-
-      occVM->setInteractionStyle( mode );
-    }
-#endif
-#ifndef DISABLE_VTKVIEWER
-#ifndef DISABLE_SALOMEOBJECT
-    viewManagers( SVTK_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> itVTK( lst );
-    while ( itVTK.hasNext() )
-    {
-      SUIT_ViewModel* vm = itVTK.next()->getViewModel();
-      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
-        continue;
-
-      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
-      if( vtkVM ) vtkVM->setInteractionStyle( mode );
-    }
-#endif
-#endif
-  }
 
   if ( sec == QString( "3DViewer" ) && param == QString( "zooming_mode" ) )
   {
