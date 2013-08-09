@@ -1465,6 +1465,10 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
     vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
     vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
+
+    vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
+    vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
+
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
     new LightApp_OCCSelector( (OCCViewer_Viewer*)viewMgr->getViewModel(), mySelMgr );
   }
@@ -2206,6 +2210,18 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "image_formats", formats, bgId );
   // ... "Background" group <<end>>
 
+
+  // ... "Selection" group <<start>>
+  int occSelectionGroup = pref->addPreference( tr( "PREF_GROUP_SELECTION" ), occGroup );
+  pref->setItemProperty( "columns", 2, occSelectionGroup );
+  // .... -> enable preselection
+  pref->addPreference( tr( "PREF_ENABLE_PRESELECTION" ), occSelectionGroup, 
+		       LightApp_Preferences::Bool, "OCCViewer", "enable_preselection" );
+  // .... -> enable selection
+  pref->addPreference( tr( "PREF_ENABLE_SELECTION" ), occSelectionGroup, 
+		       LightApp_Preferences::Bool, "OCCViewer", "enable_selection" );
+  // ... "Selection" group <<end>>
+
   // ... -> empty frame (for layout) <<start>>
   int occGen = pref->addPreference( "", occGroup, LightApp_Preferences::Frame );
   pref->setItemProperty( "margin",  0, occGen );
@@ -2578,6 +2594,44 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         continue;
 
       OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "enable_preselection" ) )
+  {
+    bool isToEnablePreselection = resMgr->booleanValue( "OCCViewer", "enable_preselection", true );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->enablePreselection( isToEnablePreselection );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "enable_selection" ) )
+  {
+    bool isToEnableSelection = resMgr->booleanValue( "OCCViewer", "enable_selection", true );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->enableSelection( isToEnableSelection );
+    }
+  }
+#endif
+
       occVM->setInteractionStyle( mode );
     }
 #endif

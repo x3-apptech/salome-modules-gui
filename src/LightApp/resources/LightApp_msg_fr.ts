@@ -715,8 +715,32 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Console Python</translation>
     </message>
     <message>
-        <source>PREF_DYNAMIC_PRESELECTION</source>
-        <translation>Utiliser l&apos;algorithme de sélection avancée</translation>
+        <source>PREF_GROUP_SELECTION</source>
+        <translation type="unfinished">Selection</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_SELECTION</source>
+        <translation type="unfinished">Enable selection</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_PRESELECTION</source>
+        <translation type="unfinished">Enable preselection</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION</source>
+        <translation type="unfinished">Preselection</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_STANDARD</source>
+        <translation type="unfinished">Standard</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_DYNAMIC</source>
+        <translation type="unfinished">Dynamic</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_DISABLED</source>
+        <translation type="unfinished">Disabled</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>

@@ -140,6 +140,8 @@
   </section>
   <section name="OCCViewer" >
     <!-- OCC viewer preferences -->
+    <parameter name="enable_preselection" value="true"/>
+    <parameter name="enable_selection"    value="true"/>
     <parameter name="background"      value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="xz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="yz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />

@@ -715,8 +715,32 @@ The changes will be applied on the next application session.</translation>
         <translation>Python Console</translation>
     </message>
     <message>
-        <source>PREF_DYNAMIC_PRESELECTION</source>
-        <translation>Dynamic pre-selection</translation>
+        <source>PREF_GROUP_SELECTION</source>
+        <translation>Selection</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_SELECTION</source>
+        <translation>Enable selection</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_PRESELECTION</source>
+        <translation>Enable preselection</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION</source>
+        <translation>Preselection</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_STANDARD</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_DYNAMIC</source>
+        <translation>Dynamic</translation>
+    </message>
+    <message>
+        <source>PREF_PRESELECTION_DISABLED</source>
+        <translation>Disabled</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
