@@ -1298,6 +1298,9 @@ void SVTK_InteractorStyle::onOperation(QPoint mousePos)
 */
 void SVTK_InteractorStyle::onCursorMove(QPoint mousePos) 
 {
+  if ( !GetSelector()->IsPreSelectionEnabled() ) 
+    return;
+
   // processing highlighting
   SVTK_SelectionEvent* aSelectionEvent = GetSelectionEventFlipY();
   this->FindPokedRenderer(aSelectionEvent->myX,aSelectionEvent->myY);

@@ -184,10 +184,28 @@ public:
   bool
   GetDynamicPreSelection() const;
 
+  virtual
+  void
+  SetPreSelectionEnabled( bool theEnabled );
+
+  virtual
+  bool
+  IsPreSelectionEnabled() const;
+
+  virtual
+  void
+  SetSelectionEnabled( bool theEnabled );
+
+  virtual
+  bool
+  IsSelectionEnabled() const;
+
 private:
   int mySelectionMode;
 
   bool myDynamicPreselection;
+  bool myPreselectionEnabled;
+  bool mySelectionEnabled;
 
   struct TIOLessThan
   {

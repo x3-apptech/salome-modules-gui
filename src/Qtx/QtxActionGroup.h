@@ -46,6 +46,8 @@ public:
 
   void             add( QAction* );
 
+  void             setEnabled( bool );
+
 public slots:
   void             setExclusive( const bool );
   void             setUsesDropDown( const bool );

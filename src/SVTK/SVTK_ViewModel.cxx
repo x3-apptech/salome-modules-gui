@@ -29,7 +29,6 @@
 #include <vtkActorCollection.h>
 
 //#include "SUIT_Session.h"
-#include "SVTK_Selection.h"
 #include "SVTK_ViewModel.h"
 #include "SVTK_ViewWindow.h"
 #include "SVTK_View.h"
@@ -87,7 +86,8 @@ SVTK_Viewer::SVTK_Viewer()
   myProjMode = 0;
   myStyle = 0;
   myZoomingStyle = 0;
-  myDynamicPreSelection = false;
+  mySelectionEnabled = true;
+  myPreSelectionMode = Standard_Preselection;
   mySpaceBtn[0] = 1;
   mySpaceBtn[1] = 2;
   mySpaceBtn[2] = 9;
@@ -179,7 +179,8 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
   aViewWindow->SetProjectionMode( projectionMode() );
   aViewWindow->SetInteractionStyle( interactionStyle() );
   aViewWindow->SetZoomingStyle( zoomingStyle() );
-  aViewWindow->SetDynamicPreSelection( dynamicPreSelection() );
+  aViewWindow->SetPreSelectionMode( preSelectionMode() );
+  aViewWindow->SetSelectionEnabled( isSelectionEnabled() );
   aViewWindow->SetIncrementalSpeed( incrementalSpeed(), incrementalSpeedMode() );
   aViewWindow->SetSpacemouseButtons( spacemouseBtn(1), spacemouseBtn(2), spacemouseBtn(3) );
 
@@ -335,27 +336,27 @@ void SVTK_Viewer::setZoomingStyle( const int theStyle )
 }
 
 /*!
-  \return dynamic preselection
+  \return current preselection mode
 */
-bool SVTK_Viewer::dynamicPreSelection() const
+Preselection_Mode SVTK_Viewer::preSelectionMode() const
 {
-  return myDynamicPreSelection;
+  return myPreSelectionMode;
 }
 
 /*!
-  Sets dynamic preselection
-  \param theMode - new dynamic preselection mode
+  Sets preselection mode
+  \param theMode - new preselection mode
 */
-void SVTK_Viewer::setDynamicPreSelection( const bool theMode )
+void SVTK_Viewer::setPreSelectionMode( Preselection_Mode theMode )
 {
-  myDynamicPreSelection = theMode;
+  myPreSelectionMode = theMode;
   
   if (SUIT_ViewManager* aViewManager = getViewManager()) {
     QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
     for ( uint i = 0; i < aViews.count(); i++ )
     {
       if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
-        aView->SetDynamicPreSelection( theMode );
+        aView->SetPreSelectionMode( theMode );
     }
   }
 }
@@ -494,6 +495,15 @@ void SVTK_Viewer::enableSelection(bool isEnabled)
 {
   mySelectionEnabled = isEnabled;
   //!! To be done for view windows
+   
+  if (SUIT_ViewManager* aViewManager = getViewManager()) {
+    QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
+    for ( uint i = 0; i < aViews.count(); i++ )
+    {
+      if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+        aView->SetSelectionEnabled( isEnabled );
+    }
+  }
 }
 
 /*!

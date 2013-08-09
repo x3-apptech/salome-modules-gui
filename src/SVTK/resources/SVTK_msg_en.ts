@@ -209,16 +209,40 @@
     </message>
     <message>
         <source>MNU_SVTK_ZOOMING_STYLE_SWITCH</source>
-        <translation>Zomming style switch</translation>
+        <translation>Zooming style switch</translation>
     </message>
     <message>
-        <source>DSC_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
-        <translation>Dynamic preselection switch</translation>
+        <source>DSC_SVTK_PRESELECTION_STANDARD</source>
+        <translation>Standard preselection mode</translation>
     </message>
     <message>
-        <source>MNU_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
-        <translation>Dynamic preselection switch</translation>
+        <source>MNU_SVTK_PRESELECTION_STANDARD</source>
+        <translation>Standard Preselection Mode</translation>
     </message>
+    <message>
+        <source>DSC_SVTK_PRESELECTION_DYNAMIC</source>
+        <translation>Dynamic preselection mode</translation>
+    </message>
+    <message>
+        <source>MNU_SVTK_PRESELECTION_DYNAMIC</source>
+        <translation>Dynamic Preselection Mode</translation>
+    </message>
+    <message>
+        <source>DSC_SVTK_PRESELECTION_DISABLED</source>
+        <translation>Disable preselection</translation>
+    </message>
+    <message>
+        <source>MNU_SVTK_PRESELECTION_DISABLED</source>
+        <translation>Disable Preselection</translation>
+    </message>
+    <message>
+        <source>DSC_SVTK_ENABLE_SELECTION</source>
+        <translation>Enable/Disable selection</translation>
+    </message>
+    <message>
+        <source>MNU_SVTK_ENABLE_SELECTION</source>
+        <translation>Enable/Disable selection</translation>
+    </message>		
 </context>
 <context>
     <name>SVTK_FontWidget</name>

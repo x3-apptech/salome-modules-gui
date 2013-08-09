@@ -61,6 +61,8 @@ SVTK_SelectorDef
 {
   mySelectionMode = ActorSelection;
   myDynamicPreselection = true;
+  myPreselectionEnabled = true;
+  mySelectionEnabled = true;
 
   myPicker->Delete();
   myCellPicker->Delete();
@@ -572,4 +574,32 @@ SVTK_SelectorDef
 ::GetDynamicPreSelection() const
 {
   return myDynamicPreselection;
+}
+
+void
+SVTK_SelectorDef
+::SetPreSelectionEnabled( bool theEnabled )
+{
+  myPreselectionEnabled = theEnabled;
+}
+
+bool
+SVTK_SelectorDef
+::IsPreSelectionEnabled() const
+{
+  return mySelectionEnabled && myPreselectionEnabled;
+}
+
+void
+SVTK_SelectorDef
+::SetSelectionEnabled( bool theEnabled )
+{
+  mySelectionEnabled = theEnabled;
+}
+
+bool
+SVTK_SelectorDef
+::IsSelectionEnabled() const
+{
+  return mySelectionEnabled;
 }

@@ -224,6 +224,22 @@ public:
   virtual
   bool
   GetDynamicPreSelection() const = 0;
+
+  virtual
+  void
+  SetPreSelectionEnabled( bool theEnabled ) = 0;
+
+  virtual
+  bool
+  IsPreSelectionEnabled() const = 0;
+
+  virtual
+  void
+  SetSelectionEnabled( bool theEnabled ) = 0;
+
+  virtual
+  bool
+  IsSelectionEnabled() const = 0;
 };
 
 

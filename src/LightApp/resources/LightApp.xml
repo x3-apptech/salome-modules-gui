@@ -151,7 +151,8 @@
     <!-- VTK viewer preferences -->
     <parameter name="background"                       value="0, 0, 0"/>
     <parameter name="projection_mode"                  value="0"/>
-    <parameter name="dynamic_preselection"             value="false"/>
+    <parameter name="preselection"                     value="0"/>
+    <parameter name="enable_selection"                 value="true"/>
     <parameter name="speed_value"                      value="10"/>
     <parameter name="speed_mode"                       value="0"/>
     <parameter name="spacemouse_func1_btn"             value="1"/>

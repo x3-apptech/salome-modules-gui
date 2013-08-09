@@ -35,12 +35,20 @@ only for parallel (non-perspective) view's mode.
 
 \image html vtk_view_highlight.png
 
-<b>Dynamic pre-selection switch</b> - allows to switch on/off dynamic
-pre-selection of objects. When the dynamic pre-selection is switched
-on, an objects can be selected by clicking the point/cell belonging to
+These buttons allow to switch between three pre-selection modes.
+Possible choices:
+- <b>Standard preselection mode</b> - pre-selection is enabled in a standard mode;
+- <b>Dynamic preselection mode</b> - when the dynamic pre-selection is chosen, 
+an objects can be selected by clicking the point/cell belonging to
 this object, with some performance loss. Switch dynamic pre-selection
-off to have a good performance on big objects (for example, huge
-meshes).
+off to have a good performance on big objects (for example, huge meshes);
+- <b>Disable preselection</b> - pre-selection is disabled.
+
+<hr>
+
+\image html vtk_view_selection.png
+
+<b>Enable/Disable selection</b> - enables or disables selection in the view.
 <hr>
 
 \image html vtk_view_triedre.png

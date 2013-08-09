@@ -56,8 +56,20 @@
         <translation>vtk_view_recording_stop.png</translation>
     </message>
     <message>
-        <source>ICON_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
-        <translation>vtk_view_highlight.png</translation>
+        <source>ICON_SVTK_PRESELECTION_STANDARD</source>
+        <translation>vtk_view_highlight_std.png</translation>
+    </message>
+    <message>
+        <source>ICON_SVTK_PRESELECTION_DYNAMIC</source>
+        <translation>vtk_view_highlight_dyn.png</translation>
+    </message>
+    <message>
+        <source>ICON_SVTK_PRESELECTION_DISABLED</source>
+        <translation>vtk_view_highlight_off.png</translation>
+    </message>
+    <message>
+        <source>ICON_SVTK_SELECTION</source>
+        <translation>vtk_view_selection.png</translation>
     </message>
 </context>
 </TS>

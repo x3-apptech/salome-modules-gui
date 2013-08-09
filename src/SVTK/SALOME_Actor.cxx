@@ -431,7 +431,7 @@ SALOME_Actor
 {
   mySelector = theSelector;
 }
-
+  
 /*!
   To map current selection to VTK representation
 */
@@ -500,7 +500,7 @@ SALOME_Actor
                SVTK_SelectionEvent* theSelectionEvent,
                bool theIsHighlight)
 {
-  if ( !GetPickable() )
+  if ( !GetPickable() || !mySelector->IsPreSelectionEnabled() )
     return false;
       
   vtkRenderer *aRenderer = theInteractorStyle->GetCurrentRenderer();
@@ -655,7 +655,7 @@ SALOME_Actor
             SVTK_SelectionEvent* theSelectionEvent,
             bool theIsHighlight)
 {
-  if ( !GetPickable() || !mySelector )
+  if ( !GetPickable() || !mySelector || !mySelector->IsSelectionEnabled() )
     return false;
 
   myOutlineActor->SetVisibility( false );

@@ -233,8 +233,11 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Set zooming style
   virtual void SetZoomingStyle( const int );
 
-  //! Set dynamic preselection on/off
-  virtual void SetDynamicPreSelection( bool );
+  //! Set preselection mode
+  virtual void SetPreSelectionMode( Preselection_Mode );
+
+  //! Enable/disable selection
+  virtual void SetSelectionEnabled( bool );
 
   //! Customize space mouse buttons
   virtual void SetSpacemouseButtons( const int, const int, const int );
@@ -315,7 +318,9 @@ public slots:
 
   void onSwitchInteractionStyle(bool theOn);
   void onSwitchZoomingStyle(bool theOn);
-  void onSwitchDynamicPreSelection(bool theOn);
+
+  void onSwitchPreSelectionMode(int theMode);
+  void onEnableSelection(bool theOn);
 
   void onStartRecording();
   void onPlayRecording();
@@ -411,7 +416,9 @@ protected:
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId, ResetId,
 	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate,
          ParallelModeId, ProjectionModeId, ViewParametersId, SynchronizeId, SwitchInteractionStyleId,
-         SwitchZoomingStyleId,SwitchDynamicPreselectionId,
+         SwitchZoomingStyleId, 
+	 PreselectionId, StandardPreselectionId, DynamicPreselectionId, DisablePreselectionId, 
+	 EnableSelectionId,
          StartRecordingId, PlayRecordingId, PauseRecordingId, StopRecordingId };
 
   SVTK_View* myView;

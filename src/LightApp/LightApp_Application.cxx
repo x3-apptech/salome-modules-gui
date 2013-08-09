@@ -1491,7 +1491,8 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
       vm->setStaticTrihedronVisible( resMgr->booleanValue( "3DViewer", "show_static_trihedron", vm->isStaticTrihedronVisible() ) );
       vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
       vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
-      vm->setDynamicPreSelection( resMgr->booleanValue( "VTKViewer", "dynamic_preselection", vm->dynamicPreSelection() ) );
+      vm->setPreSelectionMode(resMgr->integerValue( "VTKViewer", "preselection", vm->preSelectionMode() ) );
+      vm->enableSelection( resMgr->booleanValue( "VTKViewer", "enable_selection", vm->isSelectionEnabled() ) );
       vm->setIncrementalSpeed( resMgr->integerValue( "VTKViewer", "speed_value", vm->incrementalSpeed() ),
                                resMgr->integerValue( "VTKViewer", "speed_mode", vm->incrementalSpeedMode() ) );
       vm->setSpacemouseButtons( resMgr->integerValue( "VTKViewer", "spacemouse_func1_btn", vm->spacemouseBtn(1) ),
@@ -2273,8 +2274,23 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                     << 1;
   pref->setItemProperty( "strings", aValuesList,   vtkSpeedMode );
   pref->setItemProperty( "indexes", anIndicesList, vtkSpeedMode );
-  // .... -> dynamic pre-selection
-  pref->addPreference( tr( "PREF_DYNAMIC_PRESELECTION" ),  vtkGen, LightApp_Preferences::Bool, "VTKViewer", "dynamic_preselection" );
+
+  // ... "Selection" group <<start>>
+  int vtkSelectionGroup = pref->addPreference( tr( "PREF_GROUP_SELECTION" ), vtkGroup );
+  pref->setItemProperty( "columns", 2, vtkSelectionGroup );
+  // .... -> preselection
+  int vtkPreselection = pref->addPreference( tr( "PREF_PRESELECTION" ),  vtkSelectionGroup, 
+                                             LightApp_Preferences::Selector, "VTKViewer", "preselection" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_PRESELECTION_STANDARD") << tr("PREF_PRESELECTION_DYNAMIC") << tr("PREF_PRESELECTION_DISABLED");
+  anIndicesList << 0 << 1 << 2;
+  pref->setItemProperty( "strings", aValuesList,   vtkPreselection );
+  pref->setItemProperty( "indexes", anIndicesList, vtkPreselection );
+  // .... -> enable selection
+  pref->addPreference( tr( "PREF_ENABLE_SELECTION" ), vtkSelectionGroup, LightApp_Preferences::Bool, "VTKViewer", "enable_selection" );
+  // ... "Selection" group <<end>>
+
   // ... -> empty frame (for layout) <<end>>
 
   // ... space mouse sub-group <<start>>
@@ -2729,9 +2745,9 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #endif
 
 #ifndef DISABLE_VTKVIEWER
-  if ( sec == QString( "VTKViewer" ) && param == QString( "dynamic_preselection" ) )
+  if ( sec == QString( "VTKViewer" ) && param == QString( "preselection" ) )
   {
-    bool mode = resMgr->booleanValue( "VTKViewer", "dynamic_preselection", true );
+    int mode = resMgr->integerValue( "VTKViewer", "preselection", 0 );
     QList<SUIT_ViewManager*> lst;
 #ifndef DISABLE_SALOMEOBJECT
     viewManagers( SVTK_Viewer::Type(), lst );
@@ -2743,7 +2759,28 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         continue;
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
-      if( vtkVM ) vtkVM->setDynamicPreSelection( mode );
+      if( vtkVM ) vtkVM->setPreSelectionMode( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "enable_selection" ) )
+  {
+    bool isToEnableSelection = resMgr->booleanValue( "VTKViewer", "enable_selection", true );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->enableSelection( isToEnableSelection );
     }
 #endif
   }

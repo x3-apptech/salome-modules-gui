@@ -25,6 +25,7 @@
 
 #include "SVTK.h"
 #include "SVTK_ViewModelBase.h"
+#include "SVTK_Selection.h"
 
 #include "Qtx.h"
 
@@ -125,12 +126,12 @@ public:
   //! Sets zooming style
   void setZoomingStyle( const int );
 
-  //! Gets dynamic preselection
-  bool dynamicPreSelection() const;
+  //! Gets current preselection mode (standard, dynamic or disabled)
+  Preselection_Mode preSelectionMode() const;
 
-  //! Sets dynamic preselection
-  void setDynamicPreSelection( const bool );
-
+  //! Sets new preselection mode
+  void setPreSelectionMode( Preselection_Mode );
+ 
   //! Get incremental speed (see #SVTK_InteractorStyle::ControllerIncrement)
   int incrementalSpeed() const;
 
@@ -207,7 +208,7 @@ private:
   int                  myProjMode;
   int                  myStyle;
   int                  myZoomingStyle;
-  bool                 myDynamicPreSelection;
+  Preselection_Mode    myPreSelectionMode;
   int                  mySpaceBtn[3];
 };
 

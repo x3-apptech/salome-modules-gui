@@ -41,5 +41,11 @@ const Selection_Mode ActorSelection = 6;
 const Selection_Mode Elem0DSelection = 7;
 const Selection_Mode BallSelection = 8;
 
+//! Preselection modes 
+typedef int Preselection_Mode; 
+
+const Preselection_Mode Standard_Preselection = 0;
+const Preselection_Mode Dynamic_Preselection = 1;
+const Preselection_Mode Preselection_Disabled = 2;
 
 #endif

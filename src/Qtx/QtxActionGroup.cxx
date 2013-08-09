@@ -209,6 +209,15 @@ void QtxActionGroup::onTriggered( QAction* a )
 }
 
 /*!
+  \brief Enable/disable action group
+*/
+void QtxActionGroup::setEnabled( bool on )
+{
+  QtxActionSet::setEnabled( on );
+  myActionGroup->setEnabled( on );
+}
+
+/*!
   \brief Update action group for the specified widget.
   \param w a widget this action group is added to
 */

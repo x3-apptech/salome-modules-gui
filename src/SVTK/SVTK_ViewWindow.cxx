@@ -35,6 +35,7 @@
 #include <QToolBar>
 #include <QEvent>
 #include <QFileInfo>
+#include <QSignalMapper>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QXmlStreamAttributes>
@@ -71,6 +72,7 @@
 #include "SUIT_ViewManager.h"
 #include "QtxActionToolMgr.h"
 #include "QtxMultiAction.h"
+#include "QtxActionGroup.h"
 
 #include "VTKViewer_Utilities.h"
 #include "VTKViewer_Trihedron.h"
@@ -148,10 +150,15 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
 {
   myInteractor = new SVTK_RenderWindowInteractor(this,"SVTK_RenderWindowInteractor");
   
-  SVTK_Selector* aSelector = SVTK_Selector::New(); 
-  aSelector->SetDynamicPreSelection( SUIT_Session::session()->resourceMgr()->
-				     booleanValue( "VTKViewer", "dynamic_preselection", true ) );
-  
+  SVTK_Selector* aSelector = SVTK_Selector::New();
+  int aPreselectionMode =  SUIT_Session::session()->resourceMgr()->
+    integerValue( "VTKViewer", "preselection", Standard_Preselection );
+  aSelector->SetDynamicPreSelection( aPreselectionMode == Dynamic_Preselection );
+  aSelector->SetPreSelectionEnabled( aPreselectionMode != Preselection_Disabled );
+  bool isSelectionEnabled = SUIT_Session::session()->resourceMgr()->
+    booleanValue( "VTKViewer", "enable_selection", true );
+  aSelector->SetSelectionEnabled( isSelectionEnabled );
+    
   SVTK_GenericRenderWindowInteractor* aDevice = SVTK_GenericRenderWindowInteractor::New();
   aDevice->SetRenderWidget(myInteractor);
   aDevice->SetSelector(aSelector);
@@ -891,12 +898,21 @@ void SVTK_ViewWindow::SetZoomingStyle(const int theStyle)
 }
 
 /*!
-  Switch dynamic preselection on / off
-  \param theDynPreselection - dynamic pre-selection mode
+  Set preselection mode.
+  \param theMode the mode to set (standard, dynamic or disabled)
 */
-void SVTK_ViewWindow::SetDynamicPreSelection( bool theDynPreselection )
+void SVTK_ViewWindow::SetPreSelectionMode( Preselection_Mode theMode )
 {
-  onSwitchDynamicPreSelection( theDynPreselection );
+  onSwitchPreSelectionMode( theMode );
+}
+
+/*!
+  Enables/disables selection.
+  \param theEnable if true - selection will be enabled
+*/
+void SVTK_ViewWindow::SetSelectionEnabled( bool theEnable )
+{
+  onEnableSelection( theEnable );
 }
 
 /*!
@@ -946,16 +962,36 @@ void SVTK_ViewWindow::onSwitchZoomingStyle( bool theOn )
 }
 
 /*!
-  Toogles dynamic preselection on/off
+  Switch preselection mode.
+  \param theMode the preselection mode
 */
-void SVTK_ViewWindow::onSwitchDynamicPreSelection( bool theOn )
+void SVTK_ViewWindow::onSwitchPreSelectionMode( int theMode )
 {
-  GetSelector()->SetDynamicPreSelection( theOn );
+  GetSelector()->SetDynamicPreSelection( theMode == Dynamic_Preselection );
+  GetSelector()->SetPreSelectionEnabled( theMode != Preselection_Disabled );
 
   // update action state if method is called outside
-  QtxAction* a = getAction( SwitchDynamicPreselectionId );
-  if ( a->isChecked() != theOn )
-    a->setChecked( theOn );
+  QtxAction* a = getAction( StandardPreselectionId + theMode );
+  if ( a && !a->isChecked() )
+    a->setChecked( true );
+}
+
+/*!
+  Enables/disables selection.
+  \param theOn if true - selection will be enabled
+*/
+void SVTK_ViewWindow::onEnableSelection( bool on )
+{
+  GetSelector()->SetSelectionEnabled( on );
+
+  // update action state if method is called outside
+  QtxAction* a = getAction( EnableSelectionId );
+  if ( a->isChecked() != on )
+    a->setChecked( on );
+  QtxActionGroup* aPreselectionGroup = 
+    dynamic_cast<QtxActionGroup*>( getAction( PreselectionId ) );
+  if ( aPreselectionGroup )
+    aPreselectionGroup->setEnabled( on );
 }
 
 /*!
@@ -2094,14 +2130,51 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchZoomingStyle(bool)));
   mgr->registerAction( anAction, SwitchZoomingStyleId );
 
-  // Turn on/off dynamic pre-selection
-  anAction = new QtxAction(tr("MNU_SVTK_DYNAMIC_PRESLECTION_SWITCH"), 
-                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_DYNAMIC_PRESLECTION_SWITCH" ) ),
-                           tr( "MNU_SVTK_DYNAMIC_PRESLECTION_SWITCH" ), 0, this);
-  anAction->setStatusTip(tr("DSC_SVTK_DYNAMIC_PRESLECTION_SWITCH"));
+  // Pre-selection
+  QSignalMapper* aSignalMapper = new QSignalMapper( this );
+  connect(aSignalMapper, SIGNAL(mapped(int)), this, SLOT(onSwitchPreSelectionMode(int)));
+
+  anAction = new QtxAction(tr("MNU_SVTK_PRESELECTION_STANDARD"), 
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_PRESELECTION_STANDARD" ) ),
+                           tr( "MNU_SVTK_PRESELECTION_STANDARD" ), 0, this);
+  anAction->setStatusTip(tr("DSC_SVTK_PRESELECTION_STANDARD"));
   anAction->setCheckable(true);
-  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchDynamicPreSelection(bool)));
-  mgr->registerAction( anAction, SwitchDynamicPreselectionId );
+  connect(anAction, SIGNAL(activated()), aSignalMapper, SLOT(map()));
+  aSignalMapper->setMapping( anAction, Standard_Preselection );
+  mgr->registerAction( anAction, StandardPreselectionId );
+  
+  anAction = new QtxAction(tr("MNU_SVTK_PRESELECTION_DYNAMIC"), 
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_PRESELECTION_DYNAMIC" ) ),
+                           tr( "MNU_SVTK_PRESELECTION_DYNAMIC" ), 0, this);
+  anAction->setStatusTip(tr("DSC_SVTK_PRESELECTION_DYNAMIC"));
+  anAction->setCheckable(true);
+  connect(anAction, SIGNAL(activated()), aSignalMapper, SLOT(map()));
+  aSignalMapper->setMapping( anAction, Dynamic_Preselection );
+  mgr->registerAction( anAction, DynamicPreselectionId );
+
+  anAction = new QtxAction(tr("MNU_SVTK_PRESELECTION_DISABLED"), 
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_PRESELECTION_DISABLED" ) ),
+                           tr( "MNU_SVTK_PRESELECTION_DISABLED" ), 0, this);
+  anAction->setStatusTip(tr("DSC_SVTK_PRESELECTION_DISABLED"));
+  anAction->setCheckable(true);
+  connect(anAction, SIGNAL(activated()), aSignalMapper, SLOT(map()));
+  aSignalMapper->setMapping( anAction, Preselection_Disabled );
+  mgr->registerAction( anAction, DisablePreselectionId );
+
+  QtxActionGroup* aPreselectionAction = new QtxActionGroup( this, true );
+  aPreselectionAction->add( getAction( StandardPreselectionId ) );
+  aPreselectionAction->add( getAction( DynamicPreselectionId ) );
+  aPreselectionAction->add( getAction( DisablePreselectionId ) );
+  mgr->registerAction( aPreselectionAction, PreselectionId );
+
+  // Selection
+  anAction = new QtxAction(tr("MNU_SVTK_ENABLE_SELECTION"), 
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_SELECTION" ) ),
+                           tr( "MNU_SVTK_ENABLE_SELECTION" ), 0, this);
+  anAction->setStatusTip(tr("DSC_SVTK_ENABLE_SELECTION"));
+  anAction->setCheckable(true);
+  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onEnableSelection(bool)));
+  mgr->registerAction( anAction, EnableSelectionId );
 
   // Start recording
   myStartAction = new QtxAction(tr("MNU_SVTK_RECORDING_START"), 
@@ -2149,7 +2222,14 @@ void SVTK_ViewWindow::createToolBar()
   mgr->append( DumpId, myToolBar );
   mgr->append( SwitchInteractionStyleId, myToolBar );
   mgr->append( SwitchZoomingStyleId, myToolBar );
-  mgr->append( SwitchDynamicPreselectionId, myToolBar );
+
+  mgr->append( mgr->separator(), myToolBar );
+ 
+  mgr->append( PreselectionId, myToolBar );
+  mgr->append( EnableSelectionId, myToolBar );
+
+  mgr->append( mgr->separator(), myToolBar );
+
   mgr->append( ViewTrihedronId, myToolBar );
 
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
