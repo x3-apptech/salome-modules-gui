@@ -121,7 +121,10 @@ public:
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
 	 ResetId, CloneId, ClippingId, MemId, RestoreId,
          TrihedronShowId, AxialScaleId, GraduatedAxesId, AmbientId,
-	 SwitchInteractionStyleId, SwitchZoomingStyleId, MaximizedId, SynchronizeId, UserId };
+	 SwitchInteractionStyleId, SwitchZoomingStyleId, 
+	 SwitchPreselectionId, SwitchSelectionId,
+	 MaximizedId, SynchronizeId,
+	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
                       PANGLOBAL, WINDOWFIT, FITALLVIEW, RESETVIEW,
@@ -170,6 +173,11 @@ public:
  
   virtual int                     zoomingStyle() const;
   virtual void                    setZoomingStyle( const int );
+
+  virtual bool                    isPreselectionEnabled() const;
+  virtual void                    enablePreselection( bool );   
+  virtual bool                    isSelectionEnabled() const;
+  virtual void                    enableSelection( bool );
  
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
@@ -226,6 +234,8 @@ public slots:
   virtual void setRestoreFlag();
   virtual void onSwitchInteractionStyle( bool on );
   virtual void onSwitchZoomingStyle( bool on );
+  virtual void onSwitchPreselection( bool on );
+  virtual void onSwitchSelection( bool on );
 
   virtual void activateSetRotationGravity();
   virtual void activateSetRotationSelected( double theX, double theY, double theZ );
@@ -332,6 +342,8 @@ private:
 
   QtxRectRubberBand* myRectBand; //!< selection rectangle rubber band
 
+  bool mySelectionEnabled;
+  bool myPreselectionEnabled;
   int myInteractionStyle;
 
   typedef QMap<OperationType, bool> MapOfTransformStatus;

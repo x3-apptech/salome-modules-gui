@@ -513,3 +513,17 @@ void OCCViewer_ViewFrame::updateWindowTitle(OCCViewer_ViewWindow* theView)
   if ( !title.isEmpty() )
     theView->setWindowTitle( windowTitle() + " - " + title );
 }
+
+void OCCViewer_ViewFrame::enableSelection( bool isEnabled )
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->enableSelection(isEnabled); 
+  }
+}
+
+void OCCViewer_ViewFrame::enablePreselection( bool isEnabled )
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->enablePreselection(isEnabled); 
+  }
+}

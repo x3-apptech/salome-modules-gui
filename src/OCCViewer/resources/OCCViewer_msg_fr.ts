@@ -268,6 +268,22 @@
         <translation>Changer le style de zoom</translation>
     </message>
     <message>
+        <source>DSC_ENABLE_PRESELECTION</source>
+        <translation type="unfinished">Enable/disable preselection</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_PRESELECTION</source>
+        <translation type="unfinished">Enable/disable preselection</translation>
+    </message>
+    <message>
+        <source>DSC_ENABLE_SELECTION</source>
+        <translation type="unfinished">Enable/disable selection</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_SELECTION</source>
+        <translation type="unfinished">Enable/disable selection</translation>
+    </message>
+    <message>
         <source>OCC_IMAGE_FILES</source>
         <translation>Fichiers images (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
     </message>

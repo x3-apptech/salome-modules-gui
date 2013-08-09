@@ -237,6 +237,9 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   my2dMode = No2dMode;
 
   myInteractionStyle = SUIT_ViewModel::STANDARD;
+  myPreselectionEnabled = true;
+  mySelectionEnabled = true;
+
 
   clearViewAspects();
   
@@ -1236,6 +1239,22 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onAxialScale()));
   toolMgr()->registerAction( aAction, AxialScaleId );
 
+  // Enable/disable preselection
+  aAction = new QtxAction(tr("MNU_ENABLE_PRESELECTION"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_PRESELECTION" ) ),
+                          tr( "MNU_ENABLE_PRESELECTION" ), 0, this);
+  aAction->setStatusTip(tr("DSC_ENABLE_PRESELECTION"));
+  aAction->setCheckable(true);
+  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchPreselection(bool)));
+  toolMgr()->registerAction( aAction, SwitchPreselectionId );
+
+  // Enable/disable selection
+  aAction = new QtxAction(tr("MNU_ENABLE_SELECTION"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SELECTION" ) ),
+                          tr( "MNU_ENABLE_SELECTION" ), 0, this);
+  aAction->setStatusTip(tr("DSC_ENABLE_SELECTION"));
+  aAction->setCheckable(true);
+  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchSelection(bool)));
+  toolMgr()->registerAction( aAction, SwitchSelectionId );
+
   // Graduated axes 
   aAction = new QtxAction(tr("MNU_GRADUATED_AXES"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_GRADUATED_AXES" ) ),
                            tr( "MNU_GRADUATED_AXES" ), 0, this);
@@ -1304,6 +1323,8 @@ void OCCViewer_ViewWindow::createToolBar()
 #if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
   toolMgr()->append( SwitchZoomingStyleId, tid );
 #endif
+  toolMgr()->append( SwitchPreselectionId, tid );
+  toolMgr()->append( SwitchSelectionId, tid );
   if( myModel->trihedronActivated() )
     toolMgr()->append( TrihedronShowId, tid );
 
@@ -1717,6 +1738,49 @@ void OCCViewer_ViewWindow::setRestoreFlag()
 void OCCViewer_ViewWindow::onTrihedronShow()
 {
   myModel->toggleTrihedron();
+}
+
+/*!
+  \brief Toggles preselection (highlighting) on/off
+*/
+void OCCViewer_ViewWindow::onSwitchPreselection( bool on )
+{
+  myPreselectionEnabled = on;
+  myModel->setSelectionOptions( isPreselectionEnabled(), myModel->isSelectionEnabled() );
+
+  // unhighlight all highlighted objects
+  /*if ( !on ) {
+    myModel->unHighlightAll( true, false );
+  }*/
+
+  // update action state if method is called outside
+  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchPreselectionId ) );
+  if ( a && a->isChecked() != on ) {
+    a->setChecked( on );
+  }
+}
+
+/*!
+  \brief Toggles selection on/off
+*/
+void OCCViewer_ViewWindow::onSwitchSelection( bool on )
+{
+  mySelectionEnabled = on;
+  myModel->setSelectionOptions( myModel->isPreselectionEnabled(), isSelectionEnabled() );
+  
+  // update action state if method is called outside
+
+  // preselection
+  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchPreselectionId ) );
+  if ( a ) {
+    a->setEnabled( on );
+  }
+
+  // selection
+  a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchSelectionId ) );
+  if ( a && a->isChecked() != on ) {
+    a->setChecked( on );
+  }
 }
 
 /*!
@@ -2692,4 +2756,40 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   aDestView->Redraw();
 
   blockSignals( blocked );
+}
+
+/*!
+  \brief Indicates whether preselection is enabled
+  \return true if preselection is enabled
+*/
+bool OCCViewer_ViewWindow::isPreselectionEnabled() const
+{
+  return myPreselectionEnabled;
+}
+
+/*!
+  \brief Enables/disables preselection
+  \param theIsToEnable if true - preselection will be enabled
+*/
+void OCCViewer_ViewWindow::enablePreselection( bool theIsToEnable )
+{
+  onSwitchPreselection( theIsToEnable );
+}
+
+/*!
+  \brief Indicates whether selection is enabled
+  \return true if selection is enabled
+*/
+bool OCCViewer_ViewWindow::isSelectionEnabled() const
+{
+  return mySelectionEnabled;
+}
+
+/*!
+  \brief Enables/disables selection
+  \param theIsToEnable if true - selection will be enabled
+*/
+void OCCViewer_ViewWindow::enableSelection( bool theIsToEnable )
+{
+  onSwitchSelection( theIsToEnable );
 }

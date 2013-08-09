@@ -123,5 +123,13 @@
         <source>ICON_OCCVIEWER_MINIMIZE</source>
         <translation>occ_view_minimized.png</translation>
     </message>
+    <message>
+        <source>ICON_OCCVIEWER_PRESELECTION</source>
+        <translation>occ_view_preselection.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_SELECTION</source>
+        <translation>occ_view_selection.png</translation>
+    </message>
 </context>
 </TS>

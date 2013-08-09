@@ -154,6 +154,9 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   // set zooming style to standard
   myZoomingStyle = 0;
 
+  // preselection
+  myPreselectionEnabled = true;
+
   // selection
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
@@ -220,6 +223,8 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     view->initSketchers();
     view->setInteractionStyle( interactionStyle() );
     view->setZoomingStyle( zoomingStyle() );
+    view->enablePreselection( isPreselectionEnabled() );
+    view->enableSelection( isSelectionEnabled() );
     
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
@@ -288,7 +293,9 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
 
   OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
 
-  if ( isSelectionEnabled() ) {
+  myCurPnt.setX(theEvent->x()); myCurPnt.setY(theEvent->y());
+
+  if ( isSelectionEnabled() && isPreselectionEnabled() ) {
     if (aView->getViewPort()->isBusy()) {
       QCoreApplication::processEvents();
       return; // Check that the ViewPort initialization completed
@@ -323,6 +330,13 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
 
   if (myStartPnt == myEndPnt)
   {
+    if ( !isPreselectionEnabled() ) {
+      Handle(V3d_View) aView3d = aView->getViewPort()->getView();
+      if ( !aView3d.IsNull() ) {
+	myAISContext->MoveTo(myEndPnt.x(), myEndPnt.y(), aView3d);
+      }
+    }
+
     if (aHasShift && myMultiSelectionEnabled)
       myAISContext->ShiftSelect();
     else
@@ -370,6 +384,14 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
     return;
 
   emit deselection();
+
+  if ( !isPreselectionEnabled() ) {
+    Handle(V3d_View) aView3d = aView->getViewPort()->getView();
+    if ( !aView3d.IsNull() ) {
+      myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d);
+    }
+  }
+
   myAISContext->Select();
 
   emit selectionChanged();
@@ -453,12 +475,50 @@ void OCCViewer_Viewer::setZoomingStyle( const int theStyle )
 }
 
 /*!
-  Sets selection enabled status
+  \return true if preselection is enabled
+*/
+bool OCCViewer_Viewer::isPreselectionEnabled() const 
+{ 
+  return myPreselectionEnabled; 
+}
+
+/*!
+  Enables/disables preselection
+  \param isEnabled - new status
+*/
+void OCCViewer_Viewer::enablePreselection(bool isEnabled)
+{
+  myPreselectionEnabled = isEnabled;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win ) {
+      win->enablePreselection( isEnabled );
+    }
+  }
+}
+
+/*!
+  \return true if selection is enabled
+*/
+bool OCCViewer_Viewer::isSelectionEnabled() const 
+{ 
+  return mySelectionEnabled; 
+}
+
+/*!
+  Enables/disables selection
   \param isEnabled - new status
 */
 void OCCViewer_Viewer::enableSelection(bool isEnabled)
 {
   mySelectionEnabled = isEnabled;
+
   //!! To be done for view windows
   if ( !myViewManager )
     return;
@@ -467,8 +527,10 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
   for ( int i = 0; i < (int)wins.count(); i++ )
   {
     OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
-    if ( win )
+    if ( win ) {
       win->updateEnabledDrawMode();
+      win->enableSelection( isEnabled );
+    }
   }
 }
 
@@ -627,12 +689,22 @@ bool OCCViewer_Viewer::highlight( const Handle(AIS_InteractiveObject)& obj,
   Unhilights all objects in viewer
   \param updateviewer - update current viewer
 */
-bool OCCViewer_Viewer::unHighlightAll( bool updateviewer )
+bool OCCViewer_Viewer::unHighlightAll( bool updateviewer, bool unselect )
 {
-  if ( myAISContext->HasOpenedContext() )
-    myAISContext->ClearSelected( updateviewer );
-  else
-    myAISContext->ClearCurrents( updateviewer );
+  if ( myAISContext->HasOpenedContext() ) {
+    if ( unselect ) {
+      myAISContext->ClearSelected( updateviewer );
+    } else {
+      myAISContext->UnhilightSelected( updateviewer );
+    }
+  } else {
+    if ( unselect ) {
+      myAISContext->ClearCurrents( updateviewer );
+    } else {
+      myAISContext->UnhilightCurrents( updateviewer );
+    }
+  }
+
   return false;
 }
 
@@ -923,4 +995,15 @@ void OCCViewer_Viewer::updateTrihedron() {
   } else if(myTrihedron->Size() != myTrihedronSize) {
     myTrihedron->SetSize(myTrihedronSize);
   }
+}
+
+/*!
+  Set number of isolines
+  \param u - u-isolines (first parametric co-ordinate)
+  \param v - v-isolines (second parametric co-ordinate)
+*/
+void OCCViewer_Viewer::setSelectionOptions( bool isPreselectionEnabled, bool isSelectionEnabled )
+{
+  myPreselectionEnabled = isPreselectionEnabled;
+  mySelectionEnabled = isSelectionEnabled;
 }

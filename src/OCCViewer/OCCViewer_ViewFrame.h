@@ -72,6 +72,12 @@ public:
   virtual int  zoomingStyle() const { return getView(MAIN_VIEW)->zoomingStyle(); }
   virtual void setZoomingStyle( const int );
 
+  virtual bool isSelectionEnabled() const { return getView(MAIN_VIEW)->isSelectionEnabled(); }
+  virtual void enableSelection( bool );
+
+  virtual bool isPreselectionEnabled() const { return getView(MAIN_VIEW)->isPreselectionEnabled(); }
+  virtual void enablePreselection( bool );
+
   virtual void setViewManager( SUIT_ViewManager* );
 
   virtual bool eventFilter(QObject* watched, QEvent* e) { return SUIT_ViewWindow::eventFilter(watched, e); }

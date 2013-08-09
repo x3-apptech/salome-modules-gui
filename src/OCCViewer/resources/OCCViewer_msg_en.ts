@@ -268,6 +268,22 @@
         <translation>Zooming style switch</translation>
     </message>
     <message>
+        <source>DSC_ENABLE_PRESELECTION</source>
+        <translation>Enable/disable preselection</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_PRESELECTION</source>
+        <translation>Enable/disable preselection</translation>
+    </message>
+    <message>
+        <source>DSC_ENABLE_SELECTION</source>
+        <translation>Enable/disable selection</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_SELECTION</source>
+        <translation>Enable/disable selection</translation>
+    </message>
+    <message>
         <source>OCC_IMAGE_FILES</source>
         <translation>Images Files (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
     </message>

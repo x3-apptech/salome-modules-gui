@@ -129,8 +129,13 @@ public:
   int                             zoomingStyle() const;
   void                            setZoomingStyle( const int );
 
+  void                            enablePreselection(bool isEnabled);
+  bool                            isPreselectionEnabled() const;
+  
   void                            enableSelection(bool isEnabled);
-  bool                            isSelectionEnabled() const { return mySelectionEnabled; }
+  bool                            isSelectionEnabled() const;
+
+  void                            setSelectionOptions( bool, bool );
 
   void                            enableMultiselection(bool isEnable);
   bool                            isMultiSelectionEnabled() const { return myMultiSelectionEnabled; }
@@ -142,7 +147,7 @@ public:
 
   /* Selection management */
   bool    highlight( const Handle(AIS_InteractiveObject)&, bool, bool=true );
-  bool    unHighlightAll( bool=true ); 
+  bool    unHighlightAll( bool=true, bool=true ); 
   bool    isInViewer( const Handle(AIS_InteractiveObject)&, bool=false );
   bool    isVisible( const Handle(AIS_InteractiveObject)& );
 
@@ -178,6 +183,7 @@ protected:
   int                             myInteractionStyle;
   int                             myZoomingStyle;
 
+  bool                            myPreselectionEnabled;
   bool                            mySelectionEnabled;
   bool                            myMultiSelectionEnabled;
   bool                            myIsRelative;
@@ -185,7 +191,7 @@ protected:
   int                             myTopLayerId;
 
   //QColor                          myBgColor;
-  QPoint                          myStartPnt, myEndPnt;
+  QPoint                          myStartPnt, myEndPnt, myCurPnt;
 
   bool                            myShowStaticTrihedron;
 

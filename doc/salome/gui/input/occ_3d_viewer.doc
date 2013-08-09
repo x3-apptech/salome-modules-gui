@@ -37,6 +37,16 @@ current cursor position) zooming styles.
 <b>Show/Hide Trihedron</b> - shows or hides coordinate axes.
 <hr>
 
+\image html occ_view_preselection.png
+
+<b>Enable/Disable preselection</b> - enables or disables preselection in the view.
+<hr>
+
+\image html occ_view_selection.png
+
+<b>Enable/Disable selection</b> - enables or disables selection in the view.
+<hr>
+
 \image html occ_view_fitall.png
 
 <b>Fit all</b> - allows to select a point to be the center of a scene
