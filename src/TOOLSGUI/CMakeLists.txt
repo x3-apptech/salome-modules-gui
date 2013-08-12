@@ -34,10 +34,11 @@ SET(COMMON_LIBS
   ${QT_LIBRARIES}
   suit
   ${CAS_KERNEL}
-  ${SalomeIDLKernel}
-  ${SALOMELocalTrace}
-  ${SalomeNS}
-  ${OpUtil}
+  ${KERNEL_SalomeIDLKernel}
+  ${KERNEL_SALOMELocalTrace}
+  ${KERNEL_SalomeNS}
+  ${KERNEL_OpUtil}
+  ${OMNIORB_LIBRARIES}
   SalomeIDLGUI
 )
 

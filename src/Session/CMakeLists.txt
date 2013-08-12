@@ -51,6 +51,7 @@ SET(COMMON_LIBS
   ${KERNEL_SalomeLauncher}
   ${KERNEL_Registry}
   ${KERNEL_SALOMEBasics}
+  ${OMNIORB_LIBRARIES}
   suit
   Event
   SalomeIDLGUI

@@ -97,6 +97,13 @@ static PFNGLDELETEBUFFERSARBPROC            vglDeleteBuffersARB           = NULL
 #define GL_GetProcAddress( x )   wglGetProcAddress( (const LPCSTR)x )
 #endif
 
+#ifdef WIN32
+  #ifdef max
+    #undef max
+  #endif
+#endif
+
+
 bool InitializeBufferExtensions()
 {
   vglGenBuffersARB = (PFNGLGENBUFFERSARBPROC)GL_GetProcAddress( "glGenBuffersARB" );

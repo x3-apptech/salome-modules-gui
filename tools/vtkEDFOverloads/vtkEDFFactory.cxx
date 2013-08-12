@@ -44,4 +44,37 @@ const char* vtkEDFFactory::GetDescription()
   return "VTK EDF Factory";
 }
 
+#ifdef WIN32
+  //RNV: workaround to avoid definition __declspec( dllimport )
+  //for the vtkGetFactoryCompilerUsed(), vtkGetFactoryVersion()
+  //and vtkLoad(). This happens because of a bug in the 
+  //vtkObjectFactory.h file. 
+  //This workaround will be removed in the future as soon as
+  //mentioned bug is fixed. 
+  #ifdef VTK_FACTORY_INTERFACE_IMPLEMENT
+    #undef VTK_FACTORY_INTERFACE_IMPLEMENT
+
+    #define VTK_FACTORY_INTERFACE_IMPLEMENT(factoryName)  \
+    extern "C"                                      \
+    VTKEDF_OVERLOADS_EXPORT                         \
+    const char* vtkGetFactoryCompilerUsed()         \
+    {                                               \
+      return VTK_CXX_COMPILER;                      \
+    }                                               \
+    extern "C"                                      \
+    VTKEDF_OVERLOADS_EXPORT                         \
+    const char* vtkGetFactoryVersion()              \
+    {                                               \
+      return VTK_SOURCE_VERSION;                    \
+    }                                               \
+    extern "C"                                      \
+    VTKEDF_OVERLOADS_EXPORT                         \
+    vtkObjectFactory* vtkLoad()                     \
+    {                                               \
+      return factoryName ::New();                   \
+    }
+  #endif
+#endif
+
+
 VTK_FACTORY_INTERFACE_IMPLEMENT(vtkEDFFactory);
