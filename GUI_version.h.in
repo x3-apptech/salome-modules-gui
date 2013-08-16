@@ -26,12 +26,22 @@
 #if !defined(__GUI_VERSION_H__)
 #define __GUI_VERSION_H__
 
-/*
-  GUI_VERSION is (major << 16) + (minor << 8) + patch.
+/*!
+  Specify version of SALOME GUI module, as follows
+
+  GUI_VERSION_MAJOR       : (integer) number identifying major version
+  GUI_VERSION_MINOR       : (integer) number identifying minor version
+  GUI_VERSION_MAINTENANCE : (integer) number identifying maintenance version
+  GUI_VERSION_STR         : (string)  complete version number "major.minor.maintenance"
+  GUI_VERSION             : (hex)     complete version number (major << 16) + (minor << 8) + maintenance
+  GUI_DEVELOPMENT         : (integer) indicates development version when set to 1
 */
 
-#define GUI_VERSION_STR "@VERSION@"
-#define GUI_VERSION     @XVERSION@
-#define GUI_DEVELOPMENT @VERSION_DEV@
+#define GUI_VERSION_MAJOR       @SALOMEGUI_MAJOR_VERSION@
+#define GUI_VERSION_MINOR       @SALOMEGUI_MINOR_VERSION@
+#define GUI_VERSION_MAINTENANCE @SALOMEGUI_PATCH_VERSION@
+#define GUI_VERSION_STR         "@SALOMEGUI_VERSION@"
+#define GUI_VERSION             @SALOMEGUI_XVERSION@
+#define GUI_DEVELOPMENT         @SALOMEGUI_VERSION_DEV@
 
 #endif // __GUI_VERSION_H__
