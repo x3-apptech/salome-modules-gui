@@ -20,37 +20,11 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(top_builddir
- ${PROJECT_BINARY_DIR}
-)
-SET(top_srcdir 
- ${PROJECT_SOURCE_DIR}
-)
-SET(srcdir 
- ${CMAKE_CURRENT_SOURCE_DIR}
-)
-SET(builddir 
- ${CMAKE_CURRENT_BINARY_DIR}
-)
-SET(datadir
- ${CMAKE_INSTALL_PREFIX}/share
-)
-SET(docdir 
-${datadir}/doc/salome
-)
-            
-SET(input ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in)
-SET(output ${CMAKE_CURRENT_BINARY_DIR}/doxyfile)
-MESSAGE(STATUS "Creation of ${output}")
-CONFIGURE_FILE(${input} ${output})
-               
-SET(input ${CMAKE_CURRENT_SOURCE_DIR}/static/header.html.in)
-SET(output ${CMAKE_CURRENT_BINARY_DIR}/static/header.html)
-MESSAGE(STATUS "Creation of ${output}")
-CONFIGURE_FILE(${input} ${output})
+SALOME_CONFIGURE_FILE(doxyfile.in doxyfile)
+SALOME_CONFIGURE_FILE(static/header.html.in static/header.html)
                 
 ADD_CUSTOM_TARGET(dev_docs ${DOXYGEN_EXECUTABLE}
-  COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; shutil.rmtree(r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/tui/GUI''', True); shutil.copytree(r'''${CMAKE_CURRENT_BINARY_DIR}/GUI''', r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/tui/GUI'''); shutil.copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/head.png''', r'''${CMAKE_INSTALL_PREFIX}/share/doc/salome/tui/GUI''')" 
+  COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; shutil.rmtree(r'''${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_DOC}/tui/GUI''', True); shutil.copytree(r'''${CMAKE_CURRENT_BINARY_DIR}/GUI''', r'''${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_DOC}/tui/GUI'''); shutil.copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/head.png''', r'''${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_DOC}/tui/GUI''')" 
   VERBATIM 
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
 )

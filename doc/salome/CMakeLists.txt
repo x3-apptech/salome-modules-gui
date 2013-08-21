@@ -20,11 +20,5 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(SUBDIRS
-  tui
-  gui
-)
-FOREACH(dir ${SUBDIRS})
-  ADD_SUBDIRECTORY(${dir})
-ENDFOREACH(dir ${SUBDIRS})
-            
+ADD_SUBDIRECTORY(tui)
+ADD_SUBDIRECTORY(gui)

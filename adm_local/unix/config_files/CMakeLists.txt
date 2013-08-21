@@ -20,7 +20,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(dist_admlocalm4_DATA
+SET(_m4_data
   check_disable_Corba.m4
   check_GLViewer.m4
   check_GUI.m4
@@ -41,7 +41,4 @@ SET(dist_admlocalm4_DATA
   check_salome_version.m4
 )
             
-FOREACH(f ${dist_admlocalm4_DATA})
-  SET(DEST adm_local/unix/config_files)
-  INSTALL(FILES ${f} DESTINATION ${DEST})
-ENDFOREACH(f ${dist_admlocalm4_DATA})
+INSTALL(FILES ${_m4_data} DESTINATION ${SALOME_INSTALL_AMCONFIG_LOCAL}/config_files)

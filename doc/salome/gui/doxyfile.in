@@ -38,23 +38,24 @@ WARNINGS		= YES
 #---------------------------------------------------------------------------
 #Input related options
 #---------------------------------------------------------------------------
-INPUT			= @srcdir@/input		  
+INPUT			= @CMAKE_CURRENT_SOURCE_DIR@/input		  
 FILE_PATTERNS		= *.doc
-IMAGE_PATH		= @srcdir@/images @top_srcdir@/src/OCCViewer/resources \
-                    	  @top_srcdir@/src/VTKViewer/resources \
-                    	  @top_srcdir@/src/SVTK/resources \
-                    	  @top_srcdir@/src/Plot2d/resources \
-                    	  @top_srcdir@/src/GLViewer/resources \
-                    	  @top_srcdir@/src/QxScene/resources \
+IMAGE_PATH		= @CMAKE_CURRENT_SOURCE_DIR@/images \
+			  @PROJECT_SOURCE_DIR@/src/OCCViewer/resources \
+                    	  @PROJECT_SOURCE_DIR@/src/VTKViewer/resources \
+                    	  @PROJECT_SOURCE_DIR@/src/SVTK/resources \
+                    	  @PROJECT_SOURCE_DIR@/src/Plot2d/resources \
+                    	  @PROJECT_SOURCE_DIR@/src/GLViewer/resources \
+                    	  @PROJECT_SOURCE_DIR@/src/QxScene/resources \
 
 #---------------------------------------------------------------------------
 #HTML related options
 #---------------------------------------------------------------------------
 GENERATE_HTML		= YES
 HTML_OUTPUT		= .
-HTML_HEADER		= @builddir@/static/header.html
-HTML_FOOTER		= @srcdir@/static/footer.html
-HTML_EXTRA_STYLESHEET	= @srcdir@/static/salome_extra.css
+HTML_HEADER		= @CMAKE_CURRENT_BINARY_DIR@/static/header.html
+HTML_FOOTER		= @CMAKE_CURRENT_SOURCE_DIR@/static/footer.html
+HTML_EXTRA_STYLESHEET	= @CMAKE_CURRENT_SOURCE_DIR@/static/salome_extra.css
 TOC_EXPAND		= YES
 DISABLE_INDEX		= NO
 GENERATE_TREEVIEW	= YES
