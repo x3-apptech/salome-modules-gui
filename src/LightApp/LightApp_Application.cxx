@@ -576,6 +576,8 @@ void LightApp_Application::createActions()
 
   // - Additional help items
 
+  createMenu( separator(), helpMenu, -1, 5 );
+
   QStringList addHelpItems = resMgr->parameters( "add_help" );
   foreach ( QString addHelpItem, addHelpItems ) {
     QString valueStr = resMgr->stringValue( "add_help", addHelpItem );
@@ -589,7 +591,6 @@ void LightApp_Application::createActions()
       id++;
     }
   }
-  createMenu( separator(), helpMenu, -1, 5 );
 
   //! MRU
   static QtxMRUAction* mru = new QtxMRUAction( tr( "TOT_DESK_MRU" ), tr( "MEN_DESK_MRU" ), 0 );
