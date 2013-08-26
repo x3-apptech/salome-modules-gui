@@ -19,27 +19,59 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../STD
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/STD
 )
 
-SET(COMMON_LIBS
-  qtx 
-  suit 
-  std
-  ${QT_LIBRARIES}
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx suit std)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  CAM_Application.h
+  CAM_DataModel.h
+  CAM_Module.h
+  CAM_Study.h
 )
 
-SET(CAM_HEADERS CAM_Application.h CAM_Module.h CAM_Study.h CAM_DataModel.h)
-QT4_WRAP_CPP(CAM_HEADERS_MOC ${CAM_HEADERS})
+# header files / no moc processing
+SET(_other_HEADERS
+  CAM.h
+  CAM_DataObject.h
+)
 
-SET(CAM_SOURCES
+# header files / to install
+SET(CAM_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/CAM_msg_en.ts
+  resources/CAM_msg_fr.ts
+  resources/CAM_msg_ja.ts
+)
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   CAM_Application.cxx
   CAM_DataModel.cxx
   CAM_DataObject.cxx
@@ -47,18 +79,14 @@ SET(CAM_SOURCES
   CAM_Study.cxx
 )
 
-SET(CAMTS_SOURCES
-  resources/CAM_msg_en.ts
-  resources/CAM_msg_fr.ts
-  resources/CAM_msg_ja.ts
-)
+# sources / to compile
+SET(CAM_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+# --- rules ---
 
-ADD_LIBRARY(CAM ${CAM_SOURCES} ${CAM_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(CAM ${COMMON_LIBS})
+ADD_LIBRARY(CAM ${CAM_SOURCES})
+TARGET_LINK_LIBRARIES(CAM ${_link_LIBRARIES})
 INSTALL(TARGETS CAM EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${CAMTS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${CAM_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

@@ -16,75 +16,230 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
   ${HDF5_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
-  ${PTHREAD_INCLUDE_DIRS}
-  ${QWT_INCLUDE_DIR}
   ${KERNEL_INCLUDE_DIRS}
   ${PROJECT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../STD
-  ${CMAKE_CURRENT_SOURCE_DIR}/../CAM
-  ${CMAKE_CURRENT_SOURCE_DIR}/../ObjBrowser
-  ${CMAKE_CURRENT_SOURCE_DIR}/../LogWindow
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Prs
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Event
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Style
-  ${CMAKE_CURRENT_SOURCE_DIR}/../CASCatch
+  ${PROJECT_SOURCE_DIR}/src/CAM
+  ${PROJECT_SOURCE_DIR}/src/CASCatch
+  ${PROJECT_SOURCE_DIR}/src/Event
+  ${PROJECT_SOURCE_DIR}/src/LogWindow
+  ${PROJECT_SOURCE_DIR}/src/ObjBrowser
+  ${PROJECT_SOURCE_DIR}/src/Prs
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/STD
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/Style
 )
+IF(SALOME_USE_SALOMEOBJECT)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OBJECT)
+ENDIF()
+IF(SALOME_USE_GLVIEWER)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/GLViewer)
+ENDIF()
+IF(SALOME_USE_OCCVIEWER)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OCCViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SOCC)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_PLOT2DVIEWER)
+  INCLUDE_DIRECTORIES(${QWT_INCLUDE_DIR})
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Plot2d)
+  IF(SALOME_USE_SALOMEOBJECT)
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SPlot2d)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_VTKVIEWER)
+  INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/VTKViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/SVTK)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_QXGRAPHVIEWER)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/QxScene)
+ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/src/PyConsole
+    ${PROJECT_SOURCE_DIR}/src/PyInterp
+    ${PROJECT_SOURCE_DIR}/src/SUITApp
+  )
+ENDIF()
 
-ADD_DEFINITIONS(${PYTHON_DEFINITIONS} ${HDF5_DEFINITIONS} ${CAS_DEFINITIONS} ${QT_DEFINITIONS})
-
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS} ${HDF5_DEFINITIONS})
 IF(NOT WINDOWS)
   ADD_DEFINITIONS("-Wno-deprecated")
-ENDIF(NOT WINDOWS)
+ENDIF()
+IF(NOT SALOME_USE_SALOMEOBJECT)
+  ADD_DEFINITIONS("-DDISABLE_SALOMEOBJECT")
+ENDIF()
+IF (NOT SALOME_USE_GLVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_GLVIEWER")
+ENDIF()
+IF(NOT SALOME_USE_OCCVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_OCCVIEWER")
+ENDIF()
+IF(SALOME_USE_PLOT2DVIEWER)
+  ADD_DEFINITIONS(${QWT_DEFINITIONS})
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_PLOT2DVIEWER")
+ENDIF()
+IF(NOT SALOME_USE_VTKVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_VTKVIEWER")
+ENDIF()
+IF(NOT SALOME_USE_QXGRAPHVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_QXGRAPHVIEWER")
+ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  ADD_DEFINITIONS(${PYTHON_DEFINITIONS})
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_PYCONSOLE")
+ENDIF()
 
-SET(COMMON_LIBS 
-  ${QT_LIBRARIES}
-  suit
-  std
-  CAM
-  LogWindow
+# libraries to link to
+SET(_link_LIBRARIES
   ${CAS_KERNEL}
-  SalomePrs
-  ObjBrowser
-  SalomeStyle
-  Event
+  ${QT_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${KERNEL_LDFLAGS}
-  ${KERNEL_SalomeHDFPersist}
-  ${KERNEL_SALOMELocalTrace}
+  CASCatch qtx suit std SalomeStyle SalomePrs CAM LogWindow ObjBrowser 
+  ${KERNEL_SalomeHDFPersist} ${KERNEL_SALOMELocalTrace}
 )
+IF(SALOME_USE_SALOMEOBJECT)
+  LIST(APPEND _link_LIBRARIES SalomeObject)
+ENDIF()
+IF(SALOME_USE_GLVIEWER)
+  LIST(APPEND _link_LIBRARIES GLViewer)
+ENDIF()
+IF(SALOME_USE_OCCVIEWER)
+  LIST(APPEND _link_LIBRARIES OCCViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _link_LIBRARIES SOCC)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_PLOT2DVIEWER)
+  LIST(APPEND _link_LIBRARIES Plot2d)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _link_LIBRARIES SPlot2d)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_VTKVIEWER)
+  LIST(APPEND _link_LIBRARIES VTKViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _link_LIBRARIES SVTK)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_QXGRAPHVIEWER)
+  LIST(APPEND _link_LIBRARIES QxScene)
+ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _link_LIBRARIES PyInterp PyConsole SUITApp)
+ENDIF()
 
-SET(GUI_HEADERS   
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   LightApp_AboutDlg.h
   LightApp_Application.h
   LightApp_DataModel.h
   LightApp_Dialog.h
-  LightApp_OBSelector.h
-  LightApp_Operation.h
   LightApp_Module.h
   LightApp_ModuleAction.h
   LightApp_ModuleDlg.h
   LightApp_NameDlg.h
+  LightApp_OBSelector.h
+  LightApp_Operation.h
+  LightApp_Preferences.h
+  LightApp_PreferencesDlg.h
   LightApp_SelectionMgr.h
   LightApp_ShowHideOp.h
   LightApp_Study.h
   LightApp_SwitchOp.h
-  LightApp_Preferences.h
-  LightApp_PreferencesDlg.h
   LightApp_WgViewModel.h
 )
+IF(SALOME_USE_GLVIEWER)
+  LIST(APPEND _moc_HEADERS LightApp_GLSelector.h)
+ENDIF()
+IF(SALOME_USE_OCCVIEWER)
+  LIST(APPEND _moc_HEADERS LightApp_OCCSelector.h)
+ENDIF()
+IF(SALOME_USE_PLOT2DVIEWER)
+  LIST(APPEND _moc_HEADERS LightApp_Plot2dSelector.h)
+ENDIF()
+IF(SALOME_USE_VTKVIEWER)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _moc_HEADERS LightApp_VTKSelector.h)
+  ENDIF()
+ENDIF()
 
-SET(RCCS LightApp.qrc)
+# header files / no moc processing
+SET(_other_HEADERS
+  LightApp.h
+  LightApp_DataObject.h
+  LightApp_DataOwner.h
+  LightApp_DataSubOwner.h
+  LightApp_Displayer.h
+  LightApp_Driver.h
+  LightApp_EventFilter.h
+  LightApp_FullScreenHelper.h
+  LightApp_HDFDriver.h
+  LightApp_Selection.h
+  LightApp_UpdateFlags.h
+)
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _other_HEADERS LightApp_PyInterp.h)
+ENDIF()
 
-SET(LightApp_SOURCES
+# header files / to install
+SET(LightApp_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by rcc
+SET(_rcc_RESOURCES LightApp.qrc)
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/LightApp_images.ts
+  resources/LightApp_msg_en.ts
+  resources/LightApp_msg_fr.ts
+  resources/LightApp_msg_ja.ts
+)
+
+# resource files / static
+SET(_other_RESOURCES
+  resources/icon_about.png
+  resources/icon_applogo.png
+  resources/icon_default.png
+  resources/icon_module.png
+  resources/icon_module_big.png
+  resources/icon_select.png
+  resources/LightApp.ini
+  resources/LightApp.xml
+)
+
+# --- sources ---
+
+# sources / rcc wrappings
+QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   LightApp_AboutDlg.cxx
   LightApp_Application.cxx
   LightApp_DataModel.cxx
@@ -95,6 +250,7 @@ SET(LightApp_SOURCES
   LightApp_Displayer.cxx
   LightApp_Driver.cxx
   LightApp_EventFilter.cxx
+  LightApp_FullScreenHelper.cxx
   LightApp_HDFDriver.cxx
   LightApp_Module.cxx
   LightApp_ModuleAction.cxx
@@ -102,159 +258,43 @@ SET(LightApp_SOURCES
   LightApp_NameDlg.cxx
   LightApp_OBSelector.cxx
   LightApp_Operation.cxx
+  LightApp_Preferences.cxx
+  LightApp_PreferencesDlg.cxx
   LightApp_Selection.cxx
   LightApp_SelectionMgr.cxx
   LightApp_ShowHideOp.cxx
   LightApp_Study.cxx
   LightApp_SwitchOp.cxx
-  LightApp_Preferences.cxx
-  LightApp_PreferencesDlg.cxx
   LightApp_WgViewModel.cxx
-  LightApp_FullScreenHelper.cxx
 )
-
-SET(GUITS_SOURCES
-  resources/LightApp_images.ts
-  resources/LightApp_msg_en.ts
-  resources/LightApp_msg_fr.ts
-  resources/LightApp_msg_ja.ts
-)
-
-SET(COMMON_HEADERS_H 
-  LightApp.h
-  LightApp_AboutDlg.h
-  LightApp_Application.h
-  LightApp_DataModel.h
-  LightApp_DataObject.h
-  LightApp_DataOwner.h
-  LightApp_DataSubOwner.h
-  LightApp_Dialog.h
-  LightApp_Displayer.h
-  LightApp_Driver.h
-  LightApp_EventFilter.h
-  LightApp_HDFDriver.h
-  LightApp_Module.h
-  LightApp_ModuleAction.h
-  LightApp_ModuleDlg.h
-  LightApp_NameDlg.h
-  LightApp_OBSelector.h
-  LightApp_Operation.h
-  LightApp_Selection.h
-  LightApp_SelectionMgr.h
-  LightApp_ShowHideOp.h
-  LightApp_Study.h
-  LightApp_SwitchOp.h
-  LightApp_Preferences.h
-  LightApp_PreferencesDlg.h
-  LightApp_UpdateFlags.h
-  LightApp_WgViewModel.h
-  LightApp_FullScreenHelper.h
-)
-
-IF(SALOME_USE_PYCONSOLE)
-  INCLUDE_DIRECTORIES(
-  ${PYTHON_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../PyConsole
-  ${CMAKE_CURRENT_SOURCE_DIR}/../PyInterp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUITApp
-  )
-  SET(COMMON_HEADERS_H ${COMMON_HEADERS_H} LightApp_PyInterp.h)
-  SET(LightApp_SOURCES ${LightApp_SOURCES} LightApp_PyInterp.cxx)
-  SET(COMMON_LIBS ${COMMON_LIBS} PyInterp PyConsole SUITApp)
-ELSE(SALOME_USE_PYCONSOLE)
-  ADD_DEFINITIONS("-DDISABLE_PYCONSOLE")
-ENDIF(SALOME_USE_PYCONSOLE)
-
-IF(SALOME_USE_VTKVIEWER)
-  INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../VTKViewer
-  )
-  SET(COMMON_LIBS ${COMMON_LIBS} ${VTK_LIBRARIES} VTKViewer)
-  IF(SALOME_USE_SALOMEOBJECT)
-    SET(COMMON_HEADERS_H ${COMMON_HEADERS_H} LightApp_VTKSelector.h)
-    SET(LightApp_SOURCES ${LightApp_SOURCES} LightApp_VTKSelector.cxx)
-    SET(GUI_HEADERS ${GUI_HEADERS} LightApp_VTKSelector.h)
-    SET(COMMON_LIBS ${COMMON_LIBS} SVTK)
-  ENDIF(SALOME_USE_SALOMEOBJECT)
-ELSE(SALOME_USE_VTKVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_VTKVIEWER")
-ENDIF(SALOME_USE_VTKVIEWER)
-
-IF(SALOME_USE_OCCVIEWER)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../OCCViewer)
-  SET(COMMON_HEADERS_H ${COMMON_HEADERS_H} LightApp_OCCSelector.h)
-  SET(LightApp_SOURCES ${LightApp_SOURCES} LightApp_OCCSelector.cxx)
-  SET(COMMON_LIBS ${COMMON_LIBS} OCCViewer)
-  SET(GUI_HEADERS ${GUI_HEADERS} LightApp_OCCSelector.h)
-ELSE(SALOME_USE_OCCVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_OCCVIEWER")
-ENDIF(SALOME_USE_OCCVIEWER)
-
 IF(SALOME_USE_GLVIEWER)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../GLViewer)
-  SET(COMMON_HEADERS_H ${COMMON_HEADERS_H} LightApp_GLSelector.h)
-  SET(LightApp_SOURCES ${LightApp_SOURCES} LightApp_GLSelector.cxx)
-  SET(GUI_HEADERS ${GUI_HEADERS} LightApp_GLSelector.h)
-  SET(COMMON_LIBS ${COMMON_LIBS} GLViewer)
-ELSE(SALOME_USE_GLVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_GLVIEWER")
-ENDIF(SALOME_USE_GLVIEWER)
-
+  LIST(APPEND _other_SOURCES LightApp_GLSelector.cxx)
+ENDIF()
+IF(SALOME_USE_OCCVIEWER)
+  LIST(APPEND _other_SOURCES LightApp_OCCSelector.cxx)
+ENDIF()
 IF(SALOME_USE_PLOT2DVIEWER)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../Plot2d)
-  ADD_DEFINITIONS(${QWT_DEFINITIONS})
-  SET(COMMON_HEADERS_H ${COMMON_HEADERS_H} LightApp_Plot2dSelector.h)
-  SET(LightApp_SOURCES ${LightApp_SOURCES} LightApp_Plot2dSelector.cxx)
-  SET(GUI_HEADERS ${GUI_HEADERS} LightApp_Plot2dSelector.h)
-  SET(COMMON_LIBS ${COMMON_LIBS} Plot2d)
-ELSE(SALOME_USE_PLOT2DVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_PLOT2DVIEWER")
-ENDIF(SALOME_USE_PLOT2DVIEWER)
+  LIST(APPEND _other_SOURCES LightApp_Plot2dSelector.cxx)
+ENDIF()
+IF(SALOME_USE_VTKVIEWER)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _other_SOURCES LightApp_VTKSelector.cxx)
+  ENDIF()
+ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _other_SOURCES LightApp_PyInterp.cxx)
+ENDIF()
 
-IF(SALOME_USE_SUPERVGRAPHVIEWER)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../SUPERVGraph)
-  SET(COMMON_LIBS ${COMMON_LIBS} SUPERVGraph)
-ELSE(SALOME_USE_SUPERVGRAPHVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_SUPERVGRAPHVIEWER")
-ENDIF(SALOME_USE_SUPERVGRAPHVIEWER)
+# sources / to compile
+SET(LightApp_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_rcc_SOURCES})
 
-IF(SALOME_USE_QXGRAPHVIEWER)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../QxScene)
-  SET(COMMON_LIBS ${COMMON_LIBS} QxScene)
-ELSE(SALOME_USE_QXGRAPHVIEWER)
-  ADD_DEFINITIONS("-DDISABLE_QXGRAPHVIEWER")
-ENDIF(SALOME_USE_QXGRAPHVIEWER)
+# --- rules ---
 
-IF(SALOME_USE_SALOMEOBJECT)
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../OBJECT)
-  SET(COMMON_LIBS ${COMMON_LIBS} SalomeObject)
-  IF(SALOME_USE_PLOT2DVIEWER)
-    INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../SPlot2d)
-    SET(COMMON_LIBS ${COMMON_LIBS} SPlot2d)
-  ENDIF(SALOME_USE_PLOT2DVIEWER)
- 
-  IF(SALOME_USE_OCCVIEWER)
-    INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../SOCC)
-    SET(COMMON_LIBS ${COMMON_LIBS} SOCC)
-  ENDIF(SALOME_USE_OCCVIEWER)
-
-  IF(SALOME_USE_VTKVIEWER)
-    INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../SVTK)
-  ENDIF(SALOME_USE_VTKVIEWER)
-ELSE(SALOME_USE_SALOMEOBJECT)
-  ADD_DEFINITIONS("-DDISABLE_SALOMEOBJECT")
-ENDIF(SALOME_USE_SALOMEOBJECT)
-    
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-QT4_ADD_RESOURCES(RCC_SRCS ${RCCS})
-ADD_LIBRARY(LightApp ${LightApp_SOURCES} ${GUI_HEADERS_MOC} ${RCC_SRCS})
-TARGET_LINK_LIBRARIES(LightApp ${COMMON_LIBS})
+ADD_LIBRARY(LightApp ${LightApp_SOURCES})
+TARGET_LINK_LIBRARIES(LightApp ${_link_LIBRARIES})
 INSTALL(TARGETS LightApp EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${LightApp_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-SET(GUI_DATA ${GUIPNG_DATA} ${CMAKE_CURRENT_SOURCE_DIR}/resources/LightApp.ini ${CMAKE_CURRENT_SOURCE_DIR}/resources/LightApp.xml)
-INSTALL(FILES ${GUI_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

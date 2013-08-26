@@ -17,30 +17,54 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQt4Ext)
+
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${Boost_INCLUDE_DIRS}
   ${QWT_INCLUDE_DIR}
-  ${PTHREAD_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Plot2d
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Prs
-  ${CMAKE_CURRENT_SOURCE_DIR}/../OBJECT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/Plot2d
+  ${PROJECT_SOURCE_DIR}/src/Prs
+  ${PROJECT_SOURCE_DIR}/src/OBJECT
 )
 
-ADD_DEFINITIONS("${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${QWT_DEFINITIONS}")
-SET(COMMON_LIBS suit Plot2d SalomePrs SalomeObject)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${QWT_DEFINITIONS} ${CAS_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${QWT_LIBRARY} qtx suit Plot2d SalomePrs SalomeObject)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   SPlot2d_ViewModel.h
   SPlot2d_ViewWindow.h
 )
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
-SET(SPlot2d_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  SPlot2d.h
+  SPlot2d_Curve.h
+  SPlot2d_Histogram.h
+  SPlot2d_Prs.h
+)
+
+# header files / to install
+SET(SPlot2d_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   SPlot2d_Curve.cxx
   SPlot2d_Histogram.cxx
   SPlot2d_Prs.cxx
@@ -48,17 +72,13 @@ SET(SPlot2d_SOURCES
   SPlot2d_ViewWindow.cxx
 )
 
-ADD_LIBRARY(SPlot2d ${SPlot2d_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(SPlot2d ${COMMON_LIBS})
+# sources / to compile
+SET(SPlot2d_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(SPlot2d ${SPlot2d_SOURCES})
+TARGET_LINK_LIBRARIES(SPlot2d ${_link_LIBRARIES})
 INSTALL(TARGETS SPlot2d EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  SPlot2d.h
-  SPlot2d_Curve.h
-  SPlot2d_Histogram.h
-  SPlot2d_Prs.h
-  SPlot2d_ViewModel.h
-  SPlot2d_ViewWindow.h
-)
-
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${SPlot2d_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

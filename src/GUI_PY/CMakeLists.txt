@@ -17,39 +17,36 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_BINARY_DIR}
+INCLUDE(UsePyQt4)
+
+# --- resources ---
+
+# uic files / to be processed by pyuic
+SET(_pyuic_files
+  SelectVarsDialog.ui
+  genericdialog.ui
+  mytestdialog.ui
 )
-# Python modules to be installed
-SET(mypkgpython_PYTHON
+
+# --- scripts ---
+
+# scripts / pyuic wrappings
+
+PYQT4_WRAP_UIC(_pyuic_SCRIPTS ${_pyuic_files})
+
+# scripts / static
+SET(_other_SCRIPTS 
   __init__.py
-  selectvars.py
   genericdialog.py
-  mytestdialog.py
   helper.py
-)
-SALOME_INSTALL_SCRIPTS("${mypkgpython_PYTHON}" ${SALOME_INSTALL_PYTHON}/salome/gui)
-
-SET(PYUIC_FILES
-  SelectVarsDialog_ui.py
-  genericdialog_ui.py
-  mytestdialog_ui.py
+  mytestdialog.py
+  selectvars.py
 )
 
-FOREACH(output ${PYUIC_FILES})
-  STRING(REPLACE "_ui.py" ".ui" input ${output})
-  SET(input ${CMAKE_CURRENT_SOURCE_DIR}/${input})
-  SET(output ${CMAKE_CURRENT_BINARY_DIR}/${output})
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${output}
-    COMMAND ${PYQT_PYUIC_EXECUTABLE} -o ${output} ${input}
-    MAIN_DEPENDENCY ${input}
-  )
-  #${PYQT_PYUIC_EXECUTABLE}
-ENDFOREACH(output ${PYUIC_FILES})
+# scritps / to install
 
-ADD_CUSTOM_TARGET(BUILD_PY_UI_FILES ALL DEPENDS ${PYUIC_FILES})
+SET(_all_SCRIPTS ${_other_SCRIPTS} ${_pyuic_SCRIPTS})
 
-FOREACH(output ${PYUIC_FILES})
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${output} DESTINATION ${SALOME_INSTALL_PYTHON}/salome/gui)
-ENDFOREACH(output ${PYUIC_FILES})
+# --- rules ---
+
+SALOME_INSTALL_SCRIPTS("${_all_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/salome/gui)

@@ -21,22 +21,12 @@
 #
 
 SET(_m4_data
-  check_disable_Corba.m4
-  check_GLViewer.m4
   check_GUI.m4
-  check_msg2qm.m4
-  check_OCCViewer.m4
   check_opengl.m4
-  check_Plot2dViewer.m4
-  check_PyConsole.m4
   check_pyqt.m4
   check_qt.m4
   check_qwt.m4
-  check_SalomeObject.m4
   check_sip.m4
-  check_SupervGraphViewer.m4
-  check_VTKViewer.m4
-  check_QxGraphViewer.m4
   check_TestRecorder.m4
   check_salome_version.m4
 )

@@ -16,33 +16,68 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
+  ${PROJECT_SOURCE_DIR}/src/Qtx
 )
 
-SET(COMMON_LIBS ${QT_LIBRARIES} qtx)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
   Style_PrefDlg.h
   Style_Salome.h
 )
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
-SET(RCCS Style.qrc)
-QT4_ADD_RESOURCES(RCC_SRCS ${RCCS})
-
-SET(SalomeStyle_SOURCES
-  Style.h
+# header files / internal
+# no processing currently: TODO: check for MSVS project
+SET(_internal_HEADERS
   Style_Model.h
-  Style_PrefDlg.h
-  Style_Salome.h
-  Style_Tools.h
   Style_ResourceMgr.h
+  Style_Tools.h
+)
+
+# header files / no moc processing
+SET(_other_HEADERS
+  Style.h
+)
+
+# header files / to install (internal ones are excluded)
+SET(SalomeStyle_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by rcc
+SET(_rcc_RESOURCES Style.qrc)
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES resources/Style_msg_fr.ts)
+
+# resource files / other (static)
+SET(_other_RESOURCES resources/SalomeStyle.xml)
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / rcc wrappings
+QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+
+# sources / static
+SET(_other_SOURCES
   Style_Model.cxx
   Style_PrefDlg.cxx
   Style_ResourceMgr.cxx
@@ -50,23 +85,16 @@ SET(SalomeStyle_SOURCES
   Style_Tools.cxx
 )
 
-SET(GUITS_SOURCES
-  resources/Style_msg_fr.ts
-)
+# sources / to compile
+SET(SalomeStyle_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_rcc_SOURCES})
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+# --- rules ---
 
-ADD_LIBRARY(SalomeStyle ${SalomeStyle_SOURCES} ${GUI_HEADERS_MOC} ${RCC_SRCS})
-TARGET_LINK_LIBRARIES(SalomeStyle ${COMMON_LIBS})
+ADD_LIBRARY(SalomeStyle ${SalomeStyle_SOURCES})
+TARGET_LINK_LIBRARIES(SalomeStyle ${_link_LIBRARIES})
 INSTALL(TARGETS SalomeStyle EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  Style.h
-  Style_PrefDlg.h
-  Style_Salome.h
-)
+INSTALL(FILES ${SalomeStyle_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
-
-INSTALL(FILES resources/SalomeStyle.xml DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+INSTALL(FILES "${_other_RESOURCES}" DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

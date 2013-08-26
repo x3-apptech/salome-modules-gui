@@ -17,19 +17,48 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
   ${CAS_INCLUDE_DIRS}
-  ${QT_INCLUDES}
   ${KERNEL_INCLUDE_DIRS}
 )
 
-SET(COMMON_LIBS
-  ${QT_LIBRARIES}
-  ${CAS_LDPATH}
-  ${CAS_KERNEL}
-  ${CAS_TKV3d}
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_TKV3d})
+
+# --- headers ---
+
+# header files / to install
+SET(SalomeObject_HEADERS
+  Handle_SALOME_AISObject.hxx
+  Handle_SALOME_AISShape.hxx
+  Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx
+  Handle_SALOME_Filter.hxx
+  Handle_SALOME_InteractiveObject.hxx
+  Handle_SALOME_ListNodeOfListIO.hxx
+  Handle_SALOME_TypeFilter.hxx
+  SALOME_AISObject.hxx
+  SALOME_AISShape.hxx
+  SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger.hxx
+  SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx
+  SALOME_DataMapOfIOMapOfInteger.hxx
+  SALOME_Filter.hxx
+  SALOME_InteractiveObject.hxx
+  SALOME_ListIO.hxx
+  SALOME_ListIteratorOfListIO.hxx
+  SALOME_ListNodeOfListIO.hxx
+  SALOME_Selection.h
+  SALOME_TypeFilter.hxx
 )
+
+# --- sources ---
+
+# sources / to compile
 
 SET(SalomeObject_SOURCES
   SALOME_InteractiveObject.cxx
@@ -45,11 +74,10 @@ SET(SalomeObject_SOURCES
   SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger_0.cxx
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
+# --- rules ---
 
 ADD_LIBRARY(SalomeObject ${SalomeObject_SOURCES})
-TARGET_LINK_LIBRARIES(SalomeObject ${COMMON_LIBS})
+TARGET_LINK_LIBRARIES(SalomeObject ${_link_LIBRARIES})
 INSTALL(TARGETS SalomeObject EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
-INSTALL(FILES ${COMMON_HEADERS_HXX} SALOME_Selection.h DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${SalomeObject_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

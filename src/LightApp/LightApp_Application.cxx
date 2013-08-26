@@ -49,7 +49,6 @@
 #include "LightApp_AboutDlg.h"
 #include "LightApp_ModuleAction.h"
 // temporary commented
-//#include "LightApp_OBFilter.h"
 #include "LightApp_EventFilter.h"
 #include "LightApp_OBSelector.h"
 #include "LightApp_SelectionMgr.h"
@@ -138,17 +137,7 @@
   #include <VTKViewer_ViewModel.h>
 #endif
 
-//#ifndef DISABLE_SUPERVGRAPHVIEWER
-//  #include <SUPERVGraph_ViewModel.h>
-//  #include <SUPERVGraph_ViewFrame.h>
-//  #include <SUPERVGraph_ViewManager.h>
-//#endif
-
 #ifndef DISABLE_QXGRAPHVIEWER
-//VSR: QxGraph has been replaced by QxScene
-//  #include <QxGraph_ViewModel.h>
-//  #include <QxGraph_ViewWindow.h>
-//  #include <QxGraph_ViewManager.h>
   #include <QxScene_ViewManager.h>
   #include <QxScene_ViewModel.h>
   #include <QxScene_ViewWindow.h>
@@ -684,8 +673,6 @@ void LightApp_Application::createActions()
   createActionForViewer( NewVTKViewId, newWinMenu, QString::number( 3 ), Qt::ALT+Qt::Key_K );
 #endif
 #ifndef DISABLE_QXGRAPHVIEWER
-//VSR: QxGraph has been replaced by QxScene
-//  createActionForViewer( NewQxGraphViewId, newWinMenu, QString::number( 4 ), Qt::ALT+Qt::Key_C );
   createActionForViewer( NewQxSceneViewId, newWinMenu, QString::number( 4 ), Qt::ALT+Qt::Key_S );
 #endif
 
@@ -798,10 +785,6 @@ void LightApp_Application::onNewWindow()
     break;
 #endif
 #ifndef DISABLE_QXGRAPHVIEWER
-//VSR: QxGraph has been replaced by QxScene
-//  case NewQxGraphViewId:
-//    type = QxGraph_Viewer::Type();
-//    break;
   case NewQxSceneViewId:
     type = QxScene_Viewer::Type();
     break;
@@ -925,8 +908,6 @@ void LightApp_Application::updateCommandsStatus()
 #endif
 
 #ifndef DISABLE_QXGRAPHVIEWER
-//VSR: QxGraph has been replaced by QxScene
-//  a = action( NewQxGraphViewId );
   a = action( NewQxSceneViewId );
   if( a )
     a->setEnabled( activeStudy() );
@@ -1423,18 +1404,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     }
   }
 #endif
-  //#ifndef DISABLE_SUPERVGRAPHVIEWER
-  //  if( vmType == SUPERVGraph_Viewer::Type() )
-  //  {
-  //    viewMgr = new SUPERVGraph_ViewManager( activeStudy(), desktop(), new SUPERVGraph_Viewer() );
-  //  }
-  //#endif
 #ifndef DISABLE_QXGRAPHVIEWER
-//VSR: QxGraph has been replaced by QxScene
-//  if( vmType == QxGraph_Viewer::Type() )
-//    {
-//      viewMgr = new QxGraph_ViewManager( activeStudy(), desktop(), new QxGraph_Viewer() );
-//    }
   if( vmType == QxScene_Viewer::Type() )
   {
     viewMgr = new QxScene_ViewManager( activeStudy(), desktop() );
@@ -1845,8 +1815,6 @@ QWidget* LightApp_Application::createWindow( const int flag )
     OB_ListView* ob_list = dynamic_cast<OB_ListView*>( const_cast<QListView*>( ob->listView() ) );
     if( ob_list )
       ob_list->setColumnMaxWidth( 0, desktop()->width()/4 );
-
-    ob->setFilter( new LightApp_OBFilter( selectionMgr() ) );
     */
 
     // Create OBSelector

@@ -19,51 +19,83 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
+  ${CAS_INCLUDE_DIRS}
   ${OMNIORB_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
-  ${PTHREAD_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
-  ${PROJECT_BINARY_DIR}/idl
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT)
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+)
 
-SET(COMMON_LIBS
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(
+  ${QT_DEFINITIONS}
+  ${CAS_DEFINITIONS}
+  ${BOOST_DEFINITIONS}
+  ${OMNIORB_DEFINITIONS}
+)
+
+# libraries to link to
+SET(_link_LIBRARIES
   ${QT_LIBRARIES}
-  suit
   ${CAS_KERNEL}
   ${KERNEL_SalomeIDLKernel}
   ${KERNEL_SALOMELocalTrace}
   ${KERNEL_SalomeNS}
   ${KERNEL_OpUtil}
   ${OMNIORB_LIBRARIES}
-  SalomeIDLGUI
+  qtx suit
 )
 
-SET(GUI_HEADERS ToolsGUI_CatalogGeneratorDlg.h ToolsGUI_RegWidget.h)
-QT4_WRAP_CPP(GUI_HEADERS ${GUI_HEADERS})
-SET(ToolsGUI_SOURCES
-  ToolsGUI_CatalogGeneratorDlg.cxx
-  ToolsGUI_RegWidget.cxx
-  ToolsGUI.cxx
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  ToolsGUI_CatalogGeneratorDlg.h
+  ToolsGUI_RegWidget.h
 )
 
-SET(GUITS_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  ToolsGUI.h
+)
+
+# header files / to install
+SET(ToolsGUI_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/ToolsGUI_msg_en.ts
   resources/ToolsGUI_msg_fr.ts
   resources/ToolsGUI_msg_ja.ts
+) 
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  ToolsGUI.cxx
+  ToolsGUI_CatalogGeneratorDlg.cxx
+  ToolsGUI_RegWidget.cxx
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS}  ${OMNIORB_DEFINITIONS})
+# sources / to compile
+SET(ToolsGUI_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
+# --- rules ---
 
-ADD_LIBRARY(ToolsGUI ${ToolsGUI_SOURCES} ${GUI_HEADERS})
-TARGET_LINK_LIBRARIES(ToolsGUI ${COMMON_LIBS})
+ADD_LIBRARY(ToolsGUI ${ToolsGUI_SOURCES})
+TARGET_LINK_LIBRARIES(ToolsGUI ${_link_LIBRARIES})
 INSTALL(TARGETS ToolsGUI EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${ToolsGUI_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 

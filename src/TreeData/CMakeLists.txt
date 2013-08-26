@@ -16,62 +16,94 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-INCLUDE(UseQt4Ext)
 
 ADD_SUBDIRECTORY(Test)
 
+INCLUDE(UseQt4Ext)
+
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
   ${OMNIORB_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
-  ${PTHREAD_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SalomeApp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../LightApp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../CAM
-  ${CMAKE_CURRENT_SOURCE_DIR}/../STD
-  ${CMAKE_CURRENT_SOURCE_DIR}/../ObjBrowser
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../GuiHelpers
+  ${PROJECT_SOURCE_DIR}/src/CAM
+  ${PROJECT_SOURCE_DIR}/src/GuiHelpers
+  ${PROJECT_SOURCE_DIR}/src/LightApp
+  ${PROJECT_SOURCE_DIR}/src/ObjBrowser
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/STD
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/SalomeApp
 )
 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(
+  ${CAS_DEFINITIONS}
+  ${QT_DEFINITIONS}
+  ${BOOST_DEFINITIONS}
+  ${OMNIORB_DEFINITIONS}
+)
 
-SET(COMMON_LIBS
+# libraries to link to
+SET(_link_LIBRARIES
   ${OMNIORB_LIBRARIES}
   ${QT_LIBRARIES}
-  ${KERNEL_LDFLAGS}
-  ${KERNEL_SalomeLifeCycleCORBA}
-  ${KERNEL_SalomeKernelHelpers}
-  SalomeApp
-  LightApp
-  suit
-  qtx
-  CAM
-  std
-  ObjBrowser
+  ${KERNEL_SalomeLifeCycleCORBA} ${KERNEL_SalomeKernelHelpers}
+  qtx suit std CAM ObjBrowser LightApp SalomeApp 
 )
 
-SET(GUI_HEADERS TreeModel.hxx TreeView.hxx TreeObserver.hxx)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-SET(SalomeTreeData_SOURCES
-  DockWidgets.cxx
-  TreeModel.cxx
-  TreeItem.cxx
-  TreeView.cxx
-  TreeObserver.cxx
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
+  TreeModel.hxx
+  TreeObserver.hxx
+  TreeView.hxx
+)
+
+# header files / no moc processing
+SET(_other_HEADERS
+  DataModel.hxx
+  DataObject.hxx
+  DataProcessor.hxx
+  DockWidgets.hxx
+  TreeData.hxx
+  TreeGuiManager.hxx
+  TreeItem.hxx
+)
+
+# header files / to install
+SET(SalomeTreeData_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   DataModel.cxx
   DataObject.cxx
   DataProcessor.cxx
+  DockWidgets.cxx
   TreeGuiManager.cxx
+  TreeItem.cxx
+  TreeModel.cxx
+  TreeObserver.cxx
+  TreeView.cxx
 )
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS} ${BOOST_DEFINITIONS} ${OMNIORB_DEFINITIONS})
+# sources / to compile
+SET(SalomeTreeData_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_LIBRARY(SalomeTreeData ${SalomeTreeData_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(SalomeTreeData ${COMMON_LIBS})
+# --- rules ---
+
+ADD_LIBRARY(SalomeTreeData ${SalomeTreeData_SOURCES})
+TARGET_LINK_LIBRARIES(SalomeTreeData ${_link_LIBRARIES})
 INSTALL(TARGETS SalomeTreeData EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
-INSTALL(FILES ${COMMON_HEADERS_HXX} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${SalomeTreeData_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

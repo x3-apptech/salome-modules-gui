@@ -16,8 +16,12 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${OMNIORB_INCLUDE_DIR}
   ${QT_INCLUDES}
@@ -27,38 +31,45 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/TreeData
 )
 
-SET(COMMON_LIBS
-  ${CORBA_LIBS}
-  ${QT_LIBRARIES}
-  SalomeTreeData
-  SalomeGuiHelpers
-  ${SalomeLifeCycleCORBA}
-  ${SalomeKernelHelpers}
-)
-
-SET(GUI_HEADERS mainwindow.hxx)
-QT4_WRAP_CPP(GUI_HEADERS ${GUI_HEADERS})
-SET(GUI_FORMS mainwindow.ui)
-QT4_WRAP_UI(GUI_FORMS_HEADERS ${GUI_FORMS})
-
-SET(TreeData_guitester_SOURCES
-  testhelper.cxx
-  guitester.cxx
-  mainwindow.cxx
-  MyDataModel.cxx
-)
-
+# additional preprocessor / compiler flags
 ADD_DEFINITIONS(${OMNIORB_DEFINITIONS} ${QT_DEFINITIONS})
 
-ADD_EXECUTABLE(TreeData_guitester ${TreeData_guitester_SOURCES} ${GUI_HEADERS} ${GUI_FORMS_HEADERS})
-TARGET_LINK_LIBRARIES(TreeData_guitester ${COMMON_LIBS})
-
-SET(TreeData_tester_SOURCES
-  tester.cxx
-  MyDataModel.cxx
+# libraries to link to
+SET(_link_LIBRARIES
+  ${CORBA_LIBS}
+  ${QT_LIBRARIES}
+  SalomeTreeData SalomeGuiHelpers
+  ${KERNEL_SalomeLifeCycleCORBA} ${KERNEL_SalomeKernelHelpers}
 )
 
+# --- resources ---
+
+# resource files / to be processed by uic
+SET(_uic_files mainwindow.ui)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS mainwindow.hxx)
+
+# header files / uic wrappings
+QT4_WRAP_UI(_uic_HEADERS ${_uic_files})
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / to compile
+SET(TreeData_guitester_SOURCES MyDataModel.cxx guitester.cxx mainwindow.cxx testhelper.cxx ${_moc_SOURCES} ${_uic_HEADERS})
+SET(TreeData_tester_SOURCES MyDataModel.cxx tester.cxx)
+
+# --- rules ---
+
+ADD_EXECUTABLE(TreeData_guitester ${TreeData_guitester_SOURCES})
+TARGET_LINK_LIBRARIES(TreeData_guitester ${_link_LIBRARIES})
+
 ADD_EXECUTABLE(TreeData_tester ${TreeData_tester_SOURCES})
-TARGET_LINK_LIBRARIES(TreeData_tester ${COMMON_LIBS})
+TARGET_LINK_LIBRARIES(TreeData_tester ${_link_LIBRARIES})
 
 INSTALL(TARGETS TreeData_guitester TreeData_tester DESTINATION ${SALOME_INSTALL_BINS})

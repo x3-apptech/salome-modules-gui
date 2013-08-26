@@ -69,12 +69,11 @@ OPTION(SALOME_USE_OCCVIEWER "Enable OCC visualization (Mandatory in classic conf
 OPTION(SALOME_USE_GLVIEWER "Enable OpenGL visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PLOT2DVIEWER "Enable Plot2D visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PYCONSOLE "Enable Python GUI interface (Mandatory in classic configurations)" ON)
-OPTION(SALOME_USE_SUPERVGRAPHVIEWER "Enable Supervision visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
 
 MARK_AS_ADVANCED(SALOME_LIGHT_ONLY SALOME_USE_LIBBATCH SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER)
 MARK_AS_ADVANCED(SALOME_USE_SALOMEOBJECT SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_PLOT2DVIEWER)
-MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_SUPERVGRAPHVIEWER SALOME_USE_QXGRAPHVIEWER)
+MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_QXGRAPHVIEWER)
 
 # Prerequisites
 # =============
@@ -221,13 +220,9 @@ SET(_${PROJECT_NAME}_exposed_targets
     OCCViewer OpenGLUtils Plot2d  PyConsole PyInterp  QDS qtx QxScene SalomeApp 
     SalomeIDLGUI  SalomeObject  SalomePrs SalomePyQtGUILight  SalomePyQtGUI 
     SalomePyQt  SalomePy  SalomeSession SalomeStyle SOCC  SPlot2d std SUITApp suit  
-    SUPERVGraph SVTK  ToolsGUI  ViewerTools VTKViewer  vtkTools vtkEDFOverloads SalomeGuiHelpers  
+    SVTK  ToolsGUI  ViewerTools VTKViewer  vtkTools vtkEDFOverloads SalomeGuiHelpers  
     SalomeTreeData 
 )
-
-IF(SALOME_BUILD_TESTS)
-  LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomeAppTest) 
-ENDIF()
 
 # Add all targets to the build-tree export set
 EXPORT(TARGETS ${_${PROJECT_NAME}_exposed_targets}

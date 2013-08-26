@@ -467,10 +467,6 @@ The changes will be applied on the next application session.</translation>
         <translation>Always</translation>
     </message>
     <message>
-        <source>PREF_GROUP_SUPERV</source>
-        <translation>Graph Supervisor</translation>
-    </message>
-    <message>
         <source>PREF_TAB_OBJBROWSER</source>
         <translation>Object browser</translation>
     </message>
@@ -496,10 +492,6 @@ The changes will be applied on the next application session.</translation>
     </message>
     <message>
         <source>NEW_WINDOW_4</source>
-        <translation>&amp;QxGraph 2D view</translation>
-    </message>
-    <message>
-        <source>NEW_WINDOW_5</source>
         <translation>Qx&amp;Scene 2D view</translation>
     </message>
     <message>

@@ -19,54 +19,81 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${Boost_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
 
-SET(COMMON_LIBS ${QT_LIBRARIES} suit)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUI_HEADERS   
-  QxScene_ViewWindow.h
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx suit)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   QxScene_ViewManager.h
   QxScene_ViewModel.h
-)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-
-SET(QxScene_SOURCES
-  QxScene_ViewWindow.cxx
-  QxScene_ViewManager.cxx
-  QxScene_ViewModel.cxx
+  QxScene_ViewWindow.h
 )
 
-SET(GUITS_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  QxScene.h
+  QxScene_Def.h
+)
+
+# header files / to install
+SET(QxScene_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/QxSceneViewer_images.ts
   resources/QxSceneViewer_msg_en.ts
   resources/QxSceneViewer_msg_fr.ts
   resources/QxSceneViewer_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${PYTHON_DEFINITIONS})
-
-ADD_LIBRARY(QxScene ${QxScene_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(QxScene ${COMMON_LIBS})
-INSTALL(TARGETS QxScene EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
-
-SET(COMMON_HEADERS_H 
-  QxScene_ViewWindow.h
-  QxScene_ViewManager.h
-  QxScene_ViewModel.h
-  QxScene_Def.h
-  QxScene.h
+# resource files / static
+SET(_other_RESOURCES
+  resources/qx_view_fitall.png
+  resources/qx_view_fitarea.png
+  resources/qx_view_glpan.png
+  resources/qx_view_pan.png
+  resources/qx_view_reset.png
+  resources/qx_view_zoom.png
 )
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+# --- sources ---
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  QxScene_ViewManager.cxx
+  QxScene_ViewModel.cxx
+  QxScene_ViewWindow.cxx
+)
+
+# sources / to compile
+SET(QxScene_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(QxScene ${QxScene_SOURCES})
+TARGET_LINK_LIBRARIES(QxScene ${_link_LIBRARIES})
+INSTALL(TARGETS QxScene EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+INSTALL(FILES ${QxScene_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

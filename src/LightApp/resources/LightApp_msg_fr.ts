@@ -467,10 +467,6 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Toujours</translation>
     </message>
     <message>
-        <source>PREF_GROUP_SUPERV</source>
-        <translation>Superviseur des graphes</translation>
-    </message>
-    <message>
         <source>PREF_TAB_OBJBROWSER</source>
         <translation>Arbre d&apos;étude</translation>
     </message>
@@ -496,10 +492,6 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>NEW_WINDOW_4</source>
-        <translation>Scène &amp;QxGraph</translation>
-    </message>
-    <message>
-        <source>NEW_WINDOW_5</source>
         <translation>Scène Qx&amp;Scene</translation>
     </message>
     <message>

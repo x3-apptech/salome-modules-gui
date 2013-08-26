@@ -17,22 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CPPUNIT_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
 )
 
-SET(COMMON_LIBS ${CPPUNIT_LIBRARIES} ${PLATFORM_LIBS})
-
+# additional preprocessor / compiler flags
 ADD_DEFINITIONS(${CPPUNIT_DEFINITIONS})
 
-ADD_LIBRARY(SalomeAppTest SalomeAppTest.cxx)
-TARGET_LINK_LIBRARIES(SalomeAppTest ${COMMON_LIBS})
-INSTALL(TARGETS SalomeAppTest EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS}) 
+# libraries to link to
+SET(_link_LIBRARIES ${CPPUNIT_LIBRARIES} ${PLATFORM_LIBS})
+
+# --- rules ---
 
 ADD_EXECUTABLE(TestSalomeApp TestSalomeApp.cxx)
-TARGET_LINK_LIBRARIES(TestSalomeApp SalomeAppTest ${COMMON_LIBS})
+TARGET_LINK_LIBRARIES(TestSalomeApp ${_link_LIBRARIES})
 INSTALL(TARGETS TestSalomeApp DESTINATION ${SALOME_INSTALL_BINS})  # TODO: should it be exported?
 
-INSTALL(FILES SalomeAppTest.hxx DESTINATION ${SALOME_INSTALL_HEADERS})
 SALOME_INSTALL_SCRIPTS("TestSalomeApp.py" ${SALOME_INSTALL_SCRIPT_PYTHON})

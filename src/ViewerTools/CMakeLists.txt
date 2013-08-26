@@ -19,30 +19,64 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-)
-SET(GUI_HEADERS ViewerTools_CubeAxesDlgBase.h ViewerTools_DialogBase.h ViewerTools_FontWidgetBase.h)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-SET(ViewerTools_SOURCES
-  ViewerTools_CubeAxesDlgBase.cxx
-  ViewerTools_DialogBase.cxx
-  ViewerTools_FontWidgetBase.cxx
+  ${PROJECT_SOURCE_DIR}/src/Qtx
 )
 
-SET(GUITS_SOURCES
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
+  ViewerTools_CubeAxesDlgBase.h
+  ViewerTools_DialogBase.h
+  ViewerTools_FontWidgetBase.h
+)
+
+# header files / no moc processing
+SET(_other_HEADERS ViewerTools.h)
+
+# header files / to install
+SET(ViewerTools_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/ViewerTools_msg_en.ts
   resources/ViewerTools_msg_fr.ts
   resources/ViewerTools_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+# --- sources ---
 
-ADD_LIBRARY(ViewerTools ${ViewerTools_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(ViewerTools qtx ${QT_LIBRARIES})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  ViewerTools_CubeAxesDlgBase.cxx
+  ViewerTools_DialogBase.cxx
+  ViewerTools_FontWidgetBase.cxx
+)
+
+# sources / to compile
+SET(ViewerTools_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(ViewerTools ${ViewerTools_SOURCES})
+TARGET_LINK_LIBRARIES(ViewerTools ${_link_LIBRARIES})
 INSTALL(TARGETS ViewerTools EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${ViewerTools_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

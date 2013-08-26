@@ -17,20 +17,28 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
 )
 
-SET(COMMON_LIBS ${OPENGL_LIBRARIES} ${KERNEL_SALOMELocalTrace})
+# libraries to link to
+SET(_link_LIBRARIES ${OPENGL_LIBRARIES} ${KERNEL_SALOMELocalTrace})
 
-ADD_LIBRARY(OpenGLUtils OpenGLUtils_FrameBuffer.cxx)
-TARGET_LINK_LIBRARIES(OpenGLUtils ${COMMON_LIBS})
+# --- headers ---
+
+SET(OpenGLUtils_HEADERS OpenGLUtils.h OpenGLUtils_FrameBuffer.h)
+
+# --- sources ---
+
+SET(OpenGLUtils_SOURCES OpenGLUtils_FrameBuffer.cxx)
+
+# --- rules ---
+
+ADD_LIBRARY(OpenGLUtils ${OpenGLUtils_SOURCES})
+TARGET_LINK_LIBRARIES(OpenGLUtils ${_link_LIBRARIES})
 INSTALL(TARGETS OpenGLUtils EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  OpenGLUtils.h
-  OpenGLUtils_FrameBuffer.h
-)
-
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${OpenGLUtils_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

@@ -25,16 +25,22 @@
 # variable *_ROOT_DIR).  
 #
 
-SET(plugins_PYTHON
-  salome_plugins.py
-  smesh_plugins.py
+# --- scripts ---
+
+# scripts / static
+# TODO: process UIC files via PyQt4 pyuic tool, see UsePyQt4.cmake
+SET(_plugins_SCRIPTS
+  minmax_dialog.py
+  minmax_plugin.py
   trihedron.py
   tubedialog_ui.py
   tubedialog.py
   tubebuilder.py
+  salome_plugins.py
+  smesh_plugins.py
   xalome.py
-  minmax_dialog.py
-  minmax_plugin.py
 )
 
-SALOME_INSTALL_SCRIPTS("${plugins_PYTHON}" ${SALOME_GUI_INSTALL_PLUGINS}/demo DEF_PERMS)
+# --- rules ---
+
+SALOME_INSTALL_SCRIPTS("${_plugins_SCRIPTS}" ${SALOME_GUI_INSTALL_PLUGINS}/demo DEF_PERMS)

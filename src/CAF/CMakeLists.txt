@@ -19,46 +19,72 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
+  ${QT_INCLUDES}
   ${CAS_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../STD
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/STD
 )
 
-SET(COMMON_LIBS
-  qtx 
-  suit 
-  std
-  ${QT_LIBRARIES} 
-  ${CAS_OCAF} 
-  ${CAS_OCAFVIS}
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_OCAF} ${CAS_OCAFVIS} qtx suit std)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  CAF_Application.h
+  CAF_Operation.h
+  CAF_Study.h
 )
 
-SET(GUI_HEADERS CAF_Application.h CAF_Operation.h CAF_Study.h)
-QT4_WRAP_CPP(GUI_HEADERS ${GUI_HEADERS})
-SET(caf_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  CAF.h
+  CAF_Tools.h
+)
+
+# header files / to install
+SET(caf_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/CAF_msg_en.ts
+  resources/CAF_msg_fr.ts
+  resources/CAF_msg_ja.ts
+)
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   CAF_Application.cxx
   CAF_Operation.cxx
   CAF_Study.cxx
   CAF_Tools.cxx
 )
 
-SET(GUITS_SOURCES
-  resources/CAF_msg_en.ts
-  resources/CAF_msg_fr.ts
-  resources/CAF_msg_ja.ts
-)
+# sources / to compile
+SET(caf_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})
+# --- rules ---
 
-ADD_LIBRARY(caf ${caf_SOURCES} ${GUI_HEADERS})
-TARGET_LINK_LIBRARIES(caf ${COMMON_LIBS})
+ADD_LIBRARY(caf ${caf_SOURCES})
+TARGET_LINK_LIBRARIES(caf ${QT_LIBRARIES} ${_link_LIBRARIES})
 INSTALL(TARGETS caf EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${caf_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

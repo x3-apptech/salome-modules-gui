@@ -19,32 +19,56 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
+  ${PROJECT_SOURCE_DIR}/src/Qtx
 )
 
-SET(GUI_HEADERS OB_Browser.h)
-QT4_WRAP_CPP(GUI_HEADERS ${GUI_HEADERS})
-SET(ObjBrowser_SOURCES
-  OB_Browser.cxx
-)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUITS_SOURCES
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS OB_Browser.h)
+
+# header files / no moc processing
+SET(_other_HEADERS OB.h)
+
+# header files / to install
+SET(ObjBrowser_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/OB_msg_en.ts
   resources/OB_msg_fr.ts
   resources/OB_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+# --- sources ---
 
-ADD_LIBRARY(ObjBrowser ${ObjBrowser_SOURCES} ${GUI_HEADERS})
-TARGET_LINK_LIBRARIES(ObjBrowser qtx ${QT_LIBRARIES})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES OB_Browser.cxx)
+
+# sources / to compile
+SET(ObjBrowser_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(ObjBrowser ${ObjBrowser_SOURCES})
+TARGET_LINK_LIBRARIES(ObjBrowser ${_link_LIBRARIES})
 INSTALL(TARGETS ObjBrowser EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H
-  OB.h
-  OB_Browser.h
-)
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${ObjBrowser_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

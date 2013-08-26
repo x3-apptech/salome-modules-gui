@@ -19,109 +19,151 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${QWT_INCLUDE_DIR}
   ${QT_INCLUDES}
-  ${Boost_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${QWT_INCLUDE_DIR}
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
+IF(SALOME_USE_PYCONSOLE)
+  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
+ENDIF()
 
+# additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${QWT_DEFINITIONS} ${PYTHON_DEFINITIONS})
+IF(SALOME_USE_PYCONSOLE)
+  ADD_DEFINITIONS(${PYTHON_DEFINITIONS})
+ENDIF()
 
-SET(COMMON_LIBS ${QWT_LIBRARY} ${QT_LIBRARIES} ${PYTHON_LIBRARIES} suit)
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${QWT_LIBRARY} qtx suit)
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _link_LIBRARIES ${PYTHON_LIBRARIES})
+ENDIF()
 
-SET(GUI_HEADERS   
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
+  Plot2d_Algorithm.h
   Plot2d_FitDataDlg.h
+  Plot2d_NormalizeAlgorithm.h
+  Plot2d_SetupCurveDlg.h
+  Plot2d_SetupCurveScaleDlg.h
   Plot2d_SetupViewDlg.h
+  Plot2d_ToolTip.h
   Plot2d_ViewFrame.h
   Plot2d_ViewManager.h
   Plot2d_ViewModel.h
   Plot2d_ViewWindow.h
-  Plot2d_SetupCurveDlg.h
-  Plot2d_Algorithm.h
-  Plot2d_NormalizeAlgorithm.h
-  Plot2d_SetupCurveScaleDlg.h
-  Plot2d_ToolTip.h
 )
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _moc_HEADERS
+    Plot2d_AnalyticalCurveDlg.h
+  )
+ENDIF()
 
-SET(Plot2d_SOURCES
-  Plot2d.cxx
-  Plot2d_PlotItems.cxx
-  Plot2d_Object.cxx
-  Plot2d_Curve.cxx
-  Plot2d_Histogram.cxx
-  Plot2d_FitDataDlg.cxx
-  Plot2d_Prs.cxx
-  Plot2d_SetupViewDlg.cxx
-  Plot2d_ViewFrame.cxx
-  Plot2d_ViewManager.cxx
-  Plot2d_ViewModel.cxx
-  Plot2d_ViewWindow.cxx
-  Plot2d_Algorithm.cxx
-  Plot2d_NormalizeAlgorithm.cxx
-  Plot2d_SetupCurveDlg.cxx
-  Plot2d_SetupCurveScaleDlg.cxx
-  Plot2d_ToolTip.cxx
+# header files / no moc processing
+SET(_other_HEADERS
+  Plot2d.h
+  Plot2d_Curve.h
+  Plot2d_Histogram.h
+  Plot2d_Object.h
+  Plot2d_PlotItems.h
+  Plot2d_Prs.h
 )
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _other_HEADERS
+    Plot2d_AnalyticalCurve.h
+    Plot2d_AnalyticalParser.h
+  )
+ENDIF()
 
-SET(GUITS_SOURCES
+# header files / to install
+SET(Plot2d_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/Plot2d_images.ts
   resources/Plot2d_msg_en.ts
   resources/Plot2d_msg_fr.ts
   resources/Plot2d_msg_ja.ts
 )
 
-# header files 
-SET(COMMON_HEADERS_H 
-  Plot2d.h
-  Plot2d_PlotItems.h
-  Plot2d_Object.h
-  Plot2d_Curve.h
-  Plot2d_Histogram.h
-  Plot2d_FitDataDlg.h
-  Plot2d_Prs.h
-  Plot2d_SetupViewDlg.h
-  Plot2d_ViewFrame.h
-  Plot2d_ViewManager.h
-  Plot2d_ViewModel.h
-  Plot2d_ViewWindow.h
-  Plot2d_Algorithm.h
-  Plot2d_NormalizeAlgorithm.h
-  Plot2d_SetupCurveDlg.h
-  Plot2d_ToolTip.h
-  Plot2d_SetupCurveScaleDlg.h
+# resource files / static
+SET(_other_RESOURCES
+  resources/plot2d_analytical_curve.png
+  resources/plot2d_camera_dump.png
+  resources/plot2d_clone.png
+  resources/plot2d_fitall.png
+  resources/plot2d_fitarea.png
+  resources/plot2d_glpan.png
+  resources/plot2d_legend.png
+  resources/plot2d_linear.png
+  resources/plot2d_linear_y.png
+  resources/plot2d_lines.png
+  resources/plot2d_lmax_normalization.png
+  resources/plot2d_lmin_normalization.png
+  resources/plot2d_log.png
+  resources/plot2d_log_y.png
+  resources/plot2d_pan.png
+  resources/plot2d_points.png
+  resources/plot2d_print.png
+  resources/plot2d_rmax_normalization.png
+  resources/plot2d_rmin_normalization.png
+  resources/plot2d_settings.png
+  resources/plot2d_splines.png
+  resources/plot2d_zoom.png
 )
 
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  Plot2d.cxx
+  Plot2d_Algorithm.cxx
+  Plot2d_Curve.cxx
+  Plot2d_FitDataDlg.cxx
+  Plot2d_Histogram.cxx
+  Plot2d_NormalizeAlgorithm.cxx
+  Plot2d_Object.cxx
+  Plot2d_PlotItems.cxx
+  Plot2d_Prs.cxx
+  Plot2d_SetupCurveDlg.cxx
+  Plot2d_SetupCurveScaleDlg.cxx
+  Plot2d_SetupViewDlg.cxx
+  Plot2d_ToolTip.cxx
+  Plot2d_ViewFrame.cxx
+  Plot2d_ViewManager.cxx
+  Plot2d_ViewModel.cxx
+  Plot2d_ViewWindow.cxx
+)
 IF(SALOME_USE_PYCONSOLE)
-  SET(COMMON_HEADERS_H
-      ${COMMON_HEADERS_H}
-      Plot2d_AnalyticalCurve.h
-      Plot2d_AnalyticalCurveDlg.h
-      Plot2d_AnalyticalParser.h
+  LIST(APPEND _other_SOURCES
+    Plot2d_AnalyticalCurve.cxx
+    Plot2d_AnalyticalCurveDlg.cxx
+    Plot2d_AnalyticalParser.cxx
   )
-  SET(Plot2d_SOURCES
-      ${Plot2d_SOURCES}
-      Plot2d_AnalyticalCurve.cxx
-      Plot2d_AnalyticalCurveDlg.cxx
-      Plot2d_AnalyticalParser.cxx
-  )
-  SET(GUI_HEADERS
-      ${GUI_HEADERS}
-      Plot2d_AnalyticalCurveDlg.h
-  )
-ENDIF(SALOME_USE_PYCONSOLE)
+ENDIF()
 
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
+# sources / to compile
+SET(Plot2d_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_LIBRARY(Plot2d ${Plot2d_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(Plot2d ${COMMON_LIBS})
+# --- rules ---
+
+ADD_LIBRARY(Plot2d ${Plot2d_SOURCES})
+TARGET_LINK_LIBRARIES(Plot2d ${_link_LIBRARIES})
 INSTALL(TARGETS Plot2d EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${Plot2d_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

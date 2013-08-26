@@ -19,54 +19,91 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
 
-SET(COMMON_LIBS ${QT_LIBRARIES} suit qtx)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx suit)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   STD_Application.h
   STD_MDIDesktop.h
   STD_SDIDesktop.h
   STD_TabDesktop.h
 )
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
-SET(std_SOURCES
-  STD_Application.cxx
-  STD_MDIDesktop.cxx
-  STD_SDIDesktop.cxx
-  STD_TabDesktop.cxx
-)
+# header files / no moc processing
+SET(_other_HEADERS STD.h)
 
-SET(GUITS_SOURCES
+# header files / to install
+SET(std_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/STD_images.ts
   resources/STD_msg_en.ts
   resources/STD_msg_fr.ts
   resources/STD_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-ADD_LIBRARY(std ${std_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(std ${COMMON_LIBS})
-INSTALL(TARGETS std EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
-
-SET(COMMON_HEADERS_H 
-  STD.h
-  STD_Application.h
-  STD_MDIDesktop.h
-  STD_SDIDesktop.h
-  STD_TabDesktop.h
+# resource files / static
+SET(_other_RESOURCES
+  resources/cascade.png
+  resources/close.png
+  resources/copy.png
+  resources/cut.png
+  resources/delete.png
+  resources/help.png
+  resources/htile.png
+  resources/new.png
+  resources/open.png
+  resources/paste.png
+  resources/print.png
+  resources/redo.png
+  resources/reset.png
+  resources/save.png
+  resources/std.ini
+  resources/undo.png
+  resources/vtile.png
 )
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+# --- sources ---
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-SET(GUIPNG_DATA ${GUIPNG_DATA} ${CMAKE_CURRENT_SOURCE_DIR}/resources/std.ini)
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  STD_Application.cxx
+  STD_MDIDesktop.cxx
+  STD_SDIDesktop.cxx
+  STD_TabDesktop.cxx
+)
+
+# sources / to compile
+SET(std_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(std ${std_SOURCES})
+TARGET_LINK_LIBRARIES(std ${_link_LIBRARIES})
+INSTALL(TARGETS std EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+INSTALL(FILES ${std_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

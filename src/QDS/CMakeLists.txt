@@ -19,67 +19,89 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
-  ${PTHREAD_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../DDS
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/DDS
 )
 
-SET(COMMON_LIBS ${QT_LIBRARIES} ${CAS_KERNEL} DDS qtx)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_KERNEL} qtx DDS)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
   QDS_CheckBox.h
   QDS_ComboBox.h
   QDS_Datum.h
   QDS_LineEdit.h
+  QDS_RadioBox.h
   QDS_SpinBox.h
   QDS_SpinBoxDbl.h
   QDS_TextEdit.h
-  QDS_RadioBox.h
-)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-
-SET(QDS_SOURCES
-  QDS.cxx
-  QDS_CheckBox.cxx
-  QDS_ComboBox.cxx
-  QDS_Datum.cxx
-  QDS_LineEdit.cxx
-  QDS_SpinBox.cxx
-  QDS_SpinBoxDbl.cxx
-  QDS_TextEdit.cxx
-  QDS_Validator.cxx
-  QDS_RadioBox.cxx
 )
 
-SET(GUITS_SOURCES
+# obsolete files: not migrated to Qt4
+# _moc_HEADERS << QDS_Table.h
+# TODO: migrate or remove?
+
+# header files / no moc processing
+SET(_other_HEADERS
+  QDS.h
+  QDS_Validator.h
+)
+
+# header files / to install
+SET(QDS_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/QDS_msg_en.ts
   resources/QDS_msg_fr.ts
   resources/QDS_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
+# --- sources ---
 
-ADD_LIBRARY(QDS ${QDS_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(QDS ${COMMON_LIBS})
-INSTALL(TARGETS QDS EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 
-SET(COMMON_HEADERS_H 
-  QDS.h
-  QDS_CheckBox.h
-  QDS_ComboBox.h
-  QDS_Datum.h
-  QDS_LineEdit.h
-  QDS_SpinBox.h
-  QDS_SpinBoxDbl.h
-  QDS_TextEdit.h
-  QDS_Validator.h
-  QDS_RadioBox.h
+# sources / static
+SET(_other_SOURCES
+  QDS.cxx
+  QDS_CheckBox.cxx
+  QDS_ComboBox.cxx
+  QDS_Datum.cxx
+  QDS_LineEdit.cxx
+  QDS_RadioBox.cxx
+  QDS_SpinBox.cxx
+  QDS_SpinBoxDbl.cxx
+  QDS_TextEdit.cxx
+  QDS_Validator.cxx
 )
 
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+# obsolete files: not migrated to Qt4
+# _other_SOURCES << QDS_Table.cxx
+# TODO: migrate or remove?
 
+# sources / to compile
+SET(QDS_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(QDS ${QDS_SOURCES})
+TARGET_LINK_LIBRARIES(QDS ${_link_LIBRARIES})
+INSTALL(TARGETS QDS EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+INSTALL(FILES ${QDS_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

@@ -17,17 +17,26 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(Event_SOURCES
-  ${QT_INCLUDES}
-  SALOME_Event.cxx
-  SALOME_EventFilter.cxx
-)
+# --- options ---
 
+# additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES})
+
+# --- headers ---
+
+SET(Event_HEADERS Event.h SALOME_Event.h SALOME_EventFilter.h)
+
+# --- sources ---
+
+SET(Event_SOURCES SALOME_Event.cxx SALOME_EventFilter.cxx)
+
+# --- rules ---
+
 ADD_LIBRARY(Event ${Event_SOURCES})
-TARGET_LINK_LIBRARIES(Event ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(Event ${_link_LIBRARIES})
 INSTALL(TARGETS Event EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H}  DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${Event_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

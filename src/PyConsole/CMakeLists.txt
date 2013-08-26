@@ -19,58 +19,79 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${PTHREAD_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../PyInterp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Event
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/Event
+  ${PROJECT_SOURCE_DIR}/src/PyInterp
 )
 
-SET(COMMON_LIBS ${PYTHON_LIBRARIES} ${QT_LIBRARIES} ${SALOMELocalTrace} qtx suit PyInterp Event)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES} qtx suit PyInterp Event)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  PyConsole_Console.h
   PyConsole_Editor.h
   PyConsole_EnhEditor.h
-  PyConsole_Console.h
-)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
-
-SET(PyConsole_SOURCES
-  PyConsole_Console.cxx
-  PyConsole_Editor.cxx
-  PyConsole_EnhEditor.cxx
-  PyConsole_Interp.cxx
-  PyConsole_EnhInterp.cxx
-  PyConsole_Event.cxx
-  PyConsole_Request.cxx
 )
 
-SET(GUITS_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  PyConsole.h
+  PyConsole_EnhInterp.h
+  PyConsole_Event.h
+  PyConsole_Interp.h
+  PyConsole_Request.h
+)
+
+# header files / to install
+SET(PyConsole_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/PyConsole_msg_en.ts
   resources/PyConsole_msg_fr.ts
   resources/PyConsole_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
+# --- sources ---
 
-ADD_LIBRARY(PyConsole ${PyConsole_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(PyConsole ${COMMON_LIBS})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  PyConsole_Console.cxx
+  PyConsole_Editor.cxx
+  PyConsole_EnhEditor.cxx
+  PyConsole_EnhInterp.cxx
+  PyConsole_Event.cxx
+  PyConsole_Interp.cxx
+  PyConsole_Request.cxx
+)
+
+# sources / to compile
+SET(PyConsole_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(PyConsole ${PyConsole_SOURCES})
+TARGET_LINK_LIBRARIES(PyConsole ${_link_LIBRARIES})
 INSTALL(TARGETS PyConsole EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  PyConsole.h
-  PyConsole_Console.h
-  PyConsole_Editor.h
-  PyConsole_EnhEditor.h
-  PyConsole_Interp.h
-  PyConsole_EnhInterp.h
-  PyConsole_Event.h
-  PyConsole_Request.h
-)
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${PyConsole_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 

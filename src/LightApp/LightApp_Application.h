@@ -84,8 +84,8 @@ public:
   enum { RenameId = CAM_Application::UserID,
          CloseId, CloseAllId, GroupAllId,
          PreferencesId, MRUId, ModulesListId,
-         NewGLViewId, NewPlot2dId, NewOCCViewId, NewVTKViewId, NewQxGraphViewId,
-         NewQxSceneViewId = NewQxGraphViewId, StyleId, FullScreenId,
+         NewGLViewId, NewPlot2dId, NewOCCViewId, NewVTKViewId,
+         NewQxSceneViewId, StyleId, FullScreenId,
          UserID };
 
 protected:

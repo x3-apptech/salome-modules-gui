@@ -19,53 +19,102 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../ObjBrowser
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/ObjBrowser
 )
 
-SET(COMMON_LIBS
-  qtx
-  ObjBrowser
-  ${QT_LIBRARIES}
-  ${PLATFORM_LIBS}
-)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 IF(ENABLE_TESTRECORDER)
   ADD_DEFINITIONS("-DENABLE_TESTRECORDER ${TESTRECORDER_DEFINITIONS}")
-  SET(COMMON_LIBS ${COMMON_LIBS} ${TESTRECORDER_LIBS})
-ENDIF(ENABLE_TESTRECORDER)
+ENDIF()
 
-SET(GUI_HEADERS 
+# libraries to link to
+SET(_link_LIBRARIES ${PLATFORM_LIBS} ${QT_LIBRARIES} qtx ObjBrowser)
+IF(ENABLE_TESTRECORDER)
+  LIST(APPEND _link_LIBRARIES ${TESTRECORDER_LIBS})
+ENDIF()
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   SUIT_Accel.h  
   SUIT_ActionOperation.h 
   SUIT_Application.h 
   SUIT_DataBrowser.h 
   SUIT_DataObject.h 
   SUIT_Desktop.h 
-  SUIT_LicenseDlg.h
   SUIT_FileDlg.h 
+  SUIT_LicenseDlg.h
+  SUIT_MessageBox.h
   SUIT_Operation.h 
   SUIT_PopupClient.h 
   SUIT_PreferenceMgr.h 
   SUIT_SelectionMgr.h 
-  SUIT_Selector.h 
   SUIT_Session.h 
+  SUIT_ShortcutMgr.h
   SUIT_Study.h
   SUIT_TreeModel.h 
   SUIT_ViewManager.h 
   SUIT_ViewModel.h 
   SUIT_ViewWindow.h 
-  SUIT_ShortcutMgr.h
-  SUIT_CameraProperties.h
 )
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
-SET(suit_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  SUIT.h
+  SUIT_CameraProperties.h
+  SUIT_DataObjectIterator.h
+  SUIT_DataObjectKey.h
+  SUIT_DataOwner.h
+  SUIT_ExceptionHandler.h
+  SUIT_FileValidator.h
+  SUIT_OverrideCursor.h
+  SUIT_ResourceMgr.h
+  SUIT_SelectionFilter.h
+  SUIT_Selector.h
+  SUIT_SmartPtr.h
+  SUIT_Tools.h
+  SUIT_TreeSync.h
+)
+
+# header files / to install
+SET(suit_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/SUIT_msg_en.ts
+  resources/SUIT_msg_fr.ts
+  resources/SUIT_msg_ja.ts
+  resources/SUIT_images.ts
+)
+
+# resource files / static
+SET(_other_RESOURCES
+  resources/icon_visibility_on.png
+  resources/icon_visibility_off.png
+  resources/view_sync.png
+)
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   SUIT_Accel.cxx
   SUIT_ActionOperation.cxx
   SUIT_Application.cxx
+  SUIT_CameraProperties.cxx
   SUIT_DataBrowser.cxx
   SUIT_DataObject.cxx
   SUIT_DataObjectIterator.cxx
@@ -74,8 +123,8 @@ SET(suit_SOURCES
   SUIT_Desktop.cxx
   SUIT_ExceptionHandler.cxx
   SUIT_FileDlg.cxx
-  SUIT_LicenseDlg.cxx
   SUIT_FileValidator.cxx
+  SUIT_LicenseDlg.cxx
   SUIT_MessageBox.cxx
   SUIT_Operation.cxx
   SUIT_OverrideCursor.cxx
@@ -86,30 +135,26 @@ SET(suit_SOURCES
   SUIT_SelectionMgr.cxx
   SUIT_Selector.cxx
   SUIT_Session.cxx
+  SUIT_ShortcutMgr.cxx
   SUIT_Study.cxx
   SUIT_Tools.cxx
   SUIT_TreeModel.cxx
   SUIT_ViewManager.cxx
   SUIT_ViewModel.cxx
   SUIT_ViewWindow.cxx
-  SUIT_ShortcutMgr.cxx
-  SUIT_CameraProperties.cxx
-)
-SET(GUITS_SOURCES
-  resources/SUIT_msg_en.ts
-  resources/SUIT_msg_fr.ts
-  resources/SUIT_msg_ja.ts
-  resources/SUIT_images.ts
 )
 
-ADD_LIBRARY(suit ${suit_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(suit ${COMMON_LIBS})
+# sources / to compile
+SET(suit_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(suit ${suit_SOURCES})
+TARGET_LINK_LIBRARIES(suit ${_link_LIBRARIES})
 INSTALL(TARGETS suit EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${suit_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
 

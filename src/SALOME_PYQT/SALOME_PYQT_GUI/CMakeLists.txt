@@ -3,7 +3,7 @@
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
-# version 2.1 of the License.
+
 #
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,61 +19,73 @@
 
 INCLUDE(${VTK_USE_FILE})
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${PTHREAD_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
   ${SIP_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${OMNIORB_INCLUDE_DIR}
   ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../PyInterp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../SalomeApp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../LightApp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SALOME_PYQT_GUILight
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../Plot2d
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../OCCViewer
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../SalomeApp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../CAM
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../STD
+  ${PROJECT_SOURCE_DIR}/src/CAM
+  ${PROJECT_SOURCE_DIR}/src/LightApp
+  ${PROJECT_SOURCE_DIR}/src/PyInterp
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SALOME_PYQT/SALOME_PYQT_GUILight
+  ${PROJECT_SOURCE_DIR}/src/STD
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/SalomeApp
 )
 
-SET(COMMON_LIBS 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(
+  "-DCALL_OLD_METHODS"
+  ${QT_DEFINITIONS}
+  ${CAS_DEFINITIONS} 
+  ${PYTHON_DEFINITIONS}
+  ${BOOST_DEFINITIONS}
+  ${OMNIORB_DEFINITIONS}
+)
+
+# libraries to link to
+SET(_link_LIBRARIES
   ${PYTHON_LIBRARIES}
-  ${PYQT_LIBRARIES}
   ${VTK_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${PLATFORM_LIBS}
   ${OMNIORB_LIBRARIES}
-  PyInterp
-  SalomeApp
-  OCCViewer
-  Plot2d
-  SalomePyQtGUILight
+  SalomePyQtGUILight SalomeApp
 )
 
-SET(GUI_HEADERS SALOME_PYQT_Module.h)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
+# --- headers ---
 
-IF(WINDOWS)
- ADD_DEFINITIONS("-DCALL_OLD_METHODS ${QT_DEFINITIONS} ${PYTHON_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${OMNIORB_DEFINITIONS}")
-ELSE(WINDOWS)
- ADD_DEFINITIONS("-DCALL_OLD_METHODS -DHAVE_CONFIG_H ${QT_DEFINITIONS} ${PYTHON_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS} ${OMNIORB_DEFINITIONS}")
-ENDIF(WINDOWS)
+# header files / to be processed by moc
+SET(_moc_HEADERS SALOME_PYQT_Module.h)
 
+# header files / no moc processing
+SET(_other_HEADERS SALOME_PYQT_GUI.h)
 
-ADD_LIBRARY(SalomePyQtGUI SALOME_PYQT_Module.cxx ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(SalomePyQtGUI ${COMMON_LIBS})
+# header files / to install
+SET(SalomePyQtGUI_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES SALOME_PYQT_Module.cxx)
+
+# sources / to compile
+SET(SalomePyQtGUI_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(SalomePyQtGUI ${SalomePyQtGUI_SOURCES})
+TARGET_LINK_LIBRARIES(SalomePyQtGUI ${_link_LIBRARIES})
 INSTALL(TARGETS SalomePyQtGUI DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  SALOME_PYQT_GUI.h
-  SALOME_PYQT_Module.h
-)
-
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${SalomePyQtGUI_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

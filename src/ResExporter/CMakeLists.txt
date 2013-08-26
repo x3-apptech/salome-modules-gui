@@ -17,19 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
 
-SET(COMMON_LIBS qtx suit ${QT_LIBRARIES})
-
+# additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-ADD_EXECUTABLE(ResourceExporter ResourceExporter.cxx)
-TARGET_LINK_LIBRARIES(ResourceExporter SUITApp ${COMMON_LIBS})
-INSTALL(TARGETS ResourceExporter EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_BINS})
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx suit)
 
+# --- rules ---
+
+ADD_EXECUTABLE(ResourceExporter ResourceExporter.cxx)
+TARGET_LINK_LIBRARIES(ResourceExporter SUITApp ${_link_LIBRARIES})
+INSTALL(TARGETS ResourceExporter EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_BINS})

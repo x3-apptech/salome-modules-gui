@@ -19,25 +19,95 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
-  ${PTHREAD_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
 
-SET(COMMON_LIBS
-  suit 
-  ${QT_LIBRARIES} 
-  ${CAS_KERNEL} 
-  ${OPENGL_LIBRARIES}
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_KERNEL} ${OPENGL_LIBRARIES} qtx suit)
+IF(NOT WINDOWS)
+  LIST(APPEND _link_LIBRARIES Xmu)
+ENDIF()
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  GLViewer_Selector.h
+  GLViewer_Selector2d.h
+  GLViewer_ToolTip.h
+  GLViewer_ViewFrame.h
+  GLViewer_ViewManager.h
+  GLViewer_ViewPort.h
+  GLViewer_ViewPort2d.h
+  GLViewer_Viewer.h
+  GLViewer_Viewer2d.h
+  GLViewer_Widget.h
 )
 
-SET(GUI_HEADERS GLViewer_Selector.h GLViewer_Selector2d.h GLViewer_ToolTip.h GLViewer_ViewFrame.h GLViewer_ViewManager.h GLViewer_ViewPort.h GLViewer_ViewPort2d.h GLViewer_Viewer.h GLViewer_Viewer2d.h GLViewer_Widget.h)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
+# header files / no moc processing
+SET(_other_HEADERS
+  GLViewer.h
+  GLViewer_AspectLine.h
+  GLViewer_BaseDrawers.h
+  GLViewer_BaseObjects.h
+  GLViewer_Compass.h
+  GLViewer_Context.h
+  GLViewer_CoordSystem.h
+  GLViewer_Defs.h
+  GLViewer_Drawer.h
+  GLViewer_Geom.h
+  GLViewer_Grid.h
+  GLViewer_Group.h
+  GLViewer_MimeData.h
+  GLViewer_Object.h
+  GLViewer_Text.h
+  GLViewer_Tools.h
+)
 
-SET(GLViewer_SOURCES
+# header files / to install
+SET(GLViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/GLViewer_images.ts
+  resources/GLViewer_msg_en.ts
+  resources/GLViewer_msg_fr.ts
+  resources/GLViewer_msg_ja.ts
+)
+
+# resource files / static
+SET(_other_RESOURCES
+  resources/gl_cursor_rotate.png
+  resources/gl_cursor_sketch.png
+  resources/gl_cursor_zoom.png
+  resources/gl_view_dump.png
+  resources/gl_view_fitall.png
+  resources/gl_view_fitarea.png
+  resources/gl_view_fitselect.png
+  resources/gl_view_glpan.png
+  resources/gl_view_pan.png
+  resources/gl_view_reset.png
+  resources/gl_view_zoom.png
+)
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   GLViewer_AspectLine.cxx
   GLViewer_BaseDrawers.cxx
   GLViewer_BaseObjects.cxx
@@ -53,8 +123,8 @@ SET(GLViewer_SOURCES
   GLViewer_Selector.cxx
   GLViewer_Selector2d.cxx
   GLViewer_Text.cxx
-  GLViewer_Tools.cxx
   GLViewer_ToolTip.cxx
+  GLViewer_Tools.cxx
   GLViewer_ViewFrame.cxx
   GLViewer_ViewManager.cxx
   GLViewer_ViewPort.cxx
@@ -64,22 +134,16 @@ SET(GLViewer_SOURCES
   GLViewer_Widget.cxx
 )
 
-SET(GUITS_SOURCES
-  resources/GLViewer_images.ts
-  resources/GLViewer_msg_en.ts
-  resources/GLViewer_msg_fr.ts
-  resources/GLViewer_msg_ja.ts
-)
+# sources / to compile
+SET(GLViewer_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+# --- rules ---
 
-ADD_LIBRARY(GLViewer ${GLViewer_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(GLViewer ${COMMON_LIBS})
+ADD_LIBRARY(GLViewer ${GLViewer_SOURCES})
+TARGET_LINK_LIBRARIES(GLViewer ${_link_LIBRARIES})
 INSTALL(TARGETS GLViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${GLViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

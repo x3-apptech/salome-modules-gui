@@ -475,10 +475,6 @@
       <translation>常に</translation>
     </message>
     <message>
-      <source>PREF_GROUP_SUPERV</source>
-      <translation>グラフのスーパーバイザー</translation>
-    </message>
-    <message>
       <source>PREF_TAB_OBJBROWSER</source>
       <translation>オブジェクト ブラウザー</translation>
     </message>
@@ -504,10 +500,6 @@
     </message>
     <message>
       <source>NEW_WINDOW_4</source>
-      <translation>&amp; QxGraph 2D ビュー</translation>
-    </message>
-    <message>
-      <source>NEW_WINDOW_5</source>
       <translation>Qx &amp; シーン 2 D ビュー</translation>
     </message>
     <message>

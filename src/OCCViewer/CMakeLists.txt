@@ -22,105 +22,149 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
   ${OGL_INCLUDE_DIRS}
   ${QT_INCLUDES}
-  ${PTHREAD_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
-  ${CMAKE_CURRENT_SOURCE_DIR}/../ViewerTools
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../OpenGLUtils
-  ${CMAKE_CURRENT_SOURCE_DIR}/../CASCatch
+  ${PROJECT_SOURCE_DIR}/src/CASCatch
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/ViewerTools
 )
 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 
-
-SET(COMMON_LIBS
-  qtx
-  suit
-  ViewerTools
-  OpenGLUtils
-  ${OPENGL_LIBRARIES}
-  ${QT_LIBRARIES}
-  ${CAS_KERNEL}
-  ${CAS_VIEWER}
+# libraries to link to
+SET(_link_LIBRARIES
+  ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER}
+  CASCatch qtx suit OpenGLUtils ViewerTools
 )
 
-SET(GUI_HEADERS 
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   OCCViewer_AISSelector.h
-  OCCViewer_ViewModel.h
-  OCCViewer_ViewPort3d.h
-  OCCViewer_ViewPort.h
-  OCCViewer_ViewSketcher.h
-  OCCViewer_ViewWindow.h
-  OCCViewer_ViewManager.h
-  OCCViewer_CreateRestoreViewDlg.h
-  OCCViewer_SetRotationPointDlg.h
-  OCCViewer_ClippingDlg.h
   OCCViewer_AxialScaleDlg.h
-  OCCViewer_FontWidget.h
+  OCCViewer_ClippingDlg.h
+  OCCViewer_CreateRestoreViewDlg.h
   OCCViewer_CubeAxesDlg.h
+  OCCViewer_FontWidget.h
+  OCCViewer_SetRotationPointDlg.h
   OCCViewer_ToolTip.h
   OCCViewer_ViewFrame.h
-)
-QT4_WRAP_CPP(GUI_HEADERS ${GUI_HEADERS})
-
-SET(OCCViewer_SOURCES
-  OCCViewer_AISSelector.cxx
-  OCCViewer_ViewManager.cxx
-  OCCViewer_ViewModel.cxx
-  OCCViewer_ViewPort3d.cxx
-  OCCViewer_ViewPort.cxx
-  OCCViewer_ViewSketcher.cxx
-  OCCViewer_ViewWindow.cxx
-  OCCViewer_VService.cxx
-  OCCViewer_CreateRestoreViewDlg.cxx
-  OCCViewer_SetRotationPointDlg.cxx
-  OCCViewer_ClippingDlg.cxx
-  OCCViewer_AxialScaleDlg.cxx
-  OCCViewer_Trihedron.cxx
-  OCCViewer_FontWidget.cxx
-  OCCViewer_CubeAxesDlg.cxx
-  OCCViewer_ToolTip.cxx
-  OCCViewer_ViewFrame.cxx
+  OCCViewer_ViewManager.h
+  OCCViewer_ViewModel.h
+  OCCViewer_ViewPort.h
+  OCCViewer_ViewPort3d.h
+  OCCViewer_ViewSketcher.h
+  OCCViewer_ViewWindow.h
 )
 
-SET(GUITS_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  OCCViewer.h
+  OCCViewer_Trihedron.h 
+  OCCViewer_VService.h
+)
+
+# header files / no moc processing / internal
+# no processing currently: TODO: check for MSVS project
+SET(_internal_HEADERS
+  OCCViewer_VService.h
+)
+
+# header files / to install
+SET(OCCViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/OCCViewer_images.ts
   resources/OCCViewer_msg_en.ts
   resources/OCCViewer_msg_fr.ts
   resources/OCCViewer_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
-
-ADD_LIBRARY(OCCViewer ${OCCViewer_SOURCES} ${GUI_HEADERS})
-TARGET_LINK_LIBRARIES(OCCViewer ${COMMON_LIBS})
-INSTALL(TARGETS OCCViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
-SET(COMMON_HEADERS_H
-  OCCViewer_AISSelector.h
-  OCCViewer_ViewManager.h
-  OCCViewer_ViewModel.h
-  OCCViewer_ViewPort3d.h
-  OCCViewer_ViewPort.h
-  OCCViewer_ViewSketcher.h
-  OCCViewer_ViewWindow.h
-  OCCViewer_VService.h
-  OCCViewer_CreateRestoreViewDlg.h
-  OCCViewer.h
-  OCCViewer_ClippingDlg.h	
-  OCCViewer_AxialScaleDlg.h
-  OCCViewer_SetRotationPointDlg.h
-  OCCViewer_Trihedron.h 
-  OCCViewer_FontWidget.h
-  OCCViewer_CubeAxesDlg.h
-  OCCViewer_ToolTip.h
-  OCCViewer_ViewFrame.h
+# resource files / static
+SET(_other_RESOURCES
+  resources/occ_view_ambient.png
+  resources/occ_view_anticlockwise.png
+  resources/occ_view_back.png
+  resources/occ_view_bottom.png
+  resources/occ_view_camera_dump.png
+  resources/occ_view_clipping.png
+  resources/occ_view_clipping_pressed.png
+  resources/occ_view_clockwise.png
+  resources/occ_view_clone.png
+  resources/occ_view_fitall.png
+  resources/occ_view_fitarea.png
+  resources/occ_view_front.png
+  resources/occ_view_glpan.png
+  resources/occ_view_graduated_axes.png
+  resources/occ_view_left.png
+  resources/occ_view_maximized.png
+  resources/occ_view_minimized.png
+  resources/occ_view_pan.png
+  resources/occ_view_preselection.png
+  resources/occ_view_presets.png
+  resources/occ_view_reset.png
+  resources/occ_view_right.png
+  resources/occ_view_rotate.png
+  resources/occ_view_rotation_point.png
+  resources/occ_view_scaling.png
+  resources/occ_view_selection.png
+  resources/occ_view_shoot.png
+  resources/occ_view_style_switch.png
+  resources/occ_view_top.png
+  resources/occ_view_triedre.png
+  resources/occ_view_zoom.png
+  resources/occ_view_zooming_style_switch.png
 )
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
-FILE(GLOB GUIPNG_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.png")
-INSTALL(FILES ${GUIPNG_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
+  OCCViewer_AISSelector.cxx
+  OCCViewer_AxialScaleDlg.cxx
+  OCCViewer_ClippingDlg.cxx
+  OCCViewer_CreateRestoreViewDlg.cxx
+  OCCViewer_CubeAxesDlg.cxx
+  OCCViewer_FontWidget.cxx
+  OCCViewer_SetRotationPointDlg.cxx
+  OCCViewer_ToolTip.cxx
+  OCCViewer_Trihedron.cxx
+  OCCViewer_VService.cxx
+  OCCViewer_ViewFrame.cxx
+  OCCViewer_ViewManager.cxx
+  OCCViewer_ViewModel.cxx
+  OCCViewer_ViewPort.cxx
+  OCCViewer_ViewPort3d.cxx
+  OCCViewer_ViewSketcher.cxx
+  OCCViewer_ViewWindow.cxx
+)
+
+# sources / to compile
+SET(OCCViewer_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(OCCViewer ${OCCViewer_SOURCES})
+TARGET_LINK_LIBRARIES(OCCViewer ${_link_LIBRARIES})
+INSTALL(TARGETS OCCViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+INSTALL(FILES ${OCCViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

@@ -73,8 +73,6 @@
     <parameter name="CAM"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LightApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SVTK"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SUPERVGraph"  value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="QxGraph"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="ToolsGUI"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LogWindow"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
   </section>
@@ -187,14 +185,8 @@
     <parameter name="VerNormRMinMode" value="false"/>
     <parameter name="VerNormRMaxMode" value="false"/>
   </section>
-  <section name="QxGraph" >
-    <!-- QxGraph viewer preferences -->
-    <parameter name="Background" value="144, 208, 211" />
-    <parameter name="Title"      value="63, 213, 255"  />
-    <parameter name="NodeBody"   value="255, 249, 147" />
-  </section>
   <section name="QxSceneViewer" >
-    <!-- QxGraph viewer preferences -->
+    <!-- QxScene viewer preferences -->
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />
     <parameter name="NodeBody"   value="255, 249, 147" />

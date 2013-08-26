@@ -19,36 +19,59 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${PYTHON_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Event
+  ${PROJECT_SOURCE_DIR}/src/Event
 )
 
-SET(COMMON_LIBS ${PYTHON_LIBRARIES} ${QT_LIBRARIES} Event)
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
 
-SET(GUI_HEADERS PyInterp_Watcher.h)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES} Event)
 
-SET(PyInterp_SOURCES
-  PyInterp_Interp.cxx
+# --- headers ---
+
+# header files / to be processed by moc / internal
+# TODO: check for MSVS project
+SET(_moc_internal_HEADERS PyInterp_Watcher.h)
+
+# header files / no moc processing
+SET(_other_HEADERS
+  PyInterp.h
+  PyInterp_Dispatcher.h
+  PyInterp_Event.h
+  PyInterp_Interp.h
+  PyInterp_Request.h
+)
+
+# header files / to install
+SET(PyInterp_HEADERS ${_other_HEADERS})
+
+# --- sources ---
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_internal_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   PyInterp_Dispatcher.cxx
   PyInterp_Event.cxx
+  PyInterp_Interp.cxx
   PyInterp_Request.cxx
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
+# sources / to compile
+SET(PyInterp_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
-ADD_LIBRARY(PyInterp ${PyInterp_SOURCES} ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(PyInterp ${COMMON_LIBS})
+# --- rules ---
+
+ADD_LIBRARY(PyInterp ${PyInterp_SOURCES})
+TARGET_LINK_LIBRARIES(PyInterp ${_link_LIBRARIES})
 INSTALL(TARGETS PyInterp EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H 
-  PyInterp.h
-  PyInterp_Interp.h
-  PyInterp_Dispatcher.h
-  PyInterp_Event.h
-  PyInterp_Request.h
-)
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${PyInterp_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

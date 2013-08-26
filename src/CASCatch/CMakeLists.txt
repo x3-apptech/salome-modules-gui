@@ -17,23 +17,43 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
   ${CAS_INCLUDE_DIRS}
 )
 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${CAS_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${CAS_KERNEL})
+
+# --- headers ---
+
+# header files / to install
+SET(CASCatch_HEADERS
+  CASCatch.hxx
+  CASCatch_CatchSignals.hxx
+  CASCatch_ErrorHandler.hxx
+  CASCatch_Failure.hxx
+)
+
+# --- sources ---
+
+# sources / static
 SET(CASCatch_SOURCES
   CASCatch_CatchSignals.cxx
   CASCatch_ErrorHandler.cxx
   CASCatch_Failure.cxx
 )
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+# --- rules ---
 
 ADD_LIBRARY(CASCatch ${CASCatch_SOURCES})
-TARGET_LINK_LIBRARIES(CASCatch ${CAS_KERNEL})
+TARGET_LINK_LIBRARIES(CASCatch ${_link_LIBRARIES})
 INSTALL(TARGETS CASCatch EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
-INSTALL(FILES ${COMMON_HEADERS_HXX} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${CASCatch_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
 

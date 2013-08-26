@@ -31,8 +31,10 @@ SET(SalomeVTK_FIND_COMPONENTS
   vtkRenderingFreeTypeOpenGL
   vtkRenderingLOD 
   vtkRenderingAnnotation 
-  vtkFiltersParallel 
-  vtkIOExport)
+  vtkFiltersParallel
+  vtkIOExport
+  vtkWrappingPython
+)
 
 # If no VTK root dir is specified, try the ParaView root dir:
 SET(PARAVIEW_ROOT_DIR "$ENV{PARAVIEW_ROOT_DIR}" CACHE PATH "Path to the ParaView installation")

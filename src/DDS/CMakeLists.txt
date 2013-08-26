@@ -20,12 +20,34 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
-  ${PTHREAD_INCLUDE_DIRS}
   ${CAS_INCLUDE_DIRS}
   ${KERNEL_INCLUDE_DIRS}
 )
 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${CAS_DEFINITIONS})
+
+# libraries to link to
+SET(_link_LIBRARIES ${CAS_KERNEL} ${CAS_OCAF})
+
+# --- headers ---
+
+# header files / to install
+SET(DDS_HEADERS
+  DDS.h
+  DDS_DicGroup.h
+  DDS_DicItem.h
+  DDS_Dictionary.h
+  DDS_KeyWords.h
+)
+
+# --- sources ---
+
+# sources / static
 SET(DDS_SOURCES
   DDS_DicGroup.cxx
   DDS_DicItem.cxx
@@ -33,12 +55,11 @@ SET(DDS_SOURCES
   DDS_KeyWords.cxx
 )
 
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+# --- rules ---
 
 ADD_LIBRARY(DDS ${DDS_SOURCES})
-TARGET_LINK_LIBRARIES(DDS ${CAS_KERNEL} ${CAS_OCAF})
+TARGET_LINK_LIBRARIES(DDS ${_link_LIBRARIES})
 INSTALL(TARGETS DDS EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
+INSTALL(FILES ${DDS_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
 

@@ -19,27 +19,54 @@
 
 INCLUDE(UseQt4Ext)
 
+# --- options ---
+
+# additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Qtx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../SUIT
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/SUIT
 )
 
-SET(GUI_HEADERS LogWindow.h)
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUITS_SOURCES
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} qtx suit)
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS LogWindow.h)
+
+# header files / to install
+SET(LogWindow_HEADERS ${_moc_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
   resources/LogWindow_msg_en.ts
   resources/LogWindow_msg_fr.ts
   resources/LogWindow_msg_ja.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+# --- sources ---
 
-ADD_LIBRARY(LogWindow LogWindow.cxx ${GUI_HEADERS_MOC})
-TARGET_LINK_LIBRARIES(LogWindow qtx suit ${QT_LIBRARIES})
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES LogWindow.cxx)
+
+# sources / to compile
+SET(LogWindow_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(LogWindow ${LogWindow_SOURCES})
+TARGET_LINK_LIBRARIES(LogWindow ${_link_LIBRARIES})
 INSTALL(TARGETS LogWindow EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-FILE(GLOB COMMON_HEADERS_H "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${LogWindow_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

@@ -31,6 +31,7 @@
 
 class SUIT_EXPORT SUIT_MessageBox : public QMessageBox
 {
+  Q_OBJECT
 public:
   // construction/destruction
   SUIT_MessageBox( QWidget* = 0 );

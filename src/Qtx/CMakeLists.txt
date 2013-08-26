@@ -19,13 +19,21 @@
 
 INCLUDE(UseQt4Ext)
 
-INCLUDE_DIRECTORIES(
-  ${QT_INCLUDES}
-)
+# --- options ---
 
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
 
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(GUI_HEADERS   
+# libraries to link to
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+# --- headers ---
+
+# header files / to be processed by moc
+SET(_moc_HEADERS   
   QtxAction.h
   QtxActionGroup.h
   QtxActionMenuMgr.h
@@ -46,12 +54,11 @@ SET(GUI_HEADERS
   QtxGroupBox.h
   QtxIntSpinBox.h
   QtxListAction.h
-  QtxTreeView.h
   QtxLogoMgr.h
+  QtxMRUAction.h
   QtxMainWindow.h
   QtxMenu.h
   QtxMultiAction.h
-  QtxMRUAction.h
   QtxPagePrefMgr.h
   QtxPathDialog.h
   QtxPathEdit.h
@@ -63,19 +70,50 @@ SET(GUI_HEADERS
   QtxSplash.h
   QtxToolBar.h
   QtxToolTip.h
+  QtxTreeView.h
   QtxValidator.h
+  QtxWebBrowser.h
   QtxWorkspace.h
   QtxWorkspaceAction.h
   QtxWorkstack.h
   QtxWorkstackAction.h
-  QtxWebBrowser.h
 )
-QT4_WRAP_CPP(GUI_HEADERS_MOC ${GUI_HEADERS})
 
-SET(RCCS Qtx.qrc)
-QT4_ADD_RESOURCES(RCC_SRCS ${RCCS})
+# obsolete files: not migrated to Qt4
+# _moc_HEADERS << QtxListBox.h QtxTable.h
+# TODO: migrate or remove?
 
-SET(qtx_SOURCES
+# header files / no moc processing
+SET(_other_HEADERS
+  Qtx.h
+  QtxEvalExpr.h
+  QtxMap.h
+  QtxPreferenceMgr.h
+  QtxResourceMgr.h
+  QtxTranslator.h
+)
+
+# header files / to install
+SET(qtx_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
+
+# --- resources ---
+
+# resource files / to be processed by rcc
+SET(_rcc_RESOURCES Qtx.qrc)
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES resources/Qtx_msg_fr.ts)
+
+# --- sources ---
+
+# sources / rcc wrappings
+QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+
+# sources / moc wrappings
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / static
+SET(_other_SOURCES
   Qtx.cxx
   QtxAction.cxx
   QtxActionGroup.cxx
@@ -98,12 +136,11 @@ SET(qtx_SOURCES
   QtxGroupBox.cxx
   QtxIntSpinBox.cxx
   QtxListAction.cxx
-  QtxTreeView.cxx
   QtxLogoMgr.cxx
+  QtxMRUAction.cxx
   QtxMainWindow.cxx
   QtxMenu.cxx
   QtxMultiAction.cxx
-  QtxMRUAction.cxx
   QtxPagePrefMgr.cxx
   QtxPathDialog.cxx
   QtxPathEdit.cxx
@@ -118,72 +155,27 @@ SET(qtx_SOURCES
   QtxToolBar.cxx
   QtxToolTip.cxx
   QtxTranslator.cxx
+  QtxTreeView.cxx
   QtxValidator.cxx
+  QtxWebBrowser.cxx
   QtxWorkspace.cxx
   QtxWorkspaceAction.cxx
   QtxWorkstack.cxx
   QtxWorkstackAction.cxx
-  QtxWebBrowser.cxx
-)
-SET(GUITS_SOURCES
-  resources/Qtx_msg_fr.ts
 )
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-ADD_LIBRARY(qtx ${qtx_SOURCES} ${GUI_HEADERS_MOC} ${RCC_SRCS})
-TARGET_LINK_LIBRARIES(qtx ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+# obsolete files: not migrated to Qt4
+# _other_SOURCES << QtxListBox.cxx QtxTable.cxx
+# TODO: migrate or remove?
+
+# sources / to compile
+SET(qtx_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_rcc_SOURCES})
+
+# --- rules ---
+
+ADD_LIBRARY(qtx ${qtx_SOURCES})
+TARGET_LINK_LIBRARIES(qtx ${_link_LIBRARIES})
 INSTALL(TARGETS qtx EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-SET(COMMON_HEADERS_H
-  Qtx.h
-  QtxAction.h
-  QtxActionGroup.h
-  QtxActionMenuMgr.h
-  QtxActionMgr.h
-  QtxActionSet.h
-  QtxActionToolMgr.h
-  QtxBackgroundTool.h
-  QtxBiColorTool.h
-  QtxColorButton.h
-  QtxColorScale.h
-  QtxComboBox.h
-  QtxDialog.h
-  QtxDockAction.h
-  QtxDockWidget.h
-  QtxDoubleSpinBox.h
-  QtxEvalExpr.h
-  QtxFontEdit.h
-  QtxGridBox.h
-  QtxGroupBox.h
-  QtxIntSpinBox.h
-  QtxListAction.h
-  QtxTreeView.h
-  QtxLogoMgr.h
-  QtxMainWindow.h
-  QtxMap.h
-  QtxMenu.h
-  QtxMultiAction.h
-  QtxMRUAction.h
-  QtxPagePrefMgr.h
-  QtxPathDialog.h
-  QtxPathEdit.h
-  QtxPathListEdit.h
-  QtxPopupMgr.h
-  QtxPreferenceMgr.h
-  QtxResourceMgr.h
-  QtxRubberBand.h
-  QtxSearchTool.h
-  QtxShortcutEdit.h
-  QtxSplash.h
-  QtxToolBar.h
-  QtxToolTip.h
-  QtxTranslator.h
-  QtxValidator.h
-  QtxWorkspace.h
-  QtxWorkspaceAction.h
-  QtxWorkstack.h
-  QtxWorkstackAction.h
-  QtxWebBrowser.h
-)
-INSTALL(FILES ${COMMON_HEADERS_H} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${GUITS_SOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${qtx_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

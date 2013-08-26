@@ -20,14 +20,47 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// --- include all SalomeApp Test from basics until the present directory
-//
-#include "SalomeAppTest.hxx"
+#include <cppunit/extensions/HelperMacros.h>
 
-// --- Registers the fixture into the 'registry'
+/*!
+  \class SalomeAppTest: test suit
+*/
+class SalomeAppTest : public CppUnit::TestFixture
+{
+  CPPUNIT_TEST_SUITE( SalomeAppTest );
+  CPPUNIT_TEST( testSalomeApp );
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+  void setUp();
+  void tearDown();
+  void testSalomeApp();
+};
+
+/*!
+  Set up each test case
+*/
+void SalomeAppTest::setUp()
+{
+}
+/*!
+  Clean-up each test case
+*/
+void SalomeAppTest::tearDown()
+{
+}
+/*!
+  Check SalomeApp functionality (empty for the moment)
+*/
+void SalomeAppTest::testSalomeApp()
+{
+  printf("asdasdasdasdsadasdasdsdasdsad\n");
+}
+
+// --- Register the fixture into the 'registry'
 
 CPPUNIT_TEST_SUITE_REGISTRATION( SalomeAppTest );
 
-// --- generic Main program from Basic/Test
+// --- Generic main() program from Basics/Test (KERNEL module)
 
 #include "BasicMainTest.hxx"
