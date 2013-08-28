@@ -199,13 +199,22 @@ void SalomeApp_Application::start()
           hdffile = fi.absoluteFilePath();
       }
       else {
-        QRegExp rxp ("--pyscript=(.+)");
+        QRegExp rxp ("--pyscript=\\[(.+)\\]");
         if ( rxp.indexIn( QString(qApp->argv()[i]) ) >= 0 && rxp.capturedTexts().count() > 1 ) {
-          QStringList files = rxp.capturedTexts()[1].split(",",QString::SkipEmptyParts);
-          pyfiles += files;
+          QStringList dictList = rxp.capturedTexts()[1].split("},", QString::SkipEmptyParts);
+          for (int k = 0; k < dictList.count(); ++k) {
+            QRegExp rxd ("[\\s]*\\{?([^\\{\\}]+)\\}?[\\s]*");
+            if ( rxd.indexIn( dictList[k] ) >= 0 && rxd.capturedTexts().count() > 1 ) {
+              for (int m = 1; m < rxd.capturedTexts().count(); ++m) {
+                pyfiles += rxd.capturedTexts()[m];
+              }
+            }
+          }
         }
       }
     }
+    // Here pyfiles elements are: "script_name": [list_of_"arg"s]
+    // For example: "/absolute/path/to/my_script.py": ["1", "2"]
 
     if ( !hdffile.isEmpty() )       // open hdf file given as parameter
       onOpenDoc( hdffile );
@@ -219,43 +228,30 @@ void SalomeApp_Application::start()
       if ( appStudy && pyConsole ) {
         _PTR(Study) aStudy = appStudy->studyDS();
         if ( !aStudy->GetProperties()->IsLocked() ) {
+          // pyfiles[j] is a dictionary: {"/absolute/path/to/script.py": [script_args]}
+          // Path is absolute, script has .py extension
           for (uint j = 0; j < pyfiles.count(); j++ ) {
-            QFileInfo fi ( pyfiles[j] );
-            QFileInfo fipy ( pyfiles[j] + ".py" );
-            QString command = QString( "execfile(r\"%1\")" );
-            if ( fi.isAbsolute() ) {
-              if ( fi.exists() )
-                pyConsole->exec( command.arg( fi.absoluteFilePath() ) );
-              else if ( fipy.exists() )
-                pyConsole->exec( command.arg( fipy.absoluteFilePath() ) );
-              else
-                qDebug() << "Can't execute file" << pyfiles[j];
-            }
-            else {
-              bool found = false;
-              QStringList dirs;
-              dirs << QDir::currentPath();
-              if ( ::getenv( "PYTHONPATH" ) )
-                dirs += QString( ::getenv( "PYTHONPATH" ) ).split( QRegExp( "[:|;]" ) );
-              foreach( QString dir, dirs ) {
-                qDebug() << "try" << QFileInfo( dir, pyfiles[j] ).absoluteFilePath();
-                qDebug() << "try" << QFileInfo( dir, pyfiles[j] + ".py" ).absoluteFilePath();
-                if ( QFileInfo( dir, pyfiles[j] ).exists() ) {
-                  pyConsole->exec( command.arg( QFileInfo( dir, pyfiles[j] ).absoluteFilePath() ) );
-                  found = true;
-                  break;
-                }
-                else if ( QFileInfo( dir, pyfiles[j] + ".py" ).exists() ) {
-                  pyConsole->exec( command.arg( QFileInfo( dir, pyfiles[j] + ".py" ).absoluteFilePath() ) );
-                  found = true;
-                  break;
-                }
+            // Extract scripts and their arguments, if any
+            QRegExp rxp ("\"(.+)\":[\\s]*\\[(.*)\\]");
+            if ( rxp.indexIn( pyfiles[j] ) >= 0 && rxp.capturedTexts().count() == 3 ) {
+              QString script = rxp.capturedTexts()[1];
+              QString args = "";
+              QStringList argList = rxp.capturedTexts()[2].split(",", QString::SkipEmptyParts);
+              for (uint k = 0; k < argList.count(); k++ ) {
+                QString arg = argList[k].trimmed();
+                arg.remove( QRegExp("^[\"]") );
+                arg.remove( QRegExp("[\"]$") );
+                args += arg+",";
               }
-              if ( !found ) {
-                qDebug() << "Can't execute file" << pyfiles[j];
+              args.remove( QRegExp("[,]$") );
+              if (!args.isEmpty()) {
+                args = "args:"+args;
               }
+              QString cmd = script+" "+args;
+              QString command = QString( "execfile(r\"%1\")" ).arg(cmd.trimmed());
+              pyConsole->exec(command);
             }
-          }
+          } // end for loop on pyfiles QStringList
         }
       }
     }
@@ -279,7 +275,7 @@ void SalomeApp_Application::createActions()
   createAction( DumpStudyId, tr( "TOT_DESK_FILE_DUMP_STUDY" ), QIcon(),
                 tr( "MEN_DESK_FILE_DUMP_STUDY" ), tr( "PRP_DESK_FILE_DUMP_STUDY" ),
                 Qt::CTRL+Qt::Key_D, desk, false, this, SLOT( onDumpStudy() ) );
-  
+
   //! Load script
   createAction( LoadScriptId, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), QIcon(),
                 tr( "MEN_DESK_FILE_LOAD_SCRIPT" ), tr( "PRP_DESK_FILE_LOAD_SCRIPT" ),
@@ -660,7 +656,7 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
   connect( aStudy, SIGNAL( closed ( SUIT_Study* ) ), this, SLOT( onStudyClosed ( SUIT_Study* ) ) );
 
   //to receive signal in application that NoteBook's variable was modified
-  connect( aStudy, SIGNAL(notebookVarUpdated(QString)), 
+  connect( aStudy, SIGNAL(notebookVarUpdated(QString)),
            this, SIGNAL(notebookVarUpdated(QString)) );
 
   return aStudy;
@@ -795,7 +791,7 @@ void SalomeApp_Application::onDumpStudy( )
       QFileInfo aFileInfo(aFileName);
       if( aFileInfo.isDir() ) // IPAL19257
         return;
-      
+
       // Issue 21377 - dump study implementation moved to SalomeApp_Study class
       bool res;
       {
@@ -950,7 +946,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
       _PTR(Study) aStudy = appStudy->studyDS();
       setNoteBook( new SalomeApp_NoteBook( desktop(), aStudy ) );
       //to receive signal in NoteBook that it's variable was modified
-      connect( this, SIGNAL( notebookVarUpdated( QString ) ), 
+      connect( this, SIGNAL( notebookVarUpdated( QString ) ),
                getNoteBook(), SLOT( onVarUpdate( QString ) ) );
     }
     wid = getNoteBook();
@@ -1381,7 +1377,7 @@ void SalomeApp_Application::onDblClick( SUIT_DataObject* theObj )
     SUIT_DataOwnerPtrList aList;
     aList.append( new LightApp_DataOwner( entry ) );
     selectionMgr()->setSelected( aList, false );
-    
+
     SUIT_DataBrowser* ob = objectBrowser();
 
     QModelIndexList aSelectedIndexes = ob->selectedIndexes();
@@ -1446,7 +1442,7 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
 {
   LightApp_Application::onStudyCreated( study );
 
-  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
+  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
                                windowDock( getWindow( WT_ObjectBrowser ) ) );
 
   loadDockWindowsState();
@@ -1475,7 +1471,7 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
 {
   LightApp_Application::onStudyOpened( study );
 
-  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ), 
+  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
                                windowDock( getWindow( WT_ObjectBrowser ) ) );
 
   loadDockWindowsState();
@@ -1499,7 +1495,7 @@ void SalomeApp_Application::updateSavePointDataObjects( SalomeApp_Study* study )
   SUIT_DataBrowser* ob = objectBrowser();
   LightApp_SelectionMgr* selMgr = selectionMgr();
 
-  if ( !study || !ob || !selMgr ) 
+  if ( !study || !ob || !selMgr )
     return;
 
   // find GUI states root object
@@ -1522,7 +1518,7 @@ void SalomeApp_Application::updateSavePointDataObjects( SalomeApp_Study* study )
     selMgr->clearSelected();
     ob->setAutoUpdate(true);
     DataObjectList ch = guiRootObj->children();
-    for( int i = 0; i < ch.size(); i++ ) 
+    for( int i = 0; i < ch.size(); i++ )
       delete ch[i];
     delete guiRootObj;
     ob->setAutoUpdate(isAutoUpdate);
@@ -1830,7 +1826,7 @@ bool SalomeApp_Application::renameObject( const QString& entry, const QString& n
 void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
   LightApp_Application::defaultWindows(aMap);
-  if ( !aMap.contains( WT_NoteBook ) ) { 
+  if ( !aMap.contains( WT_NoteBook ) ) {
     if ( !myNoteBook ) {
       aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
     }
@@ -1859,7 +1855,7 @@ void SalomeApp_Application::onUpdateStudy()
 
   if( !updateStudy() )
     SUIT_MessageBox::warning( desktop(), tr( "ERROR" ), tr( "ERR_UPDATE_STUDY_FAILED" ) );
-    
+
   QApplication::restoreOverrideCursor();
 }
 
@@ -1915,7 +1911,7 @@ bool SalomeApp_Application::updateStudy()
   int anIndex = aList.indexOf( this );
 
   // Disconnect dialog from application desktop in case if:
-  // 1) Application is not the first application in the session 
+  // 1) Application is not the first application in the session
   // 2) Application is the first application in session but not the only.
   bool changeDesktop = ((anIndex > 0) || (anIndex == 0 && aList.count() > 1));
   if( changeDesktop ) {
@@ -1941,7 +1937,7 @@ bool SalomeApp_Application::updateStudy()
   onCloseDoc( false );
 
   if( !changeDesktop ) {
-    ok = onRestoreStudy( aDumpScript, 
+    ok = onRestoreStudy( aDumpScript,
                          aStudyName,
                          isStudySaved );
   }
@@ -1954,8 +1950,8 @@ bool SalomeApp_Application::updateStudy()
  *  Purpose  : Load the dumped study from Python script
  */
 //============================================================================
-bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript, 
-                                            const QString& theStudyName, 
+bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
+                                            const QString& theStudyName,
                                             bool theIsStudySaved )
 {
   bool ok = true;
@@ -2005,8 +2001,8 @@ void SalomeApp_Application::afterCloseDoc()
 {
   // emit signal to restore study from Python script
   if ( myNoteBook ) {
-    emit dumpedStudyClosed( myNoteBook->getDumpedStudyScript(), 
-                            myNoteBook->getDumpedStudyName(), 
+    emit dumpedStudyClosed( myNoteBook->getDumpedStudyScript(),
+                            myNoteBook->getDumpedStudyName(),
                             myNoteBook->isDumpedStudySaved() );
   }
   LightApp_Application::afterCloseDoc();

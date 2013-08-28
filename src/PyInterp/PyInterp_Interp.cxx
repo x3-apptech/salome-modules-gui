@@ -34,6 +34,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <algorithm>
 
 #define TOP_HISTORY_PY   "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"
@@ -50,7 +51,7 @@ std::map<long,PyThreadState*> currentThreadMap;
   \brief Constructor. Automatically acquires GIL.
   \param theThreadState python thread state
 */
-PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState): 
+PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState):
   myThreadState(theThreadState),
   mySaveThreadState(0)
 {
@@ -113,7 +114,7 @@ PyLockWrapper PyInterp_Interp::GetLockWrapper()
 }
 
 /*
-  The following functions are used to hook the Python 
+  The following functions are used to hook the Python
   interpreter output.
 */
 
@@ -237,11 +238,11 @@ PyInterpreterState* PyInterp_Interp::_interp       = NULL;
 
 /*!
   \brief Basic constructor.
-  
-  After construction the interpreter instance successor classes 
+
+  After construction the interpreter instance successor classes
   must call virtual method initalize().
 */
-PyInterp_Interp::PyInterp_Interp(): 
+PyInterp_Interp::PyInterp_Interp():
   _tstate(0), _vout(0), _verr(0), _g(0)
 {
 }
@@ -255,7 +256,7 @@ PyInterp_Interp::~PyInterp_Interp()
 
 /*!
   \brief Initialize embedded interpreter.
-  
+
   This method shoud be called after construction of the interpreter.
   The method initialize() calls virtuals methods
   - initPython()  to initialize global Python interpreter
@@ -267,7 +268,7 @@ PyInterp_Interp::~PyInterp_Interp()
 */
 void PyInterp_Interp::initialize()
 {
-  _history.clear();       // start a new list of user's commands 
+  _history.clear();       // start a new list of user's commands
   _ith = _history.begin();
 
   initPython();
@@ -288,7 +289,7 @@ void PyInterp_Interp::initialize()
   }
 
   // Create python objects to capture stdout and stderr
-  _vout=(PyObject*)newPyStdOut( false ); // stdout 
+  _vout=(PyObject*)newPyStdOut( false ); // stdout
   _verr=(PyObject*)newPyStdOut( true );  // stderr
 
   // All the initRun outputs are redirected to the standard output (console)
@@ -300,8 +301,8 @@ void PyInterp_Interp::initialize()
   \brief Initialize Python interpreter.
 
   In case if Python is not initialized, it sets program name, initializes the interpreter, sets program arguments,
-  initializes threads. 
-  Otherwise, it just obtains the global interpreter and thread states. This is important for light SALOME configuration, 
+  initializes threads.
+  Otherwise, it just obtains the global interpreter and thread states. This is important for light SALOME configuration,
   as in full SALOME this is done at SalomeApp level.
   \sa SalomeApp_PyInterp class
  */
@@ -341,15 +342,15 @@ std::string PyInterp_Interp::getbanner()
 
 /*!
   \brief Initialize run command.
- 
-  This method is used to prepare interpreter for running 
+
+  This method is used to prepare interpreter for running
   Python commands.
-  
+
   \return \c true on success and \c false on error
 */
 bool PyInterp_Interp::initRun()
 {
-  // 
+  //
   // probably all below code isn't required
   //
   /*
@@ -357,7 +358,7 @@ bool PyInterp_Interp::initRun()
   PySys_SetObject("stdout",_vout);
 
   //PyObject *m = PyImport_GetModuleDict();
-  
+
   PySys_SetObject("stdout",PySys_GetObject("__stdout__"));
   PySys_SetObject("stderr",PySys_GetObject("__stderr__"));
   */
@@ -365,7 +366,7 @@ bool PyInterp_Interp::initRun()
 }
 
 /*!
-  \brief Compile Python command and evaluate it in the 
+  \brief Compile Python command and evaluate it in the
          python dictionary context if possible.
   \internal
   \param command Python command string
@@ -373,7 +374,7 @@ bool PyInterp_Interp::initRun()
   \return -1 on fatal error, 1 if command is incomplete and 0
          if command is executed successfully
  */
-static int compile_command(const char *command,PyObject *context)
+static int run_command(const char *command, PyObject *context)
 {
   PyObject *m = PyImport_AddModule("codeop");
   if(!m) { // Fatal error. No way to go on.
@@ -408,6 +409,59 @@ static int compile_command(const char *command,PyObject *context)
     }
     // The command has been successfully executed. Return 0
     return 0;
+  }
+}
+
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+    if(from.empty())
+        return;
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+/*!
+  \brief Compile Python command and evaluate it in the
+         python dictionary context if possible. Command might correspond to
+         the execution of a script with optional arguments.
+         In this case, command is:
+         execfile(r"/absolute/path/to/script.py [args:arg1,...,argn]")
+  \internal
+  \param command Python command string
+  \param context Python context (dictionary)
+  \return -1 on fatal error, 1 if command is incomplete and 0
+         if command is executed successfully
+ */
+static int compile_command(const char *command,PyObject *context)
+{
+  // First guess if command is execution of a script with args, or a simple Python command
+  std::string singleCommand = command;
+  std::string commandArgs = "";
+
+  std::size_t pos = std::string(command).find("args:");
+  if (pos != std::string::npos) {
+    commandArgs = singleCommand.substr(pos+5);
+    commandArgs = commandArgs.substr(0, commandArgs.length()-3);
+    singleCommand = singleCommand.substr(0, pos-1)+"\")";
+  }
+
+  if (commandArgs.empty()) {
+    // process command: expression
+    // process command: execfile(r"/absolute/path/to/script.py") (no args)
+    return run_command(singleCommand.c_str(), context);
+  }
+  else {
+    // process command: execfile(r"/absolute/path/to/script.py [args:arg1,...,argn]")
+    std::string script = singleCommand.substr(11); // remove leading execfile(r"
+    script = script.substr(0, script.length()-2); // remove trailing ")
+
+    std::string preCommandBegin = "import sys; save_argv = sys.argv; sys.argv=[";
+    std::string preCommandEnd = "];";
+    replaceAll(commandArgs, ",", "\",\"");
+    commandArgs = "\""+commandArgs+"\"";
+    std::string completeCommand = preCommandBegin+"\""+script+"\","+commandArgs+preCommandEnd+singleCommand+";sys.argv=save_argv";
+    return run_command(completeCommand.c_str(), context);
   }
 }
 
@@ -487,7 +541,7 @@ const char * PyInterp_Interp::getNext()
   \param data callback function parameters
 */
 void PyInterp_Interp::setvoutcb(PyOutChanged* cb, void* data)
-{  
+{
   ((PyStdOut*)_vout)->_cb=cb;
   ((PyStdOut*)_vout)->_data=data;
 }
@@ -498,7 +552,7 @@ void PyInterp_Interp::setvoutcb(PyOutChanged* cb, void* data)
   \param data callback function parameters
 */
 void PyInterp_Interp::setverrcb(PyOutChanged* cb, void* data)
-{  
+{
   ((PyStdOut*)_verr)->_cb=cb;
   ((PyStdOut*)_verr)->_data=data;
 }
