@@ -247,6 +247,8 @@ void SalomeApp_Application::start()
               if (!args.isEmpty()) {
                 args = "args:"+args;
               }
+
+              script.remove( QRegExp("^python.*[\\s]+") );
               QString cmd = script+" "+args;
               QString command = QString( "execfile(r\"%1\")" ).arg(cmd.trimmed());
               pyConsole->exec(command);
