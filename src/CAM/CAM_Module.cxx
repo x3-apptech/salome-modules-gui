@@ -1046,6 +1046,37 @@ void CAM_Module::updateModuleVisibilityState() {
 
 }
 
+/*!
+  \brief Activate GUI operation of module by its ID.
+  This method is called from CAM_Application::startOperation().
+  \param actionId is a numerical unique operation id.
+*/
+bool CAM_Module::activateOperation( int actionId )
+{
+  return false;
+}
+
+/*!
+  \brief Activate GUI operation of module by its ID.
+  This method is called from CAM_Application::startOperation().
+  \param actionId is a string unique operation id.
+*/
+bool CAM_Module::activateOperation( const QString& actionId )
+{
+  return false;
+}
+
+/*!
+  \brief Activate GUI operation of module by its ID and \a pluginName.
+  This method is called from CAM_Application::startOperation().
+  \param actionId is a string unique operation id.
+  \param pluginName is a name of a plugin where the operation is implemented.
+*/
+bool CAM_Module::activateOperation( const QString& actionId, const QString& pluginName )
+{
+  return false;
+}
+
 
 /*!
   \brief Connect data model of the module to the active study

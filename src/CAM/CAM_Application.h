@@ -64,6 +64,11 @@ public:
 
   virtual bool        activateModule( const QString& );
 
+  bool                activateOperation( const QString& modName, int actionId );
+  bool                activateOperation( const QString& modName, const QString& actionId );
+  bool                activateOperation( const QString& modName, const QString& actionId,
+                                         const QString& pluginName );
+
   virtual void        contextMenuPopup( const QString&, QMenu*, QString& );
 
   static QString      moduleName( const QString& );

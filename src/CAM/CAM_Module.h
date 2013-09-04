@@ -83,6 +83,10 @@ public:
 
   virtual void           updateModuleVisibilityState();
 
+  virtual bool           activateOperation( int actionId );
+  virtual bool           activateOperation( const QString& actionId );
+  virtual bool           activateOperation( const QString& actionId, const QString& pluginName );
+
   // actions/menu/toolbars management
 
   QtxActionMenuMgr*      menuMgr() const;

@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 #include "CAM_Application.h"
 
@@ -44,6 +43,7 @@
 #endif
 
 #include <cstdio>
+#include <iostream>
 
 namespace
 {
@@ -384,7 +384,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
 */
 bool CAM_Application::activateModule( const QString& modName )
 {
-  if ( !modName.isEmpty() && !activeStudy() || myBlocked )
+  if ( (!modName.isEmpty() && !activeStudy()) || myBlocked )
     return false;
 
   // VSR 25/10/2011: prevent nested activation/deactivation
@@ -455,6 +455,67 @@ bool CAM_Application::activateModule( CAM_Module* mod )
   updateCommandsStatus();
 
   return true;
+}
+
+/*!
+  \brief Load module \a modName and activate its operation, corresponding to \a actionId.
+  This method is dedicated to run operations of some module from any other module.
+  \param modName module name
+  \param actionId is a numerical unique operation identifier
+  \return \c true in case of success and \c false otherwise
+*/
+bool CAM_Application::activateOperation( const QString& modName, int actionId )
+{
+  if (isModuleAccessible(modName)) {
+    CAM_Module* mod = loadModule(modName, false);
+    if (mod) {
+      addModule(mod);
+      return mod->activateOperation(actionId);
+    }
+  }
+  return false;
+}
+
+/*!
+  \brief Load module \a modName and activate its operation, corresponding to \a actionId.
+  This method is dedicated to run operations of some module from any other module.
+  \param modName module name
+  \param actionId is a string unique operation identifier
+  \return \c true in case of success and \c false otherwise
+*/
+bool CAM_Application::activateOperation( const QString& modName, const QString& actionId )
+{
+  if (isModuleAccessible(modName)) {
+    CAM_Module* mod = loadModule(modName, false);
+    if (mod) {
+      addModule(mod);
+      return mod->activateOperation(actionId);
+    }
+  }
+  return false;
+}
+
+/*!
+  \brief Load module \a modName and activate its operation,
+         corresponding to \a actionId and \a pluginName.
+  This method is dedicated to run operations of some module from any other module.
+  \param modName module name
+  \param actionId is a string unique operation identifier
+  \param pluginName is a name of a plugin where the operation is implemented
+  \return \c true in case of success and \c false otherwise
+*/
+bool CAM_Application::activateOperation( const QString& modName,
+                                         const QString& actionId,
+                                         const QString& pluginName )
+{
+  if (isModuleAccessible(modName)) {
+    CAM_Module* mod = loadModule(modName, false);
+    if (mod) {
+      addModule(mod);
+      return mod->activateOperation(actionId, pluginName);
+    }
+  }
+  return false;
 }
 
 /*!
