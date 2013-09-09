@@ -25,12 +25,10 @@ ADD_SUBDIRECTORY(deprecated)
 
 # These files are data, module or lib files
 SET(_adm_data
-  FindCAS.cmake
   FindQwt.cmake
   FindGUI.cmake
   FindSIP.cmake
   FindPyQt4.cmake
-  FindSalomeCAS.cmake
   FindSalomePyQt4.cmake
   FindSalomeQt4.cmake
   FindSalomeQwt.cmake
