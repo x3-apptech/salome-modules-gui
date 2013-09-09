@@ -35,7 +35,7 @@
 # (contains definitions for IMPORTED targets). This is only 
 # imported if we are not built as a subproject (in this case targets are already there)
 IF(NOT TARGET Event AND NOT @PROJECT_NAME@_BINARY_DIR)
-  INCLUDE("@PACKAGE_SALOME_INSTALL_CMAKE@/@PROJECT_NAME@Targets.cmake")
+  INCLUDE("@PACKAGE_SALOME_INSTALL_CMAKE_LOCAL@/@PROJECT_NAME@Targets.cmake")
 ENDIF()   
 
 # Package root dir:

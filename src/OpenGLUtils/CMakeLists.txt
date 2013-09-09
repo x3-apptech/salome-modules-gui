@@ -22,6 +22,7 @@
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${KERNEL_INCLUDE_DIRS}
+  ${PTHREAD_INCLUDE_DIR}
 )
 
 # libraries to link to
