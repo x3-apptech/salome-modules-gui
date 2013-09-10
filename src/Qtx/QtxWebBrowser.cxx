@@ -22,30 +22,40 @@
 
 // File:      QtxWebBrowser.cxx
 // Author:    Roman NIKOLAEV
-//
+
 #include "QtxWebBrowser.h"
+#include "QtxResourceMgr.h"
 #include "QtxSearchTool.h"
 
 #include <QApplication>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QFileDialog>
 #include <QFileInfo>
-#include <QWebView>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QToolBar>
-#include <QMenu>
+#include <QPushButton>
+#include <QRadioButton>
 #include <QStatusBar>
+#include <QToolBar>
 #include <QVBoxLayout>
+#include <QWebView>
 
 /*!
-  \class WebViewSearcher
+  \class QtxWebBrowser::Searcher
   \brief A class is used with QtxSearchTool in order to search text within the web page 
   \internal
 */
-class WebViewSearcher : public QtxSearchTool::Searcher
+
+class QtxWebBrowser::Searcher : public QtxSearchTool::Searcher
 {
 public:
-  WebViewSearcher( QWebView* );
-  ~WebViewSearcher();
+  Searcher( QWebView* );
+  ~Searcher();
 
   bool find( const QString&, QtxSearchTool* );
   bool findNext( const QString&, QtxSearchTool* );
@@ -57,15 +67,31 @@ private:
   QWebView* myView;
 };
 
-WebViewSearcher::WebViewSearcher( QWebView* view ) : myView( view )
+/*!
+  \brief Constructor
+  \param view web view
+  \internal
+*/
+QtxWebBrowser::Searcher::Searcher( QWebView* view ) : myView( view )
 {
 }
 
-WebViewSearcher::~WebViewSearcher()
+/*!
+  \brief Destructor
+  \internal
+*/
+QtxWebBrowser::Searcher::~Searcher()
 {
 }
 
-bool WebViewSearcher::find( const QString& text, QtxSearchTool* st )
+/*!
+  \brief Find specified text
+  \param text text being searched
+  \param st search tool
+  \return \c true if text has been found or \c false otherwise
+  \internal
+*/
+bool QtxWebBrowser::Searcher::find( const QString& text, QtxSearchTool* st )
 {
   QWebPage::FindFlags fl = 0;
   if ( st->isCaseSensitive() ) fl = fl | QWebPage::FindCaseSensitively;
@@ -73,12 +99,26 @@ bool WebViewSearcher::find( const QString& text, QtxSearchTool* st )
   return myView->findText( text, fl );
 }
 
-bool WebViewSearcher::findNext( const QString& text, QtxSearchTool* st )
+/*!
+  \brief Find next entry of specified text starting from the current position
+  \param text text being searched
+  \param st search tool
+  \return \c true if text has been found or \c false otherwise
+  \internal
+*/
+bool QtxWebBrowser::Searcher::findNext( const QString& text, QtxSearchTool* st )
 {
   return find( text, st );
 }
 
-bool WebViewSearcher::findPrevious( const QString& text, QtxSearchTool* st )
+/*!
+  \brief Find previous entry of specified text starting from the current position
+  \param text text being searched
+  \param st search tool
+  \return \c true if text has been found or \c false otherwise
+  \internal
+*/
+bool QtxWebBrowser::Searcher::findPrevious( const QString& text, QtxSearchTool* st )
 {
   QWebPage::FindFlags fl = QWebPage::FindBackward;
   if ( st->isCaseSensitive() ) fl = fl | QWebPage::FindCaseSensitively;
@@ -86,15 +126,151 @@ bool WebViewSearcher::findPrevious( const QString& text, QtxSearchTool* st )
   return myView->findText( text, fl );
 }
 
-bool WebViewSearcher::findFirst( const QString&, QtxSearchTool* )
+/*!
+  \brief Find first entry of specified text; does nothing in this implementation
+  \param text text being searched
+  \param st search tool
+  \return \c true if text has been found or \c false otherwise
+  \internal
+*/
+bool QtxWebBrowser::Searcher::findFirst( const QString& /*text*/, QtxSearchTool* /*st*/ )
 {
   return false;
 }
 
-bool WebViewSearcher::findLast( const QString&, QtxSearchTool* )
+/*!
+  \brief Find last entry of specified text; does nothing in this implementation
+  \param text text being searched
+  \param st search tool
+  \return \c true if text has been found or \c false otherwise
+  \internal
+*/
+bool QtxWebBrowser::Searcher::findLast( const QString& /*text*/, QtxSearchTool* /*st*/)
 {
   return false;
 }
+
+
+/*!
+  \class QtxWebBrowser::Downloader
+  \brief A dialog box that is used to process file links
+  \internal
+*/
+
+/*!
+  \brief Constructor
+  \param fileName name of the file being opened
+  \param action default action to be used for the file
+  \param program default program to be used to open the file
+  \param parent parent widget
+  \internal
+*/
+QtxWebBrowser::Downloader::Downloader( const QString& fileName, int action, const QString& program, QWidget* parent )
+  : QDialog( parent ), myProgram( program )
+{
+  setModal( true );
+  setWindowTitle( tr( "Open URL" ) );
+  setSizeGripEnabled( true );
+
+  myFileName = new QLabel( this );
+  QRadioButton* rbOpen = new QRadioButton( tr( "Open in" ), this );
+  QRadioButton* rbSave = new QRadioButton( tr( "Save file" ), this );
+  myBrowse = new QPushButton( tr( "&Browse..." ),     this );
+  myRepeat = new QCheckBox( tr( "Use this program for all files of this type" ), this );
+
+  myAction = new QButtonGroup( this );
+  myAction->addButton( rbOpen, mOpen );
+  myAction->addButton( rbSave, mSave );
+
+  QPushButton* btnOk     = new QPushButton( tr( "&OK" ),     this );
+  QPushButton* btnCancel = new QPushButton( tr( "&Cancel" ), this );
+
+  QFont f = myFileName->font(); f.setBold( true ); myFileName->setFont( f );
+
+  QHBoxLayout* btnLayout = new QHBoxLayout;
+  btnLayout->addWidget( btnOk );
+  btnLayout->addStretch();
+  btnLayout->addWidget( btnCancel );
+
+  QGridLayout* l = new QGridLayout( this );
+  l->addWidget( new QLabel( tr( "You are opening the file" ), this ), 
+		            0, 0, 1, 4 );
+  l->addWidget( myFileName, 1, 1, 1, 3 );
+  l->addWidget( new QLabel( tr( "Please choose the action to be done" ), this ), 
+		            3, 0, 1, 4 );
+  l->addWidget( rbOpen,     4, 1, 1, 1 );
+  l->addWidget( myBrowse,   4, 2, 1, 1 );
+  l->addWidget( rbSave,     5, 1, 1, 3 );
+  l->addWidget( myRepeat,   6, 1, 1, 3 );
+  l->addLayout( btnLayout,  7, 0, 1, 4 );
+  l->setRowMinimumHeight( 2, 10 );
+
+  connect( myAction,  SIGNAL( buttonClicked( int ) ), this, SLOT( setAction( int ) ) );
+  connect( myBrowse,  SIGNAL( clicked() ), this, SLOT( browse() ) );
+  connect( btnOk,     SIGNAL( clicked() ), this, SLOT( accept() ) );
+  connect( btnCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+
+  myFileName->setText( QFileInfo( fileName ).fileName() );
+  myAction->button( action )->click();
+}
+
+/*!
+  \brief Destructor
+*/
+QtxWebBrowser::Downloader::~Downloader()
+{
+}
+
+/*!
+  \brief Get action selected by the user
+  \return action being selected:
+  - 0: open file
+  - 1: save file
+*/
+int QtxWebBrowser::Downloader::action() const
+{
+  return myAction->checkedId();
+}
+
+/*!
+  \brief Get "repeat action for all such files" flag status
+  \return \c true if chosen action should be automatically done for all files of given type
+  or \c false otherwise
+*/
+bool QtxWebBrowser::Downloader::isRepeatAction() const
+{
+  return myRepeat->isChecked();
+}
+
+/*!
+  \brief Get program to be used to open chosen file
+  \return path to the program
+*/
+QString QtxWebBrowser::Downloader::program() const
+{
+  return myProgram;
+}
+
+/*!
+  \brief Set current action
+  \param action action to be done for the file:
+  - 0: open file
+  - 1: save file
+*/
+void QtxWebBrowser::Downloader::setAction( int action )
+{
+  myBrowse->setEnabled( action == mOpen );
+}
+
+/*!
+  \brief Browse program to be used to open the file
+*/
+void QtxWebBrowser::Downloader::browse()
+{
+  QString program = QFileDialog::getOpenFileName( this, tr( "Choose program" ), myProgram );
+  if ( !program.isEmpty() ) myProgram = program;
+}
+
 
 /*!
   \class QtxWebBrowser
@@ -112,6 +288,10 @@ bool WebViewSearcher::findLast( const QString&, QtxSearchTool* )
 
   To set visual properties of the browser use static method setData().
 
+  Optionally resource manager can be specified to automatically store
+  action (open/save) and program to be used to download files to the
+  user preferences.
+
   The following sample demonstrates how to use web browser.
   In this code the browser window is created, /data/index.html file is opened
   and scrolled to the "anchor1" anchor on this page.
@@ -121,7 +301,9 @@ bool WebViewSearcher::findLast( const QString&, QtxSearchTool* )
   {
     QApplication app(argc, argv);    
 
-    // set icon, title and menu items.
+    // set resource manager
+    QtxWebBrowser::setResourceManager(myResourceMgr);
+    // set icon, title and menu items
     QtxWebBrowser::setData("browser:title",      tr("Web Browser"));
     QtxWebBrowser::setData("browser:icon",       QPixmap(":/icon.png"));
     QtxWebBrowser::setData("menu:file:title",    tr("&File"));
@@ -139,15 +321,17 @@ bool WebViewSearcher::findLast( const QString&, QtxSearchTool* )
 //! The only one instance of web browser
 QtxWebBrowser* QtxWebBrowser::myBrowser = 0;
 
+//! Resources manager
+QtxResourceMgr* QtxWebBrowser::myResourceMgr = 0;
+
 //! Internal data map to store resources of the browser.
 QMap<QString, QVariant> QtxWebBrowser::myData;
 
 /*!
   \brief Constructor.
- 
   Construct the web browser.
 */
-QtxWebBrowser::QtxWebBrowser() : QMainWindow( 0 )
+QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
 {
   setAttribute( Qt::WA_DeleteOnClose );
   statusBar();
@@ -167,7 +351,7 @@ QtxWebBrowser::QtxWebBrowser() : QMainWindow( 0 )
 				   Qt::Horizontal );
   myFindPanel->setFrameStyle( QFrame::NoFrame | QFrame::Plain );
   myFindPanel->setActivators( QtxSearchTool::SlashKey );
-  myFindPanel->setSearcher( new WebViewSearcher( myWebView ) );
+  myFindPanel->setSearcher( new Searcher( myWebView ) );
   myFindPanel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
   myToolbar = addToolBar( tr( "Navigation" ) );
@@ -188,9 +372,19 @@ QtxWebBrowser::QtxWebBrowser() : QMainWindow( 0 )
   main->setSpacing( 3 );
 
   connect( myWebView, SIGNAL( titleChanged( QString ) ), SLOT( adjustTitle() ) ); 
+  connect( myWebView, SIGNAL( loadFinished( bool ) ),    SLOT( finished( bool ) ) ); 
   connect( myWebView, SIGNAL( linkClicked( QUrl ) ),     SLOT( linkClicked( QUrl ) ) ); 
-  connect( myWebView->page(), SIGNAL( linkHovered( QString, QString, QString ) ), SLOT( linkHovered( QString, QString, QString ) ) ); 
+  connect( myWebView->page(), SIGNAL( linkHovered( QString, QString, QString ) ), 
+	   SLOT( linkHovered( QString, QString, QString ) ) ); 
+  connect( myWebView->pageAction( QWebPage::DownloadLinkToDisk ), SIGNAL( activated() ),
+	   SLOT( linkAction() ) );
+  disconnect( myWebView->pageAction( QWebPage::OpenLink ), 0, 0, 0 );
+  connect( myWebView->pageAction( QWebPage::OpenLink ), SIGNAL( activated() ),
+	   SLOT( linkAction() ) );
   
+
+  myWebView->pageAction( QWebPage::OpenLinkInNewWindow )->setVisible( false );
+
   setCentralWidget( frame );
   setFocusProxy( myWebView );
   updateData();
@@ -229,11 +423,12 @@ void QtxWebBrowser::loadUrl( const QString& url, const QString& anchor )
 
   Qtx::alignWidget( webBrowser(), (QWidget*)QApplication::desktop(), Qtx::AlignCenter );
 
-  webBrowser()->show();
-  webBrowser()->myWebView->load( QUrl( anUrl ) );
-  webBrowser()->setFocus();
-  webBrowser()->activateWindow();
-  webBrowser()->raise();
+  QtxWebBrowser* browser = webBrowser();
+  browser->show();
+  browser->myWebView->load( QUrl( anUrl ) );
+  browser->setFocus();
+  browser->activateWindow();
+  browser->raise();
 }
 
 /*!
@@ -256,6 +451,10 @@ void QtxWebBrowser::loadUrl( const QString& url, const QString& anchor )
   - \c "action:findnext:icon"  : File/Find Next menu item icon
   - \c "action:findprev:title" : File/Find Previous menu item title
   - \c "action:findprev:icon"  : File/Find Previous menu item icon
+  - \c "preferences:section"   : Preferences file section (base, used as prefix to the file extension)
+  - \c "preferences:action"    : Preferences file parameter name for action
+  - \c "preferences:program"   : Preferences file parameter name for program
+  - \c "preferences:repeat"    : Preferences file parameter name for repeat action flag
   
   \param key name of the property
   \param val value of the property
@@ -268,14 +467,24 @@ void QtxWebBrowser::setData( const QString& key, const QVariant& val )
 }
 
 /*!
+  \brief Shutdown help browser
+*/
+void QtxWebBrowser::shutdown()
+{
+  if ( myBrowser )
+    myBrowser->close();
+}
+
+/*!
   \brief Get string value by key from the internal data map
   \param key data key identifier
+  \param def default value
   \return string value assigned to the key (null string if data is not assigned to the key)
   \internal
 */
-QString QtxWebBrowser::getStringValue( const QString& key )
+QString QtxWebBrowser::getStringValue( const QString& key, const QString& def )
 {
-  QString val;
+  QString val = def;
   if ( myData.contains( key ) && myData[key].canConvert( QVariant::String ) )
     val = myData[key].toString();
   return val;
@@ -284,12 +493,13 @@ QString QtxWebBrowser::getStringValue( const QString& key )
 /*!
   \brief Get icon value by key from the internal data map
   \param key data key identifier
+  \param def default value
   \return icon assigned to the key (null icon if data is not assigned to the key)
   \internal
 */
-QIcon QtxWebBrowser::getIconValue(const QString& key)
+QIcon QtxWebBrowser::getIconValue( const QString& key, const QIcon& def )
 {
-  QIcon val;
+  QIcon val = def;
   if ( myData.contains( key ) ) {
     if ( myData[key].canConvert( QVariant::Pixmap ) )
       val = myData[key].value<QPixmap>();
@@ -389,6 +599,14 @@ void QtxWebBrowser::clearData()
 }
 
 /*!
+  \brief Set resource manager
+*/
+void QtxWebBrowser::setResourceManager( QtxResourceMgr* resMgr )
+{
+  myResourceMgr = resMgr;
+}
+
+/*!
   \brief Called when users activated any link at the page
   \param url URL being clicked
   \internal
@@ -397,37 +615,6 @@ void QtxWebBrowser::linkClicked( const QUrl& url )
 {
   myWebView->page()->setLinkDelegationPolicy( QWebPage::DontDelegateLinks );
   myWebView->load( url );
-  if ( url.scheme() == "file" ) {
-    QString filename = url.toLocalFile();
-    if ( QFileInfo( filename ).suffix().toLower() == "pdf" ) {
-      int i = -1;
-#ifdef WIN32
-      i = ::system( QString( "start %2" ).arg( filename ).toLatin1().constData() );
-#else
-      // special processing of PDF files
-      QStringList readers;
-      readers << "xdg-open" << "acroread"<< "okular" << "evince" << "kpdf" << "kghostview" << "xpdf";
-      foreach ( QString r, readers ) {
-	QString reader = QString( "/usr/bin/%1" ).arg( r );
-	if ( QFileInfo( reader ).exists() ) {
-	  // Warning: the test on the return value of ::system does not work if the command ends with '&'
-	  i = ::system( QString( "%1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
-	  if (i != 0) {
-	    // If Salome Qt version is lower than the system one, on KDE an unresolved symbol is raised
-	    // In this case, we can try to launch the pdf viewer after unsetting the LD_LIBRARY_PATH environnement variable
-	    i = ::system( QString( "unset LD_LIBRARY_PATH ; %1 %2" ).arg( reader ).arg( url.toLocalFile() ).toLatin1().constData() );
-	  }
-          if (i == 0) {
-            break;
-          }
-	}
-      }
-#endif // WIN32
-      if (i != 0) {
-	QMessageBox::warning(this, tr("Opening pdf file"), tr("Impossible to open the pdf file: no viewer found or compatible."));
-      }
-    }
-  }
   myWebView->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
 }
 
@@ -440,6 +627,8 @@ void QtxWebBrowser::linkClicked( const QUrl& url )
 */
 void QtxWebBrowser::linkHovered( const QString& link, const QString& /*title*/, const QString& /*context*/ )
 {
+  QUrl url = link;
+  if ( !link.isEmpty() && url.scheme() == "file" ) myLastUrl = url;
   statusBar()->showMessage( link );
 }
 
@@ -451,4 +640,117 @@ void QtxWebBrowser::adjustTitle()
 {
   QString title = getStringValue( "browser:title" );
   setWindowTitle( title.isEmpty() ? myWebView->title() : title + QString( " [%1]" ).arg( myWebView->title() ) );
+}
+
+/*
+  \brief Called when link is processed by browser
+  \param ok operation status: \c true is URL is correctly processed, \c false otherwise
+*/
+void QtxWebBrowser::finished( bool ok )
+{
+  if ( !ok && !myLastUrl.isEmpty() ) {
+    if ( myLastUrl.scheme() == "file" ) {
+      QString filename = myLastUrl.toLocalFile();
+      QString extension = QFileInfo( filename ).suffix();
+      if ( extension == "html" || extension == "htm" ) return;
+      openLink( filename );
+    }
+  }
+}
+
+/*
+  \brief Called when link is processed from browser via popup menu actions
+*/
+void QtxWebBrowser::linkAction()
+{
+  QObject* s = sender();
+  if ( s == myWebView->pageAction( QWebPage::DownloadLinkToDisk ) ) {
+    saveLink( myLastUrl.toLocalFile() );
+  }
+  else if ( s == myWebView->pageAction( QWebPage::OpenLink ) ) {
+    QString fileName  = myLastUrl.toLocalFile();
+    QString extension = QFileInfo( fileName ).suffix();
+    if ( extension != "html" && extension != "htm" ) {
+      openLink( fileName, true );
+    }
+    else {
+      linkClicked( myLastUrl );
+    }
+  }
+}
+
+/*!
+  \brief Open file
+  \param fileName link to the file being opened
+  Opens dialog box to allow the user to choose the program to be used to open the file.
+*/
+void QtxWebBrowser::openLink( const QString& fileName, bool force )
+{
+  QString extension = QFileInfo( fileName ).suffix();
+  int defAction = Downloader::mOpen;
+  bool defRepeat = false;
+  QString defProgram;
+  QString resSection   = QString( "%1:%2" ).arg( getStringValue( "preferences:section", "web_browser" ) ).arg( extension );
+  QString actionParam  = getStringValue( "preferences:action",  "action" );
+  QString programParam = getStringValue( "preferences:program", "program" );
+  QString repeatParam  = getStringValue( "preferences:repeat",  "repeat" );
+  
+  if ( !extension.isEmpty() && myResourceMgr ) {
+    defAction  = myResourceMgr->integerValue( resSection, actionParam, defAction );
+    defRepeat  = myResourceMgr->booleanValue( resSection, repeatParam, defRepeat );
+    defProgram = myResourceMgr->stringValue( resSection, programParam, defProgram );
+  }
+  
+  if ( force || !defRepeat || ( defAction == Downloader::mOpen && defProgram.isEmpty() ) ) {
+    Downloader downloader( fileName, defAction, defProgram, this );
+    if ( !downloader.exec() ) return;
+    defAction  = downloader.action();
+    defRepeat  = downloader.isRepeatAction();
+    defProgram = downloader.program();
+    if ( myResourceMgr ) {
+      myResourceMgr->setValue( resSection, actionParam, defAction );
+      myResourceMgr->setValue( resSection, repeatParam, defRepeat );
+      if ( defAction == Downloader::mOpen )
+	myResourceMgr->setValue( resSection, programParam, defProgram );
+    }
+  }
+  switch( defAction ) {
+  case Downloader::mOpen:
+    if ( !defProgram.isEmpty() ) {
+#ifdef WIN32
+      QString cmd = "";
+#else
+      // If Salome Qt version is lower than the system one, on KDE an unresolved symbol is raised
+      // In this case, we can try to launch the pdf viewer after unsetting the LD_LIBRARY_PATH environnement variable
+      QString cmd = "env LD_LIBRARY_PATH=/usr/lib:/usr/lib64";
+#endif
+      int r = ::system( QString( "%1 %2 %3 &" ).arg( cmd ).arg( defProgram ).arg( myLastUrl.toLocalFile() ).toLatin1().constData() );
+    }
+    break;
+  case Downloader::mSave:
+    {
+      saveLink( fileName );
+    }
+    break;
+  default:
+    break;
+  }
+}
+
+/*!
+  \brief Save file
+  \param fileName link to the file being saved
+  Shows "Save file" standard dialog box to allow user to choose where to save the file.
+*/
+void QtxWebBrowser::saveLink( const QString& fileName )
+{
+  QString newFileName = QFileDialog::getSaveFileName( this, tr( "Save File" ), fileName, 
+						      QString( "*.%1" ).arg( QFileInfo( fileName ).suffix() ) );
+  if ( !newFileName.isEmpty() && 
+       QFileInfo( newFileName ).canonicalFilePath() != QFileInfo( fileName ).canonicalFilePath() ) {
+    QFile toFile( newFileName );
+    QFile fromFile( fileName );
+    if ( toFile.exists() && !toFile.remove() || !fromFile.copy( newFileName ) )
+      QMessageBox::warning( this, tr( "Error"), tr( "Can't save file:\n%1" ).arg( newFileName ) );
+  }
 }

@@ -255,6 +255,7 @@ LightApp_Application::LightApp_Application()
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   QPixmap aLogo = aResMgr->loadPixmap( "LightApp", tr( "APP_DEFAULT_ICO" ), false );
 
+  QtxWebBrowser::setResourceManager( aResMgr );
   QtxWebBrowser::setData("browser:icon",          aResMgr->loadPixmap( "LightApp", tr( "BROWSER_ICON" ) ) );
   QtxWebBrowser::setData("browser:title",         tr( "BROWSER_TITLE" ) );
   QtxWebBrowser::setData("toolbar:title",         tr( "BROWSER_TOOLBAR_TITLE" ) );
@@ -1007,7 +1008,7 @@ void LightApp_Application::onHelpContentsModule()
     // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
     QtxWebBrowser::loadUrl(helpFile);
 #else
-        QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile));
+    QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile));
 #endif
   }
 }
@@ -1078,9 +1079,9 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
 #ifdef WIN32
     // On Win32 platform QWebKit of the Qt 4.6.3 hang up in case 'file://' protocol 
     // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
-        QtxWebBrowser::loadUrl(helpFile, context);
+    QtxWebBrowser::loadUrl(helpFile, context);
 #else
-        QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile),context);
+    QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile), context);
 #endif
     
   }
@@ -2865,10 +2866,9 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
   if ( sec == "ExternalBrowser" && param == "use_external_browser" ) {
     if ( resMgr->booleanValue("ExternalBrowser", "use_external_browser", false ) )
-      {
-        if(QtxWebBrowser::webBrowser())
-          QtxWebBrowser::webBrowser()->close();
-      }
+    {
+      QtxWebBrowser::shutdown();
+    }
   }
 
 #ifndef DISABLE_PLOT2DVIEWER

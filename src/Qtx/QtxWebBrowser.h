@@ -29,14 +29,20 @@
 
 #include "Qtx.h"
 
+#include <QDialog>
 #include <QMainWindow>
 #include <QMap>
+#include <QUrl>
 
 class QAction;
+class QButtonGroup;
+class QCheckBox;
+class QLabel;
 class QMenu;
+class QPushButton;
 class QToolBar;
 class QWebView;
-class QUrl;
+class QtxResourceMgr;
 class QtxSearchTool;
 
 class QTX_EXPORT QtxWebBrowser : public QMainWindow
@@ -45,6 +51,9 @@ class QTX_EXPORT QtxWebBrowser : public QMainWindow
 
   enum { File };
   enum { Find, FindNext, FindPrev, Close };
+
+  class Downloader;
+  class Searcher;
 
 private:
   QtxWebBrowser();
@@ -55,28 +64,64 @@ public:
   static QtxWebBrowser*           webBrowser();
   static void                     loadUrl( const QString&, const QString& = QString() );
   static void                     setData( const QString&, const QVariant& );
+  static void                     setResourceManager( QtxResourceMgr* );
+  static void                     shutdown();
 
 private:
-  static QString                  getStringValue( const QString& );
-  static QIcon                    getIconValue( const QString& );
+  static QString                  getStringValue( const QString&, const QString& = QString() );
+  static QIcon                    getIconValue( const QString&, const QIcon& = QIcon() );
   void                            updateData();
   static void                     clearData();
+  void                            saveLink( const QString& );
+  void                            openLink( const QString&, bool = false );
 
 protected slots:
   virtual void                    linkClicked( const QUrl& );
   virtual void                    linkHovered( const QString&, const QString&, const QString& );
 
 private slots:
-  void                            adjustTitle();    
+  void                            adjustTitle();
+  void                            finished( bool );
+  void                            linkAction();
   
 private:
   static QMap<QString, QVariant>  myData;
   static QtxWebBrowser*           myBrowser;
+  static QtxResourceMgr*          myResourceMgr;
   QWebView*                       myWebView;
   QToolBar*                       myToolbar;
   QMap<int, QMenu*>               myMenus;
   QMap<int, QAction*>             myActions;
   QtxSearchTool*                  myFindPanel;
+  QUrl                            myLastUrl;
+};
+
+class QtxWebBrowser::Downloader: public QDialog
+{
+  Q_OBJECT;
+  
+  enum { mOpen, mSave };
+
+public:
+  Downloader( const QString&, int = mOpen, const QString& = QString(), QWidget* = 0 );
+  ~Downloader();
+
+  int          action() const;
+  bool         isRepeatAction() const;
+  QString      program() const;
+
+private slots:
+  void         setAction( int );
+  void         browse();
+
+private:
+  QString       myProgram;
+  QLabel*       myFileName;
+  QButtonGroup* myAction;
+  QPushButton*  myBrowse;
+  QCheckBox*    myRepeat;
+
+  friend class QtxWebBrowser;
 };
 
 #endif // QTXWEBBROWSER_H
