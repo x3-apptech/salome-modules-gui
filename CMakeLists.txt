@@ -41,6 +41,8 @@ IF(EXISTS ${KERNEL_ROOT_DIR})
   LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
   INCLUDE(SalomeMacros)
   FIND_PACKAGE(SalomeKERNEL REQUIRED)
+  ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
+  INCLUDE_DIRECTORIES(${KERNEL_INCLUDE_DIRS})
 ELSE(EXISTS ${KERNEL_ROOT_DIR})
   MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
 ENDIF(EXISTS ${KERNEL_ROOT_DIR})
@@ -56,7 +58,6 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
 # User options
 # (some options have already been defined in KERNEL) 
 # ============
-#OPTION(SALOME_USE_MPI "Use MPI containers" ${SALOME_USE_MPI})
 OPTION(SALOME_BUILD_DOC "Generate SALOME GUI documentation" ${SALOME_BUILD_DOC})
 OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ${SALOME_BUILD_TESTS})
 
@@ -77,7 +78,7 @@ MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_QXGRAPHVIEWER)
 # =============
 # Find "big" prerequisites first - they reference themselves many others
 #   -> this can help finding the smaller prerequisites and detect conficts.
-# In our case KERNEL has already loaded many prereq:
+# In our case KERNEL has already loaded many prereq which are also used in GUI:
 
 ##
 ## From KERNEL:
@@ -92,12 +93,6 @@ FIND_PACKAGE(SalomeBoost REQUIRED)
 FIND_PACKAGE(SalomeHDF5 REQUIRED COMPONENTS C)
 
 # Other KERNEL optionals:
-IF(SALOME_USE_MPI)
-  FIND_PACKAGE(SalomeMPI REQUIRED)
-  IF(HDF5_IS_PARALLEL)
-    SALOME_ADD_MPI_TO_HDF5()
-  ENDIF()  
-ENDIF()
 IF(NOT SALOME_LIGHT_ONLY)
   FIND_PACKAGE(SalomeOmniORB REQUIRED)
   FIND_PACKAGE(SalomeOmniORBPy REQUIRED)

@@ -22,7 +22,6 @@
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${CPPUNIT_INCLUDE_DIRS}
-  ${KERNEL_INCLUDE_DIRS}
 )
 
 # additional preprocessor / compiler flags

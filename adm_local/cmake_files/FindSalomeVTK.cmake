@@ -33,6 +33,7 @@ SET(SalomeVTK_FIND_COMPONENTS
   vtkRenderingAnnotation 
   vtkFiltersParallel
   vtkIOExport
+  #vtkWrappingPythonCore  ## ParaView 4.0.1
   vtkWrappingPython
 )
 
