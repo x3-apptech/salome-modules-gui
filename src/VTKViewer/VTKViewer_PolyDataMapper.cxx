@@ -69,8 +69,16 @@ vtkStandardNewMacro(VTKViewer_PolyDataMapper);
 #define APIENTRYP APIENTRY *
 #endif
 
+#ifndef GL_ARB_shader_objects
+typedef char GLcharARB;
+#endif
+
 #ifndef GL_VERTEX_PROGRAM_POINT_SIZE_ARB
 #define GL_VERTEX_PROGRAM_POINT_SIZE_ARB  0x8642
+#endif
+
+#ifndef GL_VERTEX_SHADER_ARB
+#define GL_VERTEX_SHADER_ARB              0x8B31
 #endif
 
 #ifndef GL_ARB_point_sprite
@@ -95,8 +103,8 @@ typedef GLhandleARB (APIENTRYP PFNGLCREATEPROGRAMOBJECTARBPROC) (void);
 typedef void (APIENTRYP PFNGLATTACHOBJECTARBPROC) (GLhandleARB containerObj, GLhandleARB obj);
 typedef void (APIENTRYP PFNGLLINKPROGRAMARBPROC) (GLhandleARB programObj);
 typedef void (APIENTRYP PFNGLUSEPROGRAMOBJECTARBPROC) (GLhandleARB programObj);
-typedef GLint (APIENTRYP PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const GLchar *name);
-typedef void (APIENTRYP PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+typedef GLint (APIENTRYP PFNGLGETATTRIBLOCATIONARBPROC) (GLhandleARB programObj, const GLcharARB *name);
+typedef void (APIENTRYP PFNGLVERTEXATTRIBPOINTERARBPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 typedef void (APIENTRYP PFNGLENABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
 typedef void (APIENTRYP PFNGLDISABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
 
@@ -116,7 +124,7 @@ static PFNGLBINDBUFFERARBPROC               vglBindBufferARB               = NUL
 static PFNGLBUFFERDATAARBPROC               vglBufferDataARB               = NULL;
 static PFNGLDELETEBUFFERSARBPROC            vglDeleteBuffersARB            = NULL;
 static PFNGLGETATTRIBLOCATIONARBPROC        vglGetAttribLocationARB        = NULL;
-static PFNGLVERTEXATTRIBPOINTERPROC         vglVertexAttribPointerARB      = NULL;
+static PFNGLVERTEXATTRIBPOINTERARBPROC      vglVertexAttribPointerARB      = NULL;
 static PFNGLENABLEVERTEXATTRIBARRAYARBPROC  vglEnableVertexAttribArrayARB  = NULL;
 static PFNGLDISABLEVERTEXATTRIBARRAYARBPROC vglDisableVertexAttribArrayARB = NULL;
 
@@ -188,7 +196,7 @@ bool InitializeBufferExtensions()
   if( !vglGetAttribLocationARB )
     return false;
 
-  vglVertexAttribPointerARB = (PFNGLVERTEXATTRIBPOINTERPROC)GL_GetProcAddress( "glVertexAttribPointer" );
+  vglVertexAttribPointerARB = (PFNGLVERTEXATTRIBPOINTERARBPROC)GL_GetProcAddress( "glVertexAttribPointer" );
   if( !vglVertexAttribPointerARB )
     return false;
 
@@ -952,7 +960,7 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
 
 	  attribute_diams = vglGetAttribLocationARB(this->VertexProgram, "diameter");
 	  vglEnableVertexAttribArrayARB(attribute_diams);
-	  vglBindBufferARB(GL_ARRAY_BUFFER, aDiamsID);
+	  vglBindBufferARB(GL_ARRAY_BUFFER_ARB, aDiamsID);
 	  vglVertexAttribPointerARB(
 				    attribute_diams,   // attribute
 				    1,                 // number of elements per vertex, here (diameter)

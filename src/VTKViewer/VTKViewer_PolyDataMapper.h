@@ -43,6 +43,11 @@ class vtkImageData;
 #define MAPPER_SUPERCLASS vtkMesaPolyDataMapper
 #endif
 
+#ifndef GL_ARB_shader_objects
+typedef GLuint GLhandleARB;
+#endif
+
+
 //----------------------------------------------------------------------------
 //! OpenGL Point Sprites PolyData Mapper.
 /*!
