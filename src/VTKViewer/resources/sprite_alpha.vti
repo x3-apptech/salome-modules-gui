@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <ImageData WholeExtent="0 15 0 15 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 15 0 15 0 0">
+      <PointData Scalars="BMPImage">
+        <DataArray type="UInt8" Name="BMPImage" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="441.67295593"         offset="0"                   />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAwAApQAAAA==eJzVkLERhCAQRa3AiIjQDmxCMiLJjK3AlBIIwZAe7AFiupACiOH+GNx4M8LF/vjt7n/bdS8IpXQYhr7v/5LA1nVVShljpJTTNDVgQsi2bd77cuU8T2stY6zGY9txHOWWGCOu1IotyxJCKL/RWqPkIz/Ps3PuDuec4QL9R34cx33fU0pfHuPQbyhzzlEAGIrBBfq1MvcrQgi44DP4WBt+XT5+l3QU
+  </AppendedData>
+</VTKFile>

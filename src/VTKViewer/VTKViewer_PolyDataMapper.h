@@ -65,6 +65,11 @@ public:
   //! Set point marker enabled
   void SetMarkerEnabled( bool );
 
+  //! Set point ball enabled
+  void SetBallEnabled( bool );
+  
+  bool GetBallEnabled( );
+
   //! Set standard point marker
   void SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
 
@@ -102,14 +107,20 @@ protected:
   //! Initializing textures for Point Sprites.
   void              InitTextures();
 
+  //! Initializing of the Vertex Shader.
+  void              InitShader();
+
 private:
   int               ExtensionsInitialized;
 
   GLuint            PointSpriteTexture;
 
   vtkSmartPointer<vtkImageData> ImageData;
+  
+  GLhandleARB       VertexProgram;
 
   bool              MarkerEnabled;
+  bool              BallEnabled;  
   VTK::MarkerType   MarkerType;
   VTK::MarkerScale  MarkerScale;
   int               MarkerId;
@@ -117,6 +128,7 @@ private:
   typedef std::map< int, vtkSmartPointer<vtkImageData> > ImageDataMap;
   ImageDataMap      StandardTextures;
   ImageDataMap      CustomTextures;
+  ImageDataMap      SpecialTextures;  //special predefined textures, used to draw point sprites.
 };
 
 #endif

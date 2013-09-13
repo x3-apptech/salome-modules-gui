@@ -32,6 +32,7 @@
 #include <vtkCellArray.h>
 #include <vtkIdList.h>
 #include <vtkCell.h>
+#include <vtkCellData.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkVersion.h>
@@ -95,7 +96,7 @@ vtkIdType VTKViewer_ExtractUnstructuredGrid::GetOutputId(int theInId) const{
 }
 
 
-inline void InsertCell(vtkUnstructuredGrid *theInput,
+inline int InsertCell(vtkUnstructuredGrid *theInput,
                        vtkCellArray *theConnectivity, 
                        vtkUnsignedCharArray* theCellTypesArray,
                        vtkIdTypeArray*& theFaces,
@@ -110,6 +111,7 @@ inline void InsertCell(vtkUnstructuredGrid *theInput,
   vtkCell *aCell = theInput->GetCell(theCellId);
   vtkIdList *aPntIds = aCell->GetPointIds();
   vtkIdType aNbIds = aPntIds->GetNumberOfIds();
+  vtkIdType aCellId = -1;
   theIdList->SetNumberOfIds(aNbIds);
   for(vtkIdType i = 0; i < aNbIds; i++){
     theIdList->SetId(i,aPntIds->GetId(i));
@@ -119,7 +121,7 @@ inline void InsertCell(vtkUnstructuredGrid *theInput,
   if (aCellType != VTK_POLYHEDRON)
     {
 #endif
-      theConnectivity->InsertNextCell(theIdList);
+      aCellId = theConnectivity->InsertNextCell(theIdList);
       if (theFaceLocations)
         theFaceLocations->InsertNextValue(-1);
 #if VTK_XVERSION > 50700
@@ -152,11 +154,12 @@ inline void InsertCell(vtkUnstructuredGrid *theInput,
     }
 #endif
 
-  theCellTypesArray->InsertNextValue(aCellType);
+  vtkIdType anID = theCellTypesArray->InsertNextValue(aCellType);
   if(theStoreMapping){
     theOut2InId.push_back(theCellId);
     theIn2OutId[theCellId] = theOutId;
   }
+  return aCellId;
 }
 
 inline void InsertPointCell(vtkCellArray *theConnectivity, 
@@ -224,6 +227,7 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
       vtkUnsignedCharArray* aCellTypesArray = vtkUnsignedCharArray::New();
       aCellTypesArray->SetNumberOfComponents(1);
       aCellTypesArray->Allocate(aNbElems*aCellTypesArray->GetNumberOfComponents());
+      anOutput->GetCellData()->CopyAllocate(anInput->GetCellData(),aNbElems,aNbElems/2);
 
       vtkIdTypeArray *newFaces = 0;
       vtkIdTypeArray *newFaceLocations = 0;
@@ -233,15 +237,17 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
         if(myChangeMode == eAdding){
           for(vtkIdType aCellId = 0, anOutId = 0; aCellId < aNbElems; aCellId++,anOutId++){
             if(myCellIds.find(aCellId) != myCellIds.end()){
-              InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+              vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                          myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+	      anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
             }
           }
         }else{
           for(vtkIdType aCellId = 0, anOutId = 0; aCellId < aNbElems; aCellId++,anOutId++){
             if(myCellIds.find(aCellId) == myCellIds.end()){
-              InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+              vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                          myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+	      anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
             }
           }
         }
@@ -250,16 +256,18 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
           for(vtkIdType aCellId = 0, anOutId = 0; aCellId < aNbElems; aCellId++,anOutId++){
             vtkIdType aType = anInput->GetCellType(aCellId);
             if(myCellTypes.find(aType) != myCellTypes.end()){
-              InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+              vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                          myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+	      anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
             }
           }
         }else{
           for(vtkIdType aCellId = 0, anOutId = 0; aCellId < aNbElems; aCellId++,anOutId++){
             vtkIdType aType = anInput->GetCellType(aCellId);
             if(myCellTypes.find(aType) == myCellTypes.end()){
-              InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+              vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                          myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+	      anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
             }
           }
         }
@@ -269,8 +277,9 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
             vtkIdType aType = anInput->GetCellType(aCellId);
             if(myCellTypes.find(aType) != myCellTypes.end()){
               if(myCellIds.find(aCellId) != myCellIds.end()){
-                InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+                vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                            myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+		anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
               }
             }
           }
@@ -279,8 +288,9 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
             vtkIdType aType = anInput->GetCellType(aCellId);
             if(myCellTypes.find(aType) == myCellTypes.end()){
               if(myCellIds.find(aCellId) == myCellIds.end()){
-                InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
+                vtkIdType newId = InsertCell(anInput,aConnectivity,aCellTypesArray,newFaces,newFaceLocations,aCellId,anIdList,
                            myStoreMapping,anOutId,myOut2InId,myIn2OutId);
+		anOutput->GetCellData()->CopyData(anInput->GetCellData(),aCellId,newId);
               }
             }
           }

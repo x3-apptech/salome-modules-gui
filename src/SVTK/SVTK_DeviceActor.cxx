@@ -697,6 +697,14 @@ double SVTK_DeviceActor::GetQuadraticArcAngle(){
 }
 
 /*!
+ * Set ball drawing enabled
+ * \param theBallEnabled flag to enable/disable balls
+ */
+void SVTK_DeviceActor::SetBallEnabled( bool theBallEnabled ) {
+  myMapper->SetBallEnabled( theBallEnabled );
+}
+
+/*!
  * Set point marker enabled
  * \param theMarkerEnabled flag to enable/disable point marker
  */

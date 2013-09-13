@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <ImageData WholeExtent="0 15 0 15 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 15 0 15 0 0">
+      <PointData Scalars="BMPImage">
+        <DataArray type="UInt8" Name="BMPImage" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="429.54860028"         offset="0"                   />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAwAA3AEAAA==eJylkr+L2mAcxv2RnIGkySkRTkUEMXURBxtz2ZpBHJJzSC+biIeLW0TSHrgILndEepOTAW9LoQfN4A06u8Q/QCfH65rOjn1AauEqpdB3egnPN9/n+TxvKPRfJ0oQNE2fx+OJRIJjOSoWC4fDJ5X4zrxhstlsqVSSpKp8KVcqFUEQkskkSZJ/iEMcyxaLRUVRjGvjpt3udDrNZlNTNVEU0+n0qxGKogqFQq1Wg2wwGNzd3dtjezQamaZ5bRjvRJHn+aMxXHg+eSnLrVZrOBw6juN53vx57rruw8Nns9dTNVV4K1BU7KAnCCKXy9XrdfxtMpksl8vtZrvb7fz1+ovrYguMIQvLcQc9vMFM4+rq9tPt42y29v0gCPb7PUae53PbtmFSlmUQO+rz+bymqpZlOc50tVq9vHz/EQSb7cb75iFL+6ZdlaR4/Pygj0QimUwGZLrd7tgeP319woi/9heLhTN1EN8wDEBmaPrIB9WUy+UPut7v92Fg6jiz2SOyID7MKO8V9EIQ0d+1RqOp1IVUlXRdxxbL+ogsvZ4JYoCMXhiGeVXZ2RmZukhhC4ypqtZoNEAMkIECVZ58FdjCsizaRHzIABmPAVWefkC/DuKTJAFoGP+r8J/OTxIOlB8=
+  </AppendedData>
+</VTKFile>

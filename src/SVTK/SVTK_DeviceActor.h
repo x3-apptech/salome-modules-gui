@@ -214,6 +214,10 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   SetShaded(bool theShaded);
   //@}
 
+  /** @name For ball marker management purpose */
+  void 
+  SetBallEnabled( bool );
+
   /** @name For marker management purpose */
   void
   SetMarkerEnabled( bool );

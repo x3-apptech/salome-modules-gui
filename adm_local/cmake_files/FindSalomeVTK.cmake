@@ -35,6 +35,7 @@ SET(SalomeVTK_FIND_COMPONENTS
   vtkIOExport
   #vtkWrappingPythonCore  ## ParaView 4.0.1
   vtkWrappingPython
+  vtkIOXML
 )
 
 # If no VTK root dir is specified, try the ParaView root dir:
