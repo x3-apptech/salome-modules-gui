@@ -135,6 +135,9 @@ bool OCCViewer_ViewPort3d::mapView( const Handle(V3d_View)& view )
       view->TriedronDisplay( Aspect_TOTP_LEFT_LOWER, Quantity_NOC_WHITE, 0.05, V3d_ZBUFFER );
     }
   }
+
+  emit( vpMapped() );
+
   return true;
 }
 

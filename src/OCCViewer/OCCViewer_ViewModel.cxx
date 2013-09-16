@@ -99,23 +99,20 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myTrihedronSize(100)
 {
   // init CasCade viewers
-  myV3dViewer = OCCViewer_VService::Viewer3d( "", (short*) "Viewer3d", "", 1000.,
-                                              V3d_XposYnegZpos, true, true );
-
+  myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
   myV3dViewer->Init();
-
-  myV3dCollector = OCCViewer_VService::Viewer3d( "", (short*) "Collector3d", "", 1000.,
-                                                 V3d_XposYnegZpos, true, true );
+  myV3dCollector = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Collector3d").ToExtString() );
   myV3dCollector->Init();
 
   // init selector
-  myAISContext = new AIS_InteractiveContext( myV3dViewer, myV3dCollector);
+  myAISContext = new AIS_InteractiveContext( myV3dViewer, myV3dCollector );
 
   myAISContext->SelectionColor( Quantity_NOC_WHITE );
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
 
+  /*
   double h = QApplication::desktop()->screenGeometry( QApplication::desktop()->primaryScreen() ).height() / 300. ;
   Handle(Prs3d_Drawer) drawer = myAISContext->DefaultDrawer();
   Handle(Prs3d_TextAspect) ta = drawer->TextAspect();
@@ -124,9 +121,10 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   drawer->SetTextAspect(ta);
   drawer->AngleAspect()->SetTextAspect(ta);
   drawer->LengthAspect()->SetTextAspect(ta);
+  */
   
   /* create trihedron */
-  if( DisplayTrihedron )
+  if ( DisplayTrihedron )
   {
     Handle(Geom_Axis2Placement) anAxis = new Geom_Axis2Placement(gp::XOY());
     myTrihedron = new AIS_Trihedron(anAxis);
@@ -138,15 +136,12 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     myTrihedron->SetSize(100);
     Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
     if (drawer->HasDatumAspect()) {
-        Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
-        daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
-        daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
-        daspect->ThirdAxisAspect()->SetColor(Quantity_Color(0.0, 0.0, 1.0, Quantity_TOC_RGB));
+      Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
+      daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
+      daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
+      daspect->ThirdAxisAspect()->SetColor(Quantity_Color(0.0, 0.0, 1.0, Quantity_TOC_RGB));
     }
-
-    myAISContext->Display(myTrihedron);
-    myAISContext->Deactivate(myTrihedron);
-    }
+  }
 
   // set interaction style to standard
   myInteractionStyle = 0;
@@ -250,6 +245,7 @@ SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
   vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
   // connect signal from viewport
   connect(view->getViewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
+  connect(view->getViewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
   return view;
 }
 
@@ -406,6 +402,11 @@ void OCCViewer_Viewer::onViewClosed()
     //clean up presentations before last view is closed
     myAISContext->RemoveAll(Standard_False);
   }
+}
+
+void OCCViewer_Viewer::onViewMapped()
+{
+  setTrihedronShown( true );
 }
 
 int OCCViewer_Viewer::getTopLayerId()
@@ -821,10 +822,13 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
   if ( myTrihedron.IsNull() )
     return;
 
-  if ( on )
+  if ( on ) {
     myAISContext->Display( myTrihedron );
-  else
+    myAISContext->Deactivate(myTrihedron);
+  }
+  else {
     myAISContext->Erase( myTrihedron );
+  }
 }
 
 /*!
@@ -986,6 +990,9 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
  * Update the size of the trihedron
  */
 void OCCViewer_Viewer::updateTrihedron() {
+  if ( myTrihedron.IsNull() )
+    return;
+
   if(myIsRelative){
     double newSz, oldSz;
     
