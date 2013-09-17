@@ -264,6 +264,8 @@ void SalomeApp_VisualState::restoreState(int savePoint)
     }
   }
 
+  qApp->processEvents( QEventLoop::ExcludeUserInputEvents, 5000 );
+
   // restore modules' visual parameters
   std::vector<std::string> v = ip->getValues( "AP_MODULES_LIST" );
   for ( int i = 0; i < v.size(); i++ )
@@ -305,7 +307,7 @@ void SalomeApp_VisualState::restoreState(int savePoint)
   // so the same views will get the same names.
   nameViewWindows( lst );
 
-  qApp->processEvents();
+  qApp->processEvents( QEventLoop::ExcludeUserInputEvents, 5000 );
 
   // restore workstack parameters.  should be done after module's restoreVisualParameters(), because
   // some modules can create their own viewers (like VISU creates GaussViewers)
