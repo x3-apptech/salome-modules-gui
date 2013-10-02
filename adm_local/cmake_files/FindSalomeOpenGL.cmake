@@ -23,5 +23,10 @@
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
+IF(WIN32)
+  # The variable is not even set under Windows 32. Force it to blank so that 
+  # we don't get a warning in the big macro.
+  SET(OPENGL_INCLUDE_DIR "")
+ENDIF()
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(OpenGL OPENGL_INCLUDE_DIR 1)
 #MARK_AS_ADVANCED()
