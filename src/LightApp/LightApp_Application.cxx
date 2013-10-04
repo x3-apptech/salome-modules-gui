@@ -210,6 +210,55 @@ static const char* imageEmptyIcon[] = {
 
 int LightApp_Application::lastStudyId = 0;
 
+
+// Markers used to parse array with dockable windows and toolbars state.
+// For more details please see the qdockarealayout.cpp && qtoolbararealayout.cpp
+// in the Qt source code.
+
+#define QDockWidgetMarker 0xfd // = DockWidgetStateMarker
+#define QToolBarMarker 0xfc    // = ToolBarStateMarkerEx
+
+// Format of the Byte array with the windows and toolbar state is:
+// VersionMarker|version|DockWidgetStateMarker|nbDockWidgetLines|...DocWidgetData...|ToolBarStateMarkerEx|nbToolBarLines|...ToolBarData...
+
+//Find toolbar marker position in the array in the following way:
+//since the 'toolbar marker' is not unique, find index of first occurrence of the
+//'toolbar marker' in the array and check that next string is name of the toolbar
+
+int getToolbarMarkerIndex(QByteArray input, const QStringList& aFlags) {
+  int aResult = -1,tmp = 0;
+  int inputLen = input.length();
+  QDataStream anInputData(&input, QIODevice::ReadOnly);
+  while(tmp < inputLen) {
+      tmp = input.indexOf(QToolBarMarker, tmp + 1);
+      if(tmp < 0 )
+	break;
+      anInputData.device()->seek(tmp);
+      uchar mark;
+      anInputData>>mark;
+      int lines;
+      anInputData >> lines;
+
+      if(lines == 0 && anInputData.atEnd()){
+	//Case then array doesn't contain information about toolbars,
+	aResult = tmp;
+	break;
+      }
+
+      int pos;
+      anInputData >> pos;
+      int cnt;
+      anInputData >> cnt;
+      QString str;
+      anInputData>>str;
+      if(aFlags.contains(str)) {
+	aResult = tmp;
+	break;
+      }
+    }        
+  return aResult;
+}
+
 /*!
   \return last global id of study
 */
@@ -2036,6 +2085,8 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->addPreference( tr( "PREF_ASCII_FILE" ), studyGroup, LightApp_Preferences::Bool, "Study", "ascii_file" );
   // .... -> store windows geometry
   pref->addPreference( tr( "PREF_STORE_POS" ),  studyGroup, LightApp_Preferences::Bool, "Study", "store_positions" );
+  pref->addPreference( "", studyGroup, LightApp_Preferences::Space );
+  pref->addPreference( tr( "PREF_STORE_TOOL_POS" ),  studyGroup, LightApp_Preferences::Bool, "Study", "store_tool_positions" );
   // .... -> auto-save
   int autoSaveInterval = pref->addPreference( tr( "PREF_AUTO_SAVE" ),  studyGroup,
                                               LightApp_Preferences::IntSpin, "Study", "auto_save_interval" );
@@ -2810,8 +2861,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
   if( sec=="Study" )
   {
-    if( param=="store_positions" )
-      updateWindows();
     if( param=="auto_save_interval" ) {
       myAutoSaveTimer->stop();
       int autoSaveInterval = resMgr->integerValue( "Study", "auto_save_interval", 0 );
@@ -2913,17 +2962,8 @@ void LightApp_Application::loadPreferences()
     mru_load = false;
   }
 
-  myWinGeom.clear();
-  QStringList mods = aResMgr->parameters( "windows_geometry" );
-  for ( QStringList::const_iterator it = mods.begin(); it != mods.end(); ++it )
-  {
-    QByteArray arr;
-    if ( aResMgr->value( "windows_geometry", *it, arr ) )
-      myWinGeom.insert( *it, arr );
-  }
-
   myWinVis.clear();
-  mods = aResMgr->parameters( "windows_visibility" );
+  QStringList mods = aResMgr->parameters( "windows_visibility" );
   for ( QStringList::const_iterator itr = mods.begin(); itr != mods.end(); ++itr )
   {
     QByteArray arr;
@@ -2961,9 +3001,6 @@ void LightApp_Application::savePreferences()
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
   if ( mru )
     mru->saveLinks( aResMgr, "MRU" );
-
-  for ( WinGeom::const_iterator it = myWinGeom.begin(); it != myWinGeom.end(); ++it )
-    aResMgr->setValue( "windows_geometry", it.key(), it.value() );
 
   for ( WinVis::const_iterator itr = myWinVis.begin(); itr != myWinVis.end(); ++itr )
     aResMgr->setValue( "windows_visibility", itr.key(), itr.value() );
@@ -3163,50 +3200,90 @@ void LightApp_Application::loadDockWindowsState()
 {
   if ( !desktop() )
     return;
-
-  bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
-  if( !store )
-    return;
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  bool storeWin = aResMgr->booleanValue( "Study", "store_positions", true );
+  bool storeTb = aResMgr->booleanValue( "Study", "store_tool_positions", true );
 
   QString modName;
   if ( activeModule() )
     modName = activeModule()->name();
 
-  if ( myWinGeom.contains( modName ) )
-    desktop()->restoreState( myWinGeom[modName] );
-
-  if ( !myWinVis.contains( modName ) )
+  QtxResourceMgr::WorkingMode prevMode = aResMgr->workingMode();
+  aResMgr->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
+  QByteArray aDefaultState;
+  aResMgr->value("windows_geometry", modName , aDefaultState );
+  QByteArray aDefaultVisibility;
+  aResMgr->value("windows_visibility", modName , aDefaultVisibility );
+  bool hasDefaultVisibility = !aDefaultVisibility.isEmpty();
+  aResMgr->setWorkingMode(prevMode);
+  
+  if( !storeWin && !storeTb && aDefaultState.isEmpty() && !hasDefaultVisibility)
     return;
 
-  QMap<QString, bool> tbMap, dwMap;
-  dockWindowsState( myWinVis[modName], tbMap, dwMap );
-
-  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
-  for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit )
-  {
-    QToolBar* tb = *tit;
-
-    QObject* po = Qtx::findParent( tb, "QMainWindow" );
-    if ( po != desktop() )
-      continue;
-
-    if ( tbMap.contains( tb->objectName() ) )
-      tb->setVisible( tbMap[tb->objectName()] );
+  if ( aResMgr->hasValue("windows_geometry" ,modName ) ) {
+    QByteArray arr;
+    aResMgr->value("windows_geometry", modName , arr );
+    QByteArray aTargetArray = processState(arr, storeWin, storeTb, aDefaultState);
+    desktop()->restoreState( aTargetArray );
   }
 
-  QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
-  for ( QList<QDockWidget*>::iterator dit = dwList.begin(); dit != dwList.end(); ++dit )
-  {
-    QDockWidget* dw = *dit;
+  if ( !myWinVis.contains( modName ) && aDefaultVisibility.isEmpty())
+    return;
 
-    QObject* po = Qtx::findParent( dw, "QMainWindow" );
-    if ( po != desktop() )
-      continue;
+  QMap<QString, bool> *tbMap = 0;
+  QMap<QString, bool> *dwMap = 0;
+  
+  QMap<QString, bool> userTbMap, userDwMap;
+  dockWindowsState( myWinVis[modName], userTbMap, userDwMap );
 
-    if ( dwMap.contains( dw->objectName() ) )
-      dw->setVisible( dwMap[dw->objectName()] );
+  QMap<QString, bool> defaultTbMap, defaultDwMap;
+  if(hasDefaultVisibility) {
+    dockWindowsState( aDefaultVisibility, defaultTbMap, defaultDwMap);    
+  }
+
+  if(storeTb) {
+    tbMap =  &userTbMap;
+  } else {
+    if(hasDefaultVisibility){
+      tbMap =  &defaultTbMap;
+    }
+  }
+
+  if(storeWin) {
+    dwMap =  &userDwMap;
+  } else {
+    if(hasDefaultVisibility){
+      dwMap =  &defaultDwMap;
+    }
+  }
+  
+  if(tbMap) {
+    QList<QToolBar*> tbList = findToolBars();
+    for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit )
+      {	
+	QToolBar* tb = *tit;
+	if ( tbMap->contains( tb->objectName() ) ) {	  
+	  tb->setVisible( (*tbMap)[tb->objectName()] );
+	}
+      }
+  }
+
+  if(dwMap) {
+    QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
+    for ( QList<QDockWidget*>::iterator dit = dwList.begin(); dit != dwList.end(); ++dit )
+      {
+	QDockWidget* dw = *dit;
+	
+	QObject* po = Qtx::findParent( dw, "QMainWindow" );
+	if ( po != desktop() )
+	  continue;
+	
+	if ( dwMap->contains( dw->objectName() ) )
+	  dw->setVisible( (*dwMap)[dw->objectName()] );
+      }
   }
 }
+
 
 /*!
   Saves windows geometry
@@ -3216,15 +3293,18 @@ void LightApp_Application::saveDockWindowsState()
   if ( !desktop() )
     return;
 
-  bool store = resourceMgr()->booleanValue( "Study", "store_positions", true );
-  if( !store )
+  bool storeWin = resourceMgr()->booleanValue( "Study", "store_positions", true );
+  bool storeTb = resourceMgr()->booleanValue( "Study", "store_tool_positions", true );
+
+  if( !storeWin && !storeTb )
     return;
 
   QString modName;
   if ( activeModule() )
     modName = activeModule()->name();
 
-  myWinGeom.insert( modName, desktop()->saveState() );
+  QByteArray arr = desktop()->saveState();
+  resourceMgr()->setValue( "windows_geometry", modName, processState(arr, storeWin, storeTb) );
 
   QByteArray visArr;
   if ( myWinVis.contains( modName ) )
@@ -4000,4 +4080,128 @@ void LightApp_Application::onDesktopMessage( const QString& message )
       }
     }
   }
+}
+
+/*!
+  Internal method. 
+  Returns all top level toolbars.
+  Note : Result list contains only main window toolbars, not including toolbars from viewers.
+*/
+QList<QToolBar*> LightApp_Application::findToolBars() {
+  QList<QToolBar*> aResult;
+  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
+  for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit ) {
+    QToolBar* tb = *tit;    
+    QObject* po = Qtx::findParent( tb, "QMainWindow" );
+    if ( po != desktop() )
+      continue;	
+    aResult.append(tb);
+  }
+  return aResult;
+}
+
+/*!
+  Internal method to parse toolbars and dockable windows state.
+ */
+QByteArray LightApp_Application::processState(QByteArray& input, const bool processWin,const bool processTb, QByteArray defaultState) {
+
+  QByteArray aRes;
+  bool hasDefaultState  = !defaultState.isEmpty();
+  bool isDockWinWriten = false;
+  if(processWin && processTb) {
+    aRes = input;
+  } else if(!processWin && !processTb ) {
+    if(hasDefaultState)
+      aRes = defaultState;
+  } else {
+    QDataStream aData(&aRes, QIODevice::WriteOnly);
+    QList<QToolBar*> aToolBars = findToolBars();
+
+    QStringList aNames;
+    for ( QList<QToolBar*>::iterator tit = aToolBars.begin(); tit != aToolBars.end(); ++tit ) {	
+      QToolBar* tb = *tit;
+      aNames.append(tb->objectName());
+    }
+
+    int toolBarMarkerIndex = getToolbarMarkerIndex(input,aNames);
+    QDataStream anInputData(&input, QIODevice::ReadOnly);
+    if(toolBarMarkerIndex < 0)
+      return aRes;
+
+    int toolBarMarkerIndexDef;
+    if(hasDefaultState) {
+      toolBarMarkerIndexDef = getToolbarMarkerIndex(defaultState, aNames);
+      if(toolBarMarkerIndexDef < 0)
+	return aRes;      
+    }
+    QDataStream anInputDataDef(&defaultState, QIODevice::ReadOnly);
+
+    QDataStream* aTargetData = 0;
+    int          aTargetIndex = -1;
+
+    if(processWin) {
+      //Write date from users settings
+      aTargetData = &anInputData;
+      aTargetIndex = toolBarMarkerIndex;
+    } else {
+      //Write date from default settings
+      if(hasDefaultState) {
+	aTargetData = &anInputDataDef;
+	aTargetIndex = toolBarMarkerIndexDef;	
+      }
+    }
+
+    if(aTargetData && aTargetIndex >= 0 ) {
+      aTargetData->device()->seek(0);
+      while( aTargetData->device()->pos() < aTargetIndex ) {
+	uchar ch;
+	*aTargetData >> ch;
+	aData<<ch;
+      }
+      isDockWinWriten = true;
+    }
+    
+    aTargetData = 0;
+    aTargetIndex = -1;
+
+    if(processTb) {
+      aTargetData = &anInputData;
+      aTargetIndex = toolBarMarkerIndex;
+    } else {
+      if(hasDefaultState) {
+	aTargetData = &anInputDataDef;
+	aTargetIndex = toolBarMarkerIndexDef;	
+      }      
+    }
+
+    if(aTargetData && aTargetIndex >= 0) {
+      int index;
+      if(!isDockWinWriten ) {
+	//Write version marker
+	int marker, version;
+	aTargetData->device()->seek(0);
+	*aTargetData >> marker;
+	*aTargetData >> version;
+	aData << marker;
+	aData << version;
+	aData << (uchar) QDockWidgetMarker;
+	aData << (int) 0;
+	int shift = 4*sizeof(int) + sizeof(QSize);
+	index = aTargetIndex - shift;
+      } else {
+	index = aTargetIndex;
+      }
+      
+      aTargetData->device()->seek(index);
+      while(!aTargetData->atEnd()) {
+	uchar ch;
+	*aTargetData >> ch;
+	aData << ch;
+      }
+    } else { // Not treat toolbars
+      aData << (uchar) QToolBarMarker;
+      aData << (int) 0; //Nb toolbars = 0
+    }
+  }
+  return aRes;
 }

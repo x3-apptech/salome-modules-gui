@@ -171,6 +171,10 @@ The changes will be applied on the next application session.</translation>
         <translation>Store positions of windows</translation>
     </message>
     <message>
+        <source>PREF_STORE_TOOL_POS</source>
+        <translation>Store positions of toolbars</translation>
+        </message>
+    <message>
         <source>PREF_AUTO_SAVE</source>
         <translation>Auto-save interval (min)</translation>
     </message>

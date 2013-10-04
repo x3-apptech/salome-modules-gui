@@ -283,6 +283,9 @@ protected:
 
 private:
   void                                emptyPreferences( const QString& );
+  QList<QToolBar*>                    findToolBars();
+  
+  QByteArray                          processState(QByteArray& input, const bool processWin,const bool processTb, QByteArray defaultState = QByteArray());
 
 protected:
   typedef QPointer<QWidget>         WinPtr;
@@ -300,7 +303,6 @@ protected:
 
   WinMap                              myWin;
   WinVis                              myWinVis;
-  WinGeom                             myWinGeom;
 
   SUIT_Accel*                         myAccel;
   QTimer*                             myAutoSaveTimer;

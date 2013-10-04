@@ -364,13 +364,14 @@ QtxToolBar::~QtxToolBar()
 */
 void QtxToolBar::setVisible( bool visible )
 {
-  if ( isVisible() == visible ) return;
-  if ( myWatcher )
-  {
-    if ( visible )
-      myWatcher->shown( this );
-    else
-      myWatcher->hidden( this );
+  if ( isVisible() != visible ) {
+    if ( myWatcher )
+      {
+	if ( visible )
+	  myWatcher->shown( this );
+	else
+	  myWatcher->hidden( this );
+      }
   }
 
   QToolBar::setVisible( visible );
