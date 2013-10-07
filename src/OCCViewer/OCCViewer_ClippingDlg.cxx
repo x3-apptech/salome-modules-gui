@@ -530,7 +530,11 @@ void OCCViewer_ClippingDlg::erasePreview ()
   
   if ( !myPreviewPlane.IsNull() && ic->IsDisplayed( myPreviewPlane ) )
     {
+#if OCC_VERSION_LARGE <= 0x06060000
       ic->Erase( myPreviewPlane, false, false );
+#else
+      ic->Erase( myPreviewPlane, false );
+#endif
       ic->Remove( myPreviewPlane, false );
       myPreviewPlane.Nullify();
     }
