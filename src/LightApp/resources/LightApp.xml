@@ -121,7 +121,7 @@
   <section name="Study">
     <!-- General study settings -->
     <parameter name="store_positions"    value="true" />
-    <parameter name="store_tool_positions"     value="false" />
+    <parameter name="store_tool_positions"     value="true" />
     <parameter name="auto_save_interval" value="0" />
     <parameter name="multi_file"         value="false" />
     <parameter name="ascii_file"         value="false" />

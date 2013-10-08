@@ -55,7 +55,7 @@
   <section name="Study">
     <!-- General study settings -->
     <parameter name="store_positions"     value="true" />
-    <parameter name="store_tool_positions"     value="false" />
+    <parameter name="store_tool_positions"     value="true" />
     <parameter name="store_visual_state"  value="false" />
     <parameter name="pydump_publish"      value="true" />
     <parameter name="multi_file_dump"     value="false" />
