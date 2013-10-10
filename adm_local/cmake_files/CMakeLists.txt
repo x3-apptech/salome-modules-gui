@@ -33,7 +33,6 @@ SET(_adm_data
   FindSalomeQt4.cmake
   FindSalomeQwt.cmake
   FindSalomeSIP.cmake
-  FindSalomeVTK.cmake
   FindSalomeGUI.cmake
   FindSalomeOpenGL.cmake
   UsePyQt4.cmake
