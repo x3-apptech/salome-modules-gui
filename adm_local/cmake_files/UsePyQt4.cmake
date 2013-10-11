@@ -137,3 +137,39 @@ MACRO(PYQT4_WRAP_SIP outfiles)
       )
   ENDFOREACH()
 ENDMACRO(PYQT4_WRAP_SIP)
+
+
+####################################################################
+#
+# PYQT4_WRAP_QRC macro
+#
+# Generate Python wrappings for *.qrc files by processing them with pyrcc4.
+#
+# USAGE: PYQT4_WRAP_QRC(output_files qrc_files)
+#
+# ARGUMENTS:
+#   output_files [out] variable where output file names are listed to
+#   qrc_files  [in]  list of *.qrc files
+# 
+# NOTES:
+#   - Input files are considered relative to the current source directory.
+#   - Output files are generated in the current build directory.
+#   - Macro automatically adds custom build target to generate output files
+# 
+####################################################################
+
+MACRO(PYQT4_WRAP_QRC outfiles)
+  FOREACH(_input ${ARGN})
+    GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
+    STRING(REPLACE ".qrc" "_qrc.py" _input_name ${_input_name})
+    SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_output}
+      COMMAND ${PYQT_PYRCC_EXECUTABLE} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      MAIN_DEPENDENCY ${_input}
+      )
+    SET(${outfiles} ${${outfiles}} ${_output})
+  ENDFOREACH()
+  _PYQT4_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_QRC_PY_FILES _uniqueTargetName)
+  ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL DEPENDS ${${outfiles}})
+ENDMACRO(PYQT4_WRAP_QRC)
