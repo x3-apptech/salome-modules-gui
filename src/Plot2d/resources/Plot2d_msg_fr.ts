@@ -72,6 +72,10 @@
         <translation>Fichiers PostScript encapsulés (*.eps)</translation>
     </message>
     <message>
+        <source>PDF_FILES</source>
+        <translation>Fichiers PDF (*.pdf)</translation>
+    </message>
+    <message>
         <source>DSC_GLOBALPAN_VIEW</source>
         <translation>Sélection d&apos;un nouveau centre de vue</translation>
     </message>

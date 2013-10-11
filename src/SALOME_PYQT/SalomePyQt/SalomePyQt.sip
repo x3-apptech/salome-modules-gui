@@ -33,6 +33,7 @@
 #include <QtxActionSet.h>
 #include <QtxActionGroup.h>
 #include <SalomePyQt.h>
+#include <Plot2d_Curve.h>
 %End
 
 class SALOME_Selection : QObject
@@ -196,6 +197,62 @@ private:
   QtxActionGroup( const QtxActionGroup& );
 };
 
+enum ObjectType
+{
+  MainTitle,
+  XTitle,
+  YTitle,
+  Y2Title,
+  XAxis,
+  YAxis,
+  Y2Axis
+};
+
+class Plot2d_Curve
+{
+%TypeHeaderCode
+#include <Plot2d_Curve.h>
+%End
+
+%ConvertToSubClassCode
+    if ( dynamic_cast<Plot2d_Curve*>( sipCpp ) )
+      sipClass = sipClass_Plot2d_Curve;
+    else
+      sipClass = NULL;
+%End
+
+public:
+  Plot2d_Curve();
+  virtual ~Plot2d_Curve();
+  void setName( const QString& );
+  void addPoint( double, double );
+  void addPoints(SIP_PYLIST X, SIP_PYLIST Y);
+%MethodCode
+  int nx = PyList_Size(a0);
+  int ny = PyList_Size(a1);
+  
+  if( nx != ny ) { 
+    PyErr_Format(PyExc_TypeError,"The dimention of x and y should be the same. It is %d and %d currently.", nx, ny);
+  }
+  
+  int i;
+  PyObject *pX, *pY;
+
+  for (i=0; i<nx; i++) {
+    pX = PyList_GET_ITEM(a0,i);
+    pY = PyList_GET_ITEM(a1,i);
+    double aX = PyFloat_AsDouble(pX);
+    double aY = PyFloat_AsDouble(pY);
+    Py_DECREF(pX);
+    Py_DECREF(pY);
+    sipCpp->addPoint(aX, aY);
+  }
+%End
+  void insertPoint( int, double, double );
+  void deletePoint( int );
+  void clearAllPoints();
+};
+
 class SalomePyQt
 {
 %TypeHeaderCode
@@ -250,7 +307,7 @@ public:
   static QIcon             loadIcon( const QString&, const QString& ) /ReleaseGIL/ ;
   static void              helpContext( const QString&, const QString& ) /ReleaseGIL/ ;
 
-  static bool              dumpView( const QString& ) /ReleaseGIL/ ;
+  static bool              dumpView( const QString&, const int = 0 ) /ReleaseGIL/ ;
 
   static int               defaultMenuGroup() /ReleaseGIL/ ;
 
@@ -329,10 +386,11 @@ public:
   static QString           getViewTitle( const int ) /ReleaseGIL/ ;
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
-  static int               createView( const QString& ) /ReleaseGIL/ ;
+  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 ) /ReleaseGIL/ ;
   static int               createView( const QString&, QWidget* ) /ReleaseGIL/ ;
   static bool              closeView( const int ) /ReleaseGIL/ ;
   static int               cloneView( const int ) /ReleaseGIL/ ;
+  static void              setViewVisible( const int id, bool visible = true ) /ReleaseGIL/ ;
   static bool              isViewVisible( const int id ) /ReleaseGIL/ ;
   static void              setViewClosable( const int id, const bool ) /ReleaseGIL/ ;
   static bool              isViewClosable( const int id ) /ReleaseGIL/ ;
@@ -341,4 +399,14 @@ public:
   static bool              splitView( const int, Orientation, Action ) /ReleaseGIL/ ;
   static bool              moveView( const int, const int, const bool ) /ReleaseGIL/ ;
   static QList<int>        neighbourViews( const int ) /ReleaseGIL/ ;
+  
+  static void              displayCurve(const int, Plot2d_Curve*) /ReleaseGIL/ ;
+  static void              eraseCurve(const int, Plot2d_Curve*) /ReleaseGIL/ ;
+  static void              eraseCurve(Plot2d_Curve*) /ReleaseGIL/ ;
+  static void              updateCurves( const int ) /ReleaseGIL/ ;
+  static QString           getPlot2dTitle(const int, ObjectType = MainTitle) /ReleaseGIL/ ;
+  static void              setPlot2dTitle(const int, const QString&, ObjectType = MainTitle, bool = true) /ReleaseGIL/ ;
+  static QList<double>     getPlot2dFitRangeByCurves(const int) /ReleaseGIL/ ;
+  static QList<double>     getPlot2dFitRangeCurrent(const int) /ReleaseGIL/ ;
+  static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax ) /ReleaseGIL/ ;
 };

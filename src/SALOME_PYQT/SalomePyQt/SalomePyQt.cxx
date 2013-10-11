@@ -53,6 +53,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QPaintEvent>
 
 /*!
   \brief Get the currently active application.
@@ -1523,51 +1524,6 @@ void SalomePyQt::helpContext( const QString& source, const QString& context )
 }
 
 /*!
-  \fn bool SalomePyQt::dumpView( const QString& filename );
-  \brief Dump the contents of the currently active view window 
-  to the image file in the specified format.
-
-  For the current moment JPEG, PNG and BMP images formats are supported.
-  The image format is defined automatically by the file name extension.
-  By default, BMP format is used.
-
-  \param filename image file name
-  \return operation status (\c true on success)
-*/
-
-class TDumpViewEvent: public SALOME_Event 
-{
-public:
-  typedef bool TResult;
-  TResult myResult;
-  QString myFileName;
-  TDumpViewEvent( const QString& filename ) 
-    : myResult ( false ), myFileName( filename ) {}
-  virtual void Execute() 
-  {
-    if ( LightApp_Application* anApp = getApplication() ) {
-      SUIT_ViewManager* vm = anApp->activeViewManager();
-      if ( vm ) { 
-        SUIT_ViewWindow* vw = vm->getActiveView();
-        if ( vw ) {
-          QImage im = vw->dumpView();
-          if ( !im.isNull() && !myFileName.isEmpty() ) {
-            QString fmt = SUIT_Tools::extension( myFileName ).toUpper();
-            if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
-            if ( fmt == "JPG" )  fmt = "JPEG";
-            myResult = im.save( myFileName, fmt.toLatin1() );
-          }
-        }
-      }
-    }
-  }
-};
-bool SalomePyQt::dumpView( const QString& filename )
-{
-  return ProcessEvent( new TDumpViewEvent( filename ) );
-}
-
-/*!
   \fn int SalomePyQt::defaultMenuGroup();
   \brief Get detault menu group identifier which can be used when 
   creating menus (insert custom menu commands).
@@ -2337,6 +2293,75 @@ static SUIT_ViewWindow* getWnd( const int id )
 }
 
 /*!
+  \fn bool SalomePyQt::dumpView( const QString& filename, const int id = 0 );
+  \brief Dump the contents of the id view window. If id is 0 then current active view is processed. 
+  to the image file in the specified format.
+
+  For the current moment JPEG, PNG and BMP images formats are supported.
+  The image format is defined automatically by the file name extension.
+  By default, BMP format is used.
+
+  \param filename image file name
+  \return operation status (\c true on success)
+*/
+
+class TDumpViewEvent: public SALOME_Event 
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  QString myFileName;
+  int myWndId;
+  TDumpViewEvent( const QString& filename, const int id ) 
+    : myResult ( false ), myFileName( filename ), myWndId(id) {}
+  virtual void Execute() 
+  {
+	SUIT_ViewWindow* wnd = NULL;
+	if(myWndId == 0)
+	{
+      if ( LightApp_Application* anApp = getApplication() ) {
+	    SUIT_ViewManager* vm = anApp->activeViewManager();
+	    if ( vm )
+	      wnd = vm->getActiveView();
+	  }
+      myWndId = wnd->getId();
+	}
+	else
+	{
+	  wnd = dynamic_cast<SUIT_ViewWindow*>(getWnd( myWndId ));
+	}
+    if ( wnd ) {
+      QString fmt = SUIT_Tools::extension( myFileName ).toUpper();
+      Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>(wnd);
+      if(fmt == "PS" || fmt == "EPS" || fmt == "PDF") {
+    	if(wnd2D) {
+    	  myResult = wnd2D->getViewFrame()->print(myFileName, fmt);
+    	} else {
+    	  myResult = false;
+    	}
+      } else {
+	if(wnd2D) {
+	  qApp->postEvent( wnd2D->getViewFrame(), new QPaintEvent( QRect( 0, 0, wnd2D->getViewFrame()->width(), wnd2D->getViewFrame()->height() ) ) );
+	  qApp->postEvent( wnd2D, new QPaintEvent( QRect( 0, 0, wnd2D->width(), wnd2D->height() ) ) );
+	  qApp->processEvents();
+	}
+	QImage im = wnd->dumpView();
+	if ( !im.isNull() && !myFileName.isEmpty() ) {
+	  if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
+	  if ( fmt == "JPG" )  fmt = "JPEG";
+	  myResult = im.save( myFileName, fmt.toLatin1() );
+        }
+      }
+    }
+  }
+};
+bool SalomePyQt::dumpView( const QString& filename, const int id )
+{
+  return ProcessEvent( new TDumpViewEvent( filename, id ) );
+}
+
+
+/*!
   \fn QList<int> SalomePyQt::getViews();
   \brief Get list of integer identifiers of all the currently opened views
   \return list of integer identifiers of all the currently opened views
@@ -2571,9 +2596,12 @@ bool SalomePyQt::activateView( const int id )
 }
 
 /*!
-  \fn int SalomePyQt::createView( const QString& type );
+  \fn int SalomePyQt::createView( const QString& type, bool visible = true, const int width = 0, const int height = 0 );
   \brief Create new view and activate it
   \param type viewer type
+  \param visible
+  \param width
+  \param height
   \return integer identifier of created view (or -1 if view could not be created)
 */
 
@@ -2583,27 +2611,47 @@ public:
   typedef int TResult;
   TResult myResult;
   QString myType;
-  TCreateView( const QString& theType )
+  bool myVisible;
+  int myWidth;
+  int myHeight;
+  TCreateView( const QString& theType, bool visible, const int width, const int height )
     : myResult( -1 ),
-      myType( theType ) {}
+      myType( theType ),
+      myVisible(visible),
+      myWidth(width),
+      myHeight(height) {}
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
     if ( app )
-    {
-      SUIT_ViewManager* viewMgr = app->createViewManager( myType );
-      if ( viewMgr )
       {
-        SUIT_ViewWindow* wnd = viewMgr->getActiveView();
-        if ( wnd )
-          myResult = wnd->getId();
+        SUIT_ViewManager* viewMgr = app->createViewManager( myType );
+        if ( viewMgr )
+          {
+            SUIT_ViewWindow* wnd = viewMgr->getActiveView();
+            if ( wnd ) {
+              wnd->setShown(myVisible);
+              if(!myVisible && myWidth == 0 && myHeight == 0) {
+                myWidth = 1024;
+                myHeight = 768;
+              }
+              if(myWidth > 0 && myHeight > 0) {
+                Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>(wnd);
+                if(wnd2D) {
+                  wnd2D->getViewFrame()->setGeometry(0,0,myWidth,myHeight);
+                } else {
+                  wnd->setGeometry(0,0,myWidth,myHeight);
+                }
+              }
+              myResult = wnd->getId();
+            }
+          }
       }
-    }
   }
 };
-int SalomePyQt::createView( const QString& type )
+int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height )
 {
-  return ProcessEvent( new TCreateView( type ) );
+  return ProcessEvent( new TCreateView( type, visible, width, height ) );
 }
 
 /*!
@@ -2730,6 +2778,31 @@ public:
 int SalomePyQt::cloneView( const int id )
 {
   return ProcessEvent( new TCloneView( id ) );
+}
+
+/*!
+  \fn bool SalomePyQt::setViewVisible( const int id, const bool visible )
+  \brief Set view visibility.
+  \param id window identifier
+  \param visible new visiblity
+*/
+
+void SalomePyQt::setViewVisible( const int id, const bool visible )
+{
+  class TEvent: public SALOME_Event
+  {
+    int myWndId;
+    bool myVisible;
+  public:
+    TEvent( const int id, const bool visible )
+      : myWndId( id ), myVisible( visible ) {}
+    virtual void Execute()
+    {
+      SUIT_ViewWindow* wnd = getWnd( myWndId );
+      if ( wnd ) wnd->setVisible( myVisible );
+    }
+  };
+  ProcessVoidEvent( new TEvent( id, visible ) );
 }
 
 /*!
@@ -3462,4 +3535,290 @@ public:
 QStringList SalomePyQt::getChildren( const QString& entry, const bool recursive )
 {
   return ProcessEvent( new TGetChildrenEvent( entry, recursive ) ); 
+}
+
+
+/*!
+  \fn void SalomePyQt::displayCurve( const int id, Plot2d_Curve* theCurve )
+  \brief Display theCurve in view
+  \param id window identifier
+  \param theCurve curve to display
+*/
+
+class TDisplayCurve: public SALOME_Event
+{
+public:
+  int myWndId;
+  Plot2d_Curve* myCurve;
+  TDisplayCurve(const int id, Plot2d_Curve* theCurve) : myWndId(id), myCurve(theCurve) {}
+  virtual void Execute() {
+	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+	if ( wnd )
+	{
+	  wnd->getViewFrame()->displayCurve(myCurve);
+	}
+  }
+};
+void SalomePyQt::displayCurve(const int id, Plot2d_Curve* theCurve)
+{
+	ProcessVoidEvent( new TDisplayCurve(id, theCurve) ); 
+}
+
+/*!
+  \fn void SalomePyQt::eraseCurve( const int id, Plot2d_Curve* theCurve )
+  \brief Erase theCurve in view
+  \param id window identifier
+  \param theCurve curve to erase
+*/
+
+class TEraseCurve: public SALOME_Event
+{
+public:
+  int myWndId;
+  Plot2d_Curve* myCurve;
+  TEraseCurve(const int id, Plot2d_Curve* theCurve) : myWndId(id), myCurve(theCurve) {}
+  virtual void Execute() {
+	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+	if ( wnd )
+	{
+	  wnd->getViewFrame()->eraseCurve(myCurve);
+	}
+  }
+};
+void SalomePyQt::eraseCurve(const int id, Plot2d_Curve* theCurve)
+{
+	ProcessVoidEvent( new TEraseCurve(id, theCurve) ); 
+}
+
+/*!
+  \fn void SalomePyQt::deleteCurve( Plot2d_Curve* theCurve )
+  \brief Delete theCurve from all views
+  \param theCurve curve to delete
+*/
+
+class TDeleteCurve: public SALOME_Event
+{
+public:
+  Plot2d_Curve* myCurve;
+  TDeleteCurve(Plot2d_Curve* theCurve) : myCurve(theCurve) {}
+  virtual void Execute() {
+    LightApp_Application* app  = getApplication();
+    if ( app )
+    {
+      STD_TabDesktop* tabDesk = dynamic_cast<STD_TabDesktop*>( app->desktop() );
+      if ( tabDesk )
+      {
+        QList<SUIT_ViewWindow*> wndlist = tabDesk->windows();
+        SUIT_ViewWindow* wnd;
+        foreach ( wnd, wndlist )
+        {
+          Plot2d_ViewWindow* aP2d = dynamic_cast<Plot2d_ViewWindow*>(wnd);
+          if(aP2d)
+          {
+        	aP2d->getViewFrame()->eraseObject(myCurve);
+          }
+        }
+      }
+    }
+  }
+};
+void SalomePyQt::eraseCurve(Plot2d_Curve * theCurve)
+{
+	ProcessVoidEvent( new TDeleteCurve(theCurve) );
+}
+
+/*!
+  \brief updateCurves (repaint) curves in view window.
+*/
+void SalomePyQt::updateCurves(const int id)
+{
+  class TEvent: public SALOME_Event
+  {
+  public:
+    int myWndId;
+    TEvent( const int id ) : myWndId( id ) {}
+    virtual void Execute()
+    {
+      Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+      if ( wnd )
+      {
+    	wnd->getViewFrame()->DisplayAll();
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent(id) );
+}
+
+/*!
+  \fn QString SalomePyQt::getPlot2dTitle( const int id, ObjectType type = MainTitle )
+  \brief Get title of corresponding type
+  \param id window identifier
+  \param type is type of title
+  \return title of corresponding type
+*/
+
+class TGetPlot2dTitle: public SALOME_Event
+{
+public:
+  typedef QString TResult;
+  TResult myResult;
+  int myWndId;
+  ObjectType myType;
+  TGetPlot2dTitle(const int id, ObjectType type) :
+	  myWndId(id),
+	  myType(type) {}
+  virtual void Execute() {
+	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+	if ( wnd )
+	{
+	  myResult = wnd->getViewFrame()->getTitle((Plot2d_ViewFrame::ObjectType)myType);
+	}
+  }
+};
+QString SalomePyQt::getPlot2dTitle(const int id, ObjectType type)
+{
+	return ProcessEvent( new TGetPlot2dTitle(id, type) ); 
+}
+
+
+/*!
+  \fn void SalomePyQt::setPlot2dTitle( const int id, const QString& title, ObjectType type = MainTitle, bool show = true )
+  \brief Set title of corresponding type
+  \param id window identifier
+  \param title
+  \param type is type of title
+  \param show
+*/
+
+class TSetPlot2dTitle: public SALOME_Event
+{
+public:
+  int myWndId;
+  Plot2d_Curve* myCurve;
+  QString myTitle;
+  ObjectType myType;
+  bool myShow;
+  TSetPlot2dTitle(const int id, const QString& title, ObjectType type, bool show) :
+	  myWndId(id),
+	  myTitle(title),
+	  myType(type),
+	  myShow(show) {}
+  virtual void Execute() {
+	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+	if ( wnd )
+	{
+	  wnd->getViewFrame()->setTitle(myShow, myTitle, (Plot2d_ViewFrame::ObjectType)myType, false);
+	}
+  }
+};
+void SalomePyQt::setPlot2dTitle(const int id, const QString& title, ObjectType type, bool show)
+{
+	ProcessVoidEvent( new TSetPlot2dTitle(id, title, type, show) ); 
+}
+
+/*!
+  \fn QList<int> SalomePyQt::getPlot2dFitRangeByCurves( const int id )
+  \brief Get list of Plot2d view ranges
+  \param id window identifier
+  \return list of view ranges (XMin, XMax, YMin, YMax)
+*/
+
+class TFitRangeByCurves: public SALOME_Event
+{
+public:
+  typedef QList<double> TResult;
+  TResult myResult;
+  int myWndId;
+  TFitRangeByCurves( const int id )
+    : myWndId( id ) {}
+  virtual void Execute() 
+  {
+    myResult.clear();
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+    if ( wnd )
+    {
+      double XMin, XMax, YMin, YMax, Y2Min, Y2Max;
+      wnd->getViewFrame()->getFitRangeByCurves(XMin, XMax, YMin, YMax, Y2Min, Y2Max);
+      myResult.append(XMin);
+      myResult.append(XMax);
+      myResult.append(YMin);
+      myResult.append(YMax);
+    }
+  }
+};
+QList<double> SalomePyQt::getPlot2dFitRangeByCurves( const int id )
+{
+  return ProcessEvent( new TFitRangeByCurves( id ) );
+}
+
+/*!
+  \fn QList<int> SalomePyQt::getPlot2dFitRangeCurrent( const int id )
+  \brief Get list of current Plot2d view ranges
+  \param id window identifier
+  \return list of view ranges (XMin, XMax, YMin, YMax)
+*/
+
+class TFitRangeCurrent: public SALOME_Event
+{
+public:
+  typedef QList<double> TResult;
+  TResult myResult;
+  int myWndId;
+  TFitRangeCurrent( const int id )
+    : myWndId( id ) {}
+  virtual void Execute() 
+  {
+    myResult.clear();
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+    if ( wnd )
+    {
+      double XMin, XMax, YMin, YMax, Y2Min, Y2Max;
+      wnd->getViewFrame()->getFitRanges(XMin, XMax, YMin, YMax, Y2Min, Y2Max);
+      myResult.append(XMin);
+      myResult.append(XMax);
+      myResult.append(YMin);
+      myResult.append(YMax);
+    }
+  }
+};
+QList<double> SalomePyQt::getPlot2dFitRangeCurrent( const int id )
+{
+  return ProcessEvent( new TFitRangeCurrent( id ) );
+}
+
+/*!
+  \fn void SalomePyQt::setPlot2dFitRange( const int id, const double XMin, const double XMax, const double YMin, const double YMax )
+  \brief Set range of Plot2d view
+  \param id window identifier
+  \param XMin
+  \param XMax
+  \param YMin
+  \param YMax
+*/
+
+class TPlot2dFitRange: public SALOME_Event
+{
+public:
+  int myWndId;
+  double myXMin;
+  double myXMax;
+  double myYMin;
+  double myYMax;
+  TPlot2dFitRange(const int id, const double XMin, const double XMax, const double YMin, const double YMax) :
+	  myWndId(id),
+	  myXMin(XMin),
+	  myXMax(XMax),
+	  myYMin(YMin),
+	  myYMax(YMax) {}
+  virtual void Execute() {
+	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+	if ( wnd )
+	{
+	  wnd->getViewFrame()->fitData(0, myXMin, myXMax, myYMin, myYMax);
+	}
+  }
+};
+void SalomePyQt::setPlot2dFitRange(const int id, const double XMin, const double XMax, const double YMin, const double YMax)
+{
+	ProcessVoidEvent( new TPlot2dFitRange(id, XMin, XMax, YMin, YMax) ); 
 }

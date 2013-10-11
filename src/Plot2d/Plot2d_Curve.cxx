@@ -159,6 +159,8 @@ void Plot2d_Curve::updatePlotItem( QwtPlotItem* theItem )
     } else {
       aCurve->clearDeviationData();
     }
+  } else {
+    aCurve->setData( NULL, NULL, 0 );
   }
 }
 

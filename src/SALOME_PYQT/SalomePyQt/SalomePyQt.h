@@ -34,6 +34,7 @@
 
 #include <LightApp_Application.h>
 #include <LightApp_Preferences.h>
+#include <Plot2d_ViewFrame.h>
 
 class LightApp_SelectionMgr;
 class QMenuBar;
@@ -42,6 +43,7 @@ class QWidget;
 class QAction;
 class QTreeView;
 class QtxActionGroup;
+class Plot2d_Curve;
 
 class SALOME_Selection : public QObject
 {
@@ -115,6 +117,18 @@ enum Action {
   SplitAt      = 2  //!< the view area is splitted in such a way, that specified view and all views which follow it, are moved to the new area
 };
 
+//! Type of titles in Plot3d View
+enum ObjectType
+{
+  MainTitle = Plot2d_ViewFrame::MainTitle,
+  XTitle = Plot2d_ViewFrame::XTitle,
+  YTitle = Plot2d_ViewFrame::YTitle,
+  Y2Title = Plot2d_ViewFrame::Y2Title,
+  XAxis = Plot2d_ViewFrame::XAxis,
+  YAxis = Plot2d_ViewFrame::YAxis,
+  Y2Axis = Plot2d_ViewFrame::Y2Axis
+};
+
 class SalomePyQt
 {
 public:
@@ -161,7 +175,7 @@ public:
 
   static void              helpContext( const QString&, const QString& );
 
-  static bool              dumpView( const QString& );
+  static bool              dumpView( const QString&, const int = 0 );
 
   static int               defaultMenuGroup();
 
@@ -228,10 +242,11 @@ public:
   static QString           getViewTitle( const int );
   static QList<int>        findViews( const QString& );
   static bool              activateView( const int );
-  static int               createView( const QString& );
+  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 );
   static int               createView( const QString&, QWidget* );
   static bool              closeView( const int );
   static int               cloneView( const int );
+  static void              setViewVisible( const int id, bool visible = true );
   static bool              isViewVisible( const int );
   static void              setViewClosable( const int, const bool );
   static bool              isViewClosable( const int );
@@ -240,6 +255,16 @@ public:
   static bool              splitView( const int, const Orientation, const Action );
   static bool              moveView( const int, const int, const bool );
   static QList<int>        neighbourViews( const int );
+
+  static void              displayCurve(const int, Plot2d_Curve*);
+  static void              eraseCurve(const int, Plot2d_Curve*);
+  static void              eraseCurve(Plot2d_Curve*);
+  static void              updateCurves( const int );
+  static QString           getPlot2dTitle(const int, ObjectType = MainTitle);
+  static void              setPlot2dTitle(const int, const QString&, ObjectType = MainTitle, bool = true);
+  static QList<double>     getPlot2dFitRangeByCurves(const int);
+  static QList<double>     getPlot2dFitRangeCurrent(const int);
+  static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax);
 
   // the following methods are obsolete
   static void              addStringSetting( const QString&, const QString&, bool = true );

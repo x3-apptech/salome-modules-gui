@@ -773,6 +773,7 @@ bool Plot2d_ViewWindow::dumpViewToFormat( const QImage&  img,
 QString Plot2d_ViewWindow::filter() const
 {
   QStringList filters = SUIT_ViewWindow::filter().split( ";;", QString::SkipEmptyParts );
+  filters << tr( "PDF_FILES" );
   filters << tr( "POSTSCRIPT_FILES" );
   filters << tr( "ENCAPSULATED_POSTSCRIPT_FILES" );
   return filters.join( ";;" );
