@@ -71,7 +71,8 @@ class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
 public:
   enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
-         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID };
+         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID,
+         SimanCheckInId, SimanLocalCheckInId };
 
   typedef enum { WT_NoteBook = LightApp_Application::WT_User } WindowTypes;
 
@@ -125,6 +126,7 @@ public slots:
   virtual void                        onNewWithScript();
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onCloseDoc( bool ask = true);
+  virtual void                        onLoadDocMessage(const QString&);
 
   virtual void                        onExit();
   virtual void                        onCopy();
@@ -134,6 +136,9 @@ public slots:
   bool                                onRestoreStudy( const QString& theDumpScript,
                                                       const QString& theStudyName,
                                                       bool theIsStudySaved );
+
+  virtual void                        onCheckIn();
+  virtual void                        onLocalCheckIn();
 
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
@@ -193,6 +198,7 @@ private:
 private:
   QPointer<SalomeApp_NoteBook>        myNoteBook;
   QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
+  bool                                myIsSiman; // application corresponds to the siman study flag
 
 signals:
   void                                dumpedStudyClosed( const QString& theDumpScript, 

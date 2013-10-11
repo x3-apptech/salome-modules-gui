@@ -164,6 +164,9 @@ SalomeApp_Application::SalomeApp_Application()
 {
   connect( desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this,      SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
+  connect( desktop(), SIGNAL( message( const QString& ) ),
+           this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
+  myIsSiman = false; // default
 }
 
 /*!Destructor.
@@ -178,16 +181,14 @@ SalomeApp_Application::~SalomeApp_Application()
 /*!Start application.*/
 void SalomeApp_Application::start()
 {
-  LightApp_Application::start();
-
-  SALOME_EventFilter::Init();
-
+  // process the command line options before start: to createActions in accordance to the options
   static bool isFirst = true;
   if ( isFirst ) {
     isFirst = false;
 
     QString hdffile;
     QStringList pyfiles;
+    QString loadStudy;
 
     for (int i = 1; i < qApp->argc(); i++) {
       QRegExp rxs ("--study-hdf=(.+)");
@@ -200,7 +201,9 @@ void SalomeApp_Application::start()
       }
       else {
         QRegExp rxp ("--pyscript=\\[(.+)\\]");
+	QRegExp rxl ("--siman-study=(.+)");
         if ( rxp.indexIn( QString(qApp->argv()[i]) ) >= 0 && rxp.capturedTexts().count() > 1 ) {
+	  // pyscript
           QStringList dictList = rxp.capturedTexts()[1].split("},", QString::SkipEmptyParts);
           for (int k = 0; k < dictList.count(); ++k) {
             QRegExp rxd ("[\\s]*\\{?([^\\{\\}]+)\\}?[\\s]*");
@@ -211,15 +214,29 @@ void SalomeApp_Application::start()
             }
           }
         }
+#ifdef WITH_SIMANIO
+	if ( rxl.indexIn( QString(qApp->argv()[i]) ) >= 0 && rxl.capturedTexts().count() > 1 ) {
+	  // siman
+	  loadStudy = rxl.capturedTexts()[1];
+	  myIsSiman = true;
+	}
+#endif
       }
     }
     // Here pyfiles elements are: "script_name": [list_of_"arg"s]
     // For example: "/absolute/path/to/my_script.py": ["1", "2"]
 
+    LightApp_Application::start();
+    SALOME_EventFilter::Init();
+
     if ( !hdffile.isEmpty() )       // open hdf file given as parameter
       onOpenDoc( hdffile );
     else if ( pyfiles.count() > 0 ) // create new study
       onNewDoc();
+    else if (!loadStudy.isEmpty()) {// load study by name
+      if (onLoadDoc(loadStudy))
+        updateObjectBrowser(true);
+    }
 
     // import/execute python scripts
     if ( pyfiles.count() > 0 && activeStudy() ) {
@@ -257,6 +274,9 @@ void SalomeApp_Application::start()
         }
       }
     }
+  } else {
+    LightApp_Application::start();
+    SALOME_EventFilter::Init();
   }
 }
 
@@ -305,6 +325,17 @@ void SalomeApp_Application::createActions()
                 Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
   //SRN: BugID IPAL9021: End
 
+#ifdef WITH_SIMANIO
+  if (myIsSiman) {
+    // check-in operations for SIMAN study  
+    createAction( SimanCheckInId, tr( "TOT_SIMAN_CHECK_IN" ), QIcon(),
+                tr( "MEN_SIMAN_CHECK_IN" ), tr( "PRP_SIMAN_CHECK_IN" ),
+                0, desk, false, this, SLOT( onCheckIn() ) );
+    createAction( SimanLocalCheckInId, tr( "TOT_SIMAN_LOCAL_CHECK_IN" ), QIcon(),
+                tr( "MEN_SIMAN_LOCAL_CHECK_IN" ), tr( "PRP_SIMAN_LOCAL_CHECK_IN" ),
+                0, desk, false, this, SLOT( onLocalCheckIn() ) );
+  }
+#endif
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
@@ -314,6 +345,15 @@ void SalomeApp_Application::createActions()
 
   createMenu( FileLoadId,   fileMenu, 0 );  //SRN: BugID IPAL9021, add a menu item "Load"
 
+#ifdef WITH_SIMANIO
+  if (myIsSiman) {
+    // check-in operation for SIMAN study
+    // last argument "5" locates this just after "Save As" but certain constant is bad => insert after the separator
+    createMenu( SimanCheckInId, fileMenu, 5);
+    createMenu( SimanLocalCheckInId, fileMenu, 5);
+    createMenu( separator(), fileMenu, 5 );
+  }
+#endif
   createMenu( DumpStudyId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 10, -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
@@ -348,6 +388,8 @@ void SalomeApp_Application::setDesktop( SUIT_Desktop* desk )
   if ( desk ) {
     connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
              this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
+    connect( desk, SIGNAL( message( const QString& ) ),
+             this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
   }
 }
 
@@ -473,6 +515,20 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
   }
 
   return res;
+}
+
+/*!SLOT. Load document with a name, specified in \a aMessage.*/
+void SalomeApp_Application::onLoadDocMessage(const QString& aMessage)
+{
+  if (aMessage.indexOf("simanCheckoutDone ") == 0) {
+#ifdef WITH_SIMANIO
+    onLoadDoc(aMessage.section(' ', 1));
+#else
+    printf( "****************************************************************\n" );
+    printf( "*    Warning: SALOME is built without SIMAN support.\n" );
+    printf( "****************************************************************\n" );
+#endif
+  }
 }
 
 /*!SLOT. Copy objects to study maneger from selection maneger..*/
@@ -827,6 +883,17 @@ void SalomeApp_Application::onLoadScript( )
   QString anInitialPath = "";
   if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
     anInitialPath = QDir::currentPath();
+  
+#ifdef WITH_SIMANIO
+  // MPV: if it is SIMAN study, make the initial path as the path to the Siman scripts storage
+  if (myIsSiman) {
+    SALOMEDSClient_StudyManager* aMgr = studyMgr();
+    aMgr->GetSimanStudy()->StudyId();
+    anInitialPath = QString(QDir::separator()) + "tmp" + QDir::separator() + "SimanSalome" + QDir::separator() + 
+      aMgr->GetSimanStudy()->StudyId().c_str() + QDir::separator() +
+      aMgr->GetSimanStudy()->ScenarioId().c_str() + QDir::separator() + aMgr->GetSimanStudy()->UserId().c_str();
+  }
+#endif
 
   QString aFile = SUIT_FileDlg::getFileName( desktop(), anInitialPath, filtersList, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), true, true );
 
@@ -851,6 +918,40 @@ void SalomeApp_Application::onSaveGUIState()
     updateObjectBrowser();
   }
   updateActions();
+}
+
+/*!Public SLOT. On SIMAN check in operation.*/
+void SalomeApp_Application::onCheckIn()
+{
+#ifdef WITH_SIMANIO
+  setMenuShown(SimanCheckInId, false); // check in may be performed only once
+  setMenuShown(SimanLocalCheckInId, false);
+  SALOMEDSClient_StudyManager* aMgr = studyMgr();
+  aMgr->GetSimanStudy()->CheckIn("");
+#else
+  printf( "****************************************************************\n" );
+  printf( "*    Warning: SALOME is built without SIMAN support.\n" );
+  printf( "****************************************************************\n" );
+#endif
+}
+
+/*!Public SLOT. On SIMAN local check in operation.*/
+void SalomeApp_Application::onLocalCheckIn()
+{
+#ifdef WITH_SIMANIO
+  // get the active module
+  CAM_Module* aModule = activeModule();
+  if (!aModule) return; // there is no active module
+  
+  setMenuShown(SimanCheckInId, false); // check in may be performed only once
+  setMenuShown(SimanLocalCheckInId, false);
+  SALOMEDSClient_StudyManager* aMgr = studyMgr();
+  aMgr->GetSimanStudy()->CheckIn(aModule->name().toLatin1().data());
+#else
+  printf( "****************************************************************\n" );
+  printf( "*    Warning: SALOME is built without SIMAN support.\n" );
+  printf( "****************************************************************\n" );
+#endif
 }
 
 /*!Gets file filter.

@@ -344,6 +344,30 @@ Do you want to reload it ?</translation>
         <source>ACTIVATE_MODULE_OP_SCRIPT</source>
         <translation>Load &amp;Script...</translation>
     </message>
+    <message>
+        <source>TOT_SIMAN_CHECK_IN</source>
+        <translation>Check In</translation>
+    </message>
+    <message>
+        <source>MEN_SIMAN_CHECK_IN</source>
+        <translation>Check In</translation>
+    </message>
+    <message>
+        <source>PRP_SIMAN_CHECK_IN</source>
+        <translation>Check In</translation>
+    </message>
+    <message>
+        <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In for module</translation>
+    </message>
+    <message>
+        <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In for module</translation>
+    </message>
+    <message>
+        <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In for module</translation>
+    </message>
 </context>
 <context>
     <name>SalomeApp_StudyPropertiesDlg</name>
