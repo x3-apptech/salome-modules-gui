@@ -1,7 +1,7 @@
 # - Find PyQt4 installation
 # Sets the following variables:
-#    PYQT_PYUIC_EXECUTABLE  - command to launch pyuic with the correct PYTHONPATH
-#    PYQT_PYUIC_PATH        - path to the pyuic executable
+#    PYQT_PYUIC_EXECUTABLE  - path to the pyuic executable
+#    PYQT_PYRCC_EXECUTABLE  - path to the pyrcc executable
 #    PYQT_PYTHONPATH        - path to the PyQt Python modules
 #    PYQT_SIPS_DIR          - path to main include directory (which contains several sub folders)
 #    PYQT_INCLUDE_DIRS      - list of paths to include when compiling (all rooted on PYQT_SIP_DIRS)
@@ -43,11 +43,11 @@ IF(NOT PyQt4_FIND_QUIETLY)
   MESSAGE(STATUS "Looking for PyQt4 ...")
 ENDIF()
 
-FIND_PROGRAM(PYQT_PYUIC_PATH NAMES pyuic4 pyuic4.bat)
-FIND_PROGRAM(PYQT_PYRCC_EXECUTABLE NAMES pyrcc4 pyrcc4.exe)
+FIND_PROGRAM(PYQT_PYUIC_EXECUTABLE NAMES pyuic4 pyuic4.bat)
+FIND_PROGRAM(PYQT_PYRCC_EXECUTABLE NAMES pyrcc4 pyrcc4.bat)
 
 # Get root dir locally, going up two levels from the exec:
-GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_PATH}" PATH)
+GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_EXECUTABLE}" PATH)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 
 # Typical locations of qobject.sip are: 
@@ -94,5 +94,5 @@ FOREACH(_dir ${PYQT_INCLUDE_DIRS})
 ENDFOREACH()
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_PATH PYQT_SIPS_DIR PYQT_SIPFLAGS )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_EXECUTABLE PYQT_PYRCC_EXECUTABLE PYQT_SIPS_DIR PYQT_SIPFLAGS )
 

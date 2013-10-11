@@ -69,7 +69,7 @@ MACRO(PYQT4_WRAP_UIC outfiles)
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_output}
-      COMMAND ${PYQT_PYUIC_EXECUTABLE} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      COMMAND ${PYQT_PYUIC_PATH} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
       MAIN_DEPENDENCY ${_input}
       )
     SET(${outfiles} ${${outfiles}} ${_output})
@@ -165,7 +165,7 @@ MACRO(PYQT4_WRAP_QRC outfiles)
     SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_output}
-      COMMAND ${PYQT_PYRCC_EXECUTABLE} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      COMMAND ${PYQT_PYRCC_PATH} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
       MAIN_DEPENDENCY ${_input}
       )
     SET(${outfiles} ${${outfiles}} ${_output})
