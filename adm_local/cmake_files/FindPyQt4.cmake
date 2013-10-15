@@ -2,6 +2,8 @@
 # Sets the following variables:
 #    PYQT_PYUIC_EXECUTABLE  - path to the pyuic executable
 #    PYQT_PYRCC_EXECUTABLE  - path to the pyrcc executable
+#    PYQT_PYUIC_PATH        - command to launch pyuic with the correct PYTHONPATH
+#    PYQT_PYRCC_PATH        - command to launch pyrcc with the correct PYTHONPATH
 #    PYQT_PYTHONPATH        - path to the PyQt Python modules
 #    PYQT_SIPS_DIR          - path to main include directory (which contains several sub folders)
 #    PYQT_INCLUDE_DIRS      - list of paths to include when compiling (all rooted on PYQT_SIP_DIRS)
@@ -41,6 +43,10 @@
 
 IF(NOT PyQt4_FIND_QUIETLY)
   MESSAGE(STATUS "Looking for PyQt4 ...")
+ENDIF()
+
+IF(NOT SIP_FOUND AND NOT PyQt4_FIND_QUIETLY)
+   MESSAGE(WARNING "PyQt4 needs SIP to be detected correctly!")
 ENDIF()
 
 FIND_PROGRAM(PYQT_PYUIC_EXECUTABLE NAMES pyuic4 pyuic4.bat)
@@ -96,3 +102,16 @@ ENDFOREACH()
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_EXECUTABLE PYQT_PYRCC_EXECUTABLE PYQT_SIPS_DIR PYQT_SIPFLAGS )
 
+# Wrap the final executables so that they always use the proper environment (PYTHONPATH):
+# The results are put to variables:
+#   PYQT_PYUIC_PATH - command to launch pyuic with the correct PYTHONPATH
+#   PYQT_PYRCC_PATH - command to launch pyrcc with the correct PYTHONPATH
+# TODO: should be done like Sphinx in KERNEL (i.e. generating a shell script)?
+IF(WIN32 AND NOT CYGWIN)
+  MESSAGE(WARNING "PyQt4 command was not tested under Win32")
+  SET(PYQT_PYUIC_PATH set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH};%PYTHONPATH% && ${PYQT_PYUIC_EXECUTABLE})
+  SET(PYQT_PYRCC_PATH set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH};%PYTHONPATH% && ${PYQT_PYRCC_EXECUTABLE})
+ELSE()
+  SET(PYQT_PYUIC_PATH /usr/bin/env PYTHONPATH="${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:$$PYTHONPATH" ${PYQT_PYUIC_EXECUTABLE})
+  SET(PYQT_PYRCC_PATH /usr/bin/env PYTHONPATH="${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:$$PYTHONPATH" ${PYQT_PYRCC_EXECUTABLE})
+ENDIF()
