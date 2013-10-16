@@ -1216,7 +1216,8 @@ void OCCViewer_ViewWindow::createActions()
   myClippingAction->setStatusTip(tr("DSC_CLIPPING"));
   myClippingAction->setCheckable( true );
   connect(myClippingAction, SIGNAL(toggled( bool )), this, SLOT(onClipping( bool )));
-  toolMgr()->registerAction( myClippingAction, ClippingId );
+  // RNV: Temporary commented, this functionality will be moved into Geometry module
+  //toolMgr()->registerAction( myClippingAction, ClippingId );
 
   aAction = new QtxAction(tr("MNU_SHOOT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SHOOT_VIEW" ) ),
                            tr( "MNU_SHOOT_VIEW" ), 0, this);
@@ -1587,7 +1588,6 @@ void OCCViewer_ViewWindow::onClipping( bool on )
     {
       if ( myClippingDlg->isVisible() )
         myClippingDlg->hide();
-      aParent->setCuttingPlane(false);
     }
 }
 
@@ -1671,6 +1671,10 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
   aView3d->SetEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
+  if ( myClippingDlg ) {
+    myClippingDlg->onApply();
+    myClippingDlg->isRestore = false;
+  }
 
   if ( !baseParamsOnly ) {
 
@@ -1957,15 +1961,15 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     gp_Pln pln (gp_Pnt(x, y, z), gp_Dir(dx, dy, dz));
     double a, b, c, d;
     pln.Coefficients(a, b, c, d);
-
+    
 #if OCC_VERSION_LARGE > 0x06060000 // Porting to OCCT higher 6.6.0 version
     Graphic3d_SetOfHClipPlane aPlanes = view->GetClipPlanes();
     Handle(Graphic3d_ClipPlane) aClipPlane;
     if(aPlanes.Size() > 0 ) {
       Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
-      anIter.Next();
       aClipPlane = anIter.Value();
       aClipPlane->SetEquation(pln);
+      aClipPlane->SetOn(Standard_True);
     } else {
       aClipPlane = new Graphic3d_ClipPlane(pln);
       view->AddClipPlane(aClipPlane);
@@ -1981,13 +1985,8 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
       view->SetPlaneOn(clipPlane);
     }
 #else
-    if (view->MoreActivePlanes())
-      clipPlane = view->ActivePlane();
-    else
-      clipPlane = new V3d_Plane (viewer);
-    
+    clipPlane = new V3d_Plane (viewer);
     clipPlane->SetPlane(a, b, c, d);
-    view->SetPlaneOn(clipPlane);
 #endif
   }
   else {
@@ -2023,7 +2022,17 @@ bool OCCViewer_ViewWindow::isCuttingPlane()
 {
   Handle(V3d_View) view = myViewPort->getView();
 #if OCC_VERSION_LARGE > 0x06060000 // Porting to OCCT higher 6.6.0 version
-  return (view->GetClipPlanes().Size());
+  bool res = false;
+  Graphic3d_SetOfHClipPlane aPlanes = view->GetClipPlanes();
+  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+  for( ;anIter.More();anIter.Next() ) {
+    Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
+    if(aClipPlane->IsOn()) {
+      res = true;
+      break;
+    }
+  }
+  return res;
 #else
   view->InitActivePlanes();
   return (view->MoreActivePlanes());
@@ -2127,7 +2136,6 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   return params;
 }
 
-
 /*!
   \brief Get visual parameters of this view window.
   \return visual parameters of view window
@@ -2156,6 +2164,34 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "scaleZ=%1" )   .arg( params.scaleZ,  0, 'e', 12 );
   data << QString( "isVisible=%1" ).arg( params.isVisible );
   data << QString( "size=%1" )     .arg( params.size,    0, 'f',  2 );
+
+  if ( myClippingDlg ) {
+    if ( !myClippingDlg->myClippingPlanes.empty() ) {
+      for ( int i=0; i < myClippingDlg->myClippingPlanes.size(); i++ ) {
+        QString ClippingPlane = QString( "ClippingPlane%1=").arg( i+1 );
+        Pnt_ClipPlane aPlane = myClippingDlg->myClippingPlanes[i];
+        ClippingPlane +=  QString( "Mode~%1;").arg( (int)aPlane->PlaneMode );
+        ClippingPlane +=  QString( "IsActive~%1;").arg( aPlane->IsActive );
+        if ( aPlane->PlaneMode == Absolute ) {
+          ClippingPlane += QString( "AbsoluteOrientation~%1;" ).arg( aPlane->Orientation );
+          ClippingPlane += QString( "IsInvert~%1;" ).arg( aPlane->IsInvert );
+          ClippingPlane +=  QString( "X~%1;" ).arg( aPlane->X );
+          ClippingPlane +=  QString( "Y~%1;" ).arg( aPlane->Y );
+          ClippingPlane +=  QString( "Z~%1;" ).arg( aPlane->Z );
+          ClippingPlane +=  QString( "Dx~%1;" ).arg( aPlane->Dx );
+          ClippingPlane +=  QString( "Dy~%1;" ).arg( aPlane->Dy );;
+          ClippingPlane +=  QString( "Dz~%1" ).arg( aPlane->Dz );
+        }
+        else if ( aPlane->PlaneMode == Relative ) {
+          ClippingPlane +=  QString( "RelativeOrientation~%1;" ).arg( aPlane->RelativeMode.Orientation );
+          ClippingPlane +=  QString( "Distance~%1;" ).arg( aPlane->RelativeMode.Distance );
+          ClippingPlane +=  QString( "Rotation1~%1;" ).arg( aPlane->RelativeMode.Rotation1 );
+          ClippingPlane +=  QString( "Rotation2~%1" ).arg( aPlane->RelativeMode.Rotation2 );
+        }
+        data << ClippingPlane;
+      }
+    }
+  }
 
 #if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 or newer version
   // graduated trihedron
@@ -2239,6 +2275,41 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
       else if ( paramName == "scaleZ" )            params.scaleZ            = paramValue.toDouble();
       else if ( paramName == "isVisible" )         params.isVisible         = paramValue.toInt();
       else if ( paramName == "size" )              params.size              = paramValue.toDouble();
+      else if ( paramName.contains( "ClippingPlane" ) ) {
+        OCCViewer_ViewWindow* aParent = dynamic_cast<OCCViewer_ViewWindow*>(parent()->parent());
+        if (!aParent)
+          aParent = this;
+        if ( !myClippingDlg )
+        {
+          myClippingDlg = new OCCViewer_ClippingDlg( aParent );
+          myClippingDlg->SetAction( myClippingAction );
+          myClippingDlg->hide();
+        }
+    	QStringList ClipPlaneData = paramValue.split( ';' );
+        ClipPlane* aPlane = new ClipPlane();
+    	foreach( QString ClipPlaneParam, ClipPlaneData ) {
+          QString ClipPlane_paramName  = ClipPlaneParam.section( '~', 0, 0 ).trimmed();
+          QString ClipPlane_paramValue = ClipPlaneParam.section( '~', 1, 1 ).trimmed();
+          if      ( ClipPlane_paramName == "Mode" )                aPlane->PlaneMode                  = ( Mode )ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "IsActive" )            aPlane->IsActive                   = ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "AbsoluteOrientation" ) aPlane->Orientation                = ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "IsInvert" )            aPlane->IsInvert                   = ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "X" )                   aPlane->X                          = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Y" )                   aPlane->Y                          = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Z" )                   aPlane->Z                          = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Dx" )                  aPlane->Dx                         = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Dy" )                  aPlane->Dy                         = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Dz" )                  aPlane->Dz                         = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "RelativeOrientation" ) aPlane->RelativeMode.Orientation   = ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "Distance" )            aPlane->RelativeMode.Distance      = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Rotation1" )           aPlane->RelativeMode.Rotation1     = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Rotation2" )           aPlane->RelativeMode.Rotation2     = ClipPlane_paramValue.toDouble();
+    	}
+    	myClippingDlg->myClippingPlanes.push_back( aPlane );
+    	myClippingDlg->isRestore = true;
+    	myClippingDlg->synchronize();
+    	myClippingDlg->SetCurrentPlaneParam();
+      }
       // graduated trihedron
       else if ( paramName == "gtIsVisible" )       params.gtIsVisible       = paramValue.toInt();
       else if ( paramName == "gtDrawNameX" )       params.gtDrawNameX       = paramValue.toInt();

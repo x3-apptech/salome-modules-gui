@@ -292,8 +292,20 @@ QVTK_RenderWindowInteractor
     GetDevice()->LeftButtonReleaseEvent();
   else if( event->button() & Qt::MidButton )
     GetDevice()->MiddleButtonReleaseEvent();
-  else if( event->button() & Qt::RightButton )
+  else if( event->button() & Qt::RightButton ) {
+    #ifndef Fix_Of_vtkImplicitPlaneWidget_bug
+    GetDevice()->SetEventInformationFlipY( -99999, -99999,
+                                           event->modifiers() & Qt::ControlModifier,
+                                           event->modifiers() & Qt::ShiftModifier);
+    GetDevice()->LeftButtonPressEvent();
+    GetDevice()->LeftButtonReleaseEvent();
+    GetDevice()->SetEventInformationFlipY(event->x(),
+                                          event->y(),
+                                          event->modifiers() & Qt::ControlModifier,
+                                          event->modifiers() & Qt::ShiftModifier);
+    #endif
     GetDevice()->RightButtonReleaseEvent();
+  }
 }
 
 

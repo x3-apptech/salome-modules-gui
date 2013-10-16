@@ -305,7 +305,7 @@
     </message>
     <message>
         <source>MNU_MINIMIZE_VIEW</source>
-        <translation>Create sub-views</translation>
+        <translation>Minimize</translation>
     </message>
 </context>
 <context>
@@ -441,6 +441,117 @@
     <message>
         <source>LBL_Z</source>
         <translation>Z:</translation>
+    </message>
+</context>
+<context>
+    <name>OCCViewer_ClippingDlg</name>
+    <message>
+        <source>CLIPPING_PLANES</source>
+        <translation>Clipping planes</translation>
+    </message>
+    <message>
+        <source>NO_PLANES</source>
+        <translation>No planes</translation>
+    </message>
+    <message>
+        <source>IS_ACTIVE_PLANE</source>
+        <translation>Active</translation>
+    </message>
+    <message>
+        <source>BTN_NEW</source>
+        <translation>New</translation>
+    </message>  
+        <message>
+        <source>BTN_DELETE</source>
+        <translation>Delete</translation>
+    </message>   
+    <message>
+        <source>AUTO_APPLY</source>
+        <translation>Auto Apply</translation>
+    </message>
+    <message>
+        <source>MODE</source>
+        <translation>Mode</translation>
+    </message>
+    <message>
+        <source>ORIENTATION</source>
+        <translation>Orientation</translation>
+    </message>
+    <message>
+        <source>DISTANCE</source>
+        <translation>Distance</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_X_Y2Z</source>
+        <translation>Rotation around X (Y to Z):</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_Y_X2Z</source>
+        <translation>Rotation around Y (X to Z):</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_Z_Y2X</source>
+        <translation>Rotation around Z (Y to X):</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_X_Z2Y</source>
+        <translation>Rotation around X (Z to Y):</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_Y_Z2X</source>
+        <translation>Rotation around Y (Z to X):</translation>
+    </message>
+    <message>
+        <source>ROTATION_AROUND_Z_X2Y</source>
+        <translation>Rotation around Z (X to Y):</translation>
+    </message>
+    <message>
+        <source>ALONG_XY</source>
+        <translation>|| X-Y</translation>
+    </message>
+    <message>
+        <source>ALONG_YZ</source>
+        <translation>|| Y-Z</translation>
+    </message>
+    <message>
+        <source>ALONG_ZX</source>
+        <translation>|| Z-X</translation>
+    </message>
+    <message>
+        <source>ABSOLUTE</source>
+        <translation>Absolute</translation>
+    </message>
+    <message>
+        <source>RELATIVE</source>
+        <translation>Relative</translation>
+    </message>
+    <message>
+        <source>BTN_DISABLE_ALL</source>
+        <translation>Disable all</translation>
+    </message>
+    <message>
+        <source>PREVIEW</source>
+        <translation>Preview</translation>
+    </message>
+    <message>
+        <source>RESET</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <source>INVERT</source>
+        <translation>Invert</translation>
+    </message>
+    <message>
+        <source>BASE_POINT</source>
+        <translation>Base point</translation>
+    </message>
+    <message>
+        <source>DIRECTION</source>
+        <translation>Direction</translation>
+    </message>
+    <message>
+        <source>PARAMETERS</source>
+        <translation>Parameters</translation>
     </message>
 </context>
 </TS>

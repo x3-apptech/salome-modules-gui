@@ -33,6 +33,7 @@
 #include "OCCViewer_ViewModel.h"
 
 #include <V3d_View.hxx>
+#include <Visual3d_View.hxx>
 #include <Geom_Plane.hxx>
 #include <Prs3d_Presentation.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
@@ -42,6 +43,7 @@
 #include <IntAna_IntConicQuad.hxx>
 #include <gp_Lin.hxx>
 #include <gp_Pln.hxx>
+#include <math.h>
 
 // QT Includes
 #include <QApplication>
@@ -53,7 +55,217 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QStackedLayout>
+#include <QSlider>
+#include <QMenu>
 
+/*!
+  Constructor of class ClipPlane
+ */
+ClipPlane::ClipPlane():
+  RelativeMode(),
+  X(0.0), Y(0.0), Z(0.0),
+  Dx(1.0), Dy(1.0), Dz(1.0),
+  Orientation(0),
+  IsActive( true ),
+  IsInvert( false ),
+  PlaneMode( Absolute )
+{
+}
+
+/*!
+  Constructor of class OrientedPlane
+ */
+OrientedPlane::OrientedPlane():
+  Orientation(0),
+  Distance(0.5),
+  Rotation1(0),
+  Rotation2(0)
+{
+}
+
+/**********************************************************************************
+ ************************        Internal functions        ************************
+ *********************************************************************************/
+
+/*!
+  Compute the point of bounding box and current clipping plane
+ */
+void ComputeBoundsParam( double theBounds[6],
+                         double theDirection[3],
+                         double theMinPnt[3],
+                         double& theMaxBoundPrj,
+                         double& theMinBoundPrj )
+{
+  //Enlarge bounds in order to avoid conflicts of precision
+  for(int i = 0; i < 6; i += 2) {
+    static double EPS = 1.0E-3;
+    double aDelta = (theBounds[i+1] - theBounds[i])*EPS;
+    theBounds[i] -= aDelta;
+    theBounds[i+1] += aDelta;
+  }
+
+  double aBoundPoints[8][3] = { { theBounds[0], theBounds[2], theBounds[4] },
+                                { theBounds[1], theBounds[2], theBounds[4] },
+                                { theBounds[0], theBounds[3], theBounds[4] },
+                                { theBounds[1], theBounds[3], theBounds[4] },
+                                { theBounds[0], theBounds[2], theBounds[5] },
+                                { theBounds[1], theBounds[2], theBounds[5] },
+                                { theBounds[0], theBounds[3], theBounds[5] },
+                                { theBounds[1], theBounds[3], theBounds[5] } };
+
+  int aMaxId = 0;
+  theMaxBoundPrj = theDirection[0] * aBoundPoints[aMaxId][0] + theDirection[1] * aBoundPoints[aMaxId][1]
+                   + theDirection[2] * aBoundPoints[aMaxId][2];
+  theMinBoundPrj = theMaxBoundPrj;
+  for(int i = 1; i < 8; i++) {
+    double aTmp = theDirection[0] * aBoundPoints[i][0] + theDirection[1] * aBoundPoints[i][1]
+                  + theDirection[2] * aBoundPoints[i][2];
+    if(theMaxBoundPrj < aTmp) {
+      theMaxBoundPrj = aTmp;
+      aMaxId = i;
+    }
+    if(theMinBoundPrj > aTmp) {
+      theMinBoundPrj = aTmp;
+    }
+  }
+  double *aMinPnt = aBoundPoints[aMaxId];
+  theMinPnt[0] = aMinPnt[0];
+  theMinPnt[1] = aMinPnt[1];
+  theMinPnt[2] = aMinPnt[2];
+}
+
+/*!
+  Compute the position of current plane by distance
+ */
+void DistanceToPosition( double theBounds[6],
+                         double theDirection[3],
+                         double theDist,
+                         double thePos[3] )
+{
+  double aMaxBoundPrj, aMinBoundPrj, aMinPnt[3];
+  ComputeBoundsParam( theBounds,theDirection,aMinPnt,aMaxBoundPrj,aMinBoundPrj );
+  double aLength = (aMaxBoundPrj - aMinBoundPrj)*theDist;
+  thePos[0] = aMinPnt[0] - theDirection[0]*aLength;
+  thePos[1] = aMinPnt[1] - theDirection[1]*aLength;
+  thePos[2] = aMinPnt[2] - theDirection[2]*aLength;
+}
+
+/*!
+  Compute the parameters of clipping plane
+ */
+bool ComputeClippingPlaneParameters( double theNormal[3],
+                                     double theDist,
+                                     double theBounds[6],
+                                     double theOrigin[3],
+                                     Handle(V3d_View) theView3d )
+{
+  bool anIsOk = false;
+  theBounds[0] = theBounds[2] = theBounds[4] = 999.99;
+  theBounds[1] = theBounds[3] = theBounds[5] = -999.99;
+  double aBounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+  theView3d->View()->MinMaxValues( aBounds[0], aBounds[2], aBounds[4], aBounds[1], aBounds[3], aBounds[5]);
+  if ( !theView3d->View()->ContainsFacet() ) {
+    aBounds[0] = aBounds[2] = aBounds[4] = 0.0;
+    aBounds[1] = aBounds[3] = aBounds[5] = 100.0;
+  }
+  anIsOk = true;
+
+  if( !anIsOk )
+    return false;
+
+  DistanceToPosition( aBounds, theNormal, theDist, theOrigin );
+  return true;
+}
+
+/*!
+  Cross product of two 3-vectors. Result vector in result[3].
+ */
+void Cross(const double first[3], const double second[3], double result[3])
+{
+  result[0] = first[1]*second[2] - first[2]*second[1];
+  result[1] = first[2]*second[0] - first[0]*second[2];
+  result[2] = first[0]*second[1] - first[1]*second[0];
+}
+
+/*!
+  Compute relative clipping plane in absolute coordinates
+ */
+void RelativePlaneToAbsolute ( ClipPlane* thePlane, Handle(V3d_View) theView3d )
+{
+  double aNormal[3];
+  double aDir[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } };
+  {
+    static double aCoeff = M_PI/180.0;
+
+    double anU[2] = { cos( aCoeff * thePlane->RelativeMode.Rotation1 ), cos( aCoeff * thePlane->RelativeMode.Rotation2 ) };
+    double aV[2] = { sqrt( 1.0 - anU[0]*anU[0] ), sqrt( 1.0 - anU[1] * anU[1] ) };
+    aV[0] = thePlane->RelativeMode.Rotation1 > 0? aV[0]: -aV[0];
+    aV[1] = thePlane->RelativeMode.Rotation2 > 0? aV[1]: -aV[1];
+
+    switch ( thePlane->RelativeMode.Orientation ) {
+    case 0:
+      aDir[0][1] = anU[0];
+      aDir[0][2] = aV[0];
+      aDir[1][0] = anU[1];
+      aDir[1][2] = aV[1];
+      break;
+    case 1:
+      aDir[0][2] = anU[0];
+      aDir[0][0] = aV[0];
+      aDir[1][1] = anU[1];
+      aDir[1][0] = aV[1];
+      break;
+    case 2:
+      aDir[0][0] = anU[0];
+      aDir[0][1] = aV[0];
+      aDir[1][2] = anU[1];
+      aDir[1][1] = aV[1];
+      break;
+    }
+
+    Cross( aDir[1], aDir[0], aNormal );
+    // Normalize
+    double den;
+    den = sqrt( aNormal[0] * aNormal[0] + aNormal[1] * aNormal[1] + aNormal[2] * aNormal[2] );
+    if ( den != 0.0 ) {
+      for (int i=0; i < 3; i++) {
+        aNormal[i] /= den;
+      }
+    }
+    Cross( aNormal, aDir[1], aDir[0] );
+  }
+
+  double aBounds[6];
+  double anOrigin[3];
+
+  bool anIsOk = false;
+
+  anOrigin[0] = anOrigin[1] = anOrigin[2] = 0;
+  aBounds[0] = aBounds[2] = aBounds[4] = 0;
+  aBounds[1] = aBounds[3] = aBounds[5] = 0;
+  anIsOk = true;
+
+  anIsOk = ComputeClippingPlaneParameters( aNormal,
+                                           thePlane->RelativeMode.Distance,
+                                           aBounds,
+                                           anOrigin,
+                                           theView3d );
+  if( !anIsOk )
+	  return;
+
+  thePlane->Dx = aNormal[0];
+  thePlane->Dy = aNormal[1];
+  thePlane->Dz = aNormal[2];
+  thePlane->X = anOrigin[0];
+  thePlane->Y = anOrigin[1];
+  thePlane->Z = anOrigin[2];
+}
+
+/*********************************************************************************
+ *********************      class OCCViewer_ClippingDlg      *********************
+ *********************************************************************************/
 /*!
   Constructor
   \param view - view window
@@ -73,130 +285,266 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
   
   QVBoxLayout* topLayout = new QVBoxLayout( this );
   topLayout->setMargin( 11 ); topLayout->setSpacing( 6 );
-  
+
   /***************************************************************/
-  GroupPoint = new QGroupBox( this );
-  GroupPoint->setObjectName( "GroupPoint" );
-  GroupPoint->setTitle( tr("Base point") );
-  QGridLayout* GroupPointLayout = new QGridLayout( GroupPoint );
-  GroupPointLayout->setAlignment( Qt::AlignTop );
-  GroupPointLayout->setSpacing( 6 );
-  GroupPointLayout->setMargin( 11 );
-  
-  // Controls
+  // Controls for selecting, creating, deleting planes
+  QGroupBox* GroupPlanes = new QGroupBox( tr("CLIPPING_PLANES"), this );
+  QHBoxLayout* GroupPlanesLayout = new QHBoxLayout( GroupPlanes );
+  ComboBoxPlanes = new QComboBox( GroupPlanes );
+  isActivePlane = new QCheckBox( tr("IS_ACTIVE_PLANE"), this );
+  buttonNew = new QPushButton( tr("BTN_NEW"), GroupPlanes );
+  buttonDelete = new QPushButton( tr("BTN_DELETE"), GroupPlanes );
+  buttonDisableAll = new QPushButton( tr("BTN_DISABLE_ALL"), GroupPlanes );
+  MenuMode = new QMenu( "MenuMode", buttonNew );
+  MenuMode->addAction( tr( "ABSOLUTE" ), this, SLOT( onModeAbsolute() ) );
+  MenuMode->addAction( tr( "RELATIVE" ), this, SLOT( onModeRelative() ) );
+  buttonNew->setMenu( MenuMode );
+  CurrentMode = Absolute;
+
+  GroupPlanesLayout->addWidget( ComboBoxPlanes );
+  GroupPlanesLayout->addWidget( isActivePlane );
+  GroupPlanesLayout->addWidget( buttonNew );
+  GroupPlanesLayout->addWidget( buttonDelete );
+  GroupPlanesLayout->addWidget( buttonDisableAll );
+
+  ModeStackedLayout = new QStackedLayout();
+
+  /**********************   Mode Absolute   **********************/
+  /* Controls for absolute mode of clipping plane:
+     X, Y, Z - coordinates of the intersection of cutting plane and the three axes
+     Dx, Dy, Dz - components of normal to the cutting plane
+     Orientation - direction of cutting plane
+   */
   const double min = -1e+7;
   const double max =  1e+7;
   const double step = 5;
   const int precision = -7;
 
-  TextLabelX = new QLabel( GroupPoint );
+  // Croup Point
+  QGroupBox* GroupAbsolutePoint = new QGroupBox( this );
+  GroupAbsolutePoint->setObjectName( "GroupPoint" );
+  GroupAbsolutePoint->setTitle( tr("BASE_POINT") );
+  QGridLayout* GroupPointLayout = new QGridLayout( GroupAbsolutePoint );
+  GroupPointLayout->setAlignment( Qt::AlignTop );
+  GroupPointLayout->setSpacing( 6 ); GroupPointLayout->setMargin( 11 );
+
+  TextLabelX = new QLabel( GroupAbsolutePoint );
   TextLabelX->setObjectName( "TextLabelX" );
   TextLabelX->setText( tr("X:") );
   GroupPointLayout->addWidget( TextLabelX, 0, 0 );
   
-  SpinBox_X = new QtxDoubleSpinBox( min, max, step, GroupPoint );
+  SpinBox_X = new QtxDoubleSpinBox( min, max, step, GroupAbsolutePoint );
   SpinBox_X->setObjectName("SpinBox_X" );
   SpinBox_X->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_X, 0, 1 );
 
-  TextLabelY = new QLabel( GroupPoint );
+  TextLabelY = new QLabel( GroupAbsolutePoint );
   TextLabelY->setObjectName( "TextLabelY" );
   TextLabelY->setText( tr("Y:") );
   GroupPointLayout->addWidget( TextLabelY, 0, 2 );
 
-  SpinBox_Y = new QtxDoubleSpinBox( min, max, step, GroupPoint );
+  SpinBox_Y = new QtxDoubleSpinBox( min, max, step, GroupAbsolutePoint );
   SpinBox_Y->setObjectName("SpinBox_Y" );
   SpinBox_Y->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Y, 0, 3 );
 
-  TextLabelZ = new QLabel( GroupPoint );
+  TextLabelZ = new QLabel( GroupAbsolutePoint );
   TextLabelZ->setObjectName( "TextLabelZ" );
   TextLabelZ->setText( tr("Z:") );
   GroupPointLayout->addWidget( TextLabelZ, 0, 4 );
 
-  SpinBox_Z = new QtxDoubleSpinBox( min, max, step, GroupPoint );
+  SpinBox_Z = new QtxDoubleSpinBox( min, max, step, GroupAbsolutePoint );
   SpinBox_Z->setObjectName("SpinBox_Z" );
   SpinBox_Z->setPrecision( precision );
   GroupPointLayout->addWidget( SpinBox_Z, 0, 5 );
 
-  resetButton  = new QPushButton( GroupPoint );
+  resetButton  = new QPushButton( GroupAbsolutePoint );
   resetButton->setObjectName( "resetButton" );
-  resetButton->setText( tr( "Reset"  ) );
+  resetButton->setText( tr( "RESET"  ) );
   GroupPointLayout->addWidget( resetButton, 0, 6 );
 
-  /***************************************************************/
-  GroupDirection = new QGroupBox( this );
-  GroupDirection->setObjectName( "GroupDirection" );
-  GroupDirection->setTitle( tr("Direction") );
-  QGridLayout* GroupDirectionLayout = new QGridLayout( GroupDirection );
+  // Group Direction
+  GroupAbsoluteDirection = new QGroupBox( this );
+  GroupAbsoluteDirection->setObjectName( "GroupDirection" );
+  GroupAbsoluteDirection->setTitle( tr("DIRECTION") );
+  QGridLayout* GroupDirectionLayout = new QGridLayout( GroupAbsoluteDirection );
   GroupDirectionLayout->setAlignment( Qt::AlignTop );
   GroupDirectionLayout->setSpacing( 6 );
   GroupDirectionLayout->setMargin( 11 );
   
-  // Controls
-  TextLabelDx = new QLabel( GroupDirection );
+  TextLabelDx = new QLabel( GroupAbsoluteDirection );
   TextLabelDx->setObjectName( "TextLabelDx" );
   TextLabelDx->setText( tr("Dx:") );
   GroupDirectionLayout->addWidget( TextLabelDx, 0, 0 );
   
-  SpinBox_Dx = new QtxDoubleSpinBox( min, max, step, GroupDirection );
+  SpinBox_Dx = new QtxDoubleSpinBox( min, max, step, GroupAbsoluteDirection );
   SpinBox_Dx->setObjectName("SpinBox_Dx" );
   SpinBox_Dx->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dx, 0, 1 );
 
-  TextLabelDy = new QLabel( GroupDirection );
+  TextLabelDy = new QLabel( GroupAbsoluteDirection );
   TextLabelDy->setObjectName( "TextLabelDy" );
   TextLabelDy->setText( tr("Dy:") );
   GroupDirectionLayout->addWidget( TextLabelDy, 0, 2 );
   
-  SpinBox_Dy = new QtxDoubleSpinBox( min, max, step, GroupDirection );
+  SpinBox_Dy = new QtxDoubleSpinBox( min, max, step, GroupAbsoluteDirection );
   SpinBox_Dy->setObjectName("SpinBox_Dy" );
   SpinBox_Dy->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dy, 0, 3 );
 
-  TextLabelDz = new QLabel( GroupDirection );
+  TextLabelDz = new QLabel( GroupAbsoluteDirection );
   TextLabelDz->setObjectName( "TextLabelDz" );
   TextLabelDz->setText( tr("Dz:") );
   GroupDirectionLayout->addWidget( TextLabelDz, 0, 4 );
   
-  SpinBox_Dz = new QtxDoubleSpinBox( min, max, step, GroupDirection );
+  SpinBox_Dz = new QtxDoubleSpinBox( min, max, step, GroupAbsoluteDirection );
   SpinBox_Dz->setObjectName("SpinBox_Dz" );
   SpinBox_Dz->setPrecision( precision );
   GroupDirectionLayout->addWidget( SpinBox_Dz, 0, 5 );
 
-  invertButton  = new QPushButton( GroupDirection );
+  invertButton  = new QPushButton( GroupAbsoluteDirection );
   invertButton->setObjectName( "invertButton" );
-  invertButton->setText( tr( "Invert"  ) );
+  invertButton->setText( tr( "INVERT"  ) );
   GroupDirectionLayout->addWidget( invertButton, 0, 6 );
  
-  DirectionCB = new QComboBox( GroupDirection );
-  DirectionCB->setObjectName( "DirectionCB" );
-  DirectionCB->insertItem(DirectionCB->count(),tr("CUSTOM"));
-  DirectionCB->insertItem(DirectionCB->count(),tr("||X-Y"));
-  DirectionCB->insertItem(DirectionCB->count(),tr("||Y-Z"));
-  DirectionCB->insertItem(DirectionCB->count(),tr("||Z-X"));
-  GroupDirectionLayout->addWidget( DirectionCB, 1, 0, 1, 6 );
-  
+  CBAbsoluteOrientation = new QComboBox( GroupAbsoluteDirection );
+  CBAbsoluteOrientation->setObjectName( "AbsoluteOrientation" );
+  CBAbsoluteOrientation->insertItem( CBAbsoluteOrientation->count(), tr( "CUSTOM" ) );
+  CBAbsoluteOrientation->insertItem( CBAbsoluteOrientation->count(), tr( "||X-Y" ) );
+  CBAbsoluteOrientation->insertItem( CBAbsoluteOrientation->count(), tr( "||Y-Z" ) );
+  CBAbsoluteOrientation->insertItem( CBAbsoluteOrientation->count(), tr( "||Z-X" ) );
+  GroupDirectionLayout->addWidget( CBAbsoluteOrientation, 1, 0, 1, 6 );
+
+  QVBoxLayout* ModeActiveLayout = new QVBoxLayout();
+  ModeActiveLayout->setMargin( 11 ); ModeActiveLayout->setSpacing( 6 );
+  ModeActiveLayout->addWidget( GroupAbsolutePoint );
+  ModeActiveLayout->addWidget( GroupAbsoluteDirection );
+
+  QWidget* ModeActiveWidget = new QWidget( this );
+  ModeActiveWidget->setLayout( ModeActiveLayout );
+
+  /**********************   Mode Relative   **********************/
+  /* Controls for relative mode of clipping plane:
+     Distance - Value from 0 to 1.
+     Specifies the distance from the minimum value in a given direction of bounding box to the current position
+     Rotation1, Rotation2 - turn angles of cutting plane in given directions
+     Orientation - direction of cutting plane
+   */
+  QGroupBox* GroupParameters = new QGroupBox( tr("PARAMETERS"), this );
+  QGridLayout* GroupParametersLayout = new QGridLayout( GroupParameters );
+  GroupParametersLayout->setMargin( 11 ); GroupParametersLayout->setSpacing( 6 );
+
+  TextLabelOrientation = new QLabel( tr("ORIENTATION"), GroupParameters);
+  TextLabelOrientation->setObjectName( "TextLabelOrientation" );
+  GroupParametersLayout->addWidget( TextLabelOrientation, 0, 0 );
+
+  CBRelativeOrientation = new QComboBox(GroupParameters);
+  CBRelativeOrientation->setObjectName( "RelativeOrientation" );
+  CBRelativeOrientation->addItem( tr("ALONG_XY") );
+  CBRelativeOrientation->addItem( tr("ALONG_YZ") );
+  CBRelativeOrientation->addItem( tr("ALONG_ZX") );
+  GroupParametersLayout->addWidget( CBRelativeOrientation, 0, 1 );
+
+  TLValueDistance = new QLabel( GroupParameters );
+  TLValueDistance->setObjectName( "TLValueDistance" );
+  TLValueDistance->setAlignment( Qt::AlignCenter );
+  TLValueDistance->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  QFont fnt = TLValueDistance->font(); fnt.setBold( true ); TLValueDistance->setFont( fnt );
+  GroupParametersLayout->addWidget( TLValueDistance, 1, 1 );
+
+  TextLabelDistance = new QLabel( tr("DISTANCE"), GroupParameters );
+  TextLabelDistance->setObjectName( "TextLabelDistance" );
+  GroupParametersLayout->addWidget( TextLabelDistance, 2, 0 );
+
+  SliderDistance = new QSlider( Qt::Horizontal, GroupParameters );
+  SliderDistance->setObjectName( "SliderDistance" );
+  SliderDistance->setFocusPolicy( Qt::NoFocus );
+  SliderDistance->setMinimumSize( 300, 0 );
+  SliderDistance->setMinimum( 0 );
+  SliderDistance->setMaximum( 100 );
+  SliderDistance->setSingleStep( 1 );
+  SliderDistance->setPageStep( 10 );
+  SliderDistance->setTracking( false );
+  GroupParametersLayout->addWidget( SliderDistance, 2, 1 );
+
+  TLValueRotation1 = new QLabel( GroupParameters );
+  TLValueRotation1->setObjectName( "TLValueRotation1" );
+  TLValueRotation1->setAlignment( Qt::AlignCenter );
+  TLValueRotation1->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  TLValueRotation1->setFont( fnt );
+  GroupParametersLayout->addWidget( TLValueRotation1, 3, 1 );
+
+  TextLabelRotation1 = new QLabel( tr("ROTATION_AROUND_X_Y2Z"), GroupParameters );
+  TextLabelRotation1->setObjectName( "TextLabelRotation1" );
+  GroupParametersLayout->addWidget( TextLabelRotation1, 4, 0 );
+
+  SliderRotation1 = new QSlider( Qt::Horizontal, GroupParameters );
+  SliderRotation1->setObjectName( "SliderRotation1" );
+  SliderRotation1->setFocusPolicy( Qt::NoFocus );
+  SliderRotation1->setMinimumSize( 300, 0 );
+  SliderRotation1->setMinimum( -180 );
+  SliderRotation1->setMaximum( 180 );
+  SliderRotation1->setSingleStep( 1 );
+  SliderRotation1->setPageStep( 10 );
+  SliderRotation1->setTracking(false);
+  GroupParametersLayout->addWidget( SliderRotation1, 4, 1 );
+
+  TLValueRotation2 = new QLabel( GroupParameters );
+  TLValueRotation2->setObjectName( "TLValueRotation2" );
+  TLValueRotation2->setAlignment( Qt::AlignCenter );
+  TLValueRotation2->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  TLValueRotation2->setFont( fnt );
+  GroupParametersLayout->addWidget( TLValueRotation2, 5, 1 );
+
+  TextLabelRotation2 = new QLabel(tr("ROTATION_AROUND_Y_X2Z"), GroupParameters);
+  TextLabelRotation2->setObjectName( "TextLabelRotation2" );
+  TextLabelRotation2->setObjectName( "TextLabelRotation2" );
+  GroupParametersLayout->addWidget( TextLabelRotation2, 6, 0 );
+
+  SliderRotation2 = new QSlider( Qt::Horizontal, GroupParameters );
+  SliderRotation2->setObjectName( "SliderRotation2" );
+  SliderRotation2->setFocusPolicy( Qt::NoFocus );
+  SliderRotation2->setMinimumSize( 300, 0 );
+  SliderRotation2->setMinimum( -180 );
+  SliderRotation2->setMaximum( 180 );
+  SliderRotation2->setSingleStep( 1 );
+  SliderRotation2->setPageStep( 10 );
+  SliderRotation2->setTracking(false);
+  GroupParametersLayout->addWidget( SliderRotation2, 6, 1 );
+
   /***************************************************************/
+  QGroupBox* CheckBoxWidget = new QGroupBox( this );
+  QHBoxLayout* CheckBoxLayout = new QHBoxLayout( CheckBoxWidget );
   
-  PreviewChB = new QCheckBox( tr("Preview") ,this );
-  PreviewChB->setObjectName( "PreviewChB" );
-  PreviewChB->setChecked( true );
+  PreviewCheckBox = new QCheckBox( tr("PREVIEW"), CheckBoxWidget );
+  PreviewCheckBox->setObjectName( "PreviewCheckBox" );
+  PreviewCheckBox->setChecked( true );
+  CheckBoxLayout->addWidget( PreviewCheckBox, 0, Qt::AlignCenter );
   
+  AutoApplyCheckBox = new QCheckBox( tr("AUTO_APPLY"), CheckBoxWidget );
+  AutoApplyCheckBox->setObjectName( "AutoApplyCheckBox" );
+  CheckBoxLayout->addWidget( AutoApplyCheckBox, 0, Qt::AlignCenter );
+
   /***************************************************************/
   QGroupBox* GroupButtons = new QGroupBox( this );
-  GroupButtons->setObjectName( "GroupButtons" );
   QHBoxLayout* GroupButtonsLayout = new QHBoxLayout( GroupButtons );
   GroupButtonsLayout->setAlignment( Qt::AlignTop );
   GroupButtonsLayout->setMargin( 11 ); GroupButtonsLayout->setSpacing( 6 );
   
+  buttonOk = new QPushButton( GroupButtons );
+  buttonOk->setObjectName( "buttonOk" );
+  buttonOk->setText( tr( "BUT_APPLY_AND_CLOSE"  ) );
+  buttonOk->setAutoDefault( TRUE );
+  buttonOk->setDefault( TRUE );
+  GroupButtonsLayout->addWidget( buttonOk );
+
   buttonApply = new QPushButton( GroupButtons );
   buttonApply->setObjectName( "buttonApply" );
   buttonApply->setText( tr( "BUT_APPLY"  ) );
-  buttonApply->setAutoDefault( TRUE ); 
+  buttonApply->setAutoDefault( TRUE );
   buttonApply->setDefault( TRUE );
   GroupButtonsLayout->addWidget( buttonApply );
-  
+
   GroupButtonsLayout->addStretch();
   
   buttonClose = new QPushButton( GroupButtons );
@@ -205,47 +553,65 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
   buttonClose->setAutoDefault( TRUE );
   GroupButtonsLayout->addWidget( buttonClose );
 
-  /***************************************************************/
-  
-  topLayout->addWidget( GroupPoint );
-  topLayout->addWidget( GroupDirection );
-  
-  topLayout->addWidget( PreviewChB );
+  QPushButton* buttonHelp = new QPushButton( tr( "SMESH_BUT_HELP" ), GroupButtons );
+  buttonHelp->setAutoDefault( TRUE );
+  GroupButtonsLayout->addWidget( buttonHelp );
 
+  /***************************************************************/
+  ModeStackedLayout->addWidget( ModeActiveWidget );
+  ModeStackedLayout->addWidget( GroupParameters );
+
+  topLayout->addWidget( GroupPlanes );
+  topLayout->addLayout( ModeStackedLayout );
+  topLayout->addWidget( CheckBoxWidget );
   topLayout->addWidget( GroupButtons );
 
-  /* initializations */
+  this->setLayout( topLayout );
 
-  SpinBox_X->setValue( 0.0 );
-  SpinBox_Y->setValue( 0.0 );
-  SpinBox_Z->setValue( 0.0 );
+  // Initializations
+  initParam();
 
-  SpinBox_Dx->setValue( 1.0 );
-  SpinBox_Dy->setValue( 1.0 );
-  SpinBox_Dz->setValue( 1.0 );
+  // Signals and slots connections
+  connect( ComboBoxPlanes, SIGNAL( activated( int ) ), this, SLOT( onSelectPlane( int ) ) );
+  connect( isActivePlane,  SIGNAL ( toggled ( bool ) ),  this, SLOT( onValueChanged() ) );
+  connect( buttonNew, SIGNAL( clicked() ), buttonNew, SLOT( showMenu() ) );
+  connect( buttonDelete, SIGNAL( clicked() ), this, SLOT( ClickOnDelete() ) );
+  connect( buttonDisableAll, SIGNAL( clicked() ), this, SLOT( ClickOnDisableAll() ) );
 
-  /* signals and slots connections */
   connect( resetButton,  SIGNAL (clicked() ), this, SLOT( onReset() ) );
   connect( invertButton, SIGNAL (clicked() ), this, SLOT( onInvert() ) ) ;
-
   connect( SpinBox_X,  SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
   connect( SpinBox_Y,  SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
   connect( SpinBox_Z,  SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
   connect( SpinBox_Dx, SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
   connect( SpinBox_Dy, SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
   connect( SpinBox_Dz, SIGNAL ( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
-   
-  connect( DirectionCB, SIGNAL ( activated ( int ) ), this, SLOT( onModeChanged( int ) ) ) ;
+  connect( CBAbsoluteOrientation, SIGNAL ( activated ( int ) ), this, SLOT( onOrientationAbsoluteChanged( int ) ) ) ;
 
-  connect( PreviewChB, SIGNAL ( toggled ( bool ) ), this, SLOT( onPreview( bool ) ) ) ;
+  connect( CBRelativeOrientation, SIGNAL( activated( int ) ), this, SLOT( onOrientationRelativeChanged( int ) ) );
+  connect( SliderDistance,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderDistanceHasMoved( int ) ) );
+  connect( SliderDistance,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderDistanceHasMoved( int ) ) );
+  connect( SliderRotation1,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderRotation1HasMoved( int ) ) );
+  connect( SliderRotation1,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderRotation1HasMoved( int ) ) );
+  connect( SliderRotation2,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderRotation2HasMoved( int ) ) );
+  connect( SliderRotation2,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderRotation2HasMoved( int ) ) );
+
+  connect( PreviewCheckBox, SIGNAL ( toggled ( bool ) ), this, SLOT( onPreview( bool ) ) ) ;
+  connect( AutoApplyCheckBox, SIGNAL ( toggled( bool ) ), this, SLOT( onAutoApply( bool ) ) );
   
   connect( buttonClose, SIGNAL( clicked() ), this, SLOT( ClickOnClose() ) ) ;
+  connect( buttonOk, SIGNAL( clicked() ), this, SLOT( ClickOnOk() ) );
   connect( buttonApply, SIGNAL( clicked() ), this, SLOT( ClickOnApply() ) );
+  connect( buttonHelp, SIGNAL( clicked() ), this, SLOT( ClickOnHelp() ) );
   
-  myBusy = false;
+  connect(view, SIGNAL(Show( QShowEvent* ) ), this, SLOT( onViewShow() ) );
+  connect(view, SIGNAL(Hide( QHideEvent* ) ), this, SLOT( onViewHide() ) );
 
-  connect(view, SIGNAL(Show( QShowEvent * )), this, SLOT(onViewShow()));
-  connect(view, SIGNAL(Hide( QHideEvent * )), this, SLOT(onViewHide()));
+  myBusy = false;
+  myIsSelectPlane = false;
+  myView3d = myView->getViewPort()->getView();
+
+  synchronize();
 }
 
 /*!
@@ -255,8 +621,9 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
 OCCViewer_ClippingDlg::~ OCCViewer_ClippingDlg()
 {
   // no need to delete child widgets, Qt does it all for us
+  foreach( ClipPlane* aPlane, myClippingPlanes )
+    delete aPlane;
 }
-
 
 /*!
   Custom handling of close event: erases preview
@@ -264,29 +631,18 @@ OCCViewer_ClippingDlg::~ OCCViewer_ClippingDlg()
 void OCCViewer_ClippingDlg::closeEvent( QCloseEvent* e )
 {
   erasePreview();
-  
-  // Set the clipping plane back
-  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
-  if ( !aView3d.IsNull() && !myClippingPlane.IsNull() )
-  aView3d->SetPlaneOn( myClippingPlane );*/
-  
   myAction->setChecked( false );
-  
   QDialog::closeEvent( e );
 }
-
 
 /*!
   Custom handling of show event: displays preview
 */
 void OCCViewer_ClippingDlg::showEvent( QShowEvent* e )
 {
-  //ReserveClippingPlane();
-  
   QDialog::showEvent( e );
-  onPreview( PreviewChB->isChecked() );
+  onPreview( PreviewCheckBox->isChecked() );
 }
-
 
 /*!
   Custom handling of hide event: erases preview
@@ -297,6 +653,270 @@ void OCCViewer_ClippingDlg::hideEvent( QHideEvent* e )
   QDialog::hideEvent( e );
 }
 
+/*!
+  Initialization of initial values of widgets
+*/
+void OCCViewer_ClippingDlg::initParam()
+{
+  SpinBox_X->setValue( 0.0 );
+  SpinBox_Y->setValue( 0.0 );
+  SpinBox_Z->setValue( 0.0 );
+
+  SpinBox_Dx->setValue( 1.0 );
+  SpinBox_Dy->setValue( 1.0 );
+  SpinBox_Dz->setValue( 1.0 );
+
+  CBAbsoluteOrientation->setCurrentIndex(0);
+
+  TLValueDistance->setText( "0" );
+  TLValueRotation1->setText( "0\xB0" );
+  TLValueRotation2->setText( "0\xB0" );
+  CBRelativeOrientation->setCurrentIndex( 0 );
+  SliderDistance->setValue( 50 );
+  SliderRotation1->setValue( 0 );
+  SliderRotation2->setValue( 0 );
+}
+
+/*!
+  Synchronize dialog's widgets with data
+*/
+void OCCViewer_ClippingDlg::synchronize()
+{
+  ComboBoxPlanes->clear();
+  int aNbPlanesAbsolute = myClippingPlanes.size();
+
+  QString aName;
+  for(int i = 1; i<=aNbPlanesAbsolute; i++ ) {
+    aName = QString("Plane %1").arg(i);
+    ComboBoxPlanes->addItem( aName );
+  }
+
+  int aPos = ComboBoxPlanes->count() - 1;
+  ComboBoxPlanes->setCurrentIndex( aPos );
+
+  bool anIsControlsEnable = ( aPos >= 0 );
+  if ( anIsControlsEnable ) {
+    onSelectPlane( aPos );
+  }
+  else {
+    ComboBoxPlanes->addItem( tr( "NO_PLANES" ) );
+    initParam();
+    ClickOnDisableAll();
+  }
+  if ( CurrentMode == Absolute ) {
+    SpinBox_X->setEnabled( anIsControlsEnable );
+    SpinBox_Y->setEnabled( anIsControlsEnable );
+    SpinBox_Z->setEnabled( anIsControlsEnable );
+    SpinBox_Dx->setEnabled( anIsControlsEnable );
+    SpinBox_Dy->setEnabled( anIsControlsEnable );
+    SpinBox_Dz->setEnabled( anIsControlsEnable );
+    CBAbsoluteOrientation->setEnabled( anIsControlsEnable );
+    invertButton->setEnabled( anIsControlsEnable );
+    resetButton->setEnabled( anIsControlsEnable );
+  }
+  else if( CurrentMode == Relative ) {
+    CBRelativeOrientation->setEnabled( anIsControlsEnable );
+    SliderDistance->setEnabled( anIsControlsEnable );
+    SliderRotation1->setEnabled( anIsControlsEnable );
+    SliderRotation2->setEnabled( anIsControlsEnable );
+    isActivePlane->setEnabled( anIsControlsEnable );
+  }
+  isActivePlane->setEnabled( anIsControlsEnable );
+}
+
+/*!
+  Displays preview of clipping plane
+*/
+void OCCViewer_ClippingDlg::displayPreview()
+{
+  if ( myBusy || !isValid() )
+    return;
+
+  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
+  if ( !anOCCViewer )
+    return;
+
+  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
+
+  double aXMin, aYMin, aZMin, aXMax, aYMax, aZMax;
+  aXMin = aYMin = aZMin = DBL_MAX;
+  aXMax = aYMax = aZMax = -DBL_MAX;
+
+  bool isFound = false;
+  AIS_ListOfInteractive aList;
+  ic->DisplayedObjects( aList );
+  for ( AIS_ListIteratorOfListOfInteractive it( aList ); it.More(); it.Next() )
+  {
+    Handle(AIS_InteractiveObject) anObj = it.Value();
+    if ( !anObj.IsNull() && anObj->HasPresentation() &&
+         !anObj->IsKind( STANDARD_TYPE(AIS_Plane) ) ) {
+      Handle(Prs3d_Presentation) aPrs = anObj->Presentation();
+      if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() ) {
+        isFound = true;
+        double xmin, ymin, zmin, xmax, ymax, zmax;
+        aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
+        aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
+        aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
+        aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
+      }
+    }
+  }
+
+  double aSize = 50;
+
+  ClipPlane* aClipPlane;
+  for ( int i=0; i < myClippingPlanes.size(); i++ ) {
+  Pnt_ClipPlane aPlane = myClippingPlanes[i];
+  aClipPlane = aPlane;
+
+  double Epsilon = 0.0001;
+  double Epsilon_Dx = ( aClipPlane->Dx > 0 ) ? Epsilon: -Epsilon;
+  double Epsilon_Dy = ( aClipPlane->Dy > 0 ) ? Epsilon: -Epsilon;
+  double Epsilon_Dz = ( aClipPlane->Dz > 0 ) ? Epsilon: -Epsilon;
+
+  gp_Pnt aBasePnt( aClipPlane->X + Epsilon_Dx,  aClipPlane->Y + Epsilon_Dy,  aClipPlane->Z + Epsilon_Dz );
+  gp_Dir aNormal( aClipPlane->Dx, aClipPlane->Dy, aClipPlane->Dz );
+  gp_Pnt aCenter = aBasePnt;
+
+  if ( isFound )
+  {
+    // compute clipping plane size
+    aCenter = gp_Pnt( ( aXMin + aXMax ) / 2, ( aYMin + aYMax ) / 2, ( aZMin + aZMax ) / 2 );
+    double aDiag = aCenter.Distance( gp_Pnt( aXMax, aYMax, aZMax ) )*2;
+    aSize = aDiag * 1.1;
+
+    // compute clipping plane center ( redefine the base point )
+    IntAna_IntConicQuad intersector = IntAna_IntConicQuad();
+
+    intersector.Perform( gp_Lin( aCenter, aNormal), gp_Pln( aBasePnt, aNormal), Precision::Confusion() );
+    if ( intersector.IsDone() && intersector.NbPoints() == 1 )
+      aBasePnt = intersector.Point( 1 );
+    }
+
+    if ( aClipPlane->IsActive == true ) {
+      Handle(AIS_Plane) myPreviewPlane;
+      myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ) );
+      myPreviewPlane->SetSize( aSize, aSize );
+
+      ic->Display( myPreviewPlane, 1, -1, false );
+      ic->SetWidth( myPreviewPlane, 10, false );
+      ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
+      ic->SetTransparency( myPreviewPlane, 0.5, false );
+      ic->SetColor( myPreviewPlane, Quantity_Color( 85 / 255., 85 / 255., 255 / 255., Quantity_TOC_RGB ), false );
+
+      myPreviewPlaneVector.push_back( myPreviewPlane );
+    }
+  }
+  anOCCViewer->update();
+}
+
+/*!
+  Erases preview of clipping plane
+*/
+void OCCViewer_ClippingDlg::erasePreview()
+{
+  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
+  if ( !anOCCViewer )
+    return;
+  
+  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
+  
+  for ( int i=0; i < myPreviewPlaneVector.size(); i++ ) {
+  Handle(AIS_Plane) myPreviewPlane = myPreviewPlaneVector[i];
+    if ( !myPreviewPlane.IsNull() && ic->IsDisplayed( myPreviewPlane ) ) {
+      ic->Erase( myPreviewPlane, false );
+      ic->Remove( myPreviewPlane, false );
+      myPreviewPlane.Nullify();
+    }
+  }
+  anOCCViewer->update();
+}
+
+/*!
+  Return true if plane parameters are valid
+*/
+bool OCCViewer_ClippingDlg::isValid()
+{
+  return ( SpinBox_Dx->value() !=0 || SpinBox_Dy->value() !=0 || SpinBox_Dz->value() !=0 );
+}
+
+/*!
+  Update view after changes
+*/
+void OCCViewer_ClippingDlg::updateView()
+{
+  if ( PreviewCheckBox->isChecked() || AutoApplyCheckBox->isChecked() ) {
+    erasePreview();
+    if ( AutoApplyCheckBox->isChecked() )
+      onApply();
+    if ( PreviewCheckBox->isChecked() && !isRestore )
+      displayPreview();
+  }
+}
+
+/*!
+  SLOT on new button click: create a new clipping plane
+*/
+void OCCViewer_ClippingDlg::ClickOnNew()
+{
+  ClipPlane* aPlane = new ClipPlane();
+  aPlane->PlaneMode = CurrentMode;
+  myClippingPlanes.push_back( aPlane );
+  synchronize();
+}
+
+/*!
+  SLOT on delete button click: Delete selected clipping plane
+*/
+void OCCViewer_ClippingDlg::ClickOnDelete()
+{
+  if ( myClippingPlanes.empty() )
+    return;
+
+  int aPlaneIndex = ComboBoxPlanes->currentIndex();
+
+  ClipPlaneVector::iterator anIter = myClippingPlanes.begin() + aPlaneIndex;
+  myClippingPlanes.erase( anIter );
+  updateView();
+  synchronize();
+}
+
+/*!
+  SLOT on disable all button click: Restore initial state of viewer,
+  erase all clipping planes
+*/
+void OCCViewer_ClippingDlg::ClickOnDisableAll()
+{
+  AutoApplyCheckBox->setChecked( false );
+  Graphic3d_SetOfHClipPlane aPlanes = myView3d->GetClipPlanes();
+  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+  for( ;anIter.More();anIter.Next() ){
+    Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
+    aClipPlane->SetOn(Standard_False);
+  }
+  myView3d->Update();
+  myView3d->Redraw();
+}
+
+/*!
+  SLOT on ok button click: sets cutting plane and closes dialog
+*/
+void OCCViewer_ClippingDlg::ClickOnOk()
+{
+  onApply();
+  erasePreview();
+  myAction->setChecked( false );
+}
+
+/*!
+  SLOT on Apply button click: sets cutting plane and update viewer
+*/
+void OCCViewer_ClippingDlg::ClickOnApply()
+{
+  onApply();
+  myView3d->Update();
+  myView3d->Redraw();
+}
 
 /*!
   SLOT on close button click: erases preview and rejects dialog
@@ -304,35 +924,129 @@ void OCCViewer_ClippingDlg::hideEvent( QHideEvent* e )
 void OCCViewer_ClippingDlg::ClickOnClose()
 {
   erasePreview();
-
-  // Set the clipping plane back
-  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
-  if ( !aView3d.IsNull() && !myClippingPlane.IsNull() )
-    aView3d->SetPlaneOn( myClippingPlane );
-  */
   myAction->setChecked( false );
-  
-  reject();
 }
 
+/*!
+  SLOT on help button click: opens a help page
+*/
+void OCCViewer_ClippingDlg::ClickOnHelp()
+{
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( app )
+    app->onHelpContextModule( "GUI", "occ_3d_viewer_page.html", "clipping_planes" );
+}
 
 /*!
-  SLOT on apply button click: sets cutting plane
+  Set absolute mode of clipping plane
 */
-void OCCViewer_ClippingDlg::ClickOnApply()
+void OCCViewer_ClippingDlg::onModeAbsolute()
 {
-  qApp->processEvents();
-  QApplication::setOverrideCursor( Qt::WaitCursor );
-  qApp->processEvents();
-  
-  myView->setCuttingPlane( true, SpinBox_X->value() , SpinBox_Y->value() , SpinBox_Z->value(),
-                                 SpinBox_Dx->value(), SpinBox_Dy->value(), SpinBox_Dz->value() );
-  
-  QApplication::restoreOverrideCursor(); 
-  
-  erasePreview();
-  
-  //ReserveClippingPlane();
+  ModeStackedLayout->setCurrentIndex(0);
+  CurrentMode = Absolute;
+  ClickOnNew();
+  onValueChanged();
+}
+
+/*!
+  Set relative mode of clipping plane
+*/
+void OCCViewer_ClippingDlg::onModeRelative()
+{
+  ModeStackedLayout->setCurrentIndex(1);
+  CurrentMode = Relative;
+  ClickOnNew();
+  onValueChanged();
+}
+
+/*!
+  SLOT: called on value of clipping plane changed
+*/
+void OCCViewer_ClippingDlg::onValueChanged()
+{
+  SetCurrentPlaneParam();
+  if ( myIsSelectPlane )
+    return;
+  updateView();
+}
+
+/*!
+  Set current parameters of selected plane
+*/
+void OCCViewer_ClippingDlg::onSelectPlane ( int theIndex )
+{
+  if ( myClippingPlanes.empty() )
+    return;
+
+  Pnt_ClipPlane aPlane = myClippingPlanes[theIndex];
+  ClipPlane* aClipPlane = aPlane;
+
+  myIsSelectPlane = true;
+  if ( aClipPlane->PlaneMode == Absolute ) {
+    ModeStackedLayout->setCurrentIndex( 0 );
+    CurrentMode = Absolute;
+    int anOrientation = aClipPlane->Orientation;
+    // Set plane parameters in the dialog
+    SpinBox_X->setValue( aClipPlane->X );
+    SpinBox_Y->setValue( aClipPlane->Y );
+    SpinBox_Z->setValue( aClipPlane->Z );
+    SpinBox_Dx->setValue( aClipPlane->Dx );
+    SpinBox_Dy->setValue( aClipPlane->Dy );
+    SpinBox_Dz->setValue( aClipPlane->Dz );
+    CBAbsoluteOrientation->setCurrentIndex( anOrientation );
+    onOrientationAbsoluteChanged( anOrientation );
+  }
+  else if( aClipPlane->PlaneMode == Relative ) {
+    ModeStackedLayout->setCurrentIndex( 1 );
+    CurrentMode = Relative;
+    int anOrientation = aClipPlane->RelativeMode.Orientation;
+    // Set plane parameters in the dialog
+    SliderDistance->setValue( aClipPlane->RelativeMode.Distance*100 );
+    TLValueDistance->setText( QString::number(aClipPlane->RelativeMode.Distance ) );
+    SliderRotation1->setValue( aClipPlane->RelativeMode.Rotation1 );
+    TLValueRotation1->setText( QString( "%1\xB0" ).arg( aClipPlane->RelativeMode.Rotation1 ) );
+    SliderRotation2->setValue( aClipPlane->RelativeMode.Rotation2 );
+    TLValueRotation2->setText( QString( "%1\xB0" ).arg( aClipPlane->RelativeMode.Rotation2 ) );
+    CBRelativeOrientation->setCurrentIndex( anOrientation );
+    onOrientationRelativeChanged( anOrientation );
+  }
+  isActivePlane->setChecked( aClipPlane->IsActive );
+  ComboBoxPlanes->setCurrentIndex( theIndex );
+
+  myIsSelectPlane = false;
+}
+
+/*!
+  Restore parameters of selected plane
+*/
+void OCCViewer_ClippingDlg::SetCurrentPlaneParam()
+{
+  if ( myClippingPlanes.empty() || myIsSelectPlane )
+    return;
+
+  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+
+  Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
+  ClipPlane* aPlaneData = aPlane;
+
+  if ( aPlaneData->PlaneMode == Absolute ) {
+    aPlaneData->Orientation = CBAbsoluteOrientation->currentIndex();
+    aPlaneData->X = SpinBox_X->value();
+    aPlaneData->Y = SpinBox_Y->value();
+    aPlaneData->Z = SpinBox_Z->value();
+    aPlaneData->Dx = SpinBox_Dx->value();
+    aPlaneData->Dy = SpinBox_Dy->value();
+    aPlaneData->Dz = SpinBox_Dz->value();
+  }
+  else if( aPlaneData->PlaneMode == Relative ) {
+    aPlaneData->RelativeMode.Orientation = CBRelativeOrientation->currentIndex();
+    aPlaneData->RelativeMode.Distance = TLValueDistance->text().toDouble();
+    aPlaneData->RelativeMode.Rotation1 = TLValueRotation1->text().remove("\xB0").toInt();
+    aPlaneData->RelativeMode.Rotation2 = TLValueRotation2->text().remove("\xB0").toInt();
+    erasePreview();
+    RelativePlaneToAbsolute( aPlane, myView3d );
+  }
+  aPlaneData->IsActive = isActivePlane->isChecked();
 }
 
 /*!
@@ -346,11 +1060,7 @@ void OCCViewer_ClippingDlg::onReset()
   SpinBox_Z->setValue(0);
   myBusy = false;
 
-  if ( PreviewChB->isChecked() )
-    {
-      erasePreview();
-      displayPreview();
-    }
+  updateView();
 }
 
 /*!
@@ -361,27 +1071,29 @@ void OCCViewer_ClippingDlg::onInvert()
   double Dx = SpinBox_Dx->value();
   double Dy = SpinBox_Dy->value();
   double Dz = SpinBox_Dz->value();
-  
+
   myBusy = true;
   SpinBox_Dx->setValue( -Dx );
   SpinBox_Dy->setValue( -Dy );
   SpinBox_Dz->setValue( -Dz );
   myBusy = false;
 
-  if ( PreviewChB->isChecked() )
-    {
-      erasePreview();
-      displayPreview();
-    }
+  if ( !myClippingPlanes.empty() ) {
+    int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+    Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
+    ClipPlane* aPlaneData = aPlane;
+    aPlaneData->IsInvert = !aPlaneData->IsInvert;
+  }
+  updateView();
 }
 
 /*!
-  SLOT: called on mode changed
+  SLOT: called on orientation of clipping plane in absolute mode changed
 */
-void OCCViewer_ClippingDlg::onModeChanged( int mode )
+void OCCViewer_ClippingDlg::onOrientationAbsoluteChanged( int mode )
 {
   bool isUserMode = (mode==0);
-  
+
   TextLabelX->setEnabled( isUserMode );
   TextLabelY->setEnabled( isUserMode );
   TextLabelZ->setEnabled( isUserMode );
@@ -397,164 +1109,76 @@ void OCCViewer_ClippingDlg::onModeChanged( int mode )
   SpinBox_Dx->setEnabled( isUserMode );
   SpinBox_Dy->setEnabled( isUserMode );
   SpinBox_Dz->setEnabled( isUserMode );
-  
+
   if ( isUserMode )
     return;
 
   double aDx = 0, aDy = 0, aDz = 0;
 
   if ( mode == 1 )
-    {
-      aDz = 1;
-      TextLabelZ->setEnabled( true );
-      SpinBox_Z->setEnabled( true );
-      SpinBox_Z->setFocus();
-    }
+  {
+    aDz = 1;
+    TextLabelZ->setEnabled( true );
+    SpinBox_Z->setEnabled( true );
+    SpinBox_Z->setFocus();
+  }
   else if ( mode == 2 )
-    {
-      aDx = 1;
-      TextLabelX->setEnabled( true );
-      SpinBox_X->setEnabled( true );
-      SpinBox_X->setFocus();
-    }
+  {
+    aDx = 1;
+    TextLabelX->setEnabled( true );
+    SpinBox_X->setEnabled( true );
+    SpinBox_X->setFocus();
+  }
   else if ( mode == 3 )
-    {
-      aDy = 1;
-      TextLabelY->setEnabled( true );
-      SpinBox_Y->setEnabled( true );
-      SpinBox_Y->setFocus();
-    }
-  
+  {
+    aDy = 1;
+    TextLabelY->setEnabled( true );
+    SpinBox_Y->setEnabled( true );
+    SpinBox_Y->setFocus();
+  }
+
+  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+  Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
+  ClipPlane* aPlaneData = aPlane;
+  if ( aPlaneData->IsInvert == true ) {
+    aDx = -aDx; aDy = -aDy; aDz = -aDz;
+  }
+
   myBusy = true;
   SpinBox_Dx->setValue( aDx );
   SpinBox_Dy->setValue( aDy );
   SpinBox_Dz->setValue( aDz );
   myBusy = false;
 
-  if ( PreviewChB->isChecked() )
-    {
-      erasePreview();
-      displayPreview();
-    }
+  SetCurrentPlaneParam();
+  updateView();
 }
 
-
 /*!
-  Displays preview of clipping plane
+  SLOT: called on orientation of clipping plane in relative mode changed
 */
-void OCCViewer_ClippingDlg::displayPreview()
+void OCCViewer_ClippingDlg::onOrientationRelativeChanged (int theItem)
 {
-  if ( myBusy || !isValid() )
+  if ( myClippingPlanes.empty() )
     return;
 
-  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
-  if (!anOCCViewer)
-    return;
-  
-  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
-
-  double aXMin, aYMin, aZMin, aXMax, aYMax, aZMax;
-  aXMin = aYMin = aZMin = DBL_MAX;
-  aXMax = aYMax = aZMax = -DBL_MAX;
-
-  bool isFound = false;
-  AIS_ListOfInteractive aList;
-  ic->DisplayedObjects( aList );
-  for ( AIS_ListIteratorOfListOfInteractive it( aList ); it.More(); it.Next() )
-  {
-    Handle(AIS_InteractiveObject) anObj = it.Value();
-    if ( !anObj.IsNull() && anObj->HasPresentation() &&
-         !anObj->IsKind( STANDARD_TYPE(AIS_Plane) ) )
-    {
-      Handle(Prs3d_Presentation) aPrs = anObj->Presentation();
-      if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() )
-      {
-        isFound = true;
-        double xmin, ymin, zmin, xmax, ymax, zmax;
-        aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
-        aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
-        aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
-        aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
-      }
-    }
+  if ( theItem == 0 ) {
+    TextLabelRotation1->setText( tr( "ROTATION_AROUND_X_Y2Z" ) );
+    TextLabelRotation2->setText( tr( "ROTATION_AROUND_Y_X2Z" ) );
+  }
+  else if ( theItem == 1 ) {
+    TextLabelRotation1->setText( tr( "ROTATION_AROUND_Y_Z2X" ) );
+    TextLabelRotation2->setText( tr( "ROTATION_AROUND_Z_Y2X" ) );
+  }
+  else if ( theItem == 2 ) {
+    TextLabelRotation1->setText( tr( "ROTATION_AROUND_Z_X2Y" ) );
+    TextLabelRotation2->setText( tr( "ROTATION_AROUND_X_Z2Y" ) );
   }
 
-  double aSize = 50;
-  
-  gp_Pnt aBasePnt( SpinBox_X->value(),  SpinBox_Y->value(),  SpinBox_Z->value() );
-  gp_Dir aNormal( SpinBox_Dx->value(), SpinBox_Dy->value(), SpinBox_Dz->value() );
-  gp_Pnt aCenter = aBasePnt;
-  
-  if ( isFound )
-    {
-      // compute clipping plane size
-      aCenter = gp_Pnt( ( aXMin + aXMax ) / 2, ( aYMin + aYMax ) / 2, ( aZMin + aZMax ) / 2 );
-      double aDiag = aCenter.Distance(gp_Pnt(aXMax, aYMax, aZMax ))*2;
-      aSize = aDiag * 1.1;
-
-      // compute clipping plane center ( redefine the base point )
-      IntAna_IntConicQuad intersector = IntAna_IntConicQuad();
-      
-      intersector.Perform( gp_Lin( aCenter, aNormal), gp_Pln( aBasePnt, aNormal), Precision::Confusion() );
-      if ( intersector.IsDone() && intersector.NbPoints() == 1 )
-        aBasePnt = intersector.Point( 1 );
-    }
-  
-  myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ) );
-  myPreviewPlane->SetSize( aSize, aSize );
-  
-  // Deactivate clipping planes
-  //myView->getViewPort()->getView()->SetPlaneOff();
-  //myView->setPlaneOff();
-
-  ic->Display( myPreviewPlane, 1, -1, false );
-  ic->SetWidth( myPreviewPlane, 10, false );
-  ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
-  ic->SetTransparency( myPreviewPlane, 0.5, false );
-  ic->SetColor( myPreviewPlane, Quantity_Color( 85 / 255., 85 / 255., 255 / 255., Quantity_TOC_RGB ), false );
-  
-  anOCCViewer->update();
+  if( (QComboBox*)sender() == CBRelativeOrientation )
+    SetCurrentPlaneParam();
+  updateView();
 }
-
-
-/*!
-  Erases preview of clipping plane
-*/
-void OCCViewer_ClippingDlg::erasePreview ()
-{
-  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
-  if (!anOCCViewer)
-    return;
-  
-  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
-  
-  if ( !myPreviewPlane.IsNull() && ic->IsDisplayed( myPreviewPlane ) )
-    {
-#if OCC_VERSION_LARGE <= 0x06060000
-      ic->Erase( myPreviewPlane, false, false );
-#else
-      ic->Erase( myPreviewPlane, false );
-#endif
-      ic->Remove( myPreviewPlane, false );
-      myPreviewPlane.Nullify();
-    }
-  
-  anOCCViewer->update();
-}
-
-
-/*!
-  SLOT: called on value changes (co-ordinates of point or normal)
-*/
-void OCCViewer_ClippingDlg::onValueChanged()
-{
-  if ( PreviewChB->isChecked() )
-    {
-      erasePreview();
-      displayPreview();
-    }
-}
-
 
 /*!
   SLOT: called on preview check box toggled
@@ -562,31 +1186,49 @@ void OCCViewer_ClippingDlg::onValueChanged()
 void OCCViewer_ClippingDlg::onPreview( bool on )
 {
   erasePreview();
-
   if ( on ) 
     displayPreview();
 }
 
 /*!
-  \return true if plane parameters are valid
+  SLOT: called on Auto Apply check box toggled
 */
-bool OCCViewer_ClippingDlg::isValid()
+void OCCViewer_ClippingDlg::onAutoApply( bool toggled )
 {
-  return ( SpinBox_Dx->value()!=0 || SpinBox_Dy->value()!=0 || SpinBox_Dz->value()!=0 );
+  if ( toggled ) onApply();
+  myView3d->Update();
+  myView3d->Redraw();
 }
 
 /*!
-  Remember the current clipping plane
+  SLOT on Apply button click: sets cutting plane
 */
-void OCCViewer_ClippingDlg::ReserveClippingPlane()
+void OCCViewer_ClippingDlg::onApply()
 {
-  /*Handle(V3d_View) aView3d = myView->getViewPort()->getView();
-  if ( !aView3d.IsNull() )
-    {
-      aView3d->InitActivePlanes();
-      if ( aView3d->MoreActivePlanes() )
-        myClippingPlane = aView3d->ActivePlane();
-        }*/
+  if ( myBusy )
+    return;
+  myIsSelectPlane = true;
+  Graphic3d_SetOfHClipPlane aPlanes = myView3d->GetClipPlanes();
+  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+  for( ;anIter.More();anIter.Next() ){
+    Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
+    aClipPlane->SetOn(Standard_False);
+  }
+
+  qApp->processEvents();
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+  qApp->processEvents();
+
+  for ( int i=0;i<myClippingPlanes.size();i++ ) {
+    Pnt_ClipPlane aPlane = myClippingPlanes[i];
+    ClipPlane* aClipPlane = aPlane;
+    if ( aClipPlane->IsActive == true )
+      myView->setCuttingPlane( true, aClipPlane->X , aClipPlane->Y , aClipPlane->Z,
+                               aClipPlane->Dx, aClipPlane->Dy, aClipPlane->Dz );
+  }
+
+  QApplication::restoreOverrideCursor();
+  myIsSelectPlane = false;
 }
 
 void OCCViewer_ClippingDlg::onViewShow()
@@ -602,3 +1244,30 @@ void OCCViewer_ClippingDlg::onViewHide()
   hide();
 }
 
+/*!
+  SLOT: Called when value of slider distance change
+*/
+void OCCViewer_ClippingDlg::SliderDistanceHasMoved( int value )
+{
+  double new_value = value/100.;
+  TLValueDistance->setText( QString("%1").arg( new_value ) );
+  onValueChanged();
+}
+
+/*!
+  SLOT: Called when value of slider rotation1 change
+*/
+void OCCViewer_ClippingDlg::SliderRotation1HasMoved( int value )
+{
+  TLValueRotation1->setText( QString("%1\xB0").arg( value ) );
+  onValueChanged();
+}
+
+/*!
+  SLOT: Called when value of slider rotation2 change
+*/
+void OCCViewer_ClippingDlg::SliderRotation2HasMoved( int value )
+{
+  TLValueRotation2->setText( QString("%1\xB0").arg( value ) );
+  onValueChanged();
+}

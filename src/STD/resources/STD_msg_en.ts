@@ -216,6 +216,10 @@ Do you want to reload it ?</translation>
         <translation>&amp;Close</translation>
     </message>
     <message>
+        <source>BUT_APPLY_AND_CLOSE</source>
+        <translation>A&amp;pply and Close</translation>
+    </message>
+    <message>
         <source>INF_DESK_EXIT</source>
         <translation>Exit</translation>
     </message>

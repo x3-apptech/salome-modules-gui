@@ -216,6 +216,10 @@ Voulez-vous le réouvrir?</translation>
         <translation>&amp;Fermer</translation>
     </message>
     <message>
+        <source>BUT_APPLY_AND_CLOSE</source>
+        <translation>A&amp;ppliquer et Fermer</translation>
+    </message>
+    <message>
         <source>INF_DESK_EXIT</source>
         <translation>&amp;Quitter</translation>
     </message>
