@@ -20,7 +20,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#if !defined WNT
+#if !defined WIN32
 #define QT_CLEAN_NAMESPACE         /* avoid definition of INT32 and INT8 */
 #endif
 
@@ -40,7 +40,7 @@
 
 #include <stdlib.h>
 
-#if !defined WNT
+#if !defined WIN32
 #include <QX11Info>
 #include <GL/glx.h>
 #include <X11/Xlib.h>
@@ -225,7 +225,7 @@ void OCCViewer_ViewPort::cleanup()
 */
 void OCCViewer_ViewPort::selectVisualId()
 {
-#if !defined WNT
+#if !defined WIN32
   XVisualInfo* pVisualInfo;
   if ( QX11Info::display() )
   {

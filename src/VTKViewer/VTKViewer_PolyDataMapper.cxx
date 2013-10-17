@@ -39,7 +39,7 @@
 #include <vtkCommand.h>
 #include <vtkCellData.h>
 
-#ifndef WNT
+#ifndef WIN32
 # ifndef GLX_GLXEXT_LEGACY
 #  define GLX_GLXEXT_LEGACY
 # endif
@@ -129,7 +129,7 @@ static PFNGLENABLEVERTEXATTRIBARRAYARBPROC  vglEnableVertexAttribArrayARB  = NUL
 static PFNGLDISABLEVERTEXATTRIBARRAYARBPROC vglDisableVertexAttribArrayARB = NULL;
 
 
-#ifndef WNT
+#ifndef WIN32
 #define GL_GetProcAddress( x )   glXGetProcAddressARB( (const GLubyte*)x )
 #else
 #define GL_GetProcAddress( x )   wglGetProcAddress( (const LPCSTR)x )

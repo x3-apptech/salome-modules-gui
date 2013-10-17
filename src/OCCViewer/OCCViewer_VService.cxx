@@ -28,7 +28,7 @@
 #include <Aspect_DisplayConnection.hxx>
 #include <Graphic3d.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
-#ifdef WNT
+#ifdef WIN32
 #include <WNT_Window.hxx>
 #else
 #include <Xw_Window.hxx>
@@ -41,7 +41,7 @@ Handle(Aspect_Window) OCCViewer_VService::CreateWindow( const Handle(V3d_View)& 
 							WId winId )
 {
   Aspect_Handle aWindowHandle = (Aspect_Handle)winId;
-#ifdef WNT
+#ifdef WIN32
   Handle(WNT_Window) viewWindow = new WNT_Window( aWindowHandle );
 #else
   Handle(Aspect_DisplayConnection) aDispConnection = view->Viewer()->Driver()->GetDisplayConnection();
@@ -65,7 +65,7 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
   if (aGraphicDriver.IsNull())
   {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
-#ifndef WNT
+#ifndef WIN32
     aDisplayConnection = new Aspect_DisplayConnection( displayName );
 #else
     aDisplayConnection = new Aspect_DisplayConnection();

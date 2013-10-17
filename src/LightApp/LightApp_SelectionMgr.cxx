@@ -395,7 +395,7 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
       dynamic_cast<const LightApp_DataSubOwner*>( (*itr).operator->() );
     if ( subOwner )
     {
-//#ifndef WNT
+//#ifndef WIN32
       if ( !theMap.IsBound( TCollection_AsciiString(subOwner->entry().toLatin1().data()) ) )
 //#else
 //      if ( !theMap.IsBound( subOwner->entry().toLatin1().data() ) )

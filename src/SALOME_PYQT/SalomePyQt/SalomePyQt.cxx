@@ -23,7 +23,7 @@
 // File   : SalomePyQt.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-#ifdef WNT
+#ifdef WIN32
 // E.A. : On windows with python 2.6, there is a conflict
 // E.A. : between pymath.h and Standard_math.h which define
 // E.A. : some same symbols : acosh, asinh, ...

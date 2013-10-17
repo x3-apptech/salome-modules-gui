@@ -46,7 +46,7 @@
 
 #include "utilities.h"
 
-#if defined WNT
+#if defined WIN32
 #include <WNT_Window.hxx>
 #else
 #include <Xw_Window.hxx>
@@ -623,7 +623,7 @@ void OCCViewer_ViewPort3d::endRotation()
 */
 void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 {
-#ifndef WNT
+#ifndef WIN32
   /* X11 : map before show doesn't work */
   if ( !mapped( activeView() ) )
     mapView( activeView() );
@@ -643,7 +643,7 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 */
 void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 {
-#ifdef WNT
+#ifdef WIN32
   /* Win32 : map before first show to avoid flicker */
   if ( !mapped( activeView() ) )
     mapView( activeView() );

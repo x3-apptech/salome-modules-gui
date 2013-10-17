@@ -23,7 +23,7 @@
 #include "VTKViewer.h"
 #include "VTKViewer_MarkerDef.h"
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 

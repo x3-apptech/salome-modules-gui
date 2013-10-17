@@ -34,7 +34,7 @@ class QPolygon;
 class QtxRectRubberBand;
 class QtxPolyRubberBand;
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( disable:4251 )
 #endif
 
@@ -144,7 +144,7 @@ private:
   QtxPolyRubberBand*           mypPolyRB;
 };
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning( default:4251 )
 #endif
 

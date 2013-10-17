@@ -26,7 +26,7 @@
 
 #include <cstring>
 
-#ifndef WNT
+#ifndef WIN32
 # ifndef GLX_GLXEXT_LEGACY
 #  define GLX_GLXEXT_LEGACY
 # endif
@@ -85,7 +85,7 @@ static PFNGLRENDERBUFFERSTORAGEEXTPROC vglRenderbufferStorageEXT = NULL;
 static PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC vglFramebufferRenderbufferEXT = NULL;
 static PFNGLDELETERENDERBUFFERSEXTPROC vglDeleteRenderbuffersEXT = NULL;
 
-#ifndef WNT
+#ifndef WIN32
 #define GL_GetProcAddress( x ) glXGetProcAddressARB( (const GLubyte*)x )
 #else
 #define GL_GetProcAddress( x ) wglGetProcAddress( (const LPCSTR)x )

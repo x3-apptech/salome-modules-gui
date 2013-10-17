@@ -36,7 +36,7 @@
 
 #include <Python.h>
 
-#ifdef WNT
+#ifdef WIN32
 #  if defined SUITAPP_EXPORTS || defined SUITApp_EXPORTS
 #    define SUITAPP_EXPORT __declspec(dllexport)
 #  else

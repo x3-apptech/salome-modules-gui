@@ -46,7 +46,7 @@ CASCatch_CatchSignals::CASCatch_CatchSignals()
     mySigStates[i] = NULL;
 }
 
-#ifndef WNT
+#ifndef WIN32
 
 //================================ UNIX part ==================================================
 
@@ -218,7 +218,7 @@ void CASCatch_CatchSignals::Deactivate()
 
 
 #else
-//====================================== WNT part ====================================================
+//====================================== WIN32 part ====================================================
 #include <OSD_WNT_1.hxx>
 
 #include <process.h>

@@ -36,7 +36,7 @@
 #  define LIGHTAPP_EXPORT
 #endif // WIN32
 
-#if defined WNT
+#if defined WIN32
 #pragma warning ( disable:4251 )
 #pragma warning ( disable:4786 )
 #pragma warning ( disable:4503 )

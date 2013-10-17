@@ -19,7 +19,7 @@
 
 //  SALOME QxScene : build Supervisor viewer into desktop
 //
-#ifdef WNT
+#ifdef WIN32
 #if defined QXSCENE_EXPORTS || defined QxScene_EXPORTS
 #define QXSCENE_EXPORT __declspec(dllexport)
 #else
@@ -29,6 +29,6 @@
 #define QXSCENE_EXPORT
 #endif
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning ( disable:4251 )
 #endif

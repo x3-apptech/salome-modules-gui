@@ -43,7 +43,7 @@
 #include <OSD_SharedLibrary.hxx>
 #include <OSD_Function.hxx>
 
-#ifdef WNT
+#ifdef WIN32
 # include <process.h>
 #else
 #include <unistd.h>
@@ -248,7 +248,7 @@ CORBA::Long SALOME_Session_i::GetActiveStudyId()
 
 CORBA::Long SALOME_Session_i::getPID() {
   return (CORBA::Long)
-#ifndef WNT
+#ifndef WIN32
     getpid();
 #else
     _getpid();
