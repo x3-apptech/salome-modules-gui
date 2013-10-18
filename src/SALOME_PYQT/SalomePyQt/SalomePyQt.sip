@@ -243,8 +243,6 @@ public:
     pY = PyList_GET_ITEM(a1,i);
     double aX = PyFloat_AsDouble(pX);
     double aY = PyFloat_AsDouble(pY);
-    Py_DECREF(pX);
-    Py_DECREF(pY);
     sipCpp->addPoint(aX, aY);
   }
 %End
