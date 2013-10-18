@@ -99,11 +99,13 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
-  myV3dViewer->Init();
+  //myV3dViewer->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
+  myV3dViewer->SetDefaultLights();
 
 #if OCC_VERSION_LARGE <= 0x06060000 // Porting to OCCT higher 6.6.0 version
   myV3dCollector = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Collector3d").ToExtString() );
-  myV3dCollector->Init();
+  //myV3dCollector->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
+  myV3dCollector->SetDefaultLights();
 #endif
 
   // init selector
