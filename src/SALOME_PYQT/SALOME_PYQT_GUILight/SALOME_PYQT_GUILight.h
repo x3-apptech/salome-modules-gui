@@ -33,8 +33,8 @@
 #define SALOME_PYQT_LIGHT_EXPORT __declspec(dllimport)
 #endif
 
-#else   // 
-           WIN32
+#else   // WIN32
+
 #define SALOME_PYQT_LIGHT_EXPORT
 
 #endif  // WIN32
