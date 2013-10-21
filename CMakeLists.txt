@@ -58,8 +58,8 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
 # User options
 # (some options have already been defined in KERNEL) 
 # ============
-OPTION(SALOME_BUILD_DOC "Generate SALOME GUI documentation" ${SALOME_BUILD_DOC})
-OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ${SALOME_BUILD_TESTS})
+OPTION(SALOME_BUILD_DOC "Generate SALOME GUI documentation" ON)
+OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ON)
 
 # Advanced options:
 OPTION(SALOME_USE_VTKVIEWER "Enable VTK visualization (Mandatory in classic configurations)" ON)
@@ -99,13 +99,13 @@ IF(NOT SALOME_LIGHT_ONLY)
 ENDIF() 
 IF(SALOME_BUILD_TESTS)
   ENABLE_TESTING()
-  FIND_PACKAGE(SalomeCppUnit)
+  FIND_PACKAGE(SalomeCppUnit REQUIRED)
   SALOME_LOG_OPTIONAL_PACKAGE(CppUnit SALOME_BUILD_TESTS)  
 ENDIF()
 IF(SALOME_BUILD_DOC)
-  FIND_PACKAGE(SalomeDoxygen)
-  FIND_PACKAGE(SalomeGraphviz)
-  FIND_PACKAGE(SalomeSphinx)
+  FIND_PACKAGE(SalomeDoxygen REQUIRED)
+  FIND_PACKAGE(SalomeGraphviz REQUIRED)
+  FIND_PACKAGE(SalomeSphinx REQUIRED)
   SALOME_LOG_OPTIONAL_PACKAGE(Doxygen SALOME_BUILD_DOC)
   SALOME_LOG_OPTIONAL_PACKAGE(Graphviz SALOME_BUILD_DOC)
   SALOME_LOG_OPTIONAL_PACKAGE(Sphinx SALOME_BUILD_DOC)
@@ -120,7 +120,7 @@ FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python and before PyQt4
 # Build with GUI observers feature
 ADD_DEFINITIONS(-DWITH_SALOMEDS_OBSERVER)
 
-#OCCT
+# OCCT
 FIND_PACKAGE(SalomeCAS REQUIRED)
 
 # Qt4
@@ -131,16 +131,16 @@ FIND_PACKAGE(SalomePyQt4 REQUIRED)
 
 # Optional prerequisites for GUI
 IF(SALOME_USE_GLVIEWER)
-  FIND_PACKAGE(SalomeOpenGL)
+  FIND_PACKAGE(SalomeOpenGL REQUIRED)
   SALOME_LOG_OPTIONAL_PACKAGE(OpenGL SALOME_USE_GLVIEWER) 
 ENDIF()
 IF(SALOME_USE_VTKVIEWER)
   # Required components are listed in the FindSalomeVTK.cmake file: 
-  FIND_PACKAGE(SalomeVTK 6.0) 
+  FIND_PACKAGE(SalomeVTK 6.0 REQUIRED) 
   SALOME_LOG_OPTIONAL_PACKAGE(VTK SALOME_USE_VTKVIEWER)
 ENDIF()
 IF(SALOME_USE_PLOT2DVIEWER)
-  FIND_PACKAGE(SalomeQwt)  
+  FIND_PACKAGE(SalomeQwt REQUIRED)  
   SALOME_LOG_OPTIONAL_PACKAGE(Qwt SALOME_USE_PLOT2DVIEWER)
 ENDIF()
 
@@ -217,13 +217,70 @@ INCLUDE(CMakePackageConfigHelpers)
 # List of targets in this project we want to make visible to the rest of the world.
 # They all have to be INSTALL'd with the option "EXPORT ${PROJECT_NAME}TargetGroup"
 SET(_${PROJECT_NAME}_exposed_targets 
-    caf CAM CASCatch  DDS Event GLViewer  LightApp  LogWindow ObjBrowser  
-    OCCViewer OpenGLUtils Plot2d  PyConsole PyInterp  QDS qtx QxScene SalomeApp 
-    SalomeIDLGUI  SalomeObject  SalomePrs SalomePyQtGUILight  SalomePyQtGUI 
-    SalomePyQt  SalomePy  SalomeSession SalomeStyle SOCC  SPlot2d std SUITApp suit  
-    SVTK  ToolsGUI  ViewerTools VTKViewer  vtkTools vtkEDFOverloads SalomeGuiHelpers  
-    SalomeTreeData 
+    caf CAM CASCatch DDS Event LightApp LogWindow ObjBrowser OpenGLUtils 
+    QDS qtx SalomeIDLGUI SalomePrs SalomeStyle std SUITApp suit ViewerTools  
+    vtkTools vtkEDFOverloads     
 )
+
+# SALOME object specific targets:
+IF(SALOME_USE_SALOMEOBJECT)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       SalomeObject)
+ENDIF(SALOME_USE_SALOMEOBJECT)
+
+# GL specific targets:
+IF(SALOME_USE_GLVIEWER)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       GLViewer)
+ENDIF(SALOME_USE_GLVIEWER)
+
+# VTK specific targets:
+IF(SALOME_USE_VTKVIEWER)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       VTKViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+         SVTK)
+  ENDIF(SALOME_USE_SALOMEOBJECT)
+ENDIF(SALOME_USE_VTKVIEWER)
+
+# OCC specific targets:
+IF(SALOME_USE_OCCVIEWER)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       OCCViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+         SOCC)
+  ENDIF(SALOME_USE_SALOMEOBJECT)
+ENDIF(SALOME_USE_OCCVIEWER)
+
+# Plot2d specific targets:
+IF(SALOME_USE_PLOT2DVIEWER)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       Plot2d)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+         SPlot2d)
+  ENDIF(SALOME_USE_SALOMEOBJECT)
+ENDIF(SALOME_USE_PLOT2DVIEWER)
+
+# Qx specific targets:
+IF(SALOME_USE_QXGRAPHVIEWER)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       QxScene)
+ENDIF(SALOME_USE_QXGRAPHVIEWER)
+
+# Python-based packages specific targets:
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       PyInterp PyConsole SalomePy SalomePyQtGUI SalomePyQtGUILight SalomePyQt)
+ENDIF(SALOME_USE_PYCONSOLE)
+
+# CORBA specific targets:
+IF(NOT SALOME_LIGHT_ONLY)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets
+       SalomeSession SalomeApp SalomeGuiHelpers SalomeTreeData ToolsGUI)
+ENDIF(NOT SALOME_LIGHT_ONLY)
 
 # Add all targets to the build-tree export set
 EXPORT(TARGETS ${_${PROJECT_NAME}_exposed_targets}
@@ -233,6 +290,7 @@ EXPORT(TARGETS ${_${PROJECT_NAME}_exposed_targets}
 #   - in the build tree:
 
 #      Ensure the variables are always defined for the configure:
+SET(KERNEL_ROOT_DIR "${KERNEL_ROOT_DIR}")
 SET(SIP_ROOT_DIR "${SIP_ROOT_DIR}")
 SET(QT4_ROOT_DIR "${QT4_ROOT_DIR}")
 SET(PYQT4_ROOT_DIR "${PYQT4_ROOT_DIR}")
