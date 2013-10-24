@@ -33,6 +33,7 @@
 #include <vtkRenderer.h>
 
 #include <vtkCell.h>
+#include <vtkVersion.h>
 #define VTK_XVERSION (VTK_MAJOR_VERSION*10000+VTK_MINOR_VERSION*100+VTK_BUILD_VERSION)
 #if VTK_XVERSION > 50700
 #include <vtkPolyhedron.h>

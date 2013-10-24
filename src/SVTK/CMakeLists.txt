@@ -46,6 +46,7 @@ SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES}
   ${VTK_LIBRARIES} 
   ${CAS_KERNEL} ${CAS_VIEWER}
+  ${KERNEL_OpUtil}
   qtx suit ViewerTools SalomeObject SalomePrs VTKViewer OpenGLUtils
 )
 
