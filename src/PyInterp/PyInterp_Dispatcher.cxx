@@ -152,7 +152,7 @@ void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
     return;
 
   //if ( theRequest->IsSync() && !IsBusy() ) // synchronous processing - nothing is done if dispatcher is busy!
-  if ( theRequest->IsSync() ) // synchronous processing - nothing is done if dispatcher is busy!
+  if ( theRequest->IsSync() ) // synchronous processing
     processRequest( theRequest );
   else // asynchronous processing
   {
