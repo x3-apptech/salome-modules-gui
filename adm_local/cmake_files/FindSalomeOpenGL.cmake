@@ -19,7 +19,7 @@
 # Author: Adrien Bruneton
 #
 
-# OpenGL detection dor Salome
+# OpenGL detection for Salome
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
@@ -31,5 +31,8 @@ ENDIF()
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(OpenGL OPENGL_INCLUDE_DIR 1)
 #MARK_AS_ADVANCED()
 
-SALOME_ACCUMULATE_HEADERS(OPENGL_INCLUDE_DIR)
+IF(OPENGL_FOUND) 
+  SALOME_ACCUMULATE_HEADERS(OPENGL_INCLUDE_DIR)
+  SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${OPENGL_LIBRARIES})
+ENDIF()
 
