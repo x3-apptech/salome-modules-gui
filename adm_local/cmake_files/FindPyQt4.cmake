@@ -56,6 +56,7 @@ FIND_PROGRAM(PYQT_PYRCC_EXECUTABLE NAMES pyrcc4 pyrcc4.bat)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${PYQT_PYUIC_EXECUTABLE}" PATH)
 GET_FILENAME_COMPONENT(_tmp_ROOT_DIR "${_tmp_ROOT_DIR}" PATH)
 
+
 # Typical locations of qobject.sip are: 
 #   - /usr/share/sip/PyQt4/QtCore, for a system install
 #   - or <xyz>/sip/QtCore, for a custom install
@@ -69,18 +70,12 @@ ENDIF()
 MARK_AS_ADVANCED(PYQT_SIP_MAIN_FILE)
 
 # Get PyQt compilation flags:
-SET(PYQT_PYTHONPATH "${_tmp_ROOT_DIR};${_tmp_ROOT_DIR}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages")
+SET(PYQT_PYTHONPATH ${_tmp_ROOT_DIR} ${_tmp_ROOT_DIR}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
 SET(PYQT_SIPFLAGS)
 
-IF(WIN32 AND NOT CYGWIN)
-  SET(_cmd set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH};%PYTHONPATH% && ${PYTHON_EXECUTABLE})
-ELSE()
-  SET(_cmd /usr/bin/env PYTHONPATH="${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:$$PYTHONPATH" ${PYTHON_EXECUTABLE})
-ENDIF()
-
-EXECUTE_PROCESS(COMMAND "${_cmd}" -c "import sys; 
-sys.path[:0] = ['${PYQT_PYTHONPATH}'] 
-sys.path[:0] = ['${SIP_PYTHONPATH}']
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; 
+sys.path[:0] = '${PYQT_PYTHONPATH}'.split(';');
+sys.path[:0] = '${SIP_PYTHONPATH}'.split(';');
 from PyQt4 import pyqtconfig; 
 sys.stdout.write(pyqtconfig.Configuration().pyqt_sip_flags)"
   OUTPUT_VARIABLE PYQT_SIPFLAGS)
@@ -114,11 +109,13 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_EXECUTABLE PYQT
 #   PYQT_PYUIC_PATH - command to launch pyuic with the correct PYTHONPATH
 #   PYQT_PYRCC_PATH - command to launch pyrcc with the correct PYTHONPATH
 # TODO: should be done like Sphinx in KERNEL (i.e. generating a shell script)?
+
 IF(WIN32 AND NOT CYGWIN)
   MESSAGE(WARNING "PyQt4 command was not tested under Win32")
   SET(PYQT_PYUIC_PATH set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH};%PYTHONPATH% && ${PYQT_PYUIC_EXECUTABLE})
   SET(PYQT_PYRCC_PATH set PYTHONPATH=${PYQT_PYTHONPATH};${SIP_PYTHONPATH};%PYTHONPATH% && ${PYQT_PYRCC_EXECUTABLE})
 ELSE()
+  STRING(REPLACE ";" ":" PYQT_PYTHONPATH "${PYQT_PYTHONPATH}")
   SET(PYQT_PYUIC_PATH /usr/bin/env PYTHONPATH="${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:$$PYTHONPATH" ${PYQT_PYUIC_EXECUTABLE})
   SET(PYQT_PYRCC_PATH /usr/bin/env PYTHONPATH="${PYQT_PYTHONPATH}:${SIP_PYTHONPATH}:$$PYTHONPATH" ${PYQT_PYRCC_EXECUTABLE})
 ENDIF()
