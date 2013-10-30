@@ -310,7 +310,6 @@ SET(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/inc
 
 # Build variables that will be expanded when configuring Salome<MODULE>Config.cmake:
 SALOME_CONFIGURE_PREPARE(CAS OpenGL PyQt4 Qt4 Qwt SIP VTK)
-message("_PREREQ_LIST ${_PREREQ_LIST}")
 
 CONFIGURE_PACKAGE_CONFIG_FILE(${PROJECT_NAME}Config.cmake.in 
     ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
