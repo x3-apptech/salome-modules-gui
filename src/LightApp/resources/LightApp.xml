@@ -64,6 +64,7 @@
     <parameter name="Plot2d"       value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SPlot2d"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="GLViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="GraphicsView" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OCCViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="VTKViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="QxSceneViewer" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>

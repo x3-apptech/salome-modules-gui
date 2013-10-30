@@ -172,4 +172,5 @@ SET(GUI_vtkEDFOverloads vtkEDFOverloads)
 SET(GUI_vtkTools vtkTools)
 SET(GUI_SalomeGuiHelpers SalomeGuiHelpers)
 SET(GUI_SalomeTreeData SalomeTreeData)
-
+SET(GUI_ImageComposer ImageComposer)
+SET(GUI_GraphicsView GraphicsView)

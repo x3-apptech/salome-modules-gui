@@ -66,11 +66,12 @@ OPTION(SALOME_USE_VTKVIEWER "Enable VTK visualization (Mandatory in classic conf
 OPTION(SALOME_USE_SALOMEOBJECT "Enable Salome Object (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_OCCVIEWER "Enable OCC visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_GLVIEWER "Enable OpenGL visualization (Mandatory in classic configurations)" ON)
+OPTION(SALOME_USE_GRAPHICSVIEW "Enable GraphicsView visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PLOT2DVIEWER "Enable Plot2D visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PYCONSOLE "Enable Python GUI interface (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
 
-MARK_AS_ADVANCED(SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER)
+MARK_AS_ADVANCED(SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER SALOME_USE_GRAPHICSVIEW)
 MARK_AS_ADVANCED(SALOME_USE_SALOMEOBJECT SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_PLOT2DVIEWER)
 MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_QXGRAPHVIEWER)
 
@@ -226,7 +227,7 @@ INCLUDE(CMakePackageConfigHelpers)
 SET(_${PROJECT_NAME}_exposed_targets 
     caf CAM CASCatch DDS Event LightApp LogWindow ObjBrowser OpenGLUtils 
     QDS qtx SalomeIDLGUI SalomePrs SalomeStyle std SUITApp suit ViewerTools  
-    vtkTools vtkEDFOverloads     
+    vtkTools vtkEDFOverloads ImageComposer
 )
 
 # SALOME object specific targets:
@@ -276,6 +277,12 @@ IF(SALOME_USE_QXGRAPHVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
        QxScene)
 ENDIF(SALOME_USE_QXGRAPHVIEWER)
+
+# GraphicsView specific targets:
+IF(SALOME_USE_GRAPHICSVIEW)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+       GraphicsView)
+ENDIF(SALOME_USE_GRAPHICSVIEW)
 
 # Python-based packages specific targets:
 IF(SALOME_USE_PYCONSOLE)

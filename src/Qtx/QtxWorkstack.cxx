@@ -1795,6 +1795,16 @@ QWidget* QtxWorkstack::activeWindow() const
 }
 
 /*!
+  \brief Set active widget
+  \param wid widget to activate
+*/
+void QtxWorkstack::setActiveWindow( QWidget* wid )
+{
+  if ( activeArea() )
+    activeArea()->setActiveWidget( wid );
+}
+
+/*!
   \brief Split workstack.
 
   Splitting is possible only if there are two or more widgets in the workarea.

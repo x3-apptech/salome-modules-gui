@@ -1,0 +1,45 @@
+<!DOCTYPE TS><TS>
+<context>
+    <name>@default</name>
+    <message>
+        <source>ICON_GV_DUMP</source>
+        <translation>graphics_view_dump.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_ZOOM</source>
+        <translation>graphics_view_zoom.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_PAN</source>
+        <translation>graphics_view_pan.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_GLOBALPAN</source>
+        <translation>graphics_view_glpan.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_CURSOR_ZOOM</source>
+        <translation>graphics_view_cursor_zoom.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_FITALL</source>
+        <translation>graphics_view_fitall.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_FITSELECT</source>
+        <translation>graphics_view_fitselect.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_RESET</source>
+        <translation>graphics_view_reset.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_FITAREA</source>
+        <translation>graphics_view_fitarea.png</translation>
+    </message>
+    <message>
+        <source>ICON_GV_ROTATE</source>
+        <translation>graphics_view_rotate.png</translation>
+    </message>
+</context>
+</TS>

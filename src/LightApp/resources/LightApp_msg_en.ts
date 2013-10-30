@@ -499,6 +499,10 @@ The changes will be applied on the next application session.</translation>
         <translation>Qx&amp;Scene 2D view</translation>
     </message>
     <message>
+        <source>NEW_WINDOW_5</source>
+        <translation>G&amp;raphics view</translation>
+    </message>
+    <message>
         <source>CREATING_NEW_WINDOW</source>
         <translation>Create new %1</translation>
     </message>

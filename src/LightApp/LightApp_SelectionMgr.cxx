@@ -209,7 +209,7 @@ void LightApp_SelectionMgr::selectedObjects( QStringList& theList, const QString
 	if ( !owner )
 	  continue;
 
-	if ( !aSet.contains( owner->entry() ) ) {
+        if ( !aSet.contains( owner->entry() ) && !owner->IO().IsNull() ) {
 	  selList.append( owner->entry() );
 	  aSet.insert( owner->entry() );
 	}

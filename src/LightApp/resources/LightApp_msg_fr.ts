@@ -495,6 +495,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène Qx&amp;Scene</translation>
     </message>
     <message>
+        <source>NEW_WINDOW_5</source>
+        <translation type="unfinished">G&amp;raphics view</translation>
+    </message>
+    <message>
         <source>CREATING_NEW_WINDOW</source>
         <translation>Créer une nouvelle %1</translation>
     </message>
