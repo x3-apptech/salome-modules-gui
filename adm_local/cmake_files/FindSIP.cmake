@@ -2,7 +2,7 @@
 # Sets the following variables:
 #   SIP_EXECUTABLE      - path to the SIP executable
 #   SIP_INCLUDE_DIR     - path to the SIP headers
-#   SIP_PYTHON_PATH     - path to the SIP Python packages
+#   SIP_PYTHONPATH      - path to the SIP Python packages
 #
 #  The header sip.h is looked for.
 #  The binary 'sip' is looked for.
