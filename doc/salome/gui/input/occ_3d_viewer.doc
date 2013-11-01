@@ -248,6 +248,11 @@ on/off.
 view area to the minimized / maximized state.
 <hr>
 
+\image html occ_view_return_3d_view.png
+
+<b>Return to 3D</b> - this button switches from 2D view projection back to the 3D view mode.
+<hr>
+
 \image html occ_view_sync.png
 
 <b>Synchronize view</b> - allows to synchronize 3d view

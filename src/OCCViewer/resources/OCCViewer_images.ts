@@ -124,6 +124,10 @@
         <translation>occ_view_minimized.png</translation>
     </message>
     <message>
+        <source>ICON_OCCVIEWER_RETURN_3D_VIEW</source>
+        <translation>occ_view_return_3d_view.png</translation>
+    </message>
+    <message>
         <source>ICON_OCCVIEWER_PRESELECTION</source>
         <translation>occ_view_preselection.png</translation>
     </message>

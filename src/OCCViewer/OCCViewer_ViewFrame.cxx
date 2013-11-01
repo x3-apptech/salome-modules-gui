@@ -86,6 +86,24 @@ void OCCViewer_ViewFrame::setViewManager( SUIT_ViewManager* theMgr )
 }
 
 //**************************************************************************************
+void OCCViewer_ViewFrame::returnTo3dView()
+{
+  OCCViewer_ViewWindow* view = 0;
+  for (int i = BOTTOM_RIGHT; i <= TOP_RIGHT; i++ ) {
+    view = myViews.at(i);
+    view->setVisible( view->get2dMode() == No2dMode );
+    view->setMaximized( true, false );
+    if (view->get2dMode() == No2dMode) myMaximizedView = view;
+  }
+  myLayout->setColumnStretch(0, 0);
+  myLayout->setColumnStretch(1, 0);
+  myLayout->addWidget( myMaximizedView, 0, 0 );
+  mySplitMode = -1;
+  myViewsMode.clear();
+  myLayout->invalidate();
+}
+
+//**************************************************************************************
 void OCCViewer_ViewFrame::onMaximizedView( OCCViewer_ViewWindow* theView, bool isMaximized)
 {
   myMaximizedView = theView;
@@ -227,6 +245,7 @@ void OCCViewer_ViewFrame::splitSubViews()
   }
 
   OCCViewer_ViewWindow* view = 0;
+  bool isVisible3dView = false;
   for ( int i = 0; i< myViews.count(); i++ ) {
     view = myViews.at(i);
     bool isShowed = false;
@@ -239,12 +258,20 @@ void OCCViewer_ViewFrame::splitSubViews()
     if( isShowed ) {
       view->show();
       view->setMaximized( false, false );
+      if ( view->get2dMode() == No2dMode ) isVisible3dView = true;
       ///////////////QApplication::processEvents(); // VSR: hangs up ?
       if ( view != myMaximizedView )
         view->onViewFitAll();
     }
     else
       view->setVisible( false );
+  }
+  if ( !isVisible3dView ) {
+    for ( int i = 0; i< myViews.count(); i++ ){
+      view = myViews.at(i);
+      if( view->isVisible() )
+        view->setReturnedTo3dView( false );
+    }
   }
 }
 
@@ -300,6 +327,8 @@ void OCCViewer_ViewFrame::setZoomingStyle( const int i )
 //**************************************************************************************
 void OCCViewer_ViewFrame::connectViewSignals(OCCViewer_ViewWindow* theView)
 {
+  connect( theView, SIGNAL( returnedTo3d( ) ), this, SLOT( returnTo3dView( ) ) );
+
   connect( theView, SIGNAL( maximized( OCCViewer_ViewWindow*, bool ) ), 
            this, SLOT( onMaximizedView( OCCViewer_ViewWindow*, bool ) ) );
 

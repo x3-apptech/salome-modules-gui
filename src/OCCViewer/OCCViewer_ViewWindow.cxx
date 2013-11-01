@@ -1299,6 +1299,15 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onMaximizedView()));
   toolMgr()->registerAction( aAction, MaximizedId );
 
+  // Return to 3d view
+  if (my2dMode!=No2dMode){
+    aAction = new QtxAction(tr("MNU_RETURN_3D_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_RETURN_3D_VIEW" ) ),
+                            tr( "MNU_RETURN_3D_VIEW" ), 0, this );
+    aAction->setStatusTip(tr("DSC_RETURN_3D_VIEW"));
+    connect(aAction, SIGNAL(triggered()), this, SLOT(returnTo3dView()));
+    toolMgr()->registerAction( aAction, ReturnTo3dViewId );
+  }
+
   // Synchronize View 
   toolMgr()->registerAction( synchronizeAction(), SynchronizeId );
 }
@@ -1324,7 +1333,10 @@ void OCCViewer_ViewWindow::createToolBar()
   }
   
   int tid = toolMgr()->createToolBar( aToolbarName, false );
-
+  if ( my2dMode != No2dMode ){
+    toolMgr()->append( ReturnTo3dViewId, tid );
+    toolMgr()->append( toolMgr()->separator(), tid );
+  }
   toolMgr()->append( DumpId, tid );
   toolMgr()->append( SwitchInteractionStyleId, tid );
 #if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
@@ -2587,16 +2599,34 @@ void OCCViewer_ViewWindow::onMaximizedView()
   setMaximized(!isMaximized());
 }
 
+void OCCViewer_ViewWindow::returnTo3dView()
+{
+  setReturnedTo3dView( true );
+}
+
+void OCCViewer_ViewWindow::setReturnedTo3dView(bool isVisible3dView)
+{
+  if ( !toolMgr()->action( ReturnTo3dViewId ) ||
+    toolMgr()->isShown(ReturnTo3dViewId) != isVisible3dView ) return;
+  if ( !isVisible3dView )
+    toolMgr()->show( ReturnTo3dViewId );
+  else
+    toolMgr()->hide( ReturnTo3dViewId );
+  if ( isVisible3dView ) emit returnedTo3d( );
+}
+
 
 void OCCViewer_ViewWindow::setMaximized(bool toMaximize, bool toSendSignal)
 {
   QAction* anAction =  toolMgr()->action( MaximizedId );
+  QAction* anAction2 =  toolMgr()->action( ReturnTo3dViewId );
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   if ( toMaximize ) {
     anAction->setText( tr( "MNU_MINIMIZE_VIEW" ) );  
     anAction->setToolTip( tr( "MNU_MINIMIZE_VIEW" ) );  
     anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MINIMIZE" ) ) );
     anAction->setStatusTip( tr( "DSC_MINIMIZE_VIEW" ) );
+    if ( anAction2 && my2dMode != No2dMode ) toolMgr()->show( ReturnTo3dViewId );
     if (toSendSignal) {
       emit maximized( this, true );
     }
@@ -2606,12 +2636,12 @@ void OCCViewer_ViewWindow::setMaximized(bool toMaximize, bool toSendSignal)
     anAction->setToolTip( tr( "MNU_MAXIMIZE_VIEW" ) );  
     anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MAXIMIZE" ) ) );
     anAction->setStatusTip( tr( "DSC_MAXIMIZE_VIEW" ) );
+    if ( anAction2 && my2dMode != No2dMode ) toolMgr()->hide( ReturnTo3dViewId );
     if (toSendSignal) {
       emit maximized( this, false );
     }
   }
 }
-
 
 bool OCCViewer_ViewWindow::isMaximized() const
 {

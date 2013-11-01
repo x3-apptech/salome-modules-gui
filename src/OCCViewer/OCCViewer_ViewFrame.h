@@ -122,6 +122,7 @@ public slots:
   virtual void updateGravityCoords() {}
    
   void onMaximizedView( OCCViewer_ViewWindow*, bool );
+  void returnTo3dView();
 
   virtual void onDumpView();
 

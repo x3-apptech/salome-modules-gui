@@ -300,12 +300,20 @@
         <translation>Minimiser la vue</translation>
     </message>
     <message>
+        <source>DSC_RETURN_3D_VIEW</source>
+        <translation type="unfinished">Return to 3D view</translation>
+    </message>
+    <message>
         <source>MNU_MAXIMIZE_VIEW</source>
         <translation>Maximiser</translation>
     </message>
     <message>
         <source>MNU_MINIMIZE_VIEW</source>
         <translation>Minimiser</translation>
+    </message>
+    <message>
+        <source>MNU_RETURN_3D_VIEW</source>
+        <translation type="unfinished">Return to 3D</translation>
     </message>
 </context>
 <context>

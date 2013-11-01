@@ -123,7 +123,7 @@ public:
          TrihedronShowId, AxialScaleId, GraduatedAxesId, AmbientId,
 	 SwitchInteractionStyleId, SwitchZoomingStyleId, 
 	 SwitchPreselectionId, SwitchSelectionId,
-	 MaximizedId, SynchronizeId,
+	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
@@ -188,6 +188,7 @@ public:
 
   void            setMaximized( bool, bool = true );
   bool            isMaximized() const;
+  void            setReturnedTo3dView( bool = true );
   
   void            setSketcherStyle( bool enable );
   bool            isSketcherStyle() const;
@@ -246,6 +247,7 @@ public slots:
   virtual void hideEvent( QHideEvent * );
 
   virtual void onMaximizedView();
+  virtual void returnTo3dView();
 
 signals:
   void vpTransformationStarted(OCCViewer_ViewWindow::OperationType type);
@@ -255,6 +257,7 @@ signals:
   void Show( QShowEvent * );
   void Hide( QHideEvent * );
   void maximized( OCCViewer_ViewWindow*, bool );
+  void returnedTo3d( );
 
 protected slots:
   void synchronize( SUIT_ViewWindow* );

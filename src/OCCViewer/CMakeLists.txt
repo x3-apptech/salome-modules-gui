@@ -116,6 +116,7 @@ SET(_other_RESOURCES
   resources/occ_view_preselection.png
   resources/occ_view_presets.png
   resources/occ_view_reset.png
+  resources/occ_view_return_3d_view.png
   resources/occ_view_right.png
   resources/occ_view_rotate.png
   resources/occ_view_rotation_point.png
