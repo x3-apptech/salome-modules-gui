@@ -76,6 +76,17 @@
   In case of any error these methods return None object to the Python.
 */
 
+#ifdef WIN32
+ #if defined SALOMEPY_EXPORTS || defined SalomePy_EXPORTS
+  #define SALOMEPY_EXPORT __declspec( dllexport )
+ #else
+  #define SALOMEPY_EXPORT __declspec( dllimport )
+ #endif
+#else
+ #define SALOMEPY_EXPORT
+#endif
+
+
 #define PUBLISH_ENUM(i)                              \
 {                                                    \
   PyObject *w;                                       \
@@ -198,7 +209,7 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
   \return VTK window renderer object
 */
 
-class TGetRendererEvent: public SALOME_Event
+class SALOMEPY_EXPORT TGetRendererEvent: public SALOME_Event
 {
 public:
   typedef PyObject* TResult;
@@ -222,7 +233,7 @@ public:
   }
 };
 
-extern "C" PyObject* libSalomePy_getRenderer( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderer( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -251,7 +262,7 @@ extern "C" PyObject* libSalomePy_getRenderer( PyObject* self, PyObject* args )
   \return VTK window render window object
 */
 
-class TGetRenderWindowEvent: public SALOME_Event
+class SALOMEPY_EXPORT TGetRenderWindowEvent: public SALOME_Event
 {
 public:
   typedef PyObject* TResult;
@@ -275,7 +286,7 @@ public:
   }
 };
 
-extern "C" PyObject* libSalomePy_getRenderWindow( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindow( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -304,7 +315,7 @@ extern "C" PyObject* libSalomePy_getRenderWindow( PyObject* self, PyObject* args
   \return VTK window render window interactor object
 */
 
-class TGetRenderWindowInteractorEvent: public SALOME_Event
+class SALOMEPY_EXPORT TGetRenderWindowInteractorEvent: public SALOME_Event
 {
 public:
   typedef PyObject* TResult;
@@ -328,7 +339,7 @@ public:
   }
 };
 
-extern "C" PyObject* libSalomePy_getRenderWindowInteractor( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindowInteractor( PyObject* self, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -349,7 +360,7 @@ extern "C" PyObject* libSalomePy_getRenderWindowInteractor( PyObject* self, PyOb
   \return nothing (Py_None)
 */
 
-extern "C" PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -384,7 +395,7 @@ extern "C" PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
   \return nothing (Py_None)
 */
 
-extern "C" PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -412,7 +423,7 @@ extern "C" PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
   \return nothing (Py_None)
 */
 
-extern "C" PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -463,7 +474,7 @@ extern "C" PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
   \return nothing (Py_None)
 */
 
-extern "C" PyObject* libSalomePy_resetView( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_resetView( PyObject* self, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -497,7 +508,7 @@ static PyMethodDef Module_Methods[] =
   \brief Python module initialization.
   \internal
 */
-extern "C" void initlibSalomePy()
+extern "C" SALOMEPY_EXPORT void initlibSalomePy()
 {
   static char* modulename = (char*)"libSalomePy";
 
