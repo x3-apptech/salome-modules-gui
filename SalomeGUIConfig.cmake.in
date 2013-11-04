@@ -100,7 +100,7 @@ FOREACH(_p RANGE ${_range})
           NO_DEFAULT_PATH)
   ELSE()
     STRING(REPLACE "," ";" _compo_lst "${_pkg_compo}")
-    MESSAGE(STATUS "===> (components ${_pkg_compo})")
+    MESSAGE(STATUS "===> (components: ${_pkg_compo})")
     FIND_PACKAGE(${_pkg} REQUIRED NO_MODULE
           COMPONENTS ${_compo_lst} 
           PATHS "${_pkg_dir}"
