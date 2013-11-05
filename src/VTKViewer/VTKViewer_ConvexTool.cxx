@@ -26,6 +26,7 @@
 #include <set>
 #include <map>
 #include <algorithm>
+#include <iterator>
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkGeometryFilter.h>
