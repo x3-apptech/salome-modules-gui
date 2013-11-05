@@ -88,7 +88,7 @@ SET(_PREREQ_CONFIG_DIR @_PREREQ_DIR_LIST@)
 SET(_PREREQ_COMPONENTS "@_PREREQ_COMPO_LIST@")
 LIST(LENGTH _PREREQ_CONFIG_DIR _list_len)
 IF(NOT _list_len EQUAL 0)
-# Another CMake stupidity - FOREACH(... RANGE r) generates r+1 numbers ...
+  # Another CMake stupidity - FOREACH(... RANGE r) generates r+1 numbers ...
   MATH(EXPR _range "${_list_len}-1")
   FOREACH(_p RANGE ${_range})  
     LIST(GET _PREREQ            ${_p} _pkg    )
