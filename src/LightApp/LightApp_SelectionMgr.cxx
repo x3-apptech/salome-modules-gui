@@ -113,7 +113,7 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
 	if ( !owner )
 	  continue;
 
-	if ( !aSet.contains( owner->entry() ) ) {
+	if ( !aSet.contains( owner->entry() ) && !owner->IO().IsNull() ) {
 	  selList.append( owner->IO() );
 	  aSet.insert( owner->entry() );
 	}
@@ -209,7 +209,7 @@ void LightApp_SelectionMgr::selectedObjects( QStringList& theList, const QString
 	if ( !owner )
 	  continue;
 
-        if ( !aSet.contains( owner->entry() ) && !owner->IO().IsNull() ) {
+        if ( !aSet.contains( owner->entry() ) ) {
 	  selList.append( owner->entry() );
 	  aSet.insert( owner->entry() );
 	}
