@@ -5,55 +5,55 @@
     <name>@default</name>
     <message>
       <source>WRN_FILE_NAME_BAD</source>
-      <translation>正しいファイル名を入力してください。Python ファイルは文字、数字およびアンダー スコアのみを含める、文字またはアンダー スコアから開始する必要があります。</translation>
+      <translation>正しいファイル名を指定します。Python ファイルは文字、数字、ダッシュを構成する必要があり、、文字またはアンダー スコアで始まる必要があります。</translation>
     </message>
     <message>
       <source>WRN_FILE_NOT_EXIST</source>
-      <translation>%1 ファイルは存在しません。</translation>
+      <translation>ファイル %1 は存在しません。</translation>
     </message>
     <message>
       <source>CLOSE_LOCKED_STUDY</source>
-      <translation>ロックされた研究ですか？</translation>
+      <translation>ロックされた研究を閉じますか。</translation>
     </message>
     <message>
       <source>PUBLISH_IN_STUDY</source>
-      <translation>研究で公開します。</translation>
+      <translation>スタディ公開</translation>
     </message>
     <message>
       <source>MULTI_FILE_DUMP</source>
-      <translation>マルチ ファイル ダンプ</translation>
+      <translation>複数ファイルをダンプする</translation>
     </message>
     <message>
       <source>BUT_NEW</source>
-      <translation>&amp; 新</translation>
+      <translation>新規作成(&amp;N)</translation>
     </message>
     <message>
       <source>SAVE_POINT_ROOT_NAME</source>
-      <translation>GUI の状態</translation>
+      <translation>HMI の状態</translation>
     </message>
     <message>
       <source>SAVE_POINT_ROOT_TOOLTIP</source>
-      <translation>永続的な GUI の状態</translation>
+      <translation>状態の HMI 永続的です</translation>
     </message>
     <message>
       <source>SAVE_GUI_STATE</source>
-      <translation>GUI の状態を保存します。</translation>
+      <translation>GUIの状態を保存</translation>
     </message>
     <message>
       <source>BUT_LOAD</source>
-      <translation>&amp; 負荷</translation>
+      <translation>読み込み(&amp;L)</translation>
     </message>
     <message>
       <source>BUT_OPEN</source>
-      <translation>&amp; オープン</translation>
+      <translation>開く(&amp;O)</translation>
     </message>
     <message>
       <source>SAVE_POINT_OBJECT_TOOLTIP</source>
-      <translation>GUI の状態を保存：%1</translation>
+      <translation>保存されたGUI状態: %1</translation>
     </message>
     <message>
       <source>SAVE_POINT_DEF_NAME</source>
-      <translation>GUI の状態:</translation>
+      <translation>HCI の状態:</translation>
     </message>
     <message>
       <source>VALUE_COLUMN</source>
@@ -65,19 +65,19 @@
     </message>
     <message>
       <source>REFENTRY_COLUMN</source>
-      <translation>Ref.Entry</translation>
+      <translation>REFエントリ</translation>
     </message>
     <message>
       <source>ERR_INCOMPATIBLE_TYPE</source>
-      <translation>変数名「%1」と互換性のない数値型があり</translation>
+      <translation>変数"%1"の数値型は互換性がありません</translation>
     </message>
     <message>
       <source>ERR_INVALID_VALUE</source>
-      <translation>値は検証されていません</translation>
+      <translation>値が検証されていません</translation>
     </message>
     <message>
       <source>ERR_NO_VARIABLE</source>
-      <translation>名前「%1」の変数が存在しません。</translation>
+      <translation>変数"%1"は存在しません。</translation>
     </message>
   </context>
   <context>
@@ -88,11 +88,11 @@
     </message>
     <message>
       <source>APPCLOSE_UNLOAD</source>
-      <translation>&amp; アンロード</translation>
+      <translation>アンロード(&amp;U)</translation>
     </message>
     <message>
       <source>APPCLOSE_CLOSE</source>
-      <translation>&amp; 保存 w/o を閉じる</translation>
+      <translation>保存せずに閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>MEN_WINDOWS_NEW</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>MEN_DELETE_INVALID_REFERENCE</source>
-      <translation>無効な参照を削除します。</translation>
+      <translation>無効な参照を削除します</translation>
     </message>
     <message>
       <source>TOT_FILE_DESK_PREFERENCES</source>
@@ -112,47 +112,47 @@
     </message>
     <message>
       <source>MEN_OPENWITH</source>
-      <translation>%1 モジュールをアクティブにします。</translation>
+      <translation>モジュール %1 を有効</translation>
     </message>
     <message>
       <source>MEN_DESK_REGISTRY_DISPLAY</source>
-      <translation>レジストリ &amp; 表示</translation>
+      <translation>表示を登録(&amp;D)</translation>
     </message>
     <message>
       <source>APPCLOSE_SAVE</source>
-      <translation>&amp; 保存 &amp;&amp; 閉じる</translation>
+      <translation>保存して閉じる(&amp;S)</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_LOAD_SCRIPT</source>
-      <translation>Python スクリプトをロードします。</translation>
+      <translation>Python スクリプトを実行</translation>
     </message>
     <message>
       <source>PREF_PYDUMP_PUBLISH</source>
-      <translation>研究では python のダンプで公開します。</translation>
+      <translation>Python scrypt の研究を公開します。</translation>
     </message>
     <message>
       <source>PREF_PYDUMP_MULTI_FILE</source>
-      <translation>マルチ ファイル python をダンプします。</translation>
+      <translation>複数ファイルをPythonでダンプする</translation>
     </message>
     <message>
       <source>PREF_PYDUMP_SAVE_GUI</source>
-      <translation>Python のダンプで GUI の状態を保存します。</translation>
+      <translation>PythonダンプでGUIの状態を保存</translation>
     </message>
     <message>
       <source>PREF_STORE_VISUAL_STATE</source>
-      <translation>GUI の最後の状態を保存/復元</translation>
+      <translation>バックアップ/リストア HCI の最後の状態</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_SAVE_GUI_STATE</source>
-      <translation>視聴者、表示されているオブジェクトなどの現在の状態を保存します。</translation>
+      <translation>ビューや表示オブジェクトなど、現在の状態を保存</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_SAVE_GUI_STATE</source>
-      <translation>GUI の状態を保存します。</translation>
+      <translation>GUIの状態を保存</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_SAVE_GUI_STATE</source>
-      <translation>GUI の状態を保存します。</translation>
+      <translation>GUIの状態を保存</translation>
     </message>
     <message>
       <source>MEN_RESTORE_VS</source>
@@ -160,55 +160,55 @@
     </message>
     <message>
       <source>WRN_DUMP_STUDY_FAILED</source>
-      <translation>失敗したダンプ研究</translation>
+      <translation>研究のスクリプトを生成できません。</translation>
     </message>
     <message>
       <source>MEN_DESK_PROPERTIES</source>
-      <translation>プロ &amp; 越冬.</translation>
+      <translation>プロパティ...(&amp;p)</translation>
     </message>
     <message>
       <source>QUE_DOC_ALREADYEXIST</source>
-      <translation>%1 のドキュメントは、既に研究マネージャーで存在します。それを再読み込みしますか。</translation>
+      <translation>ドキュメント %1 は、既にStudyのマネージャーに存在します。\n再読み込みしますか？</translation>
     </message>
     <message>
       <source>MEN_RENAME_VS</source>
-      <translation>名前の変更</translation>
+      <translation>名前変更</translation>
     </message>
     <message>
       <source>TOT_DESK_CATALOG_GENERATOR</source>
-      <translation>カタログ ジェネレーター</translation>
+      <translation>カタログの生成</translation>
     </message>
     <message>
       <source>TOT_DESK_ADD_VARS_TO_NOTEBOOK</source>
-      <translation>ノートブックに変数を追加します。</translation>
+      <translation>変数をレジストリに追加します。</translation>
     </message>
     <message>
       <source>PUBLISH_IN_STUDY</source>
-      <translation>研究で公開します。</translation>
+      <translation>スタディ公開</translation>
     </message>
     <message>
       <source>PREF_OBJ_BROWSER_SETTINGS</source>
-      <translation>設定</translation>
+      <translation>パラメーター</translation>
     </message>
     <message>
       <source>PRP_DESK_REGISTRY_DISPLAY</source>
-      <translation>レジストリ CORBA サーバーの内容が表示されます。</translation>
+      <translation>CORBAサーバーの登録内容を表示</translation>
     </message>
     <message>
       <source>PYTHON_FILES_FILTER</source>
-      <translation>PYTHON ファイル （*.py)</translation>
+      <translation>ファイル (*.py) PYTHON</translation>
     </message>
     <message>
       <source>APPCLOSE_DESCRIPTION</source>
-      <translation>閉じるまたは終了する前に研究をアンロードしますか。</translation>
+      <translation>閉じる、または閉じる前にスタディをアンロードしますか？</translation>
     </message>
     <message>
       <source>PRP_DESK_PROPERTIES</source>
-      <translation>プロパティの編集に関する研究します。</translation>
+      <translation>スタディのプロパティを編集</translation>
     </message>
     <message>
       <source>PREF_TAB_OBJBROWSER</source>
-      <translation>オブジェクト ブラウザー</translation>
+      <translation>オブジェクトブラウザー</translation>
     </message>
     <message>
       <source>STUDY_LOCKED</source>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>APPCLOSE_CANCEL</source>
-      <translation>&amp; [キャンセル</translation>
+      <translation>キャンセル(&amp;C)</translation>
     </message>
     <message>
       <source>OBJ_BROWSER_NAME</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>TOT_DESK_REGISTRY_DISPLAY</source>
-      <translation>レジストリの表示</translation>
+      <translation>CORBA のレジスタを表示します。</translation>
     </message>
     <message>
       <source>OBJ_BROWSER_COLUMN_0</source>
@@ -240,11 +240,11 @@
     </message>
     <message>
       <source>OBJ_BROWSER_COLUMN_3</source>
-      <translation>参照エントリ</translation>
+      <translation>参照のエントリ</translation>
     </message>
     <message>
       <source>PREF_CATEGORY_SALOME</source>
-      <translation>サロメ</translation>
+      <translation>Salome-Meca</translation>
     </message>
     <message>
       <source>PYTHON_CONSOLE</source>
@@ -252,11 +252,11 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_LOAD_SCRIPT</source>
-      <translation>ロード スクリプト &amp; t.</translation>
+      <translation>スクリプトを読込み...(&amp;t)</translation>
     </message>
     <message>
       <source>MEN_DESK_TOOLS</source>
-      <translation>&amp; ツール</translation>
+      <translation>ツール(&amp;T)</translation>
     </message>
     <message>
       <source>MEN_DESK_PLUGINS_TOOLS</source>
@@ -268,7 +268,7 @@
     </message>
     <message>
       <source>TOT_DESK_FILE_DUMP_STUDY</source>
-      <translation>ダンプの研究</translation>
+      <translation>physonスクリプトを保存</translation>
     </message>
     <message>
       <source>MEN_VIEW_WNDS</source>
@@ -276,35 +276,35 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_DUMP_STUDY</source>
-      <translation>&amp; 研究をダンプ.</translation>
+      <translation>スクリプトを保存(&amp;D)</translation>
     </message>
     <message>
       <source>PRP_DESK_CATALOG_GENERATOR</source>
-      <translation>XML カタログのコンポーネントのインタ フェースを生成します</translation>
+      <translation>コンポーネントインターフェイスのXMLカタログを生成</translation>
     </message>
     <message>
       <source>PRP_DESK_ADD_VARS_TO_NOTEBOOK</source>
-      <translation>変数研究のノートブックに追加します。</translation>
+      <translation>スタディの変数をnotebookに追加</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_DUMP_STUDY</source>
-      <translation>Python スクリプトをダンプ研究</translation>
+      <translation>Pythonスクリプトにスタディをダンプする</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_NOTEBOOK</source>
-      <translation>ノートブックを開く</translation>
+      <translation>レジストリを開く</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_NOTEBOOK</source>
-      <translation>Noteboo &amp; k.</translation>
+      <translation>Notebook...(&amp;k)</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_NOTEBOOK</source>
-      <translation>ノートブックを開く</translation>
+      <translation>レジストリを開く</translation>
     </message>
     <message>
       <source>TOT_DESK_PROPERTIES</source>
-      <translation>物性研究</translation>
+      <translation>スタディのプロパティ</translation>
     </message>
     <message>
       <source>PREF_GROUP_DEF_COLUMNS</source>
@@ -312,46 +312,46 @@
     </message>
     <message>
       <source>PRP_DESK_FILE_LOAD_SCRIPT</source>
-      <translation>Python スクリプトをファイルから読み込みます</translation>
+      <translation>ファイルからPythonスクリプトを読込み</translation>
     </message>
     <message>
       <source>MEN_DESK_CATALOG_GENERATOR</source>
-      <translation>カタログ &amp; ジェネレーター</translation>
+      <translation>カタログ ジェネレーター(&amp;G)</translation>
     </message>
     <message>
       <source>MEN_DESK_ADD_VARS_TO_NOTEBOOK</source>
-      <translation>ノートブックに変数を追加します。</translation>
+      <translation>変数をレジストリに追加します。</translation>
     </message>
     <message>
       <source>APPCLOSE_CAPTION</source>
-      <translation>アクティブな研究</translation>
+      <translation>現在のスタディを閉じる</translation>
     </message>
     <message>
       <source>MEN_DESK_MRU</source>
-      <translation>最近使用しました。</translation>
+      <translation>最近のスタディ</translation>
     </message>
     <message>
       <source>TOT_DESK_MRU</source>
-      <translation>最近使用しました。</translation>
+      <translation>最近のスタディ</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_LOAD</source>
-      <translation>&amp; 負荷.</translation>
+      <translation>読込み(&amp;L)</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_SCRIPT</source>
-      <translation>負荷 &amp; スクリプト.</translation>
+      <translation>スクリプト読込み(&amp;S)</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_StudyPropertiesDlg</name>
     <message>
       <source>PRP_MODE_FROM_SCRATCH</source>
-      <translation>最初から</translation>
+      <translation>ゼロから</translation>
     </message>
     <message>
       <source>PRP_AUTHOR</source>
-      <translation>著者</translation>
+      <translation>作成者</translation>
     </message>
     <message>
       <source>PRP_LOCKED</source>
@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>PRP_NOT_MODIFIED</source>
-      <translation>変更されません。</translation>
+      <translation>変更無</translation>
     </message>
     <message>
       <source>PRP_DATE</source>
@@ -411,33 +411,33 @@
     </message>
     <message>
       <source>PRP_MODE_FROM_COPYFROM</source>
-      <translation>コピーします。</translation>
+      <translation>…からコピー</translation>
     </message>
     <message>
       <source>TLT_STUDY_PROPERTIES</source>
-      <translation>物性研究</translation>
+      <translation>スタディのプロパティ</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_ExitDlg</name>
     <message>
       <source>SHUTDOWN_SERVERS</source>
-      <translation>シャット ダウン サーバー</translation>
+      <translation>サーバーを停止します。</translation>
     </message>
   </context>
   <context>
     <name>NoteBook_Table</name>
     <message>
       <source>REMOVE_VARIABLE_IS_USED</source>
-      <translation>変数名「%1」を研究に使用されます。それを削除するよろしいですか。</translation>
+      <translation>変数"%1"は、Studyに使用されています。\n本当にそれを削除しますか？</translation>
     </message>
     <message>
       <source>RENAME_VARIABLE_IS_USED</source>
-      <translation>変数名「%1」を研究に使用されます。名前を変更しますか。</translation>
+      <translation>変数"%1"は、Studyに使用されています。\n本当にその名前を変更しますか？</translation>
     </message>
     <message>
       <source>VARNAME_COLUMN</source>
-      <translation>変数名</translation>
+      <translation>変数の名前</translation>
     </message>
     <message>
       <source>VARVALUE_COLUMN</source>
@@ -445,76 +445,76 @@
     </message>
     <message>
       <source>VARVALUE_INCORRECT</source>
-      <translation>変数の値が正しくない:%1</translation>
+      <translation>変数の値が正しくありません: %1</translation>
     </message>
     <message>
       <source>VARNAME_INCORRECT</source>
-      <translation>変数名が正しくない:%1</translation>
+      <translation>変数の名前が正しくありません: %1</translation>
     </message>
     <message>
       <source>VARNAME_EXISTS</source>
-      <translation>変数名「%1」が存在します。</translation>
+      <translation>変数"%1"です。</translation>
     </message>
   </context>
   <context>
-    <name>SalomeApp_NoteBookDlg</name>
+    <name>SalomeApp_NoteBook</name>
     <message>
       <source>NOTEBOOK_TITLE</source>
-      <translation>『 サロメ 』 ノート</translation>
+      <translation>NOTEBOOK_TITLE</translation>
     </message>
     <message>
       <source>BUT_UPDATE_STUDY</source>
-      <translation>&amp; 研究更新</translation>
+      <translation>BUT_UPDATE_STUDY</translation>
     </message>
     <message>
       <source>BUT_REMOVE</source>
-      <translation>&amp; 削除</translation>
+      <translation>BUT_REMOVE</translation>
     </message>
     <message>
       <source>BUT_APPLY_AND_CLOSE</source>
-      <translation>A &amp; に当てて行うと閉じる</translation>
+      <translation>BUT_APPLY_AND_CLOSE</translation>
     </message>
     <message>
       <source>BUT_HELP</source>
-      <translation>&amp; ヘルプ</translation>
+      <translation>BUT_HELP</translation>
     </message>
     <message>
       <source>CLOSE_CAPTION</source>
-      <translation>ノートブックを閉じる</translation>
+      <translation>CLOSE_CAPTION</translation>
     </message>
     <message>
       <source>CLOSE_DESCRIPTION</source>
-      <translation>ノートブックに加えた変更を保存しますか。</translation>
+      <translation>CLOSE_DESCRIPTION</translation>
     </message>
     <message>
       <source>INCORRECT_DATA</source>
-      <translation>少なくとも 1 つの変数が正しく定義されています。そのパラメーターを編集またはテーブルから削除してください。</translation>
+      <translation>INCORRECT_DATA</translation>
     </message>
     <message>
       <source>ERR_UPDATE_STUDY_FAILED</source>
-      <translation>研究の更新に失敗しました。</translation>
+      <translation>ERR_UPDATE_STUDY_FAILED</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_DoubleSpinBox</name>
     <message>
       <source>VALID_RANGE_VAR_MSG</source>
-      <translation>変数名または浮動小数点値の範囲 (%1;%2) で%3 を指定する-桁の有効桁数</translation>
+      <translation>変数名または%3桁の精度で(%1; %2) の範囲の小数点で入力します。</translation>
     </message>
     <message>
       <source>VALID_RANGE_NOVAR_MSG</source>
-      <translation>浮動小数点値の範囲 (%1;%2) で%3 を指定する-桁の有効桁数</translation>
+      <translation>%3桁の精度で（%1; %2）の範囲の小数点を入力します。</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_IntSpinBox</name>
     <message>
       <source>VALID_RANGE_VAR_MSG</source>
-      <translation>変数名または整数値のいずれか (%1;%2) の範囲で指定します</translation>
+      <translation>変数名または%3桁の精度で(%1; %2) の範囲の小数点で入力します。</translation>
     </message>
     <message>
       <source>VALID_RANGE_NOVAR_MSG</source>
-      <translation>(%1;%2) の範囲の整数値を指定します。</translation>
+      <translation>%3桁の精度で（%1; %2）の範囲の小数点を入力します。</translation>
     </message>
   </context>
 </TS>

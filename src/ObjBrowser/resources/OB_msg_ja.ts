@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MEN_COLLAPSE_ALL</source>
-      <translation>すべて折りたたむ</translation>
+      <translation>すべてを削減します。</translation>
     </message>
     <message>
       <source>MEN_FIND</source>

@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>ERROR_ACTIVATE_MODULE_MSG</source>
-      <translation>モジュール%1 をアクティブにできませんでした。</translation>
+      <translation>%1 のモジュールを有効にできません。</translation>
     </message>
     <message>
       <source>MODULE_ROOT_OBJECT_TOOLTIP</source>
-      <translation>%1 モジュール ルート オブジェクト</translation>
+      <translation>%1 module root object</translation>
     </message>
   </context>
 </TS>

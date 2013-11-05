@@ -6,37 +6,37 @@
     <message>
       <location filename="../PyConsole_Console.cxx" line="216"/>
       <source>EDIT_COPY_CMD</source>
-      <translation>&amp; コピー</translation>
+      <translation>コピー(&amp;C)</translation>
     </message>
     <message>
       <location filename="../PyConsole_Console.cxx" line="221"/>
       <source>EDIT_PASTE_CMD</source>
-      <translation>&amp; 貼り付け</translation>
+      <translation>貼り付け(&amp;P)</translation>
     </message>
     <message>
       <location filename="../PyConsole_Console.cxx" line="226"/>
       <source>EDIT_CLEAR_CMD</source>
-      <translation>クレア &amp; r</translation>
+      <translation>削除(&amp;r)</translation>
     </message>
     <message>
       <location filename="../PyConsole_Console.cxx" line="231"/>
       <source>EDIT_SELECTALL_CMD</source>
-      <translation>&amp; すべてを選択します</translation>
+      <translation>すべて選択します。(&amp;A)</translation>
     </message>
     <message>
       <source>EDIT_DUMPCOMMANDS_CMD</source>
-      <translation>D &amp; ump のコマンド</translation>
+      <translation>スクリプト コマンドを生成します。(&amp;u)</translation>
     </message>
   </context>
   <context>
     <name>PyConsole_Editor</name>
     <message>
       <source>TOT_DUMP_PYCOMMANDS</source>
-      <translation>ダンプ コマンド</translation>
+      <translation>スクリプト コマンドを生成します。</translation>
     </message>
     <message>
       <source>PYTHON_FILES_FILTER</source>
-      <translation>PYTHON ファイル （*.py)</translation>
+      <translation>ファイル (*.py) PYTHON</translation>
     </message>
   </context>
 </TS>

@@ -5,11 +5,14 @@
     <name>@default</name>
     <message>
       <source>EXTERNAL_BROWSER_CANNOT_SHOW_PAGE</source>
-      <translation>外部ブラウザー「%1」「%2」のページのヘルプを表示することができます。設定を変更するか。</translation>
+      <translation>外部ブラウザー「%1」ページ「%2」のヘルプを表示することができません。設定を変更しますか？</translation>
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
-      <translation>著作権 (C) 2007年-2012 CEA/デン、EDF の R&amp;D オープン カスケード著作権 (C) 2003年-2007 年オープン カスケード、EADS/CCR、LIP6、CEA/デン、CEDRAT、EDF の R&amp;D、脚、プリンキピア R&amp;D、ビューローベリタスジャパン</translation>
+      <translation>Copyright (C) 2007-2012 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+
+Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
+CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
     </message>
     <message>
       <source>ABOUT_CAPTION</source>
@@ -29,11 +32,11 @@
     </message>
     <message>
       <source>ABOUT_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>APP_NAME</source>
-      <translation>サロメ</translation>
+      <translation>Salome-Meca</translation>
     </message>
     <message>
       <source>ABOUT_LICENSE</source>
@@ -41,7 +44,7 @@
     </message>
     <message>
       <source>ABOUT_VERSION</source>
-      <translation>バージョン%1</translation>
+      <translation>バージョン %1</translation>
     </message>
     <message>
       <source>ENTRY_COLUMN</source>
@@ -49,7 +52,7 @@
     </message>
     <message>
       <source>BROWSER_TITLE</source>
-      <translation>サロメ ヘルプ ・ ブラウザー</translation>
+      <translation>Salome ヘルプ ・ ブラウザー</translation>
     </message>
     <message>
       <source>BROWSER_TOOLBAR_TITLE</source>
@@ -57,42 +60,42 @@
     </message>
     <message>
       <source>BROWSER_FILEMENU</source>
-      <translation>&amp; ファイル</translation>
+      <translation>ファイル (&amp;F)</translation>
     </message>
     <message>
       <source>BROWSER_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる (&amp;C)</translation>
     </message>
     <message>
       <source>BROWSER_BACK</source>
-      <translation>戻ってください</translation>
+      <translation>戻る</translation>
     </message>
     <message>
       <source>BROWSER_FORWARD</source>
-      <translation>前に進む</translation>
+      <translation>進む</translation>
     </message>
     <message>
       <source>BROWSER_FIND</source>
-      <translation>&amp; を見つける.</translation>
+      <translation>検索(&amp;F)</translation>
     </message>
     <message>
       <source>BROWSER_FINDNEXT</source>
-      <translation>検索 &amp; 次へ</translation>
+      <translation>次を検索(&amp;n)</translation>
     </message>
     <message>
       <source>BROWSER_FINDPREV</source>
-      <translation>見つける &amp; 前</translation>
+      <translation>前を検索(&amp;N)</translation>
     </message>
   </context>
   <context>
     <name>LightApp_Application</name>
     <message>
       <source>LANG_CHANGED</source>
-      <translation>アプリケーションの言語が変更されました。変更は、次のアプリケーション セッションに適用されます。</translation>
+      <translation>アプリケーションの言語が変更されました。\n変更は、次のセッションに適用されます。</translation>
     </message>
     <message>
       <source>MEN_DESK_THEME</source>
-      <translation>テーマ</translation>
+      <translation>テーマ(&amp;h)</translation>
     </message>
     <message>
       <source>TOT_THEME</source>
@@ -100,7 +103,7 @@
     </message>
     <message>
       <source>PRP_THEME</source>
-      <translation>スタイルのプロパティの変更</translation>
+      <translation>スタイルのプロパティを変更</translation>
     </message>
     <message>
       <source>TOT_FULLSCREEN</source>
@@ -112,35 +115,35 @@
     </message>
     <message>
       <source>PRP_FULLSCREEN</source>
-      <translation>全画面表示モードに切り替える</translation>
+      <translation>全画面表示モードに切り替え</translation>
     </message>
     <message>
       <source>INF_TOOLBAR_MODULES</source>
-      <translation>モジュール</translation>
+      <translation>モジュール情報</translation>
     </message>
     <message>
       <source>PREF_SHOW_LEGEND</source>
-      <translation>凡例を表示します。</translation>
+      <translation>凡例を表示</translation>
     </message>
     <message>
       <source>MEN_DESK_RENAME</source>
-      <translation>&amp; 名前の変更</translation>
+      <translation>名前変更(&amp;R)</translation>
     </message>
     <message>
       <source>PREF_MULTI_FILE</source>
-      <translation>マルチ ファイルを保存します。</translation>
+      <translation>複数のファイル保存</translation>
     </message>
     <message>
       <source>MEN_DESK_PREFERENCES</source>
-      <translation>前 &amp; ferences.</translation>
+      <translation>環境設定...(&amp;f)</translation>
     </message>
     <message>
       <source>PREF_TRIHEDRON_SHOW</source>
-      <translation>三面体を表示します。</translation>
+      <translation>三面体を表示</translation>
     </message>
     <message>
       <source>PREF_TRIHEDRON</source>
-      <translation>三面体を</translation>
+      <translation>三面体</translation>
     </message>
     <message>
       <source>PREF_TRIHEDRON_SIZE</source>
@@ -148,23 +151,27 @@
     </message>
     <message>
       <source>OBJECT_BROWSER</source>
-      <translation>オブジェクト ブラウザー</translation>
+      <translation>オブジェクトブラウザー</translation>
     </message>
     <message>
       <source>PRP_DESK_PREFERENCES</source>
-      <translation>設定を変更することができます。</translation>
+      <translation>設定を変更することができます</translation>
     </message>
     <message>
       <source>PREF_GROUP_DIRECTORIES</source>
-      <translation>クイック ディレクトリ リスト</translation>
+      <translation>ディレクトリの一覧</translation>
     </message>
     <message>
       <source>PREF_GROUP_VTKVIEWER</source>
-      <translation>VTK 3D ビューアー</translation>
+      <translation>VTK 3D Viewer</translation>
     </message>
     <message>
       <source>PREF_STORE_POS</source>
-      <translation>ウィンドウの位置を保存します。</translation>
+      <translation>ウィンドウの位置を保存</translation>
+    </message>
+    <message>
+      <source>PREF_STORE_TOOL_POS</source>
+      <translation>PREF_STORE_TOOL_POS</translation>
     </message>
     <message>
       <source>PREF_AUTO_SAVE</source>
@@ -184,47 +191,47 @@
     </message>
     <message>
       <source>PREF_PERSPECTIVE</source>
-      <translation>視点</translation>
+      <translation>遠近法</translation>
     </message>
     <message>
       <source>PREF_NAVIGATION</source>
-      <translation>ナビゲーション スタイル</translation>
+      <translation>ナビゲーション:</translation>
     </message>
     <message>
       <source>PREF_STANDARD_STYLE</source>
-      <translation>サロメの標準のコントロール</translation>
+      <translation>Salome標準コントロール</translation>
     </message>
     <message>
       <source>PREF_KEYFREE_STYLE</source>
-      <translation>キーボードのフリー スタイル</translation>
+      <translation>キーボードなしのスタイル</translation>
     </message>
     <message>
       <source>PREF_ZOOMING</source>
-      <translation>ズームのスタイル</translation>
+      <translation>ズーム モード:</translation>
     </message>
     <message>
       <source>PREF_ZOOMING_AT_CENTER</source>
-      <translation>ビューの中心を基準</translation>
+      <translation>画面の中心を基準に</translation>
     </message>
     <message>
       <source>PREF_ZOOMING_AT_CURSOR</source>
-      <translation>カーソルに合わせる</translation>
+      <translation>カーソルを中心に</translation>
     </message>
     <message>
       <source>PREF_INCREMENTAL_SPEED</source>
-      <translation>速の増分:</translation>
+      <translation>速度の増加:</translation>
     </message>
     <message>
       <source>PREF_INCREMENTAL_SPEED_MODE</source>
-      <translation>変更モード:</translation>
+      <translation>編集モード:</translation>
     </message>
     <message>
       <source>PREF_ARITHMETIC</source>
-      <translation>等差数列</translation>
+      <translation>Arithmetic progression</translation>
     </message>
     <message>
       <source>PREF_GEOMETRICAL</source>
-      <translation>幾何学的な進行</translation>
+      <translation>幾何学的進行</translation>
     </message>
     <message>
       <source>PREF_FRAME_SPACEMOUSE</source>
@@ -232,19 +239,19 @@
     </message>
     <message>
       <source>PREF_SHOW_STATIC_TRIHEDRON</source>
-      <translation>静的三面体を表示します。</translation>
+      <translation>静的三面体をを表示</translation>
     </message>
     <message>
       <source>PREF_SPACEMOUSE_FUNC_1</source>
-      <translation>減少速度増加</translation>
+      <translation>速度低減</translation>
     </message>
     <message>
       <source>PREF_SPACEMOUSE_FUNC_2</source>
-      <translation>増加速度の増加</translation>
+      <translation>速度増加</translation>
     </message>
     <message>
       <source>PREF_SPACEMOUSE_FUNC_3</source>
-      <translation>支配的な/複合スイッチ</translation>
+      <translation>Dominant / combined スイッチ</translation>
     </message>
     <message>
       <source>PREF_SPACEMOUSE_BTN_1</source>
@@ -292,11 +299,11 @@
     </message>
     <message>
       <source>PREF_FRAME_RECORDING</source>
-      <translation>Avi ファイルの記録</translation>
+      <translation>AVIで記録</translation>
     </message>
     <message>
       <source>PREF_ALL_DISLPAYED_FRAMES</source>
-      <translation>表示を記録フレーム</translation>
+      <translation>表示されるすべてのフレームを保存</translation>
     </message>
     <message>
       <source>PREF_FPS</source>
@@ -304,7 +311,7 @@
     </message>
     <message>
       <source>PREF_GROUP_TTL</source>
-      <translation>設定</translation>
+      <translation>パラメーター</translation>
     </message>
     <message>
       <source>PREF_PROGRESSIVE</source>
@@ -320,7 +327,7 @@
     </message>
     <message>
       <source>PREF_SKIPPED_FRAMES</source>
-      <translation>指定した FPS で記録</translation>
+      <translation>与えられたFPSに記録しています</translation>
     </message>
     <message>
       <source>PREF_FRAME_GROUP_NAMES</source>
@@ -332,27 +339,15 @@
     </message>
     <message>
       <source>PREF_GROUP_NAMES_TRANSPARENCY</source>
-      <translation>透明性</translation>
+      <translation>透明度</translation>
     </message>
     <message>
       <source>PREF_BOTTOM</source>
-      <translation>下</translation>
+      <translation>Bottom</translation>
     </message>
     <message>
       <source>PREF_CURVE_TYPE</source>
-      <translation>カーブの種類:</translation>
-    </message>
-    <message>
-      <source>PREF_ISOS</source>
-      <translation>面分割線の数</translation>
-    </message>
-    <message>
-      <source>PREF_ISOS_U</source>
-      <translation>U に沿って</translation>
-    </message>
-    <message>
-      <source>PREF_ISOS_V</source>
-      <translation>V に沿って</translation>
+      <translation>曲線の種類:</translation>
     </message>
     <message>
       <source>PREF_POINTS</source>
@@ -360,15 +355,15 @@
     </message>
     <message>
       <source>PRP_MODULE</source>
-      <translation>「%1」のモジュールに切り替えます</translation>
+      <translation>モジュール”%1”に切り替え</translation>
     </message>
     <message>
       <source>PREF_ASCII_FILE</source>
-      <translation>ASCII 保存</translation>
+      <translation>ASCIIでの保存</translation>
     </message>
     <message>
       <source>PREFERENCES_NOT_LOADED</source>
-      <translation>モジュールの設定"&lt;b&gt;%N&lt;/b&gt;」、モジュールが読み込まれる場合に利用できます</translation>
+      <translation>“&lt;b&gt;%N&lt;/b&gt;”モジュールの環境設定は、そのモジュールをロードしているときだけです。</translation>
     </message>
     <message>
       <source>PREF_LINEAR</source>
@@ -380,19 +375,19 @@
     </message>
     <message>
       <source>PRP_RENAME</source>
-      <translation>作業中のウィンドウの名前を変更します。</translation>
+      <translation>アクティブなウィンドウの名前を変更</translation>
     </message>
     <message>
       <source>TOT_RENAME</source>
-      <translation>名前の変更</translation>
+      <translation>名前変更</translation>
     </message>
     <message>
       <source>MEN_RENAME_OBJ</source>
-      <translation>名前の変更</translation>
+      <translation>名前変更</translation>
     </message>
     <message>
       <source>LOG_WINDOW</source>
-      <translation>メッセージ ウィンドウ</translation>
+      <translation>メッセージウィンドウ</translation>
     </message>
     <message>
       <source>PREF_SPLINE</source>
@@ -404,39 +399,39 @@
     </message>
     <message>
       <source>PREF_AUTO_HIDE_SEARCH_TOOL</source>
-      <translation>自動非表示を有効にします。</translation>
+      <translation>自動的に隠す</translation>
     </message>
     <message>
       <source>PREF_OBJ_BROWSER_SETTINGS</source>
-      <translation>[オブジェクト ブラウザー設定]</translation>
+      <translation>オブジェクトブラウザーの設定</translation>
     </message>
     <message>
       <source>PRP_APP_MODULE</source>
-      <translation>サロメ プラットフォーム中立的なポイントに切り替える</translation>
+      <translation>Salomeプラットフォームの中立ポイントにスイッチ</translation>
     </message>
     <message>
       <source>PREF_GROUP_PY_CONSOLE</source>
-      <translation>Python コンソール</translation>
+      <translation>Python コンソールのプロパティ</translation>
     </message>
     <message>
       <source>PREF_SHOW_BANNER</source>
-      <translation>バナーを表示します。</translation>
+      <translation>バナーの表示</translation>
     </message>
     <message>
       <source>PREF_GROUP_STYLE</source>
-      <translation>サロメ スタイル</translation>
+      <translation>Salomeスタイル</translation>
     </message>
     <message>
       <source>PREF_USE_SALOME_STYLE</source>
-      <translation>サロメ スタイルを使用します。</translation>
+      <translation>Salomeスタイルを使用</translation>
     </message>
     <message>
       <source>PREF_MARKER_SIZE</source>
-      <translation>マーカーのサイズ:</translation>
+      <translation>マーカーサイズ</translation>
     </message>
     <message>
       <source>PREF_TAB_VIEWERS</source>
-      <translation>視聴者</translation>
+      <translation>シーン</translation>
     </message>
     <message>
       <source>PREF_APP</source>
@@ -444,7 +439,7 @@
     </message>
     <message>
       <source>PREF_TOP</source>
-      <translation>ページのトップへ</translation>
+      <translation>トップ</translation>
     </message>
     <message>
       <source>MEN_REFRESH</source>
@@ -452,31 +447,31 @@
     </message>
     <message>
       <source>PREF_AUTO_SIZE_FIRST</source>
-      <translation>「名」列の自動サイズ</translation>
+      <translation>[名前] 列の自動サイズ</translation>
     </message>
     <message>
       <source>PREF_RESIZE_ON_EXPAND_ITEM</source>
-      <translation>項目のサイズを変更する列を展開します。</translation>
+      <translation>オブジェクトを開いたときの列のサイズを変更</translation>
     </message>
     <message>
       <source>PREF_BROWSE_TO_THE_PUBLISHED_OBJECT</source>
-      <translation>パブリッシュされたオブジェクトを参照します。</translation>
+      <translation>公開オブジェクトをブラウズ</translation>
     </message>
     <message>
       <source>PREF_BROWSE_NEVER</source>
-      <translation>決して</translation>
+      <translation>なし</translation>
     </message>
     <message>
       <source>PREF_BROWSE_AFTER_APPLY_AND_CLOSE_ONLY</source>
-      <translation>適用 &amp; 終了後のみ</translation>
+      <translation>適用して閉じるをした後のみ</translation>
     </message>
     <message>
       <source>PREF_BROWSE_ALWAYS</source>
-      <translation>常に</translation>
+      <translation>適用毎に</translation>
     </message>
     <message>
       <source>PREF_TAB_OBJBROWSER</source>
-      <translation>オブジェクト ブラウザー</translation>
+      <translation>オブジェクトブラウザー</translation>
     </message>
     <message>
       <source>PREF_TAB_GENERAL</source>
@@ -484,27 +479,27 @@
     </message>
     <message>
       <source>NEW_WINDOW_0</source>
-      <translation>&amp; GL 2D ビュー</translation>
+      <translation>GL 2D view(&amp;G)</translation>
     </message>
     <message>
       <source>NEW_WINDOW_1</source>
-      <translation>&amp; プロット 2 D ビュー</translation>
+      <translation>Plot 2D View(&amp;P)</translation>
     </message>
     <message>
       <source>NEW_WINDOW_2</source>
-      <translation>&amp; OCC の 3 D ビュー</translation>
+      <translation>OCC 3D　View(&amp;O)</translation>
     </message>
     <message>
       <source>NEW_WINDOW_3</source>
-      <translation>VT &amp; K 3 D ビュー</translation>
+      <translation>VTK 3D View(&amp;K)</translation>
     </message>
     <message>
       <source>NEW_WINDOW_4</source>
-      <translation>Qx &amp; シーン 2 D ビュー</translation>
+      <translation>QxGraph 2D view(&amp;Q)</translation>
     </message>
     <message>
       <source>CREATING_NEW_WINDOW</source>
-      <translation>新しい%1 を作成します。</translation>
+      <translation>新しい %1 を作成します。</translation>
     </message>
     <message>
       <source>OBJ_BROWSER_NAME</source>
@@ -520,7 +515,7 @@
     </message>
     <message>
       <source>PREF_VIEWER_BACKGROUND</source>
-      <translation>バック グラウンド</translation>
+      <translation>背景</translation>
     </message>
     <message>
       <source>PREF_VIEWER_BACKGROUND_COLOR</source>
@@ -540,11 +535,11 @@
     </message>
     <message>
       <source>PREF_YZVIEWER_BACKGROUND</source>
-      <translation>YZ ビュー</translation>
+      <translation>ビュー YZ</translation>
     </message>
     <message>
       <source>PREF_3DVIEWER_BACKGROUND</source>
-      <translation>3 D ビュー</translation>
+      <translation>3D ビュー</translation>
     </message>
     <message>
       <source>PREF_FONT</source>
@@ -560,7 +555,7 @@
     </message>
     <message>
       <source>PREF_SELECTED_FONT_COLOR</source>
-      <translation>強調表示された凡例のフォントの色</translation>
+      <translation>ハイライトした凡例の文字色</translation>
     </message>
     <message>
       <source>PREF_LEFT</source>
@@ -568,19 +563,19 @@
     </message>
     <message>
       <source>PREF_TAB_DIRECTORIES</source>
-      <translation>ディレクトリ</translation>
+      <translation>ディレクトリー</translation>
     </message>
     <message>
       <source>ACTIVATING_MODULE</source>
-      <translation>モジュール「%1」をアクティブにしようとしました。</translation>
+      <translation>モジュール”%1”をアクティブにする</translation>
     </message>
     <message>
       <source>PREF_VERT_AXIS_SCALE</source>
-      <translation>垂直軸スケール:</translation>
+      <translation>垂直軸のスケール:</translation>
     </message>
     <message>
       <source>PREF_HOR_AXIS_SCALE</source>
-      <translation>水平軸スケール:</translation>
+      <translation>水平方向の軸のスケール:</translation>
     </message>
     <message>
       <source>PREF_GROUP_LANGUAGE</source>
@@ -592,35 +587,39 @@
     </message>
     <message>
       <source>PREF_GROUP_LOOK_AND_FEEL</source>
-      <translation>ルック アンド フィール</translation>
+      <translation>外観</translation>
     </message>
     <message>
       <source>PREF_SHOW_SPLASH</source>
-      <translation>起動時にスプラッシュ スクリーンを表示します。</translation>
+      <translation>スプラッシュ スクリーンを表示します。</translation>
     </message>
     <message>
       <source>PREF_OPAQUE_RESIZE</source>
-      <translation>不透明なサイズ変更</translation>
+      <translation>不透明のサイズ変更</translation>
     </message>
     <message>
       <source>PREF_GROUP_STUDY</source>
-      <translation>物性研究</translation>
+      <translation>スタディのプロパティ</translation>
     </message>
     <message>
       <source>PREF_CATEGORY_SALOME</source>
-      <translation>サロメ</translation>
+      <translation>Salome-Meca</translation>
     </message>
     <message>
       <source>PREF_DROP_DOWN_BUTTONS</source>
-      <translation>アクション グループをツールバーのドロップ ダウン ボタン</translation>
+      <translation>バーでのボタンの配置</translation>
     </message>
     <message>
       <source>PREF_GROUP_COMMON</source>
-      <translation>一般的です</translation>
+      <translation>共通</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_3DVIEWER</source>
+      <translation>PREF_GROUP_3DVIEWER</translation>
     </message>
     <message>
       <source>PREF_GROUP_OCCVIEWER</source>
-      <translation>OCC の 3 D ビューアー</translation>
+      <translation>OCC 3D　Viewer</translation>
     </message>
     <message>
       <source>PREF_LOGARITHMIC</source>
@@ -644,11 +643,11 @@
     </message>
     <message>
       <source>PREF_LINES</source>
-      <translation>行</translation>
+      <translation>ライン</translation>
     </message>
     <message>
       <source>INF_CANCELLED</source>
-      <translation>キャンセル モジュールのアクティブ化</translation>
+      <translation>モジュールの有効化をキャンセル</translation>
     </message>
     <message>
       <source>PREF_GROUP_EXT_BROWSER</source>
@@ -656,7 +655,7 @@
     </message>
     <message>
       <source>PREF_SUPERV_CTRL_COLOR</source>
-      <translation>Ctrl キーを色</translation>
+      <translation>コントロールの色</translation>
     </message>
     <message>
       <source>PREF_GROUP_DEF_COLUMNS</source>
@@ -664,7 +663,7 @@
     </message>
     <message>
       <source>PREF_GROUP_PLOT2DVIEWER</source>
-      <translation>プロット 2 D ビューアー</translation>
+      <translation>Plot 2D Viewer</translation>
     </message>
     <message>
       <source>PREF_DEVIATION_COLOR</source>
@@ -672,15 +671,15 @@
     </message>
     <message>
       <source>PREF_DEVIATION_MARKER_LW</source>
-      <translation>偏差標示の線幅</translation>
+      <translation>偏差のマーカーの線の太さ</translation>
     </message>
     <message>
       <source>PREF_DEVIATION_MARKER_TS</source>
-      <translation>偏差マーカー ティック サイズ</translation>
+      <translation>サイズ偏差マーカーのチェック マーク</translation>
     </message>
     <message>
       <source>MEN_DESK_MRU</source>
-      <translation>最近使用しました。</translation>
+      <translation>最近使用したファイル</translation>
     </message>
     <message>
       <source>TOT_DESK_PREFERENCES</source>
@@ -688,31 +687,55 @@
     </message>
     <message>
       <source>DEFINE_EXTERNAL_BROWSER</source>
-      <translation>外部ブラウザーが見つかりません。環境設定で定義しますか。</translation>
+      <translation>外部のブラウザーが見つかりません。環境設定で設定しますか。</translation>
     </message>
     <message>
       <source>PREF_AUTO_SIZE</source>
-      <translation>その他の列の自動サイズ</translation>
+      <translation>他の列の自動サイズ</translation>
     </message>
     <message>
       <source>TOT_DESK_MRU</source>
-      <translation>最近使用しました。</translation>
+      <translation>最近使用したファイル</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_NEW</source>
-      <translation>&amp; 新</translation>
+      <translation>新規作成(&amp;N)</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_OPEN</source>
-      <translation>&amp; を開く.</translation>
+      <translation>開く...(&amp;O)</translation>
     </message>
     <message>
       <source>PYTHON_CONSOLE</source>
       <translation>Python コンソール</translation>
     </message>
     <message>
-      <source>PREF_DYNAMIC_PRESELECTION</source>
-      <translation>動的な事前選択</translation>
+      <source>PREF_GROUP_SELECTION</source>
+      <translation>PREF_GROUP_SELECTION</translation>
+    </message>
+    <message>
+      <source>PREF_ENABLE_SELECTION</source>
+      <translation>PREF_ENABLE_SELECTION</translation>
+    </message>
+    <message>
+      <source>PREF_ENABLE_PRESELECTION</source>
+      <translation>PREF_ENABLE_PRESELECTION</translation>
+    </message>
+    <message>
+      <source>PREF_PRESELECTION</source>
+      <translation>PREF_PRESELECTION</translation>
+    </message>
+    <message>
+      <source>PREF_PRESELECTION_STANDARD</source>
+      <translation>PREF_PRESELECTION_STANDARD</translation>
+    </message>
+    <message>
+      <source>PREF_PRESELECTION_DYNAMIC</source>
+      <translation>PREF_PRESELECTION_DYNAMIC</translation>
+    </message>
+    <message>
+      <source>PREF_PRESELECTION_DISABLED</source>
+      <translation>PREF_PRESELECTION_DISABLED</translation>
     </message>
     <message>
       <source>TOT_CLOSE</source>
@@ -720,11 +743,11 @@
     </message>
     <message>
       <source>MEN_DESK_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>PRP_CLOSE</source>
-      <translation>アクティブなウィンドウを閉じる</translation>
+      <translation>アクティブ ウィンドウを閉じる</translation>
     </message>
     <message>
       <source>TOT_CLOSE_ALL</source>
@@ -740,15 +763,15 @@
     </message>
     <message>
       <source>TOT_GROUP_ALL</source>
-      <translation>すべてをグループします。</translation>
+      <translation>すべてをグループ化</translation>
     </message>
     <message>
       <source>MEN_DESK_GROUP_ALL</source>
-      <translation>&amp; すべてグループ化</translation>
+      <translation>すべてをグループ化(&amp;G)</translation>
     </message>
     <message>
       <source>PRP_GROUP_ALL</source>
-      <translation>すべてのウィンドウをグループ化します。</translation>
+      <translation>すべてのウィンドウをグループ化</translation>
     </message>
     <message>
       <source>ERR_DOC_NOT_EXISTS</source>
@@ -756,11 +779,11 @@
     </message>
     <message>
       <source>PREF_GROUP_MRU</source>
-      <translation>最近使用したアイテムを表示します。</translation>
+      <translation>MRUアイテムの表示</translation>
     </message>
     <message>
       <source>PREF_MRU_VISIBLE_COUNT</source>
-      <translation>最近使用したアイテムの数</translation>
+      <translation>MRUアイテムの数</translation>
     </message>
     <message>
       <source>PREF_MRU_INSERT_MODE</source>
@@ -768,19 +791,19 @@
     </message>
     <message>
       <source>PREF_MRU_MOVE_FIRST</source>
-      <translation>先頭に移動します。</translation>
+      <translation>先頭に移動</translation>
     </message>
     <message>
       <source>PREF_MRU_MOVE_LAST</source>
-      <translation>末尾に移動します。</translation>
+      <translation>末尾に移動</translation>
     </message>
     <message>
       <source>PREF_MRU_ADD_FIRST</source>
-      <translation>先頭に追加します。</translation>
+      <translation>先頭に追加</translation>
     </message>
     <message>
       <source>PREF_MRU_ADD_LAST</source>
-      <translation>最後に追加します。</translation>
+      <translation>最後に追加</translation>
     </message>
     <message>
       <source>PREF_MRU_LINK_TYPE</source>
@@ -800,7 +823,7 @@
     </message>
     <message>
       <source>PREFERENCES_NOT_SUPPORTED</source>
-      <translation>設定モジュール「%1」はサポートされていません</translation>
+      <translation>モジュール "%1" の設定はサポートされていません</translation>
     </message>
     <message>
       <source>PREF_TAB_SHORTCUTS</source>
@@ -808,7 +831,7 @@
     </message>
     <message>
       <source>PREF_GROUP_SHORTCUTS</source>
-      <translation>ショートカット設定</translation>
+      <translation>ショートカットの設定</translation>
     </message>
   </context>
   <context>
@@ -819,15 +842,15 @@
     </message>
     <message>
       <source>TOP_DISPLAY_ONLY</source>
-      <translation>のみを表示します。</translation>
+      <translation>選択のみ表示</translation>
     </message>
     <message>
       <source>STB_DISPLAY_ONLY</source>
-      <translation>のみを表示します。</translation>
+      <translation>選択のみ表示</translation>
     </message>
     <message>
       <source>MEN_DISPLAY_ONLY</source>
-      <translation>のみを表示します。</translation>
+      <translation>選択のみ表示</translation>
     </message>
     <message>
       <source>TOP_HIDE</source>
@@ -835,7 +858,7 @@
     </message>
     <message>
       <source>MEN_ERASE_ALL</source>
-      <translation>すべてを非表示します。</translation>
+      <translation>すべてを非表示</translation>
     </message>
     <message>
       <source>STB_HIDE</source>
@@ -843,45 +866,45 @@
     </message>
     <message>
       <source>STB_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>TOP_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>MEN_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>STB_ERASE_ALL</source>
-      <translation>すべてを非表示します。</translation>
+      <translation>すべて非表示</translation>
     </message>
     <message>
       <source>TOP_ERASE_ALL</source>
-      <translation>すべてを非表示します。</translation>
+      <translation>すべて非表示</translation>
     </message>
   </context>
   <context>
     <name>LightApp_ModuleDlg</name>
     <message>
       <source>DESCRIPTION</source>
-      <translation>モジュール &lt;b&gt;%1&lt;/b&gt; を活性化しています。&lt;br&gt;してください、下の対応するボタンを押すことによって選択の必要なアクション。</translation>
+      <translation>You're activating module\n</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation>&amp; [キャンセル</translation>
+      <translation>キャンセル(&amp;C)</translation>
     </message>
     <message>
       <source>CAPTION</source>
-      <translation>モジュールをアクティブにします。</translation>
+      <translation>モジュールのアクティブ化</translation>
     </message>
   </context>
   <context>
     <name>LightApp_NameDlg</name>
     <message>
       <source>TLT_RENAME</source>
-      <translation>名前の変更</translation>
+      <translation>名前変更</translation>
     </message>
     <message>
       <source>NAME_LBL</source>
@@ -892,11 +915,11 @@
     <name>LightApp_PreferencesDlg</name>
     <message>
       <source>IMPORT_PREFERENCES</source>
-      <translation>インポートの基本設定</translation>
+      <translation>インポート設定</translation>
     </message>
     <message>
       <source>CAPTION</source>
-      <translation>設定</translation>
+      <translation>環境設定</translation>
     </message>
     <message>
       <source>WARNING</source>
@@ -908,18 +931,18 @@
     </message>
     <message>
       <source>DEFAULT_QUESTION</source>
-      <translation>既定の設定を取得しますか。</translation>
+      <translation>既定の設定を復元しますか？</translation>
     </message>
     <message>
       <source>DEFAULT_BTN_TEXT</source>
-      <translation>既定値</translation>
+      <translation>デフォルト</translation>
     </message>
   </context>
   <context>
     <name>LightApp_ModuleAction</name>
     <message>
       <source>ACTIVATE_MODULE_TOP</source>
-      <translation>モジュールのオン/オフの%1</translation>
+      <translation>モジュール %1 の有効/無効にします。</translation>
     </message>
   </context>
 </TS>

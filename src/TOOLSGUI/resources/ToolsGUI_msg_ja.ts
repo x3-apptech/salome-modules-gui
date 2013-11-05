@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>TOOLS_BUT_BROWSE</source>
-      <translation>参照.</translation>
+      <translation>移動...</translation>
     </message>
     <message>
       <source>TOOLS_ERR_ERROR</source>
@@ -17,19 +17,19 @@
     </message>
     <message>
       <source>TOOLS_ERR_FILE_NOT_EXIST</source>
-      <translation>%1 つのファイルが存在しません。</translation>
+      <translation>ファイル %1 は存在しません</translation>
     </message>
     <message>
       <source>TOOLS_BUT_OK</source>
-      <translation>&amp; [Ok]</translation>
+      <translation>Ok(&amp;O)</translation>
     </message>
     <message>
       <source>TOOLS_BUT_APPLY</source>
-      <translation>&amp; 適用</translation>
+      <translation>適用(&amp;A)</translation>
     </message>
     <message>
       <source>TOOLS_BUT_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
   </context>
   <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>TOOLS_COMP_TYPE</source>
-      <translation>タイプ:</translation>
+      <translation>型:</translation>
     </message>
     <message>
       <source>TOOLS_XML_FILE</source>
@@ -64,15 +64,15 @@
     </message>
     <message>
       <source>TOOLS_SUPPLEMENT</source>
-      <translation>補足データ コンポーネント</translation>
+      <translation>コンポーネントの追加のデータ</translation>
     </message>
     <message>
       <source>TOOLS_AUTHOR</source>
-      <translation>著者：</translation>
+      <translation>著者:</translation>
     </message>
     <message>
       <source>TOOLS_COMP_MULTISTD</source>
-      <translation>Multistudy:</translation>
+      <translation>マルチ-練習曲:</translation>
     </message>
     <message>
       <source>TOOLS_COMP_USERNAME</source>
@@ -80,7 +80,7 @@
     </message>
     <message>
       <source>TOOLS_CATALOG_GENERATOR</source>
-      <translation>カタログ ジェネレーター</translation>
+      <translation>カタログの生成</translation>
     </message>
     <message>
       <source>TOOLS_FILES</source>
@@ -88,15 +88,15 @@
     </message>
     <message>
       <source>TOOLS_MEN_IMPORT_PNG</source>
-      <translation>PNG ファイル (*.png)</translation>
+      <translation>Png (*.png)</translation>
     </message>
     <message>
       <source>TOOLS_MEN_IMPORT_IDL</source>
-      <translation>IDL ファイル (*.idl)</translation>
+      <translation>IDL (*.idl) ファイル</translation>
     </message>
     <message>
       <source>TOOLS_MEN_EXPORT_XML</source>
-      <translation>XML ファイル (*.xml)</translation>
+      <translation>XML (*.xml) ファイル</translation>
     </message>
     <message>
       <source>TOOLS_IDL_FILE</source>
@@ -107,11 +107,11 @@
     <name>ToolsGUI_RegWidget</name>
     <message>
       <source>TLT_REFRESH_INTERVAL</source>
-      <translation>更新間隔</translation>
+      <translation>リフレッシュ レート</translation>
     </message>
     <message>
       <source>LAB_REFRESH_INTERVAL</source>
-      <translation>新しい更新間隔 (秒単位)</translation>
+      <translation>新たな周波数の更新 （秒） で</translation>
     </message>
     <message>
       <source>TLT_REGISTRY</source>
@@ -131,15 +131,15 @@
     </message>
     <message>
       <source>STB_REFRESH</source>
-      <translation>コンポーネントの一覧をすぐに更新します。</translation>
+      <translation>コンポーネントの一覧を更新します。</translation>
     </message>
     <message>
       <source>MEN_INTERVAL</source>
-      <translation>更新間隔.</translation>
+      <translation>リフレッシュ レート.</translation>
     </message>
     <message>
       <source>STB_INTERVAL</source>
-      <translation>更新間隔の変更</translation>
+      <translation>更新の頻度を変更します。</translation>
     </message>
     <message>
       <source>MEN_CLOSE</source>
@@ -147,15 +147,15 @@
     </message>
     <message>
       <source>STB_CLOSE</source>
-      <translation>レジストリ ウィンドウを閉じる</translation>
+      <translation>レジストリのウィンドウを閉じる</translation>
     </message>
     <message>
       <source>TAB_RUNNING</source>
-      <translation>実行しています。</translation>
+      <translation>電流</translation>
     </message>
     <message>
       <source>TAB_HISTORY</source>
-      <translation>歴史</translation>
+      <translation>履歴</translation>
     </message>
     <message>
       <source>HDR_COMPONENT</source>
@@ -167,7 +167,7 @@
     </message>
     <message>
       <source>HDR_USERNAME</source>
-      <translation>ユーザー名</translation>
+      <translation>ユーザーの名前</translation>
     </message>
     <message>
       <source>HDR_HOSTNAME</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>HDR_FINISHED</source>
-      <translation>終了</translation>
+      <translation>完成品</translation>
     </message>
     <message>
       <source>HDR_HELLO</source>
@@ -187,35 +187,35 @@
     </message>
     <message>
       <source>ERR_NO_REGISTRY</source>
-      <translation>エラー: レジストリ サーバーが見つかりません</translation>
+      <translation>エラー: サーバー レジストリが見つからない</translation>
     </message>
     <message>
       <source>INFO_SERVICE</source>
-      <translation>サービス：%1</translation>
+      <translation>サービス: %1</translation>
     </message>
     <message>
       <source>INFO_PROCESS</source>
-      <translation>プロセス (PID:%1)、上%2 (ip アドレス:%3)。ユーザー%4 が起動 (UID:%5) ディレクトリ%6 で。</translation>
+      <translation>マシン名 %2 (IPアドレス: %3 )上プロセス (PID: %1); %4 のユーザによって起動 (UID: %5) ディレクトリ %6。</translation>
     </message>
     <message>
       <source>INFO_STARTED</source>
-      <translation>開始：%1</translation>
+      <translation>開始: %1</translation>
     </message>
     <message>
       <source>INFO_LAST_PING</source>
-      <translation>信号の最終更新:%1</translation>
+      <translation>最終信号: %1</translation>
     </message>
     <message>
       <source>INFO_FINISHED</source>
-      <translation>終了:%1</translation>
+      <translation>終了: %1</translation>
     </message>
     <message>
       <source>INFO_RUNNING</source>
-      <translation>まだ実行しています。</translation>
+      <translation>電流</translation>
     </message>
     <message>
       <source>INFO_TIME_DIFF</source>
-      <translation>時間%1 のサーバの時刻とは異なります。違いは、%2 秒です。</translation>
+      <translation>%1 の時刻はサーバーの時刻とずれております。ずれは %2 秒です。</translation>
     </message>
   </context>
 </TS>

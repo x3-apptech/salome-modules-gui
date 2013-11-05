@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>DSC_FITSELECT</source>
-      <translation>ビュー フレーム内の選択範囲の領域に収まるよう</translation>
+      <translation>ビューで選択したゾーンを表示します。</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -13,15 +13,15 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>ダンプ</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パン</translation>
+      <translation>パンニング</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心の選択</translation>
+      <translation>ビューの新しい中心地の選択</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
@@ -29,78 +29,78 @@
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>パン表示]</translation>
+      <translation>ビューを移動します。</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>ビュー フレーム内のすべてのオブジェクトに適合します。</translation>
+      <translation>すべてのオブジェクトを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべてに適合します。</translation>
+      <translation>すべて表示</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>グローバル パン</translation>
+      <translation>グローバルパンニング</translation>
     </message>
     <message>
       <source>INF_APP_DUMP_VIEW</source>
-      <translation>表示をダンプします</translation>
+      <translation>ビューを保存します。</translation>
     </message>
     <message>
       <source>GL_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.png)</translation>
+      <translation>イメージ (*.bmp *.png) ファイル</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>リセット</translation>
+      <translation>復元</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域ビュー フレームに合わせて</translation>
+      <translation>領域にビューを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>フィット エリア</translation>
+      <translation>表示エリア</translation>
     </message>
     <message>
       <source>CHANGE_BGCOLOR</source>
-      <translation>背景の変更.</translation>
+      <translation>背景色を変更.</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>作業中のビューをイメージ ファイルに保存します</translation>
+      <translation>現在のビューをイメージ ファイルに保存します。</translation>
     </message>
     <message>
       <source>MNU_FITSELECT</source>
-      <translation>選択範囲をズーム</translation>
+      <translation>ディスプレイの選択</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
-      <translation>ビューをズームします。</translation>
+      <translation>ズーム</translation>
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>リセット ビュー ポイント</translation>
+      <translation>ビューのポイントを復元します。</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
-      <translation>ファイルを保存できません。</translation>
+      <translation>ファイルを保存できませんでした。</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
-      <translation>[操作の表示</translation>
+      <translation>表示操作</translation>
     </message>
   </context>
   <context>
     <name>GLViewer_ViewFrame</name>
     <message>
       <source>DUMP_VIEW_SAVE_FILE_DLG_CAPTION</source>
-      <translation>ビューをダンプ ファイルに保存します。</translation>
+      <translation>ビューでファイルを保存します。</translation>
     </message>
     <message>
       <source>DUMP_VIEW_ERROR_DLG_TEXT</source>
-      <translation>ビューをダンプ ファイルに保存することはできません。</translation>
+      <translation>ビューでファイルを保存できませんでした。</translation>
     </message>
     <message>
       <source>DUMP_VIEW_ERROR_DLG_CAPTION</source>
@@ -111,7 +111,7 @@
     <name>GLViewer_ViewManager</name>
     <message>
       <source>GL_VIEW_TITLE</source>
-      <translation>GL シーン:%M - ビューアー:%V</translation>
+      <translation>シーン GL: %M - ビューアー: %V</translation>
     </message>
   </context>
 </TS>

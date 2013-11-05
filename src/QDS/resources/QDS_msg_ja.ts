@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>DATA_NON_EMPTY</source>
-      <translation>空ではないです。</translation>
+      <translation>非を見よ</translation>
     </message>
     <message>
       <source>DATA_MIN_LIMIT</source>
@@ -25,11 +25,11 @@
     </message>
     <message>
       <source>DATA_RANGE</source>
-      <translation>範囲 [%1,%2]</translation>
+      <translation>一方で [%1, %2]</translation>
     </message>
     <message>
       <source>DATA_SHOULD_BE_VALUE</source>
-      <translation>%1 値をする必要があります。</translation>
+      <translation>%1 に設定する必要があります。</translation>
     </message>
     <message>
       <source>DATA_INTEGER</source>
@@ -37,15 +37,15 @@
     </message>
     <message>
       <source>DATA_INCORRECT_VALUE</source>
-      <translation>「%1」のパラメーターの値が正しいです。</translation>
+      <translation>パラメーター"%1"の値が正しくありません。</translation>
     </message>
     <message>
       <source>DATA_MAX_LIMIT</source>
-      <translation>%1 未満</translation>
+      <translation>%1 より小さい</translation>
     </message>
     <message>
       <source>DATA_INPUT_VALUE</source>
-      <translation>ください、正しい値を入力します。</translation>
+      <translation>正しい値を指定します。</translation>
     </message>
   </context>
 </TS>

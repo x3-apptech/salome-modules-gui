@@ -5,23 +5,23 @@
     <name>@default</name>
     <message>
       <source>DSC_ANTICLOCKWISE_VIEW</source>
-      <translation>ビューを反時計回りに回転します。</translation>
+      <translation>表示を左に</translation>
     </message>
     <message>
       <source>DSC_CLOCKWISE_VIEW</source>
-      <translation>ビューを時計回りに回転します。</translation>
+      <translation>右のビューを回転させる</translation>
     </message>
     <message>
       <source>MNU_ANTICLOCKWISE_VIEW</source>
-      <translation>反時計回りに回転します。</translation>
+      <translation>左回転</translation>
     </message>
     <message>
       <source>MNU_CLOCKWISE_VIEW</source>
-      <translation>時計回りに回転します。</translation>
+      <translation>右回転</translation>
     </message>
     <message>
       <source>MNU_FRONT_VIEW</source>
-      <translation>フロント</translation>
+      <translation>転送</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -29,27 +29,27 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>表示をダンプします.</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>DSC_TOP_VIEW</source>
-      <translation>トップ ビュー</translation>
+      <translation>上から見る</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パン</translation>
+      <translation>パンニング</translation>
     </message>
     <message>
       <source>MNU_TOP_VIEW</source>
-      <translation>ページのトップへ</translation>
+      <translation>トップ</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心の選択</translation>
+      <translation>ビューの新しい中心地の選択</translation>
     </message>
     <message>
       <source>DSC_ROTATE_VIEW</source>
-      <translation>ビューのポイント シーンの中心の周りの回転</translation>
+      <translation>ステージの中心の周りを回転します。</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
@@ -57,19 +57,19 @@
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>パン表示]</translation>
+      <translation>ビューを移動します。</translation>
     </message>
     <message>
       <source>DSC_LEFT_VIEW</source>
-      <translation>左ビュー</translation>
+      <translation>左側のビュー</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>ビュー フレーム内のすべてのオブジェクトに適合します。</translation>
+      <translation>すべてのオブジェクトを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべてに適合します。</translation>
+      <translation>すべて表示</translation>
     </message>
     <message>
       <source>MNU_ROTATE_VIEW</source>
@@ -77,35 +77,35 @@
     </message>
     <message>
       <source>DSC_SHOW_TRIHEDRON</source>
-      <translation>三面体を現在のビューの表示/非表示</translation>
+      <translation>三面体をを表示</translation>
     </message>
     <message>
       <source>DSC_FRONT_VIEW</source>
-      <translation>正面から見た図</translation>
+      <translation>正面</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>グローバル パン</translation>
+      <translation>グローバルパンニング</translation>
     </message>
     <message>
       <source>INF_APP_DUMP_VIEW</source>
-      <translation>表示をダンプします</translation>
+      <translation>ビューを保存します。</translation>
     </message>
     <message>
       <source>MNU_BACK_VIEW</source>
-      <translation>戻る</translation>
+      <translation>背面</translation>
     </message>
     <message>
       <source>MNU_SHOW_TRIHEDRON</source>
-      <translation>三面体の表示/非表示</translation>
+      <translation>軸の表示/非表示</translation>
     </message>
     <message>
       <source>MNU_BOTTOM_VIEW</source>
-      <translation>下</translation>
+      <translation>Bottom</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>リセット</translation>
+      <translation>復元</translation>
     </message>
     <message>
       <source>MNU_LEFT_VIEW</source>
@@ -117,43 +117,43 @@
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域ビュー フレームに合わせて</translation>
+      <translation>領域にビューを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>フィット エリア</translation>
+      <translation>表示エリア</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
-      <translation>底面図</translation>
+      <translation>下から表示します。</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>作業中のビューをイメージ ファイルに保存します</translation>
+      <translation>現在のビューをイメージ ファイルに保存します。</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
-      <translation>ビューをズームします。</translation>
+      <translation>ズーム</translation>
     </message>
     <message>
       <source>VTK_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.png *.jpg クリックした場合 if)</translation>
+      <translation>イメージ (*.bmp *.png *.jpg *.jpeg) ファイル</translation>
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>リセット ビュー ポイント</translation>
+      <translation>ビューのポイントを復元します。</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
-      <translation>ファイルを保存できません。</translation>
+      <translation>ファイルを保存できませんでした。</translation>
     </message>
     <message>
       <source>MNU_RIGHT_VIEW</source>
-      <translation>右</translation>
+      <translation>法律</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
-      <translation>[操作の表示</translation>
+      <translation>表示操作</translation>
     </message>
     <message>
       <source>DSC_BACK_VIEW</source>
@@ -164,7 +164,7 @@
     <name>VTKViewer_MarkerDlg</name>
     <message>
       <source>SET_MARKER_TLT</source>
-      <translation>セット ポイント マーカー</translation>
+      <translation>ポイントマーカーの定義</translation>
     </message>
   </context>
   <context>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>TYPE</source>
-      <translation>タイプ:</translation>
+      <translation>型:</translation>
     </message>
     <message>
       <source>SCALE</source>
@@ -191,33 +191,33 @@
     </message>
     <message>
       <source>BROWSE</source>
-      <translation>参照.</translation>
+      <translation>移動...</translation>
     </message>
     <message>
       <source>LOAD_TEXTURE_TLT</source>
-      <translation>テクスチャの読み込み</translation>
+      <translation>テクスチャをロード</translation>
     </message>
   </context>
   <context>
     <name>VTKViewer_ViewManager</name>
     <message>
       <source>VTK_VIEW_TITLE</source>
-      <translation>VTK シーン:%M - ビューアー:%V</translation>
+      <translation>VTK scene:%M - viewer:%V</translation>
     </message>
   </context>
   <context>
     <name>VTKViewer_Viewer</name>
     <message>
       <source>MEN_DUMP_VIEW</source>
-      <translation>表示をダンプします.</translation>
+      <translation>ビューを保存.</translation>
     </message>
     <message>
       <source>MEN_SHOW_TOOLBAR</source>
-      <translation>ツールバーを表示します。</translation>
+      <translation>ツールバーを表示</translation>
     </message>
     <message>
       <source>MEN_CHANGE_BACKGROUND</source>
-      <translation>背景の変更.</translation>
+      <translation>背景を変更する.</translation>
     </message>
     <message>
       <source>GT_HORIZONTALGRADIENT</source>
@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>BG_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.png *.jpg クリックした場合 if *.bmp *.tif *.tiff *.mhd *.mha)</translation>
+      <translation>ファイル (*.png *.jpg *.jpeg、*.bmp, *.tif, *.tiff *.mhd *.mha)</translation>
     </message>
   </context>
 </TS>

@@ -5,7 +5,7 @@
     <name>CAF_Application</name>
     <message>
       <source>MEN_APP_EDIT</source>
-      <translation>&amp; 編集</translation>
+      <translation>編集(&amp;E)</translation>
     </message>
     <message>
       <source>INF_ALL_FILTER</source>
@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>INF_ALL_DOCUMENTS_FILTER</source>
-      <translation>すべての表示可能なドキュメント</translation>
+      <translation>すべての読み取り可能なドキュメント</translation>
     </message>
     <message>
       <source>MEN_DESK_EDIT</source>
-      <translation>&amp; 編集</translation>
+      <translation>編集(&amp;E)</translation>
     </message>
     <message>
       <source>MEN_APP_EDIT_UNDO</source>
-      <translation>&amp; 元に戻す</translation>
+      <translation>元に戻す(&amp;U)</translation>
     </message>
     <message>
       <source>MEN_APP_EDIT_REDO</source>
-      <translation>&amp; やり直し</translation>
+      <translation>やり直し(&amp;R)</translation>
     </message>
     <message>
       <source>PRP_APP_EDIT_REDO</source>
-      <translation>最後の操作をやり直します</translation>
+      <translation>最後の操作をやり直す</translation>
     </message>
     <message>
       <source>PRP_APP_EDIT_UNDO</source>
-      <translation>最後の操作を元に戻します</translation>
+      <translation>最後の操作を元に戻す</translation>
     </message>
     <message>
       <source>TOT_APP_EDIT_REDO</source>
@@ -45,15 +45,15 @@
     </message>
     <message>
       <source>INF_APP_REDOACTIONS</source>
-      <translation>%1 アクションをやり直します</translation>
+      <translation>Redo アクション %1 (s)</translation>
     </message>
     <message>
       <source>INF_APP_UNDOACTIONS</source>
-      <translation>%1 アクションを元に戻します</translation>
+      <translation>Undo %1 アクション (s)</translation>
     </message>
     <message>
       <source>ABOUT_INFO</source>
-      <translation>カフェ アプリケーションに合うよう</translation>
+      <translation>アプリケーションの次のカフェ</translation>
     </message>
   </context>
 </TS>

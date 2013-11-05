@@ -9,19 +9,19 @@
     </message>
     <message>
       <source>PRP_DESK_EDIT_CUT</source>
-      <translation>選択範囲を切り取って、クリップボードに置きます</translation>
+      <translation>選択範囲を切り取って、クリップボードにコピー</translation>
     </message>
     <message>
       <source>MEN_DESK_EDIT_CUT</source>
-      <translation>Cu &amp; t</translation>
+      <translation>カット(&amp;t)</translation>
     </message>
     <message>
       <source>ERR_APP_NOAPP</source>
-      <translation>アプリケーションなし</translation>
+      <translation>アプリケーションがありません</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW</source>
-      <translation>&amp; ウィンドウ</translation>
+      <translation>ウィンドウ(&amp;W)</translation>
     </message>
     <message>
       <source>TOT_DESK_EDIT_COPY</source>
@@ -29,27 +29,27 @@
     </message>
     <message>
       <source>MEN_DESK_WINDOW_CASCADE</source>
-      <translation>&amp; カスケード</translation>
+      <translation>カスケード(&amp;C)</translation>
     </message>
     <message>
       <source>PRP_DESK_EDIT_COPY</source>
-      <translation>選択範囲をクリップボードにコピーします。</translation>
+      <translation>選択範囲をクリップボードにコピー</translation>
     </message>
     <message>
       <source>PRP_DESK_WINDOW_CASCADE</source>
-      <translation>重ねてウィンドウを整列します。</translation>
+      <translation>ウィンドウを重ねて整理</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_SAVEAS</source>
-      <translation>ドキュメントとして保存.</translation>
+      <translation>ドキュメントを別名で保存...</translation>
     </message>
     <message>
       <source>MEN_DESK_EDIT_COPY</source>
-      <translation>&amp; コピー</translation>
+      <translation>コピー(&amp;C)</translation>
     </message>
     <message>
       <source>MSG_CANT_SAVE</source>
-      <translation>ファイル「%1」を保存することはできません。</translation>
+      <translation>ファイル"%1"を保存できませんでした</translation>
     </message>
     <message>
       <source>INF_DESK_TOOLBAR_STANDARD</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
       <source>DESK_DEFAULTTITLE</source>
-      <translation>Qt アプリケーション デスクトップ</translation>
+      <translation>Qtアプリケーション デスクトップ</translation>
     </message>
     <message>
       <source>QUE_DESK_EXIT</source>
-      <translation>終了してもよろしいですか。</translation>
+      <translation>本当に終了しますか？</translation>
     </message>
     <message>
       <source>INF_INFO</source>
@@ -73,51 +73,51 @@
     </message>
     <message>
       <source>ERR_DOC_UNKNOWNTYPE_OPEN</source>
-      <translation>不明な種類 (%1) のドキュメントを開こうとしています。</translation>
+      <translation>不明な種類のドキュメント ( %1 ) を開こうとしています。</translation>
     </message>
     <message>
       <source>ERR_DOC_UNKNOWNTYPE_SAVE</source>
-      <translation>このドキュメントは不明な種類 (%1) を保存するしようとしています。</translation>
+      <translation>不明な種類のドキュメント ( %1 ) として保存しようとしています。</translation>
     </message>
     <message>
       <source>TOT_DESK_NEWWINDOW</source>
-      <translation>新しいウィンドウを作成します。</translation>
+      <translation>新しいウィンドウを作成</translation>
     </message>
     <message>
       <source>BUT_CANCEL</source>
-      <translation>&amp; [キャンセル</translation>
+      <translation>キャンセル(&amp;C)</translation>
     </message>
     <message>
       <source>MEN_DESK_HELP_ABOUT</source>
-      <translation>&amp; 約.</translation>
+      <translation>バージョン情報...(&amp;A)</translation>
     </message>
     <message>
       <source>PRP_DESK_NEWWINDOW</source>
-      <translation>新しいウィンドウを作成します。</translation>
+      <translation>新しいウィンドウを作成</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW_STATUSBAR</source>
-      <translation>&amp; ステータス バー</translation>
+      <translation>ステータス バー(&amp;S)</translation>
     </message>
     <message>
       <source>MEN_DESK_NEWWINDOW</source>
-      <translation>&amp; 新しいウィンドウ</translation>
+      <translation>新しいウィンドウ(&amp;N)</translation>
     </message>
     <message>
       <source>PRP_DESK_VIEW_STATUSBAR</source>
-      <translation>ステータス バーの表示オン/オフを切り替えます</translation>
+      <translation>ステータスバーの有効/無効</translation>
     </message>
     <message>
       <source>ERR_DOC_DIRWITHNAMEEXIST_SAVE</source>
-      <translation>ファイル%1 を保存することができます。この名前のディレクトリが存在するディスクに。別の名前を使用してみてください。</translation>
+      <translation>ファイル %1 を保存できません。\nこの名前のディレクトリが既にディスクに存在します。別の名前を使用してください。</translation>
     </message>
     <message>
       <source>BUT_NO</source>
-      <translation>&amp; なし</translation>
+      <translation>いいえ(&amp;N)</translation>
     </message>
     <message>
       <source>BUT_OK</source>
-      <translation>&amp; [Ok]</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FILTER_FILES</source>
@@ -125,11 +125,11 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_ACTIVATE</source>
-      <translation>このウィンドウをアクティブにします</translation>
+      <translation>このウィンドウをアクティブ化</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_PRINT</source>
-      <translation>ドキュメントを印刷します。</translation>
+      <translation>ドキュメントを印刷</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_CLOSE</source>
@@ -137,11 +137,11 @@
     </message>
     <message>
       <source>TOT_DESK_FILE_NEW</source>
-      <translation>新しいドキュメント</translation>
+      <translation>新しいドキュメントを作成</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_NEW</source>
-      <translation>新しい文書を作成します。</translation>
+      <translation>新しいドキュメントを作成</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_MRU</source>
@@ -149,43 +149,43 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_NEW</source>
-      <translation>&amp; 新</translation>
+      <translation>新規作成(&amp;N)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_MRU</source>
-      <translation>最近 &amp; ファイル</translation>
+      <translation>最近使用したファイル(&amp;F)</translation>
     </message>
     <message>
       <source>TOT_DESK_EDIT_PASTE</source>
-      <translation>ペースト</translation>
+      <translation>貼り付け</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW_DOCKWINDOWS</source>
-      <translation>W &amp; indows</translation>
+      <translation>Windows(&amp;i)</translation>
     </message>
     <message>
       <source>BUT_YES</source>
-      <translation>&amp; はい</translation>
+      <translation>はい(&amp;Y)</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW</source>
-      <translation>&amp; ビュー</translation>
+      <translation>表示(&amp;V)</translation>
     </message>
     <message>
       <source>PRP_DESK_HELP_ABOUT</source>
-      <translation>'についてのダイアログが表示されます。</translation>
+      <translation>About'ダイアログ ボックスの表示</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE</source>
-      <translation>&amp; ファイル</translation>
+      <translation>ファイル(&amp;F)</translation>
     </message>
     <message>
       <source>MEN_DESK_EDIT</source>
-      <translation>&amp; 編集</translation>
+      <translation>編集(&amp;E)</translation>
     </message>
     <message>
       <source>MEN_DESK_HELP</source>
-      <translation>&amp; ヘルプ</translation>
+      <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
       <source>ERR_ERROR</source>
@@ -193,23 +193,23 @@
     </message>
     <message>
       <source>ERR_DESK_NOAPP</source>
-      <translation>アプリケーションが登録されていません</translation>
+      <translation>登録されたアプリケーションがありません</translation>
     </message>
     <message>
       <source>INF_DESK_DOC_CREATE</source>
-      <translation>新しいドキュメントを作成します。</translation>
+      <translation>新しいドキュメントを作成</translation>
     </message>
     <message>
       <source>QUE_DOC_ALREADYOPEN</source>
-      <translation>%1 のドキュメントは既に開いています。それを再読み込みしますか。</translation>
+      <translation>ドキュメント %1 は既に開いています。\n再読込みしますか？</translation>
     </message>
     <message>
       <source>BUT_APPLY</source>
-      <translation>&amp; 適用</translation>
+      <translation>適用(&amp;A)</translation>
     </message>
     <message>
       <source>BUT_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>INF_DESK_EXIT</source>
@@ -221,55 +221,55 @@
     </message>
     <message>
       <source>BUT_HELP</source>
-      <translation>&amp; ヘルプ</translation>
+      <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_CLOSE</source>
-      <translation>作業中の文書を閉じます</translation>
+      <translation>現在のドキュメントを閉じる</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_PRINT</source>
-      <translation>作業中の文書を印刷します</translation>
+      <translation>現在のドキュメントを印刷</translation>
     </message>
     <message>
       <source>WRN_WARNING</source>
-      <translation>警告</translation>
+      <translation>注意 ！</translation>
     </message>
     <message>
       <source>TOT_DESK_HELP_ABOUT</source>
-      <translation>について.</translation>
+      <translation>About...</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW_TOOLBARS</source>
-      <translation>T &amp; oolbars</translation>
+      <translation>ツールバー(&amp;o)</translation>
     </message>
     <message>
       <source>PRP_DESK_WINDOW_HSPLIT</source>
-      <translation>2 つの水平部分の作業中のウィンドウを分割します。</translation>
+      <translation>現在のウィンドウを 2つに水平分割</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_HSPLIT</source>
-      <translation>分割 &amp; 水平方向</translation>
+      <translation>水平分割(&amp;H)</translation>
     </message>
     <message>
       <source>PRP_DESK_EDIT_PASTE</source>
-      <translation>クリップボードの内容をカーソル位置に挿入します。</translation>
+      <translation>クリップボードの内容を挿入</translation>
     </message>
     <message>
       <source>DLG_LOAD_STUDY_CAPTION</source>
-      <translation>負荷の研究</translation>
+      <translation>スタディを読み込む</translation>
     </message>
     <message>
       <source>PRP_DESK_HELP_SEARCH</source>
-      <translation>検索ヘルプのトピック</translation>
+      <translation>ヘルプのトピック検索</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_SAVEAS</source>
-      <translation>作業中の文書を新しい名前で保存します</translation>
+      <translation>現在のドキュメントを新しい名前で保存</translation>
     </message>
     <message>
       <source>INF_READY</source>
-      <translation>準備ができて</translation>
+      <translation>準備完了</translation>
     </message>
     <message>
       <source>INF_CANCELLED</source>
@@ -277,131 +277,131 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_VSPLIT</source>
-      <translation>2 つの垂直部分の作業中のウィンドウを分割します。</translation>
+      <translation>現在のウィンドウを２つに上下分割</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_VSPLIT</source>
-      <translation>分割 &amp; 垂直方向に</translation>
+      <translation>垂直分割(&amp;V)</translation>
     </message>
     <message>
       <source>PRP_DESK_WINDOW_TILE</source>
-      <translation>重複しない並べて表示ウィンドウ</translation>
+      <translation>ウィンドウを並べて表示</translation>
     </message>
     <message>
       <source>MEN_DESK_HELP_CONTENTS</source>
-      <translation>&amp; 内容</translation>
+      <translation>コンテンツ(&amp;C)</translation>
     </message>
     <message>
       <source>PRP_DESK_HELP_CONTENTS</source>
-      <translation>全体のヘルプの内容を示しています</translation>
+      <translation>ヘルプコンテンツの全表示</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_HTILE</source>
-      <translation>タイル &amp; 水平方向</translation>
+      <translation>水平方向に並べて表示(&amp;H)</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_VTILE</source>
-      <translation>タイル &amp; 垂直方向に</translation>
+      <translation>垂直方向のモザイク(&amp;V)</translation>
     </message>
     <message>
       <source>ERR_DOC_PERMISSIONDENIED_SAVE</source>
-      <translation>ファイル%1 を保存することができます。アクセスが拒否されました</translation>
+      <translation>ファイル %1 を保存できません。権限がありません。</translation>
     </message>
     <message>
       <source>INF_DESK_DOCALREADYOPEN</source>
-      <translation>ドキュメントは既に開いているドキュメントの名前で保存できません。ください、別を保存するドキュメントの名前を入力します。( %1 )</translation>
+      <translation>既に開いているドキュメントと同じ名前で保存できません。\n保存するには別の名前を指定してください。\n( %1 )</translation>
     </message>
     <message>
       <source>TIT_FILE_SAVEAS</source>
-      <translation>名前を付けて保存します。</translation>
+      <translation>別名で保存</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_CLOSE</source>
-      <translation>&amp; 閉じる</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>MSG_FILE_EXISTS</source>
-      <translation>ファイル「%1」は既に存在します。それを上書きしますか。</translation>
+      <translation>ファイル"%1"は既に存在します。\n上書きしますか？</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_PRINT</source>
-      <translation>&amp; 印刷</translation>
+      <translation>印刷(&amp;P)</translation>
     </message>
     <message>
       <source>MEN_DESK_HELP_SEARCH</source>
-      <translation>&amp; 検索.</translation>
+      <translation>サーチ...(&amp;S)</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW_STDTOOLBAR</source>
-      <translation>&amp; 標準</translation>
+      <translation>標準(&amp;S)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_SAVEAS</source>
-      <translation>保存 &amp; として.</translation>
+      <translation>別名で保存...(&amp;A)</translation>
     </message>
     <message>
       <source>PRP_DESK_VIEW_STDTOOLBAR</source>
-      <translation>標準のツールバーのオン/オフの切り替え</translation>
+      <translation>標準ツールバーの有効/無効</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_SAVE</source>
-      <translation>ドキュメントを保存します。</translation>
+      <translation>ドキュメントを保存</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_EXIT</source>
-      <translation>アプリケーションを終了します。</translation>
+      <translation>アプリケーションを終了</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_LOAD</source>
-      <translation>ドキュメントを読み込みます</translation>
+      <translation>ドキュメントを読み込む</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_OPEN</source>
-      <translation>開いているドキュメント</translation>
+      <translation>ドキュメントを開く</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_REOPEN</source>
-      <translation>再び文書を開く</translation>
+      <translation>ドキュメントを開く</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_EXIT</source>
-      <translation>アプリケーションを終了します。</translation>
+      <translation>アプリケーションを終了</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_OPEN</source>
-      <translation>既存のドキュメントを開きます</translation>
+      <translation>既存のドキュメントを開く</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_REOPEN</source>
-      <translation>ファイルから現在のドキュメントを再読み込み</translation>
+      <translation>現在のドキュメントを再読込み</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_SAVE</source>
-      <translation>作業中の文書を保存します</translation>
+      <translation>現在のドキュメントを保存</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_LOAD</source>
-      <translation>文書を読み込み</translation>
+      <translation>ドキュメントを読み込み</translation>
     </message>
     <message>
       <source>PRP_DESK_WINDOW_HTILE</source>
-      <translation>Windows を重複しない水平並べて表示します</translation>
+      <translation>ウィンドウを左右に並べて表示</translation>
     </message>
     <message>
       <source>PRP_DESK_WINDOW_VTILE</source>
-      <translation>ウィンドウ重複垂直並べて表示します</translation>
+      <translation>ウィンドウを上下に並べて表示</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_TILE</source>
-      <translation>&amp; タイル</translation>
+      <translation>モザイク(&amp;T)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_EXIT</source>
-      <translation>E &amp; xit</translation>
+      <translation>終了(&amp;x)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_OPEN</source>
-      <translation>&amp; を開く.</translation>
+      <translation>開く...(&amp;O)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_REOPEN</source>
@@ -409,70 +409,70 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_LOAD</source>
-      <translation>コン &amp; 電気ショック療法.</translation>
+      <translation>接続...(&amp;e)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_SAVE</source>
-      <translation>&amp; 保存</translation>
+      <translation>保存(&amp;S)</translation>
     </message>
     <message>
       <source>MEN_DESK_EDIT_PASTE</source>
-      <translation>&amp; 貼り付け</translation>
+      <translation>貼り付け(&amp;P)</translation>
     </message>
     <message>
       <source>MEN_STUDIES_CHOICE</source>
-      <translation>既存研究を選択します。</translation>
+      <translation>既存のスタディを選択</translation>
     </message>
   </context>
   <context>
     <name>STD_Application</name>
     <message>
       <source>INF_DOC_MODIFIED</source>
-      <translation>ドキュメントが変更されています。変更を保存しますか。</translation>
+      <translation>ドキュメントが変更されています。\n変更を保存しますか。？</translation>
     </message>
     <message>
       <source>INF_DOC_SAVING</source>
-      <translation>保存の研究</translation>
+      <translation>スタディを保存</translation>
     </message>
     <message>
       <source>INF_DOC_SAVED</source>
-      <translation>研究保存%1</translation>
+      <translation>Study %1 を保存</translation>
     </message>
     <message>
       <source>TOT_DOCK_WINDOWS</source>
-      <translation>ドッキング可能なウィンドウとツールバーを非表示/表示</translation>
+      <translation>ドッキング可能なウィンドウとツールバーを表示/非表示</translation>
     </message>
     <message>
       <source>MEN_DOCK_WINDOWS</source>
-      <translation>ウィンドウおよびツールバー</translation>
+      <translation>Window およびツールバー</translation>
     </message>
     <message>
       <source>ABOUT_INFO</source>
-      <translation>スーツ スタンダード アプリケーション</translation>
+      <translation>標準アプリケーションの適合</translation>
     </message>
     <message>
       <source>INF_DOC_SAVING_FAILS</source>
-      <translation>ファイル「%1」を保存することはできません。考えられる原因:-アクセスが拒否されました。-パリパリとディスク空き容量;-アプリケーション エラー。別のファイル名を使用してください。</translation>
+      <translation>ファイル"%1"を保存できません.\n理由:\n- 権限がない;\n- ディスクの残りのスペースが不十分;\n- アプリケーション エラー.\n別のファイル名をご使用ください。</translation>
     </message>
     <message>
       <source>INF_DOCUMENT_MODIFIED</source>
-      <translation>ドキュメント「%1」が変更されました。変更を保存しますか。</translation>
+      <translation>ドキュメント"%1"が変更されました。\n変更を保存しますか？</translation>
     </message>
     <message>
       <source>CLOSE_STUDY</source>
-      <translation>アクティブな研究</translation>
+      <translation>現在のスタディを閉じる</translation>
     </message>
     <message>
       <source>CLOSE_QUESTION</source>
-      <translation>閉じる前に研究を保存しますか。</translation>
+      <translation>閉じる前にスタディを保存しますか？</translation>
     </message>
     <message>
       <source>REOPEN_STUDY</source>
-      <translation>勉学を再開します。</translation>
+      <translation>スタディを再開</translation>
     </message>
     <message>
       <source>REOPEN_QUESTION</source>
-      <translation>研究を開きますか?最後に保存してから行ったすべての変更は失われます。</translation>
+      <translation>スタディを再開しますか。\n最後に保存してからのすべての変更は失われます。</translation>
     </message>
   </context>
 </TS>

@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>APP_OK</source>
-      <translation>わかりました</translation>
+      <translation>Ok</translation>
     </message>
     <message>
       <source>APP_ERROR</source>

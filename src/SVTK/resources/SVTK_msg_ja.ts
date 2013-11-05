@@ -5,23 +5,23 @@
     <name>@default</name>
     <message>
       <source>DSC_ANTICLOCKWISE_VIEW</source>
-      <translation>ビューを反時計回りに回転します。</translation>
+      <translation>表示を左に</translation>
     </message>
     <message>
       <source>DSC_CLOCKWISE_VIEW</source>
-      <translation>ビューを時計回りに回転します。</translation>
+      <translation>右のビューを回転させる</translation>
     </message>
     <message>
       <source>MNU_ANTICLOCKWISE_VIEW</source>
-      <translation>反時計回りに回転します。</translation>
+      <translation>左回転</translation>
     </message>
     <message>
       <source>MNU_CLOCKWISE_VIEW</source>
-      <translation>時計回りに回転します。</translation>
+      <translation>右回転</translation>
     </message>
     <message>
       <source>MNU_FRONT_VIEW</source>
-      <translation>牛</translation>
+      <translation>転送</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -29,27 +29,27 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>表示をダンプします.</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>DSC_TOP_VIEW</source>
-      <translation>オンス ビュー</translation>
+      <translation>上から見る</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パン</translation>
+      <translation>パンニング</translation>
     </message>
     <message>
       <source>MNU_TOP_VIEW</source>
-      <translation>オンス</translation>
+      <translation>トップ</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心の選択</translation>
+      <translation>ビューの新しい中心地の選択</translation>
     </message>
     <message>
       <source>DSC_ROTATE_VIEW</source>
-      <translation>ビューのポイント シーンの中心の周りの回転</translation>
+      <translation>ステージの中心の周りを回転します。</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
@@ -57,19 +57,19 @@
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>パン表示]</translation>
+      <translation>ビューを移動します。</translation>
     </message>
     <message>
       <source>DSC_LEFT_VIEW</source>
-      <translation>+ オイ ビュー</translation>
+      <translation>左側のビュー</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>ビュー フレーム内のすべてのオブジェクトに適合します。</translation>
+      <translation>すべてのオブジェクトを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべてに適合します。</translation>
+      <translation>すべて表示</translation>
     </message>
     <message>
       <source>MNU_ROTATE_VIEW</source>
@@ -77,107 +77,107 @@
     </message>
     <message>
       <source>DSC_SHOW_TRIHEDRON</source>
-      <translation>三面体を現在のビューの表示/非表示</translation>
+      <translation>三面体をを表示</translation>
     </message>
     <message>
       <source>DSC_FRONT_VIEW</source>
-      <translation>牛ビュー</translation>
+      <translation>正面</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>グローバル パン</translation>
+      <translation>グローバルパンニング</translation>
     </message>
     <message>
       <source>INF_APP_DUMP_VIEW</source>
-      <translation>表示をダンプします</translation>
+      <translation>ビューを保存します。</translation>
     </message>
     <message>
       <source>MNU_BACK_VIEW</source>
-      <translation>+ 牛</translation>
+      <translation>背面</translation>
     </message>
     <message>
       <source>MNU_SHOW_TRIHEDRON</source>
-      <translation>三面体の表示/非表示</translation>
+      <translation>軸の表示/非表示</translation>
     </message>
     <message>
       <source>DSC_CHANGINGROTATIONPOINT_VIEW</source>
-      <translation>回転の周り実行ポイントを変更します。</translation>
+      <translation>シーンになってポイントを変更します。</translation>
     </message>
     <message>
       <source>MNU_BOTTOM_VIEW</source>
-      <translation>+ オンス</translation>
+      <translation>Bottom</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>リセット</translation>
+      <translation>復元</translation>
     </message>
     <message>
       <source>MNU_LEFT_VIEW</source>
-      <translation>+ オイ</translation>
+      <translation>左</translation>
     </message>
     <message>
       <source>DSC_RIGHT_VIEW</source>
-      <translation>-オイ ビュー</translation>
+      <translation>右側のビュー</translation>
     </message>
     <message>
       <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
-      <translation>変更回転ポイント</translation>
+      <translation>回転の基準点を変更</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域ビュー フレームに合わせて</translation>
+      <translation>領域にビューを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>フィット エリア</translation>
+      <translation>表示エリア</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
-      <translation>+ オンス ビュー</translation>
+      <translation>下から表示します。</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>作業中のビューをイメージ ファイルに保存します</translation>
+      <translation>現在のビューをイメージ ファイルに保存します。</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
-      <translation>ビューをズームします。</translation>
+      <translation>ズーム</translation>
     </message>
     <message>
       <source>VTK_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.png *.jpg クリックした場合 if)</translation>
+      <translation>イメージ (*.bmp *.png *.jpg *.jpeg) ファイル</translation>
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>リセット ビュー ポイント</translation>
+      <translation>ビューのポイントを復元します。</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
-      <translation>ファイルを保存できません。</translation>
+      <translation>ファイルを保存できませんでした。</translation>
     </message>
     <message>
       <source>MNU_RIGHT_VIEW</source>
-      <translation>-オイ</translation>
+      <translation>法律</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
-      <translation>[操作の表示</translation>
+      <translation>表示操作</translation>
     </message>
     <message>
       <source>DSC_BACK_VIEW</source>
-      <translation>+ 牛ビュー</translation>
+      <translation>背面図</translation>
     </message>
     <message>
       <source>SVTK_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.png *.jpg クリックした場合 if *.pdf *.ps *.eps)</translation>
+      <translation>イメージ (*.bmp *.png *.jpg *.jpeg *. pdf.PS *.eps) ファイル</translation>
     </message>
     <message>
       <source>MNU_VIEWPARAMETERS_VIEW</source>
-      <translation>表示パラメーターの変更</translation>
+      <translation>可視化の設定を変更します。</translation>
     </message>
     <message>
       <source>DSC_VIEWPARAMETERS_VIEW</source>
-      <translation>ビューのパラメーターを変更します。</translation>
+      <translation>ビューの設定を変更します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_PARALLEL_MODE</source>
@@ -185,50 +185,74 @@
     </message>
     <message>
       <source>DSC_SVTK_PARALLEL_MODE</source>
-      <translation>直交射影型を設定します。</translation>
+      <translation>直交射影を選択します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_PERSPECTIVE_MODE</source>
-      <translation>遠近法モード</translation>
+      <translation>遠近法</translation>
     </message>
     <message>
       <source>DSC_SVTK_PERSPECTIVE_MODE</source>
-      <translation>遠近法の投影タイプを設定します。</translation>
+      <translation>透視投影を選択します。</translation>
     </message>
     <message>
       <source>DSC_SVTK_STYLE_SWITCH</source>
-      <translation>相互作用のスタイルのスイッチ</translation>
+      <translation>相互作用のスタイルを変更します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_STYLE_SWITCH</source>
-      <translation>相互作用のスタイルのスイッチ</translation>
+      <translation>相互作用のスタイルを変更します。</translation>
     </message>
     <message>
       <source>DSC_SVTK_ZOOMING_STYLE_SWITCH</source>
-      <translation>ズームのスタイルのスイッチ</translation>
+      <translation>ズームのスタイルを変更します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_ZOOMING_STYLE_SWITCH</source>
-      <translation>Zomming スタイルのスイッチ</translation>
+      <translation>ズームのスタイルを変更します。</translation>
     </message>
     <message>
-      <source>DSC_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
-      <translation>動的な事前選択スイッチ</translation>
+      <source>DSC_SVTK_PRESELECTION_STANDARD</source>
+      <translation>DSC_SVTK_PRESELECTION_STANDARD</translation>
     </message>
     <message>
-      <source>MNU_SVTK_DYNAMIC_PRESLECTION_SWITCH</source>
-      <translation>動的な事前選択スイッチ</translation>
+      <source>MNU_SVTK_PRESELECTION_STANDARD</source>
+      <translation>MNU_SVTK_PRESELECTION_STANDARD</translation>
+    </message>
+    <message>
+      <source>DSC_SVTK_PRESELECTION_DYNAMIC</source>
+      <translation>DSC_SVTK_PRESELECTION_DYNAMIC</translation>
+    </message>
+    <message>
+      <source>MNU_SVTK_PRESELECTION_DYNAMIC</source>
+      <translation>MNU_SVTK_PRESELECTION_DYNAMIC</translation>
+    </message>
+    <message>
+      <source>DSC_SVTK_PRESELECTION_DISABLED</source>
+      <translation>DSC_SVTK_PRESELECTION_DISABLED</translation>
+    </message>
+    <message>
+      <source>MNU_SVTK_PRESELECTION_DISABLED</source>
+      <translation>MNU_SVTK_PRESELECTION_DISABLED</translation>
+    </message>
+    <message>
+      <source>DSC_SVTK_ENABLE_SELECTION</source>
+      <translation>DSC_SVTK_ENABLE_SELECTION</translation>
+    </message>
+    <message>
+      <source>MNU_SVTK_ENABLE_SELECTION</source>
+      <translation>MNU_SVTK_ENABLE_SELECTION</translation>
     </message>
   </context>
   <context>
     <name>SVTK_FontWidget</name>
     <message>
       <source>ARIAL</source>
-      <translation>Ms p ゴシック</translation>
+      <translation>Arial</translation>
     </message>
     <message>
       <source>TIMES</source>
-      <translation>回</translation>
+      <translation>Times</translation>
     </message>
     <message>
       <source>COURIER</source>
@@ -239,7 +263,7 @@
     <name>SVTK_ViewWindow</name>
     <message>
       <source>DSC_SVTK_UPDATE_RATE</source>
-      <translation>更新レート</translation>
+      <translation>更新の頻度</translation>
     </message>
     <message>
       <source>DSC_SVTK_SCALING</source>
@@ -251,15 +275,15 @@
     </message>
     <message>
       <source>MNU_SVTK_GRADUATED_AXES</source>
-      <translation>卒業軸</translation>
+      <translation>目盛付軸</translation>
     </message>
     <message>
       <source>DSC_SVTK_GRADUATED_AXES</source>
-      <translation>卒業軸</translation>
+      <translation>目盛付軸</translation>
     </message>
     <message>
       <source>MNU_SVTK_UPDATE_RATE</source>
-      <translation>更新レート</translation>
+      <translation>更新の頻度</translation>
     </message>
     <message>
       <source>DSC_SVTK_RECORDING_START</source>
@@ -271,35 +295,35 @@
     </message>
     <message>
       <source>DSC_SVTK_RECORDING_PLAY</source>
-      <translation>録画を続ける</translation>
+      <translation>記録を開始します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_RECORDING_PLAY</source>
-      <translation>録画を続ける</translation>
+      <translation>記録を開始します。</translation>
     </message>
     <message>
       <source>DSC_SVTK_RECORDING_PAUSE</source>
-      <translation>記録の一時停止</translation>
+      <translation>実装の一時停止の記録</translation>
     </message>
     <message>
       <source>MNU_SVTK_RECORDING_PAUSE</source>
-      <translation>記録の一時停止</translation>
+      <translation>実装の一時停止の記録</translation>
     </message>
     <message>
       <source>DSC_SVTK_RECORDING_STOP</source>
-      <translation>録音を停止します。</translation>
+      <translation>記録を停止します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_RECORDING_STOP</source>
-      <translation>録音を停止します。</translation>
+      <translation>記録を停止します。</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_RECORD_LABEL</source>
-      <translation>記録の操作</translation>
+      <translation>登録</translation>
     </message>
     <message>
       <source>MSG_NO_AVI_MAKER</source>
-      <translation>ツール jpeg2yuv、avi ファイルの書き込みに必要ではありません。マニュアルを参照してください。</translation>
+      <translation>AVI ファイルを保存するために必要な jpeg2yuv ツールは使用できません。マニュアルを参照してください。</translation>
     </message>
   </context>
   <context>
@@ -318,7 +342,7 @@
     </message>
     <message>
       <source>MEN_SCALING</source>
-      <translation>スケーリング</translation>
+      <translation>スケール</translation>
     </message>
     <message>
       <source>DLG_TITLE</source>
@@ -329,7 +353,7 @@
     <name>SVTK_RecorderDlg</name>
     <message>
       <source>ALL_DISLPAYED_FRAMES</source>
-      <translation>表示を記録フレーム</translation>
+      <translation>表示されるすべてのフレームを保存</translation>
     </message>
     <message>
       <source>CLOSE</source>
@@ -337,7 +361,7 @@
     </message>
     <message>
       <source>DLG_RECORDER_TITLE</source>
-      <translation>レコーダー</translation>
+      <translation>磁気</translation>
     </message>
     <message>
       <source>FILE_NAME</source>
@@ -349,7 +373,7 @@
     </message>
     <message>
       <source>FLT_AVI_FILES</source>
-      <translation>AVI ファイル (*.avi)</translation>
+      <translation>AVI (*.avi) ファイル</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -377,7 +401,7 @@
     </message>
     <message>
       <source>SKIPPED_FRAMES</source>
-      <translation>指定した FPS で記録</translation>
+      <translation>与えられたFPSに記録しています</translation>
     </message>
     <message>
       <source>START</source>
@@ -420,15 +444,15 @@
     </message>
     <message>
       <source>LBL_TOORIGIN</source>
-      <translation>原点に設定します。</translation>
+      <translation>原点を設定</translation>
     </message>
     <message>
       <source>LBL_SELECTPOINT</source>
-      <translation>ポイントのビューから選択</translation>
+      <translation>ビューのポイントを選択します。</translation>
     </message>
     <message>
       <source>DLG_TITLE</source>
-      <translation>回転ポイントを設定</translation>
+      <translation>回転中心設定</translation>
     </message>
   </context>
   <context>
@@ -455,7 +479,7 @@
     </message>
     <message>
       <source>LBL_DZ</source>
-      <translation>アルジェリア：</translation>
+      <translation>DZ :</translation>
     </message>
     <message>
       <source>PROJECTION_MODE</source>
@@ -467,7 +491,7 @@
     </message>
     <message>
       <source>PERSPECTIVE_MODE</source>
-      <translation>視点</translation>
+      <translation>遠近法</translation>
     </message>
     <message>
       <source>USE_BBCENTER</source>
@@ -475,15 +499,15 @@
     </message>
     <message>
       <source>LBL_TOBBCENTER</source>
-      <translation>ボックスの中心を境界に設定します。</translation>
+      <translation>境界ボックスの中心を設定します。</translation>
     </message>
     <message>
       <source>LBL_TOORIGIN</source>
-      <translation>原点に設定します。</translation>
+      <translation>原点を設定</translation>
     </message>
     <message>
       <source>LBL_SELECTPOINT</source>
-      <translation>ポイントのビューから選択</translation>
+      <translation>ビューのポイントを選択します。</translation>
     </message>
     <message>
       <source>FOCAL_POINT</source>
@@ -499,19 +523,19 @@
     </message>
     <message>
       <source>FOCAL_RELATIVE</source>
-      <translation>フォーカル ポイントに合わせる</translation>
+      <translation>焦点の問題</translation>
     </message>
     <message>
       <source>PROJECTION_DIRECTION</source>
-      <translation>投影方向:</translation>
+      <translation>投影の方向:</translation>
     </message>
     <message>
       <source>FOCAL_DISTANCE</source>
-      <translation>焦点距離：</translation>
+      <translation>焦点距離:</translation>
     </message>
     <message>
       <source>VIEW_UP_DIRECTION</source>
-      <translation>表示方向を。</translation>
+      <translation>垂直方向のビューの管理:</translation>
     </message>
     <message>
       <source>ZOOMING</source>
@@ -527,18 +551,18 @@
     </message>
     <message>
       <source>DLG_TITLE</source>
-      <translation>ビューのパラメーター</translation>
+      <translation>表示パラメータ</translation>
     </message>
   </context>
   <context>
     <name>SVTK_UpdateRateDlg</name>
     <message>
       <source>INFORMATION_FRAME_TITLE</source>
-      <translation>レンダリング統計情報</translation>
+      <translation>情報</translation>
     </message>
     <message>
       <source>STILL</source>
-      <translation>率、FPS はまだ更新します。</translation>
+      <translation>更新、FPS の頻度が減少</translation>
     </message>
     <message>
       <source>INPUT_FRAME_TITLE</source>
@@ -546,33 +570,33 @@
     </message>
     <message>
       <source>NUMBER_CELLS</source>
-      <translation>細胞の数-</translation>
+      <translation>セルの数-。</translation>
     </message>
     <message>
       <source>DESIRED</source>
-      <translation>必要な更新レート、FPS</translation>
+      <translation>必要な更新頻度、FPS</translation>
     </message>
     <message>
       <source>CURRENT_FPS</source>
-      <translation>現在の更新レート FPS</translation>
+      <translation>現在の頻度更新、FPS の</translation>
     </message>
     <message>
       <source>DLG_TITLE</source>
-      <translation>更新レート</translation>
+      <translation>割合の更新</translation>
     </message>
   </context>
   <context>
     <name>SVTK_ViewManager</name>
     <message>
       <source>VTK_VIEW_TITLE</source>
-      <translation>VTK シーン：%1 - ビューアー:%2</translation>
+      <translation>シーン VTK: %1 - ビューアー: %2</translation>
     </message>
   </context>
   <context>
     <name>SVTK_Viewer</name>
     <message>
       <source>MEN_DUMP_VIEW</source>
-      <translation>表示をダンプします.</translation>
+      <translation>ビューを保存.</translation>
     </message>
     <message>
       <source>MEN_SHOW_TOOLBAR</source>
@@ -580,7 +604,7 @@
     </message>
     <message>
       <source>MEN_CHANGE_BACKGROUND</source>
-      <translation>背景の変更.</translation>
+      <translation>背景を変更する.</translation>
     </message>
     <message>
       <source>GT_HORIZONTALGRADIENT</source>
@@ -616,7 +640,7 @@
     </message>
     <message>
       <source>BG_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.png *.jpg クリックした場合 if *.bmp *.tif *.tiff *.mhd *.mha)</translation>
+      <translation>ファイル (*.png *.jpg *.jpeg、*.bmp, *.tif, *.tiff *.mhd *.mha)</translation>
     </message>
   </context>
 </TS>

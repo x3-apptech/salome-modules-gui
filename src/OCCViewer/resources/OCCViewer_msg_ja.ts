@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>MNU_FRONT_VIEW</source>
-      <translation>フロント</translation>
+      <translation>転送</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -13,39 +13,39 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>表示をダンプします</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>DSC_TOP_VIEW</source>
-      <translation>トップ ビュー</translation>
+      <translation>上から見る</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パン</translation>
+      <translation>パンニング</translation>
     </message>
     <message>
       <source>MNU_CLONE_VIEW</source>
-      <translation>クローン ビュー</translation>
+      <translation>ビューの複製</translation>
     </message>
     <message>
       <source>DSC_SHOW_TRIHEDRE</source>
-      <translation>三面体を現在のビューの表示/非表示</translation>
+      <translation>表示/非表示の三面体をシーンに</translation>
     </message>
     <message>
       <source>MNU_SHOW_TRIHEDRE</source>
-      <translation>三面体の表示/非表示</translation>
+      <translation>軸の表示/非表示</translation>
     </message>
     <message>
       <source>MNU_TOP_VIEW</source>
-      <translation>ページのトップへ</translation>
+      <translation>トップ</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心の選択</translation>
+      <translation>ビューの新しい中心地の選択</translation>
     </message>
     <message>
       <source>DSC_ROTATE_VIEW</source>
-      <translation>ビューのポイント シーンの中心の周りの回転</translation>
+      <translation>ステージの中心の周りを回転します。</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
@@ -53,23 +53,23 @@
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>パン表示]</translation>
+      <translation>ビューを移動します。</translation>
     </message>
     <message>
       <source>DSC_LEFT_VIEW</source>
-      <translation>左ビュー</translation>
+      <translation>左側のビュー</translation>
     </message>
     <message>
       <source>DSC_SHOOT_VIEW</source>
-      <translation>作業中のビューの状態を記憶し、それをリストに追加します</translation>
+      <translation>状態の現在のシーンを保存し、一覧に追加</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>ビュー フレーム内のすべてのオブジェクトに適合します。</translation>
+      <translation>すべてのオブジェクトを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべてに適合します。</translation>
+      <translation>すべて表示</translation>
     </message>
     <message>
       <source>MNU_ROTATE_VIEW</source>
@@ -77,55 +77,55 @@
     </message>
     <message>
       <source>DSC_FRONT_VIEW</source>
-      <translation>正面から見た図</translation>
+      <translation>正面</translation>
     </message>
     <message>
       <source>MNU_ROTATIONPOINTGRAVITY_VIEW</source>
-      <translation>回転ポイント: 重力のセンター</translation>
+      <translation>回転点: 重力の中心部</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>グローバル パン</translation>
+      <translation>グローバルパンニング</translation>
     </message>
     <message>
       <source>INF_APP_DUMP_VIEW</source>
-      <translation>表示をダンプします</translation>
+      <translation>ビューを保存します。</translation>
     </message>
     <message>
       <source>DSC_CLIPPING</source>
-      <translation>クリップ平面を設定します。</translation>
+      <translation>クリップ平面を定義します。</translation>
     </message>
     <message>
       <source>DSC_CLONE_VIEW</source>
-      <translation>新しい OCC ビューアーのアクティブなシーンを作成します。</translation>
+      <translation>現在のステージの可視化の新しいウィンドウを開く</translation>
     </message>
     <message>
       <source>INF_APP_SHOOT_VIEW</source>
-      <translation>ビューを記憶します。</translation>
+      <translation>場面を覚えています。</translation>
     </message>
     <message>
       <source>MNU_CLIPPING</source>
-      <translation>クリッピング</translation>
+      <translation>断面</translation>
     </message>
     <message>
       <source>MNU_BACK_VIEW</source>
-      <translation>戻る</translation>
+      <translation>背面</translation>
     </message>
     <message>
       <source>MNU_SHOOT_VIEW</source>
-      <translation>ビューを記憶します。</translation>
+      <translation>ビューの保存</translation>
     </message>
     <message>
       <source>DSC_CHANGINGROTATIONPOINT_VIEW</source>
-      <translation>回転の周り実行ポイントを変更します。</translation>
+      <translation>シーンになってポイントを変更します。</translation>
     </message>
     <message>
       <source>MNU_BOTTOM_VIEW</source>
-      <translation>下</translation>
+      <translation>Bottom</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>リセット</translation>
+      <translation>復元</translation>
     </message>
     <message>
       <source>MNU_LEFT_VIEW</source>
@@ -137,35 +137,35 @@
     </message>
     <message>
       <source>DSC_ANTICLOCKWISE_VIEW</source>
-      <translation>ビューを反時計回りに回転します。</translation>
+      <translation>表示を左に</translation>
     </message>
     <message>
       <source>DSC_CLOCKWISE_VIEW</source>
-      <translation>ビューを時計回りに回転します。</translation>
+      <translation>右のビューを回転させる</translation>
     </message>
     <message>
       <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
-      <translation>変更回転ポイント</translation>
+      <translation>回転の基準点を変更</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域ビュー フレームに合わせて</translation>
+      <translation>領域にビューを表示します。</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>フィット エリア</translation>
+      <translation>表示エリア</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
-      <translation>底面図</translation>
+      <translation>下から表示します。</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>作業中のビューをイメージ ファイルに保存します</translation>
+      <translation>現在のビューをイメージ ファイルに保存します。</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
-      <translation>ビューをズームします。</translation>
+      <translation>ズーム</translation>
     </message>
     <message>
       <source>MNU_ROTATIONPOINT000_VIEW</source>
@@ -177,39 +177,39 @@
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>リセット ビュー ポイント</translation>
+      <translation>ビューのポイントを復元します。</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
-      <translation>ファイルを保存できません。</translation>
+      <translation>ファイルを保存できませんでした。</translation>
     </message>
     <message>
       <source>DSC_PRESETS_VIEW</source>
-      <translation>記憶の状態、アクティブなビューの選択</translation>
+      <translation>状態の復元は、現在のシーンの記憶</translation>
     </message>
     <message>
       <source>MNU_PRESETS_VIEW</source>
-      <translation>ビューを復元します。</translation>
+      <translation>ビューの読み込み</translation>
     </message>
     <message>
       <source>MNU_ANTICLOCKWISE_VIEW</source>
-      <translation>反時計回りに回転します。</translation>
+      <translation>左回転</translation>
     </message>
     <message>
       <source>MNU_CLOCKWISE_VIEW</source>
-      <translation>時計回りに回転します。</translation>
+      <translation>右回転</translation>
     </message>
     <message>
       <source>MNU_RIGHT_VIEW</source>
-      <translation>右</translation>
+      <translation>法律</translation>
     </message>
     <message>
       <source>INF_APP_PRESETS_VIEW</source>
-      <translation>ビューを復元します。</translation>
+      <translation>シーンを復元します。</translation>
     </message>
     <message>
       <source>LBL_XYTOOLBAR_LABEL</source>
-      <translation>XY 表示操作</translation>
+      <translation>XY 表示での操作</translation>
     </message>
     <message>
       <source>LBL_XZTOOLBAR_LABEL</source>
@@ -221,7 +221,7 @@
     </message>
     <message>
       <source>LBL_3DTOOLBAR_LABEL</source>
-      <translation>3 D ビューの操作</translation>
+      <translation>3D ビューの操作</translation>
     </message>
     <message>
       <source>DSC_BACK_VIEW</source>
@@ -229,51 +229,67 @@
     </message>
     <message>
       <source>DSC_SCALING</source>
-      <translation>軸の目盛を変更します。</translation>
+      <translation>座標のスケールの軸を変更します。</translation>
     </message>
     <message>
       <source>MNU_SCALING</source>
-      <translation>スケーリング</translation>
+      <translation>スケールを変更します。</translation>
     </message>
     <message>
       <source>DSC_GRADUATED_AXES</source>
-      <translation>卒業軸</translation>
+      <translation>目盛付軸</translation>
     </message>
     <message>
       <source>MNU_GRADUATED_AXES</source>
-      <translation>卒業軸</translation>
+      <translation>軸に目盛り付け</translation>
     </message>
     <message>
       <source>DSC_AMBIENT</source>
-      <translation>切り替えのみの周囲の光を維持します。</translation>
+      <translation>アンビエント ライトを表示します。</translation>
     </message>
     <message>
       <source>MNU_AMBIENT</source>
-      <translation>切り替えのみの周囲の光を維持します。</translation>
+      <translation>アンビエント ライトを表示します。</translation>
     </message>
     <message>
       <source>DSC_STYLE_SWITCH</source>
-      <translation>相互作用のスタイルのスイッチ</translation>
+      <translation>相互作用のスタイルを変更します。</translation>
     </message>
     <message>
       <source>MNU_STYLE_SWITCH</source>
-      <translation>相互作用のスタイルのスイッチ</translation>
+      <translation>相互作用のスタイルを変更します。</translation>
     </message>
     <message>
       <source>DSC_ZOOMING_STYLE_SWITCH</source>
-      <translation>ズームのスタイルのスイッチ</translation>
+      <translation>ズームのスタイルを変更します。</translation>
     </message>
     <message>
       <source>MNU_ZOOMING_STYLE_SWITCH</source>
-      <translation>ズームのスタイルのスイッチ</translation>
+      <translation>ズームのスタイルを変更します。</translation>
+    </message>
+    <message>
+      <source>DSC_ENABLE_PRESELECTION</source>
+      <translation>DSC_ENABLE_PRESELECTION</translation>
+    </message>
+    <message>
+      <source>MNU_ENABLE_PRESELECTION</source>
+      <translation>MNU_ENABLE_PRESELECTION</translation>
+    </message>
+    <message>
+      <source>DSC_ENABLE_SELECTION</source>
+      <translation>DSC_ENABLE_SELECTION</translation>
+    </message>
+    <message>
+      <source>MNU_ENABLE_SELECTION</source>
+      <translation>MNU_ENABLE_SELECTION</translation>
     </message>
     <message>
       <source>OCC_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.png *.jpg クリックした場合 if *.eps * .ps)</translation>
+      <translation>イメージ ファイル (*.bmp (*.png) *.png *.jpg *.jpeg *.eps 年 .ps)</translation>
     </message>
     <message>
       <source>OCC_TEXTURE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.gif *.pix *.xwd *.rgb * .rs)</translation>
+      <translation>ファイル (*.bmp, *.gif *.pix *.xwd *.rgb ※ .rs）</translation>
     </message>
     <message>
       <source>DSC_MAXIMIZE_VIEW</source>
@@ -289,14 +305,14 @@
     </message>
     <message>
       <source>MNU_MINIMIZE_VIEW</source>
-      <translation>最小限に抑える</translation>
+      <translation>最小化する</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_CreateRestoreViewDlg</name>
     <message>
       <source>CAPTION</source>
-      <translation>ビューを復元します。</translation>
+      <translation>表示を元に戻す</translation>
     </message>
   </context>
   <context>
@@ -319,57 +335,57 @@
     </message>
     <message>
       <source>LBL_TOORIGIN</source>
-      <translation>原点に設定します。</translation>
+      <translation>原点を設定</translation>
     </message>
     <message>
       <source>CAPTION</source>
-      <translation>回転ポイントを設定</translation>
+      <translation>回転中心設定</translation>
     </message>
     <message>
       <source>LBL_SELECTPOINT</source>
-      <translation>ポイントのビューから選択</translation>
+      <translation>ビューで、項目を選択します。</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_ViewManager</name>
     <message>
       <source>OCC_VIEW_TITLE</source>
-      <translation>OCC シーン:%M - ビューアー:%V</translation>
+      <translation>シーン OCC: %M - ビューアー: %V</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_Viewer</name>
     <message>
       <source>MEN_DUMP_VIEW</source>
-      <translation>表示をダンプします.</translation>
+      <translation>ビューを保存します。</translation>
     </message>
     <message>
       <source>MEN_SHOW_TOOLBAR</source>
-      <translation>ツールバーを表示します。</translation>
+      <translation>ツールバーを表示</translation>
     </message>
     <message>
       <source>MEN_CHANGE_BACKGROUND</source>
-      <translation>背景の変更.</translation>
+      <translation>背景を変更</translation>
     </message>
     <message>
       <source>MEN_CHANGE_IMAGE</source>
-      <translation>背景画像を設定/変更.</translation>
+      <translation>背景画像を設定/変更...</translation>
     </message>
     <message>
       <source>SELECT_IMAGE</source>
-      <translation>イメージを選択します.</translation>
+      <translation>画像を選択します。</translation>
     </message>
     <message>
       <source>CENTERED</source>
-      <translation>モードを中心としました。</translation>
+      <translation>中心のモード</translation>
     </message>
     <message>
       <source>TILED</source>
-      <translation>タイル張りのモードで</translation>
+      <translation>テンキー モード</translation>
     </message>
     <message>
       <source>STRETCHED</source>
-      <translation>ストレッチ モードで</translation>
+      <translation>ストレッチ モード</translation>
     </message>
     <message>
       <source>GT_HORIZONTALGRADIENT</source>
@@ -393,26 +409,26 @@
     </message>
     <message>
       <source>GT_SECONDCORNERGRADIENT</source>
-      <translation>2 番目のコーナーのグラデーション</translation>
+      <translation>グラデーションの 2 番目の角</translation>
     </message>
     <message>
       <source>GT_THIRDCORNERGRADIENT</source>
-      <translation>3 番目のコーナーのグラデーション</translation>
+      <translation>3 番目の角勾配</translation>
     </message>
     <message>
       <source>GT_FORTHCORNERGRADIENT</source>
-      <translation>4 番目のコーナーのグラデーション</translation>
+      <translation>第 4 コーナー グラデーション</translation>
     </message>
     <message>
       <source>BG_IMAGE_FILES</source>
-      <translation>イメージ ファイル (*.bmp *.gif *.pix *.xwd *.rgb * .rs)</translation>
+      <translation>ファイル (*.bmp, *.gif *.pix *.xwd *.rgb ※ .rs）</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_AxialScaleDlg</name>
     <message>
       <source>DLG_SCALING</source>
-      <translation>軸のスケーリング</translation>
+      <translation>スケールの変更</translation>
     </message>
     <message>
       <source>LBL_X</source>

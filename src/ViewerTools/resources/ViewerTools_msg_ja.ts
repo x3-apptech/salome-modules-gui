@@ -17,15 +17,15 @@
     </message>
     <message>
       <source>CAPTION</source>
-      <translation>卒業軸</translation>
+      <translation>軸に目盛り付け</translation>
     </message>
     <message>
       <source>IS_VISIBLE</source>
-      <translation>表示されています。</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>FONT</source>
-      <translation>フォント</translation>
+      <translation>色</translation>
     </message>
     <message>
       <source>NAME</source>
@@ -53,18 +53,18 @@
     </message>
     <message>
       <source>AXIS_NAME</source>
-      <translation>軸の名前</translation>
+      <translation>軸名</translation>
     </message>
   </context>
   <context>
     <name>ViewerTools_FontWidgetBase</name>
     <message>
       <source>BOLD</source>
-      <translation>太字</translation>
+      <translation>Bold</translation>
     </message>
     <message>
       <source>ITALIC</source>
-      <translation>斜体</translation>
+      <translation>Italic</translation>
     </message>
     <message>
       <source>SHADOW</source>
