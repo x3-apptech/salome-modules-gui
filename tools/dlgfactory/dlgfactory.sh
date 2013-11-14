@@ -150,7 +150,7 @@ displayMessage()
 
 #_fin_message
 
-echo "Note that the following directives should be present in your Makefile.am (or something like that):"
+echo "Note that the following directives should be present in your CMakeLists.txt (or something like that):"
 echo ""
 displayMessage
 
