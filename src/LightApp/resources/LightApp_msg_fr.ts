@@ -171,6 +171,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Enregistrer la position des fenêtres</translation>
     </message>
     <message>
+        <source>PREF_STORE_TOOL_POS</source>
+        <translation>Enregistrer la positions des barres d&apos;outils</translation>
+    </message>
+    <message>
         <source>PREF_AUTO_SAVE</source>
         <translation>Intervalle d&apos;enregistrement automatique (min)</translation>
     </message>
