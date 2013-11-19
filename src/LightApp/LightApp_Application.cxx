@@ -4234,3 +4234,16 @@ QByteArray LightApp_Application::processState(QByteArray& input, const bool proc
   }
   return aRes;
 }
+
+/*!
+  \brief Emits operationFinished signal.
+  \param theModuleName the name of the module which perfomed the operation
+  \param theOperationName the operation name
+  \param theEntryList the list of the created objects entries
+*/
+void LightApp_Application::emitOperationFinished( const QString& theModuleName,
+                                                  const QString& theOperationName,
+                                                  const QStringList& theEntryList )
+{
+  emit operationFinished( theModuleName, theOperationName, theEntryList );
+}

@@ -172,11 +172,14 @@ public:
   virtual bool                        renameAllowed( const QString& ) const;
   virtual bool                        renameObject( const QString&, const QString& );
 
+  void                                emitOperationFinished( const QString&, const QString&, const QStringList& );
+
 signals:
   void                                studyOpened();
   void                                studySaved();
   void                                studyClosed();
   void                                preferenceChanged( const QString&, const QString&, const QString& );
+  void                                operationFinished( const QString&, const QString&, const QStringList& );
 
 public slots:
   virtual void                        onHelpContentsModule();
