@@ -26,7 +26,13 @@ DEMO_IS_ACTIVATED = False
 if DEMO_IS_ACTIVATED:
   # Check that GEOM and SMESH modules are present
   try:
-    import geompy, smesh
+    import GEOM
+    from salome.geom import geomBuilder
+    geompy = geomBuilder.New(salome.myStudy)
+    
+    import SMESH, SALOMEDS
+    from salome.smesh import smeshBuilder
+    smesh =  smeshBuilder.New(salome.myStudy)
   except:
     DEMO_IS_ACTIVATED = False
 
@@ -38,11 +44,12 @@ if DEMO_IS_ACTIVATED:
   import salome
 
   def trihedron(context):
-      import geompy
+      import GEOM
+      from salome.geom import geomBuilder
 
       # Intialize the geompy factory with the active study
       activeStudy = context.study
-      geompy.init_geom(activeStudy)
+      geompy = geomBuilder.New(activeStudy)
 
       # Create the objects
       Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
@@ -65,11 +72,12 @@ if DEMO_IS_ACTIVATED:
   # -------------------------------------------------------------------------
   # Example 1 bis: creation of basic objects and automatic display
   def trihedron_withdisplay(context):
-      import geompy
+      import GEOM
+      from salome.geom import geomBuilder
 
       # Intialize the geompy factory with the active study
       activeStudy = context.study
-      geompy.init_geom(activeStudy)
+      geompy = geomBuilder.New(activeStudy)
 
       # Create the objects
       Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)

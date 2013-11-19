@@ -65,9 +65,10 @@ def createGeometryWithPartition(study, radius=DEFAULT_RADIUS, length=DEFAULT_LEN
 def createMesh(study, shape):
     '''This function creates the mesh of the specified shape on the specified study'''
     print "TUBE: creating the mesh ..."
-    import smesh
+    import SMESH
+    from salome.smesh import smeshBuilder
+    smesh = smeshBuilder.New(study)
 
-    smesh.SetCurrentStudy(study)
     mesh = smesh.Mesh(shape)
     Regular_1D = mesh.Segment()
     Nb_Segments = Regular_1D.NumberOfSegments(10)

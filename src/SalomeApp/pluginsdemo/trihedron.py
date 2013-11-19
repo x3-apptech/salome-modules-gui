@@ -22,9 +22,11 @@
 #
 
 # Intialize the geompy factory with the active study
-import geompy
 import salome
-geompy.init_geom(salome.myStudy)
+
+import GEOM
+from salome.geom import geomBuilder
+geompy = geomBuilder.New(salome.myStudy)
 
 # Create the objects
 Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
