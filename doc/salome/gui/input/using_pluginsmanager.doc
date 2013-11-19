@@ -98,8 +98,9 @@ training course):
 \code 
 # Intialize the geompy factory with the active study
 import salome
-import geompy
-geompy.init_geom(salome.myStudy)
+import GEOM
+from salome.geom import geomBuilder
+geompy = geomBuilder.New(salome.myStudy)
 
 # Create the objects
 Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
@@ -108,10 +109,10 @@ Vz = geompy.MakeVectorDXDYDZ(0, 0, 10)
 origin = geompy.MakeVertex(0, 0, 0)
 
 # Register the objects in the active study
-geompy.addToStudy( Vx, "Vx" ))
-geompy.addToStudy( Vy, "Vy" ))
-geompy.addToStudy( Vz, "Vz" ))
-geompy.addToStudy( origin, "origin" ))
+geompy.addToStudy( Vx, "Vx" )
+geompy.addToStudy( Vy, "Vy" )
+geompy.addToStudy( Vz, "Vz" )
+geompy.addToStudy( origin, "origin" )
 \endcode
 
 The job consists in creating the file salome_plugins.py as follows:
@@ -119,7 +120,9 @@ The job consists in creating the file salome_plugins.py as follows:
 \code
 import salome_pluginsmanager
 def trihedron(context):
-    import geompy
+    import GEOM
+    from salome.geom import geomBuilder
+    geompy = geomBuilder.New(salome.myStudy)
     # Intialize the geompy factory with the active study
     activeStudy = context.study
     geompy.init_geom(activeStudy)

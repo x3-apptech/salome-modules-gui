@@ -33,23 +33,25 @@ def minmax(context):
   from minmax_dialog import Ui_Dialog
 
   import salome
-  import smesh
+  import SMESH
+  from salome.smesh import smeshBuilder
+  smesh = smeshBuilder.New(salome.myStudy)
 
   controls_dict = {
-    "Aspect Ratio 3D" :     smesh.FT_AspectRatio3D,
-    "Volume" :              smesh.FT_Volume3D,
-    "Element Diameter 3D" : smesh.FT_MaxElementLength3D,
-    "Length 2D" :           smesh.FT_Length2D,
-    "MultiConnection 2D" :  smesh.FT_MultiConnection2D,
-    "Area" :                smesh.FT_Area,
-    "Taper" :               smesh.FT_Taper,
-    "Aspect Ratio" :        smesh.FT_AspectRatio,
-    "Minimum Angle" :       smesh.FT_MinimumAngle,
-    "Warping" :             smesh.FT_Warping,
-    "Skew" :                smesh.FT_Skew,
-    "Element Diameter 2D" : smesh.FT_MaxElementLength2D,
-    "Length" :              smesh.FT_Length,
-    "MultiConnection" :     smesh.FT_MultiConnection,
+    "Aspect Ratio 3D" :     SMESH.FT_AspectRatio3D,
+    "Volume" :              SMESH.FT_Volume3D,
+    "Element Diameter 3D" : SMESH.FT_MaxElementLength3D,
+    "Length 2D" :           SMESH.FT_Length2D,
+    "MultiConnection 2D" :  SMESH.FT_MultiConnection2D,
+    "Area" :                SMESH.FT_Area,
+    "Taper" :               SMESH.FT_Taper,
+    "Aspect Ratio" :        SMESH.FT_AspectRatio,
+    "Minimum Angle" :       SMESH.FT_MinimumAngle,
+    "Warping" :             SMESH.FT_Warping,
+    "Skew" :                SMESH.FT_Skew,
+    "Element Diameter 2D" : SMESH.FT_MaxElementLength2D,
+    "Length" :              SMESH.FT_Length,
+    "MultiConnection" :     SMESH.FT_MultiConnection,
     }
 
   controls_3d = [
