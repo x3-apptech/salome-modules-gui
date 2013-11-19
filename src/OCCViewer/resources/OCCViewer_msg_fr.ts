@@ -269,19 +269,19 @@
     </message>
     <message>
         <source>DSC_ENABLE_PRESELECTION</source>
-        <translation type="unfinished">Enable/disable preselection</translation>
+        <translation>Activer/Désactiver la préselection</translation>
     </message>
     <message>
         <source>MNU_ENABLE_PRESELECTION</source>
-        <translation type="unfinished">Enable/disable preselection</translation>
+        <translation>Activer/Désactiver préselection</translation>
     </message>
     <message>
         <source>DSC_ENABLE_SELECTION</source>
-        <translation type="unfinished">Enable/disable selection</translation>
+        <translation>Activer/Désactiver la selection</translation>
     </message>
     <message>
         <source>MNU_ENABLE_SELECTION</source>
-        <translation type="unfinished">Enable/disable selection</translation>
+        <translation>Activer/Désactiver selection</translation>
     </message>
     <message>
         <source>OCC_IMAGE_FILES</source>
@@ -301,7 +301,7 @@
     </message>
     <message>
         <source>DSC_RETURN_3D_VIEW</source>
-        <translation type="unfinished">Return to 3D view</translation>
+        <translation>Retour à la vue 3D</translation>
     </message>
     <message>
         <source>MNU_MAXIMIZE_VIEW</source>
@@ -313,7 +313,7 @@
     </message>
     <message>
         <source>MNU_RETURN_3D_VIEW</source>
-        <translation type="unfinished">Return to 3D</translation>
+        <translation>Retour à la vue 3D</translation>
     </message>
 </context>
 <context>

@@ -500,7 +500,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>NEW_WINDOW_5</source>
-        <translation type="unfinished">G&amp;raphics view</translation>
+        <translation>Sène G&amp;raphiques</translation>
     </message>
     <message>
         <source>CREATING_NEW_WINDOW</source>
@@ -716,31 +716,31 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_GROUP_SELECTION</source>
-        <translation type="unfinished">Selection</translation>
+        <translation>Sélection</translation>
     </message>
     <message>
         <source>PREF_ENABLE_SELECTION</source>
-        <translation type="unfinished">Enable selection</translation>
+        <translation>Activer sélection</translation>
     </message>
     <message>
         <source>PREF_ENABLE_PRESELECTION</source>
-        <translation type="unfinished">Enable preselection</translation>
+        <translation>Activer pré-sélection</translation>
     </message>
     <message>
         <source>PREF_PRESELECTION</source>
-        <translation type="unfinished">Preselection</translation>
+        <translation>Pré-sélection</translation>
     </message>
     <message>
         <source>PREF_PRESELECTION_STANDARD</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>PREF_PRESELECTION_DYNAMIC</source>
-        <translation type="unfinished">Dynamic</translation>
+        <translation>Dynamique</translation>
     </message>
     <message>
         <source>PREF_PRESELECTION_DISABLED</source>
-        <translation type="unfinished">Disabled</translation>
+        <translation>Désactivée</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
