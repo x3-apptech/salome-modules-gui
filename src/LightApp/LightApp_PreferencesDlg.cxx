@@ -29,6 +29,7 @@
 #include "QtxResourceMgr.h"
 
 #include <SUIT_MessageBox.h>
+#include <SUIT_FileDlg.h>
 
 #include <QAbstractButton>
 #include <QVBoxLayout>
@@ -152,20 +153,15 @@ void LightApp_PreferencesDlg::onDefault()
 void LightApp_PreferencesDlg::onImportPref()
 {
   QtxResourceMgr* mgr = myPrefs->resourceMgr();
-  if( !mgr )
-    return;
+  QStringList filtersList;
+  filtersList.append(tr("XML_FILES_FILTER"));
+  QString anInitialPath = "";
+  if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+    anInitialPath = QDir::currentPath();
 
-  QFileDialog dlg( this, tr("IMPORT_PREFERENCES"), ".", "*" );
-  dlg.setObjectName( "" );
-  //dlg.setShowHiddenFiles( true );
-  dlg.exec();
+  QString aName = SUIT_FileDlg::getFileName( this, anInitialPath, filtersList, tr("IMPORT_PREFERENCES"), true, true );
 
-  QStringList files = dlg.selectedFiles();
-  if ( files.isEmpty() )
-    return;
-
-  QString fname = files[0];
-  if( mgr->import( fname ) )
+  if( mgr->import( aName ) )
   {
     myPrefs->retrieve();
     myPrefs->toBackup();

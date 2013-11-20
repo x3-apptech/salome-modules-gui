@@ -925,6 +925,10 @@ Le fichier n&apos;existe pas</translation>
         <translation>Importer les préférences</translation>
     </message>
     <message>
+        <source>XML_FILES_FILTER</source>
+        <translation type="unfinished">XML Files (*.xml)</translation>
+    </message>
+    <message>
         <source>CAPTION</source>
         <translation>Préférences</translation>
     </message>

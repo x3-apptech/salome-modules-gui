@@ -925,6 +925,10 @@ File does not exist</translation>
         <translation>Import preferences</translation>
     </message>
     <message>
+        <source>XML_FILES_FILTER</source>
+        <translation>XML Files (*.xml)</translation>
+    </message>
+    <message>
         <source>CAPTION</source>
         <translation>Preferences</translation>
     </message>
