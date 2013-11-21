@@ -500,7 +500,7 @@ SALOME_Actor
                SVTK_SelectionEvent* theSelectionEvent,
                bool theIsHighlight)
 {
-  if ( !GetPickable() || !mySelector->IsPreSelectionEnabled() )
+  if ( !GetPickable() || !mySelector || !mySelector->IsPreSelectionEnabled() )
     return false;
       
   vtkRenderer *aRenderer = theInteractorStyle->GetCurrentRenderer();
