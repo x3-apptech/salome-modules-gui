@@ -49,6 +49,7 @@ public:
   void            initialize( CAM_Application* );
   bool            activateModule( SUIT_Study* );
   bool            deactivateModule( SUIT_Study* );
+  void            onModelClosed();
   void            windows( QMap<int, int>& ) const;
   void            viewManagers( QStringList& ) const;
   void            studyActivated();

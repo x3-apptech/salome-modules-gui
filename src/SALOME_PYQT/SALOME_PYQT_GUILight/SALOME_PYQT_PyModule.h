@@ -86,6 +86,7 @@ public slots:
   void                       initialize( CAM_Application* );
   bool                       activate( SUIT_Study* study );
   bool                       deactivate( SUIT_Study* study );
+  void                       modelClosed( SUIT_Study* study );
   void                       preferencesChanged( const QString&, const QString& setting );
   void                       preferenceChanged( const QString&, const QString&, const QString& setting );
   void                       studyActivated( SUIT_Study* );
@@ -114,6 +115,7 @@ private:
   void                       internalActivate( SUIT_Study* );
   void                       internalCustomize( SUIT_Study* );
   void                       internalDeactivate( SUIT_Study* );
+  void                       internalClosedStudy( SUIT_Study* );
   void                       internalPreferencesChanged( const QString&, const QString& );
   void                       internalStudyChanged( SUIT_Study* );
   void                       internalActionActivated( int );

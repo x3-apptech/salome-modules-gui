@@ -162,13 +162,28 @@ bool SALOME_PYQT_ModuleLight::activateModule( SUIT_Study* study )
   \sa PyModuleHelper::deactivate()
 */
 bool SALOME_PYQT_ModuleLight::deactivateModule( SUIT_Study* study )
-{
+{  
   // call helper
   bool res = myHelper->deactivate( study );
     
   // ... then call base implementation
   return LightApp_Module::deactivateModule( study ) && res;
 }
+
+/*!
+  \brief Close of the module.
+
+  This function is usually used in order to close the module's 
+  specific menus and toolbars and perform other such actions
+  required when the module is closed.
+*/
+void SALOME_PYQT_ModuleLight::onModelClosed()
+{
+  // call helper
+  myHelper->modelClosed(application()->activeStudy());
+  LightApp_Module::onModelClosed();
+}
+
 
 /*!
   \brief Get the dockable windows associated with the module.

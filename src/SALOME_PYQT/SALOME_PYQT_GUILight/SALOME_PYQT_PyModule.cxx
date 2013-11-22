@@ -963,6 +963,58 @@ bool PyModuleHelper::deactivate( SUIT_Study* study )
 }
 
 /*!
+  \brief Close of the module.
+
+  This function is usually used in order to close the module's 
+  specific menus and toolbars and perform other such actions
+  required when the module is closed.
+*/
+void PyModuleHelper::modelClosed( SUIT_Study* study )
+{
+  FuncMsg fmsg( "PyModuleHelper::modelClosed()" );
+
+  class StudyClosedReq : public PyInterp_LockRequest
+  {
+  public:
+    StudyClosedReq( PyInterp_Interp* _py_interp,
+                   PyModuleHelper*  _helper,
+                   SUIT_Study*      _study )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myHelper( _helper ),
+        myStudy ( _study )
+    {}
+  protected:
+    virtual void execute()
+    {
+      myHelper->internalClosedStudy( myStudy );
+    }
+  private:
+    PyModuleHelper* myHelper;
+    SUIT_Study*     myStudy;
+  };
+
+  // post request
+  PyInterp_Dispatcher::Get()->Exec( new StudyClosedReq( myInterp, this, study ) );
+
+  // disconnect preferences changing signal
+  disconnect( myModule->getApp(), SIGNAL( preferenceChanged( const QString&, const QString&, const QString& ) ),
+              this,               SLOT(   preferenceChanged( const QString&, const QString&, const QString& ) ) );
+  
+  // disconnect the SUIT_Desktop signal windowActivated()
+  SUIT_Desktop* d = study->application()->desktop();
+  disconnect( d,     SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+	      this,  SLOT( activeViewChanged( SUIT_ViewWindow* ) ) );
+
+  // deactivate menus, toolbars, etc
+  if ( myXmlHandler ) myXmlHandler->activateMenus( false );
+
+  // hide menus / toolbars
+  myModule->setMenuShown( false );
+  myModule->setToolShown( false );
+}
+
+
+/*!
   \brief Process module's preferences changing.
 
   Called when the module's own preferences are changed.
@@ -2012,6 +2064,39 @@ void PyModuleHelper::internalDeactivate( SUIT_Study* study )
     }
   }
 }
+
+/*!
+  \brief Internal closure:
+
+  Performs the following actions:
+  - call Python module's closeStudy() method
+
+  \param theStudy parent study object
+*/
+void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
+{
+  FuncMsg fmsg( "--- PyModuleHelper::internalClosedStudy()" );
+
+  // Get study Id
+  // get study Id
+  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( theStudy );
+  int aStudyId = aStudy ? aStudy->id() : 0;
+
+  // check that Python subinterpreter is initialized and Python module is imported
+  if ( !myInterp || !myPyModule ) {
+    // Error! Python subinterpreter should be initialized and module should be imported first!
+    return;
+  }
+  // then call Python module's deactivate() method
+  if ( PyObject_HasAttrString( myPyModule , (char*)"closeStudy" ) ) {
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i", aStudyId ) );
+    if( !res ) {
+      PyErr_Print();
+    }
+  }
+}
+
+
 
 /*!
   \brief Preference changing callback function.
