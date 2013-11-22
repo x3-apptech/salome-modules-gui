@@ -20,21 +20,17 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef OCCVIEWER_H
-#define OCCVIEWER_H
+#include "ViewerData_AISShape.hxx"
 
-#ifdef WIN32
-#if defined OCCVIEWER_EXPORTS || defined OCCViewer_EXPORTS
-#define OCCVIEWER_EXPORT __declspec(dllexport)
-#else
-#define OCCVIEWER_EXPORT __declspec(dllimport)
-#endif
-#else
-#define OCCVIEWER_EXPORT
-#endif
+IMPLEMENT_STANDARD_HANDLE (ViewerData_AISShape, AIS_TexturedShape)
+IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_TexturedShape)
 
-#if defined WIN32
-#pragma warning ( disable: 4251 )
-#endif
-
-#endif //OCCVIEWER_H
+/*!
+  Constructor
+  \param shape - TopoDS shape 
+*/
+ViewerData_AISShape::ViewerData_AISShape (const TopoDS_Shape& theShape)
+: AIS_TexturedShape (theShape),
+  myIsClippable (true)
+{
+}

@@ -395,17 +395,21 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
       }
 
       ic->Display( anAIS, false );
-      
-#if OCC_VERSION_LARGE > 0x06050200 
-      Handle(SALOME_AISShape) aSh = Handle(SALOME_AISShape)::DownCast(anAIS);
-      if ( !aSh.IsNull() ) {
-          bool top = (aSh->isTopLevel() && aSh->switchTopLevel());
+      Handle(SALOME_AISShape) aSh = Handle(SALOME_AISShape)::DownCast (anAIS);
+      if (!aSh.IsNull())
+      {
+        aSh->SetClippable (prs->IsClippable());
+        applyExistingClipPlanesToObject (anAIS);
+#if OCC_VERSION_LARGE > 0x06050200
+        bool top = (aSh->isTopLevel() && aSh->switchTopLevel());
 	      ic->SetZLayer( aSh, top ? getTopLayerId() : 0 );
-		  if(!aSh->toActivate()) {
-			ic->Deactivate( aSh );
-		  }
-      }
+		    if(!aSh->toActivate())
+        {
+			    ic->Deactivate( aSh );
+		    }
 #endif
+      }
+
       //Register anAIS (if it has an entry) in entry2aisobjects map
       Handle(SALOME_InteractiveObject) anObj = Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
       if ( !anObj.IsNull() && anObj->hasEntry())

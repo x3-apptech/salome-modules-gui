@@ -20,21 +20,40 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef OCCVIEWER_H
-#define OCCVIEWER_H
+#ifndef _ViewerData_AISShape_HeaderFile
+#define _ViewerData_AISShape_HeaderFile
 
-#ifdef WIN32
-#if defined OCCVIEWER_EXPORTS || defined OCCViewer_EXPORTS
-#define OCCVIEWER_EXPORT __declspec(dllexport)
-#else
-#define OCCVIEWER_EXPORT __declspec(dllimport)
-#endif
-#else
-#define OCCVIEWER_EXPORT
+#ifndef _AIS_TexturedShape_HeaderFile
+#include <AIS_TexturedShape.hxx>
 #endif
 
-#if defined WIN32
-#pragma warning ( disable: 4251 )
-#endif
+#include <Standard.hxx>
+#include <Standard_DefineHandle.hxx>
 
-#endif //OCCVIEWER_H
+class ViewerData_AISShape : public AIS_TexturedShape
+{
+public:
+  Standard_EXPORT ViewerData_AISShape (const TopoDS_Shape& theShape);
+
+  // checks if shape is clippable
+  inline bool IsClippable() const
+  {
+    return myIsClippable;
+  }
+
+  // makes shape clippable/not clippable
+  inline void SetClippable (bool isClippable)
+  {
+    myIsClippable = isClippable;
+  }
+
+protected:
+  bool myIsClippable;
+
+public:
+  DEFINE_STANDARD_RTTI(ViewerData_AISShape)  
+};
+
+DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_TexturedShape)
+
+#endif

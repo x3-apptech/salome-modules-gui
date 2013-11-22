@@ -25,12 +25,15 @@
 #include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
+#include "OCCViewer_ClippingDlg.h"
 
 #include "SUIT_ViewWindow.h"
 #include "SUIT_ViewManager.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Session.h"
 #include "SUIT_ResourceMgr.h"
+
+#include "ViewerData_AISShape.hxx"
 
 #include "QtxActionToolMgr.h"
 #include "QtxBackgroundTool.h"
@@ -93,7 +96,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myBackgrounds(4, Qtx::BackgroundData( Qt::black )),
   myIsRelative(true),
   myTopLayerId( 0 ),
-  myTrihedronSize(100)
+  myTrihedronSize(100),
+  myClippingDlg (NULL)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
@@ -1011,4 +1015,75 @@ void OCCViewer_Viewer::setSelectionOptions( bool isPreselectionEnabled, bool isS
 {
   myPreselectionEnabled = isPreselectionEnabled;
   mySelectionEnabled = isSelectionEnabled;
+}
+
+
+/*!
+  Applies clipping planes to clippable objects
+*/
+void OCCViewer_Viewer::setClipPlanes(ClipPlanesList theList)
+{
+  // 1. Remove existing clipping planes
+  myClipPlanes.clear();
+  myInternalClipPlanes.Clear();
+
+  // 2. Create new clipping planes
+  ClipPlanesList::iterator inIt = theList.begin();
+  for (;inIt != theList.end(); inIt++ ) {
+    OCCViewer_ClipPlane plane;
+    plane = (*inIt);
+    myClipPlanes.push_back(plane);
+    gp_Pln aPln (gp_Pnt (plane.X, plane.Y, plane.Z),
+		 gp_Dir (plane.Dx, plane.Dy, plane.Dz));
+    Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane();
+    aGraphic3dPlane->SetEquation (aPln);   
+    aGraphic3dPlane->SetOn(plane.IsOn);
+    myInternalClipPlanes.Add(aGraphic3dPlane);
+  }
+
+  // 3. Apply clipping planes
+  AIS_ListOfInteractive aList;
+  myAISContext->DisplayedObjects (aList);
+  for ( AIS_ListIteratorOfListOfInteractive anIter (aList); anIter.More(); anIter.Next() ) {
+    Handle(AIS_InteractiveObject) anObj = anIter.Value();
+    Handle(ViewerData_AISShape) aShape = Handle(ViewerData_AISShape)::DownCast (anObj);
+    if (!aShape.IsNull() && aShape->IsClippable()) {
+      aShape->SetClipPlanes(myInternalClipPlanes);
+    }
+  }
+}
+
+/*!
+  Returns the clipping planes applied to the displayed objects.
+*/
+ClipPlanesList OCCViewer_Viewer::getClipPlanes() const {
+  return myClipPlanes;
+}
+/*!
+  Applies clipping planes to given object objects
+*/
+void OCCViewer_Viewer::applyExistingClipPlanesToObject (const Handle(AIS_InteractiveObject)& theObject)
+{
+  Handle(ViewerData_AISShape) aShape = Handle(ViewerData_AISShape)::DownCast (theObject);
+  if (!aShape.IsNull() && aShape->IsClippable())
+  {
+    aShape->SetClipPlanes (myInternalClipPlanes);
+  }
+}
+
+/*!
+  Returns the pointer to the clipping dialog box.
+*/
+OCCViewer_ClippingDlg* OCCViewer_Viewer::getClippingDlg() const{
+  return myClippingDlg;
+}
+
+
+/*!
+  Stores pointer to the clipping dialog box.
+*/
+void OCCViewer_Viewer::setClippingDlg(OCCViewer_ClippingDlg* theDlg) {
+  if(myClippingDlg != theDlg) {
+    myClippingDlg = theDlg;
+  }
 }

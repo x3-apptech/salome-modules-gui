@@ -43,8 +43,11 @@
 // #ifndef _AIS_Shape_HeaderFile
 // #include <AIS_Shape.hxx>
 // #endif
-#ifndef _AIS_TexturedShape_HeaderFile
-#include <AIS_TexturedShape.hxx>
+//#ifndef _AIS_TexturedShape_HeaderFile
+//#include <AIS_TexturedShape.hxx>
+//#endif
+#ifndef _ViewerData_AISShape_HeaderFile
+#include <ViewerData_AISShape.hxx>
 #endif
 #ifndef _Standard_Boolean_HeaderFile
 #include <Standard_Boolean.hxx>
@@ -55,7 +58,7 @@ class TopoDS_Shape;
 class TColStd_IndexedMapOfInteger;
 
 
-class SALOME_AISShape : public AIS_TexturedShape {
+class SALOME_AISShape : public ViewerData_AISShape {
 
 public:
 

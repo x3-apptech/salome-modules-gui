@@ -37,8 +37,8 @@
 // #ifndef _Handle_AIS_Shape_HeaderFile
 // #include <Handle_AIS_Shape.hxx>
 // #endif
-#ifndef _AIS_TexturedShape_HeaderFile
-#include <AIS_TexturedShape.hxx>
+#ifndef _ViewerData_AISShape_HeaderFile
+#include <ViewerData_AISShape.hxx>
 #endif
 
 class Standard_Transient;
@@ -48,7 +48,7 @@ class Handle_Standard_Type;
   Smart pointer (handle) to AIS_Shape
 */
 // class Handle(AIS_Shape);
-class Handle(AIS_TexturedShape);
+class Handle(ViewerData_AISShape);
 class SALOME_AISShape;
 Standard_EXPORT Handle_Standard_Type& STANDARD_TYPE(SALOME_AISShape);
 
@@ -56,7 +56,7 @@ Standard_EXPORT Handle_Standard_Type& STANDARD_TYPE(SALOME_AISShape);
   \class Handle(SALOME_AISShape)
   Smart pointer (handle) to SALOME_AISShape
 */
-class Handle(SALOME_AISShape) : public Handle(AIS_TexturedShape) {
+class Handle(SALOME_AISShape) : public Handle(ViewerData_AISShape) {
   public:
     inline void* operator new(size_t,void* anAddress) 
       {
@@ -74,12 +74,12 @@ class Handle(SALOME_AISShape) : public Handle(AIS_TexturedShape) {
 //      { 
 //        if (anAddress) Standard::Free((Standard_Address&)anAddress,size); 
 //      }
-    Handle(SALOME_AISShape)():Handle(AIS_TexturedShape)() {} 
-    Handle(SALOME_AISShape)(const Handle(SALOME_AISShape)& aHandle) : Handle(AIS_TexturedShape)(aHandle) 
+    Handle(SALOME_AISShape)():Handle(ViewerData_AISShape)() {} 
+    Handle(SALOME_AISShape)(const Handle(SALOME_AISShape)& aHandle) : Handle(ViewerData_AISShape)(aHandle) 
      {
      }
 
-    Handle(SALOME_AISShape)(const SALOME_AISShape* anItem) : Handle(AIS_TexturedShape)((AIS_TexturedShape *)anItem) 
+    Handle(SALOME_AISShape)(const SALOME_AISShape* anItem) : Handle(ViewerData_AISShape)((ViewerData_AISShape *)anItem) 
      {
      }
 

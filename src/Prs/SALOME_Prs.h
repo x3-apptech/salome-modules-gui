@@ -47,6 +47,9 @@ class Handle_SALOME_InteractiveObject;
 class PRS_EXPORT SALOME_Prs
 {
 public:
+  //! Constructor
+  SALOME_Prs() : myIsClippable (true) {};
+
   //! Destructor
   virtual ~SALOME_Prs() {}
 
@@ -76,6 +79,22 @@ public:
 
   //! Key method for double dispatch of activation of sub-shapes selection
   virtual void LocalSelectionIn( SALOME_View*, const int ) const = 0;
+
+    // checks if shape is clippable
+  inline bool IsClippable() const
+  {
+    return myIsClippable;
+  }
+
+  // makes shape clippable/not clippable
+  inline void SetClippable (bool isClippable)
+  {
+    myIsClippable = isClippable;
+  }
+
+protected:
+
+  bool myIsClippable;
 };
 
 /*!

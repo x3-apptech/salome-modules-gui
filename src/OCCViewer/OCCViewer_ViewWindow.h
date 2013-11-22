@@ -33,7 +33,6 @@ class QtxRectRubberBand;
 class SUIT_Desktop;
 class OCCViewer_ViewPort3d;
 class OCCViewer_ViewSketcher;
-class OCCViewer_ClippingDlg;
 class OCCViewer_AxialScaleDlg;
 class OCCViewer_SetRotationPointDlg;
 class OCCViewer_Viewer;
@@ -210,6 +209,7 @@ public slots:
   virtual void onFrontView();
   virtual void onViewFitAll();
   virtual void onBackView();
+  virtual void onClipping(bool on);
   virtual void onTopView();
   virtual void onBottomView();
   virtual void onLeftView();
@@ -225,7 +225,6 @@ public slots:
   virtual void activateGlobalPanning();
   virtual void onSetRotationPoint( bool on );
   virtual void onCloneView();
-  virtual void onClipping( bool on );
   virtual void onAxialScale();
   virtual void onGraduatedAxes();
   virtual void onAmbientToogle();
@@ -335,9 +334,6 @@ protected:
   double myCurScale;
 
 private:
-  OCCViewer_ClippingDlg* myClippingDlg;
-  QtxAction* myClippingAction;
-
   OCCViewer_AxialScaleDlg* myScalingDlg;
 
   OCCViewer_SetRotationPointDlg* mySetRotationPointDlg;
@@ -354,7 +350,7 @@ private:
 
   Mode2dType my2dMode;
 
-  Handle(V3d_Plane) myReserveClippingPlane;
+  Handle(V3d_Plane) myReserveClipPlane;
 
   viewAspectList myViewAspects;
 };

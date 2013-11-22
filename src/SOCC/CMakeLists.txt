@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/OBJECT
   ${PROJECT_SOURCE_DIR}/src/Prs
   ${PROJECT_SOURCE_DIR}/src/OCCViewer
+  ${PROJECT_SOURCE_DIR}/src/ViewerData
 )
 
 # additional preprocessor / compiler flags

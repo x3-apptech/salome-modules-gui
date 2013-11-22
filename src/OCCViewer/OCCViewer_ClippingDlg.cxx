@@ -28,6 +28,7 @@
 #include "SUIT_Session.h"
 #include "SUIT_ViewWindow.h"
 #include "SUIT_ViewManager.h"
+#include "OCCViewer_ClipPlane.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
 #include "OCCViewer_ViewModel.h"
@@ -59,34 +60,51 @@
 #include <QSlider>
 #include <QMenu>
 
-/*!
-  Constructor of class ClipPlane
- */
-ClipPlane::ClipPlane():
-  RelativeMode(),
-  X(0.0), Y(0.0), Z(0.0),
-  Dx(1.0), Dy(1.0), Dz(1.0),
-  Orientation(0),
-  IsActive( true ),
-  IsInvert( false ),
-  PlaneMode( Absolute )
-{
-}
-
-/*!
-  Constructor of class OrientedPlane
- */
-OrientedPlane::OrientedPlane():
-  Orientation(0),
-  Distance(0.5),
-  Rotation1(0),
-  Rotation2(0)
-{
-}
-
 /**********************************************************************************
  ************************        Internal functions        ************************
  *********************************************************************************/
+
+void getMinMaxFromContext( Handle(AIS_InteractiveContext) ic,
+			   double  theDefaultSize,
+			   double& theXMin,
+			   double& theYMin,
+			   double& theZMin,
+			   double& theXMax,
+			   double& theYMax,
+			   double& theZMax) {
+
+  double aXMin, aYMin, aZMin, aXMax, aYMax, aZMax;
+  aXMin = aYMin = aZMin = DBL_MAX;
+  aXMax = aYMax = aZMax = -DBL_MAX;
+  
+  bool isFound = false;
+  AIS_ListOfInteractive aList;
+  ic->DisplayedObjects( aList );
+  for ( AIS_ListIteratorOfListOfInteractive it( aList ); it.More(); it.Next() ) {
+    Handle(AIS_InteractiveObject) anObj = it.Value();
+    if ( !anObj.IsNull() && anObj->HasPresentation() &&
+         !anObj->IsKind( STANDARD_TYPE(AIS_Plane) ) ) {
+      Handle(Prs3d_Presentation) aPrs = anObj->Presentation();
+      if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() ) {
+        isFound = true;
+        double xmin, ymin, zmin, xmax, ymax, zmax;
+        aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
+        aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
+        aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
+        aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
+      }
+    }
+  }
+
+  if(!isFound) {
+    if(theDefaultSize == 0.0)
+      theDefaultSize = 100.;
+    aXMin = aYMin = aZMin = -theDefaultSize;
+    aXMax = aYMax = aZMax = theDefaultSize;
+  }
+  theXMin = aXMin;theYMin = aYMin;theZMin = aZMin;
+  theXMax = aXMax;theYMax = aYMax;theZMax = aZMax;
+}
 
 /*!
   Compute the point of bounding box and current clipping plane
@@ -156,24 +174,12 @@ void DistanceToPosition( double theBounds[6],
  */
 bool ComputeClippingPlaneParameters( double theNormal[3],
                                      double theDist,
-                                     double theBounds[6],
                                      double theOrigin[3],
-                                     Handle(V3d_View) theView3d )
+                                     Handle(AIS_InteractiveContext) ic,
+				     double theDefaultSize)
 {
-  bool anIsOk = false;
-  theBounds[0] = theBounds[2] = theBounds[4] = 999.99;
-  theBounds[1] = theBounds[3] = theBounds[5] = -999.99;
   double aBounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-
-  theView3d->View()->MinMaxValues( aBounds[0], aBounds[2], aBounds[4], aBounds[1], aBounds[3], aBounds[5]);
-  if ( !theView3d->View()->ContainsFacet() ) {
-    aBounds[0] = aBounds[2] = aBounds[4] = 0.0;
-    aBounds[1] = aBounds[3] = aBounds[5] = 100.0;
-  }
-  anIsOk = true;
-
-  if( !anIsOk )
-    return false;
+  getMinMaxFromContext(ic,theDefaultSize,aBounds[0], aBounds[2], aBounds[4], aBounds[1], aBounds[3], aBounds[5]);
 
   DistanceToPosition( aBounds, theNormal, theDist, theOrigin );
   return true;
@@ -192,19 +198,19 @@ void Cross(const double first[3], const double second[3], double result[3])
 /*!
   Compute relative clipping plane in absolute coordinates
  */
-void RelativePlaneToAbsolute ( ClipPlane* thePlane, Handle(V3d_View) theView3d )
+void RelativePlaneToAbsolute (OCCViewer_ClipPlane& thePlane, Handle(AIS_InteractiveContext) ic, double theDefaultSize )
 {
   double aNormal[3];
   double aDir[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } };
   {
     static double aCoeff = M_PI/180.0;
 
-    double anU[2] = { cos( aCoeff * thePlane->RelativeMode.Rotation1 ), cos( aCoeff * thePlane->RelativeMode.Rotation2 ) };
+    double anU[2] = { cos( aCoeff * thePlane.RelativeMode.Rotation1 ), cos( aCoeff * thePlane.RelativeMode.Rotation2 ) };
     double aV[2] = { sqrt( 1.0 - anU[0]*anU[0] ), sqrt( 1.0 - anU[1] * anU[1] ) };
-    aV[0] = thePlane->RelativeMode.Rotation1 > 0? aV[0]: -aV[0];
-    aV[1] = thePlane->RelativeMode.Rotation2 > 0? aV[1]: -aV[1];
+    aV[0] = thePlane.RelativeMode.Rotation1 > 0? aV[0]: -aV[0];
+    aV[1] = thePlane.RelativeMode.Rotation2 > 0? aV[1]: -aV[1];
 
-    switch ( thePlane->RelativeMode.Orientation ) {
+    switch ( thePlane.RelativeMode.Orientation ) {
     case 0:
       aDir[0][1] = anU[0];
       aDir[0][2] = aV[0];
@@ -237,31 +243,61 @@ void RelativePlaneToAbsolute ( ClipPlane* thePlane, Handle(V3d_View) theView3d )
     Cross( aNormal, aDir[1], aDir[0] );
   }
 
-  double aBounds[6];
   double anOrigin[3];
 
-  bool anIsOk = false;
-
   anOrigin[0] = anOrigin[1] = anOrigin[2] = 0;
-  aBounds[0] = aBounds[2] = aBounds[4] = 0;
-  aBounds[1] = aBounds[3] = aBounds[5] = 0;
-  anIsOk = true;
+  bool anIsOk = true;
 
   anIsOk = ComputeClippingPlaneParameters( aNormal,
-                                           thePlane->RelativeMode.Distance,
-                                           aBounds,
+                                           thePlane.RelativeMode.Distance,
                                            anOrigin,
-                                           theView3d );
+                                           ic,
+					   theDefaultSize );
   if( !anIsOk )
 	  return;
-
-  thePlane->Dx = aNormal[0];
-  thePlane->Dy = aNormal[1];
-  thePlane->Dz = aNormal[2];
-  thePlane->X = anOrigin[0];
-  thePlane->Y = anOrigin[1];
-  thePlane->Z = anOrigin[2];
+  thePlane.X = anOrigin[0];
+  thePlane.Y = anOrigin[1];
+  thePlane.Z = anOrigin[2];
+  thePlane.Dx = aNormal[0];
+  thePlane.Dy = aNormal[1];
+  thePlane.Dz = aNormal[2];
 }
+
+/*!
+  Compute clipping plane size base point and normal
+ */
+
+void clipPlaneParams(OCCViewer_ClipPlane& theClipPlane, Handle(AIS_InteractiveContext) theContext,
+                     double& theSize, gp_Pnt& theBasePnt, gp_Dir& theNormal, double defaultSize) {
+  double aXMin, aYMin, aZMin, aXMax, aYMax, aZMax;
+  aXMin = aYMin = aZMin = DBL_MAX;
+  aXMax = aYMax = aZMax = -DBL_MAX;
+  
+  getMinMaxFromContext(theContext,defaultSize,aXMin, aYMin, aZMin, aXMax, aYMax, aZMax);
+  double aSize = 50;
+
+
+  gp_Pnt aBasePnt(theClipPlane.X ,  theClipPlane.Y ,  theClipPlane.Z);
+  gp_Dir aNormal(theClipPlane.Dx, theClipPlane.Dy, theClipPlane.Dz );
+
+  // compute clipping plane size
+  gp_Pnt aCenter = gp_Pnt( ( aXMin + aXMax ) / 2, ( aYMin + aYMax ) / 2, ( aZMin + aZMax ) / 2 );
+  double aDiag = aCenter.Distance( gp_Pnt( aXMax, aYMax, aZMax ) )*2;
+  aSize = aDiag * 1.1;
+  
+  // compute clipping plane center ( redefine the base point )
+  IntAna_IntConicQuad intersector = IntAna_IntConicQuad();
+  
+  intersector.Perform( gp_Lin( aCenter, aNormal), gp_Pln( aBasePnt, aNormal), Precision::Confusion() );
+
+  if ( intersector.IsDone() && intersector.NbPoints() == 1 )
+    aBasePnt = intersector.Point( 1 );
+  
+  theSize = aSize;
+  theBasePnt = aBasePnt;
+  theNormal = aNormal;
+}
+
 
 /*********************************************************************************
  *********************      class OCCViewer_ClippingDlg      *********************
@@ -270,18 +306,17 @@ void RelativePlaneToAbsolute ( ClipPlane* thePlane, Handle(V3d_View) theView3d )
   Constructor
   \param view - view window
   \param parent - parent widget
-  \param name - dialog name
-  \param modal - is this dialog modal
-  \param fl - flags
 */
-OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const char* name, bool modal, Qt::WindowFlags fl )
-: QDialog( view, Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
-  myView( view )
+OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCViewer_Viewer* model)
+  : QDialog( parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
+    myCurrentClipPlaneMode (Absolute)
 {
   setObjectName( "OCCViewer_ClippingDlg" );
-  setModal( modal );
+  setModal( false );
 
   setWindowTitle( tr( "Clipping" ) );
+
+  setAttribute (Qt::WA_DeleteOnClose, true);
   
   QVBoxLayout* topLayout = new QVBoxLayout( this );
   topLayout->setMargin( 11 ); topLayout->setSpacing( 6 );
@@ -299,7 +334,6 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
   MenuMode->addAction( tr( "ABSOLUTE" ), this, SLOT( onModeAbsolute() ) );
   MenuMode->addAction( tr( "RELATIVE" ), this, SLOT( onModeRelative() ) );
   buttonNew->setMenu( MenuMode );
-  CurrentMode = Absolute;
 
   GroupPlanesLayout->addWidget( ComboBoxPlanes );
   GroupPlanesLayout->addWidget( isActivePlane );
@@ -603,14 +637,15 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
   connect( buttonOk, SIGNAL( clicked() ), this, SLOT( ClickOnOk() ) );
   connect( buttonApply, SIGNAL( clicked() ), this, SLOT( ClickOnApply() ) );
   connect( buttonHelp, SIGNAL( clicked() ), this, SLOT( ClickOnHelp() ) );
-  
-  connect(view, SIGNAL(Show( QShowEvent* ) ), this, SLOT( onViewShow() ) );
-  connect(view, SIGNAL(Hide( QHideEvent* ) ), this, SLOT( onViewHide() ) );
 
   myBusy = false;
   myIsSelectPlane = false;
-  myView3d = myView->getViewPort()->getView();
+  myIsPlaneCreation = false;
+  myModel = model;
 
+  myModel->getViewer3d()->InitActiveViews();
+
+  myLocalPlanes = myModel->getClipPlanes();
   synchronize();
 }
 
@@ -618,11 +653,9 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg( OCCViewer_ViewWindow* view, const 
   Destructor
   Destroys the object and frees any allocated resources
 */
-OCCViewer_ClippingDlg::~ OCCViewer_ClippingDlg()
+OCCViewer_ClippingDlg::~OCCViewer_ClippingDlg()
 {
-  // no need to delete child widgets, Qt does it all for us
-  foreach( ClipPlane* aPlane, myClippingPlanes )
-    delete aPlane;
+  myLocalPlanes.clear();
 }
 
 /*!
@@ -631,8 +664,10 @@ OCCViewer_ClippingDlg::~ OCCViewer_ClippingDlg()
 void OCCViewer_ClippingDlg::closeEvent( QCloseEvent* e )
 {
   erasePreview();
-  myAction->setChecked( false );
   QDialog::closeEvent( e );
+  OCCViewer_ViewWindow* v = qobject_cast<OCCViewer_ViewWindow*>(parent());
+  if(v)
+    v->onClipping(false);
 }
 
 /*!
@@ -651,6 +686,10 @@ void OCCViewer_ClippingDlg::hideEvent( QHideEvent* e )
 {
   erasePreview();
   QDialog::hideEvent( e );
+  OCCViewer_ViewWindow* v = qobject_cast<OCCViewer_ViewWindow*>(parent());
+  if(v)
+    v->onClipping(false);
+
 }
 
 /*!
@@ -668,7 +707,7 @@ void OCCViewer_ClippingDlg::initParam()
 
   CBAbsoluteOrientation->setCurrentIndex(0);
 
-  TLValueDistance->setText( "0" );
+  TLValueDistance->setText( "0.5" );
   TLValueRotation1->setText( "0\xB0" );
   TLValueRotation2->setText( "0\xB0" );
   CBRelativeOrientation->setCurrentIndex( 0 );
@@ -683,7 +722,7 @@ void OCCViewer_ClippingDlg::initParam()
 void OCCViewer_ClippingDlg::synchronize()
 {
   ComboBoxPlanes->clear();
-  int aNbPlanesAbsolute = myClippingPlanes.size();
+  int aNbPlanesAbsolute = myLocalPlanes.size();
 
   QString aName;
   for(int i = 1; i<=aNbPlanesAbsolute; i++ ) {
@@ -701,9 +740,8 @@ void OCCViewer_ClippingDlg::synchronize()
   else {
     ComboBoxPlanes->addItem( tr( "NO_PLANES" ) );
     initParam();
-    ClickOnDisableAll();
   }
-  if ( CurrentMode == Absolute ) {
+  if ( myCurrentClipPlaneMode == Absolute ) {
     SpinBox_X->setEnabled( anIsControlsEnable );
     SpinBox_Y->setEnabled( anIsControlsEnable );
     SpinBox_Z->setEnabled( anIsControlsEnable );
@@ -714,7 +752,7 @@ void OCCViewer_ClippingDlg::synchronize()
     invertButton->setEnabled( anIsControlsEnable );
     resetButton->setEnabled( anIsControlsEnable );
   }
-  else if( CurrentMode == Relative ) {
+  else if( myCurrentClipPlaneMode == Relative ) {
     CBRelativeOrientation->setEnabled( anIsControlsEnable );
     SliderDistance->setEnabled( anIsControlsEnable );
     SliderRotation1->setEnabled( anIsControlsEnable );
@@ -729,85 +767,92 @@ void OCCViewer_ClippingDlg::synchronize()
 */
 void OCCViewer_ClippingDlg::displayPreview()
 {
-  if ( myBusy || !isValid() )
+  if ( myBusy || !isValid() || !myModel)
     return;
 
-  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
-  if ( !anOCCViewer )
-    return;
+  Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+  
+  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
 
-  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
-
-  double aXMin, aYMin, aZMin, aXMax, aYMax, aZMax;
-  aXMin = aYMin = aZMin = DBL_MAX;
-  aXMax = aYMax = aZMax = -DBL_MAX;
-
-  bool isFound = false;
-  AIS_ListOfInteractive aList;
-  ic->DisplayedObjects( aList );
-  for ( AIS_ListIteratorOfListOfInteractive it( aList ); it.More(); it.Next() )
-  {
-    Handle(AIS_InteractiveObject) anObj = it.Value();
-    if ( !anObj.IsNull() && anObj->HasPresentation() &&
-         !anObj->IsKind( STANDARD_TYPE(AIS_Plane) ) ) {
-      Handle(Prs3d_Presentation) aPrs = anObj->Presentation();
-      if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() ) {
-        isFound = true;
-        double xmin, ymin, zmin, xmax, ymax, zmax;
-        aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
-        aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
-        aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
-        aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
-      }
-    }
-  }
-
-  double aSize = 50;
-
-  ClipPlane* aClipPlane;
-  for ( int i=0; i < myClippingPlanes.size(); i++ ) {
-  Pnt_ClipPlane aPlane = myClippingPlanes[i];
-  aClipPlane = aPlane;
-
-  double Epsilon = 0.0001;
-  double Epsilon_Dx = ( aClipPlane->Dx > 0 ) ? Epsilon: -Epsilon;
-  double Epsilon_Dy = ( aClipPlane->Dy > 0 ) ? Epsilon: -Epsilon;
-  double Epsilon_Dz = ( aClipPlane->Dz > 0 ) ? Epsilon: -Epsilon;
-
-  gp_Pnt aBasePnt( aClipPlane->X + Epsilon_Dx,  aClipPlane->Y + Epsilon_Dy,  aClipPlane->Z + Epsilon_Dz );
-  gp_Dir aNormal( aClipPlane->Dx, aClipPlane->Dy, aClipPlane->Dz );
-  gp_Pnt aCenter = aBasePnt;
-
-  if ( isFound )
-  {
-    // compute clipping plane size
-    aCenter = gp_Pnt( ( aXMin + aXMax ) / 2, ( aYMin + aYMax ) / 2, ( aZMin + aZMax ) / 2 );
-    double aDiag = aCenter.Distance( gp_Pnt( aXMax, aYMax, aZMax ) )*2;
-    aSize = aDiag * 1.1;
-
-    // compute clipping plane center ( redefine the base point )
-    IntAna_IntConicQuad intersector = IntAna_IntConicQuad();
-
-    intersector.Perform( gp_Lin( aCenter, aNormal), gp_Pln( aBasePnt, aNormal), Precision::Confusion() );
-    if ( intersector.IsDone() && intersector.NbPoints() == 1 )
-      aBasePnt = intersector.Point( 1 );
-    }
-
-    if ( aClipPlane->IsActive == true ) {
+  for ( int i=0; i < clipPlanesCount(); i++ ) {
+  OCCViewer_ClipPlane& aClipPlane = getClipPlane(i);
+    if ( aClipPlane.IsOn ) {
       Handle(AIS_Plane) myPreviewPlane;
+      double aSize;
+      gp_Pnt aBasePnt;
+      gp_Dir aNormal;
+      clipPlaneParams(aClipPlane, ic, aSize, aBasePnt, aNormal, myModel->trihedronSize());
       myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ) );
       myPreviewPlane->SetSize( aSize, aSize );
-
       ic->Display( myPreviewPlane, 1, -1, false );
       ic->SetWidth( myPreviewPlane, 10, false );
       ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
       ic->SetTransparency( myPreviewPlane, 0.5, false );
-      ic->SetColor( myPreviewPlane, Quantity_Color( 85 / 255., 85 / 255., 255 / 255., Quantity_TOC_RGB ), false );
-
+      Quantity_Color c = (aCurPlaneIndex == i) ? Quantity_Color( 255. / 255., 70. / 255., 0. / 255., Quantity_TOC_RGB ) : Quantity_Color( 85 / 255., 85 / 255., 255 / 255., Quantity_TOC_RGB );
+      ic->SetColor( myPreviewPlane, c , false );
       myPreviewPlaneVector.push_back( myPreviewPlane );
     }
   }
-  anOCCViewer->update();
+  myModel->update();
+}
+
+void OCCViewer_ClippingDlg::updatePreview() {
+  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+  int count = clipPlanesCount();
+  if ( myBusy || 
+       !isValid() || 
+       myIsPlaneCreation ||
+       !myModel || 
+       count == 0 || 
+       (aCurPlaneIndex +1 > count) ||
+       !PreviewCheckBox->isChecked())
+    return;
+  
+  Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+  
+  OCCViewer_ClipPlane& aClipPlane = getClipPlane(aCurPlaneIndex);
+  Handle(AIS_Plane) myPreviewPlane;
+
+  if (aClipPlane.IsOn) {
+    double aSize;
+    gp_Pnt aBasePnt;
+    gp_Dir aNormal;
+    clipPlaneParams(aClipPlane, ic, aSize, aBasePnt, aNormal, myModel->trihedronSize());
+    if(myPreviewPlaneVector.size() < clipPlanesCount()) {
+      myPreviewPlaneVector.resize(clipPlanesCount());
+    }
+    myPreviewPlane = myPreviewPlaneVector[aCurPlaneIndex];
+    if(myPreviewPlane.IsNull()) {
+      //Plane was not created 
+      myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ) );
+      myPreviewPlane->SetSize( aSize, aSize );
+      ic->Display( myPreviewPlane, 1, -1, false );
+      ic->SetWidth( myPreviewPlane, 10, false );
+      ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
+      ic->SetTransparency( myPreviewPlane, 0.5, false );
+      myPreviewPlaneVector[aCurPlaneIndex] = myPreviewPlane;
+    } else {      
+      myPreviewPlane->SetComponent(new Geom_Plane( aBasePnt, aNormal ));
+      myPreviewPlane->SetSize( aSize, aSize );	
+    }
+
+    ic->SetColor( myPreviewPlane, Quantity_Color( 255. / 255., 70. / 255., 0. / 255., Quantity_TOC_RGB ), false );
+  } else {
+    if(myPreviewPlaneVector.size() > aCurPlaneIndex ) {
+      myPreviewPlane = myPreviewPlaneVector[aCurPlaneIndex];
+      if(ic->IsDisplayed(myPreviewPlane)) {
+	ic->Erase( myPreviewPlane, false );
+	ic->Remove( myPreviewPlane, false );
+      }
+      myPreviewPlaneVector[aCurPlaneIndex].Nullify();
+    }
+  }
+  for(int i = 0; i < myPreviewPlaneVector.size(); i++) {
+    if( i == aCurPlaneIndex ) continue;
+    if(!myPreviewPlaneVector[i].IsNull())
+      ic->SetColor( myPreviewPlaneVector[i], Quantity_Color( 85 / 255., 85 / 255., 255 / 255., Quantity_TOC_RGB ), false );  
+  }
+  myModel->update();
 }
 
 /*!
@@ -815,12 +860,11 @@ void OCCViewer_ClippingDlg::displayPreview()
 */
 void OCCViewer_ClippingDlg::erasePreview()
 {
-  OCCViewer_Viewer* anOCCViewer = (OCCViewer_Viewer*)myView->getViewManager()->getViewModel();
-  if ( !anOCCViewer )
+  if ( !myModel )
     return;
-  
-  Handle(AIS_InteractiveContext) ic = anOCCViewer->getAISContext();
-  
+
+  Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+
   for ( int i=0; i < myPreviewPlaneVector.size(); i++ ) {
   Handle(AIS_Plane) myPreviewPlane = myPreviewPlaneVector[i];
     if ( !myPreviewPlane.IsNull() && ic->IsDisplayed( myPreviewPlane ) ) {
@@ -829,7 +873,8 @@ void OCCViewer_ClippingDlg::erasePreview()
       myPreviewPlane.Nullify();
     }
   }
-  anOCCViewer->update();
+  myPreviewPlaneVector.clear();
+  myModel->update();
 }
 
 /*!
@@ -843,14 +888,18 @@ bool OCCViewer_ClippingDlg::isValid()
 /*!
   Update view after changes
 */
-void OCCViewer_ClippingDlg::updateView()
+void OCCViewer_ClippingDlg::updateClipping()
 {
-  if ( PreviewCheckBox->isChecked() || AutoApplyCheckBox->isChecked() ) {
-    erasePreview();
-    if ( AutoApplyCheckBox->isChecked() )
+  if (PreviewCheckBox->isChecked() || AutoApplyCheckBox->isChecked())
+  {
+    if (AutoApplyCheckBox->isChecked()) {
       onApply();
-    if ( PreviewCheckBox->isChecked() && !isRestore )
-      displayPreview();
+    }
+    
+    if (!PreviewCheckBox->isChecked())
+      myModel->update();
+    else 
+      updatePreview();
   }
 }
 
@@ -859,9 +908,10 @@ void OCCViewer_ClippingDlg::updateView()
 */
 void OCCViewer_ClippingDlg::ClickOnNew()
 {
-  ClipPlane* aPlane = new ClipPlane();
-  aPlane->PlaneMode = CurrentMode;
-  myClippingPlanes.push_back( aPlane );
+
+  OCCViewer_ClipPlane aPlane;
+  aPlane.PlaneMode = (ClipPlaneMode )myCurrentClipPlaneMode;
+  myLocalPlanes.push_back(aPlane);
   synchronize();
 }
 
@@ -870,15 +920,27 @@ void OCCViewer_ClippingDlg::ClickOnNew()
 */
 void OCCViewer_ClippingDlg::ClickOnDelete()
 {
-  if ( myClippingPlanes.empty() )
+  int aPlaneIndex = ComboBoxPlanes->currentIndex();
+  if ( (clipPlanesCount() == 0) || (aPlaneIndex+1 > clipPlanesCount()))
     return;
 
-  int aPlaneIndex = ComboBoxPlanes->currentIndex();
+  myLocalPlanes.erase(myLocalPlanes.begin() + aPlaneIndex);
 
-  ClipPlaneVector::iterator anIter = myClippingPlanes.begin() + aPlaneIndex;
-  myClippingPlanes.erase( anIter );
-  updateView();
+  Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+
+  if(aPlaneIndex+1 <= myPreviewPlaneVector.size()) {
+    Handle(AIS_Plane) myPreviewPlane = myPreviewPlaneVector[aPlaneIndex];
+    if ( !myPreviewPlane.IsNull() && ic->IsDisplayed( myPreviewPlane ) ) {
+      ic->Erase( myPreviewPlane, false );
+      ic->Remove( myPreviewPlane, false );
+    }
+    myPreviewPlaneVector.erase(myPreviewPlaneVector.begin() + aPlaneIndex);
+  }
   synchronize();
+  if (AutoApplyCheckBox->isChecked()) {
+    onApply();
+  }
+  myModel->update();
 }
 
 /*!
@@ -887,15 +949,17 @@ void OCCViewer_ClippingDlg::ClickOnDelete()
 */
 void OCCViewer_ClippingDlg::ClickOnDisableAll()
 {
-  AutoApplyCheckBox->setChecked( false );
-  Graphic3d_SetOfHClipPlane aPlanes = myView3d->GetClipPlanes();
-  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
-  for( ;anIter.More();anIter.Next() ){
-    Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
-    aClipPlane->SetOn(Standard_False);
+  AutoApplyCheckBox->setChecked (false);
+  int aClipPlanesCount = clipPlanesCount();
+  for ( int anIndex = 0; anIndex < aClipPlanesCount; anIndex++)
+  {
+    OCCViewer_ClipPlane& aPlane = getClipPlane(anIndex);
+    aPlane.IsOn = false;
   }
-  myView3d->Update();
-  myView3d->Redraw();
+  erasePreview();
+  isActivePlane->setChecked(false);
+  myModel->setClipPlanes(myLocalPlanes);
+  myModel->update();
 }
 
 /*!
@@ -904,8 +968,7 @@ void OCCViewer_ClippingDlg::ClickOnDisableAll()
 void OCCViewer_ClippingDlg::ClickOnOk()
 {
   onApply();
-  erasePreview();
-  myAction->setChecked( false );
+  ClickOnClose();
 }
 
 /*!
@@ -914,8 +977,7 @@ void OCCViewer_ClippingDlg::ClickOnOk()
 void OCCViewer_ClippingDlg::ClickOnApply()
 {
   onApply();
-  myView3d->Update();
-  myView3d->Redraw();
+  myModel->update();
 }
 
 /*!
@@ -924,7 +986,9 @@ void OCCViewer_ClippingDlg::ClickOnApply()
 void OCCViewer_ClippingDlg::ClickOnClose()
 {
   erasePreview();
-  myAction->setChecked( false );
+  OCCViewer_ViewWindow* v = qobject_cast<OCCViewer_ViewWindow*>(parent());
+  if(v)
+    v->onClipping(false);
 }
 
 /*!
@@ -942,10 +1006,12 @@ void OCCViewer_ClippingDlg::ClickOnHelp()
 */
 void OCCViewer_ClippingDlg::onModeAbsolute()
 {
+  myIsPlaneCreation = true;
   ModeStackedLayout->setCurrentIndex(0);
-  CurrentMode = Absolute;
+  myCurrentClipPlaneMode = Absolute;
   ClickOnNew();
-  onValueChanged();
+  myIsPlaneCreation = false;
+  updateClipping();
 }
 
 /*!
@@ -953,10 +1019,13 @@ void OCCViewer_ClippingDlg::onModeAbsolute()
 */
 void OCCViewer_ClippingDlg::onModeRelative()
 {
+  myIsPlaneCreation = true;
   ModeStackedLayout->setCurrentIndex(1);
-  CurrentMode = Relative;
+  myCurrentClipPlaneMode = Relative;
   ClickOnNew();
-  onValueChanged();
+  myIsPlaneCreation = false;
+  SetCurrentPlaneParam();
+  updateClipping();
 }
 
 /*!
@@ -967,7 +1036,7 @@ void OCCViewer_ClippingDlg::onValueChanged()
   SetCurrentPlaneParam();
   if ( myIsSelectPlane )
     return;
-  updateView();
+  updateClipping();
 }
 
 /*!
@@ -975,44 +1044,43 @@ void OCCViewer_ClippingDlg::onValueChanged()
 */
 void OCCViewer_ClippingDlg::onSelectPlane ( int theIndex )
 {
-  if ( myClippingPlanes.empty() )
+  if ( clipPlanesCount() == 0 )
     return;
 
-  Pnt_ClipPlane aPlane = myClippingPlanes[theIndex];
-  ClipPlane* aClipPlane = aPlane;
+  OCCViewer_ClipPlane& aClipPlane = getClipPlane (theIndex);
 
   myIsSelectPlane = true;
-  if ( aClipPlane->PlaneMode == Absolute ) {
+  if ( aClipPlane.PlaneMode == Absolute ) {
     ModeStackedLayout->setCurrentIndex( 0 );
-    CurrentMode = Absolute;
-    int anOrientation = aClipPlane->Orientation;
+    myCurrentClipPlaneMode = Absolute;
+    int anOrientation = aClipPlane.Orientation;
     // Set plane parameters in the dialog
-    SpinBox_X->setValue( aClipPlane->X );
-    SpinBox_Y->setValue( aClipPlane->Y );
-    SpinBox_Z->setValue( aClipPlane->Z );
-    SpinBox_Dx->setValue( aClipPlane->Dx );
-    SpinBox_Dy->setValue( aClipPlane->Dy );
-    SpinBox_Dz->setValue( aClipPlane->Dz );
+    SpinBox_X->setValue( aClipPlane.X );
+    SpinBox_Y->setValue( aClipPlane.Y );
+    SpinBox_Z->setValue( aClipPlane.Z );
+    SpinBox_Dx->setValue( aClipPlane.Dx );
+    SpinBox_Dy->setValue( aClipPlane.Dy );
+    SpinBox_Dz->setValue( aClipPlane.Dz );
     CBAbsoluteOrientation->setCurrentIndex( anOrientation );
     onOrientationAbsoluteChanged( anOrientation );
   }
-  else if( aClipPlane->PlaneMode == Relative ) {
+  else if( aClipPlane.PlaneMode == Relative ) {
     ModeStackedLayout->setCurrentIndex( 1 );
-    CurrentMode = Relative;
-    int anOrientation = aClipPlane->RelativeMode.Orientation;
+    myCurrentClipPlaneMode = Relative;
+    int anOrientation = aClipPlane.RelativeMode.Orientation;
     // Set plane parameters in the dialog
-    SliderDistance->setValue( aClipPlane->RelativeMode.Distance*100 );
-    TLValueDistance->setText( QString::number(aClipPlane->RelativeMode.Distance ) );
-    SliderRotation1->setValue( aClipPlane->RelativeMode.Rotation1 );
-    TLValueRotation1->setText( QString( "%1\xB0" ).arg( aClipPlane->RelativeMode.Rotation1 ) );
-    SliderRotation2->setValue( aClipPlane->RelativeMode.Rotation2 );
-    TLValueRotation2->setText( QString( "%1\xB0" ).arg( aClipPlane->RelativeMode.Rotation2 ) );
+    SliderDistance->setValue( aClipPlane.RelativeMode.Distance*100 );
+    TLValueDistance->setText( QString::number(aClipPlane.RelativeMode.Distance ) );
+    SliderRotation1->setValue( aClipPlane.RelativeMode.Rotation1 );
+    TLValueRotation1->setText( QString( "%1\xB0" ).arg( aClipPlane.RelativeMode.Rotation1 ) );
+    SliderRotation2->setValue( aClipPlane.RelativeMode.Rotation2 );
+    TLValueRotation2->setText( QString( "%1\xB0" ).arg( aClipPlane.RelativeMode.Rotation2 ) );
     CBRelativeOrientation->setCurrentIndex( anOrientation );
     onOrientationRelativeChanged( anOrientation );
   }
-  isActivePlane->setChecked( aClipPlane->IsActive );
+  
+  isActivePlane->setChecked( aClipPlane.IsOn );
   ComboBoxPlanes->setCurrentIndex( theIndex );
-
   myIsSelectPlane = false;
 }
 
@@ -1021,32 +1089,30 @@ void OCCViewer_ClippingDlg::onSelectPlane ( int theIndex )
 */
 void OCCViewer_ClippingDlg::SetCurrentPlaneParam()
 {
-  if ( myClippingPlanes.empty() || myIsSelectPlane )
+  if ( clipPlanesCount() == 0 || myIsSelectPlane )
     return;
 
   int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
 
-  Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
-  ClipPlane* aPlaneData = aPlane;
+ OCCViewer_ClipPlane& aPlane = getClipPlane (aCurPlaneIndex);
 
-  if ( aPlaneData->PlaneMode == Absolute ) {
-    aPlaneData->Orientation = CBAbsoluteOrientation->currentIndex();
-    aPlaneData->X = SpinBox_X->value();
-    aPlaneData->Y = SpinBox_Y->value();
-    aPlaneData->Z = SpinBox_Z->value();
-    aPlaneData->Dx = SpinBox_Dx->value();
-    aPlaneData->Dy = SpinBox_Dy->value();
-    aPlaneData->Dz = SpinBox_Dz->value();
+  if ( aPlane.PlaneMode == Absolute ) {
+    aPlane.Orientation = CBAbsoluteOrientation->currentIndex();
+    aPlane.X = SpinBox_X->value();
+    aPlane.Y = SpinBox_Y->value();
+    aPlane.Z = SpinBox_Z->value();
+    aPlane.Dx = SpinBox_Dx->value();
+    aPlane.Dy = SpinBox_Dy->value();
+    aPlane.Dz = SpinBox_Dz->value();
   }
-  else if( aPlaneData->PlaneMode == Relative ) {
-    aPlaneData->RelativeMode.Orientation = CBRelativeOrientation->currentIndex();
-    aPlaneData->RelativeMode.Distance = TLValueDistance->text().toDouble();
-    aPlaneData->RelativeMode.Rotation1 = TLValueRotation1->text().remove("\xB0").toInt();
-    aPlaneData->RelativeMode.Rotation2 = TLValueRotation2->text().remove("\xB0").toInt();
-    erasePreview();
-    RelativePlaneToAbsolute( aPlane, myView3d );
+  else if( aPlane.PlaneMode == Relative ) {
+    aPlane.RelativeMode.Orientation = CBRelativeOrientation->currentIndex();
+    aPlane.RelativeMode.Distance = TLValueDistance->text().toDouble();
+    aPlane.RelativeMode.Rotation1 = TLValueRotation1->text().remove("\xB0").toInt();
+    aPlane.RelativeMode.Rotation2 = TLValueRotation2->text().remove("\xB0").toInt();
+    RelativePlaneToAbsolute (aPlane, myModel->getAISContext(),myModel->trihedronSize() );
   }
-  aPlaneData->IsActive = isActivePlane->isChecked();
+  aPlane.IsOn  = isActivePlane->isChecked();
 }
 
 /*!
@@ -1060,7 +1126,7 @@ void OCCViewer_ClippingDlg::onReset()
   SpinBox_Z->setValue(0);
   myBusy = false;
 
-  updateView();
+  updateClipping();
 }
 
 /*!
@@ -1078,13 +1144,12 @@ void OCCViewer_ClippingDlg::onInvert()
   SpinBox_Dz->setValue( -Dz );
   myBusy = false;
 
-  if ( !myClippingPlanes.empty() ) {
+  if ( clipPlanesCount() != 0 ) {
     int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
-    Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
-    ClipPlane* aPlaneData = aPlane;
-    aPlaneData->IsInvert = !aPlaneData->IsInvert;
+    OCCViewer_ClipPlane& aPlane = getClipPlane (aCurPlaneIndex);
+    aPlane.IsInvert = !aPlane.IsInvert;
   }
-  updateView();
+  updateClipping();
 }
 
 /*!
@@ -1110,48 +1175,46 @@ void OCCViewer_ClippingDlg::onOrientationAbsoluteChanged( int mode )
   SpinBox_Dy->setEnabled( isUserMode );
   SpinBox_Dz->setEnabled( isUserMode );
 
-  if ( isUserMode )
-    return;
+  if ( !isUserMode ) {
 
-  double aDx = 0, aDy = 0, aDz = 0;
+    double aDx = 0, aDy = 0, aDz = 0;
 
-  if ( mode == 1 )
-  {
-    aDz = 1;
-    TextLabelZ->setEnabled( true );
-    SpinBox_Z->setEnabled( true );
-    SpinBox_Z->setFocus();
+    if ( mode == 1 )
+      {
+	aDz = 1;
+	TextLabelZ->setEnabled( true );
+	SpinBox_Z->setEnabled( true );
+	SpinBox_Z->setFocus();
+      }
+    else if ( mode == 2 )
+      {
+	aDx = 1;
+	TextLabelX->setEnabled( true );
+	SpinBox_X->setEnabled( true );
+	SpinBox_X->setFocus();
+      }
+    else if ( mode == 3 )
+      {
+	aDy = 1;
+	TextLabelY->setEnabled( true );
+	SpinBox_Y->setEnabled( true );
+	SpinBox_Y->setFocus();
+      }
+    
+    int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+    OCCViewer_ClipPlane& aPlane = getClipPlane (aCurPlaneIndex);
+    if ( aPlane.IsInvert == true ) {
+      aDx = -aDx; aDy = -aDy; aDz = -aDz;
+    }
+    
+    myBusy = true;
+    SpinBox_Dx->setValue( aDx );
+    SpinBox_Dy->setValue( aDy );
+    SpinBox_Dz->setValue( aDz );
+    myBusy = false;
   }
-  else if ( mode == 2 )
-  {
-    aDx = 1;
-    TextLabelX->setEnabled( true );
-    SpinBox_X->setEnabled( true );
-    SpinBox_X->setFocus();
-  }
-  else if ( mode == 3 )
-  {
-    aDy = 1;
-    TextLabelY->setEnabled( true );
-    SpinBox_Y->setEnabled( true );
-    SpinBox_Y->setFocus();
-  }
-
-  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
-  Pnt_ClipPlane aPlane = myClippingPlanes[aCurPlaneIndex];
-  ClipPlane* aPlaneData = aPlane;
-  if ( aPlaneData->IsInvert == true ) {
-    aDx = -aDx; aDy = -aDy; aDz = -aDz;
-  }
-
-  myBusy = true;
-  SpinBox_Dx->setValue( aDx );
-  SpinBox_Dy->setValue( aDy );
-  SpinBox_Dz->setValue( aDz );
-  myBusy = false;
-
   SetCurrentPlaneParam();
-  updateView();
+  updateClipping();
 }
 
 /*!
@@ -1159,9 +1222,9 @@ void OCCViewer_ClippingDlg::onOrientationAbsoluteChanged( int mode )
 */
 void OCCViewer_ClippingDlg::onOrientationRelativeChanged (int theItem)
 {
-  if ( myClippingPlanes.empty() )
+  if ( clipPlanesCount() == 0 )
     return;
-
+  
   if ( theItem == 0 ) {
     TextLabelRotation1->setText( tr( "ROTATION_AROUND_X_Y2Z" ) );
     TextLabelRotation2->setText( tr( "ROTATION_AROUND_Y_X2Z" ) );
@@ -1177,7 +1240,7 @@ void OCCViewer_ClippingDlg::onOrientationRelativeChanged (int theItem)
 
   if( (QComboBox*)sender() == CBRelativeOrientation )
     SetCurrentPlaneParam();
-  updateView();
+  updateClipping();
 }
 
 /*!
@@ -1195,9 +1258,10 @@ void OCCViewer_ClippingDlg::onPreview( bool on )
 */
 void OCCViewer_ClippingDlg::onAutoApply( bool toggled )
 {
-  if ( toggled ) onApply();
-  myView3d->Update();
-  myView3d->Redraw();
+  if ( toggled ) {
+    onApply();
+    myModel->update();
+  }  
 }
 
 /*!
@@ -1208,40 +1272,15 @@ void OCCViewer_ClippingDlg::onApply()
   if ( myBusy )
     return;
   myIsSelectPlane = true;
-  Graphic3d_SetOfHClipPlane aPlanes = myView3d->GetClipPlanes();
-  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
-  for( ;anIter.More();anIter.Next() ){
-    Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
-    aClipPlane->SetOn(Standard_False);
-  }
 
   qApp->processEvents();
   QApplication::setOverrideCursor( Qt::WaitCursor );
   qApp->processEvents();
 
-  for ( int i=0;i<myClippingPlanes.size();i++ ) {
-    Pnt_ClipPlane aPlane = myClippingPlanes[i];
-    ClipPlane* aClipPlane = aPlane;
-    if ( aClipPlane->IsActive == true )
-      myView->setCuttingPlane( true, aClipPlane->X , aClipPlane->Y , aClipPlane->Z,
-                               aClipPlane->Dx, aClipPlane->Dy, aClipPlane->Dz );
-  }
+  myModel->setClipPlanes(myLocalPlanes);
 
   QApplication::restoreOverrideCursor();
   myIsSelectPlane = false;
-}
-
-void OCCViewer_ClippingDlg::onViewShow()
-{
-  if(myAction->isChecked())
-    show();
-  else
-    hide();
-}
-
-void OCCViewer_ClippingDlg::onViewHide()
-{
-  hide();
 }
 
 /*!
@@ -1270,4 +1309,12 @@ void OCCViewer_ClippingDlg::SliderRotation2HasMoved( int value )
 {
   TLValueRotation2->setText( QString("%1\xB0").arg( value ) );
   onValueChanged();
+}
+
+OCCViewer_ClipPlane& OCCViewer_ClippingDlg::getClipPlane (int theIndex) {
+  return myLocalPlanes[theIndex];
+}
+
+int OCCViewer_ClippingDlg::clipPlanesCount() {
+  return myLocalPlanes.size();
 }

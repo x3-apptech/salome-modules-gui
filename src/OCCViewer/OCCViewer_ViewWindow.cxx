@@ -29,10 +29,11 @@
 #include "OCCViewer_ViewManager.h"
 #include "OCCViewer_ViewSketcher.h"
 #include "OCCViewer_CreateRestoreViewDlg.h"
-#include "OCCViewer_ClippingDlg.h"
+#include "OCCViewer_ClipPlane.h"
 #include "OCCViewer_SetRotationPointDlg.h"
 #include "OCCViewer_AxialScaleDlg.h"
 #include "OCCViewer_CubeAxesDlg.h"
+#include "OCCViewer_ClippingDlg.h"
 
 #include <Basics_OCCTVersion.hxx>
 
@@ -230,7 +231,6 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myEnableDrawMode = false;
   myDrawRect=false;
   updateEnabledDrawMode();
-  myClippingDlg = 0;
   myScalingDlg = 0;
   mySetRotationPointDlg = 0;
   myRectBand = 0;
@@ -361,13 +361,13 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
     case QEvent::Wheel:
       {
         QWheelEvent* aEvent = (QWheelEvent*) e;
-	myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
-	double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
-	int x  = aEvent->x();
-	int y  = aEvent->y();
-	int x1 = (int)( aEvent->x() + width()*delta/100 );
-	int y1 = (int)( aEvent->y() + height()*delta/100 );
-	myViewPort->zoom( x, y, x1, y1 );
+  myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
+  double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
+  int x  = aEvent->x();
+  int y  = aEvent->y();
+  int x1 = (int)( aEvent->x() + width()*delta/100 );
+  int y1 = (int)( aEvent->y() + height()*delta/100 );
+  myViewPort->zoom( x, y, x1, y1 );
       }
       return true;
 
@@ -867,8 +867,8 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
       int anInteractionStyle = interactionStyle();
       if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
            aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
-    	   ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
-    	   aButton == Qt::LeftButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
+         ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
+         aButton == Qt::LeftButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
         myDrawRect = myEnableDrawMode;
         if ( myDrawRect ) {
           drawRect();
@@ -1211,13 +1211,12 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onCloneView()));
   toolMgr()->registerAction( aAction, CloneId );
 
-  myClippingAction = new QtxAction(tr("MNU_CLIPPING"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" ) ),
-                           tr( "MNU_CLIPPING" ), 0, this);
-  myClippingAction->setStatusTip(tr("DSC_CLIPPING"));
-  myClippingAction->setCheckable( true );
-  connect(myClippingAction, SIGNAL(toggled( bool )), this, SLOT(onClipping( bool )));
-  // RNV: Temporary commented, this functionality will be moved into Geometry module
-  //toolMgr()->registerAction( myClippingAction, ClippingId );
+  aAction = new QtxAction (tr ("MNU_CLIPPING"), aResMgr->loadPixmap ("OCCViewer", tr ("ICON_OCCVIEWER_CLIPPING")),
+                                      tr ("MNU_CLIPPING"), 0, this);
+  aAction->setStatusTip (tr ("DSC_CLIPPING"));
+  aAction->setCheckable (true);
+  connect (aAction, SIGNAL (toggled (bool)), this, SLOT (onClipping (bool)));
+  toolMgr()->registerAction (aAction, ClippingId);
 
   aAction = new QtxAction(tr("MNU_SHOOT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_SHOOT_VIEW" ) ),
                            tr( "MNU_SHOOT_VIEW" ), 0, this);
@@ -1567,43 +1566,6 @@ void OCCViewer_ViewWindow::onCloneView()
 }
 
 /*!
-  \brief called if clipping operation is activated.
-
-  Enables/disables clipping plane displaying.
-
-  \parma on action state
-*/
-void OCCViewer_ViewWindow::onClipping( bool on )
-{
-  /*
-  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-  if ( on )
-    myActionsMap[ ClippingId ]->setIcon(aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING_PRESSED" )));
-  else
-    myActionsMap[ ClippingId ]->setIcon(aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CLIPPING" )));
-  */
-  OCCViewer_ViewWindow* aParent = dynamic_cast<OCCViewer_ViewWindow*>(parent()->parent());
-  if (!aParent)
-    aParent = this;
-  if ( on )
-    {
-      if ( !myClippingDlg )
-        {
-          myClippingDlg = new OCCViewer_ClippingDlg( aParent );
-          myClippingDlg->SetAction( myClippingAction );
-        }
-    
-      if ( !myClippingDlg->isVisible() )
-        myClippingDlg->show();
-    }
-  else
-    {
-      if ( myClippingDlg->isVisible() )
-        myClippingDlg->hide();
-    }
-}
-
-/*!
   Creates one more window with same content
 */
 void OCCViewer_ViewWindow::onAxialScale()
@@ -1683,10 +1645,6 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
   aView3d->SetEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
-  if ( myClippingDlg ) {
-    myClippingDlg->onApply();
-    myClippingDlg->isRestore = false;
-  }
 
   if ( !baseParamsOnly ) {
 
@@ -1704,14 +1662,14 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
     anAxisData[1].Name = anItem.gtNameZ;
     anAxisData[2].Name = anItem.gtNameZ;
     anAxisData[0].NameColor = QColor( anItem.gtNameColorRX,
-				      anItem.gtNameColorGX,
-				      anItem.gtNameColorBX );
+              anItem.gtNameColorGX,
+              anItem.gtNameColorBX );
     anAxisData[1].NameColor = QColor( anItem.gtNameColorRY,
-				      anItem.gtNameColorGY,
-				      anItem.gtNameColorBY );
+              anItem.gtNameColorGY,
+              anItem.gtNameColorBY );
     anAxisData[2].NameColor = QColor( anItem.gtNameColorRZ,
-				      anItem.gtNameColorGZ,
-				      anItem.gtNameColorBZ );
+              anItem.gtNameColorGZ,
+              anItem.gtNameColorBZ );
     anAxisData[0].DrawValues = anItem.gtDrawValuesX;
     anAxisData[1].DrawValues = anItem.gtDrawValuesY;
     anAxisData[2].DrawValues = anItem.gtDrawValuesZ;
@@ -1722,14 +1680,14 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
     anAxisData[1].Offset = anItem.gtOffsetY;
     anAxisData[2].Offset = anItem.gtOffsetZ;
     anAxisData[0].Color = QColor( anItem.gtColorRX,
-				  anItem.gtColorGX,
-				  anItem.gtColorBX );
+          anItem.gtColorGX,
+          anItem.gtColorBX );
     anAxisData[1].Color = QColor( anItem.gtColorRY,
-				  anItem.gtColorGY,
-				  anItem.gtColorBY );
+          anItem.gtColorGY,
+          anItem.gtColorBY );
     anAxisData[2].Color = QColor( anItem.gtColorRZ,
-				  anItem.gtColorGZ,
-				  anItem.gtColorBZ );
+          anItem.gtColorGZ,
+          anItem.gtColorBZ );
     anAxisData[0].DrawTickmarks = anItem.gtDrawTickmarksX;
     anAxisData[1].DrawTickmarks = anItem.gtDrawTickmarksY;
     anAxisData[2].DrawTickmarks = anItem.gtDrawTickmarksZ;
@@ -2177,33 +2135,27 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "isVisible=%1" ).arg( params.isVisible );
   data << QString( "size=%1" )     .arg( params.size,    0, 'f',  2 );
 
-  if ( myClippingDlg ) {
-    if ( !myClippingDlg->myClippingPlanes.empty() ) {
-      for ( int i=0; i < myClippingDlg->myClippingPlanes.size(); i++ ) {
-        QString ClippingPlane = QString( "ClippingPlane%1=").arg( i+1 );
-        Pnt_ClipPlane aPlane = myClippingDlg->myClippingPlanes[i];
-        ClippingPlane +=  QString( "Mode~%1;").arg( (int)aPlane->PlaneMode );
-        ClippingPlane +=  QString( "IsActive~%1;").arg( aPlane->IsActive );
-        if ( aPlane->PlaneMode == Absolute ) {
-          ClippingPlane += QString( "AbsoluteOrientation~%1;" ).arg( aPlane->Orientation );
-          ClippingPlane += QString( "IsInvert~%1;" ).arg( aPlane->IsInvert );
-          ClippingPlane +=  QString( "X~%1;" ).arg( aPlane->X );
-          ClippingPlane +=  QString( "Y~%1;" ).arg( aPlane->Y );
-          ClippingPlane +=  QString( "Z~%1;" ).arg( aPlane->Z );
-          ClippingPlane +=  QString( "Dx~%1;" ).arg( aPlane->Dx );
-          ClippingPlane +=  QString( "Dy~%1;" ).arg( aPlane->Dy );;
-          ClippingPlane +=  QString( "Dz~%1" ).arg( aPlane->Dz );
-        }
-        else if ( aPlane->PlaneMode == Relative ) {
-          ClippingPlane +=  QString( "RelativeOrientation~%1;" ).arg( aPlane->RelativeMode.Orientation );
-          ClippingPlane +=  QString( "Distance~%1;" ).arg( aPlane->RelativeMode.Distance );
-          ClippingPlane +=  QString( "Rotation1~%1;" ).arg( aPlane->RelativeMode.Rotation1 );
-          ClippingPlane +=  QString( "Rotation2~%1" ).arg( aPlane->RelativeMode.Rotation2 );
-        }
-        data << ClippingPlane;
-      }
-    }
+  ClipPlanesList aPlanes =  myModel->getClipPlanes();
+  for ( int i=0; i < aPlanes.size(); i++ ) {
+    OCCViewer_ClipPlane& aPlane = aPlanes[i];
+    QString ClippingPlane = QString( "ClippingPlane%1=").arg( i+1 );
+    ClippingPlane +=  QString( "Mode~%1;").arg( (int)aPlane.PlaneMode );
+    ClippingPlane +=  QString( "IsActive~%1;").arg( aPlane.IsOn );
+    ClippingPlane += QString( "AbsoluteOrientation~%1;" ).arg( aPlane.Orientation );
+    ClippingPlane += QString( "IsInvert~%1;" ).arg( aPlane.IsInvert );
+    ClippingPlane +=  QString( "X~%1;" ).arg( aPlane.X );
+    ClippingPlane +=  QString( "Y~%1;" ).arg( aPlane.Y );
+    ClippingPlane +=  QString( "Z~%1;" ).arg( aPlane.Z );
+    ClippingPlane +=  QString( "Dx~%1;" ).arg( aPlane.Dx );
+    ClippingPlane +=  QString( "Dy~%1;" ).arg( aPlane.Dy );;
+    ClippingPlane +=  QString( "Dz~%1;" ).arg( aPlane.Dz );
+    ClippingPlane +=  QString( "RelativeOrientation~%1;" ).arg( aPlane.RelativeMode.Orientation );
+    ClippingPlane +=  QString( "Distance~%1;" ).arg( aPlane.RelativeMode.Distance );
+    ClippingPlane +=  QString( "Rotation1~%1;" ).arg( aPlane.RelativeMode.Rotation1 );
+    ClippingPlane +=  QString( "Rotation2~%1" ).arg( aPlane.RelativeMode.Rotation2 );
+    data << ClippingPlane;
   }
+
 
 #if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 or newer version
   // graduated trihedron
@@ -2261,7 +2213,7 @@ QString OCCViewer_ViewWindow::getVisualParameters()
 void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
 {
   viewAspect params;
-
+  ClipPlanesList aClipPlanes;
   QStringList data = parameters.split( '*' );
   Qtx::BackgroundData bgData;
   if ( parameters.contains( '=' )  ) // new format - "scale=1.000e+00*centerX=0.000e+00..."
@@ -2288,39 +2240,27 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
       else if ( paramName == "isVisible" )         params.isVisible         = paramValue.toInt();
       else if ( paramName == "size" )              params.size              = paramValue.toDouble();
       else if ( paramName.contains( "ClippingPlane" ) ) {
-        OCCViewer_ViewWindow* aParent = dynamic_cast<OCCViewer_ViewWindow*>(parent()->parent());
-        if (!aParent)
-          aParent = this;
-        if ( !myClippingDlg )
-        {
-          myClippingDlg = new OCCViewer_ClippingDlg( aParent );
-          myClippingDlg->SetAction( myClippingAction );
-          myClippingDlg->hide();
+        QStringList ClipPlaneData = paramValue.split( ';' );
+        OCCViewer_ClipPlane aPlane;
+        foreach( QString ClipPlaneParam, ClipPlaneData ) {
+	  QString ClipPlane_paramName  = ClipPlaneParam.section( '~', 0, 0 ).trimmed();
+	  QString ClipPlane_paramValue = ClipPlaneParam.section( '~', 1, 1 ).trimmed();
+            if      ( ClipPlane_paramName == "Mode" )                aPlane.PlaneMode                  = ( ClipPlaneMode )ClipPlane_paramValue.toInt();
+            else if ( ClipPlane_paramName == "IsActive" )            aPlane.IsOn                       = ClipPlane_paramValue.toInt();
+            else if ( ClipPlane_paramName == "AbsoluteOrientation" ) aPlane.Orientation                = ClipPlane_paramValue.toInt();
+            else if ( ClipPlane_paramName == "IsInvert" )            aPlane.IsInvert                   = ClipPlane_paramValue.toInt();
+            else if ( ClipPlane_paramName == "X" )                   aPlane.X                          = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Y" )                   aPlane.Y                          = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Z" )                   aPlane.Z                          = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Dx" )                  aPlane.Dx                         = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Dy" )                  aPlane.Dy                         = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Dz" )                  aPlane.Dz                         = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "RelativeOrientation" ) aPlane.RelativeMode.Orientation   = ClipPlane_paramValue.toInt();
+            else if ( ClipPlane_paramName == "Distance" )            aPlane.RelativeMode.Distance      = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Rotation1" )           aPlane.RelativeMode.Rotation1     = ClipPlane_paramValue.toDouble();
+            else if ( ClipPlane_paramName == "Rotation2" )           aPlane.RelativeMode.Rotation2     = ClipPlane_paramValue.toDouble();
         }
-    	QStringList ClipPlaneData = paramValue.split( ';' );
-        ClipPlane* aPlane = new ClipPlane();
-    	foreach( QString ClipPlaneParam, ClipPlaneData ) {
-          QString ClipPlane_paramName  = ClipPlaneParam.section( '~', 0, 0 ).trimmed();
-          QString ClipPlane_paramValue = ClipPlaneParam.section( '~', 1, 1 ).trimmed();
-          if      ( ClipPlane_paramName == "Mode" )                aPlane->PlaneMode                  = ( Mode )ClipPlane_paramValue.toInt();
-          else if ( ClipPlane_paramName == "IsActive" )            aPlane->IsActive                   = ClipPlane_paramValue.toInt();
-          else if ( ClipPlane_paramName == "AbsoluteOrientation" ) aPlane->Orientation                = ClipPlane_paramValue.toInt();
-          else if ( ClipPlane_paramName == "IsInvert" )            aPlane->IsInvert                   = ClipPlane_paramValue.toInt();
-          else if ( ClipPlane_paramName == "X" )                   aPlane->X                          = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Y" )                   aPlane->Y                          = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Z" )                   aPlane->Z                          = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Dx" )                  aPlane->Dx                         = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Dy" )                  aPlane->Dy                         = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Dz" )                  aPlane->Dz                         = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "RelativeOrientation" ) aPlane->RelativeMode.Orientation   = ClipPlane_paramValue.toInt();
-          else if ( ClipPlane_paramName == "Distance" )            aPlane->RelativeMode.Distance      = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Rotation1" )           aPlane->RelativeMode.Rotation1     = ClipPlane_paramValue.toDouble();
-          else if ( ClipPlane_paramName == "Rotation2" )           aPlane->RelativeMode.Rotation2     = ClipPlane_paramValue.toDouble();
-    	}
-    	myClippingDlg->myClippingPlanes.push_back( aPlane );
-    	myClippingDlg->isRestore = true;
-    	myClippingDlg->synchronize();
-    	myClippingDlg->SetCurrentPlaneParam();
+	aClipPlanes.push_back(aPlane);
       }
       // graduated trihedron
       else if ( paramName == "gtIsVisible" )       params.gtIsVisible       = paramValue.toInt();
@@ -2364,8 +2304,8 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
       else if ( paramName == "gtTickmarkLengthY" ) params.gtTickmarkLengthY = paramValue.toInt();
       else if ( paramName == "gtTickmarkLengthZ" ) params.gtTickmarkLengthZ = paramValue.toInt();
       else if ( paramName == "background" )        {
-	QString bg = paramValue.replace( "$", "=" );
-	bgData = Qtx::stringToBackground( bg );
+  QString bg = paramValue.replace( "$", "=" );
+  bgData = Qtx::stringToBackground( bg );
       }
     }
   }
@@ -2391,8 +2331,9 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
     params.isVisible = data.count() > idx ? data[idx++].toInt()    : 1;
     params.size      = data.count() > idx ? data[idx++].toDouble() : 100.0;
   }
-  performRestoring( params );
+  performRestoring( params );  
   setBackground( bgData );
+  myModel->setClipPlanes(aClipPlanes);
 }
 
 /*!
@@ -2926,4 +2867,50 @@ bool OCCViewer_ViewWindow::isSelectionEnabled() const
 void OCCViewer_ViewWindow::enableSelection( bool theIsToEnable )
 {
   onSwitchSelection( theIsToEnable );
+}
+
+
+/*!
+  \brief called if clipping operation is activated / deactivated.
+
+  Enables/disables clipping plane displaying.
+
+  \parma on action state
+*/
+void OCCViewer_ViewWindow::onClipping (bool theIsOn)
+{
+  if(!myModel) return;
+  OCCViewer_ClippingDlg* aClippingDlg = myModel->getClippingDlg();
+  
+  if (theIsOn) {
+    if (!aClippingDlg) {
+      aClippingDlg = new OCCViewer_ClippingDlg (this, myModel);
+      myModel->setClippingDlg(aClippingDlg);
+    }
+    if (!aClippingDlg->isVisible())
+      aClippingDlg->show();
+  } else {
+    if ( aClippingDlg ) {
+      aClippingDlg->close();
+      myModel->setClippingDlg(0);
+    }
+  }
+
+  SUIT_ViewManager* mgr = getViewManager();
+  if( mgr ) {
+    QVector<SUIT_ViewWindow*> aViews = mgr->getViews();
+    for(int i = 0, iEnd = aViews.size(); i < iEnd; i++) {
+      if(SUIT_ViewWindow* aViewWindow = aViews.at(i)) {
+	QtxActionToolMgr* mgr = aViewWindow->toolMgr();
+	if(!mgr) continue;
+	QAction* a = toolMgr()->action( ClippingId );
+	if(!a) continue;
+	if(theIsOn != a->isChecked()){
+	  disconnect (a, SIGNAL (toggled (bool)), aViewWindow, SLOT (onClipping (bool)));
+	  a->setChecked(theIsOn);
+	  connect (a, SIGNAL (toggled (bool)), aViewWindow, SLOT (onClipping (bool)));
+	}
+      }
+    }
+  }
 }

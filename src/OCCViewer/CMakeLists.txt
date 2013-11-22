@@ -34,6 +34,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
   ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/ViewerData
   ${PROJECT_SOURCE_DIR}/src/ViewerTools
 )
 
@@ -70,6 +71,7 @@ SET(_moc_HEADERS
 # header files / no moc processing
 SET(_other_HEADERS
   OCCViewer.h
+  OCCViewer_ClipPlane.h
   OCCViewer_Trihedron.h 
   OCCViewer_VService.h
 )
@@ -140,6 +142,7 @@ SET(_other_SOURCES
   OCCViewer_AISSelector.cxx
   OCCViewer_AxialScaleDlg.cxx
   OCCViewer_ClippingDlg.cxx
+  OCCViewer_ClipPlane.cxx
   OCCViewer_CreateRestoreViewDlg.cxx
   OCCViewer_CubeAxesDlg.cxx
   OCCViewer_FontWidget.cxx

@@ -22,7 +22,7 @@
 ##
 SET(SUBDIRS_COMMON
   CASCatch Qtx Style DDS QDS ObjBrowser SUIT SUITApp STD CAF
-  CAM LogWindow Prs Event OpenGLUtils ViewerTools ImageComposer GUI_PY
+  CAM LogWindow Prs Event OpenGLUtils ViewerData ViewerTools ImageComposer GUI_PY
 )
 
 ##

@@ -24,6 +24,7 @@
 #define OCCVIEWER_CLIPPINGDLG_H
 
 #include "OCCViewer.h"
+#include "OCCViewer_ClipPlane.h"
 
 #include <QDialog>
 
@@ -36,63 +37,27 @@ class QPushButton;
 class QComboBox;
 class QCheckBox;
 class QtxDoubleSpinBox;
-class QtxAction;
 class QStackedLayout;
 class QSlider;
 class QMenu;
 
+class OCCViewer_Viewer;
 class OCCViewer_ViewWindow;
-
-enum Mode { Absolute, Relative };
-
-/*!
-  \class OrientedPlane
-  \brief Parameters of clipping plane in relative mode
-*/
-class OrientedPlane {
-public:
-  int Orientation;
-  double Distance;
-  double Rotation1;
-  double Rotation2;
-  OrientedPlane();
-};
-
-/*!
-  \class ClipPlane
-  \brief Parameters of clipping plane
-*/
-class ClipPlane {
-public:
-  OrientedPlane RelativeMode;
-  double X,Y,Z,Dx,Dy,Dz;
-  int Orientation;
-  bool IsActive;
-  bool IsInvert;
-  Mode PlaneMode;
-  ClipPlane();
-};
-typedef ClipPlane* Pnt_ClipPlane;
-typedef std::vector<Pnt_ClipPlane> ClipPlaneVector;
 
 /*!
   \class OCCViewer_ClippingDlg
   \brief Dialog allowing to assign parameters of clipping plane
 */
-class OCCViewer_ClippingDlg : public QDialog
+class OCCVIEWER_EXPORT OCCViewer_ClippingDlg : public QDialog
 {
     Q_OBJECT
-    
+
   public:
-  OCCViewer_ClippingDlg(OCCViewer_ViewWindow* , const char* name = 0, bool modal = FALSE, Qt::WindowFlags fl = 0);
+  OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parrent, OCCViewer_Viewer* model);
   ~OCCViewer_ClippingDlg();
 
-  void SetAction( QtxAction* theAction ) { myAction = theAction; }
   void synchronize();
   void SetCurrentPlaneParam();
-    
-  ClipPlaneVector myClippingPlanes;
-  bool isRestore;
 
 private :
 
@@ -102,8 +67,12 @@ private :
   void initParam();
   void displayPreview();
   void erasePreview();
+  void updatePreview();
   bool isValid();
-  void updateView();
+  void updateClipping();
+
+  OCCViewer_ClipPlane& getClipPlane (int theIndex);
+  int clipPlanesCount();
 
   QComboBox* ComboBoxPlanes;
   QCheckBox* isActivePlane;
@@ -122,7 +91,7 @@ private :
   QtxDoubleSpinBox* SpinBox_Y;
   QtxDoubleSpinBox* SpinBox_Z;
   QPushButton* resetButton;
-    
+
   QGroupBox* GroupAbsoluteDirection;
   QLabel* TextLabelDx;
   QLabel* TextLabelDy;
@@ -132,7 +101,7 @@ private :
   QtxDoubleSpinBox* SpinBox_Dz;
   QPushButton* invertButton;
   QComboBox* CBAbsoluteOrientation;
-    
+
   QGroupBox* GroupRelative;
   QLabel* TextLabelOrientation;
   QLabel* TextLabelDistance;
@@ -152,22 +121,22 @@ private :
   QPushButton* buttonOk;
   QPushButton* buttonApply;
   QPushButton* buttonClose;
-    
-  OCCViewer_ViewWindow* myView;
+
+  OCCViewer_Viewer* myModel;
   Handle(V3d_View) myView3d;
 
+  Standard_Integer myCurrentClipPlaneMode;
   std::vector<Handle(AIS_Plane)> myPreviewPlaneVector;
 
   bool myIsSelectPlane;
   bool myBusy;
+  bool myIsPlaneCreation;
 
-  Mode CurrentMode;
-
-  QtxAction* myAction;
-
+  ClipPlanesList myLocalPlanes;
+    
 public slots:
   void onApply();
-    
+
 private slots:
 
   void ClickOnNew();
@@ -191,9 +160,6 @@ private slots:
 
   void onPreview( bool on );
   void onAutoApply(bool);
-
-  void onViewShow();
-  void onViewHide();
 
   void SliderDistanceHasMoved(int);
   void SliderRotation1HasMoved(int);

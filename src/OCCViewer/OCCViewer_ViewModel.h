@@ -28,6 +28,7 @@
 #include <QVector>
 
 #include "OCCViewer.h"
+#include "OCCViewer_ClipPlane.h"
 
 #include "Qtx.h"
 #include "SUIT_ViewModel.h"
@@ -42,9 +43,13 @@ class QMouseEvent;
 
 class SUIT_ViewWindow;
 class SUIT_Desktop;
+class OCCViewer_ClippingDlg;
 class OCCViewer_ViewWindow;
 
 class AIS_ListOfInteractive;
+
+class QtxAction;
+
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
@@ -148,6 +153,15 @@ public:
   bool                            isStaticTrihedronDisplayed() { return myShowStaticTrihedron; }
   void                            setStaticTrihedronDisplayed(const bool on);
 
+  /* Clip planes management */
+  void                            setClipPlanes (ClipPlanesList theList);
+  ClipPlanesList                  getClipPlanes() const;
+  void                            applyExistingClipPlanesToObject (const Handle(AIS_InteractiveObject)& theObject);
+
+  OCCViewer_ClippingDlg*          getClippingDlg() const;
+  void                            setClippingDlg(OCCViewer_ClippingDlg* theDlg);
+  
+
   /* Selection management */
   bool    highlight( const Handle(AIS_InteractiveObject)&, bool, bool=true );
   bool    unHighlightAll( bool=true, bool=true ); 
@@ -186,7 +200,7 @@ protected:
 
 
   Handle(AIS_Trihedron)           myTrihedron;
-  Handle(AIS_InteractiveContext)  myAISContext;  
+  Handle(AIS_InteractiveContext)  myAISContext;
 
   int                             myInteractionStyle;
   int                             myZoomingStyle;
@@ -206,6 +220,11 @@ protected:
   double                          myTrihedronSize;
 
   QVector<Qtx::BackgroundData>    myBackgrounds;
+
+  OCCViewer_ClippingDlg*          myClippingDlg;
+
+  ClipPlanesList                  myClipPlanes;
+  Graphic3d_SetOfHClipPlane       myInternalClipPlanes;
 };
 
 #ifdef WIN32
