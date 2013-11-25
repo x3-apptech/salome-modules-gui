@@ -30,19 +30,19 @@
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
 
-class ViewerData_AISShape : public AIS_TexturedShape
+class  ViewerData_AISShape : public AIS_TexturedShape
 {
 public:
   Standard_EXPORT ViewerData_AISShape (const TopoDS_Shape& theShape);
 
   // checks if shape is clippable
-  inline bool IsClippable() const
+  Standard_EXPORT inline bool IsClippable() const
   {
     return myIsClippable;
   }
 
   // makes shape clippable/not clippable
-  inline void SetClippable (bool isClippable)
+  Standard_EXPORT inline void SetClippable (bool isClippable)
   {
     myIsClippable = isClippable;
   }

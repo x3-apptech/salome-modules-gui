@@ -46,6 +46,7 @@ OrientedPlane& OrientedPlane::operator = ( const OrientedPlane& other )
   Distance = other.Distance;
   Rotation1 = other.Rotation1;
   Rotation2 = other.Rotation2;
+  return *this;
 }
 
 OCCViewer_ClipPlane::OCCViewer_ClipPlane() :
@@ -77,4 +78,5 @@ OCCViewer_ClipPlane& OCCViewer_ClipPlane::operator = ( const OCCViewer_ClipPlane
   IsInvert = other.IsInvert;
   PlaneMode = other.PlaneMode;
   IsOn = other.IsOn;
+  return *this;
 }

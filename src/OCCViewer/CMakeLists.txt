@@ -44,7 +44,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 # libraries to link to
 SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER}
-  CASCatch qtx suit OpenGLUtils ViewerTools
+  CASCatch qtx suit OpenGLUtils ViewerTools ViewerData
 )
 
 # --- headers ---
