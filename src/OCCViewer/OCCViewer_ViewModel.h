@@ -37,6 +37,7 @@
 #include <AIS_Trihedron.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <Basics_OCCTVersion.hxx>
+#include <Graphic3d_SequenceOfHClipPlane.hxx>
 
 class QKeyEvent;
 class QMouseEvent;
@@ -224,7 +225,7 @@ protected:
   OCCViewer_ClippingDlg*          myClippingDlg;
 
   ClipPlanesList                  myClipPlanes;
-  Graphic3d_SetOfHClipPlane       myInternalClipPlanes;
+  Graphic3d_SequenceOfHClipPlane  myInternalClipPlanes;
 };
 
 #ifdef WIN32

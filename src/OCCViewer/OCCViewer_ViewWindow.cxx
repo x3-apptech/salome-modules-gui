@@ -81,7 +81,7 @@
 #include <TColgp_Array1OfPnt2d.hxx>
 
 #if OCC_VERSION_LARGE > 0x06060000 
-#include <Graphic3d_SetOfHClipPlane.hxx>
+#include <Graphic3d_SequenceOfHClipPlane.hxx>
 #include <Graphic3d_ClipPlane.hxx>
 
 #endif
@@ -1932,11 +1932,10 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     double a, b, c, d;
     pln.Coefficients(a, b, c, d);
     
-#if OCC_VERSION_LARGE > 0x06060000 // Porting to OCCT higher 6.6.0 version
-    Graphic3d_SetOfHClipPlane aPlanes = view->GetClipPlanes();
+    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
     Handle(Graphic3d_ClipPlane) aClipPlane;
     if(aPlanes.Size() > 0 ) {
-      Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+      Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
       aClipPlane = anIter.Value();
       aClipPlane->SetEquation(pln);
       aClipPlane->SetOn(Standard_True);
@@ -1945,31 +1944,14 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
       view->AddClipPlane(aClipPlane);
       aClipPlane->SetOn(Standard_True);
     }
-#elif OCC_VERSION_LARGE > 0x06040000 && CC_VERSION_LARGE <= 0x06060000 // Porting to OCCT6.5.1
-    if (view->MoreActivePlanes()) {
-      clipPlane = view->ActivePlane();
-      clipPlane->SetPlane(a, b, c, d);
-    }
-    else {
-      clipPlane = new V3d_Plane (a, b, c, d);
-      view->SetPlaneOn(clipPlane);
-    }
-#else
-    clipPlane = new V3d_Plane (viewer);
-    clipPlane->SetPlane(a, b, c, d);
-#endif
   }
   else {
-#if OCC_VERSION_LARGE > 0x06060000 // Porting to OCCT higher 6.6.0 version
-    Graphic3d_SetOfHClipPlane aPlanes = view->GetClipPlanes();
-    Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
+    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
     for( ;anIter.More();anIter.Next() ){
       Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetOn(Standard_False);
     }
-#else
-    view->SetPlaneOff();
-#endif
   }
 
   view->Update();
@@ -1991,10 +1973,9 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const gp_Pln pln )
 bool OCCViewer_ViewWindow::isCuttingPlane()
 {
   Handle(V3d_View) view = myViewPort->getView();
-#if OCC_VERSION_LARGE > 0x06060000 // Porting to OCCT higher 6.6.0 version
   bool res = false;
-  Graphic3d_SetOfHClipPlane aPlanes = view->GetClipPlanes();
-  Graphic3d_SetOfHClipPlane::Iterator anIter (aPlanes);
+  Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
+  Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
   for( ;anIter.More();anIter.Next() ) {
     Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
     if(aClipPlane->IsOn()) {
@@ -2003,10 +1984,6 @@ bool OCCViewer_ViewWindow::isCuttingPlane()
     }
   }
   return res;
-#else
-  view->InitActivePlanes();
-  return (view->MoreActivePlanes());
-#endif
 }
 
 /*!

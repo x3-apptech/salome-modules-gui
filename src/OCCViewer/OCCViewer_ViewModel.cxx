@@ -1038,7 +1038,7 @@ void OCCViewer_Viewer::setClipPlanes(ClipPlanesList theList)
     Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane();
     aGraphic3dPlane->SetEquation (aPln);   
     aGraphic3dPlane->SetOn(plane.IsOn);
-    myInternalClipPlanes.Add(aGraphic3dPlane);
+    myInternalClipPlanes.Append(aGraphic3dPlane);
   }
 
   // 3. Apply clipping planes
