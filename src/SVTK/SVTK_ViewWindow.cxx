@@ -148,6 +148,7 @@ SVTK_ViewWindow::SVTK_ViewWindow(SUIT_Desktop* theDesktop):
 */
 void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
 {
+  myModel = theModel;
   myInteractor = new SVTK_RenderWindowInteractor(this,"SVTK_RenderWindowInteractor");
   
   SVTK_Selector* aSelector = SVTK_Selector::New();
@@ -912,7 +913,14 @@ void SVTK_ViewWindow::SetPreSelectionMode( Preselection_Mode theMode )
 */
 void SVTK_ViewWindow::SetSelectionEnabled( bool theEnable )
 {
-  onEnableSelection( theEnable );
+  GetSelector()->SetSelectionEnabled( theEnable );
+  QtxAction* a = getAction( EnableSelectionId );
+  if ( a->isChecked() !=  theEnable)
+    a->setChecked( theEnable );
+  QtxActionGroup* aPreselectionGroup = 
+    dynamic_cast<QtxActionGroup*>( getAction( PreselectionId ) );
+  if ( aPreselectionGroup )
+    aPreselectionGroup->setEnabled( theEnable );
 }
 
 /*!
@@ -982,16 +990,9 @@ void SVTK_ViewWindow::onSwitchPreSelectionMode( int theMode )
 */
 void SVTK_ViewWindow::onEnableSelection( bool on )
 {
-  GetSelector()->SetSelectionEnabled( on );
-
-  // update action state if method is called outside
-  QtxAction* a = getAction( EnableSelectionId );
-  if ( a->isChecked() != on )
-    a->setChecked( on );
-  QtxActionGroup* aPreselectionGroup = 
-    dynamic_cast<QtxActionGroup*>( getAction( PreselectionId ) );
-  if ( aPreselectionGroup )
-    aPreselectionGroup->setEnabled( on );
+  SVTK_Viewer* aViewer = dynamic_cast<SVTK_Viewer*>(myModel);
+  if(aViewer)
+    aViewer->enableSelection(on);  
 }
 
 /*!

@@ -33,6 +33,7 @@
   #include "SVTK_Functor.h"
   #include "VTKViewer_Algorithm.h"
   #include <vtkRenderer.h>
+  #include "SVTK_ViewModel.h"
 #endif
 
 #ifndef DISABLE_SALOMEOBJECT
@@ -212,7 +213,8 @@ void
 LightApp_VTKSelector
 ::setSelection( const SUIT_DataOwnerPtrList& theList )
 {
-  if(myViewer){
+  SVTK_Viewer* aViewer = dynamic_cast<SVTK_Viewer*>(myViewer);
+  if(myViewer && aViewer && aViewer->isSelectionEnabled()){
     if(SUIT_ViewManager* aViewMgr = myViewer->getViewManager()){
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
         if(SVTK_Selector* aSelector = aView->GetSelector()){
