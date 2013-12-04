@@ -492,7 +492,6 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
 
   SliderDistance = new QSlider( Qt::Horizontal, GroupParameters );
   SliderDistance->setObjectName( "SliderDistance" );
-  SliderDistance->setFocusPolicy( Qt::NoFocus );
   SliderDistance->setMinimumSize( 300, 0 );
   SliderDistance->setMinimum( 0 );
   SliderDistance->setMaximum( 100 );
@@ -514,7 +513,6 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
 
   SliderRotation1 = new QSlider( Qt::Horizontal, GroupParameters );
   SliderRotation1->setObjectName( "SliderRotation1" );
-  SliderRotation1->setFocusPolicy( Qt::NoFocus );
   SliderRotation1->setMinimumSize( 300, 0 );
   SliderRotation1->setMinimum( -180 );
   SliderRotation1->setMaximum( 180 );
@@ -537,7 +535,6 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
 
   SliderRotation2 = new QSlider( Qt::Horizontal, GroupParameters );
   SliderRotation2->setObjectName( "SliderRotation2" );
-  SliderRotation2->setFocusPolicy( Qt::NoFocus );
   SliderRotation2->setMinimumSize( 300, 0 );
   SliderRotation2->setMinimum( -180 );
   SliderRotation2->setMaximum( 180 );
