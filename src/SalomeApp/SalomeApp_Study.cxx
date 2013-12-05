@@ -1163,7 +1163,13 @@ void SalomeApp_Study::updateFromNotebook( const QString& theFileName, bool isSav
 
 LightApp_DataObject* SalomeApp_Study::findObjectByEntry( const QString& theEntry )
 {
-  LightApp_DataObject* o = dynamic_cast<LightApp_DataObject*>( myObserver ? myObserver->findObject( theEntry.toLatin1().constData() ) : 0 );
+  LightApp_DataObject* o = 0;
+  if ( myObserver ) {
+    o = dynamic_cast<LightApp_DataObject*>( myObserver->findObject( theEntry.toLatin1().constData() ) );
+  }
+  if ( !o ) {
+    o = LightApp_Study::findObjectByEntry( theEntry );
+  }
   return o;
 }
 
