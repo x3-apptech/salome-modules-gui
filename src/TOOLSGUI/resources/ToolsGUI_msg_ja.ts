@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>TOOLS_BUT_BROWSE</source>
-      <translation>移動...</translation>
+      <translation>開く...</translation>
     </message>
     <message>
       <source>TOOLS_ERR_ERROR</source>
@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>TOOLS_COMP_MULTISTD</source>
-      <translation>マルチ-練習曲:</translation>
+      <translation>Multistudy:</translation>
     </message>
     <message>
       <source>TOOLS_COMP_USERNAME</source>
@@ -80,7 +80,7 @@
     </message>
     <message>
       <source>TOOLS_CATALOG_GENERATOR</source>
-      <translation>カタログの生成</translation>
+      <translation>カタログ ジェネレーター</translation>
     </message>
     <message>
       <source>TOOLS_FILES</source>
@@ -88,15 +88,15 @@
     </message>
     <message>
       <source>TOOLS_MEN_IMPORT_PNG</source>
-      <translation>Png (*.png)</translation>
+      <translation>PNG ファイル (*.png)</translation>
     </message>
     <message>
       <source>TOOLS_MEN_IMPORT_IDL</source>
-      <translation>IDL (*.idl) ファイル</translation>
+      <translation>IDL ファイル (*.idl)</translation>
     </message>
     <message>
       <source>TOOLS_MEN_EXPORT_XML</source>
-      <translation>XML (*.xml) ファイル</translation>
+      <translation>XML ファイル (*.xml)</translation>
     </message>
     <message>
       <source>TOOLS_IDL_FILE</source>
@@ -107,11 +107,11 @@
     <name>ToolsGUI_RegWidget</name>
     <message>
       <source>TLT_REFRESH_INTERVAL</source>
-      <translation>リフレッシュ レート</translation>
+      <translation>更新間隔</translation>
     </message>
     <message>
       <source>LAB_REFRESH_INTERVAL</source>
-      <translation>新たな周波数の更新 （秒） で</translation>
+      <translation>更新頻度 （秒）</translation>
     </message>
     <message>
       <source>TLT_REGISTRY</source>
@@ -135,7 +135,7 @@
     </message>
     <message>
       <source>MEN_INTERVAL</source>
-      <translation>リフレッシュ レート.</translation>
+      <translation>更新間隔.</translation>
     </message>
     <message>
       <source>STB_INTERVAL</source>
@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>TAB_RUNNING</source>
-      <translation>電流</translation>
+      <translation>実行中</translation>
     </message>
     <message>
       <source>TAB_HISTORY</source>
@@ -167,7 +167,7 @@
     </message>
     <message>
       <source>HDR_USERNAME</source>
-      <translation>ユーザーの名前</translation>
+      <translation>ユーザー名</translation>
     </message>
     <message>
       <source>HDR_HOSTNAME</source>
@@ -175,19 +175,19 @@
     </message>
     <message>
       <source>HDR_STARTED</source>
-      <translation>開始</translation>
+      <translation>開始日時</translation>
     </message>
     <message>
       <source>HDR_FINISHED</source>
-      <translation>完成品</translation>
+      <translation>終了</translation>
     </message>
     <message>
       <source>HDR_HELLO</source>
-      <translation>最後の ping</translation>
+      <translation>最後の アクセス</translation>
     </message>
     <message>
       <source>ERR_NO_REGISTRY</source>
-      <translation>エラー: サーバー レジストリが見つからない</translation>
+      <translation>エラー: レジストリ サーバーが見つかりません</translation>
     </message>
     <message>
       <source>INFO_SERVICE</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>INFO_PROCESS</source>
-      <translation>マシン名 %2 (IPアドレス: %3 )上プロセス (PID: %1); %4 のユーザによって起動 (UID: %5) ディレクトリ %6。</translation>
+      <translation>マシン名 %2 (IPアドレス: %3 )上のプロセス (PID: %1); ディレクトリ%6でユーザ%4(UID: %5)によって起動された 。</translation>
     </message>
     <message>
       <source>INFO_STARTED</source>
@@ -203,7 +203,7 @@
     </message>
     <message>
       <source>INFO_LAST_PING</source>
-      <translation>最終信号: %1</translation>
+      <translation>最終アクセス: %1</translation>
     </message>
     <message>
       <source>INFO_FINISHED</source>
@@ -211,7 +211,7 @@
     </message>
     <message>
       <source>INFO_RUNNING</source>
-      <translation>電流</translation>
+      <translation>実行中</translation>
     </message>
     <message>
       <source>INFO_TIME_DIFF</source>

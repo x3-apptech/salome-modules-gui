@@ -36,7 +36,7 @@
     <message>
       <location filename="../LogWindow.cxx" line="368"/>
       <source>BUT_OK</source>
-      <translation>OK(&amp;O)</translation>
+      <translation>わかりました(&amp;O)</translation>
     </message>
   </context>
 </TS>

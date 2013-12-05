@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>WRN_FILE_NAME_BAD</source>
-      <translation>正しいファイル名を指定します。Python ファイルは文字、数字、ダッシュを構成する必要があり、、文字またはアンダー スコアで始まる必要があります。</translation>
+      <translation>有効なファイル名を入力してください。Pythonのファイル名は、文字、数字、およびアンダー スコアで構成され、文字かアンダー スコアで始まる必要があります。</translation>
     </message>
     <message>
       <source>WRN_FILE_NOT_EXIST</source>
@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>CLOSE_LOCKED_STUDY</source>
-      <translation>ロックされた研究を閉じますか。</translation>
+      <translation>ロックされたスタディを閉じますか。</translation>
     </message>
     <message>
       <source>PUBLISH_IN_STUDY</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>MULTI_FILE_DUMP</source>
-      <translation>複数ファイルをダンプする</translation>
+      <translation>複数ファイルの書き出し</translation>
     </message>
     <message>
       <source>BUT_NEW</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>MEN_DELETE_INVALID_REFERENCE</source>
-      <translation>無効な参照を削除します</translation>
+      <translation>無効な参照を削除します。</translation>
     </message>
     <message>
       <source>TOT_FILE_DESK_PREFERENCES</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>MEN_DESK_REGISTRY_DISPLAY</source>
-      <translation>表示を登録(&amp;D)</translation>
+      <translation>レジストリの表示(&amp;D)</translation>
     </message>
     <message>
       <source>APPCLOSE_SAVE</source>
@@ -168,11 +168,11 @@
     </message>
     <message>
       <source>QUE_DOC_ALREADYEXIST</source>
-      <translation>ドキュメント %1 は、既にStudyのマネージャーに存在します。\n再読み込みしますか？</translation>
+      <translation>ドキュメント %1 は研究のマネージャーに既に存在します。それを再読み込みしますか。</translation>
     </message>
     <message>
       <source>MEN_RENAME_VS</source>
-      <translation>名前変更</translation>
+      <translation>名前の変更</translation>
     </message>
     <message>
       <source>TOT_DESK_CATALOG_GENERATOR</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>TOT_DESK_REGISTRY_DISPLAY</source>
-      <translation>CORBA のレジスタを表示します。</translation>
+      <translation>レジストリの表示</translation>
     </message>
     <message>
       <source>OBJ_BROWSER_COLUMN_0</source>
@@ -240,11 +240,11 @@
     </message>
     <message>
       <source>OBJ_BROWSER_COLUMN_3</source>
-      <translation>参照のエントリ</translation>
+      <translation>参照エントリ</translation>
     </message>
     <message>
       <source>PREF_CATEGORY_SALOME</source>
-      <translation>Salome-Meca</translation>
+      <translation>SALOME</translation>
     </message>
     <message>
       <source>PYTHON_CONSOLE</source>
@@ -371,7 +371,7 @@
     </message>
     <message>
       <source>PRP_VERSIONS</source>
-      <translation>格納されたデータ</translation>
+      <translation>格納されているデータ</translation>
     </message>
     <message>
       <source>PRP_DATE_MODIF</source>
@@ -437,11 +437,11 @@
     </message>
     <message>
       <source>VARNAME_COLUMN</source>
-      <translation>変数の名前</translation>
+      <translation>変数名</translation>
     </message>
     <message>
       <source>VARVALUE_COLUMN</source>
-      <translation>変数の値</translation>
+      <translation>値</translation>
     </message>
     <message>
       <source>VARVALUE_INCORRECT</source>
@@ -453,68 +453,68 @@
     </message>
     <message>
       <source>VARNAME_EXISTS</source>
-      <translation>変数"%1"です。</translation>
+      <translation>変数名「%1」が存在します。</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_NoteBook</name>
     <message>
       <source>NOTEBOOK_TITLE</source>
-      <translation>NOTEBOOK_TITLE</translation>
+      <translation>ノート</translation>
     </message>
     <message>
       <source>BUT_UPDATE_STUDY</source>
-      <translation>BUT_UPDATE_STUDY</translation>
+      <translation>スタディ更新(&amp;U)</translation>
     </message>
     <message>
       <source>BUT_REMOVE</source>
-      <translation>BUT_REMOVE</translation>
+      <translation>削除(&amp;R)</translation>
     </message>
     <message>
       <source>BUT_APPLY_AND_CLOSE</source>
-      <translation>BUT_APPLY_AND_CLOSE</translation>
+      <translation>適用して閉じる(&amp;p)</translation>
     </message>
     <message>
       <source>BUT_HELP</source>
-      <translation>BUT_HELP</translation>
+      <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
       <source>CLOSE_CAPTION</source>
-      <translation>CLOSE_CAPTION</translation>
+      <translation>レジストリを閉じます</translation>
     </message>
     <message>
       <source>CLOSE_DESCRIPTION</source>
-      <translation>CLOSE_DESCRIPTION</translation>
+      <translation>レジストリに変更を保存しますか?</translation>
     </message>
     <message>
       <source>INCORRECT_DATA</source>
-      <translation>INCORRECT_DATA</translation>
+      <translation>少なくとも、一つの変数の定義が正しくありません。その設定を編集または一覧から削除して下さい。</translation>
     </message>
     <message>
       <source>ERR_UPDATE_STUDY_FAILED</source>
-      <translation>ERR_UPDATE_STUDY_FAILED</translation>
+      <translation>スタディの更新に失敗しました！</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_DoubleSpinBox</name>
     <message>
       <source>VALID_RANGE_VAR_MSG</source>
-      <translation>変数名または%3桁の精度で(%1; %2) の範囲の小数点で入力します。</translation>
+      <translation>小数点以下%3桁の精度で（%1; %2）の範囲の数値または変数名を入力してください。</translation>
     </message>
     <message>
       <source>VALID_RANGE_NOVAR_MSG</source>
-      <translation>%3桁の精度で（%1; %2）の範囲の小数点を入力します。</translation>
+      <translation>%3桁の精度で（%1; %2）の範囲の浮動小数点値を入力します。</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_IntSpinBox</name>
     <message>
       <source>VALID_RANGE_VAR_MSG</source>
-      <translation>変数名または%3桁の精度で(%1; %2) の範囲の小数点で入力します。</translation>
+      <translation>変数名または整数値のいずれか (%1;%2) の範囲で指定します</translation>
     </message>
     <message>
       <source>VALID_RANGE_NOVAR_MSG</source>
-      <translation>%3桁の精度で（%1; %2）の範囲の小数点を入力します。</translation>
+      <translation>(%1;%2) の範囲の整数値を指定します。</translation>
     </message>
   </context>
 </TS>

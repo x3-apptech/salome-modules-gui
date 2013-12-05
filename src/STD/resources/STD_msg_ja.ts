@@ -73,11 +73,11 @@
     </message>
     <message>
       <source>ERR_DOC_UNKNOWNTYPE_OPEN</source>
-      <translation>不明な種類のドキュメント ( %1 ) を開こうとしています。</translation>
+      <translation>不明な種類 (%1) のドキュメントを開こうとしています。</translation>
     </message>
     <message>
       <source>ERR_DOC_UNKNOWNTYPE_SAVE</source>
-      <translation>不明な種類のドキュメント ( %1 ) として保存しようとしています。</translation>
+      <translation>不明な種類 (%1) のドキュメントを保存しようしています。</translation>
     </message>
     <message>
       <source>TOT_DESK_NEWWINDOW</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>BUT_OK</source>
-      <translation>OK</translation>
+      <translation>OK(&amp;O)</translation>
     </message>
     <message>
       <source>FILTER_FILES</source>
@@ -137,7 +137,7 @@
     </message>
     <message>
       <source>TOT_DESK_FILE_NEW</source>
-      <translation>新しいドキュメントを作成</translation>
+      <translation>新しいドキュメント</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_NEW</source>
@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>PRP_DESK_HELP_ABOUT</source>
-      <translation>About'ダイアログ ボックスの表示</translation>
+      <translation>ソフト情報の表示</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE</source>
@@ -212,6 +212,10 @@
       <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
+      <source>BUT_APPLY_AND_CLOSE</source>
+      <translation>適用して閉じる（&amp;p）</translation>
+    </message>
+    <message>
       <source>INF_DESK_EXIT</source>
       <translation>終了</translation>
     </message>
@@ -233,7 +237,7 @@
     </message>
     <message>
       <source>WRN_WARNING</source>
-      <translation>注意 ！</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <source>TOT_DESK_HELP_ABOUT</source>
@@ -301,7 +305,7 @@
     </message>
     <message>
       <source>MEN_DESK_WINDOW_VTILE</source>
-      <translation>垂直方向のモザイク(&amp;V)</translation>
+      <translation>垂直方向に並べて表示(&amp;V)</translation>
     </message>
     <message>
       <source>ERR_DOC_PERMISSIONDENIED_SAVE</source>
@@ -313,7 +317,7 @@
     </message>
     <message>
       <source>TIT_FILE_SAVEAS</source>
-      <translation>別名で保存</translation>
+      <translation>別名保存</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_CLOSE</source>
@@ -329,7 +333,7 @@
     </message>
     <message>
       <source>MEN_DESK_HELP_SEARCH</source>
-      <translation>サーチ...(&amp;S)</translation>
+      <translation>検索...(&amp;S)</translation>
     </message>
     <message>
       <source>MEN_DESK_VIEW_STDTOOLBAR</source>
@@ -337,7 +341,7 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_SAVEAS</source>
-      <translation>別名で保存...(&amp;A)</translation>
+      <translation>別名保存...(&amp;A)</translation>
     </message>
     <message>
       <source>PRP_DESK_VIEW_STDTOOLBAR</source>
@@ -357,11 +361,11 @@
     </message>
     <message>
       <source>TOT_DESK_FILE_OPEN</source>
-      <translation>ドキュメントを開く</translation>
+      <translation>文書を開く</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_REOPEN</source>
-      <translation>ドキュメントを開く</translation>
+      <translation>ドキュメントの再読み込み</translation>
     </message>
     <message>
       <source>PRP_DESK_FILE_EXIT</source>
@@ -405,7 +409,7 @@
     </message>
     <message>
       <source>MEN_DESK_FILE_REOPEN</source>
-      <translation>再開</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_LOAD</source>
@@ -428,7 +432,7 @@
     <name>STD_Application</name>
     <message>
       <source>INF_DOC_MODIFIED</source>
-      <translation>ドキュメントが変更されています。\n変更を保存しますか。？</translation>
+      <translation>ドキュメントが変更されています。変更を保存しますか。</translation>
     </message>
     <message>
       <source>INF_DOC_SAVING</source>
@@ -444,11 +448,11 @@
     </message>
     <message>
       <source>MEN_DOCK_WINDOWS</source>
-      <translation>Window およびツールバー</translation>
+      <translation>ウィンドウとツールバー</translation>
     </message>
     <message>
       <source>ABOUT_INFO</source>
-      <translation>標準アプリケーションの適合</translation>
+      <translation>SUIT標準アプリケーション</translation>
     </message>
     <message>
       <source>INF_DOC_SAVING_FAILS</source>
@@ -456,7 +460,7 @@
     </message>
     <message>
       <source>INF_DOCUMENT_MODIFIED</source>
-      <translation>ドキュメント"%1"が変更されました。\n変更を保存しますか？</translation>
+      <translation>ドキュメント"%1"が変更されました。変更を保存しますか。</translation>
     </message>
     <message>
       <source>CLOSE_STUDY</source>
@@ -468,7 +472,7 @@
     </message>
     <message>
       <source>REOPEN_STUDY</source>
-      <translation>スタディを再開</translation>
+      <translation>スタディを再読み込み</translation>
     </message>
     <message>
       <source>REOPEN_QUESTION</source>

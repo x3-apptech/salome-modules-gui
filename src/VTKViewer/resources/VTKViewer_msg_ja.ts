@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>MNU_FRONT_VIEW</source>
-      <translation>転送</translation>
+      <translation>正面</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>保存</translation>
+      <translation>ビューを保存.</translation>
     </message>
     <message>
       <source>DSC_TOP_VIEW</source>
@@ -37,11 +37,11 @@
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パンニング</translation>
+      <translation>並進移動</translation>
     </message>
     <message>
       <source>MNU_TOP_VIEW</source>
-      <translation>トップ</translation>
+      <translation>上面</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
@@ -65,11 +65,11 @@
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>すべてのオブジェクトを表示します。</translation>
+      <translation>すべてのオブジェクトを表示するには、ステージのサイズを変更します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべて表示</translation>
+      <translation>全体表示</translation>
     </message>
     <message>
       <source>MNU_ROTATE_VIEW</source>
@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>DSC_SHOW_TRIHEDRON</source>
-      <translation>三面体をを表示</translation>
+      <translation>現在のビューの三面体を表示/非表示</translation>
     </message>
     <message>
       <source>DSC_FRONT_VIEW</source>
@@ -97,15 +97,15 @@
     </message>
     <message>
       <source>MNU_SHOW_TRIHEDRON</source>
-      <translation>軸の表示/非表示</translation>
+      <translation>三面体を表示/非表示</translation>
     </message>
     <message>
       <source>MNU_BOTTOM_VIEW</source>
-      <translation>Bottom</translation>
+      <translation>底面</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>復元</translation>
+      <translation>表示リセット</translation>
     </message>
     <message>
       <source>MNU_LEFT_VIEW</source>
@@ -117,11 +117,11 @@
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域にビューを表示します。</translation>
+      <translation>選択領域をビューフレーム内に表示</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>表示エリア</translation>
+      <translation>選択範囲表示</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>現在のビューをイメージ ファイルに保存します。</translation>
+      <translation>現在のシーンをイメージファイルで保存</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>ビューのポイントを復元します。</translation>
+      <translation>ビューポイントをリセット</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
@@ -157,7 +157,7 @@
     </message>
     <message>
       <source>DSC_BACK_VIEW</source>
-      <translation>背面図</translation>
+      <translation>後側のビュー</translation>
     </message>
   </context>
   <context>
@@ -241,15 +241,15 @@
     </message>
     <message>
       <source>GT_SECONDCORNERGRADIENT</source>
-      <translation>2 番目のコーナーのグラデーション</translation>
+      <translation>グラデーションの 2 番目の角</translation>
     </message>
     <message>
       <source>GT_THIRDCORNERGRADIENT</source>
-      <translation>3 番目のコーナーのグラデーション</translation>
+      <translation>3 番目の角勾配</translation>
     </message>
     <message>
       <source>GT_FOURTHCORNERGRADIENT</source>
-      <translation>4 番目のコーナーのグラデーション</translation>
+      <translation>第 4 コーナー グラデーション</translation>
     </message>
     <message>
       <source>BG_IMAGE_FILES</source>
