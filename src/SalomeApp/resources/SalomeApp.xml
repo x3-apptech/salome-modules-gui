@@ -35,7 +35,7 @@
     <parameter name="modules"    value="GEOM,SMESH,HEXABLOCK,MED,YACS,PARAVIS"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
-    <parameter name="standalone" value="pyContainer,supervContainer"/>
+    <parameter name="standalone" value=""/>
   </section>
   <section name="language">
     <!-- Language settings (resource manager)-->
