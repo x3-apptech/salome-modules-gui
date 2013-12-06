@@ -427,7 +427,7 @@ QString SalomeApp_Study::studyName() const
   // it can be changed outside of GUI
   // TEMPORARILY SOLUTION: better to be implemented with help of SALOMEDS observers
   if ( studyDS() ) {
-    QString newName = studyDS()->Name().c_str();
+    QString newName = QString::fromUtf8(studyDS()->Name().c_str());
     if ( LightApp_Study::studyName() != newName ) {
       SalomeApp_Study* that = const_cast<SalomeApp_Study*>( this );
       that->setStudyName( newName );
