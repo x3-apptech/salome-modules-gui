@@ -686,7 +686,7 @@ void LightApp_Application::createActions()
       if ( icon.isNull() )
       {
         icon = modIcon;
-        INFOS ( "****************************************************************" << std::endl
+        INFOS ( "\n****************************************************************" << std::endl
                 <<  "*    Icon for " << (*it).toLatin1().constData()
                 << " not found. Using the default one." << std::endl
                 << "****************************************************************" << std::endl );
@@ -3727,7 +3727,7 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
 
   if ( !isLibFound )
     {
-      INFOS( "****************************************************************" << std::endl
+      INFOS( "\n****************************************************************" << std::endl
           << "*    Warning: library " << lib.toLatin1().constData() << " cannot be found" << std::endl
           << "*    Module " << moduleTitle.toLatin1().constData() << " will not be available in GUI mode" << std::endl
           << "****************************************************************" << std::endl );
@@ -3764,7 +3764,7 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
             return true;
         }
 
-      printf( "****************************************************************\n" );
+      printf( "\n****************************************************************\n" );
       printf( "*    Warning: python library for %s cannot be found:\n", moduleTitle.toLatin1().constData() );
       if (!isPyLib)
         printf( "*    No module named %s\n", moduleName( moduleTitle ).toLatin1().constData() );
