@@ -22,15 +22,14 @@
 
 // File   : CASCatch_CatchSignals.cxx
 // Author : Sergey RUIN, Open CASCADE S.A.S (sergey.ruin@opencascade.com)
-//
-#include "CASCatch_CatchSignals.hxx"
 
+#include "CASCatch_CatchSignals.hxx"
 #include "CASCatch_Failure.hxx"  
 #include "CASCatch_ErrorHandler.hxx"
+
 #include <TCollection_AsciiString.hxx>
 
 #define MAX_HANDLER_NUMBER 6
-
 
 //================================================================================
 /*! Public -
@@ -38,11 +37,9 @@
  */
 //================================================================================ 
 CASCatch_CatchSignals::CASCatch_CatchSignals() 
-     :myIsActivated(Standard_False)
+  : myIsActivated( Standard_False )
 {
-
-  Standard_Integer i = 0;
-  for(; i<=MAX_HANDLER_NUMBER; i++)
+  for ( Standard_Integer i = 0; i <= MAX_HANDLER_NUMBER; i++ )
     mySigStates[i] = NULL;
 }
 
@@ -64,9 +61,7 @@ CASCatch_CatchSignals::CASCatch_CatchSignals()
 #include <exception.h>
 #endif
 
-//==============================
 typedef void (ACT_SIGIO_HANDLER)(void) ;
-
 ACT_SIGIO_HANDLER *ADR_ACT_SIGIO_HANDLER = NULL ;
 
 typedef void (* SIG_PFV) (int);
@@ -108,7 +103,7 @@ typedef void (* SIG_PFV) (int);
  * \brief universal handler for signals
  */
 //================================================================================ 
-static void Handler(const OSD_Signals theSig, const OSD_Signals)
+static void Handler(const int theSig)
 {
   sigset_t set;
   sigemptyset(&set);
@@ -128,7 +123,7 @@ static void Handler(const OSD_Signals theSig, const OSD_Signals)
  * \brief  handler for SIGSEGV signal
  */
 //================================================================================ 
-static void SegvHandler(const OSD_Signals, const Standard_Address, const Standard_Address)
+static void SegvHandler(const int, siginfo_t*, const Standard_Address)
 {
   sigset_t set;
   sigemptyset(&set);
@@ -159,9 +154,8 @@ void CASCatch_CatchSignals::Activate()
   act.sa_handler =  (SIG_PFV) &Handler ;
   sigemptyset(&act.sa_mask) ;
 
-
-  stat = sigaction(SIGHUP,&act,(struct sigaction*)mySigStates[0]);    // ...... hangup
-  stat = sigaction(SIGFPE,&act,(struct sigaction*) mySigStates[1]);   // ...... floating point exception
+  stat = sigaction(SIGHUP,&act,(struct sigaction*)mySigStates[0]);   // ...... hangup
+  stat = sigaction(SIGFPE,&act,(struct sigaction*) mySigStates[1]);  // ...... floating point exception
   stat = sigaction(SIGINT,&act,(struct sigaction*)mySigStates[2]);   // ...... interrupt
   stat = sigaction(SIGQUIT,&act,(struct sigaction*)mySigStates[3]);  // ...... quit
   stat = sigaction(SIGBUS,&act,(struct sigaction*)mySigStates[4]);   // ...... bus error
