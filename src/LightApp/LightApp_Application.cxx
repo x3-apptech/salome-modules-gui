@@ -1171,6 +1171,15 @@ void LightApp_Application::onSelectionChanged()
   action( EditPasteId )->setEnabled(canPaste);
 }
 
+/*! Reset tree view model */
+void LightApp_Application::onCloseDoc( bool ask )
+{
+  if ( SUIT_DataBrowser* ob = objectBrowser() )
+    ob->setModel(0);
+
+  CAM_Application::onCloseDoc( ask );
+}
+
 /*!
   Adds window to application.
   \param wid - QWidget
