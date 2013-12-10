@@ -12,6 +12,10 @@
       <translation>ファイル %1 は存在しません。</translation>
     </message>
     <message>
+        <source>WRN_STUDY_LOCKED</source>
+        <translation type="unfinished">Study is locked.</translation>
+    </message>
+    <message>
       <source>CLOSE_LOCKED_STUDY</source>
       <translation>ロックされたスタディを閉じますか。</translation>
     </message>
