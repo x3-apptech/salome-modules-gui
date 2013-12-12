@@ -3,14 +3,13 @@
 \page salome_desktop_page SALOME desktop
 
 <b>Multi-Desktop Approach</b> used in Salome means that there is a separate Desktop
-for each Study and all windows connected to one Study (viewers, dockable
-windows etc) are placed in one container. 
+for each Study and all windows connected to the same Study (viewers, dockable
+windows, etc.) are placed in one container. 
 This approach positively differs from the classic multi document interface 
 if many windows are used, i.e. when one document contains a lot of
 viewers, dialogs, etc. Each desktop also has its own menu and toolbar.
 
-The main SALOME Desktop consists of the following sections and
-toolbars:
+The main SALOME Desktop consists of the following sections and toolbars:
 
 \image html desktop.png
 
@@ -19,31 +18,24 @@ toolbars:
 <ul>
 <li><b>Main menu</b> - This is a set of context-sensitive menus, which will
 be updated according to the functionality of the currently active component. In
-general, these menus contain all functional options of SALOME
-platform.</li>
-<li><b>Standard toolbar</b> - This toolbar contains standard actions
+general, these menus contain all functional options of SALOME platform.</li>
+<li><b>Standard toolbar</b> - contains standard actions
 that allow creating new or opening existing study, saving study, deleting
 objects etc.</li>
-<li><b>Components toolbar</b> - This toolbar allows activating
+<li><b>Components toolbar</b> - allows activating
 components in SALOME platform.</li>
-<li><b>Module toolbars</b> - These toolbars contain actions specific to the
+<li><b>Module toolbars</b> - contains actions specific to the
 currently active module.</li>
-<li><b>Viewer toolbar</b> - This is a set of tools destined for visualization
+<li><b>Viewer toolbar</b> - provides a set of tools destined for visualization
 of the presentations in the viewer.</li>
 </ul>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All toolbars in the
-\b SALOME Platform are context-sensitive. Loading of a definite component
-(Geometry, Post-Pro, Mesh etc.) will automatically add some additional
-toolbars specific to this component. To display/hide a definite
-toolbar, in the main menu choose <b>View > Toolbars</b>, and from this
-submenu check or uncheck the toolbar, you would like to display/hide.
+All toolbars in the \b SALOME Platform are context-sensitive. Loading of a definite component
+(Geometry, Mesh etc.) will automatically add some additional
+toolbars specific to this component. To display/hide a toolbar, in the main menu choose <b>View > Toolbars</b>, and from this submenu check or uncheck the toolbar that you would like to display/hide.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By default all
-toolbars are located on the top of the SALOME desktop. But you can
-relocate toolbars by dragging with the mouse and dropping it in any
-place of the window.
+By default all toolbars are located on top of the SALOME desktop, but you can relocate a toolbar by dragging it with the mouse and dropping in any place of the window.
 
 <b>Parts of  the study window:</b>
 <ul>
@@ -57,8 +49,7 @@ right-click in this window gives access to
 <b>Copy/Paste/SelectAll/ClearAll</b> options.</li>
 </ul>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object Browser, Python
-Console, MenuBar, etc are, in fact, separate dockable windows.
+Object Browser, Python Console, MenuBar, etc are, in fact, separate dockable windows.
 Dockable windows can be placed in special areas, on the borders of
 desktop like toolbars. You can change the size and the position of
 dockable windows, hide them or even place outside desktop. SALOME
@@ -70,8 +61,7 @@ activated). Also each module can indicate which common windows are
 necessary for working, and only they will be displayed when this
 module is active.
 
-All parts of Salome desktop and study window can be managed through \b
-View menu.
+All parts of Salome desktop and study window can be managed through \b View menu.
 
 \image html viewmenu.png
 
@@ -80,53 +70,31 @@ View menu.
 <li>\b Windows - allows to show and hide dockable windows, such as
 Object Browser and Python Console</li>
 <li><b> Status Bar </b> allows showing and hiding the Status Bar.</li>
-<li>\ref themes_page "Theme" - allows to select and edit the style (colors and fonts) for
-Salome session.</li>
+<li>\ref themes_page "Theme" - allows to select and edit the style (colors and fonts) for Salome session.</li>
 </ul>
 
-If there are several viewer windows in your current study and
-you want to display more then one at the same time, you can use the
-functionalities provided by the \b Window menu.
+If there are several viewer windows in your current study and you want to display more then one at the same time, you can use the functionalities provided by the \b Window menu.
 
 \image html windowmenu.png
 
 <ul>
-<li><b>New window </b> - allows to open a new instance of any
-viewer.</li> 
+<li><b>New window </b> - allows to open a new instance of any viewer.</li> 
 <li><b>Close</b> - closes the currently active viewer window.</li> 
 <li><b>Close all</b> - closes all viewer windows.</li>
 <li><b>Group all</b> - arranges all created viewer windows on the same desktop</li>
-<li><b>Arrange Views</b> - choice of split scheme and list of used views.
+<li><b>Arrange Views</b> - allows choosing the necessary views and their layout.
+
 \image html arrange_views_dlg.png
 
-- <b>Views Layout</b>
-
-  - Three radio-buttons to specify numbers of the views to arrange (2, 3 or 4).
-  
-  - Buttons (depending on the chosen number of views) with images to specify 
-    view layout.
-    
-  - Buttons "Previous" and "Next" for possibility to change split schemas.
-
-- <b>Views List</b>
-
-  - The list of opened view windows - the user have to select corresponding 
-    views to be arranged.
-    
-  - Two radio-buttons that specify an action to be applied to the remaining views.
-  
-    - "Close the remaining views" - all remaining views will be closed.
-    
-    - "Stack the remaining views" - all remaining views will be stacker to the 
-      last tab area.
+- The radio-buttons in <b>Views Layout</b> section allow choosing the number of views to be arranged (2, 3 or 4). The buttons with images allow choosing the view layout (depending on the chosen number of views). 
+- <b>Views List</b>  contains the list of opened view windows, where it is possible to check in the necessary views. 
+- <b>Close the remaining views</b> check-box allows closing all non-selected views.    
+- <b>Stack the remaining views</b> check-box allows stacking all non-selected views in the last tab area.
       
-<li><b>Split Vertically</b> and <b>Split Horizontally</b> allows to split
-the representation area into two parts, in horizontal or vertical
-direction.</li>
-<li>List of all opened viewer windows provides fast access to
-them.</li>
-<li>\b Rename - allows to rename the currently selected viewer
-window. </li>
+<li><b>Split Vertically</b> and <b>Split Horizontally</b> allow splitting 
+the representation area into two parts, in horizontal or vertical direction.</li>
+<li>List of all opened viewer windows provides fast access to them.</li>
+<li>\b Rename - allows renaming the currently selected viewer window. </li>
 </ul>
 
 

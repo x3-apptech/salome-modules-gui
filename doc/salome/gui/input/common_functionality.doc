@@ -1,6 +1,6 @@
 /*!
 
-\page common_functionality_page Common functionality
+\page common_functionality_page  Functionality common for OCC and VTK viewers 
 
 \anchor viewer_background
 <h2>Background</h2>
@@ -12,10 +12,10 @@ popup menu command that opens the following dialog box:
 
 The following types of the background are supported:
 
-- Single color: the background is colored with the solid color
+- <b> Single color: </b> the background is colored with the solid color
   specified by the user in the dialog box.
 
-- Gradient background: the background is gradiently colored according
+- <b> Gradient background: </b> the background is gradiently colored according
   to two colors and the gradient type specified in the dialog box. The
   following types of background are supported:
 
@@ -35,13 +35,13 @@ The following types of the background are supported:
 
   - Fourth corner
 
-- Image: allows to set image as viewer background and define filling type:
+- \b Image: allows to set image as viewer background and define filling type:
 
-  - Center: the image is located at the center of the viewer backgound
+  - \b Center: the image is located at the center of the viewer backgound
 
-  - Tile: the image fills the entire viewer backgound one by one
+  - \b Tile: the image fills the entire viewer backgound one by one
 
-  - Stretch: the image is stretched to the entire viewer backgound.
+  - \b Stretch: the image is stretched to the entire viewer backgound.
 
 Default background for the OCC viewer is specified via the
 \ref occ_preferences "OCC 3D Viewer Preferences" and for the
@@ -51,48 +51,49 @@ VTK viewer via the \ref vtk_preferences "VTK 3D Viewer Preferences".
 
 <h2>Selection</h2>
 
-For selecting it is necessary to click by left mouse button on the required 
-element. Thus, this element will be selected.
+An element can be selected by clicking on it with the left mouse button.
+Selecting objects with locked <b>Shift</b> key produces a multi selection. 
 
-Also, holding down the <b>Shift</b> key while selecting objects will 
-produce multi selection. 
-
-In the viewers there are two mechanism for selecting: rectangle and 
+In the viewers there are two selection mechanisms: rectangle and 
 polyline selection.
 
 <h3>Rectangle selection</h3>
 
-The Rectangle Selection tool is designed to select rectangular regions: 
-it is the most basic of the selection tools and very commonly used.
+Rectangle Selection is the basic and commonly used selection tool.
  
-For selecting area by rectangle press left mouse button and draw it on 
-the viewer holding down the left mouse button.
-
-To add an area to the existing selection it is necessary to hold down 
-<b>Shift</b> key while selecting.
+To select a rectangle area press and hold the left mouse button while drawing the diagonal of the selection rectangle in the viewer.
 
 \image html rectselectionvtk.png
-As a result, only a rectangle is selected.
+
+As a result, the objects within the rectangle are selected.
+
 \image html rectselectionvtk2.png
+
+
+\note It is possible to add an area to the existing selection by holding down 
+<b>Shift</b> key while selecting.
+
 
 <h3>Polyline selection</h3>
 
-OCC and VTK Viewers features a special Polyline Selection mechanism,
-which allows selecting an arbitraty part of the graphic area using a
+OCC and VTK Viewers feature a special Polyline Selection mechanism,
+which allows selecting an arbitrary part of the graphic area using a
 polygon frame (rubber band), instead of the usual selection with a
 rectangular frame.
 
-To produce a Polyline Selection, lock the right mouse button and draw
-the first side of the polygon, then change the direction by clicking
-the left mouse button add draw another side, etc. The whole selection
-frame is drawn with the locked right mouse button.
+To produce a Polyline Selection, press and hold the right mouse button and draw
+the first side of the selection polygon, then change the direction by clicking
+the left mouse button add draw another side, etc. 
+
+\image html polyselectionvtk11.png
+
+As a result, the objects within the polygon are selected.
+
+\image html polyselectionvtk21.png
 
 To add an area to the existing selection it is necessary to hold down 
 <b>Shift</b> key while selecting.
 
-\image html polyselectionvtk11.png
-As a result, only the faces within the frame are selected.
-\image html polyselectionvtk21.png
 
 <hr>
 
@@ -103,28 +104,26 @@ OCC and VTK 3D viewers support two different navigation modes:
 
 - <b>Salome standard controls</b>
 
-  Rectangle selection in this mode is performed by left mouse button, 
-  polyline selection is done by right mouse button;
+  Rectangle selection in this mode is performed by the left mouse button
+  and polyline selection by the right mouse button;
   multiple selection is available when \b Shift button is pressed.
 
-  Also, holding \b Ctrl key pressed in conjunction with 
-  mouse buttons performs view transformations:
+  Also, holding \b Ctrl key with pressed mouse buttons performs the following view transformations:
   - \b Ctrl + left mouse button - zooming;
   - \b Ctrl + middle mouse button - panning;
   - \b Ctrl + right mouse button - rotation.
 
 - <b>Keyboard free style</b>
 
-  This mode allows to process all view transformations without using
-  keyboard (only by mouse):
+  This mode allows performing all view transformations without using the 
+  keyboard (only by the mouse):
   - \b Left mouse button performs view rotation;
   - \b Middle mouse button performs panning; 
   - \b Right mouse button makes zooming.
-  .
-  
-  In this style selection of objects in view is performed by pressing
-  "S" key or by left mouse button click. Rectangle selection is done
-  by left mouse button when holding \b Ctrl key; polyline selection
-  is done by right mouse button with \b Ctrl key pressed.
+  .  
+  In this style selection of objects in the viewer is performed by pressing
+  "S" key or by the left mouse button click. Rectangle selection is done
+  by the left mouse button with \b Ctrl key pressed; polyline selection
+  is done by the right mouse button with \b Ctrl key pressed.
 
 */

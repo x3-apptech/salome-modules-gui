@@ -2,25 +2,26 @@
 
 \page viewers_page Viewers
 
-SALOME provides a set of viewers for data representation. SALOME GUI
-module includes several 2D and 3D viewers, that are used for
+
+
+SALOME GUI module includes several 2D and 3D viewers, that are used for
 different purposes within the platform:
 
 - \subpage occ_3d_viewer_page has been developed on
 the basis of Open CASCADE Technology (http://www.opencascade.org).
-This is the default viewer for SALOME Geometry module, it provids good
+This is the default viewer for SALOME Geometry module, it provides good
 representation of construction and transformation of geometrical objects.
 
 - \subpage vtk_3d_viewer_page has been developed
 basing on Kitware Visualization ToolKit library (http://www.vtk.org).
 This is the default viewer for SALOME Mesh module, where it is used
-for visualization of meshes. It is also used in SALOME Post-Pro module
-for all 3D presentations.
+for visualization of meshes.
+
+OCC and VTK 3d viewers share some \subpage common_functionality_page "common functionality". 
 
 - \subpage plot2d_viewer_page has been developed
 basing on the open-source Qwt library (http://qwt.sourceforge.net).
-It is used, for example, for the representation of 2D plots and graphs
-in the SALOME Post-Pro module.
+It can be used, for example, for the representation of 2D plots and graphs.
 
 - \subpage gl_2d_viewer_page is a general purpose
 OpenGL-based viewer, which can be used for visualization of 2D
@@ -31,6 +32,6 @@ directly, but can be used in custom modules for 2D visualization purposes.
 developed on the basis of Qt QGraphicsView scene. This viewer is used
 in SALOME YACS module for visualization of computation schemes.
 
-- \subpage common_functionality_page used in OCC and VTK 3d viewers.
+
 
 */
