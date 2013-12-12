@@ -1171,15 +1171,6 @@ void LightApp_Application::onSelectionChanged()
   action( EditPasteId )->setEnabled(canPaste);
 }
 
-/*! Reset tree view model */
-void LightApp_Application::onCloseDoc( bool ask )
-{
-  if ( SUIT_DataBrowser* ob = objectBrowser() )
-    ob->setModel(0);
-
-  CAM_Application::onCloseDoc( ask );
-}
-
 /*!
   Adds window to application.
   \param wid - QWidget
@@ -1836,6 +1827,9 @@ void LightApp_Application::onPreferenceChanged( QString& modName, QString& secti
 /*!Remove all windows from study.*/
 void LightApp_Application::beforeCloseDoc( SUIT_Study* s )
 {
+  if ( SUIT_DataBrowser* ob = objectBrowser() )
+    ob->setModel(0);
+
   CAM_Application::beforeCloseDoc( s );
 }
 

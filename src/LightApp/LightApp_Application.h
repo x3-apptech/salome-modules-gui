@@ -191,7 +191,6 @@ public slots:
   virtual void                        onCopy();
   virtual void                        onPaste();
   virtual void                        onSelectionChanged();
-  virtual void                        onCloseDoc( bool ask = true);
 
 protected:
   virtual void                        createActions();
