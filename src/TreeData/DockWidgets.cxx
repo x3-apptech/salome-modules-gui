@@ -49,6 +49,7 @@ DockWidgets::DockWidgets(SalomeApp_Application* salomeApp,
   _dwDataPanel = new QDockWidget(parent);
   _dwDataPanel->setVisible(false);
   _dwDataPanel->setWindowTitle(title);
+  _dwDataPanel->setObjectName(title);
   parent->addDockWidget(Qt::LeftDockWidgetArea, _dwDataPanel);
   //
   // At this step, the _dwDataPanel is located side by side with the object
