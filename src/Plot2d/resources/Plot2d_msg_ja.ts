@@ -4,6 +4,10 @@
   <context>
     <name>@default</name>
     <message>
+        <source>PDF_FILES</source>
+        <translation type="unfinished">PDF files (*.pdf)</translation>
+    </message>
+    <message>
       <source>PLOT2D_CURVE_TYPE_LBL</source>
       <translation>曲線の種類:</translation>
     </message>

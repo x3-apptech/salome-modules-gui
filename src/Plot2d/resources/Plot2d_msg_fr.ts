@@ -695,6 +695,10 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
 <context>
     <name>Plot2d_AnalyticalCurveDlg</name>
     <message>
+        <source>AC_OK_BTN</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
         <source>ANALYTICAL_CURVE_TLT</source>
         <translation>Propriétés des courbes analytiques</translation>
     </message>
