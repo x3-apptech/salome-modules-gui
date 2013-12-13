@@ -2041,6 +2041,7 @@ Qt::HANDLE Qtx::getVisual()
     GLX_RGBA,           // Needs to support OpenGL
     GLX_DEPTH_SIZE, 16, // Needs to support a 16 bit depth buffer
     GLX_DOUBLEBUFFER,   // Needs to support double-buffering
+    GLX_STENCIL_SIZE, 1,
     None                // end of list
   };
 
