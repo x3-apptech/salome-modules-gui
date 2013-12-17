@@ -1627,7 +1627,7 @@ void SUIT_TreeModel::updateItem( SUIT_TreeModel::TreeItem* item, bool emitLayout
         fromIndexes.append( index( obj, i ));
         toIndexes.append(QModelIndex());
     }
-    changePersistentIndexList(fromIndexes, toIndexes); // Limitation: can lead to loss of selection
+    //changePersistentIndexList(fromIndexes, toIndexes); // Limitation: can lead to loss of selection
 
     emit dataChanged( toIndexes.first(), toIndexes.last() );
     obj->setModified(false);
