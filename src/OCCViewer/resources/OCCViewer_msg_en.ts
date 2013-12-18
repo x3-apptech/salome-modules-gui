@@ -289,7 +289,8 @@
     </message>
     <message>
         <source>OCC_TEXTURE_FILES</source>
-        <translation>Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+        <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
+        <translation>Image files (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
         <source>DSC_MAXIMIZE_VIEW</source>
@@ -468,11 +469,11 @@
     <message>
         <source>BTN_NEW</source>
         <translation>New</translation>
-    </message>  
-        <message>
+    </message>
+    <message>
         <source>BTN_DELETE</source>
         <translation>Delete</translation>
-    </message>   
+    </message>
     <message>
         <source>AUTO_APPLY</source>
         <translation>Auto Apply</translation>

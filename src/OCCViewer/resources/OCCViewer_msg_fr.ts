@@ -289,7 +289,7 @@
     </message>
     <message>
         <source>OCC_TEXTURE_FILES</source>
-        <translation>Fichiers images (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
         <source>DSC_MAXIMIZE_VIEW</source>

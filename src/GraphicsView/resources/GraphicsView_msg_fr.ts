@@ -75,6 +75,42 @@
 <context>
     <name>GraphicsView_Viewer</name>
     <message>
+        <source>TEST_CROP_OPERATOR</source>
+        <translation type="unfinished">Test Crop operator</translation>
+    </message>
+    <message>
+        <source>TEST_FUSE_OPERATOR</source>
+        <translation type="unfinished">Test Fuse operator</translation>
+    </message>
+    <message>
+        <source>PROPERTIES</source>
+        <translation type="unfinished">Properties</translation>
+    </message>
+    <message>
+        <source>SEND_BACKWARD</source>
+        <translation type="unfinished">Send backward</translation>
+    </message>
+    <message>
+        <source>BRING_FORWARD</source>
+        <translation type="unfinished">Bring forward</translation>
+    </message>
+    <message>
+        <source>SEND_TO_BACK</source>
+        <translation type="unfinished">Send to back</translation>
+    </message>
+    <message>
+        <source>BRING_TO_FRONT</source>
+        <translation type="unfinished">Bring to front</translation>
+    </message>
+    <message>
+        <source>REMOVE_IMAGES</source>
+        <translation type="unfinished">Remove image(s)</translation>
+    </message>
+    <message>
+        <source>ADD_IMAGE</source>
+        <translation type="unfinished">Add image</translation>
+    </message>
+    <message>
         <source>CHANGE_BGCOLOR</source>
         <translation>Changer l&apos;arrière-plan...</translation>
     </message>

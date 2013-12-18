@@ -32,25 +32,19 @@ attributes.
 
 \image html objectbrowser2.png
 
-<ul>
-<li>\b Entry  - Identification index of the object in the structure of
-the study</li>
-<li>\b IOR -  Interoperable Object Reference</li>
-<li><b>Reference entry</b>  -  Identification index of the references
-to the objects</li>
-<li>\b Value  -  Displays the value of the first object attribute</li>
-</ul>
+- \b Name; 
+- \b Entry  - Identification index of the object in the structure of the study;
+- \b IOR -  Interoperable Object Reference; 
+- <b>Reference entry</b>  -  Identification index of the references to the objects;
+- \b Value  -  Displays the value of the first object attribute.
 
 \note <b>Entry, IOR and Reference entry</b> attributes are displayed for debugging purposes only.
 
-<h2> Enable sorting </h2>
+<h2> Sorting </h2>
 
 By default the objects in the object browser are sorted in the creation order. 
 \n
-However, it is possible to enable sorting 
-in the alphabetical order (or the reverse alphabetical order) by right
-clicking in the header of the tree (near the "Name" field) and
-checking "enable sorting" in the popup menu.
+However, it is possible to enable sorting in the alphabetical order (or the reverse alphabetical order) by right clicking in the header of the tree (near the \b Name field) and checking "enable sorting" in the context menu.
 \n
 It is possible to use the arrow near "Name" to reverse the order.
 If "enable sorting" is unchecked, the objects are sorted in the default order again.

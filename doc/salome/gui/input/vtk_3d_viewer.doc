@@ -6,7 +6,7 @@
 
 The functionalities of VTK viewer are available via its Viewer
 Toolbar. Buttons marked with small downward triangles have extended
-functionality which can be accessed by locking on them with left mouse
+functionality, which can be accessed by locking on them with left mouse
 button.  
 
 \image html vtkviewer_toolbar.png
@@ -14,8 +14,7 @@ button.
 
 \image html vtk_view_camera_dump.png
 
-<b>Dump View</b> - exports an object from the viewer in bmp, png or
-jpeg image format.
+<b>Dump View</b> - exports an object from the viewer in bmp, png or jpeg image format.
 <hr>
 
 \image html vtk_view_style_switch.png
@@ -35,14 +34,10 @@ only for parallel (non-perspective) view's mode.
 
 \image html vtk_view_highlight.png
 
-These buttons allow to switch between three pre-selection modes.
-Possible choices:
-- <b>Standard preselection mode</b> - pre-selection is enabled in a standard mode;
-- <b>Dynamic preselection mode</b> - when the dynamic pre-selection is chosen, 
-an objects can be selected by clicking the point/cell belonging to
-this object, with some performance loss. Switch dynamic pre-selection
-off to have a good performance on big objects (for example, huge meshes);
-- <b>Disable preselection</b> - pre-selection is disabled.
+These buttons allow switching between three pre-selection (highlighting) modes:
+- <b>Static pre-selection mode</b> - pre-selection is done in terms of bounding boxes;
+- <b>Dynamic pre-selection mode</b> - pre-selection is done in terms of cells, i.e. an object can be selected by clicking the point/cell belonging to this object. This mode causes some performance loss. It is advisable to switch dynamic pre-selection off to have a good performance on big objects (for example, huge meshes);
+- <b>Disable pre-selection</b> - pre-selection is disabled.
 
 <hr>
 
@@ -76,15 +71,14 @@ the contents of a frame drawn with pressed left mouse button.
 \image html vtk_view_pan.png
 
 <b>Panning</b> - if the represented objects are greater that the
-visible area and you don't wish to use <b>Fit all</b> functionality,
-click on this button and you'll be able to drag the scene to see its
-remote parts.
+visible area and you do not wish to use <b>Fit all</b> functionality,
+click on this button to drag the scene to see its remote parts.
 <hr>
 
 \image html vtk_view_glpan.png
 
 <b>Global panning</b> - allows to select a point to be the center of
-the presentation showing all displayed objects in the visible ares.
+the presentation showing all displayed objects in the visible area.
 <hr>
 
 \image html vtk_view_rotation_point.png
@@ -99,7 +93,7 @@ box of an object.
 
 \image html set_rotation_point_dialog2.png
 
-Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+Unchecking <b>Use Bounding Box Center</b> check-box allows you to
 define the coordinates of the rotation point manually.
 
 - <b>Set to Origin</b> button restores the default rotation point
@@ -129,7 +123,7 @@ These buttons orientate the scene strictly about coordinate axes:
 
 \image html vtk_view_anticlockwise.png
 
-<b>Rotate counterclockwise</b> - rotates view 90° counterclockwise.
+<b>Rotate counter-clockwise</b> - rotates view 90° counter-clockwise.
 <hr>
 
 \image html vtk_view_clockwise.png
@@ -202,46 +196,39 @@ graduate them.
 
 \image html vtk_view_parameters.png
 
-<b>Change View Parameters</b> - this button provides access to the
-dialog box allowing customization different parameters of the view.
+<b>Change View Parameters</b> - this button gives access to the
+dialog for customization of various view parameters.
 
 \image html vtk_view_parameters_dlg.png
 
-- <b>Projection Mode</b> - switchs to the Orthogonal / Perspective
-  projection mode
+- <b>Projection Mode</b> - switches between the \b Orthogonal and \b Perspective projection modes.
 
 - <b>Focal Point</b> - allows to specify the focal point of the view
 
   - <b>Set to Bounding Box Center</b> - chooses the center of the
-    bounding box of the current scene as the focal point.
-
+    bounding box of the current scene as the focal point;
   - <b>Set to Origin</b> - chooses the global coordinates system origin as
-    the focal point
-
+    the focal point;
   - <b>Select Point from View</b> - allows to specify the focal point by the
-    direct selection of a point in the view window
-
+    direct selection of a point in the view window;
   - <b>X</b>, <b>Y</b>, <b>Z</b> - allows to input the coordinates of the focal
-    point directly
+    point directly.
 
 - <b>Camera Position</b> - allows to specify the position of the view camera:
-
-  - <b>Absolute Coordinates</b> - either in absolute coordinates,
-
-  - <b>Relative to Focal Point</b> - or as a offset to the focal point;
-
+  - <b>Absolute Coordinates</b> - in absolute coordinates;
+  - <b>Relative to Focal Point</b> - as a offset to the focal point;
   - <b>Projection Direction</b> - allows specify the direction of the
     projection vector;
+  - <b>Focal Distance</b> - the focal distance value.
 
-  - <b>Focal Distance</b> - the focal distance value;
+- <b>View Up Direction</b> - direction of the "view up" vector.
 
-  - <b>View Up Direction</b> - direction of the "view up" vector.
+- <b>Zooming</b> 
 
-- <b>Zooming</b> - the current zoom factor (available in the <b>Orthogonal
-  mode</b> only)
-
-- <b>View Angle</b> - the current view angle (available in the <b>Perspective
-  mode</b> only)
+	- \b Scale - the current zoom factor (available in the <b>Orthogonal
+  mode</b> only);
+	- <b>View Angle</b> - the current view angle (available in the <b>Perspective
+  mode</b> only).
 
 <hr>
 
@@ -249,16 +236,13 @@ dialog box allowing customization different parameters of the view.
 
 <b>Synchronize view</b> - allows to synchronize 3d view
 parameters. This button has two states - checked and
-unchecked. Clicking on this button opens a drop-down menu listing the
-compatible 3d views. As soon as the user selects any view from the
-list, the parameters (view point, position, zoom coefficient, etc.) of
-the current view are synchronized with the selected view (static
+unchecked. Clicking on this button opens a drop-down menu listing 
+compatible 3d views. When a view is selected in the list , the parameters (view point, position, zoom coefficient, etc.) of the current view are synchronized with the selected view (static
 synchronization).
 
-In addition, when this button is in the "checked" state, the dynamic
-synchronization of the views is performed, i.e. any zoom, pan, rotate
-or other view operation done in one view is automatically applied to
-the other view.
+In addition, when this button is "checked", the 
+views are synchronized dynamically, i.e. any zoom, pan, rotate
+or other view operation done in one view is automatically applied to the other view.
 <hr>
 
 \image html vtk_view_parallel.png

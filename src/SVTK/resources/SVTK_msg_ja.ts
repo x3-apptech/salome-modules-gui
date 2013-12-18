@@ -13,15 +13,15 @@
     </message>
     <message>
       <source>MNU_ANTICLOCKWISE_VIEW</source>
-      <translation>左回転</translation>
+      <translation>表示を左に</translation>
     </message>
     <message>
       <source>MNU_CLOCKWISE_VIEW</source>
-      <translation>右回転</translation>
+      <translation>右のビューを回転させる</translation>
     </message>
     <message>
       <source>MNU_FRONT_VIEW</source>
-      <translation>転送</translation>
+      <translation>-OX</translation>
     </message>
     <message>
       <source>ERROR</source>
@@ -29,11 +29,11 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>保存</translation>
+      <translation>表示状態の保存</translation>
     </message>
     <message>
       <source>DSC_TOP_VIEW</source>
-      <translation>上から見る</translation>
+      <translation>-OZ View</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>MNU_TOP_VIEW</source>
-      <translation>トップ</translation>
+      <translation>-OZ</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心地の選択</translation>
+      <translation>ビューの新しい中心の選択</translation>
     </message>
     <message>
       <source>DSC_ROTATE_VIEW</source>
@@ -61,15 +61,15 @@
     </message>
     <message>
       <source>DSC_LEFT_VIEW</source>
-      <translation>左側のビュー</translation>
+      <translation>+OY View</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>すべてのオブジェクトを表示します。</translation>
+      <translation>すべてのオブジェクトを表示するには、ステージのサイズを変更します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべて表示</translation>
+      <translation>全域表示</translation>
     </message>
     <message>
       <source>MNU_ROTATE_VIEW</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>DSC_FRONT_VIEW</source>
-      <translation>正面</translation>
+      <translation>-OX View</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
       <source>MNU_BACK_VIEW</source>
-      <translation>背面</translation>
+      <translation>+OX</translation>
     </message>
     <message>
       <source>MNU_SHOW_TRIHEDRON</source>
@@ -105,7 +105,7 @@
     </message>
     <message>
       <source>MNU_BOTTOM_VIEW</source>
-      <translation>Bottom</translation>
+      <translation>+OZ</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
@@ -113,11 +113,11 @@
     </message>
     <message>
       <source>MNU_LEFT_VIEW</source>
-      <translation>左</translation>
+      <translation>+OY</translation>
     </message>
     <message>
       <source>DSC_RIGHT_VIEW</source>
-      <translation>右側のビュー</translation>
+      <translation>-OY View</translation>
     </message>
     <message>
       <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
@@ -125,19 +125,19 @@
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域にビューを表示します。</translation>
+      <translation>選択領域の表示</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>表示エリア</translation>
+      <translation>選択領域の表示</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
-      <translation>下から表示します。</translation>
+      <translation>+OZ View</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>現在のビューをイメージ ファイルに保存します。</translation>
+      <translation>表示状態の保存</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
@@ -145,7 +145,7 @@
     </message>
     <message>
       <source>VTK_IMAGE_FILES</source>
-      <translation>イメージ (*.bmp *.png *.jpg *.jpeg) ファイル</translation>
+      <translation>イメージファイル (*.bmp *.png *.jpg *.jpeg)</translation>
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
@@ -153,11 +153,11 @@
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
-      <translation>ファイルを保存できませんでした。</translation>
+      <translation>ファイルを保存できません。</translation>
     </message>
     <message>
       <source>MNU_RIGHT_VIEW</source>
-      <translation>法律</translation>
+      <translation>-OY</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
@@ -165,19 +165,19 @@
     </message>
     <message>
       <source>DSC_BACK_VIEW</source>
-      <translation>背面図</translation>
+      <translation>+OX View</translation>
     </message>
     <message>
       <source>SVTK_IMAGE_FILES</source>
-      <translation>イメージ (*.bmp *.png *.jpg *.jpeg *. pdf.PS *.eps) ファイル</translation>
+      <translation>イメージファイル (*.bmp *.png *.jpg *.jpeg *. pdf *.ps *.eps)</translation>
     </message>
     <message>
       <source>MNU_VIEWPARAMETERS_VIEW</source>
-      <translation>可視化の設定を変更します。</translation>
+      <translation>表示パラメーターの変更</translation>
     </message>
     <message>
       <source>DSC_VIEWPARAMETERS_VIEW</source>
-      <translation>ビューの設定を変更します。</translation>
+      <translation>表示パラメータの変更</translation>
     </message>
     <message>
       <source>MNU_SVTK_PARALLEL_MODE</source>
@@ -213,35 +213,35 @@
     </message>
     <message>
       <source>DSC_SVTK_PRESELECTION_STANDARD</source>
-      <translation>DSC_SVTK_PRESELECTION_STANDARD</translation>
+      <translation>標準の事前選択モード</translation>
     </message>
     <message>
       <source>MNU_SVTK_PRESELECTION_STANDARD</source>
-      <translation>MNU_SVTK_PRESELECTION_STANDARD</translation>
+      <translation>標準の事前選択モード</translation>
     </message>
     <message>
       <source>DSC_SVTK_PRESELECTION_DYNAMIC</source>
-      <translation>DSC_SVTK_PRESELECTION_DYNAMIC</translation>
+      <translation>動的な事前選択モード</translation>
     </message>
     <message>
       <source>MNU_SVTK_PRESELECTION_DYNAMIC</source>
-      <translation>MNU_SVTK_PRESELECTION_DYNAMIC</translation>
+      <translation>動的な事前選択モード</translation>
     </message>
     <message>
       <source>DSC_SVTK_PRESELECTION_DISABLED</source>
-      <translation>DSC_SVTK_PRESELECTION_DISABLED</translation>
+      <translation>事前選択を無効にします。</translation>
     </message>
     <message>
       <source>MNU_SVTK_PRESELECTION_DISABLED</source>
-      <translation>MNU_SVTK_PRESELECTION_DISABLED</translation>
+      <translation>事前選択を無効にします。</translation>
     </message>
     <message>
       <source>DSC_SVTK_ENABLE_SELECTION</source>
-      <translation>DSC_SVTK_ENABLE_SELECTION</translation>
+      <translation>選択を有効/無効にします。</translation>
     </message>
     <message>
       <source>MNU_SVTK_ENABLE_SELECTION</source>
-      <translation>MNU_SVTK_ENABLE_SELECTION</translation>
+      <translation>選択を有効/無効にします。</translation>
     </message>
   </context>
   <context>
@@ -323,7 +323,7 @@
     </message>
     <message>
       <source>MSG_NO_AVI_MAKER</source>
-      <translation>AVI ファイルを保存するために必要な jpeg2yuv ツールは使用できません。マニュアルを参照してください。</translation>
+      <translation>AVI ファイルを保存するために必要な jpeg2yuv ツールは利用できません。マニュアルを参照してください。</translation>
     </message>
   </context>
   <context>
@@ -459,11 +459,11 @@
     <name>SVTK_ViewParameterDlg</name>
     <message>
       <source>LBL_X</source>
-      <translation>X:</translation>
+      <translation>X :</translation>
     </message>
     <message>
       <source>LBL_Y</source>
-      <translation>Y:</translation>
+      <translation>Y :</translation>
     </message>
     <message>
       <source>LBL_Z</source>
@@ -628,15 +628,15 @@
     </message>
     <message>
       <source>GT_SECONDCORNERGRADIENT</source>
-      <translation>2 番目のコーナーのグラデーション</translation>
+      <translation>グラデーションの 2 番目の角</translation>
     </message>
     <message>
       <source>GT_THIRDCORNERGRADIENT</source>
-      <translation>3 番目のコーナーのグラデーション</translation>
+      <translation>3 番目の角勾配</translation>
     </message>
     <message>
       <source>GT_FOURTHCORNERGRADIENT</source>
-      <translation>4 番目のコーナーのグラデーション</translation>
+      <translation>第 4 コーナー グラデーション</translation>
     </message>
     <message>
       <source>BG_IMAGE_FILES</source>

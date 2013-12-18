@@ -427,7 +427,7 @@ QString SalomeApp_Study::studyName() const
   // it can be changed outside of GUI
   // TEMPORARILY SOLUTION: better to be implemented with help of SALOMEDS observers
   if ( studyDS() ) {
-    QString newName = studyDS()->Name().c_str();
+    QString newName = QString::fromUtf8(studyDS()->Name().c_str());
     if ( LightApp_Study::studyName() != newName ) {
       SalomeApp_Study* that = const_cast<SalomeApp_Study*>( this );
       that->setStudyName( newName );
@@ -1163,7 +1163,13 @@ void SalomeApp_Study::updateFromNotebook( const QString& theFileName, bool isSav
 
 LightApp_DataObject* SalomeApp_Study::findObjectByEntry( const QString& theEntry )
 {
-  LightApp_DataObject* o = dynamic_cast<LightApp_DataObject*>( myObserver ? myObserver->findObject( theEntry.toLatin1().constData() ) : 0 );
+  LightApp_DataObject* o = 0;
+  if ( myObserver ) {
+    o = dynamic_cast<LightApp_DataObject*>( myObserver->findObject( theEntry.toLatin1().constData() ) );
+  }
+  if ( !o ) {
+    o = LightApp_Study::findObjectByEntry( theEntry );
+  }
   return o;
 }
 

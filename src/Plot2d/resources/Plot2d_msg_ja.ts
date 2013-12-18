@@ -4,6 +4,10 @@
   <context>
     <name>@default</name>
     <message>
+        <source>PDF_FILES</source>
+        <translation type="unfinished">PDF files (*.pdf)</translation>
+    </message>
+    <message>
       <source>PLOT2D_CURVE_TYPE_LBL</source>
       <translation>曲線の種類:</translation>
     </message>
@@ -21,7 +25,7 @@
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>保存</translation>
+      <translation>ビューを保存.</translation>
     </message>
     <message>
       <source>PLOT2D_SCALE_MODE_HOR</source>
@@ -137,7 +141,7 @@
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>すべてのオブジェクトを表示します。</translation>
+      <translation>すべてのオブジェクトを表示するには、シーンを調整します。</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
@@ -169,7 +173,7 @@
     </message>
     <message>
       <source>DSC_CLONE_VIEW</source>
-      <translation>現在のステージの可視化の新しいウィンドウを開く</translation>
+      <translation>現在のステージの新しいビューアー OCC を開く</translation>
     </message>
     <message>
       <source>DSC_PRINT_VIEW</source>
@@ -349,15 +353,15 @@
     </message>
     <message>
       <source>WRN_XLOG_NOT_ALLOWED</source>
-      <translation>非陽性値、x 軸上で検出されたポイント。X 軸の対数スケールは許可されていません。</translation>
+      <translation>X 軸上非陽性値を持つポイントが検出されました。カテゴリの対数目盛は許可されていません。</translation>
     </message>
     <message>
       <source>WRN_YLOG_NOT_ALLOWED</source>
-      <translation>非陽性値、y 軸上で検出されたポイント。Y 軸の対数スケールは許可されていません。</translation>
+      <translation>Y 軸上非陽性値を持つポイントが検出されました。切片の対数目盛は許可されていません。</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>領域にビューを表示します。</translation>
+      <translation>シーンのボックスで選択した領域を調整します。</translation>
     </message>
     <message>
       <source>PLOT2D_LEGEND_POSITION_LEFT</source>
@@ -497,7 +501,7 @@
     </message>
     <message>
       <source>NONE_MARKER_LBL</source>
-      <translation>なし</translation>
+      <translation>[なし]</translation>
     </message>
     <message>
       <source>ERR_DOC_CANT_SAVE_FILE</source>
@@ -549,7 +553,7 @@
     </message>
     <message>
       <source>NONE_LINE_LBL</source>
-      <translation>なし</translation>
+      <translation>[なし]</translation>
     </message>
     <message>
       <source>PLOT2D_MARKER_SIZE_LBL</source>
@@ -746,7 +750,7 @@
     </message>
     <message>
       <source>AC_CANT_CALCULATE</source>
-      <translation>曲線を計算することはできません。\n 入力パラメーターをチェック</translation>
+      <translation>曲線は計算できません。入力パラメーターを確認してください。</translation>
     </message>
     <message>
       <source>AC_CLOSE_BTN</source>

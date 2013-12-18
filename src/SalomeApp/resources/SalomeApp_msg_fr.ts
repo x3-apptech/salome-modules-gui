@@ -13,6 +13,10 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
         <translation>Le fichier %1 n&apos;existe pas.</translation>
     </message>
     <message>
+        <source>WRN_STUDY_LOCKED</source>
+        <translation type="unfinished">Study is locked.</translation>
+    </message>
+    <message>
         <source>CLOSE_LOCKED_STUDY</source>
         <translation>Fermer l&apos;étude verrouillée ?</translation>
     </message>

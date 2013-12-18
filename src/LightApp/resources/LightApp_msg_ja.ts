@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
-      <translation>Copyright (C) 2007-2012 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+      <translation>Copyright (C) 2007-2013 CEA/DEN, EDF R&amp;D, OPEN CASCADE
 
 Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
 CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
@@ -20,7 +20,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>ABOUT_BASE</source>
-      <translation>基本情報</translation>
+      <translation>一般的な情報</translation>
     </message>
     <message>
       <source>ABOUT_MODULE_INFOS</source>
@@ -36,7 +36,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>APP_NAME</source>
-      <translation>Salome-Meca</translation>
+      <translation>SALOME</translation>
     </message>
     <message>
       <source>ABOUT_LICENSE</source>
@@ -44,7 +44,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>ABOUT_VERSION</source>
-      <translation>バージョン %1</translation>
+      <translation>Version %1</translation>
     </message>
     <message>
       <source>ENTRY_COLUMN</source>
@@ -60,11 +60,11 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>BROWSER_FILEMENU</source>
-      <translation>ファイル (&amp;F)</translation>
+      <translation>ファイル(&amp;F)</translation>
     </message>
     <message>
       <source>BROWSER_CLOSE</source>
-      <translation>閉じる (&amp;C)</translation>
+      <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
       <source>BROWSER_BACK</source>
@@ -72,7 +72,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>BROWSER_FORWARD</source>
-      <translation>進む</translation>
+      <translation>前に進む</translation>
     </message>
     <message>
       <source>BROWSER_FIND</source>
@@ -91,7 +91,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <name>LightApp_Application</name>
     <message>
       <source>LANG_CHANGED</source>
-      <translation>アプリケーションの言語が変更されました。\n変更は、次のセッションに適用されます。</translation>
+      <translation>アプリケーションの言語が変更されました。&lt;BR&gt;変更は、次のセッションに適用されます。</translation>
     </message>
     <message>
       <source>MEN_DESK_THEME</source>
@@ -155,7 +155,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PRP_DESK_PREFERENCES</source>
-      <translation>設定を変更することができます</translation>
+      <translation>設定を変更することができます。</translation>
     </message>
     <message>
       <source>PREF_GROUP_DIRECTORIES</source>
@@ -171,7 +171,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_STORE_TOOL_POS</source>
-      <translation>PREF_STORE_TOOL_POS</translation>
+      <translation>ツールバーの位置を保存します。</translation>
     </message>
     <message>
       <source>PREF_AUTO_SAVE</source>
@@ -195,7 +195,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_NAVIGATION</source>
-      <translation>ナビゲーション:</translation>
+      <translation>ナビゲーション スタイル</translation>
     </message>
     <message>
       <source>PREF_STANDARD_STYLE</source>
@@ -211,7 +211,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_ZOOMING_AT_CENTER</source>
-      <translation>画面の中心を基準に</translation>
+      <translation>ビューの中心を基準</translation>
     </message>
     <message>
       <source>PREF_ZOOMING_AT_CURSOR</source>
@@ -495,7 +495,11 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>NEW_WINDOW_4</source>
-      <translation>QxGraph 2D view(&amp;Q)</translation>
+      <translation>シーン QxScene(&amp;S)</translation>
+    </message>
+    <message>
+      <source>NEW_WINDOW_5</source>
+      <translation>グラフィックの表示 （&amp;r）</translation>
     </message>
     <message>
       <source>CREATING_NEW_WINDOW</source>
@@ -603,7 +607,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_CATEGORY_SALOME</source>
-      <translation>Salome-Meca</translation>
+      <translation>SALOME</translation>
     </message>
     <message>
       <source>PREF_DROP_DOWN_BUTTONS</source>
@@ -615,7 +619,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_GROUP_3DVIEWER</source>
-      <translation>PREF_GROUP_3DVIEWER</translation>
+      <translation>3D シーン</translation>
     </message>
     <message>
       <source>PREF_GROUP_OCCVIEWER</source>
@@ -711,31 +715,31 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_GROUP_SELECTION</source>
-      <translation>PREF_GROUP_SELECTION</translation>
+      <translation>選択</translation>
     </message>
     <message>
       <source>PREF_ENABLE_SELECTION</source>
-      <translation>PREF_ENABLE_SELECTION</translation>
+      <translation>選択範囲を有効にします。</translation>
     </message>
     <message>
       <source>PREF_ENABLE_PRESELECTION</source>
-      <translation>PREF_ENABLE_PRESELECTION</translation>
+      <translation>予選を有効にします。</translation>
     </message>
     <message>
       <source>PREF_PRESELECTION</source>
-      <translation>PREF_PRESELECTION</translation>
+      <translation>予選</translation>
     </message>
     <message>
       <source>PREF_PRESELECTION_STANDARD</source>
-      <translation>PREF_PRESELECTION_STANDARD</translation>
+      <translation>標準</translation>
     </message>
     <message>
       <source>PREF_PRESELECTION_DYNAMIC</source>
-      <translation>PREF_PRESELECTION_DYNAMIC</translation>
+      <translation>動的</translation>
     </message>
     <message>
       <source>PREF_PRESELECTION_DISABLED</source>
-      <translation>PREF_PRESELECTION_DISABLED</translation>
+      <translation>無効になっています。</translation>
     </message>
     <message>
       <source>TOT_CLOSE</source>
@@ -775,7 +779,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>ERR_DOC_NOT_EXISTS</source>
-      <translation>%1 を開くことができません。ファイルが存在しません。</translation>
+      <translation>%1 を開くことができません。ファイルが存在しません</translation>
     </message>
     <message>
       <source>PREF_GROUP_MRU</source>
@@ -878,18 +882,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>STB_ERASE_ALL</source>
-      <translation>すべて非表示</translation>
+      <translation>すべてを非表示</translation>
     </message>
     <message>
       <source>TOP_ERASE_ALL</source>
-      <translation>すべて非表示</translation>
+      <translation>すべてを非表示</translation>
     </message>
   </context>
   <context>
     <name>LightApp_ModuleDlg</name>
     <message>
       <source>DESCRIPTION</source>
-      <translation>You're activating module\n</translation>
+      <translation>モジュール &lt;b&gt;%1&lt;/b&gt; を起動します。&lt;br&gt;下のボタンを押して動作を選択して下さい。</translation>
     </message>
     <message>
       <source>CANCEL</source>
@@ -916,6 +920,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>IMPORT_PREFERENCES</source>
       <translation>インポート設定</translation>
+    </message>
+    <message>
+      <source>XML_FILES_FILTER</source>
+      <translation>XMLファイル （*.xml）</translation>
     </message>
     <message>
       <source>CAPTION</source>

@@ -43,7 +43,7 @@ current cursor position) zooming styles.
 
 \image html occ_view_preselection.png
 
-<b>Enable/Disable preselection</b> - enables or disables preselection in the view.
+<b>Enable/Disable preselection</b> - enables or disables preselection (highlighting) in the view.
 <hr>
 
 \image html occ_view_selection.png
@@ -156,29 +156,25 @@ scene.
 <hr>
 
 \anchor clipping_planes
-\image html occ_view_clipping.png
 
-<b>Clipping</b> - allows to create cross-section views (clipping
-planes) of geometrical objects.
+\b Clipping allows creating cross-section views (clipping planes)
+of your mesh.
 
-To start, click on the \em New button.
+To create a clipping plane, click on the \b New button in the dialog and choose how it is  definition by \b Absolute or \b Relative coordinates.
 
-Now you must specify what mode of creating plane you want to choose: 
-absolute or relative.
-
-<b>Absolute mode</b>
+<b>Absolute Coordinates</b>
 
 \image html Clipping_Absolute.png
 
-- <b>Base point</b> - allows to define the coordinates of the base
+- <b>Base point</b> - allows defining the coordinates of the base
   point for the clipping plane.
 
   - <b>Reset</b> - returns the base point to coordinate origin.
 
-- <b>Direction</b> - allows to define the orientation of the
+- <b>Direction</b> - allows defining the orientation of the
   clipping plane.
 
-  - <b>Invert</b> - allows to select which part of the object will be
+	- <b>Invert</b> - allows selecting, which part of the object will be
     removed and which will remain after clipping.
     
 <b>Relative mode</b>  
@@ -186,17 +182,20 @@ absolute or relative.
 \image html Clipping_Relative.png
 
 - \b Orientation ( ||X-Y, ||X-Z or ||Y-Z).
+
 - \b Distance between the opposite extremities of the boundary box of 
 selected objects, if it is set to 0.5 the boundary box is split in two halves.
+
 - \b Rotation (in angle degrees) <b>around X</b> (Y to Z) and <b>around 
 Y</b> (X to Z) (depending on the chosen Orientation)
 
+The other parameters are available in both modes : 
+- <b>Preview</b> check-box shows the clipping plane in the <b>3D Viewer</b>.
+- <b>Auto Apply</b> check-box shows button is on, you can preview the
+cross-section in the <b>3D Viewer</b>.
 
-If the <b>Show preview</b> button is on, you can see the clipping plane
-in the viewer.
-
-If the <b>Auto Apply</b> button is on, you can preview the
-cross-section in the viewer.
+It is also possible to interact  with the clipping plane directly in 3D 
+view using the mouse. 
 
 <hr>
 
@@ -269,66 +268,5 @@ or other view operation done in one view is automatically applied to
 the other view.
 <hr>
 
-\anchor occ_background
-<h2>Background</h2>
-
-OCC Viewer background can be customized using the "Change background"
-popup menu command that opens the following dialog box:
-
-\image html change_background_dlg.png
-
-The following types of the background are supported:
-
-- Single color: the background is colored with the solid color
-  specified by the user in the dialog box.
-
-- Gradient background: the background is gradiently colored according
-  to two colors and the gradient type specified in the dialog box. The
-  following types of background are supported:
-
-  - Horizontal
-
-  - Vertical
-
-  - First diagonal
-
-  - Second diagonal
-
-  - First corner
-
-  - Second corner
-
-  - Third corner
-
-  - Fourth corner
-
-- Image: allows to set image as viewer background and define filling type:
-
-  - Center: the image is located at the center of the viewer backgound
-
-  - Tile: the image fills the entire viewer backgound one by one
-
-  - Stretch: the image is stretched to the entire viewer backgound.
-
-Default background for the viewer is specified via the
-\ref occ_preferences "application preferences".
-
-<h2>Polyline selection</h2>
-
-OCC Viewer features a special <b>Polyline Selection</b> mechanism,
-which allows selecting an arbitraty part of the graphic area using a
-polygon frame (rubber band), instead of the usual selection with a
-rectangular frame.
-
-To produce a Polyline Selection, lock the right mouse button and draw
-the first side of the polygon, then change the direction by clicking
-the left mouse button add draw another side, etc. The whole selection
-frame is drawn with the locked right mouse button.
-   
-\image html polyselection1.png
-
-As a result, only the nodes within the frame are selected.
-
-\image html polyselection2.png
 
 */

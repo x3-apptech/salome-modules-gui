@@ -21,7 +21,7 @@ cooperate dynamically and be configurable.
 etc. Third party modules optionally can have GUI, but in any case they always connected with KERNEL.
 <li>\b Geometry :  facilitates construction and optimization of geometrical models using a wide range of  CAD functions. 
 <li>\b Mesh :  generates meshes on geometrical models previously created or imported by the Geometry component.
-<li>\b Post-Pro :  performs data visualization and post-processing.
+<li>\b ParaVis :  performs data visualization and post-processing.
 <li>\b MED :  allows to work with MED files.
 </ul>
 
@@ -46,7 +46,7 @@ other components.
 
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-All software components (Post-Pro, Geometry, Mesh...) integrated into
+All software components (Geometry, Mesh...) integrated into
 \b SALOME platform  implement predefined interfaces. Each component
 provides data for the \b SALOME study in a form of links (stored in
 the Study) to the specific data created and stored in the

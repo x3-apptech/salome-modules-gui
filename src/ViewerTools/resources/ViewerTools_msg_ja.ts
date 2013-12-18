@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>CAPTION</source>
-      <translation>軸に目盛り付け</translation>
+      <translation>目盛付軸</translation>
     </message>
     <message>
       <source>IS_VISIBLE</source>

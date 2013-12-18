@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_CASCADE</source>
-      <translation>ウィンドウを重ねて整理</translation>
+      <translation>Windows ではスーパーイン ポーズ</translation>
     </message>
     <message>
       <source>ERR_DIR_NOT_EXIST</source>
@@ -49,23 +49,23 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_ACTIVATE</source>
-      <translation>このウィンドウをアクティブ化</translation>
+      <translation>アクティブ ウィンドウ</translation>
     </message>
     <message>
       <source>ERR_PERMISSION_DENIED</source>
-      <translation>ファイル"%1"を保存できませんでした。\n権限がありません。</translation>
+      <translation>ファイル"%1"を保存できません。アクセス許可は、禁じられています。</translation>
     </message>
     <message>
       <source>ERR_OPEN_PERMISSION_DENIED</source>
-      <translation>ファイル"%1"を開くことができません。\n権限がありません。</translation>
+      <translation>ファイル"%1"を開けません。アクセス許可は、禁じられています。</translation>
     </message>
     <message>
       <source>ERR_DIR_READ_PERMISSION_DENIED</source>
-      <translation>ディレクトリ"%1"を読み取れません。\n権限がありません。</translation>
+      <translation>ディレクトリ"%1"を読み取れません。アクセス許可は、禁じられています。</translation>
     </message>
     <message>
       <source>ERR_DIR_WRITE_PERMISSION_DENIED</source>
-      <translation>「1%」のディレクトリへの書き込みすることはできません。\n権限がありません。</translation>
+      <translation>ディレクトリ"%1"に書き込めませんでした。アクセス許可は、禁じられています。</translation>
     </message>
     <message>
       <source>ERR_ERROR</source>
@@ -85,7 +85,7 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_TILE</source>
-      <translation>ウィンドウを並べて表示</translation>
+      <translation>ウィンドウの場所</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_VTILE</source>
@@ -97,7 +97,7 @@
     </message>
     <message>
       <source>PRP_DESK_WINDOW_VTILE</source>
-      <translation>ウィンドウを上下に並べて表示</translation>
+      <translation>垂直方向のモザイクで Windows の場所</translation>
     </message>
     <message>
       <source>MEN_DESK_WINDOW_TILE</source>
@@ -139,7 +139,7 @@
     </message>
     <message>
       <source>BUT_ADD_PATH</source>
-      <translation>パスを追加します。</translation>
+      <translation>パスの追加</translation>
     </message>
     <message>
       <source>INF_DESK_DOC_OPEN</source>
