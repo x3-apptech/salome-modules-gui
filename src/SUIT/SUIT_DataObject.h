@@ -76,9 +76,11 @@ public:
 
   int                         childCount() const;
   int                         childPos( const SUIT_DataObject* ) const;
+  void                        moveChildPos( SUIT_DataObject*, int );
   SUIT_DataObject*            childObject( const int ) const;
   int                         level() const;
   int                         position() const;
+  void                        setPosition(int);
 
   SUIT_DataObject*            nextBrother() const;
   SUIT_DataObject*            prevBrother() const;

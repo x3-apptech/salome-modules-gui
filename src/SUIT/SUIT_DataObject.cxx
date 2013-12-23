@@ -139,6 +139,25 @@ int SUIT_DataObject::childPos( const SUIT_DataObject* obj ) const
 }
 
 /*!
+  \brief Moves the child position from current to new one.
+  \param theObj child object
+  \param theNewPos child objectnew position in the children list
+
+*/
+void SUIT_DataObject::moveChildPos( SUIT_DataObject* theObj, int theNewPos)
+{
+  if (myChildren.size() <= 1)  return;
+
+  int aNewPos = theNewPos;
+  if (aNewPos < 0) aNewPos = 0;
+  if (aNewPos > (myChildren.size() - 1)) aNewPos = myChildren.size() - 1;
+
+  if (myChildren.removeOne(theObj))
+    myChildren.insert(aNewPos, theObj);
+}
+
+
+/*!
   \brief Get child object by the specified index.
   \param idx child object index
   \return child object or 0 if index is out of range
@@ -178,6 +197,16 @@ int SUIT_DataObject::level() const
 int SUIT_DataObject::position() const
 {
   return myParent ? myParent->childPos( this ) : 0;
+}
+
+/*!
+  \brief Sets new position of the object in parent's list
+*/
+void SUIT_DataObject::setPosition(int theNewPos)
+{
+  if (theNewPos == position())  return;
+  if (!myParent)  return;
+  myParent->moveChildPos(this, theNewPos);
 }
 
 /*!
