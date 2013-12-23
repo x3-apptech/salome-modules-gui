@@ -92,6 +92,9 @@ public:
   void            removeObject( const QString& );
   void            removeChildren( const QString& );
 
+  void            setObjectPosition( const QString&, int );
+  int             getObjectPosition( const QString& );
+
   QStringList     getChildren( const QString&, const bool = false ) const;
 
 protected:

@@ -3822,3 +3822,86 @@ void SalomePyQt::setPlot2dFitRange(const int id, const double XMin, const double
 {
 	ProcessVoidEvent( new TPlot2dFitRange(id, XMin, XMax, YMin, YMax) ); 
 }
+
+
+void SalomePyQt::setVisibilityState( const QString& theEntry, VisibilityState theState)
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myEntry;
+    int myState;
+  public:
+    TEvent( const QString& theEntry, int theState):
+      myEntry(theEntry), myState(theState) {}
+    virtual void Execute() 
+    {
+      LightApp_Study* aStudy = getActiveStudy();
+      if ( !aStudy )
+        return;
+      aStudy->setVisibilityState(myEntry, (Qtx::VisibilityState)myState);
+    }
+  };
+  ProcessVoidEvent( new TEvent(theEntry, theState ) );
+}
+
+class TGetVisibilityStateEvent: public SALOME_Event 
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString myEntry;
+  TGetVisibilityStateEvent(const QString& theEntry) : myResult( 0 ), myEntry(theEntry) {}
+  virtual void Execute()
+  {
+    LightApp_Study* aStudy = getActiveStudy();
+    if ( aStudy )
+      myResult = aStudy->visibilityState(myEntry);
+  }
+};
+
+VisibilityState SalomePyQt::getVisibilityState( const QString& theEntry )
+{
+  return (VisibilityState) ProcessEvent( new TGetVisibilityStateEvent(theEntry) );
+}
+
+
+void SalomePyQt::setObjectPosition( const QString& theEntry, int thePos )
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myEntry;
+    int myPos;
+  public:
+    TEvent( const QString& theEntry, int thePos):
+      myEntry(theEntry), myPos(thePos) {}
+    virtual void Execute() 
+    {
+      SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+      if ( module )
+        module->setObjectPosition(myEntry, myPos );
+    }
+  };
+  ProcessVoidEvent( new TEvent(theEntry, thePos ) );
+}
+
+
+
+class TGetObjectPositionEvent: public SALOME_Event 
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString myEntry;
+  TGetObjectPositionEvent(const QString& theEntry) : myResult( 0 ), myEntry(theEntry) {}
+  virtual void Execute()
+  {
+    SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+    if ( module )
+      myResult = module->getObjectPosition(myEntry);
+  }
+};
+
+int SalomePyQt::getObjectPosition( const QString& theEntry )
+{
+  return ProcessEvent( new TGetObjectPositionEvent(theEntry) );
+}

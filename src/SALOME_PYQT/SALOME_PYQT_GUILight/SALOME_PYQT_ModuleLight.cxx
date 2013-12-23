@@ -27,7 +27,8 @@
 #include "CAM_Application.h"
 #include "SUITApp_init_python.hxx"
 #include "SUIT_DataObjectIterator.h"
-
+#include "LightApp_Application.h"
+#include "SUIT_DataBrowser.h"
 #include "sipAPISalomePyQtGUILight.h"
 
 #ifndef GUI_DISABLE_CORBA
@@ -141,6 +142,11 @@ void SALOME_PYQT_ModuleLight::initialize( CAM_Application* app )
 
   // ... then call helper
   myHelper->initialize( app );
+  SUIT_DataBrowser* ob = getApp()->objectBrowser();
+  if (ob && ob->model()) {
+    connect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
+             myHelper, SLOT( onObjectBrowserClicked( SUIT_DataObject*, int ) ), Qt::UniqueConnection );
+  }
 }
 
 /*!
@@ -466,6 +472,22 @@ QColor SALOME_PYQT_ModuleLight::getColor( const QString& entry ) const
     color = dataObj->color( SUIT_DataObject::Foreground );
   return color;
 }
+
+void SALOME_PYQT_ModuleLight::setObjectPosition( const QString& theEntry, int thePos )
+{
+  SALOME_PYQT_DataObjectLight* dataObj = findObject( theEntry );
+  if ( dataObj )
+    dataObj->setPosition(thePos);
+}
+
+int SALOME_PYQT_ModuleLight::getObjectPosition( const QString& theEntry )
+{
+  SALOME_PYQT_DataObjectLight* dataObj = findObject( theEntry );
+  if ( dataObj )
+    return dataObj->position();
+  return -1;
+}
+
 
 /*!
   \brief Set reference to another data object

@@ -129,6 +129,14 @@ enum ObjectType
   Y2Axis = Plot2d_ViewFrame::Y2Axis
 };
 
+enum VisibilityState 
+{
+  ShownState,             //!< Object is shown in viewer
+  HiddenState,            //!< Object is hidden in viewer
+  UnpresentableState      //!< Unpresentable object    
+};
+
+
 class SalomePyQt
 {
 public:
@@ -164,6 +172,13 @@ public:
   static void              setToolTip( const QString&, const QString& );
   static QString           getName( const QString& );
   static QString           getToolTip( const QString& );
+
+  static void              setVisibilityState( const QString&, VisibilityState );
+  static VisibilityState   getVisibilityState( const QString& );
+
+  static void              setObjectPosition( const QString&, int );
+  static int               getObjectPosition( const QString& );
+
 
   static void              setColor( const QString&, const QColor& );
   static QColor            getColor( const QString& );

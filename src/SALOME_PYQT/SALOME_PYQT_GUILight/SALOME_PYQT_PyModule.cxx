@@ -2708,3 +2708,65 @@ void PyModuleHelper::connectView( SUIT_ViewWindow* view )
 	     Qt::UniqueConnection );
   }
 }
+
+
+
+void PyModuleHelper::internalOBClickedPython( const QString& theObj, int theColumn)
+{
+  FuncMsg fmsg( "--- PyModuleHelper::internalOBClickedPython()" );
+
+  // Python interpreter should be initialized and Python module should be
+  // import first
+  if ( !myInterp || !myPyModule )
+    return; // Error
+
+  if ( PyObject_HasAttrString( myPyModule, (char*)"onObjectBrowserClicked" ) ) {
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"onObjectBrowserClicked", (char*)"si", theObj.toLatin1().constData(), theColumn ) );
+    if( !res ) {
+      PyErr_Print();
+    }
+  }
+}
+
+
+
+void PyModuleHelper::onObjectBrowserClicked(SUIT_DataObject* theObj, int theColumn)
+{
+  FuncMsg fmsg( "PyModuleHelper::onObjectBrowserClicked()" );
+
+  // temporary set myInitModule because dumpPython() method
+  // might be called by the framework when this module is inactive,
+  // but still it should be possible to access this module's data
+  // from Python
+  InitLocker lock( myModule );
+
+  class PythonReq: public PyInterp_LockRequest
+  {
+  public:     
+    PythonReq( PyInterp_Interp* _py_interp,
+               PyModuleHelper*  _helper,
+               const QString& _entry,
+               int     _column )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myHelper( _helper ) ,
+        myEntry( _entry ),
+        myColumn( _column )
+    {}
+  protected:
+    virtual void execute()
+    {
+      myHelper->internalOBClickedPython( myEntry, myColumn );
+    }
+  private:
+    PyModuleHelper* myHelper;
+    int    myColumn;
+    QString myEntry;
+  };
+  
+  // Posting the request only if dispatcher is not busy!
+  // Executing the request synchronously
+  const LightApp_DataObject* data_object = dynamic_cast<const LightApp_DataObject*>( theObj );
+  if ( (!PyInterp_Dispatcher::Get()->IsBusy()) && data_object )
+    PyInterp_Dispatcher::Get()->Exec( new PythonReq( myInterp, this, data_object->entry(), theColumn ) );
+}
+

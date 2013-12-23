@@ -251,6 +251,14 @@ public:
   void clearAllPoints();
 };
 
+enum VisibilityState 
+{
+  ShownState,
+  HiddenState,
+  UnpresentableState 
+};
+
+
 class SalomePyQt
 {
 %TypeHeaderCode
@@ -290,6 +298,12 @@ public:
   static void              setToolTip(const QString& ,const QString& ) /ReleaseGIL/ ;
   static QString           getName(const QString& ) /ReleaseGIL/ ;
   static QString           getToolTip(const QString& ) /ReleaseGIL/ ;
+
+  static void              setVisibilityState( const QString&, VisibilityState );
+  static VisibilityState   getVisibilityState( const QString& );
+
+  static void              setObjectPosition( const QString&, int );
+  static int               getObjectPosition( const QString& );
 
   static void              setColor( const QString&, const QColor& ) /ReleaseGIL/ ;
   static QColor            getColor( const QString& ) /ReleaseGIL/ ;

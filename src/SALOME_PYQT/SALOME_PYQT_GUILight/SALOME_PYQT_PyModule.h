@@ -106,6 +106,8 @@ public slots:
 					  const int, Qt::DropAction );
   QString                    engineIOR() const;
 
+  void                       onObjectBrowserClicked(SUIT_DataObject*, int);
+
 private:
   void                       initInterp( int );
   void                       importModule();
@@ -133,6 +135,7 @@ private:
   void                       internalDropObjects( const DataObjectList&, SUIT_DataObject*,
 						  const int, Qt::DropAction );
   QString                    internalEngineIOR() const;
+  void                       internalOBClickedPython( const QString&, int );
 
   void                       connectView( SUIT_ViewWindow* );
 };

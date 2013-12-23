@@ -41,6 +41,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/STD
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/SUITApp
+  ${PROJECT_SOURCE_DIR}/src/ObjBrowser
 )
 
 # additional preprocessor / compiler flags
