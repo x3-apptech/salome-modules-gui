@@ -57,6 +57,10 @@
 static bool GENERATE_SUIT_EVENTS = true;
 static bool FOCUS_UNDER_MOUSE = false;
 
+// workaround about the bug in vtkImplicitPlaneWidget class
+// that eats mouse button release event
+// causing clipping plane preview in SMESH sticking up
+#define Fix_Of_vtkImplicitPlaneWidget_bug
 
 /*!
   Constructor
@@ -293,17 +297,19 @@ QVTK_RenderWindowInteractor
   else if( event->button() & Qt::MidButton )
     GetDevice()->MiddleButtonReleaseEvent();
   else if( event->button() & Qt::RightButton ) {
-    #ifndef Fix_Of_vtkImplicitPlaneWidget_bug
+#if defined(Fix_Of_vtkImplicitPlaneWidget_bug)
     GetDevice()->SetEventInformationFlipY( -99999, -99999,
                                            event->modifiers() & Qt::ControlModifier,
                                            event->modifiers() & Qt::ShiftModifier);
+    bool blocked = blockSignals( true );
     GetDevice()->LeftButtonPressEvent();
     GetDevice()->LeftButtonReleaseEvent();
+    blockSignals( blocked );
     GetDevice()->SetEventInformationFlipY(event->x(),
                                           event->y(),
                                           event->modifiers() & Qt::ControlModifier,
                                           event->modifiers() & Qt::ShiftModifier);
-    #endif
+#endif
     GetDevice()->RightButtonReleaseEvent();
   }
 }
