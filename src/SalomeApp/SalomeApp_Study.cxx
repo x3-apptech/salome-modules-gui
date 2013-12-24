@@ -185,13 +185,13 @@ public:
 
 	  /* Define visibility state */
 	  bool isComponent = dynamic_cast<SalomeApp_ModuleObject*>( suit_obj ) != 0;
-	  if ( suit_obj && !isComponent ) {
+	  if ( suit_obj && !isComponent && myStudy->visibilityState( theID.c_str() ) == Qtx::UnpresentableState ) {
 	    QString moduleTitle = ((CAM_Application*)myStudy->application())->moduleTitle(suit_obj->componentDataType());
 	    if (!moduleTitle.isEmpty()) {
 	      LightApp_Displayer* aDisplayer = LightApp_Displayer::FindDisplayer(moduleTitle,false);
 	      if (aDisplayer) {
 		if(aDisplayer->canBeDisplayed(theID.c_str())) {
-		  myStudy->setVisibilityState( theID.c_str(), Qtx::HiddenState );
+		  myStudy->setVisibilityState( theID.c_str(), Qtx::HiddenState ); //hide the just added object
 		  //MESSAGE("Object with entry : "<< theID <<" CAN be displayed !!!");
 		}
 		else
