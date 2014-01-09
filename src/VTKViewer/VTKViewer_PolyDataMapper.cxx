@@ -147,7 +147,6 @@ static PFNGLDISABLEVERTEXATTRIBARRAYARBPROC vglDisableVertexAttribArrayARB = NUL
 
 bool InitializeBufferExtensions()
 {
-
   vglShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)GL_GetProcAddress( "glShaderSourceARB" );
   if( !vglShaderSourceARB )
     return false;
@@ -255,6 +254,7 @@ VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
   this->MarkerScale               = VTK::MS_NONE;
   this->MarkerId                  = 0;
   this->BallEnabled               = false;
+  this->VertexProgram             = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -543,7 +543,7 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     this->InitTextures();
   }
 
-  if(!this->BallEnabled) {
+  if(!this->BallEnabled || this->ExtensionsInitialized != ES_Ok) {
     MAPPER_SUPERCLASS::RenderPiece( ren, act );
     if( isUsePointSprites )
       this->CleanupPointSprites();
@@ -982,7 +982,7 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
 	  vglDeleteBuffersARB( 2, &aDiamsID );
 	}
 
-      } else { // there are no extensions
+	  } else { // there are no extensions
         glColorPointer( 4, GL_FLOAT, sizeof(VTK::TVertex), aVertexArr );
         glVertexPointer( 3, GL_FLOAT, sizeof(VTK::TVertex), 
                          (void*)((GLfloat*)((void*)(aVertexArr)) + 4));
