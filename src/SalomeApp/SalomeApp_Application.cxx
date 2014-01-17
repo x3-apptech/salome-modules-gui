@@ -1843,7 +1843,7 @@ void SalomeApp_Application::updateVisibilityState( DataObjectList& theList,
 
   SALOME_View* aView = dynamic_cast<SALOME_View*>( theViewModel );
 
-  if (theList.isEmpty() || !aView || !aStudy)
+  if (theList.isEmpty() || !aStudy)
     return;
 
   for ( DataObjectList::iterator itr = theList.begin(); itr != theList.end(); ++itr ) {
@@ -1859,13 +1859,13 @@ void SalomeApp_Application::updateVisibilityState( DataObjectList& theList,
       LightApp_Displayer* aDisplayer = anObjModule->displayer();
       if(aDisplayer) {
         if( aDisplayer->canBeDisplayed(obj->entry(), theViewModel->getType()) ) {
-          if(aDisplayer->IsDisplayed(obj->entry(),aView))
+          if(aView && aDisplayer->IsDisplayed(obj->entry(),aView))
             anObjState = Qtx::ShownState;
           else
             anObjState = Qtx::HiddenState;
         }
+	aStudy->setVisibilityState( obj->entry(), anObjState );
       }
-      aStudy->setVisibilityState( obj->entry(), anObjState );
     }
   }
 }
