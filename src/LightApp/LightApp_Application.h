@@ -288,7 +288,11 @@ private:
   void                                emptyPreferences( const QString& );
   QList<QToolBar*>                    findToolBars();
   
-  QByteArray                          processState(QByteArray& input, const bool processWin,const bool processTb, QByteArray defaultState = QByteArray());
+  QByteArray                          processState(QByteArray& input, 
+						   const bool processWin,
+						   const bool processTb,
+						   const bool isRestoring,
+						   QByteArray defaultState = QByteArray());
 
 protected:
   typedef QPointer<QWidget>         WinPtr;

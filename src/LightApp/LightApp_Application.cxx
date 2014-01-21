@@ -3255,7 +3255,7 @@ void LightApp_Application::loadDockWindowsState()
   if ( aResMgr->hasValue("windows_geometry" ,modName ) ) {
     QByteArray arr;
     aResMgr->value("windows_geometry", modName , arr );
-    QByteArray aTargetArray = processState(arr, storeWin, storeTb, aDefaultState);
+    QByteArray aTargetArray = processState(arr, storeWin, storeTb, true, aDefaultState);
     desktop()->restoreState( aTargetArray );
   }
 
@@ -3336,7 +3336,7 @@ void LightApp_Application::saveDockWindowsState()
     modName = activeModule()->name();
 
   QByteArray arr = desktop()->saveState();
-  resourceMgr()->setValue( "windows_geometry", modName, processState(arr, storeWin, storeTb) );
+  resourceMgr()->setValue( "windows_geometry", modName, processState(arr, storeWin, storeTb, false) );
 
   QByteArray visArr;
   if ( myWinVis.contains( modName ) )
@@ -4135,12 +4135,27 @@ QList<QToolBar*> LightApp_Application::findToolBars() {
 /*!
   Internal method to parse toolbars and dockable windows state.
  */
-QByteArray LightApp_Application::processState(QByteArray& input, const bool processWin,const bool processTb, QByteArray defaultState) {
+QByteArray LightApp_Application::processState(QByteArray& input, 
+					      const bool processWin, 
+					      const bool processTb, 
+					      const bool isRestoring, 
+					      QByteArray defaultState) {
 
   QByteArray aRes;
   bool hasDefaultState  = !defaultState.isEmpty();
   bool isDockWinWriten = false;
-  if(processWin && processTb) {
+  int nbDocWin = -1;
+  //Write date from users settings
+  if(isRestoring){
+    QDataStream tmpInputData(&input, QIODevice::ReadOnly);
+    int marker, version;
+    uchar dockmarker;
+    tmpInputData >> marker;
+    tmpInputData >> version;
+    tmpInputData >> dockmarker;
+    tmpInputData >> nbDocWin;
+  }  
+  if(processWin && processTb && !isRestoring) {
     aRes = input;
   } else if(!processWin && !processTb ) {
     if(hasDefaultState)
@@ -4171,15 +4186,24 @@ QByteArray LightApp_Application::processState(QByteArray& input, const bool proc
     QDataStream* aTargetData = 0;
     int          aTargetIndex = -1;
 
-    if(processWin) {
-      //Write date from users settings
+    QByteArray currentArr = desktop()->saveState();
+    QDataStream anInputDataCur(&currentArr, QIODevice::ReadOnly);
+    bool useInputData = !isRestoring || (isRestoring && nbDocWin > 0);
+    if(processWin && useInputData) {
       aTargetData = &anInputData;
       aTargetIndex = toolBarMarkerIndex;
     } else {
       //Write date from default settings
       if(hasDefaultState) {
 	aTargetData = &anInputDataDef;
-	aTargetIndex = toolBarMarkerIndexDef;	
+	aTargetIndex = toolBarMarkerIndexDef;
+      } else {
+	//If no default state, write current snapshot of the dockable windows
+	if(isRestoring) {
+	  aTargetData = &anInputDataCur;
+	  int toolBarMarkerIndexCur = getToolbarMarkerIndex(currentArr, aNames);
+	  aTargetIndex = toolBarMarkerIndexCur;
+	}	  
       }
     }
 
