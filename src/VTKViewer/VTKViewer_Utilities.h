@@ -58,4 +58,7 @@ VTKVIEWER_EXPORT
 extern
 bool ComputeBBCenter(vtkRenderer* theRenderer, 
                      double theCenter[3]);
+VTKVIEWER_EXPORT
+extern
+bool isBoundValid(double* theBounds);
 #endif

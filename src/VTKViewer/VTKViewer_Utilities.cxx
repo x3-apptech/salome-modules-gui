@@ -264,6 +264,19 @@ bool IsBBEmpty(vtkRenderer* theRenderer)
   return !isAny;
 }
 
+/*!
+  Check that the given bounding box is valid, i.e each min bound < each max bound
+*/
+
+bool isBoundValid(double* theBounds) {
+  if(theBounds[0] > theBounds[1] ||
+     theBounds[2] > theBounds[3] ||
+     theBounds[4] > theBounds[5])
+    return false;
+  else 
+    return true;
+}
+
 bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
 {  
   theCenter[0] = theCenter[1] = theCenter[2] = 0.0;
@@ -288,6 +301,10 @@ bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
       if(anActor->GetVisibility() && !anActor->IsInfinitive())
       {
         double *aBounds = anActor->GetBounds();
+	
+	//Ignore invalid bounds
+	if(!isBoundValid(aBounds)) continue;
+
         if(aBounds[0] > -VTK_LARGE_FLOAT && aBounds[1] < VTK_LARGE_FLOAT &&
            aBounds[2] > -VTK_LARGE_FLOAT && aBounds[3] < VTK_LARGE_FLOAT &&
            aBounds[4] > -VTK_LARGE_FLOAT && aBounds[5] < VTK_LARGE_FLOAT)
