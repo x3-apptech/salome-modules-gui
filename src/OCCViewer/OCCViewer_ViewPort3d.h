@@ -117,9 +117,11 @@ private:
   void                  updateBackground();
   
 private:
+  Handle(V3d_View)      myActiveView;
+#if OCC_VERSION_LARGE <= 0x06070000
   Handle(V3d_View)      myOrthoView;
   Handle(V3d_View)      myPerspView;
-  Handle(V3d_View)      myActiveView;
+#endif
   bool                  myBusy;
   double                myScale;
   bool                  myIsAdvancedZoomingEnabled;

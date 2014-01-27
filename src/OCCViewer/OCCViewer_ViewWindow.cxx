@@ -603,7 +603,11 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
   Nstruct = MySetOfStructures.Extent() ;
 
   Graphic3d_MapIteratorOfMapOfStructure MyIterator(MySetOfStructures) ;
-  aView->ViewMapping().WindowLimit(Umin,Vmin,Umax,Vmax) ;
+#if OCC_VERSION_LARGE > 0x06070000
+  aView->Camera()->WindowLimit(Umin,Vmin,Umax,Vmax);
+#else
+  aView->ViewMapping().WindowLimit(Umin,Vmin,Umax,Vmax);
+#endif
   Npoint = 0 ; theX = theY = theZ = 0. ;
   for( ; MyIterator.More(); MyIterator.Next()) {
     if (!(MyIterator.Key())->IsEmpty()) {
@@ -2695,9 +2699,15 @@ SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
                    Precision::Confusion(),
                    Precision::Confusion() );
 
-  // get projection reference point in view coordinates
+// get projection reference point in view coordinates
+#if OCC_VERSION_LARGE > 0x06070000
+  gp_Pnt aProjRef = aSourceView->Camera()->ProjectionShift();
+  aProjRef.SetX( -aProjRef.X() );
+  aProjRef.SetY( -aProjRef.Y() );
+#else
   Graphic3d_Vertex aProjRef = aSourceView->ViewMapping().ProjectionReferencePoint();
-  
+#endif
+
   // transform to world-space coordinate system
   gp_Pnt aPosition = gp_Pnt(aProjRef.X(), aProjRef.Y(), aCameraDepth).Transformed(aTrsf);
   
@@ -2771,6 +2781,11 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   gp_Pnt aProjRef(aPosition[0], aPosition[1], aPosition[2]);
   aProjRef.Transform(aTrsf);
 
+#if OCC_VERSION_LARGE > 0x06070000
+  aDestView->Camera()->SetDirection( -aProjDir );
+  aDestView->Camera()->SetUp( gp_Dir( anUpDir[0], anUpDir[1], anUpDir[2] ) );
+  aDestView->Camera()->SetProjectionShift( gp_Pnt( -aProjRef.X(), -aProjRef.Y(), 0.0 ) );
+#else
   // set view camera properties using low-level approach. this is done
   // in order to avoid interference with static variables in v3d view used
   // when rotation is in process in another view.
@@ -2791,6 +2806,7 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
 
   // set panning
   aDestView->SetCenter(aProjRef.X(), aProjRef.Y());
+#endif
 
   // set mapping scale
   Standard_Real aWidth, aHeight;

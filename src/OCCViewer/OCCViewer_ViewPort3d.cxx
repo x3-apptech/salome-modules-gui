@@ -41,8 +41,13 @@
 
 #include <Visual3d_View.hxx>
 #include <V3d_Viewer.hxx>
+
+#if OCC_VERSION_LARGE > 0x06070000
+#include <V3d_View.hxx>
+#else
 #include <V3d_PerspectiveView.hxx>
 #include <V3d_OrthographicView.hxx>
+#endif
 
 #include "utilities.h"
 
@@ -72,6 +77,9 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
   // VSR: 01/07/2010 commented to avoid SIGSEGV at SALOME exit
   //selectVisualId();
 
+#if OCC_VERSION_LARGE > 0x06070000
+  myActiveView = new V3d_View( viewer, type );
+#else
   if ( type == V3d_ORTHOGRAPHIC ) {
     myOrthoView = new V3d_OrthographicView( viewer );
     myActiveView = myOrthoView;
@@ -80,6 +88,8 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
     myPerspView = new V3d_PerspectiveView( viewer );
     myActiveView = myPerspView;
   }
+#endif
+
   setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
 }
 
@@ -665,7 +675,14 @@ void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
     myScale = activeView()->Scale();
 
   Standard_Real margin = 0.01;
+  
+#if OCC_VERSION_LARGE > 0x06070000
+  activeView()->FitAll( margin, upd );
+  if(withZ)
+    activeView()->ZFitAll();
+#else 
   activeView()->FitAll( margin, withZ, upd );
+#endif
   activeView()->SetZSize(0.);
   emit vpTransformed( this );
 }
@@ -774,8 +791,12 @@ bool OCCViewer_ViewPort3d::synchronize( OCCViewer_ViewPort* view )
     Handle(V3d_View) aView3d = getView();
     Handle(V3d_View) aRefView3d = vp3d->getView();
     aView3d->SetImmediateUpdate( Standard_False );
+#if OCC_VERSION_LARGE > 0x06070000
+    aView3d->Camera()->Copy( aRefView3d->Camera() );
+#else    
     aView3d->SetViewMapping( aRefView3d->ViewMapping() );
     aView3d->SetViewOrientation( aRefView3d->ViewOrientation() );
+#endif
     aView3d->ZFitAll();
     aView3d->SetImmediateUpdate( Standard_True );
     aView3d->Update();
