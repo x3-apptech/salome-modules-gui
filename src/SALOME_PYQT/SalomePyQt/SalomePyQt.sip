@@ -101,6 +101,13 @@ enum Action {
   SplitAt      = 2  
 };
 
+enum Axis {
+  yLeft,
+  yRight,
+  xBottom,
+  xTop,		
+};	
+
 class QtxAction : QWidgetAction
 {
 %TypeHeaderCode
@@ -232,7 +239,7 @@ public:
   int ny = PyList_Size(a1);
   
   if( nx != ny ) { 
-    PyErr_Format(PyExc_TypeError,"The dimention of x and y should be the same. It is %d and %d currently.", nx, ny);
+    PyErr_Format(PyExc_TypeError,"The dimension of x and y should be the same. It is %d and %d currently.", nx, ny);
   }
   
   int i;
@@ -249,6 +256,24 @@ public:
   void insertPoint( int, double, double );
   void deletePoint( int );
   void clearAllPoints();
+  void setXAxis( Axis );
+%MethodCode
+  int ax = int(a0);
+  sipCpp->setXAxis(QwtPlot::Axis(ax));
+%End
+  Axis getXAxis() const;
+%MethodCode
+  sipRes = Axis(sipCpp->getXAxis());
+%End
+  void setYAxis( Axis );
+%MethodCode
+  int ay = int(a0);
+  sipCpp->setYAxis(QwtPlot::Axis(ay));
+%End
+  Axis getYAxis() const;
+%MethodCode
+  sipRes = Axis(sipCpp->getYAxis());
+%End
 };
 
 enum VisibilityState 

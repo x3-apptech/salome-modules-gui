@@ -136,6 +136,12 @@ enum VisibilityState
   UnpresentableState      //!< Unpresentable object    
 };
 
+enum Axis {
+  yLeft    = QwtPlot::yLeft,
+  yRight   = QwtPlot::yRight,
+  xBottom  = QwtPlot::xBottom,
+  xTop     = QwtPlot::xTop,
+};	
 
 class SalomePyQt
 {
