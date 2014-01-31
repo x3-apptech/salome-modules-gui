@@ -43,7 +43,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES
-  ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER}
+  ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
   CASCatch qtx suit OpenGLUtils ViewerTools ViewerData
 )
 
@@ -66,6 +66,8 @@ SET(_moc_HEADERS
   OCCViewer_ViewPort3d.h
   OCCViewer_ViewSketcher.h
   OCCViewer_ViewWindow.h
+  OCCViewer_ViewportInputFilter.h
+  OCCViewer_ClipPlaneInteractor.h
 )
 
 # header files / no moc processing
@@ -157,6 +159,8 @@ SET(_other_SOURCES
   OCCViewer_ViewPort3d.cxx
   OCCViewer_ViewSketcher.cxx
   OCCViewer_ViewWindow.cxx
+  OCCViewer_ViewportInputFilter.cxx
+  OCCViewer_ClipPlaneInteractor.cxx
 )
 
 # sources / to compile

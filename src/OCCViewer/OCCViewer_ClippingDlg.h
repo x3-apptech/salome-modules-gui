@@ -43,6 +43,7 @@ class QMenu;
 
 class OCCViewer_Viewer;
 class OCCViewer_ViewWindow;
+class OCCViewer_ClipPlaneInteractor;
 
 /*!
   \class OCCViewer_ClippingDlg
@@ -70,8 +71,9 @@ private :
   void updatePreview();
   bool isValid();
   void updateClipping();
+  void updateControls();
 
-  OCCViewer_ClipPlane& getClipPlane (int theIndex);
+  OCCViewer_ClipPlane& getClipPlane( int );
   int clipPlanesCount();
 
   QComboBox* ComboBoxPlanes;
@@ -129,11 +131,14 @@ private :
   std::vector<Handle(AIS_Plane)> myPreviewPlaneVector;
 
   bool myIsSelectPlane;
+  bool myIsUpdatingControls;
   bool myBusy;
   bool myIsPlaneCreation;
 
   ClipPlanesList myLocalPlanes;
-    
+
+  OCCViewer_ClipPlaneInteractor* myInteractor;
+
 public slots:
   void onApply();
 
@@ -156,7 +161,7 @@ private slots:
   void onReset();
   void onInvert();
   void onOrientationAbsoluteChanged( int );
-  void onOrientationRelativeChanged (int);
+  void onOrientationRelativeChanged( int );
 
   void onPreview( bool on );
   void onAutoApply(bool);
@@ -164,6 +169,9 @@ private slots:
   void SliderDistanceHasMoved(int);
   void SliderRotation1HasMoved(int);
   void SliderRotation2HasMoved(int);
+
+  void onPlaneClicked( const Handle_AIS_Plane& thePlane );
+  void onPlaneDragged( const Handle_AIS_Plane& thePlane );
 };
 
 #endif // OCCVIEWER_CLIPPINGDLG_H
