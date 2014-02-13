@@ -88,7 +88,7 @@ class PYINTERP_EXPORT PyInterp_LockRequest : public PyInterp_Request
 {
 public:
 
-  PyInterp_LockRequest( PyInterp_Interp* interp, QObject* listener = 0, bool sync = false )
+  PyInterp_LockRequest( PyInterp_Interp* interp, QObject* listener=0, bool sync=false )
     : PyInterp_Request( listener, sync ), myInterp( interp )
   {}
 

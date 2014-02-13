@@ -96,11 +96,11 @@ void PyInterp_Request::setListener( QObject* o )
 
 void PyInterp_LockRequest::safeExecute()
 {
-  if ( getInterp() ){
-    PyLockWrapper aLock = getInterp()->GetLockWrapper();
+  //if ( getInterp() ){  // No need to have an interpreter now! we can simply run in a empty context
+    PyLockWrapper aLock; // Acquire GIL
     //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
     execute();
-  }
+  //}
 }
 
 PyInterp_Event::~PyInterp_Event()

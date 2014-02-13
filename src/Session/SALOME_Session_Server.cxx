@@ -234,32 +234,32 @@ protected:
       
       QString fname = QFileInfo( _fname ).fileName();
       if( exp.exactMatch( fname ) ) {
-        QStringList vers = exp.cap( 1 ).split( ".", QString::SkipEmptyParts );
-        int major=0, minor=0;
-        int release = 0, dev1 = 0, dev2 = 0;
-	if ( vers.count() > 0 ) major = vers[0].toInt();
-	if ( vers.count() > 1 ) minor = vers[1].toInt();
-	if ( vers.count() > 2 ) {
-	  if ( vers_exp.indexIn( vers[2] ) != -1 ) {
-	    release = vers_exp.cap( 1 ).toInt();
-	    QString tag = vers_exp.cap( 2 ).toLower();
-	    if ( !tag.isEmpty() ) {
-	      if ( tag == "rc" ) // release candidate
-		dev1 = 49;       // 'rc'=49
-	      else               // a, b, c, ... 
-		dev1 = (int)( tag[ 0 ].toLatin1() ) - (int)( QChar('a').toLatin1() ) + 1; // 'a'=1, 'b'=2, ..., 'z'=26
-	    }
-	    if ( !vers_exp.cap( 3 ).isEmpty() )
-	      dev2 = vers_exp.cap( 3 ).toInt();
-	  }
-	}
-        
-        int dev = dev1*100+dev2;
-	id = major;
-        id*=100; id+=minor;
-        id*=100; id+=release;
-        id*=10000;
-        if ( dev > 0 ) id-=dev;
+          QStringList vers = exp.cap( 1 ).split( ".", QString::SkipEmptyParts );
+          int major=0, minor=0;
+          int release = 0, dev1 = 0, dev2 = 0;
+          if ( vers.count() > 0 ) major = vers[0].toInt();
+          if ( vers.count() > 1 ) minor = vers[1].toInt();
+          if ( vers.count() > 2 ) {
+              if ( vers_exp.indexIn( vers[2] ) != -1 ) {
+                  release = vers_exp.cap( 1 ).toInt();
+                  QString tag = vers_exp.cap( 2 ).toLower();
+                  if ( !tag.isEmpty() ) {
+                      if ( tag == "rc" ) // release candidate
+                        dev1 = 49;       // 'rc'=49
+                      else               // a, b, c, ...
+                        dev1 = (int)( tag[ 0 ].toLatin1() ) - (int)( QChar('a').toLatin1() ) + 1; // 'a'=1, 'b'=2, ..., 'z'=26
+                  }
+                  if ( !vers_exp.cap( 3 ).isEmpty() )
+                    dev2 = vers_exp.cap( 3 ).toInt();
+              }
+          }
+
+          int dev = dev1*100+dev2;
+          id = major;
+          id*=100; id+=minor;
+          id*=100; id+=release;
+          id*=10000;
+          if ( dev > 0 ) id-=dev;
       }
     }
     return id;
@@ -475,14 +475,6 @@ int main( int argc, char **argv )
     int   _argc   = 1;
     char* _argv[] = {(char*)""};
     KERNEL_PYTHON::init_python( _argc,_argv );
-    PyEval_RestoreThread( KERNEL_PYTHON::_gtstate );
-    if ( !KERNEL_PYTHON::salome_shared_modules_module ) // import only once
-      KERNEL_PYTHON::salome_shared_modules_module = PyImport_ImportModule( "salome_shared_modules" );
-    if ( !KERNEL_PYTHON::salome_shared_modules_module ) {
-      INFOS( "salome_shared_modules_module == NULL" );
-      PyErr_Print();
-    }
-    PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate );
 
     // ...create ORB, get RootPOA object, NamingService, etc.
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
@@ -631,28 +623,28 @@ int main( int argc, char **argv )
 
         if ( splash )
           splash->finish( aGUIApp->desktop() );
-	
+
         result = _qappl.exec();
         
         splash = 0;
-	
+
         if ( result == SUIT_Session::NORMAL ) {
-	  // desktop is explicitly closed by user from GUI
-	  // exit flags says if it's necessary to shutdown all servers
-	  // all session server only
+        // desktop is explicitly closed by user from GUI
+        // exit flags says if it's necessary to shutdown all servers
+        // all session server only
           shutdownAll = aGUISession->exitFlags();
-	}
-	else {
-	  // desktop might be closed from:
-	  // - StopSesion() /temporarily/ or
-	  // - Shutdown() /permanently/
-	  stat = session->GetStatSession();
-	  shutdownSession = stat.state == SALOME::shutdown;
-	}
-	if ( shutdownAll || shutdownSession ) {
-	  _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
-	  break;
-	}
+        }
+        else {
+          // desktop might be closed from:
+          // - StopSesion() /temporarily/ or
+          // - Shutdown() /permanently/
+          stat = session->GetStatSession();
+          shutdownSession = stat.state == SALOME::shutdown;
+        }
+        if ( shutdownAll || shutdownSession ) {
+          _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
+          break;
+        }
       }
 
       delete aGUISession;

@@ -228,9 +228,9 @@ public:
   XmlHandler( PyModuleHelper* helper, const QString& fileName );
   void             createActions();
   void             createPopup( QMenu* menu,
-				const QString& context,
-				const QString& parent,
-				const QString& object );
+                                const QString& context,
+                                const QString& parent,
+                                const QString& object );
   void             activateMenus( bool );
 
 private:
@@ -238,11 +238,11 @@ private:
   QIcon            loadIcon( const QString& fileName );
 
   void             createMenu( QDomNode& parentNode,
-			       const int parentMenuId = -1,
-			       QMenu* parentPopup = 0 );
+                               const int parentMenuId = -1,
+                               QMenu* parentPopup = 0 );
   void             createToolBar( QDomNode& parentNode );
   void             insertPopupItems( QDomNode& parentNode,
-				     QMenu* menu );
+                                     QMenu* menu );
 
 private:
   PyModuleHelper*  myHelper;
@@ -258,7 +258,7 @@ private:
   \param fileName path to the XML menu description file 
 */
 PyModuleHelper::XmlHandler::XmlHandler( PyModuleHelper*  helper,
-					const QString&   fileName )
+                                        const QString&   fileName )
 : myHelper( helper )
 {
   if ( !fileName.isEmpty() ) { 
@@ -305,9 +305,9 @@ void PyModuleHelper::XmlHandler::createActions()
   \param context popup menu object name
 */
 void PyModuleHelper::XmlHandler::createPopup( QMenu*         menu,
-					      const QString& context,
-					      const QString& parent,
-					      const QString& object )
+                                              const QString& context,
+                                              const QString& parent,
+                                              const QString& object )
 {
   // get document element
   QDomElement aDocElem = myDoc.documentElement();
@@ -364,10 +364,10 @@ QIcon PyModuleHelper::XmlHandler::loadIcon( const QString& fileName )
   if ( module() && !fileName.isEmpty() ) {
       SUIT_ResourceMgr* resMgr = module()->getApp()->resourceMgr();
       QPixmap pixmap = resMgr->loadPixmap( module()->name(),
-					   QApplication::translate( module()->name().toLatin1().data(), 
-								    fileName.toLatin1().data() ) );
-    if ( !pixmap.isNull() )
-      icon = QIcon( pixmap );
+          QApplication::translate( module()->name().toLatin1().data(),
+                                   fileName.toLatin1().data() ) );
+      if ( !pixmap.isNull() )
+        icon = QIcon( pixmap );
   }
 
   return icon;
@@ -381,8 +381,8 @@ QIcon PyModuleHelper::XmlHandler::loadIcon( const QString& fileName )
   \param parentPopup parent popup menu (0 for top-level menu)
 */
 void PyModuleHelper::XmlHandler::createMenu( QDomNode& parentNode, 
-					     const int parentMenuId, 
-					     QMenu*    parentPopup )
+                                             const int parentMenuId,
+                                             QMenu*    parentPopup )
 {
   if ( !module() || parentNode.isNull() )
     return;
@@ -425,14 +425,14 @@ void PyModuleHelper::XmlHandler::createMenu( QDomNode& parentNode,
             if ( id != -1 ) {
               // create menu action
               QAction* action = module()->createAction( id,                     // ID
-							tooltip,                // tooltip
-							icon,                   // icon
-							label,                  // menu text
-							tooltip,                // status-bar text
-							QKeySequence( accel ),  // keyboard accelerator
-							module(),               // action owner
-							toggle );               // toogled action
-	      myHelper->connectAction( action );
+                                                        tooltip,                // tooltip
+                                                        icon,                   // icon
+                                                        label,                  // menu text
+                                                        tooltip,                // status-bar text
+                                                        QKeySequence( accel ),  // keyboard accelerator
+                                                        module(),               // action owner
+                                                        toggle );               // toogled action
+              myHelper->connectAction( action );
               module()->createMenu( action,   // action
                                     menuId,   // parent menu ID
                                     id,       // ID (same as for createAction())
@@ -496,17 +496,17 @@ void PyModuleHelper::XmlHandler::createToolBar( QDomNode& parentNode )
             // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
             // also check if the action with given ID is already created
             if ( id != -1 ) {
-              // create toolbar action
-              QAction* action = module()->createAction( id,                     // ID
-							tooltip,                // tooltip
-							icon,                   // icon
-							label,                  // menu text
-							tooltip,                // status-bar text
-							QKeySequence( accel ),  // keyboard accelerator
-							module(),               // action owner
-							toggle );               // toogled action
-	      myHelper->connectAction( action );
-              module()->createTool( action, tbId, -1, pos );
+                // create toolbar action
+                QAction* action = module()->createAction( id,                     // ID
+                                                          tooltip,                // tooltip
+                                                          icon,                   // icon
+                                                          label,                  // menu text
+                                                          tooltip,                // status-bar text
+                                                          QKeySequence( accel ),  // keyboard accelerator
+                                                          module(),               // action owner
+                                                          toggle );               // toogled action
+                myHelper->connectAction( action );
+                module()->createTool( action, tbId, -1, pos );
             }
           }
           else if ( aTagName == "separatorTB" || aTagName == "separator" ) {
@@ -552,15 +552,15 @@ void PyModuleHelper::XmlHandler::insertPopupItems( QDomNode& parentNode, QMenu* 
         // -1 action ID is not allowed : it means that <item-id> attribute is missed in the XML file!
         // also check if the action with given ID is already created
         if ( id != -1 ) {
-	  QAction* action = module()->createAction( id,                     // ID
-						    tooltip,                // tooltip
-						    icon,                   // icon
-						    label,                  // menu text
-						    tooltip,                // status-bar text
-						    QKeySequence( accel ),  // keyboard accelerator
-						    module(),               // action owner
-						    toggle );               // toogled action
-	  myHelper->connectAction( action );
+          QAction* action = module()->createAction( id,                     // ID
+                                                    tooltip,                // tooltip
+                                                    icon,                   // icon
+                                                    label,                  // menu text
+                                                    tooltip,                // status-bar text
+                                                    QKeySequence( accel ),  // keyboard accelerator
+                                                    module(),               // action owner
+                                                    toggle );               // toogled action
+          myHelper->connectAction( action );
           QAction* before = ( pos >= 0 && pos < actions.count() ) ? actions[ pos ] : 0;
           menu->insertAction( before, action );
         }
@@ -627,7 +627,7 @@ PyModuleHelper::~PyModuleHelper()
 {
   delete myXmlHandler;
   if ( myInterp && myPyModule ) {
-    PyLockWrapper aLock = myInterp->GetLockWrapper();
+    PyLockWrapper aLock; // Acquire GIL
     Py_XDECREF( myPyModule );
   }
 }
@@ -691,8 +691,8 @@ void PyModuleHelper::connectAction( QAction* a )
 {
   if ( myModule && a )
     QObject::connect( a, SIGNAL( triggered( bool ) ), 
-		      this, SLOT( actionActivated() ),
-		      Qt::UniqueConnection );
+                      this, SLOT( actionActivated() ),
+                      Qt::UniqueConnection );
 }
 
 /*!
@@ -747,11 +747,11 @@ QStringList PyModuleHelper::viewManagers() const
   \brief Initialization of the Python-based SALOME module.
   
   This method can be used for creation of the menus, toolbars and 
-  other such staff.
+  other such stuff.
   
   There are two ways to do this:
-  1) for obsolete modules implementatino this method first tries to read
-  <module>_<language>.xml resource file which contains a menu,
+  1) for obsolete modules, the implementation of this method first tries to read
+  the <module>_<language>.xml resource file which contains a menu,
   toolbars and popup menus description;
   2) new modules can create menus by direct calling of the
   corresponding methods of SalomePyQt Python API in the Python
@@ -759,7 +759,7 @@ QStringList PyModuleHelper::viewManagers() const
 
   \note SALOME supports two modes of modules loading:
   - immediate (all the modules are created and initialized 
-  immediately when the application object is created;
+  immediately when the application object is created);
   - postponed modules loading (used currently); in this mode
   the module is loaded only by explicit request.
   If postponed modules loading is not used, the active
@@ -798,10 +798,10 @@ void PyModuleHelper::initialize( CAM_Application* app )
   {
   public:
     InitializeReq( PyModuleHelper*  _helper,
-		   CAM_Application* _app )
+                   CAM_Application* _app )
       : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ),
-	myApp( _app )
+        myApp( _app )
     {}
   protected:
     virtual void execute()
@@ -841,21 +841,21 @@ bool PyModuleHelper::activate( SUIT_Study* study )
   {
   public:
     ActivateReq( PyModuleHelper* _helper,
-		 SUIT_Study*     _study,
-		 bool            _customize )
-      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
-	myHelper( _helper ),
-        myStudy ( _study ),
-	myCustomize( _customize )
-    {}
+                 SUIT_Study*     _study,
+                 bool            _customize )
+  : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
+    myHelper( _helper ),
+    myStudy ( _study ),
+    myCustomize( _customize )
+  {}
   protected:
     virtual void execute()
-    {
-      if ( !myCustomize )
-	myHelper->internalActivate( myStudy );  // first activation stage
-      else
-	myHelper->internalCustomize( myStudy ); // second activation stage
-    }
+      {
+        if ( !myCustomize )
+          myHelper->internalActivate( myStudy );  // first activation stage
+        else
+          myHelper->internalCustomize( myStudy ); // second activation stage
+      }
   private:
     PyModuleHelper* myHelper;
     SUIT_Study*     myStudy;
@@ -881,12 +881,12 @@ bool PyModuleHelper::activate( SUIT_Study* study )
     if ( myLastActivateStatus ) {
       // connect preferences changing signal
       connect( myModule->getApp(), SIGNAL( preferenceChanged( const QString&, const QString&, const QString& ) ),
-	       this,               SLOT(   preferenceChanged( const QString&, const QString&, const QString& ) ) );
+               this,               SLOT(   preferenceChanged( const QString&, const QString&, const QString& ) ) );
       
       // connect active view change signal
       SUIT_Desktop* d = study->application()->desktop();
       connect( d,     SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-	       this,  SLOT( activeViewChanged( SUIT_ViewWindow* ) ) );
+               this,  SLOT( activeViewChanged( SUIT_ViewWindow* ) ) );
       // if active window exists, call activeViewChanged() function;
       // temporary solution: if a getActiveView() in SalomePyQt available
       // we no longer need this 
@@ -924,11 +924,11 @@ bool PyModuleHelper::deactivate( SUIT_Study* study )
   {
   public:
     DeactivateReq( PyInterp_Interp* _py_interp,
-		   PyModuleHelper*  _helper,
+                   PyModuleHelper*  _helper,
                    SUIT_Study*      _study )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ),
-	myStudy ( _study )
+        myStudy ( _study )
     {}
   protected:
     virtual void execute()
@@ -950,7 +950,7 @@ bool PyModuleHelper::deactivate( SUIT_Study* study )
   // disconnect the SUIT_Desktop signal windowActivated()
   SUIT_Desktop* d = study->application()->desktop();
   disconnect( d,     SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-	      this,  SLOT( activeViewChanged( SUIT_ViewWindow* ) ) );
+              this,  SLOT( activeViewChanged( SUIT_ViewWindow* ) ) );
 
   // deactivate menus, toolbars, etc
   if ( myXmlHandler ) myXmlHandler->activateMenus( false );
@@ -1023,7 +1023,7 @@ void PyModuleHelper::modelClosed( SUIT_Study* study )
   \param parameter preference resources parameter name
 */
 void PyModuleHelper::preferencesChanged( const QString& section, 
-					 const QString& parameter )
+                                         const QString& parameter )
 {
   FuncMsg fmsg( "PyModuleHelper::preferencesChanged()" );
 
@@ -1031,9 +1031,9 @@ void PyModuleHelper::preferencesChanged( const QString& section,
   {
   public:
     PrefChangeReq( PyInterp_Interp* _py_interp,
-		   PyModuleHelper*  _helper,
-		   const QString&   _section,
-		   const QString&   _parameter )
+                   PyModuleHelper*  _helper,
+                   const QString&   _section,
+                   const QString&   _parameter )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper ( _helper ),
         mySection( _section ),
@@ -1065,8 +1065,8 @@ void PyModuleHelper::preferencesChanged( const QString& section,
   \param parameter preference resources parameter name
 */
 void PyModuleHelper::preferenceChanged( const QString& module, 
-					const QString& section, 
-					const QString& parameter )
+                                        const QString& section,
+                                        const QString& parameter )
 {
   FuncMsg fmsg( "PyModuleHelper::preferenceChanged()" );
 
@@ -1094,10 +1094,10 @@ void PyModuleHelper::studyActivated( SUIT_Study* study )
   {
   public:
     StudyChangedReq( PyModuleHelper* _helper,
-		     SUIT_Study*     _study )
+                     SUIT_Study*     _study )
       : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ), 
-	myStudy ( _study )
+        myStudy ( _study )
     {}
   protected:
     virtual void execute()
@@ -1130,8 +1130,8 @@ void PyModuleHelper::actionActivated()
   {
   public:
     ActionReq( PyInterp_Interp* _py_interp,
-	       PyModuleHelper*  _helper,
-	       int              _id )
+               PyModuleHelper*  _helper,
+               int              _id )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ),
         myId    ( _id  )
@@ -1176,7 +1176,7 @@ void PyModuleHelper::contextMenu( const QString& context, QMenu* menu )
                     const QString&   _context,
                     QMenu*           _menu )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
-	myHelper ( _helper ),
+        myHelper ( _helper ),
         myContext( _context ),
         myMenu   ( _menu )
     {}
@@ -1214,7 +1214,7 @@ void PyModuleHelper::createPreferences()
   {
   public:
     CreatePrefReq( PyInterp_Interp* _py_interp,
-		   PyModuleHelper*  _helper )
+                   PyModuleHelper*  _helper )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper )
     {}
@@ -1249,11 +1249,11 @@ void PyModuleHelper::activeViewChanged( SUIT_ViewWindow* view )
   {
   public:
     ActiveViewChangeReq( PyInterp_Interp* _py_interp,
-			 PyModuleHelper*  _helper, 
-			 SUIT_ViewWindow* _view )
+                         PyModuleHelper*  _helper,
+                         SUIT_ViewWindow* _view )
       : PyInterp_LockRequest( _py_interp, 0, true ),
         myHelper( _helper ),
-	myView( _view )
+        myView( _view )
     {}
   protected:
     virtual void execute()
@@ -1283,11 +1283,11 @@ void PyModuleHelper::tryCloseView( SUIT_ViewWindow* view )
   {
   public:
     TryCloseViewReq( PyInterp_Interp* _py_interp,
-		     PyModuleHelper*  _helper, 
-		     SUIT_ViewWindow* _view )
+                     PyModuleHelper*  _helper,
+                     SUIT_ViewWindow* _view )
       : PyInterp_LockRequest( _py_interp, 0, true ),
         myHelper( _helper ), 
-	myView( _view )
+        myView( _view )
     {}
   protected:
     virtual void execute()
@@ -1314,8 +1314,8 @@ void PyModuleHelper::closeView( SUIT_ViewWindow* view )
   {
   public:
     CloseViewReq( PyInterp_Interp* _py_interp,
-		  PyModuleHelper*  _helper, 
-		  SUIT_ViewWindow* _view )
+                  PyModuleHelper*  _helper,
+                  SUIT_ViewWindow* _view )
       : PyInterp_LockRequest( _py_interp, 0, true ),
         myHelper( _helper ),
 	myView( _view )
@@ -1345,11 +1345,11 @@ void PyModuleHelper::cloneView( SUIT_ViewWindow* view )
   {
   public:
     CloneViewReq( PyInterp_Interp* _py_interp,
-		  PyModuleHelper*  _helper, 
-		  SUIT_ViewWindow* _view )
+                  PyModuleHelper*  _helper,
+                  SUIT_ViewWindow* _view )
       : PyInterp_LockRequest( _py_interp, 0, true ),
         myHelper( _helper ),
-	myView( _view )
+        myView( _view )
     {}
   protected:
     virtual void execute()
@@ -1383,8 +1383,8 @@ void PyModuleHelper::save( QStringList& files )
   {
   public:     
     SaveReq( PyInterp_Interp* _py_interp,
-	     PyModuleHelper*  _helper,
-	     QStringList&     _files )
+             PyModuleHelper*  _helper,
+             QStringList&     _files )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myFiles( _files )
@@ -1420,9 +1420,9 @@ bool PyModuleHelper::load( const QStringList& files )
   {
   public:
     LoadReq( PyInterp_Interp* _py_interp,
-	     PyModuleHelper*  _helper,
-	     QStringList      _files,
-	     bool&            _loaded )
+             PyModuleHelper*  _helper,
+             QStringList      _files,
+             bool&            _loaded )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myFiles( _files ),
@@ -1466,8 +1466,8 @@ void PyModuleHelper::dumpPython( QStringList& files )
   {
   public:     
     DumpPythonReq( PyInterp_Interp* _py_interp,
-		   PyModuleHelper*  _helper,
-		   QStringList&     _files )
+                   PyModuleHelper*  _helper,
+                   QStringList&     _files )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myFiles( _files )
@@ -1504,9 +1504,9 @@ bool PyModuleHelper::isDraggable( const SUIT_DataObject* what ) const
   {
   public:
     IsDraggableReq( PyInterp_Interp*     _py_interp,
-		    PyModuleHelper*      _helper,
-		    LightApp_DataObject* _data_object,
-		    bool&                _is_draggable )
+                    PyModuleHelper*      _helper,
+                    LightApp_DataObject* _data_object,
+                    bool&                _is_draggable )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myDataObject( _data_object ),
@@ -1529,9 +1529,9 @@ bool PyModuleHelper::isDraggable( const SUIT_DataObject* what ) const
     // Executing the request synchronously
     if ( !PyInterp_Dispatcher::Get()->IsBusy() )
       PyInterp_Dispatcher::Get()->Exec( new IsDraggableReq( myInterp,
-							    const_cast<PyModuleHelper*>( this ),
-							    const_cast<LightApp_DataObject*>( data_object ),
-							    draggable ) );
+                                        const_cast<PyModuleHelper*>( this ),
+                                        const_cast<LightApp_DataObject*>( data_object ),
+                                        draggable ) );
   }
   
   return draggable;
@@ -1553,9 +1553,9 @@ bool PyModuleHelper::isDropAccepted( const SUIT_DataObject* where ) const
   {
   public:
     IsDropAcceptedReq( PyInterp_Interp*     _py_interp,
-		       PyModuleHelper*      _helper,
-		       LightApp_DataObject* _data_object,
-		       bool&                _is_drop_accepted )
+                       PyModuleHelper*      _helper,
+                       LightApp_DataObject* _data_object,
+                       bool&                _is_drop_accepted )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myDataObject( _data_object ),
@@ -1578,9 +1578,9 @@ bool PyModuleHelper::isDropAccepted( const SUIT_DataObject* where ) const
     // Executing the request synchronously
     if ( !PyInterp_Dispatcher::Get()->IsBusy() )
       PyInterp_Dispatcher::Get()->Exec( new IsDropAcceptedReq( myInterp,
-							       const_cast<PyModuleHelper*>( this ),
-							       const_cast<LightApp_DataObject*>( data_object ),
-							       dropAccepted ) );
+                                         const_cast<PyModuleHelper*>( this ),
+                                         const_cast<LightApp_DataObject*>( data_object ),
+                                         dropAccepted ) );
   }
 
   return dropAccepted;
@@ -1594,7 +1594,7 @@ bool PyModuleHelper::isDropAccepted( const SUIT_DataObject* where ) const
   \param action current drop action (copy or move)
 */
 void PyModuleHelper::dropObjects( const DataObjectList& what, SUIT_DataObject* where,
-				  const int row, Qt::DropAction action )
+                                  const int row, Qt::DropAction action )
 {
   FuncMsg fmsg( "PyModuleHelper::dropObjects()" );
 
@@ -1603,17 +1603,17 @@ void PyModuleHelper::dropObjects( const DataObjectList& what, SUIT_DataObject* w
   {
   public:
     DropObjectsReq( PyInterp_Interp*      _py_interp,
-		    PyModuleHelper*       _helper,
-		    const DataObjectList& _what,
-		    SUIT_DataObject*      _where,
-		    const int             _row,
-		    Qt::DropAction        _action )
+                    PyModuleHelper*       _helper,
+                    const DataObjectList& _what,
+                    SUIT_DataObject*      _where,
+                    const int             _row,
+                    Qt::DropAction        _action )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myWhat( _what ),
-	myWhere( _where ),
-	myRow( _row ),
-	myAction ( _action )
+        myWhere( _where ),
+        myRow( _row ),
+        myAction ( _action )
     {}
   protected:
     virtual void execute()
@@ -1647,10 +1647,10 @@ QString PyModuleHelper::engineIOR() const
   public:
     EngineIORReq( PyInterp_Interp* _py_interp,
                   PyModuleHelper*  _helper,
-		  QString&         _ior )
+                  QString&         _ior )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ),
-	myIOR( _ior )
+        myIOR( _ior )
     {}
   protected:
     virtual void execute()
@@ -1667,8 +1667,8 @@ QString PyModuleHelper::engineIOR() const
   if ( anIOR.isEmpty() ) {
     // post request
     PyInterp_Dispatcher::Get()->Exec( new EngineIORReq( myInterp, 
-							const_cast<PyModuleHelper*>( this ),
-							anIOR ) );
+                                      const_cast<PyModuleHelper*>( this ),
+                                      anIOR ) );
   }
 
   return anIOR;
@@ -1708,7 +1708,7 @@ void PyModuleHelper::initInterp( int studyId )
     // import 'salome' module and call 'salome_init' method;
     // do it only once on interpreter creation
     // ... first get python lock
-    PyLockWrapper aLock = myInterp->GetLockWrapper();
+    PyLockWrapper aLock; // Acquire GIL
     // ... then import a module
     PyObjWrapper aMod = PyImport_ImportModule( "salome" );
     if ( !aMod ) {
@@ -1732,7 +1732,7 @@ void PyModuleHelper::initInterp( int studyId )
   \brief Import Python GUI module and store reference to the module.
   \internal
 
-  Attention! initInterp() should be called first!!!
+  Warning! initInterp() should be called first!!!
 */
 void PyModuleHelper::importModule()
 {
@@ -1747,7 +1747,7 @@ void PyModuleHelper::importModule()
 
   // import Python GUI module and put it in <myPyModule> attribute
   // ... first get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
   // ... then import a module
   QString aMod = QString( "%1GUI" ).arg( myModule->name() );
   try {
@@ -1787,7 +1787,7 @@ void PyModuleHelper::setWorkSpace()
 
   // call setWorkSpace() method
   // ... first get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
 
   // ... then try to import SalomePyQt module. If it's not possible don't go on.
   PyObjWrapper aQtModule( PyImport_ImportModule( "SalomePyQt" ) );
@@ -1865,7 +1865,7 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
 
   // then call Python module's initialize() method
   // ... first get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
 
   // ... (the Python module is already imported)
   // ... finally call Python module's initialize() method
@@ -1969,7 +1969,7 @@ void PyModuleHelper::internalActivate( SUIT_Study* study )
   }
 
   // get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
 
   // call Python module's activate() method (for the new modules)
   if ( PyObject_HasAttrString( myPyModule , (char*)"activate" ) ) {
@@ -2024,7 +2024,7 @@ void PyModuleHelper::internalCustomize( SUIT_Study* study )
   setWorkSpace();
 
   // get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
 
   if ( IsCallOldMethods ) {
     // call Python module's setSettings() method (obsolete)
@@ -2166,7 +2166,7 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
   setWorkSpace();
 
   // get python lock
-  PyLockWrapper aLock = myInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
 
   // call Python module's activeStudyChanged() method
   if ( PyObject_HasAttrString( myPyModule, (char*)"activeStudyChanged" ) ) {
@@ -2552,7 +2552,7 @@ bool PyModuleHelper::internalIsDraggable( LightApp_DataObject* what )
 
   if ( PyObject_HasAttrString(myPyModule , (char*)"isDraggable") ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"isDraggable",
-					   (char*)"s", what->entry().toLatin1().constData() ) );
+                      (char*)"s", what->entry().toLatin1().constData() ) );
     if( !res || !PyBool_Check( res )) {
       PyErr_Print();
       draggable = false;
@@ -2584,7 +2584,7 @@ bool PyModuleHelper::internalIsDropAccepted( LightApp_DataObject* where )
 
   if ( PyObject_HasAttrString(myPyModule , (char*)"isDropAccepted") ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"isDropAccepted",
-					   (char*)"s", where->entry().toLatin1().constData() ) );
+                      (char*)"s", where->entry().toLatin1().constData() ) );
     if( !res || !PyBool_Check( res )) {
       PyErr_Print();
       dropAccepted = false;
@@ -2606,7 +2606,7 @@ bool PyModuleHelper::internalIsDropAccepted( LightApp_DataObject* where )
   \param action current drop action (copy or move)
 */
 void PyModuleHelper::internalDropObjects( const DataObjectList& what, SUIT_DataObject* where,
-					  const int row, Qt::DropAction action )
+                                          const int row, Qt::DropAction action )
 {
   FuncMsg fmsg( "--- PyModuleHelper::internalDropObjects()" );
 
@@ -2631,10 +2631,10 @@ void PyModuleHelper::internalDropObjects( const DataObjectList& what, SUIT_DataO
   PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL) );
 #endif
   if ( PyObject_HasAttrString(myPyModule, (char*)"dropObjects") ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"dropObjects", (char*)"Osii",
-					   sipList.get(),
-					   whereObject->entry().toLatin1().constData(),
-					   row, action ) );
+      PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"dropObjects", (char*)"Osii",
+                        sipList.get(),
+                        whereObject->entry().toLatin1().constData(),
+                        row, action ) );
     
     if( !res ) {
       PyErr_Print();
@@ -2663,13 +2663,13 @@ QString PyModuleHelper::internalEngineIOR() const
     if ( PyObject_HasAttrString( myPyModule , "engineIOR" ) ) {
       PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"engineIOR", (char*)"" ) );
       if ( !res ) {
-	PyErr_Print();
+          PyErr_Print();
       }
       else {
-	// parse the return value, result chould be string
-	if ( PyString_Check( res ) ) {
-	  ior = PyString_AsString( res );
-	}
+        // parse the return value, result chould be string
+        if ( PyString_Check( res ) ) {
+          ior = PyString_AsString( res );
+        }
       }
     }
   }
@@ -2688,23 +2688,23 @@ void PyModuleHelper::connectView( SUIT_ViewWindow* view )
   // Connect tryCloseView() and deleteView() signals
   if ( viewMgr ) {
     connect( viewMgr, SIGNAL( tryCloseView( SUIT_ViewWindow* ) ),
-	     this, SLOT( tryCloseView( SUIT_ViewWindow* ) ),
-	     Qt::UniqueConnection );
+             this, SLOT( tryCloseView( SUIT_ViewWindow* ) ),
+             Qt::UniqueConnection );
     connect( viewMgr, SIGNAL( deleteView( SUIT_ViewWindow* ) ),
              this, SLOT( closeView( SUIT_ViewWindow* ) ),
-	     Qt::UniqueConnection );
+             Qt::UniqueConnection );
   }
   
   // Connect cloneView() signal of an OCC View
   if ( view->inherits( "OCCViewer_ViewWindow" ) ) {
     connect( view, SIGNAL( viewCloned( SUIT_ViewWindow* ) ), 
              this, SLOT( cloneView( SUIT_ViewWindow* ) ),
-	     Qt::UniqueConnection );
+             Qt::UniqueConnection );
   }
   // Connect cloneView() signal of Plot2d View 
   else if ( viewModel && viewModel->inherits( "Plot2d_Viewer" ) ) {
     connect( viewModel, SIGNAL( viewCloned( SUIT_ViewWindow* ) ), 
              this, SLOT( cloneView( SUIT_ViewWindow* ) ),
-	     Qt::UniqueConnection );
+             Qt::UniqueConnection );
   }
 }

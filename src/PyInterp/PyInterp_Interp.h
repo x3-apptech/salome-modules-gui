@@ -32,26 +32,42 @@
 #include <list>
 #include <string>
 
+/**
+ * Utility class wrappin the Python GIL acquisition. This makes use of the high level
+ * API (PyGILState_Ensure and PyGILState_Release), and is hence compatible with only
+ * one running Python interpreter (no call to Py_NewInterpreter()).
+ * When the class is instanciated the lock is acquired. It is released at destruction time.
+ * Copy construction (and hence assignation) is forbidden.
+ */
 class PYINTERP_EXPORT PyLockWrapper
 {
-  PyThreadState* myThreadState;
-  PyThreadState* mySaveThreadState;
-  PyGILState_STATE _savestate;
+  PyGILState_STATE _gil_state;
 public:
-  PyLockWrapper(PyThreadState* theThreadState);
+  PyLockWrapper();
   ~PyLockWrapper();
+
+private:
+  // "Rule of 3" - Forbid usage of copy operator and copy-constructor
+  PyLockWrapper(const PyLockWrapper & another);
+  const PyLockWrapper & operator=(const PyLockWrapper & another);
 };
 
 typedef void PyOutChanged(void* data,char * c);
 
+/**
+ * Main class representing a *virtual* Python interpreter. There is really only one true
+ * Python interpreter in the whole application (no call to Py_NewInterpreter),
+ * but the use of different execution contexts allow
+ * to split the execution lines, and hence to emulate (relatively) independent interpreters.
+ * This has some consequences: modules imported in one context are not re-imported in another context
+ * (only there namespace is made available when importing in another context).
+ * See also class PyConsole_Interp.
+ */
 class PYINTERP_EXPORT PyInterp_Interp
 {
 public:
   static int _argc;
   static char* _argv[];
-  static PyObject *builtinmodule;
-  static PyThreadState *_gtstate;
-  static PyInterpreterState *_interp;
   
   PyInterp_Interp();
   virtual ~PyInterp_Interp();
@@ -60,33 +76,41 @@ public:
 
   virtual int run(const char *command); 
 
-  PyLockWrapper GetLockWrapper();
+  // [ABN] - the PyLockWrapper is no more attached to the interpreter
+  // PyLockWrapper GetLockWrapper() const;
 
-  std::string getbanner(); 
+  std::string getbanner() const;
   void setverrcb(PyOutChanged*,void*);
   void setvoutcb(PyOutChanged*,void*);
 
   const char * getPrevious();
-  const char * getNext();    
+  const char * getNext();
 
 protected:
-  PyThreadState * _tstate;
+  /** Redirection of stdout and stderr */
   PyObject * _vout;
   PyObject * _verr;
-  PyObject * _g;
+  /** Execution context (local and global variables) */
+  PyObject * _context;
   PyObject * _codeop;
   std::list<std::string> _history;
   std::list<std::string>::iterator _ith;
 
-  virtual int beforeRun() { return 0; }
+  virtual int beforeRun();
   int simpleRun(const char* command, const bool addToHistory = true);
 
-  virtual bool initRun();
   virtual void initPython();
-  virtual bool initState() = 0;
-  virtual bool initContext() = 0;  
+  /** OBSOLETE - should'nt be called anymore */
+  //virtual bool initState() = 0;
+
+  /** Initialize execution context. Must set the member _context, and return True on success. */
+  virtual bool initContext() = 0;
+  virtual bool initRun();
 };
 
+/**
+ * Utility class to properly handle the reference counting required on Python objects.
+ */
 class PYINTERP_EXPORT PyObjWrapper
 {
   PyObject* myObject;

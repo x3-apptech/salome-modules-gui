@@ -277,16 +277,7 @@ int main( int argc, char* argv[] )
     int   _argc   = 1;
     char* _argv[] = {(char*)""};
     SUIT_PYTHON::init_python(_argc,_argv);
-    
-    PyEval_RestoreThread( SUIT_PYTHON::_gtstate );
-    
-    if ( !SUIT_PYTHON::salome_shared_modules_module ) // import only once
-      SUIT_PYTHON::salome_shared_modules_module = PyImport_ImportModule( (char*)"salome_shared_modules" );
-    if ( !SUIT_PYTHON::salome_shared_modules_module ) 
-      PyErr_Print();
-    
-    PyEval_ReleaseThread( SUIT_PYTHON::_gtstate );
-
+    PyEval_ReleaseLock();
 #endif
 
     SUIT_Application* theApp = aSession->startApplication( argList.first() );

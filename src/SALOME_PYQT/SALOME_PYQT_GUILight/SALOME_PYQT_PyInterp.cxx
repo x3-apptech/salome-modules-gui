@@ -49,37 +49,8 @@ void SALOME_PYQT_PyInterp::initPython()
   * Do nothing
   * The initialization has been done in main
   */
-  MESSAGE("SALOME_PYQT_PyInterp::initPython");
-#ifndef GUI_DISABLE_CORBA
-  if(SUIT_PYTHON::initialized) {
-    ASSERT(SUIT_PYTHON::_gtstate); // initialisation in main
-    SCRUTE(SUIT_PYTHON::_gtstate);
-    _tstate = SUIT_PYTHON::_gtstate;
-  }
-  else {
-    ASSERT(KERNEL_PYTHON::_gtstate); // initialisation in main
-    SCRUTE(KERNEL_PYTHON::_gtstate);
-    _tstate = KERNEL_PYTHON::_gtstate;
-  }
-#else
-  SCRUTE(SUIT_PYTHON::_gtstate);
-  _tstate = SUIT_PYTHON::_gtstate;
-#endif
+  MESSAGE("SALOME_PYQT_PyInterp::initPython - does nothing");
 }
-
-bool SALOME_PYQT_PyInterp::initState()
-{
- /*
-  * The GIL is assumed to not be held on the call
-  * The GIL is acquired in initState and will be held on initState exit
-  * It is the caller responsability to release the lock on exit if needed
-  */
-  PyEval_AcquireThread(_tstate);
-  SCRUTE(_tstate);
-  PyEval_ReleaseThread(_tstate);
-  return true;
-}
-
 
 bool SALOME_PYQT_PyInterp::initContext()
 {
@@ -88,10 +59,7 @@ bool SALOME_PYQT_PyInterp::initContext()
    * It is the caller responsability to acquire the GIL before calling initContext
    * It will still be held on initContext exit
    */
-  _g = PyDict_New();          // create interpreter dictionnary context
-  PyObject *bimod = PyImport_ImportModule("__builtin__");
-  PyDict_SetItemString(_g, "__builtins__", bimod);
-  Py_DECREF(bimod); 
+  _context = PyDict_New();          // create interpreter dictionnary context
   return true;
 }
 
@@ -100,18 +68,15 @@ int SALOME_PYQT_PyInterp::run(const char *command)
   MESSAGE("compile");
   PyObject *code = Py_CompileString((char *)command,"PyGUI",Py_file_input);
   if(!code){
-    // Une erreur s est produite en general SyntaxError
+    // An error occured - normally here a SyntaxError
     PyErr_Print();
     return -1;
   }
-  //#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
-  //  PyObject *r = PyEval_EvalCode(code,_g,_g);
-  //#else
-  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_g,_g);
-  //#endif
+  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_context,_context);
+
   Py_DECREF(code);
   if(!r){
-    // Une erreur s est produite a l execution
+      // An error occured at execution
     PyErr_Print();
     return -1 ;
   }
