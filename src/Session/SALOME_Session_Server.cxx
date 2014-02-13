@@ -94,8 +94,6 @@
  * - get session state
  */
 
-PyObject* salome_shared_modules_module = 0;
-
 void MessageOutput( QtMsgType type, const char* msg )
 {
   switch ( type )
