@@ -487,6 +487,10 @@ void SalomeApp_Application::onNewWithScript()
 /*!SLOT. Load document with \a aName.*/
 bool SalomeApp_Application::onLoadDoc( const QString& aName )
 {
+#ifdef SINGLE_DESKTOP
+  if ( !LightApp_Application::closeDoc() )
+    return false;
+#endif
   bool res = true;
   if ( !activeStudy() ) {
     // if no study - load in current desktop
