@@ -74,6 +74,7 @@
 #include <qwt_scale_engine.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_curve_fitter.h>
+#include <qwt_plot_renderer.h>
 
 #include <stdlib.h>
 #include <limits>
@@ -181,10 +182,11 @@ Plot2d_ViewFrame::Plot2d_ViewFrame( QWidget* parent, const QString& title )
      : QWidget (parent, 0),
        myOperation( NoOpId ),
        myCurveType( 1 ),
-       myShowLegend( true ), myLegendPos( 1 ), myLegendFont("Helvetic",12),
-       myLegendColor(Qt::black),
+       myShowLegend( true ), myLegendPos( 1 ), myLegendSymbolType( 0 ), myLegendFont("Helvetic",12),
+       myLegendColor(Qt::black), mySelectedLegendFontColor( Qt::darkBlue ),
        myMarkerSize( DEFAULT_MARKER_SIZE ),
        myBackground( Qt::white ),
+       mySelectionColor( Qt::gray ),
        myTitle( "" ), myXTitle( "" ), myYTitle( "" ), myY2Title( "" ),
        myTitleEnabled( true ), myXTitleEnabled( true ),
        myYTitleEnabled( true ), myY2TitleEnabled (true),
@@ -206,18 +208,6 @@ Plot2d_ViewFrame::Plot2d_ViewFrame( QWidget* parent, const QString& title )
 
   aLayout->addWidget( myPlot );
 
-  //  createActions();
-  connect( myPlot, SIGNAL( legendClicked( QwtPlotItem* ) ),
-           this, SIGNAL( legendClicked( QwtPlotItem* ) ) );
-
-  // IPAL 21465
-  /*  connect( myPlot->axisWidget( QwtPlot::xBottom ), SIGNAL( scaleDivChanged() ),
-           myPlot, SLOT( onScaleDivChanged() ) );
-  connect( myPlot->axisWidget( QwtPlot::yLeft ), SIGNAL( scaleDivChanged() ),
-           myPlot, SLOT( onScaleDivChanged() ) );
-  if (mySecondY)
-    connect( myPlot->axisWidget( QwtPlot::yRight ), SIGNAL( scaleDivChanged() ),
-    myPlot, SLOT( onScaleDivChanged() ) );*/
 #ifndef NO_SUIT
   Init();
 #endif
@@ -236,7 +226,6 @@ void Plot2d_ViewFrame::Init()
   /* Initial Setup - get from the preferences */
   readPreferences();
 
-  myPlot->setMargin( 5 );
   setCurveType( myCurveType, false );
   setXGrid( myXGridMajorEnabled, myXGridMaxMajor, myXGridMinorEnabled, myXGridMaxMinor, false );
   setYGrid( myYGridMajorEnabled, myYGridMaxMajor, myYGridMinorEnabled, myYGridMaxMinor,
@@ -251,9 +240,12 @@ void Plot2d_ViewFrame::Init()
   setHorScaleMode( myXMode, false );
   setVerScaleMode( myYMode, false );
   setBackgroundColor( myBackground );
+  setSelectionColor( mySelectionColor );
   setLegendPos( myLegendPos );
+  setLegendSymbolType( myLegendSymbolType );
   setLegendFont( myLegendFont );
   setLegendFontColor( myLegendColor );
+  setSelectedLegendFontColor( mySelectedLegendFontColor );
   showLegend( myShowLegend, false );
   myPlot->replot();
 
@@ -271,6 +263,21 @@ void Plot2d_ViewFrame::Init()
     myYDistance2 = yMap2.s2() - yMap2.s1();
   }
   myPlot->canvas()->installEventFilter( this );
+}
+void Plot2d_ViewFrame::SetPreference()
+{
+  readPreferences();
+  setBackgroundColor( myBackground );
+  setSelectionColor( mySelectionColor );
+  setCurveType( myCurveType, true );
+  setMarkerSize( myMarkerSize, true );
+  showLegend( myShowLegend, true );
+  setLegendPos( myLegendPos );
+  setLegendSymbolType( myLegendSymbolType );
+  setLegendFont( myLegendFont );
+  setLegendFontColor( myLegendColor );
+  setSelectedLegendFontColor( mySelectedLegendFontColor );
+  myPlot->replot();
 }
 /*!
   Gets window's central widget
@@ -465,10 +472,13 @@ void Plot2d_ViewFrame::readPreferences()
 
   myShowLegend = resMgr->booleanValue( "Plot2d", "ShowLegend", myShowLegend );
   myLegendPos = resMgr->integerValue( "Plot2d", "LegendPos", myLegendPos );
+  myLegendSymbolType = resMgr->integerValue( "Plot2d", "LegendSymbolType", myLegendSymbolType );
   myLegendFont = resMgr->fontValue( "Plot2d", "LegendFont", myLegendFont );
   myLegendColor = resMgr->colorValue( "Plot2d", "LegendFontColor", myLegendColor );
+  mySelectedLegendFontColor = resMgr->colorValue( "Plot2d", "SelectedLegendFontColor", mySelectedLegendFontColor );
   myMarkerSize = resMgr->integerValue( "Plot2d", "MarkerSize", myMarkerSize );
   myBackground = resMgr->colorValue( "Plot2d", "Background", myBackground );
+  mySelectionColor = resMgr->colorValue( "Plot2d", "SelectionColor", mySelectionColor );
 
   myTitleEnabled = resMgr->booleanValue( "Plot2d", "ShowTitle", myTitleEnabled );
   myXTitleEnabled = resMgr->booleanValue( "Plot2d", "ShowHorTitle", myXTitleEnabled );
@@ -519,13 +529,19 @@ void Plot2d_ViewFrame::writePreferences()
   resMgr->setValue( "Plot2d", "CurveType", myCurveType );
   resMgr->setValue( "Plot2d", "ShowLegend", myShowLegend );
   resMgr->setValue( "Plot2d", "LegendPos", myLegendPos );
+  resMgr->setValue( "Plot2d", "LegendSymbolType", myLegendSymbolType );
   resMgr->setValue( "Plot2d", "LegendFont", myLegendFont );
   resMgr->setValue( "Plot2d", "LegendFontColor", myLegendColor );
+  resMgr->setValue( "Plot2d", "SelectedLegendFontColor", mySelectedLegendFontColor );
   resMgr->setValue( "Plot2d", "MarkerSize", myMarkerSize );
   resMgr->setValue( "Plot2d", "Background", myBackground );
+  resMgr->setValue( "Plot2d", "SelectionColor", mySelectionColor );
   resMgr->setValue( "Plot2d", "ShowTitle", myTitleEnabled );
   resMgr->setValue( "Plot2d", "ShowHorTitle", myXTitleEnabled );
   resMgr->setValue( "Plot2d", "ShowVerLeftTitle", myYTitleEnabled );
+  resMgr->setValue( "Plot2d", "DeviationMarkerColor", myPlot->property(PLOT2D_DEVIATION_COLOR).value<QColor>() );
+  resMgr->setValue( "Plot2d", "DeviationMarkerLineWidth", myPlot->property(PLOT2D_DEVIATION_LW).toInt() );
+  resMgr->setValue( "Plot2d", "DeviationMarkerTickSize", myPlot->property(PLOT2D_DEVIATION_TS).toInt() );
   if ( mySecondY )
     resMgr->setValue( "Plot2d", "ShowVerRightTitle", myY2TitleEnabled );
 
@@ -567,8 +583,8 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
   QwtValueList aTicks;
   bool xFound = false, yFound = false;
   double xCoord, yCoord;
-  const QwtScaleDiv* aXscale = myPlot->axisScaleDiv( QwtPlot::xBottom );
-  aTicks = aXscale->ticks( QwtScaleDiv::MajorTick );
+  const QwtScaleDiv& aXscale = myPlot->axisScaleDiv( QwtPlot::xBottom );
+  aTicks = aXscale.ticks( QwtScaleDiv::MajorTick );
   for ( i = 0; i < aTicks.count(); i++ ) {
     double majXmark = aTicks[i];
     int xmark = myPlot->transform( QwtPlot::xBottom, majXmark );
@@ -579,7 +595,7 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
     }
   }
   if ( !xFound ) {
-    aTicks = aXscale->ticks( QwtScaleDiv::MinorTick );
+    aTicks = aXscale.ticks( QwtScaleDiv::MinorTick );
     for ( i = 0; i < aTicks.count(); i++ ) {
       double minXmark = aTicks[i];
       int xmark = myPlot->transform( QwtPlot::xBottom, minXmark );
@@ -590,8 +606,8 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
       }
     }
   }
-  const QwtScaleDiv* aYscale = myPlot->axisScaleDiv( QwtPlot::yLeft );
-  aTicks = aYscale->ticks( QwtScaleDiv::MajorTick );
+  const QwtScaleDiv& aYscale = myPlot->axisScaleDiv( QwtPlot::yLeft );
+  aTicks = aYscale.ticks( QwtScaleDiv::MajorTick );
   for ( i = 0; i < aTicks.count(); i++ ) {
     double majYmark = aTicks[i];
     int ymark = myPlot->transform( QwtPlot::yLeft, majYmark );
@@ -602,7 +618,7 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
     }
   }
   if ( !yFound ) {
-    aTicks = aYscale->ticks( QwtScaleDiv::MinorTick );
+    aTicks = aYscale.ticks( QwtScaleDiv::MinorTick );
     for ( i = 0; i < aTicks.count(); i++ ) {
       double minYmark = aTicks[i];
       int ymark = myPlot->transform( QwtPlot::yLeft, minYmark );
@@ -626,8 +642,8 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
     bool yFound2 = false;
     double yCoord2;
 
-    const QwtScaleDiv* aYscale2 = myPlot->axisScaleDiv( QwtPlot::yRight );
-    aTicks = aYscale2->ticks( QwtScaleDiv::MajorTick );
+    const QwtScaleDiv& aYscale2 = myPlot->axisScaleDiv( QwtPlot::yRight );
+    aTicks = aYscale2.ticks( QwtScaleDiv::MajorTick );
     for ( i = 0; i < aTicks.count(); i++ ) {
       double majYmark = aTicks[i];
       int ymark = myPlot->transform( QwtPlot::yRight, majYmark );
@@ -638,7 +654,7 @@ QString Plot2d_ViewFrame::getInfo( const QPoint& pnt )
       }
     }
     if ( !yFound2 ) {
-      aTicks = aYscale2->ticks( QwtScaleDiv::MinorTick );
+      aTicks = aYscale2.ticks( QwtScaleDiv::MinorTick );
       for ( i = 0; i < aTicks.count(); i++ ) {
         double minYmark = aTicks[i];
         int ymark = myPlot->transform( QwtPlot::yRight, minYmark );
@@ -731,8 +747,8 @@ QVector< QVector<QwtPlotCurve *> > Plot2d_ViewFrame::displayPlot2dCurveList( con
                                                                              bool  displayLegend, const QList< bool >& sides)
 {
   // Consider the new legend's entries
-  // (PB: to update the legend we must remove it and put a new QwtLegend in the QwtPlot)
-  myPlot->insertLegend( (QwtLegend*)NULL); // we remove here, we shall put at the end
+  // (PB: to update the legend we must remove it and put a new QwtAbstractLegend in the QwtPlot)
+  myPlot->insertLegend( (QwtAbstractLegend*)NULL); // we remove here, we shall put at the end
 
   int nbAllCurves = curveList.size();
   int nbGroups    = nbAllCurves / groupSize;
@@ -875,9 +891,10 @@ QVector< QVector<QwtPlotCurve *> > Plot2d_ViewFrame::displayPlot2dCurveList( con
           QwtPlotCurve* plotCurve = dynamic_cast<QwtPlotCurve *>(getPlotObject(plot2dCurve));
           vectCurve[ig].push_back(plotCurve);
           // Modify the points' markers
-          QwtSymbol symbol(plotCurve->symbol()) ;
-          symbol.setStyle(symbolStyle1);
-          symbol.setPen(QPen(color1,lineWidth1));
+          QwtSymbol* symbol = new QwtSymbol(plotCurve->symbol()->style(), plotCurve->symbol()->brush(),
+                                            plotCurve->symbol()->pen(), plotCurve->symbol()->size()) ;
+          symbol->setStyle(symbolStyle1);
+          symbol->setPen(QPen(color1,lineWidth1));
           //symbol.setBrush( QBrush( color1));
           //QSize size = 0.5*(symbol.size());
           //symbol.setSize(size);
@@ -1002,7 +1019,7 @@ Plot2d_Curve* Plot2d_ViewFrame::createPlot2dCurve( QString & title,
   {
       if (!displayLegend)
         {
-          myPlot->insertLegend( (QwtLegend*)NULL);
+          myPlot->insertLegend( (QwtAbstractLegend*)NULL);
         }
       displayCurve( plot2dCurve);
 
@@ -1024,15 +1041,16 @@ Plot2d_Curve* Plot2d_ViewFrame::createPlot2dCurve( QString & title,
       }
 
       // Modify points' markers
-      QwtSymbol symbol (plotCurve->symbol()) ;
-      symbol.setStyle( markerKind);
+      QwtSymbol* symbol = new QwtSymbol( plotCurve->symbol()->style(), plotCurve->symbol()->brush(),
+    		                             plotCurve->symbol()->pen(), plotCurve->symbol()->size() ) ;
+      symbol->setStyle( markerKind );
       //
       if (markerKind != QwtSymbol::NoSymbol)
       {
-          symbol.setPen( QPen( theColor, lineWidth));
-          symbol.setBrush( QBrush( theColor));
-          QSize size = 2.0*(symbol.size()); //0.5
-          symbol.setSize(size);
+        symbol->setPen( QPen( theColor, lineWidth));
+        symbol->setBrush( QBrush( theColor));
+        QSize size = 2.0*(symbol->size()); //0.5
+        symbol->setSize(size);
       }
 
       plotCurve->setSymbol( symbol);
@@ -1071,14 +1089,14 @@ QwtPlotCurve *Plot2d_ViewFrame::createSegment( double *X, double *Y, int nbPoint
                                                QColor & lineColor,
                                                QwtSymbol::Style markerKind, bool side)
 {
-  QwtPlotCurve* aPCurve = new QwtPlotCurve();
+  QwtPlotCurve* aPCurve = new QwtPlotCurve( QString::null );
 
-  aPCurve->setData( X, Y, nbPoint);
+  aPCurve->setSamples( X, Y, nbPoint);
 
   aPCurve->setPen( QPen( lineColor, lineWidth, lineKind));
-  QwtSymbol aSymbol;
-  aSymbol.setStyle( markerKind);
-  aPCurve->setSymbol( aSymbol);
+  QwtSymbol* aSymbol;
+  aSymbol->setStyle( markerKind );
+  aPCurve->setSymbol( aSymbol );
 
   // The segment must not have legend's entry
   aPCurve->setItemAttribute( QwtPlotItem::Legend, false);
@@ -1254,13 +1272,8 @@ QwtPlotItem* Plot2d_ViewFrame::displayObject( Plot2d_Object* object, bool update
       Plot2d_Curve* aCurve = dynamic_cast<Plot2d_Curve*>( object );
       if ( aCurve )
       {
-	//myMarkerSize = 1;
-        //aCurve->setMarkerSize( myMarkerSize );
-
-	if (aCurve->getMarkerSize() == 0)
-	{
-            aCurve->setMarkerSize( myMarkerSize );
-	}
+        if ( aCurve->getMarkerSize() == 0 )
+          aCurve->setMarkerSize( myMarkerSize );
 
         processFiltering(update);
         updatePlotItem( aCurve, anItem );
@@ -1409,10 +1422,12 @@ void Plot2d_ViewFrame::updateLegend( const Plot2d_Prs* prs )
   update legend
 */
 void Plot2d_ViewFrame::updateLegend() {
-  if ( myPlot->getLegend() ) {
-    ObjectDict::iterator it = myObjects.begin();
-    for( ; it != myObjects.end(); ++it )
-      it.key()->updateLegend(myPlot->getLegend());
+  const QwtPlotItemList& items = myPlot->itemList();
+  QwtPlotItemIterator it;
+  for ( it = items.begin(); it != items.end(); it++ ) {
+    QwtPlotItem* item = *it;
+    if ( item )
+      item->updateLegend( item, item->legendData() );
   }
 }
 
@@ -1422,14 +1437,7 @@ void Plot2d_ViewFrame::updateLegend() {
 */
 void Plot2d_ViewFrame::fitAll()
 {
-  // Postpone fitAll operation until QwtPlot geometry
-  // has been fully defined
-  if ( !myPlot->polished() ){
-    QApplication::postEvent( this, new QEvent( (QEvent::Type)FITALL_EVENT ) );
-    return;
-  }
-
-  // no need to set auto scaling, it wiil be disabled by setAxisScale() method call
+  // no need to set auto scaling, it will be disabled by setAxisScale() method call
   // myPlot->setAxisAutoScale( QwtPlot::yLeft );
   // myPlot->setAxisAutoScale( QwtPlot::xBottom );
   // myPlot->replot();
@@ -1708,9 +1716,11 @@ void Plot2d_ViewFrame::onSettings()
   if (mySecondY)
     dlg->setY2Title( myY2TitleEnabled, myY2Title );
   dlg->setCurveType( myCurveType );
-  dlg->setLegend( myShowLegend, myLegendPos, myLegendFont, myLegendColor );
+  dlg->setLegend( myShowLegend, myLegendPos, myLegendSymbolType, myLegendFont,
+                  myLegendColor, mySelectedLegendFontColor );
   dlg->setMarkerSize( myMarkerSize );
   dlg->setBackgroundColor( myBackground );
+  dlg->setSelectionColor( mySelectionColor );
   dlg->setScaleMode(myXMode, myYMode);
   dlg->setLMinNormMode(myNormLMin);
   dlg->setLMaxNormMode(myNormLMax);
@@ -1760,11 +1770,17 @@ void Plot2d_ViewFrame::onSettings()
     if ( myLegendPos != dlg->getLegendPos() ) {
       setLegendPos( dlg->getLegendPos() );
     }
+    if ( myLegendSymbolType != dlg->getLegendSymbolType() ) {
+      setLegendSymbolType( dlg->getLegendSymbolType() );
+    }
 	if ( myLegendFont != dlg->getLegendFont() ) {
       setLegendFont( dlg->getLegendFont() );
     }
 	if ( myLegendColor != dlg->getLegendColor() ) {
       setLegendFontColor( dlg->getLegendColor() );
+    }
+    if ( mySelectedLegendFontColor != dlg->getSelectedLegendColor() ) {
+      setSelectedLegendFontColor( dlg->getSelectedLegendColor() );
     }
 
     // marker size
@@ -1774,6 +1790,10 @@ void Plot2d_ViewFrame::onSettings()
     // background color
     if ( myBackground != dlg->getBackgroundColor() ) {
       setBackgroundColor( dlg->getBackgroundColor() );
+    }
+    // selection color
+    if ( mySelectionColor != dlg->getSelectionColor() ) {
+      setSelectionColor( dlg->getSelectionColor() );
     }
     // grid
     bool aXGridMajorEnabled, aXGridMinorEnabled, aYGridMajorEnabled, aYGridMinorEnabled,
@@ -1857,9 +1877,9 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
 {
 #ifndef DISABLE_PYCONSOLE
   if(!c) return;
-  QwtScaleDiv* div = myPlot->axisScaleDiv(QwtPlot::xBottom);
-  c->setRangeBegin(div->lowerBound());
-  c->setRangeEnd(div->upperBound());
+  QwtScaleDiv div = myPlot->axisScaleDiv(QwtPlot::xBottom);
+  c->setRangeBegin(div.lowerBound());
+  c->setRangeEnd(div.upperBound());
   c->calculate();
   c->setMarkerSize(myMarkerSize);
   QwtPlotItem* item = c->plotItem();
@@ -1869,6 +1889,7 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
     if( c->isActive() ) {
       c->updatePlotItem();
       item->attach( myPlot );
+      item->itemChanged();
       item->show();
     }
     c->setAction(Plot2d_AnalyticalCurve::ActNothing);
@@ -2020,19 +2041,31 @@ void Plot2d_ViewFrame::showLegend( bool show, bool update )
 {
   myShowLegend = show;
   if ( myShowLegend ) {
-    QwtLegend* legend = myPlot->legend();
-    if ( !legend ) {
-      legend = new QwtLegend( myPlot );
+    QwtAbstractLegend* absLegend = myPlot->legend();
+    QwtLegend* legend = 0;
+    if ( !absLegend ) {
+      legend = new Plot2d_QwtLegend( myPlot );
+      legend->setDefaultItemMode(QwtLegendData::Clickable);
+      connect( legend, SIGNAL( clicked (const QVariant&, int) ),
+               this, SIGNAL( clicked (const QVariant&, int) ) );
       legend->setFrameStyle( QFrame::Box | QFrame::Sunken );
     }
-    legend->setItemMode( QwtLegend::ClickableItem );
-    myPlot->insertLegend( legend );
-    setLegendPos( myLegendPos );
-    setLegendFont( myLegendFont );
-    setLegendFontColor( myLegendColor );
+    else {
+      legend = dynamic_cast<QwtLegend*>(absLegend);
+    }
+    if(legend) {
+      myPlot->insertLegend( legend );
+      setLegendPos( myLegendPos );
+      setLegendFont( myLegendFont );
+      setLegendFontColor( myLegendColor );
+    }
   }
   else
     myPlot->insertLegend( 0 );
+
+  if( show && update )
+    updateLegend();
+
   if ( update )
     myPlot->replot();
 }
@@ -2043,7 +2076,7 @@ void Plot2d_ViewFrame::showLegend( bool show, bool update )
 void Plot2d_ViewFrame::setLegendPos( int pos )
 {
   myLegendPos = pos;
-  QwtLegend* legend = myPlot->legend();
+  QwtAbstractLegend* legend = myPlot->legend();
   if ( legend ) {
     switch( pos ) {
     case 0:
@@ -2071,12 +2104,30 @@ int Plot2d_ViewFrame::getLegendPos() const
 }
 
 /*!
+  Sets legend symbol type : 0 - marker on line, 1 - marker above line
+*/
+void Plot2d_ViewFrame::setLegendSymbolType( int type )
+{
+  myLegendSymbolType = type;
+  myPlot->setLegendSymbolType( type );
+  updateLegend();
+}
+
+/*!
+  Gets legend symbol type : 0 - marker on line, 1 - marker above line
+*/
+int Plot2d_ViewFrame::getLegendSymbolType() const
+{
+  return myLegendSymbolType;
+}
+
+/*!
   Sets legend font
 */
 void Plot2d_ViewFrame::setLegendFont( const QFont& fnt )
 {
   myLegendFont = fnt;
-  QwtLegend* legend = myPlot->legend();
+  QwtAbstractLegend* legend = myPlot->legend();
   if ( legend ) {
     legend->setFont(fnt);
   }
@@ -2091,6 +2142,20 @@ QFont Plot2d_ViewFrame::getLegendFont() const
 }
 
 /*!
+  Sets legend font color
+*/
+void Plot2d_ViewFrame::setLegendFontColor( const QColor& col )
+{
+  myLegendColor = col;
+  QwtAbstractLegend* legend = myPlot->legend();
+  if ( legend ) {
+    QPalette pal = legend->palette();
+    pal.setColor( QPalette::Text, col );
+    legend->setPalette( pal );
+  }
+}
+
+/*!
   Gets legend font color
 */
 QColor Plot2d_ViewFrame::getLegendFontColor() const
@@ -2099,17 +2164,20 @@ QColor Plot2d_ViewFrame::getLegendFontColor() const
 }
 
 /*!
-  Sets legend font color
+  Sets selected legend font color
 */
-void Plot2d_ViewFrame::setLegendFontColor( const QColor& col )
+void Plot2d_ViewFrame::setSelectedLegendFontColor( const QColor& col )
 {
-  myLegendColor = col;
-  QwtLegend* legend = myPlot->legend();
-  if ( legend ) {
-    QPalette pal = legend->palette();
-    pal.setColor( QPalette::Text, col );
-    legend->setPalette( pal );
-  }
+  mySelectedLegendFontColor = col;
+  Plot2d_Object::setHighlightedLegendTextColor( col );
+}
+
+/*!
+  Gets selected legend font color
+*/
+QColor Plot2d_ViewFrame::getSelectedLegendFontColor() const
+{
+  return mySelectedLegendFontColor;
 }
 
 /*!
@@ -2126,11 +2194,11 @@ void Plot2d_ViewFrame::setMarkerSize( const int size, bool update )
       QwtPlotCurve* crv = it.key();
       if ( crv )
       {
-        QwtSymbol aSymbol = crv->symbol();
-        aSymbol.setSize( myMarkerSize, myMarkerSize );
+        QwtSymbol* aSymbol = new QwtSymbol( crv->symbol()->style(), crv->symbol()->brush(),
+        		                            crv->symbol()->pen(), QSize( myMarkerSize, myMarkerSize ) );
         crv->setSymbol( aSymbol );
-	if(it.value())
-	  it.value()->setMarkerSize( myMarkerSize );
+        if( it.value() )
+	      it.value()->setMarkerSize( myMarkerSize );
       }
     }
     if ( update )
@@ -2165,6 +2233,7 @@ void Plot2d_ViewFrame::setBackgroundColor( const QColor& color )
   }
   Repaint();
 }
+
 /*!
   Gets background color
 */
@@ -2172,6 +2241,24 @@ QColor Plot2d_ViewFrame::backgroundColor() const
 {
   return myBackground;
 }
+
+/*!
+  Sets selection color
+*/
+void Plot2d_ViewFrame::setSelectionColor( const QColor& color )
+{
+  mySelectionColor = color;
+  Plot2d_Object::setSelectionColor( color );
+}
+
+/*!
+  Gets selection color
+*/
+QColor Plot2d_ViewFrame::selectionColor() const
+{
+  return mySelectionColor;
+}
+
 /*!
   Sets hor.axis grid parameters
 */
@@ -2188,8 +2275,8 @@ void Plot2d_ViewFrame::setXGrid( bool xMajorEnabled, const int xMajorMax,
   myPlot->setAxisMaxMinor( QwtPlot::xBottom, myXGridMaxMinor );
 
   QwtPlotGrid* grid = myPlot->grid();
-  if ( myPlot->axisScaleDiv( QwtPlot::xBottom ) )
-    grid->setXDiv( *myPlot->axisScaleDiv( QwtPlot::xBottom ) );
+  if ( !myPlot->axisScaleDiv( QwtPlot::xBottom ).isEmpty() )
+    grid->setXDiv( myPlot->axisScaleDiv( QwtPlot::xBottom ) );
   grid->enableX( myXGridMajorEnabled );
   grid->enableXMin( myXGridMinorEnabled );
 
@@ -2225,8 +2312,8 @@ void Plot2d_ViewFrame::setYGrid( bool yMajorEnabled, const int yMajorMax,
   }
 
   QwtPlotGrid* grid = myPlot->grid();
-  if ( myPlot->axisScaleDiv( QwtPlot::yLeft ) )
-    grid->setYDiv( *myPlot->axisScaleDiv( QwtPlot::yLeft ) );
+  if ( !myPlot->axisScaleDiv( QwtPlot::yLeft ).isEmpty() )
+    grid->setYDiv( myPlot->axisScaleDiv( QwtPlot::yLeft ) );
 
   if (mySecondY) {
     if (myYGridMajorEnabled) {
@@ -2234,8 +2321,8 @@ void Plot2d_ViewFrame::setYGrid( bool yMajorEnabled, const int yMajorMax,
       grid->enableYMin( myYGridMinorEnabled );
     }
     else if (myY2GridMajorEnabled) {
-      if ( myPlot->axisScaleDiv( QwtPlot::yRight ) )
-        grid->setYDiv( *myPlot->axisScaleDiv( QwtPlot::yRight ) );
+      if ( !myPlot->axisScaleDiv( QwtPlot::yRight ).isEmpty() )
+        grid->setYDiv( myPlot->axisScaleDiv( QwtPlot::yRight ) );
       grid->enableY( myY2GridMajorEnabled );
       grid->enableYMin( myY2GridMinorEnabled );
     }
@@ -2353,6 +2440,12 @@ void Plot2d_ViewFrame::setHorScaleMode( const int mode, bool update )
 
   myXMode = mode;
 
+  // set bounds of logarithmic scale
+  if( myXMode != 0 ) {
+    myPlot->setAxisScale( QwtPlot::xBottom, 1.0, 1e5 );
+    myPlot->updateAxes();
+  }
+
   myPlot->setLogScale(QwtPlot::xBottom, myXMode != 0);
 
   if ( update )
@@ -2389,9 +2482,21 @@ void Plot2d_ViewFrame::setVerScaleMode( const int mode, bool update )
   }
 
   myYMode = mode;
+
+  // set bounds of logarithmic scale
+  if( myYMode != 0 ){
+    myPlot->setAxisScale( QwtPlot::yLeft, 1.0, 1e5 );
+    myPlot->updateAxes();
+  }
+
   myPlot->setLogScale(QwtPlot::yLeft, myYMode != 0);
-  if (mySecondY)
+  if (mySecondY) {
+    if( myYMode != 0 ){
+      myPlot->setAxisScale( QwtPlot::yRight, 1.0, 1e5 );
+      myPlot->updateAxes();
+    }
     myPlot->setLogScale( QwtPlot::yRight, myYMode != 0 );
+  }
 
   if ( update )
     fitAll();
@@ -2878,7 +2983,7 @@ void Plot2d_ViewFrame::setEnableAxis( QwtPlot::Axis theAxis, bool isEnable )
 class Plot2d_QwtPlotZoomer : public QwtPlotZoomer
 {
 public:
-  Plot2d_QwtPlotZoomer( int xAxis, int yAxis, QwtPlotCanvas* canvas )
+  Plot2d_QwtPlotZoomer( int xAxis, int yAxis, QWidget* canvas )
   : QwtPlotZoomer( xAxis, yAxis, canvas )
   {
     qApp->installEventFilter( this );
@@ -2893,7 +2998,6 @@ public:
 */
 Plot2d_Plot2d::Plot2d_Plot2d( QWidget* parent )
   : QwtPlot( parent ),
-    myIsPolished( false ),
     myPicker( 0 )
 {
   // Create alternative scales
@@ -2902,7 +3006,6 @@ Plot2d_Plot2d::Plot2d_Plot2d( QWidget* parent )
   setAxisScaleDraw( QwtPlot::yRight,  new Plot2d_ScaleDraw() );
 
   myPlotZoomer = new Plot2d_QwtPlotZoomer( QwtPlot::xBottom, QwtPlot::yLeft, canvas() );
-  myPlotZoomer->setSelectionFlags( QwtPicker::DragSelection | QwtPicker::CornerToCorner );
   myPlotZoomer->setTrackerMode( QwtPicker::AlwaysOff );
   myPlotZoomer->setRubberBand( QwtPicker::RectRubberBand );
   myPlotZoomer->setRubberBandPen( QColor( Qt::green ) );
@@ -2917,7 +3020,7 @@ Plot2d_Plot2d::Plot2d_Plot2d( QWidget* parent )
   myScaleDraw = NULL;
 // grid
   myGrid = new QwtPlotGrid();
-  QPen aMajPen = myGrid->majPen();
+  QPen aMajPen = myGrid->majorPen();
   aMajPen.setStyle( Qt::DashLine );
   myGrid->setPen( aMajPen );
 
@@ -2947,7 +3050,7 @@ Plot2d_Plot2d::~Plot2d_Plot2d()
 void Plot2d_Plot2d::setLogScale( int axisId, bool log10 )
 {
   if ( log10 )
-    setAxisScaleEngine( axisId, new QwtLog10ScaleEngine() );
+    setAxisScaleEngine( axisId, new QwtLogScaleEngine() );
   else
     setAxisScaleEngine( axisId, new QwtLinearScaleEngine() );
 }
@@ -2984,7 +3087,7 @@ void Plot2d_Plot2d::replot()
 /*!
   Get legend
 */
-QwtLegend* Plot2d_Plot2d::getLegend()
+QwtAbstractLegend* Plot2d_Plot2d::getLegend()
 {
 #if QWT_VERSION < 0x040200
   return d_legend;
@@ -3016,12 +3119,14 @@ void Plot2d_Plot2d::defaultPicker()
   myPlotZoomer->setMousePattern( QwtEventPattern::MouseSelect1,
                                  Qt::RightButton, Qt::ControlModifier ); // zooming button
   for ( int i = QwtEventPattern::MouseSelect2; i < QwtEventPattern::MouseSelect6; i++ )
-    myPlotZoomer->setMousePattern( i, Qt::NoButton, Qt::NoButton );
+    myPlotZoomer->setMousePattern( (QwtEventPattern::MousePatternCode)i, Qt::NoButton,
+    		                       Qt::NoModifier );
 }
 
 void Plot2d_Plot2d::setPickerMousePattern( int button, int state )
 {
-  myPlotZoomer->setMousePattern( QwtEventPattern::MouseSelect1, button, state );
+  myPlotZoomer->setMousePattern( QwtEventPattern::MouseSelect1, (Qt::MouseButton)button,
+		                         (Qt::KeyboardModifiers)state );
 }
 
 /*!
@@ -3035,11 +3140,11 @@ void Plot2d_Plot2d::setPicker( Plot2d_QwtPlotPicker *picker)
 /*!
  * Create marker and tooltip associed with a point
  */
-QwtPlotMarker* Plot2d_Plot2d::createMarkerAndTooltip( QwtSymbol symbol,
-                                            double    X,
-                                            double    Y,
-                                            QString & tooltip,
-                                            Plot2d_QwtPlotPicker *picker)
+QwtPlotMarker* Plot2d_Plot2d::createMarkerAndTooltip( QwtSymbol* symbol,
+                                                      double    X,
+                                                      double    Y,
+                                                      QString & tooltip,
+                                                      Plot2d_QwtPlotPicker *picker)
 {
   QwtPlotMarker* aPlotMarker = new QwtPlotMarker();
 
@@ -3066,11 +3171,6 @@ QwtPlotMarker* Plot2d_Plot2d::createMarkerAndTooltip( QwtSymbol symbol,
   return aPlotMarker;
 }
 
-bool Plot2d_Plot2d::polished() const
-{
-  return myIsPolished;
-}
-
 QwtPlotGrid* Plot2d_Plot2d::grid() const
 {
   return myGrid;
@@ -3079,44 +3179,6 @@ QwtPlotGrid* Plot2d_Plot2d::grid() const
 QwtPlotZoomer* Plot2d_Plot2d::zoomer() const
 {
   return myPlotZoomer;
-}
-
-/*!
-  Slot: checks the current labels format and change it if needed
-*/
-void Plot2d_Plot2d::onScaleDivChanged()
-{
-  QwtScaleWidget* aSW = 0;
-  if ( ( aSW = dynamic_cast<QwtScaleWidget*>(sender()) ) ) {
-    int axisId = -1;
-    switch ( aSW->alignment() ) {
-    case QwtScaleDraw::BottomScale:
-      axisId = QwtPlot::xBottom;
-      break;
-    case QwtScaleDraw::LeftScale:
-      axisId = QwtPlot::yLeft;
-      break;
-    case QwtScaleDraw::RightScale:
-      axisId = QwtPlot::yRight;
-      break;
-    default:
-      break;
-    }
-
-    if ( axisId >= 0 ) {
-      QwtScaleMap map = canvasMap(axisId);
-      double aDist = fabs(map.s2()-map.s1()) / (axisMaxMajor(axisId)*axisMaxMinor(axisId));
-
-      QString aDistStr;
-      aDistStr.sprintf("%e",aDist);
-      int aPrecision = aDistStr.right(aDistStr.length()-aDistStr.indexOf('e')-2).toInt();
-
-      QwtScaleDraw* aQwtSD = axisScaleDraw(axisId);
-      Plot2d_ScaleDraw* aPlot2dSD = dynamic_cast<Plot2d_ScaleDraw*>(aQwtSD);
-      if ( ( !aPlot2dSD && aPrecision > 6 ) || ( aPlot2dSD && aPlot2dSD->precision() != aPrecision ) )
-        setAxisScaleDraw( axisId, new Plot2d_ScaleDraw(*aQwtSD, 'f', aPrecision) );
-    }
-  }
 }
 
 /*!
@@ -3143,17 +3205,8 @@ void Plot2d_Plot2d::updateYAxisIdentifiers()
     if ( Plot2d_QwtPlotCurve* aPCurve = dynamic_cast<Plot2d_QwtPlotCurve*>( item ) )
       aPCurve->setYAxisIdentifierEnabled( enableYLeft && enableYRight );
     if ( item && item->isVisible() && legend() )
-      item->updateLegend( legend() );
+      item->updateLegend( item, item->legendData() );
   }
-}
-
-/*!
-  Sets the flag saying that QwtPlot geometry has been fully defined.
-*/
-void Plot2d_Plot2d::polish()
-{
-  QwtPlot::polish();
-  myIsPolished = true;
 }
 
 // Methods to manage axis graduations
@@ -3360,6 +3413,20 @@ void Plot2d_Plot2d::clearSeparationLineList()
   mySeparationLineList.clear();
 }
 
+/* Set type of legend symbol
+ */
+void Plot2d_Plot2d::setLegendSymbolType( const int type )
+{
+  myLegendSymbolType = type;
+}
+
+/* Get type of legend symbol
+ */
+int Plot2d_Plot2d::getLegendSymbolType()
+{
+  return myLegendSymbolType;
+}
+
 /*!
   Creates presentation of object
   Default implementation is empty
@@ -3381,8 +3448,12 @@ void Plot2d_ViewFrame::copyPreferences( Plot2d_ViewFrame* vf )
   myCurveType = vf->myCurveType;
   myShowLegend = vf->myShowLegend;
   myLegendPos = vf->myLegendPos;
+  myLegendSymbolType = vf->myLegendSymbolType;
+  myLegendFont = vf->myLegendFont;
+  mySelectedLegendFontColor = vf->mySelectedLegendFontColor;
   myMarkerSize = vf->myMarkerSize;
   myBackground = vf->myBackground;
+  mySelectionColor = vf->mySelectionColor;
   myTitle = vf->myTitle;
   myXTitle = vf->myXTitle;
   myYTitle = vf->myYTitle;
@@ -3519,22 +3590,24 @@ bool Plot2d_ViewFrame::print( const QString& file, const QString& format ) const
 
     if( pd )
     {
-      myPlot->print( *pd );
+      QwtPlotRenderer* pr = new QwtPlotRenderer();
+      pr->renderTo( myPlot, *pd );
       res = true;
       delete pd;
     }
   }
   return res;
 #endif
+
 }
 
 /**
  * Print Plot2d window
  */
-void Plot2d_ViewFrame::printPlot( QPainter* p, const QRect& rect,
-                                  const QwtPlotPrintFilter& filter ) const
+void Plot2d_ViewFrame::printPlot( QPainter* p, const QRectF& rect) const
 {
-  myPlot->print( p, rect, filter );
+  QwtPlotRenderer* pr = new QwtPlotRenderer();
+  pr->render( myPlot, p, rect );
 }
 
 /*!
@@ -3951,7 +4024,7 @@ void Plot2d_ViewFrame::updatePlotItem(Plot2d_Object* theObject, QwtPlotItem* the
         xNew[j] = itTmp.value().at(j).first;
         yNew[j] = itTmp.value().at(j).second;
       }
-      cu->setData(xNew, yNew,j);
+      cu->setSamples(xNew, yNew,j);
       delete [] xNew;
       delete [] yNew;
       if(aNormAlgo->getNormalizationMode() != Plot2d_NormalizeAlgorithm::NormalizeNone) {
@@ -3969,7 +4042,7 @@ void Plot2d_ViewFrame::updatePlotItem(Plot2d_Object* theObject, QwtPlotItem* the
  */
 QwtPlotCanvas* Plot2d_ViewFrame::getPlotCanvas() const
 {
-  return myPlot ? myPlot->canvas() : 0;
+  return myPlot ? (QwtPlotCanvas*)myPlot->canvas() : 0;
 }
 
 /*!
@@ -4120,21 +4193,13 @@ Plot2d_ScaleDraw::Plot2d_ScaleDraw( char f, int prec )
   invalidateCache();
 }
 
-Plot2d_ScaleDraw::Plot2d_ScaleDraw( const QwtScaleDraw& scaleDraw, char f, int prec )
-  : QwtScaleDraw(scaleDraw),
-    myFormat(f),
-    myPrecision(prec)
-{
-  invalidateCache();
-}
-
 QwtText Plot2d_ScaleDraw::label( double value ) const
 {
-  QwtScaleMap m = map();
+  QwtScaleMap m = scaleMap();
   QString str1 = QwtScaleDraw::label( m.s1() ).text();
   QString str2 = QwtScaleDraw::label( m.s2() ).text();
   if ( str1 == str2 ) {
-    double aDist = fabs(map().s2()-map().s1())/5;
+    double aDist = fabs(scaleMap().s2()-scaleMap().s1())/5;
     int precision = 0;
     while (aDist < 1 ) {
       precision++;
@@ -4218,9 +4283,13 @@ void Plot2d_AxisScaleDraw::draw( QPainter* painter, const QPalette & palette) co
   major_ticks.clear();
 
   major_ticks.append( myTicks);
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MajorTick,  major_ticks);
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MediumTick, medium_ticks);
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MinorTick,  minor_ticks);
+
+  QwtScaleDiv aScaleDiv = myPlot->axisScaleDiv( QwtPlot::xBottom );
+  aScaleDiv.setTicks( QwtScaleDiv::MajorTick,  major_ticks );
+  aScaleDiv.setTicks( QwtScaleDiv::MediumTick, medium_ticks );
+  aScaleDiv.setTicks( QwtScaleDiv::MinorTick,  minor_ticks );
+  myPlot->setAxisScaleDiv( QwtPlot::xBottom, aScaleDiv );
+
   QwtScaleDraw *scale = myPlot->axisScaleDraw(QwtPlot::xBottom);
   ((Plot2d_AxisScaleDraw*)(scale))->applyTicks();
 
@@ -4294,9 +4363,11 @@ void Plot2d_AxisScaleDraw::applyTicks()
   medium_ticks.clear();
   minor_ticks.clear();
 
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MajorTick, myTicks);
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MediumTick, medium_ticks);
-  myPlot->axisScaleDiv(QwtPlot::xBottom)->setTicks(QwtScaleDiv::MinorTick, minor_ticks);
+  QwtScaleDiv aQwtScaleDiv = myPlot->axisScaleDiv( QwtPlot::xBottom );
+  aQwtScaleDiv.setTicks( QwtScaleDiv::MajorTick, myTicks );
+  aQwtScaleDiv.setTicks( QwtScaleDiv::MediumTick, medium_ticks );
+  aQwtScaleDiv.setTicks( QwtScaleDiv::MinorTick, minor_ticks );
+  myPlot->setAxisScaleDiv( QwtPlot::xBottom, aQwtScaleDiv );
 
   QwtScaleDiv* aScaleDiv = (QwtScaleDiv*) &scaleDiv();
 
@@ -4327,7 +4398,7 @@ void Plot2d_AxisScaleDraw::drawLabel( QPainter* painter, double value) const
       //const char *c_label = std_label.c_str();
       //std::cout << "    deviceLabel= |" << c_label << "|" << std::endl;
 
-      QPoint p = labelPosition( value );
+      QPointF p = labelPosition( value );
       p += QPoint(0, DEVICE_BY);
       QFont  prevf = painter->font();
       //QColor prevc = (painter->pen()).color();
@@ -4371,13 +4442,11 @@ const double Plot2d_QwtPlotPicker::BOUND_HV_SIZE = 0.2;
 
 Plot2d_QwtPlotPicker::Plot2d_QwtPlotPicker( int            xAxis,
                                             int            yAxis,
-                                            int            selectionFlags,
                                             RubberBand     rubberBand,
                                             DisplayMode    trackerMode,
                                             QwtPlotCanvas *canvas)
 : QwtPlotPicker( xAxis,
                  yAxis,
-                 selectionFlags,
                  rubberBand,
                  trackerMode,
                  canvas)    // of drawing zone QwtPlot
@@ -4400,20 +4469,30 @@ Plot2d_QwtPlotPicker::~Plot2d_QwtPlotPicker()
 
 /* Return the tooltip associated with a point when the mouse cursor pass near
  */
-QwtText Plot2d_QwtPlotPicker::trackerText( const QwtDoublePoint & pos ) const
+QwtText Plot2d_QwtPlotPicker::trackerText( const QPoint & pos ) const
 {
   for (QList<QwtPlotMarker* >::const_iterator pMarkerIt = pMarkers.begin();pMarkerIt != pMarkers.end(); ++pMarkerIt )
     {
       QwtPlotMarker* pMarker = *pMarkerIt;
       if ( pMarker != NULL )
         {
-          const QwtSymbol &symb=pMarker->symbol();
-          const QSize& sz=symb.size();
+          const QwtSymbol* symb=pMarker->symbol();
+          const QSize& sz=symb->size();
           const QwtScaleMap yMapRef=plot()->canvasMap(QwtPlot::yLeft);
           const QwtScaleMap xMap=plot()->canvasMap(pMarker->xAxis());
           const QwtScaleMap yMap=plot()->canvasMap(pMarker->yAxis());
           QwtDoubleRect  bound0=pMarker->boundingRect();
-          QRect bound00=pMarker->transform(xMap,yMap,bound0);
+          int x1 = qRound(xMap.transform(bound0.left()));
+          int x2 = qRound(xMap.transform(bound0.right()));
+          int y1 = qRound(yMap.transform(bound0.top()));
+          int y2 = qRound(yMap.transform(bound0.bottom()));
+	  
+          if ( x2 < x1 )
+            qSwap(x1, x2);
+          if ( y2 < y1 )
+            qSwap(y1, y2);
+	  
+          QRect bound00=QRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
           QPoint toto(xMap.transform(pos.x()),yMapRef.transform(pos.y()));
           bound00.setX(bound00.x()-sz.width());
           bound00.setY(bound00.y()-sz.height());

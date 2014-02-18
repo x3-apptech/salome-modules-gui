@@ -28,7 +28,7 @@
 #include "Plot2d.h"
 #include "Plot2d_Object.h"
 
-#include <qwt_interval_data.h>
+#include <qwt_series_data.h>
 
 class PLOT2D_EXPORT Plot2d_Histogram : public Plot2d_Object
 {
@@ -39,30 +39,30 @@ public:
   virtual ~Plot2d_Histogram();
   Plot2d_Histogram& operator= ( const Plot2d_Histogram& );
 
-  virtual int          rtti();
-  virtual QwtPlotItem* createPlotItem();
-  virtual void         autoFill( const QwtPlot* );
-  virtual void         updatePlotItem( QwtPlotItem* );
+  virtual int           rtti();
+  virtual QwtPlotItem*  createPlotItem();
+  virtual void          autoFill( const QwtPlot* );
+  virtual void          updatePlotItem( QwtPlotItem* );
 
-  void                 setData( const QList<double>&, const QList<double>& );
-  QwtIntervalData      getData() const;
+  void                  setData( const QList<double>&, const QList<double>& );
+  QwtIntervalSeriesData getData() const;
 
-  void                 setColor( const QColor& );
-  QColor               getColor() const;
+  void                  setColor( const QColor& );
+  QColor                getColor() const;
 
-  void                 setWidth( const double );
-  double               getWidth( const bool ) const;
+  void                  setWidth( const double );
+  double                getWidth( const bool ) const;
 
-  static double        getMinInterval( const QList<double>& );
+  static double         getMinInterval( const QList<double>& );
 
 protected:
-  QColor               getNextColor( const QwtPlot* );
-  bool                 existColor( const QwtPlot*, const QColor& );
+  QColor                getNextColor( const QwtPlot* );
+  bool                  existColor( const QwtPlot*, const QColor& );
 
 private:
-  QColor               myColor;
-  double               myWidth;
-  double               myDefWidth;
+  QColor                myColor;
+  double                myWidth;
+  double                myDefWidth;
 };
 
 #endif // PLOT2D_HISTOGRAM_H

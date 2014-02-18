@@ -138,16 +138,28 @@ The options are as follows:
 - <b>Curve type</b> you can select from \em Points, \em Lines or
   \em Spline.
 
-- <b>Show legend</b> here you can define the position of the
-  description table on the XY plot (to the \em Left, to the \em Right,
-  on \em Top or on \em Bottom).
-
-- <b>Legend font</b> here you can set type, face and color for the
-  font of Legend item.
-
 - <b>Marker size</b> - size of the points (markers) forming curve lines.
 
 - <b>Background color</b> of the XY plot.
+
+- <b>Selection color</b> - this submenu allows to select the color of selected object in the viewer.
+
+- <b>Legend</b> allows specifying the properties of the legend.
+  
+  - <b>Show legend</b> - this options specifies if it's necessary to show legend by default.
+
+  - <b>Legend Position</b> here you can define the position of the
+  description table on the XY plot (to the \em Left, to the \em Right,
+  on \em Top or on \em Bottom).
+  
+  - <b>Symbol type</b> you can select the type of legend item symbol from "Marker on line" or "Marker above line"
+
+  - <b>Legend font</b> here you can set type, face and color for the
+  font of Legend item.
+  
+  - <b>Legend font color</b> - this allows to select the color of the font of the legend item.
+
+  - <b>Highlighted legend font color</b> - this submenu allows to select the color of the font of the selected legend item.
 
 - <b>Deviation marker</b> allows specifying the properties of the
   marker, which is used for drawing deviations data.

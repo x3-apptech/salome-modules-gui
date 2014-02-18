@@ -336,6 +336,10 @@
         <translation>Couleur d&apos;arrière-plan:</translation>
     </message>
     <message>
+        <source>PLOT2D_SELECTION_COLOR_LBL</source>
+        <translation>Couleur de sélection:</translation>
+    </message>
+    <message>
         <source>PLOT2D_DEVIATION_MARKER_TLT</source>
         <translation>Marqueur de déviation</translation>
     </message>
@@ -565,6 +569,34 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
         <source>PLOT2D_ENABLE_MAIN_TITLE</source>
         <translation>Titre principal</translation>
     </message>
+    <message>
+        <source>PLOT2D_LEGEND_GROUP</source>
+        <translation>Légende</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_POSITION</source>
+        <translation>Position de la Légende:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_SYMBOL_TYPE</source>
+        <translation>Type de symbole:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_MARKER_ABOVE_LINE</source>
+        <translation>Marqueur dessus de la ligne</translation>
+    </message>
+    <message>
+        <source>PLOT2D_MARKER_ON_LINE</source>
+        <translation>Marqueur sur la ligne</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_FONT_COLOR</source>
+        <translation>Couleur de police de la légende:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
+        <translation>Couleur de surlignement de la légende:</translation>
+    </message> 
     <message>
         <source>TOT_PLOT2D_CURVES_LINES</source>
         <translation>Dessiner des lignes</translation>

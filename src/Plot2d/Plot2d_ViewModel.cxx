@@ -40,7 +40,8 @@ Plot2d_Viewer::Plot2d_Viewer(bool theAutoDel)
 {
   myPrs = 0;
   myAutoDel = theAutoDel;
-  Plot2d_Object::initColors();
+  Plot2d_Object::setSelectionColor( QColor(80,80,80) );
+  Plot2d_Object::setHighlightedLegendTextColor( QColor(255,255,255) );
 }
 
 /*!
@@ -219,7 +220,7 @@ void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* n
 /*
   SLOT: called when clicked item in the legend from Plot2d_ViewManager
  */
-void Plot2d_Viewer::onLegendClicked( QwtPlotItem* plotItem )
+void Plot2d_Viewer::onClicked(const QVariant& itemInfo, int index)
 {
 }
 

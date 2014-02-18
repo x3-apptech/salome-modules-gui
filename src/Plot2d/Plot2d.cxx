@@ -529,7 +529,7 @@ bool Plot2d::existMarker( const int rtti, const QwtPlot* thePlot, const QwtSymbo
       if ( anItem && anItem->rtti() == rtti ) {
 	QwtPlotCurve* crv = dynamic_cast<QwtPlotCurve*>( anItem );
 	if ( crv ) {
-	  QwtSymbol::Style aStyle = crv->symbol().style();
+	  QwtSymbol::Style aStyle = crv->symbol()->style();
 	  QColor           aColor = crv->pen().color();
 	  Qt::PenStyle     aLine  = crv->pen().style();
 	  ok = closeColors( aColor, color ) && aStyle == typeMarker && aLine == typeLine;

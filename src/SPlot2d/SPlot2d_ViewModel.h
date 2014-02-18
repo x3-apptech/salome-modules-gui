@@ -84,7 +84,7 @@ public:
   Handle(SALOME_InteractiveObject) FindIObject( const char* Entry );
 
 protected slots:
-  virtual void onLegendClicked( QwtPlotItem* plotItem );
+  virtual void onClicked( const QVariant&, int );
 
 signals:
   void legendSelected( const QString& );

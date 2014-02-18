@@ -25,34 +25,10 @@
 
 #include "Plot2d_Object.h"
 
-#ifndef NO_SUIT
-#include <SUIT_Session.h>
-#include <SUIT_ResourceMgr.h>
-#endif
-
 // Static members
 QColor Plot2d_Object::mySelectionColor;
 QColor Plot2d_Object::myHighlightedLegendTextColor;
 
-/*
- * Read colors from the resource manager.
-*/
-void Plot2d_Object::initColors() {
-#ifndef NO_SUIT
-  SUIT_Session* session = SUIT_Session::session();
-  if(!session)
-    return;
-
-  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-  if(resMgr) {
-    mySelectionColor = resMgr->colorValue( "Plot2d", "SelectionColor", QColor(80,80,80) );
-    myHighlightedLegendTextColor = resMgr->colorValue( "Plot2d", "SelectedLegendFontColor", QColor(255,255,255) );
-  }
-#else
-  mySelectionColor = QColor(80,80,80);
-  myHighlightedLegendTextColor = QColor(255,255,255);
-#endif
-}
 
 /*!
   Constructor
@@ -127,7 +103,7 @@ void Plot2d_Object::updatePlotItem( QwtPlotItem* theItem )
     return;
 
   if ( theItem->yAxis() != getYAxis() || theItem->xAxis() != getXAxis() ) {
-    theItem->setAxis( getXAxis(), getYAxis() );
+    theItem->setAxes( getXAxis(), getYAxis() );
 
     QwtPlot* aPlot = theItem->plot();
     if ( aPlot ) {

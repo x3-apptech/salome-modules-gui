@@ -89,19 +89,6 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   myCurveCombo->addItem( tr( "PLOT2D_CURVE_TYPE_LINES" ) );
   myCurveCombo->addItem( tr( "PLOT2D_CURVE_TYPE_SPLINE" ) );
 
-  // legend
-  myLegendCheck = new QCheckBox( tr( "PLOT2D_ENABLE_LEGEND" ), this );
-  myLegendCombo = new QComboBox( this );
-  myLegendFont = new QtxFontEdit( this );
-  myLegendColor = new QtxColorButton( this );
-  QLabel* aLegendFontLab = new QLabel( tr( "PLOT2D_LEGEND_FONT" ), this );
-  myLegendCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  myLegendCombo->setMinimumWidth( MIN_COMBO_WIDTH );
-  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_LEFT" ) );
-  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_RIGHT" ) );
-  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_TOP" ) );
-  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_BOTTOM" ) );
-
   // marker size
   QLabel* aMarkerLab  = new QLabel( tr( "PLOT2D_MARKER_SIZE_LBL" ), this );
   myMarkerSpin = new QSpinBox( this );
@@ -114,6 +101,68 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   // background color
   QLabel* aBGLab  = new QLabel( tr( "PLOT2D_BACKGROUND_COLOR_LBL" ), this );
   myBackgroundBtn = new QtxColorButton( this );
+
+  // selection color
+  QLabel* aSelectionLab  = new QLabel( tr( "PLOT2D_SELECTION_COLOR_LBL" ), this );
+  mySelectionBtn = new QtxColorButton( this );
+
+  QHBoxLayout* ViewerColorLayout = new QHBoxLayout;
+  ViewerColorLayout->addWidget( aBGLab );
+  ViewerColorLayout->addWidget( myBackgroundBtn );
+  ViewerColorLayout->addStretch();
+  ViewerColorLayout->addWidget( aSelectionLab );
+  ViewerColorLayout->addWidget( mySelectionBtn );
+  ViewerColorLayout->addStretch();
+
+  // legend
+  QGroupBox* aLegendGrp = new QGroupBox( tr( "PLOT2D_LEGEND_GROUP" ), this );
+  QGridLayout* aLegendLayout = new QGridLayout( aLegendGrp );
+  aLegendLayout->setMargin( MARGIN_SIZE ); aLegendLayout->setSpacing( SPACING_SIZE );
+  aLegendGrp->setLayout( aLegendLayout );
+
+  myLegendCheck = new QCheckBox( tr( "PLOT2D_ENABLE_LEGEND" ), this );
+
+  QLabel* aLegendPosition = new QLabel( tr( "PLOT2D_LEGEND_POSITION" ), this );
+  myLegendCombo = new QComboBox( this );
+  myLegendCombo->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myLegendCombo->setMinimumWidth( MIN_COMBO_WIDTH );
+  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_LEFT" ) );
+  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_RIGHT" ) );
+  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_TOP" ) );
+  myLegendCombo->addItem( tr( "PLOT2D_LEGEND_POSITION_BOTTOM" ) );
+
+  QLabel* aLegendSymbolType = new QLabel( tr( "PLOT2D_LEGEND_SYMBOL_TYPE" ), this );
+  myLegendSymbolType = new QComboBox( this );
+  myLegendSymbolType->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
+  myLegendSymbolType->setMinimumWidth( MIN_COMBO_WIDTH );
+  myLegendSymbolType->addItem( tr( "PLOT2D_MARKER_ON_LINE" ) );
+  myLegendSymbolType->addItem( tr( "PLOT2D_MARKER_ABOVE_LINE" ) );
+
+  QLabel* aLegendFontLab = new QLabel( tr( "PLOT2D_LEGEND_FONT" ), this );
+  myLegendFont = new QtxFontEdit( this );
+
+  QLabel* aLegendFontColor = new QLabel( tr( "PLOT2D_LEGEND_FONT_COLOR" ), this );
+  myLegendFontColor = new QtxColorButton( this );
+
+  QLabel* aSelectLegendFontColor = new QLabel( tr( "PLOT2D_SELECTED_LEGEND_FONT_COLOR" ), this );
+  mySelectedLegendFontColor = new QtxColorButton( this );
+
+  QHBoxLayout* FontLayout = new QHBoxLayout;
+  FontLayout->addWidget( aLegendFontColor );
+  FontLayout->addWidget( myLegendFontColor );
+  FontLayout->addStretch();
+  FontLayout->addWidget( aSelectLegendFontColor );
+  FontLayout->addWidget( mySelectedLegendFontColor );
+  FontLayout->addStretch();
+
+  aLegendLayout->addWidget( myLegendCheck,      0, 0 );
+  aLegendLayout->addWidget( aLegendPosition,    1, 0 );
+  aLegendLayout->addWidget( myLegendCombo,      1, 1 );
+  aLegendLayout->addWidget( aLegendSymbolType,  2, 0 );
+  aLegendLayout->addWidget( myLegendSymbolType, 2, 1 );
+  aLegendLayout->addWidget( aLegendFontLab,     3, 0 );
+  aLegendLayout->addWidget( myLegendFont,       3, 1 );
+  aLegendLayout->addLayout( FontLayout,         4, 0, 1, 2 );
 
   //Deviation marker parameters
   QGroupBox* aDeviationGrp = new QGroupBox( tr( "PLOT2D_DEVIATION_MARKER_TLT" ), this );
@@ -375,30 +424,21 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
   btnLayout->addWidget( myHelpBtn );
 
   // layout widgets
-  topLayout->addWidget( myTitleCheck,  0,    0    );
-  topLayout->addWidget( myTitleEdit,   0, 1, 1, 3 );
-  topLayout->addWidget( myLegendCheck, 1,    0    );
-  topLayout->addWidget( myLegendCombo, 1,    1    );
-  topLayout->addWidget( aCurveLab,  1,    2    );
-  topLayout->addWidget( myCurveCombo,  1,     3    );
-  topLayout->addWidget( aLegendFontLab,2,    0    );
-  topLayout->addWidget( myLegendFont,     2,    1    );
-  topLayout->addWidget( myLegendColor,  2,    2    );
-
-  topLayout->addWidget( aMarkerLab,    3,    0    );
-  topLayout->addWidget( myMarkerSpin,  3,    1    );
-  QHBoxLayout* bgLayout = new QHBoxLayout;
-  bgLayout->addWidget( myBackgroundBtn ); bgLayout->addStretch();
-  topLayout->addWidget( aBGLab,        3,    2    );
-  topLayout->addLayout( bgLayout,      3,    3    );
-  topLayout->addWidget( aDeviationGrp,   4, 0, 1, 4 );
-  topLayout->addWidget( aNormalizeGrp,      5, 0, 1, 4 );
-  topLayout->addWidget( aScaleGrp,     6, 0, 1, 4 );
-  topLayout->addWidget( aTabWidget,    7, 0, 1, 4 );
-  topLayout->addWidget( myDefCheck,    8, 0, 1, 4 );
-  topLayout->setRowStretch( 9, 5 );
-
-  topLayout->addLayout( btnLayout,     10, 0, 1, 4 );
+  topLayout->addWidget( myTitleCheck,      0, 0       );
+  topLayout->addWidget( myTitleEdit,       0, 1, 1, 3 );
+  topLayout->addWidget( aCurveLab,         1, 0       );
+  topLayout->addWidget( myCurveCombo,      1, 1       );
+  topLayout->addWidget( aMarkerLab,        2, 0       );
+  topLayout->addWidget( myMarkerSpin,      2, 1       );
+  topLayout->addLayout( ViewerColorLayout, 3, 0, 1, 4 );
+  topLayout->addWidget( aLegendGrp,        4, 0, 1, 4 );
+  topLayout->addWidget( aDeviationGrp,     5, 0, 1, 4 );
+  topLayout->addWidget( aNormalizeGrp,     6, 0, 1, 4 );
+  topLayout->addWidget( aScaleGrp,         7, 0, 1, 4 );
+  topLayout->addWidget( aTabWidget,        8, 0, 1, 4 );
+  topLayout->addWidget( myDefCheck,        9, 0, 1, 4 );
+  topLayout->setRowStretch( 10, 5 );
+  topLayout->addLayout( btnLayout,         11, 0, 1, 4 );
 
   if ( !showDefCheck )
     myDefCheck->hide();
@@ -698,12 +738,15 @@ bool Plot2d_SetupViewDlg::getRMinNormMode()
   \param col legend font color
   \sa isLegendEnabled(), getLegendPos(), getLegendFont()
 */
-void Plot2d_SetupViewDlg::setLegend( bool enable, int pos, const QFont& fnt, const QColor& col )
+void Plot2d_SetupViewDlg::setLegend( bool enable, int pos, int symbolType,
+                                     const QFont& fnt, const QColor& fontColor, const QColor& selFontColor )
 {
   myLegendCheck->setChecked( enable );
   myLegendCombo->setCurrentIndex( pos );
+  myLegendSymbolType->setCurrentIndex( symbolType );
   myLegendFont->setCurrentFont( fnt );
-  myLegendColor->setColor( col );
+  myLegendFontColor->setColor( fontColor );
+  mySelectedLegendFontColor->setColor( selFontColor );
   onLegendChecked();
 }
 
@@ -728,6 +771,16 @@ int Plot2d_SetupViewDlg::getLegendPos()
 }
 
 /*!
+  \brief Get legend symbol type.
+  \return legend symbol type: 0 (marker on line), 1 (marker above line)
+  \sa setLegend()
+*/
+int Plot2d_SetupViewDlg::getLegendSymbolType()
+{
+  return myLegendSymbolType->currentIndex();
+}
+
+/*!
   \brief Get legend font.
   \return legend font
   \sa setLegend()
@@ -744,7 +797,17 @@ QFont Plot2d_SetupViewDlg::getLegendFont()
 */
 QColor Plot2d_SetupViewDlg::getLegendColor()
 {
-  return myLegendColor->color();
+  return myLegendFontColor->color();
+}
+
+/*!
+  \brief Get selected legend font color.
+  \return selected legend font color
+  \sa setLegend()
+*/
+QColor Plot2d_SetupViewDlg::getSelectedLegendColor()
+{
+  return mySelectedLegendFontColor->color();
 }
 
 /*!
@@ -838,6 +901,26 @@ void Plot2d_SetupViewDlg::setBackgroundColor( const QColor& color )
 QColor Plot2d_SetupViewDlg::getBackgroundColor()
 {
   return myBackgroundBtn->color();
+}
+
+/*!
+  \brief Set selection color.
+  \param color selection color
+  \sa getSelectionColor()
+*/
+void Plot2d_SetupViewDlg::setSelectionColor( const QColor& color )
+{
+  mySelectionBtn->setColor( color );
+}
+
+/*!
+  \brief Get selection color.
+  \return selection color
+  \sa setSelectionColor()
+*/
+QColor Plot2d_SetupViewDlg::getSelectionColor()
+{
+  return mySelectionBtn->color();
 }
 
 /*!

@@ -105,8 +105,6 @@ public:
   void                 setSelected(const bool);
   bool                 isSelected() const;
   
-  static void initColors();
-  
   static void   setSelectionColor(const QColor& c);
   static QColor selectionColor();
 

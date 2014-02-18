@@ -135,19 +135,19 @@ void Plot2d_Curve::updatePlotItem( QwtPlotItem* theItem )
   aCurve->setSelected(isSelected());
 
   aCurve->setPen( QPen(aColor , lineW, ps ) );
-  aCurve->setSymbol( QwtSymbol( ms, QBrush( aColor ), 
-				QPen( aColor ), 
-				QSize( markerS , markerS ) ) );
+  aCurve->setSymbol( new QwtSymbol( ms, QBrush( aColor ), 
+                                    QPen( aColor ),
+                                    QSize( markerS , markerS ) ) );
 
   aCurve->setLegendPen(QPen(getColor(), getLineWidth(), ps ));
-  aCurve->setLegendSymbol( QwtSymbol( ms, QBrush( getColor() ), 
-				      QPen( getColor() ), 
-				      QSize( getMarkerSize() , getMarkerSize() )));
+  aCurve->setLegendSymbol( new QwtSymbol( ms, QBrush( getColor() ),
+                                          QPen( getColor() ),
+                                          QSize( getMarkerSize() , getMarkerSize() )));
   
   double *x, *y, *min, *max;
   long nb = getData( &x, &y );
   if(nb > 0 && x && y) {
-    aCurve->setData( x, y, nb );
+    aCurve->setSamples( x, y, nb );
     delete [] x;
     delete [] y;
     QList<int> idx;
@@ -160,7 +160,7 @@ void Plot2d_Curve::updatePlotItem( QwtPlotItem* theItem )
       aCurve->clearDeviationData();
     }
   } else {
-    aCurve->setData( NULL, NULL, 0 );
+    aCurve->setSamples( NULL, NULL, 0 );
   }
 }
 

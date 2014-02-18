@@ -336,6 +336,10 @@
         <translation>Background color:</translation>
     </message>
     <message>
+        <source>PLOT2D_SELECTION_COLOR_LBL</source>
+        <translation>Selection color:</translation>
+    </message>
+    <message>
         <source>PLOT2D_DEVIATION_MARKER_TLT</source>
         <translation>Deviation marker</translation>
     </message>
@@ -565,6 +569,34 @@ Logarithmic scale for ordinate axis is not allowed.</translation>
         <source>PLOT2D_ENABLE_MAIN_TITLE</source>
         <translation>Main title</translation>
     </message>
+    <message>
+        <source>PLOT2D_LEGEND_GROUP</source>
+        <translation>Legend</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_POSITION</source>
+        <translation>Legend position:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_SYMBOL_TYPE</source>
+        <translation>Symbol type:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_MARKER_ABOVE_LINE</source>
+        <translation>Marker above line</translation>
+    </message>
+    <message>
+        <source>PLOT2D_MARKER_ON_LINE</source>
+        <translation>Marker on line</translation>
+    </message>
+    <message>
+        <source>PLOT2D_LEGEND_FONT_COLOR</source>
+        <translation>Legend font color:</translation>
+    </message>
+    <message>
+        <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
+        <translation>Highlighted legend font color:</translation>
+    </message> 
     <message>
         <source>TOT_PLOT2D_CURVES_LINES</source>
         <translation>Draw lines</translation>

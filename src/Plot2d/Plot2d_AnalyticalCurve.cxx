@@ -165,18 +165,18 @@ void Plot2d_AnalyticalCurve::updatePlotItem()
   aCurve->setSelected(isSelected());
 
   aCurve->setPen( QPen(aColor , lineW, ps ) );
-  aCurve->setSymbol( QwtSymbol( ms, QBrush( aColor ), 
-				QPen( aColor ), 
-				QSize( markerS , markerS ) ) );
+  aCurve->setSymbol( new QwtSymbol( ms, QBrush( aColor ),
+                                    QPen( aColor ),
+                                    QSize( markerS , markerS ) ) );
 
   aCurve->setLegendPen(QPen(getColor(), getLineWidth(), ps ));
-  aCurve->setLegendSymbol( QwtSymbol( ms, QBrush( getColor() ), 
-				      QPen( getColor() ), 
-				      QSize( getMarkerSize() , getMarkerSize() )));
+  aCurve->setLegendSymbol( new QwtSymbol( ms, QBrush( getColor() ),
+                                          QPen( getColor() ),
+                                          QSize( getMarkerSize() , getMarkerSize() )));
 
   double *x, *y;
   long nb = getData( &x, &y );
-  aCurve->setData( x, y, nb );
+  aCurve->setSamples( x, y, nb );
   aCurve->setTitle(getName());
 }
 
@@ -213,10 +213,10 @@ void Plot2d_AnalyticalCurve::calculate() {
 */
 bool Plot2d_AnalyticalCurve::checkCurve( const QwtPlot* thePlot) {
   if( !myExpression.isEmpty() && thePlot ) {
-	const QwtScaleDiv* div = thePlot->axisScaleDiv(QwtPlot::xBottom);
-	setRangeBegin(div->lowerBound());
-	setRangeEnd(div->upperBound());
-	calculate();
+    const QwtScaleDiv div = thePlot->axisScaleDiv(QwtPlot::xBottom);
+    setRangeBegin(div.lowerBound());
+    setRangeEnd(div.upperBound());
+    calculate();
   }
   return myState == Plot2d_AnalyticalCurve::StateOk;
 }

@@ -176,6 +176,7 @@
     <parameter name="CurveType"    value="1" />
     <parameter name="HorScaleMode" value="0" />
     <parameter name="LegendPos"    value="1" />
+    <parameter name="LegendSymbolType" value="0" />
     <parameter name="LegendFont"   value="Helvetic,12" />
     <parameter name="LegendFontColor"  value="0, 0, 0" />
     <parameter name="SelectedLegendFontColor"  value="255, 255, 255" />

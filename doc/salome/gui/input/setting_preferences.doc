@@ -186,39 +186,43 @@ titles displayed in the viewer:
 
 \image html pref_salome_plot2dviewer.png
 
-- <b>Show legend</b> - this options specifies if it's necessary to
-show legend by default.
-- <b>Legend Position</b> - this submenu allows to set the default position
-of the legend, it can be located to the left, to the right, on top or
-on bottom of the graph.
-- <b>Legend font</b> - this allows to set type and face for the font of Legend item.
-- <b>Curve Type</b> - this allows to set the representation of graphs in
-your presentations. You can see only <b>Points</b>, points connected with
-<b>Lines</b> or points connected with smooth <b>Splines</b>.
-- <b>Marker Size</b> - this submenu allows you to set the size of
-markers in your graphs.
-- <b>Horizontal</b> and <b>Vertical axis scale</b> - this submenus allow you to set
-the scale for vertical and horizontal axes. It can be either <b>Linear</b> or
-<b>Logarithmic</b>. Note that the <b>Logarithmic</b> scale can be used only
-if the minimum value of corresponding component (abscissa or ordinate)
-of all points displayed in the viewer is greater than zero.
-If this condition is not met, the scale is switched to <b>Linear</b>
-automatically, even if it is set to <b>Logarithmic</b>.
 - <b>Background color</b> - this submenu allows to select the background
 color. Click on the colored line to access to the
 \ref select_color_and_font_page "Select Color" dialog box.
-- <b>Legend font color</b> - this allows to select the color of the
-font of the legend item. 
-- <b>Highlighted legend font color</b> - this submenu allows to select
-the color of the font of the selected legend item. 
 - <b>Selection color</b> - this submenu allows to select the color of
 selected object in the viewer. 
-- <b>Deviation marker color</b> - this submenu allows to select the
-color of the deviation marker. 
-- <b>Deviation marker line width</b> allows to define line width of
-the deviation marker. 
-- <b>Deviation marker tick size</b> allows to define size of the upper
-and lower horizontal lines of the deviation marker. 
+- <b>Viewer</b> - allows specifying the properties of the Plot 2D Viewer.
+  - <b>Curve Type</b> - this allows to set the representation of graphs in
+  your presentations. You can see only <b>Points</b>, points connected with
+  <b>Lines</b> or points connected with smooth <b>Splines</b>.
+  - <b>Marker Size</b> - this submenu allows you to set the size of
+  markers in your graphs.
+  - <b>Horizontal</b> and <b>Vertical axis scale</b> - this submenus allow you to set
+  the scale for vertical and horizontal axes. It can be either <b>Linear</b> or
+  <b>Logarithmic</b>. Note that the <b>Logarithmic</b> scale can be used only
+  if the minimum value of corresponding component (abscissa or ordinate)
+  of all points displayed in the viewer is greater than zero.
+  If this condition is not met, the scale is switched to <b>Linear</b>
+  automatically, even if it is set to <b>Logarithmic</b>.
+  - <b>Deviation marker color</b> - this submenu allows to select the
+  color of the deviation marker. 
+  - <b>Deviation marker line width</b> allows to define line width of
+  the deviation marker. 
+  - <b>Deviation marker tick size</b> allows to define size of the upper
+  and lower horizontal lines of the deviation marker. 
+- <b>Legend</b> - allows specifying the properties of the legend.
+  - <b>Show legend</b> - this options specifies if it's necessary to
+  show legend by default.
+  - <b>Legend Position</b> - this submenu allows to set the default position
+  of the legend, it can be located to the left, to the right, on top or
+  on bottom of the graph.
+  - <b>Symbol type</b> you can select the type of legend item symbol from "Marker on line" 
+  or "Marker above line"
+  - <b>Legend font</b> - this allows to set type and face for the font of Legend item.
+  - <b>Legend font color</b> - this allows to select the color of the
+  font of the legend item. 
+  - <b>Highlighted legend font color</b> - this submenu allows to select
+  the color of the font of the selected legend item. 
 
 <br><h2>Directories Preferences</h2>
 

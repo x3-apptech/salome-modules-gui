@@ -2423,22 +2423,18 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int plot2dGroup = pref->addPreference( tr( "PREF_GROUP_PLOT2DVIEWER" ), salomeCat ); //viewTab
   //pref->setItemProperty( "columns", 2, plot2dGroup );
 
-  // ... -> show legend
-  pref->addPreference( tr( "PREF_SHOW_LEGEND" ), plot2dGroup,
-                       LightApp_Preferences::Bool, "Plot2d", "ShowLegend" );
-  // ... -> legend position
-  int legendPosition = pref->addPreference( tr( "PREF_LEGEND_POSITION" ), plot2dGroup,
-                                            LightApp_Preferences::Selector, "Plot2d", "LegendPos" );
-  aValuesList.clear();
-  anIndicesList.clear();
-  aValuesList   << tr("PREF_LEFT") << tr("PREF_RIGHT") << tr("PREF_TOP") << tr("PREF_BOTTOM");
-  anIndicesList << 0               << 1                << 2              << 3                ;
-  pref->setItemProperty( "strings", aValuesList,   legendPosition );
-  pref->setItemProperty( "indexes", anIndicesList, legendPosition );
-  // ... -> legend font
-  pref->addPreference( tr( "PREF_LEGEND_FONT" ), plot2dGroup, LightApp_Preferences::Font, "Plot2d", "LegendFont" );
-  // ... -> curve type
-  int curveType = pref->addPreference( tr( "PREF_CURVE_TYPE" ), plot2dGroup,
+  // ... -> background
+  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND_COLOR" ), plot2dGroup,
+                       LightApp_Preferences::Color, "Plot2d", "Background" );
+  // ... -> selection color
+  pref->addPreference( tr( "PREF_VIEWER_SELECTION" ), plot2dGroup,
+                       LightApp_Preferences::Color, "Plot2d", "SelectionColor" );
+
+  // ... "Viewer" group <<start>>
+  int plot2dViewerGroup = pref->addPreference( tr( "PREF_GROUP_VIEWER" ), plot2dGroup );
+
+  // .... -> curve type
+  int curveType = pref->addPreference( tr( "PREF_CURVE_TYPE" ), plot2dViewerGroup,
                                        LightApp_Preferences::Selector, "Plot2d", "CurveType" );
   aValuesList.clear();
   anIndicesList.clear();
@@ -2446,13 +2442,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                 << 1                << 2                ;
   pref->setItemProperty( "strings", aValuesList,   curveType );
   pref->setItemProperty( "indexes", anIndicesList, curveType );
-  // ... -> marker size
-  int markerSize = pref->addPreference( tr( "PREF_MARKER_SIZE" ), plot2dGroup,
+  // .... -> marker size
+  int markerSize = pref->addPreference( tr( "PREF_MARKER_SIZE" ), plot2dViewerGroup,
                                         LightApp_Preferences::IntSpin, "Plot2d", "MarkerSize" );
   pref->setItemProperty( "min", 0, markerSize );
   pref->setItemProperty( "max", 100, markerSize );
-  // ... -> horizontal scaling mode
-  int horScale = pref->addPreference( tr( "PREF_HOR_AXIS_SCALE" ), plot2dGroup,
+  // .... -> horizontal scaling mode
+  int horScale = pref->addPreference( tr( "PREF_HOR_AXIS_SCALE" ), plot2dViewerGroup,
                                       LightApp_Preferences::Selector, "Plot2d", "HorScaleMode" );
   aValuesList.clear();
   anIndicesList.clear();
@@ -2460,34 +2456,59 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                 << 1                     ;
   pref->setItemProperty( "strings", aValuesList,   horScale );
   pref->setItemProperty( "indexes", anIndicesList, horScale );
-  // ... -> vertical scaling mode
-  int verScale = pref->addPreference( tr( "PREF_VERT_AXIS_SCALE" ), plot2dGroup,
+  // .... -> vertical scaling mode
+  int verScale = pref->addPreference( tr( "PREF_VERT_AXIS_SCALE" ), plot2dViewerGroup,
                                       LightApp_Preferences::Selector, "Plot2d", "VerScaleMode" );
   pref->setItemProperty( "strings", aValuesList,   verScale );
   pref->setItemProperty( "indexes", anIndicesList, verScale );
-  // ... -> background
-  pref->addPreference( tr( "PREF_VIEWER_BACKGROUND_COLOR" ), plot2dGroup,
-                       LightApp_Preferences::Color, "Plot2d", "Background" );
-  // ... -> font color
-  pref->addPreference( tr( "PREF_FONT_COLOR" ), plot2dGroup, LightApp_Preferences::Color, "Plot2d", "LegendFontColor" );
-  // ... -> selection font color
-  pref->addPreference( tr( "PREF_SELECTED_FONT_COLOR" ), plot2dGroup, LightApp_Preferences::Color, "Plot2d", "SelectedLegendFontColor" );
-  // ... -> selection color
-  pref->addPreference( tr( "PREF_VIEWER_SELECTION" ), plot2dGroup,
-                       LightApp_Preferences::Color, "Plot2d", "SelectionColor" );
-  // ... -> errors/deviation colot
-  pref->addPreference( tr( "PREF_DEVIATION_COLOR" ), plot2dGroup,
+
+  // .... -> errors/deviation colot
+  pref->addPreference( tr( "PREF_DEVIATION_COLOR" ), plot2dViewerGroup,
                        LightApp_Preferences::Color, "Plot2d", "DeviationMarkerColor" );
-  // ... -> deviation markers line size
-  int deviationMarkerLw = pref->addPreference( tr( "PREF_DEVIATION_MARKER_LW" ), plot2dGroup,
+  // .... -> deviation markers line size
+  int deviationMarkerLw = pref->addPreference( tr( "PREF_DEVIATION_MARKER_LW" ), plot2dViewerGroup,
                                         LightApp_Preferences::IntSpin, "Plot2d", "DeviationMarkerLineWidth" );
   pref->setItemProperty( "min", 1, deviationMarkerLw );
   pref->setItemProperty( "max", 5, deviationMarkerLw );
-  // ... -> deviation markers tick mark size
-  int deviationMarkerTs = pref->addPreference( tr( "PREF_DEVIATION_MARKER_TS" ), plot2dGroup,
+  // .... -> deviation markers tick mark size
+  int deviationMarkerTs = pref->addPreference( tr( "PREF_DEVIATION_MARKER_TS" ), plot2dViewerGroup,
                                         LightApp_Preferences::IntSpin, "Plot2d", "DeviationMarkerTickSize" );
   pref->setItemProperty( "min", 1, deviationMarkerTs );
   pref->setItemProperty( "max", 5, deviationMarkerTs );
+  // .... "Viewer" group <<end>>
+
+  // ... "Legend" group <<start>>
+  int plot2dLegendGroup = pref->addPreference( tr( "PREF_GROUP_LEGEND" ), plot2dGroup );
+
+  // .... -> show legend
+  pref->addPreference( tr( "PREF_SHOW_LEGEND" ), plot2dLegendGroup,
+                       LightApp_Preferences::Bool, "Plot2d", "ShowLegend" );
+  // .... -> legend position
+  int legendPosition = pref->addPreference( tr( "PREF_LEGEND_POSITION" ), plot2dLegendGroup,
+                                            LightApp_Preferences::Selector, "Plot2d", "LegendPos" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_LEFT") << tr("PREF_RIGHT") << tr("PREF_TOP") << tr("PREF_BOTTOM");
+  anIndicesList << 0               << 1                << 2              << 3                ;
+  pref->setItemProperty( "strings", aValuesList,   legendPosition );
+  pref->setItemProperty( "indexes", anIndicesList, legendPosition );
+  // .... -> Symbol type
+  int legendSymbolType = pref->addPreference( tr( "PREF_LEGEND_SYMBOL_TYPE" ), plot2dLegendGroup,
+                                            LightApp_Preferences::Selector, "Plot2d", "LegendSymbolType" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_MARKER_ON_LINE") << tr("PREF_MARKER_ABOVE_LINE");
+  anIndicesList << 0                            << 1                        ;
+  pref->setItemProperty( "strings", aValuesList,   legendSymbolType );
+  pref->setItemProperty( "indexes", anIndicesList, legendSymbolType );
+  // .... -> legend font
+  pref->addPreference( tr( "PREF_LEGEND_FONT" ), plot2dLegendGroup, LightApp_Preferences::Font, "Plot2d", "LegendFont" );
+  // ... -> font color
+  pref->addPreference( tr( "PREF_FONT_COLOR" ), plot2dLegendGroup, LightApp_Preferences::Color, "Plot2d", "LegendFontColor" );
+  // ... -> selection font color
+  pref->addPreference( tr( "PREF_SELECTED_FONT_COLOR" ), plot2dLegendGroup, LightApp_Preferences::Color, "Plot2d", "SelectedLegendFontColor" );
+  // ... "Legend" group <<end>>
+
   // .. "Plot2d viewer" group <<end>>
 
   // .. "Directories" preferences tab <<start>>
@@ -2953,14 +2974,22 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
   }
 
 #ifndef DISABLE_PLOT2DVIEWER
-  if ( sec == "Plot2d" ) {
-    if( param == "SelectionColor" ) {
-      QColor c = resMgr->colorValue( sec, param );
-      Plot2d_Object::setSelectionColor(c);
-    }
-    else if (param == "SelectedLegendFontColor") {
-      QColor c = resMgr->colorValue( sec, param );      
-      Plot2d_Object::setHighlightedLegendTextColor(c);
+  QList<SUIT_ViewManager*> lst;
+  viewManagers( Plot2d_Viewer::Type(), lst );
+  QListIterator<SUIT_ViewManager*> itPlot2d( lst );
+  while ( itPlot2d.hasNext() ) {
+    SUIT_ViewManager* viewMgr = itPlot2d.next();
+    SUIT_ViewModel* vm = viewMgr->getViewModel();
+    if ( !vm || !vm->inherits( "Plot2d_Viewer" ) )
+      continue;
+
+    Plot2d_Viewer* Plot2dVM = dynamic_cast<Plot2d_Viewer*>( vm );
+
+    viewMgr->setViewModel( vm  );
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( viewMgr->getActiveView() );
+    if( wnd ) {
+      Plot2d_ViewFrame* frame = wnd->getViewFrame();
+      frame->SetPreference();
     }
   }
 #endif
