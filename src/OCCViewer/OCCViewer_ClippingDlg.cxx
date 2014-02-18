@@ -305,7 +305,14 @@ void absolutePlaneToRelative( OCCViewer_ClipPlane& thePlane, Handle(AIS_Interact
   {
     case 0:
     {
-      if ( aDY.IsEqual( aPlaneN, Precision::Angular() ) )
+      if ( aDY.IsParallel( aPlaneN, Precision::Angular() ) )
+      {
+        anAng1 = 0.0;
+        anAng2 = 0.0;
+        break;
+      }
+
+      if ( aDX.IsParallel( aPlaneN, Precision::Angular() ) )
       {
         anAng1 = 0.0;
         anAng2 = 0.0;
@@ -331,7 +338,14 @@ void absolutePlaneToRelative( OCCViewer_ClipPlane& thePlane, Handle(AIS_Interact
     }
     case 1:
     {
-      if ( aDZ.IsEqual( aPlaneN, Precision::Angular() ) )
+      if ( aDZ.IsParallel( aPlaneN, Precision::Angular() ) )
+      {
+        anAng1 = 0.0;
+        anAng2 = 0.0;
+        break;
+      }
+
+      if ( aDY.IsParallel( aPlaneN, Precision::Angular() ) )
       {
         anAng1 = 0.0;
         anAng2 = 0.0;
@@ -357,7 +371,14 @@ void absolutePlaneToRelative( OCCViewer_ClipPlane& thePlane, Handle(AIS_Interact
     }
     case 2:
     {
-      if ( aDX.IsEqual( aPlaneN, Precision::Angular() ) )
+      if ( aDX.IsParallel( aPlaneN, Precision::Angular() ) )
+      {
+        anAng1 = 0.0;
+        anAng2 = 0.0;
+        break;
+      }
+
+      if ( aDZ.IsParallel( aPlaneN, Precision::Angular() ) )
       {
         anAng1 = 0.0;
         anAng2 = 0.0;
@@ -1286,7 +1307,7 @@ void OCCViewer_ClippingDlg::onSelectPlane ( int theIndex )
 */
 void OCCViewer_ClippingDlg::SetCurrentPlaneParam()
 {
-  if ( clipPlanesCount() == 0 || myIsSelectPlane )
+  if ( clipPlanesCount() == 0 || myIsSelectPlane || myBusy)
     return;
 
   int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
@@ -1295,6 +1316,11 @@ void OCCViewer_ClippingDlg::SetCurrentPlaneParam()
 
   if ( aPlane.PlaneMode == Absolute )
   {
+    if( qFuzzyIsNull( SpinBox_Dx->value() ) && 
+        qFuzzyIsNull( SpinBox_Dy->value() ) && 
+        qFuzzyIsNull( SpinBox_Dz->value() ) ) {
+      return;
+    }
     aPlane.Orientation = CBAbsoluteOrientation->currentIndex();
     aPlane.X  = SpinBox_X->value();
     aPlane.Y  = SpinBox_Y->value();
