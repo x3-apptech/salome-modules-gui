@@ -867,8 +867,13 @@ void LightApp_Application::onNewWindow()
 void LightApp_Application::onNewDoc()
 {
   //asl: fix for 0020515
-  if ( activeStudy() )
+  if ( activeStudy() ) {
     saveDockWindowsState();
+#ifdef SINGLE_DESKTOP
+    if ( !closeDoc() )
+      return;
+#endif
+  }
 
   CAM_Application::onNewDoc();
 }
@@ -880,6 +885,12 @@ void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
   saveDockWindowsState();
+  if (study) {
+#ifdef SINGLE_DESKTOP
+    if ( !closeDoc() )
+      return;
+#endif
+  }
 
   CAM_Application::onOpenDoc();
 
@@ -896,6 +907,12 @@ void LightApp_Application::onOpenDoc()
 */
 bool LightApp_Application::onOpenDoc( const QString& aName )
 {
+  if ( activeStudy() ) {
+#ifdef SINGLE_DESKTOP
+    if ( !closeDoc() )
+      return false;
+#endif
+  }
   // We should take mru action first because this application instance can be deleted later.
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
 

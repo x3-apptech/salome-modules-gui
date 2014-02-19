@@ -391,10 +391,16 @@ void STD_Application::afterCloseDoc()
 /*!Close document, if it's possible.*/
 void STD_Application::onCloseDoc( bool ask )
 {
+  closeDoc( ask );
+}
+
+/*!Close document, if it's possible.*/
+bool STD_Application::closeDoc( bool ask )
+{
   bool closePermanently = true;
 
   if ( ask && !isPossibleToClose( closePermanently ) )
-    return;
+    return false;
 
   SUIT_Study* study = activeStudy();
 
@@ -430,6 +436,7 @@ void STD_Application::onCloseDoc( bool ask )
 
   if ( !desktop() )
     closeApplication();
+  return true;
 }
 
 /*!Check the application on closing.
