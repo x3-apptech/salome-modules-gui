@@ -384,7 +384,7 @@ SalomeApp_IntSpinBox::SearchState SalomeApp_IntSpinBox::findVariable( const QStr
             {
               PyConsole_Console* pyConsole = app->pythonConsole();
               PyConsole_Interp* pyInterp = pyConsole->getInterp();
-              PyLockWrapper aLock = pyInterp->GetLockWrapper();
+              PyLockWrapper aLock; // Acquire GIL
               std::string command;
               command  = "import salome_notebook ; ";
               command += "salome_notebook.notebook.setAsInteger(\"";

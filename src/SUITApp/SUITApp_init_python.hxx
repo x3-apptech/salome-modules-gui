@@ -48,12 +48,8 @@
 
 struct SUITAPP_EXPORT SUIT_PYTHON
 {
-  static PyThreadState *_gtstate;
-  static PyInterpreterState *_interp;
-  static PyObject *salome_shared_modules_module;
   static bool initialized;
   static void init_python(int argc, char **argv);
-
 };
 
 #endif // _SUITAPP_INIT_PYTHON_

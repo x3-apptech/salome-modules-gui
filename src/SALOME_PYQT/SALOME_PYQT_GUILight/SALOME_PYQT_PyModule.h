@@ -103,7 +103,7 @@ public slots:
   bool                       isDraggable( const SUIT_DataObject* ) const;
   bool                       isDropAccepted( const SUIT_DataObject* ) const;
   void                       dropObjects( const DataObjectList&, SUIT_DataObject*,
-					  const int, Qt::DropAction );
+                                          const int, Qt::DropAction );
   QString                    engineIOR() const;
 
 private:
@@ -131,7 +131,7 @@ private:
   bool                       internalIsDraggable( LightApp_DataObject* );
   bool                       internalIsDropAccepted( LightApp_DataObject* );
   void                       internalDropObjects( const DataObjectList&, SUIT_DataObject*,
-						  const int, Qt::DropAction );
+                                                  const int, Qt::DropAction );
   QString                    internalEngineIOR() const;
 
   void                       connectView( SUIT_ViewWindow* );

@@ -33,7 +33,6 @@ public:
   
 protected:
   virtual void initPython();
-  virtual bool initContext();
 };
 
 #endif //_LIGHTAPP_PYINTERP_H_

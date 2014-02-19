@@ -115,13 +115,12 @@ extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
   // We disable FPE signal as it was in earlier versions of SALOME. It is enabled
   // only in debug mode if the environment variable DISABLE_FPE is not set to 1.
   bool raiseFPE;
-#if defined(_DEBUG_) | defined(_DEBUG) //the Last for WIN32 default settings
-  raiseFPE = true;
-  char* envDisableFPE = getenv("DISABLE_FPE");
-  if (envDisableFPE && atoi(envDisableFPE))
-    raiseFPE = false;
-#else
   raiseFPE = false;
+
+#if defined(_DEBUG_) | defined(_DEBUG) //the Last for WIN32 default settings
+  char* envEnableFPE = getenv("ENABLE_FPE");
+  if (envEnableFPE && atoi(envEnableFPE))
+    raiseFPE = true;
 #endif
 
   return new SalomeApp_ExceptionHandler( raiseFPE );

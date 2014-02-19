@@ -22,10 +22,6 @@
 //
 #include "SUITApp_init_python.hxx"
 
-
-PyThreadState* SUIT_PYTHON::_gtstate                = NULL;
-PyObject *SUIT_PYTHON::salome_shared_modules_module = NULL;
-PyInterpreterState* SUIT_PYTHON::_interp            = NULL;
 bool SUIT_PYTHON::initialized                       = false;
 
 void SUIT_PYTHON::init_python(int argc, char **argv)
@@ -37,9 +33,6 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   Py_SetProgramName(argv[0]);
   Py_Initialize(); // Initialize the interpreter
   PySys_SetArgv(argc, argv);
-  SUIT_PYTHON::_interp = PyThreadState_Get()->interp;
-  PyEval_InitThreads(); // Create (and acquire) the interpreter lock
-  SUIT_PYTHON::_gtstate = PyEval_SaveThread(); // Release global thread state
-  SUIT_PYTHON::initialized = true;
+  PyEval_InitThreads(); // Create (and acquire) the interpreter lock - can be called many times
 }
 
