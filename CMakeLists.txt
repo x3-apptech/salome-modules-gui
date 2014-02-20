@@ -70,7 +70,7 @@ OPTION(SALOME_USE_GRAPHICSVIEW "Enable GraphicsView visualization (Mandatory in 
 OPTION(SALOME_USE_PLOT2DVIEWER "Enable Plot2D visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PYCONSOLE "Enable Python GUI interface (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
-OPTION(SALOME_USE_SINGLE_DESKTOP "Enable multiple document interface" OFF)
+OPTION(SALOME_USE_SINGLE_DESKTOP "Enable multiple document interface" ON)
 
 MARK_AS_ADVANCED(SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER SALOME_USE_GRAPHICSVIEW)
 MARK_AS_ADVANCED(SALOME_USE_SALOMEOBJECT SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_PLOT2DVIEWER)
