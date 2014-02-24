@@ -23,6 +23,8 @@
 #include "OCCViewer_ClippingDlg.h"
 
 #include <QtxDoubleSpinBox.h>
+#include <QtxDoubleSpinSlider.h>
+#include <QtxIntSpinSlider.h>
 #include <QtxAction.h>
 
 #include "SUIT_Session.h"
@@ -624,72 +626,38 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   CBRelativeOrientation->addItem( tr("ALONG_ZX") );
   GroupParametersLayout->addWidget( CBRelativeOrientation, 0, 1 );
 
-  TLValueDistance = new QLabel( GroupParameters );
-  TLValueDistance->setObjectName( "TLValueDistance" );
-  TLValueDistance->setAlignment( Qt::AlignCenter );
-  TLValueDistance->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  QFont fnt = TLValueDistance->font(); fnt.setBold( true ); TLValueDistance->setFont( fnt );
-  GroupParametersLayout->addWidget( TLValueDistance, 1, 1 );
-
   TextLabelDistance = new QLabel( tr("DISTANCE"), GroupParameters );
   TextLabelDistance->setObjectName( "TextLabelDistance" );
-  GroupParametersLayout->addWidget( TextLabelDistance, 2, 0 );
+  GroupParametersLayout->addWidget( TextLabelDistance, 1, 0 );
+  
+  SpinSliderDistance = new QtxDoubleSpinSlider( 0., 1., 0.01, GroupParameters );
+  SpinSliderDistance->setObjectName( "SpinSliderDistance" );
+  SpinSliderDistance->setPrecision( precision );
+  QFont fnt = SpinSliderDistance->font(); fnt.setBold( true ); SpinSliderDistance->setFont( fnt );
+  GroupParametersLayout->addWidget( SpinSliderDistance, 1, 1 );
 
-  SliderDistance = new QSlider( Qt::Horizontal, GroupParameters );
-  SliderDistance->setObjectName( "SliderDistance" );
-  SliderDistance->setFocusPolicy( Qt::NoFocus );
-  SliderDistance->setMinimumSize( 300, 0 );
-  SliderDistance->setMinimum( 0 );
-  SliderDistance->setMaximum( 100 );
-  SliderDistance->setSingleStep( 1 );
-  SliderDistance->setPageStep( 10 );
-  SliderDistance->setTracking( false );
-  GroupParametersLayout->addWidget( SliderDistance, 2, 1 );
-
-  TLValueRotation1 = new QLabel( GroupParameters );
-  TLValueRotation1->setObjectName( "TLValueRotation1" );
-  TLValueRotation1->setAlignment( Qt::AlignCenter );
-  TLValueRotation1->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  TLValueRotation1->setFont( fnt );
-  GroupParametersLayout->addWidget( TLValueRotation1, 3, 1 );
+  QString aUnitRot = "\xB0";
 
   TextLabelRotation1 = new QLabel( tr("ROTATION_AROUND_X_Y2Z"), GroupParameters );
   TextLabelRotation1->setObjectName( "TextLabelRotation1" );
-  GroupParametersLayout->addWidget( TextLabelRotation1, 4, 0 );
-
-  SliderRotation1 = new QSlider( Qt::Horizontal, GroupParameters );
-  SliderRotation1->setObjectName( "SliderRotation1" );
-  SliderRotation1->setFocusPolicy( Qt::NoFocus );
-  SliderRotation1->setMinimumSize( 300, 0 );
-  SliderRotation1->setMinimum( -180 );
-  SliderRotation1->setMaximum( 180 );
-  SliderRotation1->setSingleStep( 1 );
-  SliderRotation1->setPageStep( 10 );
-  SliderRotation1->setTracking(false);
-  GroupParametersLayout->addWidget( SliderRotation1, 4, 1 );
-
-  TLValueRotation2 = new QLabel( GroupParameters );
-  TLValueRotation2->setObjectName( "TLValueRotation2" );
-  TLValueRotation2->setAlignment( Qt::AlignCenter );
-  TLValueRotation2->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) );
-  TLValueRotation2->setFont( fnt );
-  GroupParametersLayout->addWidget( TLValueRotation2, 5, 1 );
+  GroupParametersLayout->addWidget( TextLabelRotation1, 2, 0 );
+  
+  SpinSliderRotation1 = new QtxIntSpinSlider( -180, 180, 1, GroupParameters );
+  SpinSliderRotation1->setObjectName( "SpinSliderRotation1" );
+  SpinSliderRotation1->setUnit( aUnitRot );
+  SpinSliderRotation1->setFont( fnt );
+  GroupParametersLayout->addWidget( SpinSliderRotation1, 2, 1 );
 
   TextLabelRotation2 = new QLabel(tr("ROTATION_AROUND_Y_X2Z"), GroupParameters);
   TextLabelRotation2->setObjectName( "TextLabelRotation2" );
   TextLabelRotation2->setObjectName( "TextLabelRotation2" );
-  GroupParametersLayout->addWidget( TextLabelRotation2, 6, 0 );
+  GroupParametersLayout->addWidget( TextLabelRotation2, 3, 0 );
 
-  SliderRotation2 = new QSlider( Qt::Horizontal, GroupParameters );
-  SliderRotation2->setObjectName( "SliderRotation2" );
-  SliderRotation2->setFocusPolicy( Qt::NoFocus );
-  SliderRotation2->setMinimumSize( 300, 0 );
-  SliderRotation2->setMinimum( -180 );
-  SliderRotation2->setMaximum( 180 );
-  SliderRotation2->setSingleStep( 1 );
-  SliderRotation2->setPageStep( 10 );
-  SliderRotation2->setTracking(false);
-  GroupParametersLayout->addWidget( SliderRotation2, 6, 1 );
+  SpinSliderRotation2 = new QtxIntSpinSlider( -180, 180, 1, GroupParameters );
+  SpinSliderRotation2->setObjectName( "SpinSliderRotation2" );
+  SpinSliderRotation2->setUnit( aUnitRot );
+  SpinSliderRotation2->setFont( fnt );
+  GroupParametersLayout->addWidget( SpinSliderRotation2, 3, 1 );
 
   /***************************************************************/
   QGroupBox* CheckBoxWidget = new QGroupBox( this );
@@ -768,12 +736,9 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   connect( CBAbsoluteOrientation, SIGNAL ( activated ( int ) ), this, SLOT( onOrientationAbsoluteChanged( int ) ) ) ;
 
   connect( CBRelativeOrientation, SIGNAL( activated( int ) ), this, SLOT( onOrientationRelativeChanged( int ) ) );
-  connect( SliderDistance,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderDistanceHasMoved( int ) ) );
-  connect( SliderDistance,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderDistanceHasMoved( int ) ) );
-  connect( SliderRotation1,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderRotation1HasMoved( int ) ) );
-  connect( SliderRotation1,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderRotation1HasMoved( int ) ) );
-  connect( SliderRotation2,   SIGNAL( sliderMoved( int ) ),  this, SLOT( SliderRotation2HasMoved( int ) ) );
-  connect( SliderRotation2,   SIGNAL( valueChanged( int ) ),  this, SLOT( SliderRotation2HasMoved( int ) ) );
+  connect( SpinSliderDistance, SIGNAL( valueChanged( double ) ),  this, SLOT( onValueChanged() ) );
+  connect( SpinSliderRotation1, SIGNAL( valueChanged( int ) ), this, SLOT( onValueChanged() ) );
+  connect( SpinSliderRotation2, SIGNAL( valueChanged( int ) ), this, SLOT( onValueChanged() ) );
 
   connect( PreviewCheckBox, SIGNAL ( toggled ( bool ) ), this, SLOT( onPreview( bool ) ) ) ;
   connect( AutoApplyCheckBox, SIGNAL ( toggled( bool ) ), this, SLOT( onAutoApply( bool ) ) );
@@ -858,13 +823,10 @@ void OCCViewer_ClippingDlg::initParam()
 
   CBAbsoluteOrientation->setCurrentIndex(0);
 
-  TLValueDistance->setText( "0.5" );
-  TLValueRotation1->setText( "0\xB0" );
-  TLValueRotation2->setText( "0\xB0" );
+  SpinSliderDistance->setValue( 0.5 );
+  SpinSliderRotation1->setValue( 0 );
+  SpinSliderRotation2->setValue( 0 );
   CBRelativeOrientation->setCurrentIndex( 0 );
-  SliderDistance->setValue( 50 );
-  SliderRotation1->setValue( 0 );
-  SliderRotation2->setValue( 0 );
 }
 
 /*!
@@ -905,9 +867,9 @@ void OCCViewer_ClippingDlg::synchronize()
   }
   else if( myCurrentClipPlaneMode == Relative ) {
     CBRelativeOrientation->setEnabled( anIsControlsEnable );
-    SliderDistance->setEnabled( anIsControlsEnable );
-    SliderRotation1->setEnabled( anIsControlsEnable );
-    SliderRotation2->setEnabled( anIsControlsEnable );
+    SpinSliderDistance->setEnabled( anIsControlsEnable );
+    SpinSliderRotation1->setEnabled( anIsControlsEnable );
+    SpinSliderRotation2->setEnabled( anIsControlsEnable );
     isActivePlane->setEnabled( anIsControlsEnable );
   }
   isActivePlane->setEnabled( anIsControlsEnable );
@@ -1121,18 +1083,13 @@ void OCCViewer_ClippingDlg::updateControls()
     int anOrientation = aPlane.RelativeMode.Orientation;
 
     // Set plane parameters in the dialog
-    QString aFmtDistance  = QString::number( aPlane.RelativeMode.Distance, '.', 2 );
-    QString aFmtRotation1 = QString::number( floor( aPlane.RelativeMode.Rotation1 ) );
-    QString aFmtRotation2 = QString::number( floor( aPlane.RelativeMode.Rotation2 ) );
-    aFmtRotation1 = QString( "%1\xB0" ).arg( aFmtRotation1 );
-    aFmtRotation2 = QString( "%1\xB0" ).arg( aFmtRotation2 );
+    double aFmtDistance  = double(aPlane.RelativeMode.Distance);
+    int aFmtRotation1 = int(aPlane.RelativeMode.Rotation1);
+    int aFmtRotation2 = int(aPlane.RelativeMode.Rotation2);
 
-    SliderDistance->setValue( aPlane.RelativeMode.Distance * 100 );
-    TLValueDistance->setText( aFmtDistance );
-    SliderRotation1->setValue( floor( aPlane.RelativeMode.Rotation1 ) );
-    TLValueRotation1->setText( aFmtRotation1 );
-    SliderRotation2->setValue( floor( aPlane.RelativeMode.Rotation2 ) );
-    TLValueRotation2->setText( aFmtRotation2 );
+    SpinSliderDistance->setValue( aFmtDistance );
+    SpinSliderRotation1->setValue( aFmtRotation1 );
+    SpinSliderRotation2->setValue( aFmtRotation2 );
     CBRelativeOrientation->setCurrentIndex( anOrientation );
     onOrientationRelativeChanged( anOrientation );
   }
@@ -1333,9 +1290,9 @@ void OCCViewer_ClippingDlg::SetCurrentPlaneParam()
   else if( aPlane.PlaneMode == Relative )
   {
     aPlane.RelativeMode.Orientation = CBRelativeOrientation->currentIndex();
-    aPlane.RelativeMode.Distance = TLValueDistance->text().toDouble();
-    aPlane.RelativeMode.Rotation1 = TLValueRotation1->text().remove("\xB0").toInt();
-    aPlane.RelativeMode.Rotation2 = TLValueRotation2->text().remove("\xB0").toInt();
+    aPlane.RelativeMode.Distance = SpinSliderDistance->value();
+    aPlane.RelativeMode.Rotation1 = SpinSliderRotation1->value();
+    aPlane.RelativeMode.Rotation2 = SpinSliderRotation2->value();
     relativePlaneToAbsolute( aPlane, myModel->getAISContext(),myModel->trihedronSize() );
   }
   aPlane.IsOn  = isActivePlane->isChecked();
@@ -1576,34 +1533,6 @@ void OCCViewer_ClippingDlg::onPlaneDragged( const Handle(AIS_Plane)& thePlane )
 
     break;
   }
-}
-
-/*!
-  SLOT: Called when value of slider distance change
-*/
-void OCCViewer_ClippingDlg::SliderDistanceHasMoved( int value )
-{
-  double new_value = value/100.;
-  TLValueDistance->setText( QString("%1").arg( new_value ) );
-  onValueChanged();
-}
-
-/*!
-  SLOT: Called when value of slider rotation1 change
-*/
-void OCCViewer_ClippingDlg::SliderRotation1HasMoved( int value )
-{
-  TLValueRotation1->setText( QString("%1\xB0").arg( value ) );
-  onValueChanged();
-}
-
-/*!
-  SLOT: Called when value of slider rotation2 change
-*/
-void OCCViewer_ClippingDlg::SliderRotation2HasMoved( int value )
-{
-  TLValueRotation2->setText( QString("%1\xB0").arg( value ) );
-  onValueChanged();
 }
 
 OCCViewer_ClipPlane& OCCViewer_ClippingDlg::getClipPlane( int theIdx )

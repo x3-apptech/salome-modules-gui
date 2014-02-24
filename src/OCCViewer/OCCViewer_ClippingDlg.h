@@ -37,6 +37,8 @@ class QPushButton;
 class QComboBox;
 class QCheckBox;
 class QtxDoubleSpinBox;
+class QtxDoubleSpinSlider;
+class QtxIntSpinSlider;
 class QStackedLayout;
 class QSlider;
 class QMenu;
@@ -109,12 +111,9 @@ private :
   QLabel* TextLabelDistance;
   QLabel* TextLabelRotation1;
   QLabel* TextLabelRotation2;
-  QLabel* TLValueDistance;
-  QLabel* TLValueRotation1;
-  QLabel* TLValueRotation2;
-  QSlider* SliderDistance;
-  QSlider* SliderRotation1;
-  QSlider* SliderRotation2;
+  QtxDoubleSpinSlider* SpinSliderDistance;
+  QtxIntSpinSlider* SpinSliderRotation1;
+  QtxIntSpinSlider* SpinSliderRotation2;
   QComboBox* CBRelativeOrientation;
 
   QCheckBox* PreviewCheckBox;
@@ -165,10 +164,6 @@ private slots:
 
   void onPreview( bool on );
   void onAutoApply(bool);
-
-  void SliderDistanceHasMoved(int);
-  void SliderRotation1HasMoved(int);
-  void SliderRotation2HasMoved(int);
 
   void onPlaneClicked( const Handle_AIS_Plane& thePlane );
   void onPlaneDragged( const Handle_AIS_Plane& thePlane );

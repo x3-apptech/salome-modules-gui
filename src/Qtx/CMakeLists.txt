@@ -49,10 +49,12 @@ SET(_moc_HEADERS
   QtxDockAction.h
   QtxDockWidget.h
   QtxDoubleSpinBox.h
+  QtxDoubleSpinSlider.h
   QtxFontEdit.h
   QtxGridBox.h
   QtxGroupBox.h
   QtxIntSpinBox.h
+  QtxIntSpinSlider.h
   QtxListAction.h
   QtxLogoMgr.h
   QtxMRUAction.h
@@ -67,6 +69,7 @@ SET(_moc_HEADERS
   QtxRubberBand.h
   QtxSearchTool.h
   QtxShortcutEdit.h
+  QtxSlider.h
   QtxSplash.h
   QtxToolBar.h
   QtxToolTip.h
@@ -130,11 +133,13 @@ SET(_other_SOURCES
   QtxDockAction.cxx
   QtxDockWidget.cxx
   QtxDoubleSpinBox.cxx
+  QtxDoubleSpinSlider.cxx
   QtxEvalExpr.cxx
   QtxFontEdit.cxx
   QtxGridBox.cxx
   QtxGroupBox.cxx
   QtxIntSpinBox.cxx
+  QtxIntSpinSlider.cxx
   QtxListAction.cxx
   QtxLogoMgr.cxx
   QtxMRUAction.cxx
@@ -151,6 +156,7 @@ SET(_other_SOURCES
   QtxRubberBand.cxx
   QtxSearchTool.cxx
   QtxShortcutEdit.cxx
+  QtxSlider.cxx
   QtxSplash.cxx
   QtxToolBar.cxx
   QtxToolTip.cxx
