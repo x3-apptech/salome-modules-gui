@@ -84,6 +84,7 @@ public:
   void                   selectedSubOwners( MapEntryOfMapOfInteger& theMap );
 #else
   void                   selectedObjects( QStringList&, const QString& = QString(), const bool = true ) const;
+  void                   setSelectedObjects( const QStringList&, const bool = false );
 #endif
 
   void                   clearSelectionCache();

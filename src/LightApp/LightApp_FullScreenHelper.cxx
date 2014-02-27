@@ -28,8 +28,6 @@
 #include <QMenuBar>
 #include <QStatusBar>
 
-#include <PyConsole_Console.h>
-
 #include <STD_Application.h>
 
 #include <SUIT_Session.h>

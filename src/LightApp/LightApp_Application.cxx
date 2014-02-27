@@ -42,6 +42,7 @@
 #include "LightApp_Application.h"
 #include "LightApp_Module.h"
 #include "LightApp_DataModel.h"
+#include "LightApp_DataOwner.h"
 #include "LightApp_Study.h"
 #include "LightApp_Preferences.h"
 #include "LightApp_PreferencesDlg.h"
@@ -2206,6 +2207,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // ... "Trihedron" group <<end>>
   // .. "3D viewer" group <<end>>
 
+  QString formats;
+  int bgId;
+#ifndef DISABLE_OCCVIEWER
   // .. "OCC viewer" group <<start>>
   int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), salomeCat );
 
@@ -2215,10 +2219,10 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   aValuesList.clear();
   anIndicesList.clear();
   txtList.clear();
-  QString formats = OCCViewer_Viewer::backgroundData( aValuesList, idList, txtList );
+  formats = OCCViewer_Viewer::backgroundData( aValuesList, idList, txtList );
   foreach( int gid, idList ) anIndicesList << gid;
   // .... -> 3D viewer background
-  int bgId = pref->addPreference( tr( "PREF_3DVIEWER_BACKGROUND" ), bgGroup,
+  bgId = pref->addPreference( tr( "PREF_3DVIEWER_BACKGROUND" ), bgGroup,
                                   LightApp_Preferences::Background, "OCCViewer", "background" );
   pref->setItemProperty( "gradient_names", aValuesList, bgId );
   pref->setItemProperty( "gradient_ids", anIndicesList, bgId );
@@ -2281,7 +2285,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "columns", 2, occGen );
   // ... -> empty frame (for layout) <<end>>
   // .. "OCC viewer" group <<end>>
+#endif
 
+#ifndef DISABLE_VTKVIEWER
   // .. "VTK viewer" group <<start>>
   int vtkGroup = pref->addPreference( tr( "PREF_GROUP_VTKVIEWER" ), salomeCat ); //viewTab
 
@@ -2301,7 +2307,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   aValuesList.clear();
   anIndicesList.clear();
   txtList.clear();
+#ifndef DISABLE_SALOMEOBJECT
   formats = SVTK_Viewer::backgroundData( aValuesList, idList, txtList );
+#endif
   foreach( int gid, idList ) anIndicesList << gid;
   bgId = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), vtkGen,
                               LightApp_Preferences::Background, "VTKViewer", "background" );
@@ -2312,7 +2320,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "texture_tile_enabled", (bool)txtList.contains( Qtx::TileTexture ), bgId );
   pref->setItemProperty( "texture_stretch_enabled", (bool)txtList.contains( Qtx::StretchTexture ), bgId );
   pref->setItemProperty( "custom_enabled", false, bgId );
+#ifndef DISABLE_SALOMEOBJECT
   pref->setItemProperty( "image_formats", formats, bgId );
+#endif
   // .... -> speed increment
   int vtkSpeed = pref->addPreference( tr( "PREF_INCREMENTAL_SPEED" ), vtkGen,
                                       LightApp_Preferences::IntSpin, "VTKViewer", "speed_value" );
@@ -2418,6 +2428,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "step", 0.1, transPref );
   // ... -> group names sub-group <<end>>
   // .. "VTK viewer" group <<end>>
+#endif
 
   // .. "Plot2d viewer" group <<start>>
   int plot2dGroup = pref->addPreference( tr( "PREF_GROUP_PLOT2DVIEWER" ), salomeCat ); //viewTab
@@ -3478,6 +3489,7 @@ void LightApp_Application::contextMenuPopup( const QString& type, QMenu* thePopu
       a->setShortcut( ob->shortcutKey(SUIT_DataBrowser::UpdateShortcut) );
   }
 
+#ifndef DISABLE_SALOMEOBJECT
   if ( selMgr && ob ) {
     SALOME_ListIO selected;
     selMgr->selectedObjects( selected );
@@ -3496,6 +3508,7 @@ void LightApp_Application::contextMenuPopup( const QString& type, QMenu* thePopu
       }
     }
   }
+#endif
 
   selMgr->setSelectionCacheEnabled( cacheIsOn );
 }

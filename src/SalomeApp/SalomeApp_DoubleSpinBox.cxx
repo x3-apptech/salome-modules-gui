@@ -20,8 +20,11 @@
 // File:      SalomeApp_DoubleSpinBox.cxx
 // Author:    Oleg UVAROV
 //
-#include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
-#include <PyConsole_Console.h>
+
+#ifndef DISABLE_PYCONSOLE
+  #include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
+  #include <PyConsole_Console.h>
+#endif
 
 #include "SalomeApp_DoubleSpinBox.h"
 #include "SalomeApp_Application.h"
@@ -434,6 +437,7 @@ SalomeApp_DoubleSpinBox::SearchState SalomeApp_DoubleSpinBox::findVariable( cons
         {
           if( studyDS->IsString( aName ) )
             {
+#ifndef DISABLE_PYCONSOLE
               PyConsole_Console* pyConsole = app->pythonConsole();
               PyConsole_Interp* pyInterp = pyConsole->getInterp();
               PyLockWrapper aLock = pyInterp->GetLockWrapper();
@@ -448,6 +452,7 @@ SalomeApp_DoubleSpinBox::SearchState SalomeApp_DoubleSpinBox::findVariable( cons
                 {
                   return IncorrectType;
                 }
+#endif
             }
           value = studyDS->GetReal( aName );
           return Found;

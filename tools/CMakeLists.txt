@@ -17,11 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(SUBDIRS
-  vtkEDFOverloads
-  dlgfactory
-)
-FOREACH(dir ${SUBDIRS})
-  ADD_SUBDIRECTORY(${dir})
-ENDFOREACH(dir ${SUBDIRS})
-            
+ADD_SUBDIRECTORY(dlgfactory)
+
+IF(SALOME_USE_VTKVIEWER)
+  ADD_SUBDIRECTORY(vtkEDFOverloads)            
+ENDIF()

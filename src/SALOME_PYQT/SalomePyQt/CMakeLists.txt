@@ -18,7 +18,9 @@
 #
 
 INCLUDE(UsePyQt4)
-INCLUDE(${VTK_USE_FILE})
+IF(SALOME_USE_VTKVIEWER)
+  INCLUDE(${VTK_USE_FILE})
+ENDIF()
 
 # --- options ---
 

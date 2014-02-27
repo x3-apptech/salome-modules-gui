@@ -92,6 +92,7 @@
 #include <QVariant>
 #include <QString>
 #include <QStringList>
+#include <QAction>
 
 #include <iostream>
 

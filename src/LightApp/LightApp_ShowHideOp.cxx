@@ -143,7 +143,7 @@ void LightApp_ShowHideOp::startOperation()
         entries.append( entry );
     }
 
-  // be sure to use real obejct entries
+  // be sure to use real object entries
   QStringList objEntries;
   QStringList::const_iterator it = entries.begin(), last = entries.end();
   for ( ; it!=last; ++it )

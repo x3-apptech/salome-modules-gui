@@ -433,7 +433,6 @@ void Plot2d_ViewWindow::createActions()
   mgr->registerAction( aAction, CurvSettingsId );
 
   // 9. Analytical curves
-#ifndef DISABLE_PYCONSOLE
   aAction = new QtxAction( tr( "TOT_PLOT2D_ANALYTICAL_CURVES" ),
                            aResMgr->loadPixmap( "Plot2d", tr( "ICON_PLOT2D_ANALYTICAL_CURVES" ) ),
                            tr( "MEN_PLOT2D_ANALYTICAL_CURVES" ),
@@ -442,7 +441,6 @@ void Plot2d_ViewWindow::createActions()
   aAction->setStatusTip( tr( "PRP_PLOT2D_ANALYTICAL_CURVES" ) );
   connect( aAction, SIGNAL( triggered( bool ) ), myViewFrame, SLOT( onAnalyticalCurve() ) );
   mgr->registerAction( aAction, AnalyticalCurveId );
-#endif
 
   // 10. Clone
   aAction = new QtxAction( tr( "MNU_CLONE_VIEW" ),

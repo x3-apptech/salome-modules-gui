@@ -228,6 +228,20 @@ void LightApp_SelectionMgr::selectedObjects( QStringList& theList, const QString
   theList = selList;
 }
 
+/*!
+  Append selected objects.
+*/
+void LightApp_SelectionMgr::setSelectedObjects( const QStringList& lst, const bool append )
+{
+  SUIT_DataOwnerPtrList owners;
+  foreach( const QString& aValue, lst ) {
+    if ( !aValue.isNull() )
+      owners.append( new LightApp_DataOwner( aValue ) );
+  }
+
+  setSelected( owners, append );
+}
+
 #endif
 
 /*!

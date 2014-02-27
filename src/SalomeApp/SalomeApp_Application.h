@@ -48,7 +48,9 @@
 
 class LightApp_Preferences;
 class SalomeApp_Study;
-class SalomeApp_NoteBook;
+#ifndef DISABLE_PYCONSOLE
+  class SalomeApp_NoteBook;
+#endif
 class SUIT_Desktop;
 
 class SUIT_ViewModel;
@@ -110,9 +112,11 @@ public:
   virtual bool                        useStudy( const QString& );
   virtual void                        updateDesktopTitle();
   virtual void                        currentWindows( QMap<int, int>& ) const;
-  
+
+#ifndef DISABLE_PYCONSOLE
   virtual void                        setNoteBook(SalomeApp_NoteBook* theNoteBook);
   virtual SalomeApp_NoteBook*         getNoteBook() const;
+#endif
 
  //! update visibility state of objects
   void                                updateVisibilityState( DataObjectList& theList,
@@ -132,7 +136,9 @@ public slots:
   virtual void                        onCopy();
   virtual void                        onPaste();
   void                                onSaveGUIState();// called from VISU
+#ifndef DISABLE_PYCONSOLE
   void                                onUpdateStudy(); // called from NoteBook
+#endif
   bool                                onRestoreStudy( const QString& theDumpScript,
                                                       const QString& theStudyName,
                                                       bool theIsStudySaved );
@@ -171,7 +177,9 @@ protected:
 
   void                                objectBrowserColumnsVisibility();
 
+#ifndef DISABLE_PYCONSOLE
   bool                                updateStudy();
+#endif
 
   virtual void                        afterCloseDoc();
 
@@ -196,7 +204,9 @@ private:
   void                                createExtraActions();
 
 private:
+#ifndef DISABLE_PYCONSOLE
   QPointer<SalomeApp_NoteBook>        myNoteBook;
+#endif
   QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
   bool                                myIsSiman; // application corresponds to the siman study flag
 

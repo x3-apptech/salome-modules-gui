@@ -40,16 +40,25 @@
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_DataOwner.h>
 #include <SALOME_Prs.h>
-#include <SOCC_ViewModel.h>
-#include <SVTK_ViewModel.h>
-#include <SVTK_ViewWindow.h>
-#include <SOCC_ViewWindow.h>
-#include <SPlot2d_ViewWindow.h>
-
 #include <SALOME_Event.h>
-#include <SALOME_ListIO.hxx>
-#include <SALOME_InteractiveObject.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
+
+#ifndef DISABLE_SALOMEOBJECT
+  #include <SALOME_ListIO.hxx>
+  #include <SALOME_InteractiveObject.hxx>
+  #include <SALOME_ListIteratorOfListIO.hxx>
+#ifndef DISABLE_OCCVIEWER
+    #include <SOCC_ViewModel.h>
+    #include <SOCC_ViewWindow.h>
+#endif
+#ifndef DISABLE_VTKVIEWER
+    #include <SVTK_ViewModel.h>
+    #include <SVTK_ViewWindow.h>
+#endif
+#ifndef DISABLE_PLOT2DVIEWER
+    #include <SPlot2d_ViewWindow.h>
+#endif
+#endif
+
 
 /*!
   \class SALOMEGUI_Swig
@@ -613,7 +622,7 @@ public:
     if ( LightApp_Application* anApp = getApplication() ) {
       SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
       if ( window ) {
-        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
+        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
         if ( view ) {
           SALOME_Prs* aPrs = view->CreatePrs( myEntry.toLatin1() );
           myResult = !aPrs->IsNull();
@@ -641,7 +650,7 @@ void SALOMEGUI_Swig::UpdateView()
       if ( LightApp_Application* anApp = getApplication() ) {
         SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
         if ( window ) {
-          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
+          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
           if ( view )
             view->Repaint();
         }
@@ -665,12 +674,20 @@ void SALOMEGUI_Swig::FitAll()
       if ( LightApp_Application* anApp = getApplication() ) {
         SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
         if ( window ) {
+#ifndef DISABLE_SALOMEOBJECT
+#ifndef DISABLE_VTKVIEWER
           if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
             ( dynamic_cast<SVTK_ViewWindow*>( window ) )->onFitAll();
-          else if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )
-            ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )->onFitAll();
-          else if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
+#endif
+#ifndef DISABLE_PLOT2DVIEWER
+          if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
             ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )->onFitAll();
+#endif
+#endif
+#ifndef DISABLE_OCCVIEWER
+          if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )
+            ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )->onFitAll();
+#endif
         }
       }
     }
@@ -692,14 +709,22 @@ void SALOMEGUI_Swig::ResetView()
       if ( LightApp_Application* anApp = getApplication() ) {
         SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
         if ( window ) {
+#ifndef DISABLE_SALOMEOBJECT
+#ifndef DISABLE_VTKVIEWER
           if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
             (dynamic_cast<SVTK_ViewWindow*>( window ))->onResetView();
-          else if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )
-            (dynamic_cast<OCCViewer_ViewWindow*>( window ))->onResetView();
-          else if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
+#endif
+#ifndef DISABLE_PLOT2DVIEWER
+          if ( dynamic_cast<SPlot2d_ViewWindow*>( window ) )
             (dynamic_cast<SPlot2d_ViewWindow*>( window ))->onFitAll();
           // VSR: there is no 'ResetView' functionality for Plot2d viewer,
           // so we use 'FitAll' instead.
+#endif
+#endif
+#ifndef DISABLE_OCCVIEWER
+          if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )
+            (dynamic_cast<OCCViewer_ViewWindow*>( window ))->onResetView();
+#endif
         }
       }
     }
@@ -738,6 +763,8 @@ static void setView( int view )
       if ( LightApp_Application* anApp = getApplication() ) {
         SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
         if ( window ) {
+#ifndef DISABLE_SALOMEOBJECT
+#ifndef DISABLE_VTKVIEWER
           if ( dynamic_cast<SVTK_ViewWindow*>( window ) ) {
             switch( myView ) {
             case __ViewTop:
@@ -756,7 +783,10 @@ static void setView( int view )
               break;
             }
           }
-          else if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) ) {
+#endif
+#endif
+#ifndef DISABLE_OCCVIEWER
+          if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) ) {
             switch( myView ) {
             case __ViewTop:
               (dynamic_cast<OCCViewer_ViewWindow*>( window ))->onTopView(); break;
@@ -774,6 +804,7 @@ static void setView( int view )
               break;
             }
           }
+#endif
         }
       }
     }

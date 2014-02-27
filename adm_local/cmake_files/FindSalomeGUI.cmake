@@ -40,3 +40,44 @@ ENDIF()
 FOREACH(_res ${SalomeGUI_EXTRA_ENV})
   SALOME_ACCUMULATE_ENVIRONMENT(${_res} "${SalomeGUI_EXTRA_ENV_${_res}}")
 ENDFOREACH()
+
+#----------------------------------------------------------------------------
+# FULL_GUI is a macro useful for determining whether a GUI module 
+# builded in full mode 
+#----------------------------------------------------------------------------
+#########################################################################
+# FULL_GUI()
+# 
+# USAGE: FULL_GUI(with_corba)
+#
+# ARGUMENTS:
+#   with_corba [input] TRUE or FALSE - use CORBA for building module or no.
+#
+MACRO(FULL_GUI with_corba)
+  SET(_options)
+  IF(${with_corba} AND ${SALOME_GUI_LIGHT_ONLY})
+    SET(_corba_message "We absolutely need a Salome GUI module with CORBA.\nPlease set option SALOME_LIGHT_ONLY to OFF when building GUI module.")
+  ENDIF() 
+  
+  LIST(APPEND _options SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_VTKVIEWER
+              SALOME_USE_PLOT2DVIEWER SALOME_USE_GRAPHICSVIEW SALOME_USE_QXGRAPHVIEWER
+              SALOME_USE_SALOMEOBJECT SALOME_USE_PYCONSOLE)
+              
+  SET(_message) 
+  FOREACH(_option ${_options}) 
+    IF(NOT ${_option})
+      LIST(APPEND _message ${_option})
+    ENDIF()
+  ENDFOREACH()
+  IF(_message)
+    SET(_message "We absolutely need a Salome GUI module in full mode.\nThe following options should be set to ON when building GUI module:\n${_message}\n")
+    IF(_corba_message)
+      MESSAGE(FATAL_ERROR "${_corba_message}\n${_message}")
+    ELSE()
+      MESSAGE(FATAL_ERROR "${_message}")
+    ENDIF()
+  ELSEIF(_corba_message)
+    MESSAGE(FATAL_ERROR "${_corba_message}") 
+  ENDIF() 
+  
+ENDMACRO(FULL_GUI)

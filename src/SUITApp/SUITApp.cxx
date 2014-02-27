@@ -20,21 +20,21 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//#if defined WIN32
-//#ifdef SUIT_ENABLE_PYTHON
-//#undef SUIT_ENABLE_PYTHON
+//#ifdefined WIN32
+//#ifndef DISABLE_PYCONSOLE
+//#define DISABLE_PYCONSOLE
 //#endif
 //#else //#if defined WIN32
-//#ifndef SUIT_ENABLE_PYTHON
+//#ifdef DISABLE_PYCONSOLE
 // NOTE: DO NOT DELETE THIS DEFINITION ON LINUX
 // or make sure Python is initialized in main() in any case
 // Otherwise, application based on light SALOME and using Python 
 // are unlikely to work properly.
-//#define SUIT_ENABLE_PYTHON
+//#undef DISABLE_PYCONSOLE
 //#include <Python.h>
 //#endif
 //
-#ifdef SUIT_ENABLE_PYTHON
+#ifndef DISABLE_PYCONSOLE
 #include "SUITApp_init_python.hxx"
 #endif
 
@@ -156,7 +156,7 @@ private:
 
 int main( int argc, char* argv[] )
 {
-  //#ifdef SUIT_ENABLE_PYTHON
+  //#ifndef DISABLE_PYCONSOLE
   //  // First of all initialize Python, as in complex multi-component applications
   //  // someone else might initialize it some way unsuitable for light SALOME!
   //  Py_SetProgramName( argv[0] );
@@ -272,7 +272,7 @@ int main( int argc, char* argv[] )
       }
     }
 
-#ifdef SUIT_ENABLE_PYTHON
+#ifndef DISABLE_PYCONSOLE
     //...Initialize python 
     int   _argc   = 1;
     char* _argv[] = {(char*)""};

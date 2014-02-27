@@ -83,7 +83,9 @@ public:
   void                setNameOfSavePoint(int savePoint, const QString& nameOfSavePoint);
 
   virtual void        restoreState(int savePoint);
+#ifndef DISABLE_PYCONSOLE
   void                updateFromNotebook(const QString&, bool);
+#endif
 
   virtual LightApp_DataObject* findObjectByEntry( const QString& theEntry );
 
@@ -106,7 +108,9 @@ protected:
 						SUIT_DataObject* theParent ) const;
 protected slots:
   virtual void        updateModelRoot( const CAM_DataModel* );
+#ifndef DISABLE_PYCONSOLE
   void                onNoteBookVarUpdate( QString theVarName );
+#endif
 
 private:
   QString             newStudyName() const;
@@ -115,8 +119,10 @@ private:
   _PTR(Study)         myStudyDS;
   Observer_i*         myObserver;
 
+#ifndef DISABLE_PYCONSOLE
  signals:
   void                notebookVarUpdated( QString theVarName );
+#endif
 };
 
 #ifdef WIN32

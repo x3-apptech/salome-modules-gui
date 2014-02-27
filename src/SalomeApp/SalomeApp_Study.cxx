@@ -334,11 +334,13 @@ public:
         }
         break;
       }
+#ifndef DISABLE_PYCONSOLE
     case 6: //NoteBook variables were modified
       {
 	myStudy->onNoteBookVarUpdate( QString( theID.c_str() ) );
 	break;
       }
+#endif
     default:MESSAGE("Unknown event: "  << event);break;
     } //switch
   } //notifyObserverID_real
@@ -402,10 +404,12 @@ SalomeApp_Study::~SalomeApp_Study()
   }
 }
 
+#ifndef DISABLE_PYCONSOLE
 void SalomeApp_Study::onNoteBookVarUpdate( QString theVarName)
 {
   emit notebookVarUpdated( theVarName );
 }
+#endif
 
 /*!
   Gets study id.
@@ -1150,6 +1154,7 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bo
   }
 }
 
+#ifndef DISABLE_PYCONSOLE
 /*!
   Mark the study as saved in the file
   \param theFileName - the name of file
@@ -1160,6 +1165,7 @@ void SalomeApp_Study::updateFromNotebook( const QString& theFileName, bool isSav
   studyDS()->Name(theFileName.toStdString());
   setIsSaved( isSaved );
 }
+#endif
 
 LightApp_DataObject* SalomeApp_Study::findObjectByEntry( const QString& theEntry )
 {

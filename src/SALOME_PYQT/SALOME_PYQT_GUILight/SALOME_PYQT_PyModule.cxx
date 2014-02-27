@@ -75,7 +75,7 @@ QMutex myInitMutex;
   etc. is blocked.
 
   CALL_OLD_METHODS macro can be defined, for example, by adding 
-  -DCALL_OLD_METHODS compilation option to the Makefile.
+  -DCALL_OLD_METHODS compilation option to the CMakeLists.txt.
 */
 #ifdef CALL_OLD_METHODS
 const bool IsCallOldMethods = true;

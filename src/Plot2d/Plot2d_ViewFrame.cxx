@@ -1829,25 +1829,19 @@ void Plot2d_ViewFrame::onSettings()
 */
 void Plot2d_ViewFrame::onAnalyticalCurve()
 {
-#ifndef DISABLE_PYCONSOLE
   Plot2d_AnalyticalCurveDlg dlg( this, this );
   dlg.exec();
   updateAnalyticalCurves();
-#endif
 }
 
 void Plot2d_ViewFrame::addAnalyticalCurve( Plot2d_AnalyticalCurve* theCurve)
 {
-#ifndef DISABLE_PYCONSOLE
-	myAnalyticalCurves.append(theCurve);
-#endif
+  myAnalyticalCurves.append(theCurve);
 }
 
 void Plot2d_ViewFrame::removeAnalyticalCurve( Plot2d_AnalyticalCurve* theCurve)
 {
-#ifndef DISABLE_PYCONSOLE
-	theCurve->setAction(Plot2d_AnalyticalCurve::ActRemoveFromView);
-#endif
+  theCurve->setAction(Plot2d_AnalyticalCurve::ActRemoveFromView);
 }
 
 /*
@@ -1855,7 +1849,6 @@ void Plot2d_ViewFrame::removeAnalyticalCurve( Plot2d_AnalyticalCurve* theCurve)
 */
 void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool updateView)
 {
-#ifndef DISABLE_PYCONSOLE
   if(!c) return;
   QwtScaleDiv* div = myPlot->axisScaleDiv(QwtPlot::xBottom);
   c->setRangeBegin(div->lowerBound());
@@ -1895,7 +1888,6 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
 
   if(updateView)
     myPlot->replot();
-#endif
 }
 
 /*
@@ -1903,13 +1895,11 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
 */
 void Plot2d_ViewFrame::updateAnalyticalCurves()
 {
-#ifndef DISABLE_PYCONSOLE
   AnalyticalCurveList::iterator it = myAnalyticalCurves.begin();
   for( ; it != myAnalyticalCurves.end(); it++) {
     updateAnalyticalCurve(*it);
   }
   myPlot->replot();
-#endif
 }
 
 /*!
@@ -1924,14 +1914,12 @@ AnalyticalCurveList Plot2d_ViewFrame::getAnalyticalCurves() const
   Get analytical curve by plot item.
 */
 Plot2d_AnalyticalCurve* Plot2d_ViewFrame::getAnalyticalCurve(QwtPlotItem * theItem) {
-#ifndef DISABLE_PYCONSOLE
   AnalyticalCurveList::iterator it = myAnalyticalCurves.begin();
   for( ; it != myAnalyticalCurves.end(); it++) {
     if((*it)->plotItem() == theItem);
 		return (*it);
   }
   return 0;
-#endif
 }
 #endif
 

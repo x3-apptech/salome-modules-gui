@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+INCLUDE(CMakeDependentOption)
+
 PROJECT(SalomeGUI C CXX)
 
 # Ensure a proper linker behavior:
@@ -62,16 +64,19 @@ OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ON)
 OPTION(SALOME_GUI_USE_OBSERVERS "Use study observers in GUI (advanced)" ON)
 
 # Advanced options:
+CMAKE_DEPENDENT_OPTION(SALOME_LIGHT_ONLY "Build SALOME Light only (no CORBA)" OFF
+                       "NOT SALOME_KERNEL_LIGHT_ONLY" ON)
 OPTION(SALOME_USE_VTKVIEWER "Enable VTK visualization (Mandatory in classic configurations)" ON)
-OPTION(SALOME_USE_SALOMEOBJECT "Enable Salome Object (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_OCCVIEWER "Enable OCC visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_GLVIEWER "Enable OpenGL visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_GRAPHICSVIEW "Enable GraphicsView visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PLOT2DVIEWER "Enable Plot2D visualization (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_PYCONSOLE "Enable Python GUI interface (Mandatory in classic configurations)" ON)
 OPTION(SALOME_USE_QXGRAPHVIEWER "Enable QX graph visualization (Mandatory in classic configurations)" ON)
+CMAKE_DEPENDENT_OPTION(SALOME_USE_SALOMEOBJECT "Enable Salome Object (Mandatory in classic configurations)" ON
+                       "SALOME_LIGHT_ONLY" ON)
 
-MARK_AS_ADVANCED(SALOME_USE_VTKVIEWER SALOME_USE_VTKVIEWER SALOME_USE_GRAPHICSVIEW)
+MARK_AS_ADVANCED(SALOME_LIGHT_ONLY SALOME_USE_VTKVIEWER SALOME_USE_GRAPHICSVIEW)
 MARK_AS_ADVANCED(SALOME_USE_SALOMEOBJECT SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_PLOT2DVIEWER)
 MARK_AS_ADVANCED(SALOME_USE_PYCONSOLE SALOME_USE_QXGRAPHVIEWER)
 
@@ -96,6 +101,8 @@ FIND_PACKAGE(SalomeHDF5 REQUIRED COMPONENTS C)
 IF(NOT SALOME_LIGHT_ONLY)
   FIND_PACKAGE(SalomeOmniORB REQUIRED)
   FIND_PACKAGE(SalomeOmniORBPy REQUIRED)
+ELSE()
+  ADD_DEFINITIONS("-DGUI_DISABLE_CORBA")
 ENDIF() 
 IF(SALOME_BUILD_TESTS)
   ENABLE_TESTING()
@@ -124,6 +131,9 @@ ENDIF()
 
 # OCCT
 FIND_PACKAGE(SalomeCAS REQUIRED)
+IF(NOT SALOME_USE_OCCVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_OCCVIEWER")
+ENDIF()
 
 # Qt4
 FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui QtXml QtWebKit QtOpenGL)
@@ -135,15 +145,36 @@ FIND_PACKAGE(SalomePyQt4 REQUIRED)
 IF(SALOME_USE_GLVIEWER)
   FIND_PACKAGE(SalomeOpenGL)
   SALOME_LOG_OPTIONAL_PACKAGE(OpenGL SALOME_USE_GLVIEWER) 
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_GLVIEWER")
 ENDIF()
 IF(SALOME_USE_VTKVIEWER)
   # Required components are listed in the FindSalomeVTK.cmake file: 
   FIND_PACKAGE(SalomeVTK 6.0) 
   SALOME_LOG_OPTIONAL_PACKAGE(VTK SALOME_USE_VTKVIEWER)
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_VTKVIEWER")
 ENDIF()
 IF(SALOME_USE_PLOT2DVIEWER)
   FIND_PACKAGE(SalomeQwt)  
   SALOME_LOG_OPTIONAL_PACKAGE(Qwt SALOME_USE_PLOT2DVIEWER)
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_PLOT2DVIEWER")
+ENDIF()
+IF (NOT SALOME_USE_GRAPHICSVIEW)
+  ADD_DEFINITIONS("-DDISABLE_GRAPHICSVIEW")
+ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  # Build with obsolete Python module's methods
+  ADD_DEFINITIONS(-DCALL_OLD_METHODS)
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_PYCONSOLE")
+ENDIF()
+IF(NOT SALOME_USE_QXGRAPHVIEWER)
+  ADD_DEFINITIONS("-DDISABLE_QXGRAPHVIEWER")
+ENDIF()
+IF(NOT SALOME_USE_SALOMEOBJECT)
+  ADD_DEFINITIONS("-DDISABLE_SALOMEOBJECT")
 ENDIF()
 
 # Detection summary:
@@ -227,8 +258,8 @@ INCLUDE(CMakePackageConfigHelpers)
 # They all have to be INSTALL'd with the option "EXPORT ${PROJECT_NAME}TargetGroup"
 SET(_${PROJECT_NAME}_exposed_targets 
     caf CAM CASCatch DDS Event LightApp LogWindow ObjBrowser OpenGLUtils
-    QDS qtx SalomeIDLGUI SalomePrs SalomeStyle std SUITApp suit ViewerTools ViewerData
-    vtkTools vtkEDFOverloads ImageComposer
+    QDS qtx SalomePrs SalomeStyle std SUITApp suit ViewerTools ViewerData
+    ImageComposer
 )
 
 # SALOME object specific targets:
@@ -246,7 +277,7 @@ ENDIF(SALOME_USE_GLVIEWER)
 # VTK specific targets:
 IF(SALOME_USE_VTKVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       VTKViewer)
+       VTKViewer vtkTools vtkEDFOverloads)
   IF(SALOME_USE_SALOMEOBJECT)
     LIST(APPEND _${PROJECT_NAME}_exposed_targets 
          SVTK)
@@ -288,13 +319,22 @@ ENDIF(SALOME_USE_GRAPHICSVIEW)
 # Python-based packages specific targets:
 IF(SALOME_USE_PYCONSOLE)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       PyInterp PyConsole SalomePy SalomePyQtGUI SalomePyQtGUILight SalomePyQt)
+       PyInterp PyConsole  SalomePyQtGUILight)
+  IF(SALOME_USE_PLOT2DVIEWER)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomePyQt)
+  ENDIF()
+  IF(NOT SALOME_LIGHT_ONLY)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomePyQtGUI)
+  ENDIF()
+  IF(SALOME_USE_VTKVIEWER)
+    LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomePy)
+  ENDIF(SALOME_USE_VTKVIEWER)
 ENDIF(SALOME_USE_PYCONSOLE)
 
 # CORBA specific targets:
 IF(NOT SALOME_LIGHT_ONLY)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets
-       SalomeSession SalomeApp SalomeGuiHelpers SalomeTreeData ToolsGUI)
+       SalomeIDLGUI SalomeSession SalomeApp SalomeGuiHelpers SalomeTreeData ToolsGUI)
 ENDIF(NOT SALOME_LIGHT_ONLY)
 
 # Add all targets to the build-tree export set

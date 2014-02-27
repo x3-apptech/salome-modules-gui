@@ -23,7 +23,9 @@ IF(SALOME_BUILD_TESTS)
 ENDIF()
 
 INCLUDE(UseQt4Ext)
-INCLUDE(${VTK_USE_FILE})
+IF(SALOME_USE_VTKVIEWER)
+  INCLUDE(${VTK_USE_FILE})
+ENDIF()
 
 # --- options ---
 
@@ -33,7 +35,6 @@ INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${QWT_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
   ${PTHREAD_INCLUDE_DIR}
   ${OMNIORB_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR}/idl
@@ -44,8 +45,6 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/OBJECT
   ${PROJECT_SOURCE_DIR}/src/ObjBrowser
   ${PROJECT_SOURCE_DIR}/src/Prs
-  ${PROJECT_SOURCE_DIR}/src/PyConsole
-  ${PROJECT_SOURCE_DIR}/src/PyInterp
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/STD
   ${PROJECT_SOURCE_DIR}/src/SUIT
@@ -55,6 +54,14 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/VTKViewer
 )
 
+IF(SALOME_USE_PYCONSOLE)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/src/PyConsole
+    ${PROJECT_SOURCE_DIR}/src/PyInterp
+  )
+ENDIF()
+
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(
   ${QT_DEFINITIONS}
@@ -62,8 +69,11 @@ ADD_DEFINITIONS(
   ${QWT_DEFINITIONS}
   ${CAS_DEFINITIONS}
   ${BOOST_DEFINITIONS}
-  ${PYTHON_DEFINITIONS}
 )
+
+IF(SALOME_USE_PYCONSOLE)
+  ADD_DEFINITIONS(${PYTHON_DEFINITIONS})
+ENDIF()
 
 # libraries to link to
 SET(_link_LIBRARIES
@@ -71,10 +81,43 @@ SET(_link_LIBRARIES
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
   ${KERNEL_OpUtil} ${KERNEL_SALOMELocalTrace} ${KERNEL_SalomeDSClient} ${KERNEL_TOOLSDS}
-  CASCatch suit std CAM ObjBrowser SalomePrs PyInterp PyConsole Event
-  GLViewer Plot2d OCCViewer VTKViewer SalomeObject SPlot2d SOCC SVTK
-  LogWindow LightApp SalomePrs ToolsGUI SalomeSession
+  CASCatch suit std CAM ObjBrowser SalomePrs Event
+  LogWindow LightApp SalomePrs ToolsGUI
 )
+
+IF(SALOME_USE_VTKVIEWER)
+  LIST(APPEND _link_LIBRARIES VTKViewer SVTK)
+ENDIF()
+
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _link_LIBRARIES PyInterp PyConsole)
+ENDIF()
+
+IF(SALOME_USE_GLVIEWER)
+  LIST(APPEND _link_LIBRARIES GLViewer)
+ENDIF()
+
+IF(SALOME_USE_PLOT2DVIEWER)
+  LIST(APPEND _link_LIBRARIES Plot2d)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _link_LIBRARIES SPlot2d)
+  ENDIF(SALOME_USE_SALOMEOBJECT)
+ENDIF(SALOME_USE_PLOT2DVIEWER)
+
+IF(SALOME_USE_OCCVIEWER)
+  LIST(APPEND _link_LIBRARIES OCCViewer)
+  IF(SALOME_USE_SALOMEOBJECT)
+    LIST(APPEND _link_LIBRARIES SOCC)
+  ENDIF(SALOME_USE_SALOMEOBJECT)
+ENDIF()
+
+IF(SALOME_USE_SALOMEOBJECT)
+  LIST(APPEND _link_LIBRARIES SalomeObject)
+ENDIF()
+
+IF(NOT SALOME_LIGHT_ONLY)
+  LIST(APPEND _link_LIBRARIES SalomeSession)
+ENDIF()
 
 # --- headers ---
 
@@ -89,10 +132,13 @@ SET(_moc_HEADERS
   SalomeApp_ListView.h
   SalomeApp_LoadStudiesDlg.h
   SalomeApp_Module.h
-  SalomeApp_NoteBook.h
   SalomeApp_Study.h
   SalomeApp_StudyPropertiesDlg.h
 )
+
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _moc_HEADERS SalomeApp_NoteBook.h)
+ENDIF()
 
 # header files / no moc processing
 SET(_other_HEADERS
@@ -102,11 +148,14 @@ SET(_other_HEADERS
   SalomeApp_ExceptionHandler.h
   SalomeApp_Filter.h
   SalomeApp_ImportOperation.h
-  SalomeApp_PyInterp.h
   SalomeApp_Tools.h
   SalomeApp_TypeFilter.h
   SalomeApp_VisualState.h
 )
+
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _other_HEADERS SalomeApp_PyInterp.h)
+ENDIF()
 
 # header files / to install
 SET(SalomeApp_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
@@ -148,14 +197,16 @@ SET(_other_SOURCES
   SalomeApp_ListView.cxx
   SalomeApp_LoadStudiesDlg.cxx
   SalomeApp_Module.cxx
-  SalomeApp_NoteBook.cxx
-  SalomeApp_PyInterp.cxx
   SalomeApp_Study.cxx
   SalomeApp_StudyPropertiesDlg.cxx
   SalomeApp_Tools.cxx
   SalomeApp_TypeFilter.cxx
   SalomeApp_VisualState.cxx
 )
+
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _other_SOURCES SalomeApp_PyInterp.cxx SalomeApp_NoteBook.cxx)
+ENDIF()
 
 # sources / to compile
 SET(SalomeApp_SOURCES ${_other_SOURCES} ${_moc_SOURCES})

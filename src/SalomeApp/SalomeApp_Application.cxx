@@ -25,14 +25,20 @@
 // Author:    Sergey LITONIN
 
 #ifdef WIN32
-// E.A. : On windows with python 2.6, there is a conflict
-// E.A. : between pymath.h and Standard_math.h which define
-// E.A. : some same symbols : acosh, asinh, ...
-#include <Standard_math.hxx>
-#include <pymath.h>
+  // E.A. : On windows with python 2.6, there is a conflict
+  // E.A. : between pymath.h and Standard_math.h which define
+  // E.A. : some same symbols : acosh, asinh, ...
+  #include <Standard_math.hxx>
+  #ifndef DISABLE_PYCONSOLE
+    #include <pymath.h>
+  #endif
 #endif
 
-#include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
+#ifndef DISABLE_PYCONSOLE
+  #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
+  #include <PyConsole_Console.h>
+  #include "SalomeApp_NoteBook.h"
+#endif
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
 #include "SalomeApp_DataModel.h"
@@ -40,8 +46,6 @@
 #include "SalomeApp_VisualState.h"
 #include "SalomeApp_StudyPropertiesDlg.h"
 #include "SalomeApp_LoadStudiesDlg.h"
-#include "SalomeApp_NoteBook.h"
-
 #include "SalomeApp_ExitDlg.h"
 
 #include <LightApp_Application.h>
@@ -75,7 +79,6 @@
 // temporary commented
 //#include <OB_ListItem.h>
 
-#include <PyConsole_Console.h>
 
 #include <Utils_ORB_INIT.hxx>
 #include <Utils_SINGLETON.hxx>
@@ -238,6 +241,7 @@ void SalomeApp_Application::start()
         updateObjectBrowser(true);
     }
 
+#ifndef DISABLE_PYCONSOLE
     // import/execute python scripts
     if ( pyfiles.count() > 0 && activeStudy() ) {
       SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
@@ -274,6 +278,7 @@ void SalomeApp_Application::start()
         }
       }
     }
+#endif
   } else {
     LightApp_Application::start();
     SALOME_EventFilter::Init();
@@ -368,6 +373,8 @@ void SalomeApp_Application::createActions()
 
   createExtraActions();
 
+#ifndef DISABLE_PYCONSOLE
+#ifndef DISABLE_SALOMEOBJECT
   // import Python module that manages SALOME plugins
   PyGILState_STATE gstate = PyGILState_Ensure();
   PyObjWrapper pluginsmanager = PyImport_ImportModule((char*)"salome_pluginsmanager");
@@ -376,6 +383,8 @@ void SalomeApp_Application::createActions()
     PyErr_Print();
   PyGILState_Release(gstate);
   // end of SALOME plugins loading
+#endif
+#endif
 
 }
 
@@ -476,10 +485,12 @@ void SalomeApp_Application::onNewWithScript()
 
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
+#ifndef DISABLE_PYCONSOLE
     PyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
+#endif
   }
 }
 
@@ -711,9 +722,11 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
   connect( aStudy, SIGNAL( saved  ( SUIT_Study* ) ), this, SLOT( onStudySaved  ( SUIT_Study* ) ) );
   connect( aStudy, SIGNAL( closed ( SUIT_Study* ) ), this, SLOT( onStudyClosed ( SUIT_Study* ) ) );
 
+#ifndef DISABLE_PYCONSOLE
   //to receive signal in application that NoteBook's variable was modified
   connect( aStudy, SIGNAL(notebookVarUpdated(QString)),
            this, SIGNAL(notebookVarUpdated(QString)) );
+#endif
 
   return aStudy;
 }
@@ -901,10 +914,12 @@ void SalomeApp_Application::onLoadScript( )
   {
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
+#ifndef DISABLE_PYCONSOLE
     PyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
+#endif
   }
 }
 
@@ -966,7 +981,11 @@ QString SalomeApp_Application::getFileFilter() const
 QWidget* SalomeApp_Application::createWindow( const int flag )
 {
   QWidget* wid = 0;
+#ifndef DISABLE_PYCONSOLE
   if ( flag != WT_PyConsole ) wid = LightApp_Application::createWindow(flag);
+#else
+  wid = LightApp_Application::createWindow(flag);
+#endif
 
   SUIT_ResourceMgr* resMgr = resourceMgr();
 
@@ -1029,6 +1048,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
       */
     }
   }
+#ifndef DISABLE_PYCONSOLE
   else if ( flag == WT_PyConsole )
   {
     PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), new SalomeApp_PyInterp() );
@@ -1052,6 +1072,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
     }
     wid = getNoteBook();
   }
+#endif
   return wid;
 }
 
@@ -1497,7 +1518,7 @@ SUIT_ViewManager* SalomeApp_Application::newViewManager(const QString& type)
 }
 
 
-/*!Global utility funciton, returns selected GUI Save point object's ID */
+/*!Global utility function, returns selected GUI Save point object's ID */
 int getSelectedSavePoint( const LightApp_SelectionMgr* selMgr )
 {
   SALOME_ListIO aList;
@@ -1543,8 +1564,10 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
 {
   LightApp_Application::onStudyCreated( study );
 
+#ifndef DISABLE_PYCONSOLE
   desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
                                windowDock( getWindow( WT_ObjectBrowser ) ) );
+#endif
 
   loadDockWindowsState();
 
@@ -1572,8 +1595,10 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
 {
   LightApp_Application::onStudyOpened( study );
 
+#ifndef DISABLE_PYCONSOLE
   desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
                                windowDock( getWindow( WT_ObjectBrowser ) ) );
+#endif
 
   loadDockWindowsState();
 
@@ -1707,6 +1732,7 @@ void SalomeApp_Application::objectBrowserColumnsVisibility()
     }
 }
 
+#ifndef DISABLE_PYCONSOLE
 /*! Set SalomeApp_NoteBook pointer */
 void SalomeApp_Application::setNoteBook( SalomeApp_NoteBook* theNoteBook )
 {
@@ -1718,6 +1744,7 @@ SalomeApp_NoteBook* SalomeApp_Application::getNoteBook() const
 {
   return myNoteBook;
 }
+#endif
 
 /*!
  * Define extra actions defined in module definition XML file.
@@ -1927,11 +1954,13 @@ bool SalomeApp_Application::renameObject( const QString& entry, const QString& n
 void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
   LightApp_Application::defaultWindows(aMap);
+#ifndef DISABLE_PYCONSOLE
   if ( !aMap.contains( WT_NoteBook ) ) {
     if ( !myNoteBook ) {
       aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
     }
   }
+#endif
 }
 
 /*!
@@ -1941,10 +1970,13 @@ void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 void SalomeApp_Application::currentWindows(QMap<int, int>& aMap) const
 {
   LightApp_Application::currentWindows( aMap );
+#ifndef DISABLE_PYCONSOLE
   if ( !aMap.contains( WT_NoteBook) && myNoteBook )
     aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
+#endif
 }
 
+#ifndef DISABLE_PYCONSOLE
 //============================================================================
 /*! Function : onUpdateStudy
  *  Purpose  : Slot to update the study.
@@ -2045,6 +2077,7 @@ bool SalomeApp_Application::updateStudy()
 
   return ok;
 }
+#endif
 
 //============================================================================
 /*! Function : onRestoreStudy
@@ -2066,9 +2099,11 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   // load study from the temporary directory
   QString command = QString( "execfile(r\"%1\")" ).arg( theDumpScript );
 
+#ifndef DISABLE_PYCONSOLE
   PyConsole_Console* pyConsole = app->pythonConsole();
   if ( pyConsole )
     pyConsole->execAndWait( command );
+#endif
 
   // remove temporary directory
   QFileInfo aScriptInfo = QFileInfo( theDumpScript );
@@ -2082,12 +2117,14 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 
   if( SalomeApp_Study* newStudy = dynamic_cast<SalomeApp_Study*>( app->activeStudy() ) )
   {
+#ifndef DISABLE_PYCONSOLE
     _PTR(Study) aStudyDS = newStudy->studyDS();
     app->getNoteBook()->Init( aStudyDS );
     newStudy->updateFromNotebook(theStudyName, theIsStudySaved);
     newStudy->Modified();
     updateDesktopTitle();
     updateActions();
+#endif
   }
   else
     ok = false;
@@ -2100,11 +2137,13 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 */
 void SalomeApp_Application::afterCloseDoc()
 {
+#ifndef DISABLE_PYCONSOLE
   // emit signal to restore study from Python script
   if ( myNoteBook ) {
     emit dumpedStudyClosed( myNoteBook->getDumpedStudyScript(),
                             myNoteBook->getDumpedStudyName(),
                             myNoteBook->isDumpedStudySaved() );
   }
+#endif
   LightApp_Application::afterCloseDoc();
 }

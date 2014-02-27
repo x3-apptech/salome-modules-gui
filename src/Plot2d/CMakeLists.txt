@@ -25,24 +25,16 @@ INCLUDE(UseQt4Ext)
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${QWT_INCLUDE_DIR}
+  ${PYTHON_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SUIT
 )
-IF(SALOME_USE_PYCONSOLE)
-  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-ENDIF()
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${QWT_DEFINITIONS} ${PYTHON_DEFINITIONS})
-IF(SALOME_USE_PYCONSOLE)
-  ADD_DEFINITIONS(${PYTHON_DEFINITIONS})
-ENDIF()
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${QWT_LIBRARY} qtx suit)
-IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _link_LIBRARIES ${PYTHON_LIBRARIES})
-ENDIF()
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${QWT_LIBRARY} ${PYTHON_LIBRARIES} qtx suit)
 
 # --- headers ---
 
@@ -59,12 +51,8 @@ SET(_moc_HEADERS
   Plot2d_ViewManager.h
   Plot2d_ViewModel.h
   Plot2d_ViewWindow.h
-)
-IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _moc_HEADERS
-    Plot2d_AnalyticalCurveDlg.h
+  Plot2d_AnalyticalCurveDlg.h
   )
-ENDIF()
 
 # header files / no moc processing
 SET(_other_HEADERS
@@ -74,13 +62,9 @@ SET(_other_HEADERS
   Plot2d_Object.h
   Plot2d_PlotItems.h
   Plot2d_Prs.h
-)
-IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _other_HEADERS
-    Plot2d_AnalyticalCurve.h
-    Plot2d_AnalyticalParser.h
+  Plot2d_AnalyticalCurve.h
+  Plot2d_AnalyticalParser.h
   )
-ENDIF()
 
 # header files / to install
 SET(Plot2d_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
@@ -145,14 +129,10 @@ SET(_other_SOURCES
   Plot2d_ViewManager.cxx
   Plot2d_ViewModel.cxx
   Plot2d_ViewWindow.cxx
-)
-IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _other_SOURCES
-    Plot2d_AnalyticalCurve.cxx
-    Plot2d_AnalyticalCurveDlg.cxx
-    Plot2d_AnalyticalParser.cxx
+  Plot2d_AnalyticalCurve.cxx
+  Plot2d_AnalyticalCurveDlg.cxx
+  Plot2d_AnalyticalParser.cxx
   )
-ENDIF()
 
 # sources / to compile
 SET(Plot2d_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
