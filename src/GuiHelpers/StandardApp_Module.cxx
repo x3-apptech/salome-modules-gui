@@ -208,7 +208,9 @@ void StandardApp_Module::windows( QMap<int, int>& theMap ) const
 {
   theMap.clear();
   theMap.insert( SalomeApp_Application::WT_ObjectBrowser, Qt::LeftDockWidgetArea );
+#ifndef DISABLE_PYCONSOLE
   theMap.insert( SalomeApp_Application::WT_PyConsole,     Qt::BottomDockWidgetArea );
+#endif
 }
 
 // Module's engine IOR
