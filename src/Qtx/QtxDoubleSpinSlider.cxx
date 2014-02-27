@@ -139,7 +139,7 @@ void QtxDoubleSpinSlider::setPrecision( int thePrecision )
 */
 int QtxDoubleSpinSlider::precision()
 {
-  myDoubleSpinBox->getPrecision();
+ return myDoubleSpinBox->getPrecision();
 }
 
 void QtxDoubleSpinSlider::setUnit( QString& theUnit )
