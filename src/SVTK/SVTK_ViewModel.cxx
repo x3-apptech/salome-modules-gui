@@ -504,6 +504,23 @@ void SVTK_Viewer::enableSelection(bool isEnabled)
         aView->SetSelectionEnabled( isEnabled );
     }
   }
+
+  if(!isEnabled) {
+    //clear current selection in the viewer
+    bool blocked = blockSignals( true );
+    if ( SUIT_ViewManager* aViewMgr = getViewManager() ) {
+      if( SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>( aViewMgr->getActiveView() ) ){
+	if( SVTK_Selector* aSelector = aViewWindow->GetSelector() ) {
+	  if(SVTK_View* aView = aViewWindow->getView()){
+	    aSelector->ClearIObjects();
+	    aView->onSelectionChanged();
+	  }
+	}
+      }
+    }
+    blockSignals( blocked );  
+  }
+
 }
 
 /*!

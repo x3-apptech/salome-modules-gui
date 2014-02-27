@@ -85,6 +85,9 @@ void LightApp_OCCSelector::getSelection( SUIT_DataOwnerPtrList& aList ) const
   if ( !myViewer )
     return;
 
+  if ( !myViewer->isSelectionEnabled() )
+    return;
+
   AIS_ListOfInteractive aSelList;
   myViewer->getSelectedObjects( aSelList );
   for ( AIS_ListIteratorOfListOfInteractive anIt( aSelList ); anIt.More(); anIt.Next() )

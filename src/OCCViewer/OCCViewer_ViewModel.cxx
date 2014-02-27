@@ -533,6 +533,13 @@ void OCCViewer_Viewer::enableSelection(bool isEnabled)
       win->enableSelection( isEnabled );
     }
   }
+
+  
+  //clear current selection in the viewer
+  if(!isEnabled) {
+    myAISContext->ClearSelected( Standard_True );
+  }
+
 }
 
 /*!
@@ -1015,6 +1022,11 @@ void OCCViewer_Viewer::setSelectionOptions( bool isPreselectionEnabled, bool isS
 {
   myPreselectionEnabled = isPreselectionEnabled;
   mySelectionEnabled = isSelectionEnabled;
+  //clear current selection in the viewer
+  
+  if(!mySelectionEnabled) {
+    myAISContext->ClearSelected( Standard_True );
+  }
 }
 
 

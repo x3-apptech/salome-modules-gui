@@ -187,7 +187,11 @@ void
 LightApp_VTKSelector
 ::getSelection( SUIT_DataOwnerPtrList& aList ) const
 {
-  if(myViewer){
+  if( myViewer ) {
+    if( SVTK_Viewer* aSViewer = dynamic_cast<SVTK_Viewer*>(myViewer) ) {
+      if( !aSViewer->isSelectionEnabled() ) 
+	return;
+    }
     if(SUIT_ViewManager* aViewManager = myViewer->getViewManager()){
       if(SVTK_ViewManager* aViewMgr = dynamic_cast<SVTK_ViewManager*>(aViewManager)){
         if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
