@@ -51,31 +51,56 @@ SUIT_FileDlg( parent, open, showQuickDir, modal )
 }
 
 /*!
-Constructor
+  Constructor
 */
-SalomeApp_CheckFileDlg::SalomeApp_CheckFileDlg( QWidget* parent, bool open, const QStringList& theCheckBoxNames, bool showQuickDir, bool modal) :
-SUIT_FileDlg( parent, open, showQuickDir, modal )
+SalomeApp_CheckFileDlg::SalomeApp_CheckFileDlg( QWidget*                 parent,
+                                                bool                     open,
+                                                const QStringList&       theCheckBoxNames,
+                                                bool                     showQuickDir,
+                                                bool                     modal,
+                                                const QList< QWidget* >& wdgList,
+                                                const bool               wdgAfter) :
+  SUIT_FileDlg( parent, open, showQuickDir, modal )
 {
-  if ( theCheckBoxNames.count() > 0 )
+  if ( theCheckBoxNames.count() > 0 || wdgList.count() > 0 )
   {
-    
     QGridLayout* grid = ::qobject_cast<QGridLayout*>( layout() );
     if ( grid )
     {
+      if ( !wdgAfter )
+        for ( int i = 0; i < wdgList.count(); ++i )
+        {
+          if ( wdgList[i] )
+          {
+            int row = grid->rowCount();
+            grid->addWidget( wdgList[i], row, 1 );
+          }
+        }
+
       for ( int i = 0; i < theCheckBoxNames.count(); ++i )
       {
         QCheckBox* myCheckBox = new QCheckBox( theCheckBoxNames.at(i), this );
         myCheckBoxes.append( myCheckBox );
-    
+
         int row = grid->rowCount();
         grid->addWidget( myCheckBox, row, 1 );
       }
+
+      if ( wdgAfter )
+        for ( int i = 0; i < wdgList.count(); ++i )
+        {
+          if ( wdgList[i] )
+          {
+            int row = grid->rowCount();
+            grid->addWidget( wdgList[i], row, 1 );
+          }
+        }
     }
   }
 }
 
 /*!
-Destructor
+  Destructor
 */
 SalomeApp_CheckFileDlg::~SalomeApp_CheckFileDlg() 
 {

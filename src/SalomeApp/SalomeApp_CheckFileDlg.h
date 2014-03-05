@@ -35,7 +35,7 @@ class SALOMEAPP_EXPORT SalomeApp_CheckFileDlg : public SUIT_FileDlg
     
 public:
   SalomeApp_CheckFileDlg( QWidget*, bool open, const QString& theCheckBoxName, bool showQuickDir = true, bool modal = true );
-  SalomeApp_CheckFileDlg( QWidget*, bool open, const QStringList& theCheckBoxNames, bool showQuickDir = true, bool modal = true );
+  SalomeApp_CheckFileDlg( QWidget*, bool open, const QStringList& theCheckBoxNames, bool showQuickDir = true, bool modal = true, const QList< QWidget* >& = QList< QWidget* >(), const bool wdgAfter = false );
   virtual ~SalomeApp_CheckFileDlg();
 
 public:
