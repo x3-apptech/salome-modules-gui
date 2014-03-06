@@ -2117,23 +2117,43 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "size=%1" )     .arg( params.size,    0, 'f',  2 );
 
   ClipPlanesList aPlanes =  myModel->getClipPlanes();
-  for ( int i=0; i < aPlanes.size(); i++ ) {
+  for ( int i=0; i < aPlanes.size(); i++ )
+  {
     OCCViewer_ClipPlane& aPlane = aPlanes[i];
     QString ClippingPlane = QString( "ClippingPlane%1=").arg( i+1 );
-    ClippingPlane +=  QString( "Mode~%1;").arg( (int)aPlane.PlaneMode );
+    ClippingPlane +=  QString( "Mode~%1;").arg( (int)aPlane.Mode );
     ClippingPlane +=  QString( "IsActive~%1;").arg( aPlane.IsOn );
-    ClippingPlane += QString( "AbsoluteOrientation~%1;" ).arg( aPlane.Orientation );
-    ClippingPlane += QString( "IsInvert~%1;" ).arg( aPlane.IsInvert );
+    switch ( aPlane.Mode )
+    {
+      case OCCViewer_ClipPlane::Absolute :
+      {
+        ClippingPlane += QString( "AbsoluteOrientation~%1;" ).arg( aPlane.OrientationType );
+
+        if ( aPlane.OrientationType == OCCViewer_ClipPlane::AbsoluteCustom )
+        {
+          ClippingPlane += QString( "Dx~%1;" ).arg( aPlane.AbsoluteOrientation.Dx );
+          ClippingPlane += QString( "Dy~%1;" ).arg( aPlane.AbsoluteOrientation.Dy );
+          ClippingPlane += QString( "Dz~%1;" ).arg( aPlane.AbsoluteOrientation.Dz );
+        }
+        else
+        {
+          ClippingPlane += QString( "IsInvert~%1;" ).arg( aPlane.AbsoluteOrientation.IsInvert );
+        }
+      }
+      break;
+
+      case OCCViewer_ClipPlane::Relative :
+      {
+        ClippingPlane += QString( "RelativeOrientation~%1;" ).arg( aPlane.OrientationType );
+        ClippingPlane += QString( "Rotation1~%1;" ).arg( aPlane.RelativeOrientation.Rotation1 );
+        ClippingPlane += QString( "Rotation2~%1" ).arg( aPlane.RelativeOrientation.Rotation2 );
+      }
+      break;
+    }
+
     ClippingPlane +=  QString( "X~%1;" ).arg( aPlane.X );
     ClippingPlane +=  QString( "Y~%1;" ).arg( aPlane.Y );
     ClippingPlane +=  QString( "Z~%1;" ).arg( aPlane.Z );
-    ClippingPlane +=  QString( "Dx~%1;" ).arg( aPlane.Dx );
-    ClippingPlane +=  QString( "Dy~%1;" ).arg( aPlane.Dy );;
-    ClippingPlane +=  QString( "Dz~%1;" ).arg( aPlane.Dz );
-    ClippingPlane +=  QString( "RelativeOrientation~%1;" ).arg( aPlane.RelativeMode.Orientation );
-    ClippingPlane +=  QString( "Distance~%1;" ).arg( aPlane.RelativeMode.Distance );
-    ClippingPlane +=  QString( "Rotation1~%1;" ).arg( aPlane.RelativeMode.Rotation1 );
-    ClippingPlane +=  QString( "Rotation2~%1" ).arg( aPlane.RelativeMode.Rotation2 );
     data << ClippingPlane;
   }
 
@@ -2220,28 +2240,43 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
       else if ( paramName == "scaleZ" )            params.scaleZ            = paramValue.toDouble();
       else if ( paramName == "isVisible" )         params.isVisible         = paramValue.toInt();
       else if ( paramName == "size" )              params.size              = paramValue.toDouble();
-      else if ( paramName.contains( "ClippingPlane" ) ) {
+      else if ( paramName.contains( "ClippingPlane" ) )
+      {
         QStringList ClipPlaneData = paramValue.split( ';' );
         OCCViewer_ClipPlane aPlane;
-        foreach( QString ClipPlaneParam, ClipPlaneData ) {
-	  QString ClipPlane_paramName  = ClipPlaneParam.section( '~', 0, 0 ).trimmed();
-	  QString ClipPlane_paramValue = ClipPlaneParam.section( '~', 1, 1 ).trimmed();
-            if      ( ClipPlane_paramName == "Mode" )                aPlane.PlaneMode                  = ( ClipPlaneMode )ClipPlane_paramValue.toInt();
-            else if ( ClipPlane_paramName == "IsActive" )            aPlane.IsOn                       = ClipPlane_paramValue.toInt();
-            else if ( ClipPlane_paramName == "AbsoluteOrientation" ) aPlane.Orientation                = ClipPlane_paramValue.toInt();
-            else if ( ClipPlane_paramName == "IsInvert" )            aPlane.IsInvert                   = ClipPlane_paramValue.toInt();
-            else if ( ClipPlane_paramName == "X" )                   aPlane.X                          = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Y" )                   aPlane.Y                          = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Z" )                   aPlane.Z                          = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Dx" )                  aPlane.Dx                         = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Dy" )                  aPlane.Dy                         = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Dz" )                  aPlane.Dz                         = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "RelativeOrientation" ) aPlane.RelativeMode.Orientation   = ClipPlane_paramValue.toInt();
-            else if ( ClipPlane_paramName == "Distance" )            aPlane.RelativeMode.Distance      = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Rotation1" )           aPlane.RelativeMode.Rotation1     = ClipPlane_paramValue.toDouble();
-            else if ( ClipPlane_paramName == "Rotation2" )           aPlane.RelativeMode.Rotation2     = ClipPlane_paramValue.toDouble();
+        foreach( QString ClipPlaneParam, ClipPlaneData )
+        {
+          QString ClipPlane_paramName  = ClipPlaneParam.section( '~', 0, 0 ).trimmed();
+          QString ClipPlane_paramValue = ClipPlaneParam.section( '~', 1, 1 ).trimmed();
+          if ( ClipPlane_paramName == "Mode" )
+          {
+            aPlane.Mode = ( OCCViewer_ClipPlane::PlaneMode ) ClipPlane_paramValue.toInt();
+          }
+          else if ( ClipPlane_paramName == "IsActive" ) aPlane.IsOn = ClipPlane_paramValue.toInt();
+          else if ( ClipPlane_paramName == "X" )        aPlane.X    = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Y" )        aPlane.Y    = ClipPlane_paramValue.toDouble();
+          else if ( ClipPlane_paramName == "Z" )        aPlane.Z    = ClipPlane_paramValue.toDouble();
+          else
+          {
+            switch ( aPlane.Mode )
+            {
+              case OCCViewer_ClipPlane::Absolute :
+                if      ( ClipPlane_paramName == "Dx" ) aPlane.AbsoluteOrientation.Dx = ClipPlane_paramValue.toDouble();
+                else if ( ClipPlane_paramName == "Dy" ) aPlane.AbsoluteOrientation.Dy = ClipPlane_paramValue.toDouble();
+                else if ( ClipPlane_paramName == "Dz" ) aPlane.AbsoluteOrientation.Dz = ClipPlane_paramValue.toDouble();
+                else if ( ClipPlane_paramName == "IsInvert" ) aPlane.AbsoluteOrientation.IsInvert = ClipPlane_paramValue.toInt();
+                else if ( ClipPlane_paramName == "AbsoluteOrientation" ) aPlane.OrientationType = ClipPlane_paramValue.toInt();
+                break;
+
+              case OCCViewer_ClipPlane::Relative :
+                if      ( ClipPlane_paramName == "RelativeOrientation" ) aPlane.OrientationType = ClipPlane_paramValue.toInt();
+                else if ( ClipPlane_paramName == "Rotation1" )           aPlane.RelativeOrientation.Rotation1 = ClipPlane_paramValue.toDouble();
+                else if ( ClipPlane_paramName == "Rotation2" )           aPlane.RelativeOrientation.Rotation2 = ClipPlane_paramValue.toDouble();
+                break;
+            }
+          }
         }
-	aClipPlanes.push_back(aPlane);
+        aClipPlanes.push_back(aPlane);
       }
       // graduated trihedron
       else if ( paramName == "gtIsVisible" )       params.gtIsVisible       = paramValue.toInt();

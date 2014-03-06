@@ -28,45 +28,96 @@
 #include <Graphic3d_ClipPlane.hxx>
 #include <vector>
 
-enum ClipPlaneMode { Absolute, Relative };
-
 /*!
-  \class OrientedPlane
-  \brief Parameters of clipping plane in relative mode
+  \class OCCViewer_ClipPlane
+         Definition of OCC viewer clipping plane.
 */
-class OCCVIEWER_EXPORT OrientedPlane {
-
- public:
-  OrientedPlane();
-  OrientedPlane& operator =(const OrientedPlane& other);
-
- public:
-  Standard_Integer Orientation;
-  Standard_Real Distance;
-  Standard_Real Rotation1;
-  Standard_Real Rotation2;  
-};
-
 class OCCVIEWER_EXPORT OCCViewer_ClipPlane
 {
-  
- public:
-  OCCViewer_ClipPlane();
-  OCCViewer_ClipPlane& operator =(const OCCViewer_ClipPlane& other);
-  
- public:
-  OrientedPlane RelativeMode;
-  Standard_Real X;
-  Standard_Real Y;
-  Standard_Real Z;
-  Standard_Real Dx;
-  Standard_Real Dy;
-  Standard_Real Dz;
-  Standard_Integer Orientation;
-  bool IsInvert;
-  bool IsOn;
-  ClipPlaneMode PlaneMode;
+public:
 
+  enum PlaneMode
+  {
+    Absolute,
+    Relative
+  };
+
+  enum AbsoluteOrientationType
+  {
+    AbsoluteCustom,
+    AbsoluteXY,
+    AbsoluteYZ,
+    AbsoluteZX
+  };
+
+  enum RelativeOrientationType
+  {
+    RelativeXY,
+    RelativeYZ,
+    RelativeZX
+  };
+
+public:
+
+  OCCViewer_ClipPlane();
+  OCCViewer_ClipPlane& operator =( const OCCViewer_ClipPlane& theOther );
+
+// Parameters
+public:
+
+  // Plane definition mode
+  PlaneMode Mode;
+
+  // Is active
+  bool IsOn;
+
+  // Plane position
+  double X;
+  double Y;
+  double Z;
+
+  // Orientation type
+  int OrientationType;
+
+  // Plane orientation (depends on mode)
+  union
+  {
+    struct
+    {
+      bool   IsInvert;
+      double Dx;
+      double Dy;
+      double Dz;
+    } AbsoluteOrientation;
+
+    struct
+    {
+      double Rotation1;
+      double Rotation2;
+    } RelativeOrientation;
+  };
+
+// Tools
+public:
+
+  // Converts defined orientation to direction.
+  void OrientationToXYZ( double& theDx, double& theDy, double& theDz ) const;
+
+  // Converts absoulte orientation to relative equivalent.
+  static void DXYZToRelative( const double theDx,
+                              const double theDy,
+                              const double theDz,
+                              const int theRelativeType,
+                              double& theRotation1,
+                              double& theRotation2 );
+
+  // Converts relative orientation to absolute equivalent.
+  static void RelativeToDXYZ( const int theRelativeType,
+                              const double theRotation1,
+                              const double theRotation2,
+                              double& theDx,
+                              double& theDy,
+                              double& theDz );
 };
 
 typedef std::vector<OCCViewer_ClipPlane> ClipPlanesList;

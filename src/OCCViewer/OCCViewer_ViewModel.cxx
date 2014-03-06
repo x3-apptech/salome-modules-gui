@@ -1041,16 +1041,21 @@ void OCCViewer_Viewer::setClipPlanes(ClipPlanesList theList)
 
   // 2. Create new clipping planes
   ClipPlanesList::iterator inIt = theList.begin();
-  for (;inIt != theList.end(); inIt++ ) {
-    OCCViewer_ClipPlane plane;
-    plane = (*inIt);
-    myClipPlanes.push_back(plane);
-    gp_Pln aPln (gp_Pnt (plane.X, plane.Y, plane.Z),
-		 gp_Dir (plane.Dx, plane.Dy, plane.Dz));
-    Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane();
-    aGraphic3dPlane->SetEquation (aPln);   
-    aGraphic3dPlane->SetOn(plane.IsOn);
-    myInternalClipPlanes.Append(aGraphic3dPlane);
+  for (;inIt != theList.end(); inIt++ )
+  {
+    OCCViewer_ClipPlane aPlane = *inIt;
+
+    double aDx = 0.0, aDy = 0.0, aDz = 0.0;
+    aPlane.OrientationToXYZ( aDx, aDy, aDz );
+
+    gp_Pnt anOrigin( aPlane.X, aPlane.Y, aPlane.Z );
+    gp_Dir aDirection( aDx, aDy, aDz );
+
+    Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane( gp_Pln( anOrigin, aDirection ) );
+    aGraphic3dPlane->SetOn( aPlane.IsOn );
+
+    myInternalClipPlanes.Append( aGraphic3dPlane );
+    myClipPlanes.push_back( aPlane );
   }
 
   // 3. Apply clipping planes

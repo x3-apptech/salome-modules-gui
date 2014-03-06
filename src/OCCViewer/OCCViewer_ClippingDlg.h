@@ -68,6 +68,7 @@ private :
   virtual void showEvent ( QShowEvent * );
   virtual void hideEvent ( QHideEvent * );
   void initParam();
+  void setPlaneParam( OCCViewer_ClipPlane& thePlane );
   void displayPreview();
   void erasePreview();
   void updatePreview();
@@ -77,6 +78,10 @@ private :
 
   OCCViewer_ClipPlane& getClipPlane( int );
   int clipPlanesCount();
+
+  OCCViewer_ClipPlane::PlaneMode currentPlaneMode() const;
+
+private:
 
   QComboBox* ComboBoxPlanes;
   QCheckBox* isActivePlane;
@@ -126,7 +131,6 @@ private :
   OCCViewer_Viewer* myModel;
   Handle(V3d_View) myView3d;
 
-  Standard_Integer myCurrentClipPlaneMode;
   std::vector<Handle(AIS_Plane)> myPreviewPlaneVector;
 
   bool myIsSelectPlane;
