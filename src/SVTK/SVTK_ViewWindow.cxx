@@ -2490,22 +2490,22 @@ SUIT_CameraProperties SVTK_ViewWindow::cameraProperties()
   double anAxialScale[3];
 
   aCamera->OrthogonalizeViewUp();
-  aCamera->GetFocalPoint(aFocalPoint);
-  aCamera->GetPosition(aPosition);
-  aCamera->GetViewUp(aViewUp);
+  aCamera->GetFocalPoint( aFocalPoint );
+  aCamera->GetPosition( aPosition );
+  aCamera->GetViewUp( aViewUp );
   
-  aProps.setFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
-  aProps.setPosition(aPosition[0], aPosition[1], aPosition[2]);
-  aProps.setViewUp(aViewUp[0], aViewUp[1], aViewUp[2]);
-  aProps.setMappingScale(aCamera->GetParallelScale());
+  aProps.setFocalPoint( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+  aProps.setPosition( aPosition[0], aPosition[1], aPosition[2] );
+  aProps.setViewUp( aViewUp[0], aViewUp[1], aViewUp[2] );
+  aProps.setMappingScale( aCamera->GetParallelScale() * 2.0 );
 
-  if (aProps.getProjection() == SUIT_CameraProperties::PrjPerspective)
+  if ( aProps.getProjection() == SUIT_CameraProperties::PrjPerspective )
   {
-    aProps.setViewAngle(aCamera->GetViewAngle());
+    aProps.setViewAngle( aCamera->GetViewAngle() );
   }
 
-  GetRenderer()->GetScale(anAxialScale);
-  aProps.setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  GetRenderer()->GetScale( anAxialScale );
+  aProps.setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
   
   return aProps;
 }
@@ -2535,26 +2535,26 @@ void SVTK_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   double anAxialScale[3];
 
   // get common properties
-  aProps.getViewUp(aViewUp[0], aViewUp[1], aViewUp[2]);
-  aProps.getPosition(aPosition[0], aPosition[1], aPosition[2]);
-  aProps.getFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
-  aProps.getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  aProps.getViewUp( aViewUp[0], aViewUp[1], aViewUp[2] );
+  aProps.getPosition( aPosition[0], aPosition[1], aPosition[2] );
+  aProps.getFocalPoint( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+  aProps.getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
   
   // restore properties to the camera
-  aCamera->SetViewUp(aViewUp);
-  aCamera->SetPosition(aPosition);
-  aCamera->SetFocalPoint(aFocalPoint);
-  aCamera->SetParallelScale(aProps.getMappingScale());
+  aCamera->SetViewUp( aViewUp );
+  aCamera->SetPosition( aPosition );
+  aCamera->SetFocalPoint( aFocalPoint );
+  aCamera->SetParallelScale( aProps.getMappingScale() / 2.0 );
 
-  if (aProps.getProjection() == SUIT_CameraProperties::PrjPerspective)
+  if ( aProps.getProjection() == SUIT_CameraProperties::PrjPerspective )
   {
-    aCamera->SetViewAngle(aProps.getViewAngle());
+    aCamera->SetViewAngle( aProps.getViewAngle() );
   }
 
-  GetRenderer()->SetScale(anAxialScale);
+  GetRenderer()->SetScale( anAxialScale );
 
   getRenderer()->ResetCameraClippingRange();
-  Repaint(false);
+  Repaint( false );
 
   blockSignals( blocked );
 }

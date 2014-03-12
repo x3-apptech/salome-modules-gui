@@ -236,13 +236,16 @@ bool OCCViewer_ViewPort3d::syncronize( const OCCViewer_ViewPort3d* ref )
   refView->Up( x, y, z ); tgtView->SetUp( x, y, z );
   refView->Eye( x, y, z ); tgtView->SetEye( x, y, z );
   refView->Proj( x, y, z ); tgtView->SetProj( x, y, z );
+#if OCC_VERSION_LARGE <= 0x06070000
   refView->Center( x, y ); tgtView->SetCenter( x, y );
+#endif
   tgtView->SetScale( refView->Scale() );
   tgtView->SetTwist( refView->Twist() );
 
   /* update */
   tgtView->Update();
   tgtView->SetImmediateUpdate( Standard_True );
+  tgtView->ZFitAll();
   return true;
 }
 
@@ -621,8 +624,10 @@ void OCCViewer_ViewPort3d::rotate( int x, int y,
 void OCCViewer_ViewPort3d::endRotation()
 {
   if ( !activeView().IsNull() ) {
-    activeView()->ZFitAll(1.);
-    activeView()->SetZSize(0.);
+    activeView()->ZFitAll( 1.0 );
+#if OCC_VERSION_LARGE <= 0x06070000
+    activeView()->SetZSize( 0.0 );
+#endif
     activeView()->Update();
     emit vpTransformed( this );
   }
@@ -793,7 +798,7 @@ bool OCCViewer_ViewPort3d::synchronize( OCCViewer_ViewPort* view )
     aView3d->SetImmediateUpdate( Standard_False );
 #if OCC_VERSION_LARGE > 0x06070000
     aView3d->Camera()->Copy( aRefView3d->Camera() );
-#else    
+#else
     aView3d->SetViewMapping( aRefView3d->ViewMapping() );
     aView3d->SetViewOrientation( aRefView3d->ViewOrientation() );
 #endif

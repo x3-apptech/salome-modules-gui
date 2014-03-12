@@ -157,7 +157,9 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListWidgetItem* curItem )
     
     Standard_Boolean prev = aView3d->SetImmediateUpdate( Standard_False );
     aView3d->SetScale( myCurrentItem.scale );
+#if OCC_VERSION_LARGE <= 0x06070000
     aView3d->SetCenter( myCurrentItem.centerX, myCurrentItem.centerY );
+#endif
     aView3d->SetProj( myCurrentItem.projX, myCurrentItem.projY, myCurrentItem.projZ );
     aView3d->SetTwist( myCurrentItem.twist );
     aView3d->SetAt( myCurrentItem.atX, myCurrentItem.atY, myCurrentItem.atZ );

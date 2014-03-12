@@ -78,6 +78,7 @@
 
 #include <gp_Dir.hxx>
 #include <gp_Pln.hxx>
+#include <gp_GTrsf.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 
 #if OCC_VERSION_LARGE > 0x06060000 
@@ -592,69 +593,92 @@ void OCCViewer_ViewWindow::activateRotation()
 */
 bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, double& theZ )
 {
-  Handle(Visual3d_View) aView = myViewPort->getView()->View();
+  Handle(V3d_View) aView3d = myViewPort->getView();
 
-  Standard_Real Xmin,Ymin,Zmin,Xmax,Ymax,Zmax,U,V,W ;
-  Standard_Real Umin,Vmin,Umax,Vmax ;
-  Standard_Integer Nstruct,Npoint ;
-  Graphic3d_MapOfStructure MySetOfStructures;
+  // Project boundaries points and add to avergae gravity
+  // the ones which lie within the screen limits
+  Standard_Real aScreenLimits[4] = { 0.0, 0.0, 0.0, 0.0 };
 
-  aView->DisplayedStructures (MySetOfStructures);
-  Nstruct = MySetOfStructures.Extent() ;
-
-  Graphic3d_MapIteratorOfMapOfStructure MyIterator(MySetOfStructures) ;
 #if OCC_VERSION_LARGE > 0x06070000
-  aView->Camera()->WindowLimit(Umin,Vmin,Umax,Vmax);
+  // NDC space screen limits
+  aScreenLimits[0] = -1.0;
+  aScreenLimits[1] =  1.0;
+  aScreenLimits[2] = -1.0;
+  aScreenLimits[3] =  1.0;
 #else
-  aView->ViewMapping().WindowLimit(Umin,Vmin,Umax,Vmax);
+  aView3d->View()->ViewMapping().WindowLimit( aScreenLimits[0],
+                                              aScreenLimits[1],
+                                              aScreenLimits[2],
+                                              aScreenLimits[3] );
 #endif
-  Npoint = 0 ; theX = theY = theZ = 0. ;
-  for( ; MyIterator.More(); MyIterator.Next()) {
-    if (!(MyIterator.Key())->IsEmpty()) {
-      (MyIterator.Key())->MinMaxValues(Xmin,Ymin,Zmin,
-                                         Xmax,Ymax,Zmax) ;
 
-      Standard_Real LIM = ShortRealLast() -1.;
-      if (!    (fabs(Xmin) > LIM || fabs(Ymin) > LIM || fabs(Zmin) > LIM
-                ||  fabs(Xmax) > LIM || fabs(Ymax) > LIM || fabs(Zmax) > LIM )) {
+  Standard_Integer aPointsNb = 0;
 
-        aView->Projects(Xmin,Ymin,Zmin,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmin ; theY += Ymin ; theZ += Zmin ;
-        }
-        aView->Projects(Xmax,Ymin,Zmin,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmax ; theY += Ymin ; theZ += Zmin ;
-        }
-        aView->Projects(Xmin,Ymax,Zmin,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmin ; theY += Ymax ; theZ += Zmin ;
-        }
-        aView->Projects(Xmax,Ymax,Zmin,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmax ; theY += Ymax ; theZ += Zmin ;
-        }
-        aView->Projects(Xmin,Ymin,Zmax,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmin ; theY += Ymin ; theZ += Zmax ;
-        }
-        aView->Projects(Xmax,Ymin,Zmax,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmax ; theY += Ymin ; theZ += Zmax ;
-        }
-        aView->Projects(Xmin,Ymax,Zmax,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmin ; theY += Ymax ; theZ += Zmax ;
-        }
-        aView->Projects(Xmax,Ymax,Zmax,U,V,W) ;
-        if( U >= Umin && U <= Umax && V >= Vmin && V <= Vmax ) {
-          Npoint++ ; theX += Xmax ; theY += Ymax ; theZ += Zmax ;
-        }
+  Standard_Real aXmin = 0.0;
+  Standard_Real aYmin = 0.0;
+  Standard_Real aZmin = 0.0;
+  Standard_Real aXmax = 0.0;
+  Standard_Real aYmax = 0.0;
+  Standard_Real aZmax = 0.0;
+
+  Graphic3d_MapOfStructure aSetOfStructures;
+  aView3d->View()->DisplayedStructures( aSetOfStructures );
+  Graphic3d_MapIteratorOfMapOfStructure aStructureIt( aSetOfStructures );
+
+  for( ; aStructureIt.More(); aStructureIt.Next() ) {
+    const Handle(Graphic3d_Structure)& aStructure = aStructureIt.Key();
+    if ( aStructure->IsEmpty() ) {
+      continue;
+    }
+
+    aStructure->MinMaxValues( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
+
+    // Infinite structures are skipped
+    Standard_Real aLIM = ShortRealLast() - 1.0;
+    if ( Abs( aXmin ) > aLIM || Abs( aYmin ) > aLIM || Abs( aZmin ) > aLIM
+      || Abs( aXmax ) > aLIM || Abs( aYmax ) > aLIM || Abs( aZmax ) > aLIM ) {
+      continue;
+    }
+
+    gp_Pnt aPoints[8] = {
+      gp_Pnt( aXmin, aYmin, aZmin ), gp_Pnt( aXmin, aYmin, aZmax ),
+      gp_Pnt( aXmin, aYmax, aZmin ), gp_Pnt( aXmin, aYmax, aZmax ),
+      gp_Pnt( aXmax, aYmin, aZmin ), gp_Pnt( aXmax, aYmin, aZmax ),
+      gp_Pnt( aXmax, aYmax, aZmin ), gp_Pnt( aXmax, aYmax, aZmax )
+    };
+
+    for ( Standard_Integer aPointIt = 0; aPointIt < 8; ++aPointIt ) {
+      const gp_Pnt& aBBPoint = aPoints[aPointIt];
+
+#if OCC_VERSION_LARGE > 0x06070000
+      gp_Pnt aProjected = aView3d->Camera()->Project( aBBPoint );
+      const Standard_Real& U = aProjected.X();
+      const Standard_Real& V = aProjected.Y();
+#else
+      Standard_Real U = 0.0;
+      Standard_Real V = 0.0;
+      Standard_Real W = 0.0;
+      aView3d->View()->Projects( aBBPoint.X(), aBBPoint.Y(), aBBPoint.Z(), U, V, W );
+#endif
+
+      if (U >= aScreenLimits[0]
+       && U <= aScreenLimits[1]
+       && V >= aScreenLimits[2]
+       && V <= aScreenLimits[3])
+      {
+        aPointsNb++;
+        theX += aBBPoint.X();
+        theY += aBBPoint.Y();
+        theZ += aBBPoint.Z();
       }
     }
   }
-  if( Npoint > 0 ) {
-    theX /= Npoint ; theY /= Npoint ; theZ /= Npoint ;
+
+  if ( aPointsNb > 0 )
+  {
+    theX /= aPointsNb;
+    theY /= aPointsNb;
+    theZ /= aPointsNb;
   }
   return true;
 }
@@ -1642,13 +1666,38 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
 
   Standard_Boolean prev = aView3d->SetImmediateUpdate( Standard_False );
   aView3d->SetScale( anItem.scale );
-  aView3d->SetCenter( anItem.centerX, anItem.centerY );
   aView3d->SetTwist( anItem.twist );
   aView3d->SetAt( anItem.atX, anItem.atY, anItem.atZ );
   aView3d->SetImmediateUpdate( prev );
   aView3d->SetEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
+
+#if OCC_VERSION_LARGE > 0x06070000
+  if ( anItem.centerX != 0.0 || anItem.centerY != 0.0 )
+  {
+    double anUpX = 0.0, anUpY = 0.0, anUpZ = 0.0;
+
+    // "eye" and "at" require conversion to represent center panning
+    // up direction is only available after setting angle of twist and
+    // other view parameters
+    aView3d->Up( anUpX, anUpY, anUpZ );
+
+    gp_Dir aProj( -anItem.projX, -anItem.projY, -anItem.projZ );
+    gp_Dir anUp( anUpX, anUpY, anUpZ );
+    gp_Pnt anAt( anItem.atX, anItem.atY, anItem.atZ );
+    gp_Pnt anEye( anItem.eyeX, anItem.eyeY, anItem.eyeZ );
+    gp_Dir aSide = aProj ^ anUp;
+
+    anAt.Translate( gp_Vec( aSide ) * anItem.centerX );
+    anAt.Translate( gp_Vec( anUp  ) * anItem.centerY );
+
+    aView3d->SetAt( anAt.X(), anAt.Y(), anAt.Z() );
+    aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
+  }
+#else
+  aView3d->SetCenter( anItem.centerX, anItem.centerY );
+#endif
 
   if ( !baseParamsOnly ) {
 
@@ -1996,13 +2045,12 @@ bool OCCViewer_ViewWindow::isCuttingPlane()
 */
 viewAspect OCCViewer_ViewWindow::getViewParams() const
 {
-  double centerX, centerY, projX, projY, projZ, twist;
+  double projX, projY, projZ, twist;
   double atX, atY, atZ, eyeX, eyeY, eyeZ;
   double aScaleX, aScaleY, aScaleZ;
 
   Handle(V3d_View) aView3d = myViewPort->getView();
 
-  aView3d->Center( centerX, centerY );
   aView3d->Proj( projX, projY, projZ );
   aView3d->At( atX, atY, atZ );
   aView3d->Eye( eyeX, eyeY, eyeZ );
@@ -2017,8 +2065,6 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
 
   viewAspect params;
   params.scale    = aView3d->Scale();
-  params.centerX  = centerX;
-  params.centerY  = centerY;
   params.projX    = projX;
   params.projY    = projY;
   params.projZ    = projZ;
@@ -2035,6 +2081,10 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   params.name     = aName;
   params.isVisible= isShown;
   params.size     = size;
+
+#if OCC_VERSION_LARGE <= 0x06070000 // the property is deprecated in OCCT 6.7.1
+  aView3d->Center( params.centerX, params.centerY );
+#endif
 
 #if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
   // graduated trihedron
@@ -2098,8 +2148,10 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   QStringList data;
 
   data << QString( "scale=%1" )    .arg( params.scale,   0, 'e', 12 );
+#if OCC_VERSION_LARGE <= 0x06070000 // the property is deprecated in OCCT 6.7.1
   data << QString( "centerX=%1" )  .arg( params.centerX, 0, 'e', 12 );
   data << QString( "centerY=%1" )  .arg( params.centerY, 0, 'e', 12 );
+#endif
   data << QString( "projX=%1" )    .arg( params.projX,   0, 'e', 12 );
   data << QString( "projY=%1" )    .arg( params.projY,   0, 'e', 12 );
   data << QString( "projZ=%1" )    .arg( params.projZ,   0, 'e', 12 );
@@ -2696,65 +2748,85 @@ SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
     aProps.setDimension( SUIT_CameraProperties::Dim2D );
     aProps.setViewSide( (SUIT_CameraProperties::ViewSide)(int)get2dMode() );
   }
-  
+
   // read common properites of the view
-  Standard_Real anUpDir[3];
-  Standard_Real aPrjDir[3];
-  Standard_Real aMapScale[2];
-  Standard_Real aTranslation[3];
+  Standard_Real anUp[3];
+  Standard_Real anAt[3];
+  Standard_Real anEye[3];
+  Standard_Real aProj[3];
   Standard_Real anAxialScale[3];
-  
-  aSourceView->Up(anUpDir[0], anUpDir[1], anUpDir[2]);
-  aSourceView->Proj(aPrjDir[0], aPrjDir[1], aPrjDir[2]);
-  aSourceView->At(aTranslation[0], aTranslation[1], aTranslation[2]);
-  aSourceView->Size(aMapScale[0], aMapScale[1]);
 
-  getViewPort()->getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  aSourceView->Up( anUp[0], anUp[1], anUp[2] );
+  aSourceView->At( anAt[0], anAt[1], anAt[2] );
+  aSourceView->Proj( aProj[0], aProj[1], aProj[2] );
+  getViewPort()->getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
 
-  // we use similar depth to the one used in perspective projection 
-  // to proivde a convinience synchronization with other camera views that
-  // can switch between orthogonal & perspective projection. otherwise,
-  // the camera will get to close when switching from orthogonal to perspective.
+  aProps.setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
+  aProps.setViewUp( anUp[0], anUp[1], anUp[2] );
+
+#if OCC_VERSION_LARGE > 0x06070000
+  aSourceView->Eye( anEye[0], anEye[1], anEye[2] );
+
+  // store camera properties "as is": it is up to synchronized
+  // view classes to provide necessary property conversion.
+  aProps.setPosition( anEye[0], anEye[1], anEye[2] );
+  aProps.setFocalPoint( anAt[0], anAt[1], anAt[2] );
+
+  if ( aSourceView->Camera()->IsOrthographic() )
+  {
+    aProps.setProjection( SUIT_CameraProperties::PrjOrthogonal );
+    aProps.setViewAngle( 0.0 );
+  }
+  else
+  {
+    aProps.setProjection( SUIT_CameraProperties::PrjPerspective );
+    aProps.setViewAngle( aSourceView->Camera()->FOVy() );
+  }
+  aProps.setMappingScale( aSourceView->Camera()->Scale() );
+#else
   Standard_Real aCameraDepth = aSourceView->Depth() + aSourceView->ZSize() * 0.5;
 
-  // store common props
-  aProps.setViewUp(anUpDir[0], anUpDir[1], anUpDir[2]);
-  aProps.setMappingScale(aMapScale[1] / 2.0);
-  aProps.setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
-  
   // generate view orientation matrix for transforming OCC projection reference point
   // into a camera (eye) position.
-  gp_Dir aLeftDir = gp_Dir(anUpDir[0], anUpDir[1], anUpDir[2]).Crossed(
-    gp_Dir(aPrjDir[0], aPrjDir[1], aPrjDir[2]));
+  gp_Dir aLeftDir = gp_Dir( anUp[0], anUp[1], anUp[2] ) ^ gp_Dir( aProj[0], aProj[1], aProj[2] );
 
-  gp_Trsf aTrsf;
-  aTrsf.SetValues( aLeftDir.X(), anUpDir[0], aPrjDir[0], aTranslation[0],
-                   aLeftDir.Y(), anUpDir[1], aPrjDir[1], aTranslation[1],
-                   aLeftDir.Z(), anUpDir[2], aPrjDir[2], aTranslation[2],
-                   Precision::Confusion(),
-                   Precision::Confusion() );
+  gp_GTrsf aTrsf;
+  aTrsf.SetValue( 1, 1, aLeftDir.X() );
+  aTrsf.SetValue( 2, 1, aLeftDir.Y() );
+  aTrsf.SetValue( 3, 1, aLeftDir.Z() );
 
-// get projection reference point in view coordinates
-#if OCC_VERSION_LARGE > 0x06070000
-  gp_Pnt aProjRef = aSourceView->Camera()->ProjectionShift();
-  aProjRef.SetX( -aProjRef.X() );
-  aProjRef.SetY( -aProjRef.Y() );
-#else
+  aTrsf.SetValue( 1, 2, anUp[0] );
+  aTrsf.SetValue( 2, 2, anUp[1] );
+  aTrsf.SetValue( 3, 2, anUp[2] );
+
+  aTrsf.SetValue( 1, 3, aProj[0] );
+  aTrsf.SetValue( 2, 3, aProj[1] );
+  aTrsf.SetValue( 3, 3, aProj[2] );
+
+  aTrsf.SetValue( 1, 4, anAt[0] );
+  aTrsf.SetValue( 2, 4, anAt[1] );
+  aTrsf.SetValue( 3, 4, anAt[2] );
+
   Graphic3d_Vertex aProjRef = aSourceView->ViewMapping().ProjectionReferencePoint();
-#endif
 
   // transform to world-space coordinate system
-  gp_Pnt aPosition = gp_Pnt(aProjRef.X(), aProjRef.Y(), aCameraDepth).Transformed(aTrsf);
-  
+  gp_XYZ aPosition( aProjRef.X(), aProjRef.Y(), aCameraDepth );
+  aTrsf.Transforms( aPosition );
+
   // compute focal point
   double aFocalPoint[3];
 
-  aFocalPoint[0] = aPosition.X() - aPrjDir[0] * aCameraDepth;
-  aFocalPoint[1] = aPosition.Y() - aPrjDir[1] * aCameraDepth;
-  aFocalPoint[2] = aPosition.Z() - aPrjDir[2] * aCameraDepth;
+  aFocalPoint[0] = aPosition.X() - aProj[0] * aCameraDepth;
+  aFocalPoint[1] = aPosition.Y() - aProj[1] * aCameraDepth;
+  aFocalPoint[2] = aPosition.Z() - aProj[2] * aCameraDepth;
 
-  aProps.setFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
-  aProps.setPosition(aPosition.X(), aPosition.Y(), aPosition.Z());
+  aProps.setFocalPoint( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+  aProps.setPosition( aPosition.X(), aPosition.Y(), aPosition.Z() );
+
+  Standard_Real aViewScale[2];
+  aSourceView->Size( aViewScale[0], aViewScale[1] );
+  aProps.setMappingScale( aViewScale[1] );
+#endif
 
   return aProps;
 }
@@ -2782,77 +2854,82 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   double anUpDir[3];
   double aPosition[3];
   double aFocalPoint[3];
-  double aMapScaling;
   double anAxialScale[3];
 
   // get common properties
-  aProps.getFocalPoint(aFocalPoint[0], aFocalPoint[1], aFocalPoint[2]);
-  aProps.getPosition(aPosition[0], aPosition[1], aPosition[2]);
-  aProps.getViewUp(anUpDir[0], anUpDir[1], anUpDir[2]);
-  aProps.getAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
-  aMapScaling = aProps.getMappingScale() * 2.0;
+  aProps.getFocalPoint( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+  aProps.getPosition( aPosition[0], aPosition[1], aPosition[2] );
+  aProps.getViewUp( anUpDir[0], anUpDir[1], anUpDir[2] );
+  aProps.getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
 
-  gp_Dir aProjDir(aPosition[0] - aFocalPoint[0],
-                  aPosition[1] - aFocalPoint[1],
-                  aPosition[2] - aFocalPoint[2]);
-  
+#if OCC_VERSION_LARGE > 0x06070000
+  aDestView->SetAt( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+  aDestView->SetEye( aPosition[0], aPosition[1], aPosition[2] );
+  aDestView->SetUp( anUpDir[0], anUpDir[1], anUpDir[2] );
+  aDestView->Camera()->SetScale( aProps.getMappingScale() );
+#else
+  gp_Dir aProjDir( aPosition[0] - aFocalPoint[0],
+                   aPosition[1] - aFocalPoint[1],
+                   aPosition[2] - aFocalPoint[2] );
+
   // get custom view translation
   Standard_Real aTranslation[3];
-  aDestView->At(aTranslation[0], aTranslation[1], aTranslation[2]);
+  aDestView->At( aTranslation[0], aTranslation[1], aTranslation[2] );
 
-  gp_Dir aLeftDir = gp_Dir(anUpDir[0], anUpDir[1], anUpDir[2]).Crossed(
-    gp_Dir(aProjDir.X(), aProjDir.Y(), aProjDir.Z()));
+  gp_Dir aLeftDir = gp_Dir( anUpDir[0], anUpDir[1], anUpDir[2] )
+                  ^ gp_Dir( aProjDir.X(), aProjDir.Y(), aProjDir.Z() );
 
-  // convert camera position into a view reference point
-  gp_Trsf aTrsf;
-  aTrsf.SetValues( aLeftDir.X(), anUpDir[0], aProjDir.X(), aTranslation[0],
-                   aLeftDir.Y(), anUpDir[1], aProjDir.Y(), aTranslation[1],
-                   aLeftDir.Z(), anUpDir[2], aProjDir.Z(), aTranslation[2], 
-                   Precision::Confusion(),
-                   Precision::Confusion() );
+  gp_GTrsf aTrsf;
+  aTrsf.SetValue( 1, 1, aLeftDir.X() );
+  aTrsf.SetValue( 2, 1, aLeftDir.Y() );
+  aTrsf.SetValue( 3, 1, aLeftDir.Z() );
+
+  aTrsf.SetValue( 1, 2, anUpDir[0] );
+  aTrsf.SetValue( 2, 2, anUpDir[1] );
+  aTrsf.SetValue( 3, 2, anUpDir[2] );
+
+  aTrsf.SetValue( 1, 3, aProjDir.X() );
+  aTrsf.SetValue( 2, 3, aProjDir.Y() );
+  aTrsf.SetValue( 3, 3, aProjDir.Z() );
+
+  aTrsf.SetValue( 1, 4, aTranslation[0] );
+  aTrsf.SetValue( 2, 4, aTranslation[1] );
+  aTrsf.SetValue( 3, 4, aTranslation[2] );
   aTrsf.Invert();
 
   // transform to view-space coordinate system
-  gp_Pnt aProjRef(aPosition[0], aPosition[1], aPosition[2]);
-  aProjRef.Transform(aTrsf);
+  gp_XYZ aProjRef( aPosition[0], aPosition[1], aPosition[2] );
+  aTrsf.Transforms( aProjRef );
 
-#if OCC_VERSION_LARGE > 0x06070000
-  aDestView->Camera()->SetDirection( -aProjDir );
-  aDestView->Camera()->SetUp( gp_Dir( anUpDir[0], anUpDir[1], anUpDir[2] ) );
-  aDestView->Camera()->SetProjectionShift( gp_Pnt( -aProjRef.X(), -aProjRef.Y(), 0.0 ) );
-#else
   // set view camera properties using low-level approach. this is done
   // in order to avoid interference with static variables in v3d view used
   // when rotation is in process in another view.
   Visual3d_ViewMapping aMapping = aDestView->View()->ViewMapping();
   Visual3d_ViewOrientation anOrientation = aDestView->View()->ViewOrientation();
 
-  Graphic3d_Vector aMappingProj(aProjDir.X(), aProjDir.Y(), aProjDir.Z());
-  Graphic3d_Vector aMappingUp(anUpDir[0], anUpDir[1], anUpDir[2]);
+  Graphic3d_Vector aMappingProj( aProjDir.X(), aProjDir.Y(), aProjDir.Z() );
+  Graphic3d_Vector aMappingUp( anUpDir[0], anUpDir[1], anUpDir[2] );
 
   aMappingProj.Normalize();
   aMappingUp.Normalize();
 
-  anOrientation.SetViewReferencePlane(aMappingProj);
-  anOrientation.SetViewReferenceUp(aMappingUp);
+  anOrientation.SetViewReferencePlane( aMappingProj );
+  anOrientation.SetViewReferenceUp( aMappingUp );
 
-  aDestView->SetViewMapping(aMapping);
-  aDestView->SetViewOrientation(anOrientation);
+  aDestView->SetViewMapping( aMapping );
+  aDestView->SetViewOrientation( anOrientation );
 
   // set panning
-  aDestView->SetCenter(aProjRef.X(), aProjRef.Y());
-#endif
+  aDestView->SetCenter( aProjRef.X(), aProjRef.Y() );
 
   // set mapping scale
+  double aMapScaling = aProps.getMappingScale();
   Standard_Real aWidth, aHeight;
-  aDestView->Size(aWidth, aHeight);
-  
-  if ( aWidth > aHeight )
-    aDestView->SetSize (aMapScaling * (aWidth / aHeight));
-  else
-    aDestView->SetSize (aMapScaling);
+  aDestView->Size( aWidth, aHeight );
+  aDestView->SetSize ( aWidth > aHeight ? aMapScaling * (aWidth / aHeight) : aMapScaling );
+#endif
 
-  getViewPort()->setAxialScale(anAxialScale[0], anAxialScale[1], anAxialScale[2]);
+  getViewPort()->setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
 
   aDestView->ZFitAll();
   aDestView->SetImmediateUpdate( Standard_True );

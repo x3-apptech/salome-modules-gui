@@ -42,66 +42,93 @@ class QtxAction;
 struct viewAspect
 {
 public:
-        double    scale;
-        double  centerX;
-        double  centerY;
-        double    projX;
-        double    projY;
-        double    projZ;
-        double    twist;
-        double      atX;
-        double      atY;
-        double      atZ;
-        double     eyeX;
-        double     eyeY;
-        double     eyeZ;
-        double   scaleX;
-        double   scaleY;
-        double   scaleZ;
-        QString    name;
-        bool     isVisible;
-        double   size;
-        // graduated trihedron
-        bool    gtIsVisible;
-        bool    gtDrawNameX;
-        bool    gtDrawNameY;
-        bool    gtDrawNameZ;
-        QString gtNameX;
-        QString gtNameY;
-        QString gtNameZ;
-        int     gtNameColorRX;
-        int     gtNameColorGX;
-        int     gtNameColorBX;
-        int     gtNameColorRY;
-        int     gtNameColorGY;
-        int     gtNameColorBY;
-        int     gtNameColorRZ;
-        int     gtNameColorGZ;
-        int     gtNameColorBZ;
-        bool    gtDrawValuesX;
-        bool    gtDrawValuesY;
-        bool    gtDrawValuesZ;
-        int     gtNbValuesX;
-        int     gtNbValuesY;
-        int     gtNbValuesZ;
-        int     gtOffsetX;
-        int     gtOffsetY;
-        int     gtOffsetZ;
-        int     gtColorRX;
-        int     gtColorGX;
-        int     gtColorBX;
-        int     gtColorRY;
-        int     gtColorGY;
-        int     gtColorBY;
-        int     gtColorRZ;
-        int     gtColorGZ;
-        int     gtColorBZ;
-        bool    gtDrawTickmarksX;
-        bool    gtDrawTickmarksY;
-        bool    gtDrawTickmarksZ;
-        int     gtTickmarkLengthX;
-        int     gtTickmarkLengthY;
-        int     gtTickmarkLengthZ;
+  double    scale;
+  double  centerX; // deprecated since OCCT 6.7.1
+  double  centerY; // deprecated since OCCT 6.7.1
+  double    projX;
+  double    projY;
+  double    projZ;
+  double    twist;
+  double      atX;
+  double      atY;
+  double      atZ;
+  double     eyeX;
+  double     eyeY;
+  double     eyeZ;
+  double   scaleX;
+  double   scaleY;
+  double   scaleZ;
+  QString    name;
+  bool     isVisible;
+  double   size;
+  // graduated trihedron
+  bool    gtIsVisible;
+  bool    gtDrawNameX;
+  bool    gtDrawNameY;
+  bool    gtDrawNameZ;
+  QString gtNameX;
+  QString gtNameY;
+  QString gtNameZ;
+  int     gtNameColorRX;
+  int     gtNameColorGX;
+  int     gtNameColorBX;
+  int     gtNameColorRY;
+  int     gtNameColorGY;
+  int     gtNameColorBY;
+  int     gtNameColorRZ;
+  int     gtNameColorGZ;
+  int     gtNameColorBZ;
+  bool    gtDrawValuesX;
+  bool    gtDrawValuesY;
+  bool    gtDrawValuesZ;
+  int     gtNbValuesX;
+  int     gtNbValuesY;
+  int     gtNbValuesZ;
+  int     gtOffsetX;
+  int     gtOffsetY;
+  int     gtOffsetZ;
+  int     gtColorRX;
+  int     gtColorGX;
+  int     gtColorBX;
+  int     gtColorRY;
+  int     gtColorGY;
+  int     gtColorBY;
+  int     gtColorRZ;
+  int     gtColorGZ;
+  int     gtColorBZ;
+  bool    gtDrawTickmarksX;
+  bool    gtDrawTickmarksY;
+  bool    gtDrawTickmarksZ;
+  int     gtTickmarkLengthX;
+  int     gtTickmarkLengthY;
+  int     gtTickmarkLengthZ;
+
+public:
+  viewAspect()
+  : scale( 0.0 ),
+    centerX( 0.0 ), centerY( 0.0 ),
+    projX( 0.0 ), projY( 0.0 ), projZ( 0.0 ),
+    twist( 0.0 ),
+    atX( 0.0 ), atY( 0.0 ), atZ( 0.0 ),
+    eyeX( 0.0 ), eyeY( 0.0 ), eyeZ( 0.0 ),
+    scaleX( 0.0 ), scaleY( 0.0 ), scaleZ( 0.0 ),
+    name(),
+    isVisible( false ),
+    size( 0.0 ),
+    gtIsVisible( false ),
+    gtDrawNameX( false ), gtDrawNameY( false ), gtDrawNameZ( false ),
+    gtNameX(), gtNameY(), gtNameZ(), 
+    gtNameColorRX( 0 ), gtNameColorGX( 0 ), gtNameColorBX( 0 ),
+    gtNameColorRY( 0 ), gtNameColorGY( 0 ), gtNameColorBY( 0 ),
+    gtNameColorRZ( 0 ), gtNameColorGZ( 0 ), gtNameColorBZ( 0 ),
+    gtDrawValuesX( false ), gtDrawValuesY( false ), gtDrawValuesZ( false ),
+    gtNbValuesX( 0 ), gtNbValuesY( 0 ), gtNbValuesZ( 0 ),
+    gtOffsetX( 0 ), gtOffsetY( 0 ), gtOffsetZ( 0 ),
+    gtColorRX( 0 ), gtColorGX( 0 ), gtColorBX( 0 ),
+    gtColorRY( 0 ), gtColorGY( 0 ), gtColorBY( 0 ),
+    gtColorRZ( 0 ), gtColorGZ( 0 ), gtColorBZ( 0 ),
+    gtDrawTickmarksX( false ), gtDrawTickmarksY( false ), gtDrawTickmarksZ( false ),
+    gtTickmarkLengthX( 0 ), gtTickmarkLengthY( 0 ), gtTickmarkLengthZ( 0 ) {}
 };
 
 typedef QList<viewAspect> viewAspectList;
