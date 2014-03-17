@@ -694,7 +694,9 @@ void SalomeApp_Study::closeDocument(bool permanently)
   _PTR(Study) studyPtr = studyDS();
   if ( studyPtr )
   {
-    if(permanently) {
+    if ( myObserver )
+      myStudyDS->detach( myObserver->_this() );
+    if ( permanently ) {
       SalomeApp_Application::studyMgr()->Close( studyPtr );
     }
     SALOMEDSClient_Study* aStudy = 0;
