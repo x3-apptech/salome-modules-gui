@@ -77,3 +77,9 @@ int SalomeApp_PyInterp::beforeRun()
   }
   return true;
 }
+
+void SalomeApp_PyInterp::closeContext()
+{
+    simpleRun( "import salome", false );
+    simpleRun( "salome.salome_close()", false );
+}

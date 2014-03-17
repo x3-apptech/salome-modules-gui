@@ -36,6 +36,7 @@ public:
   virtual ~SalomeApp_PyInterp();
 
   virtual void initPython();
+  virtual void closeContext();
 
 protected:
   virtual int  beforeRun();

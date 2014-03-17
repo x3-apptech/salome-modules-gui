@@ -254,6 +254,12 @@ void PyInterp_Interp::initialize()
   initRun();
 }
 
+void PyInterp_Interp::destroy()
+{
+  PyLockWrapper lck;
+  closeContext();
+}
+
 /*!
   \brief Initialize Python interpreter.
 
@@ -300,6 +306,10 @@ std::string PyInterp_Interp::getbanner() const
 bool PyInterp_Interp::initRun()
 {
   return true;
+}
+
+void PyInterp_Interp::closeContext()
+{
 }
 
 /*!

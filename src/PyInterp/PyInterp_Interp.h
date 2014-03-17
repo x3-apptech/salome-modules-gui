@@ -73,6 +73,7 @@ public:
   virtual ~PyInterp_Interp();
   
   void initialize();
+  void destroy();
 
   virtual int run(const char *command); 
 
@@ -106,6 +107,7 @@ protected:
   /** Initialize execution context. Must set the member _context, and return True on success. */
   virtual bool initContext() = 0;
   virtual bool initRun();
+  virtual void closeContext();
 };
 
 /**
