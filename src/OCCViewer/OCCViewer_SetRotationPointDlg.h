@@ -26,6 +26,9 @@
 #include "OCCViewer.h"
 
 #include <QDialog>
+#include <QMap>
+
+#include <TopAbs_ShapeEnum.hxx>
 
 class QtxAction;
 
@@ -33,6 +36,7 @@ class QLineEdit;
 class QPushButton;
 class QGroupBox;
 class QCheckBox;
+class QAction;
 
 class OCCViewer_ViewWindow;
 
@@ -54,6 +58,7 @@ public:
 protected:
   OCCViewer_ViewWindow* myView;
   QtxAction* myAction;
+  QMap<QAction*, TopAbs_ShapeEnum> mySelectActions;
 
   QCheckBox*    myIsBBCenter;
 
@@ -72,7 +77,7 @@ protected slots:
   void onBBCenterChecked();
   
   void onToOrigin();
-  void onSelectPoint();
+  void onSelectMenu( QAction* );
 
   void onCoordChanged();
 

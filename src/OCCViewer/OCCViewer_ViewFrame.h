@@ -27,6 +27,7 @@
 #include "OCCViewer_ViewWindow.h"
 
 #include <gp_Pln.hxx>
+#include <TopAbs_ShapeEnum.hxx>
 
 class SUIT_Desktop;
 class OCCViewer_Viewer;
@@ -118,7 +119,7 @@ public slots:
 
   virtual void activateSetRotationGravity() {}
   virtual void activateSetRotationSelected( double theX, double theY, double theZ ) {}
-  virtual void activateStartPointSelection() {}
+  virtual void activateStartPointSelection( TopAbs_ShapeEnum ) {}
   virtual void updateGravityCoords() {}
    
   void onMaximizedView( OCCViewer_ViewWindow*, bool );

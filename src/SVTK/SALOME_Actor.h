@@ -258,6 +258,10 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   SetCellAreaPicker(SVTK_AreaPicker* theAreaPicker);
 
   //----------------------------------------------------------------------------
+  //! To find a gravity center of object
+  double* GetGravityCenter( int );
+
+  //----------------------------------------------------------------------------
   //! To set up a prehighlight property (initialized by #SVTK_Renderer::AddActor)
   void
   SetPreHighlightProperty(vtkProperty* theProperty);

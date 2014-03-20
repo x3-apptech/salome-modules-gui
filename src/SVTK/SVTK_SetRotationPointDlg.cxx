@@ -38,11 +38,13 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QMenu>
 #include <QGridLayout>
 #include <QDoubleValidator>
 #include <QCheckBox>
 
 #include <vtkCallbackCommand.h>
+#include <vtkInteractorStyle.h>
 
 /*!
   Constructor
@@ -87,12 +89,19 @@ SVTK_SetRotationPointDlg
   vbox->addWidget(myToOrigin);
   connect(myToOrigin, SIGNAL(clicked()), this, SLOT(onToOrigin()));
 
-  // Create "Select Point from View" button
-  mySelectPoint = new QPushButton(myGroupBoxSel);
-  mySelectPoint->setText(tr("LBL_SELECTPOINT"));
+  // Create "Gravity Center of Select Object" button
+  mySelectPoint = new QPushButton(tr("LBL_SELECTPOINT"));
   mySelectPoint->setCheckable(true);
+
+  QMenu* menuType = new QMenu( this );
+  mySelectActions[ menuType->addAction( tr("LBL_POINT") ) ] = NodeSelection;
+  mySelectActions[ menuType->addAction( tr("LBL_EDGE") ) ] = EdgeSelection;
+  mySelectActions[ menuType->addAction( tr("LBL_FACE") ) ] = FaceSelection;
+  mySelectActions[ menuType->addAction( tr("LBL_VOLUME") ) ] = VolumeSelection;
+  connect( menuType, SIGNAL( triggered( QAction* ) ),  this, SLOT( onSelectMenu( QAction* ) ) );
+
+  mySelectPoint->setMenu( menuType );
   vbox->addWidget(mySelectPoint);
-  connect(mySelectPoint, SIGNAL(clicked()), this, SLOT(onSelectPoint()));
 
   // Create croup box with grid layout
   myGroupBoxCoord = new QGroupBox(this);
@@ -165,7 +174,6 @@ SVTK_SetRotationPointDlg
   myEventCallbackCommand->Delete();
   myEventCallbackCommand->SetClientData(this);
   myEventCallbackCommand->SetCallback(SVTK_SetRotationPointDlg::ProcessEvents);
-  myIsObserverAdded = false;
 }
 
 /*
@@ -181,11 +189,10 @@ void
 SVTK_SetRotationPointDlg
 ::addObserver()
 {
-  if ( !myIsObserverAdded ) {
-    vtkInteractorStyle* aIStyle = myRWInteractor->GetInteractorStyle();
+  vtkInteractorStyle* aIStyle = myRWInteractor->GetInteractorStyle();
+  if( !IsObserverAdded( aIStyle ) ) {
     aIStyle->AddObserver(SVTK::BBCenterChanged, myEventCallbackCommand.GetPointer(), myPriority);
     aIStyle->AddObserver(SVTK::RotationPointChanged, myEventCallbackCommand.GetPointer(), myPriority);
-    myIsObserverAdded = true;
   }
 }
 
@@ -239,6 +246,21 @@ SVTK_SetRotationPointDlg
   }
 }
 
+bool
+SVTK_SetRotationPointDlg
+::IsObserverAdded( vtkInteractorStyle* theInteractorStyle )
+{
+  bool isAdded = false;
+  for( int i = 0; i < myInteractorStyleList.count(); i++ )
+    if( myInteractorStyleList.at(i) == theInteractorStyle )
+      isAdded = true;
+
+  if( !isAdded )
+    myInteractorStyleList.append( theInteractorStyle );
+
+  return isAdded;
+}
+
 void 
 SVTK_SetRotationPointDlg
 ::setEnabled(QGroupBox* theGrp, const bool theState)
@@ -284,8 +306,7 @@ void
 SVTK_SetRotationPointDlg
 ::onToOrigin()
 {
-  if ( mySelectPoint->isChecked() )
-    mySelectPoint->toggle();
+  mySelectPoint->setChecked( false );
   myX->setText(QString::number(0.0));
   myY->setText(QString::number(0.0));
   myZ->setText(QString::number(0.0));
@@ -293,12 +314,10 @@ SVTK_SetRotationPointDlg
 
 void
 SVTK_SetRotationPointDlg
-::onSelectPoint()
+::onSelectMenu( QAction* theAction )
 {
-  if ( mySelectPoint->isChecked() )
-    myMainWindow->activateStartPointSelection();
-  else
-    mySelectPoint->toggle();
+  mySelectPoint->setChecked( true );
+  myMainWindow->activateStartPointSelection( mySelectActions[theAction] );
 }
 
 void

@@ -351,7 +351,23 @@
     </message>
     <message>
         <source>LBL_SELECTPOINT</source>
-        <translation>Choisir le point dans la vue</translation>
+        <translation>Сentre de gravité des objets sélectionnés</translation>
+    </message>
+    <message>
+        <source>LBL_POINT</source>
+        <translation>Point</translation>
+    </message>
+    <message>
+        <source>LBL_EDGE</source>
+        <translation>Arête</translation>
+    </message>
+    <message>
+        <source>LBL_FACE</source>
+        <translation>Face</translation>
+    </message>
+    <message>
+        <source>LBL_SOLID</source>
+        <translation>Solide</translation>
     </message>
 </context>
 <context>

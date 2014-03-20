@@ -65,6 +65,8 @@
 
 #include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
 #include <TopoDS.hxx>
 
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
@@ -488,19 +490,37 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
           for ( ic->InitSelected(); ic->MoreSelected(); ic->NextSelected() )
           {
             TopoDS_Shape aShape = ic->SelectedShape();
+            GProp_GProps aSystem;
+            gp_Pnt aPnt;
             if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX )
             {
-              gp_Pnt aPnt = BRep_Tool::Pnt( TopoDS::Vertex( ic->SelectedShape() ) );
-              if ( mySetRotationPointDlg )
-              {
-                myRotationPointSelection = false;
-                mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
-              }
+              aPnt = BRep_Tool::Pnt( TopoDS::Vertex( aShape ) );
+            }
+            else if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE )
+            {
+              BRepGProp::LinearProperties( aShape, aSystem );
+              aPnt = aSystem.CentreOfMass();
+            }
+            else if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_FACE )
+            {
+              BRepGProp::SurfaceProperties( aShape, aSystem );
+              aPnt = aSystem.CentreOfMass();
+            }
+            else if ( !aShape.IsNull() && aShape.ShapeType() == TopAbs_SOLID )
+            {
+              BRepGProp::VolumeProperties( aShape, aSystem );
+              aPnt = aSystem.CentreOfMass();
             }
             else
             {
               myCurrPointType = myPrevPointType;
               break;
+            }
+
+            if ( mySetRotationPointDlg )
+            {
+              myRotationPointSelection = false;
+              mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
             }
           }
           if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
@@ -744,9 +764,9 @@ void OCCViewer_ViewWindow::activateSetRotationSelected( double theX, double theY
 }
 
 /*!
-  \brief Start the point selection process.
+  \brief Start the shape selection process.
 */
-void OCCViewer_ViewWindow::activateStartPointSelection()
+void OCCViewer_ViewWindow::activateStartPointSelection( TopAbs_ShapeEnum theShapeType )
 {
   myPrevPointType = myCurrPointType;
   myCurrPointType = SELECTED;
@@ -765,7 +785,7 @@ void OCCViewer_ViewWindow::activateStartPointSelection()
          anObj->IsKind( STANDARD_TYPE(AIS_Shape) ) )
     {
       ic->Load(anObj,-1);
-      ic->Activate(anObj,AIS_Shape::SelectionMode(TopAbs_VERTEX));
+      ic->Activate(anObj,AIS_Shape::SelectionMode(theShapeType));
      }
   }
   // activate selection <------

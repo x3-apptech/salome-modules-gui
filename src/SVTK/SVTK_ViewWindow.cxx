@@ -1866,10 +1866,11 @@ void SVTK_ViewWindow::activateSetRotationSelected(void* theData)
 }
 
 /*!
-  Set the point selected by user as a rotation point
+  Set the gravity center of element selected by user as a rotation point
 */
-void SVTK_ViewWindow::activateStartPointSelection()
+void SVTK_ViewWindow::activateStartPointSelection( Selection_Mode theSelectionMode )
 {
+  SetSelectionMode( theSelectionMode );
   myEventDispatcher->InvokeEvent(SVTK::StartPointSelection,0);
 }
 

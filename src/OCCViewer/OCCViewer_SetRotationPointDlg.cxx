@@ -30,6 +30,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QMenu>
 #include <QGridLayout>
 #include <QDoubleValidator>
 #include <QCheckBox>
@@ -77,11 +78,20 @@ OCCViewer_SetRotationPointDlg::OCCViewer_SetRotationPointDlg( OCCViewer_ViewWind
   vbox->addWidget(myToOrigin);
   connect(myToOrigin, SIGNAL(clicked()), this, SLOT(onToOrigin()));
 
-  // Create "Select Point from View" button
+  // Create "Gravity Center of Select Object" button
   mySelectPoint = new QPushButton(tr("LBL_SELECTPOINT"));
   mySelectPoint->setCheckable(true);
+
+  QMenu* menuType = new QMenu( this );
+  mySelectActions[ menuType->addAction( tr("LBL_POINT") ) ] = TopAbs_VERTEX;
+  mySelectActions[ menuType->addAction( tr("LBL_EDGE") ) ] = TopAbs_EDGE;
+  mySelectActions[ menuType->addAction( tr("LBL_FACE") ) ] = TopAbs_FACE;
+  mySelectActions[ menuType->addAction( tr("LBL_SOLID") ) ] = TopAbs_SOLID;
+  connect( menuType, SIGNAL( triggered( QAction* ) ),  this, SLOT( onSelectMenu( QAction* ) ) );
+
+  mySelectPoint->setMenu( menuType );
+
   vbox->addWidget(mySelectPoint);
-  connect(mySelectPoint, SIGNAL(clicked()), this, SLOT(onSelectPoint()));
 
   myGroupBoxSel->setLayout(vbox);
 
@@ -217,8 +227,7 @@ void
 OCCViewer_SetRotationPointDlg
 ::onToOrigin()
 {
-  if ( mySelectPoint->isChecked() )
-    mySelectPoint->toggle();
+  mySelectPoint->setChecked( false );
   setCoords();
   myView->activateSetRotationSelected(myX->text().toDouble(), 
                                       myY->text().toDouble(), 
@@ -227,12 +236,10 @@ OCCViewer_SetRotationPointDlg
 
 void
 OCCViewer_SetRotationPointDlg
-::onSelectPoint()
+::onSelectMenu( QAction* theAction )
 {
-  if ( mySelectPoint->isChecked() )
-    myView->activateStartPointSelection();
-  else
-    mySelectPoint->toggle();
+  mySelectPoint->setChecked( true );
+  myView->activateStartPointSelection( mySelectActions[theAction] );
 }
 
 void

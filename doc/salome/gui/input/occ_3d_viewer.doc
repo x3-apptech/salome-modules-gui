@@ -100,8 +100,8 @@ define the coordinates of the rotation point manually.
 - <b>Set to Origin</b> button restores the default rotation point
   coordinates.
 
-- <b>Select Point from View</b> button allows to select the rotation
-  point in the 3D Viewer.
+- <b>Gravity Center of Select Object</b> button allows to choose Point, Edge, Face or Solid in drop-down menu.
+  As soon as corresponding object is selected in the viewer, its gravity center will be used as center of the rotation point.
 
 <hr>
 

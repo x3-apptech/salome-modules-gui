@@ -91,7 +91,7 @@ which the rotation is performed.
 By default the rotation point is located in the Center of the bounding
 box of an object.
 
-\image html set_rotation_point_dialog2.png
+\image html set_rotation_point_dialog3.png
 
 Unchecking <b>Use Bounding Box Center</b> check-box allows you to
 define the coordinates of the rotation point manually.
@@ -99,8 +99,8 @@ define the coordinates of the rotation point manually.
 - <b>Set to Origin</b> button restores the default rotation point
   coordinates.
 
-- <b>Select Point from View</b> button allows to select the rotation
-  point in the 3D Viewer.
+- <b>Gravity Center of Select Object</b> button allows to choose Point, Edge, Face or Volume in drop-down menu.
+  As soon as corresponding object is selected in the viewer, its gravity center will be used as center of the rotation point.
 
 <hr>
 
@@ -123,12 +123,12 @@ These buttons orientate the scene strictly about coordinate axes:
 
 \image html vtk_view_anticlockwise.png
 
-<b>Rotate counter-clockwise</b> - rotates view 90° counter-clockwise.
+<b>Rotate counter-clockwise</b> - rotates view 90ï¿½ counter-clockwise.
 <hr>
 
 \image html vtk_view_clockwise.png
 
-<b>Rotate clockwise</b> - rotates view 90° clockwise.
+<b>Rotate clockwise</b> - rotates view 90ï¿½ clockwise.
 <hr>
 
 \image html vtk_view_reset.png

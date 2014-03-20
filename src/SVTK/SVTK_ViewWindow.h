@@ -294,7 +294,7 @@ public slots:
 
   void activateSetRotationGravity();
   void activateSetRotationSelected(void* theData);
-  void activateStartPointSelection();
+  void activateStartPointSelection( Selection_Mode );
 
   void onUpdateRate(bool theIsActivate);
   void onNonIsometric(bool theIsActivate);

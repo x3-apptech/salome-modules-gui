@@ -449,7 +449,23 @@ Please, refer to the documentation.</translation>
     </message>
     <message>
         <source>LBL_SELECTPOINT</source>
-        <translation>Select Point from View</translation>
+        <translation>Gravity Center of Select Object</translation>
+    </message>
+    <message>
+        <source>LBL_POINT</source>
+        <translation>Point</translation>
+    </message>
+    <message>
+        <source>LBL_EDGE</source>
+        <translation>Edge</translation>
+    </message>
+    <message>
+        <source>LBL_FACE</source>
+        <translation>Face</translation>
+    </message>
+    <message>
+        <source>LBL_VOLUME</source>
+        <translation>Volume</translation>
     </message>
     <message>
         <source>DLG_TITLE</source>

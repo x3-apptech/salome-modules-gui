@@ -28,6 +28,7 @@
 #include "SUIT_ViewWindow.h"
 #include <gp_Pnt.hxx>
 #include <V3d_Plane.hxx>
+#include <TopAbs_ShapeEnum.hxx>
 
 class QtxRectRubberBand;
 class SUIT_Desktop;
@@ -266,7 +267,7 @@ public slots:
 
   virtual void activateSetRotationGravity();
   virtual void activateSetRotationSelected( double theX, double theY, double theZ );
-  virtual void activateStartPointSelection();
+  virtual void activateStartPointSelection( TopAbs_ShapeEnum );
   virtual void updateGravityCoords();
    
   virtual void showEvent( QShowEvent * );

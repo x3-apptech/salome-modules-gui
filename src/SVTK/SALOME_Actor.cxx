@@ -1019,6 +1019,38 @@ SALOME_Actor
 }
 
 /*!
+  To find a gravity center of object
+  \param theObjId - identification of object
+*/
+double*
+SALOME_Actor
+::GetGravityCenter( int theObjId )
+{
+  double* result = new double[3];
+  for( int i = 0; i < 3; i++ )
+    result[i]= 0.0;
+
+  vtkPoints* points = GetElemCell( theObjId )->GetPoints();
+  int nbPoints = points->GetNumberOfPoints();
+
+  if( nbPoints <= 0 )
+    return NULL;
+
+  for( int i = 0; i < nbPoints; i++ )
+  {
+    double* aPoint = points->GetPoint(i);
+    result[0] += aPoint[0];
+    result[1] += aPoint[1];
+    result[2] += aPoint[2];
+  }
+  result[0] = result[0] / nbPoints;
+  result[1] = result[1] / nbPoints;
+  result[2] = result[2] / nbPoints;
+
+  return result;
+}
+
+/*!
   To set up a prehighlight property (initialized by SVTK_Renderer::AddActor)
 */
 void

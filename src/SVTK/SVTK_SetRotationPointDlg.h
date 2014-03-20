@@ -28,10 +28,14 @@
 #define SVTK_SETROTATIONPOINTDLG_H
 
 #include "SVTK.h"
+#include "SVTK_Selection.h"
 
 #include <ViewerTools_DialogBase.h>
 
 #include <vtkSmartPointer.h>
+
+#include <QMap>
+#include <QList>
 
 class SVTK_ViewWindow;
 class SVTK_RenderWindowInteractor;
@@ -42,8 +46,10 @@ class QLineEdit;
 class QPushButton;
 class QGroupBox;
 class QCheckBox;
+class QAction;
 
 class vtkCallbackCommand;
+class vtkInteractorStyle;
 class vtkObject;
 
 class SVTK_EXPORT SVTK_SetRotationPointDlg : public ViewerTools_DialogBase
@@ -63,8 +69,10 @@ public:
 protected:
   SVTK_ViewWindow *myMainWindow;
   SVTK_RenderWindowInteractor* myRWInteractor;
-  bool myIsObserverAdded;
+  QList<vtkInteractorStyle*> myInteractorStyleList;
   
+  QMap<QAction*, Selection_Mode> mySelectActions;
+
   QCheckBox*    myIsBBCenter;
 
   QGroupBox   * myGroupBoxSel;
@@ -77,6 +85,7 @@ protected:
   QLineEdit* myZ;
 
   void setEnabled(QGroupBox* theGrp, const bool theState);
+  bool IsObserverAdded( vtkInteractorStyle* );
 
   //----------------------------------------------------------------------------
   // Priority at which events are processed
@@ -96,7 +105,7 @@ protected slots:
   void onBBCenterChecked();
   
   void onToOrigin();
-  void onSelectPoint();
+  void onSelectMenu( QAction* );
 
   void onCoordChanged();
 

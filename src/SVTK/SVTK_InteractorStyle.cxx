@@ -48,6 +48,7 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCallbackCommand.h>
@@ -535,22 +536,61 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
         {
           if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aVTKActor ) )
           {
-            SVTK::TPickLimiter aPickLimiter( myPointPicker, anActor );
-            myPointPicker->Pick( aSelectionEvent->myX,
-                                 aSelectionEvent->myY, 
-                                 0.0, 
+        	Selection_Mode aSelectionMode = GetSelector()->SelectionMode();
+        	double* aCoords;
+        	int aVtkId;
+        	bool isTrueType = false;
+        	
+        	if( myCurrFocalPointType == SVTK::StartFocalPointSelection ||
+        		( myCurrRotationPointType == SVTK::StartPointSelection && aSelectionMode == NodeSelection ) )
+        	{
+              SVTK::TPickLimiter aPickLimiter( myPointPicker, anActor );
+              myPointPicker->Pick( aSelectionEvent->myX,
+                                   aSelectionEvent->myY,
+                                   0.0,
+                                   GetCurrentRenderer() );
+              aVtkId = myPointPicker->GetPointId();
+              if ( aVtkId >= 0 )
+              {
+                int anObjId = anActor->GetNodeObjId( aVtkId );
+                aCoords = anActor->GetNodeCoord(anObjId);
+                isTrueType = true;
+              }
+        	}
+
+        	if( aSelectionMode == EdgeSelection || aSelectionMode == FaceSelection ||  aSelectionMode == VolumeSelection )
+        	{
+              vtkSmartPointer<vtkCellPicker> aCellPicker = vtkCellPicker::New();
+              aCellPicker->SetTolerance( 0.005 );
+              SVTK::TPickLimiter aPickLimiter( aCellPicker, anActor );
+              aCellPicker->Pick( aSelectionEvent->myX,
+                                 aSelectionEvent->myY,
+                                 0.0,
                                  GetCurrentRenderer() );
-            int aVtkId = myPointPicker->GetPointId();
-            if ( aVtkId >= 0 )
-            {
-              int anObjId = anActor->GetNodeObjId( aVtkId );
-              double* aCoords = anActor->GetNodeCoord(anObjId);
-              
+              aVtkId = aCellPicker->GetCellId();
+              int aCellId = anActor->GetElemObjId( aVtkId );
+
+              if( aSelectionMode == EdgeSelection )
+            	isTrueType = anActor->GetObjDimension( aCellId ) == 1;
+              else if( aSelectionMode == FaceSelection )
+            	isTrueType = anActor->GetObjDimension( aCellId ) == 2;
+              else if( aSelectionMode == VolumeSelection )
+            	isTrueType = anActor->GetObjDimension( aCellId ) == 3;
+
+              if ( aVtkId >= 0 && isTrueType )
+                aCoords = anActor->GetGravityCenter( aCellId );
+        	}
+
+        	if( aVtkId >= 0 )
+        	{
               if (myCurrRotationPointType == SVTK::StartPointSelection) {
                 myCurrRotationPointType = SVTK::SetRotateSelected;
-                
                 // invoke event for update coordinates in SVTK_SetRotationPointDlg
-                InvokeEvent(SVTK::RotationPointChanged,(void*)aCoords);
+                if( isTrueType )
+                  InvokeEvent(SVTK::RotationPointChanged,(void*)aCoords);
+                else
+                  InvokeEvent(SVTK::RotationPointChanged);
+                GetSelector()->SetSelectionMode(ActorSelection);
               }
               else if (myCurrFocalPointType == SVTK::StartFocalPointSelection) {
                 myCurrFocalPointType = SVTK::SetFocalPointSelected;
@@ -572,6 +612,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
           // invoke event with no data (for SVTK_SetRotationPointDlg)
           InvokeEvent(SVTK::RotationPointChanged,0);
           myCurrRotationPointType = myPrevRotationPointType;
+          GetSelector()->SetSelectionMode(ActorSelection);
         }
         else if (myCurrFocalPointType == SVTK::StartFocalPointSelection) {
           // invoke event with no data (for SVTK_ViewParameterDlg)
@@ -1310,8 +1351,7 @@ void SVTK_InteractorStyle::onCursorMove(QPoint mousePos)
   SALOME_Actor* aPreHighlightedActor = NULL;
   vtkActorCollection* anActorCollection = GetSelector()->Pick(aSelectionEvent, GetCurrentRenderer());
 
-  if ( myCurrRotationPointType == SVTK::StartPointSelection ||
-       myCurrFocalPointType == SVTK::StartFocalPointSelection )
+  if ( myCurrFocalPointType == SVTK::StartFocalPointSelection )
   {
     myHighlightSelectionPointActor->SetVisibility( false );
 
