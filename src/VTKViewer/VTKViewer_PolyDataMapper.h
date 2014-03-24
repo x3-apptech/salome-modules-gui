@@ -75,6 +75,11 @@ public:
   
   bool GetBallEnabled( );
 
+  //! Set ball scale factor
+  void SetBallScale( int );
+
+  int GetBallScale( );
+
   //! Set standard point marker
   void SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
 
@@ -125,7 +130,8 @@ private:
   GLhandleARB       VertexProgram;
 
   bool              MarkerEnabled;
-  bool              BallEnabled;  
+  bool              BallEnabled; 
+  int               BallScale;
   VTK::MarkerType   MarkerType;
   VTK::MarkerScale  MarkerScale;
   int               MarkerId;

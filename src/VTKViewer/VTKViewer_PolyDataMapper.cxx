@@ -254,6 +254,7 @@ VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
   this->MarkerScale               = VTK::MS_NONE;
   this->MarkerId                  = 0;
   this->BallEnabled               = false;
+  this->BallScale                 = VTK::MS_10;
   this->VertexProgram             = 0;
 }
 
@@ -382,6 +383,19 @@ void VTKViewer_PolyDataMapper::SetBallEnabled( bool theBallEnabled )
     this->ImageData = this->SpecialTextures[BallTextureId];
   }
   this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+int VTKViewer_PolyDataMapper::GetBallScale()
+{
+  return this->BallScale;
+}
+//-----------------------------------------------------------------------------
+void VTKViewer_PolyDataMapper::SetBallScale( int theBallScale )
+{
+  if( this->BallScale == theBallScale )
+    return;
+  this->BallScale = theBallScale;
 }
 
 //-----------------------------------------------------------------------------
@@ -778,8 +792,9 @@ namespace VTK
                    TVertex* theVertexArr,
                    vtkIdType &theCellId,
                    vtkIdType &theVertexId,
-		   TBall* theBallArr,
-		   vtkDataArray* theDiamArray)
+                   TBall* theBallArr,
+                   vtkDataArray* theDiamArray,
+                   int theBallScale )
   {
     vtkIdType* ptIds = theCells->GetPointer();
     vtkIdType* endPtIds = ptIds + theCells->GetNumberOfConnectivityEntries();
@@ -810,7 +825,7 @@ namespace VTK
       }
       
       if(mapBalls){
-	theBallArr[theCellId] = (TBall)theDiamArray->GetTuple(theCellId)[0];
+        theBallArr[theCellId] = (TBall)theDiamArray->GetTuple(theCellId)[0]*theBallScale;
       }
 
       ++theCellId;
@@ -823,7 +838,8 @@ namespace VTK
                         vtkPoints* thePoints,
                         TColorFunctorBase* theColorFunctor,
                         TVertex* theVertexArr,
-			TBall* theBallArr)
+                        TBall* theBallArr,
+                        int theBallScale )
   {
     vtkIdType aCellId = 0, aVertexId = 0;
 
@@ -831,17 +847,17 @@ namespace VTK
     vtkDataArray* aDiams = theInput->GetCellData() ? theInput->GetCellData()->GetScalars() : 0;    
 
     if ( vtkCellArray* aCellArray = theInput->GetVerts() ) {
-      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams);
+      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams, theBallScale );
     }
   
     if ( vtkCellArray* aCellArray = theInput->GetLines() )
-      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams);
+      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams, theBallScale );
   
     if ( vtkCellArray* aCellArray = theInput->GetPolys() )
-      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams);
+      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams, theBallScale );
   
     if ( vtkCellArray* aCellArray = theInput->GetStrips() )
-      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams); 
+      DrawPoints( aStartPoints, aCellArray, theColorFunctor, theVertexArr, aCellId, aVertexId, theBallArr, aDiams, theBallScale ); 
   }
 } // namespace VTK
 
@@ -920,9 +936,9 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
           aColorFunctor = new VTK::TPropertyColor( prop );
         }
         if ( points->GetDataType() == VTK_FLOAT )
-          VTK::DrawCellsPoints< float >( input, points, aColorFunctor, aVertexArr, aBallArray );
+          VTK::DrawCellsPoints< float >( input, points, aColorFunctor, aVertexArr, aBallArray, GetBallScale() );
         else
-          VTK::DrawCellsPoints< double >( input, points, aColorFunctor, aVertexArr, aBallArray );
+          VTK::DrawCellsPoints< double >( input, points, aColorFunctor, aVertexArr, aBallArray, GetBallScale() );
 
         delete aColorFunctor;
       }
