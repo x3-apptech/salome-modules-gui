@@ -26,8 +26,6 @@
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewModel.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <SUIT_ViewManager.h>
 #include <SUIT_ViewModel.h>
 

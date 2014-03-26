@@ -23,6 +23,8 @@
 #ifndef OCCVIEWER_VIEWPORT3D_H
 #define OCCVIEWER_VIEWPORT3D_H
 
+#include <Basics_OCCTVersion.hxx>
+
 #include "OCCViewer_ViewPort.h"
 #include "Qtx.h"
 
