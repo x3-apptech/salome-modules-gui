@@ -291,7 +291,20 @@ class SalomePyQt
 %End
 
 public:
+/* KeepReference is necessary on method getDesktop with SIP >= 4.15.5 to avoid garbage collection of
+   the Python objects added to the desktop. This causes a small memory leak (the wrapper around desktop
+   object is never garbage collected) but since this object contains only references this is not
+   considered a big problem. With versions < 4.15, it seems that this reference was kept implicitly.
+   No proper solution was found for versions between 4.15 and 4.15.4 (included), so those versions
+   should not be used to compile GUI module.
+*/
+%If (SIP_4_15_5 - )
+  static QWidget*          getDesktop() /ReleaseGIL,KeepReference/ ;
+%End
+%If ( - SIP_4_15_5)
   static QWidget*          getDesktop() /ReleaseGIL/ ;
+%End
+
   static QWidget*          getMainFrame() /ReleaseGIL/ ;
   static QMenuBar*         getMainMenuBar() /ReleaseGIL/ ;
   static QMenu*            getPopupMenu( const MenuName ) /ReleaseGIL/ ;
