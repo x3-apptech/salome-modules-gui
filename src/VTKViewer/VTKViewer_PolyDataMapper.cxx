@@ -254,7 +254,7 @@ VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
   this->MarkerScale               = VTK::MS_NONE;
   this->MarkerId                  = 0;
   this->BallEnabled               = false;
-  this->BallScale                 = VTK::MS_10;
+  this->BallScale                 = 1.0;
   this->VertexProgram             = 0;
 }
 
@@ -386,12 +386,12 @@ void VTKViewer_PolyDataMapper::SetBallEnabled( bool theBallEnabled )
 }
 
 //-----------------------------------------------------------------------------
-int VTKViewer_PolyDataMapper::GetBallScale()
+double VTKViewer_PolyDataMapper::GetBallScale()
 {
   return this->BallScale;
 }
 //-----------------------------------------------------------------------------
-void VTKViewer_PolyDataMapper::SetBallScale( int theBallScale )
+void VTKViewer_PolyDataMapper::SetBallScale( double theBallScale )
 {
   if( this->BallScale == theBallScale )
     return;
@@ -794,7 +794,7 @@ namespace VTK
                    vtkIdType &theVertexId,
                    TBall* theBallArr,
                    vtkDataArray* theDiamArray,
-                   int theBallScale )
+                   double theBallScale )
   {
     vtkIdType* ptIds = theCells->GetPointer();
     vtkIdType* endPtIds = ptIds + theCells->GetNumberOfConnectivityEntries();
@@ -839,7 +839,7 @@ namespace VTK
                         TColorFunctorBase* theColorFunctor,
                         TVertex* theVertexArr,
                         TBall* theBallArr,
-                        int theBallScale )
+                        double theBallScale )
   {
     vtkIdType aCellId = 0, aVertexId = 0;
 
