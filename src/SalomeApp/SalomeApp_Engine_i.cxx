@@ -340,7 +340,7 @@ SALOME_NamingService* SalomeApp_Engine_i::namingService()
   \param theComponentName - synthetic "component data type" used to identify a given light module
   \return Object reference to the CORBA engine
 */
-CORBA::Object_ptr SalomeApp_Engine_i::engineForComponent( const char* theComponentName,
+CORBA::Object_ptr SalomeApp_Engine_i::EngineForComponent( const char* theComponentName,
 							  bool toCreate )
 {
   CORBA::Object_var anEngine;
@@ -384,7 +384,7 @@ std::string SalomeApp_Engine_i::EngineIORForComponent( const char* theComponentN
 						       bool toCreate )
 {
   std::string anIOR( "" );
-  CORBA::Object_var anEngine = engineForComponent( theComponentName, toCreate );
+  CORBA::Object_var anEngine = EngineForComponent( theComponentName, toCreate );
   if ( !CORBA::is_nil( anEngine ) )
   {
     CORBA::String_var objStr = orb()->object_to_string( anEngine.in() );
@@ -402,7 +402,7 @@ SalomeApp_Engine_i* SalomeApp_Engine_i::GetInstance( const char* theComponentNam
 						     bool toCreate )
 {
   SalomeApp_Engine_i* aServant = 0;
-  CORBA::Object_var anEngine = engineForComponent( theComponentName, toCreate );
+  CORBA::Object_var anEngine = EngineForComponent( theComponentName, toCreate );
   if ( !CORBA::is_nil( anEngine ) )
   {
     PortableServer::Servant aServantBase = poa()->reference_to_servant( anEngine.in() );

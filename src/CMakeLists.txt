@@ -108,7 +108,7 @@ SET(SUBDIRS_LIGHT LightApp ResExporter)
 # Full (CORBA) SALOME packages
 ##
 IF(NOT SALOME_LIGHT_ONLY)
-  SET(SUBDIRS_CORBA TOOLSGUI Session SalomeApp GuiHelpers TreeData)
+  SET(SUBDIRS_CORBA TOOLSGUI SalomeApp Session GuiHelpers TreeData)
 ENDIF(NOT SALOME_LIGHT_ONLY)
 
 SET(SUBDIRS

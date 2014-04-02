@@ -72,6 +72,9 @@ public:
   static SalomeApp_Engine_i* GetInstance          ( const char* theComponentName,
 						    bool toCreate ); 
 
+  static CORBA::Object_ptr   EngineForComponent( const char* theComponentName,
+						 bool toCreate  );
+
 public:
   // methods from SALOMEDS::Driver without implementation.  Must be redefined because 
   // there is no default implementation of SALOMEDS::Driver interface
@@ -94,9 +97,6 @@ private:
   static CORBA::ORB_var              orb();
   static PortableServer::POA_var     poa();
   static SALOME_NamingService*       namingService();
-  static CORBA::Object_ptr           engineForComponent( const char* theComponentName,
-							 bool toCreate  );
-
 private:
   typedef std::map<int, ListOfFiles> MapOfListOfFiles;
   MapOfListOfFiles                   myMap;

@@ -28,10 +28,12 @@ INCLUDE_DIRECTORIES(
   ${OMNIORB_INCLUDE_DIR}
   ${PTHREAD_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR}
+  ${PROJECT_BINARY_DIR}/idl
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/Event
   ${PROJECT_SOURCE_DIR}/src/Style
+  ${PROJECT_SOURCE_DIR}/src/SalomeApp
 )
 
 # additional preprocessor / compiler flags
@@ -63,7 +65,7 @@ SET(_link_LIBRARIES
   ${KERNEL_SalomeLauncher}
   ${KERNEL_Registry}
   ${KERNEL_SALOMEBasics}
-  qtx suit Event SalomeStyle SalomeIDLGUI
+  qtx suit Event SalomeStyle SalomeApp SalomeIDLGUI
 )
 IF(ENABLE_TESTRECORDER)
   LIST(APPEND _link_LIBRARIES ${TESTRECORDER_LIBS})

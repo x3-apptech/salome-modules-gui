@@ -29,7 +29,7 @@
 
 #include "SALOME_NamingService.hxx"
 #include "SALOME_Event.h"
-
+#include "SalomeApp_Engine_i.h"
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Study.h"
@@ -80,10 +80,16 @@ Engines::EngineComponent_ptr SALOME_Session_i::GetComponent(const char* theLibra
   typedef Engines::EngineComponent_ptr TGetImpl(CORBA::ORB_ptr,
                                                 PortableServer::POA_ptr,
                                                 SALOME_NamingService*,QMutex*);
-  OSD_SharedLibrary  aSharedLibrary(const_cast<char*>(theLibraryName));
-  if(aSharedLibrary.DlOpen(OSD_RTLD_LAZY))
-    if(OSD_Function anOSDFun = aSharedLibrary.DlSymb("GetImpl"))
+  OSD_SharedLibrary aSharedLibrary(const_cast<char*>(theLibraryName));
+  if (aSharedLibrary.DlOpen(OSD_RTLD_LAZY)) {
+    if (OSD_Function anOSDFun = aSharedLibrary.DlSymb("GetImpl"))
       return ((TGetImpl (*)) anOSDFun)(_orb,_poa,_NS,_GUIMutex);
+  }
+  CORBA::Object_var obj = SalomeApp_Engine_i::EngineForComponent(theLibraryName, true);
+  if (!CORBA::is_nil(obj)){
+    Engines::EngineComponent_var anEngine = Engines::EngineComponent::_narrow(obj);
+    return anEngine._retn();
+  }
   return Engines::EngineComponent::_nil();
 }
 
