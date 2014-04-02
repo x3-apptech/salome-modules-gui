@@ -120,7 +120,7 @@ private:
   
 private:
   Handle(V3d_View)      myActiveView;
-#if OCC_VERSION_LARGE <= 0x06070000
+#if OCC_VERSION_LARGE <= 0x06070100
   Handle(V3d_View)      myOrthoView;
   Handle(V3d_View)      myPerspView;
 #endif

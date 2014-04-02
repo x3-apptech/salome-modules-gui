@@ -619,7 +619,7 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
   // the ones which lie within the screen limits
   Standard_Real aScreenLimits[4] = { 0.0, 0.0, 0.0, 0.0 };
 
-#if OCC_VERSION_LARGE > 0x06070000
+#if OCC_VERSION_LARGE > 0x06070100
   // NDC space screen limits
   aScreenLimits[0] = -1.0;
   aScreenLimits[1] =  1.0;
@@ -670,7 +670,7 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     for ( Standard_Integer aPointIt = 0; aPointIt < 8; ++aPointIt ) {
       const gp_Pnt& aBBPoint = aPoints[aPointIt];
 
-#if OCC_VERSION_LARGE > 0x06070000
+#if OCC_VERSION_LARGE > 0x06070100
       gp_Pnt aProjected = aView3d->Camera()->Project( aBBPoint );
       const Standard_Real& U = aProjected.X();
       const Standard_Real& V = aProjected.Y();
@@ -1693,7 +1693,7 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
 
-#if OCC_VERSION_LARGE > 0x06070000
+#if OCC_VERSION_LARGE > 0x06070100
   if ( anItem.centerX != 0.0 || anItem.centerY != 0.0 )
   {
     double anUpX = 0.0, anUpY = 0.0, anUpZ = 0.0;
@@ -2102,7 +2102,7 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   params.isVisible= isShown;
   params.size     = size;
 
-#if OCC_VERSION_LARGE <= 0x06070000 // the property is deprecated in OCCT 6.7.1
+#if OCC_VERSION_LARGE <= 0x06070100 // the property is deprecated after OCCT 6.7.1
   aView3d->Center( params.centerX, params.centerY );
 #endif
 
@@ -2168,7 +2168,7 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   QStringList data;
 
   data << QString( "scale=%1" )    .arg( params.scale,   0, 'e', 12 );
-#if OCC_VERSION_LARGE <= 0x06070000 // the property is deprecated in OCCT 6.7.1
+#if OCC_VERSION_LARGE <= 0x06070100 // the property is deprecated after OCCT 6.7.1
   data << QString( "centerX=%1" )  .arg( params.centerX, 0, 'e', 12 );
   data << QString( "centerY=%1" )  .arg( params.centerY, 0, 'e', 12 );
 #endif
@@ -2784,7 +2784,7 @@ SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
   aProps.setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
   aProps.setViewUp( anUp[0], anUp[1], anUp[2] );
 
-#if OCC_VERSION_LARGE > 0x06070000
+#if OCC_VERSION_LARGE > 0x06070100
   aSourceView->Eye( anEye[0], anEye[1], anEye[2] );
 
   // store camera properties "as is": it is up to synchronized
@@ -2882,7 +2882,7 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   aProps.getViewUp( anUpDir[0], anUpDir[1], anUpDir[2] );
   aProps.getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
 
-#if OCC_VERSION_LARGE > 0x06070000
+#if OCC_VERSION_LARGE > 0x06070100
   aDestView->SetAt( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
   aDestView->SetEye( aPosition[0], aPosition[1], aPosition[2] );
   aDestView->SetUp( anUpDir[0], anUpDir[1], anUpDir[2] );
