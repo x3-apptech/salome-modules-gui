@@ -39,7 +39,6 @@ public:
   ~PyConsole_Interp();
 
 protected:
-  virtual bool initState();
   virtual bool initContext();  
 };
 

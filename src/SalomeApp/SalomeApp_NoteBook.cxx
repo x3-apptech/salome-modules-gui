@@ -286,7 +286,7 @@ bool NoteBook_TableRow::IsValidStringValue(const QString theValue)
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
   PyConsole_Console* pyConsole = app->pythonConsole();
   PyConsole_Interp* pyInterp = pyConsole->getInterp();
-  PyLockWrapper aLock = pyInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
   std::string command = "import salome_notebook ; ";
   command += "salome_notebook.checkThisNoteBook(";
   for( int i = 0, n = aLastRowIsEmpty ? aNumRows - 1 : aNumRows; i < n; i++ ) {
@@ -460,7 +460,7 @@ bool NoteBook_Table::IsValid() const
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
   PyConsole_Console* pyConsole = app->pythonConsole();
   PyConsole_Interp* pyInterp = pyConsole->getInterp();
-  PyLockWrapper aLock = pyInterp->GetLockWrapper();
+  PyLockWrapper aLock; // Acquire GIL
   std::string command = "import salome_notebook ; ";
   command += "salome_notebook.checkThisNoteBook(";
   for( int i = 0, n = aLastRowIsEmpty ? aNumRows - 1 : aNumRows; i < n; i++ )

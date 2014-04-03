@@ -400,10 +400,12 @@ SUIT_ViewWindow* SPlot2d_Viewer::createView( SUIT_Desktop* theDesktop )
   SLOT: called when action "Legend Clicked" is activated.
   override "onLegendClicked" method from Plot2d_ViewModel.
 */
-void SPlot2d_Viewer::onLegendClicked( QwtPlotItem* plotItem )
+void SPlot2d_Viewer::onClicked( const QVariant& itemInfo, int index )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
   if(aViewFrame == NULL) return;
+
+  QwtPlotItem* plotItem = aViewFrame->getPlot()->infoToItem( itemInfo );
 
   bool isAnalytical = false;
   AnalyticalCurveList curves = aViewFrame->getAnalyticalCurves();

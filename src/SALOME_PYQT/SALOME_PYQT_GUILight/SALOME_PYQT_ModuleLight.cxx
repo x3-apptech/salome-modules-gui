@@ -38,11 +38,11 @@
 // Py_ssize_t for old Pythons
 // This code is as recommended by"
 // http://www.python.org/dev/peps/pep-0353/#conversion-guidelines
-#if PY_VERSION_HEX < 0x02050000 && !defined(PY_SSIZE_T_MIN)
-typedef int Py_ssize_t;
-# define PY_SSIZE_T_MAX INT_MAX
-# define PY_SSIZE_T_MIN INT_MIN
-#endif
+//#if PY_VERSION_HEX < 0x02050000 && !defined(PY_SSIZE_T_MIN)
+//typedef int Py_ssize_t;
+//# define PY_SSIZE_T_MAX INT_MAX
+//# define PY_SSIZE_T_MIN INT_MIN
+//#endif
 
 //
 // NB: Python requests.
@@ -84,21 +84,8 @@ extern "C"
 
     // make initialization only once (see comment above) !
     if ( !alreadyInitialized ) {
-      static PyThreadState* gtstate = 0;
-#ifndef GUI_DISABLE_CORBA
-      if ( SUIT_PYTHON::initialized )
-        gtstate = SUIT_PYTHON::_gtstate;
-      else
-        gtstate = KERNEL_PYTHON::_gtstate;
-#else
-      gtstate = SUIT_PYTHON::_gtstate;
-#endif
-      PyEval_RestoreThread( gtstate );
-
+      PyLockWrapper lck; // GIL acquisition
       INIT_FUNCTION();
-
-      PyEval_ReleaseThread( gtstate );
-
       alreadyInitialized = !alreadyInitialized;
     }
 

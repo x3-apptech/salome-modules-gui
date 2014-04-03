@@ -135,22 +135,20 @@ void Plot2d_Histogram::setData( const QList<double>& theXVals,
 /*!
   Gets data
 */
-QwtIntervalData Plot2d_Histogram::getData() const
+QwtIntervalSeriesData Plot2d_Histogram::getData() const
 {
   pointList aPoints = getPointList();
   int aSize = aPoints.size();
 
-  QwtArray<QwtDoubleInterval> anIntervals( aSize );
-  QwtArray<double> aValues( aSize );
+  QwtArray<QwtIntervalSample> anIntervals( aSize );
   double aX;
   double aWidth = myWidth <= 0 ? myDefWidth : myWidth; // VSR: width is either manually assigned or auto-calculated
   for ( int i = 0; i < aSize; i++ ) {
     aX = aPoints[i].x;
-    anIntervals[i] = QwtDoubleInterval( aX - aWidth/2, aX + aWidth/2 );
-    aValues[i] = aPoints[i].y;
+    anIntervals[i] = QwtIntervalSample( aPoints[i].y, aX - aWidth/2, aX + aWidth/2 );
   }
 
-  return QwtIntervalData( anIntervals, aValues );
+  return QwtIntervalSeriesData( anIntervals );
 }
 
 /*!

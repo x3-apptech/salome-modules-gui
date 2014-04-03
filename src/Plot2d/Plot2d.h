@@ -37,7 +37,9 @@
 #endif
 
 #include <qwt_symbol.h>
-#include <Qt>
+#include <QString>
+#include <QColor>
+#include <QPixmap>
 
 class QPainter;
 class QwtPlot;

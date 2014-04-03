@@ -671,6 +671,26 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène Plot2d</translation>
     </message>
     <message>
+        <source>PREF_GROUP_VIEWER</source>
+        <translation>Scène</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_LEGEND</source>
+        <translation>Légende</translation>
+    </message>
+    <message>
+        <source>PREF_LEGEND_SYMBOL_TYPE</source>
+        <translation>Type de symbole:</translation>
+    </message>
+    <message>
+        <source>PREF_MARKER_ABOVE_LINE</source>
+        <translation>Marqueur dessus de la ligne</translation>
+    </message>
+    <message>
+        <source>PREF_MARKER_ON_LINE</source>
+        <translation>Marqueur sur la ligne</translation>
+    </message>
+    <message>
         <source>PREF_DEVIATION_COLOR</source>
         <translation>Couleur des marqueurs de déviation</translation>
     </message>

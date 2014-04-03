@@ -376,12 +376,13 @@ void SalomeApp_Application::createActions()
 #ifndef DISABLE_PYCONSOLE
 #ifndef DISABLE_SALOMEOBJECT
   // import Python module that manages SALOME plugins
-  PyGILState_STATE gstate = PyGILState_Ensure();
-  PyObjWrapper pluginsmanager = PyImport_ImportModule((char*)"salome_pluginsmanager");
-  PyObjWrapper res = PyObject_CallMethod( pluginsmanager, (char*)"initialize", (char*)"isss",0,"salome",tr("MEN_DESK_PLUGINS_TOOLS").toStdString().c_str(),tr("MEN_DESK_PLUGINS").toStdString().c_str());
-  if ( !res )
-    PyErr_Print();
-  PyGILState_Release(gstate);
+  {
+    PyLockWrapper lck; // acquire GIL
+    PyObjWrapper pluginsmanager = PyImport_ImportModule((char*)"salome_pluginsmanager");
+    PyObjWrapper res = PyObject_CallMethod( pluginsmanager, (char*)"initialize", (char*)"isss",0,"salome",tr("MEN_DESK_PLUGINS_TOOLS").toStdString().c_str(),tr("MEN_DESK_PLUGINS").toStdString().c_str());
+    if ( !res )
+      PyErr_Print();
+  }
   // end of SALOME plugins loading
 #endif
 #endif
@@ -498,6 +499,10 @@ void SalomeApp_Application::onNewWithScript()
 /*!SLOT. Load document with \a aName.*/
 bool SalomeApp_Application::onLoadDoc( const QString& aName )
 {
+#ifdef SINGLE_DESKTOP
+  if ( !LightApp_Application::closeDoc() )
+    return false;
+#endif
   bool res = true;
   if ( !activeStudy() ) {
     // if no study - load in current desktop

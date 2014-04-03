@@ -671,6 +671,26 @@ The changes will be applied on the next application session.</translation>
         <translation>Plot 2D Viewer</translation>
     </message>
     <message>
+        <source>PREF_GROUP_VIEWER</source>
+        <translation>Viewer</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_LEGEND</source>
+        <translation>Legend</translation>
+    </message>
+    <message>
+        <source>PREF_LEGEND_SYMBOL_TYPE</source>
+        <translation>Symbol type:</translation>
+    </message>
+    <message>
+        <source>PREF_MARKER_ABOVE_LINE</source>
+        <translation>Marker above line</translation>
+    </message>
+    <message>
+        <source>PREF_MARKER_ON_LINE</source>
+        <translation>Marker on line</translation>
+    </message>
+    <message>
         <source>PREF_DEVIATION_COLOR</source>
         <translation>Deviation marker color</translation>
     </message>

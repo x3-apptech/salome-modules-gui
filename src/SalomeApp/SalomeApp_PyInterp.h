@@ -38,7 +38,6 @@ public:
   virtual void initPython();
 
 protected:
-  virtual bool initContext();
   virtual int  beforeRun();
 
 private:

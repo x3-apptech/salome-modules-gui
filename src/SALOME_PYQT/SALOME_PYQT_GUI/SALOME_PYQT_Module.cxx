@@ -67,10 +67,8 @@ extern "C" {
     static bool alreadyInitialized = false;
 
     if ( !alreadyInitialized ) {
-      // call only once (see comment above) !
-      PyEval_RestoreThread( KERNEL_PYTHON::_gtstate);
+      PyLockWrapper lck; // GIL acquisition
       INIT_FUNCTION();
-      PyEval_ReleaseThread( KERNEL_PYTHON::_gtstate);
       alreadyInitialized = !alreadyInitialized;
     }
 

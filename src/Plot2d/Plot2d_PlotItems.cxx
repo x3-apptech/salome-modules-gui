@@ -24,18 +24,24 @@
 
 #include "Plot2d_PlotItems.h"
 #include "Plot2d_Object.h"
+#include "Plot2d_ViewFrame.h"
 
 #include <QPainter>
 #include <QPalette>
 #include <QLayout>
 #include <QLine>
 #include <QVariant>
+#include <QStyleOption>
+#include <QPaintEvent>
 #include <qwt_plot.h>
 #include <qwt_painter.h>
 #include <qwt_scale_map.h>
 #include <qwt_legend.h>
-#include <qwt_legend_item.h>
+#include <qwt_legend_label.h>
 #include <qwt_plot_dict.h>
+
+const int SPACING = 10;
+const int SYMBOL_SIZE = 13;
 
 const char* yAxisLeft[] = {
   "12 12 2 1",
@@ -72,44 +78,69 @@ const char* yAxisRight[] = {
   "            "};
 
 /*!
-  Constructor of Plot2d_QwtLegendItem
+  Constructor of Plot2d_QwtLegendLabel
 */
-Plot2d_QwtLegendItem::Plot2d_QwtLegendItem( QWidget* parent ) :
-  QwtLegendItem( parent ),
+Plot2d_QwtLegendLabel::Plot2d_QwtLegendLabel( QWidget* parent ) :
+  QwtLegendLabel( parent ),
   myYAxisIdentifierMode( IM_None ),
-  myIsSelected(false)
+  myIsSelected(false),
+  mySymbol( new QwtSymbol() ),
+  mySymbolType(0),
+  myPen( QPen() )
 {
   myYAxisLeftIcon = yAxisLeft;
   myYAxisRightIcon = yAxisRight;
   int anIconWidth = qMax( myYAxisLeftIcon.width(), myYAxisRightIcon.width() );
+  setSpacing( SPACING );
 
   mySpacingCollapsed = spacing();
-  mySpacingExpanded = anIconWidth - mySpacingCollapsed;
+  mySpacingExpanded = anIconWidth + mySpacingCollapsed;
 }
 
 /*!
-  Destructor of Plot2d_QwtLegendItem
+  Destructor of Plot2d_QwtLegendLabel
 */
-Plot2d_QwtLegendItem::~Plot2d_QwtLegendItem()
+Plot2d_QwtLegendLabel::~Plot2d_QwtLegendLabel()
 {
 }
 
 /*!
   Set Y axis identifier displaying mode
 */
-void Plot2d_QwtLegendItem::setYAxisIdentifierMode( const int theMode )
+void Plot2d_QwtLegendLabel::setYAxisIdentifierMode( const int theMode )
 {
   myYAxisIdentifierMode = theMode;
   setSpacing( theMode == IM_None ? mySpacingCollapsed : mySpacingExpanded );
 }
 
 /*!
-  Redefined method of drawing identifier of legend item
+  Paint the identifier to a given rect.
+  \param painter Painter
+  \param rect Rect where to paint
 */
-void Plot2d_QwtLegendItem::drawIdentifier( QPainter* painter, const QRect& rect ) const
+void Plot2d_QwtLegendLabel::drawIdentifier( QPainter* painter, const QRect& rect )
 {
-  QwtLegendItem::drawIdentifier( painter, rect );
+  if ( rect.isEmpty() )
+    return;
 
+  if( myPen.style() != Qt::NoPen ) {
+    painter->save();
+    painter->setPen(myPen);
+    QwtPainter::drawLine( painter, rect.left() - 2, rect.center().y() + mySymbolType * 4,
+                                   rect.right() + 2, rect.center().y() + mySymbolType * 4 );
+    painter->restore();
+  }
+  if ( mySymbol->style() != QwtSymbol::NoSymbol )
+  {
+    QRect symbolRect;
+    symbolRect.setSize( QSize( SYMBOL_SIZE, SYMBOL_SIZE ) );
+    symbolRect.moveCenter( QPoint( rect.center().x(), rect.center().y() - mySymbolType * 4 ) );
+    painter->save();
+    painter->setBrush( mySymbol->brush() );
+    painter->setPen( mySymbol->pen() );
+    mySymbol->drawSymbol( painter, symbolRect );
+    painter->restore();
+  }
   if( myYAxisIdentifierMode != IM_None ) {
     QPixmap aPixmap( myYAxisIdentifierMode == IM_Left ? yAxisLeft : yAxisRight );
     painter->save();
@@ -121,19 +152,22 @@ void Plot2d_QwtLegendItem::drawIdentifier( QPainter* painter, const QRect& rect 
 /*!
   Update highliting on the item.
 */
-void Plot2d_QwtLegendItem::updateHighlit() {
+void Plot2d_QwtLegendLabel::updateHighlit() {
   QwtText txt = text();
-  if(isSelected()) {
+  if( isSelected() ) {
     QColor highlightColor = Plot2d_Object::selectionColor();
-    if(highlightColor != txt.backgroundBrush().color()) {
-      txt.setBackgroundBrush(highlightColor);
+    if( highlightColor != txt.backgroundBrush().color() ) {
+      txt.setBackgroundBrush( highlightColor  );
       setText(txt);
     }
-  } else if( QWidget* parent = qobject_cast<QWidget*>(this->parent()->parent()) ) {
-    QPalette aPal = parent->palette();
-    if(aPal.color(QPalette::Background) != txt.backgroundBrush().color()) {
-      txt.setBackgroundBrush(aPal.color(QPalette::Background));
-      setText(txt);
+  }
+  else if( this->parent() ) {
+    if(QWidget* parent = qobject_cast<QWidget*>( this->parent()->parent() ) ) {
+      QPalette aPal = parent->palette();
+      if( aPal.color( QPalette::Background) != txt.backgroundBrush().color() ) {
+        txt.setBackgroundBrush( aPal.color( QPalette::Background ) );
+        setText( txt );
+      }
     }
   }
 }
@@ -141,14 +175,14 @@ void Plot2d_QwtLegendItem::updateHighlit() {
 /*!
   Sets selected property.
 */
-void Plot2d_QwtLegendItem::setSelected(const bool on) {
+void Plot2d_QwtLegendLabel::setSelected(const bool on) {
   myIsSelected = on;
 }
 
 /*!
   Gets selected property.
 */
-bool Plot2d_QwtLegendItem::isSelected() const {
+bool Plot2d_QwtLegendLabel::isSelected() const {
   return myIsSelected;
 }
 
@@ -156,17 +190,79 @@ bool Plot2d_QwtLegendItem::isSelected() const {
 /*
   Draw text of the item.
 */
-void  Plot2d_QwtLegendItem::drawText(QPainter * painter, const QRect &rect) {
+void  Plot2d_QwtLegendLabel::drawText( QPainter * painter, const QRectF &rect ) {
   painter->setPen( isSelected() ? Plot2d_Object::highlightedLegendTextColor() :
-		   getColorFromPalette( QPalette::Text) );
+                   getColorFromPalette( QPalette::Text) );
 
-  QwtLegendItem::drawText( painter, rect );
+  QwtTextLabel::drawText( painter, rect );
+}
+
+/*!
+  Sets symbol.
+*/
+void Plot2d_QwtLegendLabel::setSymbol( const QwtSymbol* theSymbol )
+{
+  mySymbol = new QwtSymbol( theSymbol->style(), theSymbol->brush(),
+                            theSymbol->pen(), theSymbol->size() );
+}
+
+/*!
+  Sets symbol type 0(marker on line) or 1(marker above line).
+*/
+void Plot2d_QwtLegendLabel::setSymbolType( const int theType )
+{
+  mySymbolType = theType;
+}
+
+/*!
+  Sets pen.
+*/
+void Plot2d_QwtLegendLabel::setPen (const QPen& thePen )
+{
+  myPen = thePen;
+}
+
+/*!
+  Redefined method paintEvent of QwtLegendLabel
+*/
+void Plot2d_QwtLegendLabel::paintEvent( QPaintEvent *e )
+{
+  const QRect cr = contentsRect();
+
+  int ButtonFrame = 6;
+  QPainter painter( this );
+  painter.setClipRegion( e->region() );
+
+  if ( isDown() )
+  {
+    qDrawWinButton( &painter, 0, 0, width(), height(),
+                    palette(), true );
+  }
+
+  painter.save();
+  painter.setClipRect( cr );
+
+  drawContents( &painter );
+
+  QRect iconRect = cr;
+  if ( !icon().isNull() )
+  {
+    if ( itemMode() != QwtLegendData::ReadOnly )
+      iconRect.setX( iconRect.x() + ButtonFrame );
+      iconRect.setSize( QSize( icon().size().width() + spacing() ,
+    		                   icon().size().height() + spacing() ) );
+      iconRect.moveCenter( QPoint( iconRect.center().x(), cr.center().y() ) );
+  }
+
+  drawIdentifier( &painter, iconRect );
+
+  painter.restore();
 }
 
 /*
   Get color from the legend pallete by 'role' flag.
 */
-QColor Plot2d_QwtLegendItem::getColorFromPalette(QPalette::ColorRole role) {
+QColor Plot2d_QwtLegendLabel::getColorFromPalette(QPalette::ColorRole role) {
   QWidget* pw = parentWidget();
   QColor  col = palette().color( role );
   while( pw ) {
@@ -242,72 +338,63 @@ void Plot2d_QwtPlotCurve::setYAxisIdentifierEnabled( const bool on )
 /*!
   Redefined method, which updates legend of the curve
 */
-void Plot2d_QwtPlotCurve::updateLegend( QwtLegend* legend ) const
+void Plot2d_QwtPlotCurve::updateLegend( const QwtPlotItem* thePlotItem,
+                                        const QList<QwtLegendData>& theLegendData )
 {
-  if ( !legend )
+  if ( !thePlotItem || !thePlotItem->plot() )
     return;
 
-  QWidget* widget = legend->find( this );
+  if ( !testItemAttribute( QwtPlotItem::Legend ) )
+    return;
 
-  if ( testItemAttribute(QwtPlotItem::Legend) ) {
+  QwtPlotCurve::updateLegend( thePlotItem, theLegendData );
 
-    if ( widget == NULL ) {
-      widget = legendItem();
-      if ( widget ) {
-	if ( widget->inherits("QwtLegendItem") ) {
-	  QwtLegendItem *label = (QwtLegendItem *)widget;
-	  label->setItemMode(legend->itemMode());
+  const QVariant itemInfo = thePlotItem->plot()->itemToInfo( const_cast< QwtPlotItem *>( thePlotItem ) );
+  QwtLegend* legend = dynamic_cast<QwtLegend*>( thePlotItem->plot()->legend() );
+  QWidget* widget = legend->legendWidget( itemInfo );
+  QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
+  if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)label ) {
+    int aMode = Plot2d_QwtLegendLabel::IM_None;
+    if( myYAxisIdentifierEnabled )
+      aMode = myYAxis == QwtPlot::yRight ?
+              Plot2d_QwtLegendLabel::IM_Right :
+              Plot2d_QwtLegendLabel::IM_Left;
+    anItem->setYAxisIdentifierMode( aMode );
 
-	  if ( plot() ) {
-	    QObject::connect(label, SIGNAL(clicked()),
-			     plot(), SLOT(legendItemClicked()));
-	    QObject::connect(label, SIGNAL(checked(bool)),
-			     plot(), SLOT(legendItemChecked(bool)));
-	  }
-	}
-	legend->contentsWidget()->layout()->addWidget(widget);
-	legend->insert(this, widget);
-      }
-    }
+    anItem->setSymbol( legendSymbol() );
+    if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
+      anItem->setSymbolType( plot->getLegendSymbolType() );
+    anItem->setPen( legendPen() );
 
-    QwtPlotCurve::updateLegend( legend );
-
-
-    if( Plot2d_QwtLegendItem* anItem = dynamic_cast<Plot2d_QwtLegendItem*>( widget ) ) {
-      int aMode = Plot2d_QwtLegendItem::IM_None;
-      if( myYAxisIdentifierEnabled )
-	aMode = myYAxis == QwtPlot::yRight ?
-	  Plot2d_QwtLegendItem::IM_Right :
-	  Plot2d_QwtLegendItem::IM_Left;
-      anItem->setYAxisIdentifierMode( aMode );
-      if(isSelected()) {
-	anItem->setCurvePen(legendPen());
-	anItem->setSymbol(legendSymbol());
-      }
-      anItem->setSelected(isSelected());
-      anItem->updateHighlit();
-    }
+    anItem->setSelected( isSelected() );
+    anItem->updateHighlit();
+    anItem->repaint();
   }
 }
 
 /*!
-  Redefined method, which creates and returns legend item of the curve
+  Redefined method, which updates and calls QwtPlot::autoRefresh() for the parent plot
 */
-QWidget* Plot2d_QwtPlotCurve::legendItem() const
+void Plot2d_QwtPlotCurve::itemChanged()
 {
-  return new Plot2d_QwtLegendItem;
+  if ( plot() )
+    updateLegend( this, legendData() );
+
+  QwtPlotItem::itemChanged();
 }
 
 /*!
   Redefined method, which draw a set of points of a curve.
 */
-void Plot2d_QwtPlotCurve::draw(QPainter *painter,
-                               const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                               int from, int to) const
+void Plot2d_QwtPlotCurve::drawSeries( QPainter *painter,
+                                      const QwtScaleMap &xMap,
+                                      const QwtScaleMap &yMap,
+                                      const QRectF &canvasRect,
+                                      int from, int to) const
 {
   if (to < 0)
     to = dataSize() - 1;
-  QwtPlotCurve::draw(painter, xMap, yMap, from, to);
+  QwtPlotCurve::drawSeries(painter, xMap, yMap, canvasRect, from, to);
 
   //draw deviation data
   if(hasDeviationData()) {
@@ -321,8 +408,9 @@ void Plot2d_QwtPlotCurve::draw(QPainter *painter,
     painter->setPen(p);
     for (int i = from; i <= to; i++) {
       if(!myDeviationData->values(i,min,max)) continue;
-      xi = x(i);
-      yi = y(i);
+      const QPointF sample = data()->sample( i );
+      xi = sample.x();
+      yi = sample.y();
       xp = xMap.transform(xi);
       ytop = yMap.transform(yi + max);
       ybtm = yMap.transform(yi - min);
@@ -406,7 +494,9 @@ void Plot2d_QwtPlotCurve::clearDeviationData()
   Constructor.
 */
 Plot2d_SelectableItem::Plot2d_SelectableItem():
-  myIsSelected(false)
+  myIsSelected(false),
+  myLegendSymbol( new QwtSymbol() ),
+  myLegendPen( QPen() )
 {
 }
 
@@ -448,15 +538,19 @@ QPen Plot2d_SelectableItem::legendPen() const {
 /*!
   Sets legend symbol property.
 */
-void Plot2d_SelectableItem::setLegendSymbol(const QwtSymbol& s) {
-  myLegendSymbol = s;
+void Plot2d_SelectableItem::setLegendSymbol( const QwtSymbol* s ) {
+  myLegendSymbol->setStyle( s->style() );
+  myLegendSymbol->setBrush( s->brush() );
+  myLegendSymbol->setPen( s->pen() );
+  myLegendSymbol->setSize( s->size() );
 }
 
 /*!
   Sets legend symbol property.
 */
-QwtSymbol Plot2d_SelectableItem::legendSymbol() const {
-  return myLegendSymbol;
+QwtSymbol* Plot2d_SelectableItem::legendSymbol() const {
+  return new QwtSymbol( myLegendSymbol->style(), myLegendSymbol->brush(),
+                        myLegendSymbol->pen(), myLegendSymbol->size() );
 }
 
 /*!
@@ -521,16 +615,16 @@ double Plot2d_HistogramQwtItem::baseline() const
 /*!
   Sets data to object
 */
-void Plot2d_HistogramQwtItem::setData( const QwtIntervalData& theData )
+void Plot2d_HistogramQwtItem::setData( const QwtIntervalSeriesData& theData )
 {
-  myData = theData;
+  myData.setSamples( theData.samples() );
   itemChanged();
 }
 
 /*!
   Returns data from object
 */
-const QwtIntervalData& Plot2d_HistogramQwtItem::data() const
+const QwtIntervalSeriesData& Plot2d_HistogramQwtItem::data() const
 {
   return myData;
 }
@@ -618,7 +712,7 @@ bool Plot2d_HistogramQwtItem::testHistogramAttribute( HistogramAttribute theAttr
 void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
 				    const QwtScaleMap& theXMap,
 				    const QwtScaleMap& theYMap,
-				    const QRect& ) const
+				    const QRectF& ) const
 {
   thePainter->setPen( QPen( myColor ) );
 
@@ -627,19 +721,19 @@ void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
 
   for ( int i = 0; i < (int)myData.size(); i++ ) {
     if ( myAttributes & Plot2d_HistogramQwtItem::Xfy ) {
-      const int x2 = theXMap.transform( myData.value( i ) );
+      const int x2 = theXMap.transform( myData.sample(i).value );
       if ( x2 == x0 )
         continue;
-      int y1 = theYMap.transform( myData.interval( i ).minValue() );
-      int y2 = theYMap.transform( myData.interval( i ).maxValue() );
+      int y1 = theYMap.transform( myData.sample( i ).interval.minValue() );
+      int y2 = theYMap.transform( myData.sample( i ).interval.maxValue() );
       if ( y1 > y2 )
         qSwap( y1, y2 );
 
       if ( i < (int)myData.size() - 2 ) {
-        const int yy1 = theYMap.transform( myData.interval(i+1).minValue() );
-        const int yy2 = theYMap.transform( myData.interval(i+1).maxValue() );
+        const int yy1 = theYMap.transform( myData.sample(i+1).interval.minValue() );
+        const int yy2 = theYMap.transform( myData.sample(i+1).interval.maxValue() );
         if ( y2 == qwtMin( yy1, yy2 ) ) {
-          const int xx2 = theXMap.transform( myData.interval(i+1).minValue() );
+          const int xx2 = theXMap.transform( myData.sample(i+1).interval.minValue() );
           if ( xx2 != x0 && ( ( xx2 < x0 && x2 < x0 ) ||
                               ( xx2 > x0 && x2 > x0 ) ) ) {
             // One pixel distance between neighboured bars
@@ -650,19 +744,19 @@ void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
       drawBar( thePainter, Qt::Horizontal, QRect( x0, y1, x2 - x0, y2 - y1 ) );
     }
     else {
-      const int y2 = theYMap.transform( myData.value( i ) );
+      const int y2 = theYMap.transform( myData.sample( i ).value );
       if ( y2 == y0 )
         continue;
-      int x1 = theXMap.transform( myData.interval( i ).minValue() );
-      int x2 = theXMap.transform( myData.interval( i ).maxValue() );
+      int x1 = theXMap.transform( myData.sample( i ).interval.minValue() );
+      int x2 = theXMap.transform( myData.sample( i ).interval.maxValue() );
       if ( x1 > x2 )
         qSwap( x1, x2 );
 
       if ( i < (int)myData.size() - 2 ) {
-        const int xx1 = theXMap.transform( myData.interval(i+1).minValue() );
-        const int xx2 = theXMap.transform( myData.interval(i+1).maxValue() );
+        const int xx1 = theXMap.transform( myData.sample(i+1).interval.minValue() );
+        const int xx2 = theXMap.transform( myData.sample(i+1).interval.maxValue() );
         if ( x2 == qwtMin( xx1, xx2 ) ) {
-          const int yy2 = theYMap.transform( myData.value(i+1) );
+          const int yy2 = theYMap.transform( myData.sample(i+1).value );
           if ( yy2 != y0 && ( ( yy2 < y0 && y2 < y0 ) ||
                               ( yy2 > y0 && y2 > y0 ) ) ) {
             // One pixel distance between neighboured bars
@@ -756,28 +850,35 @@ QList<QRect> Plot2d_HistogramItem::getBars() const
 /*!
   Set to legend item symbol with color of item
 */
-void Plot2d_HistogramItem::updateLegend( QwtLegend* theLegend ) const
+void Plot2d_HistogramItem::updateLegend( QwtPlotItem* thePlotItem,
+                                         QList<QwtLegendData>& theLegendData )
 {
-  if ( !theLegend )
+  if ( !thePlotItem || !thePlotItem->plot() )
     return;
 
-  Plot2d_HistogramQwtItem::updateLegend( theLegend );
+  Plot2d_HistogramQwtItem::updateLegend( thePlotItem, theLegendData );
 
-  QWidget* theWidget = theLegend->find( this );
-  if ( !theWidget || !theWidget->inherits( "QwtLegendItem" ) )
+  const QVariant itemInfo = thePlotItem->plot()->itemToInfo( const_cast< QwtPlotItem *>( thePlotItem ) );
+  QwtLegend *legend = dynamic_cast<QwtLegend *>( thePlotItem->plot()->legend() );
+  QWidget* widget = legend->legendWidget( itemInfo );
+
+  if ( !widget || !widget->inherits( "QwtLegendItem" ) )
     return;
 
-  Plot2d_QwtLegendItem* anItem = ( Plot2d_QwtLegendItem* )theWidget;
-  QFontMetrics aFMetrics( anItem->font() );
-  int aSize = aFMetrics.height();
-  QwtSymbol aSymbol( QwtSymbol::Rect, QBrush( legendPen().color() ),
-                     QPen( legendPen().color() ), QSize( aSize, aSize ) );
-  anItem->setSymbol( aSymbol );
-  anItem->setIdentifierMode( theLegend->identifierMode()
-			     | QwtLegendItem::ShowSymbol );
-  anItem->setSelected(isSelected());
-  anItem->updateHighlit();
-  anItem->update();
+  QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
+  if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)( label ) ) {
+    QFontMetrics aFMetrics( anItem->font() );
+    int aSize = aFMetrics.height();
+    QwtSymbol* aSymbol = new QwtSymbol( QwtSymbol::Rect, QBrush( legendPen().color() ),
+                                        QPen( legendPen().color() ), QSize( aSize, aSize ) );
+    anItem->setSymbol( aSymbol );
+    if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
+      anItem->setSymbolType( plot->getLegendSymbolType() );
+    anItem->setSelected( isSelected() );
+    anItem->updateHighlit();
+    anItem->update();
+    anItem->repaint();
+  }
 }
 
 /*!
@@ -786,7 +887,7 @@ void Plot2d_HistogramItem::updateLegend( QwtLegend* theLegend ) const
 void Plot2d_HistogramItem::draw( QPainter* thePainter,
 				 const QwtScaleMap& theXMap,
 				 const QwtScaleMap& theYMap,
-				 const QRect& ) const
+				 const QRectF& ) const
 {
   // nds: clear list of bar items
   Plot2d_HistogramItem* anItem = (Plot2d_HistogramItem*)this;
@@ -796,23 +897,23 @@ void Plot2d_HistogramItem::draw( QPainter* thePainter,
   const int x0 = theXMap.transform( baseline() );
   const int y0 = theYMap.transform( baseline() );
 
-  const QwtIntervalData& iData = data();
+  const QwtIntervalSeriesData& iData = data();
 
   for ( int i = 0; i < (int)iData.size(); i++ ) {
     if ( testHistogramAttribute( Plot2d_HistogramItem::Xfy ) ) {
-      const int x2 = theXMap.transform( iData.value( i ) );
+      const int x2 = theXMap.transform( iData.sample(i).value );
       if ( x2 == x0 )
         continue;
-      int y1 = theYMap.transform( iData.interval( i ).minValue() );
-      int y2 = theYMap.transform( iData.interval( i ).maxValue() );
+      int y1 = theYMap.transform( iData.sample(i).interval.minValue() );
+      int y2 = theYMap.transform( iData.sample(i).interval.maxValue() );
       if ( y1 > y2 )
         qSwap( y1, y2 );
 
       if ( i < (int)iData.size() - 2 ) {
-        const int yy1 = theYMap.transform( iData.interval(i+1).minValue() );
-        const int yy2 = theYMap.transform( iData.interval(i+1).maxValue() );
+        const int yy1 = theYMap.transform( iData.sample(i+1).interval.minValue() );
+        const int yy2 = theYMap.transform( iData.sample(i+1).interval.maxValue() );
         if ( y2 == qwtMin( yy1, yy2 ) ) {
-          const int xx2 = theXMap.transform( iData.interval(i+1).minValue() );
+          const int xx2 = theXMap.transform( iData.sample(i+1).interval.minValue() );
           if ( xx2 != x0 && ( ( xx2 < x0 && x2 < x0 ) ||
                               ( xx2 > x0 && x2 > x0 ) ) ) {
             // One pixel distance between neighboured bars
@@ -826,19 +927,19 @@ void Plot2d_HistogramItem::draw( QPainter* thePainter,
       anItem->myBarItems.append( aRect );
     }
     else {
-      const int y2 = theYMap.transform( iData.value( i ) );
+      const int y2 = theYMap.transform( iData.sample(i).value );
       if ( y2 == y0 )
         continue;
-      int x1 = theXMap.transform( iData.interval( i ).minValue() );
-      int x2 = theXMap.transform( iData.interval( i ).maxValue() );
+      int x1 = theXMap.transform( iData.sample(i).interval.minValue() );
+      int x2 = theXMap.transform( iData.sample(i).interval.maxValue() );
       if ( x1 > x2 )
         qSwap( x1, x2 );
 
       if ( i < (int)iData.size() - 2 ) {
-        const int xx1 = theXMap.transform( iData.interval(i+1).minValue() );
-        const int xx2 = theXMap.transform( iData.interval(i+1).maxValue() );
+        const int xx1 = theXMap.transform( iData.sample(i+1).interval.minValue() );
+        const int xx2 = theXMap.transform( iData.sample(i+1).interval.maxValue() );
         if ( x2 == qwtMin( xx1, xx2 ) ) {
-          const int yy2 = theYMap.transform( iData.value(i+1) );
+          const int yy2 = theYMap.transform( iData.sample(i+1).value );
           if ( yy2 != y0 && ( ( yy2 < y0 && y2 < y0 ) ||
                               ( yy2 > y0 && y2 > y0 ) ) ) {
             // One pixel distance between neighboured bars
@@ -869,15 +970,6 @@ bool Plot2d_HistogramItem::isCrossItems() const
 {
   return myCrossed;
 }
-
-/*!
-  Redefined method, which creates and returns legend item of the curve
-*/
-QWidget* Plot2d_HistogramItem::legendItem() const
-{
-  return new Plot2d_QwtLegendItem;
-}
-
 
 /*!
   Draws bar of histogram and on it bars of histograms with lower height.
@@ -930,4 +1022,30 @@ int Plot2d_HistogramItem::getCrossedTop( const QRect& theRect ) const
     }
   }
   return aRes;
+}
+
+Plot2d_QwtLegend::Plot2d_QwtLegend( QWidget *parent ):
+QwtLegend( parent )
+{
+  setAutoFillBackground(true);
+}
+
+Plot2d_QwtLegend::~Plot2d_QwtLegend()
+{
+}
+
+/*!
+  Redefined method, which create a widget to be inserted into the legend.
+*/
+QWidget *Plot2d_QwtLegend::createWidget( const QwtLegendData &data ) const
+{
+  Q_UNUSED( data );
+
+  Plot2d_QwtLegendLabel *label = new Plot2d_QwtLegendLabel();
+  label->setItemMode( defaultItemMode() );
+
+  connect( label, SIGNAL( clicked() ), SLOT( itemClicked() ) );
+  connect( label, SIGNAL( checked( bool ) ), SLOT( itemChecked( bool ) ) );
+
+  return label;
 }

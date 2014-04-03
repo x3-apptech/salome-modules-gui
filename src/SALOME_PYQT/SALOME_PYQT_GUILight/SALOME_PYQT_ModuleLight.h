@@ -71,9 +71,9 @@ public:
   // data model management
   QString         createObject( const QString& );
   QString         createObject( const QString&, 
-				const QString&,
-				const QString&,
-				const QString& );
+                                const QString&,
+                                const QString&,
+                                const QString& );
 
   void            setName( const QString&, const QString& );
   QString         getName( const QString& ) const;

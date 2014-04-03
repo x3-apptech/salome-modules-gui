@@ -39,6 +39,8 @@
 #include <qwt_scale_draw.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_picker.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_legend.h>
 
 #include <iostream>
 #include <ostream>
@@ -74,6 +76,7 @@ public:
   virtual ~Plot2d_ViewFrame();
 
   void Init();
+  void SetPreference();
 
   enum ObjectType { MainTitle, XTitle, YTitle, Y2Title, XAxis, YAxis, Y2Axis };
 
@@ -186,14 +189,20 @@ public:
   void           showLegend( bool, bool = true );
   void           setLegendPos( int );
   int            getLegendPos() const;
+  void           setLegendSymbolType( int );
+  int            getLegendSymbolType() const;
   void           setLegendFont( const QFont& );
   QFont          getLegendFont() const;
   void           setLegendFontColor( const QColor& );
   QColor         getLegendFontColor() const;
+  void           setSelectedLegendFontColor( const QColor& );
+  QColor         getSelectedLegendFontColor() const;
   void           setMarkerSize( const int, bool = true  );
   int            getMarkerSize() const;
   virtual void   setBackgroundColor( const QColor& );
   QColor         backgroundColor() const;
+  virtual void   setSelectionColor( const QColor& );
+  QColor         selectionColor() const;
   void           setXGrid( bool, const int, bool, const int, bool = true );
   void           setYGrid( bool, const int, bool, const int,
 			   bool, const int, bool, const int, bool = true );
@@ -232,8 +241,7 @@ public:
   void           setEnableAxis( QwtPlot::Axis, bool );
 
   virtual bool   print( const QString&, const QString& ) const;
-  void           printPlot( QPainter*, const QRect&,
-			    const QwtPlotPrintFilter& = QwtPlotPrintFilter() ) const;
+  void           printPlot( QPainter*, const QRectF& ) const;
 
   QString        getVisualParameters();
   void           setVisualParameters( const QString& );
@@ -294,7 +302,7 @@ signals:
   void           vpNormRModeChanged();
   void           vpCurveChanged();
   void           contextMenuRequested( QContextMenuEvent* );
-  void           legendClicked( QwtPlotItem* );
+  void           clicked (const QVariant&, int );
 
 protected:
   Plot2d_Plot2d*      myPlot;
@@ -304,10 +312,13 @@ protected:
   int                 myCurveType;
   bool                myShowLegend;
   int                 myLegendPos;
+  int                 myLegendSymbolType;
   QFont               myLegendFont;
   QColor              myLegendColor;
+  QColor              mySelectedLegendFontColor;
   int                 myMarkerSize;
   QColor              myBackground;
+  QColor              mySelectionColor;
   QString             myTitle, myXTitle, myYTitle, myY2Title;
   bool                myTitleEnabled, myXTitleEnabled, myYTitleEnabled, myY2TitleEnabled;
   bool                myXGridMajorEnabled, myYGridMajorEnabled, myY2GridMajorEnabled;
@@ -343,26 +354,27 @@ public:
   Plot2d_Plot2d( QWidget* );
   virtual ~Plot2d_Plot2d();
 
-  void           setLogScale( int, bool );
+  void               setLogScale( int, bool );
 
-  void           replot();
-  QwtLegend*     getLegend();
-  QSize          sizeHint() const;
-  QSize          minimumSizeHint() const;
-  void           defaultPicker();
-  void           setPickerMousePattern( int, int = Qt::NoButton );
-  void           setPicker( Plot2d_QwtPlotPicker *picker);
+  void               replot();
+  QwtAbstractLegend* getLegend();
+  QSize              sizeHint() const;
+  QSize              minimumSizeHint() const;
+  void               defaultPicker();
+  void               setPickerMousePattern( int, int = Qt::NoButton );
+  void               setPicker( Plot2d_QwtPlotPicker *picker);
   Plot2d_QwtPlotPicker* getPicker() { return myPicker; }
   Plot2d_AxisScaleDraw* getScaleDraw() { return myScaleDraw; }
   QList<QwtPlotMarker*> getSeparationLineList() { return mySeparationLineList; }
   void clearSeparationLineList();
-  QwtPlotMarker *createMarkerAndTooltip( QwtSymbol symbol,
-                               double    X,
-                               double    Y,
-                               QString & tooltip,
-                               Plot2d_QwtPlotPicker *picker);
+  void setLegendSymbolType( const int );
+  int  getLegendSymbolType();
+  QwtPlotMarker *createMarkerAndTooltip( QwtSymbol* symbol,
+                                         double    X,
+                                         double    Y,
+                                         QString & tooltip,
+                                         Plot2d_QwtPlotPicker *picker);
 
-  bool           polished() const;
   QwtPlotGrid*   grid() const;
   QwtPlotZoomer* zoomer() const;
 
@@ -380,17 +392,9 @@ public:
 
   void createSeparationLine( double Xpos);
 
-
-public slots:
-  virtual void   polish();
-
-protected slots:
-  void           onScaleDivChanged();
-
 protected:
   QwtPlotGrid*   myGrid;
   QList<QColor>  myColors;
-  bool           myIsPolished;
   QwtPlotZoomer* myPlotZoomer;
   Plot2d_AxisScaleDraw* myScaleDraw;
   // The point picker associated with the graphic view
@@ -398,13 +402,13 @@ protected:
 private:
   // List of verticals segments between two curves
   QList<QwtPlotMarker*> mySeparationLineList;
+  int myLegendSymbolType;
 };
 
 class Plot2d_ScaleDraw: public QwtScaleDraw
 {
 public:
   Plot2d_ScaleDraw( char f = 'g', int prec = 6 );
-  Plot2d_ScaleDraw( const QwtScaleDraw& scaleDraw, char f = 'g', int prec = 6 );
 
   virtual QwtText label( double value ) const;
 
@@ -486,7 +490,6 @@ public:
 
   Plot2d_QwtPlotPicker( int            xAxis,
                         int            yAxis,
-                        int            selectionFlags,
                         RubberBand     rubberBand,
                         DisplayMode    trackerMode,
                         QwtPlotCanvas *canvas);
@@ -502,7 +505,7 @@ public:
 
 protected:
 
-  virtual QwtText trackerText( const QwtDoublePoint & pos ) const;
+  virtual QwtText trackerText( const QPoint & pos ) const;
 
 };
 

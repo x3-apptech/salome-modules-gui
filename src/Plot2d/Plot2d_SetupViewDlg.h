@@ -73,17 +73,22 @@ public:
   bool            getRMinNormMode();
   void            setRMinNormMode(const bool);
 
-  void            setLegend( bool, int, const QFont&, const QColor& );
+  void            setLegend( bool, int, int, const QFont&, const QColor&, const QColor& );
   bool            isLegendEnabled();
   int             getLegendPos();
+  int             getLegendSymbolType();
   QFont           getLegendFont();
   QColor          getLegendColor();
+  QColor          getSelectedLegendColor();
   
   void            setMarkerSize( const int );
   int             getMarkerSize();
 
   void            setBackgroundColor( const QColor& );
   QColor          getBackgroundColor();
+
+  void            setSelectionColor( const QColor& );
+  QColor          getSelectionColor();
 
   void            setMajorGrid( bool, const int, bool, const int, bool, const int );
   void            getMajorGrid( bool&, int&, bool&, int&, bool&, int& );
@@ -133,7 +138,9 @@ private:
   QLineEdit*      myTitleYEdit;
   QLineEdit*      myTitleY2Edit;
   QtxColorButton* myBackgroundBtn;
-  QtxColorButton* myLegendColor;
+  QtxColorButton* mySelectionBtn;
+  QtxColorButton* myLegendFontColor;
+  QtxColorButton* mySelectedLegendFontColor;
   QtxFontEdit*    myLegendFont;
   QCheckBox*      myXGridCheck;
   QSpinBox*       myXGridSpin;
@@ -150,6 +157,7 @@ private:
   QComboBox*      myCurveCombo;
   QCheckBox*      myLegendCheck;
   QComboBox*      myLegendCombo;
+  QComboBox*      myLegendSymbolType;
   QSpinBox*       myMarkerSpin;
   QComboBox*      myXModeCombo;
   QComboBox*      myYModeCombo;

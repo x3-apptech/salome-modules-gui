@@ -27,31 +27,37 @@
 
 #include "Plot2d.h"
 
-#include <qwt_legend_item.h>
+#include <qwt_legend_label.h>
+#include <qwt_legend.h>
 #include <qwt_plot_item.h>
 #include <qwt_plot_curve.h>
-#include <qwt_interval_data.h>
 #include <qwt_plot.h>
+#include <qwt_series_data.h>
+#include <qwt_compat.h>
 
-class PLOT2D_EXPORT Plot2d_QwtLegendItem : public QwtLegendItem
+class PLOT2D_EXPORT Plot2d_QwtLegendLabel : public QwtLegendLabel
 {
 public:
   enum YAxisIdentifierMode { IM_None = 0, IM_Left, IM_Right };
 
 public:
-  Plot2d_QwtLegendItem( QWidget* = 0 );
-  virtual ~Plot2d_QwtLegendItem();
+  Plot2d_QwtLegendLabel( QWidget* = 0 );
+  virtual ~Plot2d_QwtLegendLabel();
 
 public:
   void             setYAxisIdentifierMode( const int );
   void             updateHighlit();
-  void             setSelected(const bool on);
+  void             setSelected( const bool on );
   bool             isSelected() const;
-  QColor           getColorFromPalette(QPalette::ColorRole role);  
+  QColor           getColorFromPalette( QPalette::ColorRole role );
+  void             drawIdentifier( QPainter*, const QRect& );
+  void             setSymbol( const QwtSymbol* );
+  void             setSymbolType( const int );
+  void             setPen( const QPen& );
 
 protected:
-  virtual void     drawIdentifier( QPainter*, const QRect& ) const;
-  virtual void     drawText(QPainter *, const QRect &);
+  virtual void     drawText( QPainter*, const QRectF& );
+  virtual void     paintEvent( QPaintEvent* );
 
 private:
 
@@ -62,26 +68,29 @@ private:
   int              mySpacingCollapsed;
   int              mySpacingExpanded;
   bool             myIsSelected;
+  QwtSymbol*       mySymbol;
+  int              mySymbolType;
+  QPen             myPen;
 };
 
 class PLOT2D_EXPORT Plot2d_SelectableItem {
 public:
-    Plot2d_SelectableItem();
-    ~Plot2d_SelectableItem();
-  
-    void             setSelected( const bool );
-    bool             isSelected() const;
-    
-    void             setLegendPen( const QPen & );
-    QPen             legendPen() const;
-	
-    void             setLegendSymbol( const QwtSymbol& );
-    QwtSymbol        legendSymbol() const;
-    
+  Plot2d_SelectableItem();
+  ~Plot2d_SelectableItem();
+
+  void             setSelected( const bool );
+  bool             isSelected() const;
+
+  void             setLegendPen( const QPen& );
+  QPen             legendPen() const;
+
+  void             setLegendSymbol( const QwtSymbol* );
+  QwtSymbol*       legendSymbol() const;
+
 private:
   bool             myIsSelected;
   QPen             myLegendPen;
-  QwtSymbol        myLegendSymbol;
+  QwtSymbol*       myLegendSymbol;
 };
 
 class PLOT2D_EXPORT Plot2d_QwtPlotCurve : public QwtPlotCurve, public Plot2d_SelectableItem
@@ -92,27 +101,28 @@ public:
 
 public:
   virtual void     setYAxisIdentifierEnabled( const bool );
-  virtual void     draw(QPainter *p, 
-                        const QwtScaleMap &xMap, 
-                        const QwtScaleMap &yMap,
-                        int from, int to) const;
+  virtual void     drawSeries( QPainter* p,
+                               const QwtScaleMap& xMap,
+                               const QwtScaleMap& yMap,
+                               const QRectF& canvasRect,
+                               int from, int to) const;
 
-  void             setDeviationData(const double* min, const double* max, const QList<int> &idx);
+  void             setDeviationData( const double* min, const double* max, const QList<int>& idx );
   bool             hasDeviationData() const;
   void             clearDeviationData();
 
-
 protected:
-  virtual void     updateLegend( QwtLegend* ) const;
-  virtual QWidget* legendItem() const;
+  virtual void     updateLegend( const QwtPlotItem*,
+                                 const QList<QwtLegendData>& );
+  virtual void     itemChanged();
 
   QColor           deviationMarkerColor() const;
   int              deviationMarkerLineWidth() const;
   int              deviationMarkerTickSize() const;
 
 private:
-  QwtPlot::Axis        myYAxis;
-  bool                 myYAxisIdentifierEnabled;
+  QwtPlot::Axis    myYAxis;
+  bool             myYAxisIdentifierEnabled;
   
   class Plot2d_DeviationData;
   Plot2d_DeviationData* myDeviationData;
@@ -131,8 +141,8 @@ public:
   explicit Plot2d_HistogramQwtItem( const QwtText& );
   virtual ~Plot2d_HistogramQwtItem();
 
-  void                   setData( const QwtIntervalData& );
-  const QwtIntervalData& data() const;
+  void                   setData( const QwtIntervalSeriesData& );
+  const QwtIntervalSeriesData& data() const;
 
   void                   setColor( const QColor& );
   QColor                 color() const;
@@ -140,7 +150,7 @@ public:
   virtual QwtDoubleRect  boundingRect() const;
   virtual int            rtti() const;
   virtual void           draw( QPainter*, const QwtScaleMap&, 
-			       const QwtScaleMap&, const QRect& ) const;
+                               const QwtScaleMap&, const QRectF& ) const;
 
   void                   setBaseline( double );
   double                 baseline() const;
@@ -156,7 +166,7 @@ private:
 
 private:
   int                    myAttributes;
-  QwtIntervalData        myData;
+  QwtIntervalSeriesData  myData;
   QColor                 myColor;
   double                 myReference;
 };
@@ -168,25 +178,34 @@ public:
   explicit Plot2d_HistogramItem( const QwtText& );
   virtual ~Plot2d_HistogramItem();
 
-  QList<QRect>           getBars() const;
+  QList<QRect>     getBars() const;
 
-  virtual void           updateLegend( QwtLegend* ) const;
-  virtual void           draw( QPainter*, const QwtScaleMap&, 
-			       const QwtScaleMap&, const QRect& ) const;
+  virtual void     updateLegend( QwtPlotItem*,
+                                 QList<QwtLegendData>& );
+  virtual void     draw( QPainter*, const QwtScaleMap&,
+                         const QwtScaleMap&, const QRectF& ) const;
 
-  void                   setCrossItems( bool theCross );
-  bool                   isCrossItems() const;
-
-protected:
-  void                   drawRectAndLowers( QPainter*, Qt::Orientation,
-					    const QRect& ) const;
-  int                    getCrossedTop( const QRect& ) const;
-
-  virtual QWidget*       legendItem() const;
+  void             setCrossItems( bool theCross );
+  bool             isCrossItems() const;
 
 protected:
-  QList<QRect>           myBarItems;
-  bool                   myCrossed;
+  void             drawRectAndLowers( QPainter*, Qt::Orientation,
+                                      const QRect& ) const;
+  int              getCrossedTop( const QRect& ) const;
+
+protected:
+  QList<QRect>     myBarItems;
+  bool             myCrossed;
+};
+
+class PLOT2D_EXPORT Plot2d_QwtLegend : public QwtLegend
+{
+public:
+  explicit Plot2d_QwtLegend( QWidget *parent = NULL );
+  virtual ~Plot2d_QwtLegend();
+
+protected:
+  virtual QWidget* createWidget( const QwtLegendData& ) const;
 };
 
 #endif // PLOT2D_PLOTITEMS_H

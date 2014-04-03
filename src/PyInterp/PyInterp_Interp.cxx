@@ -39,9 +39,6 @@
 #define TOP_HISTORY_PY   "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"
 
-// a map to store python thread states that have been created for a given system thread (key=thread id,value=thread state)
-std::map<long,PyThreadState*> currentThreadMap;
-
 /*!
   \class PyLockWrapper
   \brief Python GIL wrapper.
@@ -49,16 +46,10 @@ std::map<long,PyThreadState*> currentThreadMap;
 
 /*!
   \brief Constructor. Automatically acquires GIL.
-  \param theThreadState python thread state
 */
-PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState):
-  myThreadState(theThreadState),
-  mySaveThreadState(0)
+PyLockWrapper::PyLockWrapper()
 {
-  if (myThreadState->interp == PyInterp_Interp::_interp)
-    _savestate = PyGILState_Ensure();
-  else
-    PyEval_AcquireThread(myThreadState);
+  _gil_state = PyGILState_Ensure();
 }
 
 /*!
@@ -66,51 +57,15 @@ PyLockWrapper::PyLockWrapper(PyThreadState* theThreadState):
 */
 PyLockWrapper::~PyLockWrapper()
 {
-  if (myThreadState->interp == PyInterp_Interp::_interp)
-    PyGILState_Release(_savestate);
-  else
-    PyEval_ReleaseThread(myThreadState);
-}
+//  if (myThreadState->interp == PyInterp_Interp::_interp)
+//    PyGILState_Release(_savestate);
+//  else
+//    PyEval_ReleaseThread(myThreadState);
 
-/*!
-  \brief Get Python GIL wrapper.
-  \return GIL lock wrapper (GIL is automatically acquired here)
-*/
-PyLockWrapper PyInterp_Interp::GetLockWrapper()
-{
-  if (_tstate->interp == PyInterp_Interp::_interp)
-    return _tstate;
-
-  // If we are here, we have a secondary python interpreter. Try to get a thread state synchronized with the system thread
-  long currentThreadid=PyThread_get_thread_ident(); // the system thread id
-  PyThreadState* theThreadState;
-  if(currentThreadMap.count(currentThreadid) != 0)
-    {
-      //a thread state exists for this thread id
-      PyThreadState* oldThreadState=currentThreadMap[currentThreadid];
-      if(_tstate->interp ==oldThreadState->interp)
-        {
-          //The old thread state has the same python interpreter as this one : reuse the threadstate
-          theThreadState=oldThreadState;
-        }
-      else
-        {
-          //The old thread state has not the same python interpreter as this one : delete the old threadstate and create a new one
-          PyEval_AcquireLock();
-          PyThreadState_Clear(oldThreadState);
-          PyThreadState_Delete(oldThreadState);
-          PyEval_ReleaseLock();
-          theThreadState=PyThreadState_New(_tstate->interp);
-          currentThreadMap[currentThreadid]=theThreadState;
-        }
-    }
-  else
-    {
-      // no old thread state for this thread id : create a new one
-      theThreadState=PyThreadState_New(_tstate->interp);
-      currentThreadMap[currentThreadid]=theThreadState;
-    }
-  return theThreadState;
+  /* The destructor can never be called concurrently by two threads since it is called
+   * when the GIL is held - the below test should never run concurrently in two threads.
+   */
+  PyGILState_Release(_gil_state);
 }
 
 /*
@@ -232,9 +187,9 @@ static PyStdOut* newPyStdOut( bool iscerr )
 
 int   PyInterp_Interp::_argc   = 1;
 char* PyInterp_Interp::_argv[] = {(char*)""};
-PyObject*           PyInterp_Interp::builtinmodule = NULL;
-PyThreadState*      PyInterp_Interp::_gtstate      = NULL;
-PyInterpreterState* PyInterp_Interp::_interp       = NULL;
+//PyObject*           PyInterp_Interp::builtinmodule = NULL;
+//PyThreadState*      PyInterp_Interp::_gtstate      = NULL;
+//PyInterpreterState* PyInterp_Interp::_interp       = NULL;
 
 /*!
   \brief Basic constructor.
@@ -243,9 +198,11 @@ PyInterpreterState* PyInterp_Interp::_interp       = NULL;
   must call virtual method initalize().
 */
 PyInterp_Interp::PyInterp_Interp():
-  _tstate(0), _vout(0), _verr(0), _g(0)
+  _vout(0), _verr(0), _context(0)
 {
 }
+
+
 
 /*!
   \brief Destructor.
@@ -271,20 +228,21 @@ void PyInterp_Interp::initialize()
   _history.clear();       // start a new list of user's commands
   _ith = _history.begin();
 
-  initPython();
-  // Here the global lock is released
+  initPython();  // This also inits the multi-threading for Python (but w/o acquiring GIL)
 
-  initState();
+  //initState(); // [ABN] OBSOLETE
 
-  PyEval_AcquireThread(_tstate);
+  // ---- The rest of the initialisation process is done hodling the GIL
+  PyLockWrapper lck;
 
   initContext();
 
-  // used to interpret & compile commands
+  // used to interpret & compile commands - this is really imported here
+  // and only added again (with PyImport_AddModule) later on
   PyObjWrapper m(PyImport_ImportModule("codeop"));
   if(!m) {
     PyErr_Print();
-    PyEval_ReleaseThread(_tstate);
+    PyEval_ReleaseLock();
     return;
   }
 
@@ -294,17 +252,16 @@ void PyInterp_Interp::initialize()
 
   // All the initRun outputs are redirected to the standard output (console)
   initRun();
-  PyEval_ReleaseThread(_tstate);
 }
 
 /*!
   \brief Initialize Python interpreter.
 
-  In case if Python is not initialized, it sets program name, initializes the interpreter, sets program arguments,
-  initializes threads.
-  Otherwise, it just obtains the global interpreter and thread states. This is important for light SALOME configuration,
+  In case if Python is not initialized, it sets program name, initializes the single true Python
+  interpreter, sets program arguments, and initializes threads.
+  Otherwise, does nothing. This is important for light SALOME configuration,
   as in full SALOME this is done at SalomeApp level.
-  \sa SalomeApp_PyInterp class
+  \sa SalomeApp_PyInterp class and main() in SALOME_Session_Server
  */
 void PyInterp_Interp::initPython()
 {
@@ -313,30 +270,22 @@ void PyInterp_Interp::initPython()
     Py_SetProgramName(_argv[0]);
     Py_Initialize(); // Initialize the interpreter
     PySys_SetArgv(_argc, _argv);
-    PyEval_InitThreads(); // Create (and acquire) the interpreter lock
-  }
 
-  if ( _interp == NULL )
-    _interp = PyThreadState_Get()->interp;
-  if (PyType_Ready(&PyStdOut_Type) < 0) {
-    PyErr_Print();
+    PyEval_InitThreads(); // Create (and acquire) the Python global interpreter lock (GIL)
+    PyEval_ReleaseLock();
   }
-  if ( _gtstate == NULL )
-    _gtstate = PyEval_SaveThread(); // Release global thread state
 }
 
 /*!
   \brief Get embedded Python interpreter banner.
   \return banner string
  */
-std::string PyInterp_Interp::getbanner()
+std::string PyInterp_Interp::getbanner() const
 {
- // Should we take the lock ?
- // PyEval_RestoreThread(_tstate);
+  PyLockWrapper lck;
   std::string aBanner("Python ");
   aBanner = aBanner + Py_GetVersion() + " on " + Py_GetPlatform() ;
   aBanner = aBanner + "\ntype help to get general information on environment\n";
-  //PyEval_SaveThread();
   return aBanner;
 }
 
@@ -350,24 +299,13 @@ std::string PyInterp_Interp::getbanner()
 */
 bool PyInterp_Interp::initRun()
 {
-  //
-  // probably all below code isn't required
-  //
-  /*
-  PySys_SetObject("stderr",_verr);
-  PySys_SetObject("stdout",_vout);
-
-  //PyObject *m = PyImport_GetModuleDict();
-
-  PySys_SetObject("stdout",PySys_GetObject("__stdout__"));
-  PySys_SetObject("stderr",PySys_GetObject("__stderr__"));
-  */
   return true;
 }
 
 /*!
   \brief Compile Python command and evaluate it in the
-         python dictionary context if possible.
+         python dictionary context if possible. This is not thread-safe.
+         This is the caller's responsability to make this thread-safe.
   \internal
   \param command Python command string
   \param context Python context (dictionary)
@@ -396,12 +334,7 @@ static int run_command(const char *command, PyObject *context)
     return 1;
   }
   else {
-    // Complete and correct text. We evaluate it.
-    //#if PY_VERSION_HEX < 0x02040000 // python version earlier than 2.4.0
-    //    PyObjWrapper r(PyEval_EvalCode(v,context,context));
-    //#else
     PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)(void *)v,context,context));
-    //#endif
     if(!r) {
       // Execution error. We return -1
       PyErr_Print();
@@ -433,7 +366,7 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
   \return -1 on fatal error, 1 if command is incomplete and 0
          if command is executed successfully
  */
-static int compile_command(const char *command,PyObject *context)
+static int compile_command(const char *command, PyObject *context)
 {
   // First guess if command is execution of a script with args, or a simple Python command
   std::string singleCommand = command;
@@ -466,7 +399,8 @@ static int compile_command(const char *command,PyObject *context)
 }
 
 /*!
-  \brief Run Python command.
+  \brief Run Python command - the command has to fit on a single line (no \n!).
+  Use ';' if you need multiple statements evaluated at once.
   \param command Python command
   \return command status
 */
@@ -476,8 +410,17 @@ int PyInterp_Interp::run(const char *command)
   return simpleRun(command);
 }
 
+/**
+ * Called before a command is run (when calling run() method). Not thread-safe. Caller's responsability
+ * to acquire GIL if needed.
+ */
+int PyInterp_Interp::beforeRun()
+{
+  return 0;
+}
+
 /*!
-  \brief Run Python command (used internally).
+  \brief Run Python command (used internally). Not thread-safe. GIL acquisition is caller's responsability.
   \param command Python command
   \param addToHistory if \c true (default), the command is added to the commands history
   \return command status
@@ -489,19 +432,22 @@ int PyInterp_Interp::simpleRun(const char *command, const bool addToHistory)
     _ith = _history.end();
   }
 
-  // We come from C++ to enter Python world
-  // We need to acquire the Python global lock
-  //PyLockWrapper aLock(_tstate); // san - lock is centralized now
+  // Current stdout and stderr are saved
+  PyObject * oldOut = PySys_GetObject((char*)"stdout");
+  PyObject * oldErr = PySys_GetObject((char*)"stderr");
+  // Keep them alive (PySys_GetObject returned a *borrowed* ref!)
+  Py_INCREF(oldOut);
+  Py_INCREF(oldErr);
 
-  // Reset redirected outputs before treatment
+  // Redirect outputs to SALOME Python console before treatment
   PySys_SetObject((char*)"stderr",_verr);
   PySys_SetObject((char*)"stdout",_vout);
 
-  int ier = compile_command(command,_g);
+  int ier = compile_command(command,_context);
 
-  // Outputs are redirected on standards outputs (console)
-  PySys_SetObject((char*)"stdout",PySys_GetObject((char*)"__stdout__"));
-  PySys_SetObject((char*)"stderr",PySys_GetObject((char*)"__stderr__"));
+  // Outputs are redirected to what they were before
+  PySys_SetObject((char*)"stdout",oldOut);
+  PySys_SetObject((char*)"stderr",oldErr);
 
   return ier;
 }

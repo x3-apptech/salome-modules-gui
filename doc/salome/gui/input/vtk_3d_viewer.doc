@@ -123,12 +123,12 @@ These buttons orientate the scene strictly about coordinate axes:
 
 \image html vtk_view_anticlockwise.png
 
-<b>Rotate counter-clockwise</b> - rotates view 90ï¿½ counter-clockwise.
+<b>Rotate counter-clockwise</b> - rotates view 90° counter-clockwise.
 <hr>
 
 \image html vtk_view_clockwise.png
 
-<b>Rotate clockwise</b> - rotates view 90ï¿½ clockwise.
+<b>Rotate clockwise</b> - rotates view 90° clockwise.
 <hr>
 
 \image html vtk_view_reset.png

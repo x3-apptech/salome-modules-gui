@@ -38,7 +38,6 @@ class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_PyInterp : public PyInterp_Interp
   
  protected:
   virtual void initPython();
-  virtual bool initState();
   virtual bool initContext();
 };
 
