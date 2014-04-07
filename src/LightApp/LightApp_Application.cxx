@@ -3316,6 +3316,7 @@ void LightApp_Application::loadDockWindowsState()
     desktop()->restoreState( aTargetArray );
   }
 
+  /*
   if ( !myWinVis.contains( modName ) && aDefaultVisibility.isEmpty())
     return;
 
@@ -3345,7 +3346,7 @@ void LightApp_Application::loadDockWindowsState()
       dwMap =  &defaultDwMap;
     }
   }
-  
+
   if(tbMap) {
     QList<QToolBar*> tbList = findToolBars();
     for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit )
@@ -3371,6 +3372,7 @@ void LightApp_Application::loadDockWindowsState()
 	  dw->setVisible( (*dwMap)[dw->objectName()] );
       }
   }
+  */
 }
 
 
