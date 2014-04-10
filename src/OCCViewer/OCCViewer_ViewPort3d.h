@@ -63,8 +63,6 @@ public:
   virtual int           getBgImgHeight(){return myBgImgHeight; };
   virtual int           getBgImgWidth() {return myBgImgWidth;  };
 
-  virtual void          updateStaticTriedronVisibility();
-
 //   void         setActive( V3d_TypeOfView );
   virtual bool          syncronize( const OCCViewer_ViewPort3d* );
 
@@ -94,10 +92,12 @@ public:
   void                  setAdvancedZoomingEnabled( const bool theState ) { myIsAdvancedZoomingEnabled = theState; }
   bool                  isAdvancedZoomingEnabled() const { return myIsAdvancedZoomingEnabled; }
 
+  void                  showStaticTrihedron( bool );
+
 signals:
   void                  vpChangeBackground( const Qtx::BackgroundData& );
-  void                  vpClosed();
-  void                  vpMapped();
+  void                  vpClosed(OCCViewer_ViewPort3d*);
+  void                  vpMapped(OCCViewer_ViewPort3d*);
 
 public slots:
   virtual bool          synchronize( OCCViewer_ViewPort* );

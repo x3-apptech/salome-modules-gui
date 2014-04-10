@@ -89,7 +89,9 @@ public:
   virtual Qtx::BackgroundData background() const;
   virtual void                setBackground( const Qtx::BackgroundData& );
 
-  virtual void   setDropDownButtons( bool );
+  virtual void showStaticTrihedron( bool );
+
+  virtual void setDropDownButtons( bool );
 
   virtual SUIT_CameraProperties cameraProperties();
 

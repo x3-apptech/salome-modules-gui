@@ -2715,6 +2715,11 @@ void OCCViewer_ViewWindow::setBackground( const Qtx::BackgroundData& theBackgrou
   if ( myViewPort ) myViewPort->setBackground( theBackground );
 }
 
+void OCCViewer_ViewWindow::showStaticTrihedron( bool on )
+{
+  if ( myViewPort ) myViewPort->showStaticTrihedron( on );
+}
+
 /*!
   Clears view aspects
 */

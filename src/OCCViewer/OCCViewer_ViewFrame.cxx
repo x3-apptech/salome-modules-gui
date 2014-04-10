@@ -423,6 +423,17 @@ Qtx::BackgroundData OCCViewer_ViewFrame::background() const
   return getView(MAIN_VIEW)->background(); 
 }
 
+void OCCViewer_ViewFrame::showStaticTrihedron( bool on )
+{
+  if ( myPopupRequestedView )
+    myPopupRequestedView->showStaticTrihedron( on ); 
+  else {
+    foreach ( OCCViewer_ViewWindow* aView, myViews ) {
+      aView->showStaticTrihedron( on ); 
+    }
+  }
+}
+
 QImage OCCViewer_ViewFrame::dumpView()
 {
   foreach (OCCViewer_ViewWindow* aView, myViews) {
