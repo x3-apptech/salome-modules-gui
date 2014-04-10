@@ -114,8 +114,9 @@ public:
   
   bool                            trihedronRelative() const {return myIsRelative; }
 
-  // a utility function, used by SALOME_View_s methods
+  // a utility functions, used by SALOME_View_s methods
   bool                            computeTrihedronSize( double& theNewSize, double& theSize );
+  virtual double                  computeSceneSize(const Handle(V3d_View)&) const;
 
   void                            updateTrihedron();
   

@@ -966,18 +966,7 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
   if ( view3d.IsNull() )
     return false;
 
-  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
-  double aMaxSide;
-
-  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
-
-  if ( Xmin == RealFirst() || Ymin == RealFirst() || Zmin == RealFirst() ||
-       Xmax == RealLast()  || Ymax == RealLast()  || Zmax == RealLast() )
-    return false;
-
-  aMaxSide = Xmax - Xmin;
-  if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
-  if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+  double aMaxSide = computeSceneSize( view3d );
 
   // IPAL21687
   // The boundary box of the view may be initialized but nullified
@@ -991,8 +980,29 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
   theSize = getTrihedron()->Size();
   theNewSize = aMaxSide*aSizeInPercents / 100.0;
 
-  return fabs( theNewSize - theSize ) > theSize * EPS ||
-         fabs( theNewSize - theSize) > theNewSize * EPS;
+  return fabs( theNewSize - theSize ) > theSize    * EPS ||
+         fabs( theNewSize - theSize ) > theNewSize * EPS;
+}
+
+/*!
+ * Compute scene size
+ */
+double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
+{
+  double aMaxSide = 0;
+  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
+
+  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
+
+  if ( Xmin != RealFirst() && Ymin != RealFirst() && Zmin != RealFirst() &&
+       Xmax != RealLast()  && Ymax != RealLast()  && Zmax != RealLast() )
+  {
+    aMaxSide = Xmax - Xmin;
+    if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
+    if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+  }
+
+  return aMaxSide;
 }
 
 /*! 
