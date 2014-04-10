@@ -43,15 +43,15 @@ public:
   virtual ~LightApp_Displayer();
 
   void Display( const QString&, const bool = true, SALOME_View* = 0 );
-  void Display( const QStringList&, const bool = true,
-                SALOME_View* = 0 );
+  virtual void Display( const QStringList&, const bool = true,
+                        SALOME_View* = 0 );
 
-  void Redisplay( const QString&, const bool = true );
+  virtual void Redisplay( const QString&, const bool = true );
 
-  void Erase( const QStringList&, const bool forced = false,
-              const bool updateViewer = true, SALOME_View* = 0);
+  virtual void Erase( const QStringList&, const bool forced = false,
+                      const bool updateViewer = true, SALOME_View* = 0);
   void Erase( const QString&, const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 );
-  void EraseAll( const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 ) const;
+  virtual void EraseAll( const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 ) const;
 
   virtual bool IsDisplayed( const QString&, SALOME_View* = 0 ) const;
   void UpdateViewer() const;
