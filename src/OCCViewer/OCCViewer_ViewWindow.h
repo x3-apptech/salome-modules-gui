@@ -223,6 +223,8 @@ public:
   virtual QColor  backgroundColor() const;                      // obsolete
   virtual void    setBackgroundColor( const QColor& );          // obsolete
 
+  virtual void    showStaticTrihedron( bool );
+
   virtual Qtx::BackgroundData  background() const;
   virtual void                 setBackground( const Qtx::BackgroundData& );
 

@@ -46,6 +46,7 @@ class SUIT_ViewWindow;
 class SUIT_Desktop;
 class OCCViewer_ClippingDlg;
 class OCCViewer_ViewWindow;
+class OCCViewer_ViewPort3d;
 
 class AIS_ListOfInteractive;
 
@@ -114,8 +115,9 @@ public:
   
   bool                            trihedronRelative() const {return myIsRelative; }
 
-  // a utility function, used by SALOME_View_s methods
+  // a utility functions, used by SALOME_View_s methods
   bool                            computeTrihedronSize( double& theNewSize, double& theSize );
+  virtual double                  computeSceneSize(const Handle(V3d_View)&) const;
 
   void                            updateTrihedron();
   
@@ -151,7 +153,6 @@ public:
 
   int                             getSelectionCount() const { return (!myAISContext.IsNull())? myAISContext->NbSelected():0; }
 
-  bool                            isStaticTrihedronDisplayed() { return myShowStaticTrihedron; }
   void                            setStaticTrihedronDisplayed(const bool on);
 
   /* Clip planes management */
@@ -186,8 +187,8 @@ protected slots:
   virtual void onMouseMove(SUIT_ViewWindow*, QMouseEvent*);
   virtual void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
   virtual void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
-  virtual void onViewClosed();
-  virtual void onViewMapped();
+  virtual void onViewClosed(OCCViewer_ViewPort3d*);
+  virtual void onViewMapped(OCCViewer_ViewPort3d*);
 
   void onDumpView();
   void onChangeBackground();
@@ -215,8 +216,6 @@ protected:
 
   //QColor                          myBgColor;
   QPoint                          myStartPnt, myEndPnt, myCurPnt;
-
-  bool                            myShowStaticTrihedron;
 
   double                          myTrihedronSize;
 

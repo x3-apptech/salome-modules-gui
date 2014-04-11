@@ -153,11 +153,6 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   // selection
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
-  
-  
-  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-  if(resMgr)
-    myShowStaticTrihedron = resMgr->booleanValue( "3DViewer", "show_static_trihedron", true );
 }
 
 /*!
@@ -225,6 +220,9 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     if ( vp3d )
     {
       vp3d->getView()->SetSurfaceDetail(V3d_TEX_ALL);
+      // connect signal from viewport
+      connect(vp3d, SIGNAL(vpClosed(OCCViewer_ViewPort3d*)), this, SLOT(onViewClosed(OCCViewer_ViewPort3d*)));
+      connect(vp3d, SIGNAL(vpMapped(OCCViewer_ViewPort3d*)), this, SLOT(onViewMapped(OCCViewer_ViewPort3d*)));
     }
   }
 }
@@ -243,9 +241,7 @@ SUIT_ViewWindow* OCCViewer_Viewer::createView( SUIT_Desktop* theDesktop )
   initView( vw );
   // set default background for view window
   vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
-  // connect signal from viewport
-  connect(view->getViewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
-  connect(view->getViewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
+
   return view;
 }
 
@@ -393,7 +389,7 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
   emit selectionChanged();
 }
 
-void OCCViewer_Viewer::onViewClosed()
+void OCCViewer_Viewer::onViewClosed(OCCViewer_ViewPort3d*)
 {
   Standard_Integer aViewsNb = 0;
   for ( myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews(); myV3dViewer->NextActiveViews())
@@ -404,9 +400,13 @@ void OCCViewer_Viewer::onViewClosed()
   }
 }
 
-void OCCViewer_Viewer::onViewMapped()
+void OCCViewer_Viewer::onViewMapped(OCCViewer_ViewPort3d* viewPort)
 {
   setTrihedronShown( true );
+  bool showStaticTrihedron = true;
+  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+  if ( resMgr ) showStaticTrihedron = resMgr->booleanValue( "3DViewer", "show_static_trihedron", true );
+  viewPort->showStaticTrihedron( showStaticTrihedron );
 }
 
 int OCCViewer_Viewer::getTopLayerId()
@@ -899,7 +899,7 @@ void OCCViewer_Viewer::isos( int& u, int& v ) const
  */
 OCCViewer_ViewWindow* OCCViewer_Viewer::createSubWindow()
 {
-  return new OCCViewer_ViewWindow( 0,  this);
+  return new OCCViewer_ViewWindow(0,  this);
 }
 
 // obsolete  
@@ -933,18 +933,10 @@ void OCCViewer_Viewer::setBackground( int theViewId, const Qtx::BackgroundData& 
 /*!
   Set the show static trihedron flag
 */
-void OCCViewer_Viewer::setStaticTrihedronDisplayed(const bool on) {
-  if(myShowStaticTrihedron != on) {
-    OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
-    if(!aView)
-      return;
-
-    OCCViewer_ViewPort3d* vp3d = aView->getViewPort();
-    if(vp3d) {
-      myShowStaticTrihedron = on;
-      vp3d->updateStaticTriedronVisibility();
-    }
-  }
+void OCCViewer_Viewer::setStaticTrihedronDisplayed(const bool on)
+{
+  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*)(myViewManager->getActiveView());
+  if ( aView ) aView->showStaticTrihedron( on );
 }
 
 /*!
@@ -966,18 +958,7 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
   if ( view3d.IsNull() )
     return false;
 
-  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
-  double aMaxSide;
-
-  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
-
-  if ( Xmin == RealFirst() || Ymin == RealFirst() || Zmin == RealFirst() ||
-       Xmax == RealLast()  || Ymax == RealLast()  || Zmax == RealLast() )
-    return false;
-
-  aMaxSide = Xmax - Xmin;
-  if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
-  if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+  double aMaxSide = computeSceneSize( view3d );
 
   // IPAL21687
   // The boundary box of the view may be initialized but nullified
@@ -991,8 +972,29 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
   theSize = getTrihedron()->Size();
   theNewSize = aMaxSide*aSizeInPercents / 100.0;
 
-  return fabs( theNewSize - theSize ) > theSize * EPS ||
-         fabs( theNewSize - theSize) > theNewSize * EPS;
+  return fabs( theNewSize - theSize ) > theSize    * EPS ||
+         fabs( theNewSize - theSize ) > theNewSize * EPS;
+}
+
+/*!
+ * Compute scene size
+ */
+double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
+{
+  double aMaxSide = 0;
+  double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
+
+  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
+
+  if ( Xmin != RealFirst() && Ymin != RealFirst() && Zmin != RealFirst() &&
+       Xmax != RealLast()  && Ymax != RealLast()  && Zmax != RealLast() )
+  {
+    aMaxSide = Xmax - Xmin;
+    if ( aMaxSide < Ymax -Ymin ) aMaxSide = Ymax -Ymin;
+    if ( aMaxSide < Zmax -Zmin ) aMaxSide = Zmax -Zmin;
+  }
+
+  return aMaxSide;
 }
 
 /*! 

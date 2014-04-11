@@ -96,7 +96,7 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
 */
 OCCViewer_ViewPort3d::~OCCViewer_ViewPort3d()
 {
-  emit vpClosed();
+  emit vpClosed(this);
   Handle(V3d_View) aView = activeView();
   if (!aView.IsNull())
     aView->Remove();
@@ -134,17 +134,7 @@ bool OCCViewer_ViewPort3d::mapView( const Handle(V3d_View)& view )
       view->View()->Deactivate();
   }
 
-  /* create static trihedron (16551: EDF PAL 501) */
-  OCCViewer_ViewWindow* aVW = dynamic_cast<OCCViewer_ViewWindow*>( parentWidget()->parentWidget()->parentWidget() );
-  if ( aVW ) {
-    OCCViewer_Viewer* aViewModel = dynamic_cast<OCCViewer_Viewer*>( aVW->getViewManager()->getViewModel() );
-    if ( aViewModel && aViewModel->isStaticTrihedronDisplayed() ){
-      view->ZBufferTriedronSetup();
-      view->TriedronDisplay( Aspect_TOTP_LEFT_LOWER, Quantity_NOC_WHITE, 0.05, V3d_ZBUFFER );
-    }
-  }
-
-  emit( vpMapped() );
+  emit( vpMapped(this) );
 
   return true;
 }
@@ -812,18 +802,16 @@ bool OCCViewer_ViewPort3d::synchronize( OCCViewer_ViewPort* view )
 /*
  * Show/Hide static triedron
  */
-void OCCViewer_ViewPort3d::updateStaticTriedronVisibility() {
-  OCCViewer_ViewWindow* aVW = dynamic_cast<OCCViewer_ViewWindow*>( parentWidget()->parentWidget()->parentWidget() );
-  if ( aVW ) {
-    OCCViewer_Viewer* aViewModel = dynamic_cast<OCCViewer_Viewer*>( aVW->getViewManager()->getViewModel() );
-    Handle(V3d_View) aView = activeView();
-    if ( aViewModel ){
-      if(aViewModel->isStaticTrihedronDisplayed()) {
-	aView->TriedronDisplay( Aspect_TOTP_LEFT_LOWER, Quantity_NOC_WHITE, 0.05, V3d_ZBUFFER );
-      } else {
-	aView->TriedronErase();
-      }
-      aView->Update();
-    }
+void OCCViewer_ViewPort3d::showStaticTrihedron( bool on )
+{
+  Handle(V3d_View) aView = activeView();
+  if ( !aView ) return;
+  
+  if ( on ) {
+    aView->ZBufferTriedronSetup();
+    aView->TriedronDisplay( Aspect_TOTP_LEFT_LOWER, Quantity_NOC_WHITE, 0.05, V3d_ZBUFFER );
+  } else {
+    aView->TriedronErase();
   }
+  aView->Update();
 }
