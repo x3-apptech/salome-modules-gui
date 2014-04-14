@@ -34,8 +34,6 @@
 #include "SalomeApp.h"
 #include <LightApp_Application.h>
 
-#include <SUIT_DataObject.h>
-
 #include <omniORB4/CORBA.h>
 
 //#include <SALOMEconfig.h>
@@ -49,11 +47,9 @@
 class LightApp_Preferences;
 class SalomeApp_Study;
 #ifndef DISABLE_PYCONSOLE
-  class SalomeApp_NoteBook;
+class SalomeApp_NoteBook;
 #endif
 class SUIT_Desktop;
-
-class SUIT_ViewModel;
 class SALOME_LifeCycleCORBA;
 
 
@@ -118,10 +114,6 @@ public:
   virtual SalomeApp_NoteBook*         getNoteBook() const;
 #endif
 
- //! update visibility state of objects
-  void                                updateVisibilityState( DataObjectList& theList,
-                                                             SUIT_ViewModel* theViewModel );  
-
   virtual bool                        renameAllowed( const QString& ) const;
   virtual bool                        renameObject( const QString&, const QString& );
   
@@ -148,12 +140,8 @@ public slots:
 
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
-  void                                onStudySaved( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
-  void                                onStudyClosed( SUIT_Study* );
   
-  void                                onViewManagerRemoved( SUIT_ViewManager* );
-
 protected:
   virtual void                        createActions();
   virtual SUIT_Study*                 createNewStudy();
@@ -197,8 +185,6 @@ private slots:
   void                                onRegDisplay();
   void                                onOpenWith();
   void                                onExtAction();
-
-  void                                onWindowActivated( SUIT_ViewWindow* theViewWindow );
 
 private:
   void                                createExtraActions();

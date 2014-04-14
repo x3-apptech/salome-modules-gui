@@ -711,34 +711,8 @@ void SUIT_TreeModel::setVisibilityState( const QString& id, Qtx::VisibilityState
 */
 void SUIT_TreeModel::setVisibilityStateForAll( Qtx::VisibilityState state )
 {
-  if ( state != Qtx::UnpresentableState ) {
-    VisibilityMap::ConstIterator it = myVisibilityMap.begin();
-    while ( it != myVisibilityMap.end() ) {
-      if ( it.value() != state )
-	setVisibilityState( it.key(), state );
-      it++;
-    }
-  }
-  else {
-    QList<QString> anIds = myVisibilityMap.keys();
-    myVisibilityMap.clear();
-    QList<QString>::ConstIterator it = anIds.begin();
-    while ( it != anIds.end() ) {
-      QModelIndexList lst;
-      if ( searcher() ) {
-	SUIT_DataObject* o = searcher()->findObject( *it );
-	if ( o ) lst << index( o );
-      }
-      else {
-	lst = match( index( 0, root()->customData( Qtx::IdType ).toInt() ), DisplayRole, (*it), 1, Qt::MatchExactly | Qt::MatchRecursive );
-      }
-      if ( !lst.isEmpty() ) {
-	QModelIndex idx = index( lst.first().row(), SUIT_DataObject::VisibilityId ,lst.first().parent() );
-	emit dataChanged( idx, idx );
-      }
-      it++;
-    }
-  }
+  foreach( QString id, myVisibilityMap.keys() )
+    setVisibilityState( id, state );
 }
 
 /*!

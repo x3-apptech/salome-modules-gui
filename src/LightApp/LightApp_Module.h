@@ -106,9 +106,13 @@ public:
   virtual bool                        renameAllowed( const QString& ) const;
   virtual bool                        renameObject( const QString&, const QString& );
 
+  virtual void                        updateModuleVisibilityState();
+
 public slots:
   virtual bool                        activateModule( SUIT_Study* );
   virtual bool                        deactivateModule( SUIT_Study* );
+  virtual void                        studyClosed( SUIT_Study* );
+  virtual void                        onObjectClicked( SUIT_DataObject*, int );
 
   void                                MenuItem();
 
@@ -165,6 +169,7 @@ private:
 
 protected:
   int                   myDisplay, myErase, myDisplayOnly, myEraseAll;
+  bool                  myIsFirstActivate;
 };
 
 #ifdef WIN32

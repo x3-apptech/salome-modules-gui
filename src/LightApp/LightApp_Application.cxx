@@ -43,6 +43,7 @@
 #include "LightApp_Module.h"
 #include "LightApp_DataModel.h"
 #include "LightApp_DataOwner.h"
+#include "LightApp_Displayer.h"
 #include "LightApp_Study.h"
 #include "LightApp_Preferences.h"
 #include "LightApp_PreferencesDlg.h"
@@ -378,6 +379,11 @@ LightApp_Application::LightApp_Application()
 #endif
 
   connect( mySelMgr, SIGNAL( selectionChanged() ), this, SLOT( onSelection() ) );
+  connect( desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+           this,      SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
+  connect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
+           this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ), Qt::UniqueConnection );
+
 
   // Set existing font for the python console in resources
   if( !aResMgr->hasValue( "PyConsole", "font" ) )
@@ -1688,6 +1694,11 @@ void LightApp_Application::onStudySaved( SUIT_Study* s )
 /*!Protected SLOT. On study closed.*/
 void LightApp_Application::onStudyClosed( SUIT_Study* s )
 {
+  /*
+  disconnect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
+	      this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
+  */
+
   // stop auto-save timer
   myAutoSaveTimer->stop();
 
@@ -3586,6 +3597,8 @@ void LightApp_Application::setDesktop( SUIT_Desktop* desk )
   if ( desk ) {
     connect( desk, SIGNAL( message( const QString& ) ),
              this, SLOT( onDesktopMessage( const QString& ) ), Qt::UniqueConnection );
+    connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+             this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
   }
 }
 
@@ -4334,4 +4347,74 @@ void LightApp_Application::emitOperationFinished( const QString& theModuleName,
                                                   const QStringList& theEntryList )
 {
   emit operationFinished( theModuleName, theOperationName, theEntryList );
+}
+
+/*!
+  Update visibility state of given objects
+*/
+void LightApp_Application::updateVisibilityState( DataObjectList& theList,
+						  SUIT_ViewModel*  theViewModel )
+{
+  if ( !theViewModel || theList.isEmpty() ) return;
+
+  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
+  if ( !aStudy ) return;
+
+  SALOME_View* aView = dynamic_cast<SALOME_View*>( theViewModel );
+
+  for ( DataObjectList::iterator itr = theList.begin(); itr != theList.end(); ++itr ) {
+    LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>(*itr);
+
+    if ( !obj || aStudy->isComponent( obj->entry() ) )
+      continue;
+
+    LightApp_Module* anObjModule = dynamic_cast<LightApp_Module*>(obj->module());
+    if ( anObjModule ) {
+      LightApp_Displayer* aDisplayer = anObjModule->displayer();
+      if ( aDisplayer ) {
+	Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
+        if ( aDisplayer->canBeDisplayed( obj->entry(), theViewModel->getType() ) ) {
+          if ( aView && aDisplayer->IsDisplayed( obj->entry(), aView ) )
+            anObjState = Qtx::ShownState;
+          else
+            anObjState = Qtx::HiddenState;
+        }
+	aStudy->setVisibilityState( obj->entry(), anObjState );
+      }
+    }
+  }
+}
+
+/*!
+ * Called when window activated
+ */
+void LightApp_Application::onWindowActivated( SUIT_ViewWindow* theViewWindow )
+{
+  SUIT_DataBrowser* anOB = objectBrowser();
+  if ( !anOB )
+    return;
+  SUIT_DataObject* rootObj = anOB->root();
+  if ( !rootObj )
+    return;
+
+  DataObjectList listObj = rootObj->children( true );
+
+  SUIT_ViewModel* vmod = 0;
+  if ( SUIT_ViewManager* vman = theViewWindow->getViewManager() )
+    vmod = vman->getViewModel();
+  updateVisibilityState( listObj, vmod );
+}
+
+/*!
+  Called then view manager removed
+*/
+void LightApp_Application::onViewManagerRemoved( SUIT_ViewManager* )
+{
+  ViewManagerList lst;
+  viewManagers( lst );
+  if ( lst.count() == 1) { // in case if closed last view window
+    LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( activeStudy() );
+    if ( aStudy )
+      aStudy->setVisibilityStateForAll( Qtx::UnpresentableState );
+  }
 }

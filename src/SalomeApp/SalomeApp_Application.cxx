@@ -54,7 +54,6 @@
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_NameDlg.h>
 #include <LightApp_DataOwner.h>
-#include <LightApp_Displayer.h>
 
 #include <CAM_Module.h>
 
@@ -165,8 +164,6 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 SalomeApp_Application::SalomeApp_Application()
   : LightApp_Application()
 {
-  connect( desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-           this,      SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
   connect( desktop(), SIGNAL( message( const QString& ) ),
            this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
   myIsSiman = false; // default
@@ -396,8 +393,6 @@ void SalomeApp_Application::setDesktop( SUIT_Desktop* desk )
   LightApp_Application::setDesktop( desk );
 
   if ( desk ) {
-    connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-             this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
     connect( desk, SIGNAL( message( const QString& ) ),
              this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
   }
@@ -1576,23 +1571,7 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
 
   loadDockWindowsState();
 
-  connect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
-           this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ), Qt::UniqueConnection );
-
-
   objectBrowserColumnsVisibility();
-}
-
-/*!Called on Save study operation*/
-void SalomeApp_Application::onStudySaved( SUIT_Study* study )
-{
-  LightApp_Application::onStudySaved( study );
-
-  // temporary commented
-  /*if ( objectBrowser() ) {
-    updateSavePointDataObjects( dynamic_cast<SalomeApp_Study*>( study ) );
-    objectBrowser()->updateTree( study->root() );
-  }*/
 }
 
 /*!Called on Open study operation*/
@@ -1606,9 +1585,6 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
 #endif
 
   loadDockWindowsState();
-
-  connect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
-           this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ), Qt::UniqueConnection );
 
   objectBrowserColumnsVisibility();
 
@@ -1840,80 +1816,6 @@ void SalomeApp_Application::onExtAction()
 
   if (!QMetaObject::invokeMethod(aModule, qPrintable(aDataList[1]), Q_ARG(QString, aEntry)))
     printf("Error: Can't Invoke method %s\n", qPrintable(aDataList[1]));
-}
-
-/*!
- * Called when window activated
- */
-void SalomeApp_Application::onWindowActivated( SUIT_ViewWindow* theViewWindow )
-{
-  SUIT_DataBrowser* anOB = objectBrowser();
-  if( !anOB )
-    return;
-  SUIT_DataObject* rootObj = anOB->root();
-  if( !rootObj )
-    return;
-
-  DataObjectList listObj = rootObj->children( true );
-
-  SUIT_ViewModel* vmod = 0;
-  if ( SUIT_ViewManager* vman = theViewWindow->getViewManager() )
-    vmod = vman->getViewModel();
-  updateVisibilityState( listObj, vmod );
-}
-
-/*!
-  Update visibility state of given objects
- */
-void SalomeApp_Application::updateVisibilityState( DataObjectList& theList,
-                                                   SUIT_ViewModel*  theViewModel )
-{
-  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
-
-  if(!theViewModel)
-    return;
-
-  SALOME_View* aView = dynamic_cast<SALOME_View*>( theViewModel );
-
-  if (theList.isEmpty() || !aStudy)
-    return;
-
-  for ( DataObjectList::iterator itr = theList.begin(); itr != theList.end(); ++itr ) {
-    LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>(*itr);
-
-    if (!obj || aStudy->isComponent(obj->entry()))
-      continue;
-
-    LightApp_Module* anObjModule = dynamic_cast<LightApp_Module*>(obj->module());
-    Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
-
-    if(anObjModule) {
-      LightApp_Displayer* aDisplayer = anObjModule->displayer();
-      if(aDisplayer) {
-        if( aDisplayer->canBeDisplayed(obj->entry(), theViewModel->getType()) ) {
-          if(aView && aDisplayer->IsDisplayed(obj->entry(),aView))
-            anObjState = Qtx::ShownState;
-          else
-            anObjState = Qtx::HiddenState;
-        }
-	aStudy->setVisibilityState( obj->entry(), anObjState );
-      }
-    }
-  }
-}
-
-/*!
-  Called then view manager removed
-*/
-void SalomeApp_Application::onViewManagerRemoved( SUIT_ViewManager* )
-{
-  ViewManagerList lst;
-  viewManagers(lst);
-  if( lst.count() == 1) { // in case if closed last view window
-    LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
-    if(aStudy)
-      aStudy->setVisibilityStateForAll(Qtx::UnpresentableState);
-  }
 }
 
 /*!

@@ -49,6 +49,7 @@
 #include <SUIT_ShortcutMgr.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_TreeModel.h>
+#include <SUIT_Session.h>
 
 #ifndef DISABLE_SALOMEOBJECT
 #include <SALOME_ListIO.hxx>
@@ -104,7 +105,8 @@ LightApp_Module::LightApp_Module( const QString& name )
   myDisplay( -1 ),
   myErase( -1 ),
   myDisplayOnly( -1 ),
-  myEraseAll( -1 )
+  myEraseAll( -1 ),
+  myIsFirstActivate( true )
 {
 }
 
@@ -243,6 +245,12 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
     m->registerColumn( getApp()->objectBrowser(), EntryCol, LightApp_DataObject::EntryId );
     treeModel->setAppropriate( EntryCol, Qtx::Toggled );
   }*/
+
+  if ( myIsFirstActivate ) {
+    updateModuleVisibilityState();
+    myIsFirstActivate = false;
+  }
+  
   return res;
 }
 
@@ -283,6 +291,22 @@ bool LightApp_Module::deactivateModule( SUIT_Study* study )
   }
   */
   return CAM_Module::deactivateModule( study );
+}
+
+/*! Redefined to reset internal flags valid for study instance */
+void LightApp_Module::studyClosed( SUIT_Study* theStudy )
+{
+  CAM_Module::studyClosed( theStudy );
+  
+  myIsFirstActivate = true;
+  
+  LightApp_Application* app = dynamic_cast<LightApp_Application*>(application());
+  if ( app ) {
+    SUIT_DataBrowser* ob = app->objectBrowser();
+    if ( ob && ob->model() )
+      disconnect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
+		  this, SLOT( onObjectClicked( SUIT_DataObject*, int ) ) );
+  }
 }
 
 /*!NOT IMPLEMENTED*/
@@ -755,4 +779,62 @@ bool LightApp_Module::renameAllowed( const QString& /*entry*/ ) const
 bool LightApp_Module::renameObject( const QString& /*entry*/, const QString& /*name*/ )
 {
   return false;
+}
+
+/*!
+  Update visibility state for data objects
+*/
+void LightApp_Module::updateModuleVisibilityState()
+{
+  // update visibility state of objects
+  LightApp_Application* app = dynamic_cast<LightApp_Application*>(SUIT_Session::session()->activeApplication());
+  if ( !app ) return;
+  
+  SUIT_DataBrowser* ob = app->objectBrowser();
+  if ( !ob || !ob->model() ) return;
+
+  // connect to click on item
+  connect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
+           this, SLOT( onObjectClicked( SUIT_DataObject*, int ) ), Qt::UniqueConnection );
+
+  SUIT_DataObject* rootObj = ob->root();
+  if ( !rootObj ) return;
+  
+  DataObjectList listObj = rootObj->children( true );
+  
+  SUIT_ViewModel* vmod = 0;
+  if ( SUIT_ViewManager* vman = app->activeViewManager() )
+    vmod = vman->getViewModel();
+  app->updateVisibilityState( listObj, vmod );
+}
+
+/*!
+ * \brief Virtual public slot
+ *
+ * This method is called after the object inserted into data view to update their visibility state
+ * This is default implementation
+ */
+void LightApp_Module::onObjectClicked( SUIT_DataObject* theObject, int theColumn )
+{
+  if ( !isActiveModule() ) return;
+
+  // change visibility of object
+  if ( !theObject || theColumn != SUIT_DataObject::VisibilityId ) return;
+
+  LightApp_Study* study = dynamic_cast<LightApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
+  if ( !study ) return;
+
+  LightApp_DataObject* lo = dynamic_cast<LightApp_DataObject*>( theObject );
+  if ( !lo ) return;
+  
+  // detect action index (from LightApp level)
+  int id = -1;
+  
+  if ( study->visibilityState( lo->entry() ) == Qtx::ShownState )
+    id = myErase;
+  else if ( study->visibilityState( lo->entry() ) == Qtx::HiddenState )
+    id = myDisplay;
+  
+  if ( id != -1 )
+    startOperation( id );
 }
