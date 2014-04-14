@@ -64,20 +64,9 @@ public:
   virtual void                        restoreVisualParameters(int savePoint);
   virtual LightApp_Selection*         createSelection() const;
   
-  public slots:
-  virtual bool                        activateModule( SUIT_Study* );
-  virtual void                        studyClosed( SUIT_Study* );
-  virtual void                        onObjectClicked( SUIT_DataObject*, int );
-
-  virtual void                        updateModuleVisibilityState();
-
 protected:
   virtual CAM_DataModel*              createDataModel();
   virtual void                        extractContainers( const SALOME_ListIO&, SALOME_ListIO& ) const;
-
-
- protected:
-  bool myIsFirstActivate;
 };
 
 #endif

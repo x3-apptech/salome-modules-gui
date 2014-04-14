@@ -33,6 +33,7 @@
 
 #include "LightApp.h"
 #include <SUIT_TreeModel.h>
+#include <SUIT_DataObject.h>
 #include <CAM_Application.h>
 
 #include <QPointer>
@@ -50,6 +51,7 @@ class LightApp_DataObject;
 class SUIT_DataBrowser;
 class SUIT_Study;
 class SUIT_Accel;
+class SUIT_ViewModel;
 class CAM_Module;
 
 class QString;
@@ -174,6 +176,9 @@ public:
 
   void                                emitOperationFinished( const QString&, const QString&, const QStringList& );
 
+  void                                updateVisibilityState( DataObjectList& theList,
+                                                             SUIT_ViewModel* theViewModel );  
+
 signals:
   void                                studyOpened();
   void                                studySaved();
@@ -223,15 +228,17 @@ protected:
 
 protected slots:
   virtual void                        onDesktopActivated();
+  virtual void                        onViewManagerRemoved( SUIT_ViewManager* );
+  virtual void                        onWindowActivated( SUIT_ViewWindow* theViewWindow );
 
   void                                onNewWindow();
   void                                onModuleActivation( const QString& );
   void                                onCloseView( SUIT_ViewManager* );
 
-  void                                onStudyCreated( SUIT_Study* );
-  void                                onStudyOpened( SUIT_Study* );
-  void                                onStudySaved( SUIT_Study* );
-  void                                onStudyClosed( SUIT_Study* );
+  virtual void                        onStudyCreated( SUIT_Study* );
+  virtual void                        onStudyOpened( SUIT_Study* );
+  virtual void                        onStudySaved( SUIT_Study* );
+  virtual void                        onStudyClosed( SUIT_Study* );
 
   void                                onWCDestroyed( QObject* );
 

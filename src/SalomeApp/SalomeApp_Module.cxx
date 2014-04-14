@@ -53,8 +53,7 @@
 
 /*!Constructor.*/
 SalomeApp_Module::SalomeApp_Module( const QString& name )
-  : LightApp_Module( name ),
-    myIsFirstActivate( true )
+  : LightApp_Module( name )
 {
 }
 
@@ -141,22 +140,6 @@ void SalomeApp_Module::storeVisualParameters(int savePoint)
 {
 }
 
-
-/*!Activate module.*/
-bool SalomeApp_Module::activateModule( SUIT_Study* theStudy )
-{
-  bool state = LightApp_Module::activateModule( theStudy );
-
-  if (!myIsFirstActivate)
-    return state;
-  
-  updateModuleVisibilityState();
-
-  myIsFirstActivate = false;
-  
-  return state;
-}
-
 /*!
  * \brief Virtual public
  *
@@ -165,95 +148,4 @@ bool SalomeApp_Module::activateModule( SUIT_Study* theStudy )
  */
 void SalomeApp_Module::restoreVisualParameters(int savePoint)
 {
-}
-
-/*! Redefined to reset internal flags valid for study instance */
-void SalomeApp_Module::studyClosed( SUIT_Study* theStudy )
-{
-  LightApp_Module::studyClosed( theStudy );
-  
-  myIsFirstActivate = true;
-  
-  LightApp_Application* app = dynamic_cast<LightApp_Application*>(application());
-  if (!app)
-    return;
-  
-  SUIT_DataBrowser* ob = app->objectBrowser();
-  if (ob && ob->model())
-    disconnect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
-                this, SLOT( onObjectClicked( SUIT_DataObject*, int ) ) );
-}
-
-
-/*!
- * \brief Virtual public slot
- *
- * This method is called after the object inserted into data view to update their visibility state
- * This is default implementation
- */
-void SalomeApp_Module::onObjectClicked( SUIT_DataObject* theObject, int theColumn )
-{
-  if (!isActiveModule())
-    return;
-  // change visibility of object
-  if (!theObject || theColumn != SUIT_DataObject::VisibilityId )
-    return;
-
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
-  if( !study )
-    return;
-
-  LightApp_DataObject* lo = dynamic_cast<LightApp_DataObject*>(theObject);
-  if(!lo)
-    return;
-  
-  // detect action index (from LightApp level)
-  int id = -1;
-  
-  if ( study->visibilityState(lo->entry()) == Qtx::ShownState )
-    id = myErase;
-  else if ( study->visibilityState(lo->entry()) == Qtx::HiddenState )
-    id = myDisplay;
-  
-  if ( id != -1 )
-    startOperation( id );
-}
-
-
-/*!
-  Called then study closed
-*/
-void SalomeApp_Application::onStudyClosed( SUIT_Study* theStudy){
-  LightApp_Application::onStudyClosed(theStudy);
-
-  disconnect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
-	      this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
-}
-
-
-void SalomeApp_Module::updateModuleVisibilityState() {
-
-  // update visibility state of objects
-  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>(SUIT_Session::session()->activeApplication());
-  if (!app)
-    return;
-  
-  SUIT_DataBrowser* ob = app->objectBrowser();
-  if (!ob || !ob->model())
-    return;
-
-  // connect to click on item
-  connect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
-           this, SLOT( onObjectClicked( SUIT_DataObject*, int ) ), Qt::UniqueConnection );
-
-  SUIT_DataObject* rootObj = ob->root();
-  if( !rootObj )
-    return;
-  
-  DataObjectList listObj = rootObj->children( true );
-  
-  SUIT_ViewModel* vmod = 0;
-  if ( SUIT_ViewManager* vman = app->activeViewManager() )
-    vmod = vman->getViewModel();
-  app->updateVisibilityState( listObj, vmod );
 }
