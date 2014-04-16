@@ -63,6 +63,9 @@ ENDFUNCTION()
 # 
 ####################################################################
 MACRO(PYQT4_WRAP_UIC outfiles)
+
+ IF(NOT WIN32)
+
   FOREACH(_input ${ARGN})
     GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
     STRING(REPLACE ".ui" "_ui.py" _input_name ${_input_name})
@@ -76,6 +79,33 @@ MACRO(PYQT4_WRAP_UIC outfiles)
   ENDFOREACH()
   _PYQT4_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _uniqueTargetName)
   ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL DEPENDS ${${outfiles}})
+
+ ELSE(WIN32)
+####
+# ANA: Workaround for the Microsoft Visual Studio 2010. Seems there is a bug in 
+# the Microsoft Visual Studio 2010 or CMake 2.8.10.2: custom target doesn't work 
+# for the list of the dependencies. It works only for the first dependency in the 
+# list. So generate separate target for the each input file. This problem will be 
+#investigated in the future.
+####
+
+  SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+  _PYQT4_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _uniqueTargetName)
+  ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL)
+  FOREACH(_input ${ARGN})
+    GET_FILENAME_COMPONENT(_input_name ${_input} NAME)
+    STRING(REPLACE ".ui" "_ui.py" _input_name ${_input_name})
+    SET(_output ${CMAKE_CURRENT_BINARY_DIR}/${_input_name})
+    _PYQT4_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _TgName)
+    ADD_CUSTOM_TARGET(${_TgName} ${PYQT_PYUIC_PATH} -o ${_output} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
+      COMMENT ANA:${_output}
+      DEPENDS ${_input}
+      )
+    SET_TARGET_PROPERTIES(${_TgName} PROPERTIES FOLDER PYQT4_WRAP_UIC_TARGETS)
+    ADD_DEPENDENCIES(${_uniqueTargetName} DEPEND ${_TgName})
+    SET(${outfiles} ${${outfiles}} ${_output})
+  ENDFOREACH()
+ ENDIF(WIN32)
 ENDMACRO(PYQT4_WRAP_UIC)
 
 ####################################################################
