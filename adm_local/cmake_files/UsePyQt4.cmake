@@ -80,7 +80,7 @@ MACRO(PYQT4_WRAP_UIC outfiles)
   _PYQT4_WRAP_GET_UNIQUE_TARGET_NAME(BUILD_UI_PY_FILES _uniqueTargetName)
   ADD_CUSTOM_TARGET(${_uniqueTargetName} ALL DEPENDS ${${outfiles}})
 
- ELSE(WIN32)
+ ELSEIF(NOT WIN32)
 ####
 # ANA: Workaround for the Microsoft Visual Studio 2010. Seems there is a bug in 
 # the Microsoft Visual Studio 2010 or CMake 2.8.10.2: custom target doesn't work 
@@ -105,7 +105,7 @@ MACRO(PYQT4_WRAP_UIC outfiles)
     ADD_DEPENDENCIES(${_uniqueTargetName} DEPEND ${_TgName})
     SET(${outfiles} ${${outfiles}} ${_output})
   ENDFOREACH()
- ENDIF(WIN32)
+ ENDIF(NOT WIN32)
 ENDMACRO(PYQT4_WRAP_UIC)
 
 ####################################################################
