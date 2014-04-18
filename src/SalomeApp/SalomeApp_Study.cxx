@@ -41,6 +41,9 @@
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_TreeModel.h>
 #include <SUIT_DataBrowser.h>
+#include <SUIT_MessageBox.h>
+#include <SUIT_Session.h>
+#include <SUIT_Desktop.h>
 
 #include <LightApp_Displayer.h>
 
@@ -458,7 +461,15 @@ bool SalomeApp_Study::createDocument( const QString& theStr )
 
   // initialize myStudyDS, read HDF file
   QString aName = newStudyName();
-  _PTR(Study) study ( SalomeApp_Application::studyMgr()->NewStudy( aName.toUtf8().data() ) );
+
+  _PTR(Study) study;
+  try {
+    study = _PTR(Study)( SalomeApp_Application::studyMgr()->NewStudy( aName.toUtf8().data() ) );
+  }
+  catch(...) {
+    SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
+                               tr("ERR_ERROR"), tr("ERR_ACTIVE_STUDY_CREATE") );
+  }
   if ( !study )
     return false;
 
@@ -494,7 +505,14 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
   MESSAGE( "openDocument" );
 
   // initialize myStudyDS, read HDF file
-  _PTR(Study) study ( SalomeApp_Application::studyMgr()->Open( theFileName.toUtf8().data() ) );
+  _PTR(Study) study;
+  try {
+    study = _PTR(Study) ( SalomeApp_Application::studyMgr()->Open( theFileName.toUtf8().data() ) );
+  }
+  catch(...) {
+    SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
+                               tr("ERR_ERROR"), tr("ERR_ACTIVE_STUDY_OPEN") );
+  }
   if ( !study )
     return false;
 

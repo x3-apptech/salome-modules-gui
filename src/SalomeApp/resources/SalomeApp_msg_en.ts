@@ -84,6 +84,16 @@ Python file must include only letters, digits and underscores and start from let
         <source>ERR_NO_VARIABLE</source>
         <translation>Variable with name &quot;%1&quot; doesn&apos;t exist</translation>
     </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_CREATE</source>
+        <translation>Cannot create study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_OPEN</source>
+        <translation>Cannot open study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
 </context>
 <context>
     <name>SalomeApp_Application</name>

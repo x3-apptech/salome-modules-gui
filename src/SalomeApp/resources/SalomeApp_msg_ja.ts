@@ -83,6 +83,16 @@
       <source>ERR_NO_VARIABLE</source>
       <translation>変数"%1"は存在しません。</translation>
     </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_CREATE</source>
+        <translation type="unfinished">Cannot create study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_OPEN</source>
+        <translation type="unfinished">Cannot open study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
   </context>
   <context>
     <name>SalomeApp_Application</name>

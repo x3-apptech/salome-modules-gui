@@ -84,6 +84,16 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
         <source>ERR_NO_VARIABLE</source>
         <translation>La variable &quot;%1&quot; n&apos;existe pas.</translation>
     </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_CREATE</source>
+        <translation type="unfinished">Cannot create study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
+    <message>
+        <source>ERR_ACTIVE_STUDY_OPEN</source>
+        <translation type="unfinished">Cannot open study: there is already an active study in this session.
+Launch a new session or close the study.</translation>
+    </message>
 </context>
 <context>
     <name>SalomeApp_Application</name>
