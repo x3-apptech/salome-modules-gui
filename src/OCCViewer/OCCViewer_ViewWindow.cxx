@@ -371,6 +371,7 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
   int x1 = (int)( aEvent->x() + width()*delta/100 );
   int y1 = (int)( aEvent->y() + height()*delta/100 );
   myViewPort->zoom( x, y, x1, y1 );
+  myViewPort->getView()->ZFitAll();
       }
       return true;
 
@@ -1001,6 +1002,7 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 
   case PANVIEW:
   case ZOOMVIEW:
+    myViewPort->getView()->ZFitAll();
     resetState();
     break;
 
