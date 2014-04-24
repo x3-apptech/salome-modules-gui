@@ -35,6 +35,7 @@
     <!-- Language settings (resource manager)-->
     <parameter name="languages"   value="en,fr,ja"/>
     <parameter name="language"    value="en"/>
+    <parameter name="locale"      value="true"/>
     <parameter name="translators" value="%P_msg_%L.qm|%P_icons.qm|%P_images.qm"/>
   </section>
   <section name="splash" >

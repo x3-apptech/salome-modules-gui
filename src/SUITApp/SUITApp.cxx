@@ -97,29 +97,6 @@ static QString getAppName( const QString& libName )
 //   }
 // }
 
-/* XPM */
-static const char* pixmap_not_found_xpm[] = {
-"16 16 3 1",
-"       c None",
-".      c #000000",
-"+      c #A80000",
-"                ",
-"                ",
-"    .     .     ",
-"   .+.   .+.    ",
-"  .+++. .+++.   ",
-"   .+++.+++.    ",
-"    .+++++.     ",
-"     .+++.      ",
-"    .+++++.     ",
-"   .+++.+++.    ",
-"  .+++. .+++.   ",
-"   .+.   .+.    ",
-"    .     .     ",
-"                ",
-"                ",
-"                "};
-
 class SUITApp_Session: public SUIT_Session
 {
 public:
@@ -143,8 +120,6 @@ public:
 
     if ( resMgr )
     {
-      static QPixmap defaultPixmap( pixmap_not_found_xpm );
-      resMgr->setDefaultPixmap( defaultPixmap );
       resMgr->setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
     }
     return resMgr;

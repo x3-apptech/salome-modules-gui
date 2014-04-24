@@ -95,6 +95,11 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
 The changes will be applied on the next application session.</translation>
     </message>
     <message>
+        <source>LOCALE_CHANGED</source>
+        <translation>Application locale has been changed.
+The changes will be applied on the next application session.</translation>
+    </message>
+    <message>
         <source>MEN_DESK_THEME</source>
         <translation>Theme</translation>
     </message>
@@ -589,6 +594,10 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_CURRENT_LANGUAGE</source>
         <translation>Current language</translation>
+    </message>
+    <message>
+        <source>PREF_CURRENT_LOCALE</source>
+        <translation>Use C locale</translation>
     </message>
     <message>
         <source>PREF_GROUP_LOOK_AND_FEEL</source>

@@ -35,6 +35,9 @@ the whole GUI SALOME session.
 - <b>Language</b>
   - <b>Current language</b> - the language used by the application
   GUI. The language change will come in force only after the application is restarted.
+  - <b>Use C locale</b>  - when checked, the C locale will be set for the application,
+  otherwise a system locale will be used. The locale change will come in force only after
+  the application is restarted.
 - <b>Look and feel</b>
   - <b>Opaque resize</b> - force opaque resize mode for viewers area (tabbed workspace).
   Clear this checkbox for less perfomant workstations.

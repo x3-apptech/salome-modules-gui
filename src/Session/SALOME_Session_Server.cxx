@@ -110,29 +110,6 @@ void MessageOutput( QtMsgType type, const char* msg )
   }
 }
 
-/* XPM */
-static const char* pixmap_not_found_xpm[] = {
-"16 16 3 1",
-"       c None",
-".      c #000000",
-"+      c #A80000",
-"                ",
-"                ",
-"    .     .     ",
-"   .+.   .+.    ",
-"  .+++. .+++.   ",
-"   .+++.+++.    ",
-"    .+++++.     ",
-"     .+++.      ",
-"    .+++++.     ",
-"   .+++.+++.    ",
-"  .+++. .+++.   ",
-"   .+.   .+.    ",
-"    .     .     ",
-"                ",
-"                ",
-"                "};
-
 QString salomeVersion()
 {
   return GUI_VERSION_STR;
@@ -145,7 +122,6 @@ public:
   {
     setCurrentFormat( "xml" );
     setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
-    setDefaultPixmap( QPixmap( pixmap_not_found_xpm ) );
   }
   static void initResourceMgr()
   {
@@ -277,7 +253,7 @@ public:
   SALOME_Session() : SUIT_Session() {}
   virtual ~SALOME_Session() {}
 
-protected:
+public:
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
   {
     SALOME_ResourceMgr::initResourceMgr();
@@ -413,6 +389,19 @@ int main( int argc, char **argv )
   QString qtdir( ::getenv( "QTDIR" ) );
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
+
+  {
+    SALOME_Session s;
+    QApplication::setApplicationName( "salome" );
+    SUIT_ResourceMgr* resMgr = s.createResourceMgr( "SalomeApp" );
+    bool isCloc = resMgr->booleanValue( "language", "locale", true );
+    if ( isCloc ) { 
+      QLocale::setDefault( QLocale::c() );
+    }
+    else {
+      QLocale::setDefault( QLocale::system() );
+    }
+  }
 
   // Create Qt application instance;
   // this should be done the very first!

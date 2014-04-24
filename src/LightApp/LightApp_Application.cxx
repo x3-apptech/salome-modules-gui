@@ -2124,6 +2124,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   }
   pref->setItemProperty( "strings", aLangs, curLang );
   pref->setItemProperty( "icons",   aIcons, curLang );
+
+  int curLocale = pref->addPreference( tr( "PREF_CURRENT_LOCALE" ), langGroup,
+                                          LightApp_Preferences::Bool, "language", "locale" );
   // ... "Language" group <<end>>
 
   // ... "Look and feel" group <<start>>
@@ -2993,6 +2996,10 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
   if ( sec == "language" && param == "language" )
   {
     SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LANG_CHANGED" ) );
+  }
+  if ( sec == "language" && param == "locale")
+  {
+    SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LOCALE_CHANGED" ) );
   }
   if ( sec == "desktop" && param == "opaque_resize" ) {
     bool opaqueResize = resMgr->booleanValue( "desktop", "opaque_resize", false );

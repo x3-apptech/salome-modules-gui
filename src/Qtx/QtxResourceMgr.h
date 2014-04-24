@@ -141,8 +141,8 @@ public:
   QString          option( const QString& ) const;
   void             setOption( const QString&, const QString& );
 
-  QPixmap          defaultPixmap() const;
-  virtual void     setDefaultPixmap( const QPixmap& );
+  static QPixmap  defaultPixmap();
+  static void     setDefaultPixmap( const QPixmap& );
 
   QString          resSection() const;
   QString          langSection() const;
@@ -201,7 +201,7 @@ private:
   ResList          myResources;               //!< resources list
   bool             myCheckExist;              //!< "check existance" flag
   TransListMap     myTranslator;              //!< map of loaded translators
-  QPixmap*         myDefaultPix;              //!< default icon
+  static QPixmap*  myDefaultPix;              //!< default icon
   bool             myIsPixmapCached;          //!< "cached pixmaps" flag
 
   bool             myHasUserValues;           //!< \c true if user preferences has been read
