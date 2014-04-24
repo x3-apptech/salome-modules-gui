@@ -1854,35 +1854,6 @@ bool SalomeApp_Application::renameObject( const QString& entry, const QString& n
   return false;
 }
 
-/*!
-  \return default windows( Object Browser, Python Console )
-  Adds to map \a aMap.
-*/
-void SalomeApp_Application::defaultWindows( QMap<int, int>& aMap ) const
-{
-  LightApp_Application::defaultWindows(aMap);
-#ifndef DISABLE_PYCONSOLE
-  if ( !aMap.contains( WT_NoteBook ) ) {
-    if ( !myNoteBook ) {
-      aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
-    }
-  }
-#endif
-}
-
-/*!
-  Gets current windows.
-  \param winMap - output current windows map.
-*/
-void SalomeApp_Application::currentWindows(QMap<int, int>& aMap) const
-{
-  LightApp_Application::currentWindows( aMap );
-#ifndef DISABLE_PYCONSOLE
-  if ( !aMap.contains( WT_NoteBook) && myNoteBook )
-    aMap.insert( WT_NoteBook, Qt::LeftDockWidgetArea );
-#endif
-}
-
 #ifndef DISABLE_PYCONSOLE
 //============================================================================
 /*! Function : onUpdateStudy

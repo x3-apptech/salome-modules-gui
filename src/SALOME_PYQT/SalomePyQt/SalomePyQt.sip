@@ -25,6 +25,8 @@
 
 %Module SalomePyQt
 
+%Feature ENABLE_CORBA
+
 %Import QtGuimod.sip
 %Import QtXmlmod.sip
 
@@ -66,6 +68,9 @@ enum MenuName {
 
 enum WindowType {
   WT_ObjectBrowser,
+%If (ENABLE_CORBA)
+  WT_NoteBook,
+%End
   WT_PyConsole,
   WT_LogWindow,
   WT_User

@@ -107,7 +107,6 @@ public:
 
   virtual bool                        useStudy( const QString& );
   virtual void                        updateDesktopTitle();
-  virtual void                        currentWindows( QMap<int, int>& ) const;
 
 #ifndef DISABLE_PYCONSOLE
   virtual void                        setNoteBook(SalomeApp_NoteBook* theNoteBook);
@@ -160,8 +159,6 @@ protected:
 
   virtual QMap<int, QString>          activateModuleActions() const;
   virtual void                        moduleActionSelected( const int );
-
-  virtual void                        defaultWindows( QMap<int, int>& ) const;
 
   void                                objectBrowserColumnsVisibility();
 

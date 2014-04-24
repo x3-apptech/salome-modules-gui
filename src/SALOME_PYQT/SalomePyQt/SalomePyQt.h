@@ -33,6 +33,9 @@
 #include <QColor>
 
 #include <LightApp_Application.h>
+#ifndef GUI_DISABLE_CORBA
+#include <SalomeApp_Application.h>
+#endif
 #include <LightApp_Preferences.h>
 #include <Plot2d_ViewFrame.h>
 
@@ -80,6 +83,9 @@ enum MenuName {
 
 enum {
   WT_ObjectBrowser = LightApp_Application::WT_ObjectBrowser,
+#ifndef GUI_DISABLE_CORBA
+  WT_NoteBook      = SalomeApp_Application::WT_NoteBook,
+#endif
   WT_PyConsole     = LightApp_Application::WT_PyConsole,
   WT_LogWindow     = LightApp_Application::WT_LogWindow,
   WT_User          = LightApp_Application::WT_User
