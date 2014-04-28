@@ -88,7 +88,11 @@ enum {
 #endif
   WT_PyConsole     = LightApp_Application::WT_PyConsole,
   WT_LogWindow     = LightApp_Application::WT_LogWindow,
+#ifndef GUI_DISABLE_CORBA
+  WT_User          = SalomeApp_Application::WT_User
+#else
   WT_User          = LightApp_Application::WT_User
+#endif
 };
 
 enum { 

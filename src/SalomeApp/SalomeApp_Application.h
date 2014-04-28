@@ -72,7 +72,9 @@ public:
          CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID,
          SimanCheckInId, SimanLocalCheckInId };
 
-  typedef enum { WT_NoteBook = LightApp_Application::WT_User } WindowTypes;
+  typedef enum { WT_NoteBook = LightApp_Application::WT_User,
+                 WT_User
+               } WindowTypes;
 
 protected:
   enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
