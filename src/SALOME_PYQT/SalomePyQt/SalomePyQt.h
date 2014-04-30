@@ -83,12 +83,10 @@ enum MenuName {
 
 enum {
   WT_ObjectBrowser = LightApp_Application::WT_ObjectBrowser,
-#ifndef GUI_DISABLE_CORBA
-  WT_NoteBook      = SalomeApp_Application::WT_NoteBook,
-#endif
   WT_PyConsole     = LightApp_Application::WT_PyConsole,
   WT_LogWindow     = LightApp_Application::WT_LogWindow,
 #ifndef GUI_DISABLE_CORBA
+  WT_NoteBook      = SalomeApp_Application::WT_NoteBook,
   WT_User          = SalomeApp_Application::WT_User
 #else
   WT_User          = LightApp_Application::WT_User

@@ -68,11 +68,11 @@ enum MenuName {
 
 enum WindowType {
   WT_ObjectBrowser,
+  WT_PyConsole,
+  WT_LogWindow,
 %If (ENABLE_CORBA)
   WT_NoteBook,
 %End
-  WT_PyConsole,
-  WT_LogWindow,
   WT_User
 };
 
