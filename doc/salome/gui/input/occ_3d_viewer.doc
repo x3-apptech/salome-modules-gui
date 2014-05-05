@@ -94,14 +94,14 @@ box of an object.
 
 \image html set_rotation_point_dialog2.png
 
-Unchecking <b>Use Bounding Box Center</b> checkbox allows you to
+Disabling <b>Use Bounding Box Center</b> check-box allows you to
 define the coordinates of the rotation point manually.
 
 - <b>Set to Origin</b> button restores the default rotation point
   coordinates.
 
-- <b>Gravity Center of Select Object</b> button allows to choose Point, Edge, Face or Solid in drop-down menu.
-  As soon as corresponding object is selected in the viewer, its gravity center will be used as center of the rotation point.
+- <b>Gravity Center of Selected Object</b> button allows using the gravity center of the object selected in the viewer as the center of the rotation point. 
+When you click this button, you should first choose the type of selectable object: Point, Edge, Face or Solid and only then proceed with selection in the viewer.
 
 <hr>
 
