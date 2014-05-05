@@ -597,7 +597,7 @@ The changes will be applied on the next application session.</translation>
     </message>
     <message>
         <source>PREF_CURRENT_LOCALE</source>
-        <translation>Use C locale</translation>
+        <translation>Use &quot;C&quot; locale</translation>
     </message>
     <message>
         <source>PREF_GROUP_LOOK_AND_FEEL</source>

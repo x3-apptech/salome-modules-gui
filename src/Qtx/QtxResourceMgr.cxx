@@ -66,8 +66,6 @@ static const char* pixmap_not_found_xpm[] = {
 "                ",
 "                "};
 
-QPixmap*  QtxResourceMgr::myDefaultPix = NULL;
-
 /*!
   \class QtxResourceMgr::Resources
   \internal
@@ -1239,6 +1237,7 @@ bool QtxResourceMgr::Format::save( Resources* res )
 QtxResourceMgr::QtxResourceMgr( const QString& appName, const QString& resVarTemplate )
 : myAppName( appName ),
   myCheckExist( true ),
+  myDefaultPix( 0 ),
   myIsPixmapCached( true ),
   myHasUserValues( true ),
   myWorkingMode( AllowUserValues )
@@ -1276,6 +1275,8 @@ QtxResourceMgr::~QtxResourceMgr()
 
   qDeleteAll( myResources );
   qDeleteAll( myFormats );
+
+  delete myDefaultPix;
 }
 
 /*!
@@ -2543,15 +2544,13 @@ QString QtxResourceMgr::sectionsToken() const
   \return default pixmap
   \sa setDefaultPixmap(), loadPixmap()
 */
-QPixmap QtxResourceMgr::defaultPixmap()
+QPixmap QtxResourceMgr::defaultPixmap() const
 {
-  QPixmap res;
-  if(!myDefaultPix)
-    myDefaultPix = new QPixmap( pixmap_not_found_xpm );
-  
-  if ( myDefaultPix && !myDefaultPix->isNull() )
-    res = *myDefaultPix;
-  return res;
+  static QPixmap* defpx = 0;
+  if ( !defpx ) 
+    defpx = new QPixmap( pixmap_not_found_xpm );
+
+  return myDefaultPix ? *myDefaultPix : *defpx;
 }
 
 /*!
@@ -2568,7 +2567,7 @@ void QtxResourceMgr::setDefaultPixmap( const QPixmap& pix )
   if ( pix.isNull() )
     myDefaultPix = 0;
   else
-    myDefaultPix = new QPixmap( pix ); 
+    myDefaultPix = new QPixmap( pix );
 }
 
 /*!
