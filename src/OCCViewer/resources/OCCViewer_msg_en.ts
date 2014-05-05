@@ -352,7 +352,7 @@
     </message>
     <message>
         <source>LBL_SELECTPOINT</source>
-        <translation>Gravity Center of Select Object</translation>
+        <translation>Gravity Center of Selected Object</translation>
     </message>
     <message>
         <source>LBL_POINT</source>
