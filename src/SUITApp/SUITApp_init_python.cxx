@@ -34,5 +34,6 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   Py_Initialize(); // Initialize the interpreter
   PySys_SetArgv(argc, argv);
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock - can be called many times
+  SUIT_PYTHON::initialized = true;
 }
 
