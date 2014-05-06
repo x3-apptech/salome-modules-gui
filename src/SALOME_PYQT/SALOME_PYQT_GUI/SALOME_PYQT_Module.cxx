@@ -29,6 +29,8 @@
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <Container_init_python.hxx>
 
+#include <QCoreApplication>
+
 //
 // NB: Python requests.
 // General rule for Python requests created by Python-based GUI modules
@@ -64,12 +66,13 @@ PyMODINIT_FUNC INIT_FUNCTION();
 extern "C" {
   SALOME_PYQT_EXPORT CAM_Module* createModule()
   {
-    static bool alreadyInitialized = false;
+    QCoreApplication* app = QCoreApplication::instance();
+    bool alreadyInitialized = app && app->property( "salome_pyqt_gui_light_initialized" ).toBool();
 
     if ( !alreadyInitialized ) {
       PyLockWrapper lck; // GIL acquisition
       INIT_FUNCTION();
-      alreadyInitialized = !alreadyInitialized;
+      if ( app ) app->setProperty( "salome_pyqt_gui_light_initialized", true );
     }
 
     return new SALOME_PYQT_Module();
