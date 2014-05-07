@@ -76,39 +76,39 @@
     <name>GraphicsView_Viewer</name>
     <message>
         <source>TEST_CROP_OPERATOR</source>
-        <translation type="unfinished">Test Crop operator</translation>
+        <translation>Test Crop operator</translation>
     </message>
     <message>
         <source>TEST_FUSE_OPERATOR</source>
-        <translation type="unfinished">Test Fuse operator</translation>
+        <translation>Test Fuse operator</translation>
     </message>
     <message>
         <source>PROPERTIES</source>
-        <translation type="unfinished">Properties</translation>
+        <translation>Propriétés</translation>
     </message>
     <message>
         <source>SEND_BACKWARD</source>
-        <translation type="unfinished">Send backward</translation>
+        <translation>Afficher derrière</translation>
     </message>
     <message>
         <source>BRING_FORWARD</source>
-        <translation type="unfinished">Bring forward</translation>
+        <translation>Afficher devant</translation>
     </message>
     <message>
         <source>SEND_TO_BACK</source>
-        <translation type="unfinished">Send to back</translation>
+        <translation>Afficher au fond</translation>
     </message>
     <message>
         <source>BRING_TO_FRONT</source>
-        <translation type="unfinished">Bring to front</translation>
+        <translation>Afficher au premier plan</translation>
     </message>
     <message>
         <source>REMOVE_IMAGES</source>
-        <translation type="unfinished">Remove image(s)</translation>
+        <translation>Supprimer image(s)</translation>
     </message>
     <message>
         <source>ADD_IMAGE</source>
-        <translation type="unfinished">Add image</translation>
+        <translation>Ajouter une image</translation>
     </message>
     <message>
         <source>CHANGE_BGCOLOR</source>

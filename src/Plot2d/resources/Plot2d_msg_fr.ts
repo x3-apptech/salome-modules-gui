@@ -234,23 +234,23 @@
     <message>
         <source>TOT_PLOT2D_ANALYTICAL_CURVES</source>
         <translation>Courbes analytiques</translation>
-    </message>     
+    </message>
     <message>
         <source>TOT_PLOT2D_NORMALIZE_MODE_LMAX</source>
         <translation>Axe Y gauche: Normaliser sur le maximum global</translation>
-    </message>    
+    </message>
     <message>
         <source>TOT_PLOT2D_NORMALIZE_MODE_LMIN</source>
         <translation>Axe Y gauche: Normaliser sur le minimum global</translation>
-    </message>    
+    </message>
     <message>
         <source>TOT_PLOT2D_NORMALIZE_MODE_RMAX</source>
         <translation>Axe Y droite: Normaliser sur le maximum global</translation>
-    </message>    
+    </message>
     <message>
         <source>TOT_PLOT2D_NORMALIZE_MODE_RMIN</source>
         <translation>Axe Y droite: Normaliser sur le minimum global</translation>
-    </message>     
+    </message>
     <message>
         <source>PLOT2D_CURVE_TYPE_LINES</source>
         <translation>Lignes</translation>
@@ -423,19 +423,19 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
     </message>
     <message>
         <source>PRP_PLOT2D_NORMALIZE_MODE_LMAX</source>
-        <translation>Bascule la vue vers le mode de normalisation sur le maximum pour l'axe Y gauche</translation>
+        <translation>Bascule la vue vers le mode de normalisation sur le maximum pour l&apos;axe Y gauche</translation>
     </message>
     <message>
         <source>PRP_PLOT2D_NORMALIZE_MODE_LMIN</source>
-        <translation>Bascule la vue vers le mode de normalisation sur le minimum pour l'axe Y gauche</translation>
+        <translation>Bascule la vue vers le mode de normalisation sur le minimum pour l&apos;axe Y gauche</translation>
     </message>
     <message>
         <source>PRP_PLOT2D_NORMALIZE_MODE_RMAX</source>
-        <translation>Bascule la vue vers le mode de normalisation sur le maximum pour l'axe Y droite</translation>
+        <translation>Bascule la vue vers le mode de normalisation sur le maximum pour l&apos;axe Y droite</translation>
     </message>
     <message>
         <source>PRP_PLOT2D_NORMALIZE_MODE_RMIN</source>
-        <translation>Bascule la vue vers le mode de normalisation sur le minimum pour l'axe Y droite</translation>
+        <translation>Bascule la vue vers le mode de normalisation sur le minimum pour l&apos;axe Y droite</translation>
     </message>
     <message>
         <source>PRP_PLOT2D_SETTINGS</source>
@@ -596,7 +596,7 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
     <message>
         <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
         <translation>Couleur de surlignement de la légende:</translation>
-    </message> 
+    </message>
     <message>
         <source>TOT_PLOT2D_CURVES_LINES</source>
         <translation>Dessiner des lignes</translation>
@@ -728,7 +728,7 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
     <name>Plot2d_AnalyticalCurveDlg</name>
     <message>
         <source>AC_OK_BTN</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>ANALYTICAL_CURVE_TLT</source>
@@ -737,15 +737,15 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
     <message>
         <source>AC_CURVE_PARAMS</source>
         <translation>Paramètres de la courbe</translation>
-    </message>    
+    </message>
     <message>
         <source>AC_CURVE_PROPS</source>
         <translation>Propriétés de la courbe</translation>
-    </message>        
+    </message>
     <message>
         <source>AC_FORMULA</source>
         <translation>y(x) = </translation>
-    </message>            
+    </message>
     <message>
         <source>AC_NB_INTERVALS</source>
         <translation>Nb. intervalles</translation>
@@ -773,19 +773,19 @@ L&apos;échelle logarithmique de l&apos;ordonnée n&apos;est pas permise.</trans
     <message>
         <source>AC_ADD_BTN</source>
         <translation>Ajouter une courbe</translation>
-    </message>                
+    </message>
     <message>
         <source>AC_REM_BTN</source>
         <translation>Supprimer une courbe</translation>
-    </message>                    
+    </message>
     <message>
         <source>AC_UPD_BTN</source>
         <translation>Mettre à jour la courbe</translation>
-    </message>                    
+    </message>
     <message>
         <source>AC_APPLY_BTN</source>
         <translation>Appliquer</translation>
-    </message>                    
+    </message>
     <message>
         <source>AC_CANT_CALCULATE</source>
         <translation>La courbe ne peut pas être calculée. 

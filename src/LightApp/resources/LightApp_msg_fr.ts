@@ -596,7 +596,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_SHOW_SPLASH</source>
-        <translation>Afficher l'écran de démarrage</translation>
+        <translation>Afficher l&apos;écran de démarrage</translation>
     </message>
     <message>
         <source>PREF_OPAQUE_RESIZE</source>
@@ -946,7 +946,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>XML_FILES_FILTER</source>
-        <translation type="unfinished">XML Files (*.xml)</translation>
+        <translation>Fichiers XML (*.xml)</translation>
     </message>
     <message>
         <source>CAPTION</source>

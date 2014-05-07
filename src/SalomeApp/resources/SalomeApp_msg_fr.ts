@@ -14,7 +14,7 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
     </message>
     <message>
         <source>WRN_STUDY_LOCKED</source>
-        <translation type="unfinished">Study is locked.</translation>
+        <translation>L&apos;étude est verrouillée</translation>
     </message>
     <message>
         <source>CLOSE_LOCKED_STUDY</source>
@@ -86,13 +86,13 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
     </message>
     <message>
         <source>ERR_ACTIVE_STUDY_CREATE</source>
-        <translation type="unfinished">Cannot create study: there is already an active study in this session.
-Launch a new session or close the study.</translation>
+        <translation>Impossible de créer une étude car il y en a déjà une d&apos;active.
+Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
     </message>
     <message>
         <source>ERR_ACTIVE_STUDY_OPEN</source>
-        <translation type="unfinished">Cannot open study: there is already an active study in this session.
-Launch a new session or close the study.</translation>
+        <translation>Impossible d&apos;ouvrir l&apos;étude car il y en a déjà une d&apos;active.
+Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
     </message>
 </context>
 <context>
@@ -371,16 +371,16 @@ Voulez-vous le recharger ?</translation>
         <translation>Check In</translation>
     </message>
     <message>
-      <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>Check In pour la module</translation>
+        <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In pour la module</translation>
     </message>
     <message>
-      <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>Check In pour la module</translation>
+        <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In pour la module</translation>
     </message>
     <message>
-      <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>Check In pour la module"</translation>
+        <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
+        <translation>Check In pour la module&quot;</translation>
     </message>
 </context>
 <context>
