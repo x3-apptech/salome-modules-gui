@@ -129,45 +129,40 @@ allows to specify advanced parameters for the Plot 2d Viewer.
 \anchor settings
 \image html plot2d_view_settings.png
 
-The options are as follows:
+The following options are available:
 
-- <b>Main title</b> the title of the XY plot. By default, it will
-  consist of the names of the tables, on the basis of which the curve
-  lines have been constructed.
+- <b>Main title</b> is the XY plot title. By default, it contains the names of tables, from which the curve
+  lines are constructed.
 
-- <b>Curve type</b> you can select from \em Points, \em Lines or
-  \em Spline.
+- <b>Curve type</b> allows selecting from \em Points, \em Lines or  \em Spline.
 
 - <b>Marker size</b> - size of the points (markers) forming curve lines.
 
 - <b>Background color</b> of the XY plot.
 
-- <b>Selection color</b> - this submenu allows to select the color of selected object in the viewer.
+- <b>Selection color</b> - defines the color of selected object in the viewer.
 
-- <b>Legend</b> allows specifying the properties of the legend.
+- <b>Legend</b> specifies the legend properties.
   
-  - <b>Show legend</b> - this options specifies if it's necessary to show legend by default.
+  - <b>Show legend</b> - specifies if the legend is shown by default.
 
-  - <b>Legend Position</b> here you can define the position of the
-  description table on the XY plot (to the \em Left, to the \em Right,
+  - <b>Legend Position</b> allows positioning the
+  description table on XY plot (to the \em Left, to the \em Right,
   on \em Top or on \em Bottom).
   
-  - <b>Symbol type</b> you can select the type of legend item symbol from "Marker on line" or "Marker above line"
+  - <b>Symbol type</b> allows positioning the legend item symbol: "Marker on line" or "Marker above line".
 
-  - <b>Legend font</b> here you can set type, face and color for the
-  font of Legend item.
+  - <b>Legend font</b> allows setting font variant, size and style for legend items.
   
-  - <b>Legend font color</b> - this allows to select the color of the font of the legend item.
+  - <b>Legend font color</b> allows selecting the font color for legend items.
 
-  - <b>Highlighted legend font color</b> - this submenu allows to select the color of the font of the selected legend item.
+  - <b>Highlighted legend font color</b> allows selecting font color for selected legend items.
 
-- <b>Deviation marker</b> allows specifying the properties of the
-  marker, which is used for drawing deviations data.
+- <b>Deviation marker</b> specifies the properties of the marker, which is used for drawing deviations data.
 
   - <b>Line width</b> line width of the marker.
 
-  - <b>Tick size</b> size of the upper and lower horizontal lines of
-    the marker.
+  - <b>Tick size</b> size of the upper and lower horizontal lines of the marker.
 
   - <b>Color</b> color of the marker.
 
