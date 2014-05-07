@@ -179,6 +179,8 @@ public:
   void                                updateVisibilityState( DataObjectList& theList,
                                                              SUIT_ViewModel* theViewModel );  
 
+  virtual bool                        checkExistingDoc();
+
 signals:
   void                                studyOpened();
   void                                studySaved();
@@ -191,6 +193,7 @@ public slots:
   virtual void                        onHelpContextModule( const QString&, const QString&, const QString& = QString() );
   virtual void                        onNewDoc();
   virtual void                        onOpenDoc();
+
   virtual void                        onHelpAbout();
   virtual bool                        onOpenDoc( const QString& );
   virtual void                        onCopy();

@@ -35,6 +35,8 @@
 #include <Container_init_python.hxx>
 #endif
 
+#include <QCoreApplication>
+
 // Py_ssize_t for old Pythons
 // This code is as recommended by"
 // http://www.python.org/dev/peps/pep-0353/#conversion-guidelines
@@ -80,13 +82,14 @@ extern "C"
 {
   SALOME_PYQT_LIGHT_EXPORT CAM_Module* createModule() 
   {
-    static bool alreadyInitialized = false;
+    QCoreApplication* app = QCoreApplication::instance();
+    bool alreadyInitialized = app && app->property( "salome_pyqt_gui_light_initialized" ).toBool();
 
     // make initialization only once (see comment above) !
     if ( !alreadyInitialized ) {
       PyLockWrapper lck; // GIL acquisition
       INIT_FUNCTION();
-      alreadyInitialized = !alreadyInitialized;
+      if ( app ) app->setProperty( "salome_pyqt_gui_light_initialized", true );
     }
 
     return new SALOME_PYQT_ModuleLight();

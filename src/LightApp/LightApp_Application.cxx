@@ -876,11 +876,12 @@ void LightApp_Application::onNewDoc()
   //asl: fix for 0020515
   if ( activeStudy() ) {
     saveDockWindowsState();
-#ifdef SINGLE_DESKTOP
-    if ( !closeDoc() )
-      return;
-#endif
   }
+  
+#ifdef SINGLE_DESKTOP
+  if ( !checkExistingDoc() )
+    return;
+#endif
 
   CAM_Application::onNewDoc();
 }
@@ -892,15 +893,14 @@ void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
   saveDockWindowsState();
-  if (study) {
+  
 #ifdef SINGLE_DESKTOP
-    if ( !closeDoc() )
-      return;
+  if ( !checkExistingDoc() )
+    return;
 #endif
-  }
-
+  
   CAM_Application::onOpenDoc();
-
+  
   if ( !study ) // new study will be create in THIS application
   {
     updateWindows();
@@ -914,15 +914,13 @@ void LightApp_Application::onOpenDoc()
 */
 bool LightApp_Application::onOpenDoc( const QString& aName )
 {
-  if ( activeStudy() ) {
 #ifdef SINGLE_DESKTOP
-    if ( !closeDoc() )
-      return false;
+  if ( !checkExistingDoc() )
+    return false;
 #endif
-  }
   // We should take mru action first because this application instance can be deleted later.
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
-
+  
   bool res = CAM_Application::onOpenDoc( aName );
 
   if ( mru )
@@ -4425,3 +4423,11 @@ void LightApp_Application::onViewManagerRemoved( SUIT_ViewManager* )
       aStudy->setVisibilityStateForAll( Qtx::UnpresentableState );
   }
 }
+
+/*!
+  Check existing document.
+*/
+bool LightApp_Application::checkExistingDoc() {
+  return true;
+}
+
