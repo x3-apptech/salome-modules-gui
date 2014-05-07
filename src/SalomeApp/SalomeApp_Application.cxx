@@ -320,12 +320,13 @@ void SalomeApp_Application::createActions()
                 tr( "MEN_DESK_REGISTRY_DISPLAY" ), tr( "PRP_DESK_REGISTRY_DISPLAY" ),
                 /*Qt::SHIFT+Qt::Key_D*/0, desk, false, this, SLOT( onRegDisplay() ) );
 
-  //SRN: BugID IPAL9021, add an action "Load"
-  createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),
-                resourceMgr()->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
-                tr( "MEN_DESK_FILE_LOAD" ), tr( "PRP_DESK_FILE_LOAD" ),
-                Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
-  //SRN: BugID IPAL9021: End
+  //rnv commented : implementation of the mono-study in GUI
+  //
+  //createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),
+  //              resourceMgr()->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
+  //              tr( "MEN_DESK_FILE_LOAD" ), tr( "PRP_DESK_FILE_LOAD" ),
+  //              Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
+
 
 #ifdef WITH_SIMANIO
   if (myIsSiman) {
@@ -345,7 +346,7 @@ void SalomeApp_Application::createActions()
   // creation of menu item is moved to VISU
   //  createMenu( SaveGUIStateId, fileMenu, 10, -1 );
 
-  createMenu( FileLoadId,   fileMenu, 0 );  //SRN: BugID IPAL9021, add a menu item "Load"
+  // createMenu( FileLoadId,   fileMenu, 0 );
 
 #ifdef WITH_SIMANIO
   if (myIsSiman) {
@@ -423,6 +424,11 @@ void SalomeApp_Application::onLoadDoc()
 
   std::vector<std::string> List = studyMgr()->GetOpenStudies();
 
+  // rnv: According to the single-study approach on the server side
+  //      can be only one study. So if it is exists connect to them,  
+  //      overwise show warning message: "No active study on the server"
+
+  /*
   SUIT_Session* aSession = SUIT_Session::session();
   QList<SUIT_Application*> aAppList = aSession->applications();
 
@@ -444,10 +450,19 @@ void SalomeApp_Application::onLoadDoc()
      if ( !isAlreadyOpen )
        unloadedStudies << studyName;
   }
-
   studyName = SalomeApp_LoadStudiesDlg::selectStudy( desktop(), unloadedStudies );
   if ( studyName.isEmpty() )
     return;
+  */
+
+  if(List.size() <= 0) {
+    SUIT_MessageBox::warning( desktop(),
+                              QObject::tr("WRN_WARNING"),
+                              QObject::tr("WRN_NO_STUDY_ON SERV") );
+    return;
+  }
+  
+  studyName = List[0].c_str();
 
 #ifndef WIN32
   // this code replaces marker of windows drive and path become invalid therefore
@@ -1138,15 +1153,16 @@ int SalomeApp_Application::closeChoice( const QString& docName )
 {
   int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ), tr( "APPCLOSE_DESCRIPTION" ).arg( docName ),
                                           tr ("APPCLOSE_SAVE"), tr ("APPCLOSE_CLOSE"),
-                                          tr ("APPCLOSE_UNLOAD"), tr ("APPCLOSE_CANCEL"), 0 );
+					  //tr ("APPCLOSE_UNLOAD"), 
+					  tr ("APPCLOSE_CANCEL"), 0 );
 
   int res = CloseCancel;
   if ( answer == 0 )
     res = CloseSave;
   else if ( answer == 1 )
     res = CloseDiscard;
-  else if ( answer == 2 )
-    res = CloseUnload;
+  // else if ( answer == 2 )
+  //   res = CloseUnload;
 
   return res;
 }
@@ -1249,7 +1265,10 @@ bool SalomeApp_Application::openAction( const int aChoice, const QString& aName 
 QMap<int, QString> SalomeApp_Application::activateModuleActions() const
 {
   QMap<int, QString> opmap = LightApp_Application::activateModuleActions();
-  opmap.insert( LoadStudyId,     tr( "ACTIVATE_MODULE_OP_LOAD" ) );
+
+  // rnv commented : implementation of the mono-study in GUI
+  // opmap.insert( LoadStudyId,     tr( "ACTIVATE_MODULE_OP_LOAD" ) );
+
   opmap.insert( NewAndScriptId,  tr( "ACTIVATE_MODULE_OP_SCRIPT" ) );
   return opmap;
 }
@@ -1564,10 +1583,10 @@ void SalomeApp_Application::onStudyCreated( SUIT_Study* study )
 {
   LightApp_Application::onStudyCreated( study );
 
-#ifndef DISABLE_PYCONSOLE
-  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
-                               windowDock( getWindow( WT_ObjectBrowser ) ) );
-#endif
+//#ifndef DISABLE_PYCONSOLE
+//  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
+//                               windowDock( getWindow( WT_ObjectBrowser ) ) );
+//#endif
 
   loadDockWindowsState();
 
@@ -1579,10 +1598,10 @@ void SalomeApp_Application::onStudyOpened( SUIT_Study* study )
 {
   LightApp_Application::onStudyOpened( study );
 
-#ifndef DISABLE_PYCONSOLE
-  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
-                               windowDock( getWindow( WT_ObjectBrowser ) ) );
-#endif
+//#ifndef DISABLE_PYCONSOLE
+//  desktop()->tabifyDockWidget( windowDock( getWindow( WT_NoteBook ) ),
+//                               windowDock( getWindow( WT_ObjectBrowser ) ) );
+//#endif
 
   loadDockWindowsState();
 
@@ -2024,4 +2043,50 @@ void SalomeApp_Application::afterCloseDoc()
   }
 #endif
   LightApp_Application::afterCloseDoc();
+}
+
+/*
+  Asks to close existing document.
+*/
+bool SalomeApp_Application::checkExistingDoc() {
+  bool result = true;
+  if( activeStudy() ) {
+    int answer = SUIT_MessageBox::question( desktop(), 
+					    tr( "APPCLOSE_CAPTION" ), 
+					    tr( "STUDYCLOSE_DESCRIPTION" ),
+					    tr( "APPCLOSE_SAVE" ), 
+					    tr( "APPCLOSE_CLOSE" ),
+					    tr( "APPCLOSE_CANCEL" ), 0 );
+    if(answer == 0) {
+      if ( activeStudy()->isSaved() ) {
+	onSaveDoc();
+	closeDoc( false );
+      } else if ( onSaveAsDoc() ) {
+	if( !closeDoc( false ) ) {
+	  result = false;
+	}
+      } else {
+	result = false;
+      }	
+    }
+    else if( answer == 1 ) {
+      closeDoc( false );
+    } else if( answer == 2 ) {
+      result = false;
+    }
+  } else {
+    SALOMEDSClient_StudyManager* aMgr = studyMgr();
+    if( aMgr ) {
+      std::vector<std::string> List = studyMgr()->GetOpenStudies();
+      if( List.size() > 0 ) {
+        int answer = SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "QUE_ACTIVEDOC_LOAD" ),
+                                                SUIT_MessageBox::Yes | SUIT_MessageBox::No, SUIT_MessageBox::No );
+        if ( answer == SUIT_MessageBox::Yes ) {
+	  onLoadDoc();
+	}
+	result = false;
+      }
+    }
+  }
+  return result;
 }

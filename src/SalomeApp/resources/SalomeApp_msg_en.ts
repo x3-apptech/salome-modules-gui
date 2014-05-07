@@ -13,8 +13,24 @@ Python file must include only letters, digits and underscores and start from let
         <translation>The file %1 does not exist.</translation>
     </message>
     <message>
+        <source>QUE_ACTIVEDOC_LOAD</source>
+        <translation>There is an active study in the session.
+Do you want to load it?
+</translation>
+    </message>
+    <message>
+        <source>STUDYCLOSE_DESCRIPTION</source>
+        <translation>You should close an existing study before.
+Do you want to close it?
+</translation>
+    </message>
+    <message>
         <source>WRN_STUDY_LOCKED</source>
         <translation>Study is locked.</translation>
+    </message>
+    <message>
+        <source>WRN_NO_STUDY_ON SERV</source>
+        <translation>No active study in this session.</translation>
     </message>
     <message>
         <source>CLOSE_LOCKED_STUDY</source>
@@ -216,7 +232,7 @@ Do you want to reload it ?</translation>
     </message>
     <message>
         <source>APPCLOSE_DESCRIPTION</source>
-        <translation>Do you want to close or unload study before closing?</translation>
+        <translation>Do you want to save study before closing?</translation>
     </message>
     <message>
         <source>PRP_DESK_PROPERTIES</source>

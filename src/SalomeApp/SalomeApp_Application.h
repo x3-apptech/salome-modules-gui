@@ -96,6 +96,8 @@ public:
   virtual bool                        checkDataObject(LightApp_DataObject* theObj);
 
   virtual void                        setDesktop( SUIT_Desktop* );
+  
+  virtual bool                        checkExistingDoc();
 
   static CORBA::ORB_var               orb();
   static SALOMEDSClient_StudyManager* studyMgr();
