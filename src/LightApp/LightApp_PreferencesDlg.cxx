@@ -28,6 +28,8 @@
 
 #include "QtxResourceMgr.h"
 
+#include <SUIT_Session.h>
+#include <SUIT_Application.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_FileDlg.h>
 
@@ -39,7 +41,7 @@
   Constructor.
 */
 LightApp_PreferencesDlg::LightApp_PreferencesDlg( LightApp_Preferences* prefs, QWidget* parent )
-: QtxDialog( parent, true, true, OK | Close | Apply ),
+: QtxDialog( parent, true, true, OK | Close | Apply | Help ),
 myPrefs( prefs ), mySaved ( false )
 {
   setWindowTitle( tr( "CAPTION" ) );
@@ -115,6 +117,9 @@ void LightApp_PreferencesDlg::reject()
 /*!Do nothing.*/
 void LightApp_PreferencesDlg::onHelp()
 {
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( app )
+    app->onHelpContextModule( "GUI", "setting_preferences_page.html" );
 }
 
 /*!Store preferences on apply.*/
