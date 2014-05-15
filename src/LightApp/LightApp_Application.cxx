@@ -1617,6 +1617,31 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   return vm;
 }
 
+SUIT_ViewManager* LightApp_Application::createViewManager( SUIT_ViewModel* theModel )
+{
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+
+  SUIT_ViewManager* vm = new SUIT_ViewManager( activeStudy(),
+                                               desktop(),
+                                               theModel );
+
+  QString vmType = vm->getType();
+
+  vm->setTitle( QString( "%1: %M - viewer %V" ).arg( vmType ) );
+
+  addViewManager( vm );
+  SUIT_ViewWindow* vw = vm->createViewWindow();
+  if ( vw && desktop() ) {
+    vw->resize( (int)( desktop()->width() * 0.6 ), (int)( desktop()->height() * 0.6 ) );
+    vw->setDropDownButtons( resMgr->booleanValue( "viewers", "drop_down_buttons", true ) );
+  }
+
+  if ( !vmType.isEmpty() && !myUserWmTypes.contains( vmType ) )
+    myUserWmTypes << vmType;
+
+  return vm;
+}
+
 /*!
   SLOT: Removes view manager from application
 */

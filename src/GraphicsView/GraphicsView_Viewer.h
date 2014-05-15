@@ -52,7 +52,7 @@ public:
   enum TransformType { NoTransform, Reset, FitAll, FitRect, FitSelect,
                        Zoom, PanGlobal, Pan, FitWidth, UserTransform = 100 };
 public:
-  GraphicsView_Viewer( const QString& title );
+  GraphicsView_Viewer( const QString& title, QWidget* widget = NULL );
   ~GraphicsView_Viewer();
 
 public:
@@ -126,6 +126,7 @@ private:
 protected:
   GraphicsView_Selector*        mySelector;
   GraphicsView_ViewTransformer* myTransformer;
+  QWidget*                      myWidget;
 
   bool                          myIsInitialized;
 };

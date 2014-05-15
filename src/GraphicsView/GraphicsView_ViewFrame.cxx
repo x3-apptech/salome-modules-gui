@@ -47,7 +47,7 @@
 // Name    : GraphicsView_ViewFrame
 // Purpose : Constructor
 //=======================================================================
-GraphicsView_ViewFrame::GraphicsView_ViewFrame( SUIT_Desktop* d, GraphicsView_Viewer* vw )
+GraphicsView_ViewFrame::GraphicsView_ViewFrame( SUIT_Desktop* d, GraphicsView_Viewer* vw, QWidget* w )
 : SUIT_ViewWindow( d ),
   myViewer( vw )
 {
@@ -58,7 +58,11 @@ GraphicsView_ViewFrame::GraphicsView_ViewFrame( SUIT_Desktop* d, GraphicsView_Vi
   aLayout->setMargin( 0 );
   aLayout->setSpacing( 0 );
 
-  myViewPort = new GraphicsView_ViewPort( aFrame );
+  if( w )
+    myViewPort = dynamic_cast<GraphicsView_ViewPort*>(w);
+  else
+    myViewPort = new GraphicsView_ViewPort( aFrame );
+
   aLayout->addWidget( myViewPort );
 
   createActions();
@@ -185,6 +189,15 @@ int GraphicsView_ViewFrame::createToolBar()
   toolMgr()->append( toolMgr()->action( ResetId ), tid );
 
   return tid;
+}
+
+//================================================================
+// Function : getToolBarId
+// Purpose  :
+//================================================================
+int GraphicsView_ViewFrame::getToolBarId()
+{
+  return myToolBarId;
 }
 
 //================================================================

@@ -82,6 +82,7 @@ public:
 public:
   GraphicsView_Scene*              getScene() { return myScene; }
   void                             addItem( QGraphicsItem* theItem );
+  bool                             isItemAdded( QGraphicsItem* theItem );
   void                             removeItem( QGraphicsItem* theItem );
 
   enum SortType { NoSorting, SelectedFirst, SortByZLevel };

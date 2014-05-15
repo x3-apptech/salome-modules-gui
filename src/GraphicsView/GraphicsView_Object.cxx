@@ -32,7 +32,8 @@ GraphicsView_Object::GraphicsView_Object( QGraphicsItem* theParent )
   myIsOnTop( false ),
   myIsHighlighted( false ),
   myIsSelected( false ),
-  myIsMoving( false )
+  myIsMoving( false ),
+  myIsMovable( true )
 {
 }
 
@@ -156,6 +157,9 @@ void GraphicsView_Object::unselect()
 //================================================================
 void GraphicsView_Object::move( double theDX, double theDY, bool theIsAtOnce )
 {
+  if( !myIsMovable )
+    return;
+
   if( theIsAtOnce )
   {
     finishMove( true );
