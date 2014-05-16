@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS>
+<TS version="2.0" language="ja" sourcelanguage="en">
   <context>
     <name>@default</name>
     <message>
@@ -12,8 +12,20 @@
       <translation>ファイル %1 は存在しません。</translation>
     </message>
     <message>
-        <source>WRN_STUDY_LOCKED</source>
-        <translation type="unfinished">Study is locked.</translation>
+      <source>QUE_ACTIVEDOC_LOAD</source>
+      <translation>QUE_ACTIVEDOC_LOAD</translation>
+    </message>
+    <message>
+      <source>STUDYCLOSE_DESCRIPTION</source>
+      <translation>STUDYCLOSE_DESCRIPTION</translation>
+    </message>
+    <message>
+      <source>WRN_STUDY_LOCKED</source>
+      <translation>WRN_STUDY_LOCKED</translation>
+    </message>
+    <message>
+      <source>WRN_NO_STUDY_ON SERV</source>
+      <translation>WRN_NO_STUDY_ON SERV</translation>
     </message>
     <message>
       <source>CLOSE_LOCKED_STUDY</source>
@@ -84,42 +96,16 @@
       <translation>変数"%1"は存在しません。</translation>
     </message>
     <message>
-        <source>ERR_ACTIVE_STUDY_CREATE</source>
-        <translation type="unfinished">Cannot create study: there is already an active study in this session.
-Launch a new session or close the study.</translation>
+      <source>ERR_ACTIVE_STUDY_CREATE</source>
+      <translation>ERR_ACTIVE_STUDY_CREATE</translation>
     </message>
     <message>
-        <source>ERR_ACTIVE_STUDY_OPEN</source>
-        <translation type="unfinished">Cannot open study: there is already an active study in this session.
-Launch a new session or close the study.</translation>
+      <source>ERR_ACTIVE_STUDY_OPEN</source>
+      <translation>ERR_ACTIVE_STUDY_OPEN</translation>
     </message>
   </context>
   <context>
     <name>SalomeApp_Application</name>
-    <message>
-        <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
-        <translation type="unfinished">Check In for module</translation>
-    </message>
-    <message>
-        <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
-        <translation type="unfinished">Check In for module</translation>
-    </message>
-    <message>
-        <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
-        <translation type="unfinished">Check In for module</translation>
-    </message>
-    <message>
-        <source>PRP_SIMAN_CHECK_IN</source>
-        <translation type="unfinished">Check In</translation>
-    </message>
-    <message>
-        <source>MEN_SIMAN_CHECK_IN</source>
-        <translation type="unfinished">Check In</translation>
-    </message>
-    <message>
-        <source>TOT_SIMAN_CHECK_IN</source>
-        <translation type="unfinished">Check In</translation>
-    </message>
     <message>
       <source>ALL_FILES_FILTER</source>
       <translation>すべてのファイル (*. *)</translation>
@@ -379,6 +365,30 @@ Launch a new session or close the study.</translation>
     <message>
       <source>ACTIVATE_MODULE_OP_SCRIPT</source>
       <translation>スクリプト読込み(&amp;S)</translation>
+    </message>
+    <message>
+      <source>TOT_SIMAN_CHECK_IN</source>
+      <translation>TOT_SIMAN_CHECK_IN</translation>
+    </message>
+    <message>
+      <source>MEN_SIMAN_CHECK_IN</source>
+      <translation>MEN_SIMAN_CHECK_IN</translation>
+    </message>
+    <message>
+      <source>PRP_SIMAN_CHECK_IN</source>
+      <translation>PRP_SIMAN_CHECK_IN</translation>
+    </message>
+    <message>
+      <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
+      <translation>TOT_SIMAN_LOCAL_CHECK_IN</translation>
+    </message>
+    <message>
+      <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
+      <translation>MEN_SIMAN_LOCAL_CHECK_IN</translation>
+    </message>
+    <message>
+      <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
+      <translation>PRP_SIMAN_LOCAL_CHECK_IN</translation>
     </message>
   </context>
   <context>

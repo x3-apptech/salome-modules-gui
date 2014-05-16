@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS>
+<TS version="2.0" language="ja" sourcelanguage="en">
   <context>
     <name>@default</name>
-    <message>
-        <source>PDF_FILES</source>
-        <translation type="unfinished">PDF files (*.pdf)</translation>
-    </message>
     <message>
       <source>PLOT2D_CURVE_TYPE_LBL</source>
       <translation>曲線の種類:</translation>
@@ -74,6 +70,10 @@
     <message>
       <source>ENCAPSULATED_POSTSCRIPT_FILES</source>
       <translation>カプセル化された PostScript (*.eps) ファイル</translation>
+    </message>
+    <message>
+      <source>PDF_FILES</source>
+      <translation>PDF_FILES</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
@@ -336,6 +336,10 @@
       <translation>背景色:</translation>
     </message>
     <message>
+      <source>PLOT2D_SELECTION_COLOR_LBL</source>
+      <translation>PLOT2D_SELECTION_COLOR_LBL</translation>
+    </message>
+    <message>
       <source>PLOT2D_DEVIATION_MARKER_TLT</source>
       <translation>バイパス マーカー</translation>
     </message>
@@ -562,6 +566,34 @@
     <message>
       <source>PLOT2D_ENABLE_MAIN_TITLE</source>
       <translation>主なタイトル</translation>
+    </message>
+    <message>
+      <source>PLOT2D_LEGEND_GROUP</source>
+      <translation>PLOT2D_LEGEND_GROUP</translation>
+    </message>
+    <message>
+      <source>PLOT2D_LEGEND_POSITION</source>
+      <translation>PLOT2D_LEGEND_POSITION</translation>
+    </message>
+    <message>
+      <source>PLOT2D_LEGEND_SYMBOL_TYPE</source>
+      <translation>PLOT2D_LEGEND_SYMBOL_TYPE</translation>
+    </message>
+    <message>
+      <source>PLOT2D_MARKER_ABOVE_LINE</source>
+      <translation>PLOT2D_MARKER_ABOVE_LINE</translation>
+    </message>
+    <message>
+      <source>PLOT2D_MARKER_ON_LINE</source>
+      <translation>PLOT2D_MARKER_ON_LINE</translation>
+    </message>
+    <message>
+      <source>PLOT2D_LEGEND_FONT_COLOR</source>
+      <translation>PLOT2D_LEGEND_FONT_COLOR</translation>
+    </message>
+    <message>
+      <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
+      <translation>PLOT2D_SELECTED_LEGEND_FONT_COLOR</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_CURVES_LINES</source>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS>
+<TS version="2.0" language="ja" sourcelanguage="en">
   <context>
     <name>@default</name>
     <message>
@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
-      <translation>Copyright (C) 2007-2014 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+      <translation>Copyright (C) 2007-2013 CEA/DEN, EDF R&amp;D, OPEN CASCADE
 
 Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
 CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
@@ -92,6 +92,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>LANG_CHANGED</source>
       <translation>アプリケーションの言語が変更されました。&lt;BR&gt;変更は、次のセッションに適用されます。</translation>
+    </message>
+    <message>
+      <source>LOCALE_CHANGED</source>
+      <translation>LOCALE_CHANGED</translation>
     </message>
     <message>
       <source>MEN_DESK_THEME</source>
@@ -590,6 +594,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>現在の言語</translation>
     </message>
     <message>
+      <source>PREF_CURRENT_LOCALE</source>
+      <translation>PREF_CURRENT_LOCALE</translation>
+    </message>
+    <message>
       <source>PREF_GROUP_LOOK_AND_FEEL</source>
       <translation>外観</translation>
     </message>
@@ -668,6 +676,26 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>PREF_GROUP_PLOT2DVIEWER</source>
       <translation>Plot 2D Viewer</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_VIEWER</source>
+      <translation>PREF_GROUP_VIEWER</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_LEGEND</source>
+      <translation>PREF_GROUP_LEGEND</translation>
+    </message>
+    <message>
+      <source>PREF_LEGEND_SYMBOL_TYPE</source>
+      <translation>PREF_LEGEND_SYMBOL_TYPE</translation>
+    </message>
+    <message>
+      <source>PREF_MARKER_ABOVE_LINE</source>
+      <translation>PREF_MARKER_ABOVE_LINE</translation>
+    </message>
+    <message>
+      <source>PREF_MARKER_ON_LINE</source>
+      <translation>PREF_MARKER_ON_LINE</translation>
     </message>
     <message>
       <source>PREF_DEVIATION_COLOR</source>

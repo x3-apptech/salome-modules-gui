@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS>
+<TS version="2.0" language="ja" sourcelanguage="en">
   <context>
     <name>@default</name>
     <message>
@@ -449,6 +449,22 @@
     <message>
       <source>LBL_SELECTPOINT</source>
       <translation>ビューのポイントを選択します。</translation>
+    </message>
+    <message>
+      <source>LBL_POINT</source>
+      <translation>LBL_POINT</translation>
+    </message>
+    <message>
+      <source>LBL_EDGE</source>
+      <translation>LBL_EDGE</translation>
+    </message>
+    <message>
+      <source>LBL_FACE</source>
+      <translation>LBL_FACE</translation>
+    </message>
+    <message>
+      <source>LBL_VOLUME</source>
+      <translation>LBL_VOLUME</translation>
     </message>
     <message>
       <source>DLG_TITLE</source>
