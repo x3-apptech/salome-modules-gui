@@ -110,6 +110,14 @@ Launch a new session or close the study.</translation>
         <translation>Cannot open study: there is already an active study in this session.
 Launch a new session or close the study.</translation>
     </message>
+    <message>
+        <source>OPEN_DOCUMENT_PROBLEM</source>
+        <translation>Unknown problem during opening of the document</translation>
+    </message>
+    <message>
+        <source>CREATE_DOCUMENT_PROBLEM</source>
+        <translation>Unknown problem during creation of the document</translation>
+    </message>
 </context>
 <context>
     <name>SalomeApp_Application</name>

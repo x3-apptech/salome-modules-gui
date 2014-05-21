@@ -466,10 +466,17 @@ bool SalomeApp_Study::createDocument( const QString& theStr )
   try {
     study = _PTR(Study)( SalomeApp_Application::studyMgr()->NewStudy( aName.toUtf8().data() ) );
   }
+  catch(const SALOME_Exception& ex) {
+    SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
+                               tr("ERR_ERROR"), tr(ex.what()));
+    return false;
+  } 
   catch(...) {
     SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
-                               tr("ERR_ERROR"), tr("ERR_ACTIVE_STUDY_CREATE") );
+                               tr("ERR_ERROR"), tr("CREATE_DOCUMENT_PROBLEM"));
+    return false;
   }
+
   if ( !study )
     return false;
 
@@ -509,10 +516,17 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
   try {
     study = _PTR(Study) ( SalomeApp_Application::studyMgr()->Open( theFileName.toUtf8().data() ) );
   }
+  catch(const SALOME_Exception& ex) {
+    SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
+                               tr("ERR_ERROR"), tr(ex.what()));
+    return false;
+  } 
   catch(...) {
     SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
-                               tr("ERR_ERROR"), tr("ERR_ACTIVE_STUDY_OPEN") );
+                               tr("ERR_ERROR"), tr("OPEN_DOCUMENT_PROBLEM"));
+    return false;
   }
+
   if ( !study )
     return false;
 
