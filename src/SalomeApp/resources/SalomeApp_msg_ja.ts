@@ -13,19 +13,20 @@
     </message>
     <message>
       <source>QUE_ACTIVEDOC_LOAD</source>
-      <translation>QUE_ACTIVEDOC_LOAD</translation>
+      <translation>セッションにスタディがあります。読み込みますか？</translation>
     </message>
     <message>
       <source>STUDYCLOSE_DESCRIPTION</source>
-      <translation>STUDYCLOSE_DESCRIPTION</translation>
+      <translation>既存のスタディを閉じる必要があります。閉じますか？
+</translation>
     </message>
     <message>
       <source>WRN_STUDY_LOCKED</source>
-      <translation>WRN_STUDY_LOCKED</translation>
+      <translation>スタディがロックされています</translation>
     </message>
     <message>
       <source>WRN_NO_STUDY_ON SERV</source>
-      <translation>WRN_NO_STUDY_ON SERV</translation>
+      <translation>セッションにスタディがありません。</translation>
     </message>
     <message>
       <source>CLOSE_LOCKED_STUDY</source>
@@ -97,11 +98,13 @@
     </message>
     <message>
       <source>ERR_ACTIVE_STUDY_CREATE</source>
-      <translation>ERR_ACTIVE_STUDY_CREATE</translation>
+      <translation>スタディを作成できません: セッションに既にスタディがあります。
+新規セッションを開始するかスタディを閉じてください。</translation>
     </message>
     <message>
       <source>ERR_ACTIVE_STUDY_OPEN</source>
-      <translation>ERR_ACTIVE_STUDY_OPEN</translation>
+      <translation>スタディを開けません: セッションに既にスタディがあります。
+新規セッションを開始するかスタディを閉じてください。</translation>
     </message>
   </context>
   <context>
@@ -368,27 +371,27 @@
     </message>
     <message>
       <source>TOT_SIMAN_CHECK_IN</source>
-      <translation>TOT_SIMAN_CHECK_IN</translation>
+      <translation>チェックイン</translation>
     </message>
     <message>
       <source>MEN_SIMAN_CHECK_IN</source>
-      <translation>MEN_SIMAN_CHECK_IN</translation>
+      <translation>チェックイン</translation>
     </message>
     <message>
       <source>PRP_SIMAN_CHECK_IN</source>
-      <translation>PRP_SIMAN_CHECK_IN</translation>
+      <translation>チェックイン</translation>
     </message>
     <message>
       <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>TOT_SIMAN_LOCAL_CHECK_IN</translation>
+      <translation>モジュールにチェックイン</translation>
     </message>
     <message>
       <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>MEN_SIMAN_LOCAL_CHECK_IN</translation>
+      <translation>モジュールにチェックイン</translation>
     </message>
     <message>
       <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>PRP_SIMAN_LOCAL_CHECK_IN</translation>
+      <translation>モジュールにチェックイン</translation>
     </message>
   </context>
   <context>

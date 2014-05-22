@@ -73,7 +73,7 @@
     </message>
     <message>
       <source>PDF_FILES</source>
-      <translation>PDF_FILES</translation>
+      <translation>PDF files (*.pdf)</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>PLOT2D_SELECTION_COLOR_LBL</source>
-      <translation>PLOT2D_SELECTION_COLOR_LBL</translation>
+      <translation>選択色:</translation>
     </message>
     <message>
       <source>PLOT2D_DEVIATION_MARKER_TLT</source>
@@ -569,31 +569,31 @@
     </message>
     <message>
       <source>PLOT2D_LEGEND_GROUP</source>
-      <translation>PLOT2D_LEGEND_GROUP</translation>
+      <translation>凡例</translation>
     </message>
     <message>
       <source>PLOT2D_LEGEND_POSITION</source>
-      <translation>PLOT2D_LEGEND_POSITION</translation>
+      <translation>凡例の位置</translation>
     </message>
     <message>
       <source>PLOT2D_LEGEND_SYMBOL_TYPE</source>
-      <translation>PLOT2D_LEGEND_SYMBOL_TYPE</translation>
+      <translation>シンボルタイプ:</translation>
     </message>
     <message>
       <source>PLOT2D_MARKER_ABOVE_LINE</source>
-      <translation>PLOT2D_MARKER_ABOVE_LINE</translation>
+      <translation>線の上のマーカー</translation>
     </message>
     <message>
       <source>PLOT2D_MARKER_ON_LINE</source>
-      <translation>PLOT2D_MARKER_ON_LINE</translation>
+      <translation>線上のマーカー</translation>
     </message>
     <message>
       <source>PLOT2D_LEGEND_FONT_COLOR</source>
-      <translation>PLOT2D_LEGEND_FONT_COLOR</translation>
+      <translation>凡例フォントの色:</translation>
     </message>
     <message>
       <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
-      <translation>PLOT2D_SELECTED_LEGEND_FONT_COLOR</translation>
+      <translation>ハイライト凡例フォントの色:</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_CURVES_LINES</source>

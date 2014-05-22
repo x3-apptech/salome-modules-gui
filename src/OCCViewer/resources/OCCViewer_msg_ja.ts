@@ -356,19 +356,19 @@
     </message>
     <message>
       <source>LBL_POINT</source>
-      <translation>LBL_POINT</translation>
+      <translation>点</translation>
     </message>
     <message>
       <source>LBL_EDGE</source>
-      <translation>LBL_EDGE</translation>
+      <translation>エッジ</translation>
     </message>
     <message>
       <source>LBL_FACE</source>
-      <translation>LBL_FACE</translation>
+      <translation>面</translation>
     </message>
     <message>
       <source>LBL_SOLID</source>
-      <translation>LBL_SOLID</translation>
+      <translation>ソリッド</translation>
     </message>
   </context>
   <context>

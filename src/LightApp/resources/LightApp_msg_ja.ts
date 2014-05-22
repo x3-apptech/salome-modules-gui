@@ -16,7 +16,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>ABOUT_CAPTION</source>
-      <translation>約%1</translation>
+      <translation>%1について</translation>
     </message>
     <message>
       <source>ABOUT_BASE</source>
@@ -72,7 +72,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>BROWSER_FORWARD</source>
-      <translation>前に進む</translation>
+      <translation>進む</translation>
     </message>
     <message>
       <source>BROWSER_FIND</source>
@@ -84,7 +84,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>BROWSER_FINDPREV</source>
-      <translation>前を検索(&amp;N)</translation>
+      <translation>前を検索(&amp;p)</translation>
     </message>
   </context>
   <context>
@@ -95,7 +95,8 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>LOCALE_CHANGED</source>
-      <translation>LOCALE_CHANGED</translation>
+      <translation>アプリケーションの言語が変更されました。
+次回のセッションから有効になります。</translation>
     </message>
     <message>
       <source>MEN_DESK_THEME</source>
@@ -135,7 +136,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_MULTI_FILE</source>
-      <translation>複数のファイル保存</translation>
+      <translation>複数ファイルの保存</translation>
     </message>
     <message>
       <source>MEN_DESK_PREFERENCES</source>
@@ -403,7 +404,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_AUTO_HIDE_SEARCH_TOOL</source>
-      <translation>自動的に隠す</translation>
+      <translation>自動非表示の有効化</translation>
     </message>
     <message>
       <source>PREF_OBJ_BROWSER_SETTINGS</source>
@@ -431,7 +432,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_MARKER_SIZE</source>
-      <translation>マーカーサイズ</translation>
+      <translation>マーカーのサイズ:</translation>
     </message>
     <message>
       <source>PREF_TAB_VIEWERS</source>
@@ -595,7 +596,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_CURRENT_LOCALE</source>
-      <translation>PREF_CURRENT_LOCALE</translation>
+      <translation>言語 "C" を使います</translation>
     </message>
     <message>
       <source>PREF_GROUP_LOOK_AND_FEEL</source>
@@ -679,23 +680,23 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_GROUP_VIEWER</source>
-      <translation>PREF_GROUP_VIEWER</translation>
+      <translation>ビューワ</translation>
     </message>
     <message>
       <source>PREF_GROUP_LEGEND</source>
-      <translation>PREF_GROUP_LEGEND</translation>
+      <translation>凡例</translation>
     </message>
     <message>
       <source>PREF_LEGEND_SYMBOL_TYPE</source>
-      <translation>PREF_LEGEND_SYMBOL_TYPE</translation>
+      <translation>シンボルの型:</translation>
     </message>
     <message>
       <source>PREF_MARKER_ABOVE_LINE</source>
-      <translation>PREF_MARKER_ABOVE_LINE</translation>
+      <translation>線の上のマーカー</translation>
     </message>
     <message>
       <source>PREF_MARKER_ON_LINE</source>
-      <translation>PREF_MARKER_ON_LINE</translation>
+      <translation>線上のマーカー</translation>
     </message>
     <message>
       <source>PREF_DEVIATION_COLOR</source>

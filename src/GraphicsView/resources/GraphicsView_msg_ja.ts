@@ -5,121 +5,121 @@
     <name>GraphicsView_ViewFrame</name>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>DSC_DUMP_VIEW</translation>
+      <translation>&#x30A2;&#x30AF;&#x30C6;&#x30A3;&#x30D6;&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x753B;&#x50CF;&#x3092;&#x4FDD;&#x5B58;</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>DSC_FITALL</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x67A0;&#x5185;&#x306B;&#x3059;&#x3079;&#x3066;&#x306E;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3092;&#x30D5;&#x30A3;&#x30C3;&#x30C8;&#x3059;&#x308B;</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>DSC_FITRECT</translation>
+      <translation>&#x9818;&#x57DF;&#x3092;&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x67A0;&#x5185;&#x306B;&#x30D5;&#x30A3;&#x30C3;&#x30C8;&#x3059;&#x308B;</translation>
     </message>
     <message>
       <source>DSC_FITSELECT</source>
-      <translation>DSC_FITSELECT</translation>
+      <translation>&#x9078;&#x629E;&#x9818;&#x57DF;&#x3092;&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x67A0;&#x5185;&#x306B;&#x30D5;&#x30A3;&#x30C3;&#x30C8;&#x3059;&#x308B;</translation>
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>DSC_GLOBALPAN_VIEW</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x65B0;&#x3057;&#x3044;&#x4E2D;&#x5FC3;&#x306E;&#x9078;&#x629E;</translation>
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>DSC_PAN_VIEW</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x56DE;&#x8EE2;</translation>
     </message>
     <message>
       <source>DSC_RESET_VIEW</source>
-      <translation>DSC_RESET_VIEW</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x30EA;&#x30BB;&#x30C3;&#x30C8;</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
-      <translation>DSC_ZOOM_VIEW</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x62E1;&#x5927;</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
-      <translation>LBL_TOOLBAR_LABEL</translation>
+      <translation>&#x30D3;&#x30E5;&#x30FC;&#x306E;&#x64CD;&#x4F5C;</translation>
     </message>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>MNU_DUMP_VIEW</translation>
+      <translation>&#x8868;&#x793A;&#x72B6;&#x614B;&#x306E;&#x4FDD;&#x5B58;</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>MNU_FITALL</translation>
+      <translation>&#x5168;&#x8868;&#x793A;</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>MNU_FITRECT</translation>
+      <translation>&#x9818;&#x57DF;&#x306B;&#x30D5;&#x30A3;&#x30C3;&#x30C8;</translation>
     </message>
     <message>
       <source>MNU_FITSELECT</source>
-      <translation>MNU_FITSELECT</translation>
+      <translation>&#x9078;&#x629E;&#x7BC4;&#x56F2;&#x3092;&#x30BA;&#x30FC;&#x30E0;</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>MNU_GLOBALPAN_VIEW</translation>
+      <translation>&#x30B0;&#x30ED;&#x30FC;&#x30D0;&#x30EB;&#x56DE;&#x8EE2;</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>MNU_PAN_VIEW</translation>
+      <translation>&#x56DE;&#x8EE2;</translation>
     </message>
     <message>
       <source>MNU_RESET_VIEW</source>
-      <translation>MNU_RESET_VIEW</translation>
+      <translation>&#x30EA;&#x30BB;&#x30C3;&#x30C8;</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
-      <translation>MNU_ZOOM_VIEW</translation>
+      <translation>&#x30BA;&#x30FC;&#x30E0;</translation>
     </message>
   </context>
   <context>
     <name>GraphicsView_Viewer</name>
     <message>
       <source>CHANGE_BGCOLOR</source>
-      <translation>CHANGE_BGCOLOR</translation>
+      <translation>&#x80CC;&#x666F;&#x306E;&#x5909;&#x66F4;.</translation>
     </message>
     <message>
       <source>ADD_IMAGE</source>
-      <translation>ADD_IMAGE</translation>
+      <translation>&#x753B;&#x50CF;&#x306E;&#x8FFD;&#x52A0;</translation>
     </message>
     <message>
       <source>REMOVE_IMAGES</source>
-      <translation>REMOVE_IMAGES</translation>
+      <translation>&#x753B;&#x50CF;&#x306E;&#x524A;&#x9664;</translation>
     </message>
     <message>
       <source>BRING_TO_FRONT</source>
-      <translation>BRING_TO_FRONT</translation>
+      <translation>&#x6700;&#x524D;&#x9762;&#x3078;&#x79FB;&#x52D5;</translation>
     </message>
     <message>
       <source>SEND_TO_BACK</source>
-      <translation>SEND_TO_BACK</translation>
+      <translation>&#x6700;&#x80CC;&#x9762;&#x3078;&#x79FB;&#x52D5;</translation>
     </message>
     <message>
       <source>BRING_FORWARD</source>
-      <translation>BRING_FORWARD</translation>
+      <translation>&#x524D;&#x9762;&#x3078;&#x79FB;&#x52D5;</translation>
     </message>
     <message>
       <source>SEND_BACKWARD</source>
-      <translation>SEND_BACKWARD</translation>
+      <translation>&#x80CC;&#x9762;&#x3078;&#x79FB;&#x52D5;</translation>
     </message>
     <message>
       <source>PROPERTIES</source>
-      <translation>PROPERTIES</translation>
+      <translation>&#x30D7;&#x30ED;&#x30D1;&#x30C6;&#x30A3;</translation>
     </message>
     <message>
       <source>TEST_FUSE_OPERATOR</source>
-      <translation>TEST_FUSE_OPERATOR</translation>
+      <translation>&#x7D50;&#x5408;&#x306E;&#x30C6;&#x30B9;&#x30C8;</translation>
     </message>
     <message>
       <source>TEST_CROP_OPERATOR</source>
-      <translation>TEST_CROP_OPERATOR</translation>
+      <translation>&#x30C8;&#x30EA;&#x30E0;&#x306E;&#x30C6;&#x30B9;&#x30C8;</translation>
     </message>
   </context>
   <context>
     <name>GraphicsView_ViewManager</name>
     <message>
       <source>GRAPHICS_VIEW_TITLE</source>
-      <translation>GRAPHICS_VIEW_TITLE</translation>
+      <translation>&#x30B0;&#x30E9;&#x30D5;&#x30A3;&#x30C3;&#x30AF;&#x30B7;&#x30FC;&#x30F3;:%M - &#x30D3;&#x30E5;&#x30FC;&#x30EF;:%V</translation>
     </message>
   </context>
 </TS>
