@@ -260,7 +260,7 @@ public slots:
   virtual void onAmbientToogle();
   virtual void onMemorizeView();
   virtual void onRestoreView();
-  virtual void onTrihedronShow();
+  virtual void onTrihedronShow(bool);
   virtual void setRestoreFlag();
   virtual void onSwitchInteractionStyle( bool on );
   virtual void onSwitchZoomingStyle( bool on );

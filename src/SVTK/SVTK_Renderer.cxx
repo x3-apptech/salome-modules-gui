@@ -559,6 +559,18 @@ SVTK_Renderer
 }
 
 /*!
+  Set trihedron visibility
+*/
+void 
+SVTK_Renderer
+::SetTrihedronVisibility( const bool show ) {
+  if(show)
+    myTrihedron->VisibilityOn();
+  else
+    myTrihedron->VisibilityOff();  
+}
+
+/*!
   Adjust size of the trihedron to the bounding box of the scene
 */
 void

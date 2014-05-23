@@ -799,9 +799,9 @@ bool SVTK_ViewWindow::isCubeAxesDisplayed()
 /*!
   Redirect the request to #SVTK_Renderer::OnViewTrihedron
 */
-void SVTK_ViewWindow::onViewTrihedron()
+void SVTK_ViewWindow::onViewTrihedron(bool show)
 {
-  GetRenderer()->OnViewTrihedron();
+  GetRenderer()->SetTrihedronVisibility(show);
   Repaint();
 }
 
@@ -2050,8 +2050,11 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   anAction = new QtxAction(tr("MNU_SHOW_TRIHEDRON"), 
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
                            tr( "MNU_SHOW_TRIHEDRON" ), 0, this);
+  anAction->setCheckable( true );
+  anAction->setChecked( true );
+  
   anAction->setStatusTip(tr("DSC_SHOW_TRIHEDRON"));
-  connect(anAction, SIGNAL(activated()), this, SLOT(onViewTrihedron()));
+  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onViewTrihedron(bool)));
   mgr->registerAction( anAction, ViewTrihedronId );
 
   // onNonIsometric: Manage non-isometric params

@@ -365,7 +365,7 @@ public slots:
   virtual void onFitAll();
 
   //! Redirect the request to #SVTK_Renderer::OnViewTrihedron
-  virtual void onViewTrihedron(); 
+  virtual void onViewTrihedron(bool); 
 
   //! Redirect the request to #SVTK_Renderer::OnViewCubeAxes
   virtual void onViewCubeAxes();

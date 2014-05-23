@@ -1283,8 +1283,10 @@ void OCCViewer_ViewWindow::createActions()
   if (myModel->trihedronActivated()) {
     aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_TRIHEDRON" ) ),
                              tr( "MNU_SHOW_TRIHEDRE" ), 0, this);
+    aAction->setCheckable( true );
+    aAction->setChecked( true );
     aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRE"));
-    connect(aAction, SIGNAL(triggered()), this, SLOT(onTrihedronShow()));
+    connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onTrihedronShow(bool)));
     toolMgr()->registerAction( aAction, TrihedronShowId );
   }
 
@@ -1790,9 +1792,9 @@ void OCCViewer_ViewWindow::setRestoreFlag()
 /*!
   \brief Called when action "show/hide trihedron" is activated.
 */
-void OCCViewer_ViewWindow::onTrihedronShow()
+void OCCViewer_ViewWindow::onTrihedronShow(bool show)
 {
-  myModel->toggleTrihedron();
+  myModel->setTrihedronShown(show);
 }
 
 /*!

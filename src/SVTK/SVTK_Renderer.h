@@ -153,6 +153,11 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   void 
   OnViewTrihedron(); 
 
+  //! Set Toggle trihedron visibility
+
+  void
+  SetTrihedronVisibility( const bool );
+
   //! Adjust size of the trihedron to the bounding box of the scene
   void 
   OnAdjustTrihedron();
