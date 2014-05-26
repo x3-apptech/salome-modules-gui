@@ -41,13 +41,23 @@ IF(WIN32)
   IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     FIND_LIBRARY(QWT_LIBRARY qwtd)
   ENDIF()
+  FIND_LIBRARY(QWT_LIBRARY qwt)
 ELSE(WIN32)
-  # Give precedence to qwt-qt4 library:
+  # Give precedence to qwt-qt4 library.
+  # Note: on some platforms there can be several native qwt libraries linked against different 
+  #       versions of Qt; for example /usr/lib/libqwt.so for qwt linked against Qt 3 and
+  #       /usr/lib/libqwt-qt4.so for qwt linked against Qt 4.
+  #       We need only qt4-based qwt library, so we search libqwt-qt4, then libqwt library
+  #       first ignoring system paths, then including system paths.
+  FIND_LIBRARY(QWT_LIBRARY qwt-qt4 PATH_SUFFIXES lib lib64 PATHS "${QWT_ROOT_DIR}" NO_DEFAULT_PATH)
+  FIND_LIBRARY(QWT_LIBRARY qwt-qt4 PATHS "${QWT_ROOT_DIR}" NO_DEFAULT_PATH)
+  FIND_LIBRARY(QWT_LIBRARY qwt PATH_SUFFIXES lib lib64 PATHS "${QWT_ROOT_DIR}" NO_DEFAULT_PATH)
+  FIND_LIBRARY(QWT_LIBRARY qwt PATHS "${QWT_ROOT_DIR}" NO_DEFAULT_PATH)
   FIND_LIBRARY(QWT_LIBRARY qwt-qt4 PATH_SUFFIXES lib lib64)
   FIND_LIBRARY(QWT_LIBRARY qwt-qt4)
   FIND_LIBRARY(QWT_LIBRARY qwt PATH_SUFFIXES lib lib64)
+  FIND_LIBRARY(QWT_LIBRARY qwt)
 ENDIF(WIN32)
-FIND_LIBRARY(QWT_LIBRARY qwt)
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Qwt REQUIRED_VARS QWT_INCLUDE_DIR QWT_LIBRARY)
