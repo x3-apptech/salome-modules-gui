@@ -89,6 +89,8 @@
 
 #endif
 
+#include <Image_PixMap.hxx>
+
 #include <Standard_Version.hxx>
 
 #include "utilities.h"
@@ -1914,6 +1916,10 @@ QImage OCCViewer_ViewWindow::dumpView()
   
   int aWidth = myViewPort->width();
   int aHeight = myViewPort->height();
+
+  // rnv: An old approach to dump the OCCViewer content
+  //      Now used OCCT built-in procedure.
+  /*     
   QApplication::syncX();
   view->Redraw(); // In order to reactivate GL context
   //view->Update();
@@ -1950,10 +1956,13 @@ QImage OCCViewer_ViewWindow::dumpView()
 
   glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
                 data);
+  */
+  
+  Image_PixMap aPix;
+  view->ToPixMap(aPix,aWidth, aHeight,Graphic3d_BT_RGBA);
 
-  QImage anImage( data, aWidth, aHeight, QImage::Format_ARGB32 );
+  QImage anImage( aPix.Data(), aWidth, aHeight, QImage::Format_ARGB32 );
   anImage = anImage.mirrored();
-  anImage = anImage.rgbSwapped();
   return anImage;
 }
 
