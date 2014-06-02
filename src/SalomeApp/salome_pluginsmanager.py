@@ -111,9 +111,9 @@ def initialize(module,name,basemenuname,menuname):
     else:
       plugins[name]=[]
   if module:
-    studyId=sg.getActiveStudyId()
-    if plugins[name].has_key(studyId):return
-    plugins[name][studyId]=PluginsManager(module,name,basemenuname,menuname)
+    d=sgPyQt.getDesktop()
+    if plugins[name].has_key(d):return
+    plugins[name][d]=PluginsManager(module,name,basemenuname,menuname)
   else:
     plugins[name].append(PluginsManager(module,name,basemenuname,menuname))
 
