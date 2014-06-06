@@ -82,12 +82,12 @@ QString SalomeApp_DataObject::name() const
 {
   QString str;
   if ( myObject )
-    str = myObject->GetName().c_str();
+    str = QString::fromUtf8( myObject->GetName().c_str() );
   
   if ( str.isEmpty() ) {
     _PTR(SObject) refObj = referencedObject();
     if ( refObj )
-      str = refObj->GetName().c_str();
+      str = QString::fromUtf8( refObj->GetName().c_str() );
   }
   
   if ( isReference() ) {
