@@ -139,13 +139,13 @@ bool DumpCommandsFileValidator::canSave(const QString& file, bool permissions)
 void staticCallbackStdout( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput())
-    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( c, false ) );
+    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( QString::fromUtf8(c), false ) );
 }
 
 void staticCallbackStderr( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput())
-    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( c, true ) );
+    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( QString::fromUtf8(c), true ) );
 }
 
 

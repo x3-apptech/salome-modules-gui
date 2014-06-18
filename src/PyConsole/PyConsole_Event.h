@@ -44,7 +44,7 @@ public:
     \param c message text (python trace)
     \param isError default to false - if true indicates that an error is being printed.
   */
-  PrintEvent( const char* c, bool isError = false) :
+  PrintEvent( const QString& c, bool isError = false) :
     QEvent( (QEvent::Type)EVENT_ID ), myText( c ), errorFlag(isError)
   {}
 
