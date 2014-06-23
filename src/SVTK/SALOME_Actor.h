@@ -202,12 +202,12 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
   //! To set offset of name actor
   virtual
   void
-  SetNameActorOffset(int theOffset[2]);
+  SetNameActorOffset(double theOffset[2]);
 
   //! To get size of name actor
   virtual
   void
-  GetNameActorSize(vtkRenderer* theRenderer, int theSize[2]) const;
+  GetNameActorSize(vtkRenderer* theRenderer, double theSize[2]) const;
 
   //! To update visibility of name actors
   virtual

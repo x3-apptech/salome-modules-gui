@@ -522,9 +522,15 @@ void VTKViewer_PolyDataMapper::InitTextures()
   if( !this->ImageData.GetPointer() )
     return;
 
+  glEnable( GL_TEXTURE_2D );
+  if( this->PointSpriteTexture == 0 ) {
+    glGenTextures( 1, &this->PointSpriteTexture );
+  }
+  glBindTexture( GL_TEXTURE_2D, this->PointSpriteTexture );
+  glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
+  
   if(this->BallEnabled) {
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -537,11 +543,6 @@ void VTKViewer_PolyDataMapper::InitTextures()
   unsigned char* dataPtr = (unsigned char*)this->ImageData->GetScalarPointer();
   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, aSize[0], aSize[1], 0,
                 GL_RGBA, GL_UNSIGNED_BYTE, dataPtr );
-
-  //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  glEnable( GL_TEXTURE_2D );
-  glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-  glBindTexture( GL_TEXTURE_2D, this->PointSpriteTexture );
 }
 
 //-----------------------------------------------------------------------------
@@ -561,6 +562,7 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     MAPPER_SUPERCLASS::RenderPiece( ren, act );
     if( isUsePointSprites )
       this->CleanupPointSprites();
+    glBindTexture( GL_TEXTURE_2D, 0 );
   } else {
     vtkIdType numPts;
     vtkPolyData *input= this->GetInput();
@@ -670,8 +672,8 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
       this->TimeToDraw = 0.0001;
 
     vglUseProgramObjectARB( 0 );
-
     this->CleanupPointSprites();
+    glBindTexture( GL_TEXTURE_2D, 0 );
   }  
 }
 

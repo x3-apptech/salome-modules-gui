@@ -924,7 +924,7 @@ SALOME_Actor
 */
 void
 SALOME_Actor
-::SetNameActorOffset(int theOffset[2])
+::SetNameActorOffset(double theOffset[2])
 {
   myNameActor->SetOffset(theOffset);
 }
@@ -936,7 +936,7 @@ SALOME_Actor
 */
 void
 SALOME_Actor
-::GetNameActorSize(vtkRenderer* theRenderer, int theSize[2]) const
+::GetNameActorSize(vtkRenderer* theRenderer, double theSize[2]) const
 {
   myNameActor->GetSize(theRenderer, theSize);
 }
@@ -950,7 +950,7 @@ SALOME_Actor
 {
   if( vtkRenderer* aRenderer = GetRenderer() )
   {
-    int anOffset[2] = { 0, 0 };
+    double anOffset[2] = { 0, 0 };
     VTK::ActorCollectionCopy aCopy(aRenderer->GetActors());
     vtkActorCollection* aCollection = aCopy.GetActors();
     for( int anIndex = 0, aNbItems = aCollection->GetNumberOfItems(); anIndex < aNbItems; anIndex++ )
@@ -962,7 +962,7 @@ SALOME_Actor
           anActor->SetNameActorOffset( anOffset );
           if( anActor->GetVisibility() )
           {
-            int aSize[2];
+            double aSize[2];
             anActor->GetNameActorSize( aRenderer, aSize );
             anOffset[0] = anOffset[0] + aSize[0];
             anOffset[1] = anOffset[1] + aSize[1];

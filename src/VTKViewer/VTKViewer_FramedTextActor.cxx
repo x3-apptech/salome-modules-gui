@@ -64,12 +64,9 @@ VTKViewer_FramedTextActor::VTKViewer_FramedTextActor()
   myTextProperty->SetItalic(0);
   myTextProperty->SetShadow(1);
   myTextProperty->SetFontFamilyToArial();
-
-  myTextMapper=vtkTextMapper::New();
-  myTextMapper->SetInput("");
-  myTextMapper->GetTextProperty()->ShallowCopy(myTextProperty);
-  myTextActor=vtkActor2D::New();
-  myTextActor->SetMapper(myTextMapper);
+  
+  myTextActor=vtkTextActor::New();
+  myTextActor->SetTextProperty(myTextProperty);
 
   myBarActor->SetVisibility(1);
   myTextActor->SetVisibility(1);
@@ -99,7 +96,6 @@ VTKViewer_FramedTextActor::VTKViewer_FramedTextActor()
 VTKViewer_FramedTextActor::~VTKViewer_FramedTextActor()
 {
   myTextActor->Delete();
-  myTextMapper->Delete();
   myTextProperty->Delete();
   myBarActor->Delete();
   myBarMapper->Delete();
@@ -148,9 +144,9 @@ int VTKViewer_FramedTextActor::GetPickable()
 // function : GetSize
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::GetSize(vtkRenderer* theRenderer, int theSize[2]) const
+void VTKViewer_FramedTextActor::GetSize(vtkRenderer* vport, double theSize[2]) const
 {
-  myTextMapper->GetSize(theRenderer, theSize);
+  myTextActor->GetSize(vport, theSize);
   theSize[0] = theSize[0] + 2 * GetTextMargin() + OFFSET_SPACING;
   theSize[1] = theSize[1] + 2 * GetTextMargin() + OFFSET_SPACING;
 }
@@ -164,7 +160,7 @@ void VTKViewer_FramedTextActor::SetForegroundColor(const double r,
                                                    const double b)
 {
   myTextProperty->SetColor(r, g, b);
-  myTextMapper->GetTextProperty()->ShallowCopy(myTextProperty);
+  myTextActor->GetTextProperty()->ShallowCopy(myTextProperty);
   Modified();
 }
 
@@ -257,7 +253,7 @@ int VTKViewer_FramedTextActor::GetTextMargin() const
 // function : SetOffset
 // purpose  :
 //==================================================================
-void VTKViewer_FramedTextActor::SetOffset(const int theOffset[2])
+void VTKViewer_FramedTextActor::SetOffset(const double theOffset[2])
 {
   myHorizontalOffset = theOffset[0];
   myVerticalOffset = theOffset[1];
@@ -272,7 +268,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
 {
   // remove whitespaces from from the start and the end
   // additionally, consider a case of multi-string text
-  QString aString(theText);
+  QString aString(QString::fromUtf8(theText));
 
   QStringList aTrimmedStringList;
   QStringList aStringList = aString.split("\n");
@@ -280,7 +276,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
   while(anIter.hasNext())
     aTrimmedStringList.append(anIter.next().trimmed());
 
-  myTextMapper->SetInput(aTrimmedStringList.join("\n").toLatin1().constData());
+  myTextActor->SetInput(aTrimmedStringList.join("\n").toUtf8().constData());
   Modified();
 }
 
@@ -290,7 +286,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
 //==================================================================
 char* VTKViewer_FramedTextActor::GetText()
 {
-  return myTextMapper->GetInput();
+  return myTextActor->GetInput();
 }
 
 //==================================================================
@@ -410,8 +406,8 @@ void VTKViewer_FramedTextActor::ReleaseGraphicsResources(vtkWindow *win)
 int VTKViewer_FramedTextActor::RenderOverlay(vtkViewport *viewport)
 {
   int renderedSomething = 0;
-  myBarActor->RenderOverlay(viewport);
   renderedSomething +=myTextActor->RenderOverlay(viewport);
+  renderedSomething +=myBarActor->RenderOverlay(viewport);
   return renderedSomething;
 }
 
@@ -431,7 +427,7 @@ VTKViewer_FramedTextActor
   if(aViewPortWidth == 1 || aViewPortHeight == 1)
     return anIsRenderedSomething;
 
-  if(!myTextMapper->GetInput())
+  if(!myTextActor->GetInput())
     return anIsRenderedSomething;
 
   myBar->Initialize();
@@ -449,8 +445,8 @@ VTKViewer_FramedTextActor
   myBar->SetPolys(aPolys);
   aPolys->Delete(); 
 
-  int aTextSize[2]; 
-  myTextMapper->GetSize(theViewport, aTextSize);
+  double aTextSize[2]; 
+  myTextActor->GetSize(theViewport, aTextSize);
   int aBarWidth = aTextSize[0];
   int aBarHeight = aTextSize[1];
 
@@ -511,6 +507,7 @@ VTKViewer_FramedTextActor
                                  y / (double)aViewPortHeight);
   }
 
+
   aPoints->SetPoint(0, xMin, yMax, 0.0);
   aPoints->SetPoint(1, xMin, yMin, 0.0);
   aPoints->SetPoint(2, xMax, yMax, 0.0);
@@ -518,7 +515,6 @@ VTKViewer_FramedTextActor
 
   myTextProperty->SetVerticalJustificationToCentered();
 
-  myTextMapper->GetTextProperty()->ShallowCopy(myTextProperty);
   myBarActor ->GetPositionCoordinate()->SetReferenceCoordinate(PositionCoordinate);
   myTextActor->GetPositionCoordinate()->SetReferenceCoordinate(PositionCoordinate);
 

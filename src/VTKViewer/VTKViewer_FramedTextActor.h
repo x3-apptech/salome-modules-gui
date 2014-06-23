@@ -32,6 +32,7 @@ class vtkTextMapper;
 class vtkTextProperty;
 class vtkViewport;
 class vtkWindow;
+class vtkTextActor;
 
 class VTKVIEWER_EXPORT VTKViewer_FramedTextActor : public vtkActor2D
 {
@@ -53,7 +54,7 @@ public:
   virtual void                SetPickable(int);
   virtual int                 GetPickable();
 
-  virtual void                GetSize(vtkRenderer* theRenderer, int theSize[2]) const;
+  virtual void                GetSize(vtkRenderer* vport, double theSize[2]) const;
 
   void                        SetText(const char* theText);
   char*                       GetText();
@@ -93,7 +94,7 @@ public:
   void                        SetTextMargin(const int theMargin);
   int                         GetTextMargin() const;
 
-  void                        SetOffset(const int theOffset[2]);
+  void                        SetOffset(const double theOffset[2]);
 
 protected:
   VTKViewer_FramedTextActor();
@@ -105,8 +106,7 @@ protected:
   vtkActor2D*                 myBarActor;
 
   vtkTextProperty*            myTextProperty;
-  vtkTextMapper*              myTextMapper;
-  vtkActor2D*                 myTextActor;
+  vtkTextActor*               myTextActor;
 
   vtkTimeStamp                myBuildTime;
 
