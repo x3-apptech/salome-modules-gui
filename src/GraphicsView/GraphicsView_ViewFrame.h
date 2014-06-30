@@ -47,7 +47,7 @@ public:
   enum { DumpId, FitAllId, FitRectId, FitSelectId, ZoomId, PanId, GlobalPanId, ResetId };
 
 public:
-  GraphicsView_ViewFrame( SUIT_Desktop*, GraphicsView_Viewer* );
+  GraphicsView_ViewFrame( SUIT_Desktop*, GraphicsView_Viewer*, QWidget* w = NULL );
   ~GraphicsView_ViewFrame();
 
 public:
@@ -60,6 +60,7 @@ public:
   virtual void            setVisualParameters( const QString& theParameters );
 
   void                    expandToolBarActions();
+  int                     getToolBarId();
 
 protected slots:
   void                    onViewPan();

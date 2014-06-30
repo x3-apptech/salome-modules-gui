@@ -132,6 +132,7 @@ public:
   virtual void                        removeViewManager( SUIT_ViewManager* );
   virtual SUIT_ViewManager*           createViewManager( const QString& vmType );
   virtual SUIT_ViewManager*           createViewManager( const QString& vmType, QWidget* w );
+  virtual SUIT_ViewManager*           createViewManager( SUIT_ViewModel* );
 
   QWidget*                            getWindow( const int, const int = -1 );
   QWidget*                            dockWindow( const int ) const;

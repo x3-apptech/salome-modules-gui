@@ -48,10 +48,11 @@
 // Name    : GraphicsView_Viewer
 // Purpose : Constructor
 //=======================================================================
-GraphicsView_Viewer::GraphicsView_Viewer( const QString& title )
+GraphicsView_Viewer::GraphicsView_Viewer( const QString& title, QWidget* widget )
 : SUIT_ViewModel(),
   mySelector( 0 ),
   myTransformer( 0 ),
+  myWidget( widget ),
   myIsInitialized( false )
 {
 }
@@ -71,7 +72,7 @@ GraphicsView_Viewer::~GraphicsView_Viewer()
 //================================================================
 SUIT_ViewWindow* GraphicsView_Viewer::createView( SUIT_Desktop* theDesktop )
 {
-  GraphicsView_ViewFrame* aViewFrame = new GraphicsView_ViewFrame( theDesktop, this );
+  GraphicsView_ViewFrame* aViewFrame = new GraphicsView_ViewFrame( theDesktop, this, myWidget );
 
   connect( aViewFrame, SIGNAL( keyPressed( QKeyEvent* ) ),
            this, SLOT( onKeyEvent( QKeyEvent* ) ) );

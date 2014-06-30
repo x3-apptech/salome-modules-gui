@@ -54,7 +54,9 @@ public:
   virtual bool               hasSpecificZValue() const { return false; }
 
   virtual bool               isSelectable() const { return true; }
-  virtual bool               isMovable() const { return true; }
+  
+  virtual bool               isMovable() const { return myIsMovable; }
+  virtual bool               setMovable( bool theMovable ) { myIsMovable = theMovable; }
 
   virtual QRectF             getRect() const;
 
@@ -103,6 +105,7 @@ protected:
   bool                       myIsSelected;
 
   bool                       myIsMoving;
+  bool                       myIsMovable;
 
   QTransform                 myViewTransform;
 };

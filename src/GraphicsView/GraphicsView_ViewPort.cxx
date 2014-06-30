@@ -272,6 +272,26 @@ void GraphicsView_ViewPort::addItem( QGraphicsItem* theItem )
 }
 
 //================================================================
+// Function : isItemAdded
+// Purpose  :
+//================================================================
+bool GraphicsView_ViewPort::isItemAdded( QGraphicsItem* theItem )
+{
+  if( GraphicsView_Object* anObject = dynamic_cast<GraphicsView_Object*>( theItem ) )
+  {
+    for( GraphicsView_ObjectList::iterator anIter = myObjects.begin(); anIter != myObjects.end(); anIter++ )
+      if( theItem == *anIter )
+        return true;
+  }
+  else {
+    for( int i = 0; i < myScene->items().size(); i++ )
+      if( theItem == myScene->items().at(i) )
+        return true;
+  }
+  return false;
+}
+
+//================================================================
 // Function : removeItem
 // Purpose  : 
 //================================================================
