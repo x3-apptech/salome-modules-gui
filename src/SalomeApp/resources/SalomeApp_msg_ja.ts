@@ -106,6 +106,14 @@
       <translation>スタディを開けません: セッションに既にスタディがあります。
 新規セッションを開始するかスタディを閉じてください。</translation>
     </message>
+    <message>
+      <source>OPEN_DOCUMENT_PROBLEM</source>
+      <translation>ドキュメントオープン中に不明な問題が発生しました</translation>
+    </message>
+    <message>
+      <source>CREATE_DOCUMENT_PROBLEM</source>
+      <translation>ドキュメント作成中に不明な問題が発生しました</translation>
+    </message>
   </context>
   <context>
     <name>SalomeApp_Application</name>
