@@ -56,7 +56,7 @@ public:
   virtual bool               isSelectable() const { return true; }
   
   virtual bool               isMovable() const { return myIsMovable; }
-  virtual bool               setMovable( bool theMovable ) { myIsMovable = theMovable; }
+  virtual void               setMovable( bool theMovable ) { myIsMovable = theMovable; }
 
   virtual QRectF             getRect() const;
 
