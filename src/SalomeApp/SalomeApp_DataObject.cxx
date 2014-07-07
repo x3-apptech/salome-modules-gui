@@ -164,7 +164,7 @@ QPixmap SalomeApp_DataObject::icon( const int id ) const
       _PTR(AttributePixMap) aPixAttr ( anAttr );
       if ( aPixAttr->HasPixMap() ) {
         QString componentType = componentDataType();
-        QString pixmapID      = aPixAttr->GetPixMap().c_str();
+        QString pixmapID      = QString::fromUtf8(aPixAttr->GetPixMap().c_str());
         // select a plugin within a component
         QStringList plugin_pixmap = pixmapID.split( "::", QString::KeepEmptyParts );
         if ( plugin_pixmap.size() == 2 ) {
@@ -517,7 +517,7 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   {
     _PTR(AttributeString) strAttr = attr;
     std::string str = strAttr->Value();
-    QString aStrings = QString( str.c_str() );
+    QString aStrings = QString::fromUtf8( str.c_str() );
     
     //Special case to show NoteBook variables in the "Value" column of the OB 
     if ( LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() ) )
@@ -585,7 +585,7 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   {
     _PTR(AttributeComment) comm = attr;
     std::string str = comm->Value();
-    val = QString( str.c_str() );
+    val = QString::fromUtf8( str.c_str() );
   }
 
   return val;
