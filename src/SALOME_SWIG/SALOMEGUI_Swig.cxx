@@ -227,7 +227,7 @@ public:
   virtual void Execute()
   {
     if ( LightApp_Study* aStudy = getActiveStudy() ) {
-      myResult = aStudy->id();
+      myResult = aStudy->studyName().toUtf8().constData();
     }
   }
 };
