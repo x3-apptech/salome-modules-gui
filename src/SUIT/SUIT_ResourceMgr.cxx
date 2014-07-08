@@ -85,7 +85,7 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
   // Try config file, given in arguments
   for (int i = 1; i < arguments.count(); i++) {
     QRegExp rx ("--resources=(.+)");
-    if ( rx.indexIn( arguments[i] ) >= 0 && rx.numCaptures() > 1 ) {
+    if ( rx.indexIn( arguments[i] ) >= 0 && rx.numCaptures() > 0 ) {
       QString file = rx.cap(1);
       QFileInfo fi (file);
       pathName = fi.absoluteFilePath();
