@@ -92,8 +92,6 @@ public:
   DEFINE_STANDARD_RTTI(DDS_DicGroup)
 };
 
-DEFINE_BASECOLLECTION(DDS_BaseCollectionOfDicGroups, Handle(DDS_DicGroup))
-DEFINE_INDEXEDDATAMAP(DDS_IndexedDataMapOfDicGroups, DDS_BaseCollectionOfDicGroups,
-                      TCollection_AsciiString, Handle(DDS_DicGroup))
+typedef NCollection_IndexedDataMap<TCollection_AsciiString, Handle(DDS_DicGroup)> DDS_IndexedDataMapOfDicGroups;
 
 #endif

@@ -23,7 +23,12 @@
 #include "OCCViewer.h"
 
 #include <AIS_InteractiveObject.hxx>
-#include <Graphic3d_CBounds.hxx>
+#include <Basics_OCCTVersion.hxx>
+#if OCC_VERSION_LARGE > 0x06070100 // for OCC-6.7.2 and higher version
+  #include <Graphic3d_BndBox4f.hxx>
+#else
+  #include <Graphic3d_CBounds.hxx>
+#endif
 #include <Standard_DefineHandle.hxx>
 
 /*!
@@ -43,7 +48,11 @@ public:
   virtual void           ComputeSelection( const Handle( SelectMgr_Selection )&,
                                            const Standard_Integer );
 
+#if OCC_VERSION_LARGE > 0x06070100
+  virtual void           bounds( Graphic3d_BndBox4f& ) const;
+#else
   virtual void           bounds( Graphic3d_CBounds& ) const;
+#endif
 
   virtual void           display();
 

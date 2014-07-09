@@ -258,8 +258,6 @@ public:
 
 DEFINE_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)
 
-DEFINE_BASECOLLECTION(DDS_BaseCollectionOfDicItems, Handle(DDS_DicItem))
-DEFINE_INDEXEDDATAMAP(DDS_IndexedDataMapOfDicItems, DDS_BaseCollectionOfDicItems,
-                      TCollection_AsciiString, Handle(DDS_DicItem))
+typedef NCollection_IndexedDataMap<TCollection_AsciiString, Handle(DDS_DicItem)> DDS_IndexedDataMapOfDicItems;
 
 #endif
