@@ -156,6 +156,7 @@ public:
   void                            setStaticTrihedronDisplayed(const bool on);
 
   /* Clip planes management */
+  Handle(Graphic3d_ClipPlane)     createClipPlane(const gp_Pln& thePlane, const Standard_Boolean theIsOn);
   void                            setClipPlanes (ClipPlanesList theList);
   ClipPlanesList                  getClipPlanes() const;
   void                            applyExistingClipPlanesToObject (const Handle(AIS_InteractiveObject)& theObject);

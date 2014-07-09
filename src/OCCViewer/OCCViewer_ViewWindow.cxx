@@ -2019,16 +2019,13 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     pln.Coefficients(a, b, c, d);
     
     Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
-    Handle(Graphic3d_ClipPlane) aClipPlane;
     if(aPlanes.Size() > 0 ) {
       Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
-      aClipPlane = anIter.Value();
+      Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetEquation(pln);
       aClipPlane->SetOn(Standard_True);
     } else {
-      aClipPlane = new Graphic3d_ClipPlane(pln);
-      view->AddClipPlane(aClipPlane);
-      aClipPlane->SetOn(Standard_True);
+      view->AddClipPlane( myModel->createClipPlane( pln, Standard_True ) );
     }
   }
   else {

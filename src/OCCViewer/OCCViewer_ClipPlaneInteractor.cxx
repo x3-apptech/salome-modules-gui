@@ -520,7 +520,7 @@ bool OCCViewer_ClipPlaneInteractor::mousePress( QMouseEvent* theEvent,
   myIsClickable = isClickable( aPlane );
 
   // process mouse click on the object
-  if ( myIsClickable );
+  if ( myIsClickable )
   {
     myViewer->getAISContext()->SetSelected( aPlane );
     emit planeClicked( aPlane );

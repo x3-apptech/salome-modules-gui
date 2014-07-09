@@ -1031,7 +1031,16 @@ void OCCViewer_Viewer::setSelectionOptions( bool isPreselectionEnabled, bool isS
   }
 }
 
-
+/*!
+  Creates clipping plane based on the incoming plane
+*/
+Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& thePlane, const Standard_Boolean theIsOn)
+{
+  Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane( thePlane );
+  aGraphic3dPlane->SetOn( theIsOn );
+  aGraphic3dPlane->SetCapping( Standard_True );
+  return aGraphic3dPlane;
+}
 /*!
   Applies clipping planes to clippable objects
 */
@@ -1053,10 +1062,7 @@ void OCCViewer_Viewer::setClipPlanes(ClipPlanesList theList)
     gp_Pnt anOrigin( aPlane.X, aPlane.Y, aPlane.Z );
     gp_Dir aDirection( aDx, aDy, aDz );
 
-    Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane( gp_Pln( anOrigin, aDirection ) );
-    aGraphic3dPlane->SetOn( aPlane.IsOn );
-
-    myInternalClipPlanes.Append( aGraphic3dPlane );
+    myInternalClipPlanes.Append( createClipPlane( gp_Pln( anOrigin, aDirection ), aPlane.IsOn ) );
     myClipPlanes.push_back( aPlane );
   }
 
