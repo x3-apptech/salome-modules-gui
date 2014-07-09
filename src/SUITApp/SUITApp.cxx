@@ -252,7 +252,6 @@ int main( int argc, char* argv[] )
     int   _argc   = 1;
     char* _argv[] = {(char*)""};
     SUIT_PYTHON::init_python(_argc,_argv);
-    PyEval_ReleaseLock();
 #endif
 
     SUIT_Application* theApp = aSession->startApplication( argList.first() );
