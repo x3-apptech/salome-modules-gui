@@ -242,7 +242,6 @@ void PyInterp_Interp::initialize()
   PyObjWrapper m(PyImport_ImportModule("codeop"));
   if(!m) {
     PyErr_Print();
-    PyEval_ReleaseLock();
     return;
   }
 
