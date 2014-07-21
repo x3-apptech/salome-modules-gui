@@ -349,26 +349,28 @@ void Plot2d_QwtPlotCurve::updateLegend( const QwtPlotItem* thePlotItem,
 
   QwtPlotCurve::updateLegend( thePlotItem, theLegendData );
 
-  const QVariant itemInfo = thePlotItem->plot()->itemToInfo( const_cast< QwtPlotItem *>( thePlotItem ) );
-  QwtLegend* legend = dynamic_cast<QwtLegend*>( thePlotItem->plot()->legend() );
-  QWidget* widget = legend->legendWidget( itemInfo );
-  QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
-  if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)label ) {
-    int aMode = Plot2d_QwtLegendLabel::IM_None;
-    if( myYAxisIdentifierEnabled )
-      aMode = myYAxis == QwtPlot::yRight ?
-              Plot2d_QwtLegendLabel::IM_Right :
-              Plot2d_QwtLegendLabel::IM_Left;
-    anItem->setYAxisIdentifierMode( aMode );
-
-    anItem->setSymbol( legendSymbol() );
-    if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
-      anItem->setSymbolType( plot->getLegendSymbolType() );
-    anItem->setPen( legendPen() );
-
-    anItem->setSelected( isSelected() );
-    anItem->updateHighlit();
-    anItem->repaint();
+  const QVariant itemInfo = thePlotItem->plot()->itemToInfo( const_cast< QwtPlotItem *>( thePlotItem ) );  
+  if( QwtLegend* legend = dynamic_cast<QwtLegend*>( thePlotItem->plot()->legend() ) ) {
+    if( QWidget* widget = legend->legendWidget( itemInfo ) ) {
+      QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
+      if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)label ) {
+	int aMode = Plot2d_QwtLegendLabel::IM_None;
+	if( myYAxisIdentifierEnabled )
+	  aMode = myYAxis == QwtPlot::yRight ?
+	    Plot2d_QwtLegendLabel::IM_Right :
+	    Plot2d_QwtLegendLabel::IM_Left;
+	anItem->setYAxisIdentifierMode( aMode );
+	
+	anItem->setSymbol( legendSymbol() );
+	if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
+	  anItem->setSymbolType( plot->getLegendSymbolType() );
+	anItem->setPen( legendPen() );
+	
+	anItem->setSelected( isSelected() );
+	anItem->updateHighlit();
+	anItem->repaint();
+      }
+    }
   }
 }
 
