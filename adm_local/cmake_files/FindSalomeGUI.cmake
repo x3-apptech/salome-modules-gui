@@ -42,29 +42,43 @@ FOREACH(_res ${SalomeGUI_EXTRA_ENV})
 ENDFOREACH()
 
 #----------------------------------------------------------------------------
-# FULL_GUI is a macro useful for determining whether a GUI module 
-# builded in full mode 
+# SALOME_GUI_WITH_CORBA is a macro useful for determining whether a SALOME GUI module 
+# is built in not light mode (with CORBA)
+#----------------------------------------------------------------------------
+MACRO(SALOME_GUI_WITH_CORBA)
+  IF(SALOME_GUI_LIGHT_ONLY)
+    MESSAGE(FATAL_ERROR "\nWe absolutely need a Salome GUI module with CORBA.\nPlease set option SALOME_LIGHT_ONLY to OFF when building GUI module.")
+  ENDIF()
+ENDMACRO(SALOME_GUI_WITH_CORBA)
+
+#----------------------------------------------------------------------------
+# FULL_GUI is a macro useful for determining whether a GUI module
+# builded in full mode
+#----------------------------------------------------------------------------
+MACRO(FULL_GUI)
+  SET(_options)
+  LIST(APPEND _options SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_VTKVIEWER
+              SALOME_USE_PLOT2DVIEWER SALOME_USE_GRAPHICSVIEW SALOME_USE_QXGRAPHVIEWER
+              SALOME_USE_SALOMEOBJECT SALOME_USE_PYCONSOLE)
+  SALOME_GUI_MODE(${_options})
+ENDMACRO(FULL_GUI)
+
+#----------------------------------------------------------------------------
+# SALOME_GUI_MODE is a macro useful for determining whether a GUI module
+# builded in particular mode 
 #----------------------------------------------------------------------------
 #########################################################################
 # FULL_GUI()
 # 
-# USAGE: FULL_GUI(with_corba)
+# USAGE: FULL_GUI(_options)
 #
 # ARGUMENTS:
-#   with_corba [input] TRUE or FALSE - use CORBA for building module or no.
+#   _options [input] List - The list of CMake options given to SALOME GUI
 #
-MACRO(FULL_GUI with_corba)
-  SET(_options)
-  IF(${with_corba} AND ${SALOME_GUI_LIGHT_ONLY})
-    SET(_corba_message "We absolutely need a Salome GUI module with CORBA.\nPlease set option SALOME_LIGHT_ONLY to OFF when building GUI module.")
-  ENDIF() 
-  
-  LIST(APPEND _options SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_VTKVIEWER
-              SALOME_USE_PLOT2DVIEWER SALOME_USE_GRAPHICSVIEW SALOME_USE_QXGRAPHVIEWER
-              SALOME_USE_SALOMEOBJECT SALOME_USE_PYCONSOLE)
-              
+MACRO(SALOME_GUI_MODE _options)
+  MESSAGE(STATUS "Checking status of GUI options ${_options}")
   SET(_message) 
-  FOREACH(_option ${_options}) 
+  FOREACH(_option ${_options})
     IF(NOT ${_option})
       LIST(APPEND _message ${_option})
     ENDIF()
@@ -79,5 +93,4 @@ MACRO(FULL_GUI with_corba)
   ELSEIF(_corba_message)
     MESSAGE(FATAL_ERROR "${_corba_message}") 
   ENDIF() 
-  
-ENDMACRO(FULL_GUI)
+ENDMACRO(SALOME_GUI_MODE)
