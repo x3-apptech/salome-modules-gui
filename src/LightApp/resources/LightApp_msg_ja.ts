@@ -50,42 +50,6 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <source>ENTRY_COLUMN</source>
       <translation>エントリ</translation>
     </message>
-    <message>
-      <source>BROWSER_TITLE</source>
-      <translation>Salome ヘルプ ・ ブラウザー</translation>
-    </message>
-    <message>
-      <source>BROWSER_TOOLBAR_TITLE</source>
-      <translation>ナビゲーション</translation>
-    </message>
-    <message>
-      <source>BROWSER_FILEMENU</source>
-      <translation>ファイル(&amp;F)</translation>
-    </message>
-    <message>
-      <source>BROWSER_CLOSE</source>
-      <translation>閉じる(&amp;C)</translation>
-    </message>
-    <message>
-      <source>BROWSER_BACK</source>
-      <translation>戻る</translation>
-    </message>
-    <message>
-      <source>BROWSER_FORWARD</source>
-      <translation>進む</translation>
-    </message>
-    <message>
-      <source>BROWSER_FIND</source>
-      <translation>検索(&amp;F)</translation>
-    </message>
-    <message>
-      <source>BROWSER_FINDNEXT</source>
-      <translation>次を検索(&amp;n)</translation>
-    </message>
-    <message>
-      <source>BROWSER_FINDPREV</source>
-      <translation>前を検索(&amp;p)</translation>
-    </message>
   </context>
   <context>
     <name>LightApp_Application</name>

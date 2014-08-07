@@ -21,7 +21,7 @@
 # Common packages
 ##
 SET(SUBDIRS_COMMON
-  CASCatch Qtx Style DDS QDS ObjBrowser SUIT SUITApp STD CAF
+  CASCatch Qtx HelpBrowser Style DDS QDS ObjBrowser SUIT SUITApp STD CAF
   CAM LogWindow Prs Event OpenGLUtils ViewerData ViewerTools ImageComposer GUI_PY
 )
 

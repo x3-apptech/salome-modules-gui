@@ -93,7 +93,6 @@
 #include <QtxSearchTool.h>
 #include <QtxWorkstack.h>
 #include <QtxMap.h>
-#include <QtxWebBrowser.h>
 
 #include <LogWindow.h>
 
@@ -310,19 +309,6 @@ LightApp_Application::LightApp_Application()
 
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   QPixmap aLogo = aResMgr->loadPixmap( "LightApp", tr( "APP_DEFAULT_ICO" ), false );
-
-  QtxWebBrowser::setResourceManager( aResMgr );
-  QtxWebBrowser::setData("browser:icon",          aResMgr->loadPixmap( "LightApp", tr( "BROWSER_ICON" ) ) );
-  QtxWebBrowser::setData("browser:title",         tr( "BROWSER_TITLE" ) );
-  QtxWebBrowser::setData("toolbar:title",         tr( "BROWSER_TOOLBAR_TITLE" ) );
-  QtxWebBrowser::setData("menu:file:title",       tr( "BROWSER_FILEMENU" ) );
-  QtxWebBrowser::setData("action:close:title",    tr( "BROWSER_CLOSE" ) );
-  QtxWebBrowser::setData("action:close:icon",     aResMgr->loadPixmap( "LightApp", tr( "BROWSER_CLOSE_ICON" ) ) );
-  QtxWebBrowser::setData("action:back:title",     tr( "BROWSER_BACK" ) );
-  QtxWebBrowser::setData("action:forward:title",  tr( "BROWSER_FORWARD" ) );
-  QtxWebBrowser::setData("action:find:title",     tr( "BROWSER_FIND" ) );
-  QtxWebBrowser::setData("action:findnext:title", tr( "BROWSER_FINDNEXT" ) );
-  QtxWebBrowser::setData("action:findprev:title", tr( "BROWSER_FINDPREV" ) );
 
   desktop()->setWindowIcon( aLogo );
   desktop()->setDockableMenuBar( false );
@@ -1096,13 +1082,10 @@ void LightApp_Application::onHelpContentsModule()
     }
   }
   else {
-#ifdef WIN32
-    // On Win32 platform QWebKit of the Qt 4.6.3 hang up in case 'file://' protocol 
-    // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
-    QtxWebBrowser::loadUrl(helpFile);
-#else
-    QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile));
-#endif
+    QStringList parameters;
+    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    parameters << helpFile;
+    QProcess::startDetached( "HelpBrowser", parameters );
   }
 }
 
@@ -1169,14 +1152,10 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
     }
   }
   else {
-#ifdef WIN32
-    // On Win32 platform QWebKit of the Qt 4.6.3 hang up in case 'file://' protocol 
-    // is defined. On Linux platform QWebKit doesn't work correctly without 'file://' protocol.
-    QtxWebBrowser::loadUrl(helpFile, context);
-#else
-    QtxWebBrowser::loadUrl(QString("file://%1").arg(helpFile), context);
-#endif
-    
+    QStringList parameters;
+    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    parameters << QString( "%1#%2" ).arg( helpFile ).arg( context );
+    QProcess::startDetached( "HelpBrowser", parameters );
   }
 }
 
@@ -3033,13 +3012,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     desktop()->setOpaqueResize( opaqueResize );
     if ( dynamic_cast<STD_TabDesktop*>( desktop() ) )
       dynamic_cast<STD_TabDesktop*>( desktop() )->workstack()->setOpaqueResize( opaqueResize );
-  }
-
-  if ( sec == "ExternalBrowser" && param == "use_external_browser" ) {
-    if ( resMgr->booleanValue("ExternalBrowser", "use_external_browser", false ) )
-    {
-      QtxWebBrowser::shutdown();
-    }
   }
 
 #ifndef DISABLE_PLOT2DVIEWER

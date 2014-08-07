@@ -50,42 +50,6 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>ENTRY_COLUMN</source>
         <translation>Entry</translation>
     </message>
-    <message>
-        <source>BROWSER_TITLE</source>
-        <translation>SALOME Help Browser</translation>
-    </message>    
-    <message>
-        <source>BROWSER_TOOLBAR_TITLE</source>
-        <translation>Navigation</translation>
-    </message>    
-    <message>
-        <source>BROWSER_FILEMENU</source>
-        <translation>&amp;File</translation>
-    </message>    
-    <message>
-        <source>BROWSER_CLOSE</source>
-        <translation>&amp;Close</translation>
-    </message>    
-    <message>
-        <source>BROWSER_BACK</source>
-        <translation>Go Back</translation>
-    </message>    
-    <message>
-        <source>BROWSER_FORWARD</source>
-        <translation>Go Forward</translation>
-    </message>    
-    <message>
-        <source>BROWSER_FIND</source>
-        <translation>&amp;Find...</translation>
-    </message>    
-    <message>
-        <source>BROWSER_FINDNEXT</source>
-        <translation>Find &amp;next</translation>
-    </message>    
-    <message>
-        <source>BROWSER_FINDPREV</source>
-        <translation>Find &amp;previous</translation>
-    </message>    
 </context>
 <context>
     <name>LightApp_Application</name>

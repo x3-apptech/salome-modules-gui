@@ -31,16 +31,12 @@
 
 #include <QDialog>
 #include <QMainWindow>
-#include <QMap>
 #include <QUrl>
 
-class QAction;
 class QButtonGroup;
 class QCheckBox;
 class QLabel;
-class QMenu;
 class QPushButton;
-class QToolBar;
 class QWebView;
 class QtxResourceMgr;
 class QtxSearchTool;
@@ -49,49 +45,43 @@ class QTX_EXPORT QtxWebBrowser : public QMainWindow
 {
   Q_OBJECT
 
-  enum { File };
-  enum { Find, FindNext, FindPrev, Close };
-
   class Downloader;
   class Searcher;
 
-private:
-  QtxWebBrowser();
-  
 public:
   virtual ~QtxWebBrowser();
   
   static QtxWebBrowser*           webBrowser();
   static void                     loadUrl( const QString&, const QString& = QString() );
-  static void                     setData( const QString&, const QVariant& );
-  static void                     setResourceManager( QtxResourceMgr* );
+  static void                     setResourceMgr( QtxResourceMgr* );
   static void                     shutdown();
 
+protected:
+  QtxWebBrowser();
+  QtxResourceMgr*                 resourceMgr() const;
+
 private:
-  static QString                  getStringValue( const QString&, const QString& = QString() );
-  static QIcon                    getIconValue( const QString&, const QIcon& = QIcon() );
-  void                            updateData();
-  static void                     clearData();
   void                            saveLink( const QString& );
   void                            openLink( const QString&, bool = false );
 
-protected slots:
+public Q_SLOTS:
+  virtual void                    load( const QString& );
+
+protected Q_SLOTS:
+  virtual void                    about();
   virtual void                    linkClicked( const QUrl& );
   virtual void                    linkHovered( const QString&, const QString&, const QString& );
 
-private slots:
+private Q_SLOTS:
+  void                            open();
   void                            adjustTitle();
   void                            finished( bool );
   void                            linkAction();
   
 private:
-  static QMap<QString, QVariant>  myData;
   static QtxWebBrowser*           myBrowser;
   static QtxResourceMgr*          myResourceMgr;
   QWebView*                       myWebView;
-  QToolBar*                       myToolbar;
-  QMap<int, QMenu*>               myMenus;
-  QMap<int, QAction*>             myActions;
   QtxSearchTool*                  myFindPanel;
   QUrl                            myLastUrl;
 };
@@ -110,7 +100,7 @@ public:
   bool         isRepeatAction() const;
   QString      program() const;
 
-private slots:
+private Q_SLOTS:
   void         setAction( int );
   void         browse();
 

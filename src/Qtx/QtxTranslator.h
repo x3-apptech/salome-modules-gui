@@ -23,9 +23,11 @@
 #ifndef QTXTRANSLATOR_H
 #define QTXTRANSLATOR_H
 
+#include "Qtx.h"
+
 #include <QTranslator>
 
-class QtxTranslator : public QTranslator
+class QTX_EXPORT QtxTranslator : public QTranslator
 {
 public:
   QtxTranslator( QObject* parent = 0 );

@@ -29,6 +29,9 @@
   <file>images/qtx_split4_19.png</file>
   <file>images/qtx_split4_20.png</file>
   <file>images/qtx_split4_21.png</file>
+  <file>images/open.png</file>
+  <file>images/close.png</file>
+  <file>images/appicon.png</file>
 </qresource>
 </RCC>
  

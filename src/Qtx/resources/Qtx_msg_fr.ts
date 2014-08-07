@@ -384,4 +384,115 @@
         <translation>&amp;Fermer</translation>
     </message>
 </context>
+<context>
+    <name>QtxWebBrowser</name>
+    <message>
+        <source>Open URL</source>
+        <translation>Ouvrir le URL</translation>
+    </message>
+    <message>
+        <source>Open in</source>
+        <translation type="unfinished">Open in</translation>
+    </message>
+    <message>
+        <source>Save file</source>
+        <translation>Sauvegarder le fichier</translation>
+    </message>
+    <message>
+        <source>&amp;Browse...</source>
+        <translation>&amp;Parcourir...</translation>
+    </message>
+    <message>
+        <source>Use this program for all files of this type</source>
+        <translation type="unfinished">Use this program for all files of this type</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Annuler</translation>
+    </message>
+    <message>
+        <source>You are opening the file</source>
+        <translation type="unfinished">You are opening the file</translation>
+    </message>
+    <message>
+        <source>Please choose the action to be done</source>
+        <translation type="unfinished">Please choose the action to be done</translation>
+    </message>
+    <message>
+        <source>Choose program</source>
+        <translation type="unfinished">Choose program</translation>
+    </message>
+    <message>
+        <source>Go Back</source>
+        <translation>Reculer</translation>
+    </message>
+    <message>
+        <source>Go Forward</source>
+        <translation>Avancer</translation>
+    </message>
+    <message>
+        <source>Navigation</source>
+        <translation>Navigation</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fichier</translation>
+    </message>
+    <message>
+        <source>&amp;Open...</source>
+        <translation>&amp;Ouvrir...</translation>
+    </message>
+    <message>
+        <source>&amp;Find in text...</source>
+        <translation>&amp;Chercher...</translation>
+    </message>
+    <message>
+        <source>&amp;Find next</source>
+        <translation>Chercher &amp;suivant</translation>
+    </message>
+    <message>
+        <source>&amp;Find previous</source>
+        <translation>Chercher &amp;précédent</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Aide</translation>
+    </message>
+    <message>
+        <source>&amp;About...</source>
+        <translation>&amp;A propos de...</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>A propos de %1</translation>
+    </message>
+    <message>
+        <source>Help Browser</source>
+        <translation type="unfinished">Help Browser</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Erreur</translation>
+    </message>
+    <message>
+        <source>Can't save file:\n%1</source>
+        <translation>Impossible de sauvegarder le fichier:\n%1</translation>
+    </message>
+    <message>
+        <source>Open file</source>
+        <translation>Ouvrir le fichier</translation>
+    </message>
+    <message>
+        <source>%1 has been developed using %2</source>
+        <translation type="unfinished">%1 has been developed using %2</translation>
+    </message>
+</context>
 </TS>
