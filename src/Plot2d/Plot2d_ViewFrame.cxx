@@ -1094,7 +1094,7 @@ QwtPlotCurve *Plot2d_ViewFrame::createSegment( double *X, double *Y, int nbPoint
   aPCurve->setSamples( X, Y, nbPoint);
 
   aPCurve->setPen( QPen( lineColor, lineWidth, lineKind));
-  QwtSymbol* aSymbol;
+  QwtSymbol* aSymbol = new QwtSymbol();
   aSymbol->setStyle( markerKind );
   aPCurve->setSymbol( aSymbol );
 
