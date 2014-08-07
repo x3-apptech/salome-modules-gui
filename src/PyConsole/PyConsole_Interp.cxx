@@ -77,7 +77,6 @@ bool PyConsole_Interp::initContext()
     PyErr_Print();
     return false;
   }  
-  PyObject* global_dict = PyModule_GetDict(m);          // get interpreter dictionnary context
-  _context = PyDict_Copy(global_dict);
+  _context = PyModule_GetDict(m);          // get interpreter dictionnary context
   return true;
 }
