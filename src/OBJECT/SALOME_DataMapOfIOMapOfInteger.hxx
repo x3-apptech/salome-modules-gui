@@ -108,10 +108,8 @@ Standard_EXPORT   TColStd_IndexedMapOfInteger& ChangeFind(const Handle(SALOME_In
   return ChangeFind(K);
 }
 
-#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
 Standard_EXPORT   Standard_Address Find1 (const Handle(SALOME_InteractiveObject)& K) const;
 Standard_EXPORT   Standard_Address ChangeFind1 (const Handle(SALOME_InteractiveObject)& K);
-#endif
 
 private: 
 Standard_EXPORT SALOME_DataMapOfIOMapOfInteger(const SALOME_DataMapOfIOMapOfInteger& Other);

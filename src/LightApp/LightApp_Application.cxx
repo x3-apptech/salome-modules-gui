@@ -2152,16 +2152,14 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "strings", aValuesList,   vtkStyleMode );
   pref->setItemProperty( "indexes", anIndicesList, vtkStyleMode );
   // ... -> zooming mode
-  #if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
-    int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), Viewer3DGroup,
-                                                   LightApp_Preferences::Selector, "3DViewer", "zooming_mode" );
-    aValuesList.clear();
-    anIndicesList.clear();
-    aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
-    anIndicesList << 0                            << 1;
-    pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
-    pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
-  #endif
+  int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), Viewer3DGroup,
+                                                 LightApp_Preferences::Selector, "3DViewer", "zooming_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
+  anIndicesList << 0                            << 1;
+  pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
+  pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
   // ... "Trihedron" group <<start>>
   int occTriGroup = pref->addPreference( tr( "PREF_TRIHEDRON" ), Viewer3DGroup );
   pref->setItemProperty( "columns", 2, occTriGroup );

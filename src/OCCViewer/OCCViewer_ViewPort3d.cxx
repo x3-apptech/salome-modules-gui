@@ -313,22 +313,6 @@ void OCCViewer_ViewPort3d::updateBackground()
   if ( activeView().IsNull() ) return;
   if ( !myBackground.isValid() ) return;
 
-  // VSR: Important note on below code.
-  // In OCCT (in version 6.5.2), things about the background drawing
-  // are not straightforward and not clearly understandable:
-  // - Horizontal gradient is drawn vertically (!), well ok, from top side to bottom one.
-  // - Vertical gradient is drawn horizontally (!), from right side to left one (!!!).
-  // - First and second diagonal gradients are confused.
-  // - Image texture, once set, can not be removed (!).
-  // - Texture image fill mode Aspect_FM_NONE is not taken into account (and means the same
-  //   as Aspect_FM_CENTERED).
-  // - The only way to cancel gradient background (and get back to single colored) is to
-  //   set gradient background style to Aspect_GFM_NONE while passing two colors is also needed
-  //   (see V3d_View::SetBgGradientColors() function).
-  // - Also, it is impossible to draw texture image above the gradiented background (only above
-  //   single-colored).
-  // In OCCT 6.5.3 all above mentioned problems are fixed; so, above comment should be removed as soon
-  // as SALOME is migrated to OCCT 6.5.3. The same concerns #ifdef statements in the below code
   switch ( myBackground.mode() ) {
   case Qtx::ColorBackground:
     {
@@ -337,13 +321,8 @@ void OCCViewer_ViewPort3d::updateBackground()
 	// Unset texture should be done here
 	// ...
 	Quantity_Color qCol( c.red()/255., c.green()/255., c.blue()/255., Quantity_TOC_RGB );
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
 	activeView()->SetBgGradientStyle( Aspect_GFM_NONE ); // cancel gradient background
 	activeView()->SetBgImageStyle( Aspect_FM_NONE );     // cancel texture background
-#else
-	// cancel gradient background (in OCC before v6.5.3 the only way to do this is to set it to NONE type passing arbitrary colors as parameters)
-	activeView()->SetBgGradientColors( qCol, qCol, Aspect_GFM_NONE );
-#endif
 	// then change background color
 	activeView()->SetBackgroundColor( qCol );
 	// update viewer
@@ -365,38 +344,16 @@ void OCCViewer_ViewPort3d::updateBackground()
 	activeView()->SetBgImageStyle( Aspect_FM_NONE );    // cancel texture background
 	switch ( type ) {
 	case OCCViewer_Viewer::HorizontalGradient:
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
 	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_HOR, Standard_True );
-#else
-	  // in OCCT before v6.5.3, to draw horizontal gradient it's necessary to use Aspect_GFM_VER type
-	  // and interchange the colors
-	  activeView()->SetBgGradientColors( qCol2, qCol1, Aspect_GFM_VER, Standard_True );
-#endif
 	  break;
 	case OCCViewer_Viewer::VerticalGradient:
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
 	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_VER, Standard_True );
-#else
-	  // in OCCT before v6.5.3, to draw vertical gradient it's necessary to use Aspect_GFM_HOR type
-	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_HOR, Standard_True );
-#endif
 	  break;
 	case OCCViewer_Viewer::Diagonal1Gradient:
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
 	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_DIAG1, Standard_True );
-#else
-	  // in OCCT before v6.5.3, to draw 1st dialognal gradient it's necessary to use Aspect_GFM_DIAG2 type
-	  // and interchange the colors
-	  activeView()->SetBgGradientColors( qCol2, qCol1, Aspect_GFM_DIAG2, Standard_True );
-#endif
 	  break;
 	case OCCViewer_Viewer::Diagonal2Gradient:
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
 	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_DIAG2, Standard_True );
-#else
-	  // in OCCT before v6.5.3, to draw 2nd dialognal gradient it's necessary to use Aspect_GFM_DIAG1 type
-	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_DIAG1, Standard_True );
-#endif
 	  break;
 	case OCCViewer_Viewer::Corner1Gradient:
 	  activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_CORNER1, Standard_True );
@@ -424,9 +381,6 @@ void OCCViewer_ViewPort3d::updateBackground()
   default:
     break;
   }
-#if OCC_VERSION_LARGE > 0x06050200 // available since OCCT 6.5.3
-  // VSR: In OCCT before v6.5.3 below code can't be used because of very ugly bug - it has been impossible to
-  // clear the background texture image as soon as it was once set to the viewer.
   if ( myBackground.isTextureShown() ) {
     QString fileName;
     int textureMode = myBackground.texture( fileName );
@@ -449,7 +403,6 @@ void OCCViewer_ViewPort3d::updateBackground()
       activeView()->Update();
     }
   }
-#endif
 }
 
 /*!
@@ -477,10 +430,8 @@ void OCCViewer_ViewPort3d::fitRect( const QRect& rect )
 */
 void OCCViewer_ViewPort3d::startZoomAtPoint( int x, int y )
 {
-#if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
   if ( !activeView().IsNull() && isAdvancedZoomingEnabled() )
     activeView()->StartZoomAtPoint( x, y );
-#endif
 }
 
 /*!
@@ -492,11 +443,9 @@ void OCCViewer_ViewPort3d::zoom( int x0, int y0, int x, int y )
     // as OCCT respects a sign of only dx,
     // but we want both signes to be taken into account
     //activeView()->Zoom( x0, y0, x, y );
-#if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
     if ( isAdvancedZoomingEnabled() )
       activeView()->ZoomAtPoint( x0, y0, x, y );
     else
-#endif
       activeView()->Zoom( x0 + y0, 0, x + y, 0 );
     emit vpTransformed( this );
   }

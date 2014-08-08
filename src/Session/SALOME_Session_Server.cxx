@@ -259,19 +259,6 @@ public:
 
   virtual bool notify( QObject* receiver, QEvent* e )
   {
-#if OCC_VERSION_LARGE < 0x06010100
-    // Disable GUI user actions while python command is executed
-    if (SUIT_Session::IsPythonExecuted()) {
-      // Disable mouse and keyboard events
-      QEvent::Type aType = e->type();
-      if (aType == QEvent::MouseButtonPress || aType == QEvent::MouseButtonRelease ||
-          aType == QEvent::MouseButtonDblClick || aType == QEvent::MouseMove ||
-          aType == QEvent::Wheel || aType == QEvent::ContextMenu ||
-          aType == QEvent::KeyPress || aType == QEvent::KeyRelease ||
-          aType == QEvent::Accel || aType == QEvent::AccelOverride)
-        return false;
-    }
-#endif
 
 #ifdef ENABLE_TESTRECORDER
     return myHandler ? myHandler->handle( receiver, e ) :
