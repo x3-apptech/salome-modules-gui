@@ -73,8 +73,6 @@ class HelpBrowser: public QtxWebBrowser
 public:
   HelpBrowser() : QtxWebBrowser()
   {
-    Q_INIT_RESOURCE( Qtx );
-
     setAttribute( Qt::WA_DeleteOnClose, false );
   }
   ~HelpBrowser()
