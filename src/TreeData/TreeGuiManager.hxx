@@ -44,6 +44,7 @@ public:
   
   TreeModel * getDataTreeModel();
   TreeView * getDataTreeView();
+  DockWidgets * getDockWidgets();
   
   void setDataModel(DataModel * dataModel);
   DataModel * getDataModel();

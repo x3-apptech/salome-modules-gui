@@ -113,6 +113,12 @@ TreeView * TreeGuiManager::getDataTreeView() {
   return _dataTreeView;
 }
 
+/*!
+ * This returns the dock widgets manager
+ */
+DockWidgets * TreeGuiManager::getDockWidgets() {
+  return _dockWidgets;
+}
 
 /*!
  * This function specifies the data model to be used by the

@@ -42,6 +42,8 @@ class TREEDATA_EXPORT DockWidgets {
   void setDataView(QTreeView * dataView);
   void setPropertiesView(QTreeView * propertyView);
 
+  QDockWidget * getDockWidget();
+
  private:
   SalomeApp_Application* _salomeApp;
   QDockWidget * _dwDataPanel;

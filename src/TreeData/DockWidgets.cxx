@@ -29,6 +29,20 @@
 #include <SUIT_DataBrowser.h>
 #include <QtxTreeView.h>
 
+namespace
+{
+  QString toObjectName( const QString& s )
+  {
+    QStringList words = s.split( QRegExp("\\s+") );
+    QStringList result;
+    if ( words.count() > 0 )
+      result.append( words[0].left(1).toLower() + words[0].mid(1) );
+    for ( int i = 1; i < words.count(); i++ )
+      result.append( words[i].left(1).toUpper() + words[i].mid(1) );
+    return result.join( "" );
+  }
+}
+
 /*!
  * This create a gui container to hold widgets dedicated to the XCAD
  * data model. By default, the dock widgets are not visible. Use the
@@ -49,7 +63,7 @@ DockWidgets::DockWidgets(SalomeApp_Application* salomeApp,
   _dwDataPanel = new QDockWidget(parent);
   _dwDataPanel->setVisible(false);
   _dwDataPanel->setWindowTitle(title);
-  _dwDataPanel->setObjectName(title);
+  _dwDataPanel->setObjectName(toObjectName(title)+"Dock");
   parent->addDockWidget(Qt::LeftDockWidgetArea, _dwDataPanel);
   //
   // At this step, the _dwDataPanel is located side by side with the object
@@ -104,4 +118,11 @@ void DockWidgets::setDataView(QTreeView * dataView) {
 
 void DockWidgets::setPropertiesView(QTreeView * propertiesView) {
   // Not implemented yet
+}
+
+/*!
+ * This function returns dock widget
+ */
+QDockWidget * DockWidgets::getDockWidget() {
+  return _dwDataPanel;
 }
