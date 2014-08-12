@@ -1172,74 +1172,6 @@ void LightApp_Application::onSelectionChanged()
   action( EditPasteId )->setEnabled(canPaste);
 }
 
-/*!
-  Adds window to application.
-  \param wid - QWidget
-  \param flag - key for window
-  \param studyId - study id
-  Flag used how identificator of window in windows list.
-*/
-/*
-void LightApp_Application::addWindow( QWidget* wid, const int flag, const int studyId )
-{
-  if ( !wid )
-    return;
-
-  int sId = studyId;
-  if ( sId < 0 )
-  {
-    if ( !activeStudy() )
-      return;
-    else
-      sId = activeStudy()->id();
-  }
-
-  if ( !myWindows.contains( flag ) )
-  {
-    QMap<int, int> winMap;
-    currentWindows( winMap );
-
-    LightApp_WidgetContainer* newWC = new LightApp_WidgetContainer( flag, desktop() );
-    connect( newWC, SIGNAL(  destroyed ( QObject* ) ), this, SLOT( onWCDestroyed( QObject* ) ) );
-    // asv: connecting a slot for storing visibility flag of a window
-    connect( newWC, SIGNAL( visibilityChanged ( bool ) ), SLOT( onVisibilityChanged( bool ) ) );
-    myWindows.insert( flag, newWC );
-    if ( winMap.contains( flag ) ) {
-      //desktop()->removeDockWidget( myWindows[flag] );
-      desktop()->addDockWidget( (Qt::DockWidgetArea)winMap[flag], myWindows[flag] );
-    }
-
-    //myWindows[flag]->setResizeEnabled( true );
-    myWindows[flag]->setFeatures( QDockWidget::AllDockWidgetFeatures );
-    myWindows[flag]->setObjectName( QString( "dock_window_%1" ).arg( flag ) );
-    //myWindows[flag]->setFixedExtentWidth( wid->width() );
-    //myWindows[flag]->setFixedExtentHeight( wid->height() );
-    myWindows[flag]->resize( wid->width(), wid->height() );
-  }
-
-  QFont f;
-#ifndef DISABLE_PYCONSOLE
-  if( wid->inherits( "PyConsole_Console" ) )
-  {
-    if( resourceMgr()->hasValue( "PyConsole", "font" ) )
-      f = resourceMgr()->fontValue( "PyConsole", "font" );
-    else
-      {
-        f = ( ( PyConsole_Console* )wid )->font();
-        resourceMgr()->setValue( "PyConsole", "font", f );
-      }
-  }
-  else
-#endif
-    f = wid->font();
-
-  myWindows[flag]->insert( sId, wid );
-  wid->setFont( f );
-
-  setWindowShown( flag, !myWindows[flag]->isEmpty() );
-}
-*/
-
 QWidget* LightApp_Application::dockWindow( const int id ) const
 {
   QWidget* wid = 0;
@@ -1277,7 +1209,8 @@ void LightApp_Application::insertDockWindow( const int id, QWidget* wid )
   connect( dock, SIGNAL(  destroyed( QObject* ) ), this, SLOT( onWCDestroyed( QObject* ) ) );
 
   dock->setFeatures( QDockWidget::AllDockWidgetFeatures );
-  dock->setObjectName( QString( "window_%1" ).arg( id ) );
+  dock->setObjectName( wid->objectName().isEmpty() ? QString( "window_%1" ).arg( id ) : 
+		       QString( "%1Dock" ).arg( wid->objectName() ) );
   dock->setWidget( wid );
 
   QKeySequence accel = wid->property( "shortcut" ).value<QKeySequence>();
@@ -1901,6 +1834,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
   if ( flag == WT_ObjectBrowser )
   {
     SUIT_DataBrowser* ob = new SUIT_DataBrowser( new LightApp_DataObject(), desktop() );
+    ob->setObjectName( "objectBrowser" );
     ob->setSortMenuEnabled( true );
     ob->setAutoUpdate( true );
     if ( resMgr->hasValue( "ObjectBrowser", "auto_hide_search_tool" ) )
@@ -1944,6 +1878,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
   else  if ( flag == WT_PyConsole )
   {
     PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(),new LightApp_PyInterp());
+    pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
     pyCons->setIsShowBanner(resourceMgr()->booleanValue( "PyConsole", "show_banner", true ));
@@ -1956,6 +1891,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
   else if ( flag == WT_LogWindow )
   {
     LogWindow* logWin = new LogWindow( desktop() );
+    logWin->setObjectName( "logWindow" );
     logWin->setWindowTitle( tr( "LOG_WINDOW" ) );
     logWin->setProperty( "shortcut", QKeySequence( "Alt+Shift+L" ) );
     wid = logWin;
