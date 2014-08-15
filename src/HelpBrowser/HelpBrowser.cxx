@@ -107,9 +107,12 @@ int main( int argc, char **argv )
   
   QtSingleApplication::setApplicationName( "salome" );
 
+  // specify application identifier via its name
+  QFileInfo fi( argv[0] );
+
   // create application instance
 
-  QtSingleApplication instance( argc, argv );
+  QtSingleApplication instance( fi.fileName(), argc, argv );
 
   // parse command line arguments
 
