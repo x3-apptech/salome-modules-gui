@@ -1194,3 +1194,63 @@ void OB_Browser::onDoubleClicked( QListViewItem* item )
   \fn void OB_Browser::selectionChanged();
   \brief Emitted when selection is changed in the Object Browser.
 */
+
+QByteArray OB_Browser::getOpenStates( int theColumn ) const
+{
+  QByteArray aData;
+  QDataStream aStream( &aData, QIODevice::WriteOnly );
+  MapOfOpenStates aMap;
+  const_cast<OB_Browser*>( this )->openStates( true, aMap, QModelIndex(), theColumn );
+  MapOfOpenStates::const_iterator anIt = aMap.begin(), aLast = aMap.end();
+  for( ; anIt!=aLast; anIt++ )
+  {
+    QString anEntry = anIt.key();
+    qint32 anOpenAttr = anIt.value() ? 1 : 0;
+    aStream << anEntry << anOpenAttr;
+  }
+  return aData;
+}
+
+void OB_Browser::setOpenStates( const QByteArray& theData, int theColumn )
+{
+  QByteArray* aData = const_cast<QByteArray*>( &theData );
+  QDataStream aStream( aData, QIODevice::ReadOnly );
+  MapOfOpenStates aMap;
+  while( !aStream.atEnd() )
+  {
+    QString anEntry;
+    qint32 anOpenAttr;
+    aStream >> anEntry >> anOpenAttr;
+    bool isOpen = anOpenAttr!=0;
+    aMap[anEntry] = isOpen;
+  }
+  openStates( false, aMap, QModelIndex(), theColumn );
+}
+
+void OB_Browser::openStates( bool isGet, MapOfOpenStates& theMap, const QModelIndex& theIndex, int theColumn )
+{
+  if( theIndex.isValid() )
+  {
+    QString anEntry = theIndex.sibling( theIndex.row(), theColumn ).data().toString();
+    bool isOpen;
+    if( isGet )
+    {
+      isOpen = treeView()->isExpanded( theIndex );
+      theMap[anEntry] = isOpen;
+    }
+    else
+    {
+      isOpen = theMap.contains( anEntry ) ? theMap[anEntry] : false;
+      treeView()->setExpanded( theIndex, isOpen );
+    }
+  }
+
+  const QAbstractItemModel* aModel = model();
+
+  int n = aModel->rowCount( theIndex );
+  for( int i=0; i<n; i++ )
+  {
+    QModelIndex aChild = aModel->index( i, 0, theIndex );
+    openStates( isGet, theMap, aChild, theColumn );
+  }
+}

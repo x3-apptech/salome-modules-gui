@@ -112,6 +112,12 @@ public:
 
   QtxTreeView*           treeView() const;
 
+  QByteArray             getOpenStates( int theColumn ) const;
+  void                   setOpenStates( const QByteArray&, int theColumn );
+
+  typedef QMap<QString, bool> MapOfOpenStates;
+  void                   openStates( bool isGet, MapOfOpenStates&, const QModelIndex& theIndex, int theColumn );
+
 signals:
   void                   selectionChanged();
   //void                   doubleClicked( SUIT_DataObject* );
