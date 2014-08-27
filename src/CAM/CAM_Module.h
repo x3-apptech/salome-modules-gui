@@ -99,7 +99,7 @@ public:
                                        const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
   QtxActionGroup*        createActionGroup( const int, const bool = true );
 
-  int                    createTool( const QString& );
+  int                    createTool( const QString&, const QString& = QString() );
   int                    createTool( const int, const int, const int = -1 );
   int                    createTool( const int, const QString&, const int = -1 );
   int                    createTool( QAction*, const int, const int = -1, const int = -1 );

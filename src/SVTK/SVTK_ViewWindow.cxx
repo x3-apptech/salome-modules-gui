@@ -173,8 +173,13 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   aRenderer->Delete();
   aSelector->Delete();
   
-  myToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL"), false, Qt::AllToolBarAreas, -1, this );
-  myRecordingToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_RECORD_LABEL"), false, Qt::AllToolBarAreas, -1, this );
+  myToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL"),                       // title (language-dependant)
+					QString( "VTKViewerViewOperations" ),          // name (language-independant)
+					false );                                       // disable floatable toolbar
+
+  myRecordingToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_RECORD_LABEL"),       // title (language-dependant)
+						 QString( "VTKRecordingOperations" ),  // name (language-independant)
+						 false );                              // disable floatable toolbar
   
   createActions( SUIT_Session::session()->resourceMgr() );
   createToolBar();

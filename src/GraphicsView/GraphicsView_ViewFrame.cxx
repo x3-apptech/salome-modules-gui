@@ -171,7 +171,9 @@ void GraphicsView_ViewFrame::createActions()
 //================================================================
 int GraphicsView_ViewFrame::createToolBar()
 {
-  int tid = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL") );
+  int tid = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL"),                 // title (language-dependant)
+				      QString( "GraphicsViewViewOperations" ), // name (language-independant)
+				      false );                                 // disable floatable toolbar
   toolMgr()->append( DumpId, tid );
 
   myScaleAction = new QtxMultiAction( this );

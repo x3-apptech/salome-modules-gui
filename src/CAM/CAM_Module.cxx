@@ -396,17 +396,18 @@ QtxActionToolMgr* CAM_Module::toolMgr() const
 
   If the toolbar has been already created, its ID is just returned.
 
-  \param name toolbar name
+  \param title toolbar title
+  \param name toolbar name (identifier)
   \return toolbar ID or -1 if toolbar could not be created
 */
-int CAM_Module::createTool( const QString& name )
+int CAM_Module::createTool( const QString& title, const QString& name )
 {
   if ( !toolMgr() )
     return -1;
 
   ActionMgrLocker lock( toolMgr(), !myToolShown );
 
-  return toolMgr()->createToolBar( name, myToolShown );
+  return toolMgr()->createToolBar( title, name );
 }
 
 /*!

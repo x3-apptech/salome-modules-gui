@@ -190,7 +190,8 @@ void CAF_Application::createActions()
   createMenu( EditRedoId, editMenu, 0 );
   createMenu( separator(), editMenu, -1, 0 );
 
-  int stdTBar = createTool( tr( "INF_DESK_TOOLBAR_STANDARD" ) );
+  int stdTBar = createTool( tr( "INF_DESK_TOOLBAR_STANDARD" ),   // title (language-dependant)
+			    QString( "SalomeStandard" ) );       // name (language-independant)
 
   createTool( separator(), stdTBar );
   createTool( EditUndoId, stdTBar );

@@ -152,12 +152,15 @@
         <translation>Right</translation>
     </message>
     <message>
-        <source>LBL_TOOLBAR_LABEL</source>
-        <translation>View Operations</translation>
-    </message>
-    <message>
         <source>DSC_BACK_VIEW</source>
         <translation>Back View</translation>
+    </message>
+</context>
+<context>
+    <name>VTKViewer_ViewWindow</name>
+    <message>
+        <source>LBL_TOOLBAR_LABEL</source>
+        <translation>View Operations</translation>
     </message>
 </context>
 <context>

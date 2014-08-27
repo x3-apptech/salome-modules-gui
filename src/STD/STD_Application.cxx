@@ -253,7 +253,8 @@ void STD_Application::createActions()
 
   // Create tool bars
 
-  int stdTBar = createTool( tr( "INF_DESK_TOOLBAR_STANDARD" ) );
+  int stdTBar = createTool( tr( "INF_DESK_TOOLBAR_STANDARD" ),  // title (language-dependant)
+			    QString( "SalomeStandard" ) );      // name (language-independant)
 
   // Create tool items
 

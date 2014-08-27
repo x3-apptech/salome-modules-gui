@@ -65,6 +65,7 @@ SET(_ts_RESOURCES
   resources/GraphicsView_images.ts
   resources/GraphicsView_msg_en.ts
   resources/GraphicsView_msg_fr.ts
+  resources/GraphicsView_msg_ja.ts
 )
 
 # resource files / static

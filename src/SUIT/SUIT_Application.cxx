@@ -315,14 +315,15 @@ void SUIT_Application::setActiveStudy( SUIT_Study* study )
 /*!
   Creates new toolbar
   \return identificator of new toolbar in tool manager
-  \param name - name of new toolbar
+  \param title - title of new toolbar
+  \param name - name (identifier) of new toolbar
 */
-int SUIT_Application::createTool( const QString& name )
+int SUIT_Application::createTool( const QString& title, const QString& name )
 {
   if ( !desktop() || !desktop()->toolMgr() )
     return -1;
 
-  return desktop()->toolMgr()->createToolBar( name );
+  return desktop()->toolMgr()->createToolBar( title, name );
 }
 
 /*!

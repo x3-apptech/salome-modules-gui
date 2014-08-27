@@ -754,7 +754,8 @@ void LightApp_Application::createActions()
   createMenu( StyleId, viewMenu, 20, -1 );
   createMenu( FullScreenId, viewMenu, 20, -1 );
 
-  int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ) );
+  int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ),    // title (language-dependant)
+			    QString( "SalomeModules" ) );   // name (language-independant)
   createTool( ModulesListId, modTBar );
 }
 

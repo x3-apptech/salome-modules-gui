@@ -113,7 +113,36 @@ int QtxActionToolMgr::createToolBar( const QString& title, const int tid, QMainW
   If \a tid is less than 0, the identifier is generated automatically.
   If toolbar with given \a tid is already registered, the toolbar will not be created.
 
+  The parameter \a name can be specified to give an unique string identifier to the toolbar.
+  This can be useful in the multi-language environment where identifier of the toolbar should
+  not be dependant on the language chosen (e.g. to store positions of toolbars of main menu
+  in the preferences).
+
   \param title toolbar title
+  \param name toolbar name (identifier)
+  \param tid requested toolbar ID
+  \param mw parent main window; if it is null, the tool manager's main window is used
+  \param vis show toolbar visible immediately after creation (true by default)
+  \return id of created/found toolbar
+*/
+int QtxActionToolMgr::createToolBar( const QString& title, const QString& name, const int tid, QMainWindow* mw, bool vis )
+{
+  return createToolBar( title, name, true, Qt::AllToolBarAreas, tid, mw, vis );
+}
+
+/*!
+  \brief Create toolbar and assign \a id to it.
+
+  If \a tid is less than 0, the identifier is generated automatically.
+  If toolbar with given \a tid is already registered, the toolbar will not be created.
+
+  The parameter \a name can be specified to give an unique string identifier to the toolbar.
+  This can be useful in the multi-language environment where identifier of the toolbar should
+  not be dependant on the language chosen (e.g. to store positions of toolbars of main menu
+  in the preferences).
+
+  \param title toolbar title
+  \param name toolbar name (identifier)
   \param floatable if \c true, new toolbar is made floatable
   \param dockAreas dock areas of the main window where the new toolbar can be situated
   \param tid requested toolbar ID
@@ -121,7 +150,7 @@ int QtxActionToolMgr::createToolBar( const QString& title, const int tid, QMainW
   \param vis show toolbar visible immediately after creation (true by default)
   \return id of created/found toolbar
 */
-int QtxActionToolMgr::createToolBar( const QString& title, bool floatable, Qt::ToolBarAreas dockAreas, 
+int QtxActionToolMgr::createToolBar( const QString& title, const QString& name, bool floatable, Qt::ToolBarAreas dockAreas, 
                                      int tid, QMainWindow* mw, bool vis )
 {
   static int _toolBarId = -1;
@@ -154,7 +183,7 @@ int QtxActionToolMgr::createToolBar( const QString& title, bool floatable, Qt::T
     tb->setMovable( dockAreas & Qt::AllToolBarAreas );
     //mainWindow()->addToolBar( tb );
     tb->setWindowTitle( title );
-    tb->setObjectName( title );
+    tb->setObjectName( name.isEmpty() ? title : name );
     tb->setToolTip( title );
     if ( !vis )
       QApplication::postEvent( tb, new QHideEvent());
@@ -164,6 +193,26 @@ int QtxActionToolMgr::createToolBar( const QString& title, bool floatable, Qt::T
   connect( tInfo.toolBar, SIGNAL( destroyed() ), this, SLOT( onToolBarDestroyed() ) );
 
   return tbId;
+}
+
+/*!
+  \brief Create toolbar and assign \a id to it.
+
+  If \a tid is less than 0, the identifier is generated automatically.
+  If toolbar with given \a tid is already registered, the toolbar will not be created.
+
+  \param title toolbar title
+  \param floatable if \c true, new toolbar is made floatable
+  \param dockAreas dock areas of the main window where the new toolbar can be situated
+  \param tid requested toolbar ID
+  \param mw parent main window; if it is null, the tool manager's main window is used
+  \param vis show toolbar visible immediately after creation (true by default)
+  \return id of created/found toolbar
+*/
+int QtxActionToolMgr::createToolBar( const QString& title, bool floatable, Qt::ToolBarAreas dockAreas, 
+                                     int tid, QMainWindow* mw, bool vis )
+{
+  return createToolBar( title, QString(), floatable, dockAreas, tid, mw, vis );
 }
 
 /*!

@@ -1549,37 +1549,38 @@ int SalomePyQt::defaultMenuGroup()
 class CrTool
 {
 public:
-  CrTool( const QString& tBar ) 
-    : myCase( 0 ), myTbName( tBar ) {}
+  CrTool( const QString& tBar, const QString& nBar ) 
+    : myCase( 0 ), myTbTitle( tBar ), myTbName( nBar)  {}
   CrTool( const int id, const int tBar, const int idx ) 
     : myCase( 1 ), myId( id ), myTbId( tBar ), myIndex( idx ) {}
   CrTool( const int id, const QString& tBar, const int idx )
-    : myCase( 2 ), myId( id ), myTbName( tBar ), myIndex( idx ) {}
+    : myCase( 2 ), myId( id ), myTbTitle( tBar ), myIndex( idx ) {}
   CrTool( QAction* action, const int tbId, const int id, const int idx )
     : myCase( 3 ), myAction( action ), myTbId( tbId ), myId( id ), myIndex( idx ) {}
   CrTool( QAction* action, const QString& tBar, const int id, const int idx )
-    : myCase( 4 ), myAction( action ), myTbName( tBar ), myId( id ), myIndex( idx ) {}
+    : myCase( 4 ), myAction( action ), myTbTitle( tBar ), myId( id ), myIndex( idx ) {}
 
   int execute( LightApp_Module* module ) const
   {
     if ( module ) {
       switch ( myCase ) {
       case 0:
-        return module->createTool( myTbName );
+        return module->createTool( myTbTitle, myTbName );
       case 1:
         return module->createTool( myId, myTbId, myIndex );
       case 2:
-        return module->createTool( myId, myTbName, myIndex );
+        return module->createTool( myId, myTbTitle, myIndex );
       case 3:
         return module->createTool( myAction, myTbId, myId, myIndex );
       case 4:
-        return module->createTool( myAction, myTbName, myId, myIndex );
+        return module->createTool( myAction, myTbTitle, myId, myIndex );
       }
     }
     return -1;
   }
 private:
    int        myCase;
+   QString    myTbTitle;
    QString    myTbName;
    int        myTbId;
    QAction*   myAction;
@@ -1605,12 +1606,13 @@ public:
 
 /*!
   \brief Create toolbar with specified name.
-  \param tBar toolbar name
+  \param tBar toolbar title (language-dependent)
+  \param nBar toolbar name (language-independent) [optional]
   \return toolbar ID or -1 if toolbar creation is failed
 */
-int SalomePyQt::createTool( const QString& tBar )
+int SalomePyQt::createTool( const QString& tBar, const QString& nBar )
 {
-  return ProcessEvent( new TCreateToolEvent( CrTool( tBar ) ) );
+  return ProcessEvent( new TCreateToolEvent( CrTool( tBar, nBar ) ) );
 }
 
 /*! 
