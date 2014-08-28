@@ -1991,7 +1991,83 @@ void Qtx::BackgroundData::setGradient( const QGradient& grad )
   myGradient = grad;
   setMode( Qtx::CustomGradientBackground );
 }
+
+/*!
+  \brief Convert string representation of version identifier to the numerical value.
+  Resulting value can be used for comparison of different versions (lower, higher, equal).
+
+  String representation of the version consists of zero or more components:
+
+  [major[.minor[.release[patchid]]]]
+ 
+  where
+  - major is version major number
+  - minor is version minor number
+  - release is version release number
+  - patchid is a version dev identifier which is one of the following
+    * 1 letter optionally followed by 1 or 2 digits, e.g. "a" for "alpha", "b1" for "beta 1"
+    * "rc" optionally followed by 1 or 2 digits, e.g. "rc1" for "release candidate 1"
+    * "dev" for development version (note: 7.4.0dev > 7.4.0, 7.4.0dev < 7.4.1, 7.4.0dev < 7.4.0a1)
+
+  If version string does not include any component or has invalid format, the function returns 0.
+
+  Examples:
+    1.0      - version 1.0
+    1.2.3a   - version 1.2.3 alpha
+    3.3.3b1  - version 3.3.3 beta 1
+    7.4.0rc1 - version 7.4.0 release candidate 1
+    7.4.0dev - dev version, i.e. future version 7.4.1 (or 7.5.0)
+
+  \param version string representation of version
+  \return numerical identifier of the version
+*/
+long Qtx::versionToId( const QString& version )
+{
+  long id = 0;
+
+  QRegExp vers_exp( "^([0-9]+)([A-Z]|RC|DEV)?([0-9]{0,2})$", Qt::CaseInsensitive );
   
+  QStringList vers = version.split( ".", QString::SkipEmptyParts );
+  int major=0, minor=0;
+  int release = 0, dev1 = 0, dev2 = 0;
+  if ( vers.count() > 0 ) major = vers[0].toInt();
+  if ( vers.count() > 1 ) minor = vers[1].toInt();
+  if ( vers.count() > 2 ) {
+    if ( vers_exp.indexIn( vers[2] ) != -1 ) {
+      release = vers_exp.cap( 1 ).toInt();
+      QString tag = vers_exp.cap( 2 ).toLower();
+      if ( !tag.isEmpty() ) {
+	// patchid is subtracted from version number
+	// a   = 55 --> -(55 * 100) + patch number --> 4500..4599, e.g. 7.4.1a1  -> 704004501
+	// b   = 54 --> -(54 * 100) + patch number --> 4600..4699, e.g. 7.4.1b1  -> 704004601
+	// c   = 53 --> -(53 * 100) + patch number --> 4700..4799, e.g. 7.4.1c1  -> 704004701
+	// ...
+	// z   = 30 --> -( 1 * 100) + patch number --> 7000..7099, e.g. 7.4.1z1  -> 704007001
+	// rc  =  1 --> -( 1 * 100) + patch number --> 9900..9999, e.g. 7.4.1rc1 -> 704009901
+	// dev = -1 --> +( 1 * 100) + patch number --> 0100..0199, e.g. 7.4.1dev -> 704010100
+	// ---
+	// i.e. "a" < "b" < ... < "z" < "rc" < [stable] < "dev"
+	if ( tag == "rc" )
+	  dev1 = 1;
+	else if ( tag == "dev" )
+	  dev1 = -1;
+	else
+	  dev1 = (int)( QChar('z').toLatin1() ) - (int)( tag[ 0 ].toLatin1() ) + 30;
+      }
+      if ( !vers_exp.cap( 3 ).isEmpty() )
+	dev2 = vers_exp.cap( 3 ).toInt();
+    }
+  }
+  
+  int dev = dev1*100-dev2;
+  id = major;
+  id*=100; id+=minor;
+  id*=100; id+=release;
+  id*=10000;
+  id-=dev;
+
+  return id;
+}
 
 #ifndef WIN32
 

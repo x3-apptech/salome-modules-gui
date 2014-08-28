@@ -3047,6 +3047,12 @@ void LightApp_Application::savePreferences()
   if ( desktop() )
     aResMgr->setValue( "desktop", "geometry", desktop()->storeGeometry() );
 
+#if GUI_DEVELOPMENT > 0
+  aResMgr->setValue( "salome", "version", QString(GUI_VERSION_STR)+"dev" );
+#else
+  aResMgr->setValue( "salome", "version", QString(GUI_VERSION_STR) );
+#endif
+
   aResMgr->save();
 }
 
@@ -3242,6 +3248,7 @@ void LightApp_Application::loadDockWindowsState()
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   bool storeWin = aResMgr->booleanValue( "Study", "store_positions", true );
   bool storeTb = aResMgr->booleanValue( "Study", "store_tool_positions", true );
+  long version = Qtx::versionToId( aResMgr->stringValue( "salome", "version", "" ) );
 
   QString modName;
   if ( activeModule() )
@@ -3261,7 +3268,10 @@ void LightApp_Application::loadDockWindowsState()
 
   if ( aResMgr->hasValue("windows_geometry" ,modName ) ) {
     QByteArray arr;
-    aResMgr->value("windows_geometry", modName , arr );
+    if ( version > Qtx::versionToId( "7.4.1" ) )
+      aResMgr->value( "windows_geometry", modName , arr );
+    else
+      arr = aDefaultState;
     QByteArray aTargetArray = processState(arr, storeWin, storeTb, true, aDefaultState);
     desktop()->restoreState( aTargetArray );
   }

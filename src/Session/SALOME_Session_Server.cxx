@@ -204,36 +204,10 @@ protected:
       // for backward compatibility we also check files prepended with "." with lower priority
       QRegExp exp( QString( "\\.?%1rc\\.([a-zA-Z0-9.]+)" ).arg( myExtAppName ) );
 #endif
-      QRegExp vers_exp( "^([0-9]+)([A-Z]|RC)?([0-9]*)", Qt::CaseInsensitive );
-      
       QString fname = QFileInfo( _fname ).fileName();
-      if( exp.exactMatch( fname ) ) {
-          QStringList vers = exp.cap( 1 ).split( ".", QString::SkipEmptyParts );
-          int major=0, minor=0;
-          int release = 0, dev1 = 0, dev2 = 0;
-          if ( vers.count() > 0 ) major = vers[0].toInt();
-          if ( vers.count() > 1 ) minor = vers[1].toInt();
-          if ( vers.count() > 2 ) {
-              if ( vers_exp.indexIn( vers[2] ) != -1 ) {
-                  release = vers_exp.cap( 1 ).toInt();
-                  QString tag = vers_exp.cap( 2 ).toLower();
-                  if ( !tag.isEmpty() ) {
-                      if ( tag == "rc" ) // release candidate
-                        dev1 = 49;       // 'rc'=49
-                      else               // a, b, c, ...
-                        dev1 = (int)( tag[ 0 ].toLatin1() ) - (int)( QChar('a').toLatin1() ) + 1; // 'a'=1, 'b'=2, ..., 'z'=26
-                  }
-                  if ( !vers_exp.cap( 3 ).isEmpty() )
-                    dev2 = vers_exp.cap( 3 ).toInt();
-              }
-          }
-
-          int dev = dev1*100+dev2;
-          id = major;
-          id*=100; id+=minor;
-          id*=100; id+=release;
-          id*=10000;
-          if ( dev > 0 ) id-=dev;
+      if ( exp.exactMatch( fname ) ) {
+	long fid = Qtx::versionToId( exp.cap( 1 ) );
+	if ( fid > 0 ) id = fid;
       }
     }
     return id;
