@@ -4,44 +4,73 @@
 <context>
     <name>@default</name>
     <message>
+        <!-- used in GEOM module: to be moved there? -->
+        <source>OCC_TEXTURE_FILES</source>
+        <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
+        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+    </message>
+</context>
+<context>
+    <name>OCCViewer_ViewWindow</name>
+    <message>
         <source>MNU_FRONT_VIEW</source>
         <translation>Avant</translation>
     </message>
     <message>
-        <source>ERROR</source>
-        <translation>Erreur</translation>
-    </message>
-    <message>
-        <source>MNU_DUMP_VIEW</source>
-        <translation>Sauvegarder la scène</translation>
-    </message>
-    <message>
-        <source>DSC_TOP_VIEW</source>
-        <translation>Vue de dessus</translation>
-    </message>
-    <message>
-        <source>MNU_PAN_VIEW</source>
-        <translation>Panoramique</translation>
-    </message>
-    <message>
-        <source>MNU_CLONE_VIEW</source>
-        <translation>Dupliquer la scène</translation>
-    </message>
-    <message>
-        <source>DSC_SHOW_TRIHEDRE</source>
-        <translation>Afficher/cacher le trièdre dans la scène</translation>
-    </message>
-    <message>
-        <source>MNU_SHOW_TRIHEDRE</source>
-        <translation>Afficher/cacher le trièdre</translation>
+        <source>DSC_FRONT_VIEW</source>
+        <translation>Vue de devant</translation>
     </message>
     <message>
         <source>MNU_TOP_VIEW</source>
         <translation>Dessus</translation>
     </message>
     <message>
+        <source>DSC_TOP_VIEW</source>
+        <translation>Vue de dessus</translation>
+    </message>
+    <message>
+        <source>MNU_DUMP_VIEW</source>
+        <translation>Sauvegarder la scène</translation>
+    </message>
+    <message>
+        <source>DSC_DUMP_VIEW</source>
+        <translation>Sauvegarder la scène en cours dans un fichier image</translation>
+    </message>
+    <message>
+        <source>MNU_PAN_VIEW</source>
+        <translation>Panoramique</translation>
+    </message>
+    <message>
+        <source>DSC_PAN_VIEW</source>
+        <translation>Déplacer la vue</translation>
+    </message>
+    <message>
+        <source>MNU_GLOBALPAN_VIEW</source>
+        <translation>Panoramique global</translation>
+    </message>
+    <message>
         <source>DSC_GLOBALPAN_VIEW</source>
         <translation>Sélection d&apos;un nouveau centre de vue</translation>
+    </message>
+    <message>
+        <source>MNU_CLONE_VIEW</source>
+        <translation>Dupliquer la scène</translation>
+    </message>
+    <message>
+        <source>DSC_CLONE_VIEW</source>
+        <translation>Ouvrir une nouvelle fenêtre de visualisation pour la scène en cours</translation>
+    </message>
+    <message>
+        <source>MNU_SHOW_TRIHEDRE</source>
+        <translation>Afficher/cacher le trièdre</translation>
+    </message>
+    <message>
+        <source>DSC_SHOW_TRIHEDRE</source>
+        <translation>Afficher/cacher le trièdre dans la scène</translation>
+    </message>
+    <message>
+        <source>MNU_ROTATE_VIEW</source>
+        <translation>Rotation</translation>
     </message>
     <message>
         <source>DSC_ROTATE_VIEW</source>
@@ -52,68 +81,52 @@
         <translation>Zoom</translation>
     </message>
     <message>
-        <source>DSC_PAN_VIEW</source>
-        <translation>Déplacer la vue</translation>
+        <source>DSC_ZOOM_VIEW</source>
+        <translation>Zoom la vue</translation>
+    </message>
+    <message>
+        <source>MNU_LEFT_VIEW</source>
+        <translation>Gauche</translation>
     </message>
     <message>
         <source>DSC_LEFT_VIEW</source>
         <translation>Vue de gauche</translation>
     </message>
     <message>
-        <source>DSC_SHOOT_VIEW</source>
-        <translation>Memoriser l&apos;état courant de la scène et l&apos;ajouter dans la liste</translation>
+        <source>MNU_SHOOT_VIEW</source>
+        <translation>Memoriser la vue</translation>
     </message>
     <message>
-        <source>DSC_FITALL</source>
-        <translation>Redimentionner la scène pour montrer tous les objets</translation>
+        <source>DSC_SHOOT_VIEW</source>
+        <translation>Memoriser l&apos;état courant de la scène et l&apos;ajouter dans la liste</translation>
     </message>
     <message>
         <source>MNU_FITALL</source>
         <translation>Tout afficher</translation>
     </message>
     <message>
-        <source>MNU_ROTATE_VIEW</source>
-        <translation>Rotation</translation>
-    </message>
-    <message>
-        <source>DSC_FRONT_VIEW</source>
-        <translation>Vue de devant</translation>
-    </message>
-    <message>
-        <source>MNU_ROTATIONPOINTGRAVITY_VIEW</source>
-        <translation>Point de Rotation : le centre de gravité</translation>
-    </message>
-    <message>
-        <source>MNU_GLOBALPAN_VIEW</source>
-        <translation>Panoramique global</translation>
-    </message>
-    <message>
-        <source>INF_APP_DUMP_VIEW</source>
-        <translation>Sauvegarder la vue</translation>
-    </message>
-    <message>
-        <source>DSC_CLIPPING</source>
-        <translation>Définir le plan de coupe</translation>
-    </message>
-    <message>
-        <source>DSC_CLONE_VIEW</source>
-        <translation>Ouvrir une nouvelle fenêtre de visualisation pour la scène en cours</translation>
-    </message>
-    <message>
-        <source>INF_APP_SHOOT_VIEW</source>
-        <translation>Mémoriser la scène</translation>
+        <source>DSC_FITALL</source>
+        <translation>Redimentionner la scène pour montrer tous les objets</translation>
     </message>
     <message>
         <source>MNU_CLIPPING</source>
         <translation>Plan de coupe</translation>
     </message>
     <message>
+        <source>DSC_CLIPPING</source>
+        <translation>Définir le plan de coupe</translation>
+    </message>
+    <message>
         <source>MNU_BACK_VIEW</source>
         <translation>Arrière</translation>
     </message>
     <message>
-        <source>MNU_SHOOT_VIEW</source>
-        <translation>Memoriser la vue</translation>
+        <source>DSC_BACK_VIEW</source>
+        <translation>Vue arrière</translation>
+    </message>
+    <message>
+        <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
+        <translation>Changer le point de rotation</translation>
     </message>
     <message>
         <source>DSC_CHANGINGROTATIONPOINT_VIEW</source>
@@ -124,88 +137,140 @@
         <translation>Dessous</translation>
     </message>
     <message>
-        <source>MNU_RESET_VIEW</source>
-        <translation>Restaurer le point de vue</translation>
-    </message>
-    <message>
-        <source>MNU_LEFT_VIEW</source>
-        <translation>Gauche</translation>
-    </message>
-    <message>
-        <source>DSC_RIGHT_VIEW</source>
-        <translation>Vue de droite</translation>
-    </message>
-    <message>
-        <source>DSC_ANTICLOCKWISE_VIEW</source>
-        <translation>Tourner la vue à gauche</translation>
-    </message>
-    <message>
-        <source>DSC_CLOCKWISE_VIEW</source>
-        <translation>Tourner la vue à droite</translation>
-    </message>
-    <message>
-        <source>MNU_CHANGINGROTATIONPOINT_VIEW</source>
-        <translation>Changer le point de rotation</translation>
-    </message>
-    <message>
-        <source>DSC_FITRECT</source>
-        <translation>Redimensionner la scène pour ne montrer que sa partie choisie par l&apos;encadré</translation>
-    </message>
-    <message>
-        <source>MNU_FITRECT</source>
-        <translation>Afficher la zone</translation>
-    </message>
-    <message>
         <source>DSC_BOTTOM_VIEW</source>
         <translation>Vue de dessous</translation>
     </message>
     <message>
-        <source>DSC_DUMP_VIEW</source>
-        <translation>Sauvegarder la scène en cours dans un fichier image</translation>
-    </message>
-    <message>
-        <source>DSC_ZOOM_VIEW</source>
-        <translation>Zoom la vue</translation>
-    </message>
-    <message>
-        <source>MNU_ROTATIONPOINT000_VIEW</source>
-        <translation>Point de Rotation : (0,0,0)</translation>
-    </message>
-    <message>
-        <source>MNU_ROTATIONPOINTSELECTED_VIEW</source>
-        <translation>Point de Rotation : le point choisi par l&apos;utilisateur</translation>
+        <source>MNU_RESET_VIEW</source>
+        <translation>Restaurer le point de vue</translation>
     </message>
     <message>
         <source>DSC_RESET_VIEW</source>
         <translation>Restaurer le point de vue</translation>
     </message>
     <message>
-        <source>ERR_DOC_CANT_SAVE_FILE</source>
-        <translation>Impossible de sauvegarder le fichier</translation>
+        <source>MNU_RIGHT_VIEW</source>
+        <translation>Droit</translation>
     </message>
     <message>
-        <source>DSC_PRESETS_VIEW</source>
-        <translation>Restaurer d&apos;un état mémorisé de la scène courante</translation>
-    </message>
-    <message>
-        <source>MNU_PRESETS_VIEW</source>
-        <translation>Restaurer la vue</translation>
+        <source>DSC_RIGHT_VIEW</source>
+        <translation>Vue de droite</translation>
     </message>
     <message>
         <source>MNU_ANTICLOCKWISE_VIEW</source>
         <translation>Tourner à gauche</translation>
     </message>
     <message>
+        <source>DSC_ANTICLOCKWISE_VIEW</source>
+        <translation>Tourner la vue à gauche</translation>
+    </message>
+    <message>
         <source>MNU_CLOCKWISE_VIEW</source>
         <translation>Tourner à droite</translation>
     </message>
     <message>
-        <source>MNU_RIGHT_VIEW</source>
-        <translation>Droit</translation>
+        <source>DSC_CLOCKWISE_VIEW</source>
+        <translation>Tourner la vue à droite</translation>
     </message>
     <message>
-        <source>INF_APP_PRESETS_VIEW</source>
-        <translation>Restaurer la scène</translation>
+        <source>MNU_FITRECT</source>
+        <translation>Afficher la zone</translation>
+    </message>
+    <message>
+        <source>DSC_FITRECT</source>
+        <translation>Redimensionner la scène pour ne montrer que sa partie choisie par l&apos;encadré</translation>
+    </message>
+    <message>
+        <source>MNU_PRESETS_VIEW</source>
+        <translation>Restaurer la vue</translation>
+    </message>
+    <message>
+        <source>DSC_PRESETS_VIEW</source>
+        <translation>Restaurer d&apos;un état mémorisé de la scène courante</translation>
+    </message>
+    <message>
+        <source>MNU_SCALING</source>
+        <translation>Changer l&apos;échelle</translation>
+    </message>
+    <message>
+        <source>DSC_SCALING</source>
+        <translation>Changer l&apos;échelle des axes de coordonnées</translation>
+    </message>
+    <message>
+        <source>MNU_GRADUATED_AXES</source>
+        <translation>Axes gradués</translation>
+    </message>
+    <message>
+        <source>DSC_GRADUATED_AXES</source>
+        <translation>Axes gradués</translation>
+    </message>
+    <message>
+        <source>MNU_AMBIENT</source>
+        <translation>Ne montrer que la lumière d&apos;ambiance</translation>
+    </message>
+    <message>
+        <source>DSC_AMBIENT</source>
+        <translation>Ne montrer que la lumière d&apos;ambiance</translation>
+    </message>
+    <message>
+        <source>MNU_STYLE_SWITCH</source>
+        <translation>Changer le style d&apos;intéraction</translation>
+    </message>
+    <message>
+        <source>DSC_STYLE_SWITCH</source>
+        <translation>Changer le style d&apos;intéraction</translation>
+    </message>
+    <message>
+        <source>MNU_ZOOMING_STYLE_SWITCH</source>
+        <translation>Changer le style de zoom</translation>
+    </message>
+    <message>
+        <source>DSC_ZOOMING_STYLE_SWITCH</source>
+        <translation>Changer le style de zoom</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_PRESELECTION</source>
+        <translation>Activer/Désactiver préselection</translation>
+    </message>
+    <message>
+        <source>DSC_ENABLE_PRESELECTION</source>
+        <translation>Activer/Désactiver la préselection</translation>
+    </message>
+    <message>
+        <source>MNU_ENABLE_SELECTION</source>
+        <translation>Activer/Désactiver selection</translation>
+    </message>
+    <message>
+        <source>DSC_ENABLE_SELECTION</source>
+        <translation>Activer/Désactiver la selection</translation>
+    </message>
+    <message>
+        <source>MNU_MAXIMIZE_VIEW</source>
+        <translation>Maximiser</translation>
+    </message>
+    <message>
+        <source>DSC_MAXIMIZE_VIEW</source>
+        <translation>Maximiser la vue</translation>
+    </message>
+    <message>
+        <source>MNU_MINIMIZE_VIEW</source>
+        <translation>Minimiser</translation>
+    </message>
+    <message>
+        <source>DSC_MINIMIZE_VIEW</source>
+        <translation>Minimiser la vue</translation>
+    </message>
+    <message>
+        <source>MNU_RETURN_3D_VIEW</source>
+        <translation>Retour à la vue 3D</translation>
+    </message>
+    <message>
+        <source>DSC_RETURN_3D_VIEW</source>
+        <translation>Retour à la vue 3D</translation>
+    </message>
+    <message>
+        <source>OCC_IMAGE_FILES</source>
+        <translation>Fichiers images (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
     </message>
     <message>
         <source>LBL_XYTOOLBAR_LABEL</source>
@@ -216,104 +281,12 @@
         <translation>Opérations sur la vue XZ</translation>
     </message>
     <message>
-        <source>LBL_YZTOOLBAR_LABEL</source>
+        <source>>LBL_YZTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue YZ</translation>
     </message>
     <message>
         <source>LBL_3DTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue 3D</translation>
-    </message>
-    <message>
-        <source>DSC_BACK_VIEW</source>
-        <translation>Vue arrière</translation>
-    </message>
-    <message>
-        <source>DSC_SCALING</source>
-        <translation>Changer l&apos;échelle des axes de coordonnées</translation>
-    </message>
-    <message>
-        <source>MNU_SCALING</source>
-        <translation>Changer l&apos;échelle</translation>
-    </message>
-    <message>
-        <source>DSC_GRADUATED_AXES</source>
-        <translation>Axes gradués</translation>
-    </message>
-    <message>
-        <source>MNU_GRADUATED_AXES</source>
-        <translation>Axes gradués</translation>
-    </message>
-    <message>
-        <source>DSC_AMBIENT</source>
-        <translation>Ne montrer que la lumière d&apos;ambiance</translation>
-    </message>
-    <message>
-        <source>MNU_AMBIENT</source>
-        <translation>Ne montrer que la lumière d&apos;ambiance</translation>
-    </message>
-    <message>
-        <source>DSC_STYLE_SWITCH</source>
-        <translation>Changer le style d&apos;intéraction</translation>
-    </message>
-    <message>
-        <source>MNU_STYLE_SWITCH</source>
-        <translation>Changer le style d&apos;intéraction</translation>
-    </message>
-    <message>
-        <source>DSC_ZOOMING_STYLE_SWITCH</source>
-        <translation>Changer le style de zoom</translation>
-    </message>
-    <message>
-        <source>MNU_ZOOMING_STYLE_SWITCH</source>
-        <translation>Changer le style de zoom</translation>
-    </message>
-    <message>
-        <source>DSC_ENABLE_PRESELECTION</source>
-        <translation>Activer/Désactiver la préselection</translation>
-    </message>
-    <message>
-        <source>MNU_ENABLE_PRESELECTION</source>
-        <translation>Activer/Désactiver préselection</translation>
-    </message>
-    <message>
-        <source>DSC_ENABLE_SELECTION</source>
-        <translation>Activer/Désactiver la selection</translation>
-    </message>
-    <message>
-        <source>MNU_ENABLE_SELECTION</source>
-        <translation>Activer/Désactiver selection</translation>
-    </message>
-    <message>
-        <source>OCC_IMAGE_FILES</source>
-        <translation>Fichiers images (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
-    </message>
-    <message>
-        <source>OCC_TEXTURE_FILES</source>
-        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
-    </message>
-    <message>
-        <source>DSC_MAXIMIZE_VIEW</source>
-        <translation>Maximiser la vue</translation>
-    </message>
-    <message>
-        <source>DSC_MINIMIZE_VIEW</source>
-        <translation>Minimiser la vue</translation>
-    </message>
-    <message>
-        <source>DSC_RETURN_3D_VIEW</source>
-        <translation>Retour à la vue 3D</translation>
-    </message>
-    <message>
-        <source>MNU_MAXIMIZE_VIEW</source>
-        <translation>Maximiser</translation>
-    </message>
-    <message>
-        <source>MNU_MINIMIZE_VIEW</source>
-        <translation>Minimiser</translation>
-    </message>
-    <message>
-        <source>MNU_RETURN_3D_VIEW</source>
-        <translation>Retour à la vue 3D</translation>
     </message>
 </context>
 <context>

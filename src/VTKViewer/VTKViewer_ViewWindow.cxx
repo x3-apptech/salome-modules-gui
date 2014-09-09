@@ -92,6 +92,7 @@ VTKViewer_ViewWindow::VTKViewer_ViewWindow( SUIT_Desktop* theDesktop,
   setCentralWidget( myRenderWindow );
 
   myToolBar = new QtxToolBar( true, tr("LBL_TOOLBAR_LABEL"), this );
+  myToolBar->setObjectName( "VTKViewerViewOperations" );
   myToolBar->setFloatable( false );
 
   createActions();

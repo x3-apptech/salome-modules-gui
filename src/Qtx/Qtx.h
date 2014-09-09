@@ -258,6 +258,8 @@ public:
   static QString        backgroundToString( const BackgroundData& );
   static BackgroundData stringToBackground( const QString& );
 
+  static long        versionToId( const QString& );
+
 #ifndef WIN32
   static void*       getDisplay();
   static Qt::HANDLE  getVisual();

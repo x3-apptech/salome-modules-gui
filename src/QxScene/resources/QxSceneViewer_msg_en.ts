@@ -23,6 +23,9 @@
         <source>DSC_RESET_VIEW</source>
         <translation>Reset View Point</translation>
     </message>
+</context>
+<context>
+    <name>QxScene_ViewWindow</name>
     <message>
         <source>LBL_TOOLBAR_LABEL</source>
         <translation>View Operations</translation>

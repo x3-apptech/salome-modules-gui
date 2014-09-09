@@ -138,7 +138,7 @@ protected:
   virtual void          setActiveStudy( SUIT_Study* );
   
   /** @name Create tool functions*/ //@{
-  int                   createTool( const QString& );
+  int                   createTool( const QString&, const QString& = QString() );
   int                   createTool( const int, const int, const int = -1 );
   int                   createTool( const int, const QString&, const int = -1 );
   int                   createTool( QAction*, const int, const int = -1, const int = -1 );

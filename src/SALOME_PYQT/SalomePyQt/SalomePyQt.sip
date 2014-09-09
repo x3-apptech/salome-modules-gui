@@ -366,7 +366,7 @@ public:
 
   static int               defaultMenuGroup() /ReleaseGIL/ ;
 
-  static int               createTool( const QString& ) /ReleaseGIL/ ;
+  static int               createTool( const QString&, const QString& = QString() ) /ReleaseGIL/ ;
   static int               createTool( const int,  const int,      const int = -1 ) /ReleaseGIL/ ;
   static int               createTool( const int,  const QString&, const int = -1 ) /ReleaseGIL/ ;
   static int               createTool( QAction*,   const int,      const int = -1, const int = -1 ) /ReleaseGIL/ ;

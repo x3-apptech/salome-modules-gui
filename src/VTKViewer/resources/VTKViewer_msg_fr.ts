@@ -152,12 +152,15 @@
         <translation>Droite</translation>
     </message>
     <message>
-        <source>LBL_TOOLBAR_LABEL</source>
-        <translation>Opérations de visualisation</translation>
-    </message>
-    <message>
         <source>DSC_BACK_VIEW</source>
         <translation>Vue de derrière</translation>
+    </message>
+</context>
+<context>
+    <name>VTKViewer_ViewWindow</name>
+    <message>
+        <source>LBL_TOOLBAR_LABEL</source>
+        <translation>Opérations de visualisation</translation>
     </message>
 </context>
 <context>

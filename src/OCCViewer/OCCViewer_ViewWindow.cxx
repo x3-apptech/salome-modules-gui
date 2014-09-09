@@ -1263,9 +1263,9 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onCloneView()));
   toolMgr()->registerAction( aAction, CloneId );
 
-  aAction = new QtxAction (tr ("MNU_CLIPPING"), aResMgr->loadPixmap ("OCCViewer", tr ("ICON_OCCVIEWER_CLIPPING")),
-                                      tr ("MNU_CLIPPING"), 0, this);
-  aAction->setStatusTip (tr ("DSC_CLIPPING"));
+  aAction = new QtxAction (tr("MNU_CLIPPING"), aResMgr->loadPixmap ("OCCViewer", tr("ICON_OCCVIEWER_CLIPPING")),
+                                      tr("MNU_CLIPPING"), 0, this);
+  aAction->setStatusTip (tr("DSC_CLIPPING"));
   aAction->setCheckable (true);
   connect (aAction, SIGNAL (toggled (bool)), this, SLOT (onClipping (bool)));
   toolMgr()->registerAction (aAction, ClippingId);
@@ -1370,22 +1370,21 @@ void OCCViewer_ViewWindow::createActions()
 */
 void OCCViewer_ViewWindow::createToolBar()
 {
-  QString aToolbarName;
-  switch (my2dMode) {
-  case XYPlane:
-    aToolbarName = tr( "LBL_XYTOOLBAR_LABEL" );
-    break;
-  case XZPlane:
-    aToolbarName = tr( "LBL_XZTOOLBAR_LABEL" );
-    break;
-  case YZPlane:
-    aToolbarName = tr( "LBL_YZTOOLBAR_LABEL" );
-    break;
-  default:
-    aToolbarName = tr( "LBL_3DTOOLBAR_LABEL" );
-  }
-  
-  int tid = toolMgr()->createToolBar( aToolbarName, false );
+  static const char* titles[] = {
+    "LBL_3DTOOLBAR_LABEL",
+    "LBL_XYTOOLBAR_LABEL",
+    "LBL_XZTOOLBAR_LABEL",
+    "LBL_YZTOOLBAR_LABEL",
+  };
+  static const char* names[] = {
+    "OCCViewer3DViewOperations",
+    "OCCViewerXYViewOperations",
+    "OCCViewerXZViewOperations",
+    "OCCViewerYZViewOperations",
+  };
+  int tid = toolMgr()->createToolBar( tr( titles[my2dMode] ),        // title (language-dependant)
+				      QString( names[my2dMode] ),    // name (language-independant)
+				      false );                       // disable floatable toolbar
   if ( my2dMode != No2dMode ){
     toolMgr()->append( ReturnTo3dViewId, tid );
     toolMgr()->append( toolMgr()->separator(), tid );

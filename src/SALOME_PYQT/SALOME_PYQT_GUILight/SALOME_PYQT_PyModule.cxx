@@ -476,9 +476,10 @@ void PyModuleHelper::XmlHandler::createToolBar( QDomNode& parentNode )
   QDomElement parentElement = parentNode.toElement();
   if ( !parentElement.isNull() ) {
     QString aLabel = attribute( parentElement, "label-id" );
+    QString aName  = attribute( parentElement, "name-id" );
     if ( !aLabel.isEmpty() ) {
       // create toolbar
-      int tbId = module()->createTool( aLabel );
+      int tbId = module()->createTool( aLabel, aName );
       QDomNode node = parentNode.firstChild();
       while ( !node.isNull() ) {
         if ( node.isElement() ) {

@@ -2419,9 +2419,9 @@ void Plot2d_ViewFrame::setHorScaleMode( const int mode, bool update )
   // non-positive X/Y coordinate
   if ( mode && !isXLogEnabled() ){
 #ifndef NO_SUIT
-    SUIT_MessageBox::warning(this, tr("WARNING"), tr("WRN_XLOG_NOT_ALLOWED"));
+    SUIT_MessageBox::warning(this, tr("WRN_WARNING"), tr("WRN_XLOG_NOT_ALLOWED"));
 #else
-    QMessageBox::warning(this, tr("WARNING"), tr("WRN_XLOG_NOT_ALLOWED"));
+    QMessageBox::warning(this, tr("WRN_WARNING"), tr("WRN_XLOG_NOT_ALLOWED"));
 #endif
     return;
   }
@@ -2462,9 +2462,9 @@ void Plot2d_ViewFrame::setVerScaleMode( const int mode, bool update )
   // non-positive X/Y coordinate
   if ( mode && !isYLogEnabled() ){
 #ifndef NO_SUIT
-    SUIT_MessageBox::warning(this, tr("WARNING"), tr("WRN_YLOG_NOT_ALLOWED"));
+    SUIT_MessageBox::warning(this, tr("WRN_WARNING"), tr("WRN_YLOG_NOT_ALLOWED"));
 #else
-    QMessageBox::warning(this, tr("WARNING"), tr("WRN_YLOG_NOT_ALLOWED"));
+    QMessageBox::warning(this, tr("WRN_WARNING"), tr("WRN_YLOG_NOT_ALLOWED"));
 #endif
     return;
   }

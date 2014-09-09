@@ -297,7 +297,7 @@ protected:
 
 private:
   void                                emptyPreferences( const QString& );
-  QList<QToolBar*>                    findToolBars();
+  QList<QToolBar*>                    findToolBars( const QStringList& names = QStringList() );
   
   QByteArray                          processState(QByteArray& input, 
 						   const bool processWin,

@@ -208,7 +208,7 @@ public:
 
   static int               defaultMenuGroup();
 
-  static int               createTool( const QString& );
+  static int               createTool( const QString&, const QString& = QString() );
   static int               createTool( const int,  const int,      const int = -1 );
   static int               createTool( const int,  const QString&, const int = -1 );
   static int               createTool( QAction*, const int,      const int = -1, const int = -1 );

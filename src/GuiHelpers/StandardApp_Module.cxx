@@ -76,7 +76,7 @@ void StandardApp_Module::initialize( CAM_Application* app )
   // share/salome/resources/xsalome/SalomeApp.xml in the install
   // directory.
   _defaultMenuId = this->createMenu( QCHARSTAR(moduleName()), -1, -1, 30 );
-  _defaultToolbarId = this->createTool ( QCHARSTAR(moduleName()) );
+  _defaultToolbarId = this->createTool ( QCHARSTAR(moduleName()), moduleName() );
   _actionId_internalCount = StandardApp_Module::ACTIONID_DEFAULT_INIT_VALUE;
 
   //

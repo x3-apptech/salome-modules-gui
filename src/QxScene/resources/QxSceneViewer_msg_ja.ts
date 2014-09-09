@@ -23,6 +23,9 @@
       <source>DSC_RESET_VIEW</source>
       <translation>ビューのポイントを復元します。</translation>
     </message>
+  </context>
+  <context>
+    <name>QxScene_ViewWindow</name>
     <message>
       <source>LBL_TOOLBAR_LABEL</source>
       <translation>表示操作</translation>

@@ -160,10 +160,6 @@
       <translation>-OY</translation>
     </message>
     <message>
-      <source>LBL_TOOLBAR_LABEL</source>
-      <translation>表示操作</translation>
-    </message>
-    <message>
       <source>DSC_BACK_VIEW</source>
       <translation>+OX View</translation>
     </message>
@@ -316,6 +312,10 @@
     <message>
       <source>MNU_SVTK_RECORDING_STOP</source>
       <translation>記録を停止します。</translation>
+    </message>
+    <message>
+      <source>LBL_TOOLBAR_LABEL</source>
+      <translation>表示操作</translation>
     </message>
     <message>
       <source>LBL_TOOLBAR_RECORD_LABEL</source>

@@ -754,7 +754,8 @@ void LightApp_Application::createActions()
   createMenu( StyleId, viewMenu, 20, -1 );
   createMenu( FullScreenId, viewMenu, 20, -1 );
 
-  int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ) );
+  int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ),    // title (language-dependant)
+			    QString( "SalomeModules" ) );   // name (language-independant)
   createTool( ModulesListId, modTBar );
 }
 
@@ -3046,6 +3047,12 @@ void LightApp_Application::savePreferences()
   if ( desktop() )
     aResMgr->setValue( "desktop", "geometry", desktop()->storeGeometry() );
 
+#if GUI_DEVELOPMENT > 0
+  aResMgr->setValue( "salome", "version", QString(GUI_VERSION_STR)+"dev" );
+#else
+  aResMgr->setValue( "salome", "version", QString(GUI_VERSION_STR) );
+#endif
+
   aResMgr->save();
 }
 
@@ -3241,6 +3248,7 @@ void LightApp_Application::loadDockWindowsState()
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   bool storeWin = aResMgr->booleanValue( "Study", "store_positions", true );
   bool storeTb = aResMgr->booleanValue( "Study", "store_tool_positions", true );
+  long version = Qtx::versionToId( aResMgr->stringValue( "salome", "version", "" ) );
 
   QString modName;
   if ( activeModule() )
@@ -3260,11 +3268,18 @@ void LightApp_Application::loadDockWindowsState()
 
   if ( aResMgr->hasValue("windows_geometry" ,modName ) ) {
     QByteArray arr;
-    aResMgr->value("windows_geometry", modName , arr );
+    if ( version > Qtx::versionToId( "7.4.1" ) )
+      aResMgr->value( "windows_geometry", modName , arr );
+    else
+      arr = aDefaultState;
     QByteArray aTargetArray = processState(arr, storeWin, storeTb, true, aDefaultState);
     desktop()->restoreState( aTargetArray );
   }
 
+  QStringList mainToolbarsNames;
+  mainToolbarsNames << "SalomeStandard" << "SalomeModules";
+  QList<QToolBar*> mainToolbars = findToolBars( mainToolbarsNames );
+  foreach( QToolBar* tb, mainToolbars ) tb->setVisible( true );
   /*
   if ( !myWinVis.contains( modName ) && aDefaultVisibility.isEmpty())
     return;
@@ -4131,7 +4146,8 @@ void LightApp_Application::onDesktopMessage( const QString& message )
   Returns all top level toolbars.
   Note : Result list contains only main window toolbars, not including toolbars from viewers.
 */
-QList<QToolBar*> LightApp_Application::findToolBars() {
+QList<QToolBar*> LightApp_Application::findToolBars( const QStringList& names )
+{
   QList<QToolBar*> aResult;
   QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
   for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit ) {
@@ -4139,7 +4155,8 @@ QList<QToolBar*> LightApp_Application::findToolBars() {
     QObject* po = Qtx::findParent( tb, "QMainWindow" );
     if ( po != desktop() )
       continue;	
-    aResult.append(tb);
+    if ( names.isEmpty() || names.contains( tb->objectName() ) )
+      aResult.append(tb);
   }
   return aResult;
 }
@@ -4183,9 +4200,9 @@ QByteArray LightApp_Application::processState(QByteArray& input,
     }
 
     int toolBarMarkerIndex = getToolbarMarkerIndex(input,aNames);
-    QDataStream anInputData(&input, QIODevice::ReadOnly);
     if(toolBarMarkerIndex < 0)
       return aRes;
+    QDataStream anInputData(&input, QIODevice::ReadOnly);
 
     int toolBarMarkerIndexDef;
     if(hasDefaultState) {

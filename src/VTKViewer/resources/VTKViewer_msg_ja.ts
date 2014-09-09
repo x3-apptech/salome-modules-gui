@@ -152,12 +152,15 @@
       <translation>法律</translation>
     </message>
     <message>
-      <source>LBL_TOOLBAR_LABEL</source>
-      <translation>表示操作</translation>
-    </message>
-    <message>
       <source>DSC_BACK_VIEW</source>
       <translation>後側のビュー</translation>
+    </message>
+  </context>
+  <context>
+    <name>VTKViewer_ViewWindow</name>
+    <message>
+      <source>LBL_TOOLBAR_LABEL</source>
+      <translation>表示操作</translation>
     </message>
   </context>
   <context>
