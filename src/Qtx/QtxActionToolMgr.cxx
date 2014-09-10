@@ -749,8 +749,10 @@ void QtxActionToolMgr::setVisible( const int id, const int tid, const bool on )
     }
   }
 
-  if ( changed )
+  if ( changed ) {
     triggerUpdate( tid );
+    updateContent();
+  }
 }
 
 /*!
