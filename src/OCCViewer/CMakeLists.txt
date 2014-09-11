@@ -77,6 +77,7 @@ SET(_other_HEADERS
   OCCViewer_ClipPlane.h
   OCCViewer_Trihedron.h 
   OCCViewer_VService.h
+  OCCViewer_Utilities.h
 )
 
 # header files / no moc processing / internal
@@ -89,6 +90,9 @@ SET(_internal_HEADERS
 SET(OCCViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 
 # --- resources ---
+
+# resource files / to be processed by rcc
+SET(_rcc_RESOURCES OCCViewer.qrc)
 
 # resource files / to be processed by lrelease
 SET(_ts_RESOURCES
@@ -140,6 +144,9 @@ SET(_other_RESOURCES
 # sources / moc wrappings
 QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 
+# sources / rcc wrappings
+QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+
 # sources / static
 SET(_other_SOURCES
   OCCViewer_AISSelector.cxx
@@ -162,10 +169,11 @@ SET(_other_SOURCES
   OCCViewer_ViewWindow.cxx
   OCCViewer_ViewportInputFilter.cxx
   OCCViewer_ClipPlaneInteractor.cxx
+  OCCViewer_Utilities.cxx
 )
 
 # sources / to compile
-SET(OCCViewer_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+SET(OCCViewer_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_rcc_SOURCES})
 
 # --- rules ---
 
