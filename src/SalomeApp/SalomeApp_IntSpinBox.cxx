@@ -456,7 +456,7 @@ bool SalomeApp_IntSpinBox::isAcceptNames() const
 */
 void SalomeApp_IntSpinBox::setShowTipOnValidate( const bool flag )
 {
-  myShowTip = myShowTip;
+  myShowTip = flag;
 }
 
 /*!

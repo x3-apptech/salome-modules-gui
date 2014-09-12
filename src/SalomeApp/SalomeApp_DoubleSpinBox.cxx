@@ -508,7 +508,7 @@ bool SalomeApp_DoubleSpinBox::isAcceptNames() const
 */
 void SalomeApp_DoubleSpinBox::setShowTipOnValidate( const bool flag )
 {
-  myShowTip = myShowTip;
+  myShowTip = flag;
 }
 
 /*!
