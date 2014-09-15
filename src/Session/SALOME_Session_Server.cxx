@@ -654,12 +654,21 @@ int main( int argc, char **argv )
     abort(); //abort program to avoid deadlock in destructors or atexit when shutdown has been interrupted
   }
 
-  PyGILState_Ensure();
-  //Destroy orb from python (for chasing memory leaks)
+    //Destroy orb from python (for chasing memory leaks)
   //PyRun_SimpleString("from omniORB import CORBA");
   //PyRun_SimpleString("orb=CORBA.ORB_init([''], CORBA.ORB_ID)");
   //PyRun_SimpleString("orb.destroy()");
-  Py_Finalize();
+
+  // Destroy the ORB:
+  MESSAGE("Explicitely destroying the ORB (hoping to kill omniORB threads ...)");
+  ORB_INIT * init = SINGLETON_<ORB_INIT>::Instance();
+  if (init)
+    init->explicit_destroy();
+
+  // After ORB destruction
+  PyGILState_Ensure();
+  if(Py_IsInitialized())
+    Py_Finalize();
 
   if ( shutdownAll )
     killOmniNames();
