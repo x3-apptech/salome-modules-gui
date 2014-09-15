@@ -26,6 +26,7 @@
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
 #include "OCCViewer_ClippingDlg.h"
+#include "OCCViewer_Utilities.h"
 
 #include "SUIT_ViewWindow.h"
 #include "SUIT_ViewManager.h"
@@ -53,6 +54,9 @@
 #include <AIS_Drawer.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+
+#include <Graphic3d_Texture2Dmanual.hxx>
+#include <Graphic3d_TextureParams.hxx>
 
 #include <Geom_Axis2Placement.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -1039,6 +1043,19 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   Handle(Graphic3d_ClipPlane) aGraphic3dPlane = new Graphic3d_ClipPlane( thePlane );
   aGraphic3dPlane->SetOn( theIsOn );
   aGraphic3dPlane->SetCapping( Standard_True );
+
+  // load capping texture
+  QPixmap px( ":images/hatch.png" );
+  if( !px.isNull() ) {
+    const Handle(Image_PixMap) aPixmap = imageToPixmap( px.toImage() );
+    Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
+    if( aTexture->IsDone() ) {
+      aTexture->EnableModulate();
+      aTexture->EnableRepeat();
+      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.01, 0.01 ) );
+      aGraphic3dPlane->SetCappingTexture( aTexture );
+    }
+  }
   return aGraphic3dPlane;
 }
 /*!

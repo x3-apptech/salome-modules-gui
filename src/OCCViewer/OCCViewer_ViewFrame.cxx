@@ -131,9 +131,7 @@ void OCCViewer_ViewFrame::onMaximizedView( OCCViewer_ViewWindow* theView, bool i
       mySplitMode = CreateSubViewsDlg.getSplitMode();
       myViewsMode = CreateSubViewsDlg.getViewsMode();
       splitSubViews();
-    }
-    else {
-      myMaximizedView->setMaximized(true);
+      myMaximizedView->setMaximized(false, false);
     }
   }
   myLayout->invalidate();
