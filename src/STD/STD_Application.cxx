@@ -459,7 +459,7 @@ bool STD_Application::isPossibleToClose( bool& closePermanently )
 
 int STD_Application::closeChoice( const QString& docName )
 {
-  int answer = SUIT_MessageBox::question( desktop(), tr( "CLOSE_STUDY" ), tr( "CLOSE_QUESTION" ).arg( docName ),
+  int answer = SUIT_MessageBox::question( desktop(), tr( "CLOSE_STUDY" ), tr( "CLOSE_QUESTION" ),
                                           SUIT_MessageBox::Save | SUIT_MessageBox::Discard | SUIT_MessageBox::Cancel,
                                           SUIT_MessageBox::Save );
 
