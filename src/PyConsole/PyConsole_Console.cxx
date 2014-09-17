@@ -248,6 +248,7 @@ void PyConsole_Console::contextMenuPopup( QMenu* menu )
   menu->addAction( myActions[SelectAllId] );
   menu->addSeparator();
   menu->addAction( myActions[DumpCommandsId] );
+  menu->addAction( myActions[SaveLogId] );
 
   Qtx::simplifySeparators( menu );
 
@@ -269,6 +270,7 @@ void PyConsole_Console::setMenuActions( const int flags )
   myActions[ClearId]->setVisible( flags & ClearId );
   myActions[SelectAllId]->setVisible( flags & SelectAllId );
   myActions[DumpCommandsId]->setVisible( flags & DumpCommandsId );
+  myActions[SaveLogId]->setVisible( flags & SaveLogId );
 }
 
 /*!
@@ -284,6 +286,7 @@ int PyConsole_Console::menuActions() const
   ret = ret | ( myActions[ClearId]->isVisible() ? ClearId : 0 );
   ret = ret | ( myActions[SelectAllId]->isVisible() ? SelectAllId : 0 );
   ret = ret | ( myActions[DumpCommandsId]->isVisible() ? DumpCommandsId : 0 );
+  ret = ret | ( myActions[SaveLogId]->isVisible() ? SaveLogId : 0 );
   return ret;
 }
 
@@ -318,6 +321,11 @@ void PyConsole_Console::createActions()
   a->setStatusTip( tr( "EDIT_DUMPCOMMANDS_CMD" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( dump() ) );
   myActions.insert( DumpCommandsId, a );
+
+  a = new QAction( tr( "EDIT_SAVELOG_CMD" ), this );
+  a->setStatusTip( tr( "EDIT_SAVELOG_CMD" ) );
+  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( saveLog() ) );
+  myActions.insert( SaveLogId, a );
 }
 
 /*!

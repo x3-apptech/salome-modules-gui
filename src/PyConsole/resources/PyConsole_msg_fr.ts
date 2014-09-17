@@ -27,12 +27,20 @@
         <source>EDIT_DUMPCOMMANDS_CMD</source>
         <translation>&amp;Générer le script des commandes</translation>
     </message>
+    <message>
+        <source>EDIT_SAVELOG_CMD</source>
+        <translation type="unfinished">&amp;Save log</translation>
+    </message>
 </context>
 <context>
     <name>PyConsole_Editor</name>
     <message>
         <source>TOT_DUMP_PYCOMMANDS</source>
         <translation>&amp;Générer le script des commandes</translation>
+    </message>
+    <message>
+        <source>TOT_SAVE_PYLOG</source>
+        <translation type="unfinished">Save log</translation>
     </message>
     <message>
         <source>PYTHON_FILES_FILTER</source>

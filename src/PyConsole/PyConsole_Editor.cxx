@@ -339,8 +339,11 @@ void PyConsole_Editor::exec( const QString& command )
   if ( !cmd.endsWith( "\n" ) ) cmd += "\n";
   QStringList lines = command.split( "\n" );
   for ( int i = 0; i < lines.size(); i++ ) {
-    if ( !lines[i].trimmed().isEmpty() )
-      myHistory.push_back( lines[i] );
+    if ( !lines[i].trimmed().isEmpty() ) {
+      PyCommand aCommand;
+      aCommand.command = lines[i];
+      myHistory.append( aCommand );
+    }
     addText( ( i == 0 ? READY_PROMPT : DOTS_PROMPT ) + lines[i], i != 0 );
   }
   // IPAL20182
@@ -409,8 +412,11 @@ void PyConsole_Editor::handleReturn()
   // extend the command buffer with the current command 
   myCommandBuffer.append( cmd );
   // add command to the history
-  if ( !cmd.trimmed().isEmpty() )
-    myHistory.push_back( cmd );
+  if ( !cmd.trimmed().isEmpty() ) {
+    PyCommand aCommand;
+    aCommand.command = cmd;
+    myHistory.append( aCommand );
+  }
 
   // IPAL19397
   addText( "", true ); 
@@ -596,7 +602,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory--;
           // get previous command in the history
-          QString previousCommand = myHistory.at( myCmdInHistory );
+          QString previousCommand = myHistory.at( myCmdInHistory ).command;
           // print previous command
           moveCursor( QTextCursor::End );
           moveCursor( QTextCursor::StartOfBlock, QTextCursor::KeepAnchor );
@@ -633,7 +639,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
           QString nextCommand;
           if ( myCmdInHistory < myHistory.count() ) {
             // next command in history
-            nextCommand = myHistory.at( myCmdInHistory );
+            nextCommand = myHistory.at( myCmdInHistory ).command;
           }
           else {
             // end of history is reached
@@ -740,7 +746,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory = 0;
           // get very first command in the history
-          QString firstCommand = myHistory.at( myCmdInHistory );
+          QString firstCommand = myHistory.at( myCmdInHistory ).command;
           // print first command
           moveCursor( QTextCursor::End );
           moveCursor( QTextCursor::StartOfBlock, QTextCursor::KeepAnchor );
@@ -935,6 +941,7 @@ void PyConsole_Editor::customEvent( QEvent* event )
     {
       PrintEvent* pe=(PrintEvent*)event;
       addText( pe->text(), false, pe->isError());
+      myHistory.last().output = myHistory.last().output + pe->text();
       return;
     }
   case PyInterp_Event::ES_OK:
@@ -1126,7 +1133,32 @@ void PyConsole_Editor::dump()
     QTextStream out (&file);
   
     for( int i=0; i<myHistory.count(); i++ ) {
-         out<<myHistory[i]<<endl;
+         out<<myHistory.at(i).command<<endl;
+    }
+    file.close();
+  }
+}
+/*!
+  \brief "Save log" operation.
+ */
+void PyConsole_Editor::saveLog()
+{
+  QStringList aFilters;
+  aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
+
+  QString fileName = SUIT_FileDlg::getFileName( this, QString(),
+                     aFilters, tr( "TOT_SAVE_PYLOG" ),
+                 false, true, new DumpCommandsFileValidator( this ) );
+  if ( fileName != "" ) {
+    QFile file( fileName );
+    if ( !file.open( QFile::WriteOnly ) )
+      return;
+
+    QTextStream out (&file);
+
+    for( int i = 0; i < myHistory.count(); i++ ) {
+         out << myHistory.at(i).command << endl;
+         out << myHistory.at(i).output;
     }
     file.close();
   }

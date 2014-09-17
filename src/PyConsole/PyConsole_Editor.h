@@ -35,6 +35,10 @@ class PyConsole_Interp;
 class PyInterp_Request;
 class QEventLoop;
 
+typedef struct {
+  QString command, output;
+} PyCommand;
+
 class PYCONSOLE_EXPORT PyConsole_Editor : public QTextEdit
 {
   Q_OBJECT;
@@ -67,6 +71,7 @@ public slots:
     void           handleReturn();
     void           onPyInterpChanged( PyConsole_Interp* );
     void           dump();
+    void           saveLog();
 
 protected:
   virtual void   dropEvent( QDropEvent* event );
@@ -85,7 +90,7 @@ protected:
   QString           myCurrentCommand;   //!< currently being printed command
   QString           myPrompt;           //!< current command line prompt
   int               myCmdInHistory;     //!< current history command index
-  QStringList       myHistory;          //!< commands history buffer
+  QList<PyCommand>  myHistory;          //!< commands history buffer
   QEventLoop*       myEventLoop;        //!< internal event loop
   QString           myBanner;           //!< current banner
   bool              myShowBanner;       //!< 'show banner' flag

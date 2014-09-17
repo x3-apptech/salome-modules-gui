@@ -44,12 +44,13 @@ public:
   //! Context popup menu actions flags
   enum
   {
-    CopyId         = 0x01,                                           //!< "Copy" menu action
-    PasteId        = 0x02,                                           //!< "Paste" menu action
-    ClearId        = 0x04,                                           //!< "Clear" menu action
-    SelectAllId    = 0x08,                                           //!< "Select All" menu action
-    DumpCommandsId = 0x16,                                           //!< "DumpCommands" menu action
-    All = CopyId | PasteId | ClearId | SelectAllId | DumpCommandsId  //!< all menu actions
+    CopyId         = 0x01,                                                      //!< "Copy" menu action
+    PasteId        = 0x02,                                                      //!< "Paste" menu action
+    ClearId        = 0x04,                                                      //!< "Clear" menu action
+    SelectAllId    = 0x08,                                                      //!< "Select All" menu action
+    DumpCommandsId = 0x10,                                                      //!< "DumpCommands" menu action
+    SaveLogId      = 0x20,                                                      //!< "Save log" menu action
+    All = CopyId | PasteId | ClearId | SelectAllId | DumpCommandsId | SaveLogId //!< all menu actions
   };
 
 public:
