@@ -550,5 +550,9 @@
       <source>PARAMETERS</source>
       <translation>パラメータ</translation>
     </message>
+    <message>
+        <source>HELP</source>
+        <translation>ヘルプ(&amp;H)</translation>
+    </message>
   </context>
 </TS>

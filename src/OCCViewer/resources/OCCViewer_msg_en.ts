@@ -550,5 +550,9 @@
         <source>PARAMETERS</source>
         <translation>Parameters</translation>
     </message>
+    <message>
+        <source>HELP</source>
+        <translation>&amp;Help</translation>
+    </message>
 </context>
 </TS>

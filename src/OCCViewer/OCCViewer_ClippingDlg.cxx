@@ -571,7 +571,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   buttonClose->setAutoDefault( TRUE );
   GroupButtonsLayout->addWidget( buttonClose );
 
-  QPushButton* buttonHelp = new QPushButton( tr( "SMESH_BUT_HELP" ), GroupButtons );
+  QPushButton* buttonHelp = new QPushButton( tr( "HELP" ), GroupButtons );
   buttonHelp->setAutoDefault( TRUE );
   GroupButtonsLayout->addWidget( buttonHelp );
 
