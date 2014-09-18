@@ -6,7 +6,7 @@
 
 #include "SUIT_ViewManager.h"
 #include "QtxActionToolMgr.h"
-
+#include <QtxMultiAction.h>
 #include <V3d_View.hxx>
 
 #include <QAction>
@@ -30,7 +30,7 @@ void OCCViewer_Utilities::setViewer2DMode( OCCViewer_Viewer* theViewer,
                << OCCViewer_ViewWindow::RotationId
                << OCCViewer_ViewWindow::FrontId
                << OCCViewer_ViewWindow::BackId
-               << OCCViewer_ViewWindow::TopId
+               //<< OCCViewer_ViewWindow::TopId
                << OCCViewer_ViewWindow::BottomId
                << OCCViewer_ViewWindow::LeftId
                << OCCViewer_ViewWindow::RightId
@@ -45,6 +45,9 @@ void OCCViewer_Utilities::setViewer2DMode( OCCViewer_Viewer* theViewer,
     if ( anAction )
       anAction->setEnabled( !is2dMode );
   }
+  QAction* aTop = aToolMgr->action( OCCViewer_ViewWindow::TopId );
+  QtxMultiAction* aMulti = dynamic_cast<QtxMultiAction*>( aTop->parent() );
+  aMulti->setActiveAction( aTop );
 
   // change view position
   Handle(V3d_View) aView3d = aView->getViewPort()->getView();
