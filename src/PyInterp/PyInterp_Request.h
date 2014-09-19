@@ -43,6 +43,7 @@ class PYINTERP_EXPORT PyInterp_Request
   friend class PyInterp_Dispatcher;
   friend class PyInterp_ExecuteEvent;
 
+private:
   PyInterp_Request();
   PyInterp_Request( const PyInterp_Request& );
 
@@ -51,7 +52,7 @@ protected:
   // protected destructor - to control deletion of requests
 
 public:
-  PyInterp_Request( QObject* listener, bool sync = false )
+  PyInterp_Request( QObject* listener, bool sync = true )
     : myIsSync( sync ), myListener( listener ) {};
 
   static void     Destroy( PyInterp_Request* );
@@ -88,7 +89,7 @@ class PYINTERP_EXPORT PyInterp_LockRequest : public PyInterp_Request
 {
 public:
 
-  PyInterp_LockRequest( PyInterp_Interp* interp, QObject* listener=0, bool sync=false )
+  PyInterp_LockRequest( PyInterp_Interp* interp, QObject* listener=0, bool sync=true )
     : PyInterp_Request( listener, sync ), myInterp( interp )
   {}
 

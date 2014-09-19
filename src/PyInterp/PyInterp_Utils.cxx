@@ -19,24 +19,29 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
+//  Author : Adrien BRUNETON
 //
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
 
-#include "PyConsole.h"
+#include "PyInterp_Utils.h"
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+/*!
+  \class PyLockWrapper
+  \brief Python GIL wrapper.
+*/
 
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+/*!
+  \brief Constructor. Automatically acquires GIL.
+*/
+PyLockWrapper::PyLockWrapper()
 {
-public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
-};
+  _gil_state = PyGILState_Ensure();
+}
 
-#endif // PYCONSOLE_INTERP_H
+/*!
+  \brief Destructor. Automatically releases GIL.
+*/
+PyLockWrapper::~PyLockWrapper()
+{
+  PyGILState_Release(_gil_state);
+}
+

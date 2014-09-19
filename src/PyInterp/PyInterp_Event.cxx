@@ -26,6 +26,12 @@
 #include "PyInterp_Event.h"
 #include "PyInterp_Request.h"
 
+PyInterp_Event::~PyInterp_Event()
+{
+  PyInterp_Request::Destroy( myRequest );
+  myRequest = 0;
+}
+
 void PyInterp_ExecuteEvent::Execute()
 {
   myRequest->execute();

@@ -1096,7 +1096,7 @@ void PyModuleHelper::studyActivated( SUIT_Study* study )
   public:
     StudyChangedReq( PyModuleHelper* _helper,
                      SUIT_Study*     _study )
-      : PyInterp_Request( 0, true ), // this request should be processed synchronously (sync == true)
+      : PyInterp_Request(0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ), 
         myStudy ( _study )
     {}

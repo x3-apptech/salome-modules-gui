@@ -34,7 +34,7 @@ class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_PyInterp : public PyInterp_Interp
   SALOME_PYQT_PyInterp();
   ~SALOME_PYQT_PyInterp();
   
-  int run(const char *command);
+  virtual int run(const char *command);
   
  protected:
   virtual void initPython();

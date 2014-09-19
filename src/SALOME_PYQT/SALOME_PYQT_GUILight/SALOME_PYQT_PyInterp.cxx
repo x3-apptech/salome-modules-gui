@@ -52,6 +52,10 @@ void SALOME_PYQT_PyInterp::initPython()
   MESSAGE("SALOME_PYQT_PyInterp::initPython - does nothing");
 }
 
+/*!
+ * Override. Create a distinct context from the SALOME Python console.
+ * Especially the global context is not connected to __main__ as in PyInterp_Interp
+ */
 bool SALOME_PYQT_PyInterp::initContext()
 {
   /*
@@ -59,7 +63,8 @@ bool SALOME_PYQT_PyInterp::initContext()
    * It is the caller responsability to acquire the GIL before calling initContext
    * It will still be held on initContext exit
    */
-  _context = PyDict_New();          // create interpreter dictionnary context
+  _local_context = PyDict_New();
+  _global_context = PyDict_New();
   return true;
 }
 
@@ -72,7 +77,7 @@ int SALOME_PYQT_PyInterp::run(const char *command)
     PyErr_Print();
     return -1;
   }
-  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_context,_context);
+  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_global_context,_local_context);
 
   Py_DECREF(code);
   if(!r){

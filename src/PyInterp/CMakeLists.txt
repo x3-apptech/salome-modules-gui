@@ -47,6 +47,7 @@ SET(_other_HEADERS
   PyInterp_Event.h
   PyInterp_Interp.h
   PyInterp_Request.h
+  PyInterp_Utils.h
 )
 
 # header files / to install
@@ -63,6 +64,7 @@ SET(_other_SOURCES
   PyInterp_Event.cxx
   PyInterp_Interp.cxx
   PyInterp_Request.cxx
+  PyInterp_Utils.cxx
 )
 
 # sources / to compile

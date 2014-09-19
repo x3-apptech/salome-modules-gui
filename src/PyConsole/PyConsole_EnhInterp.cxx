@@ -73,7 +73,7 @@ int PyConsole_EnhInterp::runDirCommand(const QString & dirArgument, const QStrin
       if (dirArgument.trimmed() != "")
         cmd = dirArgument + ".";
       cmd += _last_matches[0] + ".__doc__";
-      PyObject * str = PyRun_String(cmd.toStdString().c_str(), Py_eval_input, _context, _context);
+      PyObject * str = PyRun_String(cmd.toStdString().c_str(), Py_eval_input, _global_context, _local_context);
       if (!str || str == Py_None || !PyString_Check(str))
         {
           if (!str)
@@ -104,7 +104,7 @@ int PyConsole_EnhInterp::runDirAndExtract(const QString& dirArgument,
 {
   QRegExp re("^[A-Z].+_[A-Z]+[a-z]+.+$");  // discard SWIG static method, e.g. MEDCouplingUMesh_Blabla
   QString command("dir(" + dirArgument + ")");
-  PyObject * plst = PyRun_String(command.toStdString().c_str(), Py_eval_input, _context, _context);
+  PyObject * plst = PyRun_String(command.toStdString().c_str(), Py_eval_input, _global_context, _local_context);
   if(!plst || plst == Py_None) {
     if(!plst)
       PyErr_Clear();

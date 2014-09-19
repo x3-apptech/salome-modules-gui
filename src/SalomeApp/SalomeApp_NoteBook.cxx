@@ -21,8 +21,8 @@
 // Author : Roman NIKOLAEV, Open CASCADE S.A.S.
 // Module : GUI
 //
-#include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
-#include <PyConsole_Console.h>
+#include "PyConsole_Interp.h" // this include must be first (see PyInterp_base.h)!
+#include "PyConsole_Console.h"
 
 #include "SalomeApp_NoteBook.h"
 #include "SalomeApp_Application.h"

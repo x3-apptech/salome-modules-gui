@@ -22,7 +22,7 @@
 
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : PyConsole_Interp.cxx
-//  Author : Nicolas REJNERI
+//  Author : Nicolas REJNERI, Adrien BRUNETON
 //  Module : SALOME
 //
 #include "PyConsole_Interp.h"
@@ -38,7 +38,6 @@
 
   The method initialize() calls virtuals methods
   - initPython()  to initialize global Python interpreter
-  //- initState()   to initialize embedded interpreter state (OBSOLETE)
   - initContext() to initialize interpreter internal context
   - initRun()     to prepare interpreter for running commands
 */
@@ -61,22 +60,3 @@ PyConsole_Interp::~PyConsole_Interp()
 {
 }
  
-/*!
-  \brief Initialize python interpeter context.
-
-  The GIL is assumed to be held.
-  It is the caller responsability to acquire the GIL.
-  It must still be held on initContext() exit.
-
-  \return \c true on success
-*/
-bool PyConsole_Interp::initContext()
-{
-  PyObject *m = PyImport_AddModule("__main__");  // interpreter main module (module context)
-  if(!m){
-    PyErr_Print();
-    return false;
-  }  
-  _context = PyModule_GetDict(m);          // get interpreter dictionnary context
-  return true;
-}

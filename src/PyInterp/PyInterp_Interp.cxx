@@ -21,10 +21,11 @@
 //
 
 //  File   : PyInterp_Interp.cxx
-//  Author : Christian CAREMOLI, Paul RASCLE, EDF
+//  Author : Christian CAREMOLI, Paul RASCLE, Adrien BRUNETON
 //  Module : SALOME
 //
 #include "PyInterp_Interp.h"  // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
+#include "PyInterp_Utils.h"
 #include <pythread.h>
 
 #include <cStringIO.h>
@@ -38,35 +39,6 @@
 
 #define TOP_HISTORY_PY   "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"
-
-/*!
-  \class PyLockWrapper
-  \brief Python GIL wrapper.
-*/
-
-/*!
-  \brief Constructor. Automatically acquires GIL.
-*/
-PyLockWrapper::PyLockWrapper()
-{
-  _gil_state = PyGILState_Ensure();
-}
-
-/*!
-  \brief Destructor. Automatically releases GIL.
-*/
-PyLockWrapper::~PyLockWrapper()
-{
-//  if (myThreadState->interp == PyInterp_Interp::_interp)
-//    PyGILState_Release(_savestate);
-//  else
-//    PyEval_ReleaseThread(myThreadState);
-
-  /* The destructor can never be called concurrently by two threads since it is called
-   * when the GIL is held - the below test should never run concurrently in two threads.
-   */
-  PyGILState_Release(_gil_state);
-}
 
 /*
   The following functions are used to hook the Python
@@ -187,9 +159,6 @@ static PyStdOut* newPyStdOut( bool iscerr )
 
 int   PyInterp_Interp::_argc   = 1;
 char* PyInterp_Interp::_argv[] = {(char*)""};
-//PyObject*           PyInterp_Interp::builtinmodule = NULL;
-//PyThreadState*      PyInterp_Interp::_gtstate      = NULL;
-//PyInterpreterState* PyInterp_Interp::_interp       = NULL;
 
 /*!
   \brief Basic constructor.
@@ -198,7 +167,7 @@ char* PyInterp_Interp::_argv[] = {(char*)""};
   must call virtual method initalize().
 */
 PyInterp_Interp::PyInterp_Interp():
-  _vout(0), _verr(0), _context(0)
+  _vout(0), _verr(0), _local_context(0), _global_context(0)
 {
 }
 
@@ -209,6 +178,7 @@ PyInterp_Interp::PyInterp_Interp():
 */
 PyInterp_Interp::~PyInterp_Interp()
 {
+  destroy();
 }
 
 /*!
@@ -217,7 +187,6 @@ PyInterp_Interp::~PyInterp_Interp()
   This method shoud be called after construction of the interpreter.
   The method initialize() calls virtuals methods
   - initPython()  to initialize global Python interpreter
-  - initState()   to initialize embedded interpreter state
   - initContext() to initialize interpreter internal context
   - initRun()     to prepare interpreter for running commands
   which should be implemented in the successor classes, according to the
@@ -307,27 +276,49 @@ bool PyInterp_Interp::initRun()
   return true;
 }
 
+/*!
+ * Initialize context dictionaries. GIL is held already.
+ */
+bool PyInterp_Interp::initContext()
+{
+  PyObject *m = PyImport_AddModule("__main__");  // interpreter main module (module context)
+  if(!m){
+    PyErr_Print();
+    return false;
+  }
+  _global_context = PyModule_GetDict(m);          // get interpreter global variable context
+  Py_INCREF(_global_context);
+  _local_context = PyDict_New();
+  return true;
+}
+
+/*!
+ * Destroy context dictionaries. GIL is held already.
+ */
 void PyInterp_Interp::closeContext()
 {
+  Py_XDECREF(_global_context);
+  Py_XDECREF(_local_context);
 }
 
 /*!
   \brief Compile Python command and evaluate it in the
-         python dictionary context if possible. This is not thread-safe.
+         python dictionary contexts if possible. This is not thread-safe.
          This is the caller's responsability to make this thread-safe.
   \internal
   \param command Python command string
-  \param context Python context (dictionary)
   \return -1 on fatal error, 1 if command is incomplete and 0
          if command is executed successfully
  */
-static int run_command(const char *command, PyObject *context)
+static int run_command(const char *command, PyObject * global_ctxt, PyObject * local_ctxt)
 {
   PyObject *m = PyImport_AddModule("codeop");
   if(!m) { // Fatal error. No way to go on.
     PyErr_Print();
     return -1;
   }
+
+//  PyObjWrapper v(Py_CompileString(command, "<salome_input>", Py_file_input));
   PyObjWrapper v(PyObject_CallMethod(m,(char*)"compile_command",(char*)"s",command));
   if(!v) {
     // Error encountered. It should be SyntaxError,
@@ -343,7 +334,7 @@ static int run_command(const char *command, PyObject *context)
     return 1;
   }
   else {
-    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)(void *)v,context,context));
+    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)(void *)v,global_ctxt, local_ctxt));
     if(!r) {
       // Execution error. We return -1
       PyErr_Print();
@@ -375,7 +366,7 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
   \return -1 on fatal error, 1 if command is incomplete and 0
          if command is executed successfully
  */
-static int compile_command(const char *command, PyObject *context)
+static int compile_command(const char *command, PyObject * global_ctxt, PyObject * local_ctxt)
 {
   // First guess if command is execution of a script with args, or a simple Python command
   std::string singleCommand = command;
@@ -391,7 +382,7 @@ static int compile_command(const char *command, PyObject *context)
   if (commandArgs.empty()) {
     // process command: expression
     // process command: execfile(r"/absolute/path/to/script.py") (no args)
-    return run_command(singleCommand.c_str(), context);
+    return run_command(singleCommand.c_str(), global_ctxt, local_ctxt);
   }
   else {
     // process command: execfile(r"/absolute/path/to/script.py [args:arg1,...,argn]")
@@ -403,7 +394,7 @@ static int compile_command(const char *command, PyObject *context)
     replaceAll(commandArgs, ",", "\",\"");
     commandArgs = "\""+commandArgs+"\"";
     std::string completeCommand = preCommandBegin+"\""+script+"\","+commandArgs+preCommandEnd+singleCommand+";sys.argv=save_argv";
-    return run_command(completeCommand.c_str(), context);
+    return run_command(completeCommand.c_str(), global_ctxt, local_ctxt);
   }
 }
 
@@ -452,7 +443,7 @@ int PyInterp_Interp::simpleRun(const char *command, const bool addToHistory)
   PySys_SetObject((char*)"stderr",_verr);
   PySys_SetObject((char*)"stdout",_vout);
 
-  int ier = compile_command(command,_context);
+  int ier = compile_command(command, _global_context, _local_context);
 
   // Outputs are redirected to what they were before
   PySys_SetObject((char*)"stdout",oldOut);

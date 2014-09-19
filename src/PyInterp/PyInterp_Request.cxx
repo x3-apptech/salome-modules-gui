@@ -24,4 +24,74 @@
 //  Module : GUI
 
 #include "PyInterp_Request.h"
+#include "PyInterp_Utils.h"
+#include <QCoreApplication>
 
+void PyInterp_Request::process()
+{
+  safeExecute();
+
+  bool isSync = IsSync();
+
+  if ( !isSync )
+    myMutex.lock();
+
+  if ( listener() )
+    processEvent( listener() );
+
+  if ( !isSync )
+    myMutex.unlock();
+}
+
+void PyInterp_Request::safeExecute()
+{
+  //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
+  execute();
+}
+
+void PyInterp_Request::Destroy( PyInterp_Request* request )
+{
+  // Lock and unlock the mutex to avoid errors on its deletion
+  request->myMutex.lock();
+  request->myMutex.unlock();
+  delete request;
+}
+
+QEvent* PyInterp_Request::createEvent()
+{
+  return new PyInterp_Event( PyInterp_Event::ES_NOTIFY, this );
+}
+
+void PyInterp_Request::processEvent( QObject* o )
+{
+  if ( !o )
+    return;
+
+  QEvent* e = createEvent();
+  if ( !e )
+    return;
+
+  if ( !IsSync() )
+    QCoreApplication::postEvent( o, e );
+  else
+  {
+    QCoreApplication::sendEvent( o, e );
+    delete e;
+  }
+}
+
+void PyInterp_Request::setListener( QObject* o )
+{
+  myMutex.lock();
+  myListener = o;
+  myMutex.unlock();
+}
+
+void PyInterp_LockRequest::safeExecute()
+{
+  //if ( getInterp() ){  // No need to have an interpreter now! we can simply run in a empty context
+    PyLockWrapper aLock; // Acquire GIL
+    //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
+    execute();
+  //}
+}
