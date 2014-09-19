@@ -1153,7 +1153,7 @@ void SalomeApp_Application::updateDesktopTitle() {
 
 int SalomeApp_Application::closeChoice( const QString& docName )
 {
-  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ), tr( "APPCLOSE_DESCRIPTION" ).arg( docName ),
+  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ), tr( "APPCLOSE_DESCRIPTION" ),
                                           tr ("APPCLOSE_SAVE"), tr ("APPCLOSE_CLOSE"),
 					  //tr ("APPCLOSE_UNLOAD"), 
 					  tr ("APPCLOSE_CANCEL"), 0 );
