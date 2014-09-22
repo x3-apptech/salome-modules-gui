@@ -50,6 +50,27 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <source>ENTRY_COLUMN</source>
       <translation>エントリ</translation>
     </message>
+    <message>
+      <source>APPCLOSE_CAPTION</source>
+      <translation>現在のスタディを閉じる</translation>
+    </message>
+    <message>
+      <source>STUDYCLOSE_DESCRIPTION</source>
+        <translation type="unfinished">You already have an active study in your 
+session. It has to be closed before working with another study.</translation>
+    </message>
+    <message>
+      <source>APPCLOSE_SAVE</source>
+      <translation>保存して閉じる(&amp;S)</translation>
+    </message>
+    <message>
+      <source>APPCLOSE_CLOSE</source>
+      <translation>保存せずに閉じる(&amp;C)</translation>
+    </message>
+    <message>
+      <source>APPCLOSE_CANCEL</source>
+      <translation>キャンセル(&amp;C)</translation>
+    </message>
   </context>
   <context>
     <name>LightApp_Application</name>

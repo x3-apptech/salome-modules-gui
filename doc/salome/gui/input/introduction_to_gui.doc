@@ -4,13 +4,13 @@
 
 \image html view2.png
 
-\n SALOME GUI is based on SUIT (Salome User Interface
+\b SALOME \b GUI is based on SUIT (Salome User Interface
 Toolkit) that proposes very flexible, powerful and safe mechanisms of
 interaction with SALOME tool components (both CORBA and standalone),
 resource management, viewers and selection handling,
-exception and signals processing. This approach brings to the top
-Salome multi-desktop dockable-windowed user interface.
-\n All Graphical User Interfaces of standard modules have plug-in
+exception and signals processing.
+
+All Graphical User Interfaces of standard modules have plug-in
 structure, i.e. each module is placed in a dynamic library which is
 loaded on demand. So, all modules add their own menu items, buttons
 in toolbar, windows etc.
@@ -22,7 +22,7 @@ basic GUI functionalities, common for all modules.
 
 <ul>
 <li>\b File menu corresponds to \subpage study_management_page "Study management" functionalities
-(creation, saving, loading, editing studies, etc.).</li>
+(creation, saving, loading, editing studies, connecting, disconnecting, etc.).</li>
 <li>\b Edit menu gives access to <b> Copy/Paste</b> allowing to paste the
 objects from one study into the other. The availability of this
 functionality depends on the module and the nature of an operation or

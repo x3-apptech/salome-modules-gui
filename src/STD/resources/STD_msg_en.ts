@@ -363,10 +363,6 @@ Do you want to overwrite it?</translation>
         <translation>Exit from application</translation>
     </message>
     <message>
-        <source>TOT_DESK_FILE_LOAD</source>
-        <translation>Load document</translation>
-    </message>
-    <message>
         <source>TOT_DESK_FILE_OPEN</source>
         <translation>Open document</translation>
     </message>
@@ -391,10 +387,6 @@ Do you want to overwrite it?</translation>
         <translation>Saves the active document</translation>
     </message>
     <message>
-        <source>PRP_DESK_FILE_LOAD</source>
-        <translation>Loads a document</translation>
-    </message>
-    <message>
         <source>PRP_DESK_WINDOW_HTILE</source>
         <translation>Arranges the windows as nonoverlapping horizontal tiles</translation>
     </message>
@@ -417,10 +409,6 @@ Do you want to overwrite it?</translation>
     <message>
         <source>MEN_DESK_FILE_REOPEN</source>
         <translation>Reopen</translation>
-    </message>
-    <message>
-        <source>MEN_DESK_FILE_LOAD</source>
-        <translation>Conn&amp;ect...</translation>
     </message>
     <message>
         <source>MEN_DESK_FILE_SAVE</source>

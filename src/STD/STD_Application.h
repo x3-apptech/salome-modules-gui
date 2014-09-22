@@ -168,6 +168,7 @@ protected:
   virtual int           closeChoice( const QString& );
   virtual bool          closeAction( const int, bool& );
   virtual bool          closeDoc( bool ask = true );
+  virtual bool          closeActiveDoc( bool permanently = true );
 
 private:
   ViewManagerList       myViewMgrs;

@@ -50,6 +50,26 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>ENTRY_COLUMN</source>
         <translation>Entry</translation>
     </message>
+    <message>
+        <source>APPCLOSE_CAPTION</source>
+        <translation>Close active study</translation>
+    </message>
+    <message>
+        <source>STUDYCLOSE_DESCRIPTION</source>
+        <translation>You already have an active study in your session. It has to be closed before working with another study.</translation>
+    </message>
+    <message>
+        <source>APPCLOSE_SAVE</source>
+        <translation>&amp;Save &amp;&amp; Close</translation>
+    </message>
+    <message>
+        <source>APPCLOSE_CLOSE</source>
+        <translation>&amp;Close w/o saving</translation>
+    </message>
+    <message>
+        <source>APPCLOSE_CANCEL</source>
+        <translation>&amp;Cancel</translation>
+    </message>
 </context>
 <context>
     <name>LightApp_Application</name>

@@ -47,6 +47,11 @@
 
 #include <LightApp_Displayer.h>
 
+#ifndef DISABLE_PYCONSOLE
+  #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
+  #include <PyConsole_Console.h>
+#endif
+
 #include "utilities.h"
 
 #include "SALOMEDS_Tool.hxx"
@@ -729,7 +734,16 @@ void SalomeApp_Study::closeDocument(bool permanently)
     if ( myObserver )
       myStudyDS->detach( myObserver->_this() );
     if ( permanently ) {
+      SUIT_Desktop* desk = SUIT_Session::session()->activeApplication()->desktop();
+      bool isBlocked = desk->signalsBlocked();
+      desk->blockSignals( true );
       SalomeApp_Application::studyMgr()->Close( studyPtr );
+      desk->blockSignals( isBlocked );
+#ifndef DISABLE_PYCONSOLE
+      SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
+      if( app->pythonConsole() )
+        app->pythonConsole()->getInterp()->destroy();
+#endif
     }
     SALOMEDSClient_Study* aStudy = 0;
     setStudyDS( _PTR(Study)(aStudy) );

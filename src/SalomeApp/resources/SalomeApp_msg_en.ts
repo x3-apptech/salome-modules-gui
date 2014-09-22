@@ -13,16 +13,8 @@ Python file must include only letters, digits and underscores and start from let
         <translation>The file %1 does not exist.</translation>
     </message>
     <message>
-        <source>QUE_ACTIVEDOC_LOAD</source>
-        <translation>There is an active study in the session.
-Do you want to load it?
-</translation>
-    </message>
-    <message>
-        <source>STUDYCLOSE_DESCRIPTION</source>
-        <translation>You should close an existing study before.
-Do you want to close it?
-</translation>
+        <source>ERR_ACTIVEDOC_LOAD</source>
+        <translation>A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.</translation>
     </message>
     <message>
         <source>WRN_STUDY_LOCKED</source>
@@ -118,6 +110,30 @@ Launch a new session or close the study.</translation>
         <source>CREATE_DOCUMENT_PROBLEM</source>
         <translation>Unknown problem during creation of the document</translation>
     </message>
+    <message>
+        <source>TOT_DESK_CONNECT_STUDY</source>
+        <translation>Connect study</translation>
+    </message>
+    <message>
+        <source>TOT_DESK_DISCONNECT_STUDY</source>
+        <translation>Disconnect study</translation>
+    </message>
+    <message>
+        <source>PRP_DESK_CONNECT</source>
+        <translation>Connect active study</translation>
+    </message>
+    <message>
+        <source>PRP_DESK_DISCONNECT</source>
+        <translation>Disconnect the current study</translation>
+    </message>
+    <message>
+        <source>MEN_DESK_CONNECT</source>
+        <translation>Conn&amp;ect</translation>
+    </message>
+    <message>
+        <source>MEN_DESK_DISCONNECT</source>
+        <translation>D&amp;isconnect</translation>
+    </message>
 </context>
 <context>
     <name>SalomeApp_Application</name>
@@ -128,10 +144,6 @@ Launch a new session or close the study.</translation>
     <message>
         <source>APPCLOSE_UNLOAD</source>
         <translation>&amp;Unload</translation>
-    </message>
-    <message>
-        <source>APPCLOSE_CLOSE</source>
-        <translation>&amp;Close w/o saving</translation>
     </message>
     <message>
         <source>MEN_WINDOWS_NEW</source>
@@ -156,10 +168,6 @@ Launch a new session or close the study.</translation>
     <message>
         <source>MEN_DESK_REGISTRY_DISPLAY</source>
         <translation>Registry &amp;Display</translation>
-    </message>
-    <message>
-        <source>APPCLOSE_SAVE</source>
-        <translation>&amp;Save &amp;&amp; Close</translation>
     </message>
     <message>
         <source>TOT_DESK_FILE_LOAD_SCRIPT</source>
@@ -253,10 +261,6 @@ Do you want to reload it ?</translation>
     <message>
         <source>STUDY_LOCKED</source>
         <translation>LOCKED</translation>
-    </message>
-    <message>
-        <source>APPCLOSE_CANCEL</source>
-        <translation>&amp;Cancel</translation>
     </message>
     <message>
         <source>OBJ_BROWSER_NAME</source>
@@ -363,10 +367,6 @@ Do you want to reload it ?</translation>
         <translation>Add vars to NoteBook</translation>
     </message>
     <message>
-        <source>APPCLOSE_CAPTION</source>
-        <translation>Close active study</translation>
-    </message>
-    <message>
         <source>MEN_DESK_MRU</source>
         <translation>Most Recently Used</translation>
     </message>
@@ -376,7 +376,7 @@ Do you want to reload it ?</translation>
     </message>
     <message>
         <source>ACTIVATE_MODULE_OP_LOAD</source>
-        <translation>&amp;Load...</translation>
+        <translation>&amp;Connect</translation>
     </message>
     <message>
         <source>ACTIVATE_MODULE_OP_SCRIPT</source>
@@ -405,6 +405,22 @@ Do you want to reload it ?</translation>
     <message>
         <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
         <translation>Check In for module</translation>
+    </message>
+    <message>
+        <source>DISCONNECT_CAPTION</source>
+        <translation>Disconnect active study</translation>
+    </message>
+    <message>
+        <source>DISCONNECT_DESCRIPTION</source>
+        <translation>Do you want to save study before disconnect?</translation>
+    </message>
+    <message>
+        <source>DISCONNECT_SAVE</source>
+        <translation>&amp;Save &amp;&amp; Disconnect</translation>
+    </message>
+    <message>
+        <source>DISCONNECT_WO_SAVE</source>
+        <translation>&amp;Disconnect w/o saving</translation>
     </message>
 </context>
 <context>
