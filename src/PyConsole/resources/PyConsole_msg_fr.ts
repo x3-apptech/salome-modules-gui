@@ -28,8 +28,12 @@
         <translation>&amp;Générer le script des commandes</translation>
     </message>
     <message>
-        <source>EDIT_SAVELOG_CMD</source>
-        <translation type="unfinished">&amp;Save log</translation>
+        <source>EDIT_STARTLOG_CMD</source>
+        <translation type="unfinished">Start &amp;Log</translation>
+    </message>
+    <message>
+        <source>EDIT_STOPLOG_CMD</source>
+        <translation type="unfinished">Stop &amp;Log</translation>
     </message>
 </context>
 <context>
@@ -49,6 +53,10 @@
     <message>
         <source>LOG_FILES_FILTER</source>
         <translation type="unfinished">Log files (*.log *.txt)</translation>
+    </message>
+    <message>
+        <source>ERR_FILE_NOT_WRITABLE</source>
+        <translation type="unfinished">File is not writable!</translation>
     </message>
 </context>
 </TS>
