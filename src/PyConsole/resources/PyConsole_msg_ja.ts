@@ -46,5 +46,9 @@
       <source>PYTHON_FILES_FILTER</source>
       <translation>ファイル (*.py) PYTHON</translation>
     </message>
+    <message>
+        <source>LOG_FILES_FILTER</source>
+        <translation type="unfinished">Log files (*.log *.txt)</translation>
+    </message>
   </context>
 </TS>

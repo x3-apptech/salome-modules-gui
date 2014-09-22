@@ -342,6 +342,7 @@ void PyConsole_Editor::exec( const QString& command )
     if ( !lines[i].trimmed().isEmpty() ) {
       PyCommand aCommand;
       aCommand.command = lines[i];
+      aCommand.prompt = i == 0 ? READY_PROMPT : DOTS_PROMPT;
       myHistory.append( aCommand );
     }
     addText( ( i == 0 ? READY_PROMPT : DOTS_PROMPT ) + lines[i], i != 0 );
@@ -415,6 +416,7 @@ void PyConsole_Editor::handleReturn()
   if ( !cmd.trimmed().isEmpty() ) {
     PyCommand aCommand;
     aCommand.command = cmd;
+    aCommand.prompt = myPrompt;
     myHistory.append( aCommand );
   }
 
@@ -1123,17 +1125,17 @@ void PyConsole_Editor::dump()
   aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
   
   QString fileName = SUIT_FileDlg::getFileName( this, QString(),
-  	  	     		     aFilters, tr( "TOT_DUMP_PYCOMMANDS" ),
- 	    			     false, true, new DumpCommandsFileValidator( this ) );
-  if ( fileName != "" ) {
+						aFilters, tr( "TOT_DUMP_PYCOMMANDS" ),
+						false, true, new DumpCommandsFileValidator( this ) );
+  if ( !fileName.isEmpty() ) {
     QFile file( fileName ); 
     if ( !file.open( QFile::WriteOnly ) )
       return;
 
     QTextStream out (&file);
   
-    for( int i=0; i<myHistory.count(); i++ ) {
-         out<<myHistory.at(i).command<<endl;
+    for ( int i=0; i<myHistory.count(); i++ ) {
+      out << myHistory.at(i).command << endl;
     }
     file.close();
   }
@@ -1144,21 +1146,21 @@ void PyConsole_Editor::dump()
 void PyConsole_Editor::saveLog()
 {
   QStringList aFilters;
-  aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
+  aFilters.append( tr( "LOG_FILES_FILTER" ) );
 
   QString fileName = SUIT_FileDlg::getFileName( this, QString(),
-                     aFilters, tr( "TOT_SAVE_PYLOG" ),
-                 false, true, new DumpCommandsFileValidator( this ) );
-  if ( fileName != "" ) {
+						aFilters, tr( "TOT_SAVE_PYLOG" ),
+						false, true );
+  if ( !fileName.isEmpty() ) {
     QFile file( fileName );
     if ( !file.open( QFile::WriteOnly ) )
       return;
 
     QTextStream out (&file);
 
-    for( int i = 0; i < myHistory.count(); i++ ) {
-         out << myHistory.at(i).command << endl;
-         out << myHistory.at(i).output;
+     for( int i = 0; i < myHistory.count(); i++ ) {
+      out << myHistory.at(i).prompt << myHistory.at(i).command << endl;
+      out << myHistory.at(i).output;
     }
     file.close();
   }

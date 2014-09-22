@@ -36,7 +36,7 @@ class PyInterp_Request;
 class QEventLoop;
 
 typedef struct {
-  QString command, output;
+  QString command, output, prompt;
 } PyCommand;
 
 class PYCONSOLE_EXPORT PyConsole_Editor : public QTextEdit
