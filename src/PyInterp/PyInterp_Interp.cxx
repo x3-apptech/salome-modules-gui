@@ -278,6 +278,10 @@ bool PyInterp_Interp::initRun()
 
 /*!
  * Initialize context dictionaries. GIL is held already.
+ * The code executed in an embedded interpreter is expected to be run at the module
+ * level, in which case local and global context have to be the same dictionary.
+ * See: http://stackoverflow.com/questions/12265756/c-python-running-python-code-within-a-context
+ * for an explanation.
  */
 bool PyInterp_Interp::initContext()
 {
@@ -288,7 +292,7 @@ bool PyInterp_Interp::initContext()
   }
   _global_context = PyModule_GetDict(m);          // get interpreter global variable context
   Py_INCREF(_global_context);
-  _local_context = PyDict_New();
+  _local_context = _global_context;
   return true;
 }
 
@@ -298,7 +302,8 @@ bool PyInterp_Interp::initContext()
 void PyInterp_Interp::closeContext()
 {
   Py_XDECREF(_global_context);
-  Py_XDECREF(_local_context);
+  // both _global and _local point to the same Python object:
+  // Py_XDECREF(_local_context);
 }
 
 /*!
