@@ -84,6 +84,9 @@ public:
   void                setMenuActions( const int );
   int                 menuActions() const;
 
+  void                startLog( const QString& );
+  void                stopLog();
+
 protected:
   void                createActions();
   void                updateActions();

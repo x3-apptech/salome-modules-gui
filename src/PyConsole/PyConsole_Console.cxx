@@ -350,6 +350,23 @@ void PyConsole_Console::updateActions()
   myActions[SelectAllId]->setEnabled( !myEditor->document()->isEmpty() );
 }
 
+/*!
+  \brief Start python trace logging
+  \param fileName the path to the log file
+*/
+void PyConsole_Console::startLog( const QString& fileName )
+{
+  myEditor->startLog( fileName );
+}
+
+/*!
+  \brief Stop python trace logging
+*/
+void PyConsole_Console::stopLog()
+{
+  myEditor->stopLog();
+}
+
 /**
  * Similar to constructor of the base class but using enhanced objects.
  * TODO: this should really be done in a factory to avoid code duplication.

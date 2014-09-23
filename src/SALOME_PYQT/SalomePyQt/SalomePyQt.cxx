@@ -50,6 +50,7 @@
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 #include "SUIT_Tools.h"
+#include "PyConsole_Console.h"
 
 #include <QAction>
 #include <QApplication>
@@ -3906,4 +3907,40 @@ public:
 int SalomePyQt::getObjectPosition( const QString& theEntry )
 {
   return ProcessEvent( new TGetObjectPositionEvent(theEntry) );
+}
+
+void SalomePyQt::startPyLog(const QString& theFileName)
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myFileName;
+  public:
+    TEvent( const QString& theFileName ):
+      myFileName( theFileName ) {}
+    virtual void Execute() 
+    {
+      if ( getApplication() ) {
+	PyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
+	if ( pyConsole ) pyConsole->startLog( myFileName );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( theFileName ) );
+}
+
+void SalomePyQt::stopPyLog()
+{
+  class TEvent: public SALOME_Event
+  {
+  public:
+    TEvent() {}
+    virtual void Execute() 
+    {
+      if ( getApplication() ) {
+	PyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
+	if ( pyConsole ) pyConsole->stopLog();
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
 }

@@ -1151,7 +1151,7 @@ void PyConsole_Editor::dump()
   }
 }
 /*!
-  \brief "Save log" operation.
+  \brief "Start log" operation.
  */
 void PyConsole_Editor::startLog()
 {
@@ -1163,10 +1163,7 @@ void PyConsole_Editor::startLog()
 						  aFilters, tr( "TOT_SAVE_PYLOG" ),
 						  false, true );
     if ( !fileName.isEmpty() ) {
-      QFile file( fileName );
-      if ( file.open( QFile::WriteOnly ) ) {
-	file.close();
-	myLogFile = fileName;
+      if ( startLog( fileName ) ) {
 	break;
       }
       else {
@@ -1181,6 +1178,24 @@ void PyConsole_Editor::startLog()
   }
 }
 
+/*!
+  \brief Start python trace logging
+  \param fileName the path to the log file
+  \sa stopLog()
+ */
+bool PyConsole_Editor::startLog( const QString& fileName )
+{
+  bool ok = false;
+  if ( !fileName.isEmpty() ) {
+    QFile file( fileName );
+    if ( file.open( QFile::WriteOnly ) ) {
+      file.close();
+      myLogFile = fileName;
+      ok = true;
+    }
+  }
+  return ok;
+}
 
 /*!
   \brief "Stop log" operation.

@@ -69,6 +69,7 @@ public slots:
     void           handleReturn();
     void           onPyInterpChanged( PyConsole_Interp* );
     void           dump();
+    bool           startLog( const QString& );
     void           startLog();
     void           stopLog();
     void           putLog( const QString& );
