@@ -304,6 +304,9 @@ public:
   static QString           getSetting      ( const QString& );
 
   static void              removeChild( const QString& = QString() );
+
+  static void              startPyLog(const QString&);
+  static void              stopPyLog();
 };
 
 #endif // SALOME_PYQT_H

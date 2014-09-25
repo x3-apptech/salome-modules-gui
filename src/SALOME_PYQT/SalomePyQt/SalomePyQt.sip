@@ -464,4 +464,7 @@ public:
   static QList<double>     getPlot2dFitRangeByCurves(const int) /ReleaseGIL/ ;
   static QList<double>     getPlot2dFitRangeCurrent(const int) /ReleaseGIL/ ;
   static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax ) /ReleaseGIL/ ;
+
+  static void              startPyLog(const QString&) /ReleaseGIL/ ;
+  static void              stopPyLog() /ReleaseGIL/ ;
 };

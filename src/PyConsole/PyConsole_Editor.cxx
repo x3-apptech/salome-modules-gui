@@ -138,14 +138,20 @@ bool DumpCommandsFileValidator::canSave(const QString& file, bool permissions)
 
 void staticCallbackStdout( void* data, char* c )
 {
-  if(!((PyConsole_Editor*)data)->isSuppressOutput())
-    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( QString::fromUtf8(c), false ) );
+  if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
+    PyConsole_Editor* e = (PyConsole_Editor*)data;
+    e->putLog( QString::fromUtf8(c) );
+    QApplication::postEvent( e, new PrintEvent( QString::fromUtf8(c), false ) );
+  }
 }
 
 void staticCallbackStderr( void* data, char* c )
 {
-  if(!((PyConsole_Editor*)data)->isSuppressOutput())
-    QApplication::postEvent( (PyConsole_Editor*)data, new PrintEvent( QString::fromUtf8(c), true ) );
+  if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
+    PyConsole_Editor* e = (PyConsole_Editor*)data;
+    e->putLog( QString::fromUtf8(c) );
+    QApplication::postEvent( e, new PrintEvent( QString::fromUtf8(c), true ) );
+  }
 }
 
 
@@ -273,6 +279,17 @@ void PyConsole_Editor::setIsShowBanner( const bool on )
 }
 
 /*!
+  \brief Check if trace logging is switched on.
+  
+  \sa startLog(), stopLog()
+  \return \c true if trace logging is switched on
+*/
+bool PyConsole_Editor::isLogging() const
+{
+  return !myLogFile.isEmpty();
+}
+
+/*!
   \brief Get size hint for the Python console window
   \return size hint value
 */
@@ -339,12 +356,10 @@ void PyConsole_Editor::exec( const QString& command )
   if ( !cmd.endsWith( "\n" ) ) cmd += "\n";
   QStringList lines = command.split( "\n" );
   for ( int i = 0; i < lines.size(); i++ ) {
-    if ( !lines[i].trimmed().isEmpty() ) {
-      PyCommand aCommand;
-      aCommand.command = lines[i];
-      myHistory.append( aCommand );
-    }
+    if ( !lines[i].trimmed().isEmpty() )
+      myHistory.push_back( lines[i] );
     addText( ( i == 0 ? READY_PROMPT : DOTS_PROMPT ) + lines[i], i != 0 );
+    putLog( QString( "%1%2\n" ).arg( i == 0 ? READY_PROMPT : DOTS_PROMPT ).arg( lines[i] ) );
   }
   // IPAL20182
   addText( "", true );
@@ -412,11 +427,9 @@ void PyConsole_Editor::handleReturn()
   // extend the command buffer with the current command 
   myCommandBuffer.append( cmd );
   // add command to the history
-  if ( !cmd.trimmed().isEmpty() ) {
-    PyCommand aCommand;
-    aCommand.command = cmd;
-    myHistory.append( aCommand );
-  }
+  if ( !cmd.trimmed().isEmpty() )
+    myHistory.push_back( cmd );
+  putLog( QString( "%1%2\n" ).arg( myPrompt ).arg( cmd ) );
 
   // IPAL19397
   addText( "", true ); 
@@ -602,7 +615,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory--;
           // get previous command in the history
-          QString previousCommand = myHistory.at( myCmdInHistory ).command;
+          QString previousCommand = myHistory.at( myCmdInHistory );
           // print previous command
           moveCursor( QTextCursor::End );
           moveCursor( QTextCursor::StartOfBlock, QTextCursor::KeepAnchor );
@@ -639,7 +652,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
           QString nextCommand;
           if ( myCmdInHistory < myHistory.count() ) {
             // next command in history
-            nextCommand = myHistory.at( myCmdInHistory ).command;
+            nextCommand = myHistory.at( myCmdInHistory );
           }
           else {
             // end of history is reached
@@ -746,7 +759,7 @@ void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
         if ( myCmdInHistory > 0 ) {
           myCmdInHistory = 0;
           // get very first command in the history
-          QString firstCommand = myHistory.at( myCmdInHistory ).command;
+          QString firstCommand = myHistory.at( myCmdInHistory );
           // print first command
           moveCursor( QTextCursor::End );
           moveCursor( QTextCursor::StartOfBlock, QTextCursor::KeepAnchor );
@@ -941,7 +954,6 @@ void PyConsole_Editor::customEvent( QEvent* event )
     {
       PrintEvent* pe=(PrintEvent*)event;
       addText( pe->text(), false, pe->isError());
-      myHistory.last().output = myHistory.last().output + pe->text();
       return;
     }
   case PyInterp_Event::ES_OK:
@@ -1123,43 +1135,90 @@ void PyConsole_Editor::dump()
   aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
   
   QString fileName = SUIT_FileDlg::getFileName( this, QString(),
-  	  	     		     aFilters, tr( "TOT_DUMP_PYCOMMANDS" ),
- 	    			     false, true, new DumpCommandsFileValidator( this ) );
-  if ( fileName != "" ) {
+						aFilters, tr( "TOT_DUMP_PYCOMMANDS" ),
+						false, true, new DumpCommandsFileValidator( this ) );
+  if ( !fileName.isEmpty() ) {
     QFile file( fileName ); 
     if ( !file.open( QFile::WriteOnly ) )
       return;
 
     QTextStream out (&file);
   
-    for( int i=0; i<myHistory.count(); i++ ) {
-         out<<myHistory.at(i).command<<endl;
+    for ( int i=0; i<myHistory.count(); i++ ) {
+      out << myHistory[i] << endl;
     }
     file.close();
   }
 }
 /*!
-  \brief "Save log" operation.
+  \brief "Start log" operation.
  */
-void PyConsole_Editor::saveLog()
+void PyConsole_Editor::startLog()
 {
   QStringList aFilters;
-  aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
+  aFilters.append( tr( "LOG_FILES_FILTER" ) );
 
-  QString fileName = SUIT_FileDlg::getFileName( this, QString(),
-                     aFilters, tr( "TOT_SAVE_PYLOG" ),
-                 false, true, new DumpCommandsFileValidator( this ) );
-  if ( fileName != "" ) {
-    QFile file( fileName );
-    if ( !file.open( QFile::WriteOnly ) )
-      return;
-
-    QTextStream out (&file);
-
-    for( int i = 0; i < myHistory.count(); i++ ) {
-         out << myHistory.at(i).command << endl;
-         out << myHistory.at(i).output;
+  while (1) {
+    QString fileName = SUIT_FileDlg::getFileName( this, QString(),
+						  aFilters, tr( "TOT_SAVE_PYLOG" ),
+						  false, true );
+    if ( !fileName.isEmpty() ) {
+      if ( startLog( fileName ) ) {
+	break;
+      }
+      else {
+	SUIT_MessageBox::critical( this,
+				   QObject::tr("ERR_ERROR"),
+				   QObject::tr("ERR_FILE_NOT_WRITABLE") );
+      }
     }
+    else {
+      break;
+    }
+  }
+}
+
+/*!
+  \brief Start python trace logging
+  \param fileName the path to the log file
+  \sa stopLog()
+ */
+bool PyConsole_Editor::startLog( const QString& fileName )
+{
+  bool ok = false;
+  if ( !fileName.isEmpty() ) {
+    QFile file( fileName );
+    if ( file.open( QFile::WriteOnly ) ) {
+      file.close();
+      myLogFile = fileName;
+      ok = true;
+    }
+  }
+  return ok;
+}
+
+/*!
+  \brief "Stop log" operation.
+  \sa startLog()
+ */
+void PyConsole_Editor::stopLog()
+{
+  myLogFile = QString();
+}
+
+/*!
+  \brief Put string to the log file
+ */
+void PyConsole_Editor::putLog( const QString& s )
+{
+  if ( !myLogFile.isEmpty() ) {
+    QFile file( myLogFile );
+    if ( !file.open( QFile::Append ) )
+      return;
+    
+    QTextStream out (&file);
+    out << s;
+    
     file.close();
   }
 }

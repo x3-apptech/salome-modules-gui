@@ -248,7 +248,10 @@ void PyConsole_Console::contextMenuPopup( QMenu* menu )
   menu->addAction( myActions[SelectAllId] );
   menu->addSeparator();
   menu->addAction( myActions[DumpCommandsId] );
-  menu->addAction( myActions[SaveLogId] );
+  if ( !myEditor->isLogging() )
+    menu->addAction( myActions[StartLogId] );
+  else
+    menu->addAction( myActions[StopLogId] );
 
   Qtx::simplifySeparators( menu );
 
@@ -270,7 +273,8 @@ void PyConsole_Console::setMenuActions( const int flags )
   myActions[ClearId]->setVisible( flags & ClearId );
   myActions[SelectAllId]->setVisible( flags & SelectAllId );
   myActions[DumpCommandsId]->setVisible( flags & DumpCommandsId );
-  myActions[SaveLogId]->setVisible( flags & SaveLogId );
+  myActions[StartLogId]->setVisible( flags & StartLogId );
+  myActions[StopLogId]->setVisible( flags & StopLogId );
 }
 
 /*!
@@ -286,7 +290,8 @@ int PyConsole_Console::menuActions() const
   ret = ret | ( myActions[ClearId]->isVisible() ? ClearId : 0 );
   ret = ret | ( myActions[SelectAllId]->isVisible() ? SelectAllId : 0 );
   ret = ret | ( myActions[DumpCommandsId]->isVisible() ? DumpCommandsId : 0 );
-  ret = ret | ( myActions[SaveLogId]->isVisible() ? SaveLogId : 0 );
+  ret = ret | ( myActions[StartLogId]->isVisible() ? StartLogId : 0 );
+  ret = ret | ( myActions[StopLogId]->isVisible() ? StopLogId : 0 );
   return ret;
 }
 
@@ -322,10 +327,15 @@ void PyConsole_Console::createActions()
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( dump() ) );
   myActions.insert( DumpCommandsId, a );
 
-  a = new QAction( tr( "EDIT_SAVELOG_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_SAVELOG_CMD" ) );
-  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( saveLog() ) );
-  myActions.insert( SaveLogId, a );
+  a = new QAction( tr( "EDIT_STARTLOG_CMD" ), this );
+  a->setStatusTip( tr( "EDIT_STARTLOG_CMD" ) );
+  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( startLog() ) );
+  myActions.insert( StartLogId, a );
+
+  a = new QAction( tr( "EDIT_STOPLOG_CMD" ), this );
+  a->setStatusTip( tr( "EDIT_STOPLOG_CMD" ) );
+  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( stopLog() ) );
+  myActions.insert( StopLogId, a );
 }
 
 /*!
@@ -338,6 +348,23 @@ void PyConsole_Console::updateActions()
   myActions[CopyId]->setEnabled( myEditor->textCursor().hasSelection() );
   myActions[PasteId]->setEnabled( !myEditor->isReadOnly() && !QApplication::clipboard()->text().isEmpty() );
   myActions[SelectAllId]->setEnabled( !myEditor->document()->isEmpty() );
+}
+
+/*!
+  \brief Start python trace logging
+  \param fileName the path to the log file
+*/
+void PyConsole_Console::startLog( const QString& fileName )
+{
+  myEditor->startLog( fileName );
+}
+
+/*!
+  \brief Stop python trace logging
+*/
+void PyConsole_Console::stopLog()
+{
+  myEditor->stopLog();
 }
 
 /**

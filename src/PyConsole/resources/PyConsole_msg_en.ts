@@ -25,11 +25,15 @@
     </message>
     <message>
         <source>EDIT_DUMPCOMMANDS_CMD</source>
-        <translation>D&amp;ump commands</translation>
+        <translation>D&amp;ump Commands</translation>
     </message>
     <message>
-        <source>EDIT_SAVELOG_CMD</source>
-        <translation>&amp;Save log</translation>
+      <source>EDIT_STARTLOG_CMD</source>
+        <translation>Start &amp;Log</translation>
+    </message>
+    <message>
+      <source>EDIT_STOPLOG_CMD</source>
+        <translation>Stop &amp;Log</translation>
     </message>
 </context>
 <context>
@@ -45,6 +49,14 @@
     <message>
         <source>PYTHON_FILES_FILTER</source>
         <translation>PYTHON Files (*.py)</translation>
+    </message>
+    <message>
+        <source>LOG_FILES_FILTER</source>
+        <translation>Log files (*.log *.txt)</translation>
+    </message>
+    <message>
+        <source>ERR_FILE_NOT_WRITABLE</source>
+        <translation>File is not writable!</translation>
     </message>
 </context>
 </TS>
