@@ -169,7 +169,7 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
   myCmdInHistory( -1 ),
   myEventLoop( 0 ),
   myShowBanner( true ),
-  myIsSync( false ),
+  myIsSync( true ),
   myIsSuppressOutput( false )
 {
   QString fntSet( "" );
