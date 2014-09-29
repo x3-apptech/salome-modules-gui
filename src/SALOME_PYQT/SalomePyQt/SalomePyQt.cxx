@@ -41,6 +41,8 @@
 #include "OCCViewer_ViewWindow.h"
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewWindow.h"
+#include "PVViewer_ViewManager.h"
+#include "PVViewer_ViewModel.h"
 #include "QtxActionMenuMgr.h"
 #include "QtxWorkstack.h"
 #include "QtxTreeView.h"
@@ -55,6 +57,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QPaintEvent>
+#include <QCoreApplication>
 
 /*!
   \brief Get the currently active application.
@@ -3826,6 +3829,26 @@ void SalomePyQt::setPlot2dFitRange(const int id, const double XMin, const double
 	ProcessVoidEvent( new TPlot2dFitRange(id, XMin, XMax, YMin, YMax) ); 
 }
 
+//class TInitParaview: public SALOME_Event
+//{
+//public:
+//  TInitParaview() {}
+//  virtual void Execute() {
+//    LightApp_Application* anApp = getApplication();
+//    // Create PVViewer_ViewManager, which will initialize ParaView stuff
+//    PVViewer_ViewManager* viewMgr =
+//          dynamic_cast<PVViewer_ViewManager*>( anApp->getViewManager( PVViewer_Viewer::Type(), true ) );
+//  }
+//};
+//void SalomePyQt::initializeParaViewGUI()
+//{
+//  ProcessVoidEvent( new TInitParaview() );
+//}
+
+void SalomePyQt::processEvents()
+{
+  QCoreApplication::processEvents();
+}
 
 void SalomePyQt::setVisibilityState( const QString& theEntry, VisibilityState theState)
 {

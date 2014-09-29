@@ -78,6 +78,10 @@
   #include <GLViewer_ViewFrame.h>
   #include <GLViewer_ViewPort.h>
 #endif
+#ifndef DISABLE_PVVIEWER
+  #include <PVViewer_ViewManager.h>
+  #include <PVViewer_ViewWindow.h>
+#endif
 #ifndef DISABLE_PLOT2DVIEWER
   #include <Plot2d_ViewWindow.h>
   #include <Plot2d_ViewFrame.h>
@@ -382,6 +386,10 @@ void LightApp_Module::update( const int theFlags )
 #ifndef DISABLE_GLVIEWER
         if ( viewWnd->inherits( "GLViewer_ViewFrame" ) )
           ( (GLViewer_ViewFrame*)viewWnd )->getViewPort()->onUpdate();
+#endif
+#ifndef DISABLE_PVVIEWER
+//        if ( viewWnd->inherits( "PVViewer_ViewWindow" ) )
+//          ( (PVViewer_ViewWindow*)viewWnd )->getViewPort()->onUpdate();
 #endif
       }
   }

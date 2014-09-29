@@ -87,7 +87,7 @@ public:
          CloseId, CloseAllId, GroupAllId,
          PreferencesId, MRUId, ModulesListId,
          NewGLViewId, NewPlot2dId, NewOCCViewId, NewVTKViewId,
-         NewQxSceneViewId, NewGraphicsViewId, StyleId, FullScreenId,
+         NewQxSceneViewId, NewGraphicsViewId, NewPVViewId, StyleId, FullScreenId,
          UserID };
 
 protected:

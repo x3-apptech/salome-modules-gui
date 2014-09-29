@@ -68,6 +68,7 @@
     <parameter name="GraphicsView" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OCCViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="VTKViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+	<parameter name="PVViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>    
     <parameter name="QxSceneViewer" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="PyConsole"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SalomeApp"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
