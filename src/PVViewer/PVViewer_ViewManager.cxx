@@ -29,6 +29,7 @@
 #include <SUIT_MessageBox.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
+#include <SUIT_Study.h>
 #include <SUIT_ResourceMgr.h>
 #include <PyInterp_Interp.h>
 #include <PyConsole_Interp.h>
@@ -111,20 +112,6 @@ bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop)
       vtkOutputWindow::SetInstance(PVViewer_LogWindowAdapter::New());
 
       new pqTabbedMultiViewWidget(); // registers a "MULTIVIEW_WIDGET" on creation
-
-      // At this stage, the pqPythonManager has been initialized, i.e. the current process has
-      // activated the embedded Python interpreter. "paraview" package has also been imported once already.
-      // Make sure the current process executes paraview's Python command with the "fromGUI" flag.
-      // This is used in pvsimple.py to avoid reconnecting the GUI thread to the pvserver (when
-      // user types "import pvsimple" in SALOME's console).
-      SalomeApp_Application* app =
-                  dynamic_cast< SalomeApp_Application* >(SUIT_Session::session()->activeApplication());
-      PyConsole_Interp* pyInterp = app->pythonConsole()->getInterp();
-      {
-        PyLockWrapper aGil;
-        std::string cmd = "import paraview;paraview.fromGUI = True";
-        pyInterp->run(cmd.c_str());
-      }
 
       for (int i = 0; i < argc; i++)
         free(argv[i]);
