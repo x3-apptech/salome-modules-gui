@@ -74,9 +74,6 @@ int SalomeApp_PyInterp::beforeRun()
     ret = simpleRun( "salome.salome_init(0,1)", false );
     if (ret)
       return ret;
-    ret = simpleRun( "salome.fromEmbeddedConsole=True", false );
-    if (ret)
-      return ret;
   }
   return true;
 }
