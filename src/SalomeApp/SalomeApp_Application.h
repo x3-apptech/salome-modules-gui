@@ -79,7 +79,7 @@ public:
 
 protected:
   enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
-  enum { CloseUnload = LightApp_Application::CloseDiscard + 1 };
+  enum { CloseDisconnectSave = LightApp_Application::CloseDiscard + 1, CloseDisconnect };
   enum { LoadStudyId = LightApp_Application::OpenStudyId + 1, NewAndScriptId };
 
 public:
@@ -192,10 +192,11 @@ private:
 
 private:
 #ifndef DISABLE_PYCONSOLE
-  QPointer<SalomeApp_NoteBook>        myNoteBook;
+  QPointer<SalomeApp_NoteBook>        myNoteBook;        // Notebook instance
 #endif
-  QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
-  bool                                myIsSiman; // application corresponds to the siman study flag
+  QMap<QString, QAction*>             myExtActions;      // Map <AttributeUserID, QAction>
+  bool                                myIsSiman;         // application corresponds to the siman study flag
+  bool                                myIsCloseFromExit; // "Close from Exit" flag
 
 signals:
   void                                dumpedStudyClosed( const QString& theDumpScript, 

@@ -64,7 +64,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>APPCLOSE_CLOSE</source>
-        <translation>&amp;Close w/o saving</translation>
+        <translation>Close &amp;w/o saving</translation>
     </message>
     <message>
         <source>APPCLOSE_CANCEL</source>

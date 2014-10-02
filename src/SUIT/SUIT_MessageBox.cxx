@@ -766,6 +766,150 @@ int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QStr
   \brief Show critical message box with arbitrary number of user-specified
          buttons.
 
+  List of buttons to be shown is specified via \a buttons parameter.
+  
+  The function returns clicked button id. The identifiers for the buttons
+  are assigned automatically. The first button is identified as 0, the
+  second one as 1, etc.
+
+  The \a defaultButton parameter allows to specify the button which is assigned
+  for the \c Return or \c Enter key. Similarly, \a escapeButton parameter
+  allows specifing the button which is assigned for \c Escape key.
+  If these parameters are not specified (-1 by default), the first button
+  is set as default button and the last one is defined as escape button.
+
+  \param parent parent widget
+  \param title message box title
+  \param text message box text
+  \param defaultButton default button
+  \param escapeButton escape button
+  \param buttons list of buttons to be shown
+  \return button used button id
+*/
+int SUIT_MessageBox::critical( QWidget* parent, const QString& title, const QString& text,
+			       const QStringList& buttons,
+			       const int defaultButton, const int escapeButton )
+{
+  ButtonInfos lst;
+  int id = 0;
+  Q_FOREACH( QString button, buttons )
+    lst.append( ButtonInfo( id++, button ) );
+  return messageBox( SUIT_MessageBox::Critical, parent, title, text, lst,
+                     defaultButton, escapeButton );
+}
+
+/*!
+  \brief Show warning message box with arbitrary number of user-specified
+         buttons.
+
+  List of buttons to be shown is specified via \a buttons parameter.
+  
+  The function returns clicked button id. The identifiers for the buttons
+  are assigned automatically. The first button is identified as 0, the
+  second one as 1, etc.
+
+  The \a defaultButton parameter allows to specify the button which is assigned
+  for the \c Return or \c Enter key. Similarly, \a escapeButton parameter
+  allows specifing the button which is assigned for \c Escape key.
+  If these parameters are not specified (-1 by default), the first button
+  is set as default button and the last one is defined as escape button.
+
+  \param parent parent widget
+  \param title message box title
+  \param text message box text
+  \param defaultButton default button
+  \param escapeButton escape button
+  \param buttons list of buttons to be shown
+  \return button used button id
+*/
+int SUIT_MessageBox::warning( QWidget* parent, const QString& title, const QString& text,
+			      const QStringList& buttons,
+			      const int defaultButton, const int escapeButton )
+{
+  ButtonInfos lst;
+  int id = 0;
+  Q_FOREACH( QString button, buttons )
+    lst.append( ButtonInfo( id++, button ) );
+  return messageBox( SUIT_MessageBox::Warning, parent, title, text, lst,
+                     defaultButton, escapeButton );
+}
+
+/*!
+  \brief Show information message box with arbitrary number of user-specified
+         buttons.
+
+  List of buttons to be shown is specified via \a buttons parameter.
+  
+  The function returns clicked button id. The identifiers for the buttons
+  are assigned automatically. The first button is identified as 0, the
+  second one as 1, etc.
+
+  The \a defaultButton parameter allows to specify the button which is assigned
+  for the \c Return or \c Enter key. Similarly, \a escapeButton parameter
+  allows specifing the button which is assigned for \c Escape key.
+  If these parameters are not specified (-1 by default), the first button
+  is set as default button and the last one is defined as escape button.
+
+  \param parent parent widget
+  \param title message box title
+  \param text message box text
+  \param defaultButton default button
+  \param escapeButton escape button
+  \param buttons list of buttons to be shown
+  \return button used button id
+*/
+int SUIT_MessageBox::information( QWidget* parent, const QString& title, const QString& text,
+				  const QStringList& buttons,
+				  const int defaultButton, const int escapeButton )
+{
+  ButtonInfos lst;
+  int id = 0;
+  Q_FOREACH( QString button, buttons )
+    lst.append( ButtonInfo( id++, button ) );
+  return messageBox( SUIT_MessageBox::Information, parent, title, text, lst,
+                     defaultButton, escapeButton );
+}
+
+/*!
+  \brief Show question message box with arbitrary number of user-specified
+         buttons.
+
+  List of buttons to be shown is specified via \a buttons parameter.
+  
+  The function returns clicked button id. The identifiers for the buttons
+  are assigned automatically. The first button is identified as 0, the
+  second one as 1, etc.
+
+  The \a defaultButton parameter allows to specify the button which is assigned
+  for the \c Return or \c Enter key. Similarly, \a escapeButton parameter
+  allows specifing the button which is assigned for \c Escape key.
+  If these parameters are not specified (-1 by default), the first button
+  is set as default button and the last one is defined as escape button.
+
+  \param parent parent widget
+  \param title message box title
+  \param text message box text
+  \param defaultButton default button
+  \param escapeButton escape button
+  \param buttons list of buttons to be shown
+  \return button used button id
+*/
+int SUIT_MessageBox::question( QWidget* parent, const QString& title, const QString& text,
+			       const QStringList& buttons,
+			       const int defaultButton, const int escapeButton )
+{
+  ButtonInfos lst;
+  int id = 0;
+  Q_FOREACH( QString button, buttons )
+    lst.append( ButtonInfo( id++, button ) );
+  return messageBox( SUIT_MessageBox::Question, parent, title, text, lst,
+                     defaultButton, escapeButton );
+}
+
+/*!
+  \brief Show critical message box with arbitrary number of user-specified
+         buttons.
+
   The function accepts arbitrary number of parameters. Each parameter starting
   from \a btn should be of type const char* to specify the button text.
   After the last button parameter and additional 0 (zero) value should be 

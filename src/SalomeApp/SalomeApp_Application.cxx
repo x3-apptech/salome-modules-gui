@@ -162,9 +162,10 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application()
+  : LightApp_Application(), 
+    myIsSiman( false ),
+    myIsCloseFromExit( false )
 {
-  myIsSiman = false; // default
 }
 
 /*!Destructor.
@@ -401,8 +402,11 @@ void SalomeApp_Application::onExit()
     killServers = dlg.isServersShutdown();
   }
 
-  if ( result )
+  if ( result ) {
+    if ( !killServers ) myIsCloseFromExit = true;
     SUIT_Session::session()->closeSession( SUIT_Session::ASK, killServers );
+    myIsCloseFromExit = false;
+  }
 }
 
 /*!SLOT. Load document.*/
@@ -1193,20 +1197,25 @@ void SalomeApp_Application::updateDesktopTitle() {
 
 int SalomeApp_Application::closeChoice( const QString& docName )
 {
-  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ), tr( "APPCLOSE_DESCRIPTION" ),
-                                          tr ("APPCLOSE_SAVE"), tr ("APPCLOSE_CLOSE"),
-					  //tr ("APPCLOSE_UNLOAD"), 
-					  tr ("APPCLOSE_CANCEL"), 0 );
+  QStringList buttons;
+  QMap<int, int> choices;
+  int idx = 0;
+  buttons << tr ("APPCLOSE_SAVE");                // Save & Close
+  choices.insert( idx++, CloseSave );             // ...
+  buttons << tr ("APPCLOSE_CLOSE");               // Close w/o saving
+  choices.insert( idx++, CloseDiscard );          // ...
+  if ( myIsCloseFromExit ) {
+    buttons << tr ("APPCLOSE_UNLOAD_SAVE");       // Save & Disconnect
+    choices.insert( idx++, CloseDisconnectSave );     // ...
+    buttons << tr ("APPCLOSE_UNLOAD");            // Disconnect
+    choices.insert( idx++, CloseDisconnect );         // ...
+  }
+  buttons << tr ("APPCLOSE_CANCEL");              // Cancel
+  choices.insert( idx++, CloseCancel );           // ...
 
-  int res = CloseCancel;
-  if ( answer == 0 )
-    res = CloseSave;
-  else if ( answer == 1 )
-    res = CloseDiscard;
-  // else if ( answer == 2 )
-  //   res = CloseUnload;
-
-  return res;
+  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ),
+					  tr( "APPCLOSE_DESCRIPTION" ), buttons, 0 );
+  return choices[answer];
 }
 
 bool SalomeApp_Application::closeAction( const int choice, bool& closePermanently )
@@ -1222,14 +1231,19 @@ bool SalomeApp_Application::closeAction( const int choice, bool& closePermanentl
     break;
   case CloseDiscard:
     break;
-  case CloseUnload:
+  case CloseDisconnectSave:
+    if ( activeStudy()->isSaved() )
+      onSaveDoc();
+    else if ( !onSaveAsDoc() )
+      res = false;
+  case CloseDisconnect:
+    closeActiveDoc( false );
     closePermanently = false;
     break;
   case CloseCancel:
   default:
     res = false;
   }
-
   return res;
 }
 

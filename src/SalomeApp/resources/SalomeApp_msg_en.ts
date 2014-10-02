@@ -143,7 +143,11 @@ Launch a new session or close the study.</translation>
     </message>
     <message>
         <source>APPCLOSE_UNLOAD</source>
-        <translation>&amp;Unload</translation>
+        <translation>&amp;Disconnect w/o saving</translation>
+    </message>
+    <message>
+        <source>APPCLOSE_UNLOAD_SAVE</source>
+        <translation>S&amp;ave &amp;&amp; Disconnect</translation>
     </message>
     <message>
         <source>MEN_WINDOWS_NEW</source>

@@ -131,7 +131,11 @@ Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
     </message>
     <message>
         <source>APPCLOSE_UNLOAD</source>
-        <translation>&amp;Déconnecter</translation>
+        <translation>&amp;Déconnecter sans sauvegarder</translation>
+    </message>
+    <message>
+        <source>APPCLOSE_UNLOAD_SAVE</source>
+        <translation>Sauvegarder &amp;&amp; D&amp;éconnecter</translation>
     </message>
     <message>
         <source>MEN_WINDOWS_NEW</source>
