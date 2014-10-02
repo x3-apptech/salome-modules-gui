@@ -56,7 +56,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>STUDYCLOSE_DESCRIPTION</source>
-        <translation type="unfinished">You already have an active study in your session. It has to be closed before working with another study.</translation>
+        <translation>Une étude est déjà ouverte. Elle doit être fermée avant d&apos;en ouvrir une autre.</translation>
     </message>
     <message>
         <source>APPCLOSE_SAVE</source>

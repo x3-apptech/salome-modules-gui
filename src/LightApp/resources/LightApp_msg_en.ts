@@ -33,7 +33,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
         <source>ABOUT_CLOSE</source>
         <translation>&amp;Close</translation>
-    </message>    
+    </message>
     <message>
         <source>APP_NAME</source>
         <translation>SALOME</translation>
@@ -162,7 +162,7 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_STORE_TOOL_POS</source>
         <translation>Store positions of toolbars</translation>
-        </message>
+    </message>
     <message>
         <source>PREF_AUTO_SAVE</source>
         <translation>Auto-save interval (min)</translation>
@@ -374,7 +374,7 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>MEN_RENAME_OBJ</source>
         <translation>Rename</translation>
-    </message>        	
+    </message>
     <message>
         <source>LOG_WINDOW</source>
         <translation>Message Window</translation>
@@ -437,7 +437,7 @@ The changes will be applied on the next application session.</translation>
     </message>
     <message>
         <source>PREF_AUTO_SIZE_FIRST</source>
-        <translation>Auto size for "Name" column</translation>
+        <translation>Auto size for &quot;Name&quot; column</translation>
     </message>
     <message>
         <source>PREF_RESIZE_ON_EXPAND_ITEM</source>
@@ -518,7 +518,7 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_VIEWER_SELECTION</source>
         <translation>Selection color</translation>
-    </message>    
+    </message>
     <message>
         <source>PREF_XYVIEWER_BACKGROUND</source>
         <translation>XY View</translation>
@@ -550,7 +550,7 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_SELECTED_FONT_COLOR</source>
         <translation>Highlighted legend font color</translation>
-    </message>			        
+    </message>
     <message>
         <source>PREF_LEFT</source>
         <translation>Left</translation>
