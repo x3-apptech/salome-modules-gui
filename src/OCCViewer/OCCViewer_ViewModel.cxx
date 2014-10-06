@@ -1015,7 +1015,7 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   // load capping texture
   QPixmap px( ":images/hatch.png" );
   if( !px.isNull() ) {
-    const Handle(Image_PixMap) aPixmap = imageToPixmap( px.toImage() );
+    const Handle(Image_PixMap) aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage() );
     Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
     if( aTexture->IsDone() ) {
       aTexture->EnableModulate();

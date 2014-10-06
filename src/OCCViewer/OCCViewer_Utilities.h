@@ -22,15 +22,37 @@
 
 // internal includes
 #include "OCCViewer.h"
+#include "OCCViewer_ViewWindow.h"
 
 // OCC includes
-#include <Image_PixMap_Handle.hxx>
+#include <Image_PixMap.hxx>
 
 class QImage;
+class OCCViewer_Viewer;
 
-OCCVIEWER_EXPORT
-extern
-Handle(Image_PixMap)
-imageToPixmap( const QImage& anImage );
-
+#ifdef WIN32
+#pragma warning ( disable:4251 )
 #endif
+
+class OCCVIEWER_EXPORT OCCViewer_Utilities
+{
+public:
+
+  /*!
+   * Convert Qt image to OCCT pixmap
+   * \param theImage Qt source image
+   * \return resulting OCCT pixmap
+   */
+  static Handle(Image_PixMap) imageToPixmap( const QImage& theImage );
+
+  /*!
+   * Set 2D mode for the viewer. Hide or show 3D actions.
+   * \param theViewer an OCC viewer
+   * \param theMode OCC view window mode
+   */
+  static void setViewer2DMode( OCCViewer_Viewer* theViewer,
+                               const OCCViewer_ViewWindow::Mode2dType& theMode );
+
+};
+
+#endif // OCCVIEWER_UTILITIES_H
