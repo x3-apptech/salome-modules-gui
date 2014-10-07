@@ -65,6 +65,7 @@ public:
   void destroy();
 
   virtual int run(const char *command); 
+  virtual void initStudy(){};
 
   // [ABN] - the PyLockWrapper is no more attached to the interpreter
   // PyLockWrapper GetLockWrapper() const;

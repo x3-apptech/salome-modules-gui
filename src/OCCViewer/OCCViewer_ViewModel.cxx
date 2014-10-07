@@ -66,10 +66,6 @@
 
 #include <Visual3d_View.hxx>
 
-
-// VSR: Uncomment below line to allow texture background support in OCC viewer
-#define OCC_ENABLE_TEXTURED_BACKGROUND
-
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats
 */
@@ -83,11 +79,7 @@ QString OCCViewer_Viewer::backgroundData( QStringList& gradList, QIntList& idLis
               Diagonal1Gradient              << Diagonal2Gradient <<
               Corner1Gradient                << Corner2Gradient   <<
               Corner3Gradient                << Corner4Gradient;
-#if OCC_VERSION_LARGE > 0x06050200 // enabled since OCCT 6.5.3, since in previous version this functionality is buggy
-#ifdef OCC_ENABLE_TEXTURED_BACKGROUND
   txtList  << Qtx::CenterTexture << Qtx::TileTexture << Qtx::StretchTexture;
-#endif
-#endif
   return tr("BG_IMAGE_FILES");
 }
 
@@ -108,18 +100,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   //myV3dViewer->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
   myV3dViewer->SetDefaultLights();
 
-#if OCC_VERSION_LARGE <= 0x06060000 // Porting to OCCT higher 6.6.0 version
-  myV3dCollector = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Collector3d").ToExtString() );
-  //myV3dCollector->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
-  myV3dCollector->SetDefaultLights();
-#endif
-
   // init selector
-#if OCC_VERSION_LARGE <= 0x06060000 
-  myAISContext = new AIS_InteractiveContext( myV3dViewer, myV3dCollector );
-#else
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
-#endif
   myAISContext->SelectionColor( Quantity_NOC_WHITE );
   
   // display isoline on planar faces (box for ex.)
@@ -166,9 +148,6 @@ OCCViewer_Viewer::~OCCViewer_Viewer()
 {
   myAISContext.Nullify();
   myV3dViewer.Nullify();
-#if OCC_VERSION_LARGE <= 0x06060000
-  myV3dCollector.Nullify();
-#endif
 }
 
 /*!
@@ -415,10 +394,8 @@ void OCCViewer_Viewer::onViewMapped(OCCViewer_ViewPort3d* viewPort)
 
 int OCCViewer_Viewer::getTopLayerId()
 {
-#if OCC_VERSION_LARGE > 0x06050200
   if ( myTopLayerId == 0 && !myAISContext->CurrentViewer().IsNull() )    
     myAISContext->CurrentViewer()->AddZLayer( myTopLayerId );
-#endif
 
   return myTopLayerId;
 }
@@ -731,15 +708,6 @@ bool OCCViewer_Viewer::isInViewer( const Handle(AIS_InteractiveObject)& obj,
   AIS_ListOfInteractive List;
   myAISContext->DisplayedObjects(List);
 
-#if OCC_VERSION_LARGE <= 0x06060000
-  if( !onlyInViewer )
-  {
-    AIS_ListOfInteractive List1;
-    myAISContext->ObjectsInCollector(List1);
-    List.Append(List1);
-  }
-#endif
-
   AIS_ListIteratorOfListOfInteractive ite(List);
   for ( ; ite.More(); ite.Next() )
     if( ite.Value()==obj )
@@ -1047,7 +1015,7 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   // load capping texture
   QPixmap px( ":images/hatch.png" );
   if( !px.isNull() ) {
-    const Handle(Image_PixMap) aPixmap = imageToPixmap( px.toImage() );
+    const Handle(Image_PixMap) aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage() );
     Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
     if( aTexture->IsDone() ) {
       aTexture->EnableModulate();

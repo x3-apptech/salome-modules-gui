@@ -126,9 +126,6 @@ public:
 
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
-#if OCC_VERSION_LARGE <= 0x06060000 
-  Handle(V3d_Viewer)              getCollector3d() const { return myV3dCollector; }
-#endif
   Handle(AIS_InteractiveContext)  getAISContext()  const { return myAISContext; }
   Handle(AIS_Trihedron)           getTrihedron()   const { return myTrihedron; }
 
@@ -196,11 +193,6 @@ protected slots:
 
 protected:
   Handle(V3d_Viewer)              myV3dViewer;
-
-#if OCC_VERSION_LARGE <= 0x06060000
-  Handle(V3d_Viewer)              myV3dCollector;
-#endif
-
 
   Handle(AIS_Trihedron)           myTrihedron;
   Handle(AIS_InteractiveContext)  myAISContext;

@@ -229,10 +229,9 @@ void STD_Application::createActions()
   createMenu( FileNewId,    fileMenu, 0 );
   createMenu( FileOpenId,   fileMenu, 0 );
   createMenu( FileReopenId, fileMenu, 0 ); 
-  createMenu( FileCloseId,  fileMenu, 5 );
-  createMenu( separator(),  fileMenu, -1, 5 );
   createMenu( FileSaveId,   fileMenu, 5 );
   createMenu( FileSaveAsId, fileMenu, 5 );
+  createMenu( FileCloseId,  fileMenu, 5 );
   createMenu( separator(),  fileMenu, -1, 5 );
 
   createMenu( separator(),  fileMenu );
@@ -403,12 +402,18 @@ bool STD_Application::closeDoc( bool ask )
   if ( ask && !isPossibleToClose( closePermanently ) )
     return false;
 
+  return closeActiveDoc( closePermanently );
+}
+
+/*!Close document.*/
+bool STD_Application::closeActiveDoc( bool permanently )
+{
   SUIT_Study* study = activeStudy();
 
   beforeCloseDoc( study );
 
   if ( study )
-    study->closeDocument( closePermanently );
+    study->closeDocument( permanently );
 
   clearViewManagers();
 

@@ -69,8 +69,9 @@ class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
 public:
   enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
-         CatalogGenId, RegDisplayId, SaveGUIStateId, FileLoadId, UserID,
-         SimanCheckInId, SimanLocalCheckInId };
+         CatalogGenId, RegDisplayId, SaveGUIStateId, ConnectId, DisconnectId,
+         SimanCheckInId, SimanLocalCheckInId,
+         UserID };
 
   typedef enum { WT_NoteBook = LightApp_Application::WT_User,
                  WT_User
@@ -78,7 +79,7 @@ public:
 
 protected:
   enum { OpenRefresh = LightApp_Application::OpenReload + 1 };
-  enum { CloseUnload = LightApp_Application::CloseDiscard + 1 };
+  enum { CloseDisconnectSave = LightApp_Application::CloseDiscard + 1, CloseDisconnect };
   enum { LoadStudyId = LightApp_Application::OpenStudyId + 1, NewAndScriptId };
 
 public:
@@ -94,8 +95,6 @@ public:
   virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   virtual bool                        checkDataObject(LightApp_DataObject* theObj);
-
-  virtual void                        setDesktop( SUIT_Desktop* );
   
   virtual bool                        checkExistingDoc();
 
@@ -124,8 +123,8 @@ public slots:
   virtual void                        onLoadDoc();
   virtual void                        onNewWithScript();
   virtual bool                        onLoadDoc( const QString& );
+  virtual void                        onUnloadDoc( bool ask = true);
   virtual void                        onCloseDoc( bool ask = true);
-  virtual void                        onLoadDocMessage(const QString&);
 
   virtual void                        onExit();
   virtual void                        onCopy();
@@ -144,6 +143,7 @@ public slots:
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
+  void                                onDesktopMessage( const QString& );
   
 protected:
   virtual void                        createActions();
@@ -192,10 +192,11 @@ private:
 
 private:
 #ifndef DISABLE_PYCONSOLE
-  QPointer<SalomeApp_NoteBook>        myNoteBook;
+  QPointer<SalomeApp_NoteBook>        myNoteBook;        // Notebook instance
 #endif
-  QMap<QString, QAction*>             myExtActions; // Map <AttributeUserID, QAction>
-  bool                                myIsSiman; // application corresponds to the siman study flag
+  QMap<QString, QAction*>             myExtActions;      // Map <AttributeUserID, QAction>
+  bool                                myIsSiman;         // application corresponds to the siman study flag
+  bool                                myIsCloseFromExit; // "Close from Exit" flag
 
 signals:
   void                                dumpedStudyClosed( const QString& theDumpScript, 

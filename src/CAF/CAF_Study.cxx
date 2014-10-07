@@ -108,9 +108,7 @@ bool CAF_Study::createDocument( const QString& doc )
   if ( res && app && !app->stdApp().IsNull() )
   {
     try {
-#if OCC_VERSION_LARGE > 0x06010000
       OCC_CATCH_SIGNALS;
-#endif
       TColStd_SequenceOfExtendedString formats;
       app->stdApp()->Formats( formats );
       if ( !formats.IsEmpty() )
@@ -149,15 +147,8 @@ bool CAF_Study::openDocument( const QString& fname )
 
   bool status = false;
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
-
-#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
     status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == PCDM_RS_OK;
-#else
-    status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == CDF_RS_OK;
-#endif
   }
   catch ( Standard_Failure ) {
     status = false;
@@ -185,15 +176,9 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
 
   bool status = false;
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     if ( save )
-#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
       status = app->Save( stdDoc() ) == PCDM_SS_OK;
-#else
-      status = app->Save( stdDoc() ) == CDF_SS_OK;
-#endif
     else
     {
       TCollection_ExtendedString format, path( CAF_Tools::toExtString( fname ) );
@@ -202,11 +187,7 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
       if ( format.Length() )
         stdDoc()->ChangeStorageFormat( format );
 
-#if OCC_VERSION_LARGE > 0x06050100 // for OCC-6.5.2 and higher version
       status = app->SaveAs( stdDoc(), path ) == PCDM_SS_OK;
-#else
-      status = app->SaveAs( stdDoc(), path ) == CDF_SS_OK;
-#endif
     }
   }
   catch ( Standard_Failure ) {
@@ -233,9 +214,7 @@ bool CAF_Study::openTransaction()
 
   bool res = true;
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     if ( myStdDoc->HasOpenCommand() )
       myStdDoc->AbortCommand();
 
@@ -259,9 +238,7 @@ bool CAF_Study::abortTransaction()
 
   bool res = true;
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     myStdDoc->AbortCommand();
     update();
   }
@@ -282,9 +259,7 @@ bool CAF_Study::commitTransaction( const QString& name )
 
   bool res = true;
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     myStdDoc->CommitCommand();
 
     if ( canUndo() )
@@ -387,9 +362,7 @@ bool CAF_Study::undo()
     return false;
 
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     myStdDoc->Undo();
     undoModified();     /* decrement modification counter */
   }
@@ -411,9 +384,7 @@ bool CAF_Study::redo()
     return false;
 
   try {
-#if OCC_VERSION_LARGE > 0x06010000
     OCC_CATCH_SIGNALS;
-#endif
     myStdDoc->Redo();
     doModified();      /* increment modification counter */
   }

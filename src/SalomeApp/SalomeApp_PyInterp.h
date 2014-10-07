@@ -36,6 +36,7 @@ public:
   virtual ~SalomeApp_PyInterp();
 
   virtual void initPython();
+  virtual void initStudy();
   virtual void closeContext();
 
 protected:
@@ -43,6 +44,7 @@ protected:
 
 private:
   bool myFirstRun;
+  bool myFirstInitStudy;
 };
 
 #endif

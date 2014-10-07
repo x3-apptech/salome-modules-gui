@@ -363,10 +363,6 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation>Quitter l&apos;application</translation>
     </message>
     <message>
-        <source>TOT_DESK_FILE_LOAD</source>
-        <translation>Charger le document</translation>
-    </message>
-    <message>
         <source>TOT_DESK_FILE_OPEN</source>
         <translation>Ouvrir un document</translation>
     </message>
@@ -391,10 +387,6 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation>Sauvegarder le document actuel</translation>
     </message>
     <message>
-        <source>PRP_DESK_FILE_LOAD</source>
-        <translation>Charge un document</translation>
-    </message>
-    <message>
         <source>PRP_DESK_WINDOW_HTILE</source>
         <translation>Ranger les fenêtres en mosaïque horizontale</translation>
     </message>
@@ -417,10 +409,6 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <source>MEN_DESK_FILE_REOPEN</source>
         <translation>&amp;Réouvrir</translation>
-    </message>
-    <message>
-        <source>MEN_DESK_FILE_LOAD</source>
-        <translation>Connec&amp;ter...</translation>
     </message>
     <message>
         <source>MEN_DESK_FILE_SAVE</source>

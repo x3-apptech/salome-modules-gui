@@ -422,6 +422,7 @@ void LightApp_Application::start()
 
   updateWindows();
   updateViewManagers();
+  updateCommandsStatus();
 
   putInfo( "" );
   desktop()->statusBar()->showMessage( "" );
@@ -875,16 +876,14 @@ void LightApp_Application::onNewWindow()
 */
 void LightApp_Application::onNewDoc()
 {
-  //asl: fix for 0020515
-  if ( activeStudy() ) {
-    saveDockWindowsState();
-  }
-  
 #ifdef SINGLE_DESKTOP
   if ( !checkExistingDoc() )
     return;
 #endif
 
+  //asl: fix for 0020515
+  saveDockWindowsState();
+  
   CAM_Application::onNewDoc();
 }
 
@@ -894,7 +893,6 @@ void LightApp_Application::onNewDoc()
 void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
-  saveDockWindowsState();
   
 #ifdef SINGLE_DESKTOP
   if ( !checkExistingDoc() )
@@ -920,6 +918,9 @@ bool LightApp_Application::onOpenDoc( const QString& aName )
   if ( !checkExistingDoc() )
     return false;
 #endif
+
+  saveDockWindowsState();
+
   // We should take mru action first because this application instance can be deleted later.
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
   
@@ -1614,6 +1615,11 @@ void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
 
   if ( objectBrowser() )
     objectBrowser()->openLevels();
+
+#ifndef DISABLE_PYCONSOLE
+  if( pythonConsole() )
+    pythonConsole()->getInterp()->initStudy();
+#endif
 }
 
 /*!
@@ -1640,6 +1646,11 @@ void LightApp_Application::onStudyOpened( SUIT_Study* theStudy )
 
   if ( objectBrowser() )
     objectBrowser()->openLevels();
+
+#ifndef DISABLE_PYCONSOLE
+  if( pythonConsole() )
+    pythonConsole()->getInterp()->initStudy();
+#endif
 
   emit studyOpened();
 }
@@ -1819,6 +1830,8 @@ void LightApp_Application::onPreferenceChanged( QString& modName, QString& secti
 /*!Remove all windows from study.*/
 void LightApp_Application::beforeCloseDoc( SUIT_Study* s )
 {
+  saveDockWindowsState();
+
   if ( SUIT_DataBrowser* ob = objectBrowser() )
     ob->setModel(0);
 
@@ -1934,11 +1947,13 @@ QWidget* LightApp_Application::createWindow( const int flag )
  */
 void LightApp_Application::defaultWindows( QMap<int, int>& aMap ) const
 {
-  aMap.insert( WT_ObjectBrowser, Qt::LeftDockWidgetArea );
 #ifndef DISABLE_PYCONSOLE
   aMap.insert( WT_PyConsole, Qt::BottomDockWidgetArea );
 #endif
-  //  aMap.insert( WT_LogWindow, Qt::DockBottom );
+  if ( activeStudy() ) {
+    aMap.insert( WT_ObjectBrowser, Qt::LeftDockWidgetArea );
+    //  aMap.insert( WT_LogWindow, Qt::DockBottom );
+  }
 }
 
 /*!Default view managers*/
@@ -2179,16 +2194,14 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "strings", aValuesList,   vtkStyleMode );
   pref->setItemProperty( "indexes", anIndicesList, vtkStyleMode );
   // ... -> zooming mode
-  #if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
-    int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), Viewer3DGroup,
-                                                   LightApp_Preferences::Selector, "3DViewer", "zooming_mode" );
-    aValuesList.clear();
-    anIndicesList.clear();
-    aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
-    anIndicesList << 0                            << 1;
-    pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
-    pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
-  #endif
+  int occZoomingStyleMode = pref->addPreference( tr( "PREF_ZOOMING" ), Viewer3DGroup,
+                                                 LightApp_Preferences::Selector, "3DViewer", "zooming_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ZOOMING_AT_CENTER") << tr("PREF_ZOOMING_AT_CURSOR");
+  anIndicesList << 0                            << 1;
+  pref->setItemProperty( "strings", aValuesList,   occZoomingStyleMode );
+  pref->setItemProperty( "indexes", anIndicesList, occZoomingStyleMode );
   // ... "Trihedron" group <<start>>
   int occTriGroup = pref->addPreference( tr( "PREF_TRIHEDRON" ), Viewer3DGroup );
   pref->setItemProperty( "columns", 2, occTriGroup );
@@ -3196,9 +3209,6 @@ void LightApp_Application::removeModuleAction( const QString& modName )
 void LightApp_Application::currentWindows( QMap<int, int>& winMap ) const
 {
   winMap.clear();
-  if ( !activeStudy() )
-    return;
-
   if ( activeModule() && activeModule()->inherits( "LightApp_Module" ) )
     ((LightApp_Module*)activeModule())->windows( winMap );
   else
@@ -3229,28 +3239,22 @@ void LightApp_Application::updateWindows()
   QMap<int, int> winMap;
   currentWindows( winMap );
 
-  if ( activeStudy() )
+  for ( QMap<int, int>::ConstIterator it = winMap.begin(); it != winMap.end(); ++it )
   {
-    for ( QMap<int, int>::ConstIterator it = winMap.begin(); it != winMap.end(); ++it )
-    {
-      if ( !dockWindow( it.key() ) )
-        getWindow( it.key() );
-    }
+    if ( !dockWindow( it.key() ) )
+      getWindow( it.key() );
   }
 
   for ( WinMap::ConstIterator it = myWin.begin(); it != myWin.end(); ++it )
   {
     QWidget* wid = it.value();
-    if ( activeStudy() )
-      wid->setVisible( winMap.contains( it.key() ) );
+    if ( winMap.contains( it.key() ) )
+      wid->setVisible( true );
     else
       delete wid;
   }
 
-  if ( activeStudy() )
-    loadDockWindowsState();
-  else
-    myWin.clear();
+  loadDockWindowsState();
 }
 
 /*!
@@ -3275,18 +3279,19 @@ void LightApp_Application::loadDockWindowsState()
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   bool storeWin = aResMgr->booleanValue( "Study", "store_positions", true );
   bool storeTb = aResMgr->booleanValue( "Study", "store_tool_positions", true );
-  long version = Qtx::versionToId( aResMgr->stringValue( "salome", "version", "" ) );
 
   QString modName;
   if ( activeModule() )
     modName = activeModule()->name();
+  else if ( activeStudy() )
+    modName = "nomodule";
 
   QtxResourceMgr::WorkingMode prevMode = aResMgr->workingMode();
-  aResMgr->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
+  aResMgr->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
   QByteArray aDefaultState;
-  aResMgr->value("windows_geometry", modName , aDefaultState );
+  aResMgr->value( "windows_geometry", modName, aDefaultState );
   QByteArray aDefaultVisibility;
-  aResMgr->value("windows_visibility", modName , aDefaultVisibility );
+  aResMgr->value( "windows_visibility", modName, aDefaultVisibility );
   bool hasDefaultVisibility = !aDefaultVisibility.isEmpty();
   aResMgr->setWorkingMode(prevMode);
   
@@ -3294,6 +3299,7 @@ void LightApp_Application::loadDockWindowsState()
     return;
 
   if ( aResMgr->hasValue("windows_geometry" ,modName ) ) {
+    long version = Qtx::versionToId( aResMgr->stringValue( "windows_geometry_version", modName, "" ) );
     QByteArray arr;
     if ( version > Qtx::versionToId( "7.4.1" ) )
       aResMgr->value( "windows_geometry", modName , arr );
@@ -3384,9 +3390,17 @@ void LightApp_Application::saveDockWindowsState()
   QString modName;
   if ( activeModule() )
     modName = activeModule()->name();
+  else if ( activeStudy() )
+    modName = "nomodule";
+
+  QString versionId = GUI_VERSION_STR;
+#if GUI_DEVELOPMENT > 0
+  versionId += "dev";
+#endif
 
   QByteArray arr = desktop()->saveState();
   resourceMgr()->setValue( "windows_geometry", modName, processState(arr, storeWin, storeTb, false) );
+  resourceMgr()->setValue( "windows_geometry_version", modName, versionId );
 
   QByteArray visArr;
   if ( myWinVis.contains( modName ) )
@@ -4407,7 +4421,34 @@ void LightApp_Application::onViewManagerRemoved( SUIT_ViewManager* )
 /*!
   Check existing document.
 */
-bool LightApp_Application::checkExistingDoc() {
-  return true;
+bool LightApp_Application::checkExistingDoc()
+{
+  bool result = true;
+  if( activeStudy() ) {
+    int answer = SUIT_MessageBox::question( desktop(), 
+					    tr( "APPCLOSE_CAPTION" ), 
+					    tr( "STUDYCLOSE_DESCRIPTION" ),
+					    tr( "APPCLOSE_SAVE" ), 
+					    tr( "APPCLOSE_CLOSE" ),
+					    tr( "APPCLOSE_CANCEL" ), 0 );
+    if(answer == 0) {
+      if ( activeStudy()->isSaved() ) {
+	onSaveDoc();
+	closeDoc( false );
+      } else if ( onSaveAsDoc() ) {
+	if( !closeDoc( false ) ) {
+	  result = false;
+	}
+      } else {
+	result = false;
+      }	
+    }
+    else if( answer == 1 ) {
+      closeDoc( false );
+    } else if( answer == 2 ) {
+      result = false;
+    }
+  }
+  return result;
 }
 

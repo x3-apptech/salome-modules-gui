@@ -33,12 +33,9 @@
 
 #include <QString>
 
-#if OCC_VERSION_LARGE > 0x06010000
-  #include <Standard_ErrorHandler.hxx>
-  #include <Standard_Failure.hxx>
-#else
-  #include "CASCatch.hxx"
-#endif
+#include <Standard_ErrorHandler.hxx>
+#include <Standard_Failure.hxx>
+
 
 /*!Constructor. Initialize by \a floatSignal.*/
 SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
@@ -57,19 +54,11 @@ SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 /*!Try to call SUIT_ExceptionHandler::internalHandle(o, e), catch if failure.*/
 bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
-#if OCC_VERSION_LARGE > 0x06010000
   try {
     OCC_CATCH_SIGNALS;
-#else
-  CASCatch_TRY {
-#endif
     SUIT_ExceptionHandler::internalHandle( o, e );
   }
-#if OCC_VERSION_LARGE > 0x06010000
   catch(Standard_Failure) {
-#else
-  CASCatch_CATCH(Standard_Failure) {
-#endif
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     throw Standard_Failure( aFail->GetMessageString() );
   }

@@ -162,11 +162,10 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application()
+  : LightApp_Application(), 
+    myIsSiman( false ),
+    myIsCloseFromExit( false )
 {
-  connect( desktop(), SIGNAL( message( const QString& ) ),
-           this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
-  myIsSiman = false; // default
 }
 
 /*!Destructor.
@@ -320,12 +319,13 @@ void SalomeApp_Application::createActions()
                 tr( "MEN_DESK_REGISTRY_DISPLAY" ), tr( "PRP_DESK_REGISTRY_DISPLAY" ),
                 /*Qt::SHIFT+Qt::Key_D*/0, desk, false, this, SLOT( onRegDisplay() ) );
 
-  //rnv commented : implementation of the mono-study in GUI
-  //
-  //createAction( FileLoadId, tr( "TOT_DESK_FILE_LOAD" ),
-  //              resourceMgr()->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
-  //              tr( "MEN_DESK_FILE_LOAD" ), tr( "PRP_DESK_FILE_LOAD" ),
-  //              Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
+  createAction( ConnectId, tr( "TOT_DESK_CONNECT_STUDY" ), QIcon(),
+                tr( "MEN_DESK_CONNECT" ), tr( "PRP_DESK_CONNECT" ),
+                Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
+
+  createAction( DisconnectId, tr( "TOT_DESK_DISCONNECT_STUDY" ), QIcon(),
+                tr( "MEN_DESK_DISCONNECT" ), tr( "PRP_DESK_DISCONNECT" ),
+                Qt::CTRL+Qt::Key_U, desk, false, this, SLOT( onUnloadDoc() ) );
 
 
 #ifdef WITH_SIMANIO
@@ -346,7 +346,9 @@ void SalomeApp_Application::createActions()
   // creation of menu item is moved to VISU
   //  createMenu( SaveGUIStateId, fileMenu, 10, -1 );
 
-  // createMenu( FileLoadId,   fileMenu, 0 );
+  createMenu( ConnectId,    fileMenu, 5 );
+  createMenu( DisconnectId, fileMenu, 5 );
+  createMenu( separator(),  fileMenu, -1, 5 );
 
 #ifdef WITH_SIMANIO
   if (myIsSiman) {
@@ -358,7 +360,6 @@ void SalomeApp_Application::createActions()
   }
 #endif
   createMenu( DumpStudyId, fileMenu, 10, -1 );
-  createMenu( separator(), fileMenu, -1, 10, -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 10, -1 );
   createMenu( PropertiesId, fileMenu, 10, -1 );
@@ -387,18 +388,6 @@ void SalomeApp_Application::createActions()
 
 }
 
-
-/*!Set desktop:*/
-void SalomeApp_Application::setDesktop( SUIT_Desktop* desk )
-{
-  LightApp_Application::setDesktop( desk );
-
-  if ( desk ) {
-    connect( desk, SIGNAL( message( const QString& ) ),
-             this, SLOT( onLoadDocMessage( const QString& ) ), Qt::UniqueConnection );
-  }
-}
-
 /*!
   \brief Close application.
 */
@@ -413,8 +402,11 @@ void SalomeApp_Application::onExit()
     killServers = dlg.isServersShutdown();
   }
 
-  if ( result )
+  if ( result ) {
+    if ( !killServers ) myIsCloseFromExit = true;
     SUIT_Session::session()->closeSession( SUIT_Session::ASK, killServers );
+    myIsCloseFromExit = false;
+  }
 }
 
 /*!SLOT. Load document.*/
@@ -475,6 +467,31 @@ void SalomeApp_Application::onLoadDoc()
     updateViewManagers();
     updateObjectBrowser( true );
   }
+}
+
+/*!SLOT. Unload document.*/
+void SalomeApp_Application::onUnloadDoc( bool ask )
+{
+  if ( ask ) {
+    activeStudy()->abortAllOperations();
+    if ( activeStudy()->isModified() ) {
+      QString docName = activeStudy()->studyName().trimmed();
+      int answer = SUIT_MessageBox::question( desktop(), tr( "DISCONNECT_CAPTION" ),
+					    tr( "DISCONNECT_DESCRIPTION" ),
+					    tr( "DISCONNECT_SAVE" ), 
+					    tr( "DISCONNECT_WO_SAVE" ),
+					    tr( "APPCLOSE_CANCEL" ), 0 );
+      if ( answer == 0 ) { // save before unload
+	if ( activeStudy()->isSaved() )
+	  onSaveDoc();
+	else if ( !onSaveAsDoc() )
+	  return;
+      }
+      else if ( answer == 2 ) // Cancel
+	return;
+    }
+  }
+  closeActiveDoc( false );
 }
 
 /*!SLOT. Create new study and load script*/
@@ -543,18 +560,36 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
   return res;
 }
 
-/*!SLOT. Load document with a name, specified in \a aMessage.*/
-void SalomeApp_Application::onLoadDocMessage(const QString& aMessage)
+/*!SLOT. Parse message for desktop.*/
+void SalomeApp_Application::onDesktopMessage( const QString& message )
 {
-  if (aMessage.indexOf("simanCheckoutDone ") == 0) {
+  if (message.indexOf("simanCheckoutDone ") == 0) {
 #ifdef WITH_SIMANIO
-    onLoadDoc(aMessage.section(' ', 1));
+    // Load document with a name, specified in aMessage.
+    onLoadDoc(message.section(' ', 1));
 #else
     printf( "****************************************************************\n" );
     printf( "*    Warning: SALOME is built without SIMAN support.\n" );
     printf( "****************************************************************\n" );
 #endif
   }
+  else if (message.indexOf("studyCreated:") == 0) {
+    // Enable 'Connect' action
+    updateCommandsStatus();
+  }
+  else if (message.indexOf("studyClosed:") == 0) {
+    /* message also contains ID of the closed study,
+       but as soon as SALOME is mono-study application for the moment,
+       this ID is not needed now.*/
+    //long aStudyId = message.section(':', 1).toLong();
+    // Disconnect GUI from active study, because it was closed on DS side.
+    closeActiveDoc( false );
+    // Disable 'Connect' action
+    QAction* a = action( ConnectId );
+    if ( a )
+      a->setEnabled( false );
+  }
+  LightApp_Application::onDesktopMessage( message );
 }
 
 /*!SLOT. Copy objects to study maneger from selection maneger..*/
@@ -641,7 +676,6 @@ void SalomeApp_Application::onCloseDoc( bool ask )
 
     }
   }
-
   LightApp_Application::onCloseDoc( ask );
 }
 
@@ -760,8 +794,8 @@ void SalomeApp_Application::updateCommandsStatus()
 
   // Load script menu
   a = action( LoadScriptId );
-  if ( a )
-    a->setEnabled( activeStudy() );
+  if( a )
+    a->setEnabled( pythonConsole() );
 
   // Properties menu
   a = action( PropertiesId );
@@ -770,6 +804,16 @@ void SalomeApp_Application::updateCommandsStatus()
 
   // Save GUI state menu
   a = action( SaveGUIStateId );
+  if( a )
+    a->setEnabled( activeStudy() );
+
+  // Connect study menu
+  a = action( ConnectId );
+  if( a )
+    a->setEnabled( !activeStudy() && studyMgr()->GetOpenStudies().size() > 0 );
+
+  // Disconnect study menu
+  a = action( DisconnectId );
   if( a )
     a->setEnabled( activeStudy() );
 
@@ -894,14 +938,14 @@ void SalomeApp_Application::onDumpStudy( )
 void SalomeApp_Application::onLoadScript( )
 {
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-  if ( !appStudy ) return;
-  _PTR(Study) aStudy = appStudy->studyDS();
-
-  if ( aStudy->GetProperties()->IsLocked() ) {
-    SUIT_MessageBox::warning( desktop(),
-                              QObject::tr("WRN_WARNING"),
-                              QObject::tr("WRN_STUDY_LOCKED") );
-    return;
+  if ( appStudy ) {
+    _PTR(Study) aStudy = appStudy->studyDS();
+    if ( aStudy->GetProperties()->IsLocked() ) {
+      SUIT_MessageBox::warning( desktop(),
+                                QObject::tr("WRN_WARNING"),
+                                QObject::tr("WRN_STUDY_LOCKED") );
+      return;
+    }
   }
 
   QStringList filtersList;
@@ -1153,20 +1197,25 @@ void SalomeApp_Application::updateDesktopTitle() {
 
 int SalomeApp_Application::closeChoice( const QString& docName )
 {
-  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ), tr( "APPCLOSE_DESCRIPTION" ),
-                                          tr ("APPCLOSE_SAVE"), tr ("APPCLOSE_CLOSE"),
-					  //tr ("APPCLOSE_UNLOAD"), 
-					  tr ("APPCLOSE_CANCEL"), 0 );
+  QStringList buttons;
+  QMap<int, int> choices;
+  int idx = 0;
+  buttons << tr ("APPCLOSE_SAVE");                // Save & Close
+  choices.insert( idx++, CloseSave );             // ...
+  buttons << tr ("APPCLOSE_CLOSE");               // Close w/o saving
+  choices.insert( idx++, CloseDiscard );          // ...
+  if ( myIsCloseFromExit ) {
+    buttons << tr ("APPCLOSE_UNLOAD_SAVE");       // Save & Disconnect
+    choices.insert( idx++, CloseDisconnectSave );     // ...
+    buttons << tr ("APPCLOSE_UNLOAD");            // Disconnect
+    choices.insert( idx++, CloseDisconnect );         // ...
+  }
+  buttons << tr ("APPCLOSE_CANCEL");              // Cancel
+  choices.insert( idx++, CloseCancel );           // ...
 
-  int res = CloseCancel;
-  if ( answer == 0 )
-    res = CloseSave;
-  else if ( answer == 1 )
-    res = CloseDiscard;
-  // else if ( answer == 2 )
-  //   res = CloseUnload;
-
-  return res;
+  int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ),
+					  tr( "APPCLOSE_DESCRIPTION" ), buttons, 0 );
+  return choices[answer];
 }
 
 bool SalomeApp_Application::closeAction( const int choice, bool& closePermanently )
@@ -1182,14 +1231,19 @@ bool SalomeApp_Application::closeAction( const int choice, bool& closePermanentl
     break;
   case CloseDiscard:
     break;
-  case CloseUnload:
+  case CloseDisconnectSave:
+    if ( activeStudy()->isSaved() )
+      onSaveDoc();
+    else if ( !onSaveAsDoc() )
+      res = false;
+  case CloseDisconnect:
+    closeActiveDoc( false );
     closePermanently = false;
     break;
   case CloseCancel:
   default:
     res = false;
   }
-
   return res;
 }
 
@@ -1268,8 +1322,7 @@ QMap<int, QString> SalomeApp_Application::activateModuleActions() const
 {
   QMap<int, QString> opmap = LightApp_Application::activateModuleActions();
 
-  // rnv commented : implementation of the mono-study in GUI
-  // opmap.insert( LoadStudyId,     tr( "ACTIVATE_MODULE_OP_LOAD" ) );
+  opmap.insert( LoadStudyId,     tr( "ACTIVATE_MODULE_OP_LOAD" ) );
 
   opmap.insert( NewAndScriptId,  tr( "ACTIVATE_MODULE_OP_SCRIPT" ) );
   return opmap;
@@ -2050,42 +2103,15 @@ void SalomeApp_Application::afterCloseDoc()
 /*
   Asks to close existing document.
 */
-bool SalomeApp_Application::checkExistingDoc() {
-  bool result = true;
-  if( activeStudy() ) {
-    int answer = SUIT_MessageBox::question( desktop(), 
-					    tr( "APPCLOSE_CAPTION" ), 
-					    tr( "STUDYCLOSE_DESCRIPTION" ),
-					    tr( "APPCLOSE_SAVE" ), 
-					    tr( "APPCLOSE_CLOSE" ),
-					    tr( "APPCLOSE_CANCEL" ), 0 );
-    if(answer == 0) {
-      if ( activeStudy()->isSaved() ) {
-	onSaveDoc();
-	closeDoc( false );
-      } else if ( onSaveAsDoc() ) {
-	if( !closeDoc( false ) ) {
-	  result = false;
-	}
-      } else {
-	result = false;
-      }	
-    }
-    else if( answer == 1 ) {
-      closeDoc( false );
-    } else if( answer == 2 ) {
-      result = false;
-    }
-  } else {
+bool SalomeApp_Application::checkExistingDoc()
+{
+  bool result = LightApp_Application::checkExistingDoc();
+  if ( result && !activeStudy() ) {
     SALOMEDSClient_StudyManager* aMgr = studyMgr();
-    if( aMgr ) {
+    if ( aMgr ) {
       std::vector<std::string> List = studyMgr()->GetOpenStudies();
       if( List.size() > 0 ) {
-        int answer = SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "QUE_ACTIVEDOC_LOAD" ),
-                                                SUIT_MessageBox::Yes | SUIT_MessageBox::No, SUIT_MessageBox::No );
-        if ( answer == SUIT_MessageBox::Yes ) {
-	  onLoadDoc();
-	}
+        SUIT_MessageBox::critical( desktop(), tr( "WRN_WARNING" ), tr( "ERR_ACTIVEDOC_LOAD" ));
 	result = false;
       }
     }

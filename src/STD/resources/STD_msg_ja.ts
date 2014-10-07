@@ -356,10 +356,6 @@
       <translation>アプリケーションを終了</translation>
     </message>
     <message>
-      <source>TOT_DESK_FILE_LOAD</source>
-      <translation>ドキュメントを読み込む</translation>
-    </message>
-    <message>
       <source>TOT_DESK_FILE_OPEN</source>
       <translation>文書を開く</translation>
     </message>
@@ -384,10 +380,6 @@
       <translation>現在のドキュメントを保存</translation>
     </message>
     <message>
-      <source>PRP_DESK_FILE_LOAD</source>
-      <translation>ドキュメントを読み込み</translation>
-    </message>
-    <message>
       <source>PRP_DESK_WINDOW_HTILE</source>
       <translation>ウィンドウを左右に並べて表示</translation>
     </message>
@@ -410,10 +402,6 @@
     <message>
       <source>MEN_DESK_FILE_REOPEN</source>
       <translation>再読み込み</translation>
-    </message>
-    <message>
-      <source>MEN_DESK_FILE_LOAD</source>
-      <translation>接続...(&amp;e)</translation>
     </message>
     <message>
       <source>MEN_DESK_FILE_SAVE</source>

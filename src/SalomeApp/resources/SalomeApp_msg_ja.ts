@@ -12,13 +12,8 @@
       <translation>ファイル %1 は存在しません。</translation>
     </message>
     <message>
-      <source>QUE_ACTIVEDOC_LOAD</source>
-      <translation>セッションにスタディがあります。読み込みますか？</translation>
-    </message>
-    <message>
-      <source>STUDYCLOSE_DESCRIPTION</source>
-      <translation>既存のスタディを閉じる必要があります。閉じますか？
-</translation>
+      <source>ERR_ACTIVEDOC_LOAD</source>
+      <translation type="unfinished">A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.</translation>
     </message>
     <message>
       <source>WRN_STUDY_LOCKED</source>
@@ -114,6 +109,30 @@
       <source>CREATE_DOCUMENT_PROBLEM</source>
       <translation>ドキュメント作成中に不明な問題が発生しました</translation>
     </message>
+    <message>
+      <source>TOT_DESK_CONNECT_STUDY</source>
+      <translation type="unfinished">Connect study</translation>
+    </message>
+    <message>
+      <source>TOT_DESK_DISCONNECT_STUDY</source>
+      <translation type="unfinished">Disconnect study</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_CONNECT</source>
+      <translation type="unfinished">Connect active study</translation>
+    </message>
+    <message>
+      <source>PRP_DESK_DISCONNECT</source>
+      <translation type="unfinished">Disconnect the current study</translation>
+    </message>
+    <message>
+      <source>MEN_DESK_CONNECT</source>
+      <translation type="unfinished">Conn&amp;ect</translation>
+    </message>
+    <message>
+      <source>MEN_DESK_DISCONNECT</source>
+      <translation type="unfinished">D&amp;isconnect</translation>
+    </message>
   </context>
   <context>
     <name>SalomeApp_Application</name>
@@ -122,12 +141,12 @@
       <translation>すべてのファイル (*. *)</translation>
     </message>
     <message>
-      <source>APPCLOSE_UNLOAD</source>
-      <translation>アンロード(&amp;U)</translation>
+        <source>APPCLOSE_UNLOAD</source>
+        <translation type="unfinished">&amp;Disconnect w/o saving</translation>
     </message>
     <message>
-      <source>APPCLOSE_CLOSE</source>
-      <translation>保存せずに閉じる(&amp;C)</translation>
+        <source>APPCLOSE_UNLOAD_SAVE</source>
+        <translation type="unfinished">S&amp;ave &amp;&amp; Disconnect</translation>
     </message>
     <message>
       <source>MEN_WINDOWS_NEW</source>
@@ -152,10 +171,6 @@
     <message>
       <source>MEN_DESK_REGISTRY_DISPLAY</source>
       <translation>レジストリの表示(&amp;D)</translation>
-    </message>
-    <message>
-      <source>APPCLOSE_SAVE</source>
-      <translation>保存して閉じる(&amp;S)</translation>
     </message>
     <message>
       <source>TOT_DESK_FILE_LOAD_SCRIPT</source>
@@ -248,10 +263,6 @@
     <message>
       <source>STUDY_LOCKED</source>
       <translation>ロック</translation>
-    </message>
-    <message>
-      <source>APPCLOSE_CANCEL</source>
-      <translation>キャンセル(&amp;C)</translation>
     </message>
     <message>
       <source>OBJ_BROWSER_NAME</source>
@@ -358,10 +369,6 @@
       <translation>変数をレジストリに追加します。</translation>
     </message>
     <message>
-      <source>APPCLOSE_CAPTION</source>
-      <translation>現在のスタディを閉じる</translation>
-    </message>
-    <message>
       <source>MEN_DESK_MRU</source>
       <translation>最近のスタディ</translation>
     </message>
@@ -371,7 +378,7 @@
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_LOAD</source>
-      <translation>読込み(&amp;L)</translation>
+      <translation type="unfinished">&amp;Connect</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_SCRIPT</source>
@@ -400,6 +407,22 @@
     <message>
       <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
       <translation>モジュールにチェックイン</translation>
+    </message>
+    <message>
+      <source>DISCONNECT_CAPTION</source>
+      <translation type="unfinished">Disconnect active study</translation>
+    </message>
+    <message>
+      <source>DISCONNECT_DESCRIPTION</source>
+      <translation type="unfinished">Do you want to save study before disconnect?</translation>
+    </message>
+    <message>
+      <source>DISCONNECT_SAVE</source>
+      <translation type="unfinished">&amp;Save &amp;&amp; Disconnect</translation>
+    </message>
+    <message>
+      <source>DISCONNECT_WO_SAVE</source>
+      <translation type="unfinished">&amp;Disconnect w/o saving</translation>
     </message>
   </context>
   <context>

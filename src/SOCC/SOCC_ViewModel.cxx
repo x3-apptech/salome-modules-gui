@@ -158,16 +158,6 @@ bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
 {
   AIS_ListOfInteractive List;
   getAISContext()->DisplayedObjects(List);
-
-#if OCC_VERSION_LARGE <= 0x06060000
-  if( !onlyInViewer ) {
-    AIS_ListOfInteractive List1;
-    getAISContext()->ObjectsInCollector(List1);
-    List.Append(List1);
-}
-#endif
-
-
   AIS_ListIteratorOfListOfInteractive ite(List);
   for ( ; ite.More(); ite.Next() )
   {
@@ -362,29 +352,6 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
           continue;
         }
 
-#if OCC_VERSION_LARGE <= 0x06060000
-      // then try to find presentation in the collector
-      if(ic->IsInCollector(anAIS))
-        {
-          ic->DisplayFromCollector( anAIS, false );
-          // Deactivate object if necessary
-          if ( !anOCCPrs->ToActivate() )
-            ic->Deactivate( anAIS );
-
-          // Set visibility flag
-          // Temporarily commented to avoid awful dependecy on SALOMEDS
-          // TODO: better mechanism of storing display/erse status in a study
-          // should be provided...
-          //Handle(SALOME_InteractiveObject) anObj =
-          //  Handle(SALOME_InteractiveObject)::DownCast( anAIS->GetOwner() );
-          //if ( !anObj.IsNull() && anObj->hasEntry() )
-          //{
-          //  if ( study )
-          //    ToolsGUI::SetVisibility( study, anObj->getEntry(), true, this );
-          //}
-          continue;
-        }
-#endif
       // if object is not displayed and not found in the collector - display it
       if ( anAIS->IsKind( STANDARD_TYPE(AIS_Trihedron) ) )
       {
@@ -400,14 +367,12 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
       {
         aSh->SetClippable (prs->IsClippable());
         applyExistingClipPlanesToObject (anAIS);
-#if OCC_VERSION_LARGE > 0x06050200
         bool top = (aSh->isTopLevel() && aSh->switchTopLevel());
 	      ic->SetZLayer( aSh, top ? getTopLayerId() : 0 );
 		    if(!aSh->toActivate())
         {
 			    ic->Deactivate( aSh );
 		    }
-#endif
       }
 
       //Register anAIS (if it has an entry) in entry2aisobjects map
@@ -481,11 +446,7 @@ void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
     Handle(AIS_InteractiveObject) anAIS = aIter.Value();
     if ( !anAIS.IsNull() ) {
       // erase the object from context : move it to collector
-#if OCC_VERSION_LARGE <= 0x06060000
-      ic->Erase( anAIS, false, forced ? false : true );
-#else
       ic->Erase( anAIS, false );
-#endif
       // Set visibility flag if necessary
       // Temporarily commented to avoid awful dependecy on SALOMEDS
       // TODO: better mechanism of storing display/erse status in a study
@@ -535,11 +496,7 @@ void SOCC_Viewer::EraseAll( const bool forced )
 
     // erase an object
     Handle(AIS_InteractiveObject) anIO = anIter.Value();
-#if OCC_VERSION_LARGE <= 0x06060000
-    ic->Erase( anIO, false, forced ? false : true );
-#else
     ic->Erase( anIO, false );
-#endif
     
     // Set visibility flag if necessary
     // Temporarily commented to avoid awful dependecy on SALOMEDS
@@ -579,11 +536,7 @@ SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
         for ( unsigned int ind = 0; ind < List.size(); ind++ )
           {
             Handle(AIS_InteractiveObject) anAIS=List[ind];
-            if(ic->IsDisplayed(anAIS)
-#if OCC_VERSION_LARGE <= 0x06060000
-               || ic->IsInCollector(anAIS)
-#endif
-              )
+            if(ic->IsDisplayed(anAIS))
               {
                 prs->AddObject( anAIS );
               }

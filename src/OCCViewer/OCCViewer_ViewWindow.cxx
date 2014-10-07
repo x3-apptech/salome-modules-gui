@@ -83,11 +83,8 @@
 #include <gp_GTrsf.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 
-#if OCC_VERSION_LARGE > 0x06060000 
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 #include <Graphic3d_ClipPlane.hxx>
-
-#endif
 
 #include <Image_PixMap.hxx>
 
@@ -1391,9 +1388,7 @@ void OCCViewer_ViewWindow::createToolBar()
   }
   toolMgr()->append( DumpId, tid );
   toolMgr()->append( SwitchInteractionStyleId, tid );
-#if OCC_VERSION_LARGE > 0x0603000A // available only with OCC-6.3-sp11 and higher version
   toolMgr()->append( SwitchZoomingStyleId, tid );
-#endif
   toolMgr()->append( SwitchPreselectionId, tid );
   toolMgr()->append( SwitchSelectionId, tid );
   if( myModel->trihedronActivated() )
@@ -1440,9 +1435,7 @@ void OCCViewer_ViewWindow::createToolBar()
   toolMgr()->append( toolMgr()->separator(), tid );
   toolMgr()->append( ClippingId, tid );
   toolMgr()->append( AxialScaleId, tid );
-#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
   toolMgr()->append( GraduatedAxesId, tid );
-#endif
   toolMgr()->append( AmbientId, tid );
 
   toolMgr()->append( MaximizedId, tid );
@@ -1729,7 +1722,6 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
     myModel->setTrihedronShown( anItem.isVisible );
     myModel->setTrihedronSize( anItem.size );
         
-#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
     // graduated trihedron
     bool anIsVisible = anItem.gtIsVisible;
     OCCViewer_AxisWidget::AxisData anAxisData[3];
@@ -1775,7 +1767,6 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
 
     myCubeAxesDlg->SetData( anIsVisible, anAxisData );
     myCubeAxesDlg->ApplyData( aView3d );
-#endif
 
   } // if ( !baseParamsOnly )
 
@@ -2115,7 +2106,6 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   aView3d->Center( params.centerX, params.centerY );
 #endif
 
-#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 and higher version
   // graduated trihedron
   bool anIsVisible = false;
   OCCViewer_AxisWidget::AxisData anAxisData[3];
@@ -2161,7 +2151,6 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   params.gtTickmarkLengthX = anAxisData[0].TickmarkLength;
   params.gtTickmarkLengthY = anAxisData[1].TickmarkLength;
   params.gtTickmarkLengthZ = anAxisData[2].TickmarkLength;
-#endif
 
   return params;
 }
@@ -2238,8 +2227,6 @@ QString OCCViewer_ViewWindow::getVisualParameters()
     data << ClippingPlane;
   }
 
-
-#if OCC_VERSION_LARGE > 0x06030009 // available only with OCC-6.3-sp10 or newer version
   // graduated trihedron
   data << QString( "gtIsVisible=%1" )      .arg( params.gtIsVisible );
   data << QString( "gtDrawNameX=%1" )      .arg( params.gtDrawNameX );
@@ -2281,7 +2268,6 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "gtTickmarkLengthX=%1" ).arg( params.gtTickmarkLengthX );
   data << QString( "gtTickmarkLengthY=%1" ).arg( params.gtTickmarkLengthY );
   data << QString( "gtTickmarkLengthZ=%1" ).arg( params.gtTickmarkLengthZ );
-#endif
   QString bg = Qtx::backgroundToString( background() ).replace( "=", "$" );
   data << QString( "background=%1" ).arg( bg );
 
