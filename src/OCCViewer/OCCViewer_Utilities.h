@@ -18,8 +18,10 @@ public:
    * Set 2D mode for the viewer. Hide or show 3D actions.
    * \param theViewer an OCC viewer
    * \param theMode OCC view window mode
+   * \return the old 2d mode.
    */
-  static void setViewer2DMode( OCCViewer_Viewer* theViewer,
+  static OCCViewer_ViewWindow::Mode2dType
+              setViewer2DMode( OCCViewer_Viewer* theViewer,
                                const OCCViewer_ViewWindow::Mode2dType& theMode );
 
 };

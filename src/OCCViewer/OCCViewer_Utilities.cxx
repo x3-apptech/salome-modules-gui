@@ -11,16 +11,19 @@
 
 #include <QAction>
 
-void OCCViewer_Utilities::setViewer2DMode( OCCViewer_Viewer* theViewer,
+OCCViewer_ViewWindow::Mode2dType OCCViewer_Utilities::setViewer2DMode
+                                         ( OCCViewer_Viewer* theViewer,
                                            const OCCViewer_ViewWindow::Mode2dType& theMode )
 {
+  OCCViewer_ViewWindow::Mode2dType anOldMode = OCCViewer_ViewWindow::No2dMode;
   OCCViewer_ViewFrame* aFrame = dynamic_cast<OCCViewer_ViewFrame*>
                                      ( theViewer->getViewManager()->getActiveView() );
   OCCViewer_ViewWindow* aView = aFrame ? aFrame->getView( OCCViewer_ViewFrame::MAIN_VIEW ) : 0;
   if ( !aView )
-    return;
+    return anOldMode;
 
   // set a view mode
+  anOldMode = aView->get2dMode();
   aView->set2dMode( theMode );
   bool is2dMode = theMode != OCCViewer_ViewWindow::No2dMode;
 
@@ -61,4 +64,6 @@ void OCCViewer_Utilities::setViewer2DMode( OCCViewer_Viewer* theViewer,
         break;
     }
   }
+
+  return anOldMode;
 }
