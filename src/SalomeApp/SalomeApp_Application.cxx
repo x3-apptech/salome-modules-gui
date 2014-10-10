@@ -1437,67 +1437,71 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
   // isInvalidRefs will be true, if at least one of selected objects is invalid reference
   bool isInvalidRefs = false;
   SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
-  _PTR(Study) aStudyDS = aStudy->studyDS();
-  _PTR(SObject) anObj;
-
-  for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
-    if( it.Value()->hasEntry() )
+  if ( aStudy ) {
+    _PTR(Study) aStudyDS = aStudy->studyDS();
+    _PTR(SObject) anObj;
+    
+    for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
     {
-      _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
-      while( aRefObj && aRefObj->ReferencedObject( anObj ) )
-        aRefObj = anObj;
-
-      if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
-        isInvalidRefs = true;
-    }
-
-  // Add "Delete reference" item to popup
-  if ( isInvalidRefs )
-  {
-    thePopup->addSeparator();
-    thePopup->addAction( tr( "MEN_DELETE_INVALID_REFERENCE" ), this, SLOT( onDeleteInvalidReferences() ) );
-    return;
-  }
-
-  // "Activate module" item should appear only if it's necessary
-  if ( aList.Extent() == 1 ) {
-    aList.Clear();
-    mgr->selectedObjects( aList );
-
-    Handle(SALOME_InteractiveObject) aIObj = aList.First();
-
-    // add extra popup menu (defined in XML)
-    if ( myExtActions.size() > 0 ) {
-      // Use only first selected object
-      SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-      if ( study ) {
-        _PTR(Study) stdDS = study->studyDS();
-        if ( stdDS ) {
-          _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
-          if ( aSO ) {
-            _PTR( GenericAttribute ) anAttr;
-            std::string auid = "AttributeUserID";
-            auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
-            if ( aSO->FindAttribute( anAttr, auid ) ) {
-              _PTR(AttributeUserID) aAttrID = anAttr;
-              QString aId = aAttrID->Value().c_str();
-              if ( myExtActions.contains( aId ) ) {
-                thePopup->addAction(myExtActions[aId]);
-              }
-            }
-          }
-        }
+      if( it.Value()->hasEntry() )
+      {
+	_PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
+	while( aRefObj && aRefObj->ReferencedObject( anObj ) )
+	  aRefObj = anObj;
+	
+	if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
+	  isInvalidRefs = true;
       }
     }
+    
+    // Add "Delete reference" item to popup
+    if ( isInvalidRefs )
+    {
+      thePopup->addSeparator();
+      thePopup->addAction( tr( "MEN_DELETE_INVALID_REFERENCE" ), this, SLOT( onDeleteInvalidReferences() ) );
+      return;
+    }
 
-    // check if item is a "GUI state" item (also a first level object)
-    QString entry( aIObj->getEntry() );
-    if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
-      QString aModuleName( aIObj->getComponentDataType() );
-      QString aModuleTitle = moduleTitle( aModuleName );
-      CAM_Module* currentModule = activeModule();
-      if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
-        thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
+    // "Activate module" item should appear only if it's necessary
+    if ( aList.Extent() == 1 ) {
+      aList.Clear();
+      mgr->selectedObjects( aList );
+      
+      Handle(SALOME_InteractiveObject) aIObj = aList.First();
+      
+      // add extra popup menu (defined in XML)
+      if ( myExtActions.size() > 0 ) {
+	// Use only first selected object
+	SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+	if ( study ) {
+	  _PTR(Study) stdDS = study->studyDS();
+	  if ( stdDS ) {
+	    _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
+	    if ( aSO ) {
+	      _PTR( GenericAttribute ) anAttr;
+	      std::string auid = "AttributeUserID";
+	      auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
+	      if ( aSO->FindAttribute( anAttr, auid ) ) {
+		_PTR(AttributeUserID) aAttrID = anAttr;
+		QString aId = aAttrID->Value().c_str();
+		if ( myExtActions.contains( aId ) ) {
+		  thePopup->addAction(myExtActions[aId]);
+		}
+	      }
+	    }
+	  }
+	}
+      }
+      
+      // check if item is a "GUI state" item (also a first level object)
+      QString entry( aIObj->getEntry() );
+      if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
+	QString aModuleName( aIObj->getComponentDataType() );
+	QString aModuleTitle = moduleTitle( aModuleName );
+	CAM_Module* currentModule = activeModule();
+	if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
+	  thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
+      }
     }
   }
 
