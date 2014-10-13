@@ -295,6 +295,9 @@ public:
   static QList<double>     getPlot2dFitRangeCurrent(const int);
   static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax);
 
+//  static void              initializeParaViewGUI();
+  static void              processEvents();
+
   // the following methods are obsolete
   static void              addStringSetting( const QString&, const QString&, bool = true );
   static void              addIntSetting   ( const QString&, const int,      bool = true );
@@ -307,6 +310,7 @@ public:
 
   static void              startPyLog(const QString&);
   static void              stopPyLog();
+
 };
 
 #endif // SALOME_PYQT_H

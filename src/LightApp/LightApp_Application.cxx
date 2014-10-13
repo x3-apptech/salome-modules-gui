@@ -150,6 +150,13 @@
   #include "LightApp_GVSelector.h"
 #endif
 
+#ifndef DISABLE_PVVIEWER
+  #include "PVViewer_ViewManager.h"
+  #include "PVViewer_ViewWindow.h"
+  #include "PVViewer_ViewModel.h"
+#endif
+
+
 #define VISIBILITY_COLUMN_WIDTH 25
 
 #include <QDir>
@@ -730,6 +737,9 @@ void LightApp_Application::createActions()
 #ifndef DISABLE_GRAPHICSVIEW
   createActionForViewer( NewGraphicsViewId, newWinMenu, QString::number( 5 ), Qt::ALT+Qt::Key_R );
 #endif
+#ifndef DISABLE_PVVIEWER
+  createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_W );
+#endif
 
   createAction( RenameId, tr( "TOT_RENAME" ), QIcon(), tr( "MEN_DESK_RENAME" ), tr( "PRP_RENAME" ),
                 Qt::ALT+Qt::SHIFT+Qt::Key_R, desk, false, this, SLOT( onRenameWindow() ) );
@@ -848,6 +858,11 @@ void LightApp_Application::onNewWindow()
 #ifndef DISABLE_GRAPHICSVIEW
   case NewGraphicsViewId:
     type = GraphicsView_Viewer::Type();
+    break;
+#endif
+#ifndef DISABLE_PVVIEWER
+  case NewPVViewId:
+    type = PVViewer_Viewer::Type();
     break;
 #endif
   }
@@ -991,6 +1006,12 @@ void LightApp_Application::updateCommandsStatus()
 
 #ifndef DISABLE_GRAPHICSVIEW
   a = action( NewGraphicsViewId );
+  if( a )
+    a->setEnabled( activeStudy() );
+#endif
+
+#ifndef DISABLE_PVVIEWER
+  a = action( NewPVViewId );
   if( a )
     a->setEnabled( activeStudy() );
 #endif
@@ -1426,6 +1447,12 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   {
     viewMgr = new GraphicsView_ViewManager( activeStudy(), desktop() );
     new LightApp_GVSelector( (GraphicsView_Viewer*)viewMgr->getViewModel(), mySelMgr );
+  }
+#endif
+#ifndef DISABLE_PVVIEWER
+  if( vmType == PVViewer_Viewer::Type() )
+  {
+    viewMgr = new PVViewer_ViewManager( activeStudy(), desktop() );
   }
 #endif
 #ifndef DISABLE_OCCVIEWER
@@ -3936,6 +3963,9 @@ QStringList LightApp_Application::viewManagersTypes() const
 #endif
 #ifndef DISABLE_QXGRAPHVIEWER
   aTypesList<<QxScene_Viewer::Type();
+#endif
+#ifndef DISABLE_PVVIEWER
+  aTypesList<<PVViewer_Viewer::Type();
 #endif
 #ifndef DISABLE_OCCVIEWER
   aTypesList<<OCCViewer_Viewer::Type();

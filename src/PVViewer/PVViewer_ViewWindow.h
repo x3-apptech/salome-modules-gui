@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2014  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2010-2014  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,27 +16,42 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
+// File   : Plot2d_ViewWindow.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
 
-#include "PyConsole.h"
+#ifndef PVViewer_VIEWWINDOW_H
+#define PVViewer_VIEWWINDOW_H
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include <SUIT_ViewWindow.h>
+#include <QMap>
 
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+class SUIT_Desktop;
+class PVViewer_Viewer;
+class pqTabbedMultiViewWidget;
+
+class PVViewer_ViewWindow : public SUIT_ViewWindow
 {
-public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
+  Q_OBJECT
 
-  virtual int afterRun();
-  virtual int beforeRun();
+public:
+  PVViewer_ViewWindow( SUIT_Desktop*, PVViewer_Viewer* );
+  virtual ~PVViewer_ViewWindow();
+
+  virtual QString   getVisualParameters();
+  virtual void      setVisualParameters( const QString& );
+  
+  pqTabbedMultiViewWidget*    getMultiViewManager() const;
+
+signals:
+  void applyRequest();
+
+public slots:
+  void onEmulateApply();
+
+private:
+  PVViewer_Viewer*     myModel;
+  pqTabbedMultiViewWidget*    myPVMgr;
 };
 
-#endif // PYCONSOLE_INTERP_H
+#endif // PLOT2D_VIEWWINDOW_H

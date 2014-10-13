@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2014  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2010-2014  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,27 +16,40 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
-//
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
 
-#include "PyConsole.h"
+#ifndef PVGUIBEHAVIORS_H_
+#define PVGUIBEHAVIORS_H_
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include <QObject>
 
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+class SalomeApp_Module;
+class SUIT_Desktop;
+class pqPropertiesPanel;
+
+/**!
+ * PARAVIS behaviors - mimic what is done in
+ *    Qt/ApplicationComponents/pqParaViewBehaviors.cxx
+ * Except a few ones, behaviors are destroyed when the module is destroyed.
+ */
+class PVViewer_Behaviors: public QObject
 {
-public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
+  Q_OBJECT
 
-  virtual int afterRun();
-  virtual int beforeRun();
+public:
+  PVViewer_Behaviors(SUIT_Desktop * parent);
+
+  void instanciateMinimalBehaviors(SUIT_Desktop * desk);
+  void instanciateAllBehaviors(SUIT_Desktop * desk);
+
+  virtual ~PVViewer_Behaviors() {}
+
+//public slots:
+//  void onEmulateApply();
+
+private:
+  static int BehaviorLoadingLevel;
 };
 
-#endif // PYCONSOLE_INTERP_H
+#endif /* PVGUIBEHAVIORS_H_ */

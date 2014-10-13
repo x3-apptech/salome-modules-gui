@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2014  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2010-2014  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,26 +17,29 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
-//
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
+#include "PVViewer_ViewModel.h"
+#include "PVViewer_ViewWindow.h"
 
-#include "PyConsole.h"
+#include <utilities.h>
+#include <SUIT_Desktop.h>
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include <SalomeApp_Application.h>
 
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+//----------------------------------------
+PVViewer_Viewer::PVViewer_Viewer()
+:SUIT_ViewModel() 
 {
-public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
+  MESSAGE("PVViewer_Viewer: creating view model ...");
+}
 
-  virtual int afterRun();
-  virtual int beforeRun();
-};
 
-#endif // PYCONSOLE_INTERP_H
+/*!
+  Create new instance of view window on desktop \a theDesktop.
+  \retval SUIT_ViewWindow* - created view window pointer.
+*/
+SUIT_ViewWindow* PVViewer_Viewer::createView(SUIT_Desktop* theDesktop)
+{
+  PVViewer_ViewWindow* aPVView = new PVViewer_ViewWindow(theDesktop, this);
+  return aPVView;
+}
+

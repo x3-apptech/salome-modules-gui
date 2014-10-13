@@ -48,15 +48,27 @@
   Creates new python interpreter.
 */
 PyConsole_Interp::PyConsole_Interp(): PyInterp_Interp()
-{
-}
+{}
 
 /*!
   \brief Destructor.
 
   Does nothing for the moment.
 */
-PyConsole_Interp::~PyConsole_Interp()
+PyConsole_Interp::~PyConsole_Interp() { }
+
+/*! Sets the variable "__IN_SALOME_GUI_CONSOLE" to True.
+* This is not attached to a module (like salome_iapp.IN_SALOME_GUI_CONSOLE)
+* since modules are shared across all interpreters in SALOME.
+*
+* (GIL is already acquired here)
+*/
+int PyConsole_Interp::beforeRun()
 {
+  return PyRun_SimpleString("__builtins__.__IN_SALOME_GUI_CONSOLE=True");
 }
  
+int PyConsole_Interp::afterRun()
+{
+  return PyRun_SimpleString("__builtins__.__IN_SALOME_GUI_CONSOLE=False");
+}

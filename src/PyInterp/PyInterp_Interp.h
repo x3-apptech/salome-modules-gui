@@ -89,6 +89,7 @@ protected:
   std::list<std::string>::iterator _ith;
 
   virtual int beforeRun();
+  virtual int afterRun();
   int simpleRun(const char* command, const bool addToHistory = true);
 
   virtual void initPython();

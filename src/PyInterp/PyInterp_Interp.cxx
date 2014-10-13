@@ -293,7 +293,10 @@ bool PyInterp_Interp::initContext()
   _global_context = PyModule_GetDict(m);          // get interpreter global variable context
   Py_INCREF(_global_context);
   _local_context = _global_context;
-  return true;
+
+  int ret = PyRun_SimpleString("import salome_iapp;salome_iapp.IN_SALOME_GUI=True");
+
+  return ret == 0;
 }
 
 /*!
@@ -412,7 +415,9 @@ static int compile_command(const char *command, PyObject * global_ctxt, PyObject
 int PyInterp_Interp::run(const char *command)
 {
   beforeRun();
-  return simpleRun(command);
+  int ret = simpleRun(command);
+  afterRun();
+  return ret;
 }
 
 /**
@@ -420,6 +425,15 @@ int PyInterp_Interp::run(const char *command)
  * to acquire GIL if needed.
  */
 int PyInterp_Interp::beforeRun()
+{
+  return 0;
+}
+
+/**
+ * Called after a command is run (when calling run() method). Not thread-safe. Caller's responsability
+ * to acquire GIL if needed.
+ */
+int PyInterp_Interp::afterRun()
 {
   return 0;
 }

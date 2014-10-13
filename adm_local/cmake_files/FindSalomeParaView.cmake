@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2014  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2010-2014  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,27 +16,15 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-ADD_SUBDIRECTORY(deprecated)
+# Graphviz detection for salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
 
-# ===============================================================
-# Files to be installed
-# ===============================================================
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(ParaView PARAVIEW_USE_FILE 4)
+#MARK_AS_ADVANCED()
 
-# These files are data, module or lib files
-SET(_adm_data
-  FindQwt.cmake
-  FindGUI.cmake
-  FindSIP.cmake
-  FindPyQt4.cmake
-  FindSalomePyQt4.cmake
-  FindSalomeQt4.cmake
-  FindSalomeQwt.cmake
-  FindSalomeSIP.cmake
-  FindSalomeGUI.cmake
-  FindSalomeOpenGL.cmake
-  FindSalomeParaView.cmake
-  UsePyQt4.cmake
-  UseQt4Ext.cmake
-)
-INSTALL(FILES ${_adm_data} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})
+INCLUDE(${PARAVIEW_USE_FILE})

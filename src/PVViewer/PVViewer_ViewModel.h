@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2014  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2010-2014  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,27 +16,27 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#if !defined(_PVViewer_VIEWMODEL_H)
+#define _PVViewer_VIEWMODEL_H
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
-//
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
+#include <SUIT_ViewModel.h>
 
-#include "PyConsole.h"
+class SUIT_ViewWindow;
+class SUIT_Desktop;
+class SUIT_Desktop;
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
-
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+class PVViewer_Viewer: public SUIT_ViewModel
 {
-public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
+  Q_OBJECT
 
-  virtual int afterRun();
-  virtual int beforeRun();
+public:
+  PVViewer_Viewer();
+  virtual ~PVViewer_Viewer() {}
+
+  virtual SUIT_ViewWindow* createView(SUIT_Desktop* theDesktop);
+  virtual QString getType() const { return Type(); }
+  static QString Type() { return "ParaView"; }
 };
 
-#endif // PYCONSOLE_INTERP_H
+#endif // !defined(_PVViewer_VIEWMODEL_H)
+
