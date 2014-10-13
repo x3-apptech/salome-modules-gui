@@ -45,7 +45,7 @@ ADD_DEFINITIONS(${OMNIORB_DEFINITIONS})
 
 SET(_link_LIBRARIES 
   ${KERNEL_LDFLAGS} ${KERNEL_SALOMELocalTrace} ${KERNEL_OpUtil} 
-  ${GUI_LDFLAGS} suit Event PyInterp
+  ${GUI_LDFLAGS} suit Event PyInterp 
   ${_PARAVIEW_APP_COMPO_LIB}
 )
 
