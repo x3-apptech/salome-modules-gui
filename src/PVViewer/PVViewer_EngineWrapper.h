@@ -21,16 +21,27 @@
 #ifndef PVVIEWERENGINEWRAPPER_H_
 #define PVVIEWERENGINEWRAPPER_H_
 
-#include <PyInterp_Utils.h>
+//#include <PyInterp_Utils.h>
 #include <string>
+
+#include <SALOMEconfig.h>
+#include <SALOME_LifeCycleCORBA.hxx>
+#include <SALOMEDS_SObject.hxx>
+#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
+#include CORBA_SERVER_HEADER(SALOMEDS)
+
 
 /*!
  * Class facilitating the access to the PARAVIS engine without having to link
- * to it.
+ * to it. Documentation of the method is found in the PARAVIS module (in the idl directory).
+ *
+ * (Two implementations are provided: one with CORBA dynamic invokation from C++, one using
+ * Python - see commented elements in the .cxx file)
  */
 class PVViewer_EngineWrapper
 {
 public:
+  //! Returns the unique instance of the engine.
   static PVViewer_EngineWrapper * GetInstance();
 
   bool GetGUIConnected();
@@ -42,7 +53,9 @@ private:
   virtual ~PVViewer_EngineWrapper() {}
 
   static PVViewer_EngineWrapper * instance;
-  PyObjWrapper paravisEngine;
+  Engines::EngineComponent_var _component;
+
+  //PyObjWrapper paravisEngine;
 };
 
 #endif /* PVVIEWERENGINEWRAPPER_H_ */

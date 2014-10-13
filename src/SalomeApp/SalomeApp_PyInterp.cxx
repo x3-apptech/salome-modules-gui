@@ -78,7 +78,7 @@ int SalomeApp_PyInterp::beforeRun()
     if (ret)
       return ret;
   }
-  return true;
+  return PyConsole_EnhInterp::beforeRun();
 }
 
 void SalomeApp_PyInterp::initStudy()

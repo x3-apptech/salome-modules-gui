@@ -653,9 +653,11 @@ int main( int argc, char **argv )
     init->explicit_destroy();
 
   // After ORB destruction
-  PyGILState_Ensure();
   if(Py_IsInitialized())
-    Py_Finalize();
+    {
+      PyGILState_Ensure();
+      Py_Finalize();
+    }
 
   if ( shutdownAll )
     killOmniNames();
