@@ -37,6 +37,9 @@ class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
 public:
   PyConsole_Interp();
   ~PyConsole_Interp();
+
+  virtual int afterRun();
+  virtual int beforeRun();
 };
 
 #endif // PYCONSOLE_INTERP_H
