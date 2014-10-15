@@ -86,7 +86,7 @@ public:
   void             clear();
 
   WorkingMode      workingMode() const;
-  void             setWorkingMode( WorkingMode );
+  WorkingMode      setWorkingMode( WorkingMode );
 
   bool             value( const QString&, const QString&, int& ) const;
   bool             value( const QString&, const QString&, double& ) const;

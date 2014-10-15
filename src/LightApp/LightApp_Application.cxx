@@ -3286,14 +3286,13 @@ void LightApp_Application::loadDockWindowsState()
   else if ( activeStudy() )
     modName = "nomodule";
 
-  QtxResourceMgr::WorkingMode prevMode = aResMgr->workingMode();
-  aResMgr->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
+  QtxResourceMgr::WorkingMode prevMode = aResMgr->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
   QByteArray aDefaultState;
   aResMgr->value( "windows_geometry", modName, aDefaultState );
   QByteArray aDefaultVisibility;
   aResMgr->value( "windows_visibility", modName, aDefaultVisibility );
   bool hasDefaultVisibility = !aDefaultVisibility.isEmpty();
-  aResMgr->setWorkingMode(prevMode);
+  aResMgr->setWorkingMode( prevMode );
   
   if( !storeWin && !storeTb && aDefaultState.isEmpty() && !hasDefaultVisibility)
     return;

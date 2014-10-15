@@ -1409,11 +1409,14 @@ QtxResourceMgr::WorkingMode QtxResourceMgr::workingMode() const
   Note, that setValue() method always put the value to the user settings file.
   
   \param mode new working mode
+  \return previous working mode
   \sa workingMode(), value(), hasValue(), hasSection(), setValue()
 */
-void QtxResourceMgr::setWorkingMode( WorkingMode mode )
+QtxResourceMgr::WorkingMode QtxResourceMgr::setWorkingMode( WorkingMode mode )
 {
+  WorkingMode m = myWorkingMode;
   myWorkingMode = mode;
+  return m;
 }
 
 /*!
