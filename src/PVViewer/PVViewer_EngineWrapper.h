@@ -21,14 +21,14 @@
 #ifndef PVVIEWERENGINEWRAPPER_H_
 #define PVVIEWERENGINEWRAPPER_H_
 
-//#include <PyInterp_Utils.h>
+#include <PyInterp_Utils.h>
 #include <string>
 
-#include <SALOMEconfig.h>
-#include <SALOME_LifeCycleCORBA.hxx>
-#include <SALOMEDS_SObject.hxx>
-#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
-#include CORBA_SERVER_HEADER(SALOMEDS)
+//#include <SALOMEconfig.h>
+//#include <SALOME_LifeCycleCORBA.hxx>
+//#include <SALOMEDS_SObject.hxx>
+//#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
+//#include CORBA_SERVER_HEADER(SALOMEDS)
 
 
 /*!
@@ -53,9 +53,9 @@ private:
   virtual ~PVViewer_EngineWrapper() {}
 
   static PVViewer_EngineWrapper * instance;
-  Engines::EngineComponent_var _component;
+  //Engines::EngineComponent_var _component;
 
-  //PyObjWrapper paravisEngine;
+  PyObjWrapper paravisEngine;
 };
 
 #endif /* PVVIEWERENGINEWRAPPER_H_ */

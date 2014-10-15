@@ -23,8 +23,6 @@
 #include <utilities.h>
 #include <SUIT_Desktop.h>
 
-#include <SalomeApp_Application.h>
-
 //----------------------------------------
 PVViewer_Viewer::PVViewer_Viewer()
 :SUIT_ViewModel() 

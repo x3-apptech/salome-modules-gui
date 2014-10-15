@@ -25,7 +25,6 @@
 #include "PVViewer_EngineWrapper.h"
 
 #include <utilities.h>
-#include <SalomeApp_Application.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
@@ -34,6 +33,7 @@
 #include <PyInterp_Interp.h>
 #include <PyConsole_Interp.h>
 #include <PyConsole_Console.h>
+#include <LogWindow.h>
 
 #include <QApplication>
 #include <QStringList>
@@ -61,14 +61,14 @@ PVViewer_Behaviors * PVViewer_ViewManager::ParaviewBehaviors = NULL;
 /*!
   Constructor
 */
-PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* desk )
+PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* desk, LogWindow * logWindow )
 : SUIT_ViewManager( study, desk, new PVViewer_Viewer() ),
   desktop(desk)
 {
   MESSAGE("PARAVIS - view manager created ...")
   setTitle( tr( "PARAVIEW_VIEW_TITLE" ) );
   // Initialize minimal paraview stuff (if not already done)
-  ParaviewInitApp(desk);
+  ParaviewInitApp(desk, logWindow);
 
 //  connect(this, SIGNAL(viewCreated(SUIT_ViewWindow*)), this, SLOT(onPVViewCreated(SUIT_ViewWindow*)));
 }
@@ -83,7 +83,7 @@ pqPVApplicationCore * PVViewer_ViewManager::GetPVApplication()
   \param fullSetup whether to instanciate all behaviors or just the minimal ones.
   \return \c true if ParaView has been initialized successfully, otherwise false
 */
-bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop)
+bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop, LogWindow * logWindow)
 {
   if ( ! MyCoreApp) {
       // Obtain command-line arguments
@@ -109,7 +109,9 @@ bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop)
       }
 
       // Direct VTK log messages to our SALOME window - TODO: review this
-      vtkOutputWindow::SetInstance(PVViewer_LogWindowAdapter::New());
+      PVViewer_LogWindowAdapter * w = PVViewer_LogWindowAdapter::New();
+      w->setLogWindow(logWindow);
+      vtkOutputWindow::SetInstance(w);
 
       new pqTabbedMultiViewWidget(); // registers a "MULTIVIEW_WIDGET" on creation
 

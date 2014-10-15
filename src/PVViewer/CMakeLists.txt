@@ -27,8 +27,6 @@ INCLUDE_DIRECTORIES(${GUI_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src/SUIT
     ${CMAKE_SOURCE_DIR}/src/CAM
     ${CMAKE_SOURCE_DIR}/src/STD
-    ${CMAKE_SOURCE_DIR}/src/LightApp
-    ${CMAKE_SOURCE_DIR}/src/SalomeApp
     ${CMAKE_SOURCE_DIR}/src/Qtx
     ${CMAKE_SOURCE_DIR}/src/Event
     ${CMAKE_SOURCE_DIR}/src/PyInterp
@@ -68,10 +66,18 @@ SET(_other_HEADERS
 # header files / to install
 SET(PVViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/PVViewer_msg_en.ts
+)
+
 # --- sources ---
 
 # sources / moc wrappings
 QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / rcc wrappings
+QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / static
 SET(_other_SOURCES
@@ -88,6 +94,7 @@ SET(_other_SOURCES
 SET(PVViewer_SOURCES 
   ${_other_SOURCES} 
   ${_moc_SOURCES} 
+  ${_rcc_SOURCES}
   )
 
 # --- rules ---
@@ -95,6 +102,8 @@ ADD_LIBRARY(PVViewer ${PVViewer_SOURCES})
 
 TARGET_LINK_LIBRARIES(PVViewer ${_link_LIBRARIES})
 INSTALL(TARGETS PVViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
 # --- header and resources installation ---
 INSTALL(FILES ${PVViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

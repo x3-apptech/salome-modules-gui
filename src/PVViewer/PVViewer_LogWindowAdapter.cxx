@@ -21,7 +21,7 @@
 
 #include <vtkObjectFactory.h>
 
-#include <LightApp_Application.h>
+#include <LogWindow.h>
 #include <LogWindow.h>
 #include <SUIT_Session.h>
 #include <SALOME_Event.h>
@@ -57,7 +57,8 @@ PVViewer_LogWindowAdapter::PVViewer_LogWindowAdapter() :
   TextCount(0),
   ErrorCount(0),
   WarningCount(0),
-  GenericWarningCount(0)
+  GenericWarningCount(0),
+  logWindow(0)
 {
 }
 
@@ -85,14 +86,14 @@ const unsigned int PVViewer_LogWindowAdapter::getGenericWarningCount()
   return this->GenericWarningCount;
 }
 
-static LogWindow* getLogWindow()
-{
-  LogWindow* wnd = 0;
-  LightApp_Application* anApp = dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
-  if ( anApp )
-    wnd = anApp->logWindow();
-  return wnd;
-}
+//LogWindow* PVViewer_LogWindowAdapter::getLogWindow()
+//{
+//  LogWindow* wnd = 0;
+//  LightApp_Application* anApp = dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
+//  if ( anApp )
+//    wnd = anApp->logWindow();
+//  return wnd;
+//}
 
 void PVViewer_LogWindowAdapter::DisplayText(const char* text)
 {

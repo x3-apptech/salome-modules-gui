@@ -21,7 +21,6 @@
 #include "PVViewer_Behaviors.h"
 
 #include <SUIT_Desktop.h>
-#include <SalomeApp_Module.h>
 
 #include <pqInterfaceTracker.h>
 #include <pqApplicationCore.h>

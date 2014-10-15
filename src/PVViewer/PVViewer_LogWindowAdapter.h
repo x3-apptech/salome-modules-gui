@@ -22,6 +22,8 @@
 
 #include <vtkOutputWindow.h>
 
+class LogWindow;
+
 /*!
 vtkOutputWindow implementation that puts VTK output messages to SALOME log window.
 
@@ -45,6 +47,9 @@ public:
   //! Returns the number of generic warning messages received
   const unsigned int getGenericWarningCount();
 
+  void setLogWindow( LogWindow* w) { logWindow = w; }
+  LogWindow* getLogWindow() { return logWindow; }
+
 private:
   PVViewer_LogWindowAdapter();
   PVViewer_LogWindowAdapter(const PVViewer_LogWindowAdapter&);
@@ -55,6 +60,7 @@ private:
   unsigned int ErrorCount;
   unsigned int WarningCount;
   unsigned int GenericWarningCount;
+  LogWindow * logWindow;
 
   virtual void DisplayText(const char*);
   virtual void DisplayErrorText(const char*);

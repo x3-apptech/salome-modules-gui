@@ -30,20 +30,21 @@ class pqPVApplicationCore;
 class PVViewer_Behaviors;
 class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
+class LogWindow;
 
 class PVViewer_ViewManager : public SUIT_ViewManager
 {
   Q_OBJECT
 
 public:
-  PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop* );
+  PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop*, LogWindow *);
   ~PVViewer_ViewManager() {}
 
   static pqPVApplicationCore * GetPVApplication();
   static PVViewer_EngineWrapper * GetEngine();
 
   //! Initialize ParaView if not yet done (once per session)
-  static bool   ParaviewInitApp(SUIT_Desktop* aDesktop);
+  static bool   ParaviewInitApp(SUIT_Desktop* aDesktop, LogWindow * w);
   static void   ParaviewInitBehaviors(bool fullSetup=false, SUIT_Desktop* aDesktop=0);
   static void   ParaviewLoadConfigurations();
   static void   ParaviewCleanup();
@@ -53,7 +54,6 @@ public:
   static bool   ConnectToExternalPVServer(SUIT_Desktop* aDesktop);
 
 public slots:
-//  void onPVViewCreated(SUIT_ViewWindow*);
   void onEmulateApply();
 
 private:
