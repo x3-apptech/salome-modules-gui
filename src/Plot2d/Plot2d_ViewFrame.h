@@ -454,6 +454,8 @@ public:
 
   void applyTicks();
 
+  double extent( const QFont &font ) const;
+
 protected:
 
   void drawLabel( QPainter* painter, double value) const;

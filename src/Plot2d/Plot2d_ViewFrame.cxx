@@ -4292,6 +4292,12 @@ void Plot2d_AxisScaleDraw::draw( QPainter* painter, const QPalette & palette) co
 }
 
 
+double Plot2d_AxisScaleDraw::extent( const QFont &font ) const
+{
+  QFontMetrics fm( font );
+  return QwtScaleDraw::extent( font ) + fm.height() * 2;
+}
+
 QwtText Plot2d_AxisScaleDraw::label( double value) const
 {
   if (myLabelX.contains(value))
