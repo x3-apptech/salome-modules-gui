@@ -146,8 +146,7 @@ void LightApp_PreferencesDlg::onDefault()
     {
       if ( myPrefs && myPrefs->resourceMgr() )
         {
-          QtxResourceMgr::WorkingMode prev = myPrefs->resourceMgr()->workingMode();
-          myPrefs->resourceMgr()->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
+          QtxResourceMgr::WorkingMode prev = myPrefs->resourceMgr()->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
           myPrefs->retrieve();
           myPrefs->resourceMgr()->setWorkingMode( prev );
         }

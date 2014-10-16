@@ -1343,7 +1343,10 @@ bool QtxPagePrefFrameItem::stretch() const
 void QtxPagePrefFrameItem::setStretch( const bool on )
 {
   QSpacerItem* s = 0;
-  QLayout* l = widget() ? widget()->layout() : 0;
+  QWidget* w = widget();
+  if ( qobject_cast<QScrollArea*>( w ) )
+    w = qobject_cast<QScrollArea*>( w )->widget();
+  QLayout* l = w ? w->layout() : 0;
   for ( int i = 0; l && i < l->count() && !s; i++ )
     s = l->itemAt( i )->spacerItem();
 
