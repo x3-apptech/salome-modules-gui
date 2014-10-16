@@ -2657,7 +2657,9 @@ public:
 };
 int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height )
 {
-  return ProcessEvent( new TCreateView( type, visible, width, height ) );
+  int ret = ProcessEvent( new TCreateView( type, visible, width, height ) );
+  QCoreApplication::processEvents();
+  return ret;
 }
 
 /*!
