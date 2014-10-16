@@ -41,7 +41,7 @@ PVViewer_EngineWrapper * PVViewer_EngineWrapper::GetInstance()
 //}
 //
 //PVViewer_EngineWrapper::PVViewer_EngineWrapper()
-//// : paravisEngine(NULL)
+//// : pvserverEngine(NULL)
 //{
 //  _component = getApplication()->lcc()->FindOrLoad_Component( "FactoryServer", "PARAVIS" );
 //}
@@ -94,21 +94,20 @@ PVViewer_EngineWrapper * PVViewer_EngineWrapper::GetInstance()
 //}
 
 PVViewer_EngineWrapper::PVViewer_EngineWrapper() :
-    paravisEngine(NULL)
+    pvserverEngine(NULL)
 {
-//  const char * cmd = "import PARAVIS_utils;e=";
   PyLockWrapper lock;
-  const char* code = "import PARAVIS_utils as pa;__enginePARAVIS=pa.getEngine()";
+  const char* code = "import PVSERVER_utils as pa;__enginePVSERVER=pa.getEngine()";
   int ret = PyRun_SimpleString(const_cast<char*>(code));
 
   if (ret == -1)
-    throw SALOME_Exception("Unable to retrieve PARAVIS engine!");
+    throw SALOME_Exception("Unable to retrieve PVSERVER engine!");
 
   // Now get the reference to __engine and save the pointer.
   PyObject* main_module = PyImport_AddModule((char*)"__main__");
   PyObject* global_dict = PyModule_GetDict(main_module);
-  PyObjWrapper tmp(PyDict_GetItemString(global_dict, "__enginePARAVIS"));
-  paravisEngine = tmp;
+  PyObjWrapper tmp(PyDict_GetItemString(global_dict, "__enginePVSERVER"));
+  pvserverEngine = tmp;
 }
 
 
@@ -116,11 +115,11 @@ PVViewer_EngineWrapper::PVViewer_EngineWrapper() :
 bool PVViewer_EngineWrapper::GetGUIConnected()
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("GetGUIConnected"), NULL));
+  PyObjWrapper obj(PyObject_CallMethod(pvserverEngine, (char*)("GetGUIConnected"), NULL));
   if (!obj)
     {
       PyErr_Print();
-      throw SALOME_Exception("Unable to invoke PARAVIS engine!");
+      throw SALOME_Exception("Unable to invoke PVSERVER engine!");
     }
   return PyObject_IsTrue(obj);
 }
@@ -129,24 +128,24 @@ void PVViewer_EngineWrapper::SetGUIConnected(bool isConnected)
 {
   PyLockWrapper lock;
 
-  PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("SetGUIConnected"),
+  PyObjWrapper obj(PyObject_CallMethod(pvserverEngine, (char*)("SetGUIConnected"),
                                        (char *)"i", (int)isConnected ) );
   if (!obj)
     {
       PyErr_Print();
-      throw SALOME_Exception("Unable to invoke PARAVIS engine!");
+      throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
 }
 
 std::string PVViewer_EngineWrapper::FindOrStartPVServer(int port)
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("FindOrStartPVServer"),
+  PyObjWrapper obj(PyObject_CallMethod(pvserverEngine, (char*)("FindOrStartPVServer"),
                                          (char *)"i", port ) );
   if (!obj)
     {
       PyErr_Print();
-      throw SALOME_Exception("Unable to invoke PARAVIS engine!");
+      throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
   char * s = PyString_AsString(obj);
 
@@ -156,11 +155,11 @@ std::string PVViewer_EngineWrapper::FindOrStartPVServer(int port)
 void PVViewer_EngineWrapper::PutPythonTraceStringToEngine(const char * str)
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("PutPythonTraceStringToEngine"),
+  PyObjWrapper obj(PyObject_CallMethod(pvserverEngine, (char*)("PutPythonTraceStringToEngine"),
                                        (char *)"s",  str) );
   if (!obj)
     {
       PyErr_Print();
-      throw SALOME_Exception("Unable to invoke PARAVIS engine!");
+      throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
 }

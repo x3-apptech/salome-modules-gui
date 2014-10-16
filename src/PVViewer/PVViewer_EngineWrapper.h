@@ -56,7 +56,7 @@ private:
   static PVViewer_EngineWrapper * instance;
   //Engines::EngineComponent_var _component;
 
-  PyObjWrapper paravisEngine;
+  PyObjWrapper pvserverEngine;
 };
 
 #endif /* PVVIEWERENGINEWRAPPER_H_ */
