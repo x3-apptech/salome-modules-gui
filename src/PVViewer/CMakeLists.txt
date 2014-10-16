@@ -19,6 +19,9 @@
 
 INCLUDE(UseQt4Ext)
 
+# Install ParaView filters, etc ...
+ADD_SUBDIRECTORY(resources)
+
 # --- options ---
 
 INCLUDE_DIRECTORIES(${GUI_INCLUDE_DIRS} 

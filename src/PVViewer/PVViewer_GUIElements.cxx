@@ -35,8 +35,8 @@ PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
   propertiesPanel(0), pipelineBrowserWidget(0),
   sourcesMenu(0)
 {
-//  propertiesPanel = new pqPropertiesPanel(desk);
-//  propertiesPanel->hide();
+  propertiesPanel = new pqPropertiesPanel(desk);
+  propertiesPanel->hide();
   pipelineBrowserWidget  = new pqPipelineBrowserWidget(desk);
   pipelineBrowserWidget->hide();
 

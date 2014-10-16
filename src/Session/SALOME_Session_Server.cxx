@@ -68,6 +68,8 @@
 #include CORBA_SERVER_HEADER(SALOME_Session)
 #include CORBA_SERVER_HEADER(SALOMEDS)
 
+#include <time.h>
+
 #include <QDir>
 #include <QFile>
 #include <QApplication>
@@ -647,20 +649,28 @@ int main( int argc, char **argv )
   //PyRun_SimpleString("orb.destroy()");
 
   // Destroy the ORB:
-  MESSAGE("Explicitely destroying the ORB (hoping to kill omniORB threads ...)");
+  sleep(2);
+  //std::cout << "@@@@@ Explicitely destroying the ORB (hoping to kill omniORB threads ...)\n";
   ORB_INIT * init = SINGLETON_<ORB_INIT>::Instance();
   if (init)
     init->explicit_destroy();
+  //std::cout << "@@@@@ ORB destroyed\n";
 
   // After ORB destruction
   if(Py_IsInitialized())
     {
       PyGILState_Ensure();
+      //std::cout << "@@@@@ About to PyFinalize\n";
       Py_Finalize();
+      //std::cout << "@@@@@ DONE PyFinalize\n";
     }
 
   if ( shutdownAll )
-    killOmniNames();
+    {
+      //std::cout << "@@@@@ About to kill omni\n";
+      killOmniNames();
+      //std::cout << "@@@@@ DONE kill omni\n";
+    }
 
   MESSAGE( "Salome_Session_Server:endofserver" );
   return result;

@@ -141,7 +141,6 @@ void PVViewer_EngineWrapper::SetGUIConnected(bool isConnected)
 std::string PVViewer_EngineWrapper::FindOrStartPVServer(int port)
 {
   PyLockWrapper lock;
-
   PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("FindOrStartPVServer"),
                                          (char *)"i", port ) );
   if (!obj)
@@ -152,4 +151,16 @@ std::string PVViewer_EngineWrapper::FindOrStartPVServer(int port)
   char * s = PyString_AsString(obj);
 
   return std::string(s);
+}
+
+void PVViewer_EngineWrapper::PutPythonTraceStringToEngine(const char * str)
+{
+  PyLockWrapper lock;
+  PyObjWrapper obj(PyObject_CallMethod(paravisEngine, (char*)("PutPythonTraceStringToEngine"),
+                                       (char *)"s",  str) );
+  if (!obj)
+    {
+      PyErr_Print();
+      throw SALOME_Exception("Unable to invoke PARAVIS engine!");
+    }
 }

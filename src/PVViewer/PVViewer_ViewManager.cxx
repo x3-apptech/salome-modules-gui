@@ -65,7 +65,7 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
 : SUIT_ViewManager( study, desk, new PVViewer_Viewer() ),
   desktop(desk)
 {
-  MESSAGE("PARAVIS - view manager created ...")
+  MESSAGE("PVViewer - view manager created ...")
   setTitle( tr( "PARAVIEW_VIEW_TITLE" ) );
   // Initialize minimal paraview stuff (if not already done)
   ParaviewInitApp(desk, logWindow);
@@ -89,7 +89,7 @@ bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop, LogWindow * 
       // Obtain command-line arguments
       int argc = 0;
       char** argv = 0;
-      QString aOptions = getenv("PARAVIS_OPTIONS");
+      QString aOptions = getenv("PARAVIEW_OPTIONS");
       QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
       argv = new char*[aOptList.size() + 1];
       QStringList args = QApplication::arguments();
@@ -140,7 +140,7 @@ void PVViewer_ViewManager::ParaviewLoadConfigurations()
   if (!ConfigLoaded)
     {
       SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-      QString aPath = resMgr->stringValue("resources", "PARAVIS", QString());
+      QString aPath = resMgr->stringValue("resources", "PVViewer", QString());
       if (!aPath.isNull()) {
           MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewFilters.xml");
           MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewReaders.xml");
@@ -204,7 +204,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
   std::stringstream msg;
 
   // Try to connect to the external PVServer - gives priority to an externally specified URL:
-  QString serverUrlEnv = getenv("PARAVIS_PVSERVER_URL");
+  QString serverUrlEnv = getenv("PARAVIEW_PVSERVER_URL");
   std::string serverUrl;
   if (!serverUrlEnv.isEmpty())
     serverUrl = serverUrlEnv.toStdString();
@@ -234,13 +234,6 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
     }
   return true;
 }
-
-//void PVViewer_ViewManager::onPVViewCreated(SUIT_ViewWindow* w)
-//{
-//  PVViewer_ViewWindow * w2 = dynamic_cast<PVViewer_ViewWindow *>(w);
-//  Q_ASSERT(w2 != NULL);
-//  connect(w2, SIGNAL(applyRequest()), ParaviewBehaviors, SLOT(onEmulateApply()));
-//}
 
 void PVViewer_ViewManager::onEmulateApply()
 {

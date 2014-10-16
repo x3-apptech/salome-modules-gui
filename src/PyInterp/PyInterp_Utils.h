@@ -37,12 +37,15 @@
  */
 class PYINTERP_EXPORT PyLockWrapper
 {
-  PyGILState_STATE _gil_state;
+
 public:
   PyLockWrapper();
   ~PyLockWrapper();
 
 private:
+  PyGILState_STATE _gil_state;
+  PyThreadState * _state;
+
   // "Rule of 3" - Forbid usage of copy operator and copy-constructor
   PyLockWrapper(const PyLockWrapper & another);
   const PyLockWrapper & operator=(const PyLockWrapper & another);

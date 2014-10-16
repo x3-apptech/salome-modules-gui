@@ -24,6 +24,8 @@
 
 #include "PyInterp_Utils.h"
 
+#include <iostream>
+
 /*!
   \class PyLockWrapper
   \brief Python GIL wrapper.
@@ -35,6 +37,8 @@
 PyLockWrapper::PyLockWrapper()
 {
   _gil_state = PyGILState_Ensure();
+  // Save current thread state for later comparison
+  _state = PyGILState_GetThisThreadState();
 }
 
 /*!
@@ -42,6 +46,13 @@ PyLockWrapper::PyLockWrapper()
 */
 PyLockWrapper::~PyLockWrapper()
 {
+  PyThreadState * _currState = PyGILState_GetThisThreadState();
+  if (_currState != _state)
+    {
+      std::cout << "!!!!!!!!! PyLockWrapper inconsistency - now entering infinite loop for debugging\n";
+      while(1);
+    }
+
   PyGILState_Release(_gil_state);
 }
 

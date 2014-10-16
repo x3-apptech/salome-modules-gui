@@ -76,7 +76,6 @@ SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES}
   ${QWT_LIBRARY}
   SalomePyQtGUILight
-  SalomeApp
 ) 
 
 # --- headers ---

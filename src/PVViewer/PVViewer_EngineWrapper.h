@@ -47,6 +47,7 @@ public:
   bool GetGUIConnected();
   void SetGUIConnected(bool isConnected);
   std::string FindOrStartPVServer(int port);
+  void PutPythonTraceStringToEngine(const char *);
 
 private:
   PVViewer_EngineWrapper();
