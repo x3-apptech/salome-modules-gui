@@ -143,9 +143,7 @@ void PVViewer_ViewManager::ParaviewLoadConfigurations()
       QString aPath = resMgr->stringValue("resources", "PVViewer", QString());
       if (!aPath.isNull()) {
           MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewFilters.xml");
-          MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewReaders.xml");
           MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewSources.xml");
-          MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewWriters.xml");
       }
       ConfigLoaded = true;
     }

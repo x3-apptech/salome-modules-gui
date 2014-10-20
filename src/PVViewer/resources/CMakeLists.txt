@@ -19,9 +19,7 @@
 
 SET(dist_salomeres_DATA
   ParaViewFilters.xml
-  ParaViewReaders.xml
   ParaViewSources.xml
-  ParaViewWriters.xml
   )
 
 FOREACH(f ${dist_salomeres_DATA})
