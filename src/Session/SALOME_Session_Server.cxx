@@ -68,6 +68,10 @@
 #include CORBA_SERVER_HEADER(SALOME_Session)
 #include CORBA_SERVER_HEADER(SALOMEDS)
 
+#ifdef WIN32
+#define sleep _sleep
+#endif
+
 #include <time.h>
 
 #include <QDir>
