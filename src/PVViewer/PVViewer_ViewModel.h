@@ -19,13 +19,15 @@
 #if !defined(_PVViewer_VIEWMODEL_H)
 #define _PVViewer_VIEWMODEL_H
 
+#include "PVViewer.h"
+
 #include <SUIT_ViewModel.h>
 
 class SUIT_ViewWindow;
 class SUIT_Desktop;
 class SUIT_Desktop;
 
-class PVViewer_Viewer: public SUIT_ViewModel
+class PVVIEWER_EXPORT PVViewer_Viewer: public SUIT_ViewModel
 {
   Q_OBJECT
 

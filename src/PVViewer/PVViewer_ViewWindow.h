@@ -23,6 +23,8 @@
 #ifndef PVViewer_VIEWWINDOW_H
 #define PVViewer_VIEWWINDOW_H
 
+#include "PVViewer.h"
+
 #include <SUIT_ViewWindow.h>
 #include <QMap>
 
@@ -30,7 +32,7 @@ class SUIT_Desktop;
 class PVViewer_Viewer;
 class pqTabbedMultiViewWidget;
 
-class PVViewer_ViewWindow : public SUIT_ViewWindow
+class PVVIEWER_EXPORT PVViewer_ViewWindow : public SUIT_ViewWindow
 {
   Q_OBJECT
 

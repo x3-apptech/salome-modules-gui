@@ -20,6 +20,8 @@
 #ifndef _PVViewer_LogWindowAdapter_h
 #define _PVViewer_LogWindowAdapter_h
 
+#include "PVViewer.h"
+
 #include <vtkOutputWindow.h>
 
 class LogWindow;
@@ -32,7 +34,7 @@ vtkOutputWindow::setInstance() static method.
 
 This class is based on pqOutputWindow ParaView class.
 */
-class PVViewer_LogWindowAdapter : public vtkOutputWindow
+class PVVIEWER_EXPORT PVViewer_LogWindowAdapter : public vtkOutputWindow
 {
 public:
   static PVViewer_LogWindowAdapter *New();

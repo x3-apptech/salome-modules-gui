@@ -15,43 +15,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-// Author: Adrien Bruneton (CEA)
 
+#ifndef PVVIEWER_H
+#define PVVIEWER_H
 
-#ifndef PVGUIBEHAVIORS_H_
-#define PVGUIBEHAVIORS_H_
+#ifdef WIN32
+#if defined PVViewer_EXPORTS
+#define PVVIEWER_EXPORT __declspec(dllexport)
+#else
+#define PVVIEWER_EXPORT __declspec(dllimport)
+#endif
+#else
+#define PVVIEWER_EXPORT
+#endif
 
-#include "PVViewer.h"
-
-#include <QObject>
-
-class SalomeApp_Module;
-class SUIT_Desktop;
-class pqPropertiesPanel;
-
-/**!
- * PARAVIS behaviors - mimic what is done in
- *    Qt/ApplicationComponents/pqParaViewBehaviors.cxx
- * Except a few ones, behaviors are destroyed when the module is destroyed.
- */
-class PVVIEWER_EXPORT PVViewer_Behaviors: public QObject
-{
-  Q_OBJECT
-
-public:
-  PVViewer_Behaviors(SUIT_Desktop * parent);
-
-  void instanciateMinimalBehaviors(SUIT_Desktop * desk);
-  void instanciateAllBehaviors(SUIT_Desktop * desk);
-
-  virtual ~PVViewer_Behaviors() {}
-
-//public slots:
-//  void onEmulateApply();
-
-private:
-  static int BehaviorLoadingLevel;
-};
-
-#endif /* PVGUIBEHAVIORS_H_ */
+#endif //PVVIEWER_H

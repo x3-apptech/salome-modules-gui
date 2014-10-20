@@ -48,6 +48,7 @@ SET(_link_LIBRARIES
   ${KERNEL_LDFLAGS} ${KERNEL_SALOMELocalTrace} ${KERNEL_OpUtil} 
   ${GUI_LDFLAGS} suit Event PyInterp 
   ${_PARAVIEW_APP_COMPO_LIB}
+  vtkRenderingFreeTypeOpenGL
 )
 
 # --- headers ---
@@ -63,6 +64,7 @@ SET(_moc_HEADERS
 
 # header files / no moc processing
 SET(_other_HEADERS
+  PVViewer.h
   PVViewer_LogWindowAdapter.h
   PVViewer_EngineWrapper.h
 )

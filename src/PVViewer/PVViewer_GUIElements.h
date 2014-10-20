@@ -21,6 +21,8 @@
 #ifndef PVVIEWERGUIELEMENTS_H_
 #define PVVIEWERGUIELEMENTS_H_
 
+#include "PVViewer.h"
+
 #include <QObject>
 
 class pqPropertiesPanel;
@@ -34,7 +36,7 @@ class QMenu;
  * For example sources menu should be built *before* loading ParaView's configuration, so that the
  * list of sources gets properly populated.
  */
-class PVViewer_GUIElements: public QObject
+class PVVIEWER_EXPORT PVViewer_GUIElements: public QObject
 {
   Q_OBJECT
 

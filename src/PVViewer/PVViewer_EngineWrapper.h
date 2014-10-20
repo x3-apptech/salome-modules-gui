@@ -21,6 +21,8 @@
 #ifndef PVVIEWERENGINEWRAPPER_H_
 #define PVVIEWERENGINEWRAPPER_H_
 
+#include "PVViewer.h"
+
 #include <PyInterp_Utils.h>
 #include <string>
 
@@ -38,7 +40,7 @@
  * (Two implementations are provided: one with CORBA dynamic invokation from C++, one using
  * Python - see commented elements in the .cxx file)
  */
-class PVViewer_EngineWrapper
+class PVVIEWER_EXPORT PVViewer_EngineWrapper
 {
 public:
   //! Returns the unique instance of the engine.

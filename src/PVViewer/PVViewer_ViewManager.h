@@ -19,6 +19,8 @@
 #ifndef PVViewer_VIEWMANAGER_H
 #define PVViewer_VIEWMANAGER_H
 
+#include "PVViewer.h"
+
 #include <SUIT_ViewManager.h>
 
 class PVViewer_EngineWrapper;
@@ -32,7 +34,7 @@ class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
 class LogWindow;
 
-class PVViewer_ViewManager : public SUIT_ViewManager
+class PVVIEWER_EXPORT PVViewer_ViewManager : public SUIT_ViewManager
 {
   Q_OBJECT
 
