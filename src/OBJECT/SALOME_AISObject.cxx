@@ -20,8 +20,15 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
-//  File   : SALOME_AISObject.hxx
-//  Author : Nicolas REJNERI
+#include "SALOME_AISObject.hxx"
 
-#include "SALOME_AISObject.ixx"
+IMPLEMENT_STANDARD_HANDLE (SALOME_AISObject, AIS_InteractiveObject)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISObject, AIS_InteractiveObject)
+
+SALOME_AISObject::SALOME_AISObject()
+{
+}
+
+SALOME_AISObject::~SALOME_AISObject()
+{
+}

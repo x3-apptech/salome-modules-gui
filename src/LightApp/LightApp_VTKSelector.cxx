@@ -38,7 +38,7 @@
 
 #ifndef DISABLE_SALOMEOBJECT
   #include "SALOME_Actor.h"
-  #include "SALOME_ListIteratorOfListIO.hxx"
+  #include "SALOME_ListIO.hxx"
 #endif
 
 

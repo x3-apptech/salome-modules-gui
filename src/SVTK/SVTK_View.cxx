@@ -30,7 +30,7 @@
 #include "SVTK_Renderer.h"
 #include "SVTK_ViewWindow.h"
 #include "SVTK_RenderWindowInteractor.h"
-#include "SALOME_ListIteratorOfListIO.hxx"
+#include "SALOME_ListIO.hxx"
 
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"

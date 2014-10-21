@@ -31,7 +31,6 @@
 
 #ifndef DISABLE_SALOMEOBJECT
   #include <SALOME_ListIO.hxx>
-  #include <SALOME_ListIteratorOfListIO.hxx>
 #endif
 
 /*!

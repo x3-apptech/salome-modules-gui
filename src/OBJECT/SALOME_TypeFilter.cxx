@@ -20,25 +20,32 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : SALOME_TypeFilter.cxx
-//  Author : Nicolas REJNERI
+#include "SALOME_TypeFilter.hxx"
 
-#include "SALOME_TypeFilter.ixx"
-#include "SALOME_InteractiveObject.hxx"
+IMPLEMENT_STANDARD_HANDLE (SALOME_TypeFilter, SALOME_Filter)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_TypeFilter, SALOME_Filter)
 
 /*!
   Constructor
   \param TheKind - type of filter
 */
-SALOME_TypeFilter::SALOME_TypeFilter(const Standard_CString TheKind):
-myKind(TheKind){}
+SALOME_TypeFilter::SALOME_TypeFilter(const Standard_CString theKind)
+: myKind( theKind )
+{
+}
 
 /*!
-  \return true if object passes filter
-  \param anObj - object to be checked
+  Destructor
 */
-Standard_Boolean SALOME_TypeFilter::IsOk(const Handle(SALOME_InteractiveObject)& anObj) const 
+SALOME_TypeFilter::~SALOME_TypeFilter()
 {
-  return anObj->isComponentType( myKind );
+}
+
+/*!
+  \param theObj - object to be checked
+  \return \c true if object passes filter
+*/
+Standard_Boolean SALOME_TypeFilter::IsOk(const Handle(SALOME_InteractiveObject)& theObj) const 
+{
+  return theObj->isComponentType( myKind );
 }

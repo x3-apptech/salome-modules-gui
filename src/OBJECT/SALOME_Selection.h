@@ -20,21 +20,18 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME Selection : description of enumeration Selection_Mode
-//  File   : SALOME_Selection.h
-//  Author :
-
 #ifndef SALOME_SELECTION_H
 #define SALOME_SELECTION_H
 
-enum Selection_Mode {
- NodeSelection,
- CellSelection,
- EdgeOfCellSelection,
- EdgeSelection,
- FaceSelection,
- VolumeSelection,
- ActorSelection };
+enum Selection_Mode
+{
+  NodeSelection,
+  CellSelection,
+  EdgeOfCellSelection,
+  EdgeSelection,
+  FaceSelection,
+  VolumeSelection,
+  ActorSelection
+};
  
-#endif
-
+#endif // SALOME_SELECTION_H

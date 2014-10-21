@@ -98,7 +98,6 @@
 #include <Basics_Utils.hxx>
 
 #include <SALOME_ListIO.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
 #include <SALOME_Prs.h>
 
 

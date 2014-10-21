@@ -35,7 +35,6 @@
 #include "SUIT_ViewManager.h"
 
 #include "SALOME_ListIO.hxx"
-#include "SALOME_ListIteratorOfListIO.hxx"
 
 #include <QApplication>
 #include <QToolBar>

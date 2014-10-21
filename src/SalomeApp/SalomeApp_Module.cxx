@@ -38,7 +38,6 @@
 //#include "OB_Browser.h"
 
 #include <SALOME_ListIO.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
 #include <SALOME_InteractiveObject.hxx>
           
 #include <LightApp_DataObject.h>

@@ -20,97 +20,29 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : SALOME_TypeFilter.hxx
-//  Module : SALOME
-//
-#ifndef _SALOME_TypeFilter_HeaderFile
-#define _SALOME_TypeFilter_HeaderFile
+#ifndef SALOME_TYPEFILTER_HXX
+#define SALOME_TYPEFILTER_HXX
 
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
-#ifndef _Handle_SALOME_TypeFilter_HeaderFile
-#include "Handle_SALOME_TypeFilter.hxx"
-#endif
-
-#ifndef _Standard_CString_HeaderFile
-#include <Standard_CString.hxx>
-#endif
-#ifndef _SALOME_Filter_HeaderFile
 #include "SALOME_Filter.hxx"
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include <Handle_SALOME_InteractiveObject.hxx>
-#endif
 
-class SALOME_TypeFilter : public SALOME_Filter {
+#include <Standard.hxx>
+#include <Standard_DefineHandle.hxx>
 
+class SALOME_TypeFilter : public SALOME_Filter
+{
 public:
+  Standard_EXPORT SALOME_TypeFilter(const Standard_CString theKind);
+  Standard_EXPORT ~SALOME_TypeFilter();
 
-    inline void* operator new(size_t,void* anAddress) 
-      {
-        return anAddress;
-      }
-    inline void* operator new(size_t size) 
-      { 
-        return Standard::Allocate(size); 
-      }
-    inline void  operator delete(void *anAddress) 
-      { 
-        if (anAddress) Standard::Free((Standard_Address&)anAddress); 
-      }
-//    inline void  operator delete(void *anAddress, size_t size) 
-//      { 
-//        if (anAddress) Standard::Free((Standard_Address&)anAddress,size); 
-//      }
- // Methods PUBLIC
- // 
-Standard_EXPORT SALOME_TypeFilter(const Standard_CString aGivenKind);
-Standard_EXPORT virtual  Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& anobj) const;
-Standard_EXPORT ~SALOME_TypeFilter();
-
-
-
-
- // Type management
- //
- Standard_EXPORT friend Handle_Standard_Type& SALOME_TypeFilter_Type_();
- Standard_EXPORT const Handle(Standard_Type)& DynamicType() const;
- Standard_EXPORT Standard_Boolean              IsKind(const Handle(Standard_Type)&) const;
+  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& theObj) const;
 
 protected:
+  Standard_CString myKind;
 
- // Methods PROTECTED
- // 
-
-
- // Fields PROTECTED
- //
-Standard_CString myKind;
-
-
-private: 
-
- // Methods PRIVATE
- // 
-
-
- // Fields PRIVATE
- //
-
-
+public:
+  DEFINE_STANDARD_RTTI(SALOME_TypeFilter);
 };
 
+DEFINE_STANDARD_HANDLE(SALOME_TypeFilter, SALOME_Filter)
 
-
-
-
-// other inline functions and methods (like "C++: function call" methods)
-//
-
-
-#endif
+#endif // SALOME_TYPEFILTER_HXX

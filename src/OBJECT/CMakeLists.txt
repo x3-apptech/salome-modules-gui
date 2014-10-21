@@ -35,23 +35,12 @@ SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_TKV3d} Vie
 
 # header files / to install
 SET(SalomeObject_HEADERS
-  Handle_SALOME_AISObject.hxx
-  Handle_SALOME_AISShape.hxx
-  Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx
-  Handle_SALOME_Filter.hxx
-  Handle_SALOME_InteractiveObject.hxx
-  Handle_SALOME_ListNodeOfListIO.hxx
-  Handle_SALOME_TypeFilter.hxx
   SALOME_AISObject.hxx
   SALOME_AISShape.hxx
-  SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger.hxx
-  SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx
   SALOME_DataMapOfIOMapOfInteger.hxx
   SALOME_Filter.hxx
   SALOME_InteractiveObject.hxx
   SALOME_ListIO.hxx
-  SALOME_ListIteratorOfListIO.hxx
-  SALOME_ListNodeOfListIO.hxx
   SALOME_Selection.h
   SALOME_TypeFilter.hxx
 )
@@ -64,14 +53,8 @@ SET(SalomeObject_SOURCES
   SALOME_InteractiveObject.cxx
   SALOME_AISShape.cxx
   SALOME_AISObject.cxx
-  SALOME_ListIO_0.cxx
-  SALOME_ListIteratorOfListIO_0.cxx
-  SALOME_ListNodeOfListIO_0.cxx
   SALOME_Filter.cxx
   SALOME_TypeFilter.cxx
-  SALOME_DataMapOfIOMapOfInteger_0.cxx
-  SALOME_DataMapNodeOfDataMapOfIOMapOfInteger_0.cxx
-  SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger_0.cxx
 )
 
 # --- rules ---

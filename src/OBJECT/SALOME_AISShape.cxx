@@ -20,11 +20,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
-//  File   : SALOME_AISShape.cxx
-//  Author : Nicolas REJNERI
+#include "SALOME_AISShape.hxx"
 
-#include "SALOME_AISShape.ixx"
+IMPLEMENT_STANDARD_HANDLE (SALOME_AISShape, ViewerData_AISShape)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISShape, ViewerData_AISShape)
 
 /*!
   Constructor
@@ -32,5 +31,12 @@
 */
 SALOME_AISShape::SALOME_AISShape(const TopoDS_Shape& shape)
 : ViewerData_AISShape(shape)
+{
+}
+
+/*!
+  Destructor
+*/
+SALOME_AISShape::~SALOME_AISShape()
 {
 }

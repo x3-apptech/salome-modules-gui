@@ -22,15 +22,32 @@
 
 #include "ViewerData_AISShape.hxx"
 
+#ifdef USE_TEXTURED_SHAPE
 IMPLEMENT_STANDARD_HANDLE (ViewerData_AISShape, AIS_TexturedShape)
 IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_TexturedShape)
+#else
+IMPLEMENT_STANDARD_HANDLE (ViewerData_AISShape, AIS_Shape)
+IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_Shape)
+#endif
 
 /*!
   Constructor
   \param shape - TopoDS shape 
 */
 ViewerData_AISShape::ViewerData_AISShape (const TopoDS_Shape& theShape)
+#ifdef USE_TEXTURED_SHAPE
 : AIS_TexturedShape (theShape),
+#else
+: AIS_Shape (theShape),
+#endif
   myIsClippable (true)
 {
 }
+
+/*!
+  Destructor
+*/
+ViewerData_AISShape::~ViewerData_AISShape()
+{
+}
+

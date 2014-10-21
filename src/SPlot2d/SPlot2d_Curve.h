@@ -27,14 +27,9 @@
 
 #include "SPlot2d.h"  
 #include "Plot2d_Curve.h"
-
+#include "SALOME_InteractiveObject.hxx"
 
 #include <QSet>
-
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include <Handle_SALOME_InteractiveObject.hxx>
-#endif
-#include "SALOME_InteractiveObject.hxx"
 
 typedef QSet<QString> OwnerSet;
 

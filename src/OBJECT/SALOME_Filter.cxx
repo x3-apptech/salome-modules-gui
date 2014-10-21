@@ -20,9 +20,15 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : SALOME_Filter.cxx
-//  Author : Nicolas REJNERI
+#include "SALOME_Filter.hxx"
 
-#include "SALOME_Filter.ixx"
+IMPLEMENT_STANDARD_HANDLE (SALOME_Filter, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_Filter, MMgt_TShared)
 
+SALOME_Filter::SALOME_Filter()
+{
+}
+
+SALOME_Filter::~SALOME_Filter()
+{
+}

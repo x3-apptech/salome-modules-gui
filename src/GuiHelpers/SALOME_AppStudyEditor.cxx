@@ -24,7 +24,6 @@
 #include <SalomeApp_Study.h>
 #include <SALOME_ListIO.hxx>
 #include <LightApp_SelectionMgr.h>
-#include <SALOME_ListIteratorOfListIO.hxx>
 
 SALOME_AppStudyEditor::SALOME_AppStudyEditor(SalomeApp_Application * salomeApp)
   : SALOME_StudyEditor()

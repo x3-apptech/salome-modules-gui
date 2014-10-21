@@ -96,7 +96,7 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVAxesActor.h"
 
-#include "SALOME_ListIteratorOfListIO.hxx"
+#include "SALOME_ListIO.hxx"
 
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"

@@ -53,7 +53,6 @@
 
 #ifndef DISABLE_SALOMEOBJECT
 #include <SALOME_ListIO.hxx>
-#include <SALOME_ListIteratorOfListIO.hxx>
 #endif
 
 #ifndef DISABLE_VTKVIEWER
@@ -203,7 +202,7 @@ bool LightApp_Module::isSelectionCompatible()
     // check data type of selection
     SALOME_ListIteratorOfListIO It( selected );
     for ( ; isCompatible && It.More(); It.Next()) {
-      Handle(SALOME_InteractiveObject)& io = It.Value();
+      Handle(SALOME_InteractiveObject) io = It.Value();
       isCompatible = ( aStudy->componentDataType( io->getEntry() ) == moduleDataType );
     }
   }

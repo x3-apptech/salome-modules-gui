@@ -20,26 +20,25 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
-//  File   : SALOME_InteractiveObject.cxx
-//  Author : Nicolas REJNERI
-
 /*!
   \class SALOME_InteractiveObject SALOME_InteractiveObject.hxx
   \brief ...
 */
 
-#include "SALOME_InteractiveObject.ixx"
+#include "SALOME_InteractiveObject.hxx"
+
+IMPLEMENT_STANDARD_HANDLE (SALOME_InteractiveObject, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_InteractiveObject, MMgt_TShared)
 
 /*!
   Default constructor
 */
-SALOME_InteractiveObject::SALOME_InteractiveObject()
+SALOME_InteractiveObject::SALOME_InteractiveObject():
+  myEntry(""),
+  myName(""),
+  myComponentDataType(""),
+  myReference("")
 {
-  myEntry = "";
-  myName  = "";
-  myComponentDataType = "";
-  myReference = "";
 }
 
 /*!
@@ -58,17 +57,26 @@ SALOME_InteractiveObject::SALOME_InteractiveObject(const char* anEntry,
 {}
 
 /*!
+  Destructor
+*/
+SALOME_InteractiveObject::~SALOME_InteractiveObject()
+{
+}
+
+/*!
   Sets entry
   \param anEntry - new entry of object
 */
-void SALOME_InteractiveObject::setEntry(const char* anEntry){
+void SALOME_InteractiveObject::setEntry(const char* anEntry)
+{
   myEntry = anEntry;
 }
 
 /*!
   \return entry
 */
-const char* SALOME_InteractiveObject::getEntry(){
+const char* SALOME_InteractiveObject::getEntry()
+{
   return myEntry.c_str();
 }
 
@@ -76,14 +84,16 @@ const char* SALOME_InteractiveObject::getEntry(){
   Sets component data type
   \param aComponentDataType - component data type name
 */
-void SALOME_InteractiveObject::setComponentDataType(const char* aComponentDataType){
+void SALOME_InteractiveObject::setComponentDataType(const char* aComponentDataType)
+{
   myComponentDataType = aComponentDataType; 
 }
 
 /*!
   \return component data type
 */
-const char* SALOME_InteractiveObject::getComponentDataType(){
+const char* SALOME_InteractiveObject::getComponentDataType()
+{
   return myComponentDataType.c_str();
 }
 
@@ -91,21 +101,24 @@ const char* SALOME_InteractiveObject::getComponentDataType(){
   Sets name
   \param aName - new name of object
 */
-void SALOME_InteractiveObject::setName(const char* aName){
+void SALOME_InteractiveObject::setName(const char* aName)
+{
   myName = aName;
 }
 
 /*!
   \return name
 */
-const char* SALOME_InteractiveObject::getName(){
+const char* SALOME_InteractiveObject::getName()
+{
   return myName.c_str();
 }
 
 /*!
   \return true if entry isn't empty
 */
-Standard_Boolean SALOME_InteractiveObject::hasEntry(){
+Standard_Boolean SALOME_InteractiveObject::hasEntry()
+{
   return myEntry != "";
 }
 
@@ -113,24 +126,21 @@ Standard_Boolean SALOME_InteractiveObject::hasEntry(){
   \return true if objects have same entries
   \param anIO - other object
 */
-Standard_Boolean SALOME_InteractiveObject::isSame(const Handle(SALOME_InteractiveObject)& anIO ){
-  if ( anIO->hasEntry() && this->hasEntry() ) {
-    if ( myEntry == anIO->getEntry() )
-      return Standard_True;
-  }
-  
-  return Standard_False;
+Standard_Boolean SALOME_InteractiveObject::isSame(const Handle(SALOME_InteractiveObject)& anIO )
+{
+  Standard_Boolean r = Standard_False;
+  if ( anIO->hasEntry() && this->hasEntry() )
+    r = myEntry == anIO->getEntry();
+  return r;
 }
 
 /*!
   \return true if component data types are same
   \param ComponentDataType - component data type to be checked
 */
-Standard_Boolean SALOME_InteractiveObject::isComponentType(const char* ComponentDataType){
-  if ( myComponentDataType == ComponentDataType )
-    return Standard_True;
-  else
-    return Standard_False;
+Standard_Boolean SALOME_InteractiveObject::isComponentType(const char* ComponentDataType)
+{
+  return myComponentDataType == ComponentDataType;
 }
 
 /*!
@@ -156,4 +166,15 @@ const char* SALOME_InteractiveObject::getReference()
 void SALOME_InteractiveObject::setReference(const char* aReference)
 {
   myReference = aReference;
+}
+
+/*!
+  Compare two objects
+  \param anIO1 - first object to compare
+  \param anIO1 - second object to compare
+*/
+Standard_Boolean IsEqual(const Handle(SALOME_InteractiveObject)& anIO1,
+			 const Handle(SALOME_InteractiveObject)& anIO2)
+{
+  return anIO1->isSame( anIO2 );
 }

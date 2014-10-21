@@ -45,7 +45,6 @@
 #ifndef DISABLE_SALOMEOBJECT
   #include <SALOME_ListIO.hxx>
   #include <SALOME_InteractiveObject.hxx>
-  #include <SALOME_ListIteratorOfListIO.hxx>
 #ifndef DISABLE_OCCVIEWER
     #include <SOCC_ViewModel.h>
     #include <SOCC_ViewWindow.h>

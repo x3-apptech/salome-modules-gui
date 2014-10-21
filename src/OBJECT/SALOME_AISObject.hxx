@@ -20,100 +20,31 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
-//  File   : SALOME_AISObject.hxx
-//  Module : SALOME
-//
-#ifndef _SALOME_AISObject_HeaderFile
-#define _SALOME_AISObject_HeaderFile
+#ifndef SALOME_AISOBJECT_HXX
+#define SALOME_AISOBJECT_HXX
 
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
-#ifndef _Handle_SALOME_AISObject_HeaderFile
-#include "Handle_SALOME_AISObject.hxx"
-#endif
-
-#ifndef _AIS_InteractiveObject_HeaderFile
 #include <AIS_InteractiveObject.hxx>
-#endif
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include <Handle_SALOME_InteractiveObject.hxx>
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
-#ifndef _Standard_CString_HeaderFile
-#include <Standard_CString.hxx>
-#endif
-class SALOME_InteractiveObject;
+#include <Standard.hxx>
+#include <Standard_DefineHandle.hxx>
 
+#include "SALOME_InteractiveObject.hxx"
 
-class SALOME_AISObject : public AIS_InteractiveObject {
+class SALOME_AISObject : public AIS_InteractiveObject
+{
+public:
+  Standard_EXPORT SALOME_AISObject();
+  Standard_EXPORT ~SALOME_AISObject();
+
+  Standard_EXPORT virtual Handle_SALOME_InteractiveObject getIO() = 0;
+  Standard_EXPORT virtual Standard_Boolean hasIO() = 0;
+
+  Standard_EXPORT virtual Standard_CString getName() = 0;
+  Standard_EXPORT virtual void setName(const Standard_CString aName) = 0;
 
 public:
-
-    inline void* operator new(size_t,void* anAddress) 
-      {
-        return anAddress;
-      }
-    inline void* operator new(size_t size) 
-      { 
-        return Standard::Allocate(size); 
-      }
-    inline void  operator delete(void *anAddress) 
-      { 
-        if (anAddress) Standard::Free((Standard_Address&)anAddress); 
-      }
-//    inline void  operator delete(void *anAddress, size_t size) 
-//      { 
-//        if (anAddress) Standard::Free((Standard_Address&)anAddress,size); 
-//      }
- // Methods PUBLIC
- // 
-Standard_EXPORT virtual  Handle_SALOME_InteractiveObject getIO()  = 0;
-Standard_EXPORT virtual  Standard_Boolean hasIO()  = 0;
-Standard_EXPORT virtual  Standard_CString getName()  = 0;
-Standard_EXPORT virtual  void setName(const Standard_CString aName)  = 0;
-Standard_EXPORT ~SALOME_AISObject();
-
-
-
-
- // Type management
- //
- Standard_EXPORT friend Handle_Standard_Type& SALOME_AISObject_Type_();
- Standard_EXPORT const Handle(Standard_Type)& DynamicType() const;
- Standard_EXPORT Standard_Boolean              IsKind(const Handle(Standard_Type)&) const;
-
-protected:
-
- // Methods PROTECTED
- // 
-
-
- // Fields PROTECTED
- //
-
-
-private: 
-
- // Methods PRIVATE
- // 
-
-
- // Fields PRIVATE
- //
-
-
+  DEFINE_STANDARD_RTTI(SALOME_AISObject);
 };
 
+DEFINE_STANDARD_HANDLE(SALOME_AISObject, AIS_InteractiveObject)
 
-
-
-
-// other inline functions and methods (like "C++: function call" methods)
-//
-
-
-#endif
+#endif // SALOME_AISOBJECT_HXX

@@ -20,102 +20,14 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : SALOME_DataMapOfIOMapOfInteger.hxx
-//  Module : SALOME
+#ifndef SALOME_DATAMAPOFIOMAPOFINTEGER_HXX
+#define SALOME_DATAMAPOFIOMAPOFINTEGER_HXX
 
-#ifndef _SALOME_DataMapOfIOMapOfInteger_HeaderFile
-#define _SALOME_DataMapOfIOMapOfInteger_HeaderFile
+#include <NCollection_DataMap.hxx>
+#include <TColStd_IndexedMapOfInteger.hxx>
+#include "SALOME_InteractiveObject.hxx"
 
-#ifndef _TCollection_BasicMap_HeaderFile
-#include <TCollection_BasicMap.hxx>
-#endif
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include "Handle_SALOME_InteractiveObject.hxx"
-#endif
-#ifndef _Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger_HeaderFile
-#include "Handle_SALOME_DataMapNodeOfDataMapOfIOMapOfInteger.hxx"
-#endif
-#ifndef _Standard_Integer_HeaderFile
-#include <Standard_Integer.hxx>
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
+typedef NCollection_DataMap<Handle(SALOME_InteractiveObject), TColStd_IndexedMapOfInteger> SALOME_DataMapOfIOMapOfInteger;
+typedef SALOME_DataMapOfIOMapOfInteger::Iterator SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger;
 
-class Standard_DomainError;
-class Standard_NoSuchObject;
-class SALOME_InteractiveObject;
-class TColStd_IndexedMapOfInteger;
-class TColStd_MapTransientHasher;
-class SALOME_DataMapNodeOfDataMapOfIOMapOfInteger;
-class SALOME_DataMapIteratorOfDataMapOfIOMapOfInteger;
-
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
-#ifndef _Standard_Macro_HeaderFile
-#include <Standard_Macro.hxx>
-#endif
-
-#include <Basics_OCCTVersion.hxx>
-
-class SALOME_DataMapOfIOMapOfInteger  : public TCollection_BasicMap {
-
-public:
-
-    inline void* operator new(size_t,void* anAddress) 
-      {
-        return anAddress;
-      }
-    inline void* operator new(size_t size) 
-      { 
-        return Standard::Allocate(size); 
-      }
-    inline void  operator delete(void *anAddress) 
-      { 
-        if (anAddress) Standard::Free((Standard_Address&)anAddress); 
-      }
-
- // Methods PUBLIC
- // 
-Standard_EXPORT SALOME_DataMapOfIOMapOfInteger(const Standard_Integer NbBuckets = 1);
-Standard_EXPORT   SALOME_DataMapOfIOMapOfInteger& Assign(const SALOME_DataMapOfIOMapOfInteger& Other) ;
-  SALOME_DataMapOfIOMapOfInteger& operator =(const SALOME_DataMapOfIOMapOfInteger& Other) 
-{
-  return Assign(Other);
-}
-
-Standard_EXPORT   void ReSize(const Standard_Integer NbBuckets) ;
-Standard_EXPORT   void Clear() ;
-~SALOME_DataMapOfIOMapOfInteger()
-{
-  Clear();
-}
-
-Standard_EXPORT   Standard_Boolean Bind(const Handle(SALOME_InteractiveObject)& K,const TColStd_IndexedMapOfInteger& I) ;
-Standard_EXPORT   Standard_Boolean IsBound(const Handle(SALOME_InteractiveObject)& K) const;
-Standard_EXPORT   Standard_Boolean UnBind(const Handle(SALOME_InteractiveObject)& K) ;
-Standard_EXPORT  const TColStd_IndexedMapOfInteger& Find(const Handle(SALOME_InteractiveObject)& K) const;
- const TColStd_IndexedMapOfInteger& operator()(const Handle(SALOME_InteractiveObject)& K) const
-{
-  return Find(K);
-}
-
-Standard_EXPORT   TColStd_IndexedMapOfInteger& ChangeFind(const Handle(SALOME_InteractiveObject)& K) ;
-  TColStd_IndexedMapOfInteger& operator()(const Handle(SALOME_InteractiveObject)& K) 
-{
-  return ChangeFind(K);
-}
-
-Standard_EXPORT   Standard_Address Find1 (const Handle(SALOME_InteractiveObject)& K) const;
-Standard_EXPORT   Standard_Address ChangeFind1 (const Handle(SALOME_InteractiveObject)& K);
-
-private: 
-Standard_EXPORT SALOME_DataMapOfIOMapOfInteger(const SALOME_DataMapOfIOMapOfInteger& Other);
-};
-
-// other inline functions and methods (like "C++: function call" methods)
-//
-
-#endif
+#endif // SALOME_DATAMAPOFIOMAPOFINTEGER_HXX

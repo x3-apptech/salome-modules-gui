@@ -20,128 +20,56 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME OBJECT : implementation of interactive object visualization for OCC and VTK viewers
-//  File   : SALOME_InteractiveObject.hxx
-//  Module : SALOME
-//
-#ifndef _SALOME_InteractiveObject_HeaderFile
-#define _SALOME_InteractiveObject_HeaderFile
+#ifndef SALOME_INTERACTIVEOBJECT_HXX
+#define SALOME_INTERACTIVEOBJECT_HXX
 
-#ifndef _Standard_HeaderFile
-// E.A. : Standard.hxx defines PACKAGE and VERSION --> Pb in Werror mode
-// E.A. : --> Add the undef of PACKAGE and VERSION (really ugly !)
-#ifdef PACKAGE
-#undef PACKAGE
-#endif
-#ifdef VERSION
-#undef VERSION
-#endif
-#ifdef HAVE_FINITE
-#undef HAVE_FINITE
-#endif
-#include <Standard.hxx>
-#endif
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include "Handle_SALOME_InteractiveObject.hxx"
-#endif
-
-#ifndef _Standard_CString_HeaderFile
-#include <Standard_CString.hxx>
-#endif
-#ifndef _MMgt_TShared_HeaderFile
 #include <MMgt_TShared.hxx>
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
+#include <Standard.hxx>
+#include <Standard_DefineHandle.hxx>
 
 #include <string>
 
-class SALOME_InteractiveObject : public MMgt_TShared {
+class SALOME_InteractiveObject;
+DEFINE_STANDARD_HANDLE(SALOME_InteractiveObject, MMgt_TShared)
 
+class SALOME_InteractiveObject : public MMgt_TShared
+{
 public:
+  Standard_EXPORT   SALOME_InteractiveObject();
+  Standard_EXPORT   SALOME_InteractiveObject(const char* anEntry, 
+					     const char* aComponentDataType,
+					     const char* aName = "");
+  Standard_EXPORT   virtual ~SALOME_InteractiveObject();
 
-    void* operator new(size_t,void* anAddress) 
-      {
-        return anAddress;
-      }
-    void* operator new(size_t size) 
-      { 
-        return Standard::Allocate(size); 
-      }
-    void  operator delete(void *anAddress) 
-      { 
-        if (anAddress) Standard::Free((Standard_Address&)anAddress); 
-      }
- // Methods PUBLIC
- // 
-Standard_EXPORT   SALOME_InteractiveObject();
-Standard_EXPORT   SALOME_InteractiveObject(const char* anEntry, 
-                                           const char* aComponentDataType,
-                                           const char* aName = "");
-Standard_EXPORT   void setEntry(const char* anEntry) ;
-Standard_EXPORT   const char* getEntry() ;
-Standard_EXPORT   void setName(const char* aName) ;
-Standard_EXPORT   const char* getName() ;
-Standard_EXPORT   Standard_Boolean hasEntry() ;
-Standard_EXPORT   virtual  Standard_Boolean isSame(const Handle(SALOME_InteractiveObject)& anIO) ;
+  Standard_EXPORT   void setEntry(const char* anEntry);
+  Standard_EXPORT   const char* getEntry();
+  Standard_EXPORT   Standard_Boolean hasEntry();
+  
+  Standard_EXPORT   void setName(const char* aName);
+  Standard_EXPORT   const char* getName();
+  
+  Standard_EXPORT   virtual  Standard_Boolean isSame(const Handle(SALOME_InteractiveObject)& anIO);
 
-Standard_EXPORT   Standard_Boolean hasReference() ;
-Standard_EXPORT   const char* getReference() ;
-Standard_EXPORT   void setReference(const char* aReference) ;
+  Standard_EXPORT   void setReference(const char* aReference);
+  Standard_EXPORT   const char* getReference();
+  Standard_EXPORT   Standard_Boolean hasReference();
 
-Standard_EXPORT   void setComponentDataType(const char* ComponentDataType) ;
-Standard_EXPORT   const char* getComponentDataType() ;
-Standard_EXPORT   Standard_Boolean isComponentType(const char* ComponentDataType) ; 
-  //Standard_EXPORT   Standard_Boolean isComponentType(std::string  ComponentDataType) ; 
-Standard_EXPORT   virtual ~SALOME_InteractiveObject();
+  Standard_EXPORT   void setComponentDataType(const char* ComponentDataType);
+  Standard_EXPORT   const char* getComponentDataType();
+  Standard_EXPORT   Standard_Boolean isComponentType(const char* ComponentDataType); 
 
-// Must be defined for using by NCollection for ceratin of data map
-friend Standard_Boolean IsEqual(const Handle(SALOME_InteractiveObject)& anIO1,
-                                const Handle(SALOME_InteractiveObject)& anIO2)
-{ return anIO1->isSame( anIO2 ); }
-
-
-
-
-
- // Type management
- //
- Standard_EXPORT friend Handle_Standard_Type& SALOME_InteractiveObject_Type_();
- Standard_EXPORT const Handle(Standard_Type)& DynamicType() const;
- Standard_EXPORT Standard_Boolean              IsKind(const Handle(Standard_Type)&) const;
+  // Must be defined for using by NCollection for ceratin of data map
+  friend Standard_Boolean IsEqual(const Handle(SALOME_InteractiveObject)& anIO1,
+				  const Handle(SALOME_InteractiveObject)& anIO2);
 
 protected:
-
- // Methods PROTECTED
- // 
-
-
- // Fields PROTECTED
- //
-  std::string myReference;
   std::string myEntry;
   std::string myName;
   std::string myComponentDataType;
+  std::string myReference;
 
-private: 
-
- // Methods PRIVATE
- // 
-
-
- // Fields PRIVATE
- //
-
-
+public:
+  DEFINE_STANDARD_RTTI(SALOME_InteractiveObject);
 };
 
-
-
-
-
-// other Inline functions and methods (like "C++: function call" methods)
-//
-
-
-#endif
+#endif // SALOME_INTERACTIVEOBJECT_HXX

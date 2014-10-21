@@ -23,9 +23,9 @@
 #ifndef OCCVIEWER_VSERVICE_H
 #define OCCVIEWER_VSERVICE_H
 
-#include <Handle_Aspect_Window.hxx>
-#include <Handle_V3d_View.hxx>
-#include <Handle_V3d_Viewer.hxx>
+#include <Aspect_Window.hxx>
+#include <V3d_View.hxx>
+#include <V3d_Viewer.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_CString.hxx>
 #include <Standard_ExtString.hxx>

@@ -20,92 +20,27 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-//  File   : SALOME_Filter.hxx
-//  Module : SALOME
-//
-#ifndef _SALOME_Filter_HeaderFile
-#define _SALOME_Filter_HeaderFile
+#ifndef SALOME_FILTER_HXX
+#define SALOME_FILTER_HXX
 
-#ifndef _Standard_HeaderFile
-#include <Standard.hxx>
-#endif
-#ifndef _Handle_SALOME_Filter_HeaderFile
-#include "Handle_SALOME_Filter.hxx"
-#endif
-
-#ifndef _MMgt_TShared_HeaderFile
 #include <MMgt_TShared.hxx>
-#endif
-#ifndef _Standard_Boolean_HeaderFile
-#include <Standard_Boolean.hxx>
-#endif
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include "Handle_SALOME_InteractiveObject.hxx"
-#endif
+#include <Standard.hxx>
+#include <Standard_DefineHandle.hxx>
 
-class SALOME_Filter : public MMgt_TShared {
+#include "SALOME_InteractiveObject.hxx"
+
+class SALOME_Filter : public MMgt_TShared
+{
+public:
+  Standard_EXPORT SALOME_Filter();
+  Standard_EXPORT ~SALOME_Filter();
+
+  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& anObj) const = 0;
 
 public:
-
-    inline void* operator new(size_t,void* anAddress) 
-      {
-        return anAddress;
-      }
-    inline void* operator new(size_t size) 
-      { 
-        return Standard::Allocate(size); 
-      }
-    inline void  operator delete(void *anAddress) 
-      { 
-        if (anAddress) Standard::Free((Standard_Address&)anAddress); 
-      }
-//    inline void  operator delete(void *anAddress, size_t size) 
-//      { 
-//        if (anAddress) Standard::Free((Standard_Address&)anAddress,size); 
-//      }
- // Methods PUBLIC
- // 
-Standard_EXPORT virtual  Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& anObj) const = 0;
-Standard_EXPORT ~SALOME_Filter();
-
-
-
-
- // Type management
- //
- Standard_EXPORT friend Handle_Standard_Type& SALOME_Filter_Type_();
- Standard_EXPORT const Handle(Standard_Type)& DynamicType() const;
- Standard_EXPORT Standard_Boolean             IsKind(const Handle(Standard_Type)&) const;
-
-protected:
-
- // Methods PROTECTED
- // 
-
-
- // Fields PROTECTED
- //
-
-
-private: 
-
- // Methods PRIVATE
- // 
-
-
- // Fields PRIVATE
- //
-
-
+  DEFINE_STANDARD_RTTI(SALOME_Filter);
 };
 
+DEFINE_STANDARD_HANDLE(SALOME_Filter, MMgt_TShared)
 
-
-
-
-// other inline functions and methods (like "C++: function call" methods)
-//
-
-
-#endif
+#endif // SALOME_FILTER_HXX

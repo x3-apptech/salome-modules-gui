@@ -32,7 +32,6 @@
 
 #ifndef DISABLE_SALOMEOBJECT
   #include <SALOME_ListIO.hxx>
-  #include <SALOME_ListIteratorOfListIO.hxx>
 
   // Open CASCADE Include
   #include <TColStd_MapOfInteger.hxx>

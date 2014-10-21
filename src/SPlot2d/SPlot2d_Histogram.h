@@ -26,12 +26,7 @@
 #define SPlot2d_Histogram_h
 
 #include "SPlot2d.h"  
-
 #include "Plot2d_Histogram.h"
-
-#ifndef _Handle_SALOME_InteractiveObject_HeaderFile
-#include <Handle_SALOME_InteractiveObject.hxx>
-#endif
 #include "SALOME_InteractiveObject.hxx"
 
 class SPLOT2D_EXPORT SPlot2d_Histogram : public Plot2d_Histogram

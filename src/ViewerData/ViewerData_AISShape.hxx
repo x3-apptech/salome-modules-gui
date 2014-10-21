@@ -23,17 +23,28 @@
 #ifndef _ViewerData_AISShape_HeaderFile
 #define _ViewerData_AISShape_HeaderFile
 
-#ifndef _AIS_TexturedShape_HeaderFile
-#include <AIS_TexturedShape.hxx>
+// When below macro is defined, AIS_TexturedShape is used as base class
+#define USE_TEXTURED_SHAPE
+
+#ifdef USE_TEXTURED_SHAPE
+  #include <AIS_TexturedShape.hxx>
+#else
+  #include <AIS_Shape.hxx>
 #endif
 
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
 
-class  ViewerData_AISShape : public AIS_TexturedShape
+class ViewerData_AISShape
+#ifdef USE_TEXTURED_SHAPE
+  : public AIS_TexturedShape
+#else
+  : public AIS_Shape
+#endif
 {
 public:
   Standard_EXPORT ViewerData_AISShape (const TopoDS_Shape& theShape);
+  Standard_EXPORT ~ViewerData_AISShape();
 
   // checks if shape is clippable
   Standard_EXPORT inline bool IsClippable() const
@@ -54,6 +65,10 @@ public:
   DEFINE_STANDARD_RTTI(ViewerData_AISShape)  
 };
 
+#ifdef USE_TEXTURED_SHAPE
 DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_TexturedShape)
-
+#else
+DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_Shape)
 #endif
+
+#endif // _ViewerData_AISShape_HeaderFile
