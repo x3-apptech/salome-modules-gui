@@ -60,6 +60,7 @@ protected:
 
 signals:
   void                 preferenceChanged( QString&, QString&, QString& );
+  void                 resetToDefaults();
 
 private slots:
   void                 onHelp();

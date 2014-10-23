@@ -51,6 +51,9 @@ public:
   bool                  isSaved() { return mySaved; }
   void                  setSaved( bool saved ) { mySaved = saved; } 
 
+signals:
+  void                  defaultPressed();
+
 private slots:
   void                  onHelp();
   void                  onApply();

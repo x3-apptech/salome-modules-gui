@@ -68,6 +68,7 @@ myPrefs( prefs ), mySaved ( false )
   QAbstractButton* impBtn = userButton( insertButton( tr( "IMPORT_BTN_TEXT" ) ) );
   if( impBtn )
     connect( impBtn, SIGNAL( clicked() ), this, SLOT( onImportPref() ) );
+  connect( this, SIGNAL( defaultPressed() ), prefs, SIGNAL( resetToDefaults() ) );
 
   setMinimumSize( 800, 600 );
 }
@@ -140,17 +141,18 @@ void LightApp_PreferencesDlg::onApply()
 /*! Restore default preferences*/
 void LightApp_PreferencesDlg::onDefault()
 {
-  if( SUIT_MessageBox::Ok == SUIT_MessageBox::question( this, tr( "WARNING" ), tr( "DEFAULT_QUESTION" ),
-                                                        SUIT_MessageBox::Ok | SUIT_MessageBox::Cancel,
-                                                        SUIT_MessageBox::Ok ) )
+  if ( SUIT_MessageBox::Ok == SUIT_MessageBox::question( this, tr( "WARNING" ), tr( "DEFAULT_QUESTION" ),
+							 SUIT_MessageBox::Ok | SUIT_MessageBox::Cancel,
+							 SUIT_MessageBox::Ok ) )
+  {
+    if ( myPrefs && myPrefs->resourceMgr() )
     {
-      if ( myPrefs && myPrefs->resourceMgr() )
-        {
-          QtxResourceMgr::WorkingMode prev = myPrefs->resourceMgr()->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
-          myPrefs->retrieve();
-          myPrefs->resourceMgr()->setWorkingMode( prev );
-        }
+      QtxResourceMgr::WorkingMode prev = myPrefs->resourceMgr()->setWorkingMode( QtxResourceMgr::IgnoreUserValues );
+      myPrefs->retrieve();
+      myPrefs->resourceMgr()->setWorkingMode( prev );
     }
+    emit defaultPressed();
+  }
 }
 
 /*! Import preferences from some file */

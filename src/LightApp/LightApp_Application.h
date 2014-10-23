@@ -187,6 +187,7 @@ signals:
   void                                studySaved();
   void                                studyClosed();
   void                                preferenceChanged( const QString&, const QString&, const QString& );
+  void                                preferenceResetToDefaults();
   void                                operationFinished( const QString&, const QString&, const QStringList& );
 
 public slots:
