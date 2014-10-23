@@ -3677,7 +3677,7 @@ void LightApp_Application::removeViewManager( SUIT_ViewManager* vm )
            this, SLOT( onCloseView( SUIT_ViewManager* ) ) );
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
   if (aStudy )
-    aStudy->removeViewMgr(vm->getGlobalId());
+    aStudy->removeObjectProperties( vm->getGlobalId() );
 
   CAM_Application::removeViewManager( vm );
 

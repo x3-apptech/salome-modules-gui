@@ -38,9 +38,9 @@ class Handle(AIS_InteractiveObject);
 class SOCC_EXPORT SOCC_Prs : public SALOME_OCCPrs
 {
 public:
-  SOCC_Prs();
+  explicit SOCC_Prs( const char* entry );
   // Default constructor
-  SOCC_Prs( const Handle(AIS_InteractiveObject)& obj );
+  SOCC_Prs( const char* entry, const Handle(AIS_InteractiveObject)& obj );
   // Standard constructor
   ~SOCC_Prs();
   // Destructor

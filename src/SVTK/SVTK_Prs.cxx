@@ -31,14 +31,14 @@
 /*!
   Default constructor
 */
-SVTK_Prs::SVTK_Prs() : myObjects( 0 )
+SVTK_Prs::SVTK_Prs( const char* entry ) : SALOME_VTKPrs(entry), myObjects( 0 )
 {
 }
  
 /*!
   Standard constructor
 */
-SVTK_Prs::SVTK_Prs( const vtkActor* obj ) 
+SVTK_Prs::SVTK_Prs( const char* entry, const vtkActor* obj ) : SALOME_VTKPrs(entry)
 { 
   AddObject( obj ); 
 }

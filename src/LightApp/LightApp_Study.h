@@ -96,14 +96,16 @@ public:
 
   virtual QString     getVisualComponentName() const;
 
-  virtual void              setObjectProperty  ( int theViewMgrId, QString theEntry, QString thePropName, QVariant theValue );
-  virtual QVariant          getObjectProperty  ( int theViewMgrId, QString theEntry, QString thePropName, QVariant theDefValue ) const;
-  virtual void              removeViewMgr      ( int theViewMgrId );
-  virtual void              setObjectPropMap   ( int theViewMgrId, QString theEntry, PropMap thePropMap );
-  virtual const PropMap&    getObjectPropMap   ( int theViewMgrId, QString theEntry ) ;
-  virtual void              removeObjectFromAll( QString theEntry );
-  virtual const ObjMap&     getObjectMap       ( int theViewMgrId );
-  virtual const ViewMgrMap& getViewMgrMap      ( int theViewMgrId ) { return myViewMgrMap; };
+  virtual void              setObjectProperty( int, const QString&, const QString&, const QVariant& );
+  virtual void              setObjectProperty( const QString&, const QString&, const QVariant& );
+  virtual void              setObjectProperty( int, const QString&, const QVariant& );
+  virtual void              setObjectProperties( int, const QString&, const PropMap& );
+  virtual QVariant          getObjectProperty( int, const QString&, const QString&, const QVariant& ) const;
+  virtual const PropMap&    getObjectProperties( int, const QString& );
+  virtual const ObjMap&     getObjectProperties( int );
+  virtual const ViewMgrMap& getObjectProperties() const;
+  virtual void              removeObjectProperties( int );
+  virtual void              removeObjectProperties( const QString& );
 
   virtual void                  setVisibilityState(const QString& theEntry, Qtx::VisibilityState theState);
   virtual Qtx::VisibilityState  visibilityState(const QString& theEntry) const;

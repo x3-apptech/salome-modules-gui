@@ -51,7 +51,7 @@ public:
   virtual void Erase( const QStringList&, const bool forced = false,
                       const bool updateViewer = true, SALOME_View* = 0);
   void Erase( const QString&, const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 );
-  virtual void EraseAll( const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 ) const;
+  virtual void EraseAll( const bool forced = false, const bool updateViewer = true, SALOME_View* = 0 );
 
   virtual bool IsDisplayed( const QString&, SALOME_View* = 0 ) const;
   void UpdateViewer() const;

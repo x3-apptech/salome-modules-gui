@@ -27,16 +27,16 @@
 /*!
  Default constructor
 */
-SPlot2d_Prs::SPlot2d_Prs()
-:Plot2d_Prs()  
+SPlot2d_Prs::SPlot2d_Prs( const char* entry )
+  : SALOME_Prs2d( entry ), Plot2d_Prs()  
 {
 }
 
 /*!
  Standard constructor
 */
-SPlot2d_Prs::SPlot2d_Prs( const Plot2d_Object* obj )
-:Plot2d_Prs(obj)
+SPlot2d_Prs::SPlot2d_Prs( const char* entry, const Plot2d_Object* obj )
+  : SALOME_Prs2d( entry ), Plot2d_Prs( obj )
 { 
 }
 
@@ -44,9 +44,13 @@ SPlot2d_Prs::SPlot2d_Prs( const Plot2d_Object* obj )
  Standard constructor
 */
 SPlot2d_Prs::SPlot2d_Prs( const Plot2d_Prs* prs )
+  : SALOME_Prs2d( 0 )
 {
   mySecondY = prs->isSecondY();
   myObjects = prs->getObjects();
+  const SPlot2d_Prs* sp = dynamic_cast<const SPlot2d_Prs*>( prs );
+  if ( sp )
+    myEntry = sp->myEntry;
   myIsAutoDel = false;          // VSR: error? should auto-delete flag be removed
 }
 

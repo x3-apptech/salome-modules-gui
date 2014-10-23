@@ -670,7 +670,7 @@ void SVTK_Viewer::Erase( const SALOME_VTKPrs* prs, const bool forced )
   Erase all presentations
   \param forced - removes all objects from view
 */
-void SVTK_Viewer::EraseAll( const bool forced )
+void SVTK_Viewer::EraseAll( SALOME_Displayer* d, const bool forced )
 {
   // Temporarily commented to avoid awful dependecy on SALOMEDS
   // TODO: better mechanism of storing display/erse status in a study
@@ -711,6 +711,9 @@ void SVTK_Viewer::EraseAll( const bool forced )
         }
       }
   }
+
+  SALOME_View::EraseAll( d, forced );
+
   Repaint();
 }
 
@@ -720,7 +723,7 @@ void SVTK_Viewer::EraseAll( const bool forced )
 */
 SALOME_Prs* SVTK_Viewer::CreatePrs( const char* entry )
 {
-  SVTK_Prs* prs = new SVTK_Prs();
+  SVTK_Prs* prs = new SVTK_Prs( entry );
   if ( entry ) {
     if(SVTK_ViewWindow* aViewWindow = dynamic_cast<SVTK_ViewWindow*>(getViewManager()->getActiveView()))
       if(SVTK_View* aView = aViewWindow->getView()){

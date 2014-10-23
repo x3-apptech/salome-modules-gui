@@ -532,49 +532,19 @@ QString LightApp_Study::getVisualComponentName() const
   return "Interface Applicative";
 }
 
-
-
-
-
 /*!
   Set a visual property of the object
-  \param theViewId - Id of the viewer namager
+  \param theViewMgrId - Id of the viewer namager
   \param theEntry - Entry of the object
   \param thePropName - the name of the visual property
   \param theValue - the value of the visual property
 */
-void LightApp_Study::setObjectProperty(int theViewId, QString theEntry, QString thePropName, QVariant theValue) {
-  
-  //Try to find viewer manager in the map
-  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewId);
-  if(v_it == myViewMgrMap.end()) {
-
-    //1) Create property map
-    PropMap aPropMap;
-    aPropMap.insert(thePropName, theValue);
-    
-    //2) Create object map
-    ObjMap anObjMap;
-    anObjMap.insert(theEntry,aPropMap);
-
-    //3) Insert in the view manager map
-    myViewMgrMap.insert(theViewId, anObjMap);
-    
-  } else {
-    ObjMap& anObjMap = v_it.value();
-    ObjMap::Iterator o_it = anObjMap.find(theEntry);
-    if(o_it == anObjMap.end()) {
-      //1) Create property map
-      PropMap aPropMap;
-      aPropMap.insert(thePropName, theValue);
-      
-      //2) Insert in the object map
-      anObjMap.insert(theEntry, aPropMap);
-    } else {
-      PropMap& aPropMap = o_it.value();
-      aPropMap.insert(thePropName, theValue);
-    }
-  }
+void LightApp_Study::setObjectProperty( int theViewMgrId,
+				        const QString& theEntry,
+				        const QString& thePropName,
+				        const QVariant& theValue )
+{
+  myViewMgrMap[theViewMgrId][theEntry][thePropName] = theValue;
 }
 
 /*!
@@ -585,16 +555,20 @@ void LightApp_Study::setObjectProperty(int theViewId, QString theEntry, QString 
   \param theDefValue - the default value of the visual property.
   \return value of the visual propetry. If value is't found then return theDefValue.
 */
-QVariant LightApp_Study::getObjectProperty(int theViewMgrId, QString theEntry, QString thePropName, QVariant theDefValue) const {
-  QVariant& aResult = theDefValue;
-  ViewMgrMap::ConstIterator v_it = myViewMgrMap.find(theViewMgrId);
-  if(v_it != myViewMgrMap.end()){
+QVariant LightApp_Study::getObjectProperty( int theViewMgrId,
+					    const QString& theEntry,
+					    const QString& thePropName,
+					    const QVariant& theDefValue ) const
+{
+  QVariant aResult = theDefValue;
+  ViewMgrMap::ConstIterator v_it = myViewMgrMap.find( theViewMgrId );
+  if ( v_it != myViewMgrMap.end() ) {
     const ObjMap& anObjectMap = v_it.value();
-    ObjMap::ConstIterator o_it = anObjectMap.find(theEntry);
-    if(o_it != anObjectMap.end()) {
+    ObjMap::ConstIterator o_it = anObjectMap.find( theEntry );
+    if ( o_it != anObjectMap.end() ) {
       const PropMap& aPropMap = o_it.value();
-      PropMap::ConstIterator p_it = aPropMap.find(thePropName);
-      if(p_it != aPropMap.end()) {
+      PropMap::ConstIterator p_it = aPropMap.find( thePropName );
+      if ( p_it != aPropMap.end() ) {
 	aResult = p_it.value();
       }
     }
@@ -603,13 +577,38 @@ QVariant LightApp_Study::getObjectProperty(int theViewMgrId, QString theEntry, Q
 }
 
 /*!
-  Remove view manager with all objects.
-  \param theViewMgrId - Id of the viewer manager.
+  Set a visual property of the object for all registered viewers
+  \param theEntry - Entry of the object
+  \param thePropName - the name of the visual property
+  \param theValue - the value of the visual property
 */
-void LightApp_Study::removeViewMgr( int theViewMgrId ) { 
-  myViewMgrMap.remove(theViewMgrId);
+void LightApp_Study::setObjectProperty( const QString& theEntry,
+				        const QString& thePropName,
+				        const QVariant& theValue )
+{
+  const ViewMgrMap& vm = getObjectProperties();
+  ViewMgrMap::ConstIterator v_it;
+  for ( v_it = vm.begin(); v_it != vm.end(); ++v_it ) {
+    setObjectProperty( v_it.key(), theEntry, thePropName, theValue );
+  }
 }
 
+/*!
+  Set a visual property for all registered objects for given viewer
+  \param theViewMgrId - Id of the viewer manager.
+  \param thePropName - the name of the visual property
+  \param theValue - the value of the visual property
+*/
+void LightApp_Study::setObjectProperty( int theViewMgrId,
+				        const QString& thePropName,
+				        const QVariant& theValue )
+{
+  const ObjMap& om = getObjectProperties( theViewMgrId );
+  ObjMap::ConstIterator o_it;
+  for ( o_it = om.begin(); o_it != om.end(); ++o_it ) {
+    setObjectProperty( theViewMgrId, o_it.key(), thePropName, theValue );
+  }
+}
 
 /*!
   Get a map of the properties of the object identified by theViewMgrId and theEntry.
@@ -617,27 +616,18 @@ void LightApp_Study::removeViewMgr( int theViewMgrId ) {
   \param theEntry - Entry of the object.
   \return a map of the properties of the object.
 */
-const PropMap& LightApp_Study::getObjectPropMap(int theViewMgrId, QString theEntry) {
-  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
-  if (v_it != myViewMgrMap.end()) {
-    ObjMap& anObjectMap = v_it.value();
-    ObjMap::Iterator o_it = anObjectMap.find(theEntry);
-    if(o_it != anObjectMap.end()) {
-      return o_it.value();
-    } else {
-      PropMap aPropMap;
-      anObjectMap.insert(theEntry, aPropMap);
-      return anObjectMap.find(theEntry).value();
-    }
-  } else {
-    PropMap aPropMap;
-    ObjMap anObjMap;
-    anObjMap.insert(theEntry,aPropMap);
-    myViewMgrMap.insert(theViewMgrId, anObjMap);
-
-    ObjMap& anObjectMap = myViewMgrMap.find(theViewMgrId).value();
-    return anObjectMap.find(theEntry).value();
-  }
+const PropMap& LightApp_Study::getObjectProperties( int theViewMgrId, const QString& theEntry )
+{
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find( theViewMgrId );
+  if ( v_it == myViewMgrMap.end() )
+    v_it = myViewMgrMap.insert( theViewMgrId, ObjMap() );
+  
+  ObjMap& anObjectMap = v_it.value();
+  ObjMap::Iterator o_it = anObjectMap.find( theEntry );
+  if ( o_it == anObjectMap.end() )
+    o_it = anObjectMap.insert( theEntry, PropMap() );
+  
+  return o_it.value();
 }
 
 /*!
@@ -645,46 +635,52 @@ const PropMap& LightApp_Study::getObjectPropMap(int theViewMgrId, QString theEnt
   \param theViewMgrId - Id of the viewer manager.
   \param theEntry - Entry of the object.
 */
-void LightApp_Study::setObjectPropMap(int theViewMgrId, QString theEntry, PropMap thePropMap) {
-  //Try to find viewer manager in the map
-  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
-  if(v_it == myViewMgrMap.end()) {
-    
-    //1) Create object map
-    ObjMap anObjMap;
-    anObjMap.insert(theEntry,thePropMap);
-
-    //3) Insert in the view manager map
-    myViewMgrMap.insert(theViewMgrId, anObjMap);
-  } else {
-    ObjMap& anObjMap = v_it.value();
-    anObjMap.insert(theEntry,thePropMap);
-  }
+void LightApp_Study::setObjectProperties( int theViewMgrId,
+					  const QString& theEntry,
+					  const PropMap& thePropMap )
+{
+  myViewMgrMap[theViewMgrId][theEntry] = thePropMap;
 }
+
+/*!
+  Remove view manager with all objects.
+  \param theViewMgrId - Id of the viewer manager.
+*/
+void LightApp_Study::removeObjectProperties( int theViewMgrId )
+{ 
+  myViewMgrMap.remove( theViewMgrId );
+}
+
 
 /*!
    Remove object's properties from all view managers.
   \param theEntry - Entry of the object.
 */
-void LightApp_Study::removeObjectFromAll( QString theEntry ) {
-  ViewMgrMap::Iterator v_it = myViewMgrMap.begin();
-  for( ;v_it != myViewMgrMap.end(); v_it++ ) {
-    v_it.value().remove(theEntry);
-  }
+void LightApp_Study::removeObjectProperties( const QString& theEntry )
+{
+  ViewMgrMap::Iterator v_it;
+  for ( v_it = myViewMgrMap.begin(); v_it != myViewMgrMap.end(); v_it++ )
+    v_it.value().remove( theEntry );
 }
 
 /*!
   Get all objects and it's properties from view manager identified by theViewMgrId.
   \param theEntry - Entry of the object.
 */
-const ObjMap& LightApp_Study::getObjectMap ( int theViewMgrId ) {
-  ViewMgrMap::Iterator v_it = myViewMgrMap.find(theViewMgrId);
-  if( v_it == myViewMgrMap.end() ) {
-    ObjMap anObjMap;
-    myViewMgrMap.insert(theViewMgrId , anObjMap);
-    return myViewMgrMap.find(theViewMgrId).value();
-  }
+const ObjMap& LightApp_Study::getObjectProperties( int theViewMgrId )
+{
+  ViewMgrMap::Iterator v_it = myViewMgrMap.find( theViewMgrId );
+  if ( v_it == myViewMgrMap.end() )
+    v_it = myViewMgrMap.insert( theViewMgrId, ObjMap() );
   return v_it.value();
+}
+
+/*!
+  Get global properties map
+*/
+const ViewMgrMap& LightApp_Study::getObjectProperties() const
+{
+  return myViewMgrMap;
 }
 
 /*!
@@ -692,37 +688,30 @@ const ObjMap& LightApp_Study::getObjectMap ( int theViewMgrId ) {
   \param theEntry - Entry of the object.
   \param theState - visibility status
 */
-void LightApp_Study::setVisibilityState(const QString& theEntry, Qtx::VisibilityState theState) {
+void LightApp_Study::setVisibilityState( const QString& theEntry, Qtx::VisibilityState theState )
+ {
   LightApp_Application* app = (LightApp_Application*)application();
-  if(!app)
-    return;
+  if ( !app ) return;
   SUIT_DataBrowser* db = app->objectBrowser();
-  if(!db)
-    return;
-
-  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
-  
-  if(treeModel)
-    treeModel->setVisibilityState(theEntry,theState);
+  if ( !db ) return;
+  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( db->model() );
+  if ( treeModel )
+    treeModel->setVisibilityState( theEntry, theState );
 }
 
 /*!
   Set 'visibility state' property for all object.
   \param theEntry - Entry of the object.
 */
-void LightApp_Study::setVisibilityStateForAll(Qtx::VisibilityState theState) {
-  
+void LightApp_Study::setVisibilityStateForAll( Qtx::VisibilityState theState )
+{
   LightApp_Application* app = (LightApp_Application*)application();
-  if(!app)
-    return;
+  if ( !app ) return;
   SUIT_DataBrowser* db = app->objectBrowser();
-  if(!db)
-    return;
-
-  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
-  
-  if(treeModel)
-    treeModel->setVisibilityStateForAll(theState);
+  if ( !db ) return;
+  SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( db->model() );
+  if ( treeModel )
+    treeModel->setVisibilityStateForAll( theState );
 }
 
 /*!
@@ -730,18 +719,19 @@ void LightApp_Study::setVisibilityStateForAll(Qtx::VisibilityState theState) {
   \param theEntry - Entry of the object.
   \return 'visibility state' property of the object.
 */
-Qtx::VisibilityState LightApp_Study::visibilityState(const QString& theEntry) const {
+Qtx::VisibilityState LightApp_Study::visibilityState( const QString& theEntry ) const
+{
+  Qtx::VisibilityState state = Qtx::UnpresentableState;
   LightApp_Application* app = (LightApp_Application*)application();
-  if(app) {
-    
+  if ( app ) {
     SUIT_DataBrowser* db = app->objectBrowser();
-    if(db) {
-      SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>(db->model());
-      if(treeModel)
-	return treeModel->visibilityState(theEntry);
+    if ( db ) {
+      SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( db->model() );
+      if ( treeModel )
+	state = treeModel->visibilityState( theEntry );
     }
   }
-  return Qtx::UnpresentableState;
+  return state;
 }
 
 /*!

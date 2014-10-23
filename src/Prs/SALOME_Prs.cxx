@@ -26,6 +26,22 @@
 #include "SALOME_Prs.h"
 
 /*!
+  Constructor
+*/
+SALOME_Prs::SALOME_Prs(const char* e) : myIsClippable(true)
+{
+  myEntry = std::string( e ? e : "" );
+}
+
+/*!
+  Get entry
+*/
+const char* SALOME_Prs::GetEntry() const
+{
+  return myEntry.c_str();
+}
+
+/*!
   Dispatches display operation to proper Display() method of SALOME_View
 */
 void SALOME_OCCPrs::DisplayIn( SALOME_View* v ) const
@@ -220,17 +236,19 @@ void SALOME_Prs2d::Update( SALOME_Displayer* d )
 /*!
   Gives control to SALOME_Prs object, so that it could perform double dispatch
 */
-void SALOME_View::Display( const SALOME_Prs* prs )
+void SALOME_View::Display( SALOME_Displayer* d, const SALOME_Prs* prs )
 {
   prs->DisplayIn( this );
+  if ( d ) d->UpdateVisibility( this, prs, true );
 }
 
 /*!
   Gives control to SALOME_Prs object, so that it could perform double dispatch
 */
-void SALOME_View::Erase( const SALOME_Prs* prs, const bool forced )
+void SALOME_View::Erase( SALOME_Displayer* d, const SALOME_Prs* prs, const bool forced )
 {
   prs->EraseIn( this, forced );
+  if ( d ) d->UpdateVisibility( this, prs, false );
 }
 
 /*!
@@ -292,9 +310,10 @@ void SALOME_View::Erase( const SALOME_Prs2d*, const bool )
 /*!
   Virtual method, should be reimplemented in successors, by default issues a warning and does nothing.
 */
-void SALOME_View::EraseAll( const bool )
+void SALOME_View::EraseAll( SALOME_Displayer* d, const bool )
 {
 //  MESSAGE( "SALOME_View::EraseAll() called!" );
+  if ( d ) d->UpdateVisibility( this, 0, false );
 }
 
 /*!
@@ -385,3 +404,9 @@ void SALOME_Displayer::Update( SALOME_Prs2d* )
 //  MESSAGE( "SALOME_Displayer::Update( SALOME_Prs2d* ) called! Probably, presentation is being updated in uncompatible viewframe." );
 }
 
+/*!
+  Virtual method, should be reimplemented in successors, by default does nothing.
+*/
+void SALOME_Displayer::UpdateVisibility( SALOME_View*, const SALOME_Prs*, bool )
+{
+}

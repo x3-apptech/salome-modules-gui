@@ -38,6 +38,8 @@ class SALOME_Displayer;
 class SALOME_ListIO;
 class Handle_SALOME_InteractiveObject;
 
+#include <string>
+
 /*!
  \class SALOME_Prs
  Base class for SALOME graphic object wrappers - presentations.
@@ -48,10 +50,13 @@ class PRS_EXPORT SALOME_Prs
 {
 public:
   //! Constructor
-  SALOME_Prs() : myIsClippable (true) {};
-
+  explicit SALOME_Prs( const char* );
+ 
   //! Destructor
   virtual ~SALOME_Prs() {}
+
+  //! Get entry
+  const char* GetEntry() const;
 
   //! Key method for double dispatch of display operation
   virtual void DisplayIn( SALOME_View* ) const = 0;
@@ -93,7 +98,7 @@ public:
   }
 
 protected:
-
+  std::string myEntry;
   bool myIsClippable;
 };
 
@@ -106,6 +111,9 @@ protected:
 class PRS_EXPORT SALOME_OCCPrs : public SALOME_Prs
 {
 public:
+  //! Constructor
+  explicit SALOME_OCCPrs(const char* e) : SALOME_Prs(e) {}
+
   //! It uses double dispatch in order to
   //! invoke Display() method corresponding to the actual type of presentation.
   virtual void DisplayIn( SALOME_View* ) const;
@@ -146,6 +154,9 @@ public:
 class PRS_EXPORT SALOME_VTKPrs : public SALOME_Prs
 {
 public:
+  //! Constructor
+  explicit SALOME_VTKPrs(const char* e) : SALOME_Prs(e) {}
+
   //! It uses double dispatch in order to
   //! invoke Display() method corresponding to the actual type of presentation.
   virtual void DisplayIn( SALOME_View* ) const;
@@ -185,6 +196,9 @@ public:
 class PRS_EXPORT SALOME_Prs2d : public SALOME_Prs
 {
 public:
+  //! Constructor
+  explicit SALOME_Prs2d(const char* e) : SALOME_Prs(e) {}
+
   //! It uses double dispatch in order to
   //! invoke Display() method corresponding to the actual type of presentation.
   virtual void DisplayIn( SALOME_View* ) const;
@@ -233,12 +247,16 @@ public:
   //! This Display() method should be called to display given presentation
   //! created anywhere by anybody. It simply passes control to SALOME_Prs object
   //! so that it could perform double dispatch.
-  void Display( const SALOME_Prs* );
+  void Display( SALOME_Displayer*, const SALOME_Prs* );
 
   //! This Erase() method should be called to erase given presentation
   //! created anywhere by anybody. It simply passes control to SALOME_Prs object
   //! so that it could perform double dispatch.
-  void Erase( const SALOME_Prs*, const bool = false );
+  void Erase( SALOME_Displayer*, const SALOME_Prs*, const bool = false );
+
+  //! This EraseAll() method should be called to erase all presentations
+  //! created anywhere by anybody.
+  virtual void EraseAll( SALOME_Displayer*, const bool = false );
 
   //! This LocalSelection() method should be called to activate sub-shapes selection
   //! created anywhere by anybody. It simply passes control to SALOME_Prs object
@@ -257,7 +275,6 @@ public:
   virtual void Erase( const SALOME_OCCPrs*, const bool = false );//!< Erase SALOME_OCCPrs
   virtual void Erase( const SALOME_VTKPrs*, const bool = false );//!< Erase SALOME_VTKPrs
   virtual void Erase( const SALOME_Prs2d*,  const bool = false );//!< Erase SALOME_Prs2d
-  virtual void EraseAll( const bool = false );
   // Add new Erase() methods here...
 
   // LocalSelection() methods for ALL kinds of presentation should appear here
@@ -325,6 +342,8 @@ public:
   virtual void BeforeErase( SALOME_View*, const SALOME_Prs2d*  ) {} //! Null body here
   virtual void AfterErase ( SALOME_View*, const SALOME_Prs2d*  ) {} //! Null body here
 
+  // Axiluary method called to update visibility state of presentation
+  virtual void UpdateVisibility( SALOME_View*, const SALOME_Prs*, bool );
 };
 
 #endif

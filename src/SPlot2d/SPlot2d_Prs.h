@@ -35,11 +35,12 @@ class SPLOT2D_EXPORT SPlot2d_Prs : public SALOME_Prs2d, public Plot2d_Prs
 {
 public:
   // Default constructor 
-  SPlot2d_Prs();
+  explicit SPlot2d_Prs( const char* entry );
 
   // Standard constructor    
-  SPlot2d_Prs( const Plot2d_Object* obj );
+  SPlot2d_Prs( const char* entry , const Plot2d_Object* obj );
 
+  // Copy constructor
   SPlot2d_Prs( const Plot2d_Prs* prs );
 
   // Destructor

@@ -58,7 +58,7 @@ public:
   /* Reimplemented from SALOME_View */
   virtual void                Display( const SALOME_OCCPrs* );
   virtual void                Erase( const SALOME_OCCPrs*, const bool = false );
-  virtual void                EraseAll( const bool = false );
+  virtual void                EraseAll( SALOME_Displayer*, const bool = false );
   virtual SALOME_Prs*         CreatePrs( const char* entry = 0 );
 
   virtual void                LocalSelection( const SALOME_OCCPrs*, const int );

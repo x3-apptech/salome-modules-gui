@@ -164,8 +164,8 @@ public:
   //! See #SALOME_View::Erase( const SALOME_VTKPrs*, const bool = false )
   void Erase( const SALOME_VTKPrs*, const bool = false );
 
-  //! See #SALOME_View::EraseAll( const bool = false )
-  void EraseAll( const bool = false );
+  //! See #SALOME_View::EraseAll( SALOME_Displayer*, const bool = false )
+  void EraseAll( SALOME_Displayer*, const bool = false );
 
   //! See #SALOME_View::getVisible( SALOME_ListIO& )
   virtual void GetVisible( SALOME_ListIO& );

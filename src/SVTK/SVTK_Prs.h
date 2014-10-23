@@ -36,9 +36,9 @@ class vtkActor;
 class SVTK_EXPORT SVTK_Prs : public SALOME_VTKPrs
 {
 public:
-  SVTK_Prs();
+  explicit SVTK_Prs( const char* entry );
   // Default constructor
-  SVTK_Prs( const vtkActor* obj );
+  SVTK_Prs( const char* entry, const vtkActor* obj );
   // Standard constructor
   ~SVTK_Prs();
   // Destructor

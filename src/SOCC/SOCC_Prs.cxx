@@ -31,7 +31,8 @@
 /*!
   Default constructor
 */
-SOCC_Prs::SOCC_Prs() 
+SOCC_Prs::SOCC_Prs( const char* entry )
+  : SALOME_OCCPrs( entry )
 {
   myToActivate = true;
 }
@@ -39,7 +40,8 @@ SOCC_Prs::SOCC_Prs()
 /*!
   Standard constructor
 */
-SOCC_Prs::SOCC_Prs( const Handle(AIS_InteractiveObject)& obj ) 
+SOCC_Prs::SOCC_Prs( const char* entry, const Handle(AIS_InteractiveObject)& obj ) 
+  : SALOME_OCCPrs( entry )
 {  
   AddObject( obj ); 
 }

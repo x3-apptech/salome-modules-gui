@@ -31,7 +31,7 @@ class PLOT2D_EXPORT Plot2d_Prs
 public:
   Plot2d_Prs( bool theDelete = false );
   Plot2d_Prs( Plot2d_Object* obj, bool theDelete = false );
-  ~Plot2d_Prs();
+  virtual ~Plot2d_Prs();
 
   objectList getObjects() const;
   void       AddObject( Plot2d_Object* obj );

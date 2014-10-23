@@ -68,7 +68,7 @@ public:
   /* Reimplemented from SALOME_View */
   void                 Display( const SALOME_Prs2d* );
   void                 Erase( const SALOME_Prs2d*, const bool = false );
-  virtual void         EraseAll(const bool = false);
+  virtual void         EraseAll(SALOME_Displayer*, const bool = false);
   virtual void         Repaint();
   virtual SALOME_Prs*  CreatePrs( const char* entry = 0 );
 

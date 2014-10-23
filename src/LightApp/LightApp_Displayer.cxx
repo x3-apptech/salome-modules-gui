@@ -88,7 +88,7 @@ void LightApp_Displayer::Display( const QStringList& list, const bool updateView
       {
 	myLastEntry = *it;
         vf->BeforeDisplay( this, prs );
-        vf->Display( prs );
+        vf->Display( this, prs );
         vf->AfterDisplay( this, prs );
 
         if ( updateViewer )
@@ -97,7 +97,6 @@ void LightApp_Displayer::Display( const QStringList& list, const bool updateView
       delete prs;  // delete presentation because displayer is its owner
       setVisibilityState(*it, Qtx::ShownState);
     }
-
   }
 }
 
@@ -174,7 +173,7 @@ void LightApp_Displayer::Erase( const QStringList& list, const bool forced,
     if ( prs ) {
       myLastEntry = *it;
       vf->BeforeErase( this, prs );
-      vf->Erase( prs, forced );
+      vf->Erase( this, prs, forced );
       vf->AfterErase( this, prs );
       if ( updateViewer )
         vf->Repaint();
@@ -190,12 +189,12 @@ void LightApp_Displayer::Erase( const QStringList& list, const bool forced,
   \param updateViewer - is it necessary to update viewer
   \param theViewFrame - view
 */
-void LightApp_Displayer::EraseAll( const bool forced, const bool updateViewer, SALOME_View* theViewFrame ) const
+void LightApp_Displayer::EraseAll( const bool forced, const bool updateViewer, SALOME_View* theViewFrame )
 {
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
 
   if ( vf ) {
-    vf->EraseAll( forced );
+    vf->EraseAll( this, forced );
     if ( updateViewer )
       vf->Repaint();
   }

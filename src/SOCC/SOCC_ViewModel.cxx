@@ -471,7 +471,7 @@ void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
   Erase all presentations
   \param forced - removes all objects from context
 */
-void SOCC_Viewer::EraseAll( const bool forced )
+void SOCC_Viewer::EraseAll( SALOME_Displayer* d, const bool forced )
 {
   // get SALOMEDS Study
   // Temporarily commented to avoid awful dependecy on SALOMEDS
@@ -513,6 +513,8 @@ void SOCC_Viewer::EraseAll( const bool forced )
     //}
   }
 
+  SALOME_View::EraseAll( d, forced );
+
   Repaint();
   updateTrihedron();
 }
@@ -523,7 +525,7 @@ void SOCC_Viewer::EraseAll( const bool forced )
 */
 SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
 {
-  SOCC_Prs* prs = new SOCC_Prs();
+  SOCC_Prs* prs = new SOCC_Prs(entry);
   if ( entry )
   {
     if(entry2aisobjects.count(entry)>0)

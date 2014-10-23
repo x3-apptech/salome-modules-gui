@@ -230,10 +230,11 @@ void SPlot2d_Viewer::Erase( const Handle(SALOME_InteractiveObject)& IObject, boo
 /*!
    Removes all curves from the view
 */
-void SPlot2d_Viewer::EraseAll(const bool /*forced*/) 
+void SPlot2d_Viewer::EraseAll(SALOME_Displayer* d, const bool forced) 
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
   if(aViewFrame) aViewFrame->EraseAll();
+  SALOME_View::EraseAll(d, forced);
 }
 
 /*!
@@ -271,7 +272,7 @@ void SPlot2d_Viewer::Erase( const SALOME_Prs2d* prs, const bool )
 SALOME_Prs* SPlot2d_Viewer::CreatePrs( const char* entry )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
-  SPlot2d_Prs *prs = new SPlot2d_Prs();
+  SPlot2d_Prs *prs = new SPlot2d_Prs( entry );
   if(aViewFrame)
   {
     CurveDict aCurves = aViewFrame->getCurves();
