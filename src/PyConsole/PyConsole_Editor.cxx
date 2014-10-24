@@ -396,14 +396,21 @@ void PyConsole_Editor::execAndWait( const QString& command )
     return;
 
   // create new event loop
-  myEventLoop = new QEventLoop( this );
+  bool sync = isSync();
+  if ( !sync ) {
+    myEventLoop = new QEventLoop( this );
+  }
+
   // execute command
   exec( command );
-  // run event loop
-  myEventLoop->exec();
-  // delete event loop after command is processed
-  delete myEventLoop;
-  myEventLoop = 0;
+
+  if ( !sync ) {
+    // run event loop
+    myEventLoop->exec();
+    // delete event loop after command is processed
+    delete myEventLoop;
+    myEventLoop = 0;
+  }
 }
 
 /*!
