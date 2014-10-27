@@ -651,7 +651,17 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
       continue;
     }
 
+#if OCC_VERSION_LARGE > 0x06070100
+    Bnd_Box aBox = aStructure->MinMaxValues();
+    aXmin = aBox.CornerMin().X();
+    aYmin = aBox.CornerMin().Y();
+    aZmin = aBox.CornerMin().Z();
+    aXmax = aBox.CornerMax().X();
+    aYmax = aBox.CornerMax().Y();
+    aZmax = aBox.CornerMax().Z();
+#else
     aStructure->MinMaxValues( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
+#endif
 
     // Infinite structures are skipped
     Standard_Real aLIM = ShortRealLast() - 1.0;

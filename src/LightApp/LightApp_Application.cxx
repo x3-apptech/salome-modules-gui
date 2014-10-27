@@ -58,9 +58,7 @@
 #include "LightApp_WgViewModel.h"
 #include "LightApp_FullScreenHelper.h"
 
-
 #include <GUI_version.h>
-#include <Basics_OCCTVersion.hxx>
 
 #include <SALOME_Event.h>
 

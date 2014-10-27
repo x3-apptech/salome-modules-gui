@@ -29,8 +29,6 @@
 #include "QtxAction.h"
 #include "QtxIntSpinBox.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QLineEdit>

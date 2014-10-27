@@ -36,7 +36,6 @@
 #include <V3d_View.hxx>
 #include <AIS_Trihedron.hxx>
 #include <AIS_InteractiveContext.hxx>
-#include <Basics_OCCTVersion.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 
 class QKeyEvent;
