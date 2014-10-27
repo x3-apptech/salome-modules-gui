@@ -3,23 +3,23 @@
 \page salome_desktop_page SALOME desktop
 
 SALOME applies <b>Single Document Interface</b> (SDI) approach. Only one 
-\ref study_management_page "study (document)" can be opened at the moment.
+\ref study_management_page "study (document)" can be opened at any given moment.
 
-The front-end of the application is represented as a single Desktop top-level window
-that embeds all GUI operations. Desktop window provides access to standard GUI elements
-like viewers, main menu, toolbars, dock windows, dialog boxes, etc. 
+The front-end of the application is a single Desktop top-level window
+that embeds all GUI operations. The desktop window provides access to standard GUI elements,
+such as viewers, main menu, toolbars, dockable windows, dialog boxes, etc. 
 
 The main elements of the SALOME Desktop are represented on the picture below:
 
 \image html desktop.png
 
 The main parts of the SALOME Desktop are:
-- <b>Main menu</b> - This is a set of context-sensitive menus, which will
-be updated according to the functionality of the currently active component. In
+- <b>Main menu</b> - This is a set of context-sensitive menus
+updated according to the functionality of the currently active component. In
 general, these menus contain all functional options of SALOME platform.
 - <b>Standard toolbar</b> - contains standard actions
 that allow creating new or opening existing study, saving study, deleting
-objects etc.
+objects, etc.
 - <b>Components toolbar</b> - allows activating
 components in SALOME platform.
 - <b>Module toolbars</b> - contain actions specific to the
