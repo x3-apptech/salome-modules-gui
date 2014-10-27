@@ -24,8 +24,6 @@
 
 #include "DDS_KeyWords.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <LDOMString.hxx>
 #include <LDOMParser.hxx>
 

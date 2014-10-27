@@ -25,8 +25,6 @@
 #include "CAF_Tools.h"
 #include "CAF_Application.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <SUIT_Desktop.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_Application.h>

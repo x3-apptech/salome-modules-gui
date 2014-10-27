@@ -36,6 +36,8 @@
 
 #include "ViewerData_AISShape.hxx"
 
+#include <Basics_OCCTVersion.hxx>
+
 #include "QtxActionToolMgr.h"
 #include "QtxBackgroundTool.h"
 
@@ -956,7 +958,17 @@ double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
   double aMaxSide = 0;
   double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
 
+#if OCC_VERSION_LARGE > 0x06070100
+  Bnd_Box aBox = view3d->View()->MinMaxValues();
+  Xmin = aBox.CornerMin().X();
+  Ymin = aBox.CornerMin().Y();
+  Zmin = aBox.CornerMin().Z();
+  Xmax = aBox.CornerMax().X();
+  Ymax = aBox.CornerMax().Y();
+  Zmax = aBox.CornerMax().Z();
+#else
   view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
+#endif
 
   if ( Xmin != RealFirst() && Ymin != RealFirst() && Zmin != RealFirst() &&
        Xmax != RealLast()  && Ymax != RealLast()  && Zmax != RealLast() )

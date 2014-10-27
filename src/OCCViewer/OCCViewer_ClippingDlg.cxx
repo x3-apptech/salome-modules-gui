@@ -37,6 +37,8 @@
 #include "OCCViewer_ViewManager.h"
 #include "OCCViewer_ClipPlaneInteractor.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <V3d_View.hxx>
 #include <Visual3d_View.hxx>
 #include <Geom_Plane.hxx>
@@ -92,7 +94,17 @@ void getMinMaxFromContext( Handle(AIS_InteractiveContext) ic,
       if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() ) {
         isFound = true;
         double xmin, ymin, zmin, xmax, ymax, zmax;
+#if OCC_VERSION_LARGE > 0x06070100
+	Bnd_Box aBox = aPrs->MinMaxValues();
+	xmin = aBox.CornerMin().X();
+	ymin = aBox.CornerMin().Y();
+	zmin = aBox.CornerMin().Z();
+	xmax = aBox.CornerMax().X();
+	ymax = aBox.CornerMax().Y();
+	zmax = aBox.CornerMax().Z();
+#else
         aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
+#endif
         aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
         aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
         aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
