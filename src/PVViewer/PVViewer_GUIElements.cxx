@@ -40,14 +40,12 @@ PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
   pipelineBrowserWidget  = new pqPipelineBrowserWidget(desk);
   pipelineBrowserWidget->hide();
 
-  sourcesMenu = new QMenu(desk);
-  pqParaViewMenuBuilders::buildSourcesMenu(*sourcesMenu, desk);
-
-  filtersMenu = new QMenu(desk);
-  pqParaViewMenuBuilders::buildFiltersMenu(*filtersMenu, desk);
-
-  macrosMenu = new QMenu(desk);
-  pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
+//  sourcesMenu = new QMenu(desk);
+//  pqParaViewMenuBuilders::buildSourcesMenu(*sourcesMenu, desk);
+//  filtersMenu = new QPVMenu(desk);
+//  pqParaViewMenuBuilders::buildFiltersMenu(*filtersMenu, desk);
+//  macrosMenu = new QMenu(desk);
+//  pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
 }
 
 PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
@@ -57,44 +55,45 @@ PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
   return theInstance;
 }
 
-void PVViewer_GUIElements::updateSourcesMenu(QMenu *menu)
-{
-  if (menu)
-    {
-      menu->clear();
-      QList<QAction *> act_list = sourcesMenu->actions();
-      foreach(QAction * a, act_list)
-      {
-        menu->addAction(a);
-      }
-    }
-}
-
-void PVViewer_GUIElements::updateFiltersMenu(QMenu *menu)
-{
-  if (menu)
-    {
-      menu->clear();
-      QList<QAction *> act_list = filtersMenu->actions();
-      foreach(QAction * a, act_list)
-      {
-        menu->addAction(a);
-      }
-    }
-}
-
-void PVViewer_GUIElements::updateMacrosMenu(QMenu *menu)
-{
-  if (menu)
-    {
-      menu->clear();
-      QList<QAction *> act_list = macrosMenu->actions();
-      foreach(QAction * a, act_list)
-      {
-        menu->addAction(a);
-      }
-    }
-}
+//void PVViewer_GUIElements::updateSourcesMenu(QMenu *menu)
+//{
+//  if (menu)
+//    {
+//      menu->clear();
+//      QList<QAction *> act_list = sourcesMenu->actions();
+//      foreach(QAction * a, act_list)
+//      {
+//        menu->addAction(a);
+//      }
+//    }
+//}
+//
+//void PVViewer_GUIElements::updateFiltersMenu(QMenu *menu)
+//{
+//  if (menu)
+//    {
+//      filtersMenu->linkToMenu(menu);
+//      menu->clear();
+//      QList<QAction *> act_list = filtersMenu->actions();
+//      foreach(QAction * a, act_list)
+//      {
+//        menu->addAction(a);
+//      }
+//    }
+//}
+//
+//void PVViewer_GUIElements::updateMacrosMenu(QMenu *menu)
+//{
+//  if (menu)
+//    {
+//      menu->clear();
+//      QList<QAction *> act_list = macrosMenu->actions();
+//      foreach(QAction * a, act_list)
+//      {
+//        menu->addAction(a);
+//      }
+//    }
+//}
 
 
 void PVViewer_GUIElements::onEmulateApply()

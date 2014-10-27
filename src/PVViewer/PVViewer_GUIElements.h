@@ -33,8 +33,6 @@ class QMenu;
 /*!
  * Some GUI elements of ParaView need to be instanciated in a proper order. This class
  * holds all of them for the sake of clarity.
- * For example sources menu should be built *before* loading ParaView's configuration, so that the
- * list of sources gets properly populated.
  */
 class PVVIEWER_EXPORT PVViewer_GUIElements: public QObject
 {
@@ -47,9 +45,9 @@ public:
   pqPipelineBrowserWidget * getPipelineBrowserWidget() { return pipelineBrowserWidget; }
 
   // Update the sources menu from what was built in private member 'sourcesMenu'
-  void updateSourcesMenu(QMenu *);
-  void updateFiltersMenu(QMenu *);
-  void updateMacrosMenu(QMenu *);
+//  void updateSourcesMenu(QMenu *);
+//  void updateFiltersMenu(QMenu *);
+//  void updateMacrosMenu(QMenu *);
 
 public slots:
   void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"

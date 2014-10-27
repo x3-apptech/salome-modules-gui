@@ -48,7 +48,7 @@ public:
   //! Initialize ParaView if not yet done (once per session)
   static bool   ParaviewInitApp(SUIT_Desktop* aDesktop, LogWindow * w);
   static void   ParaviewInitBehaviors(bool fullSetup=false, SUIT_Desktop* aDesktop=0);
-  static void   ParaviewLoadConfigurations();
+  static void   ParaviewLoadConfigurations(bool force=false);
   static void   ParaviewCleanup();
 
   //! Connect to the external PVServer, using the PARAVIS engine to launch it if it is not

@@ -135,9 +135,9 @@ void PVViewer_ViewManager::ParaviewInitBehaviors(bool fullSetup, SUIT_Desktop* a
     ParaviewBehaviors->instanciateMinimalBehaviors(aDesktop);
 }
 
-void PVViewer_ViewManager::ParaviewLoadConfigurations()
+void PVViewer_ViewManager::ParaviewLoadConfigurations(bool force)
 {
-  if (!ConfigLoaded)
+  if (!ConfigLoaded || force)
     {
       SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
       QString aPath = resMgr->stringValue("resources", "PVViewer", QString());
