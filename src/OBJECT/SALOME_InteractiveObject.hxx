@@ -59,7 +59,7 @@ public:
   Standard_EXPORT   Standard_Boolean isComponentType(const char* ComponentDataType); 
 
   // Must be defined for using by NCollection for ceratin of data map
-  friend Standard_Boolean IsEqual(const Handle(SALOME_InteractiveObject)& anIO1,
+  Standard_EXPORT friend Standard_Boolean IsEqual(const Handle(SALOME_InteractiveObject)& anIO1,
 				  const Handle(SALOME_InteractiveObject)& anIO2);
 
 protected:
