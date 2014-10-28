@@ -263,7 +263,7 @@
     </message>
     <message>
         <source>DSC_SVTK_SCALING</source>
-        <translation>Mise à l&apos;échelle</translation>
+        <translation>Changer l&apos;échelle des axes de coordonnées</translation>
     </message>
     <message>
         <source>MNU_SVTK_SCALING</source>
@@ -340,10 +340,6 @@ Veuillez consulter la documentation.</translation>
     <message>
         <source>LBL_Z</source>
         <translation>Z:</translation>
-    </message>
-    <message>
-        <source>MEN_SCALING</source>
-        <translation>Echelle</translation>
     </message>
     <message>
         <source>DLG_TITLE</source>

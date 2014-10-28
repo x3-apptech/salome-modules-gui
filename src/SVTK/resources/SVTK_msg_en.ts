@@ -263,7 +263,7 @@
     </message>
     <message>
         <source>DSC_SVTK_SCALING</source>
-        <translation>Scaling</translation>
+        <translation>Change scale of axes</translation>
     </message>
     <message>
         <source>MNU_SVTK_SCALING</source>
@@ -340,10 +340,6 @@ Please, refer to the documentation.</translation>
     <message>
         <source>LBL_Z</source>
         <translation>Z:</translation>
-    </message>
-    <message>
-        <source>MEN_SCALING</source>
-        <translation>Scaling</translation>
     </message>
     <message>
         <source>DLG_TITLE</source>

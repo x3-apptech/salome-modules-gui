@@ -190,7 +190,7 @@
     </message>
     <message>
         <source>MNU_SCALING</source>
-        <translation>Changer l&apos;échelle</translation>
+        <translation>Mise à l&apos;échelle</translation>
     </message>
     <message>
         <source>DSC_SCALING</source>
@@ -425,7 +425,7 @@
     <name>OCCViewer_AxialScaleDlg</name>
     <message>
         <source>DLG_SCALING</source>
-        <translation>Changer l&apos;échelle des axes</translation>
+        <translation>Mise à l&apos;échelle</translation>
     </message>
     <message>
         <source>LBL_X</source>

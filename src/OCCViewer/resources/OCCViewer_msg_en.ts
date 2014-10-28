@@ -425,7 +425,7 @@
     <name>OCCViewer_AxialScaleDlg</name>
     <message>
         <source>DLG_SCALING</source>
-        <translation>Axes scaling</translation>
+        <translation>Scaling</translation>
     </message>
     <message>
         <source>LBL_X</source>

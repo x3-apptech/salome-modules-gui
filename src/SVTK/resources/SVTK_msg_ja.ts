@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>DSC_SVTK_SCALING</source>
-      <translation>スケーリング</translation>
+      <translation>座標のスケールの軸を変更します。</translation>
     </message>
     <message>
       <source>MNU_SVTK_SCALING</source>
@@ -339,10 +339,6 @@
     <message>
       <source>LBL_Z</source>
       <translation>Z:</translation>
-    </message>
-    <message>
-      <source>MEN_SCALING</source>
-      <translation>スケール</translation>
     </message>
     <message>
       <source>DLG_TITLE</source>
