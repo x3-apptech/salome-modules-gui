@@ -96,12 +96,12 @@ void getMinMaxFromContext( Handle(AIS_InteractiveContext) ic,
         double xmin, ymin, zmin, xmax, ymax, zmax;
 #if OCC_VERSION_LARGE > 0x06070100
 	Bnd_Box aBox = aPrs->MinMaxValues();
-	xmin = aBox.CornerMin().X();
-	ymin = aBox.CornerMin().Y();
-	zmin = aBox.CornerMin().Z();
-	xmax = aBox.CornerMax().X();
-	ymax = aBox.CornerMax().Y();
-	zmax = aBox.CornerMax().Z();
+	xmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
+	ymin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
+	zmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Z();
+	xmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
+	ymax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
+	zmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
 #else
         aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
 #endif

@@ -960,12 +960,12 @@ double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
 
 #if OCC_VERSION_LARGE > 0x06070100
   Bnd_Box aBox = view3d->View()->MinMaxValues();
-  Xmin = aBox.CornerMin().X();
-  Ymin = aBox.CornerMin().Y();
-  Zmin = aBox.CornerMin().Z();
-  Xmax = aBox.CornerMax().X();
-  Ymax = aBox.CornerMax().Y();
-  Zmax = aBox.CornerMax().Z();
+  Xmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
+  Ymin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
+  Zmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Z();
+  Xmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
+  Ymax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
+  Zmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
 #else
   view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
 #endif
