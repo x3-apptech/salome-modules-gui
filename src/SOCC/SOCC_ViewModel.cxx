@@ -57,7 +57,6 @@
 
 //#include "SALOMEDSClient.hxx"
 //#include "SALOMEDS_StudyManager.hxx"
-#include <Basics_OCCTVersion.hxx>
 
 #include <AIS_TypeOfIso.hxx>
 #include <Precision.hxx>

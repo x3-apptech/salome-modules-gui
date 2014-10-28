@@ -24,7 +24,6 @@
 #include "Utils_CorbaException.hxx"
 
 #include "CASCatch.hxx"
-#include "Basics_OCCTVersion.hxx"
 
 #include <OSD.hxx>
 
