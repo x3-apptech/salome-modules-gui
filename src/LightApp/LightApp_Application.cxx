@@ -4154,6 +4154,11 @@ void LightApp_Application::onDesktopMessage( const QString& message )
     // update object browser
     updateObjectBrowser();
   }
+  else if ( message.toLower().startsWith( "activate_viewer" ) ) {
+    QString vtype = message.split( sectionSeparator ).last();
+    if ( !vtype.isEmpty() )
+      getViewManager( vtype, true );
+  }
   else {
     QStringList data = message.split( sectionSeparator );
     if ( data.count() > 1 ) {

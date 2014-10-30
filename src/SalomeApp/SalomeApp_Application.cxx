@@ -588,6 +588,9 @@ void SalomeApp_Application::onDesktopMessage( const QString& message )
     if ( a )
       a->setEnabled( false );
   }
+  else if ( message.toLower() == "connect_to_study" ) {
+    onLoadDoc();
+  }
   LightApp_Application::onDesktopMessage( message );
 }
 
