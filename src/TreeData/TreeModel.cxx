@@ -186,7 +186,7 @@ bool TreeModel::setHeaderData(int section, Qt::Orientation orientation,
 // This part is a specific behavior to get a TreeModel that can
 // organize itself the tree hierarchy using data provided in a
 // filesystem-like format:
-// 
+//
 // data="a/b/c" ==> creation/filling of the hierarchy a->b->c
 // The "folder" categories are unique whereas the leaves may exists
 // in multiple instances.
@@ -206,5 +206,12 @@ bool TreeModel::addData(DataObject * dataObject) {
 bool TreeModel::addData(DataObject * dataObject, const QStringList &path) {
   TreeItem * rootItem = this->getItem();
   rootItem->appendChild(dataObject, path);
+  return true;
+}
+
+bool TreeModel::removeData(DataObject * dataObject) {
+  QStringList path = QString(dataObject->getPath().c_str()).split(DataObject::pathsep.c_str());
+  TreeItem * rootItem = this->getItem();
+  rootItem->removeChild(dataObject, path);
   return true;
 }

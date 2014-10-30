@@ -47,7 +47,7 @@ void TreeItem::initialize(const QString &nameId,
   //when creating the root item).
   if ( parent != NULL ) {
     this->associateToModel(parent->associatedModel());
-  }  
+  }
 }
 
 TreeItem::~TreeItem()
@@ -128,13 +128,13 @@ void TreeItem::appendChild(const QString &nameId,
     folder = new TreeItem(folderNameId, folderColumnValues, this);
     this->appendChild(folder);
   }
-    
+
   // We create the relative path of the next iteration (delete the
   // first folder path).
   QStringList nextRelativePath;
   for (int i = 1; i < relativePath.size(); ++i)
     nextRelativePath << relativePath[i];
-    
+
   folder->appendChild(nameId, columnValues, nextRelativePath);
 }
 
@@ -152,6 +152,49 @@ void TreeItem::appendChild(TreeItem *item)
   _childItemsMapById[item->nameId()] = item;
   _childItemsMapByLabel[item->data(0).toString()] = item;
   model->endInsertRows();
+}
+
+/*!
+ * This removes the specified child to this item. This item is the
+ * direct parent of the specified child.
+ */
+void TreeItem::removeChild(TreeItem *item)
+{
+  TreeModel * model = this->associatedModel();
+
+  int position = this->childCount();
+  model->beginRemoveRows(this->modelIndex(), position, position);
+  _childItems.removeOne(item);
+  _childItemsMapById.remove(item->nameId());
+  _childItemsMapByLabel.remove(item->data(0).toString());
+  model->endRemoveRows();
+}
+
+void TreeItem::removeChild(DataObject * dataObject, const QStringList &relativePath) {
+  if ( relativePath.isEmpty() ) {
+    // It is a direct child => just remove it.
+    QString nameId = QString(dataObject->getNameId().c_str());
+    TreeItem * child = this->childById(nameId);
+    if (child != NULL)
+      this->removeChild(child);
+    return;
+  }
+
+  // The child is embedded in a sub-folder.
+  // We first check if the sub-folder already exist:
+  TreeItem * folder = this->childByLabel(relativePath[0]);
+  if ( folder == NULL )
+    return;
+
+  // Go down into subfolder, if any.
+  QStringList nextRelativePath;
+  for (int i = 1; i < relativePath.size(); ++i)
+    nextRelativePath << relativePath[i];
+
+  folder->removeChild(dataObject, nextRelativePath);
+
+  if (folder->childCount() == 0)
+    this->removeChild(folder);
 }
 
 /*!

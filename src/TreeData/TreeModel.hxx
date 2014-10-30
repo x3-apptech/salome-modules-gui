@@ -83,7 +83,7 @@ public:
   // This part is a specific behavior to get a TreeModel that can
   // organize itself the tree hierarchy using data provided in a
   // filesystem-like format:
-  // 
+  //
   // data="a/b/c" ==> creation/filling of the hierarchy a->b->c
   // The "folder" categories are unique whereas the leaves may exists
   // in multiple instances.
@@ -93,6 +93,7 @@ public:
   bool addData(DataObject * dataObject, const QStringList &path);
 
   // TODO: We should implement the delete and the update fucntions
+  bool removeData(DataObject * dataObject);
 
   // This part contains helper functions for general purposes
   TreeItem * getRootItem();

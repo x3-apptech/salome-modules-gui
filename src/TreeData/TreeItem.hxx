@@ -51,8 +51,10 @@ class TREEDATA_EXPORT TreeItem
                    const QVector<QVariant> &columnValues,
                    const QStringList &relativePath=QStringList());
 
-  
-  
+  void removeChild(TreeItem * child);
+  void removeChild(DataObject * dataObject,
+                   const QStringList &relativePath=QStringList());
+
   TreeItem *child(int row);
   TreeItem *childById(const QString &nameId);
   TreeItem *childByLabel(const QString &label);
@@ -61,7 +63,6 @@ class TREEDATA_EXPORT TreeItem
   int rowIndex() const;
   QVariant data(int column) const;
   bool setData(int column, const QVariant &value);
-
 
  private:
   void initialize(const QString &nameId,
