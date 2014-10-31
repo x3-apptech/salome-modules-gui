@@ -205,8 +205,8 @@ void QtxAbstractRubberBand::updateMask()
   if ( isClosed() )
     r += createRegion( myPoints.last(), myPoints.first() );
 
-  setMask( r );
-
+  if ( !r.isEmpty() )
+    setMask( r );
 }
 
 
