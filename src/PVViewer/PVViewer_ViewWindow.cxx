@@ -22,6 +22,7 @@
 
 #include "PVViewer_ViewWindow.h"
 #include "PVViewer_ViewManager.h"
+#include "PVViewer_ViewModel.h"
 #include "PVViewer_GUIElements.h"
 
 #include <SUIT_ViewManager.h>
@@ -46,6 +47,7 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
   : SUIT_ViewWindow( theDesktop ), myPVMgr( 0 )
 {
   myModel = theModel;
+  setViewManager(myModel->getViewManager());
   myPVMgr = qobject_cast<pqTabbedMultiViewWidget*>(pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (myPVMgr) {
     myPVMgr->setParent( this );
