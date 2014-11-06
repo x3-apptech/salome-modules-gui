@@ -23,7 +23,6 @@
 
 #ifndef DISABLE_PYCONSOLE
   #include <PyConsole_Interp.h> // this include must be first (see PyInterp_base.h)!
-  #include <PyConsole_Console.h>
 #endif
 
 #include "SalomeApp_DoubleSpinBox.h"
@@ -438,8 +437,7 @@ SalomeApp_DoubleSpinBox::SearchState SalomeApp_DoubleSpinBox::findVariable( cons
           if( studyDS->IsString( aName ) )
             {
 #ifndef DISABLE_PYCONSOLE
-              PyConsole_Console* pyConsole = app->pythonConsole();
-              PyConsole_Interp* pyInterp = pyConsole->getInterp();
+              PyConsole_Interp* pyInterp = app->getPyInterp();
               PyLockWrapper aLock; // Acquire GIL
               std::string command;
               command  = "import salome_notebook ; ";

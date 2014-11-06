@@ -19,12 +19,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : PyConsole_Interp.cxx
 //  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
-//
+
 #include "PyConsole_Interp.h"
 
 /*!
@@ -48,14 +45,17 @@
   Creates new python interpreter.
 */
 PyConsole_Interp::PyConsole_Interp(): PyInterp_Interp()
-{}
+{
+}
 
 /*!
   \brief Destructor.
 
   Does nothing for the moment.
 */
-PyConsole_Interp::~PyConsole_Interp() { }
+PyConsole_Interp::~PyConsole_Interp()
+{
+}
 
 /*! Sets the variable "__IN_SALOME_GUI_CONSOLE" to True.
 * This is not attached to a module (like salome_iapp.IN_SALOME_GUI_CONSOLE)
@@ -71,4 +71,23 @@ int PyConsole_Interp::beforeRun()
 int PyConsole_Interp::afterRun()
 {
   return PyRun_SimpleString("__builtins__.__IN_SALOME_GUI_CONSOLE=False");
+}
+
+QStringList PyConsole_Interp::getLastMatches() const
+{
+  return QStringList();
+}
+
+QString PyConsole_Interp::getDocStr() const
+{
+  return QString();
+}
+
+int PyConsole_Interp::runDirCommand(const QString&, const QString& )
+{
+  return 0;
+}
+
+void PyConsole_Interp::clearCompletion()
+{
 }

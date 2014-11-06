@@ -23,7 +23,6 @@
 #ifndef PYCONSOLE_REQUEST_H_
 #define PYCONSOLE_REQUEST_H_
 
-#include "PyConsole.h"
 #include "PyInterp_Request.h"
 
 #include <vector>
@@ -31,7 +30,6 @@
 #include <QEvent>
 
 class PyInterp_Interp;
-class PyConsole_Editor;
 
 /*!
   \class ExecCommand
@@ -52,8 +50,8 @@ public:
   */
   ExecCommand( PyInterp_Interp*        theInterp,
                const QString&          theCommand,
-               PyConsole_Editor*       theListener,
-               bool                    sync = false );
+               QObject*                theListener,
+               bool                    theSync = false );
 
 protected:
   /*!
@@ -73,17 +71,14 @@ private:
   int     myState;     //!< Python command execution status
 };
 
-class PyConsole_EnhInterp;
-class PyConsole_EnhEditor;
-
 class CompletionCommand : public PyInterp_LockRequest
 {
 public:
-  CompletionCommand( PyConsole_EnhInterp*      theInterp,
-               const QString&          input,
-               const QString&          startMatch,
-               PyConsole_EnhEditor*    theListener,
-               bool                    sync = false );
+  CompletionCommand( PyInterp_Interp*     theInterp,
+		     const QString&       theInput,
+		     const QString&       theStartMatch,
+		     QObject*             theListener,
+		     bool                 theSync = false );
 
 
 protected:
@@ -99,7 +94,6 @@ protected:
 
   virtual void execute();
   virtual QEvent* createEvent();
-
 };
 
 #endif /* PYCONSOLE_REQUEST_H_ */

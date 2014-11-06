@@ -221,7 +221,6 @@ static const char* imageEmptyIcon[] = {
 
 int LightApp_Application::lastStudyId = 0;
 
-
 // Markers used to parse array with dockable windows and toolbars state.
 // For more details please see the qdockarealayout.cpp && qtoolbararealayout.cpp
 // in the Qt source code.
@@ -1616,7 +1615,7 @@ void LightApp_Application::onStudyCreated( SUIT_Study* theStudy )
 
 #ifndef DISABLE_PYCONSOLE
   if( pythonConsole() )
-    pythonConsole()->getInterp()->initStudy();
+    getPyInterp()->initStudy();
 #endif
 }
 
@@ -1647,7 +1646,7 @@ void LightApp_Application::onStudyOpened( SUIT_Study* theStudy )
 
 #ifndef DISABLE_PYCONSOLE
   if( pythonConsole() )
-    pythonConsole()->getInterp()->initStudy();
+    getPyInterp()->initStudy();
 #endif
 
   emit studyOpened();
@@ -1916,7 +1915,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else  if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(),new LightApp_PyInterp());
+    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), getPyInterp() );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
@@ -4456,3 +4455,19 @@ bool LightApp_Application::checkExistingDoc()
   return result;
 }
 
+#ifndef DISABLE_PYCONSOLE
+
+PyConsole_Interp* LightApp_Application::getPyInterp()
+{
+  static PyConsole_Interp* myInterp = 0;
+  if ( !myInterp )
+    myInterp = createPyInterp();
+  return myInterp;
+}
+
+PyConsole_Interp* LightApp_Application::createPyInterp()
+{
+  return new LightApp_PyInterp();
+}
+
+#endif // DISABLE_PYCONSOLE

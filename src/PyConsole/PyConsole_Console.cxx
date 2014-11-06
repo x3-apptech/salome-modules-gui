@@ -52,18 +52,15 @@
 PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp )
 : QWidget( parent )
 {
-  // create python interpreter
-  myInterp = interp;
-  if ( !myInterp )
-    myInterp = new PyConsole_Interp();
+  PyConsole_Interp* anInterp = interp ? interp : new PyConsole_Interp();
   
   // initialize Python interpretator
-  myInterp->initialize();
+  anInterp->initialize();
   
   // create editor console
   QVBoxLayout* lay = new QVBoxLayout( this );
   lay->setMargin( 0 );
-  myEditor = new PyConsole_Editor( myInterp, this );
+  myEditor = new PyConsole_Editor( anInterp, this );
   char* synchronous = getenv("PYTHON_CONSOLE_SYNC");
   if (synchronous && atoi(synchronous))
   {
@@ -78,8 +75,8 @@ PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp 
 /**
  * Protected constructor.
  */
-PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* i,  PyConsole_Editor* e)
-  : QWidget (parent), myEditor(e), myInterp(i)
+PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* /*i*/,  PyConsole_Editor* e )
+  : QWidget (parent), myEditor(e)
 {}
 
 /*!
@@ -90,6 +87,11 @@ PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* i,  PyC
 PyConsole_Console::~PyConsole_Console()
 {
 }
+
+PyConsole_Interp* PyConsole_Console::getInterp() const
+{
+  return myEditor ? myEditor->getInterp() : 0;
+} 
 
 /*!
   \brief Execute python command in the interpreter.
@@ -373,21 +375,18 @@ void PyConsole_Console::stopLog()
  * @param parent
  * @param interp
  */
-PyConsole_EnhConsole::PyConsole_EnhConsole( QWidget* parent, PyConsole_EnhInterp* interp)
-  : PyConsole_Console(parent, interp, 0)
+PyConsole_EnhConsole::PyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp )
+  : PyConsole_Console( parent, interp, 0 )
 {
-  // create python interpreter
-  myInterp = interp;
-  if ( !myInterp )
-    myInterp = new PyConsole_EnhInterp();
+  PyConsole_Interp* anInterp = interp ? interp : new PyConsole_EnhInterp();
 
   // initialize Python interpretator
-  myInterp->initialize();
+  anInterp->initialize();
 
   // create editor console
   QVBoxLayout* lay = new QVBoxLayout( this );
   lay->setMargin( 0 );
-  myEditor = new PyConsole_EnhEditor( static_cast<PyConsole_EnhInterp*>(myInterp), this );
+  myEditor = new PyConsole_EnhEditor( anInterp, this );
   char* synchronous = getenv("PYTHON_CONSOLE_SYNC");
   if (synchronous && atoi(synchronous))
   {

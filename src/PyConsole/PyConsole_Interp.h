@@ -19,18 +19,16 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : PyConsole_Interp.h
 //  Author : Nicolas REJNERI, Adrien BRUNETON
-//  Module : SALOME
-//
+
 #ifndef PYCONSOLE_INTERP_H
 #define PYCONSOLE_INTERP_H
 
 #include "PyConsole.h"
+#include "PyInterp_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
 
-#include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include <QStringList>
 
 class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
 {
@@ -40,6 +38,12 @@ public:
 
   virtual int afterRun();
   virtual int beforeRun();
+
+  virtual QStringList getLastMatches() const;
+  virtual QString getDocStr() const;
+
+  virtual int runDirCommand(const QString&, const QString&);
+  virtual void clearCompletion();
 };
 
 #endif // PYCONSOLE_INTERP_H

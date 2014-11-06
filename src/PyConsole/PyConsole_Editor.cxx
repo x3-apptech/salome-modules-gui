@@ -191,14 +191,18 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
 
 /*!
   \brief Destructor.
-
-  Does nothing for the moment.
 */
 PyConsole_Editor::~PyConsole_Editor()
 {
-  myInterp->destroy();
-  delete myInterp;
   myInterp = 0;
+}
+
+/*!
+  \brief Get Python interpreter
+*/
+PyConsole_Interp* PyConsole_Editor::getInterp() const
+{
+  return myInterp;
 }
 
 /*!

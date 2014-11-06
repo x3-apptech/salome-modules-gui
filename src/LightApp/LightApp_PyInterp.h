@@ -27,11 +27,13 @@
 
 class LightApp_PyInterp : public PyConsole_EnhInterp
 {
+  friend class LightApp_Application;
+
 public:
-  LightApp_PyInterp();
   virtual ~LightApp_PyInterp();
   
 protected:
+  LightApp_PyInterp();
   virtual void initPython();
 };
 

@@ -1112,7 +1112,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), new SalomeApp_PyInterp() );
+    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), getPyInterp() );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
@@ -2124,3 +2124,13 @@ bool SalomeApp_Application::checkExistingDoc()
   }
   return result;
 }
+
+
+#ifndef DISABLE_PYCONSOLE
+
+PyConsole_Interp* SalomeApp_Application::createPyInterp()
+{
+  return new SalomeApp_PyInterp();
+}
+
+#endif // DISABLE_PYCONSOLE

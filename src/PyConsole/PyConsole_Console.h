@@ -34,7 +34,6 @@
 
 class PyConsole_Interp;
 class PyConsole_Editor;
-class PyConsole_EnhInterp;
 
 class PYCONSOLE_EXPORT PyConsole_Console : public QWidget, public SUIT_PopupClient
 {
@@ -59,7 +58,7 @@ public:
   virtual ~PyConsole_Console();
 
   //! \brief Get python interperter
-  PyConsole_Interp*   getInterp() { return myInterp; } 
+  PyConsole_Interp*   getInterp() const;
   QFont               font() const;
   virtual void        setFont( const QFont& );
 
@@ -93,8 +92,6 @@ protected:
 
   PyConsole_Console( QWidget* parent, PyConsole_Interp*,  PyConsole_Editor*);
 
-
-  PyConsole_Interp*   myInterp;    //!< python interpreter
   PyConsole_Editor*   myEditor;    //!< python console editor widget
   QMap<int, QAction*> myActions;   //!< menu actions list
 };
@@ -109,7 +106,7 @@ class PYCONSOLE_EXPORT PyConsole_EnhConsole: public PyConsole_Console
   Q_OBJECT
 
 public:
-  PyConsole_EnhConsole( QWidget* parent, PyConsole_EnhInterp* interp = 0);
+  PyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp = 0 );
   virtual ~PyConsole_EnhConsole() {}
 };
 
