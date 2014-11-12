@@ -312,7 +312,8 @@ int QtxActionMenuMgr::insert( QAction* a, const int pId, const int group, const 
   \param idx menu index inside the menu group
   \return action ID
 */
-int QtxActionMenuMgr::insert( const QString& title, const int pId, const int group, const int id, const int idx )
+int QtxActionMenuMgr::insert( const QString& title, const int pId, const int group,
+                              const int id, const int idx,  QMenu* _menu)
 {
   MenuNode* pNode = pId == -1 ? myRoot : find( pId );
   if ( !pNode )
@@ -333,7 +334,11 @@ int QtxActionMenuMgr::insert( const QString& title, const int pId, const int gro
 
   int gid = (id == -1 || eNode ) ? generateId() : id;
 
-  QMenu* menu = new QMenu( 0 );
+  QMenu* menu;
+  if (_menu)
+    menu = _menu;
+  else
+    menu = new QMenu( 0 );
   QAction* ma = menu->menuAction();
   ma->setText( title );
 

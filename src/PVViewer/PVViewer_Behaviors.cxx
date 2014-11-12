@@ -79,7 +79,6 @@ void PVViewer_Behaviors::instanciateMinimalBehaviors(SUIT_Desktop * desk)
 
       new pqDefaultViewBehavior(this);  // shows a 3D view as soon as a server connection is made
       new pqAlwaysConnectedBehavior(this);  // client always connected to a server
-      new pqAutoLoadPluginXMLBehavior(this);  // auto load plugins
       new pqVerifyRequiredPluginBehavior(this);
       new pqPluginSettingsBehavior(this);
       new pqFixPathsInStateFilesBehavior(this);
@@ -111,6 +110,7 @@ void PVViewer_Behaviors::instanciateAllBehaviors(SUIT_Desktop * desk)
       new pqSpreadSheetVisibilityBehavior(this);
       new pqPipelineContextMenuBehavior(this);
       new pqUndoRedoBehavior(this);
+      new pqAutoLoadPluginXMLBehavior(this);  // auto load plugins GUI stuff
       new pqPluginDockWidgetsBehavior(desk);
       new pqPluginActionGroupBehavior(desk);
       new pqPersistentMainWindowStateBehavior(desk);

@@ -44,10 +44,10 @@ public:
   pqPropertiesPanel * getPropertiesPanel() { return propertiesPanel; }
   pqPipelineBrowserWidget * getPipelineBrowserWidget() { return pipelineBrowserWidget; }
 
-  // Update the sources menu from what was built in private member 'sourcesMenu'
-//  void updateSourcesMenu(QMenu *);
-//  void updateFiltersMenu(QMenu *);
-//  void updateMacrosMenu(QMenu *);
+  QMenu * getFiltersMenu() { return filtersMenu; }
+  QMenu * getSourcesMenu() { return sourcesMenu; }
+  QMenu * getMacrosMenu()  { return macrosMenu; }
+
 
 public slots:
   void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"

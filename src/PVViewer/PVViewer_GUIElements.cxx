@@ -40,12 +40,12 @@ PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
   pipelineBrowserWidget  = new pqPipelineBrowserWidget(desk);
   pipelineBrowserWidget->hide();
 
-//  sourcesMenu = new QMenu(desk);
-//  pqParaViewMenuBuilders::buildSourcesMenu(*sourcesMenu, desk);
-//  filtersMenu = new QPVMenu(desk);
-//  pqParaViewMenuBuilders::buildFiltersMenu(*filtersMenu, desk);
-//  macrosMenu = new QMenu(desk);
-//  pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
+  sourcesMenu = new QMenu(0);
+  pqParaViewMenuBuilders::buildSourcesMenu(*sourcesMenu, desk);
+  filtersMenu = new QMenu(0);
+  pqParaViewMenuBuilders::buildFiltersMenu(*filtersMenu, desk);
+  macrosMenu = new QMenu(0);
+  pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
 }
 
 PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
