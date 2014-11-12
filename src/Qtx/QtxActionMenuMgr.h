@@ -71,7 +71,7 @@ public:
 
   int          insert( const QString&, const QString&, const int, const int = -1, const int = -1 );
   int          insert( const QString&, const QStringList&, const int, const int = -1, const int = -1 );
-  virtual int  insert( const QString&, const int, const int, const int = -1, const int = -1 );
+  virtual int  insert( const QString&, const int, const int, const int = -1, const int = -1 , QMenu* = 0);
 
   int          append( const int, const int, const int );
   int          append( QAction*, const int, const int );

@@ -572,12 +572,12 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
   \return menu item ID or -1 if menu item could not be added
 */
 int CAM_Module::createMenu( const QString& subMenu, const int menu,
-                            const int id, const int group, const int idx )
+                            const int id, const int group, const int idx, QMenu * menuObj )
 {
   if ( !menuMgr() )
     return -1;
   
-  return menuMgr()->insert( subMenu, menu, group, id, idx );
+  return menuMgr()->insert( subMenu, menu, group, id, idx, menuObj );
 }
 
 /*!
