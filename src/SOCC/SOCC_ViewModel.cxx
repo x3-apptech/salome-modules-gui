@@ -550,7 +550,7 @@ SALOME_Prs* SOCC_Viewer::CreatePrs( const char* entry )
 /*!
   Activates selection of sub-shapes
 */
-void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
+void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<int> modes )
 {
   Handle(AIS_InteractiveContext) ic = getAISContext();
   
@@ -578,18 +578,31 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode
     Handle(AIS_InteractiveObject) anAIS = aIter.Value();
     if ( !anAIS.IsNull() )
     {
+      std::list<int>::const_iterator it;
       if ( anAIS->IsKind( STANDARD_TYPE( AIS_Shape ) ) )
       {
         ic->Load( anAIS, -1, false );
-        ic->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)theMode ) );
+        for( it = modes.begin(); it != modes.end(); ++it )
+          ic->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)*it ) );
       }
       else if ( anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron) )
       {
         ic->Load( anAIS, -1, false );
-        ic->Activate( anAIS, theMode );
+        for( it = modes.begin(); it != modes.end(); ++it )
+          ic->Activate( anAIS, *it );
       }
     }
   }
+}
+
+/*!
+  Activates selection of sub-shapes
+*/
+void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const int theMode )
+{
+  std::list<int> modes;
+  modes.push_back( theMode );
+  LocalSelection( thePrs, modes );
 }
 
 /*!

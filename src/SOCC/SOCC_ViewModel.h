@@ -62,6 +62,7 @@ public:
   virtual SALOME_Prs*         CreatePrs( const char* entry = 0 );
 
   virtual void                LocalSelection( const SALOME_OCCPrs*, const int );
+  virtual void                LocalSelection( const SALOME_OCCPrs*, const std::list<int> );
   virtual void                GlobalSelection( const bool = false ) const;
   virtual bool                isVisible( const Handle(SALOME_InteractiveObject)& );
   virtual void                GetVisible( SALOME_ListIO& );
