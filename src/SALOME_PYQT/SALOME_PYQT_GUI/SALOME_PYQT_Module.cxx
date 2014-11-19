@@ -247,6 +247,18 @@ void SALOME_PYQT_Module::preferencesChanged( const QString& section, const QStri
 }
 
 /*!
+  \brief Called when study is closed
+  \param study study being closed
+  \sa PyModuleHelper::studyClosed()
+*/
+void SALOME_PYQT_Module::studyClosed( SUIT_Study* study )
+{
+  // call helper
+  myHelper->modelClosed( study );
+  SalomeApp_Module::studyClosed( study );
+}
+
+/*!
   \brief Test if object \a what can be dragged by the user.
   \param what data object being tested
   \return \c true if object can be dragged or \c false otherwise

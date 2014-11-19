@@ -53,6 +53,7 @@ public:
   void            contextMenuPopup( const QString&, QMenu*, QString& );
   void            createPreferences();
   void            preferencesChanged( const QString&, const QString& );
+  void            studyClosed( SUIT_Study* );
 
   // drag-n-drop support
   bool            isDraggable( const SUIT_DataObject* ) const;
