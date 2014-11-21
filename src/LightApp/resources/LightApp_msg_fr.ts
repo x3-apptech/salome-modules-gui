@@ -75,7 +75,12 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <name>LightApp_Application</name>
     <message>
         <source>LANG_CHANGED</source>
-        <translation>La langue de l&apos;application a été modifié.
+        <translation>La langue de l&apos;application a été modifiée.
+Les modifications seront appliquées à la prochaine session.</translation>
+    </message>
+    <message>
+        <source>LOCALE_CHANGED</source>
+        <translation>La locale de l&apos;application a été modifiée.
 Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
@@ -484,7 +489,11 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>NEW_WINDOW_5</source>
-        <translation>Sène G&amp;raphiques</translation>
+        <translation>Scène G&amp;raphiques</translation>
+    </message>
+    <message>
+        <source>NEW_WINDOW_6</source>
+        <translation>Scène ParaVie&amp;w</translation>
     </message>
     <message>
         <source>CREATING_NEW_WINDOW</source>
@@ -573,6 +582,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
     <message>
         <source>PREF_CURRENT_LANGUAGE</source>
         <translation>Langue actuelle</translation>
+    </message>
+    <message>
+        <source>PREF_CURRENT_LOCALE</source>
+        <translation>Utiliser la locale &quot;C&quot;</translation>
     </message>
     <message>
         <source>PREF_GROUP_LOOK_AND_FEEL</source>
