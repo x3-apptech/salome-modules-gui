@@ -21,6 +21,10 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
         <translation>L&apos;étude est verrouillée</translation>
     </message>
     <message>
+        <source>WRN_NO_STUDY_ON SERV</source>
+        <translation>Pas d&apos;étude active dans cette session.</translation>
+    </message>
+    <message>
         <source>CLOSE_LOCKED_STUDY</source>
         <translation>Fermer l&apos;étude verrouillée ?</translation>
     </message>
@@ -97,6 +101,14 @@ Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
         <source>ERR_ACTIVE_STUDY_OPEN</source>
         <translation>Impossible d&apos;ouvrir l&apos;étude car il y en a déjà une d&apos;active.
 Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
+    </message>
+    <message>
+        <source>OPEN_DOCUMENT_PROBLEM</source>
+        <translation>Problème inconnu à l&apos;ouverture du document</translation>
+    </message>
+    <message>
+        <source>CREATE_DOCUMENT_PROBLEM</source>
+        <translation>Problème inconnu à la création du document</translation>
     </message>
     <message>
         <source>TOT_DESK_CONNECT_STUDY</source>
