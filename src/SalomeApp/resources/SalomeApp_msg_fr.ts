@@ -14,15 +14,11 @@ Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas 
     </message>
     <message>
         <source>ERR_ACTIVEDOC_LOAD</source>
-        <translation>Une étude est déjà en cours dans votre session, mais vous n&apos;êtes pas connecté dessus. Utiliser le bouton Connecter pour la charger dans l&apos;interface.</translation>
+        <translation type="unfinished">A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.</translation>
     </message>
     <message>
         <source>WRN_STUDY_LOCKED</source>
         <translation>L&apos;étude est verrouillée</translation>
-    </message>
-    <message>
-        <source>WRN_NO_STUDY_ON SERV</source>
-        <translation>Pas d&apos;étude active dans cette session.</translation>
     </message>
     <message>
         <source>CLOSE_LOCKED_STUDY</source>
@@ -103,36 +99,28 @@ Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
 Lancez une nouvelle session ou fermez l&apos;étude en cours.</translation>
     </message>
     <message>
-        <source>OPEN_DOCUMENT_PROBLEM</source>
-        <translation>Problème inconnu à l&apos;ouverture du document</translation>
-    </message>
-    <message>
-        <source>CREATE_DOCUMENT_PROBLEM</source>
-        <translation>Problème inconnu à la création du document</translation>
-    </message>
-    <message>
         <source>TOT_DESK_CONNECT_STUDY</source>
-        <translation>Connecter une étude</translation>
+        <translation type="unfinished">Connect study</translation>
     </message>
     <message>
         <source>TOT_DESK_DISCONNECT_STUDY</source>
-        <translation>Déconnecter une étude</translation>
+        <translation type="unfinished">Disconnect study</translation>
     </message>
     <message>
         <source>PRP_DESK_CONNECT</source>
-        <translation>Connecter l&apos;étude en cours</translation>
+        <translation type="unfinished">Connect active study</translation>
     </message>
     <message>
         <source>PRP_DESK_DISCONNECT</source>
-        <translation>Déconnecter l&apos;étude en cours</translation>
+        <translation type="unfinished">Disconnect the current study</translation>
     </message>
     <message>
         <source>MEN_DESK_CONNECT</source>
-        <translation>Conn&amp;ecter</translation>
+        <translation type="unfinished">Conn&amp;ect</translation>
     </message>
     <message>
         <source>MEN_DESK_DISCONNECT</source>
-        <translation>Déconnecter</translation>
+        <translation type="unfinished">D&amp;isconnect</translation>
     </message>
 </context>
 <context>
@@ -380,7 +368,7 @@ Voulez-vous le recharger ?</translation>
     </message>
     <message>
         <source>ACTIVATE_MODULE_OP_LOAD</source>
-        <translation>&amp;Connecter</translation>
+        <translation type="unfinished">&amp;Connect</translation>
     </message>
     <message>
         <source>ACTIVATE_MODULE_OP_SCRIPT</source>
@@ -412,19 +400,19 @@ Voulez-vous le recharger ?</translation>
     </message>
     <message>
         <source>DISCONNECT_CAPTION</source>
-        <translation>Déconnecter l&apos;étude en cours</translation>
+        <translation type="unfinished">Disconnect active study</translation>
     </message>
     <message>
         <source>DISCONNECT_DESCRIPTION</source>
-        <translation>Voulez-vous sauver l&apos;étude avant de la déconnecter ?</translation>
+        <translation type="unfinished">Do you want to save study before disconnect?</translation>
     </message>
     <message>
         <source>DISCONNECT_SAVE</source>
-        <translation>&amp;Sauver &amp;&amp; Déconnecter</translation>
+        <translation type="unfinished">&amp;Save &amp;&amp; Disconnect</translation>
     </message>
     <message>
         <source>DISCONNECT_WO_SAVE</source>
-        <translation>&amp;Déconnecter sans sauver</translation>
+        <translation type="unfinished">&amp;Disconnect w/o saving</translation>
     </message>
 </context>
 <context>
