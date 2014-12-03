@@ -93,8 +93,8 @@
 #include "SVTK_Recorder.h"
 #include "SVTK_RecorderDlg.h"
 
-#include "vtkPVAxesWidget.h"
-#include "vtkPVAxesActor.h"
+#include "salomevtkPVAxesWidget.h"
+#include "salomevtkPVAxesActor.h"
 
 #include "SALOME_ListIO.hxx"
 
@@ -213,14 +213,14 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   
   setCentralWidget(myInteractor);
   
-  myAxesWidget = vtkPVAxesWidget::New();
+  myAxesWidget = salomevtk::vtkPVAxesWidget::New();
   myAxesWidget->SetParentRenderer(aRenderer->GetDevice());
   myAxesWidget->SetViewport(0, 0, 0.25, 0.25);
   myAxesWidget->SetInteractor(myInteractor->GetDevice());
   myAxesWidget->SetEnabled(1);
   myAxesWidget->SetInteractive(0);
 
-  vtkPVAxesActor* anAxesActor = myAxesWidget->GetAxesActor();
+  salomevtk::vtkPVAxesActor* anAxesActor = myAxesWidget->GetAxesActor();
   anAxesActor->GetXAxisTipProperty()->SetColor(   1.0, 0.0, 0.0 );
   anAxesActor->GetXAxisShaftProperty()->SetColor( 1.0, 0.0, 0.0 );
   anAxesActor->GetXAxisLabelProperty()->SetColor( 1.0, 0.0, 0.0 );

@@ -66,7 +66,10 @@ class SVTK_KeyFreeInteractorStyle;
 class SVTK_ViewParameterDlg;
 class SVTK_Recorder;
 
-class vtkPVAxesWidget;
+namespace salomevtk
+{
+  class vtkPVAxesWidget;
+}
 
 class vtkObject;
 class QtxAction;
@@ -453,7 +456,7 @@ protected:
   int myToolBar;
   int myRecordingToolBar;
 
-  vtkPVAxesWidget* myAxesWidget;
+  salomevtk::vtkPVAxesWidget* myAxesWidget;
   Qtx::BackgroundData myBackground;
 
 private:

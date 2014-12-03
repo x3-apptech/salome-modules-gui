@@ -35,12 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkPVAxesActor is used to represent 3D axes in the scene. The user can
 // define the geometry to use for the shaft and the tip, and the user can
 // set the text for the three axes. The text will follow the camera.
+//
+// VSR 03/12/2014: the original file vtkPVAxesActor.h has been renamed to salomevtkPVAxesActor.h
+// to avoid collisions with native VTK/ParaView classes
 
+#ifndef __salomevtkPVAxesActor_h
+#define __salomevtkPVAxesActor_h
 
-#ifndef __vtkPVAxesActor_h
-#define __vtkPVAxesActor_h
-
-#include "SVTK.h"
+#include "SVTK.h"               // added by SALOME
 #include "vtkProp3D.h"
 
 #include <vtkVersion.h>
@@ -57,6 +59,11 @@ class vtkConeSource;
 class vtkSphereSource;
 class vtkPolyData;
 class vtkVectorText;
+
+// VSR 03/12/2014: we put classes copied from VTK/ParaView to the specific namespace
+// to avoid collisions with native VTK/ParaView classes
+namespace salomevtk
+{
 
 class SVTK_EXPORT vtkPVAxesActor : public vtkProp3D
 {
@@ -290,6 +297,8 @@ private:
   vtkPVAxesActor(const vtkPVAxesActor&);  // Not implemented.
   void operator=(const vtkPVAxesActor&);  // Not implemented.
 };
+
+} // end of salomevtk namespace
 
 #endif
 

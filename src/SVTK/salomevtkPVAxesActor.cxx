@@ -29,7 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVAxesActor.h"
+//
+// VSR 03/12/2014: the original file vtkPVAxesActor.cxx has been renamed to salomevtkPVAxesActor.cxx
+// to avoid collisions with native VTK/ParaView classes
+
+#include "salomevtkPVAxesActor.h" // changed by SALOME
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
 
@@ -49,6 +53,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 #include <math.h>
+
+// VSR 03/12/2014: we put classes copied from VTK/ParaView to the specific namespace
+// to avoid collisions with native VTK/ParaView classes
+namespace salomevtk
+{
 
 vtkStandardNewMacro(vtkPVAxesActor);
 
@@ -807,3 +816,5 @@ void vtkPVAxesActor::AddToRender( vtkRenderer* theRenderer )
   theRenderer->AddActor(this->YAxisLabel);
   theRenderer->AddActor(this->ZAxisLabel);
 }
+
+} // end of salomevtk namespace
