@@ -56,7 +56,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>STUDYCLOSE_DESCRIPTION</source>
-        <translation type="unfinished">You already have an active study in your 
+      <translation type="unfinished">You already have an active study in your 
 session. It has to be closed before working with another study.</translation>
     </message>
     <message>
@@ -490,6 +490,10 @@ session. It has to be closed before working with another study.</translation>
     <message>
       <source>NEW_WINDOW_5</source>
       <translation>グラフィックの表示 （&amp;r）</translation>
+    </message>
+    <message>
+      <source>NEW_WINDOW_6</source>
+      <translation type="unfinished">ParaVie&w view</translation>
     </message>
     <message>
       <source>CREATING_NEW_WINDOW</source>

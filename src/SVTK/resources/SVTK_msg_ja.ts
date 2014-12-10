@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>DSC_SVTK_SCALING</source>
-      <translation>座標のスケールの軸を変更します。</translation>
+      <translation>スケーリング</translation>
     </message>
     <message>
       <source>MNU_SVTK_SCALING</source>
