@@ -24,10 +24,25 @@
 #include <pqPropertiesPanel.h>
 #include <pqPipelineBrowserWidget.h>
 #include <pqParaViewMenuBuilders.h>
+#include <pqMainControlsToolbar.h>
+#include <pqVCRToolbar.h>
+#include <pqAnimationTimeToolbar.h>
+#include <pqColorToolbar.h>
+#include <pqRepresentationToolbar.h>
+#include <pqCameraToolbar.h>
+#include <pqAxesToolbar.h>
+#include <pqSetName.h>
+
+#include <pqPythonManager.h>
+#include <pqApplicationCore.h>
 
 #include <QMenu>
 #include <QList>
 #include <QAction>
+#include <QToolBar>
+#include <QLayout>
+
+#include <QCoreApplication>
 
 PVViewer_GUIElements * PVViewer_GUIElements::theInstance = 0;
 
@@ -46,6 +61,8 @@ PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
   pqParaViewMenuBuilders::buildFiltersMenu(*filtersMenu, desk);
   macrosMenu = new QMenu(0);
   pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
+
+  myBuildToolbars(desk);
 }
 
 PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
@@ -55,46 +72,93 @@ PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
   return theInstance;
 }
 
-//void PVViewer_GUIElements::updateSourcesMenu(QMenu *menu)
-//{
-//  if (menu)
-//    {
-//      menu->clear();
-//      QList<QAction *> act_list = sourcesMenu->actions();
-//      foreach(QAction * a, act_list)
-//      {
-//        menu->addAction(a);
-//      }
-//    }
-//}
-//
-//void PVViewer_GUIElements::updateFiltersMenu(QMenu *menu)
-//{
-//  if (menu)
-//    {
-//      filtersMenu->linkToMenu(menu);
-//      menu->clear();
-//      QList<QAction *> act_list = filtersMenu->actions();
-//      foreach(QAction * a, act_list)
-//      {
-//        menu->addAction(a);
-//      }
-//    }
-//}
-//
-//void PVViewer_GUIElements::updateMacrosMenu(QMenu *menu)
-//{
-//  if (menu)
-//    {
-//      menu->clear();
-//      QList<QAction *> act_list = macrosMenu->actions();
-//      foreach(QAction * a, act_list)
-//      {
-//        menu->addAction(a);
-//      }
-//    }
-//}
+/**
+ * See ParaView source code: pqParaViewMenuBuilders::buildToolbars()
+ * to keep this function up to date:
+ */
+void PVViewer_GUIElements::myBuildToolbars(SUIT_Desktop* mainWindow)
+{
+  mainToolBar = new pqMainControlsToolbar(mainWindow)
+    << pqSetName("MainControlsToolbar");
+  mainToolBar->layout()->setSpacing(0);
 
+  vcrToolbar = new pqVCRToolbar(mainWindow)
+    << pqSetName("VCRToolbar");
+  vcrToolbar->layout()->setSpacing(0);
+
+  timeToolbar = new pqAnimationTimeToolbar(mainWindow)
+    << pqSetName("currentTimeToolbar");
+  timeToolbar->layout()->setSpacing(0);
+
+  colorToolbar = new pqColorToolbar(mainWindow)
+    << pqSetName("variableToolbar");
+  colorToolbar->layout()->setSpacing(0);
+
+  reprToolbar = new pqRepresentationToolbar(mainWindow)
+    << pqSetName("representationToolbar");
+  reprToolbar->layout()->setSpacing(0);
+
+  cameraToolbar = new pqCameraToolbar(mainWindow)
+    << pqSetName("cameraToolbar");
+  cameraToolbar->layout()->setSpacing(0);
+
+  axesToolbar = new pqAxesToolbar(mainWindow)
+    << pqSetName("axesToolbar");
+  axesToolbar->layout()->setSpacing(0);
+
+  // Give the macros menu to the pqPythonMacroSupervisor
+  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
+    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+
+  macrosToolbar = new QToolBar("Macros Toolbars", mainWindow)
+      << pqSetName("MacrosToolbar");
+    manager->addWidgetForRunMacros(macrosToolbar);
+
+  addToolbars(mainWindow);
+}
+
+void PVViewer_GUIElements::setToolBarVisible(bool show)
+{
+  QCoreApplication::processEvents();
+  mainAction->setChecked(!show);
+  mainAction->trigger();
+  vcrAction->setChecked(!show);
+  vcrAction->trigger();
+  timeAction->setChecked(!show);
+  timeAction->trigger();
+  colorAction->setChecked(!show);
+  colorAction->trigger();
+  reprAction->setChecked(!show);
+  reprAction->trigger();
+  cameraAction->setChecked(!show);
+  cameraAction->trigger();
+  axesAction->setChecked(!show);
+  axesAction->trigger();
+  macrosAction->setChecked(!show);
+  macrosAction->trigger();
+}
+
+void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
+{
+  desk->addToolBar(Qt::TopToolBarArea, mainToolBar);
+  desk->addToolBar(Qt::TopToolBarArea, vcrToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, timeToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, colorToolbar);
+  desk->insertToolBarBreak(colorToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, reprToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, cameraToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, axesToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, macrosToolbar);
+
+  mainAction = mainToolBar->toggleViewAction();
+  vcrAction = vcrToolbar->toggleViewAction();
+  timeAction = timeToolbar->toggleViewAction();
+  colorAction = colorToolbar->toggleViewAction();
+  reprAction = reprToolbar->toggleViewAction();
+  cameraAction = cameraToolbar->toggleViewAction();
+  axesAction = axesToolbar->toggleViewAction();
+  macrosAction = macrosToolbar->toggleViewAction();
+}
 
 void PVViewer_GUIElements::onEmulateApply()
 {

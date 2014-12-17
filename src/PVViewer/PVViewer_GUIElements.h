@@ -29,6 +29,10 @@ class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
 class SUIT_Desktop;
 class QMenu;
+class QToolBar;
+class QAction;
+class pqAnimationTimeToolbar;
+class pqVCRToolbar;
 
 /*!
  * Some GUI elements of ParaView need to be instanciated in a proper order. This class
@@ -48,6 +52,12 @@ public:
   QMenu * getSourcesMenu() { return sourcesMenu; }
   QMenu * getMacrosMenu()  { return macrosMenu; }
 
+  pqVCRToolbar * getVCRToolbar() { return vcrToolbar; }
+  pqAnimationTimeToolbar * getTimeToolbar() { return timeToolbar; }
+
+  void myBuildToolbars(SUIT_Desktop* desk);
+  void addToolbars(SUIT_Desktop* desk);
+  void setToolBarVisible(bool show);
 
 public slots:
   void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"
@@ -66,6 +76,26 @@ private:
   QMenu * sourcesMenu;
   QMenu * filtersMenu;
   QMenu * macrosMenu;
+
+  // Toolbars also need to be instanciated early:
+  QToolBar* mainToolBar;
+  pqVCRToolbar* vcrToolbar;
+  pqAnimationTimeToolbar * timeToolbar;
+  QToolBar* colorToolbar;
+  QToolBar* reprToolbar;
+  QToolBar* cameraToolbar;
+  QToolBar* axesToolbar;
+  QToolBar* macrosToolbar;
+
+public:
+  QAction * mainAction;
+  QAction *  vcrAction;
+  QAction *  timeAction;
+  QAction *  colorAction;
+  QAction *  reprAction;
+  QAction *  cameraAction;
+  QAction *  axesAction;
+  QAction *  macrosAction;
 };
 
 #endif /* PVVIEWERGUIELEMENTS_H_ */
