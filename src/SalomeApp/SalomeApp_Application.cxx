@@ -688,10 +688,15 @@ void SalomeApp_Application::onSelectionChanged()
    LightApp_SelectionMgr* mgr = selectionMgr();
    mgr->selectedObjects(list);
 
-   LightApp_Module* m = dynamic_cast<LightApp_Module*>( activeModule() );
-
    bool canCopy  = false;
    bool canPaste = false;
+
+   LightApp_Module* m = dynamic_cast<LightApp_Module*>( activeModule() );
+
+   if ( m ) {
+     canCopy  = m->canCopy();
+     canPaste = m->canPaste();
+   }
 
    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
    if (study) {
@@ -704,12 +709,8 @@ void SalomeApp_Application::onSelectionChanged()
          _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
          if ( so ) {
-           canCopy = studyMgr()->CanCopy(so);
-           canPaste = studyMgr()->CanPaste(so);
-         }
-         else if ( m ) {
-           canCopy  = m->canCopy();
-           canPaste = m->canPaste();
+           canCopy  = canCopy  || studyMgr()->CanCopy(so);
+           canPaste = canPaste || studyMgr()->CanPaste(so);
          }
        }
      }
