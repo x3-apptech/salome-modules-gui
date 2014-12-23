@@ -493,7 +493,7 @@ session. It has to be closed before working with another study.</translation>
     </message>
     <message>
       <source>NEW_WINDOW_6</source>
-      <translation type="unfinished">ParaVie&w view</translation>
+      <translation type="unfinished">ParaVie&amp;w view</translation>
     </message>
     <message>
       <source>CREATING_NEW_WINDOW</source>
