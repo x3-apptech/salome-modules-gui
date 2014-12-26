@@ -288,14 +288,11 @@ public:
         if ( it != entry2SuitObject.end() )
         {
           suit_obj = it->second;
-          // VSR: object is not removed, since SALOMEDS::SObject is not actually removed,
-          //      only its attributes are cleared;
-          //      thus, the object can be later reused
           suit_obj->updateItem();
-          //SUIT_DataObject* father=suit_obj->parent();
-          //if(father)
-          //  father->removeChild(suit_obj);
-          //entry2SuitObject.erase(it);
+          SUIT_DataObject* father=suit_obj->parent();
+          if(father)
+            father->removeChild(suit_obj);
+          entry2SuitObject.erase(it);
         }
         else
         {
