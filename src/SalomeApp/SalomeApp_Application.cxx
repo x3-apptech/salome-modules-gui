@@ -404,7 +404,7 @@ void SalomeApp_Application::onExit()
   if ( result ) {
     if ( !killServers ) myIsCloseFromExit = true;
     SUIT_Session::session()->closeSession( SUIT_Session::ASK, killServers );
-    myIsCloseFromExit = false;
+    if ( SUIT_Session::session()->applications().count() > 0 ) myIsCloseFromExit = false;
   }
 }
 
