@@ -41,6 +41,7 @@ SET(_link_LIBRARIES
 SET(_moc_HEADERS
   qtlocalpeer.h
   qtsingleapplication.h
+  HelpBrowser_Application.h
 )
 
 # --- resources ---
@@ -60,6 +61,7 @@ QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 SET(_other_SOURCES
   qtlocalpeer.cpp
   qtsingleapplication.cpp
+  HelpBrowser_Application.cxx
   HelpBrowser.cxx
 )
 

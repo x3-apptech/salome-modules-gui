@@ -427,6 +427,15 @@ void LightApp_Application::start()
   LightApp_EventFilter::Init();
 }
 
+/*!Closeapplication.*/
+void LightApp_Application::closeApplication()
+{
+  QProcess::startDetached( "HelpBrowser",
+                           QStringList() << QString( "--remove=%1" ).arg( QApplication::instance()->applicationPid() ) );
+
+  CAM_Application::closeApplication();
+}
+
 /*!Gets application name.*/
 QString LightApp_Application::applicationName() const
 {
@@ -1108,6 +1117,7 @@ void LightApp_Application::onHelpContentsModule()
   else {
     QStringList parameters;
     parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
     parameters << helpFile;
     QProcess::startDetached( "HelpBrowser", parameters );
   }
@@ -1178,6 +1188,7 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
   else {
     QStringList parameters;
     parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
     parameters << QString( "%1#%2" ).arg( helpFile ).arg( context );
     QProcess::startDetached( "HelpBrowser", parameters );
   }

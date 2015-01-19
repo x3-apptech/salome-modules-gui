@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2014  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -21,11 +21,14 @@
 //
 // File   : HelpBrowser.cxx
 // Author : Vadim SANDLER, OpenCASCADE S.A.S. (vadim.sandler@opencascade.com)
+//          Maxim GLIBIN, OpenCASCADE S.A.S. (maxim.glibin@opencascade.com)
 
-#include "qtsingleapplication.h"
+#include "HelpBrowser_Application.h"
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QLibraryInfo>
 #include <QMessageBox>
 #include <QTextStream>
@@ -40,7 +43,7 @@ namespace
 {
   void printHelp()
   {
-    QFileInfo fi( QtSingleApplication::arguments().at(0) );
+    QFileInfo fi( HelpBrowser_Application::arguments().at(0) );
 
     std::cout << std::endl;
     std::cout << "SALOME Help Browser" << std::endl;
@@ -51,6 +54,8 @@ namespace
     std::cout << "Options:" << std::endl;
     std::cout << "-h, --help         Prints this help and quits." << std::endl;
     std::cout << "--language=LANG    Use LANG language in menus." << std::endl;
+    //std::cout << "--add=APP_PID      Adds PID of application into the file." << std::endl;
+    //std::cout << "--remove=APP_PID   Removes PID of application from the file." << std::endl;
     std::cout << std::endl;
   }
 }
@@ -92,7 +97,7 @@ public:
     info << in.readAll().split( "\n" );
 
     QMessageBox::about( this, tr( "About %1" ).arg( tr( "Help Browser" ) ),
-			info.join( "\n" ) );
+      info.join( "\n" ) );
   }
   void load( const QString& url )
   {
@@ -103,73 +108,154 @@ public:
 
 int main( int argc, char **argv )
 {
-  // set application name (for preferences)
-  
-  QtSingleApplication::setApplicationName( "salome" );
+  // Set application name (for preferences)
+  HelpBrowser_Application::setApplicationName( "salome" );
 
-  // specify application identifier via its name
+  // Specify application identifier via its name
   QFileInfo fi( argv[0] );
 
-  // create application instance
+  // Create application instance
+  HelpBrowser_Application instance( fi.fileName(), argc, argv );
 
-  QtSingleApplication instance( fi.fileName(), argc, argv );
+  // Parse command line arguments
+  bool showHelp  = false;
+  bool removeId  = false;
 
-  // parse command line arguments
-
-  bool showHelp = false;
   QString language;
   QString helpfile;
+  QString anAppID = QString();
 
-  QRegExp rl( "--language=(.+)" );
+  QRegExp rl( "--(.+)=(.+)" );
   rl.setMinimal( false );
 
-  for ( int a = 1; a < argc; ++a ) {
-    QString param = argv[a];
-    if ( param == "--help" || param == "-h" )
+  for ( int i = 1; i < argc; i++ )
+  {
+    QString param = argv[i];
+    if ( param == "--help" || param == "-h" ) {
       showHelp = true;
-    else if ( rl.exactMatch( param ) )
-      language = rl.cap( 1 );
-    else
+    }
+    else if ( rl.exactMatch( param ) ) {
+      QString opt = rl.cap( 1 );
+      QString val = rl.cap( 2 );
+      if ( opt == "language" )
+        language = val;
+      else if ( opt == "add" )
+        anAppID = val;
+      else if ( opt == "remove" ) {
+        anAppID = val;
+        removeId = true;
+      }
+    }
+    else {
       helpfile = param;
+    }
   }
 
-  // show help and exit if --help or -h option has been specified via command line
-
-  if ( showHelp ) {
+  // Show help and exit if '--help' or '-h' option has been specified via command line
+  if ( showHelp )
+  {
     printHelp();
     exit( 0 );
   }
 
+  // Create a file with an application PIDs. File will be managed by only current application
+  QStringList dirs;
+  dirs << QDir::homePath();
+  dirs << QString( ".config" );
+  dirs << HelpBrowser_Application::applicationName();
+  dirs << QString( "HelpBrowser" );
+  QString aWatchedFile = dirs.join( QDir::separator() );
+
+  QFile aFile( aWatchedFile );
   if ( instance.sendMessage( helpfile ) )
+  {
+    // Client application.
+    if ( aFile.exists() && !anAppID.isEmpty() )
+    {
+      // Update the content of monitoring file
+      if ( aFile.open( QIODevice::ReadWrite | QIODevice::Text ) )
+      {
+        QTextStream anInStream( &aFile );
+        QString aContent( anInStream.readAll() );
+
+        QRegExp rx("(\\d+)+");
+        QStringList anAppIDs;
+        int pos = 0;
+        while ( pos >= 0 )
+        {
+          pos = rx.indexIn( aContent, pos );
+          if ( pos >= 0 )
+          {
+            anAppIDs += rx.cap( 1 );
+            pos += rx.matchedLength();
+          }
+        }
+
+        if ( removeId )
+        {
+          if ( anAppIDs.contains( anAppID ) )
+            anAppIDs.removeAt( anAppIDs.indexOf( anAppID ) );
+        }
+        else
+        {
+          if ( !anAppIDs.contains( anAppID ) )
+            anAppIDs.append( anAppID );
+        }
+
+        aFile.resize( 0 );
+
+        QTextStream anOutStream( &aFile );
+        
+        foreach (QString anAppId, anAppIDs )
+          anOutStream << anAppId << endl;
+        aFile.close();
+      }
+    }
     return 0;
+  }
+  else
+  {
+    if ( !anAppID.isEmpty() )
+    {
+      // Clear file system watcher if one has have path
+      instance.clearWatcher();
 
-  // load translations
+      if ( aFile.open( QIODevice::WriteOnly | QIODevice::Text ) )
+      {
+        // Write date and time when the file was created
+        QTextStream aOutStream( &aFile );
+        aOutStream << anAppID << endl;
+        aFile.close();
+      }
 
+      // Add file path to file system watcher
+      instance.addWatchPath( aWatchedFile );
+    }
+  }
+
+  // Load translations
   QtxTranslator tqt, tsal;
   if ( !language.isEmpty() ) {
     if ( tqt.load( QString( "qt_%1" ).arg( language ), QLibraryInfo::location( QLibraryInfo::TranslationsPath ) ) )
       instance.installTranslator( &tqt );
 
-    QDir appDir = QtSingleApplication::applicationDirPath();
-    appDir.cdUp(); appDir.cdUp(); 
-    
+    QDir appDir = HelpBrowser_Application::applicationDirPath();
+    appDir.cdUp(); appDir.cdUp();
+
     if ( tsal.load( QString( "Qtx_msg_%1" ).arg( language ), appDir.filePath( "share/salome/resources/gui" ) ) )
       instance.installTranslator( &tsal );
   }
 
-  // initialize resource manager (for preferences)
-
+  // Initialize resource manager (for preferences)
   QtxResourceMgr* resMgr = new QtxResourceMgr( "HelpBrowser", "%1Config" );
   resMgr->setCurrentFormat( "xml" );
   QtxWebBrowser::setResourceMgr( resMgr );
 
-  // show main window
-
+  // Show main window
   HelpBrowser browser;
   browser.show();
 
-  // load file specified via command line
-
+  // Load file specified via command line
   if ( helpfile.isEmpty() ) {
     QString docdir = qgetenv( "DOCUMENTATION_ROOT_DIR" );
     if ( !docdir.isEmpty() )
@@ -180,12 +266,14 @@ int main( int argc, char **argv )
     browser.load( helpfile );
   }
 
-  // finalize main window activation
-
+  // Finalize main window activation
   instance.setActivationWindow( &browser );
-  
+
   QObject::connect( &instance, SIGNAL( messageReceived( QString ) ),
-		    &browser,  SLOT( load ( QString ) ) );
+                    &browser,  SLOT( load ( QString ) ) );
+
+  QObject::connect( instance.fileSysWatcher(), SIGNAL(fileChanged(const QString&)),
+                    &instance, SLOT(updateWatchStatement(const QString&)));
 
   return instance.exec();
 }

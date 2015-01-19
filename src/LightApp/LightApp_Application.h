@@ -142,6 +142,7 @@ public:
   void                                placeDockWindow( const int, Qt::DockWidgetArea );
 
   virtual void                        start();
+  virtual void                        closeApplication();
 
   virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
