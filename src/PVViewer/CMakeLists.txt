@@ -74,6 +74,7 @@ SET(PVViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 # resource files / to be processed by lrelease
 SET(_ts_RESOURCES
   resources/PVViewer_msg_en.ts
+  resources/PVViewer_msg_ja.ts
 )
 
 # --- sources ---

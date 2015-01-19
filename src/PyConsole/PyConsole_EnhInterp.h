@@ -38,14 +38,11 @@
 class PYCONSOLE_EXPORT PyConsole_EnhInterp: public PyConsole_Interp
 {
 public:
-  PyConsole_EnhInterp()
-    : PyConsole_Interp(), _last_matches(0), _doc_str("")
-    {}
+  PyConsole_EnhInterp();
+  virtual ~PyConsole_EnhInterp();
 
-  virtual ~PyConsole_EnhInterp() {}
-
-  const std::vector<QString>& getLastMatches() const { return _last_matches; }
-  const QString & getDocStr() const                  { return _doc_str; }
+  virtual QStringList getLastMatches() const;
+  virtual QString getDocStr() const;
 
   virtual int runDirCommand(const QString& dirArgument, const QString& startMatch);
   virtual void clearCompletion();
@@ -55,13 +52,12 @@ protected:
   static const std::vector<QString> PYTHON_KEYWORDS;
 
   /** Last computed matches */
-  std::vector<QString> _last_matches;
+  QStringList _last_matches;
   /** Doc string of the first match - when only one match it will be displayed by the Editor*/
   QString _doc_str;
 
-  virtual int runDirAndExtract(const QString& dirArgument, const QString & startMatch,
-      std::vector<QString> & result, bool discardSwig=true) const;
-
+  virtual int runDirAndExtract(const QString& dirArgument, const QString& startMatch,
+			       QStringList& result, bool discardSwig=true) const;
 };
 
 #endif /* PYCONSOLE_ENHINTERP_H_ */

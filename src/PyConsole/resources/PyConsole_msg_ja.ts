@@ -28,12 +28,12 @@
       <translation>スクリプト コマンドを生成します。(&amp;u)</translation>
     </message>
     <message>
-        <source>EDIT_STARTLOG_CMD</source>
-        <translation type="unfinished">Start &amp;Log</translation>
+      <source>EDIT_STARTLOG_CMD</source>
+      <translation type="unfinished">Start &amp;Log</translation>
     </message>
     <message>
-        <source>EDIT_STOPLOG_CMD</source>
-        <translation type="unfinished">Stop &amp;Log</translation>
+      <source>EDIT_STOPLOG_CMD</source>
+      <translation type="unfinished">Stop &amp;Log</translation>
     </message>
   </context>
   <context>
@@ -43,20 +43,20 @@
       <translation>スクリプト コマンドを生成します。</translation>
     </message>
     <message>
-        <source>TOT_SAVE_PYLOG</source>
-        <translation type="unfinished">Save log</translation>
+      <source>TOT_SAVE_PYLOG</source>
+      <translation type="unfinished">Save log</translation>
     </message>
     <message>
       <source>PYTHON_FILES_FILTER</source>
       <translation>ファイル (*.py) PYTHON</translation>
     </message>
     <message>
-        <source>LOG_FILES_FILTER</source>
-        <translation type="unfinished">Log files (*.log *.txt)</translation>
+      <source>LOG_FILES_FILTER</source>
+      <translation type="unfinished">Log files (*.log *.txt)</translation>
     </message>
     <message>
-        <source>ERR_FILE_NOT_WRITABLE</source>
-        <translation type="unfinished">File is not writable!</translation>
+      <source>ERR_FILE_NOT_WRITABLE</source>
+      <translation type="unfinished">File is not writable!</translation>
     </message>
   </context>
 </TS>

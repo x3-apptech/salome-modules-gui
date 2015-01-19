@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>すべてのオブジェクトを表示するには、シーンを Redimentionner</translation>
+      <translation>すべてのオブジェクトを表示するには、シーンを</translation>
     </message>
     <message>
       <source>MNU_CLIPPING</source>
@@ -425,7 +425,7 @@
     <name>OCCViewer_AxialScaleDlg</name>
     <message>
       <source>DLG_SCALING</source>
-      <translation>スケーリング</translation>
+      <translation>スケールの変更</translation>
     </message>
     <message>
       <source>LBL_X</source>
@@ -551,8 +551,8 @@
       <translation>パラメータ</translation>
     </message>
     <message>
-        <source>HELP</source>
-        <translation>ヘルプ(&amp;H)</translation>
+      <source>HELP</source>
+      <translation>ヘルプ(&amp;H)</translation>
     </message>
   </context>
 </TS>

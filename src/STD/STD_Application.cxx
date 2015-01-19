@@ -409,6 +409,8 @@ bool STD_Application::closeDoc( bool ask )
 bool STD_Application::closeActiveDoc( bool permanently )
 {
   SUIT_Study* study = activeStudy();
+  if ( !study ) // no active study
+    return true;
 
   beforeCloseDoc( study );
 

@@ -168,6 +168,7 @@ protected:
 
 #ifndef DISABLE_PYCONSOLE
   bool                                updateStudy();
+  virtual PyConsole_Interp*           createPyInterp();
 #endif
 
   virtual void                        afterCloseDoc();

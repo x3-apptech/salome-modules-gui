@@ -29,7 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVAxesWidget.h"
+// VSR 03/12/2014: the original file vtkPVAxesWidget.cxx has been renamed to salomevtkPVAxesWidget.cxx
+// to avoid collisions with native VTK/ParaView classes
+
+#include "salomevtkPVAxesWidget.h"   // changed by SALOME
+#include "salomevtkPVAxesActor.h"    // changed by SALOME
 
 #include "vtkActor2D.h"
 #include "vtkCallbackCommand.h"
@@ -41,10 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
-#include "vtkPVAxesActor.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+
+// VSR 03/12/2014: we put classes copied from VTK/ParaView to the specific namespace
+// to avoid collisions with native VTK/ParaView classes
+namespace salomevtk
+{
 
 vtkStandardNewMacro(vtkPVAxesWidget);
 
@@ -866,3 +874,5 @@ void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AxesActor: " << this->AxesActor << endl;
   os << indent << "Interactive: " << this->Interactive << endl;
 }
+
+} // end of salomevtk namespace

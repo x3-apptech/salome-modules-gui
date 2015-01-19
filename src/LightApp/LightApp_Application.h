@@ -42,6 +42,7 @@
 class LogWindow;
 #ifndef DISABLE_PYCONSOLE
 class PyConsole_Console;
+class PyConsole_Interp;
 #endif
 class LightApp_WidgetContainer;
 class LightApp_Preferences;
@@ -182,6 +183,10 @@ public:
 
   virtual bool                        checkExistingDoc();
 
+#ifndef DISABLE_PYCONSOLE
+  PyConsole_Interp*                   getPyInterp();
+#endif
+
 signals:
   void                                studyOpened();
   void                                studySaved();
@@ -230,6 +235,10 @@ protected:
 
   virtual QMap<int, QString>          activateModuleActions() const;
   virtual void                        moduleActionSelected( const int );
+
+#ifndef DISABLE_PYCONSOLE
+  virtual PyConsole_Interp*           createPyInterp();
+#endif
 
 protected slots:
   virtual void                        onDesktopActivated();

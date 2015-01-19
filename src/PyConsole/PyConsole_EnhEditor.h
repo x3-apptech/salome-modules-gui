@@ -23,12 +23,10 @@
 #define PYCONSOLE_ENHEDITOR_H_
 
 #include "PyConsole.h"
-
 #include "PyConsole_Editor.h"
+
 #include <QObject>
 #include <queue>
-
-class PyConsole_EnhInterp;
 
 /**
  * Enhanced Python editor handling tab completion.
@@ -38,7 +36,7 @@ class PYCONSOLE_EXPORT PyConsole_EnhEditor: public PyConsole_Editor
   Q_OBJECT;
 
 public:
-  PyConsole_EnhEditor(PyConsole_EnhInterp * interp, QWidget * parent=0);
+  PyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent = 0);
   virtual ~PyConsole_EnhEditor() {}
 
 signals:
@@ -83,14 +81,14 @@ protected:
   virtual void handleTab();
   virtual void handleBackTab();
   virtual void clearCompletion();
-  virtual void formatCompletion(const std::vector<QString> & matches, QString & result) const;
+  virtual void formatCompletion(const QStringList& matches, QString& result) const;
   virtual QString formatDocHTML(const QString & doc) const;
 
   virtual void multilinePaste(const QString & s);
   virtual void multiLineProcessNextLine();
 
 private:
-  void extractCommon(const std::vector<QString> & matches, QString & result) const;
+  void extractCommon(const QStringList& matches, QString& result) const;
 
 };
 

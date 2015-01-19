@@ -2,7 +2,7 @@
 
 \page study_management_page Study management
 
-Study is a document within application, where you can carry out all
+Study is a document within the application, where you can carry out all
 operations provided by the SALOME functionality. 
 This is a certain abstraction layer between actual
 document data (probably, remote data available through CORBA) and data
@@ -14,21 +14,21 @@ All operations with study are available from the \b File menu.
 \note SALOME is a single-study application. It means that only one study
 can be opened at the moment.
 
-Immediately after application start-up there is (normally) no active study.
+Immediately after the application is launched there is (normally) no active study.
 However, you have access to the embedded Python console, that can be used to initialize
-the study by means of Python API (see documentation on SALOME KERNEL module for more details).
+a study by means of Python API (see documentation on SALOME KERNEL module for more details).
 
 The following operations are available from the \b File menu:
 
 \image html menu_file.png
 
-As soon as study is created, loaded from the file or from the data server,
-some additional operations become available from the \b File menu:
+As soon as a study is created or loaded from a file or a data server,
+additional operations become available from the \b File menu:
 
 \image html studymanagement.png
 
 \b New - creates a new study. The study will be created
-with default name \b Study1. If there is already opened study,
+with default name \b Study1. If there is an already opened study,
 you will be asked to close it before creating new one.
 
 \b Open - allows to open an existing study by browsing for it in a
@@ -70,7 +70,7 @@ by the following dialog box with several options:
 
 \b Disconnect - unloads the current study from the desktop. The study stays opened
 in the data server; it can be then reloaded in the same working session
-(\b Connect operation), but if you quit SALOME application, all changes in the
+(using \b Connect operation), but if you quit SALOME application, all changes in the
 unloaded study can be lost.
 
 \note If the study has not been previously saved, you will be prompted

@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>DASHDOT_LINE_LBL</source>
-      <translation>TiretPoint</translation>
+      <translation>DashDot</translation>
     </message>
     <message>
       <source>DASH_LINE_LBL</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>DAHSDOTDOT_LINE_LBL</source>
-      <translation>TiretPointPoint</translation>
+      <translation>DashDotDot</translation>
     </message>
     <message>
       <source>NONE_LINE_LBL</source>
@@ -60,12 +60,12 @@
       <translation>ダイヤモンド</translation>
     </message>
     <message>
-      <source>NONE_MARKER_LBL</source>
-      <translation>[なし]</translation>
-    </message>
-    <message>
       <source>CIRCLE_MARKER_LBL</source>
       <translation>円</translation>
+    </message>
+    <message>
+      <source>NONE_MARKER_LBL</source>
+      <translation>[なし]</translation>
     </message>
   </context>
   <context>
@@ -143,7 +143,7 @@
     </message>
     <message>
       <source>PREF_BOTTOM</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>下</translation>
     </message>
     <message>
       <source>PREF_CURVE_TYPE</source>
@@ -462,8 +462,8 @@
       <source>PLOT2D_SELECTED_LEGEND_FONT_COLOR</source>
       <translation>ハイライト凡例フォントの色:</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>Plot2d_SetupCurveDlg</name>
     <message>
       <source>TLT_SETUP_CURVE</source>
@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>CURVE_LINE_WIDTH_LAB</source>
-      <translation>線の太さ:</translation>
+      <translation>線幅:</translation>
     </message>
     <message>
       <source>CURVE_LINE_TYPE_LAB</source>
-      <translation>回線の種類:</translation>
+      <translation>線種:</translation>
     </message>
     <message>
       <source>CURVE_COLOR_LAB</source>
@@ -483,30 +483,30 @@
     </message>
     <message>
       <source>CURVE_PREVIEW_LAB</source>
-      <translation>プレビュー</translation>
+      <translation>プレビュー：</translation>
     </message>
     <message>
       <source>CURVE_MARKER_TYPE_LAB</source>
       <translation>マーカーの種類:</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>Plot2d_ViewWindow</name>
     <message>
       <source>MNU_DUMP_VIEW</source>
-      <translation>ビューを保存.</translation>
+      <translation type="unfinished">Dump view...</translation>
     </message>
     <message>
       <source>MNU_PAN_VIEW</source>
-      <translation>パンニング</translation>
+      <translation>パン</translation>
     </message>
     <message>
       <source>MNU_CLONE_VIEW</source>
-      <translation>ビューの複製</translation>
+      <translation type="unfinished">Clone View</translation>
     </message>
     <message>
       <source>MNU_PRINT_VIEW</source>
-      <translation>印刷ビュー</translation>
+      <translation type="unfinished">Print View</translation>
     </message>
     <message>
       <source>POSTSCRIPT_FILES</source>
@@ -514,7 +514,7 @@
     </message>
     <message>
       <source>ENCAPSULATED_POSTSCRIPT_FILES</source>
-      <translation>カプセル化された PostScript (*.eps) ファイル</translation>
+      <translation>カプセル化された PostScript ファイル (*.eps)</translation>
     </message>
     <message>
       <source>PDF_FILES</source>
@@ -522,31 +522,31 @@
     </message>
     <message>
       <source>DSC_GLOBALPAN_VIEW</source>
-      <translation>ビューの新しい中心地の選択</translation>
+      <translation type="unfinished">Selection of a new center of the view</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_MODE_LINEAR_VER</source>
-      <translation>線形スケールのモードには、垂直軸の表示を変更します。</translation>
+      <translation type="unfinished">Switches view to linear scaling mode along vertical axis</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_MODE_LINEAR_HOR</source>
-      <translation>線形スケールのモードに、ビューの水平方向の軸を変更します。</translation>
+      <translation type="unfinished">Switches view to linear scaling mode along horizontal axis</translation>
     </message>
     <message>
       <source>CURVE_TYPE_POPUP</source>
-      <translation>曲線の種類</translation>
+      <translation type="unfinished">Curve type</translation>
     </message>
     <message>
       <source>NORMALIZATION_TYPE_POPUP</source>
-      <translation>標準化</translation>
+      <translation type="unfinished">Normalization</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_MODE_LINEAR_VER</source>
-      <translation>垂直軸: 線形</translation>
+      <translation type="unfinished">Vertical axis: linear</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_MODE_LINEAR_HOR</source>
-      <translation>水平軸: 線形</translation>
+      <translation type="unfinished">Horizontal axis: linear</translation>
     </message>
     <message>
       <source>MNU_ZOOM_VIEW</source>
@@ -554,99 +554,99 @@
     </message>
     <message>
       <source>DSC_PAN_VIEW</source>
-      <translation>ビューを移動します。</translation>
+      <translation>パン</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_CURVES_SPLINES</source>
-      <translation>表示モードのスプラインを変更します。</translation>
+      <translation type="unfinished">Switches view to splines mode</translation>
     </message>
     <message>
       <source>DSC_FITALL</source>
-      <translation>すべてのオブジェクトを表示するには、シーンを調整します。</translation>
+      <translation>全表示</translation>
     </message>
     <message>
       <source>MNU_FITALL</source>
-      <translation>すべて表示</translation>
+      <translation>全表示</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_MODE_LOGARITHMIC_HOR</source>
-      <translation>水平軸: 対数</translation>
+      <translation type="unfinished">Horizontal axis: logarithmic</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_MODE_LOGARITHMIC_VER</source>
-      <translation>垂直軸: 対数</translation>
+      <translation type="unfinished">Vertical axis: logarithmic</translation>
     </message>
     <message>
       <source>MNU_GLOBALPAN_VIEW</source>
-      <translation>グローバルパンニング</translation>
+      <translation type="unfinished">Global Panning</translation>
     </message>
     <message>
       <source>DSC_CLONE_VIEW</source>
-      <translation>現在のステージの新しいビューアー OCC を開く</translation>
+      <translation type="unfinished">Create new OCC viewer for the active scene</translation>
     </message>
     <message>
       <source>DSC_PRINT_VIEW</source>
-      <translation>現在のビューを印刷します。</translation>
+      <translation type="unfinished">Print active view</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_SETTINGS</source>
-      <translation>パラメーター</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_ANALYTICAL_CURVES</source>
-      <translation>分析曲線</translation>
+      <translation type="unfinished">Analytical curves</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_NORMALIZE_MODE_LMAX</source>
-      <translation>左の Y 軸: グローバルの最大値を標準化します。</translation>
+      <translation type="unfinished">Left Y Axis: Normalize to global maximum</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_NORMALIZE_MODE_LMIN</source>
-      <translation>左の Y 軸: 世界最小の標準化</translation>
+      <translation type="unfinished">Left Y Axis: Normalize to global minimum</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_NORMALIZE_MODE_RMAX</source>
-      <translation>右の Y 軸: グローバルの最大値を標準化します。</translation>
+      <translation type="unfinished">Right Y Axis: Normalize to global maximum</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_NORMALIZE_MODE_RMIN</source>
-      <translation>右の Y 軸: 世界最小の標準化</translation>
+      <translation type="unfinished">Right Y Axis: Normalize to global minimum</translation>
     </message>
     <message>
       <source>MEN_PLOT2D_CURVES_SPLINES</source>
-      <translation>スプラインを描画します。</translation>
+      <translation>2Dスプラインカーブ</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_MODE_LOGARITHMIC_HOR</source>
-      <translation>横軸に対数スケール モードの表示方法を変更</translation>
+      <translation type="unfinished">Switches view to logarithmic scaling mode along horizontal axis</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_MODE_LOGARITHMIC_VER</source>
-      <translation>垂直軸を対数スケール モードの表示方法を変更</translation>
+      <translation type="unfinished">Switches view to logarithmic scaling mode along vertical axis</translation>
     </message>
     <message>
       <source>TOT_PLOT2D_CURVES_POINTS</source>
-      <translation>ポイントを描画します。</translation>
+      <translation type="unfinished">Draw points</translation>
     </message>
     <message>
       <source>DSC_FITRECT</source>
-      <translation>シーンのボックスで選択した領域を調整します。</translation>
+      <translation>領域でフィット</translation>
     </message>
     <message>
       <source>MNU_FITRECT</source>
-      <translation>表示エリア</translation>
+      <translation>領域でフィット</translation>
     </message>
     <message>
       <source>MEN_PLOT2D_CURVES_POINTS</source>
-      <translation>ポイントを描画します。</translation>
+      <translation type="unfinished">Draw Points</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_CURVES_POINTS</source>
-      <translation>表示モードのポイントを変更します。</translation>
+      <translation type="unfinished">Switches view to points mode</translation>
     </message>
     <message>
       <source>DSC_DUMP_VIEW</source>
-      <translation>現在のビューをイメージ ファイルに保存します。</translation>
+      <translation type="unfinished">Saves the active view in the image file</translation>
     </message>
     <message>
       <source>DSC_ZOOM_VIEW</source>
@@ -654,19 +654,19 @@
     </message>
     <message>
       <source>PRP_PLOT2D_ANALYTICAL_CURVES</source>
-      <translation>分析曲線のプロパティを設定します。</translation>
+      <translation type="unfinished">Setups analytical curves properties</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_NORMALIZE_MODE_LMAX</source>
-      <translation>左側の Y 軸の最大の標準化の方法に、ビューを切り替える</translation>
+      <translation type="unfinished">Switches view to maximum normalization mode by left Y axis</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_NORMALIZE_MODE_LMIN</source>
-      <translation>左側の Y 軸の最小の標準化の方法に、ビューを切り替える</translation>
+      <translation type="unfinished">Switches view to minimum normalization mode by left Y axis</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_NORMALIZE_MODE_RMAX</source>
-      <translation>右側の Y 軸の最大の標準化の方法に、ビューを切り替える</translation>
+      <translation type="unfinished">Switches view to maximum normalization mode by right Y axis</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_NORMALIZE_MODE_RMIN</source>
@@ -754,7 +754,7 @@
     </message>
     <message>
       <source>TOT_PLOT2D_CURVES_LINES</source>
-      <translation>線を描く</translation>
+      <translation>線を描</translation>
     </message>
     <message>
       <source>PRP_PLOT2D_CURVES_LINES</source>
@@ -783,16 +783,16 @@
       <translation>お問い合わせ: x: %1、y: %2</translation>
     </message>
     <message>
-      <source>INF_COORDINATES_SOME_Y</source>
-      <translation>お問い合わせ: x: %1、y: %2 ( %3 )</translation>
-    </message>
-    <message>
       <source>WRN_XLOG_NOT_ALLOWED</source>
       <translation>X 軸上非陽性値を持つポイントが検出されました。カテゴリの対数目盛は許可されていません。</translation>
     </message>
     <message>
       <source>WRN_YLOG_NOT_ALLOWED</source>
       <translation>Y 軸上非陽性値を持つポイントが検出されました。切片の対数目盛は許可されていません。</translation>
+    </message>
+    <message>
+      <source>INF_COORDINATES_SOME_Y</source>
+      <translation>お問い合わせ: x: %1、y: %2 ( %3 )</translation>
     </message>
   </context>
 </TS>

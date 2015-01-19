@@ -2698,7 +2698,9 @@ public:
 };
 int SalomePyQt::createView( const QString& type, QWidget* w )
 {
-  return ProcessEvent( new TCreateViewWg( type, w ) );
+  int ret = ProcessEvent( new TCreateViewWg( type, w ) );
+  QCoreApplication::processEvents();
+  return ret;
 }
 
 /*!

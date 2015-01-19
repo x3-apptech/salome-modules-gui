@@ -33,20 +33,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // .SECTION Description
 // This widget creates and manages its own vtkPVAxesActor.
+// VSR 03/12/2014: the original file vtkPVAxesWidget.h has been renamed to salomevtkPVAxesWidget.h
+// to avoid collisions with native VTK/ParaView classes
 
 
-#ifndef __vtkPVAxesWidget_h
-#define __vtkPVAxesWidget_h
+#ifndef __salomevtkPVAxesWidget_h
+#define __salomevtkPVAxesWidget_h
 
-#include "SVTK.h"
+#include "SVTK.h"                            // added by SALOME
 #include "vtkInteractorObserver.h"
 
 class vtkActor2D;
 class vtkKWApplication;
 class vtkPolyData;
-class vtkPVAxesActor;
-class vtkPVAxesWidgetObserver;
 class vtkRenderer;
+
+// VSR 03/12/2014: we put classes copied from VTK/ParaView to the specific namespace
+// to avoid collisions with native VTK/ParaView classes
+namespace salomevtk
+{
+
+class vtkPVAxesWidgetObserver;
+class vtkPVAxesActor;
 
 class SVTK_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
 {
@@ -155,5 +163,7 @@ private:
   vtkPVAxesWidget(const vtkPVAxesWidget&);  // Not implemented
   void operator=(const vtkPVAxesWidget&);  // Not implemented
 };
+
+} // end of salomevtk namespace
 
 #endif

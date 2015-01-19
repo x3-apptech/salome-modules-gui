@@ -42,6 +42,8 @@ class PYCONSOLE_EXPORT PyConsole_Editor : public QTextEdit
 public:
   PyConsole_Editor( PyConsole_Interp* theInterp, QWidget *theParent = 0 );
   ~PyConsole_Editor();
+
+  PyConsole_Interp* getInterp() const;
   
   virtual void   addText( const QString& str, const bool newBlock = false, const bool isError = false );
   bool           isCommand( const QString& str ) const;

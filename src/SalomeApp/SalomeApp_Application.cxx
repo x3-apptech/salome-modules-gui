@@ -404,7 +404,7 @@ void SalomeApp_Application::onExit()
   if ( result ) {
     if ( !killServers ) myIsCloseFromExit = true;
     SUIT_Session::session()->closeSession( SUIT_Session::ASK, killServers );
-    myIsCloseFromExit = false;
+    if ( SUIT_Session::session()->applications().count() > 0 ) myIsCloseFromExit = false;
   }
 }
 
@@ -691,8 +691,15 @@ void SalomeApp_Application::onSelectionChanged()
    bool canCopy  = false;
    bool canPaste = false;
 
+   LightApp_Module* m = dynamic_cast<LightApp_Module*>( activeModule() );
+
+   if ( m ) {
+     canCopy  = m->canCopy();
+     canPaste = m->canPaste();
+   }
+
    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
-   if (study != NULL) {
+   if (study) {
      _PTR(Study) stdDS = study->studyDS();
 
      if (stdDS) {
@@ -702,8 +709,8 @@ void SalomeApp_Application::onSelectionChanged()
          _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
 
          if ( so ) {
-             canCopy = studyMgr()->CanCopy(so);
-             canPaste = studyMgr()->CanPaste(so);
+           canCopy  = canCopy  || studyMgr()->CanCopy(so);
+           canPaste = canPaste || studyMgr()->CanPaste(so);
          }
        }
      }
@@ -1112,7 +1119,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), new SalomeApp_PyInterp() );
+    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), getPyInterp() );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
@@ -2124,3 +2131,13 @@ bool SalomeApp_Application::checkExistingDoc()
   }
   return result;
 }
+
+
+#ifndef DISABLE_PYCONSOLE
+
+PyConsole_Interp* SalomeApp_Application::createPyInterp()
+{
+  return new SalomeApp_PyInterp();
+}
+
+#endif // DISABLE_PYCONSOLE

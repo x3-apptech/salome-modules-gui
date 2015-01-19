@@ -38,6 +38,31 @@ const std::vector<QString> PyConsole_EnhInterp::PYTHON_KEYWORDS = \
       std::vector<QString>(tmp_k, tmp_k+sizeof(tmp_k)/sizeof(tmp_k[0]));
 
 /*!
+  \brief Constructor
+*/
+PyConsole_EnhInterp::PyConsole_EnhInterp()
+  : PyConsole_Interp()
+{
+}
+
+/*!
+  \brief Destructor
+*/
+PyConsole_EnhInterp::~PyConsole_EnhInterp()
+{
+}
+
+QStringList PyConsole_EnhInterp::getLastMatches() const
+{
+  return _last_matches;
+}
+
+QString PyConsole_EnhInterp::getDocStr() const
+{
+  return _doc_str;
+}
+
+/*!
   \brief Run Python dir() command and saves the result internally in _lastPy
   \param dirArgument Python expression to pass to the dir command. The parsing of what the
   user actually started typing is dedicated to the caller
@@ -45,7 +70,7 @@ const std::vector<QString> PyConsole_EnhInterp::PYTHON_KEYWORDS = \
   the user types "a_string_variable.rsp <TAB>", this is "rsp".
   \return command exit status - 0 = success
 */
-int PyConsole_EnhInterp::runDirCommand(const QString & dirArgument, const QString & startMatch)
+int PyConsole_EnhInterp::runDirCommand(const QString& dirArgument, const QString& startMatch)
 {
   int ret;
   std::vector<QString> v;
@@ -99,8 +124,9 @@ int PyConsole_EnhInterp::runDirCommand(const QString & dirArgument, const QStrin
  * @return -1 if the call to dir() or the parsing of the result failed, 0 otherwise.
  */
 int PyConsole_EnhInterp::runDirAndExtract(const QString& dirArgument,
-       const QString & startMatch, std::vector<QString> & result,
-       bool discardSwig) const
+					  const QString& startMatch,
+					  QStringList& result,
+					  bool discardSwig) const
 {
   QRegExp re("^[A-Z].+_[A-Z]+[a-z]+.+$");  // discard SWIG static method, e.g. MEDCouplingUMesh_Blabla
   QString command("dir(" + dirArgument + ")");
@@ -146,9 +172,6 @@ int PyConsole_EnhInterp::runDirAndExtract(const QString& dirArgument,
  */
 void PyConsole_EnhInterp::clearCompletion()
 {
-  _last_matches.resize(0);
-  _doc_str = QString("");
+  _last_matches.clear();
+  _doc_str = "";
 }
-
-
-

@@ -105,8 +105,8 @@ SET(_other_HEADERS
 SET(_internal_HEADERS
   SVTK_SelectorDef.h
   SVTK_Trihedron.h
-  vtkPVAxesActor.h
-  vtkPVAxesWidget.h
+  salomevtkPVAxesActor.h
+  salomevtkPVAxesWidget.h
 )
 
 # header files / to install
@@ -181,8 +181,8 @@ SET(_other_SOURCES
   SVTK_ViewModel.cxx
   SVTK_ViewParameterDlg.cxx
   SVTK_ViewWindow.cxx
-  vtkPVAxesActor.cxx
-  vtkPVAxesWidget.cxx
+  salomevtkPVAxesActor.cxx
+  salomevtkPVAxesWidget.cxx
 )
 
 # sources / to compile

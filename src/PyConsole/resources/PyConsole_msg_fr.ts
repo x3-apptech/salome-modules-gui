@@ -29,11 +29,11 @@
     </message>
     <message>
         <source>EDIT_STARTLOG_CMD</source>
-        <translation type="unfinished">Start &amp;Log</translation>
+        <translation>Démarrer une &amp;trace</translation>
     </message>
     <message>
         <source>EDIT_STOPLOG_CMD</source>
-        <translation type="unfinished">Stop &amp;Log</translation>
+        <translation>Arrêter la &amp;trace</translation>
     </message>
 </context>
 <context>

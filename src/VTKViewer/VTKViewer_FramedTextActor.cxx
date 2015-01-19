@@ -38,6 +38,30 @@
 #define TEXT_MARGIN    4
 #define OFFSET_SPACING 2
 
+//VSR: uncomment below macro to support unicode text properly in SALOME
+//     current commented out due to regressions
+//#define PAL22528_UNICODE
+
+namespace
+{
+  QString fromUtf8( const char* txt )
+  {
+#ifdef PAL22528_UNICODE
+    return QString::fromUtf8( txt );
+#else
+    return QString( txt );
+#endif
+  }
+  const char* toUtf8( const QString& txt )
+  {
+#ifdef PAL22528_UNICODE
+    return txt.toUtf8().constData();
+#else
+    return txt.toLatin1().constData();
+#endif
+  }
+}
+
 //==================================================================
 vtkStandardNewMacro(VTKViewer_FramedTextActor);
 
@@ -268,7 +292,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
 {
   // remove whitespaces from from the start and the end
   // additionally, consider a case of multi-string text
-  QString aString(QString::fromUtf8(theText));
+  QString aString(fromUtf8(theText));
 
   QStringList aTrimmedStringList;
   QStringList aStringList = aString.split("\n");
@@ -276,7 +300,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
   while(anIter.hasNext())
     aTrimmedStringList.append(anIter.next().trimmed());
 
-  myTextActor->SetInput(aTrimmedStringList.join("\n").toUtf8().constData());
+  myTextActor->SetInput(toUtf8(aTrimmedStringList.join("\n")));
   Modified();
 }
 

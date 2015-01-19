@@ -38,6 +38,27 @@
 #include <QObject>
 #include <QVariant>
 
+//VSR: uncomment below macro to support unicode text properly in SALOME
+//     current commented out due to regressions
+//#define PAL22528_UNICODE
+
+namespace
+{
+  QString fromUtf8( const char* txt )
+  {
+#ifdef PAL22528_UNICODE
+    return QString::fromUtf8( txt );
+#else
+    return QString( txt );
+#endif
+  }
+
+  QString fromUtf8( const std::string& txt )
+  {
+    return fromUtf8( txt.c_str() );
+  }
+}
+
 /*!
   \class SalomeApp_DataObject
   \brief Implementation of the data object for use in CORBA-based
@@ -82,12 +103,12 @@ QString SalomeApp_DataObject::name() const
 {
   QString str;
   if ( myObject )
-    str = QString::fromUtf8( myObject->GetName().c_str() );
+    str = fromUtf8( myObject->GetName() );
   
   if ( str.isEmpty() ) {
     _PTR(SObject) refObj = referencedObject();
     if ( refObj )
-      str = QString::fromUtf8( refObj->GetName().c_str() );
+      str = fromUtf8( refObj->GetName() );
   }
   
   if ( isReference() ) {
@@ -164,7 +185,7 @@ QPixmap SalomeApp_DataObject::icon( const int id ) const
       _PTR(AttributePixMap) aPixAttr ( anAttr );
       if ( aPixAttr->HasPixMap() ) {
         QString componentType = componentDataType();
-        QString pixmapID      = QString::fromUtf8(aPixAttr->GetPixMap().c_str());
+        QString pixmapID      = fromUtf8( aPixAttr->GetPixMap() );
         // select a plugin within a component
         QStringList plugin_pixmap = pixmapID.split( "::", QString::KeepEmptyParts );
         if ( plugin_pixmap.size() == 2 ) {
@@ -517,7 +538,7 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   {
     _PTR(AttributeString) strAttr = attr;
     std::string str = strAttr->Value();
-    QString aStrings = QString::fromUtf8( str.c_str() );
+    QString aStrings = fromUtf8( str );
     
     //Special case to show NoteBook variables in the "Value" column of the OB 
     if ( LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() ) )

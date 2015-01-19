@@ -141,12 +141,12 @@
       <translation>すべてのファイル (*. *)</translation>
     </message>
     <message>
-        <source>APPCLOSE_UNLOAD</source>
-        <translation type="unfinished">&amp;Disconnect w/o saving</translation>
+      <source>APPCLOSE_UNLOAD</source>
+      <translation>アンロード(&amp;U)</translation>
     </message>
     <message>
-        <source>APPCLOSE_UNLOAD_SAVE</source>
-        <translation type="unfinished">S&amp;ave &amp;&amp; Disconnect</translation>
+      <source>APPCLOSE_UNLOAD_SAVE</source>
+      <translation type="unfinished">S&amp;ave &amp;&amp; Disconnect</translation>
     </message>
     <message>
       <source>MEN_WINDOWS_NEW</source>
@@ -378,7 +378,7 @@
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_LOAD</source>
-      <translation type="unfinished">&amp;Connect</translation>
+      <translation>読込み(&amp;L)</translation>
     </message>
     <message>
       <source>ACTIVATE_MODULE_OP_SCRIPT</source>

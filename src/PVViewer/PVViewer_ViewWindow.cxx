@@ -33,6 +33,7 @@
 #include <pqTabbedMultiViewWidget.h>
 #include <pqApplicationCore.h>
 
+
 /*!
   \class PVViewer_ViewWindow
   \brief PVGUI view window.
@@ -59,6 +60,10 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
     PVViewer_ViewManager::ParaviewInitBehaviors(true, theDesktop);
     PVViewer_ViewManager::ConnectToExternalPVServer(theDesktop);
     PVViewer_ViewManager::ParaviewLoadConfigurations();
+
+    // Hide toolbars
+    PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(theDesktop);
+    pvge->setToolBarVisible(false);
   } else
     qDebug("No multiViewManager defined");
 }

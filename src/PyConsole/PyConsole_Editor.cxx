@@ -113,6 +113,22 @@
 #include <QTextStream>
 #include <QChar>
 
+//VSR: uncomment below macro to support unicode text properly in SALOME
+//     current commented out due to regressions
+//#define PAL22528_UNICODE
+
+namespace
+{
+  QString fromUtf8( const char* txt )
+  {
+#ifdef PAL22528_UNICODE
+    return QString::fromUtf8( txt );
+#else
+    return QString( txt );
+#endif
+  }
+}
+
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
 
@@ -140,8 +156,8 @@ void staticCallbackStdout( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
     PyConsole_Editor* e = (PyConsole_Editor*)data;
-    e->putLog( QString::fromUtf8(c) );
-    QApplication::postEvent( e, new PrintEvent( QString::fromUtf8(c), false ) );
+    e->putLog( fromUtf8(c) );
+    QApplication::postEvent( e, new PrintEvent( fromUtf8(c), false ) );
   }
 }
 
@@ -149,8 +165,8 @@ void staticCallbackStderr( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
     PyConsole_Editor* e = (PyConsole_Editor*)data;
-    e->putLog( QString::fromUtf8(c) );
-    QApplication::postEvent( e, new PrintEvent( QString::fromUtf8(c), true ) );
+    e->putLog( fromUtf8(c) );
+    QApplication::postEvent( e, new PrintEvent( fromUtf8(c), true ) );
   }
 }
 
@@ -191,14 +207,18 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
 
 /*!
   \brief Destructor.
-
-  Does nothing for the moment.
 */
 PyConsole_Editor::~PyConsole_Editor()
 {
-  myInterp->destroy();
-  delete myInterp;
   myInterp = 0;
+}
+
+/*!
+  \brief Get Python interpreter
+*/
+PyConsole_Interp* PyConsole_Editor::getInterp() const
+{
+  return myInterp;
 }
 
 /*!

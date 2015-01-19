@@ -22,7 +22,7 @@ basic GUI functionalities, common for all modules.
 
 <ul>
 <li>\b File menu corresponds to \subpage study_management_page "Study management" functionalities
-(creation, saving, loading, editing studies, connecting, disconnecting, etc.).</li>
+(creation, saving, loading, connecting, disconnecting, editing studies, etc.)</li>
 <li>\b Edit menu gives access to <b> Copy/Paste</b> allowing to paste the
 objects from one study into the other. The availability of this
 functionality depends on the module and the nature of an operation or

@@ -49,7 +49,6 @@
 
 #ifndef DISABLE_PYCONSOLE
   #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
-  #include <PyConsole_Console.h>
 #endif
 
 #include "utilities.h"
@@ -738,8 +737,7 @@ void SalomeApp_Study::closeDocument(bool permanently)
       desk->blockSignals( isBlocked );
 #ifndef DISABLE_PYCONSOLE
       SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
-      if( app->pythonConsole() )
-        app->pythonConsole()->getInterp()->destroy();
+      app->getPyInterp()->destroy();
 #endif
     }
     SALOMEDSClient_Study* aStudy = 0;

@@ -393,7 +393,7 @@ QString LightApp_DataObject::componentDataType() const
 {
   if ( myCompDataType.isEmpty() ) {
     SUIT_DataObject* aCompObj = componentObject();
-    LightApp_ModuleObject* anObj = dynamic_cast<LightApp_ModuleObject*>( aCompObj );
+    CAM_ModuleObject* anObj = dynamic_cast<CAM_ModuleObject*>( aCompObj );
     if ( anObj ) {
       CAM_DataModel* aModel = anObj->dataModel();
       if ( aModel ) {

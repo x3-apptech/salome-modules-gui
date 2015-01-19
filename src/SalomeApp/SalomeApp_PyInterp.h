@@ -31,8 +31,9 @@
 
 class SalomeApp_PyInterp : public PyConsole_EnhInterp
 {
+  friend class SalomeApp_Application;
+
 public:
-  SalomeApp_PyInterp();
   virtual ~SalomeApp_PyInterp();
 
   virtual void initPython();
@@ -40,6 +41,7 @@ public:
   virtual void closeContext();
 
 protected:
+  SalomeApp_PyInterp();
   virtual int  beforeRun();
 
 private:

@@ -43,7 +43,7 @@ const std::vector<QString> PyConsole_EnhEditor::SEPARATORS = \
  * @param interp the interpreter linked to the editor
  * @param parent parent widget
  */
-PyConsole_EnhEditor::PyConsole_EnhEditor(PyConsole_EnhInterp * interp, QWidget * parent) :
+PyConsole_EnhEditor::PyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent) :
      PyConsole_Editor(interp, parent),
      _tab_mode(false),
      _cursor_pos(-1),
@@ -117,7 +117,8 @@ void PyConsole_EnhEditor::clearCompletion()
       setTextCursor(tc);
       textCursor().deletePreviousChar();
       // TODO: before wait for any TAB event to be completed
-      static_cast<PyConsole_EnhInterp *>(myInterp)->clearCompletion();
+      if ( myInterp ) 
+	myInterp->clearCompletion();
     }
   _tab_mode = false;
 }
@@ -222,8 +223,8 @@ PyInterp_Request* PyConsole_EnhEditor::createTabRequest( const QString& input )
       _compl_before_point = QString("");
     }
 
-  return new CompletionCommand( static_cast<PyConsole_EnhInterp *>(myInterp), _compl_before_point,
-                               _compl_after_point, this, isSync() );
+  return new CompletionCommand( myInterp, _compl_before_point,
+				_compl_after_point, this, isSync() );
 }
 
 /**
@@ -231,7 +232,7 @@ PyInterp_Request* PyConsole_EnhEditor::createTabRequest( const QString& input )
  * @param matches list of possible completions
  * @param result return value
  */
-void PyConsole_EnhEditor::formatCompletion(const std::vector<QString> & matches, QString & result) const
+void PyConsole_EnhEditor::formatCompletion(const QStringList& matches, QString& result) const
 {
   int sz = matches.size();
 
@@ -255,90 +256,97 @@ void PyConsole_EnhEditor::formatCompletion(const std::vector<QString> & matches,
  */
 void PyConsole_EnhEditor::customEvent( QEvent* event )
 {
-  std::vector<QString> matches;
+  QStringList matches;
   QString first_match, comple_text, doc, base;
   QTextCursor cursor(textCursor());
   QTextBlockFormat bf;
   QTextCharFormat cf;
-  PyConsole_EnhInterp * interp = static_cast<PyConsole_EnhInterp *>(myInterp);
   int cursorPos;
 
   switch( event->type() )
   {
     case PyInterp_Event::ES_TAB_COMPLETE_OK:
+    {
       // Extract corresponding matches from the interpreter
-      matches = interp->getLastMatches();
+      matches = getInterp()->getLastMatches();
+      doc = getInterp()->getDocStr();
 
       if (matches.size() == 0)
-        {
-          // Completion successful but nothing returned.
-          _tab_mode = false;
-          _cursor_pos = -1;
-          return;
-        }
-
+      {
+	// Completion successful but nothing returned.
+	_tab_mode = false;
+	_cursor_pos = -1;
+	return;
+      }
+      
       // Only one match - complete directly and update doc string window
-      doc = interp->getDocStr();
       if (matches.size() == 1)
-        {
-          first_match = matches[0].mid(_compl_after_point.size());
-          cursor.insertText(first_match);
-          _tab_mode = false;
-          if (doc == QString(""))
-            emit updateDoc(formatDocHTML("(no documentation available)\n"));
-          else
-            emit updateDoc(formatDocHTML(doc));
-        }
+      {
+	first_match = matches[0].mid(_compl_after_point.size());
+	cursor.insertText(first_match);
+	_tab_mode = false;
+	if (doc.isEmpty())
+	  emit updateDoc(formatDocHTML("(no documentation available)\n"));
+	else
+	  emit updateDoc(formatDocHTML(doc));
+      }
       else
-        {
-          // Detect if there is a common base to all available completion
-          // In this case append this base to the text already
-          extractCommon(matches, base);
-          first_match = base.mid(_compl_after_point.size());
-          cursor.insertText(first_match);
-
-          // If this happens to match exaclty the first completion
-          // also provide doc
-          if (base == matches[0])
-            {
-              doc = formatDocHTML(doc);
-              emit updateDoc(doc);
-            }
-
-          // Print all matching completion in a "undo-able" block
-          cursorPos = cursor.position();
-          cursor.insertBlock();
-          cursor.beginEditBlock();
-
-          // Insert all matches
-          QTextCharFormat cf;
-          cf.setForeground(QBrush(Qt::darkGreen));
-          cursor.setCharFormat(cf);
-          formatCompletion(matches, comple_text);
-          cursor.insertText(comple_text);
-          cursor.endEditBlock();
-
-          // Position cursor where it was before inserting the completion list:
-          cursor.setPosition(cursorPos);
-          setTextCursor(cursor);
-        }
+      {
+	// Detect if there is a common base to all available completion
+	// In this case append this base to the text already
+	extractCommon(matches, base);
+	first_match = base.mid(_compl_after_point.size());
+	cursor.insertText(first_match);
+	
+	// If this happens to match exaclty the first completion
+	// also provide doc
+	if (base == matches[0])
+	{
+	  doc = formatDocHTML(doc);
+	  emit updateDoc(doc);
+	}
+	
+	// Print all matching completion in a "undo-able" block
+	cursorPos = cursor.position();
+	cursor.insertBlock();
+	cursor.beginEditBlock();
+	
+	// Insert all matches
+	QTextCharFormat cf;
+	cf.setForeground(QBrush(Qt::darkGreen));
+	cursor.setCharFormat(cf);
+	formatCompletion(matches, comple_text);
+	cursor.insertText(comple_text);
+	cursor.endEditBlock();
+	
+	// Position cursor where it was before inserting the completion list:
+	cursor.setPosition(cursorPos);
+	setTextCursor(cursor);
+      }
       break;
+    }
     case PyInterp_Event::ES_TAB_COMPLETE_ERR:
+    {
       // Tab completion was unsuccessful, switch off mode:
       _tab_mode = false;
       _cursor_pos = -1;
       break;
+    }
     case PyInterp_Event::ES_OK:
     case PyInterp_Event::ES_ERROR:
     case PyInterp_Event::ES_INCOMPLETE:
+    {
       // Before everything else, call super()
       PyConsole_Editor::customEvent(event);
       // If we are in multi_paste_mode, process the next item:
       multiLineProcessNextLine();
       break;
+    }
     default:
+    {
       PyConsole_Editor::customEvent( event );
       break;
+    }
   }
 }
 
@@ -347,7 +355,7 @@ void PyConsole_EnhEditor::customEvent( QEvent* event )
  * @param matches
  * @param result
  */
-void PyConsole_EnhEditor::extractCommon(const std::vector<QString> & matches, QString & result) const
+void PyConsole_EnhEditor::extractCommon(const QStringList& matches, QString& result) const
 {
   result = "";
   int charIdx = 0;

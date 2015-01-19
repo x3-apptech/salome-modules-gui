@@ -20,11 +20,9 @@
 // Created on: 3 avr. 2013
 
 #include "PyConsole_Request.h"
-
-#include "PyInterp_Event.h"
+#include "PyConsole_Interp.h"
 #include "PyConsole_Event.h"
-#include "PyConsole_EnhInterp.h"
-#include "PyConsole_EnhEditor.h"
+#include "PyInterp_Event.h"
 
 #include <QCoreApplication>
 
@@ -37,12 +35,12 @@
  * @param sync
  */
 ExecCommand::ExecCommand( PyInterp_Interp*        theInterp,
-               const QString&          theCommand,
-               PyConsole_Editor*       theListener,
-               bool                    sync )
-    : PyInterp_LockRequest( theInterp, theListener, sync ),
-      myCommand( theCommand ), myState( PyInterp_Event::ES_OK )
-  {}
+			  const QString&          theCommand,
+			  QObject*                theListener,
+			  bool                    theSync )
+  : PyInterp_LockRequest( theInterp, theListener, theSync ),
+    myCommand( theCommand ), myState( PyInterp_Event::ES_OK )
+{}
 
 /**
  * Execute the command by calling the run() method of the embedded interpreter.
@@ -50,13 +48,13 @@ ExecCommand::ExecCommand( PyInterp_Interp*        theInterp,
 void ExecCommand::execute()
 {
   if ( myCommand != "" )
-    {
-      int ret = getInterp()->run( myCommand.toUtf8().data() );
-      if ( ret < 0 )
-        myState = PyInterp_Event::ES_ERROR;
-      else if ( ret > 0 )
-        myState = PyInterp_Event::ES_INCOMPLETE;
-    }
+  {
+    int ret = getInterp()->run( myCommand.toUtf8().data() );
+    if ( ret < 0 )
+      myState = PyInterp_Event::ES_ERROR;
+    else if ( ret > 0 )
+      myState = PyInterp_Event::ES_INCOMPLETE;
+  }
 }
 
 /**
@@ -80,13 +78,13 @@ QEvent* ExecCommand::createEvent()
   \param theListener widget to get the notification messages
   \param sync        if True the request is processed synchronously
 */
-CompletionCommand::CompletionCommand( PyConsole_EnhInterp*  theInterp,
-               const QString&          input,
-               const QString&         startMatch,
-               PyConsole_EnhEditor*           theListener,
-               bool                    sync)
-     : PyInterp_LockRequest( theInterp, theListener, sync ),
-       _tabSuccess(false), _dirArg(input), _startMatch(startMatch)
+CompletionCommand::CompletionCommand( PyInterp_Interp*   theInterp,
+				      const QString&     theInput,
+				      const QString&     theStartMatch,
+				      QObject*           theListener,
+				      bool               theSync )
+  : PyInterp_LockRequest( theInterp, theListener, theSync ),
+    _tabSuccess(false), _dirArg(theInput), _startMatch(theStartMatch)
 {}
 
 /**
@@ -95,12 +93,8 @@ CompletionCommand::CompletionCommand( PyConsole_EnhInterp*  theInterp,
  */
 void CompletionCommand::execute()
 {
-  PyConsole_EnhInterp * interp = static_cast<PyConsole_EnhInterp *>(getInterp());
-    int ret = interp->runDirCommand( _dirArg,  _startMatch);
-    if (ret == 0)
-      _tabSuccess = true;
-    else
-      _tabSuccess = false;
+  int ret = static_cast<PyConsole_Interp*>(getInterp())->runDirCommand( _dirArg,  _startMatch );
+  _tabSuccess = ret == 0;
 }
 
 /**
@@ -110,9 +104,5 @@ void CompletionCommand::execute()
 QEvent* CompletionCommand::createEvent()
 {
   int typ = _tabSuccess ? PyInterp_Event::ES_TAB_COMPLETE_OK : PyInterp_Event::ES_TAB_COMPLETE_ERR;
-
   return new PyInterp_Event( typ, this);
 }
-
-
-
