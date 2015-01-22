@@ -112,7 +112,13 @@ void PVViewer_GUIElements::myBuildToolbars(SUIT_Desktop* mainWindow)
 
   macrosToolbar = new QToolBar("Macros Toolbars", mainWindow)
       << pqSetName("MacrosToolbar");
-    manager->addWidgetForRunMacros(macrosToolbar);
+  manager->addWidgetForRunMacros(macrosToolbar);
+
+  commonToolbar = new QToolBar("Common", mainWindow) << pqSetName("Common");
+  commonToolbar->layout()->setSpacing(0);
+
+  dataToolbar = new QToolBar("DataAnalysis", mainWindow) << pqSetName("DataAnalysis");
+  dataToolbar->layout()->setSpacing(0);
 
   addToolbars(mainWindow);
 }
@@ -121,21 +127,35 @@ void PVViewer_GUIElements::setToolBarVisible(bool show)
 {
   QCoreApplication::processEvents();
   mainAction->setChecked(!show);
+  mainAction->setVisible(show);
   mainAction->trigger();
   vcrAction->setChecked(!show);
+  vcrAction->setVisible(show);
   vcrAction->trigger();
   timeAction->setChecked(!show);
+  timeAction->setVisible(show);
   timeAction->trigger();
   colorAction->setChecked(!show);
+  colorAction->setVisible(show);
   colorAction->trigger();
   reprAction->setChecked(!show);
+  reprAction->setVisible(show);
   reprAction->trigger();
   cameraAction->setChecked(!show);
+  cameraAction->setVisible(show);
   cameraAction->trigger();
   axesAction->setChecked(!show);
+  axesAction->setVisible(show);
   axesAction->trigger();
   macrosAction->setChecked(!show);
+  macrosAction->setVisible(show);
   macrosAction->trigger();
+  commonAction->setChecked(!show);
+  commonAction->setVisible(show);
+  commonAction->trigger();
+  dataAction->setChecked(!show);
+  dataAction->setVisible(show);
+  dataAction->trigger();
 }
 
 void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
@@ -149,6 +169,8 @@ void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
   desk->addToolBar(Qt::TopToolBarArea, cameraToolbar);
   desk->addToolBar(Qt::TopToolBarArea, axesToolbar);
   desk->addToolBar(Qt::TopToolBarArea, macrosToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, commonToolbar);
+  desk->addToolBar(Qt::TopToolBarArea, dataToolbar);
 
   mainAction = mainToolBar->toggleViewAction();
   vcrAction = vcrToolbar->toggleViewAction();
@@ -158,10 +180,21 @@ void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
   cameraAction = cameraToolbar->toggleViewAction();
   axesAction = axesToolbar->toggleViewAction();
   macrosAction = macrosToolbar->toggleViewAction();
+  commonAction = commonToolbar->toggleViewAction();
+  dataAction = dataToolbar->toggleViewAction();
 }
 
 void PVViewer_GUIElements::onEmulateApply()
 {
   if (propertiesPanel)
     propertiesPanel->apply();
+}
+
+QList<QToolBar*> PVViewer_GUIElements::getToolbars()
+{
+  QList<QToolBar*> l;
+  l << mainToolBar << vcrToolbar << timeToolbar << colorToolbar
+    << reprToolbar << cameraToolbar << axesToolbar << macrosToolbar
+    << commonToolbar << dataToolbar;
+  return l;
 }
