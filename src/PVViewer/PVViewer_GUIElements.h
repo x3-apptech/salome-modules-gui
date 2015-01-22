@@ -24,6 +24,7 @@
 #include "PVViewer.h"
 
 #include <QObject>
+#include <QList>
 
 class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
@@ -48,16 +49,17 @@ public:
   pqPropertiesPanel * getPropertiesPanel() { return propertiesPanel; }
   pqPipelineBrowserWidget * getPipelineBrowserWidget() { return pipelineBrowserWidget; }
 
-  QMenu * getFiltersMenu() { return filtersMenu; }
-  QMenu * getSourcesMenu() { return sourcesMenu; }
-  QMenu * getMacrosMenu()  { return macrosMenu; }
+  QMenu* getFiltersMenu() { return filtersMenu; }
+  QMenu* getSourcesMenu() { return sourcesMenu; }
+  QMenu* getMacrosMenu()  { return macrosMenu; }
 
-  pqVCRToolbar * getVCRToolbar() { return vcrToolbar; }
-  pqAnimationTimeToolbar * getTimeToolbar() { return timeToolbar; }
+  pqVCRToolbar* getVCRToolbar() { return vcrToolbar; }
+  pqAnimationTimeToolbar* getTimeToolbar() { return timeToolbar; }
 
   void myBuildToolbars(SUIT_Desktop* desk);
   void addToolbars(SUIT_Desktop* desk);
   void setToolBarVisible(bool show);
+  QList<QToolBar*> getToolbars();
 
 public slots:
   void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"
@@ -66,36 +68,40 @@ private:
   PVViewer_GUIElements(SUIT_Desktop* desk);
   virtual ~PVViewer_GUIElements() {}
 
-  static PVViewer_GUIElements * theInstance;
+  static PVViewer_GUIElements* theInstance;
 
   // Widgets
-  pqPropertiesPanel * propertiesPanel;
-  pqPipelineBrowserWidget * pipelineBrowserWidget;
+  pqPropertiesPanel* propertiesPanel;
+  pqPipelineBrowserWidget* pipelineBrowserWidget;
 
   // Dummy QMenus receiving ParaView's reaction for automatic add when new sources are added
-  QMenu * sourcesMenu;
-  QMenu * filtersMenu;
-  QMenu * macrosMenu;
+  QMenu* sourcesMenu;
+  QMenu* filtersMenu;
+  QMenu* macrosMenu;
 
   // Toolbars also need to be instanciated early:
   QToolBar* mainToolBar;
   pqVCRToolbar* vcrToolbar;
-  pqAnimationTimeToolbar * timeToolbar;
+  pqAnimationTimeToolbar* timeToolbar;
   QToolBar* colorToolbar;
   QToolBar* reprToolbar;
   QToolBar* cameraToolbar;
   QToolBar* axesToolbar;
   QToolBar* macrosToolbar;
+  QToolBar* commonToolbar;
+  QToolBar* dataToolbar;
 
 public:
-  QAction * mainAction;
-  QAction *  vcrAction;
-  QAction *  timeAction;
-  QAction *  colorAction;
-  QAction *  reprAction;
-  QAction *  cameraAction;
-  QAction *  axesAction;
-  QAction *  macrosAction;
+  QAction* mainAction;
+  QAction* vcrAction;
+  QAction* timeAction;
+  QAction* colorAction;
+  QAction* reprAction;
+  QAction* cameraAction;
+  QAction* axesAction;
+  QAction* macrosAction;
+  QAction* commonAction;
+  QAction* dataAction;
 };
 
 #endif /* PVVIEWERGUIELEMENTS_H_ */
