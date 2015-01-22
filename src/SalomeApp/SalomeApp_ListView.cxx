@@ -29,6 +29,8 @@
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 
+#include "utilities.h"
+
 #include <QValidator>
 #include <QToolButton>
 #include <QPixmap>
