@@ -233,6 +233,9 @@ int main( int argc, char **argv )
     }
   }
 
+  if ( removeId )
+    return 0;
+
   // Load translations
   QtxTranslator tqt, tsal;
   if ( !language.isEmpty() ) {
