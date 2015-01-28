@@ -303,7 +303,10 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
-  if (!aHasShift) emit deselection();
+  if (!aHasShift) {
+    myAISContext->ClearCurrents( false );
+    emit deselection();
+  }
 
   if (myStartPnt == myEndPnt)
   {
@@ -353,25 +356,49 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
 void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEvent)
 {
   if (!mySelectionEnabled) return;
-  if (theEvent->key() != Qt::Key_S) return;
-  if (!theWindow->inherits("OCCViewer_ViewWindow")) return;
 
-  OCCViewer_ViewWindow* aView = (OCCViewer_ViewWindow*) theWindow;
-  if (!aView || aView->interactionStyle() != SUIT_ViewModel::KEY_FREE)
-    return;
+  OCCViewer_ViewWindow* aView = qobject_cast<OCCViewer_ViewWindow*>( theWindow );
+  if ( !aView ) return;
 
-  emit deselection();
+  bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
 
-  if ( !isPreselectionEnabled() ) {
-    Handle(V3d_View) aView3d = aView->getViewPort()->getView();
-    if ( !aView3d.IsNull() ) {
-      myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d);
+  switch ( theEvent->key() ) {
+  case  Qt::Key_S:
+    if (!aHasShift) {
+      myAISContext->ClearCurrents( false );
+      emit deselection();
     }
+
+    if ( !isPreselectionEnabled() ) {
+      Handle(V3d_View) aView3d = aView->getViewPort()->getView();
+      if ( !aView3d.IsNull() ) {
+	myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d);
+      }
+    }
+
+    if (aHasShift && myMultiSelectionEnabled)
+      myAISContext->ShiftSelect();
+    else
+      myAISContext->Select();
+
+    emit selectionChanged();
+
+    break;
+  case  Qt::Key_N:
+    if ( isPreselectionEnabled() ) {
+      if ( getAISContext()->HasOpenedContext() )
+	getAISContext()->HilightNextDetected( aView->getViewPort()->getView() );
+    }
+    break;
+  case  Qt::Key_P:
+    if ( isPreselectionEnabled() ) {
+      if ( getAISContext()->HasOpenedContext() )
+	getAISContext()->HilightPreviousDetected( aView->getViewPort()->getView() );
+    }
+    break;
+  default:
+    break;
   }
-
-  myAISContext->Select();
-
-  emit selectionChanged();
 }
 
 void OCCViewer_Viewer::onViewClosed(OCCViewer_ViewPort3d*)

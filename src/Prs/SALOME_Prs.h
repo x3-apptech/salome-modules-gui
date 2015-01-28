@@ -39,6 +39,7 @@ class SALOME_ListIO;
 class Handle_SALOME_InteractiveObject;
 
 #include <string>
+#include <list>
 
 /*!
  \class SALOME_Prs
@@ -84,6 +85,7 @@ public:
 
   //! Key method for double dispatch of activation of sub-shapes selection
   virtual void LocalSelectionIn( SALOME_View*, const int ) const = 0;
+  virtual void LocalSelectionIn( SALOME_View*, const std::list<int> ) const;
 
     // checks if shape is clippable
   inline bool IsClippable() const
@@ -144,6 +146,7 @@ public:
 
   //! Key method for double dispatch of activation of sub-shapes selection
   virtual void LocalSelectionIn( SALOME_View*, const int ) const;
+  virtual void LocalSelectionIn( SALOME_View*, const std::list<int> ) const;
 };
 
 /*!
@@ -262,6 +265,7 @@ public:
   //! created anywhere by anybody. It simply passes control to SALOME_Prs object
   //! so that it could perform double dispatch.
   void LocalSelection( const SALOME_Prs*, const int );
+  void LocalSelection( const SALOME_Prs*, const std::list<int> );
 
   // Interface for derived views
 
@@ -278,9 +282,10 @@ public:
   // Add new Erase() methods here...
 
   // LocalSelection() methods for ALL kinds of presentation should appear here
-  virtual void LocalSelection( const SALOME_OCCPrs*, const int );//!< Local selection SALOME_OCCPrs
-  virtual void LocalSelection( const SALOME_VTKPrs*, const int );//!< Local selection SALOME_VTKPrs
-  virtual void LocalSelection( const SALOME_Prs2d* , const int );//!< Local selection SALOME_Prs2d
+  virtual void LocalSelection( const SALOME_OCCPrs*, const int );           //!< Local selection SALOME_OCCPrs
+  virtual void LocalSelection( const SALOME_OCCPrs*, const std::list<int> );//!< Multiple local selection SALOME_OCCPrs
+  virtual void LocalSelection( const SALOME_VTKPrs*, const int );           //!< Local selection SALOME_VTKPrs
+  virtual void LocalSelection( const SALOME_Prs2d* , const int );           //!< Local selection SALOME_Prs2d
 
   //! Deactivates selection of sub-shapes (must be redefined with OCC viewer)
   virtual void GlobalSelection( const bool = false ) const;

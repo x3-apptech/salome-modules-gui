@@ -363,14 +363,26 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
     case QEvent::Wheel:
       {
         QWheelEvent* aEvent = (QWheelEvent*) e;
-  myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
-  double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
-  int x  = aEvent->x();
-  int y  = aEvent->y();
-  int x1 = (int)( aEvent->x() + width()*delta/100 );
-  int y1 = (int)( aEvent->y() + height()*delta/100 );
-  myViewPort->zoom( x, y, x1, y1 );
-  myViewPort->getView()->ZFitAll();
+     
+        if ( aEvent->modifiers().testFlag(Qt::ControlModifier) ) {
+          Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+          if ( isPreselectionEnabled() && ic->HasOpenedContext() ) {
+            if ( aEvent->delta() > 0 ) {
+              ic->HilightNextDetected( myViewPort->getView() );
+            } else {
+              ic->HilightPreviousDetected( myViewPort->getView() );
+            }
+          }
+        } else {
+          myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
+          double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
+          int x  = aEvent->x();
+          int y  = aEvent->y();
+          int x1 = (int)( aEvent->x() + width()*delta/100 );
+          int y1 = (int)( aEvent->y() + height()*delta/100 );
+          myViewPort->zoom( x, y, x1, y1 );
+          myViewPort->getView()->ZFitAll();
+        }
       }
       return true;
 
