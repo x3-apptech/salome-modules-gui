@@ -41,19 +41,10 @@ show_usage() {
     echo "Usage: $(basename $0) [options]"
     echo
     echo "Options:"
-    echo " * all options have both short and long format;"
-    echo " * some options require additional parameter (below referenced as <param>)"
-    echo "   which should be separated by = symbol from the option itself."
-    echo
-    echo -en " --help"
-    ${MOVE2} ; echo -en "(-h)"
-    ${MOVE1} ; echo "Display this information and exit."
-    echo -en " --version"
-    ${MOVE2} ; echo -en "(-v)"
-    ${MOVE1} ; echo "Print SALOME version and exit."
-    echo -en " --modules=<param>"
-    ${MOVE2} ; echo -en "(-m)"
-    ${MOVE1} ; echo "List of modules, separated by comma, to be used within SALOME session."
+    echo "-m MODULES, --modules=MODULES   List of modules, separated by comma, to be used within SALOME session."
+    echo "-r RCFILE, --resources=RCFILE   Preferences file to be used within SALOME session."
+    echo "-v, --version                   Print SALOME version and exit."
+    echo "-h, --help                      Print this help and exit."
     echo
     echo "Example:"
     echo "  $(basename $0) --modules=LIGHT,PYLIGHT"
@@ -85,7 +76,21 @@ show_version() {
 ###
 
 option_modules() {
-    local MODS=`echo $1 | awk -F "=" '{ if(NF>1) print $2 ; else print $1 }'`
+    local MODS
+    case $1 in
+	modules\=* )
+	    MODS=`echo $1 | awk -F "=" '{ if(NF>1) print $2 ; else print "" }'`
+	    ;;
+	modules* )
+            echo
+            echo "Error: Invalid option format, please use --modules=MODULES" > /dev/stderr
+            echo
+            exit 1
+	    ;;
+	* )
+	    MODS=$1
+	    ;;
+    esac
     if [ "X${MODS}" = "X" ] ; then
         echo
         echo "Error: Please, specify list of modules" > /dev/stderr
@@ -96,6 +101,32 @@ option_modules() {
     return
 }
 
+###
+# function option_resources() : process --resources / -r command line option
+###
+
+option_resources() {
+    local RCF
+    case $1 in
+	resources\=* )
+	    RCF=`echo $1 | awk -F "=" '{ if(NF>1) print $2 ; else print "" }'` ;;
+	resources* )
+            echo
+            echo "Error: Invalid option format, please use --resources=RCFILE" > /dev/stderr
+            echo
+            exit 1
+	    ;;
+	* ) RCF=$1
+    esac
+    if [ "X${RCF}" = "X" ] ; then
+        echo
+        echo "Error: Please, specify resource file" > /dev/stderr
+        echo
+        exit 1
+    fi
+    RCFILE="--resources=${RCF}"
+    return
+}
 
 ###
 # function run_light_salome(): run SALOME
@@ -104,25 +135,28 @@ option_modules() {
 run_light_salome(){
 
     local MODULES
+    local RCFILE
 
     ###
     # process command line options
     ###
 
     local OPTION
-    while getopts ":-:hvm:" OPTION "$@" ; do
+    while getopts ":-:hvm:r:" OPTION "$@" ; do
 	if [ "${OPTION}" = "-" ] ; then
             case ${OPTARG} in
-		help      )  show_usage                          ;;
-		version   )  show_version                        ;;
-		modules*  )  option_modules  "${OPTARG}"         ;;
-		*         )  echo "!!!Wrong option!!!" ; exit 1  ;;
+		help       )  show_usage                          ;;
+		version    )  show_version                        ;;
+		modules*   )  option_modules  "${OPTARG}"         ;;
+		resources* )  option_resources  "${OPTARG}"       ;;
+		*          )  echo "!!!Wrong option!!!" ; exit 1  ;;
             esac
 	else
 	    case ${OPTION} in
 		h  )  show_usage                                 ;;
 		v  )  show_version                               ;;
 		m* )  option_modules "${OPTARG}"                 ;;
+		r* )  option_resources "${OPTARG}"               ;;
 		?  )  echo "!!!Wrong option!!!" ; exit 1         ;;
 	    esac
 	fi
@@ -156,8 +190,6 @@ run_light_salome(){
 	export LightAppResources=${LightAppResources}:${GUI_ROOT_DIR}/share/salome/resources/gui
     fi
 
-    MODULES="KERNEL GUI ${MODULES}"
-
     ###
     # exclude modules duplication
     ###
@@ -165,10 +197,16 @@ run_light_salome(){
     local MODS=""
     local MOD
     for MOD in ${MODULES} ; do
-	echo ${MODS} | grep -E "\<${MOD}\>" >/dev/null 2>&1
-	if [ "$?" == "1" ] ; then
-	    MODS="${MODS} ${MOD}"
-	fi
+	case ${MOD} in
+	    KERNEL | GUI )
+		;;
+	    * ) 
+		echo ${MODS} | grep -E "\<${MOD}\>" >/dev/null 2>&1
+		if [ "$?" == "1" ] ; then
+		    MODS="${MODS} ${MOD}"
+		fi
+		;;
+	esac
     done
     MODULES=${MODS}
 
@@ -182,7 +220,7 @@ run_light_salome(){
     local MY_LD_LIBRARY_PATH=""
     local MY_PYTHONPATH=""
 
-    for MOD in ${MODULES} ; do
+    for MOD in KERNEL GUI ${MODULES} ; do
 	local ROOTDIR=`printenv ${MOD}_ROOT_DIR`
 	if [ -z "${ROOTDIR}" ] ; then continue ; fi
 	local LMOD=`echo ${MOD} | tr 'A-Z' 'a-z'`
@@ -229,12 +267,11 @@ run_light_salome(){
     # start application
     ###
 
-    MODULES=`echo $MODULES | tr " " ","`
-    SUITApp LightApp --modules=${MODULES} "$*" &
+    SUITApp LightApp --modules=`echo $MODULES | tr " " ","` "${RCFILE}" "$@" &
 }
 
 ###
 # call wrapper function (entry point)
 ###
 
-run_light_salome  "$@"
+run_light_salome "$@"
