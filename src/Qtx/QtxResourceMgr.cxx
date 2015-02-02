@@ -2697,9 +2697,9 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
   if ( pref.isEmpty() && lang != "en" ) {
     // load Qt resources
     QString qt_translations = QLibraryInfo::location( QLibraryInfo::TranslationsPath );
-    QString qt_dir_trpath;
-    if ( ::getenv( "QTDIR" ) )
-      qt_dir_trpath = QString( ::getenv( "QTDIR" ) );
+    QString qt_dir_trpath = qgetenv( "QT_ROOT_DIR" );
+    if ( qt_dir_trpath.isEmpty() )
+      qt_dir_trpath = qgetenv( "QTDIR" );
     if ( !qt_dir_trpath.isEmpty() )
       qt_dir_trpath = QDir( qt_dir_trpath ).absoluteFilePath( "translations" );
 

@@ -351,7 +351,9 @@ int main( int argc, char **argv )
   }
   
   // add $QTDIR/plugins to the pluins search path for image plugins
-  QString qtdir( ::getenv( "QTDIR" ) );
+  QString qtdir = qgetenv( "QT_ROOT_DIR" );
+  if ( qtdir.isEmpty() )
+    qtdir = qgetenv( "QTDIR" );
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
 
