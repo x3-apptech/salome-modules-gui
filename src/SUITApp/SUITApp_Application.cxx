@@ -28,7 +28,6 @@
 #include <Qtx.h>
 
 #include <QDir>
-#include <QTranslator>
 
 #ifdef WIN32
 #include <windows.h>
@@ -54,14 +53,6 @@ SUITApp_Application::SUITApp_Application( int& argc, char** argv, SUIT_Exception
 #endif
 myExceptHandler( hand )
 {
-  QString path = SUIT_Tools::dir( argv[0] ) + QDir::separator() + "../../resources";
-  path = QDir::convertSeparators( QDir( path ).canonicalPath() );
-
-  QTranslator* strTbl = new QTranslator( 0 );
-  if ( strTbl->load( "SUITApp_msg_en.po", path  ) )
-    installTranslator( strTbl );
-  else
-    delete strTbl;
 }
 
 /*!
@@ -75,9 +66,6 @@ SUITApp_Application::SUITApp_Application( int& argc, char** argv, Type type, SUI
 #endif
 myExceptHandler( hand )
 {
-    QTranslator* strTbl = new QTranslator( 0 );
-    strTbl->load( "resources\\SUITApp_msg_en.po" );
-    installTranslator( strTbl );
 }
 
 /*!
@@ -102,7 +90,7 @@ bool SUITApp_Application::notify( QObject* receiver, QEvent* e )
 */
 void SUITApp_Application::setHandler( SUIT_ExceptionHandler* hand )
 {
-        myExceptHandler = hand;
+  myExceptHandler = hand;
 }
 
 /*!
