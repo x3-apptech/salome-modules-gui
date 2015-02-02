@@ -2704,8 +2704,9 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
       qt_dir_trpath = QDir( qt_dir_trpath ).absoluteFilePath( "translations" );
 
     QTranslator* trans = new QtxTranslator( 0 );
-    if ( trans->load( QString("qt_%1").arg( lang ), qt_translations ) || trans->load( QString("qt_%1").arg( lang ), qt_dir_trpath ) )
-      QApplication::instance()->installTranslator( trans );
+    if ( trans->load( QString("qt_%1").arg( lang ), qt_translations ) || trans->load( QString("qt_%1").arg( lang ), qt_dir_trpath ) ) {
+      if ( QApplication::instance() ) QApplication::instance()->installTranslator( trans );
+    }
   }
 
   for ( QStringList::ConstIterator iter = prefixList.begin(); iter != prefixList.end(); ++iter )
@@ -2751,7 +2752,7 @@ void QtxResourceMgr::loadTranslators( const QString& prefix, const QStringList& 
       {
         if ( !myTranslator[prefix].contains( trans ) )
           myTranslator[prefix].append( trans );
-        QApplication::instance()->installTranslator( trans );
+        if ( QApplication::instance() ) QApplication::instance()->installTranslator( trans );
       }
     }
   }
@@ -2783,7 +2784,7 @@ void QtxResourceMgr::loadTranslator( const QString& prefix, const QString& name 
     {
       if ( !myTranslator[prefix].contains( trans ) )
         myTranslator[prefix].append( trans );
-      QApplication::instance()->installTranslator( trans );
+      if ( QApplication::instance() ) QApplication::instance()->installTranslator( trans );
     }
   }
 }
@@ -2799,7 +2800,7 @@ void QtxResourceMgr::removeTranslators( const QString& prefix )
 
   for ( TransList::Iterator it = myTranslator[prefix].begin(); it != myTranslator[prefix].end(); ++it )
   {
-    QApplication::instance()->removeTranslator( *it );
+    if ( QApplication::instance() ) QApplication::instance()->removeTranslator( *it );
     delete *it;
   }
 
@@ -2818,8 +2819,10 @@ void QtxResourceMgr::raiseTranslators( const QString& prefix )
 
   for ( TransList::Iterator it = myTranslator[prefix].begin(); it != myTranslator[prefix].end(); ++it )
   {
-    QApplication::instance()->removeTranslator( *it );
-    QApplication::instance()->installTranslator( *it );
+    if ( QApplication::instance() ) {
+      QApplication::instance()->removeTranslator( *it );
+      QApplication::instance()->installTranslator( *it );
+    }
   }
 }
 
