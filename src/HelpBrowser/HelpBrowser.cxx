@@ -220,7 +220,8 @@ int main( int argc, char **argv )
       // Clear file system watcher if one has have path
       instance.clearWatcher();
 
-      if ( aFile.open( QIODevice::WriteOnly | QIODevice::Text ) )
+      QFileInfo wfi( aFile.fileName() );
+      if ( QDir().mkpath( wfi.absolutePath() ) && aFile.open( QIODevice::WriteOnly | QIODevice::Text ) )
       {
         // Write date and time when the file was created
         QTextStream aOutStream( &aFile );
