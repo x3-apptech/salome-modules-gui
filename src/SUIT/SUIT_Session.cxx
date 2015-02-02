@@ -53,6 +53,22 @@ SUIT_Session::SUIT_Session()
   mySession = this;
 }
 
+SUIT_Session::SUIT_Session( int argc, char** argv )
+: QObject(),
+  myResMgr( 0 ),
+  myActiveApp( 0 ),
+  myHandler( 0 ),
+  myExitStatus( NORMAL ),
+  myExitFlags ( 0 )
+{
+  SUIT_ASSERT( !mySession )
+
+  mySession = this;
+
+  for ( int i = 0; i < argc; i++ )
+    myArguments << QString( argv[i] );
+}
+
 /*!destructor. Clear applications list and set mySession to zero.*/
 SUIT_Session::~SUIT_Session()
 {
@@ -67,6 +83,17 @@ SUIT_Session::~SUIT_Session()
     myResMgr = 0;
   }
   mySession = 0;
+}
+
+/*!
+  Get arguments of the current session
+ */
+QStringList SUIT_Session::arguments()
+{
+  QStringList r;
+  if ( !myArguments.isEmpty() ) r = myArguments;
+  else if ( QApplication::instance() ) r = QApplication::arguments();
+  return r;
 }
 
 /*! \retval return mySession */

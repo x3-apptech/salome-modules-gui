@@ -228,7 +228,7 @@ QString SALOME_ResourceMgr::myExtAppVersion = QString();
 class SALOME_Session : public SUIT_Session
 {
 public:
-  SALOME_Session() : SUIT_Session() {}
+  SALOME_Session( int argc, char** argv ) : SUIT_Session( argc, argv ) {}
   virtual ~SALOME_Session() {}
 
 public:
@@ -355,12 +355,13 @@ int main( int argc, char **argv )
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
 
+  // set "C" locale if requested via preferences
   {
-    SALOME_Session s;
+    SALOME_Session stmp( argc, argv );
     QApplication::setApplicationName( "salome" );
-    SUIT_ResourceMgr* resMgr = s.createResourceMgr( "SalomeApp" );
+    SUIT_ResourceMgr* resMgr = stmp.createResourceMgr( "SalomeApp" );
     bool isCloc = resMgr->booleanValue( "language", "locale", true );
-    if ( isCloc ) { 
+    if ( isCloc ) {
       QLocale::setDefault( QLocale::c() );
     }
     else {
@@ -556,7 +557,7 @@ int main( int argc, char **argv )
       }
 
       // SUIT_Session creation
-      aGUISession = new SALOME_Session();
+      aGUISession = new SALOME_Session( argc, argv );
 
       // Load SalomeApp dynamic library
       MESSAGE( "creation SUIT_Application" );

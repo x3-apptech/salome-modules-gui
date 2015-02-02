@@ -51,6 +51,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QLocale>
 #include <QRegExp>
 #include <QString>
 #include <QStringList>
@@ -100,7 +101,7 @@ static QString getAppName( const QString& libName )
 class SUITApp_Session: public SUIT_Session
 {
 public:
-  SUITApp_Session( bool theIniFormat ) : SUIT_Session(), myIniFormat ( theIniFormat ) {}
+  SUITApp_Session( bool theIniFormat, int argc, char** argv ) : SUIT_Session( argc, argv ), myIniFormat ( theIniFormat ) {}
   virtual ~SUITApp_Session() {}
 
   virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
@@ -162,6 +163,20 @@ int main( int argc, char* argv[] )
       argList.append( QString( argv[i] ) );
   }
 
+  // set "C" locale if requested via preferences
+  {
+    SUITApp_Session stmp( iniFormat, argc, argv );
+    QApplication::setApplicationName( "salome" );
+    SUIT_ResourceMgr* resMgr = stmp.createResourceMgr( "LightApp" );
+    bool isCloc = resMgr->booleanValue( "language", "locale", true );
+    if ( isCloc ) {
+      QLocale::setDefault( QLocale::c() );
+    }
+    else {
+      QLocale::setDefault( QLocale::system() );
+    }
+  }
+
   // add $QTDIR/plugins to the pluins search path for image plugins
   QString qtdir( ::getenv( "QTDIR" ) );
   if ( !qtdir.isEmpty() )
@@ -212,9 +227,9 @@ int main( int argc, char* argv[] )
 
   if ( !argList.isEmpty() )
   {
-    SUITApp_Session* aSession = new SUITApp_Session( iniFormat );
+    SUITApp_Session aSession( iniFormat, argc, argv );
     QtxSplash* splash = 0;
-    SUIT_ResourceMgr* resMgr = aSession->createResourceMgr( argList.first() );
+    SUIT_ResourceMgr* resMgr = aSession.createResourceMgr( argList.first() );
     if ( !noSplash ) 
     {
       if ( resMgr )
@@ -254,7 +269,7 @@ int main( int argc, char* argv[] )
     SUIT_PYTHON::init_python(_argc,_argv);
 #endif
 
-    SUIT_Application* theApp = aSession->startApplication( argList.first() );
+    SUIT_Application* theApp = aSession.startApplication( argList.first() );
     if ( theApp )
     {
       Style_Salome::initialize( theApp->resourceMgr() );
@@ -262,14 +277,13 @@ int main( int argc, char* argv[] )
         Style_Salome::apply();
 
       if ( !noExceptHandling )
-        app.setHandler( aSession->handler() );
+        app.setHandler( aSession.handler() );
 
       if ( splash )
         splash->finish( theApp->desktop() );
 
       result = app.exec();
     }
-    delete aSession;
   }
 
   return result;

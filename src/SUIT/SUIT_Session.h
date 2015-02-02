@@ -29,6 +29,7 @@
 #include <QList>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #ifdef WIN32
 #include <windows.h>
@@ -63,9 +64,12 @@ public:
 
 public:
   SUIT_Session();
+  SUIT_Session( int, char** );
   virtual ~SUIT_Session();
 
   static SUIT_Session*         session();
+
+  QStringList                  arguments();
 
   SUIT_Application*            startApplication( const QString&, int = 0, char** = 0 );
 
@@ -101,6 +105,8 @@ private:
   QString                      applicationName( const QString& ) const;
 
 private:
+  QStringList                  myArguments;
+
   SUIT_ResourceMgr*            myResMgr;
   AppList                      myAppList;
   AppLibMap                    myAppLibs;

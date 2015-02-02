@@ -21,6 +21,7 @@
 //
 
 #include "SUIT_ResourceMgr.h"
+#include "SUIT_Session.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -81,7 +82,8 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
 {
   QString pathName;
 
-  QStringList arguments = QApplication::arguments();
+  QStringList arguments;
+  if ( SUIT_Session::session() ) arguments = SUIT_Session::session()->arguments();
   // Try config file, given in arguments
   for (int i = 1; i < arguments.count(); i++) {
     QRegExp rx ("--resources=(.+)");
