@@ -140,6 +140,13 @@ different locations have the same name.
   - <b>XZ View</b>
   - <b>YZ View</b>
   - <b>XY View</b>
+  
+- <b>Clipping parameters</b> - specifies the default clipping plane parameters.
+  - <b>Color</b> - allows to change the color of the clipped region.
+  - <b>Use default texture</b> - if this option is switched on, the default texture
+    will be used for clipping texture, otherwise - the texture specified in "Texture" field.
+  - <b>Texture</b> - allows to change the texture of the clipped region 
+    (enable if "Use default texture" is switched off).
 
 \anchor vtk_preferences
 <h2>VTK 3D Viewer Preferences</h2>

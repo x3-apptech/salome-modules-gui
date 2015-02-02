@@ -147,6 +147,15 @@ public:
   void                            enableMultiselection(bool isEnable);
   bool                            isMultiSelectionEnabled() const { return myMultiSelectionEnabled; }
 
+  void                            setClippingColor( const QColor& );
+  QColor                          clippingColor() const;
+
+  void                            useDefaultTexture( const bool );
+  bool                            isDefaultTextureUsed() const;
+
+  void                            setClippingTexture( const QString& );
+  QString                         clippingTexture() const;
+
   int                             getSelectionCount() const { return (!myAISContext.IsNull())? myAISContext->NbSelected():0; }
 
   void                            setStaticTrihedronDisplayed(const bool on);
@@ -191,6 +200,7 @@ protected slots:
   void onChangeBackground();
 
 protected:
+
   Handle(V3d_Viewer)              myV3dViewer;
 
   Handle(AIS_Trihedron)           myTrihedron;
@@ -217,6 +227,11 @@ protected:
 
   ClipPlanesList                  myClipPlanes;
   Graphic3d_SequenceOfHClipPlane  myInternalClipPlanes;
+
+  QColor                          myClippingColor;
+  bool                            myDefaultTextureUsed;
+  QString                         myClippingTexture;
+
 };
 
 #ifdef WIN32

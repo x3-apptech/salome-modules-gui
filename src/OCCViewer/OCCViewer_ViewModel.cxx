@@ -58,6 +58,7 @@
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
 #include <Graphic3d_Texture2Dmanual.hxx>
+#include <Graphic3d_MaterialAspect.hxx>
 #include <Graphic3d_TextureParams.hxx>
 
 #include <Geom_Axis2Placement.hxx>
@@ -141,6 +142,12 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   // selection
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
+
+  //set clipping color and texture to standard
+  myClippingColor = QColor( 50, 50, 50 );
+  myDefaultTextureUsed = true;
+  myClippingTexture = QString();
+
 }
 
 /*!
@@ -570,6 +577,112 @@ void OCCViewer_Viewer::enableMultiselection(bool isEnable)
     if ( win )
       win->updateEnabledDrawMode();
   }
+}
+
+/*!
+  Sets a color of the clipped region
+  \param theColor - a new color of the clipped region
+*/
+void OCCViewer_Viewer::setClippingColor( const QColor& theColor )
+{
+  myClippingColor = theColor;
+
+  if( myInternalClipPlanes.IsEmpty() )
+    return;
+
+  Graphic3d_MaterialAspect aMaterialAspect = Graphic3d_MaterialAspect();
+  aMaterialAspect.SetColor( Quantity_Color( theColor.redF(), theColor.greenF(),
+                                            theColor.blueF(), Quantity_TOC_RGB ) );
+
+  for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
+    myInternalClipPlanes.Value(i)->SetCappingMaterial( aMaterialAspect );
+
+  update();
+}
+
+/*!
+  \return clipping color
+*/
+QColor OCCViewer_Viewer::clippingColor() const
+{
+  return myClippingColor;
+}
+
+// initialize a texture for clipped region
+Handle(Graphic3d_Texture2Dmanual) initClippingTexture( const bool isDefault, const QString& theTexture)
+{
+  QString aTextureFile = isDefault ? ":images/hatch.png" : theTexture;
+  QPixmap px( aTextureFile );
+  const Handle(Image_PixMap) aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage() );
+  Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
+  if( aTexture->IsDone() ) {
+    aTexture->EnableRepeat();
+    if( isDefault ) {
+      aTexture->EnableModulate();
+      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.01, 0.01 ) );
+    }
+    else {
+      aTexture->DisableModulate();
+      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.005, 0.005 ) );
+    }
+  }
+  return aTexture;
+}
+
+/*!
+  Sets default texture enabled status
+  \param isUsed - new status
+*/
+void OCCViewer_Viewer::useDefaultTexture( const bool isUsed )
+{
+  myDefaultTextureUsed = isUsed;
+
+  if( myInternalClipPlanes.IsEmpty() )
+    return;
+
+  Handle(Graphic3d_Texture2Dmanual) aTexture =
+    initClippingTexture( myDefaultTextureUsed, myClippingTexture );
+
+  for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
+    myInternalClipPlanes.Value(i)->SetCappingTexture( aTexture );
+
+  update();
+}
+
+/*!
+  \return true if default texture is used
+*/
+bool OCCViewer_Viewer::isDefaultTextureUsed() const
+{
+  return myDefaultTextureUsed;
+}
+
+/*!
+  Sets a texture of the clipped region
+  \param theTexture - a new texture of the clipped region
+*/
+void OCCViewer_Viewer::setClippingTexture( const QString& theTexture )
+{
+  myClippingTexture = theTexture;
+
+  if( myInternalClipPlanes.IsEmpty() || myDefaultTextureUsed )
+    return;
+
+  Handle(Graphic3d_Texture2Dmanual) aTexture =
+    initClippingTexture( myDefaultTextureUsed, myClippingTexture );
+
+  for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
+    myInternalClipPlanes.Value(i)->SetCappingTexture( aTexture );
+
+  update();
+}
+
+/*!
+  \return clipping texture
+*/
+QString OCCViewer_Viewer::clippingTexture() const
+{
+  return myClippingTexture;
 }
 
 /*!
@@ -1051,18 +1164,15 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   aGraphic3dPlane->SetOn( theIsOn );
   aGraphic3dPlane->SetCapping( Standard_True );
 
-  // load capping texture
-  QPixmap px( ":images/hatch.png" );
-  if( !px.isNull() ) {
-    const Handle(Image_PixMap) aPixmap = OCCViewer_Utilities::imageToPixmap( px.toImage() );
-    Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
-    if( aTexture->IsDone() ) {
-      aTexture->EnableModulate();
-      aTexture->EnableRepeat();
-      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.01, 0.01 ) );
-      aGraphic3dPlane->SetCappingTexture( aTexture );
-    }
-  }
+  // set capping color
+  Graphic3d_MaterialAspect aMaterialAspect = Graphic3d_MaterialAspect();
+  aMaterialAspect.SetColor( Quantity_Color( myClippingColor.redF(), myClippingColor.greenF(),
+                                            myClippingColor.blueF(), Quantity_TOC_RGB ) );
+  aGraphic3dPlane->SetCappingMaterial( aMaterialAspect );
+
+  // set capping texture
+  aGraphic3dPlane->SetCappingTexture( initClippingTexture( myDefaultTextureUsed, myClippingTexture) );
+
   return aGraphic3dPlane;
 }
 /*!

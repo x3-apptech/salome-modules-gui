@@ -760,6 +760,26 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Désactivée</translation>
     </message>
     <message>
+        <source>PREF_GROUP_CLIPPING</source>
+        <translation>Plan de coupe</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_COLOR</source>
+        <translation>Couleur</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_DEFAULT_TEXTURE</source>
+        <translation type="unfinished">Use default texture</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_TEXTURE</source>
+        <translation>Texture</translation>
+    </message>
+    <message>
+        <source>OCC_TEXTURE_FILES</source>
+        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+    </message>
+    <message>
         <source>TOT_CLOSE</source>
         <translation>Fermer</translation>
     </message>

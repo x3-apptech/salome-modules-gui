@@ -760,6 +760,26 @@ session. It has to be closed before working with another study.</translation>
       <translation>無効になっています。</translation>
     </message>
     <message>
+        <source>PREF_GROUP_CLIPPING</source>
+        <translation type="unfinished">Clipping</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_COLOR</source>
+        <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_DEFAULT_TEXTURE</source>
+        <translation type="unfinished">Use default texture</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_TEXTURE</source>
+        <translation type="unfinished">Texture</translation>
+    </message>
+    <message>
+        <source>OCC_TEXTURE_FILES</source>
+        <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+    </message>
+    <message>
       <source>TOT_CLOSE</source>
       <translation>閉じる</translation>
     </message>
