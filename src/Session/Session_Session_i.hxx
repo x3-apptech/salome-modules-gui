@@ -77,6 +77,9 @@ public:
   //! Restors a visual state of the study at theSavePoint
   bool restoreVisualState(CORBA::Long theSavePoint);
 
+  //! Get list of selected entities
+  SALOME::StringSeq* getSelection();
+
   //! Emit a qt signal from the session GUI desktop window.
   void emitMessage(const char* theMessage);
   void emitMessageOneWay(const char* theMessage);

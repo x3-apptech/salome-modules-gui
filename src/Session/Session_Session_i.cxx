@@ -30,6 +30,9 @@
 #include "SALOME_NamingService.hxx"
 #include "SALOME_Event.h"
 #include "SalomeApp_Engine_i.h"
+#include "LightApp_Application.h"
+#include "LightApp_SelectionMgr.h"
+#include "SALOME_ListIO.hxx"
 #include "SUIT_Session.h"
 #include "SUIT_Desktop.h"
 #include "SUIT_Study.h"
@@ -325,4 +328,28 @@ void SALOME_Session_i::emitMessage(const char* theMessage)
 void SALOME_Session_i::emitMessageOneWay(const char* theMessage)
 {
   emitMessage(theMessage);
+}
+
+SALOME::StringSeq* SALOME_Session_i::getSelection()
+{
+  SALOME::StringSeq_var selection = new SALOME::StringSeq;
+  _GUIMutex->lock();
+  if ( SUIT_Session::session() ) {
+    LightApp_Application* app = dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
+    if ( app ) {
+      LightApp_SelectionMgr* selMgr = dynamic_cast<LightApp_SelectionMgr*>( app->selectionMgr() );
+      SALOME_ListIO selected;
+      selMgr->selectedObjects( selected );
+      selection->length( selected.Extent() );
+      int nbSel = 0;
+      for ( SALOME_ListIteratorOfListIO it( selected ); it.More(); it.Next() ) {
+        Handle( SALOME_InteractiveObject ) io = it.Value();
+        if ( io->hasEntry() )
+          selection[nbSel++] = CORBA::string_dup( io->getEntry() );
+      }
+      selection->length( nbSel );
+    }
+  }
+  _GUIMutex->unlock();
+  return selection._retn();
 }
