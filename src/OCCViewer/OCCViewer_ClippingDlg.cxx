@@ -744,6 +744,7 @@ void OCCViewer_ClippingDlg::setPlaneParam( OCCViewer_ClipPlane& thePlane )
       thePlane.AbsoluteOrientation.Dx = SpinBox_Dx->value();
       thePlane.AbsoluteOrientation.Dy = SpinBox_Dy->value();
       thePlane.AbsoluteOrientation.Dz = SpinBox_Dz->value();
+      thePlane.AbsoluteOrientation.IsInvert = false;
     }
     else
     {
@@ -1261,6 +1262,7 @@ void OCCViewer_ClippingDlg::onReset()
   SpinBox_Z->setValue(0);
   myBusy = false;
 
+  SetCurrentPlaneParam();
   updateClipping();
 }
 
@@ -1311,47 +1313,50 @@ void OCCViewer_ClippingDlg::onOrientationAbsoluteChanged( int mode )
   SpinBox_Dy->setEnabled( isUserMode );
   SpinBox_Dz->setEnabled( isUserMode );
 
-  if ( !isUserMode ) {
+  int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
+  OCCViewer_ClipPlane& aPlane = getClipPlane( aCurPlaneIndex );
+  double aDx = 0, aDy = 0, aDz = 0;
 
-    double aDx = 0, aDy = 0, aDz = 0;
-
-    if ( mode == 1 )
-    {
-      aDz = 1;
-      TextLabelZ->setEnabled( true );
-      SpinBox_Z->setEnabled( true );
-      SpinBox_Z->setFocus();
-    }
-    else if ( mode == 2 )
-    {
-      aDx = 1;
-      TextLabelX->setEnabled( true );
-      SpinBox_X->setEnabled( true );
-      SpinBox_X->setFocus();
-    }
-    else if ( mode == 3 )
-    {
-      aDy = 1;
-      TextLabelY->setEnabled( true );
-      SpinBox_Y->setEnabled( true );
-      SpinBox_Y->setFocus();
-    }
-    
-    int aCurPlaneIndex = ComboBoxPlanes->currentIndex();
-    OCCViewer_ClipPlane& aPlane = getClipPlane( aCurPlaneIndex );
-    if ( aPlane.AbsoluteOrientation.IsInvert == true )
-    {
-      aDx = -aDx;
-      aDy = -aDy;
-      aDz = -aDz;
-    }
-    
-    myBusy = true;
-    SpinBox_Dx->setValue( aDx );
-    SpinBox_Dy->setValue( aDy );
-    SpinBox_Dz->setValue( aDz );
-    myBusy = false;
+  if ( mode == 0 )
+  {
+    aDx = aPlane.AbsoluteOrientation.Dx;
+    aDy = aPlane.AbsoluteOrientation.Dy;
+    aDz = aPlane.AbsoluteOrientation.Dz;
   }
+  else if ( mode == 1 )
+  {
+    aDz = 1;
+    TextLabelZ->setEnabled( true );
+    SpinBox_Z->setEnabled( true );
+    SpinBox_Z->setFocus();
+  }
+  else if ( mode == 2 )
+  {
+    aDx = 1;
+    TextLabelX->setEnabled( true );
+    SpinBox_X->setEnabled( true );
+    SpinBox_X->setFocus();
+  }
+  else if ( mode == 3 )
+  {
+    aDy = 1;
+    TextLabelY->setEnabled( true );
+    SpinBox_Y->setEnabled( true );
+    SpinBox_Y->setFocus();
+  }
+    
+  if ( aPlane.AbsoluteOrientation.IsInvert == true )
+  {
+    aDx = -aDx;
+    aDy = -aDy;
+    aDz = -aDz;
+  }
+    
+  myBusy = true;
+  SpinBox_Dx->setValue( aDx );
+  SpinBox_Dy->setValue( aDy );
+  SpinBox_Dz->setValue( aDz );
+  myBusy = false;
 
   if ( !myIsUpdatingControls )
   {
@@ -1478,9 +1483,10 @@ void OCCViewer_ClippingDlg::onPlaneDragged( const Handle(AIS_Plane)& thePlane )
     {
       if ( aClipPlane.OrientationType == OCCViewer_ClipPlane::AbsoluteCustom )
       {
-        aClipPlane.AbsoluteOrientation.Dx = aPlaneN.X();
-        aClipPlane.AbsoluteOrientation.Dy = aPlaneN.Y();
-        aClipPlane.AbsoluteOrientation.Dz = aPlaneN.Z();
+        int anInvertCoeff = aClipPlane.AbsoluteOrientation.IsInvert ? 1 : -1;
+        aClipPlane.AbsoluteOrientation.Dx = anInvertCoeff * aPlaneN.X();
+        aClipPlane.AbsoluteOrientation.Dy = anInvertCoeff * aPlaneN.Y();
+        aClipPlane.AbsoluteOrientation.Dz = anInvertCoeff * aPlaneN.Z();
       }
     }
     else

@@ -117,9 +117,10 @@ void OCCViewer_ClipPlane::OrientationToXYZ( double &theDx, double &theDy, double
         break;
 
       case AbsoluteCustom :
-        theDx = AbsoluteOrientation.Dx;
-        theDy = AbsoluteOrientation.Dy;
-        theDz = AbsoluteOrientation.Dz;
+        int anInvertCoeff = AbsoluteOrientation.IsInvert ? 1 : -1;
+        theDx = anInvertCoeff * AbsoluteOrientation.Dx;
+        theDy = anInvertCoeff * AbsoluteOrientation.Dy;
+        theDz = anInvertCoeff * AbsoluteOrientation.Dz;
         break;
     }
 
