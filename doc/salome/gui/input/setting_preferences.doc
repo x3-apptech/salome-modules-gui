@@ -147,6 +147,8 @@ different locations have the same name.
     will be used for clipping texture, otherwise - the texture specified in "Texture" field.
   - <b>Texture</b> - allows to change the texture of the clipped region 
     (enable if "Use default texture" is switched off).
+  - <b>Modulate</b> - controls if "Texture" should be mixed with "Color" parameter or no.
+  - <b>Scale factor</b> - sets the scale factor for default and custom textures.
 
 \anchor vtk_preferences
 <h2>VTK 3D Viewer Preferences</h2>
