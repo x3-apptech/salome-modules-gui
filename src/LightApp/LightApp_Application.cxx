@@ -1493,8 +1493,10 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
     vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
     vm->setClippingColor( resMgr->colorValue( "OCCViewer", "clipping_color", vm->clippingColor() ) );
-    vm->useDefaultTexture( resMgr->booleanValue( "OCCViewer", "clipping_use_default_texture", vm->isDefaultTextureUsed() ) );
-    vm->setClippingTexture( resMgr->stringValue( "OCCViewer", "clipping_texture", vm->clippingTexture() ) );
+    vm->setClippingTextureParams( resMgr->booleanValue( "OCCViewer", "clipping_use_default_texture", vm->isDefaultTextureUsed() ),
+                                  resMgr->stringValue( "OCCViewer", "clipping_texture", vm->clippingTexture() ),
+                                  resMgr->booleanValue( "OCCViewer", "clipping_modulate", vm->isTextureModulated() ),
+                                  resMgr->doubleValue( "OCCViewer", "clipping_scale", vm->clippingTextureScale() ) );
 
 
     viewMgr->setViewModel( vm );// custom view model, which extends SALOME_View interface
@@ -2321,6 +2323,16 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int filePref = pref->addPreference( tr( "PREF_CLIPPING_TEXTURE" ), texturePref,
                LightApp_Preferences::File, "OCCViewer", "clipping_texture" );
   pref->setItemProperty( "path_filter", tr( "OCC_TEXTURE_FILES" ), filePref );
+  // .... -> modulate
+  pref->addPreference( tr( "PREF_CLIPPING_MODULATE" ), texturePref,
+               LightApp_Preferences::Bool, "OCCViewer", "clipping_modulate" );
+  // .... -> scale factor
+  int scaleFactor = pref->addPreference( tr( "PREF_CLIPPING_SCALE" ), texturePref,
+               LightApp_Preferences::DblSpin, "OCCViewer", "clipping_scale" );
+  pref->setItemProperty( "precision", 3, scaleFactor );
+  pref->setItemProperty( "min", 1.0E-03, scaleFactor );
+  pref->setItemProperty( "max", 1.0E03, scaleFactor );
+  pref->setItemProperty( "step", 0.1, scaleFactor );
   // ... "Clipping" group <<end>>
 
   // ... -> empty frame (for layout) <<start>>
@@ -2816,28 +2828,15 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 #endif
 
 #ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && param == QString( "clipping_use_default_texture" ) )
+  if ( sec == QString( "OCCViewer" ) && ( param == QString( "clipping_use_default_texture" ) ||
+                                          param == QString( "clipping_texture" ) ||
+                                          param == QString( "clipping_modulate" ) ||
+                                          param == QString( "clipping_scale" ) ) )
   {
     bool isDefaultTextureUsed = resMgr->booleanValue( "OCCViewer", "clipping_use_default_texture" );
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( OCCViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> it( lst );
-    while ( it.hasNext() )
-    {
-      SUIT_ViewModel* vm = it.next()->getViewModel();
-      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
-        continue;
-
-      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
-      occVM->useDefaultTexture( isDefaultTextureUsed );
-    }
-  }
-#endif
-
-#ifndef DISABLE_OCCVIEWER
-  if ( sec == QString( "OCCViewer" ) && param == QString( "clipping_texture" ) )
-  {
     QString aTexture = resMgr->stringValue( "OCCViewer", "clipping_texture" );
+    bool isModulated = resMgr->booleanValue( "OCCViewer", "clipping_modulate" );
+    double aScale = resMgr->doubleValue( "OCCViewer", "clipping_scale" );
     QList<SUIT_ViewManager*> lst;
     viewManagers( OCCViewer_Viewer::Type(), lst );
     QListIterator<SUIT_ViewManager*> it( lst );
@@ -2848,7 +2847,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         continue;
 
       OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
-      occVM->setClippingTexture( aTexture );
+      occVM->setClippingTextureParams( isDefaultTextureUsed, aTexture, isModulated, aScale );
     }
   }
 #endif

@@ -146,6 +146,8 @@
     <parameter name="enable_selection"    value="true"/>
     <parameter name="clipping_color"      value="50, 50, 50"/>
     <parameter name="clipping_use_default_texture" value="true"/>
+    <parameter name="clipping_modulate"   value="true"/>
+    <parameter name="clipping_scale"      value="1.0"/>
     <parameter name="background"      value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="xz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="yz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />

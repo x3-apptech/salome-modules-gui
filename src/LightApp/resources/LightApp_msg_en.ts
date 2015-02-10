@@ -780,6 +780,14 @@ The changes will be applied on the next application session.</translation>
         <translation>Image files (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
+        <source>PREF_CLIPPING_MODULATE</source>
+        <translation>Modulate</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_SCALE</source>
+        <translation>Scale factor</translation>
+    </message>
+    <message>
         <source>TOT_CLOSE</source>
         <translation>Close</translation>
     </message>

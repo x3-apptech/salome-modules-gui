@@ -147,6 +147,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myClippingColor = QColor( 50, 50, 50 );
   myDefaultTextureUsed = true;
   myClippingTexture = QString();
+  myTextureModulated = true;
+  myClippingTextureScale = 1.0;
 
 }
 
@@ -609,7 +611,8 @@ QColor OCCViewer_Viewer::clippingColor() const
 }
 
 // initialize a texture for clipped region
-Handle(Graphic3d_Texture2Dmanual) initClippingTexture( const bool isDefault, const QString& theTexture)
+Handle(Graphic3d_Texture2Dmanual) initClippingTexture( const bool isDefault, const QString& theTexture,
+                                                       const bool isModulate, const double theScale )
 {
   QString aTextureFile = isDefault ? ":images/hatch.png" : theTexture;
   QPixmap px( aTextureFile );
@@ -617,31 +620,33 @@ Handle(Graphic3d_Texture2Dmanual) initClippingTexture( const bool isDefault, con
   Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual( aPixmap );
   if( aTexture->IsDone() ) {
     aTexture->EnableRepeat();
-    if( isDefault ) {
-      aTexture->EnableModulate();
-      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.01, 0.01 ) );
-    }
-    else {
-      aTexture->DisableModulate();
-      aTexture->GetParams()->SetScale( Graphic3d_Vec2( 0.005, 0.005 ) );
-    }
+    isModulate ? aTexture->EnableModulate() : aTexture->DisableModulate();
+    aTexture->GetParams()->SetScale( Graphic3d_Vec2( 1/( theScale*100 ), -1 / ( theScale*100 ) ) );
   }
   return aTexture;
 }
 
 /*!
-  Sets default texture enabled status
-  \param isUsed - new status
+  Sets default texture parameters
+  \param isDefault - use/non-use default texture
+  \param theTexture - new texture of the clipped region
+  \param isModulate - enable/disable texture modulate mode
+  \param theScale - scale factor.
 */
-void OCCViewer_Viewer::useDefaultTexture( const bool isUsed )
+void OCCViewer_Viewer::setClippingTextureParams( const bool isDefault, const QString& theTexture,
+                                                 const bool isModulate, const double theScale )
 {
-  myDefaultTextureUsed = isUsed;
+  myDefaultTextureUsed = isDefault;
+  myClippingTexture = theTexture;
+  myTextureModulated = isModulate;
+  myClippingTextureScale = theScale;
 
   if( myInternalClipPlanes.IsEmpty() )
     return;
 
   Handle(Graphic3d_Texture2Dmanual) aTexture =
-    initClippingTexture( myDefaultTextureUsed, myClippingTexture );
+    initClippingTexture( myDefaultTextureUsed, myClippingTexture,
+                         myTextureModulated, myClippingTextureScale );
 
   for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
     myInternalClipPlanes.Value(i)->SetCappingTexture( aTexture );
@@ -658,31 +663,27 @@ bool OCCViewer_Viewer::isDefaultTextureUsed() const
 }
 
 /*!
-  Sets a texture of the clipped region
-  \param theTexture - a new texture of the clipped region
-*/
-void OCCViewer_Viewer::setClippingTexture( const QString& theTexture )
-{
-  myClippingTexture = theTexture;
-
-  if( myInternalClipPlanes.IsEmpty() || myDefaultTextureUsed )
-    return;
-
-  Handle(Graphic3d_Texture2Dmanual) aTexture =
-    initClippingTexture( myDefaultTextureUsed, myClippingTexture );
-
-  for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
-    myInternalClipPlanes.Value(i)->SetCappingTexture( aTexture );
-
-  update();
-}
-
-/*!
   \return clipping texture
 */
 QString OCCViewer_Viewer::clippingTexture() const
 {
   return myClippingTexture;
+}
+
+/*!
+  \return true if texture is modulated
+*/
+bool OCCViewer_Viewer::isTextureModulated() const
+{
+  return myTextureModulated;
+}
+
+/*!
+  \return scale factor of texture
+*/
+double OCCViewer_Viewer::clippingTextureScale() const
+{
+  return myClippingTextureScale;
 }
 
 /*!
@@ -1171,7 +1172,8 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   aGraphic3dPlane->SetCappingMaterial( aMaterialAspect );
 
   // set capping texture
-  aGraphic3dPlane->SetCappingTexture( initClippingTexture( myDefaultTextureUsed, myClippingTexture) );
+  aGraphic3dPlane->SetCappingTexture( initClippingTexture( myDefaultTextureUsed, myClippingTexture,
+                                                           myTextureModulated, myClippingTextureScale ) );
 
   return aGraphic3dPlane;
 }

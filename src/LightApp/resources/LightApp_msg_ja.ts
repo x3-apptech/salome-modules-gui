@@ -780,6 +780,14 @@ session. It has to be closed before working with another study.</translation>
         <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
+        <source>PREF_CLIPPING_MODULATE</source>
+        <translation type="unfinished">Modulate</translation>
+    </message>
+    <message>
+        <source>PREF_CLIPPING_SCALE</source>
+        <translation type="unfinished">Scale factor</translation>
+    </message>
+    <message>
       <source>TOT_CLOSE</source>
       <translation>閉じる</translation>
     </message>

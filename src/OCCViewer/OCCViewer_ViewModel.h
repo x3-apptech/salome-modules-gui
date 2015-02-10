@@ -150,11 +150,11 @@ public:
   void                            setClippingColor( const QColor& );
   QColor                          clippingColor() const;
 
-  void                            useDefaultTexture( const bool );
+  void                            setClippingTextureParams( const bool, const QString&, const bool, const double );
   bool                            isDefaultTextureUsed() const;
-
-  void                            setClippingTexture( const QString& );
   QString                         clippingTexture() const;
+  bool                            isTextureModulated() const;
+  double                          clippingTextureScale() const;
 
   int                             getSelectionCount() const { return (!myAISContext.IsNull())? myAISContext->NbSelected():0; }
 
@@ -231,6 +231,8 @@ protected:
   QColor                          myClippingColor;
   bool                            myDefaultTextureUsed;
   QString                         myClippingTexture;
+  bool                            myTextureModulated;
+  double                          myClippingTextureScale;
 
 };
 
