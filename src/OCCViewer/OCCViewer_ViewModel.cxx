@@ -53,7 +53,11 @@
 #include <QDesktopWidget>
 
 #include <AIS_Axis.hxx>
-#include <AIS_Drawer.hxx>
+#if OCC_VERSION_LARGE > 0x06080000
+  #include <Prs3d_Drawer.hxx>
+#else
+  #include <AIS_Drawer.hxx>
+#endif
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
@@ -121,8 +125,13 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     //myTrihedron->SetColor( Col );
     myTrihedron->SetArrowColor( Col.Name() );
     myTrihedron->SetSize(100);
-    Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
-    if (drawer->HasDatumAspect()) {
+    #if OCC_VERSION_LARGE > 0x06080000
+      Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
+      if (drawer->HasOwnDatumAspect()) {
+    #else
+      Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
+      if (drawer->HasDatumAspect()) {
+    #endif
       Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
       daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
       daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
