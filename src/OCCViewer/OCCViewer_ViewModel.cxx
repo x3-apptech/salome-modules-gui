@@ -125,13 +125,13 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     //myTrihedron->SetColor( Col );
     myTrihedron->SetArrowColor( Col.Name() );
     myTrihedron->SetSize(100);
-    #if OCC_VERSION_LARGE > 0x06080000
+#if OCC_VERSION_LARGE > 0x06080100 // VSR 20/02/2015: temporarily change to larger version until issue OCC25540 is integrated to master; to be reverted later
       Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
       if (drawer->HasOwnDatumAspect()) {
-    #else
+#else
       Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
       if (drawer->HasDatumAspect()) {
-    #endif
+#endif
       Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
       daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
       daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
