@@ -340,6 +340,8 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   myWebView->pageAction( QWebPage::OpenLinkInNewWindow )->setVisible( false );
   myWebView->pageAction( QWebPage::Back )->setText( tr( "Go Back" ) );
   myWebView->pageAction( QWebPage::Forward )->setText( tr( "Go Forward" ) );
+  myWebView->pageAction( QWebPage::Reload )->setText( tr( "Refresh" ) );
+
   myWebView->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
 
   myFindPanel = new QtxSearchTool( frame, myWebView,
@@ -353,11 +355,16 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   QToolBar* toolbar = addToolBar( tr( "Navigation" ) );
   toolbar->addAction( myWebView->pageAction( QWebPage::Back ) );
   toolbar->addAction( myWebView->pageAction( QWebPage::Forward ) );
+  toolbar->addAction( myWebView->pageAction( QWebPage::Reload ) );
 
   QMenu* fileMenu = menuBar()->addMenu( tr( "&File" ) );
   fileMenu->addAction( QPixmap( ":/images/open.png" ), tr( "&Open..." ), 
 		       this, SLOT( open() ),
 		       QKeySequence( QKeySequence::Open ) );
+  fileMenu->addSeparator();
+  fileMenu->addAction( myWebView->pageAction( QWebPage::Back ) );
+  fileMenu->addAction( myWebView->pageAction( QWebPage::Forward ) );
+  fileMenu->addAction( myWebView->pageAction( QWebPage::Reload ) );
   fileMenu->addSeparator();
   fileMenu->addAction( tr( "&Find in text..." ),
 		       myFindPanel, SLOT( find() ),
