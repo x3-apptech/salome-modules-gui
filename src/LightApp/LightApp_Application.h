@@ -274,6 +274,7 @@ private slots:
   void                                onCloseWindow();
   void                                onCloseAllWindow();
   void                                onGroupAllWindow();
+  void                                onRenamed();
 
 protected:
   void                                updateWindows();

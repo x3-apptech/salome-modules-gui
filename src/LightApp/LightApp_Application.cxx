@@ -1784,6 +1784,13 @@ void LightApp_Application::onRefresh()
   updateObjectBrowser( true );
 }
 
+/*!Private SLOT. Update actions after rename object.*/
+void LightApp_Application::onRenamed()
+{
+  activeStudy()->Modified();
+  updateActions();
+}
+
 /*!Private SLOT. Support drag-and-drop operation.*/
 void LightApp_Application::onDropped( const QList<SUIT_DataObject*>& objects, SUIT_DataObject* parent, int row, Qt::DropAction action )
 {
@@ -1914,6 +1921,9 @@ QWidget* LightApp_Application::createWindow( const int flag )
     if ( proxyModel ) {
       connect( proxyModel, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
                this,       SLOT( onDropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
+      connect( proxyModel, SIGNAL( renamed( SUIT_DataObject* ) ),
+               this,       SLOT( onRenamed( ) ) );
+
     }
 
     // temporary commented

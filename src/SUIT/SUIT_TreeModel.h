@@ -194,6 +194,7 @@ signals:
   void modelUpdated();
   void clicked( SUIT_DataObject*, int );
   void dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction );
+  void renamed( SUIT_DataObject* );
 
 private:
   void                   initialize();
@@ -297,6 +298,7 @@ signals:
   void modelUpdated();
   void clicked( SUIT_DataObject*, int );
   void dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction );
+  void renamed( SUIT_DataObject* );
 
 protected:
   SUIT_AbstractModel*    treeModel() const;

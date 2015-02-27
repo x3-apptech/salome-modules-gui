@@ -941,12 +941,15 @@ bool SUIT_TreeModel::setData( const QModelIndex& index,
         }
         break;
       case EditRole: {
-	QString val = value.toString();
+	    QString val = value.toString();
+	    bool mod = obj->name() != val;
         if ( !val.isEmpty() && obj->setName(val) ) {
           emit( dataChanged( index, index ) );
-	  return true;
-	}
-	return false;
+          if (mod)
+            emit ( renamed(obj) );
+          return true;
+        }
+        return false;
         break;
       }
       default:
@@ -1787,6 +1790,7 @@ SUIT_ProxyModel::SUIT_ProxyModel( QObject* parent )
   connect( model, SIGNAL( clicked( SUIT_DataObject*, int ) ), this, SIGNAL(clicked( SUIT_DataObject*, int ) ) );
   connect( model, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
            this,  SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
+  connect( model, SIGNAL( renamed( SUIT_DataObject* ) ), this, SIGNAL( renamed( SUIT_DataObject* ) ) );
   setSourceModel( model );
   setDynamicSortFilter( true );
 }
@@ -1805,6 +1809,7 @@ SUIT_ProxyModel::SUIT_ProxyModel( SUIT_DataObject* root, QObject* parent )
   connect( model, SIGNAL( clicked( SUIT_DataObject*, int ) ), this, SIGNAL( clicked( SUIT_DataObject*, int ) ) );
   connect( model, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
            this,  SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
+  connect( model, SIGNAL( renamed( SUIT_DataObject* ) ), this, SIGNAL( renamed( SUIT_DataObject* ) ) );
   setSourceModel( model );
   setDynamicSortFilter( true );
 }
@@ -1822,6 +1827,7 @@ SUIT_ProxyModel::SUIT_ProxyModel( SUIT_AbstractModel* model, QObject* parent )
   connect( *model, SIGNAL( clicked( SUIT_DataObject*, int ) ), this, SIGNAL( clicked( SUIT_DataObject*, int ) ) );
   connect( *model, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
            this,   SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
+  connect( *model, SIGNAL( renamed( SUIT_DataObject* ) ), this, SIGNAL( rename( SUIT_DataObject* ) ) );
   setSourceModel( *model );
   setDynamicSortFilter( true );
 }
