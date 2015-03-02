@@ -52,7 +52,7 @@ namespace
     return QString( txt );
 #endif
   }
-  const char* toUtf8( const QString& txt )
+  std::string toUtf8( const QString& txt )
   {
 #ifdef PAL22528_UNICODE
     return txt.toUtf8().constData();
@@ -300,7 +300,7 @@ void VTKViewer_FramedTextActor::SetText(const char* theText)
   while(anIter.hasNext())
     aTrimmedStringList.append(anIter.next().trimmed());
 
-  myTextActor->SetInput(toUtf8(aTrimmedStringList.join("\n")));
+  myTextActor->SetInput(toUtf8(aTrimmedStringList.join("\n")).c_str());
   Modified();
 }
 
