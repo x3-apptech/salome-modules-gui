@@ -125,7 +125,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     //myTrihedron->SetColor( Col );
     myTrihedron->SetArrowColor( Col.Name() );
     myTrihedron->SetSize(100);
-#if OCC_VERSION_LARGE > 0x06080100 // VSR 20/02/2015: temporarily change to larger version until issue OCC25540 is integrated to master; to be reverted later
+#if OCC_VERSION_LARGE > 0x06080000
       Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
       if (drawer->HasOwnDatumAspect()) {
 #else
