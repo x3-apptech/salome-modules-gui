@@ -232,6 +232,15 @@ bool CAM_Module::isSelectionCompatible()
  */
 bool CAM_Module::activateModule( SUIT_Study* /*study*/ )
 {
+  // IMN 05/03/2015: we copied myActionMap for reset/unset actions accelerator keys
+  // after activate/deactivate modules
+  for ( QMap<QPair<int, QAction*>, QKeySequence>::Iterator it = myActionShortcutMap.begin(); it != myActionShortcutMap.end(); ++it )
+  {
+    myActionMap.insert( it.key().first, it.key().second );
+    // Reset actions accelerator keys
+    it.key().second->setShortcut( it.value() );
+  }
+  myActionShortcutMap.clear();
   return true;
 }
 
@@ -249,6 +258,14 @@ bool CAM_Module::activateModule( SUIT_Study* /*study*/ )
  */
 bool CAM_Module::deactivateModule( SUIT_Study* )
 {
+  // IMN 05/03/2015: we copied myActionMap for reset/unset actions accelerator keys
+  // after activate/deactivate modules
+  myActionShortcutMap.clear();
+  for ( QMap<int, QAction*>::Iterator it = myActionMap.begin(); it != myActionMap.end(); ++it )
+  {
+    myActionShortcutMap.insert( qMakePair( it.key(), it.value() ), it.value()->shortcut() );
+  }
+  myActionMap.clear();
   return true;
 }
 

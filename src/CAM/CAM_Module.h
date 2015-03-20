@@ -29,6 +29,8 @@
 #include <QPixmap>
 #include <QString>
 #include <QMap>
+#include <QPair>
+#include <QKeySequence>
 
 class QAction;
 class QMenu;
@@ -139,6 +141,9 @@ protected:
   int                    registerAction( const int, QAction* );
   bool                   unregisterAction( const int );
   bool                   unregisterAction( QAction* );
+  // IMN 05/03/2015: we copied myActionMap for reset/unset actions accelerator keys
+  // after activate/deactivate modules
+  QMap<QPair<int, QAction*>, QKeySequence> myActionShortcutMap; //!< copy actions shortcut map
 
 private:
   CAM_Application*       myApp;             //!< parent application object
