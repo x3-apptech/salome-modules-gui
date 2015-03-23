@@ -33,6 +33,8 @@
 #include <QGroupBox>
 #include <QLineEdit>
 
+#include <Basics_OCCTVersion.hxx>
+
 /*!
   \class OCCViewer_CubeAxesDlg::AxisWidget
   \brief Axis tab widget of the "Graduated axis" dialog box
@@ -248,15 +250,76 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
   if( myIsVisible->isChecked() )
   {
     OCCViewer_AxisWidget::AxisData anAxisData[3];
-    for( int i = 0; i < 3; i++ )
+    for( int i = 0; i < 3; i++ ) {
       if( OCCViewer_AxisWidget* anAxisWidget = dynamic_cast<OCCViewer_AxisWidget*>( myAxes[ i ] ) )
         anAxisWidget->GetData( anAxisData[i] );
+    }
 
     // A gap used offset of axis names' offset
     // (this hard-coded value will be removed when the
     // font support will be introduced in OCC-6.4)
     int aGap = 20;
 
+#if OCC_VERSION_LARGE > 0x06080000
+    Graphic3d_GraduatedTrihedron gt;
+    // main params
+    gt.SetToDrawTickmarks(Standard_True);  // to draw grid
+    gt.SetToDrawAxes(Standard_True);       // to draw axes
+    gt.SetGridColor(Quantity_NOC_WHITE);   // grid color
+    // X axis aspect
+    gt.ChangeXAxisAspect().SetName(anAxisData[0].Name.toLatin1().constData());
+    gt.ChangeXAxisAspect().SetToDrawName(anAxisData[0].DrawName);
+    gt.ChangeXAxisAspect().SetToDrawValues(anAxisData[0].DrawValues);
+    gt.ChangeXAxisAspect().SetToDrawTickmarks(anAxisData[0].DrawTickmarks);
+    gt.ChangeXAxisAspect().SetNameColor(Quantity_Color(anAxisData[0].NameColor.redF(),
+						       anAxisData[0].NameColor.greenF(),
+						       anAxisData[0].NameColor.blueF(),
+						       Quantity_TOC_RGB));
+    gt.ChangeXAxisAspect().SetColor(Quantity_Color(anAxisData[0].Color.redF(),
+						   anAxisData[0].Color.greenF(),
+						   anAxisData[0].Color.blueF(),
+						   Quantity_TOC_RGB));
+    gt.ChangeXAxisAspect().SetTickmarkNumber(anAxisData[0].NbValues-1);
+    gt.ChangeXAxisAspect().SetTickmarkLength(anAxisData[0].TickmarkLength);
+    gt.ChangeXAxisAspect().SetValuesOffset(anAxisData[0].Offset);
+    gt.ChangeXAxisAspect().SetNameOffset(anAxisData[0].Offset + aGap); // see above
+    // Y axis aspect
+    gt.ChangeYAxisAspect().SetName(anAxisData[1].Name.toLatin1().constData());
+    gt.ChangeYAxisAspect().SetToDrawName(anAxisData[1].DrawName);
+    gt.ChangeYAxisAspect().SetToDrawValues(anAxisData[1].DrawValues);
+    gt.ChangeYAxisAspect().SetToDrawTickmarks(anAxisData[1].DrawTickmarks);
+    gt.ChangeYAxisAspect().SetNameColor(Quantity_Color(anAxisData[1].NameColor.redF(),
+						       anAxisData[1].NameColor.greenF(),
+						       anAxisData[1].NameColor.blueF(),
+						       Quantity_TOC_RGB));
+    gt.ChangeYAxisAspect().SetColor(Quantity_Color(anAxisData[1].Color.redF(),
+						   anAxisData[1].Color.greenF(),
+						   anAxisData[1].Color.blueF(),
+						   Quantity_TOC_RGB));
+    gt.ChangeYAxisAspect().SetTickmarkNumber(anAxisData[1].NbValues-1);
+    gt.ChangeYAxisAspect().SetTickmarkLength(anAxisData[1].TickmarkLength);
+    gt.ChangeYAxisAspect().SetValuesOffset(anAxisData[1].Offset);
+    gt.ChangeYAxisAspect().SetNameOffset(anAxisData[1].Offset + aGap); // see above
+    // Z axis aspect
+    gt.ChangeZAxisAspect().SetName(anAxisData[2].Name.toLatin1().constData());
+    gt.ChangeZAxisAspect().SetToDrawName(anAxisData[2].DrawName);
+    gt.ChangeZAxisAspect().SetToDrawValues(anAxisData[2].DrawValues);
+    gt.ChangeZAxisAspect().SetToDrawTickmarks(anAxisData[2].DrawTickmarks);
+    gt.ChangeZAxisAspect().SetNameColor(Quantity_Color(anAxisData[2].NameColor.redF(),
+						       anAxisData[2].NameColor.greenF(),
+						       anAxisData[2].NameColor.blueF(),
+						       Quantity_TOC_RGB));
+    gt.ChangeZAxisAspect().SetColor(Quantity_Color(anAxisData[2].Color.redF(),
+						   anAxisData[2].Color.greenF(),
+						   anAxisData[2].Color.blueF(),
+						   Quantity_TOC_RGB));
+    gt.ChangeZAxisAspect().SetTickmarkNumber(anAxisData[2].NbValues-1);
+    gt.ChangeZAxisAspect().SetTickmarkLength(anAxisData[2].TickmarkLength);
+    gt.ChangeZAxisAspect().SetValuesOffset(anAxisData[2].Offset);
+    gt.ChangeZAxisAspect().SetNameOffset(anAxisData[2].Offset + aGap); // see above
+    // draw trihedron
+    theView->GraduatedTrihedronDisplay(gt);
+#else
     theView->GraduatedTrihedronDisplay(
       anAxisData[0].Name.toLatin1().constData(),
       anAxisData[1].Name.toLatin1().constData(),
@@ -309,6 +372,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
                       anAxisData[2].Color.greenF(),
                       anAxisData[2].Color.blueF(),
                       Quantity_TOC_RGB ) );
+#endif // OCC_VERSION_LARGE > 0x06080000
   }
   else
     theView->GraduatedTrihedronErase();
