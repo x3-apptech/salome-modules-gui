@@ -29,11 +29,15 @@
 #include "QtxAction.h"
 #include "QtxIntSpinBox.h"
 
+#include <Basics_OCCTVersion.hxx>
+
+#if OCC_VERSION_LARGE > 0x06080000
+#include <Graphic3d_GraduatedTrihedron.hxx>
+#endif
+
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QLineEdit>
-
-#include <Basics_OCCTVersion.hxx>
 
 /*!
   \class OCCViewer_CubeAxesDlg::AxisWidget
