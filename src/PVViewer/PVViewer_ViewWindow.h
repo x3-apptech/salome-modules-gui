@@ -52,6 +52,7 @@ public slots:
   void onEmulateApply();
 
 private:
+  SUIT_Desktop*     myDesktop;
   PVViewer_Viewer*     myModel;
   pqTabbedMultiViewWidget*    myPVMgr;
 };

@@ -47,6 +47,7 @@
 PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Viewer* theModel )
   : SUIT_ViewWindow( theDesktop ), myPVMgr( 0 )
 {
+  myDesktop = theDesktop;
   myModel = theModel;
   setViewManager(myModel->getViewManager());
   myPVMgr = qobject_cast<pqTabbedMultiViewWidget*>(pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
@@ -61,9 +62,6 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
     PVViewer_ViewManager::ConnectToExternalPVServer(theDesktop);
     PVViewer_ViewManager::ParaviewLoadConfigurations();
 
-    // Hide toolbars
-    PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(theDesktop);
-    pvge->setToolBarVisible(false);
   } else
     qDebug("No multiViewManager defined");
 }
@@ -77,6 +75,9 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
 PVViewer_ViewWindow::~PVViewer_ViewWindow()
 {
   if ( myPVMgr ) {
+    // Hide toolbars
+    PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(myDesktop);
+    pvge->setToolBarEnabled(false);
     myPVMgr->setParent( 0 );
     myPVMgr->hide();
     myPVMgr = 0;
