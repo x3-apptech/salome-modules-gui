@@ -58,6 +58,9 @@ public:
 public slots:
   void onEmulateApply();
 
+protected slots:
+  void onWindowActivated(SUIT_ViewWindow*);
+
 private:
   static pqPVApplicationCore* MyCoreApp;
   static bool ConfigLoaded;

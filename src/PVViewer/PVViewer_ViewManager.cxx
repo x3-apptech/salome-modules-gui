@@ -70,6 +70,8 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
   // Initialize minimal paraview stuff (if not already done)
   ParaviewInitApp(desk, logWindow);
 
+  connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+           this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 //  connect(this, SIGNAL(viewCreated(SUIT_ViewWindow*)), this, SLOT(onPVViewCreated(SUIT_ViewWindow*)));
 }
 
@@ -237,4 +239,16 @@ void PVViewer_ViewManager::onEmulateApply()
 {
   PVViewer_GUIElements * guiElements = PVViewer_GUIElements::GetInstance(desktop);
   guiElements->onEmulateApply();
+}
+
+/*!Enable toolbars if view \a view is ParaView viewer and disable otherwise.
+*/
+void PVViewer_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
+{
+  if (view)
+    {
+    PVViewer_ViewWindow* pvWindow = dynamic_cast<PVViewer_ViewWindow*>(view);
+    PVViewer_GUIElements * guiElements = PVViewer_GUIElements::GetInstance(desktop);
+    guiElements->setToolBarEnabled(pvWindow!=0);
+    }
 }

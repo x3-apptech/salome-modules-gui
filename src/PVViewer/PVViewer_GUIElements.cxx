@@ -198,3 +198,17 @@ QList<QToolBar*> PVViewer_GUIElements::getToolbars()
     << commonToolbar << dataToolbar;
   return l;
 }
+
+void PVViewer_GUIElements::setToolBarEnabled(bool enabled)
+{
+  mainToolBar  ->setEnabled(enabled);
+  vcrToolbar   ->setEnabled(enabled);
+  timeToolbar  ->setEnabled(enabled);
+  colorToolbar ->setEnabled(enabled);
+  reprToolbar  ->setEnabled(enabled);
+  cameraToolbar->setEnabled(enabled);
+  axesToolbar  ->setEnabled(enabled);
+  macrosToolbar->setEnabled(enabled);
+  commonToolbar->setEnabled(enabled);
+  dataToolbar  ->setEnabled(enabled);
+}

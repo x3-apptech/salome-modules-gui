@@ -59,6 +59,7 @@ public:
   void myBuildToolbars(SUIT_Desktop* desk);
   void addToolbars(SUIT_Desktop* desk);
   void setToolBarVisible(bool show);
+  void setToolBarEnabled(bool enabled);
   QList<QToolBar*> getToolbars();
 
 public slots:
