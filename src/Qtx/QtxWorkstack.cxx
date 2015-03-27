@@ -953,6 +953,11 @@ void QtxWorkstackArea::customEvent( QEvent* e )
   {
   case ActivateWidget:
     myBar->updateActiveState();
+    // IMN 27/03/2015: This workaround caused by the bug INT PAL 0052623: OCC view blinking when
+    // using polyline sketcher which is reproduced on Unix systems with qt-4.8.4.
+    myStack->setUpdatesEnabled( false );
+    updateCurrent();
+    myStack->setUpdatesEnabled( true );
     emit activated( activeWidget() );
     break;
   case FocusWidget:
