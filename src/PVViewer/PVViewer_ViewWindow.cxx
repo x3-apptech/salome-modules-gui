@@ -62,6 +62,9 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
     PVViewer_ViewManager::ConnectToExternalPVServer(theDesktop);
     PVViewer_ViewManager::ParaviewLoadConfigurations();
 
+    // Hide toolbars
+    PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(myDesktop);
+    pvge->setToolBarVisible(false);
   } else
     qDebug("No multiViewManager defined");
 }
