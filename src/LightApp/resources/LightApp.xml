@@ -57,27 +57,29 @@
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->
-    <parameter name="Qtx"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="Style"        value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SUIT"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="STD"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="ViewerTools"  value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="Plot2d"       value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SPlot2d"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="GLViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="GraphicsView" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="OCCViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="VTKViewer"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-	<parameter name="PVViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>    
+    <parameter name="Qtx"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="Style"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SUIT"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="STD"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="ViewerTools"   value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="Plot2d"        value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SPlot2d"       value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="GLViewer"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="GraphicsView"  value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="OCCViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="VTKViewer"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PVViewer"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="QxSceneViewer" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="PyConsole"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SalomeApp"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="OB"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="CAM"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="LightApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SVTK"         value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="ToolsGUI"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="LogWindow"    value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PyEditor"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PyViewer"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="PyConsole"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SalomeApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="OB"            value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="CAM"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="LightApp"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SVTK"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="ToolsGUI"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="LogWindow"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
   </section>
   <section name="desktop" >
     <!-- Default GUI desktop state, position, size -->
@@ -199,6 +201,18 @@
     <parameter name="Background" value="144, 208, 211" />
     <parameter name="Title"      value="63, 213, 255"  />
     <parameter name="NodeBody"   value="255, 249, 147" />
+  </section>
+  <section name="PyEditor" >
+    <!-- PyEditor viewer preferences -->
+    <parameter name="Font"                 value="Courier, 10" />
+    <parameter name="HighlightCurrentLine" value="true" />
+    <parameter name="TextWrapping"         value="false" />
+    <parameter name="CenterCursorOnScroll" value="true" />
+    <parameter name="LineNumberArea"       value="true" />
+    <parameter name="TabSpaceVisible"      value="true" />
+    <parameter name="TabSize"              value="4" />
+    <parameter name="VerticalEdge"         value="true" />
+    <parameter name="NumberColumns"        value="90" />
   </section>
   <section name="GUI" >
     <parameter name="documentation"     value="gui_help"/>

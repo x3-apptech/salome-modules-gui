@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource>
+    <file>images/py_browser.png</file>
+    <file>images/py_close.png</file>
+    <file>images/py_copy.png</file>
+    <file>images/py_cut.png</file>
+    <file>images/py_delete.png</file>
+    <file>images/py_new.png</file>
+    <file>images/py_open.png</file>
+    <file>images/py_paste.png</file>
+    <file>images/py_preferences.png</file>
+    <file>images/py_redo.png</file>
+    <file>images/py_save.png</file>
+    <file>images/py_save_as.png</file>
+    <file>images/py_select_all.png</file>
+    <file>images/py_undo.png</file>
+  </qresource>
+</RCC>

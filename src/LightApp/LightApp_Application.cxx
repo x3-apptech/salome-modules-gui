@@ -154,6 +154,12 @@
   #include "PVViewer_ViewModel.h"
 #endif
 
+#ifndef DISABLE_PYVIEWER
+  #include <PyViewer_ViewManager.h>
+  #include <PyViewer_ViewModel.h>
+  #include <PyViewer_ViewWindow.h>
+#endif
+
 
 #define VISIBILITY_COLUMN_WIDTH 25
 
@@ -750,6 +756,9 @@ void LightApp_Application::createActions()
 #ifndef DISABLE_PVVIEWER
   createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
 #endif
+#ifndef DISABLE_PYVIEWER
+  createActionForViewer( NewPyViewerId, newWinMenu, QString::number( 7 ), Qt::ALT+Qt::Key_Y );
+#endif
 
   createAction( RenameId, tr( "TOT_RENAME" ), QIcon(), tr( "MEN_DESK_RENAME" ), tr( "PRP_RENAME" ),
                 Qt::ALT+Qt::SHIFT+Qt::Key_R, desk, false, this, SLOT( onRenameWindow() ) );
@@ -873,6 +882,11 @@ void LightApp_Application::onNewWindow()
 #ifndef DISABLE_PVVIEWER
   case NewPVViewId:
     type = PVViewer_Viewer::Type();
+    break;
+#endif
+#ifndef DISABLE_PYVIEWER
+  case NewPyViewerId:
+    type = PyViewer_Viewer::Type();
     break;
 #endif
   }
@@ -1022,6 +1036,12 @@ void LightApp_Application::updateCommandsStatus()
 
 #ifndef DISABLE_PVVIEWER
   a = action( NewPVViewId );
+  if( a )
+    a->setEnabled( activeStudy() );
+#endif
+
+#ifndef DISABLE_PYVIEWER
+  a = action( NewPyViewerId );
   if( a )
     a->setEnabled( activeStudy() );
 #endif
@@ -1470,6 +1490,12 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     } else {
       viewMgr = new PVViewer_ViewManager( activeStudy(), desktop(), logWindow() );
     }
+  }
+#endif
+#ifndef DISABLE_PYVIEWER
+  if( vmType == PyViewer_Viewer::Type() )
+  {
+    viewMgr = new PyViewer_ViewManager( activeStudy(), desktop() );
   }
 #endif
 #ifndef DISABLE_OCCVIEWER
@@ -2593,6 +2619,51 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   // .. "Plot2d viewer" group <<end>>
 
+  // .. "PyViewer" preferences tab <<start>>
+  int pyeditTab = pref->addPreference( tr( "PREF_TAB_PYEDITOR" ), salomeCat );
+  // ... "Font settings" group <<start>>
+  int pyFontGroup = pref->addPreference( tr( "PREF_GROUP_PY_FONT" ), pyeditTab );
+  pref->addPreference( tr( "PREF_PY_FONT" ), pyFontGroup,
+    LightApp_Preferences::Font, "PyEditor", "Font" );
+  // ... "Font settings" group <<end>>
+  // ... "Display settings" group <<start>>
+  int pyDispGroup = pref->addPreference( tr( "PREF_GROUP_PY_DISPLAY" ), pyeditTab );
+  pref->setItemProperty( "columns", 2, pyDispGroup );
+  // ... -> current line highlight
+  pref->addPreference( tr( "PREF_PY_CURRLINE_HIGHLIGHT" ), pyDispGroup,
+    LightApp_Preferences::Bool, "PyEditor", "HighlightCurrentLine" );
+  // ... -> text wrapping
+  pref->addPreference( tr( "PREF_PY_TEXT_WRAP" ), pyDispGroup,
+    LightApp_Preferences::Bool, "PyEditor", "TextWrapping" );
+  // ... -> center cursor on scroll
+  pref->addPreference( tr( "PREF_PY_CURSON_ON_SCROLL" ), pyDispGroup,
+    LightApp_Preferences::Bool, "PyEditor", "CenterCursorOnScroll" );
+  // ... -> line numbers area
+  pref->addPreference( tr( "PREF_PY_LINE_NUMBS_AREA" ), pyDispGroup,
+    LightApp_Preferences::Bool, "PyEditor", "LineNumberArea" );
+  // ... "Display settings" group <<end>>
+  // ... "Tab settings" group <<start>>
+  int pyTabGroup = pref->addPreference( tr( "PREF_GROUP_PY_TAB" ), pyeditTab );
+  pref->setItemProperty( "columns", 2, pyTabGroup );
+  // ... -> tab whitespaces
+  pref->addPreference( tr( "PREF_PY_TAB_WHITESPACES" ), pyTabGroup,
+    LightApp_Preferences::Bool, "PyEditor", "TabSpaceVisible" );
+  // ... -> tab size
+  pref->addPreference( tr( "PREF_PY_TAB_SIZE" ), pyTabGroup,
+    LightApp_Preferences::IntSpin, "PyEditor", "TabSize" );
+  // ... "Tab settings" group <<end>>
+  // ... "Vertical edge settings" group <<start>>
+  int pyVertEdgeGroup = pref->addPreference( tr( "PREF_GROUP_VERT_EDGE" ), pyeditTab );
+  pref->setItemProperty( "columns", 2, pyVertEdgeGroup );
+  // ... -> vertical edge
+  pref->addPreference( tr( "PREF_PY_VERT_EDGE" ), pyVertEdgeGroup,
+    LightApp_Preferences::Bool, "PyEditor", "VerticalEdge" );
+  // ... -> number of columns
+  pref->addPreference( tr( "PREF_PY_NUM_COLUMNS" ), pyVertEdgeGroup,
+    LightApp_Preferences::IntSpin, "PyEditor", "NumberColumns" );
+  // ... "Vertical edge settings" group <<end>>
+  // .. "PyEditor" preferences tab <<end>>
+
   // .. "Directories" preferences tab <<start>>
   int dirTab = pref->addPreference( tr( "PREF_TAB_DIRECTORIES" ), salomeCat );
   // ... --> quick directories list
@@ -3113,6 +3184,39 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     if( wnd ) {
       Plot2d_ViewFrame* frame = wnd->getViewFrame();
       frame->SetPreference();
+    }
+  }
+#endif
+
+#ifndef DISABLE_PYVIEWER
+  if ( sec == QString( "PyViewer" ) && ( param == QString( "HighlightCurrentLine" ) ||
+                                         param == QString( "LineNumberArea" ) ||
+                                         param == QString( "TextWrapping" ) ||
+                                         param == QString( "CenterCursorOnScroll" ) ||
+                                         param == QString( "TabSpaceVisible" ) ||
+                                         param == QString( "TabSize" ) ||
+                                         param == QString( "VerticalEdge" ) ||
+                                         param == QString( "NumberColumns" ) ||
+                                         param == QString( "Font" ) ) )
+  {
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( PyViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> itPy( lst );
+    while ( itPy.hasNext() )
+    {
+      SUIT_ViewManager* viewMgr = itPy.next();
+      SUIT_ViewModel* vm = viewMgr->getViewModel();
+      if ( !vm || !vm->inherits( "PyViewer_Viewer" ) )
+        continue;
+
+      PyViewer_Viewer* pyEditVM = dynamic_cast<PyViewer_Viewer*>( vm );
+
+      viewMgr->setViewModel( vm );
+      PyViewer_ViewWindow* pyView = dynamic_cast<PyViewer_ViewWindow*>( viewMgr->getActiveView() );
+      if( pyView )
+      {
+        pyView->setPreferences();
+      }
     }
   }
 #endif
@@ -4070,6 +4174,9 @@ QStringList LightApp_Application::viewManagersTypes() const
 #endif
 #ifndef DISABLE_PVVIEWER
   aTypesList<<PVViewer_Viewer::Type();
+#endif
+#ifndef DISABLE_PYVIEWER
+  aTypesList<<PyViewer_Viewer::Type();
 #endif
 #ifndef DISABLE_OCCVIEWER
   aTypesList<<OCCViewer_Viewer::Type();

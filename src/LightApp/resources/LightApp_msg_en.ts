@@ -495,6 +495,10 @@ The changes will be applied on the next application session.</translation>
         <source>NEW_WINDOW_6</source>
         <translation>ParaVie&amp;w view</translation>
     </message>
+	<message>
+        <source>NEW_WINDOW_7</source>
+        <translation>P&amp;ython view</translation>
+    </message>
     <message>
         <source>CREATING_NEW_WINDOW</source>
         <translation>Create new %1</translation>
@@ -884,6 +888,62 @@ File does not exist</translation>
         <source>PREF_GROUP_SHORTCUTS</source>
         <translation>Shortcuts settings</translation>
     </message>
+  <message>
+    <source>PREF_TAB_PYEDITOR</source>
+    <translation>Python Viewer</translation>
+  </message>
+  <message>
+    <source>PREF_GROUP_PY_FONT</source>
+    <translation>Font settings</translation>
+  </message>
+  <message>
+    <source>PREF_PY_FONT</source>
+    <translation>Font</translation>
+  </message>
+  <message>
+    <source>PREF_GROUP_PY_DISPLAY</source>
+    <translation>Display settings</translation>
+  </message>
+  <message>
+    <source>PREF_PY_CURRLINE_HIGHLIGHT</source>
+    <translation>Enable current line highlight</translation>
+  </message>
+  <message>
+    <source>PREF_PY_TEXT_WRAP</source>
+    <translation>Enable text wrapping</translation>
+  </message>
+  <message>
+    <source>PREF_PY_CURSON_ON_SCROLL</source>
+    <translation>Center cursor on scroll</translation>
+  </message>
+  <message>
+    <source>PREF_PY_LINE_NUMBS_AREA</source>
+    <translation>Display line numbers area</translation>
+  </message>
+  <message>
+    <source>PREF_GROUP_PY_TAB</source>
+    <translation>Tab settings</translation>
+  </message>
+  <message>
+    <source>PREF_PY_TAB_WHITESPACES</source>
+    <translation>Display tab whitespaces</translation>
+  </message>
+  <message>
+    <source>PREF_PY_TAB_SIZE</source>
+    <translation>Tab size:</translation>
+  </message>
+  <message>
+    <source>PREF_GROUP_VERT_EDGE</source>
+    <translation>Vertical edge settings</translation>
+  </message>
+  <message>
+    <source>PREF_PY_VERT_EDGE</source>
+    <translation>Display vertical edge</translation>
+  </message>
+  <message>
+    <source>PREF_PY_NUM_COLUMNS</source>
+    <translation>Number of columns:</translation>
+  </message>
 </context>
 <context>
     <name>LightApp_Module</name>
