@@ -748,7 +748,7 @@ void LightApp_Application::createActions()
   createActionForViewer( NewGraphicsViewId, newWinMenu, QString::number( 5 ), Qt::ALT+Qt::Key_R );
 #endif
 #ifndef DISABLE_PVVIEWER
-  createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_W );
+  createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
 #endif
 
   createAction( RenameId, tr( "TOT_RENAME" ), QIcon(), tr( "MEN_DESK_RENAME" ), tr( "PRP_RENAME" ),
