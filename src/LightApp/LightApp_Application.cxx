@@ -1464,7 +1464,12 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
 #ifndef DISABLE_PVVIEWER
   if( vmType == PVViewer_Viewer::Type() )
   {
-    viewMgr = new PVViewer_ViewManager( activeStudy(), desktop(), logWindow() );
+    if ( viewMgr = dynamic_cast<PVViewer_ViewManager*>( getViewManager( vmType, false ) ) ) {
+      viewMgr->getActiveView()->setFocus();
+      return 0;
+    } else {
+      viewMgr = new PVViewer_ViewManager( activeStudy(), desktop(), logWindow() );
+    }
   }
 #endif
 #ifndef DISABLE_OCCVIEWER
