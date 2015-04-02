@@ -78,22 +78,6 @@ void LightApp_ShowHideOp::startOperation()
     return;
   }
 
-  QString mod_name;
-  if( sel->count()>0 )
-  {
-    QString aStr =  sel->parameter( 0, "displayer" ).toString();
-    mod_name = app->moduleTitle( aStr );
-  }
-  else if( app->activeModule() )
-    mod_name = app->moduleTitle( app->activeModule()->name() );
-
-  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, true );
-  if( !d )
-  {
-    abort();
-    return;
-  }
-
   if( myActionType==DISPLAY_ONLY || myActionType==ERASE_ALL )
   {
     //ERASE ALL
@@ -108,10 +92,28 @@ void LightApp_ShowHideOp::startOperation()
     }
     if( myActionType==ERASE_ALL )
     {
-      d->UpdateViewer();
+      // Temporary displayer just to update viewer!
+      LightApp_Displayer ld;
+      ld.UpdateViewer();
       commit();
       return;
     }
+  }
+
+  QString mod_name;
+  if( sel->count()>0 )
+  {
+    QString aStr =  sel->parameter( 0, "displayer" ).toString();
+    mod_name = app->moduleTitle( aStr );
+  }
+  else if( app->activeModule() )
+    mod_name = app->moduleTitle( app->activeModule()->name() );
+
+  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, true );
+  if( !d )
+  {
+    abort();
+    return;
   }
 
   QStringList entries;
