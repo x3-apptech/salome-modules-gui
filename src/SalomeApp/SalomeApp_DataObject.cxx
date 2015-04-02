@@ -606,7 +606,7 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
   {
     _PTR(AttributeComment) comm = attr;
     std::string str = comm->Value();
-    val = QString::fromUtf8( str.c_str() );
+    val = fromUtf8( str );
   }
 
   return val;

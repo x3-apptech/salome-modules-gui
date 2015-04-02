@@ -49,7 +49,7 @@ void ExecCommand::execute()
 {
   if ( myCommand != "" )
   {
-    int ret = getInterp()->run( myCommand.toUtf8().data() );
+    int ret = getInterp()->run( myCommand.toLatin1().data() );
     if ( ret < 0 )
       myState = PyInterp_Event::ES_ERROR;
     else if ( ret > 0 )
