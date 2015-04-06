@@ -43,10 +43,16 @@
 #include <Visual3d_View.hxx>
 #include <Geom_Plane.hxx>
 #include <Prs3d_Presentation.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
+#if OCC_VERSION_LARGE > 0x06080000
+  #include <Prs3d_Drawer.hxx>
+#else
+  #include <AIS_Drawer.hxx>
+#endif
 #include <IntAna_IntConicQuad.hxx>
 #include <gp_Lin.hxx>
 #include <gp_Pln.hxx>
@@ -858,7 +864,9 @@ void OCCViewer_ClippingDlg::displayPreview()
       clipPlaneParams(aClipPlane, ic, aSize, aBasePnt, aNormal, myModel->trihedronSize());
       myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ), aBasePnt );
       myPreviewPlane->SetTypeOfSensitivity( Select3D_TOS_INTERIOR );
-      myPreviewPlane->SetSize( aSize, aSize );
+      Handle(Prs3d_PlaneAspect) aPlaneAspect = new Prs3d_PlaneAspect();
+      aPlaneAspect->SetPlaneLength( aSize, aSize );
+      myPreviewPlane->Attributes()->SetPlaneAspect( aPlaneAspect );
       ic->SetWidth( myPreviewPlane, 10, false );
       ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
       ic->SetTransparency( myPreviewPlane, 0.5, false );
@@ -914,7 +922,9 @@ void OCCViewer_ClippingDlg::updatePreview() {
       //Plane was not created
       myPreviewPlane = new AIS_Plane( new Geom_Plane( aBasePnt, aNormal ), aBasePnt );
       myPreviewPlane->SetTypeOfSensitivity( Select3D_TOS_INTERIOR );
-      myPreviewPlane->SetSize( aSize, aSize );
+      Handle(Prs3d_PlaneAspect) aPlaneAspect = new Prs3d_PlaneAspect();
+      aPlaneAspect->SetPlaneLength( aSize, aSize );
+      myPreviewPlane->Attributes()->SetPlaneAspect( aPlaneAspect );
       ic->Display( myPreviewPlane, 1, 0, false );
       ic->SetWidth( myPreviewPlane, 10, false );
       ic->SetMaterial( myPreviewPlane, Graphic3d_NOM_PLASTIC, false );
