@@ -24,6 +24,7 @@
 #define PYEDITOR_SETTINGSDLG_H
 
 #include <QDialog>
+#include "PyEditor.h"
 
 class PyEditor_Editor;
 class QAbstractButton;
@@ -34,7 +35,7 @@ class QFontComboBox;
 class QLabel;
 class QSpinBox;
 
-class PyEditor_SettingsDlg : public QDialog
+class PYEDITOR_EXPORT PyEditor_SettingsDlg : public QDialog
 {
   Q_OBJECT
 

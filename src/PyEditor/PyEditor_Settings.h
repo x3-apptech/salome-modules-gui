@@ -24,6 +24,7 @@
 #define PYEDITOR_SETTINGS_H
 
 #include <QFont>
+#include "PyEditor.h"
 
 class QSettings;
 class QtxResourceMgr;
@@ -40,7 +41,7 @@ const char* const NUM_COLUMNS        = "NumberColumns";
 const char* const FONT_FAMILY        = "FontFamily";
 const char* const FONT_SIZE          = "FontSize";
 
-class PyEditor_Settings
+class PYEDITOR_EXPORT PyEditor_Settings
 {
 public:
   PyEditor_Settings( QtxResourceMgr* = 0 ,  bool isSingle = true );

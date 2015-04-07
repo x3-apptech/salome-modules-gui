@@ -24,12 +24,13 @@
 #define PYEDITOR_EDITOR_H
 
 #include <QPlainTextEdit>
+#include "PyEditor.h"
 
 class PyEditor_PyHighlighter;
 class PyEditor_Settings;
 class QtxResourceMgr;
 
-class PyEditor_Editor : public QPlainTextEdit
+class PYEDITOR_EXPORT PyEditor_Editor : public QPlainTextEdit
 {
   Q_OBJECT
 

@@ -8,7 +8,6 @@
         <translation>Pythonのエディタ:%M - ビューア:%V</translation>
     </message>
 </context>
-</context>
 <context>
       <name>PyViewer_ViewWindow</name>
 </context>
