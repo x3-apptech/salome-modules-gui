@@ -219,22 +219,20 @@ VTKViewer_Actor
   }
 
   int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
-  double aFactor, aUnit; 
-  vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
-  
-  double aNewFactor = myPolygonOffsetFactor, aNewUnit = myPolygonOffsetUnits;
-  if(!myIsResolveCoincidentTopology){
-    static double EPS = .01;
-    aNewFactor *= (1.0-EPS);
-    aNewUnit *= (1.0-EPS);
+  if(myIsResolveCoincidentTopology){
+    double aFactor, aUnit; 
+    vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
+    
+    vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
+                                                                   myPolygonOffsetUnits);
+    Superclass::Render(ren,m);
+    
+    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
+  }else{
+    vtkMapper::SetResolveCoincidentTopologyToOff();
+    Superclass::Render(ren,m);
   }
-    
-  vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aNewFactor,
-								 aNewUnit);
-  Superclass::Render(ren,m);
-    
-  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
   vtkMapper::SetResolveCoincidentTopology(aResolveCoincidentTopology);
 }
 
