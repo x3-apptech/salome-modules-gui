@@ -621,21 +621,24 @@ void
 SVTK_DeviceActor
 ::Render(vtkRenderer *ren, vtkMapper* m)
 {
-  if(myIsResolveCoincidentTopology){
-    int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
-    double aFactor, aUnit; 
-    vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
-    
-    vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-                                                                   myPolygonOffsetUnits);
-    Superclass::Render(ren,m);
-    
-    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
-    vtkMapper::SetResolveCoincidentTopology(aResolveCoincidentTopology);
-  }else{
-    Superclass::Render(ren,m);
+  int aResolveCoincidentTopology = vtkMapper::GetResolveCoincidentTopology();
+  double aFactor, aUnit; 
+  vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
+  
+  double aNewFactor = myPolygonOffsetFactor, aNewUnit = myPolygonOffsetUnits;
+  if(!myIsResolveCoincidentTopology){
+    static double EPS = .01;
+    aNewFactor *= (1.0-EPS);
+    aNewUnit *= (1.0-EPS);
   }
+  
+  vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aNewFactor,
+								 aNewUnit);
+  Superclass::Render(ren,m);
+  
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(aFactor,aUnit);
+  vtkMapper::SetResolveCoincidentTopology(aResolveCoincidentTopology);
 }
 
 /*!
