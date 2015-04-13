@@ -30,6 +30,7 @@
 
 class QwtPlot;
 class QwtPlotItem;
+class QwtPlotCurve;
 
 
 class PLOT2D_EXPORT Plot2d_AnalyticalCurve
@@ -131,7 +132,7 @@ protected:
   QString              myName; 
   int                  myAction;
   int                  myState;
-  QwtPlotItem*         myCurve;
+  QwtPlotCurve*         myCurve;
   bool                 myActive;
   bool                 myIsSelected;
 

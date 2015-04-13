@@ -1988,6 +1988,13 @@ void Plot2d_ViewFrame::setCurveType( int curveType, bool update )
     if ( crv )
       setCurveType( crv, myCurveType );
   }
+  for(int i=0 ; i < myAnalyticalCurves.count(); i++) {
+    QwtPlotCurve* aPCurve = dynamic_cast<QwtPlotCurve*>( myAnalyticalCurves[i]->plotItem() );
+    Plot2d_AnalyticalCurve* aCurve = dynamic_cast<Plot2d_AnalyticalCurve*>( myAnalyticalCurves[i] );
+    if ( aPCurve && aCurve ) {
+      setCurveType( aPCurve, myCurveType );
+    }
+  }
   if ( update )
     myPlot->replot();
   emit vpCurveChanged();
