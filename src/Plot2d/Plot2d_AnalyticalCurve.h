@@ -132,7 +132,7 @@ protected:
   QString              myName; 
   int                  myAction;
   int                  myState;
-  QwtPlotCurve*         myCurve;
+  QwtPlotCurve*        myCurve;
   bool                 myActive;
   bool                 myIsSelected;
 
