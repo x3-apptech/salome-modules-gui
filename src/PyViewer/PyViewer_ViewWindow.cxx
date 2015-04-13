@@ -256,7 +256,7 @@ void PyViewer_ViewWindow::createActions()
                             tr( "MNU_PY_BROWSER" ), 0, this );
   anAction->setStatusTip( tr( "DSC_PY_BROWSER" ) );
   connect( anAction, SIGNAL( triggered() ), this, SLOT( onBrowser() ) );
-  aMgr->registerAction( anAction, BrowserId );
+  //aMgr->registerAction( anAction, BrowserId );
 
   // 4.2. Create multi-action for help operations
   /*QtxMultiAction* aHelpAction = new QtxMultiAction( this );
@@ -365,8 +365,11 @@ bool PyViewer_ViewWindow::onSaveAs()
  */
 void PyViewer_ViewWindow::onPreferences()
 {
-  PyEditor_SettingsDlg aPage( my_TextEditor, this );
-  aPage.exec();
+  PyEditor_SettingsDlg* aPage = new PyEditor_SettingsDlg( my_TextEditor, this );
+  connect( aPage, SIGNAL( onHelpClicked() ),
+	   this, SLOT( onHelp() ) );
+  aPage->exec();
+  delete aPage;
 }
 
 /*!
@@ -486,4 +489,16 @@ void PyViewer_ViewWindow::onBrowser()
   QStringList parameters;
   parameters << QString( "--file=%1" ).arg( appDir.filePath( "pyeditor.html" ) );
   QProcess::startDetached( "HelpBrowser", parameters );
+}
+
+/*!
+  Slot, called when user clicks "Help" button in "Preferences" dialog box.
+*/
+void PyViewer_ViewWindow::onHelp()
+{
+#ifndef NO_SUIT
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if ( app )
+    app->onHelpContextModule( "GUI", "python_viewer_page.html", "custom_python_preferences" );
+#endif
 }

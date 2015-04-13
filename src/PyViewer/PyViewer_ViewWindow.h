@@ -57,6 +57,7 @@ private Q_SLOTS:
   bool        onSaveAs();
   void        onPreferences();
   void        onBrowser();
+  void        onHelp();
 
 private:
   void        loadFile( const QString& );

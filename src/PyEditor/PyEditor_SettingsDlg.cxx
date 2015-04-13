@@ -26,14 +26,12 @@
 #include "PyEditor_Settings.h"
 
 #include <QCheckBox>
-#include <QComboBox>
-#include <QDialogButtonBox>
-#include <QFontComboBox>
 #include <QGroupBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
-
+#include <QtxFontEdit.h>
 
 /*!
   \class PyEditor_SettingsDlg
@@ -55,21 +53,8 @@ PyEditor_SettingsDlg::PyEditor_SettingsDlg( PyEditor_Editor* theEditor, QWidget*
   // . Font settings <start>
   QGroupBox* aFontSetBox = new QGroupBox( tr( "GR_FONT_SET" ) );
   QHBoxLayout* aFontSetLayout = new QHBoxLayout( aFontSetBox );
-  QLabel* aFontFamilyLabel = new QLabel( tr( "LBL_FONT_FAM" ) );
-  w_FontFamily = new QFontComboBox;
-  w_FontFamily->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
-  QLabel* aFontSizeLabel = new QLabel( tr( "LBL_FONT_SIZE" ) );
-  w_FontSize = new QComboBox;
-  w_FontSize->setInsertPolicy( QComboBox::NoInsert );
-  w_FontSize->setValidator( new QIntValidator( 1, 250, w_FontSize ) );
-  w_FontSize->setEditable( true );
-  w_FontSize->setMinimumContentsLength( 3 );
-  aFontSetLayout->addWidget( aFontFamilyLabel );
-  aFontSetLayout->addWidget( w_FontFamily );
-  aFontSetLayout->addWidget( aFontSizeLabel );
-  aFontSetLayout->addWidget( w_FontSize );
-  /*connect( w_FontFamily,  SIGNAL( currentFontChanged( const QFont& ) ),
-           this, SLOT( onFontChanged( const QFont& ) ) );*/
+  w_FontWidget = new QtxFontEdit( QtxFontEdit::Family|QtxFontEdit::Size|QtxFontEdit::UserSize, this );
+  aFontSetLayout->addWidget( w_FontWidget );
   // . Font settings <end>
   
   // . Display settings <start>
@@ -137,97 +122,25 @@ PyEditor_SettingsDlg::PyEditor_SettingsDlg( PyEditor_Editor* theEditor, QWidget*
   aMainLayout->addWidget( w_DefaultCheck );
   aMainLayout->addStretch( 1 );
   
+  myOkBtn = new QPushButton( tr( "BUT_OK" ), this );
+  myOkBtn->setAutoDefault( TRUE );
+  myOkBtn->setDefault( TRUE );
+  myCancelBtn = new QPushButton( tr( "BUT_CANCEL" ), this );
+  myCancelBtn->setAutoDefault( TRUE );
+  myHelpBtn = new QPushButton( tr( "BUT_HELP" ), this );
+  myHelpBtn->setAutoDefault( TRUE );
   QHBoxLayout* aButtonLayout = new QHBoxLayout;
-  w_ButtonBox = new QDialogButtonBox( Qt::Horizontal );
-  w_ButtonBox->setStandardButtons( QDialogButtonBox::Ok
-                                 | QDialogButtonBox::Cancel
-                                 | QDialogButtonBox::Apply );
-  aButtonLayout->addWidget( w_ButtonBox, 1, Qt::AlignRight );
+  aButtonLayout->addWidget( myOkBtn );
+  aButtonLayout->addStretch();
+  aButtonLayout->addWidget( myCancelBtn );
+  aButtonLayout->addWidget( myHelpBtn );
   aMainLayout->addLayout( aButtonLayout );
 
-  connect( w_ButtonBox, SIGNAL( clicked( QAbstractButton* ) ),
-           this, SLOT( onClick( QAbstractButton* ) ) );
-
-  settingsToGui();
-
-  onFontChanged( currentFont() );
-}
-
-/*!
-  \brief Set currently selected font.
-  \param fnt current font
-  \sa currentFont()
-*/
-void PyEditor_SettingsDlg::setCurrentFont( const QFont& fnt )
-{
-  w_FontFamily->blockSignals( true );
-  w_FontSize->blockSignals( true );
+  connect( myOkBtn,         SIGNAL( clicked() ), this, SLOT( onOk() ) );
+  connect( myCancelBtn,     SIGNAL( clicked() ), this, SLOT( reject() ) );
+  connect( myHelpBtn,       SIGNAL( clicked() ), this, SLOT( onHelp() ) );
   
-  setFontFamily( fnt.family() );
-  setFontSize( fnt.pointSize() );
-
-  w_FontFamily->blockSignals( false );
-  w_FontSize->blockSignals( false );
-}
-
-/*!
-  \brief Get currently selected font.
-  \return current font
-  \sa setCurrentFont()
-*/
-QFont PyEditor_SettingsDlg::currentFont() const
-{
-  return QFont( fontFamily(), fontSize() );
-}
-
-/*!
-  \brief Set font size.
-  \param s size value
-  \sa fontSize()
-*/
-void PyEditor_SettingsDlg::setFontSize( const int s )
-{
-  if ( s <= 0 )
-    return;
-
-  int idx = w_FontSize->findText( QString::number( s ) );
-  if ( idx != -1 )
-    w_FontSize->setCurrentIndex( idx );
-  else if ( w_FontSize->isEditable() )
-    w_FontSize->setEditText( QString::number( s ) );
-}
-
-/*!
-  \brief Get font size.
-  \return size value
-  \sa setFontSize()
-*/
-int PyEditor_SettingsDlg::fontSize() const
-{
-  bool ok;
-  int pSize = w_FontSize->currentText().toInt( &ok );
-  return ok ? pSize : 0;
-}
-
-/*!
-  \brief Set font family name.
-  \param theFamily new font family name
-  \sa fontFamily()
-*/
-void PyEditor_SettingsDlg::setFontFamily( const QString& theFamily )
-{
-  w_FontFamily->setCurrentFont( QFont( theFamily ) );
-  onFontChanged( w_FontFamily->currentFont() );
-}
-
-/*!
-  \brief Get font family name.
-  \return font family name
-  \sa setFontFamily()
-*/
-QString PyEditor_SettingsDlg::fontFamily() const
-{
-  return w_FontFamily->currentFont().family();
+  settingsToGui();
 }
 
 /*!
@@ -240,30 +153,6 @@ bool PyEditor_SettingsDlg::isSetAsDefault()
 }
 
 /*!
-  SLOT: Perform dialog actions
-  \param theButton button
-*/
-void PyEditor_SettingsDlg::onClick( QAbstractButton* theButton )
-{
-  QDialogButtonBox::ButtonRole aButtonRole = w_ButtonBox->buttonRole( theButton );
-  if ( aButtonRole == QDialogButtonBox::AcceptRole )
-  {
-    settingsFromGui();
-    setSettings();
-    accept();
-  }
-  else if ( aButtonRole == QDialogButtonBox::ApplyRole )
-  {
-    settingsFromGui();
-    setSettings();
-  }
-  else if ( aButtonRole == QDialogButtonBox::RejectRole )
-  {
-    reject();
-  }
-}
-
-/*!
   SLOT: Changes the widget visibility depending on the set theState flag.
   \param theState flag of visibility
  */
@@ -271,29 +160,6 @@ void PyEditor_SettingsDlg::onVerticalEdgeChecked( bool theState )
 {
   lbl_NumColumns->setEnabled( theState );
   w_NumberColumns->setEnabled( theState );
-}
-
-/*!
-  \brief Called when current font is changed.
-  \param theFont (not used)
-*/
-void PyEditor_SettingsDlg::onFontChanged( const QFont& /*theFont*/ )
-{
-  bool blocked = w_FontSize->signalsBlocked();
-  w_FontSize->blockSignals( true );
-
-  int s = fontSize();
-  w_FontSize->clear();
-
-  QList<int> szList = QFontDatabase().pointSizes( fontFamily() );
-  QStringList sizes;
-  for ( QList<int>::const_iterator it = szList.begin(); it != szList.end(); ++it )
-    sizes.append( QString::number( *it ) );
-  w_FontSize->addItems( sizes );
-
-  setFontSize( s );
-
-  w_FontSize->blockSignals( blocked );
 }
 
 /*!
@@ -309,7 +175,7 @@ void PyEditor_SettingsDlg::settingsFromGui()
   my_Editor->settings()->p_TabSize = w_TabSize->value();
   my_Editor->settings()->p_VerticalEdge = w_VerticalEdge->isChecked();
   my_Editor->settings()->p_NumberColumns = w_NumberColumns->value();
-  my_Editor->settings()->p_Font = currentFont();
+  my_Editor->settings()->p_Font = w_FontWidget->currentFont();
 }
 
 /*!
@@ -325,7 +191,8 @@ void PyEditor_SettingsDlg::settingsToGui()
   w_TabSize->setValue( my_Editor->settings()->p_TabSize );
   w_VerticalEdge->setChecked( my_Editor->settings()->p_VerticalEdge );
   w_NumberColumns->setValue( my_Editor->settings()->p_NumberColumns );
-  setCurrentFont( my_Editor->settings()->p_Font );
+  w_FontWidget->setCurrentFont( my_Editor->settings()->p_Font );
+  w_FontWidget->setSizes();
 
   onVerticalEdgeChecked( my_Editor->settings()->p_VerticalEdge );
 }
@@ -340,4 +207,22 @@ void PyEditor_SettingsDlg::setSettings()
     my_Editor->settings()->writeSettings();
 
   my_Editor->updateStatement();
+}
+
+/*!
+  Slot, called when user clicks "OK" button
+*/
+void PyEditor_SettingsDlg::onOk()
+{
+  settingsFromGui();
+  setSettings();
+  accept();
+}
+
+/*!
+  Slot, called when user clicks "Help" button.
+*/
+void PyEditor_SettingsDlg::onHelp()
+{
+  emit onHelpClicked();
 }

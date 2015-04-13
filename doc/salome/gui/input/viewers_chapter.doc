@@ -32,6 +32,7 @@ directly, but can be used in custom modules for 2D visualization purposes.
 developed on the basis of Qt QGraphicsView scene. This viewer is used
 in SALOME YACS module for visualization of computation schemes.
 
+- \subpage python_viewer_page allows a user to create/edit Python scripts.
 
 
 */

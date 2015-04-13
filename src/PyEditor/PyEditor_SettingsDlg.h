@@ -27,38 +27,28 @@
 #include "PyEditor.h"
 
 class PyEditor_Editor;
-class QAbstractButton;
 class QCheckBox;
-class QComboBox;
-class QDialogButtonBox;
-class QFontComboBox;
 class QLabel;
+class QPushButton;
 class QSpinBox;
+class QtxFontEdit;
 
 class PYEDITOR_EXPORT PyEditor_SettingsDlg : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit PyEditor_SettingsDlg( PyEditor_Editor*, QWidget* = 0 );
-
-  void    setCurrentFont( const QFont& );
-  QFont   currentFont() const;
-
-  void    setFontSize( const int );
-  int     fontSize() const;
-
-  void    setFontFamily( const QString& );
-  QString fontFamily() const;
+  PyEditor_SettingsDlg( PyEditor_Editor*, QWidget* = 0 );
 
   bool    isSetAsDefault();
 
-public Q_SLOTS:
-  void onClick( QAbstractButton* );
-
 private Q_SLOTS:
   void onVerticalEdgeChecked( bool );
-  void onFontChanged( const QFont& );
+  void onOk();
+  void onHelp();
+
+Q_SIGNALS:
+  void onHelpClicked();
 
 private:
   void settingsToGui();
@@ -77,12 +67,13 @@ private:
   QSpinBox*         w_NumberColumns;
   QLabel*           lbl_NumColumns;
 
-  QFontComboBox*    w_FontFamily;
-  QComboBox*        w_FontSize;
+  QtxFontEdit*      w_FontWidget;
 
   QCheckBox*        w_DefaultCheck;
 
-  QDialogButtonBox* w_ButtonBox;
+  QPushButton*      myOkBtn;
+  QPushButton*      myCancelBtn;
+  QPushButton*      myHelpBtn;
 
   PyEditor_Editor*  my_Editor;
 };

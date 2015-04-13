@@ -236,7 +236,29 @@ selected object in the viewer.
   - <b>Highlighted legend font color</b> - this submenu allows to select
   the color of the font of the selected legend item. 
 
-<br><h2>Directories Preferences</h2>
+\anchor default_python_preferences
+<h2>Python Viewer Preferences</h2>
+
+\image html pref_salome_pythonviewer.png
+
+\note The following settings are default and will be applied for a new created Python viewers only. Customization of already opened viewers can be done using local \ref custom_python_preferences "Preferences dialog box" that is called by click on corresponding icon of \ref python_viewer_page "Python viewer toolbar".
+
+- <b>Font settings</b> allows setting font variant, size and style.
+  
+- <b>Display settings</b> specifies the script representation in the viewer:
+
+  - <b>Enable current line highlight</b> switches on a background coloring of current line.
+  - <b>Enable text wrapping</b> allows lines wrapping at the view border of the editor.
+
+  - <b>Center cursor on scroll</b> scrolls the script vertically to make the cursor visible at the center of the viewer.
+
+  - <b>Display line numbers area</b> will make a panel displaying the line numbers of the script visible in the left border of the editor.
+
+- <b>Tab settings</b> allows to display tab indentation as a set of desirable number of white spaces.
+
+- <b>Vertical edge settings</b> manages drawing of vertical line at the specified column of the viewer.
+
+<h2>Directories Preferences</h2>
 
 \image html pref_salome_directories.png
 
