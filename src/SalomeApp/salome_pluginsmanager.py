@@ -244,7 +244,7 @@ class PluginsManager:
           self.menu.clear()
           self.menu.menuAction().setVisible(False)
           return
-        elif self.lasttime ==0:
+        elif self.lasttime ==0 or salome.myStudy == None:
           salome.salome_init(embedded=1)
 
         lasttime=0
