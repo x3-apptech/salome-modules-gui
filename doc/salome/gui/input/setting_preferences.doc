@@ -39,6 +39,7 @@ the whole GUI SALOME session.
   otherwise a system locale will be used. The locale change will come in force only after
   the application is restarted.
 - <b>Look and feel</b>
+  - <b>Show splash screen at start-up</b> - allows to show or not splash screen at start-up.
   - <b>Opaque resize</b> - force opaque resize mode for viewers area (tabbed workspace).
   Clear this checkbox for less perfomant workstations.
   - <b>Drop-down buttons in toolbars for action groups</b> - when
@@ -70,17 +71,17 @@ the whole GUI SALOME session.
   - <b>Store/restore last GUI state</b> - if checked in, all GUI settings are
     saved with the rest of the data whenever you save the study. When the
     study is reopened, the GUI state is restored.
-  - <b>Multi file python dump</b> - allows to generate multiple files
-    (separately for each component) for dumping of a study to a python script.
-    If the option is disabled, the study is dumped to a single python script.
   - <b>Publish in study in python dump</b> - if this option is switched on,
     the Python script resulting from Dump Python operation will
     include commands related to the publication of the data in the
     study (if this option is supported by specific module).
+  - <b>Multi file python dump</b> - allows to generate multiple files
+    (separately for each component) for dumping of a study to a python script.
+    If the option is disabled, the study is dumped to a single python script.
   - <b>Save GUI state in python dump</b> - if this option is switched on,
     the Python script resulting from Dump Python operation will
     include commands related to the GUI state.
-- <b>External browser</b> - allow to define what browser will 
+- <b>External browser</b> - allows to define what browser will 
     be used to show SALOME reference manuals: internal (built-in
     SALOME browser) or external (IE, Netscape, Mozilla, ...). In
     addition, it is possible to specify 
@@ -89,9 +90,11 @@ the whole GUI SALOME session.
     default, Mozilla is used.
     - \b Parameters - additional parameters required for launching of
     the external browser (if applicable).
-- <b>Python console</b> - here you can quickly set the parameters
-  (style, size, face) of the \ref font_color_dlg "font" used in
-  embedded Python console. 
+- <b>Python console</b>
+    - \b Font - allows quickly set the parameters (style, size, face) of the 
+    \ref font_color_dlg "font" used in embedded Python console.
+    - <b>Show banner</b> - this option allows to show/hide the Python banner 
+    in the top of the console window.
 - <b>Show MRU items</b> - allows to define the maximum \b Number of
 items in <b>Most Recently Used</b> list and the <b>Link type</b>: 
   - \b Long - shows the full path to the file. 
@@ -123,7 +126,7 @@ different locations have the same name.
 - <b>Trihedron</b> - viewer trihedron settings:
   - <b>Size</b> - size of the coordinate axes (global trihedron)
     displayed in the viewer.
-  - <b>Relative size</b> - if this option is switched on, trihedron
+  - <b>Relative</b> - if this option is switched on, trihedron
     axes scale to fit the size of the scene displayed in 3D viewer.
   - <b>Show static trihedron</b> - allows to show/hide the static
     mini-trihedron located in the bottom-left corner of the viewer.
@@ -140,7 +143,9 @@ different locations have the same name.
   - <b>XZ View</b>
   - <b>YZ View</b>
   - <b>XY View</b>
-  
+- <b>Selection</b>
+  - <b>Enable preselection</b> - switches preselection on/off.
+  - <b>Enable selection</b> - switches selection on/off.
 - <b>Clipping parameters</b> - specifies the default clipping plane parameters.
   - <b>Color</b> - allows to change the color of the clipped region.
   - <b>Use default texture</b> - if this option is switched on, the default texture
@@ -164,7 +169,15 @@ different locations have the same name.
   or [-] keyboard buttons.
 - <b>Modification Mode</b> - allows choosing between \b Arithmetic
   and \b Geometrical progression used for zooming.
-- <b>Dynamic pre-selection</b> - switches dynamic pre-selection on/off.
+- <b>Selection</b>
+  - <b>Preselection</b> - allows to choose preselection mode from three regimes:
+    - <b>Standard</b> - this preselection mode works quickly, by checking only 
+    bounding boxes of objects, not dealing with the order of the actors in the view 
+    and not dealing with their data (points/ cells).
+    - <b>Dynamic</b> - works directly with cells of actors that allows to have the 
+    exact area of preselection. But this mode is much more slower. 
+    - <b>Disabled</b> - allows to switch off the preselection.
+  - <b>Enable selection</b> - switches selection on/off.
 - <b>Spacemouse</b> - a mouse-like manipulator device specially designed
   for working with 3D presentations, objects, etc. You can reassign the
   actions listed below to any of its buttons.
@@ -285,11 +298,11 @@ button:
   - <b>Enable auto-hiding</b> checkbox - hides the search tool
   automatically after short perioud of time when it is not used.
 - <b>Look and feel</b>
-  - <b>Auto size for the first column</b> - this checkbox enables automatic
-  resizing for the first column.
+  - <b>Auto size for “Name” column</b> - this checkbox enables automatic
+  resizing for the “Name” column.
   - <b>Auto size for other columns</b> - this checkbox enables
   automatic resizing for the other columns.
-  - <b>Resize columns after expanding an item</b> - this checkbox enables
+  - <b>Resize columns on expand item</b> - this checkbox enables
   resizing columns on expanding an object browser item.
   - <b>Browse to the published object</b> - this combobox allows to enable
   automatic browsing to the objects just published to the study (using GUI
