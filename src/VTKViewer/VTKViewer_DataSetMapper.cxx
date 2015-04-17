@@ -30,6 +30,7 @@ VTKViewer_DataSetMapper::VTKViewer_DataSetMapper()
 {
   this->MarkerEnabled = false;
   this->BallEnabled = false;
+  this->BallScale = 1;
   this->MarkerType    = VTK::MT_NONE;
   this->MarkerScale   = VTK::MS_NONE;
   this->MarkerId      = 0;
@@ -56,6 +57,7 @@ void VTKViewer_DataSetMapper::Render(vtkRenderer *ren, vtkActor *act)
     else
       pm->SetMarkerTexture( this->MarkerId, this->MarkerTexture );
     pm->SetBallEnabled( this->BallEnabled );
+    pm->SetBallScale( this->BallScale );
     
     this->GeometryExtractor = gf;
     this->PolyDataMapper = pm;
@@ -82,6 +84,14 @@ void VTKViewer_DataSetMapper::SetBallEnabled( bool theBallEnabled )
       aMapper->SetBallEnabled( theBallEnabled );
 }
 
+//-----------------------------------------------------------------------------
+void VTKViewer_DataSetMapper::SetBallScale( double theBallScale )
+{
+  this->BallScale = theBallScale;
+  if( this->PolyDataMapper )
+    if( VTKViewer_PolyDataMapper* aMapper = dynamic_cast<VTKViewer_PolyDataMapper*>( this->PolyDataMapper ) )
+      aMapper->SetBallScale( theBallScale );
+}
 
 //----------------------------------------------------------------------------
 void VTKViewer_DataSetMapper::SetMarkerStd( VTK::MarkerType theMarkerType, VTK::MarkerScale theMarkerScale )

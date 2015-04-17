@@ -33,8 +33,13 @@ public:
 
   //! Set point marker enabled
   void SetMarkerEnabled( bool );
+  
+  //! Set ball element enabled
   void SetBallEnabled( bool );
-
+  
+  //! Set ball element scale factor
+  void SetBallScale( double );
+  
   //! Set standard point marker
   void SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
 
@@ -64,6 +69,7 @@ private:
 private:
   bool               MarkerEnabled;
   bool               BallEnabled;
+  double           BallScale;
   VTK::MarkerType    MarkerType;
   VTK::MarkerScale   MarkerScale;
   int                MarkerId;
