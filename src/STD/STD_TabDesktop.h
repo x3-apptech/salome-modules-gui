@@ -46,6 +46,7 @@ public:
   virtual ~STD_TabDesktop();
 
   virtual SUIT_ViewWindow* activeWindow() const;
+  virtual void setActiveWindow(SUIT_ViewWindow*);
   virtual QList<SUIT_ViewWindow*> windows() const;
 
   void                     windowOperation( const int );

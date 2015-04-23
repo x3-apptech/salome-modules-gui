@@ -1423,7 +1423,7 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
     if ( !aVM->getActiveView() )
       aVM->createView();
     else
-      aVM->getActiveView()->setFocus();
+      desktop()->setActiveWindow( aVM->getActiveView() );
   }
   else if ( create )
     aVM = createViewManager( vmType );

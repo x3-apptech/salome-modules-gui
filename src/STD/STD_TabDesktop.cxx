@@ -98,6 +98,18 @@ SUIT_ViewWindow* STD_TabDesktop::activeWindow() const
 }
 
 /*!
+  Set active window
+  \param wnd - view window
+*/
+void STD_TabDesktop::setActiveWindow(SUIT_ViewWindow* wnd)
+{
+  if (wnd) {
+    myWorkstack->setActiveWindow(wnd);
+    wnd->setFocus();
+  }
+}
+
+/*!
   \retval QPtrList<SUIT_ViewWindow> - return const active window list.
 */
 QList<SUIT_ViewWindow*> STD_TabDesktop::windows() const

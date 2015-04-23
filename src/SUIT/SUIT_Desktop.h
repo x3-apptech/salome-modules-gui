@@ -60,6 +60,7 @@ public:
   QtxLogoMgr*              logoMgr() const;
 
   virtual SUIT_ViewWindow* activeWindow() const = 0;
+  virtual void setActiveWindow(SUIT_ViewWindow*);
   virtual QList<SUIT_ViewWindow*> windows() const = 0;
 
   int                      logoCount() const;
