@@ -216,3 +216,11 @@ void SUIT_Desktop::emitMessage( const QString& theMessage )
 {
   emit message( theMessage );
 }
+
+/*!
+  Activate window (default implementation just sets focus to the window.
+*/
+void SUIT_Desktop::setActiveWindow(SUIT_ViewWindow* wnd)
+{
+  if (wnd) wnd->setFocus();
+}
