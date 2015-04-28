@@ -265,6 +265,35 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     int aGap = 20;
 
 #if OCC_VERSION_LARGE > 0x06080000
+#ifdef OCCT_DEV_COMPAT // VSR: temporarily, to be removed later and replace below implementation
+    Graphic3d_GraduatedTrihedron gt;
+    // main params
+    gt.SetDrawGrid(Standard_True);       // to draw grid
+    gt.SetDrawAxes(Standard_True);       // to draw axes
+    gt.SetGridColor(Quantity_NOC_WHITE); // grid color
+    // axes params
+    for ( int i = 0; i < 3; i++ ) {
+      Graphic3d_AxisAspect& aspect = gt.ChangeAxisAspect(i);
+      aspect.SetName(anAxisData[i].Name.toLatin1().constData());
+      aspect.SetDrawName(anAxisData[i].DrawName);
+      aspect.SetDrawValues(anAxisData[i].DrawValues);
+      aspect.SetDrawTickmarks(anAxisData[i].DrawTickmarks);
+      aspect.SetNameColor(Quantity_Color(anAxisData[i].NameColor.redF(),
+                                         anAxisData[i].NameColor.greenF(),
+                                         anAxisData[i].NameColor.blueF(),
+                                         Quantity_TOC_RGB));
+      aspect.SetColor(Quantity_Color(anAxisData[i].Color.redF(),
+                                     anAxisData[i].Color.greenF(),
+                                     anAxisData[i].Color.blueF(),
+                                     Quantity_TOC_RGB));
+      aspect.SetTickmarksNumber(anAxisData[i].NbValues-1);
+      aspect.SetTickmarksLength(anAxisData[i].TickmarkLength);
+      aspect.SetValuesOffset(anAxisData[i].Offset);
+      aspect.SetNameOffset(anAxisData[i].Offset + aGap); // see above
+    }
+    // draw trihedron
+    theView->GraduatedTrihedronDisplay(gt);
+#else // #ifdef OCCT_DEV_COMPAT / VSR: temporarily, to be removed later and replace below implementation
     Graphic3d_GraduatedTrihedron gt;
     // main params
     gt.SetToDrawTickmarks(Standard_True);  // to draw grid
@@ -323,6 +352,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     gt.ChangeZAxisAspect().SetNameOffset(anAxisData[2].Offset + aGap); // see above
     // draw trihedron
     theView->GraduatedTrihedronDisplay(gt);
+#endif // #ifdef OCCT_DEV_COMPAT / VSR: temporarily, to be removed later and replace below implementation
 #else
     theView->GraduatedTrihedronDisplay(
       anAxisData[0].Name.toLatin1().constData(),
