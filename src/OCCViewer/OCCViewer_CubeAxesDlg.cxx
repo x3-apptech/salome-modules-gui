@@ -265,7 +265,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     int aGap = 20;
 
 #if OCC_VERSION_LARGE > 0x06080000
-#ifdef OCCT_DEV_COMPAT // VSR: temporarily, to be removed later and replace below implementation
+#ifndef OCCT_690BETA_COMPAT // VSR: temporarily, to be removed later and replace below implementation
     Graphic3d_GraduatedTrihedron gt;
     // main params
     gt.SetDrawGrid(Standard_True);       // to draw grid
@@ -293,7 +293,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     }
     // draw trihedron
     theView->GraduatedTrihedronDisplay(gt);
-#else // #ifdef OCCT_DEV_COMPAT / VSR: temporarily, to be removed later and replace below implementation
+#else // #ifndef OCCT_690BETA_COMPAT / VSR: temporarily, to be removed later and replace below implementation
     Graphic3d_GraduatedTrihedron gt;
     // main params
     gt.SetToDrawTickmarks(Standard_True);  // to draw grid
@@ -352,7 +352,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     gt.ChangeZAxisAspect().SetNameOffset(anAxisData[2].Offset + aGap); // see above
     // draw trihedron
     theView->GraduatedTrihedronDisplay(gt);
-#endif // #ifdef OCCT_DEV_COMPAT / VSR: temporarily, to be removed later and replace below implementation
+#endif // #ifdef OCCT_690BETA_COMPAT / VSR: temporarily, to be removed later and replace below implementation
 #else
     theView->GraduatedTrihedronDisplay(
       anAxisData[0].Name.toLatin1().constData(),
