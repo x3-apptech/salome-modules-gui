@@ -29,11 +29,11 @@
     </message>
     <message>
       <source>EDIT_STARTLOG_CMD</source>
-      <translation type="unfinished">Start &amp;Log</translation>
+      <translation>ログの開始 (&amp;L)</translation>
     </message>
     <message>
       <source>EDIT_STOPLOG_CMD</source>
-      <translation type="unfinished">Stop &amp;Log</translation>
+      <translation>ログの停止 (&amp;L)</translation>
     </message>
   </context>
   <context>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>TOT_SAVE_PYLOG</source>
-      <translation type="unfinished">Save log</translation>
+      <translation>ログの保存</translation>
     </message>
     <message>
       <source>PYTHON_FILES_FILTER</source>
@@ -52,11 +52,11 @@
     </message>
     <message>
       <source>LOG_FILES_FILTER</source>
-      <translation type="unfinished">Log files (*.log *.txt)</translation>
+      <translation>ログファイル (*.log *.txt)</translation>
     </message>
     <message>
       <source>ERR_FILE_NOT_WRITABLE</source>
-      <translation type="unfinished">File is not writable!</translation>
+      <translation>ファイルが書き込み禁止です!</translation>
     </message>
   </context>
 </TS>

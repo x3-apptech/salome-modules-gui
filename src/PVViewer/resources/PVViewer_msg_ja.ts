@@ -11,7 +11,7 @@
     <name>PVViewer_ViewManager</name>
     <message>
       <source>PARAVIEW_VIEW_TITLE</source>
-      <translation type="unfinished">ParaView scene:%M - viewer:%V</translation>
+      <translation>ParaView シーン:%M - ビューア:%V</translation>
     </message>
   </context>
 </TS>

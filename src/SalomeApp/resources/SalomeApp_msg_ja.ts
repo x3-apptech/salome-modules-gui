@@ -13,7 +13,8 @@
     </message>
     <message>
       <source>ERR_ACTIVEDOC_LOAD</source>
-      <translation type="unfinished">A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.</translation>
+      <translation>A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.
+スタディはあなたのセッション内ですでにアクティブになっていますが、接続できません。インターフェイス内でそれをロードするための接続用ボタンを使用してください。</translation>
     </message>
     <message>
       <source>WRN_STUDY_LOCKED</source>
@@ -111,27 +112,27 @@
     </message>
     <message>
       <source>TOT_DESK_CONNECT_STUDY</source>
-      <translation type="unfinished">Connect study</translation>
+      <translation>スタディの接続</translation>
     </message>
     <message>
       <source>TOT_DESK_DISCONNECT_STUDY</source>
-      <translation type="unfinished">Disconnect study</translation>
+      <translation>スタディの切断</translation>
     </message>
     <message>
       <source>PRP_DESK_CONNECT</source>
-      <translation type="unfinished">Connect active study</translation>
+      <translation>アクティブスタディの接続</translation>
     </message>
     <message>
       <source>PRP_DESK_DISCONNECT</source>
-      <translation type="unfinished">Disconnect the current study</translation>
+      <translation>カレントスタディの切断</translation>
     </message>
     <message>
       <source>MEN_DESK_CONNECT</source>
-      <translation type="unfinished">Conn&amp;ect</translation>
+      <translation>接続（&amp;e）</translation>
     </message>
     <message>
       <source>MEN_DESK_DISCONNECT</source>
-      <translation type="unfinished">D&amp;isconnect</translation>
+      <translation>切断（&amp;i）</translation>
     </message>
   </context>
   <context>
@@ -146,7 +147,7 @@
     </message>
     <message>
       <source>APPCLOSE_UNLOAD_SAVE</source>
-      <translation type="unfinished">S&amp;ave &amp;&amp; Disconnect</translation>
+      <translation>保存と切断（&amp;a）</translation>
     </message>
     <message>
       <source>MEN_WINDOWS_NEW</source>
@@ -410,19 +411,19 @@
     </message>
     <message>
       <source>DISCONNECT_CAPTION</source>
-      <translation type="unfinished">Disconnect active study</translation>
+      <translation>アクティブスタディの切断</translation>
     </message>
     <message>
       <source>DISCONNECT_DESCRIPTION</source>
-      <translation type="unfinished">Do you want to save study before disconnect?</translation>
+      <translation>切断の前にスタディを保存しますか？</translation>
     </message>
     <message>
       <source>DISCONNECT_SAVE</source>
-      <translation type="unfinished">&amp;Save &amp;&amp; Disconnect</translation>
+      <translation>保存と切断（&amp;S）</translation>
     </message>
     <message>
       <source>DISCONNECT_WO_SAVE</source>
-      <translation type="unfinished">&amp;Disconnect w/o saving</translation>
+      <translation>w/o 保存の切断（&amp;D）</translation>
     </message>
   </context>
   <context>

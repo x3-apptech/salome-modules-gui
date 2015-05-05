@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>TOT_SAVE_PYLOG</source>
-        <translation type="unfinished">Save log</translation>
+        <translation>Sauver la trace</translation>
     </message>
     <message>
         <source>PYTHON_FILES_FILTER</source>
@@ -52,11 +52,11 @@
     </message>
     <message>
         <source>LOG_FILES_FILTER</source>
-        <translation type="unfinished">Log files (*.log *.txt)</translation>
+        <translation>Fichiers de trace (*.log *.txt)</translation>
     </message>
     <message>
         <source>ERR_FILE_NOT_WRITABLE</source>
-        <translation type="unfinished">File is not writable!</translation>
+        <translation>Le fichier n'est pas accessible en écriture!</translation>
     </message>
 </context>
 </TS>

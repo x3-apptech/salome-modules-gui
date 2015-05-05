@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Open in</source>
-      <translation type="unfinished">Open in</translation>
+      <translation type="unfinished">次のアプリケーションで開く:</translation>
     </message>
     <message>
       <source>Save file</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Use this program for all files of this type</source>
-      <translation type="unfinished">Use this program for all files of this type</translation>
+      <translation type="unfinished">このタイプのすべてのファイルでこのプログラムを使用</translation>
     </message>
     <message>
       <source>&amp;OK</source>
@@ -416,15 +416,15 @@
     </message>
     <message>
       <source>You are opening the file</source>
-      <translation type="unfinished">You are opening the file</translation>
+      <translation type="unfinished">ファイルを開いています。</translation>
     </message>
     <message>
       <source>Please choose the action to be done</source>
-      <translation type="unfinished">Please choose the action to be done</translation>
+      <translation type="unfinished">実行するアクションを選択してください。</translation>
     </message>
     <message>
       <source>Choose program</source>
-      <translation type="unfinished">Choose program</translation>
+      <translation type="unfinished">プログラムの選択</translation>
     </message>
     <message>
       <source>Go Back</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
       <source>Navigation</source>
-      <translation type="unfinished">Navigation</translation>
+      <translation>ナビゲーション</translation>
     </message>
     <message>
       <source>&amp;File</source>
@@ -448,15 +448,15 @@
     </message>
     <message>
       <source>&amp;Find in text...</source>
-      <translation type="unfinished">&amp;Find in text...</translation>
+      <translation>テキストを検索 （&amp;F）</translation>
     </message>
     <message>
       <source>&amp;Find next</source>
-      <translation type="unfinished">&amp;Find next</translation>
+      <translation>次を検索 （&amp;F）</translation>
     </message>
     <message>
       <source>&amp;Find previous</source>
-      <translation type="unfinished">&amp;Find previous</translation>
+      <translation>前を検索（&amp;F）</translation>
     </message>
     <message>
       <source>&amp;Close</source>
@@ -468,15 +468,15 @@
     </message>
     <message>
       <source>&amp;About...</source>
-      <translation type="unfinished">&amp;About...</translation>
+      <translation>このソフトについて（&amp;A）</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation type="unfinished">About %1</translation>
+      <translation>%1 について</translation>
     </message>
     <message>
       <source>Help Browser</source>
-      <translation type="unfinished">Help Browser</translation>
+      <translation type="unfinished">ヘルプブラウザ</translation>
     </message>
     <message>
       <source>Error</source>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Can't save file:\n%1</source>
-      <translation>Can't save file:\n%1</translation>
+      <translation>次のファイルを保存できません:¥n%1</translation>
     </message>
     <message>
       <source>Open file</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>%1 has been developed using %2</source>
-      <translation type="unfinished">%1 has been developed using %2</translation>
+      <translation type="unfinished">%1 は %2 を使用して開発されています。</translation>
     </message>
   </context>
 </TS>
