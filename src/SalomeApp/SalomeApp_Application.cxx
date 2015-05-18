@@ -1041,7 +1041,9 @@ void SalomeApp_Application::onLocalCheckIn()
 void SalomeApp_Application::onDockWindowVisibilityChanged( bool theIsVisible )
 {
   LightApp_Application::onDockWindowVisibilityChanged( theIsVisible );
-  QAction* send = (QAction*)sender();
+  QAction* send = ::qobject_cast<QAction*>( sender() );
+  if ( !send )
+    return;
   QString aWinName = send->data().toString();
   if ( theIsVisible && aWinName == "objectBrowser" )
     objectBrowserColumnsVisibility();
