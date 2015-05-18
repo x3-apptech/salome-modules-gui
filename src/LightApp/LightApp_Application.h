@@ -207,6 +207,7 @@ public slots:
   virtual void                        onCopy();
   virtual void                        onPaste();
   virtual void                        onSelectionChanged();
+  virtual void                        onDockWindowVisibilityChanged( bool );
 
 protected:
   virtual void                        createActions();

@@ -1037,6 +1037,16 @@ void SalomeApp_Application::onLocalCheckIn()
 #endif
 }
 
+/*!Public SLOT. Performs some actions when dockable windows are triggered.*/
+void SalomeApp_Application::onDockWindowVisibilityChanged( bool theIsVisible )
+{
+  LightApp_Application::onDockWindowVisibilityChanged( theIsVisible );
+  QAction* send = (QAction*)sender();
+  QString aWinName = send->data().toString();
+  if ( theIsVisible && aWinName == "objectBrowser" )
+    objectBrowserColumnsVisibility();
+}
+
 /*!Gets file filter.
  *\retval QString "(*.hdf)"
  */
