@@ -104,6 +104,7 @@ SET(_other_RESOURCES
   resources/vtk_view_camera_dump.png
   resources/vtk_view_fitall.png
   resources/vtk_view_fitarea.png
+  resources/vtk_view_fitselection.png
   resources/vtk_view_front.png
   resources/vtk_view_glpan.png
   resources/vtk_view_left.png

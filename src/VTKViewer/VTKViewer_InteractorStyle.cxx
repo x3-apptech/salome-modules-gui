@@ -628,6 +628,28 @@ void  VTKViewer_InteractorStyle::ViewFitAll() {
   ::ResetCameraClippingRange(CurrentRenderer);
 }
 
+/*!View fit selection.*/
+void  VTKViewer_InteractorStyle::ViewFitSelection() {
+
+  vtkActorCollection* aSelectedCollection = vtkActorCollection::New();
+
+  VTK::ActorCollectionCopy aCopy( CurrentRenderer->GetActors() );
+  vtkActorCollection* aCollection = aCopy.GetActors();
+  aCollection->InitTraversal();
+  while ( vtkActor* aProp = aCollection->GetNextActor() )
+    if ( VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast( aProp ) )
+      if ( anActor->isPreselected() )
+        aSelectedCollection->AddItem( aProp );
+
+  double bounds[6];
+  ::ComputeBounds( aSelectedCollection, bounds );
+
+  if ( aSelectedCollection->GetNumberOfItems() && ::isBoundValid( bounds ) ) {
+    CurrentRenderer->ResetCamera( bounds );
+    CurrentRenderer->ResetCameraClippingRange( bounds );
+  }
+}
+
 
 /*! starts Global Panning operation (e.g. through menu command)*/
 void VTKViewer_InteractorStyle::startGlobalPan()

@@ -115,6 +115,7 @@ SET(_other_RESOURCES
   resources/occ_view_clone.png
   resources/occ_view_fitall.png
   resources/occ_view_fitarea.png
+  resources/occ_view_fitselection.png
   resources/occ_view_front.png
   resources/occ_view_glpan.png
   resources/occ_view_graduated_axes.png

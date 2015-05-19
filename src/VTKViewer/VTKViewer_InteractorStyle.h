@@ -93,7 +93,8 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
 
   void OnSelectionModeChanged();
 
-  void  ViewFitAll();
+  void ViewFitAll();
+  void ViewFitSelection();
 
   void                     SetFilter( const Handle( VTKViewer_Filter)& );
   Handle(VTKViewer_Filter) GetFilter( const int );  

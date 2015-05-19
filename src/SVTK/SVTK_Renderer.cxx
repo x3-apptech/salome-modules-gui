@@ -698,6 +698,30 @@ SVTK_Renderer
 }
 
 /*!
+  Fit all selected presentation in the scene
+*/
+void SVTK_Renderer::onFitSelection()
+{
+  vtkActorCollection* aSelectedCollection = vtkActorCollection::New();
+
+  VTK::ActorCollectionCopy aCopy( GetDevice()->GetActors() );
+  vtkActorCollection* aCollection = aCopy.GetActors();
+  aCollection->InitTraversal();
+  while ( vtkActor* aProp = aCollection->GetNextActor() )
+    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) )
+      if ( mySelector->IsSelected( anActor ) )
+        aSelectedCollection->AddItem( aProp );
+
+  double bounds[6];
+  ::ComputeBounds( aSelectedCollection, bounds );
+
+  if ( aSelectedCollection->GetNumberOfItems() && ::isBoundValid( bounds ) ) {
+    GetDevice()->ResetCamera( bounds );
+    GetDevice()->ResetCameraClippingRange( bounds );
+  }
+}
+
+/*!
   Reset camera clipping range to adjust the range to the bounding box of the scene
 */
 void

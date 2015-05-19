@@ -132,6 +132,14 @@
         <translation>Afficher la zone</translation>
     </message>
     <message>
+        <source>MNU_FITSELECTION</source>
+        <translation type="unfinished">Fit Selection</translation>
+    </message>
+    <message>
+        <source>DSC_FITSELECTION</source>
+        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+    </message>
+    <message>
         <source>DSC_BOTTOM_VIEW</source>
         <translation>Vue +OZ</translation>
     </message>

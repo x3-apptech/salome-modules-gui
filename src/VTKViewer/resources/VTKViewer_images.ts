@@ -48,6 +48,10 @@
         <translation>vtk_view_fitarea.png</translation>
     </message>
     <message>
+        <source>ICON_VTKVIEWER_VIEW_FITSELECTION</source>
+        <translation>vtk_view_fitselection.png</translation>
+    </message>
+    <message>
         <source>ICON_VTKVIEWER_VIEW_FRONT</source>
         <translation>vtk_view_front.png</translation>
     </message>

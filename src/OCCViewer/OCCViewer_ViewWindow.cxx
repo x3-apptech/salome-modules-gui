@@ -1171,6 +1171,13 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(activateWindowFit()));
   toolMgr()->registerAction( aAction, FitRectId );
   
+  // FitSelection
+  aAction = new QtxAction(tr("MNU_FITSELECTION"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_FITSELECTION" ) ),
+                           tr( "MNU_FITSELECTION" ), 0, this);
+  aAction->setStatusTip(tr("DSC_FITSELECTION"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onFitSelection()));
+  toolMgr()->registerAction( aAction, FitSelectionId );
+
   // Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
@@ -1419,6 +1426,9 @@ void OCCViewer_ViewWindow::createToolBar()
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
   aScaleAction->insertAction( toolMgr()->action( FitAllId ) );
   aScaleAction->insertAction( toolMgr()->action( FitRectId ) );
+#if OCC_VERSION_LARGE > 0x06090000
+  aScaleAction->insertAction( toolMgr()->action( FitSelectionId ) );
+#endif
   aScaleAction->insertAction( toolMgr()->action( ZoomId ) );
   toolMgr()->append( aScaleAction, tid );
 
@@ -1588,6 +1598,18 @@ void OCCViewer_ViewWindow::onFitAll()
   emit vpTransformationStarted( FITALLVIEW );
   myViewPort->fitAll();
   emit vpTransformationFinished( FITALLVIEW );
+}
+
+/*!
+  \brief Perform "fit selection" transformation.
+*/
+void OCCViewer_ViewWindow::onFitSelection()
+{
+  emit vpTransformationStarted( FITSELECTION );
+#if OCC_VERSION_LARGE > 0x06090000
+  myModel->getAISContext()->FitSelected( getViewPort()->getView() );
+#endif
+  emit vpTransformationFinished( FITSELECTION );
 }
 
 /*!

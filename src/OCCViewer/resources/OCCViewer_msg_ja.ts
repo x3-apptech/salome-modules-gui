@@ -181,6 +181,14 @@
       <translation>彼の党をボックスで選択を表示するには、ステージのサイズを変更します。</translation>
     </message>
     <message>
+        <source>MNU_FITSELECTION</source>
+        <translation type="unfinished">Fit Selection</translation>
+    </message>
+    <message>
+        <source>DSC_FITSELECTION</source>
+        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+    </message>
+    <message>
       <source>MNU_PRESETS_VIEW</source>
       <translation>ビューの読み込み</translation>
     </message>

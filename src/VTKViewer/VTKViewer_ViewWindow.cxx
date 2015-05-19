@@ -208,6 +208,13 @@ void VTKViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(activated()), this, SLOT(activateWindowFit()));
   myActionsMap[ FitRectId ] = aAction;
 
+  //! \li FitSelection
+  aAction = new QtxAction(tr("MNU_FITSELECTION"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITSELECTION" ) ),
+                           tr( "MNU_FITSELECTION" ), 0, this);
+  aAction->setStatusTip(tr("DSC_FITSELECTION"));
+  connect(aAction, SIGNAL(activated()), this, SLOT(onFitSelection()));
+  myActionsMap[ FitSelectionId ] = aAction;
+
   //! \li Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
@@ -316,6 +323,7 @@ void VTKViewer_ViewWindow::createToolBar()
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
   aScaleAction->insertAction( myActionsMap[FitAllId] );
   aScaleAction->insertAction( myActionsMap[FitRectId] );
+  aScaleAction->insertAction( myActionsMap[FitSelectionId] );
   aScaleAction->insertAction( myActionsMap[ZoomId] );
   myToolBar->addAction( aScaleAction );
 
@@ -444,6 +452,13 @@ void VTKViewer_ViewWindow::onResetView()
 void VTKViewer_ViewWindow::onFitAll()
 {
   myRWInteractor->GetInteractorStyle()->ViewFitAll();
+  Repaint();
+}
+
+/*!On fit selection slot.*/
+void VTKViewer_ViewWindow::onFitSelection()
+{
+  myRWInteractor->GetInteractorStyle()->ViewFitSelection();
   Repaint();
 }
 
