@@ -136,6 +136,8 @@ signals:
   void                closed ( SUIT_Study* );
   void                created( SUIT_Study* );
 
+  void                objVisibilityChanged( QString, Qtx::VisibilityState );
+
 
 private:
   LightApp_Driver*    myDriver;

@@ -155,6 +155,7 @@ void SUIT_DataBrowser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
     if (myAutoSizeColumns)
       adjustColumnsWidth();
   }
+  emit updated();
 }
 
 /*!
