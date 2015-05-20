@@ -94,6 +94,9 @@ public:
 
   void                  showStaticTrihedron( bool );
 
+  void                  setDefaultCursor( Qt::CursorShape theCursorShape );
+  QCursor*              getDefaultCursor() const;
+
 signals:
   void                  vpChangeBackground( const Qtx::BackgroundData& );
   void                  vpClosed(OCCViewer_ViewPort3d*);
@@ -130,6 +133,7 @@ private:
   Qtx::BackgroundData   myBackground;
   int                   myBgImgHeight;
   int                   myBgImgWidth;
+  QCursor*              myCursor;
 };
 
 #ifdef WIN32

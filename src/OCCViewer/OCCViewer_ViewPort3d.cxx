@@ -89,6 +89,8 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
 #endif
 
   setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
+
+  myCursor = NULL;
 }
 
 /*!
@@ -96,6 +98,12 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
 */
 OCCViewer_ViewPort3d::~OCCViewer_ViewPort3d()
 {
+  if ( myCursor )
+  {
+    delete myCursor;
+    myCursor = NULL;
+  }
+
   emit vpClosed(this);
   Handle(V3d_View) aView = activeView();
   if (!aView.IsNull())
@@ -763,4 +771,23 @@ void OCCViewer_ViewPort3d::showStaticTrihedron( bool on )
     aView->TriedronErase();
   }
   aView->Update();
+}
+
+/*
+ * Create default cursor with a specific shape
+ */
+void OCCViewer_ViewPort3d::setDefaultCursor( Qt::CursorShape theCursorShape )
+{
+  if ( !myCursor )
+    myCursor = new QCursor();
+
+  myCursor->setShape( theCursorShape );
+}
+
+/*
+ * Get default cursor with a specific shape
+ */
+QCursor* OCCViewer_ViewPort3d::getDefaultCursor() const
+{
+  return myCursor;
 }

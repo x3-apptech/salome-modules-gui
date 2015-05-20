@@ -329,6 +329,8 @@ protected:
 
   virtual OCCViewer_ViewSketcher*       createSketcher( int );
 
+  void                                  saveCursor();
+
   OCCViewer_ViewSketcher*               mypSketcher;
   QList<OCCViewer_ViewSketcher*>        mySketchers;
 
