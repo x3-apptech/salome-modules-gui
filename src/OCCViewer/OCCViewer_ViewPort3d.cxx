@@ -52,7 +52,7 @@
 #if defined WIN32
 #include <WNT_Window.hxx>
 #else
-#include <Xw_Window.hxx>
+//#include <Xw_Window.hxx>
 #endif
 
 static double rx = 0.;
