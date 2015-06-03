@@ -223,6 +223,9 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   SetMarkerEnabled( bool );
 
   void
+  SetBallScale( double );
+
+  void
   SetMarkerStd( VTK::MarkerType, VTK::MarkerScale );
 
   void

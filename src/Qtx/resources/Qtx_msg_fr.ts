@@ -392,7 +392,7 @@
     </message>
     <message>
         <source>Open in</source>
-        <translation type="unfinished">Open in</translation>
+        <translation>Ouvrir dans</translation>
     </message>
     <message>
         <source>Save file</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
         <source>Use this program for all files of this type</source>
-        <translation type="unfinished">Use this program for all files of this type</translation>
+        <translation>Utiliser ce programme pour tous les fichiers de ce type</translation>
     </message>
     <message>
         <source>&amp;OK</source>
@@ -416,15 +416,15 @@
     </message>
     <message>
         <source>You are opening the file</source>
-        <translation type="unfinished">You are opening the file</translation>
+        <translation>Vous ouvrez le fichier</translation>
     </message>
     <message>
         <source>Please choose the action to be done</source>
-        <translation type="unfinished">Please choose the action to be done</translation>
+        <translation>Veuillez choisir l'action à faire</translation>
     </message>
     <message>
         <source>Choose program</source>
-        <translation type="unfinished">Choose program</translation>
+        <translation>Choisissez le programme</translation>
     </message>
     <message>
         <source>Go Back</source>
@@ -476,7 +476,7 @@
     </message>
     <message>
         <source>Help Browser</source>
-        <translation type="unfinished">Help Browser</translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <source>Error</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
         <source>%1 has been developed using %2</source>
-        <translation type="unfinished">%1 has been developed using %2</translation>
+        <translation>%1 a été développé en utilisant %2</translation>
     </message>
 </context>
 </TS>

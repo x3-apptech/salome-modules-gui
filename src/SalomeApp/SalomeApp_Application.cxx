@@ -377,7 +377,7 @@ void SalomeApp_Application::createActions()
   {
     PyLockWrapper lck; // acquire GIL
     PyObjWrapper pluginsmanager = PyImport_ImportModule((char*)"salome_pluginsmanager");
-    PyObjWrapper res = PyObject_CallMethod( pluginsmanager, (char*)"initialize", (char*)"isss",0,"salome",tr("MEN_DESK_PLUGINS_TOOLS").toStdString().c_str(),tr("MEN_DESK_PLUGINS").toStdString().c_str());
+    PyObjWrapper res = PyObject_CallMethod( pluginsmanager, (char*)"initialize", (char*)"isss",0,"salome",tr("MEN_DESK_TOOLS").toUtf8().data(),tr("MEN_DESK_PLUGINS").toUtf8().data());
     if ( !res )
       PyErr_Print();
   }
@@ -1035,6 +1035,18 @@ void SalomeApp_Application::onLocalCheckIn()
   printf( "*    Warning: SALOME is built without SIMAN support.\n" );
   printf( "****************************************************************\n" );
 #endif
+}
+
+/*!Public SLOT. Performs some actions when dockable windows are triggered.*/
+void SalomeApp_Application::onDockWindowVisibilityChanged( bool theIsVisible )
+{
+  LightApp_Application::onDockWindowVisibilityChanged( theIsVisible );
+  QAction* send = ::qobject_cast<QAction*>( sender() );
+  if ( !send )
+    return;
+  QString aWinName = send->data().toString();
+  if ( theIsVisible && aWinName == "objectBrowser" )
+    objectBrowserColumnsVisibility();
 }
 
 /*!Gets file filter.

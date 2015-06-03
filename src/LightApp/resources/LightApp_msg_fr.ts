@@ -496,6 +496,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène ParaVie&amp;w</translation>
     </message>
     <message>
+        <source>NEW_WINDOW_7</source>
+        <translation>Vue P&amp;ython</translation>
+    </message>
+    <message>
         <source>CREATING_NEW_WINDOW</source>
         <translation>Créer une nouvelle %1</translation>
     </message>
@@ -769,7 +773,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_DEFAULT_TEXTURE</source>
-        <translation type="unfinished">Use default texture</translation>
+        <translation>Utiliser la texture par défaut</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_TEXTURE</source>
@@ -781,11 +785,11 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_MODULATE</source>
-        <translation type="unfinished">Modulate</translation>
+        <translation>Fond transparent</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_SCALE</source>
-        <translation type="unfinished">Scale factor</translation>
+        <translation>Facteur d'échelle</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
@@ -883,6 +887,62 @@ Le fichier n&apos;existe pas</translation>
     <message>
         <source>PREF_GROUP_SHORTCUTS</source>
         <translation>Réglage des raccourcis clavier</translation>
+    </message>
+    <message>
+        <source>PREF_TAB_PYEDITOR</source>
+        <translation>Editeur python</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_PY_FONT</source>
+        <translation>Paramètres de la fonte</translation>
+    </message>
+    <message>
+        <source>PREF_PY_FONT</source>
+        <translation>Fonte</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_PY_DISPLAY</source>
+        <translation>Paramètres d'affichage</translation>
+    </message>
+    <message>
+        <source>PREF_PY_CURRLINE_HIGHLIGHT</source>
+        <translation>Met en surbrillance de la ligne actuelle</translation>
+    </message>
+    <message>
+        <source>PREF_PY_TEXT_WRAP</source>
+        <translation>Retour à la ligne dynamique</translation>
+    </message>
+    <message>
+        <source>PREF_PY_CURSON_ON_SCROLL</source>
+        <translation>Centre le curseur lors du scroll</translation>
+    </message>
+    <message>
+        <source>PREF_PY_LINE_NUMBS_AREA</source>
+        <translation>Affiche les numéros de ligne</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_PY_TAB</source>
+        <translation>Indentation</translation>
+    </message>
+    <message>
+        <source>PREF_PY_TAB_WHITESPACES</source>
+        <translation>Affiche les guides d'indentation</translation>
+    </message>
+    <message>
+        <source>PREF_PY_TAB_SIZE</source>
+        <translation>Largeur d'intentation:</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_VERT_EDGE</source>
+        <translation>Marqueur de retour à la ligne</translation>
+    </message>
+    <message>
+        <source>PREF_PY_VERT_EDGE</source>
+        <translation>Afficher la ligne verticale</translation>
+    </message>
+    <message>
+        <source>PREF_PY_NUM_COLUMNS</source>
+        <translation>Nombre de colonnes:</translation>
     </message>
 </context>
 <context>

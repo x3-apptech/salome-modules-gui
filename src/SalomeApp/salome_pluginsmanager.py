@@ -125,13 +125,13 @@ class Context:
 
 def find_menu(smenu):
   lmenus=smenu.split("|")
-  main=lmenus.pop(0).strip()
+  main=lmenus.takeFirst().trimmed()
   menu=sgPyQt.getPopupMenu(main)
   return findMenu(lmenus,menu)
 
 def findMenu(lmenu,menu):
   if not lmenu:return menu
-  m=lmenu.pop(0).strip()
+  m=lmenu.takeFirst().trimmed()
   for a in menu.actions():
     if a.menu():
       if a.text() == m:
@@ -149,8 +149,8 @@ logger=Logger("PluginsManager") #,color=GREEN)
 class PluginsManager:
     def __init__(self,module,name,basemenuname,menuname):
         self.name=name
-        self.basemenuname=basemenuname
-        self.menuname=menuname
+        self.basemenuname=QtCore.QString.fromUtf8(basemenuname)
+        self.menuname=QtCore.QString.fromUtf8(menuname)
         self.module=module
         self.registry={}
         self.handlers={}

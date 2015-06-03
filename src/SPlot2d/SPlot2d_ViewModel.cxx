@@ -407,17 +407,31 @@ void SPlot2d_Viewer::onClicked( const QVariant& itemInfo, int index )
 
   QwtPlotItem* plotItem = aViewFrame->getPlot()->infoToItem( itemInfo );
 
-  bool isAnalytical = false;
+  bool isCurveSelected = false;
+  CurveDict aCurves = aViewFrame->getCurves();
+  for( CurveDict::Iterator it = aCurves.begin(); it != aCurves.end(); ++it )
+  {
+    if(plotItem == it.key()) {
+      isCurveSelected = true;
+      it.value()->setSelected(true);
+    } else {
+      it.value()->setSelected(false);
+    }
+  }
+
   AnalyticalCurveList curves = aViewFrame->getAnalyticalCurves();
    foreach ( Plot2d_AnalyticalCurve* curve, curves ) {
 	   if(plotItem == curve->plotItem()) {
-		  isAnalytical = true;
+          isCurveSelected = true;
 		  curve->setSelected(true);
 	   } else {
 		  curve->setSelected(false);
 	   }
    }
-  if(isAnalytical) {
+  if(isCurveSelected) {
+    for( CurveDict::Iterator it = aCurves.begin(); it != aCurves.end(); ++it )
+      aViewFrame->updateCurve( it.value() );
+
 	myDeselectAnalytical = false;
 	emit clearSelected();
 	aViewFrame->updateAnalyticalCurves();
@@ -426,7 +440,6 @@ void SPlot2d_Viewer::onClicked( const QVariant& itemInfo, int index )
   }
 
   Plot2d_Object* anObject = aViewFrame->getPlotObject(plotItem);
-  
   if(anObject) {
     
     // Highlight object in Object Browser

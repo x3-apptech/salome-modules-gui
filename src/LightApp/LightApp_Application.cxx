@@ -1230,6 +1230,13 @@ void LightApp_Application::onSelectionChanged()
   action( EditPasteId )->setEnabled(canPaste);
 }
 
+/*!
+  SLOT: Performs some actions when dockable windows are triggered
+*/
+void LightApp_Application::onDockWindowVisibilityChanged( bool )
+{
+}
+
 QWidget* LightApp_Application::dockWindow( const int id ) const
 {
   QWidget* wid = 0;
@@ -1270,6 +1277,9 @@ void LightApp_Application::insertDockWindow( const int id, QWidget* wid )
   dock->setObjectName( wid->objectName().isEmpty() ? QString( "window_%1" ).arg( id ) : 
 		       QString( "%1Dock" ).arg( wid->objectName() ) );
   dock->setWidget( wid );
+  dock->toggleViewAction()->setData( QVariant( wid->objectName() ) );
+  connect( dock->toggleViewAction(), SIGNAL( triggered( bool ) ),
+           this, SLOT( onDockWindowVisibilityChanged( bool ) ) );
 
   QKeySequence accel = wid->property( "shortcut" ).value<QKeySequence>();
   if ( !accel.isEmpty() )

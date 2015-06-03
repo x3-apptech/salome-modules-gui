@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>EXTERNAL_BROWSER_CANNOT_SHOW_PAGE</source>
-      <translation>外部ブラウザー「%1」ページ「%2」のヘルプを表示することができません。設定を変更しますか？</translation>
+      <translation>拡張ブラウザ "%1" はヘルプページ "%2"は見ることができない。設定を変更しますか？</translation>
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
@@ -56,8 +56,8 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>STUDYCLOSE_DESCRIPTION</source>
-      <translation type="unfinished">You already have an active study in your 
-session. It has to be closed before working with another study.</translation>
+      <translation>既存のスタディを閉じる必要があります。閉じますか？
+</translation>
     </message>
     <message>
       <source>APPCLOSE_SAVE</source>
@@ -493,7 +493,11 @@ session. It has to be closed before working with another study.</translation>
     </message>
     <message>
       <source>NEW_WINDOW_6</source>
-      <translation type="unfinished">ParaVie&amp;w view</translation>
+      <translation>ParaView 表示 (&amp;w)</translation>
+    </message>
+    <message>
+      <source>NEW_WINDOW_7</source>
+      <translation>P&amp;ython view</translation>
     </message>
     <message>
       <source>CREATING_NEW_WINDOW</source>
@@ -760,32 +764,32 @@ session. It has to be closed before working with another study.</translation>
       <translation>無効になっています。</translation>
     </message>
     <message>
-        <source>PREF_GROUP_CLIPPING</source>
-        <translation type="unfinished">Clipping</translation>
+      <source>PREF_GROUP_CLIPPING</source>
+      <translation>クリッピングパラメータ</translation>
     </message>
     <message>
-        <source>PREF_CLIPPING_COLOR</source>
-        <translation type="unfinished">Color</translation>
+      <source>PREF_CLIPPING_COLOR</source>
+      <translation>色</translation>
     </message>
     <message>
-        <source>PREF_CLIPPING_DEFAULT_TEXTURE</source>
-        <translation type="unfinished">Use default texture</translation>
+      <source>PREF_CLIPPING_DEFAULT_TEXTURE</source>
+      <translation>デフォルトテキスチャの使用</translation>
     </message>
     <message>
-        <source>PREF_CLIPPING_TEXTURE</source>
-        <translation type="unfinished">Texture</translation>
+      <source>PREF_CLIPPING_TEXTURE</source>
+      <translation>テキスチャ</translation>
     </message>
     <message>
-        <source>OCC_TEXTURE_FILES</source>
-        <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+      <source>OCC_TEXTURE_FILES</source>
+      <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
-        <source>PREF_CLIPPING_MODULATE</source>
-        <translation type="unfinished">Modulate</translation>
+      <source>PREF_CLIPPING_MODULATE</source>
+      <translation>調整</translation>
     </message>
     <message>
-        <source>PREF_CLIPPING_SCALE</source>
-        <translation type="unfinished">Scale factor</translation>
+      <source>PREF_CLIPPING_SCALE</source>
+      <translation>スケールファクタ</translation>
     </message>
     <message>
       <source>TOT_CLOSE</source>
@@ -882,6 +886,62 @@ session. It has to be closed before working with another study.</translation>
     <message>
       <source>PREF_GROUP_SHORTCUTS</source>
       <translation>ショートカットの設定</translation>
+    </message>
+    <message>
+      <source>PREF_TAB_PYEDITOR</source>
+      <translation>Python Viewer</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_PY_FONT</source>
+      <translation>フォント設定</translation>
+    </message>
+    <message>
+      <source>PREF_PY_FONT</source>
+      <translation>フォント</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_PY_DISPLAY</source>
+      <translation>セッティング表示</translation>
+    </message>
+    <message>
+      <source>PREF_PY_CURRLINE_HIGHLIGHT</source>
+      <translation>現在のハイライト線を有効</translation>
+    </message>
+    <message>
+      <source>PREF_PY_TEXT_WRAP</source>
+      <translation>テキストラッピングを有効</translation>
+    </message>
+    <message>
+      <source>PREF_PY_CURSON_ON_SCROLL</source>
+      <translation>スクロール上のセンタカーソル</translation>
+    </message>
+    <message>
+      <source>PREF_PY_LINE_NUMBS_AREA</source>
+      <translation>ライン数エリアの表示</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_PY_TAB</source>
+      <translation>設定タブ</translation>
+    </message>
+    <message>
+      <source>PREF_PY_TAB_WHITESPACES</source>
+      <translation>タブホワイトスペースタブの表示</translation>
+    </message>
+    <message>
+      <source>PREF_PY_TAB_SIZE</source>
+      <translation>タブサイズ:</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_VERT_EDGE</source>
+      <translation>垂直エッジ設定</translation>
+    </message>
+    <message>
+      <source>PREF_PY_VERT_EDGE</source>
+      <translation>垂直エッジの表示</translation>
+    </message>
+    <message>
+      <source>PREF_PY_NUM_COLUMNS</source>
+      <translation>列数</translation>
     </message>
   </context>
   <context>

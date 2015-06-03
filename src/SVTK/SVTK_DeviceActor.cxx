@@ -704,6 +704,13 @@ double SVTK_DeviceActor::GetQuadraticArcAngle(){
 void SVTK_DeviceActor::SetBallEnabled( bool theBallEnabled ) {
   myMapper->SetBallEnabled( theBallEnabled );
 }
+/*!
+ * Set ball scale factor
+ * \param theBallScale double value a scale factor of ball element
+ */
+void SVTK_DeviceActor::SetBallScale( double theBallScale ) {
+  myMapper->SetBallScale( theBallScale );
+}
 
 /*!
  * Set point marker enabled

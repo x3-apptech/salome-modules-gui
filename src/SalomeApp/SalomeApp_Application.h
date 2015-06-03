@@ -140,6 +140,8 @@ public slots:
   virtual void                        onCheckIn();
   virtual void                        onLocalCheckIn();
 
+  virtual void                        onDockWindowVisibilityChanged( bool );
+
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
