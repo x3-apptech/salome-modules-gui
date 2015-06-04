@@ -90,6 +90,7 @@ public slots:
   void onAntiClockWiseView();
   void onResetView();
   void onFitAll();
+  void onFitSelection();
   void activateZoom();
   void activateWindowFit();
   void activateRotation();
@@ -114,7 +115,7 @@ private:
   void                              MoveActor( VTKViewer_Actor* theActor );
 
 private:
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, RotationId,
+  enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
 	 ResetId, TrihedronShowId };
   typedef QMap<int, QtxAction*> ActionsMap;

@@ -181,6 +181,14 @@
         <translation>Redimensionner la scène pour ne montrer que sa partie choisie par l&apos;encadré</translation>
     </message>
     <message>
+        <source>MNU_FITSELECTION</source>
+        <translation type="unfinished">Fit Selection</translation>
+    </message>
+    <message>
+        <source>DSC_FITSELECTION</source>
+        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+    </message>
+    <message>
         <source>MNU_PRESETS_VIEW</source>
         <translation>Restaurer la vue</translation>
     </message>

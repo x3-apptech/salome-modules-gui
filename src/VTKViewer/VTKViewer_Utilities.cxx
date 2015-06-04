@@ -109,17 +109,24 @@ int
 ComputeVisiblePropBounds(vtkRenderer* theRenderer, 
                          double theBounds[6])
 {
-  int aCount = 0;
-  
-  theBounds[0] = theBounds[2] = theBounds[4] = VTK_LARGE_FLOAT;
-  theBounds[1] = theBounds[3] = theBounds[5] = -VTK_LARGE_FLOAT;
-  
-  // loop through all props
   VTK::ActorCollectionCopy aCopy(theRenderer->GetActors());
   vtkActorCollection* aCollection = aCopy.GetActors();
-  aCollection->InitTraversal();
-  while (vtkActor* aProp = aCollection->GetNextActor()) {
-    // if it's invisible, or has no geometry, we can skip the rest 
+  return ComputeBounds( aCollection, theBounds );
+}
+
+/*! Compute the bounds of actors*/
+int
+ComputeBounds(vtkActorCollection* theCollection, double theBounds[6])
+{
+  int aCount = 0;
+
+  theBounds[0] = theBounds[2] = theBounds[4] = VTK_LARGE_FLOAT;
+  theBounds[1] = theBounds[3] = theBounds[5] = -VTK_LARGE_FLOAT;
+
+  // loop through all props
+  theCollection->InitTraversal();
+  while (vtkActor* aProp = theCollection->GetNextActor()) {
+    // if it's invisible, or has no geometry, we can skip the rest
     if(aProp->GetVisibility() && aProp->GetMapper() && vtkMath::AreBoundsInitialized(aProp->GetBounds())){
       if(VTKViewer_Actor* anActor = VTKViewer_Actor::SafeDownCast(aProp))
         if(anActor->IsInfinitive())

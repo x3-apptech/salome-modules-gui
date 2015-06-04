@@ -16,6 +16,10 @@
         <translation>occ_view_fitarea.png</translation>
     </message>
     <message>
+        <source>ICON_OCCVIEWER_VIEW_FITSELECTION</source>
+        <translation>occ_view_fitselection.png</translation>
+    </message>
+    <message>
         <source>ICON_OCCVIEWER_CLONE_VIEW</source>
         <translation>occ_view_clone.png</translation>
     </message>

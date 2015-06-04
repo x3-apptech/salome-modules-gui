@@ -63,6 +63,11 @@ representing all displayed objects in the visible area.
 the contents of a frame drawn with pressed left mouse button.
 <hr>
 
+\image html occ_view_fitselection.png
+
+<b>Fit selection</b> - fits view contents to the current selection.
+<hr>
+
 \image html occ_view_zoom.png
 
 <b>Zoom</b> - allows to zoom in and out.

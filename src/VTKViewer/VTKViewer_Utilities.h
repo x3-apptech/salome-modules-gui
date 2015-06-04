@@ -26,6 +26,7 @@
 #include "VTKViewer.h"
 
 class vtkRenderer;
+class vtkActorCollection;
 
 VTKVIEWER_EXPORT 
 extern
@@ -38,6 +39,12 @@ extern
 int
 ComputeVisiblePropBounds(vtkRenderer* theRenderer, 
                          double theBounds[6]);
+
+VTKVIEWER_EXPORT
+extern
+int
+ComputeBounds(vtkActorCollection* theCollection,
+              double theBounds[6]);
 
 VTKVIEWER_EXPORT
 extern

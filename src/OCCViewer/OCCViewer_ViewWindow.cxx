@@ -248,6 +248,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myPreselectionEnabled = true;
   mySelectionEnabled = true;
 
+  myCursorIsHand = false;
 
   clearViewAspects();
   
@@ -570,7 +571,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
 void OCCViewer_ViewWindow::activateZoom()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();                /* save old cursor */
+    saveCursor();                /* save old cursor */
 
   if ( myOperation != ZOOMVIEW ) {
     QPixmap zoomPixmap (imageZoomCursor);
@@ -589,7 +590,7 @@ void OCCViewer_ViewWindow::activateZoom()
 void OCCViewer_ViewWindow::activatePanning()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();                // save old cursor
+    saveCursor();                // save old cursor
 
   if ( myOperation != PANVIEW ) {
     QCursor panCursor (Qt::SizeAllCursor);
@@ -606,7 +607,7 @@ void OCCViewer_ViewWindow::activatePanning()
 void OCCViewer_ViewWindow::activateRotation()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();                // save old cursor
+    saveCursor();                // save old cursor
 
   if ( myOperation != ROTATE ) {
     QPixmap rotatePixmap (imageRotateCursor);
@@ -816,7 +817,7 @@ void OCCViewer_ViewWindow::activateStartPointSelection( TopAbs_ShapeEnum theShap
   {
     QCursor handCursor (Qt::PointingHandCursor);
     myCursorIsHand = true;
-    myCursor = cursor();
+    saveCursor();
     myViewPort->setCursor( handCursor );
   }
   myRotationPointSelection = true;
@@ -835,7 +836,7 @@ void OCCViewer_ViewWindow::activateGlobalPanning()
     QCursor glPanCursor (globalPanPixmap);
     myCurScale = aView3d->Scale();
     aView3d->FitAll(0.01, false);
-    myCursor = cursor();                // save old cursor
+    saveCursor();                // save old cursor
     myViewPort->fitAll(); // fits view before selecting a new scene center
     if( setTransformRequested( PANGLOBAL ) )
       myViewPort->setCursor( glPanCursor );
@@ -850,7 +851,7 @@ void OCCViewer_ViewWindow::activateGlobalPanning()
 void OCCViewer_ViewWindow::activateWindowFit()
 {
   if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();                /* save old cursor */
+    saveCursor();                /* save old cursor */
 
   if ( myOperation != WINDOWFIT ) {
     QCursor handCursor (Qt::PointingHandCursor);
@@ -945,7 +946,7 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
           if ( !myCursorIsHand )        {   // we are going to sketch a rectangle
             QCursor handCursor (Qt::PointingHandCursor);
             myCursorIsHand = true;
-            myCursor = cursor();
+            saveCursor();
             myViewPort->setCursor( handCursor );
           }
         }
@@ -1171,6 +1172,13 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(activateWindowFit()));
   toolMgr()->registerAction( aAction, FitRectId );
   
+  // FitSelection
+  aAction = new QtxAction(tr("MNU_FITSELECTION"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_FITSELECTION" ) ),
+                           tr( "MNU_FITSELECTION" ), 0, this);
+  aAction->setStatusTip(tr("DSC_FITSELECTION"));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onFitSelection()));
+  toolMgr()->registerAction( aAction, FitSelectionId );
+
   // Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
@@ -1419,6 +1427,9 @@ void OCCViewer_ViewWindow::createToolBar()
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
   aScaleAction->insertAction( toolMgr()->action( FitAllId ) );
   aScaleAction->insertAction( toolMgr()->action( FitRectId ) );
+#if OCC_VERSION_LARGE > 0x06090000
+  aScaleAction->insertAction( toolMgr()->action( FitSelectionId ) );
+#endif
   aScaleAction->insertAction( toolMgr()->action( ZoomId ) );
   toolMgr()->append( aScaleAction, tid );
 
@@ -1588,6 +1599,18 @@ void OCCViewer_ViewWindow::onFitAll()
   emit vpTransformationStarted( FITALLVIEW );
   myViewPort->fitAll();
   emit vpTransformationFinished( FITALLVIEW );
+}
+
+/*!
+  \brief Perform "fit selection" transformation.
+*/
+void OCCViewer_ViewWindow::onFitSelection()
+{
+  emit vpTransformationStarted( FITSELECTION );
+#if OCC_VERSION_LARGE > 0x06090000
+  myModel->getAISContext()->FitSelected( getViewPort()->getView() );
+#endif
+  emit vpTransformationFinished( FITSELECTION );
 }
 
 /*!
@@ -2463,6 +2486,18 @@ void OCCViewer_ViewWindow::showEvent( QShowEvent* theEvent )
 void OCCViewer_ViewWindow::hideEvent( QHideEvent* theEvent )
 {
   emit Hide( theEvent );
+}
+
+
+/*!
+    Save old cursor. [ protected ]
+*/
+void OCCViewer_ViewWindow::saveCursor()
+{
+  QCursor* aCursor = NULL;
+  if ( myViewPort )
+    aCursor = myViewPort->getDefaultCursor();
+  myCursor = ( aCursor ? *aCursor : cursor() );
 }
 
 

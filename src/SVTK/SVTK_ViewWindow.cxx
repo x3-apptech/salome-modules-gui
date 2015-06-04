@@ -444,6 +444,16 @@ void SVTK_ViewWindow::onFitAll()
 }
 
 /*!
+  Processes transformation "fit selection"
+*/
+void SVTK_ViewWindow::onFitSelection()
+{
+  GetRenderer()->onFitSelection();
+  Repaint();
+  emit transformed( this );
+}
+
+/*!
   SLOT: called if selection is changed
 */
 void SVTK_ViewWindow::onSelectionChanged()
@@ -1934,6 +1944,14 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   connect(anAction, SIGNAL(activated()), this, SLOT(activateWindowFit()));
   mgr->registerAction( anAction, FitRectId );
 
+  // FitSelection
+  anAction = new QtxAction(tr("MNU_FITSELECTION"),
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITSELECTION" ) ),
+                           tr( "MNU_FITSELECTION" ), 0, this);
+  anAction->setStatusTip(tr("DSC_FITSELECTION"));
+  connect(anAction, SIGNAL(activated()), this, SLOT(onFitSelection()));
+  mgr->registerAction( anAction, FitSelectionId );
+
   // Zoom
   anAction = new QtxAction(tr("MNU_ZOOM_VIEW"), 
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ZOOM" ) ),
@@ -2245,6 +2263,7 @@ void SVTK_ViewWindow::createToolBar()
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
   aScaleAction->insertAction( getAction( FitAllId ) );
   aScaleAction->insertAction( getAction( FitRectId ) );
+  aScaleAction->insertAction( getAction( FitSelectionId ) );
   aScaleAction->insertAction( getAction( ZoomId ) );
   mgr->append( aScaleAction, myToolBar );
 

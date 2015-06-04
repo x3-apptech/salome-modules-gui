@@ -181,6 +181,14 @@
         <translation>Fit area within the view frame</translation>
     </message>
     <message>
+        <source>MNU_FITSELECTION</source>
+        <translation>Fit Selection</translation>
+    </message>
+    <message>
+        <source>DSC_FITSELECTION</source>
+        <translation>Fit all selected objects inside the view frame</translation>
+    </message>
+    <message>
         <source>MNU_PRESETS_VIEW</source>
         <translation>Restore View</translation>
     </message>

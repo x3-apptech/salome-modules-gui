@@ -182,7 +182,11 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //----------------------------------------------------------------------------
   //! Fit all presentation in the scene into the window
   void OnFitAll(); 
-  
+
+  //----------------------------------------------------------------------------
+  //! Fit all selected presentation in the scene
+  void onFitSelection();
+
   //! Set camera into predefined state
   void OnResetView(); 
 

@@ -143,7 +143,7 @@ class OCCVIEWER_EXPORT OCCViewer_ViewWindow : public SUIT_ViewWindow
   Q_OBJECT
 
 public:
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId,
+  enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
          ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
 	 ResetId, CloneId, ClippingId, MemId, RestoreId,
@@ -154,7 +154,7 @@ public:
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
-                      PANGLOBAL, WINDOWFIT, FITALLVIEW, RESETVIEW,
+                      PANGLOBAL, WINDOWFIT, FITALLVIEW, FITSELECTION, RESETVIEW,
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
 		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW };
 
@@ -248,6 +248,7 @@ public slots:
   virtual void onAntiClockWiseView();
   virtual void onResetView();
   virtual void onFitAll();
+  virtual void onFitSelection();
   virtual void activateZoom();
   virtual void activateWindowFit();
   virtual void activateRotation();
@@ -327,6 +328,8 @@ protected:
   virtual void                          onSketchingFinished();
 
   virtual OCCViewer_ViewSketcher*       createSketcher( int );
+
+  void                                  saveCursor();
 
   OCCViewer_ViewSketcher*               mypSketcher;
   QList<OCCViewer_ViewSketcher*>        mySketchers;

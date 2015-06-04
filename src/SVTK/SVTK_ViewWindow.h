@@ -367,6 +367,9 @@ public slots:
   //! Redirect the request to #SVTK_Renderer::OnFitAll
   virtual void onFitAll();
 
+  //! Redirect the request to #SVTK_Renderer::OnFitSelection
+  virtual void onFitSelection();
+
   //! Redirect the request to #SVTK_Renderer::OnViewTrihedron
   virtual void onViewTrihedron(bool); 
 
@@ -414,7 +417,7 @@ protected:
   void createToolBar();
   void createActions(SUIT_ResourceMgr* theResourceMgr);
 
-  enum { DumpId, FitAllId, FitRectId, ZoomId, PanId, GlobalPanId, 
+  enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
          ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId, ResetId,
 	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate,
