@@ -439,6 +439,7 @@ public:
   static QString           getViewType( const int ) /ReleaseGIL/ ;
   static bool              setViewTitle( const int, const QString& ) /ReleaseGIL/ ;
   static QString           getViewTitle( const int ) /ReleaseGIL/ ;
+  static bool              setViewSize( const int, const int, const int = 0 ) /ReleaseGIL/ ;
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
   static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 ) /ReleaseGIL/ ;

@@ -39,6 +39,7 @@
 #include "LightApp_SelectionMgr.h"
 #include "LogWindow.h"
 #include "OCCViewer_ViewWindow.h"
+#include "OCCViewer_ViewFrame.h"
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewWindow.h"
 #include "PVViewer_ViewManager.h"
@@ -2499,6 +2500,82 @@ bool SalomePyQt::setViewTitle( const int id, const QString& title )
   return ProcessEvent( new TSetViewTitle( id, title ) );
 }
 
+/*!
+  \fn bool SalomePyQt::setViewSize( const int w, const int h, const int id );
+  \brief Set view size
+  \param w window width
+  \param h window height
+  \param id window identifier
+  \return \c true if operation is completed successfully and \c false otherwise 
+*/
+
+class TSetViewSize: public SALOME_Event
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  int myWndWidth;
+  int myWndHeight;
+  int myWndId;
+  TSetViewSize( const int w, const int h, const int id )
+    : myResult( false ),
+      myWndWidth( w ),
+      myWndHeight( h ),
+      myWndId( id ) {}
+  virtual void Execute() 
+  {
+    SUIT_ViewWindow* wnd = 0;
+    if ( !myWndId ) {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        SUIT_ViewManager* vm = anApp->activeViewManager();
+        if ( vm )
+          wnd = vm->getActiveView();
+      }
+    }
+    else {
+      wnd = dynamic_cast<SUIT_ViewWindow*>( getWnd( myWndId ) );
+    }
+    if ( wnd ) {
+      SUIT_ViewManager* viewMgr = wnd->getViewManager();
+      if ( viewMgr ) {
+        QString type = viewMgr->getType();
+        if ( type == "OCCViewer") {
+          // specific processing for OCC viewer:
+          // OCC view can embed up to 4 sub-views, split according to the specified layout;
+          // - if there is only one sub-view active; it will be resized;
+          // - if there are several sub-views, each of them will be resized.
+          OCCViewer_ViewWindow* occView = qobject_cast<OCCViewer_ViewWindow*>( wnd );
+          for ( int i = OCCViewer_ViewFrame::BOTTOM_RIGHT; i <= OCCViewer_ViewFrame::TOP_RIGHT; i++ ) {
+            if ( occView && occView->getView( i ) ) {
+              occView->getView( i )->centralWidget()->resize( myWndWidth, myWndHeight );
+              myResult = true;
+            }
+          }
+        }
+        else if ( type == "ParaView") {
+          // specific processing for ParaView viewer:
+          // hierarchy of ParaView viewer is much complex than for usual view;
+          // we look for sub-widget named "Viewport"
+          QList<QWidget*> lst = qFindChildren<QWidget*>( wnd, "Viewport" );
+          if ( !lst.isEmpty() ) {
+            lst[0]->resize( myWndWidth, myWndHeight );
+            myResult = true;
+          }
+        }
+        else {
+          if ( wnd->centralWidget() ) {
+            wnd->centralWidget()->resize( myWndWidth, myWndHeight );
+            myResult = true;
+          }
+        }
+      }
+    }
+  }
+};
+bool SalomePyQt::setViewSize( const int w, const int h, const int id )
+{
+  return ProcessEvent( new TSetViewSize( w, h, id ) );
+}
 
 /*!
   \fn QString SalomePyQt::getViewTitle( const int id );
