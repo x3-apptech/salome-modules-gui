@@ -122,7 +122,9 @@ SET(_other_RESOURCES
   resources/occ_view_left.png
   resources/occ_view_maximized.png
   resources/occ_view_minimized.png
+  resources/occ_view_orthographic.png
   resources/occ_view_pan.png
+  resources/occ_view_perspective.png
   resources/occ_view_preselection.png
   resources/occ_view_presets.png
   resources/occ_view_reset.png

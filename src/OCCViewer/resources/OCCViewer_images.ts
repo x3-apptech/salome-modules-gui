@@ -139,5 +139,13 @@
         <source>ICON_OCCVIEWER_SELECTION</source>
         <translation>occ_view_selection.png</translation>
     </message>
+    <message>
+        <source>ICON_OCCVIEWER_ORTHOGRAPHIC</source>
+        <translation>occ_view_orthographic.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_PERSPECTIVE</source>
+        <translation>occ_view_perspective.png</translation>
+    </message>
 </context>
 </TS>

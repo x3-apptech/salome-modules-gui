@@ -1533,6 +1533,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm->setTrihedronSize(  resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
     vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
+    vm->setProjectionType( resMgr->integerValue( "OCCViewer", "projection_mode", vm->projectionType() ) );
     vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
     vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
     vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
@@ -2297,6 +2298,15 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .. "OCC viewer" group <<start>>
   int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), salomeCat );
 
+  // .... -> projection mode
+  int occProjMode = pref->addPreference( tr( "PREF_PROJECTION_MODE" ), occGroup,
+                                         LightApp_Preferences::Selector, "OCCViewer", "projection_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ORTHOGRAPHIC") << tr("PREF_PERSPECTIVE");
+  anIndicesList << 0                       << 1;
+  pref->setItemProperty( "strings", aValuesList,   occProjMode );
+  pref->setItemProperty( "indexes", anIndicesList, occProjMode );
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
   //  pref->setItemProperty( "columns", 2, bgGroup );
@@ -2947,6 +2957,25 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
       OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
       occVM->setClippingTextureParams( isDefaultTextureUsed, aTexture, isModulated, aScale );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "projection_mode" ) )
+  {
+    int mode = resMgr->integerValue( "OCCViewer", "projection_mode", 0 );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setProjectionType( mode );
     }
   }
 #endif

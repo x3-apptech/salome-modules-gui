@@ -151,20 +151,22 @@ public:
 	 SwitchInteractionStyleId, SwitchZoomingStyleId, 
 	 SwitchPreselectionId, SwitchSelectionId,
 	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
+	 OrthographicId, PerspectiveId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
                       PANGLOBAL, WINDOWFIT, FITALLVIEW, FITSELECTION, RESETVIEW,
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
-		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW };
+		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW, PROJECTION };
 
   enum RotationPointType{ GRAVITY, SELECTED };
 
   enum SketchingType { NoSketching, Rect, Polygon };
 
-  enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane};
+  enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane };
 
-
+  enum ProjectionType { Orthographic, Perspective };
+  
   OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel);
   virtual ~OCCViewer_ViewWindow();
 
@@ -206,9 +208,11 @@ public:
   virtual bool                    isSelectionEnabled() const;
   virtual void                    enableSelection( bool );
  
+  virtual int                     projectionType() const;
+  virtual void                    setProjectionType( int );
+
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
-
 
   void            set2dMode( Mode2dType );
   Mode2dType      get2dMode() const { return my2dMode; }
@@ -246,6 +250,7 @@ public slots:
   virtual void onRightView();
   virtual void onClockWiseView();
   virtual void onAntiClockWiseView();
+  virtual void onProjectionType();
   virtual void onResetView();
   virtual void onFitAll();
   virtual void onFitSelection();

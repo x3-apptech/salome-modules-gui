@@ -315,6 +315,20 @@ void OCCViewer_ViewFrame::setInteractionStyle( const int i )
 }
 
 //**************************************************************************************
+int OCCViewer_ViewFrame::projectionType() const
+{
+  return getView(MAIN_VIEW)->projectionType();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setProjectionType( int t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setProjectionType(t);
+  }
+}
+
+//**************************************************************************************
 void OCCViewer_ViewFrame::setZoomingStyle( const int i ) 
 { 
   foreach (OCCViewer_ViewWindow* aView, myViews) {

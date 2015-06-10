@@ -296,6 +296,22 @@
       <source>LBL_3DTOOLBAR_LABEL</source>
       <translation>3D ビューの操作</translation>
     </message>
+    <message>
+      <source>MNU_ORTHOGRAPHIC_MODE</source>
+      <translation>直交モード</translation>
+    </message>
+    <message>
+      <source>DSC_ORTHOGRAPHIC_MODE</source>
+      <translation>直交射影を選択します。</translation>
+    </message>
+    <message>
+      <source>MNU_PERSPECTIVE_MODE</source>
+      <translation>遠近法</translation>
+    </message>
+    <message>
+      <source>DSC_PERSPECTIVE_MODE</source>
+      <translation>透視投影を選択します。</translation>
+    </message>
   </context>
   <context>
     <name>OCCViewer_CreateRestoreViewDlg</name>

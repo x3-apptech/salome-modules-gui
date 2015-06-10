@@ -133,6 +133,9 @@ public:
   int                             interactionStyle() const;
   void                            setInteractionStyle( const int );
 
+  int                             projectionType() const;
+  void                            setProjectionType( const int );
+
   int                             zoomingStyle() const;
   void                            setZoomingStyle( const int );
 
@@ -208,6 +211,7 @@ protected:
 
   int                             myInteractionStyle;
   int                             myZoomingStyle;
+  int                             myProjectionType;
 
   bool                            myPreselectionEnabled;
   bool                            mySelectionEnabled;

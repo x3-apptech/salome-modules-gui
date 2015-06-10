@@ -152,6 +152,9 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
 
+  // set projection type to orthographic
+  myProjectionType = 0;
+
   //set clipping color and texture to standard
   myClippingColor = QColor( 50, 50, 50 );
   myDefaultTextureUsed = true;
@@ -215,6 +218,7 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     view->initLayout();
     view->initSketchers();
     view->setInteractionStyle( interactionStyle() );
+    view->setProjectionType( projectionType() );
     view->setZoomingStyle( zoomingStyle() );
     view->enablePreselection( isPreselectionEnabled() );
     view->enableSelection( isSelectionEnabled() );
@@ -472,6 +476,34 @@ void OCCViewer_Viewer::setInteractionStyle( const int theStyle )
     OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
       win->setInteractionStyle( theStyle );
+  }
+}
+
+/*!
+  \return projection type
+*/
+int OCCViewer_Viewer::projectionType() const
+{
+  return myProjectionType;
+}
+
+/*!
+  Sets projection type: 0 - orthographic, 1 - perspective
+  \param theType - new projection type
+*/
+void OCCViewer_Viewer::setProjectionType( const int theType )
+{
+  myProjectionType = theType;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setProjectionType( (OCCViewer_ViewWindow::ProjectionType)theType );
   }
 }
 

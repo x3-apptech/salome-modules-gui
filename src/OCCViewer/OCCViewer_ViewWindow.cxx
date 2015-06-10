@@ -57,6 +57,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QActionGroup>
 #include <QMenu>
 
 #include <AIS_ListOfInteractive.hxx>
@@ -236,7 +237,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myScalingDlg = 0;
   mySetRotationPointDlg = 0;
   myRectBand = 0;
-  
+
   IsSketcherStyle = false;
   myIsKeyFree = false;
 
@@ -251,7 +252,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myCursorIsHand = false;
 
   clearViewAspects();
-  
+
 }
 
 /*!
@@ -300,7 +301,7 @@ void OCCViewer_ViewWindow::initLayout()
   QtxAction* anAction = dynamic_cast<QtxAction*>( toolMgr()->action( GraduatedAxesId ) );
   myCubeAxesDlg = new OCCViewer_CubeAxesDlg( anAction, this, "OCCViewer_CubeAxesDlg" );
   myCubeAxesDlg->initialize();
-  
+
   connect( myViewPort, SIGNAL( vpTransformed( OCCViewer_ViewPort* ) ), this, SLOT( emitViewModified() ) );
 }
 
@@ -364,7 +365,7 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
     case QEvent::Wheel:
       {
         QWheelEvent* aEvent = (QWheelEvent*) e;
-     
+
         if ( aEvent->modifiers().testFlag(Qt::ControlModifier) ) {
           Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
           if ( isPreselectionEnabled() && ic->HasOpenedContext() ) {
@@ -426,10 +427,10 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
   int anInteractionStyle = interactionStyle();
 
   // in "key free" interaction style zoom operation is activated by two buttons (simultaneously pressed),
-  // which are assigned for pan and rotate - these operations are activated immediately after pressing 
+  // which are assigned for pan and rotate - these operations are activated immediately after pressing
   // of the first button, so it is necessary to switch to zoom when the second button is pressed
   bool aSwitchToZoom = false;
-  if ( anInteractionStyle == SUIT_ViewModel::KEY_FREE && 
+  if ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
        ( myOperation == PANVIEW || myOperation == ROTATE ) ) {
     aSwitchToZoom = getButtonState( theEvent, anInteractionStyle ) == ZOOMVIEW;
   }
@@ -870,7 +871,7 @@ bool OCCViewer_ViewWindow::setTransformRequested( OperationType op )
 {
   bool ok = transformEnabled( op );
   myOperation = ok ? op : NOTHING;
-  myViewPort->setMouseTracking( myOperation == NOTHING );  
+  myViewPort->setMouseTracking( myOperation == NOTHING );
   return ok;
 }
 
@@ -1106,7 +1107,7 @@ void OCCViewer_ViewWindow::drawRect()
     //myRectBand->setPalette(palette);
   }
   //myRectBand->hide();
-  
+
   myRectBand->setUpdatesEnabled ( false );
   QRect aRect = SUIT_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
   myRectBand->initGeometry( aRect );
@@ -1146,7 +1147,7 @@ void OCCViewer_ViewWindow::createActions()
 {
   if( !toolMgr()->isEmpty() )
     return;
-  
+
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
 
   QtxAction* aAction;
@@ -1171,7 +1172,7 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_FITRECT"));
   connect(aAction, SIGNAL(triggered()), this, SLOT(activateWindowFit()));
   toolMgr()->registerAction( aAction, FitRectId );
-  
+
   // FitSelection
   aAction = new QtxAction(tr("MNU_FITSELECTION"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_FITSELECTION" ) ),
                            tr( "MNU_FITSELECTION" ), 0, this);
@@ -1243,7 +1244,7 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onBottomView()));
   this->addAction(aAction);
   toolMgr()->registerAction( aAction, BottomId );
-  
+
   aAction = new QtxAction(tr("MNU_LEFT_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_LEFT" ) ),
                            tr( "MNU_LEFT_VIEW" ), 0, this, false, "Viewers:Left view");
   aAction->setStatusTip(tr("DSC_LEFT_VIEW"));
@@ -1273,6 +1274,30 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(triggered()), this, SLOT(onClockWiseView()));
   this->addAction(aAction);
   toolMgr()->registerAction( aAction, ClockWiseId );
+
+  // Projection mode group
+
+  // - orthographic projection
+  aAction = new QtxAction(tr("MNU_ORTHOGRAPHIC_MODE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_ORTHOGRAPHIC" ) ),
+                          tr( "MNU_ORTHOGRAPHIC_MODE" ), 0, this);
+  aAction->setStatusTip(tr("DSC_ORTHOGRAPHIC_MODE"));
+  aAction->setCheckable(true);
+  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
+  toolMgr()->registerAction( aAction, OrthographicId );
+
+  // - perspective projection
+  aAction = new QtxAction(tr("MNU_PERSPECTIVE_MODE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_PERSPECTIVE" ) ),
+                          tr( "MNU_PERSPECTIVE_MODE" ), 0, this);
+  aAction->setStatusTip(tr("DSC_PERSPECTIVE_MODE"));
+  aAction->setCheckable(true);
+  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
+  toolMgr()->registerAction( aAction, PerspectiveId );
+
+  // - add exclusive action group
+  QActionGroup* aProjectionGroup = new QActionGroup( this );
+  aProjectionGroup->addAction( toolMgr()->action( OrthographicId ) );
+  aProjectionGroup->addAction( toolMgr()->action( PerspectiveId ) );
+  connect(aProjectionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onProjectionType()));
 
   // Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_RESET" ) ),
@@ -1342,7 +1367,7 @@ void OCCViewer_ViewWindow::createActions()
   connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onSwitchSelection(bool)));
   toolMgr()->registerAction( aAction, SwitchSelectionId );
 
-  // Graduated axes 
+  // Graduated axes
   aAction = new QtxAction(tr("MNU_GRADUATED_AXES"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_GRADUATED_AXES" ) ),
                            tr( "MNU_GRADUATED_AXES" ), 0, this);
   aAction->setStatusTip(tr("DSC_GRADUATED_AXES"));
@@ -1388,7 +1413,7 @@ void OCCViewer_ViewWindow::createActions()
     toolMgr()->registerAction( aAction, ReturnTo3dViewId );
   }
 
-  // Synchronize View 
+  // Synchronize View
   toolMgr()->registerAction( synchronizeAction(), SynchronizeId );
 }
 
@@ -1454,6 +1479,9 @@ void OCCViewer_ViewWindow::createToolBar()
     toolMgr()->append( AntiClockWiseId, tid );
     toolMgr()->append( ClockWiseId, tid );
 
+    toolMgr()->append( OrthographicId, tid );
+    toolMgr()->append( PerspectiveId, tid );
+
     toolMgr()->append( ResetId, tid );
   }
 
@@ -1464,7 +1492,7 @@ void OCCViewer_ViewWindow::createToolBar()
 
   toolMgr()->append( toolMgr()->separator(), tid );
   toolMgr()->append( CloneId, tid );
-  
+
   toolMgr()->append( toolMgr()->separator(), tid );
   toolMgr()->append( ClippingId, tid );
   toolMgr()->append( AxialScaleId, tid );
@@ -1587,8 +1615,21 @@ void OCCViewer_ViewWindow::onResetView()
   myViewPort->getView()->Reset( false );
   myViewPort->fitAll( false, true, false );
   myViewPort->getView()->SetImmediateUpdate( upd );
+  onProjectionType(); // needed to apply projection type properly after reset
   myViewPort->getView()->Update();
   emit vpTransformationFinished( RESETVIEW );
+}
+
+/*!
+  \brief Perform "reset view" transformation.
+
+  Sets default orientation of the viewport camera.
+*/
+void OCCViewer_ViewWindow::onProjectionType()
+{
+  emit vpTransformationStarted( PROJECTION );
+  setProjectionType( toolMgr()->action( OrthographicId )->isChecked() ? Orthographic : Perspective );
+  emit vpTransformationFinished( PROJECTION );
 }
 
 /*!
@@ -1663,7 +1704,7 @@ void OCCViewer_ViewWindow::onAxialScale()
 {
   if ( !myScalingDlg )
     myScalingDlg = new OCCViewer_AxialScaleDlg( this );
-  
+
   if ( !myScalingDlg->isVisible() )
   {
     myScalingDlg->Update();
@@ -1766,7 +1807,7 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
 
     myModel->setTrihedronShown( anItem.isVisible );
     myModel->setTrihedronSize( anItem.size );
-        
+
     // graduated trihedron
     bool anIsVisible = anItem.gtIsVisible;
     OCCViewer_AxisWidget::AxisData anAxisData[3];
@@ -1861,7 +1902,7 @@ void OCCViewer_ViewWindow::onSwitchSelection( bool on )
 {
   mySelectionEnabled = on;
   myModel->setSelectionOptions( myModel->isPreselectionEnabled(), isSelectionEnabled() );
-  
+
   // update action state if method is called outside
 
   // preselection
@@ -1948,13 +1989,13 @@ QImage OCCViewer_ViewWindow::dumpView()
   Handle(V3d_View) view = myViewPort->getView();
   if ( view.IsNull() )
     return QImage();
-  
+
   int aWidth = myViewPort->width();
   int aHeight = myViewPort->height();
 
   // rnv: An old approach to dump the OCCViewer content
   //      Now used OCCT built-in procedure.
-  /*     
+  /*
   QApplication::syncX();
   view->Redraw(); // In order to reactivate GL context
   //view->Update();
@@ -1963,7 +2004,7 @@ QImage OCCViewer_ViewWindow::dumpView()
   if( aFrameBuffer.init( aWidth, aHeight ) )
   {
     QImage anImage( aWidth, aHeight, QImage::Format_RGB32 );
-   
+
     glPushAttrib( GL_VIEWPORT_BIT );
     glViewport( 0, 0, aWidth, aHeight );
     aFrameBuffer.bind();
@@ -1992,7 +2033,7 @@ QImage OCCViewer_ViewWindow::dumpView()
   glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
                 data);
   */
-  
+
   Image_PixMap aPix;
   view->ToPixMap(aPix,aWidth, aHeight,Graphic3d_BT_RGBA);
 
@@ -2001,8 +2042,8 @@ QImage OCCViewer_ViewWindow::dumpView()
   return anImage;
 }
 
-bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img, 
-                                             const QString& fileName, 
+bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
+                                             const QString& fileName,
                                              const QString& format )
 {
   if ( format != "PS" && format != "EPS")
@@ -2052,7 +2093,7 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     gp_Pln pln (gp_Pnt(x, y, z), gp_Dir(dx, dy, dz));
     double a, b, c, d;
     pln.Coefficients(a, b, c, d);
-    
+
     Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
     if(aPlanes.Size() > 0 ) {
       Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
@@ -2459,7 +2500,7 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
     params.isVisible = data.count() > idx ? data[idx++].toInt()    : 1;
     params.size      = data.count() > idx ? data[idx++].toDouble() : 100.0;
   }
-  performRestoring( params );  
+  performRestoring( params );
   setBackground( bgData );
   myModel->setClipPlanes(aClipPlanes);
 }
@@ -2703,8 +2744,8 @@ void OCCViewer_ViewWindow::setMaximized(bool toMaximize, bool toSendSignal)
   QAction* anAction2 =  toolMgr()->action( ReturnTo3dViewId );
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   if ( toMaximize ) {
-    anAction->setText( tr( "MNU_MINIMIZE_VIEW" ) );  
-    anAction->setToolTip( tr( "MNU_MINIMIZE_VIEW" ) );  
+    anAction->setText( tr( "MNU_MINIMIZE_VIEW" ) );
+    anAction->setToolTip( tr( "MNU_MINIMIZE_VIEW" ) );
     anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MINIMIZE" ) ) );
     anAction->setStatusTip( tr( "DSC_MINIMIZE_VIEW" ) );
     if ( anAction2 && my2dMode != No2dMode ) toolMgr()->show( ReturnTo3dViewId );
@@ -2713,8 +2754,8 @@ void OCCViewer_ViewWindow::setMaximized(bool toMaximize, bool toSendSignal)
     }
   }
   else {
-    anAction->setText( tr( "MNU_MAXIMIZE_VIEW" ) );  
-    anAction->setToolTip( tr( "MNU_MAXIMIZE_VIEW" ) );  
+    anAction->setText( tr( "MNU_MAXIMIZE_VIEW" ) );
+    anAction->setToolTip( tr( "MNU_MAXIMIZE_VIEW" ) );
     anAction->setIcon( aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_MAXIMIZE" ) ) );
     anAction->setStatusTip( tr( "DSC_MAXIMIZE_VIEW" ) );
     if ( anAction2 && my2dMode != No2dMode ) toolMgr()->hide( ReturnTo3dViewId );
@@ -2730,13 +2771,13 @@ bool OCCViewer_ViewWindow::isMaximized() const
 }
 
 void OCCViewer_ViewWindow::setSketcherStyle( bool enable )
-{ 
-  IsSketcherStyle = enable; 
+{
+  IsSketcherStyle = enable;
 }
 
-bool OCCViewer_ViewWindow::isSketcherStyle() const 
-{ 
-  return IsSketcherStyle; 
+bool OCCViewer_ViewWindow::isSketcherStyle() const
+{
+  return IsSketcherStyle;
 }
 
 
@@ -2745,12 +2786,37 @@ void OCCViewer_ViewWindow::set2dMode(Mode2dType theType)
   my2dMode = theType;
 }
 
-// obsolete   
+void OCCViewer_ViewWindow::setProjectionType( int mode )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    aCamera->SetProjectionType( mode == Perspective ? Graphic3d_Camera::Projection_Perspective : Graphic3d_Camera::Projection_Orthographic );
+    onViewFitAll();
+  }
+  // update action state if method is called outside
+  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( mode == Orthographic ? OrthographicId : PerspectiveId ) );
+  if ( ! a->isChecked() )
+    a->setChecked( true );
+}
+
+int OCCViewer_ViewWindow::projectionType() const
+{
+  int mode = Orthographic;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    mode = aCamera->ProjectionType() == Graphic3d_Camera::Projection_Perspective ? Perspective : Orthographic;
+  }
+  return mode;
+}
+
+// obsolete
 QColor OCCViewer_ViewWindow::backgroundColor() const
 {
   return myViewPort ? myViewPort->backgroundColor() : Qt::black;
 }
-   
+
 // obsolete
 void OCCViewer_ViewWindow::setBackgroundColor( const QColor& theColor )
 {
@@ -2761,7 +2827,7 @@ Qtx::BackgroundData OCCViewer_ViewWindow::background() const
 {
   return myViewPort ? myViewPort->background() : Qtx::BackgroundData();
 }
-   
+
 void OCCViewer_ViewWindow::setBackground( const Qtx::BackgroundData& theBackground )
 {
   if ( myViewPort ) myViewPort->setBackground( theBackground );
@@ -3063,7 +3129,7 @@ void OCCViewer_ViewWindow::onClipping (bool theIsOn)
 {
   if(!myModel) return;
   OCCViewer_ClippingDlg* aClippingDlg = myModel->getClippingDlg();
-  
+
   if (theIsOn) {
     if (!aClippingDlg) {
       aClippingDlg = new OCCViewer_ClippingDlg (this, myModel);

@@ -296,6 +296,23 @@
         <source>LBL_3DTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue 3D</translation>
     </message>
+    <message>
+        <source>MNU_ORTHOGRAPHIC_MODE</source>
+        <translation>Mode orthogonal</translation>
+    </message>
+    <message>
+        <source>DSC_ORTHOGRAPHIC_MODE</source>
+        <translation>Choisir la projection orthogonale</translation>
+    </message>
+    <message>
+        <source>MNU_PERSPECTIVE_MODE</source>
+        <translation>Mode perspective</translation>
+    </message>
+    <message>
+        <source>DSC_PERSPECTIVE_MODE</source>
+        <translation>Choisir la projection en perspective</translation>
+    </message>
+</context>
 </context>
 <context>
     <name>OCCViewer_CreateRestoreViewDlg</name>

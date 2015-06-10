@@ -70,6 +70,9 @@ public:
   virtual int  interactionStyle() const { return getView(MAIN_VIEW)->interactionStyle(); }
   virtual void setInteractionStyle( const int i );
 
+  virtual int projectionType() const;
+  virtual void setProjectionType( int );
+
   virtual int  zoomingStyle() const { return getView(MAIN_VIEW)->zoomingStyle(); }
   virtual void setZoomingStyle( const int );
 
