@@ -801,10 +801,12 @@ void SalomeApp_Application::updateCommandsStatus()
   if ( a )
     a->setEnabled( activeStudy() );
 
+#ifndef DISABLE_PYCONSOLE
   // Load script menu
   a = action( LoadScriptId );
   if( a )
     a->setEnabled( pythonConsole() );
+#endif
 
   // Properties menu
   a = action( PropertiesId );

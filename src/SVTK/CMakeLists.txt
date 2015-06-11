@@ -34,8 +34,13 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/OBJECT
   ${PROJECT_SOURCE_DIR}/src/Prs
   ${PROJECT_SOURCE_DIR}/src/VTKViewer
-  ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
 )
+
+IF(SALOME_USE_GLVIEWER)
+  INCLUDE_DIRECTORIES(
+    ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
+    )
+ENDIF()
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS})
@@ -47,8 +52,14 @@ SET(_link_LIBRARIES
   ${VTK_LIBRARIES} 
   ${CAS_KERNEL} ${CAS_VIEWER}
   ${KERNEL_OpUtil}
-  qtx suit ViewerTools SalomeObject SalomePrs VTKViewer OpenGLUtils
+  qtx suit ViewerTools SalomeObject SalomePrs VTKViewer
 )
+
+IF(SALOME_USE_GLVIEWER)
+  LIST(APPEND _link_LIBRARIES 
+    OpenGLUtils
+    )
+ENDIF()
 
 # --- headers ---
 

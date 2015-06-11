@@ -28,8 +28,6 @@
 
 vtkStandardNewMacro(PVViewer_LogWindowAdapter);
 
-
-
 /*!
  * Put the message in the log window. 
  */
@@ -85,15 +83,6 @@ const unsigned int PVViewer_LogWindowAdapter::getGenericWarningCount()
 {
   return this->GenericWarningCount;
 }
-
-//LogWindow* PVViewer_LogWindowAdapter::getLogWindow()
-//{
-//  LogWindow* wnd = 0;
-//  LightApp_Application* anApp = dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
-//  if ( anApp )
-//    wnd = anApp->logWindow();
-//  return wnd;
-//}
 
 void PVViewer_LogWindowAdapter::DisplayText(const char* text)
 {

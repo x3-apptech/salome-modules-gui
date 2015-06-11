@@ -22,7 +22,7 @@
 ##
 SET(SUBDIRS_COMMON
   CASCatch Qtx HelpBrowser Style DDS QDS ObjBrowser SUIT SUITApp STD CAF
-  CAM LogWindow Prs Event OpenGLUtils ViewerData ViewerTools ImageComposer GUI_PY
+  CAM LogWindow Prs Event ViewerData ViewerTools ImageComposer GUI_PY
 )
 
 ##
@@ -36,7 +36,7 @@ ENDIF(SALOME_USE_SALOMEOBJECT)
 # GL viewer
 ##
 IF(SALOME_USE_GLVIEWER)
-  SET(SUBDIRS_GLVIEWER GLViewer)
+  SET(SUBDIRS_GLVIEWER OpenGLUtils GLViewer)
 ENDIF(SALOME_USE_GLVIEWER)
 
 ##

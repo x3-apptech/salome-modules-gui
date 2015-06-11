@@ -30,9 +30,6 @@
 #include <SUIT_Session.h>
 #include <SUIT_Study.h>
 #include <SUIT_ResourceMgr.h>
-#include <PyInterp_Interp.h>
-#include <PyConsole_Interp.h>
-#include <PyConsole_Console.h>
 #include <LogWindow.h>
 
 #include <QApplication>
@@ -72,7 +69,6 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
 
   connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
-//  connect(this, SIGNAL(viewCreated(SUIT_ViewWindow*)), this, SLOT(onPVViewCreated(SUIT_ViewWindow*)));
 }
 
 pqPVApplicationCore * PVViewer_ViewManager::GetPVApplication()

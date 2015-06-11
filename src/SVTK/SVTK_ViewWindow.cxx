@@ -101,7 +101,9 @@
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"
 
-#include <OpenGLUtils_FrameBuffer.h>
+#ifndef DISABLE_GLVIEWER
+  #include <OpenGLUtils_FrameBuffer.h>
+#endif
 
 
 namespace SVTK
@@ -1169,6 +1171,7 @@ QImage SVTK_ViewWindow::dumpViewContent()
   int aWidth = aSize[0];
   int aHeight = aSize[1];
   
+#ifndef DISABLE_GLVIEWER
   OpenGLUtils_FrameBuffer aFrameBuffer;
   if( aFrameBuffer.init( aWidth, aHeight ) )
   {
@@ -1192,6 +1195,7 @@ QImage SVTK_ViewWindow::dumpViewContent()
     anImage = anImage.mirrored();
     return anImage;
   }
+#endif
 
   // if frame buffers are unsupported, use old functionality
   unsigned char *aData = 

@@ -49,7 +49,9 @@
 #include <QtxMultiAction.h>
 #include <QtxRubberBand.h>
 
-#include <OpenGLUtils_FrameBuffer.h>
+#ifndef DISABLE_GLVIEWER
+  #include <OpenGLUtils_FrameBuffer.h>
+#endif
 
 #include <QPainter>
 #include <QTime>
@@ -2000,6 +2002,7 @@ QImage OCCViewer_ViewWindow::dumpView()
   view->Redraw(); // In order to reactivate GL context
   //view->Update();
 
+#ifndef DISABLE_GLVIEWER
   OpenGLUtils_FrameBuffer aFrameBuffer;
   if( aFrameBuffer.init( aWidth, aHeight ) )
   {
@@ -2032,6 +2035,7 @@ QImage OCCViewer_ViewWindow::dumpView()
 
   glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
                 data);
+#endif
   */
 
   Image_PixMap aPix;

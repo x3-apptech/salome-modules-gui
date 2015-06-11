@@ -277,7 +277,7 @@ INCLUDE(CMakePackageConfigHelpers)
 # List of targets in this project we want to make visible to the rest of the world.
 # They all have to be INSTALL'd with the option "EXPORT ${PROJECT_NAME}TargetGroup"
 SET(_${PROJECT_NAME}_exposed_targets 
-    caf CAM CASCatch DDS Event LightApp LogWindow ObjBrowser OpenGLUtils
+    caf CAM CASCatch DDS Event LightApp LogWindow ObjBrowser
     QDS qtx SalomePrs SalomeStyle std SUITApp suit ViewerTools ViewerData
     ImageComposer
 )
@@ -291,7 +291,7 @@ ENDIF(SALOME_USE_SALOMEOBJECT)
 # GL specific targets:
 IF(SALOME_USE_GLVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       GLViewer)
+       OpenGLUtils GLViewer)
 ENDIF(SALOME_USE_GLVIEWER)
 
 # VTK specific targets:

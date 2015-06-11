@@ -30,7 +30,6 @@ PVViewer_Viewer::PVViewer_Viewer()
   MESSAGE("PVViewer_Viewer: creating view model ...");
 }
 
-
 /*!
   Create new instance of view window on desktop \a theDesktop.
   \retval SUIT_ViewWindow* - created view window pointer.

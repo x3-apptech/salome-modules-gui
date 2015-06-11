@@ -47,9 +47,6 @@ public:
 
   virtual ~PVViewer_Behaviors() {}
 
-//public slots:
-//  void onEmulateApply();
-
 private:
   static int BehaviorLoadingLevel;
 };
