@@ -65,12 +65,20 @@ ENDMACRO(SALOME_GUI_WITH_CORBA)
 #   _options [input] List - The list of CMake options given to SALOME GUI
 #
 # Notes:
-# The arguments list can include "OPTIONAL" keywords:
-#  * All arguments preceded by "OPTIONAL" keyword are mandatory for current module.
-#    If GUI module was compiled without this functionality, further installation 
-#    of the current module becomes impossible.
-#  * All arguments following "OPTIONAL" keyword are optional for current module, which
-#    uses this functionality, but can be installed without it.
+# - The arguments list can include "OPTIONAL" keywords:
+#   * All arguments preceded by "OPTIONAL" keyword are mandatory for current module.
+#     If GUI module was compiled without this functionality, further installation 
+#     of the current module becomes impossible.
+#   * All arguments following "OPTIONAL" keyword are optional for current module, which
+#     uses this functionality, but can be installed without it.
+#
+# - At present there are next options in the GUI module:
+#   SALOME_USE_OCCVIEWER, SALOME_USE_VTKVIEWER, SALOME_USE_GLVIEWER, SALOME_USE_PLOT2DVIEWER,
+#   SALOME_USE_GRAPHICSVIEW, SALOME_USE_QXGRAPHVIEWER, SALOME_USE_PVVIEWER, SALOME_USE_PYVIEWER,
+#   SALOME_USE_PYCONSOLE, SALOME_USE_SALOMEOBJECT
+#
+# Example of usage:
+#   SALOME_GUI_MODE(SALOME_USE_OCCVIEWER SALOME_USE_SALOMEOBJECT OPTIONAL SALOME_USE_PYCONSOLE)
 #
 MACRO(SALOME_GUI_MODE)
   MESSAGE(STATUS "")
