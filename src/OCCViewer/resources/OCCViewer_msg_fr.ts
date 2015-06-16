@@ -313,7 +313,6 @@
         <translation>Choisir la projection en perspective</translation>
     </message>
 </context>
-</context>
 <context>
     <name>OCCViewer_CreateRestoreViewDlg</name>
     <message>

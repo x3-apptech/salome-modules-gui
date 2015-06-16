@@ -40,7 +40,8 @@ ADD_DEFINITIONS(
 
 SET(_link_LIBRARIES 
   ${KERNEL_SALOMELocalTrace} 
-  ${KERNEL_OpUtil} 
+  ${KERNEL_OpUtil}
+  PyInterp  
   suit 
   Event 
   pqApplicationComponents
