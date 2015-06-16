@@ -35,12 +35,8 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/ViewerData
   ${PROJECT_SOURCE_DIR}/src/ViewerTools
+  ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
 )
-IF(SALOME_USE_GLVIEWER)
-  INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
-    )
-ENDIF()
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
@@ -49,14 +45,8 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
   ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKOpenGl}
-  CASCatch qtx suit ViewerTools ViewerData
+  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils
 )
-
-IF(SALOME_USE_GLVIEWER)
-  LIST(APPEND _link_LIBRARIES
-    OpenGLUtils
-    )
-ENDIF()
 
 # --- headers ---
 

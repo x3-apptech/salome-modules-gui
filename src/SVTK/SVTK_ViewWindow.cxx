@@ -101,10 +101,7 @@
 #include "VTKViewer_Algorithm.h"
 #include "SVTK_Functor.h"
 
-#ifndef DISABLE_GLVIEWER
-  #include <OpenGLUtils_FrameBuffer.h>
-#endif
-
+#include <OpenGLUtils_FrameBuffer.h>
 
 namespace SVTK
 {
@@ -125,10 +122,6 @@ namespace SVTK
     return accelAction;
   }
 }
-
-
-
-
 
 /*!
   Constructor

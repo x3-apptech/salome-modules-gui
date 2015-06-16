@@ -49,9 +49,7 @@
 #include <QtxMultiAction.h>
 #include <QtxRubberBand.h>
 
-#ifndef DISABLE_GLVIEWER
-  #include <OpenGLUtils_FrameBuffer.h>
-#endif
+#include <OpenGLUtils_FrameBuffer.h>
 
 #include <QPainter>
 #include <QTime>
