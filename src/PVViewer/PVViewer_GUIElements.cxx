@@ -184,12 +184,6 @@ void PVViewer_GUIElements::addToolbars(QMainWindow* desk)
   dataAction = dataToolbar->toggleViewAction();
 }
 
-void PVViewer_GUIElements::onEmulateApply()
-{
-  if (propertiesPanel)
-    propertiesPanel->apply();
-}
-
 QList<QToolBar*> PVViewer_GUIElements::getToolbars()
 {
   QList<QToolBar*> l;

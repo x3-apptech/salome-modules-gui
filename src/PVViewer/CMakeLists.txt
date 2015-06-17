@@ -64,6 +64,7 @@ SET(_other_HEADERS
   PVViewer.h
   PVViewer_LogWindowAdapter.h
   PVViewer_EngineWrapper.h
+  PVViewer_Core.h
 )
 # header files / to install
 SET(PVViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
@@ -92,6 +93,7 @@ SET(_other_SOURCES
   PVViewer_Behaviors.cxx
   PVViewer_GUIElements.cxx
   PVViewer_EngineWrapper.cxx
+  PVViewer_Core.cxx
   )
   
 # sources / to compile

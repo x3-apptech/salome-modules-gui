@@ -62,9 +62,6 @@ public:
   void setToolBarEnabled(bool enabled);
   QList<QToolBar*> getToolbars();
 
-public slots:
-  void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"
-
 private:
   PVViewer_GUIElements(QMainWindow* desk);
   virtual ~PVViewer_GUIElements() {}

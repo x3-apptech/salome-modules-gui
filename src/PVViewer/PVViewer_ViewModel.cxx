@@ -16,6 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
 
 #include "PVViewer_ViewModel.h"
 #include "PVViewer_ViewWindow.h"

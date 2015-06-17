@@ -16,45 +16,44 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author: Adrien Bruneton (CEA)
+// Author : Adrien Bruneton (CEA)
 
-#ifndef PVViewer_VIEWMANAGER_H
-#define PVViewer_VIEWMANAGER_H
+#ifndef SRC_PVVIEWER_PVVIEWER_CORE_H_
+#define SRC_PVVIEWER_PVVIEWER_CORE_H_
 
 #include "PVViewer.h"
 
-#include <SUIT_ViewManager.h>
+#include <QString>
 
-class SUIT_Desktop;
-class SUIT_Study;
-class SUIT_ViewWindow;
-class LogWindow;
 class PVViewer_EngineWrapper;
+class PVViewer_Behaviors;
+class LogWindow;
 class QMainWindow;
+class pqPVApplicationCore;
 
-class PVVIEWER_EXPORT PVViewer_ViewManager : public SUIT_ViewManager
+/**
+ Pure static class gathering most of the interactions with ParaView's API and ParaView's
+ start sequence.
+ */
+class PVVIEWER_EXPORT PVViewer_Core
 {
-  Q_OBJECT
-
 public:
-  PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop*, LogWindow *);
-  ~PVViewer_ViewManager() {}
+  static pqPVApplicationCore * GetPVApplication();
 
-  //! Get the CORBA engine wrapper.
-  static PVViewer_EngineWrapper * GetEngine();
 
-  //! Get PVViewer configuration path as stored by SALOME's resource manager:
-  static QString GetPVConfigPath();
-
-  //! Connect to the external PVServer, using the PARAVIS engine to launch it if it is not
-  //! already up.
-  static bool   ConnectToExternalPVServer(QMainWindow* aDesktop);
-
-protected slots:
-  void onWindowActivated(SUIT_ViewWindow*);
+  //! Initialize ParaView if not yet done (once per session)
+  static bool   ParaviewInitApp(QMainWindow* aDesktop, LogWindow * w);
+  static void   ParaviewInitBehaviors(bool fullSetup=false, QMainWindow* aDesktop=0);
+  static void   ParaviewLoadConfigurations(const QString & configPath, bool force=false);
+  static void   ParaviewCleanup();
 
 private:
-  SUIT_Desktop * desktop;
+  PVViewer_Core();
+  virtual ~PVViewer_Core();
+
+  static pqPVApplicationCore* MyCoreApp;
+  static bool ConfigLoaded;
+  static PVViewer_Behaviors * ParaviewBehaviors;
 };
 
-#endif
+#endif /* SRC_PVVIEWER_PVVIEWER_CORE_H_ */
