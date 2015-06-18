@@ -1051,6 +1051,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <source>DEFAULT_BTN_TEXT</source>
       <translation>デフォルト</translation>
     </message>
+    <message>
+      <source>PREF_NEED_RESTART</source>
+      <translation type="unfinished">Some changes will take effect only after application restart</translation>
+    </message>
   </context>
   <context>
     <name>LightApp_ModuleAction</name>
