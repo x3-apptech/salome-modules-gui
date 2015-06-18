@@ -1053,6 +1053,10 @@ File does not exist</translation>
         <source>DEFAULT_BTN_TEXT</source>
         <translation>Defaults</translation>
     </message>
+    <message>
+        <source>PREF_NEED_RESTART</source>
+        <translation>Some changes will take effect only after application restart</translation>
+    </message>
 </context>
 <context>
     <name>LightApp_ModuleAction</name>

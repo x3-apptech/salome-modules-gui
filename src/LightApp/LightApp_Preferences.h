@@ -61,6 +61,7 @@ protected:
 signals:
   void                 preferenceChanged( QString&, QString&, QString& );
   void                 resetToDefaults();
+  void                 restartRequired();
 
 private slots:
   void                 onHelp();

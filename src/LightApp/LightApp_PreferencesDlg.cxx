@@ -70,6 +70,8 @@ myPrefs( prefs ), mySaved ( false )
     connect( impBtn, SIGNAL( clicked() ), this, SLOT( onImportPref() ) );
   connect( this, SIGNAL( defaultPressed() ), prefs, SIGNAL( resetToDefaults() ) );
 
+  connect( prefs, SIGNAL( restartRequired() ), this, SLOT( onRestartRequired() ) );
+
   setMinimumSize( 800, 600 );
 }
 
@@ -172,4 +174,10 @@ void LightApp_PreferencesDlg::onImportPref()
     myPrefs->retrieve();
     myPrefs->toBackup();
   }
+}
+
+/*! Called if some preferences that will come in force only after application restart are changed */
+void LightApp_PreferencesDlg::onRestartRequired()
+{
+  SUIT_MessageBox::information( this, tr( "WRN_WARNING" ), tr( "PREF_NEED_RESTART" ) );
 }
