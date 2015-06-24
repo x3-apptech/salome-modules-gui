@@ -512,8 +512,9 @@ bool LightApp_Application::activateModule( const QString& modName )
   updateWindows();
   updateViewManagers();
 
-  if ( activeStudy() && activeStudy()->root() && objectBrowser() && objectBrowser()->root() != activeStudy()->root() ) {
-    objectBrowser()->setRoot( activeStudy()->root() );
+  if ( activeStudy() && activeStudy()->root() && objectBrowser() ) {
+    if ( objectBrowser()->root() != activeStudy()->root() ) 
+      objectBrowser()->setRoot( activeStudy()->root() );
     updateObjectBrowser( true );
   }
   return true;
