@@ -144,8 +144,7 @@ VTKViewer_GeometryFilter
 
 int
 VTKViewer_GeometryFilter
-::UnstructuredGridExecute(
-                          vtkDataSet *dataSetInput,
+::UnstructuredGridExecute(vtkDataSet *dataSetInput,
                           vtkPolyData *output,
                           vtkInformation *outInfo)
 {
@@ -275,7 +274,7 @@ VTKViewer_GeometryFilter
     }//if not all visible
 
   // Loop over all cells now that visibility is known
-  // (Have to compute visibility first for 3D cell boundarys)
+  // (Have to compute visibility first for 3D cell boundaries)
   int progressInterval = numCells/20 + 1;
   TMapOfVectorId aDimension2VTK2ObjIds;
   if(myStoreMapping){
@@ -707,6 +706,7 @@ VTKViewer_GeometryFilter
         case VTK_BIQUADRATIC_TRIANGLE:
         case VTK_QUADRATIC_QUAD:
         case VTK_BIQUADRATIC_QUAD:
+        case VTK_QUADRATIC_POLYGON:
         case VTK_QUADRATIC_TETRA:
         case VTK_QUADRATIC_HEXAHEDRON:
         case VTK_TRIQUADRATIC_HEXAHEDRON:
@@ -878,6 +878,26 @@ VTKViewer_GeometryFilter
                 aNewPts[7] = pts[7];
 
                 newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+              else
+                BuildArcedPolygon(cellId,input,output,aDimension2VTK2ObjIds);
+              break;
+            }
+            case VTK_QUADRATIC_POLYGON: {
+              if(!myIsBuildArc)
+              {
+                aCellType = VTK_POLYGON;
+
+                for ( i = 0; i < npts/2; ++i )
+                {
+                  aNewPts[i*2  ] = pts[i];
+                  aNewPts[i*2+1] = pts[i+npts/2];
+                }
+                newCellId = output->InsertNextCell(aCellType,npts,aNewPts);
                 if(myStoreMapping)
                   InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
 
@@ -1453,6 +1473,27 @@ void VTKViewer_GeometryFilter::BuildArcedPolygon(vtkIdType cellId,
       aScalarCollection.push_back(aBuilder2.GetScalarValues());
       aScalarCollection.push_back(aBuilder3.GetScalarValues());
       aScalarCollection.push_back(aBuilder4.GetScalarValues());
+      break;
+    }
+    case VTK_QUADRATIC_POLYGON:
+    {
+      int nbP = aCell->GetNumberOfPoints();
+      std::vector< Pnt > pVec( nbP + 2 );
+
+      for ( int i = 0; i < nbP/2; ++i )
+      {
+        pVec[i*2 + 0] = CreatePnt( aCell, inputScalars, i );
+        pVec[i*2 + 1] = CreatePnt( aCell, inputScalars, i + nbP/2 );
+      }
+      pVec[ nbP   ] = pVec[ 0 ];
+      pVec[ nbP+1 ] = pVec[ 1 ];
+
+      for ( int i = 0; i < nbP; i += 2 )
+      {      
+        VTKViewer_ArcBuilder aBuilder( pVec[i], pVec[i+1], pVec[i+2], myMaxArcAngle );
+        aCollection.push_back( aBuilder.GetPoints() );
+        aScalarCollection.push_back( aBuilder.GetScalarValues() );
+      }
       break;
     }
     default: //Unsupported cell type

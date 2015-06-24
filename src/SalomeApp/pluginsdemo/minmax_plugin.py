@@ -115,7 +115,7 @@ def minmax(context):
         mm = study.FindObjectID(objId).GetObject()
         mesh = None
         try:
-          mesh = mm.GetMEDMesh()
+          mesh = mm.Load()
         except:
           #print "No mesh selected"
           self.clearLineEdit()
