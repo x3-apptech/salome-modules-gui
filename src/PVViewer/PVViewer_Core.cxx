@@ -23,7 +23,6 @@
 #include "PVViewer_LogWindowAdapter.h"
 #include "PVViewer_GUIElements.h"
 #include "PVViewer_Behaviors.h"
-#include "PVViewer_EngineWrapper.h"
 #include "PVViewer_Core.h"
 
 #include <QApplication>

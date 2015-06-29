@@ -350,7 +350,7 @@ ENDIF(SALOME_USE_PYVIEWER)
 
 # ParaView viewer specific targets:
 IF(SALOME_USE_PVVIEWER)
-  LIST(APPEND _${PROJECT_NAME}_exposed_targets PVViewer)
+  LIST(APPEND _${PROJECT_NAME}_exposed_targets PVViewer PVServerService)
 ENDIF()
 
 

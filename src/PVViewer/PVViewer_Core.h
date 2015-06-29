@@ -25,7 +25,7 @@
 
 #include <QString>
 
-class PVViewer_EngineWrapper;
+class PVServer_ServiceWrapper;
 class PVViewer_Behaviors;
 class LogWindow;
 class QMainWindow;

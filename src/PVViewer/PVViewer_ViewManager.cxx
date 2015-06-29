@@ -23,7 +23,7 @@
 #include "PVViewer_ViewModel.h"
 #include "PVViewer_GUIElements.h"
 #include "PVViewer_Core.h"
-#include "PVViewer_EngineWrapper.h"
+#include "PVServer_ServiceWrapper.h"
 
 #include <utilities.h>
 
@@ -56,9 +56,9 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
 }
 
 
-PVViewer_EngineWrapper * PVViewer_ViewManager::GetEngine()
+PVServer_ServiceWrapper * PVViewer_ViewManager::GetService()
 {
-  return PVViewer_EngineWrapper::GetInstance();
+  return PVServer_ServiceWrapper::GetInstance();
 }
 
 QString PVViewer_ViewManager::GetPVConfigPath()
@@ -82,7 +82,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
       return false;
     }
 
-  if (GetEngine()->GetGUIConnected())
+  if (GetService()->GetGUIConnected())
     {
       // Should never be there as the above should already tell us that we are connected.
       std::stringstream msg2;
@@ -104,7 +104,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
   else
     {
       // Get the URL from the engine (possibly starting the pvserver)
-      serverUrl = GetEngine()->FindOrStartPVServer(0);  // take the first free port
+      serverUrl = GetService()->FindOrStartPVServer(0);  // take the first free port
     }
 
   msg << "connectToExternalPVServer(): Trying to connect to the external PVServer '" << serverUrl << "' ...";
@@ -123,7 +123,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
   else
     {
       MESSAGE("connectToExternalPVServer(): Connected!");
-      GetEngine()->SetGUIConnected(true);
+      GetService()->SetGUIConnected(true);
     }
   return true;
 }

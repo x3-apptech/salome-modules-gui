@@ -38,3 +38,14 @@ SET(_idl_link_flags
 
 OMNIORB_ADD_MODULE(SalomeIDLGUI "${SalomeIDLGUI_IDLSOURCES}" "${_idl_include_dirs}" "${_idl_link_flags}")
 INSTALL(TARGETS SalomeIDLGUI EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
+########################################################################
+###  PVServer service:
+SET(SalomeIDLPVSERVER_IDLSOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/PVSERVER_Gen.idl
+  )
+# Demand Python generation:
+SET(OMNIORB_PYTHON_BACKEND 1)
+OMNIORB_ADD_MODULE(SalomeIDLPVServer "${SalomeIDLPVSERVER_IDLSOURCES}" "${_idl_include_dirs}" "${_idl_link_flags}")
+INSTALL(TARGETS SalomeIDLPVServer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+
