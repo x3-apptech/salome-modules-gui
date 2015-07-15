@@ -49,7 +49,7 @@ public:
 
 private:
   PVViewer_Core();
-  virtual ~PVViewer_Core();
+  virtual ~PVViewer_Core(){};
 
   static pqPVApplicationCore* MyCoreApp;
   static bool ConfigLoaded;
