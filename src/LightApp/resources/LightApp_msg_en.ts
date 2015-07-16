@@ -628,6 +628,34 @@ The changes will be applied on the next application session.</translation>
         <translation>OCC 3D Viewer</translation>
     </message>
     <message>
+        <source>PREF_GROUP_STEREO</source>
+        <translation>Stereo render</translation>
+    </message>
+    <message>
+        <source>PREF_STEREO_TYPE</source>
+        <translation>Stereo type</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_FILTER</source>
+        <translation>Anaglyph filter</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_RED_CYAN</source>
+        <translation>Red-Cyan</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+        <translation>Yellow-Blue</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+        <translation>Green-Magenta</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+        <translation>Enable quad-buffer support</translation>
+    </message>
+    <message>
         <source>PREF_LOGARITHMIC</source>
         <translation>Logarithmic</translation>
     </message>
@@ -887,6 +915,14 @@ File does not exist</translation>
     <message>
         <source>PREF_GROUP_SHORTCUTS</source>
         <translation>Shortcuts settings</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_FULL_SCREEN</source>
+        <translation>Full-screen</translation>
+    </message>
+    <message>
+        <source>PREF_FULL_SCREEN_AUTO</source>
+        <translation>Hide object browser and viewers toolbars</translation>
     </message>
   <message>
     <source>PREF_TAB_PYEDITOR</source>

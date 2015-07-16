@@ -628,6 +628,34 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène OCC 3D</translation>
     </message>
     <message>
+        <source>PREF_GROUP_STEREO</source>
+        <translation type="unfinished">Stereo render</translation>
+    </message>
+    <message>
+        <source>PREF_STEREO_TYPE</source>
+        <translation type="unfinished">Stereo type</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_FILTER</source>
+        <translation type="unfinished">Anaglyph filter</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_RED_CYAN</source>
+        <translation type="unfinished">Red-Cyan</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+        <translation type="unfinished">Yellow-Blue</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+        <translation type="unfinished">Green-Magenta</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+        <translation type="unfinished">Enable quad-buffer support</translation>
+    </message>
+    <message>
         <source>PREF_LOGARITHMIC</source>
         <translation>Logarithmique</translation>
     </message>
@@ -887,6 +915,14 @@ Le fichier n&apos;existe pas</translation>
     <message>
         <source>PREF_GROUP_SHORTCUTS</source>
         <translation>Réglage des raccourcis clavier</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_FULL_SCREEN</source>
+        <translation type="unfinished">Full-screen</translation>
+    </message>
+    <message>
+        <source>PREF_FULL_SCREEN_AUTO</source>
+        <translation type="unfinished">Hide object browser and viewers toolbars</translation>
     </message>
     <message>
         <source>PREF_TAB_PYEDITOR</source>

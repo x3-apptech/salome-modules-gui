@@ -528,16 +528,16 @@ QtxWorkstackArea::QtxWorkstackArea( QWidget* parent )
   base->setMargin( frameWidth() );
   base->setSpacing( 0 );
 
-  QWidget* top = new QWidget( this );
-  base->addWidget( top );
+  myTop = new QWidget( this );
+  base->addWidget( myTop );
 
-  QHBoxLayout* tl = new QHBoxLayout( top );
+  QHBoxLayout* tl = new QHBoxLayout( myTop );
   tl->setMargin( 0 );
 
-  myBar = new QtxWorkstackTabBar( top );
+  myBar = new QtxWorkstackTabBar( myTop );
   tl->addWidget( myBar, 1 );
 
-  CloseButton* close = new CloseButton( top );
+  CloseButton* close = new CloseButton( myTop );
   close->setIcon( style()->standardIcon( QStyle::SP_TitleBarCloseButton ) );
   myClose = close;
   tl->addWidget( myClose );
@@ -901,6 +901,16 @@ bool QtxWorkstackArea::restoreState( QDataStream& stream, QMap<QString, QtxWorks
 
   return true;
 }
+
+/*!
+  \brief Show/Hide tab bar.
+*/
+void QtxWorkstackArea::showTabBar( bool visible)
+{
+  myTop->setVisible(visible);
+  myBar->setVisible(visible);
+}
+
 
 /*!
   \brief Get rectangle to be drawn when highlighting drop area.
@@ -3179,6 +3189,23 @@ bool QtxWorkstack::opaqueResize() const
   return mySplit->opaqueResize();
 }
 
+/*!
+  \brief Show/Hide active tab bar.
+*/
+void QtxWorkstack::showActiveTabBar( bool visible )
+{
+  QList<QtxWorkstackArea*> areaList;
+  areas( mySplit, areaList, true );
+  QList<QtxWorkstackArea*>::ConstIterator it;
+  for ( it = areaList.begin(); it != areaList.end(); ++it )
+  {
+    (*it)->showTabBar( visible );
+  }
+  QList<QSplitter*> recList;
+  splitters( mySplit, recList, true );
+  for ( QList<QSplitter*>::iterator itr = recList.begin(); itr != recList.end(); ++itr )
+    (*itr)->setVisible(visible);
+}
 
 /*!
   \fn void QtxWorkstack::windowActivated( QWidget* w )

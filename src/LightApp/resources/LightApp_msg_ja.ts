@@ -628,6 +628,34 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>OCC 3D　Viewer</translation>
     </message>
     <message>
+      <source>PREF_GROUP_STEREO</source>
+      <translation type="unfinished">Stereo render</translation>
+    </message>
+    <message>
+      <source>PREF_STEREO_TYPE</source>
+      <translation type="unfinished">Stereo type</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_FILTER</source>
+      <translation type="unfinished">Anaglyph filter</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_RED_CYAN</source>
+      <translation type="unfinished">Red-Cyan</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+      <translation type="unfinished">Yellow-Blue</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+      <translation type="unfinished">Green-Magenta</translation>
+    </message>
+    <message>
+      <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+      <translation type="unfinished">Enable quad-buffer support</translation>
+    </message>
+    <message>
       <source>PREF_LOGARITHMIC</source>
       <translation>対数</translation>
     </message>
@@ -886,6 +914,14 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>PREF_GROUP_SHORTCUTS</source>
       <translation>ショートカットの設定</translation>
+    </message>
+    <message>
+      <source>PREF_GROUP_FULL_SCREEN</source>
+      <translation type="unfinished">Full-screen</translation>
+    </message>
+    <message>
+      <source>PREF_FULL_SCREEN_AUTO</source>
+      <translation type="unfinished">Hide object browser and viewers toolbars</translation>
     </message>
     <message>
       <source>PREF_TAB_PYEDITOR</source>

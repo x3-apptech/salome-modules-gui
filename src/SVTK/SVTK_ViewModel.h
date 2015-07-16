@@ -60,11 +60,19 @@ public:
     LastGradient = FourthCornerGradient,
   };
 
+  enum {
+    CrystalEyesType, RedBlueType,
+    InterlacedType,  LeftType,
+    RightType,       DresdenType,
+    AnaglyphType,    CheckerboardType,
+    SplitViewPortHorizontalType
+  };
   typedef SVTK_ViewWindow TViewWindow;
   
   //! Define string representation of the viewer type
   static QString           Type() { return "VTKViewer"; }
   static QString           backgroundData( QStringList&, QIntList&, QIntList& );
+  static void              stereoData( QStringList&, QIntList&);
 
   SVTK_Viewer();
   virtual ~SVTK_Viewer();
@@ -113,6 +121,18 @@ public:
 
   //! Sets projection mode
   void setProjectionMode( const int );
+
+  //! Gets stereo type
+  int stereoType() const;
+
+  //! Sets stereo type
+  void setStereoType( const int );
+
+  //! Gets anaglyph filter
+  int anaglyphFilter() const;
+
+  //! Sets anaglyph filter
+  void setAnaglyphFilter( const int );
 
   //! Gets interaction style
   int interactionStyle() const;
@@ -206,6 +226,8 @@ private:
   int                  myIncrementSpeed;
   int                  myIncrementMode;
   int                  myProjMode;
+  int                  myStereoType;
+  int                  myAnaglyphFilter;
   int                  myStyle;
   int                  myZoomingStyle;
   Preselection_Mode    myPreSelectionMode;

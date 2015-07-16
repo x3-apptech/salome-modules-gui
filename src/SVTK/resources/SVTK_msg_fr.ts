@@ -200,6 +200,14 @@
         <translation>Choisir la projection en perspective</translation>
     </message>
     <message>
+        <source>MNU_SVTK_STEREO_MODE</source>
+        <translation type="unfinished">Stereo Mode</translation>
+    </message>
+    <message>
+        <source>DSC_SVTK_STEREO_MODE</source>
+        <translation type="unfinished">Set the stereo projection type</translation>
+    </message>
+    <message>
         <source>DSC_SVTK_STYLE_SWITCH</source>
         <translation>Changer le style d&apos;intéraction</translation>
     </message>
@@ -246,7 +254,11 @@
     <message>
         <source>MNU_SVTK_ENABLE_SELECTION</source>
         <translation>Enable/Disable selection</translation>
-    </message>		
+    </message>
+    <message>
+        <source>WRN_SUPPORT_QUAD_BUFFER</source>
+        <translation type="unfinished">Graphic driver not support quad-buffer</translation>
+    </message>	
 </context>
 <context>
     <name>SVTK_FontWidget</name>
@@ -662,6 +674,42 @@ Veuillez consulter la documentation.</translation>
     <message>
         <source>BG_IMAGE_FILES</source>
         <translation>Fichiers images (*.png *.jpg *.jpeg *.bmp *.tif *.tiff *.mhd *.mha)</translation>
+    </message>
+    <message>
+        <source>ST_CRYSTALEYES</source>
+        <translation type="unfinished">Crystal Eyes</translation>
+    </message>
+    <message>
+        <source>ST_REDBLUE</source>
+        <translation type="unfinished">Red-Blue</translation>
+    </message>
+    <message>
+        <source>ST_INTERLACED</source>
+        <translation type="unfinished">Interlaced</translation>
+    </message>
+    <message>
+        <source>ST_LEFT</source>
+        <translation type="unfinished">Left</translation>
+    </message>
+    <message>
+        <source>ST_RIGHT</source>
+        <translation type="unfinished">Right</translation>
+    </message>
+    <message>
+        <source>ST_DRESDEN</source>
+        <translation type="unfinished">Dresden</translation>
+    </message>
+    <message>
+        <source>ST_ANAGLYPH</source>
+        <translation type="unfinished">Anaglyph</translation>
+    </message>
+    <message>
+        <source>ST_CHECKERBOARD</source>
+        <translation type="unfinished">Checkerboard</translation>
+    </message>
+    <message>
+        <source>ST_SPLITVIEWPORTHORIZONTAL</source>
+        <translation type="unfinished">Split View Port Horizontal</translation>
     </message>
 </context>
 </TS>

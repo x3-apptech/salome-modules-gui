@@ -159,6 +159,9 @@
     <!-- VTK viewer preferences -->
     <parameter name="background"                       value="0, 0, 0"/>
     <parameter name="projection_mode"                  value="0"/>
+    <parameter name="stereo_type"                      value="0"/>
+    <parameter name="anaglyph_filter"                  value="0"/>
+    <parameter name="enable_quad_buffer_support"       value="false"/>
     <parameter name="preselection"                     value="0"/>
     <parameter name="enable_selection"                 value="true"/>
     <parameter name="speed_value"                      value="10"/>

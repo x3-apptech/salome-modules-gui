@@ -1562,6 +1562,8 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     if( vm )
     {
       vm->setProjectionMode( resMgr->integerValue( "VTKViewer", "projection_mode", vm->projectionMode() ) );
+      vm->setStereoType( resMgr->integerValue( "VTKViewer", "stereo_type", vm->stereoType() ) );
+      vm->setAnaglyphFilter( resMgr->integerValue( "VTKViewer", "anaglyph_filter", vm->anaglyphFilter() ) );
       vm->setBackground( resMgr->backgroundValue( "VTKViewer", "background", vm->background() ) );
       vm->setTrihedronSize( resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
                             resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ) );
@@ -2258,6 +2260,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "strings", aValuesList,   mruLinkType );
   pref->setItemProperty( "indexes", anIndicesList, mruLinkType );
   // ... "MRU" preferences group <<end>>
+  // ... "Full-screen" group <<start>>
+  int fullScreenGroup = pref->addPreference( tr( "PREF_GROUP_FULL_SCREEN" ), genTab );
+  pref->setItemProperty( "columns", 2, fullScreenGroup );
+  // .... -> automatic hiding toolbars
+  pref->addPreference( tr( "PREF_FULL_SCREEN_AUTO" ), fullScreenGroup,
+                       LightApp_Preferences::Bool, "OCCViewer", "automatic_hiding" );
+  // ... "Full-screen" group <<end>>
   // .. "General" preferences tab <<end>>
 
   // .. "3D viewer" group <<start>>
@@ -2426,10 +2435,40 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                       << 1;
   pref->setItemProperty( "strings", aValuesList,   vtkProjMode );
   pref->setItemProperty( "indexes", anIndicesList, vtkProjMode );
+
+  // .... -> Stereo group
+  int vtkStereoGroup = pref->addPreference( tr( "PREF_GROUP_STEREO" ), vtkGroup);
+  pref->setItemProperty( "columns", 2, vtkStereoGroup );
+  // .... -> Stereo type
+  int vtkStereoType = pref->addPreference( tr( "PREF_STEREO_TYPE" ), vtkStereoGroup,
+                                           LightApp_Preferences::Selector, "VTKViewer", "stereo_type" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  idList.clear();
+  SVTK_Viewer::stereoData( aValuesList, idList);
+  foreach( int gid, idList ) anIndicesList << gid;
+  pref->setItemProperty( "strings", aValuesList,   vtkStereoType );
+  pref->setItemProperty( "indexes", anIndicesList, vtkStereoType );
+  // .... -> Anaglyph filter
+  int vtkAnaglyphFilter = pref->addPreference( tr( "PREF_ANAGLYPH_FILTER" ), vtkStereoGroup,
+                                               LightApp_Preferences::Selector, "VTKViewer", "anaglyph_filter" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ANAGLYPH_RED_CYAN") << tr("PREF_ANAGLYPH_YELLOW_BLUE") << tr("PREF_ANAGLYPH_GREEN_MAGENTA");
+  anIndicesList << 0                            << 1                               << 2;
+
+  pref->setItemProperty( "strings", aValuesList,   vtkAnaglyphFilter );
+  pref->setItemProperty( "indexes", anIndicesList, vtkAnaglyphFilter );
+
+  // .... -> Enable quad-buffer support
+  pref->addPreference( tr( "PREF_ENABLE_QUAD_BUFFER_SUPPORT" ), vtkStereoGroup,
+                       LightApp_Preferences::Bool, "VTKViewer", "enable_quad_buffer_support" );
+
   // .... -> background
   aValuesList.clear();
   anIndicesList.clear();
   txtList.clear();
+  idList.clear();
 #ifndef DISABLE_SALOMEOBJECT
   formats = SVTK_Viewer::backgroundData( aValuesList, idList, txtList );
 #endif
@@ -3055,6 +3094,48 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
       if( vtkVM ) vtkVM->setProjectionMode( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "stereo_type" ) )
+  {
+    int mode = resMgr->integerValue( "VTKViewer", "stereo_type", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setStereoType( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "anaglyph_filter" ) )
+  {
+    int mode = resMgr->integerValue( "VTKViewer", "anaglyph_filter", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setAnaglyphFilter( mode );
     }
 #endif
   }

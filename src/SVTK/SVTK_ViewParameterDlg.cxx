@@ -500,8 +500,8 @@ void SVTK_ViewParameterDlg::onProjectionModeChanged(int mode)
 
   vtkCamera* aCamera = myRWInteractor->getRenderer()->GetActiveCamera();
   aCamera->SetParallelProjection(aBtn == 0);
-
-  myMainWindow->activateProjectionMode(aBtn);
+  if (!myBusy)
+    myMainWindow->activateProjectionMode(!aBtn);
 
   // update view
   myRWInteractor->GetDevice()->CreateTimer(VTKI_TIMER_FIRST);

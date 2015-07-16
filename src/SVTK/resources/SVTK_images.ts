@@ -32,6 +32,10 @@
         <translation>vtk_view_perspective.png</translation>
     </message>
     <message>
+        <source>ICON_SVTK_VIEW_STEREO</source>
+        <translation>vtk_view_stereo.png</translation>
+    </message>
+    <message>
         <source>ICON_SVTK_STYLE_SWITCH</source>
         <translation>vtk_view_style_switch.png</translation>
     </message>

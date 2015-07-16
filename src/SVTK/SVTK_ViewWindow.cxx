@@ -103,6 +103,8 @@
 
 #include <OpenGLUtils_FrameBuffer.h>
 
+#include <GL/gl.h>
+
 namespace SVTK
 {
   int convertAction( const int accelAction )
@@ -183,6 +185,9 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   myInteractor->setBackgroundRole( QPalette::NoRole );//NoBackground
   myInteractor->setFocusPolicy(Qt::StrongFocus);
   myInteractor->setFocus();
+  bool isSupportQuadBuffer = SUIT_Session::session()->resourceMgr()->
+    booleanValue( "VTKViewer", "enable_quad_buffer_support", false );
+  myInteractor->getRenderWindow()->SetStereoCapableWindow((int)isSupportQuadBuffer);
   setFocusProxy(myInteractor);
   
   myUpdateRateDlg = new SVTK_UpdateRateDlg( getAction( UpdateRate ), this, "SVTK_UpdateRateDlg" );
@@ -850,13 +855,145 @@ double SVTK_ViewWindow::GetTrihedronSize() const
 
 /*!
   Sets projection mode
-  \param theMode - projection mode ( 0 - orthogonal, 1 - perspective )
+  \param theMode - projection mode ( 0 - orthogonal, 1 - perspective, 2 - stereo )
 */
 void SVTK_ViewWindow::SetProjectionMode(const int theMode)
 {
-  activateProjectionMode( theMode );
+  SVTK_Viewer* aViewer = dynamic_cast<SVTK_Viewer*>(myModel);
+
+  if ( theMode != Stereo ) {
+    aViewer->setProjectionMode(theMode);
+    bool anIsParallelMode = (theMode == Parallel);
+    vtkCamera* aCamera = getRenderer()->GetActiveCamera();
+    aCamera->SetParallelProjection(anIsParallelMode);
+    GetInteractor()->GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
+    getRenderWindow()->SetStereoRender(0);
+  }
+  else {
+    SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+    SetStereoType( aResMgr->integerValue( "VTKViewer", "stereo_type", 0 ) );
+    getRenderWindow()->SetStereoRender(1);
+  }
+  Repaint();
+
+  // update action state if method is called outside
+  QtxAction* aParallelAction = dynamic_cast<QtxAction*>( toolMgr()->action( ParallelModeId ) );
+  QtxAction* aProjectionAction = dynamic_cast<QtxAction*>( toolMgr()->action( ProjectionModeId ) );
+  QtxAction* aStereoAction = dynamic_cast<QtxAction*>( toolMgr()->action( StereoModeId ) );
+  QtxAction* aSwitchZoomingStyle = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchZoomingStyleId ) );
+  if ( theMode == Parallel && !aParallelAction->isChecked() ) {
+      aParallelAction->setChecked( true );
+	  aSwitchZoomingStyle->setEnabled(true);
+	  aStereoAction->setChecked( false );
+  }
+  if ( theMode == Projection && !aProjectionAction->isChecked() ) {
+      aProjectionAction->setChecked( true );
+	  aSwitchZoomingStyle->setEnabled(false);
+  }
+  if ( theMode == Stereo ) {
+    aStereoAction->setChecked( true );
+    if ( aParallelAction->isEnabled() ) {
+        aParallelAction->setEnabled( false );
+        aParallelAction->setChecked( false );
+        aStereoAction->setChecked( false );
+    }
+    else {
+      aParallelAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      aParallelAction->setChecked( aViewer->projectionMode() == Parallel );
+    }
+    if ( aProjectionAction->isEnabled() ) {
+      aProjectionAction->setEnabled( false );
+      aProjectionAction->setChecked( true );
+      if ( getRenderWindow()->GetStereoCapableWindow() == 1 && !isOpenGlStereoSupport() &&
+           strcmp( "CrystalEyes", getRenderWindow()->GetStereoTypeAsString() ) == 0 ){
+        SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
+      }
+    }
+    else {
+      aProjectionAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      aProjectionAction->setChecked( aViewer->projectionMode() == Projection );
+      onPerspectiveMode();
+    }
+  }
+  else {
+    if ( !aParallelAction->isEnabled() )
+      aParallelAction->setEnabled( true );
+    if ( !aProjectionAction->isEnabled() )
+      aProjectionAction->setEnabled( true );
+  }
 }
 
+/*!
+  Sets stereo type
+  \param theType - stereo type
+*/
+void SVTK_ViewWindow::SetStereoType(const int theType)
+{
+  vtkRenderWindow* aWindow = getRenderWindow();
+  switch (theType ) {
+  case CrystalEyes:
+    aWindow->SetStereoTypeToCrystalEyes();
+    break;
+  case RedBlue:
+    aWindow->SetStereoTypeToRedBlue();
+    break;
+  case Interlaced:
+    aWindow->SetStereoTypeToInterlaced();
+    break;
+  case Left:
+    aWindow->SetStereoTypeToLeft();
+    break;
+  case Right:
+    aWindow->SetStereoTypeToRight();
+    break;
+  case Dresden:
+    aWindow->SetStereoTypeToDresden();
+    break;
+  case Anaglyph:
+    aWindow->SetStereoTypeToAnaglyph();
+    break;
+  case Checkerboard:
+    aWindow->SetStereoTypeToCheckerboard();
+    break;
+  case SplitViewPortHorizontal:
+    aWindow->SetStereoTypeToSplitViewportHorizontal();
+    break;
+  }
+}
+
+/*!
+  Sets anaglyph filter
+  \param theFilter - anaglyph filter
+*/
+void SVTK_ViewWindow::SetAnaglyphFilter(const int theFilter)
+{
+  vtkRenderWindow* aWindow = getRenderWindow();
+  switch (theFilter ) {
+  case RedCyan:
+    aWindow->SetAnaglyphColorMask(4,3);
+    break;
+  case YellowBlue:
+    aWindow->SetAnaglyphColorMask(6,1);
+    break;
+  case GreenMagenta:
+    aWindow->SetAnaglyphColorMask(2,5);
+    break;
+  }
+}
+
+/*!
+  \return OpenGl stereo support
+*/
+bool SVTK_ViewWindow::isOpenGlStereoSupport() const
+{
+  GLboolean support[1];
+  glGetBooleanv (GL_STEREO, support);
+  if ( support[0] )
+    return true;
+  return false;
+}
 
 /*!
   Set the gravity center as a focal point
@@ -884,10 +1021,17 @@ void SVTK_ViewWindow::activateStartFocalPointSelection()
 
 void SVTK_ViewWindow::activateProjectionMode(int theMode)
 {
+  QtxAction* aParallelAction = dynamic_cast<QtxAction*>( toolMgr()->action( ParallelModeId ) );
+  QtxAction* aProjectionAction = dynamic_cast<QtxAction*>( toolMgr()->action( ProjectionModeId ) );
   if (theMode)
-    toolMgr()->action( ProjectionModeId )->setChecked( true );
+    aParallelAction->setChecked( true );
   else
-    toolMgr()->action( ParallelModeId )->setChecked( true );
+    aProjectionAction->setChecked( true );
+
+  if ( !aParallelAction->isEnabled() )
+    aParallelAction->setEnabled( true );
+  if ( !aProjectionAction->isEnabled() )
+    aProjectionAction->setEnabled( true );
 }
 
 /*!
@@ -1891,16 +2035,12 @@ void SVTK_ViewWindow::activateStartPointSelection( Selection_Mode theSelectionMo
 */
 void SVTK_ViewWindow::onPerspectiveMode()
 {
-  bool anIsParallelMode = toolMgr()->action( ParallelModeId )->isChecked();
-
-  // advanced zooming is not available in perspective mode
-  if( QtxAction* anAction = getAction( SwitchZoomingStyleId ) )
-    anAction->setEnabled( anIsParallelMode );
-
-  vtkCamera* aCamera = getRenderer()->GetActiveCamera();
-  aCamera->SetParallelProjection(anIsParallelMode);
-  GetInteractor()->GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
-
+  if (toolMgr()->action( ParallelModeId )->isChecked())
+    SetProjectionMode( Parallel);
+  if (toolMgr()->action( ProjectionModeId )->isChecked())
+    SetProjectionMode( Projection);
+  if (toolMgr()->action( StereoModeId )->isChecked())
+    SetProjectionMode( Stereo);
   emit transformed( this );
 }
 
@@ -2110,7 +2250,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
                            tr( "MNU_SVTK_PARALLEL_MODE" ), 0, this);
   anAction->setStatusTip(tr("DSC_SVTK_PARALLEL_MODE"));
   anAction->setCheckable(true);
-  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onPerspectiveMode()));
+  //connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onPerspectiveMode()));
   mgr->registerAction( anAction, ParallelModeId );
 
   anAction = new QtxAction(tr("MNU_SVTK_PERSPECTIVE_MODE"), 
@@ -2118,12 +2258,22 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
                            tr( "MNU_SVTK_PERSPECTIVE_MODE" ), 0, this);
   anAction->setStatusTip(tr("DSC_SVTK_PERSPECTIVE_MODE"));
   anAction->setCheckable(true);
-  connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onPerspectiveMode()));
+  //connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onPerspectiveMode()));
   mgr->registerAction( anAction, ProjectionModeId );
+
+  anAction = new QtxAction(tr("MNU_SVTK_STEREO_MODE"),
+                             theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_SVTK_VIEW_STEREO" ) ),
+                             tr( "MNU_SVTK_STEREO_MODE" ), 0, this);
+  anAction->setStatusTip(tr("DSC_SVTK_STEREO_MODE"));
+  anAction->setCheckable(true);
+  //connect(anAction, SIGNAL(toggled(bool)), this, SLOT(onPerspectiveMode()));
+  mgr->registerAction( anAction, StereoModeId );
 
   QActionGroup* aPerspectiveGroup = new QActionGroup( this );
   aPerspectiveGroup->addAction( mgr->action( ParallelModeId ) );
   aPerspectiveGroup->addAction( mgr->action( ProjectionModeId ) );
+  aPerspectiveGroup->addAction( mgr->action( StereoModeId ) );
+  connect(aPerspectiveGroup, SIGNAL(triggered(QAction*)), this, SLOT(onPerspectiveMode()));
 
   // View Parameters
   anAction = new QtxAction(tr("MNU_VIEWPARAMETERS_VIEW"), 
@@ -2298,6 +2448,7 @@ void SVTK_ViewWindow::createToolBar()
 
   mgr->append( ParallelModeId, myToolBar );
   mgr->append( ProjectionModeId, myToolBar );
+  mgr->append( StereoModeId, myToolBar );
 
   mgr->append( StartRecordingId, myRecordingToolBar );
   mgr->append( PlayRecordingId, myRecordingToolBar );

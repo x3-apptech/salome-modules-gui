@@ -27,12 +27,18 @@
 #include <QAction>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QToolBar>
+
+#include <QtxWorkstack.h>
 
 #include <STD_Application.h>
+#include <STD_TabDesktop.h>
 
 #include <SUIT_Session.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_DataBrowser.h>
+#include <SUIT_ViewWindow.h>
+#include <SUIT_ResourceMgr.h>
 
 #include "LightApp_FullScreenHelper.h"
 #include "LightApp_Application.h"
@@ -74,6 +80,35 @@ void LightApp_FullScreenHelper::switchToFullScreen() {
   if(!desktop)
     return;
   
+  STD_TabDesktop* desk = dynamic_cast<STD_TabDesktop*>( desktop );
+
+  QtxWorkstack* wgStack = desk->workstack();
+  wgStack->showActiveTabBar(false);
+  myWindowsList.clear();
+  bool isHidding = false;
+  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+  if ( resMgr )
+    isHidding = resMgr->booleanValue( "OCCViewer", "automatic_hiding", true );
+  //Hide all toolbars and inactive window
+  QList<SUIT_ViewWindow*> aWindowList = desk->windows();
+  SUIT_ViewWindow* anActiveWindow = desk->activeWindow();
+  QList<SUIT_ViewWindow*>::const_iterator it = aWindowList.begin();
+  for ( ; it!=aWindowList.end(); it++ ) {
+    QList<QToolBar*> lst = (*it)->findChildren<QToolBar*>();
+    if ( *it ) {
+      myWindowsList.push_back(*it);
+      ( *it )->hide();
+    }
+    if ( isHidding ) {
+      QList<QToolBar*>::const_iterator iter = lst.begin();
+      for ( ; iter!=lst.end(); iter++ ) {
+        (*iter)->hide();
+      }
+    }
+  }
+  if (anActiveWindow)
+    anActiveWindow->show();
+
   desktop->setWindowState(desktop->windowState() ^ Qt::WindowFullScreen);
 
   if(desktop->menuBar())
@@ -92,7 +127,7 @@ void LightApp_FullScreenHelper::switchToFullScreen() {
   myDocWidgetMap.clear();
 
   QWidget* ob = app->objectBrowser();
-  QObject* obParent = ob ? ob->parent() : 0;
+  QObject* obParent = (ob && !isHidding)? ob->parent() : 0;
 
   foreach(QDockWidget* aWidget, aDocWidgets) {
     if(aWidget && aWidget->parent() == desktop) {
@@ -153,6 +188,28 @@ void LightApp_FullScreenHelper::switchToNormalScreen() {
   
   desktop->setWindowState(desktop->windowState() ^ Qt::WindowFullScreen);
 
+  STD_TabDesktop* desk = dynamic_cast<STD_TabDesktop*>( desktop );
+
+  QtxWorkstack* wgStack = desk->workstack();
+  wgStack->showActiveTabBar(true);
+
+  bool isHidding = false;
+  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+  if ( resMgr )
+    isHidding = resMgr->booleanValue( "OCCViewer", "automatic_hiding", true );
+  //Show all toolbars and windows
+  QList<SUIT_ViewWindow*>::const_iterator itr = myWindowsList.begin();
+  for ( ; itr!=myWindowsList.end(); itr++ ) {
+    QList<QToolBar*> lst = (*itr)->findChildren<QToolBar*>();
+    if (*itr && !(*itr)->isVisible())
+      (*itr)->show();
+    if ( isHidding ) {
+      QList<QToolBar*>::const_iterator iter = lst.begin();
+      for ( ; iter!=lst.end(); iter++ ) {
+        (*iter)->show();
+      }
+    }
+  }
 
   DocWidgetMap::iterator it = myDocWidgetMap.begin();
   for( ;it != myDocWidgetMap.end() ; it++ ) {

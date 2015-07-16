@@ -200,6 +200,14 @@
         <translation>Set the perspective projection type</translation>
     </message>
     <message>
+        <source>MNU_SVTK_STEREO_MODE</source>
+        <translation>Stereo Mode</translation>
+    </message>
+    <message>
+        <source>DSC_SVTK_STEREO_MODE</source>
+        <translation>Set the stereo projection type</translation>
+    </message>
+    <message>
         <source>DSC_SVTK_STYLE_SWITCH</source>
         <translation>Interaction style switch</translation>
     </message>
@@ -246,7 +254,11 @@
     <message>
         <source>MNU_SVTK_ENABLE_SELECTION</source>
         <translation>Enable/Disable selection</translation>
-    </message>		
+    </message>
+    <message>
+        <source>WRN_SUPPORT_QUAD_BUFFER</source>
+        <translation>Graphic driver not support quad-buffer</translation>
+    </message>
 </context>
 <context>
     <name>SVTK_FontWidget</name>
@@ -662,6 +674,42 @@ Please, refer to the documentation.</translation>
     <message>
         <source>BG_IMAGE_FILES</source>
         <translation>Image files (*.png *.jpg *.jpeg *.bmp *.tif *.tiff *.mhd *.mha)</translation>
+    </message>
+    <message>
+        <source>ST_CRYSTALEYES</source>
+        <translation>Crystal Eyes</translation>
+    </message>
+    <message>
+        <source>ST_REDBLUE</source>
+        <translation>Red-Blue</translation>
+    </message>
+    <message>
+        <source>ST_INTERLACED</source>
+        <translation>Interlaced</translation>
+    </message>
+    <message>
+        <source>ST_LEFT</source>
+        <translation>Left</translation>
+    </message>
+    <message>
+        <source>ST_RIGHT</source>
+        <translation>Right</translation>
+    </message>
+    <message>
+        <source>ST_DRESDEN</source>
+        <translation>Dresden</translation>
+    </message>
+    <message>
+        <source>ST_ANAGLYPH</source>
+        <translation>Anaglyph</translation>
+    </message>
+    <message>
+        <source>ST_CHECKERBOARD</source>
+        <translation>Checkerboard</translation>
+    </message>
+    <message>
+        <source>ST_SPLITVIEWPORTHORIZONTAL</source>
+        <translation>Split View Port Horizontal</translation>
     </message>
 </context>
 </TS>

@@ -46,10 +46,9 @@ class LIGHTAPP_EXPORT LightApp_FullScreenHelper {
  private:
   typedef QMap<QDockWidget*,bool> DocWidgetMap;
   DocWidgetMap myDocWidgetMap;
-
   typedef QMap<QToolBar*, bool> ToolBarMap;
   ToolBarMap myToolBarMap;
-
+  QList<SUIT_ViewWindow*> myWindowsList;
 
   bool myStatusBarVisibility;
 

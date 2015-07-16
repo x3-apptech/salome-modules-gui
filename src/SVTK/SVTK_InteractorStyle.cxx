@@ -1200,11 +1200,6 @@ void SVTK_InteractorStyle::onFinishOperation()
 
           if( anActorCollection )
           {
-	    if( !myShiftState && 
-		anActorCollection->GetNumberOfItems () > 1 && 
-		myLastHighlitedActor.GetPointer() ) {
-	      anActorCollection->RemoveItem ( myLastHighlitedActor.GetPointer() );
-	    }	      
             anActorCollection->InitTraversal();
             while( vtkActor* aVTKActor = anActorCollection->GetNextActor() )
             {

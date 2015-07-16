@@ -139,6 +139,7 @@ SET(_other_RESOURCES
   resources/vtk_view_rotation_point.png
   resources/vtk_view_scaling.png
   resources/vtk_view_selection.png
+  resources/vtk_view_stereo.png
   resources/vtk_view_style_switch.png
   resources/vtk_view_update_rate.png
   resources/vtk_view_zooming_style_switch.png
