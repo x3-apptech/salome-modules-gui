@@ -116,12 +116,14 @@ public:
   void                setOpaqueResize( bool = true );
   bool                opaqueResize() const;
 
-  void                showActiveTabBar( bool = true );
+  void                splittersVisible( QWidget*, bool = true );
 
   void Split( QWidget* wid, const Qt::Orientation o, const SplitType type );
   void Attract( QWidget* wid1, QWidget* wid2, const bool all );
   void SetRelativePosition( QWidget* wid, const Qt::Orientation o, const double pos );
   void SetRelativePositionInSplitter( QWidget* wid, const double pos );
+
+  void                updateState();
 
 signals:
   void                windowActivated( QWidget* );
@@ -166,8 +168,9 @@ private:
 
   QtxWorkstackArea*   createArea( QWidget* ) const;
 
-  void                updateState();
   void                updateState( QSplitter* );
+
+  void                splitterVisible(QWidget*, QList<QSplitter*>&, QSplitter*, bool );
 
   void                distributeSpace( QSplitter* ) const;
 

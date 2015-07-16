@@ -84,6 +84,9 @@ bool SUIT_Desktop::event( QEvent* e )
   case QEvent::WindowDeactivate:
     emit deactivated();
     break;
+ /*case QEvent::Move:
+    emit moved();
+    break;*/
   default:
     break;
   }

@@ -151,7 +151,7 @@ public:
 	 SwitchInteractionStyleId, SwitchZoomingStyleId, 
 	 SwitchPreselectionId, SwitchSelectionId,
 	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
-	 OrthographicId, PerspectiveId,
+	 OrthographicId, PerspectiveId, StereoId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
@@ -165,8 +165,14 @@ public:
 
   enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane };
 
-  enum ProjectionType { Orthographic, Perspective };
+  enum ProjectionType { Orthographic, Perspective, Stereo };
   
+  enum StereoType { QuadBuffer, Anaglyph, RowInterlaced, ColumnInterlaced, ChessBoard, SideBySide, OverUnder, SoftPageFlip, NumberOfModes };
+
+  enum AnaglyphFilter { RedCyan, YellowBlue, GreenMagenta };
+
+  enum FocusIODType { Absolute, Relative };
+
   OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel);
   virtual ~OCCViewer_ViewWindow();
 
@@ -210,6 +216,29 @@ public:
  
   virtual int                     projectionType() const;
   virtual void                    setProjectionType( int );
+
+  virtual int                     stereoType() const;
+  virtual void                    setStereoType( const int );
+
+  virtual int                     anaglyphFilter() const;
+  virtual void                    setAnaglyphFilter( const int );
+
+  virtual void                    setStereographicFocus( const int, const double );
+  virtual int                     stereographicFocusType() const;
+  virtual double                  stereographicFocusValue() const;
+
+  virtual void                    setInterocularDistance( const int, const double );
+  virtual int                     interocularDistanceType() const;
+  virtual double                  interocularDistanceValue() const;
+
+  virtual bool                    isReverseStereo() const;
+  virtual void                    setReverseStereo( const bool );
+
+  virtual bool                    isVSync() const;
+  virtual void                    setVSync( const bool );
+
+  virtual bool                    isQuadBufferSupport() const;
+  virtual void                    setQuadBufferSupport( const bool );
 
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
@@ -304,6 +333,8 @@ public:
 protected:
   virtual QString  filter() const;
 
+  bool isOpenGlStereoSupport() const;
+
   /* Transformation selected but not started yet */
   bool transformRequested() const;
   bool setTransformRequested ( OperationType );
@@ -322,7 +353,7 @@ protected:
 
   void createActions();
   void createToolBar();
- 
+
   virtual OperationType getButtonState(QMouseEvent* theEvent, int theInteractionStyle);
 
   viewAspect getViewParams() const;

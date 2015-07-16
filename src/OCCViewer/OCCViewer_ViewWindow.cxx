@@ -35,8 +35,6 @@
 #include "OCCViewer_CubeAxesDlg.h"
 #include "OCCViewer_ClippingDlg.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
 #include <SUIT_ViewManager.h>
@@ -49,7 +47,7 @@
 #include <QtxMultiAction.h>
 #include <QtxRubberBand.h>
 
-#include <OpenGLUtils_FrameBuffer.h>
+#include <Basics_OCCTVersion.hxx>
 
 #include <QPainter>
 #include <QTime>
@@ -70,10 +68,20 @@
 #include <GProp_GProps.hxx>
 #include <TopoDS.hxx>
 
+#include <Graphic3d_SequenceOfHClipPlane.hxx>
+#include <Graphic3d_ClipPlane.hxx>
+#include <OpenGl_GraphicDriver.hxx>
+#include <OpenGLUtils_FrameBuffer.h>
+
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
 #include <Graphic3d_MapOfStructure.hxx>
 #include <Graphic3d_Structure.hxx>
 #include <Graphic3d_ExportFormat.hxx>
+#if OCC_VERSION_LARGE > 0x06090000
+#include <Graphic3d_StereoMode.hxx>
+#include <Graphic3d_RenderingParams.hxx>
+#endif
+
 
 #include <Visual3d_View.hxx>
 #include <V3d_Plane.hxx>
@@ -83,9 +91,6 @@
 #include <gp_Pln.hxx>
 #include <gp_GTrsf.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
-
-#include <Graphic3d_SequenceOfHClipPlane.hxx>
-#include <Graphic3d_ClipPlane.hxx>
 
 #include <Image_PixMap.hxx>
 
@@ -104,6 +109,12 @@ static QEvent* l_mbPressEvent = 0;
 #endif
 
 #include <GL/gl.h>
+
+// To avoid conflict between KeyPress from the X.h (define KeyPress 2)
+// and QEvent::KeyPress (qevent.h)
+#ifdef KeyPress
+#undef KeyPress
+#endif
 
 const char* imageZoomCursor[] = {
 "32 32 3 1",
@@ -252,7 +263,6 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myCursorIsHand = false;
 
   clearViewAspects();
-
 }
 
 /*!
@@ -1292,11 +1302,22 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setCheckable(true);
   //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
   toolMgr()->registerAction( aAction, PerspectiveId );
-
+#if OCC_VERSION_LARGE > 0x06090000
+  // - stereo projection
+  aAction = new QtxAction(tr("MNU_STEREO_MODE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_STEREO" ) ),
+                          tr( "MNU_STEREO_MODE" ), 0, this);
+  aAction->setStatusTip(tr("DSC_STEREO_MODE"));
+  aAction->setCheckable(true);
+  toolMgr()->registerAction( aAction, StereoId );
+  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
+#endif
   // - add exclusive action group
   QActionGroup* aProjectionGroup = new QActionGroup( this );
   aProjectionGroup->addAction( toolMgr()->action( OrthographicId ) );
   aProjectionGroup->addAction( toolMgr()->action( PerspectiveId ) );
+#if OCC_VERSION_LARGE > 0x06090000
+  aProjectionGroup->addAction( toolMgr()->action( StereoId ) );
+#endif
   connect(aProjectionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onProjectionType()));
 
   // Reset
@@ -1481,6 +1502,7 @@ void OCCViewer_ViewWindow::createToolBar()
 
     toolMgr()->append( OrthographicId, tid );
     toolMgr()->append( PerspectiveId, tid );
+    toolMgr()->append( StereoId, tid );
 
     toolMgr()->append( ResetId, tid );
   }
@@ -1628,7 +1650,14 @@ void OCCViewer_ViewWindow::onResetView()
 void OCCViewer_ViewWindow::onProjectionType()
 {
   emit vpTransformationStarted( PROJECTION );
-  setProjectionType( toolMgr()->action( OrthographicId )->isChecked() ? Orthographic : Perspective );
+  if (toolMgr()->action( OrthographicId )->isChecked())
+    setProjectionType( Orthographic);
+  if (toolMgr()->action( PerspectiveId )->isChecked())
+    setProjectionType( Perspective);
+#if OCC_VERSION_LARGE > 0x06090000
+  if (toolMgr()->action( StereoId )->isChecked())
+    setProjectionType( Stereo);
+#endif
   emit vpTransformationFinished( PROJECTION );
 }
 
@@ -2793,13 +2822,81 @@ void OCCViewer_ViewWindow::setProjectionType( int mode )
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
-    aCamera->SetProjectionType( mode == Perspective ? Graphic3d_Camera::Projection_Perspective : Graphic3d_Camera::Projection_Orthographic );
+    if (mode == Perspective) {
+      myModel->setProjectionType(Perspective);
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
+    }
+    if (mode == Orthographic) {
+      myModel->setProjectionType(Orthographic);
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Orthographic );
+    }
+  #if OCC_VERSION_LARGE > 0x06090000
+    if (mode == Stereo) {
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
+      SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+      setStereoType( aResMgr->integerValue( "OCCViewer", "stereo_type", 0 ) );
+      setAnaglyphFilter( aResMgr->integerValue( "OCCViewer", "anaglyph_filter", 0 ) );
+      setReverseStereo( aResMgr->booleanValue( "OCCViewer", "reverse_stereo", false ) );
+      setVSync( aResMgr->booleanValue( "OCCViewer", "enable_vsync", true ) );
+      setQuadBufferSupport( aResMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", false ) );
+    }
+  #endif
+    aView3d->Redraw();
     onViewFitAll();
   }
   // update action state if method is called outside
-  QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( mode == Orthographic ? OrthographicId : PerspectiveId ) );
-  if ( ! a->isChecked() )
-    a->setChecked( true );
+  QtxAction* anOrthographicAction = dynamic_cast<QtxAction*>( toolMgr()->action( OrthographicId ) );
+  QtxAction* aPerspectiveAction = dynamic_cast<QtxAction*>( toolMgr()->action( PerspectiveId ) );
+#if OCC_VERSION_LARGE > 0x06090000
+  QtxAction* aStereoAction = dynamic_cast<QtxAction*>( toolMgr()->action( StereoId ) );
+#endif
+  if ( mode == Orthographic && !anOrthographicAction->isChecked() ) {
+	  anOrthographicAction->setChecked( true );
+    #if OCC_VERSION_LARGE > 0x06090000
+	  aStereoAction->setChecked( false );
+    #endif
+  }
+  if ( mode == Perspective && !aPerspectiveAction->isChecked() ) {
+	  aPerspectiveAction->setChecked( true );
+    #if OCC_VERSION_LARGE > 0x06090000
+	  aStereoAction->setChecked( false );
+    #endif
+  }
+#if OCC_VERSION_LARGE > 0x06090000
+  if ( mode == Stereo ) {
+    aStereoAction->setChecked( true );
+    if ( anOrthographicAction->isEnabled() ) {
+      anOrthographicAction->setEnabled( false );
+      anOrthographicAction->setChecked( false );
+      aStereoAction->setChecked( false );
+    }
+    else {
+      anOrthographicAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      anOrthographicAction->setChecked(myModel->projectionType() == Orthographic);
+    }
+    if ( aPerspectiveAction->isEnabled() ) {
+      aPerspectiveAction->setEnabled( false );
+      aPerspectiveAction->setChecked( true );
+    #if OCC_VERSION_LARGE > 0x06090000
+      if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer )
+        SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
+    #endif
+    }
+    else {
+      aPerspectiveAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      aPerspectiveAction->setChecked(myModel->projectionType() == Perspective);
+      onProjectionType();
+    }
+  }
+  else {
+    if ( !anOrthographicAction->isEnabled() )
+      anOrthographicAction->setEnabled( true );
+    if ( !aPerspectiveAction->isEnabled() )
+      aPerspectiveAction->setEnabled( true );
+  }
+#endif
 }
 
 int OCCViewer_ViewWindow::projectionType() const
@@ -2808,9 +2905,234 @@ int OCCViewer_ViewWindow::projectionType() const
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
-    mode = aCamera->ProjectionType() == Graphic3d_Camera::Projection_Perspective ? Perspective : Orthographic;
+    if (aCamera->ProjectionType() == Graphic3d_Camera::Projection_Perspective)
+      mode = Perspective;
+    if (aCamera->ProjectionType() == Graphic3d_Camera::Projection_Orthographic)
+      mode = Orthographic;
+  #if OCC_VERSION_LARGE > 0x06090000
+    if (aCamera->ProjectionType() == Graphic3d_Camera::Projection_Stereo)
+      mode = Stereo;
+  #endif
   }
   return mode;
+}
+
+void OCCViewer_ViewWindow::setStereoType( int type )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    aParams->StereoMode = (Graphic3d_StereoMode)type;
+  #endif
+  }
+}
+
+int OCCViewer_ViewWindow::stereoType() const
+{
+  int type = QuadBuffer;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    type = (OCCViewer_ViewWindow::StereoType)aParams->StereoMode;
+  #endif
+  }
+  return type;
+}
+
+void OCCViewer_ViewWindow::setAnaglyphFilter( int type )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    if (type == RedCyan)
+      aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_RedCyan_Optimized;
+    if (type == YellowBlue)
+      aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_YellowBlue_Optimized;
+    if (type == GreenMagenta)
+      aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_GreenMagenta_Simple;
+  #endif
+  }
+}
+
+int OCCViewer_ViewWindow::anaglyphFilter() const
+{
+  int type = RedCyan;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    if (aParams->AnaglyphFilter == Graphic3d_RenderingParams::Anaglyph_RedCyan_Optimized)
+      type = RedCyan;
+    if (aParams->AnaglyphFilter == Graphic3d_RenderingParams::Anaglyph_YellowBlue_Optimized)
+      type = YellowBlue;
+    if (aParams->AnaglyphFilter == Graphic3d_RenderingParams::Anaglyph_GreenMagenta_Simple)
+      type = GreenMagenta;
+  #endif
+  }
+  return type;
+}
+
+void OCCViewer_ViewWindow::setStereographicFocus( int type, double value )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    aCamera->SetZFocus( (Graphic3d_Camera::FocusType) type, value );
+  #endif
+  }
+}
+
+int OCCViewer_ViewWindow::stereographicFocusType() const
+{
+  int type = Relative;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    type = (OCCViewer_ViewWindow::FocusIODType)aCamera->ZFocusType();
+  #endif
+  }
+  return type;
+}
+
+double OCCViewer_ViewWindow::stereographicFocusValue() const
+{
+  double value = 1.0;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    value = aCamera->ZFocus();
+  #endif
+  }
+  return value;
+}
+
+void OCCViewer_ViewWindow::setInterocularDistance( int type, double value )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    aCamera->SetIOD( (Graphic3d_Camera::IODType) type, value );
+  #endif
+  }
+}
+
+int OCCViewer_ViewWindow::interocularDistanceType() const
+{
+  int type = Relative;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    type = (OCCViewer_ViewWindow::FocusIODType)aCamera->GetIODType();
+  #endif
+  }
+  return type;
+}
+
+double OCCViewer_ViewWindow::interocularDistanceValue() const
+{
+  double value = 0.05;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    value = aCamera->IOD();
+  #endif
+  }
+  return value;
+}
+
+void OCCViewer_ViewWindow::setReverseStereo( bool reverse )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    aParams->ToReverseStereo = reverse;
+  #endif
+  }
+}
+
+bool OCCViewer_ViewWindow::isReverseStereo() const
+{
+  int reverse = false;
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
+    reverse = aParams->ToReverseStereo;
+  #endif
+  }
+  return reverse;
+}
+
+void OCCViewer_ViewWindow::setVSync( bool enable )
+{
+  Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
+  if ( !anIntCont.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    aCaps->swapInterval = enable;
+  #endif
+  }
+}
+
+bool OCCViewer_ViewWindow::isVSync() const
+{
+  int enable = true;
+  Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
+  if ( !anIntCont.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    enable = aCaps->swapInterval;
+  #endif
+  }
+  return enable;
+}
+
+void OCCViewer_ViewWindow::setQuadBufferSupport( bool enable )
+{
+  Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
+  if ( !anIntCont.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    aCaps->contextStereo = enable;
+  #endif
+  }
+}
+
+bool OCCViewer_ViewWindow::isQuadBufferSupport() const
+{
+  int enable = true;
+  Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
+  if ( !anIntCont.IsNull() ) {
+  #if OCC_VERSION_LARGE > 0x06090000
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    enable = aCaps->contextStereo;
+  #endif
+  }
+  return enable;
+}
+
+
+bool OCCViewer_ViewWindow::isOpenGlStereoSupport() const
+{
+  GLboolean support[1];
+  glGetBooleanv (GL_STEREO, support);
+  if ( support[0] )
+    return true;
+  return false;
 }
 
 // obsolete

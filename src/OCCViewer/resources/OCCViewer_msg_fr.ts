@@ -312,6 +312,18 @@
         <source>DSC_PERSPECTIVE_MODE</source>
         <translation>Choisir la projection en perspective</translation>
     </message>
+    <message>
+        <source>MNU_STEREO_MODE</source>
+        <translation type="unfinished">Stereo projection</translation>
+    </message>
+    <message>
+        <source>DSC_STEREO_MODE</source>
+        <translation type="unfinished">Set the stereo projection type</translation>
+    </message>
+    <message>
+        <source>WRN_SUPPORT_QUAD_BUFFER</source>
+        <translation type="unfinished">Graphic driver not support quad-buffer</translation>
+    </message>
 </context>
 <context>
     <name>OCCViewer_CreateRestoreViewDlg</name>
@@ -443,6 +455,34 @@
     <message>
         <source>BG_IMAGE_FILES</source>
         <translation>Fichiers images (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+    </message>
+    <message>
+        <source>ST_QUADBUFFER</source>
+        <translation type="unfinished">Shutter glasses (OpenGL quad-buffer)</translation>
+    </message>
+    <message>
+        <source>ST_ANAGLYPH</source>
+        <translation type="unfinished">Anaglyph</translation>
+    </message>
+    <message>
+        <source>ST_ROWINTERLACED</source>
+        <translation type="unfinished">Row-interlaced</translation>
+    </message>
+    <message>
+        <source>ST_COLUMNINTERLACED</source>
+        <translation type="unfinished">Column-interlaced</translation>
+    </message>
+    <message>
+        <source>ST_CHESSBOARD</source>
+        <translation type="unfinished">Chess-board stereo for DLP TVs</translation>
+    </message>
+    <message>
+        <source>ST_SIDEBYSIDE</source>
+        <translation type="unfinished">Horizontal-anamorphic (side-by-side)</translation>
+    </message>
+    <message>
+        <source>ST_OVERUNDER</source>
+        <translation type="unfinished">Vertical-anamorphic (Half OverUnder)</translation>
     </message>
 </context>
 <context>

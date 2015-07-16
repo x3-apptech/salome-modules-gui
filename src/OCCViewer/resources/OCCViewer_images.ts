@@ -147,5 +147,9 @@
         <source>ICON_OCCVIEWER_PERSPECTIVE</source>
         <translation>occ_view_perspective.png</translation>
     </message>
+    <message>
+        <source>ICON_OCCVIEWER_STEREO</source>
+        <translation>occ_view_stereo.png</translation>
+    </message>
 </context>
 </TS>
