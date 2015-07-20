@@ -18,53 +18,59 @@
 //
 // Author: Adrien Bruneton (CEA)
 
-#include "PVViewer_EngineWrapper.h"
+#include "PVServer_ServiceWrapper.h"
 #include <Utils_SALOME_Exception.hxx>
 
-#include <SUIT_Session.h>
 #include <PyInterp_Utils.h>
 
-class PVViewer_EngineWrapper::Private
+class PVServer_ServiceWrapper::Private
 {
 public:
-  PyObjWrapper pvserverEngine;
+  // Borrowed reference to the Python object representing the service
+  PyObject* pvserverService;
 };
 
-PVViewer_EngineWrapper * PVViewer_EngineWrapper::instance = NULL;
+PVServer_ServiceWrapper * PVServer_ServiceWrapper::instance = NULL;
 
-PVViewer_EngineWrapper * PVViewer_EngineWrapper::GetInstance()
+PVServer_ServiceWrapper * PVServer_ServiceWrapper::GetInstance()
 {
   if (!instance)
-    instance = new PVViewer_EngineWrapper();
+    instance = new PVServer_ServiceWrapper();
   return instance;
 }
 
-PVViewer_EngineWrapper::PVViewer_EngineWrapper()
+PVServer_ServiceWrapper::PVServer_ServiceWrapper()
 {
   myData = new Private;
   PyLockWrapper lock;
-  const char* code = "import PVSERVER_utils as pa;__enginePVSERVER=pa.getEngine()";
-  int ret = PyRun_SimpleString(const_cast<char*>(code));
+#ifdef GUI_DISABLE_CORBA
+  const char* code = "import PVSERVER_impl as pi;__servicePVSERVER=pi.PVSERVER_Impl()";
+#else
+  const char* code = "import PVSERVER_utils as pa;__servicePVSERVER=pa.getService()";
+#endif
 
+  int ret = PyRun_SimpleString(const_cast<char*>(code));
   if (ret == -1)
-    throw SALOME_Exception("Unable to retrieve PVSERVER engine!");
+    throw SALOME_Exception("Unable to retrieve PVSERVER service!");
 
   // Now get the reference to __engine and save the pointer.
+  // All the calls below returns *borrowed* references
   PyObject* main_module = PyImport_AddModule((char*)"__main__");
   PyObject* global_dict = PyModule_GetDict(main_module);
-  PyObjWrapper tmp(PyDict_GetItemString(global_dict, "__enginePVSERVER"));
-  myData->pvserverEngine = tmp;
+  PyObject* tmp = PyDict_GetItemString(global_dict, "__servicePVSERVER");
+  myData->pvserverService = tmp;
 }
 
-PVViewer_EngineWrapper::~PVViewer_EngineWrapper()
+PVServer_ServiceWrapper::~PVServer_ServiceWrapper()
 {
+  StopPVServer();
   delete myData;
 }
 
-bool PVViewer_EngineWrapper::GetGUIConnected()
+bool PVServer_ServiceWrapper::GetGUIConnected()
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverEngine, (char*)("GetGUIConnected"), NULL));
+  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverService, (char*)("GetGUIConnected"), NULL));
   if (!obj)
     {
       PyErr_Print();
@@ -73,11 +79,11 @@ bool PVViewer_EngineWrapper::GetGUIConnected()
   return PyObject_IsTrue(obj);
 }
 
-void PVViewer_EngineWrapper::SetGUIConnected(bool isConnected)
+void PVServer_ServiceWrapper::SetGUIConnected(bool isConnected)
 {
   PyLockWrapper lock;
 
-  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverEngine, (char*)("SetGUIConnected"),
+  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverService, (char*)("SetGUIConnected"),
                                        (char *)"i", (int)isConnected ) );
   if (!obj)
     {
@@ -86,29 +92,29 @@ void PVViewer_EngineWrapper::SetGUIConnected(bool isConnected)
     }
 }
 
-std::string PVViewer_EngineWrapper::FindOrStartPVServer(int port)
+std::string PVServer_ServiceWrapper::FindOrStartPVServer(int port)
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverEngine, (char*)("FindOrStartPVServer"),
+  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverService, (char*)("FindOrStartPVServer"),
                                          (char *)"i", port ) );
   if (!obj)
     {
       PyErr_Print();
       throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
-  char * s = PyString_AsString(obj);
-
-  return std::string(s);
+  return std::string(PyString_AsString(obj));
 }
 
-void PVViewer_EngineWrapper::PutPythonTraceStringToEngine(const char * str)
+
+bool PVServer_ServiceWrapper::StopPVServer()
 {
   PyLockWrapper lock;
-  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverEngine, (char*)("PutPythonTraceStringToEngine"),
-                                       (char *)"s",  str) );
+  PyObjWrapper obj(PyObject_CallMethod(myData->pvserverService, (char*)("StopPVServer"), NULL ));
   if (!obj)
     {
       PyErr_Print();
       throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
+  return PyObject_IsTrue(obj);
 }
+

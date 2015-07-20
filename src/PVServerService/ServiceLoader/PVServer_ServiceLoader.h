@@ -18,43 +18,33 @@
 //
 // Author: Adrien Bruneton (CEA)
 
-#ifndef PVViewer_VIEWMANAGER_H
-#define PVViewer_VIEWMANAGER_H
+#ifndef PVSERVERSERVICELOADER_H_
+#define PVSERVERSERVICELOADER_H_
 
-#include "PVViewer.h"
+#include "PVServerService.h"
 
-#include <SUIT_ViewManager.h>
+#include <SALOME_ContainerManager.hxx>
 
-class SUIT_Desktop;
-class SUIT_Study;
-class SUIT_ViewWindow;
-class LogWindow;
-class PVServer_ServiceWrapper;
-class QMainWindow;
+class SALOME_LifeCycleCORBA;
+class SALOME_NamingService;
 
-class PVVIEWER_EXPORT PVViewer_ViewManager : public SUIT_ViewManager
+class PVSERVERSERVICE_EXPORT PVServer_ServiceLoader
 {
-  Q_OBJECT
-
 public:
-  PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop*, LogWindow *);
-  ~PVViewer_ViewManager() {}
+  PVServer_ServiceLoader();
+  virtual ~PVServer_ServiceLoader();
 
-  //! Get the CORBA engine wrapper.
-  static PVServer_ServiceWrapper * GetService();
-
-  //! Get PVViewer configuration path as stored by SALOME's resource manager:
-  static QString GetPVConfigPath();
-
-  //! Connect to the external PVServer, using the PARAVIS engine to launch it if it is not
-  //! already up.
-  static bool   ConnectToExternalPVServer(QMainWindow* aDesktop);
-
-protected slots:
-  void onWindowActivated(SUIT_ViewWindow*);
+  //! Get the IOR of the CORBA service handling the PVServer
+  std::string findOrLoadService(const char * containerName);
 
 private:
-  SUIT_Desktop * desktop;
+  std::string findService(const char * containerName);
+  std::string loadService(const char * containerName);
+
+  SALOME_LifeCycleCORBA * _lcc;
+  CORBA::ORB_ptr _orb;
+  SALOME_NamingService * _ns;
+  Engines::ContainerManager_ptr _cm;
 };
 
-#endif
+#endif /* PVSERVERSERVICELOADER_H_ */

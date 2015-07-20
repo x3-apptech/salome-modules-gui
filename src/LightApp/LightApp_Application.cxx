@@ -755,10 +755,7 @@ void LightApp_Application::createActions()
   createActionForViewer( NewGraphicsViewId, newWinMenu, QString::number( 5 ), Qt::ALT+Qt::Key_C );
 #endif
 #ifndef DISABLE_PVVIEWER
-  QStringList aModuleNames;
-  modules( aModuleNames, false );
-  if ( aModuleNames.contains( "ParaViS", Qt::CaseInsensitive ) )
-    createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
+  createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
 #endif
 #ifndef DISABLE_PYVIEWER
   createActionForViewer( NewPyViewerId, newWinMenu, QString::number( 7 ), Qt::ALT+Qt::Key_Y );

@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/Event
   ${PROJECT_SOURCE_DIR}/src/PyInterp
+  ${PROJECT_SOURCE_DIR}/src/PVServerService
   ${CMAKE_SOURCE_DIR}/src/LogWindow
   )
 
@@ -44,6 +45,7 @@ SET(_link_LIBRARIES
   PyInterp  
   suit 
   Event 
+  PVServerService
   pqApplicationComponents
   vtkRenderingFreeTypeOpenGL
   )
@@ -63,7 +65,6 @@ SET(_moc_HEADERS
 SET(_other_HEADERS
   PVViewer.h
   PVViewer_LogWindowAdapter.h
-  PVViewer_EngineWrapper.h
   PVViewer_Core.h
 )
 # header files / to install
@@ -92,7 +93,6 @@ SET(_other_SOURCES
   PVViewer_LogWindowAdapter.cxx
   PVViewer_Behaviors.cxx
   PVViewer_GUIElements.cxx
-  PVViewer_EngineWrapper.cxx
   PVViewer_Core.cxx
   )
   
