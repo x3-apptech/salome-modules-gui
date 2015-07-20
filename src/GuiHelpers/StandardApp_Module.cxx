@@ -169,14 +169,17 @@ void StandardApp_Module::addActionInMenubar(int actionId, int menuId) {
  * Add the specified action as an item in the popup menu, with the
  * specified visible rule. The default is "visible for object browser".
  */
-void StandardApp_Module::addActionInPopupMenu(int actionId,const QString& rule) {
+void StandardApp_Module::addActionInPopupMenu(int actionId,const QString& menus,const QString& rule) {
   // _GBO_ for a fine customization of the rule (for example with a
   // test on the type of the selected object), see the LIGTH module:
   // implement "LightApp_Selection*    createSelection() const;"
   int parentId = -1;
   QtxPopupMgr* mgr = this->popupMgr();
   this->action( actionId )->setIconVisibleInMenu(true);
-  mgr->insert ( this->action( actionId ), parentId, 0 );
+  if (! menus.isEmpty())
+    mgr->insert ( this->action( actionId ), menus, parentId, 0 );
+  else
+    mgr->insert ( this->action( actionId ), parentId, 0 );
   mgr->setRule( this->action( actionId ), rule, QtxPopupMgr::VisibleRule );
 }
 
