@@ -70,7 +70,6 @@ public:
   enum { MenuToolsId = 5 };
   enum { DumpStudyId = LightApp_Application::UserID, LoadScriptId, PropertiesId,
          CatalogGenId, RegDisplayId, SaveGUIStateId, ConnectId, DisconnectId,
-         SimanCheckInId, SimanLocalCheckInId,
          UserID };
 
   typedef enum { WT_NoteBook = LightApp_Application::WT_User,
@@ -95,7 +94,7 @@ public:
   virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );
 
   virtual bool                        checkDataObject(LightApp_DataObject* theObj);
-  
+
   virtual bool                        checkExistingDoc();
 
   static CORBA::ORB_var               orb();
@@ -118,7 +117,7 @@ public:
 
   virtual bool                        renameAllowed( const QString& ) const;
   virtual bool                        renameObject( const QString&, const QString& );
-  
+
 public slots:
   virtual void                        onLoadDoc();
   virtual void                        onNewWithScript();
@@ -137,16 +136,13 @@ public slots:
                                                       const QString& theStudyName,
                                                       bool theIsStudySaved );
 
-  virtual void                        onCheckIn();
-  virtual void                        onLocalCheckIn();
-
   virtual void                        onDockWindowVisibilityChanged( bool );
 
 protected slots:
   void                                onStudyCreated( SUIT_Study* );
   void                                onStudyOpened( SUIT_Study* );
   void                                onDesktopMessage( const QString& );
-  
+
 protected:
   virtual void                        createActions();
   virtual SUIT_Study*                 createNewStudy();
@@ -198,12 +194,11 @@ private:
   QPointer<SalomeApp_NoteBook>        myNoteBook;        // Notebook instance
 #endif
   QMap<QString, QAction*>             myExtActions;      // Map <AttributeUserID, QAction>
-  bool                                myIsSiman;         // application corresponds to the siman study flag
   bool                                myIsCloseFromExit; // "Close from Exit" flag
 
 signals:
-  void                                dumpedStudyClosed( const QString& theDumpScript, 
-                                                         const QString& theStudyName, 
+  void                                dumpedStudyClosed( const QString& theDumpScript,
+                                                         const QString& theStudyName,
                                                          bool theIsStudySaved );
   void                                notebookVarUpdated( QString theVarName );
 

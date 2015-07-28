@@ -387,30 +387,6 @@ Do you want to reload it ?</translation>
         <translation>Load &amp;Script...</translation>
     </message>
     <message>
-        <source>TOT_SIMAN_CHECK_IN</source>
-        <translation>Check In</translation>
-    </message>
-    <message>
-        <source>MEN_SIMAN_CHECK_IN</source>
-        <translation>Check In</translation>
-    </message>
-    <message>
-        <source>PRP_SIMAN_CHECK_IN</source>
-        <translation>Check In</translation>
-    </message>
-    <message>
-        <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
-        <translation>Check In for module</translation>
-    </message>
-    <message>
-        <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
-        <translation>Check In for module</translation>
-    </message>
-    <message>
-        <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
-        <translation>Check In for module</translation>
-    </message>
-    <message>
         <source>DISCONNECT_CAPTION</source>
         <translation>Disconnect active study</translation>
     </message>
@@ -460,15 +436,15 @@ Do you want to reload it ?</translation>
     <message>
         <source>PRP_DATE_MODIF</source>
         <translation>Date</translation>
-    </message>        
+    </message>
     <message>
         <source>PRP_UNITS</source>
         <translation>Length units</translation>
-   </message>			    
+   </message>
     <message>
         <source>PRP_COMMENT</source>
         <translation>Comment</translation>
-   </message>			       
+   </message>
     <message>
         <source>PRP_NO</source>
         <translation>No</translation>
@@ -483,8 +459,8 @@ Do you want to reload it ?</translation>
     </message>
     <message>
             <source>PRP_NOT_MODIFIED</source>
-	    <translation>Not modified</translation>
-    </message>			    
+            <translation>Not modified</translation>
+    </message>
     <message>
         <source>PRP_DATE</source>
         <translation>Creation date</translation>
