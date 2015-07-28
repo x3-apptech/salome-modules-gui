@@ -386,30 +386,6 @@
       <translation>スクリプト読込み(&amp;S)</translation>
     </message>
     <message>
-      <source>TOT_SIMAN_CHECK_IN</source>
-      <translation>チェックイン</translation>
-    </message>
-    <message>
-      <source>MEN_SIMAN_CHECK_IN</source>
-      <translation>チェックイン</translation>
-    </message>
-    <message>
-      <source>PRP_SIMAN_CHECK_IN</source>
-      <translation>チェックイン</translation>
-    </message>
-    <message>
-      <source>TOT_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>モジュールにチェックイン</translation>
-    </message>
-    <message>
-      <source>MEN_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>モジュールにチェックイン</translation>
-    </message>
-    <message>
-      <source>PRP_SIMAN_LOCAL_CHECK_IN</source>
-      <translation>モジュールにチェックイン</translation>
-    </message>
-    <message>
       <source>DISCONNECT_CAPTION</source>
       <translation>アクティブスタディの切断</translation>
     </message>
