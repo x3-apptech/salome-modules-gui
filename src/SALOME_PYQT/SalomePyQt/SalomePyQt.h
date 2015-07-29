@@ -37,7 +37,9 @@
 #include <SalomeApp_Application.h>
 #endif
 #include <LightApp_Preferences.h>
+#ifndef DISABLE_PLOT2DVIEWER
 #include <Plot2d_ViewFrame.h>
+#endif
 
 class LightApp_SelectionMgr;
 class QMenuBar;
@@ -46,7 +48,9 @@ class QWidget;
 class QAction;
 class QTreeView;
 class QtxActionGroup;
+#ifndef DISABLE_PLOT2DVIEWER
 class Plot2d_Curve;
+#endif
 
 class SALOME_Selection : public QObject
 {
@@ -125,6 +129,7 @@ enum Action {
   SplitAt      = 2  //!< the view area is splitted in such a way, that specified view and all views which follow it, are moved to the new area
 };
 
+#ifndef DISABLE_PLOT2DVIEWER
 //! Type of titles in Plot3d View
 enum ObjectType
 {
@@ -136,6 +141,7 @@ enum ObjectType
   YAxis = Plot2d_ViewFrame::YAxis,
   Y2Axis = Plot2d_ViewFrame::Y2Axis
 };
+#endif
 
 enum VisibilityState 
 {
@@ -144,12 +150,14 @@ enum VisibilityState
   UnpresentableState      //!< Unpresentable object    
 };
 
+#ifndef DISABLE_PLOT2DVIEWER
 enum Axis {
   yLeft    = QwtPlot::yLeft,
   yRight   = QwtPlot::yRight,
   xBottom  = QwtPlot::xBottom,
   xTop     = QwtPlot::xTop,
 };	
+#endif
 
 class SalomePyQt
 {
@@ -286,6 +294,7 @@ public:
   static bool              moveView( const int, const int, const bool );
   static QList<int>        neighbourViews( const int );
 
+#ifndef DISABLE_PLOT2DVIEWER
   static void              displayCurve(const int, Plot2d_Curve*);
   static void              eraseCurve(const int, Plot2d_Curve*);
   static void              eraseCurve(Plot2d_Curve*);
@@ -295,6 +304,7 @@ public:
   static QList<double>     getPlot2dFitRangeByCurves(const int);
   static QList<double>     getPlot2dFitRangeCurrent(const int);
   static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax);
+#endif
 
 //  static void              initializeParaViewGUI();
   static void              processEvents();

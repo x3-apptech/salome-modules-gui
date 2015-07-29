@@ -124,17 +124,26 @@ ENDMACRO(PYQT4_WRAP_UIC)
 #   - Output files are generated in the current build directory.
 #   - This version of macro requires class(es) definition in the 
 #     *.sip file to be started on a new line without any preceeding characters.
+# 
+# WARNING:
+#   - The macro does not properly processes sip features which are wrapped
+#     with sip conditionals.
+#   - The macro works only if one single sip module is processed
+#     (there's only one %Module directive within all input sip files).
 #
 # TODO:
 #   - Check if dependency of static sources on generated headers works properly:
 #     if header is changed, dependant sources should be recompiled.
+#   - Think how to properly process sip conditionals.
+#   - Process several sip modules.
 # 
 ####################################################################
 MACRO(PYQT4_WRAP_SIP outfiles)
+  SET(_output)
+  SET(_module_input)
   FOREACH(_input ${ARGN})
     FILE(STRINGS ${_input} _sip_modules REGEX "%Module")
     FILE(STRINGS ${_input} _sip_classes REGEX "^class ")
-    SET(_output)
     FOREACH(_sip_module ${_sip_modules})
       STRING(REGEX MATCH ".*%Module *\\( *name=.*\\).*" _mod_name "${_sip_module}")
       IF (_mod_name)
@@ -146,6 +155,7 @@ MACRO(PYQT4_WRAP_SIP outfiles)
       SET(_mod_source "sip${_mod_name}cmodule${PYQT_CXX_EXT}")
       LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
       SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_mod_source})
+      SET(_module_input ${_input})
     ENDFOREACH()
     FOREACH(_sip_class ${_sip_classes})
       STRING(REGEX MATCH ".*class +.* *:" _class_name "${_sip_class}")
@@ -159,12 +169,12 @@ MACRO(PYQT4_WRAP_SIP outfiles)
       LIST(APPEND _output ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
       SET(${outfiles} ${${outfiles}} ${CMAKE_CURRENT_BINARY_DIR}/${_class_source})
     ENDFOREACH()
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_output}
-      COMMAND ${SIP_EXECUTABLE} ${PYQT_SIPFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/${_input}
-      MAIN_DEPENDENCY ${_input}
-      )
   ENDFOREACH()
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${_output}
+    COMMAND ${SIP_EXECUTABLE} ${PYQT_SIPFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/${_module_input}
+    MAIN_DEPENDENCY ${_module_input}
+    )
 ENDMACRO(PYQT4_WRAP_SIP)
 
 
