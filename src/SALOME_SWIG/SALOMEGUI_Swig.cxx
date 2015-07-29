@@ -945,6 +945,7 @@ static void setViewParameter( int parameter, QList<double>& values ) {
     virtual void Execute() {
       if ( LightApp_Application* anApp = getApplication() ) {
 	if ( SUIT_ViewWindow* window = anApp->desktop()->activeWindow() ) {
+#ifndef DISABLE_VTKVIEWER
 	  if ( SVTK_ViewWindow* svtk = dynamic_cast<SVTK_ViewWindow*>( window ) ) {	  
 	    if ( vtkRenderer* ren = svtk->getRenderer()) {		    
 	      if ( vtkCamera* camera = ren->GetActiveCamera() ) {
@@ -981,6 +982,7 @@ static void setViewParameter( int parameter, QList<double>& values ) {
             }
 	    svtk->Repaint();
           }
+#endif
         }
       }
     }
