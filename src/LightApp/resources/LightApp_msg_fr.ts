@@ -652,6 +652,38 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation type="unfinished">Green-Magenta</translation>
     </message>
     <message>
+        <source>PREF_FOCUS_TYPE</source>
+        <translation> type="unfinished"Convergence distance type</translation>
+    </message>
+    <message>
+        <source>PREF_FOCUS_VALUE</source>
+        <translation type="unfinished">Stereographic focus value</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_TYPE</source>
+        <translation type="unfinished">IOD type</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_VALUE</source>
+        <translation type="unfinished">Interocular distance (IOD) value</translation>
+    </message>
+    <message>
+        <source>PREF_ABSOLUTE</source>
+        <translation type="unfinished">Absolute</translation>
+    </message>
+    <message>
+        <source>PREF_RELATIVE</source>
+        <translation type="unfinished">Relative</translation>
+    </message>
+    <message>
+        <source>PREF_REVERSE_STEREO</source>
+        <translation type="unfinished">Reverse stereo</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_VSYNC</source>
+        <translation type="unfinished">Enable V-Sync</translation>
+    </message>
+    <message>
         <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
         <translation type="unfinished">Enable quad-buffer support</translation>
     </message>

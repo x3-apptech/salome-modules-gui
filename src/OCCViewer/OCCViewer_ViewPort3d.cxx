@@ -615,6 +615,17 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 }
 
 /*!
+  Moved the viewport
+*/
+/*
+void OCCViewer_ViewPort3d::repaintViewAfterMove( )
+{
+  if ( !activeView().IsNull() ){
+    activeView()->MustBeResized();
+  }
+}
+*/
+/*!
   Fits all objects in view. [ virtual protected ]
 */
 void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )

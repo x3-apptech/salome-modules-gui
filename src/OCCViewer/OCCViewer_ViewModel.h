@@ -69,9 +69,17 @@ public:
     Corner3Gradient,    Corner4Gradient,
     LastGradient = Corner4Gradient
   };
+  /*! supported stereo types */
+  enum {
+    QuadBufferType,    AnaglyphType,
+    RowInterlacedType, ColumnInterlacedType,
+    ChessBoardType,    SideBySideType,
+    OverUnderType
+  };
   
   static QString           Type() { return "OCCViewer"; }
   static QString           backgroundData( QStringList&, QIntList&, QIntList& );
+  static void              stereoData( QStringList&, QIntList&);
 
   OCCViewer_Viewer( bool DisplayTrihedron = true);
   virtual ~OCCViewer_Viewer();
@@ -135,7 +143,28 @@ public:
 
   int                             projectionType() const;
   void                            setProjectionType( const int );
+  int                             stereoType() const;
+  void                            setStereoType( const int );
 
+  int                             anaglyphFilter() const;
+  void                            setAnaglyphFilter( const int );
+
+  void                            setStereographicFocus( const int, const double );
+  int                             stereographicFocusType() const;
+  double                          stereographicFocusValue() const;
+
+  void                            setInterocularDistance( const int, const double );
+  int                             interocularDistanceType() const;
+  double                          interocularDistanceValue() const;
+
+  bool                            isReverseStereo() const;
+  void                            setReverseStereo( const bool );
+
+  bool                            isVSync() const;
+  void                            setVSync( const bool );
+
+  bool                            isQuadBufferSupport() const;
+  void                            setQuadBufferSupport( const bool );
   int                             zoomingStyle() const;
   void                            setZoomingStyle( const int );
 
@@ -212,11 +241,21 @@ protected:
   int                             myInteractionStyle;
   int                             myZoomingStyle;
   int                             myProjectionType;
+  int                             myStereoType;
+  int                             myAnaglyphFilter;
+  int                             myStereographicFocusType;
+  int                             myInterocularDistanceType;
+
+  double                          myStereographicFocusValue;
+  double                          myInterocularDistanceValue;
 
   bool                            myPreselectionEnabled;
   bool                            mySelectionEnabled;
   bool                            myMultiSelectionEnabled;
   bool                            myIsRelative;
+  bool                            myToReverseStereo;
+  bool                            myVSyncMode;
+  bool                            myQuadBufferSupport;
 
   int                             myTopLayerId;
 

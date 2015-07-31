@@ -135,6 +135,7 @@ SET(_other_RESOURCES
   resources/occ_view_scaling.png
   resources/occ_view_selection.png
   resources/occ_view_shoot.png
+  resources/occ_view_stereo.png
   resources/occ_view_style_switch.png
   resources/occ_view_top.png
   resources/occ_view_triedre.png

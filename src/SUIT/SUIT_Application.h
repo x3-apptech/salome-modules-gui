@@ -118,6 +118,7 @@ public:
 signals:
   void                  applicationClosed( SUIT_Application* );
   void                  activated( SUIT_Application* );
+//  void                  moving();
   void                  infoChanged( QString );
 
 public slots:
@@ -176,6 +177,7 @@ protected:
 
 protected slots:
   virtual void          onDesktopActivated();
+//  void                  onDesktopMoved();
 
 private:
   SUIT_Study*           myStudy;
