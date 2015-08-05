@@ -16,35 +16,18 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author: Adrien Bruneton (CEA)
 
-#ifndef PVSERVERSERVICELOADER_H_
-#define PVSERVERSERVICELOADER_H_
+#ifndef PVSERVERSERVICELOADER_H
+#define PVSERVERSERVICELOADER_H
 
-#include "PVServerServiceLoader.h"
+#ifdef WIN32
+#if defined PVServerServiceLoader_EXPORTS
+#define PVSERVERSERVICELOADER_EXPORT __declspec(dllexport)
+#else
+#define PVSERVERSERVICELOADER_EXPORT __declspec(dllimport)
+#endif
+#else
+#define PVSERVERSERVICELOADER_EXPORT
+#endif
 
-#include <SALOME_ContainerManager.hxx>
-
-class SALOME_LifeCycleCORBA;
-class SALOME_NamingService;
-
-class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader
-{
-public:
-  PVServer_ServiceLoader();
-  virtual ~PVServer_ServiceLoader();
-
-  //! Get the IOR of the CORBA service handling the PVServer
-  std::string findOrLoadService(const char * containerName);
-
-private:
-  std::string findService(const char * containerName);
-  std::string loadService(const char * containerName);
-
-  SALOME_LifeCycleCORBA * _lcc;
-  CORBA::ORB_ptr _orb;
-  SALOME_NamingService * _ns;
-  Engines::ContainerManager_ptr _cm;
-};
-
-#endif /* PVSERVERSERVICELOADER_H_ */
+#endif //PVSERVERSERVICELOADER_H
