@@ -315,7 +315,9 @@ public slots:
   void activatePanning(); 
   void activateGlobalPanning(); 
 
-  void onPerspectiveMode();
+  void onProjectionMode( QAction* theAction );
+  void onStereoMode( bool activate );
+  void onProjectionMode();
 
   void activateProjectionMode(int);
 

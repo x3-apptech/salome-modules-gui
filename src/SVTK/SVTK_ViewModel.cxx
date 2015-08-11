@@ -290,7 +290,7 @@ void SVTK_Viewer::setProjectionMode( const int theMode )
 {
   if ( myProjMode != theMode ) {
     if ( theMode != SVTK_ViewWindow::Stereo )
-	  myProjMode = theMode;
+      myProjMode = theMode;
     if (SUIT_ViewManager* aViewManager = getViewManager()) {
       QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
       for ( uint i = 0; i < aViews.count(); i++ )
