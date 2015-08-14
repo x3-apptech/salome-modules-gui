@@ -1497,7 +1497,9 @@ void OCCViewer_ViewWindow::createToolBar()
 
     toolMgr()->append( OrthographicId, tid );
     toolMgr()->append( PerspectiveId, tid );
+#if OCC_VERSION_LARGE > 0x06090000
     toolMgr()->append( StereoId, tid );
+#endif
 
     toolMgr()->append( ResetId, tid );
   }
@@ -1655,8 +1657,10 @@ void OCCViewer_ViewWindow::onProjectionType( QAction* theAction )
       myModel->setProjectionType(Perspective);
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
     }
+#if OCC_VERSION_LARGE > 0x06090000
     if (toolMgr()->action( StereoId )->isChecked())
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
+#endif
     aView3d->Redraw();
     onViewFitAll();
   }
