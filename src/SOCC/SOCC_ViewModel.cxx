@@ -61,6 +61,8 @@
 #include <AIS_TypeOfIso.hxx>
 #include <Precision.hxx>
 
+#include <algorithm>
+
 // in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
 // SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from 
 // SALOMEDS::StudyManager - no linkage with SalomeApp. 
@@ -572,6 +574,11 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<i
   else
     anOCCPrs->GetObjects( anObjs );
 
+  std::list<int> sel_modes;
+  for ( int i = TopAbs_COMPOUND; i < TopAbs_SHAPE; i++ )
+    if ( std::find(modes.begin(), modes.end(), (int)TopAbs_SHAPE) != modes.end() || std::find(modes.begin(), modes.end(), i) != modes.end())
+      sel_modes.push_back(i);
+
   // Activate selection of objects from prs
   AIS_ListIteratorOfListOfInteractive aIter( anObjs );
   for ( ; aIter.More(); aIter.Next() ) {
@@ -582,13 +589,13 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<i
       if ( anAIS->IsKind( STANDARD_TYPE( AIS_Shape ) ) )
       {
         ic->Load( anAIS, -1, false );
-        for( it = modes.begin(); it != modes.end(); ++it )
+        for( it = sel_modes.begin(); it != sel_modes.end(); ++it )
           ic->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)*it ) );
       }
       else if ( anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron) )
       {
         ic->Load( anAIS, -1, false );
-        for( it = modes.begin(); it != modes.end(); ++it )
+        for( it = sel_modes.begin(); it != sel_modes.end(); ++it )
           ic->Activate( anAIS, *it );
       }
     }
