@@ -903,7 +903,8 @@ void SVTK_ViewWindow::SetProjectionMode(const int theMode)
       aProjectionAction->setEnabled( false );
       aProjectionAction->setChecked( true );
       if ( getRenderWindow()->GetStereoCapableWindow() == 1 && !isOpenGlStereoSupport() &&
-           strcmp( "CrystalEyes", getRenderWindow()->GetStereoTypeAsString() ) == 0 ){
+           strcmp( "CrystalEyes", getRenderWindow()->GetStereoTypeAsString() ) == 0 &&
+           toolMgr()->action( StereoModeId )->isChecked() ) {
         SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
       }
     }
@@ -978,6 +979,16 @@ void SVTK_ViewWindow::SetAnaglyphFilter(const int theFilter)
     aWindow->SetAnaglyphColorMask(2,5);
     break;
   }
+}
+
+/*!
+  Set support quad-buffered stereo
+  \param theEnable - enable/disable support quad-buffered stereo
+*/
+void SVTK_ViewWindow::SetQuadBufferSupport(const bool theEnable)
+{
+  vtkRenderWindow* aWindow = getRenderWindow();
+  aWindow->SetStereoCapableWindow((int)theEnable);
 }
 
 /*!
@@ -2076,6 +2087,10 @@ void SVTK_ViewWindow::onStereoMode( bool activate )
       onProjectionMode(toolMgr()->action( ProjectionModeId ));
     }
   }
+  if ( getRenderWindow()->GetStereoCapableWindow() == 1 && !isOpenGlStereoSupport() &&
+       strcmp( "CrystalEyes", getRenderWindow()->GetStereoTypeAsString() ) == 0 &&
+       toolMgr()->action( StereoModeId )->isChecked() )
+    SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
 }
 
 /*!

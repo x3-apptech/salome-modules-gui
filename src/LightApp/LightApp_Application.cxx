@@ -1576,6 +1576,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
       vm->setProjectionMode( resMgr->integerValue( "VTKViewer", "projection_mode", vm->projectionMode() ) );
       vm->setStereoType( resMgr->integerValue( "VTKViewer", "stereo_type", vm->stereoType() ) );
       vm->setAnaglyphFilter( resMgr->integerValue( "VTKViewer", "anaglyph_filter", vm->anaglyphFilter() ) );
+      vm->setQuadBufferSupport( resMgr->booleanValue( "VTKViewer", "enable_quad_buffer_support", vm->isQuadBufferSupport() ) );
       vm->setBackground( resMgr->backgroundValue( "VTKViewer", "background", vm->background() ) );
       vm->setTrihedronSize( resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
                             resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ) );
@@ -3377,6 +3378,27 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
       if( vtkVM ) vtkVM->setAnaglyphFilter( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "enable_quad_buffer_support" ) )
+  {
+    int enable = resMgr->booleanValue( "VTKViewer", "enable_quad_buffer_support", false );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setQuadBufferSupport( enable );
     }
 #endif
   }
