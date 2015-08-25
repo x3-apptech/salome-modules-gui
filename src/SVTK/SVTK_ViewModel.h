@@ -134,6 +134,12 @@ public:
   //! Sets anaglyph filter
   void setAnaglyphFilter( const int );
 
+  //! Get support quad-buffered stereo
+  bool isQuadBufferSupport() const;
+
+  //! Set support quad-buffered stereo
+  void setQuadBufferSupport( const bool );
+
   //! Gets interaction style
   int interactionStyle() const;
 
@@ -228,6 +234,7 @@ private:
   int                  myProjMode;
   int                  myStereoType;
   int                  myAnaglyphFilter;
+  bool                 myQuadBufferSupport;
   int                  myStyle;
   int                  myZoomingStyle;
   Preselection_Mode    myPreSelectionMode;

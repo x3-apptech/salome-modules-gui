@@ -1705,7 +1705,8 @@ void OCCViewer_ViewWindow::onStereoType( bool activate )
     onViewFitAll();
   }
 
-  if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer )
+  if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer &&
+       toolMgr()->action( StereoId )->isChecked() )
     SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
 #endif
 }
@@ -1776,7 +1777,8 @@ void OCCViewer_ViewWindow::setProjectionType( int mode )
     if ( aPerspectiveAction->isEnabled() ) {
       aPerspectiveAction->setEnabled( false );
       aPerspectiveAction->setChecked( true );
-      if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer )
+      if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer &&
+           toolMgr()->action( StereoId )->isChecked() )
         SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
     }
     else {
