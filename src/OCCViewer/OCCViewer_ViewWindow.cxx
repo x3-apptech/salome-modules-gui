@@ -1652,14 +1652,18 @@ void OCCViewer_ViewWindow::onProjectionType( QAction* theAction )
     if (theAction == toolMgr()->action( OrthographicId )) {
       myModel->setProjectionType(Orthographic);
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Orthographic );
+      aCamera->SetFOVy(45.0);
     }
     else if (theAction == toolMgr()->action( PerspectiveId )) {
       myModel->setProjectionType(Perspective);
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
+      aCamera->SetFOVy(30.0);
     }
 #if OCC_VERSION_LARGE > 0x06090000
-    if (toolMgr()->action( StereoId )->isChecked())
+    if (toolMgr()->action( StereoId )->isChecked()) {
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
+      aCamera->SetFOVy(30.0);
+    }
 #endif
     aView3d->Redraw();
     onViewFitAll();
