@@ -564,7 +564,7 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<i
   bool allObjects = thePrs == 0 || thePrs->IsNull();
   if ( !ic->HasOpenedContext() ) {
     ic->ClearCurrents( false );
-    ic->OpenLocalContext( allObjects, true, true );
+    ic->OpenLocalContext( Standard_False, Standard_True, Standard_True );
   }
 
   AIS_ListOfInteractive anObjs;

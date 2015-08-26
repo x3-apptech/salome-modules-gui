@@ -1240,9 +1240,9 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
   if ( on ) {
     myAISContext->Display( myTrihedron,
                            0 /*wireframe*/,
-                           0 /* selection mode */,
+                           -1 /* selection mode */,
                            Standard_True /* update viewer*/,
-                           Standard_True /* allow decomposition */,
+                           Standard_False /* allow decomposition */,
                            AIS_DS_Displayed /* display status */);
     myAISContext->Deactivate( myTrihedron );
   }
