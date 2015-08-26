@@ -29,6 +29,8 @@
 #include "LightApp_SelectionMgr.h"
 #include "LightApp_Selection.h"
 
+#include "SUIT_OverrideCursor.h"
+
 #ifndef DISABLE_SALOMEOBJECT
   #include <SALOME_ListIO.hxx>
 #endif
@@ -151,6 +153,7 @@ void LightApp_ShowHideOp::startOperation()
     objEntries.append( study->referencedToEntry( *it ) ); 
   
   if( myActionType==DISPLAY || myActionType==DISPLAY_ONLY ) {
+    SUIT_OverrideCursor wc;
     d->Display( objEntries, false, 0 );
     mgr->setSelectedObjects(selObjs);
   }
