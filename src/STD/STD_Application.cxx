@@ -356,8 +356,6 @@ bool STD_Application::onReopenDoc()
     // update views / windows / status bar / title
     clearViewManagers();
     setActiveStudy( 0 );
-    updateDesktopTitle();
-    updateCommandsStatus();
 
     // delete study
     delete study;
@@ -366,13 +364,21 @@ bool STD_Application::onReopenDoc()
     // post closing actions
     afterCloseDoc();
 
+    int aNbStudies = 0;
+    QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
+    for ( int i = 0; i < apps.count(); i++ )
+      aNbStudies += apps.at( i )->getNbStudies();
+
     // reload study from the file
     res = useFile( studyName ) && activeStudy();
 
     // if reloading is failed, close the desktop
-    if ( !res ) {
-      setDesktop( 0 );
+    if ( aNbStudies && !res )
       closeApplication();
+    else
+    {
+      updateDesktopTitle();
+      updateCommandsStatus();
     }
   }
   return res;
