@@ -94,6 +94,7 @@ SVTK_Viewer::SVTK_Viewer()
   mySpaceBtn[1] = 2;
   mySpaceBtn[2] = 9;
   myDefaultBackground = Qtx::BackgroundData( Qt::black );
+  myQuadBufferSupport = false;
 }
 
 /*!
