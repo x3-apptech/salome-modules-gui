@@ -145,6 +145,8 @@ protected:
   // after activate/deactivate modules
   QMap<QPair<int, QAction*>, QKeySequence> myActionShortcutMap; //!< copy actions shortcut map
 
+  virtual bool           abortAllOperations();
+
 private:
   CAM_Application*       myApp;             //!< parent application object
   QString                myName;            //!< module title (user name)

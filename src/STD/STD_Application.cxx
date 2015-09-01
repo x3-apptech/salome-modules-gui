@@ -324,6 +324,9 @@ void STD_Application::onOpenDoc()
 /*! \retval true, if document was opened successful, else false.*/
 bool STD_Application::onOpenDoc( const QString& aName )
 {
+  if ( !abortAllOperations() )
+    return false;
+
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
   bool res = openAction( openChoice( aName ), aName );
@@ -564,6 +567,9 @@ void STD_Application::onSaveDoc()
   if ( !activeStudy() )
     return;
 
+  if ( !abortAllOperations() )
+    return;
+
   bool isOk = false;
   if ( activeStudy()->isSaved() )
   {
@@ -597,6 +603,9 @@ bool STD_Application::onSaveAsDoc()
 {
   SUIT_Study* study = activeStudy();
   if ( !study )
+    return false;
+
+  if ( !abortAllOperations() )
     return false;
 
   bool isOk = false;
@@ -1013,3 +1022,11 @@ int STD_Application::viewManagerId( const SUIT_ViewManager* theManager) const
   return myViewMgrs.indexOf(const_cast<SUIT_ViewManager*>(theManager));
 }
 
+/*!
+  \brief Abort active operations if there are any
+  \return \c false if some operation cannot be aborted
+*/
+bool STD_Application::abortAllOperations()
+{
+  return true;
+}

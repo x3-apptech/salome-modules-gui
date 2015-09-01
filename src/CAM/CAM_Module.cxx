@@ -1134,3 +1134,9 @@ void CAM_Module::connectToStudy( CAM_Study* camStudy )
   \fn void CAM_Module::updateCommandsStatus();
   \brief Update menu/toolbar actions.
 */
+
+
+bool CAM_Module::abortAllOperations()
+{
+  return true;
+}

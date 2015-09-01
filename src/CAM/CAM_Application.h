@@ -93,6 +93,8 @@ protected:
 
   static QString      moduleLibrary( const QString&, const bool = true );
 
+  virtual bool        abortAllOperations();
+
 private:
   void                readModuleList();
 
