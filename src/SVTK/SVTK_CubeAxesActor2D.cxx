@@ -286,7 +286,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
     if ( this->FlyMode == VTK_FLY_CLOSEST_TRIAD )
       {
       // Loop over points and find the closest point to the camera
-      min = VTK_LARGE_FLOAT;
+      min = VTK_FLOAT_MAX;
       for (i=0; i < 8; i++)
         {
         if ( pts[i][2] < min )
@@ -310,7 +310,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
       double e1[2], e2[2], e3[2];
 
       // Find distance to origin
-      d2Min = VTK_LARGE_FLOAT;
+      d2Min = VTK_FLOAT_MAX;
       for (i=0; i < 8; i++)
         {
         d2 = pts[i][0]*pts[i][0] + pts[i][1]*pts[i][1];
@@ -323,7 +323,7 @@ int SVTK_CubeAxesActor2D::RenderOpaqueGeometry(vtkViewport *viewport)
 
       // find minimum slope point connected to closest point and on 
       // right side (in projected coordinates). This is the first edge.
-      minSlope = VTK_LARGE_FLOAT;
+      minSlope = VTK_FLOAT_MAX;
       for (xIdx=0, i=0; i<3; i++)
         {
         num = (pts[Conn[idx][i]][1] - pts[idx][1]);

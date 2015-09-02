@@ -67,7 +67,7 @@ SVTK_NonIsometricDlg
   QLabel* TextLabelX = new QLabel (tr("LBL_X"), aGroupBox);
   TextLabelX->setObjectName("TextLabelX");
   TextLabelX->setFixedWidth(15);
-  m_sbXcoeff = new QtxDoubleSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
+  m_sbXcoeff = new QtxDoubleSpinBox(-VTK_FLOAT_MAX, VTK_FLOAT_MAX, 0.1, aGroupBox);
   m_sbXcoeff->setMinimumWidth(80);
   m_sbXcoeff->setValue(1.0);
 
@@ -75,7 +75,7 @@ SVTK_NonIsometricDlg
   QLabel* TextLabelY = new QLabel (tr("LBL_Y"), aGroupBox);
   TextLabelY->setObjectName("TextLabelY");
   TextLabelY->setFixedWidth(15);
-  m_sbYcoeff = new QtxDoubleSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
+  m_sbYcoeff = new QtxDoubleSpinBox(-VTK_FLOAT_MAX, VTK_FLOAT_MAX, 0.1, aGroupBox);
   m_sbYcoeff->setMinimumWidth(80);
   m_sbYcoeff->setValue(1.0);
 
@@ -83,7 +83,7 @@ SVTK_NonIsometricDlg
   QLabel* TextLabelZ = new QLabel (tr("LBL_Z"), aGroupBox);
   TextLabelZ->setObjectName("TextLabelZ");
   TextLabelZ->setFixedWidth(15);
-  m_sbZcoeff = new QtxDoubleSpinBox(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT, 0.1, aGroupBox);
+  m_sbZcoeff = new QtxDoubleSpinBox(-VTK_FLOAT_MAX, VTK_FLOAT_MAX, 0.1, aGroupBox);
   m_sbZcoeff->setMinimumWidth(80);
   m_sbZcoeff->setValue(1.0);
 
