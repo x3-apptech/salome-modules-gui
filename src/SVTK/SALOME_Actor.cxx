@@ -468,7 +468,7 @@ SALOME_Actor
       }
       myHighlightActor->SetVisibility( GetVisibility() && theIsHighlight );
     }
-    myHighlightActor->SetMarkerEnabled( mySelectionMode == NodeSelection);
+    myHighlightActor->SetMarkerEnabled( mySelectionMode == NodeSelection );
   }
 
   highlight(theIsHighlight);
