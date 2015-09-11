@@ -863,3 +863,20 @@ CAM_Application::ModuleShortInfoList CAM_Application::getVersionInfo()
   }  
   return info;
 }
+
+/*!
+  \brief Abort active operations if there are any
+ 
+  Iterates through all modules and asks each of them if there are pending operations that cannot be aborted.
+ 
+  \return \c false if some operation cannot be aborted
+*/
+bool CAM_Application::abortAllOperations()
+{
+  bool aborted = true;
+  for ( QList<CAM_Module*>::const_iterator it = myModules.begin(); it != myModules.end() && aborted; ++it )
+  {
+    aborted = (*it)->abortAllOperations();
+  }
+  return aborted;
+}

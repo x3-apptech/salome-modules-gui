@@ -170,6 +170,8 @@ protected:
   virtual bool          closeDoc( bool ask = true );
   virtual bool          closeActiveDoc( bool permanently = true );
 
+  virtual bool          abortAllOperations();
+
 private:
   ViewManagerList       myViewMgrs;
   SUIT_ViewManager*     myActiveViewMgr;

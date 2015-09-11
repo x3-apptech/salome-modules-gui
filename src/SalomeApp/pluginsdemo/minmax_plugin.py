@@ -115,23 +115,20 @@ def minmax(context):
         mm = study.FindObjectID(objId).GetObject()
         mesh = None
         try:
-          mesh = mm.Load()
+          mm.Load()
+          mesh = mm
         except:
-          #print "No mesh selected"
           self.clearLineEdit()
           mesh = None
           pass
         if mesh:
+          name = smeshBuilder.GetName( mm )
           self.ui.mesh.setStyleSheet("")
-          self.ui.mesh.setText(mesh.getName())
-          #print "Mesh selected: ", mesh.getName()
+          self.ui.mesh.setText( name )
           self.mm = mm
           e = self.mm.NbEdges()
           f = self.mm.NbFaces()
           v = self.mm.NbVolumes()
-          #print "NbEdges: ",e
-          #print "NbFaces: ",f
-          #print "NbVolumes: ",v
           controls = []
           if e:
             controls += controls_1d
@@ -162,20 +159,16 @@ Inputs:
       pass
 
     def compute_minmax(self):
-      if self.mm:
-        control = self.ui.control.currentText()
-        #print "Compute control: ",control
+      control = self.ui.control.currentText()
+      if self.mm and control:
         fun = smesh.GetFunctor(controls_dict[str(control)])
-        fun.SetMesh(self.mm.GetMesh())
-        hist = fun.GetHistogram(1)
+        fun.SetMesh(self.mm)
+        hist = fun.GetHistogram(1,False)
         maxVal = hist[0].max
         minVal = hist[0].min
-        #print "Max value for %s: %f"%(control, maxVal)
-        #print "Min value for %s: %f"%(control, minVal)
         self.ui.maxvalue.setText("%f"%(maxVal))
         self.ui.minvalue.setText("%f"%(minVal))
       else:
-        print "Pas de maillage"
         pass
       pass
     pass

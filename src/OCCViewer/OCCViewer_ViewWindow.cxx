@@ -385,7 +385,9 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
               ic->HilightPreviousDetected( myViewPort->getView() );
             }
           }
-        } else {
+        }
+        else {
+          emit vpTransformationStarted ( ZOOMVIEW );
           myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
           double delta = (double)( aEvent->delta() ) / ( 15 * 8 );
           int x  = aEvent->x();
@@ -394,6 +396,7 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
           int y1 = (int)( aEvent->y() + height()*delta/100 );
           myViewPort->zoom( x, y, x1, y1 );
           myViewPort->getView()->ZFitAll();
+          emit vpTransformationFinished ( ZOOMVIEW );
         }
       }
       return true;
@@ -562,7 +565,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
     }
     /* notify that we start a transformation */
     if ( transformRequested() )
-            emit vpTransformationStarted ( myOperation );
+      emit vpTransformationStarted ( myOperation );
   }
   if ( transformRequested() )
     setTransformInProcess( true );
@@ -1292,7 +1295,6 @@ void OCCViewer_ViewWindow::createActions()
                           tr( "MNU_ORTHOGRAPHIC_MODE" ), 0, this);
   aAction->setStatusTip(tr("DSC_ORTHOGRAPHIC_MODE"));
   aAction->setCheckable(true);
-  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
   toolMgr()->registerAction( aAction, OrthographicId );
 
   // - perspective projection
@@ -1300,7 +1302,6 @@ void OCCViewer_ViewWindow::createActions()
                           tr( "MNU_PERSPECTIVE_MODE" ), 0, this);
   aAction->setStatusTip(tr("DSC_PERSPECTIVE_MODE"));
   aAction->setCheckable(true);
-  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
   toolMgr()->registerAction( aAction, PerspectiveId );
 #if OCC_VERSION_LARGE > 0x06090000
   // - stereo projection
@@ -1309,17 +1310,14 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_STEREO_MODE"));
   aAction->setCheckable(true);
   toolMgr()->registerAction( aAction, StereoId );
-  //connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onProjectionType()));
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onStereoType(bool)));
 #endif
   // - add exclusive action group
   QActionGroup* aProjectionGroup = new QActionGroup( this );
   aProjectionGroup->addAction( toolMgr()->action( OrthographicId ) );
   aProjectionGroup->addAction( toolMgr()->action( PerspectiveId ) );
-#if OCC_VERSION_LARGE > 0x06090000
-  aProjectionGroup->addAction( toolMgr()->action( StereoId ) );
-#endif
-  connect(aProjectionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onProjectionType()));
-
+  connect(aProjectionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onProjectionType(QAction*)));
+  
   // Reset
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_RESET" ) ),
                            tr( "MNU_RESET_VIEW" ), 0, this, false, "Viewers:Reset view");
@@ -1502,7 +1500,9 @@ void OCCViewer_ViewWindow::createToolBar()
 
     toolMgr()->append( OrthographicId, tid );
     toolMgr()->append( PerspectiveId, tid );
+#if OCC_VERSION_LARGE > 0x06090000
     toolMgr()->append( StereoId, tid );
+#endif
 
     toolMgr()->append( ResetId, tid );
   }
@@ -1643,22 +1643,165 @@ void OCCViewer_ViewWindow::onResetView()
 }
 
 /*!
-  \brief Perform "reset view" transformation.
+  \brief Set the given projection mode.
 
-  Sets default orientation of the viewport camera.
+  Set the given projection mode: Orthographic or Perspective.
+*/
+void OCCViewer_ViewWindow::onProjectionType( QAction* theAction )
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    if (theAction == toolMgr()->action( OrthographicId )) {
+      myModel->setProjectionType(Orthographic);
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Orthographic );
+      aCamera->SetFOVy(45.0);
+    }
+    else if (theAction == toolMgr()->action( PerspectiveId )) {
+      myModel->setProjectionType(Perspective);
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
+      aCamera->SetFOVy(30.0);
+    }
+#if OCC_VERSION_LARGE > 0x06090000
+    if (toolMgr()->action( StereoId )->isChecked()) {
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
+      aCamera->SetFOVy(30.0);
+    }
+#endif
+    aView3d->Redraw();
+    onViewFitAll();
+  }
+}
+
+/*!
+  \brief Sets Stereo projection mode.
+
+  Sets Stereo projection mode.
+*/
+void OCCViewer_ViewWindow::onStereoType( bool activate )
+{
+#if OCC_VERSION_LARGE > 0x06090000
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
+    if (activate) {
+      toolMgr()->action( PerspectiveId )->setChecked(true);
+      aCamera->SetProjectionType(Graphic3d_Camera::Projection_Perspective);
+      toolMgr()->action( PerspectiveId )->actionGroup()->setEnabled(false);
+
+      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
+      SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+      setStereoType( aResMgr->integerValue( "OCCViewer", "stereo_type", 0 ) );
+      setAnaglyphFilter( aResMgr->integerValue( "OCCViewer", "anaglyph_filter", 0 ) );
+      setReverseStereo( aResMgr->booleanValue( "OCCViewer", "reverse_stereo", false ) );
+      setVSync( aResMgr->booleanValue( "OCCViewer", "enable_vsync", true ) );
+      setQuadBufferSupport( aResMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", false ) );
+    }
+    else {
+      toolMgr()->action( PerspectiveId )->actionGroup()->setEnabled(true);
+      if (myModel->projectionType() == Orthographic) {
+        toolMgr()->action( OrthographicId )->setChecked(true);
+        aCamera->SetProjectionType(Graphic3d_Camera::Projection_Orthographic);
+      }
+      else if (myModel->projectionType() == Perspective) {
+        toolMgr()->action( PerspectiveId )->setChecked(true);
+        aCamera->SetProjectionType(Graphic3d_Camera::Projection_Perspective);
+      }
+    }
+    aView3d->Redraw();
+    onViewFitAll();
+  }
+
+  if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer &&
+       toolMgr()->action( StereoId )->isChecked() )
+    SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
+#endif
+}
+
+/*!
+  \brief Restore the view.
+
+  Restore the projection mode based on tool-buttons states.
 */
 void OCCViewer_ViewWindow::onProjectionType()
 {
   emit vpTransformationStarted( PROJECTION );
   if (toolMgr()->action( OrthographicId )->isChecked())
-    setProjectionType( Orthographic);
+    setProjectionType( Orthographic );
   if (toolMgr()->action( PerspectiveId )->isChecked())
-    setProjectionType( Perspective);
+    setProjectionType( Perspective );
 #if OCC_VERSION_LARGE > 0x06090000
   if (toolMgr()->action( StereoId )->isChecked())
-    setProjectionType( Stereo);
+    setProjectionType( Stereo );
 #endif
   emit vpTransformationFinished( PROJECTION );
+}
+
+void OCCViewer_ViewWindow::setProjectionType( int mode )
+{
+  QtxAction* anOrthographicAction = dynamic_cast<QtxAction*>( toolMgr()->action( OrthographicId ) );
+  QtxAction* aPerspectiveAction = dynamic_cast<QtxAction*>( toolMgr()->action( PerspectiveId ) );
+#if OCC_VERSION_LARGE > 0x06090000
+  QtxAction* aStereoAction = dynamic_cast<QtxAction*>( toolMgr()->action( StereoId ) );
+#endif
+  switch ( mode ) {
+    case Orthographic:
+      onProjectionType( anOrthographicAction );
+      break;
+    case Perspective:
+      onProjectionType( aPerspectiveAction );
+      break;
+    case Stereo:
+      onStereoType( true );
+      break;
+  }
+  // update action state if method is called outside
+  if ( mode == Orthographic && !anOrthographicAction->isChecked() ) {
+	  anOrthographicAction->setChecked( true );
+    #if OCC_VERSION_LARGE > 0x06090000
+	  aStereoAction->setChecked( false );
+    #endif
+  }
+  if ( mode == Perspective && !aPerspectiveAction->isChecked() ) {
+	  aPerspectiveAction->setChecked( true );
+    #if OCC_VERSION_LARGE > 0x06090000
+	  aStereoAction->setChecked( false );
+    #endif
+  }
+#if OCC_VERSION_LARGE > 0x06090000
+  if ( mode == Stereo ) {
+    aStereoAction->setChecked( true );
+    if ( anOrthographicAction->isEnabled() ) {
+      anOrthographicAction->setEnabled( false );
+      anOrthographicAction->setChecked( false );
+      aStereoAction->setChecked( false );
+    }
+    else {
+      anOrthographicAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      anOrthographicAction->setChecked(myModel->projectionType() == Orthographic);
+    }
+    if ( aPerspectiveAction->isEnabled() ) {
+      aPerspectiveAction->setEnabled( false );
+      aPerspectiveAction->setChecked( true );
+      if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer &&
+           toolMgr()->action( StereoId )->isChecked() )
+        SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
+    }
+    else {
+      aPerspectiveAction->setEnabled( true );
+      aStereoAction->setChecked( false );
+      aPerspectiveAction->setChecked(myModel->projectionType() == Perspective);
+      onProjectionType();
+    }
+  }
+  else {
+    if ( !anOrthographicAction->isEnabled() )
+      anOrthographicAction->setEnabled( true );
+    if ( !aPerspectiveAction->isEnabled() )
+      aPerspectiveAction->setEnabled( true );
+  }
+#endif
 }
 
 /*!
@@ -2815,88 +2958,6 @@ bool OCCViewer_ViewWindow::isSketcherStyle() const
 void OCCViewer_ViewWindow::set2dMode(Mode2dType theType)
 {
   my2dMode = theType;
-}
-
-void OCCViewer_ViewWindow::setProjectionType( int mode )
-{
-  Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) {
-    Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
-    if (mode == Perspective) {
-      myModel->setProjectionType(Perspective);
-      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
-    }
-    if (mode == Orthographic) {
-      myModel->setProjectionType(Orthographic);
-      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Orthographic );
-    }
-  #if OCC_VERSION_LARGE > 0x06090000
-    if (mode == Stereo) {
-      aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
-      SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
-      setStereoType( aResMgr->integerValue( "OCCViewer", "stereo_type", 0 ) );
-      setAnaglyphFilter( aResMgr->integerValue( "OCCViewer", "anaglyph_filter", 0 ) );
-      setReverseStereo( aResMgr->booleanValue( "OCCViewer", "reverse_stereo", false ) );
-      setVSync( aResMgr->booleanValue( "OCCViewer", "enable_vsync", true ) );
-      setQuadBufferSupport( aResMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", false ) );
-    }
-  #endif
-    aView3d->Redraw();
-    onViewFitAll();
-  }
-  // update action state if method is called outside
-  QtxAction* anOrthographicAction = dynamic_cast<QtxAction*>( toolMgr()->action( OrthographicId ) );
-  QtxAction* aPerspectiveAction = dynamic_cast<QtxAction*>( toolMgr()->action( PerspectiveId ) );
-#if OCC_VERSION_LARGE > 0x06090000
-  QtxAction* aStereoAction = dynamic_cast<QtxAction*>( toolMgr()->action( StereoId ) );
-#endif
-  if ( mode == Orthographic && !anOrthographicAction->isChecked() ) {
-	  anOrthographicAction->setChecked( true );
-    #if OCC_VERSION_LARGE > 0x06090000
-	  aStereoAction->setChecked( false );
-    #endif
-  }
-  if ( mode == Perspective && !aPerspectiveAction->isChecked() ) {
-	  aPerspectiveAction->setChecked( true );
-    #if OCC_VERSION_LARGE > 0x06090000
-	  aStereoAction->setChecked( false );
-    #endif
-  }
-#if OCC_VERSION_LARGE > 0x06090000
-  if ( mode == Stereo ) {
-    aStereoAction->setChecked( true );
-    if ( anOrthographicAction->isEnabled() ) {
-      anOrthographicAction->setEnabled( false );
-      anOrthographicAction->setChecked( false );
-      aStereoAction->setChecked( false );
-    }
-    else {
-      anOrthographicAction->setEnabled( true );
-      aStereoAction->setChecked( false );
-      anOrthographicAction->setChecked(myModel->projectionType() == Orthographic);
-    }
-    if ( aPerspectiveAction->isEnabled() ) {
-      aPerspectiveAction->setEnabled( false );
-      aPerspectiveAction->setChecked( true );
-    #if OCC_VERSION_LARGE > 0x06090000
-      if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer )
-        SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
-    #endif
-    }
-    else {
-      aPerspectiveAction->setEnabled( true );
-      aStereoAction->setChecked( false );
-      aPerspectiveAction->setChecked(myModel->projectionType() == Perspective);
-      onProjectionType();
-    }
-  }
-  else {
-    if ( !anOrthographicAction->isEnabled() )
-      anOrthographicAction->setEnabled( true );
-    if ( !aPerspectiveAction->isEnabled() )
-      aPerspectiveAction->setEnabled( true );
-  }
-#endif
 }
 
 int OCCViewer_ViewWindow::projectionType() const

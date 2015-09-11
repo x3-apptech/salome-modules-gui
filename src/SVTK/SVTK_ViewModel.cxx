@@ -94,6 +94,7 @@ SVTK_Viewer::SVTK_Viewer()
   mySpaceBtn[1] = 2;
   mySpaceBtn[2] = 9;
   myDefaultBackground = Qtx::BackgroundData( Qt::black );
+  myQuadBufferSupport = false;
 }
 
 /*!
@@ -196,6 +197,7 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
   aViewWindow->SetProjectionMode( projectionMode() );
   aViewWindow->SetStereoType( stereoType() );
   aViewWindow->SetAnaglyphFilter( anaglyphFilter() );
+  aViewWindow->SetQuadBufferSupport( isQuadBufferSupport() );
   aViewWindow->SetInteractionStyle( interactionStyle() );
   aViewWindow->SetZoomingStyle( zoomingStyle() );
   aViewWindow->SetPreSelectionMode( preSelectionMode() );
@@ -290,7 +292,7 @@ void SVTK_Viewer::setProjectionMode( const int theMode )
 {
   if ( myProjMode != theMode ) {
     if ( theMode != SVTK_ViewWindow::Stereo )
-	  myProjMode = theMode;
+      myProjMode = theMode;
     if (SUIT_ViewManager* aViewManager = getViewManager()) {
       QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
       for ( uint i = 0; i < aViews.count(); i++ )
@@ -358,6 +360,33 @@ void SVTK_Viewer::setAnaglyphFilter( const int theFilter )
   }
 }
 
+/*!
+  \return support quad-buffered stereo
+*/
+bool SVTK_Viewer::isQuadBufferSupport() const
+{
+  return myQuadBufferSupport;
+}
+
+/*!
+  Set support quad-buffered stereo
+  \param theEnable - enable/disable support quad-buffered stereo
+*/
+void SVTK_Viewer::setQuadBufferSupport( const bool theEnable )
+{
+  if ( myQuadBufferSupport != theEnable ) {
+    myQuadBufferSupport = theEnable;
+
+    if (SUIT_ViewManager* aViewManager = getViewManager()) {
+      QVector<SUIT_ViewWindow*> aViews = aViewManager->getViews();
+      for ( uint i = 0; i < aViews.count(); i++ )
+      {
+        if ( TViewWindow* aView = dynamic_cast<TViewWindow*>(aViews.at( i )) )
+          aView->SetQuadBufferSupport( theEnable );
+      }
+    }
+  }
+}
 /*!
   \return interaction style
 */

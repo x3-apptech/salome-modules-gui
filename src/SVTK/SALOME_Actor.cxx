@@ -468,6 +468,7 @@ SALOME_Actor
       }
       myHighlightActor->SetVisibility( GetVisibility() && theIsHighlight );
     }
+    myHighlightActor->SetMarkerEnabled( mySelectionMode == NodeSelection );
   }
 
   highlight(theIsHighlight);
@@ -671,8 +672,6 @@ SALOME_Actor
 
   if ( !theIsHighlight )
     return true;
-
-  myHighlightActor->SetMarkerEnabled( aSelectionMode == NodeSelection );
 
   double x = theSelectionEvent->myX;
   double y = theSelectionEvent->myY;

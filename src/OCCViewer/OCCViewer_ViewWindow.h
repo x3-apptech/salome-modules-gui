@@ -279,6 +279,8 @@ public slots:
   virtual void onRightView();
   virtual void onClockWiseView();
   virtual void onAntiClockWiseView();
+  virtual void onProjectionType( QAction* theAction );
+  virtual void onStereoType( bool activate );
   virtual void onProjectionType();
   virtual void onResetView();
   virtual void onFitAll();

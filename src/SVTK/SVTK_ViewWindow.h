@@ -236,6 +236,9 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Sets anaglyph filter
   virtual void SetAnaglyphFilter( const int );
 
+  //! Set support quad-buffered stereo
+  virtual void SetQuadBufferSupport( const bool );
+
   //! Set interactive style
   virtual void SetInteractionStyle( const int );
 
@@ -315,7 +318,9 @@ public slots:
   void activatePanning(); 
   void activateGlobalPanning(); 
 
-  void onPerspectiveMode();
+  void onProjectionMode( QAction* theAction );
+  void onStereoMode( bool activate );
+  void onProjectionMode();
 
   void activateProjectionMode(int);
 
