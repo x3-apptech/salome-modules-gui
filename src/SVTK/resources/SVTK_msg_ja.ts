@@ -132,12 +132,12 @@
       <translation>選択領域の表示</translation>
     </message>
     <message>
-        <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+      <source>MNU_FITSELECTION</source>
+      <translation>選択をフィット</translation>
     </message>
     <message>
-        <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+      <source>DSC_FITSELECTION</source>
+      <translation>ビューフレームの内側にある選択されたすべてのオブジェクトをフィット</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
@@ -201,11 +201,11 @@
     </message>
     <message>
       <source>MNU_SVTK_STEREO_MODE</source>
-      <translation type="unfinished">Stereo Mode</translation>
+      <translation>ステレオモード</translation>
     </message>
     <message>
       <source>DSC_SVTK_STEREO_MODE</source>
-      <translation type="unfinished">Set the stereo projection type</translation>
+      <translation>ステレオ投影タイプを設定</translation>
     </message>
     <message>
       <source>DSC_SVTK_STYLE_SWITCH</source>
@@ -257,8 +257,8 @@
     </message>
     <message>
       <source>WRN_SUPPORT_QUAD_BUFFER</source>
-      <translation type="unfinished">Graphic driver not support quad-buffer</translation>
-    </message>	
+      <translation>グラフィックドライバは quad-buffer をサポートしていません</translation>
+    </message>
   </context>
   <context>
     <name>SVTK_FontWidget</name>
@@ -676,39 +676,39 @@
     </message>
     <message>
       <source>ST_CRYSTALEYES</source>
-      <translation type="unfinished">Crystal Eyes</translation>
+      <translation>水晶の目</translation>
     </message>
     <message>
       <source>ST_REDBLUE</source>
-      <translation type="unfinished">Red-Blue</translation>
+      <translation>赤-青投影</translation>
     </message>
     <message>
       <source>ST_INTERLACED</source>
-      <translation type="unfinished">Interlaced</translation>
+      <translation>インターレース</translation>
     </message>
     <message>
       <source>ST_LEFT</source>
-      <translation type="unfinished">Left</translation>
+      <translation>左</translation>
     </message>
     <message>
       <source>ST_RIGHT</source>
-      <translation type="unfinished">Right</translation>
+      <translation>右</translation>
     </message>
     <message>
       <source>ST_DRESDEN</source>
-      <translation type="unfinished">Dresden</translation>
+      <translation>Dresden</translation>
     </message>
     <message>
       <source>ST_ANAGLYPH</source>
-      <translation type="unfinished">Anaglyph</translation>
+      <translation>Anaglyph</translation>
     </message>
     <message>
       <source>ST_CHECKERBOARD</source>
-      <translation type="unfinished">Checkerboard</translation>
+      <translation>Checkerboard</translation>
     </message>
     <message>
       <source>ST_SPLITVIEWPORTHORIZONTAL</source>
-      <translation type="unfinished">Split View Port Horizontal</translation>
+      <translation>ビューポートを水平に分割</translation>
     </message>
   </context>
 </TS>

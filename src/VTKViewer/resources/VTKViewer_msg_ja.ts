@@ -124,12 +124,12 @@
       <translation>選択範囲表示</translation>
     </message>
     <message>
-        <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+      <source>MNU_FITSELECTION</source>
+      <translation>選択をフィット</translation>
     </message>
     <message>
-        <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+      <source>DSC_FITSELECTION</source>
+      <translation>ビューフレームの内側にある選択されたすべてのオブジェクトをフィット</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>

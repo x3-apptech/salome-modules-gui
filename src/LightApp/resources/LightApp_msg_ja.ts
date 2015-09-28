@@ -629,63 +629,63 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_GROUP_STEREO</source>
-      <translation type="unfinished">Stereo render</translation>
+      <translation>ステレオレンダリング</translation>
     </message>
     <message>
       <source>PREF_STEREO_TYPE</source>
-      <translation type="unfinished">Stereo type</translation>
+      <translation>ステレオタイプ</translation>
     </message>
     <message>
       <source>PREF_ANAGLYPH_FILTER</source>
-      <translation type="unfinished">Anaglyph filter</translation>
+      <translation>Anaglyph filter</translation>
     </message>
     <message>
       <source>PREF_ANAGLYPH_RED_CYAN</source>
-      <translation type="unfinished">Red-Cyan</translation>
+      <translation>赤-シアン投影</translation>
     </message>
     <message>
       <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
-      <translation type="unfinished">Yellow-Blue</translation>
+      <translation>黄-青投影</translation>
     </message>
     <message>
       <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
-      <translation type="unfinished">Green-Magenta</translation>
+      <translation>緑-マゼンタ投影</translation>
     </message>
     <message>
       <source>PREF_FOCUS_TYPE</source>
-      <translation> type="unfinished"Convergence distance type</translation>
+      <translation>一致距離型</translation>
     </message>
     <message>
       <source>PREF_FOCUS_VALUE</source>
-      <translation type="unfinished">Stereographic focus value</translation>
+      <translation>立体画法焦点値</translation>
     </message>
     <message>
       <source>PREF_IOD_TYPE</source>
-      <translation type="unfinished">IOD type</translation>
+      <translation>眼間距離（IOD）型</translation>
     </message>
     <message>
       <source>PREF_IOD_VALUE</source>
-      <translation type="unfinished">Interocular distance (IOD) value</translation>
+      <translation>眼間距離（IOD）値</translation>
     </message>
     <message>
       <source>PREF_ABSOLUTE</source>
-      <translation type="unfinished">Absolute</translation>
+      <translation>絶対</translation>
     </message>
     <message>
       <source>PREF_RELATIVE</source>
-      <translation type="unfinished">Relative</translation>
+      <translation>早退</translation>
     </message>
     <message>
       <source>PREF_REVERSE_STEREO</source>
-      <translation type="unfinished">Reverse stereo</translation>
+      <translation>Reverse stereo</translation>
     </message>
     <message>
       <source>PREF_ENABLE_VSYNC</source>
-      <translation type="unfinished">Enable V-Sync</translation>
+      <translation>V-Syncを有効</translation>
     </message>
     <message>
       <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
-      <translation type="unfinished">Enable quad-buffer support</translation>
+      <translation>quad-buffer サポートを有効</translation>
     </message>
     <message>
       <source>PREF_LOGARITHMIC</source>
@@ -949,11 +949,11 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_GROUP_FULL_SCREEN</source>
-      <translation type="unfinished">Full-screen</translation>
+      <translation>全画面表示</translation>
     </message>
     <message>
       <source>PREF_FULL_SCREEN_AUTO</source>
-      <translation type="unfinished">Hide object browser and viewers toolbars</translation>
+      <translation>オブジェクトブラウザと表示ツールバーを隠す</translation>
     </message>
     <message>
       <source>PREF_TAB_PYEDITOR</source>
@@ -1121,7 +1121,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_NEED_RESTART</source>
-      <translation type="unfinished">Some changes will take effect only after application restart</translation>
+      <translation>幾つかの変更はアプリケーションを再起動後に有効になります</translation>
     </message>
   </context>
   <context>
