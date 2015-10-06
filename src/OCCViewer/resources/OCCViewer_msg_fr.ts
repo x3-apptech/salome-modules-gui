@@ -4,7 +4,6 @@
 <context>
     <name>@default</name>
     <message>
-        <!-- used in GEOM module: to be moved there? -->
         <source>OCC_TEXTURE_FILES</source>
         <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
         <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
@@ -182,11 +181,11 @@
     </message>
     <message>
         <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+        <translation>Adapter la sélection</translation>
     </message>
     <message>
         <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+        <translation>Adapter tous les objets sélectionnés dans la vue</translation>
     </message>
     <message>
         <source>MNU_PRESETS_VIEW</source>
@@ -289,7 +288,7 @@
         <translation>Opérations sur la vue XZ</translation>
     </message>
     <message>
-        <source>>LBL_YZTOOLBAR_LABEL</source>
+        <source>LBL_YZTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue YZ</translation>
     </message>
     <message>
@@ -314,15 +313,15 @@
     </message>
     <message>
         <source>MNU_STEREO_MODE</source>
-        <translation type="unfinished">Stereo projection</translation>
+        <translation>Mode Stéréo</translation>
     </message>
     <message>
         <source>DSC_STEREO_MODE</source>
-        <translation type="unfinished">Set the stereo projection type</translation>
+        <translation>Choisir le type de projection stéréo</translation>
     </message>
     <message>
         <source>WRN_SUPPORT_QUAD_BUFFER</source>
-        <translation type="unfinished">Graphic driver not support quad-buffer</translation>
+        <translation>Le pilote graphique ne supporte pas le quad-buffer</translation>
     </message>
 </context>
 <context>
@@ -458,31 +457,31 @@
     </message>
     <message>
         <source>ST_QUADBUFFER</source>
-        <translation type="unfinished">Shutter glasses (OpenGL quad-buffer)</translation>
+        <translation>Lunette à obturation (OpenGL quad-buffer)</translation>
     </message>
     <message>
         <source>ST_ANAGLYPH</source>
-        <translation type="unfinished">Anaglyph</translation>
+        <translation>Anaglyphe</translation>
     </message>
     <message>
         <source>ST_ROWINTERLACED</source>
-        <translation type="unfinished">Row-interlaced</translation>
+        <translation>Entrelacement horizontal</translation>
     </message>
     <message>
         <source>ST_COLUMNINTERLACED</source>
-        <translation type="unfinished">Column-interlaced</translation>
+        <translation>Entrelacement vertical</translation>
     </message>
     <message>
         <source>ST_CHESSBOARD</source>
-        <translation type="unfinished">Chess-board stereo for DLP TVs</translation>
+        <translation>Damier pour téléviseurs polarisés</translation>
     </message>
     <message>
         <source>ST_SIDEBYSIDE</source>
-        <translation type="unfinished">Horizontal-anamorphic (side-by-side)</translation>
+        <translation>Horizontal anamorphosé (côte-à-côte)</translation>
     </message>
     <message>
         <source>ST_OVERUNDER</source>
-        <translation type="unfinished">Vertical-anamorphic (Half OverUnder)</translation>
+        <translation>Vertical anamorphosé (Half OverUnder)</translation>
     </message>
 </context>
 <context>

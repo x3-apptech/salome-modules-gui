@@ -133,11 +133,11 @@
     </message>
     <message>
         <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+        <translation>Adapter la sélection</translation>
     </message>
     <message>
         <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+        <translation>Adapter tous les objets sélectionnés dans la vue</translation>
     </message>
     <message>
         <source>DSC_BOTTOM_VIEW</source>
@@ -201,11 +201,11 @@
     </message>
     <message>
         <source>MNU_SVTK_STEREO_MODE</source>
-        <translation type="unfinished">Stereo Mode</translation>
+        <translation>Mode stéréo</translation>
     </message>
     <message>
         <source>DSC_SVTK_STEREO_MODE</source>
-        <translation type="unfinished">Set the stereo projection type</translation>
+        <translation>Choisir le type de projection stéréo</translation>
     </message>
     <message>
         <source>DSC_SVTK_STYLE_SWITCH</source>
@@ -257,8 +257,8 @@
     </message>
     <message>
         <source>WRN_SUPPORT_QUAD_BUFFER</source>
-        <translation type="unfinished">Graphic driver not support quad-buffer</translation>
-    </message>	
+        <translation>Les pilotes graphiques ne supportent pas le quad-buffer</translation>
+    </message>
 </context>
 <context>
     <name>SVTK_FontWidget</name>
@@ -677,39 +677,39 @@ Veuillez consulter la documentation.</translation>
     </message>
     <message>
         <source>ST_CRYSTALEYES</source>
-        <translation type="unfinished">Crystal Eyes</translation>
+        <translation>Crystal Eyes</translation>
     </message>
     <message>
         <source>ST_REDBLUE</source>
-        <translation type="unfinished">Red-Blue</translation>
+        <translation>Red-Blue</translation>
     </message>
     <message>
         <source>ST_INTERLACED</source>
-        <translation type="unfinished">Interlaced</translation>
+        <translation>Entrelacé</translation>
     </message>
     <message>
         <source>ST_LEFT</source>
-        <translation type="unfinished">Left</translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <source>ST_RIGHT</source>
-        <translation type="unfinished">Right</translation>
+        <translation>Droite</translation>
     </message>
     <message>
         <source>ST_DRESDEN</source>
-        <translation type="unfinished">Dresden</translation>
+        <translation>Dresden</translation>
     </message>
     <message>
         <source>ST_ANAGLYPH</source>
-        <translation type="unfinished">Anaglyph</translation>
+        <translation>Anaglyphe</translation>
     </message>
     <message>
         <source>ST_CHECKERBOARD</source>
-        <translation type="unfinished">Checkerboard</translation>
+        <translation>Damier</translation>
     </message>
     <message>
         <source>ST_SPLITVIEWPORTHORIZONTAL</source>
-        <translation type="unfinished">Split View Port Horizontal</translation>
+        <translation>Scinder la fenêtre d&apos;affichage horizontalement</translation>
     </message>
 </context>
 </TS>
