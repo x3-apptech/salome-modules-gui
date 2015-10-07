@@ -674,9 +674,8 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
 
   for( ; aStructureIt.More(); aStructureIt.Next() ) {
     const Handle(Graphic3d_Structure)& aStructure = aStructureIt.Key();
-    if ( aStructure->IsEmpty() ) {
+    if ( aStructure->IsEmpty() || !aStructure->IsVisible() || aStructure->CStructure()->IsForHighlight )
       continue;
-    }
 
 #if OCC_VERSION_LARGE > 0x06070100
     Bnd_Box aBox = aStructure->MinMaxValues();
