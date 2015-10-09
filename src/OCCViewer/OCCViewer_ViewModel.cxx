@@ -1544,3 +1544,22 @@ void OCCViewer_Viewer::setClippingDlg(OCCViewer_ClippingDlg* theDlg) {
     myClippingDlg = theDlg;
   }
 }
+
+
+bool OCCViewer_Viewer::enableDrawMode( bool on )
+{
+  //!! To be done for view windows
+  if ( !myViewManager )
+    return false;
+
+  bool prev = false;
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win ) {
+      prev = prev || win->enableDrawMode( on ); 
+    }
+  }
+  return prev;
+}

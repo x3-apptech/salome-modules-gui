@@ -186,6 +186,8 @@ public:
   
   virtual void initLayout();
 
+  virtual bool enableDrawMode( bool );
+
   virtual void updateEnabledDrawMode();
 
   virtual void setCuttingPlane( bool on, const double x = 0 , const double y = 0 , const double z = 0,
@@ -396,6 +398,7 @@ protected:
   bool                  myCursorIsHand;                 
   bool                  myDrawRect;           // set when a rect is used for selection or magnify 
   bool                  myEnableDrawMode;
+  bool                  myDrawRectEnabled;
   bool                  myPaintersRedrawing;  // set to draw with external painters  
   bool                  IsSketcherStyle;
   bool                  myIsKeyFree;

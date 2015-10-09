@@ -708,3 +708,12 @@ void OCCViewer_ViewFrame::enablePreselection( bool isEnabled )
     aView->enablePreselection(isEnabled); 
   }
 }
+
+bool OCCViewer_ViewFrame::enableDrawMode( bool on )
+{
+  bool prev = false;
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    prev = prev || aView->enableDrawMode( on ); 
+  }
+  return prev;
+}

@@ -243,6 +243,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   myModel = theModel;
   myRestoreFlag = 0;
   myEnableDrawMode = false;
+  myDrawRectEnabled = true;
   myDrawRect=false;
   updateEnabledDrawMode();
   myScalingDlg = 0;
@@ -421,12 +422,24 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
 }
 
 /*!
+  \brief Enable / disable draw rect (rubber band) mode
+*/
+bool OCCViewer_ViewWindow::enableDrawMode( bool on )
+{
+  bool prev = myDrawRectEnabled;
+  myDrawRectEnabled = on;
+  updateEnabledDrawMode();
+  return prev;
+}
+
+/*!
   \brief Update state of enable draw mode state.
 */
 void OCCViewer_ViewWindow::updateEnabledDrawMode()
 {
+  myEnableDrawMode = myDrawRectEnabled;
   if ( myModel )
-    myEnableDrawMode = myModel->isSelectionEnabled() && myModel->isMultiSelectionEnabled();
+    myEnableDrawMode = myEnableDrawMode && myModel->isSelectionEnabled() && myModel->isMultiSelectionEnabled();
 }
 
 /*!
