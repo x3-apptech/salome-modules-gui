@@ -57,7 +57,7 @@ void
 ViewerTools_DialogBase
 ::onParentShow()
 {
-  if(myAction->isChecked())
+  if(myAction && myAction->isChecked())
     show();
   else
     hide();
