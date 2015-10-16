@@ -237,6 +237,7 @@ void SalomeApp_Application::start()
     LightApp_Application::start();
     SALOME_EventFilter::Init();
 
+    setProperty("open_study_from_command_line", true);
     if ( !hdffile.isEmpty() )       // open hdf file given as parameter
       onOpenDoc( hdffile );
     else if ( pyfiles.count() > 0 ) // create new study
@@ -245,6 +246,7 @@ void SalomeApp_Application::start()
       if (onLoadDoc(loadStudy))
         updateObjectBrowser(true);
     }
+    setProperty("open_study_from_command_line", QVariant());
 
 #ifndef DISABLE_PYCONSOLE
     // import/execute python scripts
