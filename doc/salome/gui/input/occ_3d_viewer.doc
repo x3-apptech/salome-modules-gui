@@ -151,10 +151,10 @@ These buttons orientate the scene strictly about coordinate axes:
 
 <b>Stereo projection</b> - stereoscopic rendering of the view.
 \note Activation of this mode also switches the view to perpective projection 
-in case if orthographic one has been active.
-\note By default, quad-buffered stereo is activated, if it is supported by graphic card. 
+in case if the orthographic one has been active.
+\note By default, quad-buffered stereo is activated, if it is supported by the graphic card. 
 If no stereo capabilities are available, an error message is shown.
-\note Settigs of stereoscopic view take place in 
+\note The stereoscopic view settings can be defined in 
 \ref occ_preferences "OCC 3D Viewer" preferences.
 
 <hr>

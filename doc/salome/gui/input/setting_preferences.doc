@@ -101,7 +101,7 @@ items in <b>Most Recently Used</b> list and the <b>Link type</b>:
   - \b Short - shows the file name only.
   - \b Auto - shows full paths to the files only if some files from
 different locations have the same name.
-- <b>Full-screen</b> - options concerned full-screen mode:
+- <b>Full-screen</b> 
   - <b>Hide object browser and viewers toolbars</b> - switches automatic hiding of 
   Object Browser and OCC viewer toolbar in full-screen mode.
 
@@ -140,7 +140,7 @@ different locations have the same name.
 \image html pref_salome_occviewer.png
 
 - <b>Projection mode</b> - sets the default projection mode for the viewers: Orthogonal or Perpective.
-- <b>Stereo render</b> - group of stereoscopic view settings:
+- <b>Stereo render</b> - stereoscopic view settings:
   - <b>Stereo type</b> - specifies a stereo pair type:
     - Shutter glasses (OpenGL quad-buffer)
     - Anaglyph
@@ -154,7 +154,7 @@ different locations have the same name.
     within the same SALOME GUI session. It is not possible to use 
     different stereo modes in several OCC 3D views at the same time 
     within the same SALOME GUI session.
-  - <b>Anaglyph filter</b> - specifies format of anaglyph stereo pair:
+  - <b>Anaglyph filter</b> - specifies the format of anaglyph stereo pair:
     - Red-Cyan (default)
     - Yellow-Blue
     - Green-Magenta
@@ -201,7 +201,7 @@ different locations have the same name.
   or [-] keyboard buttons.
 - <b>Modification Mode</b> - allows choosing between \b Arithmetic
   and \b Geometrical progression used for zooming.
-- <b>Stereo render</b> - group of stereoscopic view settings:
+- <b>Stereo render</b> - stereoscopic view settings:
   - <b>Stereo type</b> - specifies a stereo pair type:
     - Crystal Eyes
     - Red-Blue
@@ -217,7 +217,7 @@ different locations have the same name.
     within the same SALOME GUI session. It is not possible to use 
     different stereo modes in several VTK 3D views at the same time 
     within the same SALOME GUI session.
-  - <b>Anaglyph filter</b> - specifies format of anaglyph stereo pair:
+  - <b>Anaglyph filter</b> - specifies the format of anaglyph stereo pair:
     - Red-Cyan (default)
     - Yellow-Blue
     - Green-Magenta
