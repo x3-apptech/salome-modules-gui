@@ -629,63 +629,63 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_GROUP_STEREO</source>
-        <translation type="unfinished">Stereo render</translation>
+        <translation>Rendu stéréo</translation>
     </message>
     <message>
         <source>PREF_STEREO_TYPE</source>
-        <translation type="unfinished">Stereo type</translation>
+        <translation>Type de rendu stéréo</translation>
     </message>
     <message>
         <source>PREF_ANAGLYPH_FILTER</source>
-        <translation type="unfinished">Anaglyph filter</translation>
+        <translation>Filtre anaglyphique</translation>
     </message>
     <message>
         <source>PREF_ANAGLYPH_RED_CYAN</source>
-        <translation type="unfinished">Red-Cyan</translation>
+        <translation>Rouge-Cyan</translation>
     </message>
     <message>
         <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
-        <translation type="unfinished">Yellow-Blue</translation>
+        <translation>Jaune-Bleu</translation>
     </message>
     <message>
         <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
-        <translation type="unfinished">Green-Magenta</translation>
+        <translation>Vert-Magenta</translation>
     </message>
     <message>
         <source>PREF_FOCUS_TYPE</source>
-        <translation> type="unfinished"Convergence distance type</translation>
+        <translation> type=&quot;unfinished&quot;Convergence distance type</translation>
     </message>
     <message>
         <source>PREF_FOCUS_VALUE</source>
-        <translation type="unfinished">Stereographic focus value</translation>
+        <translation>Valeur de la focalisation stéréographique</translation>
     </message>
     <message>
         <source>PREF_IOD_TYPE</source>
-        <translation type="unfinished">IOD type</translation>
+        <translation>Type de distance intraoculaire</translation>
     </message>
     <message>
         <source>PREF_IOD_VALUE</source>
-        <translation type="unfinished">Interocular distance (IOD) value</translation>
+        <translation>Valeur de la distance intraoculaire</translation>
     </message>
     <message>
         <source>PREF_ABSOLUTE</source>
-        <translation type="unfinished">Absolute</translation>
+        <translation>Absolu</translation>
     </message>
     <message>
         <source>PREF_RELATIVE</source>
-        <translation type="unfinished">Relative</translation>
+        <translation>Relatif</translation>
     </message>
     <message>
         <source>PREF_REVERSE_STEREO</source>
-        <translation type="unfinished">Reverse stereo</translation>
+        <translation>Stéréo inversée</translation>
     </message>
     <message>
         <source>PREF_ENABLE_VSYNC</source>
-        <translation type="unfinished">Enable V-Sync</translation>
+        <translation>Activer la synchronisation verticale</translation>
     </message>
     <message>
         <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
-        <translation type="unfinished">Enable quad-buffer support</translation>
+        <translation>Activer le support du quad-buffer</translation>
     </message>
     <message>
         <source>PREF_LOGARITHMIC</source>
@@ -849,7 +849,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_SCALE</source>
-        <translation>Facteur d'échelle</translation>
+        <translation>Facteur d&apos;échelle</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
@@ -950,11 +950,11 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_GROUP_FULL_SCREEN</source>
-        <translation type="unfinished">Full-screen</translation>
+        <translation>Plein écran</translation>
     </message>
     <message>
         <source>PREF_FULL_SCREEN_AUTO</source>
-        <translation type="unfinished">Hide object browser and viewers toolbars</translation>
+        <translation>Cacher l&apos;arbre d&apos;étude and les barres d&apos;outils des vues</translation>
     </message>
     <message>
         <source>PREF_TAB_PYEDITOR</source>
@@ -970,7 +970,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_GROUP_PY_DISPLAY</source>
-        <translation>Paramètres d'affichage</translation>
+        <translation>Paramètres d&apos;affichage</translation>
     </message>
     <message>
         <source>PREF_PY_CURRLINE_HIGHLIGHT</source>
@@ -994,11 +994,11 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_PY_TAB_WHITESPACES</source>
-        <translation>Affiche les guides d'indentation</translation>
+        <translation>Affiche les guides d&apos;indentation</translation>
     </message>
     <message>
         <source>PREF_PY_TAB_SIZE</source>
-        <translation>Largeur d'intentation:</translation>
+        <translation>Largeur d&apos;intentation:</translation>
     </message>
     <message>
         <source>PREF_GROUP_VERT_EDGE</source>
@@ -1123,7 +1123,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_NEED_RESTART</source>
-        <translation type="unfinished">Some changes will take effect only after application restart</translation>
+        <translation>Des changements prendront effets seulement après un redémarrage de l&apos;application</translation>
     </message>
 </context>
 <context>

@@ -708,10 +708,15 @@ void SVTK_Renderer::onFitSelection()
   vtkActorCollection* aCollection = aCopy.GetActors();
   aCollection->InitTraversal();
   while ( vtkActor* aProp = aCollection->GetNextActor() )
-    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) )
-      if ( mySelector->IsSelected( anActor ) )
+    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) ) {
+      const Handle(SALOME_InteractiveObject)& io = anActor->getIO();
+      if ( !io.IsNull() && mySelector->IsSelected( io ) )
         aSelectedCollection->AddItem( aProp );
-
+    }
+  
+  if( aSelectedCollection->GetNumberOfItems() == 0 )
+    return; // if collection is empty
+  
   double bounds[6];
   ::ComputeBounds( aSelectedCollection, bounds );
 

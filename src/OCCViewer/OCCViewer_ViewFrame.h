@@ -107,6 +107,8 @@ public:
   virtual bool isPreselectionEnabled() const { return getView(MAIN_VIEW)->isPreselectionEnabled(); }
   virtual void enablePreselection( bool );
 
+  virtual bool enableDrawMode( bool );
+
   virtual void setViewManager( SUIT_ViewManager* );
 
   virtual bool eventFilter(QObject* watched, QEvent* e) { return SUIT_ViewWindow::eventFilter(watched, e); }

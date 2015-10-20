@@ -181,12 +181,12 @@
       <translation>彼の党をボックスで選択を表示するには、ステージのサイズを変更します。</translation>
     </message>
     <message>
-        <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+      <source>MNU_FITSELECTION</source>
+      <translation>選択をフィット</translation>
     </message>
     <message>
-        <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+      <source>DSC_FITSELECTION</source>
+      <translation>ビューフレームの内側にある選択されたすべてのオブジェクトをフィット</translation>
     </message>
     <message>
       <source>MNU_PRESETS_VIEW</source>
@@ -298,31 +298,31 @@
     </message>
     <message>
       <source>MNU_ORTHOGRAPHIC_MODE</source>
-      <translation>直交モード</translation>
+      <translation>正射影投影</translation>
     </message>
     <message>
       <source>DSC_ORTHOGRAPHIC_MODE</source>
-      <translation>直交射影を選択します。</translation>
+      <translation>正射影投影タイプを設定</translation>
     </message>
     <message>
       <source>MNU_PERSPECTIVE_MODE</source>
-      <translation>遠近法</translation>
+      <translation>遠近投影</translation>
     </message>
     <message>
       <source>DSC_PERSPECTIVE_MODE</source>
-      <translation>透視投影を選択します。</translation>
+      <translation>遠近投影タイプを設定</translation>
     </message>
     <message>
       <source>MNU_STEREO_MODE</source>
-      <translation type="unfinished">Stereo projection</translation>
+      <translation>ステレオ投影</translation>
     </message>
     <message>
       <source>DSC_STEREO_MODE</source>
-      <translation type="unfinished">Set the stereo projection type</translation>
+      <translation>ステレオ投影タイプを設定</translation>
     </message>
     <message>
       <source>WRN_SUPPORT_QUAD_BUFFER</source>
-      <translation type="unfinished">Graphic driver not support quad-buffer</translation>
+      <translation>グラフィックドライバはquad-bufferをサポートしていません</translation>
     </message>
   </context>
   <context>
@@ -458,31 +458,31 @@
     </message>
     <message>
       <source>ST_QUADBUFFER</source>
-      <translation type="unfinished">Shutter glasses (OpenGL quad-buffer)</translation>
+      <translation>3D眼鏡 （OpenGL quad-buffer）</translation>
     </message>
     <message>
       <source>ST_ANAGLYPH</source>
-      <translation type="unfinished">Anaglyph</translation>
+      <translation>Anaglyph</translation>
     </message>
     <message>
       <source>ST_ROWINTERLACED</source>
-      <translation type="unfinished">Row-interlaced</translation>
+      <translation>行インターレース</translation>
     </message>
     <message>
       <source>ST_COLUMNINTERLACED</source>
-      <translation type="unfinished">Column-interlaced</translation>
+      <translation>列インターレース</translation>
     </message>
     <message>
       <source>ST_CHESSBOARD</source>
-      <translation type="unfinished">Chess-board stereo for DLP TVs</translation>
+      <translation>Chess-board stereo for DLP TVs</translation>
     </message>
     <message>
       <source>ST_SIDEBYSIDE</source>
-      <translation type="unfinished">Horizontal-anamorphic (side-by-side)</translation>
+      <translation>水平アナモルフィック（横に並列）</translation>
     </message>
     <message>
       <source>ST_OVERUNDER</source>
-      <translation type="unfinished">Vertical-anamorphic (Half OverUnder)</translation>
+      <translation>垂直アナモルフィック（縦に並列）</translation>
     </message>
   </context>
   <context>

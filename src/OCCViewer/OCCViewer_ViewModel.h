@@ -179,6 +179,8 @@ public:
   void                            enableMultiselection(bool isEnable);
   bool                            isMultiSelectionEnabled() const { return myMultiSelectionEnabled; }
 
+  bool                            enableDrawMode( bool on );
+
   void                            setClippingColor( const QColor& );
   QColor                          clippingColor() const;
 
