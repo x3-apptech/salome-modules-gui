@@ -852,6 +852,38 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>スケールファクタ</translation>
     </message>
     <message>
+        <source>PREF_GROUP_RAY_TRACING</source>
+        <translation type="unfinished">Ray tracing</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_DEPTH</source>
+        <translation type="unfinished">Depth</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_REFLECTION</source>
+        <translation type="unfinished">Specular reflections</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_ANTIALIASING</source>
+        <translation type="unfinished">Adaptive anti-aliasing</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_SHADOW</source>
+        <translation type="unfinished">Shadows rendering</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_TRANS_SHADOW</source>
+        <translation type="unfinished">Transparent shadow</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_LIGHT</source>
+        <translation type="unfinished">Light source</translation>
+    </message>
+    <message>
+        <source>PREF_LIGHT_COLOR</source>
+        <translation type="unfinished">Color</translation>
+    </message>
+    <message>
       <source>TOT_CLOSE</source>
       <translation>閉じる</translation>
     </message>

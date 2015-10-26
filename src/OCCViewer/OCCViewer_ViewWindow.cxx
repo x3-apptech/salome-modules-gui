@@ -34,6 +34,10 @@
 #include "OCCViewer_AxialScaleDlg.h"
 #include "OCCViewer_CubeAxesDlg.h"
 #include "OCCViewer_ClippingDlg.h"
+#include "OCCViewer_RayTracingDlg.h"
+#include "OCCViewer_EnvTextureDlg.h"
+#include "OCCViewer_LightSourceDlg.h"
+#include "OCCViewer_Utilities.h"
 
 #include <SUIT_Desktop.h>
 #include <SUIT_Session.h>
@@ -115,6 +119,9 @@ static QEvent* l_mbPressEvent = 0;
 #ifdef KeyPress
 #undef KeyPress
 #endif
+
+// Enable ray tracing features
+#define ENABLE_RAY_TRACING
 
 const char* imageZoomCursor[] = {
 "32 32 3 1",
@@ -1446,6 +1453,28 @@ void OCCViewer_ViewWindow::createActions()
 
   // Synchronize View
   toolMgr()->registerAction( synchronizeAction(), SynchronizeId );
+#ifdef ENABLE_RAY_TRACING
+  // Ray tracing
+  aAction = new QtxAction( tr("MNU_RAY_TRACING"), aResMgr->loadPixmap( "OCCViewer", tr("ICON_OCCVIEWER_RAY_TRACING") ),
+                           tr("MNU_RAY_TRACING"), 0, this );
+  aAction->setStatusTip( tr("DSC_RAY_TRACING") );
+  connect( aAction, SIGNAL( triggered() ), this, SLOT( onRayTracing() ) );
+  toolMgr()->registerAction( aAction, RayTracingId );
+
+  // Environment texture
+  aAction = new QtxAction( tr("MNU_ENV_TEXTURE"), aResMgr->loadPixmap( "OCCViewer", tr("ICON_OCCVIEWER_ENV_TEXTURE") ),
+                           tr("MNU_ENV_TEXTURE"), 0, this );
+  aAction->setStatusTip( tr("DSC_ENV_TEXTURE") );
+  connect( aAction, SIGNAL( triggered() ), this, SLOT( onEnvTexture() ) );
+  toolMgr()->registerAction( aAction, EnvTextureId );
+
+  // Light source
+  aAction = new QtxAction( tr("MNU_LIGHT_SOURCE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_LIGHT_SOURCE" ) ),
+                           tr( "MNU_LIGHT_SOURCE" ), 0, this );
+  aAction->setStatusTip( tr("DSC_LIGHT_SOURCE") );
+  connect( aAction, SIGNAL( triggered() ), this, SLOT( onLightSource() ) );
+  toolMgr()->registerAction( aAction, LightSourceId );
+#endif
 }
 
 /*!
@@ -1535,6 +1564,11 @@ void OCCViewer_ViewWindow::createToolBar()
 
   toolMgr()->append( MaximizedId, tid );
   toolMgr()->append( SynchronizeId, tid );
+#ifdef ENABLE_RAY_TRACING
+  toolMgr()->append( RayTracingId, tid );
+  toolMgr()->append( EnvTextureId, tid );
+  toolMgr()->append( LightSourceId, tid );
+#endif
 }
 
 /*!
@@ -2232,17 +2266,20 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
                                              const QString& fileName,
                                              const QString& format )
 {
+  bool res = false;
+  QApplication::setOverrideCursor( Qt::WaitCursor );
   if ( format != "PS" && format != "EPS")
-    return SUIT_ViewWindow::dumpViewToFormat( img, fileName, format );
+   res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
 
   Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
 
   if (format == "PS")
-    a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
+    res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
   else if (format == "EPS")
-    a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
+    res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
 
-  return true;
+  QApplication::restoreOverrideCursor();
+  return res;
 }
 
 
@@ -2540,6 +2577,58 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "gtTickmarkLengthX=%1" ).arg( params.gtTickmarkLengthX );
   data << QString( "gtTickmarkLengthY=%1" ).arg( params.gtTickmarkLengthY );
   data << QString( "gtTickmarkLengthZ=%1" ).arg( params.gtTickmarkLengthZ );
+
+  // ray tracing parameters
+  Graphic3d_RenderingParams rendParams = this->getViewPort()->getView()->RenderingParams();
+  if ( rendParams.Method == Graphic3d_RM_RAYTRACING ) {
+    QString RayTracing = "rayTracing=";
+    RayTracing += QString( "rtDepth~%1;" ).arg( rendParams.RaytracingDepth );
+    RayTracing += QString( "rtReflection~%1;" ).arg( rendParams.IsReflectionEnabled );
+    RayTracing += QString( "rtAntialiasing~%1;" ).arg( rendParams.IsAntialiasingEnabled );
+    RayTracing += QString( "rtShadow~%1;" ).arg( rendParams.IsShadowEnabled );
+    RayTracing += QString( "rtTransShadow~%1;" ).arg( rendParams.IsTransparentShadowEnabled );
+    data << RayTracing;
+  }
+
+  // environment texture parameters
+  Handle(Graphic3d_TextureEnv) aTexture = this->getViewPort()->getView()->TextureEnv();
+  if ( !aTexture.IsNull() ) {
+    QString EnvTexture = "envTexture=";
+    if ( aTexture->Name() == Graphic3d_NOT_ENV_UNKNOWN ) {
+      TCollection_AsciiString aFileName;
+      aTexture->Path().SystemName( aFileName );
+      EnvTexture += QString( "etFile~%1;" ).arg( aFileName.ToCString() );
+    }
+    else
+      EnvTexture += QString( "etNumber~%1;" ).arg( aTexture->Name() );
+    data << EnvTexture;
+  }
+
+  // light source parameters
+  myModel->getViewer3d()->InitDefinedLights();
+  while ( myModel->getViewer3d()->MoreDefinedLights() )
+  {
+    Handle(V3d_Light) aLight = myModel->getViewer3d()->DefinedLight();
+    if ( aLight->Type() != V3d_AMBIENT ) {
+      QString LightSource = QString( "lightSource=" );
+      LightSource += QString( "lightType~%1;" ).arg( aLight->Type() );
+      double aX, aY, aZ;
+      if ( aLight->Type() == V3d_DIRECTIONAL )
+        Handle(V3d_DirectionalLight)::DownCast( aLight )->Direction( aX, aY, aZ );
+      else if ( aLight->Type() == V3d_POSITIONAL )
+        Handle(V3d_PositionalLight)::DownCast( aLight )->Position( aX, aY, aZ );
+      LightSource += QString( "lightX~%1;" ).arg( aX );
+      LightSource += QString( "lightY~%1;" ).arg( aY );
+      LightSource += QString( "lightZ~%1;" ).arg( aZ );
+      LightSource += QString( "lightColorR~%1;" ).arg( aLight->Color().Red() );
+      LightSource += QString( "lightColorG~%1;" ).arg( aLight->Color().Green() );
+      LightSource += QString( "lightColorB~%1;" ).arg( aLight->Color().Blue() );
+      LightSource += QString( "lightHeadlight~%1;" ).arg( aLight->Headlight() );
+      data << LightSource;
+    }
+    myModel->getViewer3d()->NextDefinedLights();
+  }
+
   QString bg = Qtx::backgroundToString( background() ).replace( "=", "$" );
   data << QString( "background=%1" ).arg( bg );
 
@@ -2658,6 +2747,81 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
       else if ( paramName == "gtTickmarkLengthX" ) params.gtTickmarkLengthX = paramValue.toInt();
       else if ( paramName == "gtTickmarkLengthY" ) params.gtTickmarkLengthY = paramValue.toInt();
       else if ( paramName == "gtTickmarkLengthZ" ) params.gtTickmarkLengthZ = paramValue.toInt();
+      else if ( paramName == "rayTracing" )
+      {
+        Graphic3d_RenderingParams& rendParams = this->getViewPort()->getView()->ChangeRenderingParams();
+        rendParams.Method = Graphic3d_RM_RAYTRACING;
+        QStringList rtData = paramValue.split( ';' );
+        foreach( QString rtParam, rtData )
+        {
+          QString rt_paramName  = rtParam.section( '~', 0, 0 ).trimmed();
+          QString rt_paramValue = rtParam.section( '~', 1, 1 ).trimmed();
+          if ( rt_paramName == "rtDepth" ) rendParams.RaytracingDepth = rt_paramValue.toInt();
+          else if ( rt_paramName == "rtReflection" ) rendParams.IsReflectionEnabled = rt_paramValue.toInt();
+          else if ( rt_paramName == "rtAntialiasing" ) rendParams.IsAntialiasingEnabled = rt_paramValue.toInt();
+          else if ( rt_paramName == "rtShadow" ) rendParams.IsShadowEnabled = rt_paramValue.toInt();
+          else if ( rt_paramName == "rtTransShadow" ) rendParams.IsTransparentShadowEnabled = rt_paramValue.toInt();
+        }
+      }
+      else if ( paramName == "envTexture" )
+      {
+        Handle(Graphic3d_TextureEnv) aTexture;
+        QStringList etData = paramValue.split( ';' );
+        foreach( QString etParam, etData )
+        {
+          QString et_paramName  = etParam.section( '~', 0, 0 ).trimmed();
+          QString et_paramValue = etParam.section( '~', 1, 1 ).trimmed();
+          if ( et_paramName == "etNumber" )
+            aTexture = new Graphic3d_TextureEnv( Graphic3d_NameOfTextureEnv( et_paramValue.toInt() ) );
+          else if ( et_paramName == "etFile" )
+            aTexture = new Graphic3d_TextureEnv( TCollection_AsciiString( et_paramValue.toStdString().c_str() ) );
+          Handle(V3d_View) aView = this->getViewPort()->getView();
+          aView->SetTextureEnv( aTexture );
+          aView->SetSurfaceDetail( V3d_TEX_ENVIRONMENT );
+        }
+      }
+      else if ( paramName == "lightSource" )
+      {
+        myModel->getViewer3d()->InitDefinedLights();
+        while ( myModel->getViewer3d()->MoreDefinedLights() )
+        {
+          Handle(V3d_Light) aLight = myModel->getViewer3d()->DefinedLight();
+          if( aLight->Type() != V3d_AMBIENT )
+            myModel->getViewer3d()->DelLight( aLight );
+          myModel->getViewer3d()->NextDefinedLights();
+        }
+        double aX, aY, aZ;
+        double cR, cG, cB;
+        V3d_TypeOfLight aType;
+        bool isHeadlight;
+        QStringList lsData = paramValue.split( ';' );
+        foreach( QString lsParam, lsData )
+        {
+          QString ls_paramName  = lsParam.section( '~', 0, 0 ).trimmed();
+          QString ls_paramValue = lsParam.section( '~', 1, 1 ).trimmed();
+          if ( ls_paramName == "lightType" ) aType = V3d_TypeOfLight( ls_paramValue.toInt() );
+          else if ( ls_paramName == "lightX" ) aX = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightY" ) aY = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightZ" ) aZ = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightColorR" ) cR = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightColorG" ) cG = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightColorB" ) cB = ls_paramValue.toDouble();
+          else if ( ls_paramName == "lightHeadlight" ) isHeadlight = ls_paramValue.toInt();
+        }
+        Quantity_Color aColor = Quantity_Color( cR, cG, cB, Quantity_TOC_RGB );
+        if( aType == V3d_DIRECTIONAL ) {
+          Handle(V3d_DirectionalLight) aLight = new V3d_DirectionalLight( myModel->getViewer3d() );
+          aLight->SetDirection( aX, aY, aZ );
+          aLight->SetColor( aColor );
+          aLight->SetHeadlight( isHeadlight );
+          myModel->getViewer3d()->SetLightOn( aLight );
+        }
+        else if( aType == V3d_POSITIONAL ) {
+          Handle(V3d_PositionalLight) aLight = new V3d_PositionalLight( myModel->getViewer3d(), aX, aY, aZ, aColor.Name() );
+          aLight->SetHeadlight( isHeadlight );
+          myModel->getViewer3d()->SetLightOn( aLight );
+        }
+      }
       else if ( paramName == "background" )        {
   QString bg = paramValue.replace( "$", "=" );
   bgData = Qtx::stringToBackground( bg );
@@ -3557,5 +3721,32 @@ void OCCViewer_ViewWindow::onClipping (bool theIsOn)
 	}
       }
     }
+  }
+}
+
+void OCCViewer_ViewWindow::onRayTracing()
+{
+  if( !OCCViewer_Utilities::isDialogOpened( this, OCCViewer_RayTracingDlg::getName() ) ) {
+    QDialog* aDlg = new OCCViewer_RayTracingDlg( this );
+    if ( aDlg != NULL )
+      aDlg->show();
+  }
+}
+
+void OCCViewer_ViewWindow::onEnvTexture()
+{
+  if( !OCCViewer_Utilities::isDialogOpened( this, OCCViewer_EnvTextureDlg::getName() ) ) {
+    QDialog* aDlg = new OCCViewer_EnvTextureDlg( this );
+    if ( aDlg != NULL )
+      aDlg->show();
+  }
+}
+
+void OCCViewer_ViewWindow::onLightSource()
+{
+  if( !OCCViewer_Utilities::isDialogOpened( this, OCCViewer_LightSourceDlg::getName() ) ) {
+    QDialog* aDlg = new OCCViewer_LightSourceDlg( this, myModel );
+    if ( aDlg != NULL )
+      aDlg->show();
   }
 }

@@ -55,6 +55,14 @@ public:
               setViewer2DMode( OCCViewer_Viewer* theViewer,
                                const OCCViewer_ViewWindow::Mode2dType& theMode );
 
+  /*!
+   * Find dialog in the current view frame by name
+   * \param theView an OCC view
+   * \param theName name of dialog
+   * \return true/false if dialog is opened/isn't opened
+   */
+  static bool isDialogOpened( OCCViewer_ViewWindow* theView, const QString& theName );
+
 };
 
 #endif // OCCVIEWER_UTILITIES_H

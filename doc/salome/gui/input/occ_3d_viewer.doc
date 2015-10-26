@@ -295,5 +295,76 @@ or other view operation done in one view is automatically applied to
 the other view.
 <hr>
 
+\image html occ_view_ray_tracing.png
 
+\anchor ray_tracing
+
+<b>Ray tracing</b> - allows to switch between rendering methods in run-time 
+in the current OCCT 3D view. It can be used to produce images with photorealistic quality.
+
+\image html doc_ray_tracing.png
+
+- <b>Ray tracing</b> - specifies rendering mode: OpenGL rasterization (by default) or GPU ray-tracing.
+
+  - <b>Depth</b> - defines maximum ray-tracing depth.
+  
+  - <b>Specular reflections</b> - enables/disables specular reflections.
+  
+  - <b>Adaptive anti-aliasing</b> - enables/disables adaptive anti-aliasing.
+    
+  - <b>Shadows rendering</b> - enables/disables shadows rendering.
+  
+  - <b>Transparent shadow</b> - enables/disables light propagation through transparent media.
+  
+<hr>
+
+\image html occ_view_env_texture.png
+
+\anchor env_texture
+
+<b>Environment texture</b> - allows to set parameters for environment texture.
+This is a special mode of texture mapping when specular reflection of environment texture 
+is simulated by OpenGL using a special texture coordinates generation algorithm (a sphere map).
+
+\image html doc_env_texture.png
+
+- <b>Environment texture</b> - enables/disables environment texture in the current OCCT 3D view.
+
+User can select one of 7 predefined environment texture from the list or define its texture from file by 
+choosing item <b>"Custom..."</b> in a combo box.
+
+\note Note that the environment texture file should normally satisfy the following requirements 
+in order to produce good visual result:
+- The image file should have 2:1 width-to-height ratio.
+- It should constitute a 360-degrees panoramic image created using a fish-eye lens. 
+
+<hr>
+
+\image html occ_view_light_source.png
+
+\anchor light_source
+
+<b>Light source</b> - allows to set parameters for light source.
+
+It's possible to choose a type of light source between directional and positional light.
+
+\image html doc_dir_light_source.png
+
+<b>Directional</b> light - creates a directional light source in the viewer.
+It is defined by direction coordinates, color and headlight parameter.
+
+\image html doc_pos_light_source.png
+
+<b>Positional</b> light - creates an isolated light source X,Y,Z in the viewer. 
+It is also defined by the color and headlight parameter.
+
+Click:
+
+- <b>Apply and Close</b> to apply defined light source to the OCC 3D Viewer.
+
+- <b>Default</b> to restore default values of light source.
+
+- <b>Close</b> to return parameters of light source on initial values.
+
+<hr>
 */

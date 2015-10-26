@@ -122,6 +122,7 @@ private:
   bool                  setWindow( const Handle(V3d_View)& );
   bool                  mapped( const Handle(V3d_View)& ) const;
   void                  updateBackground();
+  void                  setDefaultParams();
   
 private:
   Handle(V3d_View)      myActiveView;

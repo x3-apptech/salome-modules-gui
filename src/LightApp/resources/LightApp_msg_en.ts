@@ -852,6 +852,38 @@ The changes will be applied on the next application session.</translation>
         <translation>Scale factor</translation>
     </message>
     <message>
+        <source>PREF_GROUP_RAY_TRACING</source>
+        <translation>Ray tracing</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_DEPTH</source>
+        <translation>Depth</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_REFLECTION</source>
+        <translation>Specular reflections</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_ANTIALIASING</source>
+        <translation>Adaptive anti-aliasing</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_SHADOW</source>
+        <translation>Shadows rendering</translation>
+    </message>
+    <message>
+        <source>PREF_RAY_TRACING_TRANS_SHADOW</source>
+        <translation>Transparent shadow</translation>
+    </message>
+    <message>
+        <source>PREF_GROUP_LIGHT</source>
+        <translation>Light source</translation>
+    </message>
+    <message>
+        <source>PREF_LIGHT_COLOR</source>
+        <translation>Color</translation>
+    </message>
+    <message>
         <source>TOT_CLOSE</source>
         <translation>Close</translation>
     </message>

@@ -28,6 +28,8 @@
 
 #include <SUIT_ViewManager.h>
 #include <SUIT_ViewModel.h>
+#include <SUIT_Session.h>
+#include <SUIT_ResourceMgr.h>
 
 #include <QColor>
 #include <QFileInfo>
@@ -88,7 +90,7 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
   }
 #endif
 
-  setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
+  setDefaultParams();
 
   myCursor = NULL;
 }
@@ -802,4 +804,27 @@ void OCCViewer_ViewPort3d::setDefaultCursor( Qt::CursorShape theCursorShape )
 QCursor* OCCViewer_ViewPort3d::getDefaultCursor() const
 {
   return myCursor;
+}
+
+/*
+ * Set default parameters from preferences
+ */
+void OCCViewer_ViewPort3d::setDefaultParams()
+{
+  setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
+
+  // get ray tracing parameters from preferences
+  int aDepth = SUIT_Session::session()->resourceMgr()->integerValue( "OCCViewer", "rt_depth", 3 );
+  bool aReflection = SUIT_Session::session()->resourceMgr()->booleanValue( "OCCViewer", "rt_reflection", true );
+  bool anAntialiasing = SUIT_Session::session()->resourceMgr()->booleanValue( "OCCViewer", "rt_antialiasing", false );
+  bool aShadow = SUIT_Session::session()->resourceMgr()->booleanValue( "OCCViewer", "rt_shadow", true );
+  bool aTransparentShadow = SUIT_Session::session()->resourceMgr()->booleanValue( "OCCViewer", "rt_trans_shadow", true );
+
+  Graphic3d_RenderingParams& aParams = myActiveView->ChangeRenderingParams();
+  aParams.RaytracingDepth = aDepth;
+  aParams.IsReflectionEnabled = aReflection;
+  aParams.IsAntialiasingEnabled = anAntialiasing;
+  aParams.IsShadowEnabled = aShadow;
+  aParams.IsTransparentShadowEnabled = aTransparentShadow;
+  myActiveView->Redraw();
 }

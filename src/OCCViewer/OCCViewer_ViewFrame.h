@@ -172,6 +172,7 @@ private:
   void updateWindowTitle( OCCViewer_ViewWindow* theView );
   void createSubViews();
   void splitSubViews();
+  void setSubViewParams( OCCViewer_ViewWindow* theView );
 
   QList<OCCViewer_ViewWindow*> myViews;
   QGridLayout* myLayout;

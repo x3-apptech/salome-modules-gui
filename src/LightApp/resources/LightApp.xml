@@ -160,6 +160,15 @@
     <parameter name="clipping_use_default_texture" value="true"/>
     <parameter name="clipping_modulate"   value="true"/>
     <parameter name="clipping_scale"      value="1.0"/>
+    <parameter name="rt_depth"            value="3"/>
+    <parameter name="rt_reflection"       value="true"/>
+    <parameter name="rt_antialiasing"     value="false"/>
+    <parameter name="rt_shadow"           value="true"/>
+    <parameter name="rt_trans_shadow"     value="false"/>                     
+    <parameter name="light_color"         value="255, 255, 255"/>
+    <parameter name="light_dx"            value="0.0"/>
+    <parameter name="light_dy"            value="0.0"/>
+    <parameter name="light_dz"            value="-1.0"/>
     <parameter name="background"      value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="xz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
     <parameter name="yz_background"   value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />

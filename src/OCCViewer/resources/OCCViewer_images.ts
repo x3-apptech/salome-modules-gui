@@ -151,5 +151,17 @@
         <source>ICON_OCCVIEWER_STEREO</source>
         <translation>occ_view_stereo.png</translation>
     </message>
+    <message>
+        <source>ICON_OCCVIEWER_RAY_TRACING</source>
+        <translation>occ_view_ray_tracing.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_ENV_TEXTURE</source>
+        <translation>occ_view_env_texture.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_LIGHT_SOURCE</source>
+        <translation>occ_view_light_source.png</translation>
+    </message>
 </context>
 </TS>

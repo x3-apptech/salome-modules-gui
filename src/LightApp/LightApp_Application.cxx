@@ -2515,6 +2515,61 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "step", 0.1, scaleFactor );
   // ... "Clipping" group <<end>>
 
+  // ... "Ray tracing" group <<start>>
+  int occRayTracingGroup = pref->addPreference( tr( "PREF_GROUP_RAY_TRACING" ), occGroup );
+  int rtPref = pref->addPreference( "", occRayTracingGroup, LightApp_Preferences::Frame );
+  pref->setItemProperty( "columns", 2, rtPref );
+  // .... -> depth
+  int rt_depth = pref->addPreference( tr( "PREF_RAY_TRACING_DEPTH" ), rtPref,
+               LightApp_Preferences::IntSpin, "OCCViewer", "rt_depth" );
+  pref->setItemProperty( "min", 1, rt_depth );
+  pref->setItemProperty( "max", 10, rt_depth );
+  pref->setItemProperty( "step", 1, rt_depth );
+  pref->addPreference( "", rtPref, LightApp_Preferences::Frame );
+  // .... -> specular reflections
+  pref->addPreference( tr( "PREF_RAY_TRACING_REFLECTION" ), rtPref,
+               LightApp_Preferences::Bool, "OCCViewer", "rt_reflection" );
+  // .... -> adaptive anti-aliasing
+  pref->addPreference( tr( "PREF_RAY_TRACING_ANTIALIASING" ), rtPref,
+               LightApp_Preferences::Bool, "OCCViewer", "rt_antialiasing" );
+  // .... -> shadows rendering
+  pref->addPreference( tr( "PREF_RAY_TRACING_SHADOW" ), rtPref,
+               LightApp_Preferences::Bool, "OCCViewer", "rt_shadow" );
+  // .... -> transparent shadow
+  pref->addPreference( tr( "PREF_RAY_TRACING_TRANS_SHADOW" ), rtPref,
+               LightApp_Preferences::Bool, "OCCViewer", "rt_trans_shadow" );
+  // ... "Ray tracing" group <<end>>
+
+  // ... "Light source" group <<start>>
+  int occLightGroup = pref->addPreference( tr( "PREF_GROUP_LIGHT" ), occGroup );
+  // .... -> light color
+  pref->addPreference( tr( "PREF_LIGHT_COLOR" ), occLightGroup,
+               LightApp_Preferences::Color, "OCCViewer", "light_color" );
+  int directionPref = pref->addPreference( "", occLightGroup, LightApp_Preferences::Frame );
+  pref->setItemProperty( "columns", 3, directionPref );
+  // .... -> light direction (dx component)
+  int light_dx = pref->addPreference( tr( "Dx" ), directionPref,
+               LightApp_Preferences::DblSpin, "OCCViewer", "light_dx" );
+  pref->setItemProperty( "precision", 2, light_dx );
+  pref->setItemProperty( "min", -1.0E03, light_dx );
+  pref->setItemProperty( "max", 1.0E03, light_dx );
+  pref->setItemProperty( "step", 0.1, light_dx );
+  // .... -> light direction (dy component)
+  int light_dy = pref->addPreference( tr( "Dy" ), directionPref,
+               LightApp_Preferences::DblSpin, "OCCViewer", "light_dy" );
+  pref->setItemProperty( "precision", 2, light_dy );
+  pref->setItemProperty( "min", -1.0E03, light_dy );
+  pref->setItemProperty( "max", 1.0E03, light_dy );
+  pref->setItemProperty( "step", 0.1, light_dy );
+  // .... -> light direction (dz component)
+  int light_dz = pref->addPreference( tr( "Dz" ), directionPref,
+               LightApp_Preferences::DblSpin, "OCCViewer", "light_dz" );
+  pref->setItemProperty( "precision", 2, light_dz );
+  pref->setItemProperty( "min", -1.0E03, light_dz );
+  pref->setItemProperty( "max", 1.0E03, light_dz );
+  pref->setItemProperty( "step", 0.1, light_dz );
+  // ... "Light source" group <<end>>
+
   // ... -> empty frame (for layout) <<start>>
   int occGen = pref->addPreference( "", occGroup, LightApp_Preferences::Frame );
   pref->setItemProperty( "margin",  0, occGen );

@@ -36,6 +36,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ViewerData
   ${PROJECT_SOURCE_DIR}/src/ViewerTools
   ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
+  ${PROJECT_SOURCE_DIR}/src/CAF
 )
 
 # additional preprocessor / compiler flags
@@ -45,7 +46,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
   ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKOpenGl}
-  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils
+  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils caf
 )
 
 # --- headers ---
@@ -55,6 +56,9 @@ SET(_moc_HEADERS
   OCCViewer_AISSelector.h
   OCCViewer_AxialScaleDlg.h
   OCCViewer_ClippingDlg.h
+  OCCViewer_RayTracingDlg.h
+  OCCViewer_EnvTextureDlg.h
+  OCCViewer_LightSourceDlg.h
   OCCViewer_CreateRestoreViewDlg.h
   OCCViewer_CubeAxesDlg.h
   OCCViewer_FontWidget.h
@@ -141,6 +145,9 @@ SET(_other_RESOURCES
   resources/occ_view_triedre.png
   resources/occ_view_zoom.png
   resources/occ_view_zooming_style_switch.png
+  resources/occ_view_ray_tracing.png
+  resources/occ_view_env_texture.png
+  resources/occ_view_light_source.png
 )
 
 # --- sources ---
@@ -156,6 +163,9 @@ SET(_other_SOURCES
   OCCViewer_AISSelector.cxx
   OCCViewer_AxialScaleDlg.cxx
   OCCViewer_ClippingDlg.cxx
+  OCCViewer_RayTracingDlg.cxx
+  OCCViewer_EnvTextureDlg.cxx
+  OCCViewer_LightSourceDlg.cxx
   OCCViewer_ClipPlane.cxx
   OCCViewer_CreateRestoreViewDlg.cxx
   OCCViewer_CubeAxesDlg.cxx

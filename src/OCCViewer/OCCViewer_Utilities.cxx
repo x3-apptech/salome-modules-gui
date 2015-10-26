@@ -36,6 +36,7 @@
 // QT includes
 #include <QImage>
 #include <QAction>
+#include <QDialog>
 
 Handle(Image_PixMap) OCCViewer_Utilities::imageToPixmap( const QImage& anImage )
 {
@@ -134,4 +135,15 @@ OCCViewer_ViewWindow::Mode2dType OCCViewer_Utilities::setViewer2DMode
   }
 
   return anOldMode;
+}
+
+bool OCCViewer_Utilities::isDialogOpened( OCCViewer_ViewWindow* theView, const QString& theName )
+{
+  bool isFound = false;
+  OCCViewer_ViewFrame* aViewFrame = dynamic_cast<OCCViewer_ViewFrame*>( theView->parent()->parent() );
+  QList<QDialog*> allDialogs = qFindChildren<QDialog*>( aViewFrame );
+  foreach ( QDialog* d, allDialogs )
+    if ( d->objectName() == theName )
+      isFound = true;
+  return isFound;
 }

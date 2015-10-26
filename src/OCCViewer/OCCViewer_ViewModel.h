@@ -100,6 +100,8 @@ public:
   void                            performSelectionChanged();
   // emit signal selectionChanged
 
+  void                            setDefaultLights();
+
   QColor                          backgroundColor() const;                              // obsolete
   void                            setBackgroundColor( const QColor& );                  // obsolete
   Qtx::BackgroundData             background() const;

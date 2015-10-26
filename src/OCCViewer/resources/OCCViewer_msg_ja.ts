@@ -273,6 +273,30 @@
       <translation>3D に戻る</translation>
     </message>
     <message>
+        <source>MNU_RAY_TRACING</source>
+        <translation type="unfinished">Ray tracing</translation>
+    </message>
+    <message>
+        <source>DSC_RAY_TRACING</source>
+        <translation type="unfinished">Ray tracing</translation>
+    </message>
+    <message>
+        <source>MNU_ENV_TEXTURE</source>
+        <translation type="unfinished">Environment texture</translation>
+    </message>
+    <message>
+        <source>DSC_ENV_TEXTURE</source>
+        <translation type="unfinished">Environment texture</translation>
+    </message>
+    <message>
+        <source>MNU_LIGHT_SOURCE</source>
+        <translation type="unfinished">Light source</translation>
+    </message>
+    <message>
+        <source>DSC_LIGHT_SOURCE</source>
+        <translation type="unfinished">Light source</translation>
+    </message>
+    <message>
       <source>DSC_RETURN_3D_VIEW</source>
       <translation>3D view に戻る</translation>
     </message>
@@ -617,6 +641,115 @@
     <message>
       <source>HELP</source>
       <translation>ヘルプ(&amp;H)</translation>
+    </message>
+  </context>
+  <context>
+    <name>OCCViewer_RayTracingDlg</name>
+    <message>
+        <source>RAY_TRACING</source>
+        <translation type="unfinished">Ray tracing</translation>
+    </message>
+    <message>
+        <source>DEPTH</source>
+        <translation type="unfinished">Depth</translation>
+    </message>
+    <message>
+        <source>SHADOW</source>
+        <translation type="unfinished">Shadows rendering</translation>
+    </message>
+    <message>
+        <source>REFLECTION</source>
+        <translation type="unfinished">Specular reflections</translation>
+    </message>
+    <message>
+        <source>ANTIALIASING</source>
+        <translation type="unfinished">Adaptive anti-aliasing</translation>
+    </message>
+    <message>
+        <source>TRANSPARENT_SHADOW</source>
+        <translation type="unfinished">Transparent shadow</translation>
+    </message>
+  </context>
+  <context>
+    <name>OCCViewer_EnvTextureDlg</name>
+    <message>
+        <source>ENV_TEXTURE</source>
+        <translation type="unfinished">Environment texture</translation>
+    </message>
+    <message>
+        <source>ENV_CLOUDS</source>
+        <translation type="unfinished">Clouds</translation>
+    </message>
+    <message>
+        <source>ENV_CV</source>
+        <translation type="unfinished">Cv</translation>
+    </message>
+    <message>
+        <source>ENV_MEDIT</source>
+        <translation type="unfinished">Medit</translation>
+    </message>
+    <message>
+        <source>ENV_PEARL</source>
+        <translation type="unfinished">Pearl</translation>
+    </message>
+    <message>
+        <source>ENV_SKY1</source>
+        <translation type="unfinished">Sky1</translation>
+    </message>
+    <message>
+        <source>ENV_SKY2</source>
+        <translation type="unfinished">Sky2</translation>
+    </message>
+    <message>
+        <source>ENV_LINES</source>
+        <translation type="unfinished">Lines</translation>
+    </message>
+    <message>
+        <source>ENV_ROAD</source>
+        <translation type="unfinished">Road</translation>
+    </message>
+    <message>
+        <source>ENV_CUSTOM</source>
+        <translation>Custom...</translation>
+    </message>
+  </context>
+  <context>
+    <name>OCCViewer_LightSourceDlg</name>
+    <message>
+        <source>LIGHT_SOURCE</source>
+        <translation type="unfinished">Light source</translation>
+    </message>
+    <message>
+        <source>TYPE</source>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <source>DIRECTIONAL</source>
+        <translation type="unfinished">Directional</translation>
+    </message>
+    <message>
+        <source>DIRECTION</source>
+        <translation type="unfinished">Direction</translation>
+    </message>
+    <message>
+        <source>POSITIONAL</source>
+        <translation type="unfinished">Positional</translation>
+    </message>
+    <message>
+        <source>POSITION</source>
+        <translation type="unfinished">Position</translation>
+    </message>
+    <message>
+        <source>COLOR</source>
+        <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+        <source>HEADLIGHT</source>
+        <translation type="unfinished">Headlight</translation>
+    </message>
+    <message>
+        <source>BUT_DEFAULT</source>
+        <translation type="unfinished">Default</translation>
     </message>
   </context>
 </TS>

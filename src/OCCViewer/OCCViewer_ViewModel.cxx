@@ -36,6 +36,8 @@
 
 #include "ViewerData_AISShape.hxx"
 
+#include "CAF_Tools.h"
+
 #include <Basics_OCCTVersion.hxx>
 
 #include "QtxActionToolMgr.h"
@@ -72,6 +74,9 @@
 #include <Prs3d_TextAspect.hxx>
 
 #include <Visual3d_View.hxx>
+
+#include <V3d_DirectionalLight.hxx>
+#include <V3d_AmbientLight.hxx>
 
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats
@@ -120,7 +125,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
   //myV3dViewer->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
-  myV3dViewer->SetDefaultLights();
+  setDefaultLights();
 
   // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
@@ -1081,6 +1086,33 @@ void OCCViewer_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 void OCCViewer_Viewer::performSelectionChanged()
 {
     emit selectionChanged();
+}
+
+/*
+ * Defines default lights
+ */
+void OCCViewer_Viewer::setDefaultLights()
+{
+  // clear all light sources
+  myV3dViewer->InitDefinedLights();
+  while ( myV3dViewer->MoreDefinedLights() )
+  {
+    myV3dViewer->DelLight( myV3dViewer->DefinedLight() );
+    myV3dViewer->InitDefinedLights();
+  }
+
+  // get light source parameters from preferences
+  QColor aColor = SUIT_Session::session()->resourceMgr()->colorValue( "OCCViewer", "light_color", QColor( 0, 0, 0 ) );
+  double aDx = SUIT_Session::session()->resourceMgr()->doubleValue( "OCCViewer", "light_dx", 0.0 );
+  double aDy = SUIT_Session::session()->resourceMgr()->doubleValue( "OCCViewer", "light_dy", 0.0 );
+  double aDz = SUIT_Session::session()->resourceMgr()->doubleValue( "OCCViewer", "light_dz", -1.0 );
+
+  Handle(V3d_DirectionalLight) aLight =
+    new V3d_DirectionalLight( myV3dViewer, V3d_Zneg, CAF_Tools::color( aColor ).Name(), Standard_True );
+  if( !( aDx == 0 && aDy == 0 && aDz == 0 ) )
+    aLight->SetDirection( aDx, aDy, aDz );
+  myV3dViewer->SetLightOn( aLight );
+  myV3dViewer->SetLightOn( new V3d_AmbientLight( myV3dViewer ) );
 }
 
 /*!
