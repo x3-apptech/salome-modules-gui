@@ -175,6 +175,25 @@ SalomeApp_Application::~SalomeApp_Application()
   //SALOME_EventFilter::Destroy();
 }
 
+QStringList __getArgsList(QString argsString)
+{
+  // Special process if some items of 'args:' list are themselves lists
+  // Note that an item can be a list, but not a list of lists...
+  // So we can have something like this:
+  // myscript.py args:['file1','file2'],val1,"done",[1,2,3],[True,False],"ok"
+  // With such a call, argsString variable contains the string representing "[file1,file2]", "val1", "done", "[1,2,3]", "[True,False]", "ok"
+  // We have to split argsString to obtain: [[file1,file2],val1,done,[1,2,3],[True,False],ok]
+  argsString.replace("\\\"", "'"); // replace escaped double quotes by simple quotes
+  bool containsList = (QRegExp("(\\[[^\\]]*\\])").indexIn(argsString) >= 0);
+  if (containsList) {
+    QStringList sl = argsString.split("\"", QString::SkipEmptyParts);
+    sl.removeAll(", ");
+    return sl;
+  }
+  else
+    return argsString.split(",", QString::SkipEmptyParts);
+}
+
 /*!Start application.*/
 void SalomeApp_Application::start()
 {
@@ -243,7 +262,7 @@ void SalomeApp_Application::start()
             if ( rxp.indexIn( pyfiles[j] ) >= 0 && rxp.capturedTexts().count() == 3 ) {
               QString script = rxp.capturedTexts()[1];
               QString args = "";
-              QStringList argList = rxp.capturedTexts()[2].split(",", QString::SkipEmptyParts);
+              QStringList argList = __getArgsList(rxp.capturedTexts()[2]);
               for (uint k = 0; k < argList.count(); k++ ) {
                 QString arg = argList[k].trimmed();
                 arg.remove( QRegExp("^[\"]") );

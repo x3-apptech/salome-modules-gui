@@ -35,6 +35,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 
 #define TOP_HISTORY_PY   "--- top of history ---"
@@ -362,6 +363,75 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
 }
+
+std::vector<std::string>
+__split(const std::string& str, char delimiter)
+{
+  std::vector<std::string> internal;
+  std::stringstream ss(str); // Turn the string into a stream.
+  std::string tok;
+
+  while (getline(ss, tok, delimiter)) {
+    internal.push_back(tok);
+  }
+
+  return internal;
+}
+
+std::string
+__join(const std::vector<std::string>& v, int begin=0, int end=-1)
+{
+  if (end == -1)
+    end = v.size();
+  std::stringstream ss;
+  for (size_t i = begin; i < end; ++i) {
+    if (i != begin)
+      ss << ",";
+    ss << v[i];
+  }
+  return ss.str();
+}
+
+std::vector<std::string>
+__getArgsList(std::string argsString)
+{
+  // Special process if some items of 'args:' list are themselves lists
+  // Note that an item can be a list, but not a list of lists...
+  // So we can have something like this:
+  // myscript.py args:[\'file1\',\'file2\'],\'val1\',\"done\",[1,2,3],[True,False],\"ok\",kwarg1=\'kwarg1\',kwarg2=\'kwarg2\',\'fin\'
+  // With such a call, argsString variable contains the string representing ['file1','file2'],'val1','done',[1,2,3],[True,False],'ok',kwarg1='kwarg1',kwarg2='kwarg2','fin'
+  // We have to split argsString to obtain a 9 string elements list
+  std::vector<std::string> x = __split(argsString, ',');
+  bool containsList = (argsString.find('[') != std::string::npos);
+  if (containsList) {
+    std::vector<int> listBeginIndices, listEndIndices;
+    for (int pos = 0; pos < x.size(); ++pos) {
+      if (x[pos][0] == '[')
+        listBeginIndices.push_back(pos);
+      else if (x[pos][x[pos].size()-1] == ']')
+        listEndIndices.push_back(pos);
+    }
+    std::vector<std::string> extractedArgs;
+    int start = 0;
+    for (int pos = 0; pos < listBeginIndices.size(); ++pos) {
+      int lbeg = listBeginIndices[pos];
+      int lend = listEndIndices[pos];
+      if (lbeg > start)
+        for (int k = start; k < lbeg; ++k)
+          extractedArgs.push_back(x[k]);
+      extractedArgs.push_back(__join(x, lbeg, lend+1));
+      start = lend+1;
+    }
+    if (start < x.size())
+      for (int k = start; k < x.size(); ++k)
+        extractedArgs.push_back(x[k]);
+    return extractedArgs;
+  }
+  else {
+    return x;
+  }
+}
+
 /*!
   \brief Compile Python command and evaluate it in the
          python dictionary context if possible. Command might correspond to
@@ -380,7 +450,7 @@ static int compile_command(const char *command, PyObject * global_ctxt, PyObject
   std::string singleCommand = command;
   std::string commandArgs = "";
 
-  if (singleCommand.at(singleCommand.size()-1) == '\n')
+  while (singleCommand.at(singleCommand.size()-1) == '\n')
     singleCommand.erase(singleCommand.size()-1);
   std::size_t pos = singleCommand.find("args:");
   if (pos != std::string::npos) {
@@ -398,12 +468,17 @@ static int compile_command(const char *command, PyObject * global_ctxt, PyObject
     // process command: execfile(r"/absolute/path/to/script.py [args:arg1,...,argn]")
     std::string script = singleCommand.substr(11); // remove leading execfile(r"
     script = script.substr(0, script.length()-2); // remove trailing ")
+    std::vector<std::string> argList = __getArgsList(commandArgs);
 
     std::string preCommandBegin = "import sys; save_argv = sys.argv; sys.argv=[";
     std::string preCommandEnd = "];";
-    replaceAll(commandArgs, ",", "\",\"");
-    commandArgs = "\""+commandArgs+"\"";
-    std::string completeCommand = preCommandBegin+"\""+script+"\","+commandArgs+preCommandEnd+singleCommand+";sys.argv=save_argv";
+    std::string completeCommand = preCommandBegin+"\""+script+"\",";
+    for (std::vector<std::string>::iterator itr = argList.begin(); itr != argList.end(); ++itr) {
+      if (itr != argList.begin())
+        completeCommand += ",";
+      completeCommand = completeCommand + "\"" + *itr + "\"";
+    }
+    completeCommand = completeCommand+preCommandEnd+singleCommand+";sys.argv=save_argv";
     return run_command(completeCommand.c_str(), global_ctxt, local_ctxt);
   }
 }
