@@ -145,8 +145,8 @@ inline int InsertCell(vtkUnstructuredGrid *theInput,
       theFaceLocations->InsertNextValue(theFaces->GetMaxId() + 1);
 
       // insert cell connectivity and faces stream
-      vtkIdType nfaces;
-      vtkIdType* face;
+      vtkIdType nfaces = 0;
+      vtkIdType*  face = 0;
       vtkIdType realnpts;
       theInput->GetFaceStream(theCellId, nfaces, face);
       vtkUnstructuredGrid::DecomposeAPolyhedronCell(
@@ -154,7 +154,7 @@ inline int InsertCell(vtkUnstructuredGrid *theInput,
     }
 #endif
 
-  vtkIdType anID = theCellTypesArray->InsertNextValue(aCellType);
+  /*vtkIdType anID = */theCellTypesArray->InsertNextValue(aCellType);
   if(theStoreMapping){
     theOut2InId.push_back(theCellId);
     theIn2OutId[theCellId] = theOutId;
