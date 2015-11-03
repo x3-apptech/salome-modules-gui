@@ -71,6 +71,15 @@ const int __DEFAULT__ATTEMPTS__ = 300;
 */
 const int __DEFAULT__DELAY__ = 50000;
 
+// The exception being thrown out of a destructor,
+// that is not allowed by default in C++11.
+
+#if __cplusplus >= 201103L
+# define TYPE_NOEXCEPT noexcept(false)
+#else
+# define TYPE_NOEXCEPT
+#endif
+
 /*!
   \classSession_ServerCheck::Locker
   \brief Automatic locker/unlocker.
@@ -92,7 +101,7 @@ public:
   /*!
     \brief Destructor. Wakes the calling thread and goes sleeping.
   */
-  ~Locker()
+  ~Locker() TYPE_NOEXCEPT
   {
     myChecker->myWC->wakeAll();
     myChecker->usleep( myChecker->myDelay );
