@@ -173,7 +173,7 @@ SalomeApp_StudyPropertiesDlg::~SalomeApp_StudyPropertiesDlg()
 */
 void SalomeApp_StudyPropertiesDlg::initData()
 {
-  bool hasData = myStudyDoc;
+  bool hasData = (myStudyDoc != NULL);
   _PTR(AttributeStudyProperties) propAttr;
   if (hasData)
     propAttr = myStudyDoc->GetProperties();
