@@ -433,7 +433,8 @@ void OB_Browser::select( const QModelIndexList& indexes, const bool on, const bo
       for (int i = 1; i < indexes.size(); ++i) 
       {
         idx=indexes.at(i);
-        if(idx.parent().internalId()==last.parent().internalId() && idx.row()==last.row()+1 && idx.column()==last.column())
+        if(idx.parent().row()==last.parent().row() && idx.parent().column()==last.parent().column() &&
+           idx.row()==last.row()+1 && idx.column()==last.column())
         {
           // index is contiguous to last: extend the range
           last=idx;
