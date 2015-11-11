@@ -177,12 +177,10 @@ int main( int argc, char* argv[] )
     }
   }
 
-  // add $QTDIR/plugins to the pluins search path for image plugins
-  QString qtdir = qgetenv( "QT_ROOT_DIR" );
-  if ( qtdir.isEmpty() )
-    qtdir = qgetenv( "QTDIR" );
+  // add <qtdir>/plugins directory to the pluins search path for image plugins
+  QString qtdir = Qtx::qtDir( "plugins" );
   if ( !qtdir.isEmpty() )
-    QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
+    QApplication::addLibraryPath( qtdir );
 
   //Set a "native" graphic system in case if application runs on the remote host
   QString remote(::getenv("REMOTEHOST"));

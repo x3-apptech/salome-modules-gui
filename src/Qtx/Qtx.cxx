@@ -2069,6 +2069,32 @@ long Qtx::versionToId( const QString& version )
   return id;
 }
 
+/*!
+  \brief Get Qt installation directory
+  
+  The function tries to detect qt installation directory by analyzing the system variables in the following order:
+  - QT5_ROOT_DIR
+  - QT4_ROOT_DIR
+  - QT_ROOT_DIR
+  - QTDIR
+
+  Optional parameter \a context allows obtaining subdirectory in the Qt installation directory.
+
+  \param context optional sub-directory
+  \return path to the Qt installation directory (or its sub-folder, if \a context is specified)
+*/
+
+QString Qtx::qtDir( const QString& context )
+{
+  const char* vars[] = { "QT5_ROOT_DIR", "QT4_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
+  QString qtPath;
+  for (uint i = 0; i < sizeof(vars)/sizeof(vars[0]) && qtPath.isEmpty(); i++ )
+    qtPath = qgetenv( vars[i] );
+  if ( !qtPath.isEmpty() && !context.isEmpty() )
+    qtPath = QDir( qtPath ).absoluteFilePath( context );
+  return qtPath;
+}
+
 #ifndef WIN32
 
 #include <X11/Xlib.h>
@@ -2136,4 +2162,5 @@ Qt::HANDLE Qtx::getVisual()
  
   return res;
 }
+
 #endif // WIN32

@@ -350,12 +350,10 @@ int main( int argc, char **argv )
     QApplication::setGraphicsSystem(QLatin1String("native"));
   }
   
-  // add $QTDIR/plugins to the pluins search path for image plugins
-  QString qtdir = qgetenv( "QT_ROOT_DIR" );
-  if ( qtdir.isEmpty() )
-    qtdir = qgetenv( "QTDIR" );
+  // add <qtdir>/plugins dir to the pluins search path for image plugins
+  QString qtdir = Qtx::qtDir( "plugins" );
   if ( !qtdir.isEmpty() )
-    QApplication::addLibraryPath( QDir( qtdir ).absoluteFilePath( "plugins" ) );
+    QApplication::addLibraryPath( qtdir );
 
   // set "C" locale if requested via preferences
   {

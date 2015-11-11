@@ -260,6 +260,8 @@ public:
 
   static long        versionToId( const QString& );
 
+  static QString     qtDir( const QString& = QString());
+
 #ifndef WIN32
   static void*       getDisplay();
   static Qt::HANDLE  getVisual();
