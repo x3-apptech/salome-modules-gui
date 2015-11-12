@@ -165,7 +165,7 @@ void SUIT_DataBrowser::updateTree( SUIT_DataObject* obj, const bool autoOpen )
 */
 int SUIT_DataBrowser::shortcutKey(const int id) const
 {
-  return myShortcutMap.value(id)->key();
+  return myShortcutMap.value(id)->key()[0];
 }
 
 /*!

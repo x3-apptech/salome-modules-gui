@@ -144,11 +144,11 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListWidgetItem* curItem )
             highLevel = index;
           }
           for( int j = lowLevel; j <= highLevel; j++ )
-            myListBox->item( j )->setSelected( TRUE );
+            myListBox->item( j )->setSelected( true );
           break;
         }
         if( myListBox->item( i )->isSelected() && i == index )
-          myListBox->item( i )->setSelected( TRUE );
+          myListBox->item( i )->setSelected( true );
       }
     }
     

@@ -62,7 +62,7 @@ SVTK_SetRotationPointDlg
   myRWInteractor(theParent->GetInteractor())
 {
   setWindowTitle(tr("DLG_TITLE"));
-  setSizeGripEnabled(TRUE);
+  setSizeGripEnabled(true);
 
   // Create layout for this dialog
   QGridLayout* layoutDlg = new QGridLayout (this);
@@ -153,7 +153,7 @@ SVTK_SetRotationPointDlg
 
   QPushButton* m_bClose = new QPushButton(tr("&Close"), aGroupBox );
   m_bClose->setObjectName("m_bClose");
-  m_bClose->setAutoDefault(TRUE);
+  m_bClose->setAutoDefault(true);
   m_bClose->setFixedSize(m_bClose->sizeHint());
   connect(m_bClose, SIGNAL(clicked()), this, SLOT(onClickClose()));
 

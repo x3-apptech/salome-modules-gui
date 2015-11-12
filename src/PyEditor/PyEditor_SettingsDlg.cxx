@@ -123,12 +123,12 @@ PyEditor_SettingsDlg::PyEditor_SettingsDlg( PyEditor_Editor* theEditor, QWidget*
   aMainLayout->addStretch( 1 );
   
   myOkBtn = new QPushButton( tr( "BUT_OK" ), this );
-  myOkBtn->setAutoDefault( TRUE );
-  myOkBtn->setDefault( TRUE );
+  myOkBtn->setAutoDefault( true );
+  myOkBtn->setDefault( true );
   myCancelBtn = new QPushButton( tr( "BUT_CANCEL" ), this );
-  myCancelBtn->setAutoDefault( TRUE );
+  myCancelBtn->setAutoDefault( true );
   myHelpBtn = new QPushButton( tr( "BUT_HELP" ), this );
-  myHelpBtn->setAutoDefault( TRUE );
+  myHelpBtn->setAutoDefault( true );
   QHBoxLayout* aButtonLayout = new QHBoxLayout;
   aButtonLayout->addWidget( myOkBtn );
   aButtonLayout->addStretch();

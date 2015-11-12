@@ -34,9 +34,6 @@
 #ifndef WIN32
 #include <QX11Info>
 #include <vtkXOpenGLRenderWindow.h>
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#include <qgl.h>
 #endif
 
 /*!Constructor. Create render window with parant \a parent and name \a name.

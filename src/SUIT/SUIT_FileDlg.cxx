@@ -131,8 +131,13 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
     setWindowIcon( parent->windowIcon() );
 
   // GDD
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   myUrls.insert(0,QUrl::fromLocalFile(QDesktopServices::storageLocation(QDesktopServices::ApplicationsLocation)));
   myUrls.insert(0,QUrl::fromLocalFile(QDesktopServices::storageLocation(QDesktopServices::HomeLocation)));
+#else
+  myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)));
+  myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)));
+#endif
   setSidebarUrls(myUrls);
 
   // add quick directories widgets
@@ -518,7 +523,7 @@ QString SUIT_FileDlg::addExtension( const QString& fileName ) const
     return fileName;
 
   QRegExp r( QString::fromLatin1("\\(?[a-zA-Z0-9.*? +;#|]*\\)?$") );
-  int index = r.indexIn( selectedFilter().trimmed() );
+  int index = r.indexIn( selectedNameFilter().trimmed() );
 
   if ( QFileInfo( fileName ).exists() )
     return fileName; // if file exists return as is
@@ -529,7 +534,7 @@ QString SUIT_FileDlg::addExtension( const QString& fileName ) const
     // Due to transformations from the filter list (*.txt *.*xx *.c++ SUIT*.* ) we 
     // will have the pattern (\.txt|\..*xx|\.c\+\+|\..*) (as we validate extension only, 
     // we remove everything except extension mask from the pattern
-    QString wildcard = selectedFilter().mid( index, r.matchedLength() ).trimmed();
+    QString wildcard = selectedNameFilter().mid( index, r.matchedLength() ).trimmed();
     // replace '|' and ';' separators by space symbol and also brackets if there are some
     wildcard.replace( QRegExp( "[\\|;|(|)]" )," " ); 
 
@@ -599,12 +604,12 @@ bool SUIT_FileDlg::processPath( const QString& path )
 */
 void SUIT_FileDlg::addFilter( const QString& filter )
 {
-  QStringList flist = filters();
+  QStringList flist = nameFilters();
   if ( !flist.contains( filter ) ) {
     flist << filter;
-    setFilters( flist );
+    setNameFilters( flist );
   }
-  selectFilter( filter );
+  selectNameFilter( filter );
 }
 
 /*!
@@ -768,9 +773,9 @@ QString SUIT_FileDlg::getFileName( QWidget* parent, const QString& initial,
   tmpfilename = tmpfilename.replace(QRegExp("\\*"), "" ).replace(QRegExp("\\?"), "" );
 
   if ( filters.isEmpty() )
-    fd.setFilter( tr( "ALL_FILES_FILTER" ) ); // All files (*)
+    fd.setNameFilter( tr( "ALL_FILES_FILTER" ) ); // All files (*)
   else
-    fd.setFilters( filters );
+    fd.setNameFilters( filters );
 
   if ( !caption.isEmpty() )
     fd.setWindowTitle( caption );
@@ -875,9 +880,9 @@ QStringList SUIT_FileDlg::getOpenFileNames( QWidget* parent, const QString& init
   fd.setFileMode( ExistingFiles );
 
   if ( filters.isEmpty() )
-    fd.setFilter( tr( "ALL_FILES_FILTER" ) ); // All files (*)
+    fd.setNameFilter( tr( "ALL_FILES_FILTER" ) ); // All files (*)
   else
-    fd.setFilters( filters );
+    fd.setNameFilters( filters );
 
   if ( !caption.isEmpty() )
     fd.setWindowTitle( caption );

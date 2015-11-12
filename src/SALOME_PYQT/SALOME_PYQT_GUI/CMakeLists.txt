@@ -17,6 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQtExt)
 IF(SALOME_USE_VTKVIEWER)
   INCLUDE(${VTK_USE_FILE})
 ENDIF()
@@ -75,7 +76,7 @@ SET(SalomePyQtGUI_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES SALOME_PYQT_Module.cxx)

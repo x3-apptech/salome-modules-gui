@@ -23,11 +23,22 @@
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
+
 SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(Qt4 QT_INCLUDES 2)
 MARK_AS_ADVANCED(QT_QMAKE_EXECUTABLE)
+
+# This is only needed to correctly detect Qt help generator tool, to workaround an error 
+# coming from ParaView detection procedure
+FIND_PROGRAM(QT_HELP_GENERATOR qhelpgenerator
+    PATHS "${QT_BINARY_DIR}" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH
+    DOC "qhelpgenerator used to compile Qt help project files"
+    )
+MARK_AS_ADVANCED(QT_HELP_GENERATOR)
 
 IF(QT4_FOUND) 
   SALOME_ACCUMULATE_HEADERS(QT_INCLUDES)
   SALOME_ACCUMULATE_ENVIRONMENT(PATH ${QT_QMAKE_EXECUTABLE})
   SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${QT_QTCORE_LIBRARY})
+  SET(QT_VERSION "${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+  MESSAGE(STATUS "Qt version is ${QT_VERSION}")
 ENDIF()

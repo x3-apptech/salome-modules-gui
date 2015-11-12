@@ -19,6 +19,9 @@
 
 # --- options ---
 
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 

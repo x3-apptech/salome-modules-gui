@@ -570,15 +570,15 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   buttonOk = new QPushButton( GroupButtons );
   buttonOk->setObjectName( "buttonOk" );
   buttonOk->setText( tr( "BUT_APPLY_AND_CLOSE"  ) );
-  buttonOk->setAutoDefault( TRUE );
-  buttonOk->setDefault( TRUE );
+  buttonOk->setAutoDefault( true );
+  buttonOk->setDefault( true );
   GroupButtonsLayout->addWidget( buttonOk );
 
   buttonApply = new QPushButton( GroupButtons );
   buttonApply->setObjectName( "buttonApply" );
   buttonApply->setText( tr( "BUT_APPLY"  ) );
-  buttonApply->setAutoDefault( TRUE );
-  buttonApply->setDefault( TRUE );
+  buttonApply->setAutoDefault( true );
+  buttonApply->setDefault( true );
   GroupButtonsLayout->addWidget( buttonApply );
 
   GroupButtonsLayout->addStretch();
@@ -586,11 +586,11 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   buttonClose = new QPushButton( GroupButtons );
   buttonClose->setObjectName( "buttonClose" );
   buttonClose->setText( tr( "BUT_CLOSE"  ) );
-  buttonClose->setAutoDefault( TRUE );
+  buttonClose->setAutoDefault( true );
   GroupButtonsLayout->addWidget( buttonClose );
 
   QPushButton* buttonHelp = new QPushButton( tr( "HELP" ), GroupButtons );
-  buttonHelp->setAutoDefault( TRUE );
+  buttonHelp->setAutoDefault( true );
   GroupButtonsLayout->addWidget( buttonHelp );
 
   /***************************************************************/

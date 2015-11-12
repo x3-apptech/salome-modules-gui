@@ -62,8 +62,10 @@
 
 #include <SALOME_Event.h>
 
+#ifdef USE_SALOME_STYLE
 #include <Style_Salome.h>
 #include <Style_PrefDlg.h>
+#endif // USE_SALOME_STYLE
 
 #include <CAM_Module.h>
 #include <CAM_DataModel.h>
@@ -779,8 +781,10 @@ void LightApp_Application::createActions()
   createMenu( MRUId, fileMenu, 100, -1 );
   createMenu( separator(), fileMenu, -1, 100, -1 );
 
+#ifdef USE_SALOME_STYLE
   createAction( StyleId, tr( "TOT_THEME" ), QIcon(), tr( "MEN_DESK_THEME" ), tr( "PRP_THEME" ),
                 0, desk, false, this, SLOT( onStylePreferences() ) );
+#endif // USE_SALOME_STYLE
 
   createAction( FullScreenId, tr( "TOT_FULLSCREEN" ), QIcon(), tr( "MEN_DESK_FULLSCREEN" ), tr( "PRP_FULLSCREEN" ),
                 Qt::Key_F11, desk, false, this, SLOT( onFullScreen() ) );
@@ -788,7 +792,9 @@ void LightApp_Application::createActions()
 
   int viewMenu = createMenu( tr( "MEN_DESK_VIEW" ), -1 );
   createMenu( separator(), viewMenu, -1, 20, -1 );
+#ifdef USE_SALOME_STYLE
   createMenu( StyleId, viewMenu, 20, -1 );
+#endif // USE_SALOME_STYLE
   createMenu( FullScreenId, viewMenu, 20, -1 );
 
   int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ),    // title (language-dependant)
@@ -2015,8 +2021,11 @@ QWidget* LightApp_Application::createWindow( const int flag )
 
     // Create OBSelector
     new LightApp_OBSelector( ob, mySelMgr );
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     ob->treeView()->header()->setResizeMode(SUIT_DataObject::VisibilityId, QHeaderView::Fixed);
+#else
+    ob->treeView()->header()->setSectionResizeMode(SUIT_DataObject::VisibilityId, QHeaderView::Fixed);
+#endif
     ob->treeView()->header()->moveSection(SUIT_DataObject::NameId,SUIT_DataObject::VisibilityId);
     ob->treeView()->setColumnWidth(SUIT_DataObject::VisibilityId, VISIBILITY_COLUMN_WIDTH);
     ob->setProperty( "shortcut", QKeySequence( "Alt+Shift+O" ) );
@@ -4066,14 +4075,14 @@ void LightApp_Application::saveDockWindowsState()
   QMap<QString, bool> tbMap, dwMap;
   dockWindowsState( visArr, tbMap, dwMap );
 
-  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
+  QList<QToolBar*> tbList = desktop()->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator it = tbList.begin(); it != tbList.end(); ++it )
   {
     QToolBar* tb = *it;
     tbMap.insert( tb->objectName(), tb->toggleViewAction()->isChecked() );
   }
 
-  QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
+  QList<QDockWidget*> dwList = desktop()->findChildren<QDockWidget*>();
   for ( QList<QDockWidget*>::iterator it = dwList.begin(); it != dwList.end(); ++it )
   {
     QDockWidget* wid = *it;
@@ -4303,10 +4312,12 @@ void LightApp_Application::onMRUActivated( const QString& name )
 
 void LightApp_Application::onStylePreferences()
 {
+#ifdef USE_SALOME_STYLE
   Style_PrefDlg dlg( desktop() );
   dlg.exec();
 
   resourceMgr()->setValue( "Style", "use_salome_style", Style_Salome::isActive() );
+#endif // USE_SALOME_STYLE
 }
 
 void LightApp_Application::onFullScreen(){
@@ -4860,7 +4871,7 @@ void LightApp_Application::onDesktopMessage( const QString& message )
 QList<QToolBar*> LightApp_Application::findToolBars( const QStringList& names )
 {
   QList<QToolBar*> aResult;
-  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
+  QList<QToolBar*> tbList = desktop()->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit ) {
     QToolBar* tb = *tit;    
     QObject* po = Qtx::findParent( tb, "QMainWindow" );

@@ -391,7 +391,7 @@ void QtxPreferenceItem::resource( QString& sec, QString& param ) const
 */
 void QtxPreferenceItem::setIcon( const QIcon& ico )
 {
-  if ( myIcon.serialNumber() == ico.serialNumber() )
+  if ( myIcon.cacheKey() == ico.cacheKey() )
     return;
 
   myIcon = ico;

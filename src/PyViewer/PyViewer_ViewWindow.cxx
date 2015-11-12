@@ -35,6 +35,10 @@
 
 #include <QtGui>
 #include <QLocale>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QApplication>
+#include <QStatusBar>
 
 /*!
   \class PyViewer_ViewWindow

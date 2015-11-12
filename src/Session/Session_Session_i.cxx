@@ -64,7 +64,7 @@ SALOME_Session_i::SALOME_Session_i(int argc,
 {
   _argc = argc ;
   _argv = argv ;
-  _isGUI = FALSE ;
+  _isGUI = false ;
   _runningStudies= 0 ;
   _orb = CORBA::ORB::_duplicate(orb) ;
   _poa = PortableServer::POA::_duplicate(poa) ;

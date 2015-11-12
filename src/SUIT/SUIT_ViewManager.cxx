@@ -327,7 +327,7 @@ bool SUIT_ViewManager::isVisible() const
 void SUIT_ViewManager::setShown( const bool on )
 {
   for ( int i = 0; i < myViews.count(); i++ )
-    myViews.at( i )->setShown( on );
+    myViews.at( i )->setVisible( on );
 }
 
 /*!Emit on \a theEvent mouse pressed in \a theView.*/

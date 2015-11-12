@@ -137,7 +137,7 @@ void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
     */
 
 
-  activateAllDrawers( TRUE );
+  activateAllDrawers( true );
 }
 
 /*!
@@ -668,7 +668,7 @@ void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
         header += "%%Pages: 1\n";
         header += "%%Page: 1\n\n";
         
-        hFile.write( header.toAscii() );
+        hFile.write( header.toLatin1() );
     }
     else if( aType == HPGL )
     {
@@ -682,7 +682,7 @@ void GLViewer_Viewer2d::insertHeader( VectorFileType aType, QFile& hFile )
         header += "LT;\n";
         header += "VS36;\n";
         
-        hFile.write( header.toAscii() );
+        hFile.write( header.toLatin1() );
     }
 }
 
@@ -696,12 +696,12 @@ void GLViewer_Viewer2d::insertEnding( VectorFileType aType, QFile& hFile )
     if( aType == POST_SCRIPT )
     {
         QString ending = "showpage\n\n%%EOF";
-        hFile.write( ending.toAscii() );
+        hFile.write( ending.toLatin1() );
     }
     else if( aType == HPGL )
     {
         QString ending = "PU;PA0,0;SP;EC;PG1;EC1;OE\n"; 
-        hFile.write( ending.toAscii() );
+        hFile.write( ending.toLatin1() );
     }
 }
 
@@ -731,7 +731,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
     if ( !getActiveView() )
       return false;
 
-        QFile hFile( FileName.toAscii() );
+        QFile hFile( FileName.toLatin1() );
 
 #ifdef WIN32
     HDC hMetaFileDC;
@@ -819,7 +819,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
                                arg( AW-mmLeft-mmRight ).arg( AH-mmBottom-mmTop );
         //It is set clipping path
 
-        hFile.write( aBuffer.toAscii() );
+        hFile.write( aBuffer.toLatin1() );
 
         aCurVP->getGLWidget()->translateBackgroundToPS( hFile, &aViewerCS, &aPaperCS );
     }

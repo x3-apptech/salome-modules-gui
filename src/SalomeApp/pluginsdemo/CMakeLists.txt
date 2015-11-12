@@ -28,7 +28,7 @@
 # --- scripts ---
 
 # scripts / static
-# TODO: process UIC files via PyQt4 pyuic tool, see UsePyQt4.cmake
+# TODO: process UIC files via PyQt pyuic tool, see UsePyQt.cmake
 SET(_plugins_SCRIPTS
   minmax_dialog.py
   minmax_plugin.py

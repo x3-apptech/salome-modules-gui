@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
+INCLUDE(UseQtExt)
 INCLUDE(${VTK_USE_FILE})
 
 # --- options ---
@@ -42,9 +42,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES 
-  ${QT_LIBRARIES} 
+  ${QT_LIBRARIES}
   ${OPENGL_LIBRARIES}
-  ${VTK_LIBRARIES} 
+  ${VTK_LIBRARIES}
   ${CAS_KERNEL} ${CAS_VIEWER}
   ${KERNEL_OpUtil}
   qtx suit ViewerTools SalomeObject SalomePrs VTKViewer OpenGLUtils
@@ -148,7 +148,7 @@ SET(_other_RESOURCES
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS} ${_moc_internal_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS} ${_moc_internal_HEADERS})
 
 # sources / static
 SET(_other_SOURCES
@@ -196,7 +196,6 @@ TARGET_LINK_LIBRARIES(SVTK ${_link_LIBRARIES})
 INSTALL(TARGETS SVTK EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 INSTALL(FILES ${SVTK_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
 INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
-

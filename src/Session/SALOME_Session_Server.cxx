@@ -52,7 +52,9 @@
 #include <Qtx.h>
 #include <QtxSplash.h>
 
+#ifdef USE_SALOME_STYLE
 #include <Style_Salome.h>
+#endif // USE_SALOME_STYLE
 
 #include "GUI_version.h"
 #include <SUIT_Tools.h>
@@ -97,19 +99,22 @@
  * - stop Session ( must be idle )
  * - get session state
  */
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void MessageOutput( QtMsgType type, const char* msg )
+#else
+void MessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &msg )
+#endif
 {
   switch ( type )
   {
   case QtDebugMsg:
-    //MESSAGE( "Debug: " << msg );
+    //MESSAGE( "Debug: " << qPrintable(msg) );
     break;
   case QtWarningMsg:
-    MESSAGE( "Warning: " << msg );
+    MESSAGE( "Warning: " << qPrintable(msg) );
     break;
   case QtFatalMsg:
-    MESSAGE( "Fatal: " << msg );
+    MESSAGE( "Fatal: " << qPrintable(msg) );
     break;
   }
 }
@@ -251,7 +256,8 @@ public:
   SALOME_QApplication( int& argc, char** argv ) : TestApplication( argc, argv ), myHandler ( 0 ) {}
 #else
   SALOME_QApplication( int& argc, char** argv )
-#ifndef WIN32
+// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
+#if !defined WIN32 && QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // san: Opening an X display and choosing a visual most suitable for 3D visualization
   // in order to make SALOME viewers work with non-native X servers
   : QApplication( (Display*)Qtx::getDisplay(), argc, argv, Qtx::getVisual() ),
@@ -341,20 +347,27 @@ void shutdownServers( SALOME_NamingService* theNS )
 int main( int argc, char **argv )
 {
   // Install Qt debug messages handler
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   qInstallMsgHandler( MessageOutput );
+#else
+  qInstallMessageHandler( MessageOutput );
+#endif
 
+// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   //Set a "native" graphic system in case if application runs on the remote host
   QString remote(getenv("REMOTEHOST"));
   QString client(getenv("SSH_CLIENT"));
   if(remote.length() > 0 || client.length() > 0 ) {
     QApplication::setGraphicsSystem(QLatin1String("native"));
   }
-  
+#endif
+
   // add <qtdir>/plugins dir to the pluins search path for image plugins
   QString qtdir = Qtx::qtDir( "plugins" );
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( qtdir );
-
+  
   // set "C" locale if requested via preferences
   {
     SALOME_Session stmp( argc, argv );
@@ -377,7 +390,7 @@ int main( int argc, char **argv )
   _qappl.setApplicationVersion( salomeVersion() );
 
   // Add application library path (to search style plugin etc...)
-  QString path = QDir::convertSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
+  QString path = QDir::toNativeSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
   _qappl.addLibraryPath( path );
 
   bool isGUI    = isFound( "GUI",    argc, argv );
@@ -564,9 +577,11 @@ int main( int argc, char **argv )
       SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
       if ( aGUIApp )
       {
+#ifdef USE_SALOME_STYLE
         Style_Salome::initialize( aGUIApp->resourceMgr() );
         if ( aGUIApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
           Style_Salome::apply();
+#endif // USE_SALOME_STYLE
 
         if ( !isFound( "noexcepthandler", argc, argv ) )
           _qappl.setHandler( aGUISession->handler() ); // after loading SalomeApp application

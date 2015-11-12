@@ -33,6 +33,7 @@ class QLabel;
 class QString;
 class QAction;
 class QWidget;
+class QKeySequence;
 
 class SUIT_Desktop;
 class SUIT_ViewManager;
@@ -172,6 +173,10 @@ protected:
   int                   registerAction( const int, QAction* );
   QAction*              createAction( const int, const QString&, const QIcon&, const QString&,
                                       const QString&, const int, QObject* = 0,
+                                      const bool = false, QObject* = 0, const char* = 0,
+				      const QString& = QString() );
+  QAction*              createAction( const int, const QString&, const QIcon&, const QString&,
+                                      const QString&, const QKeySequence&, QObject* = 0,
                                       const bool = false, QObject* = 0, const char* = 0,
 				      const QString& = QString() );
 

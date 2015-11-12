@@ -28,7 +28,7 @@
 #include "QtxWorkspace.h"
 
 #include <QMenu>
-#include <QWidgetList>
+#include <QMdiSubWindow>
 
 /*!
   \class QtxWorkspaceAction
@@ -118,7 +118,7 @@ int QtxWorkspaceAction::accel( const int id ) const
 {
   int a = 0;
   if ( action( id ) )
-    a = action( id )->shortcut();
+    a = action( id )->shortcut()[0];
   return a;
 }
 
@@ -238,7 +238,7 @@ void QtxWorkspaceAction::tile()
 {
   QtxWorkspace* ws = workspace();
   if ( ws )
-    ws->tile();
+    ws->tileSubWindows();
 }
 
 /*!
@@ -250,13 +250,13 @@ void QtxWorkspaceAction::cascade()
   if ( !ws )
     return;
 
-  ws->cascade();
+  ws->cascadeSubWindows();
 
         int w = ws->width();
         int h = ws->height();
 
-        QWidgetList winList = ws->windowList();
-  for ( QWidgetList::iterator it = winList.begin(); it != winList.end(); ++it )
+        QList<QMdiSubWindow *> winList = ws->subWindowList();
+  for ( QList<QMdiSubWindow *>::iterator it = winList.begin(); it != winList.end(); ++it )
                 (*it)->resize( int( w * 0.8 ), int( h * 0.8 ) );
 }
 
@@ -311,11 +311,11 @@ void QtxWorkspaceAction::removedFrom( QWidget* w )
 */
 void QtxWorkspaceAction::updateContent()
 {
-  bool count = workspace() ? workspace()->windowList().count() : 0;
-  action( Cascade )->setEnabled( count );
-  action( Tile )->setEnabled( count );
-  action( HTile )->setEnabled( count );
-  action( VTile )->setEnabled( count );
+  bool hasWindows = workspace() && workspace()->subWindowList().count() > 0;
+  action( Cascade )->setEnabled( hasWindows );
+  action( Tile )->setEnabled( hasWindows );
+  action( HTile )->setEnabled( hasWindows );
+  action( VTile )->setEnabled( hasWindows );
 
   updateWindows();
 }
@@ -345,12 +345,12 @@ void QtxWorkspaceAction::updateWindows()
   if ( menuActions() & Windows )
   {
     int index = 1;
-    QWidgetList wList = ws->windowList();
-    for ( QWidgetList::iterator it = wList.begin(); it != wList.end(); ++it, index++ )
+    QList<QMdiSubWindow *> wList = ws->subWindowList();
+    for ( QList<QMdiSubWindow *>::iterator it = wList.begin(); it != wList.end(); ++it, index++ )
     {
       QWidget* wid = *it;
       QAction* a = new QtxAction( wid->windowTitle(), wid->windowTitle(), 0, this, true );
-      a->setChecked( wid == ws->activeWindow() );
+      a->setChecked( wid == ws->activeSubWindow() );
       items.append( a );
       map.insert( a, Windows + index );
     }
@@ -396,7 +396,7 @@ void QtxWorkspaceAction::activateItem( const int idx )
   if ( !ws )
     return;
 
-  QWidgetList wList = ws->windowList();
+  QList<QMdiSubWindow *> wList = ws->subWindowList();
   if ( idx >= 0 && idx < (int)wList.count() )
     wList.at( idx )->setFocus();
 }

@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
+INCLUDE(UseQtExt)
 
 # --- options ---
 
@@ -52,12 +52,12 @@ SET(_uic_files mainwindow.ui)
 SET(_moc_HEADERS mainwindow.hxx)
 
 # header files / uic wrappings
-QT4_WRAP_UI(_uic_HEADERS ${_uic_files})
-
-# --- sources ---
+QT_WRAP_UIC(_uic_HEADERS ${_uic_files})
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
+
+# --- sources ---
 
 # sources / to compile
 SET(TreeData_guitester_SOURCES MyDataModel.cxx guitester.cxx mainwindow.cxx testhelper.cxx ${_moc_SOURCES} ${_uic_HEADERS})

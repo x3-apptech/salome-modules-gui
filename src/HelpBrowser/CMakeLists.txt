@@ -17,11 +17,13 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQtExt)
+
 # --- options ---
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${QT_INCLUDES}
+  ${QT_INCLUDES} 
   ${PROJECT_SOURCE_DIR}/src/Qtx
 )
 
@@ -51,11 +53,11 @@ SET(_rcc_RESOURCES HelpBrowser.qrc)
 
 # --- sources ---
 
-# sources / rcc wrappings
-QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
-
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / rcc wrappings
+QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / to compile
 SET(_other_SOURCES

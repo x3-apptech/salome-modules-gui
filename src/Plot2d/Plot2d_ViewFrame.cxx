@@ -75,13 +75,11 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_plot_renderer.h>
+#include <qwt_legend.h>
+#include <qwt_scale_widget.h>
 
 #include <stdlib.h>
 #include <limits>
-#include <qprinter.h>
-
-#include <qwt_legend.h>
-#include <qwt_scale_widget.h>
 
 #define DEFAULT_LINE_WIDTH     0     // (default) line width
 #define DEFAULT_MARKER_SIZE    9     // default marker size
@@ -1642,10 +1640,10 @@ void Plot2d_ViewFrame::getFitRangeByMarkers(double& xMin,  double& xMax,
 */
 int Plot2d_ViewFrame::testOperation( const QMouseEvent& me )
 {
-  int btn = me.button() | me.modifiers();
-  const int zoomBtn = Qt::ControlModifier | Qt::LeftButton;
-  const int panBtn  = Qt::ControlModifier | Qt::MidButton;
-  const int fitBtn  = Qt::ControlModifier | Qt::RightButton;
+  int btn = (int)me.button() | (int)me.modifiers();
+  const int zoomBtn = (int)Qt::ControlModifier | (int)Qt::LeftButton;
+  const int panBtn  = (int)Qt::ControlModifier | (int)Qt::MidButton;
+  const int fitBtn  = (int)Qt::ControlModifier | (int)Qt::RightButton;
 
   int op = NoOpId;
   if ( btn == zoomBtn ) {
@@ -2683,7 +2681,7 @@ void Plot2d_ViewFrame::plotMousePressed( const QMouseEvent& me )
     }
   }
   else {
-    int btn = me.button() | me.modifiers();
+    int btn = (int)me.button() | (int)me.modifiers();
     if (btn == Qt::RightButton) {
       QMouseEvent* aEvent = new QMouseEvent(QEvent::MouseButtonPress,
                                             me.pos(), me.button(), me.buttons(), me.modifiers() );

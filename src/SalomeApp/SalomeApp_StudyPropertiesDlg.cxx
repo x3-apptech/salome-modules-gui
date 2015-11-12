@@ -62,7 +62,7 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint ),
     myIsChanged(false)
 {
-  setModal( TRUE );
+  setModal( true );
 
   setWindowTitle(tr("TLT_STUDY_PROPERTIES"));
   setSizeGripEnabled( true );

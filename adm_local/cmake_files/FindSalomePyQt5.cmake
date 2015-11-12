@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2013-2015  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,21 +19,19 @@
 # Author: Adrien Bruneton
 #
 
-# ParaView detection for salome
+# PyQt5 detection for Salome
 #
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
 
-IF(NOT QT_VERSION)
-  MESSAGE(FATAL_ERROR "Detection of ParaView requires Qt to be detected first!")
+# PyQt needs SIP, call it automatically
+FIND_PACKAGE(SalomeSIP REQUIRED)
+
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(PyQt5 PYQT_PYUIC_EXECUTABLE 2)
+MARK_AS_ADVANCED(PYQT_PYUIC_EXECUTABLE PYQT_PYRCC_EXECUTABLE PYQT_SIPS_DIR PYQT_PYUIC_PATH PYQT_PYRCC_PATH)
+
+IF(PYQT5_FOUND) 
+  SALOME_ACCUMULATE_ENVIRONMENT(PATH ${PYQT_PYUIC_EXECUTABLE})
+  SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH ${PYQT_PYTHONPATH})
+  SALOME_ACCUMULATE_ENVIRONMENT(PYTHONPATH ${PYQT_PYTHONPATH})
 ENDIF()
-
-IF (QT_VERSION VERSION_LESS "5.0")
-  SET(PARAVIEW_QT_VERSION "4")
-ELSE()
-  SET(PARAVIEW_QT_VERSION "5")
-ENDIF()
-
-SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(ParaView PARAVIEW_USE_FILE 4)
-
-INCLUDE(${PARAVIEW_USE_FILE})

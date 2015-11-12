@@ -46,7 +46,9 @@
 #include "SUIT_LicenseDlg.h"
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
+#ifdef USE_SALOME_STYLE
 #include "Style_Salome.h"
+#endif // USE_SALOME_STYLE
 #include "QtxSplash.h"
 
 #include <QDir>
@@ -182,12 +184,15 @@ int main( int argc, char* argv[] )
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( qtdir );
 
+// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   //Set a "native" graphic system in case if application runs on the remote host
   QString remote(::getenv("REMOTEHOST"));
   QString client(::getenv("SSH_CLIENT"));
   if(remote.length() > 0 || client.length() > 0 ) {
     QApplication::setGraphicsSystem(QLatin1String("native"));
   }
+#endif
   
   SUITApp_Application app( argc, argv );
   QString cfgAppName = getAppName( argList.isEmpty() ? QString() : argList.first() );
@@ -272,9 +277,11 @@ int main( int argc, char* argv[] )
     SUIT_Application* theApp = aSession.startApplication( argList.first() );
     if ( theApp )
     {
+#ifdef USE_SALOME_STYLE
       Style_Salome::initialize( theApp->resourceMgr() );
       if ( theApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
         Style_Salome::apply();
+#endif // USE_SALOME_STYLE
 
       if ( !noExceptHandling )
         app.setHandler( aSession.handler() );

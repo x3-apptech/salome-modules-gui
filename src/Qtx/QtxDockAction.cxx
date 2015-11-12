@@ -152,7 +152,7 @@ void QtxDockAction::toolBars( QList<QToolBar*>& lst ) const
   if ( !mw )
     return;
 
-  QList<QToolBar*> toolbars = qFindChildren<QToolBar*>( mw );
+  QList<QToolBar*> toolbars = mw->findChildren<QToolBar*>( );
   for ( QList<QToolBar*>::iterator it = toolbars.begin(); it != toolbars.end(); ++it )
   {
     QToolBar* tb = *it;
@@ -173,7 +173,7 @@ void QtxDockAction::dockWidgets( QList<QDockWidget*>& lst ) const
   if ( !mw )
     return;
 
-  QList<QDockWidget*> dockwidgets = qFindChildren<QDockWidget*>( mw );
+  QList<QDockWidget*> dockwidgets = mw->findChildren<QDockWidget*>( );
   for ( QList<QDockWidget*>::iterator it = dockwidgets.begin(); it != dockwidgets.end(); ++it )
   {
     QDockWidget* dw = *it;

@@ -63,17 +63,39 @@ QtxTranslator::~QtxTranslator()
 {
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+
 /*!
   \brief Returns the translation for the key.
   \param context message context
   \param sourceText message source name
-  \param comment message comment (optional)
+  \param disambiguation message comment (optional)
   \return Translated text if found or \a sourceText otherwise
 */
-QString QtxTranslator::translate( const char* context, const char* sourceText, const char* comment ) const
+QString QtxTranslator::translate( const char* context, const char* sourceText, const char* disambiguation ) const
 {
-  QString res = QTranslator::translate( context, sourceText, comment );
-  if( res.isNull() )
-    res = QTranslator::translate( GLOBAL_CONTEXT, sourceText, comment );
+  QString res = QTranslator::translate( context, sourceText, disambiguation );
+  if ( res.isNull() )
+    res = QTranslator::translate( GLOBAL_CONTEXT, sourceText, disambiguation );
   return res;
 }
+
+#else
+
+/*!
+  \brief Returns the translation for the key.
+  \param context message context
+  \param sourceText message source name
+  \param disambiguation message comment (optional)
+  \param n optional numeral to choose the appropriate form of translation
+  \return Translated text if found or \a sourceText otherwise
+*/
+QString QtxTranslator::translate( const char* context, const char* sourceText, const char* disambiguation, int n ) const
+{
+  QString res = QTranslator::translate( context, sourceText, disambiguation, n );
+  if ( res.isNull() )
+    res = QTranslator::translate( GLOBAL_CONTEXT, sourceText, disambiguation, n );
+  return res;
+}
+
+#endif // QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

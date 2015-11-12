@@ -133,9 +133,9 @@ void LightApp_Dialog::setObjectShown( const int id, const bool shown )
   if( myObjects.contains( id ) && isObjectShown( id )!=shown )
   {
     Object& obj = myObjects[ id ];
-    obj.myEdit->setShown( shown );
-    obj.myBtn->setShown( shown );
-    obj.myLabel->setShown( shown );
+    obj.myEdit->setVisible( shown );
+    obj.myBtn->setVisible( shown );
+    obj.myLabel->setVisible( shown );
     if( !shown )
       ( ( QToolButton* )obj.myBtn )->setChecked( false );
   }

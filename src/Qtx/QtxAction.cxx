@@ -120,6 +120,38 @@ QtxAction::QtxAction( const QString& text, const QIcon& icon, const QString& men
   \brief Constructor.
 
   Creates an action owned by \a parent. Parameters \a text,
+  \a icon, \a menuText and \a accel specify the action's attributes.
+  Parameter \a toggle can be used to make the action checkable.
+  Parameter \a shortcutAction can be used to assign the shortcut from
+  preferences. This parameter value corresponds to shortcut action identifier
+  in shortcut preferences.
+
+  \param text tooltip text
+  \param icon iconset
+  \param menuText menu text
+  \param accel shortcut key sequence
+  \param parent parent object
+  \param toggle if \c true the action will be a toggle action
+  \param shortcutAction shortcut action identifier
+*/
+QtxAction::QtxAction( const QString& text, const QIcon& icon, const QString& menuText, 
+		      const QKeySequence& accel, QObject* parent, bool toggle, const QString& shortcutAction )
+: QWidgetAction( parent )
+{
+  setIcon( icon );
+  setText( menuText );
+  setToolTip( text );
+  setShortcut( accel );
+  setCheckable( toggle );
+  setShortcutActionName(shortcutAction);
+
+  QApplication::instance()->installEventFilter( this );
+}
+
+/*!
+  \brief Constructor.
+
+  Creates an action owned by \a parent. Parameters \a text,
   \a menuText and \a accel specify the action's attributes.
   Parameter \a toggle can be used to make the action checkable.
   Parameter \a shortcutAction can be used to assign the shortcut from
@@ -135,6 +167,36 @@ QtxAction::QtxAction( const QString& text, const QIcon& icon, const QString& men
 */
 QtxAction::QtxAction( const QString& text, const QString& menuText,
                       int accel, QObject* parent, bool toggle, const QString& shortcutAction )
+: QWidgetAction( parent )
+{
+  setText( menuText );
+  setToolTip( text );
+  setShortcut( accel );
+  setCheckable( toggle );
+  setShortcutActionName(shortcutAction);
+  
+  QApplication::instance()->installEventFilter( this );
+}
+
+/*!
+  \brief Constructor.
+
+  Creates an action owned by \a parent. Parameters \a text,
+  \a menuText and \a accel specify the action's attributes.
+  Parameter \a toggle can be used to make the action checkable.
+  Parameter \a shortcutAction can be used to assign the shortcut from
+  preferences. This parameter value corresponds to shortcut action identifier
+  in shortcut preferences.
+
+  \param text tooltip text
+  \param menuText menu text
+  \param accel shortcut key sequence
+  \param parent parent object
+  \param toggle if \c true the action is a toggle action
+  \param shortcutAction shortcut action identifier
+*/
+QtxAction::QtxAction( const QString& text, const QString& menuText,
+                      const QKeySequence& accel, QObject* parent, bool toggle, const QString& shortcutAction )
 : QWidgetAction( parent )
 {
   setText( menuText );

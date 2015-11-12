@@ -37,7 +37,7 @@ public:
   ViewerTools_DialogBase(QtxAction* theAction,
                          QWidget* theParent,
                          const char* theName = "", 
-                         bool theModal = FALSE, 
+                         bool theModal = false, 
                          Qt::WindowFlags theWFalgs = 0);
 
   ~ViewerTools_DialogBase();

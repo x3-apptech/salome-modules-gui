@@ -297,7 +297,7 @@ label:
     { 
       glDeleteLists( myGridList, 1 ); 
       if ( glGetError() != GL_NO_ERROR ) 
-    return FALSE;
+    return false;
     } 
          
     float xLoc = (int)(myXPan / myXSize) * myXSize; 
@@ -348,5 +348,5 @@ label:
 
     glEndList();
   }
-  return TRUE;
+  return true;
 }

@@ -120,7 +120,7 @@ namespace
   PyModuleHelper* getPythonHelper()
   {
     LightApp_Module* module = getActiveModule();
-    PyModuleHelper* helper = module ? qFindChild<PyModuleHelper*>( module, "python_module_helper" ) : 0;
+    PyModuleHelper* helper = module ? module->findChild<PyModuleHelper*>( "python_module_helper" ) : 0;
     return helper;
   }
   
@@ -1940,7 +1940,7 @@ public:
 	myResult = (QAction*)module->createAction( myId, myTipText, icon, myMenuText, myStatusText, myKey, module, myToggle );
       }
       // for Python module, automatically connect action to callback slot
-      PyModuleHelper* helper = qFindChild<PyModuleHelper*>( module, "python_module_helper" );
+      PyModuleHelper* helper = module->findChild<PyModuleHelper*>( "python_module_helper" );
       if ( helper ) helper->connectAction( myResult );
     }
   }
@@ -2561,7 +2561,7 @@ public:
           // specific processing for ParaView viewer:
           // hierarchy of ParaView viewer is much complex than for usual view;
           // we look for sub-widget named "Viewport"
-          QList<QWidget*> lst = qFindChildren<QWidget*>( wnd, "Viewport" );
+          QList<QWidget*> lst = wnd->findChildren<QWidget*>( "Viewport" );
           if ( !lst.isEmpty() ) {
             lst[0]->resize( myWndWidth, myWndHeight );
             myResult = true;
@@ -2714,7 +2714,7 @@ public:
         QWidget* wnd = viewMgr->getActiveView();
         myResult = viewMgr->getActiveView()->getId();
         if ( wnd ) {
-          wnd->setShown(myVisible);
+          wnd->setVisible(myVisible);
           if ( !myVisible && myWidth == 0 && myHeight == 0 ) {
             myWidth = 1024;
             myHeight = 768;

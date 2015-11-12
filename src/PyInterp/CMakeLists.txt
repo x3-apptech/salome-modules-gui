@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
+INCLUDE(UseQtExt)
 
 # --- options ---
 
@@ -56,7 +56,7 @@ SET(PyInterp_HEADERS ${_other_HEADERS})
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_internal_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_internal_HEADERS})
 
 # sources / static
 SET(_other_SOURCES
