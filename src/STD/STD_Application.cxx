@@ -111,7 +111,7 @@ void STD_Application::closeApplication()
     beforeCloseDoc( study );
 
     study->closeDocument();
-
+    emit appClosed();
     setActiveStudy( 0 );
     delete study;
 
