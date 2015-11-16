@@ -111,6 +111,7 @@ signals:
   void                  viewManagerRemoved( SUIT_ViewManager* );
   /*!emit that view manager activated*/
   void                  viewManagerActivated( SUIT_ViewManager* );
+  void                  appClosed();
 
 public slots:
   virtual void          onNewDoc();
