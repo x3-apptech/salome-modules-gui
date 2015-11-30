@@ -1181,6 +1181,8 @@ void OCCViewer_ViewWindow::createActions()
     return;
 
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  if( !aResMgr )
+    return;
 
   QtxAction* aAction;
 
@@ -2145,7 +2147,7 @@ void OCCViewer_ViewWindow::onSwitchInteractionStyle( bool on )
 
   // update action state if method is called outside
   QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchInteractionStyleId ) );
-  if ( a->isChecked() != on )
+  if ( a && a->isChecked() != on )
     a->setChecked( on );
 }
 
@@ -2158,7 +2160,7 @@ void OCCViewer_ViewWindow::onSwitchZoomingStyle( bool on )
 
   // update action state if method is called outside
   QtxAction* a = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchZoomingStyleId ) );
-  if ( a->isChecked() != on )
+  if ( a && a->isChecked() != on )
     a->setChecked( on );
 }
 
