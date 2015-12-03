@@ -249,11 +249,6 @@ bool LightApp_Module::activateModule( SUIT_Study* study )
     treeModel->setAppropriate( EntryCol, Qtx::Toggled );
   }*/
 
-  if ( myIsFirstActivate ) {
-    updateModuleVisibilityState();
-    myIsFirstActivate = false;
-  }
-  
   return res;
 }
 
@@ -800,9 +795,17 @@ void LightApp_Module::updateModuleVisibilityState()
   SUIT_DataBrowser* ob = app->objectBrowser();
   if ( !ob || !ob->model() ) return;
 
+  if ( !myIsFirstActivate )
+    return;
+
+  myIsFirstActivate = false;
+
   // connect to click on item
   connect( ob->model(), SIGNAL( clicked( SUIT_DataObject*, int ) ),
            this, SLOT( onObjectClicked( SUIT_DataObject*, int ) ), Qt::UniqueConnection );
+  // connect to click on item
+  connect( ob, SIGNAL( destroyed( QObject* ) ),
+           this, SLOT( onOBDestroyed() ), Qt::UniqueConnection );
 
   SUIT_DataObject* rootObj = ob->root();
   if ( !rootObj ) return;
@@ -844,4 +847,9 @@ void LightApp_Module::onObjectClicked( SUIT_DataObject* theObject, int theColumn
   
   if ( id != -1 )
     startOperation( id );
+}
+
+void LightApp_Module::onOBDestroyed()
+{
+  myIsFirstActivate = true;
 }

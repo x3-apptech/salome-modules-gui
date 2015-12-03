@@ -520,6 +520,9 @@ bool LightApp_Application::activateModule( const QString& modName )
       objectBrowser()->setRoot( activeStudy()->root() );
     updateObjectBrowser( true );
   }
+
+  if ( activeModule() ) activeModule()->updateModuleVisibilityState();
+
   return true;
 }
 

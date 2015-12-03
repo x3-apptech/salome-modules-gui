@@ -113,6 +113,7 @@ public slots:
   virtual bool                        deactivateModule( SUIT_Study* );
   virtual void                        studyClosed( SUIT_Study* );
   virtual void                        onObjectClicked( SUIT_DataObject*, int );
+  void                                onOBDestroyed();
 
   void                                MenuItem();
 
