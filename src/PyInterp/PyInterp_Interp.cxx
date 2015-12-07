@@ -450,7 +450,7 @@ static int compile_command(const char *command, PyObject * global_ctxt, PyObject
   std::string singleCommand = command;
   std::string commandArgs = "";
 
-  while (singleCommand.size() > 0 && singleCommand.at(singleCommand.size()-1) == '\n')
+  if (singleCommand.size() > 0 && singleCommand.at(singleCommand.size()-1) == '\n')
     singleCommand.erase(singleCommand.size()-1);
   std::size_t pos = singleCommand.find("args:");
   if (pos != std::string::npos) {
