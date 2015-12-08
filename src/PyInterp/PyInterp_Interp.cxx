@@ -38,6 +38,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <QRegExp>
+
 #define TOP_HISTORY_PY   "--- top of history ---"
 #define BEGIN_HISTORY_PY "--- begin of history ---"
 
@@ -450,13 +452,10 @@ static int compile_command(const char *command, PyObject * global_ctxt, PyObject
   std::string singleCommand = command;
   std::string commandArgs = "";
 
-  if (singleCommand.size() > 0 && singleCommand.at(singleCommand.size()-1) == '\n')
-    singleCommand.erase(singleCommand.size()-1);
-  std::size_t pos = singleCommand.find("args:");
-  if (pos != std::string::npos) {
-    commandArgs = singleCommand.substr(pos+5);
-    commandArgs = commandArgs.substr(0, commandArgs.length()-2);
-    singleCommand = singleCommand.substr(0, pos-1)+"\")";
+  QRegExp rx("execfile\\s*\\(.*(args:.*)\"\\s*\\)");
+  if (rx.indexIn(command) != -1) {
+    commandArgs = rx.cap(1).remove(0,5).toStdString(); // arguments of command
+    singleCommand = rx.cap().remove(rx.cap(1)).remove(" ").toStdString(); // command for execution without arguments
   }
 
   if (commandArgs.empty()) {
