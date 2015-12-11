@@ -157,6 +157,7 @@ public:
   void             removeTranslators( const QString& );
   void             loadTranslator( const QString&, const QString& );
   void             loadTranslators( const QString&, const QStringList& );
+  void             addTranslator( const QString&, QTranslator* );
 
   QString          path( const QString&, const QString&, const QString& ) const;
 

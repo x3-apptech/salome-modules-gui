@@ -2785,6 +2785,24 @@ void QtxResourceMgr::loadTranslator( const QString& prefix, const QString& name 
 }
 
 /*!
+  \brief Add custom translator.
+  \param prefix parameter which defines translation context (for example, package name)
+  \param translator translator being installed
+  \sa loadLanguage(), loadTranslators()
+*/
+void QtxResourceMgr::addTranslator( const QString& prefix, QTranslator* translator )
+{
+  if ( translator )
+  {
+    if ( !myTranslator[prefix].contains( translator ) ) {
+      myTranslator[prefix].append( translator );
+      if ( QApplication::instance() )
+        QApplication::instance()->installTranslator( translator );
+    }
+  }
+}
+
+/*!
   \brief Remove all translators corresponding to the specified translation context.
   \param prefix parameter which defines translation context (for example, package name)
 */
