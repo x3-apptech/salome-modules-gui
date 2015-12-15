@@ -113,7 +113,7 @@ enum {
   \param theClassName Python class name
   \return Python class object or None object if class is not found
 */
-static PyObject* GetPyClass( const char* theClassName ) 
+static PyTypeObject* GetPyClass( const char* theClassName )
 {
   static PyObject* aVTKModule = 0;
   PyObject* aPyClass = 0;
@@ -134,8 +134,10 @@ static PyObject* GetPyClass( const char* theClassName )
   if ( aVTKModule ) {
     PyObject* aVTKDict = PyModule_GetDict( aVTKModule );
     aPyClass = PyDict_GetItemString(aVTKDict, const_cast<char*>( theClassName ) );
+    if (!PyType_Check(aPyClass))
+      return 0;
   }
-  return aPyClass;
+  return (PyTypeObject *)aPyClass;
 }
 
 /*!
@@ -219,7 +221,7 @@ public:
     : myResult( Py_None ), myCreate( toCreate ) {}
   virtual void Execute()
   {
-    PyObject* aPyClass = ::GetPyClass( "vtkRenderer" );
+    PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderer" );
     SVTK_ViewWindow* aVTKViewWindow = 
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
@@ -227,7 +229,7 @@ public:
 #if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
 #else
-      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+      myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
 #endif
     }
   }
@@ -272,7 +274,7 @@ public:
     : myResult( Py_None ), myCreate( toCreate ) {}
   virtual void Execute()
   {
-    PyObject* aPyClass = ::GetPyClass( "vtkRenderWindow" );
+    PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderWindow" );
     SVTK_ViewWindow* aVTKViewWindow = 
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
@@ -280,7 +282,7 @@ public:
 #if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
 #else
-      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+      myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
 #endif
     }
   }
@@ -325,7 +327,7 @@ public:
     : myResult( Py_None ), myCreate( toCreate ) {}
   virtual void Execute()
   {
-    PyObject* aPyClass = ::GetPyClass( "vtkRenderWindowInteractor" );
+    PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderWindowInteractor" );
     SVTK_ViewWindow* aVTKViewWindow = 
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
     if( aVTKViewWindow && aPyClass ) {
@@ -333,7 +335,7 @@ public:
 #if VTK_XVERSION < 50700
       myResult = PyVTKObject_New( aPyClass, aVTKObject );
 #else
-      myResult = PyVTKObject_New( aPyClass, NULL, aVTKObject );
+      myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
 #endif
     }
   }
