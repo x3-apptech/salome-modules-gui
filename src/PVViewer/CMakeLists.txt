@@ -48,6 +48,7 @@ SET(_link_LIBRARIES
   PVServerService
   pqApplicationComponents
   #vtkRenderingFreeTypeOpenGL
+  vtkRenderingFreeType
   )
 
 # --- headers ---
