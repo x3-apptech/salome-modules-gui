@@ -38,9 +38,12 @@ SET(_plugins_SCRIPTS
   tubebuilder.py
   salome_plugins.py
   smesh_plugins.py
+)
+SET(_helper_SCRIPTS
   xalome.py
 )
 
 # --- rules ---
 
 SALOME_INSTALL_SCRIPTS("${_plugins_SCRIPTS}" ${SALOME_GUI_INSTALL_PLUGINS}/demo DEF_PERMS)
+SALOME_INSTALL_SCRIPTS("${_helper_SCRIPTS}" ${SALOME_INSTALL_PYTHON})
