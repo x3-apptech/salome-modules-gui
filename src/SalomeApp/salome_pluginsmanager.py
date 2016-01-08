@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
@@ -19,12 +20,11 @@
 
 """
 This module is imported from C++ SalomeApp_Application and initialized
-(call to initialize function with 4 parameters) module : 0 if it's
-plugins manager at the application level 1 if it is at the module
-level name : the name of the plugins manager. This name is used to
-build the name of the plugins files basemenuname : the name of the
-menu into we want to add the menu of the plugins ("Tools" for example)
-menuname : the name of plugins menu
+(call to initialize function with 4 parameters)
+module :       0 if it is plugins manager at the application level, 1 if it is at the module level
+name :         the name of the plugins manager. This name is used to build the name of the plugins files
+basemenuname : the name of the menu into we want to add the menu of the plugins ("Tools" for example)
+menuname :     the name of plugins menu
 
 A plugins manager is created when calling initialize.
 
@@ -54,8 +54,7 @@ AddFunction.  It is possible to customize this presentation by getting
 the entries list (salome_pluginsmanager.entries()) and modifying it in
 place. For example, you can do that :
 salome_pluginsmanager.entries().sort() to order them alphabetically or
-salome_pluginsmanager.entries().remove("a") to remove the entry named
-"a".
+salome_pluginsmanager.entries().remove("a") to remove the entry named "a".
 
 It is possible to put entries in submenus. You only need to give a
 name with / to the entry. for example::
@@ -276,8 +275,10 @@ class PluginsManager:
           self.entries=[]
           self.lasttime=lasttime
           for directory,plugins_file in plugins_files:
+            logger.debug("look for python path: %s"%directory)
             if directory not in sys.path:
               sys.path.insert(0,directory)
+              logger.debug("The directory %s has been added to PYTHONPATH"%directory)
             try:
               execfile(plugins_file,globals(),{})
             except:
