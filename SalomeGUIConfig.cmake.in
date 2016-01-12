@@ -144,18 +144,20 @@ IF(NOT _list_len EQUAL 0)
     LIST(GET _PREREQ            ${_p} _pkg    )
     LIST(GET _PREREQ_CONFIG_DIR ${_p} _pkg_dir)
     LIST(GET _PREREQ_COMPONENTS ${_p} _pkg_compo)
-    MESSAGE(STATUS "===> Reloading targets from ${_pkg} ...")
-    IF(NOT _pkg_compo)
-      FIND_PACKAGE(${_pkg} REQUIRED NO_MODULE 
-          PATHS "${_pkg_dir}" 
-          NO_DEFAULT_PATH)
-    ELSE()
-      STRING(REPLACE "," ";" _compo_lst "${_pkg_compo}")
-      MESSAGE(STATUS "===> (components: ${_pkg_compo})")
-      FIND_PACKAGE(${_pkg} REQUIRED NO_MODULE
-          COMPONENTS ${_compo_lst} 
-          PATHS "${_pkg_dir}"
-          NO_DEFAULT_PATH)
+    IF(NOT OMIT_DETECT_PACKAGE_${_pkg})
+      MESSAGE(STATUS "===> Reloading targets from ${_pkg} ...")
+      IF(NOT _pkg_compo)
+        FIND_PACKAGE(${_pkg} REQUIRED NO_MODULE 
+            PATHS "${_pkg_dir}" 
+            NO_DEFAULT_PATH)
+      ELSE()
+        STRING(REPLACE "," ";" _compo_lst "${_pkg_compo}")
+        MESSAGE(STATUS "===> (components: ${_pkg_compo})")
+        FIND_PACKAGE(${_pkg} REQUIRED NO_MODULE
+            COMPONENTS ${_compo_lst} 
+            PATHS "${_pkg_dir}"
+            NO_DEFAULT_PATH)
+      ENDIF()
     ENDIF()
   ENDFOREACH()
 ENDIF()
