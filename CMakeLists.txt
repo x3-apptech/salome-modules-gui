@@ -163,13 +163,27 @@ ELSE()
   FIND_PACKAGE(SalomePyQt5 REQUIRED)
 ENDIF()
 
-# Optional prerequisites for GUI
+# Optional packages for GUI and their pre-requisites
+
+# - GL viewer: no prereqs
 IF(NOT SALOME_USE_GLVIEWER)
   ADD_DEFINITIONS("-DDISABLE_GLVIEWER")
 ENDIF()
+
+# - OCC viewer: no prereqs
 IF(NOT SALOME_USE_OCCVIEWER)
   ADD_DEFINITIONS("-DDISABLE_OCCVIEWER")
 ENDIF()
+
+# - PV viewer: ParaView
+IF (SALOME_USE_PVVIEWER)
+  FIND_PACKAGE(SalomeParaView)
+  SALOME_LOG_OPTIONAL_PACKAGE(ParaView SALOME_USE_PVVIEWER)
+ELSE()
+  ADD_DEFINITIONS("-DDISABLE_PVVIEWER")
+ENDIF()
+
+# - VTK viewer: VTK
 IF(SALOME_USE_VTKVIEWER)
   # Required components are listed in the FindSalomeVTK.cmake file: 
   FIND_PACKAGE(SalomeVTK) 
@@ -177,40 +191,39 @@ IF(SALOME_USE_VTKVIEWER)
 ELSE()
   ADD_DEFINITIONS("-DDISABLE_VTKVIEWER")
 ENDIF()
+
+# - Plot2d viewer: Qwt
 IF(SALOME_USE_PLOT2DVIEWER)
   FIND_PACKAGE(SalomeQwt)
   SALOME_LOG_OPTIONAL_PACKAGE(Qwt SALOME_USE_PLOT2DVIEWER)
 ELSE()
   ADD_DEFINITIONS("-DDISABLE_PLOT2DVIEWER")
 ENDIF()
-IF (SALOME_USE_PVVIEWER)
-  FIND_PACKAGE(SalomeParaView)
-  SALOME_LOG_OPTIONAL_PACKAGE(ParaView SALOME_USE_PVVIEWER)
-  IF(SALOME_BUILD_WITH_QT5)
-    # RNV: Temporary solution: because ParaView CMake procedure 
-    #      defines Qt5_DIR variable, which is used in the SALOME_CONFIGURE_PREPARE
-    #      macro, and as a result leads to the broken SALOME<module>Config.cmake file. 
-    #      TODO: investigate this  !!!
-    UNSET(Qt5_DIR CACHE)
-  ENDIF()
-ELSE()
-  ADD_DEFINITIONS("-DDISABLE_PVVIEWER")
-ENDIF()
+
+# - Graphics viewer: no prereqs
 IF (NOT SALOME_USE_GRAPHICSVIEW)
   ADD_DEFINITIONS("-DDISABLE_GRAPHICSVIEW")
 ENDIF()
+
+# - Python editor: no prereqs
 IF (NOT SALOME_USE_PYVIEWER)
   ADD_DEFINITIONS("-DDISABLE_PYVIEWER")
 ENDIF()
+
+# - Python console: no prereqs
 IF(SALOME_USE_PYCONSOLE)
   # Build with obsolete Python module's methods
   ADD_DEFINITIONS(-DCALL_OLD_METHODS)
 ELSE()
   ADD_DEFINITIONS("-DDISABLE_PYCONSOLE")
 ENDIF()
+
+# - Qx viewer: no prereqs
 IF(NOT SALOME_USE_QXGRAPHVIEWER)
   ADD_DEFINITIONS("-DDISABLE_QXGRAPHVIEWER")
 ENDIF()
+
+# - SALOME object: no prereqs
 IF(NOT SALOME_USE_SALOMEOBJECT)
   ADD_DEFINITIONS("-DDISABLE_SALOMEOBJECT")
 ENDIF()
@@ -399,7 +412,7 @@ EXPORT(TARGETS ${_${PROJECT_NAME}_exposed_targets}
 # Create the configuration files:
 #   - in the build tree:
 
-#      Ensure the variables are always defined for the configure:
+# Ensure the variables are always defined for the configure:
 SET(KERNEL_ROOT_DIR "${KERNEL_ROOT_DIR}")
 SET(SIP_ROOT_DIR "${SIP_ROOT_DIR}")
 IF(NOT SALOME_BUILD_WITH_QT5)
