@@ -18,6 +18,7 @@
 //
 
 #include <QtGui>
+#include <QInputDialog>
 
 #include "mainwindow.hxx"
 #include "TreeModel.hxx"

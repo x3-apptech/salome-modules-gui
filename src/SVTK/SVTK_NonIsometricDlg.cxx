@@ -49,7 +49,7 @@ SVTK_NonIsometricDlg
   m_MainWindow(theParent)
 {
   setWindowTitle(tr("DLG_TITLE"));
-  setSizeGripEnabled(TRUE);
+  setSizeGripEnabled(true);
 
   // Create layout for this dialog
   QGridLayout* layoutDlg = new QGridLayout (this);
@@ -109,16 +109,16 @@ SVTK_NonIsometricDlg
   // Create <OK> button
   QPushButton* m_bOk = new QPushButton(tr("O&K"), aGroupBox2);
   m_bOk->setObjectName("m_bOk");
-  m_bOk->setDefault(TRUE);
-  m_bOk->setAutoDefault(TRUE);
+  m_bOk->setDefault(true);
+  m_bOk->setAutoDefault(true);
   // Create <Apply> button
   QPushButton* m_bApply = new QPushButton(tr("&Apply"), aGroupBox2);
   m_bApply->setObjectName("m_bApply");
-  m_bApply->setAutoDefault(TRUE);
+  m_bApply->setAutoDefault(true);
   // Create <Cancel> button
   QPushButton* m_bCancel = new QPushButton(tr("&Cancel"), aGroupBox2);
   m_bCancel->setObjectName("m_bCancel");
-  m_bCancel->setAutoDefault(TRUE);
+  m_bCancel->setAutoDefault(true);
 
   // Layout buttons
   aHBoxLayout2->addWidget(m_bOk);

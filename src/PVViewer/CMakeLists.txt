@@ -17,10 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
-
 # Install ParaView filters, etc ...
 ADD_SUBDIRECTORY(resources)
+
+INCLUDE(UseQtExt)
 
 # --- options ---
 
@@ -81,10 +81,10 @@ SET(_ts_RESOURCES
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / rcc wrappings
-QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / static
 SET(_other_SOURCES
@@ -110,7 +110,7 @@ ADD_LIBRARY(PVViewer ${PVViewer_SOURCES})
 TARGET_LINK_LIBRARIES(PVViewer ${_link_LIBRARIES})
 INSTALL(TARGETS PVViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
 # --- header and resources installation ---
 INSTALL(FILES ${PVViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})

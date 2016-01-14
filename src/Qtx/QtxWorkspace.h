@@ -25,13 +25,13 @@
 
 #include "Qtx.h"
 
-#include <QWorkspace>
+#include <QMdiArea>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
-class QTX_EXPORT QtxWorkspace : public QWorkspace
+class QTX_EXPORT QtxWorkspace : public QMdiArea
 {
   Q_OBJECT
 

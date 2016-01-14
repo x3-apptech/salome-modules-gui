@@ -54,7 +54,7 @@ QtxAction* SUIT_ActionOperation::action() const
  * Create new instance of QtxAction and set.
  */
 void SUIT_ActionOperation::setAction( const QString& text, const QIcon& icon,
-                                                              const QString& menuText, QKeySequence accel,
+                                      const QString& menuText, QKeySequence accel,
                                       QObject* parent, bool toggle )
 {
   setAction( new QtxAction( text, icon, menuText, accel, parent, toggle ) );
@@ -64,7 +64,7 @@ void SUIT_ActionOperation::setAction( const QString& text, const QIcon& icon,
  * Create new instance of QtxAction and set.
  */
 void SUIT_ActionOperation::setAction( const QString& text, const QString& menuText,
-                                                              QKeySequence accel, QObject* parent, bool toggle )
+                                      QKeySequence accel, QObject* parent, bool toggle )
 {
   setAction( new QtxAction( text, menuText, accel, parent, toggle ) );
 }

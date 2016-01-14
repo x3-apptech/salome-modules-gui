@@ -495,7 +495,7 @@ void AddImagePart( QFile& hFile, QImage& image, int w1, int w2, int h1, int h2,
     
     aBuffer += "> false 3 colorimage\n\n";
 
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
   }
 }
 

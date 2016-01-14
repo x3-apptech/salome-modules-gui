@@ -75,7 +75,7 @@ protected:
   virtual void   keyPressEvent ( QKeyEvent* event);
   virtual void   customEvent( QEvent* event);
   virtual void   mousePressEvent( QMouseEvent* event );
-  virtual void   insertFromMimeData(const QMimeData * source);
+  virtual void   insertFromMimeData(const QMimeData* source);
 
   virtual PyInterp_Request* createTabRequest( const QString& input );
   virtual void handleTab();

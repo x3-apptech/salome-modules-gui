@@ -1327,7 +1327,7 @@ void QtxDialog::keyPressEvent( QKeyEvent* e )
 
   if ( e->key() == Qt::Key_Tab && e->modifiers() & Qt::ControlModifier )
   {
-    QObject* tab = qFindChild<QTabWidget*>( this );
+    QObject* tab = this->findChild<QTabWidget*>( );
     if ( tab && !property( "in_tab_event" ).toBool() ) {
       setProperty( "in_tab_event", true );
       QApplication::sendEvent( tab, e );
@@ -1442,8 +1442,9 @@ void QtxDialog::reject()
 void QtxDialog::emitSignal()
 {
   QApplication::instance()->processEvents();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   QApplication::syncX();
-
+#endif
   int id = buttonId( (QAbstractButton*)mySender );
   mySender = 0;
 

@@ -27,6 +27,7 @@
 #include <QTextCursor>
 #include <QTextCharFormat>
 #include <QRegExp>
+#include <QMimeData>
 
 #include "PyConsole_EnhEditor.h"
 #include "PyConsole_EnhInterp.h"
@@ -417,7 +418,7 @@ QString PyConsole_EnhEditor::formatDocHTML(const QString & doc) const
  * If the pasted text doesn't contain a line return, no special treatment is done.
  * @param source
  */
-void PyConsole_EnhEditor::insertFromMimeData(const QMimeData * source)
+void PyConsole_EnhEditor::insertFromMimeData(const QMimeData* source)
 {
   if (_multi_line_paste)
     return;

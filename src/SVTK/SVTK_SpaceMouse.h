@@ -27,20 +27,24 @@
 #ifndef SVTK_SpaceMouse_h
 #define SVTK_SpaceMouse_h
 
+#include <QtGlobal>
+
 #ifndef WIN32
 extern "C"
 {
 #include <X11/X.h>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <X11/Xlib.h>
+#else
+#include <xcb/xcb.h>
+#endif
 }
+
 #endif
 
 class SVTK_SpaceMouse 
 {
  public:
-
-  // access to SpaceMouse utility class
-  static SVTK_SpaceMouse* getInstance();
 
   enum MoveData { x, y, z, a, b, c };
   enum EventType { SpaceMouseMove = 1, SpaceButtonPress, SpaceButtonRelease };
@@ -54,26 +58,66 @@ class SVTK_SpaceMouse
 
   bool isSpaceMouseOn() const { return spaceMouseOn != 0; }
 
+  SVTK_SpaceMouse();
+
+ protected:
+
+  int spaceMouseOn;
+};
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+
+class SVTK_SpaceMouseX: public SVTK_SpaceMouse
+{
+
+public:
+  SVTK_SpaceMouseX();
+
+  // access to SpaceMouse utility class
+  static SVTK_SpaceMouseX* getInstance();
+
 #ifndef WIN32
   int initialize     ( Display*, Window );
   int setWindow      ( Display*, Window );
   int translateEvent ( Display*, XEvent*, MoveEvent*, double, double );
   int close          ( Display* );
-#endif
 
- private:
-  SVTK_SpaceMouse();
-  static SVTK_SpaceMouse* myInstance;
-
-#ifndef WIN32
+private:
   Atom XMotionEvent;
   Atom XButtonPressEvent;
   Atom XButtonReleaseEvent;
   Atom XCommandEvent;
-
   Window win;
 #endif
-  int spaceMouseOn;
-};
 
+  static SVTK_SpaceMouseX* myInstance;
+
+};
+#else
+class SVTK_SpaceMouseXCB: public SVTK_SpaceMouse
+{
+
+public:
+  SVTK_SpaceMouseXCB();
+
+  // access to SpaceMouse utility class
+  static SVTK_SpaceMouseXCB* getInstance();
+
+#ifndef WIN32
+  int initialize     ( xcb_connection_t*, xcb_window_t );
+  int setWindow      ( xcb_connection_t*, xcb_window_t );
+  int translateEvent ( xcb_connection_t*, xcb_client_message_event_t*, MoveEvent*, double, double );
+  int close          ( xcb_connection_t* );
+
+private:
+  xcb_atom_t XCBMotionEvent;
+  xcb_atom_t XCBButtonPressEvent;
+  xcb_atom_t XCBButtonReleaseEvent;
+  xcb_window_t win;
+#endif
+
+  static SVTK_SpaceMouseXCB* myInstance;
+
+};
+#endif
 #endif

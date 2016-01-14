@@ -45,7 +45,9 @@ class QTX_EXPORT QtxAction : public QWidgetAction
 public:
   QtxAction( QObject* = 0, bool = false, const QString& = QString() );
   QtxAction( const QString&, const QString&, int, QObject*, bool = false, const QString& = QString() );
+  QtxAction( const QString&, const QString&, const QKeySequence&, QObject*, bool = false, const QString& = QString() );
   QtxAction( const QString&, const QIcon&, const QString&, int, QObject*, bool = false, const QString& = QString() );
+  QtxAction( const QString&, const QIcon&, const QString&, const QKeySequence&, QObject*, bool = false, const QString& = QString() );
   virtual ~QtxAction();
 
   virtual bool eventFilter( QObject*, QEvent* );

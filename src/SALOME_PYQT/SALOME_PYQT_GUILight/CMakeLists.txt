@@ -17,7 +17,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UsePyQt4)
+INCLUDE(UseQtExt)
+INCLUDE(UsePyQt)
+
 IF(SALOME_USE_VTKVIEWER)
   INCLUDE(${VTK_USE_FILE})
 ENDIF()
@@ -91,10 +93,10 @@ SET(_sip_files SALOME_PYQT_GUILight.sip)
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / sip wrappings
-PYQT4_WRAP_SIP(_sip_SOURCES ${_sip_files})
+PYQT_WRAP_SIP(_sip_SOURCES ${_sip_files})
 
 # sources / static
 SET(_other_SOURCES

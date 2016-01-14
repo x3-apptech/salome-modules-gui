@@ -241,7 +241,7 @@ void QtxPathDialog::onBrowse()
   {
     QStringList fList = prepareFilters( entry.filter );
     if ( !fList.isEmpty() )
-      entry.dlg->setFilters( fList );
+      entry.dlg->setNameFilters( fList );
   }
   entry.dlg->selectFile( fileName( id ) );
 
@@ -255,10 +255,10 @@ void QtxPathDialog::onBrowse()
     return;
   
   if ( Qtx::extension( fName ).isEmpty() && !isDir )
-    fName = autoExtension( fName, entry.dlg->selectedFilter() );
+    fName = autoExtension( fName, entry.dlg->selectedNameFilter() );
 
-  fName = QDir::convertSeparators( fName );
-  QString prev = QDir::convertSeparators( fileName( id ) );
+  fName = QDir::toNativeSeparators( fName );
+  QString prev = QDir::toNativeSeparators( fileName( id ) );
   if ( isDir )
   {
     while ( prev.length() && prev.at( prev.length() - 1 ) == QDir::separator() )
@@ -701,7 +701,7 @@ QString QtxPathDialog::autoExtension( const QString& theFileName, const QString&
       ext = ext.mid( ext.indexOf( "." ) + 1 );
     
     if ( !ext.isEmpty() && !ext.contains( "*" ) )
-      fName = QDir::convertSeparators( fName ) + QString( "." ) + ext;
+      fName = QDir::toNativeSeparators( fName ) + QString( "." ) + ext;
   }
   
   return fName;

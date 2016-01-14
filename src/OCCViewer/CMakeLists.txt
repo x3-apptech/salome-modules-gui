@@ -20,7 +20,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQt4Ext)
+INCLUDE(UseQtExt)
 
 # --- options ---
 
@@ -153,10 +153,10 @@ SET(_other_RESOURCES
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / rcc wrappings
-QT4_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
+QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / static
 SET(_other_SOURCES
@@ -196,6 +196,6 @@ TARGET_LINK_LIBRARIES(OCCViewer ${_link_LIBRARIES})
 INSTALL(TARGETS OCCViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 INSTALL(FILES ${OCCViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
 INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

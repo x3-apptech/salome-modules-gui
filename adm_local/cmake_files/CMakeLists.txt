@@ -29,14 +29,17 @@ SET(_adm_data
   FindGUI.cmake
   FindSIP.cmake
   FindPyQt4.cmake
+  FindPyQt5.cmake
   FindSalomePyQt4.cmake
+  FindSalomePyQt5.cmake
   FindSalomeQt4.cmake
+  FindSalomeQt5.cmake
   FindSalomeQwt.cmake
   FindSalomeSIP.cmake
   FindSalomeGUI.cmake
   FindSalomeOpenGL.cmake
   FindSalomeParaView.cmake
-  UsePyQt4.cmake
-  UseQt4Ext.cmake
+  UsePyQt.cmake
+  UseQtExt.cmake
 )
 INSTALL(FILES ${_adm_data} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})

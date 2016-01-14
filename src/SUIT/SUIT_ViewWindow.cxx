@@ -403,7 +403,7 @@ void SUIT_ViewWindow::updateSyncViews()
     SUIT_Application* app = SUIT_Session::session()->activeApplication();
     if ( app ) {
       SUIT_Desktop* d = app->desktop();
-      QList<SUIT_ViewWindow*> allViews = qFindChildren<SUIT_ViewWindow*>( d );
+      QList<SUIT_ViewWindow*> allViews = d->findChildren<SUIT_ViewWindow*>();
       foreach( SUIT_ViewWindow* vw, allViews ) {
 	if ( !vw || vw == this ) continue; // skip invalid views and this one
 	SUIT_CameraProperties otherProps = vw->cameraProperties();
@@ -473,7 +473,7 @@ void SUIT_ViewWindow::synchronizeView( SUIT_ViewWindow* viewWindow, int id )
   SUIT_Desktop* d = app->desktop();
   if ( !d ) return;
 
-  QList<SUIT_ViewWindow*> allViews = qFindChildren<SUIT_ViewWindow*>( d );
+  QList<SUIT_ViewWindow*> allViews = d->findChildren<SUIT_ViewWindow*>();
   foreach( SUIT_ViewWindow* vw, allViews ) {
     if ( !vw->cameraProperties().isValid() )
       continue;                    // omit views not supporting camera properties

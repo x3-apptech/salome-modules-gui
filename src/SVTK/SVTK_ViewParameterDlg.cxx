@@ -59,7 +59,7 @@ SVTK_ViewParameterDlg::SVTK_ViewParameterDlg(QtxAction* theAction,
   myRWInteractor(theParent->GetInteractor())
 {
   setWindowTitle(tr("DLG_TITLE"));
-  setSizeGripEnabled(TRUE);
+  setSizeGripEnabled(true);
 
   // Top layout
   QVBoxLayout* aTopLayout = new QVBoxLayout(this);
@@ -349,7 +349,7 @@ SVTK_ViewParameterDlg::SVTK_ViewParameterDlg(QtxAction* theAction,
 
   QPushButton* m_bClose = new QPushButton(tr("&Close"), aGroupBox );
   m_bClose->setObjectName("m_bClose");
-  m_bClose->setAutoDefault(TRUE);
+  m_bClose->setAutoDefault(true);
   m_bClose->setFixedSize(m_bClose->sizeHint());
   connect(m_bClose, SIGNAL(clicked()), this, SLOT(onClickClose()));
 

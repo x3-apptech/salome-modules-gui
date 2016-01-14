@@ -17,9 +17,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_SUBDIRECTORY(Test)
+INCLUDE(UseQtExt)
 
-INCLUDE(UseQt4Ext)
+ADD_SUBDIRECTORY(Test)
 
 # --- options ---
 
@@ -82,7 +82,7 @@ SET(SalomeTreeData_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES

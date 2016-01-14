@@ -322,7 +322,7 @@ int VTKViewer_RenderWindowInteractor::CreateTimer(int vtkNotUsed(timertype))
   ///
   /// Start a one-shot timer for 10ms.
   ///
-  mTimer->setSingleShot(TRUE) ;
+  mTimer->setSingleShot(true) ;
   mTimer->start(10) ;
   return 1 ;
 }

@@ -95,7 +95,7 @@ GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* t
   myGLWidget = new GLViewer_Widget( this, 0 ) ;
   qbl->addWidget( myGLWidget );
   myGLWidget->setFocusProxy( this );
-  setMouseTracking( TRUE );
+  setMouseTracking( true );
 
   myIsDragProcess = noDrag;
   //myCurDragMousePos = QPoint();
@@ -530,7 +530,7 @@ void GLViewer_ViewPort2d::initResize( int x, int y )
     GLfloat zoom, xzoom, yzoom;
     GLfloat w = x;
     GLfloat h = y;
-    bool max = FALSE;
+    bool max = false;
 
     xzoom = (GLfloat)x / myWidth;
     yzoom = (GLfloat)y / myHeight;
@@ -541,7 +541,7 @@ void GLViewer_ViewPort2d::initResize( int x, int y )
         zoom = yzoom;
     else
     {
-        max = TRUE;
+        max = true;
         zoom = xzoom > yzoom ? xzoom : yzoom;
     }
 

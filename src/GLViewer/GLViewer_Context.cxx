@@ -182,7 +182,7 @@ int GLViewer_Context::MoveTo( int xi, int yi, bool byCircle )
     if( myLastPickedChanged || myUpdateAll )
         myGLViewer2d->updateAll();
     else
-        myGLViewer2d->activateDrawers( anUpdatedObjects, TRUE, TRUE );
+        myGLViewer2d->activateDrawers( anUpdatedObjects, true, true );
 
     return 0;
 }
@@ -220,7 +220,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
             if( updateAll || myUpdateAll )
                 myGLViewer2d->updateAll();
             else
-                myGLViewer2d->activateDrawers( aList, TRUE, TRUE );
+                myGLViewer2d->activateDrawers( aList, true, true );
 
             if( mySelectedObjects.count() != 0 && status == SS_Invalid )
                 status = SS_GlobalChanged;
@@ -242,7 +242,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
              && mySelectedObjects.indexOf( myLastPicked ) == -1 )
         {
             mySelectedObjects.append( myLastPicked );
-            myGLViewer2d->activateDrawer( myLastPicked, TRUE, TRUE );
+            myGLViewer2d->activateDrawer( myLastPicked, true, true );
 
             if( status == SS_Invalid )
                 status = SS_GlobalChanged;
@@ -267,7 +267,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
             if( updateAll || myUpdateAll )
                 myGLViewer2d->updateAll();
             else
-                myGLViewer2d->activateDrawers( aList, TRUE, TRUE );
+                myGLViewer2d->activateDrawers( aList, true, true );
 
             if( mySelectedObjects.count() != 0 )
                 status = SS_GlobalChanged;
@@ -297,7 +297,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
             if( updateAll || myUpdateAll )
                 myGLViewer2d->updateAll();
             else
-                myGLViewer2d->activateDrawers( aList, TRUE, TRUE );
+                myGLViewer2d->activateDrawers( aList, true, true );
 
             if( mySelectedObjects.count() != 0 )
                 status = SS_GlobalChanged;
@@ -319,7 +319,7 @@ int GLViewer_Context::Select( bool Append, bool byCircle )
             {
                 myLastPicked = *oit;
                 mySelectedObjects.append( myLastPicked );
-                myGLViewer2d->activateDrawer( myLastPicked, TRUE, TRUE );
+                myGLViewer2d->activateDrawer( myLastPicked, true, true );
                 status = SS_GlobalChanged;
                 return status;
             }
@@ -387,7 +387,7 @@ int GLViewer_Context::SelectByRect( const QRect& theRect, bool Append )
     if( updateAll || myUpdateAll )
         myGLViewer2d->updateAll();
     else
-        myGLViewer2d->activateDrawers( aList, TRUE, TRUE );
+        myGLViewer2d->activateDrawers( aList, true, true );
 
     return status;
 }
@@ -470,10 +470,10 @@ bool GLViewer_Context::NextSelected()
   if ( mySelCurIndex >= 0 && mySelCurIndex < NbSelected() )
   {
     mySelCurIndex++;
-    return TRUE;
+    return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 /*!
@@ -512,7 +512,7 @@ int GLViewer_Context::insertObject( GLViewer_Object* object, bool display, bool 
         {
             //QRect* rect = object->getRect()->toQRect();
             //myGLViewer2d->updateBorders( *rect );
-            myGLViewer2d->activateDrawer( object, FALSE );
+            myGLViewer2d->activateDrawer( object, false );
         }
     }
     else
@@ -600,7 +600,7 @@ void GLViewer_Context::clearSelected( bool updateViewer )
   }          
         
   if( updateViewer )
-    myGLViewer2d->activateDrawers( aList, TRUE );
+    myGLViewer2d->activateDrawers( aList, true );
   mySelectedObjects.clear();    
 }
 
@@ -615,12 +615,12 @@ void GLViewer_Context::setSelected( GLViewer_Object* object, bool updateViewer )
 
   if( myActiveObjects.contains( object ) && !mySelectedObjects.contains( object ) )
   {
-    object->setSelected( TRUE );
+    object->setSelected( true );
     mySelectedObjects.append( object );
   }
      
   if( updateViewer )
-    myGLViewer2d->activateDrawer( object, TRUE, TRUE );
+    myGLViewer2d->activateDrawer( object, true, true );
 }
 
 /*!
@@ -636,7 +636,7 @@ void GLViewer_Context::remSelected( GLViewer_Object* object, bool updateViewer )
   object->unselect();
   
   if( updateViewer )
-    myGLViewer2d->activateDrawer( object, TRUE, TRUE );
+    myGLViewer2d->activateDrawer( object, true, true );
 }
 
 /*!

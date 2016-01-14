@@ -631,6 +631,28 @@ QAction* SUIT_Application::createAction( const int id, const QString& text, cons
                                          QObject* parent, const bool toggle, QObject* reciever, 
 					 const char* member, const QString& shortcutAction )
 {
+  return createAction( id, text, icon, menu, tip, QKeySequence(key), parent, toggle, reciever, member, shortcutAction );
+}
+
+/*!
+  Creates action and registers it both in menu manager and tool manager
+  \return new instance of action
+  \param id - proposed SUIT identificator
+  \param text - description
+  \param icon - icon for toolbar
+  \param menu - menu text
+  \param tip - tool tip
+  \param key - shortcut
+  \param parent - parent object
+  \param toggle - if it is TRUE the action will be a toggle action, otherwise it will be a command action
+  \param reciever - object that contains slot
+  \param member - slot to be called when action is activated
+*/
+QAction* SUIT_Application::createAction( const int id, const QString& text, const QIcon& icon,
+                                         const QString& menu, const QString& tip, const QKeySequence& key,
+                                         QObject* parent, const bool toggle, QObject* reciever, 
+					 const char* member, const QString& shortcutAction )
+{
   QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle, shortcutAction );
   a->setStatusTip( tip );
 

@@ -941,6 +941,33 @@ QAction* CAM_Module::createAction( const int id, const QString& text, const QIco
                                    QObject* parent, const bool toggle, QObject* reciever,
 				   const char* member, const QString& shortcutAction )
 {
+  return createAction( id, text, icon, menu, tip, QKeySequence(key), parent, toggle, reciever, member, shortcutAction );
+}
+
+/*!
+  \brief Create new instance of QtxAction and register action with specified \a id.
+
+  Resulting action ID may differ from the requested one. This can happen if
+  requested ID is already in use.
+
+  If \a id < 0, the action ID is generated automatically.
+
+  \param id required action ID
+  \param text tooltip text
+  \param icon action icon
+  \param menu menu text
+  \param tip status bar tip
+  \param key keyboard accelerator
+  \param parent parent object
+  \param toggle if \c true, the action will be toggled
+  \param reciever action activation signal receiver object
+  \param member action activation signal receiver slot
+*/
+QAction* CAM_Module::createAction( const int id, const QString& text, const QIcon& icon,
+                                   const QString& menu, const QString& tip, const QKeySequence& key,
+                                   QObject* parent, const bool toggle, QObject* reciever,
+				   const char* member, const QString& shortcutAction )
+{
   QtxAction* a = new QtxAction( text, icon, menu, key, parent, toggle, shortcutAction );
   a->setStatusTip( tip );
 

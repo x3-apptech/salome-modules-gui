@@ -122,6 +122,7 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
     cout << "Choosing cmap for vID = " << vi->visualid << endl;
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     if ( vi->visualid == XVisualIDFromVisual( (Visual*)QX11Info::appVisual() ) )
     {
 #ifdef DEBUG
@@ -129,7 +130,15 @@ static Colormap choose_cmap( Display *dpy, XVisualInfo *vi )
 #endif
         return QX11Info::appColormap();
     }
-
+#else
+    if ( vi->visualid == XVisualIDFromVisual( XDefaultVisual( QX11Info::display(), -1 ) ) )
+    {
+#ifdef DEBUG
+        cout << "Using XDefaultColormap" << endl;
+#endif
+        return XDefaultColormap( QX11Info::display(), -1 );
+    }
+#endif
     if ( mesa_gl )
     {
         Atom hp_cmaps = XInternAtom( dpy, "_HP_RGB_SMOOTH_MAP_LIST", true );

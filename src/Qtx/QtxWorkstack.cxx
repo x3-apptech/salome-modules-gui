@@ -2203,7 +2203,7 @@ int QtxWorkstack::accel( const int id ) const
 {
   int res = 0;
   if ( myActionsMap.contains( id ) )
-    res = myActionsMap[id]->shortcut();
+    res = myActionsMap[id]->shortcut()[0];
   return res;
 }
 
@@ -2651,7 +2651,7 @@ void QtxWorkstack::insertWidget( QWidget* wid, QWidget* pWid, QWidget* after )
   for ( QWidgetList::iterator itr = moveList.begin(); itr != moveList.end(); ++itr )
   {
     (*itr)->setParent( pWid );
-    (*itr)->setShown( map.contains( *itr ) ? map[*itr] : false );
+    (*itr)->setVisible( map.contains( *itr ) ? map[*itr] : false );
   }
 }
 

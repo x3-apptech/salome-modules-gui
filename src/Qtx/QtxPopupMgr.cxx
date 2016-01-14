@@ -26,8 +26,12 @@
 #include "QtxPopupMgr.h"
 #include "QtxAction.h"
 #include "QtxEvalExpr.h"
+#include <QList>
 #include <QMenu>
+#include <QVariant>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+ 
 /*!
   \brief Used for comparing of two QVariant values.
   \param v1 first argument for comparison
@@ -56,7 +60,7 @@ bool operator<( const QVariant& v1, const QVariant& v2 )
       for ( ; anIt1 != aLast1 && anIt2 != aLast2;  anIt1++, anIt2++ )
       {
         if ( (*anIt1) != (*anIt2) )
-          return (*anIt1)<(*anIt2);
+          return (*anIt1) < (*anIt2);
       }
       return anIt1 == aLast1 && anIt2 != aLast2;
     }
@@ -66,6 +70,22 @@ bool operator<( const QVariant& v1, const QVariant& v2 )
   }
   return t1 < t2;
 }
+
+#else
+
+bool operator<( const QList<QVariant>& v1, const QList<QVariant>& v2 )
+{
+  QList<QVariant>::const_iterator anIt1 = v1.begin(), aLast1 = v1.end(),
+    anIt2 = v2.begin(), aLast2 = v2.end();
+  for ( ; anIt1 != aLast1 && anIt2 != aLast2;  anIt1++, anIt2++ )
+  {
+    if ( (*anIt1) != (*anIt2) )
+      return (*anIt1) < (*anIt2);
+  }
+  return anIt1 == aLast1 && anIt2 != aLast2;
+}
+
+#endif // QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 
 /*!
   \class QtxPopupMgr::PopupCreator

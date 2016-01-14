@@ -99,6 +99,9 @@ public:
   virtual QAction*       createAction( const int, const QString&, const QIcon&, const QString&,
                                        const QString&, const int, QObject* = 0,
                                        const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
+  virtual QAction*       createAction( const int, const QString&, const QIcon&, const QString&,
+                                       const QString&, const QKeySequence&, QObject* = 0,
+                                       const bool = false, QObject* = 0, const char* = 0, const QString& = QString() );
   QtxActionGroup*        createActionGroup( const int, const bool = true );
 
   int                    createTool( const QString&, const QString& = QString() );

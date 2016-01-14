@@ -22,7 +22,7 @@
 //
 #include "QtxWorkspace.h"
 
-#include <QWidgetList>
+#include <QMdiSubWindow>
 
 /*!
   \class QtxWorkspace
@@ -38,7 +38,7 @@
   \param parent parent widget
 */
 QtxWorkspace::QtxWorkspace( QWidget* parent )
-: QWorkspace( parent )
+: QMdiArea( parent )
 {
 }
 
@@ -54,24 +54,24 @@ QtxWorkspace::~QtxWorkspace()
 */
 void QtxWorkspace::tileVertical()
 {
-  QWidgetList winList = windowList();
+  QList<QMdiSubWindow *> winList = subWindowList();
   if ( winList.isEmpty() )
     return;
   
   int count = 0;
-  for ( QWidgetList::const_iterator itr = winList.begin(); itr != winList.end(); ++itr )
+  for ( QList<QMdiSubWindow *>::const_iterator itr = winList.begin(); itr != winList.end(); ++itr )
     if ( !( (*itr)->windowState() & Qt::WindowMinimized ) )
       count++;
 
   if ( !count )
     return;
 
-  if ( activeWindow() && ( activeWindow()->windowState() & Qt::WindowMaximized ) )
-    activeWindow()->showNormal();
+  if ( activeSubWindow() && ( activeSubWindow()->windowState() & Qt::WindowMaximized ) )
+    activeSubWindow()->showNormal();
 
   int y = 0;
   int heightForEach = height() / count;
-  for ( QWidgetList::iterator it = winList.begin(); it != winList.end(); ++it )
+  for ( QList<QMdiSubWindow *>::iterator it = winList.begin(); it != winList.end(); ++it )
   {
     QWidget* win = *it;
     if ( win->windowState() & Qt::WindowMinimized )
@@ -98,24 +98,24 @@ void QtxWorkspace::tileVertical()
 */
 void QtxWorkspace::tileHorizontal()
 {
-  QWidgetList winList = windowList();
+  QList<QMdiSubWindow *> winList = subWindowList();
   if ( winList.isEmpty() )
     return;
 
   int count = 0;
-  for ( QWidgetList::const_iterator itr = winList.begin(); itr != winList.end(); ++itr )
+  for ( QList<QMdiSubWindow *>::const_iterator itr = winList.begin(); itr != winList.end(); ++itr )
     if ( !( (*itr)->windowState() & Qt::WindowMinimized ) )
       count++;
 
   if ( !count )
     return;
 
-  if ( activeWindow() && activeWindow()->windowState() & Qt::WindowMaximized )
-    activeWindow()->showNormal();
+  if ( activeSubWindow() && activeSubWindow()->windowState() & Qt::WindowMaximized )
+    activeSubWindow()->showNormal();
   
   int x = 0;
   int widthForEach = width() / count;
-  for ( QWidgetList::iterator it = winList.begin(); it != winList.end(); ++it )
+  for ( QList<QMdiSubWindow *>::iterator it = winList.begin(); it != winList.end(); ++it )
   {
     QWidget* win = *it;
     if ( win->windowState() & Qt::WindowMinimized )

@@ -376,8 +376,8 @@ void QtxFontEdit::setMode( const int mode )
 
   myMode = mode;
 
-  myFamily->setShown( myMode == Native );
-  myCustomFams->setShown( myMode == Custom );
+  myFamily->setVisible( myMode == Native );
+  myCustomFams->setVisible( myMode == Custom );
 
   updateGeometry();
 }

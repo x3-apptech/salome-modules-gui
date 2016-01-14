@@ -127,7 +127,7 @@ void SUIT_Desktop::customEvent( QEvent* e )
                  wid->testAttribute( Qt::WA_WState_Hidden );
 
     addWindow( wid );
-    wid->setShown( !invis );
+    wid->setVisible( !invis );
   }
 }
 

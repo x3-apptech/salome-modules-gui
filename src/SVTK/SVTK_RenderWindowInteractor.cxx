@@ -35,7 +35,10 @@
 // Put Qt includes before the X11 includes which #define the symbol None
 // (see SVTK_SpaceMouse.h) to avoid the compilation error.
 #ifndef WIN32
-# include <QX11Info>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <xcb/xcb.h>
+#endif
+#include <QX11Info>
 #endif
 #include <QMouseEvent>
 
@@ -110,9 +113,15 @@ QVTK_RenderWindowInteractor
 ::~QVTK_RenderWindowInteractor() 
 {
 #ifndef WIN32
-  SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
   if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
     aSpaceMouse->close( QX11Info::display() );
+#else
+  SVTK_SpaceMouseXCB* aSpaceMouse = SVTK_SpaceMouseXCB::getInstance();
+  if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
+    aSpaceMouse->close( QX11Info::connection() );
+#endif
 #endif
 }
 
@@ -408,8 +417,8 @@ QVTK_RenderWindowInteractor
 
 #ifndef WIN32
   // register set space mouse events receiver
-  SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance();
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
   if ( aSpaceMouse )
   {
     if ( !aSpaceMouse->isSpaceMouseOn() )
@@ -418,6 +427,17 @@ QVTK_RenderWindowInteractor
     else
       aSpaceMouse->setWindow( QX11Info::display(), winId() );
   }
+#else
+  SVTK_SpaceMouseXCB* aSpaceMouse = SVTK_SpaceMouseXCB::getInstance();
+  if ( aSpaceMouse )
+  {
+    if ( !aSpaceMouse->isSpaceMouseOn() )
+      // initialize 3D space mouse driver
+      aSpaceMouse->initialize( QX11Info::connection(), winId() );
+    else
+      aSpaceMouse->setWindow( QX11Info::connection(), winId() );
+  }
+#endif
 #endif
 }
 
@@ -432,14 +452,21 @@ QVTK_RenderWindowInteractor
   QWidget::focusOutEvent( event );
 
 #ifndef WIN32
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // unregister set space mouse events receiver
-  SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance();
+  SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
   if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
     aSpaceMouse->setWindow( QX11Info::display(), 0 );
+#else
+  SVTK_SpaceMouseXCB* aSpaceMouse = SVTK_SpaceMouseXCB::getInstance();
+  if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
+    aSpaceMouse->setWindow( QX11Info::connection(), 0 );
+#endif
 #endif
 }
 
-
+// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #ifdef WIN32
 
 /*!
@@ -456,12 +483,12 @@ bool QVTK_RenderWindowInteractor::winEvent( MSG* msg, long* result )
 /*!
   To handle native X11 events (from such devices as SpaceMouse)
 */
-bool 
+bool
 QVTK_RenderWindowInteractor
 ::x11Event( XEvent *xEvent )
 {
   // handle 3d space mouse events
-  if ( SVTK_SpaceMouse* aSpaceMouse = SVTK_SpaceMouse::getInstance() )
+  if ( SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance() )
   {
     if ( aSpaceMouse->isSpaceMouseOn() && xEvent->type == ClientMessage )
     {
@@ -486,7 +513,46 @@ QVTK_RenderWindowInteractor
 }
 
 #endif
+#else
+bool QVTK_RenderWindowInteractor
+::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+  if ( eventType == "xcb_generic_event_t" )
+  {
+    xcb_generic_event_t* ev = static_cast<xcb_generic_event_t *>(message);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    if ( SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance() )
+#else
+    if ( SVTK_SpaceMouseXCB* aSpaceMouse = SVTK_SpaceMouseXCB::getInstance() )
+#endif
+    {
+      if ( aSpaceMouse->isSpaceMouseOn() && ev->response_type == XCB_CLIENT_MESSAGE )
+      {
+        SVTK_SpaceMouse::MoveEvent anEvent;
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        int type = aSpaceMouse->translateEvent( QX11Info::display(), xEvent, &anEvent, 1.0, 1.0 );
+#else
+        int type = aSpaceMouse->translateEvent( QX11Info::connection(), (xcb_client_message_event_t*)ev, &anEvent, 1.0, 1.0 );
+#endif
+        switch ( type )
+        {
+        case SVTK_SpaceMouse::SpaceMouseMove:
+                GetDevice()->InvokeEvent( SVTK::SpaceMouseMoveEvent, anEvent.data );
+                break;
+        case SVTK_SpaceMouse::SpaceButtonPress:
+                GetDevice()->InvokeEvent( SVTK::SpaceMouseButtonEvent, &anEvent.button );
+                break;
+        case SVTK_SpaceMouse::SpaceButtonRelease:
+                break;
+        }
+        return true; // stop handling the event
+      }
+    }
+  }
 
+ return QWidget::nativeEvent( eventType, message, result );
+}
+#endif
 /*!
   Constructor
 */

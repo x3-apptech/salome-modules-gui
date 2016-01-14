@@ -203,7 +203,7 @@ int QtxWorkstackAction::accel( const int id ) const
 {
   int a = 0;
   if ( action( id ) )
-    a = action( id )->shortcut();
+    a = action( id )->shortcut()[0];
   return a;
 }
 
@@ -524,12 +524,12 @@ QtxSplitDlg::QtxSplitDlg( QWidget* parent, QtxWorkstack* workstack, QtxSplitDlgM
 
   // Buttons for possibility of switching the variants of split
   myButtonPrevious = new QPushButton( this );
-  myButtonPrevious->setIcon( QIcon( prev_xpm ) );
+  myButtonPrevious->setIcon( QIcon( QPixmap( prev_xpm ) ) );
   myButtonPrevious->setAutoDefault(true);
   myButtonPrevious->setEnabled( false );
 
   myButtonNext = new QPushButton( this );
-  myButtonNext->setIcon( QIcon( next_xpm ) );
+  myButtonNext->setIcon( QIcon( QPixmap( next_xpm ) ) );
   myButtonNext->setAutoDefault(true);
   myButtonNext->setEnabled( false );
 

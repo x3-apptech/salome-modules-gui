@@ -76,7 +76,7 @@ QVTK_GenericRenderWindowInteractor
   // Start a one-shot timer for <DELAY> ms. 
   //
   static int DELAY = 1;
-  myTimer->setSingleShot(TRUE);
+  myTimer->setSingleShot(true);
   myTimer->start(DELAY);
   return 1;
 }

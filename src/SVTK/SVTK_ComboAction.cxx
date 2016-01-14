@@ -99,7 +99,7 @@ void SVTK_ComboAction::update()
 {
   QList<QWidget*> aList = createdWidgets();
   for ( QList<QWidget*>::const_iterator it = aList.begin(); it != aList.end(); ++it )
-    updateCombo( qFindChild<QComboBox*>(*it) );
+    updateCombo( (*it)->findChild<QComboBox*>() );
 }
 
 void SVTK_ComboAction::updateCombo( QComboBox* combo )

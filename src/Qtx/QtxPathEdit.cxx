@@ -211,7 +211,7 @@ void QtxPathEdit::onBrowse( bool /*on*/ )
   }
 
   if ( !path.isEmpty() )
-    myPath->setText( QDir::convertSeparators( path ) ); 
+    myPath->setText( QDir::toNativeSeparators( path ) ); 
 
   myPath->setFocus();
 

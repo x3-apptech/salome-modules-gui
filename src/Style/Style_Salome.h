@@ -24,9 +24,12 @@
 #define STYLE_SALOME_H
 
 #include "Style.h"
-
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <QWindowsStyle>
-
+#else
+#include <QCommonStyle>
+#endif
 class Style_Model;
 
 class QApplication;
@@ -34,7 +37,12 @@ class QWidget;
 class QPainter;
 class QtxResourceMgr;
 
-class STYLE_SALOME_EXPORT Style_Salome : public QWindowsStyle
+class STYLE_SALOME_EXPORT Style_Salome
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+: public QWindowsStyle
+#else
+: public QCommonStyle
+#endif
 {
   Q_OBJECT
 
