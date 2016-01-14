@@ -347,6 +347,9 @@ CORBA::Object_ptr SalomeApp_Engine_i::EngineForComponent( const char* theCompone
   if ( !theComponentName || !strlen( theComponentName ) )
     return anEngine._retn();
 
+  if ( SalomeApp_Application::moduleTitle( theComponentName ).isEmpty() )
+    return anEngine._retn();
+
   std::string aPath( "/SalomeAppEngine/" );
   aPath += theComponentName;
   anEngine = namingService()->Resolve( aPath.c_str() );
