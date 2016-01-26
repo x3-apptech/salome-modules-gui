@@ -621,11 +621,15 @@ void QtxWebBrowser::openLink( const QString& fileName, bool force )
   \brief Load URL
   \param url path to the file to be opened in the browser
 */
-void QtxWebBrowser::load( const QString& url )
+void QtxWebBrowser::load( const QString& link )
 {
-  QString u = url;
-  if ( !u.isEmpty() )
-    myWebView->load( QUrl( u.replace('\\', '/') ) );
+  QString linkPath = link;
+  linkPath.replace('\\', '/');
+  QUrl url = linkPath;
+  if ( !url.isEmpty() ) {
+    if ( url.scheme().isEmpty() ) url.setScheme( "file" );
+    myWebView->load( url );
+  }
 }
 
 /*!
