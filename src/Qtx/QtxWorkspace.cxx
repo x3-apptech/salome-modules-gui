@@ -136,3 +136,11 @@ void QtxWorkspace::tileHorizontal()
     x += actualW;
   }
 }
+
+void QtxWorkspace::onSubWindowActivated( QMdiSubWindow* subWindow )
+{
+  QWidget* w = 0;
+  if ( subWindow )
+    w = subWindow->widget();
+  emit windowActivated( w );
+}

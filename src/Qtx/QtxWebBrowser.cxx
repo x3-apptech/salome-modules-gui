@@ -394,10 +394,10 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   connect( myWebView, SIGNAL( linkClicked( QUrl ) ),     SLOT( linkClicked( QUrl ) ) ); 
   connect( myWebView->page(), SIGNAL( linkHovered( QString, QString, QString ) ), 
 	   SLOT( linkHovered( QString, QString, QString ) ) ); 
-  connect( myWebView->pageAction( QWebPage::DownloadLinkToDisk ), SIGNAL( activated() ),
+  connect( myWebView->pageAction( QWebPage::DownloadLinkToDisk ), SIGNAL( triggered() ),
 	   SLOT( linkAction() ) );
   disconnect( myWebView->pageAction( QWebPage::OpenLink ), 0, 0, 0 );
-  connect( myWebView->pageAction( QWebPage::OpenLink ), SIGNAL( activated() ),
+  connect( myWebView->pageAction( QWebPage::OpenLink ), SIGNAL( triggered() ),
 	   SLOT( linkAction() ) );
   
   setCentralWidget( frame );

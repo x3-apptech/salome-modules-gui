@@ -91,10 +91,6 @@ protected:
   virtual void                   zoom( int, int, int, int ) = 0;
   virtual void                   fitAll( bool keepScale = false, bool withZ = true, bool upd = true ) = 0;
 
-// POPUP
-//  void                             onCreatePopup( QPopupMenu* );
-//  void                             onDestroyPopup( QPopupMenu* );
-
 public slots:
   virtual bool                   synchronize( OCCViewer_ViewPort* );
 
