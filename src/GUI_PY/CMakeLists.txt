@@ -46,11 +46,17 @@ SET(_bin_SCRIPTS
   test_dockwidgets.py
 )
 
+SALOME_CONFIGURE_FILE(qtsalome.py.in qtsalome.py)
+
+SET(_gen_SCRIPTS
+    ${CMAKE_CURRENT_BINARY_DIR}/qtsalome.py
+)
+
 # scripts / to install
 
 SET(_all_SCRIPTS ${_other_SCRIPTS} ${_pyuic_SCRIPTS})
 
 # --- rules ---
-
+SALOME_INSTALL_SCRIPTS("${_gen_SCRIPTS}" ${SALOME_INSTALL_PYTHON})
 SALOME_INSTALL_SCRIPTS("${_all_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/salome/gui)
 SALOME_INSTALL_SCRIPTS("${_bin_SCRIPTS}" ${SALOME_INSTALL_SCRIPT_DATA})

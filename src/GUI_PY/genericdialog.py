@@ -21,7 +21,7 @@
 __author__="gboulant"
 __date__ ="$31 mars 2010 17:09:53$"
 
-from PyQt4.QtGui import QDialog, QMessageBox
+from qtsalome import QDialog, QMessageBox
 
 from genericdialog_ui import Ui_GenericDialog
 
@@ -113,10 +113,9 @@ class GenericDialog(QDialog):
 #
 def TEST_GenericDialog():
     import sys
-    from PyQt4.QtGui import QApplication
-    from PyQt4.QtCore import QObject, SIGNAL, SLOT
+    from qtsalome import QApplication, Connect
     app = QApplication(sys.argv)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    Connect(app, "lastWindowClosed()", app, "quit()")
 
     dlg=GenericDialog()
     dlg.displayAndWait()

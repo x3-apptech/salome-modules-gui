@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+QT_SALOME_VERSION=@QT_SALOME_VERSION@
+
+try:
+    from PyQt@QT_SALOME_VERSION@.Qt import *
+except:
+    pass
+
+__CONNECT__ = 0
+__DISCONNECT__ = 1
+
+def Connect(*args):
+    """
+    Connects signal of sender to slot of reciever or function.
+
+    Examples:
+
+    1. Connect(sender, signal, reciever, slot)
+       - sender: sender of the signal
+       - signal: string value in the form 'signal_name(type1,type2,...)'
+       - reciever: reciever of the signal
+       - slot: string value in the form 'slot_name(type1,type2,...)'
+
+    2. Connect(sender, signal, function)
+       - sender: sender of the signal
+       - signal: string value in the form 'signal_name(type1,type2,...)'
+       - function: function instance
+    """
+    if len(args) == 4:
+        _process(args[0], args[1], args[2], args[3], __CONNECT__)
+    elif len(args) == 3:
+        _process(args[0], args[1], None, args[2], __CONNECT__)
+    else:
+        RuntimeError("Bad number of arguments, expected 3 or 4 !!!")
+
+def Disconnect(*args):
+    """
+    Disconnects signal of sender to slot of reciever or function.
+
+    Examples:
+
+    1. Disconnect(sender, signal, reciever, slot)
+       - sender: sender of the signal
+       - signal: string value in the form 'signal_name(type1,type2,...)'
+       - reciever: reciever of the signal
+       - slot: string value in the form 'slot_name(type1,type2,...)'
+
+    2. Disconnect(sender, signal, function)
+       - sender: sender of the signal
+       - signal: string value in the form 'signal_name(type1,type2,...)'
+       - function: function instance
+    """
+    if len(args) == 4:
+        _process(args[0], args[1], args[2], args[3], __DISCONNECT__)
+    elif len(args) == 3:
+        _process(args[0], args[1], None, args[2], __DISCONNECT__)
+    else:
+        RuntimeError("Bad number of arguments, expected 3 or 4 !!!")
+
+def _process(sender,signal,reciever,slot,operation):
+    isFunc = False
+    slotname = ""
+    if isinstance(slot, str):
+        n = slot.find("(")
+        if n > 0:
+            slotname = slot[:n]
+
+    if callable(slot):
+        isFunc = True
+
+    if QT_SALOME_VERSION == 4:
+        _call = None
+        if operation == __CONNECT__:
+            _call = QObject.connect
+        elif operation == __DISCONNECT__:
+            _call = QObject.disconnect
+        if isFunc:
+            _call(sender,SIGNAL(signal),slot)
+        else:
+            _call(sender,SIGNAL(signal),reciever,SLOT(slot))               
+    else:
+        signame = ""
+        n = signal.find("(")
+        if n > 0:
+            signame = signal[:n]
+        
+        tmp = signal[(n+1):]
+        m = tmp.rfind(")")
+        types = tmp[:m]
+        
+        if len(signame) > 0 and (len(slotname) > 0 or isFunc):
+            arg1 = ""
+            arg2 = ""
+            op = ""
+            rcv = ""
+            if len(types.strip()) > 0:
+                arg1 = "[" + types + "]"
+            if operation == __DISCONNECT__:
+                op = "dis"
+            if reciever is not None and not isFunc:
+                rcv= "reciever."            
+            if isFunc:
+                arg2 = "slot"
+            else:
+                arg2 = slotname
+
+            command = "sender." + signame + arg1 + "." + op + "connect(" + rcv + arg2 + ")"
+            exec(command)
+        else:
+            raise RuntimeError("Bad signal '%s' or slot '%s' format !!!"%(signal, slot))
