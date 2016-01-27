@@ -207,7 +207,7 @@ class PluginsManager:
 
         self.menu.menuAction().setVisible(False)
 
-        Connect(self.basemenu, "aboutToShow()", self.importPlugins)
+        self.basemenu.aboutToShow.connect(self.importPlugins)
 
     def analyseFile(self,filename):
       """

@@ -19,18 +19,15 @@
 #
 # Author : Guillaume Boulant (EDF)
 
+from qtsalome import *
+
 def minmax(context):
   # get context study, studyId, salomeGui
   study = context.study
   studyId = context.studyId
   sg = context.sg
 
-  from PyQt4.QtGui import QDialog
-  from PyQt4.QtGui import QMessageBox
-  from PyQt4.QtCore import Qt
-  from PyQt4.QtCore import SIGNAL
-
-  from minmax_dialog import Ui_Dialog
+  from minmax_ui import Ui_Dialog
 
   import salome
   import SMESH
@@ -86,7 +83,7 @@ def minmax(context):
       self.clearLineEdit()
 
       # Connect up the selectionChanged() event of the object browser.
-      self.connect(sg.getObjectBrowser(), SIGNAL("selectionChanged()"), self.select)
+      sg.getObjectBrowser().selectionChanged.connect(self.select)
 
       self.mm = None
       self.ui.control.setFocus()
@@ -95,7 +92,7 @@ def minmax(context):
       pass
 
     def OnCancel(self):
-      self.disconnect(sg.getObjectBrowser(), SIGNAL("selectionChanged()"), self.select)
+      sg.getObjectBrowser().selectionChanged.disconnect(self.select)
       self.reject()
       pass
 
@@ -106,7 +103,7 @@ def minmax(context):
       self.ui.maxvalue.setText("")
 
     def select(self):
-      self.disconnect(sg.getObjectBrowser(), SIGNAL("selectionChanged()"), self.select)
+      sg.getObjectBrowser().selectionChanged.disconnect(self.select)
       self.ui.control.clear()
       self.ui.minvalue.setText("")
       self.ui.maxvalue.setText("")
@@ -141,7 +138,7 @@ def minmax(context):
             pass
           self.ui.control.addItems(controls)
           self.compute_minmax()
-      self.connect(sg.getObjectBrowser(), SIGNAL("selectionChanged()"), self.select)
+      sg.getObjectBrowser().selectionChanged.connect(self.select)
       pass
 
     def helpMessage(self):

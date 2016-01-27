@@ -20,69 +20,68 @@
 # Author : Guillaume Boulant (EDF)
 
 import sys
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from qtsalome import *
 
 
-class TubeDialog_UI(QtGui.QDialog):
+class TubeDialog_UI(QDialog):
     """
     This class defines the design of a Qt dialog box dedicated to the
     salome plugin examples. It presents a UI form that contains
     parameters for the spatial dimensions of geometrical object.  
     """
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.setupUi()
 
     def setupUi(self):
         self.setObjectName("Dialog")
         self.resize(400, 300)
-        self.hboxlayout = QtGui.QHBoxLayout(self)
-        self.hboxlayout.setMargin(9)
+        self.hboxlayout = QHBoxLayout(self)
+        self.hboxlayout.setContentsMargins(9,9,9,9)
         self.hboxlayout.setSpacing(6)
         self.hboxlayout.setObjectName("hboxlayout")
-        self.vboxlayout = QtGui.QVBoxLayout()
-        self.vboxlayout.setMargin(0)
+        self.vboxlayout = QVBoxLayout()
+        self.vboxlayout.setContentsMargins(0,0,0,0)
         self.vboxlayout.setSpacing(6)
         self.vboxlayout.setObjectName("vboxlayout")
-        self.hboxlayout1 = QtGui.QHBoxLayout()
-        self.hboxlayout1.setMargin(0)
+        self.hboxlayout1 = QHBoxLayout()
+        self.hboxlayout1.setContentsMargins(0,0,0,0)
         self.hboxlayout1.setSpacing(6)
         self.hboxlayout1.setObjectName("hboxlayout1")
-        self.vboxlayout1 = QtGui.QVBoxLayout()
-        self.vboxlayout1.setMargin(0)
+        self.vboxlayout1 = QVBoxLayout()
+        self.vboxlayout1.setContentsMargins(0,0,0,0)
         self.vboxlayout1.setSpacing(6)
         self.vboxlayout1.setObjectName("vboxlayout1")
-        self.lblRadius = QtGui.QLabel(self)
+        self.lblRadius = QLabel(self)
         self.lblRadius.setObjectName("lblRadius")
         self.vboxlayout1.addWidget(self.lblRadius)
-        self.lblLength = QtGui.QLabel(self)
+        self.lblLength = QLabel(self)
         self.lblLength.setObjectName("lblLength")
         self.vboxlayout1.addWidget(self.lblLength)
-        self.lblWidth = QtGui.QLabel(self)
+        self.lblWidth = QLabel(self)
         self.lblWidth.setObjectName("lblWidth")
         self.vboxlayout1.addWidget(self.lblWidth)
         self.hboxlayout1.addLayout(self.vboxlayout1)
-        self.vboxlayout2 = QtGui.QVBoxLayout()
-        self.vboxlayout2.setMargin(0)
+        self.vboxlayout2 = QVBoxLayout()
+        self.vboxlayout2.setContentsMargins(0,0,0,0)
         self.vboxlayout2.setSpacing(6)
         self.vboxlayout2.setObjectName("vboxlayout2")
-        self.txtRadius = QtGui.QLineEdit(self)
+        self.txtRadius = QLineEdit(self)
         self.txtRadius.setObjectName("txtRadius")
         self.vboxlayout2.addWidget(self.txtRadius)
-        self.txtLength = QtGui.QLineEdit(self)
+        self.txtLength = QLineEdit(self)
         self.txtLength.setObjectName("txtLength")
         self.vboxlayout2.addWidget(self.txtLength)
-        self.txtWidth = QtGui.QLineEdit(self)
+        self.txtWidth = QLineEdit(self)
         self.txtWidth.setObjectName("txtWidth")
         self.vboxlayout2.addWidget(self.txtWidth)
         self.hboxlayout1.addLayout(self.vboxlayout2)
         self.vboxlayout.addLayout(self.hboxlayout1)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.vboxlayout.addItem(spacerItem)
-        self.buttonBox = QtGui.QDialogButtonBox(self)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.NoButton|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.NoButton|QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.vboxlayout.addWidget(self.buttonBox)
         self.hboxlayout.addLayout(self.vboxlayout)
@@ -98,10 +97,9 @@ class TubeDialog_UI(QtGui.QDialog):
 # ======================================================================
 #
 def main( args ):
-    a = QtGui.QApplication(sys.argv)
+    a = QApplication(sys.argv)
     tubedialog = TubeDialog_UI()
     sys.exit(tubedialog.exec_())
 
 if __name__=="__main__":
     main(sys.argv)
-

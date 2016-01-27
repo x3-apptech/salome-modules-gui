@@ -113,9 +113,9 @@ class GenericDialog(QDialog):
 #
 def TEST_GenericDialog():
     import sys
-    from qtsalome import QApplication, Connect
+    from qtsalome import QApplication
     app = QApplication(sys.argv)
-    Connect(app, "lastWindowClosed()", app, "quit()")
+    app.lastWindowClosed.connect(app.quit)
 
     dlg=GenericDialog()
     dlg.displayAndWait()
