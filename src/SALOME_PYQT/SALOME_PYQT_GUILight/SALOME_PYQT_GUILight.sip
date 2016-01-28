@@ -27,4 +27,4 @@
 %If (Qt_5_0_0 -)
 %Import QtWidgets/QtWidgetsmod.sip
 %End
-%Import QtXmlmod.sip
+%Import QtXml/QtXmlmod.sip

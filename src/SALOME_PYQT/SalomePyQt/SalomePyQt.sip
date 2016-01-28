@@ -33,7 +33,7 @@
 %If (Qt_5_0_0 -)
 %Import QtWidgets/QtWidgetsmod.sip
 %End
-%Import QtXmlmod.sip
+%Import QtXml/QtXmlmod.sip
 
 %If (ENABLE_PLOT2D)
 %Include SalomePyQt_Plot2d.sip

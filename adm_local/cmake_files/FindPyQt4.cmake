@@ -25,7 +25,6 @@
 #    PYQT_PYRCC_PATH        - command to launch pyrcc with the correct PYTHONPATH
 #    PYQT_PYTHONPATH        - path to the PyQt Python modules
 #    PYQT_SIPS_DIR          - path to main include directory (which contains several sub folders)
-#    PYQT_INCLUDE_DIRS      - list of paths to include when compiling (all rooted on PYQT_SIP_DIRS)
 #    PYQT_SIPFLAGS          - compilation flags extracted from PyQt
 #
 #  The executables
@@ -77,25 +76,8 @@ sys.stdout.write(pyqtconfig.Configuration().pyqt_sip_flags)"
   OUTPUT_VARIABLE PYQT_SIPFLAGS)
 SEPARATE_ARGUMENTS(PYQT_SIPFLAGS)
 
-SET(PYQT_INCLUDE_DIRS
-  "${PYQT_SIPS_DIR}"
-  "${PYQT_SIPS_DIR}/QtCore"
-  "${PYQT_SIPS_DIR}/QtGui"
-  "${PYQT_SIPS_DIR}/QtXml"
-  "${PYQT_SIPS_DIR}/QtOpenGL"
-  "${PYQT_SIPS_DIR}/QtAssistant"
-  "${PYQT_SIPS_DIR}/QtDesigner"
-  "${PYQT_SIPS_DIR}/QtNetwork"
-  "${PYQT_SIPS_DIR}/QtSql"
-  "${PYQT_SIPS_DIR}/QtSvg"
-  "${PYQT_SIPS_DIR}/QtTest"
-)
-
 SET(PYQT_CXX_EXT ".cc")
-SET(PYQT_SIPFLAGS ${PYQT_SIPFLAGS} -s ${PYQT_CXX_EXT} -c .)
-FOREACH(_dir ${PYQT_INCLUDE_DIRS})
-  LIST(APPEND PYQT_SIPFLAGS -I ${_dir})
-ENDFOREACH()
+SET(PYQT_SIPFLAGS ${PYQT_SIPFLAGS} -s ${PYQT_CXX_EXT} -I "${PYQT_SIPS_DIR}" -c .)
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(PyQt4 REQUIRED_VARS PYQT_PYUIC_EXECUTABLE PYQT_PYRCC_EXECUTABLE PYQT_SIPS_DIR PYQT_SIPFLAGS )
