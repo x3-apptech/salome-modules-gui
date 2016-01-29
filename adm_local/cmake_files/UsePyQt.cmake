@@ -116,13 +116,9 @@ ENDMACRO(PYQT_WRAP_UIC)
 #
 # Generate C++ wrappings for *.sip files by processing them with sip.
 #
-# USAGE: PYQT_WRAP_SIP(output_files sip_file [sip_file ...])
+# USAGE: PYQT_WRAP_SIP(output_files sip_file [sip_file...] [OPTIONS options] [SOURCES sources])
 #
-# ARGUMENTS:
-#   output_files [out] variable where output file names are listed to
-#   sip_file     [in]  input sip file (a sequence can be provided)
-# 
-# NOTES: See SIP_WRAP_SIP macro from UseSIP.cmake.
+# NOTES: See SIP_WRAP_SIP macro from UseSIP.cmake for the usage description.
 # 
 ####################################################################
 MACRO(PYQT_WRAP_SIP outfiles)
