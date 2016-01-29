@@ -28,8 +28,8 @@
 %Feature ENABLE_CORBA
 %Feature ENABLE_PLOT2D
 
-%Import QtGuimod.sip
-%Import QtXmlmod.sip
+%Import QtGui/QtGuimod.sip
+%Import QtXml/QtXmlmod.sip
 
 %If (ENABLE_PLOT2D)
 %Include SalomePyQt_Plot2d.sip
