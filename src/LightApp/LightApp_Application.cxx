@@ -2241,6 +2241,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .... -> ascii save mode
   pref->addPreference( tr( "PREF_ASCII_FILE" ), studyGroup, LightApp_Preferences::Bool, "Study", "ascii_file" );
   // .... -> store windows geometry
+  pref->addPreference( tr( "PREF_LOAD_LIGHT" ), studyGroup, LightApp_Preferences::Bool, "Study", "autoload_light_modules" );
   pref->addPreference( tr( "PREF_STORE_POS" ),  studyGroup, LightApp_Preferences::Bool, "Study", "store_positions" );
   pref->addPreference( "", studyGroup, LightApp_Preferences::Space );
   pref->addPreference( tr( "PREF_STORE_TOOL_POS" ),  studyGroup, LightApp_Preferences::Bool, "Study", "store_tool_positions" );
