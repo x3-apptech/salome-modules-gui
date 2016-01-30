@@ -176,13 +176,10 @@ int SalomeApp_VisualState::storeState()
   CAM_Module* module = 0;
   while ( itM.hasNext() ) {
     module = itM.next();
-    //DEBTRACE("---");
     if ( !module ) continue;
-    //DEBTRACE("--- " << module->name().toStdString());
 
 
     if ( LightApp_Module* lModule = dynamic_cast<LightApp_Module*>( module ) ) {
-      //DEBTRACE("AP_MODULES_LIST append " << lModule->moduleName().toStdString());
       ip->append( "AP_MODULES_LIST", lModule->moduleName().toStdString() );
       if ( SalomeApp_Module* sModule = dynamic_cast<SalomeApp_Module*>( module ) )
         sModule->storeVisualParameters( savePoint );
