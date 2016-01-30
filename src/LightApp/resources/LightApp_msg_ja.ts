@@ -156,6 +156,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>VTK 3D Viewer</translation>
     </message>
     <message>
+      <source>PREF_LOAD_LIGHT</source>
+      <translation>Automatic loading of light modules when opening study</translation>
+    </message>
+    <message>
       <source>PREF_STORE_POS</source>
       <translation>ウィンドウの位置を保存</translation>
     </message>
