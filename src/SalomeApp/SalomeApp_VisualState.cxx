@@ -26,7 +26,8 @@
 #include "SalomeApp_Study.h"
 #include "SalomeApp_Application.h"
 
-//#include <SUIT_ResourceMgr.h>
+#include <SUIT_Session.h>
+#include <SUIT_ResourceMgr.h>
 #include <SUIT_ViewManager.h>
 #include <SUIT_ViewWindow.h>
 #include <QtxWorkstack.h>
@@ -174,13 +175,17 @@ int SalomeApp_VisualState::storeState()
   myApp->modules( mlist );
   QListIterator<CAM_Module*> itM( mlist );
   CAM_Module* module = 0;
+  SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
+  bool loadLight = aResMgr->booleanValue( "Study", "autoload_light_modules", true );
+
   while ( itM.hasNext() ) {
     module = itM.next();
     if ( !module ) continue;
 
 
     if ( LightApp_Module* lModule = dynamic_cast<LightApp_Module*>( module ) ) {
-      ip->append( "AP_MODULES_LIST", lModule->moduleName().toStdString() );
+      if (loadLight)
+        ip->append( "AP_MODULES_LIST", lModule->moduleName().toStdString() );
       if ( SalomeApp_Module* sModule = dynamic_cast<SalomeApp_Module*>( module ) )
         sModule->storeVisualParameters( savePoint );
     }

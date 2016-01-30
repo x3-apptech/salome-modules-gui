@@ -125,6 +125,7 @@
   </section>
   <section name="Study">
     <!-- General study settings -->
+    <parameter name="autoload_light_modules"    value="true" />
     <parameter name="store_positions"    value="true" />
     <parameter name="store_tool_positions"     value="true" />
     <parameter name="auto_save_interval" value="0" />

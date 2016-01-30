@@ -156,6 +156,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène VTK 3D</translation>
     </message>
     <message>
+        <source>PREF_LOAD_LIGHT</source>
+        <translation>Chargement automatique des modules Light à l'ouverture d'étude</translation>
+    </message>
+    <message>
         <source>PREF_STORE_POS</source>
         <translation>Enregistrer la position des fenêtres</translation>
     </message>

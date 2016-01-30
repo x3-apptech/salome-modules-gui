@@ -59,6 +59,9 @@ the whole GUI SALOME session.
     the SALOME platform. 
   - <b>ASCII save</b> - if checked in, your study will be saved in
     ASCII format file (or files).
+  - <b>Automatic loading of light modules when opening study</b> -  if checked in, 
+    Light Modules of the current study will be automatically loaded at the next study
+    opening, allowing completion of object browser.
   - <b>Store positions of windows</b> -  if checked in, positions of windows
     will be saved in a special file at the end of the current session and
     then restored for a new session.
